@@ -292,8 +292,8 @@ address,function,file,kind,target
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetVisibleEnemiesInRadius]"
-0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
+0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,RecordNanoParticles
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,call,operator->
@@ -338,12 +338,12 @@ address,function,file,kind,target
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,AddOrder
-0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,GridCell
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::SetUnit
+0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,RecordBuildMenuUpdate
+0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,RecordNanoParticles
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
-0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,UpdateBuildMenuIfFocusUnit
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,get
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,operator Unit *
@@ -424,7 +424,7 @@ address,function,file,kind,target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
-0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,UpdateBuildMenuIfFocusUnit
+0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,RecordBuildMenuUpdate
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,operator WeaponDef *
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_maybe_written,Unit::resourceSlot
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_read,EconomySeam::RequestEnergyAndMetal
@@ -461,11 +461,11 @@ address,function,file,kind,target
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,AddOrder
 0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,GetOrderType
-0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,MarkSelectionOrdersDirty
 0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,Order::Position
 0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,Order::Target
 0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,Order::Wait
+0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,RecordSelectionOrdersDirty
 0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,Unit::Ready
 0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,operator Order *
 0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,operator bool
@@ -696,13 +696,13 @@ address,function,file,kind,target
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,AddOrder
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,CellToWorld
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,Definitions
-0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
-0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,MarkSelectionOrdersDirty
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::SetUnit
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,PosPlus
+0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,RecordNanoParticles
+0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,RecordSelectionOrdersDirty
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
@@ -764,11 +764,11 @@ address,function,file,kind,target
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
-0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
-0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,MarkSelectionOrdersDirty
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,Order::AttachRingApproachGoal
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
+0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,RecordNanoParticles
+0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,RecordSelectionOrdersDirty
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
@@ -809,12 +809,12 @@ address,function,file,kind,target
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, float) __attribute__((stdcall)) [UnitsSeam::AddBuildProgress]"
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
-0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,EmitReverseNanoParticles
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::Get
+0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,RecordReverseNanoParticles
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,StopBuildingScript
@@ -884,12 +884,12 @@ address,function,file,kind,target
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,ComputeReclaimDamagePulse
-0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,EmitReverseNanoParticles
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::Get
+0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,RecordReverseNanoParticles
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,SquaredDistance
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
@@ -945,11 +945,11 @@ address,function,file,kind,target
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int, int, unsigned short) __attribute__((stdcall)) [WeaponsSeam::DamageUnit]"
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x404730,ReclaimUnitOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
-0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,EmitReverseNanoParticles
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,RecordReverseNanoParticles
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
@@ -1003,14 +1003,14 @@ address,function,file,kind,target
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,AppendOrder
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,BroadcastPacket
-0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,GetOrderType
-0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,MarkSelectionOrdersDirty
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::SetUnit
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,RecordNanoParticles
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,RecordSelectionOrdersDirty
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
@@ -1111,12 +1111,12 @@ address,function,file,kind,target
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
-0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Order::AttachBuildFootprintMarker
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,RecordNanoParticles
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,StopBuildingScript
@@ -1179,9 +1179,9 @@ address,function,file,kind,target
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, float) __attribute__((stdcall)) [UnitsSeam::AddRepairProgress]"
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
-0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,EmitNanoParticles
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::Get
+0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,RecordNanoParticles
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x405740,RepairUnitNoMoveOrder,src/orders/unit_orders.cpp,call,operator->
@@ -1469,7 +1469,7 @@ address,function,file,kind,target
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,global_read,g_seams
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,call,Add
-0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,call,EmitTeleportParticles
+0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,call,RecordTeleportParticles
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,call,Sub
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,call,get
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,call,operator Unit *
@@ -1479,11 +1479,11 @@ address,function,file,kind,target
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_escape,Unit::pos
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_escape,UnitDef::modelMaxX
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_escape,UnitDef::modelMinX
-0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_maybe_written,Unit::pos
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,Game::units
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,Game::unitsEnd
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,Seams::units
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,Unit::def
+0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,Unit::pos
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,UnitsSeam::SetUnitPosition
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,Vec3::x
 0x406aa0,TeleportOrder,src/orders/unit_orders.cpp,field_read,Vec3::y
@@ -3997,9 +3997,7 @@ address,function,file,kind,target
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,AddVec3
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,AngleOfVector
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,CellToWorldPos
-0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,EmitNanoParticles
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,GetHeadingBetween
-0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,MarkSelectionOrdersDirty
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,Offset
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
@@ -4009,6 +4007,8 @@ address,function,file,kind,target
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetHeading
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PathOrderAttach::SetUnit
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,PosMinus
+0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,RecordNanoParticles
+0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,RecordSelectionOrdersDirty
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,StartBuildingScript
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
@@ -4083,9 +4083,7 @@ address,function,file,kind,target
 0x414350,CellToWorldPos,src/orders/vtol_orders.cpp,field_write,Vec3::z
 0x414350,CellToWorldPos,src/orders/vtol_orders.cpp,function,
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,AddVec3
-0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,EmitNanoParticles
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,GetHeadingBetween
-0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,MarkSelectionOrdersDirty
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,Offset
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
@@ -4094,6 +4092,8 @@ address,function,file,kind,target
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetHeading
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,PosMinus
+0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,RecordNanoParticles
+0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,RecordSelectionOrdersDirty
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,StartBuildingScript
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
@@ -4140,11 +4140,11 @@ address,function,file,kind,target
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
 0x414380,VtolHelpBuildOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
-0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,EmitReverseNanoParticles
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
+0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,RecordReverseNanoParticles
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator new
@@ -4198,11 +4198,11 @@ address,function,file,kind,target
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,CellToWorldPos
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,ComputeReclaimDamagePulse
-0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,EmitReverseNanoParticles
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
+0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,RecordReverseNanoParticles
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,Square
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,call,Sub
@@ -4253,12 +4253,12 @@ address,function,file,kind,target
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanReclaim]"
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int, int, unsigned short) __attribute__((stdcall)) [WeaponsSeam::DamageUnit]"
 0x414a80,VtolReclaimUnitOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
-0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,EmitNanoParticles
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
+0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,RecordNanoParticles
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,_hypot
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator Unit *
@@ -5739,15 +5739,12 @@ address,function,file,kind,target
 0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel.cpp,global_read,g_game
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,AttachUnitToPiece
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,BroadcastBuilderLink
-0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,IsScreenNamed
-0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,MarkChanged
-0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,RefreshBuildCountTexts
+0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,RecordBuildMenuUpdate
+0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,RecordGuiChangedIfScreen
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,Unit::SetStateBits
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,get
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,operator!=
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,operator->
-0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_maybe_written,Game::gui
-0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Game::unitIndex
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Orders::raw
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Player::active
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Player::type
@@ -5755,7 +5752,6 @@ address,function,file,kind,target
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Unit::carrier
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Unit::def
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Unit::flags
-0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Unit::id
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Unit::player
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,Unit::state
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,field_read,UnitDef::b18
@@ -7725,8 +7721,8 @@ address,function,file,kind,target
 0x423bf0,ReplaceFeatureWithBurnt,src/map/features.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
 0x423c50,PlaceFeature,src/map/features.cpp,call,AllocFeatureSpot
 0x423c50,PlaceFeature,src/map/features.cpp,call,CreateObjectState
-0x423c50,PlaceFeature,src/map/features.cpp,call,EmitTimedSubParticles
 0x423c50,PlaceFeature,src/map/features.cpp,call,GetFootprintCentre
+0x423c50,PlaceFeature,src/map/features.cpp,call,RecordTimedSubParticles
 0x423c50,PlaceFeature,src/map/features.cpp,call,RemoveFeature
 0x423c50,PlaceFeature,src/map/features.cpp,call,memset
 0x423c50,PlaceFeature,src/map/features.cpp,call,operator Cell *
@@ -20768,7 +20764,6 @@ address,function,file,kind,target
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,CountActiveAIPlayers
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,CountCombatPlayers
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,FindHostSlot
-0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,FocusCommander
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,HasMorePlayerSlots
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,IsPlayerSlotInRange
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,LoadGuiLayer
@@ -20776,6 +20771,7 @@ address,function,file,kind,target
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,MissionConditions::CheckVictory
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,OpenMessageBox
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,RandomInt
+0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,RecordFocusCommander
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,RenderLayer
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,SendPlayerEconomy
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,call,SetKeyboardInput
@@ -25749,10 +25745,10 @@ address,function,file,kind,target
 0x480e90,UnitScript::ExplodeLegacy,src/units/unit_script.cpp,function,
 0x480ea0,UnitScript::PlaySoundNoop,src/units/unit_script.cpp,function,
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,EmitBlackSmoke
-0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,EmitBubbles
-0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,EmitThrustParticles
-0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,EmitWakeParticles
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,EmitWhiteSmoke
+0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,RecordBubbles
+0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,RecordThrustParticles
+0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,RecordWakeParticles
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,UpdateObjectState
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,operator int *
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,operator->
@@ -27113,7 +27109,7 @@ address,function,file,kind,target
 0x4864b0,KillUnit,src/units/units.cpp,call,BroadcastPacket
 0x4864b0,KillUnit,src/units/units.cpp,call,CobScript::QueryScript
 0x4864b0,KillUnit,src/units/units.cpp,call,GetSlotDpid
-0x4864b0,KillUnit,src/units/units.cpp,call,PopUntilNamedLayout
+0x4864b0,KillUnit,src/units/units.cpp,call,RecordPopToGameLayout
 0x4864b0,KillUnit,src/units/units.cpp,call,_strcmpi
 0x4864b0,KillUnit,src/units/units.cpp,call,get
 0x4864b0,KillUnit,src/units/units.cpp,call,operator->
@@ -27153,9 +27149,7 @@ address,function,file,kind,target
 0x4864b0,KillUnit,src/units/units.cpp,global_read,g_game
 0x4864b0,KillUnit,src/units/units.cpp,global_read,g_seams
 0x4864b0,KillUnit,src/units/units.cpp,indirect_call,indirect via void (*)(unsigned char) __attribute__((stdcall)) [PlayersSeam::KillPlayerUnits]
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,AddCdActivitySample
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,AddMessage
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,AnnounceForcesDestroyed
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,AnnouncePlayerLeft
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,AttachUnitToPiece
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,ClearUnitRefs
@@ -27163,15 +27157,16 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,CobScript::~CobScript
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,CreateUnitCorpse
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,FindSlotByDpid
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,FlashScorePanelKillLoss
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,FreeObjectState
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordCdActivity
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordForcesDestroyed
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordScoreFlash
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RemoveSpeechOfUnit
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,Translate
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,_strcmpi
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,get
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,operator Mission *
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,operator MissionConditions *
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,operator Player *
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,operator SpotState *
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,operator Unit *
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,operator UnitMotion *
@@ -27188,7 +27183,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Unit::pos
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,UnitDef::unitname
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_maybe_written,Player::name
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,<anon>::b7
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,AiSeam::SetUnitSquad
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::commanderDeath
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::defs
@@ -28063,7 +28057,7 @@ address,function,file,kind,target
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_write,UnitDamagePacketOut::type
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,field_write,UnitDamagePacketOut::victimId
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,function,
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,AddCdActivitySample
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,RecordCdActivity
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,ScaledCos
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,ScaledSin
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,get
@@ -28336,7 +28330,7 @@ address,function,file,kind,target
 0x48aac0,AttachUnitToPiece,src/units/unit_position.cpp,field_write,OrderView::param2
 0x48aac0,AttachUnitToPiece,src/units/unit_position.cpp,field_write,OrderView::type
 0x48aac0,AttachUnitToPiece,src/units/unit_position.cpp,function,
-0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,DeselectIfIneligible
+0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,RecordDeselectIfIneligible
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,get
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,operator Unit *
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,operator!=
@@ -28460,7 +28454,7 @@ address,function,file,kind,target
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,BroadcastPacket
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,CobScript::StartScript
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,LostBits
-0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,MarkSelectionOrdersDirty
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,RecordSelectionOrdersDirty
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,RecordUnitSpeech
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,Unit::GetState
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,get
@@ -29229,7 +29223,7 @@ address,function,file,kind,target
 0x48ea10,MissionCondition::OnUnitDied,src/game/victory.cpp,function,
 0x48ea20,MissionCondition::OnUnitCaptured,src/game/victory.cpp,function,
 0x48ea30,MissionCondition::OnUnitCreated,src/game/victory.cpp,function,
-0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,call,PlaySoundByName
+0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,call,RecordSound
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,call,_strcmpi
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,call,get
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,call,operator->
@@ -29263,7 +29257,7 @@ address,function,file,kind,target
 0x48eb00,VictoryKillEnemyCommander::LoadState,src/game/victory.cpp,global_maybe_written,g_celebratedKey
 0x48eb00,VictoryKillEnemyCommander::LoadState,src/game/victory.cpp,global_maybe_written,g_killEnemyCommanderKey
 0x48eb00,VictoryKillEnemyCommander::LoadState,src/game/victory.cpp,global_maybe_written,g_satisfiedKey
-0x48eb40,VictoryDestroyAllUnits::IsSatisfied,src/game/victory.cpp,call,PlaySoundByName
+0x48eb40,VictoryDestroyAllUnits::IsSatisfied,src/game/victory.cpp,call,RecordSound
 0x48eb40,VictoryDestroyAllUnits::IsSatisfied,src/game/victory.cpp,field_read,Game::field_1df2
 0x48eb40,VictoryDestroyAllUnits::IsSatisfied,src/game/victory.cpp,field_read,MissionCondition::celebrated
 0x48eb40,VictoryDestroyAllUnits::IsSatisfied,src/game/victory.cpp,field_write,MissionCondition::celebrated
@@ -29287,7 +29281,7 @@ address,function,file,kind,target
 0x48ec00,VictoryKillAllMobileUnits::VisitUnit,src/game/victory.cpp,field_read,VictoryKillAllMobileUnits::numUnits
 0x48ec00,VictoryKillAllMobileUnits::VisitUnit,src/game/victory.cpp,field_write,VictoryKillAllMobileUnits::numUnits
 0x48ec00,VictoryKillAllMobileUnits::VisitUnit,src/game/victory.cpp,function,
-0x48ec20,VictoryKillAllMobileUnits::OnUnitDied,src/game/victory.cpp,call,PlaySoundByName
+0x48ec20,VictoryKillAllMobileUnits::OnUnitDied,src/game/victory.cpp,call,RecordSound
 0x48ec20,VictoryKillAllMobileUnits::OnUnitDied,src/game/victory.cpp,call,UnitList::ForEach
 0x48ec20,VictoryKillAllMobileUnits::OnUnitDied,src/game/victory.cpp,call,operator!=
 0x48ec20,VictoryKillAllMobileUnits::OnUnitDied,src/game/victory.cpp,deref_read,*UnitList
@@ -29316,7 +29310,7 @@ address,function,file,kind,target
 0x48ed00,VictoryKillAllMobileUnits::LoadState,src/game/victory.cpp,field_write,MissionCondition::satisfied
 0x48ed00,VictoryKillAllMobileUnits::LoadState,src/game/victory.cpp,field_write,VictoryKillAllMobileUnits::numUnits
 0x48ed00,VictoryKillAllMobileUnits::LoadState,src/game/victory.cpp,function,
-0x48ed50,VictoryBuildUnitType::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
+0x48ed50,VictoryBuildUnitType::VisitUnit,src/game/victory.cpp,call,RecordSound
 0x48ed50,VictoryBuildUnitType::VisitUnit,src/game/victory.cpp,field_read,MissionCondition::celebrated
 0x48ed50,VictoryBuildUnitType::VisitUnit,src/game/victory.cpp,field_read,MissionCondition::satisfied
 0x48ed50,VictoryBuildUnitType::VisitUnit,src/game/victory.cpp,field_read,Unit::buildLeft
@@ -29350,7 +29344,7 @@ address,function,file,kind,target
 0x48ee70,VictoryBuildUnitType::LoadState,src/game/victory.cpp,global_maybe_written,g_buildUnitTypeKey
 0x48ee70,VictoryBuildUnitType::LoadState,src/game/victory.cpp,global_maybe_written,g_celebratedKey
 0x48ee70,VictoryBuildUnitType::LoadState,src/game/victory.cpp,global_maybe_written,g_satisfiedKey
-0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,PlaySoundByName
+0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,RecordSound
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,_strcmpi
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,operator->
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,field_escape,UnitDef::unitname
@@ -29376,7 +29370,7 @@ address,function,file,kind,target
 0x48ef80,VictoryKillAllOfType::VisitUnit,src/game/victory.cpp,field_read,VictoryKillAllOfType::id
 0x48ef80,VictoryKillAllOfType::VisitUnit,src/game/victory.cpp,field_write,VictoryKillAllOfType::count
 0x48ef80,VictoryKillAllOfType::VisitUnit,src/game/victory.cpp,function,
-0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,PlaySoundByName
+0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,RecordSound
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,UnitList::ForEach
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,_strcmpi
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,operator->
@@ -29408,7 +29402,7 @@ address,function,file,kind,target
 0x48f0b0,VictoryKillAllOfType::LoadState,src/game/victory.cpp,field_write,MissionCondition::celebrated
 0x48f0b0,VictoryKillAllOfType::LoadState,src/game/victory.cpp,field_write,MissionCondition::satisfied
 0x48f0b0,VictoryKillAllOfType::LoadState,src/game/victory.cpp,function,
-0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,PlaySoundByName
+0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,RecordSound
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,_strcmpi
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,operator->
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,field_escape,UnitDef::unitname
@@ -29455,7 +29449,7 @@ address,function,file,kind,target
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,global_read,g_seams
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,indirect_call,"indirect via void (*)(int, int, Vec3 *) __attribute__((stdcall)) [LosRadarSeam::ClampWorldPosToTerrain]"
-0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
+0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,RecordSound
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,_strcmpi
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,operator->
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,operator==
@@ -29482,7 +29476,7 @@ address,function,file,kind,target
 0x48f330,VictoryMoveUnitToRadius::LoadState,src/game/victory.cpp,field_write,MissionCondition::celebrated
 0x48f330,VictoryMoveUnitToRadius::LoadState,src/game/victory.cpp,field_write,MissionCondition::satisfied
 0x48f330,VictoryMoveUnitToRadius::LoadState,src/game/victory.cpp,function,
-0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
+0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,RecordSound
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,_strcmpi
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,abs
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,operator->
@@ -29512,7 +29506,7 @@ address,function,file,kind,target
 0x48f480,VictoryUnitTypePassesX::LoadState,src/game/victory.cpp,field_write,MissionCondition::celebrated
 0x48f480,VictoryUnitTypePassesX::LoadState,src/game/victory.cpp,field_write,MissionCondition::satisfied
 0x48f480,VictoryUnitTypePassesX::LoadState,src/game/victory.cpp,function,
-0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
+0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,RecordSound
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,_strcmpi
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,abs
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,operator->
@@ -32358,12 +32352,12 @@ address,function,file,kind,target
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_write,Projectile::flags
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,function,
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,global_read,g_game
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,AccumulateScreenShake
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,AddExplosionEffect
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,ApplyAreaDamage
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,ApplyWeaponDamage
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,EmitWhiteSmoke
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,PlaySoundAt
+0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,RecordScreenShake
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator SquadManager *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator Unit *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator WeaponDef *
@@ -32972,8 +32966,8 @@ address,function,file,kind,target
 0x49c980,CopyWeaponVelocityParam,src/weapons/weapons.cpp,field_write,Projectile::speed
 0x49c980,CopyWeaponVelocityParam,src/weapons/weapons.cpp,function,
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,AngleOfVector
-0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,EmitWeaponSmoke
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,InitProjectile
+0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,RecordWeaponSmoke
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,ScaledCos
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,ScaledSin
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,bx_hypot
@@ -32982,6 +32976,7 @@ address,function,file,kind,target
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,operator->
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,operator=
+0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,deref_read,*Vec3
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,<anon>::halves
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,<anon>::startSmoke
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,field_read,<anon>::value
@@ -33028,8 +33023,8 @@ address,function,file,kind,target
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,global_read,g_seams
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *, Callback *, int) __attribute__((stdcall)) [UnitsSeam::StartScript]"
-0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,call,EmitWeaponSmoke
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,call,InitProjectile
+0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,call,RecordWeaponSmoke
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,call,ScaledCos
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,call,ScaledSin
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,call,get
@@ -33039,6 +33034,7 @@ address,function,file,kind,target
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,call,operator->
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,call,operator=
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,deref_escape,*Projectile
+0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,deref_read,*Vec3
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_maybe_written,Projectile::direction
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,<anon>::noAutoRange
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,field_read,<anon>::startSmoke
@@ -33078,8 +33074,8 @@ address,function,file,kind,target
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,global_read,g_seams
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
 0x49cc20,FireVLaunchProjectile,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *, Callback *, int) __attribute__((stdcall)) [UnitsSeam::StartScript]"
-0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,EmitWeaponSmoke
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,InitProjectile
+0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,RecordWeaponSmoke
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,ScaledCos
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,ScaledSin
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,bx_hypot
@@ -33089,6 +33085,7 @@ address,function,file,kind,target
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,operator->
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,operator=
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,deref_escape,*Projectile
+0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,deref_read,*Vec3
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,<anon>::burnBlow
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,<anon>::startSmoke
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,field_read,Game::gravity
@@ -33527,10 +33524,10 @@ address,function,file,kind,target
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *, unsigned char) __attribute__((stdcall)) [UnitsSeam::GetAimFromPosition]"
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,AngleOfVector
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,CalcAimAngles
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,RecordBuildMenuUpdate
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,SendScriptCallByName
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,SolveLaunchAngle
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,SubtractVec3
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,UpdateBuildMenuIfFocusUnit
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,WeaponCanReachPos
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,get
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,operator WeaponDef *
@@ -44063,6 +44060,14 @@ address,function,file,kind,target
 ,Contains,src/orders/unit_orders.cpp,function,
 ,Contains,src/orders/vtol_orders.cpp,deref_read,*unsigned int
 ,Contains,src/orders/vtol_orders.cpp,function,
+,ContinueArgs,src/ingame/sim_event_drain.cpp,deref_write,*unsigned int
+,ContinueArgs,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,ContinueArgs,src/ingame/sim_event_drain.cpp,field_read,SimEvent::flags
+,ContinueArgs,src/ingame/sim_event_drain.cpp,field_read,SimEventQueue::head
+,ContinueArgs,src/ingame/sim_event_drain.cpp,field_read,SimEventQueue::records
+,ContinueArgs,src/ingame/sim_event_drain.cpp,field_read,SimEventQueue::tail
+,ContinueArgs,src/ingame/sim_event_drain.cpp,field_write,SimEventQueue::head
+,ContinueArgs,src/ingame/sim_event_drain.cpp,function,
 ,Convert,src/orders/unit_orders.cpp,field_read,Vec3::x
 ,Convert,src/orders/unit_orders.cpp,field_read,Vec3::z
 ,Convert,src/orders/unit_orders.cpp,field_write,Point16::x
@@ -44313,26 +44318,90 @@ address,function,file,kind,target
 ,DoSelect,src/gui/gui.cpp,field_write,Layer::current
 ,DoSelect,src/gui/gui.cpp,function,
 ,DoSelect,src/gui/gui.cpp,global_read,g_guiContext
+,DrainCdActivity,src/ingame/sim_event_drain.cpp,call,AddCdActivitySample
+,DrainCdActivity,src/ingame/sim_event_drain.cpp,field_read,Game::localPlayer
+,DrainCdActivity,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,DrainCdActivity,src/ingame/sim_event_drain.cpp,function,
+,DrainCdActivity,src/ingame/sim_event_drain.cpp,global_read,g_game
+,DrainGuiChanged,src/ingame/sim_event_drain.cpp,call,IsScreenNamed
+,DrainGuiChanged,src/ingame/sim_event_drain.cpp,call,MarkChanged
+,DrainGuiChanged,src/ingame/sim_event_drain.cpp,field_maybe_written,Game::gui
+,DrainGuiChanged,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,DrainGuiChanged,src/ingame/sim_event_drain.cpp,function,
+,DrainGuiChanged,src/ingame/sim_event_drain.cpp,global_read,g_game
+,DrainGuiChanged,src/ingame/sim_event_drain.cpp,global_read,g_screenNames@src/ingame/sim_event_drain.cpp
+,DrainNano,src/ingame/sim_event_drain.cpp,call,ContinueArgs
+,DrainNano,src/ingame/sim_event_drain.cpp,call,EmitNanoParticles
+,DrainNano,src/ingame/sim_event_drain.cpp,call,EmitReverseNanoParticles
+,DrainNano,src/ingame/sim_event_drain.cpp,call,TakeVec3
+,DrainNano,src/ingame/sim_event_drain.cpp,call,operator=
+,DrainNano,src/ingame/sim_event_drain.cpp,field_write,Box::hi
+,DrainNano,src/ingame/sim_event_drain.cpp,field_write,Box::lo
+,DrainNano,src/ingame/sim_event_drain.cpp,function,
+,DrainScoreFlash,src/ingame/sim_event_drain.cpp,call,FlashScorePanelKillLoss
+,DrainScoreFlash,src/ingame/sim_event_drain.cpp,field_read,<anon>::b7
+,DrainScoreFlash,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,DrainScoreFlash,src/ingame/sim_event_drain.cpp,function,
+,DrainScoreFlash,src/ingame/sim_event_drain.cpp,global_read,g_game
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,AccumulateScreenShake
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,AnnounceForcesDestroyed
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DeselectIfIneligible
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainCdActivity
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainGuiChanged
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainNano
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainScoreFlash
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainSound
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainTeleport
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainThrust
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainUnitSpeech
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainWake
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitTimedSubParticles
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitWeaponSmoke
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,FocusCommander
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,MarkSelectionOrdersDirty
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,PopUntilNamedLayout
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,SimEvents
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,TakeVec3
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,UnitOf
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,UpdateBuildMenuIfFocusUnit
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_maybe_written,Game::players
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,SimEvent::flags
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,SimEvent::kind
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,SimEventQueue::head
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,SimEventQueue::records
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,SimEventQueue::tail
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_write,SimEventQueue::head
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,function,
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,global_read,g_game
+,DrainSound,src/ingame/sim_event_drain.cpp,call,PlaySoundByName
+,DrainSound,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,DrainSound,src/ingame/sim_event_drain.cpp,function,
+,DrainSound,src/ingame/sim_event_drain.cpp,global_read,g_soundNames@src/ingame/sim_event_drain.cpp
+,DrainTeleport,src/ingame/sim_event_drain.cpp,call,ContinueArgs
+,DrainTeleport,src/ingame/sim_event_drain.cpp,call,EmitTeleportParticles
+,DrainTeleport,src/ingame/sim_event_drain.cpp,call,TakeVec3
+,DrainTeleport,src/ingame/sim_event_drain.cpp,function,
+,DrainThrust,src/ingame/sim_event_drain.cpp,call,ContinueArgs
+,DrainThrust,src/ingame/sim_event_drain.cpp,call,EmitThrustParticles
+,DrainThrust,src/ingame/sim_event_drain.cpp,call,TakeVec3
+,DrainThrust,src/ingame/sim_event_drain.cpp,function,
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,call,IsUnitVisible
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,call,PresentUnitSpeech
-,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,call,operator Unit *
-,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,deref_escape,*Unit
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,call,UnitOf
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,Game::playerIndex
-,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,Game::units
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,SimEvent::flags
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,Unit::flags
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,field_read,Unit::playerIndex
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,function,
 ,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,global_read,g_game
+,DrainUnitSpeech,src/ingame/sim_event_drain.cpp,global_read,g_speechTexts@src/ingame/sim_event_drain.cpp
+,DrainWake,src/ingame/sim_event_drain.cpp,call,ContinueArgs
+,DrainWake,src/ingame/sim_event_drain.cpp,call,EmitBubbles
+,DrainWake,src/ingame/sim_event_drain.cpp,call,EmitWakeParticles
+,DrainWake,src/ingame/sim_event_drain.cpp,call,TakeVec3
+,DrainWake,src/ingame/sim_event_drain.cpp,function,
 ,DrawClippedLine,src/graphics/draw.cpp,call,BlitLine
 ,DrawClippedLine,src/graphics/draw.cpp,call,ClipLine
 ,DrawClippedLine,src/graphics/draw.cpp,call,LockScreen
@@ -49384,6 +49453,14 @@ address,function,file,kind,target
 ,Rec::Rec,src/map/line_of_sight.h,field_write,Rec::field_6
 ,Rec::Rec,src/map/line_of_sight.h,field_write,Rec::flags
 ,Rec::Rec,src/map/line_of_sight.h,function,
+,RecordBubbles,src/state/sim_effects.h,call,RecordWakeEvent
+,RecordBubbles,src/state/sim_effects.h,function,
+,RecordBuildMenuUpdate,src/state/sim_effects.h,call,RecordUnitEvent
+,RecordBuildMenuUpdate,src/state/sim_effects.h,function,
+,RecordCdActivity,src/state/sim_effects.h,call,RecordSimEvent
+,RecordCdActivity,src/state/sim_effects.h,function,
+,RecordDeselectIfIneligible,src/state/sim_effects.h,call,RecordUnitEvent
+,RecordDeselectIfIneligible,src/state/sim_effects.h,function,
 ,RecordFatal,src/wasm/wind_meteors_glue.cpp,call,strncpy
 ,RecordFatal,src/wasm/wind_meteors_glue.cpp,function,
 ,RecordFatal,src/wasm/wind_meteors_glue.cpp,global_escape,s_fatalText
@@ -49391,6 +49468,35 @@ address,function,file,kind,target
 ,RecordFatal,src/wasm/wind_meteors_glue.cpp,global_read,s_fatalPending
 ,RecordFatal,src/wasm/wind_meteors_glue.cpp,global_write,s_fatalPending
 ,RecordFatal,src/wasm/wind_meteors_glue.cpp,global_write,s_fatalText
+,RecordFocusCommander,src/state/sim_effects.h,call,RecordSimEvent
+,RecordFocusCommander,src/state/sim_effects.h,function,
+,RecordForcesDestroyed,src/state/sim_effects.h,call,RecordSimEvent
+,RecordForcesDestroyed,src/state/sim_effects.h,function,
+,RecordGuiChangedIfScreen,src/state/sim_effects.h,call,RecordSimEvent
+,RecordGuiChangedIfScreen,src/state/sim_effects.h,function,
+,RecordNanoParticles,src/state/sim_effects.h,call,RecordNanoParticles
+,RecordNanoParticles,src/state/sim_effects.h,call,RecordSimEvent
+,RecordNanoParticles,src/state/sim_effects.h,call,SimEventPut
+,RecordNanoParticles,src/state/sim_effects.h,field_read,Box::hi
+,RecordNanoParticles,src/state/sim_effects.h,field_read,Box::lo
+,RecordNanoParticles,src/state/sim_effects.h,function,
+,RecordPointParticles,src/state/sim_effects.h,call,RecordSimEvent
+,RecordPointParticles,src/state/sim_effects.h,call,SimEventPut
+,RecordPointParticles,src/state/sim_effects.h,function,
+,RecordPopToGameLayout,src/state/sim_effects.h,call,RecordSimEvent
+,RecordPopToGameLayout,src/state/sim_effects.h,function,
+,RecordReverseNanoParticles,src/state/sim_effects.h,call,RecordReverseNanoParticles
+,RecordReverseNanoParticles,src/state/sim_effects.h,call,RecordSimEvent
+,RecordReverseNanoParticles,src/state/sim_effects.h,call,SimEventPut
+,RecordReverseNanoParticles,src/state/sim_effects.h,field_read,Box::hi
+,RecordReverseNanoParticles,src/state/sim_effects.h,field_read,Box::lo
+,RecordReverseNanoParticles,src/state/sim_effects.h,function,
+,RecordScoreFlash,src/state/sim_effects.h,call,RecordSimEvent
+,RecordScoreFlash,src/state/sim_effects.h,function,
+,RecordScreenShake,src/state/sim_effects.h,call,RecordSimEvent
+,RecordScreenShake,src/state/sim_effects.h,function,
+,RecordSelectionOrdersDirty,src/state/sim_effects.h,call,RecordUnitEvent
+,RecordSelectionOrdersDirty,src/state/sim_effects.h,function,
 ,RecordSimEvent,src/state/sim_events.cpp,call,FatalError
 ,RecordSimEvent,src/state/sim_events.cpp,call,HarnessTestMode
 ,RecordSimEvent,src/state/sim_events.cpp,deref_read,*SimEventQueue
@@ -49409,10 +49515,30 @@ address,function,file,kind,target
 ,RecordSimEvent,src/state/sim_events.cpp,function,
 ,RecordSimEvent,src/state/sim_events.cpp,global_read,g_game
 ,RecordSimEvent,src/state/sim_events.cpp,global_read,g_simEvents@src/state/sim_events.cpp
+,RecordSound,src/state/sim_effects.h,call,RecordSimEvent
+,RecordSound,src/state/sim_effects.h,function,
+,RecordTeleportParticles,src/state/sim_effects.h,call,RecordSimEvent
+,RecordTeleportParticles,src/state/sim_effects.h,call,SimEventPut
+,RecordTeleportParticles,src/state/sim_effects.h,function,
+,RecordThrustParticles,src/state/sim_effects.h,call,RecordSimEvent
+,RecordThrustParticles,src/state/sim_effects.h,call,SimEventPut
+,RecordThrustParticles,src/state/sim_effects.h,function,
+,RecordTimedSubParticles,src/state/sim_effects.h,call,RecordPointParticles
+,RecordTimedSubParticles,src/state/sim_effects.h,function,
+,RecordUnitEvent,src/state/sim_effects.h,call,RecordSimEvent
+,RecordUnitEvent,src/state/sim_effects.h,field_read,Unit::id
+,RecordUnitEvent,src/state/sim_effects.h,function,
 ,RecordUnitSpeech,src/state/sim_speech.h,call,RecordSimEvent
 ,RecordUnitSpeech,src/state/sim_speech.h,field_read,Unit::flags
 ,RecordUnitSpeech,src/state/sim_speech.h,field_read,Unit::id
 ,RecordUnitSpeech,src/state/sim_speech.h,function,
+,RecordWakeEvent,src/state/sim_effects.h,call,RecordSimEvent
+,RecordWakeEvent,src/state/sim_effects.h,call,SimEventPut
+,RecordWakeEvent,src/state/sim_effects.h,function,
+,RecordWakeParticles,src/state/sim_effects.h,call,RecordWakeEvent
+,RecordWakeParticles,src/state/sim_effects.h,function,
+,RecordWeaponSmoke,src/state/sim_effects.h,call,RecordPointParticles
+,RecordWeaponSmoke,src/state/sim_effects.h,function,
 ,RefAbs,src/harness/harness.cpp,call,SimBlockBase
 ,RefAbs,src/harness/harness.cpp,function,
 ,RefreshMapListNative,src/seams/native.cpp,call,Mission::RefreshMapList
@@ -50205,6 +50331,11 @@ address,function,file,kind,target
 ,SimCreate,src/state/sim_globals.cpp,function,
 ,SimCreate,src/state/sim_globals.cpp,global_read,registered@SimCreate
 ,SimCreate,src/state/sim_globals.cpp,global_write,registered@SimCreate
+,SimEventPut,src/state/sim_effects.h,deref_write,*unsigned int
+,SimEventPut,src/state/sim_effects.h,field_read,Vec3::x
+,SimEventPut,src/state/sim_effects.h,field_read,Vec3::y
+,SimEventPut,src/state/sim_effects.h,field_read,Vec3::z
+,SimEventPut,src/state/sim_effects.h,function,
 ,SimEvents,src/state/sim_events.cpp,call,SimCreate
 ,SimEvents,src/state/sim_events.cpp,deref_read,*SimEventQueue
 ,SimEvents,src/state/sim_events.cpp,function,
@@ -50558,6 +50689,11 @@ address,function,file,kind,target
 ,TakeFrame,src/network/packets.cpp,field_read,Frame::tick
 ,TakeFrame,src/network/packets.cpp,field_read,FrameQueue::buffer
 ,TakeFrame,src/network/packets.cpp,function,
+,TakeVec3,src/ingame/sim_event_drain.cpp,deref_read,*unsigned int
+,TakeVec3,src/ingame/sim_event_drain.cpp,field_write,Vec3::x
+,TakeVec3,src/ingame/sim_event_drain.cpp,field_write,Vec3::y
+,TakeVec3,src/ingame/sim_event_drain.cpp,field_write,Vec3::z
+,TakeVec3,src/ingame/sim_event_drain.cpp,function,
 ,TdfFieldVector::DestroyAll,src/util/tdf.cpp,call,TdfField::~TdfField
 ,TdfFieldVector::DestroyAll,src/util/tdf.cpp,call,operator delete
 ,TdfFieldVector::DestroyAll,src/util/tdf.cpp,field_read,std::vector<TdfField>::_First
@@ -50790,6 +50926,12 @@ address,function,file,kind,target
 ,UnitList::ForEach,src/game/victory.cpp,field_read,UnitList::last
 ,UnitList::ForEach,src/game/victory.cpp,function,
 ,UnitList::ForEach,src/game/victory.cpp,indirect_call,virtual UnitScanVisitor::VisitUnit
+,UnitOf,src/ingame/sim_event_drain.cpp,call,operator Unit *
+,UnitOf,src/ingame/sim_event_drain.cpp,deref_escape,*Unit
+,UnitOf,src/ingame/sim_event_drain.cpp,field_read,Game::units
+,UnitOf,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,UnitOf,src/ingame/sim_event_drain.cpp,function,
+,UnitOf,src/ingame/sim_event_drain.cpp,global_read,g_game
 ,UnitRef::Get,src/units/unit_ref.h,call,operator Unit *
 ,UnitRef::Get,src/units/unit_ref.h,field_read,UnitRef::owner
 ,UnitRef::Get,src/units/unit_ref.h,function,

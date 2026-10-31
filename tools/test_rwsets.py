@@ -23,6 +23,9 @@ struct Counter { static int count; int n; int Get() const { return n; } void Bum
 extern Counter g_counter;
 template <class T> struct Vec { T* b; T* begin() { return b; } const T* begin() const { return b; } };
 struct Holder { Vec<int> v; };
+template <class T> struct BlockVector { void Reserve(unsigned n); void Insert(T* p, unsigned n, const T& x); unsigned Size() const; };
+void Reserve();
+void Insert();
 static int s_local;
 int Helper(int);
 void Fill(int* out);
@@ -59,6 +62,13 @@ int MutableObject(Holder* h) { return *h->v.begin(); }
 int ClassStatic() { return Counter::count; }
 
 int FileStatic() { return s_local; }
+
+void BlockVectorCalls(BlockVector<int>& v, const BlockVector<int>* c) { v.Reserve(1); v.Insert(0, 1, 2); c->Size(); }
+
+typedef BlockVector<int> IntVector;
+void TypedefCalls(IntVector* v) { v->Reserve(v->Size()); }
+
+void FreeCalls() { Reserve(); Insert(); }
 
 void Empty() {}
 
@@ -148,6 +158,13 @@ class RwsetsTest(unittest.TestCase):
         self.assertIn(("field_read", "Holder::v"), self.by_function["ConstObject"])
         self.assertNotIn(("field_maybe_written", "Holder::v"), self.by_function["ConstObject"])
         self.assertIn(("field_maybe_written", "Holder::v"), self.by_function["MutableObject"])
+
+    def test_block_vector_member_calls_are_qualified(self):
+        self.assertEqual(self.by_function["BlockVectorCalls"], {
+            ("call", "BlockVector::Reserve"), ("call", "BlockVector::Insert"), ("call", "BlockVector::Size")})
+        self.assertEqual(self.by_function["TypedefCalls"], {
+            ("call", "BlockVector::Reserve"), ("call", "BlockVector::Size")})
+        self.assertEqual(self.by_function["FreeCalls"], {("call", "Reserve"), ("call", "Insert")})
 
     def test_class_static_is_a_global_of_the_class(self):
         self.assertEqual(self.by_function["ClassStatic"], {("global_read", "Counter::count")})

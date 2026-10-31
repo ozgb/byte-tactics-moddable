@@ -305,6 +305,9 @@ def compile_commands(build_dir: Path, only: list[str]) -> list[tuple[str, list[s
     return sorted(out)
 
 
+BLOCK_VECTOR = re.compile(r"^BlockVector<")
+
+
 def strip(node: dict) -> dict:
     """The node under implicit casts and parentheses."""
     while node["kind"] in ("ImplicitCastExpr", "ParenExpr") and node.get("inner"):
@@ -448,6 +451,12 @@ class Analyzer:
         self.destructors: dict[str, dict] = {}
         self.functions: list[dict] = []
         self.root_cache: dict[str, str | None] = {}
+        self.block_vector_names: set[str] = set()
+
+    def is_block_vector(self, t: dict) -> bool:
+        """Whether a type is a BlockVector instantiation or a typedef of one, through a pointer or reference."""
+        text = QUALIFIERS.sub("", type_text(t)).replace("*", "").replace("&", "").strip()
+        return bool(BLOCK_VECTOR.match(text)) or text in self.block_vector_names
 
     def relative(self, file: str) -> str | None:
         """The repository-relative path of a project file, None for system headers."""
@@ -493,6 +502,9 @@ class Analyzer:
                 }
             for child in node.get("inner", ()):
                 self.declare(child, name)
+        elif kind in ("TypedefDecl", "TypeAliasDecl"):
+            if self.is_block_vector(node.get("type", {})):
+                self.block_vector_names.add(node.get("name", "?"))
         elif kind == "VarDecl":
             if node.get("storageClass") == "static":
                 name = node.get("name", "?")
@@ -759,8 +771,11 @@ class Walker:
             self.record("call", callee["referencedDecl"]["name"])
         elif callee["kind"] == "MemberExpr" and callee.get("referencedMemberDecl") and \
                 callee["type"].get("qualType") == "<bound member function type>":
+            fallback = callee.get("name", "?")
+            if callee.get("inner") and self.unit.is_block_vector(callee["inner"][0].get("type", {})):
+                fallback = "BlockVector::" + fallback
             name, virtual, const_method = self.unit.methods.get(
-                callee["referencedMemberDecl"], (callee.get("name", "?"), False, False))
+                callee["referencedMemberDecl"], (fallback, False, False))
             self.record("indirect_call" if virtual else "call", ("virtual " + name) if virtual else name)
             base = callee["inner"][0] if callee.get("inner") else None
             if base is not None:

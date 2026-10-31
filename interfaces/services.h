@@ -1,6 +1,7 @@
 #ifndef INTERFACES_SERVICES_H
 #define INTERFACES_SERVICES_H
 
+#include <stdlib.h>
 #include <string.h>
 
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
@@ -17,8 +18,72 @@ char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, cons
 // The extension of TDF data files.
 extern char g_extTdf[4];
 
+// Returns nonzero when the harness runs in test mode.
+int HarnessTestMode();
+// Puts the program in test mode.
+void EnterHarnessTestMode();
+
 #pragma pack(push, 8)
-#include "../src/util/string_ref.h"
+// A reference-counted string whose text follows a count word.
+class StringRef {
+public:
+    union {
+        char* p;
+        char* data;
+        char* ptr;
+    };
+
+    // Builds an empty string.
+    StringRef();
+    // Shares the text of another string.
+    StringRef(const StringRef& other);
+    // Copies a null-terminated text.
+    StringRef(const char* text);
+    // Copies the first len characters of a text.
+    StringRef(const char* text, int len);
+    // Releases the reference.
+    ~StringRef() { ReleaseRef(); }
+    // Shares the text of another string.
+    StringRef& operator=(const StringRef& other)
+    {
+        Assign(&other);
+        return *this;
+    }
+    // Drops the reference and frees the text when it was the last.
+    void ReleaseRef();
+    // Shares the text of another string and returns this.
+    StringRef* Assign(const StringRef* other);
+    // Appends the text of another string and returns this.
+    StringRef* Append(const StringRef& other);
+    // Converts the text to lower case and returns this.
+    StringRef* MakeLower();
+    // Converts the text to upper case and returns this.
+    StringRef* MakeUpper();
+    // Replaces the text with a copy of a null-terminated text and returns this.
+    StringRef* AssignText(const char* text);
+    // Returns the text, copying it first when it is shared.
+    char* GetUnique()
+    {
+        int len = (int)strlen(data);
+        if (*(int*)(data - 4) != 1) {
+            int* block = (int*)malloc(len + 5);
+            *block = 1;
+            char* copy = (char*)(block + 1);
+            strcpy(copy, data);
+            (*(int*)(data - 4))--;
+            if (*(int*)(data - 4) == 0) {
+                free(data - 4);
+            }
+            data = copy;
+            return copy;
+        }
+        return data;
+    }
+    // Returns nonzero when the text is empty.
+    int IsEmpty() const;
+    // Returns the characters from start up to end as a new string.
+    StringRef SubString(int start, int end) const;
+};
 
 class TdfRecord;
 

@@ -468,7 +468,7 @@ Player** __stdcall Partition(Player** first, Player** last,
     }
 }
 
-#include "../util/string_ref.h"
+#include "../../interfaces/services.h"
 #include "../state/sim_globals.h"
 
 class UnitCategory {

@@ -8,7 +8,7 @@
 
 #define PI 3.14159265358979
 
-#include "../util/string_ref.h"
+#include "../../interfaces/services.h"
 
 static inline bool operator==(const StringRef& a, const StringRef& b) {
     return strcmp(a.ptr, b.ptr) == 0;

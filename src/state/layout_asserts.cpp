@@ -129,7 +129,6 @@
 #include "../util/mouse_event.h"
 #include "../util/point.h"
 #include "../util/rot16.h"
-#include "../util/string_ref.h"
 #include "../weapons/damage_table.h"
 #include "../weapons/debris.h"
 #include "../weapons/explosion_types.h"

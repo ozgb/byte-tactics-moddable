@@ -8,13 +8,12 @@
 
 #if !defined(__wasm32__)
 #include "host.h"
+#include "services.h"
 
 // True when p lies inside the sim block.
 bool __cdecl SimOwns(const void* p);
 // The first byte of the sim block, or null before it is reserved.
 void* __cdecl SimBlockBase();
-// Nonzero when the harness runs in test mode.
-int HarnessTestMode();
 
 // Reports a pointer outside the state block named by the signature of the converting function.
 inline void RefOutsideBlock(const char* signature)

@@ -1623,7 +1623,7 @@ StringRefAppendView* StringRefAppendView::Append(const StringRefAppendView& othe
     return this;
 }
 
-#include "../util/string_ref.h"
+#include "../../interfaces/services.h"
 
 // FUNCTION: 0x4c9180 ??0StringRef@@QAE@XZ
 StringRef::StringRef()

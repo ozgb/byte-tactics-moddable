@@ -416,7 +416,7 @@ SYNTHETIC.update({
         char linkVptr[4];             // +0x12
         Ref<Unit> linkOwner;              // +0x16
         Ref<LinkRef> linkNext;            // +0x1a
-        OrderRef* linkValue;          // +0x1e
+        Ref<OrderRef> linkValue;          // +0x1e
         Vec3 pos;                     // +0x22
         Point16 start;                // +0x2e
         Point16 cached;               // +0x32
@@ -465,7 +465,7 @@ SYNTHETIC.update({
         char refVptr[4];              // +0x16
         Ref<Unit> refOwner;               // +0x1a
         Ref<LinkRef> refNext;             // +0x1e
-        OrderRef* refValue;           // +0x22
+        Ref<OrderRef> refValue;           // +0x22
         Vec3 pos;                     // +0x26
         int followOffset;             // +0x32
     """,

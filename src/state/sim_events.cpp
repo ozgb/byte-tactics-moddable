@@ -37,17 +37,22 @@ void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsig
         return;
     }
     SimEventQueue& q = *queue;
-    if (q.tail - q.head >= SIM_EVENT_CAPACITY) {
+    unsigned int records = count > 6 ? (count + 5) / 6 : 1;
+    if (q.tail - q.head + records > SIM_EVENT_CAPACITY) {
         if (HarnessTestMode())
             FatalError("The sim event queue is full.");
         q.dropped++;
         return;
     }
-    SimEvent& e = q.records[q.tail % SIM_EVENT_CAPACITY];
-    e.kind = kind;
-    e.flags = (unsigned short)flags;
-    e.tick = (unsigned int)g_game->ticks;
-    for (unsigned int i = 0; i < 6; i++)
-        e.args[i] = i < count ? args[i] : 0;
-    q.tail++;
+    for (unsigned int r = 0; r < records; r++) {
+        SimEvent& e = q.records[q.tail % SIM_EVENT_CAPACITY];
+        e.kind = kind;
+        e.flags = (unsigned short)(r == 0 ? flags : (flags | SIM_EVENT_CONTINUED));
+        e.tick = (unsigned int)g_game->ticks;
+        for (unsigned int i = 0; i < 6; i++) {
+            unsigned int n = r * 6 + i;
+            e.args[i] = n < count ? args[n] : 0;
+        }
+        q.tail++;
+    }
 }

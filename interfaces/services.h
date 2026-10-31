@@ -74,15 +74,55 @@ void __stdcall SaveSettings();
 // Loads a GAF animation file of the data directory, once.
 void* __stdcall LoadAnimGaf(char* name);
 
-// The kinds of sim event, each with the meaning of its arguments.
+// The kinds of sim event, each with the meaning of its arguments (positions are fixed-point integers; players and units are indices).
 enum SimEventKind : unsigned short {
     // Marks an empty record, never recorded.
     SIM_EVENT_NONE = 0,
     // A unit speaks: the unit index, the speech kind and a SimSpeechText.
     SIM_EVENT_UNIT_SPEECH = 1,
+    // A sound plays: a SimSoundName and the play flag.
+    SIM_EVENT_SOUND = 2,
+    // Nano particles flow from a point to a box: the origin (3), the box low and high corners (6) and the particle list.
+    SIM_EVENT_NANO_PARTICLES = 3,
+    // Nano particles flow from a box to a point: the box low and high corners (6), the origin (3) and the particle list.
+    SIM_EVENT_REVERSE_NANO_PARTICLES = 4,
+    // Teleport sparks fly between two points: the start (3), the end (3), the lifetime and the particle list.
+    SIM_EVENT_TELEPORT_PARTICLES = 5,
+    // Thrust particles stream between two points: the start (3), the end (3), the period, the lifetime and the particle list.
+    SIM_EVENT_THRUST_PARTICLES = 6,
+    // A wake trails between two points: the start (3), the end (3), the period and the particle list.
+    SIM_EVENT_WAKE_PARTICLES = 7,
+    // Bubbles rise between two points: the start (3), the end (3), the period and the particle list.
+    SIM_EVENT_BUBBLES = 8,
+    // A weapon puffs smoke: the position (3) and the particle list.
+    SIM_EVENT_WEAPON_SMOKE = 9,
+    // A timed plume of particles rises: the position (3) and the particle list.
+    SIM_EVENT_TIMED_SUB_PARTICLES = 10,
+    // The screen shakes: the two offsets and the strength.
+    SIM_EVENT_SCREEN_SHAKE = 11,
+    // The disc activity meter counts a hit: the amount and two players, the meter counts it when either is the local player.
+    SIM_EVENT_CD_ACTIVITY = 12,
+    // A side's forces are all destroyed: the player index.
+    SIM_EVENT_FORCES_DESTROYED = 13,
+    // The score panel flashes a kill and a loss: the killer's slot and the loser's player index, -1 for none.
+    SIM_EVENT_SCORE_FLASH = 14,
+    // The orders panel of a unit needs a refresh: the unit index.
+    SIM_EVENT_SELECTION_ORDERS_DIRTY = 15,
+    // The build menu and its queued build counts refresh when the unit has the focus: the unit index.
+    SIM_EVENT_BUILD_MENU_UPDATE = 16,
+    // A unit that can no longer be selected leaves the selection: the unit index.
+    SIM_EVENT_DESELECT_IF_INELIGIBLE = 17,
+    // The GUI redraws when a SimScreenName is on top: the screen.
+    SIM_EVENT_GUI_CHANGED_IF_SCREEN = 18,
+    // The camera and the selection go to the commander: the force flag.
+    SIM_EVENT_FOCUS_COMMANDER = 19,
+    // The GUI closes screens down to the game screen: the force flag.
+    SIM_EVENT_POP_TO_GAME_LAYOUT = 20,
 };
 // Flag of SIM_EVENT_UNIT_SPEECH: the unit stays silent when it is on screen.
 #define SIM_EVENT_SPEECH_IF_NOT_VISIBLE 1u
+// Flag of a record that carries the arguments past the sixth of the event before it.
+#define SIM_EVENT_CONTINUED 0x8000u
 
 // The texts that go with a unit's speech line; 0 is the text of the line's kind.
 enum SimSpeechText : unsigned short {
@@ -133,7 +173,19 @@ enum SimSpeechText : unsigned short {
     SIM_SPEECH_TEXT_COUNT = 44,
 };
 
-// Records an event for presentation with up to six arguments; a full queue drops it and counts it, and in test mode ends the program.
+// The sounds that sim plays by name.
+enum SimSoundName : unsigned short {
+    SIM_SOUND_VICTORY_CONDITION = 0,
+    SIM_SOUND_COUNT = 1,
+};
+
+// The GUI screens that sim asks about.
+enum SimScreenName : unsigned short {
+    SIM_SCREEN_BUILDER = 0,
+    SIM_SCREEN_COUNT = 1,
+};
+
+// Records an event for presentation with up to twelve arguments (a second record continues past six); a full queue drops it and counts it, and in test mode ends the program.
 void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count);
 
 // The arguments of one console command.

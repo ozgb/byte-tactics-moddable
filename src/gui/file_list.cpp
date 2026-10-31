@@ -53,7 +53,6 @@ Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_C(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
-int __stdcall IsGadgetNamed(Gadget* entries, int i, char* name);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 #include "dialogs.h"

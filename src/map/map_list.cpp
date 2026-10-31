@@ -31,7 +31,6 @@ class StringRef;
 #include "../util/registry.h"
 int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, int def);
 
-char* __stdcall Translate(char* text);
 
 #include "map_list.h"
 

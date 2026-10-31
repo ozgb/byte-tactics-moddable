@@ -99,6 +99,7 @@ src/game/game_load.cpp,src/graphics/palette.h,#392
 src/game/game_load.cpp,src/graphics/pcx.h,#392
 src/game/game_load.cpp,src/graphics/rect.h,#392
 src/game/game_load.cpp,src/graphics/surface.h,#392
+src/game/game_load.cpp,src/gui/dialogs.h,#392
 src/game/game_load.cpp,src/gui/gui.h,#392
 src/game/game_load.cpp,src/gui/layer.h,#392
 src/game/game_load.cpp,src/ingame/build_placement.h,#392
@@ -141,6 +142,7 @@ src/game/main.cpp,src/sound/sound.h,#392
 src/game/main_loop.cpp,src/frontend/frontend.h,#392
 src/game/main_loop.cpp,src/graphics/display.h,#392
 src/game/main_loop.cpp,src/graphics/pcx.h,#392
+src/game/main_loop.cpp,src/gui/dialogs.h,#392
 src/game/main_loop.cpp,src/gui/gui.h,#392
 src/game/main_loop.cpp,src/gui/keyboard.h,#392
 src/game/main_loop.cpp,src/ingame/control_panel.h,#392

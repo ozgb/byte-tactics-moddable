@@ -8,6 +8,7 @@
 #include "../game/unit_resources.h"
 #include "../files/files_api.h"
 #include "players.h"
+#include "../util/tdf.h"
 
 struct Player;
 struct Unit;
@@ -39,7 +40,6 @@ struct UnitDef;
 
 #include "../../link/globals.h"
 
-const char* __stdcall Translate(const char* text);
 
 // FUNCTION: 0x464290
 void __stdcall SetupPlayerSlot(int player, char type)
@@ -433,7 +433,6 @@ void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
 
 #include "../network/unit_sync.h"
 void __stdcall PlaySoundByName(char* str, int flag);
-int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 #include "../gui/dialogs.h"
 #include "../gui/gadget.h"
 #include "../gui/layer.h"
@@ -442,7 +441,7 @@ int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 // FUNCTION: 0x464de0
 void __stdcall ContinueWatchingCallback(Gui* gui)
 {
-    int screen = (int)gui->layer->entries;
+    Gadget* screen = gui->layer->entries;
     if (gui->hotGadgetIndex == -1)
         return;
     PlaySoundByName("BigButton", 0);
@@ -751,7 +750,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                     if (CountCombatPlayers() <= 0)
                         goto skip508;
                     OpenMessageBox(&g_game->gui,
-                                 (char *)Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
+                                 Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
                                  500, 1, 1);
                     g_game->endGameFlags &= 0xffef;
                     goto skip508;

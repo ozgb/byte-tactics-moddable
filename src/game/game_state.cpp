@@ -8,6 +8,7 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/host.h"
 #include "game_state.h"
+#include "../util/tdf.h"
 
 struct Force640x480Display;
 struct GafSequenceSource;
@@ -139,7 +140,6 @@ void ResetGameSpeed()
 }
 
 
-char* __stdcall Translate(char* text);
 #include "../network/net_game.h"
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall AddMessage(char* text, int key, int value, int last);

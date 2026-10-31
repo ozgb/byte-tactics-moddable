@@ -20,7 +20,6 @@ struct FileHandle;
 
 #include "../files/files_api.h"
 
-char* __stdcall Translate(char* text);
 #include "../sound/sound.h"
 
 // FUNCTION: 0x49e640

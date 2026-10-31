@@ -76,7 +76,6 @@ void __stdcall SelectFontForEntry(Gadget* entries, int index);
 #include "../gui/dialogs.h"
 #include "campaign_menu.h"
 void __stdcall FillMissionList();
-char* __stdcall Translate(const char* text);
 void __stdcall AddTextGadget(Layer* dialog, const char* name, char* text, int x, int y,
                             int w, int flags);
 void __stdcall SetGadgetColorByName(Gui* menu, const char* name, int value);
@@ -94,9 +93,7 @@ int __stdcall GetGafFrame(void* gaf, int frame);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
 void __stdcall InitGafSequence(void* state, void* gaf, int param_3);
 int __stdcall StepGafSequence(BriefingPlanetAnim* anim);
-int __stdcall GetButtonStageByName(Gui* menu, char* name);
 int __stdcall SetButtonStageByName(Gui* menu, char* name, char value);
-void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int value);
 void __stdcall SetQuickKeyByName(Gui* menu, const char* name, char value);
 void __stdcall RemapPaletteToClosestIndices(Gui* menu, void* param_2, void* param_3);
 void __stdcall PlaySoundByName(const char* name, int value);

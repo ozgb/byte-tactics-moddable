@@ -118,12 +118,10 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
 #include "../graphics/object_pool.h"
 void __stdcall PlaySoundByName(char* name, int param_2);
 void __stdcall SetCursorMode(int param_1);
-char* __stdcall Translate(char* text);
 void HideSoftwareCursor();
 #include "../game/game_state.h"
 #include "../files/files_api.h"
 void __stdcall RemapPaletteToClosestIndices(Gui* sub, int value, void* palette);
-void __stdcall SetGadgetActiveByName(Gui* sub, const char* name, int value);
 void __stdcall SetGadgetTextByName(Gui* sub, const char* name, const char* text);
 int __stdcall FindGadgetIndex(Gadget* gadgets, const char* name, int type);
 #include "../graphics/draw.h"
@@ -133,7 +131,6 @@ void ShowSoftwareCursor();
 #include "../debug/debug_lib.h"
 #include "../graphics/display.h"
 #include "../game/data_files.h"
-int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 int GetTicks(void);
@@ -468,7 +465,7 @@ void __stdcall HandleMainMenuClick(Gui* gadget)
 // FUNCTION: 0x426190
 void __stdcall HandleCloseCdPlayerChoice(Gui* gadget)
 {
-    int owner = (int)gadget->layer->entries;
+    Gadget* owner = gadget->layer->entries;
     if (gadget->hotGadgetIndex == -1)
         return;
     PlaySoundByName("SmallButton", 0);

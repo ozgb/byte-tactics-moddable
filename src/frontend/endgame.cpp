@@ -13,6 +13,7 @@
 #include "../graphics/memory_cache.h"
 
 #include "../map/grid.h"
+#include "../util/tdf.h"
 
 #pragma pack(push, 1)
 
@@ -107,7 +108,6 @@ void __stdcall SetFrontendState(int state, int line, const char* file);
 #include "../map/map_list.h"
 void __stdcall SetCursorMode(int n);
 #include "campaign_menu.h"
-const char* __stdcall Translate(const char* text);
 #include "../gui/dialogs.h"
 void __stdcall PlaySoundByName(const char* name, int broadcast);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
@@ -118,11 +118,9 @@ int __stdcall AddTextGadget(Layer* holder, char* type, char* text, int x, int y,
                            int width, int attribs);
 #include "endgame.h"
 Gadget* __stdcall FindGadgetChecked_D(char* entries, char* name);
-void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int value);
 int __stdcall GetGafFrame(unsigned short* gaf, int frame);
 void __stdcall DrawFrame(void* dst, int bmp, int x, int y);
 void __stdcall UpdateMenu(Gui* menu);
-void __stdcall BlitMenuLayers(Gui* menu, void* dest, void* clip);
 void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 #include "../network/net_chat.h"
 void __stdcall SetOffscreenSurface(void* surface);
@@ -773,7 +771,7 @@ void __stdcall RunEndGameState()
             Player* player=&g_game->players[g_game->localPlayer];
             if(player->rejectReason && player->rejectReason!=2) {
                 const char* name=GetRejectReasonText(player->rejectReason);
-                OpenMessageBox(&g_game->gui,(char *)Translate(name),320,1,1);
+                OpenMessageBox(&g_game->gui,Translate(name),320,1,1);
                 MarkChanged(&g_game->gui);
                 MarkLayerChanged(&g_game->gui);
                 player->rejectReason=0;

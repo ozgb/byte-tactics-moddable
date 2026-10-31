@@ -5,6 +5,7 @@
 #include <math.h>
 #include <memory.h>
 #include <stdlib.h>
+#include "../util/tdf.h"
 
 #pragma pack(push, 1)
 
@@ -200,7 +201,6 @@ int __stdcall DrawRectangle(Surface* surface, Rect* r, int color);
 
 void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp, FrameQuad* dst, FrameQuad* src);
 
-char* __stdcall Translate(char* text);
 #include "../graphics/draw.h"
 void __stdcall SetTextColors(int param_1, int param_2);
 void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int maxWidth);
@@ -244,12 +244,10 @@ Unit* __stdcall FindNextSelectedUnit(Unit* unit, int dir);
 #include "selection.h"
 #include "game_dialogs.h"
 #include "../weapons/weapons.h"
-void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect);
 #include "../graphics/particles.h"
 int __stdcall PointInRect(Rect* r, int x, int y);
 int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1, int color);
 int __stdcall GetTextWidth(Font* font, unsigned char* text);
-char* __stdcall Translate(char* key);
 void __stdcall ResetClipRect(int* surface);
 void HideSoftwareCursor();
 void __fastcall ShowSoftwareCursor(void);
@@ -1267,7 +1265,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         int rest = ticks - hours * 108000;
         int minutes = rest / 1800;
         int seconds = (rest - minutes * 1800) / 30;
-        sprintf(gameTime, "%s : %02d:%02d:%02d", (char*)Translate((char*)"Game Time"), hours, minutes, seconds);
+        sprintf(gameTime, "%s : %02d:%02d:%02d", Translate("Game Time"), hours, minutes, seconds);
         SetTextColors(colors[0xf], GetTextKeyColor());
         DrawString(&ctx, (unsigned char*)gameTime, 0x82, -0x22 - GetFontHeight() + GetScreenHeight(), -1);
     }

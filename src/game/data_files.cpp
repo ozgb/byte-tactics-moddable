@@ -18,7 +18,6 @@ void* __cdecl GameReallocTagged(void* block, const char* name, unsigned int size
 #include "main.h"
 #include "../files/files_api.h"
 #include "../graphics/display.h"
-char* __stdcall Translate(char* text);
 #include "../gui/dialogs.h"
 #include "data_files.h"
 

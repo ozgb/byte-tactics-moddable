@@ -16,6 +16,7 @@
 #include "../graphics/display.h"
 
 #include "../network/packet_manager.h"
+#include "../util/tdf.h"
 
 struct Game;
 
@@ -99,7 +100,6 @@ Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 #include "../gui/dialogs.h"
 void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
-int __stdcall GetButtonStageByName(Gui* menu, char* name);
 #include "../network/net_game.h"
 #include "../units/units.h"
 void __stdcall CollectSelectedUnits(std::vector<Unit*>* list);
@@ -107,13 +107,10 @@ void __stdcall CollectSelectedUnits(std::vector<Unit*>* list);
 #include "game_dialogs.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 #include "../debug/debug_lib.h"
-void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 void __stdcall SetButtonStageByName(Gui* menu, char* name, int value);
 int __stdcall GetButtonStage(Gui* menu, int index);
 Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name);
-void __stdcall GetGadgetText(Gui* menu, char* name, char* text);
 int __stdcall ExecuteCommandLine(char* cmd, int flags);
-void __stdcall TrySetFocus(Gui* menu, int index);
 void __stdcall SendChatMessage(Player* from, char* text, int param_3, char* to);
 #include "../frontend/multi.h"
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
@@ -122,7 +119,6 @@ void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 #include "../game/data_files.h"
 void* __stdcall LoadPcx(char* path, int param);
 #include "../units/unit_targets.h"
-char* __stdcall Translate(char* text);
 void __stdcall AddTextGadget(Layer* obj, char* name, char* text, int x, short y, int w, int flags);
 #include "../game/players.h"
 #include "../frontend/options.h"

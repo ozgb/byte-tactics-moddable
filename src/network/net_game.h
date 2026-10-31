@@ -103,5 +103,6 @@ void __stdcall NetSendShareMetal(unsigned char from, unsigned char to, float amo
 void __stdcall NetSendShareEnergy(unsigned char from, unsigned char to, float amount);
 void __stdcall NetBroadcastPlayerEconomy(Player* player);
 void __stdcall NetSendUnitStates(Player* owner);
+void __stdcall PumpNetPackets();
 
 #endif

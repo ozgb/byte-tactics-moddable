@@ -452,7 +452,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x512c84,g_cmdlineHostMode,.bss,4,type,data,int,2,0,1,one type,2,,INT_00512c84,,in DAT_00512c80+0x4,
 0x512c8c,DAT_00512c8c,.bss,4,type,data,int,1,0,1,one type,1,,INT_00512c8c,,in DAT_00512c80+0xc,
 0x512c94,g_netFrameRateConfig,.bss,4,type,data,int,1,0,1,one type,1,,INT_00512c94,,in DAT_00512c80+0x14,
-0x512c98,DAT_00512c98,.bss,16,gap,data,char[],2,0,1,one type,2,,s__00512c98,,in DAT_00512c80+0x18,
+0x512c98,g_userNameSetting,.bss,16,gap,data,char[],2,0,1,one type,2,,s__00512c98,,in DAT_00512c80+0x18,
 0x512ca8,g_cmdlineHostGameName,.bss,64,gap,data,char[],3,0,1,one type,3,,s__00512ca8,,in DAT_00512c80+0x28,
 0x512ce8,g_lobbyMapName,.bss,64,gap,data,char[],1,0,1,one type,1,,CHAR_00h_00512ce8,,in DAT_00512c80+0x68,
 0x512d28,g_onlineLobbyPassword,.bss,1,type,data,char,2,0,1,one type,2,,CHAR_00h_00512d28,,in DAT_00512c80+0xa8,

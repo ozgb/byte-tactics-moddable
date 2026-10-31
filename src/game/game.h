@@ -407,7 +407,7 @@ struct Game {
             int gravity;
             float tidal;
             void* radarFrame;
-            Feature* features;
+            Ref<Feature> features;
             Ref<unsigned short> visibilityMask;
             int count_14277;
             EyeView* eyes;

@@ -598,7 +598,7 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
         if (id >= 0xfffb) {
             return;
         }
-        id = ((FeatureNextView *)g_game->features)[id].next;
+        id = ((FeatureNextView *)g_game->features.get())[id].next;
     }
     if (id < 0xfffb) {
         void* target = g_seams.los_radar->GetMapCell(unit->cell.x, unit->cell.y);

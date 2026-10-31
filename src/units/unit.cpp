@@ -238,7 +238,7 @@ void Unit::SetStateBits(int mask, int set)
                 QueueUnitSpeech(this, 0xe, 0);
                 for (link = head; link; link = link->next) {
                     if (link->value)
-                        ((OrderBase*)link->value)->OrStatusFlags(0x10000);
+                        link->value->OrStatusFlags(0x10000);
                 }
             }
             if (lost & 4)

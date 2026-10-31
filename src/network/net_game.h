@@ -83,5 +83,6 @@ void __stdcall SendLoadProgress();
 void __stdcall HandlePlayerEconomy(PlayerViewStatePacket* packet, Player* player);
 void __stdcall SendLobbySyncRequests();
 int __stdcall HandleNetPackets();
+void __stdcall PumpNetPackets();
 
 #endif

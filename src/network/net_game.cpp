@@ -2269,6 +2269,13 @@ static inline int CommandAllowed(unsigned char* bytes)
     return 0;
 }
 
+void __stdcall PumpNetPackets()
+{
+    HandleNetPackets();
+    if (g_usePacketManager != 0)
+        g_packetManager.SendAllQueued(0);
+}
+
 // FUNCTION: 0x453d40
 int HandleNetPackets()
 {

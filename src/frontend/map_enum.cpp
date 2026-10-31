@@ -104,9 +104,7 @@ int __stdcall LoadMapList(void** out, int param_2, int param_3)
                 break;
         }
         if (s.bFlag != 0) {
-            HandleNetPackets();
-            if (g_usePacketManager != 0)
-                g_packetManager.SendAllQueued(0);
+            PumpNetPackets();
         }
     }
     SetCursorMode(0x13);

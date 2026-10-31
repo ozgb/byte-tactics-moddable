@@ -83,6 +83,7 @@
 #include "../map/grid.h"
 #include "../map/grid2.h"
 #include "../map/line_of_sight.h"
+#include "../map/los_lines.h"
 #include "../map/los_tables.h"
 #include "../map/map_info.h"
 #include "../map/mission.h"
@@ -1444,10 +1445,12 @@ static_assert(offsetof(LoadingPlayerSlots, inGame) == 0, "");
 static_assert(offsetof(LoadingPlayerSlots, unknown_28) == 40, "");
 static_assert(offsetof(LoadingPlayerSlots, flag40) == 44, "");
 static_assert(offsetof(LoadingPlayerSlots, unknown_54) == 84, "");
-static_assert(sizeof(LosTables) == 13, "");
-static_assert(offsetof(LosTables, first) == 1, "");
-static_assert(offsetof(LosTables, last) == 5, "");
-static_assert(offsetof(LosTables, end) == 9, "");
+static_assert(sizeof(LosLine) == 16, "");
+static_assert(sizeof(LosStep) == 4, "");
+static_assert(offsetof(LosStep, a) == 0, "");
+static_assert(offsetof(LosStep, b) == 2, "");
+static_assert(sizeof(LosTable) == 16, "");
+static_assert(sizeof(LosTables) == 16, "");
 static_assert(sizeof(Main2Menu) == 24, "");
 static_assert(offsetof(Main2Menu, field_51d) == 0, "");
 static_assert(offsetof(Main2Menu, unknown_8) == 4, "");

@@ -1,7 +1,7 @@
 #ifndef LOS_LINES_H
 #define LOS_LINES_H
 
-#include <vector>
+#include "../state/block_vector.h"
 
 class TdfFile;
 
@@ -10,23 +10,19 @@ struct LosStep {
     unsigned short b;
 };
 
-struct LosLineData {
-    std::vector<LosStep> v;
-};
-
-typedef std::vector<LosStep> LosStepVector;
-
-class LosLine : public LosStepVector {
+class LosLine : public BlockVector<LosStep> {
 public:
     int GetLosLineStepCount();
     void GetLosLineStep(short index, unsigned short* out1, unsigned short* out2);
     void LoadLosLine(TdfFile* obj, short line, short mode);
 };
 
-class LosTable : public std::vector<LosLineData> {
+typedef LosLine LosLineData;
+
+class LosTable : public BlockVector<LosLine> {
 public:
-    LosLineData* GetLine(short i) { return &(*this)[i]; }
-    void SetNumLines(short n) { resize(n * 4); }
+    LosLine* GetLine(short i) { return &(*this)[i]; }
+    void SetNumLines(short n) { Resize(n * 4); }
 
     int GetLosLineCount();
     void ResizeLines(short n);

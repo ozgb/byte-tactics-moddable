@@ -248,7 +248,7 @@ los_radar,StoreDwordIfDst,src/map/los_tables.cpp,0,0,0,0,0,0,?StoreDwordIfDst@@Y
 los_radar,ToggleShareLos,src/game/share_commands.cpp,0,0,0,0,0,0,?ToggleShareLos@@YGXH@Z,1,
 los_radar,UpdateAllCellHeightRanges,src/map/line_of_sight.cpp,0,0,0,0,0,0,?UpdateAllCellHeightRanges@@YGXXZ,1,
 los_radar,Visible,src/units/unit_scripts.cpp,1,0,0,0,0,0,?Visible@@YGHPAUUnitCursorView@@PAUFixedPosView@@@Z,0,menu-cursor
-map,*,,98,79,2143,1860,1022,776,,12,
+map,*,,96,78,2138,1859,1022,776,,12,
 map,ClaimFootprintsInArea,src/map/terrain.cpp,0,0,0,0,0,0,?ClaimFootprintsInArea@@YGXUPoint16@@0@Z,1,
 map,ClampBucketCoord,src/map/terrain.cpp,0,0,0,0,0,0,?ClampBucketCoord@@YGHHI@Z,1,
 map,FUN_0047caf0,src/map/terrain.cpp,0,0,0,0,0,0,?FUN_0047caf0@@YGXXZ,1,
@@ -277,7 +277,6 @@ map,Mission::MissionExists,src/map/map_list.cpp,1,0,0,0,0,0,?MissionExists@Missi
 map,Mission::SelectMission,src/map/map_list.cpp,1,0,0,0,0,0,?SelectMission@Mission@@QAEHH@Z,0,campaign-menu
 map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?ResizePassMap@MovementClass@@QAEXII@Z,1,
 map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
-map,MsvcVector::~MsvcVector,src/map/msvc_vector.h,1,0,0,0,0,0,??1?$MsvcVector@HV?$allocator@H@std@@@@QAE@XZ,0,shutdown
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
 map,VisitObjectsInRect,src/map/terrain.cpp,0,0,0,0,0,0,?VisitObjectsInRect@@YGXHHHHPAVUnitVisitor@@@Z,1,
 network,*,,287,50,5310,567,2590,117,,73,
@@ -591,7 +590,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,366,304,6445,5115,3186,1962,,25,
+orders,*,,366,304,6424,5099,3188,1964,,25,
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,AiSearchGoal::HasNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,network
 orders,AiSearchGoal::SerializeNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,network
@@ -1199,7 +1198,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1106,454,31701,9821,11814,2554,,293,
+presentation,*,,1106,454,31699,9821,11814,2554,,293,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1,
@@ -2158,7 +2157,7 @@ seams,LoadMeteorDefaultsNative,src/seams/native.cpp,1,0,0,0,0,0,?LoadMeteorDefau
 seams,MissionExistsNative,src/seams/native.cpp,1,0,0,0,0,0,?MissionExistsNative@@YIHPAVMission@@HH@Z,0,
 seams,SelectMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?SelectMissionNative@@YIHPAVMission@@HH@Z,0,
 seams,SquadManagerDeleteTimersNative,src/seams/native.cpp,1,0,0,0,0,0,?SquadManagerDeleteTimersNative@@YIXPAVSquadManager@@H@Z,0,
-state,*,,497,425,1513,1047,1008,494,,60,
+state,*,,522,446,1620,1114,1064,522,,60,
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1,
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
 state,??8@YG_NABU?$Ref@G@@PAG@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@G@@PAG@Z,0,unused-instance
@@ -2192,6 +2191,7 @@ state,BlockVector::Capacity,src/state/block_vector.h,0,0,0,0,0,0,?Capacity@?$Blo
 state,BlockVector::Capacity,src/state/block_vector.h,0,0,0,0,0,0,?Capacity@?$BlockVector@V?$BlockVector@UBuildRatingWeights@@@@@@QBEIXZ,1,
 state,BlockVector::Capacity,src/state/block_vector.h,0,0,0,0,0,0,?Capacity@?$BlockVector@V?$BlockVector@UKeyedCell@@@@@@QBEIXZ,1,
 state,BlockVector::Capacity,src/state/block_vector.h,1,0,0,0,0,0,?Capacity@?$BlockVector@VLosLine@@@@QBEIXZ,0,unused-instance
+state,BlockVector::Clear,src/state/block_vector.h,1,0,0,0,0,0,?Clear@?$BlockVector@UOrderTableEntry@@@@QAEXXZ,0,unused-instance
 state,BlockVector::Copy,src/state/block_vector.h,0,0,0,0,0,0,?Copy@?$BlockVector@V?$BlockVector@U?$Ref@UUnit@@@@@@@@CGPAV?$BlockVector@U?$Ref@UUnit@@@@@@PBV2@0PAV2@@Z,1,
 state,BlockVector::Copy,src/state/block_vector.h,0,0,0,0,0,0,?Copy@?$BlockVector@V?$BlockVector@UBuildRatingWeights@@@@@@CGPAV?$BlockVector@UBuildRatingWeights@@@@PBV2@0PAV2@@Z,1,
 state,BlockVector::Copy,src/state/block_vector.h,0,0,0,0,0,0,?Copy@?$BlockVector@V?$BlockVector@UKeyedCell@@@@@@CGPAV?$BlockVector@UKeyedCell@@@@PBV2@0PAV2@@Z,1,
@@ -2199,6 +2199,7 @@ state,BlockVector::CopyAssign,src/state/block_vector.h,1,0,0,0,0,0,?CopyAssign@?
 state,BlockVector::CopyAssign,src/state/block_vector.h,1,0,0,0,0,0,?CopyAssign@?$BlockVector@F@@CGPAFPBF0PAF@Z,0,unused-instance
 state,BlockVector::CopyAssign,src/state/block_vector.h,1,0,0,0,0,0,?CopyAssign@?$BlockVector@UBuildRatingWeights@@@@CGPAUBuildRatingWeights@@PBU2@0PAU2@@Z,0,unused-instance
 state,BlockVector::CopyAssign,src/state/block_vector.h,1,0,0,0,0,0,?CopyAssign@?$BlockVector@ULosStep@@@@CGPAULosStep@@PBU2@0PAU2@@Z,0,unused-instance
+state,BlockVector::CopyAssign,src/state/block_vector.h,1,0,0,0,0,0,?CopyAssign@?$BlockVector@UOrderTableEntry@@@@CGPAUOrderTableEntry@@PBU2@0PAU2@@Z,0,unused-instance
 state,BlockVector::CopyAssign,src/state/block_vector.h,1,0,0,0,0,0,?CopyAssign@?$BlockVector@UPercentByte@@@@CGPAUPercentByte@@PBU2@0PAU2@@Z,0,unused-instance
 state,BlockVector::CopyAssign,src/state/block_vector.h,1,0,0,0,0,0,?CopyAssign@?$BlockVector@UUnitTypeInt@@@@CGPAUUnitTypeInt@@PBU2@0PAU2@@Z,0,unused-instance
 state,BlockVector::CopyAssign,src/state/block_vector.h,0,0,0,0,0,0,?CopyAssign@?$BlockVector@V?$BlockVector@U?$Ref@UUnit@@@@@@@@CGPAV?$BlockVector@U?$Ref@UUnit@@@@@@PBV2@0PAV2@@Z,1,
@@ -2219,6 +2220,7 @@ state,BlockVector::Erase,src/state/block_vector.h,1,0,0,0,0,0,?Erase@?$BlockVect
 state,BlockVector::Erase,src/state/block_vector.h,1,0,0,0,0,0,?Erase@?$BlockVector@F@@QAEPAFPAF0@Z,0,unused-instance
 state,BlockVector::Erase,src/state/block_vector.h,1,0,0,0,0,0,?Erase@?$BlockVector@UBuildRatingWeights@@@@QAEPAUBuildRatingWeights@@PAU2@0@Z,0,unused-instance
 state,BlockVector::Erase,src/state/block_vector.h,1,0,0,0,0,0,?Erase@?$BlockVector@ULosStep@@@@QAEPAULosStep@@PAU2@0@Z,0,unused-instance
+state,BlockVector::Erase,src/state/block_vector.h,1,0,0,0,0,0,?Erase@?$BlockVector@UOrderTableEntry@@@@QAEPAUOrderTableEntry@@PAU2@0@Z,0,unused-instance
 state,BlockVector::Erase,src/state/block_vector.h,1,0,0,0,0,0,?Erase@?$BlockVector@UPercentByte@@@@QAEPAUPercentByte@@PAU2@0@Z,0,unused-instance
 state,BlockVector::Erase,src/state/block_vector.h,1,0,0,0,0,0,?Erase@?$BlockVector@UUnitTypeInt@@@@QAEPAUUnitTypeInt@@PAU2@0@Z,0,unused-instance
 state,BlockVector::Erase,src/state/block_vector.h,1,0,0,0,0,0,?Erase@?$BlockVector@VLosLine@@@@QAEPAVLosLine@@PAV2@0@Z,0,unused-instance
@@ -2245,6 +2247,7 @@ state,BlockVector::~BlockVector,src/state/block_vector.h,1,0,0,0,0,0,??1?$BlockV
 state,BlockVector::~BlockVector,src/state/block_vector.h,1,0,0,0,0,0,??1?$BlockVector@UBuildRatingWeights@@@@QAE@XZ,0,unused-instance
 state,BlockVector::~BlockVector,src/state/block_vector.h,1,0,0,0,0,0,??1?$BlockVector@UDamageTableEntry@@@@QAE@XZ,0,shutdown
 state,BlockVector::~BlockVector,src/state/block_vector.h,1,0,0,0,0,0,??1?$BlockVector@UKeyedCell@@@@QAE@XZ,0,unused-instance
+state,BlockVector::~BlockVector,src/state/block_vector.h,1,0,0,0,0,0,??1?$BlockVector@UOrderTableEntry@@@@QAE@XZ,0,shutdown
 state,BlockVector::~BlockVector,src/state/block_vector.h,1,0,0,0,0,0,??1?$BlockVector@UPercentByte@@@@QAE@XZ,0,unused-instance
 state,BlockVector::~BlockVector,src/state/block_vector.h,1,0,0,0,0,0,??1?$BlockVector@UUnitTypeInt@@@@QAE@XZ,0,unused-instance
 state,BlockVector::~BlockVector,src/state/block_vector.h,1,0,0,0,0,0,??1?$BlockVector@VLosTable@@@@QAE@XZ,0,shutdown

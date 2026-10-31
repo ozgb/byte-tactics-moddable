@@ -144,6 +144,8 @@ ModelState,shadow,pointer,src/graphics/model_types.h,#353
 NetPacketPendingEntry,next,pointer,src/network/packet_buffer.h,#353
 NetPacketPendingEntry,owner,pointer,src/network/packet_buffer.h,#353
 NetPacketPendingEntry,prev,pointer,src/network/packet_buffer.h,#353
+Object3D,faces,pointer,src/weapons/explosion_types.h,#352
+Object3D,verts,pointer,src/weapons/explosion_types.h,#352
 OptionsSliderMenu,holder,pointer,src/frontend/options_slider_menu.h,#353
 PacketBuffer,first,pointer,src/network/packet_buffer.h,#353
 PacketChannel,buffers,pointer,src/network/packet_channel.h,#353

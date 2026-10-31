@@ -132,8 +132,6 @@ extern GUID g_dpspGuidTcpip;
 extern GUID g_dpspGuidIpx;
 extern GUID g_dpspGuidSerial;
 int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
-void __stdcall BlitMenuLayers(void* menu, int a, int b);
-void __stdcall SetGadgetActiveByName(void* menu, const char* name, int value);
 #include "../gui/dialogs.h"
 void __stdcall SetOffscreenSurface(int a);
 void FlipScreen();
@@ -252,7 +250,7 @@ conn:
     msg = "Connecting  (ESC to abort)";
 shown:
     OpenMessageBox(&g_game->gui, Translate(msg), 0x96, 0, 1);
-    BlitMenuLayers(&g_game->gui, (int)g_game->screen, 0);
+    BlitMenuLayers(&g_game->gui, (unsigned int*)g_game->screen, 0);
     SetOffscreenSurface((int)g_game->screen);
     FlipScreen();
     FlipScreen();
@@ -521,16 +519,8 @@ extern int DAT_0051276c;
 extern int g_battleRoomSlotsBuilt;
 extern int g_rejectPlayer;
 
-int __stdcall TrySetFocus(void* menu, int index);
-void __stdcall SetDescListCleanupFlag(void* gui, int flag);
-void __stdcall SetGrayedOutByName(void* menu, const char* name, int value);
-void __stdcall SetGrayedOutByName(void* gui, char* name, int value);
-void __stdcall SetGadgetGrayedOutByName(void* menu, char* name, int value);
-char* __stdcall GetGadgetText(void* menu, const char* key, char* out);
-int __stdcall GetGadgetStatus(void* menu, int handle);
 char __stdcall GetGadgetActiveByName(void* menu, char* name);
 int __stdcall GetButtonStage(void* gadget, int index);
-int __stdcall GetButtonStageByName(void* gadget, char* name);
 void __stdcall SetButtonStageByName(void* gui, char* name, int value);
 int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
 void __stdcall SetGadgetStatusByName(void* gui, char* name, int value);
@@ -562,7 +552,6 @@ void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* par
 #include "../map/map_list.h"
 #include "../gui/file_list.h"
 #include "options.h"
-int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 void __stdcall RejectPlayer(int param_1, int param_2);
 int __stdcall GetDisplayModes(ModeList* obj);
 void __stdcall SortDisplayModes(ModeList* obj);
@@ -2097,7 +2086,7 @@ void UpdateBattleRoomFlags()
 // FUNCTION: 0x446020
 void __stdcall HandleRejectChoice(Gui* gadget)
 {
-    int owner = (int)gadget->layer->entries;
+    Gadget* owner = gadget->layer->entries;
     if (gadget->hotGadgetIndex == -1)
         return;
     if (IsGadgetNamed(owner, gadget->hotGadgetIndex, "CHOICE1")) {

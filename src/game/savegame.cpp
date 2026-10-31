@@ -73,7 +73,6 @@ int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 void __stdcall SetGadgetText(Gui* menu, int index, char* text);
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
-void __stdcall SetGadgetActiveByName(void* menu, char* name, int value);
 #include "../util/registry.h"
 void __stdcall FrameFromSurface(void* dst, void* src);
 #include "../graphics/surface.h"
@@ -97,7 +96,6 @@ void __cdecl operator delete(void* p);
 void* __cdecl operator new(unsigned int size);
 #include "../gui/dialogs.h"
 void __stdcall SetCursorAnimation(void* menu, void* data);
-void __stdcall SetDescListCleanupFlag(Gui* menu, int flag);
 #include "savegame.h"
 #include "side_data.h"
 
@@ -539,8 +537,8 @@ void ShowLoadGameScreen()
     }
     g_savegameSideList = BuildSideList();
     ConfigureListBoxByName(&g_game->gui, "GAMES", g_savegameDescs, count, nullptr);
-    SetGadgetActiveByName((char*)&g_game->message_519[0], "DELETE", 0);
-    SetGadgetActiveByName((char*)&g_game->message_519[0], "GAMENAME", 0);
+    SetGadgetActiveByName(&g_game->gui, "DELETE", 0);
+    SetGadgetActiveByName(&g_game->gui, "GAMENAME", 0);
     Gadget* entry = FindGadgetChecked(gadget->entries, "GAMES");
     if (entry != 0) {
         entry->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))SavedGameSelectHandler;
@@ -548,7 +546,7 @@ void ShowLoadGameScreen()
     ShowSavedGameInfo();
     SetKeyboardInput(&g_game->gui, 1);
     OrLabelAttribs();
-    SetGadgetActiveByName((char*)&g_game->message_519[0], "SaveGame", 0);
+    SetGadgetActiveByName(&g_game->gui, "SaveGame", 0);
     EnableKeyCommands((Gui *)((char*)&g_game->message_519[0]));
     RenderLayer((Gui *)((char*)&g_game->message_519[0]), 0x40);
     ((char*)g_game)[0x38a51] |= 1;

@@ -94,7 +94,6 @@ extern int __stdcall ReadGuiFile(void* entry, char* path);
 #include "../graphics/object_pool.h"
 extern void __cdecl HideSoftwareCursor(void);
 extern void __cdecl ShowSoftwareCursor(void);
-extern void __stdcall TrySetFocus(Gui* menu, int value);
 extern void __stdcall SetTextColors(int a, int b);
 #include "keyboard.h"
 #include "dialogs.h"
@@ -386,9 +385,9 @@ void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect)
 }
 
 // FUNCTION: 0x4ab190
-void __stdcall SetDescListCleanupFlag(int gui, int flag)
+void __stdcall SetDescListCleanupFlag(Gui* gui, int flag)
 {
-    *(int*)(gui + 0xcc6) = flag;
+    gui->pathsReady = flag;
 }
 
 // FUNCTION: 0x4ab1b0
@@ -755,8 +754,6 @@ struct RemapPalette {
 #include "../../link/globals.h"
 
 int __stdcall FindGadgetIndex(Gadget* entries, const char* name, int type);
-int __stdcall IsGadgetNamed(Gadget* entries, int index, char* name);
-void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int flag);
 void __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
 int __stdcall GetTextWidth(Font* font, unsigned char* text);

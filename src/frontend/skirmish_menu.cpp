@@ -96,7 +96,6 @@ int AreAllPlayersInOneAllyGroup(void)
 }
 #pragma auto_inline(on)
 
-void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 
 int __cdecl CountHumanSlots()
 {

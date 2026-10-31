@@ -244,7 +244,6 @@ Unit* __stdcall FindNextSelectedUnit(Unit* unit, int dir);
 #include "selection.h"
 #include "game_dialogs.h"
 #include "../weapons/weapons.h"
-void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect);
 #include "../graphics/particles.h"
 int __stdcall PointInRect(Rect* r, int x, int y);
 int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1, int color);

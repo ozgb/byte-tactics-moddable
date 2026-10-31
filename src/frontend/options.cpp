@@ -177,11 +177,6 @@ struct OptionsPanelGui {
 
 #pragma pack(pop)
 
-struct OptionsBlitGui {
-    char unknown_0[0xcca];
-    int changed;
-};
-
 struct DisplayModeList {
     int count;
     DisplayMode* modes;
@@ -246,16 +241,6 @@ struct ScreenFreeData {
     void* field_4;
     char unknown_8[0x14 - 0x8];
     void* field_14;
-};
-
-struct RestartGui {
-    int unknown_0;
-    int unknown_4;
-    int field_8;
-    int field_c;
-    int unknown_10;
-    int language;
-    char unknown_18[0x1c - 0x18];
 };
 
 // GLOBAL: 0x511de8
@@ -323,11 +308,8 @@ extern Surface* g_optionsBackupSurface;
 extern int g_battleQuitIntent;
 extern OptionsPrefsSnapshot g_optionsPrefsSnapshot;
 
-void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
 char* __stdcall FindGadgetChecked_C(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name);
-void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
-void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int param_3);
 int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
 #include "../graphics/palette.h"
 #include "../game/game_state.h"
@@ -336,30 +318,17 @@ Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 
 
 
-void __stdcall BlitMenuLayers(OptionsBlitGui* sub, unsigned int* a, int* b);
-void __stdcall BlitMenuLayers(char* menu, int a, int b);
 
 void __stdcall SetOffscreenSurface(void* p);
 void __stdcall SetOffscreenSurface(int param_1);
 void FlipScreen();
 
-void __stdcall SetGrayedOutByName(void* obj, char* name, int value);
-void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value);
-int __stdcall GetGadgetText(void* settings, const char* key, char* out);
 
 
 int __stdcall SetButtonStageByName(void* obj, char* name, int value);
 int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
-void __stdcall SetGadgetActiveByName(void* obj, char* name, int value);
-void __stdcall SetGadgetActiveByName(Gui* obj, char* name, int value);
-void __stdcall SetGadgetActiveByName(VisualOptionsGui* menu, char* name, int value);
-void __stdcall SetGadgetActiveByName(Gui* sub, char* name, int value);
-void __stdcall SetGadgetGrayedOutByName(void* obj, char* name, int value);
-void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int value);
 
 
-int __stdcall GetButtonStageByName(void* obj, char* name);
-int __stdcall GetButtonStageByName(Gui* gui, char* name);
 
 void __stdcall PlaySoundByName(char* name, int value);
 #include "../gui/dialogs.h"
@@ -398,7 +367,6 @@ int FindHostSlot();
 char* __cdecl _itoa(int value, char* buf, int radix);
 int __stdcall SetCursorMode(int value);
 #include "../game/cd_check.h"
-int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 #include "../game/game_state.h"
 #include "frontend.h"
 void __stdcall FrameFromSurface(GafFrame* dst, Surface* src);
@@ -932,7 +900,7 @@ void BlitOptionsPanel()
     }
     RenderLayer(&g_game->gui, 0x40);
     MarkChanged(&g_game->gui);
-    BlitMenuLayers((OptionsBlitGui*)&g_game->gui, 0, 0);
+    BlitMenuLayers(&g_game->gui, 0, 0);
     SetOffscreenSurface((void *)g_game->screen);
     FlipScreen();
 }
@@ -1906,7 +1874,7 @@ void __stdcall HandleOptionsPanelClick(Gui* gui)
         } else {
             RenderLayer(&g_game->gui, 0x40);
             MarkChanged(&g_game->gui);
-            BlitMenuLayers((char*)&g_game->gui, 0, 0);
+            BlitMenuLayers(&g_game->gui, 0, 0);
             SetOffscreenSurface((int)(void *)g_game->screen);
             FlipScreen();
         }
@@ -2107,17 +2075,16 @@ void __stdcall HandleRestartDialogClick(Gui* gui)
 // FUNCTION: 0x4604a0
 void OpenRestartDialog()
 {
-    RestartGui* menu = (RestartGui*)&g_game->gui;
     Layer* dialog = LoadGuiLayer(&g_game->gui, "RESTART.GUI", 0x1000);
     Gadget* gadgets = dialog->entries;
     dialog->handler = HandleRestartDialogClick;
     LoadPictureCached("drestart", 0, 0, 0);
     int index = FindGadgetIndex(gadgets, "MISSIONNAME", 5);
-    menu->language = menu->field_c;
+    g_game->gui.language = (FontGlyphTable*)g_game->gui.values[1];
     char* text = WordWrapText(&g_game->gui,
                               g_game->net->GetMissionName(),
                               gadgets[index].width, -1);
-    menu->language = menu->field_8;
+    g_game->gui.language = (FontGlyphTable*)g_game->gui.values[0];
     char* first = strtok(text, "\n");
     SetTranslatedTextByName(&g_game->gui, "MISSIONNAME", first, 0x80);
     char* second = strtok(0, "\n");
@@ -2133,7 +2100,7 @@ void OpenRestartDialog()
 // FUNCTION: 0x4605c0
 void __stdcall HandleSurrenderChoice(Gui* gui)
 {
-    int owner = (int)gui->layer->entries;
+    Gadget* owner = gui->layer->entries;
     if (gui->hotGadgetIndex == -1)
         return;
     PlaySoundByName("Exit", 0);

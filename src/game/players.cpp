@@ -433,7 +433,6 @@ void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
 
 #include "../network/unit_sync.h"
 void __stdcall PlaySoundByName(char* str, int flag);
-int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 #include "../gui/dialogs.h"
 #include "../gui/gadget.h"
 #include "../gui/layer.h"
@@ -442,7 +441,7 @@ int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 // FUNCTION: 0x464de0
 void __stdcall ContinueWatchingCallback(Gui* gui)
 {
-    int screen = (int)gui->layer->entries;
+    Gadget* screen = gui->layer->entries;
     if (gui->hotGadgetIndex == -1)
         return;
     PlaySoundByName("BigButton", 0);

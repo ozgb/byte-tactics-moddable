@@ -346,7 +346,7 @@ Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name)
 }
 
 // FUNCTION: 0x4a0300
-int __stdcall IsGadgetNamed(Gadget* entries, int i, char* name)
+int __stdcall IsGadgetNamed(Gadget* entries, int i, const char* name)
 {
     if (i == -1) {
         return 0;
@@ -467,7 +467,7 @@ char __stdcall GetGadgetActiveByName(Gui* obj, char* name)
 }
 
 // FUNCTION: 0x4a0570
-void __stdcall SetGadgetActiveByName(Gui* obj, char* name, int param_3)
+void __stdcall SetGadgetActiveByName(Gui* obj, const char* name, int param_3)
 {
     if (obj->layer) {
         int index = FindGadgetAccessEntry(obj->layer->entries, name);
@@ -662,7 +662,7 @@ void __stdcall SetGadgetColorByName(Gui* obj, char* name, int value)
 }
 
 // FUNCTION: 0x4a0d00
-char* __stdcall GetGadgetText(Gui* obj, char* name, char* buf)
+char* __stdcall GetGadgetText(Gui* obj, const char* name, char* buf)
 {
     char* desc = 0;
     if (obj->layer == 0) {
@@ -717,7 +717,7 @@ int __stdcall GetGadgetStatus(Gui* obj, int index)
 }
 
 // FUNCTION: 0x4a0f60
-int __stdcall GetButtonStageByName(Gui* obj, char* name)
+int __stdcall GetButtonStageByName(Gui* obj, const char* name)
 {
     Gadget* entries = obj->layer->entries;
     int i = FindGadgetAccessEntry(entries, name);
@@ -792,7 +792,7 @@ void __stdcall SetGrayedOut(Gui* obj, int index, int value)
 }
 
 // FUNCTION: 0x4a1250
-void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value)
+void __stdcall SetGrayedOutByName(Gui* obj, const char* name, int value)
 {
     Gadget* entries = obj->layer->entries;
     int i = FindGadgetAccessEntry(entries, name);
@@ -842,7 +842,7 @@ void __stdcall SetGadgetGrayedOut(Gui* obj, int index, int value)
 }
 
 // FUNCTION: 0x4a1450
-void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int param_3)
+void __stdcall SetGadgetGrayedOutByName(Gui* obj, const char* name, int param_3)
 {
     int index = FindGadgetAccessEntry(obj->layer->entries, name);
     if (index != -1)
@@ -3013,7 +3013,6 @@ GafFrame* __stdcall GetGafFrame(GafEntry* table, int index);
 GafEntry* __stdcall FindGafEntry(void* gaf, const char* name);
 void* __stdcall LoadGaf(char* path);
 #include "../graphics/palette.h"
-char* __stdcall GetGadgetText(Gui* menu, char* name, char* buf);
 
 void* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
@@ -3024,7 +3023,6 @@ int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw,
 void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
 void __stdcall DrawLineGadget(Gui* obj, int index, unsigned int param3);
 int __stdcall HandleLabelInput(Gui* obj, int index, int key);
-int __stdcall TrySetFocus(Gui* obj, int index);
 #include "../graphics/object_pool.h"
 int __stdcall SelectFontForEntry(void* entries, int index);
 

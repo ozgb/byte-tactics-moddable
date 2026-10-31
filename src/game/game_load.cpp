@@ -139,8 +139,8 @@ void __stdcall CreateUnit(unsigned char team, unsigned short id, CreateUnitPos p
 void __cdecl operator delete(void* p);
 
 #include "../gui/gui.h"
+#include "../gui/dialogs.h"
 #include "../gui/layer.h"
-void __stdcall BlitMenuLayers(Main2Menu* menu, int a, int b);
 
 #include "../graphics/pcx.h"
 #include "../ingame/build_placement.h"
@@ -446,9 +446,9 @@ void __stdcall DrawSyncStatus(void* surface)
     int off;
     extern Game* g_game;
 
-    RenderLayer((Gui *)&g_game->menu_519_18, 0x40);
-    MarkLayerChanged((Gui *)&g_game->menu_519_18);
-    BlitMenuLayers(&g_game->menu_519_18, 0, 0);
+    RenderLayer(&g_game->gui, 0x40);
+    MarkLayerChanged(&g_game->gui);
+    BlitMenuLayers(&g_game->gui, 0, 0);
 
     const char* text;
     if (g_game->netBits.synced) {

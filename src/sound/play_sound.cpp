@@ -7,6 +7,7 @@ extern int* g_diskWav;
 
 void* __stdcall HAPI_LoadFile(char* path, int flags);
 void __cdecl GameFreeThunk(int* p);
+void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position);
 
 // FUNCTION: 0x49f610
 int IsWindowsSoundAvailable(void)
@@ -52,6 +53,7 @@ void __stdcall PlayLoopingWavMemory(char* sound)
 // FUNCTION: 0x49f6c0
 BOOL __stdcall PlayWavFromDisk(char* path)
 {
+    HarnessSoundEvent("wav_file", -1, path, NULL, NULL);
     int* sound = (int*)HAPI_LoadFile(path, 0);
     if (sound == 0)
         return 0;

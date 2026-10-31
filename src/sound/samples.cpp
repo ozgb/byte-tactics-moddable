@@ -48,6 +48,7 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
 
 extern int g_playBufferLooping;
+void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position);
 
 extern const GUID IID_IDirectSound3DBuffer;
 
@@ -305,6 +306,7 @@ void Sound::ReapFinishedBuffers()
 // FUNCTION: 0x4cf150
 void Sound::StopAllBuffers()
 {
+    HarnessSoundEvent("stop_all", -1, NULL, NULL, NULL);
     IDirectSoundBuffer** slot = buffers;
     for (int i = 0x20; i != 0; i--) {
         IDirectSoundBuffer* obj = *slot;
@@ -712,6 +714,7 @@ void Sound::StartStream(FileHandle* file, int sampleRate, int bits,
 // FUNCTION: 0x4cfb40
 void Sound::StopStream()
 {
+    HarnessSoundEvent("stop_stream", -1, NULL, NULL, NULL);
     if (streamTimer != -1) {
         RemoveTimer(streamTimer);
         streamTimer = -1;
@@ -1155,6 +1158,8 @@ void Sound::LoadSample(char* path)
 // FUNCTION: 0x4d0640
 void Sound::PlaySample(const char* param1, int param2, int param3)
 {
+    int loggedVolume = param2;
+    HarnessSoundEvent("play_file", -1, param1, &loggedVolume, NULL);
     OpenSample((char*)param1, 1, param2, param3);
 }
 

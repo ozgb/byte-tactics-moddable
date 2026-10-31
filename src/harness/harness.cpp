@@ -81,6 +81,8 @@ static int s_dumpEnabled = 0;
 static char s_scenarioPath[512];
 static FILE* s_trace = NULL;
 static FILE* s_dump = NULL;
+static FILE* s_sound = NULL;
+static char s_soundBuffer[4096];
 static unsigned s_dumpTick = 0;
 static char s_loadName[64];
 static int s_loadLine = 0;
@@ -1163,8 +1165,11 @@ void HarnessAfterStep()
         fclose(s_trace);
     if (s_dump != NULL)
         fclose(s_dump);
+    if (s_sound != NULL)
+        fclose(s_sound);
     s_trace = NULL;
     s_dump = NULL;
+    s_sound = NULL;
     if (gameOver && (unsigned)g_game->ticks < s_ticks)
         sprintf(msg, "testmode: game over at tick %u\n", (unsigned)g_game->ticks);
     else
@@ -3272,6 +3277,44 @@ void HarnessBeforeStep()
     }
 }
 
+void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position)
+{
+    if (!s_testMode || s_sound == NULL)
+        return;
+    char text[33];
+    const char* name = NULL;
+    if (file != NULL) {
+        name = file;
+    } else if (index >= 0 && index < g_game->soundCount && index < 256) {
+        const char(*names)[32] = (const char(*)[32])&g_game->soundNames[0][0];
+        const char(*files)[32] = (const char(*)[32])&g_game->soundFiles[0][0];
+        const char* source = names[index][0] != '\0' ? names[index] : files[index];
+        memcpy(text, source, 32);
+        text[32] = '\0';
+        name = text;
+    }
+    if (name != NULL) {
+        const char* base = name;
+        const char* p;
+        for (p = name; *p != '\0'; p++) {
+            if (*p == '\\' || *p == '/')
+                base = p + 1;
+        }
+        name = base;
+    }
+    if (name == NULL || name[0] == '\0')
+        name = "-";
+    fprintf(s_sound, "%u %s %s ", GameU32(GAME_TICK), kind, name);
+    if (volume != NULL)
+        fprintf(s_sound, "%d ", *volume);
+    else
+        fprintf(s_sound, "- ");
+    if (position != NULL)
+        fprintf(s_sound, "%d %d %d\n", position[0], position[1], position[2]);
+    else
+        fprintf(s_sound, "- - -\n");
+}
+
 void HarnessPhase(int phase)
 {
     if (!s_testMode || s_trace == NULL)
@@ -3311,6 +3354,8 @@ void HarnessPhase(int phase)
     }
     if (phase == 7) {
         fflush(s_trace);
+        if (s_sound != NULL)
+            fflush(s_sound);
         if (s_dumpNow)
             fflush(s_dump);
     }
@@ -3345,6 +3390,11 @@ static void OpenTrace(unsigned controlWord)
     s_trace = fopen("trace.txt", "wb");
     if (s_trace == NULL)
         Fail("testmode: cannot write trace.txt\n");
+    s_sound = fopen("sound.txt", "wb");
+    if (s_sound == NULL)
+        Fail("testmode: cannot write sound.txt\n");
+    setvbuf(s_sound, s_soundBuffer, _IOFBF, sizeof s_soundBuffer);
+    fprintf(s_sound, "bt-sound 1\n");
     fprintf(s_trace, "bt-trace %d\ncommit %s\nscenario %s\ngame_seed %u\ncrt_seed %u\nview_seed %u\n"
                      "fpu_control_word 0x%05X\n",
             TRACE_FORMAT, commit, s_scenarioPath, s_gameSeed, s_crtSeed, s_viewSeed, controlWord);

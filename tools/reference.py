@@ -49,6 +49,9 @@ ROOT = Path(__file__).resolve().parent.parent
 OUTPUTS = ("TotalA.exe", "SMACKW32.DLL", "commit.txt")
 SCENARIOS = ROOT / "reference/scenarios"
 TRACES = ROOT / "reference/traces"
+SOUNDS = ROOT / "reference/sounds"
+SOUND_FILE = "sound.txt"
+SOUND_LOGS: dict[str, str | None] = {}
 MAX_PARALLEL = 6
 QUICK = ("eight-full-moon", "eight-greenhaven", "duel-coast-to-coast", "duel-great-divide", "orders-move-attack")
 RUN_SECONDS_BASE = 120
@@ -235,11 +238,9 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            extra: dict = {}
+            extra: dict = {"collect": (SOUND_FILE, *(tracediff.SAVE_FILES if save_to is not None else ()))}
             if load_from is not None:
                 extra["put"] = {path: load_from / Path(path).name for path in tracediff.SAVE_FILES}
-            if save_to is not None:
-                extra["collect"] = tracediff.SAVE_FILES
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, **extra)
             break
         except tracediff.Error as e:
@@ -254,6 +255,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
             for path in tracediff.SAVE_FILES:
                 if (run / path).is_file():
                     shutil.copyfile(run / path, save_to / Path(path).name)
+        sound_log = run / SOUND_FILE
+        SOUND_LOGS[scenario.stem] = sound_log.read_text() if sound_log.is_file() else None
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
         for key in ("game_seed", "crt_seed", "view_seed"):
             if key not in header:
@@ -355,6 +358,15 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
     for name, (header, digests, elapsed, _) in results.items():
         (TRACES / f"{name}.txt").write_text(rendered[name])
         print(f"wrote {(TRACES / f'{name}.txt').relative_to(ROOT)}: {len(digests)} ticks, {clock(elapsed)}")
+    for name in results:
+        if SOUND_LOGS.get(name) is None:
+            fail(f"{name}: the run wrote no {SOUND_FILE}; the stored sound logs are untouched")
+    SOUNDS.mkdir(parents=True, exist_ok=True)
+    for old in SOUNDS.glob("*.txt"):
+        old.unlink()
+    for name in results:
+        (SOUNDS / f"{name}.txt").write_text(SOUND_LOGS[name])
+    print(f"{len(results)} sound logs written to {SOUNDS.relative_to(ROOT)}")
     print(f"{len(results)} traces, commit {sha}, total {clock(time.time() - t0)}")
 
 

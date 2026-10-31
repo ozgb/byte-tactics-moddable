@@ -6510,6 +6510,7 @@ address,function,file,kind,target
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_maybe_written,Spot::shadow
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Cell::feature
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Cell::flags
+0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Cell::height
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Feature::burnTime
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Feature::seqburn
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_read,Feature::seqburnshad
@@ -6529,6 +6530,7 @@ address,function,file,kind,target
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_write,Spot::x
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_write,Spot::z
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_write,Vec3::x
+0x4233a0,StartFeatureBurning,src/map/features.cpp,field_write,Vec3::y
 0x4233a0,StartFeatureBurning,src/map/features.cpp,field_write,Vec3::z
 0x4233a0,StartFeatureBurning,src/map/features.cpp,function,
 0x4233a0,StartFeatureBurning,src/map/features.cpp,global_read,g_game
@@ -23295,6 +23297,7 @@ address,function,file,kind,target
 0x47f090,StreamSoundDelayed,src/sound/sound.cpp,global_read,g_noDirectSound
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,call,BroadcastPacket
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,call,GetLocalDpid
+0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,call,HarnessSoundEvent
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,call,PlayLoopingWavMemory
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,call,PlayWavMemory
 0x47f0c0,PlaySoundByIndex,src/sound/sound.cpp,call,Sound::PlayLooping
@@ -23332,6 +23335,7 @@ address,function,file,kind,target
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,Game::Current
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,GetLocalDpid
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,GetMapCell
+0x47f300,PlaySoundAt,src/sound/sound.cpp,call,HarnessSoundEvent
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,MapContains
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,PlaySoundByIndex
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,Sound::Is3DEnabled
@@ -23362,6 +23366,9 @@ address,function,file,kind,target
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Pos_0047f300::y
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Pos_0047f300::z
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Pos_0047f300::zVal
+0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Vector3_0047f300::x
+0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Vector3_0047f300::y
+0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Vector3_0047f300::z
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_write,Packet_0047f300::flag
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_write,Packet_0047f300::index
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_write,Packet_0047f300::pos
@@ -30804,6 +30811,7 @@ address,function,file,kind,target
 0x49f6a0,PlayLoopingWavMemory,src/sound/play_sound.cpp,global_write,g_loopingWav
 0x49f6c0,PlayWavFromDisk,src/sound/play_sound.cpp,call,GameFreeThunk
 0x49f6c0,PlayWavFromDisk,src/sound/play_sound.cpp,call,HAPI_LoadFile
+0x49f6c0,PlayWavFromDisk,src/sound/play_sound.cpp,call,HarnessSoundEvent
 0x49f6c0,PlayWavFromDisk,src/sound/play_sound.cpp,call,PlaySoundA
 0x49f6c0,PlayWavFromDisk,src/sound/play_sound.cpp,function,
 0x49f6c0,PlayWavFromDisk,src/sound/play_sound.cpp,global_read,g_diskWav
@@ -38911,6 +38919,7 @@ address,function,file,kind,target
 0x4cf0b0,Sound::ReapFinishedBuffers,src/sound/samples.cpp,field_write,Sound::count
 0x4cf0b0,Sound::ReapFinishedBuffers,src/sound/samples.cpp,field_write,Sound::sets
 0x4cf0b0,Sound::ReapFinishedBuffers,src/sound/samples.cpp,function,
+0x4cf150,Sound::StopAllBuffers,src/sound/samples.cpp,call,HarnessSoundEvent
 0x4cf150,Sound::StopAllBuffers,src/sound/samples.cpp,call,Stop
 0x4cf150,Sound::StopAllBuffers,src/sound/samples.cpp,deref_read,*IDirectSoundBuffer
 0x4cf150,Sound::StopAllBuffers,src/sound/samples.cpp,deref_write,*IDirectSoundBuffer
@@ -39072,6 +39081,7 @@ address,function,file,kind,target
 0x4cf940,Sound::StartStream,src/sound/samples.cpp,field_write,tWAVEFORMATEX::wFormatTag
 0x4cf940,Sound::StartStream,src/sound/samples.cpp,function,
 0x4cfb40,Sound::StopStream,src/sound/samples.cpp,call,HAPI_CloseFile
+0x4cfb40,Sound::StopStream,src/sound/samples.cpp,call,HarnessSoundEvent
 0x4cfb40,Sound::StopStream,src/sound/samples.cpp,call,Release
 0x4cfb40,Sound::StopStream,src/sound/samples.cpp,call,RemoveTimer
 0x4cfb40,Sound::StopStream,src/sound/samples.cpp,call,Stop
@@ -39197,6 +39207,7 @@ address,function,file,kind,target
 0x4d02a0,Sound::OpenSample,src/sound/samples.cpp,function,
 0x4d0620,Sound::LoadSample,src/sound/samples.cpp,call,Sound::OpenSample
 0x4d0620,Sound::LoadSample,src/sound/samples.cpp,function,
+0x4d0640,Sound::PlaySample,src/sound/samples.cpp,call,HarnessSoundEvent
 0x4d0640,Sound::PlaySample,src/sound/samples.cpp,call,Sound::OpenSample
 0x4d0640,Sound::PlaySample,src/sound/samples.cpp,function,
 0x4d0660,Sound::StreamSample,src/sound/samples.cpp,call,Sound::OpenSample
@@ -44119,10 +44130,12 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_saveTick@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_savedOptions@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_read,s_sound@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_dump@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_write,s_sound@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_trace@src/harness/harness.cpp
 ,HarnessBankString,src/harness/harness_bank.cpp,call,HapiBank::GetStringItem
 ,HarnessBankString,src/harness/harness_bank.cpp,function,
@@ -44199,6 +44212,7 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_hashHi@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_hashLo@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_phaseNames@src/harness/harness.cpp
+,HarnessPhase,src/harness/harness.cpp,global_read,s_sound@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_write,s_dumpNow@src/harness/harness.cpp
@@ -44212,6 +44226,16 @@ address,function,file,kind,target
 ,HarnessPoseObject,src/harness/harness.cpp,deref_write,*int
 ,HarnessPoseObject,src/harness/harness.cpp,deref_write,*short
 ,HarnessPoseObject,src/harness/harness.cpp,function,
+,HarnessSoundEvent,src/harness/harness.cpp,call,GameU32
+,HarnessSoundEvent,src/harness/harness.cpp,call,fprintf
+,HarnessSoundEvent,src/harness/harness.cpp,call,memcpy
+,HarnessSoundEvent,src/harness/harness.cpp,deref_read,*char
+,HarnessSoundEvent,src/harness/harness.cpp,deref_read,*int
+,HarnessSoundEvent,src/harness/harness.cpp,field_read,Game::soundCount
+,HarnessSoundEvent,src/harness/harness.cpp,function,
+,HarnessSoundEvent,src/harness/harness.cpp,global_read,g_game
+,HarnessSoundEvent,src/harness/harness.cpp,global_read,s_sound@src/harness/harness.cpp
+,HarnessSoundEvent,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessStartSkirmish,src/harness/harness.cpp,call,SetUpLoadedGame
 ,HarnessStartSkirmish,src/harness/harness.cpp,call,SetUpSkirmish
 ,HarnessStartSkirmish,src/harness/harness.cpp,deref_write,*int
@@ -46124,16 +46148,20 @@ address,function,file,kind,target
 ,OpenTrace,src/harness/harness.cpp,call,fprintf
 ,OpenTrace,src/harness/harness.cpp,call,isspace
 ,OpenTrace,src/harness/harness.cpp,call,memcpy
+,OpenTrace,src/harness/harness.cpp,call,setvbuf
 ,OpenTrace,src/harness/harness.cpp,call,strcpy
 ,OpenTrace,src/harness/harness.cpp,function,
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_scenarioPath@src/harness/harness.cpp
+,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_soundBuffer@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_crtSeed@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_dumpEnabled@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_gameSeed@src/harness/harness.cpp
+,OpenTrace,src/harness/harness.cpp,global_read,s_sound@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_viewSeed@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_write,s_dump@src/harness/harness.cpp
+,OpenTrace,src/harness/harness.cpp,global_write,s_sound@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_write,s_trace@src/harness/harness.cpp
 ,Order,src/ingame/selection_48cf30.cpp,function,
 ,Order::Advance,src/orders/unit_orders.cpp,call,Order::AttachApproachRadiusGoal

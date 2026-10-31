@@ -314,6 +314,10 @@ struct Cell {                          // 13 bytes per cell
             char unknown_0b[7];
             char field7;               // +0x7
         };
+        struct {
+            char unknown_0c[4];
+            unsigned char height;
+        };
     };
     unsigned short feature;            // +0x8
     union {
@@ -810,6 +814,7 @@ void __stdcall StartFeatureBurning(int x, int z, int flag)
     Vec3 pos;
     pos.x = x << 20;
     pos.z = z << 20;
+    pos.y = cell->height << 16;
     PlaySoundAtByName("treeburn", &pos, 0);
     if (flag == 0) {
         FeatureDamagePacket packet;

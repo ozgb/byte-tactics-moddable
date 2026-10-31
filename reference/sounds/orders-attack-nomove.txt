@@ -1,4 +1,3 @@
 bt-sound 1
 0 stop_all - - - - -
-120 play - -585 - - -
-120 play_file - - - - -
+120 play_file servmed2.WAV -585 - - -

@@ -1,15 +1,9 @@
 bt-sound 1
 0 stop_all - - - - -
-67 play - -585 - - -
-67 play_file - - - - -
-1952 play - -585 - - -
-1952 play_file - - - - -
+67 play_file nanlath1.WAV -585 - - -
+1952 play_file kcarmmov.WAV -585 - - -
 2050 play ADDBUILD -585 - - -
-2115 play - -585 - - -
-2115 play_file - - - - -
-3590 play - -585 - - -
-3590 play_file - - - - -
-4001 play - -585 - - -
-4001 play_file - - - - -
-4400 play - -585 - - -
-4400 play_file - - - - -
+2115 play_file hoverok1.WAV -585 - - -
+3590 play_file kcarmmov.WAV -585 - - -
+4001 play_file kcarmstp.WAV -585 - - -
+4400 play_file hovlgok1.WAV -585 - - -

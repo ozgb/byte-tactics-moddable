@@ -1,12 +1,7 @@
 bt-sound 1
 0 stop_all - - - - -
-36 play - -585 - - -
-36 play_file - - - - -
-433 play - -585 - - -
-433 play_file - - - - -
-702 play - -585 - - -
-702 play_file - - - - -
-770 play - -585 - - -
-770 play_file - - - - -
-860 play - -585 - - -
-860 play_file - - - - -
+36 play_file nanlath1.WAV -585 - - -
+433 play_file nanlath1.WAV -585 - - -
+702 play_file solar1.WAV -585 - - -
+770 play_file cantdo4.WAV -585 - - -
+860 play_file cantdo4.WAV -585 - - -

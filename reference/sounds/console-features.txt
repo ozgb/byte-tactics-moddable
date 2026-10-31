@@ -1,4 +1,4 @@
 bt-sound 1
 0 stop_all - - - - -
-174 play - -585 - - -
-249 play - -585 - - -
+174 play splshbig -585 - - -
+249 play splshbig -585 - - -

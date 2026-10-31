@@ -1,9 +1,6 @@
 bt-sound 1
 0 stop_all - - - - -
 610 play ADDBUILD -585 - - -
-793 play - -585 - - -
-793 play_file - - - - -
-1276 play - -585 - - -
-1276 play_file - - - - -
-1321 play - -585 - - -
-1321 play_file - - - - -
+793 play_file plabwork.WAV -585 - - -
+1276 play_file servtny2.WAV -585 - - -
+1321 play_file plabwork.WAV -585 - - -

@@ -1,8 +1,7 @@
 bt-sound 1
 0 stop_all - - - - -
-41 play - -1585 - - -
-44 play - -1585 - - -
-80 play - -585 - - -
-80 play_file - - - - -
-382 play - -1585 - - -
-382 play - -1585 - - -
+41 play rockhvy2 -1585 - - -
+44 play xplomed2 -1585 - - -
+80 play_file kbcormov.WAV -585 - - -
+382 play xplomed1 -1585 - - -
+382 play xplolrg3 -1585 - - -

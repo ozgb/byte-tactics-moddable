@@ -1,4 +1,4 @@
 bt-sound 1
 0 stop_all - - - - -
-30 play - -585 - - -
+30 play xplonuk4 -585 - - -
 30 play MessageArrived -585 - - -

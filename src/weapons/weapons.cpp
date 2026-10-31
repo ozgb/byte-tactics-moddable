@@ -102,57 +102,15 @@ void FreeWeaponArray(void)
     g_game->projectiles = 0;
 }
 
-#pragma pack(push, 1)
-
-struct WeaponFirePlayerView {
-    char unknown_0[4];
-    int f4;
-};
-
-struct WeaponFireUnitView {
-    char unknown_0[0x96];
-    Ref<WeaponFirePlayerView> kind;
-    char unknown_9a[0xa8 - 0x9a];
-    unsigned short team;
-};
-
-struct WeaponFirePacket {
-    unsigned char type;
-    Vec3 origin;
-    Vec3 aimOrVel;
-    unsigned char weaponDefIndex;
-    unsigned char flag : 1;
-    unsigned char : 7;
-    unsigned short fireHeading;
-    unsigned short firePitch;
-    unsigned short targetUnitId;
-    unsigned short ownerUnitId;
-    unsigned char weaponSlotIndex;
-};
-
-#pragma pack(pop)
-
-int __stdcall BroadcastPacket(int player, void* data, int size);
+#include "../../interfaces/seams.h"
 
 // FUNCTION: 0x499ab0
-void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, WeaponFireUnitView* source,
-                            WeaponFireUnitView* target, Vec3* a,
+void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, Unit* source,
+                            Unit* target, Vec3* a,
                             Vec3* b)
 {
-    WeaponFirePacket packet;
-    if (g_game->flags_2a44 & 1) {
-        packet.type = 0xd;
-        packet.origin = *(Vec3*)a;
-        packet.aimOrVel = *(Vec3*)b;
-        packet.weaponDefIndex = unit->weapon->index;
-        packet.weaponSlotIndex = (unit->flags >> 2) & 3;
-        packet.ownerUnitId = !source ? 0 : source->team;
-        packet.targetUnitId = !target ? 0 : target->team;
-        packet.fireHeading = unit->fireHeading;
-        packet.firePitch = unit->firePitch;
-        packet.flag = unit->weapon->flags.value >> 30;
-        BroadcastPacket(source->kind->f4, &packet, 0x24);
-    }
+    if (g_game->flags_2a44 & 1)
+        g_seams.network->SendWeaponFire(source, unit, target, a, b);
 }
 
 #include "../network/net_game.h"
@@ -160,14 +118,8 @@ void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, WeaponFireUnitView* so
 // FUNCTION: 0x499ba0
 void __stdcall BroadcastWeaponFire(char param_1, Vec3* a, Vec3* b)
 {
-    WeaponFirePacket packet;
-    if (g_game->flags_2a44 & 1) {
-        packet.type = 0xd;
-        packet.origin = *(Vec3*)a;
-        packet.aimOrVel = *(Vec3*)b;
-        packet.weaponDefIndex = param_1;
-        BroadcastPacket(GetLocalDpid(), &packet, 0x24);
-    }
+    if (g_game->flags_2a44 & 1)
+        g_seams.network->SendWeaponFireAt(param_1, a, b);
 }
 
 #pragma pack(push, 2)
@@ -434,7 +386,6 @@ struct AreaDamageHits {
     }
 };
 
-int __stdcall BroadcastPacket(int id, void* data, int size);
 
 static inline int Length(Vec3* v)
 {
@@ -684,13 +635,7 @@ done:
     g_game->projectileCount = count;
 }
 
-#pragma pack(push, 1)
-struct ProjectileDetonatePacket {
-    unsigned char type;
-    Vec3 aim;
-    unsigned char weaponIndex;
-};
-#pragma pack(pop)
+#include "../network/wire_packets.h"
 
 static inline int SamePos(const Vec3& a, const Vec3& b)
 {
@@ -1282,7 +1227,6 @@ int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit, Vec3* 
                            Vec3* point, Unit* target);
 int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* pos,
                            Vec3* aim, Unit* target);
-int __stdcall BroadcastPacket(int player, void* data, int size);
 
 // FUNCTION: 0x49d580
 int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
@@ -1338,23 +1282,8 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
             return 0;
         unit->aimCob.nAimCobDone = 0;
         unit->flags &= 0xfe;
-        if (g_game->netGameFlags & 1) {
-            WeaponFirePacket msg;
-            msg.type = 0xd;
-            msg.origin = gunpos;
-            msg.aimOrVel = *point;
-            msg.weaponDefIndex = unit->weapon->index;
-            msg.weaponSlotIndex = unit->flags >> 2 & 3;
-            if (fire == 0)
-                msg.ownerUnitId = 0;
-            else
-                msg.ownerUnitId = fire->id;
-            msg.targetUnitId = target ? target->id : 0;
-            msg.fireHeading = unit->fireHeading;
-            msg.firePitch = unit->firePitch;
-            msg.flag = unit->weapon->flags.value >> 30;
-            BroadcastPacket(fire->player->id, &msg, 0x24);
-        }
+        if (g_game->netGameFlags & 1)
+            g_seams.network->SendWeaponFire(fire, unit, target, &gunpos, point);
         return 1;
     }
     return 0;
@@ -1425,54 +1354,23 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, UnitWeaponSlot* aim,
                                        (short)((int)_hypot((double)dx, (double)dz) >> 16));
     if (AimWithinTolerance(unit, aim, unit->heading, unit->pitch)) {
         if (FireLineOfSightProjectile(aim, unit, &p, point, target)) {
-            if (g_game->netGameFlags & 1) {
-                WeaponFirePacket msg;
-                msg.type = 0xd;
-                msg.origin = unit->pos;
-                msg.aimOrVel = *point;
-                msg.weaponDefIndex = aim->weapon->index;
-                msg.weaponSlotIndex = aim->flags >> 2 & 3;
-                if (unit == 0)
-                    msg.ownerUnitId = 0;
-                else
-                    msg.ownerUnitId = unit->id;
-                msg.targetUnitId = target ? target->id : 0;
-                msg.fireHeading = aim->fireHeading;
-                msg.firePitch = aim->firePitch;
-                msg.flag = aim->weapon->flags.value >> 30;
-                BroadcastPacket(unit->player->id, &msg, 0x24);
-            }
+            if (g_game->netGameFlags & 1)
+                g_seams.network->SendWeaponFire(unit, aim, target, &unit->pos, point);
             return 1;
         }
     }
     return 0;
 }
 
-#pragma pack(push, 1)
-struct VLaunchPlayerView {
-    char unknown_0[4];
-    int player;
-};
-
-struct VLaunchUnitView {
-    char unknown_0[0x96];
-    Ref<VLaunchPlayerView> kind;
-    char unknown_9a[0xa8 - 0x9a];
-    short team;
-};
-
-#pragma pack(pop)
-
-void __stdcall GetWeaponPiecePosition(VLaunchUnitView* obj, Vec3* out, unsigned char weapon, int piece);
-int* __stdcall FindTargetableProjectile(VLaunchUnitView* obj, unsigned char weapon);
-int __stdcall FireVLaunchProjectile(UnitWeaponSlot* shot, VLaunchUnitView* source, Vec3* pos,
-                           Vec3* aim, VLaunchUnitView* target, int* param_6);
+int* __stdcall FindTargetableProjectile(Unit* obj, unsigned char weapon);
+int __stdcall FireVLaunchProjectile(UnitWeaponSlot* shot, Unit* source, Vec3* pos,
+                           Vec3* aim, Unit* target, int* param_6);
 double __cdecl _hypot(double x, double y);
 long __cdecl _ftol();
 
 // FUNCTION: 0x49db70
-int __stdcall FireVLaunchWeapon(VLaunchUnitView* source, UnitWeaponSlot* shot,
-                           VLaunchUnitView* target, Vec3* aim)
+int __stdcall FireVLaunchWeapon(Unit* source, UnitWeaponSlot* shot,
+                           Unit* target, Vec3* aim)
 {
     Vec3 pos;
     if (shot->aimCob.nAimCobDone != 0) {
@@ -1493,20 +1391,8 @@ int __stdcall FireVLaunchWeapon(VLaunchUnitView* source, UnitWeaponSlot* shot,
             p = 0;
         }
         if (FireVLaunchProjectile(shot, source, &pos, aim, target, p)) {
-            if (g_game->flags_2a44 & 1) {
-                WeaponFirePacket packet;
-                packet.type = 0xd;
-                packet.origin = pos;
-                packet.aimOrVel = *aim;
-                packet.weaponDefIndex = shot->weapon->index;
-                packet.weaponSlotIndex = (shot->flags >> 2) & 3;
-                packet.ownerUnitId = source == 0 ? 0 : source->team;
-                packet.targetUnitId = target == 0 ? 0 : target->team;
-                packet.fireHeading = shot->fireHeading;
-                packet.firePitch = shot->firePitch;
-                packet.flag = shot->weapon->flags.b.interceptor;
-                BroadcastPacket(source->kind->player, &packet, 0x24);
-            }
+            if (g_game->flags_2a44 & 1)
+                g_seams.network->SendWeaponFire(source, shot, target, &pos, aim);
             shot->aimCob.nAimCobDone = 0;
             shot->flags &= 0xfe;
             return 1;
@@ -1540,24 +1426,7 @@ int __stdcall FireDroppedWeapon(Unit* unit, UnitWeaponSlot* aim,
         projectile->direction.x = -ScaledSin((short)projectile->angles.heading, ((DroppedMotionIdView*)unit->motion.get())->id);
         projectile->direction.z = -ScaledCos((short)projectile->angles.heading, ((DroppedMotionIdView*)unit->motion.get())->id);
         if (g_game->netGameFlags & 1) {
-            WeaponFirePacket packet;
-            packet.type = 0xd;
-            packet.origin = p;
-            packet.aimOrVel = *point;
-            packet.weaponDefIndex = aim->weapon->index;
-            packet.weaponSlotIndex = aim->flags >> 2 & 3;
-            if (unit == 0)
-                packet.ownerUnitId = 0;
-            else
-                packet.ownerUnitId = unit->id;
-            if (target == 0)
-                packet.targetUnitId = 0;
-            else
-                packet.targetUnitId = target->id;
-            packet.fireHeading = aim->fireHeading;
-            packet.firePitch = aim->firePitch;
-            packet.flag = aim->weapon->flags.value >> 30;
-            BroadcastPacket(unit->player->id, &packet, 0x24);
+            g_seams.network->SendWeaponFire(unit, aim, target, &p, point);
         }
         return 1;
     }
@@ -1583,14 +1452,8 @@ int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* a, Vec3* b, int flag)
     proj->direction = *b;
     if (flag) {
         unsigned char team = weapon->index;
-        if (g_game->flags_2a44 & 1) {
-            WeaponFirePacket packet;
-            packet.type = 0xd;
-            packet.origin = *a;
-            packet.aimOrVel = *b;
-            packet.weaponDefIndex = team;
-            BroadcastPacket(GetLocalDpid(), &packet, 0x24);
-        }
+        if (g_game->flags_2a44 & 1)
+            g_seams.network->SendWeaponFireAt(team, a, b);
     }
     return 1;
 }
@@ -1651,8 +1514,6 @@ int __stdcall CalcAimAngles(Unit* unit, WeaponDef* target,
                            unsigned char weapon, Vec3* point);
 int __stdcall WeaponCanReachPos(Unit* unit, Vec3* a2, Vec3* a3,
                            unsigned char a4);
-int __stdcall SendScriptCallByName(Unit* obj, char* name, char field_5, int field_6, int field_a,
-                           unsigned short field_e, unsigned short field_12);
 
 // FUNCTION: 0x49e1a0
 void __stdcall UpdateUnitWeapons(Unit* unit) {
@@ -1701,7 +1562,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                     e->aimCob.nAimCobDone = 0;
                     g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->aimCob, 0, 2,
                                                heading, angle, 0, 0);
-                    SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, heading, angle, 0, 0);
+                    g_seams.network->SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, heading, angle, 0, 0);
                     e->flags |= 1;
                 }
             }
@@ -1711,7 +1572,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                 e->aimCob.nAimCobDone = 0;
                 g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->aimCob, 0, 2, 0, 0,
                                            0, 0);
-                SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, 0, 0, 0, 0);
+                g_seams.network->SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, 0, 0, 0, 0);
                 e->flags |= 1;
             }
         }
@@ -1779,7 +1640,6 @@ char* __stdcall FindWeaponByName(char* name)
 void DrawTriangleContours(void*, int, int, int, int, int, int);
 void DrawRangeCircle(void*, void*, void*, int, int, const char*, int);
 void IssueOrCancelOrder(unsigned char, int, void*, int, int*, int, int);
-int SendScriptCall(void*, short, char, int, int, int, int);
 void AddTextGadget(void*, char*, char*, int, short, int, int);
 void DrawProgressBar(void*, int, int, void*, void*, int);
 void WriteScreenshot(char*, char*, int, int, int, int);
@@ -2272,15 +2132,8 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
             if ((int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dy * dy) >> 32) + (int)(((__int64)dz * dz) >> 32)
                 < reach * reach) {
                 DetonateProjectile(other, nullptr);
-                ProjectileDetonatePacket packet;
-                packet.type = 0xe;
-                packet.aim = other->target;
-                packet.weaponIndex = other->type->index;
-                BroadcastPacket(weapon->attacker->player->id, &packet, sizeof(packet));
-                packet.type = 0xe;
-                packet.aim = weapon->target;
-                packet.weaponIndex = weapon->type->index;
-                BroadcastPacket(weapon->attacker->player->id, &packet, sizeof(packet));
+                g_seams.network->SendProjectileDetonated(weapon->attacker, other);
+                g_seams.network->SendProjectileDetonated(weapon->attacker, weapon);
             }
         }
     }

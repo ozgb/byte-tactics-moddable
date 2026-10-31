@@ -315,7 +315,6 @@ void __cdecl CreateMissionUnits()
 }
 
 #include "../network/net_game.h"
-void __stdcall BroadcastPacket(int who, OwnershipTransferPacket* packet, int size);
 
 // FUNCTION: 0x488570
 void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPacket* p)
@@ -333,20 +332,9 @@ void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPack
         if (other->active == 0)
             return;
         if (other->type == 3) {
-            OwnershipTransferPacket pk;
             unit->flags &= ~0x10;
             unit->postTransferHoldoff = 0x96;
-            pk.type = 0x14;
-            pk.newOwnerNetId = GetPlayerDpid(other);
-            pk.unitId = unit->id;
-            pk.buildPercent = (int)unit->buildLeft;
-            pk.hitPoints = unit->health;
-            pk.angles = unit->angles;
-            unsigned char a = unit->weapons[0].flags & 2;
-            pk.stockpile0 = a ? unit->weapons[0].stockpile : 0;
-            pk.stockpile1 = a ? unit->weapons[1].stockpile : 0;
-            pk.stockpile2 = a ? unit->weapons[2].stockpile : 0;
-            BroadcastPacket(unit->player->id, &pk, 0x18);
+            g_seams.network->SendOwnershipTransfer(unit, other);
             g_seams.weapons->DamageUnit(0, unit, 30000, 4, 0);
             return;
         }

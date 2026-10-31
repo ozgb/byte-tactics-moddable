@@ -27,7 +27,7 @@ void __stdcall CmdShareMetal(int unused)
                 (g_game->players[g_game->localPlayer].info->shareMetal != 0)
                     ? "ON" : "OFF");
         AddMessage(buf, 2, 0, 10);
-        BroadcastPlayerInfo();
+        g_seams.network->BroadcastPlayerInfo();
     }
 }
 
@@ -42,7 +42,7 @@ void __stdcall CmdShareEnergy(int unused)
                 (g_game->players[g_game->localPlayer].info->flags_97_wide & 4)
                     ? "ON" : "OFF");
         AddMessage(buf, 2, 0, 10);
-        BroadcastPlayerInfo();
+        g_seams.network->BroadcastPlayerInfo();
     }
 }
 
@@ -57,7 +57,7 @@ void __stdcall CmdShareMapping(int unused)
                 (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x20)
                     ? "ON" : "OFF");
         AddMessage(buf, 2, 0, 10);
-        BroadcastPlayerInfo();
+        g_seams.network->BroadcastPlayerInfo();
     }
 }
 
@@ -72,7 +72,7 @@ void __stdcall ToggleShareLos(int unused)
                 (g_game->players[g_game->localPlayer].info->shareLOS != 0)
                     ? "ON" : "OFF");
         AddMessage(buf, 2, 0, 10);
-        BroadcastPlayerInfo();
+        g_seams.network->BroadcastPlayerInfo();
     }
 }
 
@@ -87,7 +87,7 @@ void __stdcall CmdShareRadar(int unused)
                 (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x40)
                     ? "ON" : "OFF");
         AddMessage(buf, 2, 0, 10);
-        BroadcastPlayerInfo();
+        g_seams.network->BroadcastPlayerInfo();
     }
 }
 

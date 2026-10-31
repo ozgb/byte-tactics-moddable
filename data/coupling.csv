@@ -2102,7 +2102,7 @@ orders,platform,call,UnitDef::EnergyCost,1
 orders,platform,call,UnitDef::MaxHealth,1
 orders,platform,call,UnitDef::MetalCost,1
 orders,platform,call,WorldToCell,3
-orders,platform,call,copy,4
+orders,platform,call,copy,3
 orders,platform,call,operator delete,20
 orders,platform,call,operator new,46
 orders,platform,call,operator-,1

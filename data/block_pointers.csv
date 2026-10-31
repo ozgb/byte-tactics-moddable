@@ -1128,20 +1128,8 @@ LoadUnitTypes: MODEL PTRS,0x4+0x4*k 0x16 0x6e 0x8a 0x11e 0x16a 0x16e+0xf0*k 0x19
 LoadUnitTypes: MODEL PTRS,0x1d6,LoadSoundCategories #2,1,7200,0x11,not-a-pointer,Model pointer table words at odd offsets: they straddle two pointers and only look like addresses
 LoadUnitTypes: MODEL PTRS,0x27e 0x2aa 0x2c2 0x40e,LoadTntMap: TILE SET,4,23400,0x1a0b3c-0x400b3b,not-a-pointer,Model pointer table words at odd offsets: they straddle two pointers and only look like addresses
 LoadWeaponType,*,*,0,0,-,not-a-pointer,words of LoadWeaponType that only look like addresses
-LoadWeaponType,*,*,0,0,-,outside,"the 9 outside pair rows of LoadWeaponType, which follow"
-LoadWeaponType,0x5+0x4*k,?Insert@?$BlockVector@E@@QAEXPAEIABE@Z,27,277800,0x0-0x800,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd): the buffer is loaded with the weapon types; target names change with the heap layout"
-LoadWeaponType,0x5,?Insert@?$BlockVector@UBuildRatingWeights@@@@QAEXPAUBuildRatingWeights@@IABU2@@Z,9,66900,0x10-0x20,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd): the buffer is loaded with the weapon types; target names change with the heap layout"
 LoadWeaponType,0x3,CMemoryCache::InitCache: CMemoryCache CCH,1,7200,0xeffe0,not-a-pointer,Weapon damage table words that only look like addresses
-LoadWeaponType,0x5 0xb,HAPI_LoadFile,3,3000,0x60-0xa0201,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd); loaded with the weapon types"
-LoadWeaponType,0x5,LoadSoundCategories,3,21600,0x40,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd): the buffer is loaded with the weapon types; target names change with the heap layout"
-LoadWeaponType,0x5,LoadSoundCategories #2,5,79200,0x40,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd): the buffer is loaded with the weapon types; target names change with the heap layout"
-LoadWeaponType,0x5,LoadSoundCategories #3,1,9000,0x40,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd): the buffer is loaded with the weapon types; target names change with the heap layout"
-LoadWeaponType,0x5,LoadSoundCategories #4,9,93900,0x40,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd): the buffer is loaded with the weapon types; target names change with the heap layout"
 LoadWeaponType,0x3+0x4*k,LoadTntMap: TILE SET,2,16200,0x3b0201-0x840201,not-a-pointer,Weapon damage table words that only look like addresses
-LoadWeaponType,0x5,NanoParticles::Emit,3,126,0x1e0,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd): the buffer is loaded with the weapon types; target names change with the heap layout"
-LoadWeaponType,0x5,SmokeParticles::Emit,4,173,0x20,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd): the buffer is loaded with the weapon types; target names change with the heap layout"
-LoadWeaponType,0x5,Sound::CreateSampleFromFile: Digital Audio Sample,27,277800,0x10,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd): the buffer is loaded with the weapon types; target names change with the heap layout"
-LoadWeaponType,0x5,ThrustParticles::Emit,1,4,0xf0,outside,"WeaponDef damage table vector (first 0x5, last 0x9, end 0xd): the buffer is loaded with the weapon types; target names change with the heap layout"
 Mission::LoadMissionData: MISSIONFEATURE DATA,*,*,0,0,-,not-a-pointer,"MissionFeature table: a 0x80-byte name and two ints, no pointers; words in the name only look like addresses"
 Mission::LoadMissionData: MISSIONRULE DATA,*,*,0,0,-,not-a-pointer,"MissionRule table: numbers and strings, no pointers"
 Mission::LoadMissionData: MISSIONRULE DATA,0x12 0x14 0x1e 0x2c+0x24*k 0x4e 0x5c 0x72,HAPI_LoadFile,13,89100,0x1e0-0x9ffe0,not-a-pointer,"MissionRule table: numbers and strings, no pointers"
@@ -1327,8 +1315,6 @@ SimGlobals.g_meteorTarget,*,*,0,0,-,not-a-pointer,"g_meteorTarget: integers (tic
 SimGlobals.g_meteorTarget,0x0,LoadSoundCategories #2,1,1950,0x3b,not-a-pointer,"g_meteorTarget: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_meteorWeaponName,*,*,0,0,-,not-a-pointer,"g_meteorWeaponName: the bytes of the meteor weapon's name, which only look like an address"
 SimGlobals.g_missionOrderTableVec,*,*,0,0,-,not-a-pointer,words of SimGlobals.g_missionOrderTableVec that only look like addresses
-SimGlobals.g_missionOrderTableVec,*,*,0,0,-,outside,"the 1 outside pair rows of SimGlobals.g_missionOrderTableVec, which follow"
-SimGlobals.g_missionOrderTableVec,0x4+0x4*k,RegisterOrderTypes,27,277800,0x0-0x6a4,outside,Mission order table vector first (0x4)
 SimGlobals.g_movementClasses,*,*,0,0,-,not-a-pointer,words of SimGlobals.g_movementClasses that only look like addresses
 SimGlobals.g_movementClasses,*,*,0,0,-,outside,"the 6 outside pair rows of SimGlobals.g_movementClasses, which follow"
 SimGlobals.g_movementClasses,0xd6,AllocDepthFrame: CompositeBuffer,1,5400,0x1ffe0,not-a-pointer,"MovementClass words (sizes, depths, slopes) that only look like addresses"

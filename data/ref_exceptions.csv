@@ -172,6 +172,8 @@ Object3do,name,pointer,src/graphics/object3do.h,#353
 Object3do,sibling,pointer,src/graphics/object3do.h,#353
 Object3do,vertices,pointer,src/graphics/object3do.h,#353
 OptionsSliderMenu,holder,pointer,src/frontend/options_slider_menu.h,#353
+OrderTableEntry,name,pointer,src/orders/order_type_entry.h,#353
+OrderTableEntry,notify,function-pointer,src/orders/order_type_entry.h,#353
 PacketBuffer,first,pointer,src/network/packet_buffer.h,#353
 PacketChannel,buffers,pointer,src/network/packet_channel.h,#353
 PacketChannel,firstPacket,pointer,src/network/packet_channel.h,#353
@@ -212,4 +214,3 @@ UnitDef,data,pointer,src/units/unit_def.h,#352
 UnitDef,weaponCategories,pointer,src/units/unit_def.h,#352
 UnitInfoSnapshot,orderName,int-pointer,src/ingame/unit_info_snapshot.h,#353
 WeaponDef,fire,pointer,src/weapons/weapon_def.h,#352
-WeaponDef,table,pointer,src/weapons/weapon_def.h,#596

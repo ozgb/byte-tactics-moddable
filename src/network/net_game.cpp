@@ -79,7 +79,6 @@ void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 void __stdcall AddMessage(char* text, int key, int value, char last);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall SetupPlayerSlot(unsigned char player, char type);
-int GetTicks();
 #include "unit_sync.h"
 #include "unit_sync_state.h"
 #include "../gui/dialogs.h"

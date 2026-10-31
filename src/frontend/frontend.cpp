@@ -133,7 +133,6 @@ void ShowSoftwareCursor();
 #include "../game/data_files.h"
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
-int GetTicks(void);
 int __stdcall InitNetConnection(void);
 #include "campaign_menu.h"
 #include "endgame.h"

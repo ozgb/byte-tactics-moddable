@@ -16,7 +16,7 @@
 void __stdcall RegisterOrderTypes(void* table, int id);
 void __stdcall StepGafSequence(void* item);
 
-unsigned int __cdecl GetTicks();
+#include "../../interfaces/services.h"
 
 // GLOBAL: 0x511de8
 extern Game* g_game;

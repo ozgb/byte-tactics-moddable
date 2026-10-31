@@ -14,7 +14,7 @@
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* ptr);
 #include "packets.h"
-unsigned int GetTicks();
+#include "../../interfaces/services.h"
 #include "net_stats.h"
 #include "net_game.h"
 

@@ -563,7 +563,7 @@ struct CornerHeightSample {
 };
 #pragma pack(pop)
 
-unsigned int GetTicks();
+#include "../../interfaces/services.h"
 int __cdecl AngleOfVector(int x, int y);
 void __cdecl RotatePoint2D(unsigned short deg, XzPoint* p);
 

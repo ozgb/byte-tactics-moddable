@@ -1,5 +1,6 @@
 #ifndef DEBUG_LIB_H
 #define DEBUG_LIB_H
+#include "../../interfaces/services.h"
 
 #include <stddef.h>
 
@@ -39,9 +40,7 @@ void* __cdecl GameRealloc(void* block, unsigned int size);
 void __cdecl GameFree(void* p);
 char __cdecl AvWriteDetectStub(unsigned long);
 void __cdecl ProtectPages(int addr, int size, int protect);
-void __cdecl ProtectBlockReadOnly(void* p);
 void __cdecl ProtectBlock(void* p, int protect);
-void __cdecl ProtectBlockReadWrite(void* p);
 void __stdcall AbortProgram(void);
 bool __cdecl IsDebugKeyword(const char* arg);
 void* __stdcall GetAllocLock();
@@ -58,10 +57,8 @@ void __stdcall FpuFussyAtexitHandler(void);
 int __stdcall StringMaxSize(void);
 
 void __cdecl FillPattern(void* p, unsigned int pattern, unsigned int n);
-void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 void* __cdecl GameAllocShared(unsigned int size);
 void* __cdecl GameReallocIgnoreTag(int* block, int size);
-char* __cdecl GameStrdup(char* s);
 void __cdecl GameFreeIndirectThunk(int* p);
 int __cdecl SetOutOfMemoryHandler(int handler);
 char* __cdecl FindCommandLineSwitch(char* name);

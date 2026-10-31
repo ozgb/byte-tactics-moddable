@@ -88,7 +88,6 @@ extern Game* g_game;
 
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"
-unsigned int __cdecl GetTicks();
 #include "../graphics/palette.h"
 #include "../graphics/draw.h"
 #include "../game/data_files.h"

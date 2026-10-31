@@ -41,7 +41,6 @@ int __stdcall FindGadgetIndexBySubstring(int value, char* name);
 #include "../gui/gui.h"
 void __stdcall SetCursorAnimation(void* a, void* b);
 void __stdcall SetCloseHandler(void* a, int b);
-int GetTicks();
 #include "../gui/keyboard.h"
 #include "../gui/keyboard.h"
 #include "build_placement.h"

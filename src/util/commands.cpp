@@ -27,7 +27,7 @@ extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
 #include "../../link/globals.h"
 
-#include "string_ref.h"
+#include "../../interfaces/services.h"
 #include "../state/sim_globals.h"
 
 static inline bool operator==(const StringRef& a, const StringRef& b)

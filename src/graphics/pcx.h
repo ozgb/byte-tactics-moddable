@@ -1,5 +1,6 @@
 #ifndef PCX_H
 #define PCX_H
+#include "../../interfaces/host.h"
 struct Object3do;
 struct PieceFrame;
 struct PcxBitmap;
@@ -37,6 +38,6 @@ void __stdcall GetObjectBounds(Object3do* obj, Vec3* lo, Vec3* hi, int arg);
 void __stdcall AddObjectBounds(Object3do* obj, Vec3* offset, Vec3* lo, Vec3* hi, int arg);
 int __stdcall SaveBmp(char* name, PcxBitmap* image);
 
-int __stdcall ExceptionFilter(void* exception, const char* thread);
+void HOST_CALL ReleaseDisplayAfterCrash(void);
 
 #endif

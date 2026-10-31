@@ -1,5 +1,6 @@
 #ifndef PATHFIND_H
 #define PATHFIND_H
+#include "../../interfaces/services.h"
 struct HeapEntry;
 
 struct HeapEntry;
@@ -10,6 +11,5 @@ void __stdcall AdjustHeap(HeapEntry* first, int hole, int len, HeapEntry val);
 void __stdcall PushHeapSiftUp(HeapEntry* first, int hole, int top, HeapEntry val);
 int __stdcall DirectionFromStep(int dx, int dy);
 
-void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int*, HeapEntry*);
 
 #endif

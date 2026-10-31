@@ -1,12 +1,13 @@
 #ifndef INTERFACES_SERVICES_H
 #define INTERFACES_SERVICES_H
 
+#include <stdlib.h>
 #include <string.h>
 
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 0
+#define SERVICES_VERSION_MINOR 1
 
 // Returns a random number in [0, range) from the main stream of the game logic.
 int __stdcall RandomInt(int range);
@@ -17,8 +18,157 @@ char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, cons
 // The extension of TDF data files.
 extern char g_extTdf[4];
 
+// Returns nonzero when the harness runs in test mode.
+int HarnessTestMode();
+// Puts the program in test mode.
+void EnterHarnessTestMode();
+
+struct Vec3;
+struct Vec3f;
+struct HeapEntry;
+
+// Returns the heading of the horizontal vector from one position to another.
+int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
+// Returns the vector from one position to another.
+Vec3f __stdcall VectorFromTo(Vec3f from, Vec3f to);
+// Returns the cross product of two vectors.
+Vec3f __stdcall CrossProduct(Vec3f a, Vec3f b);
+// Returns a vector scaled to length one.
+Vec3f __stdcall NormalizeVector(Vec3f v);
+// Rotates a position by three angles and stores the result in out.
+void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
+// Returns the checksum of a byte range.
+int __stdcall ComputeChecksum(unsigned char* data, int len);
+
+// Allocates a block of the game heap, naming the call site for the debug tables.
+void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
+// Copies a string into a new block of the game heap, or returns null for null.
+char* __cdecl GameStrdup(char* s);
+// Makes the pages of a block of the game heap read-only.
+void __cdecl ProtectBlockReadOnly(void* p);
+// Makes the pages of a block of the game heap writable.
+void __cdecl ProtectBlockReadWrite(void* p);
+// Copies one dword unless the source is null.
+void __stdcall CopyDwordIfNonNull(int* dest, int* src);
+// Arranges a range of path search entries into a heap.
+void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int*, HeapEntry*);
+
+// Returns the translation of a key.
+char* __stdcall Translate(const char* key);
+// Returns the index of a translation key.
+int __stdcall FindTranslation(char* name);
+// Skips n lines of text and returns the rest.
+char* __stdcall SkipTextLines(char* text, int n);
+// Writes formatted text to a host file and returns its length, or -1 on failure.
+int FilePrintf(void* file, const char* fmt, ...);
+// Loads a whole data file into the game heap, counting the load progress.
+char* __stdcall LoadFileWithProgress(char* path);
+// Loads a 3DO model of the data directory and binds its textures.
+void* __stdcall LoadObject3d(const char* name);
+// Returns non-zero when the data files are read from archives.
+int __stdcall UsesDataArchives(void);
+// Returns the address of the preferred language name, or 0 when none is set.
+int __stdcall GetPreferredLanguage(void);
+// Writes the settings of the game to the host.
+void __stdcall SaveSettings();
+// Loads a GAF animation file of the data directory, once.
+void* __stdcall LoadAnimGaf(char* name);
+
+// The arguments of one console command.
+class CommandArgs {
+public:
+    char* args[0x14];
+    char buffer[0x7e];
+    char unknown_ce[2];
+    int count;
+
+    // Returns the argument at an index, or the default when there is none.
+    char* GetArg(int index, char* default_val);
+    // Returns the argument at an index as an integer, or the default when there is none.
+    int GetIntArg(int index, int default_val);
+    // Returns the argument at an index as a float, or the default when there is none.
+    float GetFloatArg(int index, float default_val);
+    // Clears the arguments and returns the list.
+    CommandArgs* InitArgs();
+    // Splits the text up to end into arguments.
+    void Tokenize(char* text, char* end);
+    // Removes the first n arguments.
+    void ShiftArgs(int n);
+    // Replaces the numbered placeholders of the arguments with those of another list.
+    void SubstituteArgs(CommandArgs* other);
+
+    // Returns the argument at an index unparsed, or def when there is none.
+    char* GetArgPtr(int index, char* def)
+    {
+        if (index < 0 || index >= count) return def;
+        return args[index];
+    }
+};
+
+// Runs the commands of a text and returns the number run.
+int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mask);
+
 #pragma pack(push, 8)
-#include "../src/util/string_ref.h"
+// A reference-counted string whose text follows a count word.
+class StringRef {
+public:
+    union {
+        char* p;
+        char* data;
+        char* ptr;
+    };
+
+    // Builds an empty string.
+    StringRef();
+    // Shares the text of another string.
+    StringRef(const StringRef& other);
+    // Copies a null-terminated text.
+    StringRef(const char* text);
+    // Copies the first len characters of a text.
+    StringRef(const char* text, int len);
+    // Releases the reference.
+    ~StringRef() { ReleaseRef(); }
+    // Shares the text of another string.
+    StringRef& operator=(const StringRef& other)
+    {
+        Assign(&other);
+        return *this;
+    }
+    // Drops the reference and frees the text when it was the last.
+    void ReleaseRef();
+    // Shares the text of another string and returns this.
+    StringRef* Assign(const StringRef* other);
+    // Appends the text of another string and returns this.
+    StringRef* Append(const StringRef& other);
+    // Converts the text to lower case and returns this.
+    StringRef* MakeLower();
+    // Converts the text to upper case and returns this.
+    StringRef* MakeUpper();
+    // Replaces the text with a copy of a null-terminated text and returns this.
+    StringRef* AssignText(const char* text);
+    // Returns the text, copying it first when it is shared.
+    char* GetUnique()
+    {
+        int len = (int)strlen(data);
+        if (*(int*)(data - 4) != 1) {
+            int* block = (int*)malloc(len + 5);
+            *block = 1;
+            char* copy = (char*)(block + 1);
+            strcpy(copy, data);
+            (*(int*)(data - 4))--;
+            if (*(int*)(data - 4) == 0) {
+                free(data - 4);
+            }
+            data = copy;
+            return copy;
+        }
+        return data;
+    }
+    // Returns nonzero when the text is empty.
+    int IsEmpty() const;
+    // Returns the characters from start up to end as a new string.
+    StringRef SubString(int start, int end) const;
+};
 
 class TdfRecord;
 

@@ -1,13 +1,7 @@
-#include "win_types.h"
-#include "../state/block.h"
-#include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include <vector>
 
 #include "../map/mission.h"
-#include "../../interfaces/seams.h"
 
 class StringRef;
 
@@ -20,24 +14,18 @@ class StringRef;
 #include "../network/packet_manager.h"
 
 #include "../files/files_api.h"
-#include "../gui/dialogs.h"
 
 #include "../graphics/object_pool.h"
 
-#include "../game/main.h"
 #include "../graphics/palette.h"
 
-#include "../util/registry.h"
 
 #include "map_enum.h"
 
-#include "../game/data_files.h"
-#include "../util/tdf.h"
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall SetCursorMode(int n);
 #include "../network/net_game.h"
 
-#include "../graphics/display.h"
 
 #include "../../interfaces/services.h"
 #include "../state/sim_globals.h"

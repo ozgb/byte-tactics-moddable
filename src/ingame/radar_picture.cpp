@@ -1,4 +1,3 @@
-#include "win_types.h"
 #include "radar_picture.h"
 
 #include "../graphics/gaf_frame.h"
@@ -18,20 +17,12 @@ struct InterceptorDefFlags {
     unsigned int :2;
 };
 
-#include "../network/player_info.h"
 
-#include "../network/player.h"
 
-#include "../weapons/weapon_def.h"
 
-#include "../util/angles.h"
-#include "../weapons/unit_weapon_slot.h"
 
-#include "../units/unit.h"
-#include "../weapons/projectile.h"
 
 #include "../game/game.h"
-#include "../graphics/display.h"
 #pragma pack(pop)
 
 #include "../../link/globals.h"

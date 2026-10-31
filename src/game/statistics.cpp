@@ -8,7 +8,7 @@
 
 #include "statistics.h"
 #include "../../link/globals.h"
-extern char DAT_00512c98[];
+extern char g_userNameSetting[];
 extern DpspGuid g_dpspGuidIpx;
 extern DpspGuid g_dpspGuidSerial;
 extern DpspGuid g_dpspGuidModem;

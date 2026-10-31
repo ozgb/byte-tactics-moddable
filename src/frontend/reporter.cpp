@@ -7,7 +7,7 @@
 
 #include "../game/statistics.h"
 #include "../../link/globals.h"
-extern char DAT_00512c98[];
+extern char g_userNameSetting[];
 extern DpspGuid g_dpspGuidIpx;
 extern DpspGuid g_dpspGuidSerial;
 extern DpspGuid g_dpspGuidModem;
@@ -23,11 +23,9 @@ extern RiEnableFn g_riEnable;
 extern RiTerminateFn g_riTerminate;
 
 #include "reporter.h"
-#include "../debug/debug_lib.h"
 #include "../ingame/info_panel.h"
 #include "../network/online_report.h"
 #include "../graphics/object_pool.h"
-#include "../data/exe_only.h"
 
 // FUNCTION: 0x46bf00
 int __stdcall EnableReporter(int enable)
@@ -50,7 +48,7 @@ int __stdcall LoadReporterDll(int* count, int names)
         memcpy(g_game->providerGuid, net + 0x10, 16);
     }
 
-    if (DAT_00512c98[0] == 0) {
+    if (g_userNameSetting[0] == 0) {
         if (memcmp(g_game->providerGuid, &g_dpspGuidIpx, 16) == 0) goto four;
         if (memcmp(g_game->providerGuid, &g_dpspGuidSerial, 16) == 0) goto four;
         if (memcmp(g_game->providerGuid, &g_dpspGuidModem, 16) == 0) {

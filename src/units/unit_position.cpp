@@ -96,9 +96,8 @@ struct Block {
 #include "../util/tdf.h"
 
 
-#include "../network/bit_writer.h"
+#include "../../interfaces/services.h"
 
-#include "../network/bit_reader.h"
 
 #pragma pack(pop)
 

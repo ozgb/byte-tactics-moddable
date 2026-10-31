@@ -14,6 +14,7 @@
 #include "players.h"
 #include "map.h"
 #include "files.h"
+#include "network.h"
 
 // The function table each simulation subsystem is called through.
 struct Seams {
@@ -30,6 +31,7 @@ struct Seams {
     PlayersSeam* players;
     MapSeam* map;
     FilesSeam* files;
+    NetworkSeam* network;
 };
 
 // The active table, set once at start and never changed during a match.

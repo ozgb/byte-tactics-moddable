@@ -53,6 +53,13 @@ void __stdcall CopyDwordIfNonNull(int* dest, int* src);
 // Arranges a range of path search entries into a heap.
 void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int*, HeapEntry*);
 
+// Returns the net id of the player in a slot, or -1 for an empty slot.
+int __stdcall GetSlotDpid(unsigned char index);
+// Returns the slot of the player with a net id, or 10 when there is none.
+unsigned char __stdcall FindSlotByDpid(int id);
+// Returns the slot of the host, or 10 when there is none.
+unsigned char FindHostSlot();
+
 // Returns the translation of a key.
 char* __stdcall Translate(const char* key);
 // Returns the index of a translation key.
@@ -223,6 +230,51 @@ public:
 
 // Runs the commands of a text and returns the number run.
 int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mask);
+
+// Writes values of up to 32 bits into a growing buffer of words, low bits first.
+class BitWriter {
+public:
+    int index;
+    int bit;
+    int capacity;
+    unsigned int* data;
+    unsigned int buffer[0x100];
+
+    // Starts an empty stream over the built-in buffer.
+    BitWriter();
+    // Frees the grown buffer, if the stream outgrew the built-in one.
+    void FreeBuffer();
+    // Doubles the capacity of the buffer.
+    void GrowBuffer();
+    // Appends the low bits of a value.
+    void WriteBits(int value, int bits);
+    // Overwrites one byte of the stream.
+    void SetByteAt(int offset, unsigned char value);
+};
+
+// Reads values of up to 32 bits from a buffer of words, low bits first.
+class BitReader {
+public:
+    unsigned int* data;
+    int index;
+    int bit;
+
+    // Reads bits as an unsigned value.
+    int ReadBits(int bits);
+    // Reads bits as a signed value, extending the sign.
+    int ReadSignedBits(int bits);
+
+    // Reads one bit.
+    int ReadBit()
+    {
+        int r = (data[index] & (1 << bit)) != 0;
+        if (++bit == 32) {
+            bit = 0;
+            index++;
+        }
+        return r;
+    }
+};
 
 #pragma pack(push, 8)
 // A reference-counted string whose text follows a count word.

@@ -96,7 +96,6 @@ int GetTicks();
 #include "../units/unit_commands.h"
 #include "../units/units.h"
 #include "../game/game_state.h"
-unsigned char FindHostSlot();
 void __stdcall TransferMetal(unsigned char, unsigned char, int, int);
 void __stdcall TransferEnergy(unsigned char, unsigned char, int, int);
 
@@ -167,20 +166,6 @@ int GetLocalHumanDpid()
     return -1;
 }
 
-#pragma auto_inline(off)
-// FUNCTION: 0x44fe40
-unsigned char __stdcall FindSlotByDpid(int id)
-{
-    if (id != -1) {
-        for (unsigned char i = 0; i < 10; i++) {
-            if (GetSlotDpid(i) == id)
-                return i;
-        }
-    }
-    return 10;
-}
-#pragma auto_inline(on)
-
 // FUNCTION: 0x44feb0
 unsigned char __stdcall GetPlayerSlot(Player* player)
 {
@@ -197,16 +182,6 @@ Player* __stdcall FindPlayerByDpid(int id)
         return 0;
     return &g_game->players[FindSlotByDpid(id)];
 }
-
-#pragma auto_inline(off)
-// FUNCTION: 0x44ffd0
-int __stdcall GetSlotDpid(unsigned char index)
-{
-    if (index != 10 && g_game->players[index].type != 0)
-        return g_game->players[index].id;
-    return -1;
-}
-#pragma auto_inline(on)
 
 // FUNCTION: 0x450010
 int __stdcall GetPlayerDpid(Player* obj)
@@ -2926,6 +2901,228 @@ int __stdcall SendScriptCall(Unit* obj, short index, char argCount,
     return BroadcastPacket(obj->player->id, &packet, 0x16);
 }
 
+#include "../weapons/unit_weapon_slot.h"
+#include "../weapons/projectile.h"
+#include "wire_packets.h"
+#include "../orders/unit_motion.h"
+
+#pragma pack(push, 1)
+struct ActivateFlagsPacket {
+    unsigned char type;
+    short unitId;
+    unsigned char activateFlags;
+};
+
+#pragma pack(pop)
+
+void __stdcall NetSendUnitKilled(Unit* unit, int severity, int wreckageLevel, int killType)
+{
+    UnitKilledPacket cmd;
+    cmd.unitId = unit->id;
+    cmd.cobKilledSeverity = severity;
+    cmd.type = 0xc;
+    cmd.wreckageLevel = wreckageLevel;
+    cmd.killType = killType;
+    cmd.attackerPlayerNetId = GetSlotDpid(unit->lastAttackerSlot);
+    if (unit->attacker == nullptr)
+        cmd.attackerUnitId = 0;
+    else
+        cmd.attackerUnitId = unit->attacker->id;
+    BroadcastPacket(unit->player->id, (unsigned char*)&cmd, 0xb);
+}
+
+void __stdcall NetSendUnitDamage(Unit* source, Unit* target, int amount, int kind, unsigned short extra)
+{
+    UnitDamagePacketOut d;
+    d.type = 11;
+    d.victimId = !target ? 0 : target->id;
+    d.attackerId = !source ? 0 : source->id;
+    d.amount = amount;
+    d.headingByte = (unsigned char)(extra >> 8);
+    d.damageKind = kind;
+    if (source)
+        BroadcastPacket(source->player->id, (unsigned char*)&d, 9);
+    else
+        BroadcastPacket(GetLocalDpid(), (unsigned char*)&d, 9);
+}
+
+void __stdcall NetSendAttach(Unit* unit, Unit* carrier, char piece, char mode)
+{
+    OrderView packet;
+    packet.type = 0xa;
+    if (unit == nullptr)
+        packet.id1 = 0;
+    else
+        packet.id1 = unit->id;
+    if (carrier == nullptr)
+        packet.id2 = 0;
+    else
+        packet.id2 = carrier->id;
+    packet.param = piece;
+    packet.param2 = mode;
+    BroadcastPacket(GetLocalDpid(), (unsigned char*)&packet, 7);
+}
+
+void __stdcall NetSendOwnershipTransfer(Unit* unit, Player* newOwner)
+{
+    OwnershipTransferPacket pk;
+    pk.type = 0x14;
+    pk.newOwnerNetId = GetPlayerDpid(newOwner);
+    pk.unitId = unit->id;
+    pk.buildPercent = (int)unit->buildLeft;
+    pk.hitPoints = unit->health;
+    pk.angles = unit->angles;
+    unsigned char a = unit->weapons[0].flags & 2;
+    pk.stockpile0 = a ? unit->weapons[0].stockpile : 0;
+    pk.stockpile1 = a ? unit->weapons[1].stockpile : 0;
+    pk.stockpile2 = a ? unit->weapons[2].stockpile : 0;
+    BroadcastPacket(unit->player->id, (unsigned char*)&pk, 0x18);
+}
+
+void __stdcall NetSendActivateFlags(Unit* unit)
+{
+    ActivateFlagsPacket packet;
+    packet.type = 0x11;
+    packet.unitId = unit->id;
+    packet.activateFlags = unit->activateFlags;
+    BroadcastPacket(unit->player->id, (unsigned char*)&packet, 4);
+}
+
+void __stdcall NetSendWeaponFire(Unit* shooter, UnitWeaponSlot* slot, Unit* target, Vec3* origin, Vec3* aimOrVel)
+{
+    WeaponFirePacket msg;
+    msg.type = 0xd;
+    msg.origin = *origin;
+    msg.aimOrVel = *aimOrVel;
+    msg.weaponDefIndex = slot->weapon->index;
+    msg.weaponSlotIndex = slot->flags >> 2 & 3;
+    msg.ownerUnitId = shooter->id;
+    msg.targetUnitId = target == nullptr ? 0 : target->id;
+    msg.fireHeading = slot->fireHeading;
+    msg.firePitch = slot->firePitch;
+    msg.flag = slot->weapon->flags.b.interceptor;
+    BroadcastPacket(shooter->player->id, (unsigned char*)&msg, 0x24);
+}
+
+void __stdcall NetSendWeaponFireAt(unsigned char weaponIndex, Vec3* origin, Vec3* aimOrVel)
+{
+    WeaponFirePacket msg;
+    memset(&msg, 0, sizeof(msg));
+    msg.type = 0xd;
+    msg.origin = *origin;
+    msg.aimOrVel = *aimOrVel;
+    msg.weaponDefIndex = weaponIndex;
+    BroadcastPacket(GetLocalDpid(), (unsigned char*)&msg, 0x24);
+}
+
+void __stdcall NetSendProjectileDetonated(Unit* attacker, Projectile* projectile)
+{
+    ProjectileDetonatePacket packet;
+    packet.type = 0xe;
+    packet.aim = projectile->target;
+    packet.weaponIndex = projectile->type->index;
+    BroadcastPacket(attacker->player->id, (unsigned char*)&packet, sizeof(packet));
+}
+
+void __stdcall NetSendFeatureHit(WeaponDef* weapon, int x, int z)
+{
+    FeatureDamagePacket packet;
+    packet.type = 0xf;
+    packet.sub = weapon->index;
+    packet.x = x;
+    packet.z = z;
+    SendPacketToPlayer(GetLocalDpid(), GetHostDpid(), (unsigned char*)&packet, 6);
+}
+
+void __stdcall NetSendFeatureKilled(int x, int z)
+{
+    FeatureDamagePacket packet;
+    packet.type = 0xf;
+    packet.sub = 0xfd;
+    packet.x = x;
+    packet.z = z;
+    BroadcastPacket(GetLocalDpid(), (unsigned char*)&packet, 6);
+}
+
+void __stdcall NetSendFeatureBurning(int x, int z)
+{
+    FeatureDamagePacket packet;
+    packet.type = 0xf;
+    packet.sub = 0xfe;
+    packet.x = x;
+    packet.z = z;
+    BroadcastPacket(GetLocalDpid(), (unsigned char*)&packet, 6);
+}
+
+void __stdcall NetSendFeatureReclaimed(Unit* reclaimer, int x, int z)
+{
+    FeatureDamagePacket packet;
+    packet.type = 0xf;
+    packet.sub = 0xff;
+    packet.x = x;
+    packet.z = z;
+    BroadcastPacket(reclaimer->player->id, (unsigned char*)&packet, 6);
+}
+
+static int FloatBits(float value)
+{
+    int bits;
+    memcpy(&bits, &value, sizeof(bits));
+    return bits;
+}
+
+void __stdcall NetSendShareMetal(unsigned char from, unsigned char to, float amount)
+{
+    SendShareMetal(from, to, FloatBits(amount));
+}
+
+void __stdcall NetSendShareEnergy(unsigned char from, unsigned char to, float amount)
+{
+    SendShareEnergy(from, to, FloatBits(amount));
+}
+
+void __stdcall NetBroadcastPlayerEconomy(Player* player)
+{
+    SendPlayerEconomy(player, nullptr, 0);
+}
+
+void __stdcall NetSendUnitStates(Player* owner)
+{
+    BitWriter stream;
+    stream.WriteBits(0x2c, 8);
+    stream.WriteBits(0, 0x10);
+    stream.WriteBits(g_game->ticks, 0x20);
+    for (Unit* u = owner->unitsBegin; u <= owner->unitsEnd; u++) {
+        if (!(u->flags & 0x10000000))
+            continue;
+        if (!u->motion)
+            continue;
+        if (!u->motion->player->v7())
+            continue;
+        stream.WriteBits(u->id - u->player->firstIndex, 0x10);
+        stream.WriteBits(u->unitDefIndex, g_game->unitDefCountBits);
+        u->motion->player->WriteTo(&stream);
+        if (((stream.bit + 7) >> 3) + stream.index * 4 >= 0x200)
+            break;
+    }
+    stream.WriteBits(-1, 0x10);
+    int i = g_game->ticks % g_game->maxUnitsSetting;
+    stream.data[stream.index] |= 1 << stream.bit;
+    stream.bit++;
+    if (stream.bit == 0x20) {
+        stream.bit = 0;
+        stream.index++;
+        if (stream.index == stream.capacity)
+            stream.GrowBuffer();
+        stream.data[stream.index] = 0;
+    }
+    WriteUnitState(&stream, &owner->unitsBegin[i]);
+    stream.SetByteAt(1, (char)(((stream.bit + 7) >> 3) + (unsigned char)stream.index * 4));
+    stream.SetByteAt(2, (char)((((stream.bit + 7) >> 3) + stream.index * 4) >> 8));
+    BroadcastPacket(owner->id, (unsigned char*)stream.data, ((stream.bit + 7) >> 3) + stream.index * 4);
+    stream.FreeBuffer();
+}
+
 // FUNCTION: 0x456310
 void SendNetHeartbeat()
 {
@@ -3069,17 +3266,6 @@ int AreAllPlayersReady()
     if (g_game->numPlayers == 1)
         return 0;
     return all == 0;
-}
-
-// FUNCTION: 0x456850
-unsigned char FindHostSlot()
-{
-    unsigned char i;
-    for (i = 0; i < 10; i++) {
-        if (g_game->players[i].type != 0 && (g_game->players[i].info->flags_97 & 1))
-            return i;
-    }
-    return 10;
 }
 
 // FUNCTION: 0x4568b0
@@ -3608,20 +3794,6 @@ int CountLocalComputerPlayers()
     return count;
 }
 
-// FUNCTION: 0x457bc0
-int CountActiveAIPlayers()
-{
-    int count = 0;
-    for (int i = 0; i < 10; i++) {
-        if (g_game->players[i].active != 0
-            && g_game->players[i].type == 2
-            && g_game->players[i].index != 10
-            && (g_game->players[i].unitCount != 0 || g_game->players[i].unitsCreated == 0))
-            count++;
-    }
-    return count;
-}
-
 // FUNCTION: 0x457c10
 int CountActiveHumanOrAiPlayers()
 {
@@ -3644,23 +3816,6 @@ int CountRemotePlayers()
     for (int i = 0; i < 10; i++) {
         Player* p = &g_game->players[i];
         if (p->active != 0 && p->type == 3)
-            count++;
-    }
-    return count;
-}
-
-// FUNCTION: 0x457cb0
-int CountCombatPlayers()
-{
-    int count = 0;
-    for (int i = 0; i < 10; i++) {
-        if (g_game->players[i].active != 0
-            && (g_game->players[i].type == 1 || g_game->players[i].type == 2 || g_game->players[i].type == 3)
-            && g_game->players[i].index != 10
-            && (g_game->players[i].unitCount != 0 || g_game->players[i].unitsCreated == 0)
-            && (g_game->players[i].type == 1
-                || (g_game->players[i].type == 3 && g_game->players[i].info->kind == 1))
-            && !(g_game->players[i].info->flags_9b & 0x40))
             count++;
     }
     return count;
@@ -3738,16 +3893,8 @@ void __stdcall UpdateResourceSharing(Player* player)
                 && player->allied[i] != 0) {
                 unsigned char a = player->index;
                 unsigned char b = p->index;
-                if (a != 10 && b != 10) {
-                    ResourceSharePacket packet;
-                    packet.type = 0x16;
-                    packet.subtype = 3;
-                    packet.fromNetId = SlotDpidInUpdateResourceSharing(a);
-                    packet.toNetId = SlotDpidInUpdateResourceSharing(b);
-                    packet.amount = 0;
-                    SendPacketToPlayer(SlotDpidInUpdateResourceSharing(a), SlotDpidInUpdateResourceSharing(b),
-                                 (unsigned char *)&packet, sizeof(packet));
-                }
+                if (a != 10 && b != 10)
+                    g_seams.network->SendShareMapInfo(a, b);
             }
         }
     }

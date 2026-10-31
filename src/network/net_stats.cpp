@@ -9,9 +9,8 @@
 #include "net_stats.h"
 #include "../../link/globals.h"
 
-#include "bit_writer.h"
+#include "../../interfaces/services.h"
 
-#include "bit_reader.h"
 
 void __stdcall RegisterOrderTypes(void* table, int id);
 void __stdcall StepGafSequence(void* item);

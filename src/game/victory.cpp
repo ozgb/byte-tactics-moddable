@@ -1092,9 +1092,8 @@ struct UnitDefSeaFlags {
 };
 #pragma pack(pop)
 
-#include "../network/bit_writer.h"
+#include "../../interfaces/services.h"
 
-#include "../network/bit_reader.h"
 
 struct GoalOwnerUnit;
 

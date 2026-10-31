@@ -10,6 +10,20 @@ struct Player;
 struct Unit;
 struct Vec3;
 
+class MotionSerializer {
+public:
+    virtual void v0();
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual int v7();
+    virtual void WriteTo(BitWriter* stream);
+    virtual void ReadFrom(BitReader* reader);
+};
+
 void __stdcall SnapUnitToGround(Unit* unit);
 void __stdcall UpdateUnitHeight(Unit* unit);
 unsigned short __stdcall GetHeadingBetweenOrDefault(Vec3* from, Vec3* to, unsigned short def);

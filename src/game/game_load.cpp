@@ -124,7 +124,6 @@ void RegisterUnitOrders(void);
 
 #include "../util/math.h"
 #include "../harness/harness.h"
-unsigned char __stdcall FindHostSlot();
 #include "settings.h"
 #include "../frontend/skirmish_menu.h"
 #include "game_state.h"

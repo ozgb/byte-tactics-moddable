@@ -138,7 +138,6 @@ struct FixedPosView;
 #include "order_queue.h"
 #include "../graphics/particles.h"
 void __stdcall DamageUnit(Unit*, Unit*, int, int, int);
-int __stdcall SendScriptCallByName(Unit*, char*, char, int, int, int, int);
 void __stdcall DrawUnit(void*, Unit*);
 
 #include "vtol_orders.h"
@@ -991,7 +990,7 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
         case 3: {
             int height = target->def->modelMaxY;
             g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "BeginTransport", 0, 1, 1, height, 0, 0, 0);
-            SendScriptCallByName(unit, "BeginTransport", 1, height, 0, 0, 0);
+            g_seams.network->SendScriptCallByName(unit, "BeginTransport", 1, height, 0, 0, 0);
             Vec3 offset = g_seams.units->GetPieceOffset(unit, order->piece);
             PathOrder* obj = new (kSim) PathOrder(order, order->target, -1);
             obj->SetAltitude(-((Vec3Words*)&offset)->yWhole);

@@ -44,20 +44,6 @@ union TerrainFlags {
 
 #include "../orders/unit_motion.h"
 
-class MotionSerializer {
-public:
-    virtual void v0();
-    virtual void v1();
-    virtual void v2();
-    virtual void v3();
-    virtual void v4();
-    virtual void v5();
-    virtual void v6();
-    virtual int v7();
-    virtual void WriteTo(BitWriter* stream);
-    virtual void ReadFrom(BitReader* reader);
-};
-
 #include "../map/spatial_bucket.h"
 
 #include "unit.h"
@@ -67,13 +53,7 @@ public:
 #include "../game/game.h"
 #include "../state/sim_effects.h"
 
-struct OrderView {
-    unsigned char type;
-    unsigned short id1;
-    unsigned short id2;
-    char param;
-    unsigned char param2;
-};
+#include "../network/wire_packets.h"
 
 struct Spawn {
     unsigned char player;
@@ -97,9 +77,8 @@ struct Block {
 #include "../util/tdf.h"
 
 
-#include "../network/bit_writer.h"
+#include "../../interfaces/services.h"
 
-#include "../network/bit_reader.h"
 
 #pragma pack(pop)
 
@@ -108,7 +87,6 @@ int __stdcall GetGroundHeight(Vec3* pos);
 #include "../../interfaces/seams.h"
 int __cdecl AngleOfVector(int x, int z);
 #include "../network/net_game.h"
-int __stdcall BroadcastPacket(int player, void* data, int size);
 #include "unit_position.h"
 #include "../ingame/selection.h"
 #include "unit_motion.h"
@@ -216,7 +194,7 @@ void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4)
             packet.id2 = target->id;
         packet.param = p3;
         packet.param2 = p4;
-        BroadcastPacket(GetLocalDpid(), &packet, 7);
+        g_seams.network->SendAttach(unit, target, p3, p4);
         ApplyAttachUnit(&packet);
     }
 }
@@ -515,42 +493,8 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
 void __stdcall SendUnitStates(Player* p)
 {
     extern Game* g_game;
-    BitWriter stream;
-    stream.WriteBits(0x2c, 8);
-    stream.WriteBits(0, 0x10);
-    stream.WriteBits(g_game->ticks, 0x20);
     p->syncTick = g_game->ticks;
-    for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
-        if (!(u->flags & 0x10000000))
-            continue;
-        if (!u->motion)
-            continue;
-        if (!u->motion->player->v7())
-            continue;
-        stream.WriteBits(u->id - u->player->firstIndex, 0x10);
-        stream.WriteBits(u->unitDefIndex, g_game->unitDefCountBits);
-        u->motion->player->WriteTo(&stream);
-        if (((stream.bit + 7) >> 3) + stream.index * 4 >= 0x200)
-            break;
-    }
-    stream.WriteBits(-1, 0x10);
-    int i = g_game->ticks % g_game->maxUnitsSetting;
-    stream.data[stream.index] |= 1 << stream.bit;
-    stream.bit++;
-    if (stream.bit == 0x20) {
-        stream.bit = 0;
-        stream.index++;
-        if (stream.index == stream.capacity)
-            stream.GrowBuffer();
-        stream.data[stream.index] = 0;
-    }
-    WriteUnitState(&stream, &p->unitsBegin[i]);
-    stream.SetByteAt(
-        1, (char)(((stream.bit + 7) >> 3) + (unsigned char)stream.index * 4));
-    stream.SetByteAt(
-        2, (char)((((stream.bit + 7) >> 3) + stream.index * 4) >> 8));
-    BroadcastPacket(p->id, stream.data, ((stream.bit + 7) >> 3) + stream.index * 4);
-    stream.FreeBuffer();
+    g_seams.network->SendUnitStates(p);
 }
 
 // FUNCTION: 0x48b920

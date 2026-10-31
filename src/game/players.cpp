@@ -383,7 +383,7 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
         g_game->players[to].econ->energyMake = m;
     }
     if (flag)
-        SendShareMetal(from, to, *(int*)&amount);
+        g_seams.network->SendShareMetal(from, to, amount);
 }
 
 // FUNCTION: 0x464c60
@@ -419,7 +419,7 @@ void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount
         g_game->players[to].econ->metalMake = amount + g_game->players[to].econ->metalMake;
     }
     if (flag)
-        SendShareEnergy(from, to, *(int*)&amount);
+        g_seams.network->SendShareEnergy(from, to, amount);
 }
 
 // FUNCTION: 0x464da0
@@ -430,6 +430,37 @@ void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
             g_seams.los_radar->UpdateUnitLineOfSight(u);
         }
     }
+}
+
+// FUNCTION: 0x457bc0
+int CountActiveAIPlayers()
+{
+    int count = 0;
+    for (int i = 0; i < 10; i++) {
+        if (g_game->players[i].active != 0
+            && g_game->players[i].type == 2
+            && g_game->players[i].index != 10
+            && (g_game->players[i].unitCount != 0 || g_game->players[i].unitsCreated == 0))
+            count++;
+    }
+    return count;
+}
+
+// FUNCTION: 0x457cb0
+int CountCombatPlayers()
+{
+    int count = 0;
+    for (int i = 0; i < 10; i++) {
+        if (g_game->players[i].active != 0
+            && (g_game->players[i].type == 1 || g_game->players[i].type == 2 || g_game->players[i].type == 3)
+            && g_game->players[i].index != 10
+            && (g_game->players[i].unitCount != 0 || g_game->players[i].unitsCreated == 0)
+            && (g_game->players[i].type == 1
+                || (g_game->players[i].type == 3 && g_game->players[i].info->kind == 1))
+            && !(g_game->players[i].info->flags_9b & 0x40))
+            count++;
+    }
+    return count;
 }
 
 #include "../network/unit_sync.h"
@@ -447,7 +478,7 @@ void __stdcall ContinueWatchingCallback(Gui* gui)
         return;
     PlaySoundByName("BigButton", 0);
     if (IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE1")) {
-        BroadcastPlayerInfo();
+        g_seams.network->BroadcastPlayerInfo();
         g_game->bits.flag4 = 0;
         ReportGameEvent(4);
         return;
@@ -462,13 +493,12 @@ void __stdcall ContinueWatchingCallback(Gui* gui)
 
 
 
-unsigned char __stdcall FindHostSlot();
+#include "../../interfaces/services.h"
 #include "../util/math.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
                            Vec3 pos, int a, int b, int c);
 #include "main_loop.h"
 #include "../ingame/selection.h"
-void __stdcall SendPlayerEconomy(Player* player, int a, int b);
 
 static int IsPlayerSlotInRange(unsigned char i)
 {
@@ -697,7 +727,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
             if (g_seams.map->GetGameType(g_game->net) == 3) {
                 g_economyPacketTick++;
                 if ((g_economyPacketTick & 3) == 0)
-                    SendPlayerEconomy(pi, 0, 0);
+                    g_seams.network->BroadcastPlayerEconomy(pi);
             }
         }
         goto next_bl;
@@ -712,7 +742,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                     g_game->mapFlags &= 0xfffe;
                     g_game->mapFlags &= 0xfffd;
                     g_seams.los_radar->RecalculateLineOfSight(1);
-                    BroadcastPlayerInfo();
+                    g_seams.network->BroadcastPlayerInfo();
                     if (CountActiveAIPlayers() == 0) {
                         Layer* dlg = LoadGuiLayer(&g_game->gui, "YESORNO.GUI", 0x900);
                         if (dlg != 0) {

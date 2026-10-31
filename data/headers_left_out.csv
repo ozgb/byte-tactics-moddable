@@ -81,7 +81,6 @@ FindGadgetIndex,mismatch,parameter 2 const char* vs char* (const qualifier); par
 FindGadgetIndexBySubstring,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 FindGadgetOrNull,mismatch,parameter 2 const char* vs char* (const qualifier); parameter 1 void* vs Gadget* (view type): the declaration differs from the definition in a pointer type only
 FindGafEntry,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-FindHostSlot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 FindMissionUnit,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 FindNextSelectedUnit,mismatch,pointer/int cast: definition's type is likely wrong
 FindOrderByType,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

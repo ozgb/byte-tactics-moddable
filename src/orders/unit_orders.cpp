@@ -114,7 +114,6 @@ int DrawWrappedText(char*, char*, int, int, int, int, int);
 extern char DAT_004fc6e8[];
 extern const float DAT_004fc930, DAT_004fc934, DAT_004fc938, DAT_004fc93c;
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
-int __stdcall BroadcastPacket(int player, void* data, int size);
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount,
                            Vec3** metal, float* metalAmount);
 void WriteScreenshot(char*, char*, int, int, int, int);
@@ -2067,17 +2066,12 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
             order->target->angles = spot->rot;
         g_seams.features->RemoveFeature(g_seams.los_radar->GetMapCellAtPosition(&order->pos), 0);
         if (g_seams.map->GetGameType(g_game->net) == 3) {
-            FeatureDamagePacket packet;
             int n = c - g_game->cells;
             int w = g_game->width;
-            packet.type = 0x0f;
-            packet.sub = 0xff;
             Point16 xz;
             xz.x = n % w;
             xz.y = n / w;
-            packet.x = xz.x;
-            packet.z = xz.y;
-            BroadcastPacket(unit->player->id, &packet, 6);
+            g_seams.network->SendFeatureReclaimed(unit, xz.x, xz.y);
         }
         order->target->buildLeft = 0;
         order->target->health = 1;

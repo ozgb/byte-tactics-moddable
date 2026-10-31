@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 1
+#define SERVICES_VERSION_MINOR 2
 
 // Returns a random number in [0, range) from the main stream of the game logic.
 int __stdcall RandomInt(int range);
@@ -73,6 +73,19 @@ int __stdcall GetPreferredLanguage(void);
 void __stdcall SaveSettings();
 // Loads a GAF animation file of the data directory, once.
 void* __stdcall LoadAnimGaf(char* name);
+
+// The kinds of sim event, each with the meaning of its arguments.
+enum SimEventKind : unsigned short {
+    // Marks an empty record, never recorded.
+    SIM_EVENT_NONE = 0,
+    // A unit speaks: the unit index, the speech kind and the address of the text key (0 for the kind's own text).
+    SIM_EVENT_UNIT_SPEECH = 1,
+};
+// Flag of SIM_EVENT_UNIT_SPEECH: the unit stays silent when it is on screen.
+#define SIM_EVENT_SPEECH_IF_NOT_VISIBLE 1u
+
+// Records an event for presentation with up to six arguments; a full queue drops it and counts it, and in test mode ends the program.
+void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count);
 
 // The arguments of one console command.
 class CommandArgs {

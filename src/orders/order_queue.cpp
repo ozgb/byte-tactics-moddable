@@ -19,20 +19,6 @@ struct UnitMotionSlotView {
 
 #include "../units/unit.h"
 
-struct OrderTableEntryView {
-    char unknown_0[4];
-    void (__stdcall* notify)(Unit* unit, Order* obj, int code);
-    char unknown_8[0x11 - 0x8];
-    union {
-        unsigned int flags;
-        struct {
-            char unknown_11[3];
-            unsigned char flag14;
-        };
-    };
-    char* name;
-};
-
 #include "../game/game.h"
 
 struct OrderSaveRecord {
@@ -72,7 +58,7 @@ public:
 };
 
 #include "order_list.h"
-OrderTableEntryView* __stdcall LowerBoundOrderTypes(OrderTableEntryView* first, OrderTableEntryView* last,
+OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTableEntry* last,
                                        char* const& value, int(__stdcall* pred)(int, char*),
                                        int* unused);
 #include "../network/net_game.h"
@@ -80,12 +66,6 @@ void __stdcall SendScriptCall(Unit* obj, int index, int param_3, int param_4, in
 #include "../sound/sound.h"
 
 #include "../../link/globals.h"
-typedef OrderTableEntryView* SimView_g_missionOrderTableBegin;
-#undef g_missionOrderTableBegin
-#define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
-typedef OrderTableEntryView* SimView_g_missionOrderTableEnd;
-#undef g_missionOrderTableEnd
-#define g_missionOrderTableEnd (*reinterpret_cast<SimView_g_missionOrderTableEnd*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x8))
 
 #include "path_order_attach.h"
 
@@ -204,11 +184,11 @@ int __stdcall WaitIfCobBusy(char* param_1, char* param_2, unsigned int param_3)
 // FUNCTION: 0x438760
 MissionType::MissionType(const char* name)
 {
-    OrderTableEntryView* first = g_missionOrderTableBegin;
-    int n = g_missionOrderTableEnd - g_missionOrderTableBegin;
+    OrderTableEntry* first = g_missionOrderTableVec.Begin();
+    int n = g_missionOrderTableVec.End() - g_missionOrderTableVec.Begin();
     for (; 0 < n; ) {
         int n2 = n / 2;
-        OrderTableEntryView* m = first;
+        OrderTableEntry* m = first;
         m += n2;
         int less = _strcmpi(m->name, name) < 0;
         if (less)
@@ -216,8 +196,8 @@ MissionType::MissionType(const char* name)
         else
             n = n2;
     }
-    if (first != g_missionOrderTableEnd && _strcmpi(first->name, name) == 0) {
-        index = (unsigned char)(first - g_missionOrderTableBegin);
+    if (first != g_missionOrderTableVec.End() && _strcmpi(first->name, name) == 0) {
+        index = (unsigned char)(first - g_missionOrderTableVec.Begin());
         return;
     }
     index = 0;
@@ -228,20 +208,13 @@ OrderTableEntry* MissionType::GetTableEntry()
 {
     unsigned int result = 0;
     result = *(unsigned char*)this;
-    int* base = (int*)&g_missionOrderTableBegin;
-    int fives = result * 5;
-    return (OrderTableEntry*)(*base + fives * 4 + fives);
+    return &g_missionOrderTableVec[result];
 }
 
 // FUNCTION: 0x438850
 int __fastcall GetTableEntryByTypeByte(unsigned char* param_1)
 {
-    unsigned int eax = 0;
-    eax = *param_1;
-    eax = eax + eax * 4;
-    int edx = (int)g_missionOrderTableBegin + eax * 4;
-    eax = eax + edx;
-    return eax;
+    return (int)&g_missionOrderTableVec[*param_1];
 }
 
 // FUNCTION: 0x438870
@@ -378,7 +351,7 @@ void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 void Order::MergeFlagsFromTable(int k)
 {
     kind.index = k;
-    flags_42 = ((g_missionOrderTableBegin[k & 0xff].flags ^ flags_42) & 0x600) ^ g_missionOrderTableBegin[kind.index].flags;
+    flags_42 = ((g_missionOrderTableVec[k & 0xff].flags ^ flags_42) & 0x600) ^ g_missionOrderTableVec[kind.index].flags;
 }
 
 // FUNCTION: 0x438be0
@@ -395,7 +368,7 @@ int __stdcall GetOrderFlags(void* param)
 Order::~Order()
 {
     if (flags & 2) {
-        g_missionOrderTableBegin[kind.index].notify(unit, this, 2);
+        g_missionOrderTableVec[kind.index].notify(unit, this, 2);
     }
     if (flags_42 & 0x400000) {
         Unit* obj = unit;
@@ -443,18 +416,18 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
 
 static unsigned char OrderKindFromName(char* s)
 {
-    OrderTableEntryView* e = LowerBoundOrderTypes(g_missionOrderTableBegin, g_missionOrderTableEnd, s, OrderTypeNameLess, 0);
-    if (e == g_missionOrderTableEnd || _strcmpi(e->name, s) != 0)
+    OrderTableEntry* e = LowerBoundOrderTypes(g_missionOrderTableVec.Begin(), g_missionOrderTableVec.End(), s, OrderTypeNameLess, 0);
+    if (e == g_missionOrderTableVec.End() || _strcmpi(e->name, s) != 0)
         return 0;
-    return (unsigned char)(e - g_missionOrderTableBegin);
+    return (unsigned char)(e - g_missionOrderTableVec.Begin());
 }
 
 static unsigned char OrderKindFromSavedIndex(unsigned char want)
 {
     int idx = 0;
     int k = 0;
-    for (OrderTableEntryView* p = g_missionOrderTableBegin; p <= g_missionOrderTableEnd; p++, idx++) {
-        if (!(p->flag14 & 1)) {
+    for (OrderTableEntry* p = g_missionOrderTableVec.Begin(); p <= g_missionOrderTableVec.End(); p++, idx++) {
+        if (!((p->flags >> 24) & 1)) {
             if (k == want)
                 break;
             k++;
@@ -521,7 +494,7 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     flags_42 = desc.flags;
     subFlags = desc.subFlags;
 
-    char* sname = g_missionOrderTableBegin[desc.kind].name;
+    char* sname = g_missionOrderTableVec[desc.kind].name;
     if (strcmp(sname, "MobileBuild") == 0 || strcmp(sname, "VTOL_MobileBuild") == 0 ||
         strcmp(sname, "BuildingBuild") == 0) {
         unitType = (unsigned short)ResolveUnitTypeKey(file, (unsigned short)unitType);
@@ -593,9 +566,9 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
 
     char buf1[0x80];
     sprintf(buf1, "%s%s", name, "_name");
-    file->SetStringItem(buf1, g_missionOrderTableBegin[kind.index].name);
+    file->SetStringItem(buf1, g_missionOrderTableVec[kind.index].name);
 
-    char* s = g_missionOrderTableBegin[kind.index].name;
+    char* s = g_missionOrderTableVec[kind.index].name;
     if (strcmp(s, "MobileBuild") == 0 || strcmp(s, "VTOL_MobileBuild") == 0 ||
         strcmp(s, "BuildingBuild") == 0) {
         unsigned short id = unitType;

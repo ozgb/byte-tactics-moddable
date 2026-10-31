@@ -9,7 +9,7 @@ struct OrderTableEntry {
     int (__stdcall* notify)(void* unit, Order* obj, unsigned int code);
     char unknown_8[0xc - 8];
     int drawMask;
-    char unknown_10[0x11 - 0x10];
+    unsigned char markerAnim;
     unsigned int flags;
     char* name;
 

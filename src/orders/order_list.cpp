@@ -174,9 +174,6 @@ static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 #include "order_list.h"
 
 #include "../../link/globals.h"
-typedef OrderTableEntry* SimView_g_missionOrderTableBegin;
-#undef g_missionOrderTableBegin
-#define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
 
 void __stdcall DeleteOrder(Unit* owner, Order* node);
 
@@ -206,23 +203,23 @@ void __stdcall DrawOrderOverlays(Unit* unit, unsigned int mask, void* obj,
     Vec3 pos = unit->pos;
     bool done = false;
     for (Order* e = unit->list; e != 0; e = e->next) {
-        if (g_missionOrderTableBegin[e->kind.index].drawMask & mask & 1) {
+        if (g_missionOrderTableVec[e->kind.index].drawMask & mask & 1) {
             pos = base;
             DrawBuildFootprint(obj, (View *)sel, e, (Pos *)&pos, flag);
         }
-        if (g_missionOrderTableBegin[e->kind.index].drawMask & mask & 2) {
+        if (g_missionOrderTableVec[e->kind.index].drawMask & mask & 2) {
             pos = base;
             DrawPathAnim(obj, (View *)sel, e, (Pos *)&pos, flag);
         }
-        if (g_missionOrderTableBegin[e->kind.index].drawMask & mask & 4) {
+        if (g_missionOrderTableVec[e->kind.index].drawMask & mask & 4) {
             pos = base;
             DrawOrderRangeRing(obj, (View *)sel, e, (Pos *)&pos, flag);
         }
-        if (g_missionOrderTableBegin[e->kind.index].drawMask & mask & 8) {
+        if (g_missionOrderTableVec[e->kind.index].drawMask & mask & 8) {
             pos = base;
             DrawWeaponCoverage(obj, (View *)sel, e, (Pos *)&pos, flag);
         }
-        if (g_missionOrderTableBegin[e->kind.index].drawMask & mask & 0x10) {
+        if (g_missionOrderTableVec[e->kind.index].drawMask & mask & 0x10) {
             if (!done) {
                 DrawUnitRangeRings(obj, sel, e, &pos, flag);
                 done = true;
@@ -295,16 +292,16 @@ int __stdcall GetOrderTarget(int param_1)
 int __stdcall GetOrderName(Unit* obj)
 {
     if (obj && obj->list) {
-        return g_missionOrderTableBegin[obj->list->kind.index].value;
+        return g_missionOrderTableVec[obj->list->kind.index].value;
     }
-    return g_missionOrderTableBegin[0].value;
+    return g_missionOrderTableVec[0].value;
 }
 
 // FUNCTION: 0x439e30
 Order* __stdcall FindOrderByType(Unit* obj, unsigned char kind)
 {
     Order* n;
-    if (g_missionOrderTableBegin[kind].flags & 0x40000)
+    if (g_missionOrderTableVec[kind].flags & 0x40000)
         n = obj->list2;
     else
         n = obj->list;
@@ -437,7 +434,7 @@ Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
     subFlags = 0;
     wakeFrame = -1;
     pos = p ? *p : Vec3FromInts(0, 0, 0);
-    flags_42 = g_missionOrderTableBegin[k & 0xff].flags;
+    flags_42 = g_missionOrderTableVec[k & 0xff].flags;
     unit = 0;
     next = 0;
     attached = 0;
@@ -671,9 +668,6 @@ public:
 
 #pragma pack(pop)
 
-typedef OrderTableEntry* SimView_g_missionOrderTableBegin;
-#undef g_missionOrderTableBegin
-#define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
 
 
 
@@ -727,7 +721,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
 {
     Order* node;
     if (amount > 0) {
-        if (g_missionOrderTableBegin[kind & 0xff].flags & 0x40000)
+        if (g_missionOrderTableVec[kind & 0xff].flags & 0x40000)
             node = owner->list2;
         else
             node = owner->list;
@@ -743,7 +737,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
     }
     for (;;) {
         Order* found = 0;
-        if (g_missionOrderTableBegin[kind & 0xff].flags & 0x40000)
+        if (g_missionOrderTableVec[kind & 0xff].flags & 0x40000)
             node = owner->list2;
         else
             node = owner->list;
@@ -924,7 +918,7 @@ void __stdcall RunOrders(Unit* unit)
         node->flags = 0;
         if (pending & 0x10000)
             ClearAllWeaponTargets(unit);
-        switch (g_missionOrderTableBegin[node->kind.index].notify(node->unit, node, pending)) {
+        switch (g_missionOrderTableVec[node->kind.index].notify(node->unit, node, pending)) {
         case 3:
             DelayOrderWake(node, 0xf);
             break;
@@ -996,7 +990,7 @@ void __stdcall RunSecondaryOrders(Unit* p)
     while (child != 0) {
         if (child->flags == 0 || (unsigned int)g_game->ticks >= child->wakeFrame) {
             child->flags = 0;
-            switch (g_missionOrderTableBegin[child->kind.index].notify(child->unit, child, 0)) {
+            switch (g_missionOrderTableVec[child->kind.index].notify(child->unit, child, 0)) {
             case 3: {
                 unsigned int when = RandomInt(0xf) + 0x1e;
                 child->flags |= 1;
@@ -1032,10 +1026,6 @@ void __stdcall RunSecondaryOrders(Unit* p)
         }
     }
 }
-
-typedef OrderTableEntryVector SimView_g_missionOrderTableVec;
-#undef g_missionOrderTableVec
-#define g_missionOrderTableVec (*reinterpret_cast<SimView_g_missionOrderTableVec*>(&Sim().g_missionOrderTableVec))
 
 // FUNCTION: 0x43c940
 inline void __stdcall InsertShiftOrderTypes(OrderTableEntry* _L, OrderTableEntry _V, OrderTableEntryCompare _P)
@@ -1127,10 +1117,11 @@ inline void SortOrderTableEntries(OrderTableEntry* _F, OrderTableEntry* _L, Orde
 // FUNCTION: 0x43bc90
 void __stdcall RegisterOrderTypes(OrderTableEntry* from, int count)
 {
-    int sz = g_missionOrderTableVec.size();
-    g_missionOrderTableVec.reserve(sz + count);
-    std::copy(from, from + count, std::back_inserter(g_missionOrderTableVec));
-    SortOrderTableEntries(g_missionOrderTableVec.begin(), g_missionOrderTableVec.end(), CompareOrderTypeNames);
+    int sz = g_missionOrderTableVec.Size();
+    g_missionOrderTableVec.Reserve(sz + count);
+    for (int i = 0; i < count; i++)
+        g_missionOrderTableVec.PushBack(from[i]);
+    SortOrderTableEntries(g_missionOrderTableVec.Begin(), g_missionOrderTableVec.End(), CompareOrderTypeNames);
 }
 
 // FUNCTION: 0x43c020
@@ -1152,7 +1143,7 @@ void RegisterAllOrderTypes()
 // FUNCTION: 0x43c350
 void ClearOrderTypeTable()
 {
-    g_missionOrderTableEnd = (int)g_missionOrderTableBegin;
+    g_missionOrderTableVec.Clear();
 }
 
 // FUNCTION: 0x43c360

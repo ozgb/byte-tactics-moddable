@@ -2429,13 +2429,9 @@ static void NumberUnitHeap(unsigned char* units, unsigned count)
     }
 }
 
-typedef OrderTableEntry* SimView_g_missionOrderTableBegin;
-#undef g_missionOrderTableBegin
-#define g_missionOrderTableBegin (*reinterpret_cast<SimView_g_missionOrderTableBegin*>(reinterpret_cast<char*>(&g_missionOrderTableVec) + 0x4))
-
 static const char* OrderKindName(unsigned order)
 {
-    return (const char*)ReadU32At((unsigned)g_missionOrderTableBegin + *(const unsigned char*)(order + ORDER_KIND) * ORDER_TABLE_STRIDE, ORDER_TABLE_NAME);
+    return (const char*)ReadU32At((unsigned)g_missionOrderTableVec.Begin() + *(const unsigned char*)(order + ORDER_KIND) * ORDER_TABLE_STRIDE, ORDER_TABLE_NAME);
 }
 
 static int OrderPosYUnset(unsigned order)

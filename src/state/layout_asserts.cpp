@@ -107,12 +107,12 @@
 #include "../network/settings.h"
 #include "../orders/air_maneuver_order.h"
 #include "../orders/approach_areas.h"
-#include "../orders/mission_order_table.h"
 #include "../orders/mission_type.h"
 #include "../orders/order.h"
 #include "../orders/order_base.h"
 #include "../orders/order_fx.h"
 #include "../orders/order_goals.h"
+#include "../orders/order_type_entry.h"
 #include "../orders/path_order.h"
 #include "../orders/path_order_attach.h"
 #include "../orders/unit_motion.h"
@@ -1536,10 +1536,6 @@ static_assert(offsetof(MissionOptionFlags, value) == 0, "");
 static_assert(offsetof(MissionOptionFlags, flag_4) == 4, "");
 static_assert(offsetof(MissionOptionFlags, flag_8) == 8, "");
 static_assert(offsetof(MissionOptionFlags, flag_c) == 12, "");
-static_assert(sizeof(MissionOrderTableEntry) == 25, "");
-static_assert(offsetof(MissionOrderTableEntry, unknown_0) == 0, "");
-static_assert(offsetof(MissionOrderTableEntry, markerAnim) == 16, "");
-static_assert(offsetof(MissionOrderTableEntry, unknown_11) == 17, "");
 static_assert(sizeof(MissionRule) == 12, "");
 static_assert(offsetof(MissionRule, type) == 0, "");
 static_assert(offsetof(MissionRule, id) == 4, "");
@@ -1728,6 +1724,14 @@ static_assert(offsetof(Order, attached) == 82, "");
 static_assert(sizeof(OrderBase) == 4, "");
 static_assert(sizeof(OrderFx) == 8, "");
 static_assert(offsetof(OrderFx, source) == 4, "");
+static_assert(sizeof(OrderTableEntry) == 25, "");
+static_assert(offsetof(OrderTableEntry, value) == 0, "");
+static_assert(offsetof(OrderTableEntry, notify) == 4, "");
+static_assert(offsetof(OrderTableEntry, unknown_8) == 8, "");
+static_assert(offsetof(OrderTableEntry, drawMask) == 12, "");
+static_assert(offsetof(OrderTableEntry, markerAnim) == 16, "");
+static_assert(offsetof(OrderTableEntry, flags) == 17, "");
+static_assert(offsetof(OrderTableEntry, name) == 21, "");
 static_assert(sizeof(Orders) == 6, "");
 static_assert(offsetof(Orders, raw) == 0, "");
 static_assert(offsetof(Orders, lo) == 0, "");

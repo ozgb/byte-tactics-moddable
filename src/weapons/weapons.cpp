@@ -246,7 +246,7 @@ void __stdcall UntrackProjectile(Projectile* projectile)
     if (projectile == g_game->tracked) {
         g_game->trackedPos = g_game->tracked->position;
         g_game->value_1434b = projectile->type->holdTime;
-        (*(void **)&g_game->tracked) = 0;
+        g_game->tracked = 0;
     }
     projectile->flags |= 2;
 }
@@ -269,7 +269,7 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
         if (projectile == g_game->tracked) {
             g_game->trackedPos = g_game->tracked->position;
             g_game->value_1434b = projectile->type->holdTime;
-            (*(void **)&g_game->tracked) = 0;
+            g_game->tracked = 0;
         }
         projectile->flags = projectile->flags | 2;
     }
@@ -277,7 +277,7 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
         if (projectile == g_game->tracked) {
             g_game->trackedPos = g_game->tracked->position;
             g_game->value_1434b = projectile->type->holdTime;
-            (*(void **)&g_game->tracked) = 0;
+            g_game->tracked = 0;
         }
         projectile->flags = projectile->flags | 2;
         return;
@@ -791,7 +791,7 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
     if (unit) {
         proj->owner = unit->playerIndex;
         proj->attacker = unit;
-        if ((unit->flags & 0x20000000) && (*(Unit **)&g_game->value_142f3) == unit)
+        if ((unit->flags & 0x20000000) && g_game->value_142f3 == unit)
             g_game->tracked = proj;
         for (i = 0; i < 3; i++)
             if (unit->weapons[i].weapon == shot)

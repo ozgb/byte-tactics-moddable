@@ -41,6 +41,7 @@ struct ConstructionNanoState {
 #include "../units/unit_def.h"
 #include "../units/unit.h"
 #include "../weapons/weapon_def.h"
+#include "../weapons/projectile.h"
 
 #include "../game/build_menu.h"
 
@@ -51,11 +52,6 @@ struct CursorState {
     int flag;
     POINT center;
     POINT savedScroll;
-};
-
-struct CameraFollowTarget {
-    int unknown_0;
-    Vec3 pos;
 };
 
 #include "../game/game.h"
@@ -1246,16 +1242,16 @@ void DispatchOrdersPanelPageFlags()
 void ResetCameraState()
 {
     char saved = g_game->scrollSpeed;
-    memset(&(*(Unit **)&g_game->value_142f3), 0, 0x5c);
+    memset(&g_game->value_142f3, 0, 0x5c);
     g_game->scrollSpeed = saved;
 }
 
 // FUNCTION: 0x41c2e0
 void __stdcall CycleCameraFollow(int param)
 {
-    Unit* val = (Unit *)g_game->value_142f3;
+    Unit* val = g_game->value_142f3;
     Unit* result = FindNextSelectedUnit(val, param);
-    (*(Unit **)&g_game->value_142f3) = result;
+    g_game->value_142f3 = result;
 }
 
 static inline int TestBit(unsigned int* set, unsigned short n)
@@ -1270,7 +1266,7 @@ void FindLocalCommander()
     unsigned int* set = (unsigned int *)GetCategoryMask("Commander");
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
         if (TestBit(set, u->unitDefIndex)) {
-            (*(Unit **)&g_game->value_142f3) = u;
+            g_game->value_142f3 = u;
         }
     }
 }
@@ -1279,8 +1275,8 @@ void FindLocalCommander()
 void __cdecl ClearCameraFollowState()
 {
     (*(unsigned short*)&g_game->value_1434b) = 0;
-    (*(Unit **)&g_game->value_142f3) = 0;
-    (*(CameraFollowTarget **)&g_game->tracked) = 0;
+    g_game->value_142f3 = 0;
+    g_game->tracked = 0;
 }
 
 #pragma auto_inline(off)
@@ -1496,15 +1492,15 @@ void UpdateCameraFollow()
     if ((unsigned short)g_game->value_1434b != 0) {
         (*(unsigned short*)&g_game->value_1434b)--;
         p = &g_game->trackedPos;
-    } else if ((CameraFollowTarget *)g_game->tracked != 0) {
-        p = &((CameraFollowTarget *)g_game->tracked)->pos;
-    } else if ((Unit *)g_game->value_142f3 != 0) {
-        if (((Unit *)g_game->value_142f3)->flags & 0x10000000) {
-            p = &((Unit *)g_game->value_142f3)->pos;
+    } else if (g_game->tracked != 0) {
+        p = &g_game->tracked->position;
+    } else if (g_game->value_142f3 != 0) {
+        if ((g_game->value_142f3)->flags & 0x10000000) {
+            p = &(g_game->value_142f3)->pos;
         } else {
             (*(unsigned short*)&g_game->value_1434b) = 0;
-            (*(Unit **)&g_game->value_142f3) = 0;
-            (*(CameraFollowTarget **)&g_game->tracked) = 0;
+            g_game->value_142f3 = 0;
+            g_game->tracked = 0;
         }
     }
     if (p != 0) {
@@ -1531,8 +1527,8 @@ void UpdateCameraFollow()
 void BeginMouseScroll()
 {
     (*(unsigned short*)&g_game->value_1434b) = 0;
-    (*(Unit **)&g_game->value_142f3) = 0;
-    (*(CameraFollowTarget **)&g_game->tracked) = 0;
+    g_game->value_142f3 = 0;
+    g_game->tracked = 0;
     HideSoftwareCursor();
     CursorState* cursor = &(*(CursorState*)&g_game->cursor);
     cursor->flag = 1;
@@ -1641,7 +1637,7 @@ void UpdateEdgeScroll()
         g_game->y2 = g_game->scrollY;
         g_game->mapFlags &= 0xfff7;
         (*(unsigned short*)&g_game->value_1434b) = 0;
-        (*(Unit **)&g_game->value_142f3) = 0;
-        (*(CameraFollowTarget **)&g_game->tracked) = 0;
+        g_game->value_142f3 = 0;
+        g_game->tracked = 0;
     }
 }

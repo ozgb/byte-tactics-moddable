@@ -1160,7 +1160,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     }
     DrawParticleList((void*)&ctx, 8);
     if (IsKeyDown(0xf9))
-        DrawSelectedUnitOrderOverlays((void*)&ctx, (Unit**)&(*(void**)&g_game->value_142f3));
+        DrawSelectedUnitOrderOverlays((void*)&ctx, &g_game->value_142f3);
 
     if (param_1 != 0) {
         unsigned short* pIdx = g_game->list_1435f;

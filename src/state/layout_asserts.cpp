@@ -65,6 +65,7 @@
 #include "../ingame/frame_timers.h"
 #include "../ingame/game_cursor_state.h"
 #include "../ingame/graphics_option_flags.h"
+#include "../ingame/hot_radar_slot.h"
 #include "../ingame/info_mode_flags.h"
 #include "../ingame/light_bar_counters.h"
 #include "../ingame/light_bar_sprite.h"
@@ -1417,6 +1418,10 @@ static_assert(offsetof(Handle, value) == 2, "");
 static_assert(offsetof(Handle, kind) == 4, "");
 static_assert(offsetof(Handle, unknown_5) == 5, "");
 static_assert(offsetof(Handle, src) == 8, "");
+static_assert(sizeof(HotRadarSlot) == 10, "");
+static_assert(offsetof(HotRadarSlot, unitId) == 0, "");
+static_assert(offsetof(HotRadarSlot, x) == 2, "");
+static_assert(offsetof(HotRadarSlot, y) == 6, "");
 static_assert(sizeof(InfoModeFlags) == 2, "");
 static_assert(offsetof(InfoModeFlags, raw) == 0, "");
 static_assert(sizeof(KeyedCell) == 8, "");

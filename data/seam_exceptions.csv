@@ -27,8 +27,8 @@ map,FreeOtaEnumCacheAndMission,g_otaEnumCacheComplete,TODO(#507): sim reads view
 map,FreeOtaEnumCacheAndMission,g_otaEnumFileCount,TODO(#507): sim reads view data
 map,FreeOtaEnumCacheAndMission,g_otaEnumFileList,TODO(#507): sim reads view data
 map,FreeOtaEnumCacheAndMission,g_otaEnumFileListBytes,TODO(#507): sim reads view data
-map,LoadMapList,HandleNetPackets,TODO(#506): sim sends a packet
-map,LoadMapList,PacketManager::SendAllQueued,TODO(#506): sim sends a packet
+map,LoadMapList,HandleNetPackets,TODO(#507): moves with the reporter and map list
+map,LoadMapList,PacketManager::SendAllQueued,TODO(#507): moves with the reporter and map list
 map,LoadMapList,SetCursorMode,TODO(#505): drives presentation only
 map,LoadMapList,StripExtension,TODO(#505): sim-to-presentation event
 map,LoadMapList,g_otaEnumCacheComplete,TODO(#507): sim reads view data
@@ -95,10 +95,10 @@ players,??_GUnitScript@@UAEPAXI@Z,CobScript::~CobScript,TODO(#508): constructor 
 players,ContinueWatchingCallback,ClearSelectedGadget,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,IsGadgetNamed,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,PlaySoundByName,TODO(#505): sim-to-presentation event
-players,ContinueWatchingCallback,ReportGameEvent,TODO(#506): sim sends a packet
+players,ContinueWatchingCallback,ReportGameEvent,TODO(#505): sim-to-presentation event
 players,EnableReporter,g_riEnable,TODO(#507): sim reads view data
 players,InitPlayerSlot,SquadManager::SquadManager,TODO(#508): constructor across a seam
-players,LoadReporterDll,RISetCallbacks,TODO(#506): sim sends a packet
+players,LoadReporterDll,RISetCallbacks,TODO(#507): moves with the reporter and map list
 players,LoadReporterDll,ReportGameEventCallback,TODO(#505): sim-to-presentation event
 players,LoadReporterDll,ShowGameMessage,TODO(#505): sim-to-presentation event
 players,LoadReporterDll,g_hapinetOnlineReport,TODO(#507): sim reads view data
@@ -113,7 +113,7 @@ players,ShowContinueWatchingDialog,g_noText,TODO(#507): sim reads view data
 players,ShowContinueWatchingDialog,g_titleGadgetName,TODO(#507): sim reads view data
 players,ShowContinueWatchingDialog,g_yesNoGuiName,TODO(#507): sim reads view data
 players,ShowContinueWatchingDialog,g_yesText,TODO(#507): sim reads view data
-players,ShutdownScoreTables,RISetCallbacks,TODO(#506): sim sends a packet
+players,ShutdownScoreTables,RISetCallbacks,TODO(#507): moves with the reporter and map list
 players,ShutdownScoreTables,g_hapinetOnlineReport,TODO(#507): sim reads view data
 players,ShutdownScoreTables,g_riTerminate,TODO(#507): sim reads view data
 players,UpdatePlayersOnStream,FocusCommander,TODO(#505): sim-to-presentation event

@@ -688,7 +688,7 @@ The runtime is clang's profile runtime (`lib/profile` of compiler-rt), built fro
 
 ## The messages sim sends
 
-Sim sends nothing itself: each message below is one slot of `NetworkSeam` (`interfaces/network.h`, #506), called at the point of the tick where 3.1c sent it. The slot takes sim-level arguments and reads the payload from the game state when it is called, so a re-implementation must produce the same message at the same point of the same tick. Outgoing bytes are in no trace and the scenario suite runs no net game; `playtest.py --scenario mp` is the check.
+Sim sends nothing itself: each message below is one slot of `NetworkSeam` (`interfaces/network.h`), called at the point of the tick where 3.1c sent it. The slot takes sim-level arguments and reads the payload from the game state when it is called, so a re-implementation must produce the same message at the same point of the same tick. Outgoing bytes are in no trace and the scenario suite runs no net game; `playtest.py --scenario mp` is the check.
 
 Rules that hold for every message:
 

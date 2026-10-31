@@ -7,7 +7,6 @@ struct Vec3;
 struct UnitWeaponSlot;
 struct WeaponDef;
 struct Projectile;
-class BitWriter;
 
 // Major version of the network interface, changed when a slot is removed or its signature changes.
 #define NETWORK_VERSION_MAJOR 1
@@ -58,8 +57,8 @@ struct NetworkSeam {
     void (__stdcall* SendShareMapInfo)(unsigned char from, unsigned char to);
     // Sends a player's kills, losses, resource amounts and flow to every remote human who watches. Hooks: none.
     void (__stdcall* BroadcastPlayerEconomy)(Player* player);
-    // Sends the bit stream of a player's unit states (motions and one full unit) to the remote humans. Hooks: none.
-    void (__stdcall* SendUnitStates)(Player* owner, BitWriter* stream);
+    // Builds and sends the bit stream of a player's unit states (the motion of each unit that has one, and one full unit) to the remote humans. Hooks: none.
+    void (__stdcall* SendUnitStates)(Player* owner);
 };
 
 #endif

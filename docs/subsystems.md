@@ -510,7 +510,7 @@ Coverage: 83.1% of functions (304 of 366), 79.4% of lines, 61.6% of branches; 62
 - `PointMarker::ApproxDist` (3 from pathfinding)
 - `RingApproach::ApproxDistExcess` (3 from pathfinding)
 - `DeleteOrder` (1 from harness, 1 from presentation)
-- By calling subsystem (functions called): units 15, pathfinding 14, presentation 12, seams 8, game 4, ai 3, map 3, harness 2, platform 1, weapons 1
+- By calling subsystem (functions called): pathfinding 14, presentation 12, units 9, seams 8, network 6, game 4, ai 3, map 3, harness 2, platform 1, weapons 1
 
 **Imports.** 94 functions of 13 subsystems, by target, each with the number of functions it calls there:
 
@@ -549,7 +549,7 @@ Coverage: 83.1% of functions (304 of 366), 79.4% of lines, 61.6% of branches; 62
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (192 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 63 functions are called from outside; the busiest are `FindUnitTypeId` (18), `GetNanoPiecePosition` (15), `AttachUnitToPiece` (10). It is called most by game (22 distinct functions) and seams (18). It imports 175 functions, mostly platform (49), presentation (32), seams (19) and files (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 80.5% of functions (132 of 164), 84.5% of lines, 71.2% of branches; 32 live functions no scenario enters, and 32 more are dead (data/coverage.csv). The list of those 32 is under **units, functions no scenario enters** below.
+**units** (192 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 64 functions are called from outside; the busiest are `FindUnitTypeId` (18), `GetNanoPiecePosition` (15), `AttachUnitToPiece` (10). It is called most by game (22 distinct functions) and seams (18). It imports 167 functions, mostly platform (49), presentation (32), seams (19) and files (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 80.5% of functions (132 of 164), 84.5% of lines, 71.2% of branches; 32 live functions no scenario enters, and 32 more are dead (data/coverage.csv). The list of those 32 is under **units, functions no scenario enters** below.
 
 **units, functions no scenario enters** (32 of 164 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 132 are entered, 80.5%), by reason:
 
@@ -584,7 +584,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Multiplayer lobby and menus only (5): `Mission::GetTerrainSizeTier` (the lobby colour), `Mission::GetDescription`, `Mission::GetPlanet`, `Mission::GetTranslatedName` and `Mission::HasMissionName` (the map list and mission menus). Test mode calls only `LoadMissionByName`.
 - Campaign menu, end screen and restart only (5): `Mission::GetBriefing`, `Mission::SelectMission`, `Mission::MissionExists`, `Mission::AdvanceMission` and `Mission::GetMissionIndex`.
 
-**network** (342 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 98 functions are called from outside, mostly by presentation (51) and game (30); the busiest are `BroadcastPacket` (5), `BroadcastPlayerInfo` (19), `AddMessage` (14). It imports 119 functions: platform 51, presentation 23, players 11, units 10. Its packet handlers write many sim items (285 in all).
+**network** (342 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 96 functions are called from outside, mostly by presentation (51) and game (30); the busiest are `BroadcastPacket` (5), `BroadcastPlayerInfo` (19), `AddMessage` (14). It imports 126 functions: platform 51, presentation 23, players 11, units 11. Its packet handlers write many sim items (285 in all).
 
 **network, functions no scenario enters** (237 of 287 after `save-midgame` (#422) and `allied-victory` (#432), and the six `console-` scenarios (#445); 50 are entered, 17.4%), by reason:
 

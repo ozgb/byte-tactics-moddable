@@ -2896,6 +2896,7 @@ int __stdcall SendScriptCall(Unit* obj, short index, char argCount,
 #include "../weapons/unit_weapon_slot.h"
 #include "../weapons/projectile.h"
 #include "wire_packets.h"
+#include "../orders/unit_motion.h"
 
 #pragma pack(push, 1)
 struct ActivateFlagsPacket {
@@ -3077,9 +3078,41 @@ void __stdcall NetBroadcastPlayerEconomy(Player* player)
     SendPlayerEconomy(player, nullptr, 0);
 }
 
-void __stdcall NetSendUnitStates(Player* owner, BitWriter* stream)
+void __stdcall NetSendUnitStates(Player* owner)
 {
-    BroadcastPacket(owner->id, (unsigned char*)stream->data, ((stream->bit + 7) >> 3) + stream->index * 4);
+    BitWriter stream;
+    stream.WriteBits(0x2c, 8);
+    stream.WriteBits(0, 0x10);
+    stream.WriteBits(g_game->ticks, 0x20);
+    for (Unit* u = owner->unitsBegin; u <= owner->unitsEnd; u++) {
+        if (!(u->flags & 0x10000000))
+            continue;
+        if (!u->motion)
+            continue;
+        if (!u->motion->player->v7())
+            continue;
+        stream.WriteBits(u->id - u->player->firstIndex, 0x10);
+        stream.WriteBits(u->unitDefIndex, g_game->unitDefCountBits);
+        u->motion->player->WriteTo(&stream);
+        if (((stream.bit + 7) >> 3) + stream.index * 4 >= 0x200)
+            break;
+    }
+    stream.WriteBits(-1, 0x10);
+    int i = g_game->ticks % g_game->maxUnitsSetting;
+    stream.data[stream.index] |= 1 << stream.bit;
+    stream.bit++;
+    if (stream.bit == 0x20) {
+        stream.bit = 0;
+        stream.index++;
+        if (stream.index == stream.capacity)
+            stream.GrowBuffer();
+        stream.data[stream.index] = 0;
+    }
+    WriteUnitState(&stream, &owner->unitsBegin[i]);
+    stream.SetByteAt(1, (char)(((stream.bit + 7) >> 3) + (unsigned char)stream.index * 4));
+    stream.SetByteAt(2, (char)((((stream.bit + 7) >> 3) + stream.index * 4) >> 8));
+    BroadcastPacket(owner->id, (unsigned char*)stream.data, ((stream.bit + 7) >> 3) + stream.index * 4);
+    stream.FreeBuffer();
 }
 
 // FUNCTION: 0x456310

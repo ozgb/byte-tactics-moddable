@@ -28588,43 +28588,13 @@ address,function,file,kind,target
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::RemoveUnitFromMap]
-0x48b710,SendUnitStates,src/units/unit_position.cpp,call,BitWriter::FreeBuffer
-0x48b710,SendUnitStates,src/units/unit_position.cpp,call,BitWriter::GrowBuffer
-0x48b710,SendUnitStates,src/units/unit_position.cpp,call,BitWriter::SetByteAt
-0x48b710,SendUnitStates,src/units/unit_position.cpp,call,BitWriter::WriteBits
-0x48b710,SendUnitStates,src/units/unit_position.cpp,call,WriteUnitState
-0x48b710,SendUnitStates,src/units/unit_position.cpp,call,operator Unit *
-0x48b710,SendUnitStates,src/units/unit_position.cpp,call,operator bool
-0x48b710,SendUnitStates,src/units/unit_position.cpp,call,operator->
-0x48b710,SendUnitStates,src/units/unit_position.cpp,deref_maybe_written,*Unit
-0x48b710,SendUnitStates,src/units/unit_position.cpp,deref_read,*unsigned int
-0x48b710,SendUnitStates,src/units/unit_position.cpp,deref_write,*unsigned int
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,BitWriter::bit
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,BitWriter::capacity
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,BitWriter::data
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,BitWriter::index
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Game::maxUnitsSetting
 0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Game::ticks
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Game::unitDefCountBits
 0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,NetworkSeam::SendUnitStates
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Player::firstIndex
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Player::unitsBegin
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Player::unitsEnd
 0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Seams::network
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Unit::flags
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Unit::id
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Unit::motion
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Unit::player
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Unit::unitDefIndex
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,UnitMotion::player
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_write,BitWriter::bit
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_write,BitWriter::index
 0x48b710,SendUnitStates,src/units/unit_position.cpp,field_write,Player::syncTick
 0x48b710,SendUnitStates,src/units/unit_position.cpp,function,
 0x48b710,SendUnitStates,src/units/unit_position.cpp,global_read,g_seams
-0x48b710,SendUnitStates,src/units/unit_position.cpp,indirect_call,"indirect via void (*)(Player *, BitWriter *) __attribute__((stdcall)) [NetworkSeam::SendUnitStates]"
-0x48b710,SendUnitStates,src/units/unit_position.cpp,indirect_call,virtual MotionSerializer::WriteTo
-0x48b710,SendUnitStates,src/units/unit_position.cpp,indirect_call,virtual MotionSerializer::v7
+0x48b710,SendUnitStates,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [NetworkSeam::SendUnitStates]
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,BitReader::ReadBit
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,BitReader::ReadBits
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,CreateUnitFromPacket
@@ -48222,12 +48192,41 @@ address,function,file,kind,target
 ,NetSendUnitKilled,src/network/net_game.cpp,field_write,UnitKilledPacket::unitId
 ,NetSendUnitKilled,src/network/net_game.cpp,field_write,UnitKilledPacket::wreckageLevel
 ,NetSendUnitKilled,src/network/net_game.cpp,function,
+,NetSendUnitStates,src/network/net_game.cpp,call,BitWriter::FreeBuffer
+,NetSendUnitStates,src/network/net_game.cpp,call,BitWriter::GrowBuffer
+,NetSendUnitStates,src/network/net_game.cpp,call,BitWriter::SetByteAt
+,NetSendUnitStates,src/network/net_game.cpp,call,BitWriter::WriteBits
 ,NetSendUnitStates,src/network/net_game.cpp,call,BroadcastPacket
+,NetSendUnitStates,src/network/net_game.cpp,call,WriteUnitState
+,NetSendUnitStates,src/network/net_game.cpp,call,operator Unit *
+,NetSendUnitStates,src/network/net_game.cpp,call,operator bool
+,NetSendUnitStates,src/network/net_game.cpp,call,operator->
+,NetSendUnitStates,src/network/net_game.cpp,deref_maybe_written,*Unit
+,NetSendUnitStates,src/network/net_game.cpp,deref_read,*unsigned int
+,NetSendUnitStates,src/network/net_game.cpp,deref_write,*unsigned int
 ,NetSendUnitStates,src/network/net_game.cpp,field_read,BitWriter::bit
+,NetSendUnitStates,src/network/net_game.cpp,field_read,BitWriter::capacity
 ,NetSendUnitStates,src/network/net_game.cpp,field_read,BitWriter::data
 ,NetSendUnitStates,src/network/net_game.cpp,field_read,BitWriter::index
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Game::maxUnitsSetting
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Game::ticks
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Game::unitDefCountBits
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Player::firstIndex
 ,NetSendUnitStates,src/network/net_game.cpp,field_read,Player::id
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Player::unitsBegin
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Player::unitsEnd
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Unit::flags
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Unit::id
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Unit::motion
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Unit::player
+,NetSendUnitStates,src/network/net_game.cpp,field_read,Unit::unitDefIndex
+,NetSendUnitStates,src/network/net_game.cpp,field_read,UnitMotion::player
+,NetSendUnitStates,src/network/net_game.cpp,field_write,BitWriter::bit
+,NetSendUnitStates,src/network/net_game.cpp,field_write,BitWriter::index
 ,NetSendUnitStates,src/network/net_game.cpp,function,
+,NetSendUnitStates,src/network/net_game.cpp,global_read,g_game
+,NetSendUnitStates,src/network/net_game.cpp,indirect_call,virtual MotionSerializer::WriteTo
+,NetSendUnitStates,src/network/net_game.cpp,indirect_call,virtual MotionSerializer::v7
 ,NetSendWeaponFire,src/network/net_game.cpp,call,BroadcastPacket
 ,NetSendWeaponFire,src/network/net_game.cpp,call,operator->
 ,NetSendWeaponFire,src/network/net_game.cpp,call,operator=

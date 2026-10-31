@@ -11,7 +11,6 @@ struct Vec3;
 struct UnitWeaponSlot;
 struct WeaponDef;
 struct Projectile;
-class BitWriter;
 
 int __stdcall DefaultPacketHandler(int arg1);
 int __stdcall RejectPacketType2(int arg1);
@@ -103,6 +102,6 @@ void __stdcall NetSendFeatureReclaimed(Unit* reclaimer, int x, int z);
 void __stdcall NetSendShareMetal(unsigned char from, unsigned char to, float amount);
 void __stdcall NetSendShareEnergy(unsigned char from, unsigned char to, float amount);
 void __stdcall NetBroadcastPlayerEconomy(Player* player);
-void __stdcall NetSendUnitStates(Player* owner, BitWriter* stream);
+void __stdcall NetSendUnitStates(Player* owner);
 
 #endif

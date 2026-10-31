@@ -1,5 +1,6 @@
 #include <string.h>
 #include "../state/sim_effects.h"
+#include "../../interfaces/services.h"
 #include "../state/block.h"
 #include "../state/game_rand.h"
 #include <stdio.h>

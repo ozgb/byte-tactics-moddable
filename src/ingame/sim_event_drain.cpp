@@ -18,7 +18,7 @@
 void __stdcall PlaySoundByName(char* name, int flag);
 
 static char* const g_speechTexts[SIM_SPEECH_TEXT_COUNT] = {
-    0,
+    nullptr,
     "Attacking",
     "Building",
     "Building complete",

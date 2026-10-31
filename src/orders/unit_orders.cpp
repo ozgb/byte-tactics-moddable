@@ -33,6 +33,7 @@ struct UnitDef;
 
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
+#include "../../interfaces/services.h"
 #include "../state/sim_effects.h"
 struct Chunk;
 class SquadManager;

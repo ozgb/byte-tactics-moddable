@@ -60,6 +60,7 @@ struct CameraFollowTarget {
 
 #include "../game/game.h"
 #include "../state/sim_effects.h"
+#include "../../interfaces/services.h"
 #include "../game/game_state.h"
 
 #pragma pack(pop)

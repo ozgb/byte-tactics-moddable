@@ -171,6 +171,7 @@ void __stdcall SetOffscreenSurface(void*);
 void* __stdcall AllocSurface(char*, int, int);
 void __stdcall DrawSurface(void*, void*, int, int);
 #include "../graphics/draw.h"
+unsigned int __cdecl GetTicks();
 #include "main.h"
 
 #include "../../interfaces/seams.h"

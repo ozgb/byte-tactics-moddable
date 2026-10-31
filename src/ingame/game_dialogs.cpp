@@ -122,7 +122,7 @@ void* __stdcall LoadPcx(char* path, int param);
 void __stdcall AddTextGadget(Layer* obj, char* name, char* text, int x, short y, int w, int flags);
 #include "../game/players.h"
 #include "../frontend/options.h"
-#include "../../interfaces/services.h"
+unsigned int GetTicks();
 #include "../gui/keyboard.h"
 #include "../graphics/draw.h"
 int __stdcall GetTextPixelWidth(char* text);

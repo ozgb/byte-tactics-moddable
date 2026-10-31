@@ -151,7 +151,7 @@ void* __stdcall PlaceFeature(void* target, unsigned short id, void* pos, void* a
 #include "../ingame/control_panel.h"
 #include "../network/net_stats.h"
 void __stdcall WriteScreenshot(char* name, char* description, int x, int y, int w, int h);
-#include "../../interfaces/services.h"
+unsigned int GetTicks();
 #include "../map/meteors.h"
 #include "../util/commands.h"
 #include "../graphics/object_pool.h"

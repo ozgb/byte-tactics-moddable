@@ -88,6 +88,7 @@ int __stdcall GetTextWidth(void* font, const char* text);
 void __stdcall SetTextColors(int param_1, int param_2);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
+unsigned int __cdecl GetTicks();
 int __stdcall GetGafFrame(void* gaf, int frame);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
 void __stdcall InitGafSequence(void* state, void* gaf, int param_3);

@@ -63,10 +63,8 @@ void* __stdcall LoadObject3d(const char* name);
 int __stdcall UsesDataArchives(void);
 // Returns the address of the preferred language name, or 0 when none is set.
 int __stdcall GetPreferredLanguage(void);
-// Returns the number of timer ticks per second.
-int __stdcall GetTickRate();
-// Returns the time in ticks.
-unsigned int __stdcall GetTicks();
+// Loads a GAF animation file of the data directory, once.
+void* __stdcall LoadAnimGaf(char* name);
 
 // The arguments of one console command.
 class CommandArgs {

@@ -34,6 +34,7 @@ char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall SetTextColors(int colour, int font);
 void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
+unsigned int __cdecl GetTicks();
 
 struct GafEntry;
 struct GafFrame;

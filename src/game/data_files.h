@@ -6,7 +6,6 @@ struct GafFrame;
 void __stdcall CheckGpfVersion();
 Font* __stdcall LoadFontByName(const char* name);
 void* __stdcall LoadPaletteByName(char* name);
-void* __stdcall LoadAnimGaf(char* name);
 void __stdcall FindGafSequence(int gaf, char* name);
 void __stdcall LoadGameResources();
 void __stdcall FreeAnimFiles();

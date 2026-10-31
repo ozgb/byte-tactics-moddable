@@ -10,7 +10,7 @@ int __cdecl _strcmpi(const char* a, const char* b);
 #include "../graphics/palette.h"
 int __stdcall ScanDirectory(char* path, char* list, char* sizes, int mode, int flag, int what);
 #include "../graphics/display.h"
-#include "../../interfaces/services.h"
+unsigned int GetTicks();
 #include "../graphics/draw.h"
 
 #pragma pack(push, 1)

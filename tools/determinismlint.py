@@ -84,7 +84,7 @@ ALLOWLIST: dict[tuple[int, str], str] = {
     (0x4876c0, "pointer"): ARRAY_BOUND,
     (0x488810, "pointer"): ARRAY_BOUND,
     (0x488960, "pointer"): ARRAY_BOUND,
-    (0x48a490, "GetTicks"): QUIRK_ONLY,
+    (0x48a490, "host_time_ms"): QUIRK_ONLY,
     (0x48ad30, "pointer"): ARRAY_BOUND,
     (0x48d790, "pointer"): ARRAY_BOUND,
     (0x4917d0, "GetTicks"): LOAD_TIME,

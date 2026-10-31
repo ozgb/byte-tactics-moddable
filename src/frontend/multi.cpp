@@ -569,7 +569,7 @@ extern "C" __declspec(dllimport) char* __stdcall lstrcpynA(char*, const char*, i
 void* __stdcall LoadPcx(char* path, int param_2);
 void __stdcall FrameFromSurface(void* dst, void* src);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
-#include "../../interfaces/services.h"
+unsigned int GetTicks();
 void __stdcall AddMessage(char* text, int a, int b, int c);
 void __stdcall SendChatMessage(void* from, char* text, int a, int b);
 int __stdcall GetTextPixelWidth(char* text);

@@ -18,6 +18,7 @@ struct MouseEventWords {
 #include "../graphics/display.h"
 #include "../game/game_state.h"
 #include "../files/files_api.h"
+int __stdcall GetTicks();
 #include "../gui/mouse.h"
 void __stdcall UpdateMenu(void*);
 #include "game_dialogs.h"

@@ -449,7 +449,7 @@ extern int g_cdActivitySampleRing[30];
 #include "../ingame/info_panel.h"
 #include "../graphics/particles.h"
 #include "../ingame/control_panel.h"
-#include "../../interfaces/services.h"
+unsigned int GetTicks();
 
 // FUNCTION: 0x4917d0
 void LoadBattleAssets()

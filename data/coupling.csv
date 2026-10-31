@@ -504,7 +504,6 @@ game,harness,call,HarnessInit,1
 game,harness,call,HarnessPhase,1
 game,harness,call,HarnessStartSkirmish,1
 game,harness,call,HarnessStepsPerFrame,1
-game,harness,call,HarnessTestMode,1
 game,harness,shared_write,Game::difficulty,2
 game,harness,shared_write,Game::endGameFlags,1
 game,harness,shared_write,Game::localPlayer,1
@@ -676,6 +675,7 @@ game,platform,call,GetMilliseconds,2
 game,platform,call,GetTickRate,1
 game,platform,call,GetTicks,10
 game,platform,call,GetWindowsUserName,1
+game,platform,call,HarnessTestMode,1
 game,platform,call,InitDebugSupport,1
 game,platform,call,InitEnvironment,1
 game,platform,call,InitTimers,1
@@ -1233,8 +1233,10 @@ harness,orders,shared_write,Game::difficulty,1
 harness,orders,shared_write,Game::localPlayer,2
 harness,orders,shared_write,Game::playerIndex,1
 harness,pathfinding,shared_write,Game::numPlayers,1
+harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
+harness,platform,call,HarnessTestMode,7
 harness,platform,call,IsMemSet,1
 harness,platform,call,ModulesCheckStatics,1
 harness,platform,call,ModulesHideSwitch,1
@@ -2470,7 +2472,6 @@ platform,game,shared_write,Vec3::z,3
 platform,game,shared_write,WindMeteorsSeam::UpdateMeteors,1
 platform,game,shared_write,WindMeteorsSeam::UpdateWind,1
 platform,game,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
-platform,harness,call,HarnessTestMode,1
 platform,harness,shared_write,g_randomSeed,1
 platform,los_radar,indirect,CmdLOS,1
 platform,los_radar,indirect,CmdLOSType,1
@@ -4156,7 +4157,6 @@ targeting,platform,shared_write,Vec3::z,22
 targeting,players,shared_write,Vec3::x,3
 targeting,players,shared_write,Vec3::y,3
 targeting,players,shared_write,Vec3::z,3
-targeting,presentation,call,UnitSwapEraseVector::EraseSwapBack,1
 targeting,presentation,shared_write,Vec3::x,44
 targeting,presentation,shared_write,Vec3::y,45
 targeting,presentation,shared_write,Vec3::z,43
@@ -4167,6 +4167,7 @@ targeting,seams,indirect,GetVisibleEnemiesInRadiusNative,1
 targeting,seams,indirect,GetWeaponRangeNative,1
 targeting,seams,indirect,StartScriptWithArgsNative,2
 targeting,seams,shared_write,Vec3::x,1
+targeting,units,call,UnitSwapEraseVector::EraseSwapBack,1
 targeting,units,shared_write,Vec3::x,9
 targeting,units,shared_write,Vec3::y,10
 targeting,units,shared_write,Vec3::z,9

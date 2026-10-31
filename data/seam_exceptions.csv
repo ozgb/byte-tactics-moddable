@@ -1,5 +1,4 @@
 subsystem,function,symbol,reason
-ai,??4?$BlockVector@V?$BlockVector@UBuildRatingWeights@@@@@@QAEAAV0@ABV0@@Z,HarnessTestMode,TODO(#504): engine service
 ai,BuildTimer::OnTimer,QueueBuildOrder,TODO(#505): sim-to-presentation event
 ai,BuildTimer::TryIssueIdleFactoryBuildOrder,QueueBuildOrder,TODO(#505): sim-to-presentation event
 ai,CmdLimit,CommandArgs::GetArg,TODO(#504): engine service
@@ -8,8 +7,6 @@ ai,CmdPlan,CommandArgs::GetArg,TODO(#504): engine service
 ai,CmdWeight,CommandArgs::GetArg,TODO(#504): engine service
 ai,CmdWeight,CommandArgs::GetFloatArg,TODO(#504): engine service
 ai,DumpPlayerAI,FilePrintf,TODO(#504): engine service
-ai,E::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,F::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 ai,PAUUnit::?$vector::insert,CopyDwordIfNonNull,TODO(#504): engine service
 ai,ParseDownloadableAiWeightScripts,CommandArgs::InitArgs,TODO(#504): engine service
 ai,ParseDownloadableAiWeightScripts,ExecuteCommandText,TODO(#504): engine service
@@ -21,53 +18,22 @@ ai,ProtectUnitDefsReadWrite,ProtectBlockReadWrite,TODO(#504): engine service
 ai,ReactToAttack,QueueUnitSpeechIfNotVisible,TODO(#505): sim-to-presentation event
 ai,ReparseAiWeightScriptsIfLimitNotSticky,CommandArgs::InitArgs,TODO(#504): engine service
 ai,ReparseAiWeightScriptsIfLimitNotSticky,ExecuteCommandText,TODO(#504): engine service
-ai,UBuildRatingWeights::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,UGroup::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,UKeyedCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,UKeyedCell::V?$BlockVector::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,UPercentByte::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,UPlayer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,UUnit::U?$Ref::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,UUnit::U?$Ref::V?$BlockVector::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,UUnitTypeInt::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,VPlayerAI::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-ai,VSquadTimer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 economy,??_GUnitScript@@UAEPAXI@Z,CobScript::~CobScript,TODO(#508): constructor across a seam
-economy,??__Fs_unitCategories@@YAXXZ,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 economy,CmdNoEnergy,CommandArgs::GetIntArg,TODO(#504): engine service
 economy,CmdNoMetal,CommandArgs::GetIntArg,TODO(#504): engine service
 economy,CmdSetShareEnergy,CommandArgs::GetIntArg,TODO(#504): engine service
 economy,CmdSetShareMetal,CommandArgs::GetIntArg,TODO(#504): engine service
 economy,CmdShareEnergy,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 economy,CmdShareMetal,BroadcastPlayerInfo,TODO(#506): sim sends a packet
-economy,D::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-economy,UPlayer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-economy,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-economy,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 economy,UpdateResourceSharing,SendPacketToPlayer,TODO(#506): sim sends a packet
-economy,VUnitCategory::?$vector::insert,StringRef::Assign,TODO(#504): engine service
-economy,VUnitCategory::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-economy,VUnitCategory::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
-economy,VUnitDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-economy,VUnitMotion::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-economy,VUnitScript::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 features,CmdFeature,CommandArgs::GetArg,TODO(#504): engine service
-features,D::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 features,DamageFeature,GetHostDpid,TODO(#506): sim sends a packet
 features,DamageFeature,GetLocalDpid,TODO(#506): sim sends a packet
 features,DamageFeature,SendPacketToPlayer,TODO(#506): sim sends a packet
-features,I::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 features,LoadFeatureType,LoadObject3d,TODO(#504): engine service
 features,PlaceFeature,CreateObjectState,TODO(#505): sim-to-presentation event
 features,PlaceFeature,EmitTimedSubParticles,TODO(#505): sim-to-presentation event
 features,StartFeatureBurning,GetLocalDpid,TODO(#506): sim sends a packet
-features,UFeatureAnimEntry::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-features,UFeaturePseudoUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-features,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,??4?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-los_radar,??4?$vector@V?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@V?$allocator@V?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@@2@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,DownsampleFrame,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,DrawPixel,TODO(#505): sim-to-presentation event
 los_radar,BuildRadarPicture,FreeSurface,TODO(#505): sim-to-presentation event
@@ -76,14 +42,10 @@ los_radar,BuildRadarPicture,g_radarPictureName,TODO(#507): sim reads view data
 los_radar,CmdLOS,SaveSettings,TODO(#504): engine service
 los_radar,CmdShareMapping,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 los_radar,CmdShareRadar,BroadcastPlayerInfo,TODO(#506): sim sends a packet
-los_radar,D::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,DrawRadarUnits,DrawCircle,TODO(#505): sim-to-presentation event
 los_radar,DrawRadarUnits,DrawDashedCircle,TODO(#505): sim-to-presentation event
 los_radar,DrawRadarUnits,DrawPixel,TODO(#505): sim-to-presentation event
-los_radar,E::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,F::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,FreeRadar,FreeSurface,TODO(#505): sim-to-presentation event
-los_radar,G::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 los_radar,InitEyeballs,GameAllocIgnoreTag,TODO(#504): engine service
 los_radar,InitRadar,g_radarFinalName,TODO(#507): sim reads view data
 los_radar,InitRadar,g_radarMappedName,TODO(#507): sim reads view data
@@ -95,33 +57,14 @@ los_radar,ResizeRadarPicture,AllocFrame,TODO(#505): sim-to-presentation event
 los_radar,ResizeRadarPicture,FillSurface,TODO(#505): sim-to-presentation event
 los_radar,ResizeRadarPicture,SurfaceFromFrame,TODO(#505): sim-to-presentation event
 los_radar,ToggleShareLos,BroadcastPlayerInfo,TODO(#506): sim sends a packet
-los_radar,UCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,UDamageTableEntry::?$allocator::construct,StringRef::StringRef,TODO(#505): sim-to-presentation event
-los_radar,UFogCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,ULosStep::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,UPlayerInfo::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,UScreenPos::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,VLosLine::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,VLosLine::V?$vector::?$vector::_Ucopy,HarnessTestMode,TODO(#504): engine service
-los_radar,VLosLine::V?$vector::?$vector::_Ufill,HarnessTestMode,TODO(#504): engine service
-los_radar,VLosTable::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,VSpatialBucket::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-los_radar,VUnitResources::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-map,??4MapCacheEntry@@QAEAAV0@ABV0@@Z,StringRef::Assign,TODO(#504): engine service
-map,??__Fs_mapCache@@YAXXZ,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-map,D::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,FreeOtaEnumCacheAndMission,g_otaEnumCacheComplete,TODO(#507): sim reads view data
 map,FreeOtaEnumCacheAndMission,g_otaEnumFileCount,TODO(#507): sim reads view data
 map,FreeOtaEnumCacheAndMission,g_otaEnumFileList,TODO(#507): sim reads view data
 map,FreeOtaEnumCacheAndMission,g_otaEnumFileListBytes,TODO(#507): sim reads view data
-map,I::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 map,LoadMapList,GameAllocIgnoreTag,TODO(#504): engine service
 map,LoadMapList,HandleNetPackets,TODO(#506): sim sends a packet
 map,LoadMapList,PacketManager::SendAllQueued,TODO(#506): sim sends a packet
 map,LoadMapList,SetCursorMode,TODO(#505): drives presentation only
-map,LoadMapList,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 map,LoadMapList,StripExtension,TODO(#505): sim-to-presentation event
 map,LoadMapList,Translate,TODO(#504): engine service
 map,LoadMapList,g_otaEnumCacheComplete,TODO(#507): sim reads view data
@@ -129,15 +72,12 @@ map,LoadMapList,g_otaEnumFileCount,TODO(#507): sim reads view data
 map,LoadMapList,g_otaEnumFileList,TODO(#507): sim reads view data
 map,LoadMapList,g_otaEnumFileListBytes,TODO(#507): sim reads view data
 map,LoadMapList,g_usePacketManager,TODO(#507): sim reads view data
-map,MapCacheEntry::MapCacheEntry,StringRef::StringRef,TODO(#505): sim-to-presentation event
 map,Mission::BuildCampaignFilePath,GetPreferredLanguage,TODO(#504): engine service
 map,Mission::BuildCampaignFilePath,StripExtension,TODO(#505): sim-to-presentation event
 map,Mission::BuildMissionList,GameAllocIgnoreTag,TODO(#504): engine service
 map,Mission::BuildMissionList,SkipTextLines,TODO(#504): engine service
 map,Mission::ComputeMapChecksum,ComputeChecksum,TODO(#504): engine service
 map,Mission::ComputeMapChecksum,GameAllocIgnoreTag,TODO(#504): engine service
-map,Mission::ComputeMapChecksum,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-map,Mission::ComputeMapChecksum,StringRef::StringRef,TODO(#505): sim-to-presentation event
 map,Mission::LoadCampaign,OpenMessageBox,TODO(#505): sim-to-presentation event
 map,Mission::LoadMission,FindTranslation,TODO(#504): engine service
 map,Mission::LoadMission,MissionConditions::MissionConditions,TODO(#505): sim-to-presentation event
@@ -145,17 +85,6 @@ map,Mission::LoadMission,OpenMessageBox,TODO(#505): sim-to-presentation event
 map,Mission::LoadMission,Translate,TODO(#504): engine service
 map,Mission::LoadMissionByName,GetPreferredLanguage,TODO(#504): engine service
 map,Mission::LoadMissionByName,Translate,TODO(#504): engine service
-map,UMissionFeature::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-map,UMissionRule::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-map,UMissionUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-map,USpatialBucketNode::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-map,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-map,VMapCacheEntry::?$vector::insert,StringRef::Assign,TODO(#504): engine service
-map,VMapCacheEntry::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-map,VMapCacheEntry::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
-map,VMission::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-map,VMissionConditions::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-map,VSpatialBucket::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,AiSearchGoal::SerializeNetUnitState,BitWriter::GrowBuffer,TODO(#506): sim sends a packet
 orders,AiSearchGoal::SerializeNetUnitState,BitWriter::WriteBits,TODO(#506): sim sends a packet
 orders,AirManeuverOrder::AirManeuverOrder,BitReader::ReadBits,TODO(#506): sim sends a packet
@@ -214,16 +143,7 @@ orders,SelfRepairOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
 orders,SelfRepairOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,StopBuildingScript,SendScriptCallNoArgs,TODO(#506): sim sends a packet
 orders,TeleportOrder,EmitTeleportParticles,TODO(#505): sim-to-presentation event
-orders,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-orders,UOrderTableEntry::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-orders,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,UnitMotion::SteerGroundUnit,GetHeadingBetween,TODO(#504): engine service
-orders,VMissionCondition::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-orders,VOrderFx::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-orders,VPathGoalVtableView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-orders,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-orders,VPathfinder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-orders,VUnitRef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 orders,VtolFollowOrder,GetHeadingBetween,TODO(#504): engine service
 orders,VtolGetRepairedOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolHelpBuildOrder,EmitNanoParticles,TODO(#505): sim-to-presentation event
@@ -249,21 +169,13 @@ orders,VtolRepairUnitOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
 orders,VtolSeekAttackOrder,GetHeadingBetween,TODO(#504): engine service
 orders,VtolSeekGuardOrder,GetHeadingBetween,TODO(#504): engine service
 orders,VtolUnloadOrder,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-pathfinding,PAUNode::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-pathfinding,UNode::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-pathfinding,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-pathfinding,VAiSearchGoal::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-pathfinding,VMovementClass::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-pathfinding,VTarget::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,??_GUnitScript@@UAEPAXI@Z,CobScript::~CobScript,TODO(#508): constructor across a seam
-players,??__Fs_unitCategories@@YAXXZ,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 players,AllocScoreTables,GameAllocIgnoreTag,TODO(#504): engine service
 players,ContinueWatchingCallback,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 players,ContinueWatchingCallback,ClearSelectedGadget,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,IsGadgetNamed,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,ContinueWatchingCallback,ReportGameEvent,TODO(#506): sim sends a packet
-players,E::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,EnableReporter,g_riEnable,TODO(#507): sim reads view data
 players,GiveUnitToPlayer,GetPlayerDpid,TODO(#506): sim sends a packet
 players,InitPlayerResources,FindHostSlot,TODO(#506): sim sends a packet
@@ -292,9 +204,6 @@ players,ShutdownScoreTables,g_hapinetOnlineReport,TODO(#507): sim reads view dat
 players,ShutdownScoreTables,g_riTerminate,TODO(#507): sim reads view data
 players,TransferEnergy,SendShareEnergy,TODO(#506): sim sends a packet
 players,TransferMetal,SendShareMetal,TODO(#506): sim sends a packet
-players,UPlayerInfo::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-players,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-players,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,UpdatePlayersOnStream,BroadcastPlayerInfo,TODO(#506): sim sends a packet
 players,UpdatePlayersOnStream,CountActiveAIPlayers,TODO(#506): sim sends a packet
 players,UpdatePlayersOnStream,CountCombatPlayers,TODO(#506): sim sends a packet
@@ -306,16 +215,6 @@ players,UpdatePlayersOnStream,RenderLayer,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,SetKeyboardInput,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,SetTranslatedTextByName,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,Translate,TODO(#504): engine service
-players,VMissionCondition::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-players,VOrderFx::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-players,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-players,VUnitCategory::?$vector::insert,StringRef::Assign,TODO(#504): engine service
-players,VUnitCategory::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-players,VUnitCategory::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
-players,VUnitDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-players,VUnitMotion::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-players,VUnitResources::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-players,VUnitScript::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 players,VictoryBuildUnitType::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryCaptureUnitType::OnUnitCaptured,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryDestroyAllUnits::IsSatisfied,PlaySoundByName,TODO(#505): sim-to-presentation event
@@ -326,36 +225,10 @@ players,VictoryKillUnitType::OnUnitDied,PlaySoundByName,TODO(#505): sim-to-prese
 players,VictoryMoveUnitToRadius::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryUnitTypePassesX::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
 players,VictoryUnitTypePassesZ::VisitUnit,PlaySoundByName,TODO(#505): sim-to-presentation event
-targeting,??4?$BlockVector@V?$BlockVector@UBuildRatingWeights@@@@@@QAEAAV0@ABV0@@Z,HarnessTestMode,TODO(#504): engine service
-targeting,E::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,F::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,FindWeaponTarget,UnitSwapEraseVector::EraseSwapBack,TODO(#504): engine service
 targeting,PAUUnit::?$vector::insert,CopyDwordIfNonNull,TODO(#504): engine service
-targeting,UBuildRatingWeights::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UGroup::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UKeyedCell::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UKeyedCell::V?$BlockVector::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UOrderTableEntry::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UPercentByte::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UPlayer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UUnit::U?$Ref::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UUnit::U?$Ref::V?$BlockVector::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,UUnitTypeInt::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,VPathGoalVtableView::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,VPlayerAI::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,VSquadManager::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,VSquadTimer::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-targeting,VUnitRef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,??4?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-units,??4?$vector@V?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@V?$allocator@V?$vector@UOwnedString@@V?$allocator@UOwnedString@@@std@@@std@@@2@@std@@QAEAAV01@ABV01@@Z,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-units,??__Fs_unitCategories@@YAXXZ,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 units,AddDownloadBuildOptions,ProtectBlockReadOnly,TODO(#504): engine service
 units,AddDownloadBuildOptions,ProtectBlockReadWrite,TODO(#504): engine service
 units,AlignUnitToGround,GetTicks,TODO(#504): engine service
-units,AllocateUnitMemory,HarnessTestMode,TODO(#504): engine service
 units,ApplyAttachUnit,DeselectIfIneligible,TODO(#505): sim-to-presentation event
 units,ApplyUnitDeath,AddCdActivitySample,TODO(#505): sim-to-presentation event
 units,ApplyUnitDeath,AnnounceForcesDestroyed,TODO(#505): sim-to-presentation event
@@ -371,22 +244,15 @@ units,CobScript::CobScript,GetTickRate,TODO(#504): engine service
 units,CreateUnit,BroadcastBuilderLink,TODO(#506): sim sends a packet
 units,CreateUnit,SendNewUnit,TODO(#506): sim sends a packet
 units,CreateUnitMotion,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
-units,D::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,FinishConstruction,BroadcastBuilderLink,TODO(#506): sim sends a packet
 units,FinishConstruction,IsScreenNamed,TODO(#505): sim-to-presentation event
 units,FinishConstruction,MarkChanged,TODO(#505): sim-to-presentation event
 units,FinishConstruction,RefreshBuildCountTexts,TODO(#505): sim-to-presentation event
-units,FreeUnitCategories,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 units,FreeUnitInfo,ProtectBlockReadWrite,TODO(#504): engine service
 units,FreeUnitTypes,ProtectBlockReadWrite,TODO(#504): engine service
 units,FreeUnitTypes,UnitTable::Destroy,TODO(#505): sim-to-presentation event
-units,G::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,GetCategoryMask,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-units,GetCategoryMask,StringRef::StringRef,TODO(#505): sim-to-presentation event
 units,GetPieceOffset,RotateByAngles,TODO(#504): engine service
 units,GetSweetSpot,UpdateObjectState,TODO(#505): sim-to-presentation event
-units,H::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,I::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,InitSpawnedUnit,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
 units,InitUnit,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
 units,InitUnitScript,CreateObjectState,TODO(#505): sim-to-presentation event
@@ -395,7 +261,6 @@ units,KillUnit,GetSlotDpid,TODO(#506): sim sends a packet
 units,KillUnit,PopUntilNamedLayout,TODO(#505): sim-to-presentation event
 units,LoadDownloadMenus,ProtectBlockReadOnly,TODO(#504): engine service
 units,LoadDownloadMenus,ProtectBlockReadWrite,TODO(#504): engine service
-units,LoadDownloadMenus,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 units,LoadUnit,Order::Order,TODO(#508): constructor across a seam
 units,LoadUnitFbi,MissionType::MissionType,TODO(#508): constructor across a seam
 units,LoadUnitFbi,g_noneString,TODO(#507): sim reads view data
@@ -403,7 +268,6 @@ units,LoadUnitInfo,ComputeChecksum,TODO(#504): engine service
 units,LoadUnitInfo,GameAllocIgnoreTag,TODO(#504): engine service
 units,LoadUnitInfo,ProtectBlockReadOnly,TODO(#504): engine service
 units,LoadUnitInfo,ProtectBlockReadWrite,TODO(#504): engine service
-units,LoadUnitInfo,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 units,LoadUnitInfo,Translate,TODO(#504): engine service
 units,LoadUnitInfo,UsesDataArchives,TODO(#504): engine service
 units,LoadUnitTypes,GameAllocIgnoreTag,TODO(#504): engine service
@@ -417,7 +281,6 @@ units,LoadUnitTypes,UnitTable::Initialize,TODO(#505): sim-to-presentation event
 units,MakePropList,GameAllocIgnoreTag,TODO(#504): engine service
 units,MakePropList,GetTickRate,TODO(#504): engine service
 units,MakePropList,Translate,TODO(#504): engine service
-units,PAUObject3do::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,PoseUnitModel,UpdateObjectState,TODO(#505): sim-to-presentation event
 units,ReadUnitState,BitReader::ReadBits,TODO(#506): sim sends a packet
 units,ReadUnitState,BitReader::ReadSignedBits,TODO(#506): sim sends a packet
@@ -429,19 +292,8 @@ units,SendUnitStates,BitWriter::FreeBuffer,TODO(#506): sim sends a packet
 units,SendUnitStates,BitWriter::GrowBuffer,TODO(#506): sim sends a packet
 units,SendUnitStates,BitWriter::SetByteAt,TODO(#506): sim sends a packet
 units,SendUnitStates,BitWriter::WriteBits,TODO(#506): sim sends a packet
-units,UCallback::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,UDamageTableEntry::?$allocator::construct,StringRef::StringRef,TODO(#505): sim-to-presentation event
-units,ULosStep::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,UObjectState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,UOrder::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,UPiece::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,USpotState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,UWeaponDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,Unit::SetStateBits,MarkSelectionOrdersDirty,TODO(#505): sim-to-presentation event
 units,Unit::SetStateBits,QueueUnitSpeech,TODO(#505): sim-to-presentation event
-units,UnitCategory::AssignCategory,StringRef::Assign,TODO(#504): engine service
-units,UnitCategory::UnitCategory,StringRef::StringRef,TODO(#505): sim-to-presentation event
 units,UnitScript::EmitSfx,EmitBubbles,TODO(#505): sim-to-presentation event
 units,UnitScript::EmitSfx,EmitThrustParticles,TODO(#505): sim-to-presentation event
 units,UnitScript::EmitSfx,EmitWakeParticles,TODO(#505): sim-to-presentation event
@@ -449,19 +301,6 @@ units,UnitScript::EmitSfx,UpdateObjectState,TODO(#505): sim-to-presentation even
 units,UpdateAllUnits,CycleCameraFollow,TODO(#505): sim-to-presentation event
 units,UpdateAllUnits,CycleSelection,TODO(#505): sim-to-presentation event
 units,UpdateAllUnits,IsKeyDown,TODO(#505): sim-to-presentation event
-units,VLosLine::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,VLosLine::V?$vector::?$vector::_Ucopy,HarnessTestMode,TODO(#504): engine service
-units,VLosLine::V?$vector::?$vector::_Ufill,HarnessTestMode,TODO(#504): engine service
-units,VLosTable::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,VMovementClass::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,VUnitCategory::?$vector::insert,StringRef::Assign,TODO(#504): engine service
-units,VUnitCategory::?$vector::insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-units,VUnitCategory::?$vector::insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
-units,VUnitDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,VUnitMotion::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,VUnitRef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-units,VUnitScript::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 units,WriteUnitState,BitWriter::GrowBuffer,TODO(#506): sim sends a packet
 units,WriteUnitState,BitWriter::WriteBits,TODO(#506): sim sends a packet
 weapons,??__Fg_tdfGlobalParser@@YAXXZ,g_tdfGlobalParser,TODO(#507): sim reads view data
@@ -473,16 +312,12 @@ weapons,BreakPieceIntoDebris,VectorFromTo,TODO(#504): engine service
 weapons,BroadcastWeaponFire,GetLocalDpid,TODO(#506): sim sends a packet
 weapons,BuildCalcedExplosion,GameAllocIgnoreTag,TODO(#504): engine service
 weapons,BuildExplosionFrame,AllocFrame,TODO(#505): sim-to-presentation event
-weapons,CompactProjectiles,HarnessTestMode,TODO(#504): engine service
-weapons,D::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,DamageUnit,GetLocalDpid,TODO(#506): sim sends a packet
 weapons,DetonateProjectile,AccumulateScreenShake,TODO(#505): sim-to-presentation event
 weapons,FireBallisticProjectile,EmitWeaponSmoke,TODO(#505): sim-to-presentation event
 weapons,FireLineOfSightProjectile,EmitWeaponSmoke,TODO(#505): sim-to-presentation event
 weapons,FireVLaunchProjectile,EmitWeaponSmoke,TODO(#505): sim-to-presentation event
 weapons,FreeExplosions,CMemoryCache::FreeCache,TODO(#505): sim-to-presentation event
-weapons,FreeWeaponTypes,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-weapons,H::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,InitExplosions,BuildLensFrame,TODO(#505): sim-to-presentation event
 weapons,InitExplosions,CMemoryCache::InitSimCache,TODO(#505): sim-to-presentation event
 weapons,InitExplosions,GameAllocIgnoreTag,TODO(#504): engine service
@@ -498,29 +333,10 @@ weapons,InitExplosions,g_explosion2StartSize,TODO(#507): sim reads view data
 weapons,LoadWeaponType,Load3do,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponType,LoadAnimGaf,TODO(#504): engine service
 weapons,LoadWeaponType,LoadSoundByName,TODO(#504): engine service
-weapons,LoadWeaponType,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-weapons,LoadWeaponType,StringRef::StringRef,TODO(#505): sim-to-presentation event
-weapons,LoadWeaponTypes,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponTypes,UsesDataArchives,TODO(#504): engine service
 weapons,ParalyzeUnit,MissionType::MissionType,TODO(#508): constructor across a seam
 weapons,SpawnProjectile,GetLocalDpid,TODO(#506): sim sends a packet
 weapons,StartExplodePiece,CMemoryCache::AllocHandle,TODO(#504): engine service
-weapons,UCallback::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UDamageTable::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UDamageTableEntry::?$BlockVector::Insert,StringRef::Assign,TODO(#504): engine service
-weapons,UDamageTableEntry::?$BlockVector::Insert,StringRef::ReleaseRef,TODO(#505): sim-to-presentation event
-weapons,UDamageTableEntry::?$BlockVector::Insert,StringRef::StringRef,TODO(#505): sim-to-presentation event
-weapons,UDamageTableEntry::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UObjectState::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UPiece::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UPieceRec::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UProjectile::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UUnit::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UVec3::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,UWeaponDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,UpdateUnitWeapons,UpdateBuildMenuIfFocusUnit,TODO(#505): sim-to-presentation event
-weapons,VPathOrderAttach::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
-weapons,VUnitRef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service
 weapons,_GLOBAL__sub_I_weapons.cpp,g_tdfGlobalParser,TODO(#507): sim reads view data
 wind_meteors,CmdMeteor,CommandArgs::GetIntArg,TODO(#504): engine service (needs #371's single CommandArgs)
-wind_meteors,UWeaponDef::?$Ref::?$Ref,HarnessTestMode,TODO(#504): engine service

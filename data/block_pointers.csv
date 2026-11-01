@@ -967,6 +967,7 @@ InitPlayerSlot #2,0x2,LoadSoundCategories #4,1,420,0x15,not-a-pointer,Player slo
 InitPlayerSlot #2,0x2 0x37,LoadTntMap: TILE SET,11,1857,0x2e4-0x9402cf,not-a-pointer,Player slot bytes and counters
 InitPlayerSlot #2,0x2 0x37,NanoParticles::Emit,8,2022,0x45-0x1b6,not-a-pointer,Player slot bytes and counters
 InitPlayerSlot #2,0x2,ThrustParticles::Emit,1,1,0x75,not-a-pointer,Player slot bytes and counters
+InitPlayerSlot #3,*,*,0,0,-,not-a-pointer,Words of a player slot allocation that only look like addresses
 IssueAttackOrder,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 IssueAttackOrder,0x22,HAPI_LoadFile,1,489,0xb980-0xd6d0,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 IssueAttackOrder #2,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
@@ -1367,6 +1368,7 @@ SimGlobals.g_movementClasses,0x0,SmokeParticles::Emit,1,6,0x20,outside,"Movement
 SimGlobals.g_movementClasses,0x20 0xa0 0x180,Sound::CreateSampleFromFile: Digital Audio Sample,4,8400,0x10,outside,"MovementClass.name (0x0, stride 0x20): name string loaded with the unit types; target names change with the heap layout"
 SimGlobals.g_packetHandlers,*,*,0,0,-,not-a-pointer,g_packetHandlers: function pointers into the exe; the unaligned words that straddle two entries only look like addresses
 SimGlobals.g_packetManager,*,*,0,0,-,outside,"PacketManager and the PacketChannel, PacketRing, PacketReceiver, PlayerFrameInfo and FrameQueue it holds by value: their packet and frame buffers come from outside the block (#353 moves them in)"
+SimGlobals.g_packetModes,*,*,0,0,-,not-a-pointer,"g_packetModes: the last word of the table, which straddles the sizes after it and only looks like an address in some runs"
 SimGlobals.g_packetSizes,*,*,0,0,-,not-a-pointer,"g_packetSizes: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_packetSizes,0x5,LoadTntMap: TILE SET,6,46800,0xaffe0-0x57ffe0,not-a-pointer,"g_packetSizes: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_playerAI,*,*,0,0,-,not-a-pointer,g_playerAI: Ref<PlayerAI> block offsets; the unaligned words straddle two entries and only look like addresses
@@ -1529,3 +1531,4 @@ VtolStandbyOrder,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) 
 VtolStandbyOrder,0x20 0x22,CMemoryCache::InitCache: CMemoryCache CCH,1,85,0x2b02af-0x2c5489,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolStandbyOrder,0x1c+0x6*k 0x27 0x2a,HAPI_LoadFile,2,121,0x204-0xe616,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolStandbyOrder,0x22,NanoParticles::Emit,1,38,0x16,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
+unknown,*,*,0,0,-,not-a-pointer,"The sim event queue, allocated before the allocation hooks are on and so without a site: its tick and argument words, read at every byte offset, sometimes look like addresses"

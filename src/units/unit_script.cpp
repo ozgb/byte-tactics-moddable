@@ -12,6 +12,7 @@
 #include "../network/player.h"
 
 #include "../game/game.h"
+#include "../state/sim_effects.h"
 
 struct ExplodedPieceInit {
     Ref<Unit> obj;
@@ -297,22 +298,22 @@ void UnitScript::EmitSfx(int a, int b)
 
     switch (b) {
     case 0:
-        EmitThrustParticles((int)&v1, (int)&v2, 1, 6, 7);
+        RecordThrustParticles(v1, v2, 1, 6, 7);
         break;
     case 1:
-        EmitThrustParticles((int)&v1, (int)&v2, 1, 7, 7);
+        RecordThrustParticles(v1, v2, 1, 7, 7);
         break;
     case 2:
-        EmitWakeParticles((int)&v1, (int)&v2, 0x10, 2);
+        RecordWakeParticles(v1, v2, 0x10, 2);
         break;
     case 3:
-        EmitWakeParticles((int)&v1, (int)&v2, 8, 2);
+        RecordWakeParticles(v1, v2, 8, 2);
         break;
     case 4:
-        EmitWakeParticles((int)&v2, (int)&v1, 0x10, 2);
+        RecordWakeParticles(v2, v1, 0x10, 2);
         break;
     case 5:
-        EmitWakeParticles((int)&v2, (int)&v1, 8, 2);
+        RecordWakeParticles(v2, v1, 8, 2);
         break;
     case 0x101:
         EmitWhiteSmoke((int)&v1, 9);
@@ -325,7 +326,7 @@ void UnitScript::EmitSfx(int a, int b)
         v2.y = v1.y;
         v2.z = v1.z;
         v2.y = g_game->seaLevel << 16;
-        EmitBubbles((int)&v1, (int)&v2, 8, 7);
+        RecordBubbles(v1, v2, 8, 7);
         break;
     }
 }

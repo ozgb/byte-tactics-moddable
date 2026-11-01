@@ -63,6 +63,7 @@ OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTab
                                        int* unused);
 #include "../network/net_game.h"
 #include "../sound/sound.h"
+#include "../state/sim_speech.h"
 
 #include "../../link/globals.h"
 
@@ -223,11 +224,11 @@ void Order::OrStatusFlags(unsigned int param_1)
 }
 
 // FUNCTION: 0x438880
-void Order::AnnounceStatusIfFlagged(const char* text)
+void Order::AnnounceStatusIfFlagged(SimSpeechText text)
 {
     if (flags_42 & 0x2000) {
         flags_42 &= ~0x2000;
-        QueueUnitSpeech(unit, 5, (char*)text);
+        RecordUnitSpeech(unit, 5, text);
     }
 }
 

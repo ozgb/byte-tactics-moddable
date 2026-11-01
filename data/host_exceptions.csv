@@ -434,7 +434,6 @@ src/units/unit_types.cpp,src/graphics/memory_cache.h,#392
 src/units/unit_types.cpp,src/graphics/object_pool.h,#392
 src/units/unit_types.cpp,src/graphics/palette.h,#392
 src/units/unit_types.cpp,src/graphics/pcx.h,#392
-src/units/units.cpp,src/frontend/skirmish_menu.h,#392
 src/units/units.cpp,src/graphics/model_render.h,#392
 src/units/units.cpp,src/graphics/object_pool.h,#392
 src/units/units.cpp,src/ingame/game_dialogs.h,#392

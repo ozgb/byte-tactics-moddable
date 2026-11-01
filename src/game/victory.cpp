@@ -1,4 +1,6 @@
 #include <string.h>
+#include "../state/sim_effects.h"
+#include "../../interfaces/services.h"
 #include "../state/block.h"
 #include "../state/game_rand.h"
 #include <stdio.h>
@@ -241,7 +243,7 @@ void VictoryKillEnemyCommander::OnUnitDied(Unit* unit)
         if (_strcmpi(unit->def->unitname, (*(PlayerName(*)[5])&g_game->sideDefs)[((PlayerInfoLink *)unit->player.get())->owner->side].commander) == 0) {
             satisfied = 1;
             if (celebrated == 0) {
-                PlaySoundByName("Victory Condition", 0);
+                RecordSound(SIM_SOUND_VICTORY_CONDITION, 0);
                 celebrated = 1;
             }
         }
@@ -269,7 +271,7 @@ int VictoryDestroyAllUnits::IsSatisfied()
 {
     if (g_game->field_1df2 == 0) {
         if (celebrated == 0) {
-            PlaySoundByName("Victory Condition", 0);
+            RecordSound(SIM_SOUND_VICTORY_CONDITION, 0);
             celebrated = 1;
         }
         return 1;
@@ -312,7 +314,7 @@ void VictoryKillAllMobileUnits::OnUnitDied(Unit* unit)
         if (numUnits <= 1) {
             satisfied = 1;
             if (celebrated == 0) {
-                PlaySoundByName("Victory Condition", 0);
+                RecordSound(SIM_SOUND_VICTORY_CONDITION, 0);
                 celebrated = 1;
             }
         }
@@ -343,7 +345,7 @@ int VictoryBuildUnitType::VisitUnit(Unit* unit)
     if (((short)unit->unitDefIndex) == id && unit->buildLeft == 0.0f) {
         satisfied = 1;
         if (celebrated == 0) {
-            PlaySoundByName("Victory Condition", 0);
+            RecordSound(SIM_SOUND_VICTORY_CONDITION, 0);
             celebrated = 1;
         }
     }
@@ -385,7 +387,7 @@ void VictoryCaptureUnitType::OnUnitCaptured(Unit* unit)
     if (unit->playerIndex == 1 && _strcmpi(name, unit->def->unitname) == 0) {
         satisfied = 1;
         if (celebrated == 0) {
-            PlaySoundByName("Victory Condition", 0);
+            RecordSound(SIM_SOUND_VICTORY_CONDITION, 0);
             celebrated = 1;
         }
     }
@@ -426,7 +428,7 @@ void VictoryKillAllOfType::OnUnitDied(Unit* unit)
         if (count <= 1) {
             satisfied = 1;
             if (celebrated == 0) {
-                PlaySoundByName("Victory Condition", 0);
+                RecordSound(SIM_SOUND_VICTORY_CONDITION, 0);
                 celebrated = 1;
             }
         }
@@ -457,7 +459,7 @@ void VictoryKillUnitType::OnUnitDied(Unit* unit)
         if (--numLeftToKill <= 0) {
             satisfied = 1;
             if (celebrated == 0) {
-                PlaySoundByName("Victory Condition", 0);
+                RecordSound(SIM_SOUND_VICTORY_CONDITION, 0);
                 celebrated = 1;
             }
         }
@@ -503,7 +505,7 @@ void VictoryMoveUnitToRadius::VisitUnit(Unit* unit)
             && ((unit->carrier) == 0 || (unit->carrier->flags & 0x40000000))) {
             satisfied = 1;
             if (celebrated == 0) {
-                PlaySoundByName("Victory Condition", 0);
+                RecordSound(SIM_SOUND_VICTORY_CONDITION, 0);
                 celebrated = 1;
             }
         }
@@ -533,7 +535,7 @@ int VictoryUnitTypePassesX::VisitUnit(Unit* unit)
         if (abs(unit->cell.x - x) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
-                PlaySoundByName("Victory Condition", 0);
+                RecordSound(SIM_SOUND_VICTORY_CONDITION, 0);
                 celebrated = 1;
             }
         }
@@ -573,7 +575,7 @@ int VictoryUnitTypePassesZ::VisitUnit(Unit* unit)
         if (abs(unit->cell.y - z) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
-                PlaySoundByName("Victory Condition", 0);
+                RecordSound(SIM_SOUND_VICTORY_CONDITION, 0);
                 celebrated = 1;
             }
         }

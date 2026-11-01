@@ -1,5 +1,6 @@
 #ifndef SELECTION_H
 #define SELECTION_H
+#include "../../interfaces/ref.h"
 class MissionType;
 struct MouseEvent;
 
@@ -31,7 +32,7 @@ void __stdcall SelectUnitsByCategory(char* name, int);
 unsigned short __stdcall PickUnitUnderCursor(void);
 bool __stdcall SelectSquad(int id, int);
 
-void __stdcall DrawSelectedUnitOrderOverlays(void* obj, Unit** sel);
+void __stdcall DrawSelectedUnitOrderOverlays(void* obj, Ref<Unit>* sel);
 
 void __stdcall IssueOrderToSelection(MouseEvent* entry, unsigned char mode, MissionType kind, int* pos, int typeId, int amount);
 

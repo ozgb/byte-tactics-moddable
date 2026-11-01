@@ -8,6 +8,7 @@
 #include "../../interfaces/ref.h"
 
 struct Unit;
+enum SimSpeechText : unsigned short;
 class OrderFx;
 class HapiBank;
 struct Feature;
@@ -112,7 +113,7 @@ struct Order : public OrderBase {
     void AttachApproachRadiusGoal(Vec3* pos, int n);
     void AttachRingApproachGoal(Vec3* pos, int radius1, int radius2);
     void AttachBuildFootprintMarker(Point16 cell, Point16 size);
-    void AnnounceStatusIfFlagged(const char* text);
+    void AnnounceStatusIfFlagged(SimSpeechText text);
     Unit* Target() { return target; }
     void Wait() { waiting = 1; }
     Vec3* Position() { return &pos; }

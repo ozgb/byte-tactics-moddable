@@ -97,6 +97,7 @@ struct Model {
 #include "../map/mission.h"
 
 #include "../game/game.h"
+#include "../state/sim_effects.h"
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
@@ -831,10 +832,10 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
     }
     if (f->geothermal) {
         if (pos) {
-            EmitTimedSubParticles(pos, 4);
+            RecordTimedSubParticles(*pos, 4);
         } else {
             Vec3 p = GetFootprintCentre(&at, f);
-            EmitTimedSubParticles(&p, 4);
+            RecordTimedSubParticles(p, 4);
         }
     }
     int index = cell - g_game->cells;

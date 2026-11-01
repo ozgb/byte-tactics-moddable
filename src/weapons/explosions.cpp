@@ -600,7 +600,7 @@ void __stdcall StartExplodePiece(ExplodedPiece* piece)
         return;
     }
     int num = rec->desc->vertexCount;
-    if (g_debrisMemCache.AllocHandle((void**)&g_explodedPieces[index], num * 12 + 0x66, true) == 0) {
+    if (g_debrisMemCache.AllocHandle(&g_explodedPieces[index], num * 12 + 0x66) == 0) {
         return;
     }
     ExplodedBlock* block = (ExplodedBlock*)g_explodedPieces[index].get();

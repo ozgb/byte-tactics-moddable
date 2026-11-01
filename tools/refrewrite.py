@@ -1,16 +1,14 @@
-"""Rewrite raw pointer fields to Ref<T>, for the rows of data/ref_exceptions.csv.
+"""Rewrite raw pointer fields to Ref<T>, for the fields tools/refcheck.py finds.
 
-    uv run tools/refrewrite.py --issue '#349'
     uv run tools/refrewrite.py --struct Unit --struct Order --dry-run
-    uv run tools/refrewrite.py --struct Unit --exceptions build/scratch/348/x.csv --dry-run
+    uv run tools/refrewrite.py --field Unit.target --dry-run
 
-Selects the rows of kind `pointer` that match --issue or any --struct (a row
-matching either is taken), finds each field's declaration with clang-cl
-(`-Xclang -ast-dump=json`, with the file's command from the compile database)
-and splices `Unit* carrier;` into `Ref<Unit> carrier;`, changing nothing else
-in the file. Each file in the row's `file` column is rewritten (several files
-are space-separated). Adds the include of interfaces/ref.h when it is missing
-and drops the rewritten rows from the exceptions file.
+--struct selects every raw field of kind `pointer` that refcheck finds in that struct and that is not on
+data/outside_pointers.csv. --field Struct.field selects one such field. Both repeat, and a field matching
+either is taken. refcheck's scan gives each field's struct, name and files. refrewrite finds each field's
+declaration with clang-cl (`-Xclang -ast-dump=json`, with the file's command from the compile database)
+and splices `Unit* carrier;` into `Ref<Unit> carrier;`, changing nothing else in the file. Each file that
+defines the struct is rewritten. Adds the include of interfaces/ref.h when it is missing.
 
 Handled: `T *a`, `T* a`, `struct T* a`, `const T* a` (Ref<const T>), arrays
 (`T* a[4]`), `T *a, *b;` (split into one declaration each), and `T** a`
@@ -22,7 +20,6 @@ anything the spelling does not show as a plain pointer declarator.
 """
 
 import argparse
-import csv
 import difflib
 import io
 import json
@@ -33,13 +30,12 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import refcheck
 import rwsets
 from sources import ROOT
 
-EXCEPTIONS = ROOT / "data/ref_exceptions.csv"
 REF_HEADER = "interfaces/ref.h"
 BUILD_DIR = ROOT / "build/modern"
-COLUMNS = ["struct", "field", "kind", "file", "issue"]
 
 PLAIN_FLAGS = ["clang-cl", "--target=i686-pc-windows-msvc", "/nologo", "-TP", "-fms-compatibility",
                "-fms-extensions", "-fsyntax-only", "-Xclang", "-ast-dump=json"]
@@ -289,24 +285,21 @@ def add_include(text: str, path: Path, header: Path) -> str:
     return text[:at] + line + newline + text[at:]
 
 
-def read_rows(path: Path) -> tuple[list[str], list[dict]]:
-    lines = path.read_text().splitlines(True)
-    rows = []
-    for number, line in enumerate(lines):
-        if number == 0:
-            continue
-        values = next(csv.reader([line]))
-        rows.append(dict(zip(COLUMNS, values), line=number))
-    return lines, rows
+def scan(root: Path, build_dir: Path, jobs: int) -> list[dict]:
+    """The raw fields refcheck finds that are not on the outside list, as rows of struct, field, kind and files."""
+    result = refcheck.analyse(root, build_dir, jobs)
+    outside = {(r["struct"], r["field"]) for r in result.outside if r["field"]}
+    return [{"struct": f.struct, "field": f.field, "kind": f.kind, "file": " ".join(sorted(f.files))}
+            for _, f in sorted(result.found.items()) if (f.struct, f.field) not in outside]
 
 
-def select(rows: list[dict], issue: str | None, structs: list[str]) -> list[dict]:
+def select(rows: list[dict], structs: list[str], fields: list[str]) -> list[dict]:
     return [r for r in rows if r["kind"] == "pointer"
-            and ((issue and r["issue"] == issue) or r["struct"] in structs)]
+            and (r["struct"] in structs or "%s.%s" % (r["struct"], r["field"]) in fields)]
 
 
 def rewrite(rows: list[dict], build_dir: Path, root: Path, plain: bool, header: Path):
-    """(new text per file, rows fully rewritten, Result)."""
+    """(new text per file, Result)."""
     result = Result()
     wants: dict[str, dict[str, set[str]]] = {}
     for row in rows:
@@ -350,41 +343,36 @@ def rewrite(rows: list[dict], build_dir: Path, root: Path, plain: bool, header: 
         if edits[path]:
             changed = apply_edits(text, edits[path])
             new_texts[path] = add_include(changed, Path(path), header)
-    dropped = []
     for row in rows:
         files = [str(root / f) for f in row["file"].split()]
         if all(done.get((row["struct"], row["field"], f)) for f in files):
-            dropped.append(row)
             for f in files:
                 result.rewritten.append((row["struct"], row["field"], os.path.relpath(f, root)))
-    return new_texts, dropped, result
+    return new_texts, result
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--issue", help="rewrite the pointer rows of this issue, such as '#349'")
-    parser.add_argument("--struct", action="append", default=[], help="rewrite the pointer rows of this struct")
-    parser.add_argument("--exceptions", type=Path, default=EXCEPTIONS)
+    parser.add_argument("--struct", action="append", default=[], help="rewrite the raw pointer fields of this struct")
+    parser.add_argument("--field", action="append", default=[], help="rewrite this raw pointer field, Struct.field")
+    parser.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     parser.add_argument("--build-dir", type=Path, default=BUILD_DIR)
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--plain", action="store_true", help="compile each file alone, with no compile database")
     parser.add_argument("--dry-run", action="store_true", help="print a unified diff and write nothing")
     args = parser.parse_args(argv)
-    if not args.issue and not args.struct:
-        parser.error("give --issue or --struct")
+    if not args.struct and not args.field:
+        parser.error("give --struct or --field")
 
-    lines, rows = read_rows(args.exceptions)
-    chosen = select(rows, args.issue, args.struct)
-    if not chosen:
-        print("no pointer rows selected")
-        return 0
     root = args.root.resolve()
+    chosen = select(scan(root, args.build_dir, args.jobs), args.struct, args.field)
+    if not chosen:
+        print("no pointer fields selected")
+        return 0
     header = root / REF_HEADER
-    new_texts, dropped, result = rewrite(chosen, args.build_dir, root, args.plain, header)
+    new_texts, result = rewrite(chosen, args.build_dir, root, args.plain, header)
 
-    drop_lines = {row["line"] for row in dropped}
-    new_csv = "".join(line for number, line in enumerate(lines) if number not in drop_lines)
-    outputs = {str(args.exceptions): (args.exceptions.read_text(), new_csv)}
+    outputs = {}
     for path, text in new_texts.items():
         outputs[path] = (Path(path).read_text(encoding="latin-1", newline=""), text)
 
@@ -396,14 +384,11 @@ def main(argv: list[str] | None = None) -> int:
     else:
         for path, (old, new) in outputs.items():
             if old != new:
-                if path in new_texts:
-                    Path(path).write_bytes(new.encode("latin-1"))
-                else:
-                    Path(path).write_text(new)
+                Path(path).write_bytes(new.encode("latin-1"))
 
     summary = io.StringIO()
     print(f"rewritten: {len(result.rewritten)} field(s) in {len(new_texts)} file(s); "
-          f"skipped: {len(result.skipped)}; rows dropped: {len(dropped)}", file=summary)
+          f"skipped: {len(result.skipped)}", file=summary)
     for struct, name, file in result.rewritten:
         print(f"  rewritten {struct}::{name} ({file})", file=summary)
     for struct, name, file, reason in result.skipped:

@@ -13,7 +13,6 @@
 #include "../frontend/net_game_flag_low_bits.h"
 #include "../frontend/connection_info.h"
 #include "../frontend/track_option_flags.h"
-#include "../frontend/options_slider_menu.h"
 #include "../frontend/player_info_entry.h"
 #include "../../include/v4i.h"
 #include "../graphics/object3do.h"
@@ -33,6 +32,8 @@
 #include "../ingame/unit_info_snapshot.h"
 #include "../ingame/light_bar_counters.h"
 #include "../ingame/light_bar_sprite.h"
+#include "../ingame/hot_radar_slot.h"
+#include "../map/eye.h"
 #include "../map/feature_anim_pool.h"
 #include "../map/grid2.h"
 #include "../map/map_info.h"
@@ -74,7 +75,6 @@ struct ConnectionBlob;
 struct Display;
 struct GameDescEntry;
 struct SoundCategoryEntry;
-struct EyeView;
 struct Feature;
 struct FeatureSpot;
 struct Font;
@@ -138,7 +138,7 @@ struct Game {
     int count;
     int pad_4fd;
     char pad_501[16];
-    Player* slowest;
+    Ref<Player> slowest;
     int lag;
     union {
         struct {
@@ -189,7 +189,7 @@ struct Game {
             char pad_ddb_a[1300];
             char chatHudRing[4];
             char unknown_12f3[1868];
-            PlayerInfo* infos[11];
+            Ref<PlayerInfo> infos[11];
             char unknown_1a6b[287];
             Ref<SideData> p1b8a;
             char unknown_1b8e[327];
@@ -223,7 +223,7 @@ struct Game {
             char pad_2855[331];
         };
         struct {
-            OptionsSliderMenu menu_519_1c;
+            char menu_519_1c[28];
             char unknown_535_a[5802];
             PlayerGrid players_1bdf[10];
             char pad_28cd[211];
@@ -410,7 +410,7 @@ struct Game {
             Ref<Feature> features;
             Ref<unsigned short> visibilityMask;
             int count_14277;
-            EyeView* eyes;
+            Ref<Eye> eyes;
             unsigned char seaLevel;
             unsigned char debugMode;
             unsigned short mapFlags;
@@ -436,8 +436,8 @@ struct Game {
             short screen_h;
             short blinkTimer;
             unsigned short flags_142f1;
-            int value_142f3;
-            Projectile* tracked;
+            Ref<Unit> value_142f3;
+            Ref<Projectile> tracked;
             int xs[4];
             int ys[4];
             unsigned char valid[4];
@@ -606,8 +606,8 @@ struct Game {
     int f14353;
     Ref<Unit> units;
     Ref<Unit> unitsEnd;
-    unsigned short* list_1435f;
-    void* hotRadar;
+    Ref<unsigned short> list_1435f;
+    Ref<HotRadarSlot> hotRadar;
     int count_14367;
     int hotRadarCount;
     unsigned short focusUnitId;
@@ -651,7 +651,7 @@ struct Game {
     void* smoke1;
     void* smoke2;
     int fire1;
-    int alfboom1;
+    void* alfboom1;
     void* radlogo;
     void* radlogohigh;
     void* nuclogo;
@@ -661,18 +661,18 @@ struct Game {
     union {
         struct {
             void* src3;
-            int explode2;
-            int explode3;
-            int explode4;
-            int explode5;
-            int nuke1;
+            void* explode2;
+            void* explode3;
+            void* explode4;
+            void* explode5;
+            void* nuke1;
         };
         void* sources[6];
     };
     void* gaf_1480f;
     unsigned short* image_14813;
     unsigned short* image_14817;
-    int igpaused;
+    void* igpaused;
     union {
         struct {
             unsigned short* sidePanelTopSeq[5];
@@ -722,11 +722,11 @@ struct Game {
             int cursorRed;
             int cursorGrn;
             unsigned short* cursorNormal;
-            int cursorHourglass;
+            void* cursorHourglass;
         };
         void* cursorModeSeq[21];
     };
-    int pathIcon;
+    void* pathIcon;
     void* logos;
     void* logos32;
     int count_148df;
@@ -734,11 +734,11 @@ struct Game {
     int count_148e7;
     int* data_148eb;
     int gafAnimClearedSlot;
-    int fxGaf;
-    int igTitles;
-    int vismasks;
-    int fog;
-    int cursorsGaf;
+    void* fxGaf;
+    void* igTitles;
+    void* vismasks;
+    void* fog;
+    void* cursorsGaf;
     union {
         struct {
             int array_14907[1];
@@ -1202,7 +1202,7 @@ struct Game {
     int showRanges;
     int showBps;
     int buildListCount;
-    BuildMenuPage* buildLists;
+    Ref<BuildMenuPage> buildLists;
     union {
         struct {
             char pad_391cf[24];

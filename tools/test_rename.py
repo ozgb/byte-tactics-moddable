@@ -83,7 +83,6 @@ int Read(Game* game, Game& ref, Other* other, Unknown* p)
 }
 int Shadow(Other* g_game) { return g_game->field_0; }
 """,
-    "data/ref_exceptions.csv": "struct,field,kind,file,issue\nGame,field_0,pointer,src/game/game.h,#1\nOther,field_0,pointer,src/game/other.h,#1\n",
     "data/state_classes.csv": ("name,address,kind,proposed,class,rule,note\n"
                                "field_0,0x0,game-region,,platform,r,Game::field_0 note\n"
                                "field_0,0x0,heap,,platform,r,other field_0\n"),
@@ -263,8 +262,6 @@ class ScopedMember(Fixture):
 
     def test_data_rows_of_the_type_only(self):
         self.ok("Game::field_0", "hp")
-        self.assertEqual(read(self.root, "data/ref_exceptions.csv").splitlines()[1:],
-                         ["Game,hp,pointer,src/game/game.h,#1", "Other,field_0,pointer,src/game/other.h,#1"])
         self.assertEqual(read(self.root, "data/state_classes.csv").splitlines()[1:],
                          ["hp,0x0,game-region,,platform,r,Game::hp note", "field_0,0x0,heap,,platform,r,other field_0"])
         self.assertEqual(read(self.root, "data/trace_coverage.csv").splitlines()[1:],

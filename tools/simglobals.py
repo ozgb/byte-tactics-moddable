@@ -33,13 +33,11 @@ GLOBALS = ROOT / "data" / "globals.csv"
 LAYOUT_REFS = ROOT / "data" / "layout_refs.csv"
 SIM_HEADER = ROOT / "src" / "state" / "sim_globals.h"
 SIM_CSV = ROOT / "src" / "state" / "sim_globals.csv"
-VECTOR_HEADER = ROOT / "src" / "map" / "msvc_vector.h"
 LINK_DATA = ROOT / "link" / "data.cpp"
 LINK_GLOBALS = ROOT / "link" / "globals.h"
 
 EXCLUDED = {"s_cobScriptCache@src/util/int_map.cpp", "g_game"}
 SKIP_FILES = {"src/state/sim_globals.h", "src/state/sim_globals.cpp", "src/harness/trace_schema.h"}
-SKIP_FILES |= {"src/map/msvc_vector.h"}
 SOURCE_SUFFIXES = (".cpp", ".h", ".inl")
 
 TYPE_OVERRIDES = {
@@ -62,41 +60,12 @@ HEADER_INCLUDES = [
     '"../../interfaces/ref.h"',
     '"../graphics/memory_cache.h"',
     '"../map/los_tables.h"',
-    '"../map/msvc_vector.h"',
     '"../network/packet_manager.h"',
     '"../quirks/quirks.h"',
     '"../units/movement_class.h"',
     '"../util/vec3.h"',
 ]
 FORWARD_DECLARATIONS = ["struct ExplodedPiece;", "struct PlayerAI;", "struct WeaponDef;"]
-
-VECTOR_CLASS = """#ifndef MSVC_VECTOR_H
-#define MSVC_VECTOR_H
-
-#include <memory>
-
-template <class T, class A = std::allocator<T> >
-class MsvcVector {
-public:
-    explicit MsvcVector(const A& al = A())
-        : allocator(al), first(0), last(0), end(0) {}
-    ~MsvcVector()
-    {
-        allocator.deallocate(first, end - first);
-        first = 0, last = 0, end = 0;
-    }
-
-    A allocator;
-    T* first;
-    T* last;
-    T* end;
-};
-
-#endif
-"""
-VECTOR_CLASS_IN_SOURCE = re.compile(
-    r"(?:^//[^\n]*\n)*^template <class T, class A = std::allocator<T> >\nclass MsvcVector \{.*?^\};\n\n?",
-    re.S | re.M)
 
 
 class Row:
@@ -434,14 +403,6 @@ class Tool:
         csv.writer(buf, lineterminator="\n").writerows(rows)
         self.write(GLOBALS, buf.getvalue())
 
-    def strip_vector_class(self) -> None:
-        self.write(VECTOR_HEADER, VECTOR_CLASS)
-        path = ROOT / "src" / "map" / "meteors.cpp"
-        text = path.read_text()
-        new = VECTOR_CLASS_IN_SOURCE.sub("", text, count=1)
-        if new != text:
-            self.write(path, new)
-
     def strip_member_declarations(self) -> None:
         path = ROOT / "src" / "units" / "movement_class.h"
         text = path.read_text()
@@ -464,7 +425,6 @@ class Tool:
     def run(self) -> None:
         self.write(SIM_HEADER, header_text(self.rows))
         self.write(SIM_CSV, csv_text(self.rows))
-        self.strip_vector_class()
         self.strip_member_declarations()
         self.strip_link()
         self.update_globals_csv()

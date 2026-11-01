@@ -332,7 +332,7 @@ SYNTHETIC.update({
         unsigned char a;
         unsigned char b;
         int flags;
-        Unit* first;
+        Ref<Unit> first;
     """,
     "Eye": """
         Ref<Player> player;

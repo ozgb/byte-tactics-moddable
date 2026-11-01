@@ -21,7 +21,6 @@
 #include "../frontend/connection_blob.h"
 #include "../frontend/connection_info.h"
 #include "../frontend/net_game_flag_low_bits.h"
-#include "../frontend/options_slider_menu.h"
 #include "../frontend/player_info_entry.h"
 #include "../frontend/track_option_flags.h"
 #include "../game/all_missions_flags.h"
@@ -65,6 +64,7 @@
 #include "../ingame/frame_timers.h"
 #include "../ingame/game_cursor_state.h"
 #include "../ingame/graphics_option_flags.h"
+#include "../ingame/hot_radar_slot.h"
 #include "../ingame/info_mode_flags.h"
 #include "../ingame/light_bar_counters.h"
 #include "../ingame/light_bar_sprite.h"
@@ -197,21 +197,6 @@ static_assert(offsetof(BuildRatingWeights, a) == 0, "");
 static_assert(offsetof(BuildRatingWeights, b) == 1, "");
 static_assert(offsetof(BuildRatingWeights, c) == 2, "");
 static_assert(sizeof(BuildTimer) == 20, "");
-static_assert(sizeof(CMemoryCache) == 20, "");
-static_assert(offsetof(CMemoryCache, cap) == 0, "");
-static_assert(offsetof(CMemoryCache, base) == 4, "");
-static_assert(offsetof(CMemoryCache, basePointer) == 4, "");
-static_assert(offsetof(CMemoryCache, cur) == 8, "");
-static_assert(offsetof(CMemoryCache, handle) == 12, "");
-static_assert(offsetof(CMemoryCache, image) == 16, "");
-static_assert(offsetof(CMemoryCache, bitmap) == 16, "");
-static_assert(offsetof(CMemoryCache, shadow) == 16, "");
-static_assert(offsetof(CMemoryCache, buffer) == 16, "");
-static_assert(offsetof(CMemoryCache, ptr) == 16, "");
-static_assert(offsetof(CMemoryCache, field_10) == 16, "");
-static_assert(sizeof(CacheChunk) == 8, "");
-static_assert(offsetof(CacheChunk, owner) == 0, "");
-static_assert(offsetof(CacheChunk, size) == 4, "");
 static_assert(sizeof(Callback) == 4, "");
 static_assert(sizeof(CameraFlags) == 2, "");
 static_assert(offsetof(CameraFlags, raw) == 0, "");
@@ -299,6 +284,15 @@ static_assert(offsetof(Debris, spin) == 64, "");
 static_assert(offsetof(Debris, angle_x) == 76, "");
 static_assert(offsetof(Debris, angle_y) == 78, "");
 static_assert(offsetof(Debris, angle_z) == 80, "");
+static_assert(sizeof(DebrisCache) == 20, "");
+static_assert(offsetof(DebrisCache, cap) == 0, "");
+static_assert(offsetof(DebrisCache, base) == 4, "");
+static_assert(offsetof(DebrisCache, cur) == 8, "");
+static_assert(offsetof(DebrisCache, handle) == 12, "");
+static_assert(offsetof(DebrisCache, spare) == 16, "");
+static_assert(sizeof(DebrisCacheChunk) == 8, "");
+static_assert(offsetof(DebrisCacheChunk, owner) == 0, "");
+static_assert(offsetof(DebrisCacheChunk, size) == 4, "");
 static_assert(sizeof(DebrisPiece) == 52, "");
 static_assert(offsetof(DebrisPiece, state) == 0, "");
 static_assert(offsetof(DebrisPiece, pad_1) == 1, "");
@@ -1417,6 +1411,10 @@ static_assert(offsetof(Handle, value) == 2, "");
 static_assert(offsetof(Handle, kind) == 4, "");
 static_assert(offsetof(Handle, unknown_5) == 5, "");
 static_assert(offsetof(Handle, src) == 8, "");
+static_assert(sizeof(HotRadarSlot) == 10, "");
+static_assert(offsetof(HotRadarSlot, unitId) == 0, "");
+static_assert(offsetof(HotRadarSlot, x) == 2, "");
+static_assert(offsetof(HotRadarSlot, y) == 6, "");
 static_assert(sizeof(InfoModeFlags) == 2, "");
 static_assert(offsetof(InfoModeFlags, raw) == 0, "");
 static_assert(sizeof(KeyedCell) == 8, "");
@@ -1681,9 +1679,6 @@ static_assert(offsetof(OpenHeap, used) == 12, "");
 static_assert(offsetof(OpenHeap, capacity) == 16, "");
 static_assert(offsetof(OpenHeap, count) == 20, "");
 static_assert(offsetof(OpenHeap, topPopped) == 24, "");
-static_assert(sizeof(OptionsSliderMenu) == 28, "");
-static_assert(offsetof(OptionsSliderMenu, unknown_0) == 0, "");
-static_assert(offsetof(OptionsSliderMenu, holder) == 24, "");
 static_assert(sizeof(Order) == 86, "");
 static_assert(offsetof(Order, kind) == 4, "");
 static_assert(offsetof(Order, state) == 5, "");

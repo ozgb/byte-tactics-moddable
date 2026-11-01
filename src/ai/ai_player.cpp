@@ -212,6 +212,8 @@ void __stdcall RegisterCommand(const char* name, AiCommandFn fn, int flags);
 #include "../util/file_printf.h"
 #include "../orders/unit_orders.h"
 #include "../sound/sound.h"
+#include "../state/sim_speech.h"
+#include "../../interfaces/services.h"
 #include "../units/squads.h"
 #include "../util/math.h"
 #include "pathfind.h"
@@ -400,7 +402,7 @@ void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
         }
     }
     if (!(g_seams.orders->GetOrderFlags(unit)&0x80) && (unit->lastAttackerSlot!=unit->playerIndex || unit->lastDamageType==1))
-        QueueUnitSpeechIfNotVisible(unit,2,0);
+        RecordUnitSpeech(unit,2,SIM_SPEECH_KIND_TEXT,SIM_EVENT_SPEECH_IF_NOT_VISIBLE);
 }
 
 // FUNCTION: 0x4071f0

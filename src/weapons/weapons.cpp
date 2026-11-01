@@ -150,6 +150,7 @@ void __stdcall RockUnit(RockUnitView* obj, UnitWeaponSlot* src)
 #include "../map/los_tables.h"
 
 #include "weapons.h"
+#include "../state/sim_effects.h"
 
 // FUNCTION: 0x499c70
 void __stdcall ApplyWeaponHit(Projectile* weapon, Unit* target)
@@ -246,7 +247,7 @@ void __stdcall UntrackProjectile(Projectile* projectile)
     if (projectile == g_game->tracked) {
         g_game->trackedPos = g_game->tracked->position;
         g_game->value_1434b = projectile->type->holdTime;
-        (*(void **)&g_game->tracked) = 0;
+        g_game->tracked = 0;
     }
     projectile->flags |= 2;
 }
@@ -269,7 +270,7 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
         if (projectile == g_game->tracked) {
             g_game->trackedPos = g_game->tracked->position;
             g_game->value_1434b = projectile->type->holdTime;
-            (*(void **)&g_game->tracked) = 0;
+            g_game->tracked = 0;
         }
         projectile->flags = projectile->flags | 2;
     }
@@ -277,12 +278,12 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
         if (projectile == g_game->tracked) {
             g_game->trackedPos = g_game->tracked->position;
             g_game->value_1434b = projectile->type->holdTime;
-            (*(void **)&g_game->tracked) = 0;
+            g_game->tracked = 0;
         }
         projectile->flags = projectile->flags | 2;
         return;
     }
-    AccumulateScreenShake(type->shakeMagnitude, type->shakeMagnitude, type->shakeDuration);
+    RecordScreenShake(type->shakeMagnitude, type->shakeMagnitude, type->shakeDuration);
     if (hostile && !unit) {
         PlaySoundAt(type->soundWater, position, 0);
         AddExplosionEffect(position, type->splash, 0, hostile);
@@ -791,7 +792,7 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
     if (unit) {
         proj->owner = unit->playerIndex;
         proj->attacker = unit;
-        if ((unit->flags & 0x20000000) && (*(Unit **)&g_game->value_142f3) == unit)
+        if ((unit->flags & 0x20000000) && g_game->value_142f3 == unit)
             g_game->tracked = proj;
         for (i = 0; i < 3; i++)
             if (unit->weapons[i].weapon == shot)
@@ -917,7 +918,7 @@ int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit,
     g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
 
     if (fire->weapon->flags.b.startSmoke)
-        EmitWeaponSmoke(p3, 9);
+        RecordWeaponSmoke(*p3, 9);
     return 1;
 }
 
@@ -967,7 +968,7 @@ int __stdcall FireVLaunchProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* pos,
     int b = -ScaledCos((short)angle, 800);
     g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
     if (shot->weapon->flags.b.startSmoke)
-        EmitWeaponSmoke(pos, 9);
+        RecordWeaponSmoke(*pos, 9);
     return 1;
 }
 
@@ -1010,7 +1011,7 @@ int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* po
         int b = -ScaledCos((short)angle, 800);
         g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
         if (shot->weapon->flags.b.startSmoke)
-            EmitWeaponSmoke(pos, 9);
+            RecordWeaponSmoke(*pos, 9);
         return 1;
     }
     return 0;
@@ -1595,7 +1596,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                 continue;
             if (attached->flags.b.stockpile) {
                 e->stockpile--;
-                UpdateBuildMenuIfFocusUnit(unit);
+                RecordBuildMenuUpdate(unit);
             } else {
                 int n = unit->killCount / 5;
                 if (n > 5)

@@ -1117,7 +1117,7 @@ void LoadDownloadMenus()
 // FUNCTION: 0x42e120
 void FreeDownloadMenus()
 {
-    GameFreeThunk(g_game->buildLists);
+    GameFreeThunk(g_game->buildLists.get());
 }
 
 #pragma auto_inline(off)

@@ -12,7 +12,7 @@ public:
     unsigned int bufferSize;
     int skipCount;
     char* recvBuffer;
-    FrameRing* buffer;
+    Ref<FrameRing> buffer;
     int fromId;
     int toId;
 

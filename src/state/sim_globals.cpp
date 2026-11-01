@@ -3,6 +3,7 @@
 
 #include "block.h"
 #include "sim_globals.h"
+#include "sim_events.h"
 
 SimGlobals* g_simGlobals;
 
@@ -21,6 +22,7 @@ SimGlobals& SimCreate()
     g_simGlobals = static_cast<SimGlobals*>(mem);
     SimBlockTrack(reinterpret_cast<void**>(&g_simGlobals));
     new (mem) SimGlobals();
+    SimEventsCreate();
     if (!registered) {
         registered = true;
         atexit(DestroySimGlobals);

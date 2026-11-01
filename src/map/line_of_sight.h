@@ -20,8 +20,6 @@ struct Rec {
 #pragma pack(pop)
 
 void __stdcall FreeLosTables();
-void __stdcall InitEyeballs();
-void __stdcall FreeEyeballs();
 Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
 Cell* __stdcall GetOriginCellAtPosition(Vec3* pos);
 void __stdcall RemoveUnitLineOfSight(Unit* unit);

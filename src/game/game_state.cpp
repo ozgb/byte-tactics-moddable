@@ -4,6 +4,7 @@
 #include "win_types.h"
 
 #include "../map/mission.h"
+#include "../state/sim_events.h"
 #include "../state/game_rand.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/host.h"
@@ -469,6 +470,7 @@ void LoadBattleAssets()
     g_game->bits_37f2f_1.bit8_37f2f = 0;
     LoadLightBar();
     ResetSpeech();
+    SimEventsClear();
     LoadTextureGafs();
     g_seams.features->LoadFeatureFileList();
     g_seams.units->InitUnitCategories();

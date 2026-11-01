@@ -3,7 +3,7 @@
 
 #pragma pack(push, 1)
 struct UnitInfoSnapshot {
-    int orderName;
+    const char* orderName;
     unsigned short selected;
     unsigned short health;
     unsigned short build;

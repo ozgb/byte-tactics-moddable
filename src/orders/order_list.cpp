@@ -289,7 +289,7 @@ int __stdcall GetOrderTarget(int param_1)
 }
 
 // FUNCTION: 0x439df0
-int __stdcall GetOrderName(Unit* obj)
+const char* __stdcall GetOrderName(Unit* obj)
 {
     if (obj && obj->list) {
         return g_missionOrderTableVec[obj->list->kind.index].value;
@@ -630,16 +630,6 @@ void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target,
 }
 
 #pragma pack(push, 1)
-
-class MissionOrderTable {
-public:
-    char unknown_0[0x4];
-    int first;
-    int last;
-
-    int GetCount(void);
-};
-
 
 typedef std::vector<OrderTableEntry> OrderTableEntryVector;
 typedef int(__stdcall* OrderTableEntryCompare)(const OrderTableEntry&, const OrderTableEntry&);
@@ -1144,12 +1134,6 @@ void RegisterAllOrderTypes()
 void ClearOrderTypeTable()
 {
     g_missionOrderTableVec.Clear();
-}
-
-// FUNCTION: 0x43c360
-int MissionOrderTable::GetCount(void)
-{
-    return first == 0 ? 0 : (last - first) / 0x19;
 }
 
 template class std::vector<OrderTableEntry>;

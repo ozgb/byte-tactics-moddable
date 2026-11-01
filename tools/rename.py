@@ -52,8 +52,7 @@ line). Only what is proven to belong to `Type` changes:
     or a global declared that way in a file that spells `Type`, and is never
     declared as another type in that function. `((Type*)expr)->member` and
     `static_cast<Type*>(expr)->member` count as well;
-  - in data/ref_exceptions.csv the `field` of the rows whose `struct` is `Type`;
-    in state_classes.csv and trace_coverage.csv the `name` of the rows whose
+  - in state_classes.csv and trace_coverage.csv the `name` of the rows whose
     kind is the type's region (`game-region` for Game); and the spellings
     `Type::member` and `Type.member` in the other hand-set tables and the docs.
 
@@ -126,7 +125,6 @@ CELLS = {
     "data/x87_sites.csv": [("function", "words")],
     "data/quirk_candidates.csv": [("function", "words")],
     "data/simalloc_allow.csv": [("name", "words")],
-    "data/ref_exceptions.csv": [("struct", "words"), ("field", "words")],
     "data/initialiser_allow.csv": [("refs", "symbols")],
     "data/progress.csv": [("symbol", "symbols")],
     "data/block_pointers.csv": [("holder", "symbols"), ("target", "symbols")],
@@ -386,7 +384,6 @@ def apply(pairs: list[tuple[str, str]], texts: dict[Path, str], dry_run: bool, d
 
 SCOPED_NAME = re.compile(r"([A-Za-z_]\w*)::([A-Za-z_]\w*)$")
 KIND_OF = {"Game": "game-region"}
-ROW_KEYED = {"data/ref_exceptions.csv": ("struct", "field")}
 KIND_KEYED = ["data/state_classes.csv", "data/trace_coverage.csv"]
 GENERATED = {"rwsets", "coupling", "type_dupes", "layout_refs", "outside_pointers"}
 QUALIFIERS = re.compile(r"\b(?:struct|class|union|enum|const|volatile|register|static|extern)\s+")
@@ -597,9 +594,6 @@ class Scoped:
                 continue
             before = path.read_bytes().decode("latin-1")
             after = self.data_text(before)
-            if name in ROW_KEYED:
-                key, column = ROW_KEYED[name]
-                after = edit_cells(after, row_edit(key, column, self.typ))
             if name in KIND_KEYED and kind:
                 after = edit_cells(after, row_edit("kind", "name", kind))
             if after != before:

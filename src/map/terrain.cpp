@@ -30,7 +30,7 @@ union Flags {
 
 struct UnitBucket {
     char unknown_0[6];
-    Unit* first;
+    Ref<Unit> first;
 };
 
 #include "../units/unit_def.h"
@@ -54,11 +54,6 @@ static inline int InsideExplored(Player* los, unsigned int tx, unsigned int ty)
 {
     return tx < (unsigned int)los->exploredWidth && ty < (unsigned int)los->exploredHeight;
 }
-
-struct SpatialBucketNode {
-    char unknown_0[0x8e];
-    Ref<SpatialBucketNode> next;
-};
 
 #include "spatial_bucket.h"
 
@@ -189,25 +184,23 @@ void FUN_0047caf0(void)
 // FUNCTION: 0x47cb00
 void SpatialBucket::UnlinkUnit(Unit* unit)
 {
-    SpatialBucketNode* node = (SpatialBucketNode*)unit;
-    if ((SpatialBucketNode*)head == node) {
-        head = node->next;
-        node->next = 0;
+    if (head == unit) {
+        head = unit->cargoNext;
+        unit->cargoNext = 0;
         return;
     }
-    Ref<SpatialBucketNode>* pp = &((SpatialBucketNode*)head)->next;
-    while (*pp != node)
-        pp = &(*pp)->next;
-    *pp = node->next;
-    node->next = 0;
+    Ref<Unit>* pp = &head->cargoNext;
+    while (*pp != unit)
+        pp = &(*pp)->cargoNext;
+    *pp = unit->cargoNext;
+    unit->cargoNext = 0;
 }
 
 // FUNCTION: 0x47cb40
-void SpatialBucket::PrependUnit(int node)
+void SpatialBucket::PrependUnit(Unit* unit)
 {
-    int temp = (int)head;
-    ((SpatialBucketNode*)node)->next = (SpatialBucketNode*)temp;
-    head = (void*)node;
+    unit->cargoNext = head;
+    head = unit;
 }
 
 static void UnlinkBucketUnit(UnitBucket* bucket, Unit* unit)

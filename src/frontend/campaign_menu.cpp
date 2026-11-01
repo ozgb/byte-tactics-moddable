@@ -1030,8 +1030,7 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
         if (f == 0)
             return;
 
-        unsigned char colour =
-            ((unsigned char*)arg2->image)[(int)arg1 + 0x8b2];
+        unsigned char colour = arg1->colours[arg2->image];
         FillRectangle((Surface*)surface, &rect2, colour);
 
         int x = arg2->x - g_briefingPanoramaScrollX;
@@ -1097,8 +1096,7 @@ void __stdcall UpdatePlanet(Gui* arg1, Gadget* arg2)
             int px = arg2->x + arg2->width / 2 - frame->width / 2;
             frame->yOffset = 0;
             int py = arg2->y + arg2->height / 2 - frame->height / 2;
-            unsigned char colour =
-                ((unsigned char*)arg2->image)[(int)arg1 + 0x8b2];
+            unsigned char colour = arg1->colours[arg2->image];
             FillRectangle((Surface*)surface, &rect, colour);
             DrawFrame(surface, frame, px, py);
         } else {

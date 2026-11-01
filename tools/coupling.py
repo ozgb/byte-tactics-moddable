@@ -138,7 +138,7 @@ FILES = [("src/ai/pathfind", "pathfinding"), ("src/ai/", "ai"), ("src/network/",
          ("src/game/data_files", "platform"), ("src/game/cd_check", "platform")]
 SEVERAL_SUBSYSTEMS = ("src/game/", "src/map/")
 PRESENTATION_FOLDERS = sc.PRESENTATION_DIRS
-NAMES = [("presentation", r"^(CMemoryCache|UnitTable)::|WorldToScreen"), ("platform", r"^(TdfFile|TdfFieldVector|StringRef|OvrFile)::"),
+NAMES = [("presentation", r"^(CMemoryCache|UnitTable|DebrisCache|CacheCore)::|^(ClearPointers|FreeCache|FreeBuffer|Install)$|WorldToScreen"), ("platform", r"^(TdfFile|TdfFieldVector|StringRef|OvrFile)::"),
          ("map", r"PassMap"), ("pathfinding", r"Pathfind"), ("targeting", r"Target"),
          ("weapons", r"Weapon|Projectile|Explosion|Explode|Ballistic|Damage|Paralyze|Detonate"),
          ("los_radar", r"LineOfSight|LOS|Radar|Sonar|Eyeball|Fog|Cloak|Visible|Explored|IsSeen|Sight|Jam"),

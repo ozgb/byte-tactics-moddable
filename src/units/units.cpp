@@ -92,6 +92,8 @@ struct ClampedPos {
 #include "unit.h"
 
 #include "../game/game.h"
+#include "../ingame/hot_radar_slot.h"
+#include "../state/sim_effects.h"
 #include "../quirks/quirks.h"
 #pragma pack(pop)
 
@@ -235,8 +237,8 @@ void __stdcall AllocateUnitMemory(void)
     memset(pool, 0, g_game->poolCount * 0x118);
 
     unsigned int ten = g_game->maxUnitsSetting * 10;
-    (*(void **)&g_game->list_1435f) = SimAllocTagged("HOT UNITS", ten * 2);
-    g_game->hotRadar = SimAllocTagged("HOT RADAR UNITS", ten * 10);
+    g_game->list_1435f = (unsigned short*)SimAllocTagged("HOT UNITS", ten * 2);
+    g_game->hotRadar = (HotRadarSlot*)SimAllocTagged("HOT RADAR UNITS", ten * 10);
     g_game->unitsEnd = (Unit*)((unsigned char *)g_game->units.get() + g_game->poolCount * 0x118 - 0x118);
 
     unsigned short n;
@@ -295,11 +297,11 @@ void FreeUnitMemory(void)
         }
     }
     if (g_game->hotRadar != 0)
-        GameFreeThunk(g_game->hotRadar);
+        GameFreeThunk(g_game->hotRadar.get());
     g_game->hotRadar = 0;
-    if ((void *)g_game->list_1435f != 0)
-        GameFreeThunk((void *)g_game->list_1435f);
-    (*(void **)&g_game->list_1435f) = 0;
+    if (g_game->list_1435f != 0)
+        GameFreeThunk(g_game->list_1435f.get());
+    g_game->list_1435f = 0;
     if (g_game->units != 0)
         GameFreeThunk(g_game->units);
     g_game->units = 0;
@@ -674,7 +676,7 @@ void __stdcall KillUnit(Unit* unit, int killType)
         ApplyUnitDeath(&cmd, 1);
         if (same && g_game->commanderDeath != 0 && unit->player->active != 0 &&
             (unit->player->type == 1 || unit->player->type == 2)) {
-            PopUntilNamedLayout(1);
+            RecordPopToGameLayout(1);
             g_seams.players->KillPlayerUnits(unit->playerIndex);
         }
     }
@@ -688,7 +690,6 @@ void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
 #include "unit_targets.h"
 void __stdcall FreeObjectState(void* state);
 void __cdecl operator delete(void* p);
-#include "../frontend/skirmish_menu.h"
 
 // FUNCTION: 0x4866d0
 void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
@@ -751,7 +752,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
             if (unit->attacker != 0 && unit->buildLeft == 0.0f && unit->playerIndex != unit->lastAttackerSlot)
                 unit->attacker->killCount++;
             if (unit->lastAttackerSlot == g_game->localPlayer)
-                AddCdActivitySample(5);
+                RecordCdActivity(5, unit->lastAttackerSlot, unit->lastAttackerSlot);
             credited = 1;
         }
         break;
@@ -807,13 +808,12 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
                 } while (i != 0);
                 rec->rank = best;
                 if (best == 0) {
-                    AnnouncePlayerTookLead(rec->name,
-                                           g_game->commanderDeath == 2 ? rec->commanderKills : rec->kills);
+                    RecordPlayerTookLead(rec->index,
+                                         g_game->commanderDeath == 2 ? rec->commanderKills : rec->kills);
                 }
             }
         }
-        if (g_game->bits_37f06_1.b7)
-            FlashScorePanelKillLoss(unit->lastAttackerSlot, unit->player->index);
+        RecordScoreFlash(unit->lastAttackerSlot, unit->player->index);
     }
 
     if (cmd->killType == 5 && unit->attacker != 0) {
@@ -865,9 +865,9 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     unit->player->unitCount--;
     if (unit->player->unitCount == 0) {
         if (g_seams.map->GetGameType(g_game->net) == 3)
-            AnnouncePlayerLeft(unit->player->id);
+            RecordPlayerLeft(unit->player->id);
         if (g_seams.map->GetGameType(g_game->net) == 2)
-            AnnounceForcesDestroyed(unit->player);
+            RecordForcesDestroyed(unit->player->index);
     }
 }
 

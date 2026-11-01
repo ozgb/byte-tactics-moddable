@@ -257,7 +257,7 @@ TdfRecord::TdfRecord(char* name, char* text, char** nextblock, char* filename)
                 *nextblock = current + 1;
             char* end = current - 1;
             if (text <= end)
-                this->text = (char *)ComputeChecksum((unsigned char *)text, end - text - 1);
+                this->text = ComputeChecksum((unsigned char *)text, end - text - 1);
             else
                 this->text = 0;
             return;
@@ -269,7 +269,7 @@ TdfRecord::TdfRecord(char* name, char* text, char** nextblock, char* filename)
             }
             char* end = current - 1;
             if (text <= end)
-                this->text = (char *)ComputeChecksum((unsigned char *)text, end - text - 1);
+                this->text = ComputeChecksum((unsigned char *)text, end - text - 1);
             else
                 this->text = 0;
             return;
@@ -331,7 +331,7 @@ StringRef TdfRecord::MakeTrimmedString(char* start, char* end)
 void TdfRecord::ComputeRecordChecksum(char* start, char* end)
 {
     if (start <= end) {
-        text = (char *)ComputeChecksum((unsigned char *)start, end - start - 1);
+        text = ComputeChecksum((unsigned char *)start, end - start - 1);
     } else {
         text = 0;
     }

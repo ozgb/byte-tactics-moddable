@@ -465,8 +465,8 @@ def type_idents(text: str) -> list[str]:
     return re.findall(r"[A-Za-z_]\w*", text)
 
 
-def member_idents(d: dict) -> tuple[list[str], list[str]]:
-    """(member names, identifiers of the member types) from the token list of a definition."""
+def member_idents(d: dict, skip: frozenset = frozenset()) -> tuple[list[str], list[str]]:
+    """(member names, identifiers of the member types) from the token list of a definition, without the members named in skip."""
     toks = d["toks"]
     j = toks.index("{") if "{" in toks else len(toks)
     depth, cur, stmts = 0, [], []
@@ -500,7 +500,7 @@ def member_idents(d: dict) -> tuple[list[str], list[str]]:
             continue
         cut = next((k for k, x in enumerate(s) if x in ("[", ":", "=")), len(s))
         head = [x for x in s[:cut] if IDENT.match(x)]
-        if head:
+        if head and head[-1] not in skip:
             names.append(head[-1])
             types.extend(head[:-1])
     return names, types

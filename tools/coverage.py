@@ -8,7 +8,7 @@
     uv run tools/coverage.py --exe E --game-dir D --scenario N... [--parallel N]   # a subset (no --write or --check)
     uv run tools/test_coverage.py                                               # tests, on hand-written exports
 
-The exe is the coverage build (clang's -fprofile-instr-generate -fcoverage-mapping, #385). Every scenario
+The exe is the coverage build (clang's -fprofile-instr-generate -fcoverage-mapping -fprofile-update=atomic, #385). Every scenario
 of reference/scenarios/ is played under Wine through tools/reference.py with LLVM_PROFILE_FILE naming
 build/coverage-run/<scenario>/cov-%p.profraw, so parallel runs never share a file. A scenario that fails
 or writes no profile exits 1: the coverage of a partial suite is not a baseline. The profiles are merged

@@ -479,6 +479,24 @@ class UnstableTest(unittest.TestCase):
         self.assertIn("economy Gone (src/game/economy.cpp) ?Gone@@YAXXZ", text)
         self.assertTrue(cov.unmatched_unstable(want, self.totals(False)))
 
+    def test_mouse_thread_proc_is_marked_unstable_in_the_baseline(self):
+        rows = cov.read_csv(cov.OUT)["presentation"]
+        self.assertIn(("MouseThreadProc", "src/gui/mouse.cpp", "?MouseThreadProc@@YAXH@Z"), rows.unstable)
+        reason = cov.unstable_keys(cov.read_csv(cov.OUT))[("presentation", "MouseThreadProc", "src/gui/mouse.cpp",
+                                                           "?MouseThreadProc@@YAXH@Z")]
+        self.assertIn("wall-clock", reason)
+
+    def test_inlined_branch_of_a_marked_presentation_function_is_left_out(self):
+        proc = ("MouseThreadProc", "src/gui/mouse.cpp", "?MouseThreadProc@@YAXH@Z")
+        export = {"data": [{"functions": [entry(proc[2], proc[1], 1, [region(5, 1, 9, 2, 1)],
+                                                [[6, 5, 6, 9, 3, 0, 0, 0, 4], [28, 20, 28, 31, 0, 6, 0, 1, 4]])]}]}
+        key, name = {(proc[1], proc[0]): "presentation"}, {proc[0]: {"presentation"}}
+        plain = cov.summarize(export, key, name)[0]["presentation"]
+        marked = cov.summarize(export, key, name, None, {("presentation", *proc): "unstable: x"})[0]["presentation"]
+        self.assertEqual((plain.branches, plain.branches_covered), (4, 2))
+        self.assertEqual((marked.branches, marked.branches_covered), (0, 0))
+        self.assertEqual(marked.unstable, [proc])
+
 
 class PlaySuiteTest(unittest.TestCase):
     def test_attempt_clears_the_scenarios_old_profiles(self):

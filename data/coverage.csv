@@ -1722,6 +1722,7 @@ presentation,MeasureTextInputText,src/gui/gui.cpp,1,0,0,0,0,0,?MeasureTextInputT
 presentation,MeasureTruncatedText,src/gui/dialogs.cpp,0,0,0,0,0,0,?MeasureTruncatedText@@YGHPAEH@Z,1,
 presentation,MenuEntryNameContains,src/ingame/control_panel.cpp,1,0,0,0,0,0,?MenuEntryNameContains@@YGHPAUGadget@@PADH@Z,0,
 presentation,MessageBoxHandler,src/gui/dialogs.cpp,1,0,0,0,0,0,?MessageBoxHandler@@YGXPAUGui@@@Z,0,
+presentation,MouseThreadProc,src/gui/mouse.cpp,0,0,0,0,0,0,?MouseThreadProc@@YAXH@Z,0,unstable: branches follow wall-clock sampling (host_time_ms read in the cursor thread)
 presentation,MoveEntryToFront,src/gui/gui.cpp,0,0,0,0,0,0,?MoveEntryToFront@@YGXPAUGadget@@H@Z,1,
 presentation,MoviePlayer::ClearScreen,src/graphics/movies.cpp,0,0,0,0,0,0,?ClearScreen@MoviePlayer@@QAEXXZ,1,
 presentation,MoviePlayer::Close,src/graphics/movies.cpp,1,0,0,0,0,0,?Close@MoviePlayer@@QAEXXZ,0,

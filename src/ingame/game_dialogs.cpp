@@ -1068,6 +1068,8 @@ void __stdcall RunGameSteps(int showStats)
             g_packetManager.SendAllQueued(0);
             AccumulateProfileTime(&g_game->timers, 0);
         }
+        if (HarnessTestMode())
+            DrainSimEvents();
         HarnessAfterStep();
     }
 

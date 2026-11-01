@@ -15,7 +15,7 @@ class SquadManager;
 // Major version of the ai interface, changed when a slot is removed or its signature changes.
 #define AI_VERSION_MAJOR 2
 // Minor version of the ai interface, changed when a slot is added.
-#define AI_VERSION_MINOR 0
+#define AI_VERSION_MINOR 1
 
 // Computer player decisions.
 struct AiSeam {
@@ -59,6 +59,8 @@ struct AiSeam {
     void (__fastcall* SquadManagerTickIfActive)(SquadManager* self, int unusedEdx);
     // Deletes the timers of a squad manager (thiscall in 3.1c: this in ecx, edx unused). Hooks: none.
     void (__fastcall* SquadManagerDeleteTimers)(SquadManager* self, int unusedEdx);
+    // Allocates the squad manager of a player from the sim block, builds it and stores it in the player. Hooks: none.
+    void (__stdcall* CreateSquadManager)(Player* player);
 };
 
 #endif

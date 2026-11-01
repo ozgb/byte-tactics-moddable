@@ -3,7 +3,6 @@ ai,BuildTimer::OnTimer,QueueBuildOrder,"TODO(#608): sim helper: build counts and
 ai,BuildTimer::TryIssueIdleFactoryBuildOrder,QueueBuildOrder,"TODO(#608): sim helper: build counts and a sound in one call, to split"
 ai,PlayerAI::FindCellNearFeatures,GetBuildSiteMetal,TODO(#608): sim helper: a sim value held in a presentation file
 ai,PlayerAI::FindRandomPlacementCell,GetBuildSiteMetal,TODO(#608): sim helper: a sim value held in a presentation file
-economy,??_GUnitScript@@UAEPAXI@Z,CobScript::~CobScript,TODO(#508): constructor across a seam
 features,PlaceFeature,CreateObjectState,TODO(#608): sim helper: COB piece transforms that sim stores
 los_radar,DrawRadarUnits,DrawCircle,TODO(#608): presentation code in a tick: radar picture drawing
 los_radar,DrawRadarUnits,DrawDashedCircle,TODO(#608): presentation code in a tick: radar picture drawing
@@ -20,27 +19,19 @@ map,Mission::LoadCampaign,OpenMessageBox,TODO(#608): load-time call: map and mis
 map,Mission::LoadMission,MissionConditions::MissionConditions,TODO(#608): load-time call: map and mission loading
 map,Mission::LoadMission,OpenMessageBox,TODO(#608): load-time call: map and mission loading
 map,Mission::RefreshMapList,LoadMapList,TODO(#608): load-time call: map and mission loading
-orders,CreatePathfinder,Pathfinder::Pathfinder,TODO(#508): constructor across a seam
-players,??_GUnitScript@@UAEPAXI@Z,CobScript::~CobScript,TODO(#508): constructor across a seam
 players,AllocScoreTables,ShutdownScoreTables,TODO(#608): load-time asset call: callbacks given to the reporter library
 players,ContinueWatchingCallback,ClearSelectedGadget,TODO(#608): presentation code in a tick: the continue-watching dialog and its handler
 players,ContinueWatchingCallback,IsGadgetNamed,TODO(#608): presentation code in a tick: the continue-watching dialog and its handler
 players,ContinueWatchingCallback,PlaySoundByName,TODO(#608): presentation code in a tick: the continue-watching dialog and its handler
 players,ContinueWatchingCallback,ReportGameEvent,TODO(#608): presentation code in a tick: the continue-watching dialog and its handler
-players,InitPlayerSlot,SquadManager::SquadManager,TODO(#508): constructor across a seam
 players,UpdatePlayersOnStream,LoadGuiLayer,TODO(#608): presentation code in a tick: a dialog built in a local-player branch
 players,UpdatePlayersOnStream,OpenMessageBox,TODO(#608): presentation code in a tick: a dialog built in a local-player branch
 players,UpdatePlayersOnStream,RenderLayer,TODO(#608): presentation code in a tick: a dialog built in a local-player branch
 players,UpdatePlayersOnStream,SetKeyboardInput,TODO(#608): presentation code in a tick: a dialog built in a local-player branch
 players,UpdatePlayersOnStream,SetTranslatedTextByName,TODO(#608): presentation code in a tick: a dialog built in a local-player branch
-units,CreateUnitMotion,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
 units,FreeUnitTypes,UnitTable::Destroy,"TODO(#608): load-time asset call: model, sound and cache loading"
 units,GetSweetSpot,UpdateObjectState,TODO(#608): sim helper: COB piece transforms that sim stores
-units,InitSpawnedUnit,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
-units,InitUnit,UnitMotion::UnitMotion,TODO(#508): constructor across a seam
 units,InitUnitScript,CreateObjectState,TODO(#608): sim helper: COB piece transforms that sim stores
-units,LoadUnit,Order::Order,TODO(#508): constructor across a seam
-units,LoadUnitFbi,MissionType::MissionType,TODO(#508): constructor across a seam
 units,LoadUnitTypes,Load3do,"TODO(#608): load-time asset call: model, sound and cache loading"
 units,LoadUnitTypes,StripExtension,"TODO(#608): load-time asset call: model, sound and cache loading"
 units,LoadUnitTypes,UnitTable::Construct,"TODO(#608): load-time asset call: model, sound and cache loading"
@@ -50,12 +41,10 @@ units,UnitScript::EmitSfx,UpdateObjectState,"TODO(#608): sim helper: COB piece t
 units,UpdateAllUnits,CycleCameraFollow,TODO(#608): presentation code in a tick: the camera follow block
 units,UpdateAllUnits,CycleSelection,TODO(#608): presentation code in a tick: the camera follow block
 units,UpdateAllUnits,IsKeyDown,TODO(#608): presentation code in a tick: the camera follow block
-weapons,ApplyUnitDamage,MissionType::MissionType,TODO(#508): constructor across a seam
 weapons,BuildExplosionFrame,AllocFrame,"TODO(#608): load-time asset call: model, sound and cache loading"
 weapons,FreeExplosions,CMemoryCache::FreeCache,"TODO(#608): load-time asset call: model, sound and cache loading"
 weapons,InitExplosions,BuildLensFrame,"TODO(#608): load-time asset call: model, sound and cache loading"
 weapons,InitExplosions,CMemoryCache::InitSimCache,"TODO(#608): load-time asset call: model, sound and cache loading"
 weapons,LoadWeaponType,Load3do,"TODO(#608): load-time asset call: model, sound and cache loading"
 weapons,LoadWeaponType,LoadSoundByName,"TODO(#608): load-time asset call: model, sound and cache loading"
-weapons,ParalyzeUnit,MissionType::MissionType,TODO(#508): constructor across a seam
 weapons,StartExplodePiece,CMemoryCache::AllocHandle,"TODO(#608): load-time asset call: model, sound and cache loading"

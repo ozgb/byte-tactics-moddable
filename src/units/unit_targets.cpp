@@ -346,7 +346,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
                 Player* owner = unit->player;
                 if (owner->active && (owner->type == 1 || owner->type == 2)) {
                     if (!(unit->def->flags1 & 0x4000000)) {
-                        MissionType kind(s_paralyze_00508d80);
+                        MissionType kind = g_seams.orders->MissionTypeFromName(s_paralyze_00508d80);
                         Order* e = unit->list;
                         if (e && e->kind == kind) {
                             e->ticks += ticks;
@@ -393,7 +393,7 @@ void __stdcall ParalyzeUnit(Unit* unit, int ticks)
         return;
     if (owner->type == 1 || owner->type == 2) {
         if (!(unit->def->flags1 & 0x4000000)) {
-            MissionType kind("paralyze");
+            MissionType kind = g_seams.orders->MissionTypeFromName("paralyze");
             Order* effect = unit->list;
             if (effect && effect->kind == kind) {
                 effect->ticks += ticks;

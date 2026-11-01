@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "../state/sim_effects.h"
 #include "../state/block.h"
 #include "../../interfaces/ref.h"
 #include <string.h>
@@ -694,7 +695,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                                     *slot = f;
                                 }
                                 g_seams.los_radar->RecalculateLineOfSight(1);
-                                FocusCommander(1);
+                                RecordFocusCommander(1);
                             }
                         } else {
                             goto watch_check;

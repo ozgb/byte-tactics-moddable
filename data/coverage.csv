@@ -50,7 +50,7 @@ economy,InitStartingResourcesFromSkirmish,src/game/main_loop.cpp,0,0,0,0,0,0,?In
 economy,SetStartingStorageBonusInline,src/game/main_loop.cpp,0,0,0,0,0,0,?SetStartingStorageBonusInline@@YGXPAUPlayer@@HH@Z,1,
 economy,ShareMapInfo,src/units/units.cpp,1,0,0,0,0,0,?ShareMapInfo@@YGXEE@Z,0,share-dialog
 economy,UpdateResourceSharing,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateResourceSharing@@YGXPAUPlayer@@@Z,0,network-game
-features,*,,44,42,1028,849,448,312,,4,
+features,*,,44,42,1029,850,448,312,,4,
 features,??$copy@PAGPAG@std@@YGPAGPAG00@Z,src/map/features.cpp,0,0,0,0,0,0,??$copy@PAGPAG@std@@YGPAGPAG00@Z,1,
 features,AssignTdfFileVector,src/map/features.cpp,0,0,0,0,0,0,?AssignTdfFileVector@@YGXPAV?$vector@PAVTdfFile@@V?$allocator@PAVTdfFile@@@std@@@std@@PBV12@@Z,1,
 features,FreeFeaturePool,src/map/features.cpp,1,0,0,0,0,0,?FreeFeaturePool@@YGXXZ,0,shutdown
@@ -123,7 +123,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,184,113,4387,2248,1728,549,,23,
+game,*,,216,143,4561,2402,1754,568,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -191,6 +191,8 @@ game,OutOfMemoryHandler,src/game/main.cpp,1,0,0,0,0,0,?OutOfMemoryHandler@@YGXXZ
 game,PreBattleFrame,src/game/main_loop.cpp,1,0,0,0,0,0,?PreBattleFrame@@YGXXZ,0,network
 game,QuirksFlipFirstSim,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksFlipFirstSim@@YG_NPAUQuirks@@@Z,0,test-only
 game,QuirksNormalise,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksNormalise@@YG_NPBDPADH@Z,0,moddable-only
+game,RecordFocusCommander,src/state/sim_effects.h,1,0,0,0,0,0,?RecordFocusCommander@@YGXH@Z,0,unset-case
+game,RecordTeleportParticles,src/state/sim_effects.h,1,0,0,0,0,0,?RecordTeleportParticles@@YGXABUVec3@@0HF@Z,0,unset-case
 game,ReportViaException,src/game/main.cpp,1,0,0,0,0,0,?ReportViaException@@YGXPBD@Z,0,error-path
 game,Reserve,src/state/block.cpp,1,0,0,0,0,0,?Reserve@?A0x@@YGXXZ,0,wasm
 game,ResetGameSpeed,src/game/game_state.cpp,0,0,0,0,0,0,?ResetGameSpeed@@YGXXZ,1,
@@ -1205,7 +1207,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1119,463,31984,9996,11904,2584,,294,
+presentation,*,,1132,474,32175,10152,11990,2642,,295,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
 presentation,ActivatePlayerGadgets,src/frontend/endgame.cpp,0,0,0,0,0,0,?ActivatePlayerGadgets@@YGXPAD@Z,1,
@@ -1349,6 +1351,7 @@ presentation,DisableUnavailableBuildMenuEntries,src/ingame/control_panel.cpp,0,0
 presentation,Display::LockPrimary,src/graphics/surface.cpp,1,0,0,0,0,0,?LockPrimary@Display@@QAEHPAUSurface@@@Z,0,
 presentation,DitherRectangle,src/graphics/draw.cpp,1,0,0,0,0,0,?DitherRectangle@@YGHPAUSurface@@PAURect@@H@Z,0,
 presentation,DoSelect,src/gui/gui.cpp,1,0,0,0,0,0,?DoSelect@@YGXPAUGui@@PAUGadget@@H@Z,0,
+presentation,DrainTeleport,src/ingame/sim_event_drain.cpp,1,0,0,0,0,0,?DrainTeleport@@YGXAAUSimEventQueue@@ABUSimEvent@@@Z,0,
 presentation,DrawBevelBorder,src/gui/listbox.cpp,1,0,0,0,0,0,?DrawBevelBorder@@YGXPAXPAURect@@HEH@Z,0,
 presentation,DrawBevelBorderDarkFirst,src/gui/listbox.cpp,1,0,0,0,0,0,?DrawBevelBorderDarkFirst@@YGXPAXPAURect@@HHH@Z,0,
 presentation,DrawBitmapBackground,src/frontend/campaign_menu.cpp,0,0,0,0,0,0,?DrawBitmapBackground@@YGXPADH@Z,1,
@@ -1834,6 +1837,8 @@ presentation,PresentFrontendFrame,src/frontend/frontend.cpp,1,0,0,0,0,0,?Present
 presentation,PushKey,src/gui/keyboard.cpp,1,0,0,0,0,0,?PushKey@@YGXH@Z,0,
 presentation,PushKeyCode,src/gui/keyboard.cpp,1,0,0,0,0,0,?PushKeyCode@@YGXH@Z,0,
 presentation,PushMouseEvent,src/gui/mouse.cpp,1,0,0,0,0,0,?PushMouseEvent@@YGXPAUMouseEvent@@@Z,0,
+presentation,QueueUnitSpeech,src/sound/sound.cpp,1,0,0,0,0,0,?QueueUnitSpeech@@YGXPAUUnit@@HPAD@Z,0,
+presentation,QueueUnitSpeechIfNotVisible,src/sound/sound.cpp,0,0,0,0,0,0,?QueueUnitSpeechIfNotVisible@@YGXPAUUnit@@HPAD@Z,1,
 presentation,QueueUnitSpeechIfVisible,src/sound/sound.cpp,0,0,0,0,0,0,?QueueUnitSpeechIfVisible@@YGXPAUUnit@@HPAD@Z,1,
 presentation,ReadButtonFields,src/gui/gui_file.cpp,1,0,0,0,0,0,?ReadButtonFields@@YGXPAUReadButtonFieldsRecord@@PAUReadButtonFieldsSource@@@Z,0,
 presentation,ReadFontFilenameField,src/gui/gui_file.cpp,0,0,0,0,0,0,?ReadFontFilenameField@@YGXPAUReadFontFilenameFieldRecord@@PAUReadFontFilenameFieldSource@@@Z,1,
@@ -2158,7 +2163,7 @@ presentation,YesNoDialogHandler,src/gui/dialogs.cpp,0,0,0,0,0,0,?YesNoDialogHand
 presentation,clear_screen,src/graphics/surface.cpp,1,0,0,0,0,0,?clear_screen@@YGXPAUDisplay@@H@Z,0,
 presentation,color_taken,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?color_taken@@YGHH@Z,0,
 presentation,entry_at,src/gui/gui.cpp,1,0,0,0,0,0,?entry_at@@YGPAUGadget@@PAUGui@@H@Z,0,
-seams,*,,103,93,664,634,0,0,,0,
+seams,*,,108,98,684,654,0,0,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YIHPAVMission@@@Z,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YIHPAVMission@@@Z,0,
 seams,DestroyPathfinderNative,src/seams/native.cpp,1,0,0,0,0,0,?DestroyPathfinderNative@@YGXPAVPathfinder@@@Z,0,
@@ -2304,7 +2309,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,10,10,131,126,76,56,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,164,132,4053,3453,1682,1207,,32,
+units,*,,167,135,4061,3461,1676,1204,,32,
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0,unused-slot
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
@@ -2329,7 +2334,7 @@ units,CobScript::StartScriptByIndex,src/units/cob.cpp,0,0,0,0,0,0,?StartScriptBy
 units,CobScript::StartThreadByName,src/units/cob.cpp,0,0,0,0,0,0,?StartThreadByName@CobScript@@QAEHPBD@Z,1,
 units,CopyPathLockFields,src/units/movement_class.cpp,0,0,0,0,0,0,?CopyPathLockFields@@YGXPAUPathLockDstView@@PAUPathLockSrcView@@@Z,1,
 units,CreateUnitMotion,src/units/units.cpp,0,0,0,0,0,0,?CreateUnitMotion@@YGXPAUUnit@@@Z,1,
-units,EmitUnitScriptDeletingDtor,src/units/units.cpp,0,0,0,0,0,0,?EmitUnitScriptDeletingDtor@@YGPAVUnitScript@@XZ,1,
+units,EmitUnitScriptDeletingDtor,src/units/unit_script_alloc.cpp,0,0,0,0,0,0,?EmitUnitScriptDeletingDtor@@YGPAVUnitScript@@XZ,1,
 units,FreeA,src/units/movement_class.cpp,1,0,0,0,0,0,?FreeA@@YGXH@Z,0,shutdown
 units,FreeC,src/units/movement_class.cpp,1,0,0,0,0,0,?FreeC@@YGXH@Z,0,shutdown
 units,FreeDownloadMenus,src/units/unit_types.cpp,1,0,0,0,0,0,?FreeDownloadMenus@@YGXXZ,0,shutdown

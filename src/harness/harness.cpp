@@ -1170,6 +1170,10 @@ void HarnessStartSkirmish()
     else
         SetUpSkirmish();
     *(int*)((char*)g_game + 0x579) = -1;
+    char* sound = (char*)g_game->field_10;
+    *(int*)(sound + 0x200) = 0;
+    *(int*)(sound + 0x208) = 0;
+    *(int*)(sound + 0x280) = 1;
 }
 
 void HarnessAfterStep()

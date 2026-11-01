@@ -663,7 +663,7 @@ game,platform,call,GetMilliseconds,2
 game,platform,call,GetTickRate,1
 game,platform,call,GetTicks,10
 game,platform,call,GetWindowsUserName,1
-game,platform,call,HarnessTestMode,2
+game,platform,call,HarnessTestMode,3
 game,platform,call,InitDebugSupport,1
 game,platform,call,InitEnvironment,1
 game,platform,call,InitTimers,1

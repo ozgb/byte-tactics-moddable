@@ -31204,6 +31204,7 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,HarnessAfterStep
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,HarnessBeforeStep
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,HarnessPhase
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,HarnessTestMode
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,PacketManager::SendAllQueued
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,StepAllGafSequences
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,UpdateCameraFollow

@@ -135,11 +135,11 @@ weapons,DetonateProjectile,AccumulateScreenShake,TODO(#505): sim-to-presentation
 weapons,FireBallisticProjectile,EmitWeaponSmoke,TODO(#505): sim-to-presentation event
 weapons,FireLineOfSightProjectile,EmitWeaponSmoke,TODO(#505): sim-to-presentation event
 weapons,FireVLaunchProjectile,EmitWeaponSmoke,TODO(#505): sim-to-presentation event
-weapons,FreeExplosions,CMemoryCache::FreeCache,TODO(#505): sim-to-presentation event
+weapons,FreeExplosions,VDebrisCache::?$CacheCore::FreeCache,TODO(#505): sim-to-presentation event
 weapons,InitExplosions,BuildLensFrame,TODO(#505): sim-to-presentation event
-weapons,InitExplosions,CMemoryCache::InitSimCache,TODO(#505): sim-to-presentation event
+weapons,InitExplosions,DebrisCache::InitSimCache,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponType,Load3do,TODO(#505): sim-to-presentation event
 weapons,LoadWeaponType,LoadSoundByName,TODO(#505): sim-to-presentation event
 weapons,ParalyzeUnit,MissionType::MissionType,TODO(#508): constructor across a seam
-weapons,StartExplodePiece,CMemoryCache::AllocHandle,TODO(#505): sim-to-presentation event
+weapons,StartExplodePiece,VDebrisCache::?$CacheCore::AllocHandle,TODO(#505): sim-to-presentation event
 weapons,UpdateUnitWeapons,UpdateBuildMenuIfFocusUnit,TODO(#505): sim-to-presentation event

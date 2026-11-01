@@ -52,6 +52,8 @@ TRACES = ROOT / "reference/traces"
 SOUNDS = ROOT / "reference/sounds"
 SOUND_FILE = "sound.txt"
 SOUND_LOGS: dict[str, str | None] = {}
+FRAMES = ROOT / "reference/frames"
+FRAME_DUMPS: dict[str, dict[int, bytes | None]] = {}
 MAX_PARALLEL = 6
 QUICK = ("eight-full-moon", "eight-greenhaven", "duel-coast-to-coast", "duel-great-divide", "orders-move-attack")
 RUN_SECONDS_BASE = 120
@@ -181,6 +183,22 @@ def scenario_ticks(scenario: Path) -> int:
     raise tracediff.Error(f"{scenario}: the scenario has no valid ticks line")
 
 
+def scenario_frames(scenario: Path) -> list[int]:
+    """The ticks of the scenario's `frames` line, none if it has no such line."""
+    for line in scenario.read_text().splitlines():
+        words = line.split()
+        if words and words[0] == "frames":
+            try:
+                return [int(w, 0) for w in words[1:]]
+            except ValueError:
+                break
+    return []
+
+
+def frame_path(tick: int) -> str:
+    return f"frames/{tick}.bin"
+
+
 def difference(want: tuple[dict[str, str], list[tuple[int, str]]], header: dict[str, str],
                digests: list[tuple[int, str]]) -> str | None:
     """Why a run differs from the stored (header, digests), or None when it equals them."""
@@ -238,7 +256,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            extra: dict = {"collect": (SOUND_FILE, *(tracediff.SAVE_FILES if save_to is not None else ()))}
+            extra: dict = {"collect": (SOUND_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
+                                *(tracediff.SAVE_FILES if save_to is not None else ()))}
             if load_from is not None:
                 extra["put"] = {path: load_from / Path(path).name for path in tracediff.SAVE_FILES}
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, **extra)
@@ -257,6 +276,10 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                     shutil.copyfile(run / path, save_to / Path(path).name)
         sound_log = run / SOUND_FILE
         SOUND_LOGS[scenario.stem] = sound_log.read_text() if sound_log.is_file() else None
+        FRAME_DUMPS[scenario.stem] = {}
+        for tick in scenario_frames(scenario):
+            dump = run / frame_path(tick)
+            FRAME_DUMPS[scenario.stem][tick] = dump.read_bytes() if dump.is_file() else None
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
         for key in ("game_seed", "crt_seed", "view_seed"):
             if key not in header:
@@ -361,12 +384,24 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
     for name in results:
         if SOUND_LOGS.get(name) is None:
             fail(f"{name}: the run wrote no {SOUND_FILE}; the stored sound logs are untouched")
+    for name in results:
+        for tick, dump in FRAME_DUMPS.get(name, {}).items():
+            if dump is None:
+                fail(f"{name}: the run wrote no {frame_path(tick)}; the stored frames are untouched")
     SOUNDS.mkdir(parents=True, exist_ok=True)
     for old in SOUNDS.glob("*.txt"):
         old.unlink()
     for name in results:
         (SOUNDS / f"{name}.txt").write_text(SOUND_LOGS[name])
     print(f"{len(results)} sound logs written to {SOUNDS.relative_to(ROOT)}")
+    shutil.rmtree(FRAMES, ignore_errors=True)
+    frames = 0
+    for name in results:
+        for tick, dump in FRAME_DUMPS.get(name, {}).items():
+            (FRAMES / name).mkdir(parents=True, exist_ok=True)
+            (FRAMES / name / f"{tick}.bin").write_bytes(dump)
+            frames += 1
+    print(f"{frames} frames written to {FRAMES.relative_to(ROOT)}")
     print(f"{len(results)} traces, commit {sha}, total {clock(time.time() - t0)}")
 
 

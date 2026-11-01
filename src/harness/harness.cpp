@@ -83,6 +83,11 @@ static FILE* s_trace = NULL;
 static FILE* s_dump = NULL;
 static FILE* s_sound = NULL;
 static char s_soundBuffer[4096];
+enum { FRAME_LIMIT = 64 };
+static unsigned s_frameTicks[FRAME_LIMIT];
+static unsigned s_frameCount = 0;
+static unsigned s_frameNext = 0;
+static int s_frameLine = 0;
 static unsigned s_dumpTick = 0;
 static char s_loadName[64];
 static int s_loadLine = 0;
@@ -536,6 +541,24 @@ static int KeyIsDecidedByLoad(const char* key)
     return strncmp(key, "player", 6) == 0 && isdigit((unsigned char)key[6]) && key[7] == '.';
 }
 
+static void ReadFrames(int lineNo, char* value)
+{
+    char* cursor = value;
+    if (s_frameLine != 0)
+        FailLine(lineNo, "is a second frames line", "frames", "");
+    s_frameLine = lineNo;
+    for (char* word = NextToken(&cursor); word != NULL; word = NextToken(&cursor)) {
+        unsigned tick = ParseNumber(lineNo, "frames", word);
+        if (tick == 0)
+            FailLine(lineNo, "needs ticks of at least 1", "frames", "");
+        if (s_frameCount != 0 && tick <= s_frameTicks[s_frameCount - 1])
+            FailLine(lineNo, "needs ticks in ascending order", "frames", "");
+        if (s_frameCount >= FRAME_LIMIT)
+            FailLine(lineNo, "is past the limit of 64 frames", "frames", "");
+        s_frameTicks[s_frameCount++] = tick;
+    }
+}
+
 static void ReadKey(int lineNo, const char* key, char* value)
 {
     if (s_decidedLine == 0 && KeyIsDecidedByLoad(key) && strlen(key) < sizeof s_decidedKey) {
@@ -596,6 +619,8 @@ static void ReadKey(int lineNo, const char* key, char* value)
         s_localPlayer = ParseRange(lineNo, key, value, MAX_PLAYERS - 1);
         s_localPlayerLine = lineNo;
     }
+    else if (strcmp(key, "frames") == 0)
+        ReadFrames(lineNo, value);
     else if (strcmp(key, "ticks") == 0) {
         s_ticks = ParseNumber(lineNo, key, value);
         if (s_ticks == 0)
@@ -628,6 +653,15 @@ static void ReadKey(int lineNo, const char* key, char* value)
         ReadPlayerKey(lineNo, key, value);
     else
         FailLine(lineNo, "is not a known key", key, "");
+}
+
+static void CheckFrames()
+{
+    if (s_frameCount != 0 && s_frameTicks[s_frameCount - 1] >= s_ticks) {
+        char detail[100];
+        sprintf(detail, ", tick %u is not before the last tick", s_frameTicks[s_frameCount - 1]);
+        FailLine(s_frameLine, "needs ticks before the last tick", "frames", detail);
+    }
 }
 
 static void CheckLoadScenario()
@@ -673,6 +707,7 @@ static void CheckScenario()
 {
     if (s_loadLine != 0) {
         CheckLoadScenario();
+        CheckFrames();
         return;
     }
     int named = 0;
@@ -684,6 +719,7 @@ static void CheckScenario()
         Fail("testmode: scenario needs a ticks line\n");
     if (s_map[0] == '\0')
         Fail("testmode: scenario needs a map line\n");
+    CheckFrames();
     CheckGameType();
     CheckOrders();
     CheckSpawns();
@@ -1134,6 +1170,10 @@ void HarnessStartSkirmish()
     else
         SetUpSkirmish();
     *(int*)((char*)g_game + 0x579) = -1;
+    char* sound = (char*)g_game->field_10;
+    *(int*)(sound + 0x200) = 0;
+    *(int*)(sound + 0x208) = 0;
+    *(int*)(sound + 0x280) = 1;
 }
 
 void HarnessAfterStep()
@@ -1167,6 +1207,10 @@ void HarnessAfterStep()
         fclose(s_dump);
     if (s_sound != NULL)
         fclose(s_sound);
+    if (!gameOver && s_frameNext < s_frameCount) {
+        sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_frameTicks[s_frameNext]);
+        Fail(msg);
+    }
     s_trace = NULL;
     s_dump = NULL;
     s_sound = NULL;
@@ -3313,6 +3357,50 @@ void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, 
         fprintf(s_sound, "%d %d %d\n", position[0], position[1], position[2]);
     else
         fprintf(s_sound, "- - -\n");
+}
+
+void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int width, int height, const PALETTEENTRY* entries)
+{
+    if (!s_testMode || s_frameNext >= s_frameCount)
+        return;
+    unsigned tick = GameU32(GAME_TICK);
+    unsigned wanted = s_frameTicks[s_frameNext];
+    if (tick < wanted)
+        return;
+    char msg[100];
+    if (tick > wanted) {
+        sprintf(msg, "testmode: tick %u is not the last tick of a frame\n", wanted);
+        Fail(msg);
+        return;
+    }
+    s_frameNext++;
+    char directory[] = "frames";
+    char path[32];
+    MakeDirectoryPath(directory);
+    sprintf(path, "frames\\%u.bin", tick);
+    FILE* f = fopen(path, "wb");
+    if (f == NULL) {
+        sprintf(msg, "testmode: cannot write %s\n", path);
+        Fail(msg);
+        return;
+    }
+    unsigned char header[16] = { 'B', 'T', 'F', 'R', 1, 0, (unsigned char)width, (unsigned char)(width >> 8),
+        (unsigned char)height, (unsigned char)(height >> 8), 0, 0, (unsigned char)tick, (unsigned char)(tick >> 8),
+        (unsigned char)(tick >> 16), (unsigned char)(tick >> 24) };
+    unsigned char palette[256 * 4];
+    for (int i = 0; i < 256; i++) {
+        palette[i * 4] = entries[i].peRed;
+        palette[i * 4 + 1] = entries[i].peGreen;
+        palette[i * 4 + 2] = entries[i].peBlue;
+        palette[i * 4 + 3] = 0;
+    }
+    int ok = fwrite(header, sizeof header, 1, f) == 1 && fwrite(palette, sizeof palette, 1, f) == 1;
+    for (int y = 0; ok && y < height; y++)
+        ok = fwrite(pixels + y * pitch, 1, width, f) == (size_t)width;
+    if (fclose(f) != 0 || !ok) {
+        sprintf(msg, "testmode: cannot write %s\n", path);
+        Fail(msg);
+    }
 }
 
 void HarnessPhase(int phase)

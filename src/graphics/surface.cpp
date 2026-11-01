@@ -11,12 +11,9 @@
 #include "gaf_frame.h"
 
 // Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
-void StepAllGafSequences(void);
 void StartScreenFade(void);
 void StepScreenFade(void);
 void ScheduleFadeTick(void);
-void StepPaletteFade(void);
-int IsFadeDone(void);
 
 // The display flags word at +0xf0: set through the bitfield, read whole
 // (FlipScreen) or as its low byte (FillSurface).
@@ -97,6 +94,8 @@ struct Display {
     char unknown_1c2[0x1ce - 0x1c2];
     int cursorThreadEnabled;           // +0x1ce
     int cursorOverlayEnabled;          // +0x1d2
+    char unknown_1d6[0x214 - 0x1d6];
+    PALETTEENTRY entries[256];
 
     // Method of the display object: this is the call result.
     int LockScreen(Surface* out)
@@ -486,6 +485,8 @@ static inline HRESULT RestoreSurfacesInline(Display* d)
     return hr;
 }
 
+void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int width, int height, const PALETTEENTRY* entries);
+
 struct Desc {
     DWORD dwSize, dwFlags, height, width;
     LONG lPitch;
@@ -509,6 +510,7 @@ void FlipScreen(void)
         LONG held = Lock();
         Surface* p = &d->cached;
         DrawSurface(p, d->overrideSurface, 0, 0);
+        HarnessFrameDrawn(p->pixels, p->pitch, p->width, p->height, d->entries);
         DrawCursor(d, p);
         HDC hdc = GetDC(d->hwnd);
         SelectPalette(hdc, d->hpalette, 0);
@@ -536,6 +538,7 @@ void FlipScreen(void)
             out.height = d->height;
             out.pitch = desc.lPitch;
             out.pixels = (unsigned char*)desc.lpSurface;
+            HarnessFrameDrawn(bmp->pixels, bmp->pitch, bmp->width, bmp->height, d->entries);
             DrawCursor(d, bmp);
             BlitSurface(&out, bmp, 0, 0);
             if (d->cursorThreadEnabled != 0 && d->cursorOverlayEnabled != 0)

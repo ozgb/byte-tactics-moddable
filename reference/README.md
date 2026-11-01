@@ -34,6 +34,7 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `view_seed` | 1 | Seed of the presentation random generator (screen shake, particles, menu effects) |
 | `fpu_control_word` | `0x9001F` | Expected `_control87` value, ignoring the infinity-control bit; the run exits 2 if it differs |
 | `ticks` | required | Game ticks to play (30 per second of game time) |
+| `frames` | none | Ticks at which a run dumps the 8-bit frame (before the cursor) and its palette to `frames/<tick>.bin`, ascending, each from 1 to before `ticks`, at most 64; `--traces` stores them in `reference/frames/<scenario>/`; one line only |
 | `save` | none | Saves the game with `SaveGameFile` to `savegame\harness.sav` in the run's game directory after the step of this tick, 1 to `ticks`; one line only |
 | `load` | none | Starts from the game another scenario of the suite saved, by file stem (`load save-midgame`), instead of from the scenario's own map and players; one line only (see Loading a saved game) |
 | `game_type` | 2 | 1: a mission of a campaign, 2: skirmish, 3: multiplayer without a network; one line only (see Game types) |

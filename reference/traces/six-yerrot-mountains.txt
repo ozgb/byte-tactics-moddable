@@ -1,6 +1,6 @@
 bt-digest 3
 trace_format bt-trace 3
-commit ae507bde7be3dd4fe5ca45c4b86f45ba7933ef4f
+commit 25015ca880b06a5c3fb7246bdfe90e7b53f26da6
 scenario reference/scenarios/six-yerrot-mountains.txt
 game_seed 198
 crt_seed 1198

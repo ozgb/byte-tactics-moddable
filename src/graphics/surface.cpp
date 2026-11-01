@@ -16,7 +16,6 @@ void StartScreenFade(void);
 void StepScreenFade(void);
 void ScheduleFadeTick(void);
 void StepPaletteFade(void);
-int IsFadeDone(void);
 
 // The display flags word at +0xf0: set through the bitfield, read whole
 // (FlipScreen) or as its low byte (FillSurface).

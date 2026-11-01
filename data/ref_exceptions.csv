@@ -1,11 +1,2 @@
 struct,field,kind,file,issue
-CMemoryCache,base,int-pointer,src/graphics/memory_cache.h,#353
-CMemoryCache,basePointer,pointer,src/graphics/memory_cache.h,#353
-CMemoryCache,bitmap,pointer,src/graphics/memory_cache.h,#353
-CMemoryCache,buffer,pointer,src/graphics/memory_cache.h,#353
-CMemoryCache,cur,pointer,src/graphics/memory_cache.h,#353
-CMemoryCache,handle,pointer,src/graphics/memory_cache.h,#353
-CMemoryCache,image,pointer,src/graphics/memory_cache.h,#353
-CMemoryCache,ptr,pointer,src/graphics/memory_cache.h,#353
-CMemoryCache,shadow,pointer,src/graphics/memory_cache.h,#353
 CacheChunk,owner,pointer,src/graphics/memory_cache.h,#353

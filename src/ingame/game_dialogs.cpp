@@ -1021,6 +1021,7 @@ void __stdcall RunGameSteps(int showStats)
 {
     int n = g_game->frames_38a3b;
 
+    DrainSimEvents();
     while (n--) {
         g_game->ticks++;
         HarnessBeforeStep();
@@ -1073,7 +1074,6 @@ void __stdcall RunGameSteps(int showStats)
         HarnessAfterStep();
     }
 
-    DrainSimEvents();
     EmptyPostSimStepHook();
     EmptyPostSimStepHook_B();
     EmptyPostSimStepHook_C();

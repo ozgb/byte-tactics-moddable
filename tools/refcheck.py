@@ -42,7 +42,9 @@ at load) or `code` (a pointer to code in the exe image) is written by hand: --wr
 kind, matched by (struct, field) or, for a holder-only row, by (holder, offset), and gives the row no issue,
 because no issue removes it. A `load` or `code` row with no outside row in block_pointers.csv (the scan never
 flagged it) is kept verbatim; a scan row for the same key wins and takes the hand kind. Every other row needs an
-open `#n` issue.
+open `#n` issue. Such a row of a clang kind (pointer, function-pointer, container, int-pointer) is also kept verbatim
+when the scan has no row for its key, because its target is memory the scenarios never touch (drawing, network): a
+scan row for the same key still wins.
 
 A `base+stride*k` offset of a Game row stands for a run of offsets the scan saw but did not count. The tool walks
 k = 1, 2, ... while the offset is inside Game and a raw field starts there, gives each such field its own row
@@ -766,10 +768,15 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
         if hit:
             add(hit[0], hit[1], holder, hex(offset), 1, outside_issue(note, GAME, hit[3], classes), hit[2], note,
                 [offset])
+    scanned = {(r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"]) for r in rows.values()}
     for r in old:
         key = (r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"])
-        if r["kind"] in HAND_KINDS and key not in matched:
+        if key in matched:
+            continue
+        if r["kind"] in HAND_KINDS:
             rows.setdefault((r["struct"], r["field"], r["holder"], r["offset"]), {**r, "issue": ""})
+        elif r["kind"] in KINDS and re.fullmatch(r"#[0-9]+", r["issue"]) and key not in scanned:
+            rows.setdefault((r["struct"], r["field"], r["holder"], r["offset"]), dict(r))
     return sorted(rows.values(), key=lambda r: (r["struct"], r["field"], r["holder"], r["offset"]))
 
 

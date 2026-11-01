@@ -318,6 +318,23 @@ class ClangTest(unittest.TestCase):
         kept = [r for r in out if r["field"] == "fire"]
         self.assertEqual([(r["kind"], r["issue"], r["note"]) for r in kept], [("code", "", "hand")])
 
+    def test_issue_tagged_pointer_row_survives_without_a_scan_row(self):
+        row = {**self.hand_row("Gadget", "u.list.rows", "pointer", holder="LoadGuiLayer", offset="0x1c"),
+               "issue": "#615"}
+        out = self.hand_rows([row])
+        kept = [r for r in out if r["field"] == "u.list.rows"]
+        self.assertEqual([(r["kind"], r["issue"], r["note"]) for r in kept], [("pointer", "#615", "hand")])
+
+    def test_scan_row_wins_over_an_issue_tagged_hand_row_with_the_same_key(self):
+        row = {**self.hand_row("Game", "view", "pointer"), "issue": "#392"}
+        out = self.hand_rows([row])
+        self.assertEqual(len([r for r in out if r["field"] == "view"]), 1)
+
+    def test_pointer_row_without_an_issue_is_dropped_when_the_scan_has_none(self):
+        row = self.hand_row("Gadget", "u.list.rows", "pointer", holder="LoadGuiLayer", offset="0x1c")
+        out = self.hand_rows([row])
+        self.assertEqual([r for r in out if r["field"] == "u.list.rows"], [])
+
     def test_outside_rows_fail_when_the_game_holder_is_gone(self):
         data = self.root / "data"
         data.mkdir(exist_ok=True)

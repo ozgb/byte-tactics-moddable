@@ -308,7 +308,7 @@ static void __stdcall VisitObjectsInRangeNative(Vec3* pos, int range, UnitVisito
 
 static void __fastcall SpatialBucketPrependUnitNative(SpatialBucket* self, int unusedEdx, Unit* unit)
 {
-    self->PrependUnit((int)unit);
+    self->PrependUnit(unit);
 }
 
 static void __fastcall SpatialBucketUnlinkUnitNative(SpatialBucket* self, int unusedEdx, Unit* unit)

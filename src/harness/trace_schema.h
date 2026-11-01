@@ -487,12 +487,12 @@ static const TraceField kRecFields[] = {
     { "a", 0x0, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "b", 0x1, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "flags", 0x2, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "first", 0x6, 4, TF_POINTER, TT_UNIT, 0x0 },
+    { "first", 0x6, 4, TF_REF, TT_UNIT, 0x0 },
 };
 
 static const TraceField kRecPlan[] = {
     { "", 0x0, 6, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x6, 4, TF_POINTER, TT_UNIT, 0x0 },
+    { "", 0x6, 4, TF_REF, TT_UNIT, 0x0 },
 };
 
 static const TraceField kEyeFields[] = {

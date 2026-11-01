@@ -171,20 +171,6 @@ void FreeLosTables()
     g_losTables.FreeTables();
 }
 
-// FUNCTION: 0x481500
-void InitEyeballs()
-{
-    g_game->count_14277 = 0;
-    (*(Eye **)&g_game->eyes) = (Eye*)GameAllocIgnoreTag("EYEBALL MEMORY", 0x2d0);
-}
-
-// FUNCTION: 0x481530
-void FreeEyeballs()
-{
-    int temp = (int)(Eye *)g_game->eyes;
-    GameFreeThunk((void*)temp);
-}
-
 // FUNCTION: 0x481550
 Cell* __stdcall GetMapCell(int x, int y)
 {
@@ -252,7 +238,7 @@ int __stdcall IsEyeballExpired(Eye* obj)
 void ExpireEyeballs()
 {
     int changed;
-    Eye* p = (Eye *)g_game->eyes;
+    Eye* p = g_game->eyes;
     for (int i = 0; i < g_game->count_14277; i++, p++) {
         if (p->expires < (unsigned int)g_game->ticks) {
             RemoveLineOfSight((SightQuery*)p);
@@ -261,9 +247,9 @@ void ExpireEyeballs()
     }
     if (!changed)
         return;
-    Eye* end = (Eye *)g_game->eyes + g_game->count_14277;
-    Eye* n = std::remove_if((Eye *)g_game->eyes, end, Expired());
-    g_game->count_14277 = n - (Eye *)g_game->eyes;
+    Eye* end = g_game->eyes + g_game->count_14277;
+    Eye* n = std::remove_if(g_game->eyes.get(), end, Expired());
+    g_game->count_14277 = n - g_game->eyes.get();
 }
 
 #include <io.h>
@@ -940,7 +926,7 @@ void LoadTntMap()
     mapSettings->sortLineCount = (int*)GameAllocIgnoreTag("SORT LINE COUNT", mapSettings->sortRowCount << 1);
     g_seams.features->StampFeatureMetal();
     g_game->count_14277 = 0;
-    (*(Eye **)&g_game->eyes) = (Eye*)SimAllocTagged("EYEBALL MEMORY", 0x2d0);
+    g_game->eyes = (Eye*)SimAllocTagged("EYEBALL MEMORY", 0x2d0);
     mapSettings->featureReproduceCursor = 0;
     g_game->loadProgress = 100;
 }
@@ -948,7 +934,7 @@ void LoadTntMap()
 // FUNCTION: 0x483dd0
 void FreeMapResources()
 {
-    GameFreeThunk((Eye *)g_game->eyes);
+    GameFreeThunk(g_game->eyes.get());
     g_seams.features->FreeFeaturePool();
     if (g_game->radarFrame) {
         GameFreeThunk(g_game->radarFrame);
@@ -1370,7 +1356,7 @@ void __stdcall RevealAroundUnit(SightQuery* params)
 void __stdcall AddEyeball(Vec3* src, int a, int b, int c)
 {
     if ((g_game->mapFlags_14281.raw & 2) == 2 && g_game->count_14277 < 0x14) {
-        Eye* e = &((Eye *)g_game->eyes)[g_game->count_14277];
+        Eye* e = &g_game->eyes[g_game->count_14277];
         e->player = (char*)&g_game->players[g_game->playerIndex];
         e->screen = &e->screenPos;
         e->x = a;

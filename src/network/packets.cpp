@@ -1444,7 +1444,7 @@ int FrameQueue::ResetFrames()
     fromId = -1;
     toId = -1;
     if (!buffer) {
-        buffer = new FrameRing;
+        buffer = new (kSim) FrameRing;
         return 0;
     }
     return 1;

@@ -2171,7 +2171,7 @@ static void VisitSpatial()
 
 static void VisitEyes()
 {
-    unsigned char* eyes = (unsigned char*)GameU32(GAME_EYES);
+    unsigned char* eyes = (unsigned char*)GameRef(GAME_EYES);
     unsigned count = GameU32(GAME_EYE_COUNT);
     char path[64];
     HashByte(15);

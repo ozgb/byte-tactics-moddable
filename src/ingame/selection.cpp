@@ -33,15 +33,11 @@ union Orders_37ebe {
     };
 };
 
-struct HotRadarSlot {
-    unsigned short unitId;
-    int x;
-    int y;
-};
-
 #include "../orders/order_type_entry.h"
 #include "../util/mouse_event.h"
 #include "../game/game.h"
+#include "hot_radar_slot.h"
+#include "../../interfaces/ref.h"
 #pragma pack(pop)
 
 #include "../../link/globals.h"
@@ -106,7 +102,7 @@ void CollectVisibleUnitIds(void)
 // FUNCTION: 0x48bcb0
 int __stdcall IsUnitVisible(char* unit)
 {
-    short* ids = (short*)g_game->list_1435f;
+    short* ids = (short*)g_game->list_1435f.get();
     int n = g_game->count_14367;
     for (int i = 0; i < n; i++) {
         if (ids[i] == *(short*)(unit + 0xa8))
@@ -474,7 +470,7 @@ void __stdcall CollectSelectedUnits(std::vector<Unit*>* list)
 #include "../orders/order_list.h"
 
 // FUNCTION: 0x48cc30
-void __stdcall DrawSelectedUnitOrderOverlays(void* obj, Unit** sel)
+void __stdcall DrawSelectedUnitOrderOverlays(void* obj, Ref<Unit>* sel)
 {
     Player* team = &g_game->players[g_game->localPlayer];
     Unit* sel1unit = !g_game->unitIndex ? 0 : &g_game->units[g_game->unitIndex];
@@ -528,7 +524,7 @@ unsigned short __stdcall PickUnitUnderCursor(void)
         }
     } else if (PointInRect(&g_game->viewLimit, p->x, p->y)) {
         int best = 99999;
-        HotRadarSlot* s = (HotRadarSlot *)g_game->hotRadar;
+        HotRadarSlot* s = g_game->hotRadar;
         for (int i = g_game->hotRadarCount; i > 0; i--) {
             int dy = s->y - p->y;
             int dx = s->x - p->x;

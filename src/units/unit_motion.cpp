@@ -1,6 +1,8 @@
 #include "win_types.h"
 #include <string.h>
 #include "../state/block.h"
+#include "../../interfaces/ref.h"
+#include "../../interfaces/services.h"
 
 #include "../graphics/object_pool.h"
 #include "../debug/debug_lib.h"
@@ -73,131 +75,129 @@ void __stdcall UpdateWindGenerator(Unit* unit)
 }
 
 // FUNCTION: 0x4379a0
-CMemoryCache* CMemoryCache::ClearPointers()
+template <class Cache, class Handle>
+Cache* CacheCore<Cache, Handle>::ClearPointers()
 {
-    int zero = 0;
-    base = zero;
-    handle = (void*)zero;
-    return this;
+    Cache* self = static_cast<Cache*>(this);
+    CacheSet(self->base, 0);
+    CacheSet(self->handle, 0);
+    return self;
+}
+
+template <class Cache, class Handle>
+int CacheCore<Cache, Handle>::Install(void* block, unsigned int newSize)
+{
+    Cache* self = static_cast<Cache*>(this);
+    typename Cache::Chunk* chunk = (typename Cache::Chunk*)block;
+    CacheSet(self->base, (int)chunk);
+    self->cap = newSize;
+    self->cur = chunk;
+    chunk->owner = 0;
+    self->cur->size = self->cap;
+    return 1;
 }
 
 // FUNCTION: 0x4379b0
 int CMemoryCache::InitCache(unsigned int newSize)
 {
-    if (base != 0) {
-        GameFreeThunk((int*)base);
-        base = 0;
-    }
-    CacheChunk* chunk = (CacheChunk*)GameAllocIgnoreTag("CMemoryCache CCH", newSize);
-    base = (int)chunk;
-    cap = newSize;
-    cur = chunk;
-    chunk->owner = 0;
-    cur->size = cap;
-    return 1;
+    FreeCache();
+    return Install(GameAllocIgnoreTag("CMemoryCache CCH", newSize), newSize);
 }
 
-int CMemoryCache::InitSimCache(unsigned int newSize)
+int DebrisCache::InitSimCache(unsigned int newSize)
 {
-    if (base != 0) {
-        GameFreeThunk((int*)base);
-        base = 0;
-    }
-    CacheChunk* chunk = (CacheChunk*)SimAllocTagged("CMemoryCache CCH", newSize);
-    base = (int)chunk;
-    cap = newSize;
-    cur = chunk;
-    chunk->owner = 0;
-    cur->size = cap;
-    return 1;
+    FreeCache();
+    return Install(SimAllocTagged("CMemoryCache CCH", newSize), newSize);
 }
 
 // FUNCTION: 0x437a00
-void CMemoryCache::FreeCache()
+template <class Cache, class Handle>
+void CacheCore<Cache, Handle>::FreeCache()
 {
-    if (base != 0) {
-        GameFreeThunk((int*)base);
-        base = 0;
+    Cache* self = static_cast<Cache*>(this);
+    if (CacheAddr(self->base) != 0) {
+        GameFreeThunk((int*)CacheAddr(self->base));
+        CacheSet(self->base, 0);
     }
 }
 
 // FUNCTION: 0x437a20
-void CMemoryCache::FreeBuffer()
+template <class Cache, class Handle>
+void CacheCore<Cache, Handle>::FreeBuffer()
 {
-    GameFreeThunk((int*)base);
-}
-
-static int HandleGet(void** slot, bool ref)
-{
-    return ref ? (int)((Ref<char>*)slot)->get() : (int)*slot;
-}
-
-static void HandleSet(void** slot, int address, bool ref)
-{
-    if (ref)
-        *(Ref<char>*)slot = (char*)address;
-    else
-        *slot = (void*)address;
+    GameFreeThunk((int*)CacheAddr(static_cast<Cache*>(this)->base));
 }
 
 // FUNCTION: 0x437a30
-int CMemoryCache::AllocHandle(void** p, int need, bool ref)
+template <class Cache, class Handle>
+int CacheCore<Cache, Handle>::AllocHandle(Handle* p, int need)
 {
+    Cache* self = static_cast<Cache*>(this);
+    typedef typename Cache::Chunk Chunk;
     int total = 0;
     if (need <= 0) {
-        HandleSet(p, 0, ref);
+        CacheSet(*p, 0);
         return 0;
     }
     int size = need + 8;
-    int existing = HandleGet(p, ref);
+    int existing = CacheAddr(*p);
     if (existing != 0)
         existing = *(int*)(existing - 4);
     if (existing >= size)
         return 1;
-    if (size > cap) {
-        HandleSet(p, 0, ref);
+    if (size > self->cap) {
+        CacheSet(*p, 0);
         return 0;
     }
-    CacheChunk* start;
-    int end = base + cap;
-    if ((int)cur + size > end) {
-        int q = (int)cur;
-        start = (CacheChunk*)base;
+    Chunk* start;
+    int base = CacheAddr(self->base);
+    int cur = CacheAddr(self->cur);
+    if (base == 0 || cur == 0) {
+        CacheSet(*p, 0);
+        return 0;
+    }
+    int end = base + self->cap;
+    if (cur + size > end) {
+        int q = cur;
+        start = (Chunk*)base;
         while (q < end) {
-            void** owner = *(void***)q;
-            if (owner != 0 && HandleGet(owner, ref) == q + 8)
-                HandleSet(owner, 0, ref);
+            Handle* owner = ((Chunk*)q)->owner;
+            if (owner != 0 && CacheAddr(*owner) == q + 8)
+                CacheSet(*owner, 0);
             q += *(int*)(q + 4);
-            end = base + cap;
+            end = base + self->cap;
         }
     } else {
-        start = cur;
+        start = self->cur;
     }
     int q = (int)start;
     while (total < size) {
         total += *(int*)(q + 4);
-        void** owner = *(void***)q;
-        if (owner != 0 && HandleGet(owner, ref) == q + 8)
-            HandleSet(owner, 0, ref);
+        Handle* owner = ((Chunk*)q)->owner;
+        if (owner != 0 && CacheAddr(*owner) == q + 8)
+            CacheSet(*owner, 0);
         q += *(int*)(q + 4);
     }
     if (total - size > 8u) {
-        CacheChunk* nc = (CacheChunk*)((char*)start + size);
+        Chunk* nc = (Chunk*)((char*)start + size);
         nc->owner = 0;
         nc->size = total - size;
-        cur = nc;
+        self->cur = nc;
     } else {
         size = total;
         int e = (int)start + total;
-        if (e >= base + cap)
+        if (e >= base + self->cap)
             e = base;
-        cur = (CacheChunk*)e;
+        CacheSet(self->cur, e);
     }
     start->owner = p;
     start->size = size;
-    HandleSet(p, (int)((char*)start + 8), ref);
+    CacheSet(*p, (int)((char*)start + 8));
     return 1;
 }
+
+template class CacheCore<CMemoryCache, void*>;
+template class CacheCore<DebrisCache, Ref<char> >;
 
 #pragma auto_inline(off)
 // FUNCTION: 0x437b50

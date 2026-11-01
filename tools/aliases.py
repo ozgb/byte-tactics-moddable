@@ -11,6 +11,8 @@ runtime function (tolower, sprintf, ...) to the library's symbol. Both the
 matching link (tools/link.py) and the modern CMake build link it.
 """
 
+from __future__ import annotations
+
 import argparse
 import csv
 import re

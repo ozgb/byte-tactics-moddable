@@ -4034,7 +4034,7 @@ seams,pathfinding,shared_write,UnitsSeam::MovementClassInBounds,1
 seams,pathfinding,shared_write,UnitsSeam::RefreshMovedUnits,1
 seams,pathfinding,shared_write,UnitsSeam::RefreshUnitIfStale,2
 seams,platform,call,operator delete,2
-seams,platform,call,operator new,4
+seams,platform,call,operator new,5
 seams,platform,shared_write,Seams::weapons,2
 seams,platform,shared_write,Seams::wind_meteors,2
 seams,platform,shared_write,WeaponsSeam::SpawnProjectile,1
@@ -4202,6 +4202,7 @@ seams,weapons,shared_write,NetworkSeam::SendWeaponFire,5
 seams,weapons,shared_write,NetworkSeam::SendWeaponFireAt,2
 seams,weapons,shared_write,OrdersSeam::AppendOrder,2
 seams,weapons,shared_write,OrdersSeam::MissionTypeFromName,2
+seams,weapons,shared_write,OrdersSeam::NewOrder,2
 seams,weapons,shared_write,Player::ai,3
 seams,weapons,shared_write,Seams::ai,4
 seams,weapons,shared_write,Seams::economy,1
@@ -5114,7 +5115,7 @@ weapons,platform,call,TdfRecord::GetRecordName,1
 weapons,platform,call,UsesDataArchives,1
 weapons,platform,call,VectorFromTo,1
 weapons,platform,call,operator delete,1
-weapons,platform,call,operator new,3
+weapons,platform,call,operator new,1
 weapons,platform,call,operator-,3
 weapons,platform,shared_write,Fixed::value,2
 weapons,platform,shared_write,Point16::x,8

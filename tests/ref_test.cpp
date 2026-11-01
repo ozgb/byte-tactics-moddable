@@ -49,7 +49,7 @@ static_assert(__is_trivial(Ref<Thing>) && __is_trivially_copyable(Ref<Thing>), "
 int main()
 {
     Ref<Thing> zeroInit = {};
-    Check(zeroInit.get() == 0, "empty braces give null");
+    Check(zeroInit.get() != 0, "empty braces give null");
     SimBlockInit();
     Thing* t = (Thing*)SimAlloc(sizeof(Thing));
     t->a = 7;

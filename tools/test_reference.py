@@ -64,6 +64,63 @@ class SoundLogTest(unittest.TestCase):
         self.assertEqual(differing, ["a"])
 
 
+class FrameTest(unittest.TestCase):
+    WIDTH, HEIGHT = 4, 3
+
+    def frame(self, tick: int = 30, palette: int = 7, pixels: bytes | None = None) -> bytes:
+        header = b"BTFR" + (1).to_bytes(2, "little") + self.WIDTH.to_bytes(2, "little") + self.HEIGHT.to_bytes(2, "little") + bytes(2) + tick.to_bytes(4, "little")
+        return header + bytes([palette]) * reference.FRAME_PALETTE_SIZE + (pixels or bytes(self.WIDTH * self.HEIGHT))
+
+    def test_equal_frames(self):
+        self.assertIsNone(reference.frame_difference(self.frame(), self.frame()))
+
+    def test_first_differing_pixel_is_named(self):
+        pixels = bytearray(self.WIDTH * self.HEIGHT)
+        pixels[1 * self.WIDTH + 2] = 9
+        self.assertEqual(reference.frame_difference(self.frame(), self.frame(pixels=bytes(pixels))), "pixel x 2 y 1: stored 0, got 9")
+
+    def test_palette_and_header_differences(self):
+        self.assertEqual(reference.frame_difference(self.frame(), self.frame(palette=8)), "palette")
+        self.assertEqual(reference.frame_difference(self.frame(), self.frame(tick=31)), "header")
+
+    def report(self, stored: dict[int, bytes], got: dict[int, bytes]):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            scenario = root / "a.txt"
+            scenario.write_text("ticks 100\nframes 30 60\n")
+            plain = root / "b.txt"
+            plain.write_text("ticks 100\n")
+            for tick, data in stored.items():
+                (root / "frames" / "a").mkdir(parents=True, exist_ok=True)
+                (root / "frames" / "a" / f"{tick}.bin").write_bytes(data)
+            with mock.patch.object(reference, "ROOT", root):
+                return reference.frame_report({"a": scenario, "b": plain}, {"a": got}, root / "frames")
+
+    def test_report_equal(self):
+        frames = {30: self.frame(30), 60: self.frame(60)}
+        differing, lines = self.report(frames, frames)
+        self.assertEqual(differing, [])
+        self.assertEqual(lines, ["frames: 1 of 1 scenarios equal, 0 differ, 1 with no frames line"])
+
+    def test_report_names_the_tick_and_pixel(self):
+        pixels = bytearray(self.WIDTH * self.HEIGHT)
+        pixels[0] = 5
+        differing, lines = self.report({30: self.frame(30), 60: self.frame(60)}, {30: self.frame(30), 60: self.frame(60, pixels=bytes(pixels))})
+        self.assertEqual(differing, ["a"])
+        self.assertEqual(lines[0], "DIFF a frame 60: pixel x 0 y 0: stored 0, got 5")
+
+    def test_missing_stored_frame_fails(self):
+        differing, lines = self.report({30: self.frame(30)}, {30: self.frame(30), 60: self.frame(60)})
+        self.assertEqual(differing, ["a"])
+        self.assertIn("frame 60: no stored frame", lines[0])
+
+    def test_missing_run_frame_fails(self):
+        frames = {30: self.frame(30), 60: self.frame(60)}
+        differing, lines = self.report(frames, {30: frames[30]})
+        self.assertEqual(differing, ["a"])
+        self.assertIn("frame 60: the run wrote no frame", lines[0])
+
+
 class StepsPerFrameTest(unittest.TestCase):
     def test_copies_end_with_the_key(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -227,6 +284,7 @@ class ScanRunTest(unittest.TestCase):
             raise StopIteration
 
         with mock.patch.object(reference, "scenario_ticks", lambda s: 600), \
+                mock.patch.object(reference, "scenario_frames", lambda s: []), \
                 mock.patch.object(reference.tracediff, "play", fake_play), \
                 contextlib.redirect_stdout(io.StringIO()) as out:
             try:

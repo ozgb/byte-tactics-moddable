@@ -47,6 +47,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from objread import parse
+from aliases import definition_aliases
 from sources import ROOT, base_name
 
 SUBSYSTEMS = "data/subsystems.csv"
@@ -376,13 +377,17 @@ def compiler_made(symbol: str, rules: Rules, subsystem: str, files: set) -> bool
         subsystem in rules.file_subsystems.get(f, ()) for f in files)
 
 
-def violations(units: list, root: Path) -> list:
-    return analyse(units, root)[0]
+def violations(units: list, root: Path, aliases: dict = None) -> list:
+    return analyse(units, root, aliases)[0]
 
 
-def analyse(units: list, root: Path) -> tuple:
-    """(violations, {(subsystem, kind): allowed (function, symbol) pairs}) of the units."""
+def analyse(units: list, root: Path, aliases: dict = None) -> tuple:
+    """(violations, {(subsystem, kind): allowed (function, symbol) pairs}) of the units.
+
+    A call to a symbol no object defines, which the link resolves through aliases to a definition at the same
+    address, is judged against that definition."""
     rules = build_rules(root, units)
+    aliases = aliases or {}
     found, kept = set(), {}
     for unit in units:
         for function, symbol in unit.refs:
@@ -393,12 +398,17 @@ def analyse(units: list, root: Path) -> tuple:
             else:
                 judged = [listed] if listed in SIMULATION else []
             for subsystem in judged:
+                landed = symbol
                 why = classify(rules, subsystem, symbol)
+                target = aliases.get(symbol)
+                if why == "library" and target and (target in rules.code_defs or target in rules.data_defs):
+                    landed = target
+                    why = classify(rules, subsystem, target)
                 if why:
                     kept.setdefault((subsystem, why), set()).add((name, symbol))
                     continue
-                kind = "code" if symbol in rules.code_defs else "data"
-                owner = rules.code_owner(symbol) if kind == "code" else rules.data_owner(symbol)
+                kind = "code" if landed in rules.code_defs else "data"
+                owner = rules.code_owner(landed) if kind == "code" else rules.data_owner(landed)
                 found.add(Violation(subsystem, name, base_name(symbol), kind, owner))
     ordered = sorted(found, key=lambda v: (v.subsystem, v.function, v.symbol, v.kind, v.owner))
     return ordered, {k: len(v) for k, v in kept.items()}
@@ -474,7 +484,7 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     root = Path(args.root)
     units = [unit_of(p) for a in args.objects for p in response(a)]
-    vs, counts = analyse(units, root)
+    vs, counts = analyse(units, root, definition_aliases([p for a in args.objects for p in response(a)]))
     if args.write:
         old = {(s, f, y): r for s, f, y, r in read_exceptions(root)}
         rows = [(s, f, y, old.get((s, f, y), "TODO(#0): triage")) for s, f, y in keys(vs)]

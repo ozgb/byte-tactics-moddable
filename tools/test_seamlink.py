@@ -151,6 +151,17 @@ class SeamLinkTest(unittest.TestCase):
         found = self.run_with(self.wind("?Foreign@@YAXXZ"), foreign)
         self.assertEqual([v.line() for v in found], ["wind_meteors Tick -> Foreign (code, units)"])
 
+    def test_call_through_an_alias_is_judged_against_its_definition(self):
+        foreign = Unit("src/units/units.cpp", code={"?Foreign@@YAXXZ"})
+        aliases = {"??0Foreign@@QAE@XZ": "?Foreign@@YAXXZ"}
+        found = seamlink.violations([self.wind("??0Foreign@@QAE@XZ"), foreign], self.root, aliases)
+        self.assertEqual([v.line() for v in found], ["wind_meteors Tick -> Foreign::Foreign (code, units)"])
+        self.assertEqual(self.run_with(self.wind("??0Foreign@@QAE@XZ"), foreign), [])
+
+    def test_call_through_an_alias_within_one_subsystem_is_allowed(self):
+        aliases = {"??0Helper@@QAE@XZ": "?Helper@@YAXXZ"}
+        self.assertEqual(seamlink.violations([self.wind("??0Helper@@QAE@XZ")], self.root, aliases), [])
+
     def test_call_to_other_function_in_same_file_is_violation(self):
         mixed = Unit("src/game/mixed.cpp", code={"?Mixed@@YAXXZ", "?Other@@YAXXZ"})
         mixed.refs = [("?Mixed@@YAXXZ", "?Other@@YAXXZ")]

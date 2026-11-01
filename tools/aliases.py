@@ -67,6 +67,20 @@ def build_aliases(objects: list[Path], symbols: dict[str, int], data_addr: dict[
                   annotated: dict[int, tuple[str, str]] | None = None,
                   overloads: dict[str, set[int]] | None = None) -> dict[str, str]:
     """Write the COFF object that maps caller spellings to definitions."""
+    aliases, absolute = resolve_aliases(objects, symbols, data_addr, libs, extra, winmain_addr, data_fallback,
+                                        strip_underscore, thunks, placeholder_methods, annotated, overloads)
+    write_object(aliases, out, absolute)
+    return aliases
+
+
+def resolve_aliases(objects: list[Path], symbols: dict[str, int], data_addr: dict[int, str],
+                    libs: dict[str, str], extra: dict[str, str] | None = None,
+                    winmain_addr: int | None = None, data_fallback: bool = False,
+                    strip_underscore: bool = False, thunks: dict[int, str] | None = None,
+                    placeholder_methods: bool = False,
+                    annotated: dict[int, tuple[str, str]] | None = None,
+                    overloads: dict[str, set[int]] | None = None) -> tuple[dict[str, str], dict[str, int]]:
+    """The caller spelling -> definition map, and the names that sit at absolute address 0."""
     infos = [read_object(str(o), o.read_bytes()) for o in objects]
     defined = {n for info in infos for n in info.defs}
     funcs_at = functions_at(infos, symbols, annotated)
@@ -114,8 +128,17 @@ def build_aliases(objects: list[Path], symbols: dict[str, int], data_addr: dict[
                     absolute[name] = 0
                 elif addr is not None and addr in data_addr and data_addr[addr] != name:
                     aliases[name] = data_addr[addr]
-    write_object(aliases, out, absolute)
-    return aliases
+    return aliases, absolute
+
+
+def definition_aliases(objects: list[Path]) -> dict[str, str]:
+    """Each undefined spelling the objects call -> the definition at its address, as the link resolves it."""
+    symbols, _, annotated = load_known()
+    alias_names(symbols)
+    data_addr = {a: n for a, _, n in data_extents(objects, symbols)}
+    data_addr.update({a: n for a, n in vtable_addresses(symbols).items() if a not in data_addr})
+    return resolve_aliases(objects, symbols, data_addr, {}, data_fallback=True, placeholder_methods=True,
+                           annotated=annotated, overloads=overloaded_names(symbols))[0]
 
 
 def defined_addresses(obj: Path, symbols: dict[str, int]) -> dict[int, str]:

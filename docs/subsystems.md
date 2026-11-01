@@ -682,6 +682,8 @@ The kinds, with the arguments of each and what the drain does:
 | 18, redraw screen | a screen (below) | Marks the GUI as changed when that screen is on top |
 | 19, focus commander | the force flag | Centres the camera on the commander of the viewed player and, with the flag, selects it and closes the open screens |
 | 20, close screens | the force flag | Closes the screens above the game screen, unless a dialog is open and the flag is 0 |
+| 21, player took the lead | the player, the kills that put it there | Prints the message that the player has taken the lead, in the player's name and with the kills |
+| 22, player left | the player's network id | Prints the message that the player left the game, in the player's name and with one of eight texts chosen from the view random stream, unless the local player was rejected or no slot has the id |
 
 The particle list is the index of the list the particles are drawn in. A particle kind that sim cannot change is not an argument.
 

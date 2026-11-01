@@ -5213,6 +5213,7 @@ weapons,seams,indirect,GetGroundHeightNative,1
 weapons,seams,indirect,GetWeaponTargetPosNative,1
 weapons,seams,indirect,MarkOwnerNetDirtyFromDamageSplitNative,2
 weapons,seams,indirect,MissionTypeFromNameNative,2
+weapons,seams,indirect,NewOrderNative,2
 weapons,seams,indirect,QueryScriptNative,1
 weapons,seams,indirect,SpendEnergyAndMetalNative,1
 weapons,seams,indirect,StartScriptNative,3

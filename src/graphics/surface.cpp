@@ -95,7 +95,7 @@ struct Display {
     int cursorThreadEnabled;           // +0x1ce
     int cursorOverlayEnabled;          // +0x1d2
     char unknown_1d6[0x214 - 0x1d6];
-    PALETTEENTRY entries[256];         // +0x214
+    PALETTEENTRY entries[256];
 
     // Method of the display object: this is the call result.
     int LockScreen(Surface* out)

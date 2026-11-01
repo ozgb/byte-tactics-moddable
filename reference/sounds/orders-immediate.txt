@@ -1,0 +1,7 @@
+bt-sound 1
+0 stop_all - - - - -
+36 play_file nanlath1.WAV -585 - - -
+433 play_file nanlath1.WAV -585 - - -
+702 play_file solar1.WAV -585 - - -
+770 play_file cantdo4.WAV -585 - - -
+860 play_file cantdo4.WAV -585 - - -

@@ -6,7 +6,7 @@ ai,economy,shared_write,Unit::flags,1
 ai,features,shared_write,Point16::x,10
 ai,features,shared_write,Point16::y,10
 ai,features,shared_write,Vec3::x,6
-ai,features,shared_write,Vec3::y,4
+ai,features,shared_write,Vec3::y,5
 ai,features,shared_write,Vec3::z,6
 ai,game,call,SimAllocTagged,1
 ai,game,shared_write,Point16::x,1
@@ -458,7 +458,7 @@ game,features,shared_write,Game::ticks,1
 game,features,shared_write,Point16::x,10
 game,features,shared_write,Point16::y,10
 game,features,shared_write,Vec3::x,6
-game,features,shared_write,Vec3::y,4
+game,features,shared_write,Vec3::y,5
 game,features,shared_write,Vec3::z,6
 game,files,call,CountDirectoryEntries,1
 game,files,call,HAPI_CloseFile,4
@@ -1225,7 +1225,7 @@ harness,pathfinding,shared_write,Game::numPlayers,1
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
-harness,platform,call,HarnessTestMode,7
+harness,platform,call,HarnessTestMode,8
 harness,platform,call,IsMemSet,1
 harness,platform,call,ModulesCheckStatics,1
 harness,platform,call,ModulesHideSwitch,1
@@ -1308,7 +1308,7 @@ los_radar,features,shared_write,Point16::y,10
 los_radar,features,shared_write,TntInfo::featureCount,1
 los_radar,features,shared_write,TntInfo::featureNames,1
 los_radar,features,shared_write,Vec3::x,6
-los_radar,features,shared_write,Vec3::y,4
+los_radar,features,shared_write,Vec3::y,5
 los_radar,features,shared_write,Vec3::z,6
 los_radar,game,call,Game::Current,1
 los_radar,game,call,SaveSettings,1
@@ -1482,7 +1482,7 @@ map,features,shared_write,Game::net,3
 map,features,shared_write,Point16::x,10
 map,features,shared_write,Point16::y,10
 map,features,shared_write,Vec3::x,6
-map,features,shared_write,Vec3::y,4
+map,features,shared_write,Vec3::y,5
 map,features,shared_write,Vec3::z,6
 map,files,call,HAPI_CloseFile,2
 map,files,call,HAPI_FileLengthByName,2
@@ -2043,7 +2043,7 @@ orders,features,indirect,RemoveFeature,1
 orders,features,shared_write,Point16::x,10
 orders,features,shared_write,Point16::y,10
 orders,features,shared_write,Vec3::x,6
-orders,features,shared_write,Vec3::y,4
+orders,features,shared_write,Vec3::y,5
 orders,features,shared_write,Vec3::z,6
 orders,files,call,HapiBank::GetStringItem,3
 orders,files,call,HapiBank::HasItem,4
@@ -2365,7 +2365,7 @@ platform,features,shared_write,Fixed::whole,2
 platform,features,shared_write,Point16::x,10
 platform,features,shared_write,Point16::y,10
 platform,features,shared_write,Vec3::x,6
-platform,features,shared_write,Vec3::y,4
+platform,features,shared_write,Vec3::y,5
 platform,features,shared_write,Vec3::z,6
 platform,files,call,CountDirectoryEntries,1
 platform,files,call,HAPI_AddArchive,1
@@ -2718,7 +2718,7 @@ players,features,shared_write,Player::type,2
 players,features,shared_write,Point16::x,10
 players,features,shared_write,Point16::y,10
 players,features,shared_write,Vec3::x,6
-players,features,shared_write,Vec3::y,4
+players,features,shared_write,Vec3::y,5
 players,features,shared_write,Vec3::z,6
 players,files,call,HAPI_LoadFile,1
 players,files,call,HapiBank::GetBoxSize,1
@@ -3110,7 +3110,7 @@ presentation,features,shared_write,Player::active,2
 presentation,features,shared_write,Point16::x,10
 presentation,features,shared_write,Point16::y,10
 presentation,features,shared_write,Vec3::x,6
-presentation,features,shared_write,Vec3::y,4
+presentation,features,shared_write,Vec3::y,5
 presentation,features,shared_write,Vec3::z,6
 presentation,files,call,ChangeDirectory,1
 presentation,files,call,ChangeDrive,1
@@ -3218,6 +3218,7 @@ presentation,game,shared_write,Unit::flags,3
 presentation,game,shared_write,Vec3::x,3
 presentation,game,shared_write,Vec3::y,1
 presentation,game,shared_write,Vec3::z,3
+presentation,harness,call,HarnessSoundEvent,6
 presentation,harness,call,HarnessViewRand,19
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::numPlayers,2
@@ -4198,7 +4199,7 @@ targeting,ai,shared_write,Vec3::x,18
 targeting,ai,shared_write,Vec3::y,11
 targeting,ai,shared_write,Vec3::z,18
 targeting,features,shared_write,Vec3::x,6
-targeting,features,shared_write,Vec3::y,4
+targeting,features,shared_write,Vec3::y,5
 targeting,features,shared_write,Vec3::z,6
 targeting,game,shared_write,Vec3::x,3
 targeting,game,shared_write,Vec3::y,1
@@ -4328,7 +4329,7 @@ units,features,shared_write,Game::defs,1
 units,features,shared_write,Point16::x,10
 units,features,shared_write,Point16::y,10
 units,features,shared_write,Vec3::x,6
-units,features,shared_write,Vec3::y,4
+units,features,shared_write,Vec3::y,5
 units,features,shared_write,Vec3::z,6
 units,files,call,HAPI_CloseFile,1
 units,files,call,HAPI_FileLength,1
@@ -4952,7 +4953,7 @@ weapons,features,shared_write,GafFrame::yOffset,1
 weapons,features,shared_write,Point16::x,10
 weapons,features,shared_write,Point16::y,10
 weapons,features,shared_write,Vec3::x,6
-weapons,features,shared_write,Vec3::y,4
+weapons,features,shared_write,Vec3::y,5
 weapons,features,shared_write,Vec3::z,6
 weapons,features,shared_write,WeaponDef::damage,1
 weapons,features,shared_write,WeaponDef::fireStarter,1
@@ -5232,7 +5233,7 @@ wind_meteors,features,shared_write,Game::windZ,1
 wind_meteors,features,shared_write,Point16::x,10
 wind_meteors,features,shared_write,Point16::y,10
 wind_meteors,features,shared_write,Vec3::x,6
-wind_meteors,features,shared_write,Vec3::y,4
+wind_meteors,features,shared_write,Vec3::y,5
 wind_meteors,features,shared_write,Vec3::z,6
 wind_meteors,files,call,HapiBank::GetIntegerItem,1
 wind_meteors,files,call,HapiBank::OpenAccount,2

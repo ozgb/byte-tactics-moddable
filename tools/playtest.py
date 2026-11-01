@@ -109,6 +109,7 @@ TEMPLATE_REVISION = 2
 FRAMEDUMP_SWITCH = "-framedump"
 FRAMEDUMP_KEY = "Scroll_Lock"
 FRAMEDUMP_TIMEOUT = 10.0
+FRAMEDUMP_RETRY = 2.5
 DUMP_MAGIC = b"BTFR"
 DUMP_HEADER = 16 + 256 * 4
 
@@ -590,18 +591,25 @@ class Instance:
 
     def dump(self, name: str) -> None:
         """Ask the host for a frame dump with its reserved key and move the file it writes to <run>/<name>.bin."""
-        src = self.game / "frames" / f"{self.dumps}.bin"
-        self.xdo("key", FRAMEDUMP_KEY)
+        frames = self.game / "frames"
+        src = frames / f"{self.dumps}.bin"
         deadline = time.time() + FRAMEDUMP_TIMEOUT
-        while time.time() < deadline:
+        while True:
+            self.xdo("key", FRAMEDUMP_KEY)
+            retry = time.time() + FRAMEDUMP_RETRY
+            while time.time() < min(retry, deadline) and not complete_dump(src):
+                self.run.check_alive()
+                time.sleep(0.2)
             if complete_dump(src):
                 break
-            self.run.check_alive()
-            time.sleep(0.2)
-        else:
-            raise StepFailed(f"no frame dump {src.name} within {FRAMEDUMP_TIMEOUT:g}s of {FRAMEDUMP_KEY}")
-        self.dumps += 1
+            if time.time() >= deadline:
+                raise StepFailed(f"no frame dump {src.name} within {FRAMEDUMP_TIMEOUT:g}s of {FRAMEDUMP_KEY}")
         shutil.move(str(src), self.run.out / f"{name}.bin")
+        time.sleep(0.3)
+        later = sorted(frames.glob("*.bin"), key=lambda f: int(f.stem))
+        self.dumps = max([self.dumps + 1] + [int(f.stem) + 1 for f in later])
+        for extra in later:
+            extra.unlink(missing_ok=True)
 
     def thread(self, fn) -> None:
         t = threading.Thread(target=fn, daemon=True)

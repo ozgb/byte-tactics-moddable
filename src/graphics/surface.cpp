@@ -11,11 +11,9 @@
 #include "gaf_frame.h"
 
 // Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
-void StepAllGafSequences(void);
 void StartScreenFade(void);
 void StepScreenFade(void);
 void ScheduleFadeTick(void);
-void StepPaletteFade(void);
 
 // The display flags word at +0xf0: set through the bitfield, read whole
 // (FlipScreen) or as its low byte (FillSurface).

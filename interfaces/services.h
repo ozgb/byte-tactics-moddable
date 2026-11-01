@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 2
+#define SERVICES_VERSION_MINOR 3
 
 // Returns a random number in [0, range) from the main stream of the game logic.
 int __stdcall RandomInt(int range);
@@ -42,6 +42,8 @@ int __stdcall ComputeChecksum(unsigned char* data, int len);
 
 // Allocates a block of the game heap, naming the call site for the debug tables.
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
+// Frees a block of the game heap.
+void __cdecl GameFreeThunk(void* p);
 // Copies a string into a new block of the game heap, or returns null for null.
 char* __cdecl GameStrdup(char* s);
 // Makes the pages of a block of the game heap read-only.

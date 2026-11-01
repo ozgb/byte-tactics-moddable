@@ -252,7 +252,7 @@ void* __cdecl GameReallocIgnoreTag(int* block, int size)
 
 #pragma auto_inline(off)
 // FUNCTION: 0x4d85a0
-void __cdecl GameFreeThunk(int* p)
+void __cdecl GameFreeThunk(void* p)
 {
     GameFree(p);
 }

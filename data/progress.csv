@@ -2989,7 +2989,7 @@ address,size,file,symbol,status,similarity
 0x4d84a0,19,src/debug/debug_lib.cpp,?GameReallocTagged@@YAPAXPAXHI@Z,matched,100.0
 0x4d84c0,182,src/debug/debug_lib.cpp,?GameRealloc@@YAPAXPAXI@Z,matched,100.0
 0x4d8580,21,src/debug/debug_lib.cpp,?GameReallocIgnoreTag@@YAPAXPAHH@Z,matched,100.0
-0x4d85a0,14,src/debug/debug_lib.cpp,?GameFreeThunk@@YAXPAH@Z,matched,100.0
+0x4d85a0,14,src/debug/debug_lib.cpp,?GameFreeThunk@@YAXPAX@Z,matched,100.0
 0x4d85b0,91,src/debug/debug_lib.cpp,?GameFree@@YAXPAX@Z,matched,100.0
 0x4d8610,76,src/debug/debug_lib.cpp,?GameStrdup@@YAPADPAD@Z,matched,100.0
 0x4d8660,14,src/debug/debug_lib.cpp,?GameAllocThunk@@YAPAXI@Z,matched,100.0

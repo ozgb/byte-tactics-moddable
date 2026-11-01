@@ -28080,7 +28080,6 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,operator Order *
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,operator Player *
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,operator Unit *
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,operator new
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,operator->
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,operator=
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,operator==
@@ -28092,6 +28091,7 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Order::ticks
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,OrdersSeam::AppendOrder
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,OrdersSeam::MissionTypeFromName
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,OrdersSeam::NewOrder
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Player::active
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Player::type
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Seams::ai
@@ -28125,21 +28125,21 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_maybe_written,s_TakeDamage_00508d68
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_read,g_game
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_read,g_seams
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_read,kSim
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,indirect via MissionType (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,"indirect via Order *(*)(MissionType, Unit *, void *, int, int, int) __attribute__((stdcall)) [OrdersSeam::NewOrder]"
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [UnitsSeam::MarkRecentlyDamaged]
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(Unit *, Order *) __attribute__((stdcall)) [OrdersSeam::AppendOrder]"
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [AiSeam::ReactToAttack]"
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator Order *
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator Player *
-0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator new
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator->
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator==
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,Order::kind
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,Order::ticks
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,OrdersSeam::AppendOrder
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,OrdersSeam::MissionTypeFromName
+0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,OrdersSeam::NewOrder
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,Player::active
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,Player::type
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_read,Seams::orders
@@ -28151,8 +28151,8 @@ address,function,file,kind,target
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,field_write,Order::ticks
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,function,
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,global_read,g_seams
-0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,global_read,kSim
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,indirect_call,indirect via MissionType (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
+0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,indirect_call,"indirect via Order *(*)(MissionType, Unit *, void *, int, int, int) __attribute__((stdcall)) [OrdersSeam::NewOrder]"
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(Unit *, Order *) __attribute__((stdcall)) [OrdersSeam::AppendOrder]"
 0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,deref_read,*unsigned short
 0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,deref_write,*unsigned short
@@ -46787,6 +46787,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::LoadMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::LoadOrder
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::MissionTypeFromName
+,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::NewOrder
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::NewUnitMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxAddFlags
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::ReattachFxToUnit
@@ -47174,6 +47175,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NetSendUnitStates
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NetSendWeaponFire
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NetSendWeaponFireAt
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,NewOrderNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NewUnitMotionNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NopAfterFeatureEnum
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NotifyUnitCreatedNative
@@ -48478,6 +48480,9 @@ address,function,file,kind,target
 ,NewFreeBlockNode,src/debug/debug_lib.cpp,global_read,g_outOfMemoryHandler
 ,NewFreeBlockNode,src/debug/debug_lib.cpp,global_write,g_freeBlockFreeList
 ,NewFreeBlockNode,src/debug/debug_lib.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [g_outOfMemoryHandler]
+,NewOrderNative,src/seams/native.cpp,call,operator new
+,NewOrderNative,src/seams/native.cpp,function,
+,NewOrderNative,src/seams/native.cpp,global_read,kSim
 ,NewSurface,src/graphics/surface.cpp,call,GameAllocIgnoreTag
 ,NewSurface,src/graphics/surface.cpp,call,operator=
 ,NewSurface,src/graphics/surface.cpp,field_write,Rect::bottom

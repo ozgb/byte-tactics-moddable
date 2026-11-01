@@ -55,6 +55,8 @@ struct CursorState {
 };
 
 #include "../game/game.h"
+#include "../state/sim_effects.h"
+#include "../../interfaces/services.h"
 #include "../game/game_state.h"
 
 #pragma pack(pop)
@@ -965,8 +967,7 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
         if (target->player->active != 0
             && (target->player->type == 1 || target->player->type == 2)) {
             if (target->flags & 0x20000000) {
-                if (IsScreenNamed(&g_game->gui, "BUILDER.GUI"))
-                    MarkChanged(&g_game->gui);
+                RecordGuiChangedIfScreen(SIM_SCREEN_BUILDER);
             } else {
                 if (target->carrier != 0)
                     AttachUnitToPiece(target, 0, -1, 1);
@@ -974,8 +975,7 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
         }
         if (((UnitDef*)target->def.get())->b18)
             target->SetStateBits(1, 1);
-        if (g_game->unitIndex == unit->id)
-            RefreshBuildCountTexts(&g_game->gui, unit);
+        RecordBuildMenuUpdate(unit);
         if (((UnitDef*)target->def.get())->b24) {
             target->lastDamageType = 7;
             target->flags |= 0x4000;

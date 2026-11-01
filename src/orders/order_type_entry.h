@@ -5,7 +5,7 @@ struct Order;
 
 #pragma pack(push, 1)
 struct OrderTableEntry {
-    int value;
+    const char* value;
     int (__stdcall* notify)(void* unit, Order* obj, unsigned int code);
     char unknown_8[0xc - 8];
     int drawMask;

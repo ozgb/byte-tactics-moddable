@@ -92,6 +92,7 @@ struct ClampedPos {
 #include "unit.h"
 
 #include "../game/game.h"
+#include "../ingame/hot_radar_slot.h"
 #include "../state/sim_effects.h"
 #include "../quirks/quirks.h"
 #pragma pack(pop)
@@ -236,8 +237,8 @@ void __stdcall AllocateUnitMemory(void)
     memset(pool, 0, g_game->poolCount * 0x118);
 
     unsigned int ten = g_game->maxUnitsSetting * 10;
-    (*(void **)&g_game->list_1435f) = SimAllocTagged("HOT UNITS", ten * 2);
-    g_game->hotRadar = SimAllocTagged("HOT RADAR UNITS", ten * 10);
+    g_game->list_1435f = (unsigned short*)SimAllocTagged("HOT UNITS", ten * 2);
+    g_game->hotRadar = (HotRadarSlot*)SimAllocTagged("HOT RADAR UNITS", ten * 10);
     g_game->unitsEnd = (Unit*)((unsigned char *)g_game->units.get() + g_game->poolCount * 0x118 - 0x118);
 
     unsigned short n;
@@ -296,11 +297,11 @@ void FreeUnitMemory(void)
         }
     }
     if (g_game->hotRadar != 0)
-        GameFreeThunk(g_game->hotRadar);
+        GameFreeThunk(g_game->hotRadar.get());
     g_game->hotRadar = 0;
-    if ((void *)g_game->list_1435f != 0)
-        GameFreeThunk((void *)g_game->list_1435f);
-    (*(void **)&g_game->list_1435f) = 0;
+    if (g_game->list_1435f != 0)
+        GameFreeThunk(g_game->list_1435f.get());
+    g_game->list_1435f = 0;
     if (g_game->units != 0)
         GameFreeThunk(g_game->units);
     g_game->units = 0;

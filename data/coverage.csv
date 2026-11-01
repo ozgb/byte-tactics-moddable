@@ -2156,7 +2156,7 @@ presentation,YesNoDialogHandler,src/gui/dialogs.cpp,0,0,0,0,0,0,?YesNoDialogHand
 presentation,clear_screen,src/graphics/surface.cpp,1,0,0,0,0,0,?clear_screen@@YGXPAUDisplay@@H@Z,0,
 presentation,color_taken,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?color_taken@@YGHH@Z,0,
 presentation,entry_at,src/gui/gui.cpp,1,0,0,0,0,0,?entry_at@@YGPAUGadget@@PAUGui@@H@Z,0,
-seams,*,,103,93,664,634,0,0,,0,
+seams,*,,108,98,684,654,0,0,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YIHPAVMission@@@Z,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YIHPAVMission@@@Z,0,
 seams,DestroyPathfinderNative,src/seams/native.cpp,1,0,0,0,0,0,?DestroyPathfinderNative@@YGXPAVPathfinder@@@Z,0,
@@ -2306,7 +2306,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,10,10,131,126,76,56,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,162,130,4044,3444,1678,1203,,32,
+units,*,,163,131,4047,3447,1678,1203,,32,
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0,unused-slot
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
@@ -2331,7 +2331,7 @@ units,CobScript::StartScriptByIndex,src/units/cob.cpp,0,0,0,0,0,0,?StartScriptBy
 units,CobScript::StartThreadByName,src/units/cob.cpp,0,0,0,0,0,0,?StartThreadByName@CobScript@@QAEHPBD@Z,1,
 units,CopyPathLockFields,src/units/movement_class.cpp,0,0,0,0,0,0,?CopyPathLockFields@@YGXPAUPathLockDstView@@PAUPathLockSrcView@@@Z,1,
 units,CreateUnitMotion,src/units/units.cpp,0,0,0,0,0,0,?CreateUnitMotion@@YGXPAUUnit@@@Z,1,
-units,EmitUnitScriptDeletingDtor,src/units/units.cpp,0,0,0,0,0,0,?EmitUnitScriptDeletingDtor@@YGPAVUnitScript@@XZ,1,
+units,EmitUnitScriptDeletingDtor,src/units/unit_script_alloc.cpp,0,0,0,0,0,0,?EmitUnitScriptDeletingDtor@@YGPAVUnitScript@@XZ,1,
 units,FreeA,src/units/movement_class.cpp,1,0,0,0,0,0,?FreeA@@YGXH@Z,0,shutdown
 units,FreeC,src/units/movement_class.cpp,1,0,0,0,0,0,?FreeC@@YGXH@Z,0,shutdown
 units,FreeDownloadMenus,src/units/unit_types.cpp,1,0,0,0,0,0,?FreeDownloadMenus@@YGXXZ,0,shutdown

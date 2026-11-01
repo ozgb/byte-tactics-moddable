@@ -84,8 +84,8 @@ static FILE* s_trace = NULL;
 static FILE* s_dump = NULL;
 static FILE* s_sound = nullptr;
 static char s_soundBuffer[4096];
-static const unsigned MAX_FRAMES = 64;
-static unsigned s_frameTicks[MAX_FRAMES];
+static const unsigned s_frameLimit = 64;
+static unsigned s_frameTicks[s_frameLimit];
 static unsigned s_frameCount = 0;
 static unsigned s_frameNext = 0;
 static int s_frameLine = 0;
@@ -552,7 +552,7 @@ static void ReadFrames(int lineNo, char* value)
             FailLine(lineNo, "needs ticks of at least 1", "frames", "");
         if (s_frameCount != 0 && tick <= s_frameTicks[s_frameCount - 1])
             FailLine(lineNo, "needs ticks in ascending order", "frames", "");
-        if (s_frameCount >= MAX_FRAMES)
+        if (s_frameCount >= s_frameLimit)
             FailLine(lineNo, "is past the limit of 64 frames", "frames", "");
         s_frameTicks[s_frameCount++] = tick;
     }

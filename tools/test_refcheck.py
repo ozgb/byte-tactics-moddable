@@ -541,7 +541,21 @@ struct Sim { Rec rec; };
         self.assertIn("Model", seeded)
         self.assertNotIn("Model", loaded)
 
-    def test_hand_fields_reads_load_and_code_rows_only(self):
+    def test_closure_stops_at_any_outside_field_unless_a_block_field_reaches_the_type(self):
+        import typedupes
+        source = ("struct Only { int n; };\nstruct Both { int n; };\n"
+                  "struct Rec { Only *a; Both *b; };\nstruct Sim { Rec rec; Both *held; };\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "src").mkdir()
+            (root / "src" / "a.h").write_text(source)
+            files = typedupes.collect(root)
+            reached = rc.block_structs(files, typedupes.definitions(files), [], [], extra=("Sim",),
+                                       hand=frozenset({("Rec", "a"), ("Rec", "b")}))
+        self.assertNotIn("Only", reached)
+        self.assertIn("Both", reached)
+
+    def test_hand_fields_reads_every_outside_row_with_a_field(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "data").mkdir()
@@ -552,7 +566,7 @@ struct Sim { Rec rec; };
                  "kind": "pointer", "note": "n"},
                 {"struct": "", "field": "", "holder": "H", "offset": "0x0", "words": 1, "issue": "", "kind": "code",
                  "note": "n"}]))
-            self.assertEqual(rc.hand_fields(root), frozenset({("Rec", "desc")}))
+            self.assertEqual(rc.hand_fields(root), frozenset({("Rec", "desc"), ("Rec", "kept")}))
 
 
 class OffsetTest(unittest.TestCase):

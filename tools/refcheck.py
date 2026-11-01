@@ -404,16 +404,15 @@ def scan_unit(job: tuple[dict, bool]) -> UnitScan:
 
 
 def hand_fields(root: Path) -> frozenset:
-    """The (struct, field) pairs the outside list tags `load` or `code`: data the closure does not walk through."""
-    return frozenset((r["struct"], r["field"]) for r in read_csv(root / OUTSIDE)
-                     if r["kind"] in HAND_KINDS and r["struct"] and r["field"])
+    """The (struct, field) pairs on the outside list, of any kind: the closure does not walk through them."""
+    return frozenset((r["struct"], r["field"]) for r in read_csv(root / OUTSIDE) if r["struct"] and r["field"])
 
 
 def block_structs(files: dict, by_name: dict, state_rows: list[dict], globals_rows: list[dict],
                   extra=EXTRA_BLOCK, hand: frozenset = frozenset()) -> set[str]:
     """The type names the state block holds: the closure from the sim and mixed rows, Game, SimGlobals, the
     types of Game's sim and mixed fields (less the ones in hand), and the structs Game holds by value. The closure does not walk
-    through the (struct, field) pairs in hand, which hold loaded data or code."""
+    through the (struct, field) pairs in hand, the fields on the outside list."""
     scope = typedupes.Scope(files, by_name)
     for name, ds in by_name.items():
         skip = frozenset(f for s, f in hand if s == short(name))

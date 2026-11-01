@@ -1,8 +1,8 @@
 subsystem,function,symbol,reason
-ai,BuildTimer::OnTimer,QueueBuildOrder,TODO(#505): sim-to-presentation event
-ai,BuildTimer::TryIssueIdleFactoryBuildOrder,QueueBuildOrder,TODO(#505): sim-to-presentation event
-ai,PlayerAI::FindCellNearFeatures,GetBuildSiteMetal,TODO(#505): sim-to-presentation event
-ai,PlayerAI::FindRandomPlacementCell,GetBuildSiteMetal,TODO(#505): sim-to-presentation event
+ai,BuildTimer::OnTimer,QueueBuildOrder,"TODO(#608): sim helper: build counts and a sound in one call, to split"
+ai,BuildTimer::TryIssueIdleFactoryBuildOrder,QueueBuildOrder,"TODO(#608): sim helper: build counts and a sound in one call, to split"
+ai,PlayerAI::FindCellNearFeatures,GetBuildSiteMetal,TODO(#608): sim helper: a sim value held in a presentation file
+ai,PlayerAI::FindRandomPlacementCell,GetBuildSiteMetal,TODO(#608): sim helper: a sim value held in a presentation file
 ai,PopHeap,PopHeapFirst,TODO(#621): heap helper outside the subsystem
 ai,RegisterAICommands,RegisterCommand,TODO(#621): command table filled by the console
 economy,CmdSetShareEnergy,AddMessage,TODO(#620): sim-to-presentation event or message
@@ -15,7 +15,7 @@ features,KillFeature,InitGafSequence,TODO(#608): graphics or load-time asset thr
 features,LoadFeatureType,FindGafEntry,TODO(#608): graphics or load-time asset through a seam
 features,LoadFeatureType,InitGafSequence,TODO(#608): graphics or load-time asset through a seam
 features,LoadFeatureType,LoadGaf,TODO(#608): graphics or load-time asset through a seam
-features,PlaceFeature,CreateObjectState,TODO(#505): sim-to-presentation event
+features,PlaceFeature,CreateObjectState,TODO(#608): sim helper: COB piece transforms that sim stores
 features,RemoveFeature,FreeObjectState,TODO(#608): graphics or load-time asset through a seam
 features,StartFeatureBurning,InitGafSequence,TODO(#608): graphics or load-time asset through a seam
 features,StartFeatureBurning,PlaySoundAtByName,TODO(#620): sim-to-presentation event or message
@@ -26,94 +26,94 @@ los_radar,AddEyeball,GetGafFrame,TODO(#608): graphics or load-time asset through
 los_radar,AddLineOfSight,GetGafFrame,TODO(#608): graphics or load-time asset through a seam
 los_radar,CmdShareMapping,AddMessage,TODO(#620): sim-to-presentation event or message
 los_radar,CmdShareRadar,AddMessage,TODO(#620): sim-to-presentation event or message
-los_radar,DrawRadarUnits,DrawCircle,TODO(#505): sim-to-presentation event
-los_radar,DrawRadarUnits,DrawDashedCircle,TODO(#505): sim-to-presentation event
+los_radar,DrawRadarUnits,DrawCircle,TODO(#608): presentation code in a tick: radar picture drawing
+los_radar,DrawRadarUnits,DrawDashedCircle,TODO(#608): presentation code in a tick: radar picture drawing
 los_radar,DrawRadarUnits,DrawFrame,TODO(#608): graphics or load-time asset through a seam
-los_radar,DrawRadarUnits,DrawPixel,TODO(#505): sim-to-presentation event
+los_radar,DrawRadarUnits,DrawPixel,TODO(#608): presentation code in a tick: radar picture drawing
 los_radar,DrawRadarUnits,DrawSurface,TODO(#608): graphics or load-time asset through a seam
 los_radar,DrawRadarUnits,GetGafFrame,TODO(#608): graphics or load-time asset through a seam
-los_radar,FreeRadar,FreeSurface,TODO(#505): sim-to-presentation event
+los_radar,FreeRadar,FreeSurface,TODO(#608): load-time asset call: radar picture surface
 los_radar,InitUnitSightCircleReveal,GetGafFrame,TODO(#608): graphics or load-time asset through a seam
-los_radar,LoadTntMap,AllocFrame,TODO(#505): sim-to-presentation event
+los_radar,LoadTntMap,AllocFrame,TODO(#608): load-time asset call: radar picture surface
 los_radar,LoadTntMap,DrawFrame,TODO(#608): graphics or load-time asset through a seam
-los_radar,LoadTntMap,SurfaceFromFrame,TODO(#505): sim-to-presentation event
+los_radar,LoadTntMap,SurfaceFromFrame,TODO(#608): load-time asset call: radar picture surface
 los_radar,RecalculateLineOfSight,GetGafFrame,TODO(#608): graphics or load-time asset through a seam
 los_radar,RemoveLineOfSight,GetGafFrame,TODO(#608): graphics or load-time asset through a seam
-los_radar,ResizeRadarPicture,AllocFrame,TODO(#505): sim-to-presentation event
+los_radar,ResizeRadarPicture,AllocFrame,TODO(#608): load-time asset call: radar picture surface
 los_radar,ResizeRadarPicture,DrawFrame,TODO(#608): graphics or load-time asset through a seam
 los_radar,ResizeRadarPicture,DrawFrameQuad,TODO(#608): graphics or load-time asset through a seam
-los_radar,ResizeRadarPicture,FillSurface,TODO(#505): sim-to-presentation event
-los_radar,ResizeRadarPicture,SurfaceFromFrame,TODO(#505): sim-to-presentation event
+los_radar,ResizeRadarPicture,FillSurface,TODO(#608): load-time asset call: radar picture surface
+los_radar,ResizeRadarPicture,SurfaceFromFrame,TODO(#608): load-time asset call: radar picture surface
 los_radar,RevealAroundUnit,GetGafFrame,TODO(#608): graphics or load-time asset through a seam
 los_radar,RevealNewUnit,GetGafFrame,TODO(#608): graphics or load-time asset through a seam
 los_radar,ToggleShareLos,AddMessage,TODO(#620): sim-to-presentation event or message
 los_radar,UpdateLineOfSight,GetGafFrame,TODO(#608): graphics or load-time asset through a seam
-map,FreeOtaEnumCacheAndMission,FreeOtaEnumCache,TODO(#505): sim-to-presentation event
-map,Mission::BuildCampaignFilePath,StripExtension,TODO(#505): sim-to-presentation event
+map,FreeOtaEnumCacheAndMission,FreeOtaEnumCache,TODO(#608): load-time call: map and mission loading
+map,Mission::BuildCampaignFilePath,StripExtension,TODO(#608): load-time call: map and mission loading
 map,Mission::BuildMissionList,GetLocalizedString,TODO(#620): sim-to-presentation event or message
-map,Mission::LoadCampaign,OpenMessageBox,TODO(#505): sim-to-presentation event
+map,Mission::LoadCampaign,OpenMessageBox,TODO(#608): load-time call: map and mission loading
 map,Mission::LoadMission,GetLocalizedString,TODO(#620): sim-to-presentation event or message
-map,Mission::LoadMission,MissionConditions::MissionConditions,TODO(#505): sim-to-presentation event
-map,Mission::LoadMission,OpenMessageBox,TODO(#505): sim-to-presentation event
+map,Mission::LoadMission,MissionConditions::MissionConditions,TODO(#608): load-time call: map and mission loading
+map,Mission::LoadMission,OpenMessageBox,TODO(#608): load-time call: map and mission loading
 map,Mission::LoadMission,ShowErrorBox,TODO(#620): sim-to-presentation event or message
-map,Mission::RefreshMapList,LoadMapList,TODO(#505): sim-to-presentation event
-players,AllocScoreTables,ShutdownScoreTables,TODO(#505): sim-to-presentation event
-players,ContinueWatchingCallback,ClearSelectedGadget,TODO(#505): sim-to-presentation event
-players,ContinueWatchingCallback,IsGadgetNamed,TODO(#505): sim-to-presentation event
-players,ContinueWatchingCallback,PlaySoundByName,TODO(#505): sim-to-presentation event
-players,ContinueWatchingCallback,ReportGameEvent,TODO(#505): sim-to-presentation event
-players,UpdatePlayersOnStream,LoadGuiLayer,TODO(#505): sim-to-presentation event
-players,UpdatePlayersOnStream,OpenMessageBox,TODO(#505): sim-to-presentation event
-players,UpdatePlayersOnStream,RenderLayer,TODO(#505): sim-to-presentation event
-players,UpdatePlayersOnStream,SetKeyboardInput,TODO(#505): sim-to-presentation event
-players,UpdatePlayersOnStream,SetTranslatedTextByName,TODO(#505): sim-to-presentation event
+map,Mission::RefreshMapList,LoadMapList,TODO(#608): load-time call: map and mission loading
+players,AllocScoreTables,ShutdownScoreTables,TODO(#608): load-time asset call: callbacks given to the reporter library
+players,ContinueWatchingCallback,ClearSelectedGadget,TODO(#608): presentation code in a tick: the continue-watching dialog and its handler
+players,ContinueWatchingCallback,IsGadgetNamed,TODO(#608): presentation code in a tick: the continue-watching dialog and its handler
+players,ContinueWatchingCallback,PlaySoundByName,TODO(#608): presentation code in a tick: the continue-watching dialog and its handler
+players,ContinueWatchingCallback,ReportGameEvent,TODO(#608): presentation code in a tick: the continue-watching dialog and its handler
+players,UpdatePlayersOnStream,LoadGuiLayer,TODO(#608): presentation code in a tick: a dialog built in a local-player branch
+players,UpdatePlayersOnStream,OpenMessageBox,TODO(#608): presentation code in a tick: a dialog built in a local-player branch
+players,UpdatePlayersOnStream,RenderLayer,TODO(#608): presentation code in a tick: a dialog built in a local-player branch
+players,UpdatePlayersOnStream,SetKeyboardInput,TODO(#608): presentation code in a tick: a dialog built in a local-player branch
+players,UpdatePlayersOnStream,SetTranslatedTextByName,TODO(#608): presentation code in a tick: a dialog built in a local-player branch
 units,ApplyUnitDeath,FreeObjectState,TODO(#608): graphics or load-time asset through a seam
 units,ApplyUnitDeath,RemoveSpeechOfUnit,TODO(#620): sim-to-presentation event or message
 units,CobScript::SetCob,GetCobChecksum,TODO(#608): graphics or load-time asset through a seam
 units,CreateUnitCorpse,EmitSmoke,TODO(#620): sim-to-presentation event or message
 units,FreeUnitTypes,FreeCobScript,TODO(#608): graphics or load-time asset through a seam
-units,FreeUnitTypes,UnitTable::Destroy,TODO(#505): sim-to-presentation event
-units,GetSweetSpot,UpdateObjectState,TODO(#505): sim-to-presentation event
-units,InitUnitScript,CreateObjectState,TODO(#505): sim-to-presentation event
+units,FreeUnitTypes,UnitTable::Destroy,"TODO(#608): load-time asset call: model, sound and cache loading"
+units,GetSweetSpot,UpdateObjectState,TODO(#608): sim helper: COB piece transforms that sim stores
+units,InitUnitScript,CreateObjectState,TODO(#608): sim helper: COB piece transforms that sim stores
 units,InitUnitScript,CreatePlayerObjectState,TODO(#608): graphics or load-time asset through a seam
 units,LoadUnitFbi,GetLocalizedString,TODO(#620): sim-to-presentation event or message
 units,LoadUnitInfo,GetLocalizedString,TODO(#620): sim-to-presentation event or message
 units,LoadUnitInfo,ShowErrorBox,TODO(#620): sim-to-presentation event or message
 units,LoadUnitTypes,BindModelTextures,TODO(#608): graphics or load-time asset through a seam
 units,LoadUnitTypes,GetObjectHeight,TODO(#608): graphics or load-time asset through a seam
-units,LoadUnitTypes,Load3do,TODO(#505): sim-to-presentation event
+units,LoadUnitTypes,Load3do,"TODO(#608): load-time asset call: model, sound and cache loading"
 units,LoadUnitTypes,LoadCobScript,TODO(#608): graphics or load-time asset through a seam
 units,LoadUnitTypes,MirrorObject,TODO(#608): graphics or load-time asset through a seam
-units,LoadUnitTypes,StripExtension,TODO(#505): sim-to-presentation event
-units,LoadUnitTypes,UnitTable::Construct,TODO(#505): sim-to-presentation event
-units,LoadUnitTypes,UnitTable::Initialize,TODO(#505): sim-to-presentation event
-units,PoseUnitModel,UpdateObjectState,TODO(#505): sim-to-presentation event
+units,LoadUnitTypes,StripExtension,"TODO(#608): load-time asset call: model, sound and cache loading"
+units,LoadUnitTypes,UnitTable::Construct,"TODO(#608): load-time asset call: model, sound and cache loading"
+units,LoadUnitTypes,UnitTable::Initialize,"TODO(#608): load-time asset call: model, sound and cache loading"
+units,PoseUnitModel,UpdateObjectState,TODO(#608): sim helper: COB piece transforms that sim stores
 units,ReadUnitState,CreateUnitFromPacket,TODO(#621): unit made from a packet by the network layer
 units,ReceiveUnitStates,CreateUnitFromPacket,TODO(#621): unit made from a packet by the network layer
 units,ReloadUnitType,FreeCobScript,TODO(#608): graphics or load-time asset through a seam
 units,ReloadUnitType,LoadCobScript,TODO(#608): graphics or load-time asset through a seam
 units,UnitScript::EmitSfx,EmitBlackSmoke,TODO(#620): sim-to-presentation event or message
 units,UnitScript::EmitSfx,EmitWhiteSmoke,TODO(#620): sim-to-presentation event or message
-units,UnitScript::EmitSfx,UpdateObjectState,TODO(#505): sim-to-presentation event
-units,UpdateAllUnits,CycleCameraFollow,TODO(#505): sim-to-presentation event
-units,UpdateAllUnits,CycleSelection,TODO(#505): sim-to-presentation event
-units,UpdateAllUnits,IsKeyDown,TODO(#505): sim-to-presentation event
+units,UnitScript::EmitSfx,UpdateObjectState,"TODO(#608): sim helper: COB piece transforms that sim stores (its visibility check gates the call, so it moves with it)"
+units,UpdateAllUnits,CycleCameraFollow,TODO(#608): presentation code in a tick: the camera follow block
+units,UpdateAllUnits,CycleSelection,TODO(#608): presentation code in a tick: the camera follow block
+units,UpdateAllUnits,IsKeyDown,TODO(#608): presentation code in a tick: the camera follow block
 weapons,AddExplosionEffect,EmitSmoke,TODO(#620): sim-to-presentation event or message
 weapons,AddExplosionEffect,InitGafSequence,TODO(#608): graphics or load-time asset through a seam
 weapons,BreakPieceIntoDebris,GetGafFrame,TODO(#608): graphics or load-time asset through a seam
-weapons,BuildExplosionFrame,AllocFrame,TODO(#505): sim-to-presentation event
+weapons,BuildExplosionFrame,AllocFrame,"TODO(#608): load-time asset call: model, sound and cache loading"
 weapons,DetonateProjectile,EmitWhiteSmoke,TODO(#620): sim-to-presentation event or message
 weapons,DetonateProjectile,PlaySoundAt,TODO(#620): sim-to-presentation event or message
-weapons,FreeExplosions,VDebrisCache::?$CacheCore::FreeCache,TODO(#505): sim-to-presentation event
-weapons,InitExplosions,BuildLensFrame,TODO(#505): sim-to-presentation event
-weapons,InitExplosions,DebrisCache::InitSimCache,TODO(#505): sim-to-presentation event
+weapons,FreeExplosions,VDebrisCache::?$CacheCore::FreeCache,"TODO(#608): load-time asset call: model, sound and cache loading"
+weapons,InitExplosions,BuildLensFrame,"TODO(#608): load-time asset call: model, sound and cache loading"
+weapons,InitExplosions,DebrisCache::InitSimCache,"TODO(#608): load-time asset call: model, sound and cache loading"
 weapons,InitProjectile,PlaySoundAt,TODO(#620): sim-to-presentation event or message
 weapons,LoadWeaponType,BindModelTextures,TODO(#608): graphics or load-time asset through a seam
 weapons,LoadWeaponType,FindGafEntry,TODO(#608): graphics or load-time asset through a seam
-weapons,LoadWeaponType,Load3do,TODO(#505): sim-to-presentation event
-weapons,LoadWeaponType,LoadSoundByName,TODO(#505): sim-to-presentation event
+weapons,LoadWeaponType,Load3do,"TODO(#608): load-time asset call: model, sound and cache loading"
+weapons,LoadWeaponType,LoadSoundByName,"TODO(#608): load-time asset call: model, sound and cache loading"
 weapons,LoadWeaponType,MirrorObject,TODO(#608): graphics or load-time asset through a seam
-weapons,StartExplodePiece,VDebrisCache::?$CacheCore::AllocHandle,TODO(#505): sim-to-presentation event
+weapons,StartExplodePiece,VDebrisCache::?$CacheCore::AllocHandle,"TODO(#608): load-time asset call: model, sound and cache loading"
 weapons,UpdateExplodedPiece,EmitSmoke,TODO(#620): sim-to-presentation event or message
 weapons,UpdateExplodedPiece,InitGafSequence,TODO(#608): graphics or load-time asset through a seam
 weapons,UpdateExplosions,EmitSmoke,TODO(#620): sim-to-presentation event or message

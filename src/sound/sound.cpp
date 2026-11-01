@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../units/squad.h"
+#include "../../interfaces/ref.h"
 
 #include "sound.h"
 #include "../util/tdf.h"

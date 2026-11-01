@@ -1264,8 +1264,10 @@ static void RoundTripBlock()
 {
     unsigned char* old = (unsigned char*)SimBlockBase();
     unsigned char* copy = (unsigned char*)host_mem_alloc(kSimBlockBytes);
-    if (copy == nullptr)
-        Fail("testmode: no memory for the roundtrip copy of the block\n");
+    if (copy == nullptr || old == nullptr) {
+        Fail("testmode: no block or no memory for the roundtrip copy of it\n");
+        return;
+    }
     memcpy(copy, old, kSimBlockBytes);
     if (ModulesMemory()->base != nullptr) {
         memset(old, 0xcd, kSimBlockBytes);
@@ -1274,8 +1276,10 @@ static void RoundTripBlock()
         void* fresh = host_mem_reserve(kSimBlockBytes);
         if (fresh != nullptr)
             fresh = host_mem_commit(fresh, kSimBlockBytes);
-        if (fresh == nullptr)
+        if (fresh == nullptr) {
             Fail("testmode: no memory for the roundtrip block\n");
+            return;
+        }
         memcpy(fresh, copy, kSimBlockBytes);
         memset(old, 0xcd, kSimBlockBytes);
         SimBlockAttach(fresh);

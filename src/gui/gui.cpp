@@ -3024,6 +3024,7 @@ void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
 void __stdcall DrawLineGadget(Gui* obj, int index, unsigned int param3);
 int __stdcall HandleLabelInput(Gui* obj, int index, int key);
 #include "../graphics/object_pool.h"
+#include "../state/block.h"
 int __stdcall SelectFontForEntry(void* entries, int index);
 
 static inline int GetTextPixelWidth(char* text)

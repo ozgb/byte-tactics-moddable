@@ -13,7 +13,6 @@
 #include "../frontend/net_game_flag_low_bits.h"
 #include "../frontend/connection_info.h"
 #include "../frontend/track_option_flags.h"
-#include "../frontend/options_slider_menu.h"
 #include "../frontend/player_info_entry.h"
 #include "../../include/v4i.h"
 #include "../graphics/object3do.h"
@@ -224,7 +223,7 @@ struct Game {
             char pad_2855[331];
         };
         struct {
-            OptionsSliderMenu menu_519_1c;
+            char menu_519_1c[28];
             char unknown_535_a[5802];
             PlayerGrid players_1bdf[10];
             char pad_28cd[211];

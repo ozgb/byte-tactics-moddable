@@ -21,7 +21,6 @@
 #include "../frontend/connection_blob.h"
 #include "../frontend/connection_info.h"
 #include "../frontend/net_game_flag_low_bits.h"
-#include "../frontend/options_slider_menu.h"
 #include "../frontend/player_info_entry.h"
 #include "../frontend/track_option_flags.h"
 #include "../game/all_missions_flags.h"
@@ -1686,9 +1685,6 @@ static_assert(offsetof(OpenHeap, used) == 12, "");
 static_assert(offsetof(OpenHeap, capacity) == 16, "");
 static_assert(offsetof(OpenHeap, count) == 20, "");
 static_assert(offsetof(OpenHeap, topPopped) == 24, "");
-static_assert(sizeof(OptionsSliderMenu) == 28, "");
-static_assert(offsetof(OptionsSliderMenu, unknown_0) == 0, "");
-static_assert(offsetof(OptionsSliderMenu, holder) == 24, "");
 static_assert(sizeof(Order) == 86, "");
 static_assert(offsetof(Order, kind) == 4, "");
 static_assert(offsetof(Order, state) == 5, "");

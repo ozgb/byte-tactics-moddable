@@ -5123,6 +5123,7 @@ int __stdcall UpdateMenu(Gui* menu)
 void __stdcall SetCurrentGuiContext(Gui* ctx)
 {
     g_guiContext = ctx;
+    SimBlockTrack(reinterpret_cast<void**>(&g_guiContext));
     ctx->layer = 0;
     ctx->str_9b6[0] = 0;
     ctx->str_ab6[0] = 0;

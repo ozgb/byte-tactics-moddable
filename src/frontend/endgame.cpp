@@ -139,6 +139,7 @@ void CreateGameObject()
     memset(mem, 0, sizeof(Game));
     AllocNotifyNop((int)mem);
     g_game = new (mem) Game;
+    SimBlockTrack(reinterpret_cast<void**>(&g_game));
 }
 
 // FUNCTION: 0x41d9f0

@@ -166,12 +166,61 @@ unsigned char* g_windowed;
 int g_windowedWidth;
 int g_windowedHeight;
 bool g_windowedPalette;
+unsigned char g_paletteEntries[256 * 4];
+unsigned char* g_presented;
+int g_presentedWidth;
+int g_presentedHeight;
+
+void FreePresented()
+{
+    free(g_presented);
+    g_presented = NULL;
+    g_presentedWidth = 0;
+    g_presentedHeight = 0;
+}
+
+void CopyPresented()
+{
+    const unsigned char* source;
+    int width;
+    int height;
+    int pitch;
+
+    if (g_windowed != NULL && !g_displayOpen) {
+        source = g_windowed;
+        width = g_windowedWidth;
+        height = g_windowedHeight;
+        pitch = (g_windowedWidth + 3) & ~3;
+    } else {
+        source = g_hasBack ? g_back : g_front;
+        width = g_width;
+        height = g_height;
+        pitch = g_width;
+    }
+    if (source == NULL) {
+        return;
+    }
+    if (g_presented == NULL || g_presentedWidth != width || g_presentedHeight != height) {
+        FreePresented();
+        g_presented = (unsigned char*)malloc((size_t)width * (size_t)height);
+        if (g_presented == NULL) {
+            return;
+        }
+        g_presentedWidth = width;
+        g_presentedHeight = height;
+    }
+    for (int row = 0; row < height; row++) {
+        memcpy(g_presented + (size_t)row * (size_t)width, source + (size_t)row * (size_t)pitch, (size_t)width);
+    }
+}
 
 void FreeWindowed()
 {
     free(g_windowed);
     g_windowed = NULL;
     g_windowedPalette = false;
+    FreePresented();
+    memset(g_paletteEntries, 0, sizeof(g_paletteEntries));
 }
 
 bool WindowedPaletteActive()
@@ -188,6 +237,8 @@ void FreeFrames()
     g_hasPrimary = false;
     g_hasBack = false;
     g_hasPalette = false;
+    FreePresented();
+    memset(g_paletteEntries, 0, sizeof(g_paletteEntries));
 }
 
 unsigned char* Frame(int which)
@@ -475,7 +526,11 @@ int HeadlessFrameUnlock(int which)
 int HeadlessFramePresent(int flip)
 {
     (void)flip;
-    return g_displayOpen || g_windowed != NULL ? HOST_FRAME_OK : HOST_FRAME_FAILED;
+    if (!g_displayOpen && g_windowed == NULL) {
+        return HOST_FRAME_FAILED;
+    }
+    CopyPresented();
+    return HOST_FRAME_OK;
 }
 
 int HeadlessFramePresentRect(int x, int y, int width, int height)
@@ -484,7 +539,11 @@ int HeadlessFramePresentRect(int x, int y, int width, int height)
     (void)y;
     (void)width;
     (void)height;
-    return g_windowed != NULL ? HOST_FRAME_OK : HOST_FRAME_FAILED;
+    if (g_windowed == NULL) {
+        return HOST_FRAME_FAILED;
+    }
+    CopyPresented();
+    return HOST_FRAME_OK;
 }
 
 int HeadlessFrameIsLost()
@@ -528,61 +587,65 @@ int HeadlessFrameText(int which, void* font, int x, int y, const char* text, int
 
 int HeadlessFrameRead(unsigned char* pixels, int pitch, unsigned char* palette)
 {
-    if (Frame(HOST_FRAME_BACK) == NULL && g_windowed != NULL) {
-        for (int row = 0; row < g_windowedHeight; row++) {
-            memcpy(pixels + row * pitch, g_windowed + row * ((g_windowedWidth + 3) & ~3), (size_t)g_windowedWidth);
-        }
-        memset(palette, 0, 256 * 4);
-        return g_windowedPalette ? 1 : 0;
-    }
-    if (Frame(HOST_FRAME_BACK) == NULL) {
+    int width;
+    int height;
+
+    if (g_windowed != NULL && !g_displayOpen) {
+        width = g_windowedWidth;
+        height = g_windowedHeight;
+    } else if (Frame(HOST_FRAME_BACK) != NULL || Frame(HOST_FRAME_FRONT) != NULL) {
+        width = g_width;
+        height = g_height;
+    } else {
         return 0;
     }
-    for (int row = 0; row < g_height; row++) {
-        memset(pixels + row * pitch, 0, (size_t)g_width);
+    for (int row = 0; row < height; row++) {
+        if (g_presented != NULL && g_presentedWidth == width && g_presentedHeight == height) {
+            memcpy(pixels + row * pitch, g_presented + (size_t)row * (size_t)width, (size_t)width);
+        } else {
+            memset(pixels + row * pitch, 0, (size_t)width);
+        }
     }
-    memset(palette, 0, 256 * 4);
+    memcpy(palette, g_paletteEntries, sizeof(g_paletteEntries));
     return 1;
 }
 
 int HeadlessPaletteCreate(const unsigned char* entries)
 {
-    (void)entries;
     if (WindowedPaletteActive()) {
         g_windowedPalette = true;
+        memcpy(g_paletteEntries, entries, sizeof(g_paletteEntries));
         return 1;
     }
     if (!g_displayOpen || !g_hasPrimary) {
         return 0;
     }
     g_hasPalette = true;
+    memcpy(g_paletteEntries, entries, sizeof(g_paletteEntries));
     return 1;
 }
 
 int HeadlessPaletteSet(int start, int count, const unsigned char* entries)
 {
-    (void)start;
-    (void)count;
-    (void)entries;
-    if (WindowedPaletteActive()) {
-        return g_windowedPalette ? 1 : 0;
+    bool active = WindowedPaletteActive() ? g_windowedPalette : g_hasPalette;
+
+    if (!active) {
+        return 0;
     }
-    return g_hasPalette ? 1 : 0;
+    if (start >= 0 && count >= 0 && start + count <= 256) {
+        memcpy(g_paletteEntries + start * 4, entries, (size_t)count * 4);
+    }
+    return 1;
 }
 
 int HeadlessPaletteGet(unsigned char* entries)
 {
-    if (WindowedPaletteActive()) {
-        if (!g_windowedPalette) {
-            return 0;
-        }
-        memset(entries, 0, 256 * 4);
-        return 1;
-    }
-    if (!g_hasPalette) {
+    bool active = WindowedPaletteActive() ? g_windowedPalette : g_hasPalette;
+
+    if (!active) {
         return 0;
     }
-    memset(entries, 0, 256 * 4);
+    memcpy(entries, g_paletteEntries, sizeof(g_paletteEntries));
     return 1;
 }
 

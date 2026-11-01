@@ -26,6 +26,9 @@ void* g_windowedBits;
 int g_windowedWidth;
 int g_windowedHeight;
 unsigned char g_windowedEntries[256 * 4];
+bool g_presentedFront;
+LONG g_dumpRequested;
+unsigned int g_dumpIndex;
 
 IDirectDrawSurface* Frame(int which)
 {
@@ -184,6 +187,88 @@ int WindowedSetUp(int width, int height, const unsigned char* palette)
         WindowedPaletteCreate(palette);
     }
     return HOST_DISPLAY_OK;
+}
+
+bool ReadPresented(unsigned char* pixels, int pitch, int* width, int* height)
+{
+    if (WindowedBackActive()) {
+        for (int row = 0; row < g_windowedHeight; row++) {
+            memcpy(pixels + row * pitch, (unsigned char*)g_windowedBits + row * ((g_windowedWidth + 3) & ~3), g_windowedWidth);
+        }
+        *width = g_windowedWidth;
+        *height = g_windowedHeight;
+        return true;
+    }
+    IDirectDrawSurface* surface = g_presentedFront ? g_primary : g_back;
+    DDSURFACEDESC desc;
+
+    if (!surface) {
+        return false;
+    }
+    memset(&desc, 0, sizeof(desc));
+    desc.dwSize = sizeof(desc);
+    if (surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY, 0) != DD_OK) {
+        return false;
+    }
+    for (int row = 0; row < g_height; row++) {
+        memcpy(pixels + row * pitch, (unsigned char*)desc.lpSurface + row * desc.lPitch, g_width);
+    }
+    surface->Unlock(0);
+    *width = g_width;
+    *height = g_height;
+    return true;
+}
+
+void WriteDump()
+{
+    const int width = WindowedBackActive() ? g_windowedWidth : g_width;
+    const int height = WindowedBackActive() ? g_windowedHeight : g_height;
+    const size_t size = 16 + 256 * 4 + (size_t)width * (size_t)height;
+    unsigned char* data;
+    unsigned char palette[256 * 4];
+    int readWidth;
+    int readHeight;
+    char name[32];
+    DWORD written;
+    HANDLE file;
+
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+    data = (unsigned char*)malloc(size);
+    if (!data) {
+        return;
+    }
+    memset(data, 0, 16 + 256 * 4);
+    if (!ReadPresented(data + 16 + 256 * 4, width, &readWidth, &readHeight) || readWidth != width || readHeight != height) {
+        free(data);
+        return;
+    }
+    memset(palette, 0, sizeof(palette));
+    host_palette_get(palette);
+    memcpy(data, "BTFR", 4);
+    data[4] = 1;
+    data[6] = (unsigned char)width;
+    data[7] = (unsigned char)(width >> 8);
+    data[8] = (unsigned char)height;
+    data[9] = (unsigned char)(height >> 8);
+    memcpy(data + 16, palette, sizeof(palette));
+    CreateDirectoryA("frames", 0);
+    wsprintfA(name, "frames\\%u.bin", g_dumpIndex);
+    file = CreateFileA(name, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+    if (file != INVALID_HANDLE_VALUE) {
+        WriteFile(file, data, (DWORD)size, &written, 0);
+        CloseHandle(file);
+        g_dumpIndex++;
+    }
+    free(data);
+}
+
+void DumpIfRequested(int result)
+{
+    if (result == HOST_FRAME_OK && InterlockedExchange(&g_dumpRequested, 0)) {
+        WriteDump();
+    }
 }
 
 struct ModeCollector {
@@ -410,10 +495,17 @@ extern "C" int HOST_CALL host_frame_present(int flip)
 {
     if (HostHeadless()) return HeadlessFramePresent(flip);
     if (WindowedBackActive()) {
-        return WindowedPresent(0, 0, g_windowedWidth, g_windowedHeight);
+        int shown = WindowedPresent(0, 0, g_windowedWidth, g_windowedHeight);
+        DumpIfRequested(shown);
+        return shown;
     }
     if (flip) {
-        return Result(g_primary->Flip(0, 1));
+        int flipped = Result(g_primary->Flip(0, 1));
+        if (flipped == HOST_FRAME_OK) {
+            g_presentedFront = true;
+        }
+        DumpIfRequested(flipped);
+        return flipped;
     }
     RECT rect;
     POINT pt;
@@ -424,13 +516,20 @@ extern "C" int HOST_CALL host_frame_present(int flip)
     RECT src = rect;
     ClientToScreen(hwnd, &pt);
     OffsetRect(&rect, pt.x, pt.y);
-    return Result(g_primary->Blt(&rect, g_back, &src, 0x1000000, 0));
+    int blitted = Result(g_primary->Blt(&rect, g_back, &src, 0x1000000, 0));
+    if (blitted == HOST_FRAME_OK) {
+        g_presentedFront = false;
+    }
+    DumpIfRequested(blitted);
+    return blitted;
 }
 
 extern "C" int HOST_CALL host_frame_present_rect(int x, int y, int width, int height)
 {
     if (HostHeadless()) return HeadlessFramePresentRect(x, y, width, height);
-    return WindowedPresent(x, y, width, height);
+    int shown = WindowedPresent(x, y, width, height);
+    DumpIfRequested(shown);
+    return shown;
 }
 
 extern "C" int HOST_CALL host_frame_is_lost(void)
@@ -499,17 +598,19 @@ extern "C" int HOST_CALL host_frame_text(int which, void* font, int x, int y, co
 extern "C" int HOST_CALL host_frame_read(unsigned char* pixels, int pitch, unsigned char* palette)
 {
     if (HostHeadless()) return HeadlessFrameRead(pixels, pitch, palette);
-    host_frame frame;
+    int width;
+    int height;
 
-    if (host_frame_lock(HOST_FRAME_BACK, &frame) != HOST_FRAME_OK) {
+    if (!ReadPresented(pixels, pitch, &width, &height)) {
         return 0;
     }
-    for (int row = 0; row < frame.height; row++) {
-        memcpy(pixels + row * pitch, frame.pixels + row * frame.pitch, frame.width);
-    }
-    host_frame_unlock(HOST_FRAME_BACK);
     memset(palette, 0, 256 * 4);
     return host_palette_get(palette);
+}
+
+void HostFrameDumpRequest()
+{
+    InterlockedExchange(&g_dumpRequested, 1);
 }
 
 extern "C" int HOST_CALL host_palette_create(const unsigned char* entries)

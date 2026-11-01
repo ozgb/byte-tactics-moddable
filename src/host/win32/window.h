@@ -4,5 +4,6 @@
 #include "../../../include/win_types.h"
 
 HWND __stdcall host_win32_window(void);
+void HostFrameDumpRequest();
 
 #endif

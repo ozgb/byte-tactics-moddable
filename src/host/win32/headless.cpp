@@ -174,7 +174,7 @@ int g_presentedHeight;
 void FreePresented()
 {
     free(g_presented);
-    g_presented = NULL;
+    g_presented = nullptr;
     g_presentedWidth = 0;
     g_presentedHeight = 0;
 }
@@ -186,7 +186,7 @@ void CopyPresented(bool front)
     int height;
     int pitch;
 
-    if (g_windowed != NULL && !g_displayOpen) {
+    if (g_windowed != nullptr && !g_displayOpen) {
         source = g_windowed;
         width = g_windowedWidth;
         height = g_windowedHeight;
@@ -197,13 +197,13 @@ void CopyPresented(bool front)
         height = g_height;
         pitch = g_width;
     }
-    if (source == NULL) {
+    if (source == nullptr) {
         return;
     }
-    if (g_presented == NULL || g_presentedWidth != width || g_presentedHeight != height) {
+    if (g_presented == nullptr || g_presentedWidth != width || g_presentedHeight != height) {
         FreePresented();
         g_presented = (unsigned char*)malloc((size_t)width * (size_t)height);
-        if (g_presented == NULL) {
+        if (g_presented == nullptr) {
             return;
         }
         g_presentedWidth = width;
@@ -517,19 +517,19 @@ int HeadlessFrameLock(int which, host_frame* frame)
 
 int HeadlessFrameUnlock(int which)
 {
-    if (which == HOST_FRAME_BACK && Frame(which) == NULL && g_windowed != NULL) {
+    if (which == HOST_FRAME_BACK && Frame(which) == nullptr && g_windowed != nullptr) {
         return 1;
     }
-    if (which == HOST_FRAME_FRONT && Frame(which) != NULL) {
+    if (which == HOST_FRAME_FRONT && Frame(which) != nullptr) {
         CopyPresented(true);
     }
-    return Frame(which) != NULL ? 1 : 0;
+    return Frame(which) != nullptr ? 1 : 0;
 }
 
 int HeadlessFramePresent(int flip)
 {
     (void)flip;
-    if (!g_displayOpen && g_windowed == NULL) {
+    if (!g_displayOpen && g_windowed == nullptr) {
         return HOST_FRAME_FAILED;
     }
     CopyPresented(false);
@@ -542,7 +542,7 @@ int HeadlessFramePresentRect(int x, int y, int width, int height)
     (void)y;
     (void)width;
     (void)height;
-    if (g_windowed == NULL) {
+    if (g_windowed == nullptr) {
         return HOST_FRAME_FAILED;
     }
     CopyPresented(false);
@@ -593,17 +593,17 @@ int HeadlessFrameRead(unsigned char* pixels, int pitch, unsigned char* palette)
     int width;
     int height;
 
-    if (g_windowed != NULL && !g_displayOpen) {
+    if (g_windowed != nullptr && !g_displayOpen) {
         width = g_windowedWidth;
         height = g_windowedHeight;
-    } else if (Frame(HOST_FRAME_BACK) != NULL || Frame(HOST_FRAME_FRONT) != NULL) {
+    } else if (Frame(HOST_FRAME_BACK) != nullptr || Frame(HOST_FRAME_FRONT) != nullptr) {
         width = g_width;
         height = g_height;
     } else {
         return 0;
     }
     for (int row = 0; row < height; row++) {
-        if (g_presented != NULL && g_presentedWidth == width && g_presentedHeight == height) {
+        if (g_presented != nullptr && g_presentedWidth == width && g_presentedHeight == height) {
             memcpy(pixels + row * pitch, g_presented + (size_t)row * (size_t)width, (size_t)width);
         } else {
             memset(pixels + row * pitch, 0, (size_t)width);

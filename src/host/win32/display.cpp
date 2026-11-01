@@ -1,4 +1,8 @@
 #include <windows.h>
+#include <winbase.h>
+#include <wingdi.h>
+#include <winnt.h>
+#include <winuser.h>
 #include <ddraw.h>
 #include <stdlib.h>
 #include <string.h>
@@ -205,13 +209,13 @@ bool ReadPresented(unsigned char* pixels, int pitch, int* width, int* height)
     }
     memset(&desc, 0, sizeof(desc));
     desc.dwSize = sizeof(desc);
-    if (surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY, 0) != DD_OK) {
+    if (surface->Lock(nullptr, &desc, DDLOCK_WAIT | DDLOCK_READONLY, nullptr) != DD_OK) {
         return false;
     }
     for (int row = 0; row < g_height; row++) {
         memcpy(pixels + row * pitch, (unsigned char*)desc.lpSurface + row * desc.lPitch, g_width);
     }
-    surface->Unlock(0);
+    surface->Unlock(nullptr);
     *width = g_width;
     *height = g_height;
     return true;
@@ -251,11 +255,11 @@ void WriteDump()
     data[8] = (unsigned char)height;
     data[9] = (unsigned char)(height >> 8);
     memcpy(data + 16, palette, sizeof(palette));
-    CreateDirectoryA("frames", 0);
+    CreateDirectoryA("frames", nullptr);
     wsprintfA(name, "frames\\%u.bin", g_dumpIndex);
-    file = CreateFileA(name, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+    file = CreateFileA(name, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (file != INVALID_HANDLE_VALUE) {
-        WriteFile(file, data, (DWORD)size, &written, 0);
+        WriteFile(file, data, (DWORD)size, &written, nullptr);
         CloseHandle(file);
         g_dumpIndex++;
     }

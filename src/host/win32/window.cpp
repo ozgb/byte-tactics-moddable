@@ -1,4 +1,7 @@
 #include <windows.h>
+#include <winbase.h>
+#include <winnt.h>
+#include <winuser.h>
 #include <string.h>
 
 #include "../../../interfaces/host.h"
@@ -24,7 +27,7 @@ bool FrameDumpEnabled()
     if (state == 0) {
         const char* cmd = GetCommandLineA();
         bool found = false;
-        for (const char* p = cmd; cmd != NULL && *p != '\0' && !found; p++) {
+        for (const char* p = cmd; cmd != nullptr && *p != '\0' && !found; p++) {
             found = (p[0] == '-' || p[0] == '/') && _strnicmp(p + 1, "framedump", 9) == 0
                 && (p[10] == '\0' || p[10] == ' ' || p[10] == '\t') && (p == cmd || p[-1] == ' ' || p[-1] == '\t');
         }

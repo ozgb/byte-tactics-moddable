@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <windef.h>
 #include <winbase.h>
 #include <wingdi.h>
 #include <winnt.h>

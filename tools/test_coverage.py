@@ -486,6 +486,12 @@ class UnstableTest(unittest.TestCase):
                                                            "?MouseThreadProc@@YAXH@Z")]
         self.assertIn("wall-clock", reason)
 
+    def test_gui_message_functions_are_marked_unstable_in_the_baseline(self):
+        keys = cov.unstable_keys(cov.read_csv(cov.OUT))
+        for name, file, decorated in (("IsMouseButtonMessage", "src/gui/dialogs.cpp", "?IsMouseButtonMessage@@YGHPAUGui@@E@Z"),
+                                      ("HandleLabelInput", "src/gui/gui.cpp", "?HandleLabelInput@@YGHPAUGui@@HD@Z")):
+            self.assertIn("order Wine delivers GUI messages in", keys[("presentation", name, file, decorated)])
+
     def test_inlined_branch_of_a_marked_presentation_function_is_left_out(self):
         proc = ("MouseThreadProc", "src/gui/mouse.cpp", "?MouseThreadProc@@YAXH@Z")
         export = {"data": [{"functions": [entry(proc[2], proc[1], 1, [region(5, 1, 9, 2, 1)],

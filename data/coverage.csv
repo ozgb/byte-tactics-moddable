@@ -1581,6 +1581,7 @@ presentation,HandleGuiCommand,src/gui/gui.cpp,1,0,0,0,0,0,?HandleGuiCommand@@YGH
 presentation,HandleHelpClick,src/frontend/options.cpp,1,0,0,0,0,0,?HandleHelpClick@@YGXPAUGui@@@Z,0,
 presentation,HandleHotspotInput,src/gui/gui.cpp,1,0,0,0,0,0,?HandleHotspotInput@@YGHPAUGui@@H@Z,0,
 presentation,HandleInGameOptionsClick,src/frontend/options.cpp,1,0,0,0,0,0,?HandleInGameOptionsClick@@YGXPAUGui@@@Z,0,
+presentation,HandleLabelInput,src/gui/gui.cpp,0,0,0,0,0,0,?HandleLabelInput@@YGHPAUGui@@HD@Z,0,unstable: branches follow the order Wine delivers GUI messages in
 presentation,HandleLeftClick,src/ingame/build_placement.cpp,1,0,0,0,0,0,?HandleLeftClick@@YGXPAUMouseEvent@@@Z,0,
 presentation,HandleListBoxInput,src/gui/gui.cpp,1,0,0,0,0,0,?HandleListBoxInput@@YGHPAUGui@@HH@Z,0,
 presentation,HandleLoadListClick,src/frontend/multi.cpp,1,0,0,0,0,0,?HandleLoadListClick@@YGXPAUGui@@@Z,0,
@@ -1670,7 +1671,7 @@ presentation,IsLocalHumanInRefreshBattleRoomRows,src/frontend/multi.cpp,1,0,0,0,
 presentation,IsLocalInHandleBattleRoomClick,src/frontend/multi.cpp,1,0,0,0,0,0,?IsLocalInHandleBattleRoomClick@@YGHPAUPlayer@@@Z,0,
 presentation,IsLocalInRefreshBattleRoomRows,src/frontend/multi.cpp,1,0,0,0,0,0,?IsLocalInRefreshBattleRoomRows@@YGHPAUPlayer@@@Z,0,
 presentation,IsMessageBoxScreen,src/gui/dialogs.cpp,0,0,0,0,0,0,?IsMessageBoxScreen@@YGHPAUGui@@@Z,1,
-presentation,IsMouseButtonMessage,src/gui/dialogs.cpp,1,0,0,0,0,0,?IsMouseButtonMessage@@YGHPAUGui@@E@Z,0,
+presentation,IsMouseButtonMessage,src/gui/dialogs.cpp,0,0,0,0,0,0,?IsMouseButtonMessage@@YGHPAUGui@@E@Z,0,unstable: branches follow the order Wine delivers GUI messages in
 presentation,IsPlayerAlive,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?IsPlayerAlive@@YGHPAUPlayer@@@Z,0,
 presentation,IsPlayerInGame,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?IsPlayerInGame@@YGHPAUPlayer@@@Z,0,
 presentation,IsPlayerTypeInRefreshAlliesScreen,src/frontend/multi.cpp,1,0,0,0,0,0,?IsPlayerTypeInRefreshAlliesScreen@@YGHPAUPlayer@@@Z,0,

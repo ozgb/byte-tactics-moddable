@@ -95,6 +95,66 @@ class WithQuirksTest(unittest.TestCase):
         self.assertEqual(self.rewrite("ticks 5\nmap X"), ["ticks 5", "map X", "quirks 3.1c +x"])
 
 
+class WithRoundtripTest(unittest.TestCase):
+    def rewrite(self, text: str, spec: str) -> list[str]:
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "a.txt"
+            src.write_text(text)
+            copies = reference.with_roundtrip({"a": src}, spec, Path(tmp) / "out")
+            self.assertEqual(src.read_text(), text)
+            return copies["a"].read_text().splitlines()
+
+    def test_listed_ticks_become_lines(self):
+        self.assertEqual(self.rewrite("ticks 50\nmap X", "3,40"), ["ticks 50", "map X", "roundtrip 3", "roundtrip 40"])
+
+    def test_auto_picks_early_middle_and_last_minus_one(self):
+        self.assertEqual(reference.roundtrip_ticks("auto", 200), [20, 100, 199])
+        self.assertEqual(self.rewrite("ticks 200\n", "auto")[1:], ["roundtrip 20", "roundtrip 100", "roundtrip 199"])
+
+    def test_auto_on_a_tiny_scenario_has_no_duplicates(self):
+        self.assertEqual(reference.roundtrip_ticks("auto", 1), [1])
+        self.assertEqual(reference.roundtrip_ticks("auto", 3), [1, 2])
+
+    def test_bad_specs_fail(self):
+        for spec in ("x", "0", "5,0"):
+            with self.assertRaises(SystemExit):
+                reference.roundtrip_ticks(spec, 100)
+
+    def test_a_scenario_without_ticks_fails(self):
+        with self.assertRaises(SystemExit):
+            self.rewrite("map X\n", "auto")
+
+
+class CheckRoundtripTest(unittest.TestCase):
+    def test_scenarios_get_the_lines_and_the_pointer_scan_is_off(self):
+        seen = {}
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            (tmp / "traces").mkdir()
+            (tmp / "traces" / "a.txt").write_text("")
+            (tmp / "a.txt").write_text("ticks 100\nmap X\n")
+            header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
+            stored = (header, [(1, "a" * 16)])
+
+            def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1):
+                seen["text"] = scenarios["a"].read_text()
+                seen["scans"] = scans
+                return {"a": (header, [(1, "a" * 16)], 1.0, None)}
+
+            out = io.StringIO()
+            with mock.patch.object(reference, "scenario_files", lambda: {"a": tmp / "a.txt"}), \
+                    mock.patch.object(reference, "TRACES", tmp / "traces"), \
+                    mock.patch.object(reference.tracedigest, "parse_digest", lambda p: stored), \
+                    mock.patch.object(reference, "play_all", fake_play_all), \
+                    mock.patch.object(reference, "sound_report", lambda *a: ([], [])), \
+                    mock.patch.object(reference, "report_fuel", lambda *a: 0), \
+                    contextlib.redirect_stdout(out):
+                reference.check_traces(Path("x.exe"), None, 1, roundtrip="auto")
+        self.assertEqual(seen["text"], "ticks 100\nmap X\nroundtrip 10\nroundtrip 50\nroundtrip 99\n")
+        self.assertIsNone(seen["scans"])
+        self.assertIn("block pointers: not checked with --roundtrip", out.getvalue())
+
+
 class CheckQuirksTest(unittest.TestCase):
     NAMES = ("eq", "diff", "bad")
     STORED = [(1, "a" * 16), (2, "b" * 16)]

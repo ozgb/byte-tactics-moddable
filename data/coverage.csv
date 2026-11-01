@@ -1204,7 +1204,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1150,491,32331,10273,12048,2673,,295,
+presentation,*,,1150,491,32240,10249,11980,2667,,295,
 presentation,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,src/graphics/memory_cache.h,1,0,0,0,0,0,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,0,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
@@ -1581,6 +1581,7 @@ presentation,HandleGuiCommand,src/gui/gui.cpp,1,0,0,0,0,0,?HandleGuiCommand@@YGH
 presentation,HandleHelpClick,src/frontend/options.cpp,1,0,0,0,0,0,?HandleHelpClick@@YGXPAUGui@@@Z,0,
 presentation,HandleHotspotInput,src/gui/gui.cpp,1,0,0,0,0,0,?HandleHotspotInput@@YGHPAUGui@@H@Z,0,
 presentation,HandleInGameOptionsClick,src/frontend/options.cpp,1,0,0,0,0,0,?HandleInGameOptionsClick@@YGXPAUGui@@@Z,0,
+presentation,HandleLabelInput,src/gui/gui.cpp,0,0,0,0,0,0,?HandleLabelInput@@YGHPAUGui@@HD@Z,0,unstable: branches follow the order Wine delivers GUI messages in
 presentation,HandleLeftClick,src/ingame/build_placement.cpp,1,0,0,0,0,0,?HandleLeftClick@@YGXPAUMouseEvent@@@Z,0,
 presentation,HandleListBoxInput,src/gui/gui.cpp,1,0,0,0,0,0,?HandleListBoxInput@@YGHPAUGui@@HH@Z,0,
 presentation,HandleLoadListClick,src/frontend/multi.cpp,1,0,0,0,0,0,?HandleLoadListClick@@YGXPAUGui@@@Z,0,
@@ -1670,7 +1671,8 @@ presentation,IsLocalHumanInRefreshBattleRoomRows,src/frontend/multi.cpp,1,0,0,0,
 presentation,IsLocalInHandleBattleRoomClick,src/frontend/multi.cpp,1,0,0,0,0,0,?IsLocalInHandleBattleRoomClick@@YGHPAUPlayer@@@Z,0,
 presentation,IsLocalInRefreshBattleRoomRows,src/frontend/multi.cpp,1,0,0,0,0,0,?IsLocalInRefreshBattleRoomRows@@YGHPAUPlayer@@@Z,0,
 presentation,IsMessageBoxScreen,src/gui/dialogs.cpp,0,0,0,0,0,0,?IsMessageBoxScreen@@YGHPAUGui@@@Z,1,
-presentation,IsMouseButtonMessage,src/gui/dialogs.cpp,1,0,0,0,0,0,?IsMouseButtonMessage@@YGHPAUGui@@E@Z,0,
+presentation,IsMouseButtonMessage,src/gui/dialogs.cpp,1,0,0,0,0,0,?IsMouseButtonMessage@@YGHPAUGui@@E@Z,0,unstable: branches follow the order Wine delivers GUI messages in
+presentation,IsMouseButtonMessage,src/gui/dialogs.cpp,0,0,0,0,0,0,?IsMouseButtonMessage@@YGHPAUGui@@E@Z,0,unstable: branches follow the order Wine delivers GUI messages in
 presentation,IsPlayerAlive,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?IsPlayerAlive@@YGHPAUPlayer@@@Z,0,
 presentation,IsPlayerInGame,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?IsPlayerInGame@@YGHPAUPlayer@@@Z,0,
 presentation,IsPlayerTypeInRefreshAlliesScreen,src/frontend/multi.cpp,1,0,0,0,0,0,?IsPlayerTypeInRefreshAlliesScreen@@YGHPAUPlayer@@@Z,0,
@@ -1723,6 +1725,7 @@ presentation,MeasureTextInputText,src/gui/gui.cpp,1,0,0,0,0,0,?MeasureTextInputT
 presentation,MeasureTruncatedText,src/gui/dialogs.cpp,0,0,0,0,0,0,?MeasureTruncatedText@@YGHPAEH@Z,1,
 presentation,MenuEntryNameContains,src/ingame/control_panel.cpp,1,0,0,0,0,0,?MenuEntryNameContains@@YGHPAUGadget@@PADH@Z,0,
 presentation,MessageBoxHandler,src/gui/dialogs.cpp,1,0,0,0,0,0,?MessageBoxHandler@@YGXPAUGui@@@Z,0,
+presentation,MouseThreadProc,src/gui/mouse.cpp,0,0,0,0,0,0,?MouseThreadProc@@YAXH@Z,0,unstable: branches follow wall-clock sampling (host_time_ms read in the cursor thread)
 presentation,MoveEntryToFront,src/gui/gui.cpp,0,0,0,0,0,0,?MoveEntryToFront@@YGXPAUGadget@@H@Z,1,
 presentation,MoviePlayer::ClearScreen,src/graphics/movies.cpp,0,0,0,0,0,0,?ClearScreen@MoviePlayer@@QAEXXZ,1,
 presentation,MoviePlayer::Close,src/graphics/movies.cpp,1,0,0,0,0,0,?Close@MoviePlayer@@QAEXXZ,0,

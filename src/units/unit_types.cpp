@@ -43,11 +43,12 @@ static inline int FixedField(TdfRecord* record, char* key, int def)
 #include "../../interfaces/services.h"
 
 #include "../orders/mission_type.h"
+#include "../../interfaces/seams.h"
 
 struct MissionHolder {
     char pad[3];
     MissionType mission;
-    MissionHolder(char* text) : mission(text) {}
+    MissionHolder(char* text) : mission(g_seams.orders->MissionTypeFromName(text)) {}
 };
 
 #pragma pack(pop)

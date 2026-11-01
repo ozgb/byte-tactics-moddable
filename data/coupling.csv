@@ -2120,7 +2120,7 @@ orders,platform,call,UnitDef::MetalCost,1
 orders,platform,call,WorldToCell,3
 orders,platform,call,copy,3
 orders,platform,call,operator delete,20
-orders,platform,call,operator new,46
+orders,platform,call,operator new,45
 orders,platform,call,operator-,1
 orders,platform,call,operator==,22
 orders,platform,shared_write,Fixed::value,2
@@ -2183,6 +2183,7 @@ orders,seams,indirect,CanReclaimNative,4
 orders,seams,indirect,CanRepairNative,6
 orders,seams,indirect,ChooseWeaponNative,1
 orders,seams,indirect,ClaimWeaponsNative,24
+orders,seams,indirect,CreatePathfinderNative,1
 orders,seams,indirect,DestroyPathfinderNative,1
 orders,seams,indirect,FindBestTargetIfFireAtWillNative,6
 orders,seams,indirect,FindScriptNative,3
@@ -2203,6 +2204,7 @@ orders,seams,indirect,StartScriptWithArgsNative,3
 orders,seams,indirect,UnitRefUnlinkNative,4
 orders,seams,indirect,UpdateSfxOccupyNative,1
 orders,seams,indirect,VisitObjectsInRangeNative,3
+orders,seams,shared_write,Game::pathfinder,1
 orders,seams,shared_write,Vec3::x,1
 orders,targeting,indirect,ClearWeaponTarget,5
 orders,targeting,indirect,GetWeaponTargetUnit,3
@@ -2987,6 +2989,7 @@ players,presentation,shared_write,UnitWeaponSlot::stockpile,1
 players,presentation,shared_write,Vec3::x,43
 players,presentation,shared_write,Vec3::y,44
 players,presentation,shared_write,Vec3::z,42
+players,seams,indirect,CreateSquadManagerNative,1
 players,seams,indirect,GetCellMeanHeightNative,1
 players,seams,indirect,GetGameTypeNative,8
 players,seams,indirect,GetNameSlotNative,1
@@ -2998,6 +3001,7 @@ players,seams,indirect,SpendMetalNative,1
 players,seams,indirect,SquadManagerDeleteTimersNative,1
 players,seams,indirect,SquadManagerTickIfActiveNative,1
 players,seams,indirect,VisitObjectsInRangeNative,1
+players,seams,shared_write,Player::ai,1
 players,seams,shared_write,Vec3::x,1
 players,targeting,shared_write,Player::active,1
 players,targeting,shared_write,Player::type,1
@@ -3748,6 +3752,7 @@ seams,ai,shared_write,MapSeam::GetGameType,1
 seams,ai,shared_write,OrdersSeam::DeleteOrders,1
 seams,ai,shared_write,OrdersSeam::GetOrderFlags,1
 seams,ai,shared_write,OrdersSeam::IssueAttackOrder,1
+seams,ai,shared_write,Player::ai,2
 seams,ai,shared_write,Seams::economy,4
 seams,ai,shared_write,Seams::los_radar,2
 seams,ai,shared_write,Seams::map,6
@@ -3761,6 +3766,7 @@ seams,ai,shared_write,TargetingSeam::FindWeaponTarget,1
 seams,ai,shared_write,TargetingSeam::GetWeaponTargetUnit,2
 seams,ai,shared_write,TargetingSeam::SetWeaponTargetPos,1
 seams,ai,shared_write,TargetingSeam::SetWeaponTargetUnit,2
+seams,ai,shared_write,Unit::motion,1
 seams,ai,shared_write,UnitsSeam::NotifyUnitRefs,1
 seams,ai,shared_write,UnitsSeam::SetStateBits,2
 seams,ai,shared_write,WeaponsSeam::FindTargetableProjectile,1
@@ -3840,6 +3846,7 @@ seams,files,shared_write,Seams::files,58
 seams,game,shared_write,EconomySeam::UpdateResourceSharing,1
 seams,game,shared_write,FeaturesSeam::GetCellFeature,1
 seams,game,shared_write,FeaturesSeam::UpdateFeatures,1
+seams,game,shared_write,Game::pathfinder,1
 seams,game,shared_write,LosRadarSeam::ClampWorldPosToTerrain,2
 seams,game,shared_write,LosRadarSeam::ExpireEyeballs,1
 seams,game,shared_write,LosRadarSeam::GetMapCell,1
@@ -3862,6 +3869,7 @@ seams,game,shared_write,Seams::players,13
 seams,game,shared_write,Seams::units,15
 seams,game,shared_write,Seams::weapons,3
 seams,game,shared_write,Seams::wind_meteors,5
+seams,game,shared_write,Unit::motion,1
 seams,game,shared_write,UnitsSeam::AttachUnitToPiece,1
 seams,game,shared_write,UnitsSeam::CreateUnit,4
 seams,game,shared_write,UnitsSeam::FindUnitTypeId,4
@@ -3920,8 +3928,10 @@ seams,map,shared_write,Seams::features,1
 seams,map,shared_write,Seams::los_radar,4
 seams,map,shared_write,Seams::players,2
 seams,map,shared_write,Seams::wind_meteors,1
+seams,map,shared_write,Unit::motion,3
 seams,network,shared_write,LosRadarSeam::RevealNewUnit,1
 seams,network,shared_write,Seams::los_radar,1
+seams,network,shared_write,Unit::motion,1
 seams,orders,call,AiSearchGoal::SetWaypoints,1
 seams,orders,call,Order::ReattachFxToUnit,1
 seams,orders,call,Order::SerializeToSave,1
@@ -3936,6 +3946,7 @@ seams,orders,shared_write,EconomySeam::RequestEnergyAndMetal,1
 seams,orders,shared_write,FeaturesSeam::GetCellFeature,1
 seams,orders,shared_write,FeaturesSeam::ReclaimFeature,2
 seams,orders,shared_write,FeaturesSeam::RemoveFeature,1
+seams,orders,shared_write,Game::pathfinder,3
 seams,orders,shared_write,LosRadarSeam::GetMapCellAtPosition,4
 seams,orders,shared_write,LosRadarSeam::GetOriginCellAtPosition,1
 seams,orders,shared_write,LosRadarSeam::UpdateUnitLineOfSight,1
@@ -3959,7 +3970,7 @@ seams,orders,shared_write,Seams::features,3
 seams,orders,shared_write,Seams::los_radar,5
 seams,orders,shared_write,Seams::map,12
 seams,orders,shared_write,Seams::network,5
-seams,orders,shared_write,Seams::pathfinding,3
+seams,orders,shared_write,Seams::pathfinding,4
 seams,orders,shared_write,Seams::players,1
 seams,orders,shared_write,Seams::targeting,20
 seams,orders,shared_write,Seams::units,50
@@ -3970,6 +3981,7 @@ seams,orders,shared_write,TargetingSeam::FindBestTargetIfFireAtWill,6
 seams,orders,shared_write,TargetingSeam::GetWeaponTargetUnit,3
 seams,orders,shared_write,TargetingSeam::SetWeaponTargetPos,3
 seams,orders,shared_write,TargetingSeam::SetWeaponTargetUnit,8
+seams,orders,shared_write,Unit::motion,46
 seams,orders,shared_write,UnitsSeam::AddBuildProgress,5
 seams,orders,shared_write,UnitsSeam::AddRepairProgress,4
 seams,orders,shared_write,UnitsSeam::ApplyUnfinishedBuildDecay,1
@@ -4007,11 +4019,13 @@ seams,pathfinding,shared_write,OrdersSeam::AiSearchGoalSetWaypoints,3
 seams,pathfinding,shared_write,OrdersSeam::OrderFxAddFlags,1
 seams,pathfinding,shared_write,Seams::orders,4
 seams,pathfinding,shared_write,Seams::units,4
+seams,pathfinding,shared_write,Unit::motion,2
 seams,pathfinding,shared_write,UnitsSeam::MovementClassGet,1
 seams,pathfinding,shared_write,UnitsSeam::MovementClassInBounds,1
 seams,pathfinding,shared_write,UnitsSeam::RefreshMovedUnits,1
 seams,pathfinding,shared_write,UnitsSeam::RefreshUnitIfStale,2
 seams,platform,call,operator delete,2
+seams,platform,call,operator new,4
 seams,platform,shared_write,Seams::weapons,2
 seams,platform,shared_write,Seams::wind_meteors,2
 seams,platform,shared_write,WeaponsSeam::SpawnProjectile,1
@@ -4032,6 +4046,7 @@ seams,players,shared_write,EconomySeam::Reset,1
 seams,players,shared_write,EconomySeam::SpendEnergy,1
 seams,players,shared_write,EconomySeam::SpendMetal,1
 seams,players,shared_write,EconomySeam::UpdatePlayerEconomy,1
+seams,players,shared_write,Game::pathfinder,1
 seams,players,shared_write,LosRadarSeam::ClampWorldPosToTerrain,1
 seams,players,shared_write,LosRadarSeam::DrawRadarUnits,1
 seams,players,shared_write,LosRadarSeam::RecalculateLineOfSight,1
@@ -4048,6 +4063,7 @@ seams,players,shared_write,NetworkSeam::SendOwnershipTransfer,1
 seams,players,shared_write,NetworkSeam::SendShareEnergy,1
 seams,players,shared_write,NetworkSeam::SendShareMetal,1
 seams,players,shared_write,PathfindingSeam::RunSearches,1
+seams,players,shared_write,Player::ai,4
 seams,players,shared_write,PlayersSeam::UpdatePlayersOnStream,1
 seams,players,shared_write,Seams::ai,5
 seams,players,shared_write,Seams::economy,4
@@ -4058,6 +4074,7 @@ seams,players,shared_write,Seams::pathfinding,1
 seams,players,shared_write,Seams::players,1
 seams,players,shared_write,Seams::units,6
 seams,players,shared_write,Seams::weapons,3
+seams,players,shared_write,Unit::motion,2
 seams,players,shared_write,UnitsSeam::CreateUnit,2
 seams,players,shared_write,UnitsSeam::FindUnitTypeId,4
 seams,players,shared_write,UnitsSeam::KillUnit,1
@@ -4065,7 +4082,9 @@ seams,players,shared_write,UnitsSeam::SetStateBits,1
 seams,players,shared_write,WeaponsSeam::DamageUnit,2
 seams,players,shared_write,WeaponsSeam::DetonateUnitWeapon,1
 seams,players,shared_write,WeaponsSeam::FindFeatureAtPos,1
+seams,presentation,shared_write,Game::pathfinder,1
 seams,presentation,shared_write,Seams::ai,1
+seams,presentation,shared_write,Unit::motion,2
 seams,targeting,call,FindBestTargetIfFireAtWill,1
 seams,targeting,call,GetWeaponTargetPos,1
 seams,targeting,call,SetWeaponTargetPos,1
@@ -4075,6 +4094,7 @@ seams,targeting,shared_write,AiSeam::GetVisibleEnemiesInRadius,1
 seams,targeting,shared_write,Seams::ai,1
 seams,targeting,shared_write,Seams::units,2
 seams,targeting,shared_write,Seams::weapons,1
+seams,targeting,shared_write,Unit::motion,1
 seams,targeting,shared_write,UnitsSeam::FindScript,2
 seams,targeting,shared_write,UnitsSeam::GetGroundHeight,1
 seams,targeting,shared_write,UnitsSeam::GetSweetSpot,1
@@ -4127,6 +4147,8 @@ seams,units,shared_write,NetworkSeam::SendUnitStates,1
 seams,units,shared_write,OrdersSeam::AddBeCarriedOrder,1
 seams,units,shared_write,OrdersSeam::DeleteOrders,1
 seams,units,shared_write,OrdersSeam::DestroyMotionObject,1
+seams,units,shared_write,OrdersSeam::MissionTypeFromName,1
+seams,units,shared_write,OrdersSeam::NewUnitMotion,3
 seams,units,shared_write,OrdersSeam::RunOrders,1
 seams,units,shared_write,OrdersSeam::RunSecondaryOrders,1
 seams,units,shared_write,OrdersSeam::UpdateMotion,2
@@ -4139,11 +4161,12 @@ seams,units,shared_write,Seams::features,2
 seams,units,shared_write,Seams::los_radar,6
 seams,units,shared_write,Seams::map,10
 seams,units,shared_write,Seams::network,6
-seams,units,shared_write,Seams::orders,6
+seams,units,shared_write,Seams::orders,10
 seams,units,shared_write,Seams::players,3
 seams,units,shared_write,Seams::targeting,1
 seams,units,shared_write,Seams::weapons,8
 seams,units,shared_write,TargetingSeam::ResetWeaponTarget,1
+seams,units,shared_write,Unit::motion,11
 seams,units,shared_write,WeaponsSeam::DamageUnit,4
 seams,units,shared_write,WeaponsSeam::DetonateUnitWeapon,1
 seams,units,shared_write,WeaponsSeam::InitUnitWeaponSlots,2
@@ -4169,6 +4192,8 @@ seams,weapons,shared_write,NetworkSeam::SendUnitDamage,1
 seams,weapons,shared_write,NetworkSeam::SendWeaponFire,5
 seams,weapons,shared_write,NetworkSeam::SendWeaponFireAt,2
 seams,weapons,shared_write,OrdersSeam::AppendOrder,2
+seams,weapons,shared_write,OrdersSeam::MissionTypeFromName,2
+seams,weapons,shared_write,Player::ai,3
 seams,weapons,shared_write,Seams::ai,4
 seams,weapons,shared_write,Seams::economy,1
 seams,weapons,shared_write,Seams::features,1
@@ -4180,6 +4205,7 @@ seams,weapons,shared_write,Seams::targeting,1
 seams,weapons,shared_write,Seams::units,16
 seams,weapons,shared_write,TargetingSeam::GetWeaponTargetPos,1
 seams,weapons,shared_write,TargetingSeam::GetWeaponTargetUnit,1
+seams,weapons,shared_write,Unit::motion,4
 seams,weapons,shared_write,UnitsSeam::FindScript,2
 seams,weapons,shared_write,UnitsSeam::GetAimFromPosition,4
 seams,weapons,shared_write,UnitsSeam::GetGroundHeight,1
@@ -4664,7 +4690,7 @@ units,platform,call,UsesDataArchives,2
 units,platform,call,WorldToCell,1
 units,platform,call,host_time_ms,1
 units,platform,call,operator delete,6
-units,platform,call,operator new,9
+units,platform,call,operator new,5
 units,platform,call,operator-,1
 units,platform,call,operator==,13
 units,platform,shared_write,BitReader::bit,1
@@ -4834,7 +4860,10 @@ units,seams,indirect,DestroyMotionObjectNative,1
 units,seams,indirect,FindWeaponByNameNative,1
 units,seams,indirect,GetGameTypeNative,1
 units,seams,indirect,LoadMotionNative,1
+units,seams,indirect,LoadOrderNative,1
 units,seams,indirect,LoadUnitAccountsNative,1
+units,seams,indirect,MissionTypeFromNameNative,1
+units,seams,indirect,NewUnitMotionNative,3
 units,seams,indirect,NotifyUnitCreatedNative,1
 units,seams,indirect,NotifyUnitDiedNative,1
 units,seams,indirect,ReattachFxToUnitNative,1
@@ -4849,6 +4878,7 @@ units,seams,indirect,SerializeOrderToSaveNative,1
 units,seams,indirect,SpatialBucketPrependUnitNative,1
 units,seams,indirect,SpatialBucketUnlinkUnitNative,1
 units,seams,indirect,UpdateMotionNative,2
+units,seams,shared_write,Unit::motion,1
 units,seams,shared_write,Vec3::x,1
 units,targeting,indirect,ResetWeaponTarget,1
 units,targeting,shared_write,Game::units,2
@@ -5174,6 +5204,7 @@ weapons,seams,indirect,GetCellMeanHeightNative,2
 weapons,seams,indirect,GetGroundHeightNative,1
 weapons,seams,indirect,GetWeaponTargetPosNative,1
 weapons,seams,indirect,MarkOwnerNetDirtyFromDamageSplitNative,2
+weapons,seams,indirect,MissionTypeFromNameNative,2
 weapons,seams,indirect,QueryScriptNative,1
 weapons,seams,indirect,SpendEnergyAndMetalNative,1
 weapons,seams,indirect,StartScriptNative,3

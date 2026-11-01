@@ -142,7 +142,6 @@ jobs:
       - name: Run block_test and ref_test under Wine
         if: steps.changed.outputs.run == 'true'
         env:
-          WINEARCH: win64
           WINEDEBUG: -all
           WINEPREFIX: ${{ runner.temp }}/wineprefix
         run: |

@@ -32197,6 +32197,7 @@ address,function,file,kind,target
 0x499200,BattleFrame,src/ingame/build_placement.cpp,indirect_call,"indirect via void (*)(Mission *, int, char *) __attribute__((fastcall)) [MapSeam::LoadCampaign]"
 0x499880,EndGameFrame,src/ingame/build_placement.cpp,call,RunEndGameState
 0x499880,EndGameFrame,src/ingame/build_placement.cpp,function,
+0x499890,MainFrameTick,src/ingame/screenshots.cpp,call,DrainSimEvents
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,call,GetTicks
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,call,MakeDirectoryPath
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,call,PeekKey

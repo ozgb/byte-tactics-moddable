@@ -816,7 +816,7 @@ game,presentation,call,CreateParticleLists,1
 game,presentation,call,DestroyParticleLists,1
 game,presentation,call,DisableKeyCommands,3
 game,presentation,call,DispatchOrdersPanelPageFlags,1
-game,presentation,call,DrainSimEvents,1
+game,presentation,call,DrainSimEvents,2
 game,presentation,call,DrawBattleFrame,1
 game,presentation,call,DrawFrame,1
 game,presentation,call,DrawLightBars,1

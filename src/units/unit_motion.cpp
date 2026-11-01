@@ -151,9 +151,14 @@ int CacheCore<Cache, Handle>::AllocHandle(Handle* p, int need)
     }
     Chunk* start;
     int base = CacheAddr(self->base);
+    int cur = CacheAddr(self->cur);
+    if (base == 0 || cur == 0) {
+        CacheSet(*p, 0);
+        return 0;
+    }
     int end = base + self->cap;
-    if (CacheAddr(self->cur) + size > end) {
-        int q = CacheAddr(self->cur);
+    if (cur + size > end) {
+        int q = cur;
         start = (Chunk*)base;
         while (q < end) {
             Handle* owner = ((Chunk*)q)->owner;

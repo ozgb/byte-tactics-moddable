@@ -50,7 +50,7 @@ void CenterCameraOnRadarClick()
     g_game->mapFlags &= 0xfff7;
     g_game->value_1434b = 0;
     g_game->value_142f3 = 0;
-    (*(int*)&g_game->tracked) = 0;
+    g_game->tracked = nullptr;
 }
 
 // FUNCTION: 0x41d1f0
@@ -109,7 +109,7 @@ void __stdcall RestoreCameraPosition(int index)
     if (g_game->valid != 0) {
         g_game->value_1434b = 0;
         g_game->value_142f3 = 0;
-        (*(int*)&g_game->tracked) = 0;
+        g_game->tracked = nullptr;
         SetPos(g_game->xs[index], g_game->ys[index]);
         g_game->viewDirtyFlags_142f1 |= 2;
         ClampCameraPosition();

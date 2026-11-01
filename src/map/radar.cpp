@@ -54,6 +54,7 @@ struct RadarUnitDefView {
 #include "../weapons/projectile.h"
 
 #include "../game/game.h"
+#include "../ingame/hot_radar_slot.h"
 #include "../graphics/display.h"
 #pragma pack(pop)
 
@@ -244,7 +245,7 @@ static inline int ScaledRadarY(Unit* u)
 void DrawRadarUnits(void)
 {
     unsigned char* base = (unsigned char*)g_game + 0xdcb;
-    unsigned short* out = (unsigned short *)g_game->hotRadar;
+    HotRadarSlot* out = g_game->hotRadar;
 
     g_game->hotRadarCount = 0;
     void* surface = g_game->finalSurface;
@@ -320,10 +321,10 @@ void DrawRadarUnits(void)
                             } while (n != 0);
                         }
                     }
-                    out[0] = u->id;
-                    *(int*)(out + 1) = g_game->posX + x;
-                    *(int*)(out + 3) = g_game->posY + y;
-                    out += 5;
+                    out->unitId = u->id;
+                    out->x = g_game->posX + x;
+                    out->y = g_game->posY + y;
+                    out++;
                     g_game->hotRadarCount++;
                 }
             }

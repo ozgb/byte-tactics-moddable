@@ -1160,7 +1160,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     }
     DrawParticleList((void*)&ctx, 8);
     if (IsKeyDown(0xf9))
-        DrawSelectedUnitOrderOverlays((void*)&ctx, (Unit**)&(*(void**)&g_game->value_142f3));
+        DrawSelectedUnitOrderOverlays((void*)&ctx, &g_game->value_142f3);
 
     if (param_1 != 0) {
         unsigned short* pIdx = g_game->list_1435f;
@@ -1656,7 +1656,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                         DrawString((Surface*)surface, (unsigned char*)killsText, killsX, killsY, -1);
                     }
                     if (snapshot.orderName) {
-                        strcpy(amount, Translate((char*)snapshot.orderName));
+                        strcpy(amount, Translate(snapshot.orderName));
                         int orderX = panel->missionText.left -
                                      GetTextWidth(panel->font, (unsigned char*)amount) / 2;
                         SetTextColors(0x53, GetTextKeyColor());

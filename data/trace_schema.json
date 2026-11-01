@@ -928,11 +928,11 @@
         {"name": "a", "offset": 0, "size": 1, "kind": "scalar", "target": null},
         {"name": "b", "offset": 1, "size": 1, "kind": "scalar", "target": null},
         {"name": "flags", "offset": 2, "size": 4, "kind": "scalar", "target": null},
-        {"name": "first", "offset": 6, "size": 4, "kind": "pointer", "target": "unit"}
+        {"name": "first", "offset": 6, "size": 4, "kind": "ref", "target": "unit"}
       ],
       "plan": [
         {"name": "", "offset": 0, "size": 6, "kind": "bytes", "target": null},
-        {"name": "first", "offset": 6, "size": 4, "kind": "pointer", "target": "unit"}
+        {"name": "first", "offset": 6, "size": 4, "kind": "ref", "target": "unit"}
       ],
       "excluded": [
 

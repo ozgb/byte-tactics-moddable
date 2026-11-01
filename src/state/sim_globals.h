@@ -31,7 +31,7 @@ struct SimGlobals {
     unsigned char DAT_00511a3c[4];
     int g_cdPathMismatch;
     Ref<ExplodedPiece> g_explodedPieces[100];
-    CMemoryCache g_debrisMemCache;
+    DebrisCache g_debrisMemCache;
     unsigned char DAT_00511fb4[4];
     int g_meteorNextStrikeTime;
     unsigned char DAT_005122ec[4];

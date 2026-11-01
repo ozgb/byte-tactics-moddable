@@ -5632,6 +5632,7 @@ address,function,file,kind,target
 0x41ace0,OpenBuildMenuGui,src/ingame/control_panel.cpp,call,SetPrevNextGadgetNames
 0x41ace0,OpenBuildMenuGui,src/ingame/control_panel.cpp,call,UpdateCounts
 0x41ace0,OpenBuildMenuGui,src/ingame/control_panel.cpp,call,get
+0x41ace0,OpenBuildMenuGui,src/ingame/control_panel.cpp,call,operator BuildMenuPage *
 0x41ace0,OpenBuildMenuGui,src/ingame/control_panel.cpp,call,operator->
 0x41ace0,OpenBuildMenuGui,src/ingame/control_panel.cpp,call,sprintf
 0x41ace0,OpenBuildMenuGui,src/ingame/control_panel.cpp,call,strcpy
@@ -5913,36 +5914,35 @@ address,function,file,kind,target
 0x41c180,DispatchOrdersPanelPageFlags,src/ingame/control_panel.cpp,function,
 0x41c180,DispatchOrdersPanelPageFlags,src/ingame/control_panel.cpp,global_read,g_game
 0x41c2b0,ResetCameraState,src/ingame/control_panel.cpp,call,memset
-0x41c2b0,ResetCameraState,src/ingame/control_panel.cpp,deref_read,*Unit
-0x41c2b0,ResetCameraState,src/ingame/control_panel.cpp,field_escape,Game::value_142f3
+0x41c2b0,ResetCameraState,src/ingame/control_panel.cpp,field_maybe_written,Game::value_142f3
 0x41c2b0,ResetCameraState,src/ingame/control_panel.cpp,field_read,Game::scrollSpeed
 0x41c2b0,ResetCameraState,src/ingame/control_panel.cpp,field_write,Game::scrollSpeed
 0x41c2b0,ResetCameraState,src/ingame/control_panel.cpp,function,
 0x41c2b0,ResetCameraState,src/ingame/control_panel.cpp,global_read,g_game
 0x41c2e0,CycleCameraFollow,src/ingame/control_panel.cpp,call,FindNextSelectedUnit
-0x41c2e0,CycleCameraFollow,src/ingame/control_panel.cpp,deref_write,*Unit
-0x41c2e0,CycleCameraFollow,src/ingame/control_panel.cpp,field_escape,Game::value_142f3
+0x41c2e0,CycleCameraFollow,src/ingame/control_panel.cpp,call,operator Unit *
+0x41c2e0,CycleCameraFollow,src/ingame/control_panel.cpp,call,operator=
 0x41c2e0,CycleCameraFollow,src/ingame/control_panel.cpp,field_read,Game::value_142f3
+0x41c2e0,CycleCameraFollow,src/ingame/control_panel.cpp,field_write,Game::value_142f3
 0x41c2e0,CycleCameraFollow,src/ingame/control_panel.cpp,function,
 0x41c2e0,CycleCameraFollow,src/ingame/control_panel.cpp,global_read,g_game
 0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,call,GetCategoryMask
 0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,call,TestBit
 0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,call,operator Unit *
-0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,deref_write,*Unit
+0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,call,operator=
 0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,field_escape,Game::players
-0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,field_escape,Game::value_142f3
 0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,field_read,Game::localPlayer
 0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,field_read,Player::unitsBegin
 0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,field_read,Player::unitsEnd
 0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,field_read,Unit::unitDefIndex
+0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,field_write,Game::value_142f3
 0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,function,
 0x41c310,FindLocalCommander,src/ingame/control_panel.cpp,global_read,g_game
-0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,deref_write,*CameraFollowTarget
-0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,deref_write,*Unit
+0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,call,operator=
 0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,deref_write,*unsigned short
-0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,field_escape,Game::tracked
-0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,field_escape,Game::value_142f3
 0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,field_escape,Game::value_1434b
+0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,field_write,Game::tracked
+0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,field_write,Game::value_142f3
 0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,function,
 0x41c390,ClearCameraFollowState,src/ingame/control_panel.cpp,global_read,g_game
 0x41c3c0,ClampCameraPosition,src/ingame/control_panel.cpp,call,CalcRadarViewportRect
@@ -6067,15 +6067,14 @@ address,function,file,kind,target
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,call,ClampCameraTarget
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,call,SetTarget
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,call,UpdateScreenShake
+0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,call,operator!=
+0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,call,operator->
+0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,call,operator=
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,deref_read,*unsigned short
-0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,deref_write,*CameraFollowTarget
-0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,deref_write,*Unit
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,deref_write,*unsigned short
-0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_escape,CameraFollowTarget::pos
-0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_escape,Game::tracked
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_escape,Game::trackedPos
-0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_escape,Game::value_142f3
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_escape,Game::value_1434b
+0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_escape,Projectile::position
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_escape,Unit::pos
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_read,CameraFlags::raw
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_read,Game::mapFlags
@@ -6096,6 +6095,8 @@ address,function,file,kind,target
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_write,Game::mapFlags
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_write,Game::scrollX
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_write,Game::scrollY
+0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_write,Game::tracked
+0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,field_write,Game::value_142f3
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,function,
 0x41ca10,UpdateCameraFollow,src/ingame/control_panel.cpp,global_read,g_game
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,call,GetScreenHeight
@@ -6104,12 +6105,8 @@ address,function,file,kind,target
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,call,SetCursorPosition
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,call,operator=
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,deref_escape,*CursorState
-0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,deref_write,*CameraFollowTarget
-0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,deref_write,*Unit
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,deref_write,*unsigned short
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_escape,Game::cursor
-0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_escape,Game::tracked
-0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_escape,Game::value_142f3
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_escape,Game::value_1434b
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_read,Game::scrollX
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_read,Game::scrollY
@@ -6118,6 +6115,8 @@ address,function,file,kind,target
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_read,tagPOINT::y
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_write,CursorState::flag
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_write,CursorState::start
+0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_write,Game::tracked
+0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_write,Game::value_142f3
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_write,tagPOINT::x
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,field_write,tagPOINT::y
 0x41cc60,BeginMouseScroll,src/ingame/control_panel.cpp,function,
@@ -6156,11 +6155,8 @@ address,function,file,kind,target
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,call,IsScreenNamed
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,call,host_cursor_get
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,call,host_window_has_focus
-0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,deref_write,*CameraFollowTarget
-0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,deref_write,*Unit
+0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,call,operator=
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,deref_write,*unsigned short
-0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_escape,Game::tracked
-0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_escape,Game::value_142f3
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_escape,Game::value_1434b
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_escape,tagPOINT::x
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_escape,tagPOINT::y
@@ -6182,6 +6178,8 @@ address,function,file,kind,target
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_write,Game::mapFlags
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_write,Game::scrollX
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_write,Game::scrollY
+0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_write,Game::tracked
+0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_write,Game::value_142f3
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_write,Game::x2
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_write,Game::y2
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,field_write,MouseEvent::x
@@ -6189,8 +6187,7 @@ address,function,file,kind,target
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,function,
 0x41ce90,UpdateEdgeScroll,src/ingame/control_panel.cpp,global_read,g_game
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,call,ClampCameraPosition
-0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,deref_write,*int
-0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_escape,Game::tracked
+0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,call,operator=
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_read,Game::mapFlags
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_read,Game::mapHeight
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_read,Game::mapWidth
@@ -6209,6 +6206,7 @@ address,function,file,kind,target
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_write,Game::mapFlags
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_write,Game::scrollX
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_write,Game::scrollY
+0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_write,Game::tracked
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_write,Game::value_142f3
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_write,Game::value_1434b
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,field_write,Game::viewDirtyFlags_142f1
@@ -6275,8 +6273,7 @@ address,function,file,kind,target
 0x41d3b0,SaveCameraPosition,src/ingame/camera.cpp,global_read,g_game
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,call,ClampCameraPosition
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,call,SetPos
-0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,deref_write,*int
-0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_escape,Game::tracked
+0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,call,operator=
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_escape,Game::valid
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_read,Game::mapFlags
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_read,Game::scrollX
@@ -6285,6 +6282,7 @@ address,function,file,kind,target
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_read,Game::xs
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_read,Game::ys
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_write,Game::mapFlags
+0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_write,Game::tracked
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_write,Game::value_142f3
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_write,Game::value_1434b
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,field_write,Game::viewDirtyFlags_142f1
@@ -6815,16 +6813,16 @@ address,function,file,kind,target
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,global_write,g_endGameGlamourSoundStarted
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,indirect_call,"indirect via int (*)(Mission *, int, int) __attribute__((fastcall)) [MapSeam::MissionExists]"
-0x4205f0,InitMemoryCache,src/frontend/endgame.cpp,call,CMemoryCache::ClearPointers
+0x4205f0,InitMemoryCache,src/frontend/endgame.cpp,call,ClearPointers
 0x4205f0,InitMemoryCache,src/frontend/endgame.cpp,call,atexit
 0x4205f0,InitMemoryCache,src/frontend/endgame.cpp,fn_ref,FreeMemoryCache
 0x4205f0,InitMemoryCache,src/frontend/endgame.cpp,function,
-0x4205f0,InitMemoryCache,src/frontend/endgame.cpp,global_maybe_written,g_debrisMemCache
-0x420610,FreeMemoryCache,src/frontend/endgame.cpp,call,CMemoryCache::FreeBuffer
+0x4205f0,InitMemoryCache,src/frontend/endgame.cpp,global_read,g_debrisMemCache
+0x420610,FreeMemoryCache,src/frontend/endgame.cpp,call,FreeBuffer
 0x420610,FreeMemoryCache,src/frontend/endgame.cpp,function,
-0x420610,FreeMemoryCache,src/frontend/endgame.cpp,global_maybe_written,g_debrisMemCache
+0x420610,FreeMemoryCache,src/frontend/endgame.cpp,global_read,g_debrisMemCache
 0x420620,InitExplosions,src/weapons/explosions.cpp,call,BuildLensFrame
-0x420620,InitExplosions,src/weapons/explosions.cpp,call,CMemoryCache::InitSimCache
+0x420620,InitExplosions,src/weapons/explosions.cpp,call,DebrisCache::InitSimCache
 0x420620,InitExplosions,src/weapons/explosions.cpp,call,MakeExplosion
 0x420620,InitExplosions,src/weapons/explosions.cpp,call,memset
 0x420620,InitExplosions,src/weapons/explosions.cpp,call,operator=
@@ -6877,7 +6875,7 @@ address,function,file,kind,target
 0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,field_write,DebrisPiece::state
 0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,function,
 0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,global_read,g_game
-0x420960,FreeExplosions,src/weapons/explosions.cpp,call,CMemoryCache::FreeCache
+0x420960,FreeExplosions,src/weapons/explosions.cpp,call,FreeCache
 0x420960,FreeExplosions,src/weapons/explosions.cpp,call,GameFreeThunk
 0x420960,FreeExplosions,src/weapons/explosions.cpp,deref_read,*Explosion
 0x420960,FreeExplosions,src/weapons/explosions.cpp,field_escape,Game::lists
@@ -6887,7 +6885,7 @@ address,function,file,kind,target
 0x420960,FreeExplosions,src/weapons/explosions.cpp,field_write,Game::explosionLensFrame
 0x420960,FreeExplosions,src/weapons/explosions.cpp,field_write,ImageFrame::image
 0x420960,FreeExplosions,src/weapons/explosions.cpp,function,
-0x420960,FreeExplosions,src/weapons/explosions.cpp,global_maybe_written,g_debrisMemCache
+0x420960,FreeExplosions,src/weapons/explosions.cpp,global_read,g_debrisMemCache
 0x420960,FreeExplosions,src/weapons/explosions.cpp,global_read,g_game
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,call,EmitSmoke
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,call,InitGafSequence
@@ -7158,8 +7156,8 @@ address,function,file,kind,target
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,field_read,Vec3::y
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,field_read,Vec3::z
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,function,
+0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,AllocHandle
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,BreakPieceIntoDebris
-0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,CMemoryCache::AllocHandle
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,FindFreeExplodedPieceSlot
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,get
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,call,operator Unit *
@@ -7190,8 +7188,8 @@ address,function,file,kind,target
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,field_write,Vec3::y
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,field_write,Vec3::z
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,function,
-0x421620,StartExplodePiece,src/weapons/explosions.cpp,global_escape,g_explodedPieces
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,global_maybe_written,g_debrisMemCache
+0x421620,StartExplodePiece,src/weapons/explosions.cpp,global_maybe_written,g_explodedPieces
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,global_read,g_explodedPieces
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,global_read,g_quirks
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,global_read,g_seams
@@ -9347,6 +9345,7 @@ address,function,file,kind,target
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,call,ProtectBlockReadOnly
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,call,ProtectBlockReadWrite
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,call,_strcmpi
+0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,call,operator BuildMenuPage *
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,call,operator UnitDef *
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,call,sprintf
 0x42bd40,CheckDownloadableFlags,src/units/unit_types.cpp,field_escape,BuildMenuEntry::name
@@ -9363,6 +9362,7 @@ address,function,file,kind,target
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,FindUnitTypeId
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,ProtectBlockReadOnly
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,ProtectBlockReadWrite
+0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,operator BuildMenuPage *
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,operator UnitDef *
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,operator unsigned short *
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,call,operator!=
@@ -9669,7 +9669,9 @@ address,function,file,kind,target
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,TdfRecord::GetFieldInt
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,TdfRecord::GetFieldString
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,_strcmpi
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,operator BuildMenuPage *
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,operator UnitDef *
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,operator=
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,operator[]
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,size
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,call,sprintf
@@ -9700,6 +9702,7 @@ address,function,file,kind,target
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,global_maybe_written,DAT_005119b8
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,global_read,g_game
 0x42e120,FreeDownloadMenus,src/units/unit_types.cpp,call,GameFreeThunk
+0x42e120,FreeDownloadMenus,src/units/unit_types.cpp,call,get
 0x42e120,FreeDownloadMenus,src/units/unit_types.cpp,field_read,Game::buildLists
 0x42e120,FreeDownloadMenus,src/units/unit_types.cpp,function,
 0x42e120,FreeDownloadMenus,src/units/unit_types.cpp,global_read,g_game
@@ -11049,41 +11052,25 @@ address,function,file,kind,target
 0x437910,UpdateWindGenerator,src/units/unit_motion.cpp,field_read,UnitDefMetalWindView::windGenerator
 0x437910,UpdateWindGenerator,src/units/unit_motion.cpp,function,
 0x437910,UpdateWindGenerator,src/units/unit_motion.cpp,global_read,g_game
-0x4379a0,CMemoryCache::ClearPointers,src/units/unit_motion.cpp,field_write,CMemoryCache::base
-0x4379a0,CMemoryCache::ClearPointers,src/units/unit_motion.cpp,field_write,CMemoryCache::handle
-0x4379a0,CMemoryCache::ClearPointers,src/units/unit_motion.cpp,function,
+0x4379a0,ClearPointers,src/units/unit_motion.cpp,function,
+0x4379a0,ClearPointers,src/units/unit_motion.cpp,indirect_call,indirect via <overloaded function type>
+0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,call,FreeCache
 0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,call,GameAllocIgnoreTag
-0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,call,GameFreeThunk
-0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,field_read,CMemoryCache::base
-0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,field_read,CMemoryCache::cap
-0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,field_read,CMemoryCache::cur
-0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,field_write,CMemoryCache::base
-0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,field_write,CMemoryCache::cap
-0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,field_write,CMemoryCache::cur
-0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,field_write,CacheChunk::owner
-0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,field_write,CacheChunk::size
+0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,call,Install
 0x4379b0,CMemoryCache::InitCache,src/units/unit_motion.cpp,function,
-0x437a00,CMemoryCache::FreeCache,src/units/unit_motion.cpp,call,GameFreeThunk
-0x437a00,CMemoryCache::FreeCache,src/units/unit_motion.cpp,field_read,CMemoryCache::base
-0x437a00,CMemoryCache::FreeCache,src/units/unit_motion.cpp,field_write,CMemoryCache::base
-0x437a00,CMemoryCache::FreeCache,src/units/unit_motion.cpp,function,
-0x437a20,CMemoryCache::FreeBuffer,src/units/unit_motion.cpp,call,GameFreeThunk
-0x437a20,CMemoryCache::FreeBuffer,src/units/unit_motion.cpp,field_read,CMemoryCache::base
-0x437a20,CMemoryCache::FreeBuffer,src/units/unit_motion.cpp,function,
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,call,HandleGet
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,call,HandleSet
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,deref_read,*int
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,deref_read,*void
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,field_read,CMemoryCache::base
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,field_read,CMemoryCache::cap
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,field_read,CMemoryCache::cur
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,field_write,CMemoryCache::cur
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,field_write,CacheChunk::owner
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,field_write,CacheChunk::size
-0x437a30,CMemoryCache::AllocHandle,src/units/unit_motion.cpp,function,
+0x437a00,FreeCache,src/units/unit_motion.cpp,call,GameFreeThunk
+0x437a00,FreeCache,src/units/unit_motion.cpp,function,
+0x437a00,FreeCache,src/units/unit_motion.cpp,indirect_call,indirect via <overloaded function type>
+0x437a20,FreeBuffer,src/units/unit_motion.cpp,call,GameFreeThunk
+0x437a20,FreeBuffer,src/units/unit_motion.cpp,function,
+0x437a20,FreeBuffer,src/units/unit_motion.cpp,indirect_call,indirect via <overloaded function type>
+0x437a30,AllocHandle,src/units/unit_motion.cpp,deref_read,*Handle
+0x437a30,AllocHandle,src/units/unit_motion.cpp,deref_read,*int
+0x437a30,AllocHandle,src/units/unit_motion.cpp,function,
+0x437a30,AllocHandle,src/units/unit_motion.cpp,indirect_call,indirect via <overloaded function type>
 0x437b30,GetHandleSize,src/units/unit_motion.cpp,deref_read,*int
 0x437b30,GetHandleSize,src/units/unit_motion.cpp,function,
-0x437b50,CMemoryCache::AllocBitmap,src/units/unit_motion.cpp,call,CMemoryCache::AllocHandle
+0x437b50,CMemoryCache::AllocBitmap,src/units/unit_motion.cpp,call,AllocHandle
 0x437b50,CMemoryCache::AllocBitmap,src/units/unit_motion.cpp,call,memset
 0x437b50,CMemoryCache::AllocBitmap,src/units/unit_motion.cpp,deref_read,*GafFrame
 0x437b50,CMemoryCache::AllocBitmap,src/units/unit_motion.cpp,field_read,GafFrame::pixelsOrLayers
@@ -11099,7 +11086,7 @@ address,function,file,kind,target
 0x437b50,CMemoryCache::AllocBitmap,src/units/unit_motion.cpp,field_write,GafFrame::xOffset
 0x437b50,CMemoryCache::AllocBitmap,src/units/unit_motion.cpp,field_write,GafFrame::yOffset
 0x437b50,CMemoryCache::AllocBitmap,src/units/unit_motion.cpp,function,
-0x437be0,CMemoryCache::AllocTwoPlaneBitmap,src/units/unit_motion.cpp,call,CMemoryCache::AllocHandle
+0x437be0,CMemoryCache::AllocTwoPlaneBitmap,src/units/unit_motion.cpp,call,AllocHandle
 0x437be0,CMemoryCache::AllocTwoPlaneBitmap,src/units/unit_motion.cpp,call,memset
 0x437be0,CMemoryCache::AllocTwoPlaneBitmap,src/units/unit_motion.cpp,deref_read,*GafFrame
 0x437be0,CMemoryCache::AllocTwoPlaneBitmap,src/units/unit_motion.cpp,field_read,GafFrame::pixelsOrLayers
@@ -11116,7 +11103,7 @@ address,function,file,kind,target
 0x437be0,CMemoryCache::AllocTwoPlaneBitmap,src/units/unit_motion.cpp,field_write,GafFrame::xOffset
 0x437be0,CMemoryCache::AllocTwoPlaneBitmap,src/units/unit_motion.cpp,field_write,GafFrame::yOffset
 0x437be0,CMemoryCache::AllocTwoPlaneBitmap,src/units/unit_motion.cpp,function,
-0x437c80,CMemoryCache::FlushCache,src/units/unit_motion.cpp,call,CMemoryCache::AllocHandle
+0x437c80,CMemoryCache::FlushCache,src/units/unit_motion.cpp,call,AllocHandle
 0x437c80,CMemoryCache::FlushCache,src/units/unit_motion.cpp,field_maybe_written,CMemoryCache::handle
 0x437c80,CMemoryCache::FlushCache,src/units/unit_motion.cpp,field_read,CMemoryCache::cap
 0x437c80,CMemoryCache::FlushCache,src/units/unit_motion.cpp,function,
@@ -12179,9 +12166,6 @@ address,function,file,kind,target
 0x43c350,ClearOrderTypeTable,src/orders/order_list.cpp,call,BlockVector::Clear
 0x43c350,ClearOrderTypeTable,src/orders/order_list.cpp,function,
 0x43c350,ClearOrderTypeTable,src/orders/order_list.cpp,global_maybe_written,g_missionOrderTableVec@src/orders/order_list.cpp
-0x43c360,MissionOrderTable::GetCount,src/orders/order_list.cpp,field_read,MissionOrderTable::first
-0x43c360,MissionOrderTable::GetCount,src/orders/order_list.cpp,field_read,MissionOrderTable::last
-0x43c360,MissionOrderTable::GetCount,src/orders/order_list.cpp,function,
 0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,deref_read,*OrderTableEntry
 0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,function,
 0x43c6b0,LowerBoundOrderTypes,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(const OrderTableEntry &, char *) __attribute__((stdcall)) [pred]"
@@ -17699,7 +17683,7 @@ address,function,file,kind,target
 0x457d30,UpdateResourceSharing,src/network/net_game.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char) __attribute__((stdcall)) [NetworkSeam::SendShareMapInfo]"
 0x457d30,UpdateResourceSharing,src/network/net_game.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float, int) __attribute__((stdcall)) [PlayersSeam::TransferEnergy]"
 0x457d30,UpdateResourceSharing,src/network/net_game.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float, int) __attribute__((stdcall)) [PlayersSeam::TransferMetal]"
-0x458160,UnitTable::Construct,src/graphics/model_render.cpp,call,CMemoryCache::ClearPointers
+0x458160,UnitTable::Construct,src/graphics/model_render.cpp,call,ClearPointers
 0x458160,UnitTable::Construct,src/graphics/model_render.cpp,field_write,CMemoryCache::field_10
 0x458160,UnitTable::Construct,src/graphics/model_render.cpp,function,
 0x458180,UnitTable::Initialize,src/graphics/model_render.cpp,call,AllocDepthFrame
@@ -17707,7 +17691,7 @@ address,function,file,kind,target
 0x458180,UnitTable::Initialize,src/graphics/model_render.cpp,field_read,CMemoryCache::buffer
 0x458180,UnitTable::Initialize,src/graphics/model_render.cpp,field_write,CMemoryCache::buffer
 0x458180,UnitTable::Initialize,src/graphics/model_render.cpp,function,
-0x4581c0,UnitTable::Destroy,src/graphics/model_render.cpp,call,CMemoryCache::FreeBuffer
+0x4581c0,UnitTable::Destroy,src/graphics/model_render.cpp,call,FreeBuffer
 0x4581c0,UnitTable::Destroy,src/graphics/model_render.cpp,call,GameFreeThunk
 0x4581c0,UnitTable::Destroy,src/graphics/model_render.cpp,field_read,CMemoryCache::ptr
 0x4581c0,UnitTable::Destroy,src/graphics/model_render.cpp,function,
@@ -20315,6 +20299,7 @@ address,function,file,kind,target
 0x463680,PlayerFrameInfo::~PlayerFrameInfo,src/network/packets.cpp,field_read,PlayerFrameInfo::frame
 0x463680,PlayerFrameInfo::~PlayerFrameInfo,src/network/packets.cpp,function,
 0x4636b0,FrameQueue::FrameQueue,src/network/packets.cpp,call,operator new
+0x4636b0,FrameQueue::FrameQueue,src/network/packets.cpp,call,operator=
 0x4636b0,FrameQueue::FrameQueue,src/network/packets.cpp,field_write,FrameQueue::baseTick
 0x4636b0,FrameQueue::FrameQueue,src/network/packets.cpp,field_write,FrameQueue::buffer
 0x4636b0,FrameQueue::FrameQueue,src/network/packets.cpp,field_write,FrameQueue::bufferSize
@@ -20324,11 +20309,14 @@ address,function,file,kind,target
 0x4636b0,FrameQueue::FrameQueue,src/network/packets.cpp,field_write,FrameQueue::toId
 0x4636b0,FrameQueue::FrameQueue,src/network/packets.cpp,function,
 0x4636b0,FrameQueue::FrameQueue,src/network/packets.cpp,global_read,kSim
+0x463710,FrameQueue::~FrameQueue,src/network/packets.cpp,call,operator FrameRing *
 0x463710,FrameQueue::~FrameQueue,src/network/packets.cpp,call,operator delete
 0x463710,FrameQueue::~FrameQueue,src/network/packets.cpp,field_read,FrameQueue::buffer
 0x463710,FrameQueue::~FrameQueue,src/network/packets.cpp,field_read,FrameQueue::recvBuffer
 0x463710,FrameQueue::~FrameQueue,src/network/packets.cpp,function,
+0x463730,FrameQueue::ResetFrames,src/network/packets.cpp,call,operator bool
 0x463730,FrameQueue::ResetFrames,src/network/packets.cpp,call,operator new
+0x463730,FrameQueue::ResetFrames,src/network/packets.cpp,call,operator=
 0x463730,FrameQueue::ResetFrames,src/network/packets.cpp,field_read,FrameQueue::buffer
 0x463730,FrameQueue::ResetFrames,src/network/packets.cpp,field_write,FrameQueue::baseTick
 0x463730,FrameQueue::ResetFrames,src/network/packets.cpp,field_write,FrameQueue::buffer
@@ -20338,6 +20326,7 @@ address,function,file,kind,target
 0x463730,FrameQueue::ResetFrames,src/network/packets.cpp,field_write,FrameQueue::skipCount
 0x463730,FrameQueue::ResetFrames,src/network/packets.cpp,field_write,FrameQueue::toId
 0x463730,FrameQueue::ResetFrames,src/network/packets.cpp,function,
+0x463730,FrameQueue::ResetFrames,src/network/packets.cpp,global_read,kSim
 0x463790,FrameQueue::QueueFrames,src/network/packets.cpp,call,BitReader::ReadBits
 0x463790,FrameQueue::QueueFrames,src/network/packets.cpp,call,FrameRing::Pop
 0x463790,FrameQueue::QueueFrames,src/network/packets.cpp,call,FrameRing::Push
@@ -20345,6 +20334,7 @@ address,function,file,kind,target
 0x463790,FrameQueue::QueueFrames,src/network/packets.cpp,call,memcpy
 0x463790,FrameQueue::QueueFrames,src/network/packets.cpp,call,operator delete
 0x463790,FrameQueue::QueueFrames,src/network/packets.cpp,call,operator new
+0x463790,FrameQueue::QueueFrames,src/network/packets.cpp,call,operator->
 0x463790,FrameQueue::QueueFrames,src/network/packets.cpp,deref_read,*Frame
 0x463790,FrameQueue::QueueFrames,src/network/packets.cpp,deref_read,*char
 0x463790,FrameQueue::QueueFrames,src/network/packets.cpp,field_read,Frame::data
@@ -21207,12 +21197,11 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,Player_Get
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,ScaledRadarY
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,get
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,operator HotRadarSlot *
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,operator Projectile *
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,operator Unit *
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,operator->
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,deref_read,*unsigned char
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,deref_write,*int
-0x466dc0,DrawRadarUnits,src/map/radar.cpp,deref_write,*unsigned short
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_escape,Unit::weapons
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::hi
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,<anon>::interceptor
@@ -21267,6 +21256,9 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_read,WeaponDef::coverage
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_write,<anon>::bit1
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_write,Game::hotRadarCount
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_write,HotRadarSlot::unitId
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_write,HotRadarSlot::x
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,field_write,HotRadarSlot::y
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,function,
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,global_read,g_game
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,call,Game::Current
@@ -21643,13 +21635,13 @@ address,function,file,kind,target
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,get
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,memcmp
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,operator Feature *
+0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,operator unsigned short *
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,operator!=
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,operator->
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,operator=
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,call,sprintf
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,deref_escape,*Resources
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,deref_escape,*int
-0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,deref_escape,*void
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,deref_read,*Resources
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,deref_read,*Surface
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,deref_read,*Unit
@@ -21665,9 +21657,9 @@ address,function,file,kind,target
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,field_escape,Game::rect
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,field_escape,Game::screen
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,field_escape,Game::sortUnits
-0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,field_escape,Game::value_142f3
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,field_maybe_written,Game::gui
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,field_maybe_written,Game::timers
+0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,field_maybe_written,Game::value_142f3
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,field_read,<anon>::flag5
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,field_read,<anon>::flag6
 0x468cf0,DrawBattleFrame,src/ingame/info_panel.cpp,field_read,<anon>::lagging
@@ -24041,7 +24033,6 @@ address,function,file,kind,target
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,operator PlayerInfo *
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,operator->
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,sprintf
-0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,deref_read,*unsigned char
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,deref_read,*unsigned short
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,<anon>::archive
@@ -24097,7 +24088,6 @@ address,function,file,kind,target
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,call,Sound::IsStreamActive
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,call,StepGafSequence
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,call,host_time_ms
-0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,deref_read,*unsigned char
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,<anon>::gaf
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,<anon>::index
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,<anon>::surface
@@ -24110,6 +24100,7 @@ address,function,file,kind,target
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,GafFrame::height
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,GafFrame::width
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,Game::sound
+0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,Gui::colours
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,Gui::layer
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_read,Layer::entries
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,field_write,<anon>::index
@@ -24828,22 +24819,22 @@ address,function,file,kind,target
 0x47cac0,ClaimFootprintsInArea,src/map/terrain.cpp,call,VisitObjectsInArea
 0x47cac0,ClaimFootprintsInArea,src/map/terrain.cpp,function,
 0x47caf0,FUN_0047caf0,src/map/terrain.cpp,function,
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,call,operator SpatialBucketNode *
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,call,operator!=
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,call,operator->
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,call,operator=
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,deref_read,*Ref<SpatialBucketNode>
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,deref_write,*Ref<SpatialBucketNode>
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_escape,SpatialBucketNode::next
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,call,operator==
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,deref_read,*Ref<Unit>
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,deref_write,*Ref<Unit>
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_escape,Unit::cargoNext
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_read,SpatialBucket::head
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_read,SpatialBucketNode::next
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_read,Unit::cargoNext
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_write,SpatialBucket::head
-0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_write,SpatialBucketNode::next
+0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,field_write,Unit::cargoNext
 0x47cb00,SpatialBucket::UnlinkUnit,src/map/terrain.cpp,function,
 0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,call,operator=
 0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,field_read,SpatialBucket::head
 0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,field_write,SpatialBucket::head
-0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,field_write,SpatialBucketNode::next
+0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,field_write,Unit::cargoNext
 0x47cb40,SpatialBucket::PrependUnit,src/map/terrain.cpp,function,
 0x47cb60,SetOwner,src/map/terrain.cpp,call,UnlinkBucketUnit
 0x47cb60,SetOwner,src/map/terrain.cpp,call,get
@@ -25890,16 +25881,6 @@ address,function,file,kind,target
 0x4814f0,FreeLosTables,src/map/line_of_sight.cpp,call,LosTables::FreeTables
 0x4814f0,FreeLosTables,src/map/line_of_sight.cpp,function,
 0x4814f0,FreeLosTables,src/map/line_of_sight.cpp,global_maybe_written,g_losTables
-0x481500,InitEyeballs,src/map/line_of_sight.cpp,call,GameAllocIgnoreTag
-0x481500,InitEyeballs,src/map/line_of_sight.cpp,deref_write,*Eye
-0x481500,InitEyeballs,src/map/line_of_sight.cpp,field_escape,Game::eyes
-0x481500,InitEyeballs,src/map/line_of_sight.cpp,field_write,Game::count_14277
-0x481500,InitEyeballs,src/map/line_of_sight.cpp,function,
-0x481500,InitEyeballs,src/map/line_of_sight.cpp,global_read,g_game
-0x481530,FreeEyeballs,src/map/line_of_sight.cpp,call,GameFreeThunk
-0x481530,FreeEyeballs,src/map/line_of_sight.cpp,field_read,Game::eyes
-0x481530,FreeEyeballs,src/map/line_of_sight.cpp,function,
-0x481530,FreeEyeballs,src/map/line_of_sight.cpp,global_read,g_game
 0x481550,GetMapCell,src/map/line_of_sight.cpp,call,operator Cell *
 0x481550,GetMapCell,src/map/line_of_sight.cpp,deref_escape,*Cell
 0x481550,GetMapCell,src/map/line_of_sight.cpp,field_read,Game::cells
@@ -26101,6 +26082,8 @@ address,function,file,kind,target
 0x482110,IsEyeballExpired,src/map/line_of_sight.cpp,function,
 0x482110,IsEyeballExpired,src/map/line_of_sight.cpp,global_read,g_game
 0x482130,ExpireEyeballs,src/map/line_of_sight.cpp,call,RemoveLineOfSight
+0x482130,ExpireEyeballs,src/map/line_of_sight.cpp,call,get
+0x482130,ExpireEyeballs,src/map/line_of_sight.cpp,call,operator Eye *
 0x482130,ExpireEyeballs,src/map/line_of_sight.cpp,call,remove_if
 0x482130,ExpireEyeballs,src/map/line_of_sight.cpp,field_read,Eye::expires
 0x482130,ExpireEyeballs,src/map/line_of_sight.cpp,field_read,Game::count_14277
@@ -26222,6 +26205,7 @@ address,function,file,kind,target
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,GetGafFrame
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,UpdateLineOfSight
+0x482910,AddEyeball,src/map/line_of_sight.cpp,call,operator Eye *
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,operator*
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,operator->
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,operator=
@@ -26410,12 +26394,10 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_read,*int
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_read,*unsigned char
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_read,*unsigned short
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_write,*Eye
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_write,*int
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_write,*unsigned char
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_write,*unsigned int
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_write,*unsigned short
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_escape,Game::eyes
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_escape,Mission::tidalStrength
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,FeaturesSeam::InitFeatureAnimPool
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,FeaturesSeam::PlaceFeature
@@ -26476,6 +26458,7 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,GafFrame::xOffset
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,GafFrame::yOffset
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,Game::count_14277
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,Game::eyes
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,Game::loadProgress
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,Game::radarFrame
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,IconSet::data
@@ -26838,8 +26821,6 @@ address,function,file,kind,target
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,deref_write,*unsigned char
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,deref_write,*unsigned int
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,deref_write,*unsigned short
-0x4854a0,AllocateUnitMemory,src/units/units.cpp,deref_write,*void
-0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_escape,Game::list_1435f
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_escape,Game::players
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_read,Game::autoFollowFlags_14373
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_read,Game::defs
@@ -26851,6 +26832,7 @@ address,function,file,kind,target
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_write,Game::autoFollowFlags_14373
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_write,Game::focusUnitId
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_write,Game::hotRadar
+0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_write,Game::list_1435f
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_write,Game::poolCount
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_write,Game::units
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,field_write,Game::unitsEnd
@@ -26872,17 +26854,17 @@ address,function,file,kind,target
 0x485940,ComparePlayers,src/units/units.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
 0x485980,FreeUnitMemory,src/units/units.cpp,call,GameFreeThunk
 0x485980,FreeUnitMemory,src/units/units.cpp,call,KillUnit
+0x485980,FreeUnitMemory,src/units/units.cpp,call,get
 0x485980,FreeUnitMemory,src/units/units.cpp,call,operator Unit *
 0x485980,FreeUnitMemory,src/units/units.cpp,call,operator!=
 0x485980,FreeUnitMemory,src/units/units.cpp,call,operator=
-0x485980,FreeUnitMemory,src/units/units.cpp,deref_write,*void
-0x485980,FreeUnitMemory,src/units/units.cpp,field_escape,Game::list_1435f
 0x485980,FreeUnitMemory,src/units/units.cpp,field_read,Game::hotRadar
 0x485980,FreeUnitMemory,src/units/units.cpp,field_read,Game::list_1435f
 0x485980,FreeUnitMemory,src/units/units.cpp,field_read,Game::units
 0x485980,FreeUnitMemory,src/units/units.cpp,field_read,Game::unitsEnd
 0x485980,FreeUnitMemory,src/units/units.cpp,field_read,Unit::unitDefIndex
 0x485980,FreeUnitMemory,src/units/units.cpp,field_write,Game::hotRadar
+0x485980,FreeUnitMemory,src/units/units.cpp,field_write,Game::list_1435f
 0x485980,FreeUnitMemory,src/units/units.cpp,field_write,Game::units
 0x485980,FreeUnitMemory,src/units/units.cpp,function,
 0x485980,FreeUnitMemory,src/units/units.cpp,global_read,g_game
@@ -28662,6 +28644,7 @@ address,function,file,kind,target
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,call,IsUnitVisibleToPlayer
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,call,operator Unit *
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,call,operator UnitDef *
+0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,call,operator unsigned short *
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,deref_read,*short
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,deref_write,*unsigned short
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,field_escape,Game::players
@@ -28695,6 +28678,7 @@ address,function,file,kind,target
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,field_write,Game::count_14367
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,function,
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,global_read,g_game
+0x48bcb0,IsUnitVisible,src/ingame/selection.cpp,call,get
 0x48bcb0,IsUnitVisible,src/ingame/selection.cpp,deref_read,*short
 0x48bcb0,IsUnitVisible,src/ingame/selection.cpp,field_read,Game::count_14367
 0x48bcb0,IsUnitVisible,src/ingame/selection.cpp,field_read,Game::list_1435f
@@ -28775,6 +28759,7 @@ address,function,file,kind,target
 0x48c030,SelectAllVisibleUnits,src/ingame/selection.cpp,call,PopUntilNamedLayout
 0x48c030,SelectAllVisibleUnits,src/ingame/selection.cpp,call,SelectStopOrder
 0x48c030,SelectAllVisibleUnits,src/ingame/selection.cpp,call,operator Unit *
+0x48c030,SelectAllVisibleUnits,src/ingame/selection.cpp,call,operator unsigned short *
 0x48c030,SelectAllVisibleUnits,src/ingame/selection.cpp,call,operator->
 0x48c030,SelectAllVisibleUnits,src/ingame/selection.cpp,call,operator==
 0x48c030,SelectAllVisibleUnits,src/ingame/selection.cpp,deref_escape,*Unit
@@ -28816,6 +28801,7 @@ address,function,file,kind,target
 0x48c190,FindNextSelectedUnit,src/ingame/selection.cpp,function,
 0x48c190,FindNextSelectedUnit,src/ingame/selection.cpp,global_read,g_game
 0x48c320,MarkLocalVisibleUnits,src/ingame/selection.cpp,call,operator Unit *
+0x48c320,MarkLocalVisibleUnits,src/ingame/selection.cpp,call,operator unsigned short *
 0x48c320,MarkLocalVisibleUnits,src/ingame/selection.cpp,deref_escape,*Unit
 0x48c320,MarkLocalVisibleUnits,src/ingame/selection.cpp,deref_read,*unsigned short
 0x48c320,MarkLocalVisibleUnits,src/ingame/selection.cpp,field_read,Game::count_14367
@@ -28831,6 +28817,7 @@ address,function,file,kind,target
 0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,call,QueueUnitSpeech
 0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,call,operator Unit *
 0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,call,operator bool
+0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,call,operator unsigned short *
 0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,call,operator->
 0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,deref_escape,*Unit
 0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,deref_read,*Orders_37ebe
@@ -28896,6 +28883,7 @@ address,function,file,kind,target
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,call,PopUntilNamedLayout
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,call,QueueUnitSpeech
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,call,operator Unit *
+0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,call,operator unsigned short *
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,call,operator!=
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,call,operator->
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,deref_escape,*Unit
@@ -28950,8 +28938,9 @@ address,function,file,kind,target
 0x48cc30,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,call,operator Unit *
 0x48cc30,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,call,operator bool
 0x48cc30,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,call,operator->
+0x48cc30,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,call,operator==
 0x48cc30,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,deref_escape,*Unit
-0x48cc30,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,deref_read,*Unit
+0x48cc30,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,deref_read,*Ref<Unit>
 0x48cc30,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,field_escape,Game::players
 0x48cc30,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,field_read,Game::hoverUnitId
 0x48cc30,DrawSelectedUnitOrderOverlays,src/ingame/selection.cpp,field_read,Game::localPlayer
@@ -28969,8 +28958,10 @@ address,function,file,kind,target
 0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,call,FixMul
 0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,call,HitTestUnitScreenHull
 0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,call,PointInRect
+0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,call,operator HotRadarSlot *
 0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,call,operator Unit *
 0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,call,operator UnitDef *
+0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,call,operator unsigned short *
 0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,deref_escape,*Unit
 0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,deref_read,*unsigned short
 0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,field_escape,Game::view_2c76
@@ -29068,6 +29059,7 @@ address,function,file,kind,target
 0x48d4d0,FocusNextLocalUnit,src/ingame/selection.cpp,call,CollectVisibleUnitIds
 0x48d4d0,FocusNextLocalUnit,src/ingame/selection.cpp,call,PickUnit
 0x48d4d0,FocusNextLocalUnit,src/ingame/selection.cpp,call,operator Unit *
+0x48d4d0,FocusNextLocalUnit,src/ingame/selection.cpp,call,operator unsigned short *
 0x48d4d0,FocusNextLocalUnit,src/ingame/selection.cpp,deref_escape,*Unit
 0x48d4d0,FocusNextLocalUnit,src/ingame/selection.cpp,deref_read,*unsigned short
 0x48d4d0,FocusNextLocalUnit,src/ingame/selection.cpp,field_maybe_written,Game::players
@@ -31166,6 +31158,7 @@ address,function,file,kind,target
 0x495230,UpdateFramePacing,src/ingame/game_dialogs.cpp,call,HarnessStepsPerFrame
 0x495230,UpdateFramePacing,src/ingame/game_dialogs.cpp,call,HarnessTestMode
 0x495230,UpdateFramePacing,src/ingame/game_dialogs.cpp,call,floor
+0x495230,UpdateFramePacing,src/ingame/game_dialogs.cpp,call,operator=
 0x495230,UpdateFramePacing,src/ingame/game_dialogs.cpp,deref_read,*float
 0x495230,UpdateFramePacing,src/ingame/game_dialogs.cpp,deref_read,*unsigned short
 0x495230,UpdateFramePacing,src/ingame/game_dialogs.cpp,deref_write,*float
@@ -32328,13 +32321,13 @@ address,function,file,kind,target
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,global_read,g_game
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,call,operator->
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,call,operator=
-0x499e50,UntrackProjectile,src/weapons/weapons.cpp,deref_write,*void
-0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_escape,Game::tracked
+0x499e50,UntrackProjectile,src/weapons/weapons.cpp,call,operator==
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_read,Game::tracked
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_read,Projectile::flags
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_read,Projectile::position
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_read,Projectile::type
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::holdTime
+0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_write,Game::tracked
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_write,Game::trackedPos
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_write,Game::value_1434b
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,field_write,Projectile::flags
@@ -32351,10 +32344,9 @@ address,function,file,kind,target
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator->
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator=
+0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator==
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,deref_read,*unsigned char
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,deref_write,*void
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_escape,Game::players
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_escape,Game::tracked
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_escape,Projectile::position
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,<anon>::endSmoke
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,<anon>::noExplode
@@ -32384,6 +32376,7 @@ address,function,file,kind,target
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::soundHit
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::soundWater
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::splash
+0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_write,Game::tracked
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_write,Game::trackedPos
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_write,Game::value_1434b
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_write,Projectile::flags
@@ -32542,6 +32535,7 @@ address,function,file,kind,target
 0x49ae20,CompactProjectiles,src/weapons/weapons.cpp,call,operator Projectile *
 0x49ae20,CompactProjectiles,src/weapons/weapons.cpp,call,operator bool
 0x49ae20,CompactProjectiles,src/weapons/weapons.cpp,call,operator=
+0x49ae20,CompactProjectiles,src/weapons/weapons.cpp,call,operator==
 0x49ae20,CompactProjectiles,src/weapons/weapons.cpp,deref_escape,*Projectile
 0x49ae20,CompactProjectiles,src/weapons/weapons.cpp,deref_read,*Projectile
 0x49ae20,CompactProjectiles,src/weapons/weapons.cpp,deref_write,*Projectile
@@ -32592,6 +32586,7 @@ address,function,file,kind,target
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator bool
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator->
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator=
+0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator==
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,deref_escape,*Feature
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,deref_escape,*Unit
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_escape,Projectile::position
@@ -32900,10 +32895,9 @@ address,function,file,kind,target
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,QueryWeaponPiece
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,operator=
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,operator==
-0x49c740,InitProjectile,src/weapons/weapons.cpp,deref_read,*Unit
 0x49c740,InitProjectile,src/weapons/weapons.cpp,deref_read,*Vec3
-0x49c740,InitProjectile,src/weapons/weapons.cpp,field_escape,Game::value_142f3
 0x49c740,InitProjectile,src/weapons/weapons.cpp,field_read,Game::ticks
+0x49c740,InitProjectile,src/weapons/weapons.cpp,field_read,Game::value_142f3
 0x49c740,InitProjectile,src/weapons/weapons.cpp,field_read,Projectile::flags
 0x49c740,InitProjectile,src/weapons/weapons.cpp,field_read,Unit::flags
 0x49c740,InitProjectile,src/weapons/weapons.cpp,field_read,Unit::playerIndex
@@ -43599,17 +43593,8 @@ address,function,file,kind,target
 ,BurnOut,src/map/features.cpp,global_read,g_game
 ,BurnOut,src/map/features.cpp,global_read,g_seams
 ,BurnOut,src/map/features.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,call,GameFreeThunk
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,call,SimAllocTagged
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,field_read,CMemoryCache::base
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,field_read,CMemoryCache::cap
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,field_read,CMemoryCache::cur
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,field_write,CMemoryCache::base
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,field_write,CMemoryCache::cap
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,field_write,CMemoryCache::cur
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,field_write,CacheChunk::owner
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,field_write,CacheChunk::size
-,CMemoryCache::InitSimCache,src/units/unit_motion.cpp,function,
+,CacheAddr,src/graphics/memory_cache.h,function,
+,CacheSet,src/graphics/memory_cache.h,function,
 ,Call,src/wasm/wind_meteors_glue.cpp,call,FuelBegin
 ,Call,src/wasm/wind_meteors_glue.cpp,call,ModulesFatal
 ,Call,src/wasm/wind_meteors_glue.cpp,call,Prepare
@@ -43891,6 +43876,7 @@ address,function,file,kind,target
 ,ClearPlayerSlotInRemovePlayer,src/network/net_game.cpp,function,
 ,ClearTrackedProjectile,src/weapons/weapons.cpp,call,operator->
 ,ClearTrackedProjectile,src/weapons/weapons.cpp,call,operator=
+,ClearTrackedProjectile,src/weapons/weapons.cpp,call,operator==
 ,ClearTrackedProjectile,src/weapons/weapons.cpp,field_read,Game::tracked
 ,ClearTrackedProjectile,src/weapons/weapons.cpp,field_read,Projectile::flags
 ,ClearTrackedProjectile,src/weapons/weapons.cpp,field_read,Projectile::position
@@ -44094,6 +44080,10 @@ address,function,file,kind,target
 ,DamagedAllyCollector::DamagedAllyCollector,src/map/terrain.h,function,
 ,DeactivateConditionsNative,src/seams/native.cpp,call,MissionConditions::Deactivate
 ,DeactivateConditionsNative,src/seams/native.cpp,function,
+,DebrisCache::InitSimCache,src/units/unit_motion.cpp,call,FreeCache
+,DebrisCache::InitSimCache,src/units/unit_motion.cpp,call,Install
+,DebrisCache::InitSimCache,src/units/unit_motion.cpp,call,SimAllocTagged
+,DebrisCache::InitSimCache,src/units/unit_motion.cpp,function,
 ,DefeatAllUnitsKilledOfType::DefeatAllUnitsKilledOfType,src/game/victory_conditions.h,call,strcpy
 ,DefeatAllUnitsKilledOfType::DefeatAllUnitsKilledOfType,src/game/victory_conditions.h,field_maybe_written,DefeatAllUnitsKilledOfType::name
 ,DefeatAllUnitsKilledOfType::DefeatAllUnitsKilledOfType,src/game/victory_conditions.h,function,
@@ -45827,9 +45817,6 @@ address,function,file,kind,target
 ,HAPI_readfromfile,src/files/files_api.h,global_read,g_seams
 ,HAPI_readfromfile,src/files/files_api.h,indirect_call,"indirect via int (*)(FileHandle *, void *, int) __attribute__((stdcall)) [FilesSeam::Read]"
 ,HalfNegated,src/orders/unit_orders.cpp,function,
-,HandleGet,src/units/unit_motion.cpp,call,get
-,HandleGet,src/units/unit_motion.cpp,deref_read,*void
-,HandleGet,src/units/unit_motion.cpp,function,
 ,HandleHostEvent,src/graphics/display.cpp,call,HandleVirtualKey
 ,HandleHostEvent,src/graphics/display.cpp,call,PushKeyCode
 ,HandleHostEvent,src/graphics/display.cpp,call,PushMouseEvent
@@ -45871,10 +45858,6 @@ address,function,file,kind,target
 ,HandleOf,src/wasm/wind_meteors_glue.cpp,global_read,s_importDepth
 ,HandleOf,src/wasm/wind_meteors_glue.cpp,global_write,s_handleCount
 ,HandleOf,src/wasm/wind_meteors_glue.cpp,global_write,s_handles
-,HandleSet,src/units/unit_motion.cpp,call,operator=
-,HandleSet,src/units/unit_motion.cpp,deref_write,*Ref<char>
-,HandleSet,src/units/unit_motion.cpp,deref_write,*void
-,HandleSet,src/units/unit_motion.cpp,function,
 ,HapiBank::CloseBank,src/files/files_bank.h,field_read,FilesSeam::BankClose
 ,HapiBank::CloseBank,src/files/files_bank.h,field_read,Seams::files
 ,HapiBank::CloseBank,src/files/files_bank.h,function,
@@ -46595,6 +46578,8 @@ address,function,file,kind,target
 ,InsideExplored,src/map/terrain.cpp,field_read,Player::exploredHeight
 ,InsideExplored,src/map/terrain.cpp,field_read,Player::exploredWidth
 ,InsideExplored,src/map/terrain.cpp,function,
+,Install,src/units/unit_motion.cpp,function,
+,Install,src/units/unit_motion.cpp,indirect_call,indirect via <overloaded function type>
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreatePlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreateSquadManager
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreateSquads
@@ -49116,6 +49101,8 @@ address,function,file,kind,target
 ,Patrol,src/orders/vtol_orders.cpp,global_read,g_seams
 ,Patrol,src/orders/vtol_orders.cpp,global_read,kSim
 ,Patrol,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
+,PeekFrame,src/network/packets.cpp,call,operator->
+,PeekFrame,src/network/packets.cpp,call,operator==
 ,PeekFrame,src/network/packets.cpp,field_escape,FrameRing::frames
 ,PeekFrame,src/network/packets.cpp,field_read,FrameQueue::buffer
 ,PeekFrame,src/network/packets.cpp,field_read,FrameRing::count
@@ -49372,6 +49359,8 @@ address,function,file,kind,target
 ,Queue,src/host/win32/window.cpp,field_write,host_event::x
 ,Queue,src/host/win32/window.cpp,field_write,host_event::y
 ,Queue,src/host/win32/window.cpp,function,
+,QueueCount,src/network/packets.cpp,call,operator bool
+,QueueCount,src/network/packets.cpp,call,operator->
 ,QueueCount,src/network/packets.cpp,field_read,FrameQueue::buffer
 ,QueueCount,src/network/packets.cpp,field_read,FrameRing::count
 ,QueueCount,src/network/packets.cpp,function,
@@ -49891,6 +49880,7 @@ address,function,file,kind,target
 ,ReleaseWeaponsNative,src/seams/native.cpp,function,
 ,Remove,src/weapons/weapons.cpp,call,operator->
 ,Remove,src/weapons/weapons.cpp,call,operator=
+,Remove,src/weapons/weapons.cpp,call,operator==
 ,Remove,src/weapons/weapons.cpp,deref_write,*unsigned short
 ,Remove,src/weapons/weapons.cpp,field_escape,Game::value_1434b
 ,Remove,src/weapons/weapons.cpp,field_read,Game::tracked
@@ -50957,6 +50947,7 @@ address,function,file,kind,target
 ,SyncRecordIntVectorBase::count,src/network/unit_sync.cpp,function,
 ,SystemValueType,src/host/win32/settings.cpp,function,
 ,TakeFrame,src/network/packets.cpp,call,FrameRing::Pop
+,TakeFrame,src/network/packets.cpp,call,operator->
 ,TakeFrame,src/network/packets.cpp,field_read,Frame::data
 ,TakeFrame,src/network/packets.cpp,field_read,Frame::size
 ,TakeFrame,src/network/packets.cpp,field_read,Frame::tick
@@ -51276,10 +51267,10 @@ address,function,file,kind,target
 ,UnitTypeSet::UnitTypeSet,src/units/unit_type_set.h,function,
 ,UnitTypeSetAddTypeOrCategoryNative,src/seams/native.cpp,call,UnitTypeSet::AddTypeOrCategory
 ,UnitTypeSetAddTypeOrCategoryNative,src/seams/native.cpp,function,
-,UnlinkBucketUnit,src/map/terrain.cpp,call,operator Unit *
 ,UnlinkBucketUnit,src/map/terrain.cpp,call,operator!=
 ,UnlinkBucketUnit,src/map/terrain.cpp,call,operator->
 ,UnlinkBucketUnit,src/map/terrain.cpp,call,operator=
+,UnlinkBucketUnit,src/map/terrain.cpp,call,operator==
 ,UnlinkBucketUnit,src/map/terrain.cpp,deref_read,*Ref<Unit>
 ,UnlinkBucketUnit,src/map/terrain.cpp,deref_write,*Ref<Unit>
 ,UnlinkBucketUnit,src/map/terrain.cpp,field_escape,Unit::cargoNext
@@ -51717,6 +51708,7 @@ address,function,file,kind,target
 ,VisitExplosions,src/harness/harness.cpp,global_read,kPieceRecTable@src/harness/trace_schema.h
 ,VisitExplosions,src/harness/harness.cpp,global_read,kPieceTable@src/harness/trace_schema.h
 ,VisitEyes,src/harness/harness.cpp,call,EndSection
+,VisitEyes,src/harness/harness.cpp,call,GameRef
 ,VisitEyes,src/harness/harness.cpp,call,GameU32
 ,VisitEyes,src/harness/harness.cpp,call,HashByte
 ,VisitEyes,src/harness/harness.cpp,call,VisitElement

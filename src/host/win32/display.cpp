@@ -26,8 +26,6 @@ void* g_windowedBits;
 int g_windowedWidth;
 int g_windowedHeight;
 unsigned char g_windowedEntries[256 * 4];
-bool g_presentedFront;
-LONG g_dumpRequested;
 unsigned int g_dumpIndex;
 
 IDirectDrawSurface* Frame(int which)
@@ -199,7 +197,7 @@ bool ReadPresented(unsigned char* pixels, int pitch, int* width, int* height)
         *height = g_windowedHeight;
         return true;
     }
-    IDirectDrawSurface* surface = g_presentedFront ? g_primary : g_back;
+    IDirectDrawSurface* surface = g_primary ? g_primary : g_back;
     DDSURFACEDESC desc;
 
     if (!surface) {
@@ -262,13 +260,6 @@ void WriteDump()
         g_dumpIndex++;
     }
     free(data);
-}
-
-void DumpIfRequested(int result)
-{
-    if (result == HOST_FRAME_OK && InterlockedExchange(&g_dumpRequested, 0)) {
-        WriteDump();
-    }
 }
 
 struct ModeCollector {
@@ -495,17 +486,10 @@ extern "C" int HOST_CALL host_frame_present(int flip)
 {
     if (HostHeadless()) return HeadlessFramePresent(flip);
     if (WindowedBackActive()) {
-        int shown = WindowedPresent(0, 0, g_windowedWidth, g_windowedHeight);
-        DumpIfRequested(shown);
-        return shown;
+        return WindowedPresent(0, 0, g_windowedWidth, g_windowedHeight);
     }
     if (flip) {
-        int flipped = Result(g_primary->Flip(0, 1));
-        if (flipped == HOST_FRAME_OK) {
-            g_presentedFront = true;
-        }
-        DumpIfRequested(flipped);
-        return flipped;
+        return Result(g_primary->Flip(0, 1));
     }
     RECT rect;
     POINT pt;
@@ -516,20 +500,13 @@ extern "C" int HOST_CALL host_frame_present(int flip)
     RECT src = rect;
     ClientToScreen(hwnd, &pt);
     OffsetRect(&rect, pt.x, pt.y);
-    int blitted = Result(g_primary->Blt(&rect, g_back, &src, 0x1000000, 0));
-    if (blitted == HOST_FRAME_OK) {
-        g_presentedFront = false;
-    }
-    DumpIfRequested(blitted);
-    return blitted;
+    return Result(g_primary->Blt(&rect, g_back, &src, 0x1000000, 0));
 }
 
 extern "C" int HOST_CALL host_frame_present_rect(int x, int y, int width, int height)
 {
     if (HostHeadless()) return HeadlessFramePresentRect(x, y, width, height);
-    int shown = WindowedPresent(x, y, width, height);
-    DumpIfRequested(shown);
-    return shown;
+    return WindowedPresent(x, y, width, height);
 }
 
 extern "C" int HOST_CALL host_frame_is_lost(void)
@@ -610,7 +587,7 @@ extern "C" int HOST_CALL host_frame_read(unsigned char* pixels, int pitch, unsig
 
 void HostFrameDumpRequest()
 {
-    InterlockedExchange(&g_dumpRequested, 1);
+    WriteDump();
 }
 
 extern "C" int HOST_CALL host_palette_create(const unsigned char* entries)

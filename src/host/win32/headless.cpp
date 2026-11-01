@@ -179,7 +179,7 @@ void FreePresented()
     g_presentedHeight = 0;
 }
 
-void CopyPresented()
+void CopyPresented(bool front)
 {
     const unsigned char* source;
     int width;
@@ -192,7 +192,7 @@ void CopyPresented()
         height = g_windowedHeight;
         pitch = (g_windowedWidth + 3) & ~3;
     } else {
-        source = g_hasBack ? g_back : g_front;
+        source = front || !g_hasBack ? g_front : g_back;
         width = g_width;
         height = g_height;
         pitch = g_width;
@@ -520,6 +520,9 @@ int HeadlessFrameUnlock(int which)
     if (which == HOST_FRAME_BACK && Frame(which) == NULL && g_windowed != NULL) {
         return 1;
     }
+    if (which == HOST_FRAME_FRONT && Frame(which) != NULL) {
+        CopyPresented(true);
+    }
     return Frame(which) != NULL ? 1 : 0;
 }
 
@@ -529,7 +532,7 @@ int HeadlessFramePresent(int flip)
     if (!g_displayOpen && g_windowed == NULL) {
         return HOST_FRAME_FAILED;
     }
-    CopyPresented();
+    CopyPresented(false);
     return HOST_FRAME_OK;
 }
 
@@ -542,7 +545,7 @@ int HeadlessFramePresentRect(int x, int y, int width, int height)
     if (g_windowed == NULL) {
         return HOST_FRAME_FAILED;
     }
-    CopyPresented();
+    CopyPresented(false);
     return HOST_FRAME_OK;
 }
 

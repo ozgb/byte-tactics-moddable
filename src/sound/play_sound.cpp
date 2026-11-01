@@ -4,6 +4,7 @@
 
 #include "../files/files_api.h"
 #include "../graphics/object_pool.h"
+#include "../harness/harness.h"
 
 // FUNCTION: 0x49f610
 int IsWindowsSoundAvailable(void)
@@ -46,6 +47,7 @@ void __stdcall PlayLoopingWavMemory(char* sound)
 // FUNCTION: 0x49f6c0
 int __stdcall PlayWavFromDisk(char* path)
 {
+    HarnessSoundEvent("wav_file", -1, path, nullptr, nullptr);
     int* sound = (int*)HAPI_LoadFile(path, 0);
     if (sound == 0)
         return 0;

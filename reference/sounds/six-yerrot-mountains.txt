@@ -1,0 +1,22 @@
+bt-sound 1
+0 stop_all - - - - -
+229 play_file nanlath1.WAV -585 - - -
+442 play_file mexrun1.WAV -585 - - -
+532 play_file nanlath1.WAV -585 - - -
+1456 play_file nanlath1.WAV -585 - - -
+1666 play_file mexrun1.WAV -585 - - -
+1903 play_file nanlath1.WAV -585 - - -
+2426 play_file solar1.WAV -585 - - -
+3066 play_file nanlath1.WAV -585 - - -
+3279 play_file mexrun1.WAV -585 - - -
+3571 play_file nanlath1.WAV -585 - - -
+3854 play_file solar1.WAV -585 - - -
+4091 play_file nanlath1.WAV -585 - - -
+4374 play_file solar1.WAV -585 - - -
+4494 play_file nanlath1.WAV -585 - - -
+4908 play_file nanlath1.WAV -585 - - -
+5191 play_file solar1.WAV -585 - - -
+5295 play_file nanlath1.WAV -585 - - -
+5578 play_file solar1.WAV -585 - - -
+6784 play_file nanlath1.WAV -585 - - -
+6997 play_file mexrun1.WAV -585 - - -

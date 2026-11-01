@@ -1,0 +1,5 @@
+bt-sound 1
+0 stop_all - - - - -
+132 play xplonuk3 -585 - - -
+133 play xplosml3 -585 - - -
+133 play exmine1 -585 - - -

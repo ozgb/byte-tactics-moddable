@@ -1,0 +1,9 @@
+bt-sound 1
+0 stop_all - - - - -
+1114 play_file nanlath2.WAV -585 - - -
+1725 play_file metlon2.WAV -585 - - -
+2435 play_file nanlath2.WAV -585 - - -
+3301 play_file nanlath2.WAV -585 - - -
+4200 play_file nanlath2.WAV -585 - - -
+5895 play_file nanlath2.WAV -585 - - -
+8365 play_file nanlath2.WAV -585 - - -

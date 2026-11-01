@@ -2752,6 +2752,8 @@ address,function,file,kind,target
 0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,call,Pathfinder::Push
 0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,call,Pathfinder::Steps
 0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,call,operator Node *
+0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,call,operator PathCell *
+0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,call,operator unsigned int *
 0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,deref_escape,*PathCell
 0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,deref_read,*unsigned int
 0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,deref_write,*unsigned int
@@ -2787,10 +2789,12 @@ address,function,file,kind,target
 0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,global_read,g_dirDeltaZ
 0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,call,OpenHeap::Pop
 0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,call,Pathfinder::ExpandNeighbour
-0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,call,operator Node **
+0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,call,operator Node *
+0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,call,operator PathCell *
+0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,call,operator Ref<Node> *
 0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,call,operator=
 0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,deref_escape,*PathCell
-0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,deref_read,*Node
+0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,deref_read,*Ref<Node>
 0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,field_read,Node::data
 0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,field_read,NodeData::pos
 0x40df00,Pathfinder::ExpandBestNode,src/ai/pathfind.cpp,field_read,OpenHeap::items
@@ -2856,7 +2860,9 @@ address,function,file,kind,target
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,end
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,get
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator MovementClass *
+0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator PathCell *
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator Unit *
+0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator unsigned int *
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator->
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator=
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,deref_read,*unsigned int
@@ -2917,9 +2923,12 @@ address,function,file,kind,target
 0x40e9c0,Pathfinder::AbortIfGoalMatch,src/ai/pathfind.cpp,function,
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,Pathfinder::ClearDirtyCells
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,SimAllocTagged
+0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,get
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,memset
+0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,operator PathCell *
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,operator delete
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,operator new
+0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,operator unsigned int *
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,operator=
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,deref_read,*Ref<Unit>
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,deref_read,*unsigned int
@@ -2958,8 +2967,10 @@ address,function,file,kind,target
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,global_write,g_playerBudgetCap
 0x40eb30,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,call,GameFreeThunk
 0x40eb30,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,call,operator Node *
-0x40eb30,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,call,operator Node **
+0x40eb30,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,call,operator PathCell *
+0x40eb30,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,call,operator Ref<Node> *
 0x40eb30,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,call,operator delete
+0x40eb30,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,call,operator unsigned int *
 0x40eb30,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,field_read,OpenHeap::items
 0x40eb30,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,field_read,OpenHeap::pool
 0x40eb30,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,field_read,PathGrid::cells
@@ -2977,16 +2988,17 @@ address,function,file,kind,target
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,get
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator AiSearchGoal *
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator Node *
-0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator Node **
+0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator PathCell *
+0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator Ref<Node> *
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator Unit *
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator!=
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator->
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator=
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator==
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,deref_escape,*PathCell
-0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,deref_read,*Node
+0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,deref_read,*Ref<Node>
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,deref_read,*Ref<Unit>
-0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,deref_write,*Node
+0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,deref_write,*Ref<Node>
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,deref_write,*Ref<Unit>
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_escape,Game::players
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_escape,Pathfinder::cursor
@@ -3048,9 +3060,11 @@ address,function,file,kind,target
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,call,OpenHeap::Free
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,call,OpenHeap::SiftDownInline
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,call,operator Node *
-0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,call,operator Node **
-0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,deref_read,*Node
-0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,deref_write,*Node
+0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,call,operator Ref<Node> *
+0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,call,operator->
+0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,call,operator=
+0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,deref_read,*Ref<Node>
+0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,deref_write,*Ref<Node>
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,field_read,Node::index
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,field_read,OpenHeap::count
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,field_read,OpenHeap::items
@@ -3058,16 +3072,21 @@ address,function,file,kind,target
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,field_write,Node::index
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,field_write,OpenHeap::count
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,function,
-0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,call,operator Node **
-0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,deref_read,*Node
-0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,deref_write,*Node
+0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,call,operator Node *
+0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,call,operator Ref<Node> *
+0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,call,operator=
+0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,deref_read,*Ref<Node>
+0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,deref_write,*Ref<Node>
 0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,field_read,NodeData::f
 0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,field_read,OpenHeap::items
 0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,field_write,Node::index
 0x40f000,OpenHeap::SiftUp,src/ai/pathfinder.h,function,
-0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,call,operator Node **
-0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,deref_read,*Node
-0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,deref_write,*Node
+0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,call,operator Node *
+0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,call,operator Ref<Node> *
+0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,call,operator->
+0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,call,operator=
+0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,deref_read,*Ref<Node>
+0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,deref_write,*Ref<Node>
 0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,field_read,NodeData::f
 0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,field_read,OpenHeap::count
 0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,field_read,OpenHeap::items
@@ -3075,11 +3094,13 @@ address,function,file,kind,target
 0x40f060,OpenHeap::SiftDown,src/ai/pathfind.cpp,function,
 0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,call,SimAlloc
 0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,call,operator Node *
-0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,call,operator Node **
+0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,call,operator Ref<Node> *
 0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,call,operator delete
 0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,call,operator=
 0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,deref_read,*Node
+0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,deref_read,*Ref<Node>
 0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,deref_write,*Node
+0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,deref_write,*Ref<Node>
 0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,field_read,OpenHeap::capacity
 0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,field_read,OpenHeap::count
 0x40f110,Pathfinder::GrowNodes,src/ai/pathfinder.h,field_read,OpenHeap::items
@@ -6314,9 +6335,11 @@ address,function,file,kind,target
 0x41d8c0,AllocZeroedWithTickOffset,src/game/cd_check.cpp,function,
 0x41d920,CreateGameObject,src/frontend/endgame.cpp,call,AllocNotifyNop
 0x41d920,CreateGameObject,src/frontend/endgame.cpp,call,SimAlloc
+0x41d920,CreateGameObject,src/frontend/endgame.cpp,call,SimBlockTrack
 0x41d920,CreateGameObject,src/frontend/endgame.cpp,call,memset
 0x41d920,CreateGameObject,src/frontend/endgame.cpp,call,operator new
 0x41d920,CreateGameObject,src/frontend/endgame.cpp,function,
+0x41d920,CreateGameObject,src/frontend/endgame.cpp,global_escape,g_game
 0x41d920,CreateGameObject,src/frontend/endgame.cpp,global_write,g_game
 0x41d9f0,SetEndGameState,src/frontend/endgame.cpp,field_write,Game::endGameState
 0x41d9f0,SetEndGameState,src/frontend/endgame.cpp,function,
@@ -25262,6 +25285,7 @@ address,function,file,kind,target
 0x47ed40,InitSound,src/sound/sound.cpp,call,FatalError
 0x47ed40,InitSound,src/sound/sound.cpp,call,GetPreferenceInt
 0x47ed40,InitSound,src/sound/sound.cpp,call,IsWindowsSoundAvailable
+0x47ed40,InitSound,src/sound/sound.cpp,call,SimBlockTrack
 0x47ed40,InitSound,src/sound/sound.cpp,call,Sound::HasNoDriver
 0x47ed40,InitSound,src/sound/sound.cpp,call,Sound::InitDirectSound
 0x47ed40,InitSound,src/sound/sound.cpp,call,Sound::OpenCdAudio
@@ -25270,6 +25294,7 @@ address,function,file,kind,target
 0x47ed40,InitSound,src/sound/sound.cpp,field_read,Game::displayContext
 0x47ed40,InitSound,src/sound/sound.cpp,field_read,Game::sound
 0x47ed40,InitSound,src/sound/sound.cpp,function,
+0x47ed40,InitSound,src/sound/sound.cpp,global_escape,g_speechQueue
 0x47ed40,InitSound,src/sound/sound.cpp,global_maybe_written,g_noDirectSoundKey
 0x47ed40,InitSound,src/sound/sound.cpp,global_maybe_written,g_soundInitError
 0x47ed40,InitSound,src/sound/sound.cpp,global_maybe_written,g_useWindowsSoundKey
@@ -25469,6 +25494,7 @@ address,function,file,kind,target
 0x47f850,QueueUnitSpeechIfNotVisible,src/sound/sound.cpp,function,
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,call,GameFreeThunk
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,call,operator=
+0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,call,operator==
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,deref_read,*SpeechEntry
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,deref_read,*int
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,deref_write,*SpeechEntry
@@ -25582,6 +25608,7 @@ address,function,file,kind,target
 0x47ffa0,SpeechQueue::RemoveSpeechAt,src/sound/sound.cpp,function,
 0x480020,SpeechQueue::RemoveSpeechOfId,src/sound/sound.cpp,call,GameFreeThunk
 0x480020,SpeechQueue::RemoveSpeechOfId,src/sound/sound.cpp,call,operator=
+0x480020,SpeechQueue::RemoveSpeechOfId,src/sound/sound.cpp,call,operator==
 0x480020,SpeechQueue::RemoveSpeechOfId,src/sound/sound.cpp,field_read,SpeechEntry::data
 0x480020,SpeechQueue::RemoveSpeechOfId,src/sound/sound.cpp,field_read,SpeechEntry::unit
 0x480020,SpeechQueue::RemoveSpeechOfId,src/sound/sound.cpp,field_read,SpeechQueue::count
@@ -35564,6 +35591,7 @@ address,function,file,kind,target
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,indirect_call,indirect via void (*)(Gui *) __attribute__((stdcall)) [Layer::handler]
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,indirect_call,indirect via void (*)(Gui *) __attribute__((stdcall)) [Layer::textHandler]
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,call,GetTicks
+0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,call,SimBlockTrack
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,call,memset
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,field_escape,Gui::values
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,field_write,Gui::animTimer
@@ -35582,6 +35610,7 @@ address,function,file,kind,target
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,field_write,Gui::str_bb6
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,field_write,Gui::time
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,function,
+0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,global_escape,g_guiContext
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,global_write,g_guiContext
 0x4aa8d0,GetGuiContext,src/gui/gui.cpp,function,
 0x4aa8d0,GetGuiContext,src/gui/gui.cpp,global_read,g_guiContext
@@ -43786,6 +43815,8 @@ address,function,file,kind,target
 ,CheckScenario,src/harness/harness.cpp,global_read,s_localPlayerLine@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_map@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
+,CheckScenario,src/harness/harness.cpp,global_read,s_roundTripCount@src/harness/harness.cpp
+,CheckScenario,src/harness/harness.cpp,global_read,s_roundTrips@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_saveTick@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
@@ -45983,6 +46014,7 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessAfterStep,src/harness/harness.cpp,call,MakeDirectoryPath
 ,HarnessAfterStep,src/harness/harness.cpp,call,ModulesCheckStatics
+,HarnessAfterStep,src/harness/harness.cpp,call,RoundTripBlock
 ,HarnessAfterStep,src/harness/harness.cpp,call,SaveGameFile
 ,HarnessAfterStep,src/harness/harness.cpp,call,fclose
 ,HarnessAfterStep,src/harness/harness.cpp,call,fopen
@@ -45999,6 +46031,8 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_blockScan@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_optionsPath@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_read,s_roundTripCount@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_read,s_roundTrips@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_saveTick@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_savedOptions@src/harness/harness.cpp
@@ -48683,9 +48717,11 @@ address,function,file,kind,target
 ,OpenHeap::Free,src/ai/pathfinder.h,function,
 ,OpenHeap::Pop,src/ai/pathfinder.h,call,OpenHeap::SiftDown
 ,OpenHeap::Pop,src/ai/pathfinder.h,call,operator Node *
-,OpenHeap::Pop,src/ai/pathfinder.h,call,operator Node **
-,OpenHeap::Pop,src/ai/pathfinder.h,deref_read,*Node
-,OpenHeap::Pop,src/ai/pathfinder.h,deref_write,*Node
+,OpenHeap::Pop,src/ai/pathfinder.h,call,operator Ref<Node> *
+,OpenHeap::Pop,src/ai/pathfinder.h,call,operator->
+,OpenHeap::Pop,src/ai/pathfinder.h,call,operator=
+,OpenHeap::Pop,src/ai/pathfinder.h,deref_read,*Ref<Node>
+,OpenHeap::Pop,src/ai/pathfinder.h,deref_write,*Ref<Node>
 ,OpenHeap::Pop,src/ai/pathfinder.h,field_read,Node::index
 ,OpenHeap::Pop,src/ai/pathfinder.h,field_read,OpenHeap::count
 ,OpenHeap::Pop,src/ai/pathfinder.h,field_read,OpenHeap::freeHead
@@ -48698,9 +48734,11 @@ address,function,file,kind,target
 ,OpenHeap::Remove,src/ai/pathfinder.h,call,OpenHeap::Free
 ,OpenHeap::Remove,src/ai/pathfinder.h,call,OpenHeap::SiftDown
 ,OpenHeap::Remove,src/ai/pathfinder.h,call,operator Node *
-,OpenHeap::Remove,src/ai/pathfinder.h,call,operator Node **
-,OpenHeap::Remove,src/ai/pathfinder.h,deref_read,*Node
-,OpenHeap::Remove,src/ai/pathfinder.h,deref_write,*Node
+,OpenHeap::Remove,src/ai/pathfinder.h,call,operator Ref<Node> *
+,OpenHeap::Remove,src/ai/pathfinder.h,call,operator->
+,OpenHeap::Remove,src/ai/pathfinder.h,call,operator=
+,OpenHeap::Remove,src/ai/pathfinder.h,deref_read,*Ref<Node>
+,OpenHeap::Remove,src/ai/pathfinder.h,deref_write,*Ref<Node>
 ,OpenHeap::Remove,src/ai/pathfinder.h,field_read,Node::index
 ,OpenHeap::Remove,src/ai/pathfinder.h,field_read,OpenHeap::count
 ,OpenHeap::Remove,src/ai/pathfinder.h,field_read,OpenHeap::items
@@ -48708,9 +48746,12 @@ address,function,file,kind,target
 ,OpenHeap::Remove,src/ai/pathfinder.h,field_write,Node::index
 ,OpenHeap::Remove,src/ai/pathfinder.h,field_write,OpenHeap::count
 ,OpenHeap::Remove,src/ai/pathfinder.h,function,
-,OpenHeap::SiftDownInline,src/ai/pathfinder.h,call,operator Node **
-,OpenHeap::SiftDownInline,src/ai/pathfinder.h,deref_read,*Node
-,OpenHeap::SiftDownInline,src/ai/pathfinder.h,deref_write,*Node
+,OpenHeap::SiftDownInline,src/ai/pathfinder.h,call,operator Node *
+,OpenHeap::SiftDownInline,src/ai/pathfinder.h,call,operator Ref<Node> *
+,OpenHeap::SiftDownInline,src/ai/pathfinder.h,call,operator->
+,OpenHeap::SiftDownInline,src/ai/pathfinder.h,call,operator=
+,OpenHeap::SiftDownInline,src/ai/pathfinder.h,deref_read,*Ref<Node>
+,OpenHeap::SiftDownInline,src/ai/pathfinder.h,deref_write,*Ref<Node>
 ,OpenHeap::SiftDownInline,src/ai/pathfinder.h,field_read,NodeData::f
 ,OpenHeap::SiftDownInline,src/ai/pathfinder.h,field_read,OpenHeap::count
 ,OpenHeap::SiftDownInline,src/ai/pathfinder.h,field_read,OpenHeap::items
@@ -48722,8 +48763,8 @@ address,function,file,kind,target
 ,OpenHeap::Update,src/ai/pathfinder.h,call,OpenHeap::Remove
 ,OpenHeap::Update,src/ai/pathfinder.h,call,OpenHeap::SiftUp
 ,OpenHeap::Update,src/ai/pathfinder.h,call,operator Node *
-,OpenHeap::Update,src/ai/pathfinder.h,call,operator Node **
-,OpenHeap::Update,src/ai/pathfinder.h,deref_read,*Node
+,OpenHeap::Update,src/ai/pathfinder.h,call,operator Ref<Node> *
+,OpenHeap::Update,src/ai/pathfinder.h,deref_read,*Ref<Node>
 ,OpenHeap::Update,src/ai/pathfinder.h,field_read,Node::index
 ,OpenHeap::Update,src/ai/pathfinder.h,field_read,OpenHeap::items
 ,OpenHeap::Update,src/ai/pathfinder.h,field_read,OpenHeap::pool
@@ -48923,10 +48964,13 @@ address,function,file,kind,target
 ,PathAnimTrail::Run,src/ingame/markers.cpp,field_write,PathAnimTrail::pos
 ,PathAnimTrail::Run,src/ingame/markers.cpp,function,
 ,PathGoal::~PathGoal,src/ai/ai_search_goal.h,function,
+,PathGrid::At,src/ai/pathfinder.h,call,operator PathCell *
 ,PathGrid::At,src/ai/pathfinder.h,deref_escape,*PathCell
 ,PathGrid::At,src/ai/pathfinder.h,field_read,PathGrid::cells
 ,PathGrid::At,src/ai/pathfinder.h,field_read,PathGrid::width
 ,PathGrid::At,src/ai/pathfinder.h,function,
+,PathGrid::ClearBlock,src/ai/pathfinder.h,call,operator PathCell *
+,PathGrid::ClearBlock,src/ai/pathfinder.h,call,operator unsigned int *
 ,PathGrid::ClearBlock,src/ai/pathfinder.h,deref_escape,*PathCell
 ,PathGrid::ClearBlock,src/ai/pathfinder.h,deref_read,*unsigned int
 ,PathGrid::ClearBlock,src/ai/pathfinder.h,deref_write,*unsigned int
@@ -48935,6 +48979,8 @@ address,function,file,kind,target
 ,PathGrid::ClearBlock,src/ai/pathfinder.h,field_read,PathGrid::dirty
 ,PathGrid::ClearBlock,src/ai/pathfinder.h,field_write,PathCell::flags
 ,PathGrid::ClearBlock,src/ai/pathfinder.h,function,
+,PathGrid::ClearLast,src/ai/pathfinder.h,call,operator PathCell *
+,PathGrid::ClearLast,src/ai/pathfinder.h,call,operator unsigned int *
 ,PathGrid::ClearLast,src/ai/pathfinder.h,deref_read,*unsigned int
 ,PathGrid::ClearLast,src/ai/pathfinder.h,deref_write,*unsigned int
 ,PathGrid::ClearLast,src/ai/pathfinder.h,field_read,PathGrid::cells
@@ -48947,6 +48993,8 @@ address,function,file,kind,target
 ,PathGrid::InBounds,src/ai/pathfinder.h,function,
 ,PathGrid::Index,src/ai/pathfinder.h,field_read,PathGrid::width
 ,PathGrid::Index,src/ai/pathfinder.h,function,
+,PathGrid::Set,src/ai/pathfinder.h,call,operator PathCell *
+,PathGrid::Set,src/ai/pathfinder.h,call,operator unsigned int *
 ,PathGrid::Set,src/ai/pathfinder.h,deref_read,*unsigned int
 ,PathGrid::Set,src/ai/pathfinder.h,deref_write,*unsigned int
 ,PathGrid::Set,src/ai/pathfinder.h,field_read,PathGrid::cells
@@ -49012,11 +49060,11 @@ address,function,file,kind,target
 ,Pathfinder::Push,src/ai/pathfind.cpp,call,OpenHeap::SiftUp
 ,Pathfinder::Push,src/ai/pathfind.cpp,call,Pathfinder::GrowNodes
 ,Pathfinder::Push,src/ai/pathfind.cpp,call,operator Node *
-,Pathfinder::Push,src/ai/pathfind.cpp,call,operator Node **
+,Pathfinder::Push,src/ai/pathfind.cpp,call,operator Ref<Node> *
 ,Pathfinder::Push,src/ai/pathfind.cpp,call,operator=
 ,Pathfinder::Push,src/ai/pathfind.cpp,deref_escape,*Node
-,Pathfinder::Push,src/ai/pathfind.cpp,deref_read,*Node
-,Pathfinder::Push,src/ai/pathfind.cpp,deref_write,*Node
+,Pathfinder::Push,src/ai/pathfind.cpp,deref_read,*Ref<Node>
+,Pathfinder::Push,src/ai/pathfind.cpp,deref_write,*Ref<Node>
 ,Pathfinder::Push,src/ai/pathfind.cpp,field_read,Node::index
 ,Pathfinder::Push,src/ai/pathfind.cpp,field_read,OpenHeap::capacity
 ,Pathfinder::Push,src/ai/pathfind.cpp,field_read,OpenHeap::count
@@ -49052,6 +49100,8 @@ address,function,file,kind,target
 ,Pathfinder::ResetTable,src/ai/pathfinder.h,global_read,g_turnCosts
 ,Pathfinder::Steps,src/ai/pathfinder.h,field_read,NodeData::steps
 ,Pathfinder::Steps,src/ai/pathfinder.h,function,
+,Pathfinder::Visit,src/ai/pathfinder.h,call,operator PathCell *
+,Pathfinder::Visit,src/ai/pathfinder.h,call,operator unsigned int *
 ,Pathfinder::Visit,src/ai/pathfinder.h,deref_escape,*PathCell
 ,Pathfinder::Visit,src/ai/pathfinder.h,deref_read,*unsigned int
 ,Pathfinder::Visit,src/ai/pathfinder.h,deref_write,*unsigned int
@@ -49521,6 +49571,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_read,s_loadAhead@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_loadLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_quirkReach@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_read,s_roundTripCount@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_saveTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_stepsPerFrame@src/harness/harness.cpp
@@ -49550,6 +49601,8 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkReachTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkTamper@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkTamperTick@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_roundTripCount@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_roundTrips@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_saveLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_saveTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_startPositionsLine@src/harness/harness.cpp
@@ -50057,6 +50110,20 @@ address,function,file,kind,target
 ,RestoreSurfacesInline,src/graphics/surface.cpp,function,
 ,Result,src/host/win32/display.cpp,function,
 ,Result,src/host/win32/display.cpp,global_read,kSurfaceLost
+,RoundTripBlock,src/harness/harness.cpp,call,Fail
+,RoundTripBlock,src/harness/harness.cpp,call,ModulesMemory
+,RoundTripBlock,src/harness/harness.cpp,call,SimBlockAttach
+,RoundTripBlock,src/harness/harness.cpp,call,SimBlockBase
+,RoundTripBlock,src/harness/harness.cpp,call,host_mem_alloc
+,RoundTripBlock,src/harness/harness.cpp,call,host_mem_commit
+,RoundTripBlock,src/harness/harness.cpp,call,host_mem_free
+,RoundTripBlock,src/harness/harness.cpp,call,host_mem_release
+,RoundTripBlock,src/harness/harness.cpp,call,host_mem_reserve
+,RoundTripBlock,src/harness/harness.cpp,call,memcpy
+,RoundTripBlock,src/harness/harness.cpp,call,memset
+,RoundTripBlock,src/harness/harness.cpp,field_read,ModuleMemory::base
+,RoundTripBlock,src/harness/harness.cpp,function,
+,RoundTripBlock,src/harness/harness.cpp,global_read,kSimBlockBytes
 ,Rows,src/util/tdf.cpp,deref_read,*std::vector<TdfField>
 ,Rows,src/util/tdf.cpp,field_escape,TdfEntries::v
 ,Rows,src/util/tdf.cpp,function,
@@ -51897,6 +51964,7 @@ address,function,file,kind,target
 ,VisitPassMaps,src/harness/harness.cpp,function,
 ,VisitPassMaps,src/harness/harness.cpp,global_escape,s_passRow@src/harness/harness.cpp
 ,VisitPassMaps,src/harness/harness.cpp,global_write,s_passRow@src/harness/harness.cpp
+,VisitPathCells,src/harness/harness.cpp,call,RefAbs
 ,VisitPathCells,src/harness/harness.cpp,call,VisitU32
 ,VisitPathCells,src/harness/harness.cpp,call,VisitValue
 ,VisitPathCells,src/harness/harness.cpp,call,sprintf
@@ -51913,7 +51981,6 @@ address,function,file,kind,target
 ,VisitPathNodes,src/harness/harness.cpp,call,sprintf
 ,VisitPathNodes,src/harness/harness.cpp,call,strcat
 ,VisitPathNodes,src/harness/harness.cpp,deref_read,*int
-,VisitPathNodes,src/harness/harness.cpp,deref_read,*unsigned char
 ,VisitPathNodes,src/harness/harness.cpp,deref_read,*unsigned int
 ,VisitPathNodes,src/harness/harness.cpp,deref_read,*unsigned short
 ,VisitPathNodes,src/harness/harness.cpp,function,

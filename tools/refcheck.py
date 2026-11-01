@@ -1,9 +1,8 @@
-"""Fail when a struct the shared state block holds has a raw pointer field that no CSV lists.
+"""Fail when a struct the shared state block holds has a raw pointer field that is not on the outside list.
 
     uv run tools/refcheck.py                  # print the summary: block structs, rows by kind and issue, gaps
-    uv run tools/refcheck.py --check          # fail on an unlisted raw pointer, a stale row, or an out-of-date outside list
-    uv run tools/refcheck.py --write          # regenerate data/outside_pointers.csv, prune data/ref_exceptions.csv
-    uv run tools/refcheck.py --write --init   # also (re)create data/ref_exceptions.csv from every raw field
+    uv run tools/refcheck.py --check          # fail on a raw field that is not on the outside list, or an out-of-date outside list
+    uv run tools/refcheck.py --write          # regenerate data/outside_pointers.csv
     uv run tools/refcheck.py --check --open-issues   # also check that each listed issue is open
     uv run tools/refcheck.py --build-dir D    # use D/compile_commands.json (default build/modern)
     uv run tools/test_refcheck.py             # tests
@@ -23,19 +22,16 @@ the vftable slots. A field is one of these kinds, anything else is not a pointer
   int-pointer       an integer field that code casts to a pointer (see CASTS), found in the syntax trees
   Ref<T>            allowed, not listed
 
+A raw field of any kind that is not on data/outside_pointers.csv fails the check. A field of a nested unnamed struct
+is `outer.inner`.
+
 A vtable pointer is not a field. It is allowed when the layout shows a vftable slot and the class is
 polymorphic, and the check fails when the two disagree.
-
-data/ref_exceptions.csv (struct,field,kind,file,issue) lists every raw field that remains, with the open
-issue that removes it, sorted by struct then field. A field of a nested unnamed struct is `outer.inner`. A
-row whose field is gone, is no longer raw or has another kind or file is stale, so the list only shrinks:
---write prunes it and never adds a row, only --init does.
 
 data/outside_pointers.csv (struct,field,holder,offset,words,issue,kind,note) is generated from the
 `outside` rows of data/block_pointers.csv: pointers whose targets are outside the block. A holder that is
 a struct (Game, SimGlobals) is mapped through its record layout to the field that holds each offset; the
-other holders have no struct, so their rows have a blank field and the first offset of the row. A field on
-this list needs no exceptions row.
+other holders have no struct, so their rows have a blank field and the first offset of the row.
 
 A row whose kind is `load` (a pointer into loaded game data: HAPI_LoadFile buffers and what is built from them
 at load) or `code` (a pointer to code in the exe image) is written by hand: --write keeps that kind over the clang
@@ -68,7 +64,7 @@ import re
 import subprocess
 import sys
 import time
-from collections import Counter, defaultdict
+from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -79,12 +75,9 @@ import stateclasses
 import typedupes
 from rwsets import ROOT
 
-EXCEPTIONS = "data/ref_exceptions.csv"
 OUTSIDE = "data/outside_pointers.csv"
 BLOCK_POINTERS = "data/block_pointers.csv"
-SUBSYSTEMS = "data/subsystems.csv"
 REPO = "ozgb/byte-tactics-moddable"
-EXCEPTION_COLUMNS = ["struct", "field", "kind", "file", "issue"]
 OUTSIDE_COLUMNS = ["struct", "field", "holder", "offset", "words", "issue", "kind", "note"]
 KINDS = ("pointer", "function-pointer", "container", "int-pointer")
 HAND_KINDS = ("load", "code")
@@ -98,13 +91,7 @@ REPO_DIRS = ("src/", "include/", "link/", "interfaces/")
 GAME = "Game"
 VIEW_ISSUE = "#392"
 UNCLASSIFIED = ""
-OTHER_ISSUE = "#353"
 CONTAINER_ISSUE = "#353"
-SUBSYSTEM_ISSUES = {"units": OTHER_ISSUE, "orders": OTHER_ISSUE, "weapons": OTHER_ISSUE, "pathfinding": OTHER_ISSUE,
-                    "map": OTHER_ISSUE, "los_radar": OTHER_ISSUE, "game": OTHER_ISSUE, "network": OTHER_ISSUE,
-                    "ai": OTHER_ISSUE, "players": OTHER_ISSUE}
-STRUCT_ISSUES = {"Unit": OTHER_ISSUE, "UnitDef": OTHER_ISSUE, "WeaponDef": OTHER_ISSUE, "Order": OTHER_ISSUE,
-                 "OrderFx": OTHER_ISSUE, "Mission": OTHER_ISSUE}
 OUTSIDE_ISSUES = [
     (re.compile(r"FeatureAnim\.state|view state|presentation|render cache"), VIEW_ISSUE),
     (re.compile(r"Mission order|damage table"), CONTAINER_ISSUE),
@@ -529,32 +516,6 @@ def vptr_problems(defs: list[Def]) -> tuple[list[str], int]:
     return problems, count
 
 
-def file_subsystems(root: Path) -> dict[str, Counter]:
-    path = root / SUBSYSTEMS
-    out: dict[str, Counter] = defaultdict(Counter)
-    if path.exists():
-        with path.open(newline="") as f:
-            for r in csv.DictReader(f):
-                out[r["file"]][r["subsystem"]] += 1
-    return out
-
-
-def subsystem_of(file: str, table: dict[str, Counter]) -> str:
-    """The subsystem of a file: its own rows, else its same-stem .cpp, else the majority of its directory."""
-    if table.get(file):
-        return table[file].most_common(1)[0][0]
-    stem = os.path.splitext(file)[0]
-    for suffix in (".cpp", ".c"):
-        if table.get(stem + suffix):
-            return table[stem + suffix].most_common(1)[0][0]
-    directory = os.path.dirname(file)
-    votes: Counter = Counter()
-    for f, c in table.items():
-        if os.path.dirname(f) == directory:
-            votes.update(c)
-    return votes.most_common(1)[0][0] if votes else "other"
-
-
 def game_field_classes(rows: list[dict]) -> dict[str, str]:
     """Game field name -> the state class of its region."""
     out = {}
@@ -563,14 +524,6 @@ def game_field_classes(rows: list[dict]) -> dict[str, str]:
             for name in r["name"].split("|"):
                 out[name] = r["class"]
     return out
-
-
-def exception_issue(f: Found, table: dict[str, Counter], classes: dict[str, str]) -> str:
-    if f.kind == "container":
-        return CONTAINER_ISSUE
-    if f.struct in STRUCT_ISSUES:
-        return STRUCT_ISSUES[f.struct]
-    return SUBSYSTEM_ISSUES.get(subsystem_of(sorted(f.files)[0], table), OTHER_ISSUE)
 
 
 def kind_of_leaf(rec: Record | None, path: str) -> str | None:
@@ -796,16 +749,6 @@ def read_csv(path: Path) -> list[dict]:
         return list(csv.DictReader(f))
 
 
-def fresh_exceptions(found: dict, outside_fields: set, table, classes) -> list[dict]:
-    rows = []
-    for (struct, name, kind), f in found.items():
-        if (struct, name) in outside_fields:
-            continue
-        rows.append({"struct": struct, "field": name, "kind": kind, "file": "|".join(sorted(f.files)),
-                     "issue": exception_issue(f, table, classes)})
-    return sorted(rows, key=lambda r: (r["struct"], r["field"], r["kind"]))
-
-
 @dataclass
 class Result:
     """Everything one run reads: the structs, definitions, raw fields and the generated outside list."""
@@ -816,7 +759,6 @@ class Result:
     vptr_problems: list
     vptrs: int
     unresolved: list
-    table: dict
     classes: dict
 
 
@@ -829,7 +771,6 @@ def analyse(root: Path, build_dir: Path, jobs: int) -> Result:
     names = block_structs(files, by_name, state_rows, globals_rows, hand=hand_fields(root))
     defs, scans, casts = read_definitions(build_dir, names, by_name, files, jobs)
     classes = game_field_classes(state_rows)
-    table = file_subsystems(root)
     locators = {}
     for d in defs:
         if short(d.name) in (GAME, "SimGlobals") and short(d.name) not in locators:
@@ -837,34 +778,17 @@ def analyse(root: Path, build_dir: Path, jobs: int) -> Result:
     found = raw_fields(defs, casts)
     problems, vptrs = vptr_problems(defs)
     return Result(names, defs, found, outside_rows(root, locators, classes), problems, vptrs,
-                  unresolved_rows(files, by_name, state_rows, globals_rows), table, classes)
+                  unresolved_rows(files, by_name, state_rows, globals_rows), classes)
 
 
 def check(root: Path, result: Result, open_issues: bool = False, gh: str = "gh") -> list[str]:
     problems = list(result.vptr_problems)
     outside_fields = {(r["struct"], r["field"]) for r in result.outside if r["field"]}
-    rows = read_csv(root / EXCEPTIONS)
-    listed: dict[tuple, dict] = {}
-    for r in rows:
-        if not re.fullmatch(r"#[0-9]+", r["issue"]):
-            problems.append("%s: %s.%s: issue %r is not #<number>" % (EXCEPTIONS, r["struct"], r["field"], r["issue"]))
-        listed[(r["struct"], r["field"], r["kind"])] = r
     for key, f in sorted(result.found.items()):
-        if (f.struct, f.field) in outside_fields or key in listed:
+        if (f.struct, f.field) in outside_fields:
             continue
-        problems.append("%s: %s.%s is a raw %s in a block-held struct and is in neither %s nor %s, use Ref<T>" % (
-            sorted(f.files)[0], f.struct, f.field, f.kind, EXCEPTIONS, OUTSIDE))
-    for key, r in sorted(listed.items()):
-        f = result.found.get(key)
-        if f is None:
-            problems.append("%s: stale row %s.%s: the field is gone, is no longer a raw %s or is in the struct no more, "
-                            "remove the row" % (EXCEPTIONS, key[0], key[1], key[2]))
-        elif (key[0], key[1]) in outside_fields:
-            problems.append("%s: stale row %s.%s: the field is on %s, remove the row" % (
-                EXCEPTIONS, key[0], key[1], OUTSIDE))
-        elif r["file"] != "|".join(sorted(f.files)):
-            problems.append("%s: stale row %s.%s: file is %s, expected %s, run `uv run tools/refcheck.py --write`" % (
-                EXCEPTIONS, key[0], key[1], r["file"], "|".join(sorted(f.files))))
+        problems.append("%s: %s.%s is a raw %s in a block-held struct and is not on %s, use Ref<T>" % (
+            sorted(f.files)[0], f.struct, f.field, f.kind, OUTSIDE))
     for r in result.outside:
         if r["kind"] in HAND_KINDS:
             if r["issue"]:
@@ -882,12 +806,12 @@ def check(root: Path, result: Result, open_issues: bool = False, gh: str = "gh")
         problems.append("%s: out of date, run `uv run tools/refcheck.py --write` and commit the result" % OUTSIDE)
     if open_issues:
         states = {}
-        for issue in sorted({r["issue"] for r in rows} | {r["issue"] for r in read_csv(path)}):
+        for issue in sorted({r["issue"] for r in read_csv(path)}):
             if re.fullmatch(r"#[0-9]+", issue):
                 states[issue] = gh_issue_state(issue[1:], gh)
         for issue, state in sorted(states.items()):
             if state != "OPEN":
-                problems.append("%s: issue %s is %s, not open" % (EXCEPTIONS, issue, state or "not readable"))
+                problems.append("%s: issue %s is %s, not open" % (OUTSIDE, issue, state or "not readable"))
     return problems
 
 
@@ -903,30 +827,17 @@ def gh_issue_state(number: str, gh: str) -> str | None:
         return None
 
 
-def write(root: Path, result: Result, init: bool) -> None:
-    outside_fields = {(r["struct"], r["field"]) for r in result.outside if r["field"]}
-    path = root / EXCEPTIONS
-    if init or not path.exists():
-        rows = fresh_exceptions(result.found, outside_fields, result.table, result.classes)
-    else:
-        fresh = {k: f for k, f in result.found.items() if (f.struct, f.field) not in outside_fields}
-        rows = []
-        for r in read_csv(path):
-            f = fresh.get((r["struct"], r["field"], r["kind"]))
-            if f is not None:
-                rows.append({**r, "file": "|".join(sorted(f.files))})
-        rows.sort(key=lambda r: (r["struct"], r["field"], r["kind"]))
-    path.write_text(render(EXCEPTION_COLUMNS, rows))
+def write(root: Path, result: Result) -> None:
     (root / OUTSIDE).write_text(render(OUTSIDE_COLUMNS, result.outside))
 
 
 def summary(result: Result) -> list[str]:
     outside_fields = {(r["struct"], r["field"]) for r in result.outside if r["field"]}
-    exc = [f for f in result.found.values() if (f.struct, f.field) not in outside_fields]
+    raw = [f for f in result.found.values() if (f.struct, f.field) not in outside_fields]
     lines = ["refcheck: %d block-held names, %d definitions, %d with a vftable slot" % (
         len(result.names), len(result.defs), result.vptrs)]
-    lines.append("refcheck: exceptions by kind: " + ", ".join(
-        "%s %d" % (k, n) for k, n in sorted(Counter(f.kind for f in exc).items())))
+    lines.append("refcheck: raw fields off the outside list by kind: " + ", ".join(
+        "%s %d" % (k, n) for k, n in sorted(Counter(f.kind for f in raw).items())))
     lines.append("refcheck: outside rows by kind: " + ", ".join(
         "%s %d" % (k or "unstructured", n) for k, n in sorted(Counter(r["kind"] for r in result.outside).items())))
     lines.append("refcheck: outside rows by issue: " + ", ".join(
@@ -943,14 +854,13 @@ def main(argv=None) -> int:
     parser.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--write", action="store_true")
-    parser.add_argument("--init", action="store_true", help="with --write: rebuild the exceptions from every raw field")
     parser.add_argument("--open-issues", action="store_true", help="also check that each listed issue is open")
     parser.add_argument("--gh", default="gh", help="the gh command to run (default gh)")
     args = parser.parse_args(argv)
     started = time.time()
     result = analyse(args.root, args.build_dir, args.jobs)
     if args.write:
-        write(args.root, result, args.init)
+        write(args.root, result)
     if args.check:
         problems = check(args.root, result, args.open_issues, args.gh)
         for line in problems:
@@ -958,8 +868,8 @@ def main(argv=None) -> int:
         if problems:
             return 1
     if args.check:
-        print("refcheck: %d block-held structs, %d exceptions, %d outside rows, up to date, %.0fs" % (
-            len(result.names), len(read_csv(args.root / EXCEPTIONS)), len(result.outside), time.time() - started))
+        print("refcheck: %d block-held structs, %d outside rows, up to date, %.0fs" % (
+            len(result.names), len(result.outside), time.time() - started))
         return 0
     for line in summary(result):
         print(line)

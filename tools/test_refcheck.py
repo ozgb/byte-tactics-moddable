@@ -348,7 +348,7 @@ class ClangTest(unittest.TestCase):
 
 
 def make_result(found, outside=()):
-    return rc.Result(set(), [], found, list(outside), [], 0, [], {}, {})
+    return rc.Result(set(), [], found, list(outside), [], 0, [], {})
 
 
 def found_field(struct, name, kind="pointer", files=("src/a.h",)):
@@ -367,50 +367,33 @@ class CheckTest(unittest.TestCase):
     def put(self, name, columns, rows):
         (self.root / name).write_text(rc.render(columns, rows))
 
-    def exceptions(self, *rows):
-        self.put(rc.EXCEPTIONS, rc.EXCEPTION_COLUMNS, [dict(zip(rc.EXCEPTION_COLUMNS, r)) for r in rows])
-
     def outside(self, rows=()):
         self.put(rc.OUTSIDE, rc.OUTSIDE_COLUMNS, rows)
 
-    def test_listed_field_passes(self):
-        self.exceptions(("Unit", "def", "pointer", "src/a.h", "#349"))
-        self.outside()
-        self.assertEqual(rc.check(self.root, make_result(found_field("Unit", "def"))), [])
+    OUTSIDE_VIEW = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "#392",
+                    "kind": "pointer", "note": "n"}
 
-    def test_unlisted_field_fails(self):
-        self.exceptions()
+    def test_field_with_no_outside_row_fails(self):
         self.outside()
         problems = rc.check(self.root, make_result(found_field("Unit", "def")))
-        self.assertEqual(len(problems), 1)
-        self.assertIn("src/a.h: Unit.def is a raw pointer in a block-held struct and is in neither", problems[0])
+        self.assertEqual(problems, ["src/a.h: Unit.def is a raw pointer in a block-held struct and is not on "
+                                    "data/outside_pointers.csv, use Ref<T>"])
 
-    def test_stale_rows_fail(self):
-        self.exceptions(("Unit", "gone", "pointer", "src/a.h", "#349"),
-                        ("Unit", "def", "container", "src/a.h", "#349"))
+    def test_every_kind_fails_without_an_outside_row(self):
         self.outside()
-        problems = rc.check(self.root, make_result(found_field("Unit", "def")))
-        self.assertTrue(any("stale row Unit.gone" in p for p in problems))
-        self.assertTrue(any("is no longer a raw container" in p or "stale row Unit.def" in p for p in problems))
+        for kind in rc.KINDS:
+            problems = rc.check(self.root, make_result(found_field("Unit", "def", kind)))
+            self.assertEqual(len(problems), 1, kind)
+            self.assertIn("Unit.def is a raw %s in a block-held struct" % kind, problems[0])
 
-    def test_stale_file_fails(self):
-        self.exceptions(("Unit", "def", "pointer", "src/old.h", "#349"))
-        self.outside()
-        problems = rc.check(self.root, make_result(found_field("Unit", "def")))
-        self.assertIn("file is src/old.h, expected src/a.h", problems[0])
-
-    def test_outside_field_needs_no_exception_and_blocks_a_row(self):
-        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "#392",
-               "kind": "pointer", "note": "n"}
-        self.outside([row])
-        self.exceptions()
-        result = make_result(found_field("Game", "view", files=("src/game/game.h",)), [row])
+    def test_outside_row_makes_the_same_field_pass(self):
+        self.outside([self.OUTSIDE_VIEW])
+        result = make_result(found_field("Game", "view", files=("src/game/game.h",)), [self.OUTSIDE_VIEW])
         self.assertEqual(rc.check(self.root, result), [])
-        self.exceptions(("Game", "view", "pointer", "src/game/game.h", "#392"))
-        self.assertIn("the field is on", rc.check(self.root, result)[0])
+        self.outside()
+        self.assertTrue(rc.check(self.root, make_result(found_field("Game", "view", files=("src/game/game.h",)))))
 
     def test_outside_list_out_of_date_fails(self):
-        self.exceptions()
         self.outside()
         row = {"struct": "", "field": "", "holder": "H", "offset": "0x4", "words": 1, "issue": "#353", "kind": "",
                "note": "n"}
@@ -419,7 +402,6 @@ class CheckTest(unittest.TestCase):
         self.assertIn("data/outside_pointers.csv: out of date", problems[0])
 
     def test_empty_note_fails(self):
-        self.exceptions()
         row = {"struct": "Game", "field": "sounds", "holder": "H", "offset": "0x4", "words": 1, "issue": "#392",
                "kind": "pointer", "note": ""}
         self.outside([row])
@@ -428,58 +410,35 @@ class CheckTest(unittest.TestCase):
         self.assertIn("Game.sounds H 0x4 has an empty note", problems[0])
 
     def test_load_row_passes_without_an_issue(self):
-        self.exceptions()
         row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "",
                "kind": "load", "note": "n"}
         self.outside([row])
         self.assertEqual(rc.check(self.root, make_result(found_field("Game", "view"), [row])), [])
 
     def test_load_row_with_an_issue_fails(self):
-        self.exceptions()
         row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "#353",
                "kind": "load", "note": "n"}
         self.outside([row])
         self.assertIn("names none", rc.check(self.root, make_result({}, [row]))[0])
 
     def test_blank_kind_without_an_issue_fails(self):
-        self.exceptions()
         row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "",
                "kind": "pointer", "note": "n"}
         self.outside([row])
         self.assertIn("expected #<number>", rc.check(self.root, make_result({}, [row]))[0])
 
-    def test_load_field_drops_its_exception_row(self):
-        self.exceptions(("Game", "view", "pointer", "src/a.h", "#353"))
-        row = {"struct": "Game", "field": "view", "holder": "H", "offset": "0x4", "words": 1, "issue": "",
-               "kind": "load", "note": "n"}
-        result = make_result(found_field("Game", "view"), [row])
-        rc.write(self.root, result, init=False)
-        self.assertEqual(rc.read_csv(self.root / rc.EXCEPTIONS), [])
-        self.assertEqual(rc.check(self.root, result), [])
-
-    def test_bad_issue_fails(self):
-        self.exceptions(("Unit", "def", "pointer", "src/a.h", "later"))
-        self.outside()
-        self.assertIn("is not #<number>", rc.check(self.root, make_result(found_field("Unit", "def")))[0])
-
     def test_closed_issue_fails(self):
-        self.exceptions(("Unit", "def", "pointer", "src/a.h", "#349"))
-        self.outside()
+        self.outside([self.OUTSIDE_VIEW])
         with mock.patch.object(rc, "gh_issue_state", return_value="CLOSED"):
-            problems = rc.check(self.root, make_result(found_field("Unit", "def")), open_issues=True)
-        self.assertIn("issue #349 is CLOSED, not open", problems[0])
+            problems = rc.check(self.root, make_result({}, [self.OUTSIDE_VIEW]), open_issues=True)
+        self.assertIn("data/outside_pointers.csv: issue #392 is CLOSED, not open", problems[0])
 
-    def test_write_prunes_and_never_adds(self):
-        self.exceptions(("Unit", "def", "pointer", "src/old.h", "#349"), ("Unit", "gone", "pointer", "src/a.h", "#349"))
-        found = {**found_field("Unit", "def"), **found_field("Unit", "fresh")}
-        rc.write(self.root, make_result(found), init=False)
-        rows = rc.read_csv(self.root / rc.EXCEPTIONS)
-        self.assertEqual([(r["field"], r["file"], r["issue"]) for r in rows], [("def", "src/a.h", "#349")])
-        rc.write(self.root, make_result(found), init=True)
-        self.assertEqual([r["field"] for r in rc.read_csv(self.root / rc.EXCEPTIONS)], ["def", "fresh"])
+    def test_write_regenerates_only_the_outside_list(self):
+        rc.write(self.root, make_result(found_field("Unit", "def"), [self.OUTSIDE_VIEW]))
+        self.assertEqual([r["field"] for r in rc.read_csv(self.root / rc.OUTSIDE)], ["view"])
+        self.assertEqual(sorted(p.name for p in (self.root / "data").iterdir()), ["outside_pointers.csv"])
 
     def test_main_check_exit_status(self):
-        self.exceptions()
         self.outside()
         out = io.StringIO()
         with mock.patch.object(rc, "analyse", return_value=make_result(found_field("Unit", "def"))), \
@@ -488,30 +447,7 @@ class CheckTest(unittest.TestCase):
 
 
 class IssueTest(unittest.TestCase):
-    TABLE = {"src/units/unit.cpp": rc.Counter({"units": 3}), "src/network/packets.cpp": rc.Counter({"network": 2}),
-             "src/map/a.cpp": rc.Counter({"map": 1, "los_radar": 2}), "src/gui/x.cpp": rc.Counter({"presentation": 1})}
     CLASSES = {"units": "sim", "tab": "mixed", "view": "view", "gaf": "platform"}
-
-    def issue(self, struct, field, file):
-        return rc.exception_issue(rc.Found(struct, field, "pointer", {file}), self.TABLE, self.CLASSES)
-
-    def test_by_subsystem(self):
-        self.assertEqual(self.issue("Thing", "p", "src/units/unit.h"), "#353")
-        self.assertEqual(self.issue("Packet", "p", "src/network/packets.cpp"), "#353")
-        self.assertEqual(self.issue("Cell", "p", "src/map/a.h"), "#353")
-        self.assertEqual(self.issue("Panel", "p", "src/gui/x.h"), "#353")
-        self.assertEqual(self.issue("Thing", "p", "src/elsewhere/y.h"), "#353")
-
-    def test_named_structs_and_game_regions(self):
-        self.assertEqual(self.issue("Mission", "p", "src/map/mission.h"), "#353")
-        self.assertEqual(self.issue("Game", "units", "src/game/game.h"), "#353")
-        self.assertEqual(self.issue("Game", "tab", "src/game/game.h"), "#353")
-        self.assertEqual(self.issue("Game", "view", "src/game/game.h"), "#353")
-        self.assertEqual(self.issue("Game", "unknown", "src/game/game.h"), "#353")
-
-    def test_container_exception_takes_the_container_issue(self):
-        found = rc.Found("Thing", "v", "container", {"src/units/unit.h"})
-        self.assertEqual(rc.exception_issue(found, self.TABLE, self.CLASSES), "#353")
 
     def test_outside_issue(self):
         self.assertEqual(rc.outside_issue("", "Game", "view", self.CLASSES), "#392")

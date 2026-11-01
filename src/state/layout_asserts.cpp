@@ -292,7 +292,7 @@ static_assert(offsetof(DebrisCache, cap) == 0, "");
 static_assert(offsetof(DebrisCache, base) == 4, "");
 static_assert(offsetof(DebrisCache, cur) == 8, "");
 static_assert(offsetof(DebrisCache, handle) == 12, "");
-static_assert(offsetof(DebrisCache, field_10) == 16, "");
+static_assert(offsetof(DebrisCache, spare) == 16, "");
 static_assert(sizeof(DebrisCacheChunk) == 8, "");
 static_assert(offsetof(DebrisCacheChunk, owner) == 0, "");
 static_assert(offsetof(DebrisCacheChunk, size) == 4, "");

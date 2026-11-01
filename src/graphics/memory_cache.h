@@ -37,6 +37,10 @@ public:
     void FreeBuffer();
     int AllocHandle(Handle* handle, int size);
 
+private:
+    CacheCore() = default;
+    friend Cache;
+
 protected:
     int Install(void* chunk, unsigned int size);
 };
@@ -90,7 +94,7 @@ public:
     Ref<DebrisCacheChunk> base;
     Ref<DebrisCacheChunk> cur;
     Ref<char> handle;
-    int field_10;
+    int spare;
 
     int InitSimCache(unsigned int size);
     template <class T>

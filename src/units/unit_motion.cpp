@@ -1,6 +1,8 @@
 #include "win_types.h"
 #include <string.h>
 #include "../state/block.h"
+#include "../../interfaces/ref.h"
+#include "../../interfaces/services.h"
 
 #include "../graphics/object_pool.h"
 #include "../debug/debug_lib.h"

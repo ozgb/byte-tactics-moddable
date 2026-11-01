@@ -15,6 +15,9 @@ new `reference-traces-v<n>` when a digest changes. `uv run tools/reference.py --
 on `moddable` does the second step in a worktree of `origin/reference`
 (`build/reference/branch`) and copies the traces into `reference/traces/`.
 
+`--traces` also copies the frames the branch wrote (`reference/frames/<scenario>/<tick>.bin`, for the scenarios with a `frames` line) into this tree's `reference/frames/`, replacing the old set.
+`--check` compares each such scenario's run frames byte for byte with them (docs/frame-dump.md); a missing stored frame fails.
+
 `--traces` plays `moddable`'s scenarios: it copies this tree's
 `reference/scenarios/` into the branch worktree, replacing the branch's set, so
 a new scenario needs no cherry-pick to `reference`. It refuses to replace

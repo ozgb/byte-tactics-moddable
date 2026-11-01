@@ -52,3 +52,17 @@ state, such as the game clock, are part of it.
 
 Two runs of one build on one scenario write identical files. A comparison reads the
 palette and pixels of each file and compares them byte by byte.
+
+## What the check compares
+
+A set of frames from a run is equal to a stored set when, for every tick in the scenario's
+`frames` line, the stored file and the run's file are the same bytes. A difference is
+reported as the first of these that applies, for the first tick that differs:
+
+1. `header`: the first 16 bytes differ (size, tick or version).
+2. `palette`: the 1024 palette bytes differ.
+3. A pixel: the first pixel in reading order that differs, as its x and y and both index
+   values.
+
+A tick with no stored file, or that the run did not write, is a difference. A scenario
+without a `frames` line is not compared.

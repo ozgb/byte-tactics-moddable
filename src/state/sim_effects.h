@@ -193,4 +193,49 @@ inline void RecordPopToGameLayout(int force)
     RecordSimEvent(SIM_EVENT_POP_TO_GAME_LAYOUT, 0, args, 1);
 }
 
+inline void RecordSmoke(const Vec3& at, int emitPeriod, int lifetime, short list)
+{
+    unsigned int args[6];
+    SimEventPut(args, 0, at);
+    args[3] = (unsigned int)emitPeriod;
+    args[4] = (unsigned int)lifetime;
+    args[5] = (unsigned int)list;
+    RecordSimEvent(SIM_EVENT_SMOKE, 0, args, 6);
+}
+
+inline void RecordWhiteSmoke(const Vec3& at, short list)
+{
+    RecordPointParticles(SIM_EVENT_WHITE_SMOKE, at, list);
+}
+
+inline void RecordBlackSmoke(const Vec3& at, short list)
+{
+    RecordPointParticles(SIM_EVENT_BLACK_SMOKE, at, list);
+}
+
+inline void RecordSoundAt(int index, const Vec3& at)
+{
+    unsigned int args[4] = {(unsigned int)index};
+    SimEventPut(args, 1, at);
+    RecordSimEvent(SIM_EVENT_SOUND_AT, 0, args, 4);
+}
+
+inline void RecordSoundAtName(SimSoundName name, const Vec3& at)
+{
+    unsigned int args[4] = {name};
+    SimEventPut(args, 1, at);
+    RecordSimEvent(SIM_EVENT_SOUND_AT_NAME, 0, args, 4);
+}
+
+inline void RecordRemoveUnitSpeech(const Unit* unit)
+{
+    RecordUnitEvent(SIM_EVENT_REMOVE_UNIT_SPEECH, unit);
+}
+
+inline void RecordMessage(SimMessageText text, int value)
+{
+    unsigned int args[2] = {text, (unsigned int)value};
+    RecordSimEvent(SIM_EVENT_MESSAGE, 0, args, 2);
+}
+
 #endif

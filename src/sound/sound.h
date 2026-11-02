@@ -140,4 +140,6 @@ void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
 void __stdcall PresentUnitSpeech(Unit* unit, int kind, char* text);
 void __stdcall QueueUnitSpeechIfNotVisible(Unit* unit, int kind, char* text);
 
+void __stdcall RemoveSpeechOfUnit(int id);
+
 #endif

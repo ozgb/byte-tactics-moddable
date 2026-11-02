@@ -5249,9 +5249,8 @@ address,function,file,kind,target
 0x418ca0,CmdShootAll,src/game/console_commands.cpp,field_write,<anon>::flag10
 0x418ca0,CmdShootAll,src/game/console_commands.cpp,function,
 0x418ca0,CmdShootAll,src/game/console_commands.cpp,global_read,g_game
-0x418cd0,CmdShareMetal,src/game/share_commands.cpp,call,AddMessage
+0x418cd0,CmdShareMetal,src/game/share_commands.cpp,call,RecordMessage
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,call,operator->
-0x418cd0,CmdShareMetal,src/game/share_commands.cpp,call,sprintf
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,field_read,Game::netGameFlags
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
@@ -5263,10 +5262,9 @@ address,function,file,kind,target
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,global_read,g_game
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,global_read,g_seams
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
-0x418d90,CmdShareEnergy,src/game/share_commands.cpp,call,AddMessage
+0x418d90,CmdShareEnergy,src/game/share_commands.cpp,call,RecordMessage
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,call,operator PlayerInfo *
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,call,operator->
-0x418d90,CmdShareEnergy,src/game/share_commands.cpp,call,sprintf
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,field_read,Game::netGameFlags
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
@@ -5278,10 +5276,9 @@ address,function,file,kind,target
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,global_read,g_game
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,global_read,g_seams
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
-0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,AddMessage
+0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,RecordMessage
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,operator PlayerInfo *
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,operator->
-0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,sprintf
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,field_read,Game::netGameFlags
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
@@ -5293,9 +5290,8 @@ address,function,file,kind,target
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,global_read,g_game
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,global_read,g_seams
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
-0x418f10,ToggleShareLos,src/game/share_commands.cpp,call,AddMessage
+0x418f10,ToggleShareLos,src/game/share_commands.cpp,call,RecordMessage
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,call,operator->
-0x418f10,ToggleShareLos,src/game/share_commands.cpp,call,sprintf
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,field_read,Game::netGameFlags
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
@@ -5307,9 +5303,8 @@ address,function,file,kind,target
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,global_read,g_game
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,global_read,g_seams
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
-0x418fd0,CmdShareRadar,src/game/share_commands.cpp,call,AddMessage
+0x418fd0,CmdShareRadar,src/game/share_commands.cpp,call,RecordMessage
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,call,operator->
-0x418fd0,CmdShareRadar,src/game/share_commands.cpp,call,sprintf
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,field_read,Game::netGameFlags
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
@@ -5333,9 +5328,8 @@ address,function,file,kind,target
 0x419090,CmdShareAll,src/game/share_commands.cpp,global_read,g_seams
 0x419090,CmdShareAll,src/game/share_commands.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::CmdShareMapping]
 0x419090,CmdShareAll,src/game/share_commands.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::CmdShareRadar]
-0x419340,CmdSetShareMetal,src/game/share_commands.cpp,call,AddMessage
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,call,CommandArgs::GetIntArg
-0x419340,CmdSetShareMetal,src/game/share_commands.cpp,call,sprintf
+0x419340,CmdSetShareMetal,src/game/share_commands.cpp,call,RecordMessage
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,field_escape,Game::players
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,field_read,Game::netGameFlags
@@ -5343,9 +5337,8 @@ address,function,file,kind,target
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,field_write,Player::shareMetal
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,function,
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,global_read,g_game
-0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,call,AddMessage
 0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,call,CommandArgs::GetIntArg
-0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,call,sprintf
+0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,call,RecordMessage
 0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,field_escape,Game::players
 0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,field_read,Game::netGameFlags
@@ -6887,8 +6880,8 @@ address,function,file,kind,target
 0x420960,FreeExplosions,src/weapons/explosions.cpp,function,
 0x420960,FreeExplosions,src/weapons/explosions.cpp,global_read,g_debrisMemCache
 0x420960,FreeExplosions,src/weapons/explosions.cpp,global_read,g_game
-0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,call,EmitSmoke
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,call,InitGafSequence
+0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,call,RecordSmoke
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,call,operator=
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,deref_read,*GafSequence
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,deref_read,*Vec3
@@ -7581,8 +7574,8 @@ address,function,file,kind,target
 0x4232f0,MoveFeatureSpot,src/map/features.cpp,global_read,g_game
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,AllocFeatureSpot
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,InitGafSequence
-0x4233a0,StartFeatureBurning,src/map/features.cpp,call,PlaySoundAtByName
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,RandomInt
+0x4233a0,StartFeatureBurning,src/map/features.cpp,call,RecordSoundAtName
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,operator Feature *
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,operator Spot *
 0x4233a0,StartFeatureBurning,src/map/features.cpp,deref_escape,*Feature
@@ -7799,11 +7792,11 @@ address,function,file,kind,target
 0x423c50,PlaceFeature,src/map/features.cpp,global_read,g_seams
 0x423c50,PlaceFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [MapSeam::RefreshAllPassMaps]"
 0x424050,UpdateFeatures,src/map/features.cpp,call,BurnOut
-0x424050,UpdateFeatures,src/map/features.cpp,call,EmitWhiteSmoke
 0x424050,UpdateFeatures,src/map/features.cpp,call,FeatureVec3
 0x424050,UpdateFeatures,src/map/features.cpp,call,MoveFeatureSpot
 0x424050,UpdateFeatures,src/map/features.cpp,call,PlaceFeature
 0x424050,UpdateFeatures,src/map/features.cpp,call,RandomInt
+0x424050,UpdateFeatures,src/map/features.cpp,call,RecordWhiteSmoke
 0x424050,UpdateFeatures,src/map/features.cpp,call,ReplaceFeatureWithDead
 0x424050,UpdateFeatures,src/map/features.cpp,call,SmokeAt
 0x424050,UpdateFeatures,src/map/features.cpp,call,SpreadFire
@@ -7828,6 +7821,7 @@ address,function,file,kind,target
 0x424050,UpdateFeatures,src/map/features.cpp,field_read,Cell::feature
 0x424050,UpdateFeatures,src/map/features.cpp,field_read,Cell::flags
 0x424050,UpdateFeatures,src/map/features.cpp,field_read,Cell::unit
+0x424050,UpdateFeatures,src/map/features.cpp,field_read,Coord::value
 0x424050,UpdateFeatures,src/map/features.cpp,field_read,Feature::animating
 0x424050,UpdateFeatures,src/map/features.cpp,field_read,Feature::noobject
 0x424050,UpdateFeatures,src/map/features.cpp,field_read,Feature::seedChance
@@ -9003,7 +8997,6 @@ address,function,file,kind,target
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,OvrFile::~OvrFile
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,ProtectBlockReadOnly
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,ProtectBlockReadWrite
-0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,ShowErrorBox
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,SimAllocTagged
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,TdfFile::GetDouble
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,TdfFile::GetInt
@@ -9016,6 +9009,7 @@ address,function,file,kind,target
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,UsesDataArchives
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,floor
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,get
+0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,host_message
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,memcpy
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,memset
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,operator UnitDef *
@@ -9057,7 +9051,6 @@ address,function,file,kind,target
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,field_write,UnitDef::wacky
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,field_write,UnitDef::weaponHashXor
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,function,
-0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,global_escape,DAT_005119b8
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,global_maybe_written,DAT_005119b8
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,global_read,g_game
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,global_read,s_weaponTdfParsers@src/units/unit_types.cpp
@@ -10763,7 +10756,6 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,Mission::LoadMissionData
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,Mission::SelectSchema
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,OpenMessageBox
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,ShowErrorBox
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,TdfFile::LoadFile
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,TdfFile::ResetCurrentRecord
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,TdfFile::SelectRecord
@@ -10773,6 +10765,7 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,Translate
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,_strcmpi
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,_strlwr
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,host_message
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,operator MissionConditions *
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,operator MissionFeature *
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,operator MissionRule *
@@ -25770,11 +25763,11 @@ address,function,file,kind,target
 0x480e70,UnitScript::IsPieceShaded,src/units/unit_script.cpp,function,
 0x480e90,UnitScript::ExplodeLegacy,src/units/unit_script.cpp,function,
 0x480ea0,UnitScript::PlaySoundNoop,src/units/unit_script.cpp,function,
-0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,EmitBlackSmoke
-0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,EmitWhiteSmoke
+0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,RecordBlackSmoke
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,RecordBubbles
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,RecordThrustParticles
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,RecordWakeParticles
+0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,RecordWhiteSmoke
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,UpdateObjectState
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,get
 0x480eb0,UnitScript::EmitSfx,src/units/unit_script.cpp,call,operator Unit *
@@ -27096,14 +27089,15 @@ address,function,file,kind,target
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,"indirect via void (*)(MissionConditions *, int, Unit *) __attribute__((fastcall)) [PlayersSeam::NotifyUnitCreated]"
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RevealNewUnit]
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
-0x486360,CreateUnitCorpse,src/units/units.cpp,call,EmitSmoke
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,GetGroundHeight
+0x486360,CreateUnitCorpse,src/units/units.cpp,call,RecordSmoke
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,get
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,operator->
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_escape,Unit::angles
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_escape,Unit::pos
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,FeatureNextView::next
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,FeaturesSeam::PlaceFeature
+0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,Fixed::value
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,Game::features
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,Game::seaLevel
 0x486360,CreateUnitCorpse,src/units/units.cpp,field_read,LosRadarSeam::GetMapCell
@@ -27188,8 +27182,8 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordForcesDestroyed
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordPlayerLeft
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordPlayerTookLead
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordRemoveUnitSpeech
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordScoreFlash
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RemoveSpeechOfUnit
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,_strcmpi
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,get
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,operator Mission *
@@ -32337,15 +32331,16 @@ address,function,file,kind,target
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,AddExplosionEffect
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,ApplyAreaDamage
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,ApplyWeaponDamage
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,EmitWhiteSmoke
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,PlaySoundAt
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,RecordScreenShake
+0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,RecordSoundAt
+0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,RecordWhiteSmoke
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator SquadManager *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator Unit *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator->
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator=
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator==
+0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,deref_read,*Vec3
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,deref_read,*unsigned char
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_escape,Game::players
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_escape,Projectile::position
@@ -32710,12 +32705,12 @@ address,function,file,kind,target
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,CheckProjectileCollision
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,CompactProjectiles
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,DetonateProjectile
-0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,EmitWhiteSmoke
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,Fall
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,GetProjectileAimPoint
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,GetWeaponPiecePosition
-0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,PlaySoundAt
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,RandomInt
+0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,RecordSoundAt
+0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,RecordWhiteSmoke
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,Remove
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,ScaledCos
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,ScaledSin
@@ -32892,8 +32887,8 @@ address,function,file,kind,target
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,global_read,g_game
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,global_read,g_seams
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(Player *, Vec3 *) __attribute__((stdcall)) [AiSeam::IsPointVisible]"
-0x49c740,InitProjectile,src/weapons/weapons.cpp,call,PlaySoundAt
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,QueryWeaponPiece
+0x49c740,InitProjectile,src/weapons/weapons.cpp,call,RecordSoundAt
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,operator=
 0x49c740,InitProjectile,src/weapons/weapons.cpp,call,operator==
 0x49c740,InitProjectile,src/weapons/weapons.cpp,deref_read,*Vec3
@@ -44279,6 +44274,11 @@ address,function,file,kind,target
 ,DrainGuiChanged,src/ingame/sim_event_drain.cpp,function,
 ,DrainGuiChanged,src/ingame/sim_event_drain.cpp,global_read,g_game
 ,DrainGuiChanged,src/ingame/sim_event_drain.cpp,global_read,g_screenNames@src/ingame/sim_event_drain.cpp
+,DrainMessage,src/ingame/sim_event_drain.cpp,call,AddMessage
+,DrainMessage,src/ingame/sim_event_drain.cpp,call,sprintf
+,DrainMessage,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,DrainMessage,src/ingame/sim_event_drain.cpp,function,
+,DrainMessage,src/ingame/sim_event_drain.cpp,global_read,g_messageTexts@src/ingame/sim_event_drain.cpp
 ,DrainNano,src/ingame/sim_event_drain.cpp,call,ContinueArgs
 ,DrainNano,src/ingame/sim_event_drain.cpp,call,EmitNanoParticles
 ,DrainNano,src/ingame/sim_event_drain.cpp,call,EmitReverseNanoParticles
@@ -44299,18 +44299,25 @@ address,function,file,kind,target
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DeselectIfIneligible
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainCdActivity
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainGuiChanged
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainMessage
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainNano
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainScoreFlash
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainSound
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainSoundAt
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainSoundAtName
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainTeleport
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainThrust
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainUnitSpeech
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainWake
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitBlackSmoke
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitSmoke
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitTimedSubParticles
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitWeaponSmoke
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitWhiteSmoke
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,FocusCommander
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,MarkSelectionOrdersDirty
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,PopUntilNamedLayout
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,RemoveSpeechOfUnit
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,SimEvents
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,TakeVec3
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,UnitOf
@@ -44330,6 +44337,15 @@ address,function,file,kind,target
 ,DrainSound,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
 ,DrainSound,src/ingame/sim_event_drain.cpp,function,
 ,DrainSound,src/ingame/sim_event_drain.cpp,global_read,g_soundNames@src/ingame/sim_event_drain.cpp
+,DrainSoundAt,src/ingame/sim_event_drain.cpp,call,PlaySoundAt
+,DrainSoundAt,src/ingame/sim_event_drain.cpp,call,TakeVec3
+,DrainSoundAt,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,DrainSoundAt,src/ingame/sim_event_drain.cpp,function,
+,DrainSoundAtName,src/ingame/sim_event_drain.cpp,call,PlaySoundAtByName
+,DrainSoundAtName,src/ingame/sim_event_drain.cpp,call,TakeVec3
+,DrainSoundAtName,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
+,DrainSoundAtName,src/ingame/sim_event_drain.cpp,function,
+,DrainSoundAtName,src/ingame/sim_event_drain.cpp,global_read,g_soundNames@src/ingame/sim_event_drain.cpp
 ,DrainTeleport,src/ingame/sim_event_drain.cpp,call,ContinueArgs
 ,DrainTeleport,src/ingame/sim_event_drain.cpp,call,EmitTeleportParticles
 ,DrainTeleport,src/ingame/sim_event_drain.cpp,call,TakeVec3
@@ -49730,6 +49746,8 @@ address,function,file,kind,target
 ,Rec::Rec,src/map/line_of_sight.h,field_write,Rec::field_6
 ,Rec::Rec,src/map/line_of_sight.h,field_write,Rec::flags
 ,Rec::Rec,src/map/line_of_sight.h,function,
+,RecordBlackSmoke,src/state/sim_effects.h,call,RecordPointParticles
+,RecordBlackSmoke,src/state/sim_effects.h,function,
 ,RecordBubbles,src/state/sim_effects.h,call,RecordWakeEvent
 ,RecordBubbles,src/state/sim_effects.h,function,
 ,RecordBuildMenuUpdate,src/state/sim_effects.h,call,RecordUnitEvent
@@ -49751,6 +49769,8 @@ address,function,file,kind,target
 ,RecordForcesDestroyed,src/state/sim_effects.h,function,
 ,RecordGuiChangedIfScreen,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordGuiChangedIfScreen,src/state/sim_effects.h,function,
+,RecordMessage,src/state/sim_effects.h,call,RecordSimEvent
+,RecordMessage,src/state/sim_effects.h,function,
 ,RecordNanoParticles,src/state/sim_effects.h,call,RecordNanoParticles
 ,RecordNanoParticles,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordNanoParticles,src/state/sim_effects.h,call,SimEventPut
@@ -49766,6 +49786,8 @@ address,function,file,kind,target
 ,RecordPointParticles,src/state/sim_effects.h,function,
 ,RecordPopToGameLayout,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordPopToGameLayout,src/state/sim_effects.h,function,
+,RecordRemoveUnitSpeech,src/state/sim_effects.h,call,RecordUnitEvent
+,RecordRemoveUnitSpeech,src/state/sim_effects.h,function,
 ,RecordReverseNanoParticles,src/state/sim_effects.h,call,RecordReverseNanoParticles
 ,RecordReverseNanoParticles,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordReverseNanoParticles,src/state/sim_effects.h,call,SimEventPut
@@ -49796,8 +49818,17 @@ address,function,file,kind,target
 ,RecordSimEvent,src/state/sim_events.cpp,function,
 ,RecordSimEvent,src/state/sim_events.cpp,global_read,g_game
 ,RecordSimEvent,src/state/sim_events.cpp,global_read,g_simEvents@src/state/sim_events.cpp
+,RecordSmoke,src/state/sim_effects.h,call,RecordSimEvent
+,RecordSmoke,src/state/sim_effects.h,call,SimEventPut
+,RecordSmoke,src/state/sim_effects.h,function,
 ,RecordSound,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordSound,src/state/sim_effects.h,function,
+,RecordSoundAt,src/state/sim_effects.h,call,RecordSimEvent
+,RecordSoundAt,src/state/sim_effects.h,call,SimEventPut
+,RecordSoundAt,src/state/sim_effects.h,function,
+,RecordSoundAtName,src/state/sim_effects.h,call,RecordSimEvent
+,RecordSoundAtName,src/state/sim_effects.h,call,SimEventPut
+,RecordSoundAtName,src/state/sim_effects.h,function,
 ,RecordTeleportParticles,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordTeleportParticles,src/state/sim_effects.h,call,SimEventPut
 ,RecordTeleportParticles,src/state/sim_effects.h,function,
@@ -49820,6 +49851,8 @@ address,function,file,kind,target
 ,RecordWakeParticles,src/state/sim_effects.h,function,
 ,RecordWeaponSmoke,src/state/sim_effects.h,call,RecordPointParticles
 ,RecordWeaponSmoke,src/state/sim_effects.h,function,
+,RecordWhiteSmoke,src/state/sim_effects.h,call,RecordPointParticles
+,RecordWhiteSmoke,src/state/sim_effects.h,function,
 ,RefAbs,src/harness/harness.cpp,call,SimBlockBase
 ,RefAbs,src/harness/harness.cpp,function,
 ,RefreshMapListNative,src/seams/native.cpp,call,Mission::RefreshMapList

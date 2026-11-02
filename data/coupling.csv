@@ -125,6 +125,7 @@ economy,files,call,HapiBank::ReadBox,1
 economy,files,call,HapiBank::SeekBox,2
 economy,files,call,HapiBank::WriteBox,1
 economy,game,call,IsPlaying,1
+economy,game,call,RecordMessage,4
 economy,game,shared_write,Player::energy,1
 economy,game,shared_write,Player::energyStorageBonus,1
 economy,game,shared_write,Player::metal,1
@@ -132,7 +133,6 @@ economy,game,shared_write,Player::metalStorageBonus,1
 economy,los_radar,indirect,CmdShareMapping,1
 economy,los_radar,indirect,CmdShareRadar,1
 economy,los_radar,indirect,GetMapCell,1
-economy,network,call,AddMessage,4
 economy,network,indirect,BroadcastPlayerInfo,2
 economy,network,indirect,SendShareMapInfo,1
 economy,network,shared_write,Player::energy,1
@@ -207,7 +207,9 @@ features,files,call,HapiBank::SeekBox,2
 features,files,call,HapiBank::SetIntegerItem,1
 features,files,call,HapiBank::WriteBox,1
 features,game,call,GameRand,1
+features,game,call,RecordSoundAtName,1
 features,game,call,RecordTimedSubParticles,1
+features,game,call,RecordWhiteSmoke,1
 features,game,call,SimAllocTagged,1
 features,game,call,SimRealloc,1
 features,game,call,StepGafSequence,1
@@ -292,13 +294,11 @@ features,players,shared_write,Vec3::x,3
 features,players,shared_write,Vec3::y,3
 features,players,shared_write,Vec3::z,3
 features,presentation,call,CreateObjectState,1
-features,presentation,call,EmitWhiteSmoke,1
 features,presentation,call,FindGafEntry,1
 features,presentation,call,FreeObjectState,2
 features,presentation,call,GetGafSequenceFrame,1
 features,presentation,call,InitGafSequence,3
 features,presentation,call,LoadGaf,1
-features,presentation,call,PlaySoundAtByName,1
 features,presentation,shared_write,Cell::feature,2
 features,presentation,shared_write,Cell::flags,2
 features,presentation,shared_write,Cell::spot,1
@@ -1048,7 +1048,7 @@ game,presentation,shared_write,PlayerInfo::flags_9b,10
 game,presentation,shared_write,PlayerInfo::side,18
 game,presentation,shared_write,Point16::x,5
 game,presentation,shared_write,Point16::y,5
-game,presentation,shared_write,SimEvent::args,8
+game,presentation,shared_write,SimEvent::args,11
 game,presentation,shared_write,SimEvent::flags,3
 game,presentation,shared_write,SimEvent::kind,1
 game,presentation,shared_write,SimEventQueue::head,2
@@ -1314,6 +1314,7 @@ los_radar,features,shared_write,Vec3::x,6
 los_radar,features,shared_write,Vec3::y,5
 los_radar,features,shared_write,Vec3::z,6
 los_radar,game,call,Game::Current,1
+los_radar,game,call,RecordMessage,3
 los_radar,game,call,SaveSettings,1
 los_radar,game,call,SimAlloc,1
 los_radar,game,call,SimAllocTagged,1
@@ -1340,7 +1341,6 @@ los_radar,map,shared_write,Vec3::y,4
 los_radar,map,shared_write,Vec3::z,12
 los_radar,map,shared_write,Vec3Words::xWhole,2
 los_radar,map,shared_write,Vec3Words::zWhole,3
-los_radar,network,call,AddMessage,3
 los_radar,network,indirect,BroadcastPlayerInfo,2
 los_radar,network,shared_write,Unit::flags,3
 los_radar,orders,shared_write,Cell::feature,2
@@ -1559,7 +1559,6 @@ map,platform,call,GameAllocIgnoreTag,2
 map,platform,call,GameFreeThunk,8
 map,platform,call,GetLocalizedString,2
 map,platform,call,RandomInt,1
-map,platform,call,ShowErrorBox,1
 map,platform,call,SkipTextLines,1
 map,platform,call,StringRef::Assign,1
 map,platform,call,StringRef::~StringRef,1
@@ -1576,6 +1575,7 @@ map,platform,call,TdfRecord::GetSubRecord,2
 map,platform,call,TdfRecord::GetSubRecordCount,1
 map,platform,call,Translate,2
 map,platform,call,WorldToCell,1
+map,platform,call,host_message,1
 map,platform,call,operator delete,11
 map,platform,call,operator new,7
 map,platform,call,operator==,5
@@ -1622,7 +1622,7 @@ map,targeting,shared_write,Unit::flags,1
 map,targeting,shared_write,Vec3::x,3
 map,targeting,shared_write,Vec3::y,2
 map,targeting,shared_write,Vec3::z,3
-map,units,shared_write,Fixed::value,2
+map,units,shared_write,Fixed::value,3
 map,units,shared_write,Game::list_391ed,3
 map,units,shared_write,Game::net,3
 map,units,shared_write,Mission::waterDamage,1
@@ -2226,7 +2226,7 @@ orders,units,shared_write,Angles16::heading,10
 orders,units,shared_write,Angles16::pitch,7
 orders,units,shared_write,BitWriter::bit,1
 orders,units,shared_write,BitWriter::index,1
-orders,units,shared_write,Fixed::value,2
+orders,units,shared_write,Fixed::value,3
 orders,units,shared_write,MissionType::index,1
 orders,units,shared_write,Order::flags_42,1
 orders,units,shared_write,Order::next,2
@@ -2597,7 +2597,7 @@ platform,units,indirect,CompareUnitTypeNames,1
 platform,units,shared_write,BitReader::bit,1
 platform,units,shared_write,BitReader::index,1
 platform,units,shared_write,Display::availPhys,1
-platform,units,shared_write,Fixed::value,2
+platform,units,shared_write,Fixed::value,3
 platform,units,shared_write,Fixed::whole,1
 platform,units,shared_write,Point16::x,7
 platform,units,shared_write,Point16::y,7
@@ -3301,7 +3301,7 @@ presentation,map,shared_write,Unit::pos,2
 presentation,map,shared_write,Vec3::x,12
 presentation,map,shared_write,Vec3::y,4
 presentation,map,shared_write,Vec3::z,12
-presentation,network,call,AddMessage,5
+presentation,network,call,AddMessage,6
 presentation,network,call,AddNetPlayer,1
 presentation,network,call,AnnouncePlayerLeft,1
 presentation,network,call,AreAllPlayersReady,1
@@ -3659,7 +3659,7 @@ presentation,units,call,MakePropList,1
 presentation,units,shared_write,Angles16::bank,6
 presentation,units,shared_write,Angles16::heading,10
 presentation,units,shared_write,Angles16::pitch,7
-presentation,units,shared_write,Fixed::value,2
+presentation,units,shared_write,Fixed::value,3
 presentation,units,shared_write,Fixed::whole,1
 presentation,units,shared_write,Game::commanderDeath,2
 presentation,units,shared_write,Game::difficulty,2
@@ -4360,6 +4360,7 @@ units,files,call,HapiBank::SeekBox,4
 units,files,call,HapiBank::SetIntegerItem,1
 units,files,call,HapiBank::WriteBox,2
 units,files,call,ListDirectory,3
+units,game,call,RecordBlackSmoke,1
 units,game,call,RecordBubbles,1
 units,game,call,RecordBuildMenuUpdate,1
 units,game,call,RecordCdActivity,1
@@ -4370,9 +4371,12 @@ units,game,call,RecordPopToGameLayout,1
 units,game,call,RecordScoreFlash,1
 units,game,call,RecordSelectionOrdersDirty,1
 units,game,call,RecordSimEvent,2
+units,game,call,RecordSmoke,1
 units,game,call,RecordThrustParticles,1
+units,game,call,RecordUnitEvent,1
 units,game,call,RecordUnitSpeech,1
 units,game,call,RecordWakeParticles,1
+units,game,call,RecordWhiteSmoke,1
 units,game,call,SimAllocTagged,6
 units,game,call,SimRealloc,1
 units,game,shared_write,Angles16::heading,1
@@ -4662,7 +4666,6 @@ units,platform,call,ProtectBlockReadOnly,6
 units,platform,call,ProtectBlockReadWrite,8
 units,platform,call,RandomInt,2
 units,platform,call,RotateByAngles,1
-units,platform,call,ShowErrorBox,1
 units,platform,call,StringRef::Assign,1
 units,platform,call,StringRef::~StringRef,1
 units,platform,call,TdfFile::GetDouble,1
@@ -4685,6 +4688,7 @@ units,platform,call,Translate,2
 units,platform,call,Unguarded_insert,1
 units,platform,call,UsesDataArchives,2
 units,platform,call,WorldToCell,1
+units,platform,call,host_message,1
 units,platform,call,host_time_ms,1
 units,platform,call,operator delete,6
 units,platform,call,operator new,5
@@ -4745,15 +4749,11 @@ units,presentation,call,CreateObjectState,1
 units,presentation,call,CreatePlayerObjectState,1
 units,presentation,call,CycleCameraFollow,1
 units,presentation,call,CycleSelection,1
-units,presentation,call,EmitBlackSmoke,1
-units,presentation,call,EmitSmoke,1
-units,presentation,call,EmitWhiteSmoke,1
 units,presentation,call,FreeObjectState,1
 units,presentation,call,GetObjectHeight,1
 units,presentation,call,IsKeyDown,1
 units,presentation,call,Load3do,1
 units,presentation,call,MirrorObject,1
-units,presentation,call,RemoveSpeechOfUnit,1
 units,presentation,call,StringRef::ReleaseRef,1
 units,presentation,call,StripExtension,1
 units,presentation,call,UnitTable::Construct,1
@@ -4975,7 +4975,10 @@ weapons,game,call,GameRand,1
 weapons,game,call,RecordBuildMenuUpdate,1
 weapons,game,call,RecordCdActivity,1
 weapons,game,call,RecordScreenShake,1
+weapons,game,call,RecordSmoke,1
+weapons,game,call,RecordSoundAt,3
 weapons,game,call,RecordWeaponSmoke,3
+weapons,game,call,RecordWhiteSmoke,2
 weapons,game,call,SimAllocTagged,1
 weapons,game,call,StepGafSequence,1
 weapons,game,shared_write,Angles16::heading,1
@@ -5113,15 +5116,12 @@ weapons,players,shared_write,Vec3::z,3
 weapons,presentation,call,AllocFrame,1
 weapons,presentation,call,BuildLensFrame,1
 weapons,presentation,call,DebrisCache::InitSimCache,1
-weapons,presentation,call,EmitSmoke,1
-weapons,presentation,call,EmitWhiteSmoke,2
 weapons,presentation,call,FindGafEntry,1
 weapons,presentation,call,FreeCache,1
 weapons,presentation,call,GetGafFrame,1
 weapons,presentation,call,InitGafSequence,1
 weapons,presentation,call,Load3do,1
 weapons,presentation,call,MirrorObject,1
-weapons,presentation,call,PlaySoundAt,3
 weapons,presentation,shared_write,Angles16::bank,1
 weapons,presentation,shared_write,Angles16::heading,1
 weapons,presentation,shared_write,Angles16::pitch,1
@@ -5209,7 +5209,7 @@ weapons,units,indirect,MarkRecentlyDamaged,1
 weapons,units,shared_write,Angles16::bank,6
 weapons,units,shared_write,Angles16::heading,10
 weapons,units,shared_write,Angles16::pitch,7
-weapons,units,shared_write,Fixed::value,2
+weapons,units,shared_write,Fixed::value,3
 weapons,units,shared_write,Point16::x,7
 weapons,units,shared_write,Point16::y,7
 weapons,units,shared_write,Unit::attacker,5

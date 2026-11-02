@@ -97,8 +97,6 @@ extern void __cdecl ShowSoftwareCursor(void);
 extern void __stdcall SetTextColors(int a, int b);
 #include "keyboard.h"
 #include "dialogs.h"
-#include "../game/game.h"
-#include "../../interfaces/services.h"
 
 extern int __stdcall PointInRect(DialogRect* r, int x, int y);
 #include "../util/registry.h"
@@ -890,11 +888,6 @@ int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, in
         return 1;
     }
     return 0;
-}
-
-void __stdcall ReportMissionError(char* text)
-{
-    OpenMessageBox((Gui*)g_game->messages, text, 0x1e0, 1, 1);
 }
 
 // FUNCTION: 0x4ac080

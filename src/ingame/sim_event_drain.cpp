@@ -193,8 +193,8 @@ static void DrainBuildQueueSound(const SimEvent& e)
 {
     if (e.args[0] != g_game->playerIndex)
         return;
-    static char addSound[] = "addbuild";
-    static char subSound[] = "subbuild";
+    char addSound[] = "addbuild";
+    char subSound[] = "subbuild";
     PlaySoundByName((int)e.args[1] > 0 ? addSound : subSound, 0);
 }
 

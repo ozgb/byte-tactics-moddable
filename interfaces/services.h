@@ -539,7 +539,5 @@ void __stdcall FreeUnitPictureCache(void);
 int __stdcall LoadMapList(void** out, int multiplayer, int unused);
 // Frees the cached map and mission descriptions.
 void FreeOtaEnumCache();
-// Shows the player an error that stops a campaign or mission from loading.
-void __stdcall ReportMissionError(char* text);
 
 #endif

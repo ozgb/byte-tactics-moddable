@@ -198,7 +198,7 @@ void Mission::LoadCampaign(char* file)
         if (strlen(file) != 0) {
             if (!list.LoadFile(GetNameSlot(0))) {
                 sprintf(msg, "The requested campaign file, %s, does not exist.", GetNameSlot(0));
-                ReportMissionError(msg);
+                ShowErrorBox(msg, "Campaign error");
                 LoadCampaign(DAT_005119b8);
                 return;
             }
@@ -563,7 +563,7 @@ int Mission::LoadMission(char* map)
         if (!list.SelectRecord(key)) {
             char msg[0x100];
             sprintf(msg, "The requested mission file, %s, does not exist.", key);
-            ReportMissionError(msg);
+            ShowErrorBox(msg, "Mission error");
             return 0;
         }
         GetLocalizedString(&list, missionName, "missionname", 0x100, 0);
@@ -574,7 +574,7 @@ int Mission::LoadMission(char* map)
             if (!parser.LoadFile(file)) {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  There is no mission defintion for this mission: %s", path);
-                ReportMissionError(msg);
+                ShowErrorBox(msg, "Mission error");
                 return 0;
             }
             parser.ResetCurrentRecord();
@@ -585,11 +585,11 @@ int Mission::LoadMission(char* map)
             } else {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  Mission file %s is corrupt (no header found).", path);
-                ReportMissionError(msg);
+                ShowErrorBox(msg, "Mission error");
                 return 0;
             }
         } else {
-            ReportMissionError("Old TED format no longer supported!");
+            ShowErrorBox("Old TED format no longer supported!", "Mission error");
             return 0;
         }
         break;
@@ -619,7 +619,7 @@ int Mission::LoadMission(char* map)
     }
 
     if (!parser.SelectRecord("GlobalHeader")) {
-        ReportMissionError("No GlobalHeader block in mission file!");
+        ShowErrorBox("No GlobalHeader block in mission file!", "Mission error");
         return 0;
     }
     headerChecksum = *(int*)((char*)parser.current + 0x25);

@@ -159,7 +159,6 @@ class Mask:
 
     `offset` and `bits` (the bits of that byte left out) say where. With `after_nul`, `offset` is where a
     NUL terminated string starts and the bytes after its terminator, up to `length`, are left out.
-    With `whole`, every byte of a box of any size is left out.
     """
 
     account: str
@@ -170,7 +169,6 @@ class Mask:
     why: str
     after_nul: bool = False
     length: int = 1
-    whole: bool = False
 
 
 NOT_COMPARED = (
@@ -195,7 +193,6 @@ MASKS: tuple[Mask, ...] = (
     Mask("Units", UNIT_BOX, SAVE_RECORD_SIZE, SAVE_FLAGS_BYTE, 0x0E, "SaveRec::flags FlagBits::d: " + PADDING),
     Mask("Units", MOTION_BOX, MOTION_RECORD_SIZE, MOTION_RECORD_SIZE - 1, 0xF8, "UnitMotionSaveRecord bits above mode and flag: " + PADDING),
     Mask("Units", MARKER_BOX, POINT_MARKER_SIZE, 0, 0xFF, "PointMarkerRecord::reserved: " + STACK, length=4),
-    Mask("Summary", "Radar Image", 0, 0, 0xFF, "the radar draw moved into the drain, so the stored preview's pixels differ", whole=True),
 )
 
 
@@ -203,11 +200,7 @@ def kept(account: str, box: Box) -> bytearray:
     """For each byte of the box, the bits that are compared."""
     keep = bytearray(b"\xff" * len(box.data))
     for mask in MASKS:
-        if mask.account != account or not re.fullmatch(mask.box, box.key):
-            continue
-        if mask.whole:
-            return bytearray(len(box.data))
-        if mask.size != len(box.data):
+        if mask.account != account or not re.fullmatch(mask.box, box.key) or mask.size != len(box.data):
             continue
         if mask.after_nul:
             end = box.data.index(0, mask.offset) + 1 if 0 in box.data[mask.offset:mask.length] else mask.length

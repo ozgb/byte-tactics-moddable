@@ -11,5 +11,7 @@ void __stdcall HarnessAfterStep();
 void __stdcall HarnessBeforeStep();
 void __stdcall HarnessPhase(int phase);
 void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position);
+struct tagPALETTEENTRY;
+void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int width, int height, const tagPALETTEENTRY* entries);
 
 #endif

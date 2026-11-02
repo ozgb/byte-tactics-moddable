@@ -15,3 +15,4 @@ order 5 0:ARMCOM:1 build ARMSOLAR 640 260
 order 300 0:ARMCOM:1 build ARMLLT 700 300
 order 700 0:ARMSOLAR:1 selfdestruct
 order 800 0:ARMLLT:1 selfdestruct
+frames 60 90

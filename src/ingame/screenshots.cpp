@@ -59,6 +59,7 @@ void MainFrameTick()
     UpdateMenu(g_game->menu_519);
     PeekMouseEvent((MouseEvent *)&second);
     UpdateCdCategoryByActivity();
+    DrainSimEvents();
     PlayNextSpeech();
     if (first.fields[4] == second.fields[4])
         PopMouseEvent((*(MouseEventWords*)&g_game->view).fields);

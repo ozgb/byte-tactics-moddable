@@ -15,6 +15,9 @@ new `reference-traces-v<n>` when a digest changes. `uv run tools/reference.py --
 on `moddable` does the second step in a worktree of `origin/reference`
 (`build/reference/branch`) and copies the traces into `reference/traces/`.
 
+`--traces` also copies the frames the branch wrote (`reference/frames/<scenario>/<tick>.bin`, for the scenarios with a `frames` line) into this tree's `reference/frames/`, replacing the old set.
+`--check` compares each such scenario's run frames byte for byte with them (docs/frame-dump.md); a missing stored frame fails.
+
 `--traces` plays `moddable`'s scenarios: it copies this tree's
 `reference/scenarios/` into the branch worktree, replacing the branch's set, so
 a new scenario needs no cherry-pick to `reference`. It refuses to replace
@@ -58,6 +61,7 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `fpu_control_word` | `0x9001F` | Expected `_control87` value, ignoring the infinity-control bit; the run exits 2 if it differs |
 | `ticks` | required | Game ticks to play (30 per second of game time) |
 | `steps_per_frame` | 1 | Game ticks run between two drawn frames, 1 to 8; the traces must not depend on it |
+| `frames` | none | Ticks at which a run dumps the frame drawn at the end of that tick's loop pass, ascending, each from 1 to before `ticks`, at most 64 (see `docs/frame-dump.md`); one line only |
 | `quirks` | `3.1c` | Quirk flags for the run, a spec: a preset (`3.1c`, all off; `recommended`, all on) then `+flag` or `-flag` words, as in `recommended -flag` |
 | `quirks_tamper` | none | Test only: flips a quirk flag at this tick, so the freeze check exits 2 (see Quirk flags) |
 | `quirks_reach` | none | Test only: `<tick> <flag name>`, at that tick makes the game reach the guard of `units.ignore-null-death-record`, `ai.patrol-null-enemy-skip` or `units.skip-empty-yardmap` (see Quirk flags) |

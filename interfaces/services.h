@@ -145,9 +145,9 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_WHITE_SMOKE = 28,
     // A puff of black smoke: the position (3) and the particle list.
     SIM_EVENT_BLACK_SMOKE = 29,
-    // A sound plays at a position: the sound index of the game and the position (3).
+    // A sound plays at a position: the sound index of the game, the position (3) and the set of players who hear it (bit n for player n).
     SIM_EVENT_SOUND_AT = 30,
-    // A named sound plays at a position: a SimSoundName and the position (3).
+    // A named sound plays at a position: a SimSoundName, the position (3) and the set of players who hear it (bit n for player n).
     SIM_EVENT_SOUND_AT_NAME = 31,
     // A unit's pending speech lines are dropped: the unit index.
     SIM_EVENT_REMOVE_UNIT_SPEECH = 32,

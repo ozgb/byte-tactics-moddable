@@ -18,8 +18,6 @@
 #include "../util/vec3.h"
 
 void __stdcall PlaySoundByName(char* name, int flag);
-int __stdcall PlaySoundAt(int index, Vec3* pos, int param_3);
-void __stdcall PlaySoundAtByName(char* name, Vec3* pos, int param_3);
 void __stdcall AddMessage(char* text, int key, int value, int last);
 
 static char* const g_speechTexts[SIM_SPEECH_TEXT_COUNT] = {
@@ -123,14 +121,14 @@ static void DrainSound(const SimEvent& e)
 static void DrainSoundAt(const SimEvent& e)
 {
     Vec3 at = TakeVec3(e.args, 1);
-    PlaySoundAt((int)e.args[0], &at, 0);
+    PlaySoundAtHeard((int)e.args[0], &at, e.args[4]);
 }
 
 static void DrainSoundAtName(const SimEvent& e)
 {
     Vec3 at = TakeVec3(e.args, 1);
     if (e.args[0] < SIM_SOUND_COUNT)
-        PlaySoundAtByName(g_soundNames[e.args[0]], &at, 0);
+        PlaySoundAtHeard(FindSoundByName(g_soundNames[e.args[0]]), &at, e.args[4]);
 }
 
 static void DrainMessage(const SimEvent& e)

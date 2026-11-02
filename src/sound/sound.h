@@ -142,4 +142,7 @@ void __stdcall QueueUnitSpeechIfNotVisible(Unit* unit, int kind, char* text);
 
 void __stdcall RemoveSpeechOfUnit(int id);
 
+int __stdcall PlaySoundAtHeard(int index, Vec3* at, unsigned int heard);
+int __stdcall FindSoundByName(char* name);
+
 #endif

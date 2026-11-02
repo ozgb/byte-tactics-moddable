@@ -213,18 +213,22 @@ inline void RecordBlackSmoke(const Vec3& at, short list)
     RecordPointParticles(SIM_EVENT_BLACK_SMOKE, at, list);
 }
 
+unsigned int SoundHeardMask(const Vec3& at);
+
 inline void RecordSoundAt(int index, const Vec3& at)
 {
-    unsigned int args[4] = {(unsigned int)index};
+    unsigned int args[5] = {(unsigned int)index};
     SimEventPut(args, 1, at);
-    RecordSimEvent(SIM_EVENT_SOUND_AT, 0, args, 4);
+    args[4] = SoundHeardMask(at);
+    RecordSimEvent(SIM_EVENT_SOUND_AT, 0, args, 5);
 }
 
 inline void RecordSoundAtName(SimSoundName name, const Vec3& at)
 {
-    unsigned int args[4] = {name};
+    unsigned int args[5] = {name};
     SimEventPut(args, 1, at);
-    RecordSimEvent(SIM_EVENT_SOUND_AT_NAME, 0, args, 4);
+    args[4] = SoundHeardMask(at);
+    RecordSimEvent(SIM_EVENT_SOUND_AT_NAME, 0, args, 5);
 }
 
 inline void RecordRemoveUnitSpeech(const Unit* unit)

@@ -277,6 +277,10 @@ and so on), and this page is updated to name it. The current tag is
   the stored sound logs in `reference/sounds/<scenario>.txt` (#335), which
   `tools/reference.py --check` compares as well ([`docs/sound-log.md`](sound-log.md)).
 
+The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
+traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
+by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
+
 `bt-trace N` does not name which fields are hashed. v1 to v17 are
 all `bt-trace 3`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` (and

@@ -9,6 +9,7 @@ los_radar,CmdShareMapping,AddMessage,TODO(#620): sim-to-presentation event or me
 los_radar,CmdShareRadar,AddMessage,TODO(#620): sim-to-presentation event or message
 los_radar,ToggleShareLos,AddMessage,TODO(#620): sim-to-presentation event or message
 map,Mission::BuildMissionList,GetLocalizedString,TODO(#620): sim-to-presentation event or message
+map,Mission::LoadCampaign,ShowErrorBox,TODO(#620): sim-to-presentation event or message
 map,Mission::LoadMission,GetLocalizedString,TODO(#620): sim-to-presentation event or message
 map,Mission::LoadMission,ShowErrorBox,TODO(#620): sim-to-presentation event or message
 units,ApplyUnitDeath,RemoveSpeechOfUnit,TODO(#620): sim-to-presentation event or message

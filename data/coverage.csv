@@ -123,7 +123,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,220,147,4580,2421,1754,568,,23,
+game,*,,220,147,4581,2422,1752,567,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -697,7 +697,7 @@ pathfinding,Pathfinder::MarkGoalCell,src/ai/pathfind.cpp,0,0,0,0,0,0,?MarkGoalCe
 pathfinding,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,0,0,0,0,0,0,?ReleaseHeldPathLock@Pathfinder@@QAEXXZ,1,
 pathfinding,Pathfinder::RemoveNode,src/ai/pathfind.cpp,1,0,0,0,0,0,?RemoveNode@Pathfinder@@QAEXH@Z,0,unreachable
 pathfinding,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,1,0,0,0,0,0,??1Pathfinder@@QAE@XZ,0,shutdown
-platform,*,,726,383,8032,3110,3154,793,,85,
+platform,*,,734,385,8201,3150,3264,808,,83,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,
@@ -782,6 +782,7 @@ platform,FindTranslation,src/util/tdf.cpp,1,0,0,0,0,0,?FindTranslation@@YGHPAD@Z
 platform,FormatSystemInfo,src/host/win32/crash.cpp,1,0,0,0,0,0,?FormatSystemInfo@@YAXPADH@Z,0,
 platform,FpuFussyAtexitHandler,src/debug/debug_lib.cpp,0,0,0,0,0,0,?FpuFussyAtexitHandler@@YGXXZ,1,
 platform,Frame,src/host/win32/display.cpp,1,0,0,0,0,0,?Frame@?A0x@@YGPAUIDirectDrawSurface@@H@Z,0,
+platform,FrameDumpEnabled,src/host/win32/window.cpp,1,0,0,0,0,0,?FrameDumpEnabled@?A0x@@YG_NXZ,0,
 platform,FreeAnimFiles,src/game/data_files.cpp,1,0,0,0,0,0,?FreeAnimFiles@@YGXXZ,0,
 platform,FreeBlockAllocator::Allocate,src/debug/debug_lib.cpp,1,0,0,0,0,0,?Allocate@FreeBlockAllocator@@QAEPAXI@Z,0,
 platform,FreeBlockEraseConstIter::FreeBlockEraseConstIter,src/debug/debug_lib.cpp,0,0,0,0,0,0,??0FreeBlockEraseConstIter@@QAE@ABVFreeBlockEraseIter@@@Z,1,
@@ -913,7 +914,7 @@ platform,HeadlessMusicTrackLength,src/host/win32/headless.cpp,0,0,0,0,0,0,?Headl
 platform,HeadlessMusicTrackStart,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessMusicTrackStart@@YGHH@Z,0,
 platform,HeadlessPaletteApply,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessPaletteApply@@YGHXZ,0,
 platform,HeadlessPaletteCreate,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessPaletteCreate@@YGHPBE@Z,0,
-platform,HeadlessPaletteGet,src/host/win32/headless.cpp,0,0,0,0,0,0,?HeadlessPaletteGet@@YGHPAE@Z,1,
+platform,HeadlessPaletteGet,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessPaletteGet@@YGHPAE@Z,0,
 platform,HeadlessPostQuit,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessPostQuit@@YGXXZ,0,
 platform,HeadlessSoundBufferDuplicate,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessSoundBufferDuplicate@@YGPAXPAX@Z,0,
 platform,HeadlessSoundBufferPosition,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessSoundBufferPosition@@YGHPAXPAI1@Z,0,
@@ -925,6 +926,7 @@ platform,HeadlessWindowClose,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessWi
 platform,HeadlessWindowHasFocus,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessWindowHasFocus@@YGHXZ,0,
 platform,HeadlessWindowPost,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessWindowPost@@YGXI@Z,0,
 platform,HeapEntry::HeapEntry,interfaces/services.h,0,0,0,0,0,0,??0HeapEntry@@QAE@XZ,1,
+platform,HostFrameDumpRequest,src/host/win32/display.cpp,1,0,0,0,0,0,?HostFrameDumpRequest@@YGXXZ,0,
 platform,ImageHelpEnabled,src/host/win32/crash.cpp,1,0,0,0,0,0,?ImageHelpEnabled@@YGDXZ,0,
 platform,ImageHlpAtexitHandler,src/host/win32/crash.cpp,0,0,0,0,0,0,?ImageHlpAtexitHandler@@YGXXZ,1,
 platform,ImportError,src/wasm/wind_meteors_glue.cpp,1,0,0,0,0,0,?ImportError@?A0x@@YGPBDPBD0@Z,0,
@@ -965,6 +967,7 @@ platform,QueryNumber,src/host/win32/music.cpp,1,0,0,0,0,0,?QueryNumber@?A0x@@YGH
 platform,Queue,src/host/win32/window.cpp,1,0,0,0,0,0,?Queue@?A0x@@YGXIII@Z,0,
 platform,QueueMouse,src/host/win32/window.cpp,1,0,0,0,0,0,?QueueMouse@?A0x@@YGXIIII@Z,0,
 platform,QuitApp,src/graphics/display.cpp,1,0,0,0,0,0,?QuitApp@@YGXPAD@Z,0,
+platform,ReadPresented,src/host/win32/display.cpp,1,0,0,0,0,0,?ReadPresented@?A0x@@YG_NPAEHPAH1@Z,0,
 platform,ReallocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?ReallocDebugBlock@@YAPAXPAXIH@Z,0,
 platform,RecordFatal,src/wasm/wind_meteors_glue.cpp,1,0,0,0,0,0,?RecordFatal@?A0x@@YGPBDPBD@Z,0,
 platform,RegisterCommand,src/util/commands.cpp,0,0,0,0,0,0,?RegisterCommand@@YGXPBDP6GXPAX@ZH@Z,1,
@@ -1028,6 +1031,7 @@ platform,WindowedPaletteCreate,src/host/win32/display.cpp,1,0,0,0,0,0,?WindowedP
 platform,WindowedPresent,src/host/win32/display.cpp,1,0,0,0,0,0,?WindowedPresent@?A0x@@YGHHHHH@Z,0,
 platform,WindowedSetUp,src/host/win32/display.cpp,1,0,0,0,0,0,?WindowedSetUp@?A0x@@YGHHHPBE@Z,0,
 platform,WorldToCell,src/ai/player_ai.cpp,0,0,0,0,0,0,?WorldToCell@@YG?AUPoint16@@UVec3@@U1@@Z,1,
+platform,WriteDump,src/host/win32/display.cpp,1,0,0,0,0,0,?WriteDump@?A0x@@YGXXZ,0,
 platform,WriteRegistryBinary,src/host/win32/settings.cpp,1,0,0,0,0,0,?WriteRegistryBinary@@YGXPAX00H@Z,0,
 platform,WriteTiming,src/wasm/modules.cpp,1,0,0,0,0,0,?WriteTiming@?A0x@@YGXI@Z,0,
 platform,host_alert,src/host/win32/process.cpp,1,0,0,0,0,0,host_alert,0,
@@ -1109,7 +1113,7 @@ platform,host_net_set_player_name,src/host/win32/net.cpp,0,0,0,0,0,0,host_net_se
 platform,host_net_uninit,src/host/win32/net.cpp,1,0,0,0,0,0,host_net_uninit,0,
 platform,host_palette_apply,src/host/win32/display.cpp,1,0,0,0,0,0,host_palette_apply,0,
 platform,host_palette_create,src/host/win32/display.cpp,1,0,0,0,0,0,host_palette_create,0,
-platform,host_palette_get,src/host/win32/display.cpp,0,0,0,0,0,0,host_palette_get,1,
+platform,host_palette_get,src/host/win32/display.cpp,1,0,0,0,0,0,host_palette_get,0,
 platform,host_palette_system,src/host/win32/display.cpp,1,0,0,0,0,0,host_palette_system,0,
 platform,host_post_quit,src/host/win32/window.cpp,1,0,0,0,0,0,host_post_quit,0,
 platform,host_sound_buffer_duplicate,src/host/win32/sound.cpp,1,0,0,0,0,0,host_sound_buffer_duplicate,0,
@@ -1204,7 +1208,7 @@ players,VictoryUnitTypePassesZ::IsSatisfied,src/game/victory.cpp,1,0,0,0,0,0,?Is
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,1,0,0,0,0,0,?VisitUnit@VictoryUnitTypePassesZ@@UAEHPAUUnit@@@Z,0,campaign-game
-presentation,*,,1150,491,32240,10249,11980,2667,,295,
+presentation,*,,1150,491,32242,10250,11980,2669,,295,
 presentation,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,src/graphics/memory_cache.h,1,0,0,0,0,0,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,0,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
@@ -2314,7 +2318,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,10,10,131,126,76,56,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,166,133,4075,3452,1678,1200,,32,
+units,*,,166,133,4076,3452,1678,1200,,32,
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0,unused-slot
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,

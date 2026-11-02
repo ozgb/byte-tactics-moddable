@@ -280,6 +280,48 @@ last tick, an unknown unit type, a build site the game rejects, or a selector
 that names no live unit at its tick exits with status 2 and a message that
 names the line.
 
+## Scripted input
+
+A scenario can send the game raw input, below the UI, so the game's own code turns it into selections and orders.
+One `input` line per event; lines may repeat and accumulate.
+
+```
+input <tick> <event>
+input 18 mouse move 384 240
+input 20 mouse left down 384 240
+input 21 mouse left up 384 240
+input 30 key down ctrl
+input 31 key down 1
+input 32 key up 1
+input 33 key up ctrl
+input 40 char a
+```
+
+- `<tick>` is a game tick from 1 to `ticks`. The event is queued at the start of that tick, after the tick's `order`,
+  `spawn` and `console` lines, and the UI handles it in the next frame, before the phases of tick + 1.
+- Events: `key down <key>` and `key up <key>`; `char <c>`; `mouse move <x> <y>`; `mouse left down <x> <y>`,
+  `mouse left up <x> <y>`, `mouse right down <x> <y>` and `mouse right up <x> <y>`. A mouse position is a window
+  coordinate, `x` from 0 to 639 and `y` from 0 to 479.
+- A `<key>` is a virtual-key code (decimal or `0x` hex, 1 to 255), `shift`, `ctrl`, `alt`, `esc`, `f1` to `f12`, a letter
+  `a` to `z` or a digit `0` to `9`. While Alt is held the key events reach the game as system key events, as Windows
+  sends them.
+- The game reads a letter command from a `char` event, not from a `key` event: the hotkeys `a`, `p`, `s` and `d` need
+  `char a` and so on. The `key` events are for Shift, Ctrl, Alt, Escape and the digits that make and recall groups
+  (Ctrl+1 makes a group, Alt+1 recalls it).
+- The key state and the cursor position the game reads follow the events: a key is held from its `key down` to its
+  `key up`, as a mouse button is held from its `down` to its `up`, and the cursor is where the last mouse event put it.
+  The event time is the tick, not the clock.
+- The game takes one mouse event and one key or `char` event per frame, so a scenario has at most one of each on a
+  tick, and `steps_per_frame` must be 1 (`--steps-per-frame` leaves a scenario with `input` lines at 1). A breach of
+  either, a bad event, a position outside the window or a tick after the last tick exits with status 2 and a message
+  that names the line.
+- A right-click gives an order only with interface type 1, and a left-click in an order mode only with type 0. A
+  scenario says which it uses with `console 1 +iface 1` or `console 1 +iface 0`; a scenario that does not say plays
+  with type 0.
+- A click on a unit needs the unit's position on the screen. The main view is the rectangle at (128, 32) of the 640 by
+  480 window, so a unit at world `x z` and height `y` is at screen `x - scrollX + 128`, `z - scrollY - y / 2 + 32`.
+  The scroll of slot 0 on The Pass is (304, 32) until the camera moves.
+
 ## Console commands
 
 A scenario can type a console command, as the chat line does. One `console` line per command:
@@ -318,6 +360,7 @@ The commands a line may type, by their names in the game's command table (any ca
 | Units | `reload`, `kill`, `assign`, `selectable`, `shootall`, `doubleshot`, `halfshot`, a unit type name |
 | Features and the map | `feature`, `burnone`, `burnall`, `treedeath`, `meteor`, `sealevel`, `edge`, `search`, `move`, `drop` |
 | Sight | `los`, `lostype`, `mapping`, `radar`, `nowisee` |
+| Interface | `iface <0 or 1>`: the interface type, 0 for left-click orders and 1 for right-click orders (see Scripted input) |
 | AI | `reloadaiprofiles` |
 | Game end | `iwin`, `ilose` |
 | No effect | `assert`, `dprint`, `mem`, `zbuffer` |
@@ -326,10 +369,10 @@ The sharing commands, `assert`, `dprint`, `mem`, `zbuffer`, `assign` (nothing is
 `edge` change no field the trace hashes: a scenario types them to enter their functions.
 
 A command that is not in the table, or a first word that is neither a listed command nor a unit type, exits with
-status 2 and a message that names the line. Left out are the display, sound, debugger and host commands (task #398's),
+status 2 and a message that names the line. Left out are the display, sound, debugger and host commands,
 `compression` and `netstats` (network statistics), `sharemapping` and `shareradar` (network games only), and two
 commands that touch the file system: `include` (reads `debugdat\include.txt`) and `printweights` (writes the file
-named in its second argument, so the AI weights dump `DumpPlayerAI` is not reachable). `los` and `mapping` save the
+named in its second argument, so the AI weights dump `DumpPlayerAI` is not reachable). `los`, `mapping` and `iface` save the
 game's settings through the host, which writes the run's own registry, and no scenario reads settings from it.
 
 ## Traces

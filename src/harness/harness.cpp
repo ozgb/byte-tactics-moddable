@@ -272,7 +272,7 @@ static const char* const s_consoleAllowed[] = {
     "meteor", "burnall", "burnone", "feature", "kill", "reload", "reloadaiprofiles", "los", "lostype", "radar",
     "mapping", "nowisee", "ai", "atm", "assign", "control", "doubleshot", "halfshot", "drop", "edge", "ilose",
     "iwin", "move", "search", "sealevel", "selectable", "shootall", "treedeath", "view", "assert", "dprint",
-    "mem", "zbuffer", "now"
+    "mem", "zbuffer", "now", "iface"
 };
 
 static char* NextToken(char** cursor)
@@ -492,6 +492,157 @@ static int ConsoleWordAllowed(const char* word)
     return 0;
 }
 
+enum { MAX_INPUTS = 1024 };
+
+struct ScriptedInput {
+    int lineNo;
+    unsigned tick;
+    unsigned type;
+    unsigned a;
+    int x;
+    int y;
+    int mouse;
+};
+
+static ScriptedInput s_inputs[MAX_INPUTS];
+static int s_inputCount = 0;
+static int s_altHeld = 0;
+
+static unsigned ParseKeyName(int lineNo, const char* text)
+{
+    static const struct {
+        const char* name;
+        unsigned vk;
+    } names[] = { { "shift", 0x10 }, { "ctrl", 0x11 }, { "alt", 0x12 }, { "esc", 0x1b } };
+    for (unsigned i = 0; i < sizeof names / sizeof names[0]; i++) {
+        if (strcmp(text, names[i].name) == 0)
+            return names[i].vk;
+    }
+    if (text[0] == 'f' && isdigit((unsigned char)text[1])) {
+        unsigned n = (unsigned)atoi(text + 1);
+        if (n >= 1 && n <= 12 && (text[2] == '\0' || (isdigit((unsigned char)text[2]) && text[3] == '\0')))
+            return 0x70 + n - 1;
+    }
+    if (text[1] == '\0' && isalpha((unsigned char)text[0]))
+        return (unsigned)toupper((unsigned char)text[0]);
+    if (text[1] == '\0' && isdigit((unsigned char)text[0]))
+        return (unsigned char)text[0];
+    unsigned vk = ParseNumber(lineNo, "input", text);
+    if (vk < 1 || vk > 255)
+        FailLine(lineNo, "needs a key code from 1 to 255", "input", "");
+    return vk;
+}
+
+static int ParseScreenCoordinate(int lineNo, const char* text, int limit)
+{
+    unsigned v = ParseNumber(lineNo, "input", text);
+    if (v >= (unsigned)limit) {
+        char detail[100];
+        sprintf(detail, ", %u is outside the %d pixel window", v, limit);
+        FailLine(lineNo, "has a position outside the window", "input", detail);
+    }
+    return (int)v;
+}
+
+static void ReadInput(int lineNo, char* value)
+{
+    char* cursor = value;
+    char* tickText = NextToken(&cursor);
+    char* kind = tickText != nullptr ? NextToken(&cursor) : nullptr;
+    if (kind == nullptr)
+        FailLine(lineNo, "needs <tick> key|char|mouse and its details", "input", "");
+    if (s_inputCount >= MAX_INPUTS)
+        FailLine(lineNo, "is past the limit of 1024 input lines", "input", "");
+    ScriptedInput* in = &s_inputs[s_inputCount++];
+    memset(in, 0, sizeof *in);
+    in->lineNo = lineNo;
+    in->tick = ParseNumber(lineNo, "input", tickText);
+    if (in->tick == 0)
+        FailLine(lineNo, "needs a tick of at least 1", "input", "");
+    if (strcmp(kind, "key") == 0) {
+        char* direction = NextToken(&cursor);
+        char* keyText = direction != nullptr ? NextToken(&cursor) : nullptr;
+        if (keyText == nullptr || (strcmp(direction, "down") != 0 && strcmp(direction, "up") != 0))
+            FailLine(lineNo, "needs key down|up <key>", "input", "");
+        in->type = strcmp(direction, "down") == 0 ? HOST_EVENT_KEY_DOWN : HOST_EVENT_KEY_UP;
+        in->a = ParseKeyName(lineNo, keyText);
+    } else if (strcmp(kind, "char") == 0) {
+        char* charText = NextToken(&cursor);
+        if (charText == nullptr)
+            FailLine(lineNo, "needs a character", "input", "");
+        if (charText[1] == '\0') {
+            in->a = (unsigned char)charText[0];
+        } else {
+            in->a = ParseNumber(lineNo, "input", charText);
+            if (in->a < 1 || in->a > 255)
+                FailLine(lineNo, "needs a character code from 1 to 255", "input", "");
+        }
+        in->type = HOST_EVENT_CHAR;
+    } else if (strcmp(kind, "mouse") == 0) {
+        in->mouse = 1;
+        char* what = NextToken(&cursor);
+        if (what == nullptr)
+            FailLine(lineNo, "needs mouse move or mouse left|right down|up", "input", "");
+        int left = strcmp(what, "left") == 0;
+        if (strcmp(what, "move") == 0) {
+            in->type = HOST_EVENT_MOUSE_MOVE;
+        } else if (left || strcmp(what, "right") == 0) {
+            char* direction = NextToken(&cursor);
+            if (direction == nullptr || (strcmp(direction, "down") != 0 && strcmp(direction, "up") != 0))
+                FailLine(lineNo, "needs mouse left|right down|up", "input", "");
+            int down = strcmp(direction, "down") == 0;
+            in->type = left ? (down ? HOST_EVENT_LBUTTON_DOWN : HOST_EVENT_LBUTTON_UP)
+                            : (down ? HOST_EVENT_RBUTTON_DOWN : HOST_EVENT_RBUTTON_UP);
+        } else {
+            FailLine(lineNo, "needs mouse move or mouse left|right down|up", "input", "");
+        }
+        char* xText = NextToken(&cursor);
+        char* yText = xText != nullptr ? NextToken(&cursor) : nullptr;
+        if (yText == nullptr)
+            FailLine(lineNo, "needs a window position x y", "input", "");
+        in->x = ParseScreenCoordinate(lineNo, xText, 640);
+        in->y = ParseScreenCoordinate(lineNo, yText, 480);
+    } else {
+        FailLine(lineNo, "needs key, char or mouse after the tick", "input", "");
+    }
+    if (NextToken(&cursor) != nullptr)
+        FailLine(lineNo, "has extra words after the event", "input", "");
+}
+
+static void CheckInputs()
+{
+    for (int i = 0; i < s_inputCount; i++) {
+        const ScriptedInput* in = &s_inputs[i];
+        if (in->tick > s_ticks)
+            FailLine(in->lineNo, "has a tick after the last tick", "input", "");
+        for (int k = 0; k < i; k++) {
+            if (s_inputs[k].tick == in->tick && s_inputs[k].mouse == in->mouse)
+                FailLine(in->lineNo, in->mouse ? "is a second mouse event on its tick" : "is a second key event on its tick",
+                         "input", ", the game takes one of each per frame");
+        }
+    }
+    if (s_inputCount != 0 && s_stepsPerFrame != 1)
+        FailLine(s_inputs[0].lineNo, "needs steps_per_frame 1", "input", ", the UI takes its events once per frame");
+}
+
+static void DeliverScriptedInput(const ScriptedInput* in)
+{
+    host_event ev;
+    memset(&ev, 0, sizeof ev);
+    ev.type = in->type;
+    ev.a = in->a;
+    ev.x = in->x;
+    ev.y = in->y;
+    ev.time_ms = in->tick * 1000 / 30;
+    if (ev.type == HOST_EVENT_KEY_DOWN || ev.type == HOST_EVENT_KEY_UP) {
+        if (s_altHeld || in->a == 0x12)
+            ev.type = ev.type == HOST_EVENT_KEY_DOWN ? HOST_EVENT_SYS_KEY_DOWN : HOST_EVENT_SYS_KEY_UP;
+        if (in->a == 0x12)
+            s_altHeld = in->type == HOST_EVENT_KEY_DOWN;
+    }
+    host_inject_event(&ev);
+}
+
 static void CheckConsoles()
 {
     for (int i = 0; i < s_consoleCount; i++) {
@@ -664,6 +815,8 @@ static void ReadKey(int lineNo, const char* key, char* value)
         ReadSpawn(lineNo, value);
     else if (strcmp(key, "console") == 0)
         ReadConsole(lineNo, value);
+    else if (strcmp(key, "input") == 0)
+        ReadInput(lineNo, value);
     else if (strncmp(key, "player", 6) == 0 && isdigit((unsigned char)key[6]) && key[7] == '.')
         ReadPlayerKey(lineNo, key, value);
     else
@@ -728,6 +881,7 @@ static void CheckScenario()
     CheckOrders();
     CheckSpawns();
     CheckConsoles();
+    CheckInputs();
     if (s_saveLine != 0 && s_saveTick > s_ticks)
         FailLine(s_saveLine, "has a tick after the last tick", "save", "");
     if (s_localPlayer >= 0 && !s_players[s_localPlayer].named) {
@@ -3463,6 +3617,10 @@ void HarnessBeforeStep()
     for (int i = 0; i < s_consoleCount; i++) {
         if (s_consoles[i].tick == tick)
             RunScriptedConsole(&s_consoles[i]);
+    }
+    for (int i = 0; i < s_inputCount; i++) {
+        if (s_inputs[i].tick == tick)
+            DeliverScriptedInput(&s_inputs[i]);
     }
 }
 

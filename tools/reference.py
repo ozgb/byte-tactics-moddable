@@ -411,12 +411,15 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
 
 
 def with_steps_per_frame(scenarios: dict[str, Path], steps: int, directory: Path) -> dict[str, Path]:
-    """Copies of the scenarios in `directory`, each ending with a steps_per_frame line (a later line replaces an earlier one)."""
+    """Copies of the scenarios in `directory`, each ending with a steps_per_frame line (a later line replaces an earlier one), except a scenario with an `input` line, which stays at 1."""
     directory.mkdir(parents=True, exist_ok=True)
     copies = {}
     for name, path in scenarios.items():
         text = path.read_text()
         copies[name] = directory / path.name
+        if any(line.split(None, 1)[:1] == ["input"] for line in text.splitlines()):
+            copies[name].write_text(text)
+            continue
         copies[name].write_text(text + ("" if text.endswith("\n") else "\n") + f"steps_per_frame {steps}\n")
     return copies
 

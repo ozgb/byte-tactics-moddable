@@ -130,8 +130,10 @@ class StepsPerFrameTest(unittest.TestCase):
             src.mkdir()
             (src / "a.txt").write_text("ticks 5\nmap X")
             (src / "b.txt").write_text("ticks 6\nsteps_per_frame 2\n")
+            (src / "c.txt").write_text("ticks 7\ninput 3 char 97\n")
             copies = reference.with_steps_per_frame(
-                {"a": src / "a.txt", "b": src / "b.txt"}, 5, Path(tmp) / "out")
+                {"a": src / "a.txt", "b": src / "b.txt", "c": src / "c.txt"}, 5, Path(tmp) / "out")
+            self.assertEqual(copies["c"].read_text(), "ticks 7\ninput 3 char 97\n")
             self.assertEqual(copies["a"].read_text(), "ticks 5\nmap X\nsteps_per_frame 5\n")
             self.assertEqual(copies["b"].read_text().splitlines()[-1], "steps_per_frame 5")
             self.assertEqual((src / "a.txt").read_text(), "ticks 5\nmap X")

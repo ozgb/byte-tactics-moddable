@@ -2,11 +2,11 @@
 #define OBJECT_POOL_H
 
 #include <vector>
+#include "../../interfaces/services.h"
 
 struct PoolBlock {
     int unknown_0;
 };
-void __cdecl GameFreeThunk(void* p);
 
 class ObjectPool {
 public:

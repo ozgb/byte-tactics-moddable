@@ -1,11 +1,13 @@
 #include "sim_effects.h"
 #include "../game/game.h"
+#include "../network/player.h"
+#include "../util/vec3.h"
 #include "../../interfaces/seams.h"
 #include "../../link/globals.h"
 
 unsigned int SoundHeardMask(const Vec3& at)
 {
-    if (g_seams.los_radar->GetMapCell(at.x / (1 << 20), at.z / (1 << 20)) == 0)
+    if (g_seams.los_radar->GetMapCell(at.x / (1 << 20), at.z / (1 << 20)) == nullptr)
         return 0;
     int tx = (short)(at.x >> 16) >> 5;
     int ty = ((short)(at.z >> 16) - ((short)(at.y >> 16) >> 1)) >> 5;

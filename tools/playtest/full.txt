@@ -11,7 +11,7 @@ waitfor warning_ok 300
 shot warning
 click 377 356
 waitfor mainmenu 20
-shot mainmenu
+shot mainmenu nodump
 
 # --- options: Sound, Music (5 x previous track, 3 x next), Interface, Visuals, Cancel
 click 187 402
@@ -66,9 +66,9 @@ click 32 185
 sleep 0.5
 click 300 330
 sleep 1
-shot sk_lab_placed
+shot sk_lab_placed nodump
 repeat 5 chat +atm ; sleep 9
-shot sk_lab
+shot sk_lab nodump
 # the lab builds 12 Kbots, its rally point on the enemy base
 click 330 300
 sleep 1
@@ -79,7 +79,7 @@ click 32 388
 sleep 0.5
 click 94 8
 sleep 1
-shot sk_queued
+shot sk_queued nodump
 key Escape
 sleep 1
 
@@ -92,31 +92,31 @@ type btsave
 sleep 0.5
 click 480 358
 sleep 4
-shot saved
+shot saved nodump
 click 60 165
 waitfor load_title 5
 click 160 110
 sleep 0.5
-shot load_list
+shot load_list nodump
 click 472 363
 sleep 12
 ifmatch paused key Pause
 sleep 2
-shot loaded
+shot loaded nodump
 
 # --- the Kbots fight at the Core base; the game may be won from here on
 on skirmish_end goto skirmish_over
 repeat 15 chat +atm ; sleep 9
 alive
-shot sk_late
+shot sk_late nodump
 move 400 250
 keyhold Up 8
 keyhold Right 6
 sleep 1
-shot sk_enemy
+shot sk_enemy nodump
 repeat 15 chat +atm ; sleep 9
 alive
-shot sk_enemy_late
+shot sk_enemy_late nodump
 # not won yet: surrender
 key F2
 waitfor f2menu 5
@@ -136,16 +136,16 @@ click 187 402
 sleep 3
 click 506 145
 sleep 3
-shot campaign_select
+shot campaign_select nodump
 click 535 431
 waitfor briefing_start 30
-shot briefing
+shot briefing nodump
 click 547 447
 waitfor ingame 60
 sleep 2
 ifmatch paused key Pause
 sleep 2
-shot mission
+shot mission nodump
 on continue goto mission_won
 drag 170 100 625 305
 sleep 1
@@ -170,10 +170,10 @@ click 311 254
 sleep 4
 goto mission_over
 label mission_won
-shot continue
+shot continue nodump
 click 320 300
 waitfor campaign_end 30
-shot victory
+shot victory nodump
 label mission_over
 ifmatch campaign_end click 520 403
 waitfor mainmenu 30

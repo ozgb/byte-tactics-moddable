@@ -65,6 +65,122 @@ class SoundLogTest(unittest.TestCase):
         self.assertEqual(differing, ["a"])
 
 
+class FrameTest(unittest.TestCase):
+    WIDTH, HEIGHT = 4, 3
+
+    def frame(self, tick: int = 30, palette: int = 7, pixels: bytes | None = None) -> bytes:
+        header = b"BTFR" + (1).to_bytes(2, "little") + self.WIDTH.to_bytes(2, "little") + self.HEIGHT.to_bytes(2, "little") + bytes(2) + tick.to_bytes(4, "little")
+        return header + bytes([palette]) * reference.FRAME_PALETTE_SIZE + (pixels or bytes(self.WIDTH * self.HEIGHT))
+
+    def test_equal_frames(self):
+        self.assertIsNone(reference.frame_difference(self.frame(), self.frame()))
+
+    def test_first_differing_pixel_is_named(self):
+        pixels = bytearray(self.WIDTH * self.HEIGHT)
+        pixels[1 * self.WIDTH + 2] = 9
+        self.assertEqual(reference.frame_difference(self.frame(), self.frame(pixels=bytes(pixels))), "pixel x 2 y 1: stored 0, got 9")
+
+    def test_palette_and_header_differences(self):
+        self.assertEqual(reference.frame_difference(self.frame(), self.frame(palette=8)), "palette")
+        self.assertEqual(reference.frame_difference(self.frame(), self.frame(tick=31)), "header")
+
+    def report(self, stored: dict[int, bytes], got: dict[int, bytes]):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            scenario = root / "a.txt"
+            scenario.write_text("ticks 100\nframes 30 60\n")
+            plain = root / "b.txt"
+            plain.write_text("ticks 100\n")
+            for tick, data in stored.items():
+                (root / "frames" / "a").mkdir(parents=True, exist_ok=True)
+                (root / "frames" / "a" / f"{tick}.bin").write_bytes(data)
+            with mock.patch.object(reference, "ROOT", root):
+                return reference.frame_report({"a": scenario, "b": plain}, {"a": got}, root / "frames")
+
+    def test_report_equal(self):
+        frames = {30: self.frame(30), 60: self.frame(60)}
+        differing, lines = self.report(frames, frames)
+        self.assertEqual(differing, [])
+        self.assertEqual(lines, ["frames: 1 of 1 scenarios equal, 0 differ, 1 with no frames line"])
+
+    def test_report_names_the_tick_and_pixel(self):
+        pixels = bytearray(self.WIDTH * self.HEIGHT)
+        pixels[0] = 5
+        differing, lines = self.report({30: self.frame(30), 60: self.frame(60)}, {30: self.frame(30), 60: self.frame(60, pixels=bytes(pixels))})
+        self.assertEqual(differing, ["a"])
+        self.assertEqual(lines[0], "DIFF a frame 60: pixel x 0 y 0: stored 0, got 5")
+
+    def test_missing_stored_frame_fails(self):
+        differing, lines = self.report({30: self.frame(30)}, {30: self.frame(30), 60: self.frame(60)})
+        self.assertEqual(differing, ["a"])
+        self.assertIn("frame 60: no stored frame", lines[0])
+
+    def test_missing_run_frame_fails(self):
+        frames = {30: self.frame(30), 60: self.frame(60)}
+        differing, lines = self.report(frames, {30: frames[30]})
+        self.assertEqual(differing, ["a"])
+        self.assertIn("frame 60: the run wrote no frame", lines[0])
+
+
+class SaveReportTest(unittest.TestCase):
+    @staticmethod
+    def bank(box: bytes) -> bytes:
+        import test_savefile
+        return test_savefile.bank("Players", {"A": box})
+
+    def test_equal_and_different_saves(self):
+        self.assertIsNone(reference.save_difference(self.bank(b"abc"), self.bank(b"abc")))
+        self.assertIn("Players/A offset 0x2", reference.save_difference(self.bank(b"abc"), self.bank(b"abd")))
+
+    def test_only_scenarios_with_a_save_line_are_counted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "saves"
+            directory.mkdir()
+            saver, plain, unstored = (Path(tmp) / n for n in ("saver.txt", "plain.txt", "unstored.txt"))
+            saver.write_text("ticks 10\nsave 5\n")
+            unstored.write_text("save 5\n")
+            plain.write_text("ticks 10\n")
+            (directory / "saver.sav").write_bytes(self.bank(b"abc"))
+            scenarios = {"saver": saver, "plain": plain, "unstored": unstored}
+            with mock.patch.object(reference, "ROOT", Path(tmp)):
+                differing, lines = reference.save_report(scenarios, {"saver": self.bank(b"abc"), "unstored": b"x"}, directory)
+                self.assertEqual(differing, [])
+                self.assertIn("saves: 1 of 2 equal, 0 differ, 1 with no stored save", lines[-1])
+                differing, _ = reference.save_report(scenarios, {"saver": self.bank(b"abd")}, directory)
+                self.assertEqual(differing, ["saver"])
+                differing, _ = reference.save_report(scenarios, {"saver": None}, directory)
+                self.assertEqual(differing, ["saver"])
+
+
+class CopySavesTest(unittest.TestCase):
+    def test_the_branch_saves_replace_the_stored_ones(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            branch = root / "branch/reference/saves"
+            branch.mkdir(parents=True)
+            (branch / "a.sav").write_bytes(b"new")
+            (root / "reference/saves").mkdir(parents=True)
+            (root / "reference/saves/old.sav").write_bytes(b"old")
+            with mock.patch.object(reference, "ROOT", root), mock.patch.object(reference, "SAVES", root / "reference/saves"), \
+                    contextlib.redirect_stdout(io.StringIO()) as out:
+                reference.copy_saves(root / "branch")
+            self.assertEqual(sorted(p.name for p in (root / "reference/saves").iterdir()), ["a.sav"])
+            self.assertEqual((root / "reference/saves/a.sav").read_bytes(), b"new")
+            self.assertIn("1 saves copied", out.getvalue())
+
+    def test_a_branch_with_no_saves_leaves_the_stored_ones(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "branch").mkdir()
+            (root / "reference/saves").mkdir(parents=True)
+            (root / "reference/saves/old.sav").write_bytes(b"old")
+            with mock.patch.object(reference, "ROOT", root), mock.patch.object(reference, "SAVES", root / "reference/saves"), \
+                    contextlib.redirect_stdout(io.StringIO()) as out:
+                reference.copy_saves(root / "branch")
+            self.assertTrue((root / "reference/saves/old.sav").exists())
+            self.assertIn("untouched", out.getvalue())
+
+
 class StepsPerFrameTest(unittest.TestCase):
     def test_copies_end_with_the_key(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -228,6 +344,8 @@ class ScanRunTest(unittest.TestCase):
             raise StopIteration
 
         with mock.patch.object(reference, "scenario_ticks", lambda s: 600), \
+                mock.patch.object(reference, "scenario_frames", lambda s: []), \
+                mock.patch.object(reference, "scenario_saves", lambda s: False), \
                 mock.patch.object(reference.tracediff, "play", fake_play), \
                 contextlib.redirect_stdout(io.StringIO()) as out:
             try:

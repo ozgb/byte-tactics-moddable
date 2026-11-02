@@ -6,6 +6,7 @@
 import contextlib
 import csv
 import io
+import random
 import shutil
 import sys
 import tempfile
@@ -233,6 +234,77 @@ class ClangTest(unittest.TestCase):
         self.assertEqual(keyed[("SimGlobals", "list", "SimGlobals.list")]["issue"], "")
         self.assertEqual(keyed[("SimGlobals", "table", "SimGlobals.table")]["issue"], "#353")
         self.assertEqual(len(out), 5)
+
+    def shuffled_outside(self, rows, seed):
+        data = self.root / "data"
+        data.mkdir(exist_ok=True)
+        header = "holder,offsets,target,scenarios,ticks,target_offsets,class,note\n"
+        order = list(rows)
+        random.Random(seed).shuffle(order)
+        (data / "block_pointers.csv").write_text(header + "".join(
+            '%s,%s,T,1,1,-,outside,"%s"\n' % row for row in order))
+        (data / "outside_pointers.csv").write_text(rc.render(rc.OUTSIDE_COLUMNS, []))
+        return rc.render(rc.OUTSIDE_COLUMNS, rc.outside_rows(
+            self.root, {"Game": rc.Locator(self.scan)}, {"view": "view", "items": "sim"}))
+
+    def test_outside_rows_merge_rows_that_share_a_key(self):
+        rows = [("CreateGameObject", "0x4", "Game.view"), ("CreateGameObject", "0x4 0xc", "Game.view (0x4) first"),
+                ("CreateGameObject", "0xc+0x8*k", "Game.items"), ("CreateGameObject", "0xc", "Game.items"),
+                ("H", "0x20 0x24", "same"), ("H", "0x20", "same"), ("H", "0x20 0x28", "other")]
+        want = self.shuffled_outside(rows, 0)
+        out = {(r["field"], r["holder"]): r for r in csv.DictReader(io.StringIO(want))}
+        self.assertEqual(out[("", "H")]["words"], "3")
+        self.assertEqual(out[("", "H")]["note"], "other | same")
+        self.assertEqual(out[("view", "CreateGameObject")]["note"], "Game.view (0x4) first")
+        for seed in range(1, 25):
+            self.assertEqual(self.shuffled_outside(rows, seed), want)
+
+    def test_outside_rows_drop_near_duplicate_notes(self):
+        rows = [("CreateGameObject", "0x4", "Game.view"), ("H", "0x20", "same note"),
+                ("H", "0x20", "same note (its offsets fall under more than one class)"),
+                ("H", "0x20 0x28", "H (0x28): lists"), ("H", "0x20 0x24", "H (0x24): lists"),
+                ("H", "0x20 0x2c", "H (0x2c): lists")]
+        want = self.shuffled_outside(rows, 0)
+        notes = {r["holder"]: r["note"] for r in csv.DictReader(io.StringIO(want))}
+        self.assertEqual(notes["H"], "H (0x24): lists | same note (its offsets fall under more than one class)")
+        for seed in range(1, 25):
+            self.assertEqual(self.shuffled_outside(rows, seed), want)
+
+    def test_outside_rows_are_stable_on_a_second_write(self):
+        rows = [("CreateGameObject", "0x4 0xc", "Game.view"), ("CreateGameObject", "0x4", "Game.items"),
+                ("H", "0x20 0x24", "same"), ("H", "0x20", "other")]
+        want = self.shuffled_outside(rows, 0)
+        (self.root / "data" / "outside_pointers.csv").write_text(want)
+        again = rc.outside_rows(self.root, {"Game": rc.Locator(self.scan)}, {"view": "view", "items": "sim"})
+        self.assertEqual(rc.render(rc.OUTSIDE_COLUMNS, again), want)
+
+    def test_outside_rows_fail_when_rows_with_one_key_disagree(self):
+        rows = [("CreateGameObject", "0x4", "Game.view"), ("H", "0x20", "view presentation"),
+                ("H", "0x20", "damage table")]
+        for seed in range(2):
+            with self.assertRaises(SystemExit) as raised:
+                self.shuffled_outside(rows, seed)
+            self.assertIn("cannot both be right", str(raised.exception))
+            self.assertIn("issue", str(raised.exception))
+
+    def test_real_outside_rows_ignore_the_order_of_block_pointers(self):
+        real = Path(rc.ROOT) / rc.BLOCK_POINTERS
+        with real.open(newline="") as f:
+            reader = csv.reader(f)
+            header, body = next(reader), [r for r in reader if r[0] != rc.HOLDERS[rc.GAME]]
+        data = self.root / "data"
+        data.mkdir(exist_ok=True)
+        (data / "outside_pointers.csv").write_text(rc.render(rc.OUTSIDE_COLUMNS, []))
+        outputs = set()
+        for seed in range(4):
+            random.Random(seed).shuffle(body)
+            buf = io.StringIO()
+            w = csv.writer(buf, lineterminator="\n")
+            w.writerow(header)
+            w.writerows(body)
+            (data / "block_pointers.csv").write_text(buf.getvalue())
+            outputs.add(rc.render(rc.OUTSIDE_COLUMNS, rc.outside_rows(self.root, {}, {})))
+        self.assertEqual(len(outputs), 1)
 
     def test_progression_hits_two_fields(self):
         out = self.outside_notes([("0x4+0x8*k", "Game.view")])

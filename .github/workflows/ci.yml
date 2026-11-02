@@ -41,6 +41,9 @@ jobs:
           python3 tools/test_commentlint.py
           python3 tools/test_stripcomments.py
 
+      - name: Test the save comparison
+        run: python3 tools/test_savefile.py
+
       - name: Determinism lint
         if: github.event_name == 'pull_request'
         env:

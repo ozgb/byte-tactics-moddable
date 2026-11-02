@@ -411,6 +411,11 @@ static void __stdcall DeleteConditionsNative(MissionConditions* self)
     delete self;
 }
 
+static MissionConditions* __stdcall NewConditionsNative(void)
+{
+    return new (kSim) MissionConditions;
+}
+
 static void __fastcall NotifyUnitCreatedNative(MissionConditions* self, int unusedEdx, Unit* unit)
 {
     self->NotifyUnitCreated(unit);
@@ -893,6 +898,7 @@ void InstallNativeSeams()
     s_players.RegisterConditions = RegisterConditionsNative;
     s_players.FreeConditions = FreeConditionsNative;
     s_players.DeleteConditions = DeleteConditionsNative;
+    s_players.NewConditions = NewConditionsNative;
     s_players.NotifyUnitCreated = NotifyUnitCreatedNative;
     s_players.NotifyUnitDied = NotifyUnitDiedNative;
     s_players.UpdatePlayersOnStream = UpdatePlayersOnStream;

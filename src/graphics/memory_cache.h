@@ -87,7 +87,7 @@ public:
     void DrawShadowShape(GafFrame* view, ModelState* model);
 };
 
-class DebrisCache : public CacheCore<DebrisCache, Ref<char> > {
+class DebrisCache {
 public:
     typedef DebrisCacheChunk Chunk;
     int cap;
@@ -96,9 +96,16 @@ public:
     Ref<char> handle;
     int spare;
 
+    DebrisCache* ClearPointers();
+    void FreeCache();
+    void FreeBuffer();
     int InitSimCache(unsigned int size);
     template <class T>
-    int AllocHandle(Ref<T>* slot, int size) { return CacheCore<DebrisCache, Ref<char> >::AllocHandle((Ref<char>*)slot, size); }
+    int AllocHandle(Ref<T>* slot, int size) { return AllocBytes((Ref<char>*)slot, size); }
+
+private:
+    int AllocBytes(Ref<char>* slot, int size);
+    int Install(void* block, unsigned int size);
 };
 
 class UnitTable : public CMemoryCache {

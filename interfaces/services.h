@@ -518,5 +518,15 @@ void* __stdcall BuildLensFrame(int w, int h, int lens);
 char* __stdcall StripExtension(char* name);
 // Loads the sound of a file under a name.
 int __stdcall LoadSoundByName(char* name, const char* file);
+// Builds the cache of unit pictures, sized from the screen and the memory of the machine.
+void __stdcall InitUnitPictureCache(void);
+// Frees the cache of unit pictures.
+void __stdcall FreeUnitPictureCache(void);
+// Fills the list of maps and missions the player can pick, and returns the count.
+int __stdcall LoadMapList(void** out, int multiplayer, int unused);
+// Frees the cached map and mission descriptions.
+void FreeOtaEnumCache();
+// Shows the player an error that stops a campaign or mission from loading.
+void __stdcall ReportMissionError(char* text);
 
 #endif

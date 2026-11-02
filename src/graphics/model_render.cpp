@@ -80,6 +80,7 @@ int __stdcall GetGroundHeight(FixedVec3Parts* p);
 void __stdcall DrawFrameBlended(int param_1, GafFrame* param_2, int x, int y);
 void __stdcall TintFrameBelow(GafFrame* param_1, int value);
 void __stdcall CutFrameBelow(GafFrame* param_1, int value);
+#include "display.h"
 #include "model_render.h"
 
 // FUNCTION: 0x458160
@@ -106,6 +107,38 @@ void UnitTable::Destroy()
         GameFreeThunk(ptr);
     }
     this->FreeBuffer();
+}
+
+void __stdcall InitUnitPictureCache(void)
+{
+    UnitTable* obj = (UnitTable*)operator new(0x14);
+    obj = obj ? obj->Construct() : 0;
+    (*(UnitTable **)&g_game->unitTable) = obj;
+
+    int t = g_game->screenHeight * g_game->width_37e1f * 2;
+    int v = (int)(t * 1.3);
+
+    int n = g_game->displayContext->availPhys / 0x100000 + 1;
+    float scale = 1.0f;
+    if (n > 0x10) {
+        double d = (double)n * 0.0625;
+        if (d > 5.0)
+            scale = 5.0f;
+        else
+            scale = (float)d;
+    }
+    int size = (int)(v * scale);
+    ((UnitTable *)g_game->unitTable)->Initialize((size + 0xfff) & 0xfffff000);
+}
+
+void __stdcall FreeUnitPictureCache(void)
+{
+    UnitTable* obj = (UnitTable*)(UnitTable *)g_game->unitTable;
+    if (obj != 0) {
+        obj->Destroy();
+        delete obj;
+    }
+    (*(UnitTable **)&g_game->unitTable) = 0;
 }
 
 static __inline int shade_bias(UnitDrawView* owner)

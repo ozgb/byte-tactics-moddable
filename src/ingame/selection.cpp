@@ -956,12 +956,3 @@ typedef UnitPtrVector::iterator (UnitPtrVector::*UnitPtrVectorInsertFn)(
 // FUNCTION: 0x48ddc0 ?insert@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAEPAPAUUnit@@PAPAU3@ABQAU3@@Z
 UnitPtrVectorInsertFn g_insert_0048ddc0 = &UnitPtrVector::insert;
 
-#include "../game/mission_conditions.h"
-
-// FUNCTION: 0x48df90
-MissionConditions::MissionConditions()
-{
-    active = 1;
-    victoryCount = 0;
-    defeatCount = 0;
-}

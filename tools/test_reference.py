@@ -94,6 +94,35 @@ class SaveReportTest(unittest.TestCase):
                 self.assertEqual(differing, ["saver"])
 
 
+class CopySavesTest(unittest.TestCase):
+    def test_the_branch_saves_replace_the_stored_ones(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            branch = root / "branch/reference/saves"
+            branch.mkdir(parents=True)
+            (branch / "a.sav").write_bytes(b"new")
+            (root / "reference/saves").mkdir(parents=True)
+            (root / "reference/saves/old.sav").write_bytes(b"old")
+            with mock.patch.object(reference, "ROOT", root), mock.patch.object(reference, "SAVES", root / "reference/saves"), \
+                    contextlib.redirect_stdout(io.StringIO()) as out:
+                reference.copy_saves(root / "branch")
+            self.assertEqual(sorted(p.name for p in (root / "reference/saves").iterdir()), ["a.sav"])
+            self.assertEqual((root / "reference/saves/a.sav").read_bytes(), b"new")
+            self.assertIn("1 saves copied", out.getvalue())
+
+    def test_a_branch_with_no_saves_leaves_the_stored_ones(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "branch").mkdir()
+            (root / "reference/saves").mkdir(parents=True)
+            (root / "reference/saves/old.sav").write_bytes(b"old")
+            with mock.patch.object(reference, "ROOT", root), mock.patch.object(reference, "SAVES", root / "reference/saves"), \
+                    contextlib.redirect_stdout(io.StringIO()) as out:
+                reference.copy_saves(root / "branch")
+            self.assertTrue((root / "reference/saves/old.sav").exists())
+            self.assertIn("untouched", out.getvalue())
+
+
 class StepsPerFrameTest(unittest.TestCase):
     def test_copies_end_with_the_key(self):
         with tempfile.TemporaryDirectory() as tmp:

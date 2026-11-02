@@ -3,7 +3,7 @@
 A save's account chunks are LZSS-compressed (SQSH), so one uninitialised byte shifts every later
 byte of the file. `differences` therefore decodes both files and compares them account by account,
 item by item and box by box, leaving out the bytes the format takes from the clock or from
-uninitialised stack and padding (MASKS), each named below with its offset and why.
+uninitialised stack and padding (MASKS, each with its offset and reason).
 
     uv run tools/savefile.py STORED GOT       # prints every difference; exit 1 when there is one
 """
@@ -11,7 +11,6 @@ uninitialised stack and padding (MASKS), each named below with its offset and wh
 import re
 import struct
 import sys
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -154,65 +153,71 @@ def parse(data: bytes) -> Bank:
     return Bank(data[:12] + data[16:HEADER_SIZE], pool, accounts)
 
 
-Mask = tuple[int, int]
+@dataclass(frozen=True)
+class Mask:
+    """Bytes of the boxes named `box` (a regular expression) of `account`, `size` bytes long, that are not compared.
 
-
-def clock_game_time(box: Box) -> list[Mask]:
-    """Game::lastTick, the first dword of the Players account's GameTime box, is read from the host clock."""
-    return [(0, 0xFFFFFFFF)]
-
-
-def unit_record(box: Box) -> list[Mask]:
-    """A Units account's numbered 0xb8 byte box (SaveUnits's SaveRec, written from a stack copy).
-
-    The bytes after the terminator of the 0x20 byte name are never set. The three SrcPiece bit-field
-    bytes keep their top three bits (PieceBits::b5) and the flags dword keeps bits 17 to 19 (FlagBits::d).
+    `offset` and `bits` (the bits of that byte left out) say where. With `after_nul`, `offset` is where a
+    NUL terminated string starts and the bytes after its terminator, up to `length`, are left out.
     """
-    masks: list[Mask] = []
-    end = box.data.index(0) + 1 if 0 in box.data[:NAME_FIELD] else NAME_FIELD
-    masks += [(i, 255) for i in range(end, NAME_FIELD)]
-    masks += [(SAVE_PIECE_FIRST + k * SAVE_PIECE_SIZE + 23, 0xE0) for k in range(3)]
-    masks.append((SAVE_FLAGS_BYTE, 0x0E))
-    return masks
+
+    account: str
+    box: str
+    size: int
+    offset: int
+    bits: int
+    why: str
+    after_nul: bool = False
+    length: int = 1
 
 
-def motion_record(box: Box) -> list[Mask]:
-    """A unit's `u%04xmob` box (UnitMotionSaveRecord): the five bits above mode and flag in the last byte are never set."""
-    return [(MOTION_RECORD_SIZE - 1, 0xF8)]
+NOT_COMPARED = (
+    ("header offset 12 (poolOffset)", "follows the compressed sizes of the accounts before the pool"),
+    ("account header size (offset 0 of each account)", "the compressed size of the account"),
+    ("box table, word 2 (offset 4 of an entry) of a named box", "never set by SaveBank: uninitialised stack"),
+    ("box table, word 3 (offset 8 of an entry)", "an absolute file offset, compared relative to its account"),
+)
+
+CLOCK = "read from the host clock (GetTicks)"
+STACK = "never set by the save code: uninitialised stack"
+PADDING = "never set by the save code: uninitialised bit-field padding"
+UNIT_BOX = r"#\d+"
+MOTION_BOX = r"u[0-9a-f]{4}mob"
+MARKER_BOX = r"u[0-9a-f]{4}m[0-9a-f]{4}g"
+
+MASKS: tuple[Mask, ...] = (
+    Mask("Players", "GameTime", 28, 0, 0xFF, "Game::lastTick: " + CLOCK, length=4),
+    Mask("Units", UNIT_BOX, SAVE_RECORD_SIZE, 0, 0xFF, "SaveRec::name after its terminator: " + STACK, after_nul=True, length=NAME_FIELD),
+    *(Mask("Units", UNIT_BOX, SAVE_RECORD_SIZE, SAVE_PIECE_FIRST + k * SAVE_PIECE_SIZE + 23, 0xE0, "SrcPiece PieceBits::b5: " + PADDING)
+      for k in range(3)),
+    Mask("Units", UNIT_BOX, SAVE_RECORD_SIZE, SAVE_FLAGS_BYTE, 0x0E, "SaveRec::flags FlagBits::d: " + PADDING),
+    Mask("Units", MOTION_BOX, MOTION_RECORD_SIZE, MOTION_RECORD_SIZE - 1, 0xF8, "UnitMotionSaveRecord bits above mode and flag: " + PADDING),
+    Mask("Units", MARKER_BOX, POINT_MARKER_SIZE, 0, 0xFF, "PointMarkerRecord::reserved: " + STACK, length=4),
+)
 
 
-def point_marker(box: Box) -> list[Mask]:
-    """A `u%04xm%04xg` box of 20 bytes (PointMarkerRecord): its first dword, `reserved`, is never set."""
-    return [(0, 0xFFFFFFFF)]
-
-
-MASKS: list[tuple[str, str, int, Callable[[Box], list[Mask]]]] = [
-    ("Players", r"GameTime", 28, clock_game_time),
-    ("Units", r"#\d+", SAVE_RECORD_SIZE, unit_record),
-    ("Units", r"u[0-9a-f]{4}mob", MOTION_RECORD_SIZE, motion_record),
-    ("Units", r"u[0-9a-f]{4}m[0-9a-f]{4}g", POINT_MARKER_SIZE, point_marker),
-]
-
-
-def masks_for(account: str, box: Box) -> list[Mask]:
-    out: list[Mask] = []
-    for name, pattern, length, rule in MASKS:
-        if name == account and re.fullmatch(pattern, box.key) and len(box.data) == length:
-            out += rule(box)
-    return out
+def kept(account: str, box: Box) -> bytearray:
+    """For each byte of the box, the bits that are compared."""
+    keep = bytearray(b"\xff" * len(box.data))
+    for mask in MASKS:
+        if mask.account != account or not re.fullmatch(mask.box, box.key) or mask.size != len(box.data):
+            continue
+        if mask.after_nul:
+            end = box.data.index(0, mask.offset) + 1 if 0 in box.data[mask.offset:mask.length] else mask.length
+            for i in range(end, mask.length):
+                keep[i] = 0
+        else:
+            for i in range(mask.offset, mask.offset + mask.length):
+                keep[i] &= ~mask.bits & 0xFF
+    return keep
 
 
 def box_difference(account: str, stored: Box, got: Box) -> str | None:
     if len(stored.data) != len(got.data):
         return f"{account}/{stored.key}: stored {len(stored.data)} bytes, got {len(got.data)}"
-    masks = masks_for(account, stored) + masks_for(account, got)
-    keep = bytearray(b"\xff" * len(stored.data))
-    for offset, bits in masks:
-        for i in range(4 if bits == 0xFFFFFFFF else 1):
-            if offset + i < len(keep):
-                keep[offset + i] &= ~(0xFF if bits == 0xFFFFFFFF else bits) & 0xFF
+    keep_stored, keep_got = kept(account, stored), kept(account, got)
     for i, (a, b) in enumerate(zip(stored.data, got.data)):
-        if (a ^ b) & keep[i]:
+        if (a ^ b) & keep_stored[i] & keep_got[i]:
             return f"{account}/{stored.key} offset {i:#x}: stored {a:#04x}, got {b:#04x}"
     return None
 

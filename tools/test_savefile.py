@@ -73,6 +73,22 @@ class SaveFileTest(unittest.TestCase):
         self.assertEqual(savefile.differences(units("u0001m0000g", marker), units("u0001m0000g", b"\x58\xfa\xe8\0" + marker[4:])), [])
         self.assertEqual(len(savefile.differences(units("u0001m0000g", marker), units("u0001m0000g", marker[:4] + b"\1" + marker[5:]))), 1)
 
+    def test_every_mask_has_a_reason_and_fits_its_box(self):
+        for mask in savefile.MASKS:
+            self.assertTrue(mask.why)
+            self.assertLessEqual(mask.offset + mask.length, mask.size)
+            self.assertTrue(0 < mask.bits <= 0xFF)
+
+    def test_the_derived_and_unset_table_fields_have_reasons(self):
+        self.assertEqual(len(savefile.NOT_COMPARED), 4)
+        self.assertTrue(all(what and why for what, why in savefile.NOT_COMPARED))
+
+    def test_masks_name_the_offsets_in_the_pull_request(self):
+        table = {(m.account, m.box, m.offset, m.bits, m.length, m.after_nul) for m in savefile.MASKS}
+        self.assertIn(("Players", "GameTime", 0, 0xFF, 4, False), table)
+        self.assertIn(("Units", r"u[0-9a-f]{4}mob", 34, 0xF8, 1, False), table)
+        self.assertEqual(len(table), 8)
+
     def test_a_file_that_is_not_a_bank_is_reported(self):
         self.assertIn("does not decode", savefile.differences(b"nope", b"nope")[0])
 

@@ -721,6 +721,20 @@ def name_mismatch(produced: set[str], expected: set[str]) -> str:
     return f"the traces do not match moddable's scenarios; missing: {missing}; extra: {extra}"
 
 
+def copy_saves(directory: Path) -> None:
+    """Replace reference/saves/ by the saves the reference branch checkout `directory` wrote (none written leaves it as it is)."""
+    saves = sorted((directory / "reference/saves").glob("*.sav"))
+    if not saves:
+        print("the reference branch wrote no saves; reference/saves/ is untouched")
+        return
+    SAVES.mkdir(parents=True, exist_ok=True)
+    for old in SAVES.glob("*.sav"):
+        old.unlink()
+    for path in saves:
+        shutil.copyfile(path, SAVES / path.name)
+    print(f"{len(saves)} saves copied to {SAVES.relative_to(ROOT)}")
+
+
 def write_traces(game_dir: str | None, parallel: int) -> None:
     directory = reference_branch()
     branch_scenarios = directory / "reference/scenarios"
@@ -743,16 +757,7 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
     for path in produced:
         shutil.copyfile(path, TRACES / path.name)
     print(f"{len(produced)} traces copied to {TRACES.relative_to(ROOT)}")
-    saves = sorted((directory / "reference/saves").glob("*.sav"))
-    if saves:
-        SAVES.mkdir(parents=True, exist_ok=True)
-        for old in SAVES.glob("*.sav"):
-            old.unlink()
-        for path in saves:
-            shutil.copyfile(path, SAVES / path.name)
-        print(f"{len(saves)} saves copied to {SAVES.relative_to(ROOT)}")
-    else:
-        print("the reference branch wrote no saves; reference/saves/ is untouched")
+    copy_saves(directory)
     sounds = sorted((directory / "reference/sounds").glob("*.txt"))
     if not sounds:
         print("the reference branch wrote no sound logs; reference/sounds/ is untouched")

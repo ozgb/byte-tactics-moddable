@@ -308,6 +308,11 @@ extern "C" int HOST_CALL host_event_next(host_event* event)
     return 1;
 }
 
+extern "C" void HOST_CALL host_inject_event(const host_event* event)
+{
+    if (HostHeadless()) HeadlessInject(event);
+}
+
 extern "C" int HOST_CALL host_key_state(int vk)
 {
     if (HostHeadless()) return HeadlessKeyState(vk);

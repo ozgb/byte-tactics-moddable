@@ -12,6 +12,7 @@ void HeadlessWindowPost(unsigned int type);
 int HeadlessPumpEvents(int wait);
 void HeadlessPostQuit();
 int HeadlessEventNext(host_event* event);
+void HeadlessInject(const host_event* event);
 int HeadlessKeyState(int vk);
 void HeadlessCursorGet(int* x, int* y);
 void HeadlessCursorSet(int x, int y);

@@ -14,7 +14,7 @@ extern "C" {
 // Major version of the host interface, changed when a function is removed or its signature changes.
 #define HOST_VERSION_MAJOR 2
 // Minor version of the host interface, changed when a function is added.
-#define HOST_VERSION_MINOR 2
+#define HOST_VERSION_MINOR 3
 
 // Timeout for host_event_wait that never expires.
 #define HOST_WAIT_FOREVER 0xffffffffu
@@ -256,6 +256,8 @@ int HOST_CALL host_pump_events(int wait);
 void HOST_CALL host_post_quit(void);
 // Takes the oldest queued game window event into *event and returns 1, or returns 0 when none is queued.
 int HOST_CALL host_event_next(struct host_event* event);
+// Queues one event for the game window as if the player had caused it, and updates the key, button and cursor state to match; a headless host only, any other host ignores it.
+void HOST_CALL host_inject_event(const struct host_event* event);
 // Returns a key's state: bit 15 set while the virtual key vk is held, and bit 0 set when it was pressed since the last call.
 int HOST_CALL host_key_state(int vk);
 // Stores the mouse cursor's position on the screen.

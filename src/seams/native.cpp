@@ -476,6 +476,11 @@ static Order* __stdcall LoadOrderNative(Unit* unit, HapiBank* file, char* name)
     return new (kSim) Order(unit, file, name);
 }
 
+static Order* __stdcall NewOrderNative(MissionType kind, Unit* target, void* pos, int a, int b, int c)
+{
+    return new (kSim) Order(kind, target, pos, a, b, c);
+}
+
 static MissionType __stdcall MissionTypeFromNameNative(const char* name)
 {
     return MissionType(name);
@@ -801,7 +806,9 @@ void InstallNativeSeams()
     s_ai.DumpPlayerAI = DumpPlayerAI;
     s_ai.ResetAIPlayers = ResetAIPlayers;
     s_ai.GetFactoriesInRadius = GetFactoriesInRadiusNative;
-    s_ai.RegisterAICommands = RegisterAICommands;
+    s_ai.CmdPlan = CmdPlan;
+    s_ai.CmdWeight = CmdWeight;
+    s_ai.CmdLimit = CmdLimit;
     s_ai.CreatePlayerAI = CreatePlayerAI;
     s_ai.DestroyPlayerAI = DestroyPlayerAI;
     s_ai.UpdatePlayerAI = UpdatePlayerAI;
@@ -937,6 +944,7 @@ void InstallNativeSeams()
     s_orders.NewUnitMotion = NewUnitMotionNative;
     s_orders.LoadOrder = LoadOrderNative;
     s_orders.MissionTypeFromName = MissionTypeFromNameNative;
+    s_orders.NewOrder = NewOrderNative;
     s_orders.LoadMotion = LoadMotionNative;
     s_orders.SaveMotion = SaveMotionNative;
     s_orders.UpdateMotion = UpdateMotionNative;

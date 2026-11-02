@@ -14,7 +14,7 @@ class MissionType;
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
 #define ORDERS_VERSION_MAJOR 1
 // Minor version of the orders interface, changed when a slot is added.
-#define ORDERS_VERSION_MINOR 6
+#define ORDERS_VERSION_MINOR 7
 
 // Unit orders and command queues.
 struct OrdersSeam {
@@ -66,6 +66,8 @@ struct OrdersSeam {
     Order* (__stdcall* LoadOrder)(Unit* unit, HapiBank* file, char* name);
     // Returns the order kind a name in the order type table stands for. Hooks: none.
     MissionType (__stdcall* MissionTypeFromName)(const char* name);
+    // Allocates an order from the sim block, builds it from a kind, a target, a position and three values and returns it. Hooks: none.
+    Order* (__stdcall* NewOrder)(MissionType kind, Unit* target, void* pos, int a, int b, int c);
 };
 
 #endif

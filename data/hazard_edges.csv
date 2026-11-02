@@ -1541,3 +1541,5 @@ InitUnit,NewUnitMotionNative,"seam slot filled by InstallNativeSeams, OrdersSeam
 LoadUnit,LoadOrderNative,"seam slot filled by InstallNativeSeams, OrdersSeam::LoadOrder, LoadUnit (src/units/unit_save.cpp), src/seams/native.cpp"
 MissionHolder::MissionHolder,MissionTypeFromNameNative,"seam slot filled by InstallNativeSeams, OrdersSeam::MissionTypeFromName, MissionHolder::MissionHolder (src/units/unit_types.cpp), src/seams/native.cpp"
 ParalyzeUnit,MissionTypeFromNameNative,"seam slot filled by InstallNativeSeams, OrdersSeam::MissionTypeFromName, ParalyzeUnit (src/units/unit_targets.cpp), src/seams/native.cpp"
+ApplyUnitDamage,NewOrderNative,"seam slot filled by InstallNativeSeams, OrdersSeam::NewOrder, ApplyUnitDamage (src/units/unit_targets.cpp), src/seams/native.cpp"
+ParalyzeUnit,NewOrderNative,"seam slot filled by InstallNativeSeams, OrdersSeam::NewOrder, ParalyzeUnit (src/units/unit_targets.cpp), src/seams/native.cpp"

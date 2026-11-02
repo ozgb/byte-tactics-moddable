@@ -120,7 +120,10 @@ menu's table, and never clears it; the summary items above then overwrite the fi
   save: `load-midgame` has `ticks 1800`, like `save-midgame`. The run exits 2 if `ticks` is not greater
   than the saved tick. The same holds for the tick of `quirks_tamper` and of `quirks_reach`: a tick at or before the
   saved tick never fires, so the run exits 2.
-- **The save:** it is made by every run of the saving scenario and never committed. `tools/reference.py`
+- **The save:** it is made by every run of the saving scenario. `--traces` stores the reference's `harness.sav` in
+  `reference/saves/<scenario>.sav` (`harness.opt` is never stored), and `--check` compares the modern build's with it by decoded
+  contents (`tools/savefile.py`, which leaves out the bytes the format takes from the clock or from uninitialised memory) and reports
+  `saves: N of N equal`. `tools/reference.py`
   (`--check`, `--traces`, and the tools that play the suite) plays every scenario with no `load` line first, then
   the loading ones; it copies the saving run's `savegame/harness.sav` and `savegame/harness.opt` out of its game copy and places it in the
   loading run's own game copy before that exe starts (both files are removed from a game copy first, so a file of the install never stands in). The two runs are separate processes. A loading scenario

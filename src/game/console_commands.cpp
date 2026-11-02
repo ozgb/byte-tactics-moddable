@@ -1298,6 +1298,33 @@ static void __stdcall CmdMeteorSlot(CommandArgs* args)
     g_seams.wind_meteors->CmdMeteor(args);
 }
 
+static void __stdcall CmdPlanSlot(CommandArgs* args)
+{
+    g_seams.ai->CmdPlan(args);
+}
+
+static void __stdcall CmdWeightSlot(CommandArgs* args)
+{
+    g_seams.ai->CmdWeight(args);
+}
+
+static void __stdcall CmdLimitSlot(CommandArgs* args)
+{
+    g_seams.ai->CmdLimit(args);
+}
+
+// FUNCTION: 0x406f00
+void RegisterAICommands()
+{
+    ConsoleCommand commands[4] = {
+        {"plan", CmdPlanSlot, 8},
+        {"weight", CmdWeightSlot, 8},
+        {"limit", CmdLimitSlot, 8},
+        {nullptr, nullptr, 0},
+    };
+    RegisterCommands(commands);
+}
+
 // GLOBAL: 0x501f48
 ConsoleCommand g_cheatCommands[11] = {
     {"Radar", (void (__stdcall *)(CommandArgs *))CmdRadar, 2},

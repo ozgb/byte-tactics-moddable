@@ -574,11 +574,11 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, UnitSpawnPacket* spaw
     }
     InitSpawnedUnit(spawn->type, spawn->pos, 0, unit);
     UpdateUnitHeight(unit);
-    AddUnitToMap(unit);
+    g_seams.map->AddUnitToMap(unit);
     g_seams.los_radar->RevealNewUnit(unit);
     g_game->players[player].unitCount++;
     g_game->players[player].unitsCreated++;
-    g_game->list_391ed->NotifyUnitCreated(unit);
+    g_seams.players->NotifyUnitCreated(g_game->list_391ed, 0, unit);
     return unit;
 }
 

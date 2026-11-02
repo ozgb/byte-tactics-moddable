@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 2
+#define SERVICES_VERSION_MINOR 4
 
 // Returns a random number in [0, range) from the main stream of the game logic.
 int __stdcall RandomInt(int range);
@@ -25,7 +25,13 @@ void EnterHarnessTestMode();
 
 struct Vec3;
 struct Vec3f;
-struct HeapEntry;
+// A path search entry: a value and the key the heap orders it by.
+struct HeapEntry {
+    HeapEntry() {}
+    HeapEntry(const HeapEntry& o) : value(o.value), key(o.key) {}
+    int value;
+    float key;
+};
 
 // Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
@@ -42,6 +48,8 @@ int __stdcall ComputeChecksum(unsigned char* data, int len);
 
 // Allocates a block of the game heap, naming the call site for the debug tables.
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
+// Frees a block of the game heap.
+void __cdecl GameFreeThunk(void* p);
 // Copies a string into a new block of the game heap, or returns null for null.
 char* __cdecl GameStrdup(char* s);
 // Makes the pages of a block of the game heap read-only.
@@ -52,6 +60,8 @@ void __cdecl ProtectBlockReadWrite(void* p);
 void __stdcall CopyDwordIfNonNull(int* dest, int* src);
 // Arranges a range of path search entries into a heap.
 void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int*, HeapEntry*);
+// Moves the top of a heap of path search entries to dest and re-heaps the rest with val.
+void __stdcall PopHeapFirst(HeapEntry* first, HeapEntry* last, HeapEntry* dest, HeapEntry val, int*);
 
 // Returns the net id of the player in a slot, or -1 for an empty slot.
 int __stdcall GetSlotDpid(unsigned char index);

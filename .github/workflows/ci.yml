@@ -32,12 +32,17 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 tools/commentlint.py --all
+        run: |
+          python3 tools/commentlint.py --all
+          python3 tools/commentlint.py --data
 
       - name: Test the comment lint and strip tool
         run: |
           python3 tools/test_commentlint.py
           python3 tools/test_stripcomments.py
+
+      - name: Test the save comparison
+        run: python3 tools/test_savefile.py
 
       - name: Determinism lint
         if: github.event_name == 'pull_request'
@@ -138,6 +143,21 @@ jobs:
       - name: Compile the game, data, bitexact, block_test and ref_test
         if: steps.changed.outputs.run == 'true'
         run: cmake --build build/modern --target game data bitexact block_test ref_test
+
+      - name: Run block_test and ref_test under Wine
+        if: steps.changed.outputs.run == 'true'
+        env:
+          WINEDEBUG: -all
+          WINEPREFIX: ${{ runner.temp }}/wineprefix
+        run: |
+          set -o pipefail
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends wine wine32:i386
+          for t in block_test ref_test; do
+            wine "build/modern/$t.exe" | tee "$RUNNER_TEMP/$t.log"
+            grep -q "^$t: all passed" "$RUNNER_TEMP/$t.log"
+          done
 
       - name: Check data/rwsets.csv is current
         if: steps.changed.outputs.run == 'true'

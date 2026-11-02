@@ -352,7 +352,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
                             e->ticks += ticks;
                             return;
                         }
-                        g_seams.orders->AppendOrder(unit, new (kSim) Order(kind, 0, 0, ticks, 0, 0));
+                        g_seams.orders->AppendOrder(unit, g_seams.orders->NewOrder(kind, 0, 0, ticks, 0, 0));
                         return;
                     }
                 }
@@ -399,7 +399,7 @@ void __stdcall ParalyzeUnit(Unit* unit, int ticks)
                 effect->ticks += ticks;
                 return;
             }
-            g_seams.orders->AppendOrder(unit, new (kSim) Order(kind, 0, 0, ticks, 0, 0));
+            g_seams.orders->AppendOrder(unit, g_seams.orders->NewOrder(kind, 0, 0, ticks, 0, 0));
         }
     }
 }

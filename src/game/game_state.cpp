@@ -510,7 +510,7 @@ void LoadBattleAssets()
     for (int i = 0; i < 10; i++)
         g_game->players[i].unitsCreated = 0;
     g_game->bits.flag2 = 0;
-    g_game->bits.flag4 = 0;
+    g_game->endGameVictory = 0;
     g_game->bits.flag5 = 0;
     g_game->bits.flag6 = 0;
     g_game->bits_2bee_2.flags_2bee = 0;

@@ -3474,7 +3474,7 @@ void OpenEndMultiScreen()
     FlipScreen();
     LoadGuiLayer(&g_game->gui, "ENDMULTI.GUI", 0x80)->handler = HandleEndMultiClick;
     SetTranslatedTextByName(&g_game->gui, "RESULT",
-                 Translate(g_game->bits_3923b.flag4_3923b ? "Victory" : "Failure"), 0);
+                 Translate(g_game->endGameVictory ? "Victory" : "Failure"), 0);
     RenderLayer(&g_game->gui, 0xc0);
     ShowSoftwareCursor();
 }

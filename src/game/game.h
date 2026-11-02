@@ -1250,14 +1250,14 @@ struct Game {
             unsigned short bits0_3923b : 2;
             unsigned short flag2_3923b : 1;
             unsigned short bit3_3923b : 1;
-            unsigned short flag4_3923b : 1;
+            unsigned short : 1;
             unsigned short rest_3923b : 11;
         } bits_3923b;
         struct {
             unsigned short bits_3923b : 2;
             unsigned short flag2 : 1;
             unsigned short bit3 : 1;
-            unsigned short flag4 : 1;
+            unsigned short : 1;
             unsigned short flag5 : 1;
             unsigned short flag6 : 1;
             unsigned short rest_3923b : 9;
@@ -1270,7 +1270,7 @@ struct Game {
             unsigned short : 2;
             unsigned short bit2_3923b : 1;
             unsigned short : 1;
-            unsigned short bit4_3923b : 1;
+            unsigned short : 1;
         } bits_3923b_2;
     };
     int playMovie;

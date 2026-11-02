@@ -1306,7 +1306,7 @@ void HarnessAfterStep()
     if (!HarnessTestMode())
         return;
     ModulesCheckStatics((unsigned)g_game->ticks);
-    int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0 || g_game->endGameVictory != 0;
+    int gameOver = (g_game->endGameFlags & 4) != 0 || g_game->endGameVictory != 0;
     if (!gameOver && (unsigned)g_game->ticks < s_ticks)
         return;
     char msg[64];

@@ -181,7 +181,7 @@ void SetUpEndMissionScreen()
     if (name == 0)
         g_game->image_3907b = 0;
     if (g_game->net->GetGameType() == 1
-        && g_game->bits_3923b_2.bit4_3923b && name != 0) {
+        && g_game->endGameVictory && name != 0) {
         BuildDataPath(path, "bitmaps\\glamour", name + 1, "PCX");
         if (HAPI_FileLengthByName(path) == 0)
             strncpy(g_game->glamour, "glamour\\Arm01.PCX", 0x100);
@@ -201,7 +201,7 @@ void SetUpEndMissionScreen()
 void CollectEndGameStats()
 {
     EndGamePlayerStat* stats = (EndGamePlayerStat*)g_game->slots_38dd9;
-    g_game->won = g_game->bits_3923b_2.bit4_3923b;
+    g_game->won = g_game->endGameVictory;
     if (g_game->net->GetGameType() == 1) {
         g_game->mission = g_game->net->GetMissionIndex();
         g_game->campaignMissionStatus[g_game->mission] = g_game->won ? 'W' : 'L';
@@ -534,7 +534,7 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
             g_game->bits_2a44.bit3 = 1;
             g_game->bits_2a44.bit0 = 0;
             SetMissionType(1);
-            g_game->bits_3923b_2.bit4_3923b = 0;
+            g_game->endGameVictory = 0;
             g_game->bits_3923b_2.bit2_3923b = 0;
             SetFrontendState(13, 757, "c:\\cavedog\\wargame\\endgame.cpp");
             SetGameMode(2);
@@ -819,13 +819,13 @@ void __stdcall RunEndGameState()
     case 5: {
         SetUpEndMissionScreen();
         int next=g_seams.map->MissionExists(g_game->net, 0, g_game->mission+1);
-        if(g_seams.map->GetGameType(g_game->net)==1 && g_game->bits_3923b_2.bit4_3923b && !next && !g_game->skip) {
+        if(g_seams.map->GetGameType(g_game->net)==1 && g_game->endGameVictory && !next && !g_game->skip) {
             if((unsigned char)GetDisplay()->flags.bits.fullscreen) {
                 if(!g_game->players[0].info->side) SetFrontendState(4,0x4ce,"c:\\cavedog\\wargame\\endgame.cpp");
                 else SetFrontendState(5,0x4d3,"c:\\cavedog\\wargame\\endgame.cpp");
             } else SetFrontendState(2,0x4d9,"c:\\cavedog\\wargame\\endgame.cpp");
             SetGameMode(2);
-        } else if(g_seams.map->GetGameType(g_game->net)==1 && g_game->bits_3923b_2.bit4_3923b && g_game->image_3907b) {
+        } else if(g_seams.map->GetGameType(g_game->net)==1 && g_game->endGameVictory && g_game->image_3907b) {
             memset(palette,0,sizeof(palette));
             StartPaletteFade((unsigned char*)g_game->palette_3907f,(unsigned char*)palette,5);
             g_game->nextTime=GetTicks()+1;

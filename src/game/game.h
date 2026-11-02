@@ -1277,6 +1277,7 @@ struct Game {
     int introMovieLoop;
     int cmdlineSkipIntroMovie;
     int restartMissionRequest;
+    unsigned char endGameVictory;
     Game(void);
     Player* Current(void);
     Player* Current2(void);
@@ -1308,7 +1309,8 @@ inline Player* Game::Current2(void)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
 #include <stddef.h>
-static_assert(sizeof(Game) == 0x3924d, "Game is 0x3924d bytes");
+static_assert(sizeof(Game) == 0x3924e, "Game is 0x3924e bytes");
+static_assert(offsetof(Game, endGameVictory) == 0x3924d, "endGameVictory");
 static_assert(offsetof(Game, unknown_0) == 0x0, "unknown_0");
 static_assert(offsetof(Game, field_0) == 0x0, "field_0");
 static_assert(offsetof(Game, session) == 0x14, "session");

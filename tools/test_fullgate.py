@@ -1,4 +1,4 @@
-"""Tests for fullgate.py, on a throwaway repository and fake comments (no network).
+"""Tests for fullgate.py, on a temporary repository and fake issue comments, with no network.
 
     uv run tools/test_fullgate.py
 """
@@ -6,164 +6,154 @@
 import contextlib
 import io
 import json
+import os
+import re
 import subprocess
+import sys
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
-from unittest import mock
 
 import fullgate
 
-
-def run_git(repo: Path, *args: str) -> str:
-    env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t",
-           "GIT_CONFIG_GLOBAL": "/dev/null", "GIT_CONFIG_SYSTEM": "/dev/null", "PATH": "/usr/bin:/bin"}
-    return subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True, text=True, env=env).stdout.strip()
+ENV = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+       "GIT_COMMITTER_EMAIL": "t@t"}
 
 
-def make_repo(root: Path) -> Path:
-    repo = root / "repo"
-    repo.mkdir()
-    run_git(repo, "init", "-q", "-b", "moddable")
-    (repo / "README.md").write_text("start\n")
-    run_git(repo, "add", ".")
-    run_git(repo, "commit", "-q", "-m", "Add: Start")
-    return repo
+def git(repo: Path, *args: str) -> str:
+    return subprocess.run(["git", "-C", str(repo), "-c", "commit.gpgsign=false", *args], check=True,
+                          capture_output=True, text=True, env=ENV).stdout.strip()
 
 
-def merge(repo: Path, name: str, path: str) -> str:
-    """Merge a branch that changes `path` into moddable with a merge commit; its sha."""
-    run_git(repo, "checkout", "-q", "-b", name)
-    target = repo / path
+def merge_pr(repo: Path, number: int, rel: str) -> str:
+    git(repo, "checkout", "-q", "-b", f"pr{number}", "main")
+    target = repo / rel
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(name + "\n")
-    run_git(repo, "add", ".")
-    run_git(repo, "commit", "-q", "-m", f"Add: {name}")
-    run_git(repo, "checkout", "-q", "moddable")
-    run_git(repo, "merge", "-q", "--no-ff", "-m", f"Merge pull request from {name}", name)
-    return run_git(repo, "rev-parse", "HEAD")
+    target.write_text(f"{number}\n")
+    git(repo, "add", rel)
+    git(repo, "commit", "-q", "-m", f"Update: {rel}")
+    git(repo, "checkout", "-q", "main")
+    git(repo, "merge", "-q", "--no-ff", "-m", f"Merge pull request #{number} from ozgb/issue-{number}", f"pr{number}")
+    return git(repo, "rev-parse", "HEAD")
 
 
-def comment(body: str, at: str = "") -> dict:
-    return {"body": body, "createdAt": at}
+def comment(body: str, when: str) -> dict:
+    return {"body": body, "createdAt": when}
 
 
-class PathsTest(unittest.TestCase):
-    def test_the_paths_the_gate_applies_to(self):
-        for path in ("src/game/economy.cpp", "interfaces/state.h", "reference/scenarios/a.txt", "tools/reference.py",
-                     "data/trace_schema.json", "CMakeLists.txt", "lib/bitexact/x.cpp"):
-            self.assertTrue(fullgate.needs_gate([path]), path)
-
-    def test_the_paths_it_does_not(self):
-        for path in ("docs/team.md", "tools/coverage.py", "data/coverage.csv", "AGENTS.md", ".github/workflows/ci.yml", "srcx/a.cpp"):
-            self.assertFalse(fullgate.needs_gate([path]), path)
-
-    def test_one_path_is_enough(self):
-        self.assertTrue(fullgate.needs_gate(["docs/team.md", "src/a.cpp"]))
-        self.assertFalse(fullgate.needs_gate([]))
-
-
-class CommentsTest(unittest.TestCase):
-    def test_the_newest_full_gate_comment_wins(self):
-        comments = [comment("Full gate on aaaaaaa1: 65 of 65 equal", "2026-11-01T00:00:00Z"),
-                    comment("Full gate on bbbbbbb2: 65 of 65 equal", "2026-11-03T00:00:00Z"),
-                    comment("Full gate on ccccccc3: 65 of 65 equal", "2026-11-02T00:00:00Z")]
-        self.assertEqual(fullgate.last_full_run(comments), "bbbbbbb2")
-
-    def test_position_orders_comments_without_dates(self):
-        comments = [comment("Full gate on aaaaaaa1: 1 of 1 equal"), comment("Full gate on bbbbbbb2: 1 of 1 equal")]
-        self.assertEqual(fullgate.last_full_run(comments), "bbbbbbb2")
-
-    def test_other_comments_are_ignored(self):
-        comments = [comment("Tracking the full gate on moddable."), comment("The Full gate on abc failed", "x"),
-                    comment("see Full gate on abcdef12")]
-        self.assertIsNone(fullgate.last_full_run(comments))
-        self.assertIsNone(fullgate.last_full_run([]))
-
-    def test_parse_gh_json(self):
-        text = json.dumps({"comments": [comment("Full gate on abcdef12: 3 of 3 equal", "t")]})
-        self.assertEqual(fullgate.last_full_run(fullgate.parse_comments(text)), "abcdef12")
-        self.assertEqual(fullgate.parse_comments("{}"), [])
-
-    def test_default_command_names_the_issue_and_repo(self):
-        cmd = fullgate.default_command()
-        self.assertEqual(cmd[:2], ["bwai-outside", "gh"])
-        self.assertIn("ozgb/byte-tactics-moddable", cmd)
-        self.assertIn(str(fullgate.TRACKING_ISSUE), cmd)
-
-
-class CountTest(unittest.TestCase):
+class FullGateTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.repo = make_repo(Path(self.tmp.name))
-        patch = mock.patch.object(fullgate, "ROOT", self.repo)
-        patch.start()
-        self.addCleanup(patch.stop)
+        self.repo = Path(self.tmp.name) / "repo"
+        self.repo.mkdir()
+        git(self.repo, "init", "-q", "-b", "main")
+        (self.repo / "README").write_text("x\n")
+        git(self.repo, "add", "README")
+        git(self.repo, "commit", "-q", "-m", "Add: Start")
+        self.base = git(self.repo, "rev-parse", "HEAD")
+        self.saved = fullgate.ROOT
+        fullgate.ROOT = self.repo
+        self.addCleanup(setattr, fullgate, "ROOT", self.saved)
 
-    def test_counts_the_merges_after_the_sha_that_need_the_gate(self):
-        merge(self.repo, "docs-1", "docs/a.md")
-        full = merge(self.repo, "src-1", "src/a.cpp")
-        merge(self.repo, "src-2", "src/b.cpp")
-        merge(self.repo, "docs-2", "docs/b.md")
-        merge(self.repo, "ref-1", "reference/scenarios/x.txt")
-        merges = fullgate.merges_since("moddable", full)
-        self.assertEqual(len(merges), 3)
-        self.assertEqual(fullgate.count_needing_gate(merges), 2)
+    def finish(self):
+        git(self.repo, "update-ref", "refs/remotes/origin/moddable", "main")
 
-    def test_without_a_full_run_everything_counts(self):
-        merge(self.repo, "src-1", "src/a.cpp")
-        merge(self.repo, "docs-1", "docs/a.md")
-        self.assertEqual(fullgate.count_needing_gate(fullgate.merges_since("moddable", None)), 1)
-
-    def test_the_branch_commits_are_not_counted_apart(self):
-        full = run_git(self.repo, "rev-parse", "HEAD")
-        merge(self.repo, "src-1", "src/a.cpp")
-        self.assertEqual(len(fullgate.merges_since("moddable", full)), 1)
-
-    def run_main(self, *args):
-        out = io.StringIO()
-        with contextlib.redirect_stdout(out):
-            code = fullgate.main(list(args))
-        return code, out.getvalue()
-
-    def comments_file(self, sha: str) -> str:
+    def run_main(self, comments, *args):
         path = Path(self.tmp.name) / "comments.json"
-        path.write_text(json.dumps({"comments": [comment(f"Full gate on {sha}: 65 of 65 equal", "t")]}))
-        return str(path)
+        path.write_text(json.dumps({"comments": comments}))
+        out, err = io.StringIO(), io.StringIO()
+        old = sys.argv
+        sys.argv = ["fullgate.py", "--no-fetch", "--comments-json", str(path), *args]
+        try:
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                try:
+                    code = fullgate.main()
+                except SystemExit as exit_:
+                    code = exit_.code
+        finally:
+            sys.argv = old
+        return code, out.getvalue(), err.getvalue()
 
-    def test_due_exits_1_at_five(self):
-        full = run_git(self.repo, "rev-parse", "HEAD")
-        for n in range(4):
-            merge(self.repo, f"src-{n}", f"src/{n}.cpp")
-        file = self.comments_file(full)
-        code, out = self.run_main("due", "--ref", "moddable", "--comments-file", file)
+    def merges(self, count, rel="src/game/a.cpp"):
+        for number in range(100, 100 + count):
+            merge_pr(self.repo, number, f"{rel[:-4]}{number}{rel[-4:]}")
+        self.finish()
+
+    def full_run(self):
+        return [comment(f"Full gate on {self.base[:9]}: 65 of 65 equal, block pointers: ok", "2026-11-02T10:00:00Z")]
+
+    def test_below_cadence_is_not_due(self):
+        self.merges(fullgate.CADENCE - 1)
+        code, out, _ = self.run_main(self.full_run(), "due")
         self.assertEqual(code, 0)
-        self.assertIn("4 merged pull requests needed the gate since the full gate on", out)
-        merge(self.repo, "src-4", "src/4.cpp")
-        code, out = self.run_main("due", "--ref", "moddable", "--comments-file", file)
+        self.assertIn("4 of 5 merges since the full gate on", out)
+        self.assertIn("#100, #101, #102, #103", out)
+        self.assertIn("not due", out)
+
+    def test_cadence_is_due(self):
+        self.merges(fullgate.CADENCE)
+        code, out, _ = self.run_main(self.full_run(), "due")
         self.assertEqual(code, 1)
-        self.assertIn("5 merged pull requests", out)
+        self.assertIn("5 of 5 merges", out)
+        self.assertEqual(self.run_main(self.full_run())[0], 0)
 
-    def test_without_the_action_it_only_prints(self):
-        full = run_git(self.repo, "rev-parse", "HEAD")
-        for n in range(6):
-            merge(self.repo, f"src-{n}", f"src/{n}.cpp")
-        code, out = self.run_main("--ref", "moddable", "--comments-file", self.comments_file(full))
+    def test_docs_only_merge_is_not_counted(self):
+        merge_pr(self.repo, 100, "docs/notes.md")
+        merge_pr(self.repo, 101, "src/game/b.cpp")
+        merge_pr(self.repo, 102, "tools/other.py")
+        self.finish()
+        code, out, _ = self.run_main(self.full_run())
         self.assertEqual(code, 0)
-        self.assertIn("6 merged", out)
+        self.assertIn("1 of 5 merges", out)
+        self.assertIn(": #101", out)
+        self.assertNotIn("#100", out)
 
-    def test_the_comments_command_is_replaceable(self):
-        full = run_git(self.repo, "rev-parse", "HEAD")
-        body = json.dumps({"comments": [comment(f"Full gate on {full}: 1 of 1 equal")]})
-        code, out = self.run_main("--ref", "moddable", "--comments-command", f"echo {body!r}")
+    def test_newest_full_gate_comment_wins(self):
+        comments = [
+            comment("Full gate on aaaaaaa: 65 of 65 equal", "2026-11-01T10:00:00Z"),
+            comment("Full gate on " + self.base + ": 65 of 65 equal", "2026-11-02T10:00:00Z"),
+            comment("The full gate is overdue", "2026-11-03T10:00:00Z"),
+        ]
+        self.assertEqual(fullgate.last_full_run(comments), self.base)
+        self.assertEqual(fullgate.last_full_run(list(reversed(comments))), self.base)
+
+    def test_a_merge_before_the_full_run_is_not_counted(self):
+        merge_pr(self.repo, 100, "src/game/c.cpp")
+        before = git(self.repo, "rev-parse", "HEAD")
+        merge_pr(self.repo, 101, "src/game/d.cpp")
+        self.finish()
+        code, out, _ = self.run_main([comment(f"Full gate on {before}: ok", "2026-11-02T10:00:00Z")])
         self.assertEqual(code, 0)
-        self.assertIn("0 merged pull requests", out)
+        self.assertIn("1 of 5 merges", out)
+        self.assertNotIn("#100", out)
 
-    def test_a_failing_command_exits_with_its_error(self):
-        with self.assertRaises(SystemExit) as raised:
-            self.run_main("--ref", "moddable", "--comments-command", "false")
-        self.assertIn("failed", str(raised.exception))
+    def test_no_comment_exits_2(self):
+        self.merges(1)
+        code, _, err = self.run_main([comment("hello", "2026-11-02T10:00:00Z")], "due")
+        self.assertEqual(code, 2)
+        self.assertIn("no full run is recorded", err)
+
+    def test_no_comment_source_exits_2(self):
+        env = {**os.environ, "FULLGATE_GH": "", "PATH": "/nonexistent"}
+        with unittest.mock.patch.dict(os.environ, env, clear=True):
+            with self.assertRaises(SystemExit) as raised:
+                with contextlib.redirect_stderr(io.StringIO()):
+                    fullgate.read_comments(None)
+        self.assertEqual(raised.exception.code, 2)
+
+
+class GatePathsTest(unittest.TestCase):
+    def test_paths_match_the_readme(self):
+        text = (fullgate.ROOT / "reference/README.md").read_text()
+        section = text.split("\n## Gate\n", 1)[1].split("\n## ", 1)[0]
+        paragraph = next((p for p in section.split("\n\n") if p.startswith("The gate applies when")), None)
+        self.assertIsNotNone(paragraph, "reference/README.md, Gate, lost its `The gate applies when` paragraph")
+        named = re.findall(r"`([^`\s]+)`", paragraph)
+        self.assertTrue(named)
+        for path in named:
+            self.assertTrue(fullgate.needs_gate(path), f"{path} is in the README's gate paths, not in GATE_PATHS")
 
 
 if __name__ == "__main__":

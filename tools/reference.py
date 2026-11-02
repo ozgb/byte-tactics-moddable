@@ -26,6 +26,10 @@ played again with every flag off and compared with that run's phases. A differen
 the exit status is 1 only when a scenario failed, or its all-off rerun failed or differed from the
 stored trace. It builds no reference and is not the gate.
 
+`--check --exe <exe> --roundtrip T[,T...]` (or `auto`: early, middle and last tick minus one of each scenario) adds `roundtrip T`
+lines to every scenario: at the end of tick T the run copies the sim block and continues from the copy at another base address
+(modules run natively; with WASM modules the block is scrambled and restored in place). The traces must equal the stored ones.
+
 `--traces` checks out origin/reference in build/reference/branch, runs that
 branch's own `tools/reference.py HEAD --traces` there (it links the matching
 build with the original compiler and plays the scenarios), and copies the
@@ -456,6 +460,35 @@ def with_quirks(scenarios: dict[str, Path], spec: str, directory: Path) -> dict[
     return copies
 
 
+def roundtrip_ticks(spec: str, ticks: int) -> list[int]:
+    """The ticks of a `--roundtrip` spec for a scenario of `ticks` ticks: `auto` is early, middle and last minus one; else the listed ticks."""
+    if spec == "auto":
+        return sorted({max(1, ticks // 10), max(1, ticks // 2), max(1, ticks - 1)})
+    try:
+        listed = [int(t) for t in spec.split(",")]
+    except ValueError:
+        fail(f"--roundtrip takes auto or ticks such as 100,2000, not {spec!r}")
+    if not listed or min(listed) < 1:
+        fail("--roundtrip ticks start at 1")
+    return listed
+
+
+def with_roundtrip(scenarios: dict[str, Path], spec: str, directory: Path) -> dict[str, Path]:
+    """Copies of the scenarios in `directory`, each ending with a `roundtrip <T>` line per tick of `spec` (see roundtrip_ticks)."""
+    directory.mkdir(parents=True, exist_ok=True)
+    copies = {}
+    for name, path in scenarios.items():
+        text = path.read_text()
+        match = re.search(r"^ticks\s+(\d+)\s*$", text, re.MULTILINE)
+        if match is None:
+            fail(f"scenario {name} has no ticks line to place a roundtrip by")
+        ticks = int(match.group(1))
+        lines = "".join(f"roundtrip {t}\n" for t in roundtrip_ticks(spec, ticks))
+        copies[name] = directory / path.name
+        copies[name].write_text(text + ("" if text.endswith("\n") else "\n") + lines)
+    return copies
+
+
 def first_difference(stored: list[tuple[int, str]], got: list[tuple[int, str]]) -> str | None:
     """A description of the first tick at which the digests differ, or None."""
     for a, b in zip(stored, got):
@@ -585,7 +618,7 @@ def save_report(scenarios: dict[str, Path], saves: dict[str, bytes | None], dire
 
 def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = False, poison: bool = False,
                  steps_per_frame: int | None = None, quirks: str | None = None,
-                 save_blockptrs: Path | None = None) -> None:
+                 save_blockptrs: Path | None = None, roundtrip: str | None = None) -> None:
     scenarios = scenario_files()
     stored = {p.stem: p for p in sorted(TRACES.glob("*.txt"))} if TRACES.is_dir() else {}
     if quick:
@@ -609,13 +642,15 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = F
     scratch = ROOT / "build/scratch" / f"steps-per-frame-{os.getpid()}"
     if steps_per_frame is not None:
         played = with_steps_per_frame(scenarios, steps_per_frame, scratch)
+    if roundtrip is not None:
+        played = with_roundtrip(played, roundtrip, scratch / "roundtrip")
     base = played
     if quirks is not None:
         played = with_quirks(played, quirks, scratch / "quirks")
     off_results: dict[str, tuple] = {}
     off_failed: dict[str, str] = {}
     failed: dict[str, str] = {}
-    scans: dict[str, str | None] | None = {} if quirks is None else None
+    scans: dict[str, str | None] | None = {} if quirks is None and roundtrip is None else None
     t0 = time.time()
     try:
         results = play_all(exe, played, game_dir, parallel, expected, poison, failed if quirks is not None else None,
@@ -647,7 +682,11 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = F
     print("\n".join(frame_lines))
     save_bad, save_lines = save_report(scenarios, SAVE_BYTES, SAVES)
     print("\n".join(save_lines))
-    pointers = report_block_pointers(exe, scans, quick, save_blockptrs)
+    if scans is None:
+        print("block pointers: not checked with --roundtrip (the scan names allocations by address)")
+        pointers = 0
+    else:
+        pointers = report_block_pointers(exe, scans, quick, save_blockptrs)
     pointers += report_fuel(exe, scenarios)
     if not bad:
         if pointers or sound_bad or frame_bad or save_bad:
@@ -872,6 +911,8 @@ def main() -> None:
                     help="--check: play the scenarios with new game allocations filled with 0xCD; list the bytes whose starting value reaches hashed state; a difference is expected for real uninitialised reads")
     ap.add_argument("--quirks", metavar="SPEC",
                     help="--check: play every scenario with `quirks SPEC` added and report which equal the stored traces and which differ, with the first tick and phase (a differing scenario is rerun with all flags off; a difference is not a failure; no reference build); not the gate")
+    ap.add_argument("--roundtrip", metavar="T[,T...]|auto",
+                    help="--check: play every scenario with a `roundtrip T` line per tick, which copies the sim block at the end of tick T, moves it to another base (or scrambles and restores it in place when the modules run in WASM) and continues; the traces must still equal the stored ones; `auto` picks early, middle and last tick minus one from each scenario's ticks")
     ap.add_argument("--exe", metavar="PATH", help="--check: the exe to check (build/modern/TotalA.exe)")
     ap.add_argument("--save-blockptrs", metavar="DIR", type=Path,
                     help="--check: write each scenario's blockptrs.txt to DIR/<scenario>.txt (input of blockpointers.py --from)")
@@ -905,6 +946,12 @@ def main() -> None:
         ap.error("--quirks takes a spec, such as recommended or '3.1c +flag'")
     if args.quirks is not None and args.poison:
         ap.error("--quirks cannot be combined with --poison")
+    if args.roundtrip is not None and not args.check:
+        ap.error("--roundtrip needs --check")
+    if args.roundtrip is not None and (args.quirks is not None or args.poison or args.save_blockptrs):
+        ap.error("--roundtrip cannot be combined with --quirks, --poison or --save-blockptrs")
+    if args.roundtrip is not None:
+        roundtrip_ticks(args.roundtrip, 100)
     if args.exe and not args.check:
         ap.error("--exe needs --check")
     if args.traces:
@@ -915,7 +962,7 @@ def main() -> None:
     if not Path(args.exe).is_file():
         ap.error(f"{args.exe} is not a file")
     check_traces(Path(args.exe).resolve(), args.game_dir, args.parallel, args.quick, args.poison, args.steps_per_frame,
-                 args.quirks, args.save_blockptrs)
+                 args.quirks, args.save_blockptrs, args.roundtrip)
 
 
 if __name__ == "__main__":

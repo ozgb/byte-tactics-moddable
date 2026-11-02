@@ -797,7 +797,7 @@ static const TraceField kAirManeuverOrderHeadingPlan[] = {
 };
 
 static const TraceField kUnitMotionFields[] = {
-    { "movementClass", 0x4, 4, TF_POINTER, TT_MOVECLASS, 0x0 },
+    { "movementClass", 0x4, 4, TF_REF, TT_MOVECLASS, 0x0 },
     { "velocity.x", 0x8, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "velocity.y", 0xc, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "velocity.z", 0x10, 4, TF_SCALAR, TT_NONE, 0x0 },
@@ -811,7 +811,7 @@ static const TraceField kUnitMotionFields[] = {
 };
 
 static const TraceField kUnitMotionPlan[] = {
-    { "", 0x4, 4, TF_POINTER, TT_MOVECLASS, 0x0 },
+    { "", 0x4, 4, TF_REF, TT_MOVECLASS, 0x0 },
     { "", 0x8, 34, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x2e, 1, TF_SCALAR, TT_NONE, 0x7 },
 };

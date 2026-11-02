@@ -1189,7 +1189,8 @@ harness,game,call,QuirksHash,2
 harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
 harness,game,call,SaveGameFile,1
-harness,game,call,SimBlockBase,4
+harness,game,call,SimBlockAttach,1
+harness,game,call,SimBlockBase,5
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimOwns,1
 harness,game,shared_write,Game::difficulty,4
@@ -1232,13 +1233,17 @@ harness,platform,call,HarnessTestMode,9
 harness,platform,call,IsMemSet,1
 harness,platform,call,ModulesCheckStatics,1
 harness,platform,call,ModulesHideSwitch,1
+harness,platform,call,ModulesMemory,1
 harness,platform,call,host_exit,3
 harness,platform,call,host_file_exe_path,1
 harness,platform,call,host_image_range,1
 harness,platform,call,host_log,6
-harness,platform,call,host_mem_commit,1
+harness,platform,call,host_mem_alloc,1
+harness,platform,call,host_mem_commit,2
+harness,platform,call,host_mem_free,1
 harness,platform,call,host_mem_readable,1
-harness,platform,call,host_mem_reserve,1
+harness,platform,call,host_mem_release,1
+harness,platform,call,host_mem_reserve,2
 harness,platform,call,host_mutex_create,1
 harness,platform,call,host_mutex_lock,4
 harness,platform,call,host_mutex_unlock,4
@@ -3161,6 +3166,7 @@ presentation,game,call,ShutdownIngameAndQuit,1
 presentation,game,call,ShutdownIngameSystems,1
 presentation,game,call,SimAlloc,1
 presentation,game,call,SimAllocTagged,4
+presentation,game,call,SimBlockTrack,3
 presentation,game,call,SimEvents,1
 presentation,game,call,StepGafSequence,1
 presentation,game,call,UpdateBattleRoom,1
@@ -3586,7 +3592,7 @@ presentation,platform,call,host_window_set_topmost,1
 presentation,platform,call,operator delete,7
 presentation,platform,call,operator new,23
 presentation,platform,call,operator-,5
-presentation,platform,call,operator==,11
+presentation,platform,call,operator==,13
 presentation,platform,shared_write,Fixed::value,2
 presentation,platform,shared_write,Fixed::whole,1
 presentation,platform,shared_write,GafFrame::pixelsOrLayers,1

@@ -1428,7 +1428,7 @@
     "UnitMotion": {
       "size": 47,
       "fields": [
-        {"name": "movementClass", "offset": 4, "size": 4, "kind": "pointer", "target": "moveclass"},
+        {"name": "movementClass", "offset": 4, "size": 4, "kind": "ref", "target": "moveclass"},
         {"name": "velocity.x", "offset": 8, "size": 4, "kind": "scalar", "target": null},
         {"name": "velocity.y", "offset": 12, "size": 4, "kind": "scalar", "target": null},
         {"name": "velocity.z", "offset": 16, "size": 4, "kind": "scalar", "target": null},
@@ -1441,7 +1441,7 @@
         {"name": "flags", "offset": 46, "size": 1, "kind": "scalar", "target": null, "mask": 7, "mask_reason": "bits 3 to 7 are never written; the constructor sets mode and flag (order_list.cpp:2096)"}
       ],
       "plan": [
-        {"name": "movementClass", "offset": 4, "size": 4, "kind": "pointer", "target": "moveclass"},
+        {"name": "movementClass", "offset": 4, "size": 4, "kind": "ref", "target": "moveclass"},
         {"name": "", "offset": 8, "size": 34, "kind": "bytes", "target": null},
         {"name": "flags", "offset": 46, "size": 1, "kind": "scalar", "target": null, "mask": 7}
       ],

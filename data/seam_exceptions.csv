@@ -69,7 +69,7 @@ units,ApplyUnitDeath,FreeObjectState,TODO(#608): graphics or load-time asset thr
 units,ApplyUnitDeath,RemoveSpeechOfUnit,TODO(#620): sim-to-presentation event or message
 units,CobScript::SetCob,GetCobChecksum,TODO(#608): graphics or load-time asset through a seam
 units,CreateUnitCorpse,EmitSmoke,TODO(#620): sim-to-presentation event or message
-units,FreeUnitMemory,DrainSimEvents,"TODO(#608): presentation code in a tick: the sim event drain before the units are freed"
+units,FreeUnitMemory,DrainSimEvents,TODO(#608): presentation code in a tick: the sim event drain before the units are freed
 units,FreeUnitTypes,FreeCobScript,TODO(#608): graphics or load-time asset through a seam
 units,FreeUnitTypes,UnitTable::Destroy,"TODO(#608): load-time asset call: model, sound and cache loading"
 units,GetSweetSpot,UpdateObjectState,TODO(#608): sim helper: COB piece transforms that sim stores

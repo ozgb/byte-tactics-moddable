@@ -81,6 +81,7 @@ REPO = "ozgb/byte-tactics-moddable"
 OUTSIDE_COLUMNS = ["struct", "field", "holder", "offset", "words", "issue", "kind", "note"]
 KINDS = ("pointer", "function-pointer", "container", "int-pointer")
 HAND_KINDS = ("load", "code")
+NOTE_JOIN = " | "
 DEFAULT_BUILD_DIR = ROOT / "build/modern"
 HOLDERS = {"Game": "CreateGameObject"}
 EXTRA_BLOCK = ("Game", "SimGlobals")
@@ -660,6 +661,27 @@ def outside_issue(note: str, struct: str, top: str, classes: dict[str, str]) -> 
     return UNCLASSIFIED
 
 
+def merge_contributions(found: list[dict]) -> dict:
+    """One outside row from every block-pointer row that feeds its key, whatever their order."""
+    if not all(c["late"] for c in found):
+        found = [c for c in found if not c["late"]]
+    row = dict(found[0]["row"])
+    for c in found[1:]:
+        for column in ("holder", "issue", "kind"):
+            if c["row"][column] != row[column]:
+                sys.exit("refcheck: %s has two rows for %s with %s %r and %r: they cannot both be right" % (
+                    BLOCK_POINTERS, outside_label(row), column, row[column], c["row"][column]))
+    row["offset"] = min((min(c["offsets"]), c["row"]["offset"]) for c in found)[1]
+    pinned = {c["row"]["note"] for c in found if c["pinned"]}
+    notes = pinned or {n for c in found for n in c["row"]["note"].split(NOTE_JOIN) if n}
+    row["note"] = NOTE_JOIN.join(sorted(notes))
+    if row["struct"]:
+        row["words"] = max(c["row"]["words"] for c in found)
+    else:
+        row["words"] = len({b for c in found for b in c["offsets"]})
+    return row
+
+
 def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, str]) -> list[dict]:
     """The rows of data/outside_pointers.csv from the `outside` rows of data/block_pointers.csv."""
     with (root / BLOCK_POINTERS).open(newline="") as f:
@@ -668,23 +690,28 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
         sys.exit("refcheck: %s has no outside rows for the Game holder %s: it was renamed, set HOLDERS in "
                  "tools/refcheck.py to its new name" % (BLOCK_POINTERS, HOLDERS[GAME]))
     rows: dict[tuple, dict] = {}
+    contributions: dict[tuple, list[dict]] = {}
     old = read_csv(root / OUTSIDE)
-    hand = {(r["struct"], r["field"], r["holder"], r["offset"]): r["note"] for r in old}
+    hand = {(r["struct"], r["field"], r["holder"], "" if r["struct"] else r["offset"]): r["note"] for r in old}
     hand_kinds = {(r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"]): r["kind"]
                   for r in old if r["kind"] in HAND_KINDS}
     matched = set()
 
-    def add(struct, name, holder, token, words, issue, kind, note, offsets):
+    def add(struct, name, holder, token, words, issue, kind, note, offsets, late=False):
         key = (struct, name) if struct else (holder, token)
-        written = hand.get((struct, name, holder, token), "")
-        if not note_about(note, offsets) or (key in hand_kinds and written.startswith("%s.%s " % (struct, name))):
+        written = hand.get((struct, name, holder, "" if struct else token), "")
+        prefix = "%s.%s " % (struct, name)
+        pinned = key in hand_kinds and any(n.startswith(prefix) for n in written.split(NOTE_JOIN))
+        if pinned or not note_about(note, offsets):
             note = written
         if key in hand_kinds:
             kind, issue = hand_kinds[key], ""
             matched.add(key)
-        rows.setdefault((struct, name, holder if not struct else "", token if not struct else ""), {
-            "struct": struct, "field": name, "holder": holder, "offset": token, "words": words, "issue": issue,
-            "kind": kind, "note": note})
+        rkey = (struct, name, holder if not struct else "", token if not struct else "")
+        contributions.setdefault(rkey, []).append({
+            "row": {"struct": struct, "field": name, "holder": holder, "offset": token, "words": words,
+                    "issue": issue, "kind": kind, "note": note},
+            "offsets": offsets, "late": late, "pinned": pinned})
 
     later = []
     for r in source:
@@ -720,7 +747,9 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
         hit = locators[GAME].find(GAME, offset)
         if hit:
             add(hit[0], hit[1], holder, hex(offset), 1, outside_issue(note, GAME, hit[3], classes), hit[2], note,
-                [offset])
+                [offset], late=True)
+    for rkey, found in contributions.items():
+        rows[rkey] = merge_contributions(found)
     scanned = {(r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"]) for r in rows.values()}
     for r in old:
         key = (r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"])

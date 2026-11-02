@@ -52,6 +52,9 @@ TRACES = ROOT / "reference/traces"
 SOUNDS = ROOT / "reference/sounds"
 SOUND_FILE = "sound.txt"
 SOUND_LOGS: dict[str, str | None] = {}
+SAVES = ROOT / "reference/saves"
+SAVE_FILE = tracediff.SAVE_FILES[0]
+SAVE_BYTES: dict[str, bytes | None] = {}
 FRAMES = ROOT / "reference/frames"
 FRAME_DUMPS: dict[str, dict[int, bytes | None]] = {}
 MAX_PARALLEL = 6
@@ -233,6 +236,11 @@ def should_retry(message: str) -> bool:
     return True
 
 
+def scenario_saves(scenario: Path) -> bool:
+    """Whether the scenario has a `save` line, so that its run writes harness.sav."""
+    return any(line.split()[:1] == ["save"] for line in scenario.read_text().splitlines())
+
+
 def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                   want: tuple[dict[str, str], list[tuple[int, str]]] | None = None, poison: bool = False,
                   save_to: Path | None = None, load_from: Path | None = None,
@@ -257,7 +265,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     for attempt in range(RUN_ATTEMPTS):
         try:
             extra: dict = {"collect": (SOUND_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
-                                *(tracediff.SAVE_FILES if save_to is not None else ()))}
+                                *dict.fromkeys((*(tracediff.SAVE_FILES if save_to is not None else ()),
+                                                *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if load_from is not None:
                 extra["put"] = {path: load_from / Path(path).name for path in tracediff.SAVE_FILES}
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, **extra)
@@ -276,6 +285,9 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                     shutil.copyfile(run / path, save_to / Path(path).name)
         sound_log = run / SOUND_FILE
         SOUND_LOGS[scenario.stem] = sound_log.read_text() if sound_log.is_file() else None
+        if scenario_saves(scenario):
+            saved = run / SAVE_FILE
+            SAVE_BYTES[scenario.stem] = saved.read_bytes() if saved.is_file() else None
         FRAME_DUMPS[scenario.stem] = {}
         for tick in scenario_frames(scenario):
             dump = run / frame_path(tick)
@@ -388,12 +400,23 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
         for tick, dump in FRAME_DUMPS.get(name, {}).items():
             if dump is None:
                 fail(f"{name}: the run wrote no {frame_path(tick)}; the stored frames are untouched")
+    for name in results:
+        if scenario_saves(scenarios[name]) and SAVE_BYTES.get(name) is None:
+            fail(f"{name}: the run wrote no {SAVE_FILE}; the stored saves are untouched")
     SOUNDS.mkdir(parents=True, exist_ok=True)
     for old in SOUNDS.glob("*.txt"):
         old.unlink()
     for name in results:
         (SOUNDS / f"{name}.txt").write_text(SOUND_LOGS[name])
     print(f"{len(results)} sound logs written to {SOUNDS.relative_to(ROOT)}")
+    shutil.rmtree(SAVES, ignore_errors=True)
+    saved = 0
+    for name in results:
+        if SAVE_BYTES.get(name) is not None:
+            SAVES.mkdir(parents=True, exist_ok=True)
+            (SAVES / f"{name}.sav").write_bytes(SAVE_BYTES[name])
+            saved += 1
+    print(f"{saved} saves written to {SAVES.relative_to(ROOT)}")
     shutil.rmtree(FRAMES, ignore_errors=True)
     frames = 0
     for name in results:

@@ -83,6 +83,9 @@ static FILE* s_trace = NULL;
 static FILE* s_dump = NULL;
 static FILE* s_sound = NULL;
 static char s_soundBuffer[4096];
+static FILE* s_ui = NULL;
+static char s_uiBuffer[4096];
+static int s_uiMute = 0;
 enum { FRAME_LIMIT = 64 };
 static unsigned s_frameTicks[FRAME_LIMIT];
 static unsigned s_frameCount = 0;
@@ -267,7 +270,7 @@ static const char* const s_consoleAllowed[] = {
     "meteor", "burnall", "burnone", "feature", "kill", "reload", "reloadaiprofiles", "los", "lostype", "radar",
     "mapping", "nowisee", "ai", "atm", "assign", "control", "doubleshot", "halfshot", "drop", "edge", "ilose",
     "iwin", "move", "search", "sealevel", "selectable", "shootall", "treedeath", "view", "assert", "dprint",
-    "mem", "zbuffer", "now"
+    "mem", "zbuffer", "now", "iface"
 };
 
 static char* NextToken(char** cursor)
@@ -487,6 +490,310 @@ static int ConsoleWordAllowed(const char* word)
     return 0;
 }
 
+enum { MAX_INPUTS = 1024 };
+
+struct ScriptedInput {
+    int lineNo;
+    unsigned tick;
+    unsigned type;
+    unsigned a;
+    int x;
+    int y;
+    int mouse;
+};
+
+static ScriptedInput s_inputs[MAX_INPUTS];
+static int s_inputCount = 0;
+static int s_altHeld = 0;
+
+static unsigned ParseKeyName(int lineNo, const char* text)
+{
+    static const struct {
+        const char* name;
+        unsigned vk;
+    } names[] = { { "shift", 0x10 }, { "ctrl", 0x11 }, { "alt", 0x12 }, { "esc", 0x1b } };
+    for (unsigned i = 0; i < sizeof names / sizeof names[0]; i++) {
+        if (strcmp(text, names[i].name) == 0)
+            return names[i].vk;
+    }
+    if (text[0] == 'f' && isdigit((unsigned char)text[1])) {
+        unsigned n = (unsigned)atoi(text + 1);
+        if (n >= 1 && n <= 12 && (text[2] == '\0' || (isdigit((unsigned char)text[2]) && text[3] == '\0')))
+            return 0x70 + n - 1;
+    }
+    if (text[1] == '\0' && isalpha((unsigned char)text[0]))
+        return (unsigned)toupper((unsigned char)text[0]);
+    if (text[1] == '\0' && isdigit((unsigned char)text[0]))
+        return (unsigned char)text[0];
+    unsigned vk = ParseNumber(lineNo, "input", text);
+    if (vk < 1 || vk > 255)
+        FailLine(lineNo, "needs a key code from 1 to 255", "input", "");
+    return vk;
+}
+
+static int ParseScreenCoordinate(int lineNo, const char* text, int limit)
+{
+    unsigned v = ParseNumber(lineNo, "input", text);
+    if (v >= (unsigned)limit) {
+        char detail[100];
+        sprintf(detail, ", %u is outside the %d pixel window", v, limit);
+        FailLine(lineNo, "has a position outside the window", "input", detail);
+    }
+    return (int)v;
+}
+
+static void ReadInput(int lineNo, char* value)
+{
+    char* cursor = value;
+    char* tickText = NextToken(&cursor);
+    char* kind = tickText != NULL ? NextToken(&cursor) : NULL;
+    if (kind == NULL)
+        FailLine(lineNo, "needs <tick> key|char|mouse and its details", "input", "");
+    if (s_inputCount >= MAX_INPUTS)
+        FailLine(lineNo, "is past the limit of 1024 input lines", "input", "");
+    ScriptedInput* in = &s_inputs[s_inputCount++];
+    memset(in, 0, sizeof *in);
+    in->lineNo = lineNo;
+    in->tick = ParseNumber(lineNo, "input", tickText);
+    if (in->tick == 0)
+        FailLine(lineNo, "needs a tick of at least 1", "input", "");
+    if (strcmp(kind, "key") == 0) {
+        char* direction = NextToken(&cursor);
+        char* keyText = direction != NULL ? NextToken(&cursor) : NULL;
+        if (keyText == NULL || (strcmp(direction, "down") != 0 && strcmp(direction, "up") != 0))
+            FailLine(lineNo, "needs key down|up <key>", "input", "");
+        in->type = strcmp(direction, "down") == 0 ? WM_KEYDOWN : WM_KEYUP;
+        in->a = ParseKeyName(lineNo, keyText);
+    } else if (strcmp(kind, "char") == 0) {
+        char* charText = NextToken(&cursor);
+        if (charText == NULL)
+            FailLine(lineNo, "needs a character", "input", "");
+        if (charText[1] == '\0') {
+            in->a = (unsigned char)charText[0];
+        } else {
+            in->a = ParseNumber(lineNo, "input", charText);
+            if (in->a < 1 || in->a > 255)
+                FailLine(lineNo, "needs a character code from 1 to 255", "input", "");
+        }
+        in->type = WM_CHAR;
+    } else if (strcmp(kind, "mouse") == 0) {
+        in->mouse = 1;
+        char* what = NextToken(&cursor);
+        if (what == NULL)
+            FailLine(lineNo, "needs mouse move or mouse left|right down|up", "input", "");
+        int left = strcmp(what, "left") == 0;
+        if (strcmp(what, "move") == 0) {
+            in->type = WM_MOUSEMOVE;
+        } else if (left || strcmp(what, "right") == 0) {
+            char* direction = NextToken(&cursor);
+            if (direction == NULL || (strcmp(direction, "down") != 0 && strcmp(direction, "up") != 0))
+                FailLine(lineNo, "needs mouse left|right down|up", "input", "");
+            int down = strcmp(direction, "down") == 0;
+            in->type = left ? (down ? WM_LBUTTONDOWN : WM_LBUTTONUP)
+                            : (down ? WM_RBUTTONDOWN : WM_RBUTTONUP);
+        } else {
+            FailLine(lineNo, "needs mouse move or mouse left|right down|up", "input", "");
+        }
+        char* xText = NextToken(&cursor);
+        char* yText = xText != NULL ? NextToken(&cursor) : NULL;
+        if (yText == NULL)
+            FailLine(lineNo, "needs a window position x y", "input", "");
+        in->x = ParseScreenCoordinate(lineNo, xText, 640);
+        in->y = ParseScreenCoordinate(lineNo, yText, 480);
+    } else {
+        FailLine(lineNo, "needs key, char or mouse after the tick", "input", "");
+    }
+    if (NextToken(&cursor) != NULL)
+        FailLine(lineNo, "has extra words after the event", "input", "");
+}
+
+static void CheckInputs()
+{
+    int i;
+    int k;
+    for (i = 0; i < s_inputCount; i++) {
+        const ScriptedInput* in = &s_inputs[i];
+        if (in->tick > s_ticks)
+            FailLine(in->lineNo, "has a tick after the last tick", "input", "");
+        for (k = 0; k < i; k++) {
+            if (s_inputs[k].tick == in->tick && s_inputs[k].mouse == in->mouse)
+                FailLine(in->lineNo, in->mouse ? "is a second mouse event on its tick" : "is a second key event on its tick",
+                         "input", ", the game takes one of each per frame");
+        }
+    }
+    for (i = 0; i < s_inputCount; i++) {
+        const ScriptedInput* up = &s_inputs[i];
+        if (up->type != WM_LBUTTONUP && up->type != WM_RBUTTONUP)
+            continue;
+        unsigned downType = up->type == WM_LBUTTONUP ? WM_LBUTTONDOWN : WM_RBUTTONDOWN;
+        const ScriptedInput* down = NULL;
+        for (k = 0; k < s_inputCount; k++) {
+            const ScriptedInput* c = &s_inputs[k];
+            if (c->type == downType && c->tick <= up->tick && (down == NULL || c->tick > down->tick))
+                down = c;
+        }
+        if (down == NULL || up->tick - down->tick <= 1)
+            continue;
+        int dragged = 0;
+        for (k = 0; k < s_inputCount; k++) {
+            const ScriptedInput* m = &s_inputs[k];
+            if (m->type == WM_MOUSEMOVE && m->tick > down->tick && m->tick < up->tick
+                && (abs(m->x - down->x) >= 32 || abs(m->y - down->y) >= 32))
+                dragged = 1;
+        }
+        if (!dragged)
+            FailLine(up->lineNo, "releases a button more than 1 tick after its press without a move of 32 units between",
+                     "input", ", the game would take it for a click or a box by the clock");
+    }
+}
+
+static unsigned char s_keyDown[256];
+static unsigned char s_keyPressed[256];
+static int s_cursorX = 320;
+static int s_cursorY = 240;
+static int s_injecting = 0;
+static unsigned s_injectMs = 0;
+
+struct PendingMessage {
+    unsigned msg;
+    unsigned wparam;
+    unsigned lparam;
+    unsigned ms;
+};
+
+enum { MAX_PENDING = 64 };
+static PendingMessage s_pending[MAX_PENDING];
+static int s_pendingCount = 0;
+
+static int InputScenario()
+{
+    return s_testMode && s_inputCount != 0;
+}
+
+static void SetKey(unsigned vk, int down)
+{
+    if (vk >= 256)
+        return;
+    if (down && !s_keyDown[vk])
+        s_keyPressed[vk] = 1;
+    s_keyDown[vk] = (unsigned char)down;
+    if (vk == VK_LSHIFT || vk == VK_RSHIFT)
+        s_keyDown[VK_SHIFT] = s_keyDown[VK_LSHIFT] || s_keyDown[VK_RSHIFT];
+    else if (vk == VK_LCONTROL || vk == VK_RCONTROL)
+        s_keyDown[VK_CONTROL] = s_keyDown[VK_LCONTROL] || s_keyDown[VK_RCONTROL];
+    else if (vk == VK_LMENU || vk == VK_RMENU)
+        s_keyDown[VK_MENU] = s_keyDown[VK_LMENU] || s_keyDown[VK_RMENU];
+}
+
+static void PushMessage(unsigned msg, unsigned wparam, unsigned lparam, unsigned ms)
+{
+    if (s_pendingCount >= MAX_PENDING)
+        Fail("testmode: too many input messages waiting\n");
+    s_pending[s_pendingCount].msg = msg;
+    s_pending[s_pendingCount].wparam = wparam;
+    s_pending[s_pendingCount].lparam = lparam;
+    s_pending[s_pendingCount].ms = ms;
+    s_pendingCount++;
+}
+
+static void UiLogInput(const ScriptedInput* in);
+
+static void DeliverScriptedInput(const ScriptedInput* in)
+{
+    unsigned ms = in->tick * 1000 / 30;
+    unsigned type = in->type;
+    unsigned buttons = 0;
+    switch (type) {
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+        if (s_altHeld || in->a == 0x12)
+            type = type == WM_KEYDOWN ? WM_SYSKEYDOWN : WM_SYSKEYUP;
+        if (in->a == 0x12)
+            s_altHeld = in->type == WM_KEYDOWN;
+        SetKey(in->a, in->type == WM_KEYDOWN);
+        if (in->type == WM_KEYDOWN)
+            PushMessage(type, in->a, 0, ms);
+        break;
+    case WM_CHAR:
+        PushMessage(type, in->a, 0, ms);
+        break;
+    default:
+        if (type == WM_LBUTTONDOWN)
+            SetKey(VK_LBUTTON, 1);
+        else if (type == WM_LBUTTONUP)
+            SetKey(VK_LBUTTON, 0);
+        else if (type == WM_RBUTTONDOWN)
+            SetKey(VK_RBUTTON, 1);
+        else if (type == WM_RBUTTONUP)
+            SetKey(VK_RBUTTON, 0);
+        if (s_keyDown[VK_LBUTTON])
+            buttons |= MK_LBUTTON;
+        if (s_keyDown[VK_RBUTTON])
+            buttons |= MK_RBUTTON;
+        if (s_keyDown[VK_SHIFT])
+            buttons |= MK_SHIFT;
+        if (s_keyDown[VK_CONTROL])
+            buttons |= MK_CONTROL;
+        s_cursorX = in->x;
+        s_cursorY = in->y;
+        PushMessage(type, buttons, (unsigned)in->x | ((unsigned)in->y << 16), ms);
+        break;
+    }
+    UiLogInput(in);
+}
+
+extern void* g_display;
+long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam, unsigned int lparam);
+
+void __stdcall HarnessDispatchInput()
+{
+    int i;
+    if (!InputScenario())
+        return;
+    for (i = 0; i < s_pendingCount; i++) {
+        s_injecting = 1;
+        s_injectMs = s_pending[i].ms;
+        WindowProc(*(HWND*)((char*)g_display + 0x40), s_pending[i].msg, s_pending[i].wparam, s_pending[i].lparam);
+        s_injecting = 0;
+    }
+    s_pendingCount = 0;
+}
+
+unsigned __stdcall HarnessInputTime(unsigned live)
+{
+    return s_injecting ? s_injectMs : live;
+}
+
+int __stdcall HarnessKeyState(int vk)
+{
+    int state;
+    if (!InputScenario())
+        return GetAsyncKeyState(vk);
+    if (vk < 0 || vk >= 256)
+        return 0;
+    state = (s_keyDown[vk] ? 0x8000 : 0) | (s_keyPressed[vk] ? 1 : 0);
+    s_keyPressed[vk] = 0;
+    return state;
+}
+
+BOOL __stdcall HarnessGetCursorPos(POINT* pt)
+{
+    if (!InputScenario())
+        return GetCursorPos(pt);
+    pt->x = s_cursorX;
+    pt->y = s_cursorY;
+    return TRUE;
+}
+
+BOOL __stdcall HarnessSetCursorPos(int x, int y)
+{
+    if (!InputScenario())
+        return SetCursorPos(x, y);
+    s_cursorX = x;
+    s_cursorY = y;
+    return TRUE;
+}
+
 static void CheckConsoles()
 {
     for (int i = 0; i < s_consoleCount; i++) {
@@ -649,6 +956,8 @@ static void ReadKey(int lineNo, const char* key, char* value)
         ReadSpawn(lineNo, value);
     else if (strcmp(key, "console") == 0)
         ReadConsole(lineNo, value);
+    else if (strcmp(key, "input") == 0)
+        ReadInput(lineNo, value);
     else if (strncmp(key, "player", 6) == 0 && isdigit((unsigned char)key[6]) && key[7] == '.')
         ReadPlayerKey(lineNo, key, value);
     else
@@ -724,6 +1033,7 @@ static void CheckScenario()
     CheckOrders();
     CheckSpawns();
     CheckConsoles();
+    CheckInputs();
     if (s_saveLine != 0 && s_saveTick > s_ticks)
         FailLine(s_saveLine, "has a tick after the last tick", "save", "");
     if (s_localPlayer >= 0 && !s_players[s_localPlayer].named) {
@@ -1176,6 +1486,8 @@ void HarnessStartSkirmish()
     *(int*)(sound + 0x280) = 1;
 }
 
+static void UiEndOfTick();
+
 void HarnessAfterStep()
 {
     if (s_testMode && s_saveLine != 0 && (unsigned)g_game->ticks == s_saveTick) {
@@ -1196,6 +1508,7 @@ void HarnessAfterStep()
     }
     if (!s_testMode)
         return;
+    UiEndOfTick();
     int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0;
     if (!gameOver && (unsigned)g_game->ticks < s_ticks)
         return;
@@ -1207,6 +1520,9 @@ void HarnessAfterStep()
         fclose(s_dump);
     if (s_sound != NULL)
         fclose(s_sound);
+    if (s_ui != NULL)
+        fclose(s_ui);
+    s_ui = NULL;
     if (!gameOver && s_frameNext < s_frameCount) {
         sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_frameTicks[s_frameNext]);
         Fail(msg);
@@ -3311,13 +3627,189 @@ void HarnessBeforeStep()
         if (s_spawns[i].tick == tick)
             IssueScriptedSpawn(&s_spawns[i]);
     }
+    s_uiMute = 1;
     for (i = 0; i < s_orderCount; i++) {
         if (s_orders[i].tick == tick)
             IssueScriptedOrder(&s_orders[i]);
     }
+    s_uiMute = 0;
     for (i = 0; i < s_consoleCount; i++) {
         if (s_consoles[i].tick == tick)
             RunScriptedConsole(&s_consoles[i]);
+    }
+    for (i = 0; i < s_inputCount; i++) {
+        if (s_inputs[i].tick == tick)
+            DeliverScriptedInput(&s_inputs[i]);
+    }
+}
+
+enum { UI_SELECTION_TEXT = 32768, GAME_SCROLL_X = 0x1431f, GAME_SCROLL_Y = 0x14323, UNIT_DEF_INDEX = 0xa6, UNIT_GROUP = 0xac };
+static char s_uiSelection[UI_SELECTION_TEXT];
+static int s_uiScrollX = -1;
+static int s_uiScrollZ = -1;
+static int s_uiScrollSeen = 0;
+
+static unsigned UiUnitIndex(const void* u)
+{
+    return (unsigned)(((const unsigned char*)u - (const unsigned char*)GameU32(GAME_UNITS)) / UNIT_STRIDE);
+}
+
+static int UiLive()
+{
+    return s_testMode && s_ui != NULL && !s_uiMute;
+}
+
+static void UiLineStart(const char* what)
+{
+    fprintf(s_ui, "%u %s", GameU32(GAME_TICK), what);
+}
+
+static const char* UiOrderName(unsigned char kind)
+{
+    const char* name = (const char*)ReadU32At((unsigned)g_missionOrderTableBegin + kind * ORDER_TABLE_STRIDE, ORDER_TABLE_NAME);
+    return name != NULL && name[0] != '\0' ? name : "-";
+}
+
+static int UiKindTakesUnitType(const char* name)
+{
+    return _stricmp(name, "MOBILEBUILD") == 0 || _stricmp(name, "VTOL_MOBILEBUILD") == 0 || _stricmp(name, "BUILDINGBUILD") == 0;
+}
+
+static void UiUnitType(unsigned short defIndex)
+{
+    const char* name = NULL;
+    if (defIndex != 0 && defIndex < GameU32(GAME_DEF_COUNT))
+        name = (const char*)GameU32(GAME_DEFS) + defIndex * UNITDEF_STRIDE + UNITDEF_NAME;
+    fprintf(s_ui, " %s", name != NULL ? name : "-");
+}
+
+void __stdcall HarnessUiOrder(unsigned char kind, int remove, const void* unit, const void* target, const int* pos, int typeId, int amount)
+{
+    const char* name;
+    if (!UiLive())
+        return;
+    name = UiOrderName(kind);
+    UiLineStart("order");
+    fprintf(s_ui, " %s unit %u target ", name, UiUnitIndex(unit));
+    if (target != NULL)
+        fprintf(s_ui, "%u", UiUnitIndex(target));
+    else
+        fprintf(s_ui, "-");
+    if (pos != NULL)
+        fprintf(s_ui, " pos %d %d %d", pos[0] >> 16, pos[1] >> 16, pos[2] >> 16);
+    else
+        fprintf(s_ui, " pos -");
+    fprintf(s_ui, " type");
+    if (UiKindTakesUnitType(name))
+        UiUnitType((unsigned short)typeId);
+    else
+        fprintf(s_ui, " -");
+    if (UiKindTakesUnitType(name))
+        fprintf(s_ui, " param -");
+    else
+        fprintf(s_ui, " param %d", typeId);
+    fprintf(s_ui, " amount %d remove %d\n", amount, remove != 0);
+}
+
+void __stdcall HarnessUiQueue(const char* name, const void* unit, int count)
+{
+    if (!UiLive())
+        return;
+    UiLineStart("qbuild");
+    fprintf(s_ui, " %u %s %d\n", UiUnitIndex(unit), name, count);
+}
+
+void __stdcall HarnessUiCancel(unsigned char kind, const void* unit)
+{
+    if (!UiLive())
+        return;
+    UiLineStart("cancel");
+    fprintf(s_ui, " %s unit %u\n", UiOrderName(kind), UiUnitIndex(unit));
+}
+
+static void UiListUnits(int group, int selectedOnly)
+{
+    unsigned char* u = (unsigned char*)g_game->players[g_game->localPlayer].unitsBegin;
+    unsigned char* end = (unsigned char*)g_game->players[g_game->localPlayer].unitsEnd;
+    int any = 0;
+    for (; u != NULL && u <= end; u += UNIT_STRIDE) {
+        if (*(unsigned short*)(u + UNIT_DEF_INDEX) == 0)
+            continue;
+        if (selectedOnly ? !(u[UNIT_FLAGS] & UNIT_SELECTED) : *(int*)(u + UNIT_GROUP) != group)
+            continue;
+        fprintf(s_ui, "%s%u", any ? "," : " ", UiUnitIndex(u));
+        any = 1;
+    }
+    if (!any)
+        fprintf(s_ui, " -");
+    fprintf(s_ui, "\n");
+}
+
+void __stdcall HarnessUiGroup(const char* what, int group)
+{
+    if (!UiLive())
+        return;
+    UiLineStart(what);
+    fprintf(s_ui, " %d", group);
+    UiListUnits(group, 0);
+}
+
+static void UiLogInput(const ScriptedInput* in)
+{
+    if (s_ui == NULL)
+        return;
+    UiLineStart("input");
+    switch (in->type) {
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+        fprintf(s_ui, " key %s %u\n", in->type == WM_KEYDOWN ? "down" : "up", in->a);
+        break;
+    case WM_CHAR:
+        fprintf(s_ui, " char %u\n", in->a);
+        break;
+    case WM_MOUSEMOVE:
+        fprintf(s_ui, " mouse move %d %d\n", in->x, in->y);
+        break;
+    default: {
+        int left = in->type == WM_LBUTTONDOWN || in->type == WM_LBUTTONUP;
+        int down = in->type == WM_LBUTTONDOWN || in->type == WM_RBUTTONDOWN;
+        fprintf(s_ui, " mouse %s %s %d %d\n", left ? "left" : "right", down ? "down" : "up", in->x, in->y);
+        break;
+    }
+    }
+}
+
+static void UiEndOfTick()
+{
+    static char selection[UI_SELECTION_TEXT];
+    size_t length = 0;
+    unsigned char* u;
+    unsigned char* end;
+    if (s_ui == NULL)
+        return;
+    if (!s_uiScrollSeen || g_game->scrollX != s_uiScrollX || g_game->scrollY != s_uiScrollZ) {
+        s_uiScrollSeen = 1;
+        s_uiScrollX = g_game->scrollX;
+        s_uiScrollZ = g_game->scrollY;
+        UiLineStart("scroll");
+        fprintf(s_ui, " %d %d\n", s_uiScrollX, s_uiScrollZ);
+    }
+    selection[0] = '\0';
+    u = (unsigned char*)g_game->players[g_game->localPlayer].unitsBegin;
+    end = (unsigned char*)g_game->players[g_game->localPlayer].unitsEnd;
+    for (; u != NULL && u <= end; u += UNIT_STRIDE) {
+        if (*(unsigned short*)(u + UNIT_DEF_INDEX) == 0 || !(u[UNIT_FLAGS] & UNIT_SELECTED))
+            continue;
+        if (length + 16 >= UI_SELECTION_TEXT)
+            Fail("testmode: the selection is too long for ui.txt\n");
+        length += sprintf(selection + length, "%s%u", length != 0 ? "," : "", UiUnitIndex(u));
+    }
+    if (length == 0)
+        strcpy(selection, "-");
+    if (strcmp(selection, s_uiSelection) != 0) {
+        strcpy(s_uiSelection, selection);
+        UiLineStart("select");
+        fprintf(s_ui, " %s\n", selection);
     }
 }
 
@@ -3444,6 +3936,8 @@ void HarnessPhase(int phase)
         fflush(s_trace);
         if (s_sound != NULL)
             fflush(s_sound);
+        if (s_ui != NULL)
+            fflush(s_ui);
         if (s_dumpNow)
             fflush(s_dump);
     }
@@ -3483,6 +3977,11 @@ static void OpenTrace(unsigned controlWord)
         Fail("testmode: cannot write sound.txt\n");
     setvbuf(s_sound, s_soundBuffer, _IOFBF, sizeof s_soundBuffer);
     fprintf(s_sound, "bt-sound 1\n");
+    s_ui = fopen("ui.txt", "wb");
+    if (s_ui == NULL)
+        Fail("testmode: cannot write ui.txt\n");
+    setvbuf(s_ui, s_uiBuffer, _IOFBF, sizeof s_uiBuffer);
+    fprintf(s_ui, "bt-ui 1\n");
     fprintf(s_trace, "bt-trace %d\ncommit %s\nscenario %s\ngame_seed %u\ncrt_seed %u\nview_seed %u\n"
                      "fpu_control_word 0x%05X\n",
             TRACE_FORMAT, commit, s_scenarioPath, s_gameSeed, s_crtSeed, s_viewSeed, controlWord);

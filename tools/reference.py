@@ -51,7 +51,10 @@ SCENARIOS = ROOT / "reference/scenarios"
 TRACES = ROOT / "reference/traces"
 SOUNDS = ROOT / "reference/sounds"
 SOUND_FILE = "sound.txt"
+UIS = ROOT / "reference/ui"
+UI_FILE = "ui.txt"
 SOUND_LOGS: dict[str, str | None] = {}
+UI_LOGS: dict[str, str | None] = {}
 SAVES = ROOT / "reference/saves"
 SAVE_FILE = tracediff.SAVE_FILES[0]
 SAVE_BYTES: dict[str, bytes | None] = {}
@@ -264,7 +267,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            extra: dict = {"collect": (SOUND_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
+            extra: dict = {"collect": (SOUND_FILE, UI_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
                                 *dict.fromkeys((*(tracediff.SAVE_FILES if save_to is not None else ()),
                                                 *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if load_from is not None:
@@ -285,6 +288,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                     shutil.copyfile(run / path, save_to / Path(path).name)
         sound_log = run / SOUND_FILE
         SOUND_LOGS[scenario.stem] = sound_log.read_text() if sound_log.is_file() else None
+        ui_log = run / UI_FILE
+        UI_LOGS[scenario.stem] = ui_log.read_text() if ui_log.is_file() else None
         if scenario_saves(scenario):
             saved = run / SAVE_FILE
             SAVE_BYTES[scenario.stem] = saved.read_bytes() if saved.is_file() else None
@@ -397,6 +402,9 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
         if SOUND_LOGS.get(name) is None:
             fail(f"{name}: the run wrote no {SOUND_FILE}; the stored sound logs are untouched")
     for name in results:
+        if UI_LOGS.get(name) is None:
+            fail(f"{name}: the run wrote no {UI_FILE}; the stored UI logs are untouched")
+    for name in results:
         for tick, dump in FRAME_DUMPS.get(name, {}).items():
             if dump is None:
                 fail(f"{name}: the run wrote no {frame_path(tick)}; the stored frames are untouched")
@@ -409,6 +417,12 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
     for name in results:
         (SOUNDS / f"{name}.txt").write_text(SOUND_LOGS[name])
     print(f"{len(results)} sound logs written to {SOUNDS.relative_to(ROOT)}")
+    UIS.mkdir(parents=True, exist_ok=True)
+    for old in UIS.glob("*.txt"):
+        old.unlink()
+    for name in results:
+        (UIS / f"{name}.txt").write_text(UI_LOGS[name])
+    print(f"{len(results)} UI logs written to {UIS.relative_to(ROOT)}")
     shutil.rmtree(SAVES, ignore_errors=True)
     saved = 0
     for name in results:

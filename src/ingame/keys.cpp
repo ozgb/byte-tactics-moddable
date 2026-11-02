@@ -441,6 +441,8 @@ void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h
     bmp.Close();
 }
 
+void __stdcall HarnessUiCancel(unsigned char kind, const void* unit);
+
 // In-game keyboard command dispatcher: PopKey returns the event (0 means
 // return), IsKeyDown(0xf9) the "key down" flag. The switch is value sorted
 // The key == 0 arms are written as `if (key != 0) { ... } else` to stay out of line.
@@ -707,6 +709,7 @@ void HandleGameKey(void)
             int r = FindOrderByType(*it, order);
             if (r != 0) {
                 found = 1;
+                HarnessUiCancel(order.index, (const void*)*it);
                 DeleteOrder(*it, r);
             }
         }

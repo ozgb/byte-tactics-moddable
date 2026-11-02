@@ -981,6 +981,7 @@ done:
 }
 
 void __stdcall SetUnitSquad(Unit* unit, int arg);
+void __stdcall HarnessUiGroup(const char* what, int group);
 
 // FUNCTION: 0x48d920
 void __stdcall CreateSquad(int param_1)
@@ -995,6 +996,7 @@ void __stdcall CreateSquad(int param_1)
             }
         }
     }
+    HarnessUiGroup("group", param_1);
 }
 
 static inline int TestBit(UnitTypeSet* set, unsigned short n)
@@ -1005,6 +1007,7 @@ static inline int TestBit(UnitTypeSet* set, unsigned short n)
 // FUNCTION: 0x48d9a0
 bool __stdcall SelectSquad(int id, int param_2)
 {
+    HarnessUiGroup("groupsel", id);
     UnitTypeSet* setA = GetCategoryMask("CTRL_F");
     int cnt = 0;
     Player* player = &g_game->players[g_game->localPlayer];

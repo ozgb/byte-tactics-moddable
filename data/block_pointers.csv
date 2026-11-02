@@ -1070,9 +1070,9 @@ LoadUnitInfo: UNITINFO,0x1230+0x6b67*k 0x123c+0x4b69*k 0x16c2+0x46d7*k 0x1b54+0x
 LoadUnitInfo: UNITINFO,0x47a+0x249*k 0x47e+0x249*k 0x482+0x249*k 0x486+0x249*k 0x6f3e 0x8186 0xbf39 0x19f2b 0x1ace1 0x1ea94,Sound::CreateSampleFromFile: Digital Audio Sample,13,138300,0x10,not-a-pointer,"UnitType words (numbers, flags) that only look like addresses"
 LoadUnitInfo: UNITINFO,0x7389 0xa13d 0xc182 0x143c6 0x193bc 0x19f2b 0x1bee2 0x2218b 0x2218f 0x243b6,ThrustParticles::Emit,4,329,0x2-0xf0,outside,"UnitType.data (0x18e), weaponCategories (0x231 0x235 0x239) and categories (0x23d), stride 0x249: loaded with the unit types; target names change with the heap layout (its offsets fall under rows of more than one class: not-a-pointer, outside; classed outside because some offset is a pointer field)"
 LoadUnitInfo: UNITINFO,0x88cb,TimedSubParticles::Emit,1,435,0xbd,not-a-pointer,"UnitType words (numbers, flags) that only look like addresses"
-LoadUnitTypes #3,*,*,0,0,-,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
-LoadUnitTypes #3,0x1,HAPI_LoadFile,27,277800,0xf60-0x1370,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
-LoadUnitTypes #3,0x9 0x11 0x1b 0x27,LoadTntMap: TILE SET,6,46800,0xb2de0-0x590be1,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
+LoadUnitTypes #2,*,*,0,0,-,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
+LoadUnitTypes #2,0x1,HAPI_LoadFile,27,277800,0xf60-0x1370,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
+LoadUnitTypes #2,0x9 0x11 0x1b 0x27,LoadTntMap: TILE SET,6,46800,0xb2de0-0x590be1,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
 LoadUnitTypes: MODEL PTRS,*,*,0,0,-,not-a-pointer,words of LoadUnitTypes: MODEL PTRS that only look like addresses
 LoadUnitTypes: MODEL PTRS,*,*,0,0,-,outside,"the 1 outside pair rows of LoadUnitTypes: MODEL PTRS, which follow"
 LoadUnitTypes: MODEL PTRS,0x5a 0x9e 0x10e 0x21e 0x296 0x3c2,CMemoryCache::InitCache: CMemoryCache CCH,8,54900,0x30b4f-0x380b33,not-a-pointer,Model pointer table words at odd offsets: they straddle two pointers and only look like addresses

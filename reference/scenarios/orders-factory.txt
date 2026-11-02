@@ -17,3 +17,4 @@ order 605 0:ARMLAB:1 patrol 720 340
 order 610 0:ARMLAB:1 qbuild ARMPW 2
 order 1100 0:ARMPW:1 patrol 700 300
 order 1110 0:ARMPW:1 +patrol 640 330
+frames 700 1450

@@ -26,3 +26,4 @@ order 455 1:CORAK:1 attack 0:ARMSOLAR:1
 order 520 0:ARMTHUND:1 attack 0:ARMSOLAR:1
 order 550 0:ARMSOLAR:1 selfdestruct
 order 1000 0:ARMTHUND:1 attack 0:ARMFIG:1
+frames 600 900

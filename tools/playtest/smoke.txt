@@ -6,6 +6,6 @@ until warning_ok 120 key Escape ; sleep 2
 shot warning
 click 377 356
 waitfor mainmenu 20
-shot mainmenu
+shot mainmenu nodump
 click 457 438
 waitexit 30

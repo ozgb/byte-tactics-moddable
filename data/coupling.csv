@@ -58,7 +58,6 @@ ai,platform,call,PopHeapFirst,2
 ai,platform,call,ProtectBlockReadOnly,1
 ai,platform,call,ProtectBlockReadWrite,1
 ai,platform,call,RandomInt,12
-ai,platform,call,RegisterCommand,1
 ai,platform,call,UnitDef::HasField1ce,1
 ai,platform,call,WorldToCell,2
 ai,platform,call,operator delete,2
@@ -606,7 +605,7 @@ game,network,shared_write,Player::allied,4
 game,network,shared_write,Player::energy,1
 game,network,shared_write,Player::metal,1
 game,network,shared_write,Player::rejectReason,10
-game,network,shared_write,Player::unitsCreated,5
+game,network,shared_write,Player::unitsCreated,4
 game,network,shared_write,PlayerInfo::color,7
 game,network,shared_write,PlayerInfo::flags_9b,2
 game,network,shared_write,Unit::flags,3
@@ -678,6 +677,7 @@ game,platform,call,ProtectBlockReadOnly,1
 game,platform,call,ProtectBlockReadWrite,1
 game,platform,call,QuitApp,1
 game,platform,call,RandomInt,1
+game,platform,call,RegisterCommands,1
 game,platform,call,RegisterDataArchives,2
 game,platform,call,SeedRandom,1
 game,platform,call,SetCloseHandler,10
@@ -1118,7 +1118,7 @@ game,units,shared_write,Game::seaLevel,9
 game,units,shared_write,Game::ticks,4
 game,units,shared_write,Game::version,1
 game,units,shared_write,Game::versionMinor,1
-game,units,shared_write,Player::unitsCreated,1
+game,units,shared_write,Player::unitsCreated,2
 game,units,shared_write,PlayerInfo::side,3
 game,units,shared_write,Point16::x,7
 game,units,shared_write,Point16::y,7
@@ -1539,7 +1539,7 @@ map,los_radar,shared_write,Unit::flags,6
 map,los_radar,shared_write,Vec3::x,10
 map,los_radar,shared_write,Vec3::y,10
 map,los_radar,shared_write,Vec3::z,10
-map,network,shared_write,Game::list_391ed,2
+map,network,shared_write,Game::list_391ed,1
 map,network,shared_write,Game::net,6
 map,network,shared_write,Unit::flags,3
 map,orders,indirect,DamagedAllyCollector::CollectDamagedAlly,1
@@ -1628,7 +1628,7 @@ map,targeting,shared_write,Vec3::x,3
 map,targeting,shared_write,Vec3::y,2
 map,targeting,shared_write,Vec3::z,3
 map,units,shared_write,Fixed::value,2
-map,units,shared_write,Game::list_391ed,2
+map,units,shared_write,Game::list_391ed,3
 map,units,shared_write,Game::net,3
 map,units,shared_write,Mission::waterDamage,1
 map,units,shared_write,Mission::waterDoesDamage,1
@@ -1676,7 +1676,6 @@ network,ai,shared_write,Player::exploredHeight,2
 network,ai,shared_write,Player::exploredWidth,2
 network,ai,shared_write,Player::index,6
 network,ai,shared_write,Player::type,6
-network,ai,shared_write,Player::unitCount,1
 network,economy,call,ShareMapInfo,1
 network,economy,shared_write,Game::netGameFlags,6
 network,economy,shared_write,Player::active,8
@@ -1690,8 +1689,6 @@ network,economy,shared_write,Player::totalEnergyProduced,1
 network,economy,shared_write,Player::totalMetalConsumed,1
 network,economy,shared_write,Player::totalMetalProduced,1
 network,economy,shared_write,Player::type,8
-network,economy,shared_write,Player::unitCount,1
-network,economy,shared_write,Player::unitsCreated,1
 network,economy,shared_write,PlayerInfo::kind,1
 network,features,call,DamageFeature,1
 network,features,call,KillFeature,1
@@ -1719,8 +1716,6 @@ network,game,shared_write,Player::index,8
 network,game,shared_write,Player::info,8
 network,game,shared_write,Player::rejectReason,2
 network,game,shared_write,Player::type,10
-network,game,shared_write,Player::unitCount,1
-network,game,shared_write,Player::unitsCreated,1
 network,game,shared_write,PlayerInfo::color,4
 network,game,shared_write,PlayerInfo::flags_97,2
 network,game,shared_write,PlayerInfo::versionMajor,1
@@ -1734,7 +1729,6 @@ network,harness,shared_write,Player::alliedBy,1
 network,harness,shared_write,Player::info,1
 network,harness,shared_write,Player::progress,1
 network,los_radar,call,GetMapCell,1
-network,los_radar,indirect,RevealNewUnit,1
 network,los_radar,shared_write,Game::netGameFlags,3
 network,los_radar,shared_write,Game::numPlayers,1
 network,los_radar,shared_write,Player::active,2
@@ -1748,7 +1742,6 @@ network,los_radar,shared_write,Player::info,5
 network,los_radar,shared_write,Player::type,2
 network,los_radar,shared_write,PlayerInfo::color,1
 network,los_radar,shared_write,PlayerInfo::flags_97,1
-network,map,call,AddUnitToMap,1
 network,map,call,Mission::GetGameType,4
 network,map,call,Mission::GetMissionName,2
 network,map,call,SetMissionType,1
@@ -1828,7 +1821,7 @@ network,platform,call,host_time_ms,2
 network,platform,call,host_user_name,2
 network,platform,call,operator delete,20
 network,platform,call,operator new,17
-network,platform,call,operator==,9
+network,platform,call,operator==,8
 network,platform,shared_write,BitReader::bit,1
 network,platform,shared_write,BitReader::data,1
 network,platform,shared_write,BitReader::index,1
@@ -1841,7 +1834,6 @@ network,players,call,GiveUnitToPlayer,1
 network,players,call,IsReporterDllLoaded,2
 network,players,call,KillPlayerUnits,1
 network,players,call,MissionConditions::CheckVictory,1
-network,players,call,MissionConditions::NotifyUnitCreated,1
 network,players,call,ResetPlayerSlots,1
 network,players,call,SetupPlayerSlot,1
 network,players,call,TransferEnergy,1
@@ -1884,8 +1876,6 @@ network,players,shared_write,Player::totalEnergyProduced,3
 network,players,shared_write,Player::totalMetalConsumed,2
 network,players,shared_write,Player::totalMetalProduced,3
 network,players,shared_write,Player::type,16
-network,players,shared_write,Player::unitCount,11
-network,players,shared_write,Player::unitsCreated,6
 network,players,shared_write,PlayerInfo::color,3
 network,players,shared_write,PlayerInfo::flags_97,1
 network,players,shared_write,PlayerInfo::kind,4
@@ -1943,8 +1933,6 @@ network,presentation,shared_write,Player::rejectReason,2
 network,presentation,shared_write,Player::totalEnergyProduced,1
 network,presentation,shared_write,Player::totalMetalProduced,1
 network,presentation,shared_write,Player::type,43
-network,presentation,shared_write,Player::unitCount,12
-network,presentation,shared_write,Player::unitsCreated,11
 network,presentation,shared_write,PlayerInfo::color,15
 network,presentation,shared_write,PlayerInfo::flags_97,3
 network,presentation,shared_write,PlayerInfo::flags_9d_wide,4
@@ -1961,12 +1949,10 @@ network,units,call,ApplyAttachUnit,1
 network,units,call,ApplyUnitDeath,1
 network,units,call,CobScript::FindScript,2
 network,units,call,CobScript::StartScriptWithArgsByIndex,1
+network,units,call,CreateUnitFromPacket,1
 network,units,call,FinishConstruction,1
-network,units,call,InitSpawnedUnit,1
-network,units,call,KillUnit,1
 network,units,call,ReceiveUnitStates,1
 network,units,call,Unit::SetStateBits,1
-network,units,call,UpdateUnitHeight,1
 network,units,call,WriteUnitState,1
 network,units,shared_write,BitReader::bit,1
 network,units,shared_write,BitReader::data,1
@@ -1991,8 +1977,6 @@ network,units,shared_write,Player::kills,1
 network,units,shared_write,Player::losses,1
 network,units,shared_write,Player::shareVision,1
 network,units,shared_write,Player::type,7
-network,units,shared_write,Player::unitCount,2
-network,units,shared_write,Player::unitsCreated,1
 network,units,shared_write,UnitDef::maxThisUnit,3
 network,units,shared_write,UnitKilledPacket::attackerPlayerNetId,2
 network,units,shared_write,UnitKilledPacket::attackerUnitId,2
@@ -2862,9 +2846,9 @@ players,network,shared_write,Player::totalEnergyProduced,2
 players,network,shared_write,Player::totalMetalConsumed,2
 players,network,shared_write,Player::totalMetalProduced,2
 players,network,shared_write,Player::type,69
-players,network,shared_write,Player::unitCount,4
-players,network,shared_write,Player::unitsBegin,2
-players,network,shared_write,Player::unitsCreated,5
+players,network,shared_write,Player::unitCount,3
+players,network,shared_write,Player::unitsBegin,1
+players,network,shared_write,Player::unitsCreated,4
 players,network,shared_write,Player::unitsEnd,1
 players,network,shared_write,PlayerInfo::bit6,1
 players,network,shared_write,PlayerInfo::color,7
@@ -3038,9 +3022,9 @@ players,units,shared_write,Player::losses,1
 players,units,shared_write,Player::rank,1
 players,units,shared_write,Player::syncTick,2
 players,units,shared_write,Player::type,7
-players,units,shared_write,Player::unitCount,2
-players,units,shared_write,Player::unitsBegin,4
-players,units,shared_write,Player::unitsCreated,1
+players,units,shared_write,Player::unitCount,3
+players,units,shared_write,Player::unitsBegin,5
+players,units,shared_write,Player::unitsCreated,2
 players,units,shared_write,Player::unitsEnd,4
 players,units,shared_write,PlayerInfo::bit6,1
 players,units,shared_write,PlayerInfo::side,3
@@ -3868,7 +3852,7 @@ seams,game,shared_write,PlayersSeam::TransferMetal,1
 seams,game,shared_write,PlayersSeam::UpdateBlink,1
 seams,game,shared_write,PlayersSeam::UpdatePlayers,1
 seams,game,shared_write,PlayersSeam::UpdatePlayersOnStream,1
-seams,game,shared_write,Seams::ai,2
+seams,game,shared_write,Seams::ai,5
 seams,game,shared_write,Seams::economy,1
 seams,game,shared_write,Seams::features,5
 seams,game,shared_write,Seams::los_radar,8
@@ -3938,8 +3922,6 @@ seams,map,shared_write,Seams::los_radar,4
 seams,map,shared_write,Seams::players,2
 seams,map,shared_write,Seams::wind_meteors,1
 seams,map,shared_write,Unit::motion,3
-seams,network,shared_write,LosRadarSeam::RevealNewUnit,1
-seams,network,shared_write,Seams::los_radar,1
 seams,network,shared_write,Unit::motion,1
 seams,orders,call,AiSearchGoal::SetWaypoints,1
 seams,orders,call,Order::ReattachFxToUnit,1
@@ -3973,7 +3955,7 @@ seams,orders,shared_write,NetworkSeam::SendScriptCall,3
 seams,orders,shared_write,NetworkSeam::SendScriptCallByName,1
 seams,orders,shared_write,PathfindingSeam::AbortIfGoalMatch,2
 seams,orders,shared_write,PlayersSeam::GiveUnitToPlayer,1
-seams,orders,shared_write,Seams::ai,10
+seams,orders,shared_write,Seams::ai,9
 seams,orders,shared_write,Seams::economy,1
 seams,orders,shared_write,Seams::features,3
 seams,orders,shared_write,Seams::los_radar,5
@@ -4137,9 +4119,9 @@ seams,units,shared_write,LosRadarSeam::AddEyeball,1
 seams,units,shared_write,LosRadarSeam::GetMapCell,1
 seams,units,shared_write,LosRadarSeam::IsUnitVisibleToPlayer,1
 seams,units,shared_write,LosRadarSeam::RemoveUnitLineOfSight,1
-seams,units,shared_write,LosRadarSeam::RevealNewUnit,1
+seams,units,shared_write,LosRadarSeam::RevealNewUnit,2
 seams,units,shared_write,LosRadarSeam::UpdateUnitLineOfSight,2
-seams,units,shared_write,MapSeam::AddUnitToMap,3
+seams,units,shared_write,MapSeam::AddUnitToMap,4
 seams,units,shared_write,MapSeam::CanPlaceUnitFootprint,1
 seams,units,shared_write,MapSeam::ClearFootprintAndUnlink,1
 seams,units,shared_write,MapSeam::GetGameType,1
@@ -4162,16 +4144,16 @@ seams,units,shared_write,OrdersSeam::RunOrders,1
 seams,units,shared_write,OrdersSeam::RunSecondaryOrders,1
 seams,units,shared_write,OrdersSeam::UpdateMotion,2
 seams,units,shared_write,PlayersSeam::KillPlayerUnits,1
-seams,units,shared_write,PlayersSeam::NotifyUnitCreated,1
+seams,units,shared_write,PlayersSeam::NotifyUnitCreated,2
 seams,units,shared_write,PlayersSeam::NotifyUnitDied,1
 seams,units,shared_write,Seams::ai,3
 seams,units,shared_write,Seams::economy,7
 seams,units,shared_write,Seams::features,2
-seams,units,shared_write,Seams::los_radar,6
-seams,units,shared_write,Seams::map,10
+seams,units,shared_write,Seams::los_radar,7
+seams,units,shared_write,Seams::map,11
 seams,units,shared_write,Seams::network,6
 seams,units,shared_write,Seams::orders,10
-seams,units,shared_write,Seams::players,3
+seams,units,shared_write,Seams::players,4
 seams,units,shared_write,Seams::targeting,1
 seams,units,shared_write,Seams::weapons,8
 seams,units,shared_write,TargetingSeam::ResetWeaponTarget,1
@@ -4424,7 +4406,7 @@ units,los_radar,indirect,AddEyeball,1
 units,los_radar,indirect,GetMapCell,1
 units,los_radar,indirect,IsUnitVisibleToPlayer,1
 units,los_radar,indirect,RemoveUnitLineOfSight,1
-units,los_radar,indirect,RevealNewUnit,1
+units,los_radar,indirect,RevealNewUnit,2
 units,los_radar,indirect,UpdateUnitLineOfSight,2
 units,los_radar,shared_write,Game::hotRadar,1
 units,los_radar,shared_write,Game::units,3
@@ -4510,7 +4492,6 @@ units,network,call,BitReader::ReadBits,2
 units,network,call,BitReader::ReadSignedBits,1
 units,network,call,BitWriter::GrowBuffer,1
 units,network,call,BitWriter::WriteBits,1
-units,network,call,CreateUnitFromPacket,2
 units,network,indirect,BroadcastBuilderLink,2
 units,network,indirect,NetSendActivateFlags,1
 units,network,indirect,NetSendAttach,1
@@ -4525,7 +4506,7 @@ units,network,shared_write,BitWriter::index,3
 units,network,shared_write,Game::defs,6
 units,network,shared_write,Game::unitDefCount,5
 units,network,shared_write,Game::unitDefCountBits,1
-units,network,shared_write,Game::units,3
+units,network,shared_write,Game::units,2
 units,network,shared_write,OrderView::id1,1
 units,network,shared_write,OrderView::id2,1
 units,network,shared_write,OrderView::param,1
@@ -4535,9 +4516,9 @@ units,network,shared_write,Player::commanderKills,2
 units,network,shared_write,Player::commanderLosses,2
 units,network,shared_write,Player::kills,2
 units,network,shared_write,Player::losses,2
-units,network,shared_write,Player::unitCount,4
-units,network,shared_write,Player::unitsBegin,2
-units,network,shared_write,Player::unitsCreated,5
+units,network,shared_write,Player::unitCount,3
+units,network,shared_write,Player::unitsBegin,1
+units,network,shared_write,Player::unitsCreated,4
 units,network,shared_write,Player::unitsEnd,1
 units,network,shared_write,Unit::activateFlags,1
 units,network,shared_write,Unit::angles,2
@@ -4550,7 +4531,7 @@ units,network,shared_write,Unit::motion,1
 units,network,shared_write,Unit::player,14
 units,network,shared_write,Unit::pos,1
 units,network,shared_write,Unit::script,3
-units,network,shared_write,Unit::unitDefIndex,3
+units,network,shared_write,Unit::unitDefIndex,2
 units,network,shared_write,UnitDef::fbiChecksum,10
 units,network,shared_write,UnitDef::flags1,1
 units,network,shared_write,UnitDef::flags2,1
@@ -4714,7 +4695,7 @@ units,platform,call,host_time_ms,1
 units,platform,call,operator delete,6
 units,platform,call,operator new,5
 units,platform,call,operator-,1
-units,platform,call,operator==,13
+units,platform,call,operator==,14
 units,platform,shared_write,BitReader::bit,1
 units,platform,shared_write,BitReader::data,1
 units,platform,shared_write,BitReader::index,1

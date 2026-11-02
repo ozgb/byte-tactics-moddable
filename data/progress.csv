@@ -166,7 +166,7 @@ address,size,file,symbol,status,similarity
 0x40d600,19,src/ai/pathfind.cpp,?CopyOneByte@@YGXPAD0@Z,matched,100.0
 0x40d620,73,src/ai/pathfind.cpp,?MakeHeap@@YGXPAUHeapEntry@@0PAH0@Z,matched,100.0
 0x40d670,132,src/ai/pathfind.cpp,?AdjustHeap@@YGXPAUHeapEntry@@HHU1@@Z,matched,100.0
-0x40d700,57,src/ai/pathfind.cpp,?PopHeapFirst@@YGXPAUHeapEntry@@00U1@PAX@Z,matched,100.0
+0x40d700,57,src/ai/pathfind.cpp,?PopHeapFirst@@YGXPAUHeapEntry@@00U1@PAH@Z,matched,100.0
 0x40d740,108,src/ai/pathfind.cpp,?PushHeapSiftUp@@YGXPAUHeapEntry@@HHU1@@Z,matched,100.0
 0x40d7b0,195,src/ai/pathfind.cpp,?GetCellState@Pathfinder@@QAEHHH@Z,matched,100.0
 0x40d880,46,src/ai/pathfind.cpp,?InitCostTables@Pathfinder@@QAEXXZ,matched,100.0

@@ -806,7 +806,9 @@ void InstallNativeSeams()
     s_ai.DumpPlayerAI = DumpPlayerAI;
     s_ai.ResetAIPlayers = ResetAIPlayers;
     s_ai.GetFactoriesInRadius = GetFactoriesInRadiusNative;
-    s_ai.RegisterAICommands = RegisterAICommands;
+    s_ai.CmdPlan = CmdPlan;
+    s_ai.CmdWeight = CmdWeight;
+    s_ai.CmdLimit = CmdLimit;
     s_ai.CreatePlayerAI = CreatePlayerAI;
     s_ai.DestroyPlayerAI = DestroyPlayerAI;
     s_ai.UpdatePlayerAI = UpdatePlayerAI;

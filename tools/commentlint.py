@@ -3,6 +3,7 @@
     uv run tools/commentlint.py [RANGE]          # default origin/moddable...HEAD
     python3 tools/commentlint.py origin/main...HEAD
     uv run tools/commentlint.py --all            # every line of every tracked file
+    uv run tools/commentlint.py --data           # the issues data/*.csv cite
 
 Checks the lines RANGE adds in C and C++ (.c .cpp .h .hpp .inc) and Python
 (.py) files, or with --all every line of every tracked file (what CI runs).
@@ -16,12 +17,20 @@ when it is:
     PUBLISHED_INTERFACE_DIRS), a one-line doc
     comment directly above a declaration or trailing on its line.
 
+--data checks that every issue a data file cites is open, with the same lookup:
+the TODO(#n) reasons of data/seam_exceptions.csv, the issue column of
+data/outside_pointers.csv and data/host_exceptions.csv, and the (#n) notes of
+data/block_pointers.csv. It is separate from --all because --all lints source
+lines and a data row has a column, not a comment. --issue-states FILE (lines
+"<n> <state>") replaces the lookup where there is no token.
+
 Exempt: generated files, Python docstrings (they are not comments), and
 shebang lines. Prints file:line: reason for each violation and exits 1 if
 there are any. Standard library only.
 """
 
 import argparse
+import csv
 import json
 import os
 import re
@@ -296,6 +305,45 @@ def check_todos(todos, fetch):
     return out
 
 
+DATA_CITES = (
+    ("data/seam_exceptions.csv", "reason", re.compile(r"TODO\(#(\d+)\)")),
+    ("data/outside_pointers.csv", "issue", re.compile(r"#(\d+)")),
+    ("data/block_pointers.csv", "note", re.compile(r"\(#(\d+)[^()]*\)")),
+    ("data/host_exceptions.csv", "issue", re.compile(r"#(\d+)")),
+)
+
+
+def data_citations(root):
+    """(path, line, number) for each issue a data file cites as its tracking issue."""
+    csv.field_size_limit(sys.maxsize)
+    out = []
+    for path, column, pattern in DATA_CITES:
+        file = Path(root) / path
+        if not file.exists():
+            continue
+        with file.open(newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                for match in pattern.finditer(row[column] or ""):
+                    out.append((path, reader.line_num, int(match.group(1))))
+    return out
+
+
+def check_data(root, fetch):
+    """Violations for data rows that cite an issue that is not open."""
+    return sorted(check_todos(data_citations(root), fetch))
+
+
+def read_states(path):
+    """A fetch over a file of "<n> <state>" lines, for runs without a token."""
+    states = {}
+    for line in Path(path).read_text().split("\n"):
+        if line.strip():
+            number, state = line.split()
+            states[int(number)] = {"state": state}
+    return states.get
+
+
 def lint(root, rev_range=None, everything=False, fetch=None):
     """(violations as (path, line, reason), todos) for the added lines."""
     if everything:
@@ -320,11 +368,23 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("range", nargs="?", default=DEFAULT_RANGE)
     ap.add_argument("--all", action="store_true", help="check every line of every tracked file")
+    ap.add_argument("--data", action="store_true", help="check the issues data/*.csv cite are open")
+    ap.add_argument("--issue-states", metavar="FILE", help="with --data: lines of '<n> <state>' instead of the API")
     args = ap.parse_args(argv)
     root = git(".", "rev-parse", "--show-toplevel").strip()
     token = os.environ.get("GITHUB_TOKEN")
     repo = os.environ.get("GITHUB_REPOSITORY")
     fetch = (lambda n: fetch_issue(repo, n, token)) if token and repo else None
+    if args.data:
+        if args.issue_states:
+            fetch = read_states(args.issue_states)
+        elif not fetch:
+            print("error: --data needs GITHUB_TOKEN and GITHUB_REPOSITORY, or --issue-states")
+            return 2
+        violations = check_data(root, fetch)
+        for path, line, reason in violations:
+            print(f"{path}:{line}: {reason}")
+        return 1 if violations else 0
     violations, todos = lint(root, args.range, args.all, fetch)
     for path, line, reason in violations:
         print(f"{path}:{line}: {reason}")

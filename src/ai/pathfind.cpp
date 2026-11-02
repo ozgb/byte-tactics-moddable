@@ -7,13 +7,6 @@
 void __cdecl operator delete(void* p);
 #include "../graphics/object_pool.h"
 
-struct HeapEntry {
-    HeapEntry() {}
-    HeapEntry(const HeapEntry& o) : value(o.value), key(o.key) {}
-    int value;
-    float key;
-};
-
 static inline bool operator<(const HeapEntry& a, const HeapEntry& b)
 {
     return a.key < b.key;
@@ -69,7 +62,7 @@ void __stdcall AdjustHeap(HeapEntry* first, int hole, int len, HeapEntry val)
 
 // FUNCTION: 0x40d700
 void __stdcall PopHeapFirst(HeapEntry* first, HeapEntry* last, HeapEntry* dest,
-                             HeapEntry val, void* unused)
+                             HeapEntry val, int*)
 {
     *dest = *first;
     AdjustHeap(first, 0, last - first, val);

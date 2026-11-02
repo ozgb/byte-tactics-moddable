@@ -32,7 +32,9 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 tools/commentlint.py --all
+        run: |
+          python3 tools/commentlint.py --all
+          python3 tools/commentlint.py --data
 
       - name: Test the comment lint and strip tool
         run: |

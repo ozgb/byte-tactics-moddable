@@ -146,6 +146,20 @@ class CommentLintTest(unittest.TestCase):
         found = self.repo.lint(fetch=issues.get)
         self.assertEqual([line for _, line, _ in found], [2, 3, 4], found)
 
+    def test_data_rows_cite_open_issues(self):
+        self.repo.write("data/seam_exceptions.csv",
+                        'subsystem,function,symbol,reason\nai,F,S,"TODO(#1): a"\nai,G,S,"TODO(#2): b"\n')
+        self.repo.write("data/outside_pointers.csv",
+                        "struct,field,holder,offset,words,issue,kind,note\n,,H,0,1,#2,load,n\n,,H,0,1,,load,n\n")
+        self.repo.write("data/block_pointers.csv",
+                        'holder,offsets,target,scenarios,ticks,target_offsets,class,note\nh,*,*,0,0,-,outside,"moved (#2 moves it)"\n')
+        self.repo.commit("data")
+        issues = {1: {"state": "open"}, 2: {"state": "closed"}}
+        found = commentlint.check_data(self.repo.root, issues.get)
+        self.assertEqual([(p, line) for p, line, _ in found],
+                         [("data/block_pointers.csv", 2), ("data/outside_pointers.csv", 2),
+                          ("data/seam_exceptions.csv", 3)], found)
+
     def test_main_exit_codes(self):
         self.repo.write("src/a.cpp", "// stray\n")
         self.repo.commit("change")

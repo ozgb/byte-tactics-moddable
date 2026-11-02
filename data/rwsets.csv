@@ -4739,8 +4739,8 @@ address,function,file,kind,target
 0x4169d0,CmdIWin,src/game/console_commands.cpp,field_read,PlayersSeam::KillPlayerUnits
 0x4169d0,CmdIWin,src/game/console_commands.cpp,field_read,Seams::players
 0x4169d0,CmdIWin,src/game/console_commands.cpp,field_write,<anon>::flag2
-0x4169d0,CmdIWin,src/game/console_commands.cpp,field_write,<anon>::flag4
 0x4169d0,CmdIWin,src/game/console_commands.cpp,field_write,<anon>::flag5
+0x4169d0,CmdIWin,src/game/console_commands.cpp,field_write,Game::endGameVictory
 0x4169d0,CmdIWin,src/game/console_commands.cpp,function,
 0x4169d0,CmdIWin,src/game/console_commands.cpp,global_read,g_game
 0x4169d0,CmdIWin,src/game/console_commands.cpp,global_read,g_seams
@@ -4752,8 +4752,8 @@ address,function,file,kind,target
 0x416a30,CmdILose,src/game/console_commands.cpp,field_read,PlayersSeam::KillPlayerUnits
 0x416a30,CmdILose,src/game/console_commands.cpp,field_read,Seams::players
 0x416a30,CmdILose,src/game/console_commands.cpp,field_write,<anon>::flag2
-0x416a30,CmdILose,src/game/console_commands.cpp,field_write,<anon>::flag4
 0x416a30,CmdILose,src/game/console_commands.cpp,field_write,<anon>::flag6
+0x416a30,CmdILose,src/game/console_commands.cpp,field_write,Game::endGameVictory
 0x416a30,CmdILose,src/game/console_commands.cpp,function,
 0x416a30,CmdILose,src/game/console_commands.cpp,global_read,g_game
 0x416a30,CmdILose,src/game/console_commands.cpp,global_read,g_seams
@@ -6341,8 +6341,8 @@ address,function,file,kind,target
 0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,deref_write,*float
 0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,field_escape,Game::savedPaletteBrightness
 0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,field_maybe_written,Game::glamour
-0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,field_read,<anon>::bit4_3923b
 0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,field_read,Display::paletteBrightness
+0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,field_read,Game::endGameVictory
 0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,field_read,Game::net
 0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,field_write,Display::paletteBrightness
 0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,field_write,Game::currentPalette
@@ -6362,7 +6362,6 @@ address,function,file,kind,target
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_escape,Game::slots_38dd9
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_escape,Player::name
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_maybe_written,EndGamePlayerStat::name
-0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,<anon>::bit4_3923b
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,EndGamePlayerStat::energyProduced
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,EndGamePlayerStat::energyWasted
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,EndGamePlayerStat::kills
@@ -6370,6 +6369,7 @@ address,function,file,kind,target
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,EndGamePlayerStat::metalProduced
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,EndGamePlayerStat::metalWasted
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,EndGamePlayerStat::score
+0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Game::endGameVictory
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Game::maxKills
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Game::maxLosses
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Game::maxScore
@@ -6586,11 +6586,11 @@ address,function,file,kind,target
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,<anon>::bit2
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,<anon>::bit2_3923b
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,<anon>::bit3
-0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,<anon>::bit4_3923b
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,Display::paletteBrightness
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,Game::currentPalette
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,Game::desiredPalette
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,Game::difficulty
+0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,Game::endGameVictory
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,Game::fadeTable
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,Game::frontendNextSubState
 0x41ec50,HandleEndMissionClick,src/frontend/endgame.cpp,field_write,Game::image_3907b
@@ -6768,7 +6768,6 @@ address,function,file,kind,target
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,call,sprintf
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_escape,Game::players
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_maybe_written,Game::gui
-0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,<anon>::bit4_3923b
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,<anon>::fullscreen
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Display::height
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Display::width
@@ -6777,6 +6776,7 @@ address,function,file,kind,target
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::deadline
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::done
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::endGameState
+0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::endGameVictory
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::image_3907b
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::lastFrame
 0x41f7f0,RunEndGameState,src/frontend/endgame.cpp,field_read,Game::localPlayer
@@ -14795,7 +14795,7 @@ address,function,file,kind,target
 0x44b020,OpenEndMultiScreen,src/frontend/multi.cpp,call,ShowSoftwareCursor
 0x44b020,OpenEndMultiScreen,src/frontend/multi.cpp,call,Translate
 0x44b020,OpenEndMultiScreen,src/frontend/multi.cpp,field_maybe_written,Game::gui
-0x44b020,OpenEndMultiScreen,src/frontend/multi.cpp,field_read,<anon>::flag4_3923b
+0x44b020,OpenEndMultiScreen,src/frontend/multi.cpp,field_read,Game::endGameVictory
 0x44b020,OpenEndMultiScreen,src/frontend/multi.cpp,field_read,Game::screen
 0x44b020,OpenEndMultiScreen,src/frontend/multi.cpp,field_write,Layer::handler
 0x44b020,OpenEndMultiScreen,src/frontend/multi.cpp,fn_ref,HandleEndMultiClick
@@ -17162,9 +17162,9 @@ address,function,file,kind,target
 0x453d40,HandleNetPackets,src/network/net_game.cpp,field_read,UnitScriptCallRecv::id
 0x453d40,HandleNetPackets,src/network/net_game.cpp,field_read,UnitScriptCallRecv::index
 0x453d40,HandleNetPackets,src/network/net_game.cpp,field_write,<anon>::bit2_3923b
-0x453d40,HandleNetPackets,src/network/net_game.cpp,field_write,<anon>::bit4_3923b
 0x453d40,HandleNetPackets,src/network/net_game.cpp,field_write,<anon>::bit_38a51
 0x453d40,HandleNetPackets,src/network/net_game.cpp,field_write,<anon>::dirty
+0x453d40,HandleNetPackets,src/network/net_game.cpp,field_write,Game::endGameVictory
 0x453d40,HandleNetPackets,src/network/net_game.cpp,field_write,Game::netGameFlags
 0x453d40,HandleNetPackets,src/network/net_game.cpp,field_write,Game::shareVisionReady
 0x453d40,HandleNetPackets,src/network/net_game.cpp,field_write,Game::startPosAssignAck
@@ -20765,7 +20765,7 @@ address,function,file,kind,target
 0x464de0,ContinueWatchingCallback,src/game/players.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
 0x464de0,ContinueWatchingCallback,src/game/players.cpp,field_read,Seams::network
 0x464de0,ContinueWatchingCallback,src/game/players.cpp,field_write,<anon>::flag2
-0x464de0,ContinueWatchingCallback,src/game/players.cpp,field_write,<anon>::flag4
+0x464de0,ContinueWatchingCallback,src/game/players.cpp,field_write,Game::endGameVictory
 0x464de0,ContinueWatchingCallback,src/game/players.cpp,function,
 0x464de0,ContinueWatchingCallback,src/game/players.cpp,global_read,g_game
 0x464de0,ContinueWatchingCallback,src/game/players.cpp,global_read,g_seams
@@ -20887,11 +20887,11 @@ address,function,file,kind,target
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,Vec3::x
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,Vec3::z
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,WeaponsSeam::FindFeatureAtPos
-0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_write,<anon>::flag4
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_write,<anon>::flag5
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_write,<anon>::flag6
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_write,Game::endGameCountdown
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_write,Game::endGameFlags
+0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_write,Game::endGameVictory
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_write,Game::mapFlags
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_write,Layer::handler
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_write,Player::updateTime
@@ -22107,7 +22107,7 @@ address,function,file,kind,target
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,deref_write,*OnlineReportPlayer
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_escape,Game::players
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_escape,Player::name
-0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,<anon>::bit4_3923b
+0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Game::endGameVictory
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Game::localPlayer
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Game::net
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Game::ticks
@@ -30277,7 +30277,6 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::bit8_37f2f
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::bit9_37f2f
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::flag2
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::flag4
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::flag5
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::flag6
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::flags_2bee
@@ -30287,6 +30286,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::buildTypeIndex
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::carry
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::effectiveGameSpeed
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::endGameVictory
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::field_2a46
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::gameSpeed
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::hoverUnitId
@@ -31515,8 +31515,8 @@ address,function,file,kind,target
 0x496a60,InitFrame,src/game/main_loop.cpp,field_write,<anon>::bit2
 0x496a60,InitFrame,src/game/main_loop.cpp,field_write,<anon>::bit3
 0x496a60,InitFrame,src/game/main_loop.cpp,field_write,<anon>::flag2_3923b
-0x496a60,InitFrame,src/game/main_loop.cpp,field_write,<anon>::flag4_3923b
 0x496a60,InitFrame,src/game/main_loop.cpp,field_write,Game::cursorMode
+0x496a60,InitFrame,src/game/main_loop.cpp,field_write,Game::endGameVictory
 0x496a60,InitFrame,src/game/main_loop.cpp,field_write,Game::handler
 0x496a60,InitFrame,src/game/main_loop.cpp,field_write,Game::mode_391f1
 0x496a60,InitFrame,src/game/main_loop.cpp,fn_ref,LeaveNetGameCallback
@@ -31536,7 +31536,7 @@ address,function,file,kind,target
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_write,<anon>::bit2
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_write,<anon>::bit3
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_write,<anon>::flag2_3923b
-0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_write,<anon>::flag4_3923b
+0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_write,Game::endGameVictory
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_write,Game::handler
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,field_write,Game::mode_391f1
 0x496b10,ReturnToMainMenuFrame,src/game/main_loop.cpp,fn_ref,LeaveNetGameCallback
@@ -32143,6 +32143,7 @@ address,function,file,kind,target
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::boxStartTick
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::boxStartX
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::boxStartZ
+0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::endGameVictory
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::inputFlags
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::interfaceType
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Game::layer
@@ -32167,7 +32168,6 @@ address,function,file,kind,target
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,MapSeam::SelectMission
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,MouseEvent::msg
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,NetGameFlagBits::b2
-0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,NetGameFlagBits::b4
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,NetGameFlags::value
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_read,Seams::map
 0x499200,BattleFrame,src/ingame/build_placement.cpp,field_write,Game::boxEndHeight
@@ -46060,6 +46060,7 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,call,sprintf
 ,HarnessAfterStep,src/harness/harness.cpp,call,strcmp
 ,HarnessAfterStep,src/harness/harness.cpp,field_read,Game::endGameFlags
+,HarnessAfterStep,src/harness/harness.cpp,field_read,Game::endGameVictory
 ,HarnessAfterStep,src/harness/harness.cpp,field_read,Game::ticks
 ,HarnessAfterStep,src/harness/harness.cpp,function,
 ,HarnessAfterStep,src/harness/harness.cpp,global_escape,s_commit@src/harness/harness.cpp
@@ -51903,14 +51904,28 @@ address,function,file,kind,target
 ,VisitFx,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitFx,src/harness/harness.cpp,global_read,s_fxCountSeen@src/harness/harness.cpp
 ,VisitFx,src/harness/harness.cpp,global_read,s_fxList@src/harness/harness.cpp
+,VisitGameScalarFields,src/harness/harness.cpp,call,DumpPrefix
+,VisitGameScalarFields,src/harness/harness.cpp,call,DumpValue
+,VisitGameScalarFields,src/harness/harness.cpp,call,GameAt
+,VisitGameScalarFields,src/harness/harness.cpp,call,HashField
+,VisitGameScalarFields,src/harness/harness.cpp,call,VisitFieldList
+,VisitGameScalarFields,src/harness/harness.cpp,call,sprintf
+,VisitGameScalarFields,src/harness/harness.cpp,deref_read,*TraceField
+,VisitGameScalarFields,src/harness/harness.cpp,field_read,Game::endGameFlags
+,VisitGameScalarFields,src/harness/harness.cpp,field_read,Game::endGameVictory
+,VisitGameScalarFields,src/harness/harness.cpp,field_read,TraceField::name
+,VisitGameScalarFields,src/harness/harness.cpp,field_read,TraceField::offset
+,VisitGameScalarFields,src/harness/harness.cpp,field_write,TraceField::offset
+,VisitGameScalarFields,src/harness/harness.cpp,function,
+,VisitGameScalarFields,src/harness/harness.cpp,global_escape,kGameScalarFields@src/harness/trace_schema.h
+,VisitGameScalarFields,src/harness/harness.cpp,global_read,g_game
+,VisitGameScalarFields,src/harness/harness.cpp,global_read,kGameScalarFieldCount@src/harness/trace_schema.h
+,VisitGameScalarFields,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitGameScalars,src/harness/harness.cpp,call,EndSection
-,VisitGameScalars,src/harness/harness.cpp,call,GameAt
 ,VisitGameScalars,src/harness/harness.cpp,call,HashByte
-,VisitGameScalars,src/harness/harness.cpp,call,VisitFieldList
+,VisitGameScalars,src/harness/harness.cpp,call,VisitGameScalarFields
 ,VisitGameScalars,src/harness/harness.cpp,call,VisitGlobalList
 ,VisitGameScalars,src/harness/harness.cpp,function,
-,VisitGameScalars,src/harness/harness.cpp,global_read,kGameScalarFieldCount@src/harness/trace_schema.h
-,VisitGameScalars,src/harness/harness.cpp,global_read,kGameScalarFields@src/harness/trace_schema.h
 ,VisitGameScalars,src/harness/harness.cpp,global_read,kScalarGlobals@src/harness/trace_schema.h
 ,VisitGameScalars,src/harness/harness.cpp,global_read,kScalarGlobalsCount@src/harness/trace_schema.h
 ,VisitGlobalList,src/harness/harness.cpp,call,DumpPrefix

@@ -83,7 +83,7 @@ Found during review. Each needs an order, a message to the driver, or a split of
   - `CmdSeaLevel` writes `seaLevel` and `CmdEdge` writes `mapWidth` and `mapHeight` (src/game/console_commands.cpp:843, :731-732).
   - `CmdControl` and `CmdView` write `localPlayer` and `playerIndex` (console_commands.cpp:854-868), which the tick reads.
   - The cheat toggles write `uiOptionFlags` bits.
-  - `CmdILose` and `CmdIWin` write `endGameFlags`.
+  - `CmdILose` and `CmdIWin` write `endGameFlags` and `endGameVictory`.
   - `CmdMeteor` writes the meteor globals.
   - `HandleDebugHotkey` (game_dialogs.cpp:1117-1118) writes `Player.metal` and `Player.energy`.
 - `HandleSurrenderChoice` writes `endGameFlags`.

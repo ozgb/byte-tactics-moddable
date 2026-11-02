@@ -1538,11 +1538,11 @@ address,function,file,kind,target
 0x406e40,CmdLimit,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(UnitTypeSet *, char *, int *) __attribute__((stdcall)) [UnitsSeam::UnitTypeSetAddTypeOrCategory]"
 0x406ee0,IsCountBelowAiLimit,src/ai/ai_player.cpp,call,IsUnderLimit
 0x406ee0,IsCountBelowAiLimit,src/ai/ai_player.cpp,function,
-0x406f00,RegisterAICommands,src/ai/ai_player.cpp,call,RegisterCommand
-0x406f00,RegisterAICommands,src/ai/ai_player.cpp,fn_ref,CmdLimit
-0x406f00,RegisterAICommands,src/ai/ai_player.cpp,fn_ref,CmdPlan
-0x406f00,RegisterAICommands,src/ai/ai_player.cpp,fn_ref,CmdWeight
-0x406f00,RegisterAICommands,src/ai/ai_player.cpp,function,
+0x406f00,RegisterAICommands,src/game/console_commands.cpp,call,RegisterCommands
+0x406f00,RegisterAICommands,src/game/console_commands.cpp,fn_ref,CmdLimitSlot
+0x406f00,RegisterAICommands,src/game/console_commands.cpp,fn_ref,CmdPlanSlot
+0x406f00,RegisterAICommands,src/game/console_commands.cpp,fn_ref,CmdWeightSlot
+0x406f00,RegisterAICommands,src/game/console_commands.cpp,function,
 0x406f40,FUN_00406f40,src/ai/ai_player.cpp,function,
 0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,call,get
 0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,field_read,Projectile::attacker
@@ -12157,12 +12157,8 @@ address,function,file,kind,target
 0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,call,RegisterOrderTypes
 0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,call,RegisterUnitOrders
 0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,call,RegisterVtolOrders
-0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,field_read,AiSeam::RegisterAICommands
-0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,field_read,Seams::ai
 0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,function,
 0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,global_maybe_written,g_readyOrder
-0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,global_read,g_seams
-0x43c050,RegisterAllOrderTypes,src/orders/order_list.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [AiSeam::RegisterAICommands]
 0x43c350,ClearOrderTypeTable,src/orders/order_list.cpp,call,BlockVector::Clear
 0x43c350,ClearOrderTypeTable,src/orders/order_list.cpp,function,
 0x43c350,ClearOrderTypeTable,src/orders/order_list.cpp,global_maybe_written,g_missionOrderTableVec@src/orders/order_list.cpp
@@ -27069,23 +27065,25 @@ address,function,file,kind,target
 0x485f50,CreateUnit,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x485f50,CreateUnit,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [NetworkSeam::SendNewUnit]
 0x485f50,CreateUnit,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *) __attribute__((stdcall)) [NetworkSeam::SendBuilderLink]"
-0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,AddUnitToMap
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,InitSpawnedUnit
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,KillUnit
-0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,MissionConditions::NotifyUnitCreated
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,UpdateUnitHeight
+0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,operator MissionConditions *
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,operator Unit *
-0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,operator->
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,operator==
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,deref_escape,*Unit
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_escape,Game::players
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Game::list_391ed
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Game::units
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,LosRadarSeam::RevealNewUnit
+0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,MapSeam::AddUnitToMap
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Player::unitCount
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Player::unitsBegin
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Player::unitsCreated
+0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,PlayersSeam::NotifyUnitCreated
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Seams::los_radar
+0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Seams::map
+0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Seams::players
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Unit::unitDefIndex
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,UnitSpawnPacket::id
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,UnitSpawnPacket::pos
@@ -27095,7 +27093,9 @@ address,function,file,kind,target
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,function,
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,global_read,g_game
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,global_read,g_seams
+0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,"indirect via void (*)(MissionConditions *, int, Unit *) __attribute__((fastcall)) [PlayersSeam::NotifyUnitCreated]"
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RevealNewUnit]
+0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,EmitSmoke
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,GetGroundHeight
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,get
@@ -30101,6 +30101,7 @@ address,function,file,kind,target
 0x491200,InitGame,src/game/game_state.cpp,call,MakeBlueTable
 0x491200,InitGame,src/game/game_state.cpp,call,MakeGrayTable
 0x491200,InitGame,src/game/game_state.cpp,call,ReadGameRegistryValue
+0x491200,InitGame,src/game/game_state.cpp,call,RegisterAICommands
 0x491200,InitGame,src/game/game_state.cpp,call,ReopenCdAudio
 0x491200,InitGame,src/game/game_state.cpp,call,ResetFrontendState
 0x491200,InitGame,src/game/game_state.cpp,call,SetAnimsPath
@@ -43890,6 +43891,11 @@ address,function,file,kind,target
 ,ClearTrackedProjectile,src/weapons/weapons.cpp,global_read,g_game
 ,ClearWindowedFlag,src/graphics/display.cpp,field_write,Display::windowed
 ,ClearWindowedFlag,src/graphics/display.cpp,function,
+,CmdLimitSlot,src/game/console_commands.cpp,field_read,AiSeam::CmdLimit
+,CmdLimitSlot,src/game/console_commands.cpp,field_read,Seams::ai
+,CmdLimitSlot,src/game/console_commands.cpp,function,
+,CmdLimitSlot,src/game/console_commands.cpp,global_read,g_seams
+,CmdLimitSlot,src/game/console_commands.cpp,indirect_call,indirect via void (*)(CommandArgs *) __attribute__((stdcall)) [AiSeam::CmdLimit]
 ,CmdMeteorSlot,src/game/console_commands.cpp,field_read,Seams::wind_meteors
 ,CmdMeteorSlot,src/game/console_commands.cpp,field_read,WindMeteorsSeam::CmdMeteor
 ,CmdMeteorSlot,src/game/console_commands.cpp,function,
@@ -43898,6 +43904,16 @@ address,function,file,kind,target
 ,CmdMeteorThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
 ,CmdMeteorThunk,src/wasm/wind_meteors_glue.cpp,call,ToScratch
 ,CmdMeteorThunk,src/wasm/wind_meteors_glue.cpp,function,
+,CmdPlanSlot,src/game/console_commands.cpp,field_read,AiSeam::CmdPlan
+,CmdPlanSlot,src/game/console_commands.cpp,field_read,Seams::ai
+,CmdPlanSlot,src/game/console_commands.cpp,function,
+,CmdPlanSlot,src/game/console_commands.cpp,global_read,g_seams
+,CmdPlanSlot,src/game/console_commands.cpp,indirect_call,indirect via void (*)(CommandArgs *) __attribute__((stdcall)) [AiSeam::CmdPlan]
+,CmdWeightSlot,src/game/console_commands.cpp,field_read,AiSeam::CmdWeight
+,CmdWeightSlot,src/game/console_commands.cpp,field_read,Seams::ai
+,CmdWeightSlot,src/game/console_commands.cpp,function,
+,CmdWeightSlot,src/game/console_commands.cpp,global_read,g_seams
+,CmdWeightSlot,src/game/console_commands.cpp,indirect_call,indirect via void (*)(CommandArgs *) __attribute__((stdcall)) [AiSeam::CmdWeight]
 ,CobScript::Wake,src/units/cob_script.h,field_read,Channel::state
 ,CobScript::Wake,src/units/cob_script.h,field_read,Channel::waiting
 ,CobScript::Wake,src/units/cob_script.h,field_write,Channel::state
@@ -46438,9 +46454,9 @@ address,function,file,kind,target
 ,HeadlessWindowPost,src/host/win32/headless.cpp,global_read,g_windowOpen
 ,HeadlessWindowPost,src/host/win32/headless.cpp,global_read,kQueueSize
 ,HeadlessWindowPost,src/host/win32/headless.cpp,global_write,g_posted
-,HeapEntry::HeapEntry,src/ai/pathfind.cpp,field_read,HeapEntry::key
-,HeapEntry::HeapEntry,src/ai/pathfind.cpp,field_read,HeapEntry::value
-,HeapEntry::HeapEntry,src/ai/pathfind.cpp,function,
+,HeapEntry::HeapEntry,interfaces/services.h,field_read,HeapEntry::key
+,HeapEntry::HeapEntry,interfaces/services.h,field_read,HeapEntry::value
+,HeapEntry::HeapEntry,interfaces/services.h,function,
 ,HostHeadless,src/host/win32/headless.cpp,call,Scan
 ,HostHeadless,src/host/win32/headless.cpp,function,
 ,IdAt,src/units/unit_save.cpp,function,
@@ -46580,6 +46596,9 @@ address,function,file,kind,target
 ,InsideExplored,src/map/terrain.cpp,function,
 ,Install,src/units/unit_motion.cpp,function,
 ,Install,src/units/unit_motion.cpp,indirect_call,indirect via <overloaded function type>
+,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CmdLimit
+,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CmdPlan
+,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CmdWeight
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreatePlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreateSquadManager
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreateSquads
@@ -46594,7 +46613,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::ParseDownloadableAiWeightScripts
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::ReactToAttack
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::RebuildFeatureCells
-,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::RegisterAICommands
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::ReparseAiWeightScriptsIfLimitNotSticky
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::ResetAIPlayers
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::SetUnitSquad
@@ -46993,9 +47011,12 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearFootprintAndUnlink
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearOrderTypeTable
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearWeaponTarget
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdLimit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdMeteor
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdPlan
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdShareMapping
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdShareRadar
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdWeight
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ComputeMapChecksumNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountDirectoryEntries
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CreatePathfinder
@@ -47200,7 +47221,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshPassMapNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshUnitIfStaleNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshUnitInfo
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,RegisterAICommands
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RegisterAllOrderTypes
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RegisterConditionsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReleaseWeaponsNative
@@ -49182,10 +49202,10 @@ address,function,file,kind,target
 ,PoolUnit,src/harness/harness.cpp,call,GameRef
 ,PoolUnit,src/harness/harness.cpp,function,
 ,PopHeap,src/ai/ai_player.cpp,call,PopHeapFirst
-,PopHeap,src/ai/ai_player.cpp,deref_read,*KeyedCell
+,PopHeap,src/ai/ai_player.cpp,deref_read,*HeapEntry
 ,PopHeap,src/ai/ai_player.cpp,function,
 ,PopHeap,src/ai/player_ai.cpp,call,PopHeapFirst
-,PopHeap,src/ai/player_ai.cpp,deref_read,*KeyedCell
+,PopHeap,src/ai/player_ai.cpp,deref_read,*HeapEntry
 ,PopHeap,src/ai/player_ai.cpp,function,
 ,Pos::operator+,src/ingame/markers.cpp,field_read,Fixed::value
 ,Pos::operator+,src/ingame/markers.cpp,field_write,Fixed::value

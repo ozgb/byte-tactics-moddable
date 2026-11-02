@@ -477,7 +477,7 @@ Coverage: 90.9% of functions (60 of 66), 83.4% of lines, 73.4% of branches; 6 li
 - Needs from seams: 36 functions in platform, presentation, features, game, seams, ai, network.
 - Owns: 80 named sim items that only this subsystem writes, for example `SightQuery::sightDistance`, `Game::heightMap`, `SightQuery::cacheCell`, `SightQuery::frameIdx`, `Game::visibilityMask`.
 - Shares: 7 named sim items that other subsystems also write, for example `Grid::height`, `Grid::width`, `GafFrame::xOffset`, `GafFrame::yOffset`, `Grid::cells`.
-- Its presentation imports are the GAF frame reader and the TED radar frame builder (`BuildTedRadarFrame`); the radar picture and minimap code (`DrawRadarUnits`, `ResizeRadarPicture`, `FreeRadar`) moved to presentation (src/ingame/radar.cpp) in #608, and a line of sight change records a radar redraw event (24) for it. This is the boundary #17 asks to keep clear.
+- Its presentation imports are the GAF frame reader and the TED radar frame builder (`BuildTedRadarFrame`); the radar picture and minimap code (`DrawRadarUnits`, `ResizeRadarPicture`, `FreeRadar`) moved to presentation (src/ingame/radar.cpp) in #608; the line of sight code still calls them through the `UpdateRadarMapped` and `DrawRadarUnits` slots until #647 draws the minimap from the drain. This is the boundary #17 asks to keep clear.
 - The result is `Game::visibilityMask`, which ai, economy, map, orders, pathfinding and presentation read. `Player::explored` is read here and written elsewhere.
 
 **Open questions.**
@@ -685,7 +685,6 @@ The kinds, with the arguments of each and what the drain does:
 | 21, player took the lead | the player, the kills that put it there | Prints the message that the player has taken the lead, in the player's name and with the kills |
 | 22, player left | the player's network id | Prints the message that the player left the game, in the player's name and with one of eight texts chosen from the view random stream, unless the local player was rejected or no slot has the id |
 | 23, build queue sound | the player of the unit, the change | Plays the add or subtract sound of the build menu when the player is the one shown |
-| 24, radar redraw | none | Marks on the radar picture what the shown player has mapped, then draws the units it shows |
 | 25, watch prompt | the player | Asks the local player whether to keep watching after a defeat |
 | 26, watch mode notice | the player | Tells the local player that hosting AI players that are still alive keeps the match going |
 
@@ -703,7 +702,7 @@ The particle list is the index of the list the particles are drawn in. A particl
 
 Sim calls these engine services of `interfaces/services.h` instead of recording an event, because they build or load what sim keeps and return a result: the GAF readers (`GetGafFrame`, `GetGafSequenceFrame`, `InitGafSequence`, `StepGafSequence`, `FindGafEntry`, `LoadGaf`), the model and script loaders (`Load3do`, `MirrorObject`, `BindModelTextures`, `GetObjectHeight`, `LoadCobScript`, `FreeCobScript`, `GetCobChecksum`), the frame and asset loaders (`AllocFrame`, `BuildLensFrame`, `StripExtension`, `LoadSoundByName`), the unit picture cache (`InitUnitPictureCache`, `FreeUnitPictureCache`, `ReleaseUnitPictures`), the map list (`LoadMapList`, `FreeOtaEnumCache`) and the radar frame of a TED map (`BuildTedRadarFrame`). The piece transforms (`CreateObjectState`, `FreeObjectState`, `UpdateObjectState`) are units code reached through three units seam slots, the conditions object is built through the players slot `NewConditions`, and the build count change is the orders slot `QueueBuildOrder`.
 
-Presentation code that used to run inside a tick runs from the frame code now. The auto-follow camera block (the follow key, the selection and camera cycling) is `UpdateAutoFollow`, called by the frame code right after the unit update and before the phase hash, at the point of the tick where it used to run. The units of the radar picture are drawn once per tick after the player update, so the minimap sees the state at the end of the player update, not the state at the shown player's turn in it.
+Presentation code that used to run inside a tick runs from the frame code now. The auto-follow camera block (the follow key, the selection and camera cycling) is `UpdateAutoFollow`, called by the frame code right after the unit update and before the phase hash, at the point of the tick where it used to run.
 
 ## Coverage
 

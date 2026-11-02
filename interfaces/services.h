@@ -141,8 +141,6 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_PLAYER_LEFT = 22,
     // A build count changed: the player index of the unit and the change, the sound plays when that player is the one shown.
     SIM_EVENT_BUILD_QUEUE_SOUND = 23,
-    // The line of sight changed: the radar picture marks what the shown player has mapped and draws the units it shows.
-    SIM_EVENT_RADAR_REDRAW = 24,
     // A defeated player may keep watching: the player index, the question shows when it is the local player.
     SIM_EVENT_WATCH_PROMPT = 25,
     // A player who hosts AI players that are still alive is placed in watch mode: the player index, the notice shows when it is the local player.

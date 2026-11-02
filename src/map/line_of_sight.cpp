@@ -1213,7 +1213,8 @@ void __stdcall RecalculateLineOfSight(int arg)
     }
     (*(Flags_142f1*)&g_game->viewDirtyFlags).mapChanged = 1;
     g_game->mapFlags_14281.raw &= 0xfff7;
-    RecordRadarRedraw();
+    g_seams.los_radar->UpdateRadarMapped();
+    g_seams.los_radar->DrawRadarUnits();
 }
 
 inline int LodRaw(SightQuery* params)

@@ -548,6 +548,9 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
             }
         }
 
+        if (bl == g_game->playerIndex)
+            g_seams.los_radar->DrawRadarUnits();
+
         if ((unsigned int)pi->updateTime > (unsigned int)g_game->ticks)
             goto next_bl;
         pi->updateTime += 0x1e;

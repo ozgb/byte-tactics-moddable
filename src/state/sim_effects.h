@@ -136,11 +136,6 @@ inline void RecordBuildQueueSound(int player, int count)
     RecordSimEvent(SIM_EVENT_BUILD_QUEUE_SOUND, 0, args, 2);
 }
 
-inline void RecordRadarRedraw()
-{
-    RecordSimEvent(SIM_EVENT_RADAR_REDRAW, 0, nullptr, 0);
-}
-
 inline void RecordWatchPrompt(int player)
 {
     unsigned int args[1] = {(unsigned int)player};

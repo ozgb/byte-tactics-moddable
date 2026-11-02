@@ -1,7 +1,6 @@
 #include "game_dialogs.h"
 #include "control_panel.h"
 #include "selection.h"
-#include "radar.h"
 #include "../game/game.h"
 #include "../../link/globals.h"
 #include "../frontend/skirmish_menu.h"
@@ -278,10 +277,6 @@ void DrainSimEvents()
         case SIM_EVENT_WATCH_MODE_NOTICE:
             if (e.args[0] == g_game->localPlayer)
                 OpenMessageBox(&g_game->gui, Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."), 500, 1, 1);
-            break;
-        case SIM_EVENT_RADAR_REDRAW:
-            UpdateRadarMapped();
-            DrawRadarUnits();
             break;
         case SIM_EVENT_BUILD_QUEUE_SOUND:
             DrainBuildQueueSound(e);

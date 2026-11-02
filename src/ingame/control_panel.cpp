@@ -174,11 +174,11 @@ void __stdcall IssueMobileBuildOrders(MouseEvent* arg)
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
         if ((u->flags & 0x10) && (((UnitDef*)u->def.get())->flags1 & 0x40)) {
             if (!(((UnitDef*)u->def.get())->flags1 & 0x800)) {
-                HarnessUiOrder(MissionType("MOBILEBUILD").index, remove, u, 0, (int*)&pos, index, 0);
+                HarnessUiOrder(MissionType("MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
                 IssueOrCancelOrder("MOBILEBUILD", remove, u, 0, &pos, index, 0);
             } else {
                 if (((UnitDef*)u->def.get())->flying) {
-                    HarnessUiOrder(MissionType("VTOL_MOBILEBUILD").index, remove, u, 0, (int*)&pos, index, 0);
+                    HarnessUiOrder(MissionType("VTOL_MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
                     IssueOrCancelOrder("VTOL_MOBILEBUILD", remove, u, 0, &pos, index, 0);
                 }
             }

@@ -827,19 +827,19 @@ done:
 #include "../units/squads.h"
 
 // FUNCTION: 0x48d920
-void __stdcall CreateSquad(int param_1)
+void __stdcall CreateSquad(int group)
 {
     Player* player = &g_game->players[g_game->localPlayer];
     for (Unit* u = player->unitsBegin; u <= player->unitsEnd; u++) {
         if (u->unitDefIndex != 0) {
             if (u->selected) {
-                SetUnitSquad(u, param_1);
-            } else if (u->group == param_1) {
+                SetUnitSquad(u, group);
+            } else if (u->group == group) {
                 SetUnitSquad(u, 0);
             }
         }
     }
-    HarnessUiGroup("group", param_1);
+    HarnessUiGroup("group", group);
 }
 
 static inline int TestBit(UnitTypeSet* set, unsigned short n)

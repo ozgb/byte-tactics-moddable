@@ -553,8 +553,10 @@ static void ReadInput(int lineNo, char* value)
     char* cursor = value;
     char* tickText = NextToken(&cursor);
     char* kind = tickText != nullptr ? NextToken(&cursor) : nullptr;
-    if (kind == nullptr)
+    if (kind == nullptr) {
         FailLine(lineNo, "needs <tick> key|char|mouse and its details", "input", "");
+        return;
+    }
     if (s_inputCount >= MAX_INPUTS)
         FailLine(lineNo, "is past the limit of 1024 input lines", "input", "");
     ScriptedInput* in = &s_inputs[s_inputCount++];
@@ -566,14 +568,18 @@ static void ReadInput(int lineNo, char* value)
     if (strcmp(kind, "key") == 0) {
         char* direction = NextToken(&cursor);
         char* keyText = direction != nullptr ? NextToken(&cursor) : nullptr;
-        if (keyText == nullptr || (strcmp(direction, "down") != 0 && strcmp(direction, "up") != 0))
+        if (keyText == nullptr || (strcmp(direction, "down") != 0 && strcmp(direction, "up") != 0)) {
             FailLine(lineNo, "needs key down|up <key>", "input", "");
+            return;
+        }
         in->type = strcmp(direction, "down") == 0 ? HOST_EVENT_KEY_DOWN : HOST_EVENT_KEY_UP;
         in->a = ParseKeyName(lineNo, keyText);
     } else if (strcmp(kind, "char") == 0) {
         char* charText = NextToken(&cursor);
-        if (charText == nullptr)
+        if (charText == nullptr) {
             FailLine(lineNo, "needs a character", "input", "");
+            return;
+        }
         if (charText[1] == '\0') {
             in->a = (unsigned char)charText[0];
         } else {
@@ -585,15 +591,19 @@ static void ReadInput(int lineNo, char* value)
     } else if (strcmp(kind, "mouse") == 0) {
         in->mouse = 1;
         char* what = NextToken(&cursor);
-        if (what == nullptr)
+        if (what == nullptr) {
             FailLine(lineNo, "needs mouse move or mouse left|right down|up", "input", "");
+            return;
+        }
         int left = strcmp(what, "left") == 0;
         if (strcmp(what, "move") == 0) {
             in->type = HOST_EVENT_MOUSE_MOVE;
         } else if (left || strcmp(what, "right") == 0) {
             char* direction = NextToken(&cursor);
-            if (direction == nullptr || (strcmp(direction, "down") != 0 && strcmp(direction, "up") != 0))
+            if (direction == nullptr || (strcmp(direction, "down") != 0 && strcmp(direction, "up") != 0)) {
                 FailLine(lineNo, "needs mouse left|right down|up", "input", "");
+                return;
+            }
             int down = strcmp(direction, "down") == 0;
             in->type = left ? (down ? HOST_EVENT_LBUTTON_DOWN : HOST_EVENT_LBUTTON_UP)
                             : (down ? HOST_EVENT_RBUTTON_DOWN : HOST_EVENT_RBUTTON_UP);
@@ -3750,7 +3760,7 @@ static void UiListUnits(int group, int selectedOnly)
 {
     Player* player = &g_game->players[g_game->localPlayer];
     int any = 0;
-    for (Unit* u = player->unitsBegin; u <= player->unitsEnd; u++) {
+    for (Unit* u = player->unitsBegin; u != nullptr && u <= player->unitsEnd; u++) {
         if (u->unitDefIndex == 0 || (selectedOnly ? !u->selected : u->group != group))
             continue;
         fprintf(s_ui, "%s%u", any ? "," : " ", UiUnitIndex(u));
@@ -3810,7 +3820,7 @@ static void UiEndOfTick()
     size_t length = 0;
     selection[0] = '\0';
     Player* player = &g_game->players[g_game->localPlayer];
-    for (Unit* u = player->unitsBegin; u <= player->unitsEnd; u++) {
+    for (Unit* u = player->unitsBegin; u != nullptr && u <= player->unitsEnd; u++) {
         if (u->unitDefIndex == 0 || !u->selected)
             continue;
         if (length + 16 >= UI_SELECTION_TEXT)

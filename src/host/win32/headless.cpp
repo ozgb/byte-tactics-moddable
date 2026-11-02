@@ -1,8 +1,10 @@
 #include <windows.h>
+#include <winuser.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../../interfaces/host.h"
 #include "headless.h"
 
 namespace {

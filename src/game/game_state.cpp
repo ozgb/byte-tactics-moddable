@@ -9,6 +9,7 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/host.h"
 #include "game_state.h"
+#include "console_commands.h"
 #include "../util/tdf.h"
 
 struct Force640x480Display;
@@ -347,6 +348,7 @@ void InitGame()
     ResetFrontendState();
     InitPacketTables(g_game->chatHudRing);
     g_seams.orders->RegisterAllOrderTypes();
+    RegisterAICommands();
     LoadGameFonts();
     LoadDefaultPalette();
     LoadAllSound();

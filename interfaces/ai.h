@@ -11,11 +11,12 @@ struct Player;
 struct Vec3;
 struct Projectile;
 class SquadManager;
+class CommandArgs;
 
 // Major version of the ai interface, changed when a slot is removed or its signature changes.
-#define AI_VERSION_MAJOR 2
+#define AI_VERSION_MAJOR 3
 // Minor version of the ai interface, changed when a slot is added.
-#define AI_VERSION_MINOR 1
+#define AI_VERSION_MINOR 0
 
 // Computer player decisions.
 struct AiSeam {
@@ -35,8 +36,6 @@ struct AiSeam {
     void (__stdcall* ResetAIPlayers)(void);
     // Appends to out the factories a player has within a radius of a position. Hooks: none.
     void (__stdcall* GetFactoriesInRadius)(int player, const Vec3* pos, int radius, std::vector<Unit*, std::allocator<Unit*> >* out);
-    // Registers the console commands that tune the AI. Hooks: none.
-    void (__stdcall* RegisterAICommands)(void);
     // Creates the AI state of a player. Hooks: none.
     void (__stdcall* CreatePlayerAI)(int player);
     // Frees the AI state of a player. Hooks: none.
@@ -61,6 +60,12 @@ struct AiSeam {
     void (__fastcall* SquadManagerDeleteTimers)(SquadManager* self, int unusedEdx);
     // Allocates the squad manager of a player from the sim block, builds it and stores it in the player. Hooks: none.
     void (__stdcall* CreateSquadManager)(Player* player);
+    // Runs the "plan" console command, which switches the AI weight commands on for a difficulty. Hooks: none.
+    void (__stdcall* CmdPlan)(CommandArgs* args);
+    // Runs the "weight" console command, which scales the build weights of unit types. Hooks: none.
+    void (__stdcall* CmdWeight)(CommandArgs* args);
+    // Runs the "limit" console command, which sets the build limits of unit types. Hooks: none.
+    void (__stdcall* CmdLimit)(CommandArgs* args);
 };
 
 #endif

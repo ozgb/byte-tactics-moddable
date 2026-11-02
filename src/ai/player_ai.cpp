@@ -30,9 +30,8 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 #include "../util/math.h"
 int __stdcall CanPlaceUnitFootprint(UnitDef* type, short a, Point16 cell, int b);
 int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, int b);
-void __stdcall PopHeapFirst(KeyedCell* first, KeyedCell* last, KeyedCell* dest,
-                            KeyedCell val, int*);
 #include "../../interfaces/seams.h"
+#include "../../interfaces/services.h"
 
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {
@@ -51,7 +50,7 @@ static inline int DistSq(const Point16& a, const Point16& b)
 
 static inline void PopHeap(KeyedCell* f, KeyedCell* l)
 {
-    PopHeapFirst(f, l - 1, l - 1, KeyedCell(*(l - 1)), (int*)0);
+    PopHeapFirst((HeapEntry*)f, (HeapEntry*)(l - 1), (HeapEntry*)(l - 1), *(HeapEntry*)(l - 1), (int*)0);
 }
 
 static inline Vec3 Direction(short angle, int scale)

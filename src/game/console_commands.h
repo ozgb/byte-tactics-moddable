@@ -39,6 +39,7 @@ void __stdcall CmdSave(CommandArgs* args);
 void __stdcall CmdReload(CommandArgs* args);
 void __stdcall CmdMakePoster(CommandArgs* args);
 void __stdcall CmdMeteor(CommandArgs* args);
+void RegisterAICommands();
 void __stdcall CmdDrop(CommandArgs* args);
 void __stdcall CmdInclude(CommandArgs* args);
 void __stdcall CmdDebugBreak(CommandArgs* args);

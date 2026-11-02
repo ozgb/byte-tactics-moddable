@@ -305,7 +305,6 @@ src/ingame/game_dialogs.cpp,src/gui/keyboard.h,#392
 src/ingame/game_dialogs.cpp,src/gui/layer.h,#392
 src/ingame/game_dialogs.cpp,src/ingame/control_panel.h,#392
 src/ingame/game_dialogs.cpp,src/ingame/game_dialogs.h,#392
-src/ingame/game_dialogs.cpp,src/ingame/radar.h,#392
 src/ingame/game_dialogs.cpp,src/sound/sound.h,#392
 src/ingame/info_panel.cpp,src/frontend/options.h,#392
 src/ingame/info_panel.cpp,src/graphics/display.h,#392

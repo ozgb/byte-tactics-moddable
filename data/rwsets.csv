@@ -20799,6 +20799,7 @@ address,function,file,kind,target
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,Game::startPos
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,Game::ticks
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,Game::width
+0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::DrawRadarUnits
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::RecalculateLineOfSight
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::UpdateRadarMapped
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::UpdateSensorRadarAndCloak
@@ -20867,6 +20868,7 @@ address,function,file,kind,target
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
+0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::DrawRadarUnits]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::UpdateRadarMapped]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::UpdateSensorRadarAndCloak]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
@@ -25855,7 +25857,6 @@ address,function,file,kind,target
 0x4815f0,GetOriginCellAtPosition,src/map/line_of_sight.cpp,global_read,g_game
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,AddLineOfSight
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,GetGafFrame
-0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,RecordRadarRedraw
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,UpdateLineOfSight
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,memset
@@ -25884,12 +25885,15 @@ address,function,file,kind,target
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::unitsEnd
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::visibilityMask
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::width
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,LosRadarSeam::DrawRadarUnits
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,LosRadarSeam::UpdateRadarMapped
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,MapViewFlags::raw
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Player::active
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Player::explored
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Player::exploredSize
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Player::index
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Player::type
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Seams::los_radar
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,SightQuery::cacheCell
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,SightQuery::frameIdx
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,SightQuery::sightDistance
@@ -25913,6 +25917,9 @@ address,function,file,kind,target
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_write,Vec3::y
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,function,
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,global_read,g_game
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,global_read,g_seams
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::DrawRadarUnits]
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::UpdateRadarMapped]
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,GetGafFrame
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LodRaw
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LosLine::GetLosLineStep
@@ -31117,7 +31124,6 @@ address,function,file,kind,target
 0x495230,UpdateFramePacing,src/ingame/game_dialogs.cpp,global_read,g_game
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,AccumulateProfileTime
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,DrainSimEvents
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,DrawRadarUnits
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,EmptyPostSimStepHook
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,EmptyPostSimStepHook_B
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,EmptyPostSimStepHook_C
@@ -44325,7 +44331,6 @@ address,function,file,kind,target
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainThrust
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainUnitSpeech
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainWake
-,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrawRadarUnits
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitTimedSubParticles
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitWeaponSmoke
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,FocusCommander
@@ -44338,7 +44343,6 @@ address,function,file,kind,target
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,Translate
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,UnitOf
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,UpdateBuildMenuIfFocusUnit
-,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,UpdateRadarMapped
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_escape,Player::name
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_maybe_written,Game::gui
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_maybe_written,Game::players
@@ -49917,8 +49921,6 @@ address,function,file,kind,target
 ,RecordPointParticles,src/state/sim_effects.h,function,
 ,RecordPopToGameLayout,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordPopToGameLayout,src/state/sim_effects.h,function,
-,RecordRadarRedraw,src/state/sim_effects.h,call,RecordSimEvent
-,RecordRadarRedraw,src/state/sim_effects.h,function,
 ,RecordReverseNanoParticles,src/state/sim_effects.h,call,RecordReverseNanoParticles
 ,RecordReverseNanoParticles,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordReverseNanoParticles,src/state/sim_effects.h,call,SimEventPut

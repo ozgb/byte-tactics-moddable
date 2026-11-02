@@ -3996,7 +3996,6 @@ RecordPlayerLeft,src/state/sim_effects.h,units,phase:UpdateAllUnits,
 RecordPlayerTookLead,src/state/sim_effects.h,units,phase:UpdateAllUnits,
 RecordPointParticles,src/state/sim_effects.h,game,default,
 RecordPopToGameLayout,src/state/sim_effects.h,game,phase:UpdateAllUnits,game
-RecordRadarRedraw,src/state/sim_effects.h,game,phase:UpdatePlayers,game
 RecordReverseNanoParticles,src/state/sim_effects.h,game,default,
 RecordScoreFlash,src/state/sim_effects.h,game,phase:UpdateAllUnits,game
 RecordScreenShake,src/state/sim_effects.h,game,default,

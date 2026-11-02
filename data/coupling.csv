@@ -815,7 +815,6 @@ game,presentation,call,DrawLightBars,1
 game,presentation,call,DrawLoadingBar,1
 game,presentation,call,DrawMessages,1
 game,presentation,call,DrawOutlinedString,1
-game,presentation,call,DrawRadarUnits,1
 game,presentation,call,DrawSurface,2
 game,presentation,call,DrawSyncStatus,1
 game,presentation,call,DrawTextClipped,2
@@ -1299,7 +1298,6 @@ los_radar,features,shared_write,Vec3::x,6
 los_radar,features,shared_write,Vec3::y,5
 los_radar,features,shared_write,Vec3::z,6
 los_radar,game,call,Game::Current,1
-los_radar,game,call,RecordRadarRedraw,1
 los_radar,game,call,SaveSettings,1
 los_radar,game,call,SimAlloc,1
 los_radar,game,call,SimAllocTagged,1
@@ -1377,6 +1375,8 @@ los_radar,players,shared_write,Vec3::z,3
 los_radar,presentation,call,BuildTedRadarFrame,1
 los_radar,presentation,call,GetGafFrame,8
 los_radar,presentation,call,StringRef::ReleaseRef,1
+los_radar,presentation,indirect,DrawRadarUnits,1
+los_radar,presentation,indirect,UpdateRadarMapped,1
 los_radar,presentation,shared_write,Cell::feature,2
 los_radar,presentation,shared_write,Game::cells,2
 los_radar,presentation,shared_write,Game::mapHeight,9
@@ -2856,6 +2856,7 @@ players,platform,shared_write,Point16::y,8
 players,platform,shared_write,Vec3::x,22
 players,platform,shared_write,Vec3::y,13
 players,platform,shared_write,Vec3::z,22
+players,presentation,indirect,DrawRadarUnits,1
 players,presentation,indirect,UpdateRadarMapped,1
 players,presentation,shared_write,Game::endGameFlags,2
 players,presentation,shared_write,Game::head,2
@@ -3800,12 +3801,14 @@ seams,harness,shared_write,Seams::map,1
 seams,harness,shared_write,Seams::units,1
 seams,harness,shared_write,UnitsSeam::CreateUnit,1
 seams,los_radar,shared_write,FeaturesSeam::PlaceFeature,1
+seams,los_radar,shared_write,LosRadarSeam::DrawRadarUnits,1
 seams,los_radar,shared_write,LosRadarSeam::RecalculateLineOfSight,2
+seams,los_radar,shared_write,LosRadarSeam::UpdateRadarMapped,1
 seams,los_radar,shared_write,MapSeam::VisitObjectsInRange,1
 seams,los_radar,shared_write,NetworkSeam::BroadcastPlayerInfo,3
 seams,los_radar,shared_write,Seams::ai,2
 seams,los_radar,shared_write,Seams::features,2
-seams,los_radar,shared_write,Seams::los_radar,2
+seams,los_radar,shared_write,Seams::los_radar,3
 seams,los_radar,shared_write,Seams::map,2
 seams,los_radar,shared_write,Seams::network,3
 seams,los_radar,shared_write,Seams::units,1
@@ -3955,6 +3958,7 @@ seams,players,shared_write,EconomySeam::SpendMetal,1
 seams,players,shared_write,EconomySeam::UpdatePlayerEconomy,1
 seams,players,shared_write,Game::pathfinder,1
 seams,players,shared_write,LosRadarSeam::ClampWorldPosToTerrain,1
+seams,players,shared_write,LosRadarSeam::DrawRadarUnits,1
 seams,players,shared_write,LosRadarSeam::RecalculateLineOfSight,1
 seams,players,shared_write,LosRadarSeam::UpdateRadarMapped,1
 seams,players,shared_write,LosRadarSeam::UpdateSensorRadarAndCloak,1

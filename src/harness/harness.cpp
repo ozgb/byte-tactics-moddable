@@ -625,6 +625,30 @@ static void CheckInputs()
                          "input", ", the game takes one of each per frame");
         }
     }
+    for (int i = 0; i < s_inputCount; i++) {
+        const ScriptedInput* up = &s_inputs[i];
+        if (up->type != HOST_EVENT_LBUTTON_UP && up->type != HOST_EVENT_RBUTTON_UP)
+            continue;
+        unsigned downType = up->type == HOST_EVENT_LBUTTON_UP ? HOST_EVENT_LBUTTON_DOWN : HOST_EVENT_RBUTTON_DOWN;
+        const ScriptedInput* down = nullptr;
+        for (int k = 0; k < s_inputCount; k++) {
+            const ScriptedInput* c = &s_inputs[k];
+            if (c->type == downType && c->tick <= up->tick && (down == nullptr || c->tick > down->tick))
+                down = c;
+        }
+        if (down == nullptr || up->tick - down->tick <= 1)
+            continue;
+        int dragged = 0;
+        for (int k = 0; k < s_inputCount; k++) {
+            const ScriptedInput* m = &s_inputs[k];
+            if (m->type == HOST_EVENT_MOUSE_MOVE && m->tick > down->tick && m->tick < up->tick
+                && (abs(m->x - down->x) >= 32 || abs(m->y - down->y) >= 32))
+                dragged = 1;
+        }
+        if (!dragged)
+            FailLine(up->lineNo, "releases a button more than 1 tick after its press without a move of 32 units between",
+                     "input", ", the game would take it for a click or a box by the clock");
+    }
     if (s_inputCount != 0 && s_stepsPerFrame != 1)
         FailLine(s_inputs[0].lineNo, "needs steps_per_frame 1", "input", ", the UI takes its events once per frame");
 }

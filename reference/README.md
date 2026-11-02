@@ -313,7 +313,8 @@ input 40 char a
   The event time is the tick, not the clock.
 - The game takes one mouse event and one key or `char` event per frame, so a scenario has at most one of each on a
   tick, and `steps_per_frame` must be 1 (`--steps-per-frame` leaves a scenario with `input` lines at 1). A breach of
-  either, a bad event, a position outside the window or a tick after the last tick exits with status 2 and a message
+  either, a button released more than 1 tick after its press with no mouse move of at least 32 units from the press position
+  between (the game takes a slow press and release for a click or a box by the wall clock), a bad event, a position outside the window or a tick after the last tick exits with status 2 and a message
   that names the line.
 - A right-click gives an order only with interface type 1, and a left-click in an order mode only with type 0. A
   scenario says which it uses with `console 1 +iface 1` or `console 1 +iface 0`; a scenario that does not say plays

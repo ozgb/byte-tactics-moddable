@@ -57,8 +57,10 @@ digit `0` to `9`. A window position is in the 640 by 480 window, `x` from 0 to 6
   `(gx, gy + 128)` on the screen. The build menu of a commander puts its first button
   (the first building) at gadget (0, 27, 64, 64) and the next at (64, 27, 64, 64).
 - **A click or a box.** The game takes a press and release within about a second and less than
-  32 world units apart for a click, and anything else for a box. A scenario that boxes
-  moves at least 32 units while the button is down.
+  32 world units apart for a click, and anything else for a box, judging the time by the
+  clock. A scenario releases a button on the tick after its press (a click), or moves the
+  mouse at least 32 pixels from the press position while the button is down (a box); the
+  scenario loader rejects anything between.
 
 ## Format
 

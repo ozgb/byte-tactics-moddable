@@ -140,6 +140,7 @@ void HideSoftwareCursor();
 void ShowSoftwareCursor();
 #include "../network/net_stats.h"
 #include "control_panel.h"
+#include "radar.h"
 #include "../graphics/particles.h"
 #include "../frontend/frontend.h"
 #include "../network/net_chat.h"
@@ -1041,6 +1042,7 @@ void __stdcall RunGameSteps(int showStats)
         HarnessPhase(3);
         AccumulateProfileTime(&g_game->timers, 8);
         g_seams.players->UpdatePlayers();
+        DrawRadarUnits();
         HarnessPhase(4);
         AccumulateProfileTime(&g_game->timers, 2);
 

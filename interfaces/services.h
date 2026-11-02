@@ -133,6 +133,8 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_PLAYER_LEFT = 22,
     // A build count changed: the player index of the unit and the change, the sound plays when that player is the one shown.
     SIM_EVENT_BUILD_QUEUE_SOUND = 23,
+    // The line of sight changed: the radar picture marks what the shown player has mapped and draws the units it shows.
+    SIM_EVENT_RADAR_REDRAW = 24,
 };
 // Flag of SIM_EVENT_UNIT_SPEECH: the unit stays silent when it is on screen.
 #define SIM_EVENT_SPEECH_IF_NOT_VISIBLE 1u
@@ -523,6 +525,8 @@ int __stdcall LoadSoundByName(char* name, const char* file);
 struct ModelState;
 // Drops the pictures cached for a model state, before the state is freed.
 void __stdcall ReleaseUnitPictures(ModelState* state);
+// Draws the generated picture of a TED map from its data into the radar frame.
+void __stdcall BuildTedRadarFrame(unsigned short* data);
 // Builds the cache of unit pictures, sized from the screen and the memory of the machine.
 void __stdcall InitUnitPictureCache(void);
 // Frees the cache of unit pictures.

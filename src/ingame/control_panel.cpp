@@ -71,7 +71,7 @@ extern ConsoleCommandTable g_debugCommands;
 
 Unit* __stdcall FindNextSelectedUnit(Unit*, int);
 #include "../units/unit_commands.h"
-#include "../map/radar.h"
+#include "../ingame/radar.h"
 #include "../graphics/display.h"
 #include "../gui/keyboard.h"
 void HideSoftwareCursor();

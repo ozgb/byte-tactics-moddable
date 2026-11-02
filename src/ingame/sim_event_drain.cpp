@@ -1,6 +1,7 @@
 #include "game_dialogs.h"
 #include "control_panel.h"
 #include "selection.h"
+#include "radar.h"
 #include "../game/game.h"
 #include "../../link/globals.h"
 #include "../frontend/skirmish_menu.h"
@@ -269,6 +270,10 @@ void DrainSimEvents()
             break;
         case SIM_EVENT_GUI_CHANGED_IF_SCREEN:
             DrainGuiChanged(e);
+            break;
+        case SIM_EVENT_RADAR_REDRAW:
+            UpdateRadarMapped();
+            DrawRadarUnits();
             break;
         case SIM_EVENT_BUILD_QUEUE_SOUND:
             DrainBuildQueueSound(e);

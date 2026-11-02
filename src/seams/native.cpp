@@ -96,7 +96,7 @@ int __stdcall GetWeaponRange(int param1, unsigned int param2);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
 
 #include "../map/line_of_sight.h"
-#include "../map/radar.h"
+#include "../ingame/radar.h"
 #include "../ingame/radar_picture.h"
 
 class HapiBank;

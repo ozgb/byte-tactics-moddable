@@ -27,7 +27,7 @@ struct RadarSurfaceView {
 
 #pragma pack(push, 1)
 
-#include "radar_types.h"
+#include "../map/radar_types.h"
 
 #include "../network/player_info.h"
 

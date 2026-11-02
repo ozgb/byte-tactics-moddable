@@ -7,7 +7,9 @@
 `--check --exe` plays every scenario in reference/scenarios/ (`--parallel N` at a
 time, default half the CPUs and at most 6, under Wine through tools/playtest.py)
 and compares the digest of each tick (tools/tracedigest.py) with the stored one. It also compares
-each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md), and the harness.sav of each scenario with a `save` line with
+each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md).
+A scenario with a `frames` line also has its frame dumps compared, byte for byte, with reference/frames/<scenario>/ (docs/frame-dump.md); a missing stored frame fails.
+and the harness.sav of each scenario with a `save` line with
 reference/saves/<scenario>.sav, when that file exists, by decoded contents (tools/savefile.py leaves out the bytes taken from the clock or from uninitialised memory).
 On the first difference it builds the reference from the commit the trace
 records, prints tools/tracediff.py's report for that scenario and exits 1. A
@@ -27,7 +29,8 @@ stored trace. It builds no reference and is not the gate.
 `--traces` checks out origin/reference in build/reference/branch, runs that
 branch's own `tools/reference.py HEAD --traces` there (it links the matching
 build with the original compiler and plays the scenarios), and copies the
-traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ and the saves it wrote into reference/saves/ (if it wrote any).
+traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ (if it wrote any), the
+frames it wrote into reference/frames/ (if it wrote any) and the saves it wrote into reference/saves/ (if it wrote any).
 Set WINEARCH=win64 for Wine; `--game-dir` names the game's
 install.
 """
@@ -55,6 +58,9 @@ SCENARIOS = ROOT / "reference/scenarios"
 TRACES = ROOT / "reference/traces"
 SOUNDS = ROOT / "reference/sounds"
 SOUND_FILE = "sound.txt"
+FRAMES = ROOT / "reference/frames"
+FRAME_HEADER_SIZE = 16
+FRAME_PALETTE_SIZE = 1024
 SAVES = ROOT / "reference/saves"
 SAVE_FILE = tracediff.SAVE_FILES[0]
 MAX_PARALLEL = 6
@@ -67,6 +73,7 @@ GATE_SCAN_EVERY = 8
 FUEL_FILE = "fuel.txt"
 FUEL: dict[str, dict[str, tuple[int, int]]] = {}
 SOUND_LOGS: dict[str, str | None] = {}
+FRAME_DUMPS: dict[str, dict[int, bytes]] = {}
 SAVE_BYTES: dict[str, bytes | None] = {}
 RETRY_DIALOG = "dialog-directx"
 
@@ -163,6 +170,18 @@ def scenario_ticks(scenario: Path) -> int:
             except (IndexError, ValueError):
                 break
     raise tracediff.Error(f"{scenario}: the scenario has no valid ticks line")
+
+
+def scenario_frames(scenario: Path) -> list[int]:
+    """The ticks of the scenario's `frames` line (none when it has no such line)."""
+    for line in scenario.read_text().splitlines():
+        words = line.split()
+        if words and words[0] == "frames":
+            try:
+                return [int(word) for word in words[1:]]
+            except ValueError:
+                raise tracediff.Error(f"{scenario}: the frames line has a tick that is not a number")
+    return []
 
 
 def difference(want: tuple[dict[str, str], list[tuple[int, str]]], header: dict[str, str],
@@ -280,7 +299,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, *dict.fromkeys(
+            frame_files = tuple(f"frames/{tick}.bin" for tick in scenario_frames(scenario))
+            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, *frame_files, *dict.fromkeys(
                 (*(tracediff.SAVE_FILES if save_to is not None else ()), *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if load_from is not None:
                 extra["put"] = tracediff.save_put(load_from, scenario.stem, load_from.name)
@@ -300,6 +320,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         FUEL[scenario.stem] = parse_fuel(run / FUEL_FILE)
         sound_log = run / SOUND_FILE
         SOUND_LOGS[scenario.stem] = sound_log.read_text() if sound_log.is_file() else None
+        FRAME_DUMPS[scenario.stem] = {tick: (run / "frames" / f"{tick}.bin").read_bytes()
+                                      for tick in scenario_frames(scenario) if (run / "frames" / f"{tick}.bin").is_file()}
         if scenario_saves(scenario):
             saved = run / SAVE_FILE
             SAVE_BYTES[scenario.stem] = saved.read_bytes() if saved.is_file() else None
@@ -480,6 +502,58 @@ def sound_report(scenarios: dict[str, Path], logs: dict[str, str | None], direct
     return differing, lines
 
 
+def frame_difference(stored: bytes, got: bytes) -> str | None:
+    """Where two frame dumps first differ ("header", "palette" or the first pixel with both values), or None when equal."""
+    if stored[:FRAME_HEADER_SIZE] != got[:FRAME_HEADER_SIZE]:
+        return "header"
+    palette = slice(FRAME_HEADER_SIZE, FRAME_HEADER_SIZE + FRAME_PALETTE_SIZE)
+    if stored[palette] != got[palette]:
+        return "palette"
+    pixels = FRAME_HEADER_SIZE + FRAME_PALETTE_SIZE
+    width = int.from_bytes(stored[6:8], "little")
+    for offset, (a, b) in enumerate(zip(stored[pixels:], got[pixels:])):
+        if a != b:
+            return f"pixel x {offset % width} y {offset // width}: stored {a}, got {b}"
+    if len(stored) != len(got):
+        return f"size: stored {len(stored)} bytes, got {len(got)}"
+    return None
+
+
+def frame_report(scenarios: dict[str, Path], dumps: dict[str, dict[int, bytes]], directory: Path) -> tuple[list[str], list[str]]:
+    """(the scenarios whose frames differ from directory/<scenario>/<tick>.bin, the report lines).
+
+    Only a scenario with a `frames` line is judged, and there a missing stored frame or a frame the run did not write is a difference.
+    """
+    differing: list[str] = []
+    lines: list[str] = []
+    judged = equal = 0
+    for name, path in scenarios.items():
+        ticks = scenario_frames(path)
+        if not ticks:
+            continue
+        judged += 1
+        got = dumps.get(name, {})
+        found = ""
+        for tick in ticks:
+            stored = directory / name / f"{tick}.bin"
+            if not stored.is_file():
+                found = f"frame {tick}: no stored frame in {(directory / name).relative_to(ROOT)}"
+            elif tick not in got:
+                found = f"frame {tick}: the run wrote no frame"
+            else:
+                diff = frame_difference(stored.read_bytes(), got[tick])
+                found = f"frame {tick}: {diff}" if diff else ""
+            if found:
+                break
+        if found:
+            differing.append(name)
+            lines.append(f"DIFF {name} {found}")
+        else:
+            equal += 1
+    lines.append(f"frames: {equal} of {judged} scenarios equal, {len(differing)} differ, {len(scenarios) - judged} with no frames line")
+    return differing, lines
+
+
 def save_difference(stored: bytes, got: bytes) -> str | None:
     """The first difference between two saves (tools/savefile.py compares their decoded contents), or None when they are equal."""
     found = savefile.differences(stored, got)
@@ -569,12 +643,14 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = F
     print(f"{len(scenarios) - len(bad)} of {len(scenarios)} scenarios equal, total {clock(wall)}")
     sound_bad, sound_lines = sound_report(scenarios, SOUND_LOGS, SOUNDS)
     print("\n".join(sound_lines))
+    frame_bad, frame_lines = frame_report(scenarios, FRAME_DUMPS, FRAMES)
+    print("\n".join(frame_lines))
     save_bad, save_lines = save_report(scenarios, SAVE_BYTES, SAVES)
     print("\n".join(save_lines))
     pointers = report_block_pointers(exe, scans, quick, save_blockptrs)
     pointers += report_fuel(exe, scenarios)
     if not bad:
-        if pointers or sound_bad or save_bad:
+        if pointers or sound_bad or frame_bad or save_bad:
             sys.exit(1)
         if quick:
             print("quick subset passed; this is not the gate, a pull request needs the full --check")
@@ -721,6 +797,19 @@ def name_mismatch(produced: set[str], expected: set[str]) -> str:
     return f"the traces do not match moddable's scenarios; missing: {missing}; extra: {extra}"
 
 
+def copy_frames(source: Path) -> None:
+    """Replace reference/frames/ with the <scenario>/<tick>.bin files of `source` (left alone when it holds none)."""
+    produced = sorted(source.glob("*/*.bin"))
+    if not produced:
+        print("the reference branch wrote no frames; reference/frames/ is untouched")
+        return
+    shutil.rmtree(FRAMES, ignore_errors=True)
+    for path in produced:
+        (FRAMES / path.parent.name).mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, FRAMES / path.parent.name / path.name)
+    print(f"{len(produced)} frames copied to {FRAMES.relative_to(ROOT)}")
+
+
 def copy_saves(directory: Path) -> None:
     """Replace reference/saves/ by the saves the reference branch checkout `directory` wrote (none written leaves it as it is)."""
     saves = sorted((directory / "reference/saves").glob("*.sav"))
@@ -757,6 +846,7 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
     for path in produced:
         shutil.copyfile(path, TRACES / path.name)
     print(f"{len(produced)} traces copied to {TRACES.relative_to(ROOT)}")
+    copy_frames(directory / "reference/frames")
     copy_saves(directory)
     sounds = sorted((directory / "reference/sounds").glob("*.txt"))
     if not sounds:

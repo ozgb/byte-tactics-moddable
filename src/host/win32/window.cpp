@@ -1,4 +1,7 @@
 #include <windows.h>
+#include <winbase.h>
+#include <winnt.h>
+#include <winuser.h>
 #include <string.h>
 
 #include "../../../interfaces/host.h"
@@ -14,8 +17,25 @@ DWORD g_thread;
 host_event g_queue[kQueueSize];
 unsigned int g_head;
 unsigned int g_count;
+LONG g_frameDumpState;
 UINT g_savedMouseTrails;
 bool g_mouseTrailsSaved;
+
+bool FrameDumpEnabled()
+{
+    LONG state = *(volatile LONG*)&g_frameDumpState;
+    if (state == 0) {
+        const char* cmd = GetCommandLineA();
+        bool found = false;
+        for (const char* p = cmd; cmd != nullptr && *p != '\0' && !found; p++) {
+            found = (p[0] == '-' || p[0] == '/') && _strnicmp(p + 1, "framedump", 9) == 0
+                && (p[10] == '\0' || p[10] == ' ' || p[10] == '\t') && (p == cmd || p[-1] == ' ' || p[-1] == '\t');
+        }
+        InterlockedExchange(&g_frameDumpState, found ? 2 : 1);
+        return found;
+    }
+    return state == 2;
+}
 
 void RestoreMouseTrails()
 {
@@ -109,6 +129,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         return 0;
     case WM_KEYDOWN:
     case WM_KEYUP:
+        if (wparam == VK_SCROLL && FrameDumpEnabled()) {
+            if (msg == WM_KEYDOWN && (lparam & 0x40000000) == 0) {
+                HostFrameDumpRequest();
+            }
+            return 0;
+        }
+        Queue(msg, wparam, 0);
+        return 0;
     case WM_CHAR:
         Queue(msg, wparam, 0);
         return 0;

@@ -1022,6 +1022,7 @@ void __stdcall RunGameSteps(int showStats)
 {
     int n = g_game->frames_38a3b;
 
+    DrainSimEvents();
     while (n--) {
         g_game->ticks++;
         HarnessBeforeStep();
@@ -1053,6 +1054,7 @@ void __stdcall RunGameSteps(int showStats)
         HarnessPhase(6);
         g_seams.wind_meteors->UpdateMeteors();
         HarnessPhase(7);
+        DrainSimEvents();
         UpdateCameraFollow();
         AccumulateProfileTime(&g_game->timers, 8);
 
@@ -1071,12 +1073,10 @@ void __stdcall RunGameSteps(int showStats)
             g_packetManager.SendAllQueued(0);
             AccumulateProfileTime(&g_game->timers, 0);
         }
-        if (HarnessTestMode())
-            DrainSimEvents();
+        DrainSimEvents();
         HarnessAfterStep();
     }
 
-    DrainSimEvents();
     EmptyPostSimStepHook();
     EmptyPostSimStepHook_B();
     EmptyPostSimStepHook_C();

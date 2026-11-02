@@ -3,8 +3,6 @@ ai,BuildTimer::OnTimer,QueueBuildOrder,"TODO(#608): sim helper: build counts and
 ai,BuildTimer::TryIssueIdleFactoryBuildOrder,QueueBuildOrder,"TODO(#608): sim helper: build counts and a sound in one call, to split"
 ai,PlayerAI::FindCellNearFeatures,GetBuildSiteMetal,TODO(#608): sim helper: a sim value held in a presentation file
 ai,PlayerAI::FindRandomPlacementCell,GetBuildSiteMetal,TODO(#608): sim helper: a sim value held in a presentation file
-ai,PopHeap,PopHeapFirst,TODO(#621): heap helper outside the subsystem
-ai,RegisterAICommands,RegisterCommand,TODO(#621): command table filled by the console
 economy,CmdSetShareEnergy,AddMessage,TODO(#620): sim-to-presentation event or message
 economy,CmdSetShareMetal,AddMessage,TODO(#620): sim-to-presentation event or message
 economy,CmdShareEnergy,AddMessage,TODO(#620): sim-to-presentation event or message
@@ -88,8 +86,6 @@ units,LoadUnitTypes,StripExtension,"TODO(#608): load-time asset call: model, sou
 units,LoadUnitTypes,UnitTable::Construct,"TODO(#608): load-time asset call: model, sound and cache loading"
 units,LoadUnitTypes,UnitTable::Initialize,"TODO(#608): load-time asset call: model, sound and cache loading"
 units,PoseUnitModel,UpdateObjectState,TODO(#608): sim helper: COB piece transforms that sim stores
-units,ReadUnitState,CreateUnitFromPacket,TODO(#621): unit made from a packet by the network layer
-units,ReceiveUnitStates,CreateUnitFromPacket,TODO(#621): unit made from a packet by the network layer
 units,ReloadUnitType,FreeCobScript,TODO(#608): graphics or load-time asset through a seam
 units,ReloadUnitType,LoadCobScript,TODO(#608): graphics or load-time asset through a seam
 units,UnitScript::EmitSfx,EmitBlackSmoke,TODO(#620): sim-to-presentation event or message

@@ -1243,6 +1243,20 @@ void __stdcall CycleCameraFollow(int param)
     g_game->value_142f3 = result;
 }
 
+void __stdcall UpdateAutoFollow(void)
+{
+    if (g_game->autoFollowFlags.bits.b1) {
+        if (!IsKeyDown(0xf9)) {
+            (*(short*)&g_game->autoFollowTicks)--;
+            if ((short)g_game->autoFollowTicks <= 0) {
+                (*(short*)&g_game->autoFollowTicks) = 0x5a;
+                CycleSelection();
+                CycleCameraFollow(0);
+            }
+        }
+    }
+}
+
 static inline int TestBit(unsigned int* set, unsigned short n)
 {
     return set[n >> 5] & (1 << (n & 0x1f));

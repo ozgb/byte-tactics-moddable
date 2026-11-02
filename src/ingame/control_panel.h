@@ -36,6 +36,7 @@ void __stdcall MarkSelectionOrdersDirty(Unit* unit);
 void __stdcall DispatchOrdersPanelPageFlags();
 void __stdcall ResetCameraState();
 void __stdcall CycleCameraFollow(int param);
+void __stdcall UpdateAutoFollow(void);
 void __stdcall FindLocalCommander();
 void __stdcall ClampCameraPosition();
 void __stdcall ClampCameraTarget();

@@ -1031,6 +1031,7 @@ void __stdcall RunGameSteps(int showStats)
             AccumulateProfileTime(&g_game->timers, 0);
         }
         g_seams.units->UpdateAllUnits();
+        UpdateAutoFollow();
         HarnessPhase(1);
         AccumulateProfileTime(&g_game->timers, 1);
         g_seams.weapons->UpdateProjectiles();

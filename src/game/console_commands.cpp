@@ -1320,7 +1320,7 @@ void RegisterAICommands()
         {"plan", CmdPlanSlot, 8},
         {"weight", CmdWeightSlot, 8},
         {"limit", CmdLimitSlot, 8},
-        {0, 0, 0},
+        {nullptr, nullptr, 0},
     };
     RegisterCommands(commands);
 }

@@ -13,6 +13,7 @@
 #include "share_commands.h"
 #include "../util/commands.h"
 #include "../state/sim_effects.h"
+#include "../../interfaces/services.h"
 
 void __stdcall AddMessage(char* text, int key, int value, int last);
 #include "../network/net_game.h"

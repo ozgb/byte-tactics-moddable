@@ -661,7 +661,7 @@ int Mission::LoadMission(char* map)
     killMul = GetFloat(parser.current, "killmul");
     timeMul = GetFloat(parser.current, "timemul");
     if (!SelectSchema(type, &parser, schema)) {
-        host_message(NULL, "Error", "No suitable schema type in mission file!", HOST_MESSAGE_TOPMOST);
+        host_message(nullptr, "Error", "No suitable schema type in mission file!", HOST_MESSAGE_TOPMOST);
         return 0;
     }
     startMetal[0] = (float)parser.current->GetFieldInt("HumanMetal", 0);

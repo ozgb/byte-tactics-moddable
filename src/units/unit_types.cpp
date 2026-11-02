@@ -247,7 +247,7 @@ int __stdcall LoadUnitInfo()
     }
     g_game->unitDefCount = count;
     if (oldcount != count && !bad)
-        host_message(NULL, "Error", Translate("Incompatible units found.  They will be ignored.  Please download the latest version of the game."), HOST_MESSAGE_TOPMOST);
+        host_message(nullptr, "Error", Translate("Incompatible units found.  They will be ignored.  Please download the latest version of the game."), HOST_MESSAGE_TOPMOST);
     ProtectBlockReadOnly(g_game->defs);
     return 1;
 }

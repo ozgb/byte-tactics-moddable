@@ -7,6 +7,7 @@
 
 
 #include "display.h"
+#include "../harness/harness.h"
 
 #pragma pack(push, 1)
 struct LockEntry {
@@ -283,6 +284,7 @@ void FlipScreen(void)
         long held = Lock();
         Surface* p = &d->cached;
         DrawSurface(p, d->overrideSurface, 0, 0);
+        HarnessFrameDrawn(p->pixels, p->pitch, p->width, p->height, d->entries);
         DrawCursor(d, p);
         host_frame_present_rect(0, 0, p->width, d->cached.height);
         Unlock(held);
@@ -305,6 +307,7 @@ void FlipScreen(void)
             out.height = d->height;
             out.pitch = frame.pitch;
             out.pixels = frame.pixels;
+            HarnessFrameDrawn(bmp->pixels, bmp->pitch, bmp->width, bmp->height, d->entries);
             DrawCursor(d, bmp);
             BlitSurface(&out, bmp, 0, 0);
             if (d->cursorThreadEnabled != 0 && d->cursorOverlayEnabled != 0)

@@ -284,6 +284,7 @@ int __stdcall ComparePlayers(Player* a, Player* b)
 }
 
 #include "../graphics/object_pool.h"
+#include "../ingame/game_dialogs.h"
 
 // FUNCTION: 0x485980
 void FreeUnitMemory(void)
@@ -296,6 +297,7 @@ void FreeUnitMemory(void)
                 KillUnit(u, 8);
         }
     }
+    DrainSimEvents();
     if (g_game->hotRadar != 0)
         GameFreeThunk(g_game->hotRadar.get());
     g_game->hotRadar = 0;

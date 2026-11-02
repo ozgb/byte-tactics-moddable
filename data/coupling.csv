@@ -663,7 +663,7 @@ game,platform,call,GetMilliseconds,2
 game,platform,call,GetTickRate,1
 game,platform,call,GetTicks,10
 game,platform,call,GetWindowsUserName,1
-game,platform,call,HarnessTestMode,3
+game,platform,call,HarnessTestMode,2
 game,platform,call,InitDebugSupport,1
 game,platform,call,InitEnvironment,1
 game,platform,call,InitTimers,1
@@ -817,7 +817,7 @@ game,presentation,call,CreateParticleLists,1
 game,presentation,call,DestroyParticleLists,1
 game,presentation,call,DisableKeyCommands,3
 game,presentation,call,DispatchOrdersPanelPageFlags,1
-game,presentation,call,DrainSimEvents,1
+game,presentation,call,DrainSimEvents,2
 game,presentation,call,DrawBattleFrame,1
 game,presentation,call,DrawFrame,1
 game,presentation,call,DrawLightBars,1
@@ -1177,7 +1177,7 @@ harness,features,shared_write,Game::playerIndex,1
 harness,files,call,HapiBank::GetIntegerItem,1
 harness,files,call,HapiBank::GetStringItem,1
 harness,files,call,HapiBank::OpenAccount,1
-harness,files,call,MakeDirectoryPath,1
+harness,files,call,MakeDirectoryPath,2
 harness,game,call,ApplySlotsToGamePlayers,1
 harness,game,call,ExecuteCommandLine,1
 harness,game,call,FreeSummaryBank,1
@@ -1229,7 +1229,7 @@ harness,pathfinding,shared_write,Game::numPlayers,1
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
-harness,platform,call,HarnessTestMode,9
+harness,platform,call,HarnessTestMode,10
 harness,platform,call,IsMemSet,1
 harness,platform,call,ModulesCheckStatics,1
 harness,platform,call,ModulesHideSwitch,1
@@ -2556,7 +2556,7 @@ platform,presentation,call,LoadGaf,2
 platform,presentation,call,LoadPcx,1
 platform,presentation,call,LoadPcxPalette,1
 platform,presentation,call,LoadSoundFile,1
-platform,presentation,call,Lock,2
+platform,presentation,call,Lock,3
 platform,presentation,call,LockScreen,1
 platform,presentation,call,MirrorObject,1
 platform,presentation,call,OpenMessageBox,1
@@ -2569,7 +2569,7 @@ platform,presentation,call,StringRef::AssignText,1
 platform,presentation,call,StringRef::MakeLower,1
 platform,presentation,call,StringRef::ReleaseRef,1
 platform,presentation,call,StripExtension,1
-platform,presentation,call,Unlock,2
+platform,presentation,call,Unlock,3
 platform,presentation,call,UnlockScreen,1
 platform,presentation,indirect,CmdBPS,1
 platform,presentation,indirect,CmdSFX,1
@@ -3218,6 +3218,7 @@ presentation,game,shared_write,Unit::flags,4
 presentation,game,shared_write,Vec3::x,4
 presentation,game,shared_write,Vec3::y,2
 presentation,game,shared_write,Vec3::z,4
+presentation,harness,call,HarnessFrameDrawn,1
 presentation,harness,call,HarnessSoundEvent,6
 presentation,harness,call,HarnessUiCancel,1
 presentation,harness,call,HarnessUiGroup,2
@@ -4760,6 +4761,7 @@ units,presentation,call,CreateObjectState,1
 units,presentation,call,CreatePlayerObjectState,1
 units,presentation,call,CycleCameraFollow,1
 units,presentation,call,CycleSelection,1
+units,presentation,call,DrainSimEvents,1
 units,presentation,call,EmitBlackSmoke,1
 units,presentation,call,EmitSmoke,1
 units,presentation,call,EmitWhiteSmoke,1

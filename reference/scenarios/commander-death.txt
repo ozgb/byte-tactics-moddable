@@ -11,3 +11,4 @@ player0.side Arm
 player1.controller ai
 player1.side Core
 order 30 0:ARMCOM:1 selfdestruct
+frames 190 220 250

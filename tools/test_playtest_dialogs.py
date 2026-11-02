@@ -5,6 +5,7 @@ Pure functions only; no game, display or Wine is run.
 
 import argparse
 import tempfile
+from types import SimpleNamespace
 from pathlib import Path
 
 import playtest
@@ -203,6 +204,41 @@ def test_collect_keeps_a_file_of_the_game_copy() -> None:
         inst.collect_traces()
         assert (run.out / "savegame/harness.sav").read_bytes() == b"written by the game"
         assert not (run.out / "savegame/absent.sav").exists()
+
+
+def dump_bytes(width: int, height: int, fill: int) -> bytes:
+    return playtest.DUMP_MAGIC + (1).to_bytes(2, "little") + width.to_bytes(2, "little") \
+        + height.to_bytes(2, "little") + bytes(6) + bytes(1024) + bytes([fill]) * (width * height)
+
+
+def test_complete_dump() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        path = Path(d) / "0.bin"
+        assert not playtest.complete_dump(path)
+        whole = dump_bytes(4, 3, 7)
+        path.write_bytes(whole[:-1])
+        assert not playtest.complete_dump(path)
+        path.write_bytes(whole)
+        assert playtest.complete_dump(path)
+        path.write_bytes(b"XXXX" + whole[4:])
+        assert not playtest.complete_dump(path)
+
+
+def test_compare_dumps() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        runs = []
+        for name, files in (("a", {"menu": 1, "game": 2, "end": 3}), ("b", {"menu": 1, "game": 9}),
+                            ("orig", {})):
+            out = Path(d) / name
+            out.mkdir()
+            for step, fill in files.items():
+                (out / f"{step}.bin").write_bytes(dump_bytes(2, 2, fill))
+            runs.append(SimpleNamespace(name=name, out=out, scenario=SimpleNamespace(name="s")))
+        same, differ, missing = playtest.compare_dump_dirs(runs[0].out, runs[1].out)
+        assert (same, differ, missing) == (["menu"], ["game"], ["end"])
+        notes = playtest.compare_dumps(runs)
+        assert list(notes) == ["b"]
+        assert notes["b"] == ["1 of 3 frame dumps identical to a; differ: game; missing: end"]
 
 
 if __name__ == "__main__":

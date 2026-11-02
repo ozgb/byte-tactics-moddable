@@ -413,7 +413,7 @@ struct BmpInfoHeader;
 
 void* __cdecl operator new(size_t size);
 SpotStateUnitView* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, Unit* owner);
-#include "../graphics/model_render.h"
+#include "object_state.h"
 
 // FUNCTION: 0x485d40
 void __stdcall InitUnitScript(Unit* self)
@@ -688,7 +688,6 @@ void __stdcall RemoveSpeechOfUnit(void* unit);
 void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
 #include "../ingame/game_dialogs.h"
 #include "unit_targets.h"
-void __stdcall FreeObjectState(void* state);
 void __cdecl operator delete(void* p);
 
 // FUNCTION: 0x4866d0
@@ -849,7 +848,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         unit->script = 0;
     }
     if (unit->state != 0) {
-        FreeObjectState(unit->state);
+        FreeObjectState((ModelState*)unit->state.get());
         unit->state = 0;
     }
     UnitMotion* head = unit->motion;

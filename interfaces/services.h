@@ -518,6 +518,9 @@ void* __stdcall BuildLensFrame(int w, int h, int lens);
 char* __stdcall StripExtension(char* name);
 // Loads the sound of a file under a name.
 int __stdcall LoadSoundByName(char* name, const char* file);
+struct ModelState;
+// Drops the pictures cached for a model state, before the state is freed.
+void __stdcall ReleaseUnitPictures(ModelState* state);
 // Builds the cache of unit pictures, sized from the screen and the memory of the machine.
 void __stdcall InitUnitPictureCache(void);
 // Frees the cache of unit pictures.

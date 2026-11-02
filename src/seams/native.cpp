@@ -16,6 +16,7 @@
 #include "../map/mission.h"
 #include "../map/spatial_bucket.h"
 #include "../game/mission_conditions.h"
+#include "../units/object_state.h"
 #include "../units/unit.h"
 #include "../ai/pathfinder.h"
 #include "../ai/ai_search_goal.h"
@@ -939,6 +940,9 @@ void InstallNativeSeams()
     s_units.StartScriptWithArgsByIndex = StartScriptWithArgsByIndexNative;
     s_units.UpdateSfxOccupy = UpdateSfxOccupyNative;
     s_units.PoseUnitModel = PoseUnitModel;
+    s_units.CreateObjectState = CreateObjectState;
+    s_units.FreeObjectState = FreeObjectState;
+    s_units.UpdateObjectState = UpdateObjectState;
     s_orders.ReattachFxToUnit = ReattachFxToUnitNative;
     s_orders.SerializeOrderToSave = SerializeOrderToSaveNative;
     s_orders.AddBeCarriedOrder = AddBeCarriedOrder;

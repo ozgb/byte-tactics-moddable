@@ -1,16 +1,11 @@
-#include "win_types.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 #include "../state/block.h"
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../link/globals.h"
 #include "../util/vec3.h"
-#include "../graphics/gaf_frame.h"
 #include "../graphics/model_types.h"
-#include "unit_def.h"
-#include "../network/player_info.h"
 #include "../graphics/memory_cache.h"
 #pragma pack(push, 1)
 #include "../game/game.h"

@@ -63,6 +63,10 @@ class SaveFileTest(unittest.TestCase):
             other[offset] = value
             self.assertEqual(len(savefile.differences(units("#0", bytes(base)), units("#0", bytes(other)))), 1, offset)
 
+    def test_the_radar_image_is_masked_whole_and_other_summary_boxes_are_not(self):
+        self.assertEqual(savefile.differences(bank("Summary", {"Radar Image": b"abcdef"}), bank("Summary", {"Radar Image": b"abXdeY"})), [])
+        self.assertEqual(len(savefile.differences(bank("Summary", {"Map": b"abc"}), bank("Summary", {"Map": b"abd"}))), 1)
+
     def test_motion_record_mask(self):
         motion = bytes(0x23)
         self.assertEqual(savefile.differences(units("u0001mob", motion), units("u0001mob", motion[:34] + b"\x48")), [])
@@ -76,7 +80,8 @@ class SaveFileTest(unittest.TestCase):
     def test_every_mask_has_a_reason_and_fits_its_box(self):
         for mask in savefile.MASKS:
             self.assertTrue(mask.why)
-            self.assertLessEqual(mask.offset + mask.length, mask.size)
+            if not mask.whole:
+                self.assertLessEqual(mask.offset + mask.length, mask.size)
             self.assertTrue(0 < mask.bits <= 0xFF)
 
     def test_the_derived_and_unset_table_fields_have_reasons(self):
@@ -87,7 +92,7 @@ class SaveFileTest(unittest.TestCase):
         table = {(m.account, m.box, m.offset, m.bits, m.length, m.after_nul) for m in savefile.MASKS}
         self.assertIn(("Players", "GameTime", 0, 0xFF, 4, False), table)
         self.assertIn(("Units", r"u[0-9a-f]{4}mob", 34, 0xF8, 1, False), table)
-        self.assertEqual(len(table), 8)
+        self.assertEqual(len(table), 9)
 
     def test_a_file_that_is_not_a_bank_is_reported(self):
         self.assertIn("does not decode", savefile.differences(b"nope", b"nope")[0])

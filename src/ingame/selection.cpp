@@ -544,6 +544,7 @@ static inline void Dummy(void) {}
 int __stdcall GetOrderCursor(unsigned char type, Unit* unit, Unit* target, int* out);
 
 #include "../units/squad.h"
+#include "../harness/harness.h"
 
 struct UnitOrderTypeView;
 struct FixedPosView;
@@ -610,10 +611,12 @@ void __stdcall IssueOrderToSelection(MouseEvent* mouse, unsigned char mode,
                         here[0] = pos[0] + u->pos.x - avg[0];
                         here[1] = pos[1];
                         here[2] = pos[2] + u->pos.z - avg[2];
+                        HarnessUiOrder(kind.index, flag_a, u, except, here, typeId, amount);
                         IssueOrCancelOrder(kind, flag_a, u, except, here, typeId, amount);
                         continue;
                     }
                 }
+                HarnessUiOrder(kind.index, flag_a, u, except, pos, typeId, amount);
                 IssueOrCancelOrder(kind, flag_a, u, except, pos, typeId, amount);
             }
         }
@@ -836,6 +839,7 @@ void __stdcall CreateSquad(int param_1)
             }
         }
     }
+    HarnessUiGroup("group", param_1);
 }
 
 static inline int TestBit(UnitTypeSet* set, unsigned short n)
@@ -846,6 +850,7 @@ static inline int TestBit(UnitTypeSet* set, unsigned short n)
 // FUNCTION: 0x48d9a0
 bool __stdcall SelectSquad(int id, int param_2)
 {
+    HarnessUiGroup("groupsel", id);
     UnitTypeSet* setA = GetCategoryMask("CTRL_F");
     int cnt = 0;
     Player* player = &g_game->players[g_game->localPlayer];

@@ -11,6 +11,7 @@
 #include "../game/game.h"
 #include "../map/mission.h"
 #include "../orders/order_type_entry.h"
+#include "../units/unit.h"
 #include "../network/player_info.h"
 #include "../game/game_load.h"
 #include "condition_class.h"
@@ -84,6 +85,9 @@ static FILE* s_trace = NULL;
 static FILE* s_dump = NULL;
 static FILE* s_sound = nullptr;
 static char s_soundBuffer[4096];
+static FILE* s_ui = nullptr;
+static char s_uiBuffer[4096];
+static int s_uiMute = 0;
 static unsigned s_dumpTick = 0;
 static char s_scenarioQuirks[512];
 static Quirks s_scenarioQuirkSet;
@@ -625,6 +629,8 @@ static void CheckInputs()
         FailLine(s_inputs[0].lineNo, "needs steps_per_frame 1", "input", ", the UI takes its events once per frame");
 }
 
+static void UiLogInput(const ScriptedInput* in);
+
 static void DeliverScriptedInput(const ScriptedInput* in)
 {
     host_event ev;
@@ -641,6 +647,7 @@ static void DeliverScriptedInput(const ScriptedInput* in)
             s_altHeld = in->type == HOST_EVENT_KEY_DOWN;
     }
     host_inject_event(&ev);
+    UiLogInput(in);
 }
 
 static void CheckConsoles()
@@ -1401,6 +1408,8 @@ void HarnessStartSkirmish()
     g_game->gui.hotGadgetIndex = -1;
 }
 
+static void UiEndOfTick();
+
 void HarnessAfterStep()
 {
     if (HarnessTestMode() && s_blockScan)
@@ -1424,6 +1433,7 @@ void HarnessAfterStep()
     if (!HarnessTestMode())
         return;
     ModulesCheckStatics((unsigned)g_game->ticks);
+    UiEndOfTick();
     int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0;
     if (!gameOver && (unsigned)g_game->ticks < s_ticks)
         return;
@@ -1434,6 +1444,9 @@ void HarnessAfterStep()
         fclose(s_dump);
     if (s_sound != nullptr)
         fclose(s_sound);
+    if (s_ui != nullptr)
+        fclose(s_ui);
+    s_ui = nullptr;
     s_trace = NULL;
     s_dump = NULL;
     s_sound = nullptr;
@@ -3610,10 +3623,12 @@ void HarnessBeforeStep()
         if (s_spawns[i].tick == tick)
             IssueScriptedSpawn(&s_spawns[i]);
     }
+    s_uiMute = 1;
     for (int i = 0; i < s_orderCount; i++) {
         if (s_orders[i].tick == tick)
             IssueScriptedOrder(&s_orders[i]);
     }
+    s_uiMute = 0;
     for (int i = 0; i < s_consoleCount; i++) {
         if (s_consoles[i].tick == tick)
             RunScriptedConsole(&s_consoles[i]);
@@ -3621,6 +3636,169 @@ void HarnessBeforeStep()
     for (int i = 0; i < s_inputCount; i++) {
         if (s_inputs[i].tick == tick)
             DeliverScriptedInput(&s_inputs[i]);
+    }
+}
+
+enum { UI_SELECTION_TEXT = 32768 };
+static char s_uiSelection[UI_SELECTION_TEXT];
+static int s_uiScrollX = -1;
+static int s_uiScrollZ = -1;
+static int s_uiScrollSeen = 0;
+
+static unsigned UiUnitIndex(const Unit* u)
+{
+    return (unsigned)(((const unsigned char*)u - (const unsigned char*)GameRef(GAME_UNITS)) / UNIT_STRIDE);
+}
+
+static int UiLive()
+{
+    return HarnessTestMode() && s_ui != nullptr && !s_uiMute;
+}
+
+static void UiLineStart(const char* what)
+{
+    fprintf(s_ui, "%u %s", GameU32(GAME_TICK), what);
+}
+
+static const char* UiOrderName(unsigned char kind)
+{
+    const char* name = g_missionOrderTableVec[kind].name;
+    return name != nullptr && name[0] != '\0' ? name : "-";
+}
+
+static int UiKindTakesUnitType(const char* name)
+{
+    return _stricmp(name, "MOBILEBUILD") == 0 || _stricmp(name, "VTOL_MOBILEBUILD") == 0 || _stricmp(name, "BUILDINGBUILD") == 0;
+}
+
+static void UiUnitType(unsigned short defIndex)
+{
+    const char* name = nullptr;
+    if (defIndex != 0 && defIndex < GameU32(GAME_DEF_COUNT))
+        name = (const char*)GameRef(GAME_DEFS) + defIndex * UNITDEF_STRIDE + UNITDEF_NAME;
+    fprintf(s_ui, " %s", name != nullptr ? name : "-");
+}
+
+void __stdcall HarnessUiOrder(unsigned char kind, int remove, const Unit* unit, const Unit* target, const int* pos, int typeId, int amount)
+{
+    if (!UiLive())
+        return;
+    const char* name = UiOrderName(kind);
+    UiLineStart("order");
+    fprintf(s_ui, " %s unit %u target ", name, UiUnitIndex(unit));
+    if (target != nullptr)
+        fprintf(s_ui, "%u", UiUnitIndex(target));
+    else
+        fprintf(s_ui, "-");
+    if (pos != nullptr)
+        fprintf(s_ui, " pos %d %d %d", pos[0] >> 16, pos[1] >> 16, pos[2] >> 16);
+    else
+        fprintf(s_ui, " pos -");
+    fprintf(s_ui, " type");
+    if (UiKindTakesUnitType(name))
+        UiUnitType((unsigned short)typeId);
+    else
+        fprintf(s_ui, " -");
+    if (UiKindTakesUnitType(name))
+        fprintf(s_ui, " param -");
+    else
+        fprintf(s_ui, " param %d", typeId);
+    fprintf(s_ui, " amount %d remove %d\n", amount, remove != 0);
+}
+
+void __stdcall HarnessUiQueue(const char* name, const Unit* unit, int count)
+{
+    if (!UiLive())
+        return;
+    UiLineStart("qbuild");
+    fprintf(s_ui, " %u %s %d\n", UiUnitIndex(unit), name, count);
+}
+
+void __stdcall HarnessUiCancel(unsigned char kind, const Unit* unit)
+{
+    if (!UiLive())
+        return;
+    UiLineStart("cancel");
+    fprintf(s_ui, " %s unit %u\n", UiOrderName(kind), UiUnitIndex(unit));
+}
+
+static void UiListUnits(int group, int selectedOnly)
+{
+    Player* player = &g_game->players[g_game->localPlayer];
+    int any = 0;
+    for (Unit* u = player->unitsBegin; u <= player->unitsEnd; u++) {
+        if (u->unitDefIndex == 0 || (selectedOnly ? !u->selected : u->group != group))
+            continue;
+        fprintf(s_ui, "%s%u", any ? "," : " ", UiUnitIndex(u));
+        any = 1;
+    }
+    if (!any)
+        fprintf(s_ui, " -");
+    fprintf(s_ui, "\n");
+}
+
+void __stdcall HarnessUiGroup(const char* what, int group)
+{
+    if (!UiLive())
+        return;
+    UiLineStart(what);
+    fprintf(s_ui, " %d", group);
+    UiListUnits(group, 0);
+}
+
+static void UiLogInput(const ScriptedInput* in)
+{
+    if (s_ui == nullptr)
+        return;
+    UiLineStart("input");
+    switch (in->type) {
+    case HOST_EVENT_KEY_DOWN:
+    case HOST_EVENT_KEY_UP:
+        fprintf(s_ui, " key %s %u\n", in->type == HOST_EVENT_KEY_DOWN ? "down" : "up", in->a);
+        break;
+    case HOST_EVENT_CHAR:
+        fprintf(s_ui, " char %u\n", in->a);
+        break;
+    case HOST_EVENT_MOUSE_MOVE:
+        fprintf(s_ui, " mouse move %d %d\n", in->x, in->y);
+        break;
+    default: {
+        int left = in->type == HOST_EVENT_LBUTTON_DOWN || in->type == HOST_EVENT_LBUTTON_UP;
+        int down = in->type == HOST_EVENT_LBUTTON_DOWN || in->type == HOST_EVENT_RBUTTON_DOWN;
+        fprintf(s_ui, " mouse %s %s %d %d\n", left ? "left" : "right", down ? "down" : "up", in->x, in->y);
+        break;
+    }
+    }
+}
+
+static void UiEndOfTick()
+{
+    if (s_ui == nullptr)
+        return;
+    if (!s_uiScrollSeen || g_game->scrollX != s_uiScrollX || g_game->scrollY != s_uiScrollZ) {
+        s_uiScrollSeen = 1;
+        s_uiScrollX = g_game->scrollX;
+        s_uiScrollZ = g_game->scrollY;
+        UiLineStart("scroll");
+        fprintf(s_ui, " %d %d\n", s_uiScrollX, s_uiScrollZ);
+    }
+    static char selection[UI_SELECTION_TEXT];
+    size_t length = 0;
+    selection[0] = '\0';
+    Player* player = &g_game->players[g_game->localPlayer];
+    for (Unit* u = player->unitsBegin; u <= player->unitsEnd; u++) {
+        if (u->unitDefIndex == 0 || !u->selected)
+            continue;
+        if (length + 16 >= UI_SELECTION_TEXT)
+            Fail("testmode: the selection is too long for ui.txt\n");
+        length += sprintf(selection + length, "%s%u", length != 0 ? "," : "", UiUnitIndex(u));
+    }
+    if (length == 0)
+        strcpy(selection, "-");
+    if (strcmp(selection, s_uiSelection) != 0) {
+        strcpy(s_uiSelection, selection);
+        UiLineStart("select");
+        fprintf(s_ui, " %s\n", selection);
     }
 }
 
@@ -3694,6 +3872,8 @@ void HarnessPhase(int phase)
         fflush(s_trace);
         if (s_sound != nullptr)
             fflush(s_sound);
+        if (s_ui != nullptr)
+            fflush(s_ui);
         if (s_dumpNow)
             fflush(s_dump);
     }
@@ -3734,6 +3914,11 @@ static void OpenTrace(unsigned controlWord)
         Fail("testmode: cannot write sound.txt\n");
     setvbuf(s_sound, s_soundBuffer, _IOFBF, sizeof s_soundBuffer);
     fprintf(s_sound, "bt-sound 1\n");
+    s_ui = fopen("ui.txt", "wb");
+    if (s_ui == nullptr)
+        Fail("testmode: cannot write ui.txt\n");
+    setvbuf(s_ui, s_uiBuffer, _IOFBF, sizeof s_uiBuffer);
+    fprintf(s_ui, "bt-ui 1\n");
     fprintf(s_trace, "bt-trace %d\ncommit %s\nscenario %s\ngame_seed %u\ncrt_seed %u\nview_seed %u\n"
                      "fpu_control_word 0x%05X\n",
             TRACE_FORMAT, commit, s_scenarioPath, s_gameSeed, s_crtSeed, s_viewSeed, controlWord);

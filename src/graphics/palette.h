@@ -32,7 +32,6 @@ unsigned int* __stdcall BuildAlphaTable(unsigned char* data);
 unsigned char* __stdcall BuildLightTable(tagPALETTEENTRY* palette);
 unsigned char* __stdcall BuildShadeTable(tagPALETTEENTRY* palette);
 char* __stdcall ChangeExtension(char* a, char* b, char* c);
-char* __stdcall StripExtension(char* name);
 char* __stdcall StripFileName(char* path);
 char* __stdcall StripPath(char* path);
 

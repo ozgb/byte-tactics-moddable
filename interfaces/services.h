@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 3
+#define SERVICES_VERSION_MINOR 4
 
 // Returns a random number in [0, range) from the main stream of the game logic.
 int __stdcall RandomInt(int range);
@@ -475,5 +475,48 @@ public:
     // Sets the index of the current record.
     void SetCurrentRecord(int val);
 };
+
+struct Handle;
+struct GafEntry;
+struct GafFrame;
+struct FrameTable;
+struct GafArchive;
+struct Object3do;
+struct CobScriptHeader;
+
+// Returns the frame at an index of a GAF frame table.
+GafFrame* __stdcall GetGafFrame(FrameTable* table, int index);
+// Returns the current frame of a GAF sequence player.
+GafFrame* __stdcall GetGafSequenceFrame(Handle* player);
+// Starts a GAF sequence player on a GAF entry, at a frame index.
+void __stdcall InitGafSequence(Handle* player, GafEntry* entry, int index);
+// Steps a GAF sequence player to its next frame and returns nonzero when it wrapped.
+int __stdcall StepGafSequence(Handle* player);
+// Returns the entry of a GAF file with a name, or null when there is none.
+GafEntry* __stdcall FindGafEntry(GafArchive* gaf, const char* name);
+// Loads a GAF file by path.
+GafArchive* __stdcall LoadGaf(const char* path);
+// Loads a 3DO model by path.
+void* __stdcall Load3do(char* path);
+// Mirrors the pieces of a 3DO model.
+void __stdcall MirrorObject(Object3do* model);
+// Binds the textures of a named model to its pieces.
+void __stdcall BindModelTextures(Object3do* model, const char* name);
+// Returns the height of a 3DO model.
+int __stdcall GetObjectHeight(Object3do* model);
+// Loads a COB script by path.
+CobScriptHeader* __stdcall LoadCobScript(char* path);
+// Frees a COB script.
+void __stdcall FreeCobScript(CobScriptHeader* script);
+// Returns the checksum of a COB script.
+int __stdcall GetCobChecksum(CobScriptHeader* script);
+// Allocates a blank picture frame with a name.
+GafFrame* __stdcall AllocFrame(const char* name, int width, int height);
+// Builds the picture of a lens flare.
+void* __stdcall BuildLensFrame(int w, int h, int lens);
+// Cuts the extension off a file name in place and returns the name.
+char* __stdcall StripExtension(char* name);
+// Loads the sound of a file under a name.
+int __stdcall LoadSoundByName(char* name, const char* file);
 
 #endif

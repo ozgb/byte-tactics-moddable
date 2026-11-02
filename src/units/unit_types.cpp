@@ -72,7 +72,6 @@ void __stdcall SortUnitTypes(void* start, void* end, void* cmp, int param);
 #include "../graphics/pcx.h"
 void __stdcall MirrorObject(void* obj);
 int __stdcall GetObjectHeight(void* obj);
-void* __stdcall LoadCobScript(char* path);
 #include "../graphics/palette.h"
 void __stdcall BindModelTextures(void* obj, char* name);
 

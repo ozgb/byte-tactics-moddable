@@ -147,7 +147,6 @@ JoinLobbyGameThread,mismatch,"static risk rule: a convention, parameter count, o
 JoinNetGame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 LeaveNetGameCallback,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 LoadBitmapByName,mismatch,fixing it changes the generated code of a caller
-LoadCobScript,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 LoadGaf,mismatch,pointer/int cast: definition's type is likely wrong
 LoadPcx,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 LoadPictureCached,mismatch,fixing it changes the generated code of a caller

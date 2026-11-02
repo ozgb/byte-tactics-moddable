@@ -322,6 +322,14 @@ input 40 char a
   480 window, so a unit at world `x z` and height `y` is at screen `x - scrollX + 128`, `z - scrollY - y / 2 + 32`.
   The scroll of slot 0 on The Pass is (304, 32) until the camera moves.
 
+In test mode the exe also writes `ui.txt` beside `trace.txt`: the input it delivered, the orders the UI turned it
+into, and the selection after each tick (format and meaning in [docs/ui-log.md](../docs/ui-log.md)). The harness's own
+`order` lines are not logged. `--check` compares each run's `ui.txt` line by line with `reference/ui/<scenario>.txt`
+and reports the first line that differs. It fails when a stored log has no scenario, when a `ui-*` scenario has no
+stored log, and when a `ui-*` scenario's log has no order, queued build, cancel or group line and selects no unit (a
+click that gives nothing is a broken scenario). A scenario with no stored log is only counted. `--traces` copies the
+logs the reference branch wrote into `reference/ui/`.
+
 ## Console commands
 
 A scenario can type a console command, as the chat line does. One `console` line per command:

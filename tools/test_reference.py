@@ -64,6 +64,68 @@ class SoundLogTest(unittest.TestCase):
         self.assertEqual(differing, ["a"])
 
 
+class UiLogTest(unittest.TestCase):
+    LOG = "bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n22 select 1\n"
+
+    def report(self, files: dict[str, str], scenarios: list[str], logs: dict[str, str | None], known: set[str] | None = None):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "ui"
+            directory.mkdir()
+            for name, text in files.items():
+                (directory / f"{name}.txt").write_text(text)
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                return reference.ui_report({n: Path(n) for n in scenarios}, logs, directory, set(scenarios) if known is None else known)
+
+    def test_equal_logs(self):
+        self.assertIsNone(reference.ui_difference(self.LOG, self.LOG))
+
+    def test_first_differing_line_is_named(self):
+        got = self.LOG.replace("select 1", "select 2")
+        self.assertEqual(reference.ui_difference(self.LOG, got), "ui line 5: stored `22 select 1`, got `22 select 2`")
+
+    def test_a_longer_log_differs_at_the_extra_line(self):
+        self.assertIn("ui line 6: only the got log has it", reference.ui_difference(self.LOG, self.LOG + "23 order Stop unit 1\n"))
+        self.assertIn("ui line 5: only the stored log has it", reference.ui_difference(self.LOG, "bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n"))
+
+    def test_a_log_that_orders_or_selects_nothing_gives_nothing(self):
+        self.assertTrue(reference.ui_gives_nothing("bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n"))
+        self.assertFalse(reference.ui_gives_nothing(self.LOG))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 order Stop unit 1 target - pos - type - param 0 amount 0 remove 0\n"))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 qbuild 2 ARMPW 1\n"))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 group 1 2,3\n"))
+
+    def test_report_counts_unstored_logs_and_fails_on_stored_ones(self):
+        differing, lines = self.report({"same": self.LOG, "other": self.LOG}, ["same", "other", "none"],
+                                       {"same": self.LOG, "other": self.LOG + "x\n", "none": self.LOG})
+        self.assertEqual(differing, ["other"])
+        self.assertIn("1 of 3 equal, 1 differ, 1 with no stored log", lines[-1])
+
+    def test_a_run_with_no_ui_log_differs_from_a_stored_one(self):
+        differing, _ = self.report({"a": self.LOG}, ["a"], {"a": None})
+        self.assertEqual(differing, ["a"])
+
+    def test_a_ui_scenario_needs_a_stored_log(self):
+        differing, lines = self.report({}, ["ui-click"], {"ui-click": self.LOG})
+        self.assertEqual(differing, ["ui-click"])
+        self.assertIn("has no stored UI log", lines[0])
+
+    def test_a_ui_scenario_whose_input_gives_nothing_fails_though_equal(self):
+        log = "bt-ui 1\n1 select -\n20 input mouse left down 384 240\n"
+        differing, lines = self.report({"ui-click": log}, ["ui-click"], {"ui-click": log})
+        self.assertEqual(differing, ["ui-click"])
+        self.assertIn("the input gives no order and selects no unit", lines[0])
+        self.assertEqual(self.report({"other": log}, ["other"], {"other": log})[0], [])
+
+    def test_a_stored_log_with_no_scenario_fails(self):
+        differing, lines = self.report({"a": self.LOG, "gone": self.LOG}, ["a"], {"a": self.LOG}, {"a"})
+        self.assertEqual(differing, ["gone"])
+        self.assertIn("DIFF gone stored UI log has no scenario", lines[0])
+
+    def test_a_subset_does_not_flag_logs_of_scenarios_left_out(self):
+        differing, _ = self.report({"a": self.LOG, "b": self.LOG}, ["a"], {"a": self.LOG}, {"a", "b"})
+        self.assertEqual(differing, [])
+
+
 class SaveReportTest(unittest.TestCase):
     @staticmethod
     def bank(box: bytes) -> bytes:

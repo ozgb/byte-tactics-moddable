@@ -56,6 +56,9 @@ jobs:
       - name: Test the rename tool
         run: python3 tools/test_rename.py
 
+      - name: Test the full-suite cadence tool
+        run: python3 tools/test_fullgate.py
+
       - name: Data notes cite no line numbers
         run: |
           python3 tools/test_citecheck.py

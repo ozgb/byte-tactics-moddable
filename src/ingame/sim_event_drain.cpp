@@ -188,6 +188,15 @@ static void DrainGuiChanged(const SimEvent& e)
         MarkChanged(&g_game->gui);
 }
 
+static void DrainBuildQueueSound(const SimEvent& e)
+{
+    if (e.args[0] != g_game->playerIndex)
+        return;
+    static char addSound[] = "addbuild";
+    static char subSound[] = "subbuild";
+    PlaySoundByName((int)e.args[1] > 0 ? addSound : subSound, 0);
+}
+
 void DrainSimEvents()
 {
     SimEventQueue& q = SimEvents();
@@ -260,6 +269,9 @@ void DrainSimEvents()
             break;
         case SIM_EVENT_GUI_CHANGED_IF_SCREEN:
             DrainGuiChanged(e);
+            break;
+        case SIM_EVENT_BUILD_QUEUE_SOUND:
+            DrainBuildQueueSound(e);
             break;
         case SIM_EVENT_FOCUS_COMMANDER:
             FocusCommander((int)e.args[0]);

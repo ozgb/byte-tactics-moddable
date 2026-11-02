@@ -3276,7 +3276,7 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
         for (i = 0; i < count; i++) {
             unsigned char* u = PoolUnit(i);
             if (selected[i] != 0 && (u[UNIT_FLAGS] & UNIT_SELECTED))
-                QueueBuildOrder((char*)o->buildType, (Unit*)u, o->argument);
+                QueueBuildOrderWithSound((char*)o->buildType, (Unit*)u, o->argument);
         }
     } else if (o->kind == ORDER_SELFDESTRUCT) {
         MissionType order(s_orderModes[o->kind].mission);

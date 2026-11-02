@@ -953,6 +953,7 @@ void InstallNativeSeams()
     s_orders.LoadOrder = LoadOrderNative;
     s_orders.MissionTypeFromName = MissionTypeFromNameNative;
     s_orders.NewOrder = NewOrderNative;
+    s_orders.QueueBuildOrder = QueueBuildOrder;
     s_orders.LoadMotion = LoadMotionNative;
     s_orders.SaveMotion = SaveMotionNative;
     s_orders.UpdateMotion = UpdateMotionNative;

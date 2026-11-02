@@ -14,7 +14,7 @@ int __stdcall MenuEntryNameContains(Gadget* entries, char* text, int index);
 void __stdcall SetBuildCountText(Gui* obj, unsigned short index, int n);
 void __stdcall RefreshBuildCountTexts(Gui* menu, Unit* unit);
 void __stdcall UpdateOnOffButton(Unit* unit);
-void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
+void __stdcall QueueBuildOrderWithSound(char* name, Unit* unit, int count);
 void __stdcall SetOrderIntent(unsigned char mode);
 void __stdcall RefreshOrderButtons(Unit* unit);
 int __stdcall HandleOrdersPanelClick(Gui* menu, Gadget* entries);

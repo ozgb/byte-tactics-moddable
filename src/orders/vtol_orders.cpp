@@ -144,7 +144,7 @@ void __stdcall DrawUnit(void*, Unit*);
 void WriteScreenshot(char*, char*, int, int, int, int);
 void SubtractVec3(int*, int*, int*, int*, int*);
 int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
-void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount);
+#include "order_list.h"
 
 static inline Vec3 Direction(short angle, int range)
 {

@@ -706,6 +706,21 @@ void __stdcall IssueOrCancelOrder(unsigned char kind, int remove, Unit* owner, i
     AddOrder(MissionType(kind), remove, owner, (Unit*)id, (Vec3*)pos, param_6, param_7);
 }
 
+// FUNCTION: 0x419b00
+void __stdcall QueueBuildOrder(char* name, Unit* unit, int count)
+{
+    if (strstr(name, "MAKENUKE") != 0 || strstr(name, "MAKEANTI") != 0) {
+        AdjustBuildCount(MissionType("BUILDWEAPON").index, unit, 0, count);
+        return;
+    }
+    unsigned short id = g_seams.units->FindUnitTypeId(name);
+    if (id == 0)
+        return;
+    int mobile = (int)unit->motion.get();
+    const char* kind = mobile ? "MOBILEBUILD" : "BUILDINGBUILD";
+    AdjustBuildCount(MissionType(kind).index, unit, id, count);
+}
+
 // FUNCTION: 0x43b0b0
 void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
 {

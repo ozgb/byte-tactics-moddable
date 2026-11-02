@@ -131,6 +131,8 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_PLAYER_TOOK_LEAD = 21,
     // A player has no units left in a game with leaving players: the player's network id.
     SIM_EVENT_PLAYER_LEFT = 22,
+    // A build count changed: the player index of the unit and the change, the sound plays when that player is the one shown.
+    SIM_EVENT_BUILD_QUEUE_SOUND = 23,
 };
 // Flag of SIM_EVENT_UNIT_SPEECH: the unit stays silent when it is on screen.
 #define SIM_EVENT_SPEECH_IF_NOT_VISIBLE 1u

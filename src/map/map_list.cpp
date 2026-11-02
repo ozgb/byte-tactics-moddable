@@ -29,7 +29,6 @@ class StringRef;
 #include "../graphics/palette.h"
 
 #include "../util/registry.h"
-int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, int def);
 
 
 #include "map_list.h"
@@ -43,9 +42,7 @@ void RegisterUnitOrders();
 #include "meteors.h"
 
 #include "../game/data_files.h"
-void __stdcall ShowErrorBox(const char* text, const char* caption);
 #include "../util/tdf.h"
-int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, char* def);
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall SetCursorMode(int n);
 #include "../network/net_game.h"
@@ -66,6 +63,7 @@ int RIReport(int, int, int, int, int, int, int, int, int, int);
 #include "../util/vec3.h"
 
 #include "../../interfaces/services.h"
+#include "../../interfaces/host.h"
 #include "../state/sim_globals.h"
 
 struct TntFileHeader {
@@ -663,7 +661,7 @@ int Mission::LoadMission(char* map)
     killMul = GetFloat(parser.current, "killmul");
     timeMul = GetFloat(parser.current, "timemul");
     if (!SelectSchema(type, &parser, schema)) {
-        ShowErrorBox("No suitable schema type in mission file!", "Map error");
+        host_message(NULL, "Error", "No suitable schema type in mission file!", HOST_MESSAGE_TOPMOST);
         return 0;
     }
     startMetal[0] = (float)parser.current->GetFieldInt("HumanMetal", 0);

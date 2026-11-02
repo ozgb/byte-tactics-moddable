@@ -359,6 +359,7 @@ src/map/line_of_sight.cpp,src/graphics/gaf.h,#392
 src/map/line_of_sight.cpp,src/graphics/gaf_frame.h,#392
 src/map/line_of_sight.cpp,src/graphics/object_pool.h,#392
 src/map/line_of_sight.cpp,src/graphics/rect.h,#392
+src/map/map_list.cpp,interfaces/host.h,#392
 src/map/map_list.cpp,src/frontend/map_enum.h,#392
 src/map/map_list.cpp,src/graphics/display.h,#392
 src/map/map_list.cpp,src/graphics/object_pool.h,#392
@@ -431,6 +432,7 @@ src/units/unit_scripts.cpp,src/sound/sound.h,#392
 src/units/unit_targets.cpp,interfaces/host.h,#392
 src/units/unit_targets.cpp,src/graphics/display.h,#392
 src/units/unit_targets.cpp,src/ingame/game_dialogs.h,#392
+src/units/unit_types.cpp,interfaces/host.h,#392
 src/units/unit_types.cpp,src/graphics/display.h,#392
 src/units/unit_types.cpp,src/graphics/memory_cache.h,#392
 src/units/unit_types.cpp,src/graphics/object_pool.h,#392

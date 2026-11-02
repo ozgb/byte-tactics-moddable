@@ -1,5 +1,5 @@
 subsystem,function,file,functions,functions_entered,lines,lines_hit,branches,branches_covered,decorated,dead,reason
-ai,*,,103,92,1219,1083,694,576,,33,
+ai,*,,102,91,1214,1078,694,576,,33,
 ai,??G@YG?AUMovableVec3@@ABU0@0@Z,src/ai/ai_player.cpp,0,0,0,0,0,0,??G@YG?AUMovableVec3@@ABU0@0@Z,1,
 ai,AIProfileParser::AIProfileParser,src/ai/ai_profile.cpp,0,0,0,0,0,0,??0AIProfileParser@@QAE@XZ,1,
 ai,AIProfileParser::NextToken,src/ai/ai_profile.cpp,0,0,0,0,0,0,?NextToken@AIProfileParser@@QAEHXZ,1,
@@ -123,7 +123,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,216,143,4561,2402,1754,568,,23,
+game,*,,220,147,4580,2421,1754,568,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -279,7 +279,7 @@ map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?Resiz
 map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
 map,VisitObjectsInRect,src/map/terrain.cpp,0,0,0,0,0,0,?VisitObjectsInRect@@YGXHHHHPAVUnitVisitor@@@Z,1,
-network,*,,298,54,5419,590,2570,99,,74,
+network,*,,297,54,5396,590,2564,99,,74,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,
 network,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,src/network/unit_sync.cpp,1,0,0,0,0,0,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,0,menu
 network,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,1,
@@ -338,7 +338,6 @@ network,CountPacket,src/network/net_stats.cpp,1,0,0,0,0,0,?CountPacket@@YGXHHH@Z
 network,CountRemotePlayers,src/network/net_game.cpp,0,0,0,0,0,0,?CountRemotePlayers@@YGHXZ,1,
 network,CreateLocalPlayer,src/network/net_game.cpp,1,0,0,0,0,0,?CreateLocalPlayer@@YGHEH@Z,0,menu
 network,CreateNetGame,src/network/net_game.cpp,1,0,0,0,0,0,?CreateNetGame@@YGXXZ,0,network
-network,CreateUnitFromPacket,src/units/units.cpp,1,0,0,0,0,0,?CreateUnitFromPacket@@YGPAUUnit@@EPAUUnitSpawnPacket@@@Z,0,network
 network,CreateUnitSync,src/network/unit_sync.cpp,1,0,0,0,0,0,?CreateUnitSync@@YGXH@Z,0,menu
 network,CycleMessageUnits,src/network/net_chat.cpp,1,0,0,0,0,0,?CycleMessageUnits@@YGXXZ,0,input
 network,DefaultPacketHandler,src/network/net_game.cpp,1,0,0,0,0,0,?DefaultPacketHandler@@YGHH@Z,0,network
@@ -598,7 +597,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,366,304,6419,5099,3188,1964,,24,
+orders,*,,366,304,6418,5098,3188,1964,,24,
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,AiSearchGoal::HasNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,network
 orders,AiSearchGoal::SerializeNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,network
@@ -685,11 +684,10 @@ orders,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,1,0,0,0,0,0,?VtolGetRepai
 orders,WaitForAttackOrder,src/orders/unit_orders.cpp,1,0,0,0,0,0,?WaitForAttackOrder@@YGHHPAUOrder@@H@Z,0,campaign-script
 orders,Whole,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?Whole@@YGFABH@Z,1,
 orders,WriteUnitTypeNameKey,src/orders/order_list.cpp,0,0,0,0,0,0,?WriteUnitTypeNameKey@@YGXPAVHapiBank@@G@Z,1,
-pathfinding,*,,48,45,760,702,294,256,,10,
+pathfinding,*,,47,44,759,701,294,256,,9,
 pathfinding,CopyDwordPair,src/ai/pathfind.cpp,0,0,0,0,0,0,?CopyDwordPair@@YGXPAH0@Z,1,
 pathfinding,CopyOneByte,src/ai/pathfind.cpp,0,0,0,0,0,0,?CopyOneByte@@YGXPAD0@Z,1,
 pathfinding,DirectionFromStep,src/ai/pathfind.cpp,0,0,0,0,0,0,?DirectionFromStep@@YGHHH@Z,1,
-pathfinding,HeapEntry::HeapEntry,src/ai/pathfind.cpp,0,0,0,0,0,0,??0HeapEntry@@QAE@XZ,1,
 pathfinding,OpenHeap::Pop,src/ai/pathfinder.h,0,0,0,0,0,0,?Pop@OpenHeap@@QAEXXZ,1,
 pathfinding,OpenHeap::SiftDownInline,src/ai/pathfinder.h,1,0,0,0,0,0,?SiftDownInline@OpenHeap@@QAEXH@Z,0,unreachable
 pathfinding,Pathfinder::Estimate,src/ai/pathfind.cpp,0,0,0,0,0,0,?Estimate@Pathfinder@@QAE_JHH@Z,1,
@@ -699,7 +697,7 @@ pathfinding,Pathfinder::MarkGoalCell,src/ai/pathfind.cpp,0,0,0,0,0,0,?MarkGoalCe
 pathfinding,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,0,0,0,0,0,0,?ReleaseHeldPathLock@Pathfinder@@QAEXXZ,1,
 pathfinding,Pathfinder::RemoveNode,src/ai/pathfind.cpp,1,0,0,0,0,0,?RemoveNode@Pathfinder@@QAEXH@Z,0,unreachable
 pathfinding,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,1,0,0,0,0,0,??1Pathfinder@@QAE@XZ,0,shutdown
-platform,*,,726,383,8056,3132,3164,801,,83,
+platform,*,,726,383,8032,3110,3154,793,,85,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,
@@ -926,6 +924,7 @@ platform,HeadlessSoundWavStop,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessS
 platform,HeadlessWindowClose,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessWindowClose@@YGXXZ,0,
 platform,HeadlessWindowHasFocus,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessWindowHasFocus@@YGHXZ,0,
 platform,HeadlessWindowPost,src/host/win32/headless.cpp,1,0,0,0,0,0,?HeadlessWindowPost@@YGXI@Z,0,
+platform,HeapEntry::HeapEntry,interfaces/services.h,0,0,0,0,0,0,??0HeapEntry@@QAE@XZ,1,
 platform,ImageHelpEnabled,src/host/win32/crash.cpp,1,0,0,0,0,0,?ImageHelpEnabled@@YGDXZ,0,
 platform,ImageHlpAtexitHandler,src/host/win32/crash.cpp,0,0,0,0,0,0,?ImageHlpAtexitHandler@@YGXXZ,1,
 platform,ImportError,src/wasm/wind_meteors_glue.cpp,1,0,0,0,0,0,?ImportError@?A0x@@YGPBDPBD0@Z,0,
@@ -968,6 +967,7 @@ platform,QueueMouse,src/host/win32/window.cpp,1,0,0,0,0,0,?QueueMouse@?A0x@@YGXI
 platform,QuitApp,src/graphics/display.cpp,1,0,0,0,0,0,?QuitApp@@YGXPAD@Z,0,
 platform,ReallocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?ReallocDebugBlock@@YAPAXPAXIH@Z,0,
 platform,RecordFatal,src/wasm/wind_meteors_glue.cpp,1,0,0,0,0,0,?RecordFatal@?A0x@@YGPBDPBD@Z,0,
+platform,RegisterCommand,src/util/commands.cpp,0,0,0,0,0,0,?RegisterCommand@@YGXPBDP6GXPAX@ZH@Z,1,
 platform,ReleaseAll,src/host/win32/sound.cpp,1,0,0,0,0,0,?ReleaseAll@?A0x@@YGXXZ,0,
 platform,ReleaseDirectDraw,src/host/win32/display.cpp,1,0,0,0,0,0,?ReleaseDirectDraw@?A0x@@YGXXZ,0,
 platform,ReleasePair,src/util/tdf.cpp,0,0,0,0,0,0,?ReleasePair@@YGXPAD@Z,1,
@@ -2164,7 +2164,7 @@ presentation,YesNoDialogHandler,src/gui/dialogs.cpp,0,0,0,0,0,0,?YesNoDialogHand
 presentation,clear_screen,src/graphics/surface.cpp,1,0,0,0,0,0,?clear_screen@@YGXPAUDisplay@@H@Z,0,
 presentation,color_taken,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?color_taken@@YGHH@Z,0,
 presentation,entry_at,src/gui/gui.cpp,1,0,0,0,0,0,?entry_at@@YGPAUGadget@@PAUGui@@H@Z,0,
-seams,*,,109,99,688,658,0,0,,0,
+seams,*,,109,99,690,660,0,0,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YIHPAVMission@@@Z,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YIHPAVMission@@@Z,0,
 seams,DestroyPathfinderNative,src/seams/native.cpp,1,0,0,0,0,0,?DestroyPathfinderNative@@YGXPAVPathfinder@@@Z,0,
@@ -2314,7 +2314,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,10,10,131,126,76,56,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,165,133,4052,3452,1672,1200,,32,
+units,*,,166,133,4075,3452,1678,1200,,32,
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0,unused-slot
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
@@ -2338,6 +2338,7 @@ units,CobScript::SetUnitValue,src/units/cob.cpp,1,0,0,0,0,0,?SetUnitValue@CobScr
 units,CobScript::StartScriptByIndex,src/units/cob.cpp,0,0,0,0,0,0,?StartScriptByIndex@CobScript@@QAEHHPAUCallback@@H@Z,1,
 units,CobScript::StartThreadByName,src/units/cob.cpp,0,0,0,0,0,0,?StartThreadByName@CobScript@@QAEHPBD@Z,1,
 units,CopyPathLockFields,src/units/movement_class.cpp,0,0,0,0,0,0,?CopyPathLockFields@@YGXPAUPathLockDstView@@PAUPathLockSrcView@@@Z,1,
+units,CreateUnitFromPacket,src/units/units.cpp,1,0,0,0,0,0,?CreateUnitFromPacket@@YGPAUUnit@@EPAUUnitSpawnPacket@@@Z,0,network
 units,CreateUnitMotion,src/units/units.cpp,0,0,0,0,0,0,?CreateUnitMotion@@YGXPAUUnit@@@Z,1,
 units,EmitUnitScriptDeletingDtor,src/units/unit_script_alloc.cpp,0,0,0,0,0,0,?EmitUnitScriptDeletingDtor@@YGPAVUnitScript@@XZ,1,
 units,FreeA,src/units/movement_class.cpp,1,0,0,0,0,0,?FreeA@@YGXH@Z,0,shutdown

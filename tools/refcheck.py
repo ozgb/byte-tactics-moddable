@@ -661,6 +661,18 @@ def outside_issue(note: str, struct: str, top: str, classes: dict[str, str]) -> 
     return UNCLASSIFIED
 
 
+def distinct_notes(notes: set[str]) -> list[str]:
+    """The notes of one row without near-duplicates: the lowest-offset copy of per-offset notes, the longest of prefixes."""
+    lowest: dict[str, tuple[list[int], str]] = {}
+    for n in notes:
+        offsets = [int(h, 16) for h in HEX_PATTERN.findall(n)]
+        shape = HEX_PATTERN.sub("0x#", n)
+        if shape not in lowest or (offsets, n) < lowest[shape]:
+            lowest[shape] = (offsets, n)
+    kept = [n for _, n in lowest.values()]
+    return sorted(n for n in kept if not any(o != n and o.startswith(n) for o in kept))
+
+
 def merge_contributions(found: list[dict]) -> dict:
     """One outside row from every block-pointer row that feeds its key, whatever their order."""
     if not all(c["late"] for c in found):
@@ -673,8 +685,9 @@ def merge_contributions(found: list[dict]) -> dict:
                     BLOCK_POINTERS, outside_label(row), column, row[column], c["row"][column]))
     row["offset"] = min((min(c["offsets"]), c["row"]["offset"]) for c in found)[1]
     pinned = {c["row"]["note"] for c in found if c["pinned"]}
-    notes = pinned or {n for c in found for n in c["row"]["note"].split(NOTE_JOIN) if n}
-    row["note"] = NOTE_JOIN.join(sorted(notes))
+    notes = sorted(pinned) if pinned else distinct_notes(
+        {n for c in found for n in c["row"]["note"].split(NOTE_JOIN) if n})
+    row["note"] = NOTE_JOIN.join(notes)
     if row["struct"]:
         row["words"] = max(c["row"]["words"] for c in found)
     else:

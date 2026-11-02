@@ -255,7 +255,18 @@ class ClangTest(unittest.TestCase):
         out = {(r["field"], r["holder"]): r for r in csv.DictReader(io.StringIO(want))}
         self.assertEqual(out[("", "H")]["words"], "3")
         self.assertEqual(out[("", "H")]["note"], "other | same")
-        self.assertEqual(out[("view", "CreateGameObject")]["note"], "Game.view | Game.view (0x4) first")
+        self.assertEqual(out[("view", "CreateGameObject")]["note"], "Game.view (0x4) first")
+        for seed in range(1, 25):
+            self.assertEqual(self.shuffled_outside(rows, seed), want)
+
+    def test_outside_rows_drop_near_duplicate_notes(self):
+        rows = [("CreateGameObject", "0x4", "Game.view"), ("H", "0x20", "same note"),
+                ("H", "0x20", "same note (its offsets fall under more than one class)"),
+                ("H", "0x20 0x28", "H (0x28): lists"), ("H", "0x20 0x24", "H (0x24): lists"),
+                ("H", "0x20 0x2c", "H (0x2c): lists")]
+        want = self.shuffled_outside(rows, 0)
+        notes = {r["holder"]: r["note"] for r in csv.DictReader(io.StringIO(want))}
+        self.assertEqual(notes["H"], "H (0x24): lists | same note (its offsets fall under more than one class)")
         for seed in range(1, 25):
             self.assertEqual(self.shuffled_outside(rows, seed), want)
 

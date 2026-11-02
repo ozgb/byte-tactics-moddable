@@ -7,7 +7,8 @@
 `--check --exe` plays every scenario in reference/scenarios/ (`--parallel N` at a
 time, default half the CPUs and at most 6, under Wine through tools/playtest.py)
 and compares the digest of each tick (tools/tracedigest.py) with the stored one. It also compares
-each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md).
+each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md), and the harness.sav of each scenario with a `save` line with
+reference/saves/<scenario>.sav, when that file exists, by decoded contents (tools/savefile.py leaves out the bytes taken from the clock or from uninitialised memory).
 On the first difference it builds the reference from the commit the trace
 records, prints tools/tracediff.py's report for that scenario and exits 1. A
 missing or extra trace or scenario exits 1. `--quick` restricts `--check` to the
@@ -26,7 +27,7 @@ stored trace. It builds no reference and is not the gate.
 `--traces` checks out origin/reference in build/reference/branch, runs that
 branch's own `tools/reference.py HEAD --traces` there (it links the matching
 build with the original compiler and plays the scenarios), and copies the
-traces it wrote into reference/traces/, and the sound logs it wrote into reference/sounds/ (if it wrote any).
+traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ and the saves it wrote into reference/saves/ (if it wrote any).
 Set WINEARCH=win64 for Wine; `--game-dir` names the game's
 install.
 """
@@ -44,6 +45,7 @@ from pathlib import Path
 
 import blockpointers
 import playtest
+import savefile
 import tracediff
 import tracedigest
 
@@ -53,6 +55,8 @@ SCENARIOS = ROOT / "reference/scenarios"
 TRACES = ROOT / "reference/traces"
 SOUNDS = ROOT / "reference/sounds"
 SOUND_FILE = "sound.txt"
+SAVES = ROOT / "reference/saves"
+SAVE_FILE = tracediff.SAVE_FILES[0]
 MAX_PARALLEL = 6
 QUICK = ("eight-full-moon", "eight-greenhaven", "duel-coast-to-coast", "duel-great-divide", "orders-move-attack")
 RUN_SECONDS_BASE = 120
@@ -63,6 +67,7 @@ GATE_SCAN_EVERY = 8
 FUEL_FILE = "fuel.txt"
 FUEL: dict[str, dict[str, tuple[int, int]]] = {}
 SOUND_LOGS: dict[str, str | None] = {}
+SAVE_BYTES: dict[str, bytes | None] = {}
 RETRY_DIALOG = "dialog-directx"
 
 
@@ -239,6 +244,11 @@ def report_fuel(exe: Path, scenarios: dict[str, Path]) -> int:
     return 1 if missing else 0
 
 
+def scenario_saves(scenario: Path) -> bool:
+    """Whether the scenario has a `save` line, so that its run writes harness.sav."""
+    return any(line.split()[:1] == ["save"] for line in scenario.read_text().splitlines())
+
+
 def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                   want: tuple[dict[str, str], list[tuple[int, str]]] | None = None, poison: bool = False,
                   keep_always: bool = False, scans: dict[str, str | None] | None = None,
@@ -270,7 +280,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, *(tracediff.SAVE_FILES if save_to is not None else ()))}
+            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, *dict.fromkeys(
+                (*(tracediff.SAVE_FILES if save_to is not None else ()), *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if load_from is not None:
                 extra["put"] = tracediff.save_put(load_from, scenario.stem, load_from.name)
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, scan_every if scans is not None else 0, **extra)
@@ -289,6 +300,9 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         FUEL[scenario.stem] = parse_fuel(run / FUEL_FILE)
         sound_log = run / SOUND_FILE
         SOUND_LOGS[scenario.stem] = sound_log.read_text() if sound_log.is_file() else None
+        if scenario_saves(scenario):
+            saved = run / SAVE_FILE
+            SAVE_BYTES[scenario.stem] = saved.read_bytes() if saved.is_file() else None
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
         for key in ("game_seed", "crt_seed", "view_seed"):
             if key not in header:
@@ -466,6 +480,35 @@ def sound_report(scenarios: dict[str, Path], logs: dict[str, str | None], direct
     return differing, lines
 
 
+def save_difference(stored: bytes, got: bytes) -> str | None:
+    """The first difference between two saves (tools/savefile.py compares their decoded contents), or None when they are equal."""
+    found = savefile.differences(stored, got)
+    return found[0] + (f" (and {len(found) - 1} more)" if len(found) > 1 else "") if found else None
+
+
+def save_report(scenarios: dict[str, Path], saves: dict[str, bytes | None], directory: Path) -> tuple[list[str], list[str]]:
+    """(the scenarios whose harness.sav differs from reference/saves/, the report lines): stored saves missing are only counted."""
+    differing: list[str] = []
+    lines: list[str] = []
+    unstored: list[str] = []
+    equal = 0
+    saving = [n for n, path in scenarios.items() if scenario_saves(path)]
+    for name in saving:
+        stored = directory / f"{name}.sav"
+        if not stored.is_file():
+            unstored.append(name)
+            continue
+        got = saves.get(name)
+        diff = save_difference(stored.read_bytes(), got) if got is not None else "the run wrote no harness.sav"
+        if diff:
+            differing.append(name)
+            lines.append(f"DIFF {name} {diff}")
+        else:
+            equal += 1
+    lines.append(f"saves: {equal} of {len(saving)} equal, {len(differing)} differ, {len(unstored)} with no stored save in {directory.relative_to(ROOT)}")
+    return differing, lines
+
+
 def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = False, poison: bool = False,
                  steps_per_frame: int | None = None, quirks: str | None = None,
                  save_blockptrs: Path | None = None) -> None:
@@ -526,10 +569,12 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = F
     print(f"{len(scenarios) - len(bad)} of {len(scenarios)} scenarios equal, total {clock(wall)}")
     sound_bad, sound_lines = sound_report(scenarios, SOUND_LOGS, SOUNDS)
     print("\n".join(sound_lines))
+    save_bad, save_lines = save_report(scenarios, SAVE_BYTES, SAVES)
+    print("\n".join(save_lines))
     pointers = report_block_pointers(exe, scans, quick, save_blockptrs)
     pointers += report_fuel(exe, scenarios)
     if not bad:
-        if pointers or sound_bad:
+        if pointers or sound_bad or save_bad:
             sys.exit(1)
         if quick:
             print("quick subset passed; this is not the gate, a pull request needs the full --check")
@@ -676,6 +721,20 @@ def name_mismatch(produced: set[str], expected: set[str]) -> str:
     return f"the traces do not match moddable's scenarios; missing: {missing}; extra: {extra}"
 
 
+def copy_saves(directory: Path) -> None:
+    """Replace reference/saves/ by the saves the reference branch checkout `directory` wrote (none written leaves it as it is)."""
+    saves = sorted((directory / "reference/saves").glob("*.sav"))
+    if not saves:
+        print("the reference branch wrote no saves; reference/saves/ is untouched")
+        return
+    SAVES.mkdir(parents=True, exist_ok=True)
+    for old in SAVES.glob("*.sav"):
+        old.unlink()
+    for path in saves:
+        shutil.copyfile(path, SAVES / path.name)
+    print(f"{len(saves)} saves copied to {SAVES.relative_to(ROOT)}")
+
+
 def write_traces(game_dir: str | None, parallel: int) -> None:
     directory = reference_branch()
     branch_scenarios = directory / "reference/scenarios"
@@ -698,6 +757,7 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
     for path in produced:
         shutil.copyfile(path, TRACES / path.name)
     print(f"{len(produced)} traces copied to {TRACES.relative_to(ROOT)}")
+    copy_saves(directory)
     sounds = sorted((directory / "reference/sounds").glob("*.txt"))
     if not sounds:
         print("the reference branch wrote no sound logs; reference/sounds/ is untouched")

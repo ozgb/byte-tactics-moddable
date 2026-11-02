@@ -204,8 +204,6 @@ static inline MovableVec3 operator-(const MovableVec3& p, const MovableVec3& q)
 void __stdcall ScaleUnitWeights(int player, UnitTypeSet* set, float value, int count);
 void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_4);
 #include "ai_player.h"
-typedef void (__stdcall* AiCommandFn)(CommandArgs* args);
-void __stdcall RegisterCommand(const char* name, AiCommandFn fn, int flags);
 #include "../../interfaces/seams.h"
 #include "../quirks/quirks.h"
 #include "../state/sim_globals.h"
@@ -218,8 +216,6 @@ void __stdcall RegisterCommand(const char* name, AiCommandFn fn, int flags);
 #include "../units/squads.h"
 #include "../util/math.h"
 #include "pathfind.h"
-void __stdcall PopHeapFirst(KeyedCell* first, KeyedCell* last, KeyedCell* dest,
-                            KeyedCell val, int*);
 
 #include "../util/commands.h"
 int __stdcall GetWeaponRange(Unit*, unsigned char);
@@ -259,7 +255,7 @@ static inline int DistSq(const Point16& a, const Point16& b)
 
 static inline void PopHeap(KeyedCell* f, KeyedCell* l)
 {
-    PopHeapFirst(f, l - 1, l - 1, KeyedCell(*(l - 1)), (int*)0);
+    PopHeapFirst((HeapEntry*)f, (HeapEntry*)(l - 1), (HeapEntry*)(l - 1), *(HeapEntry*)(l - 1), (int*)0);
 }
 
 static inline float Max(float a, float b) { return a > b ? a : b; }
@@ -346,14 +342,6 @@ void __stdcall CmdLimit(CommandArgs* args)
 int __stdcall IsCountBelowAiLimit(unsigned char player, unsigned short id, int value)
 {
     return IsUnderLimit(player, id, value);
-}
-
-// FUNCTION: 0x406f00
-void RegisterAICommands()
-{
-    RegisterCommand("plan", CmdPlan, 8);
-    RegisterCommand("weight", CmdWeight, 8);
-    RegisterCommand("limit", CmdLimit, 8);
 }
 
 // FUNCTION: 0x406f40

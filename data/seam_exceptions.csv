@@ -1,6 +1,4 @@
 subsystem,function,symbol,reason
-ai,PopHeap,PopHeapFirst,TODO(#621): heap helper outside the subsystem
-ai,RegisterAICommands,RegisterCommand,TODO(#621): command table filled by the console
 economy,CmdSetShareEnergy,AddMessage,TODO(#620): sim-to-presentation event or message
 economy,CmdSetShareMetal,AddMessage,TODO(#620): sim-to-presentation event or message
 economy,CmdShareEnergy,AddMessage,TODO(#620): sim-to-presentation event or message
@@ -11,7 +9,6 @@ los_radar,CmdShareMapping,AddMessage,TODO(#620): sim-to-presentation event or me
 los_radar,CmdShareRadar,AddMessage,TODO(#620): sim-to-presentation event or message
 los_radar,ToggleShareLos,AddMessage,TODO(#620): sim-to-presentation event or message
 map,Mission::BuildMissionList,GetLocalizedString,TODO(#620): sim-to-presentation event or message
-map,Mission::LoadCampaign,ShowErrorBox,TODO(#620): sim-to-presentation event or message
 map,Mission::LoadMission,GetLocalizedString,TODO(#620): sim-to-presentation event or message
 map,Mission::LoadMission,ShowErrorBox,TODO(#620): sim-to-presentation event or message
 units,ApplyUnitDeath,RemoveSpeechOfUnit,TODO(#620): sim-to-presentation event or message
@@ -19,8 +16,6 @@ units,CreateUnitCorpse,EmitSmoke,TODO(#620): sim-to-presentation event or messag
 units,LoadUnitFbi,GetLocalizedString,TODO(#620): sim-to-presentation event or message
 units,LoadUnitInfo,GetLocalizedString,TODO(#620): sim-to-presentation event or message
 units,LoadUnitInfo,ShowErrorBox,TODO(#620): sim-to-presentation event or message
-units,ReadUnitState,CreateUnitFromPacket,TODO(#621): unit made from a packet by the network layer
-units,ReceiveUnitStates,CreateUnitFromPacket,TODO(#621): unit made from a packet by the network layer
 units,UnitScript::EmitSfx,EmitBlackSmoke,TODO(#620): sim-to-presentation event or message
 units,UnitScript::EmitSfx,EmitWhiteSmoke,TODO(#620): sim-to-presentation event or message
 weapons,AddExplosionEffect,EmitSmoke,TODO(#620): sim-to-presentation event or message

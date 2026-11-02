@@ -1141,7 +1141,6 @@ void RegisterAllOrderTypes()
     RegisterOrderTypes(g_readyOrder, 1);
     RegisterGroundOrders();
     RegisterVtolOrders();
-    g_seams.ai->RegisterAICommands();
     RegisterUnitOrders();
 }
 

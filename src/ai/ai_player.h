@@ -20,7 +20,6 @@ void __stdcall CmdPlan(CommandArgs* args);
 void __stdcall EnableAICommands();
 void __stdcall CmdWeight(CommandArgs* args);
 void __stdcall CmdLimit(CommandArgs* args);
-void __stdcall RegisterAICommands();
 void __stdcall FUN_00406f40(void);
 void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused);
 void __stdcall UpdateConverter(Unit* unit);

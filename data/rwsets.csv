@@ -25370,31 +25370,21 @@ address,function,file,kind,target
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,Game::Current
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,GetLocalDpid
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,GetMapCell
-0x47f300,PlaySoundAt,src/sound/sound.cpp,call,HarnessSoundEvent
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,MapContains
+0x47f300,PlaySoundAt,src/sound/sound.cpp,call,PlayPositional
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,PlaySoundByIndex
-0x47f300,PlaySoundAt,src/sound/sound.cpp,call,Sound::Is3DEnabled
-0x47f300,PlaySoundAt,src/sound/sound.cpp,call,Sound::PlaySampleSet
-0x47f300,PlaySoundAt,src/sound/sound.cpp,call,Sound::Set3DDistances
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,operator unsigned char *
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,operator unsigned short *
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,operator=
 0x47f300,PlaySoundAt,src/sound/sound.cpp,deref_read,*SoundWorldPos
 0x47f300,PlaySoundAt,src/sound/sound.cpp,deref_read,*unsigned char
 0x47f300,PlaySoundAt,src/sound/sound.cpp,deref_read,*unsigned short
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::height
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::mapFlags
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::playerIndex
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::screenTilesX
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::screenTilesY
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::scrollX
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::scrollY
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::sound
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::soundFlags_37f19
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::sounds
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::visibilityMask
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::volume1
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Game::width
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Player::explored
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Player::exploredHeight
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Player::exploredWidth
@@ -25403,16 +25393,10 @@ address,function,file,kind,target
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,SoundWorldPos::y
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,SoundWorldPos::z
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,SoundWorldPos::zVal
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Vec3::x
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Vec3::y
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_read,Vec3::z
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_write,SoundAtPacket::flag
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_write,SoundAtPacket::index
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_write,SoundAtPacket::pos
 0x47f300,PlaySoundAt,src/sound/sound.cpp,field_write,SoundAtPacket::type
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_write,Vec3::x
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_write,Vec3::y
-0x47f300,PlaySoundAt,src/sound/sound.cpp,field_write,Vec3::z
 0x47f300,PlaySoundAt,src/sound/sound.cpp,function,
 0x47f300,PlaySoundAt,src/sound/sound.cpp,global_read,g_game
 0x47f300,PlaySoundAt,src/sound/sound.cpp,global_read,g_noDirectSound
@@ -44337,11 +44321,12 @@ address,function,file,kind,target
 ,DrainSound,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
 ,DrainSound,src/ingame/sim_event_drain.cpp,function,
 ,DrainSound,src/ingame/sim_event_drain.cpp,global_read,g_soundNames@src/ingame/sim_event_drain.cpp
-,DrainSoundAt,src/ingame/sim_event_drain.cpp,call,PlaySoundAt
+,DrainSoundAt,src/ingame/sim_event_drain.cpp,call,PlaySoundAtHeard
 ,DrainSoundAt,src/ingame/sim_event_drain.cpp,call,TakeVec3
 ,DrainSoundAt,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
 ,DrainSoundAt,src/ingame/sim_event_drain.cpp,function,
-,DrainSoundAtName,src/ingame/sim_event_drain.cpp,call,PlaySoundAtByName
+,DrainSoundAtName,src/ingame/sim_event_drain.cpp,call,FindSoundByName
+,DrainSoundAtName,src/ingame/sim_event_drain.cpp,call,PlaySoundAtHeard
 ,DrainSoundAtName,src/ingame/sim_event_drain.cpp,call,TakeVec3
 ,DrainSoundAtName,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
 ,DrainSoundAtName,src/ingame/sim_event_drain.cpp,function,
@@ -44972,6 +44957,8 @@ address,function,file,kind,target
 ,FindSound,src/sound/sound.cpp,field_read,Game::soundCount
 ,FindSound,src/sound/sound.cpp,function,
 ,FindSound,src/sound/sound.cpp,global_read,g_game
+,FindSoundByName,src/sound/sound.cpp,call,FindSound
+,FindSoundByName,src/sound/sound.cpp,function,
 ,FindTarget,src/network/net_game.cpp,field_read,Player::id
 ,FindTarget,src/network/net_game.cpp,field_read,Player::type
 ,FindTarget,src/network/net_game.cpp,function,
@@ -49156,6 +49143,44 @@ address,function,file,kind,target
 ,PickUnit,src/ingame/selection.cpp,field_write,Unit::selectState
 ,PickUnit,src/ingame/selection.cpp,function,
 ,PickUnit,src/ingame/selection.cpp,global_read,g_game
+,PlayPositional,src/sound/sound.cpp,call,HarnessSoundEvent
+,PlayPositional,src/sound/sound.cpp,call,Sound::Is3DEnabled
+,PlayPositional,src/sound/sound.cpp,call,Sound::PlaySampleSet
+,PlayPositional,src/sound/sound.cpp,call,Sound::Set3DDistances
+,PlayPositional,src/sound/sound.cpp,field_read,Game::height
+,PlayPositional,src/sound/sound.cpp,field_read,Game::screenTilesX
+,PlayPositional,src/sound/sound.cpp,field_read,Game::screenTilesY
+,PlayPositional,src/sound/sound.cpp,field_read,Game::scrollX
+,PlayPositional,src/sound/sound.cpp,field_read,Game::scrollY
+,PlayPositional,src/sound/sound.cpp,field_read,Game::sound
+,PlayPositional,src/sound/sound.cpp,field_read,Game::width
+,PlayPositional,src/sound/sound.cpp,field_read,SoundWorldPos::x
+,PlayPositional,src/sound/sound.cpp,field_read,SoundWorldPos::y
+,PlayPositional,src/sound/sound.cpp,field_read,SoundWorldPos::z
+,PlayPositional,src/sound/sound.cpp,field_read,Vec3::x
+,PlayPositional,src/sound/sound.cpp,field_read,Vec3::y
+,PlayPositional,src/sound/sound.cpp,field_read,Vec3::z
+,PlayPositional,src/sound/sound.cpp,field_write,Vec3::x
+,PlayPositional,src/sound/sound.cpp,field_write,Vec3::y
+,PlayPositional,src/sound/sound.cpp,field_write,Vec3::z
+,PlayPositional,src/sound/sound.cpp,function,
+,PlayPositional,src/sound/sound.cpp,global_read,g_game
+,PlaySoundAtHeard,src/sound/sound.cpp,call,PlayPositional
+,PlaySoundAtHeard,src/sound/sound.cpp,call,PlaySoundByIndex
+,PlaySoundAtHeard,src/sound/sound.cpp,field_read,Game::playerIndex
+,PlaySoundAtHeard,src/sound/sound.cpp,field_read,Game::soundFlags_37f19
+,PlaySoundAtHeard,src/sound/sound.cpp,field_read,Game::sounds
+,PlaySoundAtHeard,src/sound/sound.cpp,field_read,Game::volume1
+,PlaySoundAtHeard,src/sound/sound.cpp,field_read,Vec3::x
+,PlaySoundAtHeard,src/sound/sound.cpp,field_read,Vec3::y
+,PlaySoundAtHeard,src/sound/sound.cpp,field_read,Vec3::z
+,PlaySoundAtHeard,src/sound/sound.cpp,field_write,SoundWorldPos::xVal
+,PlaySoundAtHeard,src/sound/sound.cpp,field_write,SoundWorldPos::yVal
+,PlaySoundAtHeard,src/sound/sound.cpp,field_write,SoundWorldPos::zVal
+,PlaySoundAtHeard,src/sound/sound.cpp,function,
+,PlaySoundAtHeard,src/sound/sound.cpp,global_read,g_game
+,PlaySoundAtHeard,src/sound/sound.cpp,global_read,g_noDirectSound
+,PlaySoundAtHeard,src/sound/sound.cpp,global_read,g_useWindowsSound
 ,Player::Clear,src/network/player.h,field_write,Player::active
 ,Player::Clear,src/network/player.h,field_write,Player::type
 ,Player::Clear,src/network/player.h,function,
@@ -49825,9 +49850,11 @@ address,function,file,kind,target
 ,RecordSound,src/state/sim_effects.h,function,
 ,RecordSoundAt,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordSoundAt,src/state/sim_effects.h,call,SimEventPut
+,RecordSoundAt,src/state/sim_effects.h,call,SoundHeardMask
 ,RecordSoundAt,src/state/sim_effects.h,function,
 ,RecordSoundAtName,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordSoundAtName,src/state/sim_effects.h,call,SimEventPut
+,RecordSoundAtName,src/state/sim_effects.h,call,SoundHeardMask
 ,RecordSoundAtName,src/state/sim_effects.h,function,
 ,RecordTeleportParticles,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordTeleportParticles,src/state/sim_effects.h,call,SimEventPut
@@ -50725,6 +50752,25 @@ address,function,file,kind,target
 ,SortOrderTableEntries,src/orders/order_list.cpp,call,_Sort_0_0043bc90
 ,SortOrderTableEntries,src/orders/order_list.cpp,call,_Val_type
 ,SortOrderTableEntries,src/orders/order_list.cpp,function,
+,SoundHeardMask,src/state/sim_sound.cpp,call,operator unsigned char *
+,SoundHeardMask,src/state/sim_sound.cpp,call,operator unsigned short *
+,SoundHeardMask,src/state/sim_sound.cpp,deref_read,*unsigned char
+,SoundHeardMask,src/state/sim_sound.cpp,deref_read,*unsigned short
+,SoundHeardMask,src/state/sim_sound.cpp,field_escape,Game::players
+,SoundHeardMask,src/state/sim_sound.cpp,field_read,Game::mapFlags
+,SoundHeardMask,src/state/sim_sound.cpp,field_read,Game::visibilityMask
+,SoundHeardMask,src/state/sim_sound.cpp,field_read,LosRadarSeam::GetMapCell
+,SoundHeardMask,src/state/sim_sound.cpp,field_read,Player::explored
+,SoundHeardMask,src/state/sim_sound.cpp,field_read,Player::exploredHeight
+,SoundHeardMask,src/state/sim_sound.cpp,field_read,Player::exploredWidth
+,SoundHeardMask,src/state/sim_sound.cpp,field_read,Seams::los_radar
+,SoundHeardMask,src/state/sim_sound.cpp,field_read,Vec3::x
+,SoundHeardMask,src/state/sim_sound.cpp,field_read,Vec3::y
+,SoundHeardMask,src/state/sim_sound.cpp,field_read,Vec3::z
+,SoundHeardMask,src/state/sim_sound.cpp,function,
+,SoundHeardMask,src/state/sim_sound.cpp,global_read,g_game
+,SoundHeardMask,src/state/sim_sound.cpp,global_read,g_seams
+,SoundHeardMask,src/state/sim_sound.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
 ,SpatialBucketPrependUnitNative,src/seams/native.cpp,call,SpatialBucket::PrependUnit
 ,SpatialBucketPrependUnitNative,src/seams/native.cpp,function,
 ,SpatialBucketUnlinkUnitNative,src/seams/native.cpp,call,SpatialBucket::UnlinkUnit

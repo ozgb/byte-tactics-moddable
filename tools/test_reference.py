@@ -64,6 +64,36 @@ class SoundLogTest(unittest.TestCase):
         self.assertEqual(differing, ["a"])
 
 
+class SaveReportTest(unittest.TestCase):
+    @staticmethod
+    def bank(box: bytes) -> bytes:
+        import test_savefile
+        return test_savefile.bank("Players", {"A": box})
+
+    def test_equal_and_different_saves(self):
+        self.assertIsNone(reference.save_difference(self.bank(b"abc"), self.bank(b"abc")))
+        self.assertIn("Players/A offset 0x2", reference.save_difference(self.bank(b"abc"), self.bank(b"abd")))
+
+    def test_only_scenarios_with_a_save_line_are_counted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "saves"
+            directory.mkdir()
+            saver, plain, unstored = (Path(tmp) / n for n in ("saver.txt", "plain.txt", "unstored.txt"))
+            saver.write_text("ticks 10\nsave 5\n")
+            unstored.write_text("save 5\n")
+            plain.write_text("ticks 10\n")
+            (directory / "saver.sav").write_bytes(self.bank(b"abc"))
+            scenarios = {"saver": saver, "plain": plain, "unstored": unstored}
+            with mock.patch.object(reference, "ROOT", Path(tmp)):
+                differing, lines = reference.save_report(scenarios, {"saver": self.bank(b"abc"), "unstored": b"x"}, directory)
+                self.assertEqual(differing, [])
+                self.assertIn("saves: 1 of 2 equal, 0 differ, 1 with no stored save", lines[-1])
+                differing, _ = reference.save_report(scenarios, {"saver": self.bank(b"abd")}, directory)
+                self.assertEqual(differing, ["saver"])
+                differing, _ = reference.save_report(scenarios, {"saver": None}, directory)
+                self.assertEqual(differing, ["saver"])
+
+
 class StepsPerFrameTest(unittest.TestCase):
     def test_copies_end_with_the_key(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -227,6 +257,7 @@ class ScanRunTest(unittest.TestCase):
             raise StopIteration
 
         with mock.patch.object(reference, "scenario_ticks", lambda s: 600), \
+                mock.patch.object(reference, "scenario_saves", lambda s: False), \
                 mock.patch.object(reference.tracediff, "play", fake_play), \
                 contextlib.redirect_stdout(io.StringIO()) as out:
             try:

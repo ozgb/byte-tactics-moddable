@@ -29,6 +29,7 @@ players,UpdatePlayersOnStream,OpenMessageBox,TODO(#505): sim-to-presentation eve
 players,UpdatePlayersOnStream,RenderLayer,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,SetKeyboardInput,TODO(#505): sim-to-presentation event
 players,UpdatePlayersOnStream,SetTranslatedTextByName,TODO(#505): sim-to-presentation event
+units,FreeUnitMemory,DrainSimEvents,TODO(#505): sim-to-presentation event
 units,FreeUnitTypes,UnitTable::Destroy,TODO(#505): sim-to-presentation event
 units,GetSweetSpot,UpdateObjectState,TODO(#505): sim-to-presentation event
 units,InitUnitScript,CreateObjectState,TODO(#505): sim-to-presentation event

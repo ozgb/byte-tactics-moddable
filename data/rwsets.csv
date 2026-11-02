@@ -26852,6 +26852,7 @@ address,function,file,kind,target
 0x485940,ComparePlayers,src/units/units.cpp,global_read,g_game
 0x485940,ComparePlayers,src/units/units.cpp,global_read,g_seams
 0x485940,ComparePlayers,src/units/units.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
+0x485980,FreeUnitMemory,src/units/units.cpp,call,DrainSimEvents
 0x485980,FreeUnitMemory,src/units/units.cpp,call,GameFreeThunk
 0x485980,FreeUnitMemory,src/units/units.cpp,call,KillUnit
 0x485980,FreeUnitMemory,src/units/units.cpp,call,get

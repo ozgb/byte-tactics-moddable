@@ -4764,6 +4764,7 @@ units,presentation,call,CreateObjectState,1
 units,presentation,call,CreatePlayerObjectState,1
 units,presentation,call,CycleCameraFollow,1
 units,presentation,call,CycleSelection,1
+units,presentation,call,DrainSimEvents,1
 units,presentation,call,EmitBlackSmoke,1
 units,presentation,call,EmitSmoke,1
 units,presentation,call,EmitWhiteSmoke,1

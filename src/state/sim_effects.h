@@ -141,6 +141,18 @@ inline void RecordRadarRedraw()
     RecordSimEvent(SIM_EVENT_RADAR_REDRAW, 0, 0, 0);
 }
 
+inline void RecordWatchPrompt(int player)
+{
+    unsigned int args[1] = {(unsigned int)player};
+    RecordSimEvent(SIM_EVENT_WATCH_PROMPT, 0, args, 1);
+}
+
+inline void RecordWatchModeNotice(int player)
+{
+    unsigned int args[1] = {(unsigned int)player};
+    RecordSimEvent(SIM_EVENT_WATCH_MODE_NOTICE, 0, args, 1);
+}
+
 inline void RecordForcesDestroyed(int player)
 {
     unsigned int args[1] = {(unsigned int)player};

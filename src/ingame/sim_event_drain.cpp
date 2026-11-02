@@ -271,6 +271,14 @@ void DrainSimEvents()
         case SIM_EVENT_GUI_CHANGED_IF_SCREEN:
             DrainGuiChanged(e);
             break;
+        case SIM_EVENT_WATCH_PROMPT:
+            if (e.args[0] == g_game->localPlayer)
+                ShowContinueWatchingDialog();
+            break;
+        case SIM_EVENT_WATCH_MODE_NOTICE:
+            if (e.args[0] == g_game->localPlayer)
+                OpenMessageBox(&g_game->gui, Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."), 500, 1, 1);
+            break;
         case SIM_EVENT_RADAR_REDRAW:
             UpdateRadarMapped();
             DrawRadarUnits();

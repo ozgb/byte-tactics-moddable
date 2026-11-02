@@ -1137,6 +1137,27 @@ void __stdcall HandleDebugHotkey(int eventType)
 }
 
 // FUNCTION: 0x464e70
+// FUNCTION: 0x464de0
+void __stdcall ContinueWatchingCallback(Gui* gui)
+{
+    Gadget* screen = gui->layer->entries;
+    if (gui->hotGadgetIndex == -1)
+        return;
+    PlaySoundByName("BigButton", 0);
+    if (IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE1")) {
+        g_seams.network->BroadcastPlayerInfo();
+        g_game->bits.flag4 = 0;
+        ReportGameEvent(4);
+        return;
+    }
+    if (!IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE2")) {
+        ClearSelectedGadget(gui);
+        return;
+    }
+    g_game->bits.flag2 = 1;
+    g_game->bits.flag4 = 0;
+}
+
 void ShowContinueWatchingDialog()
 {
     Layer* screen = LoadGuiLayer(&g_game->gui, g_yesNoGuiName, 0x900);

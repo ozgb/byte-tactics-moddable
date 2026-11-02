@@ -28,6 +28,7 @@ void __stdcall UpdateFramePacing();
 void __stdcall RunGameSteps(int showStats);
 void __stdcall HandleDebugHotkey(int eventType);
 void __stdcall ShowContinueWatchingDialog();
+void __stdcall ContinueWatchingCallback(Gui* gui);
 
 void __stdcall HandleMain2LayoutEvent(Gui* gadget);
 

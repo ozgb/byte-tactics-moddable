@@ -519,7 +519,7 @@ Coverage: 84.7% of functions (311 of 367), 82.2% of lines, 64.8% of branches; 56
 - files (7): `HapiBank::OpenNamedBox`, `HapiBank::SeekBox`, `HapiBank::ReadBox`, `HapiBank::WriteBox`, and 3 more
 - map (7): `CanPlaceUnitFootprint`, `IsPadSlotFree`, `PickRandomReclaimableResourcesInRadius`, `SnapWorldPosToFootprint`, and 3 more
 - game (6): `RecordBuildMenuUpdate`, `RecordNanoParticles`, `RecordReverseNanoParticles`, `RecordSelectionOrdersDirty`, `RecordTeleportParticles`, `RecordUnitSpeech`
-- 6 smaller targets: features (3), los_radar (3), weapons (3), targeting (3), ai (1), players (1)
+- 6 smaller targets: features (3), los_radar (3), targeting (3), weapons (3), ai (1), players (1)
 
 **Sim writes.** 123 items in all, 117 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
@@ -532,7 +532,7 @@ Coverage: 84.7% of functions (311 of 367), 82.2% of lines, 64.8% of branches; 56
 **Draft interface.**
 
 - Exports: 60 functions (`RunOrders`, `RunSecondaryOrders`, `AddOrder`, `DeleteOrders`, `GetOrderType`, `IssueAttackOrder`, `OrderType::GetTableEntry` (presentation), the `UnitMotion::` functions called from outside (`UpdateMotion`, `LoadMotion`, `SaveMotion`, `DestroyObject`), and the goal methods pathfinding calls).
-- Needs from seams: 95 functions in seams, platform, units, network, files, map, game, features, los_radar, weapons, targeting, ai, players.
+- Needs from seams: 95 functions in seams, platform, units, network, files, map, game, features, los_radar, targeting, weapons, ai, players.
 - Owns: 89 named sim items that only this subsystem writes, for example `Order::state`, `Order::pos`, `Order::next`, `PathOrderAttach::owner`, `Order::unit`.
 - Shares: 28 named sim items that other subsystems also write, for example `Order::flags`, `Unit::pos`, `Unit::flags`, `Unit::health`, `Unit::buildLeft`.
 - The units imports are the unit lifecycle and geometry: `CreateUnit`, `SetUnitPosition`, `Unit::SetStateBits`, COB script calls and piece positions. The weapons imports are mostly the claim and release of weapons, which orders reaches through seams.

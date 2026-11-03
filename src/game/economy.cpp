@@ -288,6 +288,12 @@ static int UseEnergyD(Unit* u, float v)
     return 0;
 }
 
+#ifdef BT_REPLAY_INJECT_WIND_SCALE
+#define WIND_INCOME(v) ((v) * BT_REPLAY_INJECT_WIND_SCALE)
+#else
+#define WIND_INCOME(v) (v)
+#endif
+
 // FUNCTION: 0x401360
 void __stdcall UpdatePlayerEconomy(Player* p)
 {
@@ -324,7 +330,7 @@ void __stdcall UpdatePlayerEconomy(Player* p)
                     if (ok)
                         AddIncome(u, &u->resourceSlot.metalMake, u->def->makesMetal);
                 } else if (u->def->windgenerator > 0) {
-                    AddIncomeW(u, &u->resourceSlot.energyMake, (double)g_game->windStrength * u->def->windgenerator);
+                    AddIncomeW(u, &u->resourceSlot.energyMake, WIND_INCOME((double)g_game->windStrength * u->def->windgenerator));
                 } else if (u->def->tidalgenerator > 0) {
                     AddIncomeDB(u, &u->resourceSlot.energyMake, g_game->tidal * u->def->tidalgenerator);
                 }

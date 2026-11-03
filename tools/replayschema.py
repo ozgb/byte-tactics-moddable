@@ -14,6 +14,9 @@ Outputs:
     src/harness/replay_schema.h     the field, object and slot tables
     src/harness/replay_hooks.inc    the recording copy of every seam table, with the argument and import hooks
     tests/replay_slots.h            the slot runners, import stubs and native seam tables of the replayer
+    src/harness/replay_services.h   the ids and names of the services imports (GameRand, RandomInt, the TDF and command classes)
+    src/harness/replay_services.inc the recorder's lines for them
+    tests/replay_services.h         the replayer's answers for them
 
 A slot's reads are field_read, global_read and global_maybe_written rows; its writes are field_write, global_write and
 global_maybe_written rows, over the functions behind the slot. A row names a block field (Game member or SimGlobals
@@ -46,11 +49,12 @@ FORMAT = 2
 
 RNG_FIELDS = ["rng.main", "rng.load", "rng.seed"]
 RNG_CALLS = {"GameRand", "RandomInt"}
-SIZES = {"i32": 4, "u32": 4, "u16": 2, "f32": 4}
+SIZES = {"i32": 4, "u32": 4, "u16": 2, "f32": 4, "u8": 1, "i16": 2, "f64": 8}
 BLOCK_KINDS = {"field_read": "r", "field_write": "w", "global_read": "r", "global_write": "w", "global_maybe_written": "rw"}
 OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "rw"}
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
-               "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS"}
+               "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED"}
+TABLES = {"units": "RT_UNITS", "players": "RT_PLAYERS"}
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
            "bool", "float", "double", "Point16", "Vec3", "RandStream"}
 BARE_POINTER = re.compile(r"^\*(float|double|short|int|long|unsigned short|unsigned int|unsigned char|char)$")
@@ -142,23 +146,27 @@ def block_tables(ann: dict):
     return game, sim
 
 
-def tracked(target: str, game: dict, sim: dict) -> str | None:
+def tracked(target: str, game: dict, sim: dict, aliases: dict | None = None) -> str | None:
     if target.startswith("Game::") and target[6:] in game:
         return "Game." + target[6:]
+    if target.startswith("Game::") and target[6:] in (aliases or {}):
+        return "Game." + aliases[target[6:]]
     if target in sim:
         return "SimGlobals." + target
     return None
 
 
-def object_target(target: str, ann: dict) -> tuple[str, str] | None:
-    """(kind, field) when the target is `Type::member` of an object kind, a field of its table."""
+def object_targets(target: str, ann: dict) -> list[tuple[str, str]]:
+    """(kind, field) of every object field the target `Type::member` names: the member of a kind of that type, or an alias."""
     if "::" not in target:
-        return None
+        return []
     type_name, member = target.split("::", 1)
+    hits = []
     for kind, spec in ann["objects"].items():
-        if spec["type"] == type_name and any(f["name"] == member for f in spec["fields"]):
-            return kind, member
-    return None
+        for f in spec["fields"]:
+            if (spec["type"] == type_name and f["name"] == member) or target in f.get("aliases", []):
+                hits.append((kind, f["name"]))
+    return hits
 
 
 def functions_of(slot: dict, subsystem: str, assignment: dict[str, list[str]], note: dict) -> list[str]:
@@ -228,7 +236,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     kind_names = list(ann["objects"])
     for kind in kind_names:
         spec = ann["objects"][kind]
-        objects.append({"name": kind, "type": spec["type"], "scope": spec["scope"]})
+        objects.append({"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")})
         for f in spec["fields"]:
             object_fields.append(dict(f, object=kind))
     object_index = {(f["object"], f["name"]): i for i, f in enumerate(object_fields)}
@@ -236,7 +244,16 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for r in rows:
         by_function.setdefault(r["function"], []).append(r)
     used_rules = set()
-    rule_of = {(r["kind"], r["target"]): r for r in ann["rules"]}
+    rules_of: dict[tuple[str, str], list[int]] = {}
+    for i, r in enumerate(ann["rules"]):
+        rules_of.setdefault((r["kind"], r["target"]), []).append(i)
+    state_types = {spec["type"] for spec in ann["objects"].values() if spec["scope"] == "state"}
+
+    def rule_for(kind: str, target: str, function: str) -> int | None:
+        scoped = [i for i in rules_of.get((kind, target), []) if function in ann["rules"][i].get("functions", [])]
+        plain = [i for i in rules_of.get((kind, target), []) if "functions" not in ann["rules"][i]]
+        found = scoped or plain
+        return found[0] if found else None
     subsystems = {}
     slot_list = []
     members = seam_members()
@@ -262,13 +279,14 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             reads, writes = set(), set()
             obj_reads, obj_writes = set(), set()
             draws = False
+            all_of = None
             for fn in functions:
                 for r in by_function.get(fn, []):
                     kind, target = r["kind"], r["target"]
                     if kind == "call" and target in RNG_CALLS:
                         draws = True
                     if kind in BLOCK_KINDS:
-                        name = tracked(target, game, sim)
+                        name = tracked(target, game, sim, ann.get("game_aliases"))
                         if name is not None:
                             if "r" in BLOCK_KINDS[kind]:
                                 reads.add(name)
@@ -279,24 +297,40 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                         elif target.startswith("Game::") or target.startswith("g_"):
                             pending["untracked"].add(target)
                     if kind in OBJECT_KINDS:
-                        hit = object_target(target, ann)
-                        if hit is not None:
+                        hits = object_targets(target, ann)
+                        for hit in hits:
                             i = object_index[(hit[0], hit[1])]
                             if "r" in OBJECT_KINDS[kind]:
                                 obj_reads.add(i)
                             if "w" in OBJECT_KINDS[kind]:
                                 obj_writes.add(i)
-                    if kind == "field_escape" or (kind in ("deref_read", "deref_write") and BARE_POINTER.match(target)):
-                        rule = rule_of.get((kind, target))
-                        if rule is None:
+                        if not hits and target.split("::")[0] in state_types and (kind, target) not in rules_of:
+                            pending["untracked"].add(target)
+                    index = rule_for(kind, target, fn)
+                    needs = kind == "field_escape" or (kind in ("deref_read", "deref_write") and BARE_POINTER.match(target))
+                    if index is None:
+                        if needs:
                             pending["rules"].add("%s %s" % (kind, target))
-                        else:
-                            used_rules.add((rule["kind"], rule["target"]))
-                            if rule["rule"] == "whole-object":
-                                for i, f in enumerate(object_fields):
-                                    if f["object"] == rule["object"]:
-                                        obj_reads.add(i)
-                                        obj_writes.add(i)
+                    else:
+                        rule = ann["rules"][index]
+                        used_rules.add(index)
+                        if rule["rule"] == "whole-object":
+                            for i, f in enumerate(object_fields):
+                                if f["object"] == rule["object"]:
+                                    obj_reads.add(i)
+                                    obj_writes.add(i)
+                        elif rule["rule"] == "fields":
+                            for tag, into in (("reads", obj_reads), ("writes", obj_writes)):
+                                for name in rule.get(tag, []):
+                                    k, fname = name.split(".", 1)
+                                    if (k, fname) not in object_index:
+                                        errors.append("the rule for %s %s names the unknown field %s" % (kind, target, name))
+                                    else:
+                                        into.add(object_index[(k, fname)])
+                        elif rule["rule"] == "all-of":
+                            if all_of is not None and all_of != rule["object"]:
+                                errors.append("%s: the slot %s has rules for two all-of kinds" % (sub, s["name"]))
+                            all_of = rule["object"]
             if draws:
                 reads.update(RNG_FIELDS)
                 writes.update(RNG_FIELDS)
@@ -311,7 +345,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             slots[s["name"]] = {
                 "conv": s["conv"], "ret": s["ret"], "functions": functions,
                 "reads": [f for f in order if f in reads], "writes": [f for f in order if f in writes],
-                "objectReads": sorted(obj_reads), "objectWrites": sorted(obj_writes),
+                "objectReads": sorted(obj_reads), "objectWrites": sorted(obj_writes), "allOf": all_of,
                 "args": args, "result": result, "native": note.get("native", s["name"]),
             }
             slot_list.append((sub, s["name"]))
@@ -335,7 +369,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             seam, slot = imp.split(".")
             if seam not in {m[0] for m in members}:
                 errors.append("%s imports from the unknown seam %s" % (sub, seam))
-    stale = sorted("%s %s" % k for k in rule_of if k not in used_rules)
+    stale = sorted("%s %s" % (r["kind"], r["target"]) for i, r in enumerate(ann["rules"]) if i not in used_rules)
     errors += ["the rule for %s matches no row of a subsystem function" % s for s in stale]
     for sub, spec in subsystems.items():
         for imp in spec["imports"]:
@@ -403,25 +437,42 @@ def render_schema(ann: dict, model: dict) -> str:
     L += ["    ROK_%s," % upper(o["name"]) for o in objects]
     L += ["    ROK_COUNT", "};", "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
     scope = {"state": "RS_STATE", "index": "RS_INDEX", "value": "RS_VALUE"}
-    for o in objects:
-        L.append('    { "%s", sizeof(%s), %s },' % (o["name"], o["type"], scope[o["scope"]]))
-    L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
-          "static const ReplayObjectField kReplayObjectFields[] = {"]
     kind_id = {o["name"]: "ROK_" + upper(o["name"]) for o in objects}
     types = {o["name"]: o["type"] for o in objects}
+    for o in objects:
+        inside = o.get("inside")
+        if inside:
+            container = types[inside["kind"]]
+            tail = '1, %s, offsetof(%s, %s), "%s"' % (kind_id[inside["kind"]], container, inside["member"], inside["member"])
+        else:
+            tail = '0, 0, 0, ""'
+        L.append('    { "%s", sizeof(%s), %s, %s, %s },' % (o["name"], o["type"], scope[o["scope"]], TABLES.get(o.get("table"), "RT_ORDER"), tail))
+    L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
+          "static const ReplayObjectField kReplayObjectFields[] = {"]
+    position = {(f["object"], f["name"]): i for i, f in enumerate(ofields)}
+    range_end, range_begin = {}, {}
     for f in ofields:
+        if f.get("range_end_of"):
+            begin = position[(f["object"], f["range_end_of"])]
+            range_end[begin] = position[(f["object"], f["name"])] + 1
+            range_begin[position[(f["object"], f["name"])]] = begin + 1
+    for i, f in enumerate(ofields):
         member = f.get("member", f["name"])
         t = types[f["object"]]
         size = f.get("size")
         size_text = str(size) if size else "sizeof(((%s*)nullptr)->%s)" % (t, member)
-        target = kind_id[f["target"]] if f["kind"] == "ref" else "0"
-        L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s },' % (f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target))
+        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed") else "0"
+        L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d },' % (f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target, range_end.get(i, 0), range_begin.get(i, 0)))
     L += ["};", "static const unsigned kReplayObjectFieldCount = %d;" % len(ofields), ""]
     for f in ofields:
         t = types[f["object"]]
         member = f.get("member", f["name"])
-        if f.get("size") is None:
-            want = {"i32": 4, "u32": 4, "u16": 2, "i16": 2, "f32": 4, "flags": 4, "ref": 4, "point16": 4, "weapon": 4}[f["kind"]]
+        if f["kind"] == "embed":
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s has the size of its kind");' % (t, member, types[f["target"]], t, f["name"]))
+        elif f["kind"] == "bytes":
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, f["size"], t, f["name"]))
+        elif f.get("size") is None:
+            want = {"i32": 4, "u32": 4, "u16": 2, "i16": 2, "f32": 4, "flags": 4, "ref": 4, "point16": 4, "weapon": 4, "u8": 1, "f64": 8}[f["kind"]]
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, want, t, f["name"]))
     L += ["", "enum ReplaySubsystemId {"]
     L += ["    SUB_%s," % upper(s) for s in subsystems]
@@ -448,7 +499,8 @@ def render_schema(ann: dict, model: dict) -> str:
                 return ("%s%s" % (base, tag) if items else "nullptr", len(items))
             r, w = ref("Reads", s["reads"]), ref("Writes", s["writes"])
             ro, wo = ref("ObjReads", s["objectReads"]), ref("ObjWrites", s["objectWrites"])
-            L.append('    { "%s", SUB_%s, %s, %d, %s, %d, %s, %d, %s, %d },' % (slot, upper(sub), r[0], r[1], w[0], w[1], ro[0], ro[1], wo[0], wo[1]))
+            every = "ROK_%s + 1" % upper(s["allOf"]) if s.get("allOf") else "0"
+            L.append('    { "%s", SUB_%s, %s, %d, %s, %d, %s, %d, %s, %d, %s },' % (slot, upper(sub), r[0], r[1], w[0], w[1], ro[0], ro[1], wo[0], wo[1], every))
     L += ["};", "static const unsigned kReplaySlotCount = RSL_COUNT;", "", "static const ReplaySubsystem kReplaySubsystems[] = {"]
     first = 0
     for sub, spec in subsystems.items():
@@ -514,6 +566,10 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     call_args = ", ".join("a%d" % i for i in range(len(s["args"])))
     rid = "RSL_%s_%s" % (upper(sub), upper(slot))
     ret = s["ret"]
+    names = [a["name"] for a in s["args"]]
+    for a in s["args"]:
+        if a.get("length"):
+            a["lengthIndex"] = names.index(a["length"])
     L = ["%s %s Rec%s%s(%s)" % (ret, s["conv"], camel(sub), slot, params), "{"]
     L.append("    ReplayRoots roots;")
     for i, a in enumerate(s["args"]):
@@ -541,6 +597,9 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L.append("    if (scope.Import()) {")
         if res is not None:
             L += ["        " + x for x in result_out(res, objects, "i")]
+        for i, a in enumerate(s["args"]):
+            if a["mode"] == "bytes-out":
+                L.append('        ImportOutBytes(line, "%s", a%d, (int)result, a%d);' % (a["line"], i, a["lengthIndex"]))
         L.append("        FinishImport(line);")
         L.append("    }")
     L.append("    if (scope.Open()) {")
@@ -601,6 +660,16 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
             return ['ArgVec3(s_call, "%s", %s);' % (line, var)]
         if phase == "i":
             return ['ImportVec3(line, "%s", %s);' % (a.get("label", line), var)]
+    elif mode == "bytes-in":
+        if phase == "a":
+            return ['ArgPending(s_call, "%s");' % line]
+        if phase == "i":
+            return ["ImportBytes(line, %s, %s);" % (var, "a%d" % a["lengthIndex"])]
+    elif mode == "bytes-out":
+        if phase == "a":
+            return ['ArgPending(s_call, "%s");' % line]
+        if phase == "i":
+            return ["ImportPending(line);"]
     elif mode == "pending":
         if phase == "a":
             return ['ArgPending(s_call, "%s");' % line]
@@ -627,6 +696,9 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
         lines.append("ImportResult(line, result);")
     elif mode == "text":
         lines.append("ImportResult(line, (const char*)result);")
+    elif mode == "object" and res.get("reach"):
+        reach = ", ".join('"%s"' % f for f in res["reach"])
+        lines.append("ImportResultObjectReach(line, ROK_%s, result, %d, %s);" % (upper(res["kind"]), len(res["reach"]), reach))
     elif mode == "object":
         lines.append("ImportResultObject(line, ROK_%s, result);" % upper(res["kind"]))
     elif mode == "weapon":
@@ -692,6 +764,10 @@ def render_slots(ann: dict, model: dict) -> str:
 
 def import_stub(seam: str, slot: str, s: dict) -> list[str]:
     params = ", ".join("%s a%d" % (s["params"][i], i) for i in range(len(s["args"])))
+    names = [a["name"] for a in s["args"]]
+    for a in s["args"]:
+        if a.get("length"):
+            a["lengthIndex"] = names.index(a["length"])
     L = ["%s %s Imp_%s_%s(%s)" % (s["ret"], s["conv"], seam, slot, params), "{"]
     L += ["    ReplayText t;", '    StartImport(t, "%s.%s");' % (seam, slot)]
     for i, a in enumerate(s["args"]):
@@ -706,14 +782,26 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append("    Space(t);\n    ReplayAddWeapon(t, %s);" % v)
         elif m == "vec3":
             L.append('    Space(t);\n    t.Add("%s=");\n    AddVec3(t, %s);' % (a.get("label", a["line"]), v))
+        elif m == "object":
+            L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), v))
+        elif m == "bytes-in":
+            L.append("    Space(t);\n    AddBytes(t, %s, a%d);" % (v, a["lengthIndex"]))
         else:
             L.append("    Space(t);\n    t.Add(\"?\");")
     L.append("    const char* r = Enter(t);")
+    for i, a in enumerate(s["args"]):
+        if a["mode"] == "bytes-out":
+            L.append('    ApplyBytes(a%d, a%d, "%s");' % (i, a["lengthIndex"], a["line"]))
     res = s["result"]
     if res is None:
         L.append("    (void)r;")
     elif res["mode"] == "scalar":
         L.append("    return ParseResult<%s>(r);" % s["ret"])
+    elif res["mode"] == "object":
+        L.append("    %s o = (%s)ReplayResolveObject(r, nullptr, g_objects, AllocObject);" % (s["ret"], s["ret"]))
+        for f in res.get("reach", []):
+            L.append('    ApplyReach(o, ROK_%s, ".%s");' % (upper(res["kind"]), f))
+        L.append("    return o;")
     elif res["mode"] == "weapon":
         L.append("    %s w = (%s)ReplayParseWeapon(r);" % (s["ret"], s["ret"]))
         for f in res.get("reach", []):
@@ -826,15 +914,181 @@ def json_text(ann: dict, model: dict) -> str:
     return "\n".join(out)
 
 
+SERVICES_H = ROOT / "src/harness/replay_services.h"
+SERVICES_INC = ROOT / "src/harness/replay_services.inc"
+SERVICES_SLOTS = ROOT / "tests/replay_services.h"
+HOOK_KIND = {"stream": "Int", "int": "Int", "double": "Dbl"}
+
+
+def service_declaration(spec: dict) -> str:
+    """The declaration of the spec, checked against its header (interfaces/services.h unless `header` says another)."""
+    text = " ".join((ROOT / spec.get("header", "interfaces/services.h")).read_text().split())
+    declaration = " ".join(spec["declaration"].split()).rstrip(";")
+    if declaration + ";" not in text and declaration + " {" not in text:
+        raise Error("the service %s is not declared in %s as `%s`" % (spec["name"], spec.get("header", "interfaces/services.h"), spec["declaration"]))
+    return declaration
+
+
+def check_service_hooks(services: list[dict]) -> list[str]:
+    """Errors for a `ReplayImport call(RI_X);` in the game sources whose arguments differ from the spec."""
+    errors = []
+    found = {}
+    for path in sorted((ROOT / "src").rglob("*.cpp")):
+        if "harness" in path.parts:
+            continue
+        lines = path.read_text(errors="replace").split("\n")
+        for i, line in enumerate(lines):
+            m = re.match(r"\s*ReplayImport call\((RI_\w+)\);", line)
+            if not m:
+                continue
+            kinds = []
+            for follow in lines[i + 1:]:
+                k = re.match(r"\s*call\.(Int|Ptr|Dbl)\(", follow)
+                if not k:
+                    break
+                kinds.append(k.group(1))
+            found[m.group(1)] = (path, kinds)
+    for spec in services:
+        want = [HOOK_KIND.get(a["mode"], "Ptr") for a in spec["args"]]
+        got = found.get(spec["id"])
+        if got is None:
+            errors.append("no game source hooks %s with `ReplayImport call(%s);`" % (spec["name"], spec["id"]))
+        elif got[1] != want:
+            errors.append("%s gives %s to ReplayImport for %s, and the spec has %s" % (got[0].relative_to(ROOT), got[1], spec["id"], want))
+    for rid in sorted(set(found) - {s["id"] for s in services}):
+        errors.append("%s is hooked in %s and has no service spec" % (rid, found[rid][0].relative_to(ROOT)))
+    return errors
+
+
+def render_service_ids(services: list[dict]) -> str:
+    L = [GENERATED, "#ifndef HARNESS_REPLAY_SERVICES_H", "#define HARNESS_REPLAY_SERVICES_H", "", "enum ReplayImportId {"]
+    L += ["    %s," % s["id"] for s in services]
+    L += ["    RI_COUNT", "};", "", "static const char* const kReplayImportNames[RI_COUNT] = {"]
+    L += ['    "services.%s",' % s["name"] for s in services]
+    L += ["};", "", "#endif", ""]
+    return "\n".join(L)
+
+
+def render_service_end(services: list[dict]) -> str:
+    L = [GENERATED, "", "// included by replay.cpp after the helpers of the import lines", "",
+         "void ReplayImportEnd(ReplayImport& c)", "{", "    ReplayText& t = s_call;", "    const ReplayArg* a = c.args;",
+         '    t.Add("  i ");', "    t.Add(kReplayImportNames[c.id]);", "    switch (c.id) {"]
+    for s in services:
+        L.append("    case %s:" % s["id"])
+        L.append("    {")
+        for i, a in enumerate(s["args"]):
+            m = a["mode"]
+            if m == "skip":
+                continue
+            L.append("        AddSpace(t);")
+            if m == "stream":
+                L.append("        AddStream(t, a[%d].v.i);" % i)
+            elif m == "int":
+                L.append("        t.AddInt(a[%d].v.i);" % i)
+            elif m == "double":
+                L.append("        AddDoubleBits(t, a[%d].v.d);" % i)
+            elif m == "text":
+                L.append("        t.AddString((const char*)a[%d].v.p);" % i)
+            elif m == "handle":
+                L.append("        AddHandle(t, %s, a[%d].v.p);" % (handle_id(a["kind"]), i))
+        res = s.get("result")
+        if res == "int":
+            L.append("        AddResult(t, c.result);")
+        elif res == "double":
+            L.append('        t.Add(" = ");')
+            L.append("        AddDoubleBits(t, c.result.v.d);")
+        elif res == "text":
+            L.append('        t.Add(" = ");')
+            L.append("        t.AddString((const char*)c.result.v.p);")
+        handle_at = [j for j, a in enumerate(s["args"]) if a["mode"] == "handle"]
+        for o in s.get("outs", []):
+            if "member" in o:
+                L.append("        {")
+                L.append("            const %s* self = (const %s*)a[%d].v.p;" % (s["owner"], s["owner"], handle_at[0]))
+                L.append('            t.Add("\\n  o ");')
+                L.append("            AddHandle(t, %s, self);" % handle_id(s["args"][handle_at[0]]["kind"]))
+                L.append('            t.Add("%s ");' % o["label"])
+                L.append("            AddHandle(t, %s, self->%s);" % (handle_id(o["handle"]), o["member"]))
+                L.append("        }")
+            else:
+                index = [j for j, a in enumerate(s["args"]) if a.get("param") == o["text"]][0]
+                L.append('        t.Add("\\n  o %s ");' % o["label"])
+                L.append("        t.AddString((const char*)a[%d].v.p);" % index)
+        L.append("        break;")
+        L.append("    }")
+    L += ["    }", "    t.AddChar('\\n');", "    ReplayCalls() = 1;", "}", ""]
+    return "\n".join(L)
+
+
+def render_service_answers(services: list[dict]) -> str:
+    L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers", ""]
+    for s in services:
+        declaration = service_declaration(s).rstrip(";")
+        owner = s.get("owner")
+        if owner:
+            short = declaration.split("(")[0].split()[-1]
+            declaration = declaration.replace(short + "(", "%s::%s(" % (owner, short), 1)
+        L += [declaration, "{"]
+        L += ["    " + stmt for stmt in s.get("pre", [])]
+        L += ["    ReplayText t;", "    StartImport(t, %s);" % s["id"]]
+        for a in s["args"]:
+            if a["mode"] == "skip":
+                continue
+            v = a.get("param", "this")
+            L.append("    Space(t);")
+            if a["mode"] == "stream":
+                L.append("    ReplayValue(t, %s);" % v)
+            elif a["mode"] == "int":
+                L.append("    t.AddInt((int)%s);" % v)
+            elif a["mode"] == "double":
+                L.append("    AddDoubleBits(t, %s);" % v)
+            elif a["mode"] == "text":
+                L.append("    t.AddString(%s);" % v)
+            elif a["mode"] == "handle":
+                L.append("    AddObject(t, %s, %s);" % (handle_id(a["kind"]), v))
+        res = s.get("result")
+        L.append("    const char* %s = Enter(t);" % ("result" if res else "r"))
+        for o in s.get("outs", []):
+            if "member" in o:
+                L.append('    const char* %sText = OutValue("%s");' % (o["member"], o["label"]))
+                if o.get("optional"):
+                    L.append("    if (%sText != nullptr)\n        %s = ParseRecord(%sText);" % (o["member"], o["member"], o["member"]))
+                else:
+                    L.append("    %s = %sText == nullptr ? nullptr : ParseRecord(%sText);" % (o["member"], o["member"], o["member"]))
+            else:
+                L.append('    const char* %sText = OutValue("%s");' % (o["text"], o["label"]))
+                L.append("    if (%sText != nullptr)\n        ParseQuoted(%sText, %s, (unsigned)%s);" % (o["text"], o["text"], o["text"], o["size"]))
+        L += ["    " + stmt for stmt in s.get("effect", [])]
+        if res == "int":
+            L.append("    return atoi(result);")
+        elif res == "double":
+            L.append("    return ParseF64(result);")
+        elif res == "text":
+            L.append("    ParseQuoted(result, %s, 256);" % s["into"])
+            L.append("    return %s;" % s["into"])
+        else:
+            L.append("    (void)r;")
+        L += ["}", ""]
+    return "\n".join(L)
+
+
 def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: dict | None = None):
     ann = ann or load_annotations()
     assignment = assignment or read_assignment()
     model, errors = build(ann, rows, assignment)
     attach_raw_params(model)
+    services = ann["services"]
+    errors += check_service_hooks(services)
+    for sub, spec in ann["subsystems"].items():
+        errors += ["%s lists the service %s, which has no spec" % (sub, n) for n in spec.get("services", [])
+                   if not any(x["name"] == n or x["name"].startswith(n + "_") for x in services)]
     files = {
         SCHEMA_H: render_schema(ann, model),
         HOOKS_H: render_hooks(ann, model),
         SLOTS_H: render_slots(ann, model),
+        SERVICES_H: render_service_ids(services),
+        SERVICES_INC: render_service_end(services),
+        SERVICES_SLOTS: render_service_answers(services),
         JSON_OUT: json_text(ann, model),
     }
     return files, errors, model

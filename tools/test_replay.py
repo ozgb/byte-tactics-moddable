@@ -22,6 +22,16 @@ class Scenario(unittest.TestCase):
         self.assertEqual(replay.with_record("ticks 5\n", ["economy", "wind_meteors"], (3, 9)),
                          "ticks 5\nrecord economy 3 9\nrecord wind_meteors 3 9\n")
 
+    def test_a_window_can_differ_per_subsystem(self):
+        self.assertEqual(replay.with_record("ticks 5\n", ["economy", "wind_meteors"], {"economy": (3, 9)}),
+                         "ticks 5\nrecord economy 3 9\nrecord wind_meteors\n")
+
+    def test_the_stored_windows_name_a_recording_that_exists(self):
+        for key, window in replay.stored_windows().items():
+            subsystem, scenario = key.split("/")
+            self.assertTrue((replay.RECORDINGS / subsystem / (scenario + ".txt")).is_file(), key)
+            self.assertLessEqual(window[0], window[1])
+
     def test_ticks(self):
         self.assertEqual(replay.scenario_ticks("map x\nticks 150\n"), 150)
         with self.assertRaises(replay.Error):
@@ -62,7 +72,7 @@ class Subsystems(unittest.TestCase):
         self.assertEqual(versions["wind_meteors"], "1.2")
 
     def test_the_default_is_the_subsystems_with_recordings(self):
-        self.assertEqual(replay.default_subsystems(), ["wind_meteors"])
+        self.assertEqual(replay.default_subsystems(), ["wind_meteors", "economy"])
         self.assertEqual(replay.recorded_names(["wind_meteors"]), ["console-features", "meteors-earthquake", "meteors-hailstorm"])
         self.assertEqual(replay.plan_for(["wind_meteors"], None)["meteors-hailstorm"], ["wind_meteors"])
         self.assertEqual(replay.plan_for(["economy"], ["x"]), {"x": ["economy"]})

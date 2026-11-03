@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SCENARIOS = ROOT / "reference/scenarios"
 RECORDINGS = ROOT / "tests/replay"
 SCHEMA = ROOT / "data/replay_schema.json"
+WINDOWS = RECORDINGS / "windows.json"
 FORMAT = 2
 RUN_SECONDS_BASE = 120
 RUN_TICKS_PER_SECOND = 25
@@ -64,10 +65,20 @@ def recorded_names(subsystems: list[str]) -> list[str]:
     return sorted({p.stem for s in subsystems for p in (RECORDINGS / s).glob("*.txt")})
 
 
-def with_record(text: str, subsystems: list[str] | str, window: tuple[int, int] | None = None) -> str:
-    """The scenario text with a record line per subsystem at the end."""
+def stored_windows() -> dict[str, tuple[int, int]]:
+    """The windows of the stored recordings that cover only some ticks: "<subsystem>/<scenario>" -> (first, last)."""
+    if not WINDOWS.is_file():
+        return {}
+    return {k: (v[0], v[1]) for k, v in json.loads(WINDOWS.read_text()).items()}
+
+
+def with_record(text: str, subsystems: list[str] | str, window: tuple[int, int] | dict[str, tuple[int, int]] | None = None) -> str:
+    """The scenario text with a record line per subsystem at the end; a dict window is per subsystem."""
     names = [subsystems] if isinstance(subsystems, str) else subsystems
-    lines = "".join(f"record {s}\n" if window is None else f"record {s} {window[0]} {window[1]}\n" for s in names)
+    lines = ""
+    for s in names:
+        w = window.get(s) if isinstance(window, dict) else window
+        lines += f"record {s}\n" if w is None else f"record {s} {w[0]} {w[1]}\n"
     return text + ("" if text.endswith("\n") else "\n") + lines
 
 
@@ -110,7 +121,7 @@ def check_form(text: str, subsystem: str = "wind_meteors") -> list[str]:
     return problems
 
 
-def play_recording(exe: Path, scenario: Path, game_dir: str | None, native: bool, window: tuple[int, int] | None,
+def play_recording(exe: Path, scenario: Path, game_dir: str | None, native: bool, window: tuple[int, int] | dict[str, tuple[int, int]] | None,
                    directory: Path, subsystems: list[str]) -> dict[str, str]:
     """Play one scenario with a record line per subsystem and return the text of each recording it wrote."""
     directory.mkdir(parents=True, exist_ok=True)
@@ -149,10 +160,13 @@ def record(exe: Path, plan: dict[str, list[str]], game_dir: str | None, native: 
     out.mkdir(parents=True, exist_ok=True)
     work = out / ".scenarios"
     results: dict[tuple[str, str], str] = {}
+    stored = stored_windows()
 
     def one(name: str) -> None:
         scenario = scenario_path(name)
-        texts = play_recording(exe, scenario, game_dir, native, window, work / scenario.stem, plan[name])
+        chosen = window if window is not None else {
+            s: stored[f"{s}/{scenario.stem}"] for s in plan[name] if f"{s}/{scenario.stem}" in stored}
+        texts = play_recording(exe, scenario, game_dir, native, chosen, work / scenario.stem, plan[name])
         for subsystem, text in texts.items():
             problems = check_form(text, subsystem)
             if problems:

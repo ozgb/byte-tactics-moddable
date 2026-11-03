@@ -98,6 +98,28 @@ static void TestKnownMany()
     Check(k.Get("Unit#5000.health") == 0, "an unknown name has no value");
 }
 
+static void TestKnownGrows()
+{
+    ReplayKnown k;
+    char name[48];
+    char value[24];
+    for (int i = 0; i < 100000; i++) {
+        sprintf(name, "Unit#%d.resourceSlot.energyMake", i);
+        sprintf(value, "f32:0x%08x", i);
+        Check(k.Changed(name, value), "a new name of many is a change");
+    }
+    bool all = true;
+    for (int i = 0; i < 100000; i += 7) {
+        sprintf(name, "Unit#%d.resourceSlot.energyMake", i);
+        sprintf(value, "f32:0x%08x", i);
+        all = all && !k.Changed(name, value);
+    }
+    Check(all, "a hundred thousand names are all kept");
+    k.Reset();
+    Check(k.Get("Unit#7.resourceSlot.energyMake") == 0, "reset forgets them all");
+    Check(k.Changed("Unit#7.resourceSlot.energyMake", "f32:0x00000007"), "and a name can be set again");
+}
+
 static void TestOrdinals()
 {
     ReplayOrdinals o;
@@ -118,6 +140,7 @@ int main()
     TestGrowth();
     TestKnown();
     TestKnownMany();
+    TestKnownGrows();
     TestOrdinals();
     if (g_failures == 0) {
         printf("replay_test: all passed\n");

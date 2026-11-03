@@ -4,7 +4,7 @@
 #include "replay_text.h"
 #include "replay_types.h"
 
-enum { REPLAY_MAX_OBJECTS = 4096, REPLAY_MAX_ROOTS = 8, REPLAY_REACH_HASH = 8192 };
+enum { REPLAY_UNIT_POOL = 5001, REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384 };
 
 class ReplayObjectTable {
 public:
@@ -18,7 +18,7 @@ public:
 private:
     ReplayObjectTable(const ReplayObjectTable&);
     ReplayObjectTable& operator=(const ReplayObjectTable&);
-    enum { KINDS = 8, HASH = 16384 };
+    enum { KINDS = 16, HASH = 16384 };
     unsigned count[KINDS];
     void* objects[KINDS][REPLAY_MAX_OBJECTS];
     short slots[KINDS][HASH];
@@ -33,6 +33,7 @@ struct ReplayReach {
 
 typedef void* (*ReplayAllocFn)(unsigned size);
 
+bool ReplayInsideTable(unsigned kind, const void* p);
 void ReplayAddWeapon(ReplayText& t, const void* p);
 void* ReplayParseWeapon(const char* value);
 void ReplayAddObjectName(ReplayText& t, ReplayObjectTable& table, unsigned kind, const void* p, bool assign);

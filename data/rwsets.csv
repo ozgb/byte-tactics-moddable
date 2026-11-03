@@ -51501,6 +51501,7 @@ address,function,file,kind,target
 ,UiEndOfTick,src/harness/harness.cpp,global_maybe_written,s_uiSelection@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_maybe_written,selection@UiEndOfTick
 ,UiEndOfTick,src/harness/harness.cpp,global_read,g_game
+,UiEndOfTick,src/harness/harness.cpp,global_read,s_inputCount@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_read,s_ui@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_read,s_uiScrollSeen@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_read,s_uiScrollX@src/harness/harness.cpp

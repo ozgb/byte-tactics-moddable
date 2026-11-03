@@ -7,11 +7,6 @@ features,StartFeatureBurning,PlaySoundAtByName,TODO(#620): sim-to-presentation e
 features,UpdateFeatures,EmitWhiteSmoke,TODO(#620): sim-to-presentation event or message
 los_radar,CmdShareMapping,AddMessage,TODO(#620): sim-to-presentation event or message
 los_radar,CmdShareRadar,AddMessage,TODO(#620): sim-to-presentation event or message
-los_radar,DrawRadarUnits,DrawCircle,TODO(#647): presentation code in a tick: radar picture drawing
-los_radar,DrawRadarUnits,DrawDashedCircle,TODO(#647): presentation code in a tick: radar picture drawing
-los_radar,DrawRadarUnits,DrawFrame,TODO(#647): presentation code in a tick: radar picture drawing
-los_radar,DrawRadarUnits,DrawPixel,TODO(#647): presentation code in a tick: radar picture drawing
-los_radar,DrawRadarUnits,DrawSurface,TODO(#647): presentation code in a tick: radar picture drawing
 los_radar,ToggleShareLos,AddMessage,TODO(#620): sim-to-presentation event or message
 map,Mission::BuildMissionList,GetLocalizedString,TODO(#620): sim-to-presentation event or message
 map,Mission::LoadCampaign,ShowErrorBox,TODO(#620): sim-to-presentation event or message

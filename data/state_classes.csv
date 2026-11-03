@@ -1917,7 +1917,6 @@ g_imageHelpModule@src/host/win32/crash.cpp,,static,platform,platform,platform: t
 g_imageHi,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,1:OnEnter,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
 g_imageLo,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,1:OnEnter,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
 g_index,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,2:Note|SwapBanks,
-g_info,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,6:PrepareSpans|Probe|RebuildSpans,
 g_insideThread,,static,mixed,platform,mixed: a phase and presentation write it,0|1|2|4|5|6|7|8,0|1|2|4|5|7|8,rw,yes,3:AllocLocked|Guard::~Guard|Guard::Guard,2:AllocLocked|Guard::Guard,"Sim block allocator internals (src/state/block.cpp): constants, the block base and the owner-thread assert; the allocator's state lives inside the block."
 g_libraryDateStamp@src/host/win32/crash.cpp,,static,sim,platform,"sim: a phase reads it, nothing in game logic or presentation writes it",,0|1|2|4|5|7|8,r,,,1:FormatSystemInfo,"Debug, profiler or crash-report data (src/debug/); host only."
 g_loadedImage@src/host/win32/crash.cpp,,static,,platform,none: only code outside every walk touches it,,,,,1:CloseLoadedImage?,1:CloseLoadedImage,"UI, frontend or presentation state."
@@ -1953,18 +1952,17 @@ g_quitPending,,static,view,platform,"view: presentation writes it, no phase read
 g_quitThread,,static,view,platform,"view: presentation writes it, no phase reads it",,,rw,,1:HeadlessPostQuit,1:HeadlessPumpEvents,"Headless Win32 host state (src/host/win32/headless.cpp, test mode only): platform state behind the host interface, not game state."
 g_refCursor,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:BlockScanTick,1:SwapBanks,
 g_refIndex,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,1:SwapBanks,
-g_refInfo,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,2:PrepareSpans|SwapBanks,
 g_refPages,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,1:SwapBanks,
 g_refRowCount,,static,platform,,platform: only the debug library or the test harness touches it,,,,,,1:SwapBanks,
-g_refRows,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,1:SwapBanks,
+g_refRows,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,2:BlockScanEnable|SwapBanks,
 g_refSpanCount,,static,platform,,platform: only the debug library or the test harness touches it,,,,,,2:PrepareSpans|SwapBanks,
 g_refSpanMax,,static,platform,,platform: only the debug library or the test harness touches it,,,,,,2:PrepareSpans|SwapBanks,
 g_refSpanMin,,static,platform,,platform: only the debug library or the test harness touches it,,,,,,2:PrepareSpans|SwapBanks,
 g_refSpans,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,2:PrepareSpans|SwapBanks,
-g_registry,,static,view,view,"view: only presentation reads it, nothing writes it",,,r,,1:BlockScanEnable,4:Find|OnAdded|OnRemoved,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
+g_registry,,static,view,view,"view: only presentation reads it, nothing writes it",,,r,,1:BlockScanEnable,5:Find|OnAdded|OnRemoved,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
 g_registryCount,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,2:OnAdded|OnRemoved,3:BlockScanWrite|OnAdded|OnRemoved,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
 g_rowCount,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:Note,5:BlockScanWrite|CollectRows|Note,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
-g_rows,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,4:CollectRows|Note|ReportTopHolders,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
+g_rows,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,5:BlockScanEnable|CollectRows|Note,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
 g_savedMouseTrails,,static,view,platform,"view: only presentation reads it, nothing writes it",,,r,,1:host_window_open?,1:RestoreMouseTrails,"Window state of the Win32 host (src/host/win32/window.cpp): saved mouse trails setting; platform state behind the host interface, not game state."
 g_scanLock,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,3:BlockScanTick|OnAdded|OnRemoved,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
 g_scanMax,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:BlockScanTick,2:BlockScanTick|BlockScanWrite,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
@@ -1976,10 +1974,10 @@ g_simEvents@src/state/sim_events.cpp,,static,mixed,view,"mixed: load and present
 g_soundNames@src/ingame/sim_event_drain.cpp,,static,view,view,"view: only presentation reads it, nothing writes it",,,r,,,1:DrainSound,The sound names the drain plays for the sim events.
 g_soundOpen,,static,view,platform,"view: presentation writes it, no phase reads it",,,rw,,2:HeadlessSoundClose|HeadlessSoundOpen,2:HeadlessSoundBufferCreate|HeadlessSoundBufferDuplicate,"Headless Win32 host state (src/host/win32/headless.cpp, test mode only): platform state behind the host interface, not game state."
 g_spanBase,,static,platform,,platform: only the debug library or the test harness touches it,,,,,1:PrepareSpans,1:PrepareSpans,
-g_spanCount,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,3:RebuildSpans|SpanErase|SpanInsert,8:PrepareSpans|Probe|RebuildSpans,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
+g_spanCount,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,3:RebuildSpans|SpanErase|SpanInsert,9:PrepareSpans|Probe|RebuildSpans,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
 g_spanMax,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:SummarizeSpans,6:PrepareSpans|ProbeWord|ScanFast,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
 g_spanMin,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:SummarizeSpans,6:PrepareSpans|ProbeWord|ScanFast,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
-g_spans,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,8:PrepareSpans|Probe|RebuildSpans,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
+g_spans,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:BlockScanEnable,9:PrepareSpans|Probe|RebuildSpans,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
 g_speechTexts@src/ingame/sim_event_drain.cpp,,static,view,view,"view: only presentation reads it, nothing writes it",,,r,,,1:DrainUnitSpeech,The speech texts the drain presents for the sim events.
 g_stackHigh,,static,mixed,platform,mixed: a phase and presentation write it,0|1|2|4|5|7|8,0|1|2|4|5|7|8,rw,yes,1:IsOutsideStack,2:GetStackHigh|IsOutsideStack,CPU feature or debug/stack-probe state (src/debug).
 g_stackKnown,,static,mixed,platform,mixed: a phase and presentation write it,0|1|2|4|5|7|8,0|1|2|4|5|7|8,rw,yes,1:IsOutsideStack,1:IsOutsideStack,CPU feature or debug/stack-probe state (src/debug).

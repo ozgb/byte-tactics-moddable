@@ -11,6 +11,7 @@
 #include "../interfaces/seams.h"
 #include "../src/game/game_state.h"
 #include "../src/game/console_commands.h"
+#include "../src/harness/replay_services.h"
 #include "../src/harness/replay_text.h"
 #include "../src/harness/replay_values.h"
 #include "../src/harness/replay_objects.h"
@@ -63,32 +64,29 @@ int __cdecl ScaledCos(int angle, int scale)
     return bx_ScaledCos((short)angle, scale);
 }
 
+void __stdcall UpdateResourceSharing(Player* player);
+float __stdcall GetEnergyUse(UnitDef* def);
+void __stdcall UpdatePlayerEconomy(Player* player);
+void __stdcall UpdateMetalExtraction(Unit* unit);
+
+struct ConstructedElement {
+    ConstructedElement();
+    ~ConstructedElement();
+    int field_0;
+};
+
+ConstructedElement::ConstructedElement()
+{
+}
+
+ConstructedElement::~ConstructedElement()
+{
+}
+
 namespace {
 
-enum { MAX_LINES = 65536, MAX_OUTS = 8, MAX_RECORDS = 64, TEXT = 512 };
+enum { MAX_LINES = 1 << 21, MAX_OUTS = 8, MAX_RECORDS = 64, TEXT = 512 };
 enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
-
-enum ImportId {
-    IMP_GAME_RAND,
-    IMP_RANDOM_INT,
-    IMP_FATAL_ERROR,
-    IMP_BUILD_DATA_PATH,
-    IMP_TDF_CONSTRUCT,
-    IMP_TDF_DESTRUCT,
-    IMP_TDF_LOAD_FILE,
-    IMP_TDF_SELECT_RECORD,
-    IMP_TDF_GET_INT,
-    IMP_TDF_GET_DOUBLE,
-    IMP_TDF_GET_STRING,
-    IMP_GET_INT_ARG
-};
-
-const char* const kImportNames[] = {
-    "services.GameRand", "services.RandomInt", "services.FatalError", "services.BuildDataPath",
-    "services.TdfFile_Construct", "services.TdfFile_Destruct", "services.TdfFile_LoadFile",
-    "services.TdfFile_SelectRecord", "services.TdfRecord_GetFieldInt", "services.TdfRecord_GetFieldDouble",
-    "services.TdfRecord_GetFieldString", "services.CommandArgs_GetIntArg",
-};
 
 int g_failures;
 
@@ -408,7 +406,7 @@ void StartImport(ReplayText& t, const char* name)
 
 void StartImport(ReplayText& t, int id)
 {
-    StartImport(t, kImportNames[id]);
+    StartImport(t, kReplayImportNames[id]);
 }
 
 void Space(ReplayText& t)
@@ -427,6 +425,18 @@ template <> float ParseResult<float>(const char* text)
     float f;
     memcpy(&f, &bits, 4);
     return f;
+}
+
+void AddBytes(ReplayText& t, const void* p, int length)
+{
+    ReplayBytes(t, p, length);
+}
+
+void ApplyBytes(void* dst, int length, const char* name)
+{
+    const char* value = OutValue(name);
+    if (value != nullptr && dst != nullptr)
+        ReplayParseBytes(value, dst, length);
 }
 
 void ApplyReach(void* object, unsigned kind, const char* suffix)
@@ -607,172 +617,53 @@ void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr)
 
 }
 
-int __cdecl GameRand(RandStream stream)
-{
-    ReplayText t;
-    StartImport(t, IMP_GAME_RAND);
-    Space(t);
-    ReplayValue(t, stream);
-    const char* result = Enter(t);
-    bx_rand(SimRandStream(stream));
-    return atoi(result);
-}
-
-int __stdcall RandomInt(int range)
-{
-    ReplayText t;
-    StartImport(t, IMP_RANDOM_INT);
-    Space(t);
-    t.AddInt(range);
-    const char* result = Enter(t);
-    if (range >= 2) {
-        unsigned int seed = *SeedWord();
-        unsigned int q = seed / 127773;
-        unsigned int correction = (q << 31) - seed / 127773;
-        seed = seed * 16807 - correction;
-        if ((int)seed <= 0)
-            seed += 2147483647;
-        *SeedWord() = seed;
-    }
-    return atoi(result);
-}
-
-void __stdcall FatalError(char* message)
-{
-    ReplayText t;
-    StartImport(t, IMP_FATAL_ERROR);
-    Space(t);
-    t.AddString(message);
-    Enter(t);
-}
-
-char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext)
-{
-    ReplayText t;
-    StartImport(t, IMP_BUILD_DATA_PATH);
-    Space(t);
-    t.AddString(dir);
-    Space(t);
-    t.AddString(name);
-    Space(t);
-    t.AddString(ext);
-    const char* result = Enter(t);
-    ParseQuoted(result, buf, 256);
-    return buf;
-}
-
-TdfFile::TdfFile()
-{
-    root = nullptr;
-    current = nullptr;
-    ReplayText t;
-    StartImport(t, IMP_TDF_CONSTRUCT);
-    Space(t);
-    AddObject(t, OBJ_FILE, this);
-    Enter(t);
-}
-
-TdfFile::~TdfFile()
-{
-    ReplayText t;
-    StartImport(t, IMP_TDF_DESTRUCT);
-    Space(t);
-    AddObject(t, OBJ_FILE, this);
-    Enter(t);
-}
-
-int TdfFile::LoadFile(char* path)
-{
-    ReplayText t;
-    StartImport(t, IMP_TDF_LOAD_FILE);
-    Space(t);
-    AddObject(t, OBJ_FILE, this);
-    Space(t);
-    t.AddString(path);
-    int result = atoi(Enter(t));
-    const char* newRoot = OutValue(".root");
-    const char* newCurrent = OutValue(".current");
-    root = newRoot == nullptr ? nullptr : ParseRecord(newRoot);
-    current = newCurrent == nullptr ? nullptr : ParseRecord(newCurrent);
-    return result;
-}
-
-int TdfFile::SelectRecord(char* name)
-{
-    ReplayText t;
-    StartImport(t, IMP_TDF_SELECT_RECORD);
-    Space(t);
-    AddObject(t, OBJ_FILE, this);
-    Space(t);
-    t.AddString(name);
-    int result = atoi(Enter(t));
-    const char* newCurrent = OutValue(".current");
-    if (newCurrent != nullptr)
-        current = ParseRecord(newCurrent);
-    return result;
-}
-
-int TdfRecord::GetFieldInt(const char* name, int def)
-{
-    ReplayText t;
-    StartImport(t, IMP_TDF_GET_INT);
-    Space(t);
-    AddObject(t, OBJ_RECORD, this);
-    Space(t);
-    t.AddString(name);
-    Space(t);
-    t.AddInt(def);
-    return atoi(Enter(t));
-}
-
-double TdfRecord::GetFieldDouble(const char* name, double def)
-{
-    ReplayText t;
-    StartImport(t, IMP_TDF_GET_DOUBLE);
-    Space(t);
-    AddObject(t, OBJ_RECORD, this);
-    Space(t);
-    t.AddString(name);
-    Space(t);
-    AddDoubleBits(t, def);
-    return ParseF64(Enter(t));
-}
-
-int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
-{
-    ReplayText t;
-    StartImport(t, IMP_TDF_GET_STRING);
-    Space(t);
-    AddObject(t, OBJ_RECORD, this);
-    Space(t);
-    t.AddString(key);
-    Space(t);
-    t.AddInt((int)size);
-    Space(t);
-    t.AddString(def);
-    int result = atoi(Enter(t));
-    const char* text = OutValue("dst");
-    if (text != nullptr)
-        ParseQuoted(text, dst, (unsigned)size);
-    return result;
-}
-
-int CommandArgs::GetIntArg(int index, int def)
-{
-    ReplayText t;
-    StartImport(t, IMP_GET_INT_ARG);
-    Space(t);
-    t.AddInt(index);
-    Space(t);
-    t.AddInt(def);
-    return atoi(Enter(t));
-}
+#include "replay_services.h"
 
 namespace {
 
 void __fastcall LoadMeteorDefaultsSlot(MeteorParams* params)
 {
     params->LoadMeteorDefaults();
+}
+
+void __stdcall ResetSlot(UnitResources* self, unsigned char playerIndex)
+{
+    self->Reset(playerIndex);
+}
+
+void __stdcall SaveUnitAccountsSlot(UnitResources* self, UnitInfo* info, HapiBank* file)
+{
+    self->SaveUnitAccounts(info, file);
+}
+
+void __stdcall LoadUnitAccountsSlot(UnitResources* self, UnitInfo* info, HapiBank* file)
+{
+    self->LoadUnitAccounts(info, file);
+}
+
+int __stdcall RequestEnergySlot(UnitResources* self, UnitResources* r, float amount)
+{
+    return self->RequestEnergy(r, amount);
+}
+
+int __stdcall RequestEnergyAndMetalSlot(UnitResources* self, float energy, float metal)
+{
+    return self->RequestEnergyAndMetal(energy, metal);
+}
+
+int __stdcall SpendEnergySlot(UnitResources* self, float amount)
+{
+    return self->SpendEnergy(amount);
+}
+
+int __stdcall SpendMetalSlot(UnitResources* self, float amount)
+{
+    return self->SpendMetal(amount);
+}
+
+int __stdcall SpendEnergyAndMetalSlot(UnitResources* self, float energy, float metal)
+{
+    return self->SpendEnergyAndMetal(energy, metal);
 }
 
 #include "replay_slots.h"
@@ -851,7 +742,7 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
     if (!ReplayParseKey(name, &kind, &ordinal, &fieldName))
         return false;
     char object[48];
-    const char* dot = strchr(name, '.');
+    const char* dot = strrchr(name, '.');
     memcpy(object, name, (unsigned)(dot - name));
     object[dot - name] = '\0';
     void* p = ReplayResolveObject(object, nullptr, g_objects, AllocObject);
@@ -873,7 +764,7 @@ void CompareObjects(const ReplaySlotSets* sets)
     for (unsigned at = 0; at < g_reach.count; at++) {
         for (unsigned i = 0; i < sets->objWriteCount; i++) {
             const ReplayObjectField& f = kReplayObjectFields[sets->objWrites[i]];
-            if (f.object != g_reach.kind[at])
+            if (f.object != g_reach.kind[at] || f.kind == RK_EMBED)
                 continue;
             ReplayObjectFieldKey(key, g_objects, false, g_reach.kind[at], g_reach.object[at], f);
             ReplayFormatObjectField(f, g_reach.object[at], g_objects, false, value);
@@ -1148,7 +1039,7 @@ int Replay(const char* file, int expectCall, const char* expectField)
 
 const unsigned short* AllStateFields(unsigned* count)
 {
-    static unsigned short all[64];
+    static unsigned short all[512];
     unsigned n = 0;
     for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
         if (kReplayObjectKinds[kReplayObjectFields[i].object].scope == RS_STATE)
@@ -1160,12 +1051,13 @@ const unsigned short* AllStateFields(unsigned* count)
 
 void RecordGraph(ReplayText& text, ReplayKnown& known, void* player, const ReplaySlotSets& sets)
 {
-    ReplayObjectTable table;
+    ReplayObjectTable* table = new ReplayObjectTable;
     ReplayReach* reach = new ReplayReach;
     unsigned char kind = ROK_PLAYER;
-    ReplayWalk(*reach, table, true, sets, &kind, &player, 1);
-    ReplayCaptureObjects(text, known, table, *reach, sets.objReads, sets.objReadCount, 'r');
+    ReplayWalk(*reach, *table, true, sets, &kind, &player, 1);
+    ReplayCaptureObjects(text, known, *table, *reach, sets.objReads, sets.objReadCount, 'r');
     delete reach;
+    delete table;
 }
 
 void ObjectSelfTest()
@@ -1176,9 +1068,13 @@ void ObjectSelfTest()
     const unsigned short* all = AllStateFields(&count);
     ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
 
-    Player* player = (Player*)SimAlloc(sizeof(Player));
-    Unit* a = (Unit*)SimAlloc(sizeof(Unit));
-    Unit* b = (Unit*)SimAlloc(sizeof(Unit));
+    Unit* pool = (Unit*)SimAlloc(8 * (unsigned)sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 8;
+    Player* player = &g_game->players[3];
+    Unit* a = &pool[2];
+    Unit* m = &pool[3];
+    Unit* b = &pool[5];
     UnitDef* def = (UnitDef*)SimAlloc(sizeof(UnitDef));
     player->active = 1;
     player->id = 7;
@@ -1190,19 +1086,43 @@ void ObjectSelfTest()
     a->buildLeft = 0.5f;
     a->def = def;
     a->player = player;
+    m->health = 3;
+    m->def = def;
     b->health = -5;
     b->def = def;
     b->player = player;
     def->energymake = 25.0f;
     def->windgenerator = 0.75f;
+    UnitResources* econ = (UnitResources*)SimAlloc(sizeof(UnitResources));
+    player->econ = econ;
+    econ->energyMake = 7.0f;
+    econ->player = player;
+    player->totalEnergyProduced = 123.5;
+    player->allied[3] = 1;
+    player->type = 2;
+    a->resourceSlot.energyMake = 2.5f;
+    a->resourceSlot.player = player;
+    a->cell.x = 5;
+    a->cell.y = 6;
+    a->flags = 0x10000000u;
 
     ReplayText text;
     ReplayKnown recorded;
     RecordGraph(text, recorded, player, sets);
-    Check(strstr(text.Data(), "  r Player#1.unitsBegin Unit#1\n") != nullptr, "the player's first unit is Unit#1");
-    Check(strstr(text.Data(), "  r Unit#2.def UnitDef#1\n") != nullptr, "the second unit shares UnitDef#1");
-    Check(strstr(text.Data(), "  r Unit#1.def UnitDef#1\n") != nullptr, "the first unit shares UnitDef#1");
-    Check(strstr(text.Data(), "UnitDef#2") == nullptr && strstr(text.Data(), "Unit#3") == nullptr, "no other objects are reached");
+    Check(strstr(text.Data(), "  r Player#3.unitsBegin Unit#2\n") != nullptr, "the player's first unit is named by its slot");
+    Check(strstr(text.Data(), "  r Player#3.unitsEnd Unit#5\n") != nullptr, "the end of the range is the last unit, not one past it");
+    Check(strstr(text.Data(), "  r Unit#3.health 3\n") != nullptr, "a unit inside the range is reached");
+    Check(strstr(text.Data(), "  r Unit#4.health 0\n") != nullptr, "an empty slot of the range is reached");
+    Check(strstr(text.Data(), "  r Unit#6.") == nullptr && strstr(text.Data(), "  r Unit#1.") == nullptr, "no slot outside the range is reached");
+    Check(strstr(text.Data(), "  r Unit#5.def UnitDef#1\n") != nullptr, "the units share UnitDef#1");
+    Check(strstr(text.Data(), "UnitDef#2") == nullptr, "no other definition is reached");
+    Check(strstr(text.Data(), "  r Player#3.econ UnitResources#1\n") != nullptr, "a separate account is named by its order");
+    Check(strstr(text.Data(), "  r UnitResources#1.energyMake f32:0x40e00000\n") != nullptr, "the fields of a separate account are recorded");
+    Check(strstr(text.Data(), "  r Unit#2.resourceSlot.energyMake f32:0x40200000\n") != nullptr, "the account inside a unit is named by the unit and the member");
+    Check(strstr(text.Data(), "  r Unit#2.resourceSlot.player Player#3\n") != nullptr, "the account inside a unit leads back to its player");
+    Check(strstr(text.Data(), "  r Player#3.totalEnergyProduced f64:0x405ee00000000000\n") != nullptr, "a double is written as its bits");
+    Check(strstr(text.Data(), "  r Player#3.allied x:0000000100000000000000\n") != nullptr, "an array of bytes is written in hex");
+    Check(strstr(text.Data(), "  r Unit#2.cell (5,6)\n") != nullptr, "a cell is written as a point");
 
     ResetBlock();
     g_callIndex = 0;
@@ -1220,13 +1140,20 @@ void ObjectSelfTest()
     }
     Check(lines > 0, "lines were restored");
     free(copy);
-    Player* rebuilt = (Player*)ReplayResolveObject("Player#1", nullptr, g_objects, AllocObject);
-    Unit* ra = (Unit*)ReplayResolveObject("Unit#1", nullptr, g_objects, AllocObject);
-    Unit* rb = (Unit*)ReplayResolveObject("Unit#2", nullptr, g_objects, AllocObject);
+    Player* rebuilt = (Player*)ReplayResolveObject("Player#3", nullptr, g_objects, AllocObject);
+    Unit* ra = (Unit*)ReplayResolveObject("Unit#2", nullptr, g_objects, AllocObject);
+    Unit* rm = (Unit*)ReplayResolveObject("Unit#3", nullptr, g_objects, AllocObject);
+    Unit* rb = (Unit*)ReplayResolveObject("Unit#5", nullptr, g_objects, AllocObject);
     Check(rebuilt != nullptr && ra != nullptr && rb != nullptr, "the objects are rebuilt in the block");
+    Check(rebuilt == &g_game->players[3], "a player is a slot of the block's player array");
     Check(rebuilt->unitsBegin.get() == ra && rebuilt->unitsEnd.get() == rb, "the player's refs point at the rebuilt units");
+    Check(rm == ra + 1 && rb == ra + 3, "the slice of the unit table is contiguous");
+    Check(rm->health == 3, "a unit inside the range is restored");
     Check(ra->def.get() != nullptr && ra->def.get() == rb->def.get(), "both units share one rebuilt UnitDef");
     Check(ra->player.get() == rebuilt && rb->player.get() == rebuilt, "the units point back at the player");
+    Check(ra->resourceSlot.energyMake == 2.5f && ra->resourceSlot.player.get() == rebuilt, "the account inside a unit is restored in the unit");
+    Check(rebuilt->econ.get() != nullptr && rebuilt->econ.get()->energyMake == 7.0f, "a separate account is rebuilt");
+    Check(rebuilt->totalEnergyProduced == 123.5 && rebuilt->allied[3] == 1 && rebuilt->allied[2] == 0, "a double and an array of bytes are restored");
 
     ReplayText again;
     ReplayKnown fresh;
@@ -1247,7 +1174,7 @@ void ObjectSelfTest()
     g_detail.Clear();
     CompareObjects(&sets);
     printf("a changed field: %s\n%s", g_firstKey, g_detail.Data());
-    Check(g_diffs == 1 && strcmp(g_firstKey, "Unit#2.health") == 0, "a changed field is reported at its Kind#N.field");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Unit#5.health") == 0, "a changed field is reported at its Kind#N.field");
     rb->health = -5;
     ra->def.get()->windgenerator = 1.5f;
     g_diffs = 0;

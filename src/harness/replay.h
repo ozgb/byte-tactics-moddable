@@ -7,21 +7,7 @@ inline int& ReplayCalls()
     return calls;
 }
 
-enum ReplayImportId {
-    RI_GAME_RAND,
-    RI_RANDOM_INT,
-    RI_FATAL_ERROR,
-    RI_BUILD_DATA_PATH,
-    RI_TDF_CONSTRUCT,
-    RI_TDF_DESTRUCT,
-    RI_TDF_LOAD_FILE,
-    RI_TDF_SELECT_RECORD,
-    RI_TDF_GET_INT,
-    RI_TDF_GET_DOUBLE,
-    RI_TDF_GET_STRING,
-    RI_GET_INT_ARG,
-    RI_COUNT
-};
+#include "replay_services.h"
 
 struct ReplayArg {
     int kind;

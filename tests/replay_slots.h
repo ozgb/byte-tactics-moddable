@@ -72,6 +72,157 @@ int __stdcall Imp_files_BankGetInteger(HapiBank* a0, char* a1, int a2)
     return ParseResult<int>(r);
 }
 
+int __stdcall Imp_files_BankOpenNamedBox(HapiBank* a0, char* a1)
+{
+    ReplayText t;
+    StartImport(t, "files.BankOpenNamedBox");
+    Space(t);
+    AddObject(t, OBJ_BANK, a0);
+    Space(t);
+    t.AddString((const char*)a1);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_files_BankSeekBox(HapiBank* a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "files.BankSeekBox");
+    Space(t);
+    AddObject(t, OBJ_BANK, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+int __stdcall Imp_files_BankReadBox(HapiBank* a0, void* a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "files.BankReadBox");
+    Space(t);
+    AddObject(t, OBJ_BANK, a0);
+    Space(t);
+    t.Add("?");
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    ApplyBytes(a1, a2, "dst");
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_files_BankWriteBox(HapiBank* a0, void* a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "files.BankWriteBox");
+    Space(t);
+    AddObject(t, OBJ_BANK, a0);
+    Space(t);
+    AddBytes(t, a1, a2);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_units_SetStateBits(Unit* a0, int a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "units.SetStateBits");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+int __stdcall Imp_units_StartScriptWithArgs(CobScript* a0, char* a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
+{
+    ReplayText t;
+    StartImport(t, "units.StartScriptWithArgs");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_COBSCRIPT, a0, false);
+    Space(t);
+    t.AddString((const char*)a1);
+    Space(t);
+    t.Add("?");
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    Space(t);
+    ReplayValue(t, a5);
+    Space(t);
+    ReplayValue(t, a6);
+    Space(t);
+    ReplayValue(t, a7);
+    Space(t);
+    ReplayValue(t, a8);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.GetMapCell");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    Cell* o = (Cell*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_CELL, ".metal");
+    return o;
+}
+
+void __stdcall Imp_network_SendShareMapInfo(unsigned char a0, unsigned char a1)
+{
+    ReplayText t;
+    StartImport(t, "network.SendShareMapInfo");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_players_TransferEnergy(unsigned char a0, unsigned char a1, float a2, int a3)
+{
+    ReplayText t;
+    StartImport(t, "players.TransferEnergy");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_players_TransferMetal(unsigned char a0, unsigned char a1, float a2, int a3)
+{
+    ReplayText t;
+    StartImport(t, "players.TransferMetal");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 WindMeteorsSeam g_native_wind_meteors = {
     UpdateWind,
     UpdateMeteors,
@@ -85,6 +236,21 @@ WindMeteorsSeam g_native_wind_meteors = {
     LoadMeteors,
     CmdMeteor,
     UpdateWindOnStream,
+};
+
+EconomySeam g_native_economy = {
+    UpdateResourceSharing,
+    GetEnergyUse,
+    UpdatePlayerEconomy,
+    UpdateMetalExtraction,
+    ResetSlot,
+    SaveUnitAccountsSlot,
+    LoadUnitAccountsSlot,
+    RequestEnergySlot,
+    RequestEnergyAndMetalSlot,
+    SpendEnergySlot,
+    SpendMetalSlot,
+    SpendEnergyAndMetalSlot,
 };
 
 void Run_wind_meteors_UpdateWind()
@@ -175,6 +341,145 @@ void Run_wind_meteors_UpdateWindOnStream()
     g_seams.wind_meteors->UpdateWindOnStream(p0);
 }
 
+void Run_economy_UpdateResourceSharing()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing(nullptr);
+    g_seams.economy->UpdateResourceSharing(p0);
+}
+
+float g_result_economy_GetEnergyUse;
+
+void Run_economy_GetEnergyUse()
+{
+    UnitDef* p0 = (UnitDef*)ArgObject("def", ROK_UNITDEF);
+    SetClosing("result");
+    g_result_economy_GetEnergyUse = g_seams.economy->GetEnergyUse(p0);
+}
+
+void After_economy_GetEnergyUse()
+{
+    CompareResult(g_result_economy_GetEnergyUse);
+}
+
+void Run_economy_UpdatePlayerEconomy()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing(nullptr);
+    g_seams.economy->UpdatePlayerEconomy(p0);
+}
+
+void Run_economy_UpdateMetalExtraction()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.economy->UpdateMetalExtraction(p0);
+}
+
+void Run_economy_Reset()
+{
+    UnitResources* p0 = (UnitResources*)ArgObject("self", ROK_UNITRESOURCES);
+    unsigned char p1 = ArgScalar<unsigned char>("playerIndex");
+    SetClosing(nullptr);
+    g_seams.economy->Reset(p0, p1);
+}
+
+void Run_economy_SaveUnitAccounts()
+{
+    UnitResources* p0 = (UnitResources*)ArgObject("self", ROK_UNITRESOURCES);
+    UnitInfo* p1 = (UnitInfo*)ArgObject("info", ROK_UNIT);
+    HapiBank* p2 = (HapiBank*)ArgHandle("file");
+    SetClosing(nullptr);
+    g_seams.economy->SaveUnitAccounts(p0, p1, p2);
+}
+
+void Run_economy_LoadUnitAccounts()
+{
+    UnitResources* p0 = (UnitResources*)ArgObject("self", ROK_UNITRESOURCES);
+    UnitInfo* p1 = (UnitInfo*)ArgObject("info", ROK_UNIT);
+    HapiBank* p2 = (HapiBank*)ArgHandle("file");
+    SetClosing(nullptr);
+    g_seams.economy->LoadUnitAccounts(p0, p1, p2);
+}
+
+int g_result_economy_RequestEnergy;
+
+void Run_economy_RequestEnergy()
+{
+    UnitResources* p0 = (UnitResources*)ArgObject("self", ROK_UNITRESOURCES);
+    UnitResources* p1 = (UnitResources*)ArgObject("r", ROK_UNITRESOURCES);
+    float p2 = ArgScalar<float>("amount");
+    SetClosing("result");
+    g_result_economy_RequestEnergy = g_seams.economy->RequestEnergy(p0, p1, p2);
+}
+
+void After_economy_RequestEnergy()
+{
+    CompareResult(g_result_economy_RequestEnergy);
+}
+
+int g_result_economy_RequestEnergyAndMetal;
+
+void Run_economy_RequestEnergyAndMetal()
+{
+    UnitResources* p0 = (UnitResources*)ArgObject("self", ROK_UNITRESOURCES);
+    float p1 = ArgScalar<float>("energy");
+    float p2 = ArgScalar<float>("metal");
+    SetClosing("result");
+    g_result_economy_RequestEnergyAndMetal = g_seams.economy->RequestEnergyAndMetal(p0, p1, p2);
+}
+
+void After_economy_RequestEnergyAndMetal()
+{
+    CompareResult(g_result_economy_RequestEnergyAndMetal);
+}
+
+int g_result_economy_SpendEnergy;
+
+void Run_economy_SpendEnergy()
+{
+    UnitResources* p0 = (UnitResources*)ArgObject("self", ROK_UNITRESOURCES);
+    float p1 = ArgScalar<float>("amount");
+    SetClosing("result");
+    g_result_economy_SpendEnergy = g_seams.economy->SpendEnergy(p0, p1);
+}
+
+void After_economy_SpendEnergy()
+{
+    CompareResult(g_result_economy_SpendEnergy);
+}
+
+int g_result_economy_SpendMetal;
+
+void Run_economy_SpendMetal()
+{
+    UnitResources* p0 = (UnitResources*)ArgObject("self", ROK_UNITRESOURCES);
+    float p1 = ArgScalar<float>("amount");
+    SetClosing("result");
+    g_result_economy_SpendMetal = g_seams.economy->SpendMetal(p0, p1);
+}
+
+void After_economy_SpendMetal()
+{
+    CompareResult(g_result_economy_SpendMetal);
+}
+
+int g_result_economy_SpendEnergyAndMetal;
+
+void Run_economy_SpendEnergyAndMetal()
+{
+    UnitResources* p0 = (UnitResources*)ArgObject("self", ROK_UNITRESOURCES);
+    float p1 = ArgScalar<float>("energy");
+    float p2 = ArgScalar<float>("metal");
+    SetClosing("result");
+    g_result_economy_SpendEnergyAndMetal = g_seams.economy->SpendEnergyAndMetal(p0, p1, p2);
+}
+
+void After_economy_SpendEnergyAndMetal()
+{
+    CompareResult(g_result_economy_SpendEnergyAndMetal);
+}
+
 bool RunSlot(const char* subsystem, const char* slot)
 {
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "UpdateWind") == 0) {
@@ -225,6 +530,54 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_wind_meteors_UpdateWindOnStream();
         return true;
     }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UpdateResourceSharing") == 0) {
+        Run_economy_UpdateResourceSharing();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "GetEnergyUse") == 0) {
+        Run_economy_GetEnergyUse();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UpdatePlayerEconomy") == 0) {
+        Run_economy_UpdatePlayerEconomy();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UpdateMetalExtraction") == 0) {
+        Run_economy_UpdateMetalExtraction();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Reset") == 0) {
+        Run_economy_Reset();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "SaveUnitAccounts") == 0) {
+        Run_economy_SaveUnitAccounts();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "LoadUnitAccounts") == 0) {
+        Run_economy_LoadUnitAccounts();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RequestEnergy") == 0) {
+        Run_economy_RequestEnergy();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RequestEnergyAndMetal") == 0) {
+        Run_economy_RequestEnergyAndMetal();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "SpendEnergy") == 0) {
+        Run_economy_SpendEnergy();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "SpendMetal") == 0) {
+        Run_economy_SpendMetal();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "SpendEnergyAndMetal") == 0) {
+        Run_economy_SpendEnergyAndMetal();
+        return true;
+    }
     return false;
 }
 
@@ -232,14 +585,31 @@ void RunAfter(const char* subsystem, const char* slot)
 {
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "LoadMeteorDefaults") == 0)
         After_wind_meteors_LoadMeteorDefaults();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "GetEnergyUse") == 0)
+        After_economy_GetEnergyUse();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RequestEnergy") == 0)
+        After_economy_RequestEnergy();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RequestEnergyAndMetal") == 0)
+        After_economy_RequestEnergyAndMetal();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "SpendEnergy") == 0)
+        After_economy_SpendEnergy();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "SpendMetal") == 0)
+        After_economy_SpendMetal();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "SpendEnergyAndMetal") == 0)
+        After_economy_SpendEnergyAndMetal();
 }
 
 WeaponsSeam g_import_weapons;
 FilesSeam g_import_files;
+UnitsSeam g_import_units;
+LosRadarSeam g_import_los_radar;
+NetworkSeam g_import_network;
+PlayersSeam g_import_players;
 
 void BindSeams()
 {
     g_seams.wind_meteors = &g_native_wind_meteors;
+    g_seams.economy = &g_native_economy;
     g_seams.weapons = &g_import_weapons;
     g_import_weapons.SpawnProjectile = Imp_weapons_SpawnProjectile;
     g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
@@ -247,4 +617,18 @@ void BindSeams()
     g_import_files.BankOpenAccount = Imp_files_BankOpenAccount;
     g_import_files.BankSetInteger = Imp_files_BankSetInteger;
     g_import_files.BankGetInteger = Imp_files_BankGetInteger;
+    g_import_files.BankOpenNamedBox = Imp_files_BankOpenNamedBox;
+    g_import_files.BankSeekBox = Imp_files_BankSeekBox;
+    g_import_files.BankReadBox = Imp_files_BankReadBox;
+    g_import_files.BankWriteBox = Imp_files_BankWriteBox;
+    g_seams.units = &g_import_units;
+    g_import_units.SetStateBits = Imp_units_SetStateBits;
+    g_import_units.StartScriptWithArgs = Imp_units_StartScriptWithArgs;
+    g_seams.los_radar = &g_import_los_radar;
+    g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+    g_seams.network = &g_import_network;
+    g_import_network.SendShareMapInfo = Imp_network_SendShareMapInfo;
+    g_seams.players = &g_import_players;
+    g_import_players.TransferEnergy = Imp_players_TransferEnergy;
+    g_import_players.TransferMetal = Imp_players_TransferMetal;
 }

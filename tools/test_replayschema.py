@@ -86,10 +86,10 @@ class Accounting(unittest.TestCase):
         self.assertEqual([e for e in errors if "pending" in e], [])
 
     def test_a_pending_subsystem_lists_what_is_left(self):
-        model, errors = build([row("UpdatePlayerEconomy", "field_read", "Game::mapWidth"), row("UpdatePlayerEconomy", "field_escape", "Unit::extraction")])
-        pending = model["subsystems"]["economy"]["pending"]
-        self.assertEqual((pending["untracked"], pending["ruleless"]), (1, 1))
-        self.assertEqual([e for e in errors if "economy" in e], [])
+        model, errors = build([row("SetWeaponTargetUnit", "field_read", "Game::mapWidth"), row("SetWeaponTargetUnit", "field_escape", "Unit::unmatched")])
+        pending = model["subsystems"]["targeting"]["pending"]
+        self.assertTrue(pending["untracked"] >= 1 and pending["ruleless"] >= 1)
+        self.assertEqual([e for e in errors if "targeting" in e], [])
 
     def test_a_row_with_no_rule_is_an_error_for_a_complete_subsystem(self):
         _, errors = build([row("UpdateMeteors", "field_escape", "Game::unmatched")])
@@ -104,6 +104,72 @@ class Accounting(unittest.TestCase):
         del ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["args"]
         _, errors = build([], ann)
         self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
+
+
+class Rules(unittest.TestCase):
+    def slot(self, rows, name="UpdatePlayerEconomy", sub="economy"):
+        model, errors = build(rows)
+        names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
+        s = model["subsystems"][sub]["slots"][name]
+        return {"reads": [names[i] for i in s["objectReads"]], "writes": [names[i] for i in s["objectWrites"]], "allOf": s["allOf"], "errors": errors}
+
+    def test_a_write_through_a_float_pointer_lands_on_the_fields_of_its_rule(self):
+        s = self.slot([row("AddIncome", "deref_write", "*float")])
+        self.assertEqual(s["writes"], ["UnitResources.energyMake", "UnitResources.metalMake"])
+        self.assertEqual(s["reads"], [])
+
+    def test_a_rule_of_functions_does_not_cover_the_others(self):
+        s = self.slot([row("UpdateMetalExtraction", "deref_write", "*float")], "UpdateMetalExtraction")
+        self.assertEqual(s["writes"], ["Unit.extraction"])
+        s = self.slot([row("UseEnergyD", "deref_write", "*float")])
+        self.assertEqual(s["writes"], ["UnitResources.energyUse"])
+
+    def test_an_alias_names_the_field_that_records_a_bit_field(self):
+        s = self.slot([row("UpdatePlayerEconomy", "field_read", "Unit::cloakOn")])
+        self.assertEqual(s["reads"], ["Unit.flags"])
+
+    def test_a_plain_row_may_have_a_rule(self):
+        s = self.slot([row("UpdateMetalExtraction", "field_read", "Point16::x")], "UpdateMetalExtraction")
+        self.assertEqual(s["reads"], ["Unit.cell", "Unit.footprint"])
+
+    def test_an_all_of_rule_makes_every_slot_of_the_table_a_root(self):
+        s = self.slot([row("UpdateResourceSharing", "field_escape", "Game::players")], "UpdateResourceSharing")
+        self.assertEqual(s["allOf"], "Player")
+
+    def test_a_member_a_state_type_does_not_record_is_unaccounted_for(self):
+        _, errors = build([row("UpdatePlayerEconomy", "field_read", "Player::noSuchMember")])
+        self.assertTrue(any("economy is complete but has pending untracked" in e and "Player::noSuchMember" in e for e in errors), errors)
+
+    def test_the_range_marks_both_fields_of_the_pair(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        lines = files[rs.SCHEMA_H].split("\n")
+        begin = [l for l in lines if l.startswith('    { "unitsBegin"')][0].rstrip(" },").split(", ")
+        end = [l for l in lines if l.startswith('    { "unitsEnd"')][0].rstrip(" },").split(", ")
+        self.assertTrue(int(begin[-2]) > 0 and int(begin[-1]) == 0, begin)
+        self.assertTrue(int(end[-2]) == 0 and int(end[-1]) > 0, end)
+
+
+class Services(unittest.TestCase):
+    def test_a_declaration_the_header_lacks_is_an_error(self):
+        ann = annotations()
+        ann["services"][1]["declaration"] = "int __stdcall RandomInt(unsigned range);"
+        with self.assertRaises(rs.Error):
+            rs.generate(rs.read_rows(), ann)
+
+    def test_a_hook_that_gives_other_arguments_is_an_error(self):
+        spec = copy.deepcopy(annotations()["services"])
+        spec[1]["args"].append({"mode": "int", "param": "extra"})
+        self.assertTrue(any("RI_RANDOM_INT" in e for e in rs.check_service_hooks(spec)))
+
+    def test_a_hook_with_no_spec_is_an_error(self):
+        spec = [s for s in annotations()["services"] if s["id"] != "RI_GET_INT_ARG"]
+        self.assertTrue(any("RI_GET_INT_ARG" in e and "no service spec" in e for e in rs.check_service_hooks(spec)))
+
+    def test_every_service_has_a_line_in_the_recorder_and_an_answer(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        for s in annotations()["services"]:
+            self.assertIn("case %s:" % s["id"], files[rs.SERVICES_INC])
+            self.assertIn("StartImport(t, %s);" % s["id"], files[rs.SERVICES_SLOTS])
 
 
 class Committed(unittest.TestCase):

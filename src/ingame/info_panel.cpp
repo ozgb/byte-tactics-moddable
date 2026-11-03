@@ -1537,7 +1537,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         char* slot = (char*)unit + 0x1f;
         int* out = snapshot.weapons;
         for (int i = 0; i < 3; i++, out++, slot += 0x1c) {
-            WeaponDef* weapon = *(WeaponDef**)(slot - 0xf);
+            WeaponDef* weapon = unit->weapons[i].weapon.get();
             if (weapon->reloadTime > 0x1e) {
                 if (*(unsigned char*)slot & 2)
                     *out = *(unsigned short*)(slot - 7);

@@ -149,10 +149,15 @@ void Diff(const char* key, const char* recorded, const char* replayed)
         strncpy(g_firstKey, key, sizeof g_firstKey - 1);
     g_detail.Add("    ");
     g_detail.Add(key);
-    g_detail.Add(": recorded ");
-    g_detail.Add(recorded);
-    g_detail.Add(", replayed ");
-    g_detail.Add(replayed);
+    g_detail.Add(": ");
+    if (ReplayIsArrayText(recorded) || ReplayIsArrayText(replayed)) {
+        ReplayArrayDiff(recorded, replayed, g_detail);
+    } else {
+        g_detail.Add("recorded ");
+        g_detail.Add(recorded);
+        g_detail.Add(", replayed ");
+        g_detail.Add(replayed);
+    }
     g_detail.AddChar('\n');
 }
 
@@ -285,9 +290,19 @@ unsigned* SeedWord()
 
 #pragma pop_macro("g_randomSeed")
 
-const unsigned char* BlockAt(const ReplayField& f)
+#pragma push_macro("g_movementClasses")
+#undef g_movementClasses
+
+MovementClass* MovementEntries()
 {
-    return f.base == RB_GAME ? (const unsigned char*)g_game + f.offset : (const unsigned char*)g_simGlobals + f.offset;
+    return g_simGlobals->g_movementClasses.entries;
+}
+
+#pragma pop_macro("g_movementClasses")
+
+unsigned char* BlockBase(const ReplayField& f)
+{
+    return f.base == RB_GAME ? (unsigned char*)g_game : (unsigned char*)g_simGlobals;
 }
 
 void FormatField(const ReplayField& f, ReplayText& out)
@@ -297,8 +312,7 @@ void FormatField(const ReplayField& f, ReplayText& out)
         out.AddHex32(f.offset == 2 ? *SeedWord() : *SimRandStream((int)f.offset));
         return;
     }
-    ReplayObjectField view = { f.name, 0, f.size, 0, f.kind, 0 };
-    ReplayFormatObjectField(view, BlockAt(f), g_objects, false, out);
+    ReplayFormatObjectField(ReplayFieldView(f), BlockBase(f), g_objects, false, out);
 }
 
 bool RestoreField(const ReplayField& f, const char* value)
@@ -309,10 +323,13 @@ bool RestoreField(const ReplayField& f, const char* value)
             *SeedWord() = bits;
         else
             *SimRandStream((int)f.offset) = bits;
+        g_known.Set(f.name, value);
         return true;
     }
-    ReplayObjectField view = { f.name, 0, f.size, 0, f.kind, 0 };
-    return ReplayRestoreObjectField(view, (unsigned char*)BlockAt(f), value, g_objects, nullptr);
+    if (f.kind == RK_ARRAY)
+        return ReplayApplyArray(ReplayFieldView(f), BlockBase(f), f.name, value, g_known, true, AllocObject);
+    g_known.Set(f.name, value);
+    return ReplayRestoreObjectField(ReplayFieldView(f), BlockBase(f), value, g_objects, nullptr);
 }
 
 const ReplayField* FindField(const char* name)
@@ -670,7 +687,6 @@ void ApplyUnits(std::vector<Unit*, std::allocator<Unit*> >* out, const char* nam
         if (strchr(key, '#') == nullptr || strchr(key, '.') == nullptr)
             continue;
         RestoreObjectLine(key, g_outValues[k], g_file, nullptr, key);
-        g_known.Set(key, g_outValues[k]);
     }
     const char* list = OutExact(name);
     if (list == nullptr || out == nullptr || list[0] != '[')
@@ -779,6 +795,21 @@ const ReplaySlotSets* FindSlot(const char* subsystem, const char* name)
     return nullptr;
 }
 
+void SplitLines()
+{
+    g_lineCount = 0;
+    for (char* p = g_text; *p != '\0';) {
+        if (g_lineCount == MAX_LINES)
+            abort();
+        g_lines[g_lineCount++] = p;
+        char* end = strchr(p, '\n');
+        if (end == nullptr)
+            break;
+        *end = '\0';
+        p = end + 1;
+    }
+}
+
 bool LoadFile(const char* path)
 {
     FILE* f = fopen(path, "rb");
@@ -792,17 +823,7 @@ bool LoadFile(const char* path)
     unsigned got = (unsigned)fread(g_text, 1, (unsigned)size, f);
     fclose(f);
     g_text[got] = '\0';
-    g_lineCount = 0;
-    for (char* p = g_text; *p != '\0';) {
-        if (g_lineCount == MAX_LINES)
-            abort();
-        g_lines[g_lineCount++] = p;
-        char* end = strchr(p, '\n');
-        if (end == nullptr)
-            break;
-        *end = '\0';
-        p = end + 1;
-    }
+    SplitLines();
     return true;
 }
 
@@ -832,8 +853,14 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
         Fatal(file, g_callIndex, "an object line that names no object or field", line);
     if (sets != nullptr && !InObjectSet(sets->objReads, sets->objReadCount, f) && !InObjectSet(sets->objWrites, sets->objWriteCount, f))
         Fatal(file, g_callIndex, "field is not in the object sets of the slot", name);
+    if (f->kind == RK_ARRAY) {
+        if (!ReplayApplyArray(*f, p, name, value, g_known, true, AllocObject))
+            Fatal(file, g_callIndex, "an array line that cannot be applied", value);
+        return true;
+    }
     if (!ReplayRestoreObjectField(*f, p, value, g_objects, AllocObject))
         Fatal(file, g_callIndex, "a value that cannot be restored", value);
+    g_known.Set(name, value);
     return true;
 }
 
@@ -874,6 +901,9 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
             Fatal(file, g_callIndex, "bad write line", line);
         memcpy(name, line + 4, (unsigned)(space - (line + 4)));
         name[space - (line + 4)] = '\0';
+        bool array = false;
+        const ReplayObjectField* arrayField = nullptr;
+        ReplayObjectField blockView = {};
         if (strchr(name, '#') != nullptr) {
             unsigned kind = 0;
             unsigned ordinal = 0;
@@ -881,12 +911,22 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
             const ReplayObjectField* f = ReplayParseKey(name, &kind, &ordinal, &fieldName) ? ReplayFindObjectField(kind, fieldName) : nullptr;
             if (f == nullptr || !InObjectSet(sets->objWrites, sets->objWriteCount, f))
                 Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
+            array = f->kind == RK_ARRAY;
+            arrayField = f;
         } else {
             const ReplayField* f = FindField(name);
             if (f == nullptr || !InSet(sets->writes, sets->writeCount, f))
                 Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
+            blockView = ReplayFieldView(*f);
+            array = f->kind == RK_ARRAY;
+            arrayField = &blockView;
         }
-        g_known.Set(name, space + 1);
+        if (array) {
+            if (!ReplayApplyArray(*arrayField, nullptr, name, space + 1, g_known, false, nullptr))
+                Fatal(file, g_callIndex, "an array line that cannot be applied", line);
+        } else {
+            g_known.Set(name, space + 1);
+        }
     }
     for (unsigned i = 0; i < sets->writeCount; i++) {
         const ReplayField& f = kReplayFields[sets->writes[i]];
@@ -934,14 +974,12 @@ void ReplayCall(const char* file, Outcome& out)
         *space = '\0';
         if (strchr(line + 4, '#') != nullptr) {
             RestoreObjectLine(line + 4, space + 1, file, sets, line);
-            g_known.Set(line + 4, space + 1);
         } else {
             const ReplayField* f = FindField(line + 4);
             if (f == nullptr || !InSet(sets->reads, sets->readCount, f))
                 Fatal(file, g_callIndex, "field is not in the read set of the slot", line + 4);
             if (!RestoreField(*f, space + 1))
                 Fatal(file, g_callIndex, "a value that cannot be restored", space + 1);
-            g_known.Set(f->name, space + 1);
         }
         *space = ' ';
     }
@@ -1240,7 +1278,6 @@ void ObjectSelfTest()
         char* space = strchr(p + 4, ' ');
         *space = '\0';
         Check(RestoreObjectLine(p + 4, space + 1, "object self-test", &sets, p), "a recorded line restores");
-        g_known.Set(p + 4, space + 1);
         p = end + 1;
     }
     Check(lines > 0, "lines were restored");
@@ -1294,12 +1331,317 @@ void ObjectSelfTest()
     again.Free();
 }
 
+
+void LoadCall(const char* body)
+{
+    free(g_text);
+    g_text = (char*)malloc(strlen(body) + 16);
+    strcpy(g_text, "call 1 Fake\n");
+    strcat(g_text, body);
+    SplitLines();
+    g_callFirst = 0;
+    g_callEnd = g_lineCount;
+    g_callIndex = 0;
+}
+
+struct Recorder {
+    Recorder() : table(new ReplayObjectTable), reach(new ReplayReach) {}
+    ~Recorder()
+    {
+        delete reach;
+        delete table;
+        text.Free();
+    }
+    void Record(const unsigned char* kinds, void* const* roots, unsigned count, const ReplaySlotSets& sets)
+    {
+        text.Clear();
+        ReplayWalk(*reach, *table, true, sets, kinds, roots, count);
+        ReplayCaptureObjects(text, known, *table, *reach, sets.objReads, sets.objReadCount, 'r');
+    }
+    ReplayObjectTable* table;
+    ReplayReach* reach;
+    ReplayKnown known;
+    ReplayText text;
+
+private:
+    Recorder(const Recorder&);
+    Recorder& operator=(const Recorder&);
+};
+
+int RestoreText(const char* text, const ReplaySlotSets& sets)
+{
+    char* copy = (char*)malloc(strlen(text) + 1);
+    strcpy(copy, text);
+    int lines = 0;
+    for (char* p = copy; *p != '\0'; lines++) {
+        char* end = strchr(p, '\n');
+        *end = '\0';
+        char* space = strchr(p + 4, ' ');
+        *space = '\0';
+        Check(RestoreObjectLine(p + 4, space + 1, "self-test", &sets, p), "a recorded line restores");
+        p = end + 1;
+    }
+    free(copy);
+    return lines;
+}
+
+int CountLines(const char* text, const char* prefix)
+{
+    int n = 0;
+    unsigned length = (unsigned)strlen(prefix);
+    for (const char* p = text; p != nullptr && *p != '\0'; p = strchr(p, '\n') == nullptr ? nullptr : strchr(p, '\n') + 1) {
+        if (strncmp(p, prefix, length) == 0)
+            n++;
+    }
+    return n;
+}
+
+unsigned LongestLine(const char* text)
+{
+    unsigned longest = 0;
+    for (const char* p = text; *p != '\0';) {
+        const char* end = strchr(p, '\n');
+        unsigned length = end == nullptr ? (unsigned)strlen(p) : (unsigned)(end - p);
+        if (length > longest)
+            longest = length;
+        p = end == nullptr ? p + length : end + 1;
+    }
+    return longest;
+}
+
+void BeginCompare()
+{
+    g_diffs = 0;
+    g_detail.Clear();
+    g_firstKey[0] = '\0';
+    g_hash = 2166136261u;
+}
+
+void TableSelfTest()
+{
+    printf("indexed tables\n");
+    ResetBlock();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    Unit* pool = (Unit*)SimAlloc(8 * (unsigned)sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 8;
+    Projectile* shots = (Projectile*)SimAlloc(8 * (unsigned)sizeof(Projectile));
+    memset(shots, 0, 8 * sizeof(Projectile));
+    g_game->projectiles = shots;
+    g_game->projectileCount = 8;
+    Projectile* shot = &shots[3];
+    shot->speed = 77;
+    shot->spawnTick = 900;
+    shot->attacker = &pool[2];
+    shot->active = 1;
+    shot->owner = 4;
+    pool[2].health = 12;
+    MovementClass* movement = &MovementEntries()[5];
+    movement->footprintX = 3;
+    movement->maxSlope = 9;
+
+    unsigned char kinds[2] = { ROK_PROJECTILE, ROK_MOVEMENTCLASS };
+    void* roots[2] = { shot, movement };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 2, sets);
+    const char* text = recorder.text.Data();
+    Check(strstr(text, "  r Projectile#3.speed 77\n") != nullptr, "a projectile is named by its index in the pool");
+    Check(strstr(text, "  r Projectile#3.attacker Unit#2\n") != nullptr, "a pointer from one table to another names the index");
+    Check(strstr(text, "  r MovementClass#5.maxSlope 9\n") != nullptr, "an entry of a table in the sim globals is named by its index");
+    Check(strstr(text, "  r Unit#2.health 12\n") != nullptr, "the unit reached through the projectile is recorded");
+    Check(strstr(text, "#?") == nullptr, "every object is in a table");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    Projectile* rebuilt = (Projectile*)ReplayResolveObject("Projectile#3", nullptr, g_objects, AllocObject);
+    MovementClass* rebuiltClass = (MovementClass*)ReplayResolveObject("MovementClass#5", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt == &g_game->projectiles.get()[3], "a projectile is a slot of the rebuilt pool");
+    Check(g_game->projectileCount == 1024, "the pool has the size the schema says");
+    Check(rebuilt != nullptr && rebuilt->speed == 77 && rebuilt->spawnTick == 900 && rebuilt->owner == 4, "its fields are restored");
+    Check(rebuilt != nullptr && rebuilt->attacker.get() == &g_game->units.get()[2], "its attacker is a slot of the unit pool");
+    Check(rebuiltClass == &MovementEntries()[5] && rebuiltClass->maxSlope == 9, "an entry of the sim table is restored in place");
+
+    Recorder again;
+    unsigned char againKinds[2] = { ROK_PROJECTILE, ROK_MOVEMENTCLASS };
+    void* againRoots[2] = { rebuilt, rebuiltClass };
+    again.Record(againKinds, againRoots, 2, sets);
+    Check(strcmp(text, again.text.Data()) == 0, "the rebuilt tables record the same text");
+
+    memcpy(g_rootKinds, againKinds, 2);
+    g_rootObjects[0] = rebuilt;
+    g_rootObjects[1] = rebuiltClass;
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the unchanged tables compare equal");
+    rebuilt->speed = 78;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed field: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Projectile#3.speed") == 0, "a changed projectile is reported at its index and field");
+    rebuilt->speed = 77;
+    rebuiltClass->maxSlope = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "MovementClass#5.maxSlope") == 0, "a changed entry of the sim table is reported at its index and field");
+}
+
+void ArraySelfTest()
+{
+    printf("sized arrays\n");
+    ResetBlock();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    Player* player = &g_game->players[3];
+    player->exploredSize = 1500;
+    unsigned char* explored = (unsigned char*)SimAlloc(1500);
+    for (int i = 0; i < 1500; i++)
+        explored[i] = (unsigned char)(i * 7 + 1);
+    player->explored = explored;
+    MovementClass* movement = &MovementEntries()[2];
+    movement->width = 4;
+    movement->height = 32;
+    unsigned* cells = (unsigned*)SimAlloc(8 * 4);
+    for (int i = 0; i < 8; i++)
+        cells[i] = 0x01020304u * (unsigned)(i + 1);
+    movement->cells = cells;
+    unsigned char kinds[2] = { ROK_PLAYER, ROK_MOVEMENTCLASS };
+    void* roots[2] = { player, movement };
+
+    Recorder recorder;
+    recorder.Record(kinds, roots, 2, sets);
+    ReplayText calls;
+    calls.AddText(recorder.text);
+    const char* first = recorder.text.Data();
+    Check(strstr(first, "  r Player#3.explored [1500] 0:") != nullptr, "the first use writes the whole array, with its length");
+    Check(CountLines(first, "  r Player#3.explored ") == 3, "a long array is chunked into lines");
+    Check(strstr(first, "  r Player#3.explored 512:") != nullptr && strstr(first, "  r Player#3.explored 1024:") != nullptr, "each chunk says where it starts");
+    Check(LongestLine(first) < 1100, "the lines are bounded");
+    Check(strstr(first, "  r MovementClass#2.cells [8] 0:04030201") != nullptr, "the elements are written as the bytes of memory");
+
+    explored[5] = 0xaa;
+    explored[6] = 0xbb;
+    explored[1000] = 0xcc;
+    cells[3] = 0xdeadbeefu;
+    recorder.Record(kinds, roots, 2, sets);
+    calls.AddText(recorder.text);
+    const char* second = recorder.text.Data();
+    Check(strstr(second, "  r Player#3.explored 5:aabb 1000:cc\n") != nullptr, "a later call writes the changed runs only");
+    Check(strstr(second, "  r MovementClass#2.cells 3:efbeadde\n") != nullptr, "a changed element of a wider array is one run");
+    Check(CountLines(second, "  r ") == 2, "and nothing else");
+
+    explored[1] = 0;
+    recorder.Record(kinds, roots, 2, sets);
+    Check(strstr(recorder.text.Data(), "  r Player#3.explored 1:00\n") != nullptr, "a single element is a run of one");
+    explored[1] = (unsigned char)(1 * 7 + 1);
+    player->explored = nullptr;
+    recorder.Record(kinds, roots, 2, sets);
+    calls.AddText(recorder.text);
+    Check(strstr(recorder.text.Data(), "  r Player#3.explored null\n") != nullptr, "a null array is null");
+    unsigned char* smaller = (unsigned char*)SimAlloc(40);
+    memset(smaller, 9, 40);
+    player->explored = smaller;
+    player->exploredSize = 40;
+    recorder.Record(kinds, roots, 2, sets);
+    calls.AddText(recorder.text);
+    Check(strstr(recorder.text.Data(), "  r Player#3.explored [40] 0:09090909") != nullptr, "an array that was null or changed length is written whole again");
+
+    ResetBlock();
+    int lines = RestoreText(calls.Data(), sets);
+    Check(lines > 8, "the lines of every call restore");
+    Player* rebuilt = (Player*)ReplayResolveObject("Player#3", nullptr, g_objects, AllocObject);
+    MovementClass* rebuiltClass = (MovementClass*)ReplayResolveObject("MovementClass#2", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->exploredSize == 40 && rebuilt->explored.get() != nullptr && rebuilt->explored.get()[39] == 9 && rebuilt->explored.get()[40 - 1] == 9, "the last whole write wins");
+    Check(rebuiltClass != nullptr && rebuiltClass->cells.get() != nullptr && rebuiltClass->cells.get()[3] == 0xdeadbeefu && rebuiltClass->cells.get()[2] == 0x01020304u * 3, "the delta is applied to the array the replayer kept");
+
+    unsigned char kind = ROK_PLAYER;
+    void* root = rebuilt;
+    Recorder replayed;
+    replayed.Record(&kind, &root, 1, sets);
+    Check(strstr(replayed.text.Data(), "  r Player#3.explored [40] 0:09090909") != nullptr, "the replayed array records as it was");
+
+    g_rootKinds[0] = ROK_PLAYER;
+    g_rootObjects[0] = rebuilt;
+    g_rootKinds[1] = ROK_MOVEMENTCLASS;
+    g_rootObjects[1] = rebuiltClass;
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the arrays compare equal after the deltas");
+    rebuiltClass->cells.get()[6] ^= 0x100u;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed element: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "MovementClass#2.cells") == 0, "a changed element is reported at its array");
+    Check(strstr(g_detail.Data(), "byte 25 of 32") != nullptr, "and at its byte");
+    rebuiltClass->cells.get()[6] ^= 0x100u;
+
+    printf("block arrays\n");
+    ResetBlock();
+    const ReplayField* mask = FindField("Game.visibilityMask");
+    Check(mask != nullptr && mask->kind == RK_ARRAY, "a block field can be an array");
+    g_game->width = 8;
+    g_game->height = 8;
+    unsigned short* bits = (unsigned short*)SimAlloc(16 * 2);
+    for (int i = 0; i < 16; i++)
+        bits[i] = (unsigned short)(i * 0x101);
+    g_game->visibilityMask = bits;
+    ReplayKnown known;
+    ReplayText out;
+    ReplayText scratch;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayEmitField(out, known, *table, 'r', mask->name, ReplayFieldView(*mask), BlockBase(*mask), scratch);
+    Check(strstr(out.Data(), "  r Game.visibilityMask [16] 0:0000010102020303") != nullptr, "the whole mask is written at first use");
+    bits[9] = 0xffff;
+    bits[10] = 0;
+    ReplayText second_call;
+    ReplayEmitField(second_call, known, *table, 'r', mask->name, ReplayFieldView(*mask), BlockBase(*mask), scratch);
+    Check(strcmp(second_call.Data(), "  r Game.visibilityMask 9:ffff0000\n") == 0, "and the changed elements after it");
+    ResetBlock();
+    g_game->width = 8;
+    g_game->height = 8;
+    char* line = (char*)malloc(out.Size() + second_call.Size() + 1);
+    strcpy(line, out.Data());
+    strcat(line, second_call.Data());
+    for (char* p = line; *p != '\0';) {
+        char* end = strchr(p, '\n');
+        *end = '\0';
+        char* space = strchr(p + 4, ' ');
+        *space = '\0';
+        Check(RestoreField(*FindField(p + 4), space + 1), "a mask line restores");
+        p = end + 1;
+    }
+    free(line);
+    unsigned short* replayedBits = g_game->visibilityMask.get();
+    Check(replayedBits != nullptr && replayedBits[9] == 0xffff && replayedBits[10] == 0 && replayedBits[15] == 0x0f0f, "the mask is rebuilt in the block");
+    ReplayText now;
+    FormatField(*mask, now);
+    Check(strcmp(now.Data(), g_known.Get("Game.visibilityMask")) == 0, "the replayed mask is the recorded one");
+    replayedBits[4] ^= 1;
+    FormatField(*mask, now);
+    BeginCompare();
+    Diff("Game.visibilityMask", g_known.Get("Game.visibilityMask"), now.Data());
+    printf("a changed element: %s\n%s", g_firstKey, g_detail.Data());
+    Check(strcmp(g_firstKey, "Game.visibilityMask") == 0 && strstr(g_detail.Data(), "byte 8 of 32: recorded 04, replayed 05") != nullptr, "a changed element of the mask is reported at the field");
+    out.Free();
+    second_call.Free();
+    scratch.Free();
+    now.Free();
+    calls.Free();
+    delete table;
+}
+
 }
 
 int SelfTest(const char* file)
 {
     static const char* const names[] = { "", "an import with other arguments", "an extra import", "a missing import" };
     ObjectSelfTest();
+    TableSelfTest();
+    ArraySelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

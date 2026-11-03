@@ -34,6 +34,7 @@ public:
     bool Changed(const char* name, const char* value);
     void Set(const char* name, const char* value);
     const char* Get(const char* name) const;
+    char* Edit(const char* name);
 
 private:
     ReplayKnown(const ReplayKnown&);

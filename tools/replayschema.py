@@ -54,8 +54,8 @@ BLOCK_KINDS = {"field_read": "r", "field_write": "w", "global_read": "r", "globa
 OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "rw"}
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
-               "unitid": "UNITID", "rawbytes": "RAWBYTES"}
-TABLES = {"units": "RT_UNITS", "players": "RT_PLAYERS"}
+               "unitid": "UNITID", "rawbytes": "RAWBYTES", "array": "ARRAY"}
+FACTOR = re.compile(r"^\(?(\w+)(?:>>(\d+))?\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
            "bool", "float", "double", "Point16", "Vec3", "RandStream"}
 BARE_POINTER = re.compile(r"^\*(float|double|short|int|long|unsigned short|unsigned int|unsigned char|char)$")
@@ -143,8 +143,65 @@ def parse_interface(subsystem: str, struct: str) -> dict:
 
 def block_tables(ann: dict):
     game = ann["game_fields"]
-    sim = {k: tuple(v) for k, v in ann["sim_fields"].items()}
+    sim = {k: (v if isinstance(v, dict) else tuple(v)) for k, v in ann["sim_fields"].items()}
     return game, sim
+
+
+def parse_length(expr, where: str, errors: list[str]) -> list[dict]:
+    """The two factors of a length expression: an integer, or `member`, `member>>k` or an integer, once or twice, joined by `*`."""
+    parts = [str(expr)] if isinstance(expr, int) else [p.strip() for p in str(expr).split("*")]
+    if not 1 <= len(parts) <= 2:
+        errors.append("%s: the length `%s` is not one or two factors joined by *" % (where, expr))
+        parts = ["1"]
+    out = []
+    for p in parts:
+        m = FACTOR.match(p)
+        if p.isdigit():
+            out.append({"const": int(p)})
+        elif m:
+            out.append({"member": m.group(1), "shift": int(m.group(2) or 0)})
+        else:
+            errors.append("%s: the factor `%s` of the length is no integer, member or member>>k" % (where, p))
+            out.append({"const": 1})
+    while len(out) < 2:
+        out.append({"const": 1})
+    return out
+
+
+def render_factor(f: dict, owner: str) -> str:
+    if "const" in f:
+        return "{ %d, 0, 0 }" % f["const"]
+    return "{ offsetof(%s, %s), (unsigned char)sizeof(((%s*)nullptr)->%s), %d }" % (owner, f["member"], owner, f["member"], f["shift"])
+
+
+def render_length(length: list[dict], owner: str) -> str:
+    return "{ %s, %s }" % (render_factor(length[0], owner), render_factor(length[1], owner))
+
+
+def factor_asserts(length: list[dict], owner: str, where: str) -> list[str]:
+    return ['static_assert(sizeof(((%s*)nullptr)->%s) == 1 || sizeof(((%s*)nullptr)->%s) == 2 || sizeof(((%s*)nullptr)->%s) == 4, "%s: %s is a byte, a short or an int");'
+            % (owner, f["member"], owner, f["member"], owner, f["member"], where, f["member"]) for f in length if "member" in f]
+
+
+def check_array(where: str, spec: dict, owner: str, errors: list[str]) -> dict:
+    """The array entry of a field: element size, storage, capacity source and the parsed length. Errors for what is missing."""
+    elem = spec.get("elem")
+    if elem not in SIZES:
+        errors.append("%s: an array needs an `elem` of %s" % (where, ", ".join(sorted(SIZES))))
+        elem = "u8"
+    if "length" not in spec:
+        errors.append("%s: an array needs a `length`" % where)
+    return {"elem": SIZES[elem], "ref": bool(spec.get("ref", False)), "length": parse_length(spec.get("length", 0), where, errors), "owner": owner}
+
+
+def check_table(kind: str, spec: dict, errors: list[str]) -> dict:
+    where = "%s table" % kind
+    base = spec.get("base")
+    if base not in ("game", "sim") or not spec.get("member"):
+        errors.append("%s: needs a `base` of game or sim and a `member`" % where)
+    return {"kind": kind, "sim": base == "sim", "ref": bool(spec.get("ref", False)), "member": spec.get("member", "?"),
+            "count": parse_length(spec.get("count", 0), where, errors), "alloc": int(spec.get("alloc", 0)),
+            "owner": "SimGlobals" if base == "sim" else "Game"}
 
 
 def tracked(target: str, game: dict, sim: dict, aliases: dict | None = None) -> str | None:
@@ -288,16 +345,35 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     """The generated model: fields, objects, subsystems, and the errors."""
     game, sim = block_tables(ann)
     errors = check_sim_names(sim)
-    fields = field_table(game, sim)
+    arrays: list[dict] = []
+    fields = field_table(game, sim, arrays, errors)
     field_index = {f["name"]: i for i, f in enumerate(fields)}
     objects = []
     object_fields = []
+    tables: list[dict] = []
     kind_names = list(ann["objects"])
     for kind in kind_names:
         spec = ann["objects"][kind]
         objects.append({"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")})
+        if spec.get("table"):
+            if spec["scope"] != "state":
+                errors.append("%s: only a state kind can have a table" % kind)
+            tables.append(check_table(kind, spec["table"], errors))
         for f in spec["fields"]:
-            object_fields.append(dict(f, object=kind))
+            entry = dict(f, object=kind)
+            if f["kind"] == "array":
+                where = "%s.%s" % (kind, f["name"])
+                if spec["scope"] != "state":
+                    errors.append("%s: only the fields of a state kind can be arrays" % where)
+                array = check_array(where, f, spec["type"], errors)
+                array["member"] = f.get("member", f["name"])
+                arrays.append(array)
+                entry["array"] = len(arrays)
+            object_fields.append(entry)
+    table_targets = set()
+    for t in tables:
+        top = t["member"].split(".")[0]
+        table_targets.add(top if t["sim"] else "Game::" + top)
     object_index = {(f["object"], f["name"]): i for i, f in enumerate(object_fields)}
     reach_table: list[int] = []
     errors += resolve_field_reaches(ann, object_fields, object_index, reach_table)
@@ -353,7 +429,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                 reads.add(name)
                             if "w" in BLOCK_KINDS[kind]:
                                 writes.add(name)
-                        elif target in ann["exempt"]:
+                        elif target in ann["exempt"] or target in table_targets:
                             pass
                         elif target.startswith("Game::") or target.startswith("g_"):
                             pending["untracked"].add(target)
@@ -442,7 +518,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             seam, slot = imp.split(".")
             if slot not in subsystems.get(seam, {}).get("slots", {}):
                 errors.append("%s imports %s, which is no slot of the %s interface" % (sub, imp, seam))
-    return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table}, errors
+    return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table,
+            "arrays": arrays, "tables": tables}, errors
 
 
 def check_sim_names(sim: dict) -> list[str]:
@@ -451,16 +528,35 @@ def check_sim_names(sim: dict) -> list[str]:
     return ["SimGlobals has no member %s" % n for n in sim if n + ";" not in text and n not in known.fields]
 
 
-def field_table(game: dict, sim: dict) -> list[dict]:
+def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str]) -> list[dict]:
     schema = traceschema.Schema()
     layout = {l["name"]: l for l in schema.layout("Game")[0]}
     fields = []
     for name, kind in game.items():
         leaf = layout.get(name)
+        spec = kind if isinstance(kind, dict) else None
+        if spec is not None:
+            array = check_array("Game.%s" % name, spec, "Game", errors)
+            array["member"] = name
+            for f in array["length"]:
+                if "member" in f and f["member"] not in layout:
+                    errors.append("Game.%s: the length names %s, which is no member of Game" % (name, f["member"]))
+            arrays.append(array)
+            if leaf is None or (array["ref"] and leaf["size"] != 4) or (not array["ref"] and leaf["size"] % array["elem"] != 0):
+                raise Error("Game has no field %s that suits the array spec" % name)
+            fields.append({"name": "Game." + name, "base": "game", "offset": leaf["offset"], "size": leaf["size"], "kind": "array", "array": len(arrays)})
+            continue
         if leaf is None or leaf["size"] != SIZES[kind]:
             raise Error("Game has no field %s of %d bytes" % (name, SIZES[kind]))
         fields.append({"name": "Game." + name, "base": "game", "offset": leaf["offset"], "size": leaf["size"], "kind": kind})
-    for name, (kind, size) in sim.items():
+    for name, spec in sim.items():
+        if isinstance(spec, dict):
+            array = check_array("SimGlobals.%s" % name, spec, "SimGlobals", errors)
+            array["member"] = name
+            arrays.append(array)
+            fields.append({"name": "SimGlobals." + name, "base": "sim", "offset": name, "size": 4 if array["ref"] else spec["size"], "kind": "array", "array": len(arrays)})
+            continue
+        kind, size = spec
         fields.append({"name": "SimGlobals." + name, "base": "sim", "offset": name, "size": size, "kind": kind})
     for i, name in enumerate(RNG_FIELDS):
         fields.append({"name": name, "base": "rng", "offset": i, "size": 4, "kind": "u32"})
@@ -487,15 +583,56 @@ def render_schema(ann: dict, model: dict) -> str:
         L.append('#include "%s"' % inc)
     L += ['#include "../state/sim_globals.h"', '#include "../state/block.h"', '#include "replay_types.h"', "",
           "#define REPLAY_FORMAT %d" % FORMAT, ""]
-    for name in sim:
+    arrays, tables = model["arrays"], model["tables"]
+    macros = list(sim)
+    for t in tables:
+        if t["sim"]:
+            macros.append(t["member"].split(".")[0])
+    for a in arrays:
+        if a["owner"] == "SimGlobals":
+            macros += [a["member"]] + [f["member"] for f in a["length"] if "member" in f]
+    for t in tables:
+        if t["sim"]:
+            macros += [f["member"] for f in t["count"] if "member" in f]
+    macros = list(dict.fromkeys(macros))
+    for name in macros:
         L += ['#pragma push_macro("%s")' % name, "#undef %s" % name]
     L += ["", "static const ReplayField kReplayFields[] = {"]
     for f in fields:
         base = {"game": "RB_GAME", "sim": "RB_SIM", "rng": "RB_RNG"}[f["base"]]
         offset = "offsetof(SimGlobals, %s)" % f["offset"] if f["base"] == "sim" else "%d" % f["offset"]
-        L.append('    { "%s", %s, %d, %s, RK_%s },' % (f["name"], offset, f["size"], base, FIELD_KINDS[f["kind"]]))
+        extra = ", %d" % f["array"] if f.get("array") else ""
+        L.append('    { "%s", %s, %d, %s, RK_%s%s },' % (f["name"], offset, f["size"], base, FIELD_KINDS[f["kind"]], extra))
     L += ["};", "static const unsigned kReplayFieldCount = %d;" % len(fields), ""]
-    for name in sim:
+    L += ["static const ReplayArraySpec kReplayArrays[] = {"]
+    for a in arrays:
+        capacity = "0" if a["ref"] else "sizeof(((%s*)nullptr)->%s)" % (a["owner"], a["member"])
+        L.append("    { %d, %d, %s, %s }," % (a["elem"], int(a["ref"]), capacity, render_length(a["length"], a["owner"])))
+    if not arrays:
+        L.append("    { 1, 0, 0, { { 1, 0, 0 }, { 1, 0, 0 } } },")
+    L += ["};", "", "static const ReplayTableSpec kReplayTables[] = {"]
+    for t in tables:
+        L.append("    { %d, %d, offsetof(%s, %s), %s, %d }," % (int(t["sim"]), int(t["ref"]), t["owner"], t["member"], render_length(t["count"], t["owner"]), t["alloc"]))
+    if not tables:
+        L.append("    { 0, 0, 0, { { 1, 0, 0 }, { 1, 0, 0 } }, 0 },")
+    L += ["};", ""]
+    kind_type = {o["name"]: o["type"] for o in objects}
+    for a in arrays:
+        L += factor_asserts(a["length"], a["owner"], "%s::%s" % (a["owner"], a["member"]))
+        if a["ref"]:
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(unsigned), "%s::%s is a Ref");' % (a["owner"], a["member"], a["owner"], a["member"]))
+        else:
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) %% %d == 0, "%s::%s holds whole elements");' % (a["owner"], a["member"], a["elem"], a["owner"], a["member"]))
+    for t in tables:
+        L += factor_asserts(t["count"], t["owner"], t["kind"])
+        constant = all("const" in f for f in t["count"])
+        if not t["ref"] and constant:
+            n = t["count"][0]["const"] * t["count"][1]["const"]
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d * sizeof(%s), "the table of %s holds %d elements");' % (t["owner"], t["member"], n, kind_type[t["kind"]], t["kind"], n))
+        elif t["ref"]:
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(unsigned), "the table of %s is a Ref");' % (t["owner"], t["member"], t["kind"]))
+    L.append("")
+    for name in macros:
         L.append('#pragma pop_macro("%s")' % name)
     L += ["", "enum ReplayFieldIndex {"]
     L += ["    RF_%s," % upper(f["name"]) for f in fields]
@@ -505,6 +642,7 @@ def render_schema(ann: dict, model: dict) -> str:
     scope = {"state": "RS_STATE", "index": "RS_INDEX", "value": "RS_VALUE"}
     kind_id = {o["name"]: "ROK_" + upper(o["name"]) for o in objects}
     types = {o["name"]: o["type"] for o in objects}
+    table_id = {t["kind"]: str(i + 1) for i, t in enumerate(tables)}
     for o in objects:
         inside = o.get("inside")
         if inside:
@@ -512,7 +650,7 @@ def render_schema(ann: dict, model: dict) -> str:
             tail = '1, %s, offsetof(%s, %s), "%s"' % (kind_id[inside["kind"]], container, inside["member"], inside["member"])
         else:
             tail = '0, 0, 0, ""'
-        L.append('    { "%s", sizeof(%s), %s, %s, %s },' % (o["name"], o["type"], scope[o["scope"]], TABLES.get(o.get("table"), "RT_ORDER"), tail))
+        L.append('    { "%s", sizeof(%s), %s, %s, %s },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), tail))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
           "static const ReplayObjectField kReplayObjectFields[] = {"]
     position = {(f["object"], f["name"]): i for i, f in enumerate(ofields)}
@@ -528,9 +666,10 @@ def render_schema(ann: dict, model: dict) -> str:
         size = f.get("size")
         size_text = str(size) if size else "sizeof(((%s*)nullptr)->%s)" % (t, member)
         target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid") else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else "0")
-        L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %d, %d, %d, %d },' % (
+        extra = ", %d" % f["array"] if f.get("array") else ""
+        L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %d, %d, %d, %d%s },' % (
             f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target, range_end.get(i, 0), range_begin.get(i, 0),
-            f.get("condField", 0), f.get("condValue", 0), f.get("reachFirst", 0), f.get("reachCount", 0)))
+            f.get("condField", 0), f.get("condValue", 0), f.get("reachFirst", 0), f.get("reachCount", 0), extra))
     L += ["};", "static const unsigned kReplayObjectFieldCount = %d;" % len(ofields), ""]
     L += ["static const unsigned short kReplayReachFields[] = { %s };" % ", ".join(str(i) for i in model["reach_table"] or [0]), ""]
     for f in ofields:
@@ -542,6 +681,8 @@ def render_schema(ann: dict, model: dict) -> str:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, f["size"], t, f["name"]))
         elif f["kind"] == "rawbytes":
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a pointer");' % (t, member, t, f["name"]))
+        elif f["kind"] == "array":
+            continue
         elif f.get("size") is None:
             want = {"i32": 4, "u32": 4, "u16": 2, "i16": 2, "f32": 4, "flags": 4, "ref": 4, "point16": 4, "weapon": 4, "u8": 1, "f64": 8, "unitid": 2}[f["kind"]]
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, want, t, f["name"]))

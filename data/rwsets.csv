@@ -45222,6 +45222,12 @@ address,function,file,kind,target
 ,FormatField,src/harness/replay.cpp,field_read,SimGlobals::g_randomSeed
 ,FormatField,src/harness/replay.cpp,function,
 ,FormatField,src/harness/replay.cpp,global_read,g_game
+,FormatPath,src/harness/harness.cpp,call,__builtin_va_end
+,FormatPath,src/harness/harness.cpp,call,__builtin_va_start
+,FormatPath,src/harness/harness.cpp,call,vsprintf
+,FormatPath,src/harness/harness.cpp,deref_write,*char
+,FormatPath,src/harness/harness.cpp,function,
+,FormatPath,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,ForwardOffset,src/orders/order_targets.cpp,call,ScaledCos
 ,ForwardOffset,src/orders/order_targets.cpp,call,ScaledSin
 ,ForwardOffset,src/orders/order_targets.cpp,field_write,Vec3::x
@@ -46314,6 +46320,7 @@ address,function,file,kind,target
 ,HarnessCrtSeed,src/harness/harness.cpp,function,
 ,HarnessCrtSeed,src/harness/harness.cpp,global_read,s_crtSeed@src/harness/harness.cpp
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,Fail
+,HarnessFrameDrawn,src/harness/harness.cpp,call,FormatPath
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,GameU32
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,MakeDirectoryPath
@@ -46378,19 +46385,18 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,call,fprintf
 ,HarnessPhase,src/harness/harness.cpp,function,
 ,HarnessPhase,src/harness/harness.cpp,global_read,g_randomSeed
+,HarnessPhase,src/harness/harness.cpp,global_read,kHashOffset@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_dumpEnabled@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_dumpTick@src/harness/harness.cpp
-,HarnessPhase,src/harness/harness.cpp,global_read,s_hashHi@src/harness/harness.cpp
-,HarnessPhase,src/harness/harness.cpp,global_read,s_hashLo@src/harness/harness.cpp
+,HarnessPhase,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_phaseNames@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_sound@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_ui@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_write,s_dumpNow@src/harness/harness.cpp
-,HarnessPhase,src/harness/harness.cpp,global_write,s_hashHi@src/harness/harness.cpp
-,HarnessPhase,src/harness/harness.cpp,global_write,s_hashLo@src/harness/harness.cpp
+,HarnessPhase,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_write,s_tracePhase@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_write,s_traceTick@src/harness/harness.cpp
 ,HarnessSoundEvent,src/harness/harness.cpp,call,GameU32
@@ -46477,15 +46483,16 @@ address,function,file,kind,target
 ,HasSwitch,src/wasm/modules.cpp,deref_read,*char
 ,HasSwitch,src/wasm/modules.cpp,deref_write,*char
 ,HasSwitch,src/wasm/modules.cpp,function,
+,HashBuf,src/harness/harness.cpp,call,HashWords
 ,HashBuf,src/harness/harness.cpp,deref_read,*unsigned char
-,HashBuf,src/harness/harness.cpp,deref_read,*unsigned int
 ,HashBuf,src/harness/harness.cpp,function,
-,HashBuf,src/harness/harness.cpp,global_read,s_hashHi@src/harness/harness.cpp
-,HashBuf,src/harness/harness.cpp,global_read,s_hashLo@src/harness/harness.cpp
-,HashBuf,src/harness/harness.cpp,global_write,s_hashHi@src/harness/harness.cpp
-,HashBuf,src/harness/harness.cpp,global_write,s_hashLo@src/harness/harness.cpp
-,HashByte,src/harness/harness.cpp,call,HashBuf
+,HashBuf,src/harness/harness.cpp,global_read,kHashPrime@src/harness/harness.cpp
+,HashBuf,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
+,HashBuf,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
 ,HashByte,src/harness/harness.cpp,function,
+,HashByte,src/harness/harness.cpp,global_read,kHashPrime@src/harness/harness.cpp
+,HashByte,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
+,HashByte,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
 ,HashField,src/harness/harness.cpp,call,HashBuf
 ,HashField,src/harness/harness.cpp,call,HashPointer
 ,HashField,src/harness/harness.cpp,call,HashU32
@@ -46512,8 +46519,13 @@ address,function,file,kind,target
 ,HashRow,src/harness/block_scan.cpp,field_read,Row::targetTag
 ,HashRow,src/harness/block_scan.cpp,function,
 ,HashRow,src/harness/block_scan.cpp,global_read,kRowBits
-,HashU32,src/harness/harness.cpp,call,HashBuf
 ,HashU32,src/harness/harness.cpp,function,
+,HashU32,src/harness/harness.cpp,global_read,kHashPrime@src/harness/harness.cpp
+,HashU32,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
+,HashU32,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
+,HashWords,src/harness/harness.cpp,call,memcpy
+,HashWords,src/harness/harness.cpp,function,
+,HashWords,src/harness/harness.cpp,global_read,kHashPrime@src/harness/harness.cpp
 ,Head,src/state/block.cpp,function,
 ,Head,src/state/block.cpp,global_read,g_base
 ,HeadlessCursorGet,src/host/win32/headless.cpp,deref_write,*int
@@ -48877,6 +48889,9 @@ address,function,file,kind,target
 ,NodeData::NodeData,src/ai/pathfinder.h,field_write,Point16::x
 ,NodeData::NodeData,src/ai/pathfinder.h,field_write,Point16::y
 ,NodeData::NodeData,src/ai/pathfinder.h,function,
+,NormaliseCell,src/harness/harness.cpp,deref_read,*unsigned char
+,NormaliseCell,src/harness/harness.cpp,deref_write,*unsigned char
+,NormaliseCell,src/harness/harness.cpp,function,
 ,NotDone,src/util/registry.cpp,function,
 ,Note,src/harness/block_scan.cpp,call,Die
 ,Note,src/harness/block_scan.cpp,call,HashRow
@@ -52607,6 +52622,7 @@ address,function,file,kind,target
 ,VisitChannel,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitCondition,src/harness/harness.cpp,call,ConditionClassOf
 ,VisitCondition,src/harness/harness.cpp,call,Fail
+,VisitCondition,src/harness/harness.cpp,call,FormatPath
 ,VisitCondition,src/harness/harness.cpp,call,ReadU32At
 ,VisitCondition,src/harness/harness.cpp,call,VisitElement
 ,VisitCondition,src/harness/harness.cpp,call,VisitU32
@@ -52628,15 +52644,16 @@ address,function,file,kind,target
 ,VisitElement,src/harness/harness.cpp,function,
 ,VisitElement,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitExplored,src/harness/harness.cpp,call,EndSection
+,VisitExplored,src/harness/harness.cpp,call,FormatPath
 ,VisitExplored,src/harness/harness.cpp,call,GameAt
 ,VisitExplored,src/harness/harness.cpp,call,HashByte
 ,VisitExplored,src/harness/harness.cpp,call,ReadRefAt
 ,VisitExplored,src/harness/harness.cpp,call,VisitBlob
 ,VisitExplored,src/harness/harness.cpp,call,VisitValue
-,VisitExplored,src/harness/harness.cpp,call,sprintf
 ,VisitExplored,src/harness/harness.cpp,deref_read,*unsigned int
 ,VisitExplored,src/harness/harness.cpp,function,
 ,VisitExplosions,src/harness/harness.cpp,call,EndSection
+,VisitExplosions,src/harness/harness.cpp,call,FormatPath
 ,VisitExplosions,src/harness/harness.cpp,call,GameAt
 ,VisitExplosions,src/harness/harness.cpp,call,GameU32
 ,VisitExplosions,src/harness/harness.cpp,call,HashByte
@@ -52646,7 +52663,6 @@ address,function,file,kind,target
 ,VisitExplosions,src/harness/harness.cpp,call,VisitRaw
 ,VisitExplosions,src/harness/harness.cpp,call,memset
 ,VisitExplosions,src/harness/harness.cpp,call,operator unsigned char *
-,VisitExplosions,src/harness/harness.cpp,call,sprintf
 ,VisitExplosions,src/harness/harness.cpp,function,
 ,VisitExplosions,src/harness/harness.cpp,global_read,g_explodedPieces
 ,VisitExplosions,src/harness/harness.cpp,global_read,kDebrisTable@src/harness/trace_schema.h
@@ -52655,16 +52671,17 @@ address,function,file,kind,target
 ,VisitExplosions,src/harness/harness.cpp,global_read,kPieceRecTable@src/harness/trace_schema.h
 ,VisitExplosions,src/harness/harness.cpp,global_read,kPieceTable@src/harness/trace_schema.h
 ,VisitEyes,src/harness/harness.cpp,call,EndSection
+,VisitEyes,src/harness/harness.cpp,call,FormatPath
 ,VisitEyes,src/harness/harness.cpp,call,GameRef
 ,VisitEyes,src/harness/harness.cpp,call,GameU32
 ,VisitEyes,src/harness/harness.cpp,call,HashByte
 ,VisitEyes,src/harness/harness.cpp,call,VisitElement
 ,VisitEyes,src/harness/harness.cpp,call,VisitValue
-,VisitEyes,src/harness/harness.cpp,call,sprintf
 ,VisitEyes,src/harness/harness.cpp,function,
 ,VisitEyes,src/harness/harness.cpp,global_read,kEyeTable@src/harness/trace_schema.h
 ,VisitFeatures,src/harness/harness.cpp,call,DumpPrefix
 ,VisitFeatures,src/harness/harness.cpp,call,EndSection
+,VisitFeatures,src/harness/harness.cpp,call,FormatPath
 ,VisitFeatures,src/harness/harness.cpp,call,GameAt
 ,VisitFeatures,src/harness/harness.cpp,call,GameRef
 ,VisitFeatures,src/harness/harness.cpp,call,GameU32
@@ -52777,16 +52794,20 @@ address,function,file,kind,target
 ,VisitMapCells,src/harness/harness.cpp,call,EndSection
 ,VisitMapCells,src/harness/harness.cpp,call,Fail
 ,VisitMapCells,src/harness/harness.cpp,call,GameRef
+,VisitMapCells,src/harness/harness.cpp,call,HashBuf
 ,VisitMapCells,src/harness/harness.cpp,call,HashByte
+,VisitMapCells,src/harness/harness.cpp,call,HashWords
 ,VisitMapCells,src/harness/harness.cpp,call,MapCellCount
+,VisitMapCells,src/harness/harness.cpp,call,NormaliseCell
 ,VisitMapCells,src/harness/harness.cpp,call,VisitBlob
 ,VisitMapCells,src/harness/harness.cpp,call,VisitValue
 ,VisitMapCells,src/harness/harness.cpp,call,free
 ,VisitMapCells,src/harness/harness.cpp,call,malloc
 ,VisitMapCells,src/harness/harness.cpp,call,memcpy
-,VisitMapCells,src/harness/harness.cpp,deref_read,*unsigned char
-,VisitMapCells,src/harness/harness.cpp,deref_write,*unsigned char
 ,VisitMapCells,src/harness/harness.cpp,function,
+,VisitMapCells,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,VisitMapCells,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
+,VisitMapCells,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
 ,VisitMeteors,src/harness/harness.cpp,call,EndSection
 ,VisitMeteors,src/harness/harness.cpp,call,HashByte
 ,VisitMeteors,src/harness/harness.cpp,call,VisitGlobalList
@@ -52794,6 +52815,7 @@ address,function,file,kind,target
 ,VisitMeteors,src/harness/harness.cpp,global_read,kMeteorGlobals@src/harness/trace_schema.h
 ,VisitMeteors,src/harness/harness.cpp,global_read,kMeteorGlobalsCount@src/harness/trace_schema.h
 ,VisitMission,src/harness/harness.cpp,call,EndSection
+,VisitMission,src/harness/harness.cpp,call,FormatPath
 ,VisitMission,src/harness/harness.cpp,call,GameRef
 ,VisitMission,src/harness/harness.cpp,call,HashByte
 ,VisitMission,src/harness/harness.cpp,call,ReadRefAt
@@ -52803,7 +52825,6 @@ address,function,file,kind,target
 ,VisitMission,src/harness/harness.cpp,call,VisitRaw
 ,VisitMission,src/harness/harness.cpp,call,VisitString
 ,VisitMission,src/harness/harness.cpp,call,VisitU32
-,VisitMission,src/harness/harness.cpp,call,sprintf
 ,VisitMission,src/harness/harness.cpp,function,
 ,VisitMission,src/harness/harness.cpp,global_read,kMissionDataTable@src/harness/trace_schema.h
 ,VisitMission,src/harness/harness.cpp,global_read,kMissionStartRestTable@src/harness/trace_schema.h
@@ -52830,10 +52851,10 @@ address,function,file,kind,target
 ,VisitMotions,src/harness/harness.cpp,global_read,kUnitMotionTable@src/harness/trace_schema.h
 ,VisitMotions,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitMoveClasses,src/harness/harness.cpp,call,EndSection
+,VisitMoveClasses,src/harness/harness.cpp,call,FormatPath
 ,VisitMoveClasses,src/harness/harness.cpp,call,HashByte
 ,VisitMoveClasses,src/harness/harness.cpp,call,MoveClasses
 ,VisitMoveClasses,src/harness/harness.cpp,call,VisitElement
-,VisitMoveClasses,src/harness/harness.cpp,call,sprintf
 ,VisitMoveClasses,src/harness/harness.cpp,function,
 ,VisitMoveClasses,src/harness/harness.cpp,global_read,kMoveClassTable@src/harness/trace_schema.h
 ,VisitObjectsInRangeNative,src/seams/native.cpp,call,VisitObjectsInRange
@@ -52853,31 +52874,31 @@ address,function,file,kind,target
 ,VisitOrders,src/harness/harness.cpp,global_read,kOrderTable@src/harness/trace_schema.h
 ,VisitOrders,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitPassMaps,src/harness/harness.cpp,call,EndSection
+,VisitPassMaps,src/harness/harness.cpp,call,FormatPath
 ,VisitPassMaps,src/harness/harness.cpp,call,HashByte
 ,VisitPassMaps,src/harness/harness.cpp,call,HashU32
 ,VisitPassMaps,src/harness/harness.cpp,call,MoveClasses
 ,VisitPassMaps,src/harness/harness.cpp,call,ReadRefAt
 ,VisitPassMaps,src/harness/harness.cpp,call,VisitBlob
-,VisitPassMaps,src/harness/harness.cpp,call,sprintf
 ,VisitPassMaps,src/harness/harness.cpp,deref_read,*unsigned int
 ,VisitPassMaps,src/harness/harness.cpp,function,
 ,VisitPassMaps,src/harness/harness.cpp,global_escape,s_passRow@src/harness/harness.cpp
 ,VisitPassMaps,src/harness/harness.cpp,global_write,s_passRow@src/harness/harness.cpp
+,VisitPathCells,src/harness/harness.cpp,call,FormatPath
 ,VisitPathCells,src/harness/harness.cpp,call,RefAbs
 ,VisitPathCells,src/harness/harness.cpp,call,VisitU32
 ,VisitPathCells,src/harness/harness.cpp,call,VisitValue
-,VisitPathCells,src/harness/harness.cpp,call,sprintf
 ,VisitPathCells,src/harness/harness.cpp,deref_read,*unsigned char
 ,VisitPathCells,src/harness/harness.cpp,deref_read,*unsigned int
 ,VisitPathCells,src/harness/harness.cpp,deref_read,*unsigned short
 ,VisitPathCells,src/harness/harness.cpp,function,
+,VisitPathNodes,src/harness/harness.cpp,call,FormatPath
 ,VisitPathNodes,src/harness/harness.cpp,call,HashU32
 ,VisitPathNodes,src/harness/harness.cpp,call,RefAbs
 ,VisitPathNodes,src/harness/harness.cpp,call,VisitElement
 ,VisitPathNodes,src/harness/harness.cpp,call,VisitPointer
 ,VisitPathNodes,src/harness/harness.cpp,call,VisitValue
 ,VisitPathNodes,src/harness/harness.cpp,call,memset
-,VisitPathNodes,src/harness/harness.cpp,call,sprintf
 ,VisitPathNodes,src/harness/harness.cpp,call,strcat
 ,VisitPathNodes,src/harness/harness.cpp,deref_read,*int
 ,VisitPathNodes,src/harness/harness.cpp,deref_read,*unsigned int
@@ -52885,6 +52906,7 @@ address,function,file,kind,target
 ,VisitPathNodes,src/harness/harness.cpp,function,
 ,VisitPathNodes,src/harness/harness.cpp,global_escape,s_nodeFree@src/harness/harness.cpp
 ,VisitPathNodes,src/harness/harness.cpp,global_read,kNodeTable@src/harness/trace_schema.h
+,VisitPathNodes,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitPathNodes,src/harness/harness.cpp,global_read,s_nodeFree@src/harness/harness.cpp
 ,VisitPathNodes,src/harness/harness.cpp,global_write,s_nodeFree@src/harness/harness.cpp
 ,VisitPathfinder,src/harness/harness.cpp,call,EndSection
@@ -52901,13 +52923,13 @@ address,function,file,kind,target
 ,VisitPathfinder,src/harness/harness.cpp,global_read,kPathfinderSearchTable@src/harness/trace_schema.h
 ,VisitPathfinder,src/harness/harness.cpp,global_read,kPathfinderTable@src/harness/trace_schema.h
 ,VisitPlayerAI,src/harness/harness.cpp,call,EndSection
+,VisitPlayerAI,src/harness/harness.cpp,call,FormatPath
 ,VisitPlayerAI,src/harness/harness.cpp,call,HashByte
 ,VisitPlayerAI,src/harness/harness.cpp,call,HashU32
 ,VisitPlayerAI,src/harness/harness.cpp,call,VisitElement
 ,VisitPlayerAI,src/harness/harness.cpp,call,VisitRawVector
 ,VisitPlayerAI,src/harness/harness.cpp,call,VisitUnitVector
 ,VisitPlayerAI,src/harness/harness.cpp,call,get
-,VisitPlayerAI,src/harness/harness.cpp,call,sprintf
 ,VisitPlayerAI,src/harness/harness.cpp,field_read,VectorSpec::elem
 ,VisitPlayerAI,src/harness/harness.cpp,field_read,VectorSpec::name
 ,VisitPlayerAI,src/harness/harness.cpp,field_read,VectorSpec::offset
@@ -52922,11 +52944,11 @@ address,function,file,kind,target
 ,VisitPlayerHeap,src/harness/harness.cpp,call,VisitUnitResources
 ,VisitPlayerHeap,src/harness/harness.cpp,function,
 ,VisitPlayers,src/harness/harness.cpp,call,EndSection
+,VisitPlayers,src/harness/harness.cpp,call,FormatPath
 ,VisitPlayers,src/harness/harness.cpp,call,GameAt
 ,VisitPlayers,src/harness/harness.cpp,call,HashByte
 ,VisitPlayers,src/harness/harness.cpp,call,HashU32
 ,VisitPlayers,src/harness/harness.cpp,call,VisitElement
-,VisitPlayers,src/harness/harness.cpp,call,sprintf
 ,VisitPlayers,src/harness/harness.cpp,function,
 ,VisitPlayers,src/harness/harness.cpp,global_read,kPlayerTable@src/harness/trace_schema.h
 ,VisitPointer,src/harness/harness.cpp,call,DumpPrefix
@@ -52941,12 +52963,12 @@ address,function,file,kind,target
 ,VisitPointer,src/harness/harness.cpp,function,
 ,VisitPointer,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitProjectiles,src/harness/harness.cpp,call,EndSection
+,VisitProjectiles,src/harness/harness.cpp,call,FormatPath
 ,VisitProjectiles,src/harness/harness.cpp,call,GameRef
 ,VisitProjectiles,src/harness/harness.cpp,call,GameU32
 ,VisitProjectiles,src/harness/harness.cpp,call,HashByte
 ,VisitProjectiles,src/harness/harness.cpp,call,HashU32
 ,VisitProjectiles,src/harness/harness.cpp,call,VisitElement
-,VisitProjectiles,src/harness/harness.cpp,call,sprintf
 ,VisitProjectiles,src/harness/harness.cpp,deref_read,*unsigned short
 ,VisitProjectiles,src/harness/harness.cpp,function,
 ,VisitProjectiles,src/harness/harness.cpp,global_read,kProjectileTable@src/harness/trace_schema.h
@@ -52983,35 +53005,36 @@ address,function,file,kind,target
 ,VisitScripts,src/harness/harness.cpp,call,VisitScript
 ,VisitScripts,src/harness/harness.cpp,function,
 ,VisitSpatial,src/harness/harness.cpp,call,EndSection
+,VisitSpatial,src/harness/harness.cpp,call,FormatPath
 ,VisitSpatial,src/harness/harness.cpp,call,GameRef
 ,VisitSpatial,src/harness/harness.cpp,call,GameU32
 ,VisitSpatial,src/harness/harness.cpp,call,HashByte
 ,VisitSpatial,src/harness/harness.cpp,call,VisitElement
 ,VisitSpatial,src/harness/harness.cpp,call,VisitValue
-,VisitSpatial,src/harness/harness.cpp,call,sprintf
 ,VisitSpatial,src/harness/harness.cpp,function,
 ,VisitSpatial,src/harness/harness.cpp,global_read,kRecTable@src/harness/trace_schema.h
 ,VisitSquadManagers,src/harness/harness.cpp,call,EndSection
+,VisitSquadManagers,src/harness/harness.cpp,call,FormatPath
 ,VisitSquadManagers,src/harness/harness.cpp,call,HashByte
 ,VisitSquadManagers,src/harness/harness.cpp,call,HashU32
 ,VisitSquadManagers,src/harness/harness.cpp,call,PlayerAt
 ,VisitSquadManagers,src/harness/harness.cpp,call,ReadRefAt
 ,VisitSquadManagers,src/harness/harness.cpp,call,VisitElement
 ,VisitSquadManagers,src/harness/harness.cpp,call,VisitTimer
-,VisitSquadManagers,src/harness/harness.cpp,call,sprintf
 ,VisitSquadManagers,src/harness/harness.cpp,function,
 ,VisitSquadManagers,src/harness/harness.cpp,global_read,kSquadManagerTable@src/harness/trace_schema.h
 ,VisitSquads,src/harness/harness.cpp,call,EndSection
+,VisitSquads,src/harness/harness.cpp,call,FormatPath
 ,VisitSquads,src/harness/harness.cpp,call,HashByte
 ,VisitSquads,src/harness/harness.cpp,call,HashU32
 ,VisitSquads,src/harness/harness.cpp,call,PlayerAt
 ,VisitSquads,src/harness/harness.cpp,call,ReadRefAt
 ,VisitSquads,src/harness/harness.cpp,call,VisitElement
 ,VisitSquads,src/harness/harness.cpp,call,VisitUnitVector
-,VisitSquads,src/harness/harness.cpp,call,sprintf
 ,VisitSquads,src/harness/harness.cpp,call,strcat
 ,VisitSquads,src/harness/harness.cpp,function,
 ,VisitSquads,src/harness/harness.cpp,global_read,kSquadTable@src/harness/trace_schema.h
+,VisitSquads,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitString,src/harness/harness.cpp,call,DumpPrefix
 ,VisitString,src/harness/harness.cpp,call,HashBuf
 ,VisitString,src/harness/harness.cpp,call,HashByte
@@ -53022,10 +53045,10 @@ address,function,file,kind,target
 ,VisitString,src/harness/harness.cpp,function,
 ,VisitString,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,VisitString,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,VisitTimer,src/harness/harness.cpp,call,FormatPath
 ,VisitTimer,src/harness/harness.cpp,call,TimerClassOf
 ,VisitTimer,src/harness/harness.cpp,call,VisitElement
 ,VisitTimer,src/harness/harness.cpp,call,VisitU32
-,VisitTimer,src/harness/harness.cpp,call,sprintf
 ,VisitTimer,src/harness/harness.cpp,function,
 ,VisitTimer,src/harness/harness.cpp,global_read,kAssaultTimerTable@src/harness/trace_schema.h
 ,VisitTimer,src/harness/harness.cpp,global_read,kEscortTimerTable@src/harness/trace_schema.h
@@ -53038,6 +53061,7 @@ address,function,file,kind,target
 ,VisitU32,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,VisitU32,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitUnitDefs,src/harness/harness.cpp,call,EndSection
+,VisitUnitDefs,src/harness/harness.cpp,call,FormatPath
 ,VisitUnitDefs,src/harness/harness.cpp,call,GameRef
 ,VisitUnitDefs,src/harness/harness.cpp,call,GameU32
 ,VisitUnitDefs,src/harness/harness.cpp,call,HashByte
@@ -53046,11 +53070,11 @@ address,function,file,kind,target
 ,VisitUnitDefs,src/harness/harness.cpp,call,VisitElement
 ,VisitUnitDefs,src/harness/harness.cpp,call,VisitRaw
 ,VisitUnitDefs,src/harness/harness.cpp,call,VisitU32
-,VisitUnitDefs,src/harness/harness.cpp,call,sprintf
 ,VisitUnitDefs,src/harness/harness.cpp,call,strcat
 ,VisitUnitDefs,src/harness/harness.cpp,deref_read,*short
 ,VisitUnitDefs,src/harness/harness.cpp,function,
 ,VisitUnitDefs,src/harness/harness.cpp,global_read,kUnitDefDataTable@src/harness/trace_schema.h
+,VisitUnitDefs,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitUnitHeap,src/harness/harness.cpp,call,GameAt
 ,VisitUnitHeap,src/harness/harness.cpp,call,GameRef
 ,VisitUnitHeap,src/harness/harness.cpp,call,NumberUnitHeap
@@ -53061,27 +53085,27 @@ address,function,file,kind,target
 ,VisitUnitHeap,src/harness/harness.cpp,deref_read,*unsigned short
 ,VisitUnitHeap,src/harness/harness.cpp,function,
 ,VisitUnitResources,src/harness/harness.cpp,call,EndSection
+,VisitUnitResources,src/harness/harness.cpp,call,FormatPath
 ,VisitUnitResources,src/harness/harness.cpp,call,HashByte
 ,VisitUnitResources,src/harness/harness.cpp,call,HashU32
 ,VisitUnitResources,src/harness/harness.cpp,call,PlayerAt
 ,VisitUnitResources,src/harness/harness.cpp,call,ReadRefAt
 ,VisitUnitResources,src/harness/harness.cpp,call,VisitElement
-,VisitUnitResources,src/harness/harness.cpp,call,sprintf
 ,VisitUnitResources,src/harness/harness.cpp,function,
 ,VisitUnitResources,src/harness/harness.cpp,global_read,kUnitResourcesTable@src/harness/trace_schema.h
+,VisitUnitVector,src/harness/harness.cpp,call,FormatPath
 ,VisitUnitVector,src/harness/harness.cpp,call,ReadU32At
 ,VisitUnitVector,src/harness/harness.cpp,call,VectorCount
 ,VisitUnitVector,src/harness/harness.cpp,call,VisitPointer
 ,VisitUnitVector,src/harness/harness.cpp,call,VisitU32
-,VisitUnitVector,src/harness/harness.cpp,call,sprintf
 ,VisitUnitVector,src/harness/harness.cpp,function,
 ,VisitUnits,src/harness/harness.cpp,call,EndSection
+,VisitUnits,src/harness/harness.cpp,call,FormatPath
 ,VisitUnits,src/harness/harness.cpp,call,GameAt
 ,VisitUnits,src/harness/harness.cpp,call,GameRef
 ,VisitUnits,src/harness/harness.cpp,call,HashByte
 ,VisitUnits,src/harness/harness.cpp,call,HashU32
 ,VisitUnits,src/harness/harness.cpp,call,VisitElement
-,VisitUnits,src/harness/harness.cpp,call,sprintf
 ,VisitUnits,src/harness/harness.cpp,deref_read,*unsigned short
 ,VisitUnits,src/harness/harness.cpp,function,
 ,VisitUnits,src/harness/harness.cpp,global_read,kUnitTable@src/harness/trace_schema.h
@@ -53099,21 +53123,22 @@ address,function,file,kind,target
 ,VisitVisibility,src/harness/harness.cpp,call,VisitValue
 ,VisitVisibility,src/harness/harness.cpp,function,
 ,VisitWeaponDefs,src/harness/harness.cpp,call,EndSection
+,VisitWeaponDefs,src/harness/harness.cpp,call,FormatPath
 ,VisitWeaponDefs,src/harness/harness.cpp,call,GameAt
 ,VisitWeaponDefs,src/harness/harness.cpp,call,HashByte
 ,VisitWeaponDefs,src/harness/harness.cpp,call,ReadRefAt
 ,VisitWeaponDefs,src/harness/harness.cpp,call,VisitElement
 ,VisitWeaponDefs,src/harness/harness.cpp,call,VisitWeaponTable
-,VisitWeaponDefs,src/harness/harness.cpp,call,sprintf
 ,VisitWeaponDefs,src/harness/harness.cpp,call,strcat
 ,VisitWeaponDefs,src/harness/harness.cpp,function,
 ,VisitWeaponDefs,src/harness/harness.cpp,global_read,kWeaponDefDataTable@src/harness/trace_schema.h
+,VisitWeaponDefs,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,VisitWeaponTable,src/harness/harness.cpp,call,FormatPath
 ,VisitWeaponTable,src/harness/harness.cpp,call,HashByte
 ,VisitWeaponTable,src/harness/harness.cpp,call,ReadRefAt
 ,VisitWeaponTable,src/harness/harness.cpp,call,ReadU32At
 ,VisitWeaponTable,src/harness/harness.cpp,call,VisitString
 ,VisitWeaponTable,src/harness/harness.cpp,call,VisitU32
-,VisitWeaponTable,src/harness/harness.cpp,call,sprintf
 ,VisitWeaponTable,src/harness/harness.cpp,function,
 ,VisitWind,src/harness/harness.cpp,call,EndSection
 ,VisitWind,src/harness/harness.cpp,call,GameAt

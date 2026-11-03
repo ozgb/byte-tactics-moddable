@@ -1,0 +1,369 @@
+{
+ "replay_format": 1,
+ "fields": [
+  {
+   "name": "Game.ticks",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "Game.width",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "Game.height",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "Game.windCounter",
+   "base": "game",
+   "size": 4,
+   "kind": "u32"
+  },
+  {
+   "name": "Game.windSpeedDenominator",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "Game.windX",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "Game.windY",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "Game.windZ",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "Game.windDirection",
+   "base": "game",
+   "size": 2,
+   "kind": "u16"
+  },
+  {
+   "name": "Game.windSpeed",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "Game.windStrength",
+   "base": "game",
+   "size": 4,
+   "kind": "f32"
+  },
+  {
+   "name": "Game.windEnabled",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "Game.windSpeedMin",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "Game.windSpeedMax",
+   "base": "game",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "SimGlobals.g_meteorNextStrikeTime",
+   "base": "sim",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "SimGlobals.g_meteorWeaponName",
+   "base": "sim",
+   "size": 32,
+   "kind": "string"
+  },
+  {
+   "name": "SimGlobals.g_meteorSpawnMagnitude",
+   "base": "sim",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "SimGlobals.g_meteorSpawnInterval",
+   "base": "sim",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "SimGlobals.g_meteorActive",
+   "base": "sim",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "SimGlobals.g_meteorStrikeEndTime",
+   "base": "sim",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "SimGlobals.g_meteorOrigin",
+   "base": "sim",
+   "size": 4,
+   "kind": "point16"
+  },
+  {
+   "name": "SimGlobals.g_meteorShowerDuration",
+   "base": "sim",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "SimGlobals.g_meteorWeapon",
+   "base": "sim",
+   "size": 4,
+   "kind": "weapon"
+  },
+  {
+   "name": "SimGlobals.g_meteorsEnabled",
+   "base": "sim",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "SimGlobals.g_meteorNextHitTime",
+   "base": "sim",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "SimGlobals.g_meteorTarget",
+   "base": "sim",
+   "size": 4,
+   "kind": "point16"
+  },
+  {
+   "name": "SimGlobals.g_meteorScheduleGap",
+   "base": "sim",
+   "size": 4,
+   "kind": "i32"
+  },
+  {
+   "name": "rng.main",
+   "base": "rng",
+   "size": 4,
+   "kind": "u32"
+  },
+  {
+   "name": "rng.load",
+   "base": "rng",
+   "size": 4,
+   "kind": "u32"
+  },
+  {
+   "name": "rng.seed",
+   "base": "rng",
+   "size": 4,
+   "kind": "u32"
+  }
+ ],
+ "slots": {
+  "UpdateWind": {
+   "reads": [
+    "Game.ticks",
+    "Game.windCounter",
+    "Game.windSpeedDenominator",
+    "Game.windDirection",
+    "Game.windSpeed",
+    "Game.windStrength",
+    "Game.windSpeedMin",
+    "Game.windSpeedMax",
+    "rng.main",
+    "rng.load",
+    "rng.seed"
+   ],
+   "writes": [
+    "Game.windCounter",
+    "Game.windX",
+    "Game.windZ",
+    "Game.windDirection",
+    "Game.windSpeed",
+    "Game.windStrength",
+    "Game.windEnabled",
+    "rng.main",
+    "rng.load",
+    "rng.seed"
+   ]
+  },
+  "UpdateMeteors": {
+   "reads": [
+    "Game.ticks",
+    "Game.width",
+    "Game.height",
+    "SimGlobals.g_meteorNextStrikeTime",
+    "SimGlobals.g_meteorSpawnMagnitude",
+    "SimGlobals.g_meteorSpawnInterval",
+    "SimGlobals.g_meteorActive",
+    "SimGlobals.g_meteorStrikeEndTime",
+    "SimGlobals.g_meteorOrigin",
+    "SimGlobals.g_meteorShowerDuration",
+    "SimGlobals.g_meteorWeapon",
+    "SimGlobals.g_meteorsEnabled",
+    "SimGlobals.g_meteorNextHitTime",
+    "SimGlobals.g_meteorTarget",
+    "SimGlobals.g_meteorScheduleGap",
+    "rng.main",
+    "rng.load",
+    "rng.seed"
+   ],
+   "writes": [
+    "SimGlobals.g_meteorNextStrikeTime",
+    "SimGlobals.g_meteorActive",
+    "SimGlobals.g_meteorStrikeEndTime",
+    "SimGlobals.g_meteorOrigin",
+    "SimGlobals.g_meteorNextHitTime",
+    "SimGlobals.g_meteorTarget",
+    "rng.main",
+    "rng.load",
+    "rng.seed"
+   ]
+  },
+  "InitMeteors": {
+   "reads": [
+    "SimGlobals.g_meteorWeaponName",
+    "SimGlobals.g_meteorSpawnInterval",
+    "SimGlobals.g_meteorWeapon"
+   ],
+   "writes": [
+    "SimGlobals.g_meteorNextStrikeTime",
+    "SimGlobals.g_meteorWeaponName",
+    "SimGlobals.g_meteorActive",
+    "SimGlobals.g_meteorWeapon"
+   ]
+  },
+  "EmptyShutdownPreCleanup": {
+   "reads": [],
+   "writes": []
+  },
+  "EnableMeteors": {
+   "reads": [],
+   "writes": [
+    "SimGlobals.g_meteorsEnabled"
+   ]
+  },
+  "DisableMeteors": {
+   "reads": [],
+   "writes": [
+    "SimGlobals.g_meteorsEnabled"
+   ]
+  },
+  "SetMeteorParams": {
+   "reads": [
+    "SimGlobals.g_meteorWeaponName"
+   ],
+   "writes": [
+    "SimGlobals.g_meteorWeaponName",
+    "SimGlobals.g_meteorSpawnMagnitude",
+    "SimGlobals.g_meteorSpawnInterval",
+    "SimGlobals.g_meteorShowerDuration",
+    "SimGlobals.g_meteorScheduleGap"
+   ]
+  },
+  "LoadMeteorDefaults": {
+   "reads": [],
+   "writes": []
+  },
+  "SaveMeteors": {
+   "reads": [
+    "SimGlobals.g_meteorNextStrikeTime",
+    "SimGlobals.g_meteorActive",
+    "SimGlobals.g_meteorStrikeEndTime",
+    "SimGlobals.g_meteorOrigin",
+    "SimGlobals.g_meteorsEnabled",
+    "SimGlobals.g_meteorNextHitTime",
+    "SimGlobals.g_meteorTarget"
+   ],
+   "writes": []
+  },
+  "LoadMeteors": {
+   "reads": [],
+   "writes": [
+    "SimGlobals.g_meteorNextStrikeTime",
+    "SimGlobals.g_meteorActive",
+    "SimGlobals.g_meteorStrikeEndTime",
+    "SimGlobals.g_meteorOrigin",
+    "SimGlobals.g_meteorsEnabled",
+    "SimGlobals.g_meteorNextHitTime",
+    "SimGlobals.g_meteorTarget"
+   ]
+  },
+  "CmdMeteor": {
+   "reads": [
+    "Game.ticks",
+    "Game.width",
+    "Game.height",
+    "SimGlobals.g_meteorStrikeEndTime",
+    "SimGlobals.g_meteorShowerDuration",
+    "SimGlobals.g_meteorTarget",
+    "SimGlobals.g_meteorScheduleGap",
+    "rng.main",
+    "rng.load",
+    "rng.seed"
+   ],
+   "writes": [
+    "SimGlobals.g_meteorNextStrikeTime",
+    "SimGlobals.g_meteorActive",
+    "SimGlobals.g_meteorStrikeEndTime",
+    "SimGlobals.g_meteorOrigin",
+    "SimGlobals.g_meteorsEnabled",
+    "SimGlobals.g_meteorNextHitTime",
+    "SimGlobals.g_meteorTarget",
+    "rng.main",
+    "rng.load",
+    "rng.seed"
+   ]
+  },
+  "UpdateWindOnStream": {
+   "reads": [
+    "Game.ticks",
+    "Game.windCounter",
+    "Game.windSpeedDenominator",
+    "Game.windDirection",
+    "Game.windSpeed",
+    "Game.windStrength",
+    "Game.windSpeedMin",
+    "Game.windSpeedMax",
+    "rng.main",
+    "rng.load",
+    "rng.seed"
+   ],
+   "writes": [
+    "Game.windCounter",
+    "Game.windX",
+    "Game.windZ",
+    "Game.windDirection",
+    "Game.windSpeed",
+    "Game.windStrength",
+    "Game.windEnabled",
+    "rng.main",
+    "rng.load",
+    "rng.seed"
+   ]
+  }
+ }
+}

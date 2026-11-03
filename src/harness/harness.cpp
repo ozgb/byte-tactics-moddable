@@ -1142,6 +1142,18 @@ static void ParseBlockScan(char* cmdLine)
     }
 }
 
+static bool ParseBlockScanVerify(char* cmdLine)
+{
+    for (char* p = cmdLine; *p != '\0'; p++) {
+        if ((p[0] == '-' || p[0] == '/') && _strnicmp(p + 1, "blockscanverify", 15) == 0 && (p == cmdLine || isspace((unsigned char)p[-1]))
+            && (p[16] == '\0' || isspace((unsigned char)p[16]))) {
+            memset(p, ' ', 16);
+            return true;
+        }
+    }
+    return false;
+}
+
 static void ParseQuirksSwitch(char* cmdLine)
 {
     for (char* p = cmdLine; *p != '\0'; p++) {
@@ -1192,9 +1204,10 @@ static void ResolveQuirks()
 
 void HarnessInit(char* cmdLine)
 {
+    bool scanVerify = ParseBlockScanVerify(cmdLine);
     ParseBlockScan(cmdLine);
     if (s_blockScan)
-        BlockScanEnable((unsigned)s_blockScan);
+        BlockScanEnable((unsigned)s_blockScan, scanVerify);
     InstallNativeSeams();
     ModulesHideSwitch(cmdLine);
     ParseQuirksSwitch(cmdLine);

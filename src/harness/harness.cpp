@@ -52,6 +52,7 @@ static unsigned s_gameSeed = 1;
 static unsigned s_crtSeed = 1;
 static unsigned s_viewSeed = 1;
 static unsigned s_viewState = 1;
+static unsigned s_viewDraws = 0;
 static unsigned s_fpuControlWord = 0x9001F;
 static PlayerSpec s_players[MAX_PLAYERS];
 static char s_map[0x104];
@@ -1466,6 +1467,7 @@ unsigned HarnessCrtSeed(unsigned live)
 
 int HarnessViewRand()
 {
+    s_viewDraws++;
     s_viewState = s_viewState * 214013 + 2531011;
     return (s_viewState >> 16) & 0x7fff;
 }
@@ -3648,6 +3650,7 @@ static char s_uiSelection[UI_SELECTION_TEXT];
 static int s_uiScrollX = -1;
 static int s_uiScrollZ = -1;
 static int s_uiScrollSeen = 0;
+static unsigned s_uiViewDraws = 0;
 
 static unsigned UiUnitIndex(const void* u)
 {
@@ -3787,12 +3790,17 @@ static void UiEndOfTick()
     unsigned char* end;
     if (s_ui == NULL)
         return;
-    if (s_inputCount != 0 && (!s_uiScrollSeen || g_game->scrollX != s_uiScrollX || g_game->scrollY != s_uiScrollZ)) {
+    if ((!s_uiScrollSeen || g_game->scrollX != s_uiScrollX || g_game->scrollY != s_uiScrollZ)) {
         s_uiScrollSeen = 1;
         s_uiScrollX = g_game->scrollX;
         s_uiScrollZ = g_game->scrollY;
         UiLineStart("scroll");
         fprintf(s_ui, " %d %d\n", s_uiScrollX, s_uiScrollZ);
+    }
+    if (s_viewDraws != s_uiViewDraws) {
+        s_uiViewDraws = s_viewDraws;
+        UiLineStart("view");
+        fprintf(s_ui, " %u\n", s_uiViewDraws);
     }
     selection[0] = '\0';
     u = (unsigned char*)g_game->players[g_game->localPlayer].unitsBegin;

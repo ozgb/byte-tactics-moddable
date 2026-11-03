@@ -263,7 +263,7 @@ input 40 char a
   The scroll of slot 0 on The Pass is (304, 32) until the camera moves.
 
 In test mode the exe also writes `ui.txt` beside `trace.txt`: the input it delivered, the orders the UI turned it into, and the
-selection after each tick (format in docs/ui-log.md on `moddable`). The harness's own `order` lines are not logged.
+selection, the camera scroll and the count of view-stream draws after each tick (format in docs/ui-log.md on `moddable`). The harness's own `order` lines are not logged.
 `--traces` stores each run's `ui.txt` in `reference/ui/<scenario>.txt`.
 
 ## Console commands

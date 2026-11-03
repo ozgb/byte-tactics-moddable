@@ -4,7 +4,7 @@
 #include "replay_text.h"
 #include "replay_types.h"
 
-enum { REPLAY_MAX_OBJECTS = 4096, REPLAY_MAX_ROOTS = 8 };
+enum { REPLAY_MAX_OBJECTS = 4096, REPLAY_MAX_ROOTS = 8, REPLAY_REACH_HASH = 8192 };
 
 class ReplayObjectTable {
 public:
@@ -28,6 +28,7 @@ struct ReplayReach {
     unsigned count;
     unsigned char kind[REPLAY_MAX_OBJECTS];
     void* object[REPLAY_MAX_OBJECTS];
+    short slots[REPLAY_REACH_HASH];
 };
 
 typedef void* (*ReplayAllocFn)(unsigned size);

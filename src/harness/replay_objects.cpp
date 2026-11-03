@@ -349,12 +349,14 @@ void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned c
 {
     if (object == nullptr || kReplayObjectKinds[kind].scope != RS_STATE)
         return;
-    for (unsigned i = 0; i < reach.count; i++) {
-        if (reach.object[i] == object)
+    unsigned slot = PointerHash(object) % REPLAY_REACH_HASH;
+    for (; reach.slots[slot] >= 0; slot = (slot + 1) % REPLAY_REACH_HASH) {
+        if (reach.object[reach.slots[slot]] == object)
             return;
     }
     if (reach.count == REPLAY_MAX_OBJECTS)
         abort();
+    reach.slots[slot] = (short)reach.count;
     if (assign)
         table.Name(kind, object);
     reach.kind[reach.count] = kind;
@@ -367,6 +369,7 @@ void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned c
 void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned char* rootKinds, void* const* roots, unsigned rootCount)
 {
     reach.count = 0;
+    memset(reach.slots, 0xff, sizeof reach.slots);
     for (unsigned i = 0; i < rootCount; i++)
         Visit(reach, table, assign, rootKinds[i], roots[i]);
     for (unsigned at = 0; at < reach.count; at++) {

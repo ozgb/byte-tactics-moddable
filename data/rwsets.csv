@@ -47786,6 +47786,12 @@ address,function,file,kind,target
 ,ImportVec3,src/harness/replay.cpp,call,ReplayValue
 ,ImportVec3,src/harness/replay.cpp,deref_read,*Vec3
 ,ImportVec3,src/harness/replay.cpp,function,
+,ImportVec3Xz,src/harness/replay.cpp,call,ReplayText::Add
+,ImportVec3Xz,src/harness/replay.cpp,call,ReplayText::AddChar
+,ImportVec3Xz,src/harness/replay.cpp,call,ReplayText::AddInt
+,ImportVec3Xz,src/harness/replay.cpp,field_read,Vec3::x
+,ImportVec3Xz,src/harness/replay.cpp,field_read,Vec3::z
+,ImportVec3Xz,src/harness/replay.cpp,function,
 ,ImportWeapon,src/harness/replay.cpp,call,ReplayAddWeapon
 ,ImportWeapon,src/harness/replay.cpp,call,ReplayText::AddChar
 ,ImportWeapon,src/harness/replay.cpp,function,
@@ -53950,7 +53956,7 @@ address,function,file,kind,target
 ,RecUnitsGetGroundHeight,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecUnitsGetGroundHeight,src/harness/replay_hooks.inc,call,FinishImport
 ,RecUnitsGetGroundHeight,src/harness/replay_hooks.inc,call,ImportResult
-,RecUnitsGetGroundHeight,src/harness/replay_hooks.inc,call,ImportVec3
+,RecUnitsGetGroundHeight,src/harness/replay_hooks.inc,call,ImportVec3Xz
 ,RecUnitsGetGroundHeight,src/harness/replay_hooks.inc,call,ReplayText::Add
 ,RecUnitsGetGroundHeight,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsGetGroundHeight,src/harness/replay_hooks.inc,call,SlotScope::Open

@@ -152,8 +152,7 @@ class GatePathsTest(unittest.TestCase):
         self.assertIsNotNone(paragraph, "reference/README.md, Gate, lost its `The gate applies when` paragraph")
         named = re.findall(r"`([^`\s]+)`", paragraph)
         self.assertTrue(named)
-        for path in named:
-            self.assertTrue(fullgate.needs_gate(path), f"{path} is in the README's gate paths, not in GATE_PATHS")
+        self.assertEqual(sorted(named), sorted(fullgate.GATE_PATHS))
 
 
 if __name__ == "__main__":

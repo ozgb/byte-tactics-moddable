@@ -484,9 +484,13 @@ files. Both must report every scenario equal.
 reference. Add `--game-dir <dir>` when the game is not in a Steam directory.
 
 The gate applies when a pull request changes `src/`, `include/`,
-`lib/bitexact/`, `reference/`, or the tools that build or run the exe
-(`tools/reference.py`, `tools/playtest.py` and the like). Other
-changes do not need it. The merges that did are the ones counted for the full-suite cadence below.
+`interfaces/`, `lib/` (the bit-exact maths and the WASM loader), `wasm/`,
+`reference/`, the build (`CMakeLists.txt`, `cmake/`), the layout and
+trace format data (`data/layout_refs.csv`, `data/trace_schema.json`,
+`tools/traceschema.py`), or the tools that run the exe
+(`tools/reference.py`, `tools/playtest.py`). Other changes do not need
+it. The merges that did are the ones counted for the full-suite cadence
+below.
 
 `--traces` writes every trace with the reference branch's sha as `commit`. `--check` plays
 every scenario (`--parallel N` at a time, default half the CPUs and at most 6), prints one line per scenario with its run time
@@ -538,7 +542,9 @@ The total counts equal, differ and failed. A difference is not a failure: the ex
 scenario failed (or a trace has no scenario). It builds no reference, and it is not the gate. It
 works with `--tier`, `--steps-per-frame` and `--parallel`, and not with `--poison`.
 
-### When the full suite is the gate  The full `--check` and the play-tests stay the gate of a pull
+### When the full suite is the gate
+
+The full `--check` and the play-tests stay the gate of a pull
 request that:
 
 - changes the state block layout: `interfaces/`, `src/state/`, `data/layout_refs.csv`, or any `static_assert` on a block struct's size;

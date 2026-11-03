@@ -3,6 +3,7 @@
 #include <math.h>
 #include "../../interfaces/host.h"
 #include "../state/sim_globals.h"
+#include "../harness/replay.h"
 
 #include "../../link/globals.h"
 #include "math.h"
@@ -31,8 +32,10 @@ int __stdcall ComputeChecksum(unsigned char* data, int len)
 // FUNCTION: 0x4b6c30
 int __stdcall RandomInt(int range)
 {
+    ReplayImport call(RI_RANDOM_INT);
+    call.Int(range);
     if (range < 2)
-        return 0;
+        return call.Result(0);
 
     unsigned int seed = g_randomSeed;
     unsigned int q = seed / 127773;
@@ -41,7 +44,7 @@ int __stdcall RandomInt(int range)
     if ((int)seed <= 0)
         seed += 2147483647;
     g_randomSeed = seed;
-    return seed % range;
+    return call.Result((int)(seed % range));
 }
 
 // FUNCTION: 0x4b6ca0

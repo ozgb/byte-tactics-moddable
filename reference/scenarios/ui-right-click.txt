@@ -1,0 +1,27 @@
+# Right-click interface: a right-click on the ground moves the commander, a right-click on an enemy attacks it, a minimap click scrolls.
+game_seed 313
+crt_seed 1313
+view_seed 2313
+map The Pass
+start_positions fixed
+ticks 260
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +iface 1
+line_of_sight 0
+spawn 2 1 CORAK 700 300
+input 10 mouse move 384 240
+input 11 mouse left down 384 240
+input 12 mouse left up 384 240
+input 20 mouse move 464 300
+input 21 mouse right down 464 300
+input 22 mouse right up 464 300
+input 60 mouse move 524 300
+input 61 mouse right down 524 300
+input 62 mouse right up 524 300
+input 100 mouse move 64 64
+input 101 mouse left down 64 64
+input 102 mouse move 100 90
+input 103 mouse left up 100 90

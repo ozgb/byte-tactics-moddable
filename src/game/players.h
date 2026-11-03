@@ -22,7 +22,6 @@ void __stdcall InitPlayers();
 void __stdcall RebuildAIFeatureCells();
 void __stdcall FreePlayers();
 void __stdcall RefreshOwnedUnitsLineOfSight(Player* range);
-void __stdcall ContinueWatchingCallback(Gui* gadget);
 void __stdcall UpdatePlayers();
 void __stdcall UpdatePlayersOnStream(RandStream stream);
 void __stdcall InitPlayerResources();

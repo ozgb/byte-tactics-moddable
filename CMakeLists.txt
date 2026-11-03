@@ -253,7 +253,7 @@ add_custom_command(
 add_custom_command(
   OUTPUT "${CMAKE_BINARY_DIR}/TotalA.exe"
   COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:windows,4.0 /base:0x400000 /fixed /dynamicbase:no /largeaddressaware:no /errorlimit:0 /entry:WinMainCRTStartup /include:_WinMainCRTStartup /out:${CMAKE_BINARY_DIR}/TotalA.exe
-          /libpath:${CMAKE_BINARY_DIR}/lib /opt:noref,noicf /incremental:no /safeseh:no /force:multiple /map:${CMAKE_BINARY_DIR}/TotalA.map
+          /libpath:${CMAKE_BINARY_DIR}/lib /opt:noref,noicf /incremental:no /brepro /safeseh:no /force:multiple /map:${CMAKE_BINARY_DIR}/TotalA.map
           "@${CMAKE_BINARY_DIR}/objs/objects.rsp" "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res"
           ${ZLIB_OBJECTS} ${IMPORT_LIBS} ${SYSTEM_LIBS} $<TARGET_FILE:wasmloader>
   DEPENDS game data extra wasmloader ${PROFILE_TARGETS} ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res" ${IMPORT_LIBS}
@@ -270,6 +270,39 @@ add_custom_command(
   DEPENDS block_test_objects $<TARGET_OBJECTS:block_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(block_test DEPENDS "${CMAKE_BINARY_DIR}/block_test.exe")
+
+add_library(replay_test_objects OBJECT src/harness/replay_text.cpp tests/replay_test.cpp)
+target_include_directories(replay_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+target_compile_options(replay_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
+add_custom_command(
+  OUTPUT "${CMAKE_BINARY_DIR}/replay_test.exe"
+  COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/replay_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no
+          $<TARGET_OBJECTS:replay_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS replay_test_objects $<TARGET_OBJECTS:replay_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+  VERBATIM COMMAND_EXPAND_LISTS)
+add_custom_target(replay_test DEPENDS "${CMAKE_BINARY_DIR}/replay_test.exe")
+
+set(REPLAY_MODULE_SOURCES src/map/meteors.cpp src/game/game_state.cpp src/game/console_commands.cpp)
+foreach(variant native inject)
+  add_library(replay_${variant}_module OBJECT ${REPLAY_MODULE_SOURCES})
+  target_include_directories(replay_${variant}_module PRIVATE "${CMAKE_SOURCE_DIR}/include")
+  target_include_directories(replay_${variant}_module SYSTEM PRIVATE "${MSVC5_INCLUDE}" "${CMAKE_SOURCE_DIR}/lib/wasmloader" "${CMAKE_SOURCE_DIR}/third_party/wasmtime/include")
+  target_compile_options(replay_${variant}_module PRIVATE ${GAME_COMPILE_OPTIONS} "/FI${BITEXACT_SHIM_DIR}/route.h")
+endforeach()
+target_compile_definitions(replay_inject_module PRIVATE BT_REPLAY_INJECT_GAP_SCALE=31.0)
+add_library(replay_native_test_objects OBJECT src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp src/host/win32/library.cpp src/host/win32/time.cpp src/wasm/wind_meteors_glue.cpp src/harness/replay_text.cpp tests/replay_wasm.cpp tests/replay_native_test.cpp)
+target_include_directories(replay_native_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_include_directories(replay_native_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}" "${CMAKE_SOURCE_DIR}/lib/wasmloader" "${CMAKE_SOURCE_DIR}/third_party/wasmtime/include")
+target_compile_options(replay_native_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
+foreach(variant native inject)
+  add_custom_command(
+    OUTPUT "${CMAKE_BINARY_DIR}/replay_${variant}_test.exe"
+    COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/replay_${variant}_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no /opt:ref /force:unresolved
+            $<TARGET_OBJECTS:replay_native_test_objects> $<TARGET_OBJECTS:replay_${variant}_module> $<TARGET_FILE:bitexact> $<TARGET_FILE:wasmloader> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+    DEPENDS replay_native_test_objects replay_${variant}_module bitexact wasmloader $<TARGET_OBJECTS:replay_native_test_objects> $<TARGET_OBJECTS:replay_${variant}_module> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+    VERBATIM COMMAND_EXPAND_LISTS)
+endforeach()
+add_custom_target(replay_native_test DEPENDS "${CMAKE_BINARY_DIR}/replay_native_test.exe" "${CMAKE_BINARY_DIR}/replay_inject_test.exe")
 
 add_library(purecall_test_objects OBJECT src/harness/purecall.cpp tests/purecall_test.cpp)
 target_include_directories(purecall_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
@@ -313,5 +346,11 @@ add_custom_target(wasm_runtime
   COMMAND "${CMAKE_COMMAND}" -E copy "${WASM_HOST_DIR}/wasmtime_host.dll" "${CMAKE_BINARY_DIR}/wasmtime_host.dll"
   COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/build/wasm-modules/wind_meteors.wasm" "${CMAKE_BINARY_DIR}/wind_meteors.wasm"
   COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/wasm/modules.json" "${CMAKE_BINARY_DIR}/modules.json"
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  USES_TERMINAL)
+
+add_custom_target(wasm_runtime_inject
+  COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build-variant --define BT_REPLAY_INJECT_GAP_SCALE=31.0 --name wind_meteors_inject
+  COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/build/wasm-modules/wind_meteors_inject.wasm" "${CMAKE_BINARY_DIR}/wind_meteors_inject.wasm"
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   USES_TERMINAL)

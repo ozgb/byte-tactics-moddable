@@ -104,12 +104,6 @@ int CMemoryCache::InitCache(unsigned int newSize)
     return Install(GameAllocIgnoreTag("CMemoryCache CCH", newSize), newSize);
 }
 
-int DebrisCache::InitSimCache(unsigned int newSize)
-{
-    FreeCache();
-    return Install(SimAllocTagged("CMemoryCache CCH", newSize), newSize);
-}
-
 // FUNCTION: 0x437a00
 template <class Cache, class Handle>
 void CacheCore<Cache, Handle>::FreeCache()
@@ -197,7 +191,6 @@ int CacheCore<Cache, Handle>::AllocHandle(Handle* p, int need)
 }
 
 template class CacheCore<CMemoryCache, void*>;
-template class CacheCore<DebrisCache, Ref<char> >;
 
 #pragma auto_inline(off)
 // FUNCTION: 0x437b50

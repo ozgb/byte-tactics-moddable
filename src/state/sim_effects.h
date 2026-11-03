@@ -130,6 +130,24 @@ inline void RecordCdActivity(int amount, int playerA, int playerB)
     RecordSimEvent(SIM_EVENT_CD_ACTIVITY, 0, args, 3);
 }
 
+inline void RecordBuildQueueSound(int player, int count)
+{
+    unsigned int args[2] = {(unsigned int)player, (unsigned int)count};
+    RecordSimEvent(SIM_EVENT_BUILD_QUEUE_SOUND, 0, args, 2);
+}
+
+inline void RecordWatchPrompt(int player)
+{
+    unsigned int args[1] = {(unsigned int)player};
+    RecordSimEvent(SIM_EVENT_WATCH_PROMPT, 0, args, 1);
+}
+
+inline void RecordWatchModeNotice(int player)
+{
+    unsigned int args[1] = {(unsigned int)player};
+    RecordSimEvent(SIM_EVENT_WATCH_MODE_NOTICE, 0, args, 1);
+}
+
 inline void RecordForcesDestroyed(int player)
 {
     unsigned int args[1] = {(unsigned int)player};

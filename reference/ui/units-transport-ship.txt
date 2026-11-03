@@ -1,0 +1,31 @@
+bt-ui 1
+1 scroll 592 2112
+1 view 1
+1 select -
+21 view 2
+22 view 3
+121 view 4
+177 view 34
+178 view 94
+179 view 154
+180 view 214
+181 view 274
+182 view 334
+183 view 394
+184 view 454
+185 view 514
+186 view 574
+187 view 634
+188 view 694
+189 view 754
+190 view 814
+191 view 874
+192 view 934
+193 view 994
+194 view 1054
+195 view 1114
+196 view 1174
+197 view 1234
+198 view 1294
+199 view 1354
+200 view 1414

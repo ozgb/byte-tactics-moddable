@@ -19,7 +19,6 @@ class StringRef;
 #include "../graphics/palette.h"
 
 
-#include "map_enum.h"
 
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall SetCursorMode(int n);

@@ -636,10 +636,6 @@ address,function,file
 0x465e30,InitPlayerResources,src/game/players.cpp
 0x465fb0,LoadPlayerControllers,src/game/players.cpp
 0x466050,LoadPlayers,src/game/players.cpp
-0x466b00,DrawRadar,src/map/radar.cpp
-0x466b70,CalcRadarViewportRect,src/map/radar.cpp
-0x466c20,UpdateRadarMapped,src/map/radar.cpp
-0x466dc0,DrawRadarUnits,src/map/radar.cpp
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp
 0x467840,DetectionVisitor::MarkUnitsInRadarOrSonarRadius,src/ingame/info_panel.cpp
 0x467950,MarkRecentlyDamaged,src/ingame/info_panel.cpp

@@ -32,7 +32,6 @@ class StringRef;
 
 
 #include "map_list.h"
-#include "../frontend/map_enum.h"
 
 #include "../game/mission_conditions.h"
 
@@ -197,7 +196,7 @@ void Mission::LoadCampaign(char* file)
         if (strlen(file) != 0) {
             if (!list.LoadFile(GetNameSlot(0))) {
                 sprintf(msg, "The requested campaign file, %s, does not exist.", GetNameSlot(0));
-                OpenMessageBox((Gui *)g_game->messages, msg, 0x1e0, 1, 1);
+                ShowErrorBox(msg, "Campaign error");
                 LoadCampaign(DAT_005119b8);
                 return;
             }
@@ -527,7 +526,7 @@ int Mission::LoadMission(char* map)
     char lower[0x80];
 
     g_seams.players->DeleteConditions(g_game->list_391ed);
-    g_game->list_391ed = new (kSim) MissionConditions;
+    g_game->list_391ed = g_seams.players->NewConditions();
     surfaceMetal = -1;
     minWindSpeed = -1;
     maxWindSpeed = -1;
@@ -562,7 +561,7 @@ int Mission::LoadMission(char* map)
         if (!list.SelectRecord(key)) {
             char msg[0x100];
             sprintf(msg, "The requested mission file, %s, does not exist.", key);
-            OpenMessageBox((Gui *)g_game->messages, msg, 0x1e0, 1, 1);
+            ShowErrorBox(msg, "Mission error");
             return 0;
         }
         GetLocalizedString(&list, missionName, "missionname", 0x100, 0);
@@ -573,7 +572,7 @@ int Mission::LoadMission(char* map)
             if (!parser.LoadFile(file)) {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  There is no mission defintion for this mission: %s", path);
-                OpenMessageBox((Gui *)g_game->messages, msg, 0x1e0, 1, 1);
+                ShowErrorBox(msg, "Mission error");
                 return 0;
             }
             parser.ResetCurrentRecord();
@@ -584,11 +583,11 @@ int Mission::LoadMission(char* map)
             } else {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  Mission file %s is corrupt (no header found).", path);
-                OpenMessageBox((Gui *)g_game->messages, msg, 0x1e0, 1, 1);
+                ShowErrorBox(msg, "Mission error");
                 return 0;
             }
         } else {
-            OpenMessageBox((Gui *)g_game->messages, "Old TED format no longer supported!", 0x1e0, 1, 1);
+            ShowErrorBox("Old TED format no longer supported!", "Mission error");
             return 0;
         }
         break;
@@ -618,7 +617,7 @@ int Mission::LoadMission(char* map)
     }
 
     if (!parser.SelectRecord("GlobalHeader")) {
-        OpenMessageBox((Gui *)g_game->messages, "No GlobalHeader block in mission file!", 0x1e0, 1, 1);
+        ShowErrorBox("No GlobalHeader block in mission file!", "Mission error");
         return 0;
     }
     headerChecksum = *(int*)((char*)parser.current + 0x25);

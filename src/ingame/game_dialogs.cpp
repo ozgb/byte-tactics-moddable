@@ -1021,6 +1021,7 @@ void __stdcall RunGameSteps(int showStats)
 {
     int n = g_game->frames_38a3b;
 
+    DrainSimEvents();
     while (n--) {
         g_game->ticks++;
         HarnessBeforeStep();
@@ -1031,25 +1032,33 @@ void __stdcall RunGameSteps(int showStats)
             AccumulateProfileTime(&g_game->timers, 0);
         }
         g_seams.units->UpdateAllUnits();
+        UpdateAutoFollow();
         HarnessPhase(1);
+        DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 1);
         g_seams.weapons->UpdateProjectiles();
         HarnessPhase(2);
+        DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 7);
         g_seams.weapons->UpdateExplosions();
         HarnessPhase(3);
+        DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 8);
         g_seams.players->UpdatePlayers();
         HarnessPhase(4);
+        DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 2);
 
         g_seams.features->UpdateFeatures();
         HarnessPhase(5);
+        DrainSimEvents();
         StepAllGafSequences();
         g_seams.wind_meteors->UpdateWind();
         HarnessPhase(6);
+        DrainSimEvents();
         g_seams.wind_meteors->UpdateMeteors();
         HarnessPhase(7);
+        DrainSimEvents();
         UpdateCameraFollow();
         AccumulateProfileTime(&g_game->timers, 8);
 
@@ -1068,12 +1077,10 @@ void __stdcall RunGameSteps(int showStats)
             g_packetManager.SendAllQueued(0);
             AccumulateProfileTime(&g_game->timers, 0);
         }
-        if (HarnessTestMode())
-            DrainSimEvents();
+        DrainSimEvents();
         HarnessAfterStep();
     }
 
-    DrainSimEvents();
     EmptyPostSimStepHook();
     EmptyPostSimStepHook_B();
     EmptyPostSimStepHook_C();
@@ -1134,6 +1141,27 @@ void __stdcall HandleDebugHotkey(int eventType)
 }
 
 // FUNCTION: 0x464e70
+// FUNCTION: 0x464de0
+void __stdcall ContinueWatchingCallback(Gui* gui)
+{
+    Gadget* screen = gui->layer->entries;
+    if (gui->hotGadgetIndex == -1)
+        return;
+    PlaySoundByName("BigButton", 0);
+    if (IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE1")) {
+        g_seams.network->BroadcastPlayerInfo();
+        g_game->endGameVictory = 0;
+        ReportGameEvent(4);
+        return;
+    }
+    if (!IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE2")) {
+        ClearSelectedGadget(gui);
+        return;
+    }
+    g_game->bits.flag2 = 1;
+    g_game->endGameVictory = 0;
+}
+
 void ShowContinueWatchingDialog()
 {
     Layer* screen = LoadGuiLayer(&g_game->gui, g_yesNoGuiName, 0x900);

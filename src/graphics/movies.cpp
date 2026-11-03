@@ -289,12 +289,6 @@ void MoviePlayer::Play()
     }
 }
 
-// FUNCTION: 0x47c770
-int GetBuildSiteMetal(void)
-{
-    return g_lastPlaceMetalSum;
-}
-
 // FUNCTION: 0x47c780
 int GetBuildSiteHeight(void)
 {

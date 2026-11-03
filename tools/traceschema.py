@@ -482,7 +482,7 @@ SYNTHETIC.update({
     """,
     "UnitMotion": """
         Ref<Iface_0043dd20> obj;     // +0x0
-        MovementClass* movementClass; // +0x4
+        Ref<MovementClass> movementClass; // +0x4
         Vec3 velocity;                // +0x8
         Vec3 p2;                      // +0x14
         int speed;                    // +0x20

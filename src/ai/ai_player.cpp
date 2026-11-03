@@ -207,6 +207,7 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 #include "../../interfaces/seams.h"
 #include "../quirks/quirks.h"
 #include "../state/sim_globals.h"
+#include "../state/sim_effects.h"
 #include "../util/file_printf.h"
 #include "../orders/unit_orders.h"
 #include "../sound/sound.h"
@@ -845,7 +846,10 @@ void BuildTimer::TryIssueIdleFactoryBuildOrder(Unit* unit)
         return;
     unsigned short idx = ChooseBuildOption(player, unit);
     if (idx != 0)
-        QueueBuildOrder((char*)&g_game->defs[idx].unitname[0], unit, 1);
+        {
+            g_seams.orders->QueueBuildOrder((char*)&g_game->defs[idx].unitname[0], unit, 1);
+            RecordBuildQueueSound(unit->playerIndex, 1);
+        }
 }
 
 // FUNCTION: 0x408670
@@ -877,7 +881,10 @@ void BuildTimer::OnTimer()
             } else if (u->def->count && !u->list) {
                 unsigned short id = ChooseBuildOption(player, u);
                 if (id)
-                    QueueBuildOrder((char*)&g_game->defs[id].unitname[0], u, 1);
+                {
+                    g_seams.orders->QueueBuildOrder((char*)&g_game->defs[id].unitname[0], u, 1);
+                    RecordBuildQueueSound(u->playerIndex, 1);
+                }
             }
         }
     }
@@ -1355,9 +1362,9 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, BlockVector<KeyedC
         int d = DistSq(cell, center);
         if (limit >= 0 && d > limit + 160)
             break;
-        if (g_seams.map->CanBuildAt(type, cell, 0, 0) && GetBuildSiteMetal() > best) {
+        if (g_seams.map->CanBuildAt(type, cell, 0, 0) && g_lastPlaceMetalSum > best) {
             result = cell;
-            best = GetBuildSiteMetal();
+            best = g_lastPlaceMetalSum;
             if (limit == -1)
                 limit = d;
         }
@@ -1387,7 +1394,7 @@ bool PlayerAI::FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Poin
         Point16 cell = WorldToCell(v, *(Point16*)&type->f14a);
         cell.x = cell.x / spacing.x * spacing.x + offset.x + RandomInt(spacing.x - margin - type->footprintx);
         cell.y = cell.y / spacing.y * spacing.y + offset.y + RandomInt(spacing.y - margin - type->footprintz);
-        if (g_seams.map->CanPlaceUnitFootprint(type, 0, cell, 1) && GetBuildSiteMetal() <= threshold) {
+        if (g_seams.map->CanPlaceUnitFootprint(type, 0, cell, 1) && g_lastPlaceMetalSum <= threshold) {
             if (out)
                 *out = cell;
             return true;

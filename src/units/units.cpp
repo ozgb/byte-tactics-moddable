@@ -284,6 +284,7 @@ int __stdcall ComparePlayers(Player* a, Player* b)
 }
 
 #include "../graphics/object_pool.h"
+#include "../ingame/game_dialogs.h"
 
 // FUNCTION: 0x485980
 void FreeUnitMemory(void)
@@ -296,6 +297,7 @@ void FreeUnitMemory(void)
                 KillUnit(u, 8);
         }
     }
+    DrainSimEvents();
     if (g_game->hotRadar != 0)
         GameFreeThunk(g_game->hotRadar.get());
     g_game->hotRadar = 0;
@@ -413,7 +415,7 @@ struct BmpInfoHeader;
 
 void* __cdecl operator new(size_t size);
 SpotStateUnitView* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, Unit* owner);
-#include "../graphics/model_render.h"
+#include "object_state.h"
 
 // FUNCTION: 0x485d40
 void __stdcall InitUnitScript(Unit* self)
@@ -686,7 +688,6 @@ void __stdcall KillUnit(Unit* unit, int killType)
 void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
 #include "../ingame/game_dialogs.h"
 #include "unit_targets.h"
-void __stdcall FreeObjectState(void* state);
 void __cdecl operator delete(void* p);
 
 // FUNCTION: 0x4866d0
@@ -847,7 +848,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         unit->script = 0;
     }
     if (unit->state != 0) {
-        FreeObjectState(unit->state);
+        FreeObjectState((ModelState*)unit->state.get());
         unit->state = 0;
     }
     UnitMotion* head = unit->motion;

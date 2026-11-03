@@ -7,6 +7,9 @@ template<class T, class A> class vector;
 }
 
 struct Unit;
+struct ModelState;
+struct Object3do;
+struct UnitDrawView;
 struct UnitDef;
 struct Vec3;
 struct Angles16;
@@ -21,7 +24,7 @@ class UnitTypeSet;
 // Major version of the units interface, changed when a slot is removed or its signature changes.
 #define UNITS_VERSION_MAJOR 1
 // Minor version of the units interface, changed when a slot is added.
-#define UNITS_VERSION_MINOR 6
+#define UNITS_VERSION_MINOR 7
 
 // Unit simulation.
 struct UnitsSeam {
@@ -135,6 +138,12 @@ struct UnitsSeam {
     void (__fastcall* UpdateSfxOccupy)(UnitMotion* motion, int unusedEdx, Unit* unit);
     // Poses a unit's model from its current angles and animation, so piece reads depend on game state only. Hooks: none.
     void (__stdcall* PoseUnitModel)(Unit* unit);
+    // Builds the piece state of a 3DO model, in the state block. Hooks: none.
+    ModelState* (__stdcall* CreateObjectState)(Object3do* model);
+    // Frees the piece state of a model and the pictures cached for it. Hooks: none.
+    void (__stdcall* FreeObjectState)(ModelState* state);
+    // Poses the model of a unit from its current angles and animation when they changed. Hooks: none.
+    void (__stdcall* UpdateObjectState)(UnitDrawView* unit);
 };
 
 #endif

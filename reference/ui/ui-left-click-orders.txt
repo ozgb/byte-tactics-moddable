@@ -1,0 +1,38 @@
+bt-ui 1
+1 scroll 304 32
+1 view 1
+1 select -
+10 input mouse move 384 240
+11 input mouse left down 384 240
+12 input mouse left up 384 240
+13 select 1
+14 view 2
+20 input char 97
+21 input mouse move 470 310
+22 input mouse left down 470 310
+22 order Suppress unit 1 target - pos 646 1 310 type - param 0 amount 0 remove 0
+23 input mouse left up 470 310
+24 view 3
+30 input char 112
+31 input mouse move 480 330
+32 input mouse left down 480 330
+32 order RepairPatrol unit 1 target - pos 656 1 330 type - param 0 amount 0 remove 0
+33 input mouse left up 480 330
+40 input char 109
+41 input mouse move 440 280
+42 input mouse left down 440 280
+42 order Move_Ground unit 1 target - pos 616 1 280 type - param 0 amount 0 remove 0
+43 input mouse left up 440 280
+44 view 4
+50 input char 115
+50 order Stop unit 1 target - pos - type - param 0 amount 0 remove 0
+60 input char 109
+61 input mouse move 64 64
+62 input mouse left down 64 64
+62 order Move_Ground unit 1 target - pos 1804 1 794 type - param 0 amount 0 remove 0
+63 input mouse left up 64 64
+70 input mouse move 64 64
+71 input mouse right down 64 64
+72 input mouse move 100 90
+73 input mouse right up 100 90
+73 scroll 2563 1088

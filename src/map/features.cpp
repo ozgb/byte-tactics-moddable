@@ -118,7 +118,6 @@ static FeatureList* s_featureTdfParsers;
 #include "../graphics/display.h"
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 Gaf* __stdcall LoadGaf(char* path);
-void __stdcall FreeObjectState(void* obj);
 AnimSrc* __stdcall FindGafEntry(void* list, const char* name);
 void __stdcall InitGafSequence(Handle* ref, AnimSrc* src, int index);
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot,
@@ -129,6 +128,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot1
 int __stdcall StepGafSequence(Handle* anim);
 GafFrame* __stdcall GetGafSequenceFrame(Handle* anim);
 #include "../graphics/model_render.h"
+void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
 #include "../graphics/particles.h"
 
 // FUNCTION: 0x421e60
@@ -219,7 +219,7 @@ void FreeFeaturePool()
         while (idx != -1) {
             Spot* e = &g_game->pool.entries[idx];
             if (!(g_game->features[e->feature].flags & 1))
-                FreeObjectState(e->state);
+                g_seams.units->FreeObjectState((ModelState*)e->state.get());
             idx = e->prev;
         }
     }
@@ -808,7 +808,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
             spot->rot = *rot;
         else
             memset(&spot->rot, 0, sizeof(spot->rot));
-        spot->state = (SpotState*)CreateObjectState((Object3do *)f->object);
+        spot->state = (SpotState*)g_seams.units->CreateObjectState((Object3do *)f->object);
         cell->feature = feature;
         cell->spot = i;
         cell->flag0 = 1;
@@ -1025,7 +1025,7 @@ int __stdcall RemoveFeature(Cell* cell, int flag)
     if (cell->flags & 1) {
         Spot* spot = &((Spot *)g_game->spots.get())[cell->spot];
         if (!(f->flags16 & 1)) {
-            FreeObjectState(spot->state);
+            g_seams.units->FreeObjectState((ModelState*)spot->state.get());
             spot->state = 0;
         }
         MoveFeatureSpot(cell->spot, &g_game->pool.freeHead);

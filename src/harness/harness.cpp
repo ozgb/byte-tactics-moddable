@@ -1,16 +1,19 @@
 #include "win_types.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <float.h>
 #include <time.h>
+#include <stdarg.h>
 #include "../../interfaces/host.h"
 #include "../../interfaces/services.h"
 
 #include "../game/game.h"
 #include "../map/mission.h"
 #include "../orders/order_type_entry.h"
+#include "../units/unit.h"
 #include "../network/player_info.h"
 #include "../game/game_load.h"
 #include "condition_class.h"
@@ -32,6 +35,7 @@
 #include "../files/files_api.h"
 #include "../debug/debug_lib.h"
 #include "harness.h"
+#include "replay.h"
 
 enum { MAX_PLAYERS = 10 };
 
@@ -52,6 +56,7 @@ static unsigned s_gameSeed = 1;
 static unsigned s_crtSeed = 1;
 static unsigned s_viewSeed = 1;
 static unsigned s_viewState = 1;
+static unsigned s_viewDraws = 0;
 static unsigned s_fpuControlWord = 0x9001F;
 static PlayerSpec s_players[MAX_PLAYERS];
 static char s_map[0x104];
@@ -84,6 +89,14 @@ static FILE* s_trace = NULL;
 static FILE* s_dump = NULL;
 static FILE* s_sound = nullptr;
 static char s_soundBuffer[4096];
+static FILE* s_ui = nullptr;
+static char s_uiBuffer[4096];
+static int s_uiMute = 0;
+static const unsigned s_frameLimit = 64;
+static unsigned s_frameTicks[s_frameLimit];
+static unsigned s_frameCount = 0;
+static unsigned s_frameNext = 0;
+static int s_frameLine = 0;
 static unsigned s_dumpTick = 0;
 static char s_scenarioQuirks[512];
 static Quirks s_scenarioQuirkSet;
@@ -96,6 +109,8 @@ static unsigned s_quirkReachTick = 0;
 static int s_quirkReach = 0;
 static unsigned s_saveTick = 0;
 static int s_saveLine = 0;
+static unsigned s_roundTrips[16];
+static int s_roundTripCount = 0;
 static char s_loadName[64];
 static int s_loadLine = 0;
 static char s_decidedKey[32];
@@ -272,7 +287,7 @@ static const char* const s_consoleAllowed[] = {
     "meteor", "burnall", "burnone", "feature", "kill", "reload", "reloadaiprofiles", "los", "lostype", "radar",
     "mapping", "nowisee", "ai", "atm", "assign", "control", "doubleshot", "halfshot", "drop", "edge", "ilose",
     "iwin", "move", "search", "sealevel", "selectable", "shootall", "treedeath", "view", "assert", "dprint",
-    "mem", "zbuffer", "now"
+    "mem", "zbuffer", "now", "iface"
 };
 
 static char* NextToken(char** cursor)
@@ -492,6 +507,194 @@ static int ConsoleWordAllowed(const char* word)
     return 0;
 }
 
+enum { MAX_INPUTS = 1024 };
+
+struct ScriptedInput {
+    int lineNo;
+    unsigned tick;
+    unsigned type;
+    unsigned a;
+    int x;
+    int y;
+    int mouse;
+};
+
+static ScriptedInput s_inputs[MAX_INPUTS];
+static int s_inputCount = 0;
+static int s_altHeld = 0;
+
+static unsigned ParseKeyName(int lineNo, const char* text)
+{
+    static const struct {
+        const char* name;
+        unsigned vk;
+    } names[] = { { "shift", 0x10 }, { "ctrl", 0x11 }, { "alt", 0x12 }, { "esc", 0x1b } };
+    for (unsigned i = 0; i < sizeof names / sizeof names[0]; i++) {
+        if (strcmp(text, names[i].name) == 0)
+            return names[i].vk;
+    }
+    if (text[0] == 'f' && isdigit((unsigned char)text[1])) {
+        unsigned n = (unsigned)atoi(text + 1);
+        if (n >= 1 && n <= 12 && (text[2] == '\0' || (isdigit((unsigned char)text[2]) && text[3] == '\0')))
+            return 0x70 + n - 1;
+    }
+    if (text[1] == '\0' && isalpha((unsigned char)text[0]))
+        return (unsigned)toupper((unsigned char)text[0]);
+    if (text[1] == '\0' && isdigit((unsigned char)text[0]))
+        return (unsigned char)text[0];
+    unsigned vk = ParseNumber(lineNo, "input", text);
+    if (vk < 1 || vk > 255)
+        FailLine(lineNo, "needs a key code from 1 to 255", "input", "");
+    return vk;
+}
+
+static int ParseScreenCoordinate(int lineNo, const char* text, int limit)
+{
+    unsigned v = ParseNumber(lineNo, "input", text);
+    if (v >= (unsigned)limit) {
+        char detail[100];
+        sprintf(detail, ", %u is outside the %d pixel window", v, limit);
+        FailLine(lineNo, "has a position outside the window", "input", detail);
+    }
+    return (int)v;
+}
+
+static void ReadInput(int lineNo, char* value)
+{
+    char* cursor = value;
+    char* tickText = NextToken(&cursor);
+    char* kind = tickText != nullptr ? NextToken(&cursor) : nullptr;
+    if (kind == nullptr) {
+        FailLine(lineNo, "needs <tick> key|char|mouse and its details", "input", "");
+        return;
+    }
+    if (s_inputCount >= MAX_INPUTS)
+        FailLine(lineNo, "is past the limit of 1024 input lines", "input", "");
+    ScriptedInput* in = &s_inputs[s_inputCount++];
+    memset(in, 0, sizeof *in);
+    in->lineNo = lineNo;
+    in->tick = ParseNumber(lineNo, "input", tickText);
+    if (in->tick == 0)
+        FailLine(lineNo, "needs a tick of at least 1", "input", "");
+    if (strcmp(kind, "key") == 0) {
+        char* direction = NextToken(&cursor);
+        char* keyText = direction != nullptr ? NextToken(&cursor) : nullptr;
+        if (keyText == nullptr || (strcmp(direction, "down") != 0 && strcmp(direction, "up") != 0)) {
+            FailLine(lineNo, "needs key down|up <key>", "input", "");
+            return;
+        }
+        in->type = strcmp(direction, "down") == 0 ? HOST_EVENT_KEY_DOWN : HOST_EVENT_KEY_UP;
+        in->a = ParseKeyName(lineNo, keyText);
+    } else if (strcmp(kind, "char") == 0) {
+        char* charText = NextToken(&cursor);
+        if (charText == nullptr) {
+            FailLine(lineNo, "needs a character", "input", "");
+            return;
+        }
+        if (charText[1] == '\0') {
+            in->a = (unsigned char)charText[0];
+        } else {
+            in->a = ParseNumber(lineNo, "input", charText);
+            if (in->a < 1 || in->a > 255)
+                FailLine(lineNo, "needs a character code from 1 to 255", "input", "");
+        }
+        in->type = HOST_EVENT_CHAR;
+    } else if (strcmp(kind, "mouse") == 0) {
+        in->mouse = 1;
+        char* what = NextToken(&cursor);
+        if (what == nullptr) {
+            FailLine(lineNo, "needs mouse move or mouse left|right down|up", "input", "");
+            return;
+        }
+        int left = strcmp(what, "left") == 0;
+        if (strcmp(what, "move") == 0) {
+            in->type = HOST_EVENT_MOUSE_MOVE;
+        } else if (left || strcmp(what, "right") == 0) {
+            char* direction = NextToken(&cursor);
+            if (direction == nullptr || (strcmp(direction, "down") != 0 && strcmp(direction, "up") != 0)) {
+                FailLine(lineNo, "needs mouse left|right down|up", "input", "");
+                return;
+            }
+            int down = strcmp(direction, "down") == 0;
+            in->type = left ? (down ? HOST_EVENT_LBUTTON_DOWN : HOST_EVENT_LBUTTON_UP)
+                            : (down ? HOST_EVENT_RBUTTON_DOWN : HOST_EVENT_RBUTTON_UP);
+        } else {
+            FailLine(lineNo, "needs mouse move or mouse left|right down|up", "input", "");
+        }
+        char* xText = NextToken(&cursor);
+        char* yText = xText != nullptr ? NextToken(&cursor) : nullptr;
+        if (yText == nullptr)
+            FailLine(lineNo, "needs a window position x y", "input", "");
+        in->x = ParseScreenCoordinate(lineNo, xText, 640);
+        in->y = ParseScreenCoordinate(lineNo, yText, 480);
+    } else {
+        FailLine(lineNo, "needs key, char or mouse after the tick", "input", "");
+    }
+    if (NextToken(&cursor) != nullptr)
+        FailLine(lineNo, "has extra words after the event", "input", "");
+}
+
+static void CheckInputs()
+{
+    for (int i = 0; i < s_inputCount; i++) {
+        const ScriptedInput* in = &s_inputs[i];
+        if (in->tick > s_ticks)
+            FailLine(in->lineNo, "has a tick after the last tick", "input", "");
+        for (int k = 0; k < i; k++) {
+            if (s_inputs[k].tick == in->tick && s_inputs[k].mouse == in->mouse)
+                FailLine(in->lineNo, in->mouse ? "is a second mouse event on its tick" : "is a second key event on its tick",
+                         "input", ", the game takes one of each per frame");
+        }
+    }
+    for (int i = 0; i < s_inputCount; i++) {
+        const ScriptedInput* up = &s_inputs[i];
+        if (up->type != HOST_EVENT_LBUTTON_UP && up->type != HOST_EVENT_RBUTTON_UP)
+            continue;
+        unsigned downType = up->type == HOST_EVENT_LBUTTON_UP ? HOST_EVENT_LBUTTON_DOWN : HOST_EVENT_RBUTTON_DOWN;
+        const ScriptedInput* down = nullptr;
+        for (int k = 0; k < s_inputCount; k++) {
+            const ScriptedInput* c = &s_inputs[k];
+            if (c->type == downType && c->tick <= up->tick && (down == nullptr || c->tick > down->tick))
+                down = c;
+        }
+        if (down == nullptr || up->tick - down->tick <= 1)
+            continue;
+        int dragged = 0;
+        for (int k = 0; k < s_inputCount; k++) {
+            const ScriptedInput* m = &s_inputs[k];
+            if (m->type == HOST_EVENT_MOUSE_MOVE && m->tick > down->tick && m->tick < up->tick
+                && (abs(m->x - down->x) >= 32 || abs(m->y - down->y) >= 32))
+                dragged = 1;
+        }
+        if (!dragged)
+            FailLine(up->lineNo, "releases a button more than 1 tick after its press without a move of 32 units between",
+                     "input", ", the game would take it for a click or a box by the clock");
+    }
+    if (s_inputCount != 0 && s_stepsPerFrame != 1)
+        FailLine(s_inputs[0].lineNo, "needs steps_per_frame 1", "input", ", the UI takes its events once per frame");
+}
+
+static void UiLogInput(const ScriptedInput* in);
+
+static void DeliverScriptedInput(const ScriptedInput* in)
+{
+    host_event ev;
+    memset(&ev, 0, sizeof ev);
+    ev.type = in->type;
+    ev.a = in->a;
+    ev.x = in->x;
+    ev.y = in->y;
+    ev.time_ms = in->tick * 1000 / 30;
+    if (ev.type == HOST_EVENT_KEY_DOWN || ev.type == HOST_EVENT_KEY_UP) {
+        if (s_altHeld || in->a == 0x12)
+            ev.type = ev.type == HOST_EVENT_KEY_DOWN ? HOST_EVENT_SYS_KEY_DOWN : HOST_EVENT_SYS_KEY_UP;
+        if (in->a == 0x12)
+            s_altHeld = in->type == HOST_EVENT_KEY_DOWN;
+    }
+    host_inject_event(&ev);
+    UiLogInput(in);
+}
+
 static void CheckConsoles()
 {
     for (int i = 0; i < s_consoleCount; i++) {
@@ -532,6 +735,24 @@ static void CheckOrders()
         }
         if (o->tick > s_ticks)
             FailLine(o->lineNo, "has a tick after the last tick", "order", "");
+    }
+}
+
+static void ReadFrames(int lineNo, char* value)
+{
+    char* cursor = value;
+    if (s_frameLine != 0)
+        FailLine(lineNo, "is a second frames line", "frames", "");
+    s_frameLine = lineNo;
+    for (char* word = NextToken(&cursor); word != nullptr; word = NextToken(&cursor)) {
+        unsigned tick = ParseNumber(lineNo, "frames", word);
+        if (tick == 0)
+            FailLine(lineNo, "needs ticks of at least 1", "frames", "");
+        if (s_frameCount != 0 && tick <= s_frameTicks[s_frameCount - 1])
+            FailLine(lineNo, "needs ticks in ascending order", "frames", "");
+        if (s_frameCount >= s_frameLimit)
+            FailLine(lineNo, "is past the limit of 64 frames", "frames", "");
+        s_frameTicks[s_frameCount++] = tick;
     }
 }
 
@@ -610,7 +831,9 @@ static void ReadKey(int lineNo, const char* key, char* value)
         s_stepsPerFrame = ParseNumber(lineNo, key, value);
         if (s_stepsPerFrame < 1 || s_stepsPerFrame > 8)
             FailLine(lineNo, "must be from 1 to 8", key, "");
-    } else if (strcmp(key, "ticks") == 0) {
+    } else if (strcmp(key, "frames") == 0)
+        ReadFrames(lineNo, value);
+    else if (strcmp(key, "ticks") == 0) {
         s_ticks = ParseNumber(lineNo, key, value);
         if (s_ticks == 0)
             FailLine(lineNo, "must be at least 1", key, "");
@@ -647,6 +870,17 @@ static void ReadKey(int lineNo, const char* key, char* value)
         if (s_saveTick == 0)
             FailLine(lineNo, "needs a tick of at least 1", key, "");
         s_saveLine = lineNo;
+    } else if (strcmp(key, "roundtrip") == 0) {
+        if (s_roundTripCount == (int)(sizeof s_roundTrips / sizeof s_roundTrips[0]))
+            FailLine(lineNo, "is one roundtrip line too many", key, "");
+        unsigned tick = ParseNumber(lineNo, key, value);
+        if (tick == 0)
+            FailLine(lineNo, "needs a tick of at least 1", key, "");
+        s_roundTrips[s_roundTripCount++] = tick;
+    } else if (strcmp(key, "record") == 0) {
+        char detail[200];
+        if (!ReplayConfigure(value, detail, sizeof detail))
+            FailLine(lineNo, "is not a record spec", key, detail);
     } else if (strcmp(key, "load") == 0) {
         if (s_loadLine != 0)
             FailLine(lineNo, "is a second load line", key, "");
@@ -664,10 +898,21 @@ static void ReadKey(int lineNo, const char* key, char* value)
         ReadSpawn(lineNo, value);
     else if (strcmp(key, "console") == 0)
         ReadConsole(lineNo, value);
+    else if (strcmp(key, "input") == 0)
+        ReadInput(lineNo, value);
     else if (strncmp(key, "player", 6) == 0 && isdigit((unsigned char)key[6]) && key[7] == '.')
         ReadPlayerKey(lineNo, key, value);
     else
         FailLine(lineNo, "is not a known key", key, "");
+}
+
+static void CheckFrames()
+{
+    if (s_frameCount != 0 && s_frameTicks[s_frameCount - 1] >= s_ticks) {
+        char detail[100];
+        sprintf(detail, ", tick %u is not before the last tick", s_frameTicks[s_frameCount - 1]);
+        FailLine(s_frameLine, "needs ticks before the last tick", "frames", detail);
+    }
 }
 
 static void CheckLoadScenario()
@@ -713,6 +958,7 @@ static void CheckScenario()
 {
     if (s_loadLine != 0) {
         CheckLoadScenario();
+        CheckFrames();
         return;
     }
     int named = 0;
@@ -724,12 +970,18 @@ static void CheckScenario()
         Fail("testmode: scenario needs a ticks line\n");
     if (s_map[0] == '\0')
         Fail("testmode: scenario needs a map line\n");
+    CheckFrames();
     CheckGameType();
     CheckOrders();
     CheckSpawns();
     CheckConsoles();
+    CheckInputs();
     if (s_saveLine != 0 && s_saveTick > s_ticks)
         FailLine(s_saveLine, "has a tick after the last tick", "save", "");
+    for (int i = 0; i < s_roundTripCount; i++) {
+        if (s_roundTrips[i] > s_ticks)
+            Fail("testmode: a roundtrip line has a tick after the last tick\n");
+    }
     if (s_localPlayer >= 0 && !s_players[s_localPlayer].named) {
         char msg[128];
         sprintf(msg, "testmode: scenario line %d: local_player %d is not a player the scenario names\n",
@@ -1093,6 +1345,18 @@ static void ParseBlockScan(char* cmdLine)
     }
 }
 
+static bool ParseBlockScanVerify(char* cmdLine)
+{
+    for (char* p = cmdLine; *p != '\0'; p++) {
+        if ((p[0] == '-' || p[0] == '/') && _strnicmp(p + 1, "blockscanverify", 15) == 0 && (p == cmdLine || isspace((unsigned char)p[-1]))
+            && (p[16] == '\0' || isspace((unsigned char)p[16]))) {
+            memset(p, ' ', 16);
+            return true;
+        }
+    }
+    return false;
+}
+
 static void ParseQuirksSwitch(char* cmdLine)
 {
     for (char* p = cmdLine; *p != '\0'; p++) {
@@ -1143,9 +1407,10 @@ static void ResolveQuirks()
 
 void HarnessInit(char* cmdLine)
 {
+    bool scanVerify = ParseBlockScanVerify(cmdLine);
     ParseBlockScan(cmdLine);
     if (s_blockScan)
-        BlockScanEnable((unsigned)s_blockScan);
+        BlockScanEnable((unsigned)s_blockScan, scanVerify);
     InstallNativeSeams();
     ModulesHideSwitch(cmdLine);
     ParseQuirksSwitch(cmdLine);
@@ -1195,6 +1460,7 @@ void HarnessInit(char* cmdLine)
     EnterHarnessTestMode();
     ReadScenario(path);
     ResolveQuirks();
+    ReplayInstall();
     s_viewState = s_viewSeed;
 
     unsigned cw = _control87(0, 0);
@@ -1231,6 +1497,7 @@ unsigned HarnessCrtSeed(unsigned live)
 
 int HarnessViewRand()
 {
+    s_viewDraws++;
     s_viewState = s_viewState * 214013 + 2531011;
     return (s_viewState >> 16) & 0x7fff;
 }
@@ -1247,8 +1514,44 @@ void HarnessStartSkirmish()
     g_game->gui.hotGadgetIndex = -1;
 }
 
+static void UiEndOfTick();
+
+static void RoundTripBlock()
+{
+    unsigned char* old = (unsigned char*)SimBlockBase();
+    unsigned char* copy = (unsigned char*)host_mem_alloc(kSimBlockBytes);
+    if (copy == nullptr || old == nullptr) {
+        Fail("testmode: no block or no memory for the roundtrip copy of it\n");
+        return;
+    }
+    memcpy(copy, old, kSimBlockBytes);
+    if (ModulesMemory()->base != nullptr) {
+        memset(old, 0xcd, kSimBlockBytes);
+        memcpy(old, copy, kSimBlockBytes);
+    } else {
+        void* fresh = host_mem_reserve(kSimBlockBytes);
+        if (fresh != nullptr)
+            fresh = host_mem_commit(fresh, kSimBlockBytes);
+        if (fresh == nullptr) {
+            Fail("testmode: no memory for the roundtrip block\n");
+            return;
+        }
+        memcpy(fresh, copy, kSimBlockBytes);
+        memset(old, 0xcd, kSimBlockBytes);
+        SimBlockAttach(fresh);
+        host_mem_release(old);
+    }
+    host_mem_free(copy);
+}
+
 void HarnessAfterStep()
 {
+    if (HarnessTestMode()) {
+        for (int i = 0; i < s_roundTripCount; i++) {
+            if ((unsigned)g_game->ticks == s_roundTrips[i])
+                RoundTripBlock();
+        }
+    }
     if (HarnessTestMode() && s_blockScan)
         BlockScanTick((unsigned)g_game->ticks, s_ticks);
     if (HarnessTestMode() && s_saveLine != 0 && (unsigned)g_game->ticks == s_saveTick) {
@@ -1270,7 +1573,8 @@ void HarnessAfterStep()
     if (!HarnessTestMode())
         return;
     ModulesCheckStatics((unsigned)g_game->ticks);
-    int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0;
+    UiEndOfTick();
+    int gameOver = (g_game->endGameFlags & 4) != 0 || g_game->endGameVictory != 0;
     if (!gameOver && (unsigned)g_game->ticks < s_ticks)
         return;
     char msg[64];
@@ -1280,6 +1584,13 @@ void HarnessAfterStep()
         fclose(s_dump);
     if (s_sound != nullptr)
         fclose(s_sound);
+    if (s_ui != nullptr)
+        fclose(s_ui);
+    s_ui = nullptr;
+    if (!gameOver && s_frameNext < s_frameCount) {
+        sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_frameTicks[s_frameNext]);
+        Fail(msg);
+    }
     s_trace = NULL;
     s_dump = NULL;
     s_sound = nullptr;
@@ -1290,6 +1601,8 @@ void HarnessAfterStep()
     else
         sprintf(msg, "testmode: reached tick %u\n", s_ticks);
     host_log(msg);
+    if (!ReplayWrite())
+        Fail("testmode: cannot write replay-wind_meteors.txt\n");
     host_exit(0);
 }
 
@@ -1512,10 +1825,20 @@ static const char* const s_targetNames[] = { "", "heap", "unit", "player", "unit
                                              "feature", "piece", "rec", "node", "moveclass", "order", "orderfx", "link" };
 
 static int s_dumpNow = 0;
+
+static void FormatPath(char* out, const char* format, ...)
+{
+    va_list args;
+    out[0] = '\0';
+    if (!s_dumpNow)
+        return;
+    va_start(args, format);
+    vsprintf(out, format, args);
+    va_end(args);
+}
 static unsigned s_traceTick = 0;
 static const char* s_tracePhase = "";
-static unsigned s_hashLo = 0;
-static unsigned s_hashHi = 0;
+static unsigned long long s_hash = 0;
 
 static unsigned char* GameAt(unsigned offset)
 {
@@ -1584,44 +1907,45 @@ static void MapAdd(unsigned* keys, unsigned* ids, unsigned* used, unsigned* used
     ids[slot] = id;
 }
 
-#define HASH_MULTIPLY \
-    { \
-        unsigned pc = (lo & 0xffff) * 435; \
-        unsigned pa = (lo >> 16) * 435; \
-        unsigned plo = pc + (pa << 16); \
-        unsigned carry = plo < pc; \
-        hi = hi * 435 + (pa >> 16) + carry + (lo << 8); \
-        lo = plo; \
+static const unsigned long long kHashOffset = 0xcbf29ce484222325ull;
+static const unsigned long long kHashPrime = 0x100000001b3ull;
+
+static unsigned long long HashWords(unsigned long long h, const unsigned char* p, unsigned words)
+{
+    while (words > 0) {
+        unsigned long long word;
+        memcpy(&word, p, 8);
+        h = (h ^ word) * kHashPrime;
+        p += 8;
+        words--;
     }
+    return h;
+}
 
 static void HashBuf(const unsigned char* p, unsigned n)
 {
-    unsigned lo = s_hashLo;
-    unsigned hi = s_hashHi;
-    while (n >= 8) {
-        lo ^= *(const unsigned*)p;
-        hi ^= *(const unsigned*)(p + 4);
-        HASH_MULTIPLY
-        p += 8;
-        n -= 8;
-    }
+    unsigned long long h = HashWords(s_hash, p, n / 8);
+    p += n & ~7u;
+    n &= 7;
     while (n > 0) {
-        lo ^= *p++;
-        HASH_MULTIPLY
+        h = (h ^ *p++) * kHashPrime;
         n--;
     }
-    s_hashLo = lo;
-    s_hashHi = hi;
+    s_hash = h;
 }
 
 static void HashU32(unsigned v)
 {
-    HashBuf((const unsigned char*)&v, 4);
+    unsigned long long h = s_hash;
+    h = (h ^ (v & 0xff)) * kHashPrime;
+    h = (h ^ ((v >> 8) & 0xff)) * kHashPrime;
+    h = (h ^ ((v >> 16) & 0xff)) * kHashPrime;
+    s_hash = (h ^ (v >> 24)) * kHashPrime;
 }
 
 static void HashByte(unsigned char v)
 {
-    HashBuf(&v, 1);
+    s_hash = (s_hash ^ v) * kHashPrime;
 }
 
 static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsigned* tag, unsigned* index)
@@ -1839,7 +2163,7 @@ static void VisitUnits()
         if (*(unsigned short*)(u + 0xa6) == 0)
             continue;
         HashU32(i);
-        sprintf(path, "units[%u]", i);
+        FormatPath(path, "units[%u]", i);
         VisitElement(path, u, &kUnitTable);
     }
     EndSection();
@@ -1856,7 +2180,7 @@ static void VisitProjectiles()
         if (*(unsigned short*)(p + 0x69) & 2)
             continue;
         HashU32(i);
-        sprintf(path, "projectiles[%u]", i);
+        FormatPath(path, "projectiles[%u]", i);
         VisitElement(path, p, &kProjectileTable);
     }
     EndSection();
@@ -1880,9 +2204,9 @@ static void VisitExplosions()
         if (block == NULL)
             continue;
         HashU32(slot);
-        sprintf(path, "explodedPieces[%u]", slot);
+        FormatPath(path, "explodedPieces[%u]", slot);
         VisitElement(path, block, &kExplodedPieceTable);
-        sprintf(path, "explodedPieces[%u].rec", slot);
+        FormatPath(path, "explodedPieces[%u].rec", slot);
         VisitElement(path, block + 0x30, &kPieceRecTable);
     }
     EndSection();
@@ -1894,7 +2218,7 @@ static void VisitExplosions()
         if (obj == 0)
             continue;
         HashU32(d);
-        sprintf(path, "debris[%u]", d);
+        FormatPath(path, "debris[%u]", d);
         VisitElement(path, e, &kDebrisTable);
         if (obj >= (unsigned)pieces && (obj - (unsigned)pieces) % PIECE_STRIDE == 0
             && (obj - (unsigned)pieces) / PIECE_STRIDE < PIECE_COUNT)
@@ -1907,12 +2231,12 @@ static void VisitExplosions()
         if (!pieceUsed[i])
             continue;
         HashU32(i);
-        sprintf(path, "pieces[%u]", i);
+        FormatPath(path, "pieces[%u]", i);
         VisitElement(path, pieces + i * PIECE_STRIDE, &kPieceTable);
-        sprintf(path, "pieces[%u].vertices", i);
+        FormatPath(path, "pieces[%u].vertices", i);
         VisitRaw(path, GameAt(GAME_VERTICES) + i * 96, 96);
         for (unsigned k = 0; k < 6; k++) {
-            sprintf(path, "pieces[%u].faces[%u]", i, k);
+            FormatPath(path, "pieces[%u].faces[%u]", i, k);
             VisitElement(path, GameAt(GAME_FACES) + (i * 6 + k) * 0x20, &kFaceTable);
         }
     }
@@ -1925,7 +2249,7 @@ static void VisitPlayers()
     HashByte(6);
     for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
         HashU32(i);
-        sprintf(path, "players[%u]", i);
+        FormatPath(path, "players[%u]", i);
         VisitElement(path, GameAt(GAME_PLAYERS) + i * PLAYER_STRIDE, &kPlayerTable);
     }
     EndSection();
@@ -1958,7 +2282,7 @@ static void VisitFeatures()
                 t = &kSpotAnimTable;
             HashU32(i);
             HashByte(list[i]);
-            sprintf(path, "features[%u]", i);
+            FormatPath(path, "features[%u]", i);
             if (s_dumpNow) {
                 char name[80];
                 sprintf(name, "%s.list", path);
@@ -2084,12 +2408,43 @@ static unsigned MapCellCount()
     return n <= CELL_LIMIT ? n : 0;
 }
 
+static void VisitGameScalarFields()
+{
+    for (unsigned k = 0; k < kGameScalarFieldCount; k++) {
+        const TraceField* f = &kGameScalarFields[k];
+        if (f->offset != offsetof(Game, endGameFlags)) {
+            VisitFieldList("game", GameAt(0), f, 1);
+            continue;
+        }
+        unsigned short merged = (unsigned short)(g_game->endGameFlags | (g_game->endGameVictory != 0 ? 0x10 : 0));
+        TraceField local = *f;
+        local.offset = 0;
+        char path[96];
+        HashField((const unsigned char*)&merged, &local);
+        if (s_dumpNow) {
+            sprintf(path, "game.%s", f->name);
+            DumpPrefix(path);
+            DumpValue((const unsigned char*)&merged, &local);
+        }
+    }
+}
+
 static void VisitGameScalars()
 {
     HashByte(10);
-    VisitFieldList("game", GameAt(0), kGameScalarFields, kGameScalarFieldCount);
+    VisitGameScalarFields();
     VisitGlobalList("game", kScalarGlobals, kScalarGlobalsCount);
     EndSection();
+}
+
+enum { CELL_CHUNK = 8 };
+
+static void NormaliseCell(unsigned char* c)
+{
+    unsigned feature = c[CELL_FEATURE] | (c[CELL_FEATURE + 1] << 8);
+    c[CELL_FLAGS] &= (unsigned char)~(CELL_FLAGS_DRAW_MARK | CELL_FLAGS_UNUSED);
+    if (feature >= 0xfffb && feature != 0xfffe)
+        c[CELL_SPOT] = c[CELL_SPOT + 1] = 0;
 }
 
 static void VisitMapCells()
@@ -2098,18 +2453,26 @@ static void VisitMapCells()
     unsigned n = MapCellCount();
     HashByte(11);
     VisitValue("cells.count", n, 4);
-    if (cells != NULL) {
+    if (cells != NULL && !s_dumpNow) {
+        unsigned char chunk[CELL_CHUNK * CELL_STRIDE];
+        unsigned i = 0;
+        for (; i + CELL_CHUNK <= n; i += CELL_CHUNK) {
+            memcpy(chunk, cells + (size_t)i * CELL_STRIDE, sizeof chunk);
+            for (unsigned k = 0; k < CELL_CHUNK; k++)
+                NormaliseCell(chunk + k * CELL_STRIDE);
+            s_hash = HashWords(s_hash, chunk, sizeof chunk / 8);
+        }
+        memcpy(chunk, cells + (size_t)i * CELL_STRIDE, (size_t)(n - i) * CELL_STRIDE);
+        for (unsigned k = 0; i + k < n; k++)
+            NormaliseCell(chunk + k * CELL_STRIDE);
+        HashBuf(chunk, (n - i) * CELL_STRIDE);
+    } else if (cells != NULL) {
         unsigned char* copy = (unsigned char*)malloc((size_t)CELL_STRIDE * n);
         if (copy == NULL)
             Fail("testmode: out of memory hashing the map cells\n");
         memcpy(copy, cells, (size_t)CELL_STRIDE * n);
-        for (unsigned i = 0; i < n; i++) {
-            unsigned char* c = copy + i * CELL_STRIDE;
-            unsigned feature = c[CELL_FEATURE] | (c[CELL_FEATURE + 1] << 8);
-            c[CELL_FLAGS] &= (unsigned char)~(CELL_FLAGS_DRAW_MARK | CELL_FLAGS_UNUSED);
-            if (feature >= 0xfffb && feature != 0xfffe)
-                c[CELL_SPOT] = c[CELL_SPOT + 1] = 0;
-        }
+        for (unsigned i = 0; i < n; i++)
+            NormaliseCell(copy + i * CELL_STRIDE);
         VisitBlob("cells", 0, copy, CELL_STRIDE, n);
         free(copy);
     }
@@ -2139,7 +2502,7 @@ static void VisitExplored()
         unsigned size = *(unsigned*)(player + PLAYER_EXPLORED_SIZE);
         if (cells == NULL || size > EXPLORED_LIMIT)
             size = 0;
-        sprintf(path, "players[%u].explored", who);
+        FormatPath(path, "players[%u].explored", who);
         VisitValue(path, size, 4);
         if (size != 0)
             VisitBlob(path, 0, cells, 1, size);
@@ -2160,7 +2523,7 @@ static void VisitSpatial()
         count = 0;
     VisitValue("spatial.count", count, 4);
     for (unsigned r = 0; r < count; r++) {
-        sprintf(path, "spatial[%u]", r);
+        FormatPath(path, "spatial[%u]", r);
         VisitElement(path, recs + r * REC_STRIDE, &kRecTable);
     }
     HashByte(overflow != NULL);
@@ -2179,7 +2542,7 @@ static void VisitEyes()
         count = 0;
     VisitValue("eyes.count", count, 4);
     for (unsigned e = 0; e < count; e++) {
-        sprintf(path, "eyes[%u]", e);
+        FormatPath(path, "eyes[%u]", e);
         VisitElement(path, eyes + e * EYE_STRIDE, &kEyeTable);
     }
     EndSection();
@@ -2190,7 +2553,7 @@ static unsigned char s_nodeFree[NODE_LIMIT];
 static void VisitPathNodes(const unsigned char* pf)
 {
     unsigned char* pool = (unsigned char*)RefAbs(*(unsigned*)(pf + PF_POOL));
-    unsigned char** items = (unsigned char**)RefAbs(*(unsigned*)(pf + PF_ITEMS));
+    unsigned* items = (unsigned*)RefAbs(*(unsigned*)(pf + PF_ITEMS));
     int freeHead = *(int*)(pf + PF_FREE_HEAD);
     unsigned used = *(unsigned*)(pf + PF_USED);
     unsigned count = *(unsigned*)(pf + PF_COUNT);
@@ -2211,24 +2574,25 @@ static void VisitPathNodes(const unsigned char* pf)
         if (s_nodeFree[node])
             continue;
         HashU32(node);
-        sprintf(path, "pathfinder.pool[%u]", node);
+        FormatPath(path, "pathfinder.pool[%u]", node);
         VisitElement(path, n, &kNodeTable);
         if (*(int*)(n + NODE_G) != 0) {
-            strcat(path, ".penalty");
+            if (s_dumpNow)
+                strcat(path, ".penalty");
             VisitValue(path, *(unsigned short*)(n + NODE_PENALTY), 2);
         }
     }
     VisitValue("pathfinder.heap.count", count, 4);
     for (unsigned slot = 0; slot < count; slot++) {
-        sprintf(path, "pathfinder.heap[%u]", slot);
-        VisitPointer(path, (unsigned)items[slot], TT_NODE);
+        FormatPath(path, "pathfinder.heap[%u]", slot);
+        VisitPointer(path, RefAbs(items[slot]), TT_NODE);
     }
 }
 
 static void VisitPathCells(const unsigned char* pf)
 {
-    unsigned char* cells = *(unsigned char**)(pf + PF_CELLS);
-    unsigned* dirty = *(unsigned**)(pf + PF_DIRTY);
+    unsigned char* cells = (unsigned char*)RefAbs(*(unsigned*)(pf + PF_CELLS));
+    unsigned* dirty = (unsigned*)RefAbs(*(unsigned*)(pf + PF_DIRTY));
     unsigned count = *(unsigned*)(pf + PF_CELL_COUNT);
     char path[96];
     unsigned words;
@@ -2239,7 +2603,7 @@ static void VisitPathCells(const unsigned char* pf)
         unsigned bits = dirty[w];
         if (bits == 0)
             continue;
-        sprintf(path, "pathfinder.dirty[%u]", w);
+        FormatPath(path, "pathfinder.dirty[%u]", w);
         VisitU32(path, bits);
         for (unsigned bit = 0; bit < 32; bit++) {
             if (!((bits >> bit) & 1))
@@ -2251,14 +2615,14 @@ static void VisitPathCells(const unsigned char* pf)
                 unsigned state = flags & 3;
                 if (index >= count)
                     break;
-                sprintf(path, "pathfinder.cells[%u].flags", index);
+                FormatPath(path, "pathfinder.cells[%u].flags", index);
                 VisitValue(path, flags, 1);
                 if ((flags & 8) || state == 1 || state == 2) {
-                    sprintf(path, "pathfinder.cells[%u].dir", index);
+                    FormatPath(path, "pathfinder.cells[%u].dir", index);
                     VisitValue(path, c[1], 1);
                 }
                 if (state == 1 || state == 2) {
-                    sprintf(path, "pathfinder.cells[%u].node", index);
+                    FormatPath(path, "pathfinder.cells[%u].node", index);
                     VisitValue(path, *(const unsigned short*)(c + 2), 2);
                 }
             }
@@ -2290,7 +2654,7 @@ static void VisitMoveClasses()
     char path[64];
     HashByte(18);
     for (unsigned c = 0; c < MOVECLASS_COUNT; c++) {
-        sprintf(path, "moveClasses[%u]", c);
+        FormatPath(path, "moveClasses[%u]", c);
         VisitElement(path, classes + c * MOVECLASS_STRIDE, &kMoveClassTable);
     }
     EndSection();
@@ -2316,7 +2680,7 @@ static void VisitPassMaps()
             || width * ((height + 15) >> 4) > PASSMAP_LIMIT)
             continue;
         HashU32(c);
-        sprintf(path, "moveClasses[%u].passMap", c);
+        FormatPath(path, "moveClasses[%u].passMap", c);
         VisitBlob(path, 0, (const unsigned char*)cells, 4, full * width);
         if (tail != 0) {
             unsigned mask = (1u << (tail * 2)) - 1;
@@ -2767,10 +3131,10 @@ static void VisitUnitVector(const char* path, unsigned vec)
     const unsigned char* first;
     char name[128];
     unsigned n = VectorCount(vec, 4, &first);
-    sprintf(name, "%s.size", path);
+    FormatPath(name, "%s.size", path);
     VisitU32(name, n);
     for (unsigned k = 0; k < n; k++) {
-        sprintf(name, "%s[%u]", path, k);
+        FormatPath(name, "%s[%u]", path, k);
         VisitPointer(name, ReadU32At((unsigned)first, k * 4), TT_UNIT, true);
     }
 }
@@ -2820,16 +3184,16 @@ static void VisitPlayerAI()
         HashByte(ai != 0);
         if (ai == 0)
             continue;
-        sprintf(path, "players[%u].ai", i);
+        FormatPath(path, "players[%u].ai", i);
         VisitElement(path, (const unsigned char*)ai, &kPlayerAITable);
-        sprintf(path, "players[%u].ai.visible", i);
+        FormatPath(path, "players[%u].ai.visible", i);
         VisitUnitVector(path, ai + 0x5);
-        sprintf(path, "players[%u].ai.known", i);
+        FormatPath(path, "players[%u].ai.known", i);
         VisitUnitVector(path, ai + 0x15);
-        sprintf(path, "players[%u].ai.factories", i);
+        FormatPath(path, "players[%u].ai.factories", i);
         VisitUnitVector(path, ai + 0x25);
         for (unsigned v = 0; v < sizeof vectors / sizeof vectors[0]; v++) {
-            sprintf(path, "players[%u].ai.%s", i, vectors[v].name);
+            FormatPath(path, "players[%u].ai.%s", i, vectors[v].name);
             VisitRawVector(path, ai + vectors[v].offset, vectors[v].elem);
         }
     }
@@ -2840,7 +3204,7 @@ static void VisitTimer(const char* path, unsigned slot, unsigned timer)
 {
     char field[128];
     int cls = TimerClassOf(slot);
-    sprintf(field, "%s.class", path);
+    FormatPath(field, "%s.class", path);
     VisitU32(field, (unsigned)cls);
     switch (cls) {
     case TIMER_ASSAULT:
@@ -2868,7 +3232,7 @@ static void VisitSquadManagers()
         HashByte(manager != 0);
         if (manager == 0)
             continue;
-        sprintf(path, "players[%u].squadManager", i);
+        FormatPath(path, "players[%u].squadManager", i);
         VisitElement(path, (const unsigned char*)manager, &kSquadManagerTable);
         for (unsigned t = 0; t < SQUAD_TIMERS; t++) {
             unsigned timer = ReadRefAt(manager, MANAGER_TIMERS + t * 4);
@@ -2876,7 +3240,7 @@ static void VisitSquadManagers()
             HashByte(timer != 0);
             if (timer == 0)
                 continue;
-            sprintf(path, "players[%u].squadManager.timers[%u]", i, t);
+            FormatPath(path, "players[%u].squadManager.timers[%u]", i, t);
             VisitTimer(path, t, timer);
         }
     }
@@ -2895,9 +3259,10 @@ static void VisitSquads()
             continue;
         for (unsigned s = 0; s < SQUAD_COUNT; s++) {
             unsigned squad = squads + s * SQUAD_STRIDE;
-            sprintf(path, "players[%u].squads[%u]", i, s);
+            FormatPath(path, "players[%u].squads[%u]", i, s);
             VisitElement(path, (const unsigned char*)squad, &kSquadTable);
-            strcat(path, ".items");
+            if (s_dumpNow)
+                strcat(path, ".items");
             VisitUnitVector(path, squad + SQUAD_ITEMS);
         }
     }
@@ -2914,7 +3279,7 @@ static void VisitUnitResources()
         HashByte(econ != 0);
         if (econ == 0)
             continue;
-        sprintf(path, "players[%u].econ", i);
+        FormatPath(path, "players[%u].econ", i);
         VisitElement(path, (const unsigned char*)econ, &kUnitResourcesTable);
     }
     EndSection();
@@ -2924,7 +3289,7 @@ static void VisitCondition(const char* path, unsigned condition)
 {
     char field[128];
     int cls = ConditionClassOf(condition);
-    sprintf(field, "%s.class", path);
+    FormatPath(field, "%s.class", path);
     VisitU32(field, (unsigned)cls);
     if (cls == COND_UNKNOWN) {
         char msg[160];
@@ -2981,13 +3346,13 @@ static void VisitWeaponTable(const char* path, unsigned table)
         ? (last - first) / WEAPON_ENTRY_SIZE : 0;
     if (n > VECTOR_LIMIT)
         n = 0;
-    sprintf(field, "%s.entries", path);
+    FormatPath(field, "%s.entries", path);
     VisitU32(field, n);
     for (unsigned k = 0; k < n; k++) {
         unsigned entry = first + k * WEAPON_ENTRY_SIZE;
-        sprintf(field, "%s[%u].name", path, k);
+        FormatPath(field, "%s[%u].name", path, k);
         VisitString(field, (const char*)ReadU32At(entry, 0));
-        sprintf(field, "%s[%u].value", path, k);
+        FormatPath(field, "%s[%u].value", path, k);
         VisitU32(field, ReadU32At(entry, 4));
     }
 }
@@ -2998,9 +3363,10 @@ static void VisitWeaponDefs()
     HashByte(30);
     for (unsigned i = 0; i < WEAPON_COUNT; i++) {
         const unsigned char* w = GameAt(GAME_WEAPONS) + i * WEAPONDEF_STRIDE;
-        sprintf(path, "weapons[%u]", i);
+        FormatPath(path, "weapons[%u]", i);
         VisitElement(path, w, &kWeaponDefDataTable);
-        strcat(path, ".damage");
+        if (s_dumpNow)
+            strcat(path, ".damage");
         VisitWeaponTable(path, ReadRefAt((unsigned)w, WEAPON_TABLE));
     }
     EndSection();
@@ -3021,21 +3387,22 @@ static void VisitUnitDefs()
         unsigned ids = ReadRefAt((unsigned)d, DEF_IDS);
         unsigned idCount = ReadU32At((unsigned)d, DEF_ID_COUNT);
         unsigned yardSize = (unsigned)*(const short*)(d + DEF_FOOTPRINT_X) * (unsigned)*(const short*)(d + DEF_FOOTPRINT_Z);
-        sprintf(path, "defs[%u]", i);
+        FormatPath(path, "defs[%u]", i);
         VisitElement(path, d, &kUnitDefDataTable);
         if (yardmap == 0 || yardSize > DEF_YARD_LIMIT)
             yardSize = 0;
-        strcat(path, ".yardmap");
+        if (s_dumpNow)
+            strcat(path, ".yardmap");
         VisitU32(path, yardSize);
         VisitRaw(path, (const unsigned char*)yardmap, yardSize);
         if (ids == 0 || idCount > DEF_ID_LIMIT)
             idCount = 0;
-        sprintf(path, "defs[%u].ids", i);
+        FormatPath(path, "defs[%u].ids", i);
         VisitU32(path, idCount);
         VisitRaw(path, (const unsigned char*)ids, idCount * 2);
         for (unsigned m = 0; m < 4; m++) {
             unsigned mask = ReadU32At((unsigned)d, m < 3 ? DEF_WEAPON_CATEGORIES + m * 4 : DEF_CATEGORIES);
-            sprintf(path, "defs[%u].categories[%u]", i, m);
+            FormatPath(path, "defs[%u].categories[%u]", i, m);
             HashByte(mask != 0);
             if (mask != 0)
                 VisitRaw(path, (const unsigned char*)mask, DEF_MASK_SIZE);
@@ -3069,13 +3436,13 @@ static void VisitMission()
         VisitU32("mission.units.count", unitCount);
         for (unsigned ku = 0; ku < unitCount; ku++) {
             unsigned unit = units + ku * MISSION_UNIT_SIZE;
-            sprintf(path, "mission.units[%u].name", ku);
+            FormatPath(path, "mission.units[%u].name", ku);
             VisitString(path, (const char*)RefAbs(ReadU32At(unit, 0)));
-            sprintf(path, "mission.units[%u].ident", ku);
+            FormatPath(path, "mission.units[%u].ident", ku);
             VisitString(path, (const char*)RefAbs(ReadU32At(unit, 4)));
-            sprintf(path, "mission.units[%u].initialMission", ku);
+            FormatPath(path, "mission.units[%u].initialMission", ku);
             VisitString(path, (const char*)RefAbs(ReadU32At(unit, 8)));
-            sprintf(path, "mission.units[%u]", ku);
+            FormatPath(path, "mission.units[%u]", ku);
             VisitRaw(path, (const unsigned char*)unit + 0xc, MISSION_UNIT_SIZE - 0xc);
         }
         VisitU32("mission.rules.count", ruleCount);
@@ -3083,9 +3450,9 @@ static void VisitMission()
         VisitU32("mission.features.count", featureCount);
         for (unsigned kf = 0; kf < featureCount; kf++) {
             unsigned feature = features + kf * MISSION_FEATURE_SIZE;
-            sprintf(path, "mission.features[%u].name", kf);
+            FormatPath(path, "mission.features[%u].name", kf);
             VisitString(path, (const char*)feature);
-            sprintf(path, "mission.features[%u].pos", kf);
+            FormatPath(path, "mission.features[%u].pos", kf);
             VisitRaw(path, (const unsigned char*)feature + MISSION_FEATURE_POS, 8);
         }
     }
@@ -3276,7 +3643,7 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
         for (i = 0; i < count; i++) {
             unsigned char* u = PoolUnit(i);
             if (selected[i] != 0 && (u[UNIT_FLAGS] & UNIT_SELECTED))
-                QueueBuildOrder((char*)o->buildType, (Unit*)u, o->argument);
+                QueueBuildOrderWithSound((char*)o->buildType, (Unit*)u, o->argument);
         }
     } else if (o->kind == ORDER_SELFDESTRUCT) {
         MissionType order(s_orderModes[o->kind].mission);
@@ -3456,13 +3823,188 @@ void HarnessBeforeStep()
         if (s_spawns[i].tick == tick)
             IssueScriptedSpawn(&s_spawns[i]);
     }
+    s_uiMute = 1;
     for (int i = 0; i < s_orderCount; i++) {
         if (s_orders[i].tick == tick)
             IssueScriptedOrder(&s_orders[i]);
     }
+    s_uiMute = 0;
     for (int i = 0; i < s_consoleCount; i++) {
         if (s_consoles[i].tick == tick)
             RunScriptedConsole(&s_consoles[i]);
+    }
+    for (int i = 0; i < s_inputCount; i++) {
+        if (s_inputs[i].tick == tick)
+            DeliverScriptedInput(&s_inputs[i]);
+    }
+}
+
+enum { UI_SELECTION_TEXT = 32768 };
+static char s_uiSelection[UI_SELECTION_TEXT];
+static int s_uiScrollX = -1;
+static int s_uiScrollZ = -1;
+static int s_uiScrollSeen = 0;
+static unsigned s_uiViewDraws = 0;
+
+static unsigned UiUnitIndex(const Unit* u)
+{
+    return (unsigned)(((const unsigned char*)u - (const unsigned char*)GameRef(GAME_UNITS)) / UNIT_STRIDE);
+}
+
+static int UiLive()
+{
+    return HarnessTestMode() && s_ui != nullptr && !s_uiMute;
+}
+
+static void UiLineStart(const char* what)
+{
+    fprintf(s_ui, "%u %s", GameU32(GAME_TICK), what);
+}
+
+static const char* UiOrderName(unsigned char kind)
+{
+    const char* name = g_missionOrderTableVec[kind].name;
+    return name != nullptr && name[0] != '\0' ? name : "-";
+}
+
+static int UiKindTakesUnitType(const char* name)
+{
+    return _stricmp(name, "MOBILEBUILD") == 0 || _stricmp(name, "VTOL_MOBILEBUILD") == 0 || _stricmp(name, "BUILDINGBUILD") == 0;
+}
+
+static void UiUnitType(unsigned short defIndex)
+{
+    const char* name = nullptr;
+    if (defIndex != 0 && defIndex < GameU32(GAME_DEF_COUNT))
+        name = (const char*)GameRef(GAME_DEFS) + defIndex * UNITDEF_STRIDE + UNITDEF_NAME;
+    fprintf(s_ui, " %s", name != nullptr ? name : "-");
+}
+
+void __stdcall HarnessUiOrder(unsigned char kind, int remove, const Unit* unit, const Unit* target, const int* pos, int typeId, int amount)
+{
+    if (!UiLive())
+        return;
+    const char* name = UiOrderName(kind);
+    UiLineStart("order");
+    fprintf(s_ui, " %s unit %u target ", name, UiUnitIndex(unit));
+    if (target != nullptr)
+        fprintf(s_ui, "%u", UiUnitIndex(target));
+    else
+        fprintf(s_ui, "-");
+    if (pos != nullptr)
+        fprintf(s_ui, " pos %d %d %d", pos[0] >> 16, pos[1] >> 16, pos[2] >> 16);
+    else
+        fprintf(s_ui, " pos -");
+    fprintf(s_ui, " type");
+    if (UiKindTakesUnitType(name))
+        UiUnitType((unsigned short)typeId);
+    else
+        fprintf(s_ui, " -");
+    if (UiKindTakesUnitType(name))
+        fprintf(s_ui, " param -");
+    else
+        fprintf(s_ui, " param %d", typeId);
+    fprintf(s_ui, " amount %d remove %d\n", amount, remove != 0);
+}
+
+void __stdcall HarnessUiQueue(const char* name, const Unit* unit, int count)
+{
+    if (!UiLive())
+        return;
+    UiLineStart("qbuild");
+    fprintf(s_ui, " %u %s %d\n", UiUnitIndex(unit), name, count);
+}
+
+void __stdcall HarnessUiCancel(unsigned char kind, const Unit* unit)
+{
+    if (!UiLive())
+        return;
+    UiLineStart("cancel");
+    fprintf(s_ui, " %s unit %u\n", UiOrderName(kind), UiUnitIndex(unit));
+}
+
+static void UiListUnits(int group, int selectedOnly)
+{
+    Player* player = &g_game->players[g_game->localPlayer];
+    int any = 0;
+    for (Unit* u = player->unitsBegin; u != nullptr && u <= player->unitsEnd; u++) {
+        if (u->unitDefIndex == 0 || (selectedOnly ? !u->selected : u->group != group))
+            continue;
+        fprintf(s_ui, "%s%u", any ? "," : " ", UiUnitIndex(u));
+        any = 1;
+    }
+    if (!any)
+        fprintf(s_ui, " -");
+    fprintf(s_ui, "\n");
+}
+
+void __stdcall HarnessUiGroup(const char* what, int group)
+{
+    if (!UiLive())
+        return;
+    UiLineStart(what);
+    fprintf(s_ui, " %d", group);
+    UiListUnits(group, 0);
+}
+
+static void UiLogInput(const ScriptedInput* in)
+{
+    if (s_ui == nullptr)
+        return;
+    UiLineStart("input");
+    switch (in->type) {
+    case HOST_EVENT_KEY_DOWN:
+    case HOST_EVENT_KEY_UP:
+        fprintf(s_ui, " key %s %u\n", in->type == HOST_EVENT_KEY_DOWN ? "down" : "up", in->a);
+        break;
+    case HOST_EVENT_CHAR:
+        fprintf(s_ui, " char %u\n", in->a);
+        break;
+    case HOST_EVENT_MOUSE_MOVE:
+        fprintf(s_ui, " mouse move %d %d\n", in->x, in->y);
+        break;
+    default: {
+        int left = in->type == HOST_EVENT_LBUTTON_DOWN || in->type == HOST_EVENT_LBUTTON_UP;
+        int down = in->type == HOST_EVENT_LBUTTON_DOWN || in->type == HOST_EVENT_RBUTTON_DOWN;
+        fprintf(s_ui, " mouse %s %s %d %d\n", left ? "left" : "right", down ? "down" : "up", in->x, in->y);
+        break;
+    }
+    }
+}
+
+static void UiEndOfTick()
+{
+    if (s_ui == nullptr)
+        return;
+    if ((!s_uiScrollSeen || g_game->scrollX != s_uiScrollX || g_game->scrollY != s_uiScrollZ)) {
+        s_uiScrollSeen = 1;
+        s_uiScrollX = g_game->scrollX;
+        s_uiScrollZ = g_game->scrollY;
+        UiLineStart("scroll");
+        fprintf(s_ui, " %d %d\n", s_uiScrollX, s_uiScrollZ);
+    }
+    if (s_viewDraws != s_uiViewDraws) {
+        s_uiViewDraws = s_viewDraws;
+        UiLineStart("view");
+        fprintf(s_ui, " %u\n", s_uiViewDraws);
+    }
+    static char selection[UI_SELECTION_TEXT];
+    size_t length = 0;
+    selection[0] = '\0';
+    Player* player = &g_game->players[g_game->localPlayer];
+    for (Unit* u = player->unitsBegin; u != nullptr && u <= player->unitsEnd; u++) {
+        if (u->unitDefIndex == 0 || !u->selected)
+            continue;
+        if (length + 16 >= UI_SELECTION_TEXT)
+            Fail("testmode: the selection is too long for ui.txt\n");
+        length += sprintf(selection + length, "%s%u", length != 0 ? "," : "", UiUnitIndex(u));
+    }
+    if (length == 0)
+        strcpy(selection, "-");
+    if (strcmp(selection, s_uiSelection) != 0) {
+        strcpy(s_uiSelection, selection);
+        UiLineStart("select");
+        fprintf(s_ui, " %s\n", selection);
     }
 }
 
@@ -3499,6 +4041,50 @@ void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, 
         fprintf(s_sound, "- - -\n");
 }
 
+void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int width, int height, const tagPALETTEENTRY* entries)
+{
+    if (!HarnessTestMode() || s_frameNext >= s_frameCount)
+        return;
+    unsigned tick = GameU32(GAME_TICK);
+    unsigned wanted = s_frameTicks[s_frameNext];
+    if (tick < wanted)
+        return;
+    char msg[100];
+    if (tick > wanted) {
+        sprintf(msg, "testmode: tick %u is not the last tick of a frame\n", wanted);
+        Fail(msg);
+        return;
+    }
+    s_frameNext++;
+    char directory[] = "frames";
+    char path[32];
+    MakeDirectoryPath(directory);
+    sprintf(path, "frames\\%u.bin", tick);
+    FILE* f = fopen(path, "wb");
+    if (f == nullptr) {
+        sprintf(msg, "testmode: cannot write %s\n", path);
+        Fail(msg);
+        return;
+    }
+    unsigned char header[16] = { 'B', 'T', 'F', 'R', 1, 0, (unsigned char)width, (unsigned char)(width >> 8),
+        (unsigned char)height, (unsigned char)(height >> 8), 0, 0, (unsigned char)tick, (unsigned char)(tick >> 8),
+        (unsigned char)(tick >> 16), (unsigned char)(tick >> 24) };
+    unsigned char palette[256 * 4];
+    for (int i = 0; i < 256; i++) {
+        palette[i * 4] = entries[i].peRed;
+        palette[i * 4 + 1] = entries[i].peGreen;
+        palette[i * 4 + 2] = entries[i].peBlue;
+        palette[i * 4 + 3] = 0;
+    }
+    int ok = fwrite(header, sizeof header, 1, f) == 1 && fwrite(palette, sizeof palette, 1, f) == 1;
+    for (int y = 0; ok && y < height; y++)
+        ok = fwrite(pixels + (size_t)y * pitch, 1, width, f) == (size_t)width;
+    if (fclose(f) != 0 || !ok) {
+        sprintf(msg, "testmode: cannot write %s\n", path);
+        Fail(msg);
+    }
+}
+
 void HarnessPhase(int phase)
 {
     if (!HarnessTestMode() || s_trace == NULL)
@@ -3510,8 +4096,7 @@ void HarnessPhase(int phase)
     s_traceTick = tick;
     s_tracePhase = s_phaseNames[phase];
     s_dumpNow = s_dumpEnabled && tick == s_dumpTick;
-    s_hashLo = 0x84222325;
-    s_hashHi = 0xcbf29ce4;
+    s_hash = kHashOffset;
 
     VisitU32("gameTick", tick);
     VisitU32("rng.parkMiller", parkMiller);
@@ -3524,18 +4109,19 @@ void HarnessPhase(int phase)
     VisitWind();
     VisitMeteors();
 
-    fprintf(s_trace, "%u %s %08x%08x\n", tick, s_phaseNames[phase], s_hashHi, s_hashLo);
+    fprintf(s_trace, "%u %s %08x%08x\n", tick, s_phaseNames[phase], (unsigned)(s_hash >> 32), (unsigned)s_hash);
     if (phase == 7 || s_dumpNow) {
-        s_hashLo = 0x84222325;
-        s_hashHi = 0xcbf29ce4;
+        s_hash = kHashOffset;
         VisitWorld();
         if (phase == 7)
-            fprintf(s_trace, "%u %s %08x%08x\n", tick, s_phaseNames[8], s_hashHi, s_hashLo);
+            fprintf(s_trace, "%u %s %08x%08x\n", tick, s_phaseNames[8], (unsigned)(s_hash >> 32), (unsigned)s_hash);
     }
     if (phase == 7) {
         fflush(s_trace);
         if (s_sound != nullptr)
             fflush(s_sound);
+        if (s_ui != nullptr)
+            fflush(s_ui);
         if (s_dumpNow)
             fflush(s_dump);
     }
@@ -3576,6 +4162,11 @@ static void OpenTrace(unsigned controlWord)
         Fail("testmode: cannot write sound.txt\n");
     setvbuf(s_sound, s_soundBuffer, _IOFBF, sizeof s_soundBuffer);
     fprintf(s_sound, "bt-sound 1\n");
+    s_ui = fopen("ui.txt", "wb");
+    if (s_ui == nullptr)
+        Fail("testmode: cannot write ui.txt\n");
+    setvbuf(s_ui, s_uiBuffer, _IOFBF, sizeof s_uiBuffer);
+    fprintf(s_ui, "bt-ui 1\n");
     fprintf(s_trace, "bt-trace %d\ncommit %s\nscenario %s\ngame_seed %u\ncrt_seed %u\nview_seed %u\n"
                      "fpu_control_word 0x%05X\n",
             TRACE_FORMAT, commit, s_scenarioPath, s_gameSeed, s_crtSeed, s_viewSeed, controlWord);

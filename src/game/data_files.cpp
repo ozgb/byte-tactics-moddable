@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "../util/tdf.h"
+#include "../harness/replay.h"
 
 #pragma pack(push, 1)
 #include "game.h"
@@ -52,6 +53,11 @@ void CheckGpfVersion()
 // FUNCTION: 0x4290f0
 char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext)
 {
+    ReplayImport call(RI_BUILD_DATA_PATH);
+    call.Ptr(buf);
+    call.Ptr(dir);
+    call.Ptr(name);
+    call.Ptr(ext);
     char* side = (char*)GetPreferredLanguage();
     if (side) {
         sprintf(buf, "%s-%s\\%s", dir, side, name);
@@ -63,7 +69,7 @@ char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, cons
         FileHandle* file = HAPI_OpenFileRead(buf);
         if (file) {
             HAPI_CloseFile(file);
-            return buf;
+            return call.Result(buf);
         }
     }
     strcpy(buf, dir);
@@ -74,7 +80,7 @@ char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, cons
         strcat(buf, ".");
         strcat(buf, ext);
     }
-    return buf;
+    return call.Result(buf);
 }
 
 void* __stdcall LoadPcx(char* path, int outPalette);

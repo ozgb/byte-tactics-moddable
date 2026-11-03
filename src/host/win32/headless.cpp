@@ -1,8 +1,10 @@
 #include <windows.h>
+#include <winuser.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../../interfaces/host.h"
 #include "headless.h"
 
 namespace {
@@ -103,6 +105,33 @@ EventRing g_events;
 int g_cursorX = kScreenWidth / 2;
 int g_cursorY = kScreenHeight / 2;
 
+const int kKeyCount = 256;
+
+struct KeyState {
+    bool down;
+    bool pressed;
+};
+
+KeyState g_keys[kKeyCount];
+
+void SetKey(unsigned int vk, bool down)
+{
+    if (vk >= (unsigned int)kKeyCount) {
+        return;
+    }
+    if (down && !g_keys[vk].down) {
+        g_keys[vk].pressed = true;
+    }
+    g_keys[vk].down = down;
+    if (vk == VK_LSHIFT || vk == VK_RSHIFT) {
+        g_keys[VK_SHIFT].down = g_keys[VK_LSHIFT].down || g_keys[VK_RSHIFT].down;
+    } else if (vk == VK_LCONTROL || vk == VK_RCONTROL) {
+        g_keys[VK_CONTROL].down = g_keys[VK_LCONTROL].down || g_keys[VK_RCONTROL].down;
+    } else if (vk == VK_LMENU || vk == VK_RMENU) {
+        g_keys[VK_MENU].down = g_keys[VK_LMENU].down || g_keys[VK_RMENU].down;
+    }
+}
+
 void PushEvent(unsigned int type, unsigned int a, unsigned int b, int x, int y, unsigned int buttons, unsigned int time)
 {
     if (g_events.count == kQueueSize) {
@@ -166,12 +195,61 @@ unsigned char* g_windowed;
 int g_windowedWidth;
 int g_windowedHeight;
 bool g_windowedPalette;
+unsigned char g_paletteEntries[256 * 4];
+unsigned char* g_presented;
+int g_presentedWidth;
+int g_presentedHeight;
+
+void FreePresented()
+{
+    free(g_presented);
+    g_presented = nullptr;
+    g_presentedWidth = 0;
+    g_presentedHeight = 0;
+}
+
+void CopyPresented(bool front)
+{
+    const unsigned char* source;
+    int width;
+    int height;
+    int pitch;
+
+    if (g_windowed != nullptr && !g_displayOpen) {
+        source = g_windowed;
+        width = g_windowedWidth;
+        height = g_windowedHeight;
+        pitch = (g_windowedWidth + 3) & ~3;
+    } else {
+        source = front || !g_hasBack ? g_front : g_back;
+        width = g_width;
+        height = g_height;
+        pitch = g_width;
+    }
+    if (source == nullptr) {
+        return;
+    }
+    if (g_presented == nullptr || g_presentedWidth != width || g_presentedHeight != height) {
+        FreePresented();
+        g_presented = (unsigned char*)malloc((size_t)width * (size_t)height);
+        if (g_presented == nullptr) {
+            return;
+        }
+        g_presentedWidth = width;
+        g_presentedHeight = height;
+    }
+    for (int row = 0; row < height; row++) {
+        memcpy(g_presented + (size_t)row * (size_t)width, source + (size_t)row * (size_t)pitch, (size_t)width);
+    }
+}
 
 void FreeWindowed()
 {
     free(g_windowed);
     g_windowed = NULL;
     g_windowedPalette = false;
+    FreePresented();
+    memset(g_paletteEntries, 0, sizeof(g_paletteEntries));
 }
 
 bool WindowedPaletteActive()
@@ -188,6 +266,8 @@ void FreeFrames()
     g_hasPrimary = false;
     g_hasBack = false;
     g_hasPalette = false;
+    FreePresented();
+    memset(g_paletteEntries, 0, sizeof(g_paletteEntries));
 }
 
 unsigned char* Frame(int which)
@@ -337,10 +417,67 @@ int HeadlessEventNext(host_event* event)
     return 1;
 }
 
+void HeadlessInject(const host_event* event)
+{
+    unsigned int buttons = 0;
+    unsigned int type = event->type;
+    switch (type) {
+    case HOST_EVENT_KEY_DOWN:
+    case HOST_EVENT_SYS_KEY_DOWN:
+        SetKey(event->a, true);
+        PushEvent(type, event->a, 0, 0, 0, 0, 0);
+        return;
+    case HOST_EVENT_KEY_UP:
+    case HOST_EVENT_SYS_KEY_UP:
+        SetKey(event->a, false);
+        PushEvent(type, event->a, 0, 0, 0, 0, 0);
+        return;
+    case HOST_EVENT_CHAR:
+        PushEvent(type, event->a, 0, 0, 0, 0, 0);
+        return;
+    case HOST_EVENT_LBUTTON_DOWN:
+        SetKey(VK_LBUTTON, true);
+        break;
+    case HOST_EVENT_LBUTTON_UP:
+        SetKey(VK_LBUTTON, false);
+        break;
+    case HOST_EVENT_RBUTTON_DOWN:
+        SetKey(VK_RBUTTON, true);
+        break;
+    case HOST_EVENT_RBUTTON_UP:
+        SetKey(VK_RBUTTON, false);
+        break;
+    case HOST_EVENT_MOUSE_MOVE:
+        break;
+    default:
+        return;
+    }
+    if (g_keys[VK_LBUTTON].down) {
+        buttons |= HOST_BUTTON_LEFT;
+    }
+    if (g_keys[VK_RBUTTON].down) {
+        buttons |= HOST_BUTTON_RIGHT;
+    }
+    if (g_keys[VK_SHIFT].down) {
+        buttons |= HOST_BUTTON_SHIFT;
+    }
+    if (g_keys[VK_CONTROL].down) {
+        buttons |= HOST_BUTTON_CONTROL;
+    }
+    g_cursorX = event->x;
+    g_cursorY = event->y;
+    PushEvent(type, 0, 0, event->x, event->y, buttons, event->time_ms);
+}
+
 int HeadlessKeyState(int vk)
 {
-    (void)vk;
-    return 0;
+    if (vk < 0 || vk >= kKeyCount) {
+        return 0;
+    }
+    KeyState& key = g_keys[vk];
+    int state = (key.down ? 0x8000 : 0) | (key.pressed ? 1 : 0);
+    key.pressed = false;
+    return state;
 }
 
 void HeadlessCursorGet(int* x, int* y)
@@ -466,16 +603,23 @@ int HeadlessFrameLock(int which, host_frame* frame)
 
 int HeadlessFrameUnlock(int which)
 {
-    if (which == HOST_FRAME_BACK && Frame(which) == NULL && g_windowed != NULL) {
+    if (which == HOST_FRAME_BACK && Frame(which) == nullptr && g_windowed != nullptr) {
         return 1;
     }
-    return Frame(which) != NULL ? 1 : 0;
+    if (which == HOST_FRAME_FRONT && Frame(which) != nullptr) {
+        CopyPresented(true);
+    }
+    return Frame(which) != nullptr ? 1 : 0;
 }
 
 int HeadlessFramePresent(int flip)
 {
     (void)flip;
-    return g_displayOpen || g_windowed != NULL ? HOST_FRAME_OK : HOST_FRAME_FAILED;
+    if (!g_displayOpen && g_windowed == nullptr) {
+        return HOST_FRAME_FAILED;
+    }
+    CopyPresented(false);
+    return HOST_FRAME_OK;
 }
 
 int HeadlessFramePresentRect(int x, int y, int width, int height)
@@ -484,7 +628,11 @@ int HeadlessFramePresentRect(int x, int y, int width, int height)
     (void)y;
     (void)width;
     (void)height;
-    return g_windowed != NULL ? HOST_FRAME_OK : HOST_FRAME_FAILED;
+    if (g_windowed == nullptr) {
+        return HOST_FRAME_FAILED;
+    }
+    CopyPresented(false);
+    return HOST_FRAME_OK;
 }
 
 int HeadlessFrameIsLost()
@@ -528,61 +676,65 @@ int HeadlessFrameText(int which, void* font, int x, int y, const char* text, int
 
 int HeadlessFrameRead(unsigned char* pixels, int pitch, unsigned char* palette)
 {
-    if (Frame(HOST_FRAME_BACK) == NULL && g_windowed != NULL) {
-        for (int row = 0; row < g_windowedHeight; row++) {
-            memcpy(pixels + row * pitch, g_windowed + row * ((g_windowedWidth + 3) & ~3), (size_t)g_windowedWidth);
-        }
-        memset(palette, 0, 256 * 4);
-        return g_windowedPalette ? 1 : 0;
-    }
-    if (Frame(HOST_FRAME_BACK) == NULL) {
+    int width;
+    int height;
+
+    if (g_windowed != nullptr && !g_displayOpen) {
+        width = g_windowedWidth;
+        height = g_windowedHeight;
+    } else if (Frame(HOST_FRAME_BACK) != nullptr || Frame(HOST_FRAME_FRONT) != nullptr) {
+        width = g_width;
+        height = g_height;
+    } else {
         return 0;
     }
-    for (int row = 0; row < g_height; row++) {
-        memset(pixels + row * pitch, 0, (size_t)g_width);
+    for (int row = 0; row < height; row++) {
+        if (g_presented != nullptr && g_presentedWidth == width && g_presentedHeight == height) {
+            memcpy(pixels + row * pitch, g_presented + (size_t)row * (size_t)width, (size_t)width);
+        } else {
+            memset(pixels + row * pitch, 0, (size_t)width);
+        }
     }
-    memset(palette, 0, 256 * 4);
+    memcpy(palette, g_paletteEntries, sizeof(g_paletteEntries));
     return 1;
 }
 
 int HeadlessPaletteCreate(const unsigned char* entries)
 {
-    (void)entries;
     if (WindowedPaletteActive()) {
         g_windowedPalette = true;
+        memcpy(g_paletteEntries, entries, sizeof(g_paletteEntries));
         return 1;
     }
     if (!g_displayOpen || !g_hasPrimary) {
         return 0;
     }
     g_hasPalette = true;
+    memcpy(g_paletteEntries, entries, sizeof(g_paletteEntries));
     return 1;
 }
 
 int HeadlessPaletteSet(int start, int count, const unsigned char* entries)
 {
-    (void)start;
-    (void)count;
-    (void)entries;
-    if (WindowedPaletteActive()) {
-        return g_windowedPalette ? 1 : 0;
+    bool active = WindowedPaletteActive() ? g_windowedPalette : g_hasPalette;
+
+    if (!active) {
+        return 0;
     }
-    return g_hasPalette ? 1 : 0;
+    if (start >= 0 && count >= 0 && start + count <= 256) {
+        memcpy(g_paletteEntries + start * 4, entries, (size_t)count * 4);
+    }
+    return 1;
 }
 
 int HeadlessPaletteGet(unsigned char* entries)
 {
-    if (WindowedPaletteActive()) {
-        if (!g_windowedPalette) {
-            return 0;
-        }
-        memset(entries, 0, 256 * 4);
-        return 1;
-    }
-    if (!g_hasPalette) {
+    bool active = WindowedPaletteActive() ? g_windowedPalette : g_hasPalette;
+
+    if (!active) {
         return 0;
     }
-    memset(entries, 0, 256 * 4);
+    memcpy(entries, g_paletteEntries, sizeof(g_paletteEntries));
     return 1;
 }
 

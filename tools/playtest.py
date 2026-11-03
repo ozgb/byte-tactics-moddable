@@ -26,7 +26,8 @@ before the exe starts, and `--collect PATH` copies a file the game wrote there (
 `savegame/harness.sav`) to the run's directory, both with `--testmode`. Every `--testmode` run passes the game's
 own `-memset=0` switch, which makes GameAlloc (and so operator new) zero new memory. `--poison` passes
 `-memset=0xcdcdcdcd` instead, which fills it with 0xCD. `--blockscan` adds `-blockscan` (every tick) and copies
-blockptrs.txt too; `--blockscan-every N` adds `-blockscan=N`. `--windowed` passes the game's own `-d`
+blockptrs.txt too; `--blockscan-every N` adds `-blockscan=N`;
+`--blockscan-verify` adds `-blockscanverify`, a second plain scan whose rows must equal the fast scan's. `--windowed` passes the game's own `-d`
 switch, which starts each game in a window instead of full screen (not with `--testmode`). `--xserver` gives each
 `--testmode` game an invisible Xvfb display, which an exe built from the reference branch needs (it has no headless host
 and exits at once without a display).
@@ -57,6 +58,12 @@ also on Ctrl-C, and the prefix and game directory are deleted unless
 `--keep` is given. The summary (build/playtest/<session>/summary.md) has one
 line per run, PASS or FAIL with the reason, and how each named screenshot
 compares with the original exe's.
+
+`--framedump` starts each exe built from this tree with `-framedump`: the host then swallows Scroll Lock and
+writes the frame last presented to frames/<n>.bin in the game directory (format: DUMP_MAGIC). A `shot <name>`
+step then sends Scroll Lock too and moves the new file to <run>/<name>.bin (`shot <name> nodump` skips it).
+When a scenario ran in two or more such runs, the summary says whether each named step's dump is
+byte-identical to the first run's.
 """
 
 import argparse
@@ -100,6 +107,12 @@ POLL = 1.0
 SOUND_LEVEL = 200
 PREFIX_WRITTEN = ("system.reg", "user.reg", "userdef.reg", ".update-timestamp")
 TEMPLATE_REVISION = 2
+FRAMEDUMP_SWITCH = "-framedump"
+FRAMEDUMP_KEY = "Scroll_Lock"
+FRAMEDUMP_TIMEOUT = 10.0
+FRAMEDUMP_RETRY = 2.5
+DUMP_MAGIC = b"BTFR"
+DUMP_HEADER = 16 + 256 * 4
 
 NETNS_SCRIPT = (
     "ip link set lo up; ip link add dummy0 type dummy; ip addr add 10.77.0.1/24 dev dummy0; "
@@ -452,6 +465,7 @@ class Instance:
         self.stop_lock = threading.Lock()
         self.stopped = False
         self.quit = False
+        self.dumps = 0
 
     def env(self) -> dict[str, str]:
         env = wine_env(self.prefix, self.display)
@@ -468,6 +482,7 @@ class Instance:
         copy_game(game_src, self.game)
         for stale in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt"):
             (self.game / stale).unlink(missing_ok=True)
+        shutil.rmtree(self.game / "frames", ignore_errors=True)
         for dest, _ in self.run.put:
             (self.game / dest).unlink(missing_ok=True)
         for path in self.run.collect:
@@ -556,8 +571,12 @@ class Instance:
             args += [NATIVE_MODULES_SWITCH]
         if self.run.windowed:
             args += ["-d"]
+        if self.dumps_frames():
+            args += [FRAMEDUMP_SWITCH]
         if self.run.testmode and self.run.blockscan:
             args += ["-blockscan" if self.run.blockscan == 1 else f"-blockscan={self.run.blockscan}"]
+            if self.run.blockscan_verify:
+                args += ["-blockscanverify"]
         self.wine = subprocess.Popen(self.wrap(["wine", exe, *args]), cwd=self.game, env=env, start_new_session=True,
                                      stdout=(self.run.out / f"wine{self.suffix}.log").open("w"),
                                      stderr=subprocess.STDOUT)
@@ -569,6 +588,31 @@ class Instance:
         self.thread(self.files_loop)
         if not self.run.testmode:
             self.thread(self.shots_loop)
+
+    def dumps_frames(self) -> bool:
+        return self.run.framedump and runs_wasm_modules(self.run.exes[min(self.index, len(self.run.exes)) - 1])
+
+    def dump(self, name: str) -> None:
+        """Ask the host for a frame dump with its reserved key and move the file it writes to <run>/<name>.bin."""
+        frames = self.game / "frames"
+        src = frames / f"{self.dumps}.bin"
+        deadline = time.time() + FRAMEDUMP_TIMEOUT
+        while True:
+            self.xdo("key", FRAMEDUMP_KEY)
+            retry = time.time() + FRAMEDUMP_RETRY
+            while time.time() < min(retry, deadline) and not complete_dump(src):
+                self.run.check_alive()
+                time.sleep(0.2)
+            if complete_dump(src):
+                break
+            if time.time() >= deadline:
+                raise StepFailed(f"no frame dump {src.name} within {FRAMEDUMP_TIMEOUT:g}s of {FRAMEDUMP_KEY}")
+        shutil.move(str(src), self.run.out / f"{name}.bin")
+        time.sleep(0.3)
+        later = sorted(frames.glob("*.bin"), key=lambda f: int(f.stem))
+        self.dumps = max([self.dumps + 1] + [int(f.stem) + 1 for f in later])
+        for extra in later:
+            extra.unlink(missing_ok=True)
 
     def thread(self, fn) -> None:
         t = threading.Thread(target=fn, daemon=True)
@@ -971,7 +1015,8 @@ class Run:
                  screens: dict[str, Screen], debug: str, window: bool = False, testmode: Path | None = None,
                  testdump: int | None = None, poison: bool = False, blockscan: int = 0,
                  windowed: bool = False, put: list[tuple[str, Path]] | None = None,
-                 collect: list[str] | None = None, xserver: bool = False, native_modules: bool = False):
+                 collect: list[str] | None = None, xserver: bool = False, native_modules: bool = False,
+                 framedump: bool = False, blockscan_verify: bool = False):
         self.number = number
         self.name = name
         self.scenario = scenario
@@ -986,9 +1031,11 @@ class Run:
         self.testdump = testdump
         self.poison = poison
         self.blockscan = blockscan
+        self.blockscan_verify = blockscan_verify
         self.windowed = windowed
         self.xserver = xserver
         self.native_modules = native_modules
+        self.framedump = framedump
         self.put = put or []
         self.collect = collect or []
         self.instances = [Instance(self, i + 1) for i in range(scenario.instances)]
@@ -1121,6 +1168,8 @@ class Run:
             time.sleep(0.4)
         elif cmd == "shot":
             inst.shot(args[0] + inst.suffix)
+            if inst.dumps_frames() and args[1:] != ["nodump"]:
+                inst.dump(args[0] + inst.suffix)
         elif cmd == "every":
             inst.shot_every = float(args[0])
             inst.shot_event.set()
@@ -1413,6 +1462,53 @@ def compare_shots(runs: list[Run], session: Path) -> dict[str, list[str]]:
     return out
 
 
+def complete_dump(path: Path) -> bool:
+    """Is path a whole frame dump: its header, then width x height bytes of pixels?"""
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return False
+    if len(data) < DUMP_HEADER or data[:4] != DUMP_MAGIC:
+        return False
+    width = int.from_bytes(data[6:8], "little")
+    height = int.from_bytes(data[8:10], "little")
+    return len(data) == DUMP_HEADER + width * height
+
+
+def compare_dump_dirs(ref: Path, other: Path) -> tuple[list[str], list[str], list[str]]:
+    """The named dumps (<name>.bin) of other against ref's: (identical, differing, missing from other)."""
+    same, differ, missing = [], [], []
+    for dump in sorted(ref.glob("*.bin")):
+        mine = other / dump.name
+        if not mine.is_file():
+            missing.append(dump.stem)
+        elif mine.read_bytes() == dump.read_bytes():
+            same.append(dump.stem)
+        else:
+            differ.append(dump.stem)
+    return same, differ, missing
+
+
+def compare_dumps(runs: list["Run"]) -> dict[str, list[str]]:
+    """Each run's frame dumps against the first run of its scenario that has any: a note per run for the summary."""
+    out: dict[str, list[str]] = {}
+    refs: dict[str, Run] = {}
+    for r in runs:
+        if not any(r.out.glob("*.bin")):
+            continue
+        ref = refs.setdefault(r.scenario.name, r)
+        if ref is r:
+            continue
+        same, differ, missing = compare_dump_dirs(ref.out, r.out)
+        note = f"{len(same)} of {len(same) + len(differ) + len(missing)} frame dumps identical to {ref.name}"
+        if differ:
+            note += f"; differ: {', '.join(differ)}"
+        if missing:
+            note += f"; missing: {', '.join(missing)}"
+        out[r.name] = [note]
+    return out
+
+
 def summary(session: Path, runs: list[Run], shots: dict[str, list[str]]) -> str:
     lines = [f"# Play tests {session.name}", "",
              "| run | scenario | exe | result | time | exit | notes |",
@@ -1462,6 +1558,8 @@ def main() -> None:
                     help="--testmode: fill new game allocations with 0xCD (the game's -memset switch)")
     ap.add_argument("--blockscan", action="store_true",
                     help="--testmode: run with -blockscan, which writes blockptrs.txt (the pointers out of the block)")
+    ap.add_argument("--blockscan-verify", action="store_true",
+                    help="--blockscan: also scan every block byte by byte, and fail unless both scans find the same rows (-blockscanverify)")
     ap.add_argument("--blockscan-every", type=int, metavar="N", default=0,
                     help="--testmode: --blockscan on every Nth tick and each tick of the last 64 (-blockscan=N)")
     ap.add_argument("--xserver", action="store_true",
@@ -1472,6 +1570,8 @@ def main() -> None:
                     help="--testmode: copy the file PATH of the run's game copy (relative to the game directory) to the same path in the run's directory when the run ends, if it exists; repeatable")
     ap.add_argument("--native-modules", action="store_true", default=os.environ.get("BT_NATIVE_MODULES") == "1",
                     help="run the exes of this tree with -modules=native: their modules run as native code, and the WASM runtime files are not needed (default on when BT_NATIVE_MODULES=1)")
+    ap.add_argument("--framedump", action="store_true",
+                    help="run the exes of this tree with -framedump: each `shot` step dumps the frame last presented to <run>/<name>.bin, and runs of one scenario are compared")
     ap.add_argument("--windowed", action="store_true",
                     help="start each game in windowed mode (the game's -d switch; default full screen)")
     ap.add_argument("--list", action="store_true", help="list the scenarios")
@@ -1508,6 +1608,8 @@ def main() -> None:
         ap.error("--testdump needs --testmode")
     if (args.blockscan or args.blockscan_every) and not args.testmode:
         ap.error("--blockscan and --blockscan-every need --testmode")
+    if args.blockscan_verify and not (args.blockscan or args.blockscan_every):
+        ap.error("--blockscan-verify needs --blockscan or --blockscan-every")
     if args.blockscan_every < 0:
         ap.error("--blockscan-every needs 1 or more")
     scan_every = args.blockscan_every or int(args.blockscan)
@@ -1517,6 +1619,8 @@ def main() -> None:
         ap.error("--windowed does not apply to --testmode (the headless host has no window)")
     if args.xserver and not args.testmode:
         ap.error("--xserver needs --testmode")
+    if args.framedump and args.testmode:
+        ap.error("--framedump does not apply to --testmode (a test-mode run has no window)")
     if (args.put or args.collect) and not args.testmode:
         ap.error("--put and --collect need --testmode")
     put = []
@@ -1584,6 +1688,9 @@ def main() -> None:
             tag = "+".join(t for t, _ in parts)
             for k in range(args.repeat):
                 name = f"{sc.name}-{tag}" + (f"-{k + 1}" if args.repeat > 1 else "")
+                same_name = [r for r in runs if r.name == name or r.name.startswith(name + "-x")]
+                if same_name:
+                    name += f"-x{len(same_name) + 1}"
                 runs.append(Run(len(runs) + 1, name, sc, [p for _, p in parts], tag, session, screens,
                                 args.debug or (DEBUG_TESTMODE if args.testmode else DEBUG_SCREEN), args.window,
                                 Path(args.testmode).resolve() if sc is testmode else None,
@@ -1591,7 +1698,7 @@ def main() -> None:
                                 args.poison and sc is testmode, scan_every if sc is testmode else 0,
                                 args.windowed, put if sc is testmode else None,
                                 args.collect if sc is testmode else None, args.xserver and sc is testmode,
-                                args.native_modules))
+                                args.native_modules, args.framedump, args.blockscan_verify))
     parallel = args.parallel or min(3, len(runs))
     template = template_prefix()
     dplay = directplay_prefix() if any(sc.directplay for sc in scenarios) else None
@@ -1635,6 +1742,8 @@ def main() -> None:
         time.sleep(1)
 
     shots = compare_shots(runs, session)
+    for name, notes in compare_dumps(runs).items():
+        shots.setdefault(name, []).extend(notes)
     text = summary(session, runs, shots)
     (session / "summary.md").write_text(text)
     print()

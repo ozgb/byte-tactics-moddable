@@ -1,0 +1,10 @@
+bt-sound 1
+0 stop_all - - - - -
+15 play SelectMultipleUnits -585 - - -
+22 play CREATESQUAD -585 - - -
+33 play_file servtny2.WAV -585 - - -
+42 play CREATESQUAD -585 - - -
+62 play SELECTSQUAD -585 - - -
+72 play_file servtny2.WAV -585 - - -
+82 play SELECTSQUAD -585 - - -
+162 play_file servtny2.WAV -585 - - -

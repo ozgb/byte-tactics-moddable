@@ -1,0 +1,25 @@
+bt-ui 1
+1 scroll 304 32
+1 view 1
+1 select -
+10 input mouse move 384 240
+11 input mouse left down 384 240
+12 input mouse left up 384 240
+13 select 1
+14 view 2
+20 input mouse move 444 280
+21 input mouse left down 444 280
+22 input mouse left up 444 280
+23 select 2
+24 view 3
+30 input mouse move 324 300
+31 input key down 16
+32 input mouse left down 324 300
+33 input mouse left up 324 300
+34 input key up 16
+34 select 2,3
+35 view 4
+50 input mouse move 384 400
+51 input mouse left down 384 400
+52 input mouse left up 384 400
+53 select -

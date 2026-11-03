@@ -226,6 +226,15 @@ static void DrainGuiChanged(const SimEvent& e)
         MarkChanged(&g_game->gui);
 }
 
+static void DrainBuildQueueSound(const SimEvent& e)
+{
+    if (e.args[0] != g_game->playerIndex)
+        return;
+    char addSound[] = "addbuild";
+    char subSound[] = "subbuild";
+    PlaySoundByName((int)e.args[1] > 0 ? addSound : subSound, 0);
+}
+
 void DrainSimEvents()
 {
     SimEventQueue& q = SimEvents();
@@ -298,6 +307,17 @@ void DrainSimEvents()
             break;
         case SIM_EVENT_GUI_CHANGED_IF_SCREEN:
             DrainGuiChanged(e);
+            break;
+        case SIM_EVENT_WATCH_PROMPT:
+            if (e.args[0] == g_game->localPlayer)
+                ShowContinueWatchingDialog();
+            break;
+        case SIM_EVENT_WATCH_MODE_NOTICE:
+            if (e.args[0] == g_game->localPlayer)
+                OpenMessageBox(&g_game->gui, Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."), 500, 1, 1);
+            break;
+        case SIM_EVENT_BUILD_QUEUE_SOUND:
+            DrainBuildQueueSound(e);
             break;
         case SIM_EVENT_FOCUS_COMMANDER:
             FocusCommander((int)e.args[0]);

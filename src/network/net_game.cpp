@@ -2483,7 +2483,7 @@ int HandleNetPackets()
             DropPlayer(drop->id);
             if (drop->id == FirstJoinedId()) {
                 g_game->bits_3923b_2.bit2_3923b = 1;
-                g_game->bits_3923b_2.bit4_3923b = 0;
+                g_game->endGameVictory = 0;
             }
             break;
         }

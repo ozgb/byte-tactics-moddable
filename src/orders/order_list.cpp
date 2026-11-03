@@ -706,6 +706,21 @@ void __stdcall IssueOrCancelOrder(unsigned char kind, int remove, Unit* owner, i
     AddOrder(MissionType(kind), remove, owner, (Unit*)id, (Vec3*)pos, param_6, param_7);
 }
 
+// FUNCTION: 0x419b00
+void __stdcall QueueBuildOrder(char* name, Unit* unit, int count)
+{
+    if (strstr(name, "MAKENUKE") != 0 || strstr(name, "MAKEANTI") != 0) {
+        AdjustBuildCount(MissionType("BUILDWEAPON").index, unit, 0, count);
+        return;
+    }
+    unsigned short id = g_seams.units->FindUnitTypeId(name);
+    if (id == 0)
+        return;
+    int mobile = (int)unit->motion.get();
+    const char* kind = mobile ? "MOBILEBUILD" : "BUILDINGBUILD";
+    AdjustBuildCount(MissionType(kind).index, unit, id, count);
+}
+
 // FUNCTION: 0x43b0b0
 void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
 {
@@ -1577,7 +1592,7 @@ UnitMotion::UnitMotion(Unit* unit)
     p2 = OrderVec3(0, 0, 0);
     mode = 1;
     flag = 0;
-    movementClass = (int)((UnitDefMoveView*)unit->def.get())->movementclass.get();
+    movementClass = ((UnitDefMoveView*)unit->def.get())->movementclass.get();
     if (((PlayerTypeView*)unit->player.get())->active != 0 && ((PlayerTypeView*)unit->player.get())->type == 3) {
         if (((UnitDefMoveView*)unit->def.get())->flag_800)
             obj = (PathGoalVtableView*)new (kSim) PackedPosGoal(unit);

@@ -13,6 +13,7 @@
 #include "victory_conditions.h"
 #include "../state/sim_globals.h"
 #include "victory.h"
+#include "mission_conditions.h"
 
 typedef void* SimView_DAT_005119b8;
 #undef DAT_005119b8
@@ -1263,4 +1264,12 @@ int HarnessConditionClass(void* condition)
     CONDITION_PROBE(COND_DEFEAT_PASSES_X, DefeatAnyUnitPassesX p(0));
     CONDITION_PROBE(COND_DEFEAT_PASSES_Z, DefeatAnyUnitPassesZ p(0));
     return COND_UNKNOWN;
+}
+
+// FUNCTION: 0x48df90
+MissionConditions::MissionConditions()
+{
+    active = 1;
+    victoryCount = 0;
+    defeatCount = 0;
 }

@@ -1,6 +1,7 @@
 """Build and check the wasm modules: the C and Rust fixtures of tests/wasm/modules and wind_meteors.
 
     uv run tools/wasm_modules.py build     # build/wasm-modules/c.wasm, rust.wasm and wind_meteors.wasm
+    uv run tools/wasm_modules.py build-variant --define NAME=VALUE --name NAME   # wind_meteors.wasm built with the defines, as build/wasm-modules/NAME.wasm
     uv run tools/wasm_modules.py check     # run both fixtures in one wasmtime memory and table
     uv run tools/wasm_modules.py imports   # check every built module's imports and exports
     uv run tools/wasm_modules.py statics   # run wind_meteors for 2000 ticks and check its statics never change
@@ -184,6 +185,14 @@ def build():
     for entry in game["modules"]:
         build_game_module(entry, game)
     write_game_manifest(with_majors(game, header_majors()))
+
+
+def build_variant(defines, name):
+    game = game_manifest()
+    check_tools_game(game)
+    for entry in game["modules"]:
+        if entry["name"] == "wind_meteors":
+            build_game_module(entry, game, defines, name)
 
 
 def game_manifest():
@@ -540,8 +549,9 @@ def run(cmd, **kwargs):
         sys.exit(f"failed: {' '.join(cmd[:3])} ...")
 
 
-def build_game_module(entry, pins):
-    out = os.path.join(OUT, entry["name"])
+def build_game_module(entry, pins, defines=(), name=None):
+    name = name or entry["name"]
+    out = os.path.join(OUT, name)
     os.makedirs(out, exist_ok=True)
     generated_layout_asserts(os.path.join(out, "layout_generated.h"))
     tables = os.path.join(out, "bx_tables.c")
@@ -553,16 +563,16 @@ def build_game_module(entry, pins):
     includes = [f"-I{os.path.join(ROOT, d)}" for d in ("wasm/include", "include", ".")] + [f"-I{out}"]
     for index, source in enumerate(entry["cxx"]):
         obj = os.path.join(out, f"{index}_{os.path.basename(source)}.o")
-        jobs.append((["clang++", *CXX_FLAGS, *build_flags, *includes, "-c", os.path.join(ROOT, source), "-o", obj], obj))
+        jobs.append((["clang++", *CXX_FLAGS, *build_flags, *[f"-D{d}" for d in defines], *includes, "-c", os.path.join(ROOT, source), "-o", obj], obj))
     c_includes = [f"-I{os.path.join(ROOT, d)}" for d in ("wasm/include", "lib/bitexact")]
     for index, source in enumerate(entry["c"] + [tables]):
         path = source if os.path.isabs(source) else os.path.join(ROOT, source)
         obj = os.path.join(out, f"c{index}_{os.path.basename(source)}.o")
-        jobs.append((["clang", *C_FLAGS, *build_flags, *c_includes, "-c", path, "-o", obj], obj))
+        jobs.append((["clang", *C_FLAGS, *build_flags, *[f"-D{d}" for d in defines], *c_includes, "-c", path, "-o", obj], obj))
     with concurrent.futures.ThreadPoolExecutor() as pool:
         list(pool.map(lambda job: run(job[0]), jobs))
-    target = os.path.join(OUT, entry["name"] + ".wasm")
-    exports = [f"--export={name}" for name in entry["data"]]
+    target = os.path.join(OUT, name + ".wasm")
+    exports = [f"--export={data}" for data in entry["data"]]
     cmd = ["wasm-ld", *link_flags(entry, pins["stack_size"]), "--gc-sections", *exports, *[obj for _, obj in jobs], "-o", target]
     run(cmd)
     with open(target, "rb") as f:
@@ -1160,14 +1170,21 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["build", "check", "imports", "statics", "adapters", "fatal", "glue-fatal"])
+    parser.add_argument("command", choices=["build", "build-variant", "check", "imports", "statics", "adapters", "fatal", "glue-fatal"])
     parser.add_argument("--exe", default=os.path.join(ROOT, "build", "modern", "TotalA.exe"), help="glue-fatal: the exe to run")
+    parser.add_argument("--define", action="append", default=[], help="build-variant: NAME=VALUE for the wind_meteors compile")
+    parser.add_argument("--name", help="build-variant: the variant's name, build/wasm-modules/NAME.wasm")
     parser.add_argument("--game-dir", help="glue-fatal: the game's install (default: Steam's)")
     args = parser.parse_args()
     if args.command == "glue-fatal":
         return run_glue_fatal(args.exe, args.game_dir)
     if args.command == "build":
         build()
+        return 0
+    if args.command == "build-variant":
+        if not args.define or not args.name or args.name == "wind_meteors":
+            sys.exit("build-variant: needs --define and a --name other than wind_meteors")
+        build_variant(args.define, args.name)
         return 0
     if args.command == "imports":
         return run_imports()

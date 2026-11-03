@@ -1,0 +1,59 @@
+bt-ui 1
+1 scroll 304 32
+1 view 1
+1 select -
+10 input mouse move 384 240
+11 input mouse left down 384 240
+12 input mouse left up 384 240
+13 select 1
+14 view 2
+20 input mouse move 32 187
+21 input mouse left down 32 187
+22 input mouse left up 32 187
+30 input key down 16
+31 input mouse move 464 300
+32 input mouse left down 464 300
+32 order MobileBuild unit 1 target - pos 648 1 296 type ARMSOLAR param - amount 0 remove 1
+33 input mouse left up 464 300
+34 input mouse move 400 340
+35 input mouse left down 400 340
+35 order MobileBuild unit 1 target - pos 584 1 344 type ARMSOLAR param - amount 0 remove 1
+36 input mouse left up 400 340
+37 input key up 16
+50 input mouse move 96 187
+51 input mouse left down 96 187
+52 input mouse left up 96 187
+60 input mouse move 464 380
+61 input mouse left down 464 380
+61 order MobileBuild unit 1 target - pos 640 1 384 type ARMWIN param - amount 0 remove 0
+62 input mouse left up 464 380
+139 view 3
+172 view 33
+173 view 93
+174 view 153
+175 view 213
+176 view 273
+177 view 333
+178 view 393
+179 view 453
+180 view 513
+181 view 573
+182 view 633
+183 view 693
+184 view 753
+185 view 813
+186 view 873
+187 view 933
+188 view 993
+189 view 1053
+190 view 1113
+191 view 1173
+192 view 1233
+193 view 1293
+194 view 1353
+195 view 1413
+196 view 1473
+197 view 1533
+198 view 1593
+199 view 1653
+200 view 1713

@@ -55,11 +55,11 @@ struct PathCell {
 };
 
 struct PathGrid {
-    PathCell* cells;
+    Ref<PathCell> cells;
     unsigned int width;
     unsigned int height;
     int count;
-    unsigned int* dirty;
+    Ref<unsigned int> dirty;
     int InBounds(unsigned int x, unsigned int y)
     {
         return x < width && y < height;
@@ -148,7 +148,7 @@ static int FixMul(int a, int b)
 class OpenHeap {
 public:
     Ref<Node> pool;
-    Ref<Node*> items;
+    Ref<Ref<Node>> items;
     int freeHead;
     int used;
     int capacity;
@@ -414,7 +414,7 @@ public:
         for (i = 0; i < used; i++)
             *(newe + i) = pool[i];
         operator delete(pool);
-        Node** newp = (Node**)SimAlloc(n * 4);
+        Ref<Node>* newp = (Ref<Node>*)SimAlloc(n * 4);
         for (i = 0; i < count; i++)
             newp[i] = newe + (items[i] - pool);
         operator delete(items);

@@ -545,12 +545,12 @@ void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* par
 #include "../network/net_game.h"
 
 #include "../game/data_files.h"
-#include "../map/radar.h"
+#include "../ingame/radar.h"
 #include "../util/registry.h"
 #include "../network/unit_sync.h"
 #include "../network/unit_sync_state.h"
 #include "../map/map_list.h"
-#include "map_enum.h"
+#include "../../interfaces/services.h"
 #include "../gui/file_list.h"
 #include "options.h"
 void __stdcall RejectPlayer(int param_1, int param_2);
@@ -3474,7 +3474,7 @@ void OpenEndMultiScreen()
     FlipScreen();
     LoadGuiLayer(&g_game->gui, "ENDMULTI.GUI", 0x80)->handler = HandleEndMultiClick;
     SetTranslatedTextByName(&g_game->gui, "RESULT",
-                 Translate(g_game->bits_3923b.flag4_3923b ? "Victory" : "Failure"), 0);
+                 Translate(g_game->endGameVictory ? "Victory" : "Failure"), 0);
     RenderLayer(&g_game->gui, 0xc0);
     ShowSoftwareCursor();
 }

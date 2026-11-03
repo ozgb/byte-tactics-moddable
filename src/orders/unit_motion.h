@@ -8,6 +8,7 @@ struct Unit;
 class HapiBank;
 class PathGoalVtableView;
 class MotionSerializer;
+class MovementClass;
 
 class PathGoal;
 class OrderFx;
@@ -40,7 +41,7 @@ public:
         Ref<PathGoalVtableView> obj;
         Ref<MotionSerializer> player;
     };
-    int movementClass;
+    Ref<MovementClass> movementClass;
     Vec3 velocity;
     Vec3 p2;
     union {

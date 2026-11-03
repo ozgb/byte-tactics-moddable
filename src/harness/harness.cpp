@@ -105,6 +105,8 @@ static unsigned s_quirkReachTick = 0;
 static int s_quirkReach = 0;
 static unsigned s_saveTick = 0;
 static int s_saveLine = 0;
+static unsigned s_roundTrips[16];
+static int s_roundTripCount = 0;
 static char s_loadName[64];
 static int s_loadLine = 0;
 static char s_decidedKey[32];
@@ -864,6 +866,13 @@ static void ReadKey(int lineNo, const char* key, char* value)
         if (s_saveTick == 0)
             FailLine(lineNo, "needs a tick of at least 1", key, "");
         s_saveLine = lineNo;
+    } else if (strcmp(key, "roundtrip") == 0) {
+        if (s_roundTripCount == (int)(sizeof s_roundTrips / sizeof s_roundTrips[0]))
+            FailLine(lineNo, "is one roundtrip line too many", key, "");
+        unsigned tick = ParseNumber(lineNo, key, value);
+        if (tick == 0)
+            FailLine(lineNo, "needs a tick of at least 1", key, "");
+        s_roundTrips[s_roundTripCount++] = tick;
     } else if (strcmp(key, "load") == 0) {
         if (s_loadLine != 0)
             FailLine(lineNo, "is a second load line", key, "");
@@ -961,6 +970,10 @@ static void CheckScenario()
     CheckInputs();
     if (s_saveLine != 0 && s_saveTick > s_ticks)
         FailLine(s_saveLine, "has a tick after the last tick", "save", "");
+    for (int i = 0; i < s_roundTripCount; i++) {
+        if (s_roundTrips[i] > s_ticks)
+            Fail("testmode: a roundtrip line has a tick after the last tick\n");
+    }
     if (s_localPlayer >= 0 && !s_players[s_localPlayer].named) {
         char msg[128];
         sprintf(msg, "testmode: scenario line %d: local_player %d is not a player the scenario names\n",
@@ -1480,8 +1493,42 @@ void HarnessStartSkirmish()
 
 static void UiEndOfTick();
 
+static void RoundTripBlock()
+{
+    unsigned char* old = (unsigned char*)SimBlockBase();
+    unsigned char* copy = (unsigned char*)host_mem_alloc(kSimBlockBytes);
+    if (copy == nullptr || old == nullptr) {
+        Fail("testmode: no block or no memory for the roundtrip copy of it\n");
+        return;
+    }
+    memcpy(copy, old, kSimBlockBytes);
+    if (ModulesMemory()->base != nullptr) {
+        memset(old, 0xcd, kSimBlockBytes);
+        memcpy(old, copy, kSimBlockBytes);
+    } else {
+        void* fresh = host_mem_reserve(kSimBlockBytes);
+        if (fresh != nullptr)
+            fresh = host_mem_commit(fresh, kSimBlockBytes);
+        if (fresh == nullptr) {
+            Fail("testmode: no memory for the roundtrip block\n");
+            return;
+        }
+        memcpy(fresh, copy, kSimBlockBytes);
+        memset(old, 0xcd, kSimBlockBytes);
+        SimBlockAttach(fresh);
+        host_mem_release(old);
+    }
+    host_mem_free(copy);
+}
+
 void HarnessAfterStep()
 {
+    if (HarnessTestMode()) {
+        for (int i = 0; i < s_roundTripCount; i++) {
+            if ((unsigned)g_game->ticks == s_roundTrips[i])
+                RoundTripBlock();
+        }
+    }
     if (HarnessTestMode() && s_blockScan)
         BlockScanTick((unsigned)g_game->ticks, s_ticks);
     if (HarnessTestMode() && s_saveLine != 0 && (unsigned)g_game->ticks == s_saveTick) {
@@ -2431,7 +2478,7 @@ static unsigned char s_nodeFree[NODE_LIMIT];
 static void VisitPathNodes(const unsigned char* pf)
 {
     unsigned char* pool = (unsigned char*)RefAbs(*(unsigned*)(pf + PF_POOL));
-    unsigned char** items = (unsigned char**)RefAbs(*(unsigned*)(pf + PF_ITEMS));
+    unsigned* items = (unsigned*)RefAbs(*(unsigned*)(pf + PF_ITEMS));
     int freeHead = *(int*)(pf + PF_FREE_HEAD);
     unsigned used = *(unsigned*)(pf + PF_USED);
     unsigned count = *(unsigned*)(pf + PF_COUNT);
@@ -2462,14 +2509,14 @@ static void VisitPathNodes(const unsigned char* pf)
     VisitValue("pathfinder.heap.count", count, 4);
     for (unsigned slot = 0; slot < count; slot++) {
         sprintf(path, "pathfinder.heap[%u]", slot);
-        VisitPointer(path, (unsigned)items[slot], TT_NODE);
+        VisitPointer(path, RefAbs(items[slot]), TT_NODE);
     }
 }
 
 static void VisitPathCells(const unsigned char* pf)
 {
-    unsigned char* cells = *(unsigned char**)(pf + PF_CELLS);
-    unsigned* dirty = *(unsigned**)(pf + PF_DIRTY);
+    unsigned char* cells = (unsigned char*)RefAbs(*(unsigned*)(pf + PF_CELLS));
+    unsigned* dirty = (unsigned*)RefAbs(*(unsigned*)(pf + PF_DIRTY));
     unsigned count = *(unsigned*)(pf + PF_CELL_COUNT);
     char path[96];
     unsigned words;

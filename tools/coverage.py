@@ -6,6 +6,7 @@
     uv run tools/coverage.py --exe E --from PROFDATA [--write|--check]          # use a merged profile, play nothing
     uv run tools/coverage.py ... --live-counters FILE                           # default: live_counters.txt beside the exe
     uv run tools/coverage.py --exe E --game-dir D --scenario N... [--parallel N]   # a subset (no --write or --check)
+    uv run tools/coverage.py --exe E --game-dir D --tier                        # play reference.GATE_TIER; fail below TIER_LINE_FLOOR of the baseline's lines
     uv run tools/test_coverage.py                                               # tests, on hand-written exports
 
 The exe is the coverage build (clang's -fprofile-instr-generate -fcoverage-mapping -fprofile-update=atomic, #385). Every scenario
@@ -44,9 +45,17 @@ the counter of a function inlined into a kept function is there, though the func
 counter of a function in a section nothing reaches is not. A function that is neither entered nor live is
 dead. Of the copies of a source function, it is dead when all are.
 
-Saturated counts. A branch side whose count is 2^62 or more is not covered: clang's profile counters are
-not atomic, so two threads can lose an update, and llvm-cov then reports the other side as a count that
-underflowed to 2^63-1.
+Saturated counts. A branch side whose count is 2^62 or more is not covered: a count that underflowed to 2^63-1
+is what llvm-cov reports for the other side when an update was lost between threads, and the build's atomic
+profile updates (-fprofile-update=atomic) make that rare but not impossible.
+
+Run time. The coverage build plays slower than the gate's exe (a six-player game needs a timeout of more than the gate's 25 ticks
+a second under load), so the suite's runs time out at TICKS_PER_SECOND ticks a second.
+
+The tier. `--tier` plays the scenarios of reference.GATE_TIER (the pull request gate, plus the scenarios that save the
+games they load) and prints the lines hit and functions entered as a share of the full suite's, the sums of
+data/coverage.csv's totals rows. It exits 1 when lines are under TIER_LINE_FLOOR (96%). Run it when a scenario is added or
+removed and when the tier changes.
 
 Unstable functions. A row with `functions` and `dead` 0 and a reason starting `unstable:` marks a live function whose
 lines or branches depend on timing (a sampler on GetTicks, a wait on a lock another thread holds). The function
@@ -103,6 +112,8 @@ METRICS = (("functions", "functions", "functions_entered"), ("lines", "lines", "
 CODE_REGION = 0
 UNSTABLE = "unstable:"
 SATURATED = 1 << 62
+TIER_LINE_FLOOR = 96
+TICKS_PER_SECOND = 6
 REGION_FILE_ID = 5
 REGION_KIND = 7
 BRANCH_FILE_ID = 6
@@ -432,6 +443,20 @@ def compare(want: dict[str, Totals], got: dict[str, Totals]) -> tuple[list[str],
     return falls, notes
 
 
+def tier_share(tier: dict[str, Totals], full: dict[str, Totals]) -> tuple[int, int, int, int]:
+    """(lines hit, full suite's lines hit, functions entered, full suite's functions entered), summed over the subsystems."""
+    return (sum(t.lines_hit for t in tier.values()), sum(t.lines_hit for t in full.values()),
+            sum(t.functions_entered for t in tier.values()), sum(t.functions_entered for t in full.values()))
+
+
+def tier_report(tier: dict[str, Totals], full: dict[str, Totals]) -> tuple[str, bool]:
+    """(the two share lines, whether the line share reaches TIER_LINE_FLOOR percent)."""
+    lines, full_lines, functions, full_functions = tier_share(tier, full)
+    text = (f"tier lines: {percent(lines, full_lines)} of the full suite's ({lines}/{full_lines})\n"
+            f"tier functions: {percent(functions, full_functions)} of the full suite's ({functions}/{full_functions})")
+    return text, lines * 100 >= TIER_LINE_FLOOR * full_lines
+
+
 def table(totals: dict[str, Totals]) -> str:
     """The per-subsystem summary: function, line and branch coverage."""
     head = ["subsystem", "functions", "lines", "branches", "never entered", "dead"]
@@ -481,11 +506,14 @@ def play_suite(exe: Path, game_dir: str | None, parallel: int, names: list[str] 
     failed: dict[str, str] = {}
     tracediff.play = tracediff_play
     reference.play_scenario = play_scenario
+    original_rate = reference.RUN_TICKS_PER_SECOND
+    reference.RUN_TICKS_PER_SECOND = TICKS_PER_SECOND
     try:
         reference.play_all(exe, scenarios, game_dir, parallel, failed=failed, retry_any=True)
     finally:
         tracediff.play = original_tracediff_play
         reference.play_scenario = original_play
+        reference.RUN_TICKS_PER_SECOND = original_rate
     problems = [f"{n}: failed to run: {m}" for n, m in sorted(failed.items())]
     profiles = []
     for name in sorted(scenarios):
@@ -515,6 +543,8 @@ def main() -> None:
     parser.add_argument("--game-dir", help="the game's install (default: Steam's)")
     parser.add_argument("--parallel", type=int, metavar="N", help="scenarios played at once")
     parser.add_argument("--scenario", nargs="+", metavar="NAME", help="play only these (refuses --write and --check)")
+    parser.add_argument("--tier", action="store_true",
+                        help=f"play reference.GATE_TIER and fail when its lines are under {TIER_LINE_FLOOR}%% of data/coverage.csv's")
     parser.add_argument("--from", dest="profdata", type=Path, metavar="PROFDATA",
                         help="use this merged profile and play nothing")
     parser.add_argument("--live-counters", type=Path, metavar="FILE",
@@ -522,6 +552,10 @@ def main() -> None:
     parser.add_argument("--write", action="store_true", help="write data/coverage.csv")
     parser.add_argument("--check", action="store_true", help="fail if a subsystem's coverage fell below data/coverage.csv")
     args = parser.parse_args()
+    if args.tier and (args.scenario or args.write or args.check or args.profdata):
+        sys.exit("coverage: --tier plays the tier; it cannot be used with --scenario, --write, --check or --from")
+    if args.tier and not OUT.is_file():
+        sys.exit(f"coverage: {OUT.relative_to(ROOT)} is missing; write it with --write")
     if args.scenario and (args.write or args.check):
         sys.exit("coverage: --scenario plays a subset; it cannot be used with --write or --check")
     if args.write and args.check:
@@ -534,7 +568,7 @@ def main() -> None:
     if not live_path.is_file():
         sys.exit(f"coverage: no {live_path}; rebuild the coverage build to write it")
     profdata = args.profdata or play_suite(args.exe, args.game_dir, args.parallel or reference.default_parallel(),
-                                           args.scenario)
+                                           list(reference.GATE_TIER) if args.tier else args.scenario)
     print(f"profile: {profdata}")
     by_key, by_name = read_subsystems()
     old = read_csv(OUT) if OUT.is_file() else {}
@@ -548,6 +582,12 @@ def main() -> None:
         sys.exit("coverage: no game function in the export; not writing an empty baseline")
     print(f"excluded (harness, build, outside the repository): {excluded} functions")
     print(f"unassigned: {unassigned} functions")
+    if args.tier:
+        text, reached = tier_report(totals, read_csv(OUT))
+        print(text)
+        if not reached:
+            sys.exit(f"coverage: the tier's lines are under {TIER_LINE_FLOOR}% of the full suite's")
+        print(f"coverage: the tier reaches {TIER_LINE_FLOOR}% of the full suite's lines")
     if args.write:
         if OUT.is_file():
             carry_reasons(totals, old)

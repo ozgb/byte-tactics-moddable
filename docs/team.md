@@ -55,6 +55,8 @@ gh api repos/ozgb/byte-tactics-moddable/pulls/<PR> --jq .head.sha
 
 A pull request **needs review** when it is open, not a draft, and its head SHA differs from the SHA in its latest verdict (or it has none). Pushing new commits is how the author asks for another review: no label or mention is needed.
 
+A pull request body names the gate tier it ran: `--tier` (the scenarios of `GATE_TIER`, the gate of most changes) or the full `--check` (the gate of the changes that `reference/README.md`, "When the full suite is the gate", lists, and of the run that makes `tools/fullgate.py due` pass). A body that names only `--tier` for a change on that list is sent back.
+
 ## Branches behind `moddable`
 
 Only the maintainer merges. A branch doesn't have to contain `moddable`'s head to be merged: what matters is that the tree the maintainer tested is the tree that lands. Updating a branch changes its head, which sends it back for review, so nobody updates one without a reason.

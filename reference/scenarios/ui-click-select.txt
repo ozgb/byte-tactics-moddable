@@ -1,0 +1,29 @@
+# Human Arm commander on The Pass: clicks select the commander and a Peewee, a shift-click adds one, a click on the ground clears; right-click interface.
+game_seed 311
+crt_seed 1311
+view_seed 2311
+map The Pass
+start_positions fixed
+ticks 120
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +iface 1
+spawn 2 0 ARMPW 620 280
+spawn 2 0 ARMPW 500 300
+input 10 mouse move 384 240
+input 11 mouse left down 384 240
+input 12 mouse left up 384 240
+input 20 mouse move 444 280
+input 21 mouse left down 444 280
+input 22 mouse left up 444 280
+input 30 mouse move 324 300
+input 31 key down shift
+input 32 mouse left down 324 300
+input 33 mouse left up 324 300
+input 34 key up shift
+input 50 mouse move 384 400
+input 51 mouse left down 384 400
+input 52 mouse left up 384 400
+frames 16 40

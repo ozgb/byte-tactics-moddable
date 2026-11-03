@@ -499,6 +499,14 @@ seeds) and runs deterministically: two runs give identical traces.
 | trio-anteer-strait | Anteer Strait | 3 | 5400 | Three players on Anteer Strait, players 0 and 1 allied, three minutes, line of sight type 0 |
 | trio-dark-side | Dark Side | 3 | 9000 | Three players on Dark Side, fixed start positions, five minutes |
 | trio-etorrep-glacier | Etorrep Glacier | 3 | 3600 | Three Core players on Etorrep Glacier, random start positions, two minutes |
+| ui-build-menu | The Pass | 2 | 200 | Scripted build menu clicks, the build menu and its queue counts in frames |
+| ui-build-place | The Pass | 2 | 200 | Scripted build placement (`IssueMobileBuildOrders`) |
+| ui-click-select | The Pass | 2 | 120 | Scripted click selection (`input`, interface type 1), the commander and unit panels in frames |
+| ui-drag-select | The Pass | 2 | 200 | Scripted box selection with and without Shift |
+| ui-groups | The Pass | 2 | 300 | Scripted control groups |
+| ui-keys | The Pass | 2 | 300 | Scripted keyboard shortcuts: attack, patrol, special attack, stop, queueing, self-destruct |
+| ui-left-click-orders | The Pass | 2 | 260 | Scripted left-click orders and command characters (interface type 0) |
+| ui-right-click | The Pass | 2 | 260 | Scripted right-click move and attack, the minimap scroll |
 
 ## Stored traces and digests
 

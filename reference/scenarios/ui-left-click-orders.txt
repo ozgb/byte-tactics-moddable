@@ -1,0 +1,36 @@
+# Left-click interface: the attack, patrol, move and stop command characters with clicks, a minimap move, a minimap scroll.
+game_seed 314
+crt_seed 1314
+view_seed 2314
+map The Pass
+start_positions fixed
+ticks 260
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +iface 0
+input 10 mouse move 384 240
+input 11 mouse left down 384 240
+input 12 mouse left up 384 240
+input 20 char a
+input 21 mouse move 470 310
+input 22 mouse left down 470 310
+input 23 mouse left up 470 310
+input 30 char p
+input 31 mouse move 480 330
+input 32 mouse left down 480 330
+input 33 mouse left up 480 330
+input 40 char m
+input 41 mouse move 440 280
+input 42 mouse left down 440 280
+input 43 mouse left up 440 280
+input 50 char s
+input 60 char m
+input 61 mouse move 64 64
+input 62 mouse left down 64 64
+input 63 mouse left up 64 64
+input 70 mouse move 64 64
+input 71 mouse right down 64 64
+input 72 mouse move 100 90
+input 73 mouse right up 100 90

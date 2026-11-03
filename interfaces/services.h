@@ -139,6 +139,12 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_PLAYER_TOOK_LEAD = 21,
     // A player has no units left in a game with leaving players: the player's network id.
     SIM_EVENT_PLAYER_LEFT = 22,
+    // A build count changed: the player index of the unit and the change, the sound plays when that player is the one shown.
+    SIM_EVENT_BUILD_QUEUE_SOUND = 23,
+    // A defeated player may keep watching: the player index, the question shows when it is the local player.
+    SIM_EVENT_WATCH_PROMPT = 25,
+    // A player who hosts AI players that are still alive is placed in watch mode: the player index, the notice shows when it is the local player.
+    SIM_EVENT_WATCH_MODE_NOTICE = 26,
     // A smoke plume rises: the position (3), the emit period, the lifetime in ticks and the particle list.
     SIM_EVENT_SMOKE = 27,
     // A puff of white smoke: the position (3) and the particle list.
@@ -153,12 +159,6 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_REMOVE_UNIT_SPEECH = 32,
     // A line enters the message log: a SimMessageText and its value.
     SIM_EVENT_MESSAGE = 33,
-    // A build count changed: the player index of the unit and the change, the sound plays when that player is the one shown.
-    SIM_EVENT_BUILD_QUEUE_SOUND = 23,
-    // A defeated player may keep watching: the player index, the question shows when it is the local player.
-    SIM_EVENT_WATCH_PROMPT = 25,
-    // A player who hosts AI players that are still alive is placed in watch mode: the player index, the notice shows when it is the local player.
-    SIM_EVENT_WATCH_MODE_NOTICE = 26,
 };
 // Flag of SIM_EVENT_UNIT_SPEECH: the unit stays silent when it is on screen.
 #define SIM_EVENT_SPEECH_IF_NOT_VISIBLE 1u

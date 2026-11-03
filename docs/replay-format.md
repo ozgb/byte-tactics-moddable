@@ -14,6 +14,15 @@ A scenario line `record wind_meteors` makes the run write `replay-wind_meteors.t
 failure. `record wind_meteors <first tick> <last tick>` records only the calls whose tick is in the window.
 `tools/replay.py` adds the line to copies of the scenarios; `reference/scenarios/` never holds it.
 
+```sh
+uv run tools/replay.py --record --exe build/modern/TotalA.exe --out DIR [--native-modules] [SCENARIO...]
+uv run tools/replay.py --check --exe build/modern/TotalA.exe [--native-modules] [SCENARIO...]
+uv run tools/replay.py --compare DIR_A DIR_B
+```
+
+`--check` records again and fails when a recording of `tests/replay/` differs. `--compare` fails when two
+directories differ and names the first differing line. Record on a fresh Wine prefix, as the gate runs.
+
 ## Lines
 
 Text, LF line endings. The header is two lines: `bt-replay 1` and `subsystem wind_meteors 1.2` (the interface

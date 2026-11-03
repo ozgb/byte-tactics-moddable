@@ -1,14 +1,17 @@
 bt-ui 1
 1 scroll 304 32
+1 view 1
 1 select -
 10 input mouse move 424 300
 11 input mouse left down 424 300
 12 input mouse left up 424 300
 13 select 2
+14 view 2
 20 input mouse move 96 187
 21 input mouse left down 96 187
 22 input mouse left up 96 187
 22 qbuild 2 ARMPW 1
+24 view 3
 30 input key down 16
 31 input mouse left down 96 187
 32 input mouse left up 96 187
@@ -26,3 +29,119 @@ bt-ui 1
 62 input mouse right up 96 187
 62 qbuild 2 ARMPW -5
 63 input key up 16
+63 view 4
+64 view 5
+87 view 35
+88 view 96
+89 view 156
+90 view 216
+91 view 276
+92 view 336
+93 view 396
+94 view 456
+95 view 516
+96 view 576
+97 view 636
+98 view 696
+99 view 756
+100 view 816
+101 view 876
+102 view 936
+103 view 996
+104 view 1056
+105 view 1116
+106 view 1176
+107 view 1236
+108 view 1296
+109 view 1356
+110 view 1416
+111 view 1476
+112 view 1536
+113 view 1596
+114 view 1656
+115 view 1716
+116 view 1776
+117 view 1836
+118 view 1896
+119 view 1956
+120 view 2016
+121 view 2076
+122 view 2136
+123 view 2196
+124 view 2256
+125 view 2316
+126 view 2376
+127 view 2436
+128 view 2496
+129 view 2556
+130 view 2616
+131 view 2676
+132 view 2736
+133 view 2796
+134 view 2856
+135 view 2916
+136 view 2976
+137 view 3036
+138 view 3096
+139 view 3156
+140 view 3216
+141 view 3276
+142 view 3336
+143 view 3396
+144 view 3456
+145 view 3516
+146 view 3576
+147 view 3636
+148 view 3696
+149 view 3756
+150 view 3816
+151 view 3876
+152 view 3936
+153 view 3996
+154 view 4056
+155 view 4116
+156 view 4176
+157 view 4236
+158 view 4296
+159 view 4356
+160 view 4416
+161 view 4476
+162 view 4536
+163 view 4596
+164 view 4656
+165 view 4716
+166 view 4776
+167 view 4836
+168 view 4896
+169 view 4956
+170 view 5016
+171 view 5076
+172 view 5136
+173 view 5196
+174 view 5256
+175 view 5316
+176 view 5376
+177 view 5436
+178 view 5496
+179 view 5556
+180 view 5616
+181 view 5676
+182 view 5736
+183 view 5796
+184 view 5856
+185 view 5916
+186 view 5976
+187 view 6036
+188 view 6096
+189 view 6156
+190 view 6216
+191 view 6276
+192 view 6336
+193 view 6396
+194 view 6456
+195 view 6516
+196 view 6576
+197 view 6636
+198 view 6696
+199 view 6756
+200 view 6816

@@ -1,2 +1,79 @@
 bt-ui 1
+1 scroll 304 32
+1 view 1
 1 select -
+31 view 2
+61 view 3
+91 view 4
+121 view 5
+151 view 6
+181 view 7
+182 scroll 296 22
+182 view 11
+183 scroll 288 27
+183 view 13
+184 scroll 283 16
+184 view 15
+185 scroll 288 18
+185 view 17
+186 scroll 294 14
+186 view 19
+187 scroll 308 25
+187 view 21
+188 scroll 316 39
+188 view 24
+189 scroll 304 35
+189 view 27
+190 scroll 313 36
+190 view 29
+191 scroll 302 44
+191 view 31
+192 scroll 294 45
+192 view 33
+193 scroll 308 39
+193 view 36
+194 scroll 305 38
+194 view 38
+195 scroll 305 35
+195 view 40
+196 scroll 302 42
+196 view 45
+197 scroll 296 44
+197 view 47
+198 scroll 304 43
+198 view 49
+199 scroll 298 34
+199 view 53
+200 scroll 299 33
+200 view 55
+201 scroll 298 34
+201 view 57
+202 scroll 303 35
+202 view 60
+203 scroll 306 37
+203 view 64
+204 scroll 307 33
+204 view 66
+205 scroll 306 36
+205 view 68
+206 scroll 303 36
+206 view 71
+207 scroll 301 34
+207 view 73
+208 scroll 302 31
+208 view 77
+209 scroll 303 30
+209 view 79
+210 view 81
+211 scroll 303 31
+211 view 83
+212 view 84
+213 view 85
+215 view 86
+217 view 87
+220 view 88
+222 view 89
+224 view 90
+225 view 91
+230 view 92
+233 view 93

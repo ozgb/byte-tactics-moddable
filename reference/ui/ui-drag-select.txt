@@ -1,5 +1,6 @@
 bt-ui 1
 1 scroll 304 32
+1 view 1
 1 select -
 10 input mouse move 300 270
 11 input mouse left down 300 270

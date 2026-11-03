@@ -83,7 +83,8 @@ interface did with the input.
 | Kind | Fields | Meaning |
 | --- | --- | --- |
 | `input` | `key down <vk>`, `key up <vk>`, `char <code>`, `mouse move <x> <y>`, `mouse left down <x> <y>` and the like | An event of the scenario's `input` lines, in decimal, at the tick of its line. |
-| `scroll` | `<x> <z>` | The camera scroll, at tick 1 and at the end of any tick where it differs from the last `scroll` line. Only a scenario with `input` lines logs it (see below). |
+| `scroll` | `<x> <z>` | The camera scroll, at tick 1 and at the end of any tick where it differs from the last `scroll` line. Every scenario logs it (see below). |
+| `view` | `<draws>` | The number of draws made so far from the view random stream, counted from the start of the run, at the end of any tick where it differs from the last `view` line. A draw made between two steps counts into the next tick. See below. |
 | `select` | `<units>` | The local player's selected units, at tick 1 and at the end of any tick where the selection differs from the last `select` line. |
 | `order` | `<KIND> unit <U> target <T or -> pos <x> <y> <z> or - type <NAME or -> param <N or -> amount <A> remove <0 or 1>` | One order given to one unit. See below. |
 | `qbuild` | `<U> <TYPE> <count>` | A click in a factory's build menu changed the build queue of unit `U` by `count` (1 or 5, negative for a right click) of the unit type, or missile, named `TYPE` by the button. |
@@ -120,8 +121,15 @@ nothing is a broken scenario, not a pass. A stored log with no scenario is a fai
 
 ## The scroll snapshot
 
-The `scroll` record is limited to scenarios with `input` lines until issue #652 is done. In a long run without input, the
-camera shake and particles draw from the game's view random stream, and a build can fall one draw behind the reference
-at a tick boundary. The stream is presentation only (no trace field hashes it), but from that point every later shake
-offset differs, so the `scroll` records of such a scenario differ though its traces are equal. #652 finds and fixes the lost
-draw, adds a direct check of the stream against the reference, and then restores the `scroll` record in every scenario.
+The `scroll` record is in every scenario, whether or not it has `input` lines. The camera shake and the particles draw from the
+game's view random stream, which is presentation only (no trace field hashes it), and the shake offset is part of the scroll. A
+build that falls one draw behind the reference at a tick boundary has a different shake offset from then on, so its `scroll` records
+differ though its traces are equal.
+
+## The view stream
+
+The `view` record counts the draws from the view random stream (`HarnessViewRand`), the only random stream that presentation draws
+from. It is absolute: a single line reads on its own, and a build that skips or adds one draw changes the line of that tick and every
+later line. The check names the first tick where the counts differ, so a lost draw is found at the tick it is lost, not at the shake
+tick many ticks later. Draws are counted in the order of the game's own calls; the count says how many draws were made, and the
+`scroll` records say whether they went to the same consumers.

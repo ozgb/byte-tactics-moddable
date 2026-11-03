@@ -30,10 +30,6 @@ typedef char SimView_g_meteorWeaponName[];
 #include "../game/data_files.h"
 #include "../graphics/display.h"
 
-#ifndef BT_REPLAY_INJECT_GAP_SCALE
-#define BT_REPLAY_INJECT_GAP_SCALE 30.0
-#endif
-
 // FUNCTION: 0x437cd0
 void InitMeteors()
 {

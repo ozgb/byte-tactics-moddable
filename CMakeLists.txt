@@ -282,7 +282,7 @@ add_custom_command(
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(replay_test DEPENDS "${CMAKE_BINARY_DIR}/replay_test.exe")
 
-set(REPLAY_SUBSYSTEMS wind_meteors economy)
+set(REPLAY_SUBSYSTEMS wind_meteors economy targeting)
 set(REPLAY_INJECT_wind_meteors BT_REPLAY_INJECT_GAP_SCALE=31.0)
 set(REPLAY_INJECT_economy BT_REPLAY_INJECT_WIND_SCALE=3.0)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/data/subsystems.csv")

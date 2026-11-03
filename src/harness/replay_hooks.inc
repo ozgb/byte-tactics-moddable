@@ -593,12 +593,23 @@ void __stdcall RecAiGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, in
     SlotScope scope(RSL_AI_GETVISIBLEENEMIESINRADIUS, SUB_AI, roots);
     if (scope.Open()) {
         ArgValue(s_call, "player", a0);
-        ArgPending(s_call, "pos");
+        ArgVec3(s_call, "pos", a1);
         ArgValue(s_call, "radius", a2);
         ArgValue(s_call, "flags", a3);
-        ArgPending(s_call, "out");
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i ai.GetVisibleEnemiesInRadius");
+        ImportValue(line, a0);
+        ImportVec3(line, "pos", a1);
+        ImportValue(line, a2);
+        ImportValue(line, a3);
     }
     s_inner_ai->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4);
+    if (scope.Import()) {
+        ImportOutUnits(line, "out", a4, kReplayReachFields + 5, 7);
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -1036,7 +1047,17 @@ int __stdcall RecWeaponsGetWeaponRange(Unit* a0, unsigned int a1)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
         ArgValue(s_call, "weapon", a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i weapons.GetWeaponRange");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, a1);
+    }
     int result = s_inner_weapons->GetWeaponRange(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -1054,7 +1075,18 @@ int __stdcall RecWeaponsWeaponCanReachUnit(Unit* a0, Unit* a1, unsigned char a2)
         ArgObject(s_call, "target", ROK_UNIT, a1);
         ArgValue(s_call, "weapon", a2);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i weapons.WeaponCanReachUnit");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportObject(line, ROK_UNIT, a1);
+        ImportValue(line, a2);
+    }
     int result = s_inner_weapons->WeaponCanReachUnit(a0, a1, a2);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -1300,7 +1332,7 @@ void __stdcall RecTargetingSetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
     SlotScope scope(RSL_TARGETING_SETWEAPONTARGETPOS, SUB_TARGETING, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgPending(s_call, "pos");
+        ArgStruct(s_call, "a", "pos", ROK_VEC3, a1);
         ArgValue(s_call, "weapon", a2);
     }
     s_inner_targeting->SetWeaponTargetPos(a0, a1, a2);
@@ -1359,11 +1391,12 @@ int __stdcall RecTargetingGetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
     SlotScope scope(RSL_TARGETING_GETWEAPONTARGETPOS, SUB_TARGETING, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgPending(s_call, "pos");
+        ArgStruct(s_call, "a", "pos", ROK_VEC3, a1);
         ArgValue(s_call, "weapon", a2);
     }
     int result = s_inner_targeting->GetWeaponTargetPos(a0, a1, a2);
     if (scope.Open()) {
+        ArgStruct(s_tail, "o", "pos", ROK_VEC3, a1);
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
@@ -1890,9 +1923,10 @@ void __stdcall RecOrdersRunSecondaryOrders(Unit* a0)
 void __fastcall RecOrdersDestroyMotionObject(UnitMotion* a0)
 {
     ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
     SlotScope scope(RSL_ORDERS_DESTROYMOTIONOBJECT, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "motion");
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
     }
     s_inner_orders->DestroyMotionObject(a0);
     if (scope.Open()) {
@@ -1902,10 +1936,11 @@ void __fastcall RecOrdersDestroyMotionObject(UnitMotion* a0)
 void __fastcall RecOrdersLoadMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* a3)
 {
     ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
     roots.Add(ROK_UNIT, a2);
     SlotScope scope(RSL_ORDERS_LOADMOTION, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "motion");
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
         ArgValue(s_call, "unusedEdx", a1);
         ArgObject(s_call, "unit", ROK_UNIT, a2);
         ArgHandle(s_call, "file", OBJ_BANK, a3);
@@ -1918,10 +1953,11 @@ void __fastcall RecOrdersLoadMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* 
 void __fastcall RecOrdersSaveMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* a3)
 {
     ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
     roots.Add(ROK_UNIT, a2);
     SlotScope scope(RSL_ORDERS_SAVEMOTION, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "motion");
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
         ArgValue(s_call, "unusedEdx", a1);
         ArgObject(s_call, "unit", ROK_UNIT, a2);
         ArgHandle(s_call, "file", OBJ_BANK, a3);
@@ -1934,10 +1970,11 @@ void __fastcall RecOrdersSaveMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* 
 void __fastcall RecOrdersUpdateMotion(UnitMotion* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
     roots.Add(ROK_UNIT, a2);
     SlotScope scope(RSL_ORDERS_UPDATEMOTION, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "motion");
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
         ArgValue(s_call, "unusedEdx", a1);
         ArgObject(s_call, "unit", ROK_UNIT, a2);
     }
@@ -2082,9 +2119,18 @@ int __stdcall RecUnitsGetGroundHeight(Vec3* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_GETGROUNDHEIGHT, SUB_UNITS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "pos");
+        ArgVec3(s_call, "pos", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i units.GetGroundHeight");
+        ImportVec3(line, "pos", a0);
     }
     int result = s_inner_units->GetGroundHeight(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -2098,9 +2144,17 @@ void __stdcall RecUnitsGetSweetSpot(Unit* a0, Vec3* a1)
     SlotScope scope(RSL_UNITS_GETSWEETSPOT, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgPending(s_call, "out");
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i units.GetSweetSpot");
+        ImportObject(line, ROK_UNIT, a0);
     }
     s_inner_units->GetSweetSpot(a0, a1);
+    if (scope.Import()) {
+        ImportOutVec3(line, "out", a1);
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -2114,7 +2168,17 @@ int __stdcall RecUnitsFindScript(CobScript* a0, const char* a1)
         ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
         ArgValue(s_call, "name", (const char*)a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i units.FindScript");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+    }
     int result = s_inner_units->FindScript(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -2864,10 +2928,11 @@ int __stdcall RecUnitsStartScriptWithArgsByIndex(CobScript* a0, int a1, Callback
 void __fastcall RecUnitsUpdateSfxOccupy(UnitMotion* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
     roots.Add(ROK_UNIT, a2);
     SlotScope scope(RSL_UNITS_UPDATESFXOCCUPY, SUB_UNITS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "motion");
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
         ArgValue(s_call, "unusedEdx", a1);
         ArgObject(s_call, "unit", ROK_UNIT, a2);
     }
@@ -5162,6 +5227,22 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_FILES_BANKWRITEBOX)
             return true;
         return false;
+    case SUB_TARGETING:
+        if (slot == RSL_AI_GETVISIBLEENEMIESINRADIUS)
+            return true;
+        if (slot == RSL_WEAPONS_GETWEAPONRANGE)
+            return true;
+        if (slot == RSL_WEAPONS_WEAPONCANREACHUNIT)
+            return true;
+        if (slot == RSL_UNITS_FINDSCRIPT)
+            return true;
+        if (slot == RSL_UNITS_STARTSCRIPTWITHARGS)
+            return true;
+        if (slot == RSL_UNITS_GETGROUNDHEIGHT)
+            return true;
+        if (slot == RSL_UNITS_GETSWEETSPOT)
+            return true;
+        return false;
     default:
         return false;
     }
@@ -5281,7 +5362,7 @@ void HookSeams(const bool* on)
         s_rec_features.SaveFeatures = RecFeaturesSaveFeatures;
     if (on[SUB_FEATURES])
         s_rec_features.LoadFeatures = RecFeaturesLoadFeatures;
-    if (on[SUB_AI])
+    if (on[SUB_AI] || on[SUB_TARGETING])
         s_rec_ai.GetVisibleEnemiesInRadius = RecAiGetVisibleEnemiesInRadius;
     if (on[SUB_AI])
         s_rec_ai.HasReadyUnitInRange = RecAiHasReadyUnitInRange;
@@ -5345,9 +5426,9 @@ void HookSeams(const bool* on)
         s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
     if (on[SUB_WEAPONS])
         s_rec_weapons.ApplyAreaDamageAt = RecWeaponsApplyAreaDamageAt;
-    if (on[SUB_WEAPONS])
+    if (on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_weapons.GetWeaponRange = RecWeaponsGetWeaponRange;
-    if (on[SUB_WEAPONS])
+    if (on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_weapons.WeaponCanReachUnit = RecWeaponsWeaponCanReachUnit;
     if (on[SUB_WEAPONS])
         s_rec_weapons.FindTargetableProjectile = RecWeaponsFindTargetableProjectile;
@@ -5495,13 +5576,13 @@ void HookSeams(const bool* on)
         s_rec_orders.QueueBuildOrder = RecOrdersQueueBuildOrder;
     if (on[SUB_UNITS])
         s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
-    if (on[SUB_UNITS])
+    if (on[SUB_UNITS] || on[SUB_TARGETING])
         s_rec_units.GetGroundHeight = RecUnitsGetGroundHeight;
-    if (on[SUB_UNITS])
+    if (on[SUB_UNITS] || on[SUB_TARGETING])
         s_rec_units.GetSweetSpot = RecUnitsGetSweetSpot;
-    if (on[SUB_UNITS])
+    if (on[SUB_UNITS] || on[SUB_TARGETING])
         s_rec_units.FindScript = RecUnitsFindScript;
-    if (on[SUB_UNITS] || on[SUB_ECONOMY])
+    if (on[SUB_UNITS] || on[SUB_ECONOMY] || on[SUB_TARGETING])
         s_rec_units.StartScriptWithArgs = RecUnitsStartScriptWithArgs;
     if (on[SUB_UNITS] || on[SUB_ECONOMY])
         s_rec_units.SetStateBits = RecUnitsSetStateBits;

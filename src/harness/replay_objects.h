@@ -28,6 +28,8 @@ struct ReplayReach {
     unsigned count;
     unsigned char kind[REPLAY_MAX_OBJECTS];
     void* object[REPLAY_MAX_OBJECTS];
+    const unsigned short* limit[REPLAY_MAX_OBJECTS];
+    unsigned short limitCount[REPLAY_MAX_OBJECTS];
     short slots[REPLAY_REACH_HASH];
 };
 
@@ -42,7 +44,9 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
 const ReplayObjectField* ReplayFindObjectField(unsigned kind, const char* name);
 int ReplayFindObjectKind(const char* name, unsigned length);
 void* ReplayResolveObject(const char* text, unsigned* kind, ReplayObjectTable& table, ReplayAllocFn alloc);
-void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned char* rootKinds, void* const* roots, unsigned rootCount);
+void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned char* rootKinds, void* const* roots, unsigned rootCount,
+                const unsigned short* rootLimit = nullptr, unsigned rootLimitCount = 0);
+bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex);
 void ReplayCaptureObjects(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, const ReplayReach& reach, const unsigned short* set, unsigned count, char tag);
 void ReplayObjectFieldKey(ReplayText& key, ReplayObjectTable& table, bool assign, unsigned kind, const void* object, const ReplayObjectField& f);
 bool ReplayParseKey(const char* key, unsigned* kind, unsigned* ordinal, const char** field);

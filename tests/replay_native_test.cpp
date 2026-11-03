@@ -11,6 +11,7 @@
 #include "../interfaces/seams.h"
 #include "../src/game/game_state.h"
 #include "../src/game/console_commands.h"
+#include "../src/units/unit_targets.h"
 #include "../src/harness/replay_services.h"
 #include "../src/harness/replay_text.h"
 #include "../src/harness/replay_values.h"
@@ -85,7 +86,7 @@ ConstructedElement::~ConstructedElement()
 
 namespace {
 
-enum { MAX_LINES = 1 << 21, MAX_OUTS = 8, MAX_RECORDS = 64, TEXT = 512 };
+enum { MAX_LINES = 1 << 21, MAX_OUTS = 16384, MAX_RECORDS = 64, TEXT = 512 };
 enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
 
 int g_failures;
@@ -117,6 +118,7 @@ char* g_text;
 char* g_lines[MAX_LINES];
 int g_lineCount;
 char g_subsystem[48];
+const char* g_file = "";
 
 int g_callIndex;
 int g_callFirst;
@@ -398,6 +400,22 @@ const char* OutValue(const char* suffix)
     return nullptr;
 }
 
+const char* OutExact(const char* name)
+{
+    for (int i = 0; i < g_outCount; i++) {
+        if (strcmp(g_outNames[i], name) == 0)
+            return g_outValues[i];
+    }
+    return nullptr;
+}
+
+void ApplyVec3(Vec3* dst, const char* name)
+{
+    const char* value = OutExact(name);
+    if (value != nullptr && dst != nullptr)
+        sscanf(value, "(%d,%d,%d)", &dst->x, &dst->y, &dst->z);
+}
+
 void StartImport(ReplayText& t, const char* name)
 {
     t.Clear();
@@ -574,6 +592,19 @@ void CompareStruct(const char* name, unsigned kind, const void* object)
     value.Free();
 }
 
+void CompareObjectResult(unsigned kind, const void* object)
+{
+    ReplayText value;
+    ReplayAddObjectName(value, g_objects, kind, object, false);
+    HashText(value.Data());
+    const char* recorded = OutLine("result");
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff("result", recorded, value.Data());
+    value.Free();
+}
+
 template <class T> void CompareResult(T result)
 {
     ReplayText value;
@@ -621,9 +652,50 @@ void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr)
 
 namespace {
 
+bool RestoreObjectLine(const char* name, const char* value, const char* file, const ReplaySlotSets* sets, const char* line);
+
+void ApplyUnits(std::vector<Unit*, std::allocator<Unit*> >* out, const char* name)
+{
+    for (int k = 0; k < g_outCount; k++) {
+        const char* key = g_outNames[k];
+        if (strchr(key, '#') == nullptr || strchr(key, '.') == nullptr)
+            continue;
+        RestoreObjectLine(key, g_outValues[k], g_file, nullptr, key);
+        g_known.Set(key, g_outValues[k]);
+    }
+    const char* list = OutExact(name);
+    if (list == nullptr || out == nullptr || list[0] != '[')
+        return;
+    for (const char* p = list + 1; *p != '\0' && *p != ']';) {
+        char token[48];
+        unsigned n = 0;
+        while (*p != '\0' && *p != ',' && *p != ']' && n + 1 < sizeof token)
+            token[n++] = *p++;
+        token[n] = '\0';
+        if (*p == ',')
+            p++;
+        out->push_back((Unit*)ReplayResolveObject(token, nullptr, g_objects, AllocObject));
+    }
+}
+
 void __fastcall LoadMeteorDefaultsSlot(MeteorParams* params)
 {
     params->LoadMeteorDefaults();
+}
+
+unsigned char __fastcall ChooseWeaponSlot(Unit* unit)
+{
+    return unit->ChooseWeapon();
+}
+
+void __stdcall SetWeaponTargetUnitSlot(Unit* unit, Unit* target, int weapon)
+{
+    SetWeaponTargetUnit((char*)unit, (char*)target, weapon);
+}
+
+void __stdcall SetWeaponTargetPosSlot(Unit* unit, Vec3* pos, int weapon)
+{
+    SetWeaponTargetPos((char*)unit, &pos->x, weapon);
 }
 
 void __stdcall ResetSlot(UnitResources* self, unsigned char playerIndex)
@@ -764,7 +836,7 @@ void CompareObjects(const ReplaySlotSets* sets)
     for (unsigned at = 0; at < g_reach.count; at++) {
         for (unsigned i = 0; i < sets->objWriteCount; i++) {
             const ReplayObjectField& f = kReplayObjectFields[sets->objWrites[i]];
-            if (f.object != g_reach.kind[at] || f.kind == RK_EMBED)
+            if (f.object != g_reach.kind[at] || f.kind == RK_EMBED || f.kind == RK_UNITID || !ReplayInReach(g_reach, at, sets->objWrites[i]))
                 continue;
             ReplayObjectFieldKey(key, g_objects, false, g_reach.kind[at], g_reach.object[at], f);
             ReplayFormatObjectField(f, g_reach.object[at], g_objects, false, value);
@@ -959,6 +1031,7 @@ void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
         printf("FAIL: cannot read %s\n", file);
         exit(2);
     }
+    g_file = file;
     if (g_lineCount < 2 || strcmp(g_lines[0], "bt-replay 2") != 0 || strncmp(g_lines[1], "subsystem ", 10) != 0)
         Fatal(file, 0, "not a bt-replay 2 recording", g_lines[0]);
     char version[32] = "";

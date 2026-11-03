@@ -64,7 +64,7 @@ their value forms are the `objects` of the schema:
 | state, `table` | `Player`, `Unit` | the slot: `Player#3` is `Game::players[3]`, `Unit#17` is slot 17 of the unit table | the array in the block, or the slice of the unit pool |
 | state, `inside` | `UnitResources` of a unit | the unit and the member: `Unit#17.resourceSlot` | a member of another kind |
 | index | `weapondef` | the index in `Game::weapons` | in the block's weapon array |
-| value | `MeteorParams` | none: the lines are written with the argument's name, `params.radius` | an argument struct of one call |
+| value | `MeteorParams`, `Vec3` | none: the lines are written with the argument's name, `params.radius`, `pos.x` | an argument struct of one call |
 | handle | `file`, `rec`, `bank` | order of first use in the outermost call | the import's own objects, not state |
 
 A kind with a `table` is named by its slot because the module walks it by address (`for (u = begin; u <= end; u++)`):
@@ -135,6 +135,21 @@ sets). The annotations hold what no header says:
   "member": "resourceSlot"}`) names a kind that lives in a member of another kind (`Unit#17.resourceSlot`), a field of kind
   `embed` leads to such an object, `range_end_of` marks the end pointer of a closed range, and `aliases` (`Unit::cloakOn`) are
   the other targets of the rows that one field records (a bit field is recorded as its word).
+- Field kinds that point rather than hold a value. `unitid` is a 16-bit unit id (`weapon0TargetX` holds either an x position or
+  a unit id; `weapon0TargetUnit` is the same bytes read as an id) that the walker follows to `Unit#<id>`, but only when its `when`
+  field (`weapon0TargetZ`) equals the given value (-32768, the sentinel that says the slot holds a unit); it is never written
+  as a line, and the unit it leads to records only the fields of its `reach`. `rawbytes` is a raw pointer (not a `Ref`) to a
+  fixed number of bytes (`size`) outside the block, written as `x:` and hex or `null`, which the replayer allocates and points
+  at; it is for the category masks of a unit definition, which are heap objects (`new UnitTypeSet` in `GetCategoryMask`)
+  written only while the unit definitions load. A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
+  are recorded as `r weapondef#17.flags` lines. A field may name a `member` of its type that is not its own name
+  (`weapons[1].aimTargetXOrUnitId`, `pos.x`), so that an array element or a part of a `Vec3` is a field.
+- `reach`: a list of `Kind.field` names with an explicit `depth` (the number of objects from the root to the farthest, at most 2),
+  on a `unitid` field and on a `units` argument. An object reached through it is recorded with only the listed fields, and
+  the walk follows only the listed pointers, so `Unit.def` with `UnitDef.flags1` is depth 2. `replayschema.py --check` fails
+  when the depth is not the one the list has, or a name is no field.
+- A field a slot writes through a pointer it cannot name exactly (a weapon slot picked by an index) is also in its read set,
+  so that a change made outside the seam is recorded at the entry as an `r` line, not mistaken for a write of the module.
 - `subsystems.<name>`: `status` (`complete` or `pending`, with the `issue` that completes it), the `imports` (slots of
   other seams the subsystem calls) and per slot the `functions` behind it, the `native` symbol the replayer calls,
   and how each pointer argument is recorded:
@@ -146,14 +161,15 @@ sets). The annotations hold what no header says:
 | `text` | `char*` | `a name "text"` |
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
 | `object` | a pointer to a state kind, in | `a player Player#1`, its fields as `r` and `w` |
-| `struct` (`dir` in or out) | a pointer to a value kind | `a params.field value` in, `o params.field value` out |
+| `struct` (`dir` in, out or inout) | a pointer to a value kind | `a params.field value` in, `o params.field value` out; `inout` writes both, so the replay feeds the incoming value (`a pos.y 65536`) and compares the outgoing one (`o pos.y 131072`) |
 | `argv` | `CommandArgs*` | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length) |
 | `weapon` | `WeaponDef*` | `weapondef#17` |
-| `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line |
+| `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line; with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
+| `units` (`dir: out`) | `std::vector<Unit*>*` an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
 
-A result is `scalar`, `object`, `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
+A result is `scalar`, `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
 A `pending` subsystem lists in its generated `pending` entry what is left (untracked targets, rows with no rule,
 slots whose functions are not found, arguments with no annotation); its own issue empties that list. A complete

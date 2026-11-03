@@ -53,7 +53,8 @@ SIZES = {"i32": 4, "u32": 4, "u16": 2, "f32": 4, "u8": 1, "i16": 2, "f64": 8}
 BLOCK_KINDS = {"field_read": "r", "field_write": "w", "global_read": "r", "global_write": "w", "global_maybe_written": "rw"}
 OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "rw"}
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
-               "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED"}
+               "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
+               "unitid": "UNITID", "rawbytes": "RAWBYTES"}
 TABLES = {"units": "RT_UNITS", "players": "RT_PLAYERS"}
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
            "bool", "float", "double", "Point16", "Vec3", "RandStream"}
@@ -169,6 +170,64 @@ def object_targets(target: str, ann: dict) -> list[tuple[str, str]]:
     return hits
 
 
+WALKABLE = ("ref", "embed", "unitid", "weapon")
+MAX_REACH_DEPTH = 2
+
+
+def reach_depth(kind: str, names: set, ann: dict, seen: tuple = ()) -> int:
+    """Objects deep a reach list goes from `kind`: the kind is 1, and each listed pointer field adds the depth of its target."""
+    if kind in seen:
+        return 99
+    deepest = 0
+    for f in ann["objects"][kind]["fields"]:
+        if "%s.%s" % (kind, f["name"]) in names and f["kind"] in WALKABLE and f.get("target"):
+            deepest = max(deepest, reach_depth(f["target"], names, ann, seen + (kind,)))
+    return 1 + deepest
+
+
+def resolve_reach(where: str, spec: dict, root: str, ann: dict, object_fields: list, object_index: dict, table: list) -> list[str]:
+    """Checks the `reach` list of a spec (field names `Kind.field`, and its explicit `depth`) and gives it a slice of the table."""
+    errors = []
+    spec["reachFirst"], spec["reachCount"] = 0, 0
+    names = spec.get("reach")
+    if not names:
+        return ["%s needs a reach list" % where]
+    indices = []
+    for n in names:
+        kind, _, field = n.partition(".")
+        if (kind, field) not in object_index:
+            errors.append("%s: the reach names the unknown field %s" % (where, n))
+        else:
+            indices.append(object_index[(kind, field)])
+    if errors:
+        return errors
+    depth = reach_depth(root, set(names), ann)
+    if spec.get("depth") != depth or depth > MAX_REACH_DEPTH:
+        errors.append("%s: the reach is %d deep and its depth says %s (at most %d)" % (where, depth, spec.get("depth"), MAX_REACH_DEPTH))
+    for i in range(len(table) - len(indices) + 1):
+        if table[i:i + len(indices)] == indices:
+            spec["reachFirst"], spec["reachCount"] = i, len(indices)
+            return errors
+    spec["reachFirst"], spec["reachCount"] = len(table), len(indices)
+    table.extend(indices)
+    return errors
+
+
+def resolve_field_reaches(ann: dict, object_fields: list, object_index: dict, table: list) -> list[str]:
+    errors = []
+    for f in object_fields:
+        if f["kind"] == "unitid":
+            where = "%s.%s" % (f["object"], f["name"])
+            errors += resolve_reach(where, f, f["target"], ann, object_fields, object_index, table)
+            when = f.get("when")
+            if not when or (f["object"], when["field"]) not in object_index:
+                errors.append("%s: a unitid field names the field and the value that make it an id" % where)
+            else:
+                f["condField"] = object_index[(f["object"], when["field"])] + 1
+                f["condValue"] = when["equals"]
+    return errors
+
+
 def functions_of(slot: dict, subsystem: str, assignment: dict[str, list[str]], note: dict) -> list[str]:
     if "functions" in note:
         return note["functions"]
@@ -240,6 +299,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
         for f in spec["fields"]:
             object_fields.append(dict(f, object=kind))
     object_index = {(f["object"], f["name"]): i for i, f in enumerate(object_fields)}
+    reach_table: list[int] = []
+    errors += resolve_field_reaches(ann, object_fields, object_index, reach_table)
     by_function: dict[str, list[dict]] = {}
     for r in rows:
         by_function.setdefault(r["function"], []).append(r)
@@ -336,6 +397,9 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 writes.update(RNG_FIELDS)
             order = list(field_index)
             args = [classify_arg(p, note.get("args", {}).get(p["name"]), ann) for p in s["params"]]
+            for a in args:
+                if a["mode"] == "units":
+                    errors += resolve_reach("%s.%s(%s)" % (sub, s["name"], a["name"]), a, a["kind"], ann, object_fields, object_index, reach_table)
             result = classify_result(s["ret"], note.get("result"), ann)
             for a in args:
                 if a["mode"] == "pending":
@@ -376,7 +440,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             seam, slot = imp.split(".")
             if slot not in subsystems.get(seam, {}).get("slots", {}):
                 errors.append("%s imports %s, which is no slot of the %s interface" % (sub, imp, seam))
-    return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list}, errors
+    return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table}, errors
 
 
 def check_sim_names(sim: dict) -> list[str]:
@@ -461,9 +525,12 @@ def render_schema(ann: dict, model: dict) -> str:
         t = types[f["object"]]
         size = f.get("size")
         size_text = str(size) if size else "sizeof(((%s*)nullptr)->%s)" % (t, member)
-        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed") else "0"
-        L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d },' % (f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target, range_end.get(i, 0), range_begin.get(i, 0)))
+        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid") else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else "0")
+        L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %d, %d, %d, %d },' % (
+            f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target, range_end.get(i, 0), range_begin.get(i, 0),
+            f.get("condField", 0), f.get("condValue", 0), f.get("reachFirst", 0), f.get("reachCount", 0)))
     L += ["};", "static const unsigned kReplayObjectFieldCount = %d;" % len(ofields), ""]
+    L += ["static const unsigned short kReplayReachFields[] = { %s };" % ", ".join(str(i) for i in model["reach_table"] or [0]), ""]
     for f in ofields:
         t = types[f["object"]]
         member = f.get("member", f["name"])
@@ -471,8 +538,10 @@ def render_schema(ann: dict, model: dict) -> str:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s has the size of its kind");' % (t, member, types[f["target"]], t, f["name"]))
         elif f["kind"] == "bytes":
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, f["size"], t, f["name"]))
+        elif f["kind"] == "rawbytes":
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a pointer");' % (t, member, t, f["name"]))
         elif f.get("size") is None:
-            want = {"i32": 4, "u32": 4, "u16": 2, "i16": 2, "f32": 4, "flags": 4, "ref": 4, "point16": 4, "weapon": 4, "u8": 1, "f64": 8}[f["kind"]]
+            want = {"i32": 4, "u32": 4, "u16": 2, "i16": 2, "f32": 4, "flags": 4, "ref": 4, "point16": 4, "weapon": 4, "u8": 1, "f64": 8, "unitid": 2}[f["kind"]]
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, want, t, f["name"]))
     L += ["", "enum ReplaySubsystemId {"]
     L += ["    SUB_%s," % upper(s) for s in subsystems]
@@ -600,6 +669,10 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         for i, a in enumerate(s["args"]):
             if a["mode"] == "bytes-out":
                 L.append('        ImportOutBytes(line, "%s", a%d, (int)result, a%d);' % (a["line"], i, a["lengthIndex"]))
+            elif a["mode"] == "vec3" and a.get("dir") == "out":
+                L.append('        ImportOutVec3(line, "%s", a%d);' % (a["line"], i))
+            elif a["mode"] == "units":
+                L.append('        ImportOutUnits(line, "%s", a%d, kReplayReachFields + %d, %d);' % (a["line"], i, a["reachFirst"], a["reachCount"]))
         L.append("        FinishImport(line);")
         L.append("    }")
     L.append("    if (scope.Open()) {")
@@ -643,9 +716,9 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "i":
             return ["ImportObject(line, ROK_%s, %s);" % (upper(a["kind"]), var)]
     elif mode == "struct":
-        if a.get("dir", "in") == "in" and phase == "a":
+        if a.get("dir", "in") in ("in", "inout") and phase == "a":
             return ['ArgStruct(s_call, "a", "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
-        if a.get("dir") == "out" and phase == "o":
+        if a.get("dir") in ("out", "inout") and phase == "o":
             return ['ArgStruct(s_tail, "o", "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
     elif mode == "argv":
         if phase == "a":
@@ -656,10 +729,14 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "i":
             return ["ImportWeapon(line, %s);" % var]
     elif mode == "vec3":
+        if a.get("dir") == "out":
+            return []
         if phase == "a":
             return ['ArgVec3(s_call, "%s", %s);' % (line, var)]
         if phase == "i":
             return ['ImportVec3(line, "%s", %s);' % (a.get("label", line), var)]
+    elif mode == "units":
+        return []
     elif mode == "bytes-in":
         if phase == "a":
             return ['ArgPending(s_call, "%s");' % line]
@@ -717,7 +794,8 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for imp in spec["imports"]:
             seam, slot = imp.split(".")
-            imports.setdefault(seam, []).append(slot)
+            if slot not in imports.setdefault(seam, []):
+                imports[seam].append(slot)
     for seam, slots in imports.items():
         spec = subsystems[seam]
         for slot in slots:
@@ -744,7 +822,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") == "out" for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -780,6 +858,10 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append("    Space(t);\n    AddObject(t, %s, %s);" % (handle_id(a["kind"]), v))
         elif m == "weapon":
             L.append("    Space(t);\n    ReplayAddWeapon(t, %s);" % v)
+        elif m == "vec3" and a.get("dir") == "out":
+            pass
+        elif m == "units":
+            pass
         elif m == "vec3":
             L.append('    Space(t);\n    t.Add("%s=");\n    AddVec3(t, %s);' % (a.get("label", a["line"]), v))
         elif m == "object":
@@ -792,6 +874,10 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
     for i, a in enumerate(s["args"]):
         if a["mode"] == "bytes-out":
             L.append('    ApplyBytes(a%d, a%d, "%s");' % (i, a["lengthIndex"], a["line"]))
+        elif a["mode"] == "vec3" and a.get("dir") == "out":
+            L.append('    ApplyVec3(a%d, "%s");' % (i, a["line"]))
+        elif a["mode"] == "units":
+            L.append('    ApplyUnits(a%d, "%s");' % (i, a["line"]))
     res = s["result"]
     if res is None:
         L.append("    (void)r;")
@@ -847,6 +933,8 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
                 g = "g_out_%s_%s_%d" % (sub, slot, i)
                 head.append("%s %s;" % (ctype, g))
                 L.append("    memset(&%s, 0, sizeof %s);" % (g, g))
+                if a["dir"] == "inout":
+                    L.append('    ParseStruct("%s", ROK_%s, &%s);' % (line, upper(a["kind"]), g))
                 closing.append(line + ".")
                 after.append('    CompareStruct("%s", ROK_%s, &%s);' % (line, upper(a["kind"]), g))
                 call.append("&" + g)
@@ -867,7 +955,9 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
         g = "g_result_%s_%s" % (sub, slot)
         head.append("%s %s;" % (s["ret"], g))
         L.append("    %s = %s;" % (g, expr))
-        if res["mode"] in ("scalar", "object"):
+        if res["mode"] == "object":
+            after.append("    CompareObjectResult(ROK_%s, %s);" % (upper(res["kind"]), g))
+        elif res["mode"] == "scalar":
             after.append("    CompareResult(%s);" % g)
     L += ["}", ""]
     out = head + [""] if head else []

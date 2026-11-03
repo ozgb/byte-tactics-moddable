@@ -86,10 +86,13 @@ class Accounting(unittest.TestCase):
         self.assertEqual([e for e in errors if "pending" in e], [])
 
     def test_a_pending_subsystem_lists_what_is_left(self):
-        model, errors = build([row("SetWeaponTargetUnit", "field_read", "Game::mapWidth"), row("SetWeaponTargetUnit", "field_escape", "Unit::unmatched")])
-        pending = model["subsystems"]["targeting"]["pending"]
+        assignment = rs.read_assignment()
+        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting")
+                             for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
+        model, errors = build([row(slot, "field_read", "Game::mapWidth"), row(slot, "field_escape", "Unit::unmatched")])
+        pending = model["subsystems"][sub]["pending"]
         self.assertTrue(pending["untracked"] >= 1 and pending["ruleless"] >= 1)
-        self.assertEqual([e for e in errors if "targeting" in e], [])
+        self.assertEqual([e for e in errors if sub in e], [])
 
     def test_a_row_with_no_rule_is_an_error_for_a_complete_subsystem(self):
         _, errors = build([row("UpdateMeteors", "field_escape", "Game::unmatched")])
@@ -145,8 +148,8 @@ class Rules(unittest.TestCase):
         lines = files[rs.SCHEMA_H].split("\n")
         begin = [l for l in lines if l.startswith('    { "unitsBegin"')][0].rstrip(" },").split(", ")
         end = [l for l in lines if l.startswith('    { "unitsEnd"')][0].rstrip(" },").split(", ")
-        self.assertTrue(int(begin[-2]) > 0 and int(begin[-1]) == 0, begin)
-        self.assertTrue(int(end[-2]) == 0 and int(end[-1]) > 0, end)
+        self.assertTrue(int(begin[-6]) > 0 and int(begin[-5]) == 0, begin)
+        self.assertTrue(int(end[-6]) == 0 and int(end[-5]) > 0, end)
 
 
 class Services(unittest.TestCase):
@@ -170,6 +173,84 @@ class Services(unittest.TestCase):
         for s in annotations()["services"]:
             self.assertIn("case %s:" % s["id"], files[rs.SERVICES_INC])
             self.assertIn("StartImport(t, %s);" % s["id"], files[rs.SERVICES_SLOTS])
+
+
+class TargetingForms(unittest.TestCase):
+    """The forms #669 added: unit-id fields, raw byte pointers, in-out structs, vec3 out, unit vectors and reach lists."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def test_a_pos_the_slot_both_reads_and_writes_is_in_out(self):
+        _, _, model = self.generated()
+        slots = model["subsystems"]["targeting"]["slots"]
+        self.assertEqual([a["dir"] for a in slots["GetWeaponTargetPos"]["args"] if a["mode"] == "struct"], ["inout"])
+        self.assertEqual([a["dir"] for a in slots["SetWeaponTargetPos"]["args"] if a["mode"] == "struct"], ["in"])
+
+    def test_an_in_out_struct_is_recorded_on_entry_and_on_exit(self):
+        files, _, _ = self.generated()
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecTargetingGetWeaponTargetPos"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('ArgStruct(s_call, "a", "pos", ROK_VEC3, a1);', body)
+        self.assertIn('ArgStruct(s_tail, "o", "pos", ROK_VEC3, a1);', body)
+
+    def test_an_in_out_struct_is_fed_to_the_module_and_compared_after(self):
+        files, _, _ = self.generated()
+        runner = files[rs.SLOTS_H]
+        body = runner[runner.index("void Run_targeting_GetWeaponTargetPos"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('ParseStruct("pos", ROK_VEC3', body)
+        self.assertIn('SetClosing("pos.", "result")', body)
+
+    def test_a_vec3_out_of_an_import_is_recorded_after_the_call_and_applied_by_the_stub(self):
+        files, _, _ = self.generated()
+        self.assertIn('ImportOutVec3(line, "out", a1);', files[rs.HOOKS_H])
+        self.assertIn('ApplyVec3(a1, "out");', files[rs.SLOTS_H])
+
+    def test_a_unit_vector_out_carries_its_reach_into_the_table(self):
+        files, _, model = self.generated()
+        out = [a for a in model["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadius"]["args"] if a["name"] == "out"][0]
+        self.assertEqual((out["mode"], out["reachCount"], out["depth"]), ("units", 7, 2))
+        self.assertIn("ImportOutUnits(line, \"out\", a4, kReplayReachFields + %d, 7);" % out["reachFirst"], files[rs.HOOKS_H])
+        self.assertIn("ApplyUnits(a4, \"out\");", files[rs.SLOTS_H])
+
+    def test_a_reach_deeper_than_its_depth_is_an_error(self):
+        ann = annotations()
+        out = ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]
+        out["reach"] = out["reach"] + ["UnitDef.flags1", "Unit.player", "Player.unitsBegin"]
+        out["depth"] = 2
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("deep and its depth says" in e for e in errors), errors)
+
+    def test_a_reach_that_names_no_field_is_an_error(self):
+        ann = annotations()
+        ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]["reach"].append("Unit.noSuchField")
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("unknown field Unit.noSuchField" in e for e in errors), errors)
+
+    def test_a_unit_id_field_names_the_value_that_makes_it_an_id(self):
+        files, _, _ = self.generated()
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "weapon0TargetUnit"')][0]
+        self.assertIn("RK_UNITID", row)
+        self.assertIn("-32768", row)
+        ann = annotations()
+        del [f for f in ann["objects"]["Unit"]["fields"] if f["name"] == "weapon1TargetUnit"][0]["when"]
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("weapon1TargetUnit" in e and "value that make it an id" in e for e in errors), errors)
+
+    def test_a_raw_pointer_is_checked_to_be_a_pointer(self):
+        files, _, _ = self.generated()
+        self.assertIn("UnitDef::categories is a pointer", files[rs.SCHEMA_H])
+        self.assertTrue(any(l.startswith('    { "weaponCategories2"') and "RK_RAWBYTES" in l for l in files[rs.SCHEMA_H].split("\n")))
+
+    def test_two_subsystems_importing_one_slot_get_one_stub(self):
+        files, _, _ = self.generated()
+        self.assertEqual(files[rs.SLOTS_H].count("int __stdcall Imp_units_StartScriptWithArgs("), 1)
+
+    def test_an_object_result_is_compared_by_name(self):
+        files, _, _ = self.generated()
+        self.assertIn("CompareObjectResult(ROK_UNIT, g_result_targeting_FindWeaponTarget);", files[rs.SLOTS_H])
 
 
 class Committed(unittest.TestCase):

@@ -127,6 +127,7 @@ src/game/game_state.cpp,src/gui/gui.h,#392
 src/game/game_state.cpp,src/gui/gui_file.h,#392
 src/game/game_state.cpp,src/ingame/build_placement.h,#392
 src/game/game_state.cpp,src/ingame/control_panel.h,#392
+src/game/game_state.cpp,src/ingame/game_dialogs.h,#392
 src/game/game_state.cpp,src/ingame/info_panel.h,#392
 src/game/game_state.cpp,src/ingame/selection.h,#392
 src/game/game_state.cpp,src/sound/sound.h,#392
@@ -219,7 +220,6 @@ src/graphics/particles.cpp,src/graphics/particles.h,#392
 src/graphics/particles.cpp,src/graphics/rect.h,#392
 src/graphics/particles.cpp,src/graphics/smoke_particle.h,#392
 src/graphics/particles.cpp,src/graphics/timed_sub_particles.h,#392
-src/graphics/particles.cpp,src/ingame/game_dialogs.h,#620
 src/graphics/pcx.cpp,interfaces/host.h,#392
 src/graphics/pcx.cpp,src/graphics/display.h,#392
 src/graphics/pcx.cpp,src/graphics/object3do.h,#392
@@ -361,6 +361,7 @@ src/map/line_of_sight.cpp,src/graphics/gaf.h,#392
 src/map/line_of_sight.cpp,src/graphics/gaf_frame.h,#392
 src/map/line_of_sight.cpp,src/graphics/object_pool.h,#392
 src/map/line_of_sight.cpp,src/graphics/rect.h,#392
+src/map/map_list.cpp,interfaces/host.h,#392
 src/map/map_list.cpp,src/graphics/display.h,#392
 src/map/map_list.cpp,src/graphics/object_pool.h,#392
 src/map/map_list.cpp,src/graphics/palette.h,#392
@@ -423,6 +424,7 @@ src/units/unit_scripts.cpp,src/sound/sound.h,#392
 src/units/unit_targets.cpp,interfaces/host.h,#392
 src/units/unit_targets.cpp,src/graphics/display.h,#392
 src/units/unit_targets.cpp,src/ingame/game_dialogs.h,#392
+src/units/unit_types.cpp,interfaces/host.h,#392
 src/units/unit_types.cpp,src/graphics/display.h,#392
 src/units/unit_types.cpp,src/graphics/memory_cache.h,#392
 src/units/unit_types.cpp,src/graphics/object_pool.h,#392

@@ -559,7 +559,8 @@ void ShutdownIngameSystems()
     ((Sound*)g_game->sound)->SetTrackCategory(4);
     CollectEndGameStats();
     g_seams.wind_meteors->EmptyShutdownPreCleanup();
-    for (Unit* u = g_game->units; u != nullptr && u <= g_game->unitsEnd; u = (Unit*)((char*)u + 0x118)) {
+    Unit* unitsEnd = g_game->unitsEnd;
+    for (Unit* u = g_game->units; u != nullptr && u <= unitsEnd; u = (Unit*)((char*)u + 0x118)) {
         if (u->unitDefIndex != 0)
             g_seams.units->KillUnit(u, 8);
     }

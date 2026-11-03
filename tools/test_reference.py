@@ -974,5 +974,176 @@ class TracediffCommandTest(unittest.TestCase):
         self.assertEqual(cmd[cmd.index("--game-dir") + 1], "/ta")
 
 
+class GateCacheTest(unittest.TestCase):
+    OPTIONS = {"tier": False, "mode": "wasm", "steps_per_frame": None, "quirks": None, "roundtrip": None, "poison": False}
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = Path(tmp.name) / "root"
+        self.build = Path(tmp.name) / "build"
+        self.cache = Path(tmp.name) / "cache"
+        self.build.mkdir()
+        for relative in (*reference.KEY_TREES, "tools"):
+            (self.root / relative).mkdir(parents=True, exist_ok=True)
+        for relative in reference.KEY_TREES:
+            (self.root / relative / "a.txt").write_text("a")
+        for relative in reference.KEY_TOOLS:
+            (self.root / relative).write_text(relative)
+        (self.root / "reference/commit.txt").write_text("c1")
+        (self.root / "data").mkdir()
+        (self.root / "data/block_pointers.csv").write_text("site,class\n")
+        (self.root / "tools/reference.py").write_text("import helper\nfrom helper import x\n")
+        (self.root / "tools/helper.py").write_text("def f():\n    import deeper\n")
+        (self.root / "tools/deeper.py").write_text("x = 1\n")
+        (self.root / "tools/unrelated.py").write_text("y = 1\n")
+        self.exe = self.build / "TotalA.exe"
+        for name in ("TotalA.exe", "wasmtime_host.dll", "modules.json", "m.wasm"):
+            (self.build / name).write_text(name)
+        patch = mock.patch.dict(os.environ, {reference.CACHE_ENV: str(self.cache)})
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def key(self, **options):
+        return reference.gate_key(self.exe, {**self.OPTIONS, **options}, self.root)
+
+    def test_the_key_is_stable(self):
+        self.assertEqual(self.key(), self.key())
+
+    def test_each_input_changes_the_key(self):
+        base = self.key()
+        edits = [self.build / n for n in ("TotalA.exe", "wasmtime_host.dll", "modules.json", "m.wasm")]
+        edits += [self.root / r / "a.txt" for r in reference.KEY_TREES]
+        edits += [self.root / r for r in reference.KEY_TOOLS]
+        edits += [self.root / r for r in reference.KEY_DATA]
+        edits += [self.root / "tools/helper.py", self.root / "tools/deeper.py"]
+        for path in edits:
+            old = path.read_text()
+            path.write_text(old + "x")
+            self.assertNotEqual(self.key(), base, str(path))
+            path.write_text(old)
+        self.assertEqual(self.key(), base)
+
+    def test_savefile_block_pointers_and_imports_change_the_key(self):
+        base = self.key()
+        for relative in ("tools/savefile.py", "data/block_pointers.csv", "tools/deeper.py"):
+            self.assertIn(relative, (*reference.KEY_TOOLS, *reference.KEY_DATA, "tools/deeper.py"))
+            path = self.root / relative
+            old = path.read_text()
+            path.write_text(old + "\n# changed\n")
+            self.assertNotEqual(self.key(), base, relative)
+            path.write_text(old)
+        self.assertEqual(self.key(), base)
+
+    def test_a_module_nothing_imports_is_not_in_the_key(self):
+        base = self.key()
+        (self.root / "tools/unrelated.py").write_text("y = 2\n")
+        self.assertEqual(self.key(), base)
+
+    def test_the_map_beside_the_exe_and_its_absence_change_the_key(self):
+        absent = self.key()
+        (self.build / "TotalA.map").write_text("m1")
+        present = self.key()
+        (self.build / "TotalA.map").write_text("m2")
+        self.assertEqual(len({absent, present, self.key()}), 3)
+
+    def test_a_new_file_in_a_stored_tree_changes_the_key(self):
+        base = self.key()
+        (self.root / "reference/frames/s").mkdir()
+        (self.root / "reference/frames/s/0.bin").write_text("f")
+        self.assertNotEqual(self.key(), base)
+
+    def test_each_option_changes_the_key(self):
+        base = self.key()
+        for name, value in (("tier", True), ("mode", "native"), ("mode", "both"), ("steps_per_frame", 2),
+                            ("quirks", "recommended"), ("roundtrip", "auto"), ("poison", True)):
+            self.assertNotEqual(self.key(**{name: value}), base, name)
+
+    def test_commit_txt_does_not_change_the_key(self):
+        base = self.key()
+        (self.root / "reference/commit.txt").write_text("c2")
+        (self.build / "commit.txt").write_text("c2")
+        self.assertEqual(self.key(), base)
+
+    def test_nothing_is_stored_until_a_pass_is_written(self):
+        self.assertIsNone(reference.cached_pass(self.key()))
+        self.assertFalse(self.cache.exists())
+
+    def test_a_pass_is_stored_with_date_commit_and_output(self):
+        now = reference.datetime(2026, 11, 3, 12, 0, 0, tzinfo=reference.timezone.utc)
+        path = reference.store_pass("k", "ok a\n2 of 2 equal\n", "abc123", now)
+        self.assertEqual(path, self.cache / "k.txt")
+        self.assertEqual(path.read_text(), "date: 2026-11-03 12:00:00 UTC\ncommit: abc123\nok a\n2 of 2 equal\n")
+        self.assertEqual(reference.cached_pass("k"), path.read_text())
+
+    def test_the_hit_prints_the_date_commit_and_stored_lines(self):
+        reference.store_pass("k", "ok a\n2 of 2 equal\n", "abc123", reference.datetime(2026, 11, 3, tzinfo=reference.timezone.utc))
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            reference.report_cached(reference.cached_pass("k"))
+        self.assertEqual(out.getvalue(), "cached pass from 2026-11-03 00:00:00 UTC at abc123\nok a\n2 of 2 equal\n")
+
+    def run_main(self, check, *extra):
+        argv = ["reference.py", "--check", "--exe", str(self.exe), *extra]
+        with mock.patch.object(sys, "argv", argv), mock.patch.object(reference, "ROOT", self.root), \
+                mock.patch.object(reference, "check_traces", check), mock.patch.object(reference, "head_commit", return_value="abc"), \
+                mock.patch.object(reference, "GateLock", mock.MagicMock()), contextlib.redirect_stdout(io.StringIO()) as out:
+            try:
+                reference.main()
+                code = 0
+            except SystemExit as e:
+                code = e.code
+        return code, out.getvalue()
+
+    def test_main_plays_once_then_reports_the_cached_pass(self):
+        played = []
+
+        def check(*args):
+            played.append(args)
+            print("ok a\n1 of 1 equal")
+
+        code, out = self.run_main(check)
+        self.assertEqual((code, len(played), out), (0, 1, "ok a\n1 of 1 equal\n"))
+        code, out = self.run_main(check)
+        self.assertEqual((code, len(played)), (0, 1))
+        self.assertTrue(out.startswith("cached pass from "))
+        self.assertTrue(out.endswith(" at abc\nok a\n1 of 1 equal\n"))
+
+    def test_main_plays_again_with_no_cache_or_other_options(self):
+        played = []
+        self.run_main(lambda *a: played.append(a))
+        self.run_main(lambda *a: played.append(a), "--no-cache")
+        self.run_main(lambda *a: played.append(a), "--tier")
+        self.assertEqual(len(played), 3)
+
+    def test_main_stores_nothing_for_a_failing_run(self):
+        def check(*args):
+            print("DIFF a")
+            sys.exit(1)
+
+        code, _ = self.run_main(check)
+        self.assertEqual(code, 1)
+        self.assertEqual(list(self.cache.glob("*.txt")) if self.cache.exists() else [], [])
+
+    def test_a_pass_that_appears_while_waiting_for_the_lock_is_reported(self):
+        played = []
+        key = self.key(mode="wasm")
+
+        class Lock:
+            def __enter__(inner):
+                reference.store_pass(key, "ok a\n", "other")
+
+            def __exit__(inner, *exc):
+                pass
+
+        with mock.patch.object(reference, "GateLock", Lock):
+            argv = ["reference.py", "--check", "--exe", str(self.exe)]
+            with mock.patch.object(sys, "argv", argv), mock.patch.object(reference, "ROOT", self.root), \
+                    mock.patch.object(reference, "check_traces", lambda *a: played.append(a)), \
+                    contextlib.redirect_stdout(io.StringIO()) as out:
+                reference.main()
+        self.assertEqual(played, [])
+        self.assertIn("at other\nok a\n", out.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main()

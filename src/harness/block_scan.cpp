@@ -447,19 +447,47 @@ inline void ProbeWord(unsigned a, unsigned b, unsigned off, Row& key, unsigned t
         Probe(v3, off + 3, key, tick);
 }
 
+typedef int Lanes __attribute__((vector_size(16)));
+typedef float Floats __attribute__((vector_size(16)));
+
+__attribute__((target("sse2"))) unsigned ScanLanes(const unsigned char* bytes, unsigned size, Row& key, unsigned tick)
+{
+    const unsigned bound = (g_spanMax - g_spanMin) ^ 0x80000000u;
+    const Lanes bias = { (int)0x80000000, (int)0x80000000, (int)0x80000000, (int)0x80000000 };
+    const Lanes lows = { (int)g_spanMin, (int)g_spanMin, (int)g_spanMin, (int)g_spanMin };
+    const Lanes bounds = { (int)bound, (int)bound, (int)bound, (int)bound };
+    unsigned off = 0;
+    for (; off + 19 <= size; off += 16) {
+        Lanes v[4];
+        unsigned outside = 0;
+        for (unsigned k = 0; k < 4; k++) {
+            memcpy(&v[k], bytes + off + k, sizeof v[k]);
+            Lanes out = ((v[k] - lows) ^ bias) > bounds;
+            outside |= (unsigned)__builtin_ia32_movmskps((Floats)out) << (4 * k);
+        }
+        unsigned candidates = ~outside & 0xffff;
+        if (candidates == 0)
+            continue;
+        unsigned values[16];
+        memcpy(values, v, sizeof values);
+        do {
+            unsigned bit = __builtin_ctz(candidates);
+            candidates &= candidates - 1;
+            unsigned value = values[bit];
+            unsigned page = value >> kPageShift;
+            unsigned before = (value - 1) >> kPageShift;
+            if ((g_pages[page >> 5] >> (page & 31) | g_pages[before >> 5] >> (before & 31)) & 1)
+                Probe(value, off + (bit >> 2) + 4 * (bit & 3), key, tick);
+        } while (candidates != 0);
+    }
+    return off;
+}
+
 void ScanFast(const unsigned char* bytes, unsigned size, Row& key, unsigned tick)
 {
     const unsigned spanMin = g_spanMin;
     const unsigned spanRange = g_spanMax - g_spanMin;
-    unsigned off = 0;
-    for (; off + 20 <= size; off += 16) {
-        unsigned q[5];
-        memcpy(q, bytes + off, sizeof q);
-        if ((q[0] | q[1] | q[2] | q[3] | q[4]) == 0)
-            continue;
-        for (unsigned j = 0; j < 4; j++)
-            ProbeWord(q[j], q[j + 1], off + 4 * j, key, tick);
-    }
+    unsigned off = ScanLanes(bytes, size, key, tick);
     for (; off + 8 <= size; off += 4) {
         unsigned q[2];
         memcpy(q, bytes + off, sizeof q);

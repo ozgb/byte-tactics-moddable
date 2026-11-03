@@ -128,6 +128,7 @@ void* __stdcall AllocSurface(const char* name, int width, int height);
 #include "../network/unit_sync.h"
 #include "../graphics/display.h"
 #include "../graphics/font.h"
+#include "../state/block.h"
 void ShowSoftwareCursor();
 void HideSoftwareCursor();
 void __stdcall SendPlayerEconomy(Player* player, int a, int b);
@@ -139,6 +140,7 @@ void CreateGameObject()
     memset(mem, 0, sizeof(Game));
     AllocNotifyNop((int)mem);
     g_game = new (mem) Game;
+    SimBlockTrack(reinterpret_cast<void**>(&g_game));
 }
 
 // FUNCTION: 0x41d9f0

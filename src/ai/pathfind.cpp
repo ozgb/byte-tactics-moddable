@@ -88,7 +88,7 @@ class PathPlannerView;
 #pragma pack(push, 1)
 struct UnitMotionPlannerView {
     Ref<PathPlannerView> planner;
-    void* owner;
+    Ref<MovementClass> owner;
 };
 
 #include "../units/unit.h"
@@ -439,7 +439,7 @@ greedy:
 // FUNCTION: 0x40e630
 void Pathfinder::StartSearch(Target* t)
 {
-    owner = (MovementClass*)((UnitMotionPlannerView *)object->motion.get())->owner;
+    owner = ((UnitMotionPlannerView *)object->motion.get())->owner;
     target = t;
     start = object->cell;
     g_seams.units->RefreshMovedUnits(owner, object);
@@ -539,7 +539,7 @@ Pathfinder::Pathfinder()
     unsigned int n = m * 4;
     grid.dirty = (unsigned int*)SimAllocTagged("AISearch touched mapentries", n);
     memset(grid.dirty, 0xff, n - 1);
-    *(int*)((char*)grid.dirty + n - 4) = 0;
+    *(int*)((char*)grid.dirty.get() + n - 4) = 0;
 
     for (unsigned int i = grid.count - 0x100; i < (unsigned int)grid.count; i++)
         grid.dirty[i >> 8] |= 1 << ((i >> 3) & 0x1f);
@@ -614,7 +614,7 @@ void Pathfinder::RunSearches()
             else
                 *c = c->get() + 1;
             Unit* u = cursor[player];
-            if (((short)u->unitDefIndex) != 0 && ((UnitMotionPlannerView *)u->motion.get()) != 0 && ((UnitMotionPlannerView *)u->motion.get())->owner != 0) {
+            if (((short)u->unitDefIndex) != 0 && ((UnitMotionPlannerView *)u->motion.get()) != 0 && ((UnitMotionPlannerView *)u->motion.get())->owner.get() != 0) {
                 path = ((UnitMotionPlannerView *)u->motion.get())->planner->GetPath();
                 if (path != 0) {
                     object = u;

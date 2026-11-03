@@ -132,18 +132,38 @@ unsigned ReplayText::Size() const
     return used;
 }
 
+static unsigned KnownHash(const char* name)
+{
+    unsigned h = 2166136261u;
+    for (const unsigned char* p = (const unsigned char*)name; *p != 0; p++)
+        h = (h ^ *p) * 16777619u;
+    return h;
+}
+
 void ReplayKnown::Reset()
 {
     count = 0;
+    if (slots != nullptr)
+        memset(slots, 0xff, sizeof(short) * SLOTS);
 }
 
 int ReplayKnown::Find(const char* name) const
 {
-    for (int i = 0; i < count; i++) {
-        if (strcmp(names[i], name) == 0)
-            return i;
+    if (slots == nullptr)
+        return -1;
+    for (unsigned i = KnownHash(name) % SLOTS;; i = (i + 1) % SLOTS) {
+        int at = slots[i];
+        if (at < 0)
+            return -1;
+        if (strcmp(names[at], name) == 0)
+            return at;
     }
-    return -1;
+}
+
+const char* ReplayKnown::Get(const char* name) const
+{
+    int at = Find(name);
+    return at < 0 ? nullptr : values[at];
 }
 
 bool ReplayKnown::Changed(const char* name, const char* value)
@@ -157,12 +177,24 @@ bool ReplayKnown::Changed(const char* name, const char* value)
 
 void ReplayKnown::Set(const char* name, const char* value)
 {
+    if (slots == nullptr) {
+        names = (char (*)[NAME])malloc((size_t)CAPACITY * NAME);
+        values = (char (*)[VALUE])malloc((size_t)CAPACITY * VALUE);
+        slots = (short*)malloc(sizeof(short) * SLOTS);
+        if (names == nullptr || values == nullptr || slots == nullptr)
+            abort();
+        memset(slots, 0xff, sizeof(short) * SLOTS);
+    }
     int at = Find(name);
     if (at < 0) {
         if (count == CAPACITY || strlen(name) >= NAME)
             abort();
         at = count++;
         strcpy(names[at], name);
+        unsigned i = KnownHash(name) % SLOTS;
+        while (slots[i] >= 0)
+            i = (i + 1) % SLOTS;
+        slots[i] = (short)at;
     }
     if (strlen(value) >= VALUE)
         abort();

@@ -2,29 +2,18 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-#include "../src/state/game_rand.h"
+#include <vector>
 
-#pragma pack(push, 1)
-#include "../src/game/game.h"
-#pragma pack(pop)
-
-#include "../src/weapons/weapon_def.h"
-#include "../src/util/vec3.h"
+#include "../src/harness/replay_schema.h"
 #include "../src/files/files_bank.h"
 #include "../src/util/commands.h"
 #include "../interfaces/services.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/wind_meteors.h"
-#include "../interfaces/weapons.h"
-#include "../interfaces/files.h"
-#include "../interfaces/rand_stream.h"
-#include "../src/state/sim_globals.h"
-#include "../src/state/block.h"
-#include "../src/map/meteors.h"
 #include "../src/game/game_state.h"
 #include "../src/game/console_commands.h"
 #include "../src/harness/replay_text.h"
-#include "../src/harness/replay_schema.h"
+#include "../src/harness/replay_values.h"
+#include "../src/harness/replay_objects.h"
 #include "replay_wasm.h"
 
 extern "C" int __cdecl bx_rand(void* state);
@@ -76,8 +65,8 @@ int __cdecl ScaledCos(int angle, int scale)
 
 namespace {
 
-enum { MAX_LINES = 8192, MAX_OUTS = 8, MAX_RECORDS = 64, TEXT = 512 };
-enum ObjectKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
+enum { MAX_LINES = 65536, MAX_OUTS = 8, MAX_RECORDS = 64, TEXT = 512 };
+enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
 
 enum ImportId {
     IMP_GAME_RAND,
@@ -91,21 +80,14 @@ enum ImportId {
     IMP_TDF_GET_INT,
     IMP_TDF_GET_DOUBLE,
     IMP_TDF_GET_STRING,
-    IMP_GET_INT_ARG,
-    IMP_BANK_OPEN_ACCOUNT,
-    IMP_BANK_SET_INTEGER,
-    IMP_BANK_GET_INTEGER,
-    IMP_SPAWN_PROJECTILE,
-    IMP_FIND_WEAPON
+    IMP_GET_INT_ARG
 };
 
 const char* const kImportNames[] = {
     "services.GameRand", "services.RandomInt", "services.FatalError", "services.BuildDataPath",
     "services.TdfFile_Construct", "services.TdfFile_Destruct", "services.TdfFile_LoadFile",
     "services.TdfFile_SelectRecord", "services.TdfRecord_GetFieldInt", "services.TdfRecord_GetFieldDouble",
-    "services.TdfRecord_GetFieldString", "services.CommandArgs_GetIntArg", "services.HapiBank_OpenAccount",
-    "services.HapiBank_SetIntegerItem", "services.HapiBank_GetIntegerItem", "weapons.SpawnProjectile",
-    "weapons.FindWeaponByName",
+    "services.TdfRecord_GetFieldString", "services.CommandArgs_GetIntArg",
 };
 
 int g_failures;
@@ -124,40 +106,19 @@ void Fatal(const char* file, int call, const char* what, const char* text)
     exit(2);
 }
 
-struct Recorded {
-    char name[48];
-    char value[192];
-};
+ReplayKnown g_known;
+ReplayObjectTable g_objects;
+ReplayReach g_reach;
 
-Recorded g_recorded[64];
-int g_recordedCount;
-
-Recorded* FindRecorded(const char* name)
+void* AllocObject(unsigned size)
 {
-    for (int i = 0; i < g_recordedCount; i++) {
-        if (strcmp(g_recorded[i].name, name) == 0)
-            return &g_recorded[i];
-    }
-    return nullptr;
-}
-
-void SetRecorded(const char* name, const char* value)
-{
-    Recorded* r = FindRecorded(name);
-    if (r == nullptr) {
-        if (g_recordedCount == 64 || strlen(name) >= sizeof r->name)
-            abort();
-        r = &g_recorded[g_recordedCount++];
-        strcpy(r->name, name);
-    }
-    if (strlen(value) >= sizeof r->value)
-        abort();
-    strcpy(r->value, value);
+    return SimAlloc(size);
 }
 
 char* g_text;
 char* g_lines[MAX_LINES];
 int g_lineCount;
+char g_subsystem[48];
 
 int g_callIndex;
 int g_callFirst;
@@ -173,6 +134,11 @@ const char* g_outValues[MAX_OUTS];
 int g_outCount;
 unsigned g_hash;
 int g_importsTotal;
+const char* g_closing[3];
+unsigned char g_rootKinds[REPLAY_MAX_ROOTS];
+void* g_rootObjects[REPLAY_MAX_ROOTS];
+unsigned g_rootCount;
+const ReplaySlotSets* g_sets;
 
 char g_fakeRecords[MAX_RECORDS][16];
 HapiBank g_bank;
@@ -260,65 +226,14 @@ const char* ParseQuoted(const char* p, char* out, unsigned size)
     return *p == '"' ? p + 1 : p;
 }
 
-void AddFloatBits(ReplayText& t, float value)
-{
-    unsigned bits;
-    memcpy(&bits, &value, 4);
-    t.AddF32(bits);
-}
-
 void AddDoubleBits(ReplayText& t, double value)
 {
-    unsigned bits[2];
-    memcpy(bits, &value, 8);
-    t.AddF64(bits[0], bits[1]);
+    ReplayValue(t, value);
 }
 
 void AddVec3(ReplayText& t, const Vec3* v)
 {
-    t.AddChar('(');
-    t.AddInt(v->x);
-    t.AddChar(',');
-    t.AddInt(v->y);
-    t.AddChar(',');
-    t.AddInt(v->z);
-    t.AddChar(')');
-}
-
-void AddStream(ReplayText& t, int stream)
-{
-    if (stream == RAND_STREAM_MAIN)
-        t.Add("main");
-    else if (stream == RAND_STREAM_LOAD)
-        t.Add("load");
-    else
-        t.AddInt(stream);
-}
-
-void AddWeapon(ReplayText& t, const void* p)
-{
-    if (p == nullptr) {
-        t.Add("null");
-        return;
-    }
-    const unsigned char* base = (const unsigned char*)g_game->weapons;
-    const unsigned char* q = (const unsigned char*)p;
-    unsigned span = sizeof(WeaponDef);
-    if (q >= base && q < base + 256 * span && (unsigned)(q - base) % span == 0) {
-        t.Add("weapondef#");
-        t.AddUnsigned((unsigned)(q - base) / span);
-    } else {
-        t.Add("weapondef#?");
-    }
-}
-
-WeaponDef* ParseWeapon(const char* value)
-{
-    const char* p = Skip(value, "weapondef#");
-    if (p == nullptr)
-        return nullptr;
-    unsigned index = (unsigned)atoi(p);
-    return index < 256 ? &g_game->weapons[index] : nullptr;
+    ReplayValue(t, *v);
 }
 
 void AddObject(ReplayText& t, unsigned kind, const void* p)
@@ -351,13 +266,6 @@ TdfRecord* ParseRecord(const char* value)
     return ordinal >= 1 && ordinal <= MAX_RECORDS ? (TdfRecord*)g_fakeRecords[ordinal - 1] : nullptr;
 }
 
-const char* Block(const ReplayField& f)
-{
-    if (f.base == RB_GAME)
-        return (const char*)g_game + f.offset;
-    return (const char*)g_simGlobals + f.offset;
-}
-
 #pragma push_macro("g_randomSeed")
 #undef g_randomSeed
 
@@ -368,6 +276,11 @@ unsigned* SeedWord()
 
 #pragma pop_macro("g_randomSeed")
 
+const unsigned char* BlockAt(const ReplayField& f)
+{
+    return f.base == RB_GAME ? (const unsigned char*)g_game + f.offset : (const unsigned char*)g_simGlobals + f.offset;
+}
+
 void FormatField(const ReplayField& f, ReplayText& out)
 {
     out.Clear();
@@ -375,41 +288,8 @@ void FormatField(const ReplayField& f, ReplayText& out)
         out.AddHex32(f.offset == 2 ? *SeedWord() : *SimRandStream((int)f.offset));
         return;
     }
-    const unsigned char* at = (const unsigned char*)Block(f);
-    switch (f.kind) {
-    case RK_I32:
-        out.AddInt(*(const int*)at);
-        break;
-    case RK_U32:
-        out.AddUnsigned(*(const unsigned*)at);
-        break;
-    case RK_U16:
-        out.AddUnsigned(*(const unsigned short*)at);
-        break;
-    case RK_F32:
-        out.AddF32(*(const unsigned*)at);
-        break;
-    case RK_POINT16:
-        out.AddChar('(');
-        out.AddInt(((const short*)at)[0]);
-        out.AddChar(',');
-        out.AddInt(((const short*)at)[1]);
-        out.AddChar(')');
-        break;
-    case RK_STRING: {
-        char text[64];
-        unsigned size = f.size < sizeof text - 1 ? f.size : (unsigned)sizeof text - 1;
-        memcpy(text, at, size);
-        text[size] = '\0';
-        out.AddString(text);
-        break;
-    }
-    default: {
-        unsigned stored = *(const unsigned*)at;
-        AddWeapon(out, stored == 0 ? nullptr : (const unsigned char*)SimBlockBase() + stored);
-        break;
-    }
-    }
+    ReplayObjectField view = { f.name, 0, f.size, 0, f.kind, 0 };
+    ReplayFormatObjectField(view, BlockAt(f), g_objects, false, out);
 }
 
 bool RestoreField(const ReplayField& f, const char* value)
@@ -422,41 +302,8 @@ bool RestoreField(const ReplayField& f, const char* value)
             *SimRandStream((int)f.offset) = bits;
         return true;
     }
-    unsigned char* at = (unsigned char*)Block(f);
-    switch (f.kind) {
-    case RK_I32:
-        *(int*)at = atoi(value);
-        break;
-    case RK_U32:
-        *(unsigned*)at = strtoul(value, nullptr, 10);
-        break;
-    case RK_U16:
-        *(unsigned short*)at = (unsigned short)strtoul(value, nullptr, 10);
-        break;
-    case RK_F32:
-        *(unsigned*)at = ParseF32(value);
-        break;
-    case RK_POINT16: {
-        int x = 0;
-        int y = 0;
-        sscanf(value, "(%d,%d)", &x, &y);
-        ((short*)at)[0] = (short)x;
-        ((short*)at)[1] = (short)y;
-        break;
-    }
-    case RK_STRING:
-        memset(at, 0, f.size);
-        ParseQuoted(value, (char*)at, f.size);
-        break;
-    default: {
-        WeaponDef* weapon = ParseWeapon(value);
-        if (weapon == nullptr && strcmp(value, "null") != 0)
-            return false;
-        *(unsigned*)at = weapon == nullptr ? 0u : (unsigned)((const char*)weapon - (const char*)SimBlockBase());
-        break;
-    }
-    }
-    return true;
+    ReplayObjectField view = { f.name, 0, f.size, 0, f.kind, 0 };
+    return ReplayRestoreObjectField(view, (unsigned char*)BlockAt(f), value, g_objects, nullptr);
 }
 
 const ReplayField* FindField(const char* name)
@@ -477,6 +324,16 @@ bool InSet(const unsigned char* set, unsigned count, const ReplayField* f)
     return false;
 }
 
+bool InObjectSet(const unsigned short* set, unsigned count, const ReplayObjectField* f)
+{
+    for (unsigned i = 0; i < count; i++) {
+        const ReplayObjectField& g = kReplayObjectFields[set[i]];
+        if (g.object == f->object && strcmp(g.name, f->name) == 0)
+            return true;
+    }
+    return false;
+}
+
 const char* LastResult(const char* line)
 {
     const char* found = nullptr;
@@ -485,13 +342,24 @@ const char* LastResult(const char* line)
     return found == nullptr ? "" : found;
 }
 
-const char* Enter(int id, const ReplayText& actual)
+bool ClosingLine(const char* line)
+{
+    for (int i = 0; i < 3; i++) {
+        if (g_closing[i] != nullptr && strncmp(line + 4, g_closing[i], strlen(g_closing[i])) == 0)
+            return true;
+    }
+    return false;
+}
+
+const char* Enter(const ReplayText& actual)
 {
     int index = g_importIndex++;
     g_importsTotal++;
     g_outCount = 0;
     char key[96];
-    sprintf(key, "import %d %s", index, kImportNames[id]);
+    const char* space = strchr(actual.Data(), ' ');
+    int nameLength = space == nullptr ? (int)strlen(actual.Data()) : (int)(space - actual.Data());
+    sprintf(key, "import %d %.*s", index, nameLength, actual.Data());
     int next = g_cursor;
     while (next < g_callEnd && strncmp(g_lines[next], "  i ", 4) != 0 && strncmp(g_lines[next], "  o ", 4) != 0 && strncmp(g_lines[next], "  w ", 4) != 0)
         next++;
@@ -501,14 +369,14 @@ const char* Enter(int id, const ReplayText& actual)
     }
     g_cursor = next + 1;
     const char* recorded = g_lines[next] + 4;
-    while (g_cursor < g_callEnd && strncmp(g_lines[g_cursor], "  o ", 4) == 0 && strncmp(g_lines[g_cursor], "  o params.", 11) != 0) {
+    while (g_cursor < g_callEnd && strncmp(g_lines[g_cursor], "  o ", 4) == 0 && !ClosingLine(g_lines[g_cursor])) {
         if (g_outCount < MAX_OUTS) {
             char* name = g_lines[g_cursor] + 4;
-            char* space = strchr(name, ' ');
-            if (space != nullptr) {
-                *space = '\0';
+            char* sp = strchr(name, ' ');
+            if (sp != nullptr) {
+                *sp = '\0';
                 g_outNames[g_outCount] = name;
-                g_outValues[g_outCount] = space + 1;
+                g_outValues[g_outCount] = sp + 1;
                 g_outCount++;
             }
         }
@@ -532,15 +400,209 @@ const char* OutValue(const char* suffix)
     return nullptr;
 }
 
-void StartImport(ReplayText& t, int id)
+void StartImport(ReplayText& t, const char* name)
 {
     t.Clear();
-    t.Add(kImportNames[id]);
+    t.Add(name);
+}
+
+void StartImport(ReplayText& t, int id)
+{
+    StartImport(t, kImportNames[id]);
 }
 
 void Space(ReplayText& t)
 {
     t.AddChar(' ');
+}
+
+template <class T> T ParseResult(const char* text)
+{
+    return (T)atoi(text);
+}
+
+template <> float ParseResult<float>(const char* text)
+{
+    unsigned bits = ParseF32(text);
+    float f;
+    memcpy(&f, &bits, 4);
+    return f;
+}
+
+void ApplyReach(void* object, unsigned kind, const char* suffix)
+{
+    const char* value = OutValue(suffix);
+    const ReplayObjectField* f = ReplayFindObjectField(kind, suffix + 1);
+    if (object != nullptr && value != nullptr && f != nullptr)
+        ReplayRestoreObjectField(*f, object, value, g_objects, nullptr);
+}
+
+const char* ArgLine(const char* name)
+{
+    size_t n = strlen(name);
+    for (int k = g_callFirst + 1; k < g_callEnd; k++) {
+        const char* line = g_lines[k];
+        if (strncmp(line, "  a ", 4) == 0 && strncmp(line + 4, name, n) == 0 && line[4 + n] == ' ')
+            return line + 5 + n;
+    }
+    return nullptr;
+}
+
+const char* OutLine(const char* name)
+{
+    size_t n = strlen(name);
+    const char* found = nullptr;
+    for (int k = g_callFirst + 1; k < g_callEnd; k++) {
+        const char* line = g_lines[k];
+        if (strncmp(line, "  o ", 4) == 0 && strncmp(line + 4, name, n) == 0 && line[4 + n] == ' ')
+            found = line + 5 + n;
+    }
+    return found;
+}
+
+void ParseScalar(const char* v, int& out) { out = atoi(v); }
+void ParseScalar(const char* v, long& out) { out = atol(v); }
+void ParseScalar(const char* v, short& out) { out = (short)atoi(v); }
+void ParseScalar(const char* v, char& out) { out = (char)atoi(v); }
+void ParseScalar(const char* v, bool& out) { out = atoi(v) != 0; }
+void ParseScalar(const char* v, unsigned& out) { out = strtoul(v, nullptr, 10); }
+void ParseScalar(const char* v, unsigned short& out) { out = (unsigned short)strtoul(v, nullptr, 10); }
+void ParseScalar(const char* v, unsigned char& out) { out = (unsigned char)strtoul(v, nullptr, 10); }
+void ParseScalar(const char* v, float& out)
+{
+    unsigned bits = ParseF32(v);
+    memcpy(&out, &bits, 4);
+}
+void ParseScalar(const char* v, double& out) { out = ParseF64(v); }
+void ParseScalar(const char* v, Point16& out)
+{
+    int x = 0;
+    int y = 0;
+    sscanf(v, "(%d,%d)", &x, &y);
+    out.x = (short)x;
+    out.y = (short)y;
+}
+void ParseScalar(const char* v, Vec3& out) { sscanf(v, "(%d,%d,%d)", &out.x, &out.y, &out.z); }
+
+template <class T> T ArgScalar(const char* name)
+{
+    T value = T();
+    const char* text = ArgLine(name);
+    if (text != nullptr)
+        ParseScalar(text, value);
+    return value;
+}
+
+RandStream ArgStream(const char* name)
+{
+    const char* value = ArgLine(name);
+    if (value == nullptr || strcmp(value, "main") == 0)
+        return RAND_STREAM_MAIN;
+    return strcmp(value, "load") == 0 ? RAND_STREAM_LOAD : (RandStream)atoi(value);
+}
+
+void ArgText(const char* name, char* out, unsigned size)
+{
+    const char* value = ArgLine(name);
+    out[0] = '\0';
+    if (value != nullptr)
+        ParseQuoted(value, out, size);
+}
+
+void* ArgHandle(const char*)
+{
+    return &g_bank;
+}
+
+void ArgPending()
+{
+}
+
+void* ArgObject(const char* name, unsigned kind)
+{
+    const char* value = ArgLine(name);
+    unsigned found = 0;
+    void* p = value == nullptr ? nullptr : ReplayResolveObject(value, &found, g_objects, AllocObject);
+    if (p != nullptr && found == kind && g_rootCount < REPLAY_MAX_ROOTS) {
+        g_rootKinds[g_rootCount] = (unsigned char)kind;
+        g_rootObjects[g_rootCount++] = p;
+    }
+    return p;
+}
+
+void ParseStruct(const char* name, unsigned kind, void* object)
+{
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != kind)
+            continue;
+        char key[96];
+        sprintf(key, "%s.%s", name, f.name);
+        const char* value = ArgLine(key);
+        if (value != nullptr)
+            ReplayRestoreObjectField(f, object, value, g_objects, nullptr);
+    }
+}
+
+void CompareStruct(const char* name, unsigned kind, const void* object)
+{
+    ReplayText value;
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != kind)
+            continue;
+        char key[96];
+        sprintf(key, "%s.%s", name, f.name);
+        ReplayFormatObjectField(f, object, g_objects, false, value);
+        HashText(value.Data());
+        const char* recorded = OutLine(key);
+        if (recorded == nullptr)
+            recorded = "no such line";
+        if (strcmp(recorded, value.Data()) != 0)
+            Diff(key, recorded, value.Data());
+    }
+    value.Free();
+}
+
+template <class T> void CompareResult(T result)
+{
+    ReplayText value;
+    ReplayValue(value, result);
+    HashText(value.Data());
+    const char* recorded = OutLine("result");
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff("result", recorded, value.Data());
+    value.Free();
+}
+
+struct ArgvHolder {
+    CommandArgs args;
+    char text[0x14][128];
+};
+
+void ParseArgv(ArgvHolder& holder)
+{
+    memset(&holder, 0, sizeof holder);
+    const char* count = ArgLine("args.count");
+    holder.args.count = count == nullptr ? 0 : atoi(count);
+    for (int i = 0; i < 0x14; i++) {
+        char key[32];
+        sprintf(key, "args[%d]", i);
+        const char* value = ArgLine(key);
+        if (value != nullptr) {
+            ParseQuoted(value, holder.text[i], sizeof holder.text[i]);
+            holder.args.args[i] = holder.text[i];
+        }
+    }
+}
+
+void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr)
+{
+    g_closing[0] = a;
+    g_closing[1] = b;
+    g_closing[2] = c;
 }
 
 }
@@ -550,8 +612,8 @@ int __cdecl GameRand(RandStream stream)
     ReplayText t;
     StartImport(t, IMP_GAME_RAND);
     Space(t);
-    AddStream(t, stream);
-    const char* result = Enter(IMP_GAME_RAND, t);
+    ReplayValue(t, stream);
+    const char* result = Enter(t);
     bx_rand(SimRandStream(stream));
     return atoi(result);
 }
@@ -562,7 +624,7 @@ int __stdcall RandomInt(int range)
     StartImport(t, IMP_RANDOM_INT);
     Space(t);
     t.AddInt(range);
-    const char* result = Enter(IMP_RANDOM_INT, t);
+    const char* result = Enter(t);
     if (range >= 2) {
         unsigned int seed = *SeedWord();
         unsigned int q = seed / 127773;
@@ -581,7 +643,7 @@ void __stdcall FatalError(char* message)
     StartImport(t, IMP_FATAL_ERROR);
     Space(t);
     t.AddString(message);
-    Enter(IMP_FATAL_ERROR, t);
+    Enter(t);
 }
 
 char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext)
@@ -594,7 +656,7 @@ char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, cons
     t.AddString(name);
     Space(t);
     t.AddString(ext);
-    const char* result = Enter(IMP_BUILD_DATA_PATH, t);
+    const char* result = Enter(t);
     ParseQuoted(result, buf, 256);
     return buf;
 }
@@ -607,7 +669,7 @@ TdfFile::TdfFile()
     StartImport(t, IMP_TDF_CONSTRUCT);
     Space(t);
     AddObject(t, OBJ_FILE, this);
-    Enter(IMP_TDF_CONSTRUCT, t);
+    Enter(t);
 }
 
 TdfFile::~TdfFile()
@@ -616,7 +678,7 @@ TdfFile::~TdfFile()
     StartImport(t, IMP_TDF_DESTRUCT);
     Space(t);
     AddObject(t, OBJ_FILE, this);
-    Enter(IMP_TDF_DESTRUCT, t);
+    Enter(t);
 }
 
 int TdfFile::LoadFile(char* path)
@@ -627,7 +689,7 @@ int TdfFile::LoadFile(char* path)
     AddObject(t, OBJ_FILE, this);
     Space(t);
     t.AddString(path);
-    int result = atoi(Enter(IMP_TDF_LOAD_FILE, t));
+    int result = atoi(Enter(t));
     const char* newRoot = OutValue(".root");
     const char* newCurrent = OutValue(".current");
     root = newRoot == nullptr ? nullptr : ParseRecord(newRoot);
@@ -643,7 +705,7 @@ int TdfFile::SelectRecord(char* name)
     AddObject(t, OBJ_FILE, this);
     Space(t);
     t.AddString(name);
-    int result = atoi(Enter(IMP_TDF_SELECT_RECORD, t));
+    int result = atoi(Enter(t));
     const char* newCurrent = OutValue(".current");
     if (newCurrent != nullptr)
         current = ParseRecord(newCurrent);
@@ -660,7 +722,7 @@ int TdfRecord::GetFieldInt(const char* name, int def)
     t.AddString(name);
     Space(t);
     t.AddInt(def);
-    return atoi(Enter(IMP_TDF_GET_INT, t));
+    return atoi(Enter(t));
 }
 
 double TdfRecord::GetFieldDouble(const char* name, double def)
@@ -673,7 +735,7 @@ double TdfRecord::GetFieldDouble(const char* name, double def)
     t.AddString(name);
     Space(t);
     AddDoubleBits(t, def);
-    return ParseF64(Enter(IMP_TDF_GET_DOUBLE, t));
+    return ParseF64(Enter(t));
 }
 
 int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
@@ -688,7 +750,7 @@ int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
     t.AddInt((int)size);
     Space(t);
     t.AddString(def);
-    int result = atoi(Enter(IMP_TDF_GET_STRING, t));
+    int result = atoi(Enter(t));
     const char* text = OutValue("dst");
     if (text != nullptr)
         ParseQuoted(text, dst, (unsigned)size);
@@ -703,179 +765,17 @@ int CommandArgs::GetIntArg(int index, int def)
     t.AddInt(index);
     Space(t);
     t.AddInt(def);
-    return atoi(Enter(IMP_GET_INT_ARG, t));
+    return atoi(Enter(t));
 }
 
 namespace {
-
-int __stdcall BankOpenAccount(HapiBank* self, char* name)
-{
-    ReplayText t;
-    StartImport(t, IMP_BANK_OPEN_ACCOUNT);
-    Space(t);
-    AddObject(t, OBJ_BANK, self);
-    Space(t);
-    t.AddString(name);
-    return atoi(Enter(IMP_BANK_OPEN_ACCOUNT, t));
-}
-
-int __stdcall BankSetInteger(HapiBank* self, const char* name, int value)
-{
-    ReplayText t;
-    StartImport(t, IMP_BANK_SET_INTEGER);
-    Space(t);
-    AddObject(t, OBJ_BANK, self);
-    Space(t);
-    t.AddString(name);
-    Space(t);
-    t.AddInt(value);
-    return atoi(Enter(IMP_BANK_SET_INTEGER, t));
-}
-
-int __stdcall BankGetInteger(HapiBank* self, char* name, int def)
-{
-    ReplayText t;
-    StartImport(t, IMP_BANK_GET_INTEGER);
-    Space(t);
-    AddObject(t, OBJ_BANK, self);
-    Space(t);
-    t.AddString(name);
-    Space(t);
-    t.AddInt(def);
-    return atoi(Enter(IMP_BANK_GET_INTEGER, t));
-}
-
-int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* pos, Vec3* vel, int flag)
-{
-    ReplayText t;
-    StartImport(t, IMP_SPAWN_PROJECTILE);
-    Space(t);
-    AddWeapon(t, weapon);
-    t.Add(" pos=");
-    AddVec3(t, pos);
-    t.Add(" vel=");
-    AddVec3(t, vel);
-    Space(t);
-    t.AddInt(flag);
-    return atoi(Enter(IMP_SPAWN_PROJECTILE, t));
-}
-
-WeaponDef* __stdcall FindWeaponByName(char* name)
-{
-    ReplayText t;
-    StartImport(t, IMP_FIND_WEAPON);
-    Space(t);
-    t.AddString(name);
-    const char* result = Enter(IMP_FIND_WEAPON, t);
-    WeaponDef* weapon = ParseWeapon(result);
-    const char* flags = OutValue(".flags");
-    if (weapon != nullptr && flags != nullptr)
-        weapon->flags.value = ParseHex(flags + 2, 8);
-    return weapon;
-}
 
 void __fastcall LoadMeteorDefaultsSlot(MeteorParams* params)
 {
     params->LoadMeteorDefaults();
 }
 
-WindMeteorsSeam g_windMeteors = {
-    UpdateWind, UpdateMeteors, InitMeteors, EmptyShutdownPreCleanup, EnableMeteors, DisableMeteors,
-    SetMeteorParams, LoadMeteorDefaultsSlot, SaveMeteors, LoadMeteors, CmdMeteor, UpdateWindOnStream,
-};
-WeaponsSeam g_weaponsSeam;
-FilesSeam g_filesSeam;
-
-struct Slot {
-    const ReplaySlotSets* sets;
-    MeteorParams params;
-    CommandArgs args;
-    char argText[0x14][128];
-    int stream;
-    bool hasBank;
-};
-
-void ParseParam(MeteorParams& p, const char* name, const char* value)
-{
-    if (strcmp(name, "params.name") == 0) {
-        memset(p.name, 0, sizeof p.name);
-        char text[64];
-        ParseQuoted(value, text, sizeof text);
-        strncpy(p.name, text, sizeof p.name);
-    } else if (strcmp(name, "params.radius") == 0) {
-        p.radius = atoi(value);
-    } else {
-        unsigned bits = ParseF32(value);
-        float f;
-        memcpy(&f, &bits, 4);
-        if (strcmp(name, "params.density") == 0)
-            p.density = f;
-        else if (strcmp(name, "params.duration") == 0)
-            p.duration = f;
-        else
-            p.interval = f;
-    }
-}
-
-void ParseArgument(Slot& slot, const char* line, const char* file)
-{
-    char name[64];
-    const char* space = strchr(line + 4, ' ');
-    if (space == nullptr || (unsigned)(space - (line + 4)) >= sizeof name)
-        Fatal(file, g_callIndex, "bad argument line", line);
-    memcpy(name, line + 4, (unsigned)(space - (line + 4)));
-    name[space - (line + 4)] = '\0';
-    const char* value = space + 1;
-    if (strncmp(name, "params.", 7) == 0) {
-        ParseParam(slot.params, name, value);
-    } else if (strcmp(name, "args.count") == 0) {
-        slot.args.count = atoi(value);
-    } else if (strncmp(name, "args[", 5) == 0) {
-        int i = atoi(name + 5);
-        if (i < 0 || i >= 0x14)
-            Fatal(file, g_callIndex, "bad argument index", line);
-        ParseQuoted(value, slot.argText[i], sizeof slot.argText[i]);
-        slot.args.args[i] = slot.argText[i];
-    } else if (strcmp(name, "stream") == 0) {
-        slot.stream = strcmp(value, "load") == 0 ? RAND_STREAM_LOAD : strcmp(value, "main") == 0 ? RAND_STREAM_MAIN : atoi(value);
-    } else if (strcmp(name, "bank") == 0) {
-        slot.hasBank = true;
-    } else {
-        Fatal(file, g_callIndex, "unknown argument", line);
-    }
-}
-
-void RunSlot(Slot& slot, const char* file)
-{
-    const char* name = slot.sets->name;
-    WindMeteorsSeam* s = g_seams.wind_meteors;
-    if (strcmp(name, "UpdateWind") == 0)
-        s->UpdateWind();
-    else if (strcmp(name, "UpdateMeteors") == 0)
-        s->UpdateMeteors();
-    else if (strcmp(name, "InitMeteors") == 0)
-        s->InitMeteors();
-    else if (strcmp(name, "EmptyShutdownPreCleanup") == 0)
-        s->EmptyShutdownPreCleanup();
-    else if (strcmp(name, "EnableMeteors") == 0)
-        s->EnableMeteors();
-    else if (strcmp(name, "DisableMeteors") == 0)
-        s->DisableMeteors();
-    else if (strcmp(name, "SetMeteorParams") == 0)
-        s->SetMeteorParams(&slot.params);
-    else if (strcmp(name, "LoadMeteorDefaults") == 0)
-        s->LoadMeteorDefaults(&slot.params);
-    else if (strcmp(name, "SaveMeteors") == 0)
-        s->SaveMeteors(&g_bank);
-    else if (strcmp(name, "LoadMeteors") == 0)
-        s->LoadMeteors(&g_bank);
-    else if (strcmp(name, "CmdMeteor") == 0)
-        s->CmdMeteor(&slot.args);
-    else if (strcmp(name, "UpdateWindOnStream") == 0)
-        s->UpdateWindOnStream((RandStream)slot.stream);
-    else
-        Fatal(file, g_callIndex, "unknown slot", name);
-}
+#include "replay_slots.h"
 
 void ResetBlock()
 {
@@ -885,25 +785,24 @@ void ResetBlock()
         SimBlockReset();
     g_simGlobals = (SimGlobals*)SimAlloc(sizeof(SimGlobals));
     g_game = (Game*)SimAlloc(sizeof(Game));
-    g_seams.wind_meteors = &g_windMeteors;
-    g_seams.weapons = &g_weaponsSeam;
-    g_seams.files = &g_filesSeam;
-    g_weaponsSeam.SpawnProjectile = SpawnProjectile;
-    g_weaponsSeam.FindWeaponByName = FindWeaponByName;
-    g_filesSeam.BankOpenAccount = BankOpenAccount;
-    g_filesSeam.BankSetInteger = BankSetInteger;
-    g_filesSeam.BankGetInteger = BankGetInteger;
+    BindSeams();
     if (ReplayWasmActive())
         ReplayWasmUseSeam();
     strcpy(g_extTdf, "tdf");
-    g_recordedCount = 0;
+    g_known.Reset();
+    g_objects.Reset();
 }
 
-const ReplaySlotSets* FindSlot(const char* name)
+const ReplaySlotSets* FindSlot(const char* subsystem, const char* name)
 {
-    for (unsigned i = 0; i < kReplaySlotCount; i++) {
-        if (strcmp(kReplaySlots[i].name, name) == 0)
-            return &kReplaySlots[i];
+    for (unsigned s = 0; s < kReplaySubsystemCount; s++) {
+        if (strcmp(kReplaySubsystems[s].name, subsystem) != 0)
+            continue;
+        for (unsigned i = 0; i < kReplaySubsystems[s].slotCount; i++) {
+            const ReplaySlotSets& slot = kReplaySlots[kReplaySubsystems[s].firstSlot + i];
+            if (strcmp(slot.name, name) == 0)
+                return &slot;
+        }
     }
     return nullptr;
 }
@@ -944,77 +843,91 @@ struct Outcome {
     ReplayText log;
 };
 
+bool RestoreObjectLine(const char* name, const char* value, const char* file, const ReplaySlotSets* sets, const char* line)
+{
+    unsigned kind = 0;
+    unsigned ordinal = 0;
+    const char* fieldName = nullptr;
+    if (!ReplayParseKey(name, &kind, &ordinal, &fieldName))
+        return false;
+    char object[48];
+    const char* dot = strchr(name, '.');
+    memcpy(object, name, (unsigned)(dot - name));
+    object[dot - name] = '\0';
+    void* p = ReplayResolveObject(object, nullptr, g_objects, AllocObject);
+    const ReplayObjectField* f = ReplayFindObjectField(kind, fieldName);
+    if (p == nullptr || f == nullptr)
+        Fatal(file, g_callIndex, "an object line that names no object or field", line);
+    if (sets != nullptr && !InObjectSet(sets->objReads, sets->objReadCount, f) && !InObjectSet(sets->objWrites, sets->objWriteCount, f))
+        Fatal(file, g_callIndex, "field is not in the object sets of the slot", name);
+    if (!ReplayRestoreObjectField(*f, p, value, g_objects, AllocObject))
+        Fatal(file, g_callIndex, "a value that cannot be restored", value);
+    return true;
+}
+
+void CompareObjects(const ReplaySlotSets* sets)
+{
+    ReplayWalk(g_reach, g_objects, false, *sets, g_rootKinds, g_rootObjects, g_rootCount);
+    ReplayText key;
+    ReplayText value;
+    for (unsigned at = 0; at < g_reach.count; at++) {
+        for (unsigned i = 0; i < sets->objWriteCount; i++) {
+            const ReplayObjectField& f = kReplayObjectFields[sets->objWrites[i]];
+            if (f.object != g_reach.kind[at])
+                continue;
+            ReplayObjectFieldKey(key, g_objects, false, g_reach.kind[at], g_reach.object[at], f);
+            ReplayFormatObjectField(f, g_reach.object[at], g_objects, false, value);
+            HashText(value.Data());
+            const char* known = g_known.Get(key.Data());
+            if (known == nullptr)
+                Diff(key.Data(), "no value", value.Data());
+            else if (strcmp(known, value.Data()) != 0)
+                Diff(key.Data(), known, value.Data());
+        }
+    }
+    key.Free();
+    value.Free();
+}
+
 void CompareWrites(const char* file, const ReplaySlotSets* sets)
 {
     ReplayText value;
-    for (unsigned i = 0; i < sets->writeCount; i++) {
-        const ReplayField& f = kReplayFields[sets->writes[i]];
-        FormatField(f, value);
-        HashText(value.Data());
-        const char* recorded = nullptr;
-        for (int k = g_callFirst + 1; k < g_callEnd; k++) {
-            const char* line = g_lines[k];
-            if (strncmp(line, "  w ", 4) == 0 && strncmp(line + 4, f.name, strlen(f.name)) == 0 && line[4 + strlen(f.name)] == ' ')
-                recorded = line + 5 + strlen(f.name);
-        }
-        if (recorded != nullptr)
-            SetRecorded(f.name, recorded);
-        Recorded* known = FindRecorded(f.name);
-        if (known == nullptr)
-            Diff(f.name, "no value", value.Data());
-        else if (strcmp(known->value, value.Data()) != 0)
-            Diff(f.name, known->value, value.Data());
-    }
     for (int k = g_callFirst + 1; k < g_callEnd; k++) {
         const char* line = g_lines[k];
         if (strncmp(line, "  w ", 4) != 0)
             continue;
         const char* space = strchr(line + 4, ' ');
-        char name[64];
+        char name[96];
         if (space == nullptr || (unsigned)(space - (line + 4)) >= sizeof name)
             Fatal(file, g_callIndex, "bad write line", line);
         memcpy(name, line + 4, (unsigned)(space - (line + 4)));
         name[space - (line + 4)] = '\0';
-        const ReplayField* f = FindField(name);
-        if (f == nullptr || !InSet(sets->writes, sets->writeCount, f))
-            Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
-    }
-}
-
-void CompareClosing(const ReplaySlotSets* sets, const Slot& slot)
-{
-    if (strcmp(sets->name, "LoadMeteorDefaults") != 0)
-        return;
-    ReplayText t;
-    char name[0x21];
-    memcpy(name, slot.params.name, 0x20);
-    name[0x20] = '\0';
-    struct Item {
-        const char* name;
-        ReplayText text;
-    } items[5];
-    items[0].name = "params.name";
-    items[0].text.AddString(name);
-    items[1].name = "params.radius";
-    items[1].text.AddInt(slot.params.radius);
-    items[2].name = "params.density";
-    AddFloatBits(items[2].text, slot.params.density);
-    items[3].name = "params.duration";
-    AddFloatBits(items[3].text, slot.params.duration);
-    items[4].name = "params.interval";
-    AddFloatBits(items[4].text, slot.params.interval);
-    for (int i = 0; i < 5; i++) {
-        const char* recorded = "no such line";
-        for (int k = g_callFirst + 1; k < g_callEnd; k++) {
-            const char* line = g_lines[k];
-            size_t n = strlen(items[i].name);
-            if (strncmp(line, "  o ", 4) == 0 && strncmp(line + 4, items[i].name, n) == 0 && line[4 + n] == ' ')
-                recorded = line + 5 + n;
+        if (strchr(name, '#') != nullptr) {
+            unsigned kind = 0;
+            unsigned ordinal = 0;
+            const char* fieldName = nullptr;
+            const ReplayObjectField* f = ReplayParseKey(name, &kind, &ordinal, &fieldName) ? ReplayFindObjectField(kind, fieldName) : nullptr;
+            if (f == nullptr || !InObjectSet(sets->objWrites, sets->objWriteCount, f))
+                Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
+        } else {
+            const ReplayField* f = FindField(name);
+            if (f == nullptr || !InSet(sets->writes, sets->writeCount, f))
+                Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
         }
-        HashText(items[i].text.Data());
-        if (strcmp(recorded, items[i].text.Data()) != 0)
-            Diff(items[i].name, recorded, items[i].text.Data());
+        g_known.Set(name, space + 1);
     }
+    for (unsigned i = 0; i < sets->writeCount; i++) {
+        const ReplayField& f = kReplayFields[sets->writes[i]];
+        FormatField(f, value);
+        HashText(value.Data());
+        const char* known = g_known.Get(f.name);
+        if (known == nullptr)
+            Diff(f.name, "no value", value.Data());
+        else if (strcmp(known, value.Data()) != 0)
+            Diff(f.name, known, value.Data());
+    }
+    value.Free();
+    CompareObjects(sets);
 }
 
 void ReplayCall(const char* file, Outcome& out)
@@ -1025,7 +938,7 @@ void ReplayCall(const char* file, Outcome& out)
     if (slotText == nullptr)
         Fatal(file, g_callIndex, "bad call line", header);
     *slotText++ = '\0';
-    const ReplaySlotSets* sets = FindSlot(slotText);
+    const ReplaySlotSets* sets = FindSlot(g_subsystem, slotText);
     if (sets == nullptr)
         Fatal(file, g_callIndex, "unknown slot", slotText);
     g_diffs = 0;
@@ -1034,35 +947,37 @@ void ReplayCall(const char* file, Outcome& out)
     g_ordinals.Reset();
     g_importIndex = 0;
     g_outCount = 0;
+    g_rootCount = 0;
     if (strcmp(tickText, "-") != 0)
         g_game->ticks = atoi(tickText);
 
-    static Slot slot;
-    memset(&slot, 0, sizeof slot);
-    slot.sets = sets;
-    slot.stream = RAND_STREAM_MAIN;
     int first = g_callFirst + 1;
     for (int k = first; k < g_callEnd; k++) {
         char* line = g_lines[k];
-        if (strncmp(line, "  r ", 4) == 0) {
-            char* space = strchr(line + 4, ' ');
-            if (space == nullptr)
-                Fatal(file, g_callIndex, "bad read line", line);
-            *space = '\0';
+        if (strncmp(line, "  r ", 4) != 0)
+            continue;
+        char* space = strchr(line + 4, ' ');
+        if (space == nullptr)
+            Fatal(file, g_callIndex, "bad read line", line);
+        *space = '\0';
+        if (strchr(line + 4, '#') != nullptr) {
+            RestoreObjectLine(line + 4, space + 1, file, sets, line);
+            g_known.Set(line + 4, space + 1);
+        } else {
             const ReplayField* f = FindField(line + 4);
             if (f == nullptr || !InSet(sets->reads, sets->readCount, f))
                 Fatal(file, g_callIndex, "field is not in the read set of the slot", line + 4);
             if (!RestoreField(*f, space + 1))
                 Fatal(file, g_callIndex, "a value that cannot be restored", space + 1);
-            SetRecorded(f->name, space + 1);
-            *space = ' ';
-        } else if (strncmp(line, "  a ", 4) == 0) {
-            ParseArgument(slot, line, file);
+            g_known.Set(f->name, space + 1);
         }
+        *space = ' ';
     }
     g_cursor = first;
     g_hash = 2166136261u;
-    RunSlot(slot, file);
+    g_sets = sets;
+    if (!RunSlot(g_subsystem, slotText))
+        Fatal(file, g_callIndex, "a slot with no runner", slotText);
     for (int k = g_cursor; k < g_callEnd; k++) {
         if (strncmp(g_lines[k], "  i ", 4) == 0) {
             char key[96];
@@ -1074,7 +989,7 @@ void ReplayCall(const char* file, Outcome& out)
         }
     }
     CompareWrites(file, sets);
-    CompareClosing(sets, slot);
+    RunAfter(g_subsystem, slotText);
 
     char head[160];
     sprintf(head, "call %d %s %s", g_callIndex, tickText, sets->name);
@@ -1153,8 +1068,27 @@ void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
         printf("FAIL: cannot read %s\n", file);
         exit(2);
     }
-    if (g_lineCount < 2 || strcmp(g_lines[0], "bt-replay 1") != 0 || strncmp(g_lines[1], "subsystem wind_meteors ", 22) != 0)
-        Fatal(file, 0, "not a bt-replay 1 recording of wind_meteors", g_lines[0]);
+    if (g_lineCount < 2 || strcmp(g_lines[0], "bt-replay 2") != 0 || strncmp(g_lines[1], "subsystem ", 10) != 0)
+        Fatal(file, 0, "not a bt-replay 2 recording", g_lines[0]);
+    char version[32] = "";
+    char tail[32] = "";
+    if (sscanf(g_lines[1], "subsystem %47s %31s %31s", g_subsystem, version, tail) < 2)
+        Fatal(file, 0, "bad subsystem line", g_lines[1]);
+    const ReplaySubsystem* known = nullptr;
+    for (unsigned s = 0; s < kReplaySubsystemCount; s++) {
+        if (strcmp(kReplaySubsystems[s].name, g_subsystem) == 0)
+            known = &kReplaySubsystems[s];
+    }
+    if (known == nullptr)
+        Fatal(file, 0, "not a simulation subsystem", g_subsystem);
+    if (tail[0] != '\0' || !known->complete)
+        Fatal(file, 0, "the annotations of this subsystem are not complete, so its recordings cannot be replayed", g_subsystem);
+    char want[32];
+    sprintf(want, "%u.%u", known->major, known->minor);
+    if (strcmp(version, want) != 0)
+        Fatal(file, 0, "the interface version differs from the schema's", version);
+    if (ReplayWasmActive() && strcmp(ReplayWasmSubsystem(), g_subsystem) != 0)
+        Fatal(file, 0, "the WASM module is of another subsystem", ReplayWasmSubsystem());
     if (mutation != MUT_NONE && !Mutate(mutation))
         Fatal(file, 0, "nothing to mutate", "no SpawnProjectile import");
     ResetBlock();
@@ -1212,11 +1146,126 @@ int Replay(const char* file, int expectCall, const char* expectField)
     return 0;
 }
 
+const unsigned short* AllStateFields(unsigned* count)
+{
+    static unsigned short all[64];
+    unsigned n = 0;
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        if (kReplayObjectKinds[kReplayObjectFields[i].object].scope == RS_STATE)
+            all[n++] = (unsigned short)i;
+    }
+    *count = n;
+    return all;
+}
+
+void RecordGraph(ReplayText& text, ReplayKnown& known, void* player, const ReplaySlotSets& sets)
+{
+    ReplayObjectTable table;
+    ReplayReach* reach = new ReplayReach;
+    unsigned char kind = ROK_PLAYER;
+    ReplayWalk(*reach, table, true, sets, &kind, &player, 1);
+    ReplayCaptureObjects(text, known, table, *reach, sets.objReads, sets.objReadCount, 'r');
+    delete reach;
+}
+
+void ObjectSelfTest()
+{
+    printf("object round trip\n");
+    ResetBlock();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+
+    Player* player = (Player*)SimAlloc(sizeof(Player));
+    Unit* a = (Unit*)SimAlloc(sizeof(Unit));
+    Unit* b = (Unit*)SimAlloc(sizeof(Unit));
+    UnitDef* def = (UnitDef*)SimAlloc(sizeof(UnitDef));
+    player->active = 1;
+    player->id = 7;
+    player->energy = 1500.5f;
+    player->metal = 20.25f;
+    player->unitsBegin = a;
+    player->unitsEnd = b;
+    a->health = 100;
+    a->buildLeft = 0.5f;
+    a->def = def;
+    a->player = player;
+    b->health = -5;
+    b->def = def;
+    b->player = player;
+    def->energymake = 25.0f;
+    def->windgenerator = 0.75f;
+
+    ReplayText text;
+    ReplayKnown recorded;
+    RecordGraph(text, recorded, player, sets);
+    Check(strstr(text.Data(), "  r Player#1.unitsBegin Unit#1\n") != nullptr, "the player's first unit is Unit#1");
+    Check(strstr(text.Data(), "  r Unit#2.def UnitDef#1\n") != nullptr, "the second unit shares UnitDef#1");
+    Check(strstr(text.Data(), "  r Unit#1.def UnitDef#1\n") != nullptr, "the first unit shares UnitDef#1");
+    Check(strstr(text.Data(), "UnitDef#2") == nullptr && strstr(text.Data(), "Unit#3") == nullptr, "no other objects are reached");
+
+    ResetBlock();
+    g_callIndex = 0;
+    char* copy = (char*)malloc(text.Size() + 1);
+    memcpy(copy, text.Data(), text.Size() + 1);
+    int lines = 0;
+    for (char* p = copy; *p != '\0'; lines++) {
+        char* end = strchr(p, '\n');
+        *end = '\0';
+        char* space = strchr(p + 4, ' ');
+        *space = '\0';
+        Check(RestoreObjectLine(p + 4, space + 1, "object self-test", &sets, p), "a recorded line restores");
+        g_known.Set(p + 4, space + 1);
+        p = end + 1;
+    }
+    Check(lines > 0, "lines were restored");
+    free(copy);
+    Player* rebuilt = (Player*)ReplayResolveObject("Player#1", nullptr, g_objects, AllocObject);
+    Unit* ra = (Unit*)ReplayResolveObject("Unit#1", nullptr, g_objects, AllocObject);
+    Unit* rb = (Unit*)ReplayResolveObject("Unit#2", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && ra != nullptr && rb != nullptr, "the objects are rebuilt in the block");
+    Check(rebuilt->unitsBegin.get() == ra && rebuilt->unitsEnd.get() == rb, "the player's refs point at the rebuilt units");
+    Check(ra->def.get() != nullptr && ra->def.get() == rb->def.get(), "both units share one rebuilt UnitDef");
+    Check(ra->player.get() == rebuilt && rb->player.get() == rebuilt, "the units point back at the player");
+
+    ReplayText again;
+    ReplayKnown fresh;
+    RecordGraph(again, fresh, rebuilt, sets);
+    Check(strcmp(text.Data(), again.Data()) == 0, "the rebuilt graph records the same text");
+
+    g_rootKinds[0] = ROK_PLAYER;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    g_diffs = 0;
+    g_detail.Clear();
+    g_firstKey[0] = '\0';
+    g_hash = 2166136261u;
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the unchanged graph compares equal");
+    rb->health = 99;
+    g_diffs = 0;
+    g_detail.Clear();
+    CompareObjects(&sets);
+    printf("a changed field: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Unit#2.health") == 0, "a changed field is reported at its Kind#N.field");
+    rb->health = -5;
+    ra->def.get()->windgenerator = 1.5f;
+    g_diffs = 0;
+    g_detail.Clear();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "UnitDef#1.windgenerator") == 0, "a field of the shared definition is reported once");
+    text.Free();
+    again.Free();
+}
+
 }
 
 int SelfTest(const char* file)
 {
     static const char* const names[] = { "", "an import with other arguments", "an extra import", "a missing import" };
+    ObjectSelfTest();
+    if (file == nullptr)
+        return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {
         Outcome out;
         ReplayFile(file, out, mutation);
@@ -1239,15 +1288,15 @@ int main(int argc, char** argv)
         printf("replaying against the WASM module %s\n", argv[arg + 1]);
         arg += 2;
     }
-    if (arg + 1 < argc && strcmp(argv[arg], "--self-test") == 0) {
-        SelfTest(argv[arg + 1]);
+    if (arg < argc && strcmp(argv[arg], "--self-test") == 0) {
+        SelfTest(arg + 1 < argc ? argv[arg + 1] : nullptr);
         arg = argc;
     } else if (arg + 2 < argc && strcmp(argv[arg], "--expect") == 0) {
         expectCall = atoi(argv[arg + 1]);
         expectField = argv[arg + 2];
         arg += 3;
     } else if (arg >= argc) {
-        printf("usage: replay_native_test [--wasm MODULE.wasm] [--self-test RECORDING | --expect CALL FIELD] RECORDING...\n");
+        printf("usage: replay_native_test [--wasm MODULE.wasm] [--self-test [RECORDING] | --expect CALL FIELD RECORDING...] RECORDING...\n");
         return 2;
     }
     for (; arg < argc; arg++)

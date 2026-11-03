@@ -29,16 +29,21 @@ private:
 
 class ReplayKnown {
 public:
+    ReplayKnown() : count(0), names(nullptr), values(nullptr), slots(nullptr) {}
     void Reset();
     bool Changed(const char* name, const char* value);
     void Set(const char* name, const char* value);
+    const char* Get(const char* name) const;
 
 private:
-    enum { CAPACITY = 64, NAME = 48, VALUE = 192 };
+    ReplayKnown(const ReplayKnown&);
+    ReplayKnown& operator=(const ReplayKnown&);
+    enum { CAPACITY = 8192, SLOTS = 16384, NAME = 64, VALUE = 192 };
     int Find(const char* name) const;
     int count;
-    char names[CAPACITY][NAME];
-    char values[CAPACITY][VALUE];
+    char (*names)[NAME];
+    char (*values)[VALUE];
+    short* slots;
 };
 
 class ReplayOrdinals {

@@ -12,7 +12,7 @@ Outputs:
 
     data/replay_schema.json         the annotations (kept as written) and the generated fields, objects and subsystems
     src/harness/replay_schema.h     the field, object and slot tables
-    src/harness/replay_hooks.h      the recording copy of every seam table, with the argument and import hooks
+    src/harness/replay_hooks.inc    the recording copy of every seam table, with the argument and import hooks
     tests/replay_slots.h            the slot runners, import stubs and native seam tables of the replayer
 
 A slot's reads are field_read, global_read and global_maybe_written rows; its writes are field_write, global_write and
@@ -38,7 +38,7 @@ RWSETS = ROOT / "data/rwsets.csv"
 SUBSYSTEMS = ROOT / "data/subsystems.csv"
 INTERFACES = ROOT / "interfaces"
 SCHEMA_H = ROOT / "src/harness/replay_schema.h"
-HOOKS_H = ROOT / "src/harness/replay_hooks.h"
+HOOKS_H = ROOT / "src/harness/replay_hooks.inc"
 SLOTS_H = ROOT / "tests/replay_slots.h"
 JSON_OUT = ROOT / "data/replay_schema.json"
 SIM_GLOBALS_H = ROOT / "src/state/sim_globals.h"
@@ -409,7 +409,7 @@ def render_schema(ann: dict, model: dict) -> str:
         member = f.get("member", f["name"])
         t = types[f["object"]]
         size = f.get("size")
-        size_text = str(size) if size else "sizeof(((%s*)0)->%s)" % (t, member)
+        size_text = str(size) if size else "sizeof(((%s*)nullptr)->%s)" % (t, member)
         target = kind_id[f["target"]] if f["kind"] == "ref" else "0"
         L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s },' % (f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target))
     L += ["};", "static const unsigned kReplayObjectFieldCount = %d;" % len(ofields), ""]
@@ -418,7 +418,7 @@ def render_schema(ann: dict, model: dict) -> str:
         member = f.get("member", f["name"])
         if f.get("size") is None:
             want = {"i32": 4, "u32": 4, "u16": 2, "i16": 2, "f32": 4, "flags": 4, "ref": 4, "point16": 4, "weapon": 4}[f["kind"]]
-            L.append('static_assert(sizeof(((%s*)0)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, want, t, f["name"]))
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, want, t, f["name"]))
     L += ["", "enum ReplaySubsystemId {"]
     L += ["    SUB_%s," % upper(s) for s in subsystems]
     L += ["    SUB_COUNT", "};", "", "enum ReplaySlotId {"]

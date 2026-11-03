@@ -29,7 +29,7 @@ private:
 
 class ReplayKnown {
 public:
-    ReplayKnown() : count(0), names(nullptr), values(nullptr), slots(nullptr) {}
+    ReplayKnown() : count(0), table(nullptr) {}
     void Reset();
     bool Changed(const char* name, const char* value);
     void Set(const char* name, const char* value);
@@ -39,11 +39,14 @@ private:
     ReplayKnown(const ReplayKnown&);
     ReplayKnown& operator=(const ReplayKnown&);
     enum { CAPACITY = 8192, SLOTS = 16384, NAME = 64, VALUE = 192 };
+    struct Table {
+        char names[CAPACITY][NAME];
+        char values[CAPACITY][VALUE];
+        short slots[SLOTS];
+    };
     int Find(const char* name) const;
     int count;
-    char (*names)[NAME];
-    char (*values)[VALUE];
-    short* slots;
+    Table* table;
 };
 
 class ReplayOrdinals {

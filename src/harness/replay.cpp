@@ -2,15 +2,14 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
-#include <vector>
 
 #include "replay_schema.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/rand_stream.h"
 #include "../util/vec3.h"
-#include "../util/commands.h"
 #include "replay_text.h"
+#include "replay_types.h"
 #include "replay_values.h"
 #include "replay_objects.h"
 #include "replay.h"
@@ -419,7 +418,7 @@ void FinishImport(ReplayText& line)
     line.Free();
 }
 
-#include "replay_hooks.h"
+#include "replay_hooks.inc"
 
 }
 

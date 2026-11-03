@@ -3,7 +3,10 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "../../interfaces/ref.h"
 #include "replay_schema.h"
+#include "replay_text.h"
+#include "replay_types.h"
 #include "replay_objects.h"
 
 namespace {

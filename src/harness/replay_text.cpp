@@ -143,19 +143,19 @@ static unsigned KnownHash(const char* name)
 void ReplayKnown::Reset()
 {
     count = 0;
-    if (slots != nullptr)
-        memset(slots, 0xff, sizeof(short) * SLOTS);
+    if (table != nullptr)
+        memset(table->slots, 0xff, sizeof table->slots);
 }
 
 int ReplayKnown::Find(const char* name) const
 {
-    if (slots == nullptr)
+    if (table == nullptr)
         return -1;
     for (unsigned i = KnownHash(name) % SLOTS;; i = (i + 1) % SLOTS) {
-        int at = slots[i];
+        int at = table->slots[i];
         if (at < 0)
             return -1;
-        if (strcmp(names[at], name) == 0)
+        if (strcmp(table->names[at], name) == 0)
             return at;
     }
 }
@@ -163,13 +163,13 @@ int ReplayKnown::Find(const char* name) const
 const char* ReplayKnown::Get(const char* name) const
 {
     int at = Find(name);
-    return at < 0 ? nullptr : values[at];
+    return at < 0 ? nullptr : table->values[at];
 }
 
 bool ReplayKnown::Changed(const char* name, const char* value)
 {
     int at = Find(name);
-    if (at >= 0 && strcmp(values[at], value) == 0)
+    if (at >= 0 && strcmp(table->values[at], value) == 0)
         return false;
     Set(name, value);
     return true;
@@ -177,28 +177,26 @@ bool ReplayKnown::Changed(const char* name, const char* value)
 
 void ReplayKnown::Set(const char* name, const char* value)
 {
-    if (slots == nullptr) {
-        names = (char (*)[NAME])malloc((size_t)CAPACITY * NAME);
-        values = (char (*)[VALUE])malloc((size_t)CAPACITY * VALUE);
-        slots = (short*)malloc(sizeof(short) * SLOTS);
-        if (names == nullptr || values == nullptr || slots == nullptr)
+    if (table == nullptr) {
+        table = (Table*)malloc(sizeof(Table));
+        if (table == nullptr)
             abort();
-        memset(slots, 0xff, sizeof(short) * SLOTS);
+        memset(table->slots, 0xff, sizeof table->slots);
     }
     int at = Find(name);
     if (at < 0) {
         if (count == CAPACITY || strlen(name) >= NAME)
             abort();
         at = count++;
-        strcpy(names[at], name);
+        strcpy(table->names[at], name);
         unsigned i = KnownHash(name) % SLOTS;
-        while (slots[i] >= 0)
+        while (table->slots[i] >= 0)
             i = (i + 1) % SLOTS;
-        slots[i] = (short)at;
+        table->slots[i] = (short)at;
     }
     if (strlen(value) >= VALUE)
         abort();
-    strcpy(values[at], value);
+    strcpy(table->values[at], value);
 }
 
 void ReplayOrdinals::Reset()

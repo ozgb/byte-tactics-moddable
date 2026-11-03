@@ -131,7 +131,7 @@ A `pending` subsystem lists in its generated `pending` entry what is left (untra
 slots whose functions are not found, arguments with no annotation); its own issue empties that list. A complete
 subsystem with anything pending is an error.
 
-`uv run tools/replayschema.py` also writes `src/harness/replay_schema.h` (the tables), `src/harness/replay_hooks.h` (the
+`uv run tools/replayschema.py` also writes `src/harness/replay_schema.h` (the tables), `src/harness/replay_hooks.inc` (the
 recording copy of every seam table, its argument hooks and the import hooks) and `tests/replay_slots.h` (the slot
 runners, import stubs and native seam tables of the replayer). The services imports (`GameRand`, the TDF and command
 classes) are hooked by hand in the game source (`ReplayImport` in `src/harness/replay.h`) and answered by hand in

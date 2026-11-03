@@ -152,46 +152,46 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
 static const unsigned kReplayObjectKindCount = 5;
 
 static const ReplayObjectField kReplayObjectFields[] = {
-    { "active", offsetof(Player, active), sizeof(((Player*)0)->active), ROK_PLAYER, RK_I32, 0 },
-    { "id", offsetof(Player, id), sizeof(((Player*)0)->id), ROK_PLAYER, RK_U32, 0 },
-    { "energy", offsetof(Player, energy), sizeof(((Player*)0)->energy), ROK_PLAYER, RK_F32, 0 },
-    { "metal", offsetof(Player, metal), sizeof(((Player*)0)->metal), ROK_PLAYER, RK_F32, 0 },
-    { "unitsBegin", offsetof(Player, unitsBegin), sizeof(((Player*)0)->unitsBegin), ROK_PLAYER, RK_REF, ROK_UNIT },
-    { "unitsEnd", offsetof(Player, unitsEnd), sizeof(((Player*)0)->unitsEnd), ROK_PLAYER, RK_REF, ROK_UNIT },
-    { "health", offsetof(Unit, health), sizeof(((Unit*)0)->health), ROK_UNIT, RK_I16, 0 },
-    { "buildLeft", offsetof(Unit, buildLeft), sizeof(((Unit*)0)->buildLeft), ROK_UNIT, RK_F32, 0 },
-    { "def", offsetof(Unit, def), sizeof(((Unit*)0)->def), ROK_UNIT, RK_REF, ROK_UNITDEF },
-    { "player", offsetof(Unit, player), sizeof(((Unit*)0)->player), ROK_UNIT, RK_REF, ROK_PLAYER },
-    { "energymake", offsetof(UnitDef, energymake), sizeof(((UnitDef*)0)->energymake), ROK_UNITDEF, RK_F32, 0 },
-    { "windgenerator", offsetof(UnitDef, windgenerator), sizeof(((UnitDef*)0)->windgenerator), ROK_UNITDEF, RK_F32, 0 },
-    { "tidalgenerator", offsetof(UnitDef, tidalgenerator), sizeof(((UnitDef*)0)->tidalgenerator), ROK_UNITDEF, RK_F32, 0 },
-    { "flags", offsetof(WeaponDef, flags.value), sizeof(((WeaponDef*)0)->flags.value), ROK_WEAPONDEF, RK_FLAGS, 0 },
+    { "active", offsetof(Player, active), sizeof(((Player*)nullptr)->active), ROK_PLAYER, RK_I32, 0 },
+    { "id", offsetof(Player, id), sizeof(((Player*)nullptr)->id), ROK_PLAYER, RK_U32, 0 },
+    { "energy", offsetof(Player, energy), sizeof(((Player*)nullptr)->energy), ROK_PLAYER, RK_F32, 0 },
+    { "metal", offsetof(Player, metal), sizeof(((Player*)nullptr)->metal), ROK_PLAYER, RK_F32, 0 },
+    { "unitsBegin", offsetof(Player, unitsBegin), sizeof(((Player*)nullptr)->unitsBegin), ROK_PLAYER, RK_REF, ROK_UNIT },
+    { "unitsEnd", offsetof(Player, unitsEnd), sizeof(((Player*)nullptr)->unitsEnd), ROK_PLAYER, RK_REF, ROK_UNIT },
+    { "health", offsetof(Unit, health), sizeof(((Unit*)nullptr)->health), ROK_UNIT, RK_I16, 0 },
+    { "buildLeft", offsetof(Unit, buildLeft), sizeof(((Unit*)nullptr)->buildLeft), ROK_UNIT, RK_F32, 0 },
+    { "def", offsetof(Unit, def), sizeof(((Unit*)nullptr)->def), ROK_UNIT, RK_REF, ROK_UNITDEF },
+    { "player", offsetof(Unit, player), sizeof(((Unit*)nullptr)->player), ROK_UNIT, RK_REF, ROK_PLAYER },
+    { "energymake", offsetof(UnitDef, energymake), sizeof(((UnitDef*)nullptr)->energymake), ROK_UNITDEF, RK_F32, 0 },
+    { "windgenerator", offsetof(UnitDef, windgenerator), sizeof(((UnitDef*)nullptr)->windgenerator), ROK_UNITDEF, RK_F32, 0 },
+    { "tidalgenerator", offsetof(UnitDef, tidalgenerator), sizeof(((UnitDef*)nullptr)->tidalgenerator), ROK_UNITDEF, RK_F32, 0 },
+    { "flags", offsetof(WeaponDef, flags.value), sizeof(((WeaponDef*)nullptr)->flags.value), ROK_WEAPONDEF, RK_FLAGS, 0 },
     { "name", offsetof(MeteorParams, name), 32, ROK_METEORPARAMS, RK_STRING, 0 },
-    { "radius", offsetof(MeteorParams, radius), sizeof(((MeteorParams*)0)->radius), ROK_METEORPARAMS, RK_I32, 0 },
-    { "density", offsetof(MeteorParams, density), sizeof(((MeteorParams*)0)->density), ROK_METEORPARAMS, RK_F32, 0 },
-    { "duration", offsetof(MeteorParams, duration), sizeof(((MeteorParams*)0)->duration), ROK_METEORPARAMS, RK_F32, 0 },
-    { "interval", offsetof(MeteorParams, interval), sizeof(((MeteorParams*)0)->interval), ROK_METEORPARAMS, RK_F32, 0 },
+    { "radius", offsetof(MeteorParams, radius), sizeof(((MeteorParams*)nullptr)->radius), ROK_METEORPARAMS, RK_I32, 0 },
+    { "density", offsetof(MeteorParams, density), sizeof(((MeteorParams*)nullptr)->density), ROK_METEORPARAMS, RK_F32, 0 },
+    { "duration", offsetof(MeteorParams, duration), sizeof(((MeteorParams*)nullptr)->duration), ROK_METEORPARAMS, RK_F32, 0 },
+    { "interval", offsetof(MeteorParams, interval), sizeof(((MeteorParams*)nullptr)->interval), ROK_METEORPARAMS, RK_F32, 0 },
 };
 static const unsigned kReplayObjectFieldCount = 19;
 
-static_assert(sizeof(((Player*)0)->active) == 4, "Player::active has the size the schema says");
-static_assert(sizeof(((Player*)0)->id) == 4, "Player::id has the size the schema says");
-static_assert(sizeof(((Player*)0)->energy) == 4, "Player::energy has the size the schema says");
-static_assert(sizeof(((Player*)0)->metal) == 4, "Player::metal has the size the schema says");
-static_assert(sizeof(((Player*)0)->unitsBegin) == 4, "Player::unitsBegin has the size the schema says");
-static_assert(sizeof(((Player*)0)->unitsEnd) == 4, "Player::unitsEnd has the size the schema says");
-static_assert(sizeof(((Unit*)0)->health) == 2, "Unit::health has the size the schema says");
-static_assert(sizeof(((Unit*)0)->buildLeft) == 4, "Unit::buildLeft has the size the schema says");
-static_assert(sizeof(((Unit*)0)->def) == 4, "Unit::def has the size the schema says");
-static_assert(sizeof(((Unit*)0)->player) == 4, "Unit::player has the size the schema says");
-static_assert(sizeof(((UnitDef*)0)->energymake) == 4, "UnitDef::energymake has the size the schema says");
-static_assert(sizeof(((UnitDef*)0)->windgenerator) == 4, "UnitDef::windgenerator has the size the schema says");
-static_assert(sizeof(((UnitDef*)0)->tidalgenerator) == 4, "UnitDef::tidalgenerator has the size the schema says");
-static_assert(sizeof(((WeaponDef*)0)->flags.value) == 4, "WeaponDef::flags has the size the schema says");
-static_assert(sizeof(((MeteorParams*)0)->radius) == 4, "MeteorParams::radius has the size the schema says");
-static_assert(sizeof(((MeteorParams*)0)->density) == 4, "MeteorParams::density has the size the schema says");
-static_assert(sizeof(((MeteorParams*)0)->duration) == 4, "MeteorParams::duration has the size the schema says");
-static_assert(sizeof(((MeteorParams*)0)->interval) == 4, "MeteorParams::interval has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->active) == 4, "Player::active has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->id) == 4, "Player::id has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->energy) == 4, "Player::energy has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->metal) == 4, "Player::metal has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->unitsBegin) == 4, "Player::unitsBegin has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->unitsEnd) == 4, "Player::unitsEnd has the size the schema says");
+static_assert(sizeof(((Unit*)nullptr)->health) == 2, "Unit::health has the size the schema says");
+static_assert(sizeof(((Unit*)nullptr)->buildLeft) == 4, "Unit::buildLeft has the size the schema says");
+static_assert(sizeof(((Unit*)nullptr)->def) == 4, "Unit::def has the size the schema says");
+static_assert(sizeof(((Unit*)nullptr)->player) == 4, "Unit::player has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->energymake) == 4, "UnitDef::energymake has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->windgenerator) == 4, "UnitDef::windgenerator has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->tidalgenerator) == 4, "UnitDef::tidalgenerator has the size the schema says");
+static_assert(sizeof(((WeaponDef*)nullptr)->flags.value) == 4, "WeaponDef::flags has the size the schema says");
+static_assert(sizeof(((MeteorParams*)nullptr)->radius) == 4, "MeteorParams::radius has the size the schema says");
+static_assert(sizeof(((MeteorParams*)nullptr)->density) == 4, "MeteorParams::density has the size the schema says");
+static_assert(sizeof(((MeteorParams*)nullptr)->duration) == 4, "MeteorParams::duration has the size the schema says");
+static_assert(sizeof(((MeteorParams*)nullptr)->interval) == 4, "MeteorParams::interval has the size the schema says");
 
 enum ReplaySubsystemId {
     SUB_WIND_METEORS,

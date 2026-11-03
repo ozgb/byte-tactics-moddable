@@ -68,3 +68,20 @@ Fields are named as `data/rwsets.csv` names them: `Game.windCounter` for `Game::
 `SimGlobals.g_meteorActive` for the global `g_meteorActive`. `rng.main`, `rng.load` and `rng.seed` are the two
 generator streams of the block head and `g_randomSeed`; they are in the sets of the slots that draw.
 `weapondef#17.flags` is the flags word of a weapon the module reads through a pointer it was given.
+
+## Replaying
+
+`tests/replay_native_test.cpp` replays a recording against the native module (`replay_native_test.exe`, built by
+`cmake --build build/modern --target replay_native_test`, run under Wine in `modern-compile`):
+
+```sh
+wine build/modern/replay_native_test.exe tests/replay/*.txt
+```
+
+One block is kept across the calls of a file: each `r` line is restored into it, the outer slot runs, every import is
+answered from its `i` and `o` lines, and the write set and the closing `o` lines are compared with the file. A random
+draw returns the recorded result, and the stream words advance as the game's do, so `rng.*` is checked like any field.
+A call that differs is reported with the first import or field that differs and both values, and the file stops
+there. Each file is replayed twice and the two results must be identical. `--self-test FILE` mutates the recording
+and expects each mutation reported; `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built with one
+changed constant and expects that divergence.

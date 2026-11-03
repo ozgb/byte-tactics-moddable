@@ -331,7 +331,7 @@ input 40 char a
   The scroll of slot 0 on The Pass is (304, 32) until the camera moves.
 
 In test mode the exe also writes `ui.txt` beside `trace.txt`: the input it delivered, the orders the UI turned it
-into, and the selection after each tick (format and meaning in [docs/ui-log.md](../docs/ui-log.md)). The harness's own
+into, the selection and the camera scroll after each tick, and the count of view-stream draws (format and meaning in [docs/ui-log.md](../docs/ui-log.md)). The harness's own
 `order` lines are not logged. `--check` compares each run's `ui.txt` line by line with `reference/ui/<scenario>.txt`
 and reports the first line that differs. It fails when a stored log has no scenario, when a `ui-*` scenario has no
 stored log, and when a `ui-*` scenario's log has no order, queued build, cancel or group line and selects no unit (a

@@ -1,0 +1,7 @@
+bt-ui 1
+1 scroll 3040 1088
+1 select -
+382 scroll 3040 1086
+383 scroll 3040 1085
+384 scroll 3038 1086
+386 scroll 3039 1087

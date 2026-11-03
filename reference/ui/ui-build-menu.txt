@@ -1,0 +1,28 @@
+bt-ui 1
+1 scroll 304 32
+1 select -
+10 input mouse move 424 300
+11 input mouse left down 424 300
+12 input mouse left up 424 300
+13 select 2
+20 input mouse move 96 187
+21 input mouse left down 96 187
+22 input mouse left up 96 187
+22 qbuild 2 ARMPW 1
+30 input key down 16
+31 input mouse left down 96 187
+32 input mouse left up 96 187
+32 qbuild 2 ARMPW 5
+33 input key up 16
+40 input mouse move 32 187
+41 input mouse left down 32 187
+42 input mouse left up 32 187
+42 qbuild 2 ARMCK 1
+50 input mouse right down 96 187
+51 input mouse right up 96 187
+51 qbuild 2 ARMPW -1
+60 input key down 16
+61 input mouse right down 96 187
+62 input mouse right up 96 187
+62 qbuild 2 ARMPW -5
+63 input key up 16

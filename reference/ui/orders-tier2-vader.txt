@@ -1,0 +1,10 @@
+bt-ui 1
+1 scroll 304 32
+1 select -
+132 scroll 298 22
+133 scroll 292 17
+134 scroll 295 22
+135 scroll 305 21
+136 scroll 302 28
+137 scroll 304 30
+138 scroll 304 31

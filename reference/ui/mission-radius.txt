@@ -1,0 +1,9 @@
+bt-ui 1
+1 scroll 1632 384
+1 select -
+2523 scroll 1632 380
+2524 scroll 1639 381
+2525 scroll 1627 383
+2526 scroll 1629 383
+2527 scroll 1630 383
+2528 scroll 1631 383

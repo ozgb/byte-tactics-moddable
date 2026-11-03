@@ -1,0 +1,14 @@
+bt-ui 1
+1 scroll 864 176
+1 select -
+160 scroll 870 183
+161 scroll 872 174
+162 scroll 868 170
+163 scroll 856 161
+164 scroll 855 157
+165 scroll 860 163
+166 scroll 851 180
+167 scroll 868 174
+168 scroll 872 169
+169 scroll 873 165
+170 scroll 868 160

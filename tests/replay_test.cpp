@@ -78,6 +78,26 @@ static void TestKnown()
     Check(k.Changed("a", "2"), "reset forgets");
 }
 
+static void TestKnownMany()
+{
+    ReplayKnown k;
+    char name[32];
+    char value[16];
+    for (int i = 0; i < 5000; i++) {
+        sprintf(name, "Unit#%d.health", i);
+        sprintf(value, "%d", i);
+        k.Set(name, value);
+    }
+    bool all = true;
+    for (int i = 0; i < 5000; i++) {
+        sprintf(name, "Unit#%d.health", i);
+        sprintf(value, "%d", i);
+        all = all && !k.Changed(name, value) && strcmp(k.Get(name), value) == 0;
+    }
+    Check(all, "thousands of names are all found again");
+    Check(k.Get("Unit#5000.health") == 0, "an unknown name has no value");
+}
+
 static void TestOrdinals()
 {
     ReplayOrdinals o;
@@ -97,6 +117,7 @@ int main()
     TestStrings();
     TestGrowth();
     TestKnown();
+    TestKnownMany();
     TestOrdinals();
     if (g_failures == 0) {
         printf("replay_test: all passed\n");

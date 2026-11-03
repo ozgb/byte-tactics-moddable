@@ -132,24 +132,44 @@ unsigned ReplayText::Size() const
     return used;
 }
 
+static unsigned KnownHash(const char* name)
+{
+    unsigned h = 2166136261u;
+    for (const unsigned char* p = (const unsigned char*)name; *p != 0; p++)
+        h = (h ^ *p) * 16777619u;
+    return h;
+}
+
 void ReplayKnown::Reset()
 {
     count = 0;
+    if (table != nullptr)
+        memset(table->slots, 0, sizeof table->slots);
 }
 
 int ReplayKnown::Find(const char* name) const
 {
-    for (int i = 0; i < count; i++) {
-        if (strcmp(names[i], name) == 0)
-            return i;
+    if (table == nullptr)
+        return -1;
+    for (unsigned i = KnownHash(name) % SLOTS;; i = (i + 1) % SLOTS) {
+        int at = table->slots[i];
+        if (at == 0)
+            return -1;
+        if (strcmp(table->names[at - 1], name) == 0)
+            return at - 1;
     }
-    return -1;
+}
+
+const char* ReplayKnown::Get(const char* name) const
+{
+    int at = Find(name);
+    return at < 0 ? nullptr : table->values[at];
 }
 
 bool ReplayKnown::Changed(const char* name, const char* value)
 {
     int at = Find(name);
-    if (at >= 0 && strcmp(values[at], value) == 0)
+    if (at >= 0 && strcmp(table->values[at], value) == 0)
         return false;
     Set(name, value);
     return true;
@@ -157,16 +177,24 @@ bool ReplayKnown::Changed(const char* name, const char* value)
 
 void ReplayKnown::Set(const char* name, const char* value)
 {
+    if (table == nullptr)
+        table = (Table*)calloc(1, sizeof(Table));
+    if (table == nullptr)
+        return;
     int at = Find(name);
     if (at < 0) {
         if (count == CAPACITY || strlen(name) >= NAME)
             abort();
         at = count++;
-        strcpy(names[at], name);
+        strcpy(table->names[at], name);
+        unsigned i = KnownHash(name) % SLOTS;
+        while (table->slots[i] != 0)
+            i = (i + 1) % SLOTS;
+        table->slots[i] = (short)(at + 1);
     }
     if (strlen(value) >= VALUE)
         abort();
-    strcpy(values[at], value);
+    strcpy(table->values[at], value);
 }
 
 void ReplayOrdinals::Reset()

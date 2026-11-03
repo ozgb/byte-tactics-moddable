@@ -1602,7 +1602,7 @@ void HarnessAfterStep()
         sprintf(msg, "testmode: reached tick %u\n", s_ticks);
     host_log(msg);
     if (!ReplayWrite())
-        Fail("testmode: cannot write replay-wind_meteors.txt\n");
+        Fail("testmode: cannot write a replay file\n");
     host_exit(0);
 }
 

@@ -1,4 +1,4 @@
-bt-replay 1
+bt-replay 2
 subsystem wind_meteors 1.2
 call 0 DisableMeteors
   w SimGlobals.g_meteorsEnabled 0

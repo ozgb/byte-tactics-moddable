@@ -145,6 +145,10 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_WATCH_PROMPT = 25,
     // A player who hosts AI players that are still alive is placed in watch mode: the player index, the notice shows when it is the local player.
     SIM_EVENT_WATCH_MODE_NOTICE = 26,
+    // The radar picture shows the units and projectiles of a snapshot: its offset in the radar arena.
+    SIM_EVENT_RADAR_UNITS = 34,
+    // The radar picture marks the cells a snapshot says are explored or hidden: its offset in the radar arena.
+    SIM_EVENT_RADAR_MAPPED = 35,
 };
 // Flag of SIM_EVENT_UNIT_SPEECH: the unit stays silent when it is on screen.
 #define SIM_EVENT_SPEECH_IF_NOT_VISIBLE 1u

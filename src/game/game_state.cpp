@@ -5,6 +5,7 @@
 
 #include "../map/mission.h"
 #include "../state/sim_events.h"
+#include "../state/sim_radar.h"
 #include "../state/game_rand.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/host.h"
@@ -473,6 +474,7 @@ void LoadBattleAssets()
     LoadLightBar();
     ResetSpeech();
     SimEventsClear();
+    SimCaptureClear();
     LoadTextureGafs();
     g_seams.features->LoadFeatureFileList();
     g_seams.units->InitUnitCategories();

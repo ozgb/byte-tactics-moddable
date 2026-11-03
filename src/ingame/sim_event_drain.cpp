@@ -12,6 +12,8 @@
 #include "../orders/box.h"
 #include "../sound/sound.h"
 #include "../state/sim_events.h"
+#include "../state/sim_radar.h"
+#include "radar.h"
 #include "../../interfaces/services.h"
 #include "../units/unit.h"
 #include "../util/vec3.h"
@@ -284,6 +286,12 @@ void DrainSimEvents()
         case SIM_EVENT_FOCUS_COMMANDER:
             FocusCommander((int)e.args[0]);
             break;
+        case SIM_EVENT_RADAR_UNITS:
+            DrawRadarUnits((const RadarDrawCapture*)(SimCapture().bytes + e.args[0]));
+            break;
+        case SIM_EVENT_RADAR_MAPPED:
+            UpdateRadarMapped((const RadarMappedCapture*)(SimCapture().bytes + e.args[0]));
+            break;
         case SIM_EVENT_POP_TO_GAME_LAYOUT:
             PopUntilNamedLayout((int)e.args[0]);
             break;
@@ -291,4 +299,5 @@ void DrainSimEvents()
             break;
         }
     }
+    SimCaptureClear();
 }

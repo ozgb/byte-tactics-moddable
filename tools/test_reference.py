@@ -327,6 +327,7 @@ class CheckRoundtripTest(unittest.TestCase):
                     mock.patch.object(reference.tracedigest, "parse_digest", lambda p: stored), \
                     mock.patch.object(reference, "play_all", fake_play_all), \
                     mock.patch.object(reference, "sound_report", lambda *a: ([], [])), \
+                    mock.patch.object(reference, "ui_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "report_fuel", lambda *a: 0), \
                     contextlib.redirect_stdout(out):
                 reference.check_traces(Path("x.exe"), None, 1, roundtrip="auto")

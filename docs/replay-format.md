@@ -14,7 +14,8 @@ A scenario line `record <subsystem>` makes the run write `replay-<subsystem>.txt
 failure. `record <subsystem> <first tick> <last tick>` records only the calls whose tick is in the window.
 Every simulation subsystem (the members of `Seams`) is accepted, and a scenario may carry several `record` lines,
 one per subsystem, each with its own file and window. `tools/replay.py` adds the lines to copies of the
-scenarios; `reference/scenarios/` never holds them.
+scenarios; `reference/scenarios/` never holds them. A stored recording that covers only a window is listed in
+`tests/replay/windows.json` (`"<subsystem>/<scenario>": [first, last]`), and `--check` records it with that window.
 
 ```sh
 uv run tools/replay.py --record --exe build/modern/TotalA.exe --out DIR [--subsystem NAME]... [--native-modules] [SCENARIO...]
@@ -201,7 +202,8 @@ wine build/modern/replay_inject_test.exe --expect 5501 Player#0.energy tests/rep
 
 The recordings of economy and the scenarios they come from: `duel-shore-to-shore` (wind generators from tick 1620, metal
 extractors from tick 480), `duel-coast-to-coast` (tidal generators from tick 3330, extractors) and `load-midgame` (the
-accounts read back from a saved game, `LoadUnitAccounts`, and extractors). `UpdatePlayerEconomy` walks every unit of the
+accounts read back from a saved game, `LoadUnitAccounts`, and extractors) and `ten-ring-atoll`, ticks 6270 to 6270 only, where
+the first metal maker earns income (the `makesMetal` branch of `UpdatePlayerEconomy`). `UpdatePlayerEconomy` walks every unit of the
 player's slice of the unit table on each call, so a recording carries the `r` lines of all the slice at the first call and the
 changes after it.
 

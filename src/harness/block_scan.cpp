@@ -40,15 +40,9 @@ struct Row {
 Entry* g_registry;
 unsigned g_registryCount;
 Span* g_spans;
-struct SpanInfo {
-    unsigned site;
-    const char* tag;
-};
-SpanInfo* g_info;
 unsigned g_spanBase;
 bool g_verify;
 Span* g_refSpans;
-SpanInfo* g_refInfo;
 unsigned g_refSpanCount;
 unsigned g_refSpanMin;
 unsigned g_refSpanMax;
@@ -147,23 +141,26 @@ void SpanErase(unsigned addr)
     if (i >= g_spanCount || g_spans[i].start != addr)
         return;
     memmove(&g_spans[i], &g_spans[i + 1], (g_spanCount - i - 1) * sizeof(Span));
-    memmove(&g_info[i], &g_info[i + 1], (g_spanCount - i - 1) * sizeof(SpanInfo));
     g_spanCount--;
     g_dirty = true;
 }
 
-void SpanInsert(unsigned addr, unsigned size, unsigned site, const char* tag)
+void SpanInsert(unsigned addr, unsigned size, unsigned slot)
 {
     unsigned i = SpanLowerBound(addr);
     memmove(&g_spans[i + 1], &g_spans[i], (g_spanCount - i) * sizeof(Span));
-    memmove(&g_info[i + 1], &g_info[i], (g_spanCount - i) * sizeof(SpanInfo));
     g_spans[i].start = addr;
     g_spans[i].end = addr + size;
-    g_spans[i].index = 0;
-    g_info[i].site = site;
-    g_info[i].tag = tag;
+    g_spans[i].index = slot;
     g_spanCount++;
     g_dirty = true;
+}
+
+void SpanMoved(unsigned addr, unsigned slot)
+{
+    unsigned i = SpanLowerBound(addr);
+    if (i < g_spanCount && g_spans[i].start == addr)
+        g_spans[i].index = slot;
 }
 
 void __cdecl OnAdded(void* p, unsigned size)
@@ -186,7 +183,7 @@ void __cdecl OnAdded(void* p, unsigned size)
     if (!Inside(addr)) {
         SpanErase(addr);
         if (size != 0)
-            SpanInsert(addr, size, g_registry[i].site, g_registry[i].tag);
+            SpanInsert(addr, size, i);
     }
     host_mutex_unlock(g_scanLock);
 }
@@ -214,6 +211,8 @@ void __cdecl OnRemoved(void* p)
         bool movable = hole <= j ? (home <= hole || home > j) : (home <= hole && home > j);
         if (movable) {
             g_registry[hole] = g_registry[j];
+            if (!Inside(g_registry[hole].addr))
+                SpanMoved(g_registry[hole].addr, hole);
             hole = j;
         }
     }
@@ -255,10 +254,6 @@ void RebuildSpans()
         g_spanCount++;
     }
     qsort(g_spans, g_spanCount, sizeof(Span), CompareSpans);
-    for (unsigned i = 0; i < g_spanCount; i++) {
-        g_info[i].site = g_registry[g_spans[i].index].site;
-        g_info[i].tag = g_registry[g_spans[i].index].tag;
-    }
 }
 
 void SummarizeSpans()
@@ -288,7 +283,6 @@ template <class T> void Swap(T& a, T& b)
 void SwapBanks()
 {
     Swap(g_spans, g_refSpans);
-    Swap(g_info, g_refInfo);
     Swap(g_spanCount, g_refSpanCount);
     Swap(g_spanMin, g_refSpanMin);
     Swap(g_spanMax, g_refSpanMax);
@@ -427,7 +421,7 @@ void Probe(unsigned v, unsigned off, Row& key, unsigned tick)
     if (s == 0)
         return;
     g_hits++;
-    const SpanInfo& t = g_info[s - g_spans];
+    const Entry& t = g_registry[s->index];
     key.offset = off;
     key.target = t.site;
     key.targetTag = t.tag;
@@ -545,8 +539,7 @@ void PrepareSpans()
     SwapBanks();
     bool same = g_spanCount == g_refSpanCount && g_spanMin == g_refSpanMin && g_spanMax == g_refSpanMax;
     for (unsigned i = 0; same && i < g_spanCount; i++)
-        same = g_spans[i].start == g_refSpans[i].start && g_spans[i].end == g_refSpans[i].end && g_info[i].site == g_refInfo[i].site
-            && g_info[i].tag == g_refInfo[i].tag;
+        same = g_spans[i].start == g_refSpans[i].start && g_spans[i].end == g_refSpans[i].end && g_spans[i].index == g_refSpans[i].index;
     if (!same)
         Die("blockscan: the maintained spans differ from the spans rebuilt from the registry\n");
 }
@@ -629,17 +622,15 @@ void BlockScanEnable(unsigned every, bool verify)
     g_verify = verify;
     if (verify) {
         g_refSpans = (Span*)AllocZeroed(sizeof(Span) * kRegistrySize);
-        g_refInfo = (SpanInfo*)AllocZeroed(sizeof(SpanInfo) * kRegistrySize);
-        g_refRows = (Row*)AllocZeroed(sizeof(Row) * kRowSize);
-        g_refIndex = (unsigned*)AllocZeroed(sizeof(unsigned) * kRowSize);
+        g_refRows = (Row*)AllocZeroed(sizeof(Row) * kRowSize + sizeof(unsigned) * kRowSize);
+        g_refIndex = (unsigned*)(g_refRows + kRowSize);
         g_refPages = (unsigned*)AllocZeroed(kPageWords * sizeof(unsigned));
     }
     g_every = every != 0 ? every : 1;
     g_registry = (Entry*)AllocZeroed(sizeof(Entry) * kRegistrySize);
     g_spans = (Span*)AllocZeroed(sizeof(Span) * kRegistrySize);
-    g_info = (SpanInfo*)AllocZeroed(sizeof(SpanInfo) * kRegistrySize);
-    g_rows = (Row*)AllocZeroed(sizeof(Row) * kRowSize);
-    g_index = (unsigned*)AllocZeroed(sizeof(unsigned) * kRowSize);
+    g_rows = (Row*)AllocZeroed(sizeof(Row) * kRowSize + sizeof(unsigned) * kRowSize);
+    g_index = (unsigned*)(g_rows + kRowSize);
     g_pages = (unsigned*)AllocZeroed(kPageWords * sizeof(unsigned));
     g_scanLock = host_mutex_create();
     const void* base = 0;

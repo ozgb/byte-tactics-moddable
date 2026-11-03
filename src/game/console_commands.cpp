@@ -430,7 +430,7 @@ void __stdcall CmdIWin(CommandArgs* args)
         g_seams.players->KillPlayerUnits(0);
     else
         g_seams.players->KillPlayerUnits(1);
-    g_game->bits.flag4 = 1;
+    g_game->endGameVictory = 1;
     g_game->bits.flag5 = 1;
     g_game->bits.flag2 = 1;
 }
@@ -439,7 +439,7 @@ void __stdcall CmdIWin(CommandArgs* args)
 void __stdcall CmdILose(CommandArgs* args)
 {
     g_seams.players->KillPlayerUnits(g_game->players[g_game->localPlayer].info->side);
-    g_game->bits.flag4 = 0;
+    g_game->endGameVictory = 0;
     g_game->bits.flag6 = 1;
     g_game->bits.flag2 = 1;
 }

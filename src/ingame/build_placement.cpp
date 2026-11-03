@@ -245,7 +245,7 @@ void BattleFrame(void)
         }
     }
 
-    if ((*(NetGameFlags*)&g_game->endGameFlags_3923b).bits.b2 || (*(NetGameFlags*)&g_game->endGameFlags_3923b).bits.b4) {
+    if ((*(NetGameFlags*)&g_game->endGameFlags_3923b).bits.b2 || g_game->endGameVictory) {
         if (g_seams.map->GetGameType(g_game->net) != 3 ||
             (g_seams.map->GetGameType(g_game->net) == 3 &&
              BroadcastPendingViewState() != 0)) {

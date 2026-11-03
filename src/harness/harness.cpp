@@ -1,4 +1,5 @@
 #include "win_types.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1557,7 +1558,7 @@ void HarnessAfterStep()
         return;
     ModulesCheckStatics((unsigned)g_game->ticks);
     UiEndOfTick();
-    int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0;
+    int gameOver = (g_game->endGameFlags & 4) != 0 || g_game->endGameVictory != 0;
     if (!gameOver && (unsigned)g_game->ticks < s_ticks)
         return;
     char msg[64];
@@ -2380,10 +2381,31 @@ static unsigned MapCellCount()
     return n <= CELL_LIMIT ? n : 0;
 }
 
+static void VisitGameScalarFields()
+{
+    for (unsigned k = 0; k < kGameScalarFieldCount; k++) {
+        const TraceField* f = &kGameScalarFields[k];
+        if (f->offset != offsetof(Game, endGameFlags)) {
+            VisitFieldList("game", GameAt(0), f, 1);
+            continue;
+        }
+        unsigned short merged = (unsigned short)(g_game->endGameFlags | (g_game->endGameVictory != 0 ? 0x10 : 0));
+        TraceField local = *f;
+        local.offset = 0;
+        char path[96];
+        HashField((const unsigned char*)&merged, &local);
+        if (s_dumpNow) {
+            sprintf(path, "game.%s", f->name);
+            DumpPrefix(path);
+            DumpValue((const unsigned char*)&merged, &local);
+        }
+    }
+}
+
 static void VisitGameScalars()
 {
     HashByte(10);
-    VisitFieldList("game", GameAt(0), kGameScalarFields, kGameScalarFieldCount);
+    VisitGameScalarFields();
     VisitGlobalList("game", kScalarGlobals, kScalarGlobalsCount);
     EndSection();
 }

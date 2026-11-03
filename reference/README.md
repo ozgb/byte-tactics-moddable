@@ -176,7 +176,10 @@ A run ends at its last tick, or earlier at game over. When 3.1c sets
 `endGameFlags` to 4 or 0x10 (a victory or defeat after its countdown, a
 commander's death, the last enemy gone) the harness ends the run at the end of
 that tick's step, as at the last tick: it closes `trace.txt`, writes the block
-scan, logs `testmode: game over at tick <n>` and exits 0. `ticks` stays the
+scan, logs `testmode: game over at tick <n>` and exits 0. The modern build keeps the
+0x10 bit in its own byte, `Game::endGameVictory`, and the trace hashes and dumps
+`endGameFlags` with that byte merged back at 0x10, so the rows are the same.
+`ticks` stays the
 upper bound. The trace holds no marker: it is shorter than `ticks`, and a build
 that ends the game on another tick differs from the reference in length, which
 the comparison reports as a divergence at the first missing row.

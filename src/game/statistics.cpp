@@ -185,7 +185,7 @@ int FillScoreTables()
             s->value = p->commanderLosses;
             s = g_onlineReportScoreBoards[i]->scores[8];
             s->name = g_scoreNames[8];
-            s->value = (i == g_game->localPlayer || (p->active && p->type == 2)) ? g_game->bits_3923b_2.bit4_3923b : 0;
+            s->value = (i == g_game->localPlayer || (p->active && p->type == 2)) ? g_game->endGameVictory : 0;
         }
     }
     return count;

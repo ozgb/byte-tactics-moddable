@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
+#include <memory>
 #include <vector>
 
 #include "replay_schema.h"
@@ -9,6 +10,7 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/rand_stream.h"
 #include "../util/vec3.h"
+#include "../units/unit.h"
 #include "replay_text.h"
 #include "replay_types.h"
 #include "replay_values.h"

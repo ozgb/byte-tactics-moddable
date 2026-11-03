@@ -74,7 +74,6 @@ struct UnitDefActivateFlagView {
 #include "../weapons/unit_weapon_slot.h"
 
 #include "order.h"
-int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
 void __stdcall ScaleUnitWeights(int, unsigned int*, float, int);
 void __stdcall SetUnitLimits(int, unsigned int*, int, int);
 #include "../ingame/control_panel.h"

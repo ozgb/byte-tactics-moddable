@@ -143,7 +143,6 @@ void __stdcall DrawUnit(void*, Unit*);
 #include "vtol_orders.h"
 void WriteScreenshot(char*, char*, int, int, int, int);
 void SubtractVec3(int*, int*, int*, int*, int*);
-int __stdcall FindWeaponTarget(Unit*, unsigned char, int);
 #include "order_list.h"
 
 static inline Vec3 Direction(short angle, int range)

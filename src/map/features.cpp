@@ -128,7 +128,6 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot1
 int __stdcall StepGafSequence(Handle* anim);
 GafFrame* __stdcall GetGafSequenceFrame(Handle* anim);
 #include "../graphics/model_render.h"
-void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
 #include "../graphics/particles.h"
 
 // FUNCTION: 0x421e60

@@ -25,6 +25,7 @@
 #include "../src/game/console_commands.h"
 #include "../src/harness/replay_text.h"
 #include "../src/harness/replay_schema.h"
+#include "replay_wasm.h"
 
 extern "C" int __cdecl bx_rand(void* state);
 extern "C" int __cdecl bx_ScaledSin(short angle, int scale);
@@ -847,7 +848,7 @@ void ParseArgument(Slot& slot, const char* line, const char* file)
 void RunSlot(Slot& slot, const char* file)
 {
     const char* name = slot.sets->name;
-    WindMeteorsSeam* s = &g_windMeteors;
+    WindMeteorsSeam* s = g_seams.wind_meteors;
     if (strcmp(name, "UpdateWind") == 0)
         s->UpdateWind();
     else if (strcmp(name, "UpdateMeteors") == 0)
@@ -878,7 +879,10 @@ void RunSlot(Slot& slot, const char* file)
 
 void ResetBlock()
 {
-    SimBlockReset();
+    if (ReplayWasmActive())
+        ReplayWasmReload();
+    else
+        SimBlockReset();
     g_simGlobals = (SimGlobals*)SimAlloc(sizeof(SimGlobals));
     g_game = (Game*)SimAlloc(sizeof(Game));
     g_seams.wind_meteors = &g_windMeteors;
@@ -889,6 +893,8 @@ void ResetBlock()
     g_filesSeam.BankOpenAccount = BankOpenAccount;
     g_filesSeam.BankSetInteger = BankSetInteger;
     g_filesSeam.BankGetInteger = BankGetInteger;
+    if (ReplayWasmActive())
+        ReplayWasmUseSeam();
     strcpy(g_extTdf, "tdf");
     g_recordedCount = 0;
 }
@@ -1228,6 +1234,11 @@ int main(int argc, char** argv)
     int expectCall = -1;
     const char* expectField = nullptr;
     int arg = 1;
+    if (arg + 1 < argc && strcmp(argv[arg], "--wasm") == 0) {
+        ReplayWasmSelect(argv[arg + 1]);
+        printf("replaying against the WASM module %s\n", argv[arg + 1]);
+        arg += 2;
+    }
     if (arg + 1 < argc && strcmp(argv[arg], "--self-test") == 0) {
         SelfTest(argv[arg + 1]);
         arg = argc;
@@ -1236,7 +1247,7 @@ int main(int argc, char** argv)
         expectField = argv[arg + 2];
         arg += 3;
     } else if (arg >= argc) {
-        printf("usage: replay_native_test [--self-test RECORDING | --expect CALL FIELD] RECORDING...\n");
+        printf("usage: replay_native_test [--wasm MODULE.wasm] [--self-test RECORDING | --expect CALL FIELD] RECORDING...\n");
         return 2;
     }
     for (; arg < argc; arg++)

@@ -46,6 +46,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 from typing import NamedTuple
 
@@ -120,6 +121,14 @@ class Error(Exception):
     pass
 
 
+def parse_row(line: str) -> tuple[int, str, str] | None:
+    """The (tick, phase, hash) of a trace row, or None when the line is not one."""
+    words = line.split()
+    if len(words) == 3 and words[0].isdigit() and words[1] in PHASES:
+        return int(words[0]), words[1], words[2]
+    return None
+
+
 def parse_trace(path: Path) -> tuple[dict[str, str], list[tuple[int, str, str]]]:
     """The header lines as a dict, and the (tick, phase, hash) lines."""
     header: dict[str, str] = {}
@@ -129,8 +138,8 @@ def parse_trace(path: Path) -> tuple[dict[str, str], list[tuple[int, str, str]]]
         if n == 1:
             if words != ["bt-trace", str(TRACE_FORMAT)]:
                 raise Error(f"{path}: not a bt-trace {TRACE_FORMAT} file")
-        elif len(words) == 3 and words[0].isdigit() and words[1] in PHASES:
-            rows.append((int(words[0]), words[1], words[2]))
+        elif row := parse_row(line):
+            rows.append(row)
         elif rows or not words:
             raise Error(f"{path}:{n}: unexpected line")
         else:
@@ -379,12 +388,14 @@ def scenario_load(scenario: Path) -> str | None:
 
 def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
          poison: bool = False, blockscan: int = 0, env: dict[str, str] | None = None,
-         put: dict[str, Path] | None = None, collect: tuple[str, ...] = (), xserver: bool = False) -> Path:
+         put: dict[str, Path] | None = None, collect: tuple[str, ...] = (), xserver: bool = False,
+         started: Callable[[subprocess.Popen], None] | None = None) -> Path:
     """Run the exe on the scenario with playtest.py, in `env` (default: this process's); the run's directory.
 
     `put` maps a path in the run's game copy to a file placed there before the exe starts, and each path of
     `collect` that the game writes in its copy is kept at the same path in the run's directory. An `xserver`
     run gives the game a display: the reference build has no headless host and exits at once without one.
+    `started` is called with the playtest.py process as soon as it starts, so that a caller can stop it.
     """
     cmd = [sys.executable, str(ROOT / "tools/playtest.py"), "--exe", str(exe), "--testmode", str(scenario)]
     for dest, src in (put or {}).items():
@@ -403,7 +414,13 @@ def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, time
         cmd += ["--blockscan-every", str(blockscan)]
     if xserver:
         cmd.append("--xserver")
-    r = subprocess.run(cmd, capture_output=True, text=True, env=env)
+    if started is None:
+        r = subprocess.run(cmd, capture_output=True, text=True, env=env)
+    else:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
+        started(proc)
+        out, err = proc.communicate()
+        r = subprocess.CompletedProcess(cmd, proc.returncode, out, err)
     sys.stderr.write(r.stderr)
     m = re.search(r"^logs and screenshots: (.+)/$", r.stdout, re.M)
     if r.returncode != 0 or not m:

@@ -7,6 +7,8 @@ import contextlib
 import io
 import os
 import re
+import subprocess
+import sys
 import tempfile
 import threading
 import unittest
@@ -253,7 +255,7 @@ class CheckRoundtripTest(unittest.TestCase):
             header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
             stored = (header, [(1, "a" * 16)])
 
-            def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1):
+            def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1, watch=None):
                 seen["text"] = scenarios["a"].read_text()
                 seen["scans"] = scans
                 return {"a": (header, [(1, "a" * 16)], 1.0, None)}
@@ -301,7 +303,7 @@ class CheckQuirksTest(unittest.TestCase):
             quirk_rows = [(1, "units", "1" * 16), (2, "units", "2" * 16), (2, "players", "9" * 16)]
             off_rows = [(1, "units", "1" * 16), (2, "units", "2" * 16), (2, "players", "3" * 16)]
 
-            def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1):
+            def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1, watch=None):
                 if keep_always:
                     reruns.extend(scenarios)
                     self.rerun_texts = {name: path.read_text() for name, path in scenarios.items()}
@@ -654,6 +656,81 @@ class GateTierTest(unittest.TestCase):
         with contextlib.redirect_stdout(out):
             self.assertEqual(reference.report_block_pointers(Path("TotalA.exe"), {}, True, None), 0)
         self.assertEqual(out.getvalue().strip(), "block pointers: full suite only")
+
+
+class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
+    NAMES = ("a", "b", "c")
+
+    def test_the_other_runs_are_stopped_and_the_report_names_the_tick(self):
+        header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
+        good = [(1, "units", "1" * 16), (2, "units", "2" * 16), (3, "units", "3" * 16), (4, "units", "4" * 16)]
+        bad = good[:1] + [(2, "units", "9" * 16)] + good[2:]
+        stored = (header, reference.tracedigest.digests(good))
+        procs, paths, calls, reported = {}, {}, [], []
+
+        def rows(items):
+            return "bt-trace 3\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in items)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+
+            def fake_play(exe, scenario, game_dir, dump, timeout, poison, scan, collect=(), started=None):
+                name = scenario.stem
+                calls.append(name)
+                trace = tmp / "runs" / name / "trace.txt"
+                trace.parent.mkdir(parents=True)
+                trace.write_text(rows(good[:1]))
+                proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+                procs[name] = proc
+                paths[proc.pid] = trace
+                started(proc)
+                if name == "a":
+                    trace.write_text(rows(bad) + "3 units 33")
+                try:
+                    proc.wait(30)
+                finally:
+                    if proc.poll() is None:
+                        proc.kill()
+                        proc.wait()
+                raise reference.tracediff.Error(f"playtest.py failed (exit {proc.returncode})")
+
+            files = {n: tmp / f"{n}.txt" for n in self.NAMES}
+            for path in files.values():
+                path.write_text("ticks 4\n")
+            (tmp / "traces").mkdir()
+            for n in self.NAMES:
+                (tmp / "traces" / f"{n}.txt").write_text("")
+            out = io.StringIO()
+            status = None
+            with mock.patch.object(reference, "ROOT", tmp), \
+                    mock.patch.object(reference, "scenario_files", lambda: files), \
+                    mock.patch.object(reference, "TRACES", tmp / "traces"), \
+                    mock.patch.object(reference, "WATCH_SECONDS", 0.05), \
+                    mock.patch.object(reference, "game_trace", lambda pid: paths.get(pid)), \
+                    mock.patch.object(reference, "scenario_ticks", lambda s: 4), \
+                    mock.patch.object(reference, "scenario_frames", lambda s: []), \
+                    mock.patch.object(reference, "scenario_saves", lambda s: False), \
+                    mock.patch.object(reference.playtest, "template_prefix"), \
+                    mock.patch.object(reference.tracedigest, "parse_digest", lambda p: stored), \
+                    mock.patch.object(reference.tracediff, "play", fake_play), \
+                    mock.patch.object(reference, "report_divergence", lambda name, *a: reported.append(name) or (_ for _ in ()).throw(SystemExit(1))), \
+                    contextlib.redirect_stdout(out):
+                try:
+                    reference.check_traces(Path("x.exe"), None, 3)
+                except SystemExit as e:
+                    status = e.code
+        self.assertEqual(status, 1)
+        self.assertEqual(sorted(calls), ["a", "b", "c"])
+        self.assertEqual(reported, ["a"])
+        self.assertTrue(all(p.poll() is not None for p in procs.values()))
+        self.assertRegex(out.getvalue(), r"DIFF a \(2 ticks, .*\) tick 2: stored \w{16}, got \w{16}")
+        self.assertIn("stopped: 3 scenarios not finished", out.getvalue())
+
+    def test_a_partial_last_line_is_not_compared(self):
+        tail = reference.tracedigest.TraceTail()
+        text = b"bt-trace 3\nseed 1\n1 units " + b"1" * 16 + b"\n2 units " + b"2" * 16 + b"\n3 un"
+        self.assertEqual(len(tail.feed(text)), 1)
+        self.assertEqual(tail.feed(b"its " + b"3" * 16 + b"\n"), [reference.tracedigest.digests([(2, "units", "2" * 16)])[0]])
 
 
 class TracediffCommandTest(unittest.TestCase):

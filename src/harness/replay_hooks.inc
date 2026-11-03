@@ -2023,6 +2023,21 @@ Order* __stdcall RecOrdersNewOrder(MissionType a0, Unit* a1, void* a2, int a3, i
     return result;
 }
 
+void __stdcall RecOrdersQueueBuildOrder(char* a0, Unit* a1, int a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a1);
+    SlotScope scope(RSL_ORDERS_QUEUEBUILDORDER, SUB_ORDERS, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "name", (const char*)a0);
+        ArgObject(s_call, "unit", ROK_UNIT, a1);
+        ArgValue(s_call, "count", a2);
+    }
+    s_inner_orders->QueueBuildOrder(a0, a1, a2);
+    if (scope.Open()) {
+    }
+}
+
 void __stdcall RecUnitsUpdateAllUnits()
 {
     ReplayRoots roots;
@@ -2814,6 +2829,43 @@ void __stdcall RecUnitsPoseUnitModel(Unit* a0)
     }
 }
 
+ModelState* __stdcall RecUnitsCreateObjectState(Object3do* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_UNITS_CREATEOBJECTSTATE, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "model");
+    }
+    ModelState* result = s_inner_units->CreateObjectState(a0);
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+void __stdcall RecUnitsFreeObjectState(ModelState* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_UNITS_FREEOBJECTSTATE, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "state");
+    }
+    s_inner_units->FreeObjectState(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecUnitsUpdateObjectState(UnitDrawView* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_UNITS_UPDATEOBJECTSTATE, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "unit");
+    }
+    s_inner_units->UpdateObjectState(a0);
+    if (scope.Open()) {
+    }
+}
+
 void __stdcall RecPlayersUpdatePlayers()
 {
     ReplayRoots roots;
@@ -3176,6 +3228,18 @@ void __stdcall RecPlayersUpdatePlayersOnStream(RandStream a0)
     s_inner_players->UpdatePlayersOnStream(a0);
     if (scope.Open()) {
     }
+}
+
+MissionConditions* __stdcall RecPlayersNewConditions()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PLAYERS_NEWCONDITIONS, SUB_PLAYERS, roots);
+    if (scope.Open()) {
+    }
+    MissionConditions* result = s_inner_players->NewConditions();
+    if (scope.Open()) {
+    }
+    return result;
 }
 
 int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
@@ -5272,6 +5336,8 @@ void HookSeams(const bool* on)
         s_rec_orders.MissionTypeFromName = RecOrdersMissionTypeFromName;
     if (on[SUB_ORDERS])
         s_rec_orders.NewOrder = RecOrdersNewOrder;
+    if (on[SUB_ORDERS])
+        s_rec_orders.QueueBuildOrder = RecOrdersQueueBuildOrder;
     if (on[SUB_UNITS])
         s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
     if (on[SUB_UNITS])
@@ -5382,6 +5448,12 @@ void HookSeams(const bool* on)
         s_rec_units.UpdateSfxOccupy = RecUnitsUpdateSfxOccupy;
     if (on[SUB_UNITS])
         s_rec_units.PoseUnitModel = RecUnitsPoseUnitModel;
+    if (on[SUB_UNITS])
+        s_rec_units.CreateObjectState = RecUnitsCreateObjectState;
+    if (on[SUB_UNITS])
+        s_rec_units.FreeObjectState = RecUnitsFreeObjectState;
+    if (on[SUB_UNITS])
+        s_rec_units.UpdateObjectState = RecUnitsUpdateObjectState;
     if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayers = RecPlayersUpdatePlayers;
     if (on[SUB_PLAYERS])
@@ -5438,6 +5510,8 @@ void HookSeams(const bool* on)
         s_rec_players.NotifyUnitDied = RecPlayersNotifyUnitDied;
     if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayersOnStream = RecPlayersUpdatePlayersOnStream;
+    if (on[SUB_PLAYERS])
+        s_rec_players.NewConditions = RecPlayersNewConditions;
     if (on[SUB_MAP])
         s_rec_map.GetCellMeanHeight = RecMapGetCellMeanHeight;
     if (on[SUB_MAP])

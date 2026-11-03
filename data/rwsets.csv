@@ -47087,6 +47087,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::NewOrder
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::NewUnitMotion
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxAddFlags
+,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::QueueBuildOrder
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::ReattachFxToUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::RegisterAllOrderTypes
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::RunOrders
@@ -47114,6 +47115,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::LoadDefaultAIScript
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::LoadPlayerControllers
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::LoadPlayers
+,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::NewConditions
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::NotifyUnitCreated
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::NotifyUnitDied
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::RebuildAIFeatureCells
@@ -47157,6 +47159,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::CanLoad
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::CanReclaim
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::CanRepair
+,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::CreateObjectState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::CreateUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FindMissionUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FindScript
@@ -47165,6 +47168,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FinishConstruction
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeDownloadMenus
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeMovementClasses
+,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeObjectState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeUnitCategories
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeUnitInfo
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeUnitMemory
@@ -47203,6 +47207,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UnitRefUnlink
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UnitTypeSetAddTypeOrCategory
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateAllUnits
+,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateObjectState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateSfxOccupy
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::AllocWeaponArray
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::ApplyAreaDamageAt
@@ -47451,6 +47456,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersNewOrder
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersNewUnitMotion
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxAddFlags
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersQueueBuildOrder
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersReattachFxToUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersRegisterAllOrderTypes
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersRunOrders
@@ -47478,6 +47484,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersLoadDefaultAIScript
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersLoadPlayerControllers
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersLoadPlayers
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersNewConditions
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersNotifyUnitCreated
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersNotifyUnitDied
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersRebuildAIFeatureCells
@@ -47507,6 +47514,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsCanLoad
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsCanReclaim
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsCanRepair
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsCreateObjectState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsCreateUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFindMissionUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFindScript
@@ -47515,6 +47523,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFinishConstruction
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeDownloadMenus
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeMovementClasses
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeObjectState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeUnitCategories
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeUnitInfo
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeUnitMemory
@@ -47553,6 +47562,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUnitRefUnlink
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUnitTypeSetAddTypeOrCategory
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateAllUnits
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateObjectState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateSfxOccupy
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsAllocWeaponArray
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsApplyAreaDamageAt
@@ -53056,6 +53066,16 @@ address,function,file,kind,target
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(OrderFx *, int) __attribute__((stdcall)) [OrdersSeam::OrderFxAddFlags]"
+,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,Add
+,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,ArgObject
+,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,ArgValue
+,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,field_read,OrdersSeam::QueueBuildOrder
+,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,function,
+,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,global_read,s_call
+,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(char *, Unit *, int) __attribute__((stdcall)) [OrdersSeam::QueueBuildOrder]"
 ,RecOrdersReattachFxToUnit,src/harness/replay_hooks.inc,call,ArgPending
 ,RecOrdersReattachFxToUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersReattachFxToUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53290,6 +53310,12 @@ address,function,file,kind,target
 ,RecPlayersLoadPlayers,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPlayersLoadPlayers,src/harness/replay_hooks.inc,global_read,s_inner_players
 ,RecPlayersLoadPlayers,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [PlayersSeam::LoadPlayers]
+,RecPlayersNewConditions,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPlayersNewConditions,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPlayersNewConditions,src/harness/replay_hooks.inc,field_read,PlayersSeam::NewConditions
+,RecPlayersNewConditions,src/harness/replay_hooks.inc,function,
+,RecPlayersNewConditions,src/harness/replay_hooks.inc,global_read,s_inner_players
+,RecPlayersNewConditions,src/harness/replay_hooks.inc,indirect_call,indirect via MissionConditions *(*const)() __attribute__((stdcall)) [PlayersSeam::NewConditions]
 ,RecPlayersNotifyUnitCreated,src/harness/replay_hooks.inc,call,Add
 ,RecPlayersNotifyUnitCreated,src/harness/replay_hooks.inc,call,ArgObject
 ,RecPlayersNotifyUnitCreated,src/harness/replay_hooks.inc,call,ArgPending
@@ -53566,6 +53592,14 @@ address,function,file,kind,target
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanRepair]"
+,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,call,ArgPending
+,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,field_read,UnitsSeam::CreateObjectState
+,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,function,
+,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,global_read,s_call
+,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,global_read,s_inner_units
+,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,indirect_call,indirect via ModelState *(*const)(Object3do *) __attribute__((stdcall)) [UnitsSeam::CreateObjectState]
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ArgValue
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -53636,6 +53670,14 @@ address,function,file,kind,target
 ,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,function,
 ,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::FreeMovementClasses]
+,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,call,ArgPending
+,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,field_read,UnitsSeam::FreeObjectState
+,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,function,
+,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,global_read,s_call
+,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,global_read,s_inner_units
+,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(ModelState *) __attribute__((stdcall)) [UnitsSeam::FreeObjectState]
 ,RecUnitsFreeUnitCategories,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsFreeUnitCategories,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsFreeUnitCategories,src/harness/replay_hooks.inc,field_read,UnitsSeam::FreeUnitCategories
@@ -53968,6 +54010,14 @@ address,function,file,kind,target
 ,RecUnitsUpdateAllUnits,src/harness/replay_hooks.inc,function,
 ,RecUnitsUpdateAllUnits,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsUpdateAllUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::UpdateAllUnits]
+,RecUnitsUpdateObjectState,src/harness/replay_hooks.inc,call,ArgPending
+,RecUnitsUpdateObjectState,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecUnitsUpdateObjectState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecUnitsUpdateObjectState,src/harness/replay_hooks.inc,field_read,UnitsSeam::UpdateObjectState
+,RecUnitsUpdateObjectState,src/harness/replay_hooks.inc,function,
+,RecUnitsUpdateObjectState,src/harness/replay_hooks.inc,global_read,s_call
+,RecUnitsUpdateObjectState,src/harness/replay_hooks.inc,global_read,s_inner_units
+,RecUnitsUpdateObjectState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(UnitDrawView *) __attribute__((stdcall)) [UnitsSeam::UpdateObjectState]
 ,RecUnitsUpdateSfxOccupy,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsUpdateSfxOccupy,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsUpdateSfxOccupy,src/harness/replay_hooks.inc,call,ArgPending

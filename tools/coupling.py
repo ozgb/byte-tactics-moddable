@@ -97,7 +97,7 @@ source calls, and gives each the functions it can reach:
                 interfaces/), and in the nearest base that defines it; only functions that
                 have a row in data/subsystems.csv count
   view class    a class that only declares the slots of a vtable (PathGoalVtableView,
-                PathPlannerView, Target, GoalDrawInterface, MotionSerializer, OrderFxSlot: no
+                GoalDrawInterface, MotionSerializer, OrderFxSlot: no
                 function of it is defined) is the real class that VIEW_FAMILY names, at the
                 slot of the view's method (the place of the name in the view's declaration, or
                 N of vN and unusedN), and then as a real class
@@ -351,8 +351,8 @@ EXCEPTION_REASON = re.compile(r"TODO\(#[0-9]+\): \S")
 VIRTUAL_PREFIX = "virtual "
 SLOT_INDEX = re.compile(r"^(?:v|unused)(\d+)$")
 VTABLE_ARRAY = re.compile(r"\b(g_\w*[Vv]table\w*)\s*\[[^\]]*\]\s*=\s*\{([^}]*)\}")
-VIEW_FAMILY = {"PathGoalVtableView": "PathGoal", "PathPlannerView": "PathGoal", "GoalDrawInterface": "PathGoal",
-               "MotionSerializer": "PathGoal", "OrderFxSlot": "PathGoal", "Target": "OrderFx"}
+VIEW_FAMILY = {"PathGoalVtableView": "PathGoal", "GoalDrawInterface": "PathGoal", "MotionSerializer": "PathGoal",
+               "OrderFxSlot": "PathGoal"}
 ARRAY_FAMILY = {"Callback": ["g_weaponAimCobVtable"]}
 
 

@@ -418,14 +418,14 @@ class VirtualTest(unittest.TestCase):
 
 
 class VirtualDataTest(unittest.TestCase):
-    def test_the_committed_tree_resolves_every_virtual_call_and_finds_the_known_couplings(self):
+    def test_the_committed_tree_resolves_every_virtual_call_and_pathfinding_calls_none_across(self):
         calls, of, names, files, _ = cp.virtual_inputs()
         self.assertEqual(cp.unresolved(calls, of), [])
         edges = cp.virtual_edges(calls, of, names, files)
-        found = {(e[1], e[4]) for e in edges}
-        for known in (("Pathfinder::StartSearch", "virtual Target::GetGoals"), ("Pathfinder::StartSearch", "virtual Target::IsGoal"),
-                      ("Pathfinder::RunSearches", "virtual PathPlannerView::GetPath")):
-            self.assertIn(known, found)
+        callers = {e[1] for e in edges}
+        self.assertTrue(all(not c.startswith("Pathfinder::") for c in callers))
+        self.assertNotIn("UnitMotion::DestroyObject", callers)
+        self.assertIn("ReceiveUnitStates", callers)
 
 
 class DataTest(unittest.TestCase):

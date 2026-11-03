@@ -62,7 +62,7 @@ class Subsystems(unittest.TestCase):
         self.assertEqual(versions["wind_meteors"], "1.2")
 
     def test_the_default_is_the_subsystems_with_recordings(self):
-        self.assertEqual(replay.default_subsystems(), ["wind_meteors"])
+        self.assertEqual(replay.default_subsystems(), ["wind_meteors", "economy"])
         self.assertEqual(replay.recorded_names(["wind_meteors"]), ["console-features", "meteors-earthquake", "meteors-hailstorm"])
         self.assertEqual(replay.plan_for(["wind_meteors"], None)["meteors-hailstorm"], ["wind_meteors"])
         self.assertEqual(replay.plan_for(["economy"], ["x"]), {"x": ["economy"]})

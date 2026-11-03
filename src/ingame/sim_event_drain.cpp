@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "game_dialogs.h"
 #include "control_panel.h"
 #include "selection.h"
@@ -17,6 +18,7 @@
 #include "../util/vec3.h"
 
 void __stdcall PlaySoundByName(char* name, int flag);
+void __stdcall AddMessage(char* text, int key, int value, int last);
 
 static char* const g_speechTexts[SIM_SPEECH_TEXT_COUNT] = {
     nullptr,
@@ -67,6 +69,17 @@ static char* const g_speechTexts[SIM_SPEECH_TEXT_COUNT] = {
 
 static char* const g_soundNames[SIM_SOUND_COUNT] = {
     "Victory Condition",
+    "treeburn",
+};
+
+static char* const g_messageTexts[SIM_MESSAGE_TEXT_COUNT] = {
+    "Toggled ShareMetal to: %s",
+    "Toggled ShareEnergy to: %s",
+    "Toggled ShareMapping to: %s",
+    "Toggled ShareLOS to: %s",
+    "Toggled ShareRadar to: %s",
+    "OK.  Will share metal if above %d",
+    "OK.  Will share energy if above %d",
 };
 
 static char* const g_screenNames[SIM_SCREEN_COUNT] = {
@@ -103,6 +116,31 @@ static void DrainSound(const SimEvent& e)
 {
     if (e.args[0] < SIM_SOUND_COUNT)
         PlaySoundByName(g_soundNames[e.args[0]], (int)e.args[1]);
+}
+
+static void DrainSoundAt(const SimEvent& e)
+{
+    Vec3 at = TakeVec3(e.args, 1);
+    PlaySoundAtHeard((int)e.args[0], &at, e.args[4]);
+}
+
+static void DrainSoundAtName(const SimEvent& e)
+{
+    Vec3 at = TakeVec3(e.args, 1);
+    if (e.args[0] < SIM_SOUND_COUNT)
+        PlaySoundAtHeard(FindSoundByName(g_soundNames[e.args[0]]), &at, e.args[4]);
+}
+
+static void DrainMessage(const SimEvent& e)
+{
+    if (e.args[0] >= SIM_MESSAGE_TEXT_COUNT)
+        return;
+    char buf[256];
+    if (e.args[0] < SIM_MESSAGE_SHARE_METAL_ABOVE)
+        sprintf(buf, g_messageTexts[e.args[0]], e.args[1] != 0 ? "ON" : "OFF");
+    else
+        sprintf(buf, g_messageTexts[e.args[0]], (int)e.args[1]);
+    AddMessage(buf, 2, 0, 10);
 }
 
 static unsigned int ContinueArgs(SimEventQueue& q, const SimEvent& e, unsigned int* all)
@@ -286,6 +324,33 @@ void DrainSimEvents()
             break;
         case SIM_EVENT_POP_TO_GAME_LAYOUT:
             PopUntilNamedLayout((int)e.args[0]);
+            break;
+        case SIM_EVENT_SMOKE: {
+            Vec3 at = TakeVec3(e.args, 0);
+            EmitSmoke(&at, (int)e.args[3], (int)e.args[4], (short)e.args[5]);
+            break;
+        }
+        case SIM_EVENT_WHITE_SMOKE: {
+            Vec3 at = TakeVec3(e.args, 0);
+            EmitWhiteSmoke(&at, (short)e.args[3]);
+            break;
+        }
+        case SIM_EVENT_BLACK_SMOKE: {
+            Vec3 at = TakeVec3(e.args, 0);
+            EmitBlackSmoke(&at, (short)e.args[3]);
+            break;
+        }
+        case SIM_EVENT_SOUND_AT:
+            DrainSoundAt(e);
+            break;
+        case SIM_EVENT_SOUND_AT_NAME:
+            DrainSoundAtName(e);
+            break;
+        case SIM_EVENT_REMOVE_UNIT_SPEECH:
+            RemoveSpeechOfUnit((int)UnitOf(e));
+            break;
+        case SIM_EVENT_MESSAGE:
+            DrainMessage(e);
             break;
         default:
             break;

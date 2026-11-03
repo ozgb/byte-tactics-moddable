@@ -1,35 +1,6 @@
 subsystem,function,symbol,reason
-economy,CmdSetShareEnergy,AddMessage,TODO(#620): sim-to-presentation event or message
-economy,CmdSetShareMetal,AddMessage,TODO(#620): sim-to-presentation event or message
-economy,CmdShareEnergy,AddMessage,TODO(#620): sim-to-presentation event or message
-economy,CmdShareMetal,AddMessage,TODO(#620): sim-to-presentation event or message
-features,StartFeatureBurning,PlaySoundAtByName,TODO(#620): sim-to-presentation event or message
-features,UpdateFeatures,EmitWhiteSmoke,TODO(#620): sim-to-presentation event or message
-los_radar,CmdShareMapping,AddMessage,TODO(#620): sim-to-presentation event or message
-los_radar,CmdShareRadar,AddMessage,TODO(#620): sim-to-presentation event or message
 los_radar,DrawRadarUnits,DrawCircle,TODO(#647): presentation code in a tick: radar picture drawing
 los_radar,DrawRadarUnits,DrawDashedCircle,TODO(#647): presentation code in a tick: radar picture drawing
 los_radar,DrawRadarUnits,DrawFrame,TODO(#647): presentation code in a tick: radar picture drawing
 los_radar,DrawRadarUnits,DrawPixel,TODO(#647): presentation code in a tick: radar picture drawing
 los_radar,DrawRadarUnits,DrawSurface,TODO(#647): presentation code in a tick: radar picture drawing
-los_radar,ToggleShareLos,AddMessage,TODO(#620): sim-to-presentation event or message
-map,Mission::BuildMissionList,GetLocalizedString,TODO(#620): sim-to-presentation event or message
-map,Mission::LoadCampaign,ShowErrorBox,TODO(#620): sim-to-presentation event or message
-map,Mission::LoadMission,GetLocalizedString,TODO(#620): sim-to-presentation event or message
-map,Mission::LoadMission,ShowErrorBox,TODO(#620): sim-to-presentation event or message
-units,ApplyUnitDeath,RemoveSpeechOfUnit,TODO(#620): sim-to-presentation event or message
-units,CreateUnitCorpse,EmitSmoke,TODO(#620): sim-to-presentation event or message
-units,FreeUnitMemory,DrainSimEvents,TODO(#620): sim-to-presentation event or message
-units,LoadUnitFbi,GetLocalizedString,TODO(#620): sim-to-presentation event or message
-units,LoadUnitInfo,GetLocalizedString,TODO(#620): sim-to-presentation event or message
-units,LoadUnitInfo,ShowErrorBox,TODO(#620): sim-to-presentation event or message
-units,UnitScript::EmitSfx,EmitBlackSmoke,TODO(#620): sim-to-presentation event or message
-units,UnitScript::EmitSfx,EmitWhiteSmoke,TODO(#620): sim-to-presentation event or message
-weapons,AddExplosionEffect,EmitSmoke,TODO(#620): sim-to-presentation event or message
-weapons,DetonateProjectile,EmitWhiteSmoke,TODO(#620): sim-to-presentation event or message
-weapons,DetonateProjectile,PlaySoundAt,TODO(#620): sim-to-presentation event or message
-weapons,InitProjectile,PlaySoundAt,TODO(#620): sim-to-presentation event or message
-weapons,UpdateExplodedPiece,EmitSmoke,TODO(#620): sim-to-presentation event or message
-weapons,UpdateExplosions,EmitSmoke,TODO(#620): sim-to-presentation event or message
-weapons,UpdateProjectiles,EmitWhiteSmoke,TODO(#620): sim-to-presentation event or message
-weapons,UpdateProjectiles,PlaySoundAt,TODO(#620): sim-to-presentation event or message

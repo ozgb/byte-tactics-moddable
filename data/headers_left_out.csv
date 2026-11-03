@@ -61,9 +61,7 @@ DrawTriangleContours,mismatch,"static risk rule: a convention, parameter count, 
 DrawUnit,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawUnitRangeRings,mismatch,pointer/int cast: definition's type is likely wrong
 DrawWrappedText,mismatch,fixing it changes the generated code of a caller
-EmitBlackSmoke,mismatch,pointer/int cast: definition's type is likely wrong
 EmitJitteredThrustParticles,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-EmitSmoke,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 EmitWhiteSmoke,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 EmptyPostArchiveMountHook,mismatch,pointer/int cast: definition's type is likely wrong
 ExecuteCommandLine,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -159,7 +157,6 @@ PickRandomReclaimableResourcesInRadius,mismatch,"static risk rule: a convention,
 PlaceFeature,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 PlayLoopingWavMemory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 PlaySoundAt,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-PlaySoundAtByName,mismatch,pointer/int cast: definition's type is likely wrong
 PlaySoundByName,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 PlayWavMemory,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 PointInRect,mismatch,pointer/int cast: definition's type is likely wrong
@@ -172,7 +169,6 @@ RegisterUnitOrders,mismatch,"static risk rule: a convention, parameter count, or
 RejectPlayer,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ReleasePacketData,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 RemapPaletteToClosestIndices,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-RemoveSpeechOfUnit,mismatch,pointer/int cast: definition's type is likely wrong
 ReportGameChat,mismatch,pointer/int cast: definition's type is likely wrong
 ResetClipRect,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 ResolveCursorModeForSelection,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -204,7 +200,6 @@ SetQuickKeyByName,mismatch,"definition type not nameable in a header, or no clea
 SetTextColors,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SetUnitLimits,mismatch,fixing it changes the generated code of a caller
 SetupPlayerSlot,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-ShowErrorBox,mismatch,pointer/int cast: definition's type is likely wrong
 ShowSoftwareCursor,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SolveLaunchAngle,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SortDisplayModes,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"

@@ -96,8 +96,8 @@ extern int g_explosion0Duration, g_explosion0StartSize, g_explosion0EndSize, g_e
 #include "../graphics/gaf.h"
 #include "../graphics/gaf_frame.h"
 #include "../state/game_rand.h"
+#include "../state/sim_effects.h"
 void __stdcall InitGafSequence(GafRef* ref, GafSequence* src, int index);
-void __stdcall EmitSmoke(int* pos, int a, int b, int c);
 void __stdcall EmitWhiteSmoke(void* buf, int arg);
 void __stdcall EmitJitteredThrustParticles(void* buf, int arg);
 int __stdcall PointInRect(void* rect, int x, int y);
@@ -213,7 +213,7 @@ void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int fl
         else
             e->ref2.src = 0;
         if (flag == 0 && *(short*)((char*)&pos->y + 2) > (short)g_game->seaLevel)
-            EmitSmoke((int*)pos, 7, 0xf, 9);
+            RecordSmoke(*pos, 7, 0xf, 9);
         e->obj = 0;
     }
 }

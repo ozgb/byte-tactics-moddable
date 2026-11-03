@@ -547,6 +547,8 @@ void Force640x480Surfaces()
 }
 
 #include "../frontend/endgame.h"
+#include "../ingame/game_dialogs.h"
+#include "../units/unit.h"
 #include "../network/net_game.h"
 
 // FUNCTION: 0x491b60
@@ -557,6 +559,12 @@ void ShutdownIngameSystems()
     ((Sound*)g_game->sound)->SetTrackCategory(4);
     CollectEndGameStats();
     g_seams.wind_meteors->EmptyShutdownPreCleanup();
+    Unit* unitsEnd = g_game->unitsEnd;
+    for (Unit* u = g_game->units; u != nullptr && u <= unitsEnd; u = (Unit*)((char*)u + 0x118)) {
+        if (u->unitDefIndex != 0)
+            g_seams.units->KillUnit(u, 8);
+    }
+    DrainSimEvents();
     g_seams.units->FreeUnitMemory();
     DestroyParticleLists();
     g_seams.weapons->FreeExplosions();

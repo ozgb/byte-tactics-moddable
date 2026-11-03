@@ -43681,6 +43681,47 @@ address,function,file,kind,target
 ,CaptureSet,src/harness/replay.cpp,global_read,s_field
 ,CaptureSet,src/harness/replay.cpp,global_read,s_rec
 ,CaptureSet,src/harness/replay.cpp,global_read,s_sub
+,CaptureUnit,src/map/radar_capture.cpp,call,Player_Get
+,CaptureUnit,src/map/radar_capture.cpp,call,get
+,CaptureUnit,src/map/radar_capture.cpp,call,operator Unit *
+,CaptureUnit,src/map/radar_capture.cpp,call,operator->
+,CaptureUnit,src/map/radar_capture.cpp,field_escape,Unit::weapons
+,CaptureUnit,src/map/radar_capture.cpp,field_read,<anon>::interceptor
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Game::units
+,CaptureUnit,src/map/radar_capture.cpp,field_read,InterceptorDefFlags::bit29
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Player::info
+,CaptureUnit,src/map/radar_capture.cpp,field_read,PlayerInfo::color
+,CaptureUnit,src/map/radar_capture.cpp,field_read,RadarUnitDefView::flags2
+,CaptureUnit,src/map/radar_capture.cpp,field_read,RadarUnitDefView::radardistance
+,CaptureUnit,src/map/radar_capture.cpp,field_read,RadarUnitDefView::radardistancejam
+,CaptureUnit,src/map/radar_capture.cpp,field_read,RadarUnitDefView::sonardistance
+,CaptureUnit,src/map/radar_capture.cpp,field_read,RadarUnitDefView::sonardistancejam
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::activateFlags
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::def
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::id
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::playerIndex
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::recentlyDamagedTimer
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::xWhole
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::yWhole
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::zWhole
+,CaptureUnit,src/map/radar_capture.cpp,field_read,UnitWeaponSlot::stockpile
+,CaptureUnit,src/map/radar_capture.cpp,field_read,UnitWeaponSlot::weapon
+,CaptureUnit,src/map/radar_capture.cpp,field_read,WeaponDef::coverage
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::color
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::flags
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::id
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::radarDistance
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::radarJamDistance
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::slot
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::sonarDistance
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::sonarJamDistance
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::xWhole
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::yScaled
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarWeaponCapture::coverage
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarWeaponCapture::interceptor
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarWeaponCapture::stocked
+,CaptureUnit,src/map/radar_capture.cpp,function,
+,CaptureUnit,src/map/radar_capture.cpp,global_read,g_game
 ,CellAt,src/map/terrain.cpp,call,operator Cell *
 ,CellAt,src/map/terrain.cpp,deref_escape,*Cell
 ,CellAt,src/map/terrain.cpp,field_read,Game::cells
@@ -44489,6 +44530,7 @@ address,function,file,kind,target
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainThrust
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainUnitSpeech
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainWake
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrawRadarUnits
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitBlackSmoke
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitSmoke
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitTimedSubParticles
@@ -46965,7 +47007,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::ClampWorldPosToTerrain
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::CmdShareMapping
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::CmdShareRadar
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::DrawRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::ExpireEyeballs
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::FreeMapResources
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::FreeRadar
@@ -46976,10 +47017,11 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::IsUnitVisibleToPlayer
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::LoadTntMap
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecalculateLineOfSight
+,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecordRadarMapped
+,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecordRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RemoveUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RevealNewUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateCellHeightRange
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateRadarMapped
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::AddUnitToMap
@@ -47334,7 +47376,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarClampWorldPosToTerrain
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarCmdShareMapping
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarCmdShareRadar
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarDrawRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarExpireEyeballs
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarFreeMapResources
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarFreeRadar
@@ -47345,10 +47386,11 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarIsUnitVisibleToPlayer
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarLoadTntMap
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecalculateLineOfSight
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecordRadarMapped
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecordRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRemoveUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRevealNewUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateCellHeightRange
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateRadarMapped
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapAddUnitToMap
@@ -52231,12 +52273,6 @@ address,function,file,kind,target
 ,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [LosRadarSeam::CmdShareRadar]
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,field_read,LosRadarSeam::DrawRadarUnits
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,function,
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::DrawRadarUnits]
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,field_read,LosRadarSeam::ExpireEyeballs
@@ -52310,6 +52346,18 @@ address,function,file,kind,target
 ,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,field_read,LosRadarSeam::RecordRadarMapped
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,function,
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarMapped]
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,field_read,LosRadarSeam::RecordRadarUnits
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,function,
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarUnits]
 ,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,call,Add
 ,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,call,ArgObject
 ,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -52336,12 +52384,6 @@ address,function,file,kind,target
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Point16, Point16) __attribute__((stdcall)) [LosRadarSeam::UpdateCellHeightRange]"
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,field_read,LosRadarSeam::UpdateRadarMapped
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,function,
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::UpdateRadarMapped]
 ,RecLosRadarUpdateSensorRadarAndCloak,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarUpdateSensorRadarAndCloak,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarUpdateSensorRadarAndCloak,src/harness/replay_hooks.inc,field_read,LosRadarSeam::UpdateSensorRadarAndCloak
@@ -54393,6 +54435,58 @@ address,function,file,kind,target
 ,RecordPointParticles,src/state/sim_effects.h,function,
 ,RecordPopToGameLayout,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordPopToGameLayout,src/state/sim_effects.h,function,
+,RecordRadarMapped,src/map/radar_capture.cpp,call,RecordSimEvent
+,RecordRadarMapped,src/map/radar_capture.cpp,call,SimCaptureAlloc
+,RecordRadarMapped,src/map/radar_capture.cpp,call,operator unsigned char *
+,RecordRadarMapped,src/map/radar_capture.cpp,call,operator unsigned short *
+,RecordRadarMapped,src/map/radar_capture.cpp,deref_read,*unsigned char
+,RecordRadarMapped,src/map/radar_capture.cpp,deref_read,*unsigned short
+,RecordRadarMapped,src/map/radar_capture.cpp,deref_write,*unsigned char
+,RecordRadarMapped,src/map/radar_capture.cpp,field_escape,Game::players_1b63_14b
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,<anon>::mapChanged
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,Game::height
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,Game::playerIndex
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,Game::visibilityMask
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,Game::width
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,Player::explored
+,RecordRadarMapped,src/map/radar_capture.cpp,field_write,<anon>::mapChanged
+,RecordRadarMapped,src/map/radar_capture.cpp,field_write,RadarMappedCapture::cells
+,RecordRadarMapped,src/map/radar_capture.cpp,field_write,RadarMappedCapture::height
+,RecordRadarMapped,src/map/radar_capture.cpp,field_write,RadarMappedCapture::width
+,RecordRadarMapped,src/map/radar_capture.cpp,function,
+,RecordRadarMapped,src/map/radar_capture.cpp,global_read,g_game
+,RecordRadarUnits,src/map/radar_capture.cpp,call,CaptureUnit
+,RecordRadarUnits,src/map/radar_capture.cpp,call,Player_Get
+,RecordRadarUnits,src/map/radar_capture.cpp,call,RadarProjectileShown
+,RecordRadarUnits,src/map/radar_capture.cpp,call,RadarUnitShown
+,RecordRadarUnits,src/map/radar_capture.cpp,call,RecordSimEvent
+,RecordRadarUnits,src/map/radar_capture.cpp,call,SimCaptureAlloc
+,RecordRadarUnits,src/map/radar_capture.cpp,call,operator Projectile *
+,RecordRadarUnits,src/map/radar_capture.cpp,call,operator Unit *
+,RecordRadarUnits,src/map/radar_capture.cpp,call,operator->
+,RecordRadarUnits,src/map/radar_capture.cpp,deref_escape,*Projectile
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Game::matchFlags
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Game::projectileCount
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Game::projectiles
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Game::units
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Game::unitsEnd
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,MapViewFlags::bit0
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,MapViewFlags::bit1
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Player::info
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,PlayerInfo::color
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Projectile::owner
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Unit::unitDefIndex
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Vec3Words::xWhole
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Vec3Words::yWhole
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Vec3Words::zWhole
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarDrawCapture::projectileCount
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarDrawCapture::unitCount
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarProjectileCapture::color
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarProjectileCapture::kind
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarProjectileCapture::x
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarProjectileCapture::y
+,RecordRadarUnits,src/map/radar_capture.cpp,function,
+,RecordRadarUnits,src/map/radar_capture.cpp,global_read,g_game
 ,RecordRemoveUnitSpeech,src/state/sim_effects.h,call,RecordUnitEvent
 ,RecordRemoveUnitSpeech,src/state/sim_effects.h,function,
 ,RecordReverseNanoParticles,src/state/sim_effects.h,call,RecordReverseNanoParticles

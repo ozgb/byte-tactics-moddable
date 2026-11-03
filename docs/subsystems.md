@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5093 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5101 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -29,9 +29,9 @@ The subsystems and the issue each maps to:
 | [players](#the-remaining-subsystems) | 143 | none yet |
 | [map](#the-remaining-subsystems) | 106 | none yet |
 | [network](#the-remaining-subsystems) | 342 | none yet |
-| [game](#the-remaining-subsystems) | 250 | none yet |
+| [game](#the-remaining-subsystems) | 254 | none yet |
 | [harness](#the-remaining-subsystems) | 667 | none yet |
-| [presentation](#the-remaining-subsystems) | 1429 | none yet |
+| [presentation](#the-remaining-subsystems) | 1426 | none yet |
 | [platform](#the-remaining-subsystems) | 817 | none yet |
 | [seams](#the-remaining-subsystems) | 110 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
@@ -432,7 +432,7 @@ Issue #17. 87 functions. Line of sight, radar and sonar, the LOS tables, the map
 
 Coverage: 94.8% of functions (55 of 58), 88.1% of lines, 76.2% of branches; 3 live functions no scenario enters, and 21 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (3 of 65 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 62 are entered, 95.4%), by reason:
+**Live functions no scenario enters** (3 of 58 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 55 are entered, 94.8%), by reason:
 
 - Shutdown only (1): `FreeMapResources`. It is called from `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick.
 - Network only (2): `CmdShareMapping` and `CmdShareRadar` (the share commands, which all check `netGameFlags & 1`, a network game). Test mode runs a skirmish.
@@ -454,9 +454,9 @@ Coverage: 94.8% of functions (55 of 58), 88.1% of lines, 76.2% of branches; 3 li
 **Imports.** 37 functions of 7 subsystems, by target, each with the number of functions it calls there:
 
 - platform (16): `GameFreeThunk`, `StringRef::Assign`, `operator delete`, `GameAllocIgnoreTag`, and 12 more
-- game (6): `Game::Current`, `RecordSimEvent`, `SaveSettings`, `SimAlloc`, `SimAllocTagged`, `SimCaptureAlloc`
+- game (7): `Game::Current`, `RecordMessage`, `RecordSimEvent`, `SaveSettings`, `SimAlloc`, `SimAllocTagged`, `SimCaptureAlloc`
 - features (5): `FreeFeaturePool`, `InitFeatureAnimPool`, `PlaceFeature`, `PlaceMissionFeatures`, and 1 more
-- game (5): `Game::Current`, `RecordMessage`, `SaveSettings`, `SimAlloc`, `SimAllocTagged`
+- presentation (3): `BuildTedRadarFrame`, `GetGafFrame`, `StringRef::ReleaseRef`
 - seams (3): `GetGroundHeightNative`, `GetNameSlotNative`, `VisitObjectsInRangeNative`
 - ai (2): `HasReadyUnitInRange`, `IsPointVisible`
 - network (1): `BroadcastPlayerInfo`
@@ -594,7 +594,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Command-line switch only (2): `Onl_LoadConfigFile`, `SetPacketRate`. Switches a scenario cannot pass (`-blockscan` and the network options).
 - Entered by the console scenarios (#445): `SendShareEnergy`, `SendShareMetal`, `SendPacketToPlayer`, `FindSlotByDpidInSendPacketToPlayer`, `PlayerReady` and `Player::SetType`, which the console commands `Give` and `AI` reach.
 
-**game** (250 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 143 functions are called from outside, by platform (76 distinct functions) and presentation (27); the busiest are `SetCursorMode` (19), `SimAllocTagged` (18), `AllocSite::~AllocSite` (12). It imports 475 functions, the most of any subsystem, 219 of them from presentation, then platform 98, network 30, files 23 and units 22.
+**game** (254 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 146 functions are called from outside, by platform (76 distinct functions) and presentation (29); the busiest are `SetCursorMode` (19), `SimAllocTagged` (18), `AllocSite::~AllocSite` (12). It imports 475 functions, the most of any subsystem, 219 of them from presentation, then platform 98, network 30, files 23 and units 22.
 
 **game, functions no scenario enters** (73 of 228 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 155 are entered, 68.0%), by reason:
 
@@ -632,7 +632,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **harness** (667 functions). The test harness of #3 (`src/harness`). No phase root. 21 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 64 functions (game 16, platform 24).
 
-**presentation** (1429 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 281 functions are called from outside, mostly by game (219 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (12). It imports 343 functions: platform 158, network 54, files 32, game 27, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
+**presentation** (1426 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 275 functions are called from outside, mostly by game (219 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 345 functions: platform 158, network 54, files 32, game 29, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
 **platform** (817 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 303 functions are called from outside, by presentation (158 distinct functions), game (98), network (51) and units (49); the busiest are `GameFreeThunk` (163), `operator new` (122), `operator delete` (86), then `Translate` (77) and `GameAllocIgnoreTag` (76). It imports 179 functions: game 76, presentation 46.
 

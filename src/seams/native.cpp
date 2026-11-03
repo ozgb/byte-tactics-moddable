@@ -97,6 +97,7 @@ void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius,
 
 #include "../map/line_of_sight.h"
 #include "../ingame/radar.h"
+#include "../map/radar_capture.h"
 #include "../ingame/radar_picture.h"
 
 class HapiBank;
@@ -758,8 +759,8 @@ void InstallNativeSeams()
     s_los_radar.RemoveUnitLineOfSight = RemoveUnitLineOfSight;
     s_los_radar.RevealNewUnit = RevealNewUnit;
     s_los_radar.AddEyeball = AddEyeball;
-    s_los_radar.DrawRadarUnits = DrawRadarUnits;
-    s_los_radar.UpdateRadarMapped = UpdateRadarMapped;
+    s_los_radar.RecordRadarUnits = RecordRadarUnits;
+    s_los_radar.RecordRadarMapped = RecordRadarMapped;
     s_los_radar.UpdateSensorRadarAndCloak = UpdateSensorRadarAndCloak;
     s_pathfinding.RunSearches = RunSearchesNative;
     s_pathfinding.AbortIfGoalMatch = AbortIfGoalMatchNative;

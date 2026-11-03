@@ -4,6 +4,7 @@
 #include "block.h"
 #include "sim_globals.h"
 #include "sim_events.h"
+#include "sim_radar.h"
 
 SimGlobals* g_simGlobals;
 
@@ -23,6 +24,7 @@ SimGlobals& SimCreate()
     SimBlockTrack(reinterpret_cast<void**>(&g_simGlobals));
     new (mem) SimGlobals();
     SimEventsCreate();
+    SimCaptureCreate();
     if (!registered) {
         registered = true;
         atexit(DestroySimGlobals);

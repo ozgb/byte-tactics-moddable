@@ -463,8 +463,8 @@ enum ReplaySlotId {
     RSL_LOS_RADAR_REMOVEUNITLINEOFSIGHT,
     RSL_LOS_RADAR_REVEALNEWUNIT,
     RSL_LOS_RADAR_ADDEYEBALL,
-    RSL_LOS_RADAR_DRAWRADARUNITS,
-    RSL_LOS_RADAR_UPDATERADARMAPPED,
+    RSL_LOS_RADAR_RECORDRADARUNITS,
+    RSL_LOS_RADAR_RECORDRADARMAPPED,
     RSL_LOS_RADAR_UPDATESENSORRADARANDCLOAK,
     RSL_ORDERS_AISEARCHGOALSETWAYPOINTS,
     RSL_ORDERS_ORDERFXADDFLAGS,
@@ -815,8 +815,8 @@ static const unsigned short kReplayLosRadarUpdateUnitLineOfSightObjReads[] = { 3
 static const unsigned short kReplayLosRadarRemoveUnitLineOfSightObjReads[] = { 32, 33 };
 static const unsigned short kReplayLosRadarRevealNewUnitObjReads[] = { 32, 33 };
 static const unsigned char kReplayLosRadarAddEyeballReads[] = { 0 };
-static const unsigned short kReplayLosRadarDrawRadarUnitsObjReads[] = { 23, 32, 34, 35, 41 };
-static const unsigned char kReplayLosRadarUpdateRadarMappedReads[] = { 1, 2 };
+static const unsigned short kReplayLosRadarRecordRadarUnitsObjReads[] = { 23 };
+static const unsigned char kReplayLosRadarRecordRadarMappedReads[] = { 1, 2 };
 static const unsigned char kReplayLosRadarUpdateSensorRadarAndCloakReads[] = { 0 };
 static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakObjReads[] = { 0, 4, 5, 23, 25, 26, 29, 32, 33, 34, 35, 36 };
 static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakObjWrites[] = { 34 };
@@ -1040,8 +1040,8 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "RemoveUnitLineOfSight", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, kReplayLosRadarRemoveUnitLineOfSightObjReads, 2, nullptr, 0, 0 },
     { "RevealNewUnit", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, kReplayLosRadarRevealNewUnitObjReads, 2, nullptr, 0, 0 },
     { "AddEyeball", SUB_LOS_RADAR, kReplayLosRadarAddEyeballReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, ROK_PLAYER + 1 },
-    { "DrawRadarUnits", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, kReplayLosRadarDrawRadarUnitsObjReads, 5, nullptr, 0, 0 },
-    { "UpdateRadarMapped", SUB_LOS_RADAR, kReplayLosRadarUpdateRadarMappedReads, 2, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
+    { "RecordRadarUnits", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, kReplayLosRadarRecordRadarUnitsObjReads, 1, nullptr, 0, 0 },
+    { "RecordRadarMapped", SUB_LOS_RADAR, kReplayLosRadarRecordRadarMappedReads, 2, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "UpdateSensorRadarAndCloak", SUB_LOS_RADAR, kReplayLosRadarUpdateSensorRadarAndCloakReads, 1, nullptr, 0, kReplayLosRadarUpdateSensorRadarAndCloakObjReads, 12, kReplayLosRadarUpdateSensorRadarAndCloakObjWrites, 1, ROK_PLAYER + 1 },
     { "AiSearchGoalSetWaypoints", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "OrderFxAddFlags", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
@@ -1287,7 +1287,7 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "pathfinding", 1, 2, 0, 65, 4 },
     { "weapons", 1, 4, 0, 69, 23 },
     { "targeting", 1, 1, 0, 92, 9 },
-    { "los_radar", 1, 2, 0, 101, 21 },
+    { "los_radar", 2, 0, 0, 101, 21 },
     { "orders", 1, 8, 0, 122, 26 },
     { "units", 1, 7, 0, 148, 58 },
     { "players", 1, 5, 0, 206, 29 },

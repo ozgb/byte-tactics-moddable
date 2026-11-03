@@ -8,9 +8,9 @@ struct Vec3;
 struct Point16;
 
 // Major version of the los_radar interface, changed when a slot is removed or its signature changes.
-#define LOS_RADAR_VERSION_MAJOR 1
+#define LOS_RADAR_VERSION_MAJOR 2
 // Minor version of the los_radar interface, changed when a slot is added.
-#define LOS_RADAR_VERSION_MINOR 2
+#define LOS_RADAR_VERSION_MINOR 0
 
 // Line of sight and radar.
 struct LosRadarSeam {
@@ -50,10 +50,10 @@ struct LosRadarSeam {
     void (__stdcall* RevealNewUnit)(Unit* unit);
     // Adds an eyeball, a temporary view at a position (a is its sight distance, b a flag, c its lifetime in ticks). Hooks: none.
     void (__stdcall* AddEyeball)(Vec3* src, int a, int b, int c);
-    // Draws the units the radar shows on the radar picture. Hooks: none.
-    void (__stdcall* DrawRadarUnits)(void);
-    // Marks on the radar picture the cells the players have mapped. Hooks: none.
-    void (__stdcall* UpdateRadarMapped)(void);
+    // Records a snapshot of the units and projectiles the radar shows, for the radar picture. Hooks: none.
+    void (__stdcall* RecordRadarUnits)(void);
+    // Records a snapshot of the cells the players have mapped, when they changed, for the radar picture. Hooks: none.
+    void (__stdcall* RecordRadarMapped)(void);
     // Updates which units radar, sonar and cloaking show and hide for each player. Hooks: none.
     void (__stdcall* UpdateSensorRadarAndCloak)(void);
 };

@@ -3,8 +3,11 @@
 struct GafFrame;
 
 void __stdcall FreeRadar();
-void __stdcall UpdateRadarMapped();
-void __stdcall DrawRadarUnits(void);
+struct RadarMappedCapture;
+struct RadarDrawCapture;
+
+void UpdateRadarMapped(const RadarMappedCapture* capture);
+void DrawRadarUnits(const RadarDrawCapture* capture);
 
 void __stdcall ResizeRadarPicture(GafFrame* pic, int x, int y, int w, int h);
 void __stdcall CalcRadarViewportRect(int*);

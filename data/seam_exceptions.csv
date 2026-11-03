@@ -1,6 +1,1 @@
 subsystem,function,symbol,reason
-los_radar,DrawRadarUnits,DrawCircle,TODO(#647): presentation code in a tick: radar picture drawing
-los_radar,DrawRadarUnits,DrawDashedCircle,TODO(#647): presentation code in a tick: radar picture drawing
-los_radar,DrawRadarUnits,DrawFrame,TODO(#647): presentation code in a tick: radar picture drawing
-los_radar,DrawRadarUnits,DrawPixel,TODO(#647): presentation code in a tick: radar picture drawing
-los_radar,DrawRadarUnits,DrawSurface,TODO(#647): presentation code in a tick: radar picture drawing

@@ -219,6 +219,7 @@ src/graphics/particles.cpp,src/graphics/particles.h,#392
 src/graphics/particles.cpp,src/graphics/rect.h,#392
 src/graphics/particles.cpp,src/graphics/smoke_particle.h,#392
 src/graphics/particles.cpp,src/graphics/timed_sub_particles.h,#392
+src/graphics/particles.cpp,src/ingame/game_dialogs.h,#620
 src/graphics/pcx.cpp,interfaces/host.h,#392
 src/graphics/pcx.cpp,src/graphics/display.h,#392
 src/graphics/pcx.cpp,src/graphics/object3do.h,#392

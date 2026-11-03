@@ -7,9 +7,9 @@
 `--check --exe` plays every scenario in reference/scenarios/ (`--parallel N` at a
 time, default half the CPUs and at most 6, under Wine through tools/playtest.py)
 and compares the digest of each tick (tools/tracedigest.py) with the stored one. It also compares
-each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md).
+each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md), and each run's ui.txt with reference/ui/<scenario>.txt the same way (docs/ui-log.md).
 A scenario with a `frames` line also has its frame dumps compared, byte for byte, with reference/frames/<scenario>/ (docs/frame-dump.md); a missing stored frame fails.
-and the harness.sav of each scenario with a `save` line with
+It also compares the harness.sav of each scenario with a `save` line with
 reference/saves/<scenario>.sav, when that file exists, by decoded contents (tools/savefile.py leaves out the bytes taken from the clock or from uninitialised memory).
 On the first difference it builds the reference from the commit the trace
 records, prints tools/tracediff.py's report for that scenario and exits 1. A
@@ -33,7 +33,7 @@ lines to every scenario: at the end of tick T the run copies the sim block and c
 `--traces` checks out origin/reference in build/reference/branch, runs that
 branch's own `tools/reference.py HEAD --traces` there (it links the matching
 build with the original compiler and plays the scenarios), and copies the
-traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ (if it wrote any), the
+traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ (if it wrote any), the UI logs it wrote into reference/ui/, the
 frames it wrote into reference/frames/ (if it wrote any) and the saves it wrote into reference/saves/ (if it wrote any).
 Set WINEARCH=win64 for Wine; `--game-dir` names the game's
 install.
@@ -46,8 +46,11 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import blockpointers
@@ -62,6 +65,10 @@ SCENARIOS = ROOT / "reference/scenarios"
 TRACES = ROOT / "reference/traces"
 SOUNDS = ROOT / "reference/sounds"
 SOUND_FILE = "sound.txt"
+UIS = ROOT / "reference/ui"
+UI_FILE = "ui.txt"
+UI_PREFIX = "ui-"
+UI_EFFECTS = ("order", "qbuild", "cancel", "group", "groupsel")
 FRAMES = ROOT / "reference/frames"
 FRAME_HEADER_SIZE = 16
 FRAME_PALETTE_SIZE = 1024
@@ -105,9 +112,12 @@ BLOCK_POINTERS_TIER_TEXT = "block pointers: full suite only"
 FUEL_FILE = "fuel.txt"
 FUEL: dict[str, dict[str, tuple[int, int]]] = {}
 SOUND_LOGS: dict[str, str | None] = {}
+UI_LOGS: dict[str, str | None] = {}
 FRAME_DUMPS: dict[str, dict[int, bytes]] = {}
 SAVE_BYTES: dict[str, bytes | None] = {}
 RETRY_DIALOG = "dialog-directx"
+WATCH_SECONDS = 0.5
+STOP_SECONDS = 30
 
 
 def reference_env(environ: dict[str, str], root: Path) -> dict[str, str]:
@@ -231,7 +241,7 @@ def keep_run(run: Path, scenario: str, suffix: str = "") -> Path:
     """Copy the run's trace.txt (and dump.txt and blockptrs.txt, if any) to build/scratch/check-<scenario>-<time>/."""
     kept = ROOT / "build/scratch" / f"check-{scenario}{suffix}-{time.strftime('%Y%m%d-%H%M%S')}"
     kept.mkdir(parents=True, exist_ok=True)
-    for name in ("trace.txt", SOUND_FILE, "dump.txt", "blockptrs.txt"):
+    for name in ("trace.txt", SOUND_FILE, UI_FILE, "dump.txt", "blockptrs.txt"):
         if (run / name).is_file():
             shutil.copy2(run / name, kept / name)
     return kept
@@ -295,6 +305,113 @@ def report_fuel(exe: Path, scenarios: dict[str, Path]) -> int:
     return 1 if missing else 0
 
 
+def game_trace(pid: int) -> Path | None:
+    """The trace.txt that the playtest.py process `pid` has its exe write, or None before the run has a game directory."""
+    work = playtest.OUT / "work"
+    if not work.is_dir():
+        return None
+    found = sorted(d for d in work.iterdir() if re.match(rf"\d{{8}}-\d{{6}}-{pid}-", d.name))
+    return found[-1] / "i1/game/trace.txt" if found else None
+
+
+@dataclass
+class LiveRun:
+    """A scenario's running playtest.py process and how far its trace.txt has been read."""
+    proc: subprocess.Popen
+    path: Path | None = None
+    offset: int = 0
+    seen: int = 0
+    started: float = field(default_factory=time.time)
+    tail: tracedigest.TraceTail = field(default_factory=tracedigest.TraceTail)
+
+
+@dataclass
+class Found:
+    """The first scenario seen to differ from its stored trace."""
+    name: str
+    diff: str
+    ticks: int
+    elapsed: float
+    kept: Path | None
+
+
+class Watch:
+    """Compares each running scenario's trace.txt, as it grows, with the stored digests, and stops every run at the first difference."""
+
+    def __init__(self, expected: dict[str, tuple], locate: Callable[[int], Path | None] | None = None):
+        self.expected = expected
+        self.locate = locate or game_trace
+        self.lock = threading.Lock()
+        self.halted = threading.Event()
+        self.found: Found | None = None
+        self.live: dict[str, LiveRun] = {}
+
+    def started(self, name: str) -> Callable[[subprocess.Popen], None]:
+        """The callback that tracediff.play calls with the run's process."""
+        def register(proc: subprocess.Popen) -> None:
+            with self.lock:
+                self.live[name] = LiveRun(proc)
+                if self.halted.is_set():
+                    self.stop(proc)
+        return register
+
+    def finished(self, name: str) -> None:
+        with self.lock:
+            self.live.pop(name, None)
+
+    def poll(self) -> None:
+        """Read what each running scenario has written since the last poll, and halt at the first digest that differs."""
+        with self.lock:
+            live = list(self.live.items())
+        for name, run in live:
+            if self.halted.is_set():
+                return
+            try:
+                self.check(name, run)
+            except (tracediff.Error, OSError):
+                continue
+
+    def check(self, name: str, run: LiveRun) -> None:
+        run.path = run.path or self.locate(run.proc.pid)
+        if run.path is None:
+            return
+        with run.path.open("rb") as f:
+            f.seek(run.offset)
+            data = f.read()
+        run.offset += len(data)
+        want = self.expected[name][1]
+        for got in run.tail.feed(data):
+            index = run.seen
+            run.seen += 1
+            if want[index:index + 1] != [got]:
+                diff = first_difference(want[index:index + 1], [got])
+                self.halt(name, diff, run.seen, time.time() - run.started, keep_run(run.path.parent, name))
+                return
+
+    def halt(self, name: str, diff: str, ticks: int, elapsed: float, kept: Path | None) -> None:
+        """Record the first difference and stop every running scenario (the first call wins)."""
+        with self.lock:
+            if self.found:
+                return
+            self.found = Found(name, diff, ticks, elapsed, kept)
+            self.halted.set()
+            procs = [r.proc for r in self.live.values()]
+        for proc in procs:
+            self.stop(proc)
+
+    def stop(self, proc: subprocess.Popen) -> None:
+        """Ask a run's playtest.py to stop (it ends its own Wine processes), and kill it if it is still there after STOP_SECONDS."""
+        if proc.poll() is not None:
+            return
+        try:
+            proc.terminate()
+        except OSError:
+            return
+        timer = threading.Timer(STOP_SECONDS, lambda: proc.poll() is None and proc.kill())
+        timer.daemon = True
+        timer.start()
+
+
 def scenario_saves(scenario: Path) -> bool:
     """Whether the scenario has a `save` line, so that its run writes harness.sav."""
     return any(line.split()[:1] == ["save"] for line in scenario.read_text().splitlines())
@@ -304,7 +421,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                   want: tuple[dict[str, str], list[tuple[int, str]]] | None = None, poison: bool = False,
                   keep_always: bool = False, scans: dict[str, str | None] | None = None,
                   scan_every: int = 1, retry_any: bool = False, save_to: Path | None = None,
-                  load_from: Path | None = None) -> tuple[dict[str, str], list[tuple[int, str]], float, Path | None]:
+                  load_from: Path | None = None, watch: "Watch | None" = None) -> tuple[dict[str, str], list[tuple[int, str]], float, Path | None]:
     """Run the scenario under Wine: the trace header, the digest of each tick, the seconds taken.
 
     With `want` (the stored header and digests), a run that differs is kept: the last element is the
@@ -324,6 +441,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     With `save_to` (a directory), each of tracediff.SAVE_FILES the run wrote in its game copy is copied there by its
     file name before the run's directory is removed (nothing is copied for a file the run wrote none of). With
     `load_from` (a directory), its files are placed in the run's game copy at those paths before the exe starts.
+
+    With `watch`, the run's process is registered there (see Watch), and a run that differs at its end halts the watch.
     """
     ticks = scenario_ticks(scenario)
     rate = RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK if scans is not None and scan_every == 1 else RUN_TICKS_PER_SECOND
@@ -332,19 +451,23 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     for attempt in range(RUN_ATTEMPTS):
         try:
             frame_files = tuple(f"frames/{tick}.bin" for tick in scenario_frames(scenario))
-            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, *frame_files, *dict.fromkeys(
+            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, *frame_files, *dict.fromkeys(
                 (*(tracediff.SAVE_FILES if save_to is not None else ()), *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
+            if watch is not None:
+                extra["started"] = watch.started(scenario.stem)
             if load_from is not None:
                 extra["put"] = tracediff.save_put(load_from, scenario.stem, load_from.name)
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, scan_every if scans is not None else 0, **extra)
             break
         except tracediff.Error as e:
-            if attempt == RUN_ATTEMPTS - 1 or not (retry_any or should_retry(str(e))):
+            if (watch is not None and watch.halted.is_set()) or attempt == RUN_ATTEMPTS - 1 or not (retry_any or should_retry(str(e))):
                 raise
             failed = keep_failed_attempt(e, scenario.stem)
             where = f" [failed attempt kept: {failed.relative_to(ROOT)}]" if failed else ""
             print(f"{scenario.stem}: run failed, trying again: {last_lines(e)}{where}", flush=True)
     elapsed = time.time() - t0
+    if watch is not None:
+        watch.finished(scenario.stem)
     kept = None
     try:
         if save_to is not None:
@@ -352,6 +475,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         FUEL[scenario.stem] = parse_fuel(run / FUEL_FILE)
         sound_log = run / SOUND_FILE
         SOUND_LOGS[scenario.stem] = sound_log.read_text() if sound_log.is_file() else None
+        ui_log = run / UI_FILE
+        UI_LOGS[scenario.stem] = ui_log.read_text() if ui_log.is_file() else None
         FRAME_DUMPS[scenario.stem] = {tick: (run / "frames" / f"{tick}.bin").read_bytes()
                                       for tick in scenario_frames(scenario) if (run / "frames" / f"{tick}.bin").is_file()}
         if scenario_saves(scenario):
@@ -365,8 +490,11 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         if scans is not None:
             scanned = run / "blockptrs.txt"
             scans[scenario.stem] = scanned.read_text() if scanned.is_file() else None
-        if keep_always or (want is not None and difference(want, header, digests)):
+        diff = difference(want, header, digests) if want is not None else None
+        if keep_always or diff:
             kept = keep_run(run, scenario.stem, "-alloff" if keep_always else "")
+        if watch is not None and diff:
+            watch.halt(scenario.stem, diff, len(digests), elapsed, kept)
     finally:
         shutil.rmtree(run.parent, ignore_errors=True)
     return header, digests, elapsed, kept
@@ -392,7 +520,7 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
              expected: dict[str, tuple] | None = None, poison: bool = False,
              failed: dict[str, str] | None = None, keep_always: bool = False,
              scans: dict[str, str | None] | None = None, scan_every: int = 1,
-             retry_any: bool = False) -> dict[str, tuple]:
+             retry_any: bool = False, watch: Watch | None = None) -> dict[str, tuple]:
     """Every scenario's play_scenario result, `parallel` at a time and longest first; exits 1 if one fails to run.
 
     With `failed` (a dict), a scenario that fails to run is recorded there as name -> message and play_all
@@ -402,6 +530,7 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
     Each run has its own session directory, Wine prefix and game directory (tools/playtest.py
     names them by its pid; a test-mode run is headless, with no X display or audio sink), so runs share nothing but the template prefix,
     which they only hardlink. With `expected`, a scenario that differs keeps its trace (see play_scenario).
+    With `watch`, scenarios not yet started are skipped once the watch halts, and the runs it stopped are not failures.
 
     A scenario with a `load` line runs after every scenario that has none, in any mode and with any `parallel`:
     the scenario it names saves a game (the `save` key), the run's savegame/harness.sav and savegame/harness.opt are copied out of its game
@@ -431,6 +560,8 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
         return None
 
     def one(name: str) -> None:
+        if watch is not None and watch.halted.is_set():
+            return
         try:
             problem = load_problem(name)
             if problem:
@@ -438,8 +569,11 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
             saver = loads[name]
             results[name] = play_scenario(exe, scenarios[name], game_dir, (expected or {}).get(name), poison, keep_always, scans, scan_every, retry_any,
                                           save_to=saves / name if name in loads.values() else None,
-                                          load_from=saves / saver if saver else None)
+                                          load_from=saves / saver if saver else None,
+                                          **({"watch": watch} if watch is not None else {}))
         except (tracediff.Error, OSError) as e:
+            if watch is not None and watch.halted.is_set():
+                return
             errors[name] = last_lines(e, 5)
             if failed is not None:
                 failed[name] = errors[name]
@@ -465,12 +599,15 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
 
 
 def with_steps_per_frame(scenarios: dict[str, Path], steps: int, directory: Path) -> dict[str, Path]:
-    """Copies of the scenarios in `directory`, each ending with a steps_per_frame line (a later line replaces an earlier one)."""
+    """Copies of the scenarios in `directory`, each ending with a steps_per_frame line (a later line replaces an earlier one), except a scenario with an `input` line, which stays at 1."""
     directory.mkdir(parents=True, exist_ok=True)
     copies = {}
     for name, path in scenarios.items():
         text = path.read_text()
         copies[name] = directory / path.name
+        if any(line.split(None, 1)[:1] == ["input"] for line in text.splitlines()):
+            copies[name].write_text(text)
+            continue
         copies[name].write_text(text + ("" if text.endswith("\n") else "\n") + f"steps_per_frame {steps}\n")
     return copies
 
@@ -560,6 +697,70 @@ def sound_report(scenarios: dict[str, Path], logs: dict[str, str | None], direct
         else:
             equal += 1
     lines.append(f"sound logs: {equal} of {len(scenarios)} equal, {len(differing)} differ, {len(unstored)} with no stored log in {directory.relative_to(ROOT)}")
+    return differing, lines
+
+
+def ui_difference(stored: str, got: str) -> str | None:
+    """Where two UI logs first differ (a line number with both lines), or None when they are equal."""
+    want, have = stored.splitlines(), got.splitlines()
+    for number, (a, b) in enumerate(zip(want, have), 1):
+        if a != b:
+            return f"ui line {number}: stored `{a}`, got `{b}`"
+    if len(want) != len(have):
+        number = min(len(want), len(have)) + 1
+        longer, which = (want, "stored") if len(want) > len(have) else (have, "got")
+        return f"ui line {number}: only the {which} log has it (`{longer[number - 1]}`)"
+    return None
+
+
+def ui_gives_nothing(log: str) -> bool:
+    """Whether a UI log has no order, queued build, cancel or group line and never selects a unit (a broken ui scenario)."""
+    for line in log.splitlines():
+        words = line.split()
+        if len(words) >= 2 and words[1] in UI_EFFECTS:
+            return False
+        if len(words) >= 3 and words[1] == "select" and words[2] != "-":
+            return False
+    return True
+
+
+def ui_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path,
+              known: set[str] | None = None) -> tuple[list[str], list[str]]:
+    """(the scenarios whose UI log fails, the report lines).
+
+    A scenario fails when its stored log in `directory` differs from the run's, when its name starts with ui- and it
+    has no stored log or its run's log gives no order and selects nothing, and a stored log with no scenario (among
+    `known`, default every scenario file) is reported too. Other scenarios without a stored log are only counted.
+    """
+    known = set(scenario_files()) if known is None else known
+    differing: list[str] = []
+    lines: list[str] = []
+    unstored: list[str] = []
+    equal = 0
+    for name in scenarios:
+        stored = directory / f"{name}.txt"
+        got = logs.get(name)
+        ui_scenario = name.startswith(UI_PREFIX)
+        if not stored.is_file():
+            if ui_scenario:
+                differing.append(name)
+                lines.append(f"DIFF {name} has no stored UI log in {directory.relative_to(ROOT)}")
+            else:
+                unstored.append(name)
+            continue
+        diff = ui_difference(stored.read_text(), got) if got is not None else f"the run wrote no {UI_FILE}"
+        if not diff and ui_scenario and ui_gives_nothing(got or ""):
+            diff = "the input gives no order and selects no unit"
+        if diff:
+            differing.append(name)
+            lines.append(f"DIFF {name} {diff}")
+        else:
+            equal += 1
+    for path in sorted(directory.glob("*.txt")) if directory.is_dir() else []:
+        if path.stem not in known:
+            differing.append(path.stem)
+            lines.append(f"DIFF {path.stem} stored UI log has no scenario of that name")
+    lines.append(f"ui logs: {equal} of {len(scenarios)} equal, {len(differing)} differ, {len(unstored)} with no stored log in {directory.relative_to(ROOT)}")
     return differing, lines
 
 
@@ -679,17 +880,34 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     off_failed: dict[str, str] = {}
     failed: dict[str, str] = {}
     scans: dict[str, str | None] | None = {} if quirks is None and roundtrip is None else None
+    watch = Watch(expected) if quirks is None else None
+    watching = threading.Event()
+
+    def monitor() -> None:
+        while not watching.wait(WATCH_SECONDS):
+            watch.poll()
+
+    monitor_thread = threading.Thread(target=monitor, daemon=True)
+    if watch is not None:
+        monitor_thread.start()
     t0 = time.time()
     try:
         results = play_all(exe, played, game_dir, parallel, expected, poison, failed if quirks is not None else None,
-                           scans=scans, scan_every=GATE_SCAN_EVERY)
+                           scans=scans, scan_every=GATE_SCAN_EVERY, **({"watch": watch} if watch is not None else {}))
         if quirks is not None:
             differing = [n for n in scenarios if n in results and n not in failed and difference(expected[n], *results[n][:2])]
             if differing:
                 off_results = play_all(exe, with_savers({n: base[n] for n in differing}, base), game_dir, parallel, expected, False, off_failed, True)
     finally:
+        watching.set()
         shutil.rmtree(scratch, ignore_errors=True)
     wall = time.time() - t0
+    if watch is not None and watch.found and len(results) < len(scenarios):
+        found = watch.found
+        where = f" [kept: {found.kept.relative_to(ROOT)}]" if found.kept else ""
+        print(f"DIFF {found.name} ({found.ticks} ticks, {clock(found.elapsed)}) {found.diff}{where}")
+        print(f"stopped: {len(scenarios) - len(results)} scenarios not finished")
+        report_divergence(found.name, expected, exe, scenarios, poison, game_dir)
     if quirks is not None:
         report_quirks(scenarios, expected, results, failed, quirks, wall, off_results, off_failed)
         return
@@ -706,6 +924,8 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     print(f"{len(scenarios) - len(bad)} of {len(scenarios)} scenarios equal, total {clock(wall)}")
     sound_bad, sound_lines = sound_report(scenarios, SOUND_LOGS, SOUNDS)
     print("\n".join(sound_lines))
+    ui_bad, ui_lines = ui_report(scenarios, UI_LOGS, UIS)
+    print("\n".join(ui_lines))
     frame_bad, frame_lines = frame_report(scenarios, FRAME_DUMPS, FRAMES)
     print("\n".join(frame_lines))
     save_bad, save_lines = save_report(scenarios, SAVE_BYTES, SAVES)
@@ -717,13 +937,18 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         pointers = report_block_pointers(exe, scans, tier, save_blockptrs)
     pointers += report_fuel(exe, scenarios)
     if not bad:
-        if pointers or sound_bad or frame_bad or save_bad:
+        if pointers or sound_bad or ui_bad or frame_bad or save_bad:
             sys.exit(1)
         if tier:
             print(tier_message(len(scenarios), head_commit()))
         return
 
-    name = bad[0]
+    report_divergence(bad[0], expected, exe, scenarios, poison, game_dir)
+
+
+def report_divergence(name: str, expected: dict[str, tuple], exe: Path, scenarios: dict[str, Path], poison: bool,
+                      game_dir: str | None) -> None:
+    """Run tracediff on the scenario `name` against the reference build of its stored trace, then exit 1."""
     sha = expected[name][0].get("commit", "unknown")
     print(f"\ntracediff for {name}: a = the reference at {sha}, b = {exe}", flush=True)
     if resolve_quiet(sha) is None:
@@ -903,6 +1128,20 @@ def copy_saves(directory: Path) -> None:
     print(f"{len(saves)} saves copied to {SAVES.relative_to(ROOT)}")
 
 
+def copy_ui(directory: Path) -> None:
+    """Replace reference/ui/ by the UI logs the reference branch checkout `directory` wrote (none written leaves it as it is)."""
+    logs = sorted((directory / "reference/ui").glob("*.txt"))
+    if not logs:
+        print("the reference branch wrote no UI logs; reference/ui/ is untouched")
+        return
+    UIS.mkdir(parents=True, exist_ok=True)
+    for old in UIS.glob("*.txt"):
+        old.unlink()
+    for path in logs:
+        shutil.copyfile(path, UIS / path.name)
+    print(f"{len(logs)} UI logs copied to {UIS.relative_to(ROOT)}")
+
+
 def write_traces(game_dir: str | None, parallel: int) -> None:
     directory = reference_branch()
     branch_scenarios = directory / "reference/scenarios"
@@ -927,6 +1166,7 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
     print(f"{len(produced)} traces copied to {TRACES.relative_to(ROOT)}")
     copy_frames(directory / "reference/frames")
     copy_saves(directory)
+    copy_ui(directory)
     sounds = sorted((directory / "reference/sounds").glob("*.txt"))
     if not sounds:
         print("the reference branch wrote no sound logs; reference/sounds/ is untouched")

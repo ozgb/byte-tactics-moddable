@@ -1,0 +1,33 @@
+# A finished Arm lab is selected and its build buttons are clicked: queue +1, +5 with Shift, -1 and -5 with the right button.
+game_seed 317
+crt_seed 1317
+view_seed 2317
+map The Pass
+start_positions fixed
+ticks 200
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +iface 1
+spawn 2 0 ARMLAB 600 300
+input 10 mouse move 424 300
+input 11 mouse left down 424 300
+input 12 mouse left up 424 300
+input 20 mouse move 96 187
+input 21 mouse left down 96 187
+input 22 mouse left up 96 187
+input 30 key down shift
+input 31 mouse left down 96 187
+input 32 mouse left up 96 187
+input 33 key up shift
+input 40 mouse move 32 187
+input 41 mouse left down 32 187
+input 42 mouse left up 32 187
+input 50 mouse right down 96 187
+input 51 mouse right up 96 187
+input 60 key down shift
+input 61 mouse right down 96 187
+input 62 mouse right up 96 187
+input 63 key up shift
+frames 16 45 70

@@ -1,0 +1,49 @@
+# Ctrl+digit makes control groups, Alt+digit recalls them, and orders go to the recalled group.
+game_seed 316
+crt_seed 1316
+view_seed 2316
+map The Pass
+start_positions fixed
+ticks 300
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +iface 1
+spawn 2 0 ARMPW 500 300
+spawn 2 0 ARMPW 540 320
+spawn 2 0 ARMPW 700 250
+input 10 mouse move 300 270
+input 11 mouse left down 300 270
+input 12 mouse move 340 300
+input 13 mouse move 400 330
+input 14 mouse move 430 350
+input 15 mouse left up 430 350
+input 20 key down ctrl
+input 21 key down 1
+input 22 key up 1
+input 23 key up ctrl
+input 30 mouse move 524 250
+input 31 mouse left down 524 250
+input 32 mouse left up 524 250
+input 40 key down ctrl
+input 41 key down 2
+input 42 key up 2
+input 43 key up ctrl
+input 50 mouse move 384 400
+input 51 mouse left down 384 400
+input 52 mouse left up 384 400
+input 60 key down alt
+input 61 key down 1
+input 62 key up 1
+input 63 key up alt
+input 70 mouse move 480 360
+input 71 mouse right down 480 360
+input 72 mouse right up 480 360
+input 80 key down alt
+input 81 key down 2
+input 82 key up 2
+input 83 key up alt
+input 90 mouse move 440 380
+input 91 mouse right down 440 380
+input 92 mouse right up 440 380

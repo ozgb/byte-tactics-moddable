@@ -1,0 +1,1162 @@
+bt-replay 1
+subsystem wind_meteors 1.2
+call 0 DisableMeteors
+  w SimGlobals.g_meteorsEnabled 0
+call 0 LoadMeteorDefaults
+  i services.TdfFile_Construct file#1
+  i services.BuildDataPath "gamedata" "meteor" "tdf" = "gamedata\\meteor.tdf"
+  i services.TdfFile_LoadFile file#1 "gamedata\\meteor.tdf" = 1
+  o file#1.root rec#1
+  o file#1.current null
+  i services.TdfFile_SelectRecord file#1 "Default" = 1
+  o file#1.current rec#2
+  i services.TdfRecord_GetFieldString rec#2 "MeteorWeapon" 32 "" = 1
+  o dst "Meteor"
+  i services.TdfRecord_GetFieldInt rec#2 "MeteorRadius" 0 = 300
+  i services.TdfRecord_GetFieldDouble rec#2 "MeteorDensity" f64:0x0000000000000000 = f64:0x4000000000000000
+  i services.TdfRecord_GetFieldDouble rec#2 "MeteorDuration" f64:0x0000000000000000 = f64:0x4014000000000000
+  i services.TdfRecord_GetFieldDouble rec#2 "MeteorInterval" f64:0x0000000000000000 = f64:0x404e000000000000
+  i services.TdfFile_Destruct file#1
+  o params.name "Meteor"
+  o params.radius 300
+  o params.density f32:0x40000000
+  o params.duration f32:0x40a00000
+  o params.interval f32:0x42700000
+call 0 SetMeteorParams
+  r SimGlobals.g_meteorWeaponName ""
+  a params.name "Meteor"
+  a params.radius 300
+  a params.density f32:0x40000000
+  a params.duration f32:0x40a00000
+  a params.interval f32:0x42700000
+  w SimGlobals.g_meteorWeaponName "Meteor"
+  w SimGlobals.g_meteorSpawnMagnitude 300
+  w SimGlobals.g_meteorSpawnInterval 15
+  w SimGlobals.g_meteorShowerDuration 150
+  w SimGlobals.g_meteorScheduleGap 1800
+call 0 EnableMeteors
+  w SimGlobals.g_meteorsEnabled 1
+call 0 SetMeteorParams
+  a params.name "hailstorm"
+  a params.radius 2800
+  a params.density f32:0x43c80000
+  a params.duration f32:0x420c0000
+  a params.interval f32:0x42500000
+  w SimGlobals.g_meteorWeaponName "hailstorm"
+  w SimGlobals.g_meteorSpawnMagnitude 2800
+  w SimGlobals.g_meteorSpawnInterval 0
+  w SimGlobals.g_meteorShowerDuration 1050
+  w SimGlobals.g_meteorScheduleGap 1560
+call 0 UpdateWindOnStream
+  r Game.windCounter 0
+  r Game.windSpeedDenominator 5000
+  r Game.windDirection 0
+  r Game.windSpeed 0
+  r Game.windStrength f32:0x00000000
+  r Game.windSpeedMin 2200
+  r Game.windSpeedMax 4000
+  r rng.main 0x0000057c
+  r rng.load 0x0000057c
+  r rng.seed 0x66e294e7
+  a stream load
+  w Game.windX 0
+  w Game.windZ 0
+  w Game.windEnabled 0
+call 0 InitMeteors
+  r SimGlobals.g_meteorWeapon null
+  i weapons.FindWeaponByName "hailstorm" = weapondef#226
+  o weapondef#226.flags 0x00000020
+  w SimGlobals.g_meteorNextStrikeTime 0
+  w SimGlobals.g_meteorActive 0
+  w SimGlobals.g_meteorWeapon weapondef#226
+call 1 UpdateWind
+  r rng.load 0xbebc462a
+  r rng.seed 0x1d0f4ed8
+  i services.GameRand main = 4623
+  i services.RandomInt 1800 = 111
+  i services.RandomInt 65536 = 46636
+  w Game.windCounter 180
+  w Game.windX 4484
+  w Game.windZ 1122
+  w Game.windDirection 46636
+  w Game.windSpeed 2311
+  w Game.windStrength f32:0x3eeca57a
+  w Game.windEnabled 1
+  w rng.main 0x120f7e4f
+  w rng.seed 0x3fa8b62c
+call 1 UpdateMeteors
+  r Game.width 384
+  r Game.height 320
+  r SimGlobals.g_meteorStrikeEndTime 0
+  r SimGlobals.g_meteorOrigin (0,0)
+  r SimGlobals.g_meteorNextHitTime 0
+  r SimGlobals.g_meteorTarget (0,0)
+  i services.GameRand main = 25202
+  i services.GameRand main = 2247
+  i services.GameRand main = 3521
+  i services.GameRand main = 7061
+  i services.GameRand main = 19902
+  i services.GameRand main = 20102
+  i weapons.SpawnProjectile weapondef#226 pos=(90599392,88473600,327630432) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextStrikeTime 2611
+  w SimGlobals.g_meteorActive 1
+  w SimGlobals.g_meteorStrikeEndTime 1051
+  w SimGlobals.g_meteorOrigin (17,232)
+  w SimGlobals.g_meteorNextHitTime 1
+  w SimGlobals.g_meteorTarget (26,246)
+  w rng.main 0xce86cc55
+call 2 UpdateWind
+  w Game.windEnabled 0
+call 2 UpdateMeteors
+  i services.GameRand main = 18391
+  i services.GameRand main = 25747
+  i weapons.SpawnProjectile weapondef#226 pos=(118281816,88473600,220710072) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 2
+  w rng.main 0x64934577
+call 3 UpdateWind
+  r rng.seed 0x38411992
+call 3 UpdateMeteors
+  i services.GameRand main = 16709
+  i services.GameRand main = 27569
+  i weapons.SpawnProjectile weapondef#226 pos=(96219464,88473600,192274360) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 3
+  w rng.main 0x6bb157a9
+call 4 UpdateWind
+call 4 UpdateMeteors
+  i services.GameRand main = 24406
+  i services.GameRand main = 20060
+  i weapons.SpawnProjectile weapondef#226 pos=(105796112,88473600,347819872) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 4
+  w rng.main 0xce5c4b6b
+call 5 UpdateWind
+call 5 UpdateMeteors
+  i services.GameRand main = 31579
+  i services.GameRand main = 15965
+  i weapons.SpawnProjectile weapondef#226 pos=(2652240,88473600,419438240) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 5
+  w rng.main 0xbe5dad3d
+call 6 UpdateWind
+call 6 UpdateMeteors
+  i services.GameRand main = 11976
+  i services.GameRand main = 10975
+  i weapons.SpawnProjectile weapondef#226 pos=(-40100560,88473600,277028632) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 6
+  w rng.main 0xaadf6d9f
+call 7 UpdateWind
+call 7 UpdateMeteors
+  i services.GameRand main = 8579
+  i services.GameRand main = 17423
+  i weapons.SpawnProjectile weapondef#226 pos=(27196464,88473600,290386872) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 7
+  w rng.main 0xc40f0111
+call 8 UpdateWind
+call 8 UpdateMeteors
+  i services.GameRand main = 13173
+  i services.GameRand main = 24793
+  i weapons.SpawnProjectile weapondef#226 pos=(91499792,88473600,240551632) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 8
+  w rng.main 0x60d98013
+call 9 UpdateWind
+call 9 UpdateMeteors
+  i services.GameRand main = 9176
+  i services.GameRand main = 32648
+  i weapons.SpawnProjectile weapondef#226 pos=(19086464,88473600,191901952) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 9
+  w rng.main 0x7f88c725
+call 10 UpdateWind
+call 10 UpdateMeteors
+  i services.GameRand main = 11233
+  i services.GameRand main = 8265
+  i weapons.SpawnProjectile weapondef#226 pos=(-45015560,88473600,244044504) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 10
+  w rng.main 0xa04996c7
+call 11 UpdateWind
+call 11 UpdateMeteors
+  i services.GameRand main = 28587
+  i services.GameRand main = 28898
+  i weapons.SpawnProjectile weapondef#226 pos=(126738992,88473600,126014560) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 11
+  w rng.main 0x70e2b379
+call 12 UpdateWind
+call 12 UpdateMeteors
+  i services.GameRand main = 32661
+  i services.GameRand main = 15141
+  i weapons.SpawnProjectile weapondef#226 pos=(-26591008,88473600,420624352) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 12
+  w rng.main 0xbb2505bb
+call 13 UpdateWind
+call 13 UpdateMeteors
+  i services.GameRand main = 13678
+  i services.GameRand main = 21468
+  i weapons.SpawnProjectile weapondef#226 pos=(80944512,88473600,286569728) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 13
+  w rng.main 0xd3dcba0d
+call 14 UpdateWind
+call 14 UpdateMeteors
+  i services.GameRand main = 21538
+  i services.GameRand main = 30283
+  i weapons.SpawnProjectile weapondef#226 pos=(73364352,88473600,136225792) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 14
+  w rng.main 0xf64b60ef
+call 15 UpdateWind
+call 15 UpdateMeteors
+  i services.GameRand main = 17872
+  i services.GameRand main = 6259
+  i weapons.SpawnProjectile weapondef#226 pos=(-75541096,88473600,207256864) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 15
+  w rng.main 0x98730ee1
+call 16 UpdateWind
+call 16 UpdateMeteors
+  i services.GameRand main = 29540
+  i services.GameRand main = 26298
+  i weapons.SpawnProjectile weapondef#226 pos=(174233024,88473600,189457952) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 16
+  w rng.main 0x66ba7c63
+call 17 UpdateWind
+call 17 UpdateMeteors
+  i services.GameRand main = 18986
+  i services.GameRand main = 18866
+  i weapons.SpawnProjectile weapondef#226 pos=(66784240,88473600,337631104) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 17
+  w rng.main 0x49b225f5
+call 18 UpdateWind
+call 18 UpdateMeteors
+  i services.GameRand main = 26372
+  i services.GameRand main = 12034
+  i weapons.SpawnProjectile weapondef#226 pos=(-91579888,88473600,342419656) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 18
+  w rng.main 0x2f026c17
+call 19 UpdateWind
+call 19 UpdateMeteors
+  i services.GameRand main = 23578
+  i services.GameRand main = 22218
+  i weapons.SpawnProjectile weapondef#226 pos=(136442336,88473600,301160048) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 19
+  w rng.main 0x56cab349
+call 20 UpdateWind
+call 20 UpdateMeteors
+  i services.GameRand main = 27968
+  i services.GameRand main = 12537
+  i weapons.SpawnProjectile weapondef#226 pos=(-87309320,88473600,359279472) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 20
+  w rng.main 0x30f9840b
+call 21 UpdateWind
+call 21 UpdateMeteors
+  i services.GameRand main = 16493
+  i services.GameRand main = 29285
+  i weapons.SpawnProjectile weapondef#226 pos=(75527160,88473600,171173920) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 21
+  w rng.main 0x7265aadd
+call 22 UpdateWind
+call 22 UpdateMeteors
+  i services.GameRand main = 10991
+  i services.GameRand main = 1968
+  i weapons.SpawnProjectile weapondef#226 pos=(-5025712,88473600,186133360) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 22
+  w rng.main 0x87b0583f
+call 23 UpdateWind
+call 23 UpdateMeteors
+  i services.GameRand main = 18755
+  i services.GameRand main = 31800
+  i weapons.SpawnProjectile weapondef#226 pos=(37036976,88473600,140049568) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 23
+  w rng.main 0xfc3840b1
+call 24 UpdateWind
+call 24 UpdateMeteors
+  i services.GameRand main = 16063
+  i services.GameRand main = 23973
+  i weapons.SpawnProjectile weapondef#226 pos=(107060672,88473600,254278560) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 24
+  w rng.main 0x5da5bcb3
+call 25 UpdateWind
+call 25 UpdateMeteors
+  i services.GameRand main = 9069
+  i services.GameRand main = 10455
+  i weapons.SpawnProjectile weapondef#226 pos=(-28292224,88473600,264390544) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 25
+  w rng.main 0xa8d7e8c5
+call 26 UpdateWind
+call 26 UpdateMeteors
+  i services.GameRand main = 6594
+  i services.GameRand main = 29498
+  i weapons.SpawnProjectile weapondef#226 pos=(39440488,88473600,213367576) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 26
+  w rng.main 0xf33ac567
+call 27 UpdateWind
+call 27 UpdateMeteors
+  i services.GameRand main = 4890
+  i services.GameRand main = 23502
+  i weapons.SpawnProjectile weapondef#226 pos=(44560496,88473600,248930824) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 27
+  w rng.main 0xdbce5719
+call 28 UpdateWind
+call 28 UpdateMeteors
+  i services.GameRand main = 16681
+  i services.GameRand main = 26982
+  i weapons.SpawnProjectile weapondef#226 pos=(101752592,88473600,202309432) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 28
+  w rng.main 0xe966c65b
+call 29 UpdateWind
+call 29 UpdateMeteors
+  i services.GameRand main = 25523
+  i services.GameRand main = 26605
+  i weapons.SpawnProjectile weapondef#226 pos=(150474432,88473600,190217152) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 29
+  w rng.main 0x67ed7fad
+call 30 UpdateWind
+  r rng.seed 0x3c867062
+call 30 UpdateMeteors
+  i services.GameRand main = 23887
+  i services.GameRand main = 9387
+  i weapons.SpawnProjectile weapondef#226 pos=(-112683912,88473600,272578392) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 30
+  w rng.main 0x24ab538f
+call 31 UpdateWind
+call 31 UpdateMeteors
+  i services.GameRand main = 3843
+  i services.GameRand main = 10723
+  i weapons.SpawnProjectile weapondef#226 pos=(-1255936,88473600,253169984) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 31
+  w rng.main 0xa9e39681
+call 32 UpdateWind
+  r rng.seed 0x641793fc
+call 32 UpdateMeteors
+  i services.GameRand main = 14841
+  i services.GameRand main = 23624
+  i weapons.SpawnProjectile weapondef#226 pos=(99525568,88473600,258475488) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 32
+  w rng.main 0xdc484103
+call 33 UpdateWind
+call 33 UpdateMeteors
+  i services.GameRand main = 24475
+  i services.GameRand main = 12559
+  i weapons.SpawnProjectile weapondef#226 pos=(-74194936,88473600,344808592) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 33
+  w rng.main 0x310f0f95
+call 34 UpdateWind
+call 34 UpdateMeteors
+  i services.GameRand main = 7132
+  i services.GameRand main = 10671
+  i weapons.SpawnProjectile weapondef#226 pos=(-17822632,88473600,261213208) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 34
+  w rng.main 0xa9afa2b7
+call 35 UpdateWind
+call 35 UpdateMeteors
+  i services.GameRand main = 4725
+  i services.GameRand main = 27282
+  i weapons.SpawnProjectile weapondef#226 pos=(40806464,88473600,230251120) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 35
+  w rng.main 0x6a929ee9
+call 36 UpdateWind
+call 36 UpdateMeteors
+  i services.GameRand main = 3935
+  i services.GameRand main = 11321
+  i weapons.SpawnProjectile weapondef#226 pos=(-331648,88473600,255725824) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 36
+  w rng.main 0xac39ccab
+call 37 UpdateWind
+call 37 UpdateMeteors
+  i services.GameRand main = 15319
+  i services.GameRand main = 681
+  i weapons.SpawnProjectile weapondef#226 pos=(7330400,88473600,158197312) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 37
+  w rng.main 0x02a9387d
+call 38 UpdateWind
+call 38 UpdateMeteors
+  i services.GameRand main = 5283
+  i services.GameRand main = 5401
+  i weapons.SpawnProjectile weapondef#226 pos=(-7527624,88473600,228072736) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 38
+  w rng.main 0x151952df
+call 39 UpdateWind
+call 39 UpdateMeteors
+  i services.GameRand main = 29562
+  i services.GameRand main = 28730
+  i weapons.SpawnProjectile weapondef#226 pos=(133435760,88473600,124790128) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 39
+  w rng.main 0xf03a1051
+call 40 UpdateWind
+call 40 UpdateMeteors
+  i services.GameRand main = 19648
+  i services.GameRand main = 12175
+  i weapons.SpawnProjectile weapondef#226 pos=(-61818800,88473600,319101808) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 40
+  w rng.main 0xaf8f0953
+call 41 UpdateWind
+call 41 UpdateMeteors
+  i services.GameRand main = 3052
+  i services.GameRand main = 24236
+  i weapons.SpawnProjectile weapondef#226 pos=(34819392,88473600,244523872) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 41
+  w rng.main 0x5eac9a65
+call 42 UpdateWind
+call 42 UpdateMeteors
+  i services.GameRand main = 3154
+  i services.GameRand main = 14686
+  i weapons.SpawnProjectile weapondef#226 pos=(12090712,88473600,259939024) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 42
+  w rng.main 0x395e0407
+call 43 UpdateWind
+call 43 UpdateMeteors
+  i services.GameRand main = 22835
+  i services.GameRand main = 27132
+  i weapons.SpawnProjectile weapondef#226 pos=(130593592,88473600,182991536) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 43
+  w rng.main 0xe9fc8ab9
+call 44 UpdateWind
+call 44 UpdateMeteors
+  i services.GameRand main = 30517
+  i services.GameRand main = 8063
+  i weapons.SpawnProjectile weapondef#226 pos=(-152984848,88473600,239077576) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 44
+  w rng.main 0x9f7f96fb
+call 45 UpdateWind
+call 45 UpdateMeteors
+  i services.GameRand main = 19123
+  i services.GameRand main = 24845
+  i weapons.SpawnProjectile weapondef#226 pos=(124780896,88473600,238014688) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 45
+  w rng.main 0xe10dd54d
+call 46 UpdateWind
+call 46 UpdateMeteors
+  i services.GameRand main = 2444
+  i services.GameRand main = 29463
+  i weapons.SpawnProjectile weapondef#226 pos=(25946112,88473600,232320512) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 46
+  w rng.main 0x7317562f
+call 47 UpdateWind
+call 47 UpdateMeteors
+  i services.GameRand main = 23634
+  i services.GameRand main = 576
+  i weapons.SpawnProjectile weapondef#226 pos=(3240536,88473600,111760048) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 47
+  w rng.main 0x8240ae21
+call 48 UpdateWind
+call 48 UpdateMeteors
+  i services.GameRand main = 12808
+  i services.GameRand main = 10919
+  i weapons.SpawnProjectile weapondef#226 pos=(-44558464,88473600,278610208) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 48
+  w rng.main 0x2aa715a3
+call 49 UpdateWind
+call 49 UpdateMeteors
+  i services.GameRand main = 8921
+  i services.GameRand main = 26181
+  i weapons.SpawnProjectile weapondef#226 pos=(65429456,88473600,228188128) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 49
+  w rng.main 0x66458935
+call 50 UpdateWind
+call 50 UpdateMeteors
+  i services.GameRand main = 24935
+  i services.GameRand main = 898
+  i weapons.SpawnProjectile weapondef#226 pos=(-6047248,88473600,105739792) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 50
+  w rng.main 0x0382e957
+call 51 UpdateWind
+call 51 UpdateMeteors
+  i services.GameRand main = 30621
+  i services.GameRand main = 3377
+  i weapons.SpawnProjectile weapondef#226 pos=(-85977088,88473600,106840000) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 51
+  w rng.main 0x8d311a89
+call 52 UpdateWind
+call 52 UpdateMeteors
+  i services.GameRand main = 13114
+  i services.GameRand main = 6021
+  i weapons.SpawnProjectile weapondef#226 pos=(-49275648,88473600,213522432) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 52
+  w rng.main 0x9785254b
+call 53 UpdateWind
+call 53 UpdateMeteors
+  i services.GameRand main = 1888
+  i services.GameRand main = 16848
+  i weapons.SpawnProjectile weapondef#226 pos=(18731256,88473600,253782288) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 53
+  w rng.main 0xc1d0561d
+call 54 UpdateWind
+call 54 UpdateMeteors
+  i services.GameRand main = 5100
+  i services.GameRand main = 31490
+  i weapons.SpawnProjectile weapondef#226 pos=(24750992,88473600,215617552) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 54
+  w rng.main 0x7b025d7f
+call 55 UpdateWind
+  r rng.seed 0x47f4b8ba
+call 55 UpdateMeteors
+  i services.GameRand main = 18546
+  i services.GameRand main = 18236
+  i weapons.SpawnProjectile weapondef#226 pos=(53991680,88473600,340577920) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 55
+  w rng.main 0x473c6ff1
+call 56 UpdateWind
+call 56 UpdateMeteors
+  i services.GameRand main = 2048
+  i services.GameRand main = 30461
+  i weapons.SpawnProjectile weapondef#226 pos=(22729992,88473600,232902632) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 56
+  w rng.main 0x76fd65f3
+call 57 UpdateWind
+call 57 UpdateMeteors
+  i services.GameRand main = 7195
+  i services.GameRand main = 1198
+  i weapons.SpawnProjectile weapondef#226 pos=(9008752,88473600,204008016) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 57
+  w rng.main 0x04aedc05
+call 58 UpdateWind
+call 58 UpdateMeteors
+  i services.GameRand main = 30874
+  i services.GameRand main = 13211
+  i weapons.SpawnProjectile weapondef#226 pos=(-81721776,88473600,384624224) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 58
+  w rng.main 0x339b52a7
+call 59 UpdateWind
+call 59 UpdateMeteors
+  i services.GameRand main = 7998
+  i services.GameRand main = 9109
+  i weapons.SpawnProjectile weapondef#226 pos=(-26274152,88473600,250924696) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 59
+  w rng.main 0xa3954e59
+call 60 UpdateWind
+  r rng.seed 0x442f1078
+call 60 UpdateMeteors
+  i services.GameRand main = 10561
+  i services.GameRand main = 26327
+  i weapons.SpawnProjectile weapondef#226 pos=(73720928,88473600,224038992) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 60
+  w rng.main 0x66d7779b
+call 61 UpdateWind
+  r rng.seed 0x6de25940
+call 61 UpdateMeteors
+  i services.GameRand main = 28214
+  i services.GameRand main = 21477
+  i weapons.SpawnProjectile weapondef#226 pos=(148062192,88473600,332613152) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 61
+  w rng.main 0x53e5baed
+call 62 UpdateWind
+call 62 UpdateMeteors
+  i services.GameRand main = 15075
+  i services.GameRand main = 23415
+  i weapons.SpawnProjectile weapondef#226 pos=(100185664,88473600,261765312) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 62
+  w rng.main 0xdb7768cf
+call 63 UpdateWind
+call 63 UpdateMeteors
+  i services.GameRand main = 24580
+  i services.GameRand main = 10930
+  i weapons.SpawnProjectile weapondef#226 pos=(-101084608,88473600,312569632) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 63
+  w rng.main 0x2ab255c1
+call 64 UpdateWind
+call 64 UpdateMeteors
+  i services.GameRand main = 24601
+  i services.GameRand main = 25662
+  i weapons.SpawnProjectile weapondef#226 pos=(152589216,88473600,214732880) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 64
+  w rng.main 0xe43efa43
+call 65 UpdateWind
+call 65 UpdateMeteors
+  i services.GameRand main = 31916
+  i services.GameRand main = 20221
+  i weapons.SpawnProjectile weapondef#226 pos=(137835608,88473600,375692752) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 65
+  w rng.main 0x4efd92d5
+call 66 UpdateWind
+call 66 UpdateMeteors
+  i services.GameRand main = 9901
+  i services.GameRand main = 3940
+  i weapons.SpawnProjectile weapondef#226 pos=(-19905808,88473600,202648096) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 66
+  w rng.main 0x0f643ff7
+call 67 UpdateWind
+call 67 UpdateMeteors
+  i services.GameRand main = 13020
+  i services.GameRand main = 26830
+  i weapons.SpawnProjectile weapondef#226 pos=(84083200,88473600,212925376) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 67
+  w rng.main 0x68ce2629
+call 68 UpdateWind
+  r rng.seed 0x2751b11c
+call 68 UpdateMeteors
+  i services.GameRand main = 31322
+  i services.GameRand main = 11843
+  i weapons.SpawnProjectile weapondef#226 pos=(-116359552,88473600,356175424) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 68
+  w rng.main 0x2e438deb
+call 69 UpdateWind
+call 69 UpdateMeteors
+  i services.GameRand main = 4303
+  i services.GameRand main = 1667
+  i weapons.SpawnProjectile weapondef#226 pos=(10280272,88473600,220430488) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 69
+  w rng.main 0x068303bd
+call 70 UpdateWind
+call 70 UpdateMeteors
+  i services.GameRand main = 17618
+  i services.GameRand main = 1363
+  i weapons.SpawnProjectile weapondef#226 pos=(-7313728,88473600,147900792) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 70
+  w rng.main 0x0553781f
+call 71 UpdateWind
+call 71 UpdateMeteors
+  i services.GameRand main = 1137
+  i services.GameRand main = 27751
+  i weapons.SpawnProjectile weapondef#226 pos=(23067672,88473600,239673648) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 71
+  w rng.main 0xec675f91
+call 72 UpdateWind
+call 72 UpdateMeteors
+  i services.GameRand main = 20230
+  i services.GameRand main = 14424
+  i weapons.SpawnProjectile weapondef#226 pos=(-24226816,88473600,348414976) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 72
+  w rng.main 0x3858d293
+call 73 UpdateWind
+call 73 UpdateMeteors
+  i services.GameRand main = 26308
+  i services.GameRand main = 646
+  i weapons.SpawnProjectile weapondef#226 pos=(-204136,88473600,97124752) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 73
+  w rng.main 0x8286ada5
+call 74 UpdateWind
+call 74 UpdateMeteors
+  i services.GameRand main = 18337
+  i services.GameRand main = 18138
+  i weapons.SpawnProjectile weapondef#226 pos=(51212912,88473600,340311520) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 74
+  w rng.main 0x46dab147
+call 75 UpdateWind
+call 75 UpdateMeteors
+  i services.GameRand main = 22146
+  i services.GameRand main = 21696
+  i weapons.SpawnProjectile weapondef#226 pos=(123384256,88473600,308309024) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 75
+  w rng.main 0xd4c0a1f9
+call 76 UpdateWind
+call 76 UpdateMeteors
+  i services.GameRand main = 4821
+  i services.GameRand main = 11478
+  i weapons.SpawnProjectile weapondef#226 pos=(-4003240,88473600,259048744) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 76
+  w rng.main 0xacd6683b
+call 77 UpdateWind
+call 77 UpdateMeteors
+  i services.GameRand main = 9732
+  i services.GameRand main = 22813
+  i weapons.SpawnProjectile weapondef#226 pos=(69101816,88473600,261618112) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 77
+  w rng.main 0xd91d308d
+call 78 UpdateWind
+call 78 UpdateMeteors
+  i services.GameRand main = 18267
+  i services.GameRand main = 31667
+  i weapons.SpawnProjectile weapondef#226 pos=(39004352,88473600,143254912) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 78
+  w rng.main 0x7bb38b6f
+call 79 UpdateWind
+call 79 UpdateMeteors
+  i services.GameRand main = 24674
+  i services.GameRand main = 28768
+  i weapons.SpawnProjectile weapondef#226 pos=(114304736,88473600,144396000) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 79
+  w rng.main 0xf0608d61
+call 80 UpdateWind
+call 80 UpdateMeteors
+  i services.GameRand main = 31925
+  i services.GameRand main = 32631
+  i weapons.SpawnProjectile weapondef#226 pos=(22210808,88473600,64596592) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 80
+  w rng.main 0xff77eee3
+call 81 UpdateWind
+call 81 UpdateMeteors
+  i services.GameRand main = 10716
+  i services.GameRand main = 21727
+  i weapons.SpawnProjectile weapondef#226 pos=(68875472,88473600,274723672) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 81
+  w rng.main 0xd4df2c75
+call 82 UpdateWind
+call 82 UpdateMeteors
+  i services.GameRand main = 20151
+  i services.GameRand main = 17467
+  i weapons.SpawnProjectile weapondef#226 pos=(41190088,88473600,353606384) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 82
+  w rng.main 0x443ba697
+call 83 UpdateWind
+call 83 UpdateMeteors
+  i services.GameRand main = 32632
+  i services.GameRand main = 27537
+  i weapons.SpawnProjectile weapondef#226 pos=(172191776,88473600,145511200) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 83
+  w rng.main 0x6b91c1c9
+call 84 UpdateWind
+call 84 UpdateMeteors
+  i services.GameRand main = 14917
+  i services.GameRand main = 4061
+  i weapons.SpawnProjectile weapondef#226 pos=(-40482640,88473600,183513936) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 84
+  w rng.main 0x8fdd068b
+call 85 UpdateWind
+call 85 UpdateMeteors
+  i services.GameRand main = 6637
+  i services.GameRand main = 11113
+  i weapons.SpawnProjectile weapondef#226 pos=(-13808272,88473600,262760824) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 85
+  w rng.main 0x2b69415d
+call 86 UpdateWind
+call 86 UpdateMeteors
+  i services.GameRand main = 14174
+  i services.GameRand main = 9204
+  i weapons.SpawnProjectile weapondef#226 pos=(-60017288,88473600,258751056) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 86
+  w rng.main 0x23f4a2bf
+call 87 UpdateWind
+call 87 UpdateMeteors
+  i services.GameRand main = 30656
+  i services.GameRand main = 3810
+  i weapons.SpawnProjectile weapondef#226 pos=(-95880712,88473600,114687208) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 87
+  w rng.main 0x0ee2df31
+call 88 UpdateWind
+call 88 UpdateMeteors
+  i services.GameRand main = 13402
+  i services.GameRand main = 23561
+  i weapons.SpawnProjectile weapondef#226 pos=(91426392,88473600,257907312) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 88
+  w rng.main 0xdc094f33
+call 89 UpdateWind
+call 89 UpdateMeteors
+  i services.GameRand main = 21165
+  i services.GameRand main = 17372
+  i weapons.SpawnProjectile weapondef#226 pos=(39507328,88473600,359762688) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 89
+  w rng.main 0x43dc0f45
+call 90 UpdateWind
+  r rng.seed 0x39070a11
+call 90 UpdateMeteors
+  i services.GameRand main = 22127
+  i services.GameRand main = 31748
+  i weapons.SpawnProjectile weapondef#226 pos=(41987552,88473600,121780432) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 90
+  w rng.main 0x7c041fe7
+call 91 UpdateWind
+call 91 UpdateMeteors
+  i services.GameRand main = 1096
+  i services.GameRand main = 3494
+  i weapons.SpawnProjectile weapondef#226 pos=(14076032,88473600,238464880) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 91
+  w rng.main 0x0da68599
+call 92 UpdateWind
+call 92 UpdateMeteors
+  i services.GameRand main = 9082
+  i services.GameRand main = 17124
+  i weapons.SpawnProjectile weapondef#226 pos=(24667008,88473600,293659968) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 92
+  w rng.main 0xc2e468db
+call 93 UpdateWind
+call 93 UpdateMeteors
+  i services.GameRand main = 7652
+  i services.GameRand main = 3420
+  i weapons.SpawnProjectile weapondef#226 pos=(-8085248,88473600,209214376) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 93
+  w rng.main 0x8d5c362d
+call 94 UpdateWind
+call 94 UpdateMeteors
+  i services.GameRand main = 30972
+  i services.GameRand main = 5555
+  i weapons.SpawnProjectile weapondef#226 pos=(-134096944,88473600,159656032) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 94
+  w rng.main 0x95b3be0f
+call 95 UpdateWind
+call 95 UpdateMeteors
+  i services.GameRand main = 14260
+  i services.GameRand main = 25715
+  i weapons.SpawnProjectile weapondef#226 pos=(95709584,88473600,225779152) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 95
+  w rng.main 0x64735501
+call 96 UpdateWind
+call 96 UpdateMeteors
+  i services.GameRand main = 29795
+  i services.GameRand main = 22201
+  i weapons.SpawnProjectile weapondef#226 pos=(167716112,88473600,316423112) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 96
+  w rng.main 0xd6b9f383
+call 97 UpdateWind
+call 97 UpdateMeteors
+  i services.GameRand main = 15152
+  i services.GameRand main = 26002
+  i weapons.SpawnProjectile weapondef#226 pos=(99554832,88473600,220650512) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 97
+  w rng.main 0x65925615
+call 98 UpdateWind
+call 98 UpdateMeteors
+  i services.GameRand main = 12428
+  i services.GameRand main = 15601
+  i weapons.SpawnProjectile weapondef#226 pos=(7623216,88473600,312047896) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 98
+  w rng.main 0xbcf11d37
+call 99 UpdateWind
+call 99 UpdateMeteors
+  i services.GameRand main = 11450
+  i services.GameRand main = 18339
+  i weapons.SpawnProjectile weapondef#226 pos=(40890944,88473600,303068464) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 99
+  w rng.main 0xc7a3ed69
+call 100 UpdateWind
+call 100 UpdateMeteors
+  i services.GameRand main = 31877
+  i services.GameRand main = 16313
+  i weapons.SpawnProjectile weapondef#226 pos=(15625608,88473600,421702376) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 100
+  w rng.main 0xbfb98f2b
+call 101 UpdateWind
+call 101 UpdateMeteors
+  i services.GameRand main = 14466
+  i services.GameRand main = 3883
+  i weapons.SpawnProjectile weapondef#226 pos=(-36568096,88473600,183249472) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 101
+  w rng.main 0x8f2b0efd
+call 102 UpdateWind
+  r rng.seed 0x7d25ff56
+call 102 UpdateMeteors
+  i services.GameRand main = 28567
+  i services.GameRand main = 27341
+  i weapons.SpawnProjectile weapondef#226 pos=(156044976,88473600,162716632) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 102
+  w rng.main 0x6acddd5f
+call 103 UpdateWind
+call 103 UpdateMeteors
+  i services.GameRand main = 1703
+  i services.GameRand main = 8662
+  i weapons.SpawnProjectile weapondef#226 pos=(8357872,88473600,244085112) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 103
+  w rng.main 0x21d6eed1
+call 104 UpdateWind
+call 104 UpdateMeteors
+  i services.GameRand main = 32388
+  i services.GameRand main = 11894
+  i weapons.SpawnProjectile weapondef#226 pos=(-119483816,88473600,361719368) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 104
+  w rng.main 0xae76dbd3
+call 105 UpdateWind
+call 105 UpdateMeteors
+  i services.GameRand main = 6815
+  i services.GameRand main = 14423
+  i weapons.SpawnProjectile weapondef#226 pos=(3662240,88473600,278683168) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 105
+  w rng.main 0x385700e5
+call 106 UpdateWind
+call 106 UpdateMeteors
+  i services.GameRand main = 30221
+  i services.GameRand main = 32767
+  i weapons.SpawnProjectile weapondef#226 pos=(17825792,88473600,74055680) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 106
+  w rng.main 0x7fff9e87
+call 107 UpdateWind
+call 107 UpdateMeteors
+  i services.GameRand main = 16856
+  i services.GameRand main = 8814
+  i weapons.SpawnProjectile weapondef#226 pos=(-75970048,88473600,253672192) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 107
+  w rng.main 0xa26ef939
+call 108 UpdateWind
+call 108 UpdateMeteors
+  i services.GameRand main = 32439
+  i services.GameRand main = 24169
+  i weapons.SpawnProjectile weapondef#226 pos=(198761008,88473600,258853736) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 108
+  w rng.main 0xde69797b
+call 109 UpdateWind
+call 109 UpdateMeteors
+  i services.GameRand main = 21919
+  i services.GameRand main = 4426
+  i weapons.SpawnProjectile weapondef#226 pos=(-74081920,88473600,161994880) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 109
+  w rng.main 0x914acbcd
+call 110 UpdateWind
+call 110 UpdateMeteors
+  i services.GameRand main = 3535
+  i services.GameRand main = 3936
+  i weapons.SpawnProjectile weapondef#226 pos=(4356592,88473600,228768800) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 110
+  w rng.main 0x8f6000af
+call 111 UpdateWind
+call 111 UpdateMeteors
+  i services.GameRand main = 21570
+  i services.GameRand main = 23570
+  i weapons.SpawnProjectile weapondef#226 pos=(136293832,88473600,266830544) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 111
+  w rng.main 0x5c12aca1
+call 112 UpdateWind
+call 112 UpdateMeteors
+  i services.GameRand main = 26540
+  i services.GameRand main = 10349
+  i weapons.SpawnProjectile weapondef#226 pos=(-118720152,88473600,301812640) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 112
+  w rng.main 0x286d0823
+call 113 UpdateWind
+call 113 UpdateMeteors
+  i services.GameRand main = 5489
+  i services.GameRand main = 29375
+  i weapons.SpawnProjectile weapondef#226 pos=(36435712,88473600,218810344) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 113
+  w rng.main 0xf2bf0fb5
+call 114 UpdateWind
+call 114 UpdateMeteors
+  i services.GameRand main = 5940
+  i services.GameRand main = 14444
+  i weapons.SpawnProjectile weapondef#226 pos=(5487440,88473600,274119568) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 114
+  w rng.main 0x386ca3d7
+call 115 UpdateWind
+call 115 UpdateMeteors
+  i services.GameRand main = 7658
+  i services.GameRand main = 29484
+  i weapons.SpawnProjectile weapondef#226 pos=(43357952,88473600,208843072) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 115
+  w rng.main 0x732ca909
+call 116 UpdateWind
+call 116 UpdateMeteors
+  i services.GameRand main = 32418
+  i services.GameRand main = 9537
+  i weapons.SpawnProjectile weapondef#226 pos=(-157703568,88473600,289539712) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 116
+  w rng.main 0xa54127cb
+call 117 UpdateWind
+call 117 UpdateMeteors
+  i services.GameRand main = 22102
+  i services.GameRand main = 5232
+  i weapons.SpawnProjectile weapondef#226 pos=(-86708992,88473600,177068800) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 117
+  w rng.main 0x94706c9d
+call 118 UpdateWind
+call 118 UpdateMeteors
+  i services.GameRand main = 25990
+  i services.GameRand main = 4551
+  i weapons.SpawnProjectile weapondef#226 pos=(-93493888,88473600,149603392) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 118
+  w rng.main 0x91c727ff
+call 119 UpdateWind
+call 119 UpdateMeteors
+  i services.GameRand main = 10605
+  i services.GameRand main = 23659
+  i weapons.SpawnProjectile weapondef#226 pos=(76201184,88473600,254134384) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 119
+  w rng.main 0xdc6b8e71
+call 120 UpdateWind
+  r rng.seed 0x4ef91108
+call 120 UpdateMeteors
+  i services.GameRand main = 10252
+  i services.GameRand main = 24585
+  i weapons.SpawnProjectile weapondef#226 pos=(75235328,88473600,243269632) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 120
+  w rng.main 0x60097873
+call 121 UpdateWind
+call 121 UpdateMeteors
+  i services.GameRand main = 19809
+  i services.GameRand main = 21407
+  i weapons.SpawnProjectile weapondef#226 pos=(108489920,88473600,307118944) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 121
+  w rng.main 0xd39f8285
+call 122 UpdateWind
+call 122 UpdateMeteors
+  i services.GameRand main = 27522
+  i services.GameRand main = 9141
+  i weapons.SpawnProjectile weapondef#226 pos=(-133653840,88473600,271462824) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 122
+  w rng.main 0xa3b52d27
+call 123 UpdateWind
+call 123 UpdateMeteors
+  i services.GameRand main = 15482
+  i services.GameRand main = 11073
+  i weapons.SpawnProjectile weapondef#226 pos=(-55931232,88473600,288714704) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 123
+  w rng.main 0xab41fcd9
+call 124 UpdateWind
+call 124 UpdateMeteors
+  i services.GameRand main = 31765
+  i services.GameRand main = 6349
+  i weapons.SpawnProjectile weapondef#226 pos=(-148900656,88473600,181303584) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 124
+  w rng.main 0x18cd9a1b
+call 125 UpdateWind
+call 125 UpdateMeteors
+  i services.GameRand main = 8445
+  i services.GameRand main = 2448
+  i weapons.SpawnProjectile weapondef#226 pos=(-3417752,88473600,201065176) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 125
+  w rng.main 0x0990f16d
+call 126 UpdateWind
+call 126 UpdateMeteors
+  i services.GameRand main = 14299
+  i services.GameRand main = 29344
+  i weapons.SpawnProjectile weapondef#226 pos=(67056512,88473600,180187888) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 126
+  w rng.main 0xf2a0534f
+call 127 UpdateWind
+call 127 UpdateMeteors
+  i services.GameRand main = 14419
+  i services.GameRand main = 28774
+  i weapons.SpawnProjectile weapondef#226 pos=(74211968,88473600,185483904) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 127
+  w rng.main 0xf0669441
+call 128 UpdateWind
+call 128 UpdateMeteors
+  i services.GameRand main = 11031
+  i services.GameRand main = 5881
+  i weapons.SpawnProjectile weapondef#226 pos=(-37978288,88473600,216871024) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 128
+  w rng.main 0x16f92cc3
+call 129 UpdateWind
+call 129 UpdateMeteors
+  i services.GameRand main = 29031
+  i services.GameRand main = 29197
+  i weapons.SpawnProjectile weapondef#226 pos=(120934272,88473600,117622912) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 129
+  w rng.main 0xf20d5955
+call 130 UpdateWind
+call 130 UpdateMeteors
+  i services.GameRand main = 16824
+  i services.GameRand main = 6550
+  i weapons.SpawnProjectile weapondef#226 pos=(-71601592,88473600,213724912) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 130
+  w rng.main 0x19963a77
+call 131 UpdateWind
+call 131 UpdateMeteors
+  i services.GameRand main = 19024
+  i services.GameRand main = 10323
+  i weapons.SpawnProjectile weapondef#226 pos=(-80051208,88473600,285233632) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 131
+  w rng.main 0x2853f4a9
+call 132 UpdateWind
+call 132 UpdateMeteors
+  i services.GameRand main = 12834
+  i services.GameRand main = 3035
+  i weapons.SpawnProjectile weapondef#226 pos=(-21340864,88473600,183059776) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 132
+  w rng.main 0x0bdbd06b
+call 133 UpdateWind
+call 133 UpdateMeteors
+  i services.GameRand main = 12592
+  i services.GameRand main = 8673
+  i weapons.SpawnProjectile weapondef#226 pos=(-52367408,88473600,249315432) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 133
+  w rng.main 0xa1e15a3d
+call 134 UpdateWind
+call 134 UpdateMeteors
+  i services.GameRand main = 1329
+  i services.GameRand main = 29896
+  i weapons.SpawnProjectile weapondef#226 pos=(21710280,88473600,236965136) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 134
+  w rng.main 0x74c8829f
+call 135 UpdateWind
+call 135 UpdateMeteors
+  i services.GameRand main = 27740
+  i services.GameRand main = 14792
+  i weapons.SpawnProjectile weapondef#226 pos=(-29081248,88473600,391328272) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 135
+  w rng.main 0x39c8be11
+call 136 UpdateWind
+call 136 UpdateMeteors
+  i services.GameRand main = 24443
+  i services.GameRand main = 1321
+  i weapons.SpawnProjectile weapondef#226 pos=(-15415168,88473600,110539648) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 136
+  w rng.main 0x05292513
+call 137 UpdateWind
+call 137 UpdateMeteors
+  i services.GameRand main = 19901
+  i services.GameRand main = 3421
+  i weapons.SpawnProjectile weapondef#226 pos=(-49630208,88473600,154611232) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 137
+  w rng.main 0x0d5d9425
+call 138 UpdateWind
+call 138 UpdateMeteors
+  i services.GameRand main = 28630
+  i services.GameRand main = 23564
+  i weapons.SpawnProjectile weapondef#226 pos=(175054672,88473600,274539296) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 138
+  w rng.main 0xdc0ccbc7
+call 139 UpdateWind
+call 139 UpdateMeteors
+  i services.GameRand main = 13686
+  i services.GameRand main = 1095
+  i weapons.SpawnProjectile weapondef#226 pos=(1955448,88473600,168322704) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 139
+  w rng.main 0x04479079
+call 140 UpdateWind
+call 140 UpdateMeteors
+  i services.GameRand main = 10011
+  i services.GameRand main = 28536
+  i weapons.SpawnProjectile weapondef#226 pos=(58407512,88473600,204630472) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 140
+  w rng.main 0x6f78cabb
+call 141 UpdateWind
+call 141 UpdateMeteors
+  i services.GameRand main = 10182
+  i services.GameRand main = 7894
+  i weapons.SpawnProjectile weapondef#226 pos=(-39086128,88473600,239775712) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 141
+  w rng.main 0x1ed6a70d
+call 142 UpdateWind
+call 142 UpdateMeteors
+  i services.GameRand main = 7465
+  i services.GameRand main = 27996
+  i weapons.SpawnProjectile weapondef#226 pos=(51046616,88473600,217993472) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 142
+  w rng.main 0x6d5cb5ef
+call 143 UpdateWind
+call 143 UpdateMeteors
+  i services.GameRand main = 31280
+  i services.GameRand main = 32407
+  i weapons.SpawnProjectile weapondef#226 pos=(30715520,88473600,68627712) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 143
+  w rng.main 0x7e970be1
+call 144 UpdateWind
+call 144 UpdateMeteors
+  i services.GameRand main = 18220
+  i services.GameRand main = 10438
+  i weapons.SpawnProjectile weapondef#226 pos=(-74886912,88473600,285729760) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 144
+  w rng.main 0x28c66163
+call 145 UpdateWind
+call 145 UpdateMeteors
+  i services.GameRand main = 23514
+  i services.GameRand main = 23845
+  i weapons.SpawnProjectile weapondef#226 pos=(148057208,88473600,262588176) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 145
+  w rng.main 0x5d2532f5
+call 146 UpdateWind
+call 146 UpdateMeteors
+  i services.GameRand main = 25375
+  i services.GameRand main = 26453
+  i weapons.SpawnProjectile weapondef#226 pos=(151010368,88473600,193769856) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 146
+  w rng.main 0x6755e117
+call 147 UpdateWind
+call 147 UpdateMeteors
+  i services.GameRand main = 15668
+  i services.GameRand main = 25921
+  i weapons.SpawnProjectile weapondef#226 pos=(102612176,88473600,220919680) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 147
+  w rng.main 0x6541d049
+call 148 UpdateWind
+call 148 UpdateMeteors
+  i services.GameRand main = 15503
+  i services.GameRand main = 8945
+  i weapons.SpawnProjectile weapondef#226 pos=(-68001184,88473600,256001216) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 148
+  w rng.main 0xa2f1890b
+call 149 UpdateWind
+call 149 UpdateMeteors
+  i services.GameRand main = 23257
+  i services.GameRand main = 8741
+  i weapons.SpawnProjectile weapondef#226 pos=(-111774296,88473600,256034120) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 149
+  w rng.main 0x2225d7dd
+call 150 UpdateWind
+  r rng.seed 0x0d68276f
+call 150 UpdateMeteors
+  i services.GameRand main = 11938
+  i services.GameRand main = 5049
+  i weapons.SpawnProjectile weapondef#226 pos=(-37295008,88473600,205456192) vel=(104857,-983040,163111) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 150
+  w rng.main 0x13b9ed3f

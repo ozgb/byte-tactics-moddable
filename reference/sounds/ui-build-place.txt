@@ -1,0 +1,8 @@
+bt-sound 1
+0 stop_all - - - - -
+22 play ADDBUILD -585 - - -
+32 play OKTOBUILD -585 - - -
+35 play OKTOBUILD -585 - - -
+52 play ADDBUILD -585 - - -
+61 play OKTOBUILD -585 - - -
+138 play_file nanlath1.WAV -585 - - -

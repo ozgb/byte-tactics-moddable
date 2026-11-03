@@ -1,8 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-#include <new>
 #include "../state/game_rand.h"
 
 #pragma pack(push, 1)
@@ -14,6 +12,10 @@
 #include "../files/files_bank.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/wind_meteors.h"
+#include "../../interfaces/weapons.h"
+#include "../../interfaces/files.h"
+#include "../../interfaces/rand_stream.h"
 #include "../state/sim_globals.h"
 #include "../state/block.h"
 #include "../game/los_helpers.h"
@@ -89,14 +91,14 @@ void AddStream(ReplayText& t, int stream)
 
 void AddWeapon(ReplayText& t, const void* p)
 {
-    if (p == 0) {
+    if (p == nullptr) {
         t.Add("null");
         return;
     }
-    const unsigned char* base = g_game == 0 ? 0 : (const unsigned char*)g_game->weapons;
+    const unsigned char* base = g_game == nullptr ? nullptr : (const unsigned char*)g_game->weapons;
     const unsigned char* q = (const unsigned char*)p;
     unsigned span = sizeof(WeaponDef);
-    if (base != 0 && q >= base && q < base + 256 * span && (unsigned)(q - base) % span == 0) {
+    if (base != nullptr && q >= base && q < base + 256 * span && (unsigned)(q - base) % span == 0) {
         t.Add("weapondef#");
         t.AddUnsigned((unsigned)(q - base) / span);
     } else {
@@ -147,20 +149,20 @@ void AddVec3(ReplayText& t, const Vec3* v)
 bool FormatField(const ReplayField& f, ReplayText& out)
 {
     out.Clear();
-    const unsigned char* at = 0;
+    const unsigned char* at = nullptr;
     if (f.base == RB_GAME) {
-        if (g_game == 0)
+        if (g_game == nullptr)
             return false;
         at = (const unsigned char*)g_game + f.offset;
     } else if (f.base == RB_SIM) {
-        if (g_simGlobals == 0)
+        if (g_simGlobals == nullptr)
             return false;
         at = (const unsigned char*)g_simGlobals + f.offset;
     } else {
-        if (SimBlockBase() == 0)
+        if (SimBlockBase() == nullptr)
             return false;
         if (f.offset == 2) {
-            if (g_simGlobals == 0)
+            if (g_simGlobals == nullptr)
                 return false;
             out.AddHex32(g_simGlobals->g_randomSeed);
         } else {
@@ -198,7 +200,7 @@ bool FormatField(const ReplayField& f, ReplayText& out)
     }
     default: {
         unsigned stored = *(const unsigned*)at;
-        AddWeapon(out, stored == 0 ? 0 : (const unsigned char*)SimBlockBase() + stored);
+        AddWeapon(out, stored == 0 ? nullptr : (const unsigned char*)SimBlockBase() + stored);
         break;
     }
     }
@@ -230,7 +232,7 @@ void SlotEnter(int slot)
     if (s_depth++ != 0)
         return;
     s_slot = slot;
-    s_tick = g_game == 0 ? -1 : g_game->ticks;
+    s_tick = g_game == nullptr ? -1 : g_game->ticks;
     s_recording = !s_windowed || (s_tick >= 0 && (unsigned)s_tick >= s_first && (unsigned)s_tick <= s_last);
     if (!s_recording)
         return;
@@ -597,7 +599,7 @@ void ReplayImportEnd(ReplayImport& c)
         t.AddString((const char*)a[0].v.p);
         t.Add(" = ");
         AddWeapon(t, c.result.v.p);
-        if (c.result.v.p != 0) {
+        if (c.result.v.p != nullptr) {
             t.Add("\n  o ");
             AddWeapon(t, c.result.v.p);
             t.Add(".flags ");
@@ -671,7 +673,10 @@ int ReplayWrite()
     if (!s_on)
         return 1;
     FILE* file = fopen("replay-wind_meteors.txt", "wb");
+    if (file == nullptr)
+        return 0;
     char head[64];
     sprintf(head, "bt-replay %d\nsubsystem wind_meteors %d.%d\n", REPLAY_FORMAT, WIND_METEORS_VERSION_MAJOR, WIND_METEORS_VERSION_MINOR);
-    return file != 0 && fputs(head, file) >= 0 && fwrite(s_out.Data(), 1, s_out.Size(), file) == s_out.Size() && fclose(file) == 0;
+    bool written = fputs(head, file) >= 0 && fwrite(s_out.Data(), 1, s_out.Size(), file) == s_out.Size();
+    return fclose(file) == 0 && written;
 }

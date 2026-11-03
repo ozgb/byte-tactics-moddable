@@ -3,7 +3,7 @@
 
 class ReplayText {
 public:
-    constexpr ReplayText() : m_data(0), m_size(0), m_capacity(0) {}
+    constexpr ReplayText() : buffer(nullptr), used(0), capacity(0) {}
     void Free();
     void Clear();
     void Add(const char* text);
@@ -22,9 +22,9 @@ private:
     ReplayText(const ReplayText&);
     ReplayText& operator=(const ReplayText&);
     void Reserve(unsigned extra);
-    char* m_data;
-    unsigned m_size;
-    unsigned m_capacity;
+    char* buffer;
+    unsigned used;
+    unsigned capacity;
 };
 
 class ReplayKnown {
@@ -36,9 +36,9 @@ public:
 private:
     enum { CAPACITY = 64, NAME = 48, VALUE = 192 };
     int Find(const char* name) const;
-    int m_count;
-    char m_name[CAPACITY][NAME];
-    char m_value[CAPACITY][VALUE];
+    int count;
+    char names[CAPACITY][NAME];
+    char values[CAPACITY][VALUE];
 };
 
 class ReplayOrdinals {
@@ -48,8 +48,8 @@ public:
 
 private:
     enum { KINDS = 4, CAPACITY = 64 };
-    unsigned m_count[KINDS];
-    const void* m_object[KINDS][CAPACITY];
+    unsigned count[KINDS];
+    const void* objects[KINDS][CAPACITY];
 };
 
 #endif

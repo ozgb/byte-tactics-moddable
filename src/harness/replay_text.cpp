@@ -6,47 +6,47 @@
 
 void ReplayText::Free()
 {
-    free(m_data);
-    m_data = 0;
-    m_size = 0;
-    m_capacity = 0;
+    free(buffer);
+    buffer = nullptr;
+    used = 0;
+    capacity = 0;
 }
 
 void ReplayText::Clear()
 {
-    m_size = 0;
-    if (m_data != 0)
-        m_data[0] = '\0';
+    used = 0;
+    if (buffer != nullptr)
+        buffer[0] = '\0';
 }
 
 void ReplayText::Reserve(unsigned extra)
 {
-    if (m_size + extra + 1 <= m_capacity)
+    if (used + extra + 1 <= capacity)
         return;
-    unsigned capacity = m_capacity == 0 ? 4096 : m_capacity;
-    while (capacity < m_size + extra + 1)
-        capacity *= 2;
-    char* grown = (char*)realloc(m_data, capacity);
-    if (grown == 0)
+    unsigned wanted = capacity == 0 ? 4096 : capacity;
+    while (wanted < used + extra + 1)
+        wanted *= 2;
+    char* grown = (char*)realloc(buffer, wanted);
+    if (grown == nullptr)
         abort();
-    m_data = grown;
-    m_capacity = capacity;
+    buffer = grown;
+    capacity = wanted;
 }
 
 void ReplayText::Add(const char* text)
 {
     unsigned length = (unsigned)strlen(text);
     Reserve(length);
-    memcpy(m_data + m_size, text, length);
-    m_size += length;
-    m_data[m_size] = '\0';
+    memcpy(buffer + used, text, length);
+    used += length;
+    buffer[used] = '\0';
 }
 
 void ReplayText::AddChar(char c)
 {
     Reserve(1);
-    m_data[m_size++] = c;
-    m_data[m_size] = '\0';
+    buffer[used++] = c;
+    buffer[used] = '\0';
 }
 
 void ReplayText::AddInt(int value)
@@ -86,7 +86,7 @@ void ReplayText::AddF64(unsigned low, unsigned high)
 
 void ReplayText::AddString(const char* text)
 {
-    if (text == 0) {
+    if (text == nullptr) {
         Add("null");
         return;
     }
@@ -114,33 +114,33 @@ void ReplayText::AddString(const char* text)
 
 void ReplayText::AddText(const ReplayText& other)
 {
-    if (other.m_size == 0)
+    if (other.used == 0)
         return;
-    Reserve(other.m_size);
-    memcpy(m_data + m_size, other.m_data, other.m_size);
-    m_size += other.m_size;
-    m_data[m_size] = '\0';
+    Reserve(other.used);
+    memcpy(buffer + used, other.buffer, other.used);
+    used += other.used;
+    buffer[used] = '\0';
 }
 
 const char* ReplayText::Data() const
 {
-    return m_data == 0 ? "" : m_data;
+    return buffer == nullptr ? "" : buffer;
 }
 
 unsigned ReplayText::Size() const
 {
-    return m_size;
+    return used;
 }
 
 void ReplayKnown::Reset()
 {
-    m_count = 0;
+    count = 0;
 }
 
 int ReplayKnown::Find(const char* name) const
 {
-    for (int i = 0; i < m_count; i++) {
-        if (strcmp(m_name[i], name) == 0)
+    for (int i = 0; i < count; i++) {
+        if (strcmp(names[i], name) == 0)
             return i;
     }
     return -1;
@@ -149,7 +149,7 @@ int ReplayKnown::Find(const char* name) const
 bool ReplayKnown::Changed(const char* name, const char* value)
 {
     int at = Find(name);
-    if (at >= 0 && strcmp(m_value[at], value) == 0)
+    if (at >= 0 && strcmp(values[at], value) == 0)
         return false;
     Set(name, value);
     return true;
@@ -159,34 +159,34 @@ void ReplayKnown::Set(const char* name, const char* value)
 {
     int at = Find(name);
     if (at < 0) {
-        if (m_count == CAPACITY || strlen(name) >= NAME)
+        if (count == CAPACITY || strlen(name) >= NAME)
             abort();
-        at = m_count++;
-        strcpy(m_name[at], name);
+        at = count++;
+        strcpy(names[at], name);
     }
     if (strlen(value) >= VALUE)
         abort();
-    strcpy(m_value[at], value);
+    strcpy(values[at], value);
 }
 
 void ReplayOrdinals::Reset()
 {
     for (int k = 0; k < KINDS; k++)
-        m_count[k] = 0;
+        count[k] = 0;
 }
 
 unsigned ReplayOrdinals::Of(unsigned kind, const void* object)
 {
-    if (object == 0)
+    if (object == nullptr)
         return 0;
     if (kind >= KINDS)
         abort();
-    for (unsigned i = 0; i < m_count[kind]; i++) {
-        if (m_object[kind][i] == object)
+    for (unsigned i = 0; i < count[kind]; i++) {
+        if (objects[kind][i] == object)
             return i + 1;
     }
-    if (m_count[kind] == CAPACITY)
+    if (count[kind] == CAPACITY)
         abort();
-    m_object[kind][m_count[kind]++] = object;
-    return m_count[kind];
+    objects[kind][count[kind]++] = object;
+    return count[kind];
 }

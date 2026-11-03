@@ -175,9 +175,9 @@ def generate(rows: list[dict[str, str]]) -> tuple[str, str, list[str]]:
         "",
         "struct ReplayField {",
         "    const char* name;",
-        "    unsigned char base;",
         "    unsigned offset;",
         "    unsigned size;",
+        "    unsigned char base;",
         "    unsigned char kind;",
         "};",
         "",
@@ -196,7 +196,7 @@ def generate(rows: list[dict[str, str]]) -> tuple[str, str, list[str]]:
     for f in fields:
         base = {"game": "RB_GAME", "sim": "RB_SIM", "rng": "RB_RNG"}[f["base"]]
         offset = "offsetof(SimGlobals, %s)" % f["offset"] if f["base"] == "sim" else "%d" % f["offset"]
-        lines.append('    { "%s", %s, %s, %d, RK_%s },' % (f["name"], base, offset, f["size"], f["kind"].upper()))
+        lines.append('    { "%s", %s, %d, %s, RK_%s },' % (f["name"], offset, f["size"], base, f["kind"].upper()))
     lines += ["};", "static const unsigned kReplayFieldCount = %d;" % len(fields), ""]
     for name in SIM_FIELDS:
         lines.append('#pragma pop_macro("%s")' % name)

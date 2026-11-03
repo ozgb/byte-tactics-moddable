@@ -9,9 +9,9 @@ enum ReplayKind { RK_I32, RK_U32, RK_U16, RK_F32, RK_POINT16, RK_STRING, RK_WEAP
 
 struct ReplayField {
     const char* name;
-    unsigned char base;
     unsigned offset;
     unsigned size;
+    unsigned char base;
     unsigned char kind;
 };
 
@@ -51,36 +51,36 @@ struct ReplaySlotSets {
 #undef g_meteorScheduleGap
 
 static const ReplayField kReplayFields[] = {
-    { "Game.ticks", RB_GAME, 232007, 4, RK_I32 },
-    { "Game.width", RB_GAME, 82483, 4, RK_I32 },
-    { "Game.height", RB_GAME, 82487, 4, RK_I32 },
-    { "Game.windCounter", RB_GAME, 229060, 4, RK_U32 },
-    { "Game.windSpeedDenominator", RB_GAME, 229064, 4, RK_I32 },
-    { "Game.windX", RB_GAME, 229068, 4, RK_I32 },
-    { "Game.windY", RB_GAME, 229072, 4, RK_I32 },
-    { "Game.windZ", RB_GAME, 229076, 4, RK_I32 },
-    { "Game.windDirection", RB_GAME, 229080, 2, RK_U16 },
-    { "Game.windSpeed", RB_GAME, 229082, 4, RK_I32 },
-    { "Game.windStrength", RB_GAME, 229086, 4, RK_F32 },
-    { "Game.windEnabled", RB_GAME, 229090, 4, RK_I32 },
-    { "Game.windSpeedMin", RB_GAME, 82523, 4, RK_I32 },
-    { "Game.windSpeedMax", RB_GAME, 82527, 4, RK_I32 },
-    { "SimGlobals.g_meteorNextStrikeTime", RB_SIM, offsetof(SimGlobals, g_meteorNextStrikeTime), 4, RK_I32 },
-    { "SimGlobals.g_meteorWeaponName", RB_SIM, offsetof(SimGlobals, g_meteorWeaponName), 32, RK_STRING },
-    { "SimGlobals.g_meteorSpawnMagnitude", RB_SIM, offsetof(SimGlobals, g_meteorSpawnMagnitude), 4, RK_I32 },
-    { "SimGlobals.g_meteorSpawnInterval", RB_SIM, offsetof(SimGlobals, g_meteorSpawnInterval), 4, RK_I32 },
-    { "SimGlobals.g_meteorActive", RB_SIM, offsetof(SimGlobals, g_meteorActive), 4, RK_I32 },
-    { "SimGlobals.g_meteorStrikeEndTime", RB_SIM, offsetof(SimGlobals, g_meteorStrikeEndTime), 4, RK_I32 },
-    { "SimGlobals.g_meteorOrigin", RB_SIM, offsetof(SimGlobals, g_meteorOrigin), 4, RK_POINT16 },
-    { "SimGlobals.g_meteorShowerDuration", RB_SIM, offsetof(SimGlobals, g_meteorShowerDuration), 4, RK_I32 },
-    { "SimGlobals.g_meteorWeapon", RB_SIM, offsetof(SimGlobals, g_meteorWeapon), 4, RK_WEAPON },
-    { "SimGlobals.g_meteorsEnabled", RB_SIM, offsetof(SimGlobals, g_meteorsEnabled), 4, RK_I32 },
-    { "SimGlobals.g_meteorNextHitTime", RB_SIM, offsetof(SimGlobals, g_meteorNextHitTime), 4, RK_I32 },
-    { "SimGlobals.g_meteorTarget", RB_SIM, offsetof(SimGlobals, g_meteorTarget), 4, RK_POINT16 },
-    { "SimGlobals.g_meteorScheduleGap", RB_SIM, offsetof(SimGlobals, g_meteorScheduleGap), 4, RK_I32 },
-    { "rng.main", RB_RNG, 0, 4, RK_U32 },
-    { "rng.load", RB_RNG, 1, 4, RK_U32 },
-    { "rng.seed", RB_RNG, 2, 4, RK_U32 },
+    { "Game.ticks", 232007, 4, RB_GAME, RK_I32 },
+    { "Game.width", 82483, 4, RB_GAME, RK_I32 },
+    { "Game.height", 82487, 4, RB_GAME, RK_I32 },
+    { "Game.windCounter", 229060, 4, RB_GAME, RK_U32 },
+    { "Game.windSpeedDenominator", 229064, 4, RB_GAME, RK_I32 },
+    { "Game.windX", 229068, 4, RB_GAME, RK_I32 },
+    { "Game.windY", 229072, 4, RB_GAME, RK_I32 },
+    { "Game.windZ", 229076, 4, RB_GAME, RK_I32 },
+    { "Game.windDirection", 229080, 2, RB_GAME, RK_U16 },
+    { "Game.windSpeed", 229082, 4, RB_GAME, RK_I32 },
+    { "Game.windStrength", 229086, 4, RB_GAME, RK_F32 },
+    { "Game.windEnabled", 229090, 4, RB_GAME, RK_I32 },
+    { "Game.windSpeedMin", 82523, 4, RB_GAME, RK_I32 },
+    { "Game.windSpeedMax", 82527, 4, RB_GAME, RK_I32 },
+    { "SimGlobals.g_meteorNextStrikeTime", offsetof(SimGlobals, g_meteorNextStrikeTime), 4, RB_SIM, RK_I32 },
+    { "SimGlobals.g_meteorWeaponName", offsetof(SimGlobals, g_meteorWeaponName), 32, RB_SIM, RK_STRING },
+    { "SimGlobals.g_meteorSpawnMagnitude", offsetof(SimGlobals, g_meteorSpawnMagnitude), 4, RB_SIM, RK_I32 },
+    { "SimGlobals.g_meteorSpawnInterval", offsetof(SimGlobals, g_meteorSpawnInterval), 4, RB_SIM, RK_I32 },
+    { "SimGlobals.g_meteorActive", offsetof(SimGlobals, g_meteorActive), 4, RB_SIM, RK_I32 },
+    { "SimGlobals.g_meteorStrikeEndTime", offsetof(SimGlobals, g_meteorStrikeEndTime), 4, RB_SIM, RK_I32 },
+    { "SimGlobals.g_meteorOrigin", offsetof(SimGlobals, g_meteorOrigin), 4, RB_SIM, RK_POINT16 },
+    { "SimGlobals.g_meteorShowerDuration", offsetof(SimGlobals, g_meteorShowerDuration), 4, RB_SIM, RK_I32 },
+    { "SimGlobals.g_meteorWeapon", offsetof(SimGlobals, g_meteorWeapon), 4, RB_SIM, RK_WEAPON },
+    { "SimGlobals.g_meteorsEnabled", offsetof(SimGlobals, g_meteorsEnabled), 4, RB_SIM, RK_I32 },
+    { "SimGlobals.g_meteorNextHitTime", offsetof(SimGlobals, g_meteorNextHitTime), 4, RB_SIM, RK_I32 },
+    { "SimGlobals.g_meteorTarget", offsetof(SimGlobals, g_meteorTarget), 4, RB_SIM, RK_POINT16 },
+    { "SimGlobals.g_meteorScheduleGap", offsetof(SimGlobals, g_meteorScheduleGap), 4, RB_SIM, RK_I32 },
+    { "rng.main", 0, 4, RB_RNG, RK_U32 },
+    { "rng.load", 1, 4, RB_RNG, RK_U32 },
+    { "rng.seed", 2, 4, RB_RNG, RK_U32 },
 };
 static const unsigned kReplayFieldCount = 30;
 

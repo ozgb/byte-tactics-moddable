@@ -1,15 +1,18 @@
 bt-ui 1
 1 scroll 304 32
+1 view 1
 1 select -
 10 input mouse move 384 240
 11 input mouse left down 384 240
 12 input mouse left up 384 240
 13 select 1
+14 view 2
 20 input char 97
 21 input mouse move 470 310
 22 input mouse left down 470 310
 22 order Suppress unit 1 target - pos 646 1 310 type - param 0 amount 0 remove 0
 23 input mouse left up 470 310
+24 view 3
 30 input char 112
 31 input mouse move 480 330
 32 input mouse left down 480 330
@@ -25,6 +28,7 @@ bt-ui 1
 46 input mouse move 520 260
 50 input char 115
 50 order Stop unit 1 target - pos - type - param 0 amount 0 remove 0
+52 view 4
 60 input char 100
 61 input mouse move 520 280
 62 input mouse left down 520 280
@@ -32,13 +36,181 @@ bt-ui 1
 63 input mouse left up 520 280
 70 input key down 27
 71 input key up 27
+74 view 5
 80 input key down 17
 81 input key down 68
 82 input key up 68
 82 order SelfDestruct unit 1 target - pos - type - param 0 amount 0 remove 0
 83 input key up 17
+84 view 6
 90 input key down 17
 91 input key down 68
 92 input key up 68
 92 cancel SelfDestruct unit 1
 93 input key up 17
+93 view 7
+99 view 8
+102 view 9
+103 view 10
+105 view 12
+108 view 14
+110 view 15
+111 view 17
+113 view 18
+114 view 21
+116 view 22
+117 view 26
+120 view 29
+121 view 31
+123 view 35
+124 view 37
+126 view 42
+127 view 44
+129 view 48
+131 view 50
+132 view 54
+133 view 55
+134 view 58
+135 view 60
+136 view 63
+137 view 64
+138 view 67
+139 view 71
+140 view 72
+141 view 75
+142 view 76
+143 view 78
+144 view 82
+146 view 84
+147 view 88
+148 view 89
+150 view 91
+152 view 94
+153 view 98
+155 view 99
+156 view 104
+157 view 105
+158 view 106
+159 view 110
+161 view 112
+162 view 117
+163 view 118
+164 view 119
+165 view 122
+166 view 124
+167 view 125
+168 view 131
+170 view 133
+171 view 137
+172 view 138
+173 view 141
+174 view 143
+175 view 146
+176 view 149
+177 view 152
+178 view 153
+179 view 156
+180 view 159
+181 view 160
+182 view 163
+183 view 165
+184 view 167
+185 view 170
+186 view 174
+188 view 175
+189 view 180
+191 view 183
+192 view 187
+194 view 188
+195 view 192
+196 view 195
+197 view 197
+198 view 199
+199 view 203
+201 view 206
+202 view 207
+203 view 209
+204 view 213
+206 view 215
+207 view 219
+208 view 220
+209 view 222
+210 view 227
+211 view 228
+212 view 229
+213 view 235
+214 view 236
+216 view 240
+217 view 241
+218 view 242
+219 view 246
+220 view 247
+221 view 248
+222 view 251
+223 view 252
+224 view 255
+225 view 257
+226 view 258
+227 view 261
+228 view 264
+231 view 268
+232 view 271
+234 view 274
+236 view 276
+237 view 280
+239 view 282
+240 view 285
+241 view 286
+242 view 288
+243 view 291
+244 view 293
+246 view 295
+247 view 300
+248 view 301
+249 view 303
+250 view 307
+251 view 309
+252 view 312
+254 view 314
+255 view 319
+256 view 320
+257 view 323
+258 view 328
+259 view 329
+260 view 331
+261 view 336
+262 view 339
+263 view 341
+264 view 345
+265 view 349
+266 view 351
+267 view 354
+268 view 358
+269 view 359
+270 view 362
+271 view 366
+272 view 369
+273 view 371
+274 view 372
+275 view 377
+276 view 379
+277 view 380
+278 view 384
+279 view 386
+280 view 387
+281 view 388
+282 view 391
+283 view 394
+284 view 395
+285 view 400
+287 view 402
+288 view 408
+290 view 410
+291 view 413
+292 view 414
+293 view 417
+294 view 420
+295 view 421
+296 view 423
+298 view 425
+299 view 428

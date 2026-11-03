@@ -1,20 +1,137 @@
 bt-ui 1
 1 scroll 304 32
+1 view 1
 1 select -
 10 input mouse move 384 240
 11 input mouse left down 384 240
 12 input mouse left up 384 240
 13 select 1
+14 view 2
 20 input mouse move 464 300
 21 input mouse right down 464 300
 21 order Move_Ground unit 1 target - pos 640 1 300 type - param 0 amount 0 remove 0
 22 input mouse right up 464 300
+23 view 3
 60 input mouse move 524 300
 61 input mouse right down 524 300
 61 order Attack_Chase unit 1 target 252 pos 700 1 300 type - param 0 amount 0 remove 0
 62 input mouse right up 524 300
+63 view 4
+79 view 5
+85 view 6
+86 view 7
+89 view 8
+93 view 11
+98 view 13
 100 input mouse move 64 64
+100 view 14
 101 input mouse left down 64 64
 102 input mouse move 100 90
 103 input mouse left up 100 90
 103 scroll 2563 1088
+103 view 16
+104 view 17
+105 view 18
+106 view 19
+109 view 21
+110 view 22
+111 view 23
+113 view 24
+114 view 25
+115 view 26
+118 view 30
+119 view 31
+121 view 32
+123 view 34
+124 view 36
+125 view 37
+126 view 38
+127 view 40
+129 view 42
+130 view 43
+131 view 44
+133 view 45
+135 view 47
+136 view 49
+138 view 50
+140 view 51
+143 view 55
+146 view 57
+148 view 58
+150 view 59
+151 view 62
+154 view 63
+155 view 64
+156 view 66
+158 view 67
+159 view 68
+160 view 70
+161 view 71
+163 view 72
+164 view 73
+165 view 75
+166 view 76
+167 view 77
+168 view 79
+169 view 80
+171 view 81
+172 view 82
+173 view 83
+174 view 84
+175 view 85
+176 view 87
+178 view 88
+179 view 89
+181 view 91
+184 view 92
+185 view 93
+186 view 95
+188 view 96
+190 view 98
+191 view 99
+193 view 101
+194 view 102
+195 view 103
+196 view 104
+199 view 106
+200 view 107
+201 view 108
+204 view 111
+205 view 112
+209 view 113
+210 view 115
+211 view 116
+213 view 117
+214 view 118
+215 view 119
+216 view 120
+218 view 123
+219 view 124
+220 view 125
+222 view 127
+225 view 129
+227 view 131
+228 view 132
+229 view 133
+230 view 135
+231 view 136
+233 view 138
+234 view 139
+235 view 140
+236 view 141
+237 view 142
+238 view 145
+240 view 146
+241 view 147
+243 view 150
+244 view 151
+245 view 152
+247 view 153
+249 view 154
+250 view 156
+253 view 158
+254 view 159
+255 view 160
+257 view 161
+258 view 163
+260 view 165

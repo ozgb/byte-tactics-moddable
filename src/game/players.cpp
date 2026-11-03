@@ -470,26 +470,6 @@ void __stdcall PlaySoundByName(char* str, int flag);
 #include "../gui/layer.h"
 #include "../gui/gui.h"
 
-// FUNCTION: 0x464de0
-void __stdcall ContinueWatchingCallback(Gui* gui)
-{
-    Gadget* screen = gui->layer->entries;
-    if (gui->hotGadgetIndex == -1)
-        return;
-    PlaySoundByName("BigButton", 0);
-    if (IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE1")) {
-        g_seams.network->BroadcastPlayerInfo();
-        g_game->endGameVictory = 0;
-        ReportGameEvent(4);
-        return;
-    }
-    if (!IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE2")) {
-        ClearSelectedGadget(gui);
-        return;
-    }
-    g_game->bits.flag2 = 1;
-    g_game->endGameVictory = 0;
-}
 
 
 
@@ -744,26 +724,12 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                     g_seams.los_radar->RecalculateLineOfSight(1);
                     g_seams.network->BroadcastPlayerInfo();
                     if (CountActiveAIPlayers() == 0) {
-                        Layer* dlg = LoadGuiLayer(&g_game->gui, "YESORNO.GUI", 0x900);
-                        if (dlg != 0) {
-                            SetKeyboardInput(&g_game->gui, 1);
-                            Gadget* w = dlg->entries;
-                            SetTranslatedTextByName(&g_game->gui, "CHOICE1", "Yes", 0);
-                            SetTranslatedTextByName(&g_game->gui, "CHOICE2", "No", 0);
-                            SetTranslatedTextByName(&g_game->gui, "TITLE",
-                                         "You're out!  Continue Watching?", 0);
-                            strcpy(w->u.names.choice, "CHOICE1");
-                            strcpy(w->u.names.choice2, "CHOICE2");
-                            dlg->handler = ContinueWatchingCallback;
-                            RenderLayer(&g_game->gui, 0x40);
-                        }
+                        RecordWatchPrompt(bl);
                         goto skip508;
                     }
                     if (CountCombatPlayers() <= 0)
                         goto skip508;
-                    OpenMessageBox(&g_game->gui,
-                                 Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
-                                 500, 1, 1);
+                    RecordWatchModeNotice(bl);
                     g_game->endGameVictory = 0;
                     goto skip508;
                 }

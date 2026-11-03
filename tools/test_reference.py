@@ -991,6 +991,12 @@ class GateCacheTest(unittest.TestCase):
         for relative in reference.KEY_TOOLS:
             (self.root / relative).write_text(relative)
         (self.root / "reference/commit.txt").write_text("c1")
+        (self.root / "data").mkdir()
+        (self.root / "data/block_pointers.csv").write_text("site,class\n")
+        (self.root / "tools/reference.py").write_text("import helper\nfrom helper import x\n")
+        (self.root / "tools/helper.py").write_text("def f():\n    import deeper\n")
+        (self.root / "tools/deeper.py").write_text("x = 1\n")
+        (self.root / "tools/unrelated.py").write_text("y = 1\n")
         self.exe = self.build / "TotalA.exe"
         for name in ("TotalA.exe", "wasmtime_host.dll", "modules.json", "m.wasm"):
             (self.build / name).write_text(name)
@@ -1009,12 +1015,37 @@ class GateCacheTest(unittest.TestCase):
         edits = [self.build / n for n in ("TotalA.exe", "wasmtime_host.dll", "modules.json", "m.wasm")]
         edits += [self.root / r / "a.txt" for r in reference.KEY_TREES]
         edits += [self.root / r for r in reference.KEY_TOOLS]
+        edits += [self.root / r for r in reference.KEY_DATA]
+        edits += [self.root / "tools/helper.py", self.root / "tools/deeper.py"]
         for path in edits:
             old = path.read_text()
             path.write_text(old + "x")
             self.assertNotEqual(self.key(), base, str(path))
             path.write_text(old)
         self.assertEqual(self.key(), base)
+
+    def test_savefile_block_pointers_and_imports_change_the_key(self):
+        base = self.key()
+        for relative in ("tools/savefile.py", "data/block_pointers.csv", "tools/deeper.py"):
+            self.assertIn(relative, (*reference.KEY_TOOLS, *reference.KEY_DATA, "tools/deeper.py"))
+            path = self.root / relative
+            old = path.read_text()
+            path.write_text(old + "\n# changed\n")
+            self.assertNotEqual(self.key(), base, relative)
+            path.write_text(old)
+        self.assertEqual(self.key(), base)
+
+    def test_a_module_nothing_imports_is_not_in_the_key(self):
+        base = self.key()
+        (self.root / "tools/unrelated.py").write_text("y = 2\n")
+        self.assertEqual(self.key(), base)
+
+    def test_the_map_beside_the_exe_and_its_absence_change_the_key(self):
+        absent = self.key()
+        (self.build / "TotalA.map").write_text("m1")
+        present = self.key()
+        (self.build / "TotalA.map").write_text("m2")
+        self.assertEqual(len({absent, present, self.key()}), 3)
 
     def test_a_new_file_in_a_stored_tree_changes_the_key(self):
         base = self.key()

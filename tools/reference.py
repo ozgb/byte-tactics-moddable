@@ -49,6 +49,7 @@ install.
 """
 
 import argparse
+import ast
 import contextlib
 import fcntl
 import hashlib
@@ -132,8 +133,11 @@ SAVE_BYTES: dict[str, bytes | None] = {}
 MODES = ("wasm", "native")
 LOCK_FILE = "bt-gate.lock"
 CACHE_ENV = "BT_GATE_CACHE"
-KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/frames", "reference/saves")
-KEY_TOOLS = ("tools/reference.py", "tools/playtest.py", "tools/tracediff.py", "tools/tracedigest.py")
+KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/frames", "reference/saves",
+            "tools/playtest")
+KEY_TOOLS = ("tools/reference.py", "tools/playtest.py", "tools/tracediff.py", "tools/tracedigest.py", "tools/savefile.py",
+             "tools/blockpointers.py")
+KEY_DATA = ("data/block_pointers.csv",)
 KEY_RUNTIME_FILES = ("wasmtime_host.dll", "modules.json")
 RETRY_DIALOG = "dialog-directx"
 WATCH_SECONDS = 0.5
@@ -375,9 +379,31 @@ def hash_tree(digest, root: Path, relative: str) -> None:
             digest.update(b"\0")
 
 
+def local_imports(root: Path, relative: str) -> set[str]:
+    """The tools/ modules (paths relative to root) that the sources in relative import, directly or through each other."""
+    found: set[str] = set()
+    pending = [relative]
+    while pending:
+        path = root / pending.pop()
+        try:
+            tree = ast.parse(path.read_bytes())
+        except (OSError, SyntaxError, ValueError):
+            continue
+        for node in ast.walk(tree):
+            names = [a.name for a in node.names] if isinstance(node, ast.Import) else \
+                [node.module or ""] if isinstance(node, ast.ImportFrom) and not node.level else []
+            for name in names:
+                module = f"tools/{name.partition('.')[0]}.py"
+                if (root / module).is_file() and module not in found:
+                    found.add(module)
+                    pending.append(module)
+    return found
+
+
 def gate_key(exe: Path, options: dict[str, object], root: Path = ROOT) -> str:
     """The SHA-256 of what decides a --check's result: the exe, the runtime files and modules beside it, the stored
-    scenarios, traces, logs and frames, the tools that play and compare, and the options (commit.txt is left out)."""
+    scenarios, traces, logs and frames, the tools that play and compare and every tools/ module they import, the block pointer
+    table, the exe's .map, and the options (commit.txt is left out)."""
     digest = hashlib.sha256()
     beside = sorted([exe.parent / n for n in KEY_RUNTIME_FILES] + list(exe.parent.glob("*.wasm")))
     for path in [exe] + beside:
@@ -386,9 +412,14 @@ def gate_key(exe: Path, options: dict[str, object], root: Path = ROOT) -> str:
         digest.update(b"\0")
     for relative in KEY_TREES:
         hash_tree(digest, root, relative)
-    for relative in KEY_TOOLS:
+    imported = set().union(*(local_imports(root, relative) for relative in KEY_TOOLS))
+    for relative in sorted({*KEY_TOOLS, *imported}):
         digest.update(f"{relative}\0".encode())
         digest.update((root / relative).read_bytes())
+        digest.update(b"\0")
+    for path in [root / relative for relative in KEY_DATA] + [exe.with_suffix(".map")]:
+        digest.update(f"{path.name}\0".encode())
+        digest.update(path.read_bytes() if path.is_file() else b"-")
         digest.update(b"\0")
     for name in sorted(options):
         digest.update(f"{name}={options[name]!r}\0".encode())

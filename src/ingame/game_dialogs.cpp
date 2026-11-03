@@ -1144,7 +1144,7 @@ void __stdcall ContinueWatchingCallback(Gui* gui)
     PlaySoundByName("BigButton", 0);
     if (IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE1")) {
         g_seams.network->BroadcastPlayerInfo();
-        g_game->bits.flag4 = 0;
+        g_game->endGameVictory = 0;
         ReportGameEvent(4);
         return;
     }
@@ -1153,7 +1153,7 @@ void __stdcall ContinueWatchingCallback(Gui* gui)
         return;
     }
     g_game->bits.flag2 = 1;
-    g_game->bits.flag4 = 0;
+    g_game->endGameVictory = 0;
 }
 
 void ShowContinueWatchingDialog()

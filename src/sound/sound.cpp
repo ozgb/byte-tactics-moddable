@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../units/squad.h"
+#include "../../interfaces/ref.h"
 
 #include "sound.h"
 #include "../util/tdf.h"
@@ -54,7 +55,7 @@ struct SoundCategoryEntryView {
 struct SpeechEntry {
     int kind;
     int frame;
-    Unit* unit;
+    Ref<Unit> unit;
     char* data;
     unsigned char priority;
 };
@@ -112,6 +113,7 @@ extern SpeechTypeInfo g_speechTypes[24];
 void* __cdecl operator new(size_t size);
 void __cdecl operator delete(void* p);
 #include "../debug/debug_lib.h"
+#include "../state/block.h"
 #include "../game/data_files.h"
 #include "../files/files_api.h"
 void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, char last);
@@ -155,6 +157,7 @@ void InitSound(void)
     }
     ((Sound *)g_game->sound)->OpenCdAudio();
     g_speechQueue = new SpeechQueue(0x1e, 0x96);
+    SimBlockTrack(reinterpret_cast<void**>(&g_speechQueue));
 }
 
 // FUNCTION: 0x47ee30

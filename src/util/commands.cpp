@@ -1,5 +1,6 @@
 #include <vector>
 #include "commands.h"
+#include "../harness/replay.h"
 
 class CommandEntry;
 
@@ -93,11 +94,14 @@ char* CommandArgs::GetArg(int index, char* default_val)
 // FUNCTION: 0x4b73e0
 int CommandArgs::GetIntArg(int index, int default_val)
 {
+    ReplayImport call(RI_GET_INT_ARG);
+    call.Int(index);
+    call.Int(default_val);
     if (index < 0 || index >= count) {
-        return default_val;
+        return call.Result(default_val);
     }
     const char* str = args[index];
-    return atoi(str);
+    return call.Result(atoi(str));
 }
 
 // FUNCTION: 0x4b7410

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../../interfaces/host.h"
+#include "../harness/replay.h"
 #include "win_types.h"
 
 #include "rect.h"
@@ -505,6 +506,8 @@ void __stdcall QuitApp(char* message)
 // FUNCTION: 0x4b6290
 void __stdcall FatalError(char* message)
 {
+    ReplayImport call(RI_FATAL_ERROR);
+    call.Ptr(message);
     if (WindMeteorsDeferFatal(message))
         return;
     host_fatal(g_display->hwnd, g_display->title, message);

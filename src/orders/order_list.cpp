@@ -1592,7 +1592,7 @@ UnitMotion::UnitMotion(Unit* unit)
     p2 = OrderVec3(0, 0, 0);
     mode = 1;
     flag = 0;
-    movementClass = (int)((UnitDefMoveView*)unit->def.get())->movementclass.get();
+    movementClass = ((UnitDefMoveView*)unit->def.get())->movementclass.get();
     if (((PlayerTypeView*)unit->player.get())->active != 0 && ((PlayerTypeView*)unit->player.get())->type == 3) {
         if (((UnitDefMoveView*)unit->def.get())->flag_800)
             obj = (PathGoalVtableView*)new (kSim) PackedPosGoal(unit);

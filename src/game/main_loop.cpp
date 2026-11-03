@@ -169,7 +169,7 @@ void InitFrame()
     g_game->bits_2a44.bit3 = 0;
     g_game->bits_2a44.bit0 = 0;
     g_seams.map->SetMissionType(0);
-    g_game->bits_3923b.flag4_3923b = 0;
+    g_game->endGameVictory = 0;
     g_game->bits_3923b.flag2_3923b = 0;
     ClearKeyQueue();
     g_game->mode_391f1 = 2;
@@ -185,7 +185,7 @@ void ReturnToMainMenuFrame()
     g_game->bits_2a44.bit3 = 0;
     g_game->bits_2a44.bit0 = 0;
     g_seams.map->SetMissionType(0);
-    g_game->bits_3923b.flag4_3923b = 0;
+    g_game->endGameVictory = 0;
     g_game->bits_3923b.flag2_3923b = 0;
     ClearKeyQueue();
     EnableKeyCommands(&g_game->gui);

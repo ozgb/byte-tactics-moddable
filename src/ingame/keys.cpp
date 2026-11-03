@@ -77,6 +77,7 @@ void __stdcall CollectSelectedUnits(void* param);
 #include "../network/net_game.h"
 void __stdcall BroadcastPacket(int id, void* packet, int size);
 #include "../frontend/options.h"
+#include "../harness/harness.h"
 #include "../graphics/pcx.h"
 int __stdcall FindOrderByType(int unit, MissionType kind);
 void __stdcall DeleteOrder(int unit, int arg);
@@ -519,6 +520,7 @@ void HandleGameKey(void)
             int r = FindOrderByType(*it, order);
             if (r != 0) {
                 found = 1;
+                HarnessUiCancel(order.index, (Unit*)*it);
                 DeleteOrder(*it, r);
             }
         }

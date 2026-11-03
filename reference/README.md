@@ -176,7 +176,10 @@ A run ends at its last tick, or earlier at game over. When 3.1c sets
 `endGameFlags` to 4 or 0x10 (a victory or defeat after its countdown, a
 commander's death, the last enemy gone) the harness ends the run at the end of
 that tick's step, as at the last tick: it closes `trace.txt`, writes the block
-scan, logs `testmode: game over at tick <n>` and exits 0. `ticks` stays the
+scan, logs `testmode: game over at tick <n>` and exits 0. The modern build keeps the
+0x10 bit in its own byte, `Game::endGameVictory`, and the trace hashes and dumps
+`endGameFlags` with that byte merged back at 0x10, so the rows are the same.
+`ticks` stays the
 upper bound. The trace holds no marker: it is shorter than `ticks`, and a build
 that ends the game on another tick differs from the reference in length, which
 the comparison reports as a divergence at the first missing row.
@@ -284,6 +287,57 @@ last tick, an unknown unit type, a build site the game rejects, or a selector
 that names no live unit at its tick exits with status 2 and a message that
 names the line.
 
+## Scripted input
+
+A scenario can send the game raw input, below the UI, so the game's own code turns it into selections and orders.
+One `input` line per event; lines may repeat and accumulate.
+
+```
+input <tick> <event>
+input 18 mouse move 384 240
+input 20 mouse left down 384 240
+input 21 mouse left up 384 240
+input 30 key down ctrl
+input 31 key down 1
+input 32 key up 1
+input 33 key up ctrl
+input 40 char a
+```
+
+- `<tick>` is a game tick from 1 to `ticks`. The event is queued at the start of that tick, after the tick's `order`,
+  `spawn` and `console` lines, and the UI handles it in the next frame, before the phases of tick + 1.
+- Events: `key down <key>` and `key up <key>`; `char <c>`; `mouse move <x> <y>`; `mouse left down <x> <y>`,
+  `mouse left up <x> <y>`, `mouse right down <x> <y>` and `mouse right up <x> <y>`. A mouse position is a window
+  coordinate, `x` from 0 to 639 and `y` from 0 to 479.
+- A `<key>` is a virtual-key code (decimal or `0x` hex, 1 to 255), `shift`, `ctrl`, `alt`, `esc`, `f1` to `f12`, a letter
+  `a` to `z` or a digit `0` to `9`. While Alt is held the key events reach the game as system key events, as Windows
+  sends them.
+- The game reads a letter command from a `char` event, not from a `key` event: the hotkeys `a`, `p`, `s` and `d` need
+  `char a` and so on. The `key` events are for Shift, Ctrl, Alt, Escape and the digits that make and recall groups
+  (Ctrl+1 makes a group, Alt+1 recalls it).
+- The key state and the cursor position the game reads follow the events: a key is held from its `key down` to its
+  `key up`, as a mouse button is held from its `down` to its `up`, and the cursor is where the last mouse event put it.
+  The event time is the tick, not the clock.
+- The game takes one mouse event and one key or `char` event per frame, so a scenario has at most one of each on a
+  tick, and `steps_per_frame` must be 1 (`--steps-per-frame` leaves a scenario with `input` lines at 1). A breach of
+  either, a button released more than 1 tick after its press with no mouse move of at least 32 units from the press position
+  between (the game takes a slow press and release for a click or a box by the wall clock), a bad event, a position outside the window or a tick after the last tick exits with status 2 and a message
+  that names the line.
+- A right-click gives an order only with interface type 1, and a left-click in an order mode only with type 0. A
+  scenario says which it uses with `console 1 +iface 1` or `console 1 +iface 0`; a scenario that does not say plays
+  with type 0.
+- A click on a unit needs the unit's position on the screen. The main view is the rectangle at (128, 32) of the 640 by
+  480 window, so a unit at world `x z` and height `y` is at screen `x - scrollX + 128`, `z - scrollY - y / 2 + 32`.
+  The scroll of slot 0 on The Pass is (304, 32) until the camera moves.
+
+In test mode the exe also writes `ui.txt` beside `trace.txt`: the input it delivered, the orders the UI turned it
+into, and the selection after each tick (format and meaning in [docs/ui-log.md](../docs/ui-log.md)). The harness's own
+`order` lines are not logged. `--check` compares each run's `ui.txt` line by line with `reference/ui/<scenario>.txt`
+and reports the first line that differs. It fails when a stored log has no scenario, when a `ui-*` scenario has no
+stored log, and when a `ui-*` scenario's log has no order, queued build, cancel or group line and selects no unit (a
+click that gives nothing is a broken scenario). A scenario with no stored log is only counted. `--traces` copies the
+logs the reference branch wrote into `reference/ui/`.
+
 ## Console commands
 
 A scenario can type a console command, as the chat line does. One `console` line per command:
@@ -322,6 +376,7 @@ The commands a line may type, by their names in the game's command table (any ca
 | Units | `reload`, `kill`, `assign`, `selectable`, `shootall`, `doubleshot`, `halfshot`, a unit type name |
 | Features and the map | `feature`, `burnone`, `burnall`, `treedeath`, `meteor`, `sealevel`, `edge`, `search`, `move`, `drop` |
 | Sight | `los`, `lostype`, `mapping`, `radar`, `nowisee` |
+| Interface | `iface <0 or 1>`: the interface type, 0 for left-click orders and 1 for right-click orders (see Scripted input) |
 | AI | `reloadaiprofiles` |
 | Game end | `iwin`, `ilose` |
 | No effect | `assert`, `dprint`, `mem`, `zbuffer` |
@@ -330,10 +385,10 @@ The sharing commands, `assert`, `dprint`, `mem`, `zbuffer`, `assign` (nothing is
 `edge` change no field the trace hashes: a scenario types them to enter their functions.
 
 A command that is not in the table, or a first word that is neither a listed command nor a unit type, exits with
-status 2 and a message that names the line. Left out are the display, sound, debugger and host commands (task #398's),
+status 2 and a message that names the line. Left out are the display, sound, debugger and host commands,
 `compression` and `netstats` (network statistics), `sharemapping` and `shareradar` (network games only), and two
 commands that touch the file system: `include` (reads `debugdat\include.txt`) and `printweights` (writes the file
-named in its second argument, so the AI weights dump `DumpPlayerAI` is not reachable). `los` and `mapping` save the
+named in its second argument, so the AI weights dump `DumpPlayerAI` is not reachable). `los`, `mapping` and `iface` save the
 game's settings through the host, which writes the run's own registry, and no scenario reads settings from it.
 
 ## Traces
@@ -447,6 +502,14 @@ seeds) and runs deterministically: two runs give identical traces.
 | trio-anteer-strait | Anteer Strait | 3 | 5400 | Three players on Anteer Strait, players 0 and 1 allied, three minutes, line of sight type 0 |
 | trio-dark-side | Dark Side | 3 | 9000 | Three players on Dark Side, fixed start positions, five minutes |
 | trio-etorrep-glacier | Etorrep Glacier | 3 | 3600 | Three Core players on Etorrep Glacier, random start positions, two minutes |
+| ui-build-menu | The Pass | 2 | 200 | Scripted build menu clicks, the build menu and its queue counts in frames |
+| ui-build-place | The Pass | 2 | 200 | Scripted build placement (`IssueMobileBuildOrders`) |
+| ui-click-select | The Pass | 2 | 120 | Scripted click selection (`input`, interface type 1), the commander and unit panels in frames |
+| ui-drag-select | The Pass | 2 | 200 | Scripted box selection with and without Shift |
+| ui-groups | The Pass | 2 | 300 | Scripted control groups |
+| ui-keys | The Pass | 2 | 300 | Scripted keyboard shortcuts: attack, patrol, special attack, stop, queueing, self-destruct |
+| ui-left-click-orders | The Pass | 2 | 260 | Scripted left-click orders and command characters (interface type 0) |
+| ui-right-click | The Pass | 2 | 260 | Scripted right-click move and attack, the minimap scroll |
 
 ## Stored traces and digests
 
@@ -466,27 +529,41 @@ cmake -S . -B build/modern -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.c
 cmake --build build/modern
 cmake --build build/modern --target wasm_runtime   # once, and again after a change to wasm/ or a module's sources
 rm -r build/playtest/prefix     # a fresh prefix; tools/playtest.py makes it again
-uv run tools/reference.py --check --exe build/modern/TotalA.exe --game-dir ~/.ta   # the gate
+uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta   # the pull request gate
+uv run tools/reference.py --check --both-modes --exe build/modern/TotalA.exe --game-dir ~/.ta   # every scenario, in both module modes: the full gate
 ```
 
-The gate is the modern build's `--check`: every scenario must report equal.
+The gate is the modern build's `--check`: every scenario it plays must report equal. There are two tiers:
+`--tier` plays the scenarios of `GATE_TIER` (see "Gate tier" below) and is the gate of a pull request; the
+full `--check` plays all of them and is the gate of the changes in "When the full suite is the gate".
 The build runs its modules in WASM (`wind_meteors` so far): the `wasm_runtime` target builds
 `wasmtime_host.dll` and `wind_meteors.wasm` (it needs cargo, the game build does not) and copies them and
 `wasm/modules.json` next to `TotalA.exe`, and `tools/playtest.py` copies the three into each game
 directory, failing with a message naming the target when they are missing. `--check --native-modules`
 plays every scenario with `-modules=native` instead, the modules as native code, which needs no runtime
-files. Both must report every scenario equal.
+files. Both modes must report every scenario equal, and `--check --both-modes` is that in one command: one
+pool plays every scenario once in WASM and once native (each line ends its name with `[wasm]` or `[native]`,
+the sound logs, frames, saves, block pointer scans and fuel are judged per mode and their lines start with the mode),
+and it exits 0 only when both modes do. The first difference in either mode stops every run of the pool, and its `DIFF`
+line names the mode. `--tier` is still one mode, unless it is given `--both-modes` too.
+A `--check` takes an exclusive lock on `$XDG_RUNTIME_DIR/bt-gate.lock` (`/tmp/bt-gate.lock` without it) for its whole run,
+so that a machine plays one gate at a time: a second one prints `waiting for the gate run of <pid> (<worktree>)` and
+starts when the first ends. `--no-lock` skips the lock, for a run that is not a gate.
 `uv run tools/wasm_modules.py glue-fatal --game-dir ~/.ta` (Wine only, not in CI) runs the exe on a bogus `meteor.tdf` and checks that the module's `FatalError` ends the game with exit code 2 after `wl_call` returned.
 `--check` without `--exe` is an error, since `moddable` does not build the
 reference. Add `--game-dir <dir>` when the game is not in a Steam directory.
 
 The gate applies when a pull request changes `src/`, `include/`,
-`lib/bitexact/`, `reference/`, or the tools that build or run the exe
-(`tools/reference.py`, `tools/playtest.py` and the like). Other
-changes do not need it.
+`interfaces/`, `lib/` (the bit-exact maths and the WASM loader), `wasm/`,
+`reference/`, the build (`CMakeLists.txt`, `cmake/`), the layout and
+trace format data (`data/layout_refs.csv`, `data/trace_schema.json`,
+`tools/traceschema.py`), or the tools that run the exe
+(`tools/reference.py`, `tools/playtest.py`). Other changes do not need
+it. The merges that did are the ones counted for the full-suite cadence
+below.
 
 `--traces` writes every trace with the reference branch's sha as `commit`. `--check` plays
-every scenario (`--parallel N` at a time, default half the CPUs and at most 6), prints one line per scenario with its run time
+every scenario (`--parallel N` at a time, default half the CPUs and at most 6, or 10 with `--both-modes`), prints one line per scenario with its run time
 and a total, and exits 0 when every digest equals the stored one. It exits 1
 when a trace has no scenario or a scenario has no trace, and on a difference:
 it builds the reference from the commit the trace records (a commit of the
@@ -533,9 +610,31 @@ directories are kept (`build/scratch/check-<scenario>-<time>/` and `check-<scena
 differs from the stored trace (the exe does not pass the gate, which is not the flag's effect), the scenario is `FAIL`.
 The total counts equal, differ and failed. A difference is not a failure: the exit status is 1 only when a
 scenario failed (or a trace has no scenario). It builds no reference, and it is not the gate. It
-works with `--quick`, `--steps-per-frame` and `--parallel`, and not with `--poison`.
+works with `--tier`, `--steps-per-frame` and `--parallel`, and not with `--poison`.
 
-The full `--check` is what a pull request's gate needs.
+### When the full suite is the gate
+
+The full `--check` and the play-tests stay the gate of a pull
+request that:
+
+- changes the state block layout: `interfaces/`, `src/state/`, `data/layout_refs.csv`, or any `static_assert` on a block struct's size;
+- changes the host interface or platform code;
+- changes `reference/` (scenarios, traces) or the trace format (`data/trace_schema.json`, `tools/traceschema.py`);
+- changes `tools/reference.py` or `tools/playtest.py`;
+- or is the run that makes `uv run tools/fullgate.py due` pass.
+
+#286 passed the gate and broke `mp`; these are the changes of that kind. Every other pull request
+that the gate applies to runs `--tier`, and its body says which tier it ran.
+
+### The full suite on moddable
+
+The full `--check` runs on the tip of `moddable` once every 5 merged pull requests that needed the
+gate. `uv run tools/fullgate.py` prints how many have merged since the newest `Full gate on <sha>`
+comment on the tracking issue (#632), and `uv run tools/fullgate.py due` exits 1 at 5 or more. When
+it is due, the lead runs the full `--check` on the tip, without `--tier`, and comments `Full gate on
+<sha>: <n> of <n> equal, block pointers: <result>` on #632. On a divergence the comment says so, and
+no pull request that needs the gate merges until a fix lands: `tools/tracediff.py` gives the first
+tick, and the 5 merges are bisected.
 
 ## Block pointers
 
@@ -554,7 +653,8 @@ pointed at in the target. The scan does not change the traces.
 resolves the sites with the linker map beside the exe
 (`build/modern/TotalA.map`) and compares every row with `data/block_pointers.csv`, after printing the trace
 results. A word whose holder the file has no wildcard row for (see below), or a scenario with no `blockptrs.txt`,
-is printed (scenario, holder, offset, target) and `--check` exits 1. `--quick` does not check the pointers.
+is printed (scenario, holder, offset, target) and `--check` exits 1. `--tier` does not check the pointers: the names of repeated sites are numbered over the scenarios played, so the
+tier prints `block pointers: full suite only` and the full `--check` is where they are checked.
 `--save-blockptrs <dir>` writes each scenario's file to `<dir>/<scenario>.txt`, and
 `uv run tools/blockpointers.py --from <dir>` regenerates the data file from them, keeping the hand-set `class` and
 `note` columns; without `--from` it plays the suite itself with the scan on every tick, which is how the list
@@ -602,26 +702,55 @@ list of #7 tasks. A difference from the stored digests is expected for the latte
 failure of the run. On a difference the report reruns tracediff with B poisoned (`--poison-b`), so
 it compares the runs that differed.
 
-## Quick check
+## Gate tier
 
 ```sh
-uv run tools/reference.py --check --exe build/modern/TotalA.exe --quick     # a fixed subset, for a fast look
+uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta
 ```
 
-`--quick` is the same `--check` restricted to the five scenarios in the
-`QUICK` constant of `tools/reference.py`. Its scenarios take about 1 to 2
-minutes at the default `--parallel`. A pass says so and reminds you that it is not the gate; a failure
-prints the same `tools/tracediff.py` report as the full run. `--quick` goes with
-`--check` and `--exe`, and `--traces` rejects it. It is no substitute for the
-full `--check`, which is what a pull request's gate needs.
+`--tier` is the same `--check` restricted to the 26 scenarios of the `GATE_TIER` constant of
+`tools/reference.py`, 37750 ticks of the suite's 322,770 (11.7%), none longer than 12,600. It is the
+gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how
+many scenarios were equal and at which commit; a failure prints the same `tools/tracediff.py` report
+as the full run. `--tier` goes with `--check` and `--exe`, and `--traces` rejects it. It does not
+check the block pointers, since repeated sites are numbered over the scenarios played; the full
+suite does.
 
-| Name | Players | Sides | Start positions |
-| --- | ---: | --- | --- |
-| duel-coast-to-coast | 2 | Core | fixed |
-| duel-great-divide | 2 | Arm | random |
-| eight-full-moon | 8 | Arm and Core | fixed |
-| eight-greenhaven | 8 | Arm | random |
-| orders-move-attack | 2 | Arm and Core, scripted orders | fixed |
+The tier was chosen greedily from a coverage run of the suite (tools/coverage.py): the scenario
+adding the most lines per tick (a floor of 600 ticks each), until one adds fewer than 20, with at
+least one game of 8 players. `uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir
+~/.ta --tier` plays the tier on the coverage build, prints its lines and functions as a share of the
+full suite's in `data/coverage.csv`, and exits 1 below 96% of the lines. Run it when a scenario is
+added or removed and when the tier changes.
+
+| Name | Players | Ticks |
+| --- | ---: | ---: |
+| allied-victory | 4 | 360 |
+| commander-death | 2 | 360 |
+| conditions-dark-side | 2 | 3200 |
+| console-economy | 2 | 200 |
+| console-features | 2 | 300 |
+| console-sight | 2 | 200 |
+| console-units | 2 | 300 |
+| eight-pincushion-teams | 8 | 12600 |
+| hailstorm-los-off | 2 | 150 |
+| load-midgame | 0 | 900 |
+| mission-radius | 0 | 2700 |
+| mission-victory | 0 | 360 |
+| orders-air | 2 | 4600 |
+| orders-air-fights | 2 | 1500 |
+| orders-air-repair | 2 | 900 |
+| orders-build-patrol | 2 | 600 |
+| orders-factory | 2 | 1500 |
+| orders-guard-attacked | 2 | 600 |
+| orders-guard-reclaim | 2 | 600 |
+| orders-immediate | 2 | 1000 |
+| orders-tier2-core | 2 | 1300 |
+| orders-tier2-spider | 2 | 700 |
+| orders-tier2-vader | 2 | 420 |
+| save-midgame | 2 | 1800 |
+| sensors-floating-teeth-los-off | 2 | 400 |
+| units-transport-ship | 2 | 200 |
 
 `tools/tracediff.py --ignore-view-seed` accepts traces whose headers differ only
 in `view_seed`; with `--scenario` given twice, run mode runs A on the first file

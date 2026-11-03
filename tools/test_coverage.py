@@ -572,6 +572,30 @@ class PlaySuiteTest(unittest.TestCase):
         self.assertEqual(seen["alpha"]["LLVM_PROFILE_FILE"], cov.windows_path(run_dir / "alpha") + "\\cov-%p.profraw")
 
 
+class PlaySuiteRateTest(unittest.TestCase):
+    def test_runs_time_out_at_the_coverage_rate_and_the_gate_rate_comes_back(self):
+        seen = []
+        before = cov.reference.RUN_TICKS_PER_SECOND
+
+        def fake_play_all(exe, scenarios, game_dir, parallel, failed=None, retry_any=False):
+            seen.append(cov.reference.RUN_TICKS_PER_SECOND)
+            raise RuntimeError("stop")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            saved = (cov.RUN_DIR, cov.reference.play_all, cov.reference.scenario_files)
+            cov.RUN_DIR = Path(tmp) / "run"
+            cov.reference.play_all = fake_play_all
+            cov.reference.scenario_files = lambda: {"alpha": Path("alpha.txt")}
+            try:
+                with self.assertRaises(RuntimeError):
+                    cov.play_suite(Path("TotalA.exe"), None, 1, None)
+            finally:
+                cov.RUN_DIR, cov.reference.play_all, cov.reference.scenario_files = saved
+        self.assertEqual(seen, [cov.TICKS_PER_SECOND])
+        self.assertLess(cov.TICKS_PER_SECOND, before)
+        self.assertEqual(cov.reference.RUN_TICKS_PER_SECOND, before)
+
+
 class PlaySuiteSaverTest(unittest.TestCase):
     def test_a_named_loader_is_played_with_its_saver(self):
         played = {}
@@ -595,6 +619,36 @@ class PlaySuiteSaverTest(unittest.TestCase):
             finally:
                 cov.RUN_DIR, cov.reference.play_all, cov.reference.scenario_files, cov.subprocess.run = saved
         self.assertEqual(sorted(played), ["loader", "saver"])
+
+
+class TierTest(unittest.TestCase):
+    def totals(self, **hits):
+        out = {}
+        for subsystem, (lines_hit, entered) in hits.items():
+            out[subsystem] = cov.Totals(functions=entered + 5, functions_entered=entered, lines=lines_hit + 50, lines_hit=lines_hit)
+        return out
+
+    def test_share_sums_the_subsystems(self):
+        full = self.totals(units=(600, 40), orders=(400, 60))
+        tier = self.totals(units=(580, 38), orders=(380, 58))
+        self.assertEqual(cov.tier_share(tier, full), (960, 1000, 96, 100))
+        text, reached = cov.tier_report(tier, full)
+        self.assertIn("tier lines: 96.0% of the full suite's (960/1000)", text)
+        self.assertIn("tier functions: 96.0% of the full suite's (96/100)", text)
+        self.assertTrue(reached)
+
+    def test_floor_is_the_line_share(self):
+        full = self.totals(units=(1000, 100))
+        self.assertTrue(cov.tier_report(self.totals(units=(960, 10)), full)[1])
+        text, reached = cov.tier_report(self.totals(units=(959, 100)), full)
+        self.assertFalse(reached)
+        self.assertIn("95.9%", text)
+
+    def test_a_subsystem_the_tier_misses_counts_against_it(self):
+        full = self.totals(units=(500, 50), orders=(500, 50))
+        text, reached = cov.tier_report(self.totals(units=(500, 50)), full)
+        self.assertIn("50.0%", text)
+        self.assertFalse(reached)
 
 
 class WriteNothingTest(unittest.TestCase):

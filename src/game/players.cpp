@@ -565,7 +565,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                             g_game->endGameCountdown--;
                             if (g_game->endGameCountdown < 0) {
                                 g_game->endGameFlags |= 4;
-                                g_game->endGameFlags &= 0xffef;
+                                g_game->endGameVictory = 0;
                                 g_game->bits.flag6 = 1;
                             }
                         }
@@ -577,7 +577,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                         g_game->endGameCountdown--;
                         if (g_game->endGameCountdown < 0) {
                             g_game->endGameFlags |= 4;
-                            g_game->bits.flag4 = 1;
+                            g_game->endGameVictory = 1;
                             g_game->bits.flag5 = 1;
                         }
                     }
@@ -730,7 +730,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                     if (CountCombatPlayers() <= 0)
                         goto skip508;
                     RecordWatchModeNotice(bl);
-                    g_game->endGameFlags &= 0xffef;
+                    g_game->endGameVictory = 0;
                     goto skip508;
                 }
                 goto skip508;
@@ -739,7 +739,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
 
     flags82e:
         g_game->endGameFlags |= 4;
-        g_game->endGameFlags &= 0xffef;
+        g_game->endGameVictory = 0;
         if (pi->rejectReason == 0)
             g_game->bits.flag6 = 1;
         goto skip508;
@@ -756,7 +756,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
             g_game->endGameCountdown--;
             if (g_game->endGameCountdown < 0) {
                 g_game->endGameFlags |= 4;
-                g_game->bits.flag4 = 1;
+                g_game->endGameVictory = 1;
                 g_game->bits.flag5 = 1;
             }
         }
@@ -777,7 +777,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
         g_game->endGameCountdown--;
         if (g_game->endGameCountdown < 0) {
             g_game->endGameFlags |= 4;
-            g_game->endGameFlags &= 0xffef;
+            g_game->endGameVictory = 0;
             g_game->bits.flag6 = 1;
         }
     }

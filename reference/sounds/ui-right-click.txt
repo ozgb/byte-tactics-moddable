@@ -1,0 +1,19 @@
+bt-sound 1
+0 stop_all - - - - -
+62 play_file kcarmmov.WAV -585 - - -
+73 play lasrfir1 -585 - - -
+79 play lasrhit2 -585 - - -
+98 play lasrfir1 -585 - - -
+104 play lasrhit2 -1585 - - -
+123 play lasrfir1 -1585 - - -
+129 play lasrhit2 -1585 - - -
+148 play lasrfir1 -1585 - - -
+154 play lasrhit2 -1585 - - -
+173 play lasrfir1 -1585 - - -
+179 play lasrhit2 -1585 - - -
+198 play lasrfir1 -1585 - - -
+204 play lasrhit2 -1585 - - -
+223 play lasrfir1 -1585 - - -
+229 play lasrhit2 -1585 - - -
+248 play lasrfir1 -1585 - - -
+254 play lasrhit2 -1585 - - -

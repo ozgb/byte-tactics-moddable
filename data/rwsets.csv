@@ -2749,11 +2749,14 @@ address,function,file,kind,target
 0x40d900,Pathfinder::ClearDirtyCells,src/ai/pathfind.cpp,field_read,PathGrid::count
 0x40d900,Pathfinder::ClearDirtyCells,src/ai/pathfind.cpp,function,
 0x40d9c0,DirectionFromStep,src/ai/pathfind.cpp,function,
-0x40da40,Pathfinder::Estimate,src/ai/pathfind.cpp,call,operator->
+0x40da40,Pathfinder::Estimate,src/ai/pathfind.cpp,call,operator OrderFx *
+0x40da40,Pathfinder::Estimate,src/ai/pathfind.cpp,field_read,OrdersSeam::OrderFxApproxDist
 0x40da40,Pathfinder::Estimate,src/ai/pathfind.cpp,field_read,Pathfinder::costScale
 0x40da40,Pathfinder::Estimate,src/ai/pathfind.cpp,field_read,Pathfinder::target
+0x40da40,Pathfinder::Estimate,src/ai/pathfind.cpp,field_read,Seams::orders
 0x40da40,Pathfinder::Estimate,src/ai/pathfind.cpp,function,
-0x40da40,Pathfinder::Estimate,src/ai/pathfind.cpp,indirect_call,virtual Target::Cost
+0x40da40,Pathfinder::Estimate,src/ai/pathfind.cpp,global_read,g_seams
+0x40da40,Pathfinder::Estimate,src/ai/pathfind.cpp,indirect_call,"indirect via int (*)(OrderFx *, int, int) __attribute__((stdcall)) [OrdersSeam::OrderFxApproxDist]"
 0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,call,OpenHeap::Update
 0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,call,PathGrid::InBounds
 0x40da70,Pathfinder::ExpandNeighbour,src/ai/pathfind.cpp,call,Pathfinder::EstimateCost
@@ -2869,6 +2872,7 @@ address,function,file,kind,target
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,end
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,get
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator MovementClass *
+0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator OrderFx *
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator PathCell *
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator Unit *
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,call,operator unsigned int *
@@ -2878,6 +2882,8 @@ address,function,file,kind,target
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,deref_write,*unsigned int
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,field_maybe_written,Pathfinder::grid
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,field_read,OrdersSeam::OrderFxAddFlags
+0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,field_read,OrdersSeam::OrderFxFillGoalCells
+0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,field_read,OrdersSeam::OrderFxIsGoal
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,field_read,PathCell::flags
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,field_read,PathGrid::cells
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,field_read,PathGrid::dirty
@@ -2906,10 +2912,10 @@ address,function,file,kind,target
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,field_write,Pathfinder::target
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,function,
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,global_read,g_seams
+0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,indirect_call,"indirect via int (*)(OrderFx *, int, int) __attribute__((stdcall)) [OrdersSeam::OrderFxIsGoal]"
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,indirect_call,"indirect via void (*)(MovementClass *, Unit *) __attribute__((stdcall)) [UnitsSeam::RefreshMovedUnits]"
 0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,indirect_call,"indirect via void (*)(OrderFx *, int) __attribute__((stdcall)) [OrdersSeam::OrderFxAddFlags]"
-0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,indirect_call,virtual Target::GetGoals
-0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,indirect_call,virtual Target::IsGoal
+0x40e630,Pathfinder::StartSearch,src/ai/pathfind.cpp,indirect_call,"indirect via void (*)(OrderFx *, std::vector<Point16, std::allocator<Point16>> *) __attribute__((stdcall)) [OrdersSeam::OrderFxFillGoalCells]"
 0x40e9a0,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,call,operator MovementClass *
 0x40e9a0,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,call,operator Unit *
 0x40e9a0,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,call,operator=
@@ -2997,9 +3003,11 @@ address,function,file,kind,target
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,get
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator AiSearchGoal *
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator Node *
+0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator OrderFx *
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator PathCell *
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator Ref<Node> *
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator Unit *
+0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator UnitMotion *
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator!=
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator->
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator=
@@ -3021,6 +3029,7 @@ address,function,file,kind,target
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,OpenHeap::pool
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,OpenHeap::topPopped
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,OrdersSeam::AiSearchGoalSetWaypoints
+0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,OrdersSeam::UnitMotionClaimRepath
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,PathCell::flags
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,PathGoal::target
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,PathGrid::cells
@@ -3042,7 +3051,6 @@ address,function,file,kind,target
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,Unit::motion
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,Unit::unitDefIndex
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,UnitMotionPlannerView::owner
-0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_read,UnitMotionPlannerView::planner
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_write,Node::index
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_write,OpenHeap::count
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_write,OpenHeap::topPopped
@@ -3064,8 +3072,8 @@ address,function,file,kind,target
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,global_write,g_budgetRefreshCounter
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,global_write,g_playerBudgetCap
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,global_write,g_playerTickLoad
+0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,indirect_call,indirect via AiSearchGoal *(*)(UnitMotion *) __attribute__((stdcall)) [OrdersSeam::UnitMotionClaimRepath]
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,indirect_call,"indirect via void (*)(AiSearchGoal *, Point16 *, int) __attribute__((stdcall)) [OrdersSeam::AiSearchGoalSetWaypoints]"
-0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,indirect_call,virtual PathPlannerView::GetPath
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,call,OpenHeap::Free
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,call,OpenHeap::SiftDownInline
 0x40ef20,Pathfinder::RemoveNode,src/ai/pathfind.cpp,call,operator Node *
@@ -47129,6 +47137,9 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::NewOrder
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::NewUnitMotion
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxAddFlags
+,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxApproxDist
+,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxFillGoalCells
+,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxIsGoal
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::QueueBuildOrder
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::ReattachFxToUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::RegisterAllOrderTypes
@@ -47136,6 +47147,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::RunSecondaryOrders
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::SaveMotion
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::SerializeOrderToSave
+,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::UnitMotionClaimRepath
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::UpdateMotion
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::AbortIfGoalMatch
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Create
@@ -47498,6 +47510,9 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersNewOrder
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersNewUnitMotion
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxAddFlags
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxApproxDist
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxFillGoalCells
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxIsGoal
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersQueueBuildOrder
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersReattachFxToUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersRegisterAllOrderTypes
@@ -47505,6 +47520,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersRunSecondaryOrders
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersSaveMotion
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersSerializeOrderToSave
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersUnitMotionClaimRepath
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersUpdateMotion
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingAbortIfGoalMatch
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingCreate
@@ -48159,6 +48175,9 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::NewOrder
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::NewUnitMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxAddFlags
+,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxApproxDist
+,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxFillGoalCells
+,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxIsGoal
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::QueueBuildOrder
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::ReattachFxToUnit
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::RegisterAllOrderTypes
@@ -48166,6 +48185,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::RunSecondaryOrders
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::SaveMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::SerializeOrderToSave
+,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::UnitMotionClaimRepath
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::UpdateMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::AbortIfGoalMatch
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Create
@@ -48561,6 +48581,9 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NotifyUnitDiedNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NotifyUnitRefs
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxAddFlagsNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxApproxDistNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxFillGoalCellsNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxIsGoalNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ParseDownloadableAiWeightScripts
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PickRandomReclaimableResourcesInRadius
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PlaceFeature
@@ -48644,6 +48667,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,StartScriptWithArgsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,TransferEnergy
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,TransferMetal
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitMotionClaimRepathNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitRefUnlinkNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitTypeSetAddTypeOrCategoryNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateAllUnits
@@ -50196,6 +50220,12 @@ address,function,file,kind,target
 ,OrderFx::SetVtable,src/orders/order_fx.h,function,
 ,OrderFxAddFlagsNative,src/seams/native.cpp,call,OrderFx::AddFlags
 ,OrderFxAddFlagsNative,src/seams/native.cpp,function,
+,OrderFxApproxDistNative,src/seams/native.cpp,function,
+,OrderFxApproxDistNative,src/seams/native.cpp,indirect_call,virtual OrderFx::ApproxDist
+,OrderFxFillGoalCellsNative,src/seams/native.cpp,function,
+,OrderFxFillGoalCellsNative,src/seams/native.cpp,indirect_call,virtual OrderFx::FillGoalCells
+,OrderFxIsGoalNative,src/seams/native.cpp,function,
+,OrderFxIsGoalNative,src/seams/native.cpp,indirect_call,virtual OrderFx::ContainsCell
 ,OrderKindFromName,src/orders/order_queue.cpp,call,BlockVector::Begin
 ,OrderKindFromName,src/orders/order_queue.cpp,call,BlockVector::End
 ,OrderKindFromName,src/orders/order_queue.cpp,call,LowerBoundOrderTypes
@@ -50420,25 +50450,34 @@ address,function,file,kind,target
 ,PathOrderAttach::~PathOrderAttach,src/units/unit_targets.cpp,field_write,PathOrderAttach::next
 ,PathOrderAttach::~PathOrderAttach,src/units/unit_targets.cpp,field_write,PathOrderAttach::owner
 ,PathOrderAttach::~PathOrderAttach,src/units/unit_targets.cpp,function,
-,Pathfinder::Cost,src/ai/pathfinder.h,call,operator->
+,Pathfinder::Cost,src/ai/pathfinder.h,call,operator OrderFx *
+,Pathfinder::Cost,src/ai/pathfinder.h,field_read,OrdersSeam::OrderFxApproxDist
 ,Pathfinder::Cost,src/ai/pathfinder.h,field_read,Pathfinder::costScale
 ,Pathfinder::Cost,src/ai/pathfinder.h,field_read,Pathfinder::target
+,Pathfinder::Cost,src/ai/pathfinder.h,field_read,Seams::orders
 ,Pathfinder::Cost,src/ai/pathfinder.h,function,
-,Pathfinder::Cost,src/ai/pathfinder.h,indirect_call,virtual Target::Cost
+,Pathfinder::Cost,src/ai/pathfinder.h,global_read,g_seams
+,Pathfinder::Cost,src/ai/pathfinder.h,indirect_call,"indirect via int (*)(OrderFx *, int, int) __attribute__((stdcall)) [OrdersSeam::OrderFxApproxDist]"
 ,Pathfinder::CostFix,src/ai/pathfinder.h,call,FixMul
-,Pathfinder::CostFix,src/ai/pathfinder.h,call,operator->
+,Pathfinder::CostFix,src/ai/pathfinder.h,call,operator OrderFx *
+,Pathfinder::CostFix,src/ai/pathfinder.h,field_read,OrdersSeam::OrderFxApproxDist
 ,Pathfinder::CostFix,src/ai/pathfinder.h,field_read,Pathfinder::costScale
 ,Pathfinder::CostFix,src/ai/pathfinder.h,field_read,Pathfinder::target
+,Pathfinder::CostFix,src/ai/pathfinder.h,field_read,Seams::orders
 ,Pathfinder::CostFix,src/ai/pathfinder.h,function,
-,Pathfinder::CostFix,src/ai/pathfinder.h,indirect_call,virtual Target::Cost
+,Pathfinder::CostFix,src/ai/pathfinder.h,global_read,g_seams
+,Pathfinder::CostFix,src/ai/pathfinder.h,indirect_call,"indirect via int (*)(OrderFx *, int, int) __attribute__((stdcall)) [OrdersSeam::OrderFxApproxDist]"
 ,Pathfinder::Dir,src/ai/pathfinder.h,field_read,Pathfinder::goalX
 ,Pathfinder::Dir,src/ai/pathfinder.h,field_read,Pathfinder::goalY
 ,Pathfinder::Dir,src/ai/pathfinder.h,function,
-,Pathfinder::EstimateCost,src/ai/pathfinder.h,call,operator->
+,Pathfinder::EstimateCost,src/ai/pathfinder.h,call,operator OrderFx *
+,Pathfinder::EstimateCost,src/ai/pathfinder.h,field_read,OrdersSeam::OrderFxApproxDist
 ,Pathfinder::EstimateCost,src/ai/pathfinder.h,field_read,Pathfinder::costScale
 ,Pathfinder::EstimateCost,src/ai/pathfinder.h,field_read,Pathfinder::target
+,Pathfinder::EstimateCost,src/ai/pathfinder.h,field_read,Seams::orders
 ,Pathfinder::EstimateCost,src/ai/pathfinder.h,function,
-,Pathfinder::EstimateCost,src/ai/pathfinder.h,indirect_call,virtual Target::Cost
+,Pathfinder::EstimateCost,src/ai/pathfinder.h,global_read,g_seams
+,Pathfinder::EstimateCost,src/ai/pathfinder.h,indirect_call,"indirect via int (*)(OrderFx *, int, int) __attribute__((stdcall)) [OrdersSeam::OrderFxApproxDist]"
 ,Pathfinder::Finish,src/ai/pathfinder.h,call,Pathfinder::Release
 ,Pathfinder::Finish,src/ai/pathfinder.h,call,operator AiSearchGoal *
 ,Pathfinder::Finish,src/ai/pathfinder.h,field_read,OrdersSeam::AiSearchGoalSetWaypoints
@@ -53292,6 +53331,34 @@ address,function,file,kind,target
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(OrderFx *, int) __attribute__((stdcall)) [OrdersSeam::OrderFxAddFlags]"
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,call,ArgValue
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,field_read,OrdersSeam::OrderFxApproxDist
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,function,
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,global_read,s_call
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,global_read,s_tail
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(OrderFx *, int, int) __attribute__((stdcall)) [OrdersSeam::OrderFxApproxDist]"
+,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,field_read,OrdersSeam::OrderFxFillGoalCells
+,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,function,
+,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,global_read,s_call
+,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(OrderFx *, std::vector<Point16, std::allocator<Point16>> *) __attribute__((stdcall)) [OrdersSeam::OrderFxFillGoalCells]"
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,call,ArgValue
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,field_read,OrdersSeam::OrderFxIsGoal
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,function,
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,global_read,s_call
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,global_read,s_tail
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(OrderFx *, int, int) __attribute__((stdcall)) [OrdersSeam::OrderFxIsGoal]"
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,ArgValue
@@ -53358,6 +53425,15 @@ address,function,file,kind,target
 ,RecOrdersSerializeOrderToSave,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersSerializeOrderToSave,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersSerializeOrderToSave,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Order *, int, Unit *, HapiBank *, char *) __attribute__((fastcall)) [OrdersSeam::SerializeOrderToSave]"
+,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,call,Add
+,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,call,ArgObject
+,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,field_read,OrdersSeam::UnitMotionClaimRepath
+,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,function,
+,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,global_read,s_call
+,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,indirect_call,indirect via AiSearchGoal *(*const)(UnitMotion *) __attribute__((stdcall)) [OrdersSeam::UnitMotionClaimRepath]
 ,RecOrdersUpdateMotion,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersUpdateMotion,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersUpdateMotion,src/harness/replay_hooks.inc,call,ArgValue
@@ -56969,6 +57045,12 @@ address,function,file,kind,target
 ,UnitList::ForEach,src/game/victory.cpp,field_read,UnitList::last
 ,UnitList::ForEach,src/game/victory.cpp,function,
 ,UnitList::ForEach,src/game/victory.cpp,indirect_call,virtual UnitScanVisitor::VisitUnit
+,UnitMotion::ClaimRepath,src/orders/order_list.cpp,call,operator->
+,UnitMotion::ClaimRepath,src/orders/order_list.cpp,field_read,UnitMotion::obj
+,UnitMotion::ClaimRepath,src/orders/order_list.cpp,function,
+,UnitMotion::ClaimRepath,src/orders/order_list.cpp,indirect_call,virtual PathGoalVtableView::v6
+,UnitMotionClaimRepathNative,src/seams/native.cpp,call,UnitMotion::ClaimRepath
+,UnitMotionClaimRepathNative,src/seams/native.cpp,function,
 ,UnitOf,src/ingame/sim_event_drain.cpp,call,operator Unit *
 ,UnitOf,src/ingame/sim_event_drain.cpp,deref_escape,*Unit
 ,UnitOf,src/ingame/sim_event_drain.cpp,field_read,Game::units

@@ -500,7 +500,7 @@ it. The merges that did are the ones counted for the full-suite cadence
 below.
 
 `--traces` writes every trace with the reference branch's sha as `commit`. `--check` plays
-every scenario (`--parallel N` at a time, default half the CPUs and at most 6), prints one line per scenario with its run time
+every scenario (`--parallel N` at a time, default half the CPUs and at most 6, or 10 with `--both-modes`), prints one line per scenario with its run time
 and a total, and exits 0 when every digest equals the stored one. It exits 1
 when a trace has no scenario or a scenario has no trace, and on a difference:
 it builds the reference from the commit the trace records (a commit of the

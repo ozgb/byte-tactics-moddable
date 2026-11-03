@@ -805,6 +805,13 @@ class BothModesTest(unittest.TestCase):
         self.assertEqual(reference.default_modes(True), ("wasm", "native"))
         self.assertEqual(reference.default_modes(False), (None,))
 
+    def test_both_modes_may_run_more_at_once(self):
+        with mock.patch.object(os, "cpu_count", lambda: 64):
+            self.assertEqual(reference.default_parallel(), reference.MAX_PARALLEL)
+            self.assertEqual(reference.default_parallel(True), reference.MAX_PARALLEL_BOTH_MODES)
+        with mock.patch.object(os, "cpu_count", lambda: 4):
+            self.assertEqual(reference.default_parallel(True), 2)
+
     def test_mode_view_keeps_the_stores_apart(self):
         store = {"a [wasm]": "w", "a [native]": "n", "b [native]": "m"}
         scenarios = {"a": Path("a.txt"), "b": Path("b.txt")}

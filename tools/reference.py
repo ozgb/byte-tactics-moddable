@@ -5,7 +5,7 @@
     uv run tools/reference.py --traces          # rewrite reference/traces/ from the reference branch
 
 `--check --exe` plays every scenario in reference/scenarios/ (`--parallel N` at a
-time, default half the CPUs and at most 6, under Wine through tools/playtest.py)
+time, default half the CPUs and at most 6 (10 with `--both-modes`), under Wine through tools/playtest.py)
 and compares the digest of each tick (tools/tracedigest.py) with the stored one. It also compares
 each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md).
 A scenario with a `frames` line also has its frame dumps compared, byte for byte, with reference/frames/<scenario>/ (docs/frame-dump.md); a missing stored frame fails.
@@ -78,6 +78,7 @@ FRAME_PALETTE_SIZE = 1024
 SAVES = ROOT / "reference/saves"
 SAVE_FILE = tracediff.SAVE_FILES[0]
 MAX_PARALLEL = 6
+MAX_PARALLEL_BOTH_MODES = 10
 GATE_TIER = (
     "allied-victory",
     "commander-death",
@@ -201,9 +202,9 @@ def scenario_files() -> dict[str, Path]:
     return {p.stem: p for p in sorted(SCENARIOS.glob("*.txt"))}
 
 
-def default_parallel() -> int:
-    """Half the CPUs, at least 1 and at most MAX_PARALLEL."""
-    return max(1, min(MAX_PARALLEL, (os.cpu_count() or 2) // 2))
+def default_parallel(both_modes: bool = False) -> int:
+    """Half the CPUs, at least 1 and at most MAX_PARALLEL (MAX_PARALLEL_BOTH_MODES when both modes are played)."""
+    return max(1, min(MAX_PARALLEL_BOTH_MODES if both_modes else MAX_PARALLEL, (os.cpu_count() or 2) // 2))
 
 
 def scenario_ticks(scenario: Path) -> int:
@@ -1230,9 +1231,11 @@ def main() -> None:
     ap.add_argument("--steps-per-frame", type=int, metavar="N",
                     help="--check: play every scenario with steps_per_frame N (1 to 8) and compare with the stored traces")
     ap.add_argument("--game-dir", help="--traces, --check: the game's install (default: Steam's)")
-    ap.add_argument("--parallel", type=int, default=default_parallel(), metavar="N",
-                    help="--traces, --check: scenarios played at once (default: half the CPUs, at most 6)")
+    ap.add_argument("--parallel", type=int, default=None, metavar="N",
+                    help="--traces, --check: scenarios played at once (default: half the CPUs, at most 6, or 10 with --both-modes)")
     args = ap.parse_args()
+    if args.parallel is None:
+        args.parallel = default_parallel(args.both_modes)
     if args.parallel < 1:
         ap.error("--parallel takes 1 or more")
     if args.traces == args.check:

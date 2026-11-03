@@ -16,6 +16,7 @@ ai,game,shared_write,Unit::flags,4
 ai,game,shared_write,Vec3::x,4
 ai,game,shared_write,Vec3::y,2
 ai,game,shared_write,Vec3::z,4
+ai,harness,shared_write,Unit::group,1
 ai,harness,shared_write,Vec3::x,1
 ai,harness,shared_write,Vec3::y,1
 ai,harness,shared_write,Vec3::z,1
@@ -501,7 +502,7 @@ game,harness,call,ReplayImport::Result,1
 game,harness,call,ReplayImport::~ReplayImport,1
 game,harness,shared_write,Game::difficulty,2
 game,harness,shared_write,Game::endGameFlags,1
-game,harness,shared_write,Game::localPlayer,1
+game,harness,shared_write,Game::localPlayer,3
 game,harness,shared_write,Game::mode_391f1,1
 game,harness,shared_write,Game::numPlayers,2
 game,harness,shared_write,Game::playerIndex,1
@@ -1251,7 +1252,7 @@ harness,pathfinding,shared_write,Game::numPlayers,1
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
-harness,platform,call,HarnessTestMode,9
+harness,platform,call,HarnessTestMode,10
 harness,platform,call,IsMemSet,1
 harness,platform,call,ModulesCheckStatics,1
 harness,platform,call,ModulesHideSwitch,1
@@ -1260,6 +1261,7 @@ harness,platform,call,Result,1
 harness,platform,call,host_exit,3
 harness,platform,call,host_file_exe_path,1
 harness,platform,call,host_image_range,1
+harness,platform,call,host_inject_event,1
 harness,platform,call,host_log,6
 harness,platform,call,host_mem_alloc,1
 harness,platform,call,host_mem_commit,2
@@ -2124,6 +2126,7 @@ orders,game,shared_write,Vec3::x,4
 orders,game,shared_write,Vec3::y,2
 orders,game,shared_write,Vec3::z,4
 orders,harness,shared_write,MissionType::index,1
+orders,harness,shared_write,Unit::group,1
 orders,harness,shared_write,Vec3::x,1
 orders,harness,shared_write,Vec3::y,1
 orders,harness,shared_write,Vec3::z,1
@@ -2216,7 +2219,7 @@ orders,presentation,shared_write,Box::hi,1
 orders,presentation,shared_write,Box::lo,1
 orders,presentation,shared_write,Fixed::value,7
 orders,presentation,shared_write,Game::pathfinder,1
-orders,presentation,shared_write,MissionType::index,4
+orders,presentation,shared_write,MissionType::index,6
 orders,presentation,shared_write,Order::flags_42,1
 orders,presentation,shared_write,Order::next,1
 orders,presentation,shared_write,Order::pos,3
@@ -2845,11 +2848,13 @@ players,game,shared_write,Vec3::x,4
 players,game,shared_write,Vec3::y,2
 players,game,shared_write,Vec3::z,4
 players,harness,shared_write,Game::endGameFlags,1
-players,harness,shared_write,Game::localPlayer,1
+players,harness,shared_write,Game::localPlayer,3
 players,harness,shared_write,Game::playerIndex,1
 players,harness,shared_write,Player::allied,1
 players,harness,shared_write,Player::alliedBy,1
 players,harness,shared_write,Player::info,1
+players,harness,shared_write,Player::unitsBegin,2
+players,harness,shared_write,Player::unitsEnd,2
 players,harness,shared_write,Vec3::x,1
 players,harness,shared_write,Vec3::y,1
 players,harness,shared_write,Vec3::z,1
@@ -3308,6 +3313,10 @@ presentation,game,shared_write,Vec3::y,2
 presentation,game,shared_write,Vec3::z,4
 presentation,harness,call,HarnessFrameDrawn,1
 presentation,harness,call,HarnessSoundEvent,6
+presentation,harness,call,HarnessUiCancel,1
+presentation,harness,call,HarnessUiGroup,2
+presentation,harness,call,HarnessUiOrder,2
+presentation,harness,call,HarnessUiQueue,1
 presentation,harness,call,HarnessViewRand,19
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::numPlayers,2
@@ -3317,6 +3326,7 @@ presentation,harness,shared_write,Player::allied,1
 presentation,harness,shared_write,Player::alliedBy,1
 presentation,harness,shared_write,PlayerInfo::energy,1
 presentation,harness,shared_write,PlayerInfo::metal,1
+presentation,harness,shared_write,Unit::selected,2
 presentation,harness,shared_write,Vec3::x,1
 presentation,harness,shared_write,Vec3::y,1
 presentation,harness,shared_write,Vec3::z,1
@@ -4503,6 +4513,11 @@ units,game,shared_write,UnitDef::unitname,2
 units,game,shared_write,Vec3::x,4
 units,game,shared_write,Vec3::y,2
 units,game,shared_write,Vec3::z,4
+units,harness,shared_write,Player::unitsBegin,2
+units,harness,shared_write,Player::unitsEnd,2
+units,harness,shared_write,Unit::group,1
+units,harness,shared_write,Unit::selected,2
+units,harness,shared_write,Unit::unitDefIndex,2
 units,harness,shared_write,Vec3::x,1
 units,harness,shared_write,Vec3::y,1
 units,harness,shared_write,Vec3::z,1

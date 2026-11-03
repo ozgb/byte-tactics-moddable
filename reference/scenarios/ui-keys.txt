@@ -1,0 +1,47 @@
+# Command characters, Shift-queued orders, Escape and the self-destruct key (Ctrl+D) toggled twice.
+game_seed 315
+crt_seed 1315
+view_seed 2315
+map The Pass
+start_positions fixed
+ticks 300
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +iface 1
+spawn 2 0 ARMPW 620 280
+spawn 2 0 ARMPW 500 300
+input 10 mouse move 384 240
+input 11 mouse left down 384 240
+input 12 mouse left up 384 240
+input 20 char a
+input 21 mouse move 470 310
+input 22 mouse left down 470 310
+input 23 mouse left up 470 310
+input 30 char p
+input 31 mouse move 480 330
+input 32 mouse left down 480 330
+input 33 mouse left up 480 330
+input 40 key down shift
+input 41 char m
+input 42 mouse move 500 250
+input 43 mouse left down 500 250
+input 44 mouse left up 500 250
+input 45 key up shift
+input 46 mouse move 520 260
+input 50 char s
+input 60 char d
+input 61 mouse move 520 280
+input 62 mouse left down 520 280
+input 63 mouse left up 520 280
+input 70 key down esc
+input 71 key up esc
+input 80 key down ctrl
+input 81 key down d
+input 82 key up d
+input 83 key up ctrl
+input 90 key down ctrl
+input 91 key down d
+input 92 key up d
+input 93 key up ctrl

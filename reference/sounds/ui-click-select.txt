@@ -1,0 +1,3 @@
+bt-sound 1
+0 stop_all - - - - -
+34 play_file servtny2.WAV -585 - - -

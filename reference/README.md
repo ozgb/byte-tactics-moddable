@@ -284,6 +284,57 @@ last tick, an unknown unit type, a build site the game rejects, or a selector
 that names no live unit at its tick exits with status 2 and a message that
 names the line.
 
+## Scripted input
+
+A scenario can send the game raw input, below the UI, so the game's own code turns it into selections and orders.
+One `input` line per event; lines may repeat and accumulate.
+
+```
+input <tick> <event>
+input 18 mouse move 384 240
+input 20 mouse left down 384 240
+input 21 mouse left up 384 240
+input 30 key down ctrl
+input 31 key down 1
+input 32 key up 1
+input 33 key up ctrl
+input 40 char a
+```
+
+- `<tick>` is a game tick from 1 to `ticks`. The event is queued at the start of that tick, after the tick's `order`,
+  `spawn` and `console` lines, and the UI handles it in the next frame, before the phases of tick + 1.
+- Events: `key down <key>` and `key up <key>`; `char <c>`; `mouse move <x> <y>`; `mouse left down <x> <y>`,
+  `mouse left up <x> <y>`, `mouse right down <x> <y>` and `mouse right up <x> <y>`. A mouse position is a window
+  coordinate, `x` from 0 to 639 and `y` from 0 to 479.
+- A `<key>` is a virtual-key code (decimal or `0x` hex, 1 to 255), `shift`, `ctrl`, `alt`, `esc`, `f1` to `f12`, a letter
+  `a` to `z` or a digit `0` to `9`. While Alt is held the key events reach the game as system key events, as Windows
+  sends them.
+- The game reads a letter command from a `char` event, not from a `key` event: the hotkeys `a`, `p`, `s` and `d` need
+  `char a` and so on. The `key` events are for Shift, Ctrl, Alt, Escape and the digits that make and recall groups
+  (Ctrl+1 makes a group, Alt+1 recalls it).
+- The key state and the cursor position the game reads follow the events: a key is held from its `key down` to its
+  `key up`, as a mouse button is held from its `down` to its `up`, and the cursor is where the last mouse event put it.
+  The event time is the tick, not the clock.
+- The game takes one mouse event and one key or `char` event per frame, so a scenario has at most one of each on a
+  tick, and `steps_per_frame` must be 1 (`--steps-per-frame` leaves a scenario with `input` lines at 1). A breach of
+  either, a button released more than 1 tick after its press with no mouse move of at least 32 units from the press position
+  between (the game takes a slow press and release for a click or a box by the wall clock), a bad event, a position outside the window or a tick after the last tick exits with status 2 and a message
+  that names the line.
+- A right-click gives an order only with interface type 1, and a left-click in an order mode only with type 0. A
+  scenario says which it uses with `console 1 +iface 1` or `console 1 +iface 0`; a scenario that does not say plays
+  with type 0.
+- A click on a unit needs the unit's position on the screen. The main view is the rectangle at (128, 32) of the 640 by
+  480 window, so a unit at world `x z` and height `y` is at screen `x - scrollX + 128`, `z - scrollY - y / 2 + 32`.
+  The scroll of slot 0 on The Pass is (304, 32) until the camera moves.
+
+In test mode the exe also writes `ui.txt` beside `trace.txt`: the input it delivered, the orders the UI turned it
+into, and the selection after each tick (format and meaning in [docs/ui-log.md](../docs/ui-log.md)). The harness's own
+`order` lines are not logged. `--check` compares each run's `ui.txt` line by line with `reference/ui/<scenario>.txt`
+and reports the first line that differs. It fails when a stored log has no scenario, when a `ui-*` scenario has no
+stored log, and when a `ui-*` scenario's log has no order, queued build, cancel or group line and selects no unit (a
+click that gives nothing is a broken scenario). A scenario with no stored log is only counted. `--traces` copies the
+logs the reference branch wrote into `reference/ui/`.
+
 ## Console commands
 
 A scenario can type a console command, as the chat line does. One `console` line per command:
@@ -322,6 +373,7 @@ The commands a line may type, by their names in the game's command table (any ca
 | Units | `reload`, `kill`, `assign`, `selectable`, `shootall`, `doubleshot`, `halfshot`, a unit type name |
 | Features and the map | `feature`, `burnone`, `burnall`, `treedeath`, `meteor`, `sealevel`, `edge`, `search`, `move`, `drop` |
 | Sight | `los`, `lostype`, `mapping`, `radar`, `nowisee` |
+| Interface | `iface <0 or 1>`: the interface type, 0 for left-click orders and 1 for right-click orders (see Scripted input) |
 | AI | `reloadaiprofiles` |
 | Game end | `iwin`, `ilose` |
 | No effect | `assert`, `dprint`, `mem`, `zbuffer` |
@@ -330,10 +382,10 @@ The sharing commands, `assert`, `dprint`, `mem`, `zbuffer`, `assign` (nothing is
 `edge` change no field the trace hashes: a scenario types them to enter their functions.
 
 A command that is not in the table, or a first word that is neither a listed command nor a unit type, exits with
-status 2 and a message that names the line. Left out are the display, sound, debugger and host commands (task #398's),
+status 2 and a message that names the line. Left out are the display, sound, debugger and host commands,
 `compression` and `netstats` (network statistics), `sharemapping` and `shareradar` (network games only), and two
 commands that touch the file system: `include` (reads `debugdat\include.txt`) and `printweights` (writes the file
-named in its second argument, so the AI weights dump `DumpPlayerAI` is not reachable). `los` and `mapping` save the
+named in its second argument, so the AI weights dump `DumpPlayerAI` is not reachable). `los`, `mapping` and `iface` save the
 game's settings through the host, which writes the run's own registry, and no scenario reads settings from it.
 
 ## Traces
@@ -447,6 +499,14 @@ seeds) and runs deterministically: two runs give identical traces.
 | trio-anteer-strait | Anteer Strait | 3 | 5400 | Three players on Anteer Strait, players 0 and 1 allied, three minutes, line of sight type 0 |
 | trio-dark-side | Dark Side | 3 | 9000 | Three players on Dark Side, fixed start positions, five minutes |
 | trio-etorrep-glacier | Etorrep Glacier | 3 | 3600 | Three Core players on Etorrep Glacier, random start positions, two minutes |
+| ui-build-menu | The Pass | 2 | 200 | Scripted build menu clicks, the build menu and its queue counts in frames |
+| ui-build-place | The Pass | 2 | 200 | Scripted build placement (`IssueMobileBuildOrders`) |
+| ui-click-select | The Pass | 2 | 120 | Scripted click selection (`input`, interface type 1), the commander and unit panels in frames |
+| ui-drag-select | The Pass | 2 | 200 | Scripted box selection with and without Shift |
+| ui-groups | The Pass | 2 | 300 | Scripted control groups |
+| ui-keys | The Pass | 2 | 300 | Scripted keyboard shortcuts: attack, patrol, special attack, stop, queueing, self-destruct |
+| ui-left-click-orders | The Pass | 2 | 260 | Scripted left-click orders and command characters (interface type 0) |
+| ui-right-click | The Pass | 2 | 260 | Scripted right-click move and attack, the minimap scroll |
 
 ## Stored traces and digests
 

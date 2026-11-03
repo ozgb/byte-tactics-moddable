@@ -1,0 +1,34 @@
+# Four Peewees on The Pass: a drag box selects three, a shift-drag adds one, a drag over nothing clears.
+game_seed 312
+crt_seed 1312
+view_seed 2312
+map The Pass
+start_positions fixed
+ticks 200
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +iface 1
+spawn 2 0 ARMPW 500 300
+spawn 2 0 ARMPW 540 320
+spawn 2 0 ARMPW 580 300
+spawn 2 0 ARMPW 700 250
+input 10 mouse move 300 270
+input 11 mouse left down 300 270
+input 12 mouse move 340 300
+input 13 mouse move 400 330
+input 14 mouse move 430 350
+input 15 mouse left up 430 350
+input 40 mouse move 500 220
+input 41 key down shift
+input 42 mouse left down 500 220
+input 43 mouse move 530 250
+input 44 mouse move 560 280
+input 45 mouse left up 560 280
+input 46 key up shift
+input 70 mouse move 200 100
+input 71 mouse left down 200 100
+input 72 mouse move 230 130
+input 73 mouse move 260 160
+input 74 mouse left up 260 160

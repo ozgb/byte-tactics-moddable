@@ -1,0 +1,7 @@
+bt-sound 1
+0 stop_all - - - - -
+22 play ADDBUILD -585 - - -
+32 play ADDBUILD -585 - - -
+42 play ADDBUILD -585 - - -
+51 play SUBBUILD -585 - - -
+62 play SUBBUILD -585 - - -

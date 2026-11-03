@@ -211,6 +211,7 @@ void __stdcall ShutdownEnvironment(void* param_1);
 void SaveCdLists();
 void ReopenCdAudio();
 void MainFrameTick();
+void __stdcall HarnessDispatchInput();
 void ShutdownMouse();
 void ShutdownGame();
 int __stdcall ParseCommandLine(char* param_1, char* param_2);
@@ -330,6 +331,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                 break;
             if (g_displayContext.active == 0 && (g_game->netGameFlags & 1) == 0)
                 break;
+            HarnessDispatchInput();
             MainFrameTick();
             {
                 DWORD tick = GetTickCount();

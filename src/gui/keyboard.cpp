@@ -115,9 +115,13 @@ void __stdcall PushKeyCode(int v)
 // short result: that is what makes the compiler test the low word with
 // `neg ax` and only mask the low byte. The cases are listed in the order the
 // original emits their blocks; the jump table sorts the case values itself.
+int __stdcall HarnessKeyState(int vk);
+BOOL __stdcall HarnessGetCursorPos(POINT* pt);
+BOOL __stdcall HarnessSetCursorPos(int x, int y);
+
 static short key_state(int vk)
 {
-    return GetAsyncKeyState(vk) & 0xfffe;
+    return HarnessKeyState(vk) & 0xfffe;
 }
 
 // FUNCTION: 0x4c1b80
@@ -237,14 +241,14 @@ void __stdcall SetCursorOverlayEnabled(int param)
 // FUNCTION: 0x4c22f0
 void __stdcall SetCursorPosition(int x, int y)
 {
-    SetCursorPos(x, y);
+    HarnessSetCursorPos(x, y);
 }
 
 // FUNCTION: 0x4c2310
 void __stdcall GetCursorPosition(int* x, int* y)
 {
     POINT pt;
-    GetCursorPos(&pt);
+    HarnessGetCursorPos(&pt);
     *x = pt.x;
     *y = pt.y;
 }

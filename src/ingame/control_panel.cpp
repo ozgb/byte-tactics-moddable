@@ -418,6 +418,9 @@ void __stdcall SetDefaultCommandHandler(void (__stdcall* callback)(int), int mas
 void __stdcall DefaultCommandHandler(int args);
 
 void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
+void __stdcall HarnessUiOrder(unsigned char kind, int remove, const void* unit, const void* target, const int* pos, int typeId, int amount);
+void __stdcall HarnessUiQueue(const char* name, const void* unit, int count);
+BOOL __stdcall HarnessGetCursorPos(POINT* pt);
 void __stdcall IssueOrCancelOrder(MissionType kind, int remove, Unit* owner,
                             int id, Vec3* pos, int typeId, int amount);
 int __stdcall CanBuildAt(UnitType* type, Point16 cell, int a, Player* player);
@@ -539,10 +542,12 @@ void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
         if ((u->flags.raw & 0x10) && (u->def->flags.raw & 0x40)) {
             if (!(u->def->flags.raw & 0x800)) {
+                HarnessUiOrder(MissionType("MOBILEBUILD").index, remove, u, 0, (int*)&pos, index, 0);
                 IssueOrCancelOrder("MOBILEBUILD", remove, u, 0, &pos, index, 0);
             } else {
                 UnitTypeFlagsBits flags = u->def->flags.bits;
                 if (flags.flag_11) {
+                    HarnessUiOrder(MissionType("VTOL_MOBILEBUILD").index, remove, u, 0, (int*)&pos, index, 0);
                     IssueOrCancelOrder("VTOL_MOBILEBUILD", remove, u, 0, &pos, index, 0);
                 }
             }
@@ -1065,17 +1070,11 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
             if (unit->flags.bits.selected) {
                 char text[256];
                 GetGadgetName(entries, text, menu->hotGadgetIndex);
-                if (IsKeyDown(0xf9)) {
-                    if (GetClickMode(menu) == 1)
-                        QueueBuildOrder(text, unit, 5);
-                    else
-                        QueueBuildOrder(text, unit, -5);
-                } else {
-                    if (GetClickMode(menu) == 1)
-                        QueueBuildOrder(text, unit, 1);
-                    else
-                        QueueBuildOrder(text, unit, -1);
-                }
+                int count = IsKeyDown(0xf9) ? 5 : 1;
+                if (GetClickMode(menu) != 1)
+                    count = -count;
+                HarnessUiQueue(text, unit, count);
+                QueueBuildOrder(text, unit, count);
                 if (unit->flags.bits.flag_29
                     || (((UnitType*)unit->weapons[0].weapon)->field_111 & 0x10000000))
                     RefreshBuildCountTexts(menu, unit);
@@ -1952,7 +1951,7 @@ void UpdateEdgeScroll()
     GetCurrentMouseEvent(&mouse);
     Display_0041ce90* d = GetDisplay();
     if (!(d->flags_f0 & 2)) {
-        GetCursorPos(&pt);
+        HarnessGetCursorPos(&pt);
         int w = g_game->screenWidth;
         int h = g_game->screenHeight;
         if ((pt.x >= w || pt.y >= h) && pt.x < w + 100 && pt.y < h + 100

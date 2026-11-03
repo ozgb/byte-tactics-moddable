@@ -79,6 +79,7 @@ extern Game* g_game;
 int __stdcall OrderModeTakesTarget(unsigned char type);
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit,
                                        Unit* target, void* pos);
+void __stdcall HarnessUiOrder(unsigned char kind, int remove, const void* unit, const void* target, const int* pos, int typeId, int amount);
 void __stdcall IssueOrCancelOrder(OrderType kind, int flag, Unit* unit,
                             Unit* target, int* pos, int typeId, int amount);
 
@@ -146,10 +147,12 @@ void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
                         here[0] = pos[0] + u->x - avg[0];
                         here[1] = pos[1];
                         here[2] = pos[2] + u->z - avg[2];
+                        HarnessUiOrder(kind.index, flag_a, u, except, here, typeId, amount);
                         IssueOrCancelOrder(kind, flag_a, u, except, here, typeId, amount);
                         continue;
                     }
                 }
+                HarnessUiOrder(kind.index, flag_a, u, except, pos, typeId, amount);
                 IssueOrCancelOrder(kind, flag_a, u, except, pos, typeId, amount);
             }
         }

@@ -204,6 +204,7 @@ int __stdcall AllocLightTable(App_4b5980* d);
 int __stdcall AllocGrayTable(App_4b5980* d);
 int __stdcall AllocBlueTable(App_4b5980* d);
 long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam, unsigned int lparam);
+unsigned __stdcall HarnessInputTime(unsigned live);
 void __stdcall PushKeyCode(int v);
 void __stdcall HandleVirtualKey(int v, int flag);
 void __stdcall PushMouseEvent(Event_4b5cc0* ev);
@@ -803,7 +804,7 @@ long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
         e.x = lparam & 0xffff;
         e.y = (lparam >> 16) & 0xffff;
         e.buttons = wparam;
-        e.time = GetTickCount() * g_display->tickScale / 1000;
+        e.time = HarnessInputTime(GetTickCount()) * g_display->tickScale / 1000;
         e.flag = 0;
         e.message = msg;
         SetCurrentMouseEvent((int*)&e);
@@ -815,7 +816,7 @@ long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
         e.x = lparam & 0xffff;
         e.y = (lparam >> 16) & 0xffff;
         e.buttons = wparam;
-        e.time = GetTickCount() * g_display->tickScale / 1000;
+        e.time = HarnessInputTime(GetTickCount()) * g_display->tickScale / 1000;
         e.flag = 0;
         break;
     case WM_LBUTTONDBLCLK:
@@ -823,7 +824,7 @@ long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
         e.x = lparam & 0xffff;
         e.y = (lparam >> 16) & 0xffff;
         e.buttons = wparam;
-        e.time = GetTickCount() * g_display->tickScale / 1000;
+        e.time = HarnessInputTime(GetTickCount()) * g_display->tickScale / 1000;
         e.flag = 1;
         break;
     case 0x219:

@@ -1,8 +1,10 @@
 #include <windows.h>
+#include <winuser.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../../interfaces/host.h"
 #include "headless.h"
 
 namespace {
@@ -102,6 +104,33 @@ void UnlockPosts()
 EventRing g_events;
 int g_cursorX = kScreenWidth / 2;
 int g_cursorY = kScreenHeight / 2;
+
+const int kKeyCount = 256;
+
+struct KeyState {
+    bool down;
+    bool pressed;
+};
+
+KeyState g_keys[kKeyCount];
+
+void SetKey(unsigned int vk, bool down)
+{
+    if (vk >= (unsigned int)kKeyCount) {
+        return;
+    }
+    if (down && !g_keys[vk].down) {
+        g_keys[vk].pressed = true;
+    }
+    g_keys[vk].down = down;
+    if (vk == VK_LSHIFT || vk == VK_RSHIFT) {
+        g_keys[VK_SHIFT].down = g_keys[VK_LSHIFT].down || g_keys[VK_RSHIFT].down;
+    } else if (vk == VK_LCONTROL || vk == VK_RCONTROL) {
+        g_keys[VK_CONTROL].down = g_keys[VK_LCONTROL].down || g_keys[VK_RCONTROL].down;
+    } else if (vk == VK_LMENU || vk == VK_RMENU) {
+        g_keys[VK_MENU].down = g_keys[VK_LMENU].down || g_keys[VK_RMENU].down;
+    }
+}
 
 void PushEvent(unsigned int type, unsigned int a, unsigned int b, int x, int y, unsigned int buttons, unsigned int time)
 {
@@ -388,10 +417,67 @@ int HeadlessEventNext(host_event* event)
     return 1;
 }
 
+void HeadlessInject(const host_event* event)
+{
+    unsigned int buttons = 0;
+    unsigned int type = event->type;
+    switch (type) {
+    case HOST_EVENT_KEY_DOWN:
+    case HOST_EVENT_SYS_KEY_DOWN:
+        SetKey(event->a, true);
+        PushEvent(type, event->a, 0, 0, 0, 0, 0);
+        return;
+    case HOST_EVENT_KEY_UP:
+    case HOST_EVENT_SYS_KEY_UP:
+        SetKey(event->a, false);
+        PushEvent(type, event->a, 0, 0, 0, 0, 0);
+        return;
+    case HOST_EVENT_CHAR:
+        PushEvent(type, event->a, 0, 0, 0, 0, 0);
+        return;
+    case HOST_EVENT_LBUTTON_DOWN:
+        SetKey(VK_LBUTTON, true);
+        break;
+    case HOST_EVENT_LBUTTON_UP:
+        SetKey(VK_LBUTTON, false);
+        break;
+    case HOST_EVENT_RBUTTON_DOWN:
+        SetKey(VK_RBUTTON, true);
+        break;
+    case HOST_EVENT_RBUTTON_UP:
+        SetKey(VK_RBUTTON, false);
+        break;
+    case HOST_EVENT_MOUSE_MOVE:
+        break;
+    default:
+        return;
+    }
+    if (g_keys[VK_LBUTTON].down) {
+        buttons |= HOST_BUTTON_LEFT;
+    }
+    if (g_keys[VK_RBUTTON].down) {
+        buttons |= HOST_BUTTON_RIGHT;
+    }
+    if (g_keys[VK_SHIFT].down) {
+        buttons |= HOST_BUTTON_SHIFT;
+    }
+    if (g_keys[VK_CONTROL].down) {
+        buttons |= HOST_BUTTON_CONTROL;
+    }
+    g_cursorX = event->x;
+    g_cursorY = event->y;
+    PushEvent(type, 0, 0, event->x, event->y, buttons, event->time_ms);
+}
+
 int HeadlessKeyState(int vk)
 {
-    (void)vk;
-    return 0;
+    if (vk < 0 || vk >= kKeyCount) {
+        return 0;
+    }
+    KeyState& key = g_keys[vk];
+    int state = (key.down ? 0x8000 : 0) | (key.pressed ? 1 : 0);
+    key.pressed = false;
+    return state;
 }
 
 void HeadlessCursorGet(int* x, int* y)

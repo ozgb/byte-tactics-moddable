@@ -1250,14 +1250,14 @@ struct Game {
             unsigned short bits0_3923b : 2;
             unsigned short flag2_3923b : 1;
             unsigned short bit3_3923b : 1;
-            unsigned short flag4_3923b : 1;
+            unsigned short : 1;
             unsigned short rest_3923b : 11;
         } bits_3923b;
         struct {
             unsigned short bits_3923b : 2;
             unsigned short flag2 : 1;
             unsigned short bit3 : 1;
-            unsigned short flag4 : 1;
+            unsigned short : 1;
             unsigned short flag5 : 1;
             unsigned short flag6 : 1;
             unsigned short rest_3923b : 9;
@@ -1270,13 +1270,14 @@ struct Game {
             unsigned short : 2;
             unsigned short bit2_3923b : 1;
             unsigned short : 1;
-            unsigned short bit4_3923b : 1;
+            unsigned short : 1;
         } bits_3923b_2;
     };
     int playMovie;
     int introMovieLoop;
     int cmdlineSkipIntroMovie;
     int restartMissionRequest;
+    unsigned char endGameVictory;
     Game(void);
     Player* Current(void);
     Player* Current2(void);
@@ -1308,7 +1309,8 @@ inline Player* Game::Current2(void)
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
 #include <stddef.h>
-static_assert(sizeof(Game) == 0x3924d, "Game is 0x3924d bytes");
+static_assert(sizeof(Game) == 0x3924e, "Game is 0x3924e bytes");
+static_assert(offsetof(Game, endGameVictory) == 0x3924d, "endGameVictory");
 static_assert(offsetof(Game, unknown_0) == 0x0, "unknown_0");
 static_assert(offsetof(Game, field_0) == 0x0, "field_0");
 static_assert(offsetof(Game, session) == 0x14, "session");

@@ -1,0 +1,8 @@
+bt-sound 1
+0 stop_all - - - - -
+20 play IMMEDIATEORDERS -585 - - -
+30 play IMMEDIATEORDERS -585 - - -
+40 play IMMEDIATEORDERS -585 - - -
+43 play_file kcarmmov.WAV -585 - - -
+50 play IMMEDIATEORDERS -585 - - -
+60 play IMMEDIATEORDERS -585 - - -

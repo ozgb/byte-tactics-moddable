@@ -3,6 +3,10 @@
 
 class HapiBank;
 
+#ifndef BT_REPLAY_INJECT_GAP_SCALE
+#define BT_REPLAY_INJECT_GAP_SCALE 30.0
+#endif
+
 class MeteorParams {
 public:
     char name[0x20];

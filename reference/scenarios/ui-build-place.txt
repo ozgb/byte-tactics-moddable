@@ -1,0 +1,32 @@
+# The commander's build menu: ARMSOLAR placed at two sites with Shift, then ARMWIN at a third.
+game_seed 318
+crt_seed 1318
+view_seed 2318
+map The Pass
+start_positions fixed
+ticks 200
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +iface 1
+input 10 mouse move 384 240
+input 11 mouse left down 384 240
+input 12 mouse left up 384 240
+input 20 mouse move 32 187
+input 21 mouse left down 32 187
+input 22 mouse left up 32 187
+input 30 key down shift
+input 31 mouse move 464 300
+input 32 mouse left down 464 300
+input 33 mouse left up 464 300
+input 34 mouse move 400 340
+input 35 mouse left down 400 340
+input 36 mouse left up 400 340
+input 37 key up shift
+input 50 mouse move 96 187
+input 51 mouse left down 96 187
+input 52 mouse left up 96 187
+input 60 mouse move 464 380
+input 61 mouse left down 464 380
+input 62 mouse left up 464 380

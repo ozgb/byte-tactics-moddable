@@ -68,7 +68,7 @@ void __stdcall SetMeteorParams(MeteorParams* p)
     g_meteorSpawnMagnitude = p->radius;
     g_meteorSpawnInterval = (int)(30.0 / p->density);
     g_meteorShowerDuration = (int)(p->duration * 30.0);
-    g_meteorScheduleGap = (int)(p->interval * 30.0);
+    g_meteorScheduleGap = (int)(p->interval * BT_REPLAY_INJECT_GAP_SCALE);
 }
 
 static inline Point16 MakePoint(int x, int y)

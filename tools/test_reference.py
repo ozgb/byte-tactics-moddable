@@ -7,6 +7,8 @@ import contextlib
 import io
 import os
 import re
+import subprocess
+import sys
 import tempfile
 import threading
 import unittest
@@ -63,6 +65,68 @@ class SoundLogTest(unittest.TestCase):
             with mock.patch.object(reference, "ROOT", directory.parent):
                 differing, _ = reference.sound_report({"a": Path("a")}, {"a": None}, directory)
         self.assertEqual(differing, ["a"])
+
+
+class UiLogTest(unittest.TestCase):
+    LOG = "bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n22 select 1\n"
+
+    def report(self, files: dict[str, str], scenarios: list[str], logs: dict[str, str | None], known: set[str] | None = None):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "ui"
+            directory.mkdir()
+            for name, text in files.items():
+                (directory / f"{name}.txt").write_text(text)
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                return reference.ui_report({n: Path(n) for n in scenarios}, logs, directory, set(scenarios) if known is None else known)
+
+    def test_equal_logs(self):
+        self.assertIsNone(reference.ui_difference(self.LOG, self.LOG))
+
+    def test_first_differing_line_is_named(self):
+        got = self.LOG.replace("select 1", "select 2")
+        self.assertEqual(reference.ui_difference(self.LOG, got), "ui line 5: stored `22 select 1`, got `22 select 2`")
+
+    def test_a_longer_log_differs_at_the_extra_line(self):
+        self.assertIn("ui line 6: only the got log has it", reference.ui_difference(self.LOG, self.LOG + "23 order Stop unit 1\n"))
+        self.assertIn("ui line 5: only the stored log has it", reference.ui_difference(self.LOG, "bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n"))
+
+    def test_a_log_that_orders_or_selects_nothing_gives_nothing(self):
+        self.assertTrue(reference.ui_gives_nothing("bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n"))
+        self.assertFalse(reference.ui_gives_nothing(self.LOG))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 order Stop unit 1 target - pos - type - param 0 amount 0 remove 0\n"))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 qbuild 2 ARMPW 1\n"))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 group 1 2,3\n"))
+
+    def test_report_counts_unstored_logs_and_fails_on_stored_ones(self):
+        differing, lines = self.report({"same": self.LOG, "other": self.LOG}, ["same", "other", "none"],
+                                       {"same": self.LOG, "other": self.LOG + "x\n", "none": self.LOG})
+        self.assertEqual(differing, ["other"])
+        self.assertIn("1 of 3 equal, 1 differ, 1 with no stored log", lines[-1])
+
+    def test_a_run_with_no_ui_log_differs_from_a_stored_one(self):
+        differing, _ = self.report({"a": self.LOG}, ["a"], {"a": None})
+        self.assertEqual(differing, ["a"])
+
+    def test_a_ui_scenario_needs_a_stored_log(self):
+        differing, lines = self.report({}, ["ui-click"], {"ui-click": self.LOG})
+        self.assertEqual(differing, ["ui-click"])
+        self.assertIn("has no stored UI log", lines[0])
+
+    def test_a_ui_scenario_whose_input_gives_nothing_fails_though_equal(self):
+        log = "bt-ui 1\n1 select -\n20 input mouse left down 384 240\n"
+        differing, lines = self.report({"ui-click": log}, ["ui-click"], {"ui-click": log})
+        self.assertEqual(differing, ["ui-click"])
+        self.assertIn("the input gives no order and selects no unit", lines[0])
+        self.assertEqual(self.report({"other": log}, ["other"], {"other": log})[0], [])
+
+    def test_a_stored_log_with_no_scenario_fails(self):
+        differing, lines = self.report({"a": self.LOG, "gone": self.LOG}, ["a"], {"a": self.LOG}, {"a"})
+        self.assertEqual(differing, ["gone"])
+        self.assertIn("DIFF gone stored UI log has no scenario", lines[0])
+
+    def test_a_subset_does_not_flag_logs_of_scenarios_left_out(self):
+        differing, _ = self.report({"a": self.LOG, "b": self.LOG}, ["a"], {"a": self.LOG}, {"a", "b"})
+        self.assertEqual(differing, [])
 
 
 class FrameTest(unittest.TestCase):
@@ -188,8 +252,10 @@ class StepsPerFrameTest(unittest.TestCase):
             src.mkdir()
             (src / "a.txt").write_text("ticks 5\nmap X")
             (src / "b.txt").write_text("ticks 6\nsteps_per_frame 2\n")
+            (src / "c.txt").write_text("ticks 7\ninput 3 char 97\n")
             copies = reference.with_steps_per_frame(
-                {"a": src / "a.txt", "b": src / "b.txt"}, 5, Path(tmp) / "out")
+                {"a": src / "a.txt", "b": src / "b.txt", "c": src / "c.txt"}, 5, Path(tmp) / "out")
+            self.assertEqual(copies["c"].read_text(), "ticks 7\ninput 3 char 97\n")
             self.assertEqual(copies["a"].read_text(), "ticks 5\nmap X\nsteps_per_frame 5\n")
             self.assertEqual(copies["b"].read_text().splitlines()[-1], "steps_per_frame 5")
             self.assertEqual((src / "a.txt").read_text(), "ticks 5\nmap X")
@@ -253,7 +319,7 @@ class CheckRoundtripTest(unittest.TestCase):
             header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
             stored = (header, [(1, "a" * 16)])
 
-            def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1):
+            def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1, watch=None):
                 seen["text"] = scenarios["a"].read_text()
                 seen["scans"] = scans
                 return {"a": (header, [(1, "a" * 16)], 1.0, None)}
@@ -264,6 +330,7 @@ class CheckRoundtripTest(unittest.TestCase):
                     mock.patch.object(reference.tracedigest, "parse_digest", lambda p: stored), \
                     mock.patch.object(reference, "play_all", fake_play_all), \
                     mock.patch.object(reference, "sound_report", lambda *a: ([], [])), \
+                    mock.patch.object(reference, "ui_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "report_fuel", lambda *a: 0), \
                     contextlib.redirect_stdout(out):
                 reference.check_traces(Path("x.exe"), None, 1, roundtrip="auto")
@@ -301,7 +368,7 @@ class CheckQuirksTest(unittest.TestCase):
             quirk_rows = [(1, "units", "1" * 16), (2, "units", "2" * 16), (2, "players", "9" * 16)]
             off_rows = [(1, "units", "1" * 16), (2, "units", "2" * 16), (2, "players", "3" * 16)]
 
-            def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1):
+            def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1, watch=None):
                 if keep_always:
                     reruns.extend(scenarios)
                     self.rerun_texts = {name: path.read_text() for name, path in scenarios.items()}
@@ -654,6 +721,243 @@ class GateTierTest(unittest.TestCase):
         with contextlib.redirect_stdout(out):
             self.assertEqual(reference.report_block_pointers(Path("TotalA.exe"), {}, True, None), 0)
         self.assertEqual(out.getvalue().strip(), "block pointers: full suite only")
+
+
+class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
+    NAMES = ("a", "b", "c")
+
+    def test_the_other_runs_are_stopped_and_the_report_names_the_tick(self):
+        header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
+        good = [(1, "units", "1" * 16), (2, "units", "2" * 16), (3, "units", "3" * 16), (4, "units", "4" * 16)]
+        bad = good[:1] + [(2, "units", "9" * 16)] + good[2:]
+        stored = (header, reference.tracedigest.digests(good))
+        procs, paths, calls, reported = {}, {}, [], []
+
+        def rows(items):
+            return "bt-trace 3\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in items)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+
+            def fake_play(exe, scenario, game_dir, dump, timeout, poison, scan, collect=(), started=None):
+                name = scenario.stem
+                calls.append(name)
+                trace = tmp / "runs" / name / "trace.txt"
+                trace.parent.mkdir(parents=True)
+                trace.write_text(rows(good[:1]))
+                proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+                procs[name] = proc
+                paths[proc.pid] = trace
+                started(proc)
+                if name == "a":
+                    trace.write_text(rows(bad) + "3 units 33")
+                try:
+                    proc.wait(30)
+                finally:
+                    if proc.poll() is None:
+                        proc.kill()
+                        proc.wait()
+                raise reference.tracediff.Error(f"playtest.py failed (exit {proc.returncode})")
+
+            files = {n: tmp / f"{n}.txt" for n in self.NAMES}
+            for path in files.values():
+                path.write_text("ticks 4\n")
+            (tmp / "traces").mkdir()
+            for n in self.NAMES:
+                (tmp / "traces" / f"{n}.txt").write_text("")
+            out = io.StringIO()
+            status = None
+            with mock.patch.object(reference, "ROOT", tmp), \
+                    mock.patch.object(reference, "scenario_files", lambda: files), \
+                    mock.patch.object(reference, "TRACES", tmp / "traces"), \
+                    mock.patch.object(reference, "WATCH_SECONDS", 0.05), \
+                    mock.patch.object(reference, "game_trace", lambda pid: paths.get(pid)), \
+                    mock.patch.object(reference, "scenario_ticks", lambda s: 4), \
+                    mock.patch.object(reference, "scenario_frames", lambda s: []), \
+                    mock.patch.object(reference, "scenario_saves", lambda s: False), \
+                    mock.patch.object(reference.playtest, "template_prefix"), \
+                    mock.patch.object(reference.tracedigest, "parse_digest", lambda p: stored), \
+                    mock.patch.object(reference.tracediff, "play", fake_play), \
+                    mock.patch.object(reference, "report_divergence", lambda name, *a: reported.append(name) or (_ for _ in ()).throw(SystemExit(1))), \
+                    contextlib.redirect_stdout(out):
+                try:
+                    reference.check_traces(Path("x.exe"), None, 3)
+                except SystemExit as e:
+                    status = e.code
+        self.assertEqual(status, 1)
+        self.assertEqual(sorted(calls), ["a", "b", "c"])
+        self.assertEqual(reported, ["a"])
+        self.assertTrue(all(p.poll() is not None for p in procs.values()))
+        self.assertRegex(out.getvalue(), r"DIFF a \(2 ticks, .*\) tick 2: stored \w{16}, got \w{16}")
+        self.assertIn("stopped: 3 scenarios not finished", out.getvalue())
+
+    def test_a_partial_last_line_is_not_compared(self):
+        tail = reference.tracedigest.TraceTail()
+        text = b"bt-trace 3\nseed 1\n1 units " + b"1" * 16 + b"\n2 units " + b"2" * 16 + b"\n3 un"
+        self.assertEqual(len(tail.feed(text)), 1)
+        self.assertEqual(tail.feed(b"its " + b"3" * 16 + b"\n"), [reference.tracedigest.digests([(2, "units", "2" * 16)])[0]])
+
+
+class GateLockTest(unittest.TestCase):
+    CHILD = (
+        "import sys, time\n"
+        "from pathlib import Path\n"
+        "import reference\n"
+        "with reference.GateLock(Path(sys.argv[1]), Path(sys.argv[2])):\n"
+        "    print('held', flush=True)\n"
+        "    sys.stdin.readline()\n"
+    )
+
+    def release(self, proc):
+        """Let the child leave its lock (it may have left already) and wait for it."""
+        try:
+            proc.stdin.write("\n")
+            proc.stdin.flush()
+        except BrokenPipeError:
+            pass
+        proc.wait(30)
+        proc.stdin.close()
+        proc.stdout.close()
+
+    def start(self, lock, worktree, env):
+        return subprocess.Popen([sys.executable, "-c", self.CHILD, str(lock), worktree], stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE, text=True, env=env)
+
+    def test_the_second_process_waits_and_names_the_first(self):
+        env = dict(os.environ, PYTHONPATH=str(Path(reference.__file__).parent))
+        with tempfile.TemporaryDirectory() as tmp:
+            lock = Path(tmp) / "gate.lock"
+            first = self.start(lock, "/work/first", env)
+            try:
+                self.assertEqual(first.stdout.readline().strip(), "held")
+                second = self.start(lock, "/work/second", env)
+                try:
+                    self.assertEqual(second.stdout.readline().strip(), f"waiting for the gate run of {first.pid} (/work/first)")
+                    self.assertIsNone(second.poll())
+                    self.release(first)
+                    self.assertEqual(second.stdout.readline().strip(), "held")
+                    self.assertIn(f"{second.pid} /work/second", lock.read_text())
+                finally:
+                    self.release(second)
+            finally:
+                if first.poll() is None:
+                    self.release(first)
+
+    def test_the_lock_is_free_after_the_holder_leaves(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            lock = Path(tmp) / "gate.lock"
+            with reference.GateLock(lock, Path("/w")):
+                pass
+            with contextlib.redirect_stdout(io.StringIO()) as out, reference.GateLock(lock, Path("/w")):
+                pass
+            self.assertEqual(out.getvalue(), "")
+
+    def test_the_lock_lives_under_the_runtime_dir_or_tmp(self):
+        with mock.patch.dict(os.environ, {"XDG_RUNTIME_DIR": "/run/user/1"}):
+            self.assertEqual(reference.lock_path(), Path("/run/user/1") / reference.LOCK_FILE)
+        with mock.patch.dict(os.environ):
+            os.environ.pop("XDG_RUNTIME_DIR", None)
+            self.assertEqual(reference.lock_path(), Path("/tmp") / reference.LOCK_FILE)
+
+
+class BothModesTest(unittest.TestCase):
+    def test_tags_name_the_mode(self):
+        self.assertEqual(reference.tag("a", None), "a")
+        self.assertEqual(reference.tag("a", "native"), "a [native]")
+        self.assertEqual(reference.untag("a [native]"), "a")
+        self.assertEqual(reference.mode_of("a [native]"), "native")
+        self.assertIsNone(reference.mode_of("a"))
+        self.assertEqual(reference.default_modes(True), ("wasm", "native"))
+        self.assertEqual(reference.default_modes(False), (None,))
+
+    def test_both_modes_may_run_more_at_once(self):
+        with mock.patch.object(os, "cpu_count", lambda: 64):
+            self.assertEqual(reference.default_parallel(), reference.MAX_PARALLEL)
+            self.assertEqual(reference.default_parallel(True), reference.MAX_PARALLEL_BOTH_MODES)
+        with mock.patch.object(os, "cpu_count", lambda: 4):
+            self.assertEqual(reference.default_parallel(True), 2)
+
+    def test_mode_view_keeps_the_stores_apart(self):
+        store = {"a [wasm]": "w", "a [native]": "n", "b [native]": "m"}
+        scenarios = {"a": Path("a.txt"), "b": Path("b.txt")}
+        self.assertEqual(reference.mode_view(store, scenarios, "wasm"), {"a": "w"})
+        self.assertEqual(reference.mode_view(store, scenarios, "native"), {"a": "n", "b": "m"})
+
+    def test_the_watch_judges_a_native_run_against_the_scenarios_digests_and_names_the_mode(self):
+        header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
+        good = [(1, "units", "1" * 16), (2, "units", "2" * 16)]
+        expected = {"a": (header, reference.tracedigest.digests(good))}
+        with tempfile.TemporaryDirectory() as tmp:
+            trace = Path(tmp) / "trace.txt"
+            trace.write_text("bt-trace 3\n1 units " + "1" * 16 + "\n2 units " + "9" * 16 + "\n3 units " + "3" * 16 + "\n")
+            proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+            watch = reference.Watch(expected, lambda pid: trace)
+            try:
+                watch.started("a [native]")(proc)
+                watch.poll()
+                self.assertTrue(watch.halted.is_set())
+                self.assertEqual(watch.found.name, "a [native]")
+                self.assertIn("tick 2", watch.found.diff)
+            finally:
+                proc.kill()
+                proc.wait()
+
+    def test_a_run_stores_its_scan_sound_and_fuel_under_its_tag(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp) / "run"
+            run.mkdir()
+            (run / "trace.txt").write_text("bt-trace 3\ngame_seed 1\ncrt_seed 1\nview_seed 1\n1 units " + "1" * 16 + "\n")
+            (run / "blockptrs.txt").write_text("scan")
+            (run / "sound.txt").write_text("header\n")
+            (run / reference.UI_FILE).write_text("ui\n")
+            scans = {}
+            with mock.patch.object(reference, "scenario_frames", lambda s: []), \
+                    mock.patch.object(reference, "scenario_saves", lambda s: False), \
+                    mock.patch.object(reference, "scenario_ticks", lambda s: 1), \
+                    mock.patch.object(reference.tracediff, "play", lambda *a, **k: run), \
+                    mock.patch.dict(reference.SOUND_LOGS), mock.patch.dict(reference.UI_LOGS), mock.patch.dict(reference.FUEL):
+                reference.play_scenario(Path("x.exe"), Path("s.txt"), None, scans=scans, mode="native")
+                self.assertEqual(scans, {"s [native]": "scan"})
+                self.assertEqual(reference.SOUND_LOGS["s [native]"], "header\n")
+                self.assertEqual(reference.UI_LOGS["s [native]"], "ui\n")
+                self.assertIn("s [native]", reference.FUEL)
+
+    def play(self, modes, loads=None, differ=None):
+        calls, lock = [], threading.Lock()
+        loads = loads or {}
+
+        def fake_play_scenario(exe, scenario, game_dir, want, poison, keep_always, scans, scan_every, retry_any,
+                               save_to=None, load_from=None, watch=None, mode=None):
+            with lock:
+                calls.append((scenario.stem, mode))
+            reference.SOUND_LOGS[reference.tag(scenario.stem, mode)] = f"{mode}\n"
+            return {}, [], 0.0, None
+
+        scenarios = {n: Path(f"{n}.txt") for n in ("a", "b", "c")}
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(reference, "ROOT", Path(tmp)), \
+                mock.patch.object(reference, "scenario_ticks", lambda s: 100), \
+                mock.patch.object(reference.playtest, "template_prefix"), \
+                mock.patch.object(reference.tracediff, "scenario_load", lambda s: loads.get(s.stem)), \
+                mock.patch.object(reference.tracediff, "save_put", lambda *a: {}), \
+                mock.patch.object(reference, "play_scenario", fake_play_scenario):
+            results = reference.play_all(Path("x.exe"), scenarios, None, 2, modes=modes)
+        return calls, results
+
+    def test_every_scenario_is_played_once_in_each_mode(self):
+        calls, results = self.play(("wasm", "native"))
+        self.assertEqual(sorted(calls), sorted((n, m) for n in "abc" for m in ("wasm", "native")))
+        self.assertEqual(sorted(results), sorted(f"{n} [{m}]" for n in "abc" for m in ("wasm", "native")))
+
+    def test_the_default_plays_each_scenario_once_with_no_mode(self):
+        calls, results = self.play((None,))
+        self.assertEqual(sorted(calls), [("a", None), ("b", None), ("c", None)])
+        self.assertEqual(sorted(results), ["a", "b", "c"])
+
+    def test_a_loader_is_played_in_its_savers_mode_after_the_others(self):
+        calls, _ = self.play(("wasm", "native"), loads={"c": "a"})
+        order = [call for call in calls]
+        self.assertEqual({order[-2], order[-1]}, {("c", "wasm"), ("c", "native")})
 
 
 class TracediffCommandTest(unittest.TestCase):

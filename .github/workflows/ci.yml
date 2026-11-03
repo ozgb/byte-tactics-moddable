@@ -64,6 +64,11 @@ jobs:
       - name: Test the full-suite cadence tool
         run: python3 tools/test_fullgate.py
 
+      - name: Replay schema
+        run: |
+          python3 tools/test_replayschema.py
+          python3 tools/replayschema.py --check
+
       - name: Data notes cite no line numbers
         run: |
           python3 tools/test_citecheck.py

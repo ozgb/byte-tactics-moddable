@@ -7,9 +7,9 @@
 `--check --exe` plays every scenario in reference/scenarios/ (`--parallel N` at a
 time, default half the CPUs and at most 6 (10 with `--both-modes`), under Wine through tools/playtest.py)
 and compares the digest of each tick (tools/tracedigest.py) with the stored one. It also compares
-each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md).
+each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md), and each run's ui.txt with reference/ui/<scenario>.txt the same way (docs/ui-log.md).
 A scenario with a `frames` line also has its frame dumps compared, byte for byte, with reference/frames/<scenario>/ (docs/frame-dump.md); a missing stored frame fails.
-and the harness.sav of each scenario with a `save` line with
+It also compares the harness.sav of each scenario with a `save` line with
 reference/saves/<scenario>.sav, when that file exists, by decoded contents (tools/savefile.py leaves out the bytes taken from the clock or from uninitialised memory).
 On the first difference it builds the reference from the commit the trace
 records, prints tools/tracediff.py's report for that scenario and exits 1. A
@@ -38,7 +38,7 @@ lines to every scenario: at the end of tick T the run copies the sim block and c
 `--traces` checks out origin/reference in build/reference/branch, runs that
 branch's own `tools/reference.py HEAD --traces` there (it links the matching
 build with the original compiler and plays the scenarios), and copies the
-traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ (if it wrote any), the
+traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ (if it wrote any), the UI logs it wrote into reference/ui/, the
 frames it wrote into reference/frames/ (if it wrote any) and the saves it wrote into reference/saves/ (if it wrote any).
 Set WINEARCH=win64 for Wine; `--game-dir` names the game's
 install.
@@ -72,6 +72,10 @@ SCENARIOS = ROOT / "reference/scenarios"
 TRACES = ROOT / "reference/traces"
 SOUNDS = ROOT / "reference/sounds"
 SOUND_FILE = "sound.txt"
+UIS = ROOT / "reference/ui"
+UI_FILE = "ui.txt"
+UI_PREFIX = "ui-"
+UI_EFFECTS = ("order", "qbuild", "cancel", "group", "groupsel")
 FRAMES = ROOT / "reference/frames"
 FRAME_HEADER_SIZE = 16
 FRAME_PALETTE_SIZE = 1024
@@ -116,6 +120,7 @@ BLOCK_POINTERS_TIER_TEXT = "block pointers: full suite only"
 FUEL_FILE = "fuel.txt"
 FUEL: dict[str, dict[str, tuple[int, int]]] = {}
 SOUND_LOGS: dict[str, str | None] = {}
+UI_LOGS: dict[str, str | None] = {}
 FRAME_DUMPS: dict[str, dict[int, bytes]] = {}
 SAVE_BYTES: dict[str, bytes | None] = {}
 MODES = ("wasm", "native")
@@ -246,7 +251,7 @@ def keep_run(run: Path, scenario: str, suffix: str = "") -> Path:
     """Copy the run's trace.txt (and dump.txt and blockptrs.txt, if any) to build/scratch/check-<scenario>-<time>/."""
     kept = ROOT / "build/scratch" / f"check-{scenario}{suffix}-{time.strftime('%Y%m%d-%H%M%S')}"
     kept.mkdir(parents=True, exist_ok=True)
-    for name in ("trace.txt", SOUND_FILE, "dump.txt", "blockptrs.txt"):
+    for name in ("trace.txt", SOUND_FILE, UI_FILE, "dump.txt", "blockptrs.txt"):
         if (run / name).is_file():
             shutil.copy2(run / name, kept / name)
     return kept
@@ -540,7 +545,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     for attempt in range(RUN_ATTEMPTS):
         try:
             frame_files = tuple(f"frames/{tick}.bin" for tick in scenario_frames(scenario))
-            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, *frame_files, *dict.fromkeys(
+            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, *frame_files, *dict.fromkeys(
                 (*(tracediff.SAVE_FILES if save_to is not None else ()), *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if watch is not None:
                 extra["started"] = watch.started(key)
@@ -566,6 +571,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         FUEL[key] = parse_fuel(run / FUEL_FILE)
         sound_log = run / SOUND_FILE
         SOUND_LOGS[key] = sound_log.read_text() if sound_log.is_file() else None
+        ui_log = run / UI_FILE
+        UI_LOGS[key] = ui_log.read_text() if ui_log.is_file() else None
         FRAME_DUMPS[key] = {tick: (run / "frames" / f"{tick}.bin").read_bytes()
                             for tick in scenario_frames(scenario) if (run / "frames" / f"{tick}.bin").is_file()}
         if scenario_saves(scenario):
@@ -696,12 +703,15 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
 
 
 def with_steps_per_frame(scenarios: dict[str, Path], steps: int, directory: Path) -> dict[str, Path]:
-    """Copies of the scenarios in `directory`, each ending with a steps_per_frame line (a later line replaces an earlier one)."""
+    """Copies of the scenarios in `directory`, each ending with a steps_per_frame line (a later line replaces an earlier one), except a scenario with an `input` line, which stays at 1."""
     directory.mkdir(parents=True, exist_ok=True)
     copies = {}
     for name, path in scenarios.items():
         text = path.read_text()
         copies[name] = directory / path.name
+        if any(line.split(None, 1)[:1] == ["input"] for line in text.splitlines()):
+            copies[name].write_text(text)
+            continue
         copies[name].write_text(text + ("" if text.endswith("\n") else "\n") + f"steps_per_frame {steps}\n")
     return copies
 
@@ -791,6 +801,70 @@ def sound_report(scenarios: dict[str, Path], logs: dict[str, str | None], direct
         else:
             equal += 1
     lines.append(f"sound logs: {equal} of {len(scenarios)} equal, {len(differing)} differ, {len(unstored)} with no stored log in {directory.relative_to(ROOT)}")
+    return differing, lines
+
+
+def ui_difference(stored: str, got: str) -> str | None:
+    """Where two UI logs first differ (a line number with both lines), or None when they are equal."""
+    want, have = stored.splitlines(), got.splitlines()
+    for number, (a, b) in enumerate(zip(want, have), 1):
+        if a != b:
+            return f"ui line {number}: stored `{a}`, got `{b}`"
+    if len(want) != len(have):
+        number = min(len(want), len(have)) + 1
+        longer, which = (want, "stored") if len(want) > len(have) else (have, "got")
+        return f"ui line {number}: only the {which} log has it (`{longer[number - 1]}`)"
+    return None
+
+
+def ui_gives_nothing(log: str) -> bool:
+    """Whether a UI log has no order, queued build, cancel or group line and never selects a unit (a broken ui scenario)."""
+    for line in log.splitlines():
+        words = line.split()
+        if len(words) >= 2 and words[1] in UI_EFFECTS:
+            return False
+        if len(words) >= 3 and words[1] == "select" and words[2] != "-":
+            return False
+    return True
+
+
+def ui_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path,
+              known: set[str] | None = None) -> tuple[list[str], list[str]]:
+    """(the scenarios whose UI log fails, the report lines).
+
+    A scenario fails when its stored log in `directory` differs from the run's, when its name starts with ui- and it
+    has no stored log or its run's log gives no order and selects nothing, and a stored log with no scenario (among
+    `known`, default every scenario file) is reported too. Other scenarios without a stored log are only counted.
+    """
+    known = set(scenario_files()) if known is None else known
+    differing: list[str] = []
+    lines: list[str] = []
+    unstored: list[str] = []
+    equal = 0
+    for name in scenarios:
+        stored = directory / f"{name}.txt"
+        got = logs.get(name)
+        ui_scenario = name.startswith(UI_PREFIX)
+        if not stored.is_file():
+            if ui_scenario:
+                differing.append(name)
+                lines.append(f"DIFF {name} has no stored UI log in {directory.relative_to(ROOT)}")
+            else:
+                unstored.append(name)
+            continue
+        diff = ui_difference(stored.read_text(), got) if got is not None else f"the run wrote no {UI_FILE}"
+        if not diff and ui_scenario and ui_gives_nothing(got or ""):
+            diff = "the input gives no order and selects no unit"
+        if diff:
+            differing.append(name)
+            lines.append(f"DIFF {name} {diff}")
+        else:
+            equal += 1
+    for path in sorted(directory.glob("*.txt")) if directory.is_dir() else []:
+        if path.stem not in known:
+            differing.append(path.stem)
+            lines.append(f"DIFF {path.stem} stored UI log has no scenario of that name")
+    lines.append(f"ui logs: {equal} of {len(scenarios)} equal, {len(differing)} differ, {len(unstored)} with no stored log in {directory.relative_to(ROOT)}")
     return differing, lines
 
 
@@ -959,17 +1033,20 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
                 bad.append(key)
     total = len(scenarios) * len(modes)
     print(f"{total - len(bad)} of {total} scenarios equal, total {clock(wall)}")
-    sound_bad = frame_bad = save_bad = 0
+    sound_bad = ui_bad = frame_bad = save_bad = 0
     pointers = 0
     for mode in modes:
         label = f"[{mode}] " if both_modes else ""
         sound_names, sound_lines = sound_report(scenarios, mode_view(SOUND_LOGS, scenarios, mode), SOUNDS)
         print("\n".join(label + line for line in sound_lines))
+        ui_names, ui_lines = ui_report(scenarios, mode_view(UI_LOGS, scenarios, mode), UIS)
+        print("\n".join(label + line for line in ui_lines))
         frame_names, frame_lines = frame_report(scenarios, mode_view(FRAME_DUMPS, scenarios, mode), FRAMES)
         print("\n".join(label + line for line in frame_lines))
         save_names, save_lines = save_report(scenarios, mode_view(SAVE_BYTES, scenarios, mode), SAVES)
         print("\n".join(label + line for line in save_lines))
         sound_bad += len(sound_names)
+        ui_bad += len(ui_names)
         frame_bad += len(frame_names)
         save_bad += len(save_names)
         if scans is None:
@@ -978,7 +1055,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
             pointers += report_block_pointers(exe, mode_view(scans, scenarios, mode), tier, save_blockptrs / mode if save_blockptrs and both_modes else save_blockptrs, label)
         pointers += report_fuel(exe, scenarios, mode_view(FUEL, scenarios, mode), mode == "native" if both_modes else None, label)
     if not bad:
-        if pointers or sound_bad or frame_bad or save_bad:
+        if pointers or sound_bad or ui_bad or frame_bad or save_bad:
             sys.exit(1)
         if tier:
             print(tier_message(len(scenarios), head_commit()))
@@ -1171,6 +1248,20 @@ def copy_saves(directory: Path) -> None:
     print(f"{len(saves)} saves copied to {SAVES.relative_to(ROOT)}")
 
 
+def copy_ui(directory: Path) -> None:
+    """Replace reference/ui/ by the UI logs the reference branch checkout `directory` wrote (none written leaves it as it is)."""
+    logs = sorted((directory / "reference/ui").glob("*.txt"))
+    if not logs:
+        print("the reference branch wrote no UI logs; reference/ui/ is untouched")
+        return
+    UIS.mkdir(parents=True, exist_ok=True)
+    for old in UIS.glob("*.txt"):
+        old.unlink()
+    for path in logs:
+        shutil.copyfile(path, UIS / path.name)
+    print(f"{len(logs)} UI logs copied to {UIS.relative_to(ROOT)}")
+
+
 def write_traces(game_dir: str | None, parallel: int) -> None:
     directory = reference_branch()
     branch_scenarios = directory / "reference/scenarios"
@@ -1195,6 +1286,7 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
     print(f"{len(produced)} traces copied to {TRACES.relative_to(ROOT)}")
     copy_frames(directory / "reference/frames")
     copy_saves(directory)
+    copy_ui(directory)
     sounds = sorted((directory / "reference/sounds").glob("*.txt"))
     if not sounds:
         print("the reference branch wrote no sound logs; reference/sounds/ is untouched")

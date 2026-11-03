@@ -88,6 +88,7 @@ int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, Player* player);
 #include "../map/terrain.h"
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 #include "../orders/order_list.h"
+#include "../harness/harness.h"
 int __stdcall FindGadgetIndexBySubstring(int value, char* name);
 int __stdcall FindGadgetIndexBySubstring(Gadget* entries, char* name);
 void __stdcall SetGadgetStatus(Gui* menu, int index, int value);
@@ -173,9 +174,11 @@ void __stdcall IssueMobileBuildOrders(MouseEvent* arg)
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
         if ((u->flags & 0x10) && (((UnitDef*)u->def.get())->flags1 & 0x40)) {
             if (!(((UnitDef*)u->def.get())->flags1 & 0x800)) {
+                HarnessUiOrder(MissionType("MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
                 IssueOrCancelOrder("MOBILEBUILD", remove, u, 0, &pos, index, 0);
             } else {
                 if (((UnitDef*)u->def.get())->flying) {
+                    HarnessUiOrder(MissionType("VTOL_MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
                     IssueOrCancelOrder("VTOL_MOBILEBUILD", remove, u, 0, &pos, index, 0);
                 }
             }
@@ -648,17 +651,11 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
             if (unit->selected) {
                 char text[256];
                 GetGadgetName(entries, text, menu->hotGadgetIndex);
-                if (IsKeyDown(0xf9)) {
-                    if (GetClickMode(menu) == 1)
-                        QueueBuildOrder(text, unit, 5);
-                    else
-                        QueueBuildOrder(text, unit, -5);
-                } else {
-                    if (GetClickMode(menu) == 1)
-                        QueueBuildOrder(text, unit, 1);
-                    else
-                        QueueBuildOrder(text, unit, -1);
-                }
+                int count = IsKeyDown(0xf9) ? 5 : 1;
+                if (GetClickMode(menu) != 1)
+                    count = -count;
+                HarnessUiQueue(text, unit, count);
+                QueueBuildOrder(text, unit, count);
                 if (unit->immobile
                     || (unit->weapons[0].weapon.get()->flags.value & 0x10000000))
                     RefreshBuildCountTexts(menu, unit);

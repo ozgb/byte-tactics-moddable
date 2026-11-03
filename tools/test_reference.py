@@ -67,6 +67,68 @@ class SoundLogTest(unittest.TestCase):
         self.assertEqual(differing, ["a"])
 
 
+class UiLogTest(unittest.TestCase):
+    LOG = "bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n22 select 1\n"
+
+    def report(self, files: dict[str, str], scenarios: list[str], logs: dict[str, str | None], known: set[str] | None = None):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "ui"
+            directory.mkdir()
+            for name, text in files.items():
+                (directory / f"{name}.txt").write_text(text)
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                return reference.ui_report({n: Path(n) for n in scenarios}, logs, directory, set(scenarios) if known is None else known)
+
+    def test_equal_logs(self):
+        self.assertIsNone(reference.ui_difference(self.LOG, self.LOG))
+
+    def test_first_differing_line_is_named(self):
+        got = self.LOG.replace("select 1", "select 2")
+        self.assertEqual(reference.ui_difference(self.LOG, got), "ui line 5: stored `22 select 1`, got `22 select 2`")
+
+    def test_a_longer_log_differs_at_the_extra_line(self):
+        self.assertIn("ui line 6: only the got log has it", reference.ui_difference(self.LOG, self.LOG + "23 order Stop unit 1\n"))
+        self.assertIn("ui line 5: only the stored log has it", reference.ui_difference(self.LOG, "bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n"))
+
+    def test_a_log_that_orders_or_selects_nothing_gives_nothing(self):
+        self.assertTrue(reference.ui_gives_nothing("bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n"))
+        self.assertFalse(reference.ui_gives_nothing(self.LOG))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 order Stop unit 1 target - pos - type - param 0 amount 0 remove 0\n"))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 qbuild 2 ARMPW 1\n"))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 group 1 2,3\n"))
+
+    def test_report_counts_unstored_logs_and_fails_on_stored_ones(self):
+        differing, lines = self.report({"same": self.LOG, "other": self.LOG}, ["same", "other", "none"],
+                                       {"same": self.LOG, "other": self.LOG + "x\n", "none": self.LOG})
+        self.assertEqual(differing, ["other"])
+        self.assertIn("1 of 3 equal, 1 differ, 1 with no stored log", lines[-1])
+
+    def test_a_run_with_no_ui_log_differs_from_a_stored_one(self):
+        differing, _ = self.report({"a": self.LOG}, ["a"], {"a": None})
+        self.assertEqual(differing, ["a"])
+
+    def test_a_ui_scenario_needs_a_stored_log(self):
+        differing, lines = self.report({}, ["ui-click"], {"ui-click": self.LOG})
+        self.assertEqual(differing, ["ui-click"])
+        self.assertIn("has no stored UI log", lines[0])
+
+    def test_a_ui_scenario_whose_input_gives_nothing_fails_though_equal(self):
+        log = "bt-ui 1\n1 select -\n20 input mouse left down 384 240\n"
+        differing, lines = self.report({"ui-click": log}, ["ui-click"], {"ui-click": log})
+        self.assertEqual(differing, ["ui-click"])
+        self.assertIn("the input gives no order and selects no unit", lines[0])
+        self.assertEqual(self.report({"other": log}, ["other"], {"other": log})[0], [])
+
+    def test_a_stored_log_with_no_scenario_fails(self):
+        differing, lines = self.report({"a": self.LOG, "gone": self.LOG}, ["a"], {"a": self.LOG}, {"a"})
+        self.assertEqual(differing, ["gone"])
+        self.assertIn("DIFF gone stored UI log has no scenario", lines[0])
+
+    def test_a_subset_does_not_flag_logs_of_scenarios_left_out(self):
+        differing, _ = self.report({"a": self.LOG, "b": self.LOG}, ["a"], {"a": self.LOG}, {"a", "b"})
+        self.assertEqual(differing, [])
+
+
 class FrameTest(unittest.TestCase):
     WIDTH, HEIGHT = 4, 3
 
@@ -190,8 +252,10 @@ class StepsPerFrameTest(unittest.TestCase):
             src.mkdir()
             (src / "a.txt").write_text("ticks 5\nmap X")
             (src / "b.txt").write_text("ticks 6\nsteps_per_frame 2\n")
+            (src / "c.txt").write_text("ticks 7\ninput 3 char 97\n")
             copies = reference.with_steps_per_frame(
-                {"a": src / "a.txt", "b": src / "b.txt"}, 5, Path(tmp) / "out")
+                {"a": src / "a.txt", "b": src / "b.txt", "c": src / "c.txt"}, 5, Path(tmp) / "out")
+            self.assertEqual(copies["c"].read_text(), "ticks 7\ninput 3 char 97\n")
             self.assertEqual(copies["a"].read_text(), "ticks 5\nmap X\nsteps_per_frame 5\n")
             self.assertEqual(copies["b"].read_text().splitlines()[-1], "steps_per_frame 5")
             self.assertEqual((src / "a.txt").read_text(), "ticks 5\nmap X")
@@ -266,6 +330,7 @@ class CheckRoundtripTest(unittest.TestCase):
                     mock.patch.object(reference.tracedigest, "parse_digest", lambda p: stored), \
                     mock.patch.object(reference, "play_all", fake_play_all), \
                     mock.patch.object(reference, "sound_report", lambda *a: ([], [])), \
+                    mock.patch.object(reference, "ui_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "report_fuel", lambda *a: 0), \
                     contextlib.redirect_stdout(out):
                 reference.check_traces(Path("x.exe"), None, 1, roundtrip="auto")
@@ -844,15 +909,17 @@ class BothModesTest(unittest.TestCase):
             (run / "trace.txt").write_text("bt-trace 3\ngame_seed 1\ncrt_seed 1\nview_seed 1\n1 units " + "1" * 16 + "\n")
             (run / "blockptrs.txt").write_text("scan")
             (run / "sound.txt").write_text("header\n")
+            (run / reference.UI_FILE).write_text("ui\n")
             scans = {}
             with mock.patch.object(reference, "scenario_frames", lambda s: []), \
                     mock.patch.object(reference, "scenario_saves", lambda s: False), \
                     mock.patch.object(reference, "scenario_ticks", lambda s: 1), \
                     mock.patch.object(reference.tracediff, "play", lambda *a, **k: run), \
-                    mock.patch.dict(reference.SOUND_LOGS), mock.patch.dict(reference.FUEL):
+                    mock.patch.dict(reference.SOUND_LOGS), mock.patch.dict(reference.UI_LOGS), mock.patch.dict(reference.FUEL):
                 reference.play_scenario(Path("x.exe"), Path("s.txt"), None, scans=scans, mode="native")
                 self.assertEqual(scans, {"s [native]": "scan"})
                 self.assertEqual(reference.SOUND_LOGS["s [native]"], "header\n")
+                self.assertEqual(reference.UI_LOGS["s [native]"], "ui\n")
                 self.assertIn("s [native]", reference.FUEL)
 
     def play(self, modes, loads=None, differ=None):

@@ -46320,7 +46320,6 @@ address,function,file,kind,target
 ,HarnessCrtSeed,src/harness/harness.cpp,function,
 ,HarnessCrtSeed,src/harness/harness.cpp,global_read,s_crtSeed@src/harness/harness.cpp
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,Fail
-,HarnessFrameDrawn,src/harness/harness.cpp,call,FormatPath
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,GameU32
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,MakeDirectoryPath

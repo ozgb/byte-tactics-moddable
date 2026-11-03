@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4693 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 4707 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -25,13 +25,13 @@ The subsystems and the issue each maps to:
 | [targeting](#targeting) | 11 | #16 |
 | [los_radar](#los_radar) | 80 | #17 |
 | [orders](#orders) | 374 | #18 |
-| [units](#the-remaining-subsystems) | 205 | none yet |
+| [units](#the-remaining-subsystems) | 206 | none yet |
 | [players](#the-remaining-subsystems) | 143 | none yet |
 | [map](#the-remaining-subsystems) | 106 | none yet |
 | [network](#the-remaining-subsystems) | 342 | none yet |
-| [game](#the-remaining-subsystems) | 243 | none yet |
+| [game](#the-remaining-subsystems) | 250 | none yet |
 | [harness](#the-remaining-subsystems) | 281 | none yet |
-| [presentation](#the-remaining-subsystems) | 1423 | none yet |
+| [presentation](#the-remaining-subsystems) | 1429 | none yet |
 | [platform](#the-remaining-subsystems) | 817 | none yet |
 | [seams](#the-remaining-subsystems) | 110 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
@@ -124,10 +124,10 @@ Coverage: 93.1% of functions (27 of 29), 79.2% of lines, 43.8% of branches; 2 li
 
 - files (4): `HapiBank::OpenNamedBox`, `HapiBank::SeekBox`, `HapiBank::ReadBox`, `HapiBank::WriteBox`
 - los_radar (3): `CmdShareMapping`, `CmdShareRadar`, `GetMapCell`
-- network (3): `AddMessage`, `BroadcastPlayerInfo`, `SendShareMapInfo`
+- game (2): `IsPlaying`, `RecordMessage`
+- network (2): `BroadcastPlayerInfo`, `SendShareMapInfo`
 - players (2): `TransferEnergy`, `TransferMetal`
 - seams (2): `SetStateBitsNative`, `StartScriptWithArgsNative`
-- game (1): `SetStartingStorageBonusInline`
 - platform (1): `CommandArgs::GetIntArg`
 
 **Sim writes.** 31 items in all, 31 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
@@ -180,10 +180,10 @@ Coverage: 97.7% of functions (43 of 44), 83.4% of lines, 70.3% of branches; 1 li
 
 - platform (15): `TdfRecord::GetFieldString`, `RandomInt`, `TdfFile::~TdfFile`, `operator delete`, and 11 more
 - files (9): `HapiBank::GetBoxSize`, `HapiBank::OpenAccount`, `HapiBank::OpenNamedBox`, `HapiBank::SeekBox`, and 5 more
-- presentation (6): `InitGafSequence`, `FindGafEntry`, `LoadGaf`, `EmitTimedSubParticles`, and 2 more
-- game (5): `GameRand`, `RecordTimedSubParticles`, `SimAllocTagged`, `SimRealloc`, `StepGafSequence`
+- game (7): `GameRand`, `RecordSoundAtName`, `RecordTimedSubParticles`, `RecordWhiteSmoke`, `SimAllocTagged`, `SimRealloc`, `StepGafSequence`
 - seams (5): `GetGameTypeNative`, `GetGroundHeightNative`, `ApplyAreaDamageAtNative`, `FindWeaponByNameNative`, and 1 more
 - network (4): `NetSendFeatureHit`, `NetSendFeatureKilled`, `NetSendFeatureBurning`, `NetSendFeatureReclaimed`
+- presentation (4): `FindGafEntry`, `GetGafSequenceFrame`, `InitGafSequence`, `LoadGaf`
 - units (2): `CreateObjectState`, `FreeObjectState`
 - los_radar (1): `GetMapCell`
 - map (1): `RefreshAllPassMaps`
@@ -349,8 +349,8 @@ Coverage: 84.2% of functions (80 of 95), 86.9% of lines, 70.9% of branches; 15 l
 
 - platform (27): `RandomInt`, `GameFreeThunk`, `operator new`, `operator-`, and 23 more
 - seams (11): `StartScriptWithArgsNative`, `StartScriptNative`, `GetCellMeanHeightNative`, `MarkOwnerNetDirtyFromDamageSplitNative`, and 7 more
-- presentation (10): `AllocFrame`, `BuildLensFrame`, `EmitSmoke`, `FindGafEntry`, and 6 more
-- game (7): `GameRand`, `RecordBuildMenuUpdate`, `RecordCdActivity`, `RecordScreenShake`, `RecordWeaponSmoke`, `SimAllocTagged`, `StepGafSequence`
+- game (10): `GameRand`, `RecordBuildMenuUpdate`, `RecordCdActivity`, `RecordScreenShake`, `RecordSmoke`, `RecordSoundAt`, `RecordWeaponSmoke`, `RecordWhiteSmoke`, `SimAllocTagged`, `StepGafSequence`
+- presentation (7): `AllocFrame`, `BuildLensFrame`, `FindGafEntry`, `GetGafFrame`, `InitGafSequence`, `Load3do`, `MirrorObject`
 - network (5): `NetSendWeaponFire`, `NetSendUnitDamage`, `NetSendProjectileDetonated`, `NetSendWeaponFireAt`, `SendScriptCallByName`
 - units (3): `GetPieceOffset`, `GetPiecePosition`, `MarkRecentlyDamaged`
 - los_radar (2): `GetMapCellAtPosition`, `GetMapCell`
@@ -456,10 +456,10 @@ Coverage: 94.8% of functions (55 of 58), 87.7% of lines, 75.5% of branches; 3 li
 - platform (16): `GameFreeThunk`, `StringRef::Assign`, `operator delete`, `GameAllocIgnoreTag`, and 12 more
 - presentation (11): `BuildTedRadarFrame`, `DrawCircle`, `DrawDashedCircle`, `DrawFrame`, and 7 more
 - features (5): `FreeFeaturePool`, `InitFeatureAnimPool`, `PlaceFeature`, `PlaceMissionFeatures`, and 1 more
-- game (4): `Game::Current`, `SaveSettings`, `SimAlloc`, `SimAllocTagged`
+- game (5): `Game::Current`, `RecordMessage`, `SaveSettings`, `SimAlloc`, `SimAllocTagged`
 - seams (3): `GetGroundHeightNative`, `GetNameSlotNative`, `VisitObjectsInRangeNative`
 - ai (2): `HasReadyUnitInRange`, `IsPointVisible`
-- network (2): `AddMessage`, `BroadcastPlayerInfo`
+- network (1): `BroadcastPlayerInfo`
 
 **Sim writes.** 92 items in all, 87 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
@@ -547,7 +547,7 @@ Coverage: 84.7% of functions (311 of 367), 82.2% of lines, 64.8% of branches; 56
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (205 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 64 functions are called from outside; the busiest are `FindUnitTypeId` (18), `GetNanoPiecePosition` (15), `AttachUnitToPiece` (10). It is called most by game (22 distinct functions) and seams (18). It imports 161 functions, mostly platform (49), presentation (13), seams (22) and files (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 81.9% of functions (145 of 177), 85.8% of lines, 73.4% of branches; 32 live functions no scenario enters, and 32 more are dead (data/coverage.csv). The list of those 32 is under **units, functions no scenario enters** below.
+**units** (206 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 64 functions are called from outside; the busiest are `FindUnitTypeId` (18), `GetNanoPiecePosition` (15), `AttachUnitToPiece` (10). It is called most by game (22 distinct functions) and seams (18). It imports 160 functions, mostly platform (49), presentation (8), seams (22) and files (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 81.9% of functions (145 of 177), 85.8% of lines, 73.4% of branches; 32 live functions no scenario enters, and 32 more are dead (data/coverage.csv). The list of those 32 is under **units, functions no scenario enters** below.
 
 **units, functions no scenario enters** (32 of 177 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 145 are entered, 81.9%), by reason:
 
@@ -582,7 +582,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Multiplayer lobby and menus only (5): `Mission::GetTerrainSizeTier` (the lobby colour), `Mission::GetDescription`, `Mission::GetPlanet`, `Mission::GetTranslatedName` and `Mission::HasMissionName` (the map list and mission menus). Test mode calls only `LoadMissionByName`.
 - Campaign menu, end screen and restart only (5): `Mission::GetBriefing`, `Mission::SelectMission`, `Mission::MissionExists`, `Mission::AdvanceMission` and `Mission::GetMissionIndex`.
 
-**network** (342 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 96 functions are called from outside, mostly by presentation (54) and game (30); the busiest are `BroadcastPacket` (5), `BroadcastPlayerInfo` (19), `AddMessage` (14). It imports 121 functions: platform 51, presentation 24, players 9, units 9. Its packet handlers write many sim items (284 in all).
+**network** (342 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 96 functions are called from outside, mostly by presentation (54) and game (30); the busiest are `BroadcastPacket` (5), `BroadcastPlayerInfo` (19), `AddMessage` (8). It imports 121 functions: platform 51, presentation 24, players 9, units 9. Its packet handlers write many sim items (284 in all).
 
 **network, functions no scenario enters** (243 of 297 after `save-midgame` (#422) and `allied-victory` (#432), and the six `console-` scenarios (#445); 54 are entered, 18.2%), by reason:
 
@@ -594,7 +594,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Command-line switch only (2): `Onl_LoadConfigFile`, `SetPacketRate`. Switches a scenario cannot pass (`-blockscan` and the network options).
 - Entered by the console scenarios (#445): `SendShareEnergy`, `SendShareMetal`, `SendPacketToPlayer`, `FindSlotByDpidInSendPacketToPlayer`, `PlayerReady` and `Player::SetType`, which the console commands `Give` and `AI` reach.
 
-**game** (243 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 136 functions are called from outside, by platform (76 distinct functions) and presentation (27); the busiest are `SetCursorMode` (19), `SimAllocTagged` (18), `AllocSite::~AllocSite` (12). It imports 475 functions, the most of any subsystem, 219 of them from presentation, then platform 98, network 30, files 23 and units 22.
+**game** (250 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 143 functions are called from outside, by platform (76 distinct functions) and presentation (27); the busiest are `SetCursorMode` (19), `SimAllocTagged` (18), `AllocSite::~AllocSite` (12). It imports 475 functions, the most of any subsystem, 219 of them from presentation, then platform 98, network 30, files 23 and units 22.
 
 **game, functions no scenario enters** (72 of 221 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 149 are entered, 67.4%), by reason:
 
@@ -632,9 +632,9 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **harness** (281 functions). The test harness of #3 (`src/harness`). No phase root. 21 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 62 functions (game 16, platform 24).
 
-**presentation** (1423 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 286 functions are called from outside, mostly by game (219 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (12). It imports 343 functions: platform 158, network 54, files 32, game 27, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
+**presentation** (1429 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 281 functions are called from outside, mostly by game (219 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (12). It imports 343 functions: platform 158, network 54, files 32, game 27, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
-**platform** (817 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 305 functions are called from outside, by presentation (158 distinct functions), game (98), network (51) and units (49); the busiest are `GameFreeThunk` (163), `operator new` (121), `operator delete` (86), then `Translate` (77) and `GameAllocIgnoreTag` (76). It imports 179 functions: game 76, presentation 46.
+**platform** (817 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 304 functions are called from outside, by presentation (158 distinct functions), game (98), network (51) and units (49); the busiest are `GameFreeThunk` (163), `operator new` (121), `operator delete` (86), then `Translate` (77) and `GameAllocIgnoreTag` (76). It imports 179 functions: game 76, presentation 46.
 
 **seams** (110 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 105 functions are called from outside. It imports 104 functions.
 
@@ -650,7 +650,7 @@ Sim records an event with `RecordSimEvent(kind, flags, args, count)`, a service 
 
 An event with more than six arguments (up to twelve) takes a second record straight after the first, with flag bit 15 set (`SIM_EVENT_CONTINUED`) and the seventh to twelfth arguments. Both records are recorded or neither: a queue with room for one only drops the event. The drain reads the pair as one event. The arguments below are listed as one run, in order, and a number in brackets is the count of values (a position is three: x, y, z, as fixed-point integers).
 
-Presentation drains the queue at fixed points, in every mode: at the start of each frame (`MainFrameTick`), before the speech pump, which is the first reader of speech; on entry to `RunGameSteps`; in each step after every phase from 1 to 7 (the drain after phase 7 comes before the camera follow and the particle update); and at each step's end, before the step is closed, for what the later parts of the step recorded (the resource sharing of network play, the blink and the expiry of eyeballs); and in `FreeUnitMemory`, before the units are freed, for what the kills of a game's shutdown recorded (a layout change and the units' last speech), which name units by index. The frame-start and entry drains take what was recorded outside any step (the units placed at the start of a match, which speak at once; a build menu change, a screen redraw, a line of speech from an order). Nothing is recorded between the last step's closing drain and the end of the call, so there is no drain after the loop. A drain takes the records in order, oldest first, and acts on each as the call it replaced did. Each drain sits before the first reader of what was recorded, because 3.1c applied these effects inline, where they were recorded: the speech pump reads the speech queue at the start of the next frame, and the camera follow and the particle update read shakes and new particles in the same step. A re-implementation must keep these drain points: draining later moves the shake and the first update of new particles by a step, which the traces cannot see but the stored frames can. Drawing from the view random stream, the only stream presentation draws from, moves with the effect to the drain, and it is not hashed. The drain after each phase, and not one after the last, is there for the order of those draws: in 3.1c every emitter draws when it is called, so the draws of a phase come before the draws of the next phase, and a draw made inline by a later phase (a puff of smoke from the projectiles) must come after the queued effects of the earlier phases (the wake of a ship). A drain only after phase 7 let the inline draw come first, which swapped the values two emitters received; every later shake offset and particle timer then differed, 20 to 35 ticks before any count of draws did. Until #620 queues the smoke and thrust emitters that sim still calls inline (`EmitSmoke`, `EmitTimedBlackSmoke`, `EmitWhiteSmoke`, `EmitBlackSmoke` and `EmitJitteredThrustParticles`), each of them drains the queue first, so that the events recorded before the call have drawn. The view draws are counted in the UI log (`view` record, docs/ui-log.md), and the check compares them with the reference tick by tick.
+Presentation drains the queue at fixed points, in every mode: at the start of each frame (`MainFrameTick`), before the speech pump, which is the first reader of speech; on entry to `RunGameSteps`; in each step after every phase from 1 to 7 (the drain after phase 7 comes before the camera follow and the particle update); and at each step's end, before the step is closed, for what the later parts of the step recorded (the resource sharing of network play, the blink and the expiry of eyeballs); and in `ShutdownIngameSystems`, after the kill of every unit and before `FreeUnitMemory` frees the units, for what the kills of a game's shutdown recorded (a layout change and the units' last speech), which name units by index. The frame-start and entry drains take what was recorded outside any step (the units placed at the start of a match, which speak at once; a build menu change, a screen redraw, a line of speech from an order). Nothing is recorded between the last step's closing drain and the end of the call, so there is no drain after the loop. A drain takes the records in order, oldest first, and acts on each as the call it replaced did. Each drain sits before the first reader of what was recorded, because 3.1c applied these effects inline, where they were recorded: the speech pump reads the speech queue at the start of the next frame, and the camera follow and the particle update read shakes and new particles in the same step. A re-implementation must keep these drain points: draining later moves the shake and the first update of new particles by a step, which the traces cannot see but the stored frames can. Drawing from the view random stream, the only stream presentation draws from, moves with the effect to the drain, and it is not hashed. The drain after each phase, and not one after the last, is there for the order of those draws: in 3.1c every emitter draws when it is called, so the draws of a phase come before the draws of the next phase, and a draw made inline by a later phase (a puff of smoke from the projectiles) must come after the queued effects of the earlier phases (the wake of a ship). A drain only after phase 7 let the inline draw come first, which swapped the values two emitters received; every later shake offset and particle timer then differed, 20 to 35 ticks before any count of draws did. The view draws are counted in the UI log (`view` record, docs/ui-log.md), and the check compares them with the reference tick by tick.
 
 When the queue is full, a test-mode run ends with a fatal error naming the queue, so that a scenario can never lose an event unseen. When playing, the new event is dropped and counted. The most that one step recorded in the 65 scenarios of the suite is 123 records, and the first drain after a load held 352 (336 plumes over the geothermal vents of one map, recorded while the features were placed), so the ring holds more than eleven times the larger count.
 

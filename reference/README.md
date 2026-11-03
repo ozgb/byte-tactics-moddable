@@ -549,6 +549,13 @@ line names the mode. `--tier` is still one mode, unless it is given `--both-mode
 A `--check` takes an exclusive lock on `$XDG_RUNTIME_DIR/bt-gate.lock` (`/tmp/bt-gate.lock` without it) for its whole run,
 so that a machine plays one gate at a time: a second one prints `waiting for the gate run of <pid> (<worktree>)` and
 starts when the first ends. `--no-lock` skips the lock, for a run that is not a gate.
+A passing `--check` is cached: its output, date and commit go to `~/.cache/bt-gate/<key>.txt` (shared by every worktree on the machine),
+where the key is a SHA-256 of the exe, `wasmtime_host.dll`, the `.wasm` modules and `modules.json` beside it, `reference/scenarios`, `traces`,
+`sounds`, `ui`, `frames` and `saves`, `tools/reference.py`, `playtest.py`, `tracediff.py` and `tracedigest.py`, and the options that change what is played
+(tier, mode, `--steps-per-frame`, `--quirks`, `--roundtrip`, `--poison`); the `commit.txt` beside the exe is not part of it. A failing run writes nothing.
+The key is looked up before the lock and again after it, so a run that waited behind a gate of the same inputs reports that gate's pass. On a hit
+`--check` prints `cached pass from <date> at <commit>` and the stored lines and exits 0; this counts as a gate run, and the pull request body says "cached".
+`--no-cache` plays anyway. (A `--both-modes` run exits 1 until #654, so it caches nothing yet.)
 `uv run tools/wasm_modules.py glue-fatal --game-dir ~/.ta` (Wine only, not in CI) runs the exe on a bogus `meteor.tdf` and checks that the module's `FatalError` ends the game with exit code 2 after `wl_call` returned.
 `--check` without `--exe` is an error, since `moddable` does not build the
 reference. Add `--game-dir <dir>` when the game is not in a Steam directory.

@@ -20,6 +20,10 @@ scenarios named in GATE_TIER, the pull request gate (tools/coverage.py --tier ch
 mode, the sound logs and block pointer scans are kept apart per mode) and passes only when both modes equal the stored traces.
 A `--check` holds an exclusive lock on $XDG_RUNTIME_DIR/bt-gate.lock (else /tmp) for the whole run, so that one machine plays
 one gate at a time; a second one prints `waiting for the gate run of <pid> (<worktree>)` and waits. `--no-lock` skips it.
+A passing `--check` stores its output under ~/.cache/bt-gate/<key>.txt, the key being a SHA-256 of the exe, the files beside it
+(wasmtime_host.dll, *.wasm, modules.json), reference/{scenarios,traces,sounds,ui,frames,saves}, the four tools that play and compare
+(commit.txt is left out) and the options; a later `--check` with the same key, looked up before the lock and again after it, prints
+`cached pass from <date> at <commit>` and the stored lines and exits 0. `--no-cache` plays anyway.
 
 Every scenario is played with new game allocations zeroed (the game's own -memset=0 switch, through
 tools/playtest.py --testmode). `--check --native-modules` runs the exe's modules as native code (-modules=native) instead of in WASM. `--check --poison` fills them with 0xCD instead (-memset=0xcdcdcdcd); a
@@ -47,6 +51,7 @@ install.
 import argparse
 import contextlib
 import fcntl
+import hashlib
 import os
 import re
 import shutil
@@ -58,6 +63,7 @@ import time
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 
 import blockpointers
@@ -125,6 +131,10 @@ FRAME_DUMPS: dict[str, dict[int, bytes]] = {}
 SAVE_BYTES: dict[str, bytes | None] = {}
 MODES = ("wasm", "native")
 LOCK_FILE = "bt-gate.lock"
+CACHE_ENV = "BT_GATE_CACHE"
+KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/frames", "reference/saves")
+KEY_TOOLS = ("tools/reference.py", "tools/playtest.py", "tools/tracediff.py", "tools/tracedigest.py")
+KEY_RUNTIME_FILES = ("wasmtime_host.dll", "modules.json")
 RETRY_DIALOG = "dialog-directx"
 WATCH_SECONDS = 0.5
 STOP_SECONDS = 30
@@ -348,6 +358,89 @@ def default_modes(both_modes: bool) -> tuple[str | None, ...]:
 def lock_path() -> Path:
     """The file the gate lock is taken on: under $XDG_RUNTIME_DIR, else /tmp."""
     return Path(os.environ.get("XDG_RUNTIME_DIR") or "/tmp") / LOCK_FILE
+
+
+def cache_dir() -> Path:
+    """The directory of cached passes, shared by every worktree on the machine: $BT_GATE_CACHE, else ~/.cache/bt-gate."""
+    return Path(os.environ.get(CACHE_ENV) or Path.home() / ".cache/bt-gate")
+
+
+def hash_tree(digest, root: Path, relative: str) -> None:
+    """Feed the paths and contents of every file under root/relative to digest, in path order."""
+    base = root / relative
+    for path in sorted(base.rglob("*")) if base.is_dir() else []:
+        if path.is_file():
+            digest.update(f"{path.relative_to(root).as_posix()}\0".encode())
+            digest.update(path.read_bytes())
+            digest.update(b"\0")
+
+
+def gate_key(exe: Path, options: dict[str, object], root: Path = ROOT) -> str:
+    """The SHA-256 of what decides a --check's result: the exe, the runtime files and modules beside it, the stored
+    scenarios, traces, logs and frames, the tools that play and compare, and the options (commit.txt is left out)."""
+    digest = hashlib.sha256()
+    beside = sorted([exe.parent / n for n in KEY_RUNTIME_FILES] + list(exe.parent.glob("*.wasm")))
+    for path in [exe] + beside:
+        digest.update(f"{path.name}\0".encode())
+        digest.update(path.read_bytes() if path.is_file() else b"-")
+        digest.update(b"\0")
+    for relative in KEY_TREES:
+        hash_tree(digest, root, relative)
+    for relative in KEY_TOOLS:
+        digest.update(f"{relative}\0".encode())
+        digest.update((root / relative).read_bytes())
+        digest.update(b"\0")
+    for name in sorted(options):
+        digest.update(f"{name}={options[name]!r}\0".encode())
+    return digest.hexdigest()
+
+
+def cached_pass(key: str) -> str | None:
+    """The stored report of a passing run of key (its first lines are `date`, `commit`), or None."""
+    path = cache_dir() / f"{key}.txt"
+    return path.read_text() if path.is_file() else None
+
+
+def store_pass(key: str, output: str, commit: str, now: datetime | None = None) -> Path:
+    """Write the report of a passing run under key: the date, the commit, then the output."""
+    directory = cache_dir()
+    directory.mkdir(parents=True, exist_ok=True)
+    date = (now or datetime.now(timezone.utc)).strftime("%Y-%m-%d %H:%M:%S UTC")
+    path = directory / f"{key}.txt"
+    temporary = path.with_name(f"{path.name}.{os.getpid()}")
+    temporary.write_text(f"date: {date}\ncommit: {commit}\n{output}")
+    os.replace(temporary, path)
+    return path
+
+
+def report_cached(stored: str) -> None:
+    """Print `cached pass from <date> at <commit>` and the stored output."""
+    lines = stored.split("\n", 2)
+    date = lines[0].removeprefix("date: ")
+    commit = lines[1].removeprefix("commit: ")
+    print(f"cached pass from {date} at {commit}")
+    sys.stdout.write(lines[2] if len(lines) > 2 else "")
+
+
+class Tee:
+    """A stdout that also keeps what was written to it."""
+
+    def __init__(self, stream):
+        self.stream = stream
+        self.parts: list[str] = []
+
+    def write(self, text: str) -> int:
+        self.parts.append(text)
+        return self.stream.write(text)
+
+    def flush(self) -> None:
+        self.stream.flush()
+
+    def __getattr__(self, name: str):
+        return getattr(self.stream, name)
+
+    def text(self) -> str:
+        return "".join(self.parts)
 
 
 class GateLock:
@@ -1311,6 +1404,8 @@ def main() -> None:
                     help="--check: play every scenario twice in one pool, once with the modules in WASM and once with -modules=native, and pass only when both modes equal the stored traces (the gate)")
     ap.add_argument("--no-lock", action="store_true",
                     help="--check: do not take the machine-wide gate lock (by default a second --check on the machine waits for the first), for runs that are not gates")
+    ap.add_argument("--no-cache", action="store_true",
+                    help="--check: play even when the same exe, files and options passed before (by default a cached pass in ~/.cache/bt-gate is reported instead)")
     ap.add_argument("--poison", action="store_true",
                     help="--check: play the scenarios with new game allocations filled with 0xCD; list the bytes whose starting value reaches hashed state; a difference is expected for real uninitialised reads")
     ap.add_argument("--quirks", metavar="SPEC",
@@ -1340,6 +1435,8 @@ def main() -> None:
         ap.error("--both-modes needs --check, and cannot be combined with --native-modules or --quirks")
     if args.no_lock and not args.check:
         ap.error("--no-lock needs --check")
+    if args.no_cache and not args.check:
+        ap.error("--no-cache needs --check")
     if args.native_modules:
         os.environ["BT_NATIVE_MODULES"] = "1"
     if args.save_blockptrs and (not args.check or args.quirks is not None):
@@ -1371,9 +1468,31 @@ def main() -> None:
         ap.error("--check needs --exe: the gate is the modern build, --exe build/modern/TotalA.exe")
     if not Path(args.exe).is_file():
         ap.error(f"{args.exe} is not a file")
+    exe = Path(args.exe).resolve()
+    key = None
+    if not args.no_cache and not args.save_blockptrs:
+        key = gate_key(exe, {"tier": args.tier, "mode": "both" if args.both_modes else "native" if args.native_modules else "wasm",
+                             "steps_per_frame": args.steps_per_frame, "quirks": args.quirks, "roundtrip": args.roundtrip,
+                             "poison": args.poison}, ROOT)
+        stored = cached_pass(key)
+        if stored is not None:
+            report_cached(stored)
+            return
     with contextlib.nullcontext() if args.no_lock else GateLock():
-        check_traces(Path(args.exe).resolve(), args.game_dir, args.parallel, args.tier, args.poison, args.steps_per_frame,
-                     args.quirks, args.save_blockptrs, args.roundtrip, args.both_modes)
+        if key is not None:
+            stored = cached_pass(key)
+            if stored is not None:
+                report_cached(stored)
+                return
+        tee = Tee(sys.stdout)
+        sys.stdout = tee
+        try:
+            check_traces(exe, args.game_dir, args.parallel, args.tier, args.poison, args.steps_per_frame,
+                         args.quirks, args.save_blockptrs, args.roundtrip, args.both_modes)
+        finally:
+            sys.stdout = tee.stream
+        if key is not None:
+            store_pass(key, tee.text(), head_commit())
 
 
 if __name__ == "__main__":

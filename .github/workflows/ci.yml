@@ -81,6 +81,9 @@ jobs:
       LLVM_VERSION: 22.1.8
       LLVM_SHA256: df0e1ecf16caf3489a272a5eea4eec9b0d82878f6477fa309504f918a0006384
       UV_VERSION: 0.12.19
+      RUST_VERSION: 1.99.1
+      WASM_TOOLS_VERSION: 1.262.0
+      WASM_TOOLS_SHA256: 655b8df67d54c3ef9b52fc237c4e94bbfbb5f5f43825245cb0940a7002a9ed65
       BT_NO_ORIG: 1
       BT_NO_GHIDRA: 1
       BT_NO_ZLIB: 1
@@ -152,7 +155,23 @@ jobs:
         if: steps.changed.outputs.run == 'true'
         run: cmake --build build/modern --target game data bitexact block_test ref_test replay_test replay_native_test
 
-      - name: Run block_test, ref_test, replay_test and the native replays under Wine
+      - name: Install the WASM toolchain
+        if: steps.changed.outputs.run == 'true'
+        run: |
+          sudo apt-get install -y --no-install-recommends gcc-mingw-w64-i686 wabt
+          rustup toolchain install "$RUST_VERSION" --profile minimal --target wasm32-unknown-unknown,i686-pc-windows-gnu
+          rustup default "$RUST_VERSION"
+          url="https://github.com/bytecodealliance/wasm-tools/releases/download/v$WASM_TOOLS_VERSION/wasm-tools-$WASM_TOOLS_VERSION-x86_64-linux.tar.gz"
+          curl -fSL -o "$RUNNER_TEMP/wasm-tools.tar.gz" "$url"
+          echo "$WASM_TOOLS_SHA256  $RUNNER_TEMP/wasm-tools.tar.gz" | sha256sum -c -
+          mkdir -p build/tools/bin
+          tar -xzf "$RUNNER_TEMP/wasm-tools.tar.gz" -C build/tools/bin --strip-components=1 "wasm-tools-$WASM_TOOLS_VERSION-x86_64-linux/wasm-tools"
+
+      - name: Build the WASM runtime and the injected wind_meteors module
+        if: steps.changed.outputs.run == 'true'
+        run: cmake --build build/modern --target wasm_runtime wasm_runtime_inject
+
+      - name: Run block_test, ref_test, replay_test and the native and WASM replays under Wine
         if: steps.changed.outputs.run == 'true'
         env:
           WINEDEBUG: -all
@@ -172,6 +191,12 @@ jobs:
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_self.log"
           wine build/modern/replay_inject_test.exe --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/meteors-hailstorm.wind_meteors.txt | tee "$RUNNER_TEMP/replay_inject.log"
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_inject.log"
+          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm tests/replay/*.txt | tee "$RUNNER_TEMP/replay_wasm.log"
+          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_wasm.log"
+          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm --self-test tests/replay/meteors-hailstorm.wind_meteors.txt | tee "$RUNNER_TEMP/replay_wasm_self.log"
+          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_wasm_self.log"
+          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors_inject.wasm --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/meteors-hailstorm.wind_meteors.txt | tee "$RUNNER_TEMP/replay_wasm_inject.log"
+          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_wasm_inject.log"
 
       - name: Check data/rwsets.csv is current
         if: steps.changed.outputs.run == 'true'

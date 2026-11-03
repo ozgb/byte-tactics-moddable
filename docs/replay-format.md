@@ -72,7 +72,7 @@ generator streams of the block head and `g_randomSeed`; they are in the sets of 
 ## Replaying
 
 `tests/replay_native_test.cpp` replays a recording against the native module (`replay_native_test.exe`, built by
-`cmake --build build/modern --target replay_native_test`, run under Wine in `modern-compile`):
+`cmake --build build/modern --target replay_native_test`, run under Wine in `modern-compile`, with the WASM replays below):
 
 ```sh
 wine build/modern/replay_native_test.exe tests/replay/*.txt
@@ -85,3 +85,22 @@ A call that differs is reported with the first import or field that differs and 
 there. Each file is replayed twice and the two results must be identical. `--self-test FILE` mutates the recording
 and expects each mutation reported; `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built with one
 changed constant and expects that divergence.
+
+### Against the WASM module
+
+`--wasm MODULE.wasm` replays the same recordings against `wind_meteors.wasm` instead of the native module, with the
+same import formatting, comparisons and checks:
+
+```sh
+cmake --build build/modern --target wasm_runtime wasm_runtime_inject
+wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm tests/replay/*.txt
+wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors_inject.wasm --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/meteors-hailstorm.wind_meteors.txt
+```
+
+`tests/replay_wasm.cpp` loads the module through `lib/wasmloader` as `src/wasm/modules.cpp` does in the game: the
+`wasmtime_host.dll` and `modules.json` beside the module file are used, the sim block of the module's memory is attached
+as the replayer's block, and the slots are called through the seam `src/wasm/wind_meteors_glue.cpp` builds. That glue is
+the only wind_meteors part of it; its imports are answered by the replayer's recorded imports, as for the native module.
+Each replay of a file loads the module afresh, so the two runs of a file start from the same state. A trap or a fuel
+overrun stops the run with `FAIL`. `wind_meteors_inject.wasm` is the module built with `BT_REPLAY_INJECT_GAP_SCALE=31.0`
+(`wasm_modules.py build-variant`), and the divergence is reported at the same call and field as for the native one.

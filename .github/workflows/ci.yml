@@ -148,11 +148,11 @@ jobs:
           uv run tools/test_tidy.py
           uv run tools/tidy.py "origin/$BASE_REF...HEAD"
 
-      - name: Compile the game, data, bitexact, block_test and ref_test
+      - name: Compile the game, data, bitexact, block_test, ref_test and replay_test
         if: steps.changed.outputs.run == 'true'
-        run: cmake --build build/modern --target game data bitexact block_test ref_test
+        run: cmake --build build/modern --target game data bitexact block_test ref_test replay_test
 
-      - name: Run block_test and ref_test under Wine
+      - name: Run block_test, ref_test and replay_test under Wine
         if: steps.changed.outputs.run == 'true'
         env:
           WINEDEBUG: -all
@@ -162,7 +162,7 @@ jobs:
           sudo dpkg --add-architecture i386
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends wine wine32:i386
-          for t in block_test ref_test; do
+          for t in block_test ref_test replay_test; do
             wine "build/modern/$t.exe" | tee "$RUNNER_TEMP/$t.log"
             grep -q "^$t: all passed" "$RUNNER_TEMP/$t.log"
           done

@@ -16,8 +16,8 @@ failure. `record wind_meteors <first tick> <last tick>` records only the calls w
 
 ## Lines
 
-Text, LF line endings. The header is three lines: `bt-replay 1`, `subsystem wind_meteors 1.2` (the interface
-version) and `scenario <name>`.
+Text, LF line endings. The header is two lines: `bt-replay 1` and `subsystem wind_meteors 1.2` (the interface
+version). The file name carries the scenario.
 
 A call is a line `call <ticks> <Slot>`, where `ticks` is `Game.ticks` when the call starts (`-` before the
 game record exists) and `Slot` is a slot of the interface. Calls are in the order they start. A slot called by
@@ -29,8 +29,9 @@ call and has no line of its own. The lines of a call, indented by two spaces, in
 | `r <field> <value>` | a field of the slot's read set that differs from the last known value of that field |
 | `a <name> <value>` | an argument of the slot that is not in the block (`MeteorParams`, `CommandArgs`, the stream) |
 | `i <import> <arguments> = <result>` | one import call, in call order; its index is its position among the `i` lines of the call |
-| `o <name> <value>` | a value the import wrote through a pointer argument, right after its `i` line |
+| `o <name> <value>` | right after an `i` line: a value the import wrote through a pointer argument or reached through its result |
 | `w <field> <value>` | a field of the slot's write set that differs from the last known value after the call |
+| `o <name> <value>` | last in the call: a value the slot wrote through its own pointer argument (`LoadMeteorDefaults`) |
 
 A call without any such line is idle. The last known value of a field is the one on the latest `r` or `w` line
 of any earlier call, or the call's own tick for `Game.ticks`. A field with no known value counts as different.

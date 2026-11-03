@@ -41,6 +41,7 @@ static inline int FixedField(TdfRecord* record, char* key, int def)
 }
 
 #include "../../interfaces/services.h"
+#include "../../interfaces/host.h"
 
 #include "../orders/mission_type.h"
 #include "../../interfaces/seams.h"
@@ -56,7 +57,6 @@ struct MissionHolder {
 #include "../../link/globals.h"
 
 #include "unit_commands.h"
-void __stdcall GetLocalizedString(void* parser, char* dst, char* key, int size, char* def);
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"
 void __stdcall FreeCobScript(void* param_1);
@@ -97,7 +97,6 @@ static TdfFile* s_weaponTdfParsers;
 static int s_weaponTdfLoadedCount;
 static int s_weaponTdfAllocCount;
 
-void __stdcall ShowErrorBox(const char* text, const char* caption);
 
 #define COPYRIGHT "Copyright 0000 Humongous Entertainment. All rights reserved."
 
@@ -247,7 +246,7 @@ int __stdcall LoadUnitInfo()
     }
     g_game->unitDefCount = count;
     if (oldcount != count && !bad)
-        ShowErrorBox(Translate("Incompatible units found.  They will be ignored.  Please download the latest version of the game."), DAT_005119b8);
+        host_message(nullptr, "Error", Translate("Incompatible units found.  They will be ignored.  Please download the latest version of the game."), HOST_MESSAGE_TOPMOST);
     ProtectBlockReadOnly(g_game->defs);
     return 1;
 }

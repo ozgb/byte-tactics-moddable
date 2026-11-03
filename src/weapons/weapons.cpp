@@ -255,8 +255,6 @@ void __stdcall UntrackProjectile(Projectile* projectile)
 
 #include "../ingame/control_panel.h"
 void __stdcall AddExplosionEffect(Vec3* position, void* value, int a, int b);
-void __stdcall EmitWhiteSmoke(Vec3* position, int value);
-void __stdcall PlaySoundAt(unsigned int sound, Vec3* position, int value);
 // FUNCTION: 0x499eb0
 void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
 {
@@ -285,12 +283,12 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
     }
     RecordScreenShake(type->shakeMagnitude, type->shakeMagnitude, type->shakeDuration);
     if (hostile && !unit) {
-        PlaySoundAt(type->soundWater, position, 0);
+        RecordSoundAt(type->soundWater, *position);
         AddExplosionEffect(position, type->splash, 0, hostile);
     } else {
-        PlaySoundAt(type->soundHit, position, 0);
+        RecordSoundAt(type->soundHit, *position);
         if (type->flags.b.endSmoke)
-            EmitWhiteSmoke(position, 9);
+            RecordWhiteSmoke(*position, 9);
         else
             AddExplosionEffect(position, type->explosionSeq, 0, hostile);
     }
@@ -769,7 +767,6 @@ Projectile* AllocProjectile()
 
 
 #include "../units/unit_scripts.h"
-void __stdcall PlaySoundAt(int sound, Vec3* pos, int param_3);
 
 // FUNCTION: 0x49c740
 void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
@@ -803,7 +800,7 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
         proj->owner = 0xa;
         proj->attacker = 0;
     }
-    PlaySoundAt(shot->sound, pos, 0);
+    RecordSoundAt(shot->sound, *pos);
 }
 
 static inline void ClearTrackedProjectile(Projectile* proj)
@@ -2184,7 +2181,7 @@ void UpdateProjectiles()
                     *q = *p;
                     q->spawnTick = (unsigned int)g_game->ticks;
                     if (type->flags.b.soundTrigger)
-                        PlaySoundAt(type->sound, &p->position, 0);
+                        RecordSoundAt(type->sound, p->position);
                     if (type->lifetime != 0)
                         q->time = (unsigned int)g_game->ticks + type->lifetime;
                     else
@@ -2276,7 +2273,7 @@ void UpdateProjectiles()
                 } else if (type->flags.b.burnBlow) {
                     DetonateProjectile(p, nullptr);
                 } else {
-                    EmitWhiteSmoke(&p->position, 9);
+                    RecordWhiteSmoke(p->position, 9);
                     Remove(p);
                 }
             } else {
@@ -2299,7 +2296,7 @@ void UpdateProjectiles()
 
         if (!p->flagBits.dead) {
             if (type->flags.b.smokeTrail && p->time > (unsigned int)g_game->ticks && p->nextSmokeTick < (unsigned int)g_game->ticks) {
-                EmitWhiteSmoke(&p->position, 9);
+                RecordWhiteSmoke(p->position, 9);
                 p->nextSmokeTick += type->smokeRate;
             }
             if (oldY > g_game->seaLevel && p->positionWords.yWhole <= g_game->seaLevel) {

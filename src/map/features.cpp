@@ -98,6 +98,7 @@ struct Model {
 
 #include "../game/game.h"
 #include "../state/sim_effects.h"
+#include "../../interfaces/services.h"
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
@@ -123,11 +124,9 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot1
                              unsigned char owner);
 #include "features.h"
 #include "../util/math.h"
-void __stdcall PlaySoundAtByName(char* name, Vec3* pos, int param_3);
 #include "../network/net_game.h"
 int __stdcall StepGafSequence(Handle* anim);
 GafFrame* __stdcall GetGafSequenceFrame(Handle* anim);
-void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
 #include "../graphics/particles.h"
 
 // FUNCTION: 0x421e60
@@ -555,7 +554,7 @@ void __stdcall StartFeatureBurning(int x, int z, int flag)
     pos.x = x << 20;
     pos.z = z << 20;
     pos.y = cell->height << 16;
-    PlaySoundAtByName("treeburn", &pos, 0);
+    RecordSoundAtName(SIM_SOUND_TREEBURN, pos);
     if (flag == 0)
         g_seams.network->SendFeatureBurning(x, z);
 }
@@ -935,7 +934,7 @@ void __stdcall UpdateFeatures()
         } else if (spot->flags & 1) {
             if (smoke) {
                 SmokePos q = SmokeAt(spot, f);
-                EmitWhiteSmoke(&q, 5);
+                RecordWhiteSmoke(Vec3{q.x.value, q.y.value, q.z.value}, 5);
             }
             StepGafSequence(&spot->anim);
             if (spot->flags & 4)

@@ -37,8 +37,6 @@ int __stdcall GetGroundHeight(Vec3* pos);
 int __cdecl AngleOfVector(int a, int b);
 #include "../../interfaces/seams.h"
 #include "../graphics/particles.h"
-void __stdcall EmitWhiteSmoke(int, short);
-void __stdcall EmitBlackSmoke(int, short);
 #include "../util/math.h"
 #include "../weapons/explosions.h"
 void __stdcall AddExplosionEffect(void* pos, void* src, int index, int flag);
@@ -316,10 +314,10 @@ void UnitScript::EmitSfx(int a, int b)
         RecordWakeParticles(v2, v1, 8, 2);
         break;
     case 0x101:
-        EmitWhiteSmoke((int)&v1, 9);
+        RecordWhiteSmoke(v1, 9);
         break;
     case 0x102:
-        EmitBlackSmoke((int)&v1, 9);
+        RecordBlackSmoke(v1, 9);
         break;
     case 0x103:
         v2.x = v1.x;

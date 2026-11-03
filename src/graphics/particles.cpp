@@ -12,7 +12,6 @@
 #include "../../interfaces/ref.h"
 #include "../debug/debug_lib.h"
 #include "../harness/harness.h"
-#include "../ingame/game_dialogs.h"
 #include "../util/vec3.h"
 #include "rect.h"
 #include "draw.h"
@@ -1452,8 +1451,6 @@ struct ThrustPos {
 // FUNCTION: 0x472ab0
 void __stdcall EmitJitteredThrustParticles(ThrustPos* pos, short index)
 {
-    // TODO(#620): drop this drain when the emitter is queued as an event
-    DrainSimEvents();
     ThrustPos s = *pos;
     s.v[0].hi += (int)((__int64)HarnessViewRand() * 3 / 0x8000) - 1;
     s.v[1].hi += (int)((__int64)HarnessViewRand() * 3 / 0x8000) - 1;
@@ -1543,8 +1540,6 @@ void __stdcall DestroyParticleLists()
 // FUNCTION: 0x472630
 void __stdcall EmitSmoke(Vec3* pos, int emitPeriod, int lifetime, short index)
 {
-    // TODO(#620): drop this drain when the emitter is queued as an event
-    DrainSimEvents();
     ParticleLists* owner = (ParticleLists *)g_game->lists_38d77;
     SmokeParticles* e = new SmokeParticles;
     if (e) {
@@ -1556,8 +1551,6 @@ void __stdcall EmitSmoke(Vec3* pos, int emitPeriod, int lifetime, short index)
 // FUNCTION: 0x472720
 void __stdcall EmitTimedBlackSmoke(Vec3* pos, int emitPeriod, int lifetime, short index)
 {
-    // TODO(#620): drop this drain when the emitter is queued as an event
-    DrainSimEvents();
     ParticleLists* owner = (ParticleLists *)g_game->lists_38d77;
     SmokeParticles* e = new SmokeParticles;
     if (e) {
@@ -1569,8 +1562,6 @@ void __stdcall EmitTimedBlackSmoke(Vec3* pos, int emitPeriod, int lifetime, shor
 // FUNCTION: 0x472810
 void __stdcall EmitWhiteSmoke(Vec3* pos, short index)
 {
-    // TODO(#620): drop this drain when the emitter is queued as an event
-    DrainSimEvents();
     ParticleLists* owner = (ParticleLists *)g_game->lists_38d77;
     SmokeParticles* e = new SmokeParticles;
     if (e) {
@@ -1582,8 +1573,6 @@ void __stdcall EmitWhiteSmoke(Vec3* pos, short index)
 // FUNCTION: 0x4728f0
 void __stdcall EmitBlackSmoke(Vec3* p, short index)
 {
-    // TODO(#620): drop this drain when the emitter is queued as an event
-    DrainSimEvents();
     ParticleLists& l = *(ParticleLists *)g_game->lists_38d77;
     SmokeParticles* e = new SmokeParticles;
     if (e) {

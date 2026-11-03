@@ -332,6 +332,38 @@ static inline int MapContains(unsigned int w, unsigned int h, int tx, int ty)
     return tx < w && ty < h;
 }
 
+static int PlayPositional(int index, SoundWorldPos* pos, void** sound)
+{
+    if (((Sound *)g_game->sound)->Is3DEnabled()) {
+        Vec3 p;
+        p.x = pos->x - g_game->scrollX - (g_game->screenTilesX / 2) * 16;
+        p.z = g_game->scrollY + (g_game->screenTilesY / 2) * 16
+            + (pos->y >> 1) - pos->z;
+        p.y = 0;
+        int loggedPosition[3];
+        loggedPosition[0] = p.x;
+        loggedPosition[1] = p.y;
+        loggedPosition[2] = p.z;
+        int loggedVolume = -585;
+        HarnessSoundEvent("play", index, nullptr, &loggedVolume, loggedPosition);
+        ((Sound *)g_game->sound)->Set3DDistances(
+            (float)(((g_game->screenTilesX + g_game->screenTilesY) / 2) * 16),
+            (float)((g_game->width + g_game->height) * 16));
+        return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, &p);
+    } else {
+        if (g_game->scrollX > pos->x || g_game->scrollY > pos->z
+            || g_game->scrollX + g_game->screenTilesX * 16 < pos->x
+            || g_game->scrollY + g_game->screenTilesY * 16 < pos->z) {
+            int loggedVolume = -1585;
+            HarnessSoundEvent("play", index, nullptr, &loggedVolume, nullptr);
+            return ((Sound *)g_game->sound)->PlaySampleSet(sound, -1585, 0);
+        }
+        int loggedVolume = -585;
+        HarnessSoundEvent("play", index, nullptr, &loggedVolume, nullptr);
+        return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, nullptr);
+    }
+}
+
 // FUNCTION: 0x47f300
 int __stdcall PlaySoundAt(int index, SoundWorldPos* pos, int param_3)
 {
@@ -381,37 +413,33 @@ int __stdcall PlaySoundAt(int index, SoundWorldPos* pos, int param_3)
             vis = (g_game->visibilityMask[player2->exploredWidth * ty + tx]
                 & (1 << pi)) ? 1 : 0;
     }
-    if (vis != 0) {
-        if (((Sound *)g_game->sound)->Is3DEnabled()) {
-            Vec3 p;
-            p.x = pos->x - g_game->scrollX - (g_game->screenTilesX / 2) * 16;
-            p.z = g_game->scrollY + (g_game->screenTilesY / 2) * 16
-                + (pos->y >> 1) - pos->z;
-            p.y = 0;
-            int loggedPosition[3];
-            loggedPosition[0] = p.x;
-            loggedPosition[1] = p.y;
-            loggedPosition[2] = p.z;
-            int loggedVolume = -585;
-            HarnessSoundEvent("play", index, nullptr, &loggedVolume, loggedPosition);
-            ((Sound *)g_game->sound)->Set3DDistances(
-                (float)(((g_game->screenTilesX + g_game->screenTilesY) / 2) * 16),
-                (float)((g_game->width + g_game->height) * 16));
-            return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, &p);
-        } else {
-            if (g_game->scrollX > pos->x || g_game->scrollY > pos->z
-                || g_game->scrollX + g_game->screenTilesX * 16 < pos->x
-                || g_game->scrollY + g_game->screenTilesY * 16 < pos->z) {
-                int loggedVolume = -1585;
-                HarnessSoundEvent("play", index, nullptr, &loggedVolume, nullptr);
-                return ((Sound *)g_game->sound)->PlaySampleSet(sound, -1585, 0);
-            }
-            int loggedVolume = -585;
-            HarnessSoundEvent("play", index, nullptr, &loggedVolume, nullptr);
-            return ((Sound *)g_game->sound)->PlaySampleSet(sound, -585, nullptr);
-        }
-    }
-    return 0;
+    return vis != 0 ? PlayPositional(index, pos, sound) : 0;
+}
+
+int __stdcall PlaySoundAtHeard(int index, Vec3* at, unsigned int heard)
+{
+    if (g_useWindowsSound)
+        return PlaySoundByIndex(index, 0);
+    if (index == 0xffff)
+        return 0;
+    if (g_game->volume1 == 0)
+        return 0;
+    if ((g_game->soundFlags_37f19 & 7) == 0)
+        return 0;
+    if (g_noDirectSound != 0)
+        return 0;
+    if (((heard >> g_game->playerIndex) & 1) == 0)
+        return 0;
+    SoundWorldPos pos;
+    pos.xVal = at->x;
+    pos.yVal = at->y;
+    pos.zVal = at->z;
+    return PlayPositional(index, &pos, (void**)g_game->sounds[index]);
+}
+
+int __stdcall FindSoundByName(char* name)
+{
+    return FindSound(name);
 }
 
 // FUNCTION: 0x47f610

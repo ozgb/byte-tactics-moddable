@@ -284,20 +284,10 @@ int __stdcall ComparePlayers(Player* a, Player* b)
 }
 
 #include "../graphics/object_pool.h"
-#include "../ingame/game_dialogs.h"
 
 // FUNCTION: 0x485980
 void FreeUnitMemory(void)
 {
-    Unit* u = g_game->units;
-    Unit* end = g_game->unitsEnd;
-    if (u != 0) {
-        for (; u <= end; u = (Unit*)((char*)u + 0x118)) {
-            if (u->unitDefIndex != 0)
-                KillUnit(u, 8);
-        }
-    }
-    DrainSimEvents();
     if (g_game->hotRadar != 0)
         GameFreeThunk(g_game->hotRadar.get());
     g_game->hotRadar = 0;
@@ -588,7 +578,6 @@ struct PlacedFeatureView {
     int velZ;
 };
 
-void __stdcall EmitSmoke(GroundHeightPos* pos, int a, int b, int c);
 
 // FUNCTION: 0x486360
 void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
@@ -617,7 +606,7 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
                 g_seams.features->PlaceFeature((Cell*)target, id, (Vec3*)pos, (Rot16*)&unit->angles, unit->playerIndex);
             }
             if (flag) {
-                EmitSmoke(pos, 0xf, 900, 9);
+                RecordSmoke(Vec3{pos->x.value, pos->y.value, pos->z.value}, 0xf, 900, 9);
             }
         }
     }
@@ -686,7 +675,6 @@ void __stdcall KillUnit(Unit* unit, int killType)
 
 #include "../../link/globals.h"
 
-void __stdcall RemoveSpeechOfUnit(void* unit);
 void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
 #include "../ingame/game_dialogs.h"
 #include "unit_targets.h"
@@ -716,7 +704,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     unit->lastAttackerSlot = FindSlotByDpid(cmd->attackerPlayerNetId);
     g_seams.players->NotifyUnitDied(g_game->list_391ed, 0, unit);
     g_seams.orders->DeleteOrders(unit, 1);
-    RemoveSpeechOfUnit(unit);
+    RecordRemoveUnitSpeech(unit);
     g_seams.ai->SetUnitSquad(unit, -1);
     g_seams.weapons->RemoveUnitProjectiles(unit);
     if (unit->carrier != 0)

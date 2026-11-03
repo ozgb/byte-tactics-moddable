@@ -12,6 +12,8 @@
 #include "../../link/globals.h"
 #include "share_commands.h"
 #include "../util/commands.h"
+#include "../state/sim_effects.h"
+#include "../../interfaces/services.h"
 
 void __stdcall AddMessage(char* text, int key, int value, int last);
 #include "../network/net_game.h"
@@ -19,14 +21,10 @@ void __stdcall AddMessage(char* text, int key, int value, int last);
 // FUNCTION: 0x418cd0
 void __stdcall CmdShareMetal(int unused)
 {
-    char buf[256];
     if (g_game->netGameFlags & 1) {
         g_game->players[g_game->localPlayer].info->shareMetal =
             !g_game->players[g_game->localPlayer].info->shareMetal;
-        sprintf(buf, "Toggled ShareMetal to: %s",
-                (g_game->players[g_game->localPlayer].info->shareMetal != 0)
-                    ? "ON" : "OFF");
-        AddMessage(buf, 2, 0, 10);
+        RecordMessage(SIM_MESSAGE_SHARE_METAL_TOGGLED, (g_game->players[g_game->localPlayer].info->shareMetal != 0));
         g_seams.network->BroadcastPlayerInfo();
     }
 }
@@ -34,14 +32,10 @@ void __stdcall CmdShareMetal(int unused)
 // FUNCTION: 0x418d90
 void __stdcall CmdShareEnergy(int unused)
 {
-    char buf[256];
     if (g_game->netGameFlags & 1) {
         PlayerInfo* data = g_game->players[g_game->localPlayer].info;
         data->flags_97_wide = (data->flags_97_wide & ~4) | (~data->flags_97_wide & 4);
-        sprintf(buf, "Toggled ShareEnergy to: %s",
-                (g_game->players[g_game->localPlayer].info->flags_97_wide & 4)
-                    ? "ON" : "OFF");
-        AddMessage(buf, 2, 0, 10);
+        RecordMessage(SIM_MESSAGE_SHARE_ENERGY_TOGGLED, (g_game->players[g_game->localPlayer].info->flags_97_wide & 4));
         g_seams.network->BroadcastPlayerInfo();
     }
 }
@@ -49,14 +43,10 @@ void __stdcall CmdShareEnergy(int unused)
 // FUNCTION: 0x418e50
 void __stdcall CmdShareMapping(int unused)
 {
-    char buf[256];
     if (g_game->netGameFlags & 1) {
         PlayerInfo* data = g_game->players[g_game->localPlayer].info;
         data->flags_97_wide = (data->flags_97_wide & ~0x20) | (~data->flags_97_wide & 0x20);
-        sprintf(buf, "Toggled ShareMapping to: %s",
-                (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x20)
-                    ? "ON" : "OFF");
-        AddMessage(buf, 2, 0, 10);
+        RecordMessage(SIM_MESSAGE_SHARE_MAPPING_TOGGLED, (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x20));
         g_seams.network->BroadcastPlayerInfo();
     }
 }
@@ -64,14 +54,10 @@ void __stdcall CmdShareMapping(int unused)
 // FUNCTION: 0x418f10
 void __stdcall ToggleShareLos(int unused)
 {
-    char buf[256];
     if (g_game->netGameFlags & 1) {
         g_game->players[g_game->localPlayer].info->shareLOS =
             !g_game->players[g_game->localPlayer].info->shareLOS;
-        sprintf(buf, "Toggled ShareLOS to: %s",
-                (g_game->players[g_game->localPlayer].info->shareLOS != 0)
-                    ? "ON" : "OFF");
-        AddMessage(buf, 2, 0, 10);
+        RecordMessage(SIM_MESSAGE_SHARE_LOS_TOGGLED, (g_game->players[g_game->localPlayer].info->shareLOS != 0));
         g_seams.network->BroadcastPlayerInfo();
     }
 }
@@ -79,14 +65,10 @@ void __stdcall ToggleShareLos(int unused)
 // FUNCTION: 0x418fd0
 void __stdcall CmdShareRadar(int unused)
 {
-    char buf[256];
     if (g_game->netGameFlags & 1) {
         g_game->players[g_game->localPlayer].info->shareRadar =
             !g_game->players[g_game->localPlayer].info->shareRadar;
-        sprintf(buf, "Toggled ShareRadar to: %s",
-                (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x40)
-                    ? "ON" : "OFF");
-        AddMessage(buf, 2, 0, 10);
+        RecordMessage(SIM_MESSAGE_SHARE_RADAR_TOGGLED, (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x40));
         g_seams.network->BroadcastPlayerInfo();
     }
 }
@@ -105,24 +87,20 @@ void __stdcall CmdShareAll(int unused)
 // FUNCTION: 0x419340
 void __stdcall CmdSetShareMetal(CommandArgs* args)
 {
-    char buf[256];
     if (g_game->netGameFlags & 1) {
         Player* p = &g_game->players[g_game->localPlayer];
         p->shareMetal = __min(p->metalCapacity, (float)args->GetIntArg(1, 0));
-        sprintf(buf, "OK.  Will share metal if above %d", args->GetIntArg(1, 0));
-        AddMessage(buf, 2, 0, 10);
+        RecordMessage(SIM_MESSAGE_SHARE_METAL_ABOVE, args->GetIntArg(1, 0));
     }
 }
 
 // FUNCTION: 0x419400
 void __stdcall CmdSetShareEnergy(CommandArgs* args)
 {
-    char buf[256];
     if (g_game->netGameFlags & 1) {
         Player* p = &g_game->players[g_game->localPlayer];
         p->shareEnergy = __min(p->energyCapacity, (float)args->GetIntArg(1, 0));
-        sprintf(buf, "OK.  Will share energy if above %d", args->GetIntArg(1, 0));
-        AddMessage(buf, 2, 0, 10);
+        RecordMessage(SIM_MESSAGE_SHARE_ENERGY_ABOVE, args->GetIntArg(1, 0));
     }
 }
 

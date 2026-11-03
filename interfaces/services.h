@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 5
+#define SERVICES_VERSION_MINOR 6
 
 // Returns a random number in [0, range) from the main stream of the game logic.
 int __stdcall RandomInt(int range);
@@ -145,6 +145,20 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_WATCH_PROMPT = 25,
     // A player who hosts AI players that are still alive is placed in watch mode: the player index, the notice shows when it is the local player.
     SIM_EVENT_WATCH_MODE_NOTICE = 26,
+    // A smoke plume rises: the position (3), the emit period, the lifetime in ticks and the particle list.
+    SIM_EVENT_SMOKE = 27,
+    // A puff of white smoke: the position (3) and the particle list.
+    SIM_EVENT_WHITE_SMOKE = 28,
+    // A puff of black smoke: the position (3) and the particle list.
+    SIM_EVENT_BLACK_SMOKE = 29,
+    // A sound plays at a position: the sound index of the game, the position (3) and the set of players who hear it (bit n for player n).
+    SIM_EVENT_SOUND_AT = 30,
+    // A named sound plays at a position: a SimSoundName, the position (3) and the set of players who hear it (bit n for player n).
+    SIM_EVENT_SOUND_AT_NAME = 31,
+    // A unit's pending speech lines are dropped: the unit index.
+    SIM_EVENT_REMOVE_UNIT_SPEECH = 32,
+    // A line enters the message log: a SimMessageText and its value.
+    SIM_EVENT_MESSAGE = 33,
     // The radar picture shows the units and projectiles of a snapshot: its offset in the radar arena.
     SIM_EVENT_RADAR_UNITS = 34,
     // The radar picture marks the cells a snapshot says are explored or hidden: its offset in the radar arena.
@@ -207,13 +221,26 @@ enum SimSpeechText : unsigned short {
 // The sounds that sim plays by name.
 enum SimSoundName : unsigned short {
     SIM_SOUND_VICTORY_CONDITION = 0,
-    SIM_SOUND_COUNT = 1,
+    SIM_SOUND_TREEBURN = 1,
+    SIM_SOUND_COUNT = 2,
 };
 
 // The GUI screens that sim asks about.
 enum SimScreenName : unsigned short {
     SIM_SCREEN_BUILDER = 0,
     SIM_SCREEN_COUNT = 1,
+};
+
+// The lines that sim puts in the message log; the value is on or off for a toggle, else a number.
+enum SimMessageText : unsigned short {
+    SIM_MESSAGE_SHARE_METAL_TOGGLED = 0,
+    SIM_MESSAGE_SHARE_ENERGY_TOGGLED = 1,
+    SIM_MESSAGE_SHARE_MAPPING_TOGGLED = 2,
+    SIM_MESSAGE_SHARE_LOS_TOGGLED = 3,
+    SIM_MESSAGE_SHARE_RADAR_TOGGLED = 4,
+    SIM_MESSAGE_SHARE_METAL_ABOVE = 5,
+    SIM_MESSAGE_SHARE_ENERGY_ABOVE = 6,
+    SIM_MESSAGE_TEXT_COUNT = 7,
 };
 
 // Records an event for presentation with up to twelve arguments (a second record continues past six); a full queue drops it and counts it, and in test mode ends the program.
@@ -494,6 +521,8 @@ public:
     void SetCurrentRecord(int val);
 };
 
+// Reads a field of the current record in the language of the player, or in the default language, into dst; returns non-zero when found.
+int __stdcall GetLocalizedString(TdfFile* file, char* dst, char* key, size_t size, char* def);
 struct Handle;
 struct GafEntry;
 struct GafFrame;

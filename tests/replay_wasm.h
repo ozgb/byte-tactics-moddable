@@ -3,6 +3,7 @@
 
 void ReplayWasmSelect(const char* wasmPath);
 bool ReplayWasmActive();
+const char* ReplayWasmSubsystem();
 void ReplayWasmReload();
 void ReplayWasmUseSeam();
 

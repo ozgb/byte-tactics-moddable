@@ -185,17 +185,17 @@ jobs:
             wine "build/modern/$t.exe" | tee "$RUNNER_TEMP/$t.log"
             grep -q "^$t: all passed" "$RUNNER_TEMP/$t.log"
           done
-          wine build/modern/replay_native_test.exe tests/replay/*.txt | tee "$RUNNER_TEMP/replay_native.log"
+          wine build/modern/replay_native_test.exe tests/replay/wind_meteors/*.txt | tee "$RUNNER_TEMP/replay_native.log"
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_native.log"
-          wine build/modern/replay_native_test.exe --self-test tests/replay/meteors-hailstorm.wind_meteors.txt | tee "$RUNNER_TEMP/replay_self.log"
+          wine build/modern/replay_native_test.exe --self-test tests/replay/wind_meteors/meteors-hailstorm.txt | tee "$RUNNER_TEMP/replay_self.log"
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_self.log"
-          wine build/modern/replay_inject_test.exe --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/meteors-hailstorm.wind_meteors.txt | tee "$RUNNER_TEMP/replay_inject.log"
+          wine build/modern/replay_inject_test.exe --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/wind_meteors/meteors-hailstorm.txt | tee "$RUNNER_TEMP/replay_inject.log"
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_inject.log"
-          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm tests/replay/*.txt | tee "$RUNNER_TEMP/replay_wasm.log"
+          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm tests/replay/wind_meteors/*.txt | tee "$RUNNER_TEMP/replay_wasm.log"
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_wasm.log"
-          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm --self-test tests/replay/meteors-hailstorm.wind_meteors.txt | tee "$RUNNER_TEMP/replay_wasm_self.log"
+          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm --self-test tests/replay/wind_meteors/meteors-hailstorm.txt | tee "$RUNNER_TEMP/replay_wasm_self.log"
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_wasm_self.log"
-          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors_inject.wasm --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/meteors-hailstorm.wind_meteors.txt | tee "$RUNNER_TEMP/replay_wasm_inject.log"
+          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors_inject.wasm --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/wind_meteors/meteors-hailstorm.txt | tee "$RUNNER_TEMP/replay_wasm_inject.log"
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_wasm_inject.log"
 
       - name: Check data/rwsets.csv is current

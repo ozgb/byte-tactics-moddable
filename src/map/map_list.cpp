@@ -29,7 +29,6 @@ class StringRef;
 #include "../graphics/palette.h"
 
 #include "../util/registry.h"
-int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, int def);
 
 
 #include "map_list.h"
@@ -42,9 +41,7 @@ void RegisterUnitOrders();
 #include "meteors.h"
 
 #include "../game/data_files.h"
-void __stdcall ShowErrorBox(const char* text, const char* caption);
 #include "../util/tdf.h"
-int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, char* def);
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void __stdcall SetCursorMode(int n);
 #include "../network/net_game.h"
@@ -65,6 +62,7 @@ int RIReport(int, int, int, int, int, int, int, int, int, int);
 #include "../util/vec3.h"
 
 #include "../../interfaces/services.h"
+#include "../../interfaces/host.h"
 #include "../state/sim_globals.h"
 
 struct TntFileHeader {
@@ -198,7 +196,7 @@ void Mission::LoadCampaign(char* file)
         if (strlen(file) != 0) {
             if (!list.LoadFile(GetNameSlot(0))) {
                 sprintf(msg, "The requested campaign file, %s, does not exist.", GetNameSlot(0));
-                ShowErrorBox(msg, "Campaign error");
+                host_message(nullptr, "Error", msg, HOST_MESSAGE_TOPMOST);
                 LoadCampaign(DAT_005119b8);
                 return;
             }
@@ -563,7 +561,7 @@ int Mission::LoadMission(char* map)
         if (!list.SelectRecord(key)) {
             char msg[0x100];
             sprintf(msg, "The requested mission file, %s, does not exist.", key);
-            ShowErrorBox(msg, "Mission error");
+            host_message(nullptr, "Error", msg, HOST_MESSAGE_TOPMOST);
             return 0;
         }
         GetLocalizedString(&list, missionName, "missionname", 0x100, 0);
@@ -574,7 +572,7 @@ int Mission::LoadMission(char* map)
             if (!parser.LoadFile(file)) {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  There is no mission defintion for this mission: %s", path);
-                ShowErrorBox(msg, "Mission error");
+                host_message(nullptr, "Error", msg, HOST_MESSAGE_TOPMOST);
                 return 0;
             }
             parser.ResetCurrentRecord();
@@ -585,11 +583,11 @@ int Mission::LoadMission(char* map)
             } else {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  Mission file %s is corrupt (no header found).", path);
-                ShowErrorBox(msg, "Mission error");
+                host_message(nullptr, "Error", msg, HOST_MESSAGE_TOPMOST);
                 return 0;
             }
         } else {
-            ShowErrorBox("Old TED format no longer supported!", "Mission error");
+            host_message(nullptr, "Error", "Old TED format no longer supported!", HOST_MESSAGE_TOPMOST);
             return 0;
         }
         break;
@@ -619,7 +617,7 @@ int Mission::LoadMission(char* map)
     }
 
     if (!parser.SelectRecord("GlobalHeader")) {
-        ShowErrorBox("No GlobalHeader block in mission file!", "Mission error");
+        host_message(nullptr, "Error", "No GlobalHeader block in mission file!", HOST_MESSAGE_TOPMOST);
         return 0;
     }
     headerChecksum = *(int*)((char*)parser.current + 0x25);
@@ -662,7 +660,7 @@ int Mission::LoadMission(char* map)
     killMul = GetFloat(parser.current, "killmul");
     timeMul = GetFloat(parser.current, "timemul");
     if (!SelectSchema(type, &parser, schema)) {
-        ShowErrorBox("No suitable schema type in mission file!", "Map error");
+        host_message(nullptr, "Error", "No suitable schema type in mission file!", HOST_MESSAGE_TOPMOST);
         return 0;
     }
     startMetal[0] = (float)parser.current->GetFieldInt("HumanMetal", 0);

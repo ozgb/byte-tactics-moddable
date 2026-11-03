@@ -153,8 +153,8 @@ uv run tools/reference.py --check --exe path/to/TotalA.exe --game-dir <install>
 ```
 
 It plays every scenario, compares the digests with `reference/traces/`, and on
-the first difference prints the `tracediff` report. Add `--quick` for a fixed
-subset of five scenarios (not the gate). `--game-dir` names the install; the
+the first difference prints the `tracediff` report. Add `--tier` to play only the
+gate tier (`reference/README.md`, "Gate tier"). `--game-dir` names the install; the
 default is Steam's.
 
 ## A loaded game's trace

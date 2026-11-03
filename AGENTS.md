@@ -107,19 +107,27 @@ and let the maintainer decide (`docs/team.md`), rather than working around it.
 ## 4. Pass the gate
 
 Run every check the issue names. The gate for a change to game code is
-identical traces for the scenario suite on the modern build:
+identical traces for the gate tier (or the full scenario suite, see
+below) on the modern build:
 
 ```sh
 export WINEARCH=win64
 cmake -S . -B build/modern -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake   # once
 cmake --build build/modern
 cmake --build build/modern --target wasm_runtime    # needs cargo: the wasmtime DLL and modules
-uv run tools/reference.py --check --exe build/modern/TotalA.exe --game-dir ~/.ta
+uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta   # the pull request gate
+uv run tools/reference.py --check --exe build/modern/TotalA.exe --game-dir ~/.ta          # every scenario
 ```
 
-It must report every scenario equal. Run it on a fresh prefix (remove
+The tier is a short list of scenarios that covers almost all the code the full
+suite does; it must report every tier scenario equal. The full `--check` is the
+gate instead when a change touches the state block layout, the host interface
+or platform code, `reference/`, the trace format, `tools/reference.py` or
+`tools/playtest.py` (`reference/README.md`, "When the full suite is the gate");
+the lead also runs it on `moddable` every 5 merges
+(`uv run tools/fullgate.py`). Run either on a fresh prefix (remove
 `build/playtest/prefix` first). `reference/README.md`, "Gate", says which
-changes need it.
+changes need a gate. Say in the pull request which one you ran.
 
 **When traces diverge**, the divergence report names the first tick, phase and
 field that differ. Find the smallest part of your change that causes it, and

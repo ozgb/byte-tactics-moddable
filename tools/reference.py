@@ -1,7 +1,7 @@
 """The conformity gate: play the scenarios and compare their digests with reference/traces/.
 
-    uv run tools/reference.py --check --exe build/modern/TotalA.exe    # the gate
-    uv run tools/reference.py --check --exe build/modern/TotalA.exe --quick    # a fixed subset, not the gate
+    uv run tools/reference.py --check --exe build/modern/TotalA.exe    # every scenario: the gate of the changes in reference/README.md, "Gate"
+    uv run tools/reference.py --check --exe build/modern/TotalA.exe --tier     # the pull request gate: the scenarios of GATE_TIER
     uv run tools/reference.py --traces          # rewrite reference/traces/ from the reference branch
 
 `--check --exe` plays every scenario in reference/scenarios/ (`--parallel N` at a
@@ -13,8 +13,8 @@ It also compares the harness.sav of each scenario with a `save` line with
 reference/saves/<scenario>.sav, when that file exists, by decoded contents (tools/savefile.py leaves out the bytes taken from the clock or from uninitialised memory).
 On the first difference it builds the reference from the commit the trace
 records, prints tools/tracediff.py's report for that scenario and exits 1. A
-missing or extra trace or scenario exits 1. `--quick` restricts `--check` to the
-scenarios named in QUICK.
+missing or extra trace or scenario exits 1. `--tier` restricts `--check` to the
+scenarios named in GATE_TIER, the pull request gate (tools/coverage.py --tier checks that they cover enough).
 
 Every scenario is played with new game allocations zeroed (the game's own -memset=0 switch, through
 tools/playtest.py --testmode). `--check --native-modules` runs the exe's modules as native code (-modules=native) instead of in WASM. `--check --poison` fills them with 0xCD instead (-memset=0xcdcdcdcd); a
@@ -72,12 +72,40 @@ FRAME_PALETTE_SIZE = 1024
 SAVES = ROOT / "reference/saves"
 SAVE_FILE = tracediff.SAVE_FILES[0]
 MAX_PARALLEL = 6
-QUICK = ("eight-full-moon", "eight-greenhaven", "duel-coast-to-coast", "duel-great-divide", "orders-move-attack")
+GATE_TIER = (
+    "allied-victory",
+    "commander-death",
+    "conditions-dark-side",
+    "console-economy",
+    "console-features",
+    "console-sight",
+    "console-units",
+    "eight-pincushion-teams",
+    "hailstorm-los-off",
+    "load-midgame",
+    "mission-radius",
+    "mission-victory",
+    "orders-air",
+    "orders-air-fights",
+    "orders-air-repair",
+    "orders-build-patrol",
+    "orders-factory",
+    "orders-guard-attacked",
+    "orders-guard-reclaim",
+    "orders-immediate",
+    "orders-tier2-core",
+    "orders-tier2-spider",
+    "orders-tier2-vader",
+    "save-midgame",
+    "sensors-floating-teeth-los-off",
+    "units-transport-ship",
+)
 RUN_SECONDS_BASE = 120
 RUN_TICKS_PER_SECOND = 25
 RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK = 6
 RUN_ATTEMPTS = 2
 GATE_SCAN_EVERY = 8
+BLOCK_POINTERS_TIER_TEXT = "block pointers: full suite only"
 FUEL_FILE = "fuel.txt"
 FUEL: dict[str, dict[str, tuple[int, int]]] = {}
 SOUND_LOGS: dict[str, str | None] = {}
@@ -690,17 +718,17 @@ def save_report(scenarios: dict[str, Path], saves: dict[str, bytes | None], dire
     return differing, lines
 
 
-def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = False, poison: bool = False,
+def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = False, poison: bool = False,
                  steps_per_frame: int | None = None, quirks: str | None = None,
                  save_blockptrs: Path | None = None, roundtrip: str | None = None) -> None:
     scenarios = scenario_files()
     stored = {p.stem: p for p in sorted(TRACES.glob("*.txt"))} if TRACES.is_dir() else {}
-    if quick:
-        missing = [n for n in QUICK if n not in scenarios or n not in stored]
+    if tier:
+        missing = [n for n in GATE_TIER if n not in scenarios or n not in stored]
         if missing:
-            fail("the quick subset names scenarios without both a scenario and a trace: " + ", ".join(missing))
-        scenarios = {n: scenarios[n] for n in QUICK}
-        stored = {n: stored[n] for n in QUICK}
+            fail("the gate tier names scenarios without both a scenario and a trace: " + ", ".join(missing))
+        scenarios = {n: scenarios[n] for n in GATE_TIER}
+        stored = {n: stored[n] for n in GATE_TIER}
     problems = [f"scenario {n} has no trace in {TRACES.relative_to(ROOT)}" for n in scenarios if n not in stored]
     problems += [f"trace {n} has no scenario in {SCENARIOS.relative_to(ROOT)}" for n in stored if n not in scenarios]
     if not scenarios or problems:
@@ -762,13 +790,13 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = F
         print("block pointers: not checked with --roundtrip (the scan names allocations by address)")
         pointers = 0
     else:
-        pointers = report_block_pointers(exe, scans, quick, save_blockptrs)
+        pointers = report_block_pointers(exe, scans, tier, save_blockptrs)
     pointers += report_fuel(exe, scenarios)
     if not bad:
         if pointers or sound_bad or ui_bad or frame_bad or save_bad:
             sys.exit(1)
-        if quick:
-            print("quick subset passed; this is not the gate, a pull request needs the full --check")
+        if tier:
+            print(tier_message(len(scenarios), head_commit()))
         return
 
     name = bad[0]
@@ -781,10 +809,22 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, quick: bool = F
     sys.exit(1)
 
 
-def report_block_pointers(exe: Path, scans: dict[str, str | None], quick: bool, save: Path | None) -> int:
+def head_commit() -> str:
+    """The short sha of the checked-out commit, or `unknown` outside a repository."""
+    sha = resolve_quiet("HEAD")
+    return sha[:12] if sha else "unknown"
+
+
+def tier_message(count: int, sha: str) -> str:
+    """The line a passing --tier run ends with: the tier and the commit, and that the full suite is a separate run."""
+    return (f"gate tier passed: {count} scenarios equal at {sha}; the full --check is the gate of the changes "
+            f"that reference/README.md, \"Gate\", lists")
+
+
+def report_block_pointers(exe: Path, scans: dict[str, str | None], tier: bool, save: Path | None) -> int:
     """Print the pointers out of the block that data/block_pointers.csv does not cover; how many there are.
 
-    The names of repeated sites are numbered over the scenarios played, so a --quick subset is not checked.
+    The names of repeated sites are numbered over the scenarios played, so the gate tier is not checked: block pointers are checked by the full suite only.
     With `save`, each scenario's blockptrs.txt is also written there as <scenario>.txt.
     """
     if save is not None:
@@ -792,8 +832,8 @@ def report_block_pointers(exe: Path, scans: dict[str, str | None], quick: bool, 
         for name, text in scans.items():
             if text is not None:
                 (save / f"{name}.txt").write_text(text)
-    if quick:
-        print("block pointers: not checked in the quick subset")
+    if tier:
+        print(BLOCK_POINTERS_TIER_TEXT)
         return 0
     problems = blockpointers.check_scans(scans, exe.with_suffix(".map"), blockpointers.default_build_dir())
     for line in problems:
@@ -994,8 +1034,8 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--traces", action="store_true", help="rewrite reference/traces/ from the reference branch")
     ap.add_argument("--check", action="store_true", help="play every scenario and compare with reference/traces/")
-    ap.add_argument("--quick", action="store_true",
-                    help="--check: play only the fixed quick subset (not the gate)")
+    ap.add_argument("--tier", action="store_true",
+                    help="--check: play only GATE_TIER, the pull request gate (not the gate of the changes that need the full suite)")
     ap.add_argument("--native-modules", action="store_true",
                     help="--check: play every scenario with -modules=native, so that the modules run as native code (the default runs them in WASM; sets BT_NATIVE_MODULES=1 for tools/playtest.py)")
     ap.add_argument("--poison", action="store_true",
@@ -1025,8 +1065,8 @@ def main() -> None:
         os.environ["BT_NATIVE_MODULES"] = "1"
     if args.save_blockptrs and (not args.check or args.quirks is not None):
         ap.error("--save-blockptrs needs --check, and cannot be combined with --quirks")
-    if args.quick and not args.check:
-        ap.error("--quick needs --check; it cannot be used with --traces")
+    if args.tier and not args.check:
+        ap.error("--tier needs --check; it cannot be used with --traces")
     if args.steps_per_frame is not None and not args.check:
         ap.error("--steps-per-frame needs --check")
     if args.steps_per_frame is not None and not 1 <= args.steps_per_frame <= 8:
@@ -1052,7 +1092,7 @@ def main() -> None:
         ap.error("--check needs --exe: the gate is the modern build, --exe build/modern/TotalA.exe")
     if not Path(args.exe).is_file():
         ap.error(f"{args.exe} is not a file")
-    check_traces(Path(args.exe).resolve(), args.game_dir, args.parallel, args.quick, args.poison, args.steps_per_frame,
+    check_traces(Path(args.exe).resolve(), args.game_dir, args.parallel, args.tier, args.poison, args.steps_per_frame,
                  args.quirks, args.save_blockptrs, args.roundtrip)
 
 

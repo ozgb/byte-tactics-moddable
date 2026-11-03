@@ -479,7 +479,7 @@ void __stdcall ContinueWatchingCallback(Gui* gui)
     PlaySoundByName("BigButton", 0);
     if (IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE1")) {
         g_seams.network->BroadcastPlayerInfo();
-        g_game->bits.flag4 = 0;
+        g_game->endGameVictory = 0;
         ReportGameEvent(4);
         return;
     }
@@ -488,7 +488,7 @@ void __stdcall ContinueWatchingCallback(Gui* gui)
         return;
     }
     g_game->bits.flag2 = 1;
-    g_game->bits.flag4 = 0;
+    g_game->endGameVictory = 0;
 }
 
 
@@ -585,7 +585,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                             g_game->endGameCountdown--;
                             if (g_game->endGameCountdown < 0) {
                                 g_game->endGameFlags |= 4;
-                                g_game->endGameFlags &= 0xffef;
+                                g_game->endGameVictory = 0;
                                 g_game->bits.flag6 = 1;
                             }
                         }
@@ -597,7 +597,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                         g_game->endGameCountdown--;
                         if (g_game->endGameCountdown < 0) {
                             g_game->endGameFlags |= 4;
-                            g_game->bits.flag4 = 1;
+                            g_game->endGameVictory = 1;
                             g_game->bits.flag5 = 1;
                         }
                     }
@@ -764,7 +764,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                     OpenMessageBox(&g_game->gui,
                                  Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
                                  500, 1, 1);
-                    g_game->endGameFlags &= 0xffef;
+                    g_game->endGameVictory = 0;
                     goto skip508;
                 }
                 goto skip508;
@@ -773,7 +773,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
 
     flags82e:
         g_game->endGameFlags |= 4;
-        g_game->endGameFlags &= 0xffef;
+        g_game->endGameVictory = 0;
         if (pi->rejectReason == 0)
             g_game->bits.flag6 = 1;
         goto skip508;
@@ -790,7 +790,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
             g_game->endGameCountdown--;
             if (g_game->endGameCountdown < 0) {
                 g_game->endGameFlags |= 4;
-                g_game->bits.flag4 = 1;
+                g_game->endGameVictory = 1;
                 g_game->bits.flag5 = 1;
             }
         }
@@ -811,7 +811,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
         g_game->endGameCountdown--;
         if (g_game->endGameCountdown < 0) {
             g_game->endGameFlags |= 4;
-            g_game->endGameFlags &= 0xffef;
+            g_game->endGameVictory = 0;
             g_game->bits.flag6 = 1;
         }
     }

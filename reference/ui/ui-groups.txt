@@ -1,0 +1,49 @@
+bt-ui 1
+1 scroll 304 32
+1 select -
+10 input mouse move 300 270
+11 input mouse left down 300 270
+12 input mouse move 340 300
+13 input mouse move 400 330
+14 input mouse move 430 350
+15 input mouse left up 430 350
+16 select 2,3
+20 input key down 17
+21 input key down 49
+22 input key up 49
+22 group 1 2,3
+23 input key up 17
+30 input mouse move 524 250
+31 input mouse left down 524 250
+32 input mouse left up 524 250
+33 select 4
+40 input key down 17
+41 input key down 50
+42 input key up 50
+42 group 2 4
+43 input key up 17
+50 input mouse move 384 400
+51 input mouse left down 384 400
+52 input mouse left up 384 400
+53 select -
+60 input key down 18
+61 input key down 49
+62 input key up 49
+62 groupsel 1 2,3
+63 input key up 18
+63 select 2,3
+70 input mouse move 480 360
+71 input mouse right down 480 360
+71 order Move_Ground unit 2 target - pos 636 1 350 type - param 0 amount 0 remove 0
+71 order Move_Ground unit 3 target - pos 676 1 370 type - param 0 amount 0 remove 0
+72 input mouse right up 480 360
+80 input key down 18
+81 input key down 50
+82 input key up 50
+82 groupsel 2 4
+83 input key up 18
+83 select 4
+90 input mouse move 440 380
+91 input mouse right down 440 380
+91 order Move_Ground unit 4 target - pos 616 1 380 type - param 0 amount 0 remove 0
+92 input mouse right up 440 380

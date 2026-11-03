@@ -116,7 +116,7 @@ cmake -S . -B build/modern -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.c
 cmake --build build/modern
 cmake --build build/modern --target wasm_runtime    # needs cargo: the wasmtime DLL and modules
 uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta   # the pull request gate
-uv run tools/reference.py --check --exe build/modern/TotalA.exe --game-dir ~/.ta          # every scenario
+uv run tools/reference.py --check --both-modes --exe build/modern/TotalA.exe --game-dir ~/.ta   # every scenario, WASM and native modules
 ```
 
 The tier is a short list of scenarios that covers almost all the code the full
@@ -125,7 +125,9 @@ gate instead when a change touches the state block layout, the host interface
 or platform code, `reference/`, the trace format, `tools/reference.py` or
 `tools/playtest.py` (`reference/README.md`, "When the full suite is the gate");
 the lead also runs it on `moddable` every 5 merges
-(`uv run tools/fullgate.py`). Run either on a fresh prefix (remove
+(`uv run tools/fullgate.py`). `--both-modes` plays each scenario in WASM and with native modules in one pool and passes only when
+both equal; a second `--check` on the machine waits for the first (`--no-lock` skips that, for
+runs that are not gates). Run either on a fresh prefix (remove
 `build/playtest/prefix` first). `reference/README.md`, "Gate", says which
 changes need a gate. Say in the pull request which one you ran.
 

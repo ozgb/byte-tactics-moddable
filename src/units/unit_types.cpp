@@ -72,7 +72,6 @@ void __stdcall SortUnitTypes(void* start, void* end, void* cmp, int param);
 #include "../graphics/pcx.h"
 void __stdcall MirrorObject(void* obj);
 int __stdcall GetObjectHeight(void* obj);
-void* __stdcall LoadCobScript(char* path);
 #include "../graphics/palette.h"
 void __stdcall BindModelTextures(void* obj, char* name);
 
@@ -810,24 +809,7 @@ void LoadUnitTypes() {
         parser.Unload();
     }
 
-    UnitTable* obj = (UnitTable*)operator new(0x14);
-    obj = obj ? obj->Construct() : 0;
-    (*(UnitTable **)&g_game->unitTable) = obj;
-
-    int t = g_game->screenHeight * g_game->width_37e1f * 2;
-    int v = (int)(t * 1.3);
-
-    int n = g_game->displayContext->availPhys / 0x100000 + 1;
-    float scale = 1.0f;
-    if (n > 0x10) {
-        double d = (double)n * 0.0625;
-        if (d > 5.0)
-            scale = 5.0f;
-        else
-            scale = (float)d;
-    }
-    int size = (int)(v * scale);
-    ((UnitTable *)g_game->unitTable)->Initialize((size + 0xfff) & 0xfffff000);
+    InitUnitPictureCache();
 
     ProtectBlockReadWrite(g_game->defs);
 
@@ -1028,12 +1010,7 @@ void FreeUnitTypes()
         }
     }
 
-    UnitTable* obj = (UnitTable*)(UnitTable *)g_game->unitTable;
-    if (obj != 0) {
-        obj->Destroy();
-        delete obj;
-    }
-    (*(UnitTable **)&g_game->unitTable) = 0;
+    FreeUnitPictureCache();
 
     GameFreeThunk(g_game->types.get());
     GameFreeThunk(g_game->defs);

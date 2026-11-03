@@ -1,5 +1,6 @@
 #include <memory>
 #include "../state/block.h"
+#include "../../interfaces/services.h"
 #include <string.h>
 #include <math.h>
 #include <stddef.h>
@@ -117,7 +118,6 @@ int ScanDirectory(char*, char*, char*, int, int, int);
 #include "../graphics/display.h"
 #include "../game/data_files.h"
 GafFrame* __stdcall GetGafFrame(void* table, int index);
-#include "radar.h"
 #include "../graphics/gaf.h"
 void __stdcall DrawFrame(void* surface, void* header, int x, int y);
 void __stdcall DrawTile(void* dst, int x, int y, unsigned char* pix);
@@ -685,7 +685,6 @@ void LoadTntMap()
 {
     MapSettings* mapSettings = (MapSettings*)((char*)g_game + 0x141fb);
     TntInfo info;
-    GafFrame pic;
     char text[64];
     Slot a;
     Slot b;
@@ -764,20 +763,7 @@ void LoadTntMap()
     mapSettings->baseX = mapSettings->width << 4;
     mapSettings->baseY = mapSettings->height << 4;
     if (info.feature_flags & 1) {
-        pic.width = *info.feature_data;
-        pic.height = info.feature_data[2];
-        pic.xOffset = 0;
-        pic.yOffset = 0;
-        pic.transparency = 0;
-        pic.compressed = 0;
-        pic.layers = 0;
-        pic.blend = 0;
-        pic.reserved = 0;
-        pic.pixelsOrLayers = (unsigned char*)(info.feature_data + 4);
-        pic.scratch = 0;
-        g_game->radarFrame = AllocFrame("TED GENERATED PIC", *(int*)info.feature_data, *(int*)(info.feature_data + 2));
-        SurfaceFromFrame((Surface *)text, (GafFrame *)g_game->radarFrame);
-        DrawFrame(text, &pic, 0, 0);
+        BuildTedRadarFrame(info.feature_data);
     } else {
         g_game->radarFrame = 0;
     }
@@ -1226,8 +1212,8 @@ void __stdcall RecalculateLineOfSight(int arg)
     }
     (*(Flags_142f1*)&g_game->viewDirtyFlags).mapChanged = 1;
     g_game->mapFlags_14281.raw &= 0xfff7;
-    UpdateRadarMapped();
-    DrawRadarUnits();
+    g_seams.los_radar->UpdateRadarMapped();
+    g_seams.los_radar->DrawRadarUnits();
 }
 
 inline int LodRaw(SightQuery* params)

@@ -1,4 +1,5 @@
 #include "radar_picture.h"
+#include "../../interfaces/services.h"
 
 #include "../graphics/gaf_frame.h"
 
@@ -14,6 +15,7 @@
 #include "../graphics/gaf.h"
 #include "../graphics/surface.h"
 #include "../graphics/draw.h"
+void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 
 void __stdcall FrameFromSurface(GafFrame* dst, void* src);
 void* __stdcall AllocSurface(char* name, int width, int height);
@@ -84,4 +86,24 @@ void InitRadar()
     g_game->timer.word.flags.mapChanged = 1;
     g_game->timer.word.blinkTimer = 7;
     g_game->timer.word.flags.blinkOn = 0;
+}
+
+void __stdcall BuildTedRadarFrame(unsigned short* data)
+{
+    char text[64];
+    GafFrame pic;
+    pic.width = *data;
+    pic.height = data[2];
+    pic.xOffset = 0;
+    pic.yOffset = 0;
+    pic.transparency = 0;
+    pic.compressed = 0;
+    pic.layers = 0;
+    pic.blend = 0;
+    pic.reserved = 0;
+    pic.pixelsOrLayers = (unsigned char*)(data + 4);
+    pic.scratch = 0;
+    g_game->radarFrame = AllocFrame("TED GENERATED PIC", *(int*)data, *(int*)(data + 2));
+    SurfaceFromFrame((Surface*)text, (GafFrame*)g_game->radarFrame);
+    DrawFrame(text, &pic, 0, 0);
 }

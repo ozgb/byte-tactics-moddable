@@ -291,7 +291,7 @@ static_assert(offsetof(SpotState, pos) == 0x18, "pos");
 static_assert(offsetof(SpotState, root) == 0x1e, "root");
 static_assert(offsetof(ModelPiece, modified) == 0x26, "modified");
 
-#include "../graphics/model_render.h"
+#include "object_state.h"
 
 void __stdcall PoseUnitModel(Unit* unit)
 {

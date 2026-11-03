@@ -241,7 +241,7 @@ float __stdcall GetEnergyIncome(void* param_1);
 #include "../game/players.h"
 float __stdcall GetMetalIncome(void* param_1);
 #include "../game/players.h"
-#include "../map/radar.h"
+#include "../ingame/radar.h"
 #include "../map/line_of_sight.h"
 Unit* __stdcall FindNextSelectedUnit(Unit* unit, int dir);
 #include "selection.h"

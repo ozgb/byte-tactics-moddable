@@ -188,7 +188,7 @@ void UnitScript::SetPieceTranslation(int index, int slot, int v)
     }
 }
 
-#include "../graphics/model_render.h"
+#include "object_state.h"
 
 // FUNCTION: 0x480cb0
 int UnitScript::GetPieceRotation(int index, int slot)

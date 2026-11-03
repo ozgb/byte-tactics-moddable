@@ -80,7 +80,9 @@ int __stdcall GetGroundHeight(FixedVec3Parts* p);
 void __stdcall DrawFrameBlended(int param_1, GafFrame* param_2, int x, int y);
 void __stdcall TintFrameBelow(GafFrame* param_1, int value);
 void __stdcall CutFrameBelow(GafFrame* param_1, int value);
+#include "display.h"
 #include "model_render.h"
+#include "../../interfaces/seams.h"
 
 // FUNCTION: 0x458160
 UnitTable* UnitTable::Construct(void)
@@ -106,6 +108,38 @@ void UnitTable::Destroy()
         GameFreeThunk(ptr);
     }
     this->FreeBuffer();
+}
+
+void __stdcall InitUnitPictureCache(void)
+{
+    UnitTable* obj = (UnitTable*)operator new(0x14);
+    obj = obj ? obj->Construct() : 0;
+    (*(UnitTable **)&g_game->unitTable) = obj;
+
+    int t = g_game->screenHeight * g_game->width_37e1f * 2;
+    int v = (int)(t * 1.3);
+
+    int n = g_game->displayContext->availPhys / 0x100000 + 1;
+    float scale = 1.0f;
+    if (n > 0x10) {
+        double d = (double)n * 0.0625;
+        if (d > 5.0)
+            scale = 5.0f;
+        else
+            scale = (float)d;
+    }
+    int size = (int)(v * scale);
+    ((UnitTable *)g_game->unitTable)->Initialize((size + 0xfff) & 0xfffff000);
+}
+
+void __stdcall FreeUnitPictureCache(void)
+{
+    UnitTable* obj = (UnitTable*)(UnitTable *)g_game->unitTable;
+    if (obj != 0) {
+        obj->Destroy();
+        delete obj;
+    }
+    (*(UnitTable **)&g_game->unitTable) = 0;
 }
 
 static __inline int shade_bias(UnitDrawView* owner)
@@ -661,308 +695,25 @@ void CMemoryCache::DrawShadowShape(GafFrame* view, ModelState* model)
     }
 }
 
-// FUNCTION: 0x45a8d0
-ModelState* __stdcall CreateObjectState(Object3do* obj)
-{
-    int count = 1;
-    if (obj->child != 0) {
-        count = CountObjects(obj->child);
-        count++;
-    }
-    if (obj->sibling != 0) {
-        count += CountObjects(obj->sibling);
-    }
-    int size = count * 0x36 + 0x22;
-    ModelState* state = (ModelState*)SimAllocTagged("Object State", size);
-    memset(state, 0, size);
-    state->root = AddStateEntries(state, obj, 0);
-    state->animDirty = 1;
-    return state;
-}
-
-struct ModelBuildList {
-    char unknown_0[8];
-    int count;
-    char unknown_c[0x20 - 0xc];
-    const char** names;
-};
-
-// FUNCTION: 0x45a950
-ModelState* __stdcall CreatePlayerObjectState(Object3do* obj, ModelBuildList* list, Unit* owner)
-{
-    int count = 1;
-    if (obj->child != 0) {
-        count = CountObjects(obj->child);
-        count++;
-    }
-    if (obj->sibling != 0) {
-        count += CountObjects(obj->sibling);
-    }
-    int size = count * 0x36 + 0x22;
-    ModelState* state = (ModelState*)SimAllocTagged("Object State", size);
-    memset(state, 0, size);
-    state->root = AddStateEntries(state, obj, 0);
-    state->animDirty = 1;
-    state->owner = owner;
-    for (int i = 0; i < list->count; i++) {
-        for (int j = i; j < state->count; j++) {
-            if (_strcmpi(list->names[i], state->pieces[j].object->name) == 0) {
-                if (i != j) {
-                    ModelPiece temp = state->pieces[i];
-                    state->pieces[i] = state->pieces[j];
-                    state->pieces[j] = temp;
-                }
-                break;
-            }
-        }
-    }
-    state->root = LinkStateEntries(state, obj, 0);
-    return state;
-}
-
-// FUNCTION: 0x45aaa0
-void __stdcall FreeObjectState(ModelState* state)
-{
-    for (int i = 0; i < state->count; i++) {
-        GameFreeThunk(state->pieces[i].points);
-    }
-    if ((CMemoryCache *)g_game->unitTable != 0) {
-        ((CMemoryCache *)g_game->unitTable)->ReleaseHandle((int)&state->bitmap);
-        ((CMemoryCache *)g_game->unitTable)->ReleaseHandle((int)&state->shadow);
-    }
-    GameFreeThunk(state);
-}
-
-// FUNCTION: 0x45b030
-int __fastcall RestorePieceVertices(ModelPiece* piece, int force)
-{
-    int result = force;
-    if (piece->modified == 0 || force) {
-        memcpy(piece->points, piece->object->vertices, piece->object->vertexCount * 12);
-        piece->offset.x = 0;
-        piece->offset.y = 0;
-        piece->offset.z = 0;
-        piece->modified = 0;
-        result = 1;
-    }
-    if (piece->child)
-        result = RestorePieceVertices(piece->child, result);
-    if (piece->sibling)
-        return RestorePieceVertices(piece->sibling, force);
-    return result;
-}
-
-static inline int FarFrom(ModelState* state, const Vector3s* pos)
-{
-    return abs((short)(state->pos.z - pos->z)) >= 8
-        || abs((short)(state->pos.y - pos->y)) >= 8
-        || abs((short)(state->pos.x - pos->x)) >= 8;
-}
-
-// FUNCTION: 0x45ab10
-void __stdcall UpdateObjectState(UnitDrawView* unit)
-{
-    ModelState* state = unit->state;
-    if (FarFrom(state, &unit->angles)) {
-        state->pos = unit->angles;
-        state->animDirty = 1;
-        state->root->modified = 0;
-        if (state->root->flags.bits.colored) {
-            state->cacheDrawCount = 0;
-        }
-    }
-    if (unit->state->animDirty != 0) {
-        RestorePieceVertices(unit->state->root, 0);
-        PoseModel(unit->state, unit->state->root, 0);
-        unit->state->animDirty = 0;
-    }
-}
-
 // FUNCTION: 0x45ac20
 void __stdcall DrawUnit(void* context, UnitDrawView* unit)
 {
     if (unit->carrier == 0) {
-        ModelState* state = unit->state;
-        if (FarFrom(state, &unit->angles)) {
-            state->pos = unit->angles;
-            state->animDirty = 1;
-            state->root->modified = 0;
-            if (state->root->flags.bits.colored) {
-                state->cacheDrawCount = 0;
-            }
-        }
-        if (unit->state->animDirty != 0) {
-            RestorePieceVertices(unit->state->root, 0);
-            PoseModel(unit->state, unit->state->root, 0);
-            unit->state->animDirty = 0;
-        }
+        g_seams.units->UpdateObjectState(unit);
         for (UnitDrawView* u = unit->cargo; u; u = u->cargoNext) {
-            if (!(u->flags & 0x20000)) {
-                ModelState* child = u->state;
-                if (FarFrom(child, &u->angles)) {
-                    child->pos = u->angles;
-                    child->animDirty = 1;
-                    child->root->modified = 0;
-                    if (child->root->flags.bits.colored) {
-                        child->cacheDrawCount = 0;
-                    }
-                }
-                if (u->state->animDirty != 0) {
-                    RestorePieceVertices(u->state->root, 0);
-                    PoseModel(u->state, u->state->root, 0);
-                    u->state->animDirty = 0;
-                }
-            }
+            if (!(u->flags & 0x20000))
+                g_seams.units->UpdateObjectState(u);
         }
         ((CMemoryCache *)g_game->unitTable)->DrawObjectState(unit->state, context);
     }
 }
 
-#pragma auto_inline(off)
-
-// FUNCTION: 0x45ae80
-int __stdcall CountObjects(Object3do* edi)
+void __stdcall ReleaseUnitPictures(ModelState* state)
 {
-    int esi = 1;
-    int eax;
-
-    eax = (int)edi->child;
-    if (eax != 0) {
-        esi = CountObjects((Object3do*)eax);
-        esi++;
+    if ((CMemoryCache *)g_game->unitTable != 0) {
+        ((CMemoryCache *)g_game->unitTable)->ReleaseHandle((int)&state->bitmap);
+        ((CMemoryCache *)g_game->unitTable)->ReleaseHandle((int)&state->shadow);
     }
-
-    eax = (int)edi->sibling;
-    if (eax != 0) {
-        eax = CountObjects((Object3do*)eax);
-        esi = esi + eax;
-    }
-
-    return esi;
-}
-
-#pragma auto_inline(on)
-
-// FUNCTION: 0x45aec0
-ModelPiece* __stdcall AddStateEntries(ModelState* state, Object3do* obj,
-                                       ModelPiece* parent)
-{
-    ModelPiece* e = &state->pieces[state->count];
-    e->flags.word |= 2;
-    e->object = obj;
-    e->modified = 0;
-    e->points = (Vec3*)SimAllocTagged("Point List", obj->vertexCount * 12);
-    memcpy(e->points, obj->vertices, obj->vertexCount * 12);
-    if (obj->vertexCount >= 3) {
-        e->flags.word |= 1;
-    } else {
-        e->flags.word &= 0xfffe;
-    }
-    e->flags.word |= 4;
-    state->count++;
-    if (obj->child != 0) {
-        e->child = AddStateEntries(state, obj->child, e);
-    } else {
-        e->child = 0;
-    }
-    if (obj->sibling != 0) {
-        e->sibling = AddStateEntries(state, obj->sibling, parent);
-    } else {
-        e->sibling = 0;
-    }
-    e->parent = parent;
-    return e;
-}
-
-// FUNCTION: 0x45af90
-ModelPiece* __stdcall LinkStateEntries(ModelState* state, Object3do* obj, ModelPiece* parent)
-{
-    int i = state->count - 1;
-    if (i >= 0) {
-        while (1) {
-            if (state->pieces[i].object == obj)
-                break;
-            i--;
-            if (i < 0)
-                return 0;
-        }
-        ModelPiece* e = &state->pieces[i];
-        if (e->object->sibling != 0) {
-            e->sibling = LinkStateEntries(state, e->object->sibling, parent);
-        } else {
-            e->sibling = 0;
-        }
-        if (e->object->child != 0) {
-            e->child = LinkStateEntries(state, e->object->child, e);
-        } else {
-            e->child = 0;
-        }
-        e->parent = parent;
-        return e;
-    }
-    return 0;
-}
-
-// FUNCTION: 0x45b150
-void __fastcall TransformPieces(ModelState* owner, ModelPiece* piece,
-                             Vector3s* angles, Vec3* delta, int deep)
-{
-    for (;;) {
-        if (piece->modified == 0) {
-            Vec3* offset = &piece->offset;
-            RotateByAngles(offset, offset, (short*)angles);
-            int count = piece->object->vertexCount;
-            for (int i = count - 1; i >= 0; i--)
-                RotateByAngles(&piece->points[i], &piece->points[i], (short*)angles);
-            offset->x += delta->x;
-            offset->y += delta->y;
-            offset->z += delta->z;
-            count = piece->object->vertexCount;
-            for (int j = count - 1; j >= 0; j--) {
-                Vec3* p = &piece->points[j];
-                p->x += delta->x;
-                p->y += delta->y;
-                p->z += delta->z;
-            }
-        }
-        if (piece->child) {
-            TransformPieces(owner, piece->child, angles, delta, 1);
-        }
-        if (deep == 0)
-            break;
-        piece = piece->sibling;
-        if (piece == 0)
-            break;
-        deep = 1;
-    }
-}
-
-// FUNCTION: 0x45b0a0
-void __fastcall PoseModel(ModelState* model, ModelPiece* piece, int force)
-{
-    if (piece->child)
-        PoseModel(model, piece->child, 1);
-
-    Vector3s pos;
-    pos.x = piece->short_14;
-    pos.z = piece->short_10;
-    pos.y = piece->short_12;
-    if (!force) {
-        pos.x += model->pos.x;
-        pos.z += model->pos.z;
-        pos.y += model->pos.y;
-    }
-
-    Object3do* object = piece->object;
-    Vec3 box;
-    box.x = piece->rot_x + object->box_x;
-    box.y = piece->rot_y + object->box_y;
-    box.z = piece->rot_z + object->box_z;
-
-    TransformPieces(model, piece, &pos, &box, 0);
-
-    if (force && piece->sibling)
-        PoseModel(model, piece->sibling, 1);
 }
 
 // FUNCTION: 0x4584d0

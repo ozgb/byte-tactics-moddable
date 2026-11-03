@@ -13,7 +13,7 @@ class TdfFile;
 // Major version of the players interface, changed when a slot is removed or its signature changes.
 #define PLAYERS_VERSION_MAJOR 1
 // Minor version of the players interface, changed when a slot is added.
-#define PLAYERS_VERSION_MINOR 4
+#define PLAYERS_VERSION_MINOR 5
 
 // Per-player state.
 struct PlayersSeam {
@@ -73,6 +73,8 @@ struct PlayersSeam {
     void (__fastcall* NotifyUnitDied)(MissionConditions* conditions, int unusedEdx, Unit* unit);
     // Advances every player's state for one tick like UpdatePlayers, but draws from the given stream; UpdatePlayers draws from the main stream.
     void (__stdcall* UpdatePlayersOnStream)(RandStream stream);
+    // Builds an empty conditions object, active and with no victory or defeat conditions. Hooks: none.
+    MissionConditions* (__stdcall* NewConditions)(void);
 };
 
 #endif

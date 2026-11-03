@@ -14,7 +14,7 @@ class MissionType;
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
 #define ORDERS_VERSION_MAJOR 1
 // Minor version of the orders interface, changed when a slot is added.
-#define ORDERS_VERSION_MINOR 7
+#define ORDERS_VERSION_MINOR 8
 
 // Unit orders and command queues.
 struct OrdersSeam {
@@ -68,6 +68,8 @@ struct OrdersSeam {
     MissionType (__stdcall* MissionTypeFromName)(const char* name);
     // Allocates an order from the sim block, builds it from a kind, a target, a position and three values and returns it. Hooks: none.
     Order* (__stdcall* NewOrder)(MissionType kind, Unit* target, void* pos, int a, int b, int c);
+    // Changes the queued count of a unit type in the build list of a unit, by name, and never plays a sound. Hooks: none.
+    void (__stdcall* QueueBuildOrder)(char* name, Unit* unit, int count);
 };
 
 #endif

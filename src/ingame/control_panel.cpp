@@ -71,7 +71,7 @@ extern ConsoleCommandTable g_debugCommands;
 
 Unit* __stdcall FindNextSelectedUnit(Unit*, int);
 #include "../units/unit_commands.h"
-#include "../map/radar.h"
+#include "../ingame/radar.h"
 #include "../graphics/display.h"
 #include "../gui/keyboard.h"
 void HideSoftwareCursor();
@@ -93,7 +93,6 @@ int __stdcall FindGadgetIndexBySubstring(int value, char* name);
 int __stdcall FindGadgetIndexBySubstring(Gadget* entries, char* name);
 void __stdcall SetGadgetStatus(Gui* menu, int index, int value);
 void __stdcall PlaySoundByName(char* name, int broadcast);
-void __stdcall AdjustBuildCount(MissionType kind, Unit* unit, int id, int count);
 #include "selection.h"
 void __stdcall SetGadgetActive(Gui* menu, int index, char value);
 #include "../gui/dialogs.h"
@@ -261,8 +260,7 @@ void __stdcall UpdateOnOffButton(Unit* unit)
     }
 }
 
-// FUNCTION: 0x419b00
-void __stdcall QueueBuildOrder(char* name, Unit* unit, int count)
+void __stdcall QueueBuildOrderWithSound(char* name, Unit* unit, int count)
 {
     if (unit->playerIndex == g_game->playerIndex) {
         if (count > 0)
@@ -270,16 +268,7 @@ void __stdcall QueueBuildOrder(char* name, Unit* unit, int count)
         else
             PlaySoundByName("subbuild", 0);
     }
-    if (strstr(name, "MAKENUKE") != 0 || strstr(name, "MAKEANTI") != 0) {
-        AdjustBuildCount(MissionType("BUILDWEAPON"), unit, 0, count);
-        return;
-    }
-    unsigned short id = FindUnitTypeId(name);
-    if (id == 0)
-        return;
-    int mobile = (int)unit->motion.get();
-    const char* kind = mobile ? "MOBILEBUILD" : "BUILDINGBUILD";
-    AdjustBuildCount(MissionType(kind), unit, id, count);
+    g_seams.orders->QueueBuildOrder(name, unit, count);
 }
 
 // FUNCTION: 0x419bc0
@@ -655,7 +644,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
                 if (GetClickMode(menu) != 1)
                     count = -count;
                 HarnessUiQueue(text, unit, count);
-                QueueBuildOrder(text, unit, count);
+                QueueBuildOrderWithSound(text, unit, count);
                 if (unit->immobile
                     || (unit->weapons[0].weapon.get()->flags.value & 0x10000000))
                     RefreshBuildCountTexts(menu, unit);
@@ -1249,6 +1238,20 @@ void __stdcall CycleCameraFollow(int param)
     Unit* val = g_game->value_142f3;
     Unit* result = FindNextSelectedUnit(val, param);
     g_game->value_142f3 = result;
+}
+
+void __stdcall UpdateAutoFollow(void)
+{
+    if (g_game->autoFollowFlags.bits.b1) {
+        if (!IsKeyDown(0xf9)) {
+            (*(short*)&g_game->autoFollowTicks)--;
+            if ((short)g_game->autoFollowTicks <= 0) {
+                (*(short*)&g_game->autoFollowTicks) = 0x5a;
+                CycleSelection();
+                CycleCameraFollow(0);
+            }
+        }
+    }
 }
 
 static inline int TestBit(unsigned int* set, unsigned short n)

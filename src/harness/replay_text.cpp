@@ -178,10 +178,11 @@ bool ReplayKnown::Changed(const char* name, const char* value)
 void ReplayKnown::Set(const char* name, const char* value)
 {
     if (table == nullptr) {
-        table = (Table*)malloc(sizeof(Table));
-        if (table == nullptr)
+        Table* made = (Table*)malloc(sizeof(Table));
+        if (made == nullptr)
             abort();
-        memset(table->slots, 0xff, sizeof table->slots);
+        memset(made->slots, 0xff, sizeof made->slots);
+        table = made;
     }
     int at = Find(name);
     if (at < 0) {

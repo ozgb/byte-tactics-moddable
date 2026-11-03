@@ -31,7 +31,7 @@ FilesSeam s_rec_files;
 const NetworkSeam* s_inner_network;
 NetworkSeam s_rec_network;
 
-void __cdecl Rec_wind_meteors_UpdateWind()
+void __cdecl RecWindMeteorsUpdateWind()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_UPDATEWIND, SUB_WIND_METEORS, roots);
@@ -42,7 +42,7 @@ void __cdecl Rec_wind_meteors_UpdateWind()
     }
 }
 
-void __stdcall Rec_wind_meteors_UpdateMeteors()
+void __stdcall RecWindMeteorsUpdateMeteors()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_UPDATEMETEORS, SUB_WIND_METEORS, roots);
@@ -53,7 +53,7 @@ void __stdcall Rec_wind_meteors_UpdateMeteors()
     }
 }
 
-void __stdcall Rec_wind_meteors_InitMeteors()
+void __stdcall RecWindMeteorsInitMeteors()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_INITMETEORS, SUB_WIND_METEORS, roots);
@@ -64,7 +64,7 @@ void __stdcall Rec_wind_meteors_InitMeteors()
     }
 }
 
-void __stdcall Rec_wind_meteors_EmptyShutdownPreCleanup()
+void __stdcall RecWindMeteorsEmptyShutdownPreCleanup()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_EMPTYSHUTDOWNPRECLEANUP, SUB_WIND_METEORS, roots);
@@ -75,7 +75,7 @@ void __stdcall Rec_wind_meteors_EmptyShutdownPreCleanup()
     }
 }
 
-void __stdcall Rec_wind_meteors_EnableMeteors()
+void __stdcall RecWindMeteorsEnableMeteors()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_ENABLEMETEORS, SUB_WIND_METEORS, roots);
@@ -86,7 +86,7 @@ void __stdcall Rec_wind_meteors_EnableMeteors()
     }
 }
 
-void __stdcall Rec_wind_meteors_DisableMeteors()
+void __stdcall RecWindMeteorsDisableMeteors()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_DISABLEMETEORS, SUB_WIND_METEORS, roots);
@@ -97,7 +97,7 @@ void __stdcall Rec_wind_meteors_DisableMeteors()
     }
 }
 
-void __stdcall Rec_wind_meteors_SetMeteorParams(MeteorParams* a0)
+void __stdcall RecWindMeteorsSetMeteorParams(MeteorParams* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_SETMETEORPARAMS, SUB_WIND_METEORS, roots);
@@ -109,7 +109,7 @@ void __stdcall Rec_wind_meteors_SetMeteorParams(MeteorParams* a0)
     }
 }
 
-void __fastcall Rec_wind_meteors_LoadMeteorDefaults(MeteorParams* a0)
+void __fastcall RecWindMeteorsLoadMeteorDefaults(MeteorParams* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_LOADMETEORDEFAULTS, SUB_WIND_METEORS, roots);
@@ -121,7 +121,7 @@ void __fastcall Rec_wind_meteors_LoadMeteorDefaults(MeteorParams* a0)
     }
 }
 
-void __stdcall Rec_wind_meteors_SaveMeteors(HapiBank* a0)
+void __stdcall RecWindMeteorsSaveMeteors(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_SAVEMETEORS, SUB_WIND_METEORS, roots);
@@ -133,7 +133,7 @@ void __stdcall Rec_wind_meteors_SaveMeteors(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_wind_meteors_LoadMeteors(HapiBank* a0)
+void __stdcall RecWindMeteorsLoadMeteors(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_LOADMETEORS, SUB_WIND_METEORS, roots);
@@ -145,7 +145,7 @@ void __stdcall Rec_wind_meteors_LoadMeteors(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_wind_meteors_CmdMeteor(CommandArgs* a0)
+void __stdcall RecWindMeteorsCmdMeteor(CommandArgs* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_CMDMETEOR, SUB_WIND_METEORS, roots);
@@ -157,7 +157,7 @@ void __stdcall Rec_wind_meteors_CmdMeteor(CommandArgs* a0)
     }
 }
 
-void __cdecl Rec_wind_meteors_UpdateWindOnStream(RandStream a0)
+void __cdecl RecWindMeteorsUpdateWindOnStream(RandStream a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_UPDATEWINDONSTREAM, SUB_WIND_METEORS, roots);
@@ -169,7 +169,7 @@ void __cdecl Rec_wind_meteors_UpdateWindOnStream(RandStream a0)
     }
 }
 
-void __stdcall Rec_economy_UpdateResourceSharing(Player* a0)
+void __stdcall RecEconomyUpdateResourceSharing(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -182,7 +182,7 @@ void __stdcall Rec_economy_UpdateResourceSharing(Player* a0)
     }
 }
 
-float __stdcall Rec_economy_GetEnergyUse(UnitDef* a0)
+float __stdcall RecEconomyGetEnergyUse(UnitDef* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITDEF, a0);
@@ -197,7 +197,7 @@ float __stdcall Rec_economy_GetEnergyUse(UnitDef* a0)
     return result;
 }
 
-void __stdcall Rec_economy_UpdatePlayerEconomy(Player* a0)
+void __stdcall RecEconomyUpdatePlayerEconomy(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -210,7 +210,7 @@ void __stdcall Rec_economy_UpdatePlayerEconomy(Player* a0)
     }
 }
 
-void __stdcall Rec_economy_UpdateMetalExtraction(Unit* a0)
+void __stdcall RecEconomyUpdateMetalExtraction(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -223,7 +223,7 @@ void __stdcall Rec_economy_UpdateMetalExtraction(Unit* a0)
     }
 }
 
-void __stdcall Rec_economy_Reset(UnitResources* a0, unsigned char a1)
+void __stdcall RecEconomyReset(UnitResources* a0, unsigned char a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_RESET, SUB_ECONOMY, roots);
@@ -236,7 +236,7 @@ void __stdcall Rec_economy_Reset(UnitResources* a0, unsigned char a1)
     }
 }
 
-void __stdcall Rec_economy_SaveUnitAccounts(UnitResources* a0, UnitInfo* a1, HapiBank* a2)
+void __stdcall RecEconomySaveUnitAccounts(UnitResources* a0, UnitInfo* a1, HapiBank* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_SAVEUNITACCOUNTS, SUB_ECONOMY, roots);
@@ -250,7 +250,7 @@ void __stdcall Rec_economy_SaveUnitAccounts(UnitResources* a0, UnitInfo* a1, Hap
     }
 }
 
-void __stdcall Rec_economy_LoadUnitAccounts(UnitResources* a0, UnitInfo* a1, HapiBank* a2)
+void __stdcall RecEconomyLoadUnitAccounts(UnitResources* a0, UnitInfo* a1, HapiBank* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_LOADUNITACCOUNTS, SUB_ECONOMY, roots);
@@ -264,7 +264,7 @@ void __stdcall Rec_economy_LoadUnitAccounts(UnitResources* a0, UnitInfo* a1, Hap
     }
 }
 
-int __stdcall Rec_economy_RequestEnergy(UnitResources* a0, UnitResources* a1, float a2)
+int __stdcall RecEconomyRequestEnergy(UnitResources* a0, UnitResources* a1, float a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_REQUESTENERGY, SUB_ECONOMY, roots);
@@ -280,7 +280,7 @@ int __stdcall Rec_economy_RequestEnergy(UnitResources* a0, UnitResources* a1, fl
     return result;
 }
 
-int __stdcall Rec_economy_RequestEnergyAndMetal(UnitResources* a0, float a1, float a2)
+int __stdcall RecEconomyRequestEnergyAndMetal(UnitResources* a0, float a1, float a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_REQUESTENERGYANDMETAL, SUB_ECONOMY, roots);
@@ -296,7 +296,7 @@ int __stdcall Rec_economy_RequestEnergyAndMetal(UnitResources* a0, float a1, flo
     return result;
 }
 
-int __stdcall Rec_economy_SpendEnergy(UnitResources* a0, float a1)
+int __stdcall RecEconomySpendEnergy(UnitResources* a0, float a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_SPENDENERGY, SUB_ECONOMY, roots);
@@ -311,7 +311,7 @@ int __stdcall Rec_economy_SpendEnergy(UnitResources* a0, float a1)
     return result;
 }
 
-int __stdcall Rec_economy_SpendMetal(UnitResources* a0, float a1)
+int __stdcall RecEconomySpendMetal(UnitResources* a0, float a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_SPENDMETAL, SUB_ECONOMY, roots);
@@ -326,7 +326,7 @@ int __stdcall Rec_economy_SpendMetal(UnitResources* a0, float a1)
     return result;
 }
 
-int __stdcall Rec_economy_SpendEnergyAndMetal(UnitResources* a0, float a1, float a2)
+int __stdcall RecEconomySpendEnergyAndMetal(UnitResources* a0, float a1, float a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_SPENDENERGYANDMETAL, SUB_ECONOMY, roots);
@@ -342,7 +342,7 @@ int __stdcall Rec_economy_SpendEnergyAndMetal(UnitResources* a0, float a1, float
     return result;
 }
 
-void __stdcall Rec_features_UpdateFeatures()
+void __stdcall RecFeaturesUpdateFeatures()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_UPDATEFEATURES, SUB_FEATURES, roots);
@@ -353,7 +353,7 @@ void __stdcall Rec_features_UpdateFeatures()
     }
 }
 
-void __stdcall Rec_features_LoadFeatureFileList()
+void __stdcall RecFeaturesLoadFeatureFileList()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_LOADFEATUREFILELIST, SUB_FEATURES, roots);
@@ -364,7 +364,7 @@ void __stdcall Rec_features_LoadFeatureFileList()
     }
 }
 
-void __stdcall Rec_features_FreeFeatureFileList()
+void __stdcall RecFeaturesFreeFeatureFileList()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_FREEFEATUREFILELIST, SUB_FEATURES, roots);
@@ -375,7 +375,7 @@ void __stdcall Rec_features_FreeFeatureFileList()
     }
 }
 
-void __stdcall Rec_features_NopAfterFeatureEnum()
+void __stdcall RecFeaturesNopAfterFeatureEnum()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_NOPAFTERFEATUREENUM, SUB_FEATURES, roots);
@@ -386,7 +386,7 @@ void __stdcall Rec_features_NopAfterFeatureEnum()
     }
 }
 
-void __stdcall Rec_features_ResolveFeatureLinks()
+void __stdcall RecFeaturesResolveFeatureLinks()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_RESOLVEFEATURELINKS, SUB_FEATURES, roots);
@@ -397,7 +397,7 @@ void __stdcall Rec_features_ResolveFeatureLinks()
     }
 }
 
-void __stdcall Rec_features_InitFeatureAnimPool(TntInfo* a0)
+void __stdcall RecFeaturesInitFeatureAnimPool(TntInfo* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_INITFEATUREANIMPOOL, SUB_FEATURES, roots);
@@ -409,7 +409,7 @@ void __stdcall Rec_features_InitFeatureAnimPool(TntInfo* a0)
     }
 }
 
-void __stdcall Rec_features_FreeFeaturePool()
+void __stdcall RecFeaturesFreeFeaturePool()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_FREEFEATUREPOOL, SUB_FEATURES, roots);
@@ -420,7 +420,7 @@ void __stdcall Rec_features_FreeFeaturePool()
     }
 }
 
-void __stdcall Rec_features_PlaceMissionFeatures()
+void __stdcall RecFeaturesPlaceMissionFeatures()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_PLACEMISSIONFEATURES, SUB_FEATURES, roots);
@@ -431,7 +431,7 @@ void __stdcall Rec_features_PlaceMissionFeatures()
     }
 }
 
-void __stdcall Rec_features_StampFeatureMetal()
+void __stdcall RecFeaturesStampFeatureMetal()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_STAMPFEATUREMETAL, SUB_FEATURES, roots);
@@ -442,7 +442,7 @@ void __stdcall Rec_features_StampFeatureMetal()
     }
 }
 
-unsigned short __stdcall Rec_features_GetCellFeature(Cell* a0)
+unsigned short __stdcall RecFeaturesGetCellFeature(Cell* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_GETCELLFEATURE, SUB_FEATURES, roots);
@@ -456,7 +456,7 @@ unsigned short __stdcall Rec_features_GetCellFeature(Cell* a0)
     return result;
 }
 
-Spot* __stdcall Rec_features_PlaceFeature(Cell* a0, unsigned short a1, Vec3* a2, Rot16* a3, unsigned char a4)
+Spot* __stdcall RecFeaturesPlaceFeature(Cell* a0, unsigned short a1, Vec3* a2, Rot16* a3, unsigned char a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_PLACEFEATURE, SUB_FEATURES, roots);
@@ -473,7 +473,7 @@ Spot* __stdcall Rec_features_PlaceFeature(Cell* a0, unsigned short a1, Vec3* a2,
     return result;
 }
 
-int __stdcall Rec_features_RemoveFeature(Cell* a0, int a1)
+int __stdcall RecFeaturesRemoveFeature(Cell* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_REMOVEFEATURE, SUB_FEATURES, roots);
@@ -488,7 +488,7 @@ int __stdcall Rec_features_RemoveFeature(Cell* a0, int a1)
     return result;
 }
 
-int __stdcall Rec_features_ReclaimFeature(Unit* a0, Vec3* a1)
+int __stdcall RecFeaturesReclaimFeature(Unit* a0, Vec3* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -504,7 +504,7 @@ int __stdcall Rec_features_ReclaimFeature(Unit* a0, Vec3* a1)
     return result;
 }
 
-unsigned short __stdcall Rec_features_FindOrLoadFeatureType(char* a0)
+unsigned short __stdcall RecFeaturesFindOrLoadFeatureType(char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_FINDORLOADFEATURETYPE, SUB_FEATURES, roots);
@@ -518,7 +518,7 @@ unsigned short __stdcall Rec_features_FindOrLoadFeatureType(char* a0)
     return result;
 }
 
-void __stdcall Rec_features_DamageFeature(Cell* a0, int a1, int a2, WeaponDef* a3)
+void __stdcall RecFeaturesDamageFeature(Cell* a0, int a1, int a2, WeaponDef* a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_DAMAGEFEATURE, SUB_FEATURES, roots);
@@ -533,7 +533,7 @@ void __stdcall Rec_features_DamageFeature(Cell* a0, int a1, int a2, WeaponDef* a
     }
 }
 
-Vec3 __stdcall Rec_features_GetFootprintCentre(Point16* a0, Feature* a1)
+Vec3 __stdcall RecFeaturesGetFootprintCentre(Point16* a0, Feature* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_GETFOOTPRINTCENTRE, SUB_FEATURES, roots);
@@ -548,7 +548,7 @@ Vec3 __stdcall Rec_features_GetFootprintCentre(Point16* a0, Feature* a1)
     return result;
 }
 
-void __stdcall Rec_features_SaveFeatures(HapiBank* a0)
+void __stdcall RecFeaturesSaveFeatures(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_SAVEFEATURES, SUB_FEATURES, roots);
@@ -560,7 +560,7 @@ void __stdcall Rec_features_SaveFeatures(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_features_LoadFeatures(HapiBank* a0)
+void __stdcall RecFeaturesLoadFeatures(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_LOADFEATURES, SUB_FEATURES, roots);
@@ -572,7 +572,7 @@ void __stdcall Rec_features_LoadFeatures(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_ai_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
+void __stdcall RecAiGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_GETVISIBLEENEMIESINRADIUS, SUB_AI, roots);
@@ -588,7 +588,7 @@ void __stdcall Rec_ai_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, 
     }
 }
 
-bool __stdcall Rec_ai_HasReadyUnitInRange(int a0, Vec3* a1, int a2)
+bool __stdcall RecAiHasReadyUnitInRange(int a0, Vec3* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_HASREADYUNITINRANGE, SUB_AI, roots);
@@ -604,7 +604,7 @@ bool __stdcall Rec_ai_HasReadyUnitInRange(int a0, Vec3* a1, int a2)
     return result;
 }
 
-int __stdcall Rec_ai_IsPointVisible(Player* a0, Vec3* a1)
+int __stdcall RecAiIsPointVisible(Player* a0, Vec3* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -620,7 +620,7 @@ int __stdcall Rec_ai_IsPointVisible(Player* a0, Vec3* a1)
     return result;
 }
 
-void __stdcall Rec_ai_ReactToAttack(Unit* a0, Unit* a1, int a2)
+void __stdcall RecAiReactToAttack(Unit* a0, Unit* a1, int a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -636,7 +636,7 @@ void __stdcall Rec_ai_ReactToAttack(Unit* a0, Unit* a1, int a2)
     }
 }
 
-void __fastcall Rec_ai_MarkOwnerNetDirtyFromDamageSplit(SquadManager* a0, int a1, Projectile* a2, int a3, int a4)
+void __fastcall RecAiMarkOwnerNetDirtyFromDamageSplit(SquadManager* a0, int a1, Projectile* a2, int a3, int a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_MARKOWNERNETDIRTYFROMDAMAGESPLIT, SUB_AI, roots);
@@ -652,7 +652,7 @@ void __fastcall Rec_ai_MarkOwnerNetDirtyFromDamageSplit(SquadManager* a0, int a1
     }
 }
 
-void __stdcall Rec_ai_DumpPlayerAI(int a0, void* a1)
+void __stdcall RecAiDumpPlayerAI(int a0, void* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_DUMPPLAYERAI, SUB_AI, roots);
@@ -665,7 +665,7 @@ void __stdcall Rec_ai_DumpPlayerAI(int a0, void* a1)
     }
 }
 
-void __stdcall Rec_ai_ResetAIPlayers()
+void __stdcall RecAiResetAIPlayers()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_RESETAIPLAYERS, SUB_AI, roots);
@@ -676,7 +676,7 @@ void __stdcall Rec_ai_ResetAIPlayers()
     }
 }
 
-void __stdcall Rec_ai_GetFactoriesInRadius(int a0, const Vec3* a1, int a2, std::vector<Unit*, std::allocator<Unit*> >* a3)
+void __stdcall RecAiGetFactoriesInRadius(int a0, const Vec3* a1, int a2, std::vector<Unit*, std::allocator<Unit*> >* a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_GETFACTORIESINRADIUS, SUB_AI, roots);
@@ -691,7 +691,7 @@ void __stdcall Rec_ai_GetFactoriesInRadius(int a0, const Vec3* a1, int a2, std::
     }
 }
 
-void __stdcall Rec_ai_CreatePlayerAI(int a0)
+void __stdcall RecAiCreatePlayerAI(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_CREATEPLAYERAI, SUB_AI, roots);
@@ -703,7 +703,7 @@ void __stdcall Rec_ai_CreatePlayerAI(int a0)
     }
 }
 
-void __stdcall Rec_ai_DestroyPlayerAI(int a0)
+void __stdcall RecAiDestroyPlayerAI(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_DESTROYPLAYERAI, SUB_AI, roots);
@@ -715,7 +715,7 @@ void __stdcall Rec_ai_DestroyPlayerAI(int a0)
     }
 }
 
-void __stdcall Rec_ai_UpdatePlayerAI(int a0)
+void __stdcall RecAiUpdatePlayerAI(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_UPDATEPLAYERAI, SUB_AI, roots);
@@ -727,7 +727,7 @@ void __stdcall Rec_ai_UpdatePlayerAI(int a0)
     }
 }
 
-void __stdcall Rec_ai_RebuildFeatureCells(int a0)
+void __stdcall RecAiRebuildFeatureCells(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_REBUILDFEATURECELLS, SUB_AI, roots);
@@ -739,7 +739,7 @@ void __stdcall Rec_ai_RebuildFeatureCells(int a0)
     }
 }
 
-void __stdcall Rec_ai_ParseDownloadableAiWeightScripts(int a0)
+void __stdcall RecAiParseDownloadableAiWeightScripts(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_PARSEDOWNLOADABLEAIWEIGHTSCRIPTS, SUB_AI, roots);
@@ -751,7 +751,7 @@ void __stdcall Rec_ai_ParseDownloadableAiWeightScripts(int a0)
     }
 }
 
-void __stdcall Rec_ai_ReparseAiWeightScriptsIfLimitNotSticky(int a0)
+void __stdcall RecAiReparseAiWeightScriptsIfLimitNotSticky(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_REPARSEAIWEIGHTSCRIPTSIFLIMITNOTSTICKY, SUB_AI, roots);
@@ -763,7 +763,7 @@ void __stdcall Rec_ai_ReparseAiWeightScriptsIfLimitNotSticky(int a0)
     }
 }
 
-void __stdcall Rec_ai_CreateSquads(Player* a0)
+void __stdcall RecAiCreateSquads(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -776,7 +776,7 @@ void __stdcall Rec_ai_CreateSquads(Player* a0)
     }
 }
 
-void __stdcall Rec_ai_FreeSquads(Player* a0)
+void __stdcall RecAiFreeSquads(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -789,7 +789,7 @@ void __stdcall Rec_ai_FreeSquads(Player* a0)
     }
 }
 
-void __stdcall Rec_ai_SetUnitSquad(Unit* a0, int a1)
+void __stdcall RecAiSetUnitSquad(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -803,7 +803,7 @@ void __stdcall Rec_ai_SetUnitSquad(Unit* a0, int a1)
     }
 }
 
-void __fastcall Rec_ai_SquadManagerTickIfActive(SquadManager* a0, int a1)
+void __fastcall RecAiSquadManagerTickIfActive(SquadManager* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_SQUADMANAGERTICKIFACTIVE, SUB_AI, roots);
@@ -816,7 +816,7 @@ void __fastcall Rec_ai_SquadManagerTickIfActive(SquadManager* a0, int a1)
     }
 }
 
-void __fastcall Rec_ai_SquadManagerDeleteTimers(SquadManager* a0, int a1)
+void __fastcall RecAiSquadManagerDeleteTimers(SquadManager* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_SQUADMANAGERDELETETIMERS, SUB_AI, roots);
@@ -829,7 +829,7 @@ void __fastcall Rec_ai_SquadManagerDeleteTimers(SquadManager* a0, int a1)
     }
 }
 
-void __stdcall Rec_ai_CreateSquadManager(Player* a0)
+void __stdcall RecAiCreateSquadManager(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -842,7 +842,7 @@ void __stdcall Rec_ai_CreateSquadManager(Player* a0)
     }
 }
 
-void __stdcall Rec_ai_CmdPlan(CommandArgs* a0)
+void __stdcall RecAiCmdPlan(CommandArgs* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_CMDPLAN, SUB_AI, roots);
@@ -854,7 +854,7 @@ void __stdcall Rec_ai_CmdPlan(CommandArgs* a0)
     }
 }
 
-void __stdcall Rec_ai_CmdWeight(CommandArgs* a0)
+void __stdcall RecAiCmdWeight(CommandArgs* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_CMDWEIGHT, SUB_AI, roots);
@@ -866,7 +866,7 @@ void __stdcall Rec_ai_CmdWeight(CommandArgs* a0)
     }
 }
 
-void __stdcall Rec_ai_CmdLimit(CommandArgs* a0)
+void __stdcall RecAiCmdLimit(CommandArgs* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_CMDLIMIT, SUB_AI, roots);
@@ -878,7 +878,7 @@ void __stdcall Rec_ai_CmdLimit(CommandArgs* a0)
     }
 }
 
-void __fastcall Rec_pathfinding_RunSearches(Pathfinder* a0)
+void __fastcall RecPathfindingRunSearches(Pathfinder* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_RUNSEARCHES, SUB_PATHFINDING, roots);
@@ -890,7 +890,7 @@ void __fastcall Rec_pathfinding_RunSearches(Pathfinder* a0)
     }
 }
 
-void __stdcall Rec_pathfinding_AbortIfGoalMatch(Pathfinder* a0, AiSearchGoal* a1)
+void __stdcall RecPathfindingAbortIfGoalMatch(Pathfinder* a0, AiSearchGoal* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_ABORTIFGOALMATCH, SUB_PATHFINDING, roots);
@@ -903,7 +903,7 @@ void __stdcall Rec_pathfinding_AbortIfGoalMatch(Pathfinder* a0, AiSearchGoal* a1
     }
 }
 
-void __stdcall Rec_pathfinding_Destroy(Pathfinder* a0)
+void __stdcall RecPathfindingDestroy(Pathfinder* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_DESTROY, SUB_PATHFINDING, roots);
@@ -915,7 +915,7 @@ void __stdcall Rec_pathfinding_Destroy(Pathfinder* a0)
     }
 }
 
-void __stdcall Rec_pathfinding_Create()
+void __stdcall RecPathfindingCreate()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_CREATE, SUB_PATHFINDING, roots);
@@ -926,7 +926,7 @@ void __stdcall Rec_pathfinding_Create()
     }
 }
 
-void __stdcall Rec_weapons_UpdateProjectiles()
+void __stdcall RecWeaponsUpdateProjectiles()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_UPDATEPROJECTILES, SUB_WEAPONS, roots);
@@ -937,7 +937,7 @@ void __stdcall Rec_weapons_UpdateProjectiles()
     }
 }
 
-void __stdcall Rec_weapons_UpdateExplosions()
+void __stdcall RecWeaponsUpdateExplosions()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_UPDATEEXPLOSIONS, SUB_WEAPONS, roots);
@@ -948,7 +948,7 @@ void __stdcall Rec_weapons_UpdateExplosions()
     }
 }
 
-int __stdcall Rec_weapons_SpawnProjectile(WeaponDef* a0, Vec3* a1, Vec3* a2, int a3)
+int __stdcall RecWeaponsSpawnProjectile(WeaponDef* a0, Vec3* a1, Vec3* a2, int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_SPAWNPROJECTILE, SUB_WEAPONS, roots);
@@ -977,7 +977,7 @@ int __stdcall Rec_weapons_SpawnProjectile(WeaponDef* a0, Vec3* a1, Vec3* a2, int
     return result;
 }
 
-WeaponDef* __stdcall Rec_weapons_FindWeaponByName(char* a0)
+WeaponDef* __stdcall RecWeaponsFindWeaponByName(char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_FINDWEAPONBYNAME, SUB_WEAPONS, roots);
@@ -999,7 +999,7 @@ WeaponDef* __stdcall Rec_weapons_FindWeaponByName(char* a0)
     return result;
 }
 
-void __stdcall Rec_weapons_ApplyAreaDamageAt(WeaponDef* a0, Vec3* a1)
+void __stdcall RecWeaponsApplyAreaDamageAt(WeaponDef* a0, Vec3* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_APPLYAREADAMAGEAT, SUB_WEAPONS, roots);
@@ -1012,7 +1012,7 @@ void __stdcall Rec_weapons_ApplyAreaDamageAt(WeaponDef* a0, Vec3* a1)
     }
 }
 
-int __stdcall Rec_weapons_GetWeaponRange(Unit* a0, unsigned int a1)
+int __stdcall RecWeaponsGetWeaponRange(Unit* a0, unsigned int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1028,7 +1028,7 @@ int __stdcall Rec_weapons_GetWeaponRange(Unit* a0, unsigned int a1)
     return result;
 }
 
-int __stdcall Rec_weapons_WeaponCanReachUnit(Unit* a0, Unit* a1, unsigned char a2)
+int __stdcall RecWeaponsWeaponCanReachUnit(Unit* a0, Unit* a1, unsigned char a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1046,7 +1046,7 @@ int __stdcall Rec_weapons_WeaponCanReachUnit(Unit* a0, Unit* a1, unsigned char a
     return result;
 }
 
-Projectile* __stdcall Rec_weapons_FindTargetableProjectile(Unit* a0, unsigned int a1)
+Projectile* __stdcall RecWeaponsFindTargetableProjectile(Unit* a0, unsigned int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1061,7 +1061,7 @@ Projectile* __stdcall Rec_weapons_FindTargetableProjectile(Unit* a0, unsigned in
     return result;
 }
 
-int __stdcall Rec_weapons_WeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3)
+int __stdcall RecWeaponsWeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1079,7 +1079,7 @@ int __stdcall Rec_weapons_WeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3
     return result;
 }
 
-void __stdcall Rec_weapons_AllocWeaponArray()
+void __stdcall RecWeaponsAllocWeaponArray()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_ALLOCWEAPONARRAY, SUB_WEAPONS, roots);
@@ -1090,7 +1090,7 @@ void __stdcall Rec_weapons_AllocWeaponArray()
     }
 }
 
-void __stdcall Rec_weapons_FreeWeaponArray()
+void __stdcall RecWeaponsFreeWeaponArray()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_FREEWEAPONARRAY, SUB_WEAPONS, roots);
@@ -1101,7 +1101,7 @@ void __stdcall Rec_weapons_FreeWeaponArray()
     }
 }
 
-void __stdcall Rec_weapons_LoadWeaponTypes()
+void __stdcall RecWeaponsLoadWeaponTypes()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_LOADWEAPONTYPES, SUB_WEAPONS, roots);
@@ -1112,7 +1112,7 @@ void __stdcall Rec_weapons_LoadWeaponTypes()
     }
 }
 
-void __stdcall Rec_weapons_FreeWeaponTypes()
+void __stdcall RecWeaponsFreeWeaponTypes()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_FREEWEAPONTYPES, SUB_WEAPONS, roots);
@@ -1123,7 +1123,7 @@ void __stdcall Rec_weapons_FreeWeaponTypes()
     }
 }
 
-void __stdcall Rec_weapons_InitExplosions()
+void __stdcall RecWeaponsInitExplosions()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_INITEXPLOSIONS, SUB_WEAPONS, roots);
@@ -1134,7 +1134,7 @@ void __stdcall Rec_weapons_InitExplosions()
     }
 }
 
-void __stdcall Rec_weapons_FreeExplosions()
+void __stdcall RecWeaponsFreeExplosions()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_FREEEXPLOSIONS, SUB_WEAPONS, roots);
@@ -1145,7 +1145,7 @@ void __stdcall Rec_weapons_FreeExplosions()
     }
 }
 
-void __stdcall Rec_weapons_DamageUnit(Unit* a0, Unit* a1, int a2, int a3, unsigned short a4)
+void __stdcall RecWeaponsDamageUnit(Unit* a0, Unit* a1, int a2, int a3, unsigned short a4)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1163,7 +1163,7 @@ void __stdcall Rec_weapons_DamageUnit(Unit* a0, Unit* a1, int a2, int a3, unsign
     }
 }
 
-unsigned short __stdcall Rec_weapons_FindFeatureAtPos(Vec3* a0, Point16* a1, Point16* a2)
+unsigned short __stdcall RecWeaponsFindFeatureAtPos(Vec3* a0, Point16* a1, Point16* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_FINDFEATUREATPOS, SUB_WEAPONS, roots);
@@ -1179,7 +1179,7 @@ unsigned short __stdcall Rec_weapons_FindFeatureAtPos(Vec3* a0, Point16* a1, Poi
     return result;
 }
 
-void __fastcall Rec_weapons_ReleaseWeapons(Unit* a0, int a1, unsigned char a2)
+void __fastcall RecWeaponsReleaseWeapons(Unit* a0, int a1, unsigned char a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1194,7 +1194,7 @@ void __fastcall Rec_weapons_ReleaseWeapons(Unit* a0, int a1, unsigned char a2)
     }
 }
 
-void __fastcall Rec_weapons_ClaimWeapons(Unit* a0, int a1, unsigned char a2)
+void __fastcall RecWeaponsClaimWeapons(Unit* a0, int a1, unsigned char a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1209,7 +1209,7 @@ void __fastcall Rec_weapons_ClaimWeapons(Unit* a0, int a1, unsigned char a2)
     }
 }
 
-void __stdcall Rec_weapons_DetonateUnitWeapon(Unit* a0, int a1)
+void __stdcall RecWeaponsDetonateUnitWeapon(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1223,7 +1223,7 @@ void __stdcall Rec_weapons_DetonateUnitWeapon(Unit* a0, int a1)
     }
 }
 
-void __stdcall Rec_weapons_InitUnitWeaponSlots(Unit* a0)
+void __stdcall RecWeaponsInitUnitWeaponSlots(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1236,7 +1236,7 @@ void __stdcall Rec_weapons_InitUnitWeaponSlots(Unit* a0)
     }
 }
 
-void __stdcall Rec_weapons_RemoveUnitProjectiles(Unit* a0)
+void __stdcall RecWeaponsRemoveUnitProjectiles(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1249,7 +1249,7 @@ void __stdcall Rec_weapons_RemoveUnitProjectiles(Unit* a0)
     }
 }
 
-void __stdcall Rec_weapons_UpdateUnitWeapons(Unit* a0)
+void __stdcall RecWeaponsUpdateUnitWeapons(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1262,7 +1262,7 @@ void __stdcall Rec_weapons_UpdateUnitWeapons(Unit* a0)
     }
 }
 
-void __stdcall Rec_targeting_SetWeaponTargetUnit(Unit* a0, Unit* a1, int a2)
+void __stdcall RecTargetingSetWeaponTargetUnit(Unit* a0, Unit* a1, int a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1278,7 +1278,7 @@ void __stdcall Rec_targeting_SetWeaponTargetUnit(Unit* a0, Unit* a1, int a2)
     }
 }
 
-void __stdcall Rec_targeting_SetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
+void __stdcall RecTargetingSetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1293,7 +1293,7 @@ void __stdcall Rec_targeting_SetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
     }
 }
 
-void __stdcall Rec_targeting_ClearWeaponTarget(Unit* a0, int a1)
+void __stdcall RecTargetingClearWeaponTarget(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1307,7 +1307,7 @@ void __stdcall Rec_targeting_ClearWeaponTarget(Unit* a0, int a1)
     }
 }
 
-void __stdcall Rec_targeting_ResetWeaponTarget(Unit* a0, int a1)
+void __stdcall RecTargetingResetWeaponTarget(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1321,7 +1321,7 @@ void __stdcall Rec_targeting_ResetWeaponTarget(Unit* a0, int a1)
     }
 }
 
-Unit* __stdcall Rec_targeting_GetWeaponTargetUnit(Unit* a0, int a1)
+Unit* __stdcall RecTargetingGetWeaponTargetUnit(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1337,7 +1337,7 @@ Unit* __stdcall Rec_targeting_GetWeaponTargetUnit(Unit* a0, int a1)
     return result;
 }
 
-int __stdcall Rec_targeting_GetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
+int __stdcall RecTargetingGetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1354,7 +1354,7 @@ int __stdcall Rec_targeting_GetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
     return result;
 }
 
-Unit* __stdcall Rec_targeting_FindWeaponTarget(Unit* a0, unsigned char a1, int a2)
+Unit* __stdcall RecTargetingFindWeaponTarget(Unit* a0, unsigned char a1, int a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1371,7 +1371,7 @@ Unit* __stdcall Rec_targeting_FindWeaponTarget(Unit* a0, unsigned char a1, int a
     return result;
 }
 
-Unit* __stdcall Rec_targeting_FindBestTargetIfFireAtWill(Unit* a0)
+Unit* __stdcall RecTargetingFindBestTargetIfFireAtWill(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1386,7 +1386,7 @@ Unit* __stdcall Rec_targeting_FindBestTargetIfFireAtWill(Unit* a0)
     return result;
 }
 
-unsigned char __fastcall Rec_targeting_ChooseWeapon(Unit* a0)
+unsigned char __fastcall RecTargetingChooseWeapon(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1401,7 +1401,7 @@ unsigned char __fastcall Rec_targeting_ChooseWeapon(Unit* a0)
     return result;
 }
 
-Cell* __stdcall Rec_los_radar_GetMapCell(int a0, int a1)
+Cell* __stdcall RecLosRadarGetMapCell(int a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_GETMAPCELL, SUB_LOS_RADAR, roots);
@@ -1415,7 +1415,7 @@ Cell* __stdcall Rec_los_radar_GetMapCell(int a0, int a1)
     return result;
 }
 
-void __stdcall Rec_los_radar_CmdShareMapping(int a0)
+void __stdcall RecLosRadarCmdShareMapping(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_CMDSHAREMAPPING, SUB_LOS_RADAR, roots);
@@ -1427,7 +1427,7 @@ void __stdcall Rec_los_radar_CmdShareMapping(int a0)
     }
 }
 
-void __stdcall Rec_los_radar_CmdShareRadar(int a0)
+void __stdcall RecLosRadarCmdShareRadar(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_CMDSHARERADAR, SUB_LOS_RADAR, roots);
@@ -1439,7 +1439,7 @@ void __stdcall Rec_los_radar_CmdShareRadar(int a0)
     }
 }
 
-void __stdcall Rec_los_radar_ClampWorldPosToTerrain(int a0, int a1, Vec3* a2)
+void __stdcall RecLosRadarClampWorldPosToTerrain(int a0, int a1, Vec3* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_CLAMPWORLDPOSTOTERRAIN, SUB_LOS_RADAR, roots);
@@ -1453,7 +1453,7 @@ void __stdcall Rec_los_radar_ClampWorldPosToTerrain(int a0, int a1, Vec3* a2)
     }
 }
 
-void __stdcall Rec_los_radar_ExpireEyeballs()
+void __stdcall RecLosRadarExpireEyeballs()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_EXPIREEYEBALLS, SUB_LOS_RADAR, roots);
@@ -1464,7 +1464,7 @@ void __stdcall Rec_los_radar_ExpireEyeballs()
     }
 }
 
-void __stdcall Rec_los_radar_FreeMapResources()
+void __stdcall RecLosRadarFreeMapResources()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_FREEMAPRESOURCES, SUB_LOS_RADAR, roots);
@@ -1475,7 +1475,7 @@ void __stdcall Rec_los_radar_FreeMapResources()
     }
 }
 
-void __stdcall Rec_los_radar_FreeRadar()
+void __stdcall RecLosRadarFreeRadar()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_FREERADAR, SUB_LOS_RADAR, roots);
@@ -1486,7 +1486,7 @@ void __stdcall Rec_los_radar_FreeRadar()
     }
 }
 
-void __stdcall Rec_los_radar_InitRadar()
+void __stdcall RecLosRadarInitRadar()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_INITRADAR, SUB_LOS_RADAR, roots);
@@ -1497,7 +1497,7 @@ void __stdcall Rec_los_radar_InitRadar()
     }
 }
 
-void __stdcall Rec_los_radar_LoadTntMap()
+void __stdcall RecLosRadarLoadTntMap()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_LOADTNTMAP, SUB_LOS_RADAR, roots);
@@ -1508,7 +1508,7 @@ void __stdcall Rec_los_radar_LoadTntMap()
     }
 }
 
-void __stdcall Rec_los_radar_RecalculateLineOfSight(int a0)
+void __stdcall RecLosRadarRecalculateLineOfSight(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_RECALCULATELINEOFSIGHT, SUB_LOS_RADAR, roots);
@@ -1520,7 +1520,7 @@ void __stdcall Rec_los_radar_RecalculateLineOfSight(int a0)
     }
 }
 
-int __stdcall Rec_los_radar_IsUnitVisibleToPlayer(Player* a0, Unit* a1)
+int __stdcall RecLosRadarIsUnitVisibleToPlayer(Player* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -1537,7 +1537,7 @@ int __stdcall Rec_los_radar_IsUnitVisibleToPlayer(Player* a0, Unit* a1)
     return result;
 }
 
-Cell* __stdcall Rec_los_radar_GetMapCellAtPosition(Vec3* a0)
+Cell* __stdcall RecLosRadarGetMapCellAtPosition(Vec3* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_GETMAPCELLATPOSITION, SUB_LOS_RADAR, roots);
@@ -1550,7 +1550,7 @@ Cell* __stdcall Rec_los_radar_GetMapCellAtPosition(Vec3* a0)
     return result;
 }
 
-Cell* __stdcall Rec_los_radar_GetOriginCellAtPosition(Vec3* a0)
+Cell* __stdcall RecLosRadarGetOriginCellAtPosition(Vec3* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_GETORIGINCELLATPOSITION, SUB_LOS_RADAR, roots);
@@ -1563,7 +1563,7 @@ Cell* __stdcall Rec_los_radar_GetOriginCellAtPosition(Vec3* a0)
     return result;
 }
 
-void __stdcall Rec_los_radar_UpdateCellHeightRange(Point16 a0, Point16 a1)
+void __stdcall RecLosRadarUpdateCellHeightRange(Point16 a0, Point16 a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_UPDATECELLHEIGHTRANGE, SUB_LOS_RADAR, roots);
@@ -1576,7 +1576,7 @@ void __stdcall Rec_los_radar_UpdateCellHeightRange(Point16 a0, Point16 a1)
     }
 }
 
-void __stdcall Rec_los_radar_UpdateUnitLineOfSight(Unit* a0)
+void __stdcall RecLosRadarUpdateUnitLineOfSight(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1589,7 +1589,7 @@ void __stdcall Rec_los_radar_UpdateUnitLineOfSight(Unit* a0)
     }
 }
 
-void __stdcall Rec_los_radar_RemoveUnitLineOfSight(Unit* a0)
+void __stdcall RecLosRadarRemoveUnitLineOfSight(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1602,7 +1602,7 @@ void __stdcall Rec_los_radar_RemoveUnitLineOfSight(Unit* a0)
     }
 }
 
-void __stdcall Rec_los_radar_RevealNewUnit(Unit* a0)
+void __stdcall RecLosRadarRevealNewUnit(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1615,7 +1615,7 @@ void __stdcall Rec_los_radar_RevealNewUnit(Unit* a0)
     }
 }
 
-void __stdcall Rec_los_radar_AddEyeball(Vec3* a0, int a1, int a2, int a3)
+void __stdcall RecLosRadarAddEyeball(Vec3* a0, int a1, int a2, int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_ADDEYEBALL, SUB_LOS_RADAR, roots);
@@ -1630,7 +1630,7 @@ void __stdcall Rec_los_radar_AddEyeball(Vec3* a0, int a1, int a2, int a3)
     }
 }
 
-void __stdcall Rec_los_radar_DrawRadarUnits()
+void __stdcall RecLosRadarDrawRadarUnits()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_DRAWRADARUNITS, SUB_LOS_RADAR, roots);
@@ -1641,7 +1641,7 @@ void __stdcall Rec_los_radar_DrawRadarUnits()
     }
 }
 
-void __stdcall Rec_los_radar_UpdateRadarMapped()
+void __stdcall RecLosRadarUpdateRadarMapped()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_UPDATERADARMAPPED, SUB_LOS_RADAR, roots);
@@ -1652,7 +1652,7 @@ void __stdcall Rec_los_radar_UpdateRadarMapped()
     }
 }
 
-void __stdcall Rec_los_radar_UpdateSensorRadarAndCloak()
+void __stdcall RecLosRadarUpdateSensorRadarAndCloak()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_UPDATESENSORRADARANDCLOAK, SUB_LOS_RADAR, roots);
@@ -1663,7 +1663,7 @@ void __stdcall Rec_los_radar_UpdateSensorRadarAndCloak()
     }
 }
 
-void __stdcall Rec_orders_AiSearchGoalSetWaypoints(AiSearchGoal* a0, Point16* a1, int a2)
+void __stdcall RecOrdersAiSearchGoalSetWaypoints(AiSearchGoal* a0, Point16* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_AISEARCHGOALSETWAYPOINTS, SUB_ORDERS, roots);
@@ -1677,7 +1677,7 @@ void __stdcall Rec_orders_AiSearchGoalSetWaypoints(AiSearchGoal* a0, Point16* a1
     }
 }
 
-void __stdcall Rec_orders_OrderFxAddFlags(OrderFx* a0, int a1)
+void __stdcall RecOrdersOrderFxAddFlags(OrderFx* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_ORDERFXADDFLAGS, SUB_ORDERS, roots);
@@ -1690,7 +1690,7 @@ void __stdcall Rec_orders_OrderFxAddFlags(OrderFx* a0, int a1)
     }
 }
 
-void __stdcall Rec_orders_AppendOrder(Unit* a0, Order* a1)
+void __stdcall RecOrdersAppendOrder(Unit* a0, Order* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1704,7 +1704,7 @@ void __stdcall Rec_orders_AppendOrder(Unit* a0, Order* a1)
     }
 }
 
-void __stdcall Rec_orders_AddOrder(MissionType a0, int a1, Unit* a2, Unit* a3, Vec3* a4, int a5, int a6)
+void __stdcall RecOrdersAddOrder(MissionType a0, int a1, Unit* a2, Unit* a3, Vec3* a4, int a5, int a6)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a2);
@@ -1724,7 +1724,7 @@ void __stdcall Rec_orders_AddOrder(MissionType a0, int a1, Unit* a2, Unit* a3, V
     }
 }
 
-void __stdcall Rec_orders_DeleteOrders(Unit* a0, int a1)
+void __stdcall RecOrdersDeleteOrders(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1738,7 +1738,7 @@ void __stdcall Rec_orders_DeleteOrders(Unit* a0, int a1)
     }
 }
 
-int __stdcall Rec_orders_GetOrderFlags(Unit* a0)
+int __stdcall RecOrdersGetOrderFlags(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1753,7 +1753,7 @@ int __stdcall Rec_orders_GetOrderFlags(Unit* a0)
     return result;
 }
 
-MissionType __stdcall Rec_orders_GetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3* a3)
+MissionType __stdcall RecOrdersGetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3* a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a1);
@@ -1771,7 +1771,7 @@ MissionType __stdcall Rec_orders_GetOrderType(unsigned char a0, Unit* a1, Unit* 
     return result;
 }
 
-int __stdcall Rec_orders_IssueAttackOrder(Unit* a0, Unit* a1, int a2)
+int __stdcall RecOrdersIssueAttackOrder(Unit* a0, Unit* a1, int a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1789,7 +1789,7 @@ int __stdcall Rec_orders_IssueAttackOrder(Unit* a0, Unit* a1, int a2)
     return result;
 }
 
-void __fastcall Rec_orders_ReattachFxToUnit(Order* a0)
+void __fastcall RecOrdersReattachFxToUnit(Order* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_REATTACHFXTOUNIT, SUB_ORDERS, roots);
@@ -1801,7 +1801,7 @@ void __fastcall Rec_orders_ReattachFxToUnit(Order* a0)
     }
 }
 
-int __fastcall Rec_orders_SerializeOrderToSave(Order* a0, int a1, Unit* a2, HapiBank* a3, char* a4)
+int __fastcall RecOrdersSerializeOrderToSave(Order* a0, int a1, Unit* a2, HapiBank* a3, char* a4)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a2);
@@ -1820,7 +1820,7 @@ int __fastcall Rec_orders_SerializeOrderToSave(Order* a0, int a1, Unit* a2, Hapi
     return result;
 }
 
-void __stdcall Rec_orders_AddBeCarriedOrder(Unit* a0)
+void __stdcall RecOrdersAddBeCarriedOrder(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1833,7 +1833,7 @@ void __stdcall Rec_orders_AddBeCarriedOrder(Unit* a0)
     }
 }
 
-void __stdcall Rec_orders_RunOrders(Unit* a0)
+void __stdcall RecOrdersRunOrders(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1846,7 +1846,7 @@ void __stdcall Rec_orders_RunOrders(Unit* a0)
     }
 }
 
-void __stdcall Rec_orders_RunSecondaryOrders(Unit* a0)
+void __stdcall RecOrdersRunSecondaryOrders(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1859,7 +1859,7 @@ void __stdcall Rec_orders_RunSecondaryOrders(Unit* a0)
     }
 }
 
-void __fastcall Rec_orders_DestroyMotionObject(UnitMotion* a0)
+void __fastcall RecOrdersDestroyMotionObject(UnitMotion* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_DESTROYMOTIONOBJECT, SUB_ORDERS, roots);
@@ -1871,7 +1871,7 @@ void __fastcall Rec_orders_DestroyMotionObject(UnitMotion* a0)
     }
 }
 
-void __fastcall Rec_orders_LoadMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* a3)
+void __fastcall RecOrdersLoadMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a2);
@@ -1887,7 +1887,7 @@ void __fastcall Rec_orders_LoadMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank
     }
 }
 
-void __fastcall Rec_orders_SaveMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* a3)
+void __fastcall RecOrdersSaveMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a2);
@@ -1903,7 +1903,7 @@ void __fastcall Rec_orders_SaveMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank
     }
 }
 
-void __fastcall Rec_orders_UpdateMotion(UnitMotion* a0, int a1, Unit* a2)
+void __fastcall RecOrdersUpdateMotion(UnitMotion* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a2);
@@ -1918,7 +1918,7 @@ void __fastcall Rec_orders_UpdateMotion(UnitMotion* a0, int a1, Unit* a2)
     }
 }
 
-void __stdcall Rec_orders_RegisterAllOrderTypes()
+void __stdcall RecOrdersRegisterAllOrderTypes()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_REGISTERALLORDERTYPES, SUB_ORDERS, roots);
@@ -1929,7 +1929,7 @@ void __stdcall Rec_orders_RegisterAllOrderTypes()
     }
 }
 
-void __stdcall Rec_orders_ClearOrderTypeTable()
+void __stdcall RecOrdersClearOrderTypeTable()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_CLEARORDERTYPETABLE, SUB_ORDERS, roots);
@@ -1940,7 +1940,7 @@ void __stdcall Rec_orders_ClearOrderTypeTable()
     }
 }
 
-void __stdcall Rec_orders_CreatePathfinder()
+void __stdcall RecOrdersCreatePathfinder()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_CREATEPATHFINDER, SUB_ORDERS, roots);
@@ -1951,7 +1951,7 @@ void __stdcall Rec_orders_CreatePathfinder()
     }
 }
 
-void __stdcall Rec_orders_DestroyPathfinder()
+void __stdcall RecOrdersDestroyPathfinder()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_DESTROYPATHFINDER, SUB_ORDERS, roots);
@@ -1962,7 +1962,7 @@ void __stdcall Rec_orders_DestroyPathfinder()
     }
 }
 
-void __stdcall Rec_orders_NewUnitMotion(Unit* a0)
+void __stdcall RecOrdersNewUnitMotion(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1975,7 +1975,7 @@ void __stdcall Rec_orders_NewUnitMotion(Unit* a0)
     }
 }
 
-Order* __stdcall Rec_orders_LoadOrder(Unit* a0, HapiBank* a1, char* a2)
+Order* __stdcall RecOrdersLoadOrder(Unit* a0, HapiBank* a1, char* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1991,7 +1991,7 @@ Order* __stdcall Rec_orders_LoadOrder(Unit* a0, HapiBank* a1, char* a2)
     return result;
 }
 
-MissionType __stdcall Rec_orders_MissionTypeFromName(const char* a0)
+MissionType __stdcall RecOrdersMissionTypeFromName(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_MISSIONTYPEFROMNAME, SUB_ORDERS, roots);
@@ -2004,7 +2004,7 @@ MissionType __stdcall Rec_orders_MissionTypeFromName(const char* a0)
     return result;
 }
 
-Order* __stdcall Rec_orders_NewOrder(MissionType a0, Unit* a1, void* a2, int a3, int a4, int a5)
+Order* __stdcall RecOrdersNewOrder(MissionType a0, Unit* a1, void* a2, int a3, int a4, int a5)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a1);
@@ -2023,7 +2023,7 @@ Order* __stdcall Rec_orders_NewOrder(MissionType a0, Unit* a1, void* a2, int a3,
     return result;
 }
 
-void __stdcall Rec_units_UpdateAllUnits()
+void __stdcall RecUnitsUpdateAllUnits()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_UPDATEALLUNITS, SUB_UNITS, roots);
@@ -2034,7 +2034,7 @@ void __stdcall Rec_units_UpdateAllUnits()
     }
 }
 
-int __stdcall Rec_units_GetGroundHeight(Vec3* a0)
+int __stdcall RecUnitsGetGroundHeight(Vec3* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_GETGROUNDHEIGHT, SUB_UNITS, roots);
@@ -2048,7 +2048,7 @@ int __stdcall Rec_units_GetGroundHeight(Vec3* a0)
     return result;
 }
 
-void __stdcall Rec_units_GetSweetSpot(Unit* a0, Vec3* a1)
+void __stdcall RecUnitsGetSweetSpot(Unit* a0, Vec3* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2062,7 +2062,7 @@ void __stdcall Rec_units_GetSweetSpot(Unit* a0, Vec3* a1)
     }
 }
 
-int __stdcall Rec_units_FindScript(CobScript* a0, const char* a1)
+int __stdcall RecUnitsFindScript(CobScript* a0, const char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_FINDSCRIPT, SUB_UNITS, roots);
@@ -2077,7 +2077,7 @@ int __stdcall Rec_units_FindScript(CobScript* a0, const char* a1)
     return result;
 }
 
-int __stdcall Rec_units_StartScriptWithArgs(CobScript* a0, char* a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
+int __stdcall RecUnitsStartScriptWithArgs(CobScript* a0, char* a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_STARTSCRIPTWITHARGS, SUB_UNITS, roots);
@@ -2099,7 +2099,7 @@ int __stdcall Rec_units_StartScriptWithArgs(CobScript* a0, char* a1, Callback* a
     return result;
 }
 
-void __stdcall Rec_units_SetStateBits(Unit* a0, int a1, int a2)
+void __stdcall RecUnitsSetStateBits(Unit* a0, int a1, int a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2114,7 +2114,7 @@ void __stdcall Rec_units_SetStateBits(Unit* a0, int a1, int a2)
     }
 }
 
-int __stdcall Rec_units_MovementClassGet(MovementClass* a0, int a1, int a2)
+int __stdcall RecUnitsMovementClassGet(MovementClass* a0, int a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_MOVEMENTCLASSGET, SUB_UNITS, roots);
@@ -2130,7 +2130,7 @@ int __stdcall Rec_units_MovementClassGet(MovementClass* a0, int a1, int a2)
     return result;
 }
 
-int __stdcall Rec_units_MovementClassInBounds(MovementClass* a0, unsigned int a1, unsigned int a2)
+int __stdcall RecUnitsMovementClassInBounds(MovementClass* a0, unsigned int a1, unsigned int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_MOVEMENTCLASSINBOUNDS, SUB_UNITS, roots);
@@ -2146,7 +2146,7 @@ int __stdcall Rec_units_MovementClassInBounds(MovementClass* a0, unsigned int a1
     return result;
 }
 
-void __stdcall Rec_units_RefreshMovedUnits(MovementClass* a0, Unit* a1)
+void __stdcall RecUnitsRefreshMovedUnits(MovementClass* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a1);
@@ -2160,7 +2160,7 @@ void __stdcall Rec_units_RefreshMovedUnits(MovementClass* a0, Unit* a1)
     }
 }
 
-void __stdcall Rec_units_RefreshUnitIfStale(MovementClass* a0, Unit* a1)
+void __stdcall RecUnitsRefreshUnitIfStale(MovementClass* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a1);
@@ -2174,7 +2174,7 @@ void __stdcall Rec_units_RefreshUnitIfStale(MovementClass* a0, Unit* a1)
     }
 }
 
-int __stdcall Rec_units_StartScript(CobScript* a0, const char* a1, Callback* a2, int a3)
+int __stdcall RecUnitsStartScript(CobScript* a0, const char* a1, Callback* a2, int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_STARTSCRIPT, SUB_UNITS, roots);
@@ -2191,7 +2191,7 @@ int __stdcall Rec_units_StartScript(CobScript* a0, const char* a1, Callback* a2,
     return result;
 }
 
-int __stdcall Rec_units_QueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
+int __stdcall RecUnitsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_QUERYSCRIPT, SUB_UNITS, roots);
@@ -2210,7 +2210,7 @@ int __stdcall Rec_units_QueryScript(CobScript* a0, char* a1, int* a2, int* a3, i
     return result;
 }
 
-void __stdcall Rec_units_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
+void __stdcall RecUnitsGetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2225,7 +2225,7 @@ void __stdcall Rec_units_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2
     }
 }
 
-Vec3 __stdcall Rec_units_GetPieceOffset(Unit* a0, int a1)
+Vec3 __stdcall RecUnitsGetPieceOffset(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2241,7 +2241,7 @@ Vec3 __stdcall Rec_units_GetPieceOffset(Unit* a0, int a1)
     return result;
 }
 
-Vec3 __stdcall Rec_units_GetPiecePosition(Unit* a0, int a1)
+Vec3 __stdcall RecUnitsGetPiecePosition(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2257,7 +2257,7 @@ Vec3 __stdcall Rec_units_GetPiecePosition(Unit* a0, int a1)
     return result;
 }
 
-void __stdcall Rec_units_MarkRecentlyDamaged(Unit* a0)
+void __stdcall RecUnitsMarkRecentlyDamaged(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2270,7 +2270,7 @@ void __stdcall Rec_units_MarkRecentlyDamaged(Unit* a0)
     }
 }
 
-void __stdcall Rec_units_NotifyUnitRefs(Unit* a0, int a1)
+void __stdcall RecUnitsNotifyUnitRefs(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2284,7 +2284,7 @@ void __stdcall Rec_units_NotifyUnitRefs(Unit* a0, int a1)
     }
 }
 
-void __stdcall Rec_units_UnitTypeSetAddTypeOrCategory(UnitTypeSet* a0, char* a1, int* a2)
+void __stdcall RecUnitsUnitTypeSetAddTypeOrCategory(UnitTypeSet* a0, char* a1, int* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_UNITTYPESETADDTYPEORCATEGORY, SUB_UNITS, roots);
@@ -2298,7 +2298,7 @@ void __stdcall Rec_units_UnitTypeSetAddTypeOrCategory(UnitTypeSet* a0, char* a1,
     }
 }
 
-void __stdcall Rec_units_AllocateUnitMemory()
+void __stdcall RecUnitsAllocateUnitMemory()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_ALLOCATEUNITMEMORY, SUB_UNITS, roots);
@@ -2309,7 +2309,7 @@ void __stdcall Rec_units_AllocateUnitMemory()
     }
 }
 
-void __stdcall Rec_units_FreeUnitMemory()
+void __stdcall RecUnitsFreeUnitMemory()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_FREEUNITMEMORY, SUB_UNITS, roots);
@@ -2320,7 +2320,7 @@ void __stdcall Rec_units_FreeUnitMemory()
     }
 }
 
-void __stdcall Rec_units_FreeUnitInfo()
+void __stdcall RecUnitsFreeUnitInfo()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_FREEUNITINFO, SUB_UNITS, roots);
@@ -2331,7 +2331,7 @@ void __stdcall Rec_units_FreeUnitInfo()
     }
 }
 
-void __stdcall Rec_units_RefreshUnitInfo()
+void __stdcall RecUnitsRefreshUnitInfo()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_REFRESHUNITINFO, SUB_UNITS, roots);
@@ -2342,7 +2342,7 @@ void __stdcall Rec_units_RefreshUnitInfo()
     }
 }
 
-void __stdcall Rec_units_LoadUnitTypes()
+void __stdcall RecUnitsLoadUnitTypes()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_LOADUNITTYPES, SUB_UNITS, roots);
@@ -2353,7 +2353,7 @@ void __stdcall Rec_units_LoadUnitTypes()
     }
 }
 
-void __stdcall Rec_units_FreeUnitTypes()
+void __stdcall RecUnitsFreeUnitTypes()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_FREEUNITTYPES, SUB_UNITS, roots);
@@ -2364,7 +2364,7 @@ void __stdcall Rec_units_FreeUnitTypes()
     }
 }
 
-void __stdcall Rec_units_LoadDownloadMenus()
+void __stdcall RecUnitsLoadDownloadMenus()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_LOADDOWNLOADMENUS, SUB_UNITS, roots);
@@ -2375,7 +2375,7 @@ void __stdcall Rec_units_LoadDownloadMenus()
     }
 }
 
-void __stdcall Rec_units_FreeDownloadMenus()
+void __stdcall RecUnitsFreeDownloadMenus()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_FREEDOWNLOADMENUS, SUB_UNITS, roots);
@@ -2386,7 +2386,7 @@ void __stdcall Rec_units_FreeDownloadMenus()
     }
 }
 
-void __stdcall Rec_units_FreeMovementClasses()
+void __stdcall RecUnitsFreeMovementClasses()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_FREEMOVEMENTCLASSES, SUB_UNITS, roots);
@@ -2397,7 +2397,7 @@ void __stdcall Rec_units_FreeMovementClasses()
     }
 }
 
-void __stdcall Rec_units_InitUnitCategories()
+void __stdcall RecUnitsInitUnitCategories()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_INITUNITCATEGORIES, SUB_UNITS, roots);
@@ -2408,7 +2408,7 @@ void __stdcall Rec_units_InitUnitCategories()
     }
 }
 
-void __stdcall Rec_units_FreeUnitCategories()
+void __stdcall RecUnitsFreeUnitCategories()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_FREEUNITCATEGORIES, SUB_UNITS, roots);
@@ -2419,7 +2419,7 @@ void __stdcall Rec_units_FreeUnitCategories()
     }
 }
 
-void __stdcall Rec_units_KillAllUnits()
+void __stdcall RecUnitsKillAllUnits()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_KILLALLUNITS, SUB_UNITS, roots);
@@ -2430,7 +2430,7 @@ void __stdcall Rec_units_KillAllUnits()
     }
 }
 
-void __stdcall Rec_units_KillUnitsOfType(short a0)
+void __stdcall RecUnitsKillUnitsOfType(short a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_KILLUNITSOFTYPE, SUB_UNITS, roots);
@@ -2442,7 +2442,7 @@ void __stdcall Rec_units_KillUnitsOfType(short a0)
     }
 }
 
-void __stdcall Rec_units_ReloadUnitType(unsigned short a0)
+void __stdcall RecUnitsReloadUnitType(unsigned short a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_RELOADUNITTYPE, SUB_UNITS, roots);
@@ -2454,7 +2454,7 @@ void __stdcall Rec_units_ReloadUnitType(unsigned short a0)
     }
 }
 
-void __stdcall Rec_units_KillUnit(Unit* a0, int a1)
+void __stdcall RecUnitsKillUnit(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2468,7 +2468,7 @@ void __stdcall Rec_units_KillUnit(Unit* a0, int a1)
     }
 }
 
-void __stdcall Rec_units_LoadUnits(HapiBank* a0)
+void __stdcall RecUnitsLoadUnits(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_LOADUNITS, SUB_UNITS, roots);
@@ -2480,7 +2480,7 @@ void __stdcall Rec_units_LoadUnits(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_units_SaveUnits(HapiBank* a0)
+void __stdcall RecUnitsSaveUnits(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_SAVEUNITS, SUB_UNITS, roots);
@@ -2492,7 +2492,7 @@ void __stdcall Rec_units_SaveUnits(HapiBank* a0)
     }
 }
 
-Unit* __stdcall Rec_units_LoadUnit(unsigned short a0, HapiBank* a1)
+Unit* __stdcall RecUnitsLoadUnit(unsigned short a0, HapiBank* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_LOADUNIT, SUB_UNITS, roots);
@@ -2507,7 +2507,7 @@ Unit* __stdcall Rec_units_LoadUnit(unsigned short a0, HapiBank* a1)
     return result;
 }
 
-Unit* __stdcall Rec_units_CreateUnit(unsigned char a0, unsigned short a1, Vec3 a2, int a3, int a4, int a5)
+Unit* __stdcall RecUnitsCreateUnit(unsigned char a0, unsigned short a1, Vec3 a2, int a3, int a4, int a5)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_CREATEUNIT, SUB_UNITS, roots);
@@ -2526,7 +2526,7 @@ Unit* __stdcall Rec_units_CreateUnit(unsigned char a0, unsigned short a1, Vec3 a
     return result;
 }
 
-UnitDef* __stdcall Rec_units_FindUnitType(const char* a0)
+UnitDef* __stdcall RecUnitsFindUnitType(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_FINDUNITTYPE, SUB_UNITS, roots);
@@ -2540,7 +2540,7 @@ UnitDef* __stdcall Rec_units_FindUnitType(const char* a0)
     return result;
 }
 
-unsigned short __stdcall Rec_units_FindUnitTypeId(const char* a0)
+unsigned short __stdcall RecUnitsFindUnitTypeId(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_FINDUNITTYPEID, SUB_UNITS, roots);
@@ -2554,7 +2554,7 @@ unsigned short __stdcall Rec_units_FindUnitTypeId(const char* a0)
     return result;
 }
 
-int __stdcall Rec_units_FindMissionUnit(char* a0, std::vector<Unit*, std::allocator<Unit*> >* a1, int a2)
+int __stdcall RecUnitsFindMissionUnit(char* a0, std::vector<Unit*, std::allocator<Unit*> >* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_FINDMISSIONUNIT, SUB_UNITS, roots);
@@ -2570,7 +2570,7 @@ int __stdcall Rec_units_FindMissionUnit(char* a0, std::vector<Unit*, std::alloca
     return result;
 }
 
-void __stdcall Rec_units_AttachUnitToPiece(Unit* a0, Unit* a1, char a2, char a3)
+void __stdcall RecUnitsAttachUnitToPiece(Unit* a0, Unit* a1, char a2, char a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2587,7 +2587,7 @@ void __stdcall Rec_units_AttachUnitToPiece(Unit* a0, Unit* a1, char a2, char a3)
     }
 }
 
-void __stdcall Rec_units_GetNanoPiecePosition(Unit* a0, Vec3* a1)
+void __stdcall RecUnitsGetNanoPiecePosition(Unit* a0, Vec3* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2601,7 +2601,7 @@ void __stdcall Rec_units_GetNanoPiecePosition(Unit* a0, Vec3* a1)
     }
 }
 
-Angles16 __stdcall Rec_units_GetPieceAngles(Unit* a0, int a1)
+Angles16 __stdcall RecUnitsGetPieceAngles(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2616,7 +2616,7 @@ Angles16 __stdcall Rec_units_GetPieceAngles(Unit* a0, int a1)
     return result;
 }
 
-int __stdcall Rec_units_AddBuildProgress(Unit* a0, Unit* a1, float a2)
+int __stdcall RecUnitsAddBuildProgress(Unit* a0, Unit* a1, float a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2634,7 +2634,7 @@ int __stdcall Rec_units_AddBuildProgress(Unit* a0, Unit* a1, float a2)
     return result;
 }
 
-int __stdcall Rec_units_AddRepairProgress(Unit* a0, Unit* a1, float a2)
+int __stdcall RecUnitsAddRepairProgress(Unit* a0, Unit* a1, float a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2652,7 +2652,7 @@ int __stdcall Rec_units_AddRepairProgress(Unit* a0, Unit* a1, float a2)
     return result;
 }
 
-void __stdcall Rec_units_ApplyUnfinishedBuildDecay(Unit* a0, int a1)
+void __stdcall RecUnitsApplyUnfinishedBuildDecay(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2666,7 +2666,7 @@ void __stdcall Rec_units_ApplyUnfinishedBuildDecay(Unit* a0, int a1)
     }
 }
 
-void __stdcall Rec_units_FinishConstruction(Unit* a0, Unit* a1)
+void __stdcall RecUnitsFinishConstruction(Unit* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2681,7 +2681,7 @@ void __stdcall Rec_units_FinishConstruction(Unit* a0, Unit* a1)
     }
 }
 
-int __stdcall Rec_units_SetUnitPosition(Unit* a0, Vec3 a1, int a2)
+int __stdcall RecUnitsSetUnitPosition(Unit* a0, Vec3 a1, int a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2698,7 +2698,7 @@ int __stdcall Rec_units_SetUnitPosition(Unit* a0, Vec3 a1, int a2)
     return result;
 }
 
-int __fastcall Rec_units_CanLoad(Unit* a0, int a1, Unit* a2)
+int __fastcall RecUnitsCanLoad(Unit* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2716,7 +2716,7 @@ int __fastcall Rec_units_CanLoad(Unit* a0, int a1, Unit* a2)
     return result;
 }
 
-int __fastcall Rec_units_CanReclaim(Unit* a0, int a1, Unit* a2)
+int __fastcall RecUnitsCanReclaim(Unit* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2734,7 +2734,7 @@ int __fastcall Rec_units_CanReclaim(Unit* a0, int a1, Unit* a2)
     return result;
 }
 
-int __fastcall Rec_units_CanRepair(Unit* a0, int a1, Unit* a2)
+int __fastcall RecUnitsCanRepair(Unit* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2752,7 +2752,7 @@ int __fastcall Rec_units_CanRepair(Unit* a0, int a1, Unit* a2)
     return result;
 }
 
-void __fastcall Rec_units_UnitRefUnlink(UnitRef* a0)
+void __fastcall RecUnitsUnitRefUnlink(UnitRef* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_UNITREFUNLINK, SUB_UNITS, roots);
@@ -2764,7 +2764,7 @@ void __fastcall Rec_units_UnitRefUnlink(UnitRef* a0)
     }
 }
 
-int __stdcall Rec_units_StartScriptWithArgsByIndex(CobScript* a0, int a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
+int __stdcall RecUnitsStartScriptWithArgsByIndex(CobScript* a0, int a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_STARTSCRIPTWITHARGSBYINDEX, SUB_UNITS, roots);
@@ -2786,7 +2786,7 @@ int __stdcall Rec_units_StartScriptWithArgsByIndex(CobScript* a0, int a1, Callba
     return result;
 }
 
-void __fastcall Rec_units_UpdateSfxOccupy(UnitMotion* a0, int a1, Unit* a2)
+void __fastcall RecUnitsUpdateSfxOccupy(UnitMotion* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a2);
@@ -2801,7 +2801,7 @@ void __fastcall Rec_units_UpdateSfxOccupy(UnitMotion* a0, int a1, Unit* a2)
     }
 }
 
-void __stdcall Rec_units_PoseUnitModel(Unit* a0)
+void __stdcall RecUnitsPoseUnitModel(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2814,7 +2814,7 @@ void __stdcall Rec_units_PoseUnitModel(Unit* a0)
     }
 }
 
-void __stdcall Rec_players_UpdatePlayers()
+void __stdcall RecPlayersUpdatePlayers()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_UPDATEPLAYERS, SUB_PLAYERS, roots);
@@ -2825,7 +2825,7 @@ void __stdcall Rec_players_UpdatePlayers()
     }
 }
 
-void __stdcall Rec_players_TransferMetal(unsigned char a0, unsigned char a1, float a2, int a3)
+void __stdcall RecPlayersTransferMetal(unsigned char a0, unsigned char a1, float a2, int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_TRANSFERMETAL, SUB_PLAYERS, roots);
@@ -2840,7 +2840,7 @@ void __stdcall Rec_players_TransferMetal(unsigned char a0, unsigned char a1, flo
     }
 }
 
-void __stdcall Rec_players_TransferEnergy(unsigned char a0, unsigned char a1, float a2, int a3)
+void __stdcall RecPlayersTransferEnergy(unsigned char a0, unsigned char a1, float a2, int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_TRANSFERENERGY, SUB_PLAYERS, roots);
@@ -2855,7 +2855,7 @@ void __stdcall Rec_players_TransferEnergy(unsigned char a0, unsigned char a1, fl
     }
 }
 
-float __stdcall Rec_players_GetEnergyIncome(Player* a0)
+float __stdcall RecPlayersGetEnergyIncome(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -2870,7 +2870,7 @@ float __stdcall Rec_players_GetEnergyIncome(Player* a0)
     return result;
 }
 
-float __stdcall Rec_players_GetMetalIncome(Player* a0)
+float __stdcall RecPlayersGetMetalIncome(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -2885,7 +2885,7 @@ float __stdcall Rec_players_GetMetalIncome(Player* a0)
     return result;
 }
 
-float __stdcall Rec_players_GetNetEnergy(Player* a0)
+float __stdcall RecPlayersGetNetEnergy(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -2900,7 +2900,7 @@ float __stdcall Rec_players_GetNetEnergy(Player* a0)
     return result;
 }
 
-float __stdcall Rec_players_GetNetMetal(Player* a0)
+float __stdcall RecPlayersGetNetMetal(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -2915,7 +2915,7 @@ float __stdcall Rec_players_GetNetMetal(Player* a0)
     return result;
 }
 
-void __stdcall Rec_players_LoadDefaultAIScript()
+void __stdcall RecPlayersLoadDefaultAIScript()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_LOADDEFAULTAISCRIPT, SUB_PLAYERS, roots);
@@ -2926,7 +2926,7 @@ void __stdcall Rec_players_LoadDefaultAIScript()
     }
 }
 
-void __stdcall Rec_players_InitPlayers()
+void __stdcall RecPlayersInitPlayers()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_INITPLAYERS, SUB_PLAYERS, roots);
@@ -2937,7 +2937,7 @@ void __stdcall Rec_players_InitPlayers()
     }
 }
 
-void __stdcall Rec_players_FreePlayers()
+void __stdcall RecPlayersFreePlayers()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_FREEPLAYERS, SUB_PLAYERS, roots);
@@ -2948,7 +2948,7 @@ void __stdcall Rec_players_FreePlayers()
     }
 }
 
-void __stdcall Rec_players_InitPlayerResources()
+void __stdcall RecPlayersInitPlayerResources()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_INITPLAYERRESOURCES, SUB_PLAYERS, roots);
@@ -2959,7 +2959,7 @@ void __stdcall Rec_players_InitPlayerResources()
     }
 }
 
-void __stdcall Rec_players_LoadPlayerControllers(HapiBank* a0)
+void __stdcall RecPlayersLoadPlayerControllers(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_LOADPLAYERCONTROLLERS, SUB_PLAYERS, roots);
@@ -2971,7 +2971,7 @@ void __stdcall Rec_players_LoadPlayerControllers(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_players_LoadPlayers(HapiBank* a0)
+void __stdcall RecPlayersLoadPlayers(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_LOADPLAYERS, SUB_PLAYERS, roots);
@@ -2983,7 +2983,7 @@ void __stdcall Rec_players_LoadPlayers(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_players_SavePlayers(HapiBank* a0)
+void __stdcall RecPlayersSavePlayers(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_SAVEPLAYERS, SUB_PLAYERS, roots);
@@ -2995,7 +2995,7 @@ void __stdcall Rec_players_SavePlayers(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_players_RebuildAIFeatureCells()
+void __stdcall RecPlayersRebuildAIFeatureCells()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_REBUILDAIFEATURECELLS, SUB_PLAYERS, roots);
@@ -3006,7 +3006,7 @@ void __stdcall Rec_players_RebuildAIFeatureCells()
     }
 }
 
-void __stdcall Rec_players_SetupPlayerSlot(int a0, char a1)
+void __stdcall RecPlayersSetupPlayerSlot(int a0, char a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_SETUPPLAYERSLOT, SUB_PLAYERS, roots);
@@ -3019,7 +3019,7 @@ void __stdcall Rec_players_SetupPlayerSlot(int a0, char a1)
     }
 }
 
-void __stdcall Rec_players_UpdateBlink()
+void __stdcall RecPlayersUpdateBlink()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_UPDATEBLINK, SUB_PLAYERS, roots);
@@ -3030,7 +3030,7 @@ void __stdcall Rec_players_UpdateBlink()
     }
 }
 
-void __stdcall Rec_players_KillPlayerUnits(unsigned char a0)
+void __stdcall RecPlayersKillPlayerUnits(unsigned char a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_KILLPLAYERUNITS, SUB_PLAYERS, roots);
@@ -3042,7 +3042,7 @@ void __stdcall Rec_players_KillPlayerUnits(unsigned char a0)
     }
 }
 
-void __stdcall Rec_players_GiveUnitToPlayer(Unit* a0, Player* a1, OwnershipTransferPacket* a2)
+void __stdcall RecPlayersGiveUnitToPlayer(Unit* a0, Player* a1, OwnershipTransferPacket* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -3058,7 +3058,7 @@ void __stdcall Rec_players_GiveUnitToPlayer(Unit* a0, Player* a1, OwnershipTrans
     }
 }
 
-void __fastcall Rec_players_DeactivateConditions(MissionConditions* a0)
+void __fastcall RecPlayersDeactivateConditions(MissionConditions* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_DEACTIVATECONDITIONS, SUB_PLAYERS, roots);
@@ -3070,7 +3070,7 @@ void __fastcall Rec_players_DeactivateConditions(MissionConditions* a0)
     }
 }
 
-void __fastcall Rec_players_LoadConditions(MissionConditions* a0, int a1, HapiBank* a2)
+void __fastcall RecPlayersLoadConditions(MissionConditions* a0, int a1, HapiBank* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_LOADCONDITIONS, SUB_PLAYERS, roots);
@@ -3084,7 +3084,7 @@ void __fastcall Rec_players_LoadConditions(MissionConditions* a0, int a1, HapiBa
     }
 }
 
-void __fastcall Rec_players_SaveConditions(MissionConditions* a0, int a1, HapiBank* a2)
+void __fastcall RecPlayersSaveConditions(MissionConditions* a0, int a1, HapiBank* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_SAVECONDITIONS, SUB_PLAYERS, roots);
@@ -3098,7 +3098,7 @@ void __fastcall Rec_players_SaveConditions(MissionConditions* a0, int a1, HapiBa
     }
 }
 
-void __fastcall Rec_players_RegisterConditions(MissionConditions* a0, int a1, TdfFile* a2)
+void __fastcall RecPlayersRegisterConditions(MissionConditions* a0, int a1, TdfFile* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_REGISTERCONDITIONS, SUB_PLAYERS, roots);
@@ -3112,7 +3112,7 @@ void __fastcall Rec_players_RegisterConditions(MissionConditions* a0, int a1, Td
     }
 }
 
-void __fastcall Rec_players_FreeConditions(MissionConditions* a0)
+void __fastcall RecPlayersFreeConditions(MissionConditions* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_FREECONDITIONS, SUB_PLAYERS, roots);
@@ -3124,7 +3124,7 @@ void __fastcall Rec_players_FreeConditions(MissionConditions* a0)
     }
 }
 
-void __stdcall Rec_players_DeleteConditions(MissionConditions* a0)
+void __stdcall RecPlayersDeleteConditions(MissionConditions* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_DELETECONDITIONS, SUB_PLAYERS, roots);
@@ -3136,7 +3136,7 @@ void __stdcall Rec_players_DeleteConditions(MissionConditions* a0)
     }
 }
 
-void __fastcall Rec_players_NotifyUnitCreated(MissionConditions* a0, int a1, Unit* a2)
+void __fastcall RecPlayersNotifyUnitCreated(MissionConditions* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a2);
@@ -3151,7 +3151,7 @@ void __fastcall Rec_players_NotifyUnitCreated(MissionConditions* a0, int a1, Uni
     }
 }
 
-void __fastcall Rec_players_NotifyUnitDied(MissionConditions* a0, int a1, Unit* a2)
+void __fastcall RecPlayersNotifyUnitDied(MissionConditions* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a2);
@@ -3166,7 +3166,7 @@ void __fastcall Rec_players_NotifyUnitDied(MissionConditions* a0, int a1, Unit* 
     }
 }
 
-void __stdcall Rec_players_UpdatePlayersOnStream(RandStream a0)
+void __stdcall RecPlayersUpdatePlayersOnStream(RandStream a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_UPDATEPLAYERSONSTREAM, SUB_PLAYERS, roots);
@@ -3178,7 +3178,7 @@ void __stdcall Rec_players_UpdatePlayersOnStream(RandStream a0)
     }
 }
 
-int __stdcall Rec_map_GetCellMeanHeight(Vec3* a0)
+int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETCELLMEANHEIGHT, SUB_MAP, roots);
@@ -3192,7 +3192,7 @@ int __stdcall Rec_map_GetCellMeanHeight(Vec3* a0)
     return result;
 }
 
-void __stdcall Rec_map_RefreshAllPassMaps(Point16 a0, Point16 a1)
+void __stdcall RecMapRefreshAllPassMaps(Point16 a0, Point16 a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_REFRESHALLPASSMAPS, SUB_MAP, roots);
@@ -3205,7 +3205,7 @@ void __stdcall Rec_map_RefreshAllPassMaps(Point16 a0, Point16 a1)
     }
 }
 
-int __fastcall Rec_map_GetGameType(Mission* a0)
+int __fastcall RecMapGetGameType(Mission* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETGAMETYPE, SUB_MAP, roots);
@@ -3219,7 +3219,7 @@ int __fastcall Rec_map_GetGameType(Mission* a0)
     return result;
 }
 
-char* __stdcall Rec_map_GetNameSlot(Mission* a0, int a1)
+char* __stdcall RecMapGetNameSlot(Mission* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETNAMESLOT, SUB_MAP, roots);
@@ -3233,7 +3233,7 @@ char* __stdcall Rec_map_GetNameSlot(Mission* a0, int a1)
     return result;
 }
 
-void __stdcall Rec_map_VisitObjectsInRange(Vec3* a0, int a1, UnitVisitor* a2)
+void __stdcall RecMapVisitObjectsInRange(Vec3* a0, int a1, UnitVisitor* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_VISITOBJECTSINRANGE, SUB_MAP, roots);
@@ -3247,7 +3247,7 @@ void __stdcall Rec_map_VisitObjectsInRange(Vec3* a0, int a1, UnitVisitor* a2)
     }
 }
 
-int __stdcall Rec_map_CanBuildAt(UnitDef* a0, Point16 a1, short a2, Player* a3)
+int __stdcall RecMapCanBuildAt(UnitDef* a0, Point16 a1, short a2, Player* a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITDEF, a0);
@@ -3266,7 +3266,7 @@ int __stdcall Rec_map_CanBuildAt(UnitDef* a0, Point16 a1, short a2, Player* a3)
     return result;
 }
 
-int __stdcall Rec_map_CanPlaceUnitFootprint(UnitDef* a0, unsigned short a1, Point16 a2, int a3)
+int __stdcall RecMapCanPlaceUnitFootprint(UnitDef* a0, unsigned short a1, Point16 a2, int a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITDEF, a0);
@@ -3284,7 +3284,7 @@ int __stdcall Rec_map_CanPlaceUnitFootprint(UnitDef* a0, unsigned short a1, Poin
     return result;
 }
 
-void __stdcall Rec_map_BuildAllPassMaps()
+void __stdcall RecMapBuildAllPassMaps()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_BUILDALLPASSMAPS, SUB_MAP, roots);
@@ -3295,7 +3295,7 @@ void __stdcall Rec_map_BuildAllPassMaps()
     }
 }
 
-void __stdcall Rec_map_FreeOtaEnumCacheAndMission()
+void __stdcall RecMapFreeOtaEnumCacheAndMission()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_FREEOTAENUMCACHEANDMISSION, SUB_MAP, roots);
@@ -3306,7 +3306,7 @@ void __stdcall Rec_map_FreeOtaEnumCacheAndMission()
     }
 }
 
-void __stdcall Rec_map_LoadMappingData(HapiBank* a0)
+void __stdcall RecMapLoadMappingData(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_LOADMAPPINGDATA, SUB_MAP, roots);
@@ -3318,7 +3318,7 @@ void __stdcall Rec_map_LoadMappingData(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_map_LoadMetalPlotmap(HapiBank* a0)
+void __stdcall RecMapLoadMetalPlotmap(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_LOADMETALPLOTMAP, SUB_MAP, roots);
@@ -3330,7 +3330,7 @@ void __stdcall Rec_map_LoadMetalPlotmap(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_map_LoadPlayerFeaturesPlotmap(HapiBank* a0)
+void __stdcall RecMapLoadPlayerFeaturesPlotmap(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_LOADPLAYERFEATURESPLOTMAP, SUB_MAP, roots);
@@ -3342,7 +3342,7 @@ void __stdcall Rec_map_LoadPlayerFeaturesPlotmap(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_map_SaveMappingData(HapiBank* a0)
+void __stdcall RecMapSaveMappingData(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_SAVEMAPPINGDATA, SUB_MAP, roots);
@@ -3354,7 +3354,7 @@ void __stdcall Rec_map_SaveMappingData(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_map_SaveMetalPlotmap(HapiBank* a0)
+void __stdcall RecMapSaveMetalPlotmap(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_SAVEMETALPLOTMAP, SUB_MAP, roots);
@@ -3366,7 +3366,7 @@ void __stdcall Rec_map_SaveMetalPlotmap(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_map_SavePlayerFeaturesPlotmap(HapiBank* a0)
+void __stdcall RecMapSavePlayerFeaturesPlotmap(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_SAVEPLAYERFEATURESPLOTMAP, SUB_MAP, roots);
@@ -3378,7 +3378,7 @@ void __stdcall Rec_map_SavePlayerFeaturesPlotmap(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_map_SetMissionType(int a0)
+void __stdcall RecMapSetMissionType(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_SETMISSIONTYPE, SUB_MAP, roots);
@@ -3390,7 +3390,7 @@ void __stdcall Rec_map_SetMissionType(int a0)
     }
 }
 
-void __stdcall Rec_map_SnapWorldPosToFootprint(UnitDef* a0, Vec3* a1)
+void __stdcall RecMapSnapWorldPosToFootprint(UnitDef* a0, Vec3* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITDEF, a0);
@@ -3404,7 +3404,7 @@ void __stdcall Rec_map_SnapWorldPosToFootprint(UnitDef* a0, Vec3* a1)
     }
 }
 
-void __stdcall Rec_map_AddUnitToMap(Unit* a0)
+void __stdcall RecMapAddUnitToMap(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -3417,7 +3417,7 @@ void __stdcall Rec_map_AddUnitToMap(Unit* a0)
     }
 }
 
-void __stdcall Rec_map_RemoveUnitFromMap(Unit* a0)
+void __stdcall RecMapRemoveUnitFromMap(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -3430,7 +3430,7 @@ void __stdcall Rec_map_RemoveUnitFromMap(Unit* a0)
     }
 }
 
-int __stdcall Rec_map_CanPlaceFootprintAt(Unit* a0, Vec3* a1)
+int __stdcall RecMapCanPlaceFootprintAt(Unit* a0, Vec3* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -3446,7 +3446,7 @@ int __stdcall Rec_map_CanPlaceFootprintAt(Unit* a0, Vec3* a1)
     return result;
 }
 
-int __stdcall Rec_map_IsPadSlotFree(Unit* a0, int a1)
+int __stdcall RecMapIsPadSlotFree(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -3462,7 +3462,7 @@ int __stdcall Rec_map_IsPadSlotFree(Unit* a0, int a1)
     return result;
 }
 
-int __stdcall Rec_map_PickRandomReclaimableResourcesInRadius(Vec3* a0, int a1, Vec3** a2, float* a3, Vec3** a4, float* a5)
+int __stdcall RecMapPickRandomReclaimableResourcesInRadius(Vec3* a0, int a1, Vec3** a2, float* a3, Vec3** a4, float* a5)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_PICKRANDOMRECLAIMABLERESOURCESINRADIUS, SUB_MAP, roots);
@@ -3481,7 +3481,7 @@ int __stdcall Rec_map_PickRandomReclaimableResourcesInRadius(Vec3* a0, int a1, V
     return result;
 }
 
-void __stdcall Rec_map_ClearFootprintAndUnlink(Unit* a0)
+void __stdcall RecMapClearFootprintAndUnlink(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -3494,7 +3494,7 @@ void __stdcall Rec_map_ClearFootprintAndUnlink(Unit* a0)
     }
 }
 
-void __stdcall Rec_map_ForceNeighborFootprintReclaim(Unit* a0)
+void __stdcall RecMapForceNeighborFootprintReclaim(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -3507,7 +3507,7 @@ void __stdcall Rec_map_ForceNeighborFootprintReclaim(Unit* a0)
     }
 }
 
-void __stdcall Rec_map_SetYardOpen(Unit* a0, int a1)
+void __stdcall RecMapSetYardOpen(Unit* a0, int a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -3521,7 +3521,7 @@ void __stdcall Rec_map_SetYardOpen(Unit* a0, int a1)
     }
 }
 
-void __fastcall Rec_map_SpatialBucketPrependUnit(SpatialBucket* a0, int a1, Unit* a2)
+void __fastcall RecMapSpatialBucketPrependUnit(SpatialBucket* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a2);
@@ -3536,7 +3536,7 @@ void __fastcall Rec_map_SpatialBucketPrependUnit(SpatialBucket* a0, int a1, Unit
     }
 }
 
-void __fastcall Rec_map_SpatialBucketUnlinkUnit(SpatialBucket* a0, int a1, Unit* a2)
+void __fastcall RecMapSpatialBucketUnlinkUnit(SpatialBucket* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a2);
@@ -3551,7 +3551,7 @@ void __fastcall Rec_map_SpatialBucketUnlinkUnit(SpatialBucket* a0, int a1, Unit*
     }
 }
 
-void __fastcall Rec_map_RefreshPassMap(MovementClass* a0, int a1, Point16 a2, Point16 a3)
+void __fastcall RecMapRefreshPassMap(MovementClass* a0, int a1, Point16 a2, Point16 a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_REFRESHPASSMAP, SUB_MAP, roots);
@@ -3566,7 +3566,7 @@ void __fastcall Rec_map_RefreshPassMap(MovementClass* a0, int a1, Point16 a2, Po
     }
 }
 
-int __fastcall Rec_map_AdvanceMission(Mission* a0)
+int __fastcall RecMapAdvanceMission(Mission* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_ADVANCEMISSION, SUB_MAP, roots);
@@ -3580,7 +3580,7 @@ int __fastcall Rec_map_AdvanceMission(Mission* a0)
     return result;
 }
 
-char* __fastcall Rec_map_GetCampaignName(Mission* a0)
+char* __fastcall RecMapGetCampaignName(Mission* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETCAMPAIGNNAME, SUB_MAP, roots);
@@ -3593,7 +3593,7 @@ char* __fastcall Rec_map_GetCampaignName(Mission* a0)
     return result;
 }
 
-int __fastcall Rec_map_GetMissionIndex(Mission* a0)
+int __fastcall RecMapGetMissionIndex(Mission* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETMISSIONINDEX, SUB_MAP, roots);
@@ -3607,7 +3607,7 @@ int __fastcall Rec_map_GetMissionIndex(Mission* a0)
     return result;
 }
 
-char* __fastcall Rec_map_GetMissionName(Mission* a0)
+char* __fastcall RecMapGetMissionName(Mission* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETMISSIONNAME, SUB_MAP, roots);
@@ -3620,7 +3620,7 @@ char* __fastcall Rec_map_GetMissionName(Mission* a0)
     return result;
 }
 
-int __fastcall Rec_map_GetStartPosition(Mission* a0, int a1, Vec3* a2, int a3)
+int __fastcall RecMapGetStartPosition(Mission* a0, int a1, Vec3* a2, int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETSTARTPOSITION, SUB_MAP, roots);
@@ -3637,7 +3637,7 @@ int __fastcall Rec_map_GetStartPosition(Mission* a0, int a1, Vec3* a2, int a3)
     return result;
 }
 
-void __fastcall Rec_map_LoadCampaign(Mission* a0, int a1, char* a2)
+void __fastcall RecMapLoadCampaign(Mission* a0, int a1, char* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_LOADCAMPAIGN, SUB_MAP, roots);
@@ -3651,7 +3651,7 @@ void __fastcall Rec_map_LoadCampaign(Mission* a0, int a1, char* a2)
     }
 }
 
-int __fastcall Rec_map_LoadMissionByName(Mission* a0, int a1, char* a2)
+int __fastcall RecMapLoadMissionByName(Mission* a0, int a1, char* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_LOADMISSIONBYNAME, SUB_MAP, roots);
@@ -3667,7 +3667,7 @@ int __fastcall Rec_map_LoadMissionByName(Mission* a0, int a1, char* a2)
     return result;
 }
 
-int __fastcall Rec_map_MissionExists(Mission* a0, int a1, int a2)
+int __fastcall RecMapMissionExists(Mission* a0, int a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_MISSIONEXISTS, SUB_MAP, roots);
@@ -3683,7 +3683,7 @@ int __fastcall Rec_map_MissionExists(Mission* a0, int a1, int a2)
     return result;
 }
 
-void __fastcall Rec_map_RefreshMapList(Mission* a0, int a1, int a2)
+void __fastcall RecMapRefreshMapList(Mission* a0, int a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_REFRESHMAPLIST, SUB_MAP, roots);
@@ -3697,7 +3697,7 @@ void __fastcall Rec_map_RefreshMapList(Mission* a0, int a1, int a2)
     }
 }
 
-int __fastcall Rec_map_SelectMission(Mission* a0, int a1, int a2)
+int __fastcall RecMapSelectMission(Mission* a0, int a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_SELECTMISSION, SUB_MAP, roots);
@@ -3713,7 +3713,7 @@ int __fastcall Rec_map_SelectMission(Mission* a0, int a1, int a2)
     return result;
 }
 
-int __fastcall Rec_map_ComputeMapChecksum(Mission* a0)
+int __fastcall RecMapComputeMapChecksum(Mission* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_COMPUTEMAPCHECKSUM, SUB_MAP, roots);
@@ -3727,7 +3727,7 @@ int __fastcall Rec_map_ComputeMapChecksum(Mission* a0)
     return result;
 }
 
-int __fastcall Rec_map_GetTerrainLength(Mission* a0)
+int __fastcall RecMapGetTerrainLength(Mission* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETTERRAINLENGTH, SUB_MAP, roots);
@@ -3741,7 +3741,7 @@ int __fastcall Rec_map_GetTerrainLength(Mission* a0)
     return result;
 }
 
-FileHandle* __stdcall Rec_files_OpenRead(char* a0)
+FileHandle* __stdcall RecFilesOpenRead(char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_OPENREAD, SUB_FILES, roots);
@@ -3754,7 +3754,7 @@ FileHandle* __stdcall Rec_files_OpenRead(char* a0)
     return result;
 }
 
-FileHandle* __stdcall Rec_files_OpenAppend(char* a0)
+FileHandle* __stdcall RecFilesOpenAppend(char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_OPENAPPEND, SUB_FILES, roots);
@@ -3767,7 +3767,7 @@ FileHandle* __stdcall Rec_files_OpenAppend(char* a0)
     return result;
 }
 
-FileHandle* __stdcall Rec_files_Create(char* a0)
+FileHandle* __stdcall RecFilesCreate(char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_CREATE, SUB_FILES, roots);
@@ -3780,7 +3780,7 @@ FileHandle* __stdcall Rec_files_Create(char* a0)
     return result;
 }
 
-int __stdcall Rec_files_Close(FileHandle* a0)
+int __stdcall RecFilesClose(FileHandle* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_CLOSE, SUB_FILES, roots);
@@ -3794,7 +3794,7 @@ int __stdcall Rec_files_Close(FileHandle* a0)
     return result;
 }
 
-bool __stdcall Rec_files_IsInArchive(FileHandle* a0)
+bool __stdcall RecFilesIsInArchive(FileHandle* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_ISINARCHIVE, SUB_FILES, roots);
@@ -3808,7 +3808,7 @@ bool __stdcall Rec_files_IsInArchive(FileHandle* a0)
     return result;
 }
 
-long __stdcall Rec_files_Seek(FileHandle* a0, long a1)
+long __stdcall RecFilesSeek(FileHandle* a0, long a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_SEEK, SUB_FILES, roots);
@@ -3823,7 +3823,7 @@ long __stdcall Rec_files_Seek(FileHandle* a0, long a1)
     return result;
 }
 
-long __stdcall Rec_files_Tell(FileHandle* a0)
+long __stdcall RecFilesTell(FileHandle* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_TELL, SUB_FILES, roots);
@@ -3837,7 +3837,7 @@ long __stdcall Rec_files_Tell(FileHandle* a0)
     return result;
 }
 
-int __stdcall Rec_files_Read(FileHandle* a0, void* a1, int a2)
+int __stdcall RecFilesRead(FileHandle* a0, void* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_READ, SUB_FILES, roots);
@@ -3853,7 +3853,7 @@ int __stdcall Rec_files_Read(FileHandle* a0, void* a1, int a2)
     return result;
 }
 
-unsigned int __stdcall Rec_files_Write(FileHandle* a0, void* a1, unsigned int a2)
+unsigned int __stdcall RecFilesWrite(FileHandle* a0, void* a1, unsigned int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_WRITE, SUB_FILES, roots);
@@ -3869,7 +3869,7 @@ unsigned int __stdcall Rec_files_Write(FileHandle* a0, void* a1, unsigned int a2
     return result;
 }
 
-long __stdcall Rec_files_Length(FileHandle* a0)
+long __stdcall RecFilesLength(FileHandle* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LENGTH, SUB_FILES, roots);
@@ -3883,7 +3883,7 @@ long __stdcall Rec_files_Length(FileHandle* a0)
     return result;
 }
 
-long __stdcall Rec_files_LengthByName(char* a0)
+long __stdcall RecFilesLengthByName(char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LENGTHBYNAME, SUB_FILES, roots);
@@ -3897,7 +3897,7 @@ long __stdcall Rec_files_LengthByName(char* a0)
     return result;
 }
 
-void* __stdcall Rec_files_ReadAt(char* a0, void* a1, long a2, unsigned int a3)
+void* __stdcall RecFilesReadAt(char* a0, void* a1, long a2, unsigned int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_READAT, SUB_FILES, roots);
@@ -3913,7 +3913,7 @@ void* __stdcall Rec_files_ReadAt(char* a0, void* a1, long a2, unsigned int a3)
     return result;
 }
 
-void* __stdcall Rec_files_Load(char* a0, int* a1)
+void* __stdcall RecFilesLoad(char* a0, int* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LOAD, SUB_FILES, roots);
@@ -3927,7 +3927,7 @@ void* __stdcall Rec_files_Load(char* a0, int* a1)
     return result;
 }
 
-void* __stdcall Rec_files_LoadOpenFile(char* a0, FileHandle* a1, unsigned int* a2)
+void* __stdcall RecFilesLoadOpenFile(char* a0, FileHandle* a1, unsigned int* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LOADOPENFILE, SUB_FILES, roots);
@@ -3942,7 +3942,7 @@ void* __stdcall Rec_files_LoadOpenFile(char* a0, FileHandle* a1, unsigned int* a
     return result;
 }
 
-int __stdcall Rec_files_WriteBuffer(char* a0, void* a1, int a2)
+int __stdcall RecFilesWriteBuffer(char* a0, void* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_WRITEBUFFER, SUB_FILES, roots);
@@ -3958,7 +3958,7 @@ int __stdcall Rec_files_WriteBuffer(char* a0, void* a1, int a2)
     return result;
 }
 
-void __stdcall Rec_files_Remove(const char* a0)
+void __stdcall RecFilesRemove(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_REMOVE, SUB_FILES, roots);
@@ -3970,7 +3970,7 @@ void __stdcall Rec_files_Remove(const char* a0)
     }
 }
 
-void __stdcall Rec_files_Rename(const char* a0, const char* a1)
+void __stdcall RecFilesRename(const char* a0, const char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_RENAME, SUB_FILES, roots);
@@ -3983,7 +3983,7 @@ void __stdcall Rec_files_Rename(const char* a0, const char* a1)
     }
 }
 
-void __stdcall Rec_files_GetCurrentDriveLetter(char* a0)
+void __stdcall RecFilesGetCurrentDriveLetter(char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_GETCURRENTDRIVELETTER, SUB_FILES, roots);
@@ -3995,7 +3995,7 @@ void __stdcall Rec_files_GetCurrentDriveLetter(char* a0)
     }
 }
 
-int __stdcall Rec_files_ChangeDrive(char* a0)
+int __stdcall RecFilesChangeDrive(char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_CHANGEDRIVE, SUB_FILES, roots);
@@ -4009,7 +4009,7 @@ int __stdcall Rec_files_ChangeDrive(char* a0)
     return result;
 }
 
-char* __stdcall Rec_files_GetDriveDirectory(char* a0, char* a1, int a2)
+char* __stdcall RecFilesGetDriveDirectory(char* a0, char* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_GETDRIVEDIRECTORY, SUB_FILES, roots);
@@ -4024,7 +4024,7 @@ char* __stdcall Rec_files_GetDriveDirectory(char* a0, char* a1, int a2)
     return result;
 }
 
-void __stdcall Rec_files_ChangeDirectory(const char* a0)
+void __stdcall RecFilesChangeDirectory(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_CHANGEDIRECTORY, SUB_FILES, roots);
@@ -4036,7 +4036,7 @@ void __stdcall Rec_files_ChangeDirectory(const char* a0)
     }
 }
 
-int __stdcall Rec_files_MatchWildcard(const char* a0, const char* a1)
+int __stdcall RecFilesMatchWildcard(const char* a0, const char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_MATCHWILDCARD, SUB_FILES, roots);
@@ -4051,7 +4051,7 @@ int __stdcall Rec_files_MatchWildcard(const char* a0, const char* a1)
     return result;
 }
 
-int __stdcall Rec_files_FindFirst(const char* a0, void* a1, int a2, char a3)
+int __stdcall RecFilesFindFirst(const char* a0, void* a1, int a2, char a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_FINDFIRST, SUB_FILES, roots);
@@ -4068,7 +4068,7 @@ int __stdcall Rec_files_FindFirst(const char* a0, void* a1, int a2, char a3)
     return result;
 }
 
-int __stdcall Rec_files_FindNext(int a0, void* a1)
+int __stdcall RecFilesFindNext(int a0, void* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_FINDNEXT, SUB_FILES, roots);
@@ -4083,7 +4083,7 @@ int __stdcall Rec_files_FindNext(int a0, void* a1)
     return result;
 }
 
-int __stdcall Rec_files_FindClose(int a0)
+int __stdcall RecFilesFindClose(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_FINDCLOSE, SUB_FILES, roots);
@@ -4097,7 +4097,7 @@ int __stdcall Rec_files_FindClose(int a0)
     return result;
 }
 
-int __stdcall Rec_files_CountDirectoryEntries(const char* a0, int a1)
+int __stdcall RecFilesCountDirectoryEntries(const char* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_COUNTDIRECTORYENTRIES, SUB_FILES, roots);
@@ -4112,7 +4112,7 @@ int __stdcall Rec_files_CountDirectoryEntries(const char* a0, int a1)
     return result;
 }
 
-void __stdcall Rec_files_ListDirectory(const char* a0, int a1, FileNameList* a2)
+void __stdcall RecFilesListDirectory(const char* a0, int a1, FileNameList* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LISTDIRECTORY, SUB_FILES, roots);
@@ -4126,7 +4126,7 @@ void __stdcall Rec_files_ListDirectory(const char* a0, int a1, FileNameList* a2)
     }
 }
 
-void __stdcall Rec_files_FindFilesRecursive(char* a0, const char* a1, FileNameList* a2, int a3, int a4)
+void __stdcall RecFilesFindFilesRecursive(char* a0, const char* a1, FileNameList* a2, int a3, int a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_FINDFILESRECURSIVE, SUB_FILES, roots);
@@ -4142,7 +4142,7 @@ void __stdcall Rec_files_FindFilesRecursive(char* a0, const char* a1, FileNameLi
     }
 }
 
-void __stdcall Rec_files_MakeDirectoryPath(char* a0)
+void __stdcall RecFilesMakeDirectoryPath(char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_MAKEDIRECTORYPATH, SUB_FILES, roots);
@@ -4154,7 +4154,7 @@ void __stdcall Rec_files_MakeDirectoryPath(char* a0)
     }
 }
 
-void __stdcall Rec_files_SaveStartDirectory()
+void __stdcall RecFilesSaveStartDirectory()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_SAVESTARTDIRECTORY, SUB_FILES, roots);
@@ -4165,7 +4165,7 @@ void __stdcall Rec_files_SaveStartDirectory()
     }
 }
 
-void __stdcall Rec_files_GetStartDirectory(char* a0)
+void __stdcall RecFilesGetStartDirectory(char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_GETSTARTDIRECTORY, SUB_FILES, roots);
@@ -4177,7 +4177,7 @@ void __stdcall Rec_files_GetStartDirectory(char* a0)
     }
 }
 
-void* __stdcall Rec_files_AddArchive(const char* a0, int a1)
+void* __stdcall RecFilesAddArchive(const char* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_ADDARCHIVE, SUB_FILES, roots);
@@ -4191,7 +4191,7 @@ void* __stdcall Rec_files_AddArchive(const char* a0, int a1)
     return result;
 }
 
-void __stdcall Rec_files_CloseArchive(OPENHAPIFILE* a0)
+void __stdcall RecFilesCloseArchive(OPENHAPIFILE* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_CLOSEARCHIVE, SUB_FILES, roots);
@@ -4203,7 +4203,7 @@ void __stdcall Rec_files_CloseArchive(OPENHAPIFILE* a0)
     }
 }
 
-void __stdcall Rec_files_DropMissingArchives()
+void __stdcall RecFilesDropMissingArchives()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_DROPMISSINGARCHIVES, SUB_FILES, roots);
@@ -4214,7 +4214,7 @@ void __stdcall Rec_files_DropMissingArchives()
     }
 }
 
-void __stdcall Rec_files_ResolveShadowedFiles()
+void __stdcall RecFilesResolveShadowedFiles()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_RESOLVESHADOWEDFILES, SUB_FILES, roots);
@@ -4225,7 +4225,7 @@ void __stdcall Rec_files_ResolveShadowedFiles()
     }
 }
 
-int __stdcall Rec_files_LzssCompress(unsigned char* a0, unsigned char* a1, int a2)
+int __stdcall RecFilesLzssCompress(unsigned char* a0, unsigned char* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LZSSCOMPRESS, SUB_FILES, roots);
@@ -4241,7 +4241,7 @@ int __stdcall Rec_files_LzssCompress(unsigned char* a0, unsigned char* a1, int a
     return result;
 }
 
-int __stdcall Rec_files_LzssExpand(unsigned char* a0, unsigned char* a1)
+int __stdcall RecFilesLzssExpand(unsigned char* a0, unsigned char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LZSSEXPAND, SUB_FILES, roots);
@@ -4256,7 +4256,7 @@ int __stdcall Rec_files_LzssExpand(unsigned char* a0, unsigned char* a1)
     return result;
 }
 
-int __stdcall Rec_files_LzssDisablePreset()
+int __stdcall RecFilesLzssDisablePreset()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LZSSDISABLEPRESET, SUB_FILES, roots);
@@ -4269,7 +4269,7 @@ int __stdcall Rec_files_LzssDisablePreset()
     return result;
 }
 
-int __stdcall Rec_files_LzssEnablePreset()
+int __stdcall RecFilesLzssEnablePreset()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LZSSENABLEPRESET, SUB_FILES, roots);
@@ -4282,7 +4282,7 @@ int __stdcall Rec_files_LzssEnablePreset()
     return result;
 }
 
-HapiBank* __stdcall Rec_files_BankInit(HapiBank* a0)
+HapiBank* __stdcall RecFilesBankInit(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKINIT, SUB_FILES, roots);
@@ -4295,7 +4295,7 @@ HapiBank* __stdcall Rec_files_BankInit(HapiBank* a0)
     return result;
 }
 
-void __stdcall Rec_files_BankClose(HapiBank* a0)
+void __stdcall RecFilesBankClose(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKCLOSE, SUB_FILES, roots);
@@ -4307,7 +4307,7 @@ void __stdcall Rec_files_BankClose(HapiBank* a0)
     }
 }
 
-void __stdcall Rec_files_BankNew(HapiBank* a0)
+void __stdcall RecFilesBankNew(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKNEW, SUB_FILES, roots);
@@ -4319,7 +4319,7 @@ void __stdcall Rec_files_BankNew(HapiBank* a0)
     }
 }
 
-int __stdcall Rec_files_BankOpen(HapiBank* a0, char* a1, char* a2, char* a3)
+int __stdcall RecFilesBankOpen(HapiBank* a0, char* a1, char* a2, char* a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKOPEN, SUB_FILES, roots);
@@ -4336,7 +4336,7 @@ int __stdcall Rec_files_BankOpen(HapiBank* a0, char* a1, char* a2, char* a3)
     return result;
 }
 
-int __stdcall Rec_files_BankSave(HapiBank* a0, char* a1, char* a2, int a3, int a4)
+int __stdcall RecFilesBankSave(HapiBank* a0, char* a1, char* a2, int a3, int a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKSAVE, SUB_FILES, roots);
@@ -4354,7 +4354,7 @@ int __stdcall Rec_files_BankSave(HapiBank* a0, char* a1, char* a2, int a3, int a
     return result;
 }
 
-int __stdcall Rec_files_BankOpenAccount(HapiBank* a0, char* a1)
+int __stdcall RecFilesBankOpenAccount(HapiBank* a0, char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKOPENACCOUNT, SUB_FILES, roots);
@@ -4379,7 +4379,7 @@ int __stdcall Rec_files_BankOpenAccount(HapiBank* a0, char* a1)
     return result;
 }
 
-int __stdcall Rec_files_BankSetInteger(HapiBank* a0, const char* a1, int a2)
+int __stdcall RecFilesBankSetInteger(HapiBank* a0, const char* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKSETINTEGER, SUB_FILES, roots);
@@ -4406,7 +4406,7 @@ int __stdcall Rec_files_BankSetInteger(HapiBank* a0, const char* a1, int a2)
     return result;
 }
 
-int __stdcall Rec_files_BankSetDouble(HapiBank* a0, const char* a1, double a2)
+int __stdcall RecFilesBankSetDouble(HapiBank* a0, const char* a1, double a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKSETDOUBLE, SUB_FILES, roots);
@@ -4422,7 +4422,7 @@ int __stdcall Rec_files_BankSetDouble(HapiBank* a0, const char* a1, double a2)
     return result;
 }
 
-int __stdcall Rec_files_BankSetString(HapiBank* a0, const char* a1, char* a2)
+int __stdcall RecFilesBankSetString(HapiBank* a0, const char* a1, char* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKSETSTRING, SUB_FILES, roots);
@@ -4438,7 +4438,7 @@ int __stdcall Rec_files_BankSetString(HapiBank* a0, const char* a1, char* a2)
     return result;
 }
 
-int __stdcall Rec_files_BankGetInteger(HapiBank* a0, char* a1, int a2)
+int __stdcall RecFilesBankGetInteger(HapiBank* a0, char* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKGETINTEGER, SUB_FILES, roots);
@@ -4465,7 +4465,7 @@ int __stdcall Rec_files_BankGetInteger(HapiBank* a0, char* a1, int a2)
     return result;
 }
 
-double __stdcall Rec_files_BankGetDouble(HapiBank* a0, char* a1, double a2)
+double __stdcall RecFilesBankGetDouble(HapiBank* a0, char* a1, double a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKGETDOUBLE, SUB_FILES, roots);
@@ -4481,7 +4481,7 @@ double __stdcall Rec_files_BankGetDouble(HapiBank* a0, char* a1, double a2)
     return result;
 }
 
-char* __stdcall Rec_files_BankGetString(HapiBank* a0, char* a1, char* a2)
+char* __stdcall RecFilesBankGetString(HapiBank* a0, char* a1, char* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKGETSTRING, SUB_FILES, roots);
@@ -4496,7 +4496,7 @@ char* __stdcall Rec_files_BankGetString(HapiBank* a0, char* a1, char* a2)
     return result;
 }
 
-int __stdcall Rec_files_BankHasItem(HapiBank* a0, const char* a1)
+int __stdcall RecFilesBankHasItem(HapiBank* a0, const char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKHASITEM, SUB_FILES, roots);
@@ -4511,7 +4511,7 @@ int __stdcall Rec_files_BankHasItem(HapiBank* a0, const char* a1)
     return result;
 }
 
-int __stdcall Rec_files_BankOpenNumberedBox(HapiBank* a0, int a1)
+int __stdcall RecFilesBankOpenNumberedBox(HapiBank* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKOPENNUMBEREDBOX, SUB_FILES, roots);
@@ -4526,7 +4526,7 @@ int __stdcall Rec_files_BankOpenNumberedBox(HapiBank* a0, int a1)
     return result;
 }
 
-int __stdcall Rec_files_BankOpenNamedBox(HapiBank* a0, char* a1)
+int __stdcall RecFilesBankOpenNamedBox(HapiBank* a0, char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKOPENNAMEDBOX, SUB_FILES, roots);
@@ -4541,7 +4541,7 @@ int __stdcall Rec_files_BankOpenNamedBox(HapiBank* a0, char* a1)
     return result;
 }
 
-int __stdcall Rec_files_BankGetBoxSize(HapiBank* a0)
+int __stdcall RecFilesBankGetBoxSize(HapiBank* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKGETBOXSIZE, SUB_FILES, roots);
@@ -4555,7 +4555,7 @@ int __stdcall Rec_files_BankGetBoxSize(HapiBank* a0)
     return result;
 }
 
-void __stdcall Rec_files_BankSeekBox(HapiBank* a0, int a1)
+void __stdcall RecFilesBankSeekBox(HapiBank* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKSEEKBOX, SUB_FILES, roots);
@@ -4568,7 +4568,7 @@ void __stdcall Rec_files_BankSeekBox(HapiBank* a0, int a1)
     }
 }
 
-int __stdcall Rec_files_BankReadBox(HapiBank* a0, void* a1, int a2)
+int __stdcall RecFilesBankReadBox(HapiBank* a0, void* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKREADBOX, SUB_FILES, roots);
@@ -4584,7 +4584,7 @@ int __stdcall Rec_files_BankReadBox(HapiBank* a0, void* a1, int a2)
     return result;
 }
 
-int __stdcall Rec_files_BankWriteBox(HapiBank* a0, void* a1, int a2)
+int __stdcall RecFilesBankWriteBox(HapiBank* a0, void* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKWRITEBOX, SUB_FILES, roots);
@@ -4600,7 +4600,7 @@ int __stdcall Rec_files_BankWriteBox(HapiBank* a0, void* a1, int a2)
     return result;
 }
 
-void __stdcall Rec_network_BroadcastPlayerInfo()
+void __stdcall RecNetworkBroadcastPlayerInfo()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_NETWORK_BROADCASTPLAYERINFO, SUB_NETWORK, roots);
@@ -4611,7 +4611,7 @@ void __stdcall Rec_network_BroadcastPlayerInfo()
     }
 }
 
-void __stdcall Rec_network_SendNewUnit(Unit* a0)
+void __stdcall RecNetworkSendNewUnit(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4624,7 +4624,7 @@ void __stdcall Rec_network_SendNewUnit(Unit* a0)
     }
 }
 
-void __stdcall Rec_network_SendBuilderLink(Unit* a0, Unit* a1)
+void __stdcall RecNetworkSendBuilderLink(Unit* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4639,7 +4639,7 @@ void __stdcall Rec_network_SendBuilderLink(Unit* a0, Unit* a1)
     }
 }
 
-void __stdcall Rec_network_SendUnitKilled(Unit* a0, int a1, int a2, int a3)
+void __stdcall RecNetworkSendUnitKilled(Unit* a0, int a1, int a2, int a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4655,7 +4655,7 @@ void __stdcall Rec_network_SendUnitKilled(Unit* a0, int a1, int a2, int a3)
     }
 }
 
-void __stdcall Rec_network_SendUnitDamage(Unit* a0, Unit* a1, int a2, int a3, unsigned short a4)
+void __stdcall RecNetworkSendUnitDamage(Unit* a0, Unit* a1, int a2, int a3, unsigned short a4)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4673,7 +4673,7 @@ void __stdcall Rec_network_SendUnitDamage(Unit* a0, Unit* a1, int a2, int a3, un
     }
 }
 
-void __stdcall Rec_network_SendAttach(Unit* a0, Unit* a1, char a2, char a3)
+void __stdcall RecNetworkSendAttach(Unit* a0, Unit* a1, char a2, char a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4690,7 +4690,7 @@ void __stdcall Rec_network_SendAttach(Unit* a0, Unit* a1, char a2, char a3)
     }
 }
 
-void __stdcall Rec_network_SendOwnershipTransfer(Unit* a0, Player* a1)
+void __stdcall RecNetworkSendOwnershipTransfer(Unit* a0, Player* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4705,7 +4705,7 @@ void __stdcall Rec_network_SendOwnershipTransfer(Unit* a0, Player* a1)
     }
 }
 
-void __stdcall Rec_network_SendActivateFlags(Unit* a0)
+void __stdcall RecNetworkSendActivateFlags(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4718,7 +4718,7 @@ void __stdcall Rec_network_SendActivateFlags(Unit* a0)
     }
 }
 
-void __stdcall Rec_network_SendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2, Vec3* a3, Vec3* a4)
+void __stdcall RecNetworkSendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2, Vec3* a3, Vec3* a4)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4736,7 +4736,7 @@ void __stdcall Rec_network_SendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2
     }
 }
 
-void __stdcall Rec_network_SendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2)
+void __stdcall RecNetworkSendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_NETWORK_SENDWEAPONFIREAT, SUB_NETWORK, roots);
@@ -4750,7 +4750,7 @@ void __stdcall Rec_network_SendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2
     }
 }
 
-void __stdcall Rec_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
+void __stdcall RecNetworkSendProjectileDetonated(Unit* a0, Projectile* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4764,7 +4764,7 @@ void __stdcall Rec_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
     }
 }
 
-void __stdcall Rec_network_SendFeatureHit(WeaponDef* a0, int a1, int a2)
+void __stdcall RecNetworkSendFeatureHit(WeaponDef* a0, int a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_NETWORK_SENDFEATUREHIT, SUB_NETWORK, roots);
@@ -4778,7 +4778,7 @@ void __stdcall Rec_network_SendFeatureHit(WeaponDef* a0, int a1, int a2)
     }
 }
 
-void __stdcall Rec_network_SendFeatureKilled(int a0, int a1)
+void __stdcall RecNetworkSendFeatureKilled(int a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_NETWORK_SENDFEATUREKILLED, SUB_NETWORK, roots);
@@ -4791,7 +4791,7 @@ void __stdcall Rec_network_SendFeatureKilled(int a0, int a1)
     }
 }
 
-void __stdcall Rec_network_SendFeatureBurning(int a0, int a1)
+void __stdcall RecNetworkSendFeatureBurning(int a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_NETWORK_SENDFEATUREBURNING, SUB_NETWORK, roots);
@@ -4804,7 +4804,7 @@ void __stdcall Rec_network_SendFeatureBurning(int a0, int a1)
     }
 }
 
-void __stdcall Rec_network_SendFeatureReclaimed(Unit* a0, int a1, int a2)
+void __stdcall RecNetworkSendFeatureReclaimed(Unit* a0, int a1, int a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4819,7 +4819,7 @@ void __stdcall Rec_network_SendFeatureReclaimed(Unit* a0, int a1, int a2)
     }
 }
 
-int __stdcall Rec_network_SendScriptCall(Unit* a0, short a1, char a2, int a3, int a4, int a5, int a6)
+int __stdcall RecNetworkSendScriptCall(Unit* a0, short a1, char a2, int a3, int a4, int a5, int a6)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4840,7 +4840,7 @@ int __stdcall Rec_network_SendScriptCall(Unit* a0, short a1, char a2, int a3, in
     return result;
 }
 
-int __stdcall Rec_network_SendScriptCallByName(Unit* a0, char* a1, char a2, int a3, int a4, int a5, int a6)
+int __stdcall RecNetworkSendScriptCallByName(Unit* a0, char* a1, char a2, int a3, int a4, int a5, int a6)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4861,7 +4861,7 @@ int __stdcall Rec_network_SendScriptCallByName(Unit* a0, char* a1, char a2, int 
     return result;
 }
 
-void __stdcall Rec_network_SendShareMetal(unsigned char a0, unsigned char a1, float a2)
+void __stdcall RecNetworkSendShareMetal(unsigned char a0, unsigned char a1, float a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_NETWORK_SENDSHAREMETAL, SUB_NETWORK, roots);
@@ -4875,7 +4875,7 @@ void __stdcall Rec_network_SendShareMetal(unsigned char a0, unsigned char a1, fl
     }
 }
 
-void __stdcall Rec_network_SendShareEnergy(unsigned char a0, unsigned char a1, float a2)
+void __stdcall RecNetworkSendShareEnergy(unsigned char a0, unsigned char a1, float a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_NETWORK_SENDSHAREENERGY, SUB_NETWORK, roots);
@@ -4889,7 +4889,7 @@ void __stdcall Rec_network_SendShareEnergy(unsigned char a0, unsigned char a1, f
     }
 }
 
-void __stdcall Rec_network_SendShareMapInfo(unsigned char a0, unsigned char a1)
+void __stdcall RecNetworkSendShareMapInfo(unsigned char a0, unsigned char a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_NETWORK_SENDSHAREMAPINFO, SUB_NETWORK, roots);
@@ -4902,7 +4902,7 @@ void __stdcall Rec_network_SendShareMapInfo(unsigned char a0, unsigned char a1)
     }
 }
 
-void __stdcall Rec_network_BroadcastPlayerEconomy(Player* a0)
+void __stdcall RecNetworkBroadcastPlayerEconomy(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -4915,7 +4915,7 @@ void __stdcall Rec_network_BroadcastPlayerEconomy(Player* a0)
     }
 }
 
-void __stdcall Rec_network_SendUnitStates(Player* a0)
+void __stdcall RecNetworkSendUnitStates(Player* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_PLAYER, a0);
@@ -4979,705 +4979,705 @@ void HookSeams(const bool* on)
     s_inner_network = g_seams.network;
     s_rec_network = *s_inner_network;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.UpdateWind = Rec_wind_meteors_UpdateWind;
+        s_rec_wind_meteors.UpdateWind = RecWindMeteorsUpdateWind;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.UpdateMeteors = Rec_wind_meteors_UpdateMeteors;
+        s_rec_wind_meteors.UpdateMeteors = RecWindMeteorsUpdateMeteors;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.InitMeteors = Rec_wind_meteors_InitMeteors;
+        s_rec_wind_meteors.InitMeteors = RecWindMeteorsInitMeteors;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.EmptyShutdownPreCleanup = Rec_wind_meteors_EmptyShutdownPreCleanup;
+        s_rec_wind_meteors.EmptyShutdownPreCleanup = RecWindMeteorsEmptyShutdownPreCleanup;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.EnableMeteors = Rec_wind_meteors_EnableMeteors;
+        s_rec_wind_meteors.EnableMeteors = RecWindMeteorsEnableMeteors;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.DisableMeteors = Rec_wind_meteors_DisableMeteors;
+        s_rec_wind_meteors.DisableMeteors = RecWindMeteorsDisableMeteors;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.SetMeteorParams = Rec_wind_meteors_SetMeteorParams;
+        s_rec_wind_meteors.SetMeteorParams = RecWindMeteorsSetMeteorParams;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.LoadMeteorDefaults = Rec_wind_meteors_LoadMeteorDefaults;
+        s_rec_wind_meteors.LoadMeteorDefaults = RecWindMeteorsLoadMeteorDefaults;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.SaveMeteors = Rec_wind_meteors_SaveMeteors;
+        s_rec_wind_meteors.SaveMeteors = RecWindMeteorsSaveMeteors;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.LoadMeteors = Rec_wind_meteors_LoadMeteors;
+        s_rec_wind_meteors.LoadMeteors = RecWindMeteorsLoadMeteors;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.CmdMeteor = Rec_wind_meteors_CmdMeteor;
+        s_rec_wind_meteors.CmdMeteor = RecWindMeteorsCmdMeteor;
     if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.UpdateWindOnStream = Rec_wind_meteors_UpdateWindOnStream;
+        s_rec_wind_meteors.UpdateWindOnStream = RecWindMeteorsUpdateWindOnStream;
     if (on[SUB_ECONOMY])
-        s_rec_economy.UpdateResourceSharing = Rec_economy_UpdateResourceSharing;
+        s_rec_economy.UpdateResourceSharing = RecEconomyUpdateResourceSharing;
     if (on[SUB_ECONOMY])
-        s_rec_economy.GetEnergyUse = Rec_economy_GetEnergyUse;
+        s_rec_economy.GetEnergyUse = RecEconomyGetEnergyUse;
     if (on[SUB_ECONOMY])
-        s_rec_economy.UpdatePlayerEconomy = Rec_economy_UpdatePlayerEconomy;
+        s_rec_economy.UpdatePlayerEconomy = RecEconomyUpdatePlayerEconomy;
     if (on[SUB_ECONOMY])
-        s_rec_economy.UpdateMetalExtraction = Rec_economy_UpdateMetalExtraction;
+        s_rec_economy.UpdateMetalExtraction = RecEconomyUpdateMetalExtraction;
     if (on[SUB_ECONOMY])
-        s_rec_economy.Reset = Rec_economy_Reset;
+        s_rec_economy.Reset = RecEconomyReset;
     if (on[SUB_ECONOMY])
-        s_rec_economy.SaveUnitAccounts = Rec_economy_SaveUnitAccounts;
+        s_rec_economy.SaveUnitAccounts = RecEconomySaveUnitAccounts;
     if (on[SUB_ECONOMY])
-        s_rec_economy.LoadUnitAccounts = Rec_economy_LoadUnitAccounts;
+        s_rec_economy.LoadUnitAccounts = RecEconomyLoadUnitAccounts;
     if (on[SUB_ECONOMY])
-        s_rec_economy.RequestEnergy = Rec_economy_RequestEnergy;
+        s_rec_economy.RequestEnergy = RecEconomyRequestEnergy;
     if (on[SUB_ECONOMY])
-        s_rec_economy.RequestEnergyAndMetal = Rec_economy_RequestEnergyAndMetal;
+        s_rec_economy.RequestEnergyAndMetal = RecEconomyRequestEnergyAndMetal;
     if (on[SUB_ECONOMY])
-        s_rec_economy.SpendEnergy = Rec_economy_SpendEnergy;
+        s_rec_economy.SpendEnergy = RecEconomySpendEnergy;
     if (on[SUB_ECONOMY])
-        s_rec_economy.SpendMetal = Rec_economy_SpendMetal;
+        s_rec_economy.SpendMetal = RecEconomySpendMetal;
     if (on[SUB_ECONOMY])
-        s_rec_economy.SpendEnergyAndMetal = Rec_economy_SpendEnergyAndMetal;
+        s_rec_economy.SpendEnergyAndMetal = RecEconomySpendEnergyAndMetal;
     if (on[SUB_FEATURES])
-        s_rec_features.UpdateFeatures = Rec_features_UpdateFeatures;
+        s_rec_features.UpdateFeatures = RecFeaturesUpdateFeatures;
     if (on[SUB_FEATURES])
-        s_rec_features.LoadFeatureFileList = Rec_features_LoadFeatureFileList;
+        s_rec_features.LoadFeatureFileList = RecFeaturesLoadFeatureFileList;
     if (on[SUB_FEATURES])
-        s_rec_features.FreeFeatureFileList = Rec_features_FreeFeatureFileList;
+        s_rec_features.FreeFeatureFileList = RecFeaturesFreeFeatureFileList;
     if (on[SUB_FEATURES])
-        s_rec_features.NopAfterFeatureEnum = Rec_features_NopAfterFeatureEnum;
+        s_rec_features.NopAfterFeatureEnum = RecFeaturesNopAfterFeatureEnum;
     if (on[SUB_FEATURES])
-        s_rec_features.ResolveFeatureLinks = Rec_features_ResolveFeatureLinks;
+        s_rec_features.ResolveFeatureLinks = RecFeaturesResolveFeatureLinks;
     if (on[SUB_FEATURES])
-        s_rec_features.InitFeatureAnimPool = Rec_features_InitFeatureAnimPool;
+        s_rec_features.InitFeatureAnimPool = RecFeaturesInitFeatureAnimPool;
     if (on[SUB_FEATURES])
-        s_rec_features.FreeFeaturePool = Rec_features_FreeFeaturePool;
+        s_rec_features.FreeFeaturePool = RecFeaturesFreeFeaturePool;
     if (on[SUB_FEATURES])
-        s_rec_features.PlaceMissionFeatures = Rec_features_PlaceMissionFeatures;
+        s_rec_features.PlaceMissionFeatures = RecFeaturesPlaceMissionFeatures;
     if (on[SUB_FEATURES])
-        s_rec_features.StampFeatureMetal = Rec_features_StampFeatureMetal;
+        s_rec_features.StampFeatureMetal = RecFeaturesStampFeatureMetal;
     if (on[SUB_FEATURES])
-        s_rec_features.GetCellFeature = Rec_features_GetCellFeature;
+        s_rec_features.GetCellFeature = RecFeaturesGetCellFeature;
     if (on[SUB_FEATURES])
-        s_rec_features.PlaceFeature = Rec_features_PlaceFeature;
+        s_rec_features.PlaceFeature = RecFeaturesPlaceFeature;
     if (on[SUB_FEATURES])
-        s_rec_features.RemoveFeature = Rec_features_RemoveFeature;
+        s_rec_features.RemoveFeature = RecFeaturesRemoveFeature;
     if (on[SUB_FEATURES])
-        s_rec_features.ReclaimFeature = Rec_features_ReclaimFeature;
+        s_rec_features.ReclaimFeature = RecFeaturesReclaimFeature;
     if (on[SUB_FEATURES])
-        s_rec_features.FindOrLoadFeatureType = Rec_features_FindOrLoadFeatureType;
+        s_rec_features.FindOrLoadFeatureType = RecFeaturesFindOrLoadFeatureType;
     if (on[SUB_FEATURES])
-        s_rec_features.DamageFeature = Rec_features_DamageFeature;
+        s_rec_features.DamageFeature = RecFeaturesDamageFeature;
     if (on[SUB_FEATURES])
-        s_rec_features.GetFootprintCentre = Rec_features_GetFootprintCentre;
+        s_rec_features.GetFootprintCentre = RecFeaturesGetFootprintCentre;
     if (on[SUB_FEATURES])
-        s_rec_features.SaveFeatures = Rec_features_SaveFeatures;
+        s_rec_features.SaveFeatures = RecFeaturesSaveFeatures;
     if (on[SUB_FEATURES])
-        s_rec_features.LoadFeatures = Rec_features_LoadFeatures;
+        s_rec_features.LoadFeatures = RecFeaturesLoadFeatures;
     if (on[SUB_AI])
-        s_rec_ai.GetVisibleEnemiesInRadius = Rec_ai_GetVisibleEnemiesInRadius;
+        s_rec_ai.GetVisibleEnemiesInRadius = RecAiGetVisibleEnemiesInRadius;
     if (on[SUB_AI])
-        s_rec_ai.HasReadyUnitInRange = Rec_ai_HasReadyUnitInRange;
+        s_rec_ai.HasReadyUnitInRange = RecAiHasReadyUnitInRange;
     if (on[SUB_AI])
-        s_rec_ai.IsPointVisible = Rec_ai_IsPointVisible;
+        s_rec_ai.IsPointVisible = RecAiIsPointVisible;
     if (on[SUB_AI])
-        s_rec_ai.ReactToAttack = Rec_ai_ReactToAttack;
+        s_rec_ai.ReactToAttack = RecAiReactToAttack;
     if (on[SUB_AI])
-        s_rec_ai.MarkOwnerNetDirtyFromDamageSplit = Rec_ai_MarkOwnerNetDirtyFromDamageSplit;
+        s_rec_ai.MarkOwnerNetDirtyFromDamageSplit = RecAiMarkOwnerNetDirtyFromDamageSplit;
     if (on[SUB_AI])
-        s_rec_ai.DumpPlayerAI = Rec_ai_DumpPlayerAI;
+        s_rec_ai.DumpPlayerAI = RecAiDumpPlayerAI;
     if (on[SUB_AI])
-        s_rec_ai.ResetAIPlayers = Rec_ai_ResetAIPlayers;
+        s_rec_ai.ResetAIPlayers = RecAiResetAIPlayers;
     if (on[SUB_AI])
-        s_rec_ai.GetFactoriesInRadius = Rec_ai_GetFactoriesInRadius;
+        s_rec_ai.GetFactoriesInRadius = RecAiGetFactoriesInRadius;
     if (on[SUB_AI])
-        s_rec_ai.CreatePlayerAI = Rec_ai_CreatePlayerAI;
+        s_rec_ai.CreatePlayerAI = RecAiCreatePlayerAI;
     if (on[SUB_AI])
-        s_rec_ai.DestroyPlayerAI = Rec_ai_DestroyPlayerAI;
+        s_rec_ai.DestroyPlayerAI = RecAiDestroyPlayerAI;
     if (on[SUB_AI])
-        s_rec_ai.UpdatePlayerAI = Rec_ai_UpdatePlayerAI;
+        s_rec_ai.UpdatePlayerAI = RecAiUpdatePlayerAI;
     if (on[SUB_AI])
-        s_rec_ai.RebuildFeatureCells = Rec_ai_RebuildFeatureCells;
+        s_rec_ai.RebuildFeatureCells = RecAiRebuildFeatureCells;
     if (on[SUB_AI])
-        s_rec_ai.ParseDownloadableAiWeightScripts = Rec_ai_ParseDownloadableAiWeightScripts;
+        s_rec_ai.ParseDownloadableAiWeightScripts = RecAiParseDownloadableAiWeightScripts;
     if (on[SUB_AI])
-        s_rec_ai.ReparseAiWeightScriptsIfLimitNotSticky = Rec_ai_ReparseAiWeightScriptsIfLimitNotSticky;
+        s_rec_ai.ReparseAiWeightScriptsIfLimitNotSticky = RecAiReparseAiWeightScriptsIfLimitNotSticky;
     if (on[SUB_AI])
-        s_rec_ai.CreateSquads = Rec_ai_CreateSquads;
+        s_rec_ai.CreateSquads = RecAiCreateSquads;
     if (on[SUB_AI])
-        s_rec_ai.FreeSquads = Rec_ai_FreeSquads;
+        s_rec_ai.FreeSquads = RecAiFreeSquads;
     if (on[SUB_AI])
-        s_rec_ai.SetUnitSquad = Rec_ai_SetUnitSquad;
+        s_rec_ai.SetUnitSquad = RecAiSetUnitSquad;
     if (on[SUB_AI])
-        s_rec_ai.SquadManagerTickIfActive = Rec_ai_SquadManagerTickIfActive;
+        s_rec_ai.SquadManagerTickIfActive = RecAiSquadManagerTickIfActive;
     if (on[SUB_AI])
-        s_rec_ai.SquadManagerDeleteTimers = Rec_ai_SquadManagerDeleteTimers;
+        s_rec_ai.SquadManagerDeleteTimers = RecAiSquadManagerDeleteTimers;
     if (on[SUB_AI])
-        s_rec_ai.CreateSquadManager = Rec_ai_CreateSquadManager;
+        s_rec_ai.CreateSquadManager = RecAiCreateSquadManager;
     if (on[SUB_AI])
-        s_rec_ai.CmdPlan = Rec_ai_CmdPlan;
+        s_rec_ai.CmdPlan = RecAiCmdPlan;
     if (on[SUB_AI])
-        s_rec_ai.CmdWeight = Rec_ai_CmdWeight;
+        s_rec_ai.CmdWeight = RecAiCmdWeight;
     if (on[SUB_AI])
-        s_rec_ai.CmdLimit = Rec_ai_CmdLimit;
+        s_rec_ai.CmdLimit = RecAiCmdLimit;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.RunSearches = Rec_pathfinding_RunSearches;
+        s_rec_pathfinding.RunSearches = RecPathfindingRunSearches;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.AbortIfGoalMatch = Rec_pathfinding_AbortIfGoalMatch;
+        s_rec_pathfinding.AbortIfGoalMatch = RecPathfindingAbortIfGoalMatch;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.Destroy = Rec_pathfinding_Destroy;
+        s_rec_pathfinding.Destroy = RecPathfindingDestroy;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.Create = Rec_pathfinding_Create;
+        s_rec_pathfinding.Create = RecPathfindingCreate;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.UpdateProjectiles = Rec_weapons_UpdateProjectiles;
+        s_rec_weapons.UpdateProjectiles = RecWeaponsUpdateProjectiles;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.UpdateExplosions = Rec_weapons_UpdateExplosions;
+        s_rec_weapons.UpdateExplosions = RecWeaponsUpdateExplosions;
     if (on[SUB_WEAPONS] || on[SUB_WIND_METEORS])
-        s_rec_weapons.SpawnProjectile = Rec_weapons_SpawnProjectile;
+        s_rec_weapons.SpawnProjectile = RecWeaponsSpawnProjectile;
     if (on[SUB_WEAPONS] || on[SUB_WIND_METEORS])
-        s_rec_weapons.FindWeaponByName = Rec_weapons_FindWeaponByName;
+        s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.ApplyAreaDamageAt = Rec_weapons_ApplyAreaDamageAt;
+        s_rec_weapons.ApplyAreaDamageAt = RecWeaponsApplyAreaDamageAt;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.GetWeaponRange = Rec_weapons_GetWeaponRange;
+        s_rec_weapons.GetWeaponRange = RecWeaponsGetWeaponRange;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.WeaponCanReachUnit = Rec_weapons_WeaponCanReachUnit;
+        s_rec_weapons.WeaponCanReachUnit = RecWeaponsWeaponCanReachUnit;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.FindTargetableProjectile = Rec_weapons_FindTargetableProjectile;
+        s_rec_weapons.FindTargetableProjectile = RecWeaponsFindTargetableProjectile;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.WeaponCanReachPos = Rec_weapons_WeaponCanReachPos;
+        s_rec_weapons.WeaponCanReachPos = RecWeaponsWeaponCanReachPos;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.AllocWeaponArray = Rec_weapons_AllocWeaponArray;
+        s_rec_weapons.AllocWeaponArray = RecWeaponsAllocWeaponArray;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.FreeWeaponArray = Rec_weapons_FreeWeaponArray;
+        s_rec_weapons.FreeWeaponArray = RecWeaponsFreeWeaponArray;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.LoadWeaponTypes = Rec_weapons_LoadWeaponTypes;
+        s_rec_weapons.LoadWeaponTypes = RecWeaponsLoadWeaponTypes;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.FreeWeaponTypes = Rec_weapons_FreeWeaponTypes;
+        s_rec_weapons.FreeWeaponTypes = RecWeaponsFreeWeaponTypes;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.InitExplosions = Rec_weapons_InitExplosions;
+        s_rec_weapons.InitExplosions = RecWeaponsInitExplosions;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.FreeExplosions = Rec_weapons_FreeExplosions;
+        s_rec_weapons.FreeExplosions = RecWeaponsFreeExplosions;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.DamageUnit = Rec_weapons_DamageUnit;
+        s_rec_weapons.DamageUnit = RecWeaponsDamageUnit;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.FindFeatureAtPos = Rec_weapons_FindFeatureAtPos;
+        s_rec_weapons.FindFeatureAtPos = RecWeaponsFindFeatureAtPos;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.ReleaseWeapons = Rec_weapons_ReleaseWeapons;
+        s_rec_weapons.ReleaseWeapons = RecWeaponsReleaseWeapons;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.ClaimWeapons = Rec_weapons_ClaimWeapons;
+        s_rec_weapons.ClaimWeapons = RecWeaponsClaimWeapons;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.DetonateUnitWeapon = Rec_weapons_DetonateUnitWeapon;
+        s_rec_weapons.DetonateUnitWeapon = RecWeaponsDetonateUnitWeapon;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.InitUnitWeaponSlots = Rec_weapons_InitUnitWeaponSlots;
+        s_rec_weapons.InitUnitWeaponSlots = RecWeaponsInitUnitWeaponSlots;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.RemoveUnitProjectiles = Rec_weapons_RemoveUnitProjectiles;
+        s_rec_weapons.RemoveUnitProjectiles = RecWeaponsRemoveUnitProjectiles;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.UpdateUnitWeapons = Rec_weapons_UpdateUnitWeapons;
+        s_rec_weapons.UpdateUnitWeapons = RecWeaponsUpdateUnitWeapons;
     if (on[SUB_TARGETING])
-        s_rec_targeting.SetWeaponTargetUnit = Rec_targeting_SetWeaponTargetUnit;
+        s_rec_targeting.SetWeaponTargetUnit = RecTargetingSetWeaponTargetUnit;
     if (on[SUB_TARGETING])
-        s_rec_targeting.SetWeaponTargetPos = Rec_targeting_SetWeaponTargetPos;
+        s_rec_targeting.SetWeaponTargetPos = RecTargetingSetWeaponTargetPos;
     if (on[SUB_TARGETING])
-        s_rec_targeting.ClearWeaponTarget = Rec_targeting_ClearWeaponTarget;
+        s_rec_targeting.ClearWeaponTarget = RecTargetingClearWeaponTarget;
     if (on[SUB_TARGETING])
-        s_rec_targeting.ResetWeaponTarget = Rec_targeting_ResetWeaponTarget;
+        s_rec_targeting.ResetWeaponTarget = RecTargetingResetWeaponTarget;
     if (on[SUB_TARGETING])
-        s_rec_targeting.GetWeaponTargetUnit = Rec_targeting_GetWeaponTargetUnit;
+        s_rec_targeting.GetWeaponTargetUnit = RecTargetingGetWeaponTargetUnit;
     if (on[SUB_TARGETING])
-        s_rec_targeting.GetWeaponTargetPos = Rec_targeting_GetWeaponTargetPos;
+        s_rec_targeting.GetWeaponTargetPos = RecTargetingGetWeaponTargetPos;
     if (on[SUB_TARGETING])
-        s_rec_targeting.FindWeaponTarget = Rec_targeting_FindWeaponTarget;
+        s_rec_targeting.FindWeaponTarget = RecTargetingFindWeaponTarget;
     if (on[SUB_TARGETING])
-        s_rec_targeting.FindBestTargetIfFireAtWill = Rec_targeting_FindBestTargetIfFireAtWill;
+        s_rec_targeting.FindBestTargetIfFireAtWill = RecTargetingFindBestTargetIfFireAtWill;
     if (on[SUB_TARGETING])
-        s_rec_targeting.ChooseWeapon = Rec_targeting_ChooseWeapon;
+        s_rec_targeting.ChooseWeapon = RecTargetingChooseWeapon;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.GetMapCell = Rec_los_radar_GetMapCell;
+        s_rec_los_radar.GetMapCell = RecLosRadarGetMapCell;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.CmdShareMapping = Rec_los_radar_CmdShareMapping;
+        s_rec_los_radar.CmdShareMapping = RecLosRadarCmdShareMapping;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.CmdShareRadar = Rec_los_radar_CmdShareRadar;
+        s_rec_los_radar.CmdShareRadar = RecLosRadarCmdShareRadar;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.ClampWorldPosToTerrain = Rec_los_radar_ClampWorldPosToTerrain;
+        s_rec_los_radar.ClampWorldPosToTerrain = RecLosRadarClampWorldPosToTerrain;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.ExpireEyeballs = Rec_los_radar_ExpireEyeballs;
+        s_rec_los_radar.ExpireEyeballs = RecLosRadarExpireEyeballs;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.FreeMapResources = Rec_los_radar_FreeMapResources;
+        s_rec_los_radar.FreeMapResources = RecLosRadarFreeMapResources;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.FreeRadar = Rec_los_radar_FreeRadar;
+        s_rec_los_radar.FreeRadar = RecLosRadarFreeRadar;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.InitRadar = Rec_los_radar_InitRadar;
+        s_rec_los_radar.InitRadar = RecLosRadarInitRadar;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.LoadTntMap = Rec_los_radar_LoadTntMap;
+        s_rec_los_radar.LoadTntMap = RecLosRadarLoadTntMap;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.RecalculateLineOfSight = Rec_los_radar_RecalculateLineOfSight;
+        s_rec_los_radar.RecalculateLineOfSight = RecLosRadarRecalculateLineOfSight;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.IsUnitVisibleToPlayer = Rec_los_radar_IsUnitVisibleToPlayer;
+        s_rec_los_radar.IsUnitVisibleToPlayer = RecLosRadarIsUnitVisibleToPlayer;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.GetMapCellAtPosition = Rec_los_radar_GetMapCellAtPosition;
+        s_rec_los_radar.GetMapCellAtPosition = RecLosRadarGetMapCellAtPosition;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.GetOriginCellAtPosition = Rec_los_radar_GetOriginCellAtPosition;
+        s_rec_los_radar.GetOriginCellAtPosition = RecLosRadarGetOriginCellAtPosition;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.UpdateCellHeightRange = Rec_los_radar_UpdateCellHeightRange;
+        s_rec_los_radar.UpdateCellHeightRange = RecLosRadarUpdateCellHeightRange;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.UpdateUnitLineOfSight = Rec_los_radar_UpdateUnitLineOfSight;
+        s_rec_los_radar.UpdateUnitLineOfSight = RecLosRadarUpdateUnitLineOfSight;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.RemoveUnitLineOfSight = Rec_los_radar_RemoveUnitLineOfSight;
+        s_rec_los_radar.RemoveUnitLineOfSight = RecLosRadarRemoveUnitLineOfSight;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.RevealNewUnit = Rec_los_radar_RevealNewUnit;
+        s_rec_los_radar.RevealNewUnit = RecLosRadarRevealNewUnit;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.AddEyeball = Rec_los_radar_AddEyeball;
+        s_rec_los_radar.AddEyeball = RecLosRadarAddEyeball;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.DrawRadarUnits = Rec_los_radar_DrawRadarUnits;
+        s_rec_los_radar.DrawRadarUnits = RecLosRadarDrawRadarUnits;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.UpdateRadarMapped = Rec_los_radar_UpdateRadarMapped;
+        s_rec_los_radar.UpdateRadarMapped = RecLosRadarUpdateRadarMapped;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.UpdateSensorRadarAndCloak = Rec_los_radar_UpdateSensorRadarAndCloak;
+        s_rec_los_radar.UpdateSensorRadarAndCloak = RecLosRadarUpdateSensorRadarAndCloak;
     if (on[SUB_ORDERS])
-        s_rec_orders.AiSearchGoalSetWaypoints = Rec_orders_AiSearchGoalSetWaypoints;
+        s_rec_orders.AiSearchGoalSetWaypoints = RecOrdersAiSearchGoalSetWaypoints;
     if (on[SUB_ORDERS])
-        s_rec_orders.OrderFxAddFlags = Rec_orders_OrderFxAddFlags;
+        s_rec_orders.OrderFxAddFlags = RecOrdersOrderFxAddFlags;
     if (on[SUB_ORDERS])
-        s_rec_orders.AppendOrder = Rec_orders_AppendOrder;
+        s_rec_orders.AppendOrder = RecOrdersAppendOrder;
     if (on[SUB_ORDERS])
-        s_rec_orders.AddOrder = Rec_orders_AddOrder;
+        s_rec_orders.AddOrder = RecOrdersAddOrder;
     if (on[SUB_ORDERS])
-        s_rec_orders.DeleteOrders = Rec_orders_DeleteOrders;
+        s_rec_orders.DeleteOrders = RecOrdersDeleteOrders;
     if (on[SUB_ORDERS])
-        s_rec_orders.GetOrderFlags = Rec_orders_GetOrderFlags;
+        s_rec_orders.GetOrderFlags = RecOrdersGetOrderFlags;
     if (on[SUB_ORDERS])
-        s_rec_orders.GetOrderType = Rec_orders_GetOrderType;
+        s_rec_orders.GetOrderType = RecOrdersGetOrderType;
     if (on[SUB_ORDERS])
-        s_rec_orders.IssueAttackOrder = Rec_orders_IssueAttackOrder;
+        s_rec_orders.IssueAttackOrder = RecOrdersIssueAttackOrder;
     if (on[SUB_ORDERS])
-        s_rec_orders.ReattachFxToUnit = Rec_orders_ReattachFxToUnit;
+        s_rec_orders.ReattachFxToUnit = RecOrdersReattachFxToUnit;
     if (on[SUB_ORDERS])
-        s_rec_orders.SerializeOrderToSave = Rec_orders_SerializeOrderToSave;
+        s_rec_orders.SerializeOrderToSave = RecOrdersSerializeOrderToSave;
     if (on[SUB_ORDERS])
-        s_rec_orders.AddBeCarriedOrder = Rec_orders_AddBeCarriedOrder;
+        s_rec_orders.AddBeCarriedOrder = RecOrdersAddBeCarriedOrder;
     if (on[SUB_ORDERS])
-        s_rec_orders.RunOrders = Rec_orders_RunOrders;
+        s_rec_orders.RunOrders = RecOrdersRunOrders;
     if (on[SUB_ORDERS])
-        s_rec_orders.RunSecondaryOrders = Rec_orders_RunSecondaryOrders;
+        s_rec_orders.RunSecondaryOrders = RecOrdersRunSecondaryOrders;
     if (on[SUB_ORDERS])
-        s_rec_orders.DestroyMotionObject = Rec_orders_DestroyMotionObject;
+        s_rec_orders.DestroyMotionObject = RecOrdersDestroyMotionObject;
     if (on[SUB_ORDERS])
-        s_rec_orders.LoadMotion = Rec_orders_LoadMotion;
+        s_rec_orders.LoadMotion = RecOrdersLoadMotion;
     if (on[SUB_ORDERS])
-        s_rec_orders.SaveMotion = Rec_orders_SaveMotion;
+        s_rec_orders.SaveMotion = RecOrdersSaveMotion;
     if (on[SUB_ORDERS])
-        s_rec_orders.UpdateMotion = Rec_orders_UpdateMotion;
+        s_rec_orders.UpdateMotion = RecOrdersUpdateMotion;
     if (on[SUB_ORDERS])
-        s_rec_orders.RegisterAllOrderTypes = Rec_orders_RegisterAllOrderTypes;
+        s_rec_orders.RegisterAllOrderTypes = RecOrdersRegisterAllOrderTypes;
     if (on[SUB_ORDERS])
-        s_rec_orders.ClearOrderTypeTable = Rec_orders_ClearOrderTypeTable;
+        s_rec_orders.ClearOrderTypeTable = RecOrdersClearOrderTypeTable;
     if (on[SUB_ORDERS])
-        s_rec_orders.CreatePathfinder = Rec_orders_CreatePathfinder;
+        s_rec_orders.CreatePathfinder = RecOrdersCreatePathfinder;
     if (on[SUB_ORDERS])
-        s_rec_orders.DestroyPathfinder = Rec_orders_DestroyPathfinder;
+        s_rec_orders.DestroyPathfinder = RecOrdersDestroyPathfinder;
     if (on[SUB_ORDERS])
-        s_rec_orders.NewUnitMotion = Rec_orders_NewUnitMotion;
+        s_rec_orders.NewUnitMotion = RecOrdersNewUnitMotion;
     if (on[SUB_ORDERS])
-        s_rec_orders.LoadOrder = Rec_orders_LoadOrder;
+        s_rec_orders.LoadOrder = RecOrdersLoadOrder;
     if (on[SUB_ORDERS])
-        s_rec_orders.MissionTypeFromName = Rec_orders_MissionTypeFromName;
+        s_rec_orders.MissionTypeFromName = RecOrdersMissionTypeFromName;
     if (on[SUB_ORDERS])
-        s_rec_orders.NewOrder = Rec_orders_NewOrder;
+        s_rec_orders.NewOrder = RecOrdersNewOrder;
     if (on[SUB_UNITS])
-        s_rec_units.UpdateAllUnits = Rec_units_UpdateAllUnits;
+        s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
     if (on[SUB_UNITS])
-        s_rec_units.GetGroundHeight = Rec_units_GetGroundHeight;
+        s_rec_units.GetGroundHeight = RecUnitsGetGroundHeight;
     if (on[SUB_UNITS])
-        s_rec_units.GetSweetSpot = Rec_units_GetSweetSpot;
+        s_rec_units.GetSweetSpot = RecUnitsGetSweetSpot;
     if (on[SUB_UNITS])
-        s_rec_units.FindScript = Rec_units_FindScript;
+        s_rec_units.FindScript = RecUnitsFindScript;
     if (on[SUB_UNITS])
-        s_rec_units.StartScriptWithArgs = Rec_units_StartScriptWithArgs;
+        s_rec_units.StartScriptWithArgs = RecUnitsStartScriptWithArgs;
     if (on[SUB_UNITS])
-        s_rec_units.SetStateBits = Rec_units_SetStateBits;
+        s_rec_units.SetStateBits = RecUnitsSetStateBits;
     if (on[SUB_UNITS])
-        s_rec_units.MovementClassGet = Rec_units_MovementClassGet;
+        s_rec_units.MovementClassGet = RecUnitsMovementClassGet;
     if (on[SUB_UNITS])
-        s_rec_units.MovementClassInBounds = Rec_units_MovementClassInBounds;
+        s_rec_units.MovementClassInBounds = RecUnitsMovementClassInBounds;
     if (on[SUB_UNITS])
-        s_rec_units.RefreshMovedUnits = Rec_units_RefreshMovedUnits;
+        s_rec_units.RefreshMovedUnits = RecUnitsRefreshMovedUnits;
     if (on[SUB_UNITS])
-        s_rec_units.RefreshUnitIfStale = Rec_units_RefreshUnitIfStale;
+        s_rec_units.RefreshUnitIfStale = RecUnitsRefreshUnitIfStale;
     if (on[SUB_UNITS])
-        s_rec_units.StartScript = Rec_units_StartScript;
+        s_rec_units.StartScript = RecUnitsStartScript;
     if (on[SUB_UNITS])
-        s_rec_units.QueryScript = Rec_units_QueryScript;
+        s_rec_units.QueryScript = RecUnitsQueryScript;
     if (on[SUB_UNITS])
-        s_rec_units.GetAimFromPosition = Rec_units_GetAimFromPosition;
+        s_rec_units.GetAimFromPosition = RecUnitsGetAimFromPosition;
     if (on[SUB_UNITS])
-        s_rec_units.GetPieceOffset = Rec_units_GetPieceOffset;
+        s_rec_units.GetPieceOffset = RecUnitsGetPieceOffset;
     if (on[SUB_UNITS])
-        s_rec_units.GetPiecePosition = Rec_units_GetPiecePosition;
+        s_rec_units.GetPiecePosition = RecUnitsGetPiecePosition;
     if (on[SUB_UNITS])
-        s_rec_units.MarkRecentlyDamaged = Rec_units_MarkRecentlyDamaged;
+        s_rec_units.MarkRecentlyDamaged = RecUnitsMarkRecentlyDamaged;
     if (on[SUB_UNITS])
-        s_rec_units.NotifyUnitRefs = Rec_units_NotifyUnitRefs;
+        s_rec_units.NotifyUnitRefs = RecUnitsNotifyUnitRefs;
     if (on[SUB_UNITS])
-        s_rec_units.UnitTypeSetAddTypeOrCategory = Rec_units_UnitTypeSetAddTypeOrCategory;
+        s_rec_units.UnitTypeSetAddTypeOrCategory = RecUnitsUnitTypeSetAddTypeOrCategory;
     if (on[SUB_UNITS])
-        s_rec_units.AllocateUnitMemory = Rec_units_AllocateUnitMemory;
+        s_rec_units.AllocateUnitMemory = RecUnitsAllocateUnitMemory;
     if (on[SUB_UNITS])
-        s_rec_units.FreeUnitMemory = Rec_units_FreeUnitMemory;
+        s_rec_units.FreeUnitMemory = RecUnitsFreeUnitMemory;
     if (on[SUB_UNITS])
-        s_rec_units.FreeUnitInfo = Rec_units_FreeUnitInfo;
+        s_rec_units.FreeUnitInfo = RecUnitsFreeUnitInfo;
     if (on[SUB_UNITS])
-        s_rec_units.RefreshUnitInfo = Rec_units_RefreshUnitInfo;
+        s_rec_units.RefreshUnitInfo = RecUnitsRefreshUnitInfo;
     if (on[SUB_UNITS])
-        s_rec_units.LoadUnitTypes = Rec_units_LoadUnitTypes;
+        s_rec_units.LoadUnitTypes = RecUnitsLoadUnitTypes;
     if (on[SUB_UNITS])
-        s_rec_units.FreeUnitTypes = Rec_units_FreeUnitTypes;
+        s_rec_units.FreeUnitTypes = RecUnitsFreeUnitTypes;
     if (on[SUB_UNITS])
-        s_rec_units.LoadDownloadMenus = Rec_units_LoadDownloadMenus;
+        s_rec_units.LoadDownloadMenus = RecUnitsLoadDownloadMenus;
     if (on[SUB_UNITS])
-        s_rec_units.FreeDownloadMenus = Rec_units_FreeDownloadMenus;
+        s_rec_units.FreeDownloadMenus = RecUnitsFreeDownloadMenus;
     if (on[SUB_UNITS])
-        s_rec_units.FreeMovementClasses = Rec_units_FreeMovementClasses;
+        s_rec_units.FreeMovementClasses = RecUnitsFreeMovementClasses;
     if (on[SUB_UNITS])
-        s_rec_units.InitUnitCategories = Rec_units_InitUnitCategories;
+        s_rec_units.InitUnitCategories = RecUnitsInitUnitCategories;
     if (on[SUB_UNITS])
-        s_rec_units.FreeUnitCategories = Rec_units_FreeUnitCategories;
+        s_rec_units.FreeUnitCategories = RecUnitsFreeUnitCategories;
     if (on[SUB_UNITS])
-        s_rec_units.KillAllUnits = Rec_units_KillAllUnits;
+        s_rec_units.KillAllUnits = RecUnitsKillAllUnits;
     if (on[SUB_UNITS])
-        s_rec_units.KillUnitsOfType = Rec_units_KillUnitsOfType;
+        s_rec_units.KillUnitsOfType = RecUnitsKillUnitsOfType;
     if (on[SUB_UNITS])
-        s_rec_units.ReloadUnitType = Rec_units_ReloadUnitType;
+        s_rec_units.ReloadUnitType = RecUnitsReloadUnitType;
     if (on[SUB_UNITS])
-        s_rec_units.KillUnit = Rec_units_KillUnit;
+        s_rec_units.KillUnit = RecUnitsKillUnit;
     if (on[SUB_UNITS])
-        s_rec_units.LoadUnits = Rec_units_LoadUnits;
+        s_rec_units.LoadUnits = RecUnitsLoadUnits;
     if (on[SUB_UNITS])
-        s_rec_units.SaveUnits = Rec_units_SaveUnits;
+        s_rec_units.SaveUnits = RecUnitsSaveUnits;
     if (on[SUB_UNITS])
-        s_rec_units.LoadUnit = Rec_units_LoadUnit;
+        s_rec_units.LoadUnit = RecUnitsLoadUnit;
     if (on[SUB_UNITS])
-        s_rec_units.CreateUnit = Rec_units_CreateUnit;
+        s_rec_units.CreateUnit = RecUnitsCreateUnit;
     if (on[SUB_UNITS])
-        s_rec_units.FindUnitType = Rec_units_FindUnitType;
+        s_rec_units.FindUnitType = RecUnitsFindUnitType;
     if (on[SUB_UNITS])
-        s_rec_units.FindUnitTypeId = Rec_units_FindUnitTypeId;
+        s_rec_units.FindUnitTypeId = RecUnitsFindUnitTypeId;
     if (on[SUB_UNITS])
-        s_rec_units.FindMissionUnit = Rec_units_FindMissionUnit;
+        s_rec_units.FindMissionUnit = RecUnitsFindMissionUnit;
     if (on[SUB_UNITS])
-        s_rec_units.AttachUnitToPiece = Rec_units_AttachUnitToPiece;
+        s_rec_units.AttachUnitToPiece = RecUnitsAttachUnitToPiece;
     if (on[SUB_UNITS])
-        s_rec_units.GetNanoPiecePosition = Rec_units_GetNanoPiecePosition;
+        s_rec_units.GetNanoPiecePosition = RecUnitsGetNanoPiecePosition;
     if (on[SUB_UNITS])
-        s_rec_units.GetPieceAngles = Rec_units_GetPieceAngles;
+        s_rec_units.GetPieceAngles = RecUnitsGetPieceAngles;
     if (on[SUB_UNITS])
-        s_rec_units.AddBuildProgress = Rec_units_AddBuildProgress;
+        s_rec_units.AddBuildProgress = RecUnitsAddBuildProgress;
     if (on[SUB_UNITS])
-        s_rec_units.AddRepairProgress = Rec_units_AddRepairProgress;
+        s_rec_units.AddRepairProgress = RecUnitsAddRepairProgress;
     if (on[SUB_UNITS])
-        s_rec_units.ApplyUnfinishedBuildDecay = Rec_units_ApplyUnfinishedBuildDecay;
+        s_rec_units.ApplyUnfinishedBuildDecay = RecUnitsApplyUnfinishedBuildDecay;
     if (on[SUB_UNITS])
-        s_rec_units.FinishConstruction = Rec_units_FinishConstruction;
+        s_rec_units.FinishConstruction = RecUnitsFinishConstruction;
     if (on[SUB_UNITS])
-        s_rec_units.SetUnitPosition = Rec_units_SetUnitPosition;
+        s_rec_units.SetUnitPosition = RecUnitsSetUnitPosition;
     if (on[SUB_UNITS])
-        s_rec_units.CanLoad = Rec_units_CanLoad;
+        s_rec_units.CanLoad = RecUnitsCanLoad;
     if (on[SUB_UNITS])
-        s_rec_units.CanReclaim = Rec_units_CanReclaim;
+        s_rec_units.CanReclaim = RecUnitsCanReclaim;
     if (on[SUB_UNITS])
-        s_rec_units.CanRepair = Rec_units_CanRepair;
+        s_rec_units.CanRepair = RecUnitsCanRepair;
     if (on[SUB_UNITS])
-        s_rec_units.UnitRefUnlink = Rec_units_UnitRefUnlink;
+        s_rec_units.UnitRefUnlink = RecUnitsUnitRefUnlink;
     if (on[SUB_UNITS])
-        s_rec_units.StartScriptWithArgsByIndex = Rec_units_StartScriptWithArgsByIndex;
+        s_rec_units.StartScriptWithArgsByIndex = RecUnitsStartScriptWithArgsByIndex;
     if (on[SUB_UNITS])
-        s_rec_units.UpdateSfxOccupy = Rec_units_UpdateSfxOccupy;
+        s_rec_units.UpdateSfxOccupy = RecUnitsUpdateSfxOccupy;
     if (on[SUB_UNITS])
-        s_rec_units.PoseUnitModel = Rec_units_PoseUnitModel;
+        s_rec_units.PoseUnitModel = RecUnitsPoseUnitModel;
     if (on[SUB_PLAYERS])
-        s_rec_players.UpdatePlayers = Rec_players_UpdatePlayers;
+        s_rec_players.UpdatePlayers = RecPlayersUpdatePlayers;
     if (on[SUB_PLAYERS])
-        s_rec_players.TransferMetal = Rec_players_TransferMetal;
+        s_rec_players.TransferMetal = RecPlayersTransferMetal;
     if (on[SUB_PLAYERS])
-        s_rec_players.TransferEnergy = Rec_players_TransferEnergy;
+        s_rec_players.TransferEnergy = RecPlayersTransferEnergy;
     if (on[SUB_PLAYERS])
-        s_rec_players.GetEnergyIncome = Rec_players_GetEnergyIncome;
+        s_rec_players.GetEnergyIncome = RecPlayersGetEnergyIncome;
     if (on[SUB_PLAYERS])
-        s_rec_players.GetMetalIncome = Rec_players_GetMetalIncome;
+        s_rec_players.GetMetalIncome = RecPlayersGetMetalIncome;
     if (on[SUB_PLAYERS])
-        s_rec_players.GetNetEnergy = Rec_players_GetNetEnergy;
+        s_rec_players.GetNetEnergy = RecPlayersGetNetEnergy;
     if (on[SUB_PLAYERS])
-        s_rec_players.GetNetMetal = Rec_players_GetNetMetal;
+        s_rec_players.GetNetMetal = RecPlayersGetNetMetal;
     if (on[SUB_PLAYERS])
-        s_rec_players.LoadDefaultAIScript = Rec_players_LoadDefaultAIScript;
+        s_rec_players.LoadDefaultAIScript = RecPlayersLoadDefaultAIScript;
     if (on[SUB_PLAYERS])
-        s_rec_players.InitPlayers = Rec_players_InitPlayers;
+        s_rec_players.InitPlayers = RecPlayersInitPlayers;
     if (on[SUB_PLAYERS])
-        s_rec_players.FreePlayers = Rec_players_FreePlayers;
+        s_rec_players.FreePlayers = RecPlayersFreePlayers;
     if (on[SUB_PLAYERS])
-        s_rec_players.InitPlayerResources = Rec_players_InitPlayerResources;
+        s_rec_players.InitPlayerResources = RecPlayersInitPlayerResources;
     if (on[SUB_PLAYERS])
-        s_rec_players.LoadPlayerControllers = Rec_players_LoadPlayerControllers;
+        s_rec_players.LoadPlayerControllers = RecPlayersLoadPlayerControllers;
     if (on[SUB_PLAYERS])
-        s_rec_players.LoadPlayers = Rec_players_LoadPlayers;
+        s_rec_players.LoadPlayers = RecPlayersLoadPlayers;
     if (on[SUB_PLAYERS])
-        s_rec_players.SavePlayers = Rec_players_SavePlayers;
+        s_rec_players.SavePlayers = RecPlayersSavePlayers;
     if (on[SUB_PLAYERS])
-        s_rec_players.RebuildAIFeatureCells = Rec_players_RebuildAIFeatureCells;
+        s_rec_players.RebuildAIFeatureCells = RecPlayersRebuildAIFeatureCells;
     if (on[SUB_PLAYERS])
-        s_rec_players.SetupPlayerSlot = Rec_players_SetupPlayerSlot;
+        s_rec_players.SetupPlayerSlot = RecPlayersSetupPlayerSlot;
     if (on[SUB_PLAYERS])
-        s_rec_players.UpdateBlink = Rec_players_UpdateBlink;
+        s_rec_players.UpdateBlink = RecPlayersUpdateBlink;
     if (on[SUB_PLAYERS])
-        s_rec_players.KillPlayerUnits = Rec_players_KillPlayerUnits;
+        s_rec_players.KillPlayerUnits = RecPlayersKillPlayerUnits;
     if (on[SUB_PLAYERS])
-        s_rec_players.GiveUnitToPlayer = Rec_players_GiveUnitToPlayer;
+        s_rec_players.GiveUnitToPlayer = RecPlayersGiveUnitToPlayer;
     if (on[SUB_PLAYERS])
-        s_rec_players.DeactivateConditions = Rec_players_DeactivateConditions;
+        s_rec_players.DeactivateConditions = RecPlayersDeactivateConditions;
     if (on[SUB_PLAYERS])
-        s_rec_players.LoadConditions = Rec_players_LoadConditions;
+        s_rec_players.LoadConditions = RecPlayersLoadConditions;
     if (on[SUB_PLAYERS])
-        s_rec_players.SaveConditions = Rec_players_SaveConditions;
+        s_rec_players.SaveConditions = RecPlayersSaveConditions;
     if (on[SUB_PLAYERS])
-        s_rec_players.RegisterConditions = Rec_players_RegisterConditions;
+        s_rec_players.RegisterConditions = RecPlayersRegisterConditions;
     if (on[SUB_PLAYERS])
-        s_rec_players.FreeConditions = Rec_players_FreeConditions;
+        s_rec_players.FreeConditions = RecPlayersFreeConditions;
     if (on[SUB_PLAYERS])
-        s_rec_players.DeleteConditions = Rec_players_DeleteConditions;
+        s_rec_players.DeleteConditions = RecPlayersDeleteConditions;
     if (on[SUB_PLAYERS])
-        s_rec_players.NotifyUnitCreated = Rec_players_NotifyUnitCreated;
+        s_rec_players.NotifyUnitCreated = RecPlayersNotifyUnitCreated;
     if (on[SUB_PLAYERS])
-        s_rec_players.NotifyUnitDied = Rec_players_NotifyUnitDied;
+        s_rec_players.NotifyUnitDied = RecPlayersNotifyUnitDied;
     if (on[SUB_PLAYERS])
-        s_rec_players.UpdatePlayersOnStream = Rec_players_UpdatePlayersOnStream;
+        s_rec_players.UpdatePlayersOnStream = RecPlayersUpdatePlayersOnStream;
     if (on[SUB_MAP])
-        s_rec_map.GetCellMeanHeight = Rec_map_GetCellMeanHeight;
+        s_rec_map.GetCellMeanHeight = RecMapGetCellMeanHeight;
     if (on[SUB_MAP])
-        s_rec_map.RefreshAllPassMaps = Rec_map_RefreshAllPassMaps;
+        s_rec_map.RefreshAllPassMaps = RecMapRefreshAllPassMaps;
     if (on[SUB_MAP])
-        s_rec_map.GetGameType = Rec_map_GetGameType;
+        s_rec_map.GetGameType = RecMapGetGameType;
     if (on[SUB_MAP])
-        s_rec_map.GetNameSlot = Rec_map_GetNameSlot;
+        s_rec_map.GetNameSlot = RecMapGetNameSlot;
     if (on[SUB_MAP])
-        s_rec_map.VisitObjectsInRange = Rec_map_VisitObjectsInRange;
+        s_rec_map.VisitObjectsInRange = RecMapVisitObjectsInRange;
     if (on[SUB_MAP])
-        s_rec_map.CanBuildAt = Rec_map_CanBuildAt;
+        s_rec_map.CanBuildAt = RecMapCanBuildAt;
     if (on[SUB_MAP])
-        s_rec_map.CanPlaceUnitFootprint = Rec_map_CanPlaceUnitFootprint;
+        s_rec_map.CanPlaceUnitFootprint = RecMapCanPlaceUnitFootprint;
     if (on[SUB_MAP])
-        s_rec_map.BuildAllPassMaps = Rec_map_BuildAllPassMaps;
+        s_rec_map.BuildAllPassMaps = RecMapBuildAllPassMaps;
     if (on[SUB_MAP])
-        s_rec_map.FreeOtaEnumCacheAndMission = Rec_map_FreeOtaEnumCacheAndMission;
+        s_rec_map.FreeOtaEnumCacheAndMission = RecMapFreeOtaEnumCacheAndMission;
     if (on[SUB_MAP])
-        s_rec_map.LoadMappingData = Rec_map_LoadMappingData;
+        s_rec_map.LoadMappingData = RecMapLoadMappingData;
     if (on[SUB_MAP])
-        s_rec_map.LoadMetalPlotmap = Rec_map_LoadMetalPlotmap;
+        s_rec_map.LoadMetalPlotmap = RecMapLoadMetalPlotmap;
     if (on[SUB_MAP])
-        s_rec_map.LoadPlayerFeaturesPlotmap = Rec_map_LoadPlayerFeaturesPlotmap;
+        s_rec_map.LoadPlayerFeaturesPlotmap = RecMapLoadPlayerFeaturesPlotmap;
     if (on[SUB_MAP])
-        s_rec_map.SaveMappingData = Rec_map_SaveMappingData;
+        s_rec_map.SaveMappingData = RecMapSaveMappingData;
     if (on[SUB_MAP])
-        s_rec_map.SaveMetalPlotmap = Rec_map_SaveMetalPlotmap;
+        s_rec_map.SaveMetalPlotmap = RecMapSaveMetalPlotmap;
     if (on[SUB_MAP])
-        s_rec_map.SavePlayerFeaturesPlotmap = Rec_map_SavePlayerFeaturesPlotmap;
+        s_rec_map.SavePlayerFeaturesPlotmap = RecMapSavePlayerFeaturesPlotmap;
     if (on[SUB_MAP])
-        s_rec_map.SetMissionType = Rec_map_SetMissionType;
+        s_rec_map.SetMissionType = RecMapSetMissionType;
     if (on[SUB_MAP])
-        s_rec_map.SnapWorldPosToFootprint = Rec_map_SnapWorldPosToFootprint;
+        s_rec_map.SnapWorldPosToFootprint = RecMapSnapWorldPosToFootprint;
     if (on[SUB_MAP])
-        s_rec_map.AddUnitToMap = Rec_map_AddUnitToMap;
+        s_rec_map.AddUnitToMap = RecMapAddUnitToMap;
     if (on[SUB_MAP])
-        s_rec_map.RemoveUnitFromMap = Rec_map_RemoveUnitFromMap;
+        s_rec_map.RemoveUnitFromMap = RecMapRemoveUnitFromMap;
     if (on[SUB_MAP])
-        s_rec_map.CanPlaceFootprintAt = Rec_map_CanPlaceFootprintAt;
+        s_rec_map.CanPlaceFootprintAt = RecMapCanPlaceFootprintAt;
     if (on[SUB_MAP])
-        s_rec_map.IsPadSlotFree = Rec_map_IsPadSlotFree;
+        s_rec_map.IsPadSlotFree = RecMapIsPadSlotFree;
     if (on[SUB_MAP])
-        s_rec_map.PickRandomReclaimableResourcesInRadius = Rec_map_PickRandomReclaimableResourcesInRadius;
+        s_rec_map.PickRandomReclaimableResourcesInRadius = RecMapPickRandomReclaimableResourcesInRadius;
     if (on[SUB_MAP])
-        s_rec_map.ClearFootprintAndUnlink = Rec_map_ClearFootprintAndUnlink;
+        s_rec_map.ClearFootprintAndUnlink = RecMapClearFootprintAndUnlink;
     if (on[SUB_MAP])
-        s_rec_map.ForceNeighborFootprintReclaim = Rec_map_ForceNeighborFootprintReclaim;
+        s_rec_map.ForceNeighborFootprintReclaim = RecMapForceNeighborFootprintReclaim;
     if (on[SUB_MAP])
-        s_rec_map.SetYardOpen = Rec_map_SetYardOpen;
+        s_rec_map.SetYardOpen = RecMapSetYardOpen;
     if (on[SUB_MAP])
-        s_rec_map.SpatialBucketPrependUnit = Rec_map_SpatialBucketPrependUnit;
+        s_rec_map.SpatialBucketPrependUnit = RecMapSpatialBucketPrependUnit;
     if (on[SUB_MAP])
-        s_rec_map.SpatialBucketUnlinkUnit = Rec_map_SpatialBucketUnlinkUnit;
+        s_rec_map.SpatialBucketUnlinkUnit = RecMapSpatialBucketUnlinkUnit;
     if (on[SUB_MAP])
-        s_rec_map.RefreshPassMap = Rec_map_RefreshPassMap;
+        s_rec_map.RefreshPassMap = RecMapRefreshPassMap;
     if (on[SUB_MAP])
-        s_rec_map.AdvanceMission = Rec_map_AdvanceMission;
+        s_rec_map.AdvanceMission = RecMapAdvanceMission;
     if (on[SUB_MAP])
-        s_rec_map.GetCampaignName = Rec_map_GetCampaignName;
+        s_rec_map.GetCampaignName = RecMapGetCampaignName;
     if (on[SUB_MAP])
-        s_rec_map.GetMissionIndex = Rec_map_GetMissionIndex;
+        s_rec_map.GetMissionIndex = RecMapGetMissionIndex;
     if (on[SUB_MAP])
-        s_rec_map.GetMissionName = Rec_map_GetMissionName;
+        s_rec_map.GetMissionName = RecMapGetMissionName;
     if (on[SUB_MAP])
-        s_rec_map.GetStartPosition = Rec_map_GetStartPosition;
+        s_rec_map.GetStartPosition = RecMapGetStartPosition;
     if (on[SUB_MAP])
-        s_rec_map.LoadCampaign = Rec_map_LoadCampaign;
+        s_rec_map.LoadCampaign = RecMapLoadCampaign;
     if (on[SUB_MAP])
-        s_rec_map.LoadMissionByName = Rec_map_LoadMissionByName;
+        s_rec_map.LoadMissionByName = RecMapLoadMissionByName;
     if (on[SUB_MAP])
-        s_rec_map.MissionExists = Rec_map_MissionExists;
+        s_rec_map.MissionExists = RecMapMissionExists;
     if (on[SUB_MAP])
-        s_rec_map.RefreshMapList = Rec_map_RefreshMapList;
+        s_rec_map.RefreshMapList = RecMapRefreshMapList;
     if (on[SUB_MAP])
-        s_rec_map.SelectMission = Rec_map_SelectMission;
+        s_rec_map.SelectMission = RecMapSelectMission;
     if (on[SUB_MAP])
-        s_rec_map.ComputeMapChecksum = Rec_map_ComputeMapChecksum;
+        s_rec_map.ComputeMapChecksum = RecMapComputeMapChecksum;
     if (on[SUB_MAP])
-        s_rec_map.GetTerrainLength = Rec_map_GetTerrainLength;
+        s_rec_map.GetTerrainLength = RecMapGetTerrainLength;
     if (on[SUB_FILES])
-        s_rec_files.OpenRead = Rec_files_OpenRead;
+        s_rec_files.OpenRead = RecFilesOpenRead;
     if (on[SUB_FILES])
-        s_rec_files.OpenAppend = Rec_files_OpenAppend;
+        s_rec_files.OpenAppend = RecFilesOpenAppend;
     if (on[SUB_FILES])
-        s_rec_files.Create = Rec_files_Create;
+        s_rec_files.Create = RecFilesCreate;
     if (on[SUB_FILES])
-        s_rec_files.Close = Rec_files_Close;
+        s_rec_files.Close = RecFilesClose;
     if (on[SUB_FILES])
-        s_rec_files.IsInArchive = Rec_files_IsInArchive;
+        s_rec_files.IsInArchive = RecFilesIsInArchive;
     if (on[SUB_FILES])
-        s_rec_files.Seek = Rec_files_Seek;
+        s_rec_files.Seek = RecFilesSeek;
     if (on[SUB_FILES])
-        s_rec_files.Tell = Rec_files_Tell;
+        s_rec_files.Tell = RecFilesTell;
     if (on[SUB_FILES])
-        s_rec_files.Read = Rec_files_Read;
+        s_rec_files.Read = RecFilesRead;
     if (on[SUB_FILES])
-        s_rec_files.Write = Rec_files_Write;
+        s_rec_files.Write = RecFilesWrite;
     if (on[SUB_FILES])
-        s_rec_files.Length = Rec_files_Length;
+        s_rec_files.Length = RecFilesLength;
     if (on[SUB_FILES])
-        s_rec_files.LengthByName = Rec_files_LengthByName;
+        s_rec_files.LengthByName = RecFilesLengthByName;
     if (on[SUB_FILES])
-        s_rec_files.ReadAt = Rec_files_ReadAt;
+        s_rec_files.ReadAt = RecFilesReadAt;
     if (on[SUB_FILES])
-        s_rec_files.Load = Rec_files_Load;
+        s_rec_files.Load = RecFilesLoad;
     if (on[SUB_FILES])
-        s_rec_files.LoadOpenFile = Rec_files_LoadOpenFile;
+        s_rec_files.LoadOpenFile = RecFilesLoadOpenFile;
     if (on[SUB_FILES])
-        s_rec_files.WriteBuffer = Rec_files_WriteBuffer;
+        s_rec_files.WriteBuffer = RecFilesWriteBuffer;
     if (on[SUB_FILES])
-        s_rec_files.Remove = Rec_files_Remove;
+        s_rec_files.Remove = RecFilesRemove;
     if (on[SUB_FILES])
-        s_rec_files.Rename = Rec_files_Rename;
+        s_rec_files.Rename = RecFilesRename;
     if (on[SUB_FILES])
-        s_rec_files.GetCurrentDriveLetter = Rec_files_GetCurrentDriveLetter;
+        s_rec_files.GetCurrentDriveLetter = RecFilesGetCurrentDriveLetter;
     if (on[SUB_FILES])
-        s_rec_files.ChangeDrive = Rec_files_ChangeDrive;
+        s_rec_files.ChangeDrive = RecFilesChangeDrive;
     if (on[SUB_FILES])
-        s_rec_files.GetDriveDirectory = Rec_files_GetDriveDirectory;
+        s_rec_files.GetDriveDirectory = RecFilesGetDriveDirectory;
     if (on[SUB_FILES])
-        s_rec_files.ChangeDirectory = Rec_files_ChangeDirectory;
+        s_rec_files.ChangeDirectory = RecFilesChangeDirectory;
     if (on[SUB_FILES])
-        s_rec_files.MatchWildcard = Rec_files_MatchWildcard;
+        s_rec_files.MatchWildcard = RecFilesMatchWildcard;
     if (on[SUB_FILES])
-        s_rec_files.FindFirst = Rec_files_FindFirst;
+        s_rec_files.FindFirst = RecFilesFindFirst;
     if (on[SUB_FILES])
-        s_rec_files.FindNext = Rec_files_FindNext;
+        s_rec_files.FindNext = RecFilesFindNext;
     if (on[SUB_FILES])
-        s_rec_files.FindClose = Rec_files_FindClose;
+        s_rec_files.FindClose = RecFilesFindClose;
     if (on[SUB_FILES])
-        s_rec_files.CountDirectoryEntries = Rec_files_CountDirectoryEntries;
+        s_rec_files.CountDirectoryEntries = RecFilesCountDirectoryEntries;
     if (on[SUB_FILES])
-        s_rec_files.ListDirectory = Rec_files_ListDirectory;
+        s_rec_files.ListDirectory = RecFilesListDirectory;
     if (on[SUB_FILES])
-        s_rec_files.FindFilesRecursive = Rec_files_FindFilesRecursive;
+        s_rec_files.FindFilesRecursive = RecFilesFindFilesRecursive;
     if (on[SUB_FILES])
-        s_rec_files.MakeDirectoryPath = Rec_files_MakeDirectoryPath;
+        s_rec_files.MakeDirectoryPath = RecFilesMakeDirectoryPath;
     if (on[SUB_FILES])
-        s_rec_files.SaveStartDirectory = Rec_files_SaveStartDirectory;
+        s_rec_files.SaveStartDirectory = RecFilesSaveStartDirectory;
     if (on[SUB_FILES])
-        s_rec_files.GetStartDirectory = Rec_files_GetStartDirectory;
+        s_rec_files.GetStartDirectory = RecFilesGetStartDirectory;
     if (on[SUB_FILES])
-        s_rec_files.AddArchive = Rec_files_AddArchive;
+        s_rec_files.AddArchive = RecFilesAddArchive;
     if (on[SUB_FILES])
-        s_rec_files.CloseArchive = Rec_files_CloseArchive;
+        s_rec_files.CloseArchive = RecFilesCloseArchive;
     if (on[SUB_FILES])
-        s_rec_files.DropMissingArchives = Rec_files_DropMissingArchives;
+        s_rec_files.DropMissingArchives = RecFilesDropMissingArchives;
     if (on[SUB_FILES])
-        s_rec_files.ResolveShadowedFiles = Rec_files_ResolveShadowedFiles;
+        s_rec_files.ResolveShadowedFiles = RecFilesResolveShadowedFiles;
     if (on[SUB_FILES])
-        s_rec_files.LzssCompress = Rec_files_LzssCompress;
+        s_rec_files.LzssCompress = RecFilesLzssCompress;
     if (on[SUB_FILES])
-        s_rec_files.LzssExpand = Rec_files_LzssExpand;
+        s_rec_files.LzssExpand = RecFilesLzssExpand;
     if (on[SUB_FILES])
-        s_rec_files.LzssDisablePreset = Rec_files_LzssDisablePreset;
+        s_rec_files.LzssDisablePreset = RecFilesLzssDisablePreset;
     if (on[SUB_FILES])
-        s_rec_files.LzssEnablePreset = Rec_files_LzssEnablePreset;
+        s_rec_files.LzssEnablePreset = RecFilesLzssEnablePreset;
     if (on[SUB_FILES])
-        s_rec_files.BankInit = Rec_files_BankInit;
+        s_rec_files.BankInit = RecFilesBankInit;
     if (on[SUB_FILES])
-        s_rec_files.BankClose = Rec_files_BankClose;
+        s_rec_files.BankClose = RecFilesBankClose;
     if (on[SUB_FILES])
-        s_rec_files.BankNew = Rec_files_BankNew;
+        s_rec_files.BankNew = RecFilesBankNew;
     if (on[SUB_FILES])
-        s_rec_files.BankOpen = Rec_files_BankOpen;
+        s_rec_files.BankOpen = RecFilesBankOpen;
     if (on[SUB_FILES])
-        s_rec_files.BankSave = Rec_files_BankSave;
+        s_rec_files.BankSave = RecFilesBankSave;
     if (on[SUB_FILES] || on[SUB_WIND_METEORS])
-        s_rec_files.BankOpenAccount = Rec_files_BankOpenAccount;
+        s_rec_files.BankOpenAccount = RecFilesBankOpenAccount;
     if (on[SUB_FILES] || on[SUB_WIND_METEORS])
-        s_rec_files.BankSetInteger = Rec_files_BankSetInteger;
+        s_rec_files.BankSetInteger = RecFilesBankSetInteger;
     if (on[SUB_FILES])
-        s_rec_files.BankSetDouble = Rec_files_BankSetDouble;
+        s_rec_files.BankSetDouble = RecFilesBankSetDouble;
     if (on[SUB_FILES])
-        s_rec_files.BankSetString = Rec_files_BankSetString;
+        s_rec_files.BankSetString = RecFilesBankSetString;
     if (on[SUB_FILES] || on[SUB_WIND_METEORS])
-        s_rec_files.BankGetInteger = Rec_files_BankGetInteger;
+        s_rec_files.BankGetInteger = RecFilesBankGetInteger;
     if (on[SUB_FILES])
-        s_rec_files.BankGetDouble = Rec_files_BankGetDouble;
+        s_rec_files.BankGetDouble = RecFilesBankGetDouble;
     if (on[SUB_FILES])
-        s_rec_files.BankGetString = Rec_files_BankGetString;
+        s_rec_files.BankGetString = RecFilesBankGetString;
     if (on[SUB_FILES])
-        s_rec_files.BankHasItem = Rec_files_BankHasItem;
+        s_rec_files.BankHasItem = RecFilesBankHasItem;
     if (on[SUB_FILES])
-        s_rec_files.BankOpenNumberedBox = Rec_files_BankOpenNumberedBox;
+        s_rec_files.BankOpenNumberedBox = RecFilesBankOpenNumberedBox;
     if (on[SUB_FILES])
-        s_rec_files.BankOpenNamedBox = Rec_files_BankOpenNamedBox;
+        s_rec_files.BankOpenNamedBox = RecFilesBankOpenNamedBox;
     if (on[SUB_FILES])
-        s_rec_files.BankGetBoxSize = Rec_files_BankGetBoxSize;
+        s_rec_files.BankGetBoxSize = RecFilesBankGetBoxSize;
     if (on[SUB_FILES])
-        s_rec_files.BankSeekBox = Rec_files_BankSeekBox;
+        s_rec_files.BankSeekBox = RecFilesBankSeekBox;
     if (on[SUB_FILES])
-        s_rec_files.BankReadBox = Rec_files_BankReadBox;
+        s_rec_files.BankReadBox = RecFilesBankReadBox;
     if (on[SUB_FILES])
-        s_rec_files.BankWriteBox = Rec_files_BankWriteBox;
+        s_rec_files.BankWriteBox = RecFilesBankWriteBox;
     if (on[SUB_NETWORK])
-        s_rec_network.BroadcastPlayerInfo = Rec_network_BroadcastPlayerInfo;
+        s_rec_network.BroadcastPlayerInfo = RecNetworkBroadcastPlayerInfo;
     if (on[SUB_NETWORK])
-        s_rec_network.SendNewUnit = Rec_network_SendNewUnit;
+        s_rec_network.SendNewUnit = RecNetworkSendNewUnit;
     if (on[SUB_NETWORK])
-        s_rec_network.SendBuilderLink = Rec_network_SendBuilderLink;
+        s_rec_network.SendBuilderLink = RecNetworkSendBuilderLink;
     if (on[SUB_NETWORK])
-        s_rec_network.SendUnitKilled = Rec_network_SendUnitKilled;
+        s_rec_network.SendUnitKilled = RecNetworkSendUnitKilled;
     if (on[SUB_NETWORK])
-        s_rec_network.SendUnitDamage = Rec_network_SendUnitDamage;
+        s_rec_network.SendUnitDamage = RecNetworkSendUnitDamage;
     if (on[SUB_NETWORK])
-        s_rec_network.SendAttach = Rec_network_SendAttach;
+        s_rec_network.SendAttach = RecNetworkSendAttach;
     if (on[SUB_NETWORK])
-        s_rec_network.SendOwnershipTransfer = Rec_network_SendOwnershipTransfer;
+        s_rec_network.SendOwnershipTransfer = RecNetworkSendOwnershipTransfer;
     if (on[SUB_NETWORK])
-        s_rec_network.SendActivateFlags = Rec_network_SendActivateFlags;
+        s_rec_network.SendActivateFlags = RecNetworkSendActivateFlags;
     if (on[SUB_NETWORK])
-        s_rec_network.SendWeaponFire = Rec_network_SendWeaponFire;
+        s_rec_network.SendWeaponFire = RecNetworkSendWeaponFire;
     if (on[SUB_NETWORK])
-        s_rec_network.SendWeaponFireAt = Rec_network_SendWeaponFireAt;
+        s_rec_network.SendWeaponFireAt = RecNetworkSendWeaponFireAt;
     if (on[SUB_NETWORK])
-        s_rec_network.SendProjectileDetonated = Rec_network_SendProjectileDetonated;
+        s_rec_network.SendProjectileDetonated = RecNetworkSendProjectileDetonated;
     if (on[SUB_NETWORK])
-        s_rec_network.SendFeatureHit = Rec_network_SendFeatureHit;
+        s_rec_network.SendFeatureHit = RecNetworkSendFeatureHit;
     if (on[SUB_NETWORK])
-        s_rec_network.SendFeatureKilled = Rec_network_SendFeatureKilled;
+        s_rec_network.SendFeatureKilled = RecNetworkSendFeatureKilled;
     if (on[SUB_NETWORK])
-        s_rec_network.SendFeatureBurning = Rec_network_SendFeatureBurning;
+        s_rec_network.SendFeatureBurning = RecNetworkSendFeatureBurning;
     if (on[SUB_NETWORK])
-        s_rec_network.SendFeatureReclaimed = Rec_network_SendFeatureReclaimed;
+        s_rec_network.SendFeatureReclaimed = RecNetworkSendFeatureReclaimed;
     if (on[SUB_NETWORK])
-        s_rec_network.SendScriptCall = Rec_network_SendScriptCall;
+        s_rec_network.SendScriptCall = RecNetworkSendScriptCall;
     if (on[SUB_NETWORK])
-        s_rec_network.SendScriptCallByName = Rec_network_SendScriptCallByName;
+        s_rec_network.SendScriptCallByName = RecNetworkSendScriptCallByName;
     if (on[SUB_NETWORK])
-        s_rec_network.SendShareMetal = Rec_network_SendShareMetal;
+        s_rec_network.SendShareMetal = RecNetworkSendShareMetal;
     if (on[SUB_NETWORK])
-        s_rec_network.SendShareEnergy = Rec_network_SendShareEnergy;
+        s_rec_network.SendShareEnergy = RecNetworkSendShareEnergy;
     if (on[SUB_NETWORK])
-        s_rec_network.SendShareMapInfo = Rec_network_SendShareMapInfo;
+        s_rec_network.SendShareMapInfo = RecNetworkSendShareMapInfo;
     if (on[SUB_NETWORK])
-        s_rec_network.BroadcastPlayerEconomy = Rec_network_BroadcastPlayerEconomy;
+        s_rec_network.BroadcastPlayerEconomy = RecNetworkBroadcastPlayerEconomy;
     if (on[SUB_NETWORK])
-        s_rec_network.SendUnitStates = Rec_network_SendUnitStates;
+        s_rec_network.SendUnitStates = RecNetworkSendUnitStates;
     g_seams.wind_meteors = &s_rec_wind_meteors;
     g_seams.economy = &s_rec_economy;
     g_seams.features = &s_rec_features;

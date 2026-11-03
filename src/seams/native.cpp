@@ -16,6 +16,7 @@
 #include "../map/mission.h"
 #include "../map/spatial_bucket.h"
 #include "../game/mission_conditions.h"
+#include "../units/object_state.h"
 #include "../units/unit.h"
 #include "../ai/pathfinder.h"
 #include "../ai/ai_search_goal.h"
@@ -95,7 +96,7 @@ int __stdcall GetWeaponRange(int param1, unsigned int param2);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
 
 #include "../map/line_of_sight.h"
-#include "../map/radar.h"
+#include "../ingame/radar.h"
 #include "../ingame/radar_picture.h"
 
 class HapiBank;
@@ -409,6 +410,11 @@ static void __fastcall FreeConditionsNative(MissionConditions* self)
 static void __stdcall DeleteConditionsNative(MissionConditions* self)
 {
     delete self;
+}
+
+static MissionConditions* __stdcall NewConditionsNative(void)
+{
+    return new (kSim) MissionConditions;
 }
 
 static void __fastcall NotifyUnitCreatedNative(MissionConditions* self, int unusedEdx, Unit* unit)
@@ -895,6 +901,7 @@ void InstallNativeSeams()
     s_players.RegisterConditions = RegisterConditionsNative;
     s_players.FreeConditions = FreeConditionsNative;
     s_players.DeleteConditions = DeleteConditionsNative;
+    s_players.NewConditions = NewConditionsNative;
     s_players.NotifyUnitCreated = NotifyUnitCreatedNative;
     s_players.NotifyUnitDied = NotifyUnitDiedNative;
     s_players.UpdatePlayersOnStream = UpdatePlayersOnStream;
@@ -935,6 +942,9 @@ void InstallNativeSeams()
     s_units.StartScriptWithArgsByIndex = StartScriptWithArgsByIndexNative;
     s_units.UpdateSfxOccupy = UpdateSfxOccupyNative;
     s_units.PoseUnitModel = PoseUnitModel;
+    s_units.CreateObjectState = CreateObjectState;
+    s_units.FreeObjectState = FreeObjectState;
+    s_units.UpdateObjectState = UpdateObjectState;
     s_orders.ReattachFxToUnit = ReattachFxToUnitNative;
     s_orders.SerializeOrderToSave = SerializeOrderToSaveNative;
     s_orders.AddBeCarriedOrder = AddBeCarriedOrder;
@@ -945,6 +955,7 @@ void InstallNativeSeams()
     s_orders.LoadOrder = LoadOrderNative;
     s_orders.MissionTypeFromName = MissionTypeFromNameNative;
     s_orders.NewOrder = NewOrderNative;
+    s_orders.QueueBuildOrder = QueueBuildOrder;
     s_orders.LoadMotion = LoadMotionNative;
     s_orders.SaveMotion = SaveMotionNative;
     s_orders.UpdateMotion = UpdateMotionNative;

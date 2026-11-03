@@ -1032,6 +1032,7 @@ void __stdcall RunGameSteps(int showStats)
             AccumulateProfileTime(&g_game->timers, 0);
         }
         g_seams.units->UpdateAllUnits();
+        UpdateAutoFollow();
         HarnessPhase(1);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 1);
@@ -1140,6 +1141,27 @@ void __stdcall HandleDebugHotkey(int eventType)
 }
 
 // FUNCTION: 0x464e70
+// FUNCTION: 0x464de0
+void __stdcall ContinueWatchingCallback(Gui* gui)
+{
+    Gadget* screen = gui->layer->entries;
+    if (gui->hotGadgetIndex == -1)
+        return;
+    PlaySoundByName("BigButton", 0);
+    if (IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE1")) {
+        g_seams.network->BroadcastPlayerInfo();
+        g_game->endGameVictory = 0;
+        ReportGameEvent(4);
+        return;
+    }
+    if (!IsGadgetNamed(screen, gui->hotGadgetIndex, "CHOICE2")) {
+        ClearSelectedGadget(gui);
+        return;
+    }
+    g_game->bits.flag2 = 1;
+    g_game->endGameVictory = 0;
+}
+
 void ShowContinueWatchingDialog()
 {
     Layer* screen = LoadGuiLayer(&g_game->gui, g_yesNoGuiName, 0x900);

@@ -19,6 +19,8 @@ void __stdcall WriteUnitTypeNameKey(HapiBank* file, unsigned short id);
 int __stdcall OrderTypeNameLess(int, char*);
 void __stdcall InsertOrderBefore(Unit* owner, Order* node, Order* before);
 void __stdcall AppendOrder(Unit* owner, Order* node);
+void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
+void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount);
 void __stdcall AppendOrderToTail(Unit* owner, Order* node);
 void __stdcall InsertOrderAfterMarked(Unit* owner, Order* node);
 int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int);

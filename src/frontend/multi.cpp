@@ -545,12 +545,12 @@ void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* par
 #include "../network/net_game.h"
 
 #include "../game/data_files.h"
-#include "../map/radar.h"
+#include "../ingame/radar.h"
 #include "../util/registry.h"
 #include "../network/unit_sync.h"
 #include "../network/unit_sync_state.h"
 #include "../map/map_list.h"
-#include "map_enum.h"
+#include "../../interfaces/services.h"
 #include "../gui/file_list.h"
 #include "options.h"
 void __stdcall RejectPlayer(int param_1, int param_2);

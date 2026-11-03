@@ -939,6 +939,7 @@ InitFeatureAnimPool: FEATURE ANIM DATA,0x4+0x30*k 0x574+0x90*k 0x5a4+0x90*k 0x66
 InitFeatureAnimPool: FEATURE ANIM DATA,0x61ae,Sound::CreateSampleFromFile: Digital Audio Sample,2,14,0x10,not-a-pointer,FEATURE ANIM DATA words that only look like addresses
 InitFeatureAnimPool: FEATURE ANIM DATA,0x61e0,SpeechQueue::EnqueueSpeech: Speech Text,1,1,0x1b,not-a-pointer,"FeatureAnim (0x30) words other than state (0x4) and src (0xc): next and prev links, flags and counters that only look like addresses, and words that straddle fields"
 InitFeatureAnimPool: FEATURE ANIM DATA,0x4+0x30*k 0xf4+0x60*k 0x184 0x1e4+0x90*k 0x2d4 0x454 0x1024 0x60be 0x6120 0x617e 0x61de 0x61e0+0x30*k 0x6600 0x6630 0xf08f,ThrustParticles::Emit,4,137,0x7-0xf0,not-a-pointer,FeatureAnim element words (0x30 bytes) that straddle fields
+InitFeatureAnimPool: Feature Unit,*,*,0,0,-,not-a-pointer,"FeaturePseudoUnit unknown_0 Unit-shaped words: xWhole high byte (0x6d), yFraction (0x6e) and yWhole low byte (0x70) spell the word; not pointers, and it can match in either module mode, depending on where the heap lands"
 InitPlayerSlot,*,*,0,0,-,not-a-pointer,"Explored map bytes, no pointers"
 InitPlayerSlot,0x36ef,?Insert@?$BlockVector@UBuildRatingWeights@@@@QAEXPAUBuildRatingWeights@@IABU2@@Z,1,5,0x18,not-a-pointer,"Explored map bytes, no pointers"
 InitPlayerSlot,0xa53,GetCategoryMask,1,47,0x39,not-a-pointer,"Explored map bytes, no pointers"
@@ -1003,6 +1004,7 @@ IssueRepairOrder #4,0x40,LoadSoundCategories,2,45713,0x40,not-a-pointer,"Order w
 IssueRepairOrder #4,0x40,LoadSoundCategories #2,1,13261,0x40,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 IssueRepairOrder #4,0x2c,ReleaseFileHandle: HAPIFILE header,1,254,0x360,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 IssueRepairOrder #5,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
+LoadDownloadMenus: DOWNLOADMENU,*,*,0,0,-,not-a-pointer,"BuildMenuPage count bytes 1-3 and entries[0].typeId low byte spell the word (page offset 1); not pointers, and it can match in either module mode, depending on where the heap lands"
 LoadFeatureType,*,*,0,0,-,not-a-pointer,"Feature words (burnTime, damage, energy, metal, feature ids, the straddles of pointer fields) that only look like addresses; includes HAPI_LoadFile targets at offsets other than the pointer fields"
 LoadFeatureType,*,*,0,0,-,outside,"the 1 outside pair row of LoadFeatureType, which follows: the Feature table (0x100 bytes per type), loaded with the feature types; target names change with the heap layout"
 LoadFeatureType,0x73e8+0x4200*k 0x8ce8+0x2f00*k 0xa9e8+0x1400*k 0xb0e8+0x1300*k 0xb7e8+0x1300*k 0xbae8+0x500*k 0xc0e8+0x3100*k 0xc1e8+0x2000*k 0xc5e8+0x300*k 0xcde8+0x1300*k 0xdbe8+0x800*k 0xe7e8+0x5000*k 0xeee8 0xefe8+0x8700*k 0xfde8 0x104e8 0x115e8 0x130e8+0x2e00*k 0x165e8+0x700*k 0x168e8+0x1300*k 0x16ee8+0x1500*k 0x179e8+0x1800*k 0x17ce8+0xf00*k 0x17de8+0x1300*k 0x180e8+0x1700*k 0x189e8 0x18de8+0x1500*k 0x194e8+0x800*k 0x195e8 0x19ee8 0x1a5e8 0x1b0e8 0x1b2e8 0x1b9e8 0x1ece8,AllocAlphaTable: ALPHA TABLE,65,43584,0x4310,not-a-pointer,"Feature words (burnTime, damage, energy, metal, feature ids, the straddles of pointer fields) that only look like addresses; includes HAPI_LoadFile targets at offsets other than the pointer fields"
@@ -1070,9 +1072,9 @@ LoadUnitInfo: UNITINFO,0x1230+0x6b67*k 0x123c+0x4b69*k 0x16c2+0x46d7*k 0x1b54+0x
 LoadUnitInfo: UNITINFO,0x47a+0x249*k 0x47e+0x249*k 0x482+0x249*k 0x486+0x249*k 0x6f3e 0x8186 0xbf39 0x19f2b 0x1ace1 0x1ea94,Sound::CreateSampleFromFile: Digital Audio Sample,13,138300,0x10,not-a-pointer,"UnitType words (numbers, flags) that only look like addresses"
 LoadUnitInfo: UNITINFO,0x7389 0xa13d 0xc182 0x143c6 0x193bc 0x19f2b 0x1bee2 0x2218b 0x2218f 0x243b6,ThrustParticles::Emit,4,329,0x2-0xf0,outside,"UnitType.data (0x18e), weaponCategories (0x231 0x235 0x239) and categories (0x23d), stride 0x249: loaded with the unit types; target names change with the heap layout (its offsets fall under rows of more than one class: not-a-pointer, outside; classed outside because some offset is a pointer field)"
 LoadUnitInfo: UNITINFO,0x88cb,TimedSubParticles::Emit,1,435,0xbd,not-a-pointer,"UnitType words (numbers, flags) that only look like addresses"
-LoadUnitTypes #3,*,*,0,0,-,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
-LoadUnitTypes #3,0x1,HAPI_LoadFile,27,277800,0xf60-0x1370,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
-LoadUnitTypes #3,0x9 0x11 0x1b 0x27,LoadTntMap: TILE SET,6,46800,0xb2de0-0x590be1,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
+LoadUnitTypes #2,*,*,0,0,-,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
+LoadUnitTypes #2,0x1,HAPI_LoadFile,27,277800,0xf60-0x1370,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
+LoadUnitTypes #2,0x9 0x11 0x1b 0x27,LoadTntMap: TILE SET,6,46800,0xb2de0-0x590be1,not-a-pointer,"Unit type id lists or yardmap bytes, no pointers"
 LoadUnitTypes: MODEL PTRS,*,*,0,0,-,not-a-pointer,words of LoadUnitTypes: MODEL PTRS that only look like addresses
 LoadUnitTypes: MODEL PTRS,*,*,0,0,-,outside,"the 1 outside pair rows of LoadUnitTypes: MODEL PTRS, which follow"
 LoadUnitTypes: MODEL PTRS,0x5a 0x9e 0x10e 0x21e 0x296 0x3c2,CMemoryCache::InitCache: CMemoryCache CCH,8,54900,0x30b4f-0x380b33,not-a-pointer,Model pointer table words at odd offsets: they straddle two pointers and only look like addresses

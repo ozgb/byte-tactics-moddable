@@ -29,7 +29,6 @@ public:
     int GetBlitMode(SmackerSurface* unused);
 };
 
-int __stdcall GetBuildSiteMetal(void);
 int __stdcall GetBuildSiteHeight(void);
 
 #endif

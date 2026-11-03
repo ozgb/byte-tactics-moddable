@@ -83,7 +83,7 @@ interface did with the input.
 | Kind | Fields | Meaning |
 | --- | --- | --- |
 | `input` | `key down <vk>`, `key up <vk>`, `char <code>`, `mouse move <x> <y>`, `mouse left down <x> <y>` and the like | An event of the scenario's `input` lines, in decimal, at the tick of its line. |
-| `scroll` | `<x> <z>` | The camera scroll, at tick 1 and at the end of any tick where it differs from the last `scroll` line. |
+| `scroll` | `<x> <z>` | The camera scroll, at tick 1 and at the end of any tick where it differs from the last `scroll` line. Only a scenario with `input` lines logs it (see below). |
 | `select` | `<units>` | The local player's selected units, at tick 1 and at the end of any tick where the selection differs from the last `select` line. |
 | `order` | `<KIND> unit <U> target <T or -> pos <x> <y> <z> or - type <NAME or -> param <N or -> amount <A> remove <0 or 1>` | One order given to one unit. See below. |
 | `qbuild` | `<U> <TYPE> <count>` | A click in a factory's build menu changed the build queue of unit `U` by `count` (1 or 5, negative for a right click) of the unit type, or missile, named `TYPE` by the button. |
@@ -117,3 +117,11 @@ scenario whose name starts with `ui-`: it must have one, and its log must show t
 input did something, with at least one `order`, `qbuild`, `cancel`, `group` or
 `groupsel` record or a `select` record with units. Input that gives no order and selects
 nothing is a broken scenario, not a pass. A stored log with no scenario is a failure.
+
+## The scroll snapshot
+
+The `scroll` record is limited to scenarios with `input` lines until issue #652 is done. In a long run without input, the
+camera shake and particles draw from the game's view random stream, and a build can fall one draw behind the reference
+at a tick boundary. The stream is presentation only (no trace field hashes it), but from that point every later shake
+offset differs, so the `scroll` records of such a scenario differ though its traces are equal. #652 finds and fixes the lost
+draw, adds a direct check of the stream against the reference, and then restores the `scroll` record in every scenario.

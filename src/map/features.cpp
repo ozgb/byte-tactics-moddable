@@ -127,7 +127,6 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot1
 #include "../network/net_game.h"
 int __stdcall StepGafSequence(Handle* anim);
 GafFrame* __stdcall GetGafSequenceFrame(Handle* anim);
-#include "../graphics/model_render.h"
 #include "../graphics/particles.h"
 
 // FUNCTION: 0x421e60

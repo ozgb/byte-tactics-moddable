@@ -5,7 +5,7 @@
     uv run tools/reference.py --traces          # rewrite reference/traces/ from the reference branch
 
 `--check --exe` plays every scenario in reference/scenarios/ (`--parallel N` at a
-time, default half the CPUs and at most 6, under Wine through tools/playtest.py)
+time, default half the CPUs and at most 6 (10 with `--both-modes`), under Wine through tools/playtest.py)
 and compares the digest of each tick (tools/tracedigest.py) with the stored one. It also compares
 each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md), and each run's ui.txt with reference/ui/<scenario>.txt the same way (docs/ui-log.md).
 A scenario with a `frames` line also has its frame dumps compared, byte for byte, with reference/frames/<scenario>/ (docs/frame-dump.md); a missing stored frame fails.
@@ -15,6 +15,11 @@ On the first difference it builds the reference from the commit the trace
 records, prints tools/tracediff.py's report for that scenario and exits 1. A
 missing or extra trace or scenario exits 1. `--tier` restricts `--check` to the
 scenarios named in GATE_TIER, the pull request gate (tools/coverage.py --tier checks that they cover enough).
+
+`--check --both-modes` plays every scenario once in WASM and once with `-modules=native` in one pool (each line names its
+mode, the sound logs and block pointer scans are kept apart per mode) and passes only when both modes equal the stored traces.
+A `--check` holds an exclusive lock on $XDG_RUNTIME_DIR/bt-gate.lock (else /tmp) for the whole run, so that one machine plays
+one gate at a time; a second one prints `waiting for the gate run of <pid> (<worktree>)` and waits. `--no-lock` skips it.
 
 Every scenario is played with new game allocations zeroed (the game's own -memset=0 switch, through
 tools/playtest.py --testmode). `--check --native-modules` runs the exe's modules as native code (-modules=native) instead of in WASM. `--check --poison` fills them with 0xCD instead (-memset=0xcdcdcdcd); a
@@ -40,6 +45,8 @@ install.
 """
 
 import argparse
+import contextlib
+import fcntl
 import os
 import re
 import shutil
@@ -75,6 +82,7 @@ FRAME_PALETTE_SIZE = 1024
 SAVES = ROOT / "reference/saves"
 SAVE_FILE = tracediff.SAVE_FILES[0]
 MAX_PARALLEL = 6
+MAX_PARALLEL_BOTH_MODES = 10
 GATE_TIER = (
     "allied-victory",
     "commander-death",
@@ -115,6 +123,8 @@ SOUND_LOGS: dict[str, str | None] = {}
 UI_LOGS: dict[str, str | None] = {}
 FRAME_DUMPS: dict[str, dict[int, bytes]] = {}
 SAVE_BYTES: dict[str, bytes | None] = {}
+MODES = ("wasm", "native")
+LOCK_FILE = "bt-gate.lock"
 RETRY_DIALOG = "dialog-directx"
 WATCH_SECONDS = 0.5
 STOP_SECONDS = 30
@@ -197,9 +207,9 @@ def scenario_files() -> dict[str, Path]:
     return {p.stem: p for p in sorted(SCENARIOS.glob("*.txt"))}
 
 
-def default_parallel() -> int:
-    """Half the CPUs, at least 1 and at most MAX_PARALLEL."""
-    return max(1, min(MAX_PARALLEL, (os.cpu_count() or 2) // 2))
+def default_parallel(both_modes: bool = False) -> int:
+    """Half the CPUs, at least 1 and at most MAX_PARALLEL (MAX_PARALLEL_BOTH_MODES when both modes are played)."""
+    return max(1, min(MAX_PARALLEL_BOTH_MODES if both_modes else MAX_PARALLEL, (os.cpu_count() or 2) // 2))
 
 
 def scenario_ticks(scenario: Path) -> int:
@@ -284,25 +294,103 @@ def parse_fuel(path: Path) -> dict[str, tuple[int, int]]:
     return found
 
 
-def report_fuel(exe: Path, scenarios: dict[str, Path]) -> int:
-    """Print the most fuel one tick burned, per scenario and module, and the largest per module; 1 if a WASM run reported none."""
-    if os.environ.get("BT_NATIVE_MODULES") == "1" or not playtest.runs_wasm_modules(exe):
-        print("fuel: not counted (the modules ran as native code)")
+def report_fuel(exe: Path, scenarios: dict[str, Path], fuel_by_name: dict[str, dict[str, tuple[int, int]]] | None = None,
+                native: bool | None = None, label: str = "") -> int:
+    """Print the most fuel one tick burned, per scenario and module, and the largest per module; 1 if a WASM run reported none.
+
+    `fuel_by_name` is the fuel of the runs to report by scenario name (default: FUEL), `native` whether they ran as native code (default: BT_NATIVE_MODULES).
+    """
+    fuel = FUEL if fuel_by_name is None else fuel_by_name
+    if (os.environ.get("BT_NATIVE_MODULES") == "1" if native is None else native) or not playtest.runs_wasm_modules(exe):
+        print(label + "fuel: not counted (the modules ran as native code)")
         return 0
-    missing = [name for name in scenarios if not FUEL.get(name)]
+    missing = [name for name in scenarios if not fuel.get(name)]
     for name in scenarios:
-        for module, (fuel, tick) in sorted(FUEL.get(name, {}).items()):
-            print(f"fuel {name}: {module} {fuel} at tick {tick}")
+        for module, (burned, tick) in sorted(fuel.get(name, {}).items()):
+            print(f"{label}fuel {name}: {module} {burned} at tick {tick}")
     for name in missing:
-        print(f"fuel {name}: no {FUEL_FILE}: the run counted no fuel")
+        print(f"{label}fuel {name}: no {FUEL_FILE}: the run counted no fuel")
     largest: dict[str, tuple[int, str, int]] = {}
     for name in scenarios:
-        for module, (fuel, tick) in FUEL.get(name, {}).items():
-            if module not in largest or fuel > largest[module][0]:
-                largest[module] = (fuel, name, tick)
-    for module, (fuel, name, tick) in sorted(largest.items()):
-        print(f"fuel max: {module} {fuel} per tick ({name}, tick {tick}) over {len(scenarios) - len(missing)} scenarios")
+        for module, (burned, tick) in fuel.get(name, {}).items():
+            if module not in largest or burned > largest[module][0]:
+                largest[module] = (burned, name, tick)
+    for module, (burned, name, tick) in sorted(largest.items()):
+        print(f"{label}fuel max: {module} {burned} per tick ({name}, tick {tick}) over {len(scenarios) - len(missing)} scenarios")
     return 1 if missing else 0
+
+
+def tag(name: str, mode: str | None) -> str:
+    """The name of a scenario's run in `mode`: `name [mode]`, or just `name` when only one mode is played."""
+    return name if mode is None else f"{name} [{mode}]"
+
+
+def untag(key: str) -> str:
+    """The scenario of a run's name (see tag)."""
+    return key.partition(" [")[0]
+
+
+def mode_of(key: str) -> str | None:
+    """The mode of a run's name (see tag), or None for a plain scenario name."""
+    return key.partition(" [")[2].rstrip("]") or None
+
+
+def mode_view(store: dict, scenarios: dict[str, Path], mode: str | None) -> dict:
+    """The entries of a per-run store (keyed as tag does) that belong to `mode`, keyed by the plain scenario name."""
+    return {name: store[tag(name, mode)] for name in scenarios if tag(name, mode) in store}
+
+
+def default_modes(both_modes: bool) -> tuple[str | None, ...]:
+    """The modes a check plays each scenario in: both of MODES, or one run per scenario (mode None, set by BT_NATIVE_MODULES)."""
+    return MODES if both_modes else (None,)
+
+
+def lock_path() -> Path:
+    """The file the gate lock is taken on: under $XDG_RUNTIME_DIR, else /tmp."""
+    return Path(os.environ.get("XDG_RUNTIME_DIR") or "/tmp") / LOCK_FILE
+
+
+class GateLock:
+    """An exclusive lock on one file, held for a whole --check, so that one machine plays one gate at a time.
+
+    The holder writes its pid and worktree into the file; a second process prints who holds it and waits.
+    """
+
+    def __init__(self, path: Path | None = None, worktree: Path | None = None):
+        self.path = path or lock_path()
+        self.worktree = worktree or ROOT
+        self.fd: int | None = None
+
+    def holder(self) -> str:
+        """`<pid> (<worktree>)` of the process that holds the lock, as it wrote it, or `another process` while it has not."""
+        for _ in range(20):
+            text = self.path.read_text().strip()
+            if text:
+                pid, _, worktree = text.partition(" ")
+                return f"{pid} ({worktree})"
+            time.sleep(0.1)
+        return "another process"
+
+    def __enter__(self) -> "GateLock":
+        self.fd = os.open(self.path, os.O_RDWR | os.O_CREAT, 0o666)
+        try:
+            os.fchmod(self.fd, 0o666)
+        except OSError:
+            pass
+        try:
+            fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            print(f"waiting for the gate run of {self.holder()}", flush=True)
+            fcntl.flock(self.fd, fcntl.LOCK_EX)
+        os.ftruncate(self.fd, 0)
+        os.write(self.fd, f"{os.getpid()} {self.worktree}\n".encode())
+        return self
+
+    def __exit__(self, *exc) -> None:
+        if self.fd is not None:
+            os.ftruncate(self.fd, 0)
+            os.close(self.fd)
+            self.fd = None
 
 
 def game_trace(pid: int) -> Path | None:
@@ -318,6 +406,7 @@ def game_trace(pid: int) -> Path | None:
 class LiveRun:
     """A scenario's running playtest.py process and how far its trace.txt has been read."""
     proc: subprocess.Popen
+    scenario: str = ""
     path: Path | None = None
     offset: int = 0
     seen: int = 0
@@ -327,7 +416,7 @@ class LiveRun:
 
 @dataclass
 class Found:
-    """The first scenario seen to differ from its stored trace."""
+    """The first run seen to differ from its stored trace (`name` is the run's name, see tag)."""
     name: str
     diff: str
     ticks: int
@@ -347,10 +436,10 @@ class Watch:
         self.live: dict[str, LiveRun] = {}
 
     def started(self, name: str) -> Callable[[subprocess.Popen], None]:
-        """The callback that tracediff.play calls with the run's process."""
+        """The callback that tracediff.play calls with the run's process; `name` is the run's name (see tag)."""
         def register(proc: subprocess.Popen) -> None:
             with self.lock:
-                self.live[name] = LiveRun(proc)
+                self.live[name] = LiveRun(proc, untag(name))
                 if self.halted.is_set():
                     self.stop(proc)
         return register
@@ -379,7 +468,7 @@ class Watch:
             f.seek(run.offset)
             data = f.read()
         run.offset += len(data)
-        want = self.expected[name][1]
+        want = self.expected[run.scenario][1]
         for got in run.tail.feed(data):
             index = run.seen
             run.seen += 1
@@ -421,7 +510,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                   want: tuple[dict[str, str], list[tuple[int, str]]] | None = None, poison: bool = False,
                   keep_always: bool = False, scans: dict[str, str | None] | None = None,
                   scan_every: int = 1, retry_any: bool = False, save_to: Path | None = None,
-                  load_from: Path | None = None, watch: "Watch | None" = None) -> tuple[dict[str, str], list[tuple[int, str]], float, Path | None]:
+                  load_from: Path | None = None, watch: "Watch | None" = None,
+                  mode: str | None = None) -> tuple[dict[str, str], list[tuple[int, str]], float, Path | None]:
     """Run the scenario under Wine: the trace header, the digest of each tick, the seconds taken.
 
     With `want` (the stored header and digests), a run that differs is kept: the last element is the
@@ -443,7 +533,11 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     `load_from` (a directory), its files are placed in the run's game copy at those paths before the exe starts.
 
     With `watch`, the run's process is registered there (see Watch), and a run that differs at its end halts the watch.
+
+    With `mode` ("wasm" or "native"), the run's modules run in that mode whatever BT_NATIVE_MODULES says, and its
+    sound log, frames, save, scan and fuel are stored under tag(scenario, mode).
     """
+    key = tag(scenario.stem, mode)
     ticks = scenario_ticks(scenario)
     rate = RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK if scans is not None and scan_every == 1 else RUN_TICKS_PER_SECOND
     timeout = RUN_SECONDS_BASE + ticks / rate
@@ -454,7 +548,9 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
             extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, *frame_files, *dict.fromkeys(
                 (*(tracediff.SAVE_FILES if save_to is not None else ()), *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if watch is not None:
-                extra["started"] = watch.started(scenario.stem)
+                extra["started"] = watch.started(key)
+            if mode is not None:
+                extra["env"] = dict(os.environ, BT_NATIVE_MODULES="1" if mode == "native" else "0")
             if load_from is not None:
                 extra["put"] = tracediff.save_put(load_from, scenario.stem, load_from.name)
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, scan_every if scans is not None else 0, **extra)
@@ -467,34 +563,34 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
             print(f"{scenario.stem}: run failed, trying again: {last_lines(e)}{where}", flush=True)
     elapsed = time.time() - t0
     if watch is not None:
-        watch.finished(scenario.stem)
+        watch.finished(key)
     kept = None
     try:
         if save_to is not None:
             tracediff.copy_save(run, save_to)
-        FUEL[scenario.stem] = parse_fuel(run / FUEL_FILE)
+        FUEL[key] = parse_fuel(run / FUEL_FILE)
         sound_log = run / SOUND_FILE
-        SOUND_LOGS[scenario.stem] = sound_log.read_text() if sound_log.is_file() else None
+        SOUND_LOGS[key] = sound_log.read_text() if sound_log.is_file() else None
         ui_log = run / UI_FILE
-        UI_LOGS[scenario.stem] = ui_log.read_text() if ui_log.is_file() else None
-        FRAME_DUMPS[scenario.stem] = {tick: (run / "frames" / f"{tick}.bin").read_bytes()
-                                      for tick in scenario_frames(scenario) if (run / "frames" / f"{tick}.bin").is_file()}
+        UI_LOGS[key] = ui_log.read_text() if ui_log.is_file() else None
+        FRAME_DUMPS[key] = {tick: (run / "frames" / f"{tick}.bin").read_bytes()
+                            for tick in scenario_frames(scenario) if (run / "frames" / f"{tick}.bin").is_file()}
         if scenario_saves(scenario):
             saved = run / SAVE_FILE
-            SAVE_BYTES[scenario.stem] = saved.read_bytes() if saved.is_file() else None
+            SAVE_BYTES[key] = saved.read_bytes() if saved.is_file() else None
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
-        for key in ("game_seed", "crt_seed", "view_seed"):
-            if key not in header:
-                raise tracediff.Error(f"{scenario}: the trace has no {key} line")
+        for seed in ("game_seed", "crt_seed", "view_seed"):
+            if seed not in header:
+                raise tracediff.Error(f"{scenario}: the trace has no {seed} line")
         digests = tracedigest.digests(rows)
         if scans is not None:
             scanned = run / "blockptrs.txt"
-            scans[scenario.stem] = scanned.read_text() if scanned.is_file() else None
+            scans[key] = scanned.read_text() if scanned.is_file() else None
         diff = difference(want, header, digests) if want is not None else None
         if keep_always or diff:
-            kept = keep_run(run, scenario.stem, "-alloff" if keep_always else "")
+            kept = keep_run(run, scenario.stem, ("-alloff" if keep_always else "") + (f"-{mode}" if mode else ""))
         if watch is not None and diff:
-            watch.halt(scenario.stem, diff, len(digests), elapsed, kept)
+            watch.halt(key, diff, len(digests), elapsed, kept)
     finally:
         shutil.rmtree(run.parent, ignore_errors=True)
     return header, digests, elapsed, kept
@@ -520,8 +616,12 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
              expected: dict[str, tuple] | None = None, poison: bool = False,
              failed: dict[str, str] | None = None, keep_always: bool = False,
              scans: dict[str, str | None] | None = None, scan_every: int = 1,
-             retry_any: bool = False, watch: Watch | None = None) -> dict[str, tuple]:
+             retry_any: bool = False, watch: Watch | None = None, modes: tuple[str | None, ...] = (None,)) -> dict[str, tuple]:
     """Every scenario's play_scenario result, `parallel` at a time and longest first; exits 1 if one fails to run.
+
+    With `modes` of more than the default (None), each scenario is played once per mode in the same pool, and the
+    results, `failed`, `scans` and the stores of play_scenario are keyed by tag(scenario, mode); a loader is played
+    in its saver's mode.
 
     With `failed` (a dict), a scenario that fails to run is recorded there as name -> message and play_all
     returns without exiting. With `keep_always`, every run's trace.txt is kept (see play_scenario). With `scans`,
@@ -541,56 +641,60 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
     results: dict[str, tuple] = {}
     failures: list[str] = []
     errors: dict[str, str] = {}
-    loads = {name: tracediff.scenario_load(path) for name, path in scenarios.items()}
+    keys = [tag(name, mode) for mode in modes for name in scenarios]
+    loads = {tag(name, mode): (tag(saver, mode) if (saver := tracediff.scenario_load(path)) is not None else None)
+             for mode in modes for name, path in scenarios.items()}
     (ROOT / "build/scratch").mkdir(parents=True, exist_ok=True)
     saves = Path(tempfile.mkdtemp(prefix="saves-", dir=ROOT / "build/scratch"))
 
-    def load_problem(name: str) -> str | None:
-        saver = loads[name]
+    def load_problem(key: str) -> str | None:
+        saver = loads[key]
         if saver is None:
             return None
-        if saver not in scenarios:
-            return f"{name}: load {saver}: {saver} is not among the scenarios played"
+        if saver not in keys:
+            return f"{key}: load {saver}: {saver} is not among the scenarios played"
         if saver in errors:
-            return f"{name}: load {saver}: {saver} failed to run"
+            return f"{key}: load {saver}: {saver} failed to run"
         try:
-            tracediff.save_put(saves / saver, name, saver)
+            tracediff.save_put(saves / saver, key, saver)
         except tracediff.Error as e:
             return str(e)
         return None
 
-    def one(name: str) -> None:
+    def one(key: str) -> None:
         if watch is not None and watch.halted.is_set():
             return
+        name, mode = untag(key), mode_of(key)
         try:
-            problem = load_problem(name)
+            problem = load_problem(key)
             if problem:
                 raise tracediff.Error(problem)
-            saver = loads[name]
-            results[name] = play_scenario(exe, scenarios[name], game_dir, (expected or {}).get(name), poison, keep_always, scans, scan_every, retry_any,
-                                          save_to=saves / name if name in loads.values() else None,
-                                          load_from=saves / saver if saver else None,
-                                          **({"watch": watch} if watch is not None else {}))
+            saver = loads[key]
+            results[key] = play_scenario(exe, scenarios[name], game_dir, (expected or {}).get(name), poison, keep_always, scans, scan_every, retry_any,
+                                         save_to=saves / key if key in loads.values() else None,
+                                         load_from=saves / saver if saver else None,
+                                         **({"watch": watch} if watch is not None else {}),
+                                         **({"mode": mode} if mode is not None else {}))
         except (tracediff.Error, OSError) as e:
             if watch is not None and watch.halted.is_set():
                 return
-            errors[name] = last_lines(e, 5)
+            errors[key] = last_lines(e, 5)
             if failed is not None:
-                failed[name] = errors[name]
+                failed[key] = errors[key]
             else:
-                failures.append(f"{name}: failed to run, playtest.py ended with:\n    {last_lines(e, 5)}")
+                failures.append(f"{key}: failed to run, playtest.py ended with:\n    {last_lines(e, 5)}")
 
-    def longest_first(name: str) -> int:
+    def longest_first(key: str) -> int:
         try:
-            return -scenario_ticks(scenarios[name])
+            return -scenario_ticks(scenarios[untag(key)])
         except tracediff.Error:
             return 0
 
-    ordered = sorted(scenarios, key=longest_first)
+    ordered = sorted(keys, key=longest_first)
     try:
         with ThreadPoolExecutor(parallel) as pool:
-            list(pool.map(one, [n for n in ordered if loads[n] is None]))
-            list(pool.map(one, [n for n in ordered if loads[n] is not None]))
+            list(pool.map(one, [k for k in ordered if loads[k] is None]))
+            list(pool.map(one, [k for k in ordered if loads[k] is not None]))
     finally:
         shutil.rmtree(saves, ignore_errors=True)
     if failures:
@@ -847,8 +951,9 @@ def save_report(scenarios: dict[str, Path], saves: dict[str, bytes | None], dire
 
 def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = False, poison: bool = False,
                  steps_per_frame: int | None = None, quirks: str | None = None,
-                 save_blockptrs: Path | None = None, roundtrip: str | None = None) -> None:
+                 save_blockptrs: Path | None = None, roundtrip: str | None = None, both_modes: bool = False) -> None:
     scenarios = scenario_files()
+    modes = default_modes(both_modes)
     stored = {p.stem: p for p in sorted(TRACES.glob("*.txt"))} if TRACES.is_dir() else {}
     if tier:
         missing = [n for n in GATE_TIER if n not in scenarios or n not in stored]
@@ -893,7 +998,8 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     t0 = time.time()
     try:
         results = play_all(exe, played, game_dir, parallel, expected, poison, failed if quirks is not None else None,
-                           scans=scans, scan_every=GATE_SCAN_EVERY, **({"watch": watch} if watch is not None else {}))
+                           scans=scans, scan_every=GATE_SCAN_EVERY, **({"watch": watch} if watch is not None else {}),
+                           **({"modes": modes} if both_modes else {}))
         if quirks is not None:
             differing = [n for n in scenarios if n in results and n not in failed and difference(expected[n], *results[n][:2])]
             if differing:
@@ -902,40 +1008,52 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         watching.set()
         shutil.rmtree(scratch, ignore_errors=True)
     wall = time.time() - t0
-    if watch is not None and watch.found and len(results) < len(scenarios):
+    if watch is not None and watch.found and len(results) < len(scenarios) * len(modes):
         found = watch.found
         where = f" [kept: {found.kept.relative_to(ROOT)}]" if found.kept else ""
         print(f"DIFF {found.name} ({found.ticks} ticks, {clock(found.elapsed)}) {found.diff}{where}")
-        print(f"stopped: {len(scenarios) - len(results)} scenarios not finished")
-        report_divergence(found.name, expected, exe, scenarios, poison, game_dir)
+        print(f"stopped: {len(scenarios) * len(modes) - len(results)} scenarios not finished")
+        if mode_of(found.name) == "native":
+            os.environ["BT_NATIVE_MODULES"] = "1"
+        report_divergence(untag(found.name), expected, exe, scenarios, poison, game_dir)
     if quirks is not None:
         report_quirks(scenarios, expected, results, failed, quirks, wall, off_results, off_failed)
         return
     bad: list[str] = []
-    for name in scenarios:
-        header, digests, elapsed, kept = results[name]
-        diff = difference(expected[name], header, digests)
-        where = f" [kept: {kept.relative_to(ROOT)}]" if kept else ""
-        logged = SOUND_LOGS.get(name)
-        sounds = f", {max(len(logged.splitlines()) - 1, 0)} sound lines" if logged is not None else ""
-        print(f"{'DIFF' if diff else 'ok':4} {name} ({len(digests)} ticks, {clock(elapsed)}{sounds})" + (f" {diff}{where}" if diff else ""))
-        if diff:
-            bad.append(name)
-    print(f"{len(scenarios) - len(bad)} of {len(scenarios)} scenarios equal, total {clock(wall)}")
-    sound_bad, sound_lines = sound_report(scenarios, SOUND_LOGS, SOUNDS)
-    print("\n".join(sound_lines))
-    ui_bad, ui_lines = ui_report(scenarios, UI_LOGS, UIS)
-    print("\n".join(ui_lines))
-    frame_bad, frame_lines = frame_report(scenarios, FRAME_DUMPS, FRAMES)
-    print("\n".join(frame_lines))
-    save_bad, save_lines = save_report(scenarios, SAVE_BYTES, SAVES)
-    print("\n".join(save_lines))
-    if scans is None:
-        print("block pointers: not checked with --roundtrip (the scan names allocations by address)")
-        pointers = 0
-    else:
-        pointers = report_block_pointers(exe, scans, tier, save_blockptrs)
-    pointers += report_fuel(exe, scenarios)
+    for mode in modes:
+        for name in scenarios:
+            key = tag(name, mode)
+            header, digests, elapsed, kept = results[key]
+            diff = difference(expected[name], header, digests)
+            where = f" [kept: {kept.relative_to(ROOT)}]" if kept else ""
+            logged = SOUND_LOGS.get(key)
+            sounds = f", {max(len(logged.splitlines()) - 1, 0)} sound lines" if logged is not None else ""
+            print(f"{'DIFF' if diff else 'ok':4} {key} ({len(digests)} ticks, {clock(elapsed)}{sounds})" + (f" {diff}{where}" if diff else ""))
+            if diff:
+                bad.append(key)
+    total = len(scenarios) * len(modes)
+    print(f"{total - len(bad)} of {total} scenarios equal, total {clock(wall)}")
+    sound_bad = ui_bad = frame_bad = save_bad = 0
+    pointers = 0
+    for mode in modes:
+        label = f"[{mode}] " if both_modes else ""
+        sound_names, sound_lines = sound_report(scenarios, mode_view(SOUND_LOGS, scenarios, mode), SOUNDS)
+        print("\n".join(label + line for line in sound_lines))
+        ui_names, ui_lines = ui_report(scenarios, mode_view(UI_LOGS, scenarios, mode), UIS)
+        print("\n".join(label + line for line in ui_lines))
+        frame_names, frame_lines = frame_report(scenarios, mode_view(FRAME_DUMPS, scenarios, mode), FRAMES)
+        print("\n".join(label + line for line in frame_lines))
+        save_names, save_lines = save_report(scenarios, mode_view(SAVE_BYTES, scenarios, mode), SAVES)
+        print("\n".join(label + line for line in save_lines))
+        sound_bad += len(sound_names)
+        ui_bad += len(ui_names)
+        frame_bad += len(frame_names)
+        save_bad += len(save_names)
+        if scans is None:
+            print(f"{label}block pointers: not checked with --roundtrip (the scan names allocations by address)")
+        else:
+            pointers += report_block_pointers(exe, mode_view(scans, scenarios, mode), tier, save_blockptrs / mode if save_blockptrs and both_modes else save_blockptrs, label)
+        pointers += report_fuel(exe, scenarios, mode_view(FUEL, scenarios, mode), mode == "native" if both_modes else None, label)
     if not bad:
         if pointers or sound_bad or ui_bad or frame_bad or save_bad:
             sys.exit(1)
@@ -943,7 +1061,9 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
             print(tier_message(len(scenarios), head_commit()))
         return
 
-    report_divergence(bad[0], expected, exe, scenarios, poison, game_dir)
+    if mode_of(bad[0]) == "native":
+        os.environ["BT_NATIVE_MODULES"] = "1"
+    report_divergence(untag(bad[0]), expected, exe, scenarios, poison, game_dir)
 
 
 def report_divergence(name: str, expected: dict[str, tuple], exe: Path, scenarios: dict[str, Path], poison: bool,
@@ -970,7 +1090,7 @@ def tier_message(count: int, sha: str) -> str:
             f"that reference/README.md, \"Gate\", lists")
 
 
-def report_block_pointers(exe: Path, scans: dict[str, str | None], tier: bool, save: Path | None) -> int:
+def report_block_pointers(exe: Path, scans: dict[str, str | None], tier: bool, save: Path | None, label: str = "") -> int:
     """Print the pointers out of the block that data/block_pointers.csv does not cover; how many there are.
 
     The names of repeated sites are numbered over the scenarios played, so the gate tier is not checked: block pointers are checked by the full suite only.
@@ -982,16 +1102,16 @@ def report_block_pointers(exe: Path, scans: dict[str, str | None], tier: bool, s
             if text is not None:
                 (save / f"{name}.txt").write_text(text)
     if tier:
-        print(BLOCK_POINTERS_TIER_TEXT)
+        print(label + BLOCK_POINTERS_TIER_TEXT)
         return 0
     problems = blockpointers.check_scans(scans, exe.with_suffix(".map"), blockpointers.default_build_dir())
     for line in problems:
-        print(f"BLOCK POINTER {line}")
+        print(f"{label}BLOCK POINTER {line}")
     if problems:
-        print(f"{len(problems)} problems with the pointers out of the block; add them to data/block_pointers.csv "
+        print(f"{label}{len(problems)} problems with the pointers out of the block; add them to data/block_pointers.csv "
               f"(uv run tools/blockpointers.py --from <dir>, see reference/README.md)")
     else:
-        print(f"block pointers: all covered by data/block_pointers.csv ({len(scans)} scenarios)")
+        print(f"{label}block pointers: all covered by data/block_pointers.csv ({len(scans)} scenarios)")
     return len(problems)
 
 
@@ -1187,6 +1307,10 @@ def main() -> None:
                     help="--check: play only GATE_TIER, the pull request gate (not the gate of the changes that need the full suite)")
     ap.add_argument("--native-modules", action="store_true",
                     help="--check: play every scenario with -modules=native, so that the modules run as native code (the default runs them in WASM; sets BT_NATIVE_MODULES=1 for tools/playtest.py)")
+    ap.add_argument("--both-modes", action="store_true",
+                    help="--check: play every scenario twice in one pool, once with the modules in WASM and once with -modules=native, and pass only when both modes equal the stored traces (the gate)")
+    ap.add_argument("--no-lock", action="store_true",
+                    help="--check: do not take the machine-wide gate lock (by default a second --check on the machine waits for the first), for runs that are not gates")
     ap.add_argument("--poison", action="store_true",
                     help="--check: play the scenarios with new game allocations filled with 0xCD; list the bytes whose starting value reaches hashed state; a difference is expected for real uninitialised reads")
     ap.add_argument("--quirks", metavar="SPEC",
@@ -1199,9 +1323,11 @@ def main() -> None:
     ap.add_argument("--steps-per-frame", type=int, metavar="N",
                     help="--check: play every scenario with steps_per_frame N (1 to 8) and compare with the stored traces")
     ap.add_argument("--game-dir", help="--traces, --check: the game's install (default: Steam's)")
-    ap.add_argument("--parallel", type=int, default=default_parallel(), metavar="N",
-                    help="--traces, --check: scenarios played at once (default: half the CPUs, at most 6)")
+    ap.add_argument("--parallel", type=int, default=None, metavar="N",
+                    help="--traces, --check: scenarios played at once (default: half the CPUs, at most 6, or 10 with --both-modes)")
     args = ap.parse_args()
+    if args.parallel is None:
+        args.parallel = default_parallel(args.both_modes)
     if args.parallel < 1:
         ap.error("--parallel takes 1 or more")
     if args.traces == args.check:
@@ -1210,6 +1336,10 @@ def main() -> None:
         ap.error("--poison needs --check")
     if args.native_modules and not args.check:
         ap.error("--native-modules needs --check")
+    if args.both_modes and (not args.check or args.native_modules or args.quirks is not None):
+        ap.error("--both-modes needs --check, and cannot be combined with --native-modules or --quirks")
+    if args.no_lock and not args.check:
+        ap.error("--no-lock needs --check")
     if args.native_modules:
         os.environ["BT_NATIVE_MODULES"] = "1"
     if args.save_blockptrs and (not args.check or args.quirks is not None):
@@ -1241,8 +1371,9 @@ def main() -> None:
         ap.error("--check needs --exe: the gate is the modern build, --exe build/modern/TotalA.exe")
     if not Path(args.exe).is_file():
         ap.error(f"{args.exe} is not a file")
-    check_traces(Path(args.exe).resolve(), args.game_dir, args.parallel, args.tier, args.poison, args.steps_per_frame,
-                 args.quirks, args.save_blockptrs, args.roundtrip)
+    with contextlib.nullcontext() if args.no_lock else GateLock():
+        check_traces(Path(args.exe).resolve(), args.game_dir, args.parallel, args.tier, args.poison, args.steps_per_frame,
+                     args.quirks, args.save_blockptrs, args.roundtrip, args.both_modes)
 
 
 if __name__ == "__main__":

@@ -527,7 +527,7 @@ cmake --build build/modern
 cmake --build build/modern --target wasm_runtime   # once, and again after a change to wasm/ or a module's sources
 rm -r build/playtest/prefix     # a fresh prefix; tools/playtest.py makes it again
 uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta   # the pull request gate
-uv run tools/reference.py --check --exe build/modern/TotalA.exe --game-dir ~/.ta          # every scenario
+uv run tools/reference.py --check --both-modes --exe build/modern/TotalA.exe --game-dir ~/.ta   # every scenario, in both module modes: the full gate
 ```
 
 The gate is the modern build's `--check`: every scenario it plays must report equal. There are two tiers:
@@ -538,7 +538,14 @@ The build runs its modules in WASM (`wind_meteors` so far): the `wasm_runtime` t
 `wasm/modules.json` next to `TotalA.exe`, and `tools/playtest.py` copies the three into each game
 directory, failing with a message naming the target when they are missing. `--check --native-modules`
 plays every scenario with `-modules=native` instead, the modules as native code, which needs no runtime
-files. Both must report every scenario equal.
+files. Both modes must report every scenario equal, and `--check --both-modes` is that in one command: one
+pool plays every scenario once in WASM and once native (each line ends its name with `[wasm]` or `[native]`,
+the sound logs, frames, saves, block pointer scans and fuel are judged per mode and their lines start with the mode),
+and it exits 0 only when both modes do. The first difference in either mode stops every run of the pool, and its `DIFF`
+line names the mode. `--tier` is still one mode, unless it is given `--both-modes` too.
+A `--check` takes an exclusive lock on `$XDG_RUNTIME_DIR/bt-gate.lock` (`/tmp/bt-gate.lock` without it) for its whole run,
+so that a machine plays one gate at a time: a second one prints `waiting for the gate run of <pid> (<worktree>)` and
+starts when the first ends. `--no-lock` skips the lock, for a run that is not a gate.
 `uv run tools/wasm_modules.py glue-fatal --game-dir ~/.ta` (Wine only, not in CI) runs the exe on a bogus `meteor.tdf` and checks that the module's `FatalError` ends the game with exit code 2 after `wl_call` returned.
 `--check` without `--exe` is an error, since `moddable` does not build the
 reference. Add `--game-dir <dir>` when the game is not in a Steam directory.
@@ -553,7 +560,7 @@ it. The merges that did are the ones counted for the full-suite cadence
 below.
 
 `--traces` writes every trace with the reference branch's sha as `commit`. `--check` plays
-every scenario (`--parallel N` at a time, default half the CPUs and at most 6), prints one line per scenario with its run time
+every scenario (`--parallel N` at a time, default half the CPUs and at most 6, or 10 with `--both-modes`), prints one line per scenario with its run time
 and a total, and exits 0 when every digest equals the stored one. It exits 1
 when a trace has no scenario or a scenario has no trace, and on a difference:
 it builds the reference from the commit the trace records (a commit of the

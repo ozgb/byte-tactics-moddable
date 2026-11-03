@@ -282,6 +282,28 @@ add_custom_command(
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(replay_test DEPENDS "${CMAKE_BINARY_DIR}/replay_test.exe")
 
+set(REPLAY_MODULE_SOURCES src/map/meteors.cpp src/game/game_state.cpp src/game/console_commands.cpp)
+foreach(variant native inject)
+  add_library(replay_${variant}_module OBJECT ${REPLAY_MODULE_SOURCES})
+  target_include_directories(replay_${variant}_module PRIVATE "${CMAKE_SOURCE_DIR}/include")
+  target_include_directories(replay_${variant}_module SYSTEM PRIVATE "${MSVC5_INCLUDE}" "${CMAKE_SOURCE_DIR}/lib/wasmloader" "${CMAKE_SOURCE_DIR}/third_party/wasmtime/include")
+  target_compile_options(replay_${variant}_module PRIVATE ${GAME_COMPILE_OPTIONS} "/FI${BITEXACT_SHIM_DIR}/route.h")
+endforeach()
+target_compile_definitions(replay_inject_module PRIVATE BT_REPLAY_INJECT_GAP_SCALE=31.0)
+add_library(replay_native_test_objects OBJECT src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp src/harness/replay_text.cpp tests/replay_native_test.cpp)
+target_include_directories(replay_native_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_include_directories(replay_native_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+target_compile_options(replay_native_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
+foreach(variant native inject)
+  add_custom_command(
+    OUTPUT "${CMAKE_BINARY_DIR}/replay_${variant}_test.exe"
+    COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/replay_${variant}_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no /opt:ref /force:unresolved
+            $<TARGET_OBJECTS:replay_native_test_objects> $<TARGET_OBJECTS:replay_${variant}_module> $<TARGET_FILE:bitexact> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+    DEPENDS replay_native_test_objects replay_${variant}_module bitexact $<TARGET_OBJECTS:replay_native_test_objects> $<TARGET_OBJECTS:replay_${variant}_module> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+    VERBATIM COMMAND_EXPAND_LISTS)
+endforeach()
+add_custom_target(replay_native_test DEPENDS "${CMAKE_BINARY_DIR}/replay_native_test.exe" "${CMAKE_BINARY_DIR}/replay_inject_test.exe")
+
 add_library(purecall_test_objects OBJECT src/harness/purecall.cpp tests/purecall_test.cpp)
 target_include_directories(purecall_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(purecall_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})

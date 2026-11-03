@@ -148,11 +148,11 @@ jobs:
           uv run tools/test_tidy.py
           uv run tools/tidy.py "origin/$BASE_REF...HEAD"
 
-      - name: Compile the game, data, bitexact, block_test, ref_test and replay_test
+      - name: Compile the game, data, bitexact, block_test, ref_test, replay_test and replay_native_test
         if: steps.changed.outputs.run == 'true'
-        run: cmake --build build/modern --target game data bitexact block_test ref_test replay_test
+        run: cmake --build build/modern --target game data bitexact block_test ref_test replay_test replay_native_test
 
-      - name: Run block_test, ref_test and replay_test under Wine
+      - name: Run block_test, ref_test, replay_test and the native replays under Wine
         if: steps.changed.outputs.run == 'true'
         env:
           WINEDEBUG: -all
@@ -166,6 +166,12 @@ jobs:
             wine "build/modern/$t.exe" | tee "$RUNNER_TEMP/$t.log"
             grep -q "^$t: all passed" "$RUNNER_TEMP/$t.log"
           done
+          wine build/modern/replay_native_test.exe tests/replay/*.txt | tee "$RUNNER_TEMP/replay_native.log"
+          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_native.log"
+          wine build/modern/replay_native_test.exe --self-test tests/replay/meteors-hailstorm.wind_meteors.txt | tee "$RUNNER_TEMP/replay_self.log"
+          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_self.log"
+          wine build/modern/replay_inject_test.exe --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/meteors-hailstorm.wind_meteors.txt | tee "$RUNNER_TEMP/replay_inject.log"
+          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_inject.log"
 
       - name: Check data/rwsets.csv is current
         if: steps.changed.outputs.run == 'true'

@@ -50430,10 +50430,21 @@ address,function,file,kind,target
 ,ScanCommandLine,src/host/win32/headless.cpp,function,
 ,ScanFast,src/harness/block_scan.cpp,call,Probe
 ,ScanFast,src/harness/block_scan.cpp,call,ProbeWord
+,ScanFast,src/harness/block_scan.cpp,call,ScanLanes
 ,ScanFast,src/harness/block_scan.cpp,call,memcpy
 ,ScanFast,src/harness/block_scan.cpp,function,
 ,ScanFast,src/harness/block_scan.cpp,global_read,g_spanMax
 ,ScanFast,src/harness/block_scan.cpp,global_read,g_spanMin
+,ScanLanes,src/harness/block_scan.cpp,call,Probe
+,ScanLanes,src/harness/block_scan.cpp,call,__builtin_ctz
+,ScanLanes,src/harness/block_scan.cpp,call,__builtin_ia32_movmskps
+,ScanLanes,src/harness/block_scan.cpp,call,memcpy
+,ScanLanes,src/harness/block_scan.cpp,deref_read,*unsigned int
+,ScanLanes,src/harness/block_scan.cpp,function,
+,ScanLanes,src/harness/block_scan.cpp,global_read,g_pages
+,ScanLanes,src/harness/block_scan.cpp,global_read,g_spanMax
+,ScanLanes,src/harness/block_scan.cpp,global_read,g_spanMin
+,ScanLanes,src/harness/block_scan.cpp,global_read,kPageShift
 ,ScanPlain,src/harness/block_scan.cpp,call,Probe
 ,ScanPlain,src/harness/block_scan.cpp,call,memcpy
 ,ScanPlain,src/harness/block_scan.cpp,function,

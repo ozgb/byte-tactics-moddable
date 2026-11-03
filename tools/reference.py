@@ -112,6 +112,7 @@ FRAME_DUMPS: dict[str, dict[int, bytes]] = {}
 SAVE_BYTES: dict[str, bytes | None] = {}
 RETRY_DIALOG = "dialog-directx"
 WATCH_SECONDS = 0.5
+STOP_SECONDS = 30
 
 
 def reference_env(environ: dict[str, str], root: Path) -> dict[str, str]:
@@ -346,7 +347,7 @@ class Watch:
             with self.lock:
                 self.live[name] = LiveRun(proc)
                 if self.halted.is_set():
-                    proc.terminate()
+                    self.stop(proc)
         return register
 
     def finished(self, name: str) -> None:
@@ -391,11 +392,19 @@ class Watch:
             self.halted.set()
             procs = [r.proc for r in self.live.values()]
         for proc in procs:
-            if proc.poll() is None:
-                try:
-                    proc.terminate()
-                except OSError:
-                    pass
+            self.stop(proc)
+
+    def stop(self, proc: subprocess.Popen) -> None:
+        """Ask a run's playtest.py to stop (it ends its own Wine processes), and kill it if it is still there after STOP_SECONDS."""
+        if proc.poll() is not None:
+            return
+        try:
+            proc.terminate()
+        except OSError:
+            return
+        timer = threading.Timer(STOP_SECONDS, lambda: proc.poll() is None and proc.kill())
+        timer.daemon = True
+        timer.start()
 
 
 def scenario_saves(scenario: Path) -> bool:

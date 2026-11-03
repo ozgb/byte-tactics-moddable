@@ -1178,6 +1178,22 @@ void ObjectSelfTest()
     a->cell.x = 5;
     a->cell.y = 6;
     a->flags = 0x10000000u;
+    UnitMotion* motion = (UnitMotion*)SimAlloc(sizeof(UnitMotion));
+    Unit* aimed = &pool[7];
+    a->motion = motion;
+    a->weapons[0].aimTargetZOrUnitSentinel = (short)0x8000;
+    a->weapons[0].aimTargetXOrUnitId = 7;
+    a->weapons[1].aimTargetXOrUnitId = 6;
+    a->weapons[1].aimTargetZOrUnitSentinel = 5;
+    aimed->unitDefIndex = 9;
+    aimed->health = 77;
+    aimed->motion = motion;
+    motion->velocity.x = 11;
+    unsigned int* mask = (unsigned int*)SimAlloc(64);
+    memset(mask, 0, 64);
+    mask[0] = 0x12345678u;
+    mask[15] = 0x80000001u;
+    def->categories = mask;
 
     ReplayText text;
     ReplayKnown recorded;
@@ -1196,6 +1212,13 @@ void ObjectSelfTest()
     Check(strstr(text.Data(), "  r Player#3.totalEnergyProduced f64:0x405ee00000000000\n") != nullptr, "a double is written as its bits");
     Check(strstr(text.Data(), "  r Player#3.allied x:0000000100000000000000\n") != nullptr, "an array of bytes is written in hex");
     Check(strstr(text.Data(), "  r Unit#2.cell (5,6)\n") != nullptr, "a cell is written as a point");
+    Check(strstr(text.Data(), "  r Unit#7.unitDefIndex 9\n") != nullptr, "a unit named by the id of a weapon slot is reached");
+    Check(strstr(text.Data(), "  r Unit#7.health") == nullptr, "and only the fields of its reach are recorded");
+    Check(strstr(text.Data(), "  r Unit#6.") == nullptr, "a slot that holds a position, not an id, is not followed");
+    Check(strstr(text.Data(), "  r UnitMotion#1.velocityX 11\n") != nullptr, "the reach of the unit leads on to its motion");
+    Check(strstr(text.Data(), "weapon0TargetUnit") == nullptr, "a unit-id field is never written as a line");
+    Check(strstr(text.Data(), "  r UnitDef#1.categories x:78563412") != nullptr && strstr(text.Data(), "01000080\n") != nullptr, "the bytes behind a raw pointer are written in hex");
+    Check(strstr(text.Data(), "  r UnitDef#1.weaponCategories0 null\n") != nullptr, "a null raw pointer is null");
 
     ResetBlock();
     g_callIndex = 0;
@@ -1226,6 +1249,10 @@ void ObjectSelfTest()
     Check(ra->player.get() == rebuilt && rb->player.get() == rebuilt, "the units point back at the player");
     Check(ra->resourceSlot.energyMake == 2.5f && ra->resourceSlot.player.get() == rebuilt, "the account inside a unit is restored in the unit");
     Check(rebuilt->econ.get() != nullptr && rebuilt->econ.get()->energyMake == 7.0f, "a separate account is rebuilt");
+    Unit* raimed = (Unit*)ReplayResolveObject("Unit#7", nullptr, g_objects, AllocObject);
+    Check(raimed != nullptr && raimed->unitDefIndex == 9 && raimed->motion.get() != nullptr && raimed->motion.get()->velocity.x == 11, "the unit named by an id is rebuilt in its slot, with its motion");
+    Check(raimed != nullptr && raimed->health == 0, "and nothing else of it");
+    Check(ra->def.get()->categories != nullptr && ra->def.get()->categories[0] == 0x12345678u && ra->def.get()->categories[15] == 0x80000001u && ra->def.get()->weaponCategories[0] == nullptr, "a raw pointer is rebuilt to bytes the replayer owns");
     Check(rebuilt->totalEnergyProduced == 123.5 && rebuilt->allied[3] == 1 && rebuilt->allied[2] == 0, "a double and an array of bytes are restored");
 
     ReplayText again;

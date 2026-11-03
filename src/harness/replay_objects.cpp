@@ -10,6 +10,7 @@
 #pragma pack(pop)
 #include "../game/los_helpers.h"
 #include "../network/player.h"
+#include "../state/sim_globals.h"
 #include "../units/unit.h"
 #include "replay_text.h"
 #include "replay_types.h"

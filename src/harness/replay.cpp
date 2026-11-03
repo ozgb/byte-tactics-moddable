@@ -6,9 +6,12 @@
 #include <vector>
 
 #include "replay_schema.h"
+#include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/rand_stream.h"
+#include "../game/los_helpers.h"
+#include "../state/game_rand.h"
 #include "../util/vec3.h"
 #include "../units/unit.h"
 #include "replay_text.h"

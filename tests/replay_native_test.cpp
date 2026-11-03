@@ -236,6 +236,15 @@ void AddVec3(ReplayText& t, const Vec3* v)
     ReplayValue(t, *v);
 }
 
+void AddVec3Xz(ReplayText& t, const Vec3* v)
+{
+    t.AddChar('(');
+    t.AddInt(v->x);
+    t.AddChar(',');
+    t.AddInt(v->z);
+    t.AddChar(')');
+}
+
 void AddObject(ReplayText& t, unsigned kind, const void* p)
 {
     static const char* const names[] = { "file#", "rec#", "bank#" };

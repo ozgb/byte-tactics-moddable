@@ -1391,12 +1391,11 @@ int __stdcall RecTargetingGetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
     SlotScope scope(RSL_TARGETING_GETWEAPONTARGETPOS, SUB_TARGETING, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgStruct(s_call, "a", "pos", ROK_VEC3, a1);
         ArgValue(s_call, "weapon", a2);
     }
     int result = s_inner_targeting->GetWeaponTargetPos(a0, a1, a2);
     if (scope.Open()) {
-        ArgStruct(s_tail, "o", "pos", ROK_VEC3, a1);
+        if (result != 0) ArgStruct(s_tail, "o", "pos", ROK_VEC3, a1);
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
@@ -2124,7 +2123,7 @@ int __stdcall RecUnitsGetGroundHeight(Vec3* a0)
     ReplayText line;
     if (scope.Import()) {
         line.Add("  i units.GetGroundHeight");
-        ImportVec3(line, "pos", a0);
+        ImportVec3Xz(line, "pos", a0);
     }
     int result = s_inner_units->GetGroundHeight(a0);
     if (scope.Import()) {

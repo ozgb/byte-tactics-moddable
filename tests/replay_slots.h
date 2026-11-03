@@ -209,7 +209,7 @@ int __stdcall Imp_units_GetGroundHeight(Vec3* a0)
     StartImport(t, "units.GetGroundHeight");
     Space(t);
     t.Add("pos=");
-    AddVec3(t, a0);
+    AddVec3Xz(t, a0);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
@@ -628,7 +628,6 @@ void Run_targeting_GetWeaponTargetPos()
 {
     Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
     memset(&g_out_targeting_GetWeaponTargetPos_1, 0, sizeof g_out_targeting_GetWeaponTargetPos_1);
-    ParseStruct("pos", ROK_VEC3, &g_out_targeting_GetWeaponTargetPos_1);
     int p2 = ArgScalar<int>("weapon");
     SetClosing("pos.", "result");
     g_result_targeting_GetWeaponTargetPos = g_seams.targeting->GetWeaponTargetPos(p0, &g_out_targeting_GetWeaponTargetPos_1, p2);
@@ -636,7 +635,7 @@ void Run_targeting_GetWeaponTargetPos()
 
 void After_targeting_GetWeaponTargetPos()
 {
-    CompareStruct("pos", ROK_VEC3, &g_out_targeting_GetWeaponTargetPos_1);
+    if (g_result_targeting_GetWeaponTargetPos != 0) CompareStruct("pos", ROK_VEC3, &g_out_targeting_GetWeaponTargetPos_1);
     CompareResult(g_result_targeting_GetWeaponTargetPos);
 }
 

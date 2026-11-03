@@ -361,6 +361,17 @@ void ImportVec3(ReplayText& t, const char* label, const Vec3* v)
     ReplayValue(t, *v);
 }
 
+void ImportVec3Xz(ReplayText& t, const char* label, const Vec3* v)
+{
+    t.AddChar(' ');
+    t.Add(label);
+    t.Add("=(");
+    t.AddInt(v->x);
+    t.AddChar(',');
+    t.AddInt(v->z);
+    t.AddChar(')');
+}
+
 void ImportPending(ReplayText& t)
 {
     t.Add(" ?");

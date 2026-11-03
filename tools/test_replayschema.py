@@ -181,27 +181,40 @@ class TargetingForms(unittest.TestCase):
     def generated(self, ann=None):
         return rs.generate(rs.read_rows(), ann or annotations())
 
-    def test_a_pos_the_slot_both_reads_and_writes_is_in_out(self):
+    def test_a_pos_the_call_writes_only_on_success_is_an_out_struct_with_a_condition(self):
         _, _, model = self.generated()
         slots = model["subsystems"]["targeting"]["slots"]
-        self.assertEqual([a["dir"] for a in slots["GetWeaponTargetPos"]["args"] if a["mode"] == "struct"], ["inout"])
+        pos = [a for a in slots["GetWeaponTargetPos"]["args"] if a["mode"] == "struct"][0]
+        self.assertEqual((pos["dir"], pos["when"]), ("out", "result != 0"))
         self.assertEqual([a["dir"] for a in slots["SetWeaponTargetPos"]["args"] if a["mode"] == "struct"], ["in"])
 
-    def test_an_in_out_struct_is_recorded_on_entry_and_on_exit(self):
+    def test_a_conditional_out_struct_is_recorded_only_when_the_result_is_nonzero(self):
         files, _, _ = self.generated()
         hooks = files[rs.HOOKS_H]
         body = hooks[hooks.index("RecTargetingGetWeaponTargetPos"):]
         body = body[:body.index("\n}\n")]
-        self.assertIn('ArgStruct(s_call, "a", "pos", ROK_VEC3, a1);', body)
-        self.assertIn('ArgStruct(s_tail, "o", "pos", ROK_VEC3, a1);', body)
+        self.assertIn('if (result != 0) ArgStruct(s_tail, "o", "pos", ROK_VEC3, a1);', body)
+        self.assertNotIn('ArgStruct(s_call, "a", "pos"', body)
 
-    def test_an_in_out_struct_is_fed_to_the_module_and_compared_after(self):
+    def test_a_conditional_out_struct_is_compared_only_when_the_result_is_nonzero(self):
         files, _, _ = self.generated()
         runner = files[rs.SLOTS_H]
-        body = runner[runner.index("void Run_targeting_GetWeaponTargetPos"):]
+        body = runner[runner.index("void After_targeting_GetWeaponTargetPos"):]
         body = body[:body.index("\n}\n")]
-        self.assertIn('ParseStruct("pos", ROK_VEC3', body)
-        self.assertIn('SetClosing("pos.", "result")', body)
+        self.assertIn('if (g_result_targeting_GetWeaponTargetPos != 0) CompareStruct("pos", ROK_VEC3', body)
+
+    def test_a_condition_on_anything_else_is_an_error(self):
+        ann = annotations()
+        ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["when"] = "result == 0"
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("`when` is only `result != 0`" in e for e in errors), errors)
+
+    def test_an_import_may_print_only_the_axes_it_reads(self):
+        files, _, _ = self.generated()
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecUnitsGetGroundHeight"):]
+        self.assertIn('ImportVec3Xz(line, "pos", a0);', body[:body.index("\n}\n")])
+        self.assertIn("AddVec3Xz(t, a0);", files[rs.SLOTS_H])
 
     def test_a_vec3_out_of_an_import_is_recorded_after_the_call_and_applied_by_the_stub(self):
         files, _, _ = self.generated()

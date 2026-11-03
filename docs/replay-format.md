@@ -161,11 +161,11 @@ sets). The annotations hold what no header says:
 | `text` | `char*` | `a name "text"` |
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
 | `object` | a pointer to a state kind, in | `a player Player#1`, its fields as `r` and `w` |
-| `struct` (`dir` in, out or inout) | a pointer to a value kind | `a params.field value` in, `o params.field value` out; `inout` writes both, so the replay feeds the incoming value (`a pos.y 65536`) and compares the outgoing one (`o pos.y 131072`) |
+| `struct` (`dir` in or out) | a pointer to a value kind | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local) |
 | `argv` | `CommandArgs*` | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length) |
 | `weapon` | `WeaponDef*` | `weapondef#17` |
-| `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line; with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
+| `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for an import that reads only those (`GetGroundHeight`); with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
 | `units` (`dir: out`) | `std::vector<Unit*>*` an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
 
@@ -235,8 +235,8 @@ The recordings of targeting, which is native code in every mode: `orders-guard-a
 slot but `SetWeaponTargetPos`, `SetWeaponTargetUnit` 315 times, candidates from `ai.GetVisibleEnemiesInRadius`, `ChooseWeapon`),
 `orders-tier2-spider` (`SetWeaponTargetPos` 8 times, and the ground positions of `GetWeaponTargetPos`) and `skirmish4-long`, ticks
 25750 to 25770 only, where a unit with more than five kills fires at a moving unit (the scale of `GetWeaponTargetPos`). Each
-`GetWeaponTargetPos` call records the `pos` the caller passed (`a pos.y 44785512`, the stale words of its stack frame, which no code
-reads before the call writes them) and the `pos` it left (`o pos.x`).
+`GetWeaponTargetPos` that returns nonzero records the `pos` it wrote (`o pos.x`); one that returns 0 leaves the stack local of its caller untouched, so
+nothing is recorded of it.
 
 ### Against the WASM module
 

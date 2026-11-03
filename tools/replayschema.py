@@ -398,6 +398,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             order = list(field_index)
             args = [classify_arg(p, note.get("args", {}).get(p["name"]), ann) for p in s["params"]]
             for a in args:
+                if a.get("when") and (a["mode"] != "struct" or a.get("dir") != "out" or a["when"] != "result != 0" or s["ret"] == "void"):
+                    errors.append("%s.%s(%s): `when` is only `result != 0`, on an out struct of a slot that returns a value" % (sub, s["name"], a["name"]))
                 if a["mode"] == "units":
                     errors += resolve_reach("%s.%s(%s)" % (sub, s["name"], a["name"]), a, a["kind"], ann, object_fields, object_index, reach_table)
             result = classify_result(s["ret"], note.get("result"), ann)
@@ -716,10 +718,11 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "i":
             return ["ImportObject(line, ROK_%s, %s);" % (upper(a["kind"]), var)]
     elif mode == "struct":
-        if a.get("dir", "in") in ("in", "inout") and phase == "a":
+        if a.get("dir", "in") == "in" and phase == "a":
             return ['ArgStruct(s_call, "a", "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
-        if a.get("dir") in ("out", "inout") and phase == "o":
-            return ['ArgStruct(s_tail, "o", "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
+        if a.get("dir") == "out" and phase == "o":
+            guard = "if (result != 0) " if a.get("when") else ""
+            return ['%sArgStruct(s_tail, "o", "%s", ROK_%s, %s);' % (guard, line, upper(a["kind"]), var)]
     elif mode == "argv":
         if phase == "a":
             return ["ArgArgv(s_call, %s);" % var]
@@ -734,7 +737,7 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "a":
             return ['ArgVec3(s_call, "%s", %s);' % (line, var)]
         if phase == "i":
-            return ['ImportVec3(line, "%s", %s);' % (a.get("label", line), var)]
+            return ['ImportVec3%s(line, "%s", %s);' % ("Xz" if a.get("axes") == "xz" else "", a.get("label", line), var)]
     elif mode == "units":
         return []
     elif mode == "bytes-in":
@@ -822,7 +825,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") == "out" for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -863,7 +866,7 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
         elif m == "units":
             pass
         elif m == "vec3":
-            L.append('    Space(t);\n    t.Add("%s=");\n    AddVec3(t, %s);' % (a.get("label", a["line"]), v))
+            L.append('    Space(t);\n    t.Add("%s=");\n    AddVec3%s(t, %s);' % (a.get("label", a["line"]), "Xz" if a.get("axes") == "xz" else "", v))
         elif m == "object":
             L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), v))
         elif m == "bytes-in":
@@ -933,10 +936,9 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
                 g = "g_out_%s_%s_%d" % (sub, slot, i)
                 head.append("%s %s;" % (ctype, g))
                 L.append("    memset(&%s, 0, sizeof %s);" % (g, g))
-                if a["dir"] == "inout":
-                    L.append('    ParseStruct("%s", ROK_%s, &%s);' % (line, upper(a["kind"]), g))
                 closing.append(line + ".")
-                after.append('    CompareStruct("%s", ROK_%s, &%s);' % (line, upper(a["kind"]), g))
+                guard = "if (%s != 0) " % ("g_result_%s_%s" % (sub, slot)) if a.get("when") else ""
+                after.append('    %sCompareStruct("%s", ROK_%s, &%s);' % (guard, line, upper(a["kind"]), g))
                 call.append("&" + g)
         elif m == "argv":
             L.append("    ArgvHolder %s;\n    ParseArgv(%s);" % (v, v))

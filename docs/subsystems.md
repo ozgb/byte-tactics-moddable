@@ -751,7 +751,7 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | network | 54 of 297 | 18.2% | 10.9% | 3.9% | 243 | 74 |
 | platform | 388 of 736 | 52.7% | 39.5% | 25.9% | 348 | 84 |
 | presentation | 567 of 1146 | 49.5% | 37.3% | 29.3% | 579 | 295 |
-| seams | 100 of 110 | 90.9% | 95.7% | - | 10 | 0 |
+| seams | 99 of 109 | 90.8% | 95.7% | - | 10 | 0 |
 | state | 496 of 566 | 87.6% | 70.3% | 49.8% | 70 | 58 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.

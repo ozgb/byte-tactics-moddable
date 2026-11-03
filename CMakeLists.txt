@@ -253,7 +253,7 @@ add_custom_command(
 add_custom_command(
   OUTPUT "${CMAKE_BINARY_DIR}/TotalA.exe"
   COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:windows,4.0 /base:0x400000 /fixed /dynamicbase:no /largeaddressaware:no /errorlimit:0 /entry:WinMainCRTStartup /include:_WinMainCRTStartup /out:${CMAKE_BINARY_DIR}/TotalA.exe
-          /libpath:${CMAKE_BINARY_DIR}/lib /opt:noref,noicf /incremental:no /safeseh:no /force:multiple /map:${CMAKE_BINARY_DIR}/TotalA.map
+          /libpath:${CMAKE_BINARY_DIR}/lib /opt:noref,noicf /incremental:no /brepro /safeseh:no /force:multiple /map:${CMAKE_BINARY_DIR}/TotalA.map
           "@${CMAKE_BINARY_DIR}/objs/objects.rsp" "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res"
           ${ZLIB_OBJECTS} ${IMPORT_LIBS} ${SYSTEM_LIBS} $<TARGET_FILE:wasmloader>
   DEPENDS game data extra wasmloader ${PROFILE_TARGETS} ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res" ${IMPORT_LIBS}

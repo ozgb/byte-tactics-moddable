@@ -131,6 +131,10 @@ runs that are not gates). Run either on a fresh prefix (remove
 `build/playtest/prefix` first). `reference/README.md`, "Gate", says which
 changes need a gate. Say in the pull request which one you ran.
 
+A passing `--check` is cached in `~/.cache/bt-gate/`, keyed on the exe, the runtime files, `reference/` and the gate tools; a
+repeat on the same inputs reports `cached pass from <date> at <commit>` and counts as a gate run (write "cached" in the pull
+request). `--no-cache` plays anyway.
+
 **When traces diverge**, the divergence report names the first tick, phase and
 field that differ. Find the smallest part of your change that causes it, and
 fix that part. Only report a check as passing when you ran it and it passed.

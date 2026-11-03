@@ -4038,7 +4038,7 @@ void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int wid
     char directory[] = "frames";
     char path[32];
     MakeDirectoryPath(directory);
-    FormatPath(path, "frames\\%u.bin", tick);
+    sprintf(path, "frames\\%u.bin", tick);
     FILE* f = fopen(path, "wb");
     if (f == nullptr) {
         sprintf(msg, "testmode: cannot write %s\n", path);

@@ -55,6 +55,7 @@ OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "r
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
                "unitid": "UNITID", "rawbytes": "RAWBYTES", "array": "ARRAY"}
+INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?(\w+)(?:>>(\d+))?\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
            "bool", "float", "double", "Point16", "Vec3", "RandStream"}
@@ -215,12 +216,16 @@ def tracked(target: str, game: dict, sim: dict, aliases: dict | None = None) -> 
 
 
 def object_targets(target: str, ann: dict) -> list[tuple[str, str]]:
-    """(kind, field) of every object field the target `Type::member` names: the member of a kind of that type, or an alias."""
+    """(kind, field) of every object field the target `Type::member` names: the member of a state or index kind of that type, or an alias.
+
+    A value kind is not matched: the fields of a struct argument are recorded as its lines, never as `r` and `w` lines of an object."""
     if "::" not in target:
         return []
     type_name, member = target.split("::", 1)
     hits = []
     for kind, spec in ann["objects"].items():
+        if spec["scope"] == "value":
+            continue
         for f in spec["fields"]:
             if (spec["type"] == type_name and f["name"] == member) or target in f.get("aliases", []):
                 hits.append((kind, f["name"]))
@@ -339,6 +344,50 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
     else:
         out["mode"] = "pending"
     return out
+
+
+ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "pending"}
+RESULT_MODES = {"scalar", "object", "text", "weapon", "value", "pending"}
+
+
+def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) -> list[str]:
+    """Errors for the struct forms of a slot: the kind must be a value kind of the argument's type, a count must name an integer argument."""
+    errors = []
+    kinds = ann["objects"]
+    names = [a["name"] for a in args]
+
+    def value_kind(item: dict, label: str, pointer: bool) -> None:
+        spec = kinds.get(item.get("kind"))
+        if spec is None or spec["scope"] != "value":
+            errors.append("%s: %s needs a `kind` that is a value kind of the schema" % (where, label))
+        elif item["type"] != spec["type"] + ("*" if pointer else ""):
+            errors.append("%s: %s is %s, and the kind %s is %s" % (where, label, item["type"], item["kind"], spec["type"] + ("*" if pointer else "")))
+
+    for a in args:
+        label = "the argument %s" % a["name"]
+        if a["mode"] not in ARG_MODES:
+            errors.append("%s: %s has the unknown mode %s" % (where, label, a["mode"]))
+        elif a["mode"] == "struct":
+            value_kind(a, label, True)
+            if a.get("nullable") and a.get("dir", "in") != "in":
+                errors.append("%s: %s is an out struct, and only a struct in can be nullable" % (where, label))
+        elif a["mode"] == "structs":
+            value_kind(a, label, True)
+            if a.get("dir", "in") != "in":
+                errors.append("%s: %s is an array of structs, and only an array in is recorded" % (where, label))
+            count = a.get("count")
+            if count not in names or count == a["name"]:
+                errors.append("%s: %s needs a `count` that names another argument" % (where, label))
+            elif args[names.index(count)]["type"] not in INTEGER_ARGS:
+                errors.append("%s: the count %s of %s is no integer" % (where, count, a["name"]))
+        elif a["mode"] == "value":
+            value_kind(a, label, False)
+    if result is not None:
+        if result["mode"] not in RESULT_MODES:
+            errors.append("%s: the result has the unknown mode %s" % (where, result["mode"]))
+        elif result["mode"] == "value":
+            value_kind(result, "the result", False)
+    return errors
 
 
 def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]]) -> dict:
@@ -479,6 +528,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 if a["mode"] == "units":
                     errors += resolve_reach("%s.%s(%s)" % (sub, s["name"], a["name"]), a, a["kind"], ann, object_fields, object_index, reach_table)
             result = classify_result(s["ret"], note.get("result"), ann)
+            errors += check_forms("%s.%s" % (sub, s["name"]), args, result, ann)
             for a in args:
                 if a["mode"] == "pending":
                     pending["args"].append("%s(%s)" % (s["name"], a["name"]))
@@ -782,6 +832,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     for a in s["args"]:
         if a.get("length"):
             a["lengthIndex"] = names.index(a["length"])
+        if a.get("count") in names:
+            a["countIndex"] = names.index(a["count"])
     L = ["%s %s Rec%s%s(%s)" % (ret, s["conv"], camel(sub), slot, params), "{"]
     L.append("    ReplayRoots roots;")
     for i, a in enumerate(s["args"]):
@@ -821,7 +873,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     L.append("    if (scope.Open()) {")
     for i, a in enumerate(s["args"]):
         L += ["        " + x for x in arg_out(a, i, "o", objects)]
-    if res is not None and res["mode"] in ("scalar", "object"):
+    if res is not None and res["mode"] in ("scalar", "object", "value"):
         L += ["        " + x for x in result_out(res, objects, "o")]
     L.append("    }")
     if ret != "void":
@@ -864,6 +916,14 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if a.get("dir") == "out" and phase == "o":
             guard = "if (result != 0) " if a.get("when") else ""
             return ['%sArgStruct(s_tail, "o", "%s", ROK_%s, %s);' % (guard, line, upper(a["kind"]), var)]
+    elif mode == "structs":
+        if phase == "a":
+            return ['ArgStructs(s_call, "%s", ROK_%s, %s, (int)a%d);' % (line, upper(a["kind"]), var, a.get("countIndex", 0))]
+    elif mode == "value":
+        if phase == "a":
+            return ['ArgValueStruct(s_call, "a", "%s", ROK_%s, &%s);' % (line, upper(a["kind"]), var)]
+        if phase == "i":
+            return ["ImportValueStruct(line, ROK_%s, &%s);" % (upper(a["kind"]), var)]
     elif mode == "argv":
         if phase == "a":
             return ["ArgArgv(s_call, %s);" % var]
@@ -911,6 +971,8 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
             return ['ArgValue(s_tail, "result", result, "o");']
         if mode == "object":
             return ['ArgObject(s_tail, "result", ROK_%s, result, "o");' % upper(res["kind"])]
+        if mode == "value":
+            return ['ArgValueStruct(s_tail, "o", "result", ROK_%s, &result);' % upper(res["kind"])]
         return []
     lines = []
     if mode == "scalar":
@@ -922,6 +984,8 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
         lines.append("ImportResultObjectReach(line, ROK_%s, result, %d, %s);" % (upper(res["kind"]), len(res["reach"]), reach))
     elif mode == "object":
         lines.append("ImportResultObject(line, ROK_%s, result);" % upper(res["kind"]))
+    elif mode == "value":
+        lines.append("ImportResultValue(line, ROK_%s, &result);" % upper(res["kind"]))
     elif mode == "weapon":
         reach = ", ".join('"%s"' % f for f in res.get("reach", []))
         lines.append("ImportResultWeapon(line, result, %d%s);" % (len(res.get("reach", [])), (", " + reach) if reach else ""))
@@ -966,7 +1030,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") == "out" for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") == "out" for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -1012,6 +1076,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), v))
         elif m == "bytes-in":
             L.append("    Space(t);\n    AddBytes(t, %s, a%d);" % (v, a["lengthIndex"]))
+        elif m == "value":
+            L.append("    Space(t);\n    AddValueStruct(t, ROK_%s, &%s);" % (upper(a["kind"]), v))
         else:
             L.append("    Space(t);\n    t.Add(\"?\");")
     L.append("    const char* r = Enter(t);")
@@ -1027,6 +1093,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
         L.append("    (void)r;")
     elif res["mode"] == "scalar":
         L.append("    return ParseResult<%s>(r);" % s["ret"])
+    elif res["mode"] == "value":
+        L.append("    return ParseValueText<%s>(ROK_%s, r);" % (s["ret"], upper(res["kind"])))
     elif res["mode"] == "object":
         L.append("    %s o = (%s)ReplayResolveObject(r, nullptr, g_objects, AllocObject);" % (s["ret"], s["ret"]))
         for f in res.get("reach", []):
@@ -1044,6 +1112,10 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
 
 
 def runner(sub: str, slot: str, s: dict) -> list[str]:
+    names = [a["name"] for a in s["args"]]
+    for a in s["args"]:
+        if a.get("count") in names:
+            a["countIndex"] = names.index(a["count"])
     head = []
     L = ["void Run_%s_%s()" % (sub, slot), "{"]
     call = []
@@ -1069,7 +1141,11 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
             call.append(v)
         elif m == "struct":
             ctype = a["type"][:-1]
-            if a.get("dir", "in") == "in":
+            if a.get("dir", "in") == "in" and a.get("nullable"):
+                L.append("    %s %s_value;\n    memset(&%s_value, 0, sizeof %s_value);" % (ctype, v, v, v))
+                L.append('    %s* %s = (%s*)ParseStructOpt("%s", ROK_%s, &%s_value);' % (ctype, v, ctype, line, upper(a["kind"]), v))
+                call.append(v)
+            elif a.get("dir", "in") == "in":
                 L.append("    %s %s;\n    memset(&%s, 0, sizeof %s);" % (ctype, v, v, v))
                 L.append('    ParseStruct("%s", ROK_%s, &%s);' % (line, upper(a["kind"]), v))
                 call.append("&" + v)
@@ -1081,6 +1157,13 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
                 guard = "if (%s != 0) " % ("g_result_%s_%s" % (sub, slot)) if a.get("when") else ""
                 after.append('    %sCompareStruct("%s", ROK_%s, &%s);' % (guard, line, upper(a["kind"]), g))
                 call.append("&" + g)
+        elif m == "structs":
+            counted = s["args"][a.get("countIndex", 0)]
+            L.append("    StructsHolder %s;\n    %s.Parse(\"%s\", ROK_%s, ArgScalar<int>(\"%s\"));" % (v, v, line, upper(a["kind"]), counted["line"]))
+            call.append("(%s*)%s.data" % (a["type"][:-1], v))
+        elif m == "value":
+            L.append("    %s %s = %s();\n    ParseValueArg(\"%s\", ROK_%s, &%s);" % (t, v, t, line, upper(a["kind"]), v))
+            call.append(v)
         elif m == "argv":
             L.append("    ArgvHolder %s;\n    ParseArgv(%s);" % (v, v))
             call.append("&%s.args" % v)
@@ -1088,7 +1171,7 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
             L.append("    ArgPending();")
             call.append("0")
     res = s["result"]
-    if res is not None and res["mode"] in ("scalar", "object"):
+    if res is not None and res["mode"] in ("scalar", "object", "value"):
         closing.append("result")
     L.append("    SetClosing(%s);" % (", ".join('"%s"' % c for c in closing) if closing else "nullptr"))
     expr = "g_seams.%s->%s(%s)" % (sub, slot, ", ".join(call))
@@ -1102,6 +1185,8 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
             after.append("    CompareObjectResult(ROK_%s, %s);" % (upper(res["kind"]), g))
         elif res["mode"] == "scalar":
             after.append("    CompareResult(%s);" % g)
+        elif res["mode"] == "value":
+            after.append("    CompareValueResult(ROK_%s, &%s);" % (upper(res["kind"]), g))
     L += ["}", ""]
     out = head + [""] if head else []
     out += L

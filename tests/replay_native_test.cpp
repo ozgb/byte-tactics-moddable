@@ -598,6 +598,72 @@ void ParseStruct(const char* name, unsigned kind, void* object)
     }
 }
 
+void* ParseStructOpt(const char* name, unsigned kind, void* storage)
+{
+    const char* value = ArgLine(name);
+    if (value != nullptr && strcmp(value, "null") == 0)
+        return nullptr;
+    ParseStruct(name, kind, storage);
+    return storage;
+}
+
+struct StructsHolder {
+    StructsHolder() : data(nullptr) {}
+    ~StructsHolder() { free(data); }
+    void Parse(const char* name, unsigned kind, int count)
+    {
+        const char* value = ArgLine(name);
+        if (value != nullptr && strcmp(value, "null") == 0)
+            return;
+        unsigned size = kReplayObjectKinds[kind].size;
+        if (count < 0 || count > (1 << 20))
+            Fatal(g_file, g_callIndex, "an array of structs that is too long", name);
+        data = (unsigned char*)calloc((unsigned)count + 1, size);
+        for (int i = 0; i < count; i++) {
+            char element[96];
+            sprintf(element, "%.80s[%d]", name, i);
+            ParseStruct(element, kind, data + (unsigned)i * size);
+        }
+    }
+    unsigned char* data;
+
+private:
+    StructsHolder(const StructsHolder&);
+    StructsHolder& operator=(const StructsHolder&);
+};
+
+void ParseValueArg(const char* name, unsigned kind, void* object)
+{
+    const char* value = ArgLine(name);
+    if (value != nullptr)
+        ReplayParseValue(kind, value, object, g_objects, nullptr);
+}
+
+void AddValueStruct(ReplayText& t, unsigned kind, const void* object)
+{
+    ReplayAddValue(t, kind, object, g_objects);
+}
+
+template <class T> T ParseValueText(unsigned kind, const char* text)
+{
+    T value = T();
+    ReplayParseValue(kind, text, &value, g_objects, nullptr);
+    return value;
+}
+
+void CompareValueResult(unsigned kind, const void* object)
+{
+    ReplayText value;
+    AddValueStruct(value, kind, object);
+    HashText(value.Data());
+    const char* recorded = OutLine("result");
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff("result", recorded, value.Data());
+    value.Free();
+}
+
 void CompareStruct(const char* name, unsigned kind, const void* object)
 {
     ReplayText value;
@@ -1634,6 +1700,125 @@ void ArraySelfTest()
     delete table;
 }
 
+void FormSelfTest()
+{
+    printf("struct forms\n");
+    ResetBlock();
+    ReplayText t;
+    Vec3 pos = { 1, -2, 3 };
+    ReplayAddStruct(t, "a", "pos", ROK_VEC3, &pos, g_objects);
+    Check(strcmp(t.Data(), "  a pos.x 1\n  a pos.y -2\n  a pos.z 3\n") == 0, "a struct in is a line per field");
+    LoadCall(t.Data());
+    Vec3 got = { 0, 0, 0 };
+    Vec3* p = (Vec3*)ParseStructOpt("pos", ROK_VEC3, &got);
+    Check(p == &got && got.x == 1 && got.y == -2 && got.z == 3, "and replays to the same struct");
+    t.Clear();
+    ReplayAddStruct(t, "a", "pos", ROK_VEC3, nullptr, g_objects);
+    Check(strcmp(t.Data(), "  a pos null\n") == 0, "a null struct in is one line");
+    LoadCall(t.Data());
+    Vec3 untouched = { 5, 5, 5 };
+    Check(ParseStructOpt("pos", ROK_VEC3, &untouched) == nullptr && untouched.x == 5, "and replays to a null pointer");
+    t.Clear();
+    ReplayAddStruct(t, "a", "pos", ROK_VEC3, &pos, g_objects);
+    LoadCall("  a pos.x 1\n  a pos.y -2\n  a pos.z 9\n");
+    got.x = got.y = got.z = 0;
+    ParseStructOpt("pos", ROK_VEC3, &got);
+    BeginCompare();
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != ROK_VEC3)
+            continue;
+        ReplayText want;
+        ReplayText have;
+        ReplayFormatObjectField(f, &pos, g_objects, false, want);
+        ReplayFormatObjectField(f, &got, g_objects, false, have);
+        if (strcmp(want.Data(), have.Data()) != 0) {
+            char key[32];
+            sprintf(key, "pos.%s", f.name);
+            Diff(key, want.Data(), have.Data());
+        }
+        want.Free();
+        have.Free();
+    }
+    printf("a changed field: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "pos.z") == 0, "a changed field of a struct in is reported at its name");
+
+    printf("arrays of structs\n");
+    Point16 points[3] = { { 1, 2 }, { 3, 4 }, { -5, 6 } };
+    t.Clear();
+    ReplayAddStructs(t, "a", "points", ROK_POINT16, points, 3, g_objects);
+    Check(strstr(t.Data(), "  a points[0].x 1\n  a points[0].y 2\n  a points[1].x 3\n") == t.Data() && strstr(t.Data(), "  a points[2].y 6\n") != nullptr, "an array of structs is a line per field of each element");
+    LoadCall(t.Data());
+    StructsHolder holder;
+    holder.Parse("points", ROK_POINT16, 3);
+    Point16* back = (Point16*)holder.data;
+    Check(back != nullptr && back[0].x == 1 && back[1].y == 4 && back[2].x == -5 && back[2].y == 6, "and replays to the same elements");
+    t.Clear();
+    ReplayAddStructs(t, "a", "points", ROK_POINT16, nullptr, 0, g_objects);
+    Check(strcmp(t.Data(), "  a points null\n") == 0, "a null array is null");
+    LoadCall(t.Data());
+    StructsHolder none;
+    none.Parse("points", ROK_POINT16, 0);
+    Check(none.data == nullptr, "and replays to a null pointer");
+    t.Clear();
+    ReplayAddStructs(t, "a", "points", ROK_POINT16, points, 0, g_objects);
+    Check(strcmp(t.Data(), "  a points []\n") == 0, "an empty array is []");
+    LoadCall(t.Data());
+    StructsHolder empty;
+    empty.Parse("points", ROK_POINT16, 0);
+    Check(empty.data != nullptr, "and replays to a pointer to nothing");
+    LoadCall("  a points[0].x 1\n  a points[0].y 2\n  a points[1].x 3\n  a points[1].y 5\n  a points[2].x -5\n  a points[2].y 6\n");
+    StructsHolder changed;
+    changed.Parse("points", ROK_POINT16, 3);
+    BeginCompare();
+    for (int e = 0; e < 3; e++) {
+        for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+            const ReplayObjectField& f = kReplayObjectFields[i];
+            if (f.object != ROK_POINT16)
+                continue;
+            ReplayText want;
+            ReplayText have;
+            ReplayFormatObjectField(f, &points[e], g_objects, false, want);
+            ReplayFormatObjectField(f, changed.data + e * sizeof(Point16), g_objects, false, have);
+            if (strcmp(want.Data(), have.Data()) != 0) {
+                char key[48];
+                sprintf(key, "points[%d].%s", e, f.name);
+                Diff(key, want.Data(), have.Data());
+            }
+            want.Free();
+            have.Free();
+        }
+    }
+    printf("a changed element: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "points[1].y") == 0, "a changed element is reported at its index and field");
+
+    printf("by-value structs\n");
+    Angles16 angles = { -3, 40000, 7 };
+    t.Clear();
+    AddValueStruct(t, ROK_ANGLES16, &angles);
+    Check(strcmp(t.Data(), "(-3,40000,7)") == 0, "a struct by value is its fields in order");
+    Angles16 parsed = ParseValueText<Angles16>(ROK_ANGLES16, t.Data());
+    Check(parsed.bank == -3 && parsed.heading == 40000 && parsed.pitch == 7, "and parses back");
+    MissionType mission(5);
+    t.Clear();
+    AddValueStruct(t, ROK_MISSIONTYPE, &mission);
+    Check(strcmp(t.Data(), "(5)") == 0, "a one-field struct keeps its parentheses");
+    MissionType again = ParseValueText<MissionType>(ROK_MISSIONTYPE, "(5)");
+    Check(again.index == 5, "and parses back");
+    Check(!ReplayParseValue(ROK_ANGLES16, "(1,2)", &parsed, g_objects, nullptr) && !ReplayParseValue(ROK_ANGLES16, "1,2,3", &parsed, g_objects, nullptr), "a malformed value is refused");
+    LoadCall("  a kind (5)\n  o result (-3,40000,7)\n");
+    MissionType arg;
+    ParseValueArg("kind", ROK_MISSIONTYPE, &arg);
+    Check(arg.index == 5, "an argument by value replays");
+    BeginCompare();
+    CompareValueResult(ROK_ANGLES16, &angles);
+    Check(g_diffs == 0, "a result by value that is the same compares equal");
+    angles.heading = 40001;
+    CompareValueResult(ROK_ANGLES16, &angles);
+    printf("a changed result: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "result") == 0, "a changed result by value is reported at the result");
+    t.Free();
+}
 }
 
 int SelfTest(const char* file)
@@ -1642,6 +1827,7 @@ int SelfTest(const char* file)
     ObjectSelfTest();
     TableSelfTest();
     ArraySelfTest();
+    FormSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

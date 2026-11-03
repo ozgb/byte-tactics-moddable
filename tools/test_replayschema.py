@@ -376,6 +376,93 @@ class Arrays(unittest.TestCase):
         self.assertIn("sizeof(((Player*)nullptr)->explored) == sizeof(unsigned)", files[rs.SCHEMA_H])
 
 
+class StructForms(unittest.TestCase):
+    """N3, N4 and N10: a nullable struct in, an array of structs in, and structs by value as arguments and results."""
+
+    def generated(self, ann):
+        return rs.generate(rs.read_rows(), ann)
+
+    def targeting(self, **pos):
+        ann = annotations()
+        ann["subsystems"]["targeting"]["slots"]["SetWeaponTargetPos"]["args"]["pos"] = dict({"mode": "struct", "kind": "Vec3", "dir": "in"}, **pos)
+        return ann
+
+    def test_a_nullable_struct_is_recorded_as_null_and_replayed_as_a_null_pointer(self):
+        files, errors, _ = self.generated(self.targeting(nullable=True))
+        self.assertEqual(errors, [])
+        self.assertIn('ArgStruct(s_call, "a", "pos", ROK_VEC3, a1);', files[rs.HOOKS_H])
+        runner = files[rs.SLOTS_H]
+        body = runner[runner.index("void Run_targeting_SetWeaponTargetPos"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('Vec3* p1 = (Vec3*)ParseStructOpt("pos", ROK_VEC3, &p1_value);', body)
+        self.assertIn("g_seams.targeting->SetWeaponTargetPos(p0, p1, p2)", body)
+
+    def test_a_struct_that_is_not_nullable_is_passed_by_address(self):
+        files, _, _ = self.generated(annotations())
+        self.assertIn("g_seams.targeting->SetWeaponTargetPos(p0, &p1, p2)", files[rs.SLOTS_H])
+
+    def test_only_a_struct_in_can_be_nullable(self):
+        ann = annotations()
+        ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["nullable"] = True
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("only a struct in can be nullable" in e for e in errors), errors)
+
+    def test_an_array_of_structs_is_a_pointer_and_a_count(self):
+        files, errors, _ = self.generated(self.targeting(mode="structs", count="weapon"))
+        self.assertEqual(errors, [])
+        self.assertIn('ArgStructs(s_call, "pos", ROK_VEC3, a1, (int)a2);', files[rs.HOOKS_H])
+        runner = files[rs.SLOTS_H]
+        body = runner[runner.index("void Run_targeting_SetWeaponTargetPos"):]
+        self.assertIn('StructsHolder p1;\n    p1.Parse("pos", ROK_VEC3, ArgScalar<int>("weapon"));', body)
+        self.assertIn("g_seams.targeting->SetWeaponTargetPos(p0, (Vec3*)p1.data, p2)", body)
+
+    def test_the_count_names_another_integer_argument(self):
+        for count, want in (("nothing", "needs a `count` that names another argument"), ("pos", "needs a `count` that names another argument"), ("unit", "is no integer")):
+            _, errors, _ = self.generated(self.targeting(mode="structs", count=count))
+            self.assertTrue(any(want in e for e in errors), (count, errors))
+
+    def test_only_an_array_in_is_recorded(self):
+        _, errors, _ = self.generated(self.targeting(mode="structs", count="weapon", dir="out"))
+        self.assertTrue(any("only an array in is recorded" in e for e in errors), errors)
+
+    def test_the_kind_of_a_struct_form_is_a_value_kind_of_the_argument_type(self):
+        _, errors, _ = self.generated(self.targeting(kind="Player"))
+        self.assertTrue(any("needs a `kind` that is a value kind" in e for e in errors), errors)
+        _, errors, _ = self.generated(self.targeting(kind="Point16"))
+        self.assertTrue(any("the argument pos is Vec3*, and the kind Point16 is Point16*" in e for e in errors), errors)
+
+    def test_a_struct_by_value_is_written_as_its_fields_in_one_line(self):
+        ann = annotations()
+        orders = ann["subsystems"]["orders"].setdefault("slots", {})
+        orders.setdefault("AddOrder", {}).setdefault("args", {})["kind"] = {"mode": "value", "kind": "MissionType"}
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn('ArgValueStruct(s_call, "a", "kind", ROK_MISSIONTYPE, &a0);', files[rs.HOOKS_H])
+
+    def test_a_result_by_value_is_recorded_in_the_import_line_and_the_closing_line(self):
+        ann = annotations()
+        ann["subsystems"]["targeting"]["imports"].append("units.GetPieceAngles")
+        ann["subsystems"]["units"]["slots"]["GetPieceAngles"] = {"result": {"mode": "value", "kind": "Angles16"}}
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecUnitsGetPieceAngles"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("ImportResultValue(line, ROK_ANGLES16, &result);", body)
+        self.assertIn('ArgValueStruct(s_tail, "o", "result", ROK_ANGLES16, &result);', body)
+        self.assertIn("return ParseValueText<Angles16>(ROK_ANGLES16, r);", files[rs.SLOTS_H])
+
+    def test_a_result_by_value_of_another_type_is_an_error(self):
+        ann = annotations()
+        ann["subsystems"]["units"]["slots"]["GetPieceAngles"] = {"result": {"mode": "value", "kind": "MissionType"}}
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("the result is Angles16" in e for e in errors), errors)
+
+    def test_an_unknown_mode_is_an_error(self):
+        _, errors, _ = self.generated(self.targeting(mode="nonsense"))
+        self.assertTrue(any("unknown mode nonsense" in e for e in errors), errors)
+
+
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
         files, errors, model = rs.generate(rs.read_rows())

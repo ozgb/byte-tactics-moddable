@@ -271,21 +271,23 @@ void ArgObject(ReplayText& t, const char* name, unsigned kind, const void* p, co
 
 void ArgStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p)
 {
-    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
-        const ReplayObjectField& f = kReplayObjectFields[i];
-        if (f.object != kind)
-            continue;
-        ReplayFormatObjectField(f, p, Table(), true, s_field);
-        t.Add("  ");
-        t.Add(tag);
-        t.AddChar(' ');
-        t.Add(name);
-        t.AddChar('.');
-        t.Add(f.name);
-        t.AddChar(' ');
-        t.Add(s_field.Data());
-        t.AddChar('\n');
-    }
+    ReplayAddStruct(t, tag, name, kind, p, Table());
+}
+
+void ArgStructs(ReplayText& t, const char* name, unsigned kind, const void* p, int count)
+{
+    ReplayAddStructs(t, "a", name, kind, p, count, Table());
+}
+
+void ArgValueStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p)
+{
+    t.Add("  ");
+    t.Add(tag);
+    t.AddChar(' ');
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddValue(t, kind, p, Table());
+    t.AddChar('\n');
 }
 
 void ArgArgv(ReplayText& t, const CommandArgs* args)
@@ -364,6 +366,18 @@ void ImportVec3Xz(ReplayText& t, const char* label, const Vec3* v)
     t.AddChar(',');
     t.AddInt(v->z);
     t.AddChar(')');
+}
+
+void ImportValueStruct(ReplayText& t, unsigned kind, const void* p)
+{
+    t.AddChar(' ');
+    ReplayAddValue(t, kind, p, Table());
+}
+
+void ImportResultValue(ReplayText& t, unsigned kind, const void* p)
+{
+    t.Add(" = ");
+    ReplayAddValue(t, kind, p, Table());
 }
 
 void ImportPending(ReplayText& t)

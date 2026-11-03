@@ -1051,3 +1051,121 @@ bool ReplayIsArrayText(const char* text)
 {
     return text[0] == '[' && text[1] >= '0' && text[1] <= '9';
 }
+
+void ReplayAddStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, ReplayObjectTable& table)
+{
+    if (p == nullptr) {
+        t.Add("  ");
+        t.Add(tag);
+        t.AddChar(' ');
+        t.Add(name);
+        t.Add(" null\n");
+        return;
+    }
+    ReplayText value;
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != kind)
+            continue;
+        ReplayFormatObjectField(f, p, table, true, value);
+        t.Add("  ");
+        t.Add(tag);
+        t.AddChar(' ');
+        t.Add(name);
+        t.AddChar('.');
+        t.Add(f.name);
+        t.AddChar(' ');
+        t.Add(value.Data());
+        t.AddChar('\n');
+    }
+    value.Free();
+}
+
+void ReplayAddStructs(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, int count, ReplayObjectTable& table)
+{
+    if (p == nullptr || count <= 0) {
+        t.Add("  ");
+        t.Add(tag);
+        t.AddChar(' ');
+        t.Add(name);
+        t.Add(p == nullptr ? " null\n" : " []\n");
+        return;
+    }
+    for (int i = 0; i < count; i++) {
+        char element[96];
+        sprintf(element, "%.80s[%d]", name, i);
+        ReplayAddStruct(t, tag, element, kind, (const unsigned char*)p + (unsigned)i * kReplayObjectKinds[kind].size, table);
+    }
+}
+
+void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table)
+{
+    ReplayText value;
+    t.AddChar('(');
+    bool first = true;
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != kind)
+            continue;
+        if (!first)
+            t.AddChar(',');
+        first = false;
+        ReplayFormatObjectField(f, p, table, true, value);
+        t.Add(value.Data());
+    }
+    t.AddChar(')');
+    value.Free();
+}
+
+bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTable& table, ReplayAllocFn alloc)
+{
+    if (text[0] != '(')
+        return false;
+    const char* q = text + 1;
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != kind)
+            continue;
+        char piece[256];
+        unsigned n = 0;
+        int depth = 0;
+        bool quoted = false;
+        for (; *q != '\0'; q++) {
+            if (quoted) {
+                if (*q == '\\' && q[1] != '\0') {
+                    if (n + 2 < sizeof piece) {
+                        piece[n++] = *q;
+                        piece[n++] = q[1];
+                    }
+                    q++;
+                    continue;
+                }
+                quoted = *q != '"';
+            } else if (*q == '"') {
+                quoted = true;
+            } else if (*q == '(') {
+                depth++;
+            } else if (*q == ')' && depth == 0) {
+                break;
+            } else if (*q == ')') {
+                depth--;
+            } else if (*q == ',' && depth == 0) {
+                break;
+            }
+            if (n + 1 < sizeof piece)
+                piece[n++] = *q;
+        }
+        piece[n] = '\0';
+        if (!ReplayRestoreObjectField(f, p, piece, table, alloc))
+            return false;
+        bool last = true;
+        for (unsigned j = i + 1; j < kReplayObjectFieldCount; j++)
+            last = last && kReplayObjectFields[j].object != kind;
+        if (last)
+            break;
+        if (*q != ',')
+            return false;
+        q++;
+    }
+    return *q == ')' && q[1] == '\0';
+}

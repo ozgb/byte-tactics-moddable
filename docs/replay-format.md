@@ -157,6 +157,21 @@ lines have the same forms, against the value known after the last `r` or `w` lin
 and applies the runs to it; at the end of the call it is compared with the value the lines made known, and a difference is
 reported at the field, as `byte 25 of 32: recorded 15, replayed 14, 1 bytes differ`.
 
+## Struct arguments
+
+A struct argument is recorded by the lines of its fields (`a pos.x 1`), whatever the kind. Three more forms are for structs of
+a value kind (`scope: value`, no row of the field sets matches its fields):
+
+| Form | Annotation | Lines |
+|---|---|---|
+| nullable struct in | `{"mode": "struct", "kind": "Vec3", "dir": "in", "nullable": true}` | `a pos null` for a null pointer, else the lines of the fields; the replayer passes NULL |
+| array of structs in | `{"mode": "structs", "kind": "Point16", "count": "count"}` | `a points[0].x 1`, `a points[0].y 2`, `a points[1].x 3`, and so on for each of `count` elements (`count` names another integer argument); `a points null` and `a points []` for a null pointer and an empty array |
+| struct by value | `{"mode": "value", "kind": "Angles16"}`, for an argument or `result` | `a kind (5)`, `o result (-3,40000,7)`, and in an import line ` (5)` and ` = (-3,40000,7)`: the values of its fields in order, in parentheses, written as the field's kind writes them |
+
+`MissionType` (one field, `index`) and `Angles16` (`bank`, `heading`, `pitch`) are the kinds of the by-value form so far. The
+count of the array form is read from the count argument's own line, so the argument must be recorded. A mismatch of a result
+by value is reported at `result`, one of an element at `points[1].y`.
+
 ## Fields
 
 Block fields are named as `data/rwsets.csv` names them: `Game.windCounter` for `Game::windCounter`,
@@ -213,7 +228,9 @@ sets). The annotations hold what no header says:
 | `text` | `char*` | `a name "text"` |
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
 | `object` | a pointer to a state kind, in | `a player Player#1`, its fields as `r` and `w` |
-| `struct` (`dir` in or out) | a pointer to a value kind | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local) |
+| `struct` (`dir` in or out) | a pointer to a value kind, `nullable` when in | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local) |
+| `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
+| `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `argv` | `CommandArgs*` | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length) |
 | `weapon` | `WeaponDef*` | `weapondef#17` |
@@ -221,7 +238,7 @@ sets). The annotations hold what no header says:
 | `units` (`dir: out`) | `std::vector<Unit*>*` an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
 
-A result is `scalar`, `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
+A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
 A `pending` subsystem lists in its generated `pending` entry what is left (untracked targets, rows with no rule,
 slots whose functions are not found, arguments with no annotation); its own issue empties that list. A complete
@@ -256,8 +273,9 @@ there. Each file is replayed twice and the two results must be identical.
 
 `--self-test [FILE]` first round-trips a small graph of objects (a `Player` with two `Unit`s sharing a `UnitDef`)
 through the text form and reports a changed field at its `Kind#N.field`. It then does the same for each form that no
-recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.maxSlope`) and the sized arrays (whole lines,
-chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte). With a
+recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.maxSlope`), the sized arrays (whole lines,
+chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
+struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`). With a
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 

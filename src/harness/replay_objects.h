@@ -41,6 +41,10 @@ void ReplayEmitField(ReplayText& out, ReplayKnown& known, ReplayObjectTable& tab
 bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc);
 void ReplayArrayDiff(const char* recorded, const char* replayed, ReplayText& out);
 bool ReplayIsArrayText(const char* text);
+void ReplayAddStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, ReplayObjectTable& table);
+void ReplayAddStructs(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, int count, ReplayObjectTable& table);
+void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table);
+bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTable& table, ReplayAllocFn alloc);
 
 bool ReplayInsideTable(unsigned kind, const void* p);
 void ReplayAddWeapon(ReplayText& t, const void* p);

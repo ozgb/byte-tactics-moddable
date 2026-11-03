@@ -10,6 +10,7 @@
 #include "../../link/globals.h"
 #include "../../interfaces/services.h"
 #include "tdf.h"
+#include "../harness/replay.h"
 #include "../state/block.h"
 #include "../state/sim_globals.h"
 #include "../quirks/quirks.h"
@@ -146,6 +147,8 @@ static inline char* SkipComment(char* p)
 // FUNCTION: 0x4c2ea0
 TdfFile::TdfFile()
 {
+    ReplayImport call(RI_TDF_CONSTRUCT);
+    call.Ptr(this);
     root = 0;
     current = 0;
     flags = 0;
@@ -172,11 +175,14 @@ void TdfFile::StripComments(char* p)
 // FUNCTION: 0x4c3410
 int TdfFile::SelectRecord(char* name)
 {
+    ReplayImport call(RI_TDF_SELECT_RECORD);
+    call.Ptr(this);
+    call.Ptr(name);
     TdfRecord* node = current;
     if (node == 0)
         node = root;
     current = node->FindChild(name);
-    return current != 0;
+    return call.Result(current != 0);
 }
 
 // FUNCTION: 0x4c3490
@@ -449,19 +455,27 @@ int TdfRecord::FindFieldValue(char* name)
 // FUNCTION: 0x4c46c0
 int TdfRecord::GetFieldInt(const char* name, int def)
 {
+    ReplayImport call(RI_TDF_GET_INT);
+    call.Ptr(this);
+    call.Ptr(name);
+    call.Int(def);
     char* s = GetString(this, name);
     if (s)
-        return atoi(s);
-    return def;
+        return call.Result(atoi(s));
+    return call.Result(def);
 }
 
 // FUNCTION: 0x4c4760
 double TdfRecord::GetFieldDouble(const char* name, double def)
 {
+    ReplayImport call(RI_TDF_GET_DOUBLE);
+    call.Ptr(this);
+    call.Ptr(name);
+    call.Dbl(def);
     char* s = GetString(this, name);
     if (s)
-        return atof(s);
-    return def;
+        return call.Result(atof(s));
+    return call.Result(def);
 }
 
 // FUNCTION: 0x4c4800
@@ -495,6 +509,12 @@ int* TdfRecord::GetFieldFixed(int* dst, char* key, int def)
 // FUNCTION: 0x4c48c0
 int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
 {
+    ReplayImport call(RI_TDF_GET_STRING);
+    call.Ptr(this);
+    call.Ptr(dst);
+    call.Ptr(key);
+    call.Int((int)size);
+    call.Ptr(def);
     TdfField* lo = Rows(this).begin();
     TdfField* hi = Rows(this).end();
     while (lo != hi) {
@@ -515,12 +535,12 @@ int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
     if (value) {
         strncpy(dst, value, size);
         dst[size - 1] = 0;
-        return 1;
+        return call.Result(1);
     }
     if (def) {
         strcpy(dst, def);
     }
-    return 0;
+    return call.Result(0);
 }
 
 // FUNCTION: 0x4c49a0 ??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@ABV01@@Z
@@ -560,9 +580,12 @@ TdfField::TdfField(const StringRef& a, const StringRef& b)
 // FUNCTION: 0x4c2f60
 int TdfFile::LoadFile(char* path)
 {
+    ReplayImport call(RI_TDF_LOAD_FILE);
+    call.Ptr(this);
+    call.Ptr(path);
     FileHandle* file = HAPI_OpenFileRead(path);
     if (!file)
-        return 0;
+        return call.Result(0);
     int size = HAPI_FileLength(file);
     int result = 0;
     if (size > 0) {
@@ -589,7 +612,7 @@ int TdfFile::LoadFile(char* path)
         GameFreeThunk((int*)buf);
     }
     HAPI_CloseFile(file);
-    return result;
+    return call.Result(result);
 }
 
 // FUNCTION: 0x4c3120
@@ -612,6 +635,8 @@ void TdfFile::LoadBuffer(char* data, int size, int flag, char* path)
 // FUNCTION: 0x4c51b0 ??_GTdfField@@QAEPAXI@Z
 TdfFile::~TdfFile()
 {
+    ReplayImport call(RI_TDF_DESTRUCT);
+    call.Ptr(this);
     delete root;
     root = nullptr;
     current = nullptr;

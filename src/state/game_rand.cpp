@@ -1,6 +1,7 @@
 #define BX_CALL __cdecl
 #include "game_rand.h"
 #include "block.h"
+#include "../harness/replay.h"
 #include "../../lib/bitexact/bitexact.h"
 
 static bx_rand_state* Stream(RandStream stream)
@@ -10,7 +11,9 @@ static bx_rand_state* Stream(RandStream stream)
 
 int __cdecl GameRand(RandStream stream)
 {
-    return bx_rand(Stream(stream));
+    ReplayImport call(RI_GAME_RAND);
+    call.Int(stream);
+    return call.Result(bx_rand(Stream(stream)));
 }
 
 void __cdecl GameSrand(RandStream stream, unsigned int seed)

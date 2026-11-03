@@ -101,9 +101,10 @@ def cargo_env(out, target=RUST_TARGET, xwin=None):
         xwin = Path(xwin or default_xwin())
         env["CARGO_TARGET_I686_PC_WINDOWS_MSVC_LINKER"] = "lld-link"
         flags = " ".join(f"-Lnative={xwin / lib}" for lib in XWIN_LIBS)
-        env["RUSTFLAGS"] = f"{env.get('RUSTFLAGS', '')} {flags}".strip()
+        env["RUSTFLAGS"] = f"{env.get('RUSTFLAGS', '')} {flags} -Clink-arg=/Brepro".strip()
     else:
         env["CARGO_TARGET_I686_PC_WINDOWS_GNU_LINKER"] = "i686-w64-mingw32-gcc"
+        env["RUSTFLAGS"] = f"{env.get('RUSTFLAGS', '')} -Clink-arg=-Wl,--no-insert-timestamp".strip()
     return env
 
 

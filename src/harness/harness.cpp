@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <float.h>
 #include <time.h>
+#include <stdarg.h>
 #include "../../interfaces/host.h"
 #include "../../interfaces/services.h"
 
@@ -1822,10 +1823,20 @@ static const char* const s_targetNames[] = { "", "heap", "unit", "player", "unit
                                              "feature", "piece", "rec", "node", "moveclass", "order", "orderfx", "link" };
 
 static int s_dumpNow = 0;
+
+static void FormatPath(char* out, const char* format, ...)
+{
+    va_list args;
+    out[0] = '\0';
+    if (!s_dumpNow)
+        return;
+    va_start(args, format);
+    vsprintf(out, format, args);
+    va_end(args);
+}
 static unsigned s_traceTick = 0;
 static const char* s_tracePhase = "";
-static unsigned s_hashLo = 0;
-static unsigned s_hashHi = 0;
+static unsigned long long s_hash = 0;
 
 static unsigned char* GameAt(unsigned offset)
 {
@@ -1894,44 +1905,45 @@ static void MapAdd(unsigned* keys, unsigned* ids, unsigned* used, unsigned* used
     ids[slot] = id;
 }
 
-#define HASH_MULTIPLY \
-    { \
-        unsigned pc = (lo & 0xffff) * 435; \
-        unsigned pa = (lo >> 16) * 435; \
-        unsigned plo = pc + (pa << 16); \
-        unsigned carry = plo < pc; \
-        hi = hi * 435 + (pa >> 16) + carry + (lo << 8); \
-        lo = plo; \
+static const unsigned long long kHashOffset = 0xcbf29ce484222325ull;
+static const unsigned long long kHashPrime = 0x100000001b3ull;
+
+static unsigned long long HashWords(unsigned long long h, const unsigned char* p, unsigned words)
+{
+    while (words > 0) {
+        unsigned long long word;
+        memcpy(&word, p, 8);
+        h = (h ^ word) * kHashPrime;
+        p += 8;
+        words--;
     }
+    return h;
+}
 
 static void HashBuf(const unsigned char* p, unsigned n)
 {
-    unsigned lo = s_hashLo;
-    unsigned hi = s_hashHi;
-    while (n >= 8) {
-        lo ^= *(const unsigned*)p;
-        hi ^= *(const unsigned*)(p + 4);
-        HASH_MULTIPLY
-        p += 8;
-        n -= 8;
-    }
+    unsigned long long h = HashWords(s_hash, p, n / 8);
+    p += n & ~7u;
+    n &= 7;
     while (n > 0) {
-        lo ^= *p++;
-        HASH_MULTIPLY
+        h = (h ^ *p++) * kHashPrime;
         n--;
     }
-    s_hashLo = lo;
-    s_hashHi = hi;
+    s_hash = h;
 }
 
 static void HashU32(unsigned v)
 {
-    HashBuf((const unsigned char*)&v, 4);
+    unsigned long long h = s_hash;
+    h = (h ^ (v & 0xff)) * kHashPrime;
+    h = (h ^ ((v >> 8) & 0xff)) * kHashPrime;
+    h = (h ^ ((v >> 16) & 0xff)) * kHashPrime;
+    s_hash = (h ^ (v >> 24)) * kHashPrime;
 }
 
 static void HashByte(unsigned char v)
 {
-    HashBuf(&v, 1);
+    s_hash = (s_hash ^ v) * kHashPrime;
 }
 
 static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsigned* tag, unsigned* index)
@@ -2149,7 +2161,7 @@ static void VisitUnits()
         if (*(unsigned short*)(u + 0xa6) == 0)
             continue;
         HashU32(i);
-        sprintf(path, "units[%u]", i);
+        FormatPath(path, "units[%u]", i);
         VisitElement(path, u, &kUnitTable);
     }
     EndSection();
@@ -2166,7 +2178,7 @@ static void VisitProjectiles()
         if (*(unsigned short*)(p + 0x69) & 2)
             continue;
         HashU32(i);
-        sprintf(path, "projectiles[%u]", i);
+        FormatPath(path, "projectiles[%u]", i);
         VisitElement(path, p, &kProjectileTable);
     }
     EndSection();
@@ -2190,9 +2202,9 @@ static void VisitExplosions()
         if (block == NULL)
             continue;
         HashU32(slot);
-        sprintf(path, "explodedPieces[%u]", slot);
+        FormatPath(path, "explodedPieces[%u]", slot);
         VisitElement(path, block, &kExplodedPieceTable);
-        sprintf(path, "explodedPieces[%u].rec", slot);
+        FormatPath(path, "explodedPieces[%u].rec", slot);
         VisitElement(path, block + 0x30, &kPieceRecTable);
     }
     EndSection();
@@ -2204,7 +2216,7 @@ static void VisitExplosions()
         if (obj == 0)
             continue;
         HashU32(d);
-        sprintf(path, "debris[%u]", d);
+        FormatPath(path, "debris[%u]", d);
         VisitElement(path, e, &kDebrisTable);
         if (obj >= (unsigned)pieces && (obj - (unsigned)pieces) % PIECE_STRIDE == 0
             && (obj - (unsigned)pieces) / PIECE_STRIDE < PIECE_COUNT)
@@ -2217,12 +2229,12 @@ static void VisitExplosions()
         if (!pieceUsed[i])
             continue;
         HashU32(i);
-        sprintf(path, "pieces[%u]", i);
+        FormatPath(path, "pieces[%u]", i);
         VisitElement(path, pieces + i * PIECE_STRIDE, &kPieceTable);
-        sprintf(path, "pieces[%u].vertices", i);
+        FormatPath(path, "pieces[%u].vertices", i);
         VisitRaw(path, GameAt(GAME_VERTICES) + i * 96, 96);
         for (unsigned k = 0; k < 6; k++) {
-            sprintf(path, "pieces[%u].faces[%u]", i, k);
+            FormatPath(path, "pieces[%u].faces[%u]", i, k);
             VisitElement(path, GameAt(GAME_FACES) + (i * 6 + k) * 0x20, &kFaceTable);
         }
     }
@@ -2235,7 +2247,7 @@ static void VisitPlayers()
     HashByte(6);
     for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
         HashU32(i);
-        sprintf(path, "players[%u]", i);
+        FormatPath(path, "players[%u]", i);
         VisitElement(path, GameAt(GAME_PLAYERS) + i * PLAYER_STRIDE, &kPlayerTable);
     }
     EndSection();
@@ -2268,7 +2280,7 @@ static void VisitFeatures()
                 t = &kSpotAnimTable;
             HashU32(i);
             HashByte(list[i]);
-            sprintf(path, "features[%u]", i);
+            FormatPath(path, "features[%u]", i);
             if (s_dumpNow) {
                 char name[80];
                 sprintf(name, "%s.list", path);
@@ -2423,24 +2435,42 @@ static void VisitGameScalars()
     EndSection();
 }
 
+enum { CELL_CHUNK = 8 };
+
+static void NormaliseCell(unsigned char* c)
+{
+    unsigned feature = c[CELL_FEATURE] | (c[CELL_FEATURE + 1] << 8);
+    c[CELL_FLAGS] &= (unsigned char)~(CELL_FLAGS_DRAW_MARK | CELL_FLAGS_UNUSED);
+    if (feature >= 0xfffb && feature != 0xfffe)
+        c[CELL_SPOT] = c[CELL_SPOT + 1] = 0;
+}
+
 static void VisitMapCells()
 {
     unsigned char* cells = (unsigned char*)GameRef(GAME_CELLS);
     unsigned n = MapCellCount();
     HashByte(11);
     VisitValue("cells.count", n, 4);
-    if (cells != NULL) {
+    if (cells != NULL && !s_dumpNow) {
+        unsigned char chunk[CELL_CHUNK * CELL_STRIDE];
+        unsigned i = 0;
+        for (; i + CELL_CHUNK <= n; i += CELL_CHUNK) {
+            memcpy(chunk, cells + (size_t)i * CELL_STRIDE, sizeof chunk);
+            for (unsigned k = 0; k < CELL_CHUNK; k++)
+                NormaliseCell(chunk + k * CELL_STRIDE);
+            s_hash = HashWords(s_hash, chunk, sizeof chunk / 8);
+        }
+        memcpy(chunk, cells + (size_t)i * CELL_STRIDE, (size_t)(n - i) * CELL_STRIDE);
+        for (unsigned k = 0; i + k < n; k++)
+            NormaliseCell(chunk + k * CELL_STRIDE);
+        HashBuf(chunk, (n - i) * CELL_STRIDE);
+    } else if (cells != NULL) {
         unsigned char* copy = (unsigned char*)malloc((size_t)CELL_STRIDE * n);
         if (copy == NULL)
             Fail("testmode: out of memory hashing the map cells\n");
         memcpy(copy, cells, (size_t)CELL_STRIDE * n);
-        for (unsigned i = 0; i < n; i++) {
-            unsigned char* c = copy + i * CELL_STRIDE;
-            unsigned feature = c[CELL_FEATURE] | (c[CELL_FEATURE + 1] << 8);
-            c[CELL_FLAGS] &= (unsigned char)~(CELL_FLAGS_DRAW_MARK | CELL_FLAGS_UNUSED);
-            if (feature >= 0xfffb && feature != 0xfffe)
-                c[CELL_SPOT] = c[CELL_SPOT + 1] = 0;
-        }
+        for (unsigned i = 0; i < n; i++)
+            NormaliseCell(copy + i * CELL_STRIDE);
         VisitBlob("cells", 0, copy, CELL_STRIDE, n);
         free(copy);
     }
@@ -2470,7 +2500,7 @@ static void VisitExplored()
         unsigned size = *(unsigned*)(player + PLAYER_EXPLORED_SIZE);
         if (cells == NULL || size > EXPLORED_LIMIT)
             size = 0;
-        sprintf(path, "players[%u].explored", who);
+        FormatPath(path, "players[%u].explored", who);
         VisitValue(path, size, 4);
         if (size != 0)
             VisitBlob(path, 0, cells, 1, size);
@@ -2491,7 +2521,7 @@ static void VisitSpatial()
         count = 0;
     VisitValue("spatial.count", count, 4);
     for (unsigned r = 0; r < count; r++) {
-        sprintf(path, "spatial[%u]", r);
+        FormatPath(path, "spatial[%u]", r);
         VisitElement(path, recs + r * REC_STRIDE, &kRecTable);
     }
     HashByte(overflow != NULL);
@@ -2510,7 +2540,7 @@ static void VisitEyes()
         count = 0;
     VisitValue("eyes.count", count, 4);
     for (unsigned e = 0; e < count; e++) {
-        sprintf(path, "eyes[%u]", e);
+        FormatPath(path, "eyes[%u]", e);
         VisitElement(path, eyes + e * EYE_STRIDE, &kEyeTable);
     }
     EndSection();
@@ -2542,16 +2572,17 @@ static void VisitPathNodes(const unsigned char* pf)
         if (s_nodeFree[node])
             continue;
         HashU32(node);
-        sprintf(path, "pathfinder.pool[%u]", node);
+        FormatPath(path, "pathfinder.pool[%u]", node);
         VisitElement(path, n, &kNodeTable);
         if (*(int*)(n + NODE_G) != 0) {
-            strcat(path, ".penalty");
+            if (s_dumpNow)
+                strcat(path, ".penalty");
             VisitValue(path, *(unsigned short*)(n + NODE_PENALTY), 2);
         }
     }
     VisitValue("pathfinder.heap.count", count, 4);
     for (unsigned slot = 0; slot < count; slot++) {
-        sprintf(path, "pathfinder.heap[%u]", slot);
+        FormatPath(path, "pathfinder.heap[%u]", slot);
         VisitPointer(path, RefAbs(items[slot]), TT_NODE);
     }
 }
@@ -2570,7 +2601,7 @@ static void VisitPathCells(const unsigned char* pf)
         unsigned bits = dirty[w];
         if (bits == 0)
             continue;
-        sprintf(path, "pathfinder.dirty[%u]", w);
+        FormatPath(path, "pathfinder.dirty[%u]", w);
         VisitU32(path, bits);
         for (unsigned bit = 0; bit < 32; bit++) {
             if (!((bits >> bit) & 1))
@@ -2582,14 +2613,14 @@ static void VisitPathCells(const unsigned char* pf)
                 unsigned state = flags & 3;
                 if (index >= count)
                     break;
-                sprintf(path, "pathfinder.cells[%u].flags", index);
+                FormatPath(path, "pathfinder.cells[%u].flags", index);
                 VisitValue(path, flags, 1);
                 if ((flags & 8) || state == 1 || state == 2) {
-                    sprintf(path, "pathfinder.cells[%u].dir", index);
+                    FormatPath(path, "pathfinder.cells[%u].dir", index);
                     VisitValue(path, c[1], 1);
                 }
                 if (state == 1 || state == 2) {
-                    sprintf(path, "pathfinder.cells[%u].node", index);
+                    FormatPath(path, "pathfinder.cells[%u].node", index);
                     VisitValue(path, *(const unsigned short*)(c + 2), 2);
                 }
             }
@@ -2621,7 +2652,7 @@ static void VisitMoveClasses()
     char path[64];
     HashByte(18);
     for (unsigned c = 0; c < MOVECLASS_COUNT; c++) {
-        sprintf(path, "moveClasses[%u]", c);
+        FormatPath(path, "moveClasses[%u]", c);
         VisitElement(path, classes + c * MOVECLASS_STRIDE, &kMoveClassTable);
     }
     EndSection();
@@ -2647,7 +2678,7 @@ static void VisitPassMaps()
             || width * ((height + 15) >> 4) > PASSMAP_LIMIT)
             continue;
         HashU32(c);
-        sprintf(path, "moveClasses[%u].passMap", c);
+        FormatPath(path, "moveClasses[%u].passMap", c);
         VisitBlob(path, 0, (const unsigned char*)cells, 4, full * width);
         if (tail != 0) {
             unsigned mask = (1u << (tail * 2)) - 1;
@@ -3098,10 +3129,10 @@ static void VisitUnitVector(const char* path, unsigned vec)
     const unsigned char* first;
     char name[128];
     unsigned n = VectorCount(vec, 4, &first);
-    sprintf(name, "%s.size", path);
+    FormatPath(name, "%s.size", path);
     VisitU32(name, n);
     for (unsigned k = 0; k < n; k++) {
-        sprintf(name, "%s[%u]", path, k);
+        FormatPath(name, "%s[%u]", path, k);
         VisitPointer(name, ReadU32At((unsigned)first, k * 4), TT_UNIT, true);
     }
 }
@@ -3151,16 +3182,16 @@ static void VisitPlayerAI()
         HashByte(ai != 0);
         if (ai == 0)
             continue;
-        sprintf(path, "players[%u].ai", i);
+        FormatPath(path, "players[%u].ai", i);
         VisitElement(path, (const unsigned char*)ai, &kPlayerAITable);
-        sprintf(path, "players[%u].ai.visible", i);
+        FormatPath(path, "players[%u].ai.visible", i);
         VisitUnitVector(path, ai + 0x5);
-        sprintf(path, "players[%u].ai.known", i);
+        FormatPath(path, "players[%u].ai.known", i);
         VisitUnitVector(path, ai + 0x15);
-        sprintf(path, "players[%u].ai.factories", i);
+        FormatPath(path, "players[%u].ai.factories", i);
         VisitUnitVector(path, ai + 0x25);
         for (unsigned v = 0; v < sizeof vectors / sizeof vectors[0]; v++) {
-            sprintf(path, "players[%u].ai.%s", i, vectors[v].name);
+            FormatPath(path, "players[%u].ai.%s", i, vectors[v].name);
             VisitRawVector(path, ai + vectors[v].offset, vectors[v].elem);
         }
     }
@@ -3171,7 +3202,7 @@ static void VisitTimer(const char* path, unsigned slot, unsigned timer)
 {
     char field[128];
     int cls = TimerClassOf(slot);
-    sprintf(field, "%s.class", path);
+    FormatPath(field, "%s.class", path);
     VisitU32(field, (unsigned)cls);
     switch (cls) {
     case TIMER_ASSAULT:
@@ -3199,7 +3230,7 @@ static void VisitSquadManagers()
         HashByte(manager != 0);
         if (manager == 0)
             continue;
-        sprintf(path, "players[%u].squadManager", i);
+        FormatPath(path, "players[%u].squadManager", i);
         VisitElement(path, (const unsigned char*)manager, &kSquadManagerTable);
         for (unsigned t = 0; t < SQUAD_TIMERS; t++) {
             unsigned timer = ReadRefAt(manager, MANAGER_TIMERS + t * 4);
@@ -3207,7 +3238,7 @@ static void VisitSquadManagers()
             HashByte(timer != 0);
             if (timer == 0)
                 continue;
-            sprintf(path, "players[%u].squadManager.timers[%u]", i, t);
+            FormatPath(path, "players[%u].squadManager.timers[%u]", i, t);
             VisitTimer(path, t, timer);
         }
     }
@@ -3226,9 +3257,10 @@ static void VisitSquads()
             continue;
         for (unsigned s = 0; s < SQUAD_COUNT; s++) {
             unsigned squad = squads + s * SQUAD_STRIDE;
-            sprintf(path, "players[%u].squads[%u]", i, s);
+            FormatPath(path, "players[%u].squads[%u]", i, s);
             VisitElement(path, (const unsigned char*)squad, &kSquadTable);
-            strcat(path, ".items");
+            if (s_dumpNow)
+                strcat(path, ".items");
             VisitUnitVector(path, squad + SQUAD_ITEMS);
         }
     }
@@ -3245,7 +3277,7 @@ static void VisitUnitResources()
         HashByte(econ != 0);
         if (econ == 0)
             continue;
-        sprintf(path, "players[%u].econ", i);
+        FormatPath(path, "players[%u].econ", i);
         VisitElement(path, (const unsigned char*)econ, &kUnitResourcesTable);
     }
     EndSection();
@@ -3255,7 +3287,7 @@ static void VisitCondition(const char* path, unsigned condition)
 {
     char field[128];
     int cls = ConditionClassOf(condition);
-    sprintf(field, "%s.class", path);
+    FormatPath(field, "%s.class", path);
     VisitU32(field, (unsigned)cls);
     if (cls == COND_UNKNOWN) {
         char msg[160];
@@ -3312,13 +3344,13 @@ static void VisitWeaponTable(const char* path, unsigned table)
         ? (last - first) / WEAPON_ENTRY_SIZE : 0;
     if (n > VECTOR_LIMIT)
         n = 0;
-    sprintf(field, "%s.entries", path);
+    FormatPath(field, "%s.entries", path);
     VisitU32(field, n);
     for (unsigned k = 0; k < n; k++) {
         unsigned entry = first + k * WEAPON_ENTRY_SIZE;
-        sprintf(field, "%s[%u].name", path, k);
+        FormatPath(field, "%s[%u].name", path, k);
         VisitString(field, (const char*)ReadU32At(entry, 0));
-        sprintf(field, "%s[%u].value", path, k);
+        FormatPath(field, "%s[%u].value", path, k);
         VisitU32(field, ReadU32At(entry, 4));
     }
 }
@@ -3329,9 +3361,10 @@ static void VisitWeaponDefs()
     HashByte(30);
     for (unsigned i = 0; i < WEAPON_COUNT; i++) {
         const unsigned char* w = GameAt(GAME_WEAPONS) + i * WEAPONDEF_STRIDE;
-        sprintf(path, "weapons[%u]", i);
+        FormatPath(path, "weapons[%u]", i);
         VisitElement(path, w, &kWeaponDefDataTable);
-        strcat(path, ".damage");
+        if (s_dumpNow)
+            strcat(path, ".damage");
         VisitWeaponTable(path, ReadRefAt((unsigned)w, WEAPON_TABLE));
     }
     EndSection();
@@ -3352,21 +3385,22 @@ static void VisitUnitDefs()
         unsigned ids = ReadRefAt((unsigned)d, DEF_IDS);
         unsigned idCount = ReadU32At((unsigned)d, DEF_ID_COUNT);
         unsigned yardSize = (unsigned)*(const short*)(d + DEF_FOOTPRINT_X) * (unsigned)*(const short*)(d + DEF_FOOTPRINT_Z);
-        sprintf(path, "defs[%u]", i);
+        FormatPath(path, "defs[%u]", i);
         VisitElement(path, d, &kUnitDefDataTable);
         if (yardmap == 0 || yardSize > DEF_YARD_LIMIT)
             yardSize = 0;
-        strcat(path, ".yardmap");
+        if (s_dumpNow)
+            strcat(path, ".yardmap");
         VisitU32(path, yardSize);
         VisitRaw(path, (const unsigned char*)yardmap, yardSize);
         if (ids == 0 || idCount > DEF_ID_LIMIT)
             idCount = 0;
-        sprintf(path, "defs[%u].ids", i);
+        FormatPath(path, "defs[%u].ids", i);
         VisitU32(path, idCount);
         VisitRaw(path, (const unsigned char*)ids, idCount * 2);
         for (unsigned m = 0; m < 4; m++) {
             unsigned mask = ReadU32At((unsigned)d, m < 3 ? DEF_WEAPON_CATEGORIES + m * 4 : DEF_CATEGORIES);
-            sprintf(path, "defs[%u].categories[%u]", i, m);
+            FormatPath(path, "defs[%u].categories[%u]", i, m);
             HashByte(mask != 0);
             if (mask != 0)
                 VisitRaw(path, (const unsigned char*)mask, DEF_MASK_SIZE);
@@ -3400,13 +3434,13 @@ static void VisitMission()
         VisitU32("mission.units.count", unitCount);
         for (unsigned ku = 0; ku < unitCount; ku++) {
             unsigned unit = units + ku * MISSION_UNIT_SIZE;
-            sprintf(path, "mission.units[%u].name", ku);
+            FormatPath(path, "mission.units[%u].name", ku);
             VisitString(path, (const char*)RefAbs(ReadU32At(unit, 0)));
-            sprintf(path, "mission.units[%u].ident", ku);
+            FormatPath(path, "mission.units[%u].ident", ku);
             VisitString(path, (const char*)RefAbs(ReadU32At(unit, 4)));
-            sprintf(path, "mission.units[%u].initialMission", ku);
+            FormatPath(path, "mission.units[%u].initialMission", ku);
             VisitString(path, (const char*)RefAbs(ReadU32At(unit, 8)));
-            sprintf(path, "mission.units[%u]", ku);
+            FormatPath(path, "mission.units[%u]", ku);
             VisitRaw(path, (const unsigned char*)unit + 0xc, MISSION_UNIT_SIZE - 0xc);
         }
         VisitU32("mission.rules.count", ruleCount);
@@ -3414,9 +3448,9 @@ static void VisitMission()
         VisitU32("mission.features.count", featureCount);
         for (unsigned kf = 0; kf < featureCount; kf++) {
             unsigned feature = features + kf * MISSION_FEATURE_SIZE;
-            sprintf(path, "mission.features[%u].name", kf);
+            FormatPath(path, "mission.features[%u].name", kf);
             VisitString(path, (const char*)feature);
-            sprintf(path, "mission.features[%u].pos", kf);
+            FormatPath(path, "mission.features[%u].pos", kf);
             VisitRaw(path, (const unsigned char*)feature + MISSION_FEATURE_POS, 8);
         }
     }
@@ -4054,8 +4088,7 @@ void HarnessPhase(int phase)
     s_traceTick = tick;
     s_tracePhase = s_phaseNames[phase];
     s_dumpNow = s_dumpEnabled && tick == s_dumpTick;
-    s_hashLo = 0x84222325;
-    s_hashHi = 0xcbf29ce4;
+    s_hash = kHashOffset;
 
     VisitU32("gameTick", tick);
     VisitU32("rng.parkMiller", parkMiller);
@@ -4068,13 +4101,12 @@ void HarnessPhase(int phase)
     VisitWind();
     VisitMeteors();
 
-    fprintf(s_trace, "%u %s %08x%08x\n", tick, s_phaseNames[phase], s_hashHi, s_hashLo);
+    fprintf(s_trace, "%u %s %08x%08x\n", tick, s_phaseNames[phase], (unsigned)(s_hash >> 32), (unsigned)s_hash);
     if (phase == 7 || s_dumpNow) {
-        s_hashLo = 0x84222325;
-        s_hashHi = 0xcbf29ce4;
+        s_hash = kHashOffset;
         VisitWorld();
         if (phase == 7)
-            fprintf(s_trace, "%u %s %08x%08x\n", tick, s_phaseNames[8], s_hashHi, s_hashLo);
+            fprintf(s_trace, "%u %s %08x%08x\n", tick, s_phaseNames[8], (unsigned)(s_hash >> 32), (unsigned)s_hash);
     }
     if (phase == 7) {
         fflush(s_trace);

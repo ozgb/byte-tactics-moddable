@@ -1243,8 +1243,8 @@ InitRadar,src/ingame/radar_picture.cpp,presentation,presentation,
 FreeRadar,src/ingame/radar.cpp,presentation,presentation,
 DrawRadar,src/ingame/radar.cpp,presentation,draw,
 CalcRadarViewportRect,src/ingame/radar.cpp,presentation,presentation,
-UpdateRadarMapped,src/ingame/radar.cpp,presentation,presentation,
-DrawRadarUnits,src/ingame/radar.cpp,presentation,draw,
+UpdateRadarMapped,src/ingame/radar.cpp,los_radar,presentation,los_radar
+DrawRadarUnits,src/ingame/radar.cpp,los_radar,draw,los_radar
 UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,los_radar,presentation,los_radar
 DetectionVisitor::MarkUnitsInRadarOrSonarRadius,src/ingame/info_panel.cpp,los_radar,presentation,los_radar
 MarkRecentlyDamaged,src/ingame/info_panel.cpp,units,presentation,units

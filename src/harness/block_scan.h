@@ -1,7 +1,7 @@
 #ifndef HARNESS_BLOCK_SCAN_H
 #define HARNESS_BLOCK_SCAN_H
 
-void BlockScanEnable(unsigned every);
+void BlockScanEnable(unsigned every, bool verify);
 
 void BlockScanTick(unsigned tick, unsigned endTick);
 

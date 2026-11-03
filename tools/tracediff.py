@@ -389,6 +389,7 @@ def scenario_load(scenario: Path) -> str | None:
 def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
          poison: bool = False, blockscan: int = 0, env: dict[str, str] | None = None,
          put: dict[str, Path] | None = None, collect: tuple[str, ...] = (), xserver: bool = False,
+         blockscan_verify: bool = False,
          started: Callable[[subprocess.Popen], None] | None = None) -> Path:
     """Run the exe on the scenario with playtest.py, in `env` (default: this process's); the run's directory.
 
@@ -412,6 +413,8 @@ def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, time
         cmd.append("--poison")
     if blockscan:
         cmd += ["--blockscan-every", str(blockscan)]
+        if blockscan_verify:
+            cmd.append("--blockscan-verify")
     if xserver:
         cmd.append("--xserver")
     if started is None:

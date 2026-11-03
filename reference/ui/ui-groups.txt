@@ -1,5 +1,6 @@
 bt-ui 1
 1 scroll 304 32
+1 view 1
 1 select -
 10 input mouse move 300 270
 11 input mouse left down 300 270
@@ -17,6 +18,7 @@ bt-ui 1
 31 input mouse left down 524 250
 32 input mouse left up 524 250
 33 select 4
+34 view 2
 40 input key down 17
 41 input key down 50
 42 input key up 50
@@ -37,6 +39,7 @@ bt-ui 1
 71 order Move_Ground unit 2 target - pos 636 1 350 type - param 0 amount 0 remove 0
 71 order Move_Ground unit 3 target - pos 676 1 370 type - param 0 amount 0 remove 0
 72 input mouse right up 480 360
+73 view 3
 80 input key down 18
 81 input key down 50
 82 input key up 50
@@ -47,3 +50,4 @@ bt-ui 1
 91 input mouse right down 440 380
 91 order Move_Ground unit 4 target - pos 616 1 380 type - param 0 amount 0 remove 0
 92 input mouse right up 440 380
+163 view 4

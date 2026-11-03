@@ -1,2 +1,36 @@
 bt-ui 1
+1 scroll 304 32
+1 view 1
 1 select -
+169 view 31
+170 view 91
+171 view 151
+172 view 211
+173 view 271
+174 view 331
+175 view 391
+176 view 451
+177 view 511
+178 view 571
+179 view 631
+180 view 691
+181 view 751
+182 view 811
+183 view 871
+184 view 931
+185 view 991
+186 view 1051
+187 view 1111
+188 view 1171
+189 view 1231
+190 view 1291
+191 view 1351
+192 view 1411
+193 view 1471
+194 view 1531
+195 view 1591
+196 view 1651
+197 view 1711
+198 view 1771
+199 view 1831
+200 view 1891

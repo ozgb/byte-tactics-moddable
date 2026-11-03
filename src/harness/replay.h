@@ -1,7 +1,11 @@
 #ifndef HARNESS_REPLAY_H
 #define HARNESS_REPLAY_H
 
-extern int g_replayCalls;
+inline int& ReplayCalls()
+{
+    static int calls;
+    return calls;
+}
 
 enum ReplayImportId {
     RI_GAME_RAND,
@@ -37,10 +41,10 @@ struct ReplayImport;
 void ReplayImportEnd(ReplayImport& call);
 
 struct ReplayImport {
-    explicit ReplayImport(int id) : id(id), active(g_replayCalls != 0), count(0)
+    explicit ReplayImport(int id) : id(id), active(ReplayCalls() != 0), count(0)
     {
         if (active) {
-            g_replayCalls = 0;
+            ReplayCalls() = 0;
             result.kind = -1;
         }
     }

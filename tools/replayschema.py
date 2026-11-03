@@ -211,8 +211,8 @@ def generate(rows: list[dict[str, str]]) -> tuple[str, str, list[str]]:
                 lines.append("static const unsigned char kReplay%s%s[] = { %s };" % (slot, tag, ", ".join(str(index[n]) for n in names)))
     lines += ["", "static const ReplaySlotSets kReplaySlots[] = {"]
     for slot, (reads, writes) in sets.items():
-        r = "kReplay%sReads" % slot if reads else "0"
-        w = "kReplay%sWrites" % slot if writes else "0"
+        r = "kReplay%sReads" % slot if reads else "nullptr"
+        w = "kReplay%sWrites" % slot if writes else "nullptr"
         lines.append('    { "%s", %s, %d, %s, %d },' % (slot, r, len(reads), w, len(writes)))
     lines += ["};", "static const unsigned kReplaySlotCount = %d;" % len(sets), "", "#endif", ""]
     model = {

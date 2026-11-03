@@ -24,8 +24,6 @@
 #include "replay.h"
 #include "replay_schema.h"
 
-int g_replayCalls;
-
 static_assert(sizeof(WeaponDef) == 0x115, "WeaponDef is 0x115 bytes");
 
 namespace {
@@ -246,14 +244,14 @@ void SlotEnter(int slot)
     }
     const ReplaySlotSets& sets = kReplaySlots[slot];
     CaptureSet(sets.reads, sets.readCount, 'r');
-    g_replayCalls = 1;
+    ReplayCalls() = 1;
 }
 
 void SlotLeave()
 {
     if (--s_depth != 0 || !s_recording)
         return;
-    g_replayCalls = 0;
+    ReplayCalls() = 0;
     const ReplaySlotSets& sets = kReplaySlots[s_slot];
     CaptureSet(sets.writes, sets.writeCount, 'w');
     s_out.Add("call ");
@@ -608,7 +606,7 @@ void ReplayImportEnd(ReplayImport& c)
         break;
     }
     t.AddChar('\n');
-    g_replayCalls = 1;
+    ReplayCalls() = 1;
 }
 
 int ReplayConfigure(const char* value, char* error, int size)

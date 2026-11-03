@@ -6,6 +6,7 @@
 import contextlib
 import io
 import os
+import re
 import tempfile
 import threading
 import unittest
@@ -623,6 +624,36 @@ class LoadOrderTest(unittest.TestCase):
             self.assertEqual((target / "harness.opt").read_bytes(), b"options")
             self.assertEqual(seen["collect"][-2:], ("savegame/harness.sav", "savegame/harness.opt"))
             self.assertFalse(run.parent.exists())
+
+
+class GateTierTest(unittest.TestCase):
+    def test_every_scenario_has_a_trace_and_is_listed_once(self):
+        scenarios = reference.scenario_files()
+        self.assertEqual(len(set(reference.GATE_TIER)), len(reference.GATE_TIER))
+        for name in reference.GATE_TIER:
+            self.assertIn(name, scenarios)
+            self.assertTrue((reference.TRACES / f"{name}.txt").is_file(), name)
+
+    def test_a_loader_comes_with_its_saver(self):
+        scenarios = reference.scenario_files()
+        chosen = {n: scenarios[n] for n in reference.GATE_TIER}
+        self.assertEqual(set(reference.with_savers(chosen, scenarios)), set(chosen))
+
+    def test_it_keeps_a_game_of_eight_players(self):
+        scenarios = reference.scenario_files()
+        most = max(len(set(re.findall(r"^player(\d+)\.side", scenarios[n].read_text(), re.M))) for n in reference.GATE_TIER)
+        self.assertGreaterEqual(most, 8)
+
+    def test_the_pass_message_names_the_tier_and_the_commit(self):
+        text = reference.tier_message(26, "0123456789ab")
+        self.assertIn("gate tier passed: 26 scenarios equal at 0123456789ab", text)
+        self.assertNotIn("not the gate", text)
+
+    def test_block_pointers_are_left_to_the_full_suite(self):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(reference.report_block_pointers(Path("TotalA.exe"), {}, True, None), 0)
+        self.assertEqual(out.getvalue().strip(), "block pointers: full suite only")
 
 
 class TracediffCommandTest(unittest.TestCase):

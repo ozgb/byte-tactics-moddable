@@ -466,10 +466,13 @@ cmake -S . -B build/modern -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.c
 cmake --build build/modern
 cmake --build build/modern --target wasm_runtime   # once, and again after a change to wasm/ or a module's sources
 rm -r build/playtest/prefix     # a fresh prefix; tools/playtest.py makes it again
-uv run tools/reference.py --check --exe build/modern/TotalA.exe --game-dir ~/.ta   # the gate
+uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta   # the pull request gate
+uv run tools/reference.py --check --exe build/modern/TotalA.exe --game-dir ~/.ta          # every scenario
 ```
 
-The gate is the modern build's `--check`: every scenario must report equal.
+The gate is the modern build's `--check`: every scenario it plays must report equal. There are two tiers:
+`--tier` plays the scenarios of `GATE_TIER` (see "Gate tier" below) and is the gate of a pull request; the
+full `--check` plays all of them and is the gate of the changes in "When the full suite is the gate".
 The build runs its modules in WASM (`wind_meteors` so far): the `wasm_runtime` target builds
 `wasmtime_host.dll` and `wind_meteors.wasm` (it needs cargo, the game build does not) and copies them and
 `wasm/modules.json` next to `TotalA.exe`, and `tools/playtest.py` copies the three into each game
@@ -481,9 +484,13 @@ files. Both must report every scenario equal.
 reference. Add `--game-dir <dir>` when the game is not in a Steam directory.
 
 The gate applies when a pull request changes `src/`, `include/`,
-`lib/bitexact/`, `reference/`, or the tools that build or run the exe
-(`tools/reference.py`, `tools/playtest.py` and the like). Other
-changes do not need it.
+`interfaces/`, `lib/` (the bit-exact maths and the WASM loader), `wasm/`,
+`reference/`, the build (`CMakeLists.txt`, `cmake/`), the layout and
+trace format data (`data/layout_refs.csv`, `data/trace_schema.json`,
+`tools/traceschema.py`), or the tools that run the exe
+(`tools/reference.py`, `tools/playtest.py`). Other changes do not need
+it. The merges that did are the ones counted for the full-suite cadence
+below.
 
 `--traces` writes every trace with the reference branch's sha as `commit`. `--check` plays
 every scenario (`--parallel N` at a time, default half the CPUs and at most 6), prints one line per scenario with its run time
@@ -533,9 +540,31 @@ directories are kept (`build/scratch/check-<scenario>-<time>/` and `check-<scena
 differs from the stored trace (the exe does not pass the gate, which is not the flag's effect), the scenario is `FAIL`.
 The total counts equal, differ and failed. A difference is not a failure: the exit status is 1 only when a
 scenario failed (or a trace has no scenario). It builds no reference, and it is not the gate. It
-works with `--quick`, `--steps-per-frame` and `--parallel`, and not with `--poison`.
+works with `--tier`, `--steps-per-frame` and `--parallel`, and not with `--poison`.
 
-The full `--check` is what a pull request's gate needs.
+### When the full suite is the gate
+
+The full `--check` and the play-tests stay the gate of a pull
+request that:
+
+- changes the state block layout: `interfaces/`, `src/state/`, `data/layout_refs.csv`, or any `static_assert` on a block struct's size;
+- changes the host interface or platform code;
+- changes `reference/` (scenarios, traces) or the trace format (`data/trace_schema.json`, `tools/traceschema.py`);
+- changes `tools/reference.py` or `tools/playtest.py`;
+- or is the run that makes `uv run tools/fullgate.py due` pass.
+
+#286 passed the gate and broke `mp`; these are the changes of that kind. Every other pull request
+that the gate applies to runs `--tier`, and its body says which tier it ran.
+
+### The full suite on moddable
+
+The full `--check` runs on the tip of `moddable` once every 5 merged pull requests that needed the
+gate. `uv run tools/fullgate.py` prints how many have merged since the newest `Full gate on <sha>`
+comment on the tracking issue (#632), and `uv run tools/fullgate.py due` exits 1 at 5 or more. When
+it is due, the lead runs the full `--check` on the tip, without `--tier`, and comments `Full gate on
+<sha>: <n> of <n> equal, block pointers: <result>` on #632. On a divergence the comment says so, and
+no pull request that needs the gate merges until a fix lands: `tools/tracediff.py` gives the first
+tick, and the 5 merges are bisected.
 
 ## Block pointers
 
@@ -554,7 +583,8 @@ pointed at in the target. The scan does not change the traces.
 resolves the sites with the linker map beside the exe
 (`build/modern/TotalA.map`) and compares every row with `data/block_pointers.csv`, after printing the trace
 results. A word whose holder the file has no wildcard row for (see below), or a scenario with no `blockptrs.txt`,
-is printed (scenario, holder, offset, target) and `--check` exits 1. `--quick` does not check the pointers.
+is printed (scenario, holder, offset, target) and `--check` exits 1. `--tier` does not check the pointers: the names of repeated sites are numbered over the scenarios played, so the
+tier prints `block pointers: full suite only` and the full `--check` is where they are checked.
 `--save-blockptrs <dir>` writes each scenario's file to `<dir>/<scenario>.txt`, and
 `uv run tools/blockpointers.py --from <dir>` regenerates the data file from them, keeping the hand-set `class` and
 `note` columns; without `--from` it plays the suite itself with the scan on every tick, which is how the list
@@ -602,26 +632,55 @@ list of #7 tasks. A difference from the stored digests is expected for the latte
 failure of the run. On a difference the report reruns tracediff with B poisoned (`--poison-b`), so
 it compares the runs that differed.
 
-## Quick check
+## Gate tier
 
 ```sh
-uv run tools/reference.py --check --exe build/modern/TotalA.exe --quick     # a fixed subset, for a fast look
+uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta
 ```
 
-`--quick` is the same `--check` restricted to the five scenarios in the
-`QUICK` constant of `tools/reference.py`. Its scenarios take about 1 to 2
-minutes at the default `--parallel`. A pass says so and reminds you that it is not the gate; a failure
-prints the same `tools/tracediff.py` report as the full run. `--quick` goes with
-`--check` and `--exe`, and `--traces` rejects it. It is no substitute for the
-full `--check`, which is what a pull request's gate needs.
+`--tier` is the same `--check` restricted to the 26 scenarios of the `GATE_TIER` constant of
+`tools/reference.py`, 37750 ticks of the suite's 322,770 (11.7%), none longer than 12,600. It is the
+gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how
+many scenarios were equal and at which commit; a failure prints the same `tools/tracediff.py` report
+as the full run. `--tier` goes with `--check` and `--exe`, and `--traces` rejects it. It does not
+check the block pointers, since repeated sites are numbered over the scenarios played; the full
+suite does.
 
-| Name | Players | Sides | Start positions |
-| --- | ---: | --- | --- |
-| duel-coast-to-coast | 2 | Core | fixed |
-| duel-great-divide | 2 | Arm | random |
-| eight-full-moon | 8 | Arm and Core | fixed |
-| eight-greenhaven | 8 | Arm | random |
-| orders-move-attack | 2 | Arm and Core, scripted orders | fixed |
+The tier was chosen greedily from a coverage run of the suite (tools/coverage.py): the scenario
+adding the most lines per tick (a floor of 600 ticks each), until one adds fewer than 20, with at
+least one game of 8 players. `uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir
+~/.ta --tier` plays the tier on the coverage build, prints its lines and functions as a share of the
+full suite's in `data/coverage.csv`, and exits 1 below 96% of the lines. Run it when a scenario is
+added or removed and when the tier changes.
+
+| Name | Players | Ticks |
+| --- | ---: | ---: |
+| allied-victory | 4 | 360 |
+| commander-death | 2 | 360 |
+| conditions-dark-side | 2 | 3200 |
+| console-economy | 2 | 200 |
+| console-features | 2 | 300 |
+| console-sight | 2 | 200 |
+| console-units | 2 | 300 |
+| eight-pincushion-teams | 8 | 12600 |
+| hailstorm-los-off | 2 | 150 |
+| load-midgame | 0 | 900 |
+| mission-radius | 0 | 2700 |
+| mission-victory | 0 | 360 |
+| orders-air | 2 | 4600 |
+| orders-air-fights | 2 | 1500 |
+| orders-air-repair | 2 | 900 |
+| orders-build-patrol | 2 | 600 |
+| orders-factory | 2 | 1500 |
+| orders-guard-attacked | 2 | 600 |
+| orders-guard-reclaim | 2 | 600 |
+| orders-immediate | 2 | 1000 |
+| orders-tier2-core | 2 | 1300 |
+| orders-tier2-spider | 2 | 700 |
+| orders-tier2-vader | 2 | 420 |
+| save-midgame | 2 | 1800 |
+| sensors-floating-teeth-los-off | 2 | 400 |
+| units-transport-ship | 2 | 200 |
 
 `tools/tracediff.py --ignore-view-seed` accepts traces whose headers differ only
 in `view_seed`; with `--scenario` given twice, run mode runs A on the first file

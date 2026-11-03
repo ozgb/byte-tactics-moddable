@@ -18,13 +18,6 @@ namespace {
 
 enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
 
-const char* const kImportNames[RI_COUNT] = {
-    "services.GameRand", "services.RandomInt", "services.FatalError", "services.BuildDataPath",
-    "services.TdfFile_Construct", "services.TdfFile_Destruct", "services.TdfFile_LoadFile",
-    "services.TdfFile_SelectRecord", "services.TdfRecord_GetFieldInt", "services.TdfRecord_GetFieldDouble",
-    "services.TdfRecord_GetFieldString", "services.CommandArgs_GetIntArg",
-};
-
 struct Recording {
     Recording() : on(true), windowed(false), first(0), last(0) {}
     bool on;
@@ -406,6 +399,46 @@ void ImportResultWeapon(ReplayText& t, const void* p, unsigned count, ...)
     va_end(names);
 }
 
+void ImportBytes(ReplayText& t, const void* p, int length)
+{
+    t.AddChar(' ');
+    ReplayBytes(t, p, length);
+}
+
+void ImportOutBytes(ReplayText& t, const char* name, const void* p, int count, int length)
+{
+    if (count <= 0 || p == nullptr)
+        return;
+    t.Add("\n  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayBytes(t, p, count < length ? count : length);
+}
+
+void ImportResultObjectReach(ReplayText& t, unsigned kind, const void* p, unsigned count, ...)
+{
+    t.Add(" = ");
+    ReplayAddObjectName(t, Table(), kind, p, true);
+    if (p == nullptr)
+        return;
+    va_list names;
+    va_start(names, count);
+    for (unsigned n = 0; n < count; n++) {
+        const char* name = va_arg(names, const char*);
+        const ReplayObjectField* f = ReplayFindObjectField(kind, name);
+        if (f == nullptr)
+            continue;
+        t.Add("\n  o ");
+        ReplayAddObjectName(t, Table(), kind, p, true);
+        t.AddChar('.');
+        t.Add(name);
+        t.AddChar(' ');
+        ReplayFormatObjectField(*f, p, Table(), true, s_field);
+        t.Add(s_field.Data());
+    }
+    va_end(names);
+}
+
 void ImportResultPending(ReplayText& t)
 {
     t.Add(" = ?");
@@ -439,105 +472,7 @@ void AddResult(ReplayText& t, const ReplayArg& r)
 
 }
 
-void ReplayImportEnd(ReplayImport& c)
-{
-    ReplayText& t = s_call;
-    const ReplayArg* a = c.args;
-    t.Add("  i ");
-    t.Add(kImportNames[c.id]);
-    switch (c.id) {
-    case RI_GAME_RAND:
-        AddSpace(t);
-        AddStream(t, a[0].v.i);
-        AddResult(t, c.result);
-        break;
-    case RI_RANDOM_INT:
-        AddSpace(t);
-        t.AddInt(a[0].v.i);
-        AddResult(t, c.result);
-        break;
-    case RI_FATAL_ERROR:
-        AddSpace(t);
-        t.AddString((const char*)a[0].v.p);
-        break;
-    case RI_BUILD_DATA_PATH:
-        AddSpace(t);
-        t.AddString((const char*)a[1].v.p);
-        AddSpace(t);
-        t.AddString((const char*)a[2].v.p);
-        AddSpace(t);
-        t.AddString((const char*)a[3].v.p);
-        t.Add(" = ");
-        t.AddString((const char*)c.result.v.p);
-        break;
-    case RI_TDF_CONSTRUCT:
-    case RI_TDF_DESTRUCT:
-        AddSpace(t);
-        AddHandle(t, OBJ_FILE, a[0].v.p);
-        break;
-    case RI_TDF_LOAD_FILE:
-    case RI_TDF_SELECT_RECORD: {
-        const TdfFile* file = (const TdfFile*)a[0].v.p;
-        AddSpace(t);
-        AddHandle(t, OBJ_FILE, file);
-        AddSpace(t);
-        t.AddString((const char*)a[1].v.p);
-        AddResult(t, c.result);
-        if (c.id == RI_TDF_LOAD_FILE) {
-            t.Add("\n  o ");
-            AddHandle(t, OBJ_FILE, file);
-            t.Add(".root ");
-            AddHandle(t, OBJ_RECORD, file->root);
-        }
-        t.Add("\n  o ");
-        AddHandle(t, OBJ_FILE, file);
-        t.Add(".current ");
-        AddHandle(t, OBJ_RECORD, file->current);
-        break;
-    }
-    case RI_TDF_GET_INT:
-        AddSpace(t);
-        AddHandle(t, OBJ_RECORD, a[0].v.p);
-        AddSpace(t);
-        t.AddString((const char*)a[1].v.p);
-        AddSpace(t);
-        t.AddInt(a[2].v.i);
-        AddResult(t, c.result);
-        break;
-    case RI_TDF_GET_DOUBLE:
-        AddSpace(t);
-        AddHandle(t, OBJ_RECORD, a[0].v.p);
-        AddSpace(t);
-        t.AddString((const char*)a[1].v.p);
-        AddSpace(t);
-        AddDoubleBits(t, a[2].v.d);
-        t.Add(" = ");
-        AddDoubleBits(t, c.result.v.d);
-        break;
-    case RI_TDF_GET_STRING:
-        AddSpace(t);
-        AddHandle(t, OBJ_RECORD, a[0].v.p);
-        AddSpace(t);
-        t.AddString((const char*)a[2].v.p);
-        AddSpace(t);
-        t.AddInt(a[3].v.i);
-        AddSpace(t);
-        t.AddString((const char*)a[4].v.p);
-        AddResult(t, c.result);
-        t.Add("\n  o dst ");
-        t.AddString((const char*)a[1].v.p);
-        break;
-    case RI_GET_INT_ARG:
-        AddSpace(t);
-        t.AddInt(a[0].v.i);
-        AddSpace(t);
-        t.AddInt(a[1].v.i);
-        AddResult(t, c.result);
-        break;
-    }
-    t.AddChar('\n');
-    ReplayCalls() = 1;
-}
+#include "replay_services.inc"
 
 int ReplayConfigure(const char* value, char* error, int size)
 {

@@ -101,4 +101,25 @@ inline void ReplayValue(ReplayText& t, const Vec3* v)
     ReplayValue(t, *v);
 }
 
+inline void ReplayBytes(ReplayText& t, const void* p, int length)
+{
+    t.Add("x:");
+    for (int i = 0; p != nullptr && i < length; i++) {
+        unsigned char b = ((const unsigned char*)p)[i];
+        t.AddChar("0123456789abcdef"[b >> 4]);
+        t.AddChar("0123456789abcdef"[b & 15]);
+    }
+}
+
+inline void ReplayParseBytes(const char* text, void* dst, int length)
+{
+    if (strncmp(text, "x:", 2) != 0)
+        return;
+    for (int i = 0; i < length && text[2 + i * 2] != '\0' && text[3 + i * 2] != '\0'; i++) {
+        char hi = text[2 + i * 2];
+        char lo = text[3 + i * 2];
+        ((unsigned char*)dst)[i] = (unsigned char)((hi <= '9' ? hi - '0' : hi - 'a' + 10) << 4 | (lo <= '9' ? lo - '0' : lo - 'a' + 10));
+    }
+}
+
 #endif

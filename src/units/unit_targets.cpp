@@ -460,6 +460,12 @@ Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index)
     return &g_game->units[p->a];
 }
 
+#ifdef BT_REPLAY_INJECT_TARGET_SCALE
+#define TARGET_BODY_SCALE BT_REPLAY_INJECT_TARGET_SCALE
+#else
+#define TARGET_BODY_SCALE 0xcccc
+#endif
+
 static Vec3 ScaleBodyOffset(UnitMotionBodyView* m, __int64 s)
 {
     Vec3 d;
@@ -502,7 +508,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
         d.z = unit->pos.z - pos->z;
         int dist = (int)sqrt((double)d.x * d.x + (double)d.y * d.y + (double)d.z * d.z);
         int scale = (int)(((__int64)dist << 16) / ((WeaponDefTargetView*)e->weapon.get())->radius);
-        scale = (int)((scale * (__int64)0xcccc) >> 16);
+        scale = (int)((scale * (__int64)TARGET_BODY_SCALE) >> 16);
         __int64 s = scale;
         d = ScaleBodyOffset((UnitMotionBodyView*)def->motion.get(), s);
         pos->x = pos->x + d.x;

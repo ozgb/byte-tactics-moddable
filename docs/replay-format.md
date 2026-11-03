@@ -223,6 +223,14 @@ the first metal maker earns income (the `makesMetal` branch of `UpdatePlayerEcon
 player's slice of the unit table on each call, so a recording carries the `r` lines of all the slice at the first call and the
 changes after it.
 
+`replay_inject_test.exe` is also built with `BT_REPLAY_INJECT_TARGET_SCALE=0x6666` (the 0xcccc of `GetWeaponTargetPos`, the part of the
+distance a target's body offset moves the aim point), and the divergence is reported at call 352 of `skirmish4-long` and at `pos.x`, the
+out `Vec3`:
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 352 pos.x tests/replay/targeting/skirmish4-long.txt
+```
+
 The recordings of targeting, which is native code in every mode: `orders-guard-attacked` (units that guard and are attacked: every
 slot but `SetWeaponTargetPos`, `SetWeaponTargetUnit` 315 times, candidates from `ai.GetVisibleEnemiesInRadius`, `ChooseWeapon`),
 `orders-tier2-spider` (`SetWeaponTargetPos` 8 times, and the ground positions of `GetWeaponTargetPos`) and `skirmish4-long`, ticks

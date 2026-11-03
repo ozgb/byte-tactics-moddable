@@ -197,6 +197,8 @@ jobs:
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_inject.log"
           wine build/modern/replay_inject_test.exe --expect 5501 Player#0.energy tests/replay/economy/duel-shore-to-shore.txt | tee "$RUNNER_TEMP/replay_economy_inject.log"
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_economy_inject.log"
+          wine build/modern/replay_inject_test.exe --expect 352 pos.x tests/replay/targeting/skirmish4-long.txt | tee "$RUNNER_TEMP/replay_targeting_inject.log"
+          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_targeting_inject.log"
           wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm tests/replay/wind_meteors/*.txt | tee "$RUNNER_TEMP/replay_wasm.log"
           grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_wasm.log"
           wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm --self-test tests/replay/wind_meteors/meteors-hailstorm.txt | tee "$RUNNER_TEMP/replay_wasm_self.log"

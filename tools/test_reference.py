@@ -733,6 +733,141 @@ class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
         self.assertEqual(tail.feed(b"its " + b"3" * 16 + b"\n"), [reference.tracedigest.digests([(2, "units", "2" * 16)])[0]])
 
 
+class GateLockTest(unittest.TestCase):
+    CHILD = (
+        "import sys, time\n"
+        "from pathlib import Path\n"
+        "import reference\n"
+        "with reference.GateLock(Path(sys.argv[1]), Path(sys.argv[2])):\n"
+        "    print('held', flush=True)\n"
+        "    sys.stdin.readline()\n"
+    )
+
+    def release(self, proc):
+        """Let the child leave its lock (it may have left already) and wait for it."""
+        try:
+            proc.stdin.write("\n")
+            proc.stdin.flush()
+        except BrokenPipeError:
+            pass
+        proc.wait(30)
+        proc.stdin.close()
+        proc.stdout.close()
+
+    def start(self, lock, worktree, env):
+        return subprocess.Popen([sys.executable, "-c", self.CHILD, str(lock), worktree], stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE, text=True, env=env)
+
+    def test_the_second_process_waits_and_names_the_first(self):
+        env = dict(os.environ, PYTHONPATH=str(Path(reference.__file__).parent))
+        with tempfile.TemporaryDirectory() as tmp:
+            lock = Path(tmp) / "gate.lock"
+            first = self.start(lock, "/work/first", env)
+            try:
+                self.assertEqual(first.stdout.readline().strip(), "held")
+                second = self.start(lock, "/work/second", env)
+                try:
+                    self.assertEqual(second.stdout.readline().strip(), f"waiting for the gate run of {first.pid} (/work/first)")
+                    self.assertIsNone(second.poll())
+                    self.release(first)
+                    self.assertEqual(second.stdout.readline().strip(), "held")
+                    self.assertIn(f"{second.pid} /work/second", lock.read_text())
+                finally:
+                    self.release(second)
+            finally:
+                if first.poll() is None:
+                    self.release(first)
+
+    def test_the_lock_is_free_after_the_holder_leaves(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            lock = Path(tmp) / "gate.lock"
+            with reference.GateLock(lock, Path("/w")):
+                pass
+            with contextlib.redirect_stdout(io.StringIO()) as out, reference.GateLock(lock, Path("/w")):
+                pass
+            self.assertEqual(out.getvalue(), "")
+
+    def test_the_lock_lives_under_the_runtime_dir_or_tmp(self):
+        with mock.patch.dict(os.environ, {"XDG_RUNTIME_DIR": "/run/user/1"}):
+            self.assertEqual(reference.lock_path(), Path("/run/user/1") / reference.LOCK_FILE)
+        with mock.patch.dict(os.environ):
+            os.environ.pop("XDG_RUNTIME_DIR", None)
+            self.assertEqual(reference.lock_path(), Path("/tmp") / reference.LOCK_FILE)
+
+
+class BothModesTest(unittest.TestCase):
+    def test_tags_name_the_mode(self):
+        self.assertEqual(reference.tag("a", None), "a")
+        self.assertEqual(reference.tag("a", "native"), "a [native]")
+        self.assertEqual(reference.untag("a [native]"), "a")
+        self.assertEqual(reference.mode_of("a [native]"), "native")
+        self.assertIsNone(reference.mode_of("a"))
+        self.assertEqual(reference.default_modes(True), ("wasm", "native"))
+        self.assertEqual(reference.default_modes(False), (None,))
+
+    def test_mode_view_keeps_the_stores_apart(self):
+        store = {"a [wasm]": "w", "a [native]": "n", "b [native]": "m"}
+        scenarios = {"a": Path("a.txt"), "b": Path("b.txt")}
+        self.assertEqual(reference.mode_view(store, scenarios, "wasm"), {"a": "w"})
+        self.assertEqual(reference.mode_view(store, scenarios, "native"), {"a": "n", "b": "m"})
+
+    def test_the_watch_judges_a_native_run_against_the_scenarios_digests_and_names_the_mode(self):
+        header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
+        good = [(1, "units", "1" * 16), (2, "units", "2" * 16)]
+        expected = {"a": (header, reference.tracedigest.digests(good))}
+        with tempfile.TemporaryDirectory() as tmp:
+            trace = Path(tmp) / "trace.txt"
+            trace.write_text("bt-trace 3\n1 units " + "1" * 16 + "\n2 units " + "9" * 16 + "\n3 units " + "3" * 16 + "\n")
+            proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+            watch = reference.Watch(expected, lambda pid: trace)
+            try:
+                watch.started("a [native]")(proc)
+                watch.poll()
+                self.assertTrue(watch.halted.is_set())
+                self.assertEqual(watch.found.name, "a [native]")
+                self.assertIn("tick 2", watch.found.diff)
+            finally:
+                proc.kill()
+                proc.wait()
+
+    def play(self, modes, loads=None, differ=None):
+        calls, lock = [], threading.Lock()
+        loads = loads or {}
+
+        def fake_play_scenario(exe, scenario, game_dir, want, poison, keep_always, scans, scan_every, retry_any,
+                               save_to=None, load_from=None, watch=None, mode=None):
+            with lock:
+                calls.append((scenario.stem, mode))
+            reference.SOUND_LOGS[reference.tag(scenario.stem, mode)] = f"{mode}\n"
+            return {}, [], 0.0, None
+
+        scenarios = {n: Path(f"{n}.txt") for n in ("a", "b", "c")}
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(reference, "ROOT", Path(tmp)), \
+                mock.patch.object(reference, "scenario_ticks", lambda s: 100), \
+                mock.patch.object(reference.playtest, "template_prefix"), \
+                mock.patch.object(reference.tracediff, "scenario_load", lambda s: loads.get(s.stem)), \
+                mock.patch.object(reference.tracediff, "save_put", lambda *a: {}), \
+                mock.patch.object(reference, "play_scenario", fake_play_scenario):
+            results = reference.play_all(Path("x.exe"), scenarios, None, 2, modes=modes)
+        return calls, results
+
+    def test_every_scenario_is_played_once_in_each_mode(self):
+        calls, results = self.play(("wasm", "native"))
+        self.assertEqual(sorted(calls), sorted((n, m) for n in "abc" for m in ("wasm", "native")))
+        self.assertEqual(sorted(results), sorted(f"{n} [{m}]" for n in "abc" for m in ("wasm", "native")))
+
+    def test_the_default_plays_each_scenario_once_with_no_mode(self):
+        calls, results = self.play((None,))
+        self.assertEqual(sorted(calls), [("a", None), ("b", None), ("c", None)])
+        self.assertEqual(sorted(results), ["a", "b", "c"])
+
+    def test_a_loader_is_played_in_its_savers_mode_after_the_others(self):
+        calls, _ = self.play(("wasm", "native"), loads={"c": "a"})
+        order = [call for call in calls]
+        self.assertEqual({order[-2], order[-1]}, {("c", "wasm"), ("c", "native")})
+
+
 class TracediffCommandTest(unittest.TestCase):
     def test_names_the_reference_side(self):
         cmd = reference.tracediff_command(Path("a/TotalA.exe"), Path("b/TotalA.exe"), Path("s.txt"), False, None)

@@ -20821,9 +20821,9 @@ address,function,file,kind,target
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,Game::startPos
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,Game::ticks
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,Game::width
-0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::DrawRadarUnits
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::RecalculateLineOfSight
-0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::UpdateRadarMapped
+0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::RecordRadarMapped
+0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::RecordRadarUnits
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::UpdateSensorRadarAndCloak
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,LosRadarSeam::UpdateUnitLineOfSight
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,field_read,MapSeam::CanPlaceUnitFootprint
@@ -20890,8 +20890,8 @@ address,function,file,kind,target
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
-0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::DrawRadarUnits]
-0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::UpdateRadarMapped]
+0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarMapped]
+0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarUnits]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::UpdateSensorRadarAndCloak]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)(Pathfinder *) __attribute__((fastcall)) [PathfindingSeam::RunSearches]
@@ -21134,26 +21134,17 @@ address,function,file,kind,target
 0x466b70,CalcRadarViewportRect,src/ingame/radar.cpp,field_read,Game::width_142eb
 0x466b70,CalcRadarViewportRect,src/ingame/radar.cpp,function,
 0x466b70,CalcRadarViewportRect,src/ingame/radar.cpp,global_read,g_game
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,call,operator unsigned char *
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,call,operator unsigned short *
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,deref_read,*unsigned char
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,deref_read,*unsigned short
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,deref_write,*unsigned char
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_escape,Game::players_1b63_14b
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,<anon>::mapChanged
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Display::grayTable
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Game::displayContext
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Game::height
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Game::mappedSurface
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Game::pictureSurface
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Game::playerIndex
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Game::screen_h
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Game::textColor
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Game::visibilityMask
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Game::width
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Game::width_142eb
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Player::explored
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_write,<anon>::mapChanged
+0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,RadarMappedCapture::height
+0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,RadarMappedCapture::width
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_write,<anon>::pending
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,function,
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,global_read,g_game
@@ -21163,19 +21154,10 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,DrawPixel
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,DrawSurface
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,GetGafFrame
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,IsOnRadar
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,Player_Get
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,ScaledRadarY
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,get
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,operator HotRadarSlot *
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,operator Projectile *
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,operator Unit *
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,call,operator->
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,deref_read,*unsigned char
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_escape,Unit::weapons
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,<anon>::hi
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,<anon>::interceptor
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,<anon>::value
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::finalSurface
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::hotRadar
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::hotRadarCount
@@ -21183,47 +21165,34 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::mapHeight
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::mapWidth
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::mappedSurface
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::matchFlags
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::nuclogo
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::playerIndex
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::posX
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::posY
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::projectileCount
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::projectiles
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::radlogo
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::radlogohigh
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::screen_h
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::units
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::unitsEnd
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Game::width_142eb
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,InterceptorDefFlags::bit29
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,MapViewFlags::bit0
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,MapViewFlags::bit1
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Player::info
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,PlayerInfo::color
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Projectile::attacker
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Projectile::owner
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Projectile::type
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitDefView::flags2
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitDefView::radardistance
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitDefView::radardistancejam
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitDefView::sonardistance
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitDefView::sonardistancejam
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Unit::activateFlags
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Unit::def
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Unit::flags
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Unit::id
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Unit::playerIndex
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Unit::recentlyDamagedTimer
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarDrawCapture::projectileCount
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarDrawCapture::unitCount
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarProjectileCapture::color
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarProjectileCapture::kind
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarProjectileCapture::x
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarProjectileCapture::y
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitCapture::color
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitCapture::flags
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitCapture::id
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitCapture::radarDistance
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitCapture::radarJamDistance
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitCapture::slot
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitCapture::sonarDistance
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitCapture::sonarJamDistance
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitCapture::xWhole
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarUnitCapture::yScaled
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarWeaponCapture::coverage
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarWeaponCapture::interceptor
+0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,RadarWeaponCapture::stocked
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Unit::selected
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Unit::unitDefIndex
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Unit::xWhole
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,UnitWeaponSlot::stockpile
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,UnitWeaponSlot::weapon
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Vec3Words::xWhole
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Vec3Words::yWhole
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,Vec3Words::zWhole
-0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_read,WeaponDef::coverage
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_write,<anon>::bit1
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_write,Game::hotRadarCount
 0x466dc0,DrawRadarUnits,src/ingame/radar.cpp,field_write,HotRadarSlot::unitId
@@ -21850,7 +21819,6 @@ address,function,file,kind,target
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,sprintf
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,strcpy
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,strncpy
-0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,deref_read,*WeaponDef
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,deref_read,*char
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,deref_read,*unsigned char
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,deref_read,*unsigned short
@@ -21940,6 +21908,7 @@ address,function,file,kind,target
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,UnitResources::energyUsePrev
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,UnitResources::metalMakePrev
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,UnitResources::metalUsePrev
+0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,UnitWeaponSlot::weapon
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_read,WeaponDef::reloadTime
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_write,UnitInfoSnapshot::build
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,field_write,UnitInfoSnapshot::button
@@ -25895,8 +25864,8 @@ address,function,file,kind,target
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::unitsEnd
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::visibilityMask
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::width
-0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,LosRadarSeam::DrawRadarUnits
-0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,LosRadarSeam::UpdateRadarMapped
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,LosRadarSeam::RecordRadarMapped
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,LosRadarSeam::RecordRadarUnits
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,MapViewFlags::raw
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Player::active
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Player::explored
@@ -25928,8 +25897,8 @@ address,function,file,kind,target
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,function,
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,global_read,g_game
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,global_read,g_seams
-0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::DrawRadarUnits]
-0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::UpdateRadarMapped]
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarMapped]
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarUnits]
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,GetGafFrame
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LodRaw
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LosLine::GetLosLineStep
@@ -30180,6 +30149,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetCameraState
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetChatHudIndices
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetSpeech
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimCaptureClear
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimEventsClear
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,memset
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,operator Mission *
@@ -43711,6 +43681,47 @@ address,function,file,kind,target
 ,CaptureSet,src/harness/replay.cpp,global_read,s_field
 ,CaptureSet,src/harness/replay.cpp,global_read,s_rec
 ,CaptureSet,src/harness/replay.cpp,global_read,s_sub
+,CaptureUnit,src/map/radar_capture.cpp,call,Player_Get
+,CaptureUnit,src/map/radar_capture.cpp,call,get
+,CaptureUnit,src/map/radar_capture.cpp,call,operator Unit *
+,CaptureUnit,src/map/radar_capture.cpp,call,operator->
+,CaptureUnit,src/map/radar_capture.cpp,field_escape,Unit::weapons
+,CaptureUnit,src/map/radar_capture.cpp,field_read,<anon>::interceptor
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Game::units
+,CaptureUnit,src/map/radar_capture.cpp,field_read,InterceptorDefFlags::bit29
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Player::info
+,CaptureUnit,src/map/radar_capture.cpp,field_read,PlayerInfo::color
+,CaptureUnit,src/map/radar_capture.cpp,field_read,RadarUnitDefView::flags2
+,CaptureUnit,src/map/radar_capture.cpp,field_read,RadarUnitDefView::radardistance
+,CaptureUnit,src/map/radar_capture.cpp,field_read,RadarUnitDefView::radardistancejam
+,CaptureUnit,src/map/radar_capture.cpp,field_read,RadarUnitDefView::sonardistance
+,CaptureUnit,src/map/radar_capture.cpp,field_read,RadarUnitDefView::sonardistancejam
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::activateFlags
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::def
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::id
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::playerIndex
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::recentlyDamagedTimer
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::xWhole
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::yWhole
+,CaptureUnit,src/map/radar_capture.cpp,field_read,Unit::zWhole
+,CaptureUnit,src/map/radar_capture.cpp,field_read,UnitWeaponSlot::stockpile
+,CaptureUnit,src/map/radar_capture.cpp,field_read,UnitWeaponSlot::weapon
+,CaptureUnit,src/map/radar_capture.cpp,field_read,WeaponDef::coverage
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::color
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::flags
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::id
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::radarDistance
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::radarJamDistance
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::slot
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::sonarDistance
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::sonarJamDistance
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::xWhole
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarUnitCapture::yScaled
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarWeaponCapture::coverage
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarWeaponCapture::interceptor
+,CaptureUnit,src/map/radar_capture.cpp,field_write,RadarWeaponCapture::stocked
+,CaptureUnit,src/map/radar_capture.cpp,function,
+,CaptureUnit,src/map/radar_capture.cpp,global_read,g_game
 ,CellAt,src/map/terrain.cpp,call,operator Cell *
 ,CellAt,src/map/terrain.cpp,deref_escape,*Cell
 ,CellAt,src/map/terrain.cpp,field_read,Game::cells
@@ -44519,6 +44530,7 @@ address,function,file,kind,target
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainThrust
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainUnitSpeech
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrainWake
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,DrawRadarUnits
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitBlackSmoke
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitSmoke
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,EmitTimedSubParticles
@@ -44530,12 +44542,16 @@ address,function,file,kind,target
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,PopUntilNamedLayout
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,RemoveSpeechOfUnit
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,ShowContinueWatchingDialog
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,SimCapture
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,SimCaptureClear
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,SimEvents
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,TakeVec3
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,Translate
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,UnitOf
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,UpdateBuildMenuIfFocusUnit
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,call,UpdateRadarMapped
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_escape,Player::name
+,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_escape,SimRadarArena::bytes
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_maybe_written,Game::gui
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_maybe_written,Game::players
 ,DrainSimEvents,src/ingame/sim_event_drain.cpp,field_read,Game::localPlayer
@@ -44785,12 +44801,12 @@ address,function,file,kind,target
 ,ExploredCell,src/map/line_of_sight.cpp,field_read,Player::explored
 ,ExploredCell,src/map/line_of_sight.cpp,field_read,Player::exploredWidth
 ,ExploredCell,src/map/line_of_sight.cpp,function,
-,ExploredOnRadar,src/ingame/radar.cpp,call,operator unsigned char *
-,ExploredOnRadar,src/ingame/radar.cpp,deref_read,*unsigned char
-,ExploredOnRadar,src/ingame/radar.cpp,field_read,Player::explored
-,ExploredOnRadar,src/ingame/radar.cpp,field_read,Player::exploredHeight
-,ExploredOnRadar,src/ingame/radar.cpp,field_read,Player::exploredWidth
-,ExploredOnRadar,src/ingame/radar.cpp,function,
+,ExploredOnRadar,src/map/radar_capture.cpp,call,operator unsigned char *
+,ExploredOnRadar,src/map/radar_capture.cpp,deref_read,*unsigned char
+,ExploredOnRadar,src/map/radar_capture.cpp,field_read,Player::explored
+,ExploredOnRadar,src/map/radar_capture.cpp,field_read,Player::exploredHeight
+,ExploredOnRadar,src/map/radar_capture.cpp,field_read,Player::exploredWidth
+,ExploredOnRadar,src/map/radar_capture.cpp,function,
 ,Eye::operator=,src/map/eye.h,call,operator=
 ,Eye::operator=,src/map/eye.h,deref_read,*Eye
 ,Eye::operator=,src/map/eye.h,field_escape,Eye::flagB
@@ -46991,7 +47007,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::ClampWorldPosToTerrain
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::CmdShareMapping
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::CmdShareRadar
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::DrawRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::ExpireEyeballs
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::FreeMapResources
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::FreeRadar
@@ -47002,10 +47017,11 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::IsUnitVisibleToPlayer
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::LoadTntMap
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecalculateLineOfSight
+,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecordRadarMapped
+,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecordRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RemoveUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RevealNewUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateCellHeightRange
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateRadarMapped
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::AddUnitToMap
@@ -47360,7 +47376,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarClampWorldPosToTerrain
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarCmdShareMapping
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarCmdShareRadar
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarDrawRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarExpireEyeballs
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarFreeMapResources
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarFreeRadar
@@ -47371,10 +47386,11 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarIsUnitVisibleToPlayer
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarLoadTntMap
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecalculateLineOfSight
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecordRadarMapped
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecordRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRemoveUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRevealNewUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateCellHeightRange
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateRadarMapped
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapAddUnitToMap
@@ -47968,7 +47984,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::ClampWorldPosToTerrain
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::CmdShareMapping
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::CmdShareRadar
-,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::DrawRadarUnits
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::ExpireEyeballs
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::FreeMapResources
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::FreeRadar
@@ -47979,10 +47994,11 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::IsUnitVisibleToPlayer
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::LoadTntMap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RecalculateLineOfSight
+,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RecordRadarMapped
+,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RecordRadarUnits
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RemoveUnitLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RevealNewUnit
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateCellHeightRange
-,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateRadarMapped
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateUnitLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::AddUnitToMap
@@ -48299,7 +48315,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,DestroyPlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,DetonateUnitWeapon
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,DisableMeteors
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,DrawRadarUnits
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,DumpPlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EmptyShutdownPreCleanup
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EnableMeteors
@@ -48481,6 +48496,8 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RebuildFeatureCells
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RecalculateLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReclaimFeature
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,RecordRadarMapped
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,RecordRadarUnits
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshAllPassMaps
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshMapListNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshMovedUnitsNative
@@ -48565,7 +48582,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayers
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayersOnStream
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateProjectiles
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateRadarMapped
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateResourceSharing
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateSensorRadarAndCloak
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateSfxOccupyNative
@@ -48750,13 +48766,13 @@ address,function,file,kind,target
 ,IsLocalInRefreshBattleRoomRows,src/frontend/multi.cpp,field_read,Player::active
 ,IsLocalInRefreshBattleRoomRows,src/frontend/multi.cpp,field_read,Player::type
 ,IsLocalInRefreshBattleRoomRows,src/frontend/multi.cpp,function,
-,IsOnRadar,src/ingame/radar.cpp,call,ExploredOnRadar
-,IsOnRadar,src/ingame/radar.cpp,call,Player_Get
-,IsOnRadar,src/ingame/radar.cpp,call,VisibleOnRadar
-,IsOnRadar,src/ingame/radar.cpp,field_read,Game::playerIndex
-,IsOnRadar,src/ingame/radar.cpp,field_read,MapViewFlags::raw
-,IsOnRadar,src/ingame/radar.cpp,function,
-,IsOnRadar,src/ingame/radar.cpp,global_read,g_game
+,IsOnRadar,src/map/radar_capture.cpp,call,ExploredOnRadar
+,IsOnRadar,src/map/radar_capture.cpp,call,Player_Get
+,IsOnRadar,src/map/radar_capture.cpp,call,VisibleOnRadar
+,IsOnRadar,src/map/radar_capture.cpp,field_read,Game::playerIndex
+,IsOnRadar,src/map/radar_capture.cpp,field_read,MapViewFlags::raw
+,IsOnRadar,src/map/radar_capture.cpp,function,
+,IsOnRadar,src/map/radar_capture.cpp,global_read,g_game
 ,IsPlayerAlive,src/ingame/game_dialogs.cpp,field_read,Player::type
 ,IsPlayerAlive,src/ingame/game_dialogs.cpp,field_read,Player::unitCount
 ,IsPlayerAlive,src/ingame/game_dialogs.cpp,field_read,Player::unitsCreated
@@ -50516,9 +50532,9 @@ address,function,file,kind,target
 ,PlayerRecordAt,src/game/game_load.cpp,deref_escape,*LoadingPlayerRecord
 ,PlayerRecordAt,src/game/game_load.cpp,field_escape,Game::players
 ,PlayerRecordAt,src/game/game_load.cpp,function,
-,Player_Get,src/ingame/radar.cpp,field_escape,Game::players_1b63_14b
-,Player_Get,src/ingame/radar.cpp,function,
-,Player_Get,src/ingame/radar.cpp,global_read,g_game
+,Player_Get,src/map/radar_capture.cpp,field_escape,Game::players_1b63_14b
+,Player_Get,src/map/radar_capture.cpp,function,
+,Player_Get,src/map/radar_capture.cpp,global_read,g_game
 ,Point16::operator!=,src/util/vec3.h,field_read,Point16::x
 ,Point16::operator!=,src/util/vec3.h,field_read,Point16::y
 ,Point16::operator!=,src/util/vec3.h,function,
@@ -50833,6 +50849,22 @@ address,function,file,kind,target
 ,QuirksParse,src/quirks/quirks.cpp,function,
 ,QuirksParse,src/quirks/quirks.cpp,global_read,s_quirkCount
 ,QuirksParse,src/quirks/quirks.cpp,global_read,s_quirks
+,RadarProjectileShown,src/map/radar_capture.cpp,call,IsOnRadar
+,RadarProjectileShown,src/map/radar_capture.cpp,call,operator->
+,RadarProjectileShown,src/map/radar_capture.cpp,deref_write,*unsigned char
+,RadarProjectileShown,src/map/radar_capture.cpp,field_read,<anon>::value
+,RadarProjectileShown,src/map/radar_capture.cpp,field_read,Game::playerIndex
+,RadarProjectileShown,src/map/radar_capture.cpp,field_read,Projectile::attacker
+,RadarProjectileShown,src/map/radar_capture.cpp,field_read,Projectile::owner
+,RadarProjectileShown,src/map/radar_capture.cpp,field_read,Projectile::type
+,RadarProjectileShown,src/map/radar_capture.cpp,field_read,Unit::playerIndex
+,RadarProjectileShown,src/map/radar_capture.cpp,function,
+,RadarProjectileShown,src/map/radar_capture.cpp,global_read,g_game
+,RadarUnitShown,src/map/radar_capture.cpp,field_read,Game::playerIndex
+,RadarUnitShown,src/map/radar_capture.cpp,field_read,Unit::flags
+,RadarUnitShown,src/map/radar_capture.cpp,field_read,Unit::playerIndex
+,RadarUnitShown,src/map/radar_capture.cpp,function,
+,RadarUnitShown,src/map/radar_capture.cpp,global_read,g_game
 ,Rally,src/ai/ai_player.cpp,call,SquadTimer::GetAveragePosition
 ,Rally,src/ai/ai_player.cpp,call,operator->
 ,Rally,src/ai/ai_player.cpp,field_read,SquadManager::timers
@@ -52241,12 +52273,6 @@ address,function,file,kind,target
 ,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [LosRadarSeam::CmdShareRadar]
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,field_read,LosRadarSeam::DrawRadarUnits
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,function,
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarDrawRadarUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::DrawRadarUnits]
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,field_read,LosRadarSeam::ExpireEyeballs
@@ -52320,6 +52346,18 @@ address,function,file,kind,target
 ,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,field_read,LosRadarSeam::RecordRadarMapped
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,function,
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
+,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarMapped]
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,field_read,LosRadarSeam::RecordRadarUnits
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,function,
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
+,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarUnits]
 ,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,call,Add
 ,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,call,ArgObject
 ,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -52346,12 +52384,6 @@ address,function,file,kind,target
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Point16, Point16) __attribute__((stdcall)) [LosRadarSeam::UpdateCellHeightRange]"
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,field_read,LosRadarSeam::UpdateRadarMapped
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,function,
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarUpdateRadarMapped,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::UpdateRadarMapped]
 ,RecLosRadarUpdateSensorRadarAndCloak,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarUpdateSensorRadarAndCloak,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarUpdateSensorRadarAndCloak,src/harness/replay_hooks.inc,field_read,LosRadarSeam::UpdateSensorRadarAndCloak
@@ -54403,6 +54435,58 @@ address,function,file,kind,target
 ,RecordPointParticles,src/state/sim_effects.h,function,
 ,RecordPopToGameLayout,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordPopToGameLayout,src/state/sim_effects.h,function,
+,RecordRadarMapped,src/map/radar_capture.cpp,call,RecordSimEvent
+,RecordRadarMapped,src/map/radar_capture.cpp,call,SimCaptureAlloc
+,RecordRadarMapped,src/map/radar_capture.cpp,call,operator unsigned char *
+,RecordRadarMapped,src/map/radar_capture.cpp,call,operator unsigned short *
+,RecordRadarMapped,src/map/radar_capture.cpp,deref_read,*unsigned char
+,RecordRadarMapped,src/map/radar_capture.cpp,deref_read,*unsigned short
+,RecordRadarMapped,src/map/radar_capture.cpp,deref_write,*unsigned char
+,RecordRadarMapped,src/map/radar_capture.cpp,field_escape,Game::players_1b63_14b
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,<anon>::mapChanged
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,Game::height
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,Game::playerIndex
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,Game::visibilityMask
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,Game::width
+,RecordRadarMapped,src/map/radar_capture.cpp,field_read,Player::explored
+,RecordRadarMapped,src/map/radar_capture.cpp,field_write,<anon>::mapChanged
+,RecordRadarMapped,src/map/radar_capture.cpp,field_write,RadarMappedCapture::cells
+,RecordRadarMapped,src/map/radar_capture.cpp,field_write,RadarMappedCapture::height
+,RecordRadarMapped,src/map/radar_capture.cpp,field_write,RadarMappedCapture::width
+,RecordRadarMapped,src/map/radar_capture.cpp,function,
+,RecordRadarMapped,src/map/radar_capture.cpp,global_read,g_game
+,RecordRadarUnits,src/map/radar_capture.cpp,call,CaptureUnit
+,RecordRadarUnits,src/map/radar_capture.cpp,call,Player_Get
+,RecordRadarUnits,src/map/radar_capture.cpp,call,RadarProjectileShown
+,RecordRadarUnits,src/map/radar_capture.cpp,call,RadarUnitShown
+,RecordRadarUnits,src/map/radar_capture.cpp,call,RecordSimEvent
+,RecordRadarUnits,src/map/radar_capture.cpp,call,SimCaptureAlloc
+,RecordRadarUnits,src/map/radar_capture.cpp,call,operator Projectile *
+,RecordRadarUnits,src/map/radar_capture.cpp,call,operator Unit *
+,RecordRadarUnits,src/map/radar_capture.cpp,call,operator->
+,RecordRadarUnits,src/map/radar_capture.cpp,deref_escape,*Projectile
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Game::matchFlags
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Game::projectileCount
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Game::projectiles
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Game::units
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Game::unitsEnd
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,MapViewFlags::bit0
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,MapViewFlags::bit1
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Player::info
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,PlayerInfo::color
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Projectile::owner
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Unit::unitDefIndex
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Vec3Words::xWhole
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Vec3Words::yWhole
+,RecordRadarUnits,src/map/radar_capture.cpp,field_read,Vec3Words::zWhole
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarDrawCapture::projectileCount
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarDrawCapture::unitCount
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarProjectileCapture::color
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarProjectileCapture::kind
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarProjectileCapture::x
+,RecordRadarUnits,src/map/radar_capture.cpp,field_write,RadarProjectileCapture::y
+,RecordRadarUnits,src/map/radar_capture.cpp,function,
+,RecordRadarUnits,src/map/radar_capture.cpp,global_read,g_game
 ,RecordRemoveUnitSpeech,src/state/sim_effects.h,call,RecordUnitEvent
 ,RecordRemoveUnitSpeech,src/state/sim_effects.h,function,
 ,RecordReverseNanoParticles,src/state/sim_effects.h,call,RecordReverseNanoParticles
@@ -55209,11 +55293,6 @@ address,function,file,kind,target
 ,ScaleBodyOffset,src/units/unit_targets.cpp,function,
 ,ScaledPosOffset,src/ingame/markers.cpp,field_write,Fixed::value
 ,ScaledPosOffset,src/ingame/markers.cpp,function,
-,ScaledRadarY,src/ingame/radar.cpp,field_read,Game::screen_h
-,ScaledRadarY,src/ingame/radar.cpp,field_read,Unit::yWhole
-,ScaledRadarY,src/ingame/radar.cpp,field_read,Unit::zWhole
-,ScaledRadarY,src/ingame/radar.cpp,function,
-,ScaledRadarY,src/ingame/radar.cpp,global_read,g_game
 ,Scan,src/host/win32/headless.cpp,call,InterlockedExchange
 ,Scan,src/host/win32/headless.cpp,call,ScanCommandLine
 ,Scan,src/host/win32/headless.cpp,deref_read,*long
@@ -55703,8 +55782,35 @@ address,function,file,kind,target
 ,SimBlockTrack,src/state/block.cpp,global_read,g_trackedCount
 ,SimBlockTrack,src/state/block.cpp,global_write,g_tracked
 ,SimBlockTrack,src/state/block.cpp,global_write,g_trackedCount
+,SimCapture,src/state/sim_radar.cpp,call,SimCreate
+,SimCapture,src/state/sim_radar.cpp,deref_read,*SimRadarArena
+,SimCapture,src/state/sim_radar.cpp,function,
+,SimCapture,src/state/sim_radar.cpp,global_read,g_simRadar@src/state/sim_radar.cpp
+,SimCaptureAlloc,src/state/sim_radar.cpp,call,FatalError
+,SimCaptureAlloc,src/state/sim_radar.cpp,call,HarnessTestMode
+,SimCaptureAlloc,src/state/sim_radar.cpp,deref_read,*unsigned int
+,SimCaptureAlloc,src/state/sim_radar.cpp,deref_write,*unsigned int
+,SimCaptureAlloc,src/state/sim_radar.cpp,field_escape,SimRadarArena::bytes
+,SimCaptureAlloc,src/state/sim_radar.cpp,field_read,SimRadarArena::dropped
+,SimCaptureAlloc,src/state/sim_radar.cpp,field_read,SimRadarArena::highWater
+,SimCaptureAlloc,src/state/sim_radar.cpp,field_read,SimRadarArena::used
+,SimCaptureAlloc,src/state/sim_radar.cpp,field_write,SimRadarArena::dropped
+,SimCaptureAlloc,src/state/sim_radar.cpp,field_write,SimRadarArena::highWater
+,SimCaptureAlloc,src/state/sim_radar.cpp,field_write,SimRadarArena::used
+,SimCaptureAlloc,src/state/sim_radar.cpp,function,
+,SimCaptureAlloc,src/state/sim_radar.cpp,global_read,g_simRadar@src/state/sim_radar.cpp
+,SimCaptureClear,src/state/sim_radar.cpp,call,SimCapture
+,SimCaptureClear,src/state/sim_radar.cpp,field_write,SimRadarArena::dropped
+,SimCaptureClear,src/state/sim_radar.cpp,field_write,SimRadarArena::used
+,SimCaptureClear,src/state/sim_radar.cpp,function,
+,SimCaptureCreate,src/state/sim_radar.cpp,call,SimAllocTagged
+,SimCaptureCreate,src/state/sim_radar.cpp,call,SimBlockTrack
+,SimCaptureCreate,src/state/sim_radar.cpp,function,
+,SimCaptureCreate,src/state/sim_radar.cpp,global_escape,g_simRadar@src/state/sim_radar.cpp
+,SimCaptureCreate,src/state/sim_radar.cpp,global_write,g_simRadar@src/state/sim_radar.cpp
 ,SimCreate,src/state/sim_globals.cpp,call,SimAlloc
 ,SimCreate,src/state/sim_globals.cpp,call,SimBlockTrack
+,SimCreate,src/state/sim_globals.cpp,call,SimCaptureCreate
 ,SimCreate,src/state/sim_globals.cpp,call,SimEventsCreate
 ,SimCreate,src/state/sim_globals.cpp,call,atexit
 ,SimCreate,src/state/sim_globals.cpp,call,operator new
@@ -56976,14 +57082,14 @@ address,function,file,kind,target
 ,Visible,src/units/unit_scripts.cpp,field_read,UnitCursorView::player
 ,Visible,src/units/unit_scripts.cpp,function,
 ,Visible,src/units/unit_scripts.cpp,global_read,g_game
-,VisibleOnRadar,src/ingame/radar.cpp,call,operator unsigned short *
-,VisibleOnRadar,src/ingame/radar.cpp,deref_read,*unsigned short
-,VisibleOnRadar,src/ingame/radar.cpp,field_read,Game::playerIndex
-,VisibleOnRadar,src/ingame/radar.cpp,field_read,Game::visibilityMask
-,VisibleOnRadar,src/ingame/radar.cpp,field_read,Player::exploredHeight
-,VisibleOnRadar,src/ingame/radar.cpp,field_read,Player::exploredWidth
-,VisibleOnRadar,src/ingame/radar.cpp,function,
-,VisibleOnRadar,src/ingame/radar.cpp,global_read,g_game
+,VisibleOnRadar,src/map/radar_capture.cpp,call,operator unsigned short *
+,VisibleOnRadar,src/map/radar_capture.cpp,deref_read,*unsigned short
+,VisibleOnRadar,src/map/radar_capture.cpp,field_read,Game::playerIndex
+,VisibleOnRadar,src/map/radar_capture.cpp,field_read,Game::visibilityMask
+,VisibleOnRadar,src/map/radar_capture.cpp,field_read,Player::exploredHeight
+,VisibleOnRadar,src/map/radar_capture.cpp,field_read,Player::exploredWidth
+,VisibleOnRadar,src/map/radar_capture.cpp,function,
+,VisibleOnRadar,src/map/radar_capture.cpp,global_read,g_game
 ,Visit,src/harness/block_scan.cpp,call,Find
 ,Visit,src/harness/block_scan.cpp,call,ScanFast
 ,Visit,src/harness/block_scan.cpp,call,ScanPlain

@@ -1630,24 +1630,24 @@ void __stdcall RecLosRadarAddEyeball(Vec3* a0, int a1, int a2, int a3)
     }
 }
 
-void __stdcall RecLosRadarDrawRadarUnits()
+void __stdcall RecLosRadarRecordRadarUnits()
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_DRAWRADARUNITS, SUB_LOS_RADAR, roots);
+    SlotScope scope(RSL_LOS_RADAR_RECORDRADARUNITS, SUB_LOS_RADAR, roots);
     if (scope.Open()) {
     }
-    s_inner_los_radar->DrawRadarUnits();
+    s_inner_los_radar->RecordRadarUnits();
     if (scope.Open()) {
     }
 }
 
-void __stdcall RecLosRadarUpdateRadarMapped()
+void __stdcall RecLosRadarRecordRadarMapped()
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_UPDATERADARMAPPED, SUB_LOS_RADAR, roots);
+    SlotScope scope(RSL_LOS_RADAR_RECORDRADARMAPPED, SUB_LOS_RADAR, roots);
     if (scope.Open()) {
     }
-    s_inner_los_radar->UpdateRadarMapped();
+    s_inner_los_radar->RecordRadarMapped();
     if (scope.Open()) {
     }
 }
@@ -5281,9 +5281,9 @@ void HookSeams(const bool* on)
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.AddEyeball = RecLosRadarAddEyeball;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.DrawRadarUnits = RecLosRadarDrawRadarUnits;
+        s_rec_los_radar.RecordRadarUnits = RecLosRadarRecordRadarUnits;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.UpdateRadarMapped = RecLosRadarUpdateRadarMapped;
+        s_rec_los_radar.RecordRadarMapped = RecLosRadarRecordRadarMapped;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.UpdateSensorRadarAndCloak = RecLosRadarUpdateSensorRadarAndCloak;
     if (on[SUB_ORDERS])

@@ -549,7 +549,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
         }
 
         if (bl == g_game->playerIndex)
-            g_seams.los_radar->DrawRadarUnits();
+            g_seams.los_radar->RecordRadarUnits();
 
         if ((unsigned int)pi->updateTime > (unsigned int)g_game->ticks)
             goto next_bl;
@@ -703,7 +703,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
 
         if (bl == g_game->playerIndex) {
             g_seams.los_radar->UpdateSensorRadarAndCloak();
-            g_seams.los_radar->UpdateRadarMapped();
+            g_seams.los_radar->RecordRadarMapped();
             if (g_seams.map->GetGameType(g_game->net) == 3) {
                 g_economyPacketTick++;
                 if ((g_economyPacketTick & 3) == 0)

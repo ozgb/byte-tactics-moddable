@@ -159,6 +159,10 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_REMOVE_UNIT_SPEECH = 32,
     // A line enters the message log: a SimMessageText and its value.
     SIM_EVENT_MESSAGE = 33,
+    // The radar picture shows the units and projectiles of a snapshot: its offset in the radar arena.
+    SIM_EVENT_RADAR_UNITS = 34,
+    // The radar picture marks the cells a snapshot says are explored or hidden: its offset in the radar arena.
+    SIM_EVENT_RADAR_MAPPED = 35,
 };
 // Flag of SIM_EVENT_UNIT_SPEECH: the unit stays silent when it is on screen.
 #define SIM_EVENT_SPEECH_IF_NOT_VISIBLE 1u

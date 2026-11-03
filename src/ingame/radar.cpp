@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "radar.h"
+#include "../state/sim_radar.h"
 
 #include "../util/point.h"
 
@@ -37,18 +38,6 @@ struct RadarSurfaceView {
 
 #include "../util/angles.h"
 #include "../weapons/unit_weapon_slot.h"
-
-struct RadarUnitDefView {
-    char unknown_0[0x204];
-    short radardistance;
-    short sonardistance;
-    char unknown_208[0x20a - 0x208];
-    short radardistancejam;
-    short sonardistancejam;
-    char unknown_20e[0x241 - 0x20e];
-    InterceptorDefFlags flags1;
-    unsigned char flags2;
-};
 
 #include "../units/unit.h"
 #include "../weapons/projectile.h"
@@ -167,83 +156,43 @@ void __stdcall CalcRadarViewportRect(int* param_1)
 }
 
 // FUNCTION: 0x466c20
-void UpdateRadarMapped()
+void UpdateRadarMapped(const RadarMappedCapture* capture)
 {
-    if (g_game->timer.word.flags.mapChanged) {
-        g_game->timer.word.flags.mapChanged = 0;
-        unsigned char fog = g_game->textColor;
-        Player* t = &g_game->players_1b63_14b[g_game->playerIndex];
-        unsigned int mask = 1 << g_game->playerIndex;
-        unsigned char* dst = *(unsigned char**)((char*)g_game->mappedSurface + 0xc);
-        unsigned char* src = *(unsigned char**)((char*)g_game->pictureSurface + 0xc);
-        int halfWidth = g_game->width / 2;
-        int halfHeight = g_game->height / 2;
-        for (int i = 0; i < g_game->screen_h; i++) {
-            int mapY = i * halfHeight;
-            int mapX = 0;
-            int j = 0;
-            while (j < g_game->width_142eb) {
-                int index = (mapY / g_game->screen_h) * halfWidth + mapX / g_game->width_142eb;
-                if (!(unsigned short)(g_game->visibilityMask[index] & mask)) {
-                    *dst = fog;
-                } else if (t->explored[index]) {
-                    *dst = *src;
-                } else {
-                    *dst = g_game->displayContext->grayTable[*src];
-                }
-                j++;
-                mapX += halfWidth;
-                src++;
-                dst++;
+    if (g_game->mappedSurface == nullptr || g_game->pictureSurface == nullptr)
+        return;
+    unsigned char fog = g_game->textColor;
+    const unsigned char* cell = (const unsigned char*)(capture + 1);
+    unsigned char* dst = *(unsigned char**)((char*)g_game->mappedSurface + 0xc);
+    unsigned char* src = *(unsigned char**)((char*)g_game->pictureSurface + 0xc);
+    int halfWidth = capture->width / 2;
+    int halfHeight = capture->height / 2;
+    for (int i = 0; i < g_game->screen_h; i++) {
+        int mapY = i * halfHeight;
+        int mapX = 0;
+        int j = 0;
+        while (j < g_game->width_142eb) {
+            int index = (mapY / g_game->screen_h) * halfWidth + mapX / g_game->width_142eb;
+            if (cell[index] == RADAR_CELL_HIDDEN) {
+                *dst = fog;
+            } else if (cell[index] == RADAR_CELL_EXPLORED) {
+                *dst = *src;
+            } else {
+                *dst = g_game->displayContext->grayTable[*src];
             }
+            j++;
+            mapX += halfWidth;
+            src++;
+            dst++;
         }
-        g_game->timer.word.flags.pending = 1;
     }
-}
-
-static Player* Player_Get(unsigned char p)
-{
-    return &g_game->players_1b63_14b[0] + p;
-}
-
-static inline int ExploredOnRadar(Player* pi, int px, int py)
-{
-    int tx = px >> 5;
-    int ty = py >> 5;
-    if ((unsigned int)tx < (unsigned int)pi->exploredWidth && (unsigned int)ty < (unsigned int)pi->exploredHeight &&
-        pi->explored[(unsigned int)pi->exploredWidth * ty + tx])
-        return 1;
-    return 0;
-}
-
-static inline int VisibleOnRadar(Player* pi, int px, int py)
-{
-    int tx = px >> 5;
-    int ty = py >> 5;
-    if (!((unsigned int)tx < (unsigned int)pi->exploredWidth && (unsigned int)ty < (unsigned int)pi->exploredHeight)) {
-        return 0;
-    }
-    Player* b = pi;
-    return (g_game->visibilityMask[(unsigned int)b->exploredWidth * ty + tx] &
-            (1 << g_game->playerIndex)) != 0;
-}
-
-static inline int IsOnRadar(int px, int py)
-{
-    Player* pi = Player_Get(g_game->playerIndex);
-    if ((g_game->mapFlags_14281.raw & 2) == 2)
-        return ExploredOnRadar(pi, px, py);
-    return VisibleOnRadar(pi, px, py);
-}
-
-static inline int ScaledRadarY(Unit* u)
-{
-    return ((int)u->zWhole - ((int)u->yWhole >> 1)) * (int)g_game->screen_h;
+    g_game->timer.word.flags.pending = 1;
 }
 
 // FUNCTION: 0x466dc0
-void DrawRadarUnits(void)
+void DrawRadarUnits(const RadarDrawCapture* capture)
 {
+    if (g_game->finalSurface == nullptr || g_game->mappedSurface == nullptr)
+        return;
     unsigned char* base = (unsigned char*)g_game + 0xdcb;
     HotRadarSlot* out = g_game->hotRadar;
 
@@ -251,117 +200,60 @@ void DrawRadarUnits(void)
     void* surface = g_game->finalSurface;
     DrawSurface(surface, g_game->mappedSurface, 0, 0);
 
-    int enabled;
-    if (g_game->mapFlags_14281.bit0 || g_game->mapFlags_14281.bit1)
-        enabled = 0;
-    else
-        enabled = 1;
-    if ((g_game->matchFlags & 2))
-        enabled = 1;
-
-    Unit* u = g_game->units;
-    Unit* end = g_game->unitsEnd;
-    if (u <= end) {
-        do {
-            RadarUnitDefView* type = (RadarUnitDefView*)u->def.get();
-            if (u->unitDefIndex != 0) {
-                if (enabled != 0 || (u->flags & 0x300) != 0 ||
-                    u->playerIndex == g_game->playerIndex) {
-                    int x = u->xWhole * g_game->width_142eb /
-                            g_game->mapWidth;
-                    int y = ScaledRadarY(u) / g_game->mapHeight;
-                    if (u->recentlyDamagedTimer == 0 ||
-                        (g_game->timer.byte.field_142f0.b.hi & 1) != 0) {
-                        DrawFrame(surface,
-                            GetGafFrame(g_game->radlogo,
-                                Player_Get(u->playerIndex)->info->color),
-                            x, y);
+    const RadarUnitCapture* u = (const RadarUnitCapture*)(capture + 1);
+    for (unsigned int n = 0; n < capture->unitCount; n++, u++) {
+        int x = u->xWhole * g_game->width_142eb / g_game->mapWidth;
+        int y = u->yScaled * (int)g_game->screen_h / g_game->mapHeight;
+        if (!(u->flags & RADAR_UNIT_DAMAGED) ||
+            (g_game->timer.byte.field_142f0.b.hi & 1) != 0) {
+            DrawFrame(surface, GetGafFrame(g_game->radlogo, u->color), x, y);
+        }
+        if ((short)u->id == (short)g_game->hoverUnitId) {
+            DrawFrame(surface, GetGafFrame(g_game->radlogohigh, 0), x, y);
+        }
+        if (g_game->units[u->slot].selected) {
+            if (u->flags & RADAR_UNIT_SHOWS_RANGES) {
+                if (u->radarDistance != 0)
+                    DrawCircle((Surface *)surface, x, y,
+                        (int)g_game->width_142eb * u->radarDistance / g_game->mapWidth, base[0xa]);
+                if (u->sonarDistance != 0)
+                    DrawCircle((Surface *)surface, x, y,
+                        (int)g_game->width_142eb * u->sonarDistance / g_game->mapWidth, base[0xa]);
+                if (u->radarJamDistance != 0)
+                    DrawCircle((Surface *)surface, x, y,
+                        (int)g_game->width_142eb * u->radarJamDistance / g_game->mapWidth, base[0xc]);
+                if (u->sonarJamDistance != 0)
+                    DrawCircle((Surface *)surface, x, y,
+                        (int)g_game->width_142eb * u->sonarJamDistance / g_game->mapWidth, base[0xc]);
+            }
+            if (u->flags & RADAR_UNIT_HAS_INTERCEPTORS) {
+                for (int w = 0; w < 3; w++) {
+                    if (u->weapons[w].interceptor) {
+                        int r = ((int)g_game->width_142eb * (u->weapons[w].coverage - 0x200)) / g_game->mapWidth;
+                        if (u->weapons[w].stocked)
+                            DrawDashedCircle((Surface *)surface, x, y, r, base[0xf], 0x20,
+                                         g_game->timer.byte.field_142f0.b.hi & 1);
+                        else
+                            DrawCircle((Surface *)surface, x, y, r, base[0xf]);
                     }
-                    if ((short)u->id == (short)g_game->hoverUnitId) {
-                        DrawFrame(surface,
-                            GetGafFrame(g_game->radlogohigh, 0), x, y);
-                    }
-                    if (u->selected) {
-                        if ((u->activateFlags & 1) != 0 ||
-                            (type->flags2 & 4) == 0) {
-                            if (type->radardistance != 0)
-                                DrawCircle((Surface *)surface, x, y,
-                                    (int)g_game->width_142eb * type->radardistance /
-                                    g_game->mapWidth, base[0xa]);
-                            if (type->sonardistance != 0)
-                                DrawCircle((Surface *)surface, x, y,
-                                    (int)g_game->width_142eb * type->sonardistance /
-                                    g_game->mapWidth, base[0xa]);
-                            if (type->radardistancejam != 0)
-                                DrawCircle((Surface *)surface, x, y,
-                                    (int)g_game->width_142eb * type->radardistancejam /
-                                    g_game->mapWidth, base[0xc]);
-                            if (type->sonardistancejam != 0)
-                                DrawCircle((Surface *)surface, x, y,
-                                    (int)g_game->width_142eb * type->sonardistancejam /
-                                    g_game->mapWidth, base[0xc]);
-                        }
-                        if (type->flags1.bit29) {
-                            UnitWeaponSlot* slot = u->weapons;
-                            int n = 3;
-                            do {
-                                if (slot->weapon->flags.b.interceptor) {
-                                    int r = ((int)g_game->width_142eb *
-                                             (slot->weapon->coverage - 0x200)) /
-                                            g_game->mapWidth;
-                                    if (slot->stockpile != 0)
-                                        DrawDashedCircle((Surface *)surface, x, y, r, base[0xf],
-                                                     0x20,
-                                                     g_game->timer.byte.field_142f0.b.hi & 1);
-                                    else
-                                        DrawCircle((Surface *)surface, x, y, r, base[0xf]);
-                                }
-                                slot++;
-                                n--;
-                            } while (n != 0);
-                        }
-                    }
-                    out->unitId = u->id;
-                    out->x = g_game->posX + x;
-                    out->y = g_game->posY + y;
-                    out++;
-                    g_game->hotRadarCount++;
                 }
             }
-            u = (Unit*)((char*)u + 0x118);
-        } while (u <= g_game->unitsEnd);
+        }
+        out->unitId = u->id;
+        out->x = g_game->posX + x;
+        out->y = g_game->posY + y;
+        out++;
+        g_game->hotRadarCount++;
     }
 
-    Projectile* p = g_game->projectiles;
-    int i = 0;
-    if (g_game->projectileCount > 0) {
-        do {
-            int px = p->positionWords.xWhole;
-            int x = (int)g_game->width_142eb * px / g_game->mapWidth;
-            int py = p->positionWords.zWhole - ((int)p->positionWords.yWhole >> 1);
-            int y = (int)g_game->screen_h * py / g_game->mapHeight;
-            if ((p->type->flags.value & 0x60000000) == 0) {
-                if ((p->type->flags.value & 0x40) == 0) {
-                    if (IsOnRadar(px, py) ||
-                        p->owner ==
-                            g_game->playerIndex) {
-                        DrawPixel((Surface *)surface, x, y, base[0xe]);
-                    }
-                }
-            } else {
-                if (IsOnRadar(px, py) ||
-                    p->attacker->playerIndex ==
-                        g_game->playerIndex) {
-                    DrawFrame(surface,
-                        GetGafFrame(g_game->nuclogo,
-                            Player_Get(
-                                p->owner)->info->color),
-                        x, y);
-                }
-            }
-            i++;
-            p++;
-        } while (i < g_game->projectileCount);
+    const RadarProjectileCapture* p = (const RadarProjectileCapture*)u;
+    for (unsigned int n = 0; n < capture->projectileCount; n++, p++) {
+        int x = (int)g_game->width_142eb * p->x / g_game->mapWidth;
+        int y = (int)g_game->screen_h * p->y / g_game->mapHeight;
+        if (p->kind == RADAR_PROJECTILE_PIXEL)
+            DrawPixel((Surface *)surface, x, y, base[0xe]);
+        else
+            DrawFrame(surface, GetGafFrame(g_game->nuclogo, p->color), x, y);
     }
 
     g_game->timer.byte.field_142f0.bits.bit1 = 1;

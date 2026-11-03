@@ -2779,7 +2779,6 @@ orders,seams,indirect,ChooseWeaponNative,1
 orders,seams,indirect,ClaimWeaponsNative,24
 orders,seams,indirect,CreatePathfinderNative,1
 orders,seams,indirect,DestroyPathfinderNative,1
-orders,seams,indirect,FindBestTargetIfFireAtWillNative,6
 orders,seams,indirect,FindScriptNative,3
 orders,seams,indirect,GetFactoriesInRadiusNative,7
 orders,seams,indirect,GetGameTypeNative,1
@@ -2801,6 +2800,7 @@ orders,seams,indirect,VisitObjectsInRangeNative,3
 orders,seams,shared_write,Game::pathfinder,1
 orders,seams,shared_write,Vec3::x,1
 orders,targeting,indirect,ClearWeaponTarget,5
+orders,targeting,indirect,FindBestTargetIfFireAtWill,6
 orders,targeting,indirect,GetWeaponTargetUnit,3
 orders,targeting,shared_write,Unit::fireOrder,1
 orders,targeting,shared_write,Unit::flags,1
@@ -4887,7 +4887,6 @@ seams,presentation,shared_write,Seams::network,1
 seams,presentation,shared_write,Seams::orders,1
 seams,presentation,shared_write,Seams::units,1
 seams,presentation,shared_write,Unit::motion,1
-seams,targeting,call,FindBestTargetIfFireAtWill,1
 seams,targeting,call,GetWeaponTargetPos,1
 seams,targeting,call,SetWeaponTargetPos,1
 seams,targeting,call,SetWeaponTargetUnit,1

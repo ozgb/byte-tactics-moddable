@@ -2502,43 +2502,43 @@ address,function,file,kind,target
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,Vec::z
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,function,
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,global_read,g_playerAI
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,call,Bits::Test
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,call,RandomInt
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,call,UnitSwapEraseVector::EraseSwapBack
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,call,begin
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,call,empty
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,call,operator->
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,call,size
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,deref_read,*Bits
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,deref_read,*Unit
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,deref_read,*unsigned char
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_escape,Unit::pos
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_escape,UnitDef::categories
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_escape,UnitDef::weaponCategories
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,AiSeam::GetVisibleEnemiesInRadius
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Game::matchFlags
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Player::active
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Player::type
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Seams::ai
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Seams::weapons
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Unit::activateFlags
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Unit::def
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Unit::flags
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Unit::player
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Unit::playerIndex
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Unit::unitDefIndex
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,UnitDef::flags1
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,UnitDef::range
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Vec3::x
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,Vec3::z
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,WeaponsSeam::GetWeaponRange
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,field_read,WeaponsSeam::WeaponCanReachUnit
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,function,
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,global_read,g_game
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,global_read,g_seams
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, unsigned int) __attribute__((stdcall)) [WeaponsSeam::GetWeaponRange]"
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetVisibleEnemiesInRadius]"
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,Bits::Test
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,RandomInt
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,UnitSwapEraseVector::EraseSwapBack
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,begin
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,empty
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,operator->
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,size
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,deref_read,*Bits
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,deref_read,*Unit
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,deref_read,*unsigned char
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_escape,Unit::pos
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_escape,UnitDef::categories
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_escape,UnitDef::weaponCategories
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,AiSeam::GetVisibleEnemiesInRadius
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Game::matchFlags
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Player::active
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Player::type
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Seams::ai
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Seams::weapons
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Unit::activateFlags
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Unit::def
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Unit::flags
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Unit::player
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Unit::playerIndex
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Unit::unitDefIndex
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,UnitDef::flags1
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,UnitDef::range
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Vec3::x
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Vec3::z
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,WeaponsSeam::GetWeaponRange
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,WeaponsSeam::WeaponCanReachUnit
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,function,
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,global_read,g_game
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,global_read,g_seams
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,indirect_call,"indirect via int (*)(Unit *, unsigned int) __attribute__((stdcall)) [WeaponsSeam::GetWeaponRange]"
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetVisibleEnemiesInRadius]"
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,call,get
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,call,operator=
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp,deref_read,*Vec3
@@ -12086,9 +12086,9 @@ address,function,file,kind,target
 0x43b400,IssueRepairOrder,src/orders/order_list.cpp,field_write,Point16::y
 0x43b400,IssueRepairOrder,src/orders/order_list.cpp,function,
 0x43b400,IssueRepairOrder,src/orders/order_list.cpp,global_read,kSim
-0x43b700,FindBestTargetIfFireAtWill,src/orders/order_list.cpp,call,FindWeaponTarget
-0x43b700,FindBestTargetIfFireAtWill,src/orders/order_list.cpp,field_read,Unit::fireOrder
-0x43b700,FindBestTargetIfFireAtWill,src/orders/order_list.cpp,function,
+0x43b700,FindBestTargetIfFireAtWill,src/units/unit_targets.cpp,call,FindWeaponTarget
+0x43b700,FindBestTargetIfFireAtWill,src/units/unit_targets.cpp,field_read,Unit::fireOrder
+0x43b700,FindBestTargetIfFireAtWill,src/units/unit_targets.cpp,function,
 0x43b730,EnqueueOrderType,src/orders/order_list.cpp,call,InsertBefore
 0x43b730,EnqueueOrderType,src/orders/order_list.cpp,call,operator Order *
 0x43b730,EnqueueOrderType,src/orders/order_list.cpp,call,operator new
@@ -43344,9 +43344,9 @@ address,function,file,kind,target
 ,BitReader::ReadBit,interfaces/services.h,field_write,BitReader::bit
 ,BitReader::ReadBit,interfaces/services.h,field_write,BitReader::index
 ,BitReader::ReadBit,interfaces/services.h,function,
-,Bits::Test,src/ai/ai_player.cpp,deref_read,*unsigned int
-,Bits::Test,src/ai/ai_player.cpp,field_read,Bits::words
-,Bits::Test,src/ai/ai_player.cpp,function,
+,Bits::Test,src/units/unit_targets.cpp,deref_read,*unsigned int
+,Bits::Test,src/units/unit_targets.cpp,field_read,Bits::words
+,Bits::Test,src/units/unit_targets.cpp,function,
 ,BlockAt,src/harness/replay_objects.cpp,call,SimBlockBase
 ,BlockAt,src/harness/replay_objects.cpp,function,
 ,BlockMap::Begin,src/debug/debug_lib.cpp,field_read,BlockMap::head
@@ -44974,8 +44974,6 @@ address,function,file,kind,target
 ,Find,src/util/tdf.cpp,field_escape,StringRef::ptr
 ,Find,src/util/tdf.cpp,field_read,StringRef::ptr
 ,Find,src/util/tdf.cpp,function,
-,FindBestTargetIfFireAtWillNative,src/seams/native.cpp,call,FindBestTargetIfFireAtWill
-,FindBestTargetIfFireAtWillNative,src/seams/native.cpp,function,
 ,FindByName,src/units/unit_commands.cpp,call,_strcmpi
 ,FindByName,src/units/unit_commands.cpp,field_escape,UnitDefNameKeyView::name
 ,FindByName,src/units/unit_commands.cpp,function,
@@ -48319,7 +48317,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EmptyShutdownPreCleanup
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EnableMeteors
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ExpireEyeballs
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,FindBestTargetIfFireAtWillNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,FindBestTargetIfFireAtWill
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FindFeatureAtPos
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FindFilesRecursiveNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FindMissionUnit

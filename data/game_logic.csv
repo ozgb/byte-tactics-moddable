@@ -55,7 +55,7 @@ address,function,file
 0x40b2c0,UpdatePlayerAI,src/ai/ai_player.cpp
 0x40b320,CreatePlayerAI,src/ai/ai_player.cpp
 0x40b370,RebuildFeatureCells,src/ai/ai_player.cpp
-0x40b7b0,FindWeaponTarget,src/ai/ai_player.cpp
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp
 0x40ba80,GetBasePosition,src/ai/ai_player.cpp
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp
 0x40bdb0,ChooseBuildOption,src/ai/ai_player.cpp

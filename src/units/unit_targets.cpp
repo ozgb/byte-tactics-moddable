@@ -12,6 +12,8 @@
 #include "../util/vec3.h"
 #include "../quirks/quirks.h"
 #include "../util/tdf.h"
+#include "../../interfaces/services.h"
+#include "squad.h"
 
 class UnitRef;
 
@@ -458,6 +460,12 @@ Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index)
     return &g_game->units[p->a];
 }
 
+#ifdef BT_REPLAY_INJECT_TARGET_SCALE
+#define TARGET_BODY_SCALE BT_REPLAY_INJECT_TARGET_SCALE
+#else
+#define TARGET_BODY_SCALE 0xcccc
+#endif
+
 static Vec3 ScaleBodyOffset(UnitMotionBodyView* m, __int64 s)
 {
     Vec3 d;
@@ -500,7 +508,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
         d.z = unit->pos.z - pos->z;
         int dist = (int)sqrt((double)d.x * d.x + (double)d.y * d.y + (double)d.z * d.z);
         int scale = (int)(((__int64)dist << 16) / ((WeaponDefTargetView*)e->weapon.get())->radius);
-        scale = (int)((scale * (__int64)0xcccc) >> 16);
+        scale = (int)((scale * (__int64)TARGET_BODY_SCALE) >> 16);
         __int64 s = scale;
         d = ScaleBodyOffset((UnitMotionBodyView*)def->motion.get(), s);
         pos->x = pos->x + d.x;
@@ -625,4 +633,50 @@ void __stdcall AlignUnitToGround(Unit* u)
         u->angles.pitch = AngleOfVector(b - a, (short)(abs(pts[0].z - pts[3].z) >> 16));
         u->angles.bank = AngleOfVector(h0 - h1, (short)(abs(pts[0].x - pts[1].x) >> 16));
     }
+}
+
+struct Bits {
+    unsigned* words;
+    int Test(unsigned short index) const { return (words[index>>5]&(1u<<(index&31)))!=0; }
+};
+
+// FUNCTION: 0x40b7b0
+Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
+{
+    int ai=unit->player->active && unit->player->type==2;
+    Unit* fallback=0;
+    int fallbackDistance=0x7fffffff;
+    int bestDistance=0x7fffffff;
+    Unit* best=0;
+    std::vector<Unit*> candidates;
+    if(useRange) g_seams.ai->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,g_seams.weapons->GetWeaponRange(unit,weapon),0,&candidates);
+    else g_seams.ai->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,unit->def->range,0,&candidates);
+    for(int count=0;count<50;++count) {
+        if(candidates.empty()) break;
+        std::vector<Unit*>::iterator it=candidates.begin()+RandomInt(candidates.size());
+        Unit* target=*it;
+        ((UnitSwapEraseVector*)&candidates)->EraseSwapBack(it);
+        if((target->flags&0x10000000) && !(target->flags&0x4000) &&
+           ((target->def->flags1&0x8000) || ai || (g_game->matchFlags&4)) &&
+           ((unit->def->flags1&0x10000000) || g_seams.weapons->WeaponCanReachUnit(unit,target,weapon)) &&
+           (useRange || !((Bits*)&unit->def->categories)->Test(target->unitDefIndex)) &&
+           (!((*(unsigned char*)&unit->weapons[weapon].weapon->flags)&0x80) || !(target->activateFlags&0x10))) {
+            int dz=unit->pos.z-target->pos.z;
+            int dx=unit->pos.x-target->pos.x;
+            int d=RandomInt((int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32));
+            if(((Bits*)unit->def->weaponCategories)[weapon].Test(target->unitDefIndex)) {
+                if(d<fallbackDistance) { fallbackDistance=d; fallback=target; }
+            } else if(d<bestDistance) { bestDistance=d; best=target; }
+        }
+    }
+    if(best) return best;
+    return fallback;
+}
+
+// FUNCTION: 0x43b700
+Unit* __stdcall FindBestTargetIfFireAtWill(Unit* unit)
+{
+    if (unit->fireOrder == 2)
+        return FindWeaponTarget(unit, 0, 0);
+    return 0;
 }

@@ -85,8 +85,6 @@ void __stdcall UpdatePlayerEconomy(Player* p);
 
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot, unsigned char owner);
 
-Unit* __stdcall FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange);
-
 #include "../map/line_of_sight.h"
 #include "../game/share_commands.h"
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
@@ -256,11 +254,6 @@ static int __stdcall GetWeaponTargetPosNative(Unit* unit, Vec3* pos, int weapon)
 static void __stdcall DamageFeatureNative(Cell* cell, int x, int z, WeaponDef* weapon)
 {
     DamageFeature(cell, x, z, weapon);
-}
-
-static Unit* __stdcall FindBestTargetIfFireAtWillNative(Unit* unit)
-{
-    return (Unit*)FindBestTargetIfFireAtWill(unit);
 }
 
 static int __stdcall GetGroundHeightNative(Vec3* pos)
@@ -739,7 +732,7 @@ void InstallNativeSeams()
     s_targeting.GetWeaponTargetUnit = GetWeaponTargetUnit;
     s_targeting.GetWeaponTargetPos = GetWeaponTargetPosNative;
     s_targeting.FindWeaponTarget = FindWeaponTarget;
-    s_targeting.FindBestTargetIfFireAtWill = FindBestTargetIfFireAtWillNative;
+    s_targeting.FindBestTargetIfFireAtWill = FindBestTargetIfFireAtWill;
     s_targeting.ChooseWeapon = ChooseWeaponNative;
     s_los_radar.GetMapCell = GetMapCell;
     s_los_radar.CmdShareMapping = CmdShareMapping;

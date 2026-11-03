@@ -44,8 +44,8 @@ address,function,callee,kind,file,class,notes
 0x40b1c0,SumUnitRatingsInRange,_allshr,call,src/ai/ai_player.cpp,game,sites=2
 0x40b530,GetFactoriesInRadius,_allmul,call,src/ai/ai_player.cpp,presentation,sites=2
 0x40b530,GetFactoriesInRadius,_allshr,call,src/ai/ai_player.cpp,presentation,sites=2
-0x40b7b0,FindWeaponTarget,_allmul,call,src/ai/ai_player.cpp,game,sites=2
-0x40b7b0,FindWeaponTarget,_allshr,call,src/ai/ai_player.cpp,game,sites=2
+0x40b7b0,FindWeaponTarget,_allmul,call,src/units/unit_targets.cpp,game,sites=2
+0x40b7b0,FindWeaponTarget,_allshr,call,src/units/unit_targets.cpp,game,sites=2
 0x40bb00,GetBuildRating,_ftol,call,src/ai/ai_player.cpp,game,sites=4
 0x40beb0,MoveToward,_alldiv,call,src/ai/ai_player.cpp,presentation,sites=1
 0x40beb0,MoveToward,_allmul,call,src/ai/ai_player.cpp,presentation,sites=3

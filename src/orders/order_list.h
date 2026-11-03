@@ -24,7 +24,6 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount);
 void __stdcall AppendOrderToTail(Unit* owner, Order* node);
 void __stdcall InsertOrderAfterMarked(Unit* owner, Order* node);
 int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int);
-int __stdcall FindBestTargetIfFireAtWill(Unit* unit);
 void __stdcall EnqueueOrderType(Unit* p, unsigned char type);
 void __stdcall MoveOrderToTail(Unit* owner, Order* node);
 void __stdcall RunOrders(Unit* unit);

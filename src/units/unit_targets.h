@@ -25,5 +25,7 @@ void __stdcall SetWeaponTargetUnit(char*, char*, int);
 void __stdcall SetWeaponTargetPos(char*, int*, int);
 
 int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index);
+Unit* __stdcall FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange);
+Unit* __stdcall FindBestTargetIfFireAtWill(Unit* unit);
 
 #endif

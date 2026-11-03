@@ -131,7 +131,7 @@ address,size,file,symbol,status,similarity
 0x40b370,19,src/ai/ai_player.cpp,?RebuildFeatureCells@@YGXH@Z,matched,100.0
 0x40b390,401,src/ai/ai_player.cpp,?DestroyPlayerAI@@YGXH@Z,matched,100.0
 0x40b530,627,src/ai/ai_player.cpp,?GetFactoriesInRadius@@YGXHPBUVec@@HPAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@@Z,matched,100.0
-0x40b7b0,720,src/ai/ai_player.cpp,?FindWeaponTarget@@YGPAUUnit@@PAU1@EH@Z,matched,100.0
+0x40b7b0,720,src/units/unit_targets.cpp,?FindWeaponTarget@@YGPAUUnit@@PAU1@EH@Z,matched,100.0
 0x40ba80,37,src/ai/ai_player.cpp,?GetBasePosition@@YGXHPAUVec3@@@Z,matched,100.0
 0x40bab0,78,src/ai/ai_player.cpp,?GetMirroredBasePosition@@YGXHHPAUMirroredBasePos@@@Z,matched,100.0
 0x40bb00,686,src/ai/ai_player.cpp,?GetBuildRating@@YGHHG@Z,matched,100.0
@@ -748,7 +748,7 @@ address,size,file,symbol,status,similarity
 0x43b0b0,310,src/orders/order_list.cpp,?AdjustBuildCount@@YGXHPAUUnit@@HH@Z,matched,100.0
 0x43b1f0,519,src/orders/order_list.cpp,?IssueAttackOrder@@YGHPAUUnit@@0H@Z,matched,100.0
 0x43b400,768,src/orders/order_list.cpp,?IssueRepairOrder@@YGHPAUUnit@@0H@Z,matched,100.0
-0x43b700,42,src/orders/order_list.cpp,?FindBestTargetIfFireAtWill@@YGHPAUUnit@@@Z,matched,100.0
+0x43b700,42,src/units/unit_targets.cpp,?FindBestTargetIfFireAtWill@@YGHPAUUnit@@@Z,matched,100.0
 0x43b730,136,src/orders/order_list.cpp,?EnqueueOrderType@@YGXPAUUnit@@E@Z,matched,100.0
 0x43b7c0,780,src/orders/order_list.cpp,?RunOrders@@YGXPAUUnit@@@Z,matched,100.0
 0x43bad0,440,src/orders/order_list.cpp,?RunSecondaryOrders@@YGXPAUUnit@@@Z,matched,100.0

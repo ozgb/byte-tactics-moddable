@@ -2,12 +2,15 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
+#include <memory>
+#include <vector>
 
 #include "replay_schema.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/rand_stream.h"
 #include "../util/vec3.h"
+#include "../units/unit.h"
 #include "replay_text.h"
 #include "replay_types.h"
 #include "replay_values.h"
@@ -358,6 +361,17 @@ void ImportVec3(ReplayText& t, const char* label, const Vec3* v)
     ReplayValue(t, *v);
 }
 
+void ImportVec3Xz(ReplayText& t, const char* label, const Vec3* v)
+{
+    t.AddChar(' ');
+    t.Add(label);
+    t.Add("=(");
+    t.AddInt(v->x);
+    t.AddChar(',');
+    t.AddInt(v->z);
+    t.AddChar(')');
+}
+
 void ImportPending(ReplayText& t)
 {
     t.Add(" ?");
@@ -413,6 +427,45 @@ void ImportOutBytes(ReplayText& t, const char* name, const void* p, int count, i
     t.Add(name);
     t.AddChar(' ');
     ReplayBytes(t, p, count < length ? count : length);
+}
+
+void ImportOutVec3(ReplayText& t, const char* name, const Vec3* v)
+{
+    t.Add("\n  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayValue(t, *v);
+}
+
+void ImportOutUnits(ReplayText& t, const char* name, const std::vector<Unit*, std::allocator<Unit*> >* units, const unsigned short* limit, unsigned limitCount)
+{
+    t.Add("\n  o ");
+    t.Add(name);
+    t.Add(" [");
+    unsigned n = (unsigned)units->size();
+    for (unsigned i = 0; i < n; i++) {
+        if (i != 0)
+            t.AddChar(',');
+        ReplayAddObjectName(t, Table(), ROK_UNIT, (*units)[i], true);
+    }
+    t.AddChar(']');
+    if (n == 0)
+        return;
+    std::vector<unsigned char> kinds(n, (unsigned char)ROK_UNIT);
+    std::vector<void*> objects(n);
+    for (unsigned i = 0; i < n; i++)
+        objects[i] = (*units)[i];
+    ReplaySlotSets none = {};
+    ReplayWalk(s_reach, Table(), true, none, &kinds[0], &objects[0], n, limit, limitCount);
+    ReplayText lines;
+    ReplayCaptureObjects(lines, s_rec[s_sub]->known, Table(), s_reach, limit, limitCount, 'o');
+    if (lines.Size() != 0) {
+        t.AddChar('\n');
+        const char* data = lines.Data();
+        for (unsigned i = 0; i + 1 < lines.Size(); i++)
+            t.AddChar(data[i]);
+    }
+    lines.Free();
 }
 
 void ImportResultObjectReach(ReplayText& t, unsigned kind, const void* p, unsigned count, ...)

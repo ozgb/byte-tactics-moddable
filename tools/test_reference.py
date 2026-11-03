@@ -830,6 +830,24 @@ class BothModesTest(unittest.TestCase):
                 proc.kill()
                 proc.wait()
 
+    def test_a_run_stores_its_scan_sound_and_fuel_under_its_tag(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp) / "run"
+            run.mkdir()
+            (run / "trace.txt").write_text("bt-trace 3\ngame_seed 1\ncrt_seed 1\nview_seed 1\n1 units " + "1" * 16 + "\n")
+            (run / "blockptrs.txt").write_text("scan")
+            (run / "sound.txt").write_text("header\n")
+            scans = {}
+            with mock.patch.object(reference, "scenario_frames", lambda s: []), \
+                    mock.patch.object(reference, "scenario_saves", lambda s: False), \
+                    mock.patch.object(reference, "scenario_ticks", lambda s: 1), \
+                    mock.patch.object(reference.tracediff, "play", lambda *a, **k: run), \
+                    mock.patch.dict(reference.SOUND_LOGS), mock.patch.dict(reference.FUEL):
+                reference.play_scenario(Path("x.exe"), Path("s.txt"), None, scans=scans, mode="native")
+                self.assertEqual(scans, {"s [native]": "scan"})
+                self.assertEqual(reference.SOUND_LOGS["s [native]"], "header\n")
+                self.assertIn("s [native]", reference.FUEL)
+
     def play(self, modes, loads=None, differ=None):
         calls, lock = [], threading.Lock()
         loads = loads or {}

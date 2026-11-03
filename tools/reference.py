@@ -566,14 +566,14 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         sound_log = run / SOUND_FILE
         SOUND_LOGS[key] = sound_log.read_text() if sound_log.is_file() else None
         FRAME_DUMPS[key] = {tick: (run / "frames" / f"{tick}.bin").read_bytes()
-                                      for tick in scenario_frames(scenario) if (run / "frames" / f"{tick}.bin").is_file()}
+                            for tick in scenario_frames(scenario) if (run / "frames" / f"{tick}.bin").is_file()}
         if scenario_saves(scenario):
             saved = run / SAVE_FILE
             SAVE_BYTES[key] = saved.read_bytes() if saved.is_file() else None
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
-        for key in ("game_seed", "crt_seed", "view_seed"):
-            if key not in header:
-                raise tracediff.Error(f"{scenario}: the trace has no {key} line")
+        for seed in ("game_seed", "crt_seed", "view_seed"):
+            if seed not in header:
+                raise tracediff.Error(f"{scenario}: the trace has no {seed} line")
         digests = tracedigest.digests(rows)
         if scans is not None:
             scanned = run / "blockptrs.txt"

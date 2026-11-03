@@ -1,110 +1,79 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
-#include "../state/game_rand.h"
 
-#pragma pack(push, 1)
-#include "../game/game.h"
-#pragma pack(pop)
-
-#include "../weapons/weapon_def.h"
-#include "../util/vec3.h"
-#include "../files/files_bank.h"
+#include "replay_schema.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
-#include "../../interfaces/wind_meteors.h"
-#include "../../interfaces/weapons.h"
-#include "../../interfaces/files.h"
 #include "../../interfaces/rand_stream.h"
-#include "../state/sim_globals.h"
-#include "../state/block.h"
-#include "../game/los_helpers.h"
-#include "../map/meteors.h"
+#include "../util/vec3.h"
 #include "replay_text.h"
+#include "replay_types.h"
+#include "replay_values.h"
+#include "replay_objects.h"
 #include "replay.h"
-#include "replay_schema.h"
-
-static_assert(sizeof(WeaponDef) == 0x115, "WeaponDef is 0x115 bytes");
 
 namespace {
 
-enum Slot {
-    SLOT_UPDATE_WIND,
-    SLOT_UPDATE_METEORS,
-    SLOT_INIT_METEORS,
-    SLOT_EMPTY_SHUTDOWN,
-    SLOT_ENABLE_METEORS,
-    SLOT_DISABLE_METEORS,
-    SLOT_SET_METEOR_PARAMS,
-    SLOT_LOAD_METEOR_DEFAULTS,
-    SLOT_SAVE_METEORS,
-    SLOT_LOAD_METEORS,
-    SLOT_CMD_METEOR,
-    SLOT_UPDATE_WIND_ON_STREAM,
-    SLOT_COUNT
-};
-
-enum ObjectKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
+enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
 
 const char* const kImportNames[RI_COUNT] = {
     "services.GameRand", "services.RandomInt", "services.FatalError", "services.BuildDataPath",
     "services.TdfFile_Construct", "services.TdfFile_Destruct", "services.TdfFile_LoadFile",
     "services.TdfFile_SelectRecord", "services.TdfRecord_GetFieldInt", "services.TdfRecord_GetFieldDouble",
-    "services.TdfRecord_GetFieldString", "services.CommandArgs_GetIntArg", "services.HapiBank_OpenAccount",
-    "services.HapiBank_SetIntegerItem", "services.HapiBank_GetIntegerItem", "weapons.SpawnProjectile",
-    "weapons.FindWeaponByName",
+    "services.TdfRecord_GetFieldString", "services.CommandArgs_GetIntArg",
 };
 
-bool s_on;
-bool s_windowed;
-unsigned s_first;
-unsigned s_last;
-int s_depth;
+struct Recording {
+    Recording() : on(true), windowed(false), first(0), last(0) {}
+    bool on;
+    bool windowed;
+    unsigned first;
+    unsigned last;
+    ReplayText out;
+    ReplayKnown known;
+    ReplayObjectTable table;
+};
+
+struct ReplayRoots {
+    constexpr ReplayRoots() : count(0), kind(), object() {}
+    template <class T> void Add(unsigned char objectKind, T* p)
+    {
+        if (count < REPLAY_MAX_ROOTS && p != nullptr) {
+            kind[count] = objectKind;
+            object[count++] = (void*)p;
+        }
+    }
+    unsigned count;
+    unsigned char kind[REPLAY_MAX_ROOTS];
+    void* object[REPLAY_MAX_ROOTS];
+};
+
+Recording* s_rec[SUB_COUNT];
+bool s_open;
 bool s_recording;
-int s_slot;
+unsigned s_slot;
+unsigned s_sub;
 int s_tick;
-ReplayText s_out;
 ReplayText s_call;
 ReplayText s_tail;
 ReplayText s_field;
-ReplayKnown s_known;
 ReplayOrdinals s_ordinals;
+ReplayReach s_reach;
+ReplayRoots s_roots;
 
-const WindMeteorsSeam* s_innerWind;
-const WeaponsSeam* s_innerWeapons;
-const FilesSeam* s_innerFiles;
-WindMeteorsSeam s_wind;
-WeaponsSeam s_weapons;
-FilesSeam s_files;
+ReplayObjectTable& Table()
+{
+    return s_rec[s_sub]->table;
+}
 
 void AddStream(ReplayText& t, int stream)
 {
-    if (stream == RAND_STREAM_MAIN)
-        t.Add("main");
-    else if (stream == RAND_STREAM_LOAD)
-        t.Add("load");
-    else
-        t.AddInt(stream);
+    ReplayValue(t, (RandStream)stream);
 }
 
-void AddWeapon(ReplayText& t, const void* p)
-{
-    if (p == nullptr) {
-        t.Add("null");
-        return;
-    }
-    const unsigned char* base = g_game == nullptr ? nullptr : (const unsigned char*)g_game->weapons;
-    const unsigned char* q = (const unsigned char*)p;
-    unsigned span = sizeof(WeaponDef);
-    if (base != nullptr && q >= base && q < base + 256 * span && (unsigned)(q - base) % span == 0) {
-        t.Add("weapondef#");
-        t.AddUnsigned((unsigned)(q - base) / span);
-    } else {
-        t.Add("weapondef#?");
-    }
-}
-
-void AddObject(ReplayText& t, unsigned kind, const void* p)
+void AddHandle(ReplayText& t, unsigned kind, const void* p)
 {
     static const char* const names[] = { "file#", "rec#", "bank#" };
     unsigned ordinal = s_ordinals.Of(kind, p);
@@ -118,27 +87,17 @@ void AddObject(ReplayText& t, unsigned kind, const void* p)
 
 void AddFloatBits(ReplayText& t, float value)
 {
-    unsigned bits;
-    memcpy(&bits, &value, 4);
-    t.AddF32(bits);
+    ReplayValue(t, value);
 }
 
 void AddDoubleBits(ReplayText& t, double value)
 {
-    unsigned bits[2];
-    memcpy(bits, &value, 8);
-    t.AddF64(bits[0], bits[1]);
+    ReplayValue(t, value);
 }
 
 void AddVec3(ReplayText& t, const Vec3* v)
 {
-    t.AddChar('(');
-    t.AddInt(v->x);
-    t.AddChar(',');
-    t.AddInt(v->y);
-    t.AddChar(',');
-    t.AddInt(v->z);
-    t.AddChar(')');
+    ReplayValue(t, *v);
 }
 
 #pragma push_macro("g_randomSeed")
@@ -168,52 +127,20 @@ bool FormatField(const ReplayField& f, ReplayText& out)
         }
         return true;
     }
-    switch (f.kind) {
-    case RK_I32:
-        out.AddInt(*(const int*)at);
-        break;
-    case RK_U32:
-        out.AddUnsigned(*(const unsigned*)at);
-        break;
-    case RK_U16:
-        out.AddUnsigned(*(const unsigned short*)at);
-        break;
-    case RK_F32:
-        out.AddF32(*(const unsigned*)at);
-        break;
-    case RK_POINT16:
-        out.AddChar('(');
-        out.AddInt(((const short*)at)[0]);
-        out.AddChar(',');
-        out.AddInt(((const short*)at)[1]);
-        out.AddChar(')');
-        break;
-    case RK_STRING: {
-        char text[64];
-        unsigned size = f.size < sizeof text - 1 ? f.size : (unsigned)sizeof text - 1;
-        memcpy(text, at, size);
-        text[size] = '\0';
-        out.AddString(text);
-        break;
-    }
-    default: {
-        unsigned stored = *(const unsigned*)at;
-        AddWeapon(out, stored == 0 ? nullptr : (const unsigned char*)SimBlockBase() + stored);
-        break;
-    }
-    }
-    return true;
+    ReplayObjectField view = { f.name, 0, f.size, 0, f.kind, 0 };
+    return ReplayFormatObjectField(view, at, Table(), true, out);
 }
 
 #pragma pop_macro("g_randomSeed")
 
 void CaptureSet(const unsigned char* set, unsigned count, char tag)
 {
+    Recording& r = *s_rec[s_sub];
     for (unsigned i = 0; i < count; i++) {
         const ReplayField& f = kReplayFields[set[i]];
         if (set[i] == RF_GAME_TICKS || !FormatField(f, s_field))
             continue;
-        if (s_known.Changed(f.name, s_field.Data())) {
+        if (r.known.Changed(f.name, s_field.Data())) {
             s_call.Add("  ");
             s_call.AddChar(tag);
             s_call.AddChar(' ');
@@ -225,236 +152,281 @@ void CaptureSet(const unsigned char* set, unsigned count, char tag)
     }
 }
 
-void SlotEnter(int slot)
+void CaptureObjectSet(const ReplaySlotSets& sets, bool entry)
 {
-    if (s_depth++ != 0)
-        return;
+    Recording& r = *s_rec[s_sub];
+    ReplayWalk(s_reach, r.table, true, sets, s_roots.kind, s_roots.object, s_roots.count);
+    if (entry)
+        ReplayCaptureObjects(s_call, r.known, r.table, s_reach, sets.objReads, sets.objReadCount, 'r');
+    else
+        ReplayCaptureObjects(s_call, r.known, r.table, s_reach, sets.objWrites, sets.objWriteCount, 'w');
+}
+
+void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
+{
+    Recording& r = *s_rec[sub];
     s_slot = slot;
+    s_sub = sub;
     s_tick = g_game == nullptr ? -1 : g_game->ticks;
-    s_recording = !s_windowed || (s_tick >= 0 && (unsigned)s_tick >= s_first && (unsigned)s_tick <= s_last);
+    s_recording = !r.windowed || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
     if (!s_recording)
         return;
     s_ordinals.Reset();
     s_call.Clear();
     s_tail.Clear();
+    s_roots = roots;
     if (s_tick >= 0) {
         s_field.Clear();
         s_field.AddInt(s_tick);
-        s_known.Set("Game.ticks", s_field.Data());
+        r.known.Set("Game.ticks", s_field.Data());
     }
     const ReplaySlotSets& sets = kReplaySlots[slot];
     CaptureSet(sets.reads, sets.readCount, 'r');
+    CaptureObjectSet(sets, true);
     ReplayCalls() = 1;
 }
 
 void SlotLeave()
 {
-    if (--s_depth != 0 || !s_recording)
+    s_open = false;
+    if (!s_recording)
         return;
+    Recording& r = *s_rec[s_sub];
     ReplayCalls() = 0;
     const ReplaySlotSets& sets = kReplaySlots[s_slot];
     CaptureSet(sets.writes, sets.writeCount, 'w');
-    s_out.Add("call ");
+    CaptureObjectSet(sets, false);
+    r.out.Add("call ");
     if (s_tick >= 0)
-        s_out.AddInt(s_tick);
+        r.out.AddInt(s_tick);
     else
-        s_out.AddChar('-');
-    s_out.AddChar(' ');
-    s_out.Add(sets.name);
-    s_out.AddChar('\n');
-    s_out.AddText(s_call);
-    s_out.AddText(s_tail);
+        r.out.AddChar('-');
+    r.out.AddChar(' ');
+    r.out.Add(sets.name);
+    r.out.AddChar('\n');
+    r.out.AddText(s_call);
+    r.out.AddText(s_tail);
     s_recording = false;
 }
 
+bool IsImportOf(unsigned owner, unsigned slot);
+
 class SlotScope {
 public:
-    explicit SlotScope(int slot)
+    SlotScope(unsigned slot, unsigned sub, const ReplayRoots& roots) : role(0)
     {
-        SlotEnter(slot);
+        if (!s_open) {
+            if (s_rec[sub] == nullptr)
+                return;
+            role = 1;
+            s_open = true;
+            SlotEnter(slot, sub, roots);
+        } else if (s_recording && ReplayCalls() != 0 && IsImportOf(s_sub, slot)) {
+            role = 2;
+            ReplayCalls() = 0;
+        }
     }
     ~SlotScope()
     {
-        SlotLeave();
+        if (role == 1)
+            SlotLeave();
+        else if (role == 2)
+            ReplayCalls() = 1;
     }
     bool Open() const
     {
-        return s_recording && s_depth == 1;
+        return role == 1 && s_recording;
     }
+    bool Import() const
+    {
+        return role == 2;
+    }
+
+private:
+    SlotScope(const SlotScope&);
+    SlotScope& operator=(const SlotScope&);
+    int role;
 };
 
-void AddParams(ReplayText& t, const char* tag, const MeteorParams* p)
+template <class T> void ArgValue(ReplayText& t, const char* name, T value, const char* tag = "a")
 {
     t.Add("  ");
     t.Add(tag);
-    t.Add(" params.name ");
-    char name[0x21];
-    memcpy(name, p->name, 0x20);
-    name[0x20] = '\0';
-    t.AddString(name);
-    t.Add("\n  ");
-    t.Add(tag);
-    t.Add(" params.radius ");
-    t.AddInt(p->radius);
-    t.Add("\n  ");
-    t.Add(tag);
-    t.Add(" params.density ");
-    AddFloatBits(t, p->density);
-    t.Add("\n  ");
-    t.Add(tag);
-    t.Add(" params.duration ");
-    AddFloatBits(t, p->duration);
-    t.Add("\n  ");
-    t.Add(tag);
-    t.Add(" params.interval ");
-    AddFloatBits(t, p->interval);
+    t.AddChar(' ');
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayValue(t, value);
     t.AddChar('\n');
 }
 
-void __cdecl RecUpdateWind()
+void ArgHandle(ReplayText& t, const char* name, unsigned kind, const void* p)
 {
-    SlotScope scope(SLOT_UPDATE_WIND);
-    s_innerWind->UpdateWind();
+    t.Add("  a ");
+    t.Add(name);
+    t.AddChar(' ');
+    AddHandle(t, kind, p);
+    t.AddChar('\n');
 }
 
-void __stdcall RecUpdateMeteors()
+void ArgObject(ReplayText& t, const char* name, unsigned kind, const void* p, const char* tag = "a")
 {
-    SlotScope scope(SLOT_UPDATE_METEORS);
-    s_innerWind->UpdateMeteors();
+    t.Add("  ");
+    t.Add(tag);
+    t.AddChar(' ');
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddObjectName(t, Table(), kind, p, true);
+    t.AddChar('\n');
 }
 
-void __stdcall RecInitMeteors()
+void ArgStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p)
 {
-    SlotScope scope(SLOT_INIT_METEORS);
-    s_innerWind->InitMeteors();
-}
-
-void __stdcall RecEmptyShutdown()
-{
-    SlotScope scope(SLOT_EMPTY_SHUTDOWN);
-    s_innerWind->EmptyShutdownPreCleanup();
-}
-
-void __stdcall RecEnableMeteors()
-{
-    SlotScope scope(SLOT_ENABLE_METEORS);
-    s_innerWind->EnableMeteors();
-}
-
-void __stdcall RecDisableMeteors()
-{
-    SlotScope scope(SLOT_DISABLE_METEORS);
-    s_innerWind->DisableMeteors();
-}
-
-void __stdcall RecSetMeteorParams(MeteorParams* params)
-{
-    SlotScope scope(SLOT_SET_METEOR_PARAMS);
-    if (scope.Open())
-        AddParams(s_call, "a", params);
-    s_innerWind->SetMeteorParams(params);
-}
-
-void __fastcall RecLoadMeteorDefaults(MeteorParams* params)
-{
-    SlotScope scope(SLOT_LOAD_METEOR_DEFAULTS);
-    s_innerWind->LoadMeteorDefaults(params);
-    if (scope.Open())
-        AddParams(s_tail, "o", params);
-}
-
-void __stdcall RecSaveMeteors(HapiBank* file)
-{
-    SlotScope scope(SLOT_SAVE_METEORS);
-    if (scope.Open()) {
-        s_call.Add("  a bank ");
-        AddObject(s_call, OBJ_BANK, file);
-        s_call.AddChar('\n');
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != kind)
+            continue;
+        ReplayFormatObjectField(f, p, Table(), true, s_field);
+        t.Add("  ");
+        t.Add(tag);
+        t.AddChar(' ');
+        t.Add(name);
+        t.AddChar('.');
+        t.Add(f.name);
+        t.AddChar(' ');
+        t.Add(s_field.Data());
+        t.AddChar('\n');
     }
-    s_innerWind->SaveMeteors(file);
 }
 
-void __stdcall RecLoadMeteors(HapiBank* file)
+void ArgArgv(ReplayText& t, const CommandArgs* args)
 {
-    SlotScope scope(SLOT_LOAD_METEORS);
-    if (scope.Open()) {
-        s_call.Add("  a bank ");
-        AddObject(s_call, OBJ_BANK, file);
-        s_call.AddChar('\n');
+    t.Add("  a args.count ");
+    t.AddInt(args->count);
+    t.AddChar('\n');
+    for (int i = 0; i < args->count && i < 0x14; i++) {
+        t.Add("  a args[");
+        t.AddInt(i);
+        t.Add("] ");
+        t.AddString(args->args[i]);
+        t.AddChar('\n');
     }
-    s_innerWind->LoadMeteors(file);
 }
 
-void __stdcall RecCmdMeteor(CommandArgs* args)
+void ArgWeapon(ReplayText& t, const char* name, const void* p)
 {
-    SlotScope scope(SLOT_CMD_METEOR);
-    if (scope.Open()) {
-        s_call.Add("  a args.count ");
-        s_call.AddInt(args->count);
-        s_call.AddChar('\n');
-        for (int i = 0; i < args->count && i < 0x14; i++) {
-            s_call.Add("  a args[");
-            s_call.AddInt(i);
-            s_call.Add("] ");
-            s_call.AddString(args->args[i]);
-            s_call.AddChar('\n');
-        }
+    t.Add("  a ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddWeapon(t, p);
+    t.AddChar('\n');
+}
+
+void ArgVec3(ReplayText& t, const char* name, const Vec3* v)
+{
+    ArgValue(t, name, v);
+}
+
+void ArgPending(ReplayText& t, const char* name)
+{
+    t.Add("  a ");
+    t.Add(name);
+    t.Add(" ?\n");
+}
+
+template <class T> void ImportValue(ReplayText& t, T value)
+{
+    t.AddChar(' ');
+    ReplayValue(t, value);
+}
+
+void ImportHandle(ReplayText& t, unsigned kind, const void* p)
+{
+    t.AddChar(' ');
+    AddHandle(t, kind, p);
+}
+
+void ImportObject(ReplayText& t, unsigned kind, const void* p)
+{
+    t.AddChar(' ');
+    ReplayAddObjectName(t, Table(), kind, p, true);
+}
+
+void ImportWeapon(ReplayText& t, const void* p)
+{
+    t.AddChar(' ');
+    ReplayAddWeapon(t, p);
+}
+
+void ImportVec3(ReplayText& t, const char* label, const Vec3* v)
+{
+    t.AddChar(' ');
+    t.Add(label);
+    t.AddChar('=');
+    ReplayValue(t, *v);
+}
+
+void ImportPending(ReplayText& t)
+{
+    t.Add(" ?");
+}
+
+template <class T> void ImportResult(ReplayText& t, T value)
+{
+    t.Add(" = ");
+    ReplayValue(t, value);
+}
+
+void ImportResultObject(ReplayText& t, unsigned kind, const void* p)
+{
+    t.Add(" = ");
+    ReplayAddObjectName(t, Table(), kind, p, true);
+}
+
+void ImportResultWeapon(ReplayText& t, const void* p, unsigned count, ...)
+{
+    t.Add(" = ");
+    ReplayAddWeapon(t, p);
+    if (p == nullptr)
+        return;
+    va_list names;
+    va_start(names, count);
+    for (unsigned n = 0; n < count; n++) {
+        const char* name = va_arg(names, const char*);
+        const ReplayObjectField* f = ReplayFindObjectField(ROK_WEAPONDEF, name);
+        if (f == nullptr)
+            continue;
+        t.Add("\n  o ");
+        ReplayAddWeapon(t, p);
+        t.AddChar('.');
+        t.Add(name);
+        t.AddChar(' ');
+        ReplayFormatObjectField(*f, p, Table(), true, s_field);
+        t.Add(s_field.Data());
     }
-    s_innerWind->CmdMeteor(args);
+    va_end(names);
 }
 
-void __cdecl RecUpdateWindOnStream(RandStream stream)
+void ImportResultPending(ReplayText& t)
 {
-    SlotScope scope(SLOT_UPDATE_WIND_ON_STREAM);
-    if (scope.Open()) {
-        s_call.Add("  a stream ");
-        AddStream(s_call, stream);
-        s_call.AddChar('\n');
-    }
-    s_innerWind->UpdateWindOnStream(stream);
+    t.Add(" = ?");
 }
 
-int __stdcall RecSpawnProjectile(WeaponDef* weapon, Vec3* pos, Vec3* vel, int flag)
+void FinishImport(ReplayText& line)
 {
-    ReplayImport call(RI_SPAWN_PROJECTILE);
-    call.Ptr(weapon);
-    call.Ptr(pos);
-    call.Ptr(vel);
-    call.Int(flag);
-    return call.Result(s_innerWeapons->SpawnProjectile(weapon, pos, vel, flag));
+    s_call.AddText(line);
+    s_call.AddChar('\n');
+    line.Free();
 }
 
-WeaponDef* __stdcall RecFindWeaponByName(char* name)
-{
-    ReplayImport call(RI_FIND_WEAPON);
-    call.Ptr(name);
-    return call.Result(s_innerWeapons->FindWeaponByName(name));
+#include "replay_hooks.inc"
+
 }
 
-int __stdcall RecBankOpenAccount(HapiBank* self, char* name)
-{
-    ReplayImport call(RI_BANK_OPEN_ACCOUNT);
-    call.Ptr(self);
-    call.Ptr(name);
-    return call.Result(s_innerFiles->BankOpenAccount(self, name));
-}
+namespace {
 
-int __stdcall RecBankSetInteger(HapiBank* self, const char* name, int value)
+void AddSpace(ReplayText& t)
 {
-    ReplayImport call(RI_BANK_SET_INTEGER);
-    call.Ptr(self);
-    call.Ptr(name);
-    call.Int(value);
-    return call.Result(s_innerFiles->BankSetInteger(self, name, value));
-}
-
-int __stdcall RecBankGetInteger(HapiBank* self, char* name, int def)
-{
-    ReplayImport call(RI_BANK_GET_INTEGER);
-    call.Ptr(self);
-    call.Ptr(name);
-    call.Int(def);
-    return call.Result(s_innerFiles->BankGetInteger(self, name, def));
+    t.AddChar(' ');
 }
 
 void AddResult(ReplayText& t, const ReplayArg& r)
@@ -464,12 +436,6 @@ void AddResult(ReplayText& t, const ReplayArg& r)
         t.AddInt(r.v.i);
     }
 }
-
-void AddSpace(ReplayText& t)
-{
-    t.AddChar(' ');
-}
-
 
 }
 
@@ -507,31 +473,31 @@ void ReplayImportEnd(ReplayImport& c)
     case RI_TDF_CONSTRUCT:
     case RI_TDF_DESTRUCT:
         AddSpace(t);
-        AddObject(t, OBJ_FILE, a[0].v.p);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
         break;
     case RI_TDF_LOAD_FILE:
     case RI_TDF_SELECT_RECORD: {
         const TdfFile* file = (const TdfFile*)a[0].v.p;
         AddSpace(t);
-        AddObject(t, OBJ_FILE, file);
+        AddHandle(t, OBJ_FILE, file);
         AddSpace(t);
         t.AddString((const char*)a[1].v.p);
         AddResult(t, c.result);
         if (c.id == RI_TDF_LOAD_FILE) {
             t.Add("\n  o ");
-            AddObject(t, OBJ_FILE, file);
+            AddHandle(t, OBJ_FILE, file);
             t.Add(".root ");
-            AddObject(t, OBJ_RECORD, file->root);
+            AddHandle(t, OBJ_RECORD, file->root);
         }
         t.Add("\n  o ");
-        AddObject(t, OBJ_FILE, file);
+        AddHandle(t, OBJ_FILE, file);
         t.Add(".current ");
-        AddObject(t, OBJ_RECORD, file->current);
+        AddHandle(t, OBJ_RECORD, file->current);
         break;
     }
     case RI_TDF_GET_INT:
         AddSpace(t);
-        AddObject(t, OBJ_RECORD, a[0].v.p);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
         AddSpace(t);
         t.AddString((const char*)a[1].v.p);
         AddSpace(t);
@@ -540,7 +506,7 @@ void ReplayImportEnd(ReplayImport& c)
         break;
     case RI_TDF_GET_DOUBLE:
         AddSpace(t);
-        AddObject(t, OBJ_RECORD, a[0].v.p);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
         AddSpace(t);
         t.AddString((const char*)a[1].v.p);
         AddSpace(t);
@@ -550,7 +516,7 @@ void ReplayImportEnd(ReplayImport& c)
         break;
     case RI_TDF_GET_STRING:
         AddSpace(t);
-        AddObject(t, OBJ_RECORD, a[0].v.p);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
         AddSpace(t);
         t.AddString((const char*)a[2].v.p);
         AddSpace(t);
@@ -568,42 +534,6 @@ void ReplayImportEnd(ReplayImport& c)
         t.AddInt(a[1].v.i);
         AddResult(t, c.result);
         break;
-    case RI_BANK_OPEN_ACCOUNT:
-    case RI_BANK_SET_INTEGER:
-    case RI_BANK_GET_INTEGER:
-        AddSpace(t);
-        AddObject(t, OBJ_BANK, a[0].v.p);
-        AddSpace(t);
-        t.AddString((const char*)a[1].v.p);
-        if (c.id != RI_BANK_OPEN_ACCOUNT) {
-            AddSpace(t);
-            t.AddInt(a[2].v.i);
-        }
-        AddResult(t, c.result);
-        break;
-    case RI_SPAWN_PROJECTILE:
-        AddSpace(t);
-        AddWeapon(t, a[0].v.p);
-        t.Add(" pos=");
-        AddVec3(t, (const Vec3*)a[1].v.p);
-        t.Add(" vel=");
-        AddVec3(t, (const Vec3*)a[2].v.p);
-        AddSpace(t);
-        t.AddInt(a[3].v.i);
-        AddResult(t, c.result);
-        break;
-    case RI_FIND_WEAPON:
-        AddSpace(t);
-        t.AddString((const char*)a[0].v.p);
-        t.Add(" = ");
-        AddWeapon(t, c.result.v.p);
-        if (c.result.v.p != nullptr) {
-            t.Add("\n  o ");
-            AddWeapon(t, c.result.v.p);
-            t.Add(".flags ");
-            t.AddHex32(((const WeaponDef*)c.result.v.p)->flags.value);
-        }
-        break;
     }
     t.AddChar('\n');
     ReplayCalls() = 1;
@@ -619,62 +549,59 @@ int ReplayConfigure(const char* value, char* error, int size)
         _snprintf(error, size, ": needs <subsystem> or <subsystem> <first tick> <last tick>");
         return 0;
     }
-    if (strcmp(subsystem, "wind_meteors") != 0) {
-        _snprintf(error, size, ": only wind_meteors can be recorded");
+    unsigned sub = 0;
+    while (sub < kReplaySubsystemCount && strcmp(kReplaySubsystems[sub].name, subsystem) != 0)
+        sub++;
+    if (sub == kReplaySubsystemCount) {
+        _snprintf(error, size, ": %s is not a simulation subsystem", subsystem);
+        return 0;
+    }
+    if (s_rec[sub] != nullptr) {
+        _snprintf(error, size, ": %s is recorded by an earlier record line", subsystem);
         return 0;
     }
     if (fields == 3 && (first == 0 || last < first)) {
         _snprintf(error, size, ": needs a first tick of at least 1 and a last tick not before it");
         return 0;
     }
-    s_on = true;
-    s_windowed = fields == 3;
-    s_first = first;
-    s_last = last;
+    s_rec[sub] = new Recording();
+    s_rec[sub]->windowed = fields == 3;
+    s_rec[sub]->first = first;
+    s_rec[sub]->last = last;
     return 1;
 }
 
 void ReplayInstall()
 {
-    if (!s_on)
-        return;
-    s_innerWind = g_seams.wind_meteors;
-    s_innerWeapons = g_seams.weapons;
-    s_innerFiles = g_seams.files;
-    s_wind = *s_innerWind;
-    s_wind.UpdateWind = RecUpdateWind;
-    s_wind.UpdateMeteors = RecUpdateMeteors;
-    s_wind.InitMeteors = RecInitMeteors;
-    s_wind.EmptyShutdownPreCleanup = RecEmptyShutdown;
-    s_wind.EnableMeteors = RecEnableMeteors;
-    s_wind.DisableMeteors = RecDisableMeteors;
-    s_wind.SetMeteorParams = RecSetMeteorParams;
-    s_wind.LoadMeteorDefaults = RecLoadMeteorDefaults;
-    s_wind.SaveMeteors = RecSaveMeteors;
-    s_wind.LoadMeteors = RecLoadMeteors;
-    s_wind.CmdMeteor = RecCmdMeteor;
-    s_wind.UpdateWindOnStream = RecUpdateWindOnStream;
-    s_weapons = *s_innerWeapons;
-    s_weapons.SpawnProjectile = RecSpawnProjectile;
-    s_weapons.FindWeaponByName = RecFindWeaponByName;
-    s_files = *s_innerFiles;
-    s_files.BankOpenAccount = RecBankOpenAccount;
-    s_files.BankSetInteger = RecBankSetInteger;
-    s_files.BankGetInteger = RecBankGetInteger;
-    g_seams.wind_meteors = &s_wind;
-    g_seams.weapons = &s_weapons;
-    g_seams.files = &s_files;
+    bool on[SUB_COUNT];
+    bool any = false;
+    for (unsigned i = 0; i < SUB_COUNT; i++) {
+        on[i] = s_rec[i] != nullptr;
+        any = any || on[i];
+    }
+    if (any)
+        HookSeams(on);
 }
 
 int ReplayWrite()
 {
-    if (!s_on)
-        return 1;
-    FILE* file = fopen("replay-wind_meteors.txt", "wb");
-    if (file == nullptr)
-        return 0;
-    char head[64];
-    sprintf(head, "bt-replay %d\nsubsystem wind_meteors %d.%d\n", REPLAY_FORMAT, WIND_METEORS_VERSION_MAJOR, WIND_METEORS_VERSION_MINOR);
-    bool written = fputs(head, file) >= 0 && fwrite(s_out.Data(), 1, s_out.Size(), file) == s_out.Size();
-    return fclose(file) == 0 && written;
+    int ok = 1;
+    for (unsigned i = 0; i < SUB_COUNT; i++) {
+        if (s_rec[i] == nullptr)
+            continue;
+        char name[96];
+        sprintf(name, "replay-%s.txt", kReplaySubsystems[i].name);
+        FILE* file = fopen(name, "wb");
+        if (file == nullptr) {
+            ok = 0;
+            continue;
+        }
+        char head[160];
+        sprintf(head, "bt-replay %d\nsubsystem %s %d.%d%s\n", REPLAY_FORMAT, kReplaySubsystems[i].name, (int)kReplaySubsystems[i].major,
+                (int)kReplaySubsystems[i].minor, kReplaySubsystems[i].complete ? "" : " incomplete");
+        bool written = fputs(head, file) >= 0 && fwrite(s_rec[i]->out.Data(), 1, s_rec[i]->out.Size(), file) == s_rec[i]->out.Size();
+        if (fclose(file) != 0 || !written)
+            ok = 0;
+    }
+    return ok;
 }

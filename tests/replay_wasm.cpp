@@ -9,8 +9,21 @@
 
 namespace {
 
+struct Glue {
+    const char* subsystem;
+    int(__stdcall* install)(wl_loader* loader, int timing);
+    int(__stdcall* bind)(wl_loader* loader, wl_module* module, unsigned fuelBudget);
+    void(__stdcall* useSeam)();
+    int(__stdcall* fuelClose)(unsigned* used);
+    int(__stdcall* fatalPending)();
+};
+
+const Glue kGlue[] = {
+    { "wind_meteors", WindMeteorsInstall, WindMeteorsBind, WindMeteorsUseSeam, WindMeteorsFuelClose, WindMeteorsFatalPending },
+};
+
 ModuleMemory s_memory;
-const char kModuleName[] = "wind_meteors";
+const Glue* s_glue;
 char s_wasmPath[320];
 char s_directory[320];
 wl_loader* s_loader;
@@ -26,7 +39,7 @@ void __cdecl OnTrap(void* user, const char* module, const char* message)
 {
     char text[700];
     (void)user;
-    if (WindMeteorsFatalPending())
+    if (s_glue != nullptr && s_glue->fatalPending())
         return;
     sprintf(text, "%s trapped: %s", module, message);
     Stop(text);
@@ -92,7 +105,21 @@ void ReplayWasmSelect(const char* wasmPath)
     while (length > 0 && s_directory[length - 1] != '\\' && s_directory[length - 1] != '/')
         length--;
     s_directory[length] = '\0';
+    const char* stem = s_wasmPath + length;
+    s_glue = nullptr;
+    for (const Glue& glue : kGlue) {
+        size_t n = strlen(glue.subsystem);
+        if (strncmp(stem, glue.subsystem, n) == 0 && (stem[n] == '.' || stem[n] == '_'))
+            s_glue = &glue;
+    }
+    if (s_glue == nullptr)
+        Stop("no WASM glue entry for the subsystem this module file is named after");
     s_active = 1;
+}
+
+const char* ReplayWasmSubsystem()
+{
+    return s_glue == nullptr ? nullptr : s_glue->subsystem;
 }
 
 bool ReplayWasmActive()
@@ -135,18 +162,18 @@ void ReplayWasmReload()
     s_memory.scratchSize = layout->scratch_size;
     SimBlockAttach(s_memory.base + layout->block_base);
 
-    Check(WindMeteorsInstall(s_loader, 0));
-    wl_module* module = wl_load_module_bytes(s_loader, kModuleName, bytes, size);
+    Check(s_glue->install(s_loader, 0));
+    wl_module* module = wl_load_module_bytes(s_loader, s_glue->subsystem, bytes, size);
     Check(module != nullptr);
     free(bytes);
     long fuelBudget = 0;
-    if (!wl_module_int(s_loader, kModuleName, "fuel_budget", &fuelBudget) || fuelBudget <= 0)
+    if (!wl_module_int(s_loader, s_glue->subsystem, "fuel_budget", &fuelBudget) || fuelBudget <= 0)
         Stop("the manifest has no fuel_budget");
-    Check(WindMeteorsBind(s_loader, module, (unsigned)fuelBudget));
-    WindMeteorsFuelClose(&used);
+    Check(s_glue->bind(s_loader, module, (unsigned)fuelBudget));
+    s_glue->fuelClose(&used);
 }
 
 void ReplayWasmUseSeam()
 {
-    WindMeteorsUseSeam();
+    s_glue->useSeam();
 }

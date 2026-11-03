@@ -430,9 +430,9 @@ Coverage: 100.0% of functions (10 of 10), 96.2% of lines, 73.7% of branches; 0 l
 
 Issue #17. 87 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 94.8% of functions (55 of 58), 88.1% of lines, 76.2% of branches; 3 live functions no scenario enters, and 21 more are dead (data/coverage.csv).
+Coverage: 95.4% of functions (62 of 65), 89.7% of lines, 76.9% of branches; 3 live functions no scenario enters, and 21 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (3 of 58 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 55 are entered, 94.8%), by reason:
+**Live functions no scenario enters** (3 of 65 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 62 are entered, 95.4%), by reason:
 
 - Shutdown only (1): `FreeMapResources`. It is called from `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick.
 - Network only (2): `CmdShareMapping` and `CmdShareRadar` (the share commands, which all check `netGameFlags & 1`, a network game). Test mode runs a skirmish.
@@ -596,7 +596,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **game** (254 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 146 functions are called from outside, by platform (76 distinct functions) and presentation (29); the busiest are `SetCursorMode` (19), `SimAllocTagged` (18), `AllocSite::~AllocSite` (12). It imports 475 functions, the most of any subsystem, 219 of them from presentation, then platform 98, network 30, files 23 and units 22.
 
-**game, functions no scenario enters** (73 of 228 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 155 are entered, 68.0%), by reason:
+**game, functions no scenario enters** (73 of 232 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 159 are entered, 68.5%), by reason:
 
 - Network only (3): `PreBattleFrame`, `RecordMessage`, `UpdateBattleRoom`. Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
 - Needs a case no scenario sets up yet (2): `RecordFocusCommander` (the camera move after a commander is created for a player who starts without one) and `RecordTeleportParticles` (the sparks of a teleport order).
@@ -741,16 +741,16 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | **pathfinding** | 44 of 47 | 93.6% | 92.4% | 87.1% | 3 | 9 |
 | **weapons** | 80 of 95 | 84.2% | 86.9% | 70.9% | 15 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 73.7% | 0 | 1 |
-| **los_radar** | 55 of 58 | 94.8% | 88.1% | 76.2% | 3 | 21 |
+| **los_radar** | 62 of 65 | 95.4% | 89.7% | 76.9% | 3 | 21 |
 | **orders** | 311 of 367 | 84.7% | 82.2% | 64.8% | 56 | 24 |
 | **units** | 146 of 178 | 82.0% | 85.9% | 73.6% | 32 | 32 |
 | **players** | 76 of 143 | 53.1% | 58.4% | 47.8% | 67 | 10 |
 | **map** | 77 of 95 | 81.1% | 87.1% | 76.7% | 18 | 12 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
-| game | 155 of 228 | 68.0% | 54.8% | 35.1% | 73 | 23 |
+| game | 159 of 232 | 68.5% | 55.0% | 35.2% | 73 | 23 |
 | network | 54 of 297 | 18.2% | 10.9% | 3.9% | 243 | 74 |
 | platform | 388 of 736 | 52.7% | 39.5% | 25.9% | 348 | 84 |
-| presentation | 570 of 1149 | 49.6% | 37.2% | 29.2% | 579 | 295 |
+| presentation | 567 of 1146 | 49.5% | 37.3% | 29.3% | 579 | 295 |
 | seams | 100 of 110 | 90.9% | 95.7% | - | 10 | 0 |
 | state | 496 of 566 | 87.6% | 70.3% | 49.8% | 70 | 58 |
 

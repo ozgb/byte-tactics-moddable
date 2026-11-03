@@ -648,6 +648,9 @@ tab-separated, a header (`bt-blockptrs 2`, `commit`, `every`, `ticks`, the ticks
 target site, target tag) with the holder (`SimGlobals` or the allocation site, a return address in the exe),
 the offset in the holder, the target site, the ticks it was seen in and the smallest and largest offset it
 pointed at in the target. The scan does not change the traces.
+`-blockscanverify` (playtest.py `--blockscan-verify`) also scans every allocation byte by byte against spans rebuilt from the
+allocation registry, and ends the run with exit 2 unless both scans find the same rows; `tools/test_blockscan.py` plays
+scenarios with it.
 
 `reference.py --check` always runs with the scan on, every 8th tick and every tick of the last 64 (`-blockscan=8`),
 resolves the sites with the linker map beside the exe

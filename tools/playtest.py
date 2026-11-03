@@ -26,7 +26,8 @@ before the exe starts, and `--collect PATH` copies a file the game wrote there (
 `savegame/harness.sav`) to the run's directory, both with `--testmode`. Every `--testmode` run passes the game's
 own `-memset=0` switch, which makes GameAlloc (and so operator new) zero new memory. `--poison` passes
 `-memset=0xcdcdcdcd` instead, which fills it with 0xCD. `--blockscan` adds `-blockscan` (every tick) and copies
-blockptrs.txt too; `--blockscan-every N` adds `-blockscan=N`. `--windowed` passes the game's own `-d`
+blockptrs.txt too; `--blockscan-every N` adds `-blockscan=N`;
+`--blockscan-verify` adds `-blockscanverify`, a second plain scan whose rows must equal the fast scan's. `--windowed` passes the game's own `-d`
 switch, which starts each game in a window instead of full screen (not with `--testmode`). `--xserver` gives each
 `--testmode` game an invisible Xvfb display, which an exe built from the reference branch needs (it has no headless host
 and exits at once without a display).
@@ -574,6 +575,8 @@ class Instance:
             args += [FRAMEDUMP_SWITCH]
         if self.run.testmode and self.run.blockscan:
             args += ["-blockscan" if self.run.blockscan == 1 else f"-blockscan={self.run.blockscan}"]
+            if self.run.blockscan_verify:
+                args += ["-blockscanverify"]
         self.wine = subprocess.Popen(self.wrap(["wine", exe, *args]), cwd=self.game, env=env, start_new_session=True,
                                      stdout=(self.run.out / f"wine{self.suffix}.log").open("w"),
                                      stderr=subprocess.STDOUT)
@@ -1013,7 +1016,7 @@ class Run:
                  testdump: int | None = None, poison: bool = False, blockscan: int = 0,
                  windowed: bool = False, put: list[tuple[str, Path]] | None = None,
                  collect: list[str] | None = None, xserver: bool = False, native_modules: bool = False,
-                 framedump: bool = False):
+                 framedump: bool = False, blockscan_verify: bool = False):
         self.number = number
         self.name = name
         self.scenario = scenario
@@ -1028,6 +1031,7 @@ class Run:
         self.testdump = testdump
         self.poison = poison
         self.blockscan = blockscan
+        self.blockscan_verify = blockscan_verify
         self.windowed = windowed
         self.xserver = xserver
         self.native_modules = native_modules
@@ -1554,6 +1558,8 @@ def main() -> None:
                     help="--testmode: fill new game allocations with 0xCD (the game's -memset switch)")
     ap.add_argument("--blockscan", action="store_true",
                     help="--testmode: run with -blockscan, which writes blockptrs.txt (the pointers out of the block)")
+    ap.add_argument("--blockscan-verify", action="store_true",
+                    help="--blockscan: also scan every block byte by byte, and fail unless both scans find the same rows (-blockscanverify)")
     ap.add_argument("--blockscan-every", type=int, metavar="N", default=0,
                     help="--testmode: --blockscan on every Nth tick and each tick of the last 64 (-blockscan=N)")
     ap.add_argument("--xserver", action="store_true",
@@ -1602,6 +1608,8 @@ def main() -> None:
         ap.error("--testdump needs --testmode")
     if (args.blockscan or args.blockscan_every) and not args.testmode:
         ap.error("--blockscan and --blockscan-every need --testmode")
+    if args.blockscan_verify and not (args.blockscan or args.blockscan_every):
+        ap.error("--blockscan-verify needs --blockscan or --blockscan-every")
     if args.blockscan_every < 0:
         ap.error("--blockscan-every needs 1 or more")
     scan_every = args.blockscan_every or int(args.blockscan)
@@ -1690,7 +1698,7 @@ def main() -> None:
                                 args.poison and sc is testmode, scan_every if sc is testmode else 0,
                                 args.windowed, put if sc is testmode else None,
                                 args.collect if sc is testmode else None, args.xserver and sc is testmode,
-                                args.native_modules, args.framedump))
+                                args.native_modules, args.framedump, args.blockscan_verify))
     parallel = args.parallel or min(3, len(runs))
     template = template_prefix()
     dplay = directplay_prefix() if any(sc.directplay for sc in scenarios) else None

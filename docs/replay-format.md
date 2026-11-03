@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors and economy have recordings so far. The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, economy and targeting have recordings so far. The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -222,6 +222,13 @@ accounts read back from a saved game, `LoadUnitAccounts`, and extractors) and `t
 the first metal maker earns income (the `makesMetal` branch of `UpdatePlayerEconomy`). `UpdatePlayerEconomy` walks every unit of the
 player's slice of the unit table on each call, so a recording carries the `r` lines of all the slice at the first call and the
 changes after it.
+
+The recordings of targeting, which is native code in every mode: `orders-guard-attacked` (units that guard and are attacked: every
+slot but `SetWeaponTargetPos`, `SetWeaponTargetUnit` 315 times, candidates from `ai.GetVisibleEnemiesInRadius`, `ChooseWeapon`),
+`orders-tier2-spider` (`SetWeaponTargetPos` 8 times, and the ground positions of `GetWeaponTargetPos`) and `skirmish4-long`, ticks
+25750 to 25770 only, where a unit with more than five kills fires at a moving unit (the scale of `GetWeaponTargetPos`). Each
+`GetWeaponTargetPos` call records the `pos` the caller passed (`a pos.y 44785512`, the stale words of its stack frame, which no code
+reads before the call writes them) and the `pos` it left (`o pos.x`).
 
 ### Against the WASM module
 

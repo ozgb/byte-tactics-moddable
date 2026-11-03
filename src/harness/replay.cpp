@@ -225,7 +225,7 @@ void CaptureSet(const unsigned char* set, unsigned count, char tag)
     }
 }
 
-void Enter(int slot)
+void SlotEnter(int slot)
 {
     if (s_depth++ != 0)
         return;
@@ -247,7 +247,7 @@ void Enter(int slot)
     g_replayCalls = 1;
 }
 
-void Leave()
+void SlotLeave()
 {
     if (--s_depth != 0 || !s_recording)
         return;
@@ -271,11 +271,11 @@ class SlotScope {
 public:
     explicit SlotScope(int slot)
     {
-        Enter(slot);
+        SlotEnter(slot);
     }
     ~SlotScope()
     {
-        Leave();
+        SlotLeave();
     }
     bool Open() const
     {

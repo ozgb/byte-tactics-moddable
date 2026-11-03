@@ -52,17 +52,17 @@ struct ReplayImport {
     void Int(int value)
     {
         if (active)
-            Push(0)->v.i = value;
+            AddArg(0)->v.i = value;
     }
     void Ptr(const void* value)
     {
         if (active)
-            Push(1)->v.p = value;
+            AddArg(1)->v.p = value;
     }
     void Dbl(double value)
     {
         if (active)
-            Push(2)->v.d = value;
+            AddArg(2)->v.d = value;
     }
     int Result(int value)
     {
@@ -82,7 +82,7 @@ struct ReplayImport {
         result.v.p = value;
         return value;
     }
-    ReplayArg* Push(int kind)
+    ReplayArg* AddArg(int kind)
     {
         ReplayArg* arg = &args[count++];
         arg->kind = kind;

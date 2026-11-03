@@ -73,11 +73,6 @@ struct WeaponDefRatingView {
     char index;
 };
 
-struct Bits {
-    unsigned* words;
-    int Test(unsigned short index) const { return (words[index>>5]&(1u<<(index&31)))!=0; }
-};
-
 #include "../units/unit_def.h"
 
 struct Flags241 {
@@ -1553,39 +1548,6 @@ void __stdcall GetFactoriesInRadius(int player,const Vec* pos,int radius,std::ve
             if(d<=radius) out->push_back(*it);
         }
     }
-}
-
-// FUNCTION: 0x40b7b0
-Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
-{
-    int ai=unit->player->active && unit->player->type==2;
-    Unit* fallback=0;
-    int fallbackDistance=0x7fffffff;
-    int bestDistance=0x7fffffff;
-    Unit* best=0;
-    std::vector<Unit*> candidates;
-    if(useRange) g_seams.ai->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,g_seams.weapons->GetWeaponRange(unit,weapon),0,&candidates);
-    else g_seams.ai->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,unit->def->range,0,&candidates);
-    for(int count=0;count<50;++count) {
-        if(candidates.empty()) break;
-        std::vector<Unit*>::iterator it=candidates.begin()+RandomInt(candidates.size());
-        Unit* target=*it;
-        ((UnitSwapEraseVector*)&candidates)->EraseSwapBack(it);
-        if((target->flags&0x10000000) && !(target->flags&0x4000) &&
-           ((target->def->flags1&0x8000) || ai || (g_game->matchFlags&4)) &&
-           ((unit->def->flags1&0x10000000) || g_seams.weapons->WeaponCanReachUnit(unit,target,weapon)) &&
-           (useRange || !((Bits*)&unit->def->categories)->Test(target->unitDefIndex)) &&
-           (!((*(unsigned char*)&unit->weapons[weapon].weapon->flags)&0x80) || !(target->activateFlags&0x10))) {
-            int dz=unit->pos.z-target->pos.z;
-            int dx=unit->pos.x-target->pos.x;
-            int d=RandomInt((int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32));
-            if(((Bits*)unit->def->weaponCategories)[weapon].Test(target->unitDefIndex)) {
-                if(d<fallbackDistance) { fallbackDistance=d; fallback=target; }
-            } else if(d<bestDistance) { bestDistance=d; best=target; }
-        }
-    }
-    if(best) return best;
-    return fallback;
 }
 
 // FUNCTION: 0x40ba80

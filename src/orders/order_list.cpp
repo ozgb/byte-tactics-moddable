@@ -191,7 +191,6 @@ int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 struct UnitOrderTypeView;
 struct FixedPosView;
 #include "order_dispatch.h"
-int __stdcall FindWeaponTarget(Unit* unit, int a, int b);
 void RegisterUnitOrders();
 extern int DAT_0051234c;
 
@@ -849,14 +848,6 @@ int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
     } else {
         return 0;
     }
-}
-
-// FUNCTION: 0x43b700
-int __stdcall FindBestTargetIfFireAtWill(Unit* unit)
-{
-    if (unit->fireOrder == 2)
-        return FindWeaponTarget(unit, 0, 0);
-    return 0;
 }
 
 // FUNCTION: 0x43b730

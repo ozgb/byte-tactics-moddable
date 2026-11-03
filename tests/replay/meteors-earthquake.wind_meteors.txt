@@ -1,0 +1,463 @@
+bt-replay 1
+subsystem wind_meteors 1.2
+call 0 DisableMeteors
+  w SimGlobals.g_meteorsEnabled 0
+call 0 LoadMeteorDefaults
+  i services.TdfFile_Construct file#1
+  i services.BuildDataPath "gamedata" "meteor" "tdf" = "gamedata\\meteor.tdf"
+  i services.TdfFile_LoadFile file#1 "gamedata\\meteor.tdf" = 1
+  o file#1.root rec#1
+  o file#1.current null
+  i services.TdfFile_SelectRecord file#1 "Default" = 1
+  o file#1.current rec#2
+  i services.TdfRecord_GetFieldString rec#2 "MeteorWeapon" 32 "" = 1
+  o dst "Meteor"
+  i services.TdfRecord_GetFieldInt rec#2 "MeteorRadius" 0 = 300
+  i services.TdfRecord_GetFieldDouble rec#2 "MeteorDensity" f64:0x0000000000000000 = f64:0x4000000000000000
+  i services.TdfRecord_GetFieldDouble rec#2 "MeteorDuration" f64:0x0000000000000000 = f64:0x4014000000000000
+  i services.TdfRecord_GetFieldDouble rec#2 "MeteorInterval" f64:0x0000000000000000 = f64:0x404e000000000000
+  i services.TdfFile_Destruct file#1
+  o params.name "Meteor"
+  o params.radius 300
+  o params.density f32:0x40000000
+  o params.duration f32:0x40a00000
+  o params.interval f32:0x42700000
+call 0 SetMeteorParams
+  r SimGlobals.g_meteorWeaponName ""
+  a params.name "Meteor"
+  a params.radius 300
+  a params.density f32:0x40000000
+  a params.duration f32:0x40a00000
+  a params.interval f32:0x42700000
+  w SimGlobals.g_meteorWeaponName "Meteor"
+  w SimGlobals.g_meteorSpawnMagnitude 300
+  w SimGlobals.g_meteorSpawnInterval 15
+  w SimGlobals.g_meteorShowerDuration 150
+  w SimGlobals.g_meteorScheduleGap 1800
+call 0 EnableMeteors
+  w SimGlobals.g_meteorsEnabled 1
+call 0 SetMeteorParams
+  a params.name "earthquake"
+  a params.radius 255
+  a params.density f32:0x3ecccccd
+  a params.duration f32:0x40800000
+  a params.interval f32:0x44340000
+  w SimGlobals.g_meteorWeaponName "earthquake"
+  w SimGlobals.g_meteorSpawnMagnitude 255
+  w SimGlobals.g_meteorSpawnInterval 74
+  w SimGlobals.g_meteorShowerDuration 120
+  w SimGlobals.g_meteorScheduleGap 21600
+call 0 UpdateWindOnStream
+  r Game.windCounter 0
+  r Game.windSpeedDenominator 5000
+  r Game.windDirection 0
+  r Game.windSpeed 0
+  r Game.windStrength f32:0x00000000
+  r Game.windSpeedMin 1000
+  r Game.windSpeedMax 2000
+  r rng.main 0x0000057b
+  r rng.load 0x0000057b
+  r rng.seed 0x66e294e1
+  a stream load
+  w Game.windX 0
+  w Game.windZ 0
+  w Game.windEnabled 0
+call 0 InitMeteors
+  r SimGlobals.g_meteorWeapon null
+  i weapons.FindWeaponByName "earthquake" = weapondef#227
+  o weapondef#227.flags 0x00000060
+  w SimGlobals.g_meteorNextStrikeTime 74
+  w SimGlobals.g_meteorActive 0
+  w SimGlobals.g_meteorWeapon weapondef#227
+call 1 UpdateWind
+  r rng.load 0x05dc9d91
+  r rng.seed 0x0d9e4c6e
+  i services.GameRand main = 4620
+  i services.RandomInt 1000 = 198
+  i services.RandomInt 65536 = 29704
+  w Game.windCounter 180
+  w Game.windX -696
+  w Game.windZ 2292
+  w Game.windDirection 29704
+  w Game.windSpeed 1198
+  w Game.windStrength f32:0x3e7559b4
+  w Game.windEnabled 1
+  w rng.main 0x120c3a52
+  w rng.seed 0x75157408
+call 1 UpdateMeteors
+  r Game.width 224
+  r Game.height 384
+  r SimGlobals.g_meteorStrikeEndTime 0
+  r SimGlobals.g_meteorOrigin (0,0)
+  r SimGlobals.g_meteorNextHitTime 0
+  r SimGlobals.g_meteorTarget (0,0)
+call 2 UpdateWind
+  w Game.windEnabled 0
+call 2 UpdateMeteors
+call 3 UpdateWind
+  r rng.seed 0x2392afd1
+call 3 UpdateMeteors
+call 4 UpdateWind
+call 4 UpdateMeteors
+call 5 UpdateWind
+call 5 UpdateMeteors
+call 6 UpdateWind
+call 6 UpdateMeteors
+call 7 UpdateWind
+call 7 UpdateMeteors
+call 8 UpdateWind
+call 8 UpdateMeteors
+call 9 UpdateWind
+call 9 UpdateMeteors
+call 10 UpdateWind
+call 10 UpdateMeteors
+call 11 UpdateWind
+call 11 UpdateMeteors
+call 12 UpdateWind
+call 12 UpdateMeteors
+call 13 UpdateWind
+call 13 UpdateMeteors
+call 14 UpdateWind
+call 14 UpdateMeteors
+call 15 UpdateWind
+call 15 UpdateMeteors
+call 16 UpdateWind
+call 16 UpdateMeteors
+call 17 UpdateWind
+call 17 UpdateMeteors
+call 18 UpdateWind
+call 18 UpdateMeteors
+call 19 UpdateWind
+call 19 UpdateMeteors
+call 20 UpdateWind
+call 20 UpdateMeteors
+call 21 UpdateWind
+call 21 UpdateMeteors
+call 22 UpdateWind
+call 22 UpdateMeteors
+call 23 UpdateWind
+call 23 UpdateMeteors
+call 24 UpdateWind
+call 24 UpdateMeteors
+call 25 UpdateWind
+call 25 UpdateMeteors
+call 26 UpdateWind
+call 26 UpdateMeteors
+call 27 UpdateWind
+call 27 UpdateMeteors
+call 28 UpdateWind
+call 28 UpdateMeteors
+call 29 UpdateWind
+call 29 UpdateMeteors
+call 30 UpdateWind
+  r rng.seed 0x5ebf83c6
+call 30 UpdateMeteors
+call 31 UpdateWind
+call 31 UpdateMeteors
+call 32 UpdateWind
+call 32 UpdateMeteors
+call 33 UpdateWind
+call 33 UpdateMeteors
+call 34 UpdateWind
+call 34 UpdateMeteors
+call 35 UpdateWind
+call 35 UpdateMeteors
+call 36 UpdateWind
+  r rng.seed 0x6f646cc2
+call 36 UpdateMeteors
+call 37 UpdateWind
+call 37 UpdateMeteors
+call 38 UpdateWind
+call 38 UpdateMeteors
+call 39 UpdateWind
+call 39 UpdateMeteors
+call 40 UpdateWind
+call 40 UpdateMeteors
+call 41 UpdateWind
+call 41 UpdateMeteors
+call 42 UpdateWind
+  r rng.seed 0x2a206db0
+call 42 UpdateMeteors
+call 43 UpdateWind
+call 43 UpdateMeteors
+call 44 UpdateWind
+call 44 UpdateMeteors
+call 45 UpdateWind
+call 45 UpdateMeteors
+call 46 UpdateWind
+call 46 UpdateMeteors
+call 47 UpdateWind
+call 47 UpdateMeteors
+call 48 UpdateWind
+call 48 UpdateMeteors
+call 49 UpdateWind
+call 49 UpdateMeteors
+call 50 UpdateWind
+call 50 UpdateMeteors
+call 51 UpdateWind
+call 51 UpdateMeteors
+call 52 UpdateWind
+call 52 UpdateMeteors
+call 53 UpdateWind
+call 53 UpdateMeteors
+call 54 UpdateWind
+call 54 UpdateMeteors
+call 55 UpdateWind
+call 55 UpdateMeteors
+call 56 UpdateWind
+call 56 UpdateMeteors
+call 57 UpdateWind
+call 57 UpdateMeteors
+call 58 UpdateWind
+  r rng.seed 0x3701536b
+call 58 UpdateMeteors
+call 59 UpdateWind
+call 59 UpdateMeteors
+call 60 UpdateWind
+  r rng.seed 0x07d3ffb4
+call 60 UpdateMeteors
+call 61 UpdateWind
+call 61 UpdateMeteors
+call 62 UpdateWind
+call 62 UpdateMeteors
+call 63 UpdateWind
+call 63 UpdateMeteors
+call 64 UpdateWind
+call 64 UpdateMeteors
+call 65 UpdateWind
+call 65 UpdateMeteors
+call 66 UpdateWind
+call 66 UpdateMeteors
+call 67 UpdateWind
+call 67 UpdateMeteors
+call 68 UpdateWind
+call 68 UpdateMeteors
+call 69 UpdateWind
+call 69 UpdateMeteors
+call 70 UpdateWind
+call 70 UpdateMeteors
+call 71 UpdateWind
+call 71 UpdateMeteors
+call 72 UpdateWind
+call 72 UpdateMeteors
+call 73 UpdateWind
+call 73 UpdateMeteors
+call 74 UpdateWind
+call 74 UpdateMeteors
+  i services.GameRand main = 14453
+  i services.GameRand main = 17150
+  i services.GameRand main = 12226
+  i services.GameRand main = 29515
+  i services.GameRand main = 15975
+  i services.GameRand main = 16990
+  i weapons.SpawnProjectile weapondef#227 pos=(136162080,88473600,172703296) vel=(-139810,-983040,139810) 1 = 1
+  w SimGlobals.g_meteorNextStrikeTime 21794
+  w SimGlobals.g_meteorActive 1
+  w SimGlobals.g_meteorStrikeEndTime 194
+  w SimGlobals.g_meteorOrigin (129,157)
+  w SimGlobals.g_meteorNextHitTime 148
+  w SimGlobals.g_meteorTarget (117,169)
+  w rng.main 0xc25e58e0
+call 75 UpdateWind
+call 75 UpdateMeteors
+call 76 UpdateWind
+call 76 UpdateMeteors
+call 77 UpdateWind
+call 77 UpdateMeteors
+call 78 UpdateWind
+call 78 UpdateMeteors
+call 79 UpdateWind
+call 79 UpdateMeteors
+call 80 UpdateWind
+call 80 UpdateMeteors
+call 81 UpdateWind
+call 81 UpdateMeteors
+call 82 UpdateWind
+call 82 UpdateMeteors
+call 83 UpdateWind
+call 83 UpdateMeteors
+call 84 UpdateWind
+  r rng.seed 0x6f38866f
+call 84 UpdateMeteors
+call 85 UpdateWind
+call 85 UpdateMeteors
+call 86 UpdateWind
+call 86 UpdateMeteors
+call 87 UpdateWind
+call 87 UpdateMeteors
+call 88 UpdateWind
+call 88 UpdateMeteors
+call 89 UpdateWind
+call 89 UpdateMeteors
+call 90 UpdateWind
+  r rng.seed 0x762b3c87
+call 90 UpdateMeteors
+call 91 UpdateWind
+call 91 UpdateMeteors
+call 92 UpdateWind
+call 92 UpdateMeteors
+call 93 UpdateWind
+call 93 UpdateMeteors
+call 94 UpdateWind
+call 94 UpdateMeteors
+call 95 UpdateWind
+  r rng.seed 0x1092ffad
+call 95 UpdateMeteors
+call 96 UpdateWind
+call 96 UpdateMeteors
+call 97 UpdateWind
+call 97 UpdateMeteors
+call 98 UpdateWind
+call 98 UpdateMeteors
+call 99 UpdateWind
+call 99 UpdateMeteors
+call 100 UpdateWind
+call 100 UpdateMeteors
+call 101 UpdateWind
+call 101 UpdateMeteors
+call 102 UpdateWind
+call 102 UpdateMeteors
+call 103 UpdateWind
+call 103 UpdateMeteors
+call 104 UpdateWind
+call 104 UpdateMeteors
+call 105 UpdateWind
+call 105 UpdateMeteors
+call 106 UpdateWind
+call 106 UpdateMeteors
+call 107 UpdateWind
+call 107 UpdateMeteors
+call 108 UpdateWind
+call 108 UpdateMeteors
+call 109 UpdateWind
+call 109 UpdateMeteors
+call 110 UpdateWind
+call 110 UpdateMeteors
+call 111 UpdateWind
+call 111 UpdateMeteors
+call 112 UpdateWind
+call 112 UpdateMeteors
+call 113 UpdateWind
+call 113 UpdateMeteors
+call 114 UpdateWind
+call 114 UpdateMeteors
+call 115 UpdateWind
+call 115 UpdateMeteors
+call 116 UpdateWind
+call 116 UpdateMeteors
+call 117 UpdateWind
+call 117 UpdateMeteors
+call 118 UpdateWind
+call 118 UpdateMeteors
+call 119 UpdateWind
+call 119 UpdateMeteors
+call 120 UpdateWind
+  r rng.seed 0x751c0137
+call 120 UpdateMeteors
+call 121 UpdateWind
+  r rng.seed 0x0193fdf2
+call 121 UpdateMeteors
+call 122 UpdateWind
+call 122 UpdateMeteors
+call 123 UpdateWind
+call 123 UpdateMeteors
+call 124 UpdateWind
+call 124 UpdateMeteors
+call 125 UpdateWind
+call 125 UpdateMeteors
+call 126 UpdateWind
+call 126 UpdateMeteors
+call 127 UpdateWind
+call 127 UpdateMeteors
+call 128 UpdateWind
+call 128 UpdateMeteors
+call 129 UpdateWind
+call 129 UpdateMeteors
+call 130 UpdateWind
+call 130 UpdateMeteors
+call 131 UpdateWind
+call 131 UpdateMeteors
+call 132 UpdateWind
+call 132 UpdateMeteors
+call 133 UpdateWind
+call 133 UpdateMeteors
+call 134 UpdateWind
+call 134 UpdateMeteors
+call 135 UpdateWind
+call 135 UpdateMeteors
+call 136 UpdateWind
+call 136 UpdateMeteors
+call 137 UpdateWind
+call 137 UpdateMeteors
+call 138 UpdateWind
+call 138 UpdateMeteors
+call 139 UpdateWind
+call 139 UpdateMeteors
+call 140 UpdateWind
+call 140 UpdateMeteors
+call 141 UpdateWind
+call 141 UpdateMeteors
+call 142 UpdateWind
+call 142 UpdateMeteors
+call 143 UpdateWind
+call 143 UpdateMeteors
+call 144 UpdateWind
+call 144 UpdateMeteors
+call 145 UpdateWind
+call 145 UpdateMeteors
+call 146 UpdateWind
+call 146 UpdateMeteors
+call 147 UpdateWind
+call 147 UpdateMeteors
+call 148 UpdateWind
+call 148 UpdateMeteors
+  i services.GameRand main = 21319
+  i services.GameRand main = 9235
+  i weapons.SpawnProjectile weapondef#227 pos=(124660104,88473600,166735792) vel=(-139810,-983040,139810) 1 = 1
+  w SimGlobals.g_meteorNextHitTime 222
+  w rng.main 0xa413ae5a
+call 149 UpdateWind
+call 149 UpdateMeteors
+call 150 UpdateWind
+  r rng.seed 0x6c5c08b6
+call 150 UpdateMeteors
+call 151 UpdateWind
+call 151 UpdateMeteors
+call 152 UpdateWind
+call 152 UpdateMeteors
+call 153 UpdateWind
+call 153 UpdateMeteors
+call 154 UpdateWind
+call 154 UpdateMeteors
+call 155 UpdateWind
+call 155 UpdateMeteors
+call 156 UpdateWind
+call 156 UpdateMeteors
+call 157 UpdateWind
+call 157 UpdateMeteors
+call 158 UpdateWind
+call 158 UpdateMeteors
+call 159 UpdateWind
+call 159 UpdateMeteors
+call 160 UpdateWind
+call 160 UpdateMeteors
+call 161 UpdateWind
+call 161 UpdateMeteors
+call 162 UpdateWind
+call 162 UpdateMeteors
+call 163 UpdateWind
+call 163 UpdateMeteors
+call 164 UpdateWind
+call 164 UpdateMeteors
+call 165 UpdateWind
+call 165 UpdateMeteors
+call 166 UpdateWind
+call 166 UpdateMeteors
+call 167 UpdateWind
+call 167 UpdateMeteors
+call 168 UpdateWind
+call 168 UpdateMeteors
+call 169 UpdateWind
+call 169 UpdateMeteors
+call 170 UpdateWind
+call 170 UpdateMeteors

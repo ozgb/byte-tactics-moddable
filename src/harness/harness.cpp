@@ -33,6 +33,7 @@
 #include "../files/files_api.h"
 #include "../debug/debug_lib.h"
 #include "harness.h"
+#include "replay.h"
 
 enum { MAX_PLAYERS = 10 };
 
@@ -873,6 +874,10 @@ static void ReadKey(int lineNo, const char* key, char* value)
         if (tick == 0)
             FailLine(lineNo, "needs a tick of at least 1", key, "");
         s_roundTrips[s_roundTripCount++] = tick;
+    } else if (strcmp(key, "record") == 0) {
+        char detail[200];
+        if (!ReplayConfigure(value, detail, sizeof detail))
+            FailLine(lineNo, "is not a record spec", key, detail);
     } else if (strcmp(key, "load") == 0) {
         if (s_loadLine != 0)
             FailLine(lineNo, "is a second load line", key, "");
@@ -1439,6 +1444,7 @@ void HarnessInit(char* cmdLine)
     EnterHarnessTestMode();
     ReadScenario(path);
     ResolveQuirks();
+    ReplayInstall();
     s_viewState = s_viewSeed;
 
     unsigned cw = _control87(0, 0);
@@ -1578,6 +1584,8 @@ void HarnessAfterStep()
     else
         sprintf(msg, "testmode: reached tick %u\n", s_ticks);
     host_log(msg);
+    if (!ReplayWrite())
+        Fail("testmode: cannot write replay-wind_meteors.txt\n");
     host_exit(0);
 }
 

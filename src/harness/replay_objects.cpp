@@ -5,6 +5,12 @@
 
 #include "../../interfaces/ref.h"
 #include "replay_schema.h"
+#pragma pack(push, 1)
+#include "../game/game.h"
+#pragma pack(pop)
+#include "../game/los_helpers.h"
+#include "../network/player.h"
+#include "../units/unit.h"
 #include "replay_text.h"
 #include "replay_types.h"
 #include "replay_objects.h"
@@ -335,7 +341,7 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
         return ordinal < 256 && g_game != nullptr ? &g_game->weapons[ordinal] : nullptr;
     void* p;
     if (kReplayObjectKinds[kind].table != RT_ORDER) {
-        if (kReplayObjectKinds[kind].table == RT_UNITS && g_game != nullptr && g_game->units == 0 && alloc != nullptr) {
+        if (kReplayObjectKinds[kind].table == RT_UNITS && g_game != nullptr && g_game->units.get() == nullptr && alloc != nullptr) {
             g_game->poolCount = REPLAY_UNIT_POOL;
             g_game->units = (Unit*)alloc(REPLAY_UNIT_POOL * (unsigned)sizeof(Unit));
         }

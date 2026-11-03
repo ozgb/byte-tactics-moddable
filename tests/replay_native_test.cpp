@@ -72,7 +72,7 @@ void __stdcall UpdateMetalExtraction(Unit* unit);
 struct ConstructedElement {
     ConstructedElement();
     ~ConstructedElement();
-    int field_0;
+    int value;
 };
 
 ConstructedElement::ConstructedElement()

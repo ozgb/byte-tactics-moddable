@@ -142,11 +142,14 @@ static unsigned KnownHash(const char* name)
 
 static char* KnownCopy(const char* text)
 {
+    if (text == nullptr)
+        text = "";
     unsigned n = (unsigned)strlen(text) + 1;
     char* copy = (char*)malloc(n);
-    if (copy == nullptr)
+    if (copy != nullptr)
+        memcpy(copy, text, n);
+    else
         abort();
-    memcpy(copy, text, n);
     return copy;
 }
 
@@ -183,16 +186,20 @@ void ReplayKnown::Grow()
             abort();
     }
     if (slotCount < (unsigned)capacity * 2) {
-        slotCount = (unsigned)capacity * 2;
-        free(slots);
-        slots = (int*)calloc(slotCount, sizeof(int));
-        if (slots == nullptr)
+        unsigned wanted = (unsigned)capacity * 2;
+        int* fresh = (int*)calloc(wanted, sizeof(int));
+        if (fresh != nullptr) {
+            for (int at = 0; entries != nullptr && at < count; at++) {
+                unsigned i = KnownHash(entries[at].name) & (wanted - 1);
+                while (fresh[i] != 0)
+                    i = (i + 1) & (wanted - 1);
+                fresh[i] = at + 1;
+            }
+            free(slots);
+            slots = fresh;
+            slotCount = wanted;
+        } else {
             abort();
-        for (int at = 0; at < count; at++) {
-            unsigned i = KnownHash(entries[at].name) & (slotCount - 1);
-            while (slots[i] != 0)
-                i = (i + 1) & (slotCount - 1);
-            slots[i] = at + 1;
         }
     }
 }

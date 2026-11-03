@@ -4,6 +4,7 @@
     uv run tools/coupling.py --check         # fail if either file differs from what the tool regenerates
     uv run tools/coupling.py --summary [S..] # print entry points, imports and sim state per subsystem
     uv run tools/coupling.py --seams         # fail on any direct call between sim subsystems, or from game into one
+    uv run tools/coupling.py --virtual       # list the virtual calls between sim subsystems (--check fails on one without an exception)
     uv run tools/test_coupling.py            # tests, on hand-written rows
 
 This is the evidence for #128: each subsystem issue (#9 to #18) starts from a draft
@@ -85,6 +86,43 @@ every `call` row whose `from` and `to` are both sim subsystems, or whose `from` 
 call to or from presentation, network, harness, seams, files or platform code is not an edge. src/seams holds
 the code that fills the seam tables; it is the `seams` subsystem, so the direct calls it makes into the
 sim are not edges, and the function addresses it takes (`fn_ref` rows) are not `call` rows in any case.
+
+Virtual calls. A virtual call has no relocation and no `call` row, so --seams and seamlink.py
+(which reads the relocations of the objects) do not see it. --virtual finds them from the
+`indirect_call virtual Class::method` rows of data/rwsets.csv, which name the method the
+source calls, and gives each the functions it can reach:
+
+  real class    the method as defined in the class, in each class derived from it (class
+                hierarchies are read from the class and struct declarations under src/ and
+                interfaces/), and in the nearest base that defines it; only functions that
+                have a row in data/subsystems.csv count
+  view class    a class that only declares the slots of a vtable (PathGoalVtableView,
+                PathPlannerView, Target, GoalDrawInterface, MotionSerializer, OrderFxSlot: no
+                function of it is defined) is the real class that VIEW_FAMILY names, at the
+                slot of the view's method (the place of the name in the view's declaration, or
+                N of vN and unusedN), and then as a real class
+  vtable array  an object whose vtable is a hand-made array of function addresses
+                (g_orderFxVtable and its siblings in src/data/vtables.cpp) runs the entry of the
+                slot in each array that holds an entry of the class (ARRAY_FAMILY names the
+                arrays of a class the entries do not name, such as Callback)
+  pointer       a caller with an indirect call that is neither virtual nor a seam slot (a
+                function pointer or a bound member function, such as the thiscall pointer
+                of Order::SetAttachedFx) is taken to reach each hand-resolved target of
+                data/hazard_edges.csv that no virtual call above accounts for
+
+An entry or a method is found among the functions of data/rwsets.csv by its qualified name,
+or by its last name when the array writes it unqualified. A call is listed when the caller's subsystem and a callee's are both sim subsystems and differ,
+or the caller is `game` and the callee is a sim subsystem (the same edges as --seams). Each
+callee class is shown with the `new` sites of it under src/ and the subsystems of their files, as
+the owner of the objects (data/rwsets.csv has no row for a constructor call). A virtual call with no callee found
+is listed as unresolved and fails --check. Blind spots: the class hierarchy is read from
+declarations by pattern, so a class declared through a macro or a typedef is missed; an
+overloaded method is matched by name; a method the source calls through a base that no
+declared class derives from is unresolved; and a call through a table of raw function
+addresses that no hazard edge names is not seen at all.
+data/seam_exceptions.csv lists the calls that remain as rows with the symbol `virtual
+Class::method` (seamlink.py ignores them) and a `TODO(#n): ...` reason; --check fails on a call
+without a row, a row that no longer occurs and a reason that is not a TODO.
 
 --summary prints, for each subsystem (or the ones named): its entry points (the phase roots
 it holds, and the functions other subsystems call, with the number of callers), its imports
@@ -304,6 +342,326 @@ def check_seams(coupling: list[dict]) -> tuple[list[str], str]:
     return lines, "seams: 0 direct calls between sim subsystems"
 
 
+HIERARCHY_DIRS = ("src", "interfaces")
+CLASS_HEAD = re.compile(r"\b(?:class|struct)\s+(?:__declspec\([^)]*\)\s*)?(\w+)\s*(?::([^{;]*))?\{")
+VIRTUAL_DECL = re.compile(r"\bvirtual\b[^;(]*?(~?\w+)\s*\(")
+EXCEPTIONS_CSV = ROOT / "data/seam_exceptions.csv"
+EXCEPTION_COLUMNS = ["subsystem", "function", "symbol", "reason"]
+EXCEPTION_REASON = re.compile(r"TODO\(#[0-9]+\): \S")
+VIRTUAL_PREFIX = "virtual "
+SLOT_INDEX = re.compile(r"^(?:v|unused)(\d+)$")
+VTABLE_ARRAY = re.compile(r"\b(g_\w*[Vv]table\w*)\s*\[[^\]]*\]\s*=\s*\{([^}]*)\}")
+VIEW_FAMILY = {"PathGoalVtableView": "PathGoal", "PathPlannerView": "PathGoal", "GoalDrawInterface": "PathGoal",
+               "MotionSerializer": "PathGoal", "OrderFxSlot": "PathGoal", "Target": "OrderFx"}
+ARRAY_FAMILY = {"Callback": ["g_weaponAimCobVtable"]}
+
+
+def strip_comments(text: str) -> str:
+    text = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
+    return re.sub(r"//[^\n]*", " ", text)
+
+
+def class_bodies(text: str):
+    """(name, bases, body) of each class or struct with a body in the text; a nested class is part of its parent's body."""
+    for m in CLASS_HEAD.finditer(text):
+        depth, i = 1, m.end()
+        while i < len(text) and depth:
+            depth += {"{": 1, "}": -1}.get(text[i], 0)
+            i += 1
+        bases = [re.sub(r"<.*", "", re.sub(r"\b(public|private|protected|virtual)\b", "", b)).strip()
+                 for b in (m.group(2) or "").split(",")]
+        yield m.group(1), [b for b in bases if b], text[m.end():i - 1]
+
+
+def depth_one(body: str) -> str:
+    """The body with everything inside nested braces blanked, so only the class's own members remain."""
+    out, depth = [], 0
+    for ch in body:
+        if ch == "{":
+            depth += 1
+            out.append(" ")
+        elif ch == "}":
+            depth -= 1
+            out.append(";" if depth == 0 else " ")
+        else:
+            out.append(ch if depth == 0 else " ")
+    return "".join(out)
+
+
+class Classes:
+    """The classes the sources declare: bases and virtual methods in declaration order, by name.
+
+    A class declared in several files (the partial views) keeps the declaration with the most virtual methods."""
+
+    def __init__(self):
+        self.bases: dict[str, list[str]] = {}
+        self.virtuals: dict[str, list[str]] = {}
+        self.arrays: dict[str, list[str]] = {}
+
+    def add(self, text: str) -> None:
+        text = strip_comments(text)
+        for name, body in VTABLE_ARRAY.findall(text):
+            entries = [re.sub(r"\([^)]*\)", "", e).strip() for e in body.split(",") if e.strip()]
+            self.arrays[name] = entries
+        for name, bases, body in class_bodies(text):
+            methods = []
+            for stmt in depth_one(body).split(";"):
+                found = VIRTUAL_DECL.search(stmt)
+                if found:
+                    methods.append(found.group(1))
+            if name not in self.virtuals or len(methods) > len(self.virtuals[name]):
+                self.virtuals[name] = methods
+                self.bases[name] = bases
+
+    @classmethod
+    def read(cls, root: Path) -> "Classes":
+        out = cls()
+        for folder in HIERARCHY_DIRS:
+            for path in sorted((root / folder).rglob("*")):
+                if path.suffix in (".h", ".cpp", ".hpp"):
+                    out.add(path.read_text(encoding="latin-1"))
+        return out
+
+    def slots(self, name: str, seen: frozenset = frozenset()) -> list[str]:
+        """The method names of the class's vtable, the bases' slots first; a destructor is one slot, named `~`."""
+        if name in seen:
+            return []
+        out: list[str] = []
+        for base in self.bases.get(name, [])[:1]:
+            out = self.slots(base, seen | {name})
+        for method in self.virtuals.get(name, []):
+            method = "~" if method.startswith("~") else method
+            if method not in out:
+                out.append(method)
+        return out
+
+    def derived(self, name: str) -> set[str]:
+        """The class and every class derived from it."""
+        out, todo = {name}, [name]
+        while todo:
+            at = todo.pop()
+            for child, bases in self.bases.items():
+                if at in bases and child not in out:
+                    out.add(child)
+                    todo.append(child)
+        return out
+
+    def ancestors(self, name: str) -> list[str]:
+        """The bases of the class, nearest first."""
+        out, todo = [], list(self.bases.get(name, []))
+        while todo:
+            at = todo.pop(0)
+            if at not in out:
+                out.append(at)
+                todo += self.bases.get(at, [])
+        return out
+
+
+def method_function(cls: str, method: str) -> str:
+    """The name a function row gives the method of a class."""
+    return "%s::~%s" % (cls, cls) if method.startswith("~") else "%s::%s" % (cls, method)
+
+
+def slot_of(classes: Classes, cls: str, method: str) -> int | None:
+    """The vtable slot of a method of a class: its place in the class's slots, or N of a view's vN and unusedN."""
+    slots = classes.slots(cls)
+    key = "~" if method.startswith("~") else method
+    if key in slots:
+        return slots.index(key)
+    found = SLOT_INDEX.match(method)
+    return int(found.group(1)) if found else None
+
+
+def split_virtual(target: str) -> tuple[str, str]:
+    """(class, method) of an indirect_call target `virtual Class::method`."""
+    cls, _, method = target[len(VIRTUAL_PREFIX):].rpartition("::")
+    return cls, method
+
+
+def resolve_virtual(classes: Classes, cls: str, method: str, defined: set[str]) -> set[str]:
+    """The function names a call of Class::method can run, among those the rows define."""
+    out = set()
+    for derived in classes.derived(cls):
+        name = method_function(derived, method)
+        if name in defined:
+            out.add(name)
+    for base in classes.ancestors(cls):
+        name = method_function(base, method)
+        if name in defined:
+            out.add(name)
+            break
+    return out
+
+
+def entry_functions(entry: str, defined: set[str]) -> set[str]:
+    """The functions a vtable array entry names: itself, else the functions of that last name."""
+    if entry in defined:
+        return {entry}
+    last = entry.rpartition("::")[2]
+    return {d for d in defined if d.rpartition("::")[2] == last} if "::" not in entry else set()
+
+
+def resolve_slot(classes: Classes, cls: str, method: str, defined: set[str]) -> set[str]:
+    """The functions a call can run through its slot: the real class of a view, then the entries of the vtable arrays."""
+    real = VIEW_FAMILY.get(cls, cls)
+    slot = slot_of(classes, cls, method)
+    out = set()
+    if slot is not None:
+        slots = classes.slots(real)
+        if slot < len(slots):
+            out |= resolve_virtual(classes, real, slots[slot], defined)
+        for name, entries in classes.arrays.items():
+            holds = any(e.startswith(real + "::") for e in entries) or name in ARRAY_FAMILY.get(real, ()) \
+                or name in ARRAY_FAMILY.get(cls, ())
+            if holds and slot < len(entries):
+                out |= entry_functions(entries[slot], defined)
+    return out
+
+
+class VirtualCall:
+    """A call the check judges: the caller, what it calls through, the functions it can run and why they were chosen."""
+
+    def __init__(self, caller, file, line, target, how, callees):
+        self.caller, self.file, self.line, self.target, self.how, self.callees = caller, file, line, target, how, callees
+
+    def key(self):
+        return (self.caller, self.target)
+
+
+def indirect_calls(rows: list[list[str]], edges: list[tuple[str, str]], classes: Classes, lines: dict) -> list[VirtualCall]:
+    """Every virtual call, and the pointer calls of callers with a hand-resolved edge, with the functions they can run."""
+    defined = {r[1] for r in rows if r[3] == "function"}
+    edge_targets: dict[str, set[str]] = defaultdict(set)
+    for caller, target in edges:
+        edge_targets[caller].add(target)
+    out, explained, pointer_callers = [], defaultdict(set), {}
+    for _, function, file, kind, target in rows:
+        if kind != "indirect_call":
+            continue
+        if not target.startswith(VIRTUAL_PREFIX):
+            if "[" not in target:
+                pointer_callers[(function, file)] = target
+            continue
+        cls, method = split_virtual(target)
+        callees = resolve_virtual(classes, cls, method, defined)
+        how = "class"
+        if cls in VIEW_FAMILY or not callees:
+            callees |= resolve_slot(classes, cls, method, defined)
+            how = "slot %s of %s" % (slot_of(classes, cls, method), VIEW_FAMILY.get(cls, cls))
+        explained[function] |= callees
+        line = lines.get((function, file, target), "")
+        out.append(VirtualCall(function, file, line, target, how, callees))
+    for (function, file), target in sorted(pointer_callers.items()):
+        left = edge_targets[function] - explained[function]
+        out.append(VirtualCall(function, file, "", "pointer " + target, "hand edge", left))
+    return out
+
+
+def construction_sites(root: Path, wanted: set[str]) -> dict[str, list[tuple[str, int]]]:
+    """Per class, the (file, line) of each `new Class(` or `new (place) Class(` under src/: rwsets.csv has no row for a constructor call."""
+    pattern = re.compile(r"\bnew\s*(?:\([^)]*\)\s*)?(\w+)\s*[(;]")
+    out: dict[str, list[tuple[str, int]]] = defaultdict(list)
+    for path in sorted((root / "src").rglob("*")):
+        if path.suffix not in (".h", ".cpp"):
+            continue
+        for number, line in enumerate(path.read_text(encoding="latin-1").splitlines(), 1):
+            for found in pattern.finditer(line):
+                if found.group(1) in wanted:
+                    out[found.group(1)].append((str(path.relative_to(root)), number))
+    return out
+
+
+def virtual_edges(calls: list[VirtualCall], of: dict, names: dict, files: dict) -> list[tuple]:
+    """(caller subsystem, caller, file, line, target, callee, callee subsystem, callee file, how) of each crossing call."""
+    sim = set(SIM_SUBSYSTEMS)
+    out = []
+    for call in calls:
+        mine = of.get((call.caller, call.file))
+        for callee in sorted(call.callees):
+            for to in names.get(callee, []):
+                if to in sim and to != mine and (mine in sim or mine == "game"):
+                    out.append((mine, call.caller, call.file, call.line, call.target, callee, to,
+                                ",".join(sorted(files.get((callee, to), ()))), call.how))
+    return sorted(set(out), key=lambda e: (e[0], e[6], e[4], e[1], e[5]))
+
+
+def unresolved(calls: list[VirtualCall], of: dict) -> list[VirtualCall]:
+    return [c for c in calls if c.target.startswith(VIRTUAL_PREFIX) and not c.callees and of.get((c.caller, c.file)) in set(SIM_SUBSYSTEMS) | {"game"}]
+
+
+def virtual_keys(edges: list[tuple]) -> set[tuple]:
+    """The (caller subsystem, caller, target) of each crossing call: what an exceptions row names."""
+    return {(e[0], e[1], e[4] if e[4].startswith(VIRTUAL_PREFIX) else VIRTUAL_PREFIX + e[4]) for e in edges}
+
+
+def read_virtual_exceptions(path: Path = EXCEPTIONS_CSV) -> list[tuple]:
+    """The rows of data/seam_exceptions.csv whose symbol is `virtual ...`."""
+    return [(r["subsystem"], r["function"], r["symbol"], r["reason"]) for r in read_csv(path)
+            if r["symbol"].startswith(VIRTUAL_PREFIX)]
+
+
+def check_virtual(edges: list[tuple], missing: list[VirtualCall], rows: list[tuple]) -> list[str]:
+    """The failure lines: a call without a row, a row without a call or a TODO(#n) reason, an unresolved call."""
+    problems = []
+    found = virtual_keys(edges)
+    listed = {(s, f, y) for s, f, y, _ in rows}
+    for s, f, y in sorted(found - listed):
+        problems.append("virtual: %s %s -> %s: crosses a subsystem and is not in data/seam_exceptions.csv" % (s, f, y))
+    for s, f, y, reason in sorted(rows):
+        if (s, f, y) not in found:
+            problems.append("virtual: data/seam_exceptions.csv: stale row %s %s -> %s, remove the row" % (s, f, y))
+        if not EXCEPTION_REASON.match(reason):
+            problems.append("virtual: data/seam_exceptions.csv: %s %s -> %s: reason %r is not TODO(#n): ..." % (s, f, y, reason))
+    for call in missing:
+        problems.append("virtual: %s (%s) -> %s: no function found to run" % (call.caller, call.file, call.target))
+    return problems
+
+
+def virtual_report(edges: list[tuple], owners: dict, missing: list[VirtualCall]) -> str:
+    """The crossing calls grouped by caller and callee subsystem: one line per call, then its callees and the `new` sites of their classes."""
+    out, group, call = [], None, None
+    for e in edges:
+        mine, caller, file, line, target, callee, to, callee_file, how = e
+        if (mine, to) != group:
+            group = (mine, to)
+            out.append("%s -> %s" % group)
+        if (caller, file, line, target) != call:
+            call = (caller, file, line, target)
+            out.append("  %s (%s%s) %s [%s]" % (caller, mine, ", " + file + (":" + line if line else ""), target, how))
+        cls = callee.rpartition("::")[0]
+        built = "; ".join("%s:%d (%s)" % site for site in owners.get(cls, [])[:4]) or "no `new` site"
+        out.append("    -> %s (%s, %s); objects built at %s" % (callee, to, callee_file, built))
+    out.append("virtual: %d crossing calls, %d callers" % (len(edges), len({(e[1], e[4]) for e in edges})))
+    for call in missing:
+        out.append("virtual: unresolved %s (%s) -> %s" % (call.caller, call.file, call.target))
+    return "\n".join(out)
+
+
+def virtual_inputs(root: Path = ROOT):
+    """Everything --virtual reads: the calls, the subsystem maps, the constructors, and the lines of data/hazards.csv."""
+    rows, graph = hazards.load_graph()
+    edges = hazards.read_edges(EDGES, graph.functions)
+    subsystems = read_csv(SUBSYSTEMS_CSV)
+    of = {(r["function"], r["file"]): r["subsystem"] for r in subsystems}
+    names: dict[str, set[str]] = defaultdict(set)
+    files: dict[tuple, set[str]] = defaultdict(set)
+    for (function, file), subsystem in of.items():
+        names[function].add(subsystem)
+        files[(function, subsystem)].add(file)
+    lines = {}
+    for r in read_csv(hazards.HAZARDS):
+        if r["kind"] == "indirect_call":
+            lines[(r["function"], r["file"], r["target"])] = r["line"]
+    calls = indirect_calls(rows, edges, Classes.read(root), lines)
+    classes_hit = {c.rpartition("::")[0] for call in calls for c in call.callees}
+    sites = construction_sites(root, classes_hit)
+    by_file: dict[str, set[str]] = defaultdict(set)
+    for (function, file), subsystem in of.items():
+        by_file[file].add(subsystem)
+    owners = {cls: sorted({(f, n, ",".join(sorted(by_file.get(f, ())))) for f, n in found}) for cls, found in sites.items()}
+    return calls, of, {n: sorted(s) for n, s in names.items()}, files, owners
+
+
 def item_accesses(rows: list[list[str]], items: sc.Items) -> tuple[dict, dict]:
     """The accesses by item key: name-level (for the class of a field) and by (function, file) with a write flag."""
     by_name: dict[tuple, sc.Access] = defaultdict(sc.Access)
@@ -494,7 +852,19 @@ def main() -> None:
                         help="print entry points, imports and sim state of the subsystems (default all)")
     parser.add_argument("--seams", action="store_true",
                         help="fail on any direct call between sim subsystems, or from game into one")
+    parser.add_argument("--virtual", action="store_true",
+                        help="list the virtual calls between sim subsystems; with --check fail on one without an exception")
     args = parser.parse_args()
+    if args.virtual:
+        calls, of, names, files, owners = virtual_inputs()
+        edges = virtual_edges(calls, of, names, files)
+        missing = unresolved(calls, of)
+        if not args.check:
+            print(virtual_report(edges, owners, missing))
+            return
+        problems = check_virtual(edges, missing, read_virtual_exceptions())
+        print("\n".join(problems) if problems else "virtual: %d crossing calls, all with exceptions" % len(edges))
+        sys.exit(1 if problems else 0)
     if args.seams:
         coupling = read_csv(COUPLING_CSV)
         lines, ok = check_seams(coupling)

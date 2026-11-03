@@ -37,7 +37,7 @@ struct Recording {
 };
 
 struct ReplayRoots {
-    ReplayRoots() : count(0) {}
+    constexpr ReplayRoots() : count(0), kind(), object() {}
     template <class T> void Add(unsigned char objectKind, T* p)
     {
         if (count < REPLAY_MAX_ROOTS && p != nullptr) {

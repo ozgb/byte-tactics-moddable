@@ -44391,7 +44391,9 @@ address,function,file,kind,target
 ,HarnessUiQueue,src/harness/harness.cpp,function,
 ,HarnessUiQueue,src/harness/harness.cpp,global_read,s_ui@src/harness/harness.cpp
 ,HarnessViewRand,src/harness/harness.cpp,function,
+,HarnessViewRand,src/harness/harness.cpp,global_read,s_viewDraws@src/harness/harness.cpp
 ,HarnessViewRand,src/harness/harness.cpp,global_read,s_viewState@src/harness/harness.cpp
+,HarnessViewRand,src/harness/harness.cpp,global_write,s_viewDraws@src/harness/harness.cpp
 ,HarnessViewRand,src/harness/harness.cpp,global_write,s_viewState@src/harness/harness.cpp
 ,HarnessZeroVec3,src/harness/harness.cpp,call,memset
 ,HarnessZeroVec3,src/harness/harness.cpp,function,
@@ -48352,14 +48354,16 @@ address,function,file,kind,target
 ,UiEndOfTick,src/harness/harness.cpp,global_maybe_written,s_uiSelection@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_maybe_written,selection@UiEndOfTick
 ,UiEndOfTick,src/harness/harness.cpp,global_read,g_game
-,UiEndOfTick,src/harness/harness.cpp,global_read,s_inputCount@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_read,s_ui@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_read,s_uiScrollSeen@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_read,s_uiScrollX@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_read,s_uiScrollZ@src/harness/harness.cpp
+,UiEndOfTick,src/harness/harness.cpp,global_read,s_uiViewDraws@src/harness/harness.cpp
+,UiEndOfTick,src/harness/harness.cpp,global_read,s_viewDraws@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_write,s_uiScrollSeen@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_write,s_uiScrollX@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_write,s_uiScrollZ@src/harness/harness.cpp
+,UiEndOfTick,src/harness/harness.cpp,global_write,s_uiViewDraws@src/harness/harness.cpp
 ,UiEndOfTick,src/harness/harness.cpp,global_write,selection@UiEndOfTick
 ,UiKindTakesUnitType,src/harness/harness.cpp,call,_stricmp
 ,UiKindTakesUnitType,src/harness/harness.cpp,function,

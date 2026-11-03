@@ -1,3 +1,2 @@
 bt-ui 1
-1 scroll 2048 2416
 1 select -

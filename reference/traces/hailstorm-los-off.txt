@@ -1,6 +1,6 @@
 bt-digest 3
 trace_format bt-trace 3
-commit c1ad12a58a385ac1ba1a8780755e521c6ee3278a
+commit 613b1c7fe4d426ce4a96f12007da29f2c3468f59
 scenario reference/scenarios/hailstorm-los-off.txt
 game_seed 409
 crt_seed 1409

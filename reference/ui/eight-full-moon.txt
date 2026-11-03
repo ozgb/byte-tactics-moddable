@@ -1,15 +1,2 @@
 bt-ui 1
-1 scroll 0 1760
 1 select -
-8021 scroll 2 1758
-8022 scroll 1 1760
-8023 scroll 2 1760
-8024 scroll 0 1759
-8081 scroll 0 1758
-8082 scroll 11 1784
-8083 scroll 2 1783
-8084 scroll 1 1772
-8085 scroll 1 1766
-8086 scroll 1 1763
-8087 scroll 1 1762
-8088 scroll 1 1761

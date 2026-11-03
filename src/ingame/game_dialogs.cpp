@@ -1033,22 +1033,28 @@ void __stdcall RunGameSteps(int showStats)
         }
         g_seams.units->UpdateAllUnits();
         HarnessPhase(1);
+        DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 1);
         g_seams.weapons->UpdateProjectiles();
         HarnessPhase(2);
+        DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 7);
         g_seams.weapons->UpdateExplosions();
         HarnessPhase(3);
+        DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 8);
         g_seams.players->UpdatePlayers();
         HarnessPhase(4);
+        DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 2);
 
         g_seams.features->UpdateFeatures();
         HarnessPhase(5);
+        DrainSimEvents();
         StepAllGafSequences();
         g_seams.wind_meteors->UpdateWind();
         HarnessPhase(6);
+        DrainSimEvents();
         g_seams.wind_meteors->UpdateMeteors();
         HarnessPhase(7);
         DrainSimEvents();

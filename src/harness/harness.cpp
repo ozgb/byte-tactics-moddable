@@ -3787,7 +3787,7 @@ static void UiEndOfTick()
     unsigned char* end;
     if (s_ui == NULL)
         return;
-    if (!s_uiScrollSeen || g_game->scrollX != s_uiScrollX || g_game->scrollY != s_uiScrollZ) {
+    if (s_inputCount != 0 && (!s_uiScrollSeen || g_game->scrollX != s_uiScrollX || g_game->scrollY != s_uiScrollZ)) {
         s_uiScrollSeen = 1;
         s_uiScrollX = g_game->scrollX;
         s_uiScrollZ = g_game->scrollY;

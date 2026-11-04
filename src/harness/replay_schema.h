@@ -543,7 +543,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "index", offsetof(Handle, index), sizeof(((Handle*)nullptr)->index), ROK_HANDLE, RK_U16, 0, 0, 0, 0, 0, 0, 0 },
     { "value", offsetof(Handle, value), sizeof(((Handle*)nullptr)->value), ROK_HANDLE, RK_U16, 0, 0, 0, 0, 0, 0, 0 },
     { "kind", offsetof(Handle, kind), sizeof(((Handle*)nullptr)->kind), ROK_HANDLE, RK_U8, 0, 0, 0, 0, 0, 0, 0 },
-    { "src", offsetof(Handle, src), sizeof(((Handle*)nullptr)->src), ROK_HANDLE, RK_PTR, ROK_FRAMETABLE, 0, 0, 0, 0, 0, 0 },
+    { "src", offsetof(Handle, src), sizeof(void*), ROK_HANDLE, RK_PTR, ROK_FRAMETABLE, 0, 0, 0, 0, 0, 0 },
 };
 static const unsigned kReplayObjectFieldCount = 171;
 

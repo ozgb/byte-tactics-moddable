@@ -1025,7 +1025,7 @@ def render_schema(ann: dict, model: dict) -> str:
         member = f.get("member", f["name"])
         t = types[f["object"]]
         size = f.get("size")
-        size_text = str(size) if size else "sizeof(((%s*)nullptr)->%s)" % (t, member)
+        size_text = str(size) if size else "sizeof(void*)" if f["kind"] == "ptr" else "sizeof(((%s*)nullptr)->%s)" % (t, member)
         target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr") or (f["kind"] == "vector" and f.get("target")) else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
         extra = ", %d" % (f.get("array") or f.get("vector")) if f.get("array") or f.get("vector") else ""
         L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %d, %d, %d, %d%s },' % (

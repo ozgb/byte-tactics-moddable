@@ -109,6 +109,86 @@ class Accounting(unittest.TestCase):
         self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
 
 
+class Unrecorded(unittest.TestCase):
+    def unannotated(self):
+        ann = annotations()
+        del ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["args"]
+        return ann
+
+    def test_a_slot_with_pending_work_passes_only_when_it_is_not_recorded(self):
+        ann = self.unannotated()
+        _, errors = build([], ann)
+        self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
+        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "load class"})
+        model, errors = build([], ann)
+        self.assertEqual([e for e in errors if "matches no row" not in e], [])
+        spec = model["subsystems"]["wind_meteors"]
+        self.assertNotIn("SetMeteorParams", spec["slots"])
+        self.assertEqual(spec["unrecorded"], {"SetMeteorParams": {"reason": "load class", "native": "SetMeteorParams"}})
+        self.assertNotIn(("wind_meteors", "SetMeteorParams"), model["slot_list"])
+
+    def test_the_native_table_keeps_the_slot_in_its_place(self):
+        ann = self.unannotated()
+        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "#711"})
+        model, _ = build([], ann)
+        rs.attach_raw_params(model)
+        text = rs.render_slots(ann, model)
+        table = text.split("g_native_wind_meteors = {")[1].split("};")[0]
+        order = [s["name"] for s in rs.parse_interface("wind_meteors", model["subsystems"]["wind_meteors"]["struct"])["slots"]]
+        self.assertEqual([x.strip(" ,") for x in table.split("\n") if x.strip()], [annotations()["subsystems"]["wind_meteors"]["slots"].get(n, {}).get("native", n) for n in order])
+
+    def test_a_slot_that_is_not_recorded_needs_a_reason(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["record"] = False
+        _, errors = build([], ann)
+        self.assertTrue(any("SetMeteorParams is not recorded and has no `reason`" in e for e in errors), errors)
+
+    def test_a_reason_on_a_recorded_slot_is_an_error(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["reason"] = "load class"
+        _, errors = build([], ann)
+        self.assertTrue(any("SetMeteorParams has a reason and is recorded" in e for e in errors), errors)
+
+    def imported(self):
+        ann = annotations()
+        ann["subsystems"]["weapons"]["slots"]["SpawnProjectile"].update({"record": False, "reason": "#711"})
+        return ann
+
+    def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
+        ann = self.imported()
+        files, errors, model = rs.generate(rs.read_rows(), ann)
+        self.assertEqual([e for e in errors if "matches no row" not in e], [])
+        weapons = model["subsystems"]["weapons"]
+        self.assertNotIn("SpawnProjectile", weapons["slots"])
+        kept = weapons["unrecorded"]["SpawnProjectile"]
+        self.assertEqual([a["mode"] for a in kept["args"]], ["weapon", "vec3", "vec3", "scalar"])
+        self.assertEqual((kept["reads"], kept["writes"], kept["functions"]), ([], [], []))
+        hooks = files[rs.HOOKS_H]
+        self.assertIn("RecWeaponsSpawnProjectile", hooks)
+        self.assertIn("SlotScope scope(RSL_WEAPONS_SPAWNPROJECTILE, SUB_WEAPONS, roots, false);", hooks)
+        self.assertIn('line.Add("  i weapons.SpawnProjectile");', hooks)
+        self.assertIn("s_rec_weapons.SpawnProjectile = RecWeaponsSpawnProjectile;", hooks)
+        self.assertNotIn("on[SUB_WEAPONS] ||", hooks.split("s_rec_weapons.SpawnProjectile")[0].rsplit("if (", 1)[1])
+
+    def test_an_imported_slot_that_is_not_recorded_has_no_recording_slot(self):
+        files, _, model = rs.generate(rs.read_rows(), self.imported())
+        spec = model["subsystems"]["weapons"]
+        self.assertNotIn(("weapons", "SpawnProjectile"), model["slot_list"])
+        self.assertEqual(spec["slots"].keys() & {"SpawnProjectile"}, set())
+        schema = files[rs.SCHEMA_H]
+        self.assertIn("RSL_WEAPONS_SPAWNPROJECTILE,", schema)
+        self.assertIn('{ "SpawnProjectile", SUB_WEAPONS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },', schema)
+
+    def test_a_missing_argument_annotation_on_an_imported_unrecorded_slot_is_reported(self):
+        ann = self.unannotated()
+        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "#711"})
+        _, errors = build([], ann)
+        self.assertEqual([e for e in errors if "pending" in e], [])
+        ann["subsystems"]["economy"]["imports"].append("wind_meteors.SetMeteorParams")
+        _, errors = build([], ann)
+        self.assertTrue(any("wind_meteors is complete but has pending args" in e and "SetMeteorParams(params)" in e for e in errors), errors)
+
+
 class Rules(unittest.TestCase):
     def slot(self, rows, name="UpdatePlayerEconomy", sub="economy"):
         model, errors = build(rows)

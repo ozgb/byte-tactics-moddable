@@ -6,6 +6,7 @@
 
 import asyncio
 import contextlib
+import http.server
 import io
 import json
 import os
@@ -13,6 +14,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import unittest
 from unittest import mock
 from pathlib import Path
@@ -563,18 +565,18 @@ class BrokerTests(unittest.TestCase):
     def test_stub_gate_answers_a_ready_request_once(self):
         self.request("r1")
         self.request("r2", ready=False)
-        self.assertEqual(bk.process_mailbox(self.session), ["r1"])
+        self.assertEqual(bk.process_mailbox(self.session, bk.stub_gate), ["r1"])
         result = json.loads((self.session / "inbox" / "r1.json").read_text())
         self.assertEqual(result["verdict"], bk.STUB_VERDICT)
         self.assertEqual(result["subsystem"], "parser")
-        self.assertEqual(bk.process_mailbox(self.session), [])
+        self.assertEqual(bk.process_mailbox(self.session, bk.stub_gate), [])
         self.assertFalse((self.session / "inbox" / "r2.json").exists())
 
     def test_bad_requests_get_an_error_result(self):
         self.request("bad1", wasm=b"not wasm")
         self.request("bad2", subsystem="../etc")
         self.request("bad3", subsystem="Parser")
-        bk.process_mailbox(self.session)
+        bk.process_mailbox(self.session, bk.stub_gate)
         for name in ("bad1", "bad2", "bad3"):
             self.assertIn("error", json.loads((self.session / "inbox" / f"{name}.json").read_text()))
 
@@ -583,7 +585,7 @@ class BrokerTests(unittest.TestCase):
         module = self.session / "outbox" / "link" / "module.wasm"
         module.unlink()
         module.symlink_to("/etc/passwd")
-        bk.process_mailbox(self.session)
+        bk.process_mailbox(self.session, bk.stub_gate)
         self.assertIn("error", json.loads((self.session / "inbox" / "link.json").read_text()))
 
     def commit(self, repo_dir, text):
@@ -595,13 +597,13 @@ class BrokerTests(unittest.TestCase):
 
     def make_repo(self, name="work"):
         work = Path(self.tmp.name) / name
-        subprocess.run(["git", "init", "-q", "-b", "main", str(work)], check=True)
+        subprocess.run(["git", "init", "-q", "-b", "impl/w", str(work)], check=True)
         return work
 
     def bundle(self, work, target, *revs):
         subprocess.run(["git", "-C", str(work), "bundle", "create", "-q", str(target), *revs], check=True)
 
-    def head(self, ref="main"):
+    def head(self, ref="refs/heads/impl/w"):
         bare = self.session / "bare" / bk.REPO_NAME
         out = subprocess.run(["git", "--git-dir", str(bare), "rev-parse", "--verify", "-q", ref], capture_output=True, text=True)
         return out.stdout.strip()
@@ -612,19 +614,19 @@ class BrokerTests(unittest.TestCase):
         outbox = self.session / "outbox" / bk.BUNDLE_NAME
         self.assertEqual(bk.sync_refs(self.session), "")
         self.commit(work, "one")
-        self.bundle(work, outbox, "main")
+        self.bundle(work, outbox, "impl/w")
         bk.sync_refs(self.session)
         first = self.head()
         self.assertNotEqual(first, "")
         self.commit(work, "two")
-        self.bundle(work, outbox, "main")
+        self.bundle(work, outbox, "impl/w")
         bk.sync_refs(self.session)
         second = self.head()
         self.assertNotEqual(first, second)
         subprocess.run(["git", "-C", str(work), "checkout", "-q", "--orphan", "other"], check=True)
         self.commit(work, "three")
-        subprocess.run(["git", "-C", str(work), "branch", "-f", "main", "other"], check=True)
-        self.bundle(work, outbox, "main")
+        subprocess.run(["git", "-C", str(work), "branch", "-f", "impl/w", "other"], check=True)
+        self.bundle(work, outbox, "impl/w")
         out = bk.sync_refs(self.session)
         self.assertEqual(self.head(), second)
         self.assertIn("rejected", out)
@@ -634,7 +636,7 @@ class BrokerTests(unittest.TestCase):
     def test_unchanged_bundle_is_processed_once(self):
         work = self.make_repo()
         self.commit(work, "one")
-        self.bundle(work, self.session / "outbox" / bk.BUNDLE_NAME, "main")
+        self.bundle(work, self.session / "outbox" / bk.BUNDLE_NAME, "impl/w")
         bk.sync_refs(self.session)
         bk.sync_refs(self.session)
         self.assertEqual((self.session / "broker.log").read_text().count("sync:"), 1)
@@ -644,7 +646,7 @@ class BrokerTests(unittest.TestCase):
         host = self.make_repo("host")
         self.commit(host, "SECRET-DECOMPILED")
         real = Path(self.tmp.name) / "host.bundle"
-        self.bundle(host, real, "main")
+        self.bundle(host, real, "impl/w")
         (self.session / "outbox" / bk.BUNDLE_NAME).symlink_to(real)
         bk.sync_refs(self.session)
         self.assertEqual(self.head(), "")
@@ -655,7 +657,7 @@ class BrokerTests(unittest.TestCase):
         host = self.make_repo("host")
         self.commit(host, "SECRET-DECOMPILED")
         self.commit(host, "later")
-        self.bundle(host, self.session / "outbox" / bk.BUNDLE_NAME, "main~1..main")
+        self.bundle(host, self.session / "outbox" / bk.BUNDLE_NAME, "impl/w~1..impl/w")
         bk.sync_refs(self.session)
         self.assertEqual(self.head(), "")
         self.assertIn("does not verify", (self.session / "broker.log").read_text())
@@ -667,7 +669,7 @@ class BrokerTests(unittest.TestCase):
         sync = self.session / "sync"
         sync.mkdir()
         (sync / bk.REPO_NAME).symlink_to(host / ".git")
-        bk.process_mailbox(self.session)
+        bk.process_mailbox(self.session, bk.stub_gate)
         bk.sync_refs(self.session)
         self.assertEqual(self.head(), "")
         (sync / bk.REPO_NAME).unlink()
@@ -682,7 +684,7 @@ class BrokerTests(unittest.TestCase):
         self.assertNotEqual(secret.returncode, 0)
 
     def host_head(self, host):
-        return subprocess.run(["git", "-C", str(host), "rev-parse", "main"], capture_output=True, text=True, check=True).stdout.strip()
+        return subprocess.run(["git", "-C", str(host), "rev-parse", "impl/w"], capture_output=True, text=True, check=True).stdout.strip()
 
     @unittest.skipUnless(shutil.which("git"), "needs git")
     def test_hook_and_config_in_a_bundle_hand_over_do_not_run(self):
@@ -692,7 +694,7 @@ class BrokerTests(unittest.TestCase):
         hook = work / ".git" / "hooks" / "reference-transaction"
         hook.write_text(f"#!/bin/sh\ntouch {marker}\n")
         hook.chmod(0o755)
-        self.bundle(work, self.session / "outbox" / bk.BUNDLE_NAME, "main")
+        self.bundle(work, self.session / "outbox" / bk.BUNDLE_NAME, "impl/w")
         bk.sync_refs(self.session)
         self.assertNotEqual(self.head(), "")
         self.assertFalse(marker.exists())
@@ -701,7 +703,7 @@ class BrokerTests(unittest.TestCase):
         self.request("real")
         outbox = self.session / "outbox"
         (outbox / "link").symlink_to(outbox / "real")
-        bk.process_mailbox(self.session)
+        bk.process_mailbox(self.session, bk.stub_gate)
         self.assertTrue((self.session / "inbox" / "real.json").exists())
         self.assertFalse((self.session / "inbox" / "link.json").exists())
 
@@ -712,15 +714,345 @@ class BrokerTests(unittest.TestCase):
         os.mkfifo(module)
         self.request("big")
         with mock.patch.object(bk, "MAX_WASM", 4):
-            bk.process_mailbox(self.session)
+            bk.process_mailbox(self.session, bk.stub_gate)
         for name in ("fifo", "big"):
             self.assertIn("error", json.loads((self.session / "inbox" / f"{name}.json").read_text()))
 
     def test_files_in_the_outbox_are_not_requests(self):
         (self.session / "outbox" / ".btm.tmp").write_text("x")
         (self.session / "outbox" / bk.BUNDLE_NAME).write_text("x")
-        self.assertEqual(bk.process_mailbox(self.session), [])
+        self.assertEqual(bk.process_mailbox(self.session, bk.stub_gate), [])
         self.assertEqual(list((self.session / "inbox").iterdir()), [])
+
+
+FAKE_TOKEN = "test-token-not-real"
+
+
+def make_secret(directory, name, text, mode=0o600):
+    path = Path(directory) / name
+    path.write_text(text)
+    path.chmod(mode)
+    return path
+
+
+class CredentialTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.dir = Path(self.tmp.name)
+        self.host = self.dir / "host-credentials.json"
+
+    def read(self, path, kind="oauth", environ=None):
+        return ln.read_credential(path, kind, environ or {}, self.host)
+
+    def test_oauth_and_api_key_names(self):
+        key = make_secret(self.dir, "k", FAKE_TOKEN + "\n")
+        self.assertEqual(self.read(key), ("CLAUDE_CODE_OAUTH_TOKEN", FAKE_TOKEN))
+        self.assertEqual(self.read(key, "api-key"), ("ANTHROPIC_API_KEY", FAKE_TOKEN))
+        with self.assertRaises(ln.Refusal):
+            self.read(key, "other")
+
+    def test_missing_empty_and_loose_files_are_refused(self):
+        with self.assertRaises(ln.Refusal):
+            self.read(self.dir / "absent")
+        with self.assertRaises(ln.Refusal):
+            self.read(make_secret(self.dir, "empty", " \n"))
+        for mode in (0o640, 0o604, 0o644, 0o660):
+            with self.assertRaises(ln.Refusal, msg=oct(mode)):
+                self.read(make_secret(self.dir, f"m{mode:o}", FAKE_TOKEN, mode))
+        with self.assertRaises(ln.Refusal):
+            self.read(self.dir)
+
+    def test_value_the_host_claude_code_uses_is_refused(self):
+        key = make_secret(self.dir, "k", FAKE_TOKEN)
+        for var in ("ANTHROPIC_API_KEY", "CLAUDE_CODE_OAUTH_TOKEN"):
+            with self.assertRaises(ln.Refusal, msg=var):
+                self.read(key, environ={var: FAKE_TOKEN})
+        self.read(key, environ={"ANTHROPIC_API_KEY": "another-fake"})
+        self.host.write_text(json.dumps({"claudeAiOauth": {"accessToken": FAKE_TOKEN}}))
+        with self.assertRaises(ln.Refusal):
+            self.read(key)
+        self.host.write_text(json.dumps({"claudeAiOauth": {"accessToken": "different"}}))
+        self.read(key)
+        self.host.write_text("not json")
+        self.read(key)
+
+    def test_refusal_text_does_not_hold_the_value(self):
+        key = make_secret(self.dir, "k", FAKE_TOKEN)
+        with self.assertRaises(ln.Refusal) as caught:
+            self.read(key, environ={"ANTHROPIC_API_KEY": FAKE_TOKEN})
+        self.assertNotIn(FAKE_TOKEN, str(caught.exception))
+
+    def test_session_may_be_checked_before_it_exists(self):
+        base = self.dir / "repo"
+        (base / "src").mkdir(parents=True)
+        later = self.dir / "new-session"
+        got = ln.check_mount(later, "session", [base], self.dir / "home", must_exist=False)
+        self.assertEqual(got, later.resolve())
+        self.assertFalse(later.exists())
+        with self.assertRaises(ln.Refusal):
+            ln.check_mount(base / "src" / "s", "session", [base], self.dir / "home", must_exist=False)
+        self.assertFalse((base / "src" / "s").exists())
+
+    def test_bt_cleanroom_directory_is_never_mounted(self):
+        home = self.dir / "home"
+        vault = home / ".config" / "bt-cleanroom"
+        vault.mkdir(parents=True)
+        (self.dir / "repo").mkdir()
+        for bad in (vault, vault.parent, home):
+            with self.assertRaises(ln.Refusal, msg=str(bad)):
+                ln.check_mount(bad, "tree", [self.dir / "repo"], home)
+        inside = vault / "sub"
+        inside.mkdir()
+        with self.assertRaises(ln.Refusal):
+            ln.check_mount(inside, "tree", [self.dir / "repo"], home)
+        self.assertIn(str(vault), ln.host_paths([], home))
+
+    def test_canary_finds_the_directory_in_the_guest_home(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertTrue(cn.check_home(tmp)[0])
+            os.makedirs(os.path.join(tmp, ".config", "bt-cleanroom"))
+            self.assertFalse(cn.check_home(tmp)[0])
+
+    def test_check_log_counts_refused_server_names(self):
+        log = self.dir / "p.log"
+        allow = self.dir / "allow.txt"
+        allow.write_text("a.example\n")
+        records = [{"method": "CONNECT", "target": "a.example:443", "allowed": True, "status": 200},
+                   {"event": "sni_refused", "target": "a.example:443", "sni": "evil.example"}]
+        log.write_text("".join(json.dumps(r) + "\n" for r in records))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = px.main(["--check-log", str(log), "--allow", str(allow)])
+        self.assertEqual(code, 1)
+        self.assertIn("1 tunnels refused", out.getvalue())
+
+
+class FakeGate:
+    """A judge that writes result.json, logs/ and a stray file the way oraclegate does."""
+
+    def __init__(self, directory):
+        self.path = Path(directory) / "fake_gate.py"
+        self.path.write_text(
+            "import json, sys\nfrom pathlib import Path\n"
+            "out = Path(sys.argv[sys.argv.index('--out') + 1])\n"
+            "(out / 'logs').mkdir()\n(out / 'logs' / 'reference.txt').write_text('REFERENCE-VALUES')\n"
+            "(out / 'runtime').mkdir()\n(out / 'extra.txt').write_text('EXTRA')\n"
+            "mode = sys.argv[sys.argv.index('--subsystem') + 1]\n"
+            "if mode == 'silent':\n    sys.exit(3)\n"
+            "(out / 'result.json').write_text(json.dumps({'verdict': 'equal', 'subsystem': mode}))\n"
+            "print('LOG-ONLY-TEXT')\n"
+        )
+
+    def command(self):
+        return [sys.executable, str(self.path)]
+
+
+class RealGateTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.session = bk.prepare(Path(self.tmp.name) / "s")
+        self.fake = FakeGate(self.tmp.name)
+
+    def request(self, name, subsystem):
+        d = self.session / "outbox" / name
+        d.mkdir()
+        (d / "module.wasm").write_bytes(b"\0asm\1\0\0\0")
+        (d / "subsystem").write_text(subsystem + "\n")
+        (d / "ready").write_text("")
+
+    def test_only_result_json_crosses(self):
+        self.request("r1", "wind_meteors")
+        gate = bk.make_gate(self.session, self.fake.command())
+        self.assertEqual(bk.process_mailbox(self.session, gate), ["r1"])
+        inbox = sorted(p.name for p in (self.session / "inbox").iterdir())
+        self.assertEqual(inbox, ["r1.json"])
+        result = json.loads((self.session / "inbox" / "r1.json").read_text())
+        self.assertEqual(result["verdict"], "equal")
+        self.assertEqual(result["subsystem"], "wind_meteors")
+        text = (self.session / "inbox" / "r1.json").read_text()
+        for secret in ("REFERENCE-VALUES", "LOG-ONLY-TEXT", "EXTRA"):
+            self.assertNotIn(secret, text)
+        kept = self.session / "gate" / "r1" / "out" / "logs" / "reference.txt"
+        self.assertTrue(kept.exists())
+
+    def test_missing_result_is_an_error_without_the_logs(self):
+        self.request("r2", "silent")
+        gate = bk.make_gate(self.session, self.fake.command())
+        bk.process_mailbox(self.session, gate)
+        text = (self.session / "inbox" / "r2.json").read_text()
+        self.assertIn("error", json.loads(text))
+        self.assertNotIn("REFERENCE-VALUES", text)
+
+    def test_timeout_is_an_error(self):
+        sleeper = Path(self.tmp.name) / "sleep.py"
+        sleeper.write_text("import time\ntime.sleep(30)\n")
+        self.request("r3", "x")
+        gate = bk.make_gate(self.session, [sys.executable, str(sleeper)], timeout=1)
+        bk.process_mailbox(self.session, gate)
+        self.assertIn("timed out", json.loads((self.session / "inbox" / "r3.json").read_text())["error"])
+
+    def test_filter_refuses_symlinks_non_objects_and_big_files(self):
+        d = Path(self.tmp.name)
+        target = d / "t.json"
+        target.write_text("{}")
+        (d / "link.json").symlink_to(target)
+        (d / "list.json").write_text("[1]")
+        (d / "big.json").write_text("{}")
+        with mock.patch.object(bk, "MAX_RESULT", 1):
+            self.assertIn("error", bk.filter_result(d / "big.json", "i", 0))
+        self.assertIn("error", bk.filter_result(d / "link.json", "i", 0))
+        self.assertIn("error", bk.filter_result(d / "list.json", "i", 0))
+        self.assertIn("error", bk.filter_result(d / "none.json", "i", 0))
+        self.assertEqual(bk.filter_result(target, "i", 0)["id"], "i")
+
+
+class BranchRuleTests(unittest.TestCase):
+    def test_accepted_and_refused_names(self):
+        for ok in ("impl/a", "impl/wind-meteors", "impl/a/b.c_d", "impl/0x/y-1", "impl/v1.2"):
+            self.assertTrue(bk.branch_allowed(f"refs/heads/{ok}"), ok)
+        for bad in ("main", "impl", "impl/", "impl//a", "impl/-x", "impl/a/-x", "impl/A", "impl/a b", "impl/a..b", "impl/a.lock",
+                    "impl/a.", "impl/.a", "impl/a/", "impl/../main", "other/a", "-x", "impl/a@{1}", "impl/a~1", "impl/a:b"):
+            self.assertFalse(bk.branch_allowed(f"refs/heads/{bad}"), bad)
+        for bad in ("refs/tags/impl/a", "refs/heads/main", "refs/remotes/impl/a", "impl/a", "refs/heads/impl/" + "a" * 200):
+            self.assertFalse(bk.branch_allowed(bad), bad)
+
+
+class PushHandler(http.server.BaseHTTPRequestHandler):
+    requests = []
+    status = 201
+
+    def do_POST(self):
+        body = self.rfile.read(int(self.headers["Content-Length"]))
+        PushHandler.requests.append((self.path, self.headers["Authorization"], json.loads(body)))
+        self.send_response(PushHandler.status)
+        self.end_headers()
+        self.wfile.write(json.dumps({"html_url": "https://example.invalid/pull/1"}).encode())
+
+    def log_message(self, *args):
+        pass
+
+
+@unittest.skipUnless(shutil.which("git"), "needs git")
+class PushTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.dir = Path(self.tmp.name)
+        self.session = bk.prepare(self.dir / "s")
+        self.bare = self.session / "bare" / bk.REPO_NAME
+        self.remote = self.dir / "remote.git"
+        subprocess.run(["git", "init", "-q", "--bare", str(self.remote)], check=True)
+        self.token = make_secret(self.dir, "btm-token", FAKE_TOKEN + "\n")
+        PushHandler.requests = []
+        PushHandler.status = 201
+        self.server = http.server.HTTPServer(("127.0.0.1", 0), PushHandler)
+        threading.Thread(target=self.server.serve_forever, daemon=True).start()
+        self.addCleanup(self.server.server_close)
+        self.addCleanup(self.server.shutdown)
+        self.api = f"http://127.0.0.1:{self.server.server_port}"
+        self.work = self.dir / "work"
+        subprocess.run(["git", "init", "-q", "-b", "main", str(self.work)], check=True)
+        env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+               "GIT_COMMITTER_EMAIL": "t@t", "GIT_CONFIG_GLOBAL": "/dev/null"}
+        (self.work / "f").write_text("x")
+        subprocess.run(["git", "-C", str(self.work), "add", "f"], check=True, env=env)
+        subprocess.run(["git", "-C", str(self.work), "commit", "-qm", "one"], check=True, env=env)
+
+    def bundle(self, *branches):
+        for b in branches:
+            if b != "main":
+                subprocess.run(["git", "-C", str(self.work), "branch", "-f", b, "main"], check=True)
+        subprocess.run(["git", "-C", str(self.work), "bundle", "create", "-q", str(self.session / "outbox" / bk.BUNDLE_NAME), *branches], check=True)
+        (self.session / bk.STATE_NAME).unlink(missing_ok=True)
+
+    def remote_refs(self):
+        out = subprocess.run(["git", "--git-dir", str(self.remote), "for-each-ref", "--format=%(refname)"], capture_output=True, text=True).stdout
+        return out.split()
+
+    def push(self, token_file=None):
+        bk.push_branches(self.session, token_file or self.token, str(self.remote), "ozgb/btm", self.api)
+
+    def test_only_impl_branches_reach_the_bare_repository(self):
+        self.bundle("main", "impl/ok", "impl/a/b", "other")
+        subprocess.run(["git", "-C", str(self.work), "tag", "v1"], check=True)
+        bk.sync_refs(self.session)
+        refs = subprocess.run(["git", "--git-dir", str(self.bare), "for-each-ref", "--format=%(refname)"], capture_output=True, text=True).stdout.split()
+        self.assertEqual(sorted(refs), ["refs/heads/impl/a/b", "refs/heads/impl/ok"])
+        log = (self.session / "broker.log").read_text()
+        self.assertIn("refs/heads/main", log)
+        self.assertIn("refs/heads/other", log)
+
+    def test_push_publishes_branches_and_opens_one_pull_request_each(self):
+        self.bundle("impl/ok", "impl/two")
+        bk.sync_refs(self.session)
+        self.push()
+        self.assertEqual(sorted(self.remote_refs()), ["refs/heads/impl/ok", "refs/heads/impl/two"])
+        self.assertEqual(len(PushHandler.requests), 2)
+        path, auth, body = PushHandler.requests[0]
+        self.assertEqual(path, "/repos/ozgb/btm/pulls")
+        self.assertEqual(auth, f"Bearer {FAKE_TOKEN}")
+        self.assertEqual((body["base"], body["head"]), ("main", "impl/ok"))
+        self.push()
+        self.assertEqual(len(PushHandler.requests), 2)
+
+    def test_existing_pull_request_is_not_an_error(self):
+        PushHandler.status = 422
+        self.bundle("impl/ok")
+        bk.sync_refs(self.session)
+        self.push()
+        self.assertIn("exists", json.loads((self.session / bk.PUSH_STATE).read_text())["pr"]["refs/heads/impl/ok"])
+
+    def test_token_is_in_no_log_config_or_environment(self):
+        self.bundle("impl/ok")
+        bk.sync_refs(self.session)
+        before = dict(os.environ)
+        self.push()
+        self.assertEqual(dict(os.environ), before)
+        self.assertNotIn(FAKE_TOKEN, "".join(os.environ.values()))
+        leaks = [str(p) for p in self.session.rglob("*") if p.is_file() and FAKE_TOKEN.encode() in p.read_bytes()]
+        self.assertEqual(leaks, [])
+        self.assertTrue(self.remote_refs())
+
+    def test_bad_token_files_push_nothing(self):
+        self.bundle("impl/ok")
+        bk.sync_refs(self.session)
+        for name, token in (("absent", self.dir / "absent"), ("empty", make_secret(self.dir, "e", "")),
+                            ("loose", make_secret(self.dir, "l", FAKE_TOKEN, 0o644))):
+            self.push(token)
+            self.assertEqual(self.remote_refs(), [], name)
+        self.assertEqual(PushHandler.requests, [])
+        self.assertIn("push skipped", (self.session / "broker.log").read_text())
+
+    def test_failed_push_is_retried_without_a_pull_request(self):
+        self.bundle("impl/ok")
+        bk.sync_refs(self.session)
+        bk.push_branches(self.session, self.token, str(self.dir / "no-such-remote.git"), "ozgb/btm", self.api)
+        self.assertEqual(PushHandler.requests, [])
+        self.assertIn("push refused", (self.session / "broker.log").read_text())
+        self.push()
+        self.assertEqual(len(PushHandler.requests), 1)
+
+    def test_askpass_prints_the_variable_and_the_environment_stays_clean(self):
+        out = subprocess.run([str(bk.ASKPASS), "Password for x: "], capture_output=True, text=True, env={bk.TOKEN_ENV: FAKE_TOKEN})
+        self.assertEqual(out.stdout.strip(), FAKE_TOKEN)
+
+    def test_a_bundle_that_fails_to_verify_is_logged_once(self):
+        self.bundle("impl/ok")
+        host = self.dir / "host"
+        subprocess.run(["git", "init", "-q", "-b", "main", str(host)], check=True)
+        env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+               "GIT_COMMITTER_EMAIL": "t@t", "GIT_CONFIG_GLOBAL": "/dev/null"}
+        for n in ("a", "b"):
+            (host / "f").write_text(n)
+            subprocess.run(["git", "-C", str(host), "add", "f"], check=True, env=env)
+            subprocess.run(["git", "-C", str(host), "commit", "-qm", n], check=True, env=env)
+        subprocess.run(["git", "-C", str(host), "bundle", "create", "-q", str(self.session / "outbox" / bk.BUNDLE_NAME), "main~1..main"], check=True)
+        bk.sync_refs(self.session)
+        bk.sync_refs(self.session)
+        self.assertEqual((self.session / "broker.log").read_text().count("does not verify"), 1)
+        self.assertFalse((self.session / bk.STATE_NAME).exists())
 
 
 if __name__ == "__main__":

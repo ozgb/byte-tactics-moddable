@@ -2104,6 +2104,65 @@ void __stdcall RecOrdersQueueBuildOrder(char* a0, Unit* a1, int a2)
     }
 }
 
+int __stdcall RecOrdersOrderFxIsGoal(OrderFx* a0, int a1, int a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ORDERS_ORDERFXISGOAL, SUB_ORDERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "self");
+        ArgValue(s_call, "x", a1);
+        ArgValue(s_call, "y", a2);
+    }
+    int result = s_inner_orders->OrderFxIsGoal(a0, a1, a2);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecOrdersOrderFxFillGoalCells(OrderFx* a0, std::vector<Point16, std::allocator<Point16> >* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ORDERS_ORDERFXFILLGOALCELLS, SUB_ORDERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "self");
+        ArgPending(s_call, "goals");
+    }
+    s_inner_orders->OrderFxFillGoalCells(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+int __stdcall RecOrdersOrderFxApproxDist(OrderFx* a0, int a1, int a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ORDERS_ORDERFXAPPROXDIST, SUB_ORDERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "self");
+        ArgValue(s_call, "x", a1);
+        ArgValue(s_call, "y", a2);
+    }
+    int result = s_inner_orders->OrderFxApproxDist(a0, a1, a2);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+AiSearchGoal* __stdcall RecOrdersUnitMotionClaimRepath(UnitMotion* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
+    SlotScope scope(RSL_ORDERS_UNITMOTIONCLAIMREPATH, SUB_ORDERS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
+    }
+    AiSearchGoal* result = s_inner_orders->UnitMotionClaimRepath(a0);
+    if (scope.Open()) {
+    }
+    return result;
+}
+
 void __stdcall RecUnitsUpdateAllUnits()
 {
     ReplayRoots roots;
@@ -5581,6 +5640,14 @@ void HookSeams(const bool* on)
         s_rec_orders.NewOrder = RecOrdersNewOrder;
     if (on[SUB_ORDERS])
         s_rec_orders.QueueBuildOrder = RecOrdersQueueBuildOrder;
+    if (on[SUB_ORDERS])
+        s_rec_orders.OrderFxIsGoal = RecOrdersOrderFxIsGoal;
+    if (on[SUB_ORDERS])
+        s_rec_orders.OrderFxFillGoalCells = RecOrdersOrderFxFillGoalCells;
+    if (on[SUB_ORDERS])
+        s_rec_orders.OrderFxApproxDist = RecOrdersOrderFxApproxDist;
+    if (on[SUB_ORDERS])
+        s_rec_orders.UnitMotionClaimRepath = RecOrdersUnitMotionClaimRepath;
     if (on[SUB_UNITS])
         s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
     if (on[SUB_UNITS] || on[SUB_TARGETING])

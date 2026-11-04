@@ -11,20 +11,9 @@
 
 struct Unit;
 class AiSearchGoal;
+class OrderFx;
 
 void __cdecl operator delete(void* p);
-
-class Target {
-public:
-    virtual void unused0();
-    virtual void unused1();
-    virtual void unused2();
-    virtual void unused3();
-    virtual void unused4();
-    virtual int IsGoal(int x, int y);
-    virtual void GetGoals(std::vector<Point16>& goals);
-    virtual int Cost(int x, int y);
-};
 
 struct NodeData {
     Point16 pos;
@@ -288,7 +277,7 @@ public:
     int baseScale;
     Ref<Unit> object;
     Ref<AiSearchGoal> path;
-    Ref<Target> target;
+    Ref<OrderFx> target;
     Ref<MovementClass> owner;
     union {
         TurnCostTable table;
@@ -305,13 +294,13 @@ public:
     int EstimateCost(int x, int y)
     {
         int factor = costScale;
-        int v = target->Cost(x, y);
+        int v = g_seams.orders->OrderFxApproxDist(target, x, y);
         return (int)(((__int64)v * factor) >> 16);
     }
     int Cost(int x, int y)
     {
         int s = costScale;
-        return (int)(((__int64)s * target->Cost(x, y)) >> 0x10);
+        return (int)(((__int64)s * g_seams.orders->OrderFxApproxDist(target, x, y)) >> 0x10);
     }
     void ResetTable()
     {
@@ -338,7 +327,7 @@ public:
     int CostFix(int x, int y)
     {
         int s = costScale;
-        return FixMul(s, target->Cost(x, y));
+        return FixMul(s, g_seams.orders->OrderFxApproxDist(target, x, y));
     }
     unsigned int Passable(int x, int y)
     {
@@ -396,7 +385,7 @@ public:
     int ExpandBestNode();
     void TracePath();
     int ProbeStraightPath();
-    void StartSearch(Target* t);
+    void StartSearch(OrderFx* t);
     void ReleaseHeldPathLock();
     void AbortIfGoalMatch(int goal);
     Pathfinder();

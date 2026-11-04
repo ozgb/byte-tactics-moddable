@@ -531,6 +531,26 @@ static void __stdcall OrderFxAddFlagsNative(OrderFx* self, int flags)
     self->AddFlags(flags);
 }
 
+static int __stdcall OrderFxIsGoalNative(OrderFx* self, int x, int y)
+{
+    return self->ContainsCell(x, y);
+}
+
+static void __stdcall OrderFxFillGoalCellsNative(OrderFx* self, std::vector<Point16>* goals)
+{
+    self->FillGoalCells(goals);
+}
+
+static int __stdcall OrderFxApproxDistNative(OrderFx* self, int x, int y)
+{
+    return self->ApproxDist(x, y);
+}
+
+static AiSearchGoal* __stdcall UnitMotionClaimRepathNative(UnitMotion* motion)
+{
+    return motion->ClaimRepath();
+}
+
 static void __fastcall RunSearchesNative(Pathfinder* self)
 {
     self->RunSearches();
@@ -761,6 +781,10 @@ void InstallNativeSeams()
     s_pathfinding.Create = CreatePathfinderNative;
     s_orders.AiSearchGoalSetWaypoints = AiSearchGoalSetWaypointsNative;
     s_orders.OrderFxAddFlags = OrderFxAddFlagsNative;
+    s_orders.OrderFxIsGoal = OrderFxIsGoalNative;
+    s_orders.OrderFxFillGoalCells = OrderFxFillGoalCellsNative;
+    s_orders.OrderFxApproxDist = OrderFxApproxDistNative;
+    s_orders.UnitMotionClaimRepath = UnitMotionClaimRepathNative;
     s_units.MovementClassGet = MovementClassGetNative;
     s_units.MovementClassInBounds = MovementClassInBoundsNative;
     s_units.RefreshMovedUnits = RefreshMovedUnitsNative;

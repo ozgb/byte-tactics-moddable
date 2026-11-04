@@ -53,6 +53,9 @@ jobs:
       - name: No direct calls between sim subsystems
         run: python3 tools/coupling.py --seams
 
+      - name: No virtual calls between sim subsystems without an exception
+        run: python3 tools/coupling.py --virtual --check
+
       - name: Platform headers stay in the host
         env:
           GH_TOKEN: ${{ github.token }}

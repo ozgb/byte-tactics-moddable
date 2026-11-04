@@ -651,6 +651,7 @@ public:
     virtual void v3(Vec3* out, int first, int count);
     virtual void v4(Vec3* a, Vec3* b, short* heading);
     virtual int v5();
+    virtual AiSearchGoal* v6();
 };
 
 #include "../units/sfx_occupy.h"
@@ -1603,6 +1604,11 @@ void UnitMotion::DestroyObject()
     if (obj != 0) {
         obj->v0(1);
     }
+}
+
+AiSearchGoal* UnitMotion::ClaimRepath()
+{
+    return obj->v6();
 }
 
 // FUNCTION: 0x43dd20

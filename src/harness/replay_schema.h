@@ -334,6 +334,10 @@ static const ReplayElemSpec kReplayElems[] = {
     { 1, 1 },
 };
 
+static const ReplaySelfSpec kReplaySelfs[] = {
+    { 0, 0 },
+};
+
 static const ReplayInsideSite kReplayInsideSites[] = {
     { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot", 0, 1, 0 },
     { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim", 0, 1, 0 },

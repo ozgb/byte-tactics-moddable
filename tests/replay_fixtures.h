@@ -147,4 +147,30 @@ struct FixtureOrder {
     FixtureAttach link;
 };
 
+struct FixtureScreen {
+    short x;
+    short y;
+};
+
+struct FixtureEye {
+    Ref<char> owner;
+    Ref<FixtureScreen> screen;
+    short x;
+    char flag;
+    Ref<char> flagPtr;
+    FixtureScreen pos;
+};
+
+struct FixtureNode {
+    int key;
+    short pri;
+};
+
+struct FixtureHeap {
+    int capacity;
+    int used;
+    Ref<FixtureNode> pool;
+    Ref<FixtureNode> top;
+};
+
 #endif

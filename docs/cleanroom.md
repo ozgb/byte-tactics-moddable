@@ -199,7 +199,8 @@ The real gate needs `--game-dir` when the game is not in a Steam or GOG default 
 "no Total Annihilation install found". `launch.py` forwards it to `broker.py --game-dir`.
 
 1. Builds the image: Rust, wasm-tools and Claude Code, with network, once.
-2. `oraclekit.py export` writes the data kit the agent reads at `/data`; the clone is the agent's `/work`.
+2. `oraclekit.py export` writes the data kit the agent reads at `/data`; the clone is the agent's `/work`. On a commit
+   without an `interfaces-v*` and `reference-traces-v*` tag it refuses; `--untagged` writes a kit without a version.
 3. `launch.py` runs the canary checks (it stops before the agent on any failure), then COMMAND as the unprivileged
    user with the implementer credential. COMMAND is the implementer's Claude Code invocation, for example
    `claude -p "Implement wind_meteors from /data; submit it through /srv/outbox"`.

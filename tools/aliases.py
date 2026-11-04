@@ -513,11 +513,14 @@ def entry_offset(original: bytes, compiled: bytes, upto: int) -> int | None:
     return None
 
 
-def add_entry_symbols(data: bytes, entries: list[tuple[int, str]], symbols: dict[str, int]) -> bytes:
+def add_entry_symbols(data: bytes, entries: list[tuple[int, str]], symbols: dict[str, int],
+                      original: bool = True) -> bytes:
     """The object with a public symbol at each entry: in the section of the
     function holding it, at the instruction the original has at that address.
     The compiler's assembler may encode an instruction differently from the
-    original's, so the offset is found by counting instructions, not bytes."""
+    original's, so the offset is found by counting instructions, not bytes.
+    Unless original, the entry is at the start of that function: nothing is
+    read from orig/TotalA.exe."""
     import pefile
     buf = bytearray(data)
     _, nsects, _, symptr, nsyms, opthdr, _ = struct.unpack_from("<HHIIIHH", buf, 0)
@@ -542,8 +545,8 @@ def add_entry_symbols(data: bytes, entries: list[tuple[int, str]], symbols: dict
             if addr is not None and (typ & 0x30) == 0x20:
                 functions.append((addr, secnum, value))
         i += 1 + naux
-    pe = pefile.PE(str(EXE))
-    base = pe.OPTIONAL_HEADER.ImageBase
+    pe = pefile.PE(str(EXE)) if original else None
+    base = pe.OPTIONAL_HEADER.ImageBase if pe else 0
     new = bytearray()
     added = 0
     for address, name in entries:
@@ -552,9 +555,12 @@ def add_entry_symbols(data: bytes, entries: list[tuple[int, str]], symbols: dict
             continue
         start, secnum, value = holder
         rawptr, size = sections[secnum - 1]
-        original = pe.get_data(start - base, max(address - start, 1) + 4096)
-        offset = entry_offset(original[:address - start + 64], bytes(buf[rawptr + value:rawptr + size]),
-                              address - start)
+        if pe is None:
+            offset = 0
+        else:
+            theirs = pe.get_data(start - base, max(address - start, 1) + 4096)
+            offset = entry_offset(theirs[:address - start + 64], bytes(buf[rawptr + value:rawptr + size]),
+                                  address - start)
         if offset is None:
             print(f"aliases: entry {address:#x} is not on an instruction both builds share in the function "
                   f"at {start:#x}", file=sys.stderr)
@@ -804,12 +810,15 @@ def report_dropped_initialisers(lost: list[tuple[str, str, list[str]]],
 
 
 def patch_objects(objects: list[Path], symbols: dict[str, int], out_dir: Path,
-                  source_of=None, ordered: bool = True) -> list[Path]:
+                  source_of=None, ordered: bool = True, original: bool = True) -> list[Path]:
     """Copies of the objects under out_dir (named for their position) with
     interior globals pointed at their containers; the unchanged ones are
     copied too, so the link takes one directory. Unless ordered, the data is
     not laid out in the original's order (no `<kind>$<address>` sections, no
-    layout.obj)."""
+    layout.obj). Unless original, orig/TotalA.exe is not read: every initialiser
+    is kept unless data/initialiser_allow.csv allows dropping it, an entry symbol
+    is at the start of its function, and the data is not ordered."""
+    ordered = ordered and original
     out_dir.mkdir(parents=True, exist_ok=True)
     statics = static_names(symbols)
     for leaf, addr in statics.items():
@@ -834,7 +843,8 @@ def patch_objects(objects: list[Path], symbols: dict[str, int], out_dir: Path,
     interior = interior_references(objects, symbols, extents)
     result = []
     patched = 0
-    wanted = wanted_initialisers() if source_of else {}
+    wanted = wanted_initialisers() if source_of and original else {}
+    allowed = load_initialiser_allowlist()
     kept = dropped = 0
     lost: list[tuple[str, str, list[str]]] = []
     candidates: dict[int, list[tuple[int, int, int]]] = defaultdict(list)
@@ -848,11 +858,15 @@ def patch_objects(objects: list[Path], symbols: dict[str, int], out_dir: Path,
         source = source_of(path) if source_of else None
         entries = entry_points(source) if source is not None else []
         if entries:
-            new = add_entry_symbols(new if new is not None else data, entries, symbols)
+            new = add_entry_symbols(new if new is not None else data, entries, symbols, original)
         patched += new is not None
         if source is not None:
             relative = str(source.relative_to(ROOT))
-            if not any(sym.startswith("_$E") for sym in wanted.get(relative, ())):
+            if original:
+                drop = not any(sym.startswith("_$E") for sym in wanted.get(relative, ()))
+            else:
+                drop = all((relative, name) in allowed for name in initialiser_refs(new if new is not None else data))
+            if drop:
                 before = new if new is not None else data
                 new = drop_initialisers(before)
                 dropped += new != before
@@ -1480,6 +1494,9 @@ def main() -> None:
                          "--objects is ignored")
     ap.add_argument("--winmain", type=lambda v: int(v, 0), default=None,
                     help="alias _WinMain@16 to the function at this address")
+    ap.add_argument("--no-original", action="store_true",
+                    help="with --patch-dir: do not read orig/TotalA.exe (for CI, which has none): keep every "
+                         "initialiser and add no entry symbols or import thunks; the exe is not the real one")
     ap.add_argument("--no-data-order", action="store_true",
                     help="with --patch-dir: do not lay the data out in the original's order")
     args = ap.parse_args()
@@ -1507,7 +1524,8 @@ def main() -> None:
             source = ROOT / Path(*parts[parts.index("src"):]).with_suffix("")
             return source if source.suffix == ".cpp" and source.exists() else None
 
-        objects = patch_objects(objects, symbols, args.patch_dir, source_of, not args.no_data_order)
+        objects = patch_objects(objects, symbols, args.patch_dir, source_of, not args.no_data_order,
+                                not args.no_original)
         (args.patch_dir / "objects.rsp").write_text("\n".join(str(o) for o in objects) + "\n")
     libs: dict[str, str] = {}
     for lib in args.libs:
@@ -1521,7 +1539,7 @@ def main() -> None:
     extra = {new: old for new, old in {**CLANG_RUNTIME, **IMPORT_SPELLINGS}.items() if old in libs}
     aliases = build_aliases(objects, symbols, data_addr, libs, args.out, extra=extra,
                             winmain_addr=args.winmain, data_fallback=True, strip_underscore=True,
-                            thunks=import_thunks(libs), placeholder_methods=True, annotated=annotated,
+                            thunks={} if args.no_original else import_thunks(libs), placeholder_methods=True, annotated=annotated,
                             overloads=overloaded_names(symbols))
     print(f"aliases: {len(aliases):,} aliases for {len(objects):,} objects", file=sys.stderr)
     if args.patch_dir is not None:

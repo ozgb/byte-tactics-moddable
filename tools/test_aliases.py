@@ -8,6 +8,7 @@ import io
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import aliases
 from aliases import Section, Symbol
@@ -43,6 +44,25 @@ class InitialiserSymbolsTest(unittest.TestCase):
         data = object_bytes("_init")
         self.assertEqual(sections_kept(data), [".text", ".CRT$XCU"])
         self.assertEqual(sections_kept(aliases.drop_initialisers(data)), [".text"])
+
+
+class NoOriginalTest(unittest.TestCase):
+    def patch(self, original: bool) -> list[str]:
+        missing = Path(tempfile.gettempdir()) / "no-such-dir" / "TotalA.exe"
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(aliases, "EXE", missing), \
+                contextlib.redirect_stderr(io.StringIO()):
+            src = Path(tmp) / "o.obj"
+            src.write_bytes(object_bytes("??__Eg_x@@YAXXZ"))
+            out = aliases.patch_objects([src], {}, Path(tmp) / "out", lambda _: Path(aliases.__file__),
+                                        True, original)
+            return sections_kept(next(p for p in out if p.name.endswith("o.obj")).read_bytes())
+
+    def test_keeps_initialisers_without_reading_the_exe(self):
+        self.assertEqual(self.patch(False), [".text", ".CRT$XCU"])
+
+    def test_default_needs_the_exe(self):
+        with self.assertRaises(FileNotFoundError):
+            self.patch(True)
 
 
 class ReportTest(unittest.TestCase):

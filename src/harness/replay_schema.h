@@ -328,12 +328,16 @@ static const ReplayVectorSpec kReplayVectors[] = {
     { RV_SCALAR, 0, sizeof(short) },
 };
 
+static const ReplayElemSpec kReplayElems[] = {
+    { 1, 1 },
+};
+
 static const ReplayInsideSite kReplayInsideSites[] = {
-    { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot" },
-    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim" },
-    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, shadowAnim), "shadowAnim" },
-    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim" },
-    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow" },
+    { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot", 0, 1, 0 },
+    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim", 0, 1, 0 },
+    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, shadowAnim), "shadowAnim", 0, 1, 0 },
+    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim", 0, 1, 0 },
+    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },
 };
 static const unsigned kReplayInsideSiteCount = 5;
 

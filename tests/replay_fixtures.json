@@ -266,6 +266,229 @@
      "depth": 1
     }
    ]
+  },
+  "FixtureTimerBase": {
+   "type": "FixtureTimerBase",
+   "scope": "state",
+   "kinds": [
+    "FixtureTimer",
+    "FixtureAssault"
+   ],
+   "fields": []
+  },
+  "FixtureTimer": {
+   "type": "FixtureTimer",
+   "scope": "state",
+   "vtable": "g_fixtureTimerVtable",
+   "fields": [
+    {
+     "name": "ticks",
+     "kind": "u16"
+    },
+    {
+     "name": "period",
+     "kind": "u16"
+    }
+   ]
+  },
+  "FixtureAssault": {
+   "type": "FixtureAssault",
+   "scope": "state",
+   "vtable": "g_fixtureAssaultVtable",
+   "fields": [
+    {
+     "name": "ticks",
+     "kind": "u16"
+    },
+    {
+     "name": "squad",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureManager": {
+   "type": "FixtureManager",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "timers",
+     "kind": "refs",
+     "count": 4,
+     "target": "FixtureTimerBase",
+     "poly": "FixtureTimerBase"
+    }
+   ]
+  },
+  "FixtureGroup": {
+   "type": "FixtureGroup",
+   "scope": "state",
+   "table": {
+    "base": {
+     "object": "FixtureOwner",
+     "field": "groups"
+    },
+    "count": 4
+   },
+   "fields": [
+    {
+     "name": "level",
+     "kind": "i32"
+    },
+    {
+     "name": "mode",
+     "kind": "i16"
+    }
+   ]
+  },
+  "FixtureOwner": {
+   "type": "FixtureOwner",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "groups",
+     "kind": "ref",
+     "target": "FixtureGroup"
+    }
+   ]
+  },
+  "FixtureUser": {
+   "type": "FixtureUser",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "tag",
+     "kind": "i32"
+    },
+    {
+     "name": "group",
+     "kind": "ref",
+     "target": "FixtureGroup"
+    }
+   ]
+  },
+  "FixtureCb": {
+   "type": "FixtureCb",
+   "scope": "state",
+   "vptr": "g_fixtureCbVtable",
+   "inside": [
+    {
+     "kind": "FixtureRig",
+     "member": "slots[].cb"
+    }
+   ],
+   "fields": [
+    {
+     "name": "done",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureRig": {
+   "type": "FixtureRig",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "cb",
+     "kind": "embeds",
+     "count": 3,
+     "target": "FixtureCb",
+     "member": "slots[].cb"
+    }
+   ]
+  },
+  "FixtureChannel": {
+   "type": "FixtureChannel",
+   "scope": "state",
+   "inside": [
+    {
+     "kind": "FixtureScript",
+     "member": "channels[]"
+    }
+   ],
+   "fields": [
+    {
+     "name": "pc",
+     "kind": "u16"
+    },
+    {
+     "name": "state",
+     "kind": "i16"
+    },
+    {
+     "name": "stack",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureScript": {
+   "type": "FixtureScript",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "channels",
+     "kind": "embeds",
+     "count": 4,
+     "target": "FixtureChannel"
+    }
+   ]
+  },
+  "FixtureAttach": {
+   "type": "FixtureAttach",
+   "scope": "state",
+   "vtable": "g_fixtureAttachVtable",
+   "inside": [
+    {
+     "kind": "FixtureOrder",
+     "member": "link"
+    }
+   ],
+   "fields": [
+    {
+     "name": "owner",
+     "kind": "ref",
+     "target": "FixtureOrder"
+    },
+    {
+     "name": "next",
+     "kind": "ref",
+     "target": "FixtureAttach"
+    },
+    {
+     "name": "value",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureOrder": {
+   "type": "FixtureOrder",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "link",
+     "kind": "embed",
+     "target": "FixtureAttach"
+    }
+   ]
   }
  },
  "inside": {

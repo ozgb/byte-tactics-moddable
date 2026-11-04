@@ -188,6 +188,19 @@ enum ReplayObjectKindId {
     ROK_FIXTUREHOLDER,
     ROK_FIXTURECELL,
     ROK_FIXTURELANE,
+    ROK_FIXTURETIMERBASE,
+    ROK_FIXTURETIMER,
+    ROK_FIXTUREASSAULT,
+    ROK_FIXTUREMANAGER,
+    ROK_FIXTUREGROUP,
+    ROK_FIXTUREOWNER,
+    ROK_FIXTUREUSER,
+    ROK_FIXTURECB,
+    ROK_FIXTURERIG,
+    ROK_FIXTURECHANNEL,
+    ROK_FIXTURESCRIPT,
+    ROK_FIXTUREATTACH,
+    ROK_FIXTUREORDER,
     ROK_COUNT
 };
 
@@ -336,16 +349,26 @@ static const ReplayVectorSpec kReplayVectors[] = {
     { RV_SCALAR, 0, sizeof(short) },
 };
 
-static const ReplayInsideSite kReplayInsideSites[] = {
-    { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot" },
-    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim" },
-    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, shadowAnim), "shadowAnim" },
-    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim" },
-    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow" },
-    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim" },
-    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow" },
+static const ReplayElemSpec kReplayElems[] = {
+    { 4, sizeof(unsigned) },
+    { 3, sizeof(((FixtureRig*)nullptr)->slots[0]) },
+    { 4, sizeof(((FixtureScript*)nullptr)->channels[0]) },
 };
-static const unsigned kReplayInsideSiteCount = 7;
+
+static const ReplayInsideSite kReplayInsideSites[] = {
+    { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot", 0, 1, 0 },
+    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim", 0, 1, 0 },
+    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, shadowAnim), "shadowAnim", 0, 1, 0 },
+    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim", 0, 1, 0 },
+    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },
+    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },
+    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },
+    { ROK_FIXTUREGROUP, ROK_FIXTUREOWNER, offsetof(FixtureOwner, groups), "groups[]", sizeof(FixtureGroup), 4, 1 },
+    { ROK_FIXTURECB, ROK_FIXTURERIG, offsetof(FixtureRig, slots[0].cb), "slots[].cb", sizeof(((FixtureRig*)nullptr)->slots[0]), 3, 0 },
+    { ROK_FIXTURECHANNEL, ROK_FIXTURESCRIPT, offsetof(FixtureScript, channels[0]), "channels[]", sizeof(((FixtureScript*)nullptr)->channels[0]), 4, 0 },
+    { ROK_FIXTUREATTACH, ROK_FIXTUREORDER, offsetof(FixtureOrder, link), "link", 0, 1, 0 },
+};
+static const unsigned kReplayInsideSiteCount = 11;
 
 static const ReplayObjectKind kReplayObjectKinds[] = {
     { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0, 0 },
@@ -388,10 +411,23 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FixtureHolder", sizeof(FixtureHolder), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
     { "FixtureCell", sizeof(FixtureCell), RS_STATE, 9, 0, 0, 0, 0, 1 },
     { "FixtureLane", sizeof(FixtureLane), RS_STATE, 10, 0, 0, 0, 0, 0 },
+    { "FixtureTimerBase", sizeof(FixtureTimerBase), RS_STATE, RT_ORDER, 0, 0, 3, 2, 0 },
+    { "FixtureTimer", sizeof(FixtureTimer), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureAssault", sizeof(FixtureAssault), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureManager", sizeof(FixtureManager), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureGroup", sizeof(FixtureGroup), RS_STATE, RT_ORDER, 7, 1, 0, 0, 0 },
+    { "FixtureOwner", sizeof(FixtureOwner), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureUser", sizeof(FixtureUser), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureCb", sizeof(FixtureCb), RS_STATE, RT_ORDER, 8, 1, 0, 0, 0 },
+    { "FixtureRig", sizeof(FixtureRig), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureChannel", sizeof(FixtureChannel), RS_STATE, RT_ORDER, 9, 1, 0, 0, 0 },
+    { "FixtureScript", sizeof(FixtureScript), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureAttach", sizeof(FixtureAttach), RS_STATE, RT_ORDER, 10, 1, 0, 0, 0 },
+    { "FixtureOrder", sizeof(FixtureOrder), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 40;
+static const unsigned kReplayObjectKindCount = 53;
 
-static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
+static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };
 
 enum ReplayCallbackId {
     RCB_UNITVISITOR,
@@ -673,8 +709,33 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "flags", offsetof(FixtureLane, flags), sizeof(((FixtureLane*)nullptr)->flags), ROK_FIXTURELANE, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "occupant", offsetof(FixtureLane, unit), sizeof(((FixtureLane*)nullptr)->unit), ROK_FIXTURELANE, RK_UNITID, ROK_UNIT, 0, 0, {}, 5, 1 },
     { "cell", offsetof(FixtureLane, unit), sizeof(((FixtureLane*)nullptr)->unit), ROK_FIXTURELANE, RK_UNITID, ROK_FIXTURECELL, 0, 0, {}, 6, 1 },
+    { "ticks", offsetof(FixtureTimer, ticks), sizeof(((FixtureTimer*)nullptr)->ticks), ROK_FIXTURETIMER, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "period", offsetof(FixtureTimer, period), sizeof(((FixtureTimer*)nullptr)->period), ROK_FIXTURETIMER, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "ticks", offsetof(FixtureAssault, ticks), sizeof(((FixtureAssault*)nullptr)->ticks), ROK_FIXTUREASSAULT, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "squad", offsetof(FixtureAssault, squad), sizeof(((FixtureAssault*)nullptr)->squad), ROK_FIXTUREASSAULT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "id", offsetof(FixtureManager, id), sizeof(((FixtureManager*)nullptr)->id), ROK_FIXTUREMANAGER, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "timers", offsetof(FixtureManager, timers), sizeof(((FixtureManager*)nullptr)->timers), ROK_FIXTUREMANAGER, RK_REFS, ROK_FIXTURETIMERBASE, 0, 0, {}, 0, 0, 1 },
+    { "level", offsetof(FixtureGroup, level), sizeof(((FixtureGroup*)nullptr)->level), ROK_FIXTUREGROUP, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "mode", offsetof(FixtureGroup, mode), sizeof(((FixtureGroup*)nullptr)->mode), ROK_FIXTUREGROUP, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "id", offsetof(FixtureOwner, id), sizeof(((FixtureOwner*)nullptr)->id), ROK_FIXTUREOWNER, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "groups", offsetof(FixtureOwner, groups), sizeof(((FixtureOwner*)nullptr)->groups), ROK_FIXTUREOWNER, RK_REF, ROK_FIXTUREGROUP, 0, 0, {}, 0, 0 },
+    { "tag", offsetof(FixtureUser, tag), sizeof(((FixtureUser*)nullptr)->tag), ROK_FIXTUREUSER, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "group", offsetof(FixtureUser, group), sizeof(((FixtureUser*)nullptr)->group), ROK_FIXTUREUSER, RK_REF, ROK_FIXTUREGROUP, 0, 0, {}, 0, 0 },
+    { "done", offsetof(FixtureCb, done), sizeof(((FixtureCb*)nullptr)->done), ROK_FIXTURECB, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "id", offsetof(FixtureRig, id), sizeof(((FixtureRig*)nullptr)->id), ROK_FIXTURERIG, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "cb", offsetof(FixtureRig, slots[0].cb), sizeof(((FixtureRig*)nullptr)->slots[0].cb), ROK_FIXTURERIG, RK_EMBEDS, ROK_FIXTURECB, 0, 0, {}, 0, 0, 2 },
+    { "pc", offsetof(FixtureChannel, pc), sizeof(((FixtureChannel*)nullptr)->pc), ROK_FIXTURECHANNEL, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "state", offsetof(FixtureChannel, state), sizeof(((FixtureChannel*)nullptr)->state), ROK_FIXTURECHANNEL, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "stack", offsetof(FixtureChannel, stack), sizeof(((FixtureChannel*)nullptr)->stack), ROK_FIXTURECHANNEL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "id", offsetof(FixtureScript, id), sizeof(((FixtureScript*)nullptr)->id), ROK_FIXTURESCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "channels", offsetof(FixtureScript, channels[0]), sizeof(((FixtureScript*)nullptr)->channels[0]), ROK_FIXTURESCRIPT, RK_EMBEDS, ROK_FIXTURECHANNEL, 0, 0, {}, 0, 0, 3 },
+    { "owner", offsetof(FixtureAttach, owner), sizeof(((FixtureAttach*)nullptr)->owner), ROK_FIXTUREATTACH, RK_REF, ROK_FIXTUREORDER, 0, 0, {}, 0, 0 },
+    { "next", offsetof(FixtureAttach, next), sizeof(((FixtureAttach*)nullptr)->next), ROK_FIXTUREATTACH, RK_REF, ROK_FIXTUREATTACH, 0, 0, {}, 0, 0 },
+    { "value", offsetof(FixtureAttach, value), sizeof(((FixtureAttach*)nullptr)->value), ROK_FIXTUREATTACH, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "id", offsetof(FixtureOrder, id), sizeof(((FixtureOrder*)nullptr)->id), ROK_FIXTUREORDER, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "link", offsetof(FixtureOrder, link), sizeof(((FixtureOrder*)nullptr)->link), ROK_FIXTUREORDER, RK_EMBED, ROK_FIXTUREATTACH, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 253;
+static const unsigned kReplayObjectFieldCount = 278;
 
 static const unsigned short kReplayReachFields[] = { 45, 49, 108, 109, 110, 32, 242, 36, 34, 37, 45, 50, 52, 79 };
 
@@ -928,12 +989,46 @@ static_assert(sizeof(((FixtureLane*)nullptr)->unit) == 2, "FixtureLane::unit has
 static_assert(sizeof(((FixtureLane*)nullptr)->flags) == 2, "FixtureLane::flags has the size the schema says");
 static_assert(sizeof(((FixtureLane*)nullptr)->unit) == 2, "FixtureLane::occupant has the size the schema says");
 static_assert(sizeof(((FixtureLane*)nullptr)->unit) == 2, "FixtureLane::cell has the size the schema says");
+static_assert(sizeof(((FixtureTimer*)nullptr)->ticks) == 2, "FixtureTimer::ticks has the size the schema says");
+static_assert(sizeof(((FixtureTimer*)nullptr)->period) == 2, "FixtureTimer::period has the size the schema says");
+static_assert(sizeof(((FixtureAssault*)nullptr)->ticks) == 2, "FixtureAssault::ticks has the size the schema says");
+static_assert(sizeof(((FixtureAssault*)nullptr)->squad) == 4, "FixtureAssault::squad has the size the schema says");
+static_assert(sizeof(((FixtureManager*)nullptr)->id) == 4, "FixtureManager::id has the size the schema says");
+static_assert(sizeof(((FixtureManager*)nullptr)->timers) == 4 * sizeof(unsigned), "FixtureManager::timers holds 4 refs");
+static_assert(__is_same(decltype(&((FixtureManager*)nullptr)->timers[0]), Ref<FixtureTimerBase>*), "FixtureManager::timers holds Ref<FixtureTimerBase>");
+static_assert(sizeof(((FixtureGroup*)nullptr)->level) == 4, "FixtureGroup::level has the size the schema says");
+static_assert(sizeof(((FixtureGroup*)nullptr)->mode) == 2, "FixtureGroup::mode has the size the schema says");
+static_assert(sizeof(((FixtureOwner*)nullptr)->id) == 4, "FixtureOwner::id has the size the schema says");
+static_assert(sizeof(((FixtureOwner*)nullptr)->groups) == 4, "FixtureOwner::groups has the size the schema says");
+static_assert(sizeof(((FixtureUser*)nullptr)->tag) == 4, "FixtureUser::tag has the size the schema says");
+static_assert(sizeof(((FixtureUser*)nullptr)->group) == 4, "FixtureUser::group has the size the schema says");
+static_assert(sizeof(((FixtureCb*)nullptr)->done) == 4, "FixtureCb::done has the size the schema says");
+static_assert(sizeof(((FixtureRig*)nullptr)->id) == 4, "FixtureRig::id has the size the schema says");
+static_assert(sizeof(((FixtureRig*)nullptr)->slots) == 3 * sizeof(((FixtureRig*)nullptr)->slots[0]), "FixtureRig::cb holds 3 elements");
+static_assert(sizeof(((FixtureRig*)nullptr)->slots[0].cb) == sizeof(FixtureCb), "FixtureRig::cb has the size of its kind");
+static_assert(sizeof(((FixtureChannel*)nullptr)->pc) == 2, "FixtureChannel::pc has the size the schema says");
+static_assert(sizeof(((FixtureChannel*)nullptr)->state) == 2, "FixtureChannel::state has the size the schema says");
+static_assert(sizeof(((FixtureChannel*)nullptr)->stack) == 4, "FixtureChannel::stack has the size the schema says");
+static_assert(sizeof(((FixtureScript*)nullptr)->id) == 4, "FixtureScript::id has the size the schema says");
+static_assert(sizeof(((FixtureScript*)nullptr)->channels) == 4 * sizeof(((FixtureScript*)nullptr)->channels[0]), "FixtureScript::channels holds 4 elements");
+static_assert(sizeof(((FixtureScript*)nullptr)->channels[0]) == sizeof(FixtureChannel), "FixtureScript::channels has the size of its kind");
+static_assert(sizeof(((FixtureAttach*)nullptr)->owner) == 4, "FixtureAttach::owner has the size the schema says");
+static_assert(sizeof(((FixtureAttach*)nullptr)->next) == 4, "FixtureAttach::next has the size the schema says");
+static_assert(sizeof(((FixtureAttach*)nullptr)->value) == 4, "FixtureAttach::value has the size the schema says");
+static_assert(sizeof(((FixtureOrder*)nullptr)->id) == 4, "FixtureOrder::id has the size the schema says");
+static_assert(sizeof(((FixtureOrder*)nullptr)->link) == sizeof(FixtureAttach), "FixtureOrder::link has the size of its kind");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");
 static_assert(__is_polymorphic(ApproachRadius), "ApproachRadius has a vtable");
 static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");
 static_assert(__is_polymorphic(PathOrder), "PathOrder has a vtable");
+static_assert(__is_base_of(FixtureTimerBase, FixtureTimer), "FixtureTimer is a kind of FixtureTimerBase");
+static_assert(__is_base_of(FixtureTimerBase, FixtureAssault), "FixtureAssault is a kind of FixtureTimerBase");
+static_assert(__is_polymorphic(FixtureTimer), "FixtureTimer has a vtable");
+static_assert(__is_polymorphic(FixtureAssault), "FixtureAssault has a vtable");
+static_assert(!__is_polymorphic(FixtureCb) && sizeof(FixtureCb) >= sizeof(void*), "FixtureCb has a vptr that the code sets by hand");
+static_assert(__is_polymorphic(FixtureAttach), "FixtureAttach has a vtable");
 
 enum ReplaySubsystemId {
     SUB_WIND_METEORS,

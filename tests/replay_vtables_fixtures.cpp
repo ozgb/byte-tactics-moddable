@@ -5,6 +5,10 @@
 extern void (* const g_approachRadiusVtable[])();
 extern void (* const g_ringApproachVtable[])();
 extern void (* const g_pathOrderVtable[])();
+extern void (* const g_fixtureTimerVtable[])();
+extern void (* const g_fixtureAssaultVtable[])();
+extern void (* const g_fixtureCbVtable[])();
+extern void (* const g_fixtureAttachVtable[])();
 
 const void* ReplayVtable(unsigned kind)
 {
@@ -15,6 +19,14 @@ const void* ReplayVtable(unsigned kind)
         return g_ringApproachVtable;
     case ROK_PATHORDER:
         return g_pathOrderVtable;
+    case ROK_FIXTURETIMER:
+        return g_fixtureTimerVtable;
+    case ROK_FIXTUREASSAULT:
+        return g_fixtureAssaultVtable;
+    case ROK_FIXTURECB:
+        return g_fixtureCbVtable;
+    case ROK_FIXTUREATTACH:
+        return g_fixtureAttachVtable;
     default:
         return nullptr;
     }
@@ -29,6 +41,14 @@ const char* ReplayVtableName(unsigned kind)
         return "g_ringApproachVtable";
     case ROK_PATHORDER:
         return "g_pathOrderVtable";
+    case ROK_FIXTURETIMER:
+        return "g_fixtureTimerVtable";
+    case ROK_FIXTUREASSAULT:
+        return "g_fixtureAssaultVtable";
+    case ROK_FIXTURECB:
+        return "g_fixtureCbVtable";
+    case ROK_FIXTUREATTACH:
+        return "g_fixtureAttachVtable";
     default:
         return "";
     }

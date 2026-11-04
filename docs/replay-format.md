@@ -62,8 +62,8 @@ their value forms are the `objects` of the schema:
 | Scope | Kind | `N` | Where it lives |
 |---|---|---|---|
 | state | `UnitDef` and the like | order of first appearance in the file, so it is stable across calls | in the block, linked by `Ref` |
-| state, `table` | `Player`, `Unit`, `Projectile`, `MovementClass`, `Cell` | the index in the table: `Player#3` is `Game::players[3]`, `Unit#17` is slot 17 of the unit pool, `Projectile#3` is `Game::projectiles[3]`, `Cell#2051` is `Game::cells[2051]`, that is `y*width+x` | an array in `Game` or `SimGlobals`, or a `Ref` to one |
-| state, `inside` | `UnitResources` of a unit | the site, the unit and the member: `Unit#17.resourceSlot` | a member of another kind (see An object embedded at several sites) |
+| state, `table` | `Player`, `Unit`, `Projectile`, `MovementClass`, `Cell`, `Feature`, `Spot`, `Pool` | the index in the table: `Player#3` is `Game::players[3]`, `Unit#17` is slot 17 of the unit pool, `Projectile#3` is `Game::projectiles[3]`, `Cell#2051` is `Game::cells[2051]`, that is `y*width+x`, `Feature#5` is `Game::features[5]`, `Spot#9` is `Game::spots[9]` and `Pool#0` is `Game::pool` | an array in `Game` or `SimGlobals`, or a `Ref` to one |
+| state, `inside` | `UnitResources` of a unit, `Handle` of a feature or a spot | the site, the container and the member: `Unit#17.resourceSlot`, `Feature#5.anim`, `Spot#9.shadow` | a member of another kind (see An object embedded at several sites) |
 | index | `weapondef` | the index in `Game::weapons` | in the block's weapon array |
 | value | `MeteorParams`, `Vec3` | none: the lines are written with the argument's name, `params.radius`, `pos.x` | an argument struct of one call |
 | handle | `file`, `rec`, `bank` | order of first use in the outermost call | the import's own objects, not state |
@@ -219,6 +219,31 @@ A container named by order (not a table kind) is named before its embedded objec
   i services.StepGafSequence Spot#3.anim = 1
   o Spot#3.anim.value 7
   i services.StepGafSequence Handle#1 = 1
+```
+
+### Features, spots and the pool
+
+`Feature` is the table `Game::features`: `Feature#N` is the feature type `N`, and it has `featureCount` elements, the size of the array the loader grows by one type at a time. `Spot` is the 0x800 entries of `Game::spots`, 0x30 bytes each, and `Pool` is the five words of `Game::pool` (`entries`, `featureUnit` and the heads of the used, rest and free lists, which link the spots by their `prev` and `next` indexes). `Game::spots` is the same word as `Pool.entries`.
+
+Both structs are unions of views, and a field is recorded on one side of a union only:
+
+| Kind | Bytes | Written as |
+|---|---|---|
+| `Feature` | `object` and `filename` share their first four bytes | `object` (a `ptr` to an `Object3do`) when bit 0 of `flags16` is clear, `filename` when it is set; both fields have a `when` on that bit |
+| `Feature` | `flags16`, with `flags`, `flagsHigh`, `steep`, `noobject`, `animating` and the other bits | one `u16` field; the other names are `aliases` of it |
+| `Feature` | `seq`, `seqshad`, and the six pointers that `seqburn` to `seqreclamateshad`, `burn`, `death` and `animIds` view | `ptr` fields to a `FrameTable`, the kind of an animation entry; `animTable`, `shadowTable`, `burn`, `death` and `animIds` are `aliases` |
+| `Feature` | `footprint`, `footprintX`, `footprintZ` | one `point16`, with the other two as `aliases` |
+| `Spot` | the two cursors `anim` and `shadow`, or `state`, `pos` and `vel`, or `frame`, `pos2` and `animIndex` | the cursors are `embed` fields of `Handle` with a `when` that reads bit 0 of `flags16` of `features[feature]` (`via`) and wants it set; `state`, `posX` to `velZ` have the same `when` and want it clear; `pos2` is an alias of `pos`, and `frame` and `animIndex` are the `index` and the `src` of the cursor, aliases of `Handle.index` and `Handle.src` |
+| `Spot` | `x` and `z`, `cell`; `burnTime`, `timer`, `animBits`, `animHi`, `animLo`; the bits of `flags` | `cell` (a `point16`), `timer` and `flags` (a `u8` each), with the other names as `aliases` |
+
+The `Handle` at `Feature#N.anim` and `Feature#N.shadowAnim`, and at `Spot#N.anim` and `Spot#N.shadow`, is named by its site everywhere, because a table kind finds the container of a pointer by its address, whether or not the walk has named it. A `Handle` the loader initialises in the entry `features[featureCount]`, one past the end of the table until `LoadFeatureType` returns, has no container yet and is named by order.
+
+```
+  r Feature#5.flags16 1
+  r Feature#5.filename "tree1"
+  r Spot#9.anim.index 2
+  r Spot#9.timer 12
+  i services.StepGafSequence Spot#9.anim = 1
 ```
 
 A pair of pointer fields that bound a slice of a table is a closed range: the schema marks the end field with

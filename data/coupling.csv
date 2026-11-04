@@ -1369,7 +1369,7 @@ harness,network,shared_write,Game::numPlayers,6
 harness,network,shared_write,LoadingFlags::value,1
 harness,network,shared_write,Player::alliedBy,2
 harness,network,shared_write,Player::progress,2
-harness,orders,call,Add,139
+harness,orders,call,Add,141
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,shared_write,AiSeam::GetFactoriesInRadius,7

@@ -1395,7 +1395,7 @@ VictoryKillAllOfType::OnUnitDied,FindUnitTypeId,"seam slot filled by InstallNati
 VictoryMoveUnitToRadius::IsSatisfied,ClampWorldPosToTerrain,"seam slot filled by InstallNativeSeams, LosRadarSeam::ClampWorldPosToTerrain, VictoryMoveUnitToRadius::IsSatisfied (src/game/victory.cpp), src/seams/native.cpp"
 VictoryMoveUnitToRadius::IsSatisfied,VisitObjectsInRangeNative,"seam slot filled by InstallNativeSeams, MapSeam::VisitObjectsInRange, VictoryMoveUnitToRadius::IsSatisfied (src/game/victory.cpp), src/seams/native.cpp"
 VisitObjectsInArea,ClaimFootprintVisitor::ClaimFootprint,"only visitor class, VisitObjectsInArea (src/map/terrain.cpp)"
-VisitObjectsInRange,DamagedAllyCollector::CollectDamagedAlly,visitor passed at DamagedAllyCollector::CollectDamagedAlly (src/orders/unit_orders.cpp)
+VisitObjectsInRange,DamagedAllyCollector::Visit,visitor passed at DamagedAllyCollector::Visit (src/orders/unit_orders.cpp)
 VisitObjectsInRange,DetectionVisitor::MarkUnitsInRadarOrSonarRadius,visitor passed at DetectionVisitor::MarkUnitsInRadarOrSonarRadius (src/ingame/info_panel.cpp)
 VisitObjectsInRange,GroundAllyVisitor::CollectGroundAlly,visitor passed at Patrol (src/orders/vtol_orders.cpp)
 VisitObjectsInRange,RadarJamVisitor::ApplyRadarJamFlag,visitor passed at RadarJamVisitor::ApplyRadarJamFlag (src/ingame/info_panel.cpp)

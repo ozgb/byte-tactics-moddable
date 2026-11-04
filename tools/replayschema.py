@@ -301,6 +301,40 @@ def check_polymorphic(ann: dict) -> list[str]:
     return errors
 
 
+def check_inside(ann: dict) -> list[str]:
+    """Errors for `inside`: a list of the sites {kind, member} that a kind is embedded at, each an embed field of its container."""
+    errors = []
+    kinds = ann["objects"]
+    taken: set[tuple[str, str]] = set()
+    for name, spec in kinds.items():
+        inside = spec.get("inside")
+        if inside is None:
+            continue
+        where = "%s inside" % name
+        if not isinstance(inside, list) or not inside:
+            errors.append("%s: `inside` lists the sites {\"kind\", \"member\"} that the kind is embedded at" % where)
+            continue
+        if spec.get("table"):
+            errors.append("%s: a kind with a table is named by its index, and is not inside another kind" % where)
+        for site in inside:
+            if not isinstance(site, dict) or set(site) != {"kind", "member"}:
+                errors.append("%s: a site is {\"kind\", \"member\"}" % where)
+                continue
+            container = kinds.get(site["kind"])
+            if container is None or container["scope"] != "state":
+                errors.append("%s: the site %s.%s is not in a state kind of the schema" % (where, site["kind"], site["member"]))
+                continue
+            if container.get("inside"):
+                errors.append("%s: the container %s is itself inside another kind" % (where, site["kind"]))
+            key = (site["kind"], site["member"])
+            if key in taken:
+                errors.append("%s: the site %s.%s is already the site of a kind" % (where, key[0], key[1]))
+            taken.add(key)
+            if not any(f["kind"] == "embed" and f.get("target") == name and f.get("member", f["name"]) == site["member"] for f in container["fields"]):
+                errors.append("%s: the site %s.%s is no embed field of %s that leads to %s" % (where, key[0], key[1], key[0], name))
+    return errors
+
+
 CALLBACK_ARG_MODES = {"scalar", "text", "object", "value"}
 
 
@@ -462,12 +496,90 @@ def resolve_field_reaches(ann: dict, object_fields: list, object_index: dict, ta
         if f["kind"] == "unitid":
             where = "%s.%s" % (f["object"], f["name"])
             errors += resolve_reach(where, f, f["target"], ann, object_fields, object_index, table)
-            when = f.get("when")
-            if not when or (f["object"], when["field"]) not in object_index:
+            if not f.get("when"):
                 errors.append("%s: a unitid field names the field and the value that make it an id" % where)
-            else:
-                f["condField"] = object_index[(f["object"], when["field"])] + 1
-                f["condValue"] = when["equals"]
+    return errors
+
+
+CONDITION_FIELDS = {"i32": (4, -2**31, 2**31 - 1), "u32": (4, -2**31, 2**32 - 1), "flags": (4, -2**31, 2**32 - 1),
+                    "i16": (2, -2**15, 2**15 - 1), "u16": (2, 0, 2**16 - 1), "u8": (1, 0, 2**8 - 1)}
+CONDITION_KEYS = {"field", "mask", "equals", "via", "kind"}
+
+
+def condition_source(where: str, f: dict, when: dict, object_fields: list, object_index: dict, ann: dict, errors: list[str]) -> str | None:
+    """The kind whose field a condition reads: the kind of f itself, or the one that its `via` field names or indexes."""
+    via = when.get("via")
+    if via is None:
+        if "kind" in when:
+            errors.append("%s: the `kind` of a condition says which table a `via` integer indexes, and there is no `via`" % where)
+        return f["object"]
+    if (f["object"], via) not in object_index:
+        errors.append("%s: the `via` of the condition names %s, which is no field of %s" % (where, via, f["object"]))
+        return None
+    v = object_fields[object_index[(f["object"], via)]]
+    if v.get("when"):
+        errors.append("%s: the `via` field %s has a `when` of its own" % (where, via))
+        return None
+    f["condVia"] = object_index[(f["object"], via)] + 1
+    if v["kind"] in ("ref", "ptr"):
+        if "kind" in when:
+            errors.append("%s: the `via` field %s leads to its target, and `kind` is for an integer" % (where, via))
+        return v["target"]
+    if v["kind"] not in ("u8", "u16", "i16", "u32", "i32"):
+        errors.append("%s: the `via` field %s is a ref, a ptr or an integer that indexes a table" % (where, via))
+        return None
+    table = ann["objects"].get(when.get("kind"))
+    if table is None or not table.get("table"):
+        errors.append("%s: the `via` field %s is an integer, and the condition's `kind` names the table kind it indexes" % (where, via))
+        return None
+    return when["kind"]
+
+
+def resolve_conditions(ann: dict, object_fields: list, object_index: dict) -> list[str]:
+    """Errors for every `when`, and the condition fields of the generated table: the field read, its mask and value, and the `via` field."""
+    errors = []
+    for f in object_fields:
+        when = f.get("when")
+        if when is None:
+            continue
+        where = "%s.%s" % (f["object"], f["name"])
+        if not isinstance(when, dict) or "field" not in when or "equals" not in when or set(when) - CONDITION_KEYS:
+            errors.append("%s: a `when` is {\"field\", \"equals\"} with an optional \"mask\", \"via\" and \"kind\"" % where)
+            continue
+        if ann["objects"][f["object"]]["scope"] != "state":
+            errors.append("%s: only the field of a state kind has a `when`" % where)
+        source = condition_source(where, f, when, object_fields, object_index, ann, errors)
+        if source is None:
+            continue
+        if (source, when["field"]) not in object_index:
+            errors.append("%s: the condition reads %s, which is no field of %s" % (where, when["field"], source))
+            continue
+        read = object_fields[object_index[(source, when["field"])]]
+        if read["kind"] not in CONDITION_FIELDS:
+            errors.append("%s: the condition reads %s.%s, and only an integer or flags field can be read" % (where, source, read["name"]))
+            continue
+        if read.get("when"):
+            errors.append("%s: the condition reads %s.%s, which has a `when` of its own" % (where, source, read["name"]))
+            continue
+        size, low, high = CONDITION_FIELDS[read["kind"]]
+        mask, equals = when.get("mask"), when["equals"]
+        if isinstance(equals, bool) or not isinstance(equals, int):
+            errors.append("%s: the `equals` of a condition is an integer" % where)
+            continue
+        if mask is not None:
+            if isinstance(mask, bool) or not isinstance(mask, int) or not 0 < mask < 1 << (8 * size):
+                errors.append("%s: the `mask` of a condition is a non-zero integer that fits the %d bytes of %s.%s" % (where, size, source, read["name"]))
+                continue
+            if equals < 0 or equals & ~mask:
+                errors.append("%s: the condition can never hold, because `equals` has bits outside its `mask`" % where)
+                continue
+            f["condMask"] = mask
+        elif not low <= equals <= high:
+            errors.append("%s: the `equals` of the condition is outside the range of %s.%s (%d to %d)" % (where, source, read["name"], low, high))
+            continue
+        f["condField"] = object_index[(source, when["field"])] + 1
+        f["condValue"] = equals if equals < 2**31 else equals - 2**32
+        f["condKind"] = source
     return errors
 
 
@@ -678,6 +790,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             f["codeTable"] = code_index.get(f.get("table"), 0)
     reach_table: list[int] = []
     errors += resolve_field_reaches(ann, object_fields, object_index, reach_table)
+    errors += resolve_conditions(ann, object_fields, object_index)
+    errors += check_inside(ann)
     by_function: dict[str, list[dict]] = {}
     for r in rows:
         by_function.setdefault(r["function"], []).append(r)
@@ -990,7 +1104,7 @@ def render_schema(ann: dict, model: dict) -> str:
         L.append("    { %s, %s, sizeof(%s) }," % (VECTOR_MODES[v["mode"]], "ROK_" + upper(v["kind"]) if v["kind"] else "0", v["ctype"]))
     if not vectors:
         L.append("    { RV_OBJECT, 0, 1 },")
-    L += ["};", "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
+    L += ["};", ""]
     scope = {"state": "RS_STATE", "index": "RS_INDEX", "value": "RS_VALUE"}
     kind_id = {o["name"]: "ROK_" + upper(o["name"]) for o in objects}
     types = {o["name"]: o["type"] for o in objects}
@@ -1001,15 +1115,18 @@ def render_schema(ann: dict, model: dict) -> str:
         if o.get("kinds"):
             poly_at[o["name"]] = (len(poly_kinds), len(o["kinds"]))
             poly_kinds += [kind_id[k] for k in o["kinds"]]
+    sites: list[str] = []
+    site_at: dict[str, tuple[int, int]] = {}
     for o in objects:
-        inside = o.get("inside")
-        if inside:
-            container = types[inside["kind"]]
-            tail = '1, %s, offsetof(%s, %s), "%s"' % (kind_id[inside["kind"]], container, inside["member"], inside["member"])
-        else:
-            tail = '0, 0, 0, ""'
+        listed = [x for x in o["inside"] if isinstance(x, dict) and x.get("kind") in kind_id and "member" in x] if isinstance(o.get("inside"), list) else []
+        site_at[o["name"]] = (len(sites) if listed else 0, len(listed))
+        for site in listed:
+            sites.append('    { %s, %s, offsetof(%s, %s), "%s" },' % (kind_id[o["name"]], kind_id[site["kind"]], types[site["kind"]], site["member"], site["member"]))
+    L += ["static const ReplayInsideSite kReplayInsideSites[] = {"] + (sites or ['    { 0, 0, 0, "" },']) + ["};", "static const unsigned kReplayInsideSiteCount = %d;" % len(sites), "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
+    for o in objects:
         first, count = poly_at.get(o["name"], (0, 0))
-        L.append('    { "%s", sizeof(%s), %s, %s, %s, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), tail, first, count))
+        inside_first, inside_count = site_at[o["name"]]
+        L.append('    { "%s", sizeof(%s), %s, %s, %d, %d, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
           "static const unsigned char kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
           "enum ReplayCallbackId {"]
@@ -1049,9 +1166,10 @@ def render_schema(ann: dict, model: dict) -> str:
         size_text = str(size) if size else "sizeof(void*)" if f["kind"] == "ptr" else "sizeof(((%s*)nullptr)->%s)" % (t, member)
         target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr") or (f["kind"] == "vector" and f.get("target")) else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
         extra = ", %d" % (f.get("array") or f.get("vector")) if f.get("array") or f.get("vector") else ""
-        L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %d, %d, %d, %d%s },' % (
+        when = "{ %d, %d, %s, %du, %d }" % (f["condField"], f.get("condVia", 0), kind_id[f["condKind"]], f.get("condMask", 0xFFFFFFFF), f["condValue"]) if f.get("condField") else "{}"
+        L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
             f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target, range_end.get(i, 0), range_begin.get(i, 0),
-            f.get("condField", 0), f.get("condValue", 0), f.get("reachFirst", 0), f.get("reachCount", 0), extra))
+            when, f.get("reachFirst", 0), f.get("reachCount", 0), extra))
     L += ["};", "static const unsigned kReplayObjectFieldCount = %d;" % len(ofields), ""]
     L += ["static const unsigned short kReplayReachFields[] = { %s };" % ", ".join(str(i) for i in model["reach_table"] or [0]), ""]
     for f in ofields:

@@ -110,17 +110,31 @@ int TableIndex(unsigned kind, const void* p)
     return (int)((unsigned)(q - base) / stride);
 }
 
-bool InsideTable(unsigned kind, const void* p, unsigned* container, int* index)
+bool InsideSite(const ReplayObjectTable& table, unsigned kind, const void* p, unsigned* site, unsigned* ordinal)
 {
     const ReplayObjectKind& k = kReplayObjectKinds[kind];
-    if (!k.hasInside || p == nullptr)
+    if (p == nullptr)
         return false;
-    int at = TableIndex(k.insideKind, (const unsigned char*)p - k.insideOffset);
-    if (at < 0)
-        return false;
-    *container = k.insideKind;
-    *index = at;
-    return true;
+    for (unsigned i = 0; i < k.insideCount; i++) {
+        const ReplayInsideSite& s = kReplayInsideSites[k.insideFirst + i];
+        unsigned found = table.Find(s.container, (const unsigned char*)p - s.offset);
+        if (found != 0) {
+            *site = k.insideFirst + i;
+            *ordinal = found;
+            return true;
+        }
+    }
+    return false;
+}
+
+const ReplayInsideSite* SiteNamed(unsigned container, const char* member, unsigned length)
+{
+    for (unsigned i = 0; i < kReplayInsideSiteCount; i++) {
+        const ReplayInsideSite& s = kReplayInsideSites[i];
+        if (s.container == container && strlen(s.member) == length && strncmp(s.member, member, length) == 0)
+            return &s;
+    }
+    return nullptr;
 }
 
 }
@@ -162,11 +176,11 @@ unsigned ReplayConcreteKind(unsigned kind, const void* p)
     return kReplayObjectKindCount;
 }
 
-bool ReplayInsideTable(unsigned kind, const void* p)
+bool ReplayIsEmbedded(unsigned kind, const void* p, const ReplayObjectTable& table)
 {
-    unsigned container;
-    int index;
-    return InsideTable(kind, p, &container, &index);
+    unsigned site;
+    unsigned ordinal;
+    return InsideSite(table, kind, p, &site, &ordinal);
 }
 
 void ReplayObjectTable::Reset()
@@ -514,17 +528,18 @@ void ReplayAddObjectName(ReplayText& t, ReplayObjectTable& table, unsigned kind,
         return;
     }
     kind = actual;
-    unsigned container;
-    int index;
-    if (InsideTable(kind, p, &container, &index)) {
-        t.Add(kReplayObjectKinds[container].name);
+    unsigned site;
+    unsigned ordinal;
+    if (InsideSite(table, kind, p, &site, &ordinal)) {
+        const ReplayInsideSite& s = kReplayInsideSites[site];
+        t.Add(kReplayObjectKinds[s.container].name);
         t.AddChar('#');
-        t.AddUnsigned((unsigned)index);
+        t.AddUnsigned(kReplayObjectKinds[s.container].table == RT_ORDER ? ordinal : ordinal - 1);
         t.AddChar('.');
-        t.Add(kReplayObjectKinds[kind].insideName);
+        t.Add(s.member);
         return;
     }
-    unsigned ordinal = assign ? table.Name(kind, p) : table.Find(kind, p);
+    ordinal = assign ? table.Name(kind, p) : table.Find(kind, p);
     t.Add(kReplayObjectKinds[kind].name);
     if (ordinal == 0) {
         t.Add("#?");
@@ -532,6 +547,72 @@ void ReplayAddObjectName(ReplayText& t, ReplayObjectTable& table, unsigned kind,
     }
     t.AddChar('#');
     t.AddUnsigned(kReplayObjectKinds[kind].table == RT_ORDER ? ordinal : ordinal - 1);
+}
+
+namespace {
+
+int ConditionWord(const ReplayObjectField& f, const unsigned char* at)
+{
+    switch (f.kind) {
+    case RK_I16:
+        return *(const short*)at;
+    case RK_U16:
+        return *(const unsigned short*)at;
+    case RK_U8:
+        return *at;
+    default:
+        return *(const int*)at;
+    }
+}
+
+const unsigned char* ConditionSource(const ReplayCondition& c, const unsigned char* object)
+{
+    if (c.via == 0)
+        return object;
+    const ReplayObjectField& via = kReplayObjectFields[c.via - 1u];
+    const unsigned char* at = object + via.offset;
+    if (via.kind == RK_REF)
+        return BlockAt(*(const unsigned*)at);
+    if (via.kind == RK_PTR)
+        return *(const unsigned char* const*)at;
+    unsigned index = via.size == 1 ? *at : via.size == 2 ? *(const unsigned short*)at : *(const unsigned*)at;
+    unsigned char* base;
+    unsigned count;
+    unsigned stride;
+    if (!TableSpan(c.kind, &base, &count, &stride) || index >= count)
+        return nullptr;
+    return base + index * stride;
+}
+
+}
+
+bool ReplayFieldLive(const ReplayObjectField& f, const void* object)
+{
+    const ReplayCondition& c = f.when;
+    if (c.field == 0)
+        return true;
+    const unsigned char* source = ConditionSource(c, (const unsigned char*)object);
+    if (source == nullptr)
+        return false;
+    const ReplayObjectField& read = kReplayObjectFields[c.field - 1u];
+    return ((unsigned)ConditionWord(read, source + read.offset) & c.mask) == (unsigned)c.value;
+}
+
+bool ReplayFieldIsCondition(const ReplayObjectField& f)
+{
+    static unsigned char reads[sizeof kReplayObjectFields / sizeof kReplayObjectFields[0]];
+    static bool built = false;
+    if (!built) {
+        for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+            const ReplayCondition& c = kReplayObjectFields[i].when;
+            if (c.field != 0)
+                reads[c.field - 1u] = 1;
+            if (c.via != 0)
+                reads[c.via - 1u] = 1;
+        }
+        built = true;
+    }
+    return &f >= kReplayObjectFields && &f < kReplayObjectFields + kReplayObjectFieldCount && reads[&f - kReplayObjectFields] != 0;
 }
 
 bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, ReplayObjectTable& table, bool assign, ReplayText& out)
@@ -634,6 +715,24 @@ const ReplayObjectField* ReplayFindObjectField(unsigned kind, const char* name)
 
 namespace {
 
+const ReplayInsideSite* ObjectTextSite(const char* text, unsigned length)
+{
+    const char* hash = (const char*)memchr(text, '#', length);
+    if (hash == nullptr)
+        return nullptr;
+    int kind = ReplayFindObjectKind(text, (unsigned)(hash - text));
+    if (kind < 0)
+        return nullptr;
+    const char* end = hash + 1;
+    while (end < text + length && *end >= '0' && *end <= '9')
+        end++;
+    if (end == text + length)
+        return nullptr;
+    if (*end != '.')
+        return nullptr;
+    return SiteNamed((unsigned)kind, end + 1, (unsigned)(text + length - (end + 1)));
+}
+
 int ObjectTextKind(const char* text, unsigned length)
 {
     const char* hash = (const char*)memchr(text, '#', length);
@@ -642,20 +741,13 @@ int ObjectTextKind(const char* text, unsigned length)
     int kind = ReplayFindObjectKind(text, (unsigned)(hash - text));
     if (kind < 0)
         return -1;
+    const ReplayInsideSite* site = ObjectTextSite(text, length);
+    if (site != nullptr)
+        return site->kind;
     const char* end = hash + 1;
     while (end < text + length && *end >= '0' && *end <= '9')
         end++;
-    if (end == text + length)
-        return kind;
-    if (*end != '.')
-        return -1;
-    unsigned inner = (unsigned)(text + length - (end + 1));
-    for (unsigned k = 0; k < kReplayObjectKindCount; k++) {
-        const ReplayObjectKind& c = kReplayObjectKinds[k];
-        if (c.hasInside && c.insideKind == kind && strlen(c.insideName) == inner && strncmp(c.insideName, end + 1, inner) == 0)
-            return (int)k;
-    }
-    return -1;
+    return end == text + length ? kind : -1;
 }
 
 }
@@ -668,6 +760,7 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
     int kind = ReplayFindObjectKind(text, (unsigned)(hash - text));
     if (kind < 0)
         return nullptr;
+    const ReplayInsideSite* site = ObjectTextSite(text, (unsigned)strlen(text));
     int result = ObjectTextKind(text, (unsigned)strlen(text));
     if (result < 0)
         result = kind;
@@ -694,13 +787,15 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
             table.Bind((unsigned)kind, ordinal, p);
         }
     }
-    if (p != nullptr && result != kind)
-        p = (unsigned char*)p + kReplayObjectKinds[result].insideOffset;
+    if (p != nullptr && site != nullptr)
+        p = (unsigned char*)p + site->offset;
     return p;
 }
 
 bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const char* value, ReplayObjectTable& table, ReplayAllocFn alloc)
 {
+    if (!ReplayFieldLive(f, object))
+        return true;
     unsigned char* at = (unsigned char*)object + f.offset;
     switch (f.kind) {
     case RK_I32:
@@ -919,7 +1014,7 @@ void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned c
         return;
     }
     reach.slots[slot] = (short)reach.count;
-    if (assign && kReplayObjectKinds[kind].scope == RS_STATE && !ReplayInsideTable(kind, object))
+    if (assign && kReplayObjectKinds[kind].scope == RS_STATE && !ReplayIsEmbedded(kind, object, table))
         table.Name(kind, object);
     reach.kind[reach.count] = kind;
     reach.object[reach.count] = object;
@@ -958,7 +1053,7 @@ void Expand(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned 
     unsigned char* base = (unsigned char*)reach.object[at];
     for (unsigned i = 0; i < count; i++) {
         const ReplayObjectField& field = kReplayObjectFields[list[i]];
-        if (field.object != reach.kind[at] || !Walkable(field))
+        if (field.object != reach.kind[at] || !Walkable(field) || !ReplayFieldLive(field, base))
             continue;
         if (field.kind == RK_EMBED) {
             Visit(reach, table, assign, field.target, base + field.offset, limit, limitCount);
@@ -971,8 +1066,6 @@ void Expand(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned 
             continue;
         }
         if (field.kind == RK_UNITID) {
-            if (field.condField != 0 && (int)*(const short*)(base + kReplayObjectFields[field.condField - 1u].offset) != field.condValue)
-                continue;
             unsigned id = *(const unsigned short*)(base + field.offset);
             unsigned char* units;
             unsigned poolCount;
@@ -1059,6 +1152,11 @@ void ReplayCaptureObjects(ReplayText& out, ReplayKnown& known, ReplayObjectTable
             if (f.object != reach.kind[at] || f.kind == RK_EMBED || f.kind == RK_UNITID || !ReplayInReach(reach, at, set[i]))
                 continue;
             ReplayObjectFieldKey(key, table, true, reach.kind[at], reach.object[at], f);
+            if (!ReplayFieldLive(f, reach.object[at])) {
+                if (known.Get(key.Data()) != nullptr)
+                    known.Set(key.Data(), "");
+                continue;
+            }
             ReplayEmitField(out, known, table, tag, key.Data(), f, reach.object[at], value);
         }
     }

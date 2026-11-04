@@ -150,11 +150,35 @@ jobs:
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Name the runner image
+        id: image
+        if: steps.changed.outputs.run == 'true'
+        run: echo "version=${ImageVersion:-unknown}" >> "$GITHUB_OUTPUT"
+
+      - name: Cache the downloaded packages
+        if: steps.changed.outputs.run == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/apt-archives
+          key: apt-${{ runner.os }}-${{ steps.image.outputs.version }}-ninja-cmake-p7zip-cabextract-mingw-wabt-wine-v1
+
+      - name: Configure apt to keep and retry its downloads
+        if: steps.changed.outputs.run == 'true'
+        run: |
+          mkdir -p "$HOME/apt-archives/partial"
+          sudo tee /etc/apt/apt.conf.d/99ci > /dev/null <<EOF
+          Dir::Cache::Archives "$HOME/apt-archives";
+          APT::Keep-Downloaded-Packages "true";
+          Acquire::Retries "3";
+          Acquire::http::Timeout "30";
+          EOF
+
       - name: Install packages
         if: steps.changed.outputs.run == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends ninja-build cmake p7zip-full cabextract curl xz-utils
+          sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-archives"
           curl -LsSf "https://astral.sh/uv/$UV_VERSION/install.sh" | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
@@ -239,6 +263,7 @@ jobs:
         if: steps.changed.outputs.run == 'true'
         run: |
           sudo apt-get install -y --no-install-recommends gcc-mingw-w64-i686 wabt
+          sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-archives"
           installed=
           for attempt in 1 2 3; do
             if timeout 180 rustup toolchain install "$RUST_VERSION" --profile minimal --target wasm32-unknown-unknown,i686-pc-windows-gnu; then
@@ -278,6 +303,7 @@ jobs:
           sudo dpkg --add-architecture i386
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends wine wine32:i386
+          sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-archives"
           tools/ci_replays.sh build/modern wine
 
       - name: Upload the replay binaries

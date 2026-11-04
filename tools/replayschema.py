@@ -27,6 +27,8 @@ global), an object field (`Type::member` of an object kind) or something else. A
 tracked by no table and is not exempt is an error for a complete subsystem; a pending subsystem lists what is left
 under `pending`, which its own issue empties. A deref_read or deref_write on a bare scalar pointer and every
 field_escape row needs a hand rule in `annotations.rules`; a rule that matches no row is an error.
+A field row on a type that is no kind, and an indirect_call row nothing accounts for, are errors for a complete subsystem too
+(docs/replay-format.md, "The schema and its annotations": `exempt_types`, `through`).
 A slot annotated `"record": false` with a `"reason"` is classified and unrecorded: it gets no recording slot and none of the checks above.
 """
 
@@ -746,6 +748,74 @@ def check_product_counts(where: str, slot: dict, tables: list[dict], object_fiel
     return errors
 
 
+SEAM_CALL = re.compile(r"\[(\w+)::(\w+)\]$")
+VIRTUAL_CALL = re.compile(r"^virtual (\w+)::(~?\w+)$")
+
+
+def through_functions(entry) -> list[str]:
+    """The functions a `through` entry adds: a list, or an object with `functions` and `reason`."""
+    return entry if isinstance(entry, list) else entry.get("functions", [])
+
+
+def check_through(where: str, through: dict, by_function: dict) -> list[str]:
+    errors = []
+    for target, entry in through.items():
+        names = through_functions(entry)
+        if isinstance(entry, dict):
+            if not entry.get("reason"):
+                errors.append("%s: the `through` entry for %s is an object and needs a `reason`" % (where, target))
+        elif not isinstance(entry, list) or not entry:
+            errors.append("%s: the `through` entry for %s is a list of functions, or {\"reason\": ...} for a call that does nothing" % (where, target))
+        if isinstance(entry, dict) and names:
+            errors.append("%s: the `through` entry for %s has a reason and functions: a reason is for a call that does nothing" % (where, target))
+        errors += ["%s: the `through` entry for %s names %s, which is no function" % (where, target, n) for n in names if n not in by_function]
+    return errors
+
+
+def through_key(target: str, through: dict) -> str | None:
+    """The `through` key that names an indirect_call target: the whole target, or the name in its last brackets."""
+    if target in through:
+        return target
+    hint = re.search(r"\[([^\[\]]+)\]$", target)
+    if hint and hint.group(1) in through:
+        return hint.group(1)
+    return None
+
+
+def unaccounted_indirect(target: str, sub: str, spec: dict, ann: dict, closure: set, by_function: dict, members: list[tuple[str, str]], own_functions) -> str | None:
+    """Why an indirect_call row is not accounted for, or None.
+
+    Accounted for: a call through a seam table to a slot the subsystem imports, or to a recorded slot of its own seam whose functions are in the
+    closure; a vtable dispatch on a poly kind whose concrete functions are in the closure."""
+    seam = SEAM_CALL.search(target)
+    if seam and target.startswith("indirect via "):
+        owner = {struct: name for name, struct in members}.get(seam.group(1))
+        if owner is not None and "%s.%s" % (owner, seam.group(2)) in spec.get("imports", []):
+            return None
+        if owner == sub:
+            inside = own_functions(seam.group(2))
+            if inside and all(f in closure for f in inside):
+                return None
+            return "a call to the slot %s of its own seam, whose functions are not all in the closure" % seam.group(2)
+        return "a seam call that %s does not import" % sub
+    virtual = VIRTUAL_CALL.match(target)
+    if virtual:
+        cls, method = virtual.groups()
+        kinds = ann["objects"]
+        base = next((s for s in kinds.values() if s["type"] == cls and "kinds" in s), None)
+        concrete = [kinds[k]["type"] for k in base["kinds"]] if base else [s["type"] for s in kinds.values() if s["type"] == cls and "vtable" in s]
+        if not concrete:
+            return "a vtable dispatch on %s, which is no kind with `poly`" % cls
+        defined = [t + "::" + method for t in concrete if t + "::" + method in by_function]
+        if base and len(defined) < len(concrete) and cls + "::" + method in by_function:
+            defined.append(cls + "::" + method)
+        missing = [f for f in defined if f not in closure]
+        if missing:
+            return "a vtable dispatch whose functions %s are not in the closure" % ", ".join(missing)
+        return None
+    return "an indirect call"
+
+
 def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]]) -> dict:
     """The generated model: fields, objects, subsystems, and the errors."""
     game, sim = block_tables(ann)
@@ -815,6 +885,10 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for i, r in enumerate(ann["rules"]):
         rules_of.setdefault((r["kind"], r["target"]), []).append(i)
     state_types = {spec["type"] for spec in ann["objects"].values() if spec["scope"] == "state"}
+    kind_types = {spec["type"] for spec in ann["objects"].values()}
+    exempt_types = ann.get("exempt_types", {})
+    seam_types = {struct for _, struct in seam_members()} | {"Seams"}
+    errors += ["exempt_types: %s needs a reason" % t for t, why in exempt_types.items() if not why]
 
     def rule_for(kind: str, target: str, function: str) -> int | None:
         scoped = [i for i in rules_of.get((kind, target), []) if function in ann["rules"][i].get("functions", [])]
@@ -838,7 +912,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
         names = [s["name"] for s in iface["slots"]]
         errors += ["%s: annotated slot %s is not in interfaces/%s.h" % (sub, n, sub) for n in notes if n not in names]
         slots = {}
-        pending = {"untracked": set(), "rules": set(), "functions": [], "args": []}
+        pending = {"untracked": set(), "rules": set(), "functions": [], "args": [], "types": set(), "indirect": set()}
         unrecorded = {}
         for s in iface["slots"]:
             note = notes.get(s["name"], {})
@@ -866,7 +940,12 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     errors.append("%s.%s: the extra read %s is no block field" % (sub, s["name"], name))
                 else:
                     reads.add(name)
-            for fn in functions:
+            through = {} if skipped else note.get("through", {})
+            errors += [] if skipped else check_through("%s.%s" % (sub, s["name"]), through, by_function)
+            closure = list(functions)
+            through_used = set()
+            indirect_rows = []
+            for fn in closure:
                 for r in by_function.get(fn, []):
                     kind, target = r["kind"], r["target"]
                     if kind == "call" and target in RNG_CALLS:
@@ -890,8 +969,22 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                 obj_reads.add(i)
                             if "w" in OBJECT_KINDS[kind]:
                                 obj_writes.add(i)
-                        if not hits and target.split("::")[0] in state_types and (kind, target) not in rules_of:
+                        owner_type = target.split("::")[0]
+                        if not hits and owner_type in state_types and (kind, target) not in rules_of:
                             pending["untracked"].add(target)
+                        elif (not hits and "::" in target and owner_type not in kind_types and owner_type not in exempt_types
+                              and owner_type not in seam_types and not any(n == owner_type or n.startswith(owner_type + "_") for n in spec.get("services", []))
+                              and owner_type != "Game" and (kind, target) not in rules_of and target not in ann["exempt"]):
+                            pending["types"].add("%s %s" % (kind, target))
+                    if kind == "indirect_call":
+                        key = through_key(target, through)
+                        if key is not None:
+                            through_used.add(key)
+                            for extra in through_functions(through[key]):
+                                if extra not in closure:
+                                    closure.append(extra)
+                        else:
+                            indirect_rows.append(target)
                     index = rule_for(kind, target, fn)
                     needs = kind == "field_escape" or (kind in ("deref_read", "deref_write") and BARE_POINTER.match(target))
                     if index is None:
@@ -920,6 +1013,12 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                     errors.append(message)
                             elif rule["object"] not in all_of:
                                 all_of.append(rule["object"])
+            for target in indirect_rows:
+                why = unaccounted_indirect(target, sub, spec, ann, set(closure), by_function, members,
+                                           lambda name: [] if name not in names or name in unrecorded else functions_of({"name": name}, sub, assignment, notes.get(name, {})))
+                if why is not None:
+                    pending["indirect"].add("%s: %s (%s)" % (s["name"], target, why))
+            errors += ["%s.%s: the `through` entry for %s matches no indirect_call row of the slot" % (sub, s["name"], k) for k in through if k not in through_used]
             if draws:
                 reads.update(RNG_FIELDS)
                 writes.update(RNG_FIELDS)
@@ -962,7 +1061,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
         left = {k: v for k, v in done.items() if v}
         if complete and left:
             for k, v in left.items():
-                errors += ["%s is complete but has pending %s: %s" % (sub, k, ", ".join(v[:6]))]
+                errors += ["%s is complete but has pending %s:\n    %s" % (sub, k, "\n    ".join(v))]
         if not complete:
             subsystems[sub]["pending"] = {
                 "untracked": len(done["untracked"]), "ruleless": len(done["rules"]),

@@ -167,7 +167,7 @@ In short:
 - Code comments are limited to three forms (see "Comments in code" in
   `AGENTS.md`); the reasons for a change go in its commit message and pull
   request.
-- Have one or two issues claimed at a time rather than many.
+- Have one or two issues claimed at a time rather than many. The `/lead` session is the exception: it holds up to 10 (`docs/team.md`, "Issue states").
 
 ## Running the lead and the maintainer
 

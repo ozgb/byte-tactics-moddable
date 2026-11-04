@@ -517,6 +517,23 @@ sets). The annotations hold what no header says:
   when the depth is not the one the list has, or a name is no field.
 - A field a slot writes through a pointer it cannot name exactly (a weapon slot picked by an index) is also in its read set,
   so that a change made outside the seam is recorded at the entry as an `r` line, not mistaken for a write of the module.
+- `exempt_types`: `{"OpenHeap": "reason"}`, a struct type that is no kind and is genuinely local (a stack copy read from a bank, a
+  union summed in a local). A field row (`field_read`, `field_write`, `field_maybe_written`) of a complete subsystem on a type that
+  is none of these is an error naming the row (`field_read OpenHeap::count`): the type of a kind or of a value kind, an alias of a kind's field
+  (`aliases`), a type in `exempt_types`, a target in `exempt` (one member of a type, for an anonymous struct: `<anon>::whole`), a hand rule for
+  the row, the table of a seam (`Seams`, `UnitsSeam`), or a service class the subsystem lists in `services` (`TdfFile`, `CommandArgs`). A type with no
+  reason is an error. A pending subsystem is not asked.
+- `indirect_call` rows of a complete subsystem. Every `indirect_call` row of a function behind a recorded slot, and of every function
+  `through` adds, is an error (`pending indirect`) unless one of these accounts for it: a call through a seam table (`[UnitsSeam::SetStateBits]`)
+  to a slot the subsystem lists in `imports`, or to a slot of its own seam whose functions are all behind the slot being checked; a
+  `virtual Class::Method` dispatch where `Class` is a kind with `kinds` (`poly`) or a kind with a `vtable`, and the `Method` of each concrete kind's type is
+  among the functions (a concrete type that defines no `Method` of its own is not asked, and the base's own `Method` is asked only when some concrete
+  type does not define one); or a `through` entry in the slot's annotation.
+- `through` (a slot annotation): `{"<row target>": ["fn", ...]}` adds the named functions to the slot, so that their sets and their own
+  `indirect_call` rows count as the slot's, for a table of code pointers such as `g_missionOrderTableVec[].notify`.
+  `{"<row target>": {"reason": "..."}}` says that the call does nothing on the recorded paths. The key is the whole target of the row
+  or the name in its last brackets (`OrderTableEntry::notify`). `replayschema.py --check` fails for an entry with no functions and no reason, a function that is
+  none of the rows' functions, and a key that matches no `indirect_call` row of the slot.
 - `subsystems.<name>`: `status` (`complete` or `pending`, with the `issue` that completes it), the `imports` (slots of
   other seams the subsystem calls) and per slot the `functions` behind it, the `native` symbol the replayer calls,
   and how each pointer argument is recorded:
@@ -543,7 +560,7 @@ A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by i
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
 A `pending` subsystem lists in its generated `pending` entry what is left (untracked targets, rows with no rule,
 slots whose functions are not found, arguments with no annotation); its own issue empties that list. A complete
-subsystem with anything pending is an error.
+subsystem with anything pending is an error, and the error prints every pending item, one per line.
 
 A slot annotated `"record": false` with a `"reason"` is classified and left out of the recording. The reason is `load class`
 (type loading and presentation-side init and free, which the full traces already cover) or the issue that will record

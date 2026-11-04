@@ -621,27 +621,32 @@ works with `--tier`, `--steps-per-frame` and `--parallel`, and not with `--poiso
 
 ### When the full suite is the gate
 
-The full `--check` and the play-tests stay the gate of a pull
-request that:
+The gate of a pull request is the tier (`--tier`), for every change the gate applies to, the state block
+layout, the host interface and platform code included. The full `--check` stays the gate only of a pull
+request that regenerates the stored reference data: `reference/` traces, sounds, UI logs, frames or
+saves, or the trace format (`data/trace_schema.json`, `tools/traceschema.py`), since that data is
+produced for every scenario anyway. The body says which tier it ran.
 
-- changes the state block layout: `interfaces/`, `src/state/`, `data/layout_refs.csv`, or any `static_assert` on a block struct's size;
-- changes the host interface or platform code;
-- changes `reference/` (scenarios, traces) or the trace format (`data/trace_schema.json`, `tools/traceschema.py`);
-- changes `tools/reference.py` or `tools/playtest.py`;
-- or is the run that makes `uv run tools/fullgate.py due` pass.
+The play-tests (`tools/playtest.py` smoke, full, mp and music) are not part of a pull request's gate.
+They run with the full `--check` on `moddable`, below.
 
-#286 passed the gate and broke `mp`; these are the changes of that kind. Every other pull request
-that the gate applies to runs `--tier`, and its body says which tier it ran.
+#286 passed the gate and broke `mp`: it is the example of what the periodic play-tests are for. The
+trade is speed for a later catch: a change of that kind can merge first and be caught at the next
+periodic run.
 
 ### The full suite on moddable
 
 The full `--check` runs on the tip of `moddable` once every 5 merged pull requests that needed the
 gate. `uv run tools/fullgate.py` prints how many have merged since the newest `Full gate on <sha>`
 comment on the tracking issue (#632), and `uv run tools/fullgate.py due` exits 1 at 5 or more. When
-it is due, the lead runs the full `--check` on the tip, without `--tier`, and comments `Full gate on
-<sha>: <n> of <n> equal, block pointers: <result>` on #632. On a divergence the comment says so, and
-no pull request that needs the gate merges until a fix lands: `tools/tracediff.py` gives the first
-tick, and the 5 merges are bisected.
+it is due, the lead runs the full `--check` on the tip, without `--tier`, with the play-tests
+(`tools/playtest.py` smoke, full, mp and music), and comments `Full gate on
+<sha>: <n> of <n> equal, block pointers: <result>` on #632, with the play-test results.
+
+**A periodic failure is fixed afterwards, not by freezing merges.** The lead files it at once as an
+issue, first in #2's order, with the failing scenario or play-test and the merges since the last pass
+(`tools/tracediff.py` gives the first tick of a divergence). Merges continue; the next periodic run
+must pass.
 
 ## Block pointers
 

@@ -5,6 +5,7 @@
 
 import contextlib
 import io
+import struct
 import tempfile
 import unittest
 from pathlib import Path
@@ -109,7 +110,7 @@ class NamingTest(unittest.TestCase):
             self.assertEqual(code.function(0x401010), "?insert@?$vector@H@std@@QAEXXZ")
             self.assertEqual(code.function(0x401110), "?insert@?$vector@G@std@@QAEXXZ")
         self.assertEqual(added.function(0x400f10), "?insert@?$vector@F@std@@QAEXXZ")
-        namer = bp.Namer(added, [(0x401010, "T"), (0x401110, "T")])
+        namer = bp.Namer(added, [0x401110])
         self.assertEqual(namer.name("0x00401110", "T"), "?insert@?$vector@G@std@@QAEXXZ: T")
 
     def test_shared_plain_names_use_the_decorated_name(self):
@@ -121,23 +122,64 @@ class NamingTest(unittest.TestCase):
         self.assertEqual(code.function(0x401110), "?Run@@YAXF@Z")
         self.assertEqual(code.function(0x401210), "Once")
 
-    def test_names_and_numbers(self):
-        sites = [(0x401010, ""), (0x401018, ""), (0x401012, "T"), (0x401014, "T"), (0x401030, "")]
-        namer = bp.Namer(self.code, sites)
-        self.assertEqual(namer.name("0x00401010", "-"), "Alias")
-        self.assertEqual(namer.name("0x00401018", "-"), "Alias #2")
-        self.assertEqual(namer.name("0x00401012", "T"), "Alias: T")
-        self.assertEqual(namer.name("0x00401014", "T"), "Alias: T #2")
+    def test_names_by_rank_among_the_function_sites(self):
+        namer = bp.Namer(self.code, [0x401004, 0x401008, 0x40100c, 0x401030])
+        self.assertEqual(namer.name("0x00401004", "-"), "Alias #1")
+        self.assertEqual(namer.name("0x0040100c", "T"), "Alias: T #3")
         self.assertEqual(namer.name("0x00401030", "-"), "Setup")
+        self.assertEqual(namer.name("0x00401018", "-"), "Alias @0x18")
         self.assertEqual(namer.name("0x00000000", "-"), "unknown")
+        self.assertEqual(namer.name("SimGlobals", "-"), "SimGlobals")
+
+    def test_names_do_not_depend_on_the_sites_a_scan_saw(self):
+        def scan(*sites):
+            lines = ["bt-blockptrs 2", "commit\tabc", "every\t1", "ticks\t1"]
+            lines += ["0x%08x\t-\t0x0\t0x00401200\tNAMES\t1\t0x0\t0x0" % s for s in sites]
+            return bp.parse_scan("\n".join(lines) + "\n", "s")
+
+        namer = bp.Namer(self.code, [0x401004, 0x401008, 0x40100c])
+        every = bp.resolve([scan(0x401004, 0x401008, 0x40100c)], namer, [])
+        without_middle = bp.resolve([scan(0x401004, 0x40100c)], namer, [])
+        self.assertEqual(without_middle[1].holder, every[2].holder)
+        self.assertEqual(without_middle[0].holder, every[0].holder)
+        self.assertEqual([r.holder for r in every], ["Alias #1", "Alias #2", "Alias #3"])
+
+    def exe_code(self, pad):
+        """Alias at 0x401000: `pad` nops, then three calls to 0x401200; the sites are the return addresses."""
+        code, sites = b"\x90" * pad, []
+        for _ in range(3):
+            code += b"\xe8" + struct.pack("<i", 0x401200 - (0x401000 + len(code) + 5))
+            sites.append(0x401000 + len(code))
+            code += b"\x90"
+        return code, sites
+
+    def test_site_names_survive_an_edit_before_the_first_call(self):
+        names = []
+        for pad in (0, 1, 7):
+            code, sites = self.exe_code(pad)
+            found = bp.call_sites(code, 0x401000, {0x401200})
+            self.assertEqual(sorted(found), sites)
+            namer = bp.Namer(self.code, sorted(found))
+            names.append([namer.name("0x%08x" % s, "-") for s in sites])
+        self.assertEqual(names, [["Alias #1", "Alias #2", "Alias #3"]] * 3)
+
+    def test_only_calls_to_allocators_are_sites(self):
+        code = b"\xe8" + struct.pack("<i", 0x401100 - 0x401005) + b"\xe9" + struct.pack("<i", 0x401200 - 0x40100a)
+        self.assertEqual(bp.call_sites(code, 0x401000, {0x401200}), set())
+
+    def test_allocators_come_from_the_map(self):
+        text = (" 0001:00000100  ?SimAllocTagged@@YAPAXPBDI@Z  0000000000401100  a.obj\n"
+                " 0001:00000200  ??2@YAPAXI@Z  0000000000401200  a.obj\n"
+                " 0001:00000300  ?Other@@YAXXZ  0000000000401300  a.obj\n")
+        self.assertEqual(bp.allocator_addresses(text), {0x401100, 0x401200})
 
     def test_resolve_simglobals(self):
         members = bp.simglobals_members(LAYOUT)
         self.assertEqual([(m.name, m.start, m.end) for m in members],
                          [("a", 0, 4), ("table", 4, 44), ("vec", 44, 48), ("last", 48, 52)])
-        out = bp.resolve([bp.parse_scan(SCAN, "s")], self.code, members)
+        out = bp.resolve([bp.parse_scan(SCAN, "s")], bp.Namer(self.code, []), members)
         self.assertEqual((out[1].holder, out[1].offset), ("SimGlobals.table", 0x10))
-        out = bp.resolve([bp.parse_scan(SCAN, "s")], self.code, None)
+        out = bp.resolve([bp.parse_scan(SCAN, "s")], bp.Namer(self.code, []), None)
         self.assertEqual((out[1].holder, out[1].offset), ("SimGlobals+0x14", 0))
 
 

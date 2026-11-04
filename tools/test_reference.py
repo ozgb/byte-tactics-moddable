@@ -972,7 +972,12 @@ class RunSlotsTest(unittest.TestCase):
             self.assertEqual(reference.gate_slots(), 3)
         with mock.patch.dict(os.environ):
             os.environ.pop(reference.SLOTS_ENV, None)
-            self.assertEqual(reference.gate_slots(), reference.GATE_SLOTS)
+            with mock.patch.object(os, "cpu_count", return_value=64):
+                self.assertEqual(reference.gate_slots(), reference.GATE_SLOTS)
+            with mock.patch.object(os, "cpu_count", return_value=8):
+                self.assertEqual(reference.gate_slots(), 4)
+            with mock.patch.object(os, "cpu_count", return_value=1):
+                self.assertEqual(reference.gate_slots(), 1)
 
 
 class BothModesTest(unittest.TestCase):

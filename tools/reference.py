@@ -18,8 +18,12 @@ scenarios named in GATE_TIER, the pull request gate (tools/coverage.py --tier ch
 
 `--check --both-modes` plays every scenario once in WASM and once with `-modules=native` in one pool (each line names its
 mode, the sound logs and block pointer scans are kept apart per mode) and passes only when both modes equal the stored traces.
-A `--check` holds an exclusive lock on $XDG_RUNTIME_DIR/bt-gate.lock (else /tmp) for the whole run, so that one machine plays
-one gate at a time; a second one prints `waiting for the gate run of <pid> (<worktree>)` and waits. `--no-lock` skips it.
+Every game run of a `--check` holds one of the machine's run slots (files bt-gate-slot-<i> in $XDG_RUNTIME_DIR, else /tmp, each
+taken with flock; half the CPUs and at most GATE_SLOTS of them, $BT_GATE_SLOTS overrides), so that all the gates on a machine together
+play at most that many games: gates run at the same time and fill the slots one gate's longest scenario leaves idle, where one
+exclusive lock made them queue. A run that waits for a slot prints once which gates hold them (`<pid> (<worktree>)`).
+A second `--check` with the same cache key waits for the first on a key lock (bt-gate-key-<key>.lock) and then reports its cached pass.
+`--no-lock` takes no slot and no key lock. A scenario with a `load` line starts as soon as the scenario it loads has finished.
 A passing `--check` stores its output under ~/.cache/bt-gate/<key>.txt, the key being a SHA-256 of the exe, the files beside it
 (wasmtime_host.dll, *.wasm, modules.json), reference/{scenarios,traces,sounds,ui,frames,saves}, the four tools that play and compare
 (commit.txt is left out) and the options; a later `--check` with the same key, looked up before the lock and again after it, prints
@@ -369,8 +373,8 @@ def lock_dir() -> Path:
 
 
 def gate_slots() -> int:
-    """The number of run slots on the machine: $BT_GATE_SLOTS, else GATE_SLOTS."""
-    return max(1, int(os.environ.get(SLOTS_ENV) or GATE_SLOTS))
+    """The number of run slots on the machine: $BT_GATE_SLOTS, else half the CPUs, at least 1 and at most GATE_SLOTS."""
+    return max(1, int(os.environ.get(SLOTS_ENV) or min(GATE_SLOTS, (os.cpu_count() or 2) // 2)))
 
 
 def key_lock_path(key: str) -> Path:

@@ -17,6 +17,10 @@ as IP literals are not checked. `--listen unix:PATH` serves on a Unix socket, wh
 session VM reaches the proxy with no network device at all. SIGHUP reopens the log file, so a
 launcher can rename it and start a fresh one.
 
+A tunnel to a host name must open with a TLS ClientHello whose server name is that host (case
+folded), else the tunnel is closed and an `event: "sni_refused"` line is logged. Tunnels to
+IP literals in the allowlist are not checked.
+
 --check-log exits 1 and prints each logged request whose target is not on the allowlist, else
 prints a summary and exits 0.
 """
@@ -34,6 +38,7 @@ from pathlib import Path
 
 HEADER_CAP = 8192
 HEADER_TIMEOUT = 10.0
+HELLO_CAP = 16384
 DEFAULT_PORT = 443
 
 
@@ -174,6 +179,18 @@ class Proxy:
             writer.write(b"HTTP/1.1 200 Connection established\r\n\r\n")
             await writer.drain()
             counts = {"up": 0, "down": 0}
+            if not is_ip_literal(pair[0]):
+                try:
+                    hello = await read_client_hello(reader)
+                except (asyncio.TimeoutError, asyncio.IncompleteReadError):
+                    hello = b""
+                sni = parse_sni(hello)
+                if sni != pair[0]:
+                    self.write({"time": now(), "client": client, "event": "sni_refused", "target": target, "sni": sni})
+                    up_writer.close()
+                    return
+                counts["up"] += len(hello)
+                up_writer.write(hello)
             await asyncio.gather(
                 self.pipe(reader, up_writer, counts, "up"),
                 self.pipe(up_reader, writer, counts, "down"),
@@ -211,6 +228,41 @@ class Proxy:
                 pass
 
 
+def parse_sni(record):
+    """Return the lowercase server name of a TLS ClientHello record, or None."""
+    try:
+        if record[0] != 0x16 or record[5] != 1:
+            return None
+        pos = 5 + 4 + 2 + 32
+        pos += 1 + record[pos]
+        pos += 2 + int.from_bytes(record[pos : pos + 2], "big")
+        pos += 1 + record[pos]
+        end = pos + 2 + int.from_bytes(record[pos : pos + 2], "big")
+        pos += 2
+        while pos + 4 <= end:
+            kind = int.from_bytes(record[pos : pos + 2], "big")
+            size = int.from_bytes(record[pos + 2 : pos + 4], "big")
+            body = record[pos + 4 : pos + 4 + size]
+            pos += 4 + size
+            if kind == 0:
+                if body[2] != 0:
+                    return None
+                length = int.from_bytes(body[3:5], "big")
+                return body[5 : 5 + length].decode("ascii").lower()
+    except (IndexError, UnicodeDecodeError):
+        return None
+    return None
+
+
+async def read_client_hello(reader):
+    """Read the first TLS record from the client and return it."""
+    head = await asyncio.wait_for(reader.readexactly(5), HEADER_TIMEOUT)
+    length = int.from_bytes(head[3:5], "big")
+    if head[0] != 0x16 or length > HELLO_CAP:
+        return head
+    return head + await asyncio.wait_for(reader.readexactly(length), HEADER_TIMEOUT)
+
+
 async def start(allowed, log_path, host, port=None):
     """Start the proxy on host:port, or on the Unix socket path when port is None."""
     proxy = Proxy(allowed, log_path)
@@ -233,7 +285,7 @@ def check_log(log_path, allow_path):
         if not line.strip():
             continue
         record = json.loads(line)
-        if record.get("event") == "close":
+        if record.get("event"):
             continue
         total += 1
         pair = split_target(record.get("target", "")) if record.get("method") == "CONNECT" else None

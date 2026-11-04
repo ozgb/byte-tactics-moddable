@@ -23,9 +23,12 @@ every 8th tick and every tick of the last 64, so the list is best made by playin
 the allocation sites with the linker map and merges the results. It accepts version 2 files only.
 
 Names. A site is a return address in the exe. The map (build/modern/TotalA.map) gives the function
-that contains it, and the tag the caller passed adds `: <tag>`. The site's offset in the function is
-appended (`VtolFollowOrder @0x1a3`), so a name is the same in every run, whichever other sites the run
-saw. The function is named by its plain name
+that contains it, and the tag the caller passed adds `: <tag>`. A function with one allocator call site
+is named by that (`AddOrder`); with several, each site takes its rank among them in address order
+(`VtolFollowOrder #2`). The call sites are those in the exe's code (the exe beside the map is read, and
+the map names the allocators), not those a run saw, so a name is the same in every run and changes only
+when the function's allocation calls are added, removed or reordered. A site the exe has no call for is
+named by its offset in the function (`@0x1a3`). The function is named by its plain name
 (`Class::method`), except a member of a class template and a plain name that two functions in the map
 share, which take their decorated name (`?insert@?$vector@...`), so that a row moves only when its own
 function does. The objects listed in objs/objects.rsp beside the map say which functions are empty
@@ -68,6 +71,7 @@ import csv
 import difflib
 import io
 import re
+import struct
 import subprocess
 import sys
 import tempfile
@@ -259,11 +263,74 @@ def load_code_map(map_path: Path) -> CodeMap:
     return parse_map(map_path.read_text(errors="replace"), empty_functions(map_path.parent / "objs"))
 
 
-class Namer:
-    """Names allocation sites: function (and tag), then `@0x<offset>`, the site's offset in its function."""
+ALLOCATORS = re.compile(r"\?(SimAllocTagged|GameAlloc|GameCalloc|GameRealloc|GameStrdup|SimAlloc|SimRealloc)\w*@@")
+NEW_OPERATORS = ("??2", "??_U")
+CODE_SECTION = 0x20000000
 
-    def __init__(self, code: CodeMap):
+
+def allocator_addresses(map_text: str) -> set[int]:
+    """The addresses of the allocation functions (and operator new) in a linker map."""
+    found = set()
+    for line in map_text.splitlines():
+        m = MAP_LINE.match(line)
+        if m and (ALLOCATORS.match(m.group(1)) or m.group(1).startswith(NEW_OPERATORS)):
+            found.add(int(m.group(2), 16))
+    return found
+
+
+def call_sites(code: bytes, address: int, callees: set[int]) -> set[int]:
+    """The return addresses of the direct calls to `callees` in `code`, which is loaded at `address`."""
+    from capstone import CS_ARCH_X86, CS_MODE_32, Cs
+    disassembler = Cs(CS_ARCH_X86, CS_MODE_32)
+    sites: set[int] = set()
+    pos = 0
+    while pos < len(code):
+        for at, size, mnemonic, operand in disassembler.disasm_lite(code[pos:], address + pos):
+            pos = at + size - address
+            if mnemonic == "call" and operand.startswith("0x") and int(operand, 16) in callees:
+                sites.add(at + size)
+        pos += 1
+    return sites
+
+
+def exe_call_sites(exe: Path, callees: set[int]) -> list[int]:
+    """The return addresses of the calls to `callees` in the code sections of a PE exe, in address order."""
+    data = exe.read_bytes()
+    pe = struct.unpack_from("<I", data, 0x3C)[0]
+    count, optional_size = struct.unpack_from("<H", data, pe + 6)[0], struct.unpack_from("<H", data, pe + 20)[0]
+    image_base = struct.unpack_from("<I", data, pe + 24 + 28)[0]
+    sites: set[int] = set()
+    for i in range(count):
+        _, size, rva, raw_size, raw, *_, flags = struct.unpack_from("<8sIIIIIIHHI", data, pe + 24 + optional_size + 40 * i)
+        if flags & CODE_SECTION:
+            sites |= call_sites(data[raw:raw + min(size, raw_size)], image_base + rva, callees)
+    return sorted(sites)
+
+
+def load_call_sites(map_path: Path) -> list[int]:
+    """The allocator call sites of the exe beside a linker map, named by the map."""
+    exe = map_path.with_suffix(".exe")
+    if not exe.is_file():
+        raise ValueError("no exe beside the map (%s): the allocation sites are the calls in its code" % exe)
+    return exe_call_sites(exe, allocator_addresses(map_path.read_text(errors="replace")))
+
+
+class Namer:
+    """Names allocation sites: function (and tag), then ` #k` when the function has several allocator call sites.
+
+    `sites` are the exe's allocator call sites (return addresses); k is a site's rank among those of its function
+    in address order. A site not among them is named by `@0x<offset>`, its offset in its function.
+    """
+
+    def __init__(self, code: CodeMap, sites: list[int]):
         self.code = code
+        self.ranks: dict[int, tuple[int, int]] = {}
+        by_function: dict[int | None, list[int]] = {}
+        for site in sorted(sites):
+            by_function.setdefault(code.start(site), []).append(site)
+        for group in by_function.values():
+            for k, site in enumerate(group, 1):
+                self.ranks[site] = (k, len(group))
 
     def name(self, site: str, tag: str) -> str:
         """The name of a site given as `0x%08x` (or SimGlobals, which has no tag)."""
@@ -275,8 +342,16 @@ class Namer:
         text = self.code.function(address)
         if tag != "-":
             text += ": " + tag
+        if address in self.ranks:
+            rank, of = self.ranks[address]
+            return text if of == 1 else "%s #%d" % (text, rank)
         start = self.code.start(address)
         return text if start is None else text + " @0x%x" % (address - start)
+
+
+def load_namer(map_path: Path) -> Namer:
+    """The namer for the exe beside a linker map: the map's functions and the exe's allocator call sites."""
+    return Namer(load_code_map(map_path), load_call_sites(map_path))
 
 
 @dataclass
@@ -338,9 +413,8 @@ class Resolved:
     target_max: int
 
 
-def resolve(scans: list[Scan], code: CodeMap, members: list[Member] | None) -> list[Resolved]:
+def resolve(scans: list[Scan], namer: Namer, members: list[Member] | None) -> list[Resolved]:
     """Every scanned row with names."""
-    namer = Namer(code)
     out = []
     for scan in scans:
         for r in scan.rows:
@@ -558,13 +632,13 @@ def check_scans(texts: dict[str, str | None], map_path: Path, build_dir: Path,
     if not map_path.is_file():
         return problems + ["%s: no linker map to name the sites with" % map_path]
     try:
-        code = load_code_map(map_path)
+        namer = load_namer(map_path)
     except ValueError as e:
         return problems + [str(e)]
     needs_layout = any(r.holder == SIM_GLOBALS for s in scans for r in s.rows)
     members = load_members(build_dir) if needs_layout else []
     listed = read_rows() if rows is None else rows
-    missing = uncovered(resolve(scans, code, members), listed)
+    missing = uncovered(resolve(scans, namer, members), listed)
     return problems + describe_uncovered(missing)
 
 
@@ -687,10 +761,10 @@ def main() -> None:
     members = load_members(args.build_dir or default_build_dir()) \
         if any(r.holder == SIM_GLOBALS for s in scans for r in s.rows) else []
     try:
-        code = load_code_map(map_path)
+        namer = load_namer(map_path)
     except ValueError as e:
         sys.exit("blockpointers: %s" % e)
-    merged = merge_kept(with_wild(merge(resolve(scans, code, members)), old), old)
+    merged = merge_kept(with_wild(merge(resolve(scans, namer, members)), old), old)
     now = {row_key(r) for r in merged}
     lost = [r for r in old if (r["class"] or r["note"]) and row_key(r) not in now]
     args.out.write_text(render(merged))

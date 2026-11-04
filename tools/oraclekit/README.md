@@ -1,0 +1,52 @@
+# The oracle data kit
+
+This is everything Milestone 2 (#180) may read of the reference. `MANIFEST.json` lists every file with its
+sha256 and size, the commit it was cut from, and the kit's version: the pair of tags (`interfaces-v*`,
+`reference-traces-v*`) at that commit. A kit with `"version": null` is a trial and is not to be built against.
+
+## What each part is
+
+| Path | What it is | Specified by |
+| --- | --- | --- |
+| `docs/trace-format.md`, `data/trace_schema.json` | the trace format and its schema | `docs/trace-format.md` |
+| `tools/tracerehash.py` | recomputes every trace hash from a test-mode dump, standard library only | `docs/trace-format.md` |
+| `reference/traces/` | the stored traces, one per scenario | `docs/reference-traces.md` |
+| `reference/scenarios/` | the scenarios the traces come from | `docs/reference-traces.md` |
+| `reference/saves/` | the saved games some scenarios load | `docs/reference-traces.md` |
+| `reference/sounds/` | the stored sound logs | `docs/sound-log.md` |
+| `reference/frames/` | the stored frames | `docs/frame-dump.md` |
+| `reference/ui/` | the stored UI logs | `docs/ui-log.md` |
+| `interfaces/` | the subsystem interface headers (the seams) | `docs/module-abi.md` |
+| `docs/module-abi.md` | the module ABI | itself |
+| `tests/replay/` | the stored per-module replay recordings | `docs/replay-format.md` |
+| `layout.json` | the state block layout (below) | `docs/module-abi.md`, sections 7 to 9 |
+
+## Presentation is not a module
+
+The gate runner judges modules, and presentation (sound, frames, the UI) is not one. Milestone 2's build
+writes its own sound log, UI log and frames in its test mode and compares them with the kit's stored ones.
+The commands the reference used to write them are in `reference/README.md`, which stays in the source
+repository; the formats are in `docs/sound-log.md`, `docs/frame-dump.md` and `docs/ui-log.md`.
+
+## No allocator in the ABI
+
+A module uses only block memory the engine allocated. The ABI has no allocator service, and adding one is a
+decision for #180, not for the clean room.
+
+## From the ABI document to layout.json
+
+`layout.json` holds, for every struct the state block holds, its size and each field's name, offset, size
+and type (a bit-field has `bit_offset` and `bit_width` in place of a size; `bases` and `vptr` appear when the
+record has them). It ends with the rows of `data/layout_refs.csv` as `layout_refs`.
+
+`docs/module-abi.md` names five records by role only. Each carries a `"role"` key in `layout.json`:
+
+| Role | Record | Where the ABI document names it |
+| --- | --- | --- |
+| `game` | `Game` | section 8.2, `g_game` |
+| `sim_globals` | `SimGlobals` | section 8.2, `g_simGlobals` |
+| `params` | `MeteorParams` | the argument of `SetMeteorParams` and `LoadMeteorDefaults`, section 9 |
+| `vec3` | `Vec3` | the position and velocity of `weapons.SpawnProjectile`, section 9.2 |
+| `weapon` | `WeaponDef` | the first argument of `weapons.SpawnProjectile` and the result of `weapons.FindWeaponByName`, section 9.2 |
+
+A pointer field stored in the block is a `Ref<T>`: a 32-bit block offset (section 7.1).

@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import io
 import json
 import re
 import shutil
@@ -98,20 +99,36 @@ def git(root: Path, *args: str) -> str:
     return subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True, text=True).stdout
 
 
-def tracked(root: Path, prefix: str) -> list[str]:
-    """The files git tracks under a path (the path itself for a file), sorted."""
-    return sorted(git(root, "ls-files", "-z", "--", prefix).split("\0")[:-1])
+KIT_MODES = ("100644", "100755")
+
+
+def tracked(root: Path, prefix: str) -> list[tuple[str, str]]:
+    """The (path, mode) of every file in HEAD's tree under a path (the path itself for a file), sorted."""
+    out = git(root, "ls-tree", "-r", "-z", "HEAD", "--", prefix)
+    rows = []
+    for record in out.split("\0")[:-1]:
+        meta, path = record.split("\t", 1)
+        rows.append((path, meta.split()[0]))
+    return sorted(rows)
+
+
+def blob(root: Path, path: str) -> bytes:
+    """The bytes of a file as HEAD holds it, not as the working tree does."""
+    return subprocess.run(["git", "-C", str(root), "cat-file", "blob", "HEAD:" + path], check=True,
+                          capture_output=True).stdout
 
 
 def select(root: Path, contents=None, lister=tracked) -> list[str]:
-    """Every file of the contents table, admitted one by one; Refusal when a table entry has no file."""
+    """Every file of the contents table, admitted one by one; Refusal when an entry has no file or a file is no regular file."""
     out: list[str] = []
     for kind, entry, _ in (contents if contents is not None else CONTENTS):
         found = lister(root, entry)
         if not found:
             raise Refusal("refused: %s on the contents list has no tracked file" % entry)
-        for path in found:
+        for path, mode in found:
             admit(path, contents)
+            if mode not in KIT_MODES:
+                raise Refusal("refused: %s has mode %s, only regular files (100644, 100755) are exported" % (path, mode))
             out.append(path)
     return sorted(set(out))
 
@@ -174,8 +191,7 @@ def verify(out: Path) -> list[str]:
 
 def layout_refs_rows(root: Path) -> list[dict]:
     """The rows of data/layout_refs.csv."""
-    with open(root / LAYOUT_REFS, newline="") as f:
-        return list(csv.DictReader(f))
+    return list(csv.DictReader(io.StringIO(blob(root, LAYOUT_REFS).decode(), newline="")))
 
 
 ANONYMOUS = re.compile(r"\((anonymous|unnamed)(?: \w+)? at [^)]*\)")
@@ -270,17 +286,24 @@ def generate_layout(root: Path, build_dir: Path, run=None) -> dict:
     return {"layout_version": 1, "records": records, "layout_refs": layout_refs_rows(root)}
 
 
+def check_target(out: Path) -> None:
+    """Refuse a target that is a file or a directory with something in it."""
+    if out.exists() and not out.is_dir():
+        raise Refusal("refused: %s exists and is not a directory" % out)
+    if out.is_dir() and any(out.iterdir()):
+        raise Refusal("refused: %s is not empty" % out)
+
+
 def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, lister=tracked) -> dict:
     """Write the kit to `out` and return its manifest. Nothing is written when the export is refused."""
     paths = select(root, contents, lister)
     tags = version_tags(root)
     version = check_tags(tags, untagged)
-    files = {p: (root / p).read_bytes() for p in paths}
+    files = {p: blob(root, p) for p in paths}
     files[LAYOUT] = (json.dumps(layout, indent=1, sort_keys=False) + "\n").encode()
-    files[README] = (root / README_SOURCE).read_bytes()
+    files[README] = blob(root, README_SOURCE)
     manifest = manifest_of(files, git(root, "rev-parse", "HEAD").strip(), tags, version)
-    if out.exists() and any(out.iterdir()):
-        raise Refusal("refused: %s is not empty" % out)
+    check_target(out)
     for path, data in files.items():
         target = out / path
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -298,6 +321,7 @@ def main() -> None:
     ex.add_argument("--build-dir", type=Path, default=ROOT / "build" / "modern")
     args = parser.parse_args()
     try:
+        check_target(args.dir)
         select(ROOT)
         check_tags(version_tags(ROOT), args.untagged)
         manifest = export(ROOT, args.dir, args.untagged, generate_layout(ROOT, args.build_dir))

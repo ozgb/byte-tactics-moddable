@@ -120,6 +120,37 @@ class OracleKitTest(unittest.TestCase):
             with self.assertRaises(oraclekit.Refusal):
                 run_export(root, Path(out))
 
+    def test_a_tracked_symlink_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {"src/game.cpp": "secret\n"})
+            (root / "data" / "link.txt").symlink_to("../src/game.cpp")
+            git(root, "add", "data/link.txt")
+            git(root, "commit", "-q", "-m", "link")
+            with self.assertRaises(oraclekit.Refusal) as e:
+                run_export(root, Path(out) / "k")
+            self.assertIn("data/link.txt", str(e.exception))
+            self.assertIn("120000", str(e.exception))
+            self.assertFalse((Path(out) / "k").exists())
+
+    def test_an_uncommitted_edit_is_not_exported(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp)
+            (root / "docs" / "a.md").write_text("edited\n")
+            (root / "data" / "x.json").write_text("[]\n")
+            manifest = run_export(root, Path(out) / "k")
+            self.assertEqual((Path(out) / "k" / "docs" / "a.md").read_bytes(), b"alpha\n")
+            self.assertEqual((Path(out) / "k" / "data" / "x.json").read_bytes(), b"{}\n")
+            by_path = {f["path"]: f for f in manifest["files"]}
+            self.assertEqual(by_path["docs/a.md"]["sha256"], hashlib.sha256(b"alpha\n").hexdigest())
+            self.assertEqual(oraclekit.verify(Path(out) / "k"), [])
+
+    def test_a_target_that_is_a_file_is_refused(self):
+        with tempfile.TemporaryDirectory() as out:
+            target = Path(out) / "f"
+            target.write_text("x")
+            with self.assertRaises(oraclekit.Refusal):
+                oraclekit.check_target(target)
+
     def test_the_clang_type_paths_are_cleaned(self):
         self.assertEqual(oraclekit.clean_type("union W::(anonymous at /a/b/c.h:24:5) "), "union W::(anonymous) ")
         self.assertEqual(oraclekit.clean_type("struct W::(unnamed union)::(unnamed at /a/c.h:61:9)"),

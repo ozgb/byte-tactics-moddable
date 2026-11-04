@@ -1044,7 +1044,7 @@ class PushTests(unittest.TestCase):
         self.push()
         self.assertEqual(self.remote_refs(), [])
         self.assertEqual(PushHandler.requests, [])
-        self.assertNotIn("refs/heads/" + branch, (self.session / bk.PUSH_STATE).read_text() if (self.session / bk.PUSH_STATE).exists() else "")
+        self.assertNotIn("refs/heads/" + branch, json.loads((self.session / bk.PUSH_STATE).read_text())["pushed"])
         log = (self.session / "broker.log").read_text()
         self.assertIn(f"push refused for refs/heads/{branch}", log)
         self.assertNotIn(content.decode(errors="replace") + "\n", log)
@@ -1065,6 +1065,25 @@ class PushTests(unittest.TestCase):
         (self.wasm_dir / "sub").mkdir(parents=True)
         (self.wasm_dir / "sub" / "m.wasm").write_bytes(b"\0asm\1\0\0\0module")
         self.refused("impl/b", "renamed.bin", b"\0asm\1\0\0\0module")
+
+    def test_refused_commit_is_logged_once_and_told_to_the_inbox(self):
+        self.refused("impl/w", "mod.wasm", b"1")
+        for _ in range(3):
+            self.push()
+        log = (self.session / "broker.log").read_text()
+        self.assertEqual(log.count("push refused for refs/heads/impl/w"), 1)
+        commit = subprocess.run(["git", "-C", str(self.work), "rev-parse", "impl/w"], capture_output=True, text=True).stdout.strip()
+        told = json.loads((self.session / "inbox" / "push.json").read_text())
+        self.assertEqual(told, {"refused": [{"commit": commit, "path": "mod.wasm", "reason": "is a .wasm file"}]})
+
+    def test_new_commit_after_a_refusal_is_pushed_and_the_old_one_not_retried(self):
+        self.refused("impl/w", "mod.wasm", b"1")
+        self.commit_file("impl/x", "notes.txt", b"fine")
+        self.bundle("impl/w", "impl/x")
+        bk.sync_refs(self.session)
+        self.push()
+        self.assertEqual(self.remote_refs(), ["refs/heads/impl/x"])
+        self.assertEqual((self.session / "broker.log").read_text().count("push refused for refs/heads/impl/w"), 1)
 
     def test_content_in_an_earlier_commit_is_refused(self):
         self.commit_file("impl/h", "a.wasm", b"1")

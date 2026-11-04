@@ -92,6 +92,7 @@
    "../network/player.h",
    "../units/unit.h",
    "../units/unit_def.h",
+   "../units/unit_type_set.h",
    "../weapons/weapon_def.h",
    "../map/meteors.h",
    "../files/files_bank.h",
@@ -559,26 +560,35 @@
      },
      {
       "name": "categories",
-      "kind": "rawbytes",
-      "size": 64
+      "kind": "ref",
+      "target": "UnitTypeSet"
      },
      {
       "name": "weaponCategories0",
-      "kind": "rawbytes",
-      "size": 64,
-      "member": "weaponCategories[0]"
+      "kind": "ref",
+      "member": "weaponCategories[0]",
+      "target": "UnitTypeSet",
+      "aliases": [
+       "UnitDef::weaponCategories"
+      ]
      },
      {
       "name": "weaponCategories1",
-      "kind": "rawbytes",
-      "size": 64,
-      "member": "weaponCategories[1]"
+      "kind": "ref",
+      "member": "weaponCategories[1]",
+      "target": "UnitTypeSet",
+      "aliases": [
+       "UnitDef::weaponCategories"
+      ]
      },
      {
       "name": "weaponCategories2",
-      "kind": "rawbytes",
-      "size": 64,
-      "member": "weaponCategories[2]"
+      "kind": "ref",
+      "member": "weaponCategories[2]",
+      "target": "UnitTypeSet",
+      "aliases": [
+       "UnitDef::weaponCategories"
+      ]
      }
     ]
    },
@@ -763,6 +773,17 @@
      {
       "name": "z",
       "kind": "i32"
+     }
+    ]
+   },
+   "UnitTypeSet": {
+    "type": "UnitTypeSet",
+    "scope": "state",
+    "fields": [
+     {
+      "name": "bits",
+      "kind": "bytes",
+      "size": 64
      }
     ]
    }
@@ -1195,41 +1216,6 @@
     "note": "the address of the position is given to an import"
    },
    {
-    "kind": "field_escape",
-    "target": "UnitDef::categories",
-    "rule": "fields",
-    "reads": [
-     "UnitDef.categories"
-    ],
-    "note": "the mask of the definition is read as a Bits through its address"
-   },
-   {
-    "kind": "field_escape",
-    "target": "UnitDef::weaponCategories",
-    "rule": "fields",
-    "reads": [
-     "UnitDef.weaponCategories0",
-     "UnitDef.weaponCategories1",
-     "UnitDef.weaponCategories2"
-    ],
-    "note": "the masks of the definition are read as an array of Bits"
-   },
-   {
-    "kind": "deref_read",
-    "target": "*unsigned int",
-    "rule": "fields",
-    "functions": [
-     "Bits::Test"
-    ],
-    "reads": [
-     "UnitDef.categories",
-     "UnitDef.weaponCategories0",
-     "UnitDef.weaponCategories1",
-     "UnitDef.weaponCategories2"
-    ],
-    "note": "the words of a category mask"
-   },
-   {
     "kind": "deref_read",
     "target": "*unsigned char",
     "rule": "fields",
@@ -1659,14 +1645,14 @@
      "FindWeaponTarget": {
       "functions": [
        "FindWeaponTarget",
-       "Bits::Test"
+       "UnitTypeSet::Contains"
       ]
      },
      "FindBestTargetIfFireAtWill": {
       "functions": [
        "FindBestTargetIfFireAtWill",
        "FindWeaponTarget",
-       "Bits::Test"
+       "UnitTypeSet::Contains"
       ]
      },
      "ChooseWeapon": {
@@ -1751,6 +1737,13 @@
         "mode": "vec3",
         "dir": "out",
         "label": "out"
+       }
+      }
+     },
+     "UnitTypeSetAddTypeOrCategory": {
+      "args": {
+       "self": {
+        "mode": "pending"
        }
       }
      }
@@ -2072,7 +2065,7 @@
  "objects": [
   {"name": "Player", "type": "Player", "scope": "state", "table": "players", "inside": null, "fields": [{"name": "active", "kind": "i32"}, {"name": "id", "kind": "u32"}, {"name": "energy", "kind": "f32"}, {"name": "metal", "kind": "f32"}, {"name": "unitsBegin", "kind": "ref", "target": "Unit"}, {"name": "unitsEnd", "kind": "ref", "target": "Unit", "range_end_of": "unitsBegin"}, {"name": "energyIncome", "kind": "f32"}, {"name": "energyUsage", "kind": "f32"}, {"name": "energyCapacity", "kind": "f32"}, {"name": "metalIncome", "kind": "f32"}, {"name": "metalUsage", "kind": "f32"}, {"name": "metalCapacity", "kind": "f32"}, {"name": "totalEnergyProduced", "kind": "f64"}, {"name": "totalMetalProduced", "kind": "f64"}, {"name": "totalEnergyConsumed", "kind": "f64"}, {"name": "totalMetalConsumed", "kind": "f64"}, {"name": "energyWasted", "kind": "f64"}, {"name": "metalWasted", "kind": "f64"}, {"name": "energyStorageBonus", "kind": "f32"}, {"name": "metalStorageBonus", "kind": "f32"}, {"name": "shareMetal", "kind": "f32"}, {"name": "shareEnergy", "kind": "f32"}, {"name": "econ", "kind": "ref", "target": "UnitResources"}, {"name": "info", "kind": "ref", "target": "PlayerInfo"}, {"name": "flags", "kind": "u16"}, {"name": "type", "kind": "u8"}, {"name": "index", "kind": "u8"}, {"name": "unitCount", "kind": "u16"}, {"name": "unitsCreated", "kind": "i32"}, {"name": "allied", "kind": "bytes", "size": 11}]},
   {"name": "Unit", "type": "Unit", "scope": "state", "table": "units", "inside": null, "fields": [{"name": "health", "kind": "i16"}, {"name": "buildLeft", "kind": "f32"}, {"name": "def", "kind": "ref", "target": "UnitDef"}, {"name": "player", "kind": "ref", "target": "Player"}, {"name": "flags", "kind": "flags", "aliases": ["Unit::cloakOn", "Unit::fireOrder"]}, {"name": "activateFlags", "kind": "u8"}, {"name": "workTime", "kind": "i32"}, {"name": "extraction", "kind": "f32"}, {"name": "cell", "kind": "point16"}, {"name": "footprint", "kind": "point16"}, {"name": "script", "kind": "ref", "target": "CobScript"}, {"name": "id", "kind": "u16", "aliases": ["UnitInfo::id"]}, {"name": "resourceSlot", "kind": "embed", "target": "UnitResources"}, {"name": "unitDefIndex", "kind": "u16"}, {"name": "killCount", "kind": "u16"}, {"name": "playerIndex", "kind": "u8"}, {"name": "netDirtyFlags", "kind": "i16"}, {"name": "motion", "kind": "ref", "target": "UnitMotion"}, {"name": "posX", "kind": "i32", "member": "pos.x"}, {"name": "posY", "kind": "i32", "member": "pos.y"}, {"name": "posZ", "kind": "i32", "member": "pos.z"}, {"name": "weapon0TargetX", "kind": "i16", "member": "weapons[0].aimTargetXOrUnitId", "aliases": ["UnitWeaponSlot::aimTargetXOrUnitId", "AimTargetPair::a"]}, {"name": "weapon0TargetZ", "kind": "i16", "member": "weapons[0].aimTargetZOrUnitSentinel", "aliases": ["UnitWeaponSlot::aimTargetZOrUnitSentinel", "AimTargetPair::b"]}, {"name": "weapon0Def", "kind": "weapon", "member": "weapons[0].weapon", "aliases": ["UnitWeaponSlot::weapon"]}, {"name": "weapon0Flags", "kind": "u8", "member": "weapons[0].flags", "aliases": ["UnitWeaponSlot::flags"]}, {"name": "weapon0TargetUnit", "kind": "unitid", "target": "Unit", "member": "weapons[0].aimTargetXOrUnitId", "when": {"field": "weapon0TargetZ", "equals": -32768}, "reach": ["Unit.unitDefIndex", "Unit.motion", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "depth": 2, "reachFirst": 0, "reachCount": 5, "condField": 53, "condValue": -32768}, {"name": "weapon1TargetX", "kind": "i16", "member": "weapons[1].aimTargetXOrUnitId", "aliases": ["UnitWeaponSlot::aimTargetXOrUnitId", "AimTargetPair::a"]}, {"name": "weapon1TargetZ", "kind": "i16", "member": "weapons[1].aimTargetZOrUnitSentinel", "aliases": ["UnitWeaponSlot::aimTargetZOrUnitSentinel", "AimTargetPair::b"]}, {"name": "weapon1Def", "kind": "weapon", "member": "weapons[1].weapon", "aliases": ["UnitWeaponSlot::weapon"]}, {"name": "weapon1Flags", "kind": "u8", "member": "weapons[1].flags", "aliases": ["UnitWeaponSlot::flags"]}, {"name": "weapon1TargetUnit", "kind": "unitid", "target": "Unit", "member": "weapons[1].aimTargetXOrUnitId", "when": {"field": "weapon1TargetZ", "equals": -32768}, "reach": ["Unit.unitDefIndex", "Unit.motion", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "depth": 2, "reachFirst": 0, "reachCount": 5, "condField": 58, "condValue": -32768}, {"name": "weapon2TargetX", "kind": "i16", "member": "weapons[2].aimTargetXOrUnitId", "aliases": ["UnitWeaponSlot::aimTargetXOrUnitId", "AimTargetPair::a"]}, {"name": "weapon2TargetZ", "kind": "i16", "member": "weapons[2].aimTargetZOrUnitSentinel", "aliases": ["UnitWeaponSlot::aimTargetZOrUnitSentinel", "AimTargetPair::b"]}, {"name": "weapon2Def", "kind": "weapon", "member": "weapons[2].weapon", "aliases": ["UnitWeaponSlot::weapon"]}, {"name": "weapon2Flags", "kind": "u8", "member": "weapons[2].flags", "aliases": ["UnitWeaponSlot::flags"]}, {"name": "weapon2TargetUnit", "kind": "unitid", "target": "Unit", "member": "weapons[2].aimTargetXOrUnitId", "when": {"field": "weapon2TargetZ", "equals": -32768}, "reach": ["Unit.unitDefIndex", "Unit.motion", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "depth": 2, "reachFirst": 0, "reachCount": 5, "condField": 63, "condValue": -32768}]},
-  {"name": "UnitDef", "type": "UnitDef", "scope": "state", "table": null, "inside": null, "fields": [{"name": "energymake", "kind": "f32"}, {"name": "windgenerator", "kind": "f32"}, {"name": "tidalgenerator", "kind": "f32"}, {"name": "energyuse", "kind": "f32"}, {"name": "metalmake", "kind": "f32"}, {"name": "extractsMetal", "kind": "f32", "aliases": ["UnitDefMetalWindView::extractsMetal"]}, {"name": "cloakcost", "kind": "f32"}, {"name": "cloakcostmoving", "kind": "f32"}, {"name": "energystorage", "kind": "f32"}, {"name": "metalstorage", "kind": "f32"}, {"name": "makesMetal", "kind": "u8"}, {"name": "flags1", "kind": "flags"}, {"name": "range", "kind": "i16"}, {"name": "categories", "kind": "rawbytes", "size": 64}, {"name": "weaponCategories0", "kind": "rawbytes", "size": 64, "member": "weaponCategories[0]"}, {"name": "weaponCategories1", "kind": "rawbytes", "size": 64, "member": "weaponCategories[1]"}, {"name": "weaponCategories2", "kind": "rawbytes", "size": 64, "member": "weaponCategories[2]"}]},
+  {"name": "UnitDef", "type": "UnitDef", "scope": "state", "table": null, "inside": null, "fields": [{"name": "energymake", "kind": "f32"}, {"name": "windgenerator", "kind": "f32"}, {"name": "tidalgenerator", "kind": "f32"}, {"name": "energyuse", "kind": "f32"}, {"name": "metalmake", "kind": "f32"}, {"name": "extractsMetal", "kind": "f32", "aliases": ["UnitDefMetalWindView::extractsMetal"]}, {"name": "cloakcost", "kind": "f32"}, {"name": "cloakcostmoving", "kind": "f32"}, {"name": "energystorage", "kind": "f32"}, {"name": "metalstorage", "kind": "f32"}, {"name": "makesMetal", "kind": "u8"}, {"name": "flags1", "kind": "flags"}, {"name": "range", "kind": "i16"}, {"name": "categories", "kind": "ref", "target": "UnitTypeSet"}, {"name": "weaponCategories0", "kind": "ref", "member": "weaponCategories[0]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "weaponCategories1", "kind": "ref", "member": "weaponCategories[1]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "weaponCategories2", "kind": "ref", "member": "weaponCategories[2]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}]},
   {"name": "weapondef", "type": "WeaponDef", "scope": "index", "table": null, "inside": null, "fields": [{"name": "flags", "kind": "flags", "member": "flags.value", "aliases": ["WeaponDefTargetView::field_111"]}, {"name": "speed", "kind": "i32", "aliases": ["WeaponDefTargetView::radius"]}]},
   {"name": "MeteorParams", "type": "MeteorParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "name", "kind": "string", "size": 32}, {"name": "radius", "kind": "i32"}, {"name": "density", "kind": "f32"}, {"name": "duration", "kind": "f32"}, {"name": "interval", "kind": "f32"}]},
   {"name": "UnitResources", "type": "UnitResources", "scope": "state", "table": null, "inside": {"kind": "Unit", "member": "resourceSlot"}, "fields": [{"name": "energyMake", "kind": "f32"}, {"name": "energyUse", "kind": "f32"}, {"name": "energyUsePaid", "kind": "f32"}, {"name": "energyStall", "kind": "f32"}, {"name": "energyMakePrev", "kind": "f32"}, {"name": "energyUsePrev", "kind": "f32"}, {"name": "metalMake", "kind": "f32"}, {"name": "metalUse", "kind": "f32"}, {"name": "metalUsePaid", "kind": "f32"}, {"name": "metalStall", "kind": "f32"}, {"name": "metalMakePrev", "kind": "f32"}, {"name": "metalUsePrev", "kind": "f32"}, {"name": "player", "kind": "ref", "target": "Player"}]},
@@ -2080,7 +2073,8 @@
   {"name": "Cell", "type": "Cell", "scope": "state", "table": null, "inside": null, "fields": [{"name": "metal", "kind": "u8"}]},
   {"name": "CobScript", "type": "CobScript", "scope": "state", "table": null, "inside": null, "fields": []},
   {"name": "UnitMotion", "type": "UnitMotion", "scope": "state", "table": null, "inside": null, "fields": [{"name": "velocityX", "kind": "i32", "member": "velocity.x"}, {"name": "velocityY", "kind": "i32", "member": "velocity.y"}, {"name": "velocityZ", "kind": "i32", "member": "velocity.z"}]},
-  {"name": "Vec3", "type": "Vec3", "scope": "value", "table": null, "inside": null, "fields": [{"name": "x", "kind": "i32"}, {"name": "y", "kind": "i32"}, {"name": "z", "kind": "i32"}]}
+  {"name": "Vec3", "type": "Vec3", "scope": "value", "table": null, "inside": null, "fields": [{"name": "x", "kind": "i32"}, {"name": "y", "kind": "i32"}, {"name": "z", "kind": "i32"}]},
+  {"name": "UnitTypeSet", "type": "UnitTypeSet", "scope": "state", "table": null, "inside": null, "fields": [{"name": "bits", "kind": "bytes", "size": 64}]}
  ],
  "subsystems": {
   "wind_meteors": {
@@ -2141,12 +2135,12 @@
    }
   },
   "ai": {
-   "header": {"interface": "interfaces/ai.h", "struct": "AiSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 21, "ruleless": 4, "unresolvedSlots": ["SquadManagerTickIfActive", "SquadManagerDeleteTimers", "CreateSquadManager"], "unannotatedArgs": ["HasReadyUnitInRange(pos)", "IsPointVisible(pos)", "MarkOwnerNetDirtyFromDamageSplit(self)", "MarkOwnerNetDirtyFromDamageSplit(projectile)", "DumpPlayerAI(file)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "SquadManagerTickIfActive(self)", "SquadManagerDeleteTimers(self)", "CmdPlan(args)", "CmdWeight(args)", "CmdLimit(args)"]}},
+   "header": {"interface": "interfaces/ai.h", "struct": "AiSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 20, "ruleless": 4, "unresolvedSlots": ["SquadManagerTickIfActive", "SquadManagerDeleteTimers", "CreateSquadManager"], "unannotatedArgs": ["HasReadyUnitInRange(pos)", "IsPointVisible(pos)", "MarkOwnerNetDirtyFromDamageSplit(self)", "MarkOwnerNetDirtyFromDamageSplit(projectile)", "DumpPlayerAI(file)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "SquadManagerTickIfActive(self)", "SquadManagerDeleteTimers(self)", "CmdPlan(args)", "CmdWeight(args)", "CmdLimit(args)"]}},
    "slots": {
     "GetVisibleEnemiesInRadius": {"conv": "__stdcall", "ret": "void", "functions": ["GetVisibleEnemiesInRadius"], "reads": [], "writes": [], "objectReads": ["Vec3.x", "Vec3.z"], "objectWrites": [], "allOf": null, "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}, {"name": "radius", "type": "int", "line": "radius", "mode": "scalar"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}, {"name": "out", "type": "std::vector<Unit*, std::allocator<Unit*> >*", "line": "out", "mode": "units", "dir": "out", "kind": "Unit", "reach": ["Unit.flags", "Unit.def", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.posX", "Unit.posZ", "UnitDef.flags1"], "depth": 2, "reachFirst": 5, "reachCount": 7}], "result": null, "native": "GetVisibleEnemiesInRadius"},
     "HasReadyUnitInRange": {"conv": "__stdcall", "ret": "bool", "functions": ["HasReadyUnitInRange"], "reads": [], "writes": [], "objectReads": ["Unit.flags", "Vec3.x", "Vec3.z"], "objectWrites": [], "allOf": null, "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}], "result": {"type": "bool", "mode": "scalar"}, "native": "HasReadyUnitInRange"},
     "IsPointVisible": {"conv": "__stdcall", "ret": "int", "functions": ["IsPointVisible"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsPointVisible"},
-    "ReactToAttack": {"conv": "__stdcall", "ret": "void", "functions": ["ReactToAttack"], "reads": ["Game.ticks", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Player.index", "Player.allied", "Unit.buildLeft", "Unit.def", "Unit.player", "Unit.flags", "Unit.unitDefIndex", "Unit.playerIndex", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "UnitDef.flags1", "UnitDef.categories"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": null, "args": [{"name": "attacker", "type": "Unit*", "line": "attacker", "mode": "object", "kind": "Unit"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "amount", "type": "int", "line": "amount", "mode": "scalar"}], "result": null, "native": "ReactToAttack"},
+    "ReactToAttack": {"conv": "__stdcall", "ret": "void", "functions": ["ReactToAttack"], "reads": ["Game.ticks", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Player.index", "Player.allied", "Unit.buildLeft", "Unit.def", "Unit.player", "Unit.flags", "Unit.unitDefIndex", "Unit.playerIndex", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "UnitDef.flags1", "UnitDef.categories", "UnitDef.weaponCategories0", "UnitDef.weaponCategories1", "UnitDef.weaponCategories2"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": null, "args": [{"name": "attacker", "type": "Unit*", "line": "attacker", "mode": "object", "kind": "Unit"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "amount", "type": "int", "line": "amount", "mode": "scalar"}], "result": null, "native": "ReactToAttack"},
     "MarkOwnerNetDirtyFromDamageSplit": {"conv": "__fastcall", "ret": "void", "functions": ["SquadManager::MarkOwnerNetDirtyFromDamageSplit"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "SquadManager*", "line": "self", "mode": "pending"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "projectile", "type": "Projectile*", "line": "projectile", "mode": "pending"}, {"name": "enemyDamage", "type": "int", "line": "enemyDamage", "mode": "scalar"}, {"name": "friendlyDamage", "type": "int", "line": "friendlyDamage", "mode": "scalar"}], "result": null, "native": "MarkOwnerNetDirtyFromDamageSplit"},
     "DumpPlayerAI": {"conv": "__stdcall", "ret": "void", "functions": ["DumpPlayerAI"], "reads": ["Game.ticks", "Game.difficulty"], "writes": [], "objectReads": ["Player.type"], "objectWrites": [], "allOf": null, "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "file", "type": "void*", "line": "file", "mode": "pending"}], "result": null, "native": "DumpPlayerAI"},
     "ResetAIPlayers": {"conv": "__stdcall", "ret": "void", "functions": ["ResetAIPlayers"], "reads": [], "writes": [], "objectReads": ["Player.active", "Player.type"], "objectWrites": [], "allOf": null, "args": [], "result": null, "native": "ResetAIPlayers"},
@@ -2214,8 +2208,8 @@
     "ResetWeaponTarget": {"conv": "__stdcall", "ret": "void", "functions": ["ResetWeaponTarget"], "reads": [], "writes": [], "objectReads": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "int", "line": "weapon", "mode": "scalar"}], "result": null, "native": "ResetWeaponTarget"},
     "GetWeaponTargetUnit": {"conv": "__stdcall", "ret": "Unit*", "functions": ["GetWeaponTargetUnit"], "reads": [], "writes": [], "objectReads": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "int", "line": "weapon", "mode": "scalar"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "GetWeaponTargetUnit"},
     "GetWeaponTargetPos": {"conv": "__stdcall", "ret": "int", "functions": ["GetWeaponTargetPos", "ScaleBodyOffset"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": ["Unit.script", "Unit.unitDefIndex", "Unit.killCount", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon0TargetUnit", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon1TargetUnit", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon2TargetUnit", "weapondef.flags", "weapondef.speed", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ", "Vec3.x", "Vec3.y", "Vec3.z"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Vec3.x", "Vec3.y", "Vec3.z"], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "out", "when": "result != 0"}, {"name": "weapon", "type": "int", "line": "weapon", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetWeaponTargetPos"},
-    "FindWeaponTarget": {"conv": "__stdcall", "ret": "Unit*", "functions": ["FindWeaponTarget", "Bits::Test"], "reads": ["Game.uiOptionFlags", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon2Def", "UnitDef.flags1", "UnitDef.range", "UnitDef.categories", "UnitDef.weaponCategories0", "UnitDef.weaponCategories1", "UnitDef.weaponCategories2", "weapondef.flags", "Vec3.x", "Vec3.z"], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "unsigned char", "line": "weapon", "mode": "scalar"}, {"name": "useRange", "type": "int", "line": "useRange", "mode": "scalar"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "FindWeaponTarget"},
-    "FindBestTargetIfFireAtWill": {"conv": "__stdcall", "ret": "Unit*", "functions": ["FindBestTargetIfFireAtWill", "FindWeaponTarget", "Bits::Test"], "reads": ["Game.uiOptionFlags", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon2Def", "UnitDef.flags1", "UnitDef.range", "UnitDef.categories", "UnitDef.weaponCategories0", "UnitDef.weaponCategories1", "UnitDef.weaponCategories2", "weapondef.flags", "Vec3.x", "Vec3.z"], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "FindBestTargetIfFireAtWill"},
+    "FindWeaponTarget": {"conv": "__stdcall", "ret": "Unit*", "functions": ["FindWeaponTarget", "UnitTypeSet::Contains"], "reads": ["Game.uiOptionFlags", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon2Def", "UnitDef.flags1", "UnitDef.range", "UnitDef.categories", "UnitDef.weaponCategories0", "UnitDef.weaponCategories1", "UnitDef.weaponCategories2", "weapondef.flags", "Vec3.x", "Vec3.z", "UnitTypeSet.bits"], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "unsigned char", "line": "weapon", "mode": "scalar"}, {"name": "useRange", "type": "int", "line": "useRange", "mode": "scalar"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "FindWeaponTarget"},
+    "FindBestTargetIfFireAtWill": {"conv": "__stdcall", "ret": "Unit*", "functions": ["FindBestTargetIfFireAtWill", "FindWeaponTarget", "UnitTypeSet::Contains"], "reads": ["Game.uiOptionFlags", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon2Def", "UnitDef.flags1", "UnitDef.range", "UnitDef.categories", "UnitDef.weaponCategories0", "UnitDef.weaponCategories1", "UnitDef.weaponCategories2", "weapondef.flags", "Vec3.x", "Vec3.z", "UnitTypeSet.bits"], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "FindBestTargetIfFireAtWill"},
     "ChooseWeapon": {"conv": "__fastcall", "ret": "unsigned char", "functions": ["Unit::ChooseWeapon"], "reads": [], "writes": [], "objectReads": ["Unit.weapon0Flags", "Unit.weapon1Flags", "Unit.weapon2Flags"], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "unsigned char", "mode": "scalar"}, "native": "ChooseWeaponSlot"}
    }
   },

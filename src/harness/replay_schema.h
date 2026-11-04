@@ -719,7 +719,7 @@ static_assert(sizeof(((Object3do*)nullptr)->box_z) == 4, "Object3do::box_z has t
 static_assert(sizeof(((Handle*)nullptr)->index) == 2, "Handle::index has the size the schema says");
 static_assert(sizeof(((Handle*)nullptr)->value) == 2, "Handle::value has the size the schema says");
 static_assert(sizeof(((Handle*)nullptr)->kind) == 1, "Handle::kind has the size the schema says");
-static_assert(sizeof(((Handle*)nullptr)->src) == sizeof(void*), "Handle::src is a raw pointer");
+static_assert(__is_pointer(decltype(((Handle*)nullptr)->src)), "Handle::src is a raw pointer");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");

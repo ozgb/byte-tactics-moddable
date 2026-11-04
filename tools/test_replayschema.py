@@ -1000,7 +1000,7 @@ class RawPointers(unittest.TestCase):
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
         self.assertIn('{ "src", offsetof(Handle, src), sizeof(((Handle*)nullptr)->src), ROK_HANDLE, RK_PTR, ROK_FRAMETABLE,', text)
-        self.assertIn('static_assert(sizeof(((Handle*)nullptr)->src) == sizeof(void*), "Handle::src is a raw pointer");', text)
+        self.assertIn('static_assert(__is_pointer(decltype(((Handle*)nullptr)->src)), "Handle::src is a raw pointer");', text)
 
     def test_a_ptr_is_not_walked(self):
         self.assertNotIn("ptr", rs.WALKABLE)

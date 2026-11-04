@@ -72,6 +72,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import astcache
 import rwsets
 import stateclasses
 import typedupes
@@ -322,24 +323,44 @@ def parse_tree(text: str) -> tuple[list[Record], dict[str, tuple[str, int]], set
     unnamed struct's location, and the (struct, file, field) triples that code casts from integer to pointer."""
     start = text.index('"inner": [')
     position = ("", 0)
+
+    def wanted_nodes():
+        nonlocal position
+        for chunk in rwsets.CHUNK.finditer(text, start):
+            body = chunk.group()
+            file = rwsets.first_file(body) or position[0]
+            kind = re.search(r'"kind": "(\w+)"', body[:400])
+            wanted = kind and (kind.group(1) in RECORD_KINDS + ("TypedefDecl",) or "IntegralToPointer" in body)
+            if not file or not wanted or repo_relative(file) is None:
+                position = rwsets.last_position(body, *position)
+                continue
+            node = json.loads(body.rstrip().rstrip(","))
+            tracker = rwsets.Position(*position)
+            tracker.annotate(node)
+            position = (tracker.file, tracker.line)
+            yield node, "IntegralToPointer" in body
+    return read_nodes(wanted_nodes())
+
+
+def parse_chunks(chunks: list) -> tuple[list[Record], dict[str, tuple[str, int]], set[tuple[str, str, str]]]:
+    """parse_tree of the shared dump of astcache: the same nodes, already decoded and annotated."""
+    def wanted_nodes():
+        for file, cast, node in chunks:
+            if node["kind"] in RECORD_KINDS + ("TypedefDecl",) or cast:
+                if repo_relative(file) is not None:
+                    yield node, cast
+    return read_nodes(wanted_nodes())
+
+
+def read_nodes(nodes) -> tuple[list[Record], dict[str, tuple[str, int]], set[tuple[str, str, str]]]:
+    """(records, typedefs, casts) of the annotated nodes parse_tree and parse_chunks pick."""
     records: list[Record] = []
     unnamed: dict[str, tuple[dict, str, int]] = {}
     typedefs: dict[str, tuple[str, int]] = {}
     targets: set[str] = set()
-    for chunk in rwsets.CHUNK.finditer(text, start):
-        body = chunk.group()
-        file = rwsets.first_file(body) or position[0]
-        kind = re.search(r'"kind": "(\w+)"', body[:400])
-        wanted = kind and (kind.group(1) in RECORD_KINDS + ("TypedefDecl",) or "IntegralToPointer" in body)
-        if not file or not wanted or repo_relative(file) is None:
-            position = rwsets.last_position(body, *position)
-            continue
-        node = json.loads(body.rstrip().rstrip(","))
-        tracker = rwsets.Position(*position)
-        tracker.annotate(node)
-        position = (tracker.file, tracker.line)
+    for node, cast in nodes:
         rel = repo_relative(node["_file"])
-        if "IntegralToPointer" in body:
+        if cast:
             targets |= cast_targets(node)
         if rel is None:
             continue
@@ -384,6 +405,13 @@ def ast_argv(entry: dict) -> list[str]:
 def scan_unit(job: tuple[dict, bool]) -> UnitScan:
     """Run clang-cl on one translation unit (layouts, then the syntax tree) and read both; keep=False drops all but the casts."""
     entry, keep = job
+    shared = astcache.unit(ast_argv(entry), entry["directory"])
+    if shared is not None:
+        records, typedefs, casts = parse_chunks(shared.chunks)
+        if not keep:
+            return UnitScan([], {}, {}, {}, casts)
+        by_name, by_loc = parse_layouts(shared.layouts, entry["directory"])
+        return UnitScan(records, typedefs, by_name, by_loc, casts)
     run = subprocess.run(ast_argv(entry), cwd=entry["directory"], capture_output=True, text=True, errors="replace")
     found = rwsets.JSON_START.search(run.stdout)
     if found is None:
@@ -453,6 +481,7 @@ def read_definitions(build_dir: Path, names: set[str], by_name: dict, files: dic
         -> tuple[list[Def], dict[str, UnitScan], set]:
     """(definitions, scans, casts): every definition of the block structs with its record and layout, the
     scans of the units that read them, and the integer fields cast to pointers anywhere in the build."""
+    astcache.configure(build_dir)
     units = typedupes.translation_units(build_dir)
     plan = typedupes.layout_units({n: by_name[n] for n in names if n in by_name}, files, units)
     order = sorted(units)
@@ -923,10 +952,13 @@ def main(argv=None) -> int:
     parser.add_argument("--build-dir", type=Path, default=DEFAULT_BUILD_DIR)
     parser.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--no-astcache", action="store_true", help="run clang on every file instead of sharing dumps")
     parser.add_argument("--write", action="store_true")
     parser.add_argument("--open-issues", action="store_true", help="also check that each listed issue is open")
     parser.add_argument("--gh", default="gh", help="the gh command to run (default gh)")
     args = parser.parse_args(argv)
+    if args.no_astcache:
+        astcache.disable()
     started = time.time()
     result = analyse(args.root, args.build_dir, args.jobs)
     if args.write:

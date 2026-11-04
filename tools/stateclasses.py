@@ -190,6 +190,7 @@ from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import astcache
 import hazards
 import rwsets
 from rwsets import ROOT, Analyzer, Walker, is_pointer, record_name, strip, type_text
@@ -235,7 +236,7 @@ ALLOCATORS = (set(hazards.ALLOCATORS) | {"calloc", "GameAllocIgnoreTag", "GameAl
 TEMPORARIES = ("MaterializeTemporaryExpr", "CXXBindTemporaryExpr")
 PRIMITIVES = {"void", "char", "unsigned char", "signed char", "short", "unsigned short", "int", "unsigned int",
               "long", "unsigned long", "float", "double", "?"}
-LAYOUT_FLAG = ["-Xclang", "-fdump-record-layouts-complete"]
+LAYOUT_FLAG = astcache.LAYOUT_FLAG
 LAYOUT_LINE = re.compile(r"^\s*(\d+)(?::(\d+)-(\d+))? \|( *)(.*?)\s*$")
 RECORD_KEYWORD = re.compile(r"^(struct|union|class|enum)\s+")
 UNKNOWN_RANGE = re.compile(r"^(unknown_|pad)")
@@ -1060,6 +1061,7 @@ def read_logic_addresses(path: Path = GAME_LOGIC) -> set[str]:
 
 def scan_all(build_dir: Path, jobs: int) -> tuple[list[dict], list[dict], int]:
     """The scan of every file under src/, the regions of Game and the number of files compiled."""
+    astcache.configure(build_dir)
     commands = rwsets.compile_commands(build_dir, [])
     regions = canonical_regions(commands[0][1], commands[0][2])
     with ProcessPoolExecutor(max_workers=jobs) as pool:
@@ -1115,7 +1117,10 @@ def main() -> None:
     parser.add_argument("--build-dir", type=Path, default=rwsets.DEFAULT_BUILD_DIR)
     parser.add_argument("--out", type=Path, default=OUT, help="write the rows here instead of the data file")
     parser.add_argument("--jobs", type=int, default=4)
+    parser.add_argument("--no-astcache", action="store_true", help="run clang on every file instead of sharing dumps")
     args = parser.parse_args()
+    if args.no_astcache:
+        astcache.disable()
     sys.setrecursionlimit(100000)
     old = read_rows()
     if args.unclassified:

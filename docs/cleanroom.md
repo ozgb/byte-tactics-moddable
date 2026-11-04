@@ -249,6 +249,33 @@ credential files in the home directory; `/etc/claude-code/managed-settings.json`
 (so a broken scanner can't pass); and no file anywhere in the VM, mounts included, hashes to a
 file of the manifest (files over 64 MiB are skipped and counted).
 
+## The btm gate agent
+
+`tools/gatebtm.py` (the `/gate-btm` skill is a thin layer over it) judges the open pull requests of `ozgb/btm` by behaviour
+and posts one verdict comment on each. The host never builds contributor code.
+
+- **The artifact:** btm's CI, on `pull_request`, uploads an artifact named `module` for the head commit, holding exactly
+  `module.wasm` and `subsystem` (one line, a subsystem name such as `wind_meteors`). The tool takes the newest completed run for
+  the head commit, downloads the zip into a fresh temp directory and accepts it only when it holds those two files (no paths,
+  no other names, `module.wasm` at most 16 MB, `subsystem` at most 64 bytes) and the subsystem is one of `wasm/modules.json`'s
+  modules. Otherwise the pull request is skipped or reported `failed`, and nothing is posted.
+- **Eligibility:** the author has write, maintain or admin permission on btm, or the pull request has the label `gate` (only the
+  human adds it). An ineligible pull request is logged as `#N skipped: not eligible` and nothing more is requested for it.
+- **What it reads:** from the list of open pull requests, the number, the author's login, the label names and the head commit,
+  dropped to those four fields as it is parsed. It never requests a title, description, comment, review, file or diff, and it
+  never reads comments, so a judged pair is kept in a state file (`~/.cache/bt-gate-btm/judged.json`, `--state`) and skipped.
+- **The verdict:** `tools/oraclegate.py` judges the module (`--game-dir`, `--full` are passed on). The comment is built from
+  `result.json`'s fields alone: the verdict, the first differing scenario, tick, phase and field, the counts and the names of
+  the checks that are not equal. No value of either side and no free text goes in.
+- **The token:** REST calls with the scoped btm token only, read at the start of the pass by `broker.read_token` from
+  `--token-file` (default: the broker's `~/.config/bt-cleanroom/btm-token`; a token file readable by group or others is
+  refused). Listing runs and downloading the artifact need Actions read on that token (see "Credentials"). The token goes to the
+  API host only: the redirect to the artifact's storage host is followed without it. The host's `gh` login is never used.
+- **`--dry-run`** judges and prints but posts and records nothing.
+- **`--local MODULE --subsystem NAME`** (tests only) judges a local module by the same path from the download on and prints the
+  summary. It never reads the token and never posts, so `build/modern/wind_meteors.wasm` is judged without anything of this
+  repository reaching btm.
+
 ## Limits
 
 - The proxy checks the server name of the first TLS record and then tunnels the rest without

@@ -83,13 +83,18 @@ void EnsureTable(unsigned kind, ReplayAllocFn alloc)
 {
     const ReplayTableSpec& spec = kReplayTables[kReplayObjectKinds[kind].table - 1];
     unsigned char* root = spec.sim ? (unsigned char*)g_simGlobals : (unsigned char*)g_game;
-    if (root == nullptr || !spec.ref || spec.alloc == 0 || alloc == nullptr || *(const unsigned*)(root + spec.offset) != 0)
+    bool product = spec.count.first.size != 0 && spec.count.second.size != 0;
+    if (root == nullptr || !spec.ref || (spec.alloc == 0 && !product) || alloc == nullptr || *(const unsigned*)(root + spec.offset) != 0)
         return;
-    unsigned size = spec.alloc * kReplayObjectKinds[kind].size;
+    unsigned elements = product ? ReplayLengthOf(spec.count, root) : spec.alloc;
+    if (elements == 0)
+        return;
+    unsigned size = elements * kReplayObjectKinds[kind].size;
     unsigned char* pool = (unsigned char*)alloc(size);
     memset(pool, 0, size);
     *(unsigned*)(root + spec.offset) = (unsigned)(pool - (unsigned char*)SimBlockBase());
-    StoreFactor(spec.count.first, root, spec.alloc);
+    if (!product)
+        StoreFactor(spec.count.first, root, spec.alloc);
 }
 
 int TableIndex(unsigned kind, const void* p)

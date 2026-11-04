@@ -128,6 +128,15 @@ class ReportTest(unittest.TestCase):
     def test_no_drops_passes(self):
         aliases.report_dropped_initialisers([], {})
 
+    def test_the_access_log_callbacks_are_not_references(self):
+        lost = [("src/old.cpp", "_init", ["_a", "___asan_load4", "___asan_memset", "___asan_report_load1"])]
+        self.fails(lost, {("src/old.cpp", "_init"): {"_a", "_memset"}})
+        aliases.IGNORED_REFERENCES = ("asan_",)
+        try:
+            aliases.report_dropped_initialisers(lost, {("src/old.cpp", "_init"): {"_a", "_memset"}})
+        finally:
+            aliases.IGNORED_REFERENCES = ()
+
     def test_allowlist_file_parses(self):
         allowed = aliases.load_initialiser_allowlist()
         self.assertIn("_atexit", allowed[("src/game/economy.cpp", "__GLOBAL__sub_I_economy.cpp")])

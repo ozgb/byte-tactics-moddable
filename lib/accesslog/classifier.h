@@ -1,43 +1,29 @@
 #ifndef ACCESSLOG_CLASSIFIER_H
 #define ACCESSLOG_CLASSIFIER_H
 
-// The four kinds of evidence a classifier counts.
 enum ClassifierEvidence { EVIDENCE_RAW, EVIDENCE_UNWRITTEN, EVIDENCE_UNREAD, EVIDENCE_ORDERED, EVIDENCE_KINDS };
 
-// The writer or reader that stands for `-`.
 const unsigned kNoSub = 0xFFFF;
 
-// The label of a window whose phase the next marker names.
 const unsigned kPendingLabel = 10;
 
-// One counted edge: who wrote, who read, which item, in which phase, what kind of evidence, how often, from which tick.
 struct ClassifierEdge {
     unsigned writer, reader, item, label, evidence, count, firstTick;
 };
 
-// Online classifier of the accesses of a window: per item the last writer, its entity and whether a read followed.
 class Classifier {
 public:
     typedef void* (*AllocFn)(unsigned bytes);
 
-    // Takes the number of items, the edge table's size as a power of two and an allocator of zeroed memory; false if the table is too big for it.
     bool Init(unsigned items, unsigned edgeBits, AllocFn alloc);
-    // Starts a window filed under label; accesses of the window count against it.
     void BeginWindow(unsigned label);
-    // Names the phase of the window in progress, moving the edges counted under kPendingLabel to it.
     void ResolveLabel(unsigned label);
-    // Ends the window: each item whose last write nobody read counts write-unread.
     void EndWindow(unsigned tick);
-    // A read of an item by a subsystem of an entity (two words).
     void Read(unsigned item, unsigned entA, unsigned entB, unsigned sub, unsigned tick);
-    // A write of an item by a subsystem of an entity.
     void Write(unsigned item, unsigned entA, unsigned entB, unsigned sub, unsigned tick);
-    // The next draw or record of a stream (an item id 0 to 3 of the caller's choosing in `stream`) by a subsystem.
     void Ordered(unsigned stream, unsigned item, unsigned sub, unsigned tick);
-    // The slots of the edge table, and the edge in one (false for an empty slot or one moved away).
     unsigned Slots() const { return slots; }
     bool Edge(unsigned slot, ClassifierEdge* out) const;
-    // True if the edge table ran out of room.
     bool Overflowed() const { return overflow; }
 
 private:

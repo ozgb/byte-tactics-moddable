@@ -144,6 +144,72 @@ class FullGateTest(unittest.TestCase):
         self.assertEqual(raised.exception.code, 2)
 
 
+BOTH_MODES = """146 of 146 scenarios equal, total 5:34
+[wasm] block pointers: all covered by data/block_pointers.csv (73 scenarios)
+[native] block pointers: all covered by data/block_pointers.csv (73 scenarios)
+"""
+BOTH_MODES_BAD = """145 of 146 scenarios equal, total 5:34
+[wasm] block pointers: all covered by data/block_pointers.csv (73 scenarios)
+[native] 10 problems with the pointers out of the block; add them to data/block_pointers.csv
+"""
+ROUND_TRIP = """73 of 73 scenarios equal, total 3:02
+block pointers: all covered by data/block_pointers.csv (73 scenarios)
+"""
+
+
+class CommentTextTest(unittest.TestCase):
+    def test_all_equal(self):
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP))
+        self.assertEqual(text, "Full gate on abc1234: 146 of 146 equal (both modes), block pointers: "
+                               "all covered by data/block_pointers.csv in both modes, round trip: 73 of 73 equal")
+        self.assertEqual(fullgate.last_full_run([comment(text, "2026-11-04T10:00:00Z")]), "abc1234")
+
+    def test_pointer_problems_name_the_mode(self):
+        self.assertEqual(fullgate.pointer_result(BOTH_MODES_BAD),
+                         "[wasm] all covered by data/block_pointers.csv; [native] 10 block pointer problems")
+
+    def test_round_trip_divergence_and_exit_status(self):
+        trip = "70 of 73 scenarios equal, total 3:02\n"
+        text = fullgate.comment_text("abc1234", (1, BOTH_MODES_BAD), (1, trip))
+        self.assertIn("145 of 146 equal (both modes)", text)
+        self.assertTrue(text.endswith("round trip: 70 of 73 equal, both modes exit 1, round trip exit 1"))
+
+    def test_a_run_that_did_not_finish(self):
+        text = fullgate.comment_text("abc1234", (1, ""), (0, ROUND_TRIP))
+        self.assertIn("not finished equal (both modes), block pointers: not reported", text)
+
+    def test_round_trip_pointer_problems_are_named(self):
+        trip = "73 of 73 scenarios equal, total 3:02\n2 problems with the pointers out of the block; add them\n"
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (1, trip))
+        self.assertTrue(text.endswith("round trip: 73 of 73 equal (block pointers: 2 block pointer problems), round trip exit 1"))
+
+    def test_single_mode_pointers(self):
+        out = "73 of 73 scenarios equal, total 1:00\nblock pointers: all covered by data/block_pointers.csv (73 scenarios)\n"
+        self.assertEqual(fullgate.pointer_result(out), "all covered by data/block_pointers.csv")
+
+    def test_run_plays_both_checks_and_prints_the_comment(self):
+        played = []
+
+        def fake_play(args, log, what):
+            played.append((what, args))
+            return (0, BOTH_MODES) if what == "both modes" else (0, ROUND_TRIP)
+
+        out = io.StringIO()
+        old = sys.argv
+        sys.argv = ["fullgate.py", "run", "--sha", "abc1234", "--exe", "x.exe", "--game-dir", ""]
+        try:
+            with unittest.mock.patch.object(fullgate, "play", fake_play), unittest.mock.patch.object(
+                    fullgate.shutil, "rmtree"), contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                code = fullgate.main()
+        finally:
+            sys.argv = old
+        self.assertEqual(code, 0)
+        self.assertEqual([what for what, _ in played], ["both modes", "round trip"])
+        self.assertEqual(played[0][1], ["--exe", "x.exe", "--both-modes"])
+        self.assertEqual(played[1][1], ["--exe", "x.exe", "--roundtrip", "auto"])
+        self.assertIn("round trip: 73 of 73 equal", out.getvalue())
+
+
 class GatePathsTest(unittest.TestCase):
     def test_paths_match_the_readme(self):
         text = (fullgate.ROOT / "reference/README.md").read_text()

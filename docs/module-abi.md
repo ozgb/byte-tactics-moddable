@@ -330,6 +330,8 @@ A conforming build runs those checks.
 
 A slot is a function export of the module's wasm instance, named exactly like the interface's slot
 (`UpdateWind`, `SetMeteorParams`). The module's `exports` lists them, in the interface's slot order.
+`SetMeteorParams` takes a `linear` address of a `MeteorParams` record, the params record of the
+`wind_meteors` module.
 
 - **Finding.** The host finds a slot by export name in the module's instance. It never looks one up
   in the table. (The loader keeps the slots in the order of `exports`, and puts free table entries in
@@ -361,6 +363,8 @@ and `handle` is i32; of `f64`, f64; `void` is no result.
 | `block` | a linear address that lies inside the state block, or 0. As a result, the host checks that it lies inside the block |
 | `scratch` | a linear address in the scratch area, where the host put a copy of a native object for this call |
 | `handle` | an opaque u32 (section 8) |
+
+A params record such as `MeteorParams` (the `SetMeteorParams` and `LoadMeteorDefaults` argument) is a `linear` argument: the caller owns the object and the callee reads and writes it in place.
 
 ### 7.1 The pointer rule for Milestone 2
 
@@ -430,6 +434,8 @@ and not in the start function.
 | `g_simGlobals` | the linear address of the simulation globals record, in the block | the module's pointer to the globals record |
 | `g_extTdf` | the 4 bytes `tdf` plus a terminating 0, the extension of TDF data files | building a data path |
 | `g_blockBase` | the linear address of the block's first byte (`block_base`, 1048576 today) | adding to a block offset, section 7.1 |
+
+The `MeteorParams` record is not a data word: it reaches a module as the `linear` argument of a slot (section 6).
 
 The host writes the words directly, not through an import. They are excluded from the hash of
 section 12.

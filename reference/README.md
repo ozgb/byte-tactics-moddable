@@ -639,9 +639,20 @@ periodic run.
 The full `--check` runs on the tip of `moddable` once every 5 merged pull requests that needed the
 gate. `uv run tools/fullgate.py` prints how many have merged since the newest `Full gate on <sha>`
 comment on the tracking issue (#632), and `uv run tools/fullgate.py due` exits 1 at 5 or more. When
-it is due, the lead runs the full `--check` on the tip, without `--tier`, with the play-tests
-(`tools/playtest.py` smoke, full, mp and music), and comments `Full gate on
-<sha>: <n> of <n> equal, block pointers: <result>` on #632, with the play-test results.
+it is due, the lead runs `uv run tools/fullgate.py run` on the tip. It plays the full `--check
+--both-modes --no-cache` (no `--tier`) and then, straight after it on a fresh prefix, `--check --no-cache
+--roundtrip auto`, which saves the block at an early, a middle and the second to last tick of every scenario,
+restores it and carries on, so that state outside the block shows as a divergence from the stored traces. The
+round trip run scans and checks block pointers as the full run does. `run` prints the comment text and posts
+nothing:
+
+```
+Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n> equal
+```
+
+The lead posts it on #632 and adds the play-tests (`tools/playtest.py` smoke, full, mp and music) and their results.
+A run that fails appends `, both modes exit <n>` or `, round trip exit <n>`, and names round trip block pointer
+problems in parentheses after the round trip count.
 
 **A periodic failure is fixed afterwards, not by freezing merges.** The lead files it at once as an
 issue, first in #2's order, with the failing scenario or play-test and the merges since the last pass

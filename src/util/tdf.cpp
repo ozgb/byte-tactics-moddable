@@ -11,6 +11,7 @@
 #include "../../interfaces/services.h"
 #include "tdf.h"
 #include "../harness/replay.h"
+#include "../harness/replay_services.h"
 #include "../state/block.h"
 #include "../state/sim_globals.h"
 #include "../quirks/quirks.h"
@@ -399,7 +400,7 @@ TdfRecord* TdfRecord::FindSubRecord(const char* name)
         if (_strcmpi((*p)->name, name) == 0)
             return call.Result(*p);
     }
-    return call.Result((TdfRecord*)0);
+    return call.Result((TdfRecord*)nullptr);
 }
 
 // FUNCTION: 0x4c44c0
@@ -409,7 +410,7 @@ TdfRecord* TdfRecord::GetSubRecord(int index)
     call.Ptr(this);
     call.Int(index);
     if ((unsigned int)index >= Kids(this).size())
-        return call.Result((TdfRecord*)0);
+        return call.Result((TdfRecord*)nullptr);
     return call.Result(Kids(this).at(index));
 }
 
@@ -426,13 +427,13 @@ char* TdfRecord::GetFieldName(int index)
     call.Ptr(this);
     call.Int(index);
     if (index < 0 || (unsigned int)index >= Rows(this).size())
-        return call.Result((char*)0);
+        return call.Result((char*)nullptr);
     unsigned int i = 0;
     for (std::vector<TdfField>::iterator p = Rows(this).begin(); p < Rows(this).end(); p++, i++) {
         if (i == (unsigned int)index)
             return call.Result(p->key.ptr);
     }
-    return call.Result((char*)0);
+    return call.Result((char*)nullptr);
 }
 
 struct NameLess {
@@ -481,7 +482,7 @@ int TdfRecord::FindFieldValue(char* name)
     char** p = Find(this, name);
     if (p)
         return (int)call.Result(*p);
-    return (int)call.Result((char*)0);
+    return (int)call.Result((char*)nullptr);
 }
 
 // FUNCTION: 0x4c46c0
@@ -775,7 +776,7 @@ char* __stdcall Translate(const char* key)
     ReplayImport call(RI_TRANSLATE);
     call.Ptr(key);
     if (key == nullptr)
-        return call.Result((char*)0);
+        return call.Result((char*)nullptr);
     TranslationTable* c = g_translations;
     if (c == nullptr)
         return call.Result((char*)key);

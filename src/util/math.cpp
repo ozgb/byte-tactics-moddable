@@ -4,6 +4,7 @@
 #include "../../interfaces/host.h"
 #include "../state/sim_globals.h"
 #include "../harness/replay.h"
+#include "../harness/replay_services.h"
 
 #include "../../link/globals.h"
 #include "math.h"

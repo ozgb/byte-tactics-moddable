@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "block.h"
+#include "../harness/replay.h"
+#include "../harness/replay_services.h"
 #include "../../interfaces/host.h"
 #include "../../lib/bitexact/bitexact.h"
 

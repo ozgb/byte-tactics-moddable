@@ -4,6 +4,7 @@
 
 #include "rect.h"
 #include "../harness/replay.h"
+#include "../harness/replay_services.h"
 
 // FUNCTION: 0x4b7e60
 void __stdcall ClipRects(Rect* other, Rect* rect, Rect* bounds)
@@ -571,7 +572,7 @@ void* __stdcall LoadGaf(char* name)
     call.Ptr(name);
     int* base = (int*)HAPI_LoadFile(name, 0);
     if (base == 0)
-        return call.Result((void*)0);
+        return call.Result((void*)nullptr);
 
     for (int i = 0; i < (short)base[1]; i++) {
         Blk* p = (Blk*)((char*)base + base[3 + i]);
@@ -616,7 +617,7 @@ GafSequenceRecord* __stdcall FindGafEntry(GafFileIndex* gaf, const char* name)
                 return call.Result(*p);
         }
     }
-    return call.Result((GafSequenceRecord*)0);
+    return call.Result((GafSequenceRecord*)nullptr);
 }
 
 #include "../debug/debug_lib.h"

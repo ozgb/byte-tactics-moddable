@@ -7,6 +7,7 @@
 
 #include "../../interfaces/services.h"
 #include "../harness/replay.h"
+#include "../harness/replay_services.h"
 #include "../../link/globals.h"
 
 #pragma auto_inline(off)

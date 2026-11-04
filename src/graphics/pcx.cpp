@@ -11,6 +11,7 @@ struct PcxImage {
 #include "../files/files_api.h"
 #include "object3do.h"
 #include "../harness/replay.h"
+#include "../harness/replay_services.h"
 #include "piece_frame.h"
 #include "../debug/debug_lib.h"
 
@@ -460,7 +461,7 @@ void* __stdcall Load3do(char* param)
     call.Ptr(param);
     void* result = HAPI_LoadFile(param, 0);
     if (result == 0) {
-        return call.Result((void*)0);
+        return call.Result((void*)nullptr);
     }
     RelocateObject((int)result, (Object3do*)result);
     return call.Result(result);

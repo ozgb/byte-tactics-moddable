@@ -6,6 +6,7 @@
 #include "../../interfaces/host.h"
 #include "file_printf.h"
 #include "../harness/replay.h"
+#include "../harness/replay_services.h"
 
 int FilePrintf(void* file, const char* fmt, ...)
 {

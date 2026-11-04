@@ -11,13 +11,13 @@ inline int& ReplayCalls()
 
 inline unsigned int& ReplayOwner()
 {
-    static unsigned int owner;
+    static unsigned int owner = 0;
     return owner;
 }
 
 inline unsigned int& ReplayNestedDepth()
 {
-    static unsigned int depth;
+    static unsigned int depth = 0;
     return depth;
 }
 
@@ -47,13 +47,13 @@ typedef bool (*ReplayAnswerFn)(ReplayImport& call);
 
 inline ReplayAnswerFn& ReplayAnswerHook()
 {
-    static ReplayAnswerFn hook;
+    static ReplayAnswerFn hook = nullptr;
     return hook;
 }
 
 inline bool& ReplayAnswerBusy()
 {
-    static bool busy;
+    static bool busy = false;
     return busy;
 }
 

@@ -1,6 +1,7 @@
 #include <vector>
 #include "commands.h"
 #include "../harness/replay.h"
+#include "../harness/replay_services.h"
 
 class CommandEntry;
 

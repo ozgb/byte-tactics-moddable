@@ -3,6 +3,7 @@
 
 #include "../util/tdf.h"
 #include "../harness/replay.h"
+#include "../harness/replay_services.h"
 
 #pragma pack(push, 1)
 #include "game.h"

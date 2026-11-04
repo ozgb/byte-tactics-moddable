@@ -6,11 +6,13 @@
     uv run tools/test_oraclekit.py                          # tests
 
 The kit is the files of CONTENTS (the table below) in their own paths, `layout.json` (the state block
-layout, generated from the modern build's types like tools/layoutasserts.py) and `README.md` (from
+layout, generated from the modern build's types like tools/layoutasserts.py), `wasm/modules.json` (the
+module manifest of the game without the fields that name the source files) and `README.md` (from
 tools/oraclekit/README.md). `MANIFEST.json` lists each file's path, sha256 and size, the commit, the
 `interfaces-v*` and `reference-traces-v*` tags at it and the tool's version. The kit's version is the
 pair of tags; without both on the commit `export` refuses, and with --untagged it writes `"version": null`.
-Any path under FORBIDDEN, and any file the table does not list, is refused with its path named.
+Any path under FORBIDDEN, and any file the table does not list, is refused with its path named, and so is a
+generated file or the fuel pass that still names a source (SOURCE_NAME).
 """
 
 from __future__ import annotations
@@ -32,6 +34,10 @@ MANIFEST = "MANIFEST.json"
 LAYOUT = "layout.json"
 README = "README.md"
 README_SOURCE = "tools/oraclekit/README.md"
+MODULES = "wasm/modules.json"
+FUEL_PASS = "tools/wasm_fuel.py"
+MODULE_SOURCE_FIELDS = ("cxx", "c")
+SOURCE_NAME = re.compile(r"(?<![\w.-])(?:src|include|orig|lib|build|cmake)/|\.(?:cpp|c|h)\b")
 LAYOUT_REFS = "data/layout_refs.csv"
 FORBIDDEN = ("src/", "include/", "orig/", "lib/", "build/", "cmake/")
 TAG_PATTERNS = {"interfaces": re.compile(r"^interfaces-v(\d+)$"),
@@ -54,6 +60,7 @@ CONTENTS = [
     ("file", "docs/scenario-format.md", "the scenario format and the test-mode run"),
     ("dir", "interfaces", "the subsystem interface headers"),
     ("file", "docs/module-abi.md", "the module ABI"),
+    ("file", FUEL_PASS, "the fuel pass of ABI 11, standard library and wasm-tools only"),
     ("dir", "tests/replay", "the stored replay recordings"),
     ("file", "docs/replay-format.md", "the replay format"),
 ]
@@ -204,6 +211,19 @@ def clean_type(text: str) -> str:
     return ANONYMOUS.sub(r"(\1)", text)
 
 
+def unnamed_bits(text: str, type_name: str, base: int = 0) -> list[dict]:
+    """The bit-fields inside an unnamed record type of a layout dump, each as {name, bit, width} from the start of the owning field."""
+    import stateclasses
+    found = stateclasses.layout_fields(text, type_name)
+    out: list[dict] = []
+    for f in (found[1] if found else []):
+        if f.bits:
+            out.append({"name": f.name, "bit": base + f.start * 8 + f.bit_low, "width": f.bit_high - f.bit_low + 1})
+        elif ANONYMOUS.search(f.type):
+            out += unnamed_bits(text, f.type, base + f.start * 8)
+    return out
+
+
 def record_entry(text: str, name: str, size: int) -> dict:
     """{size, bases, vptr, fields} of one record of a clang layout dump; fields have no sizes yet."""
     import stateclasses
@@ -221,6 +241,8 @@ def record_entry(text: str, name: str, size: int) -> dict:
             if f.bits:
                 item["bit_offset"] = f.bit_low
                 item["bit_width"] = f.bit_high - f.bit_low + 1
+            elif ANONYMOUS.search(f.type) and (bits := unnamed_bits(text, f.type)):
+                item["bits"] = bits
             fields.append(item)
     return {"size": size, "bases": bases, "vptr": vptr, "fields": fields}
 
@@ -287,6 +309,28 @@ def generate_layout(root: Path, build_dir: Path, run=None) -> dict:
     return {"layout_version": 1, "records": records, "layout_refs": layout_refs_rows(root)}
 
 
+def kit_modules(data: bytes) -> bytes:
+    """The module manifest of the kit: wasm/modules.json without the fields of a module entry that name its source files."""
+    manifest = json.loads(data)
+    for entry in manifest.get("modules", []):
+        for field in MODULE_SOURCE_FIELDS:
+            entry.pop(field, None)
+    return (json.dumps(manifest, indent=1) + "\n").encode()
+
+
+def names_source(data: bytes) -> list[str]:
+    """What in a text names a source path or file: the matches of SOURCE_NAME."""
+    return sorted({m.group(0) for m in SOURCE_NAME.finditer(data.decode())})
+
+
+def check_names(files: dict[str, bytes]) -> None:
+    """Raise Refusal when the kit's manifest or fuel pass names a source."""
+    for path in (MODULES, FUEL_PASS):
+        found = names_source(files[path]) if path in files else []
+        if found:
+            raise Refusal("refused: %s names the source: %s" % (path, ", ".join(found)))
+
+
 def check_target(out: Path) -> None:
     """Refuse a target that is a file or a directory with something in it."""
     if out.exists() and not out.is_dir():
@@ -302,6 +346,11 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     version = check_tags(tags, untagged)
     files = {p: blob(root, p) for p in paths}
     files[LAYOUT] = (json.dumps(layout, indent=1, sort_keys=False) + "\n").encode()
+    try:
+        files[MODULES] = kit_modules(blob(root, MODULES))
+    except subprocess.CalledProcessError:
+        raise Refusal("refused: %s has no tracked file" % MODULES)
+    check_names(files)
     files[README] = blob(root, README_SOURCE)
     manifest = manifest_of(files, git(root, "rev-parse", "HEAD").strip(), tags, version)
     check_target(out)

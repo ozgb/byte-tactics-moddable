@@ -138,8 +138,12 @@ LOOP_WITH_PARAM = """
 """
 
 
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO_WASM_TOOLS = os.path.join(ROOT, "build", "tools", "bin", "wasm-tools")
+
+
 def wasm_tools():
-    return wf.find_wasm_tools()
+    return wf.find_wasm_tools(REPO_WASM_TOOLS if os.path.exists(REPO_WASM_TOOLS) else None)
 
 
 def assemble(text):
@@ -287,7 +291,7 @@ class Meter(unittest.TestCase):
         self.assertTrue(wf.check_unmetered_surface(self.original, wasm_tools()))
 
     def test_the_manifest_records_the_rule(self):
-        with open(os.path.join(wf.ROOT, "wasm", "modules.json")) as f:
+        with open(os.path.join(ROOT, "wasm", "modules.json")) as f:
             fuel = json.load(f)["fuel"]
         self.assertEqual(fuel, {"rule": wf.RULE, "version": wf.VERSION})
 

@@ -19,6 +19,8 @@ sha256 and size, the commit it was cut from, and the kit's version: the pair of 
 | `interfaces/` | the subsystem interface headers (the seams) | `docs/module-abi.md` |
 | `docs/scenario-format.md` | the scenario format, the test-mode run and its outputs | itself |
 | `docs/module-abi.md` | the module ABI | itself |
+| `wasm/modules.json` | the module manifest of the game: the loader's numbers, the signatures and each module's entry | `docs/module-abi.md`, section 4 |
+| `tools/wasm_fuel.py` | the fuel pass: meters a finished module by the rule of ABI 11, standard library and `wasm-tools` only | `docs/module-abi.md`, section 11 |
 | `tests/replay/` | the stored per-module replay recordings | `docs/replay-format.md` |
 | `layout.json` | the state block layout (below) | `docs/module-abi.md`, sections 7 to 9 |
 
@@ -29,6 +31,16 @@ writes its own sound log, UI log and frames in its test mode and compares them w
 The commands the reference used to write them are in `reference/README.md`, which stays in the source
 repository; the formats are in `docs/sound-log.md`, `docs/frame-dump.md` and `docs/ui-log.md`.
 
+## The manifest and the fuel pass
+
+`wasm/modules.json` is the game's manifest as the loader reads it, with one change: the `cxx` and `c` fields of each
+module entry (the module's source files) are removed, and the export refuses a manifest that still names a source.
+ABI 9.1 requires a module's imports and exports to equal its entry exactly; the entry is the list to build against.
+
+`tools/wasm_fuel.py` is the reference for the rule of ABI 11. `uv run tools/wasm_fuel.py module.wasm -o metered.wasm`
+(or `python3`) applies it to a linked module and needs `wasm-tools` at the version `tools.wasm-tools` of the manifest;
+`--check` tests a metered module's surface. A pass of your own is accepted when the gate accepts the module it makes.
+
 ## No allocator in the ABI
 
 A module uses only block memory the engine allocated. The ABI has no allocator service, and adding one is a
@@ -38,7 +50,9 @@ decision for #180, not for the clean room.
 
 `layout.json` holds, for every struct the state block holds, its size and each field's name, offset, size
 and type (a bit-field has `bit_offset` and `bit_width` in place of a size; `bases` and `vptr` appear when the
-record has them). It ends with the rows of `data/layout_refs.csv` as `layout_refs`.
+record has them). A field whose type is an unnamed union or struct (`WeaponDef::(unnamed)`) lists the bit-fields
+inside it as `bits`: each is `{name, bit, width}`, with `bit` counted from the first bit of the field (`WeaponDef.flags`
+has `meteor` at bit 5). It ends with the rows of `data/layout_refs.csv` as `layout_refs`.
 
 `docs/module-abi.md` names five records by role only. Each carries a `"role"` key in `layout.json`:
 

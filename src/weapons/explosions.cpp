@@ -89,7 +89,7 @@ struct DebrisView {
 #pragma pack(pop)
 
 #include "../../link/globals.h"
-extern int g_explosion0Duration, g_explosion0StartSize, g_explosion0EndSize, g_explosion1Duration, g_explosion1StartSize, g_explosion1EndSize, g_explosion2Duration, g_explosion2StartSize, g_explosion2EndSize;
+static int g_explosion0Duration, g_explosion0StartSize, g_explosion0EndSize, g_explosion1Duration, g_explosion1StartSize, g_explosion1EndSize, g_explosion2Duration, g_explosion2StartSize, g_explosion2EndSize;
 
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"

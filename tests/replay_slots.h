@@ -239,6 +239,18 @@ Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
     return o;
 }
 
+void __stdcall Imp_los_radar_UpdateCellHeightRange(Point16 a0, Point16 a1)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.UpdateCellHeightRange");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 void __stdcall Imp_network_SendShareMapInfo(unsigned char a0, unsigned char a1)
 {
     ReplayText t;
@@ -341,6 +353,49 @@ TargetingSeam g_native_targeting = {
     FindWeaponTarget,
     FindBestTargetIfFireAtWill,
     ChooseWeaponSlot,
+};
+
+MapSeam g_native_map = {
+    GetCellMeanHeight,
+    RefreshAllPassMaps,
+    GetGameTypeSlot,
+    GetNameSlotSlot,
+    VisitObjectsInRange,
+    CanBuildAt,
+    CanPlaceUnitFootprint,
+    BuildAllPassMaps,
+    FreeOtaEnumCacheAndMission,
+    LoadMappingData,
+    LoadMetalPlotmap,
+    LoadPlayerFeaturesPlotmap,
+    SaveMappingData,
+    SaveMetalPlotmap,
+    SavePlayerFeaturesPlotmap,
+    SetMissionType,
+    SnapWorldPosToFootprint,
+    AddUnitToMap,
+    RemoveUnitFromMap,
+    CanPlaceFootprintAt,
+    IsPadSlotFree,
+    PickRandomReclaimableResourcesInRadius,
+    ClearFootprintAndUnlink,
+    ForceNeighborFootprintReclaim,
+    SetYardOpen,
+    SpatialBucketPrependUnitSlot,
+    SpatialBucketUnlinkUnitSlot,
+    RefreshPassMapSlot,
+    AdvanceMissionSlot,
+    GetCampaignNameSlot,
+    GetMissionIndexSlot,
+    GetMissionNameSlot,
+    GetStartPositionSlot,
+    LoadCampaignSlot,
+    LoadMissionByNameSlot,
+    MissionExistsSlot,
+    RefreshMapListSlot,
+    SelectMissionSlot,
+    ComputeMapChecksumSlot,
+    GetTerrainLengthSlot,
 };
 
 void Run_wind_meteors_UpdateWind()
@@ -683,6 +738,184 @@ void After_targeting_ChooseWeapon()
     CompareResult(g_result_targeting_ChooseWeapon);
 }
 
+int g_result_map_GetCellMeanHeight;
+
+void Run_map_GetCellMeanHeight()
+{
+    Vec3 p0;
+    memset(&p0, 0, sizeof p0);
+    ParseStruct("pos", ROK_VEC3, &p0);
+    SetClosing("result");
+    g_result_map_GetCellMeanHeight = g_seams.map->GetCellMeanHeight(&p0);
+}
+
+void After_map_GetCellMeanHeight()
+{
+    CompareResult(g_result_map_GetCellMeanHeight);
+}
+
+void Run_map_RefreshAllPassMaps()
+{
+    Point16 p0 = ArgScalar<Point16>("a");
+    Point16 p1 = ArgScalar<Point16>("b");
+    SetClosing(nullptr);
+    g_seams.map->RefreshAllPassMaps(p0, p1);
+}
+
+int g_result_map_CanBuildAt;
+
+void Run_map_CanBuildAt()
+{
+    UnitDef* p0 = (UnitDef*)ArgObject("unit", ROK_UNITDEF);
+    Point16 p1 = ArgScalar<Point16>("cell");
+    short p2 = ArgScalar<short>("type");
+    Player* p3 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing("result");
+    g_result_map_CanBuildAt = g_seams.map->CanBuildAt(p0, p1, p2, p3);
+}
+
+void After_map_CanBuildAt()
+{
+    CompareResult(g_result_map_CanBuildAt);
+}
+
+int g_result_map_CanPlaceUnitFootprint;
+
+void Run_map_CanPlaceUnitFootprint()
+{
+    UnitDef* p0 = (UnitDef*)ArgObject("unit", ROK_UNITDEF);
+    unsigned short p1 = ArgScalar<unsigned short>("otherTypeId");
+    Point16 p2 = ArgScalar<Point16>("cell");
+    int p3 = ArgScalar<int>("flags");
+    SetClosing("result");
+    g_result_map_CanPlaceUnitFootprint = g_seams.map->CanPlaceUnitFootprint(p0, p1, p2, p3);
+}
+
+void After_map_CanPlaceUnitFootprint()
+{
+    CompareResult(g_result_map_CanPlaceUnitFootprint);
+}
+
+void Run_map_BuildAllPassMaps()
+{
+    SetClosing(nullptr);
+    g_seams.map->BuildAllPassMaps();
+}
+
+Vec3 g_inout_map_SnapWorldPosToFootprint_1;
+bool g_inout_map_SnapWorldPosToFootprint_1_null;
+
+void Run_map_SnapWorldPosToFootprint()
+{
+    UnitDef* p0 = (UnitDef*)ArgObject("unit", ROK_UNITDEF);
+    memset(&g_inout_map_SnapWorldPosToFootprint_1, 0, sizeof g_inout_map_SnapWorldPosToFootprint_1);
+    Vec3* p1 = (Vec3*)ParseInOut("pos", ROK_VEC3, &g_inout_map_SnapWorldPosToFootprint_1);
+    g_inout_map_SnapWorldPosToFootprint_1_null = p1 == nullptr;
+    SetClosing("pos ");
+    g_seams.map->SnapWorldPosToFootprint(p0, p1);
+}
+
+void After_map_SnapWorldPosToFootprint()
+{
+    CompareInOut("pos", ROK_VEC3, g_inout_map_SnapWorldPosToFootprint_1_null ? nullptr : &g_inout_map_SnapWorldPosToFootprint_1);
+}
+
+void Run_map_AddUnitToMap()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.map->AddUnitToMap(p0);
+}
+
+void Run_map_RemoveUnitFromMap()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.map->RemoveUnitFromMap(p0);
+}
+
+int g_result_map_CanPlaceFootprintAt;
+
+void Run_map_CanPlaceFootprintAt()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    Vec3 p1;
+    memset(&p1, 0, sizeof p1);
+    ParseStruct("pos", ROK_VEC3, &p1);
+    SetClosing("result");
+    g_result_map_CanPlaceFootprintAt = g_seams.map->CanPlaceFootprintAt(p0, &p1);
+}
+
+void After_map_CanPlaceFootprintAt()
+{
+    CompareResult(g_result_map_CanPlaceFootprintAt);
+}
+
+int g_result_map_IsPadSlotFree;
+
+void Run_map_IsPadSlotFree()
+{
+    Unit* p0 = (Unit*)ArgObject("pad", ROK_UNIT);
+    int p1 = ArgScalar<int>("id");
+    SetClosing("result");
+    g_result_map_IsPadSlotFree = g_seams.map->IsPadSlotFree(p0, p1);
+}
+
+void After_map_IsPadSlotFree()
+{
+    CompareResult(g_result_map_IsPadSlotFree);
+}
+
+void Run_map_ClearFootprintAndUnlink()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.map->ClearFootprintAndUnlink(p0);
+}
+
+void Run_map_ForceNeighborFootprintReclaim()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.map->ForceNeighborFootprintReclaim(p0);
+}
+
+void Run_map_SetYardOpen()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    int p1 = ArgScalar<int>("open");
+    SetClosing(nullptr);
+    g_seams.map->SetYardOpen(p0, p1);
+}
+
+void Run_map_SpatialBucketPrependUnit()
+{
+    SpatialBucket* p0 = (SpatialBucket*)ArgObject("bucket", ROK_SPATIALBUCKET);
+    int p1 = ArgScalar<int>("unusedEdx");
+    Unit* p2 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.map->SpatialBucketPrependUnit(p0, p1, p2);
+}
+
+void Run_map_SpatialBucketUnlinkUnit()
+{
+    SpatialBucket* p0 = (SpatialBucket*)ArgObject("bucket", ROK_SPATIALBUCKET);
+    int p1 = ArgScalar<int>("unusedEdx");
+    Unit* p2 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.map->SpatialBucketUnlinkUnit(p0, p1, p2);
+}
+
+void Run_map_RefreshPassMap()
+{
+    MovementClass* p0 = (MovementClass*)ArgObject("movementClass", ROK_MOVEMENTCLASS);
+    int p1 = ArgScalar<int>("unusedEdx");
+    Point16 p2 = ArgScalar<Point16>("a");
+    Point16 p3 = ArgScalar<Point16>("b");
+    SetClosing(nullptr);
+    g_seams.map->RefreshPassMap(p0, p1, p2, p3);
+}
+
 void PlayNestedCalls(const char* import)
 {
     NestedScope scope;
@@ -836,6 +1069,70 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_targeting_ChooseWeapon();
         return true;
     }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "GetCellMeanHeight") == 0) {
+        Run_map_GetCellMeanHeight();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "RefreshAllPassMaps") == 0) {
+        Run_map_RefreshAllPassMaps();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "CanBuildAt") == 0) {
+        Run_map_CanBuildAt();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "CanPlaceUnitFootprint") == 0) {
+        Run_map_CanPlaceUnitFootprint();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "BuildAllPassMaps") == 0) {
+        Run_map_BuildAllPassMaps();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "SnapWorldPosToFootprint") == 0) {
+        Run_map_SnapWorldPosToFootprint();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "AddUnitToMap") == 0) {
+        Run_map_AddUnitToMap();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "RemoveUnitFromMap") == 0) {
+        Run_map_RemoveUnitFromMap();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "CanPlaceFootprintAt") == 0) {
+        Run_map_CanPlaceFootprintAt();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "IsPadSlotFree") == 0) {
+        Run_map_IsPadSlotFree();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "ClearFootprintAndUnlink") == 0) {
+        Run_map_ClearFootprintAndUnlink();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "ForceNeighborFootprintReclaim") == 0) {
+        Run_map_ForceNeighborFootprintReclaim();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "SetYardOpen") == 0) {
+        Run_map_SetYardOpen();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "SpatialBucketPrependUnit") == 0) {
+        Run_map_SpatialBucketPrependUnit();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "SpatialBucketUnlinkUnit") == 0) {
+        Run_map_SpatialBucketUnlinkUnit();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "RefreshPassMap") == 0) {
+        Run_map_RefreshPassMap();
+        return true;
+    }
     return false;
 }
 
@@ -865,6 +1162,18 @@ void RunAfter(const char* subsystem, const char* slot)
         After_targeting_FindBestTargetIfFireAtWill();
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "ChooseWeapon") == 0)
         After_targeting_ChooseWeapon();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "GetCellMeanHeight") == 0)
+        After_map_GetCellMeanHeight();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "CanBuildAt") == 0)
+        After_map_CanBuildAt();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "CanPlaceUnitFootprint") == 0)
+        After_map_CanPlaceUnitFootprint();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "SnapWorldPosToFootprint") == 0)
+        After_map_SnapWorldPosToFootprint();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "CanPlaceFootprintAt") == 0)
+        After_map_CanPlaceFootprintAt();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "IsPadSlotFree") == 0)
+        After_map_IsPadSlotFree();
 }
 
 WeaponsSeam g_import_weapons;
@@ -880,6 +1189,7 @@ void BindSeams()
     g_seams.wind_meteors = &g_native_wind_meteors;
     g_seams.economy = &g_native_economy;
     g_seams.targeting = &g_native_targeting;
+    g_seams.map = &g_native_map;
     g_seams.weapons = &g_import_weapons;
     g_import_weapons.SpawnProjectile = Imp_weapons_SpawnProjectile;
     g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
@@ -901,6 +1211,7 @@ void BindSeams()
     g_import_units.GetSweetSpot = Imp_units_GetSweetSpot;
     g_seams.los_radar = &g_import_los_radar;
     g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+    g_import_los_radar.UpdateCellHeightRange = Imp_los_radar_UpdateCellHeightRange;
     g_seams.network = &g_import_network;
     g_import_network.SendShareMapInfo = Imp_network_SendShareMapInfo;
     g_seams.players = &g_import_players;

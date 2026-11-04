@@ -1193,7 +1193,6 @@ harness,ai,shared_write,Game::playerIndex,1
 harness,ai,shared_write,LosRadarSeam::GetMapCell,1
 harness,ai,shared_write,LosRadarSeam::IsUnitVisibleToPlayer,1
 harness,ai,shared_write,MapSeam::CanPlaceUnitFootprint,1
-harness,ai,shared_write,MapSeam::GetGameType,1
 harness,ai,shared_write,OrdersSeam::DeleteOrders,1
 harness,ai,shared_write,OrdersSeam::GetOrderFlags,1
 harness,ai,shared_write,OrdersSeam::IssueAttackOrder,1
@@ -1232,7 +1231,6 @@ harness,features,shared_write,Game::difficulty,2
 harness,features,shared_write,Game::playerIndex,1
 harness,features,shared_write,LosRadarSeam::GetMapCell,13
 harness,features,shared_write,MapSeam::GetCellMeanHeight,1
-harness,features,shared_write,MapSeam::GetGameType,2
 harness,features,shared_write,MapSeam::RefreshAllPassMaps,2
 harness,features,shared_write,NetworkSeam::SendFeatureBurning,1
 harness,features,shared_write,NetworkSeam::SendFeatureHit,1
@@ -1297,7 +1295,6 @@ harness,game,shared_write,LosRadarSeam::ClampWorldPosToTerrain,2
 harness,game,shared_write,LosRadarSeam::ExpireEyeballs,1
 harness,game,shared_write,LosRadarSeam::GetMapCell,2
 harness,game,shared_write,LosRadarSeam::RecalculateLineOfSight,3
-harness,game,shared_write,MapSeam::GetGameType,12
 harness,game,shared_write,MapSeam::SnapWorldPosToFootprint,2
 harness,game,shared_write,PlayerInfo::energy,2
 harness,game,shared_write,PlayerInfo::metal,2
@@ -1336,7 +1333,6 @@ harness,los_radar,shared_write,Game::playerIndex,14
 harness,los_radar,shared_write,LosRadarSeam::RecalculateLineOfSight,2
 harness,los_radar,shared_write,LosRadarSeam::RecordRadarMapped,1
 harness,los_radar,shared_write,LosRadarSeam::RecordRadarUnits,1
-harness,los_radar,shared_write,MapSeam::VisitObjectsInRange,1
 harness,los_radar,shared_write,NetworkSeam::BroadcastPlayerInfo,3
 harness,los_radar,shared_write,Seams::ai,2
 harness,los_radar,shared_write,Seams::features,2
@@ -1387,12 +1383,9 @@ harness,orders,shared_write,LosRadarSeam::UpdateUnitLineOfSight,1
 harness,orders,shared_write,MapSeam::AddUnitToMap,1
 harness,orders,shared_write,MapSeam::CanPlaceFootprintAt,1
 harness,orders,shared_write,MapSeam::CanPlaceUnitFootprint,5
-harness,orders,shared_write,MapSeam::GetGameType,1
 harness,orders,shared_write,MapSeam::IsPadSlotFree,2
-harness,orders,shared_write,MapSeam::PickRandomReclaimableResourcesInRadius,2
 harness,orders,shared_write,MapSeam::RemoveUnitFromMap,1
 harness,orders,shared_write,MapSeam::SnapWorldPosToFootprint,2
-harness,orders,shared_write,MapSeam::VisitObjectsInRange,3
 harness,orders,shared_write,NetworkSeam::SendFeatureReclaimed,1
 harness,orders,shared_write,NetworkSeam::SendScriptCall,3
 harness,orders,shared_write,NetworkSeam::SendScriptCallByName,1
@@ -1509,8 +1502,6 @@ harness,players,shared_write,LosRadarSeam::UpdateSensorRadarAndCloak,1
 harness,players,shared_write,LosRadarSeam::UpdateUnitLineOfSight,2
 harness,players,shared_write,MapSeam::CanPlaceUnitFootprint,1
 harness,players,shared_write,MapSeam::GetCellMeanHeight,1
-harness,players,shared_write,MapSeam::GetGameType,8
-harness,players,shared_write,MapSeam::VisitObjectsInRange,1
 harness,players,shared_write,NetworkSeam::BroadcastPlayerEconomy,1
 harness,players,shared_write,NetworkSeam::BroadcastPlayerInfo,1
 harness,players,shared_write,NetworkSeam::SendOwnershipTransfer,1
@@ -1616,16 +1607,13 @@ harness,seams,shared_write,MapSeam::CanPlaceFootprintAt,1
 harness,seams,shared_write,MapSeam::CanPlaceUnitFootprint,1
 harness,seams,shared_write,MapSeam::ClearFootprintAndUnlink,1
 harness,seams,shared_write,MapSeam::GetCellMeanHeight,1
-harness,seams,shared_write,MapSeam::GetGameType,1
 harness,seams,shared_write,MapSeam::IsPadSlotFree,1
-harness,seams,shared_write,MapSeam::PickRandomReclaimableResourcesInRadius,1
 harness,seams,shared_write,MapSeam::RefreshAllPassMaps,1
 harness,seams,shared_write,MapSeam::RefreshPassMap,1
 harness,seams,shared_write,MapSeam::RemoveUnitFromMap,1
 harness,seams,shared_write,MapSeam::SnapWorldPosToFootprint,1
 harness,seams,shared_write,MapSeam::SpatialBucketPrependUnit,1
 harness,seams,shared_write,MapSeam::SpatialBucketUnlinkUnit,1
-harness,seams,shared_write,MapSeam::VisitObjectsInRange,1
 harness,seams,shared_write,NetworkSeam::BroadcastPlayerEconomy,1
 harness,seams,shared_write,NetworkSeam::BroadcastPlayerInfo,1
 harness,seams,shared_write,NetworkSeam::SendActivateFlags,1
@@ -1788,7 +1776,6 @@ harness,units,shared_write,LosRadarSeam::UpdateUnitLineOfSight,2
 harness,units,shared_write,MapSeam::AddUnitToMap,4
 harness,units,shared_write,MapSeam::CanPlaceUnitFootprint,1
 harness,units,shared_write,MapSeam::ClearFootprintAndUnlink,1
-harness,units,shared_write,MapSeam::GetGameType,1
 harness,units,shared_write,MapSeam::RefreshPassMap,2
 harness,units,shared_write,MapSeam::RemoveUnitFromMap,2
 harness,units,shared_write,MapSeam::SpatialBucketPrependUnit,1
@@ -4552,16 +4539,13 @@ seams,harness,shared_write,MapSeam::CanPlaceFootprintAt,2
 seams,harness,shared_write,MapSeam::CanPlaceUnitFootprint,2
 seams,harness,shared_write,MapSeam::ClearFootprintAndUnlink,2
 seams,harness,shared_write,MapSeam::GetCellMeanHeight,2
-seams,harness,shared_write,MapSeam::GetGameType,2
 seams,harness,shared_write,MapSeam::IsPadSlotFree,2
-seams,harness,shared_write,MapSeam::PickRandomReclaimableResourcesInRadius,2
 seams,harness,shared_write,MapSeam::RefreshAllPassMaps,2
 seams,harness,shared_write,MapSeam::RefreshPassMap,2
 seams,harness,shared_write,MapSeam::RemoveUnitFromMap,2
 seams,harness,shared_write,MapSeam::SnapWorldPosToFootprint,3
 seams,harness,shared_write,MapSeam::SpatialBucketPrependUnit,2
 seams,harness,shared_write,MapSeam::SpatialBucketUnlinkUnit,2
-seams,harness,shared_write,MapSeam::VisitObjectsInRange,2
 seams,harness,shared_write,NetworkSeam::BroadcastPlayerEconomy,2
 seams,harness,shared_write,NetworkSeam::BroadcastPlayerInfo,2
 seams,harness,shared_write,NetworkSeam::SendActivateFlags,2

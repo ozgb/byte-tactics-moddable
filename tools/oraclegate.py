@@ -8,7 +8,8 @@ starts the game on a short scenario to see whether the loader accepts the module
 `tools/reference.py --check --tier` (`--full`: the full `--check`) and `tools/replay.py --check --subsystem NAME` on that
 runtime. It writes DIR/result.json, built from the parsed fields of those tools' reports and nothing else: for each scenario
 and recording, `equal` or the first divergence (tick, phase, field name, the module's value), the kit version and the
-module's sha256. The reference's values never reach it. The raw reports stay in DIR/logs/, which is for the host only.
+module's sha256. A failure of another check of the run is `other_checks: failed`, with `reason: block-pointer` when it is
+the block pointer check, which judges the harness's scan and not the module's behaviour. The reference's values never reach it. The raw reports stay in DIR/logs/, which is for the host only.
 
 Exit status: 0 when every scenario and recording is equal, 1 when one differs or failed to run, 2 when the loader refused
 the module or the arguments were wrong.
@@ -41,6 +42,7 @@ DIVERGENCE_FOR = re.compile(r"tracediff for (\S+): a = ")
 DIVERGENCE_AT = re.compile(r"first divergence: tick (\d+), phase (\S+)$")
 DIVERGENCE_FIELD = re.compile(r"first differing field: (\S+): a=(.*?) b=(.*)$")
 FAILED_TO_RUN = re.compile(r"(\S+): failed to run")
+BLOCK_POINTER_SUMMARY = re.compile(r"(?:\[\w+\] )?\d+ problems with the pointers out of the block")
 
 
 class Error(Exception):
@@ -176,6 +178,8 @@ def parse_suite(output: str, exit_code: int, expected: list[str]) -> dict[str, d
                 verdicts[name] = {"status": "failed"}
     elif all(v["status"] == "equal" for v in verdicts.values()):
         verdicts["other_checks"] = {"status": "failed"}
+        if any(BLOCK_POINTER_SUMMARY.match(line) for line in output.splitlines()):
+            verdicts["other_checks"]["reason"] = "block-pointer"
     return verdicts
 
 
@@ -254,7 +258,7 @@ def judge(module: Path, subsystem: str, full: bool, build: Path, out: Path, game
 def summary(result: dict) -> str:
     if result["verdict"] == "refused":
         return "refused: " + result["message"].splitlines()[0]
-    bad = [f"{n}: {v['status']}" for n, v in {**result["scenarios"], **result["recordings"]}.items() if v["status"] != "equal"]
+    bad = [f"{n}: {v['status']}" + (f" ({v['reason']})" if "reason" in v else "") for n, v in {**result["scenarios"], **result["recordings"]}.items() if v["status"] != "equal"]
     return f"{result['verdict']} ({len(bad)} not equal)" + "".join("\n  " + b for b in bad)
 
 

@@ -722,7 +722,7 @@ uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out 
 | `kit` | `interfaces` and `reference_traces`: the newest `interfaces-v*` and `reference-traces-v*` tags |
 | `seconds` | wall time of the run |
 | `message` | with `refused`: the problems `check-module` found or the loader's message, and no `scenarios` or `recordings` |
-| `scenarios` | by scenario name: `status` and, for `differs`, `tick`, `phase`, `field` and `value` |
+| `scenarios` | by scenario name: `status` and, for `differs`, `tick`, `phase`, `field` and `value`; an `other_checks` entry (`failed`) when every scenario is equal and another check of the run failed, with `reason` `block-pointer` when it was the block pointer check: a fault of the harness's scan of the shared state block, not of the module |
 | `recordings` | by `<subsystem>/<recording>`: `status` and, for `differs`, `line`, `tick`, `phase` (the slot), `kind`, `field` and `value` |
 
 A `status` is `equal`, `differs`, `failed` (the scenario did not run to its end) or `not_judged` (the run stopped at the first

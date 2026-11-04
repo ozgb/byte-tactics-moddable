@@ -552,7 +552,8 @@ def offset_starts(offsets: str) -> set[str]:
 
 def merge_kept(rows: list[dict], old: list[dict]) -> list[dict]:
     """The rows with the class and note the old file had for the same row_key. A pair row with none (its target
-    was renamed) takes them from the old rows of its holder with an offset in common, when those agree."""
+    was renamed) takes them from the old rows of its holder with the same offsets, else with an offset in common,
+    when those agree."""
     kept = {row_key(r): r for r in old}
     by_holder: dict[str, list[tuple[set[str], dict]]] = {}
     for r in old:
@@ -562,7 +563,8 @@ def merge_kept(rows: list[dict], old: list[dict]) -> list[dict]:
         before = kept.get(row_key(row))
         if not before and not is_wild(row):
             starts = offset_starts(row["offsets"])
-            same = [r for s, r in by_holder.get(row["holder"], []) if s & starts]
+            held = by_holder.get(row["holder"], [])
+            same = [r for s, r in held if s == starts] or [r for s, r in held if s & starts]
             if same and len({tuple(r[c] for c in KEPT) for r in same}) == 1:
                 before = same[0]
         if before:

@@ -256,6 +256,17 @@ class KeptTest(unittest.TestCase):
                              row("G", "New", "0x4", cls="", note="")], old)
         self.assertEqual([(r["class"], r["note"]) for r in new], [("not-a-pointer", "n"), ("", ""), ("", "")])
 
+    def test_merge_kept_prefers_identical_offsets(self):
+        old = [row("H", "A", "0x4 0x8", cls="outside", note="a"), row("H", "B", "0x8", cls="moves-in", note="b")]
+        new = bp.merge_kept([row("H", "New", "0x4 0x8", cls="", note="")], old)
+        self.assertEqual([(r["class"], r["note"]) for r in new], [("outside", "a")])
+
+    def test_merge_kept_disagreeing_identical_offsets_carry_nothing(self):
+        old = [row("H", "A", "0x4 0x8", cls="outside", note="a"), row("H", "B", "0x4 0x8", cls="moves-in", note="b"),
+               row("H", "C", "0x4", cls="outside", note="a")]
+        new = bp.merge_kept([row("H", "New", "0x4 0x8", cls="", note="")], old)
+        self.assertEqual([(r["class"], r["note"]) for r in new], [("", "")])
+
     def test_differences_ignore_kept(self):
         a = [row("H", "T", cls="outside")]
         b = [row("H", "T", cls="")]

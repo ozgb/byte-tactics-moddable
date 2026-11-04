@@ -38,6 +38,7 @@ A slot annotated `"record": false` with a `"reason"` is classified and unrecorde
 import argparse
 import copy
 import csv
+import functools
 import json
 import os
 import re
@@ -99,11 +100,12 @@ def read_assignment(path: Path = SUBSYSTEMS) -> dict[str, list[str]]:
 
 
 def merge_fixtures(ann: dict, fixtures: dict) -> dict:
-    """The annotations with the test-only kinds of tests/replay_fixtures.json added: its includes, game fields and kinds come last, and `inside` adds sites to a kind."""
+    """The annotations with the test-only kinds of tests/replay_fixtures.json added: its includes, game fields and kinds come last, `inside` adds sites to a kind, and its `fixtures` are the slots the replayer's self-tests call."""
     merged = copy.deepcopy(ann)
     merged["includes"] += [i for i in fixtures.get("includes", []) if i not in merged["includes"]]
     merged["game_fields"].update(fixtures.get("game_fields", {}))
     merged["objects"].update(copy.deepcopy(fixtures.get("objects", {})))
+    merged["fixtures"] = copy.deepcopy(fixtures.get("fixtures", {}))
     for kind, sites in fixtures.get("inside", {}).items():
         have = merged["objects"][kind].setdefault("inside", [])
         have += [x for x in sites if x not in have]
@@ -913,8 +915,71 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
     return out
 
 
-ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "callback", "pending"}
+ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "vector", "callback", "pending"}
+STATE_PATH = re.compile(r"^Game(\.[A-Za-z_]\w*)+$")
+
+
+@functools.lru_cache(maxsize=None)
+def game_members() -> frozenset[str]:
+    return frozenset(l["name"] for l in traceschema.Schema().layout("Game")[0])
+
+
+def arg_type(a: dict) -> str:
+    """The type the modes of an argument see: its `cast` when it has one, else its own."""
+    return a.get("cast") or a["type"]
+
+
+def vector_type(ctype: str) -> str:
+    return "std::vector<%s, std::allocator<%s> >*" % (ctype, ctype)
+
+
+def length_parts(a: dict, i: int) -> tuple[list[str], str]:
+    """The statements and the C++ expression of the byte length of argument i: another argument, or a path through Game, times `elem`."""
+    scale = SIZES[a["elem"]] if a.get("elem") else 1
+    if not STATE_PATH.match(str(a["length"])):
+        base = "a%d" % a["lengthIndex"]
+        return [], base if scale == 1 else "(%s * %d)" % (base, scale)
+    steps = a["length"].split(".")[1:]
+    lines = ["const auto* l%d_0 = ReplayStep(g_game);" % i]
+    for k, member in enumerate(steps[:-1], 1):
+        lines.append("const auto* l%d_%d = l%d_%d != nullptr ? ReplayStep(l%d_%d->%s) : nullptr;" % (i, k, i, k - 1, i, k - 1, member))
+    last = len(steps) - 1
+    lines.append("int len%d = l%d_%d != nullptr ? (int)l%d_%d->%s : 0;" % (i, i, last, i, last, steps[-1]))
+    return lines, "len%d" % i if scale == 1 else "(len%d * %d)" % (i, scale)
 RESULT_MODES = {"scalar", "object", "text", "weapon", "value", "pending"}
+
+
+CAST_MODES = {"object", "struct", "structs", "vec3"}
+
+
+def check_vector_arg(where: str, a: dict, label: str, kinds: dict, errors: list[str]) -> None:
+    """A vector argument is an out vector of value structs: `elem` names the value kind, and the argument is the std::vector of its type."""
+    elem = a.get("elem")
+    if a.get("dir") != "out":
+        errors.append("%s: %s is a vector, and only a vector out is recorded (`dir`: out)" % (where, label))
+    if not isinstance(elem, dict) or elem.get("mode") != "value":
+        errors.append("%s: %s needs an `elem` of mode value" % (where, label))
+        return
+    spec = kinds.get(elem.get("kind"))
+    if spec is None or spec["scope"] != "value":
+        errors.append("%s: the element of %s needs a `kind` that is a value kind of the schema" % (where, label))
+    elif arg_type(a) != vector_type(spec["type"]):
+        errors.append("%s: %s is %s, and a vector of the kind %s is %s" % (where, label, arg_type(a), elem["kind"], vector_type(spec["type"])))
+
+
+def check_length(where: str, a: dict, label: str, args: list[dict], errors: list[str]) -> None:
+    """The length of a byte buffer names another integer argument, or a path through Game (`Game.net.unitCount`); `elem` scales it."""
+    length = a.get("length")
+    names = [x["name"] for x in args]
+    if STATE_PATH.match(str(length)):
+        if str(length).split(".")[1] not in game_members():
+            errors.append("%s: the length %s of %s starts at %s, which is no member of Game" % (where, length, label, length.split(".")[1]))
+    elif length not in names or length == a["name"]:
+        errors.append("%s: %s needs a `length` that names another argument or a path through Game" % (where, label))
+    elif args[names.index(length)]["type"] not in INTEGER_ARGS:
+        errors.append("%s: the length %s of %s is no integer" % (where, length, a["name"]))
+    if "elem" in a and a["elem"] not in SIZES:
+        errors.append("%s: the `elem` of %s is one of %s" % (where, label, ", ".join(sorted(SIZES))))
 
 
 def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) -> list[str]:
@@ -927,8 +992,8 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
         spec = kinds.get(item.get("kind"))
         if spec is None or spec["scope"] != "value":
             errors.append("%s: %s needs a `kind` that is a value kind of the schema" % (where, label))
-        elif item["type"] != spec["type"] + ("*" if pointer else ""):
-            errors.append("%s: %s is %s, and the kind %s is %s" % (where, label, item["type"], item["kind"], spec["type"] + ("*" if pointer else "")))
+        elif arg_type(item) != spec["type"] + ("*" if pointer else ""):
+            errors.append("%s: %s is %s, and the kind %s is %s" % (where, label, arg_type(item), item["kind"], spec["type"] + ("*" if pointer else "")))
 
     def poly_kind(item: dict, label: str) -> None:
         spec = kinds.get(item.get("kind"))
@@ -942,12 +1007,25 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
         label = "the argument %s" % a["name"]
         if a["mode"] == "object":
             poly_kind(a, label)
+        if "cast" in a:
+            if a["type"] != "void*":
+                errors.append("%s: %s is %s, and only a void* argument takes a `cast`" % (where, label, a["type"]))
+            elif not str(a["cast"]).endswith("*") or a["cast"] == "void*":
+                errors.append("%s: the `cast` of %s is a pointer type other than void*" % (where, label))
+            elif a["mode"] not in CAST_MODES:
+                errors.append("%s: %s has a `cast` and the mode %s, and a cast is for %s" % (where, label, a["mode"], ", ".join(sorted(CAST_MODES))))
         if a["mode"] not in ARG_MODES:
             errors.append("%s: %s has the unknown mode %s" % (where, label, a["mode"]))
         elif a["mode"] == "struct":
             value_kind(a, label, True)
-            if a.get("nullable") and a.get("dir", "in") != "in":
-                errors.append("%s: %s is an out struct, and only a struct in can be nullable" % (where, label))
+            if a.get("dir", "in") not in ("in", "out", "inout"):
+                errors.append("%s: %s has the direction %s, and a struct is in, out or inout" % (where, label, a["dir"]))
+            elif a.get("nullable") and a.get("dir", "in") == "out":
+                errors.append("%s: %s is an out struct, and only a struct in or inout can be nullable" % (where, label))
+        elif a["mode"] == "vector":
+            check_vector_arg(where, a, label, kinds, errors)
+        elif a["mode"] in ("bytes-in", "bytes-out"):
+            check_length(where, a, label, args, errors)
         elif a["mode"] == "structs":
             value_kind(a, label, True)
             if a.get("dir", "in") != "in":
@@ -1798,7 +1876,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     ret = s["ret"]
     names = [a["name"] for a in s["args"]]
     for a in s["args"]:
-        if a.get("length"):
+        if a.get("length") in names:
             a["lengthIndex"] = names.index(a["length"])
         if a.get("count") in names:
             a["countIndex"] = names.index(a["count"])
@@ -1817,6 +1895,9 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     if is_import or nest:
         for i in callback_args:
             L.append("    ReplayCallbackScope cb%d;" % i)
+        for i, a in enumerate(s["args"]):
+            if a["mode"] in ("bytes-in", "bytes-out"):
+                L += ["    " + x for x in length_parts(a, i)[0]]
         L.append("    ReplayText line;")
         if is_import and nest:
             condition = "scope.Import() || scope.Nested()"
@@ -1848,11 +1929,15 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             L.append("        line.AddText(cb%d.Lines());" % i)
         for i, a in enumerate(s["args"]):
             if a["mode"] == "bytes-out":
-                L.append('        ImportOutBytes(line, "%s", a%d, (int)result, a%d);' % (a["line"], i, a["lengthIndex"]))
+                L.append('        ImportOutBytes(line, "%s", a%d, (int)result, %s);' % (a["line"], i, length_parts(a, i)[1]))
             elif a["mode"] == "vec3" and a.get("dir") == "out":
-                L.append('        ImportOutVec3(line, "%s", a%d);' % (a["line"], i))
+                L.append('        ImportOutVec3(line, "%s", %s);' % (a["line"], arg_var(a, i)))
             elif a["mode"] == "units":
                 L.append('        ImportOutUnits(line, "%s", a%d, kReplayReachFields + %d, %d);' % (a["line"], i, a["reachFirst"], a["reachCount"]))
+            elif a["mode"] == "vector":
+                L.append('        ImportOutValues(line, "%s", ROK_%s, a%d);' % (a["line"], upper(a["elem"]["kind"]), i))
+            elif a["mode"] == "struct" and a.get("dir") == "inout":
+                L.append('        ImportOutInOut(line, "%s", ROK_%s, %s);' % (a["line"], upper(a["kind"]), arg_var(a, i)))
         L.append("        FinishImport(line);")
         L.append("    }")
     if nest:
@@ -1883,9 +1968,14 @@ def raw_type(s: dict, i: int) -> str:
     return s["rawParams"][i] if "rawParams" in s else s["args"][i]["type"]
 
 
+def arg_var(a: dict, i: int) -> str:
+    """The generated parameter i as the modes of its argument see it: cast to its `cast` type when it has one."""
+    return "((%s)a%d)" % (a["cast"], i) if a.get("cast") else "a%d" % i
+
+
 def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
     """Lines of C++ recording argument i. phase: 'a' outer entry, 'i' import line, 'o' outer exit."""
-    mode, var, line = a["mode"], "a%d" % i, a["line"]
+    mode, var, line = a["mode"], arg_var(a, i), a["line"]
     out = phase == "o"
     if mode == "scalar" or mode == "stream":
         if phase == "a":
@@ -1908,6 +1998,12 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "i":
             return ["ImportObject(line, ROK_%s, %s);" % (upper(a["kind"]), var)]
     elif mode == "struct":
+        if a.get("dir") == "inout":
+            if phase == "a":
+                return ['ArgInOut(s_call, "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
+            if phase == "i":
+                return ["ImportInOut(line, ROK_%s, %s);" % (upper(a["kind"]), var)]
+            return ['ArgInOutExit(s_tail, "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
         if a.get("dir", "in") == "in" and phase == "a":
             return ['ArgStruct(s_call, "a", "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
         if a.get("dir") == "out" and phase == "o":
@@ -1938,7 +2034,7 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
             return ['ArgVec3(s_call, "%s", %s);' % (line, var)]
         if phase == "i":
             return ['ImportVec3%s(line, "%s", %s);' % ("Xz" if a.get("axes") == "xz" else "", a.get("label", line), var)]
-    elif mode == "units":
+    elif mode == "units" or mode == "vector":
         return []
     elif mode == "callback":
         if phase == "i":
@@ -1947,7 +2043,7 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "a":
             return ['ArgPending(s_call, "%s");' % line]
         if phase == "i":
-            return ["ImportBytes(line, %s, %s);" % (var, "a%d" % a["lengthIndex"])]
+            return ["ImportBytes(line, %s, %s);" % (var, length_parts(a, i)[1])]
     elif mode == "bytes-out":
         if phase == "a":
             return ['ArgPending(s_call, "%s");' % line]
@@ -2033,7 +2129,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") == "out" for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -2091,12 +2187,15 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
     params = ", ".join("%s a%d" % (s["params"][i], i) for i in range(len(s["args"])))
     names = [a["name"] for a in s["args"]]
     for a in s["args"]:
-        if a.get("length"):
+        if a.get("length") in names:
             a["lengthIndex"] = names.index(a["length"])
     L = ["%s %s Imp_%s_%s(%s)" % (s["ret"], s["conv"], seam, slot, params), "{"]
     L += ["    ReplayText t;", '    StartImport(t, "%s.%s");' % (seam, slot)]
     for i, a in enumerate(s["args"]):
-        m, v = a["mode"], "a%d" % i
+        if a["mode"] in ("bytes-in", "bytes-out"):
+            L += ["    " + x for x in length_parts(a, i)[0]]
+    for i, a in enumerate(s["args"]):
+        m, v = a["mode"], arg_var(a, i)
         if m in ("scalar", "stream"):
             L.append("    Space(t);\n    ReplayValue(t, %s);" % v)
         elif m == "text":
@@ -2107,8 +2206,10 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append("    Space(t);\n    ReplayAddWeapon(t, %s);" % v)
         elif m == "vec3" and a.get("dir") == "out":
             pass
-        elif m == "units":
+        elif m == "units" or m == "vector":
             pass
+        elif m == "struct" and a.get("dir") == "inout":
+            L.append("    Space(t);\n    AddInOut(t, ROK_%s, %s);" % (upper(a["kind"]), v))
         elif m == "vec3":
             L.append('    Space(t);\n    t.Add("%s=");\n    AddVec3%s(t, %s);' % (a.get("label", a["line"]), "Xz" if a.get("axes") == "xz" else "", v))
         elif m == "callback":
@@ -2116,7 +2217,7 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
         elif m == "object":
             L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), v))
         elif m == "bytes-in":
-            L.append("    Space(t);\n    AddBytes(t, %s, a%d);" % (v, a["lengthIndex"]))
+            L.append("    Space(t);\n    AddBytes(t, %s, %s);" % (v, length_parts(a, i)[1]))
         elif m == "value":
             L.append("    Space(t);\n    AddValueStruct(t, ROK_%s, &%s);" % (upper(a["kind"]), v))
         else:
@@ -2127,11 +2228,15 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append('    PlayCallbacks_%s(a%d, OBJ_CALLBACK + RCB_%s, "%s.%s");' % (a["callback"], i, upper(a["callback"]), seam, slot))
     for i, a in enumerate(s["args"]):
         if a["mode"] == "bytes-out":
-            L.append('    ApplyBytes(a%d, a%d, "%s");' % (i, a["lengthIndex"], a["line"]))
+            L.append('    ApplyBytes(a%d, %s, "%s");' % (i, length_parts(a, i)[1], a["line"]))
         elif a["mode"] == "vec3" and a.get("dir") == "out":
-            L.append('    ApplyVec3(a%d, "%s");' % (i, a["line"]))
+            L.append('    ApplyVec3(%s, "%s");' % (arg_var(a, i), a["line"]))
         elif a["mode"] == "units":
             L.append('    ApplyUnits(a%d, "%s");' % (i, a["line"]))
+        elif a["mode"] == "vector":
+            L.append('    ApplyValues(a%d, "%s", ROK_%s);' % (i, a["line"], upper(a["elem"]["kind"])))
+        elif a["mode"] == "struct" and a.get("dir") == "inout":
+            L.append('    ApplyInOut(%s, "%s", ROK_%s);' % (arg_var(a, i), a["line"], upper(a["kind"])))
     res = s["result"]
     if res is None:
         L.append("    (void)r;")
@@ -2181,11 +2286,20 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
             L.append("    %s* %s = (%s*)ArgHandle(\"%s\");" % (handle_type(a["kind"]), v, handle_type(a["kind"]), line))
             call.append(v)
         elif m == "object":
-            L.append("    %s* %s = (%s*)ArgObject(\"%s\", ROK_%s);" % (a["type"][:-1], v, a["type"][:-1], line, upper(a["kind"])))
+            L.append("    %s* %s = (%s*)ArgObject(\"%s\", ROK_%s);" % (arg_type(a)[:-1], v, arg_type(a)[:-1], line, upper(a["kind"])))
             call.append(v)
         elif m == "struct":
-            ctype = a["type"][:-1]
-            if a.get("dir", "in") == "in" and a.get("nullable"):
+            ctype = arg_type(a)[:-1]
+            if a.get("dir") == "inout":
+                g = "g_inout_%s_%s_%d" % (sub, slot, i)
+                head += ["%s %s;" % (ctype, g), "bool %s_null;" % g]
+                L.append("    memset(&%s, 0, sizeof %s);" % (g, g))
+                L.append('    %s* %s = (%s*)ParseInOut("%s", ROK_%s, &%s);' % (ctype, v, ctype, line, upper(a["kind"]), g))
+                L.append("    %s_null = %s == nullptr;" % (g, v))
+                closing.append(line + " ")
+                after.append('    CompareInOut("%s", ROK_%s, %s_null ? nullptr : &%s);' % (line, upper(a["kind"]), g, g))
+                call.append(v)
+            elif a.get("dir", "in") == "in" and a.get("nullable"):
                 L.append("    %s %s_value;\n    memset(&%s_value, 0, sizeof %s_value);" % (ctype, v, v, v))
                 L.append('    %s* %s = (%s*)ParseStructOpt("%s", ROK_%s, &%s_value);' % (ctype, v, ctype, line, upper(a["kind"]), v))
                 call.append(v)
@@ -2204,7 +2318,7 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
         elif m == "structs":
             counted = s["args"][a.get("countIndex", 0)]
             L.append("    StructsHolder %s;\n    %s.Parse(\"%s\", ROK_%s, ArgScalar<int>(\"%s\"));" % (v, v, line, upper(a["kind"]), counted["line"]))
-            call.append("(%s*)%s.data" % (a["type"][:-1], v))
+            call.append("(%s*)%s.data" % (arg_type(a)[:-1], v))
         elif m == "value":
             L.append("    %s %s = %s();\n    ParseValueArg(\"%s\", ROK_%s, &%s);" % (t, v, t, line, upper(a["kind"]), v))
             call.append(v)
@@ -2731,6 +2845,7 @@ def render_vtables(model: dict, fixtures: bool = False) -> str:
 
 CALLBACKS_H = ROOT / "src/harness/replay_callbacks.h"
 CALLBACKS_SLOTS = ROOT / "tests/replay_callbacks.h"
+SHAPES_SLOTS = ROOT / "tests/replay_shapes.h"
 
 
 def callback_include(header: str, base: str) -> str:
@@ -2828,6 +2943,29 @@ def render_callback_players(model: dict) -> str:
     return "\n".join(L)
 
 
+def shape_slots(ann: dict) -> tuple[list[dict], list[str]]:
+    """The fixture slots of `fixtures` in tests/replay_fixtures.json: each classified as a slot of a subsystem is, for the stubs the replayer's self-tests call."""
+    out, errors = [], []
+    for name, spec in ann.get("fixtures", {}).items():
+        params = spec["params"]
+        notes = spec.get("args", {})
+        errors += ["fixtures.%s: the note for %s names no parameter" % (name, n) for n in notes if n not in {p["name"] for p in params}]
+        args = [classify_arg(p, notes.get(p["name"]), ann) for p in params]
+        result = classify_result(spec["ret"], spec.get("result"), ann)
+        errors += check_forms("fixtures.%s" % name, args, result, ann)
+        errors += ["fixtures.%s: the argument %s has no mode" % (name, a["name"]) for a in args if a["mode"] == "pending"]
+        out.append({"name": name, "conv": spec.get("conv", "__stdcall"), "ret": spec["ret"], "params": [p["type"] for p in params], "args": args, "result": result})
+    return out, errors
+
+
+def render_shapes(ann: dict) -> str:
+    L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers", ""]
+    slots, _ = shape_slots(ann)
+    for s in slots:
+        L += import_stub("fixture", s["name"], s)
+    return "\n".join(L)
+
+
 def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: dict | None = None, fixtures: dict | None = None):
     ann = ann or load_annotations()
     assignment = assignment or read_assignment()
@@ -2837,6 +2975,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
     errors += [e for e in fixture_errors if e not in errors]
     attach_raw_params(model)
     services = ann["services"]
+    errors += shape_slots(fixture_ann)[1]
     errors += check_service_hooks(services)
     errors += check_service_snapshots(services)
     spec_errors = check_service_specs(services, ann)
@@ -2858,6 +2997,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         VTABLES_CPP: render_vtables(model),
         CALLBACKS_H: render_callbacks(model),
         CALLBACKS_SLOTS: render_callback_players(model),
+        SHAPES_SLOTS: render_shapes(fixture_ann),
         JSON_OUT: json_text(ann, model),
     }
     return files, errors, model

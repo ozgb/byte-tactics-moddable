@@ -172,7 +172,7 @@ const char* g_outValues[MAX_OUTS];
 int g_outCount;
 unsigned g_hash;
 int g_importsTotal;
-const char* g_closing[3];
+const char* g_closing[8];
 unsigned char g_rootKinds[REPLAY_MAX_ROOTS];
 void* g_rootObjects[REPLAY_MAX_ROOTS];
 unsigned g_rootCount;
@@ -418,7 +418,7 @@ bool ClosingLine(const char* line)
 {
     if (strncmp(line + 4, "snapshot#", 9) == 0)
         return true;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 8; i++) {
         if (g_closing[i] != nullptr && strncmp(line + 4, g_closing[i], strlen(g_closing[i])) == 0)
             return true;
     }
@@ -537,6 +537,31 @@ void ApplyBytes(void* dst, int length, const char* name)
     const char* value = OutValue(name);
     if (value != nullptr && dst != nullptr)
         ReplayParseBytes(value, dst, length);
+}
+
+void AddInOut(ReplayText& t, unsigned kind, const void* p)
+{
+    ReplayAddInOut(t, kind, p, g_objects);
+}
+
+void ApplyInOut(void* dst, const char* name, unsigned kind)
+{
+    const char* value = OutExact(name);
+    if (value != nullptr && dst != nullptr)
+        ReplayParseValue(kind, value, dst, g_objects, nullptr);
+}
+
+template <class T> void ApplyValues(std::vector<T, std::allocator<T> >* out, const char* name, unsigned kind)
+{
+    const char* list = OutExact(name);
+    if (list == nullptr || out == nullptr || list[0] != '[')
+        return;
+    char piece[128];
+    for (const char* cursor = list; ReplayNextListValue(&cursor, piece, sizeof piece);) {
+        T value = T();
+        if (ReplayParseValue(kind, piece, &value, g_objects, nullptr))
+            out->push_back(value);
+    }
 }
 
 void ApplyReach(void* object, unsigned kind, const char* suffix)
@@ -740,6 +765,33 @@ void CompareStruct(const char* name, unsigned kind, const void* object)
     value.Free();
 }
 
+void* ParseInOut(const char* name, unsigned kind, void* storage)
+{
+    const char* value = ArgLine(name);
+    if (value == nullptr || strcmp(value, "null") == 0)
+        return nullptr;
+    ReplayParseValue(kind, value, storage, g_objects, nullptr);
+    return storage;
+}
+
+void CompareInOut(const char* name, unsigned kind, const void* object)
+{
+    const char* recorded = OutLine(name);
+    if (object == nullptr) {
+        if (recorded != nullptr)
+            Diff(name, recorded, "no line");
+        return;
+    }
+    ReplayText value;
+    ReplayAddValue(value, kind, object, g_objects);
+    HashText(value.Data());
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff(name, recorded, value.Data());
+    value.Free();
+}
+
 void CompareObjectResult(unsigned kind, const void* object)
 {
     ReplayText value;
@@ -787,11 +839,16 @@ void ParseArgv(ArgvHolder& holder)
     }
 }
 
-void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr)
+void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr, const char* d = nullptr, const char* e = nullptr, const char* f = nullptr, const char* g = nullptr, const char* h = nullptr)
 {
     g_closing[0] = a;
     g_closing[1] = b;
     g_closing[2] = c;
+    g_closing[3] = d;
+    g_closing[4] = e;
+    g_closing[5] = f;
+    g_closing[6] = g;
+    g_closing[7] = h;
 }
 
 }
@@ -1171,6 +1228,7 @@ int __stdcall SpendEnergyAndMetalSlot(UnitResources* self, float energy, float m
 }
 
 #include "replay_slots.h"
+#include "replay_shapes.h"
 
 void ResetBlock()
 {
@@ -2397,6 +2455,139 @@ void BeginImport()
     g_importIndex = 0;
     g_ordinals.Reset();
     BeginCompare();
+}
+
+void ShapeSelfTest()
+{
+    printf("an out vector of value structs\n");
+    ResetBlock();
+    ReplayText t;
+    std::vector<FixtureSpan, std::allocator<FixtureSpan> > spans;
+    FixtureSpan first = { 3, 4 };
+    FixtureSpan second = { -5, 6 };
+    spans.push_back(first);
+    spans.push_back(second);
+    ReplayAddValueList(t, ROK_FIXTURESPAN, &spans[0], (unsigned)spans.size(), g_objects);
+    Check(strcmp(t.Data(), "[(3,4),(-5,6)]") == 0, "a vector of values is a list of values in parentheses");
+    t.Clear();
+    ReplayAddValueList(t, ROK_FIXTURESPAN, nullptr, 0, g_objects);
+    Check(strcmp(t.Data(), "[]") == 0, "an empty vector is []");
+    LoadCall("  i fixture.FillGoals 7\n  o goals [(3,4),(-5,6)]\n");
+    BeginImport();
+    std::vector<FixtureSpan, std::allocator<FixtureSpan> > goals;
+    Imp_fixture_FillGoals(7, &goals);
+    Check(g_diffs == 0 && goals.size() == 2 && goals[0].from == 3 && goals[0].to == 4 && goals[1].from == -5 && goals[1].to == 6, "the stub pushes the recorded elements");
+    LoadCall("  i fixture.FillGoals 7\n  o goals []\n");
+    BeginImport();
+    std::vector<FixtureSpan, std::allocator<FixtureSpan> > none;
+    Imp_fixture_FillGoals(7, &none);
+    Check(g_diffs == 0 && none.empty(), "and none for an empty list");
+    LoadCall("  i fixture.FillGoals 7\n  o goals [(3,4),(-5,6)]\n");
+    BeginImport();
+    std::vector<FixtureSpan, std::allocator<FixtureSpan> > other;
+    Imp_fixture_FillGoals(8, &other);
+    printf("a changed argument: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.FillGoals") == 0, "an import with another argument is reported");
+
+    printf("a void* argument with a cast\n");
+    LoadCall("  i fixture.PlaceAt pos=(1,2,3) = 5\n");
+    BeginImport();
+    Vec3 place = { 1, 2, 3 };
+    int placed = Imp_fixture_PlaceAt(&place);
+    Check(g_diffs == 0 && placed == 5, "the stub reads the Vec3 behind the void* and returns the recorded result");
+    LoadCall("  i fixture.PlaceAt pos=(1,2,3) = 5\n");
+    BeginImport();
+    Vec3 moved = { 1, 2, 4 };
+    Imp_fixture_PlaceAt(&moved);
+    printf("a changed vector: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.PlaceAt") == 0, "a different Vec3 behind the pointer is reported");
+
+    printf("an array sized by a state field\n");
+    ResetBlock();
+    Player* view = (Player*)SimAlloc(sizeof(Player));
+    memset((void*)view, 0, sizeof(Player));
+    view->unitCount = 3;
+    g_game->slowest = view;
+    int ids[4] = { 1, 2, 3, 4 };
+    LoadCall("  i fixture.ReadIds x:010000000200000003000000 = 1\n");
+    BeginImport();
+    int read = Imp_fixture_ReadIds(ids);
+    Check(g_diffs == 0 && read == 1, "the stub writes as many elements as the field says");
+    view->unitCount = 2;
+    LoadCall("  i fixture.ReadIds x:010000000200000003000000 = 1\n");
+    BeginImport();
+    Imp_fixture_ReadIds(ids);
+    printf("a changed length: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.ReadIds") == 0, "a length that follows the field is reported when the field differs");
+    g_game->slowest = (Player*)nullptr;
+    LoadCall("  i fixture.ReadIds x: = 1\n");
+    BeginImport();
+    Imp_fixture_ReadIds(ids);
+    Check(g_diffs == 0, "a null ref is a length of 0");
+    g_game->slowest = view;
+    LoadCall("  i fixture.FillIds ? = 8\n  o ids x:0a0000000b000000\n");
+    BeginImport();
+    int filled[4] = { 0, 0, 0, 0 };
+    Imp_fixture_FillIds(filled);
+    Check(g_diffs == 0 && filled[0] == 10 && filled[1] == 11 && filled[2] == 0, "the stub fills the buffer by the same length");
+
+    printf("a nullable in/out value\n");
+    FixtureAmount amount = { 5 };
+    t.Clear();
+    AddInOut(t, ROK_FIXTUREAMOUNT, &amount);
+    Check(strcmp(t.Data(), "(5)") == 0, "a value going in is its fields in parentheses");
+    t.Clear();
+    AddInOut(t, ROK_FIXTUREAMOUNT, nullptr);
+    Check(strcmp(t.Data(), "null") == 0, "and a null pointer is null");
+    LoadCall("  i fixture.Query (5) null = 9\n  o first (8)\n");
+    BeginImport();
+    FixtureAmount in = { 5 };
+    int queried = Imp_fixture_Query(&in, nullptr);
+    Check(g_diffs == 0 && queried == 9 && in.amount == 8, "the stub passes the value in and writes the o line back");
+    LoadCall("  i fixture.Query (5) (6) = 0\n  o first (8)\n  o second (9)\n");
+    BeginImport();
+    FixtureAmount left = { 5 };
+    FixtureAmount right = { 6 };
+    Imp_fixture_Query(&left, &right);
+    Check(g_diffs == 0 && left.amount == 8 && right.amount == 9, "each pointer takes its own o line");
+    LoadCall("  i fixture.Query (5) null = 9\n  o first (8)\n");
+    BeginImport();
+    FixtureAmount stray = { 5 };
+    FixtureAmount extra = { 1 };
+    Imp_fixture_Query(&stray, &extra);
+    printf("a null that was not recorded: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.Query") == 0, "a pointer where null was recorded is reported");
+    LoadCall("  i fixture.Query (5) null = 9\n  o first (8)\n  o second (3)\n");
+    SetClosing("second ");
+    BeginImport();
+    FixtureAmount shut = { 5 };
+    Imp_fixture_Query(&shut, nullptr);
+    Check(g_outCount == 1, "an o line named by the closing list is the call's, not the import's");
+    SetClosing(nullptr);
+
+    printf("in/out of the slot under replay\n");
+    LoadCall("  a p2 (5)\n  o p2 (8)\n");
+    FixtureAmount storage = { 0 };
+    FixtureAmount* passed = (FixtureAmount*)ParseInOut("p2", ROK_FIXTUREAMOUNT, &storage);
+    Check(passed == &storage && storage.amount == 5, "the value goes to the slot by address");
+    storage.amount = 8;
+    BeginCompare();
+    CompareInOut("p2", ROK_FIXTUREAMOUNT, passed);
+    Check(g_diffs == 0, "and the value it leaves is compared with the o line");
+    storage.amount = 9;
+    CompareInOut("p2", ROK_FIXTUREAMOUNT, passed);
+    printf("a changed value: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "p2") == 0, "a different value is reported at the argument");
+    LoadCall("  a p2 null\n");
+    Check(ParseInOut("p2", ROK_FIXTUREAMOUNT, &storage) == nullptr, "null goes to the slot as a null pointer");
+    BeginCompare();
+    CompareInOut("p2", ROK_FIXTUREAMOUNT, nullptr);
+    Check(g_diffs == 0, "and has no o line to compare");
+    LoadCall("  a p2 null\n  o p2 (1)\n");
+    BeginCompare();
+    CompareInOut("p2", ROK_FIXTUREAMOUNT, nullptr);
+    Check(g_diffs == 1, "an o line for a null pointer is a difference");
+    t.Free();
 }
 
 void CallbackSelfTest()
@@ -4490,6 +4681,7 @@ int SelfTest(const char* file)
     TableSelfTest();
     ArraySelfTest();
     FormSelfTest();
+    ShapeSelfTest();
     PolymorphicSelfTest();
     RefsSelfTest();
     BasedTableSelfTest();

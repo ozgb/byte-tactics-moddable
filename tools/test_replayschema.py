@@ -769,7 +769,7 @@ class StructForms(unittest.TestCase):
         ann = annotations()
         ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["nullable"] = True
         _, errors, _ = self.generated(ann)
-        self.assertTrue(any("only a struct in can be nullable" in e for e in errors), errors)
+        self.assertTrue(any("only a struct in or inout can be nullable" in e for e in errors), errors)
 
     def test_an_array_of_structs_is_a_pointer_and_a_count(self):
         files, errors, _ = self.generated(self.targeting(mode="structs", count="weapon"))
@@ -1704,6 +1704,188 @@ class GameRefs(unittest.TestCase):
         ann["game_fields"]["flags_2a44"] = {"kind": "ref", "target": "FixtureView"}
         with self.assertRaises(rs.Error):
             self.generated(ann)
+
+
+class ArgumentShapes(unittest.TestCase):
+    """#765: an out vector of value structs, a cast on a void*, an array sized by a state path, and a nullable in/out value."""
+
+    SPANS = "std::vector<FixtureSpan, std::allocator<FixtureSpan> >*"
+    VECTOR = {"mode": "vector", "dir": "out", "elem": {"mode": "value", "kind": "FixtureSpan"}}
+    INOUT = {"mode": "struct", "kind": "FixtureAmount", "dir": "inout", "nullable": True}
+
+    def slot(self, params, notes, ret="void", result=None):
+        ann = annotations()
+        args = [rs.classify_arg({"type": t, "name": n}, notes.get(n), ann) for t, n in params]
+        res = rs.classify_result(ret, result, ann)
+        return {"args": args, "result": res, "ret": ret, "conv": "__stdcall", "params": [t for t, _ in params]}, ann
+
+    def errors(self, params, notes, ret="void", result=None):
+        s, ann = self.slot(params, notes, ret, result)
+        return rs.check_forms("x.Y", s["args"], s["result"], ann)
+
+    def generated(self, ann):
+        return rs.generate(rs.read_rows(), ann)
+
+    def test_an_out_vector_is_recorded_after_the_import_line_and_pushed_by_the_stub(self):
+        s, _ = self.slot([("int", "owner"), (self.SPANS, "goals")], {"goals": self.VECTOR})
+        wrapper = "\n".join(rs.wrapper("orders", {}, "Fill", s, {}, True))
+        self.assertIn('ImportOutValues(line, "goals", ROK_FIXTURESPAN, a1);', wrapper)
+        self.assertNotIn("ImportPending", wrapper)
+        stub = "\n".join(rs.import_stub("orders", "Fill", s))
+        self.assertIn('ApplyValues(a1, "goals", ROK_FIXTURESPAN);', stub)
+        self.assertNotIn('"?"', stub)
+
+    def test_an_out_vector_is_in_no_argument_line_of_the_slot(self):
+        s, _ = self.slot([(self.SPANS, "goals")], {"goals": self.VECTOR})
+        for phase in "aio":
+            self.assertEqual(rs.arg_out(s["args"][0], 0, phase, {}), [])
+
+    def test_an_out_vector_is_an_out_vector_of_values_of_its_own_type(self):
+        self.assertEqual(self.errors([(self.SPANS, "goals")], {"goals": self.VECTOR}), [])
+        cases = [(dict(self.VECTOR, dir="in"), self.SPANS, "only a vector out is recorded"),
+                 ({"mode": "vector", "dir": "out"}, self.SPANS, "needs an `elem` of mode value"),
+                 (dict(self.VECTOR, elem={"mode": "object", "kind": "Unit"}), self.SPANS, "needs an `elem` of mode value"),
+                 (dict(self.VECTOR, elem={"mode": "value", "kind": "Unit"}), self.SPANS, "needs a `kind` that is a value kind"),
+                 (dict(self.VECTOR, elem={"mode": "value", "kind": "Point16"}), self.SPANS,
+                  "is %s, and a vector of the kind Point16 is std::vector<Point16, std::allocator<Point16> >*" % self.SPANS)]
+        for note, ctype, want in cases:
+            errors = self.errors([(ctype, "goals")], {"goals": note})
+            self.assertTrue(any(want in e for e in errors), (note, errors))
+
+    def test_a_void_pointer_is_refused_without_a_cast_and_takes_the_modes_of_its_kind_with_one(self):
+        note = {"mode": "struct", "kind": "Vec3", "dir": "in", "nullable": True}
+        errors = self.errors([("void*", "pos")], {"pos": note})
+        self.assertTrue(any("the argument pos is void*, and the kind Vec3 is Vec3*" in e for e in errors), errors)
+        self.assertEqual(self.errors([("void*", "pos")], {"pos": dict(note, cast="Vec3*")}), [])
+
+    def test_a_cast_is_applied_in_the_recorder_the_stub_and_the_runner(self):
+        s, _ = self.slot([("void*", "pos")], {"pos": {"mode": "struct", "kind": "Vec3", "dir": "in", "nullable": True, "cast": "Vec3*"}})
+        self.assertEqual(rs.arg_out(s["args"][0], 0, "a", {}), ['ArgStruct(s_call, "a", "pos", ROK_VEC3, ((Vec3*)a0));'])
+        runner = "\n".join(rs.runner("orders", "NewOrder", s))
+        self.assertIn('Vec3* p0 = (Vec3*)ParseStructOpt("pos", ROK_VEC3, &p0_value);', runner)
+        v, _ = self.slot([("void*", "pos")], {"pos": {"mode": "vec3", "label": "pos", "cast": "Vec3*"}})
+        self.assertIn("AddVec3(t, ((Vec3*)a0));", "\n".join(rs.import_stub("orders", "Place", v)))
+        self.assertEqual(rs.arg_out(v["args"][0], 0, "i", {}), ['ImportVec3(line, "pos", ((Vec3*)a0));'])
+
+    def test_a_cast_is_for_a_void_pointer_and_a_pointer_mode(self):
+        note = {"mode": "struct", "kind": "Vec3", "dir": "in", "cast": "Vec3*"}
+        errors = self.errors([("Vec3*", "pos")], {"pos": note})
+        self.assertTrue(any("is Vec3*, and only a void* argument takes a `cast`" in e for e in errors), errors)
+        errors = self.errors([("void*", "pos")], {"pos": dict(note, cast="Vec3")})
+        self.assertTrue(any("the `cast` of the argument pos is a pointer type other than void*" in e for e in errors), errors)
+        errors = self.errors([("void*", "pos")], {"pos": {"mode": "scalar", "cast": "Vec3*"}})
+        self.assertTrue(any("has a `cast` and the mode scalar" in e for e in errors), errors)
+
+    def test_a_cast_kind_that_does_not_fit_is_an_error(self):
+        errors = self.errors([("void*", "pos")], {"pos": {"mode": "struct", "kind": "Point16", "dir": "in", "cast": "Vec3*"}})
+        self.assertTrue(any("the argument pos is Vec3*, and the kind Point16 is Point16*" in e for e in errors), errors)
+
+    def ids(self, mode, length, **extra):
+        return self.slot([("void*", "ids")], {"ids": dict({"mode": mode, "length": length}, **extra)}, "int", {"mode": "scalar"})
+
+    def test_a_length_that_is_a_state_path_is_read_from_the_state_at_the_call(self):
+        s, _ = self.ids("bytes-in", "Game.net.unitCount", elem="i32")
+        lines, expr = rs.length_parts(s["args"][0], 0)
+        self.assertEqual(lines, ["const auto* l0_0 = ReplayStep(g_game);",
+                                 "const auto* l0_1 = l0_0 != nullptr ? ReplayStep(l0_0->net) : nullptr;",
+                                 "int len0 = l0_1 != nullptr ? (int)l0_1->unitCount : 0;"])
+        self.assertEqual(expr, "(len0 * 4)")
+        wrapper = "\n".join(rs.wrapper("units", {}, "Read", s, {}, True))
+        self.assertIn("int len0 = l0_1 != nullptr ? (int)l0_1->unitCount : 0;", wrapper)
+        self.assertLess(wrapper.index("int len0"), wrapper.index("ReplayText line;"))
+        self.assertIn("ImportBytes(line, a0, (len0 * 4));", wrapper)
+        stub = "\n".join(rs.import_stub("units", "Read", s))
+        self.assertIn("AddBytes(t, a0, (len0 * 4));", stub)
+
+    def test_a_state_path_without_elem_is_a_length_in_bytes(self):
+        s, _ = self.ids("bytes-out", "Game.width")
+        lines, expr = rs.length_parts(s["args"][0], 0)
+        self.assertEqual((len(lines), expr), (2, "len0"))
+        wrapper = "\n".join(rs.wrapper("units", {}, "Fill", s, {}, True))
+        self.assertIn('ImportOutBytes(line, "ids", a0, (int)result, len0);', wrapper)
+        self.assertIn('ApplyBytes(a0, len0, "ids");', "\n".join(rs.import_stub("units", "Fill", s)))
+
+    def test_a_length_that_is_an_argument_is_what_it_was(self):
+        s, _ = self.slot([("void*", "src"), ("int", "len")], {"src": {"mode": "bytes-in", "length": "len"}}, "int", {"mode": "scalar"})
+        self.assertEqual(self.errors([("void*", "src"), ("int", "len")], {"src": {"mode": "bytes-in", "length": "len"}}, "int", {"mode": "scalar"}), [])
+        wrapper = "\n".join(rs.wrapper("files", {}, "Write", s, {}, True))
+        self.assertIn("ImportBytes(line, a0, a1);", wrapper)
+        self.assertNotIn("ReplayStep", wrapper)
+
+    def test_a_length_names_an_integer_argument_or_a_path_through_game(self):
+        cases = [("nothing", "needs a `length` that names another argument or a path through Game"),
+                 ("ids", "needs a `length` that names another argument or a path through Game"),
+                 ("name", "is no integer"),
+                 ("Other.net.unitCount", "needs a `length` that names another argument or a path through Game"),
+                 ("Game.nowhere.unitCount", "starts at nowhere, which is no member of Game")]
+        for length, want in cases:
+            errors = self.errors([("void*", "ids"), ("char*", "name")], {"ids": {"mode": "bytes-in", "length": length}}, "int", {"mode": "scalar"})
+            self.assertTrue(any(want in e for e in errors), (length, errors))
+        errors = self.errors([("void*", "ids")], {"ids": {"mode": "bytes-in", "length": "Game.width", "elem": "i128"}}, "int", {"mode": "scalar"})
+        self.assertTrue(any("the `elem` of the argument ids is one of" in e for e in errors), errors)
+
+    def test_an_in_out_value_goes_in_as_a_value_and_comes_out_as_an_o_line(self):
+        s, _ = self.slot([("FixtureAmount*", "count")], {"count": self.INOUT})
+        a = s["args"][0]
+        self.assertEqual(rs.arg_out(a, 0, "a", {}), ['ArgInOut(s_call, "count", ROK_FIXTUREAMOUNT, a0);'])
+        self.assertEqual(rs.arg_out(a, 0, "i", {}), ["ImportInOut(line, ROK_FIXTUREAMOUNT, a0);"])
+        self.assertEqual(rs.arg_out(a, 0, "o", {}), ['ArgInOutExit(s_tail, "count", ROK_FIXTUREAMOUNT, a0);'])
+        wrapper = "\n".join(rs.wrapper("units", {}, "Query", s, {}, True))
+        self.assertIn('ImportOutInOut(line, "count", ROK_FIXTUREAMOUNT, a0);', wrapper)
+        stub = "\n".join(rs.import_stub("units", "Query", s))
+        self.assertIn("AddInOut(t, ROK_FIXTUREAMOUNT, a0);", stub)
+        self.assertIn('ApplyInOut(a0, "count", ROK_FIXTUREAMOUNT);', stub)
+
+    def test_the_replayer_passes_an_in_out_value_by_address_or_null_and_compares_it_after(self):
+        s, _ = self.slot([("FixtureAmount*", "count")], {"count": self.INOUT}, "int", {"mode": "scalar"})
+        runner = "\n".join(rs.runner("units", "Query", s))
+        self.assertIn('FixtureAmount* p0 = (FixtureAmount*)ParseInOut("count", ROK_FIXTUREAMOUNT, &g_inout_units_Query_0);', runner)
+        self.assertIn('SetClosing("count ", "result");', runner)
+        self.assertIn('CompareInOut("count", ROK_FIXTUREAMOUNT, g_inout_units_Query_0_null ? nullptr : &g_inout_units_Query_0);', runner)
+        self.assertIn("g_seams.units->Query(p0)", runner)
+
+    def test_an_in_out_value_can_be_nullable_and_an_out_value_cannot(self):
+        self.assertEqual(self.errors([("FixtureAmount*", "count")], {"count": self.INOUT}), [])
+        self.assertEqual(self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, nullable=False)}), [])
+        errors = self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, dir="out")})
+        self.assertTrue(any("only a struct in or inout can be nullable" in e for e in errors), errors)
+        errors = self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, dir="both")})
+        self.assertTrue(any("has the direction both" in e for e in errors), errors)
+
+    def test_an_in_out_value_is_of_a_value_kind_of_its_own_type(self):
+        errors = self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, kind="Player")})
+        self.assertTrue(any("needs a `kind` that is a value kind" in e for e in errors), errors)
+        errors = self.errors([("int*", "count")], {"count": self.INOUT})
+        self.assertTrue(any("the argument count is int*, and the kind FixtureAmount is FixtureAmount*" in e for e in errors), errors)
+
+    def test_a_slot_with_an_in_out_value_gets_an_after_function(self):
+        ann = annotations()
+        ann["subsystems"]["targeting"]["slots"]["SetWeaponTargetPos"]["args"]["pos"] = {"mode": "struct", "kind": "Vec3", "dir": "inout", "nullable": True}
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        slots = files[rs.SLOTS_H]
+        self.assertIn("void After_targeting_SetWeaponTargetPos()", slots)
+        self.assertIn('if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SetWeaponTargetPos") == 0)\n        After_targeting_SetWeaponTargetPos();', slots)
+        self.assertIn('ArgInOut(s_call, "pos", ROK_VEC3, a1);', files[rs.HOOKS_H])
+
+    def test_the_fixture_slots_are_stubs_of_the_native_self_test(self):
+        files, errors, _ = self.generated(annotations())
+        self.assertEqual(errors, [])
+        text = files[rs.SHAPES_SLOTS]
+        for want in ('void __stdcall Imp_fixture_FillGoals(int a0, %s a1)' % self.SPANS, 'ApplyValues(a1, "goals", ROK_FIXTURESPAN);',
+                     "int __stdcall Imp_fixture_PlaceAt(void* a0)", "AddVec3(t, ((Vec3*)a0));",
+                     "int __stdcall Imp_fixture_Query(FixtureAmount* a0, FixtureAmount* a1)", 'ApplyInOut(a1, "second", ROK_FIXTUREAMOUNT);',
+                     "int __stdcall Imp_fixture_ReadIds(void* a0)", "AddBytes(t, a0, (len0 * 4));",
+                     "int __stdcall Imp_fixture_FillIds(void* a0)", 'ApplyBytes(a0, (len0 * 4), "ids");'):
+            self.assertIn(want, text)
+
+    def test_a_fixture_slot_is_checked_like_a_slot(self):
+        fixtures = json.loads(rs.FIXTURES_JSON.read_text())
+        fixtures["fixtures"]["FillGoals"]["args"]["goals"]["dir"] = "in"
+        fixtures["fixtures"]["Query"]["args"]["nowhere"] = {"mode": "scalar"}
+        _, errors, _ = rs.generate(rs.read_rows(), rs.load_annotations(), None, fixtures)
+        self.assertTrue(any("fixtures.FillGoals: the argument goals is a vector, and only a vector out is recorded" in e for e in errors), errors)
+        self.assertTrue(any("fixtures.Query: the note for nowhere names no parameter" in e for e in errors), errors)
 
 
 class ElementForms(unittest.TestCase):

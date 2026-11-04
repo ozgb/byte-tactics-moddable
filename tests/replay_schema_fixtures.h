@@ -201,6 +201,8 @@ enum ReplayObjectKindId {
     ROK_FIXTURESCRIPT,
     ROK_FIXTUREATTACH,
     ROK_FIXTUREORDER,
+    ROK_FIXTURESPAN,
+    ROK_FIXTUREAMOUNT,
     ROK_FIXTUREEYE,
     ROK_FIXTURENODE,
     ROK_FIXTUREHEAP,
@@ -442,11 +444,13 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FixtureScript", sizeof(FixtureScript), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
     { "FixtureAttach", sizeof(FixtureAttach), RS_STATE, RT_ORDER, 10, 1, 0, 0, 0 },
     { "FixtureOrder", sizeof(FixtureOrder), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureSpan", sizeof(FixtureSpan), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureAmount", sizeof(FixtureAmount), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
     { "FixtureEye", sizeof(FixtureEye), RS_STATE, 11, 0, 0, 0, 0, 0 },
     { "FixtureNode", sizeof(FixtureNode), RS_STATE, RT_ORDER, 11, 1, 0, 0, 0 },
     { "FixtureHeap", sizeof(FixtureHeap), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 56;
+static const unsigned kReplayObjectKindCount = 58;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };
 
@@ -755,6 +759,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "value", offsetof(FixtureAttach, value), sizeof(((FixtureAttach*)nullptr)->value), ROK_FIXTUREATTACH, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "id", offsetof(FixtureOrder, id), sizeof(((FixtureOrder*)nullptr)->id), ROK_FIXTUREORDER, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "link", offsetof(FixtureOrder, link), sizeof(((FixtureOrder*)nullptr)->link), ROK_FIXTUREORDER, RK_EMBED, ROK_FIXTUREATTACH, 0, 0, {}, 0, 0 },
+    { "from", offsetof(FixtureSpan, from), sizeof(((FixtureSpan*)nullptr)->from), ROK_FIXTURESPAN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "to", offsetof(FixtureSpan, to), sizeof(((FixtureSpan*)nullptr)->to), ROK_FIXTURESPAN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "amount", offsetof(FixtureAmount, amount), sizeof(((FixtureAmount*)nullptr)->amount), ROK_FIXTUREAMOUNT, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "owner", offsetof(FixtureEye, owner), sizeof(((FixtureEye*)nullptr)->owner), ROK_FIXTUREEYE, RK_REF, ROK_FIXTUREVIEW, 0, 0, {}, 0, 0 },
     { "screen", offsetof(FixtureEye, screen), sizeof(((FixtureEye*)nullptr)->screen), ROK_FIXTUREEYE, RK_SELF, 0, 0, 0, {}, 0, 0, 1 },
     { "x", offsetof(FixtureEye, x), sizeof(((FixtureEye*)nullptr)->x), ROK_FIXTUREEYE, RK_I16, 0, 0, 0, {}, 0, 0 },
@@ -768,7 +775,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "pool", offsetof(FixtureHeap, pool), sizeof(((FixtureHeap*)nullptr)->pool), ROK_FIXTUREHEAP, RK_REF, ROK_FIXTURENODE, 0, 0, {}, 0, 0 },
     { "top", offsetof(FixtureHeap, top), sizeof(((FixtureHeap*)nullptr)->top), ROK_FIXTUREHEAP, RK_SELFINDEX, ROK_FIXTURENODE, 0, 0, {}, 0, 0, 3 },
 };
-static const unsigned kReplayObjectFieldCount = 290;
+static const unsigned kReplayObjectFieldCount = 293;
 
 static const unsigned short kReplayReachFields[] = { 45, 49, 108, 109, 110, 32, 242, 36, 34, 37, 45, 50, 52, 79 };
 
@@ -1050,6 +1057,9 @@ static_assert(sizeof(((FixtureAttach*)nullptr)->next) == 4, "FixtureAttach::next
 static_assert(sizeof(((FixtureAttach*)nullptr)->value) == 4, "FixtureAttach::value has the size the schema says");
 static_assert(sizeof(((FixtureOrder*)nullptr)->id) == 4, "FixtureOrder::id has the size the schema says");
 static_assert(sizeof(((FixtureOrder*)nullptr)->link) == sizeof(FixtureAttach), "FixtureOrder::link has the size of its kind");
+static_assert(sizeof(((FixtureSpan*)nullptr)->from) == 4, "FixtureSpan::from has the size the schema says");
+static_assert(sizeof(((FixtureSpan*)nullptr)->to) == 4, "FixtureSpan::to has the size the schema says");
+static_assert(sizeof(((FixtureAmount*)nullptr)->amount) == 4, "FixtureAmount::amount has the size the schema says");
 static_assert(__is_same(decltype(((FixtureEye*)nullptr)->owner), Ref<char>), "FixtureEye::owner is a Ref<char>");
 static_assert(sizeof(((FixtureEye*)nullptr)->owner) == 4, "FixtureEye::owner has the size the schema says");
 static_assert(sizeof(((FixtureEye*)nullptr)->screen) == sizeof(unsigned), "FixtureEye::screen is a Ref");

@@ -5,8 +5,19 @@
 #include <string.h>
 
 #include "../../interfaces/rand_stream.h"
+#include "../../interfaces/ref.h"
 #include "../util/vec3.h"
 #include "replay_text.h"
+
+template <class T> const T* ReplayStep(const T* p)
+{
+    return p;
+}
+
+template <class T> const T* ReplayStep(const Ref<T>& r)
+{
+    return r.get();
+}
 
 inline void ReplayValue(ReplayText& t, int v)
 {

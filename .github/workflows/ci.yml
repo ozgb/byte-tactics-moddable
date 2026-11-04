@@ -344,6 +344,8 @@ jobs:
           path: replay-binaries
 
       - name: Replay the recordings
+        env:
+          REPLAY_SELF_REPEAT: 10
         run: tools/ci_replays.sh replay-binaries
 
   wasm-modules:

@@ -306,6 +306,33 @@ elements. A vector of structs whose capacity changes keeps its old elements, as 
 difference is reported at `<field>.length`, `<field>.capacity`, `<field>[<i>]` (the hex of a scalar element or the handle of an object
 element) or `<field>[<i>].<f>` (a field of a struct element), for example `PlayerAI#1.counts.length: recorded 0, replayed 2`.
 
+## Snapshots
+
+Some imports return a buffer that the slot then fills, and the bytes it leaves there are the output that counts: `SimCaptureAlloc(bytes,
+&offset)` hands out a buffer of the capture arena for a radar snapshot. A service whose result is `snapshot` (`"result": "snapshot",
+"bytes": "bytes", "offset": "offset"`, `bytes` naming its int argument and `offset` its skipped out argument) is written with the size
+and a handle, numbered in the outermost call by first use, and the bytes follow at the end of the call:
+
+```
+  i services.SimCaptureAlloc 64 = snapshot#1
+  w Game.timer 0x00000000
+  o snapshot#1 x:0100000002000000...
+```
+
+No line is written for the offset, because it is the replayer's own. After the `w` lines and the closing `o` lines, the call has one
+`o snapshot#<n> x:<bytes>` line per snapshot it allocated, the buffer's bytes as the slot left them, with a long buffer in several
+lines of the same name, in order, of at most 512 bytes (the lines are joined). A null result (the arena was full) is `= null` and has no
+line.
+
+The replayer's answer allocates `bytes` from an arena of its own, zeroed, and returns that pointer and its own offset in `offset`. At
+slot exit it compares each buffer with the recorded bytes and reports a difference at `snapshot#<n>[<byte>]` (recorded and replayed
+byte), at `snapshot#<n>.length` when the sizes differ, and at `snapshot#<n>` when a snapshot was recorded and not allocated, or the
+other way round. The `o snapshot` lines are never the outputs of the import before them. The tool writes the recorder's and the
+replayer's code for a `snapshot` service from its spec; the hook in the function, `ReplayImport call(RI_SIM_CAPTURE_ALLOC);
+call.Int(bytes); call.Ptr(offset);` and `return call.Result(buffer);`, belongs to the services issue. The self-test allocates two buffers
+through a function with the signature of `SimCaptureAlloc`, one of 700 bytes, and checks the lines, an equal replay, a changed byte,
+a snapshot the stub did not allocate and a buffer of another size.
+
 ## Fields
 
 Block fields are named as `data/rwsets.csv` names them: `Game.windCounter` for `Game::windCounter`,
@@ -409,7 +436,7 @@ recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.m
 chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
 struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
 `Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
-is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
+is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
 second object, with a changed result reported at `import 0 fixture.Scan.c[0]`). With a
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.

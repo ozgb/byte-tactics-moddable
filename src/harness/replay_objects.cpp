@@ -1744,3 +1744,41 @@ unsigned ReplayCallbackDepth()
 {
     return s_callbackDepth;
 }
+
+unsigned ReplaySnapshots::Add(const void* buffer, unsigned size)
+{
+    if (count == REPLAY_MAX_SNAPSHOTS)
+        abort();
+    data[count] = buffer;
+    bytes[count] = size;
+    return ++count;
+}
+
+void ReplaySnapshots::Emit(ReplayText& out) const
+{
+    for (unsigned n = 0; n < count; n++) {
+        const unsigned char* p = (const unsigned char*)data[n];
+        unsigned at = 0;
+        do {
+            unsigned run = bytes[n] - at < REPLAY_SNAPSHOT_LINE_BYTES ? bytes[n] - at : REPLAY_SNAPSHOT_LINE_BYTES;
+            out.Add("  o snapshot#");
+            out.AddUnsigned(n + 1);
+            out.Add(" x:");
+            AddHex(out, p + at, run);
+            out.AddChar('\n');
+            at += run;
+        } while (at < bytes[n]);
+    }
+}
+
+unsigned ReplayFirstSnapshotDifference(const char* hex, const void* data, unsigned bytes)
+{
+    const unsigned char* p = (const unsigned char*)data;
+    unsigned length = (unsigned)strlen(hex) / 2;
+    unsigned common = length < bytes ? length : bytes;
+    for (unsigned i = 0; i < common; i++) {
+        if ((unsigned char)(HexDigit(hex[i * 2]) << 4 | HexDigit(hex[i * 2 + 1])) != p[i])
+            return i;
+    }
+    return length == bytes ? ~0u : common;
+}

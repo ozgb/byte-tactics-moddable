@@ -757,6 +757,41 @@ class Vectors(unittest.TestCase):
         self.assertTrue(any("KeyedCell.v: only the fields of a state kind can be vectors" in e for e in self.errors(ann)))
 
 
+class Snapshots(unittest.TestCase):
+    """N9: an import that returns a buffer the slot fills is recorded by its size and a handle, and the bytes at slot exit."""
+
+    def spec(self, **changes):
+        out = {"name": "SimCaptureAlloc", "id": "RI_SIM_CAPTURE_ALLOC", "header": "src/state/sim_radar.h", "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
+               "args": [{"mode": "int", "param": "bytes"}, {"mode": "skip", "param": "offset"}], "result": "snapshot", "bytes": "bytes", "offset": "offset"}
+        out.update(changes)
+        return out
+
+    def test_the_recorder_writes_the_size_and_the_handle(self):
+        text = rs.render_service_end([self.spec()])
+        self.assertIn("case RI_SIM_CAPTURE_ALLOC:", text)
+        self.assertIn("t.AddInt(a[0].v.i);", text)
+        self.assertIn("AddSnapshot(t, c.result.kind == 1 ? c.result.v.p : nullptr, (unsigned)a[0].v.i);", text)
+
+    def test_the_offset_is_not_a_line(self):
+        text = rs.render_service_end([self.spec()])
+        self.assertNotIn("offset", text)
+
+    def test_the_replayer_returns_a_buffer_of_its_own_with_its_own_offset(self):
+        text = rs.render_service_answers([self.spec()])
+        self.assertIn("void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)", text)
+        self.assertIn("t.AddInt((int)bytes);", text)
+        self.assertIn("return SnapshotAnswer(result, bytes, offset);", text)
+
+    def test_a_snapshot_needs_a_size_an_offset_and_a_pointer(self):
+        self.assertEqual(rs.check_service_snapshots([self.spec()]), [])
+        self.assertTrue(rs.check_service_snapshots([self.spec(bytes="nowhere")]))
+        self.assertTrue(rs.check_service_snapshots([self.spec(offset="bytes")]))
+        self.assertTrue(rs.check_service_snapshots([self.spec(declaration="int SimCaptureAlloc(unsigned int bytes, unsigned int* offset);")]))
+
+    def test_another_result_is_untouched(self):
+        self.assertEqual(rs.check_service_snapshots([self.spec(result="int")]), [])
+
+
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
         files, errors, model = rs.generate(rs.read_rows())

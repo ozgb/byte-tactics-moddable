@@ -1571,6 +1571,22 @@ def check_service_hooks(services: list[dict]) -> list[str]:
     return errors
 
 
+def check_service_snapshots(services: list[dict]) -> list[str]:
+    """Errors for a service whose result is a snapshot: `bytes` names its int argument and `offset` its out argument."""
+    errors = []
+    for spec in services:
+        if spec.get("result") != "snapshot":
+            continue
+        params = {a.get("param"): a for a in spec["args"]}
+        if params.get(spec.get("bytes"), {}).get("mode") != "int":
+            errors.append("%s: a snapshot result needs `bytes` that names an int argument" % spec["name"])
+        if spec.get("offset") not in params or params[spec["offset"]]["mode"] != "skip":
+            errors.append("%s: a snapshot result needs `offset` that names a skipped argument" % spec["name"])
+        if not re.match(r"^void\*", spec.get("declaration", "").replace(" ", "")):
+            errors.append("%s: a snapshot result is a pointer to the buffer, and the declaration returns void*" % spec["name"])
+    return errors
+
+
 def render_service_ids(services: list[dict]) -> str:
     L = [GENERATED, "#ifndef HARNESS_REPLAY_SERVICES_H", "#define HARNESS_REPLAY_SERVICES_H", "", "enum ReplayImportId {"]
     L += ["    %s," % s["id"] for s in services]
@@ -1603,7 +1619,10 @@ def render_service_end(services: list[dict]) -> str:
             elif m == "handle":
                 L.append("        AddHandle(t, %s, a[%d].v.p);" % (handle_id(a["kind"]), i))
         res = s.get("result")
-        if res == "int":
+        if res == "snapshot":
+            index = [j for j, a in enumerate(s["args"]) if a.get("param") == s["bytes"]][0]
+            L.append("        AddSnapshot(t, c.result.kind == 1 ? c.result.v.p : nullptr, (unsigned)a[%d].v.i);" % index)
+        elif res == "int":
             L.append("        AddResult(t, c.result);")
         elif res == "double":
             L.append('        t.Add(" = ");')
@@ -1670,7 +1689,9 @@ def render_service_answers(services: list[dict]) -> str:
                 L.append('    const char* %sText = OutValue("%s");' % (o["text"], o["label"]))
                 L.append("    if (%sText != nullptr)\n        ParseQuoted(%sText, %s, (unsigned)%s);" % (o["text"], o["text"], o["text"], o["size"]))
         L += ["    " + stmt for stmt in s.get("effect", [])]
-        if res == "int":
+        if res == "snapshot":
+            L.append("    return SnapshotAnswer(result, %s, %s);" % (s["bytes"], s["offset"]))
+        elif res == "int":
             L.append("    return atoi(result);")
         elif res == "double":
             L.append("    return ParseF64(result);")
@@ -1805,6 +1826,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
     attach_raw_params(model)
     services = ann["services"]
     errors += check_service_hooks(services)
+    errors += check_service_snapshots(services)
     for sub, spec in ann["subsystems"].items():
         errors += ["%s lists the service %s, which has no spec" % (sub, n) for n in spec.get("services", [])
                    if not any(x["name"] == n or x["name"].startswith(n + "_") for x in services)]

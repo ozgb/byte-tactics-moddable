@@ -91,6 +91,25 @@ private:
     ReplayText text;
 };
 
+enum { REPLAY_MAX_SNAPSHOTS = 64, REPLAY_SNAPSHOT_LINE_BYTES = 512 };
+
+class ReplaySnapshots {
+public:
+    ReplaySnapshots() : count(0) {}
+    void Reset() { count = 0; }
+    unsigned Add(const void* data, unsigned bytes);
+    unsigned Count() const { return count; }
+    const void* Data(unsigned i) const { return data[i]; }
+    unsigned Bytes(unsigned i) const { return bytes[i]; }
+    void Emit(ReplayText& out) const;
+
+private:
+    unsigned count;
+    const void* data[REPLAY_MAX_SNAPSHOTS];
+    unsigned bytes[REPLAY_MAX_SNAPSHOTS];
+};
+
+unsigned ReplayFirstSnapshotDifference(const char* hex, const void* data, unsigned bytes);
 unsigned ReplayCallbackDepth();
 const void* ReplayVptrOf(const void* object);
 const void* ReplayVtable(unsigned kind);

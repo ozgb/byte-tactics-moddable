@@ -396,6 +396,8 @@ const char* LastResult(const char* line)
 
 bool ClosingLine(const char* line)
 {
+    if (strncmp(line + 4, "snapshot#", 9) == 0)
+        return true;
     for (int i = 0; i < 3; i++) {
         if (g_closing[i] != nullptr && strncmp(line + 4, g_closing[i], strlen(g_closing[i])) == 0)
             return true;
@@ -773,6 +775,33 @@ void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr)
 
 }
 
+namespace {
+
+enum { MAX_SNAPSHOTS = 64, CAPTURE_ARENA_BYTES = 1 << 20 };
+unsigned char g_captureArena[CAPTURE_ARENA_BYTES];
+unsigned g_captureUsed;
+unsigned char* g_snapshotData[MAX_SNAPSHOTS];
+unsigned g_snapshotBytes[MAX_SNAPSHOTS];
+
+void* SnapshotAnswer(const char* result, unsigned bytes, unsigned* offset)
+{
+    if (strncmp(result, "snapshot#", 9) != 0)
+        return nullptr;
+    unsigned ordinal = (unsigned)atoi(result + 9);
+    unsigned size = (bytes + 7u) & ~7u;
+    if (ordinal == 0 || ordinal > MAX_SNAPSHOTS || g_captureUsed + size > CAPTURE_ARENA_BYTES)
+        Fatal(g_file, g_callIndex, "a snapshot that the replayer cannot allocate", result);
+    *offset = g_captureUsed;
+    unsigned char* at = g_captureArena + g_captureUsed;
+    memset(at, 0, size);
+    g_captureUsed += size;
+    g_snapshotData[ordinal - 1] = at;
+    g_snapshotBytes[ordinal - 1] = bytes;
+    return at;
+}
+
+}
+
 #include "replay_services.h"
 
 namespace {
@@ -1012,6 +1041,7 @@ void ResetBlock()
     strcpy(g_extTdf, "tdf");
     g_known.Reset();
     g_objects.Reset();
+    g_captureUsed = 0;
 }
 
 const ReplaySlotSets* FindSlot(const char* subsystem, const char* name)
@@ -1202,6 +1232,59 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
     CompareObjects(sets);
 }
 
+void CompareSnapshots()
+{
+    ReplayText hex;
+    for (unsigned n = 0; n < MAX_SNAPSHOTS; n++) {
+        char prefix[32];
+        sprintf(prefix, "  o snapshot#%u x:", n + 1);
+        size_t length = strlen(prefix);
+        bool recorded = false;
+        hex.Clear();
+        for (int k = g_callFirst + 1; k < g_callEnd; k++) {
+            if (strncmp(g_lines[k], prefix, length) == 0) {
+                recorded = true;
+                hex.Add(g_lines[k] + length);
+            }
+        }
+        char key[48];
+        sprintf(key, "snapshot#%u", n + 1);
+        if (g_snapshotData[n] == nullptr) {
+            if (recorded)
+                Diff(key, "a snapshot", "no allocation");
+            continue;
+        }
+        ReplayText actual;
+        ReplayBytes(actual, g_snapshotData[n], g_snapshotBytes[n]);
+        HashText(actual.Data());
+        actual.Free();
+        if (!recorded) {
+            Diff(key, "no snapshot", "bytes");
+            continue;
+        }
+        if (hex.Size() / 2 != g_snapshotBytes[n]) {
+            char a[24];
+            char b[24];
+            sprintf(key, "snapshot#%u.length", n + 1);
+            sprintf(a, "%u", hex.Size() / 2);
+            sprintf(b, "%u", g_snapshotBytes[n]);
+            Diff(key, a, b);
+            continue;
+        }
+        unsigned at = ReplayFirstSnapshotDifference(hex.Data(), g_snapshotData[n], g_snapshotBytes[n]);
+        if (at != ~0u) {
+            char a[8];
+            char b[8];
+            sprintf(key, "snapshot#%u[%u]", n + 1, at);
+            memcpy(a, hex.Data() + at * 2, 2);
+            a[2] = '\0';
+            sprintf(b, "%02x", g_snapshotData[n][at]);
+            Diff(key, a, b);
+        }
+    }
+    hex.Free();
+}
+
 void ReplayCall(const char* file, Outcome& out)
 {
     char* header = g_lines[g_callFirst];
@@ -1220,6 +1303,8 @@ void ReplayCall(const char* file, Outcome& out)
     g_importIndex = 0;
     g_outCount = 0;
     g_rootCount = 0;
+    memset(g_snapshotData, 0, sizeof g_snapshotData);
+    g_captureUsed = 0;
     if (strcmp(tickText, "-") != 0)
         g_game->ticks = atoi(tickText);
 
@@ -1259,6 +1344,7 @@ void ReplayCall(const char* file, Outcome& out)
         }
     }
     CompareWrites(file, sets);
+    CompareSnapshots();
     RunAfter(g_subsystem, slotText);
 
     char head[160];
@@ -2355,6 +2441,91 @@ void VectorSelfTest()
     calls.Free();
 }
 
+unsigned char g_fakeArena[2048];
+unsigned g_fakeUsed;
+
+void* FakeCaptureAlloc(unsigned int bytes, unsigned int* offset)
+{
+    *offset = g_fakeUsed;
+    unsigned char* at = g_fakeArena + g_fakeUsed;
+    g_fakeUsed += (bytes + 7u) & ~7u;
+    return at;
+}
+
+void SnapshotSelfTest()
+{
+    printf("snapshots\n");
+    g_fakeUsed = 0;
+    ReplaySnapshots snapshots;
+    ReplayText recorded;
+    unsigned offset = 0;
+    unsigned char* first = (unsigned char*)FakeCaptureAlloc(20, &offset);
+    recorded.Add("  i services.SimCaptureAlloc 20 = snapshot#");
+    recorded.AddUnsigned(snapshots.Add(first, 20));
+    recorded.AddChar('\n');
+    unsigned char* second = (unsigned char*)FakeCaptureAlloc(700, &offset);
+    recorded.Add("  i services.SimCaptureAlloc 700 = snapshot#");
+    recorded.AddUnsigned(snapshots.Add(second, 700));
+    recorded.AddChar('\n');
+    for (int i = 0; i < 20; i++)
+        first[i] = (unsigned char)(i + 1);
+    for (int i = 0; i < 700; i++)
+        second[i] = (unsigned char)(i * 3);
+    snapshots.Emit(recorded);
+    printf("%.300s\n", recorded.Data());
+    Check(strstr(recorded.Data(), "  i services.SimCaptureAlloc 20 = snapshot#1\n  i services.SimCaptureAlloc 700 = snapshot#2\n  o snapshot#1 x:0102030405060708090a0b0c0d0e0f1011121314\n  o snapshot#2 x:000306") != nullptr, "an import line carries the size and the handle, and each buffer follows as bytes");
+    Check(CountLines(recorded.Data(), "  o snapshot#2 ") == 2, "a long buffer is several lines of the same name, in order");
+    Check(LongestLine(recorded.Data()) < 1100, "and the lines are bounded");
+    Check(strstr(recorded.Data(), "offset") == nullptr, "no line is written for the offset");
+
+    char* body = (char*)malloc(recorded.Size() + 1);
+    strcpy(body, recorded.Data());
+    LoadCall(body);
+    g_cursor = g_callFirst + 1;
+    g_importIndex = 0;
+    g_ordinals.Reset();
+    memset(g_snapshotData, 0, sizeof g_snapshotData);
+    g_captureUsed = 0;
+    BeginCompare();
+    ReplayText t;
+    unsigned char* got[2];
+    unsigned sizes[2] = { 20, 700 };
+    for (int n = 0; n < 2; n++) {
+        StartImport(t, "services.SimCaptureAlloc");
+        Space(t);
+        t.AddUnsigned(sizes[n]);
+        const char* r = Enter(t);
+        got[n] = (unsigned char*)SnapshotAnswer(r, sizes[n], &offset);
+        Check(got[n] != nullptr && g_outCount == 0, "the stub allocates from its own arena and the snapshot lines are not the outputs of the import");
+    }
+    Check(got[0] != nullptr && got[1] != nullptr && got[1] >= got[0] + 24, "two snapshots are two buffers");
+    for (int i = 0; i < 20; i++)
+        got[0][i] = (unsigned char)(i + 1);
+    for (int i = 0; i < 700; i++)
+        got[1][i] = (unsigned char)(i * 3);
+    CompareSnapshots();
+    Check(g_diffs == 0, "the snapshots the slot filled compare equal");
+    got[1][600] ^= 4;
+    BeginCompare();
+    CompareSnapshots();
+    printf("a changed byte: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "snapshot#2[600]") == 0, "a changed byte is reported at its snapshot and byte");
+    got[1][600] ^= 4;
+    memset(g_snapshotData + 1, 0, sizeof g_snapshotData[0]);
+    BeginCompare();
+    CompareSnapshots();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "snapshot#2") == 0, "a snapshot the stub never allocated is reported");
+    g_snapshotData[1] = got[1];
+    g_snapshotBytes[1] = 699;
+    BeginCompare();
+    CompareSnapshots();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "snapshot#2.length") == 0, "and a buffer of another size");
+    g_snapshotBytes[1] = 700;
+    free(body);
+    t.Free();
+    recorded.Free();
+}
+
 typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
 
 unsigned CodeIndex(const char* table, const void* function)
@@ -2547,6 +2718,7 @@ int SelfTest(const char* file)
     PolymorphicSelfTest();
     CallbackSelfTest();
     VectorSelfTest();
+    SnapshotSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

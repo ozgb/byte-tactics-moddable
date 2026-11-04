@@ -60,6 +60,7 @@ ReplayText s_call;
 ReplayText s_tail;
 ReplayText s_field;
 ReplayOrdinals s_ordinals;
+ReplaySnapshots s_snapshots;
 ReplayReach s_reach;
 ReplayRoots s_roots;
 
@@ -167,6 +168,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
     if (!s_recording)
         return;
     s_ordinals.Reset();
+    s_snapshots.Reset();
     s_call.Clear();
     s_tail.Clear();
     s_roots = roots;
@@ -201,6 +203,7 @@ void SlotLeave()
     r.out.AddChar('\n');
     r.out.AddText(s_call);
     r.out.AddText(s_tail);
+    s_snapshots.Emit(r.out);
     s_recording = false;
 }
 
@@ -537,6 +540,17 @@ namespace {
 void AddSpace(ReplayText& t)
 {
     t.AddChar(' ');
+}
+
+void AddSnapshot(ReplayText& t, const void* buffer, unsigned bytes)
+{
+    t.Add(" = ");
+    if (buffer == nullptr) {
+        t.Add("null");
+        return;
+    }
+    t.Add("snapshot#");
+    t.AddUnsigned(s_snapshots.Add(buffer, bytes));
 }
 
 void AddResult(ReplayText& t, const ReplayArg& r)

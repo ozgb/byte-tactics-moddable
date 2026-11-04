@@ -808,7 +808,7 @@ void __stdcall CmdMakePoster(CommandArgs* args)
 // FUNCTION: 0x417760
 void __stdcall CmdMeteor(CommandArgs* args)
 {
-    if (args->count > 1) {
+    if (args->Count() > 1) {
         if (args->GetIntArg(1, 0))
             EnableMeteors();
         else

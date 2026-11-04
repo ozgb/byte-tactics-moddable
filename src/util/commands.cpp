@@ -107,6 +107,11 @@ int CommandArgs::GetIntArg(int index, int default_val)
     return call.Result(atoi(str));
 }
 
+int CommandArgs::Count()
+{
+    return count;
+}
+
 // FUNCTION: 0x4b7410
 float CommandArgs::GetFloatArg(int index, float default_val)
 {

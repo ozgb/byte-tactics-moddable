@@ -44,6 +44,7 @@
       "TdfRecord_GetFieldDouble": [["handle", "linear", "f64"], "f64"],
       "TdfRecord_GetFieldString": [["handle", "linear", "linear", "int", "linear"], "int"],
       "CommandArgs_GetIntArg": [["scratch", "int", "int"], "int"],
+      "CommandArgs_Count": [["scratch"], "int"],
       "HapiBank_OpenAccount": [["handle", "linear"], "int"],
       "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
       "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"]
@@ -118,6 +119,7 @@
           "TdfRecord_GetFieldDouble": [["handle", "linear", "f64"], "f64"],
           "TdfRecord_GetFieldString": [["handle", "linear", "linear", "int", "linear"], "int"],
           "CommandArgs_GetIntArg": [["scratch", "int", "int"], "int"],
+          "CommandArgs_Count": [["scratch"], "int"],
           "HapiBank_OpenAccount": [["handle", "linear"], "int"],
           "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
           "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"]

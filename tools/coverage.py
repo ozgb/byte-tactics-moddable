@@ -8,6 +8,7 @@
     uv run tools/coverage.py --exe E --game-dir D --scenario N... [--parallel N]   # a subset (no --write or --check)
     uv run tools/coverage.py --exe E --game-dir D --tier                        # play reference.GATE_TIER; fail below TIER_LINE_FLOOR of the baseline's lines
     uv run tools/coverage.py --slots ai --slots all [--runs DIR] [--json FILE]  # which scenarios enter each slot of a subsystem; plays nothing
+    uv run tools/coverage.py --exe E --choose-tier [--max-ticks N] [--eight NAME] [--runs DIR]   # the greedy tier cover; plays nothing
     uv run tools/test_coverage.py                                               # tests, on hand-written exports
 
 The exe is the coverage build (clang's -fprofile-instr-generate -fcoverage-mapping -fprofile-update=atomic, #385). Every scenario
@@ -67,6 +68,16 @@ games they load) and prints the lines hit and functions entered as a share of th
 data/coverage.csv's totals rows. It exits 1 when lines are under TIER_LINE_FLOOR (96%). Run it when a scenario is added or
 removed and when the tier changes.
 
+Choosing the tier. `--choose-tier` reads the per-scenario profiles a coverage run left in build/coverage-run/ (`--runs DIR` names
+another) and plays nothing. Each scenario's profiles are merged and exported (llvm-cov export), and its set is the (file,
+decorated name, line) of every line of a game function that the scenario hit; the full suite's is the union. The cover is
+greedy: it takes the scenario adding the most lines per tick (its ticks are the rows of its stored trace; a scenario counts for at
+least CHOOSE_FLOOR_TICKS; ties go to fewer ticks, then the name), until the best adds fewer than CHOOSE_MIN_NEW_LINES, and then, if no scenario has
+CHOOSE_PLAYERS players, takes the one of them adding the most per tick. A scenario that loads a save comes with its saver.
+`--max-ticks N` leaves out every scenario longer than N, and `--eight NAME` takes NAME (an 8-player scenario) first, as the only one of
+its players, instead of leaving the choice to the rule. It prints the chosen scenarios with their players, ticks and new lines, and the lines and
+functions of the cover as a share of the union.
+
 Unstable functions. A row with `functions` and `dead` 0 and a reason starting `unstable:` marks a live function whose
 lines or branches depend on timing (a sampler on GetTicks, a wait on a lock another thread holds). The function
 is counted as before, but its lines and branches are left out of its subsystem's totals and covered counts. The rows are written by hand, and
@@ -95,7 +106,9 @@ import subprocess
 import sys
 import tempfile
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from fractions import Fraction
 from pathlib import Path
 
 import blockpointers
@@ -128,6 +141,9 @@ UNSTABLE = "unstable:"
 SATURATED = 1 << 62
 TIER_LINE_FLOOR = 96
 TICKS_PER_SECOND = 6
+CHOOSE_FLOOR_TICKS = 600
+CHOOSE_MIN_NEW_LINES = 20
+CHOOSE_PLAYERS = 8
 REGION_FILE_ID = 5
 REGION_KIND = 7
 BRANCH_FILE_ID = 6
@@ -673,6 +689,126 @@ def slots_main(names: list[str], runs_dir: Path, json_path: Path | None) -> None
         json_path.write_text(json.dumps({"runs": str(runs_dir), "subsystems": tables}, indent=1) + "\n")
 
 
+def scenario_sets(export_json: dict) -> tuple[set[tuple[str, str, int]], set[tuple[str, str]]]:
+    """({(file, decorated name, line)} of the game lines hit, {(file, decorated name)} of the game functions entered) of an llvm-cov export, copies of one function merged."""
+    groups: dict[tuple[str, str], list[Copy]] = {}
+    for data in export_json.get("data", []):
+        for entry in data.get("functions", []):
+            copy = parse_function(entry)
+            if copy is not None:
+                groups.setdefault((copy.file, copy.decorated), []).append(copy)
+    lines: set[tuple[str, str, int]] = set()
+    functions: set[tuple[str, str]] = set()
+    for (file, decorated), copies in groups.items():
+        fn = merge_copies(copies)
+        if fn.entered:
+            functions.add((file, decorated))
+        for c in copies:
+            lines.update((file, decorated, line) for line, count in c.line_counts.items() if count > 0)
+    return lines, functions
+
+
+def trace_ticks(name: str, scenario: Path) -> int:
+    """The ticks the scenario plays: the rows of its stored trace (a game that ends early stops before its `ticks` line), else its `ticks` value."""
+    trace = reference.TRACES / f"{name}.txt"
+    if trace.is_file():
+        rows = sum(1 for line in trace.read_text().splitlines() if line[:1].isdigit())
+        if rows:
+            return rows
+    return reference.scenario_ticks(scenario)
+
+
+def scenario_players(path: Path) -> int:
+    """The number of players a scenario file declares."""
+    return len(set(re.findall(r"^player(\d+)\.side", path.read_text(), re.M)))
+
+
+def choose_tier(lines: dict[str, set], ticks: dict[str, int], players: dict[str, int], savers: dict[str, str],
+                max_ticks: int | None = None, eight: str | None = None) -> list[tuple[str, int]]:
+    """[(scenario, new lines)] in the order the greedy cover takes them: most new lines per tick (at least CHOOSE_FLOOR_TICKS ticks each) until the best adds fewer than CHOOSE_MIN_NEW_LINES, then the best CHOOSE_PLAYERS-player scenario if none is in. `eight` goes first and is the only scenario of CHOOSE_PLAYERS players. A saver follows the loader that loads it. No scenario longer than max_ticks."""
+    pool = {n for n in lines if max_ticks is None or ticks[n] <= max_ticks}
+    if eight is not None:
+        if eight not in lines:
+            sys.exit(f"coverage: no profile of {eight}")
+        if players[eight] < CHOOSE_PLAYERS:
+            sys.exit(f"coverage: {eight} has {players[eight]} players, not {CHOOSE_PLAYERS}")
+        if eight not in pool:
+            sys.exit(f"coverage: {eight} is longer than --max-ticks {max_ticks}")
+    if eight is not None:
+        pool = {n for n in pool if players[n] < CHOOSE_PLAYERS or n == eight}
+    covered: set = set()
+    chosen: list[tuple[str, int]] = []
+
+    def take(name: str) -> None:
+        chosen.append((name, len(lines[name] - covered)))
+        covered.update(lines[name])
+        saver = savers.get(name)
+        if saver in lines and saver not in {n for n, _ in chosen}:
+            take(saver)
+
+    def best(names: set[str]) -> tuple[str, int] | None:
+        rest = names - {n for n, _ in chosen}
+        if not rest:
+            return None
+        name = min(rest, key=lambda n: (-Fraction(len(lines[n] - covered), max(ticks[n], CHOOSE_FLOOR_TICKS)), ticks[n], n))
+        return name, len(lines[name] - covered)
+
+    if eight is not None:
+        take(eight)
+    while (pick := best(pool)) and pick[1] >= CHOOSE_MIN_NEW_LINES:
+        take(pick[0])
+    if not any(players[n] >= CHOOSE_PLAYERS for n, _ in chosen):
+        pick = best({n for n in pool if players[n] >= CHOOSE_PLAYERS})
+        if pick is None:
+            sys.exit(f"coverage: no scenario of {CHOOSE_PLAYERS} players to choose")
+        take(pick[0])
+    return chosen
+
+
+def render_tier(chosen: list[tuple[str, int]], lines: dict[str, set], functions: dict[str, set], ticks: dict[str, int],
+                players: dict[str, int]) -> str:
+    """The chosen scenarios, one per line with players, ticks and new lines, then the totals and the share of the union's lines and functions."""
+    names = [n for n, _ in chosen]
+    new = dict(chosen)
+    union_lines = set().union(*lines.values())
+    union_functions = set().union(*functions.values())
+    got_lines = set().union(*(lines[n] for n in names))
+    got_functions = set().union(*(functions[n] for n in names))
+    out = [f"{'scenario':<34}{'players':>8}{'ticks':>8}{'new lines':>10}"]
+    out += [f"{n:<34}{players[n]:>8}{ticks[n]:>8}{new[n]:>10}" for n in names]
+    out.append(f"{len(names)} scenarios, {sum(ticks[n] for n in names)} of {sum(ticks.values())} ticks")
+    out.append(f"lines: {percent(len(got_lines), len(union_lines))} of the full suite's ({len(got_lines)}/{len(union_lines)})")
+    out.append(f"functions: {percent(len(got_functions), len(union_functions))} of the full suite's ({len(got_functions)}/{len(union_functions)})")
+    return "\n".join(out)
+
+
+def scenario_profile(run: Path, exe: Path) -> tuple[set, set]:
+    """The line and function sets of one scenario's profiles (its *.profraw files)."""
+    raws = sorted(run.glob("*.profraw"))
+    with tempfile.TemporaryDirectory() as d:
+        merged = Path(d) / "run.profdata"
+        subprocess.run(["llvm-profdata", "merge", "-sparse", "-o", str(merged), *map(str, raws)], check=True)
+        return scenario_sets(export(exe, merged))
+
+
+def choose_main(exe: Path, runs_dir: Path, max_ticks: int | None, eight: str | None) -> None:
+    """Print the greedy tier cover of the profiles in runs_dir."""
+    dirs = sorted(d for d in runs_dir.iterdir() if d.is_dir() and any(d.glob("*.profraw"))) if runs_dir.is_dir() else []
+    if not dirs:
+        sys.exit(f"coverage: no per-scenario profiles in {runs_dir}; play the suite first")
+    scenarios = reference.scenario_files()
+    names = [d.name for d in dirs if d.name in scenarios]
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        sets = dict(zip(names, pool.map(lambda n: scenario_profile(runs_dir / n, exe), names)))
+    lines = {n: s[0] for n, s in sets.items()}
+    functions = {n: s[1] for n, s in sets.items()}
+    ticks = {n: trace_ticks(n, scenarios[n]) for n in names}
+    players = {n: scenario_players(scenarios[n]) for n in names}
+    savers = {n: tracediff.scenario_load(scenarios[n]) for n in names}
+    chosen = choose_tier(lines, ticks, players, savers, max_ticks, eight)
+    print(render_tier(chosen, lines, functions, ticks, players))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--exe", type=Path, default=DEFAULT_EXE, help="the coverage build (default build/coverage/TotalA.exe)")
@@ -691,7 +827,16 @@ def main() -> None:
                         help="print which scenarios enter each slot of the subsystem (repeatable, or all), from build/coverage-run; plays nothing")
     parser.add_argument("--runs", type=Path, metavar="DIR", default=RUN_DIR, help="with --slots, the directory of per-scenario profiles")
     parser.add_argument("--json", type=Path, metavar="FILE", help="with --slots, also write the table as JSON")
+    parser.add_argument("--choose-tier", action="store_true",
+                        help="print the greedy tier cover of the profiles in --runs (default build/coverage-run); plays nothing")
+    parser.add_argument("--max-ticks", type=int, metavar="N", help="with --choose-tier, leave out scenarios longer than N ticks")
+    parser.add_argument("--eight", metavar="NAME", help="with --choose-tier, the 8-player scenario to take first (default: the rule's choice)")
     args = parser.parse_args()
+    if args.choose_tier:
+        choose_main(args.exe, args.runs, args.max_ticks, args.eight)
+        return
+    if args.max_ticks is not None or args.eight:
+        sys.exit("coverage: --max-ticks and --eight go with --choose-tier")
     if args.slots:
         slots_main(args.slots, args.runs, args.json)
         return

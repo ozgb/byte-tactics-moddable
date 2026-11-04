@@ -3,6 +3,7 @@
     uv run tools/test_stateclasses.py
 """
 
+import os
 import shutil
 import sys
 import tempfile
@@ -221,6 +222,11 @@ class OwnGameTest(unittest.TestCase):
         self.assertEqual(font["functions"][0]["regions"], [])
         game = functions("struct Game { int tick; };\nextern Game* g_game;\nint F() { return g_game->tick; }\n")
         self.assertEqual(game["functions"][0]["regions"], [("region_read", "0-4")])
+
+    def test_link_globals_h_is_read_for_the_g_game_it_declares_and_system_headers_are_not(self):
+        unit = sc.StateAnalyzer(sc.ROOT)
+        self.assertEqual(unit.relative(str(sc.ROOT / "link" / "globals.h")), os.path.join("link", "globals.h"))
+        self.assertIsNone(unit.relative("/usr/include/stdio.h"))
 
 
 def ev(**kw):

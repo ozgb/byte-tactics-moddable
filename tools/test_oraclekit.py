@@ -5,6 +5,8 @@
 
 import hashlib
 import json
+import posixpath
+import re
 import subprocess
 import tempfile
 import unittest
@@ -12,7 +14,46 @@ from pathlib import Path
 
 import oraclekit
 
+ROOT = oraclekit.ROOT
+OUTSIDE_URL = re.compile(r"^https?://github\.com/ozgb/byte-tactics-moddable/(blob|tree)/", re.I)
+SCHEME = re.compile(r"^[a-z][a-z0-9+.-]*:", re.I)
+FENCE = re.compile(r"^(```|~~~).*?^\1[^\n]*$", re.M | re.S)
+CODE_SPAN = re.compile(r"`[^`\n]*`")
+INLINE_LINK = re.compile(r"!?\[[^\]\n]*\]\(\s*(<[^>\n]*>|[^)\s]*)[^)\n]*\)")
+REFERENCE_LINK = re.compile(r"^ {0,3}\[[^\]\n]+\]:\s*(<[^>\n]*>|\S+)", re.M)
+
 CONTENTS = [("file", "docs/a.md", ""), ("dir", "data", "")]
+
+
+def on_disk(root: Path, entry: str) -> list[tuple[str, str]]:
+    """The working tree's files under a contents entry, as `oraclekit.tracked` lists the committed ones."""
+    base = root / entry
+    found = [base] if base.is_file() else sorted(p for p in base.rglob("*") if p.is_file()) if base.is_dir() else []
+    return [(p.relative_to(root).as_posix(), "100644") for p in found]
+
+
+def links(markdown: str) -> list[str]:
+    """The link targets of a Markdown text, leaving out code blocks and code spans."""
+    text = CODE_SPAN.sub("", FENCE.sub("", markdown))
+    targets = [m.group(1) for m in INLINE_LINK.finditer(text)] + [m.group(1) for m in REFERENCE_LINK.finditer(text)]
+    return [target[1:-1] if target.startswith("<") else target for target in targets]
+
+
+def links_outside_the_kit(documents: dict[str, str], shipped: set[str]) -> list[str]:
+    """One line per link of a document (by kit path) to a file the kit does not ship."""
+    problems = []
+    for path, text in sorted(documents.items()):
+        for target in links(text):
+            if OUTSIDE_URL.match(target):
+                problems.append("%s links to %s, which is in the source repository" % (path, target))
+            elif SCHEME.match(target) or target.startswith("#") or target == "":
+                continue
+            else:
+                relative = target.split("#", 1)[0].split("?", 1)[0]
+                resolved = posixpath.normpath(posixpath.join(posixpath.dirname(path), relative))
+                if relative.startswith("/") or resolved not in shipped:
+                    problems.append("%s links to %s, which the kit does not ship" % (path, target))
+    return problems
 
 
 def git(root: Path, *args: str) -> None:
@@ -155,6 +196,56 @@ class OracleKitTest(unittest.TestCase):
         self.assertEqual(oraclekit.clean_type("union W::(anonymous at /a/b/c.h:24:5) "), "union W::(anonymous) ")
         self.assertEqual(oraclekit.clean_type("struct W::(unnamed union)::(unnamed at /a/c.h:61:9)"),
                          "struct W::(unnamed union)::(unnamed)")
+
+
+class KitDocumentsTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.shipped = set(oraclekit.select(ROOT, lister=on_disk)) | {oraclekit.README, oraclekit.LAYOUT, oraclekit.MANIFEST}
+        cls.documents = {}
+        for path in sorted(cls.shipped):
+            if path.endswith(".md"):
+                source = oraclekit.README_SOURCE if path == oraclekit.README else path
+                cls.documents[path] = (ROOT / source).read_text(encoding="utf-8")
+
+    def test_the_kit_ships_markdown_documents(self):
+        self.assertIn("docs/scenario-format.md", self.documents)
+        self.assertIn(oraclekit.README, self.documents)
+
+    def test_no_document_of_the_kit_links_outside_it(self):
+        self.assertEqual(links_outside_the_kit(self.documents, self.shipped), [])
+
+    def test_the_link_check_finds_links_outside_the_kit(self):
+        shipped = {"docs/a.md", "docs/b.md", "data/x.json"}
+        documents = {"docs/a.md": "\n".join([
+            "[ok](b.md) [anchor](b.md#top) [here](#top) [data](../data/x.json) ![img](../data/x.json)",
+            "[web](https://example.com/x.md) [mail](mailto:a@b.c)",
+            "[ref]: b.md",
+            "`[code](nothing.md)`",
+            "```",
+            "[fenced](nothing.md)",
+            "```",
+            "[no](c.md) [up](../src/a.cpp#L1) [dir](../data/) [title](c.md \"t\") [abs](/docs/b.md)",
+            "[blob](https://github.com/ozgb/byte-tactics-moddable/blob/moddable/docs/b.md)",
+            "[tree](https://github.com/ozgb/byte-tactics-moddable/tree/moddable/data)",
+            "[late]: <missing.md>",
+        ])}
+        found = links_outside_the_kit(documents, shipped)
+        self.assertEqual(len(found), 8, found)
+        for target in ("c.md", "../src/a.cpp#L1", "../data/", "/docs/b.md", "blob/moddable", "tree/moddable", "missing.md"):
+            self.assertTrue(any(target in line for line in found), target)
+
+    def test_every_key_of_the_scenarios_is_in_the_scenario_spec(self):
+        spec = (ROOT / "docs" / "scenario-format.md").read_text(encoding="utf-8")
+        keys: dict[str, str] = {}
+        for scenario in sorted((ROOT / "reference" / "scenarios").glob("*.txt")):
+            for line in scenario.read_text(encoding="utf-8").splitlines():
+                words = line.split()
+                if words and not words[0].startswith("#"):
+                    keys.setdefault(re.sub(r"^player\d+\.", "player<N>.", words[0]), scenario.name)
+        self.assertGreater(len(keys), 20)
+        missing = ["%s (used by %s)" % (key, scenario) for key, scenario in sorted(keys.items()) if "`%s`" % key not in spec]
+        self.assertEqual(missing, [])
 
 
 if __name__ == "__main__":

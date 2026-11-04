@@ -9,7 +9,7 @@ code as a base. This page names the current tag: **`reference-traces-v20`**.
 - The source: 3.1c's game logic, and the conformity harness that writes traces
   (`src/harness/`).
 - The trace format: `bt-trace 3` (the digest files are `bt-digest 3`). The
-  format is in `reference/README.md`, the hashed fields in
+  format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `src/harness/trace_schema.h`, and the coverage decisions in
   `data/trace_coverage.csv`.
 - The scenario list: `reference/scenarios/`, 73 scenarios, each with its own
@@ -114,7 +114,7 @@ one can diverge without a logic bug.
 ## Comparing an engine against the digests
 
 Your engine writes a `trace.txt` in the same format as the reference (see
-`reference/README.md`: header, then one hash row per phase and a `world` row
+`docs/trace-format.md`: header, then one hash row per phase and a `world` row
 each tick) for a scenario in `reference/scenarios/`. Reduce it to digests and
 compare it with the stored file:
 
@@ -142,7 +142,7 @@ uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
 
 `ref/trace.txt` and `ref/dump.txt` come from running the reference exe with
 `tools/playtest.py --testmode <scenario> --testdump <tick>` (see
-`reference/README.md`, "Running a scenario" and "Dumps"). The report names the
+`docs/scenario-format.md`, section 2, and `docs/trace-format.md`, section 10). The report names the
 tick, the phase and the first differing field.
 
 If your engine is a build of this source that runs under Wine, one command does
@@ -161,7 +161,7 @@ default is Steam's.
 
 `load-midgame` starts from the save that `save-midgame` makes in the same run of the suite (the save is
 made each run and never committed), and from the options table the saver writes beside it
-(`savegame\harness.opt`, see reference/README.md, "Loading a saved game"). Its trace starts at tick 901 and
+(`savegame\harness.opt`, see docs/scenario-format.md, section 5). Its trace starts at tick 901 and
 ends at 1800.
 
 It does not match the uninterrupted game (`save-midgame`, the same as `skirmish2`) from the saved tick on:

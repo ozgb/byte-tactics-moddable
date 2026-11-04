@@ -5,7 +5,7 @@ digest files. It is enough to compute every row of `trace.txt` from the game sta
 recompute the same rows from a `dump.txt`. It is written in terms of the state block layout and
 `data/trace_schema.json`, so an engine in any language can follow it without the reference's source.
 
-The format is `bt-trace 3`. Running the reference and the gate are in `reference/README.md`.
+The format is `bt-trace 3`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
 
 Contents:
 

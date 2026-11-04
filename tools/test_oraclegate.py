@@ -4,8 +4,11 @@
 """
 
 import json
+import os
+import subprocess
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import oraclegate
@@ -122,6 +125,49 @@ class Refusal(unittest.TestCase):
         self.assertEqual(result["verdict"], "refused")
         self.assertNotIn("scenarios", result)
         self.assertIn("instantiate failed", result["message"])
+
+
+class CheckFailure(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+        self.module = self.dir / "m.wasm"
+        self.module.write_bytes(b"\0asm\1\0\0\0")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_an_unknown_subsystem_is_an_error_not_a_refusal(self):
+        with self.assertRaisesRegex(oraclegate.Error, "could not check the module .exit 2.*no module nope"):
+            oraclegate.judge(self.module, "nope", False, self.dir / "no-build", self.dir / "out", None)
+        self.assertFalse((self.dir / "out/result.json").exists())
+
+    def test_a_missing_wasm_tools_is_an_error_not_a_refusal(self):
+        saved = os.environ.get("WASM_TOOLS")
+        os.environ["WASM_TOOLS"] = str(self.dir / "none")
+        try:
+            with self.assertRaises(oraclegate.Error):
+                oraclegate.check_module(self.module, "wind_meteors")
+        finally:
+            if saved is None:
+                del os.environ["WASM_TOOLS"]
+            else:
+                os.environ["WASM_TOOLS"] = saved
+
+    def test_a_broken_module_is_still_a_refusal(self):
+        problem = "wind_meteors: has no stack pointer\n"
+        with mock.patch.object(oraclegate.subprocess, "run", return_value=subprocess.CompletedProcess([], 1, problem, "")):
+            self.assertEqual(oraclegate.check_module(self.module, "wind_meteors"), problem.strip())
+
+    def test_a_refusal_clears_the_earlier_runs_files(self):
+        out = self.dir / "out"
+        for stale in ("runtime/TotalA.exe", "logs/reference.txt"):
+            (out / stale).parent.mkdir(parents=True, exist_ok=True)
+            (out / stale).write_text("old")
+        with mock.patch.object(oraclegate, "check_module", return_value="wind_meteors: has no stack pointer"):
+            result = oraclegate.judge(self.module, "wind_meteors", False, self.dir / "no-build", out, None)
+        self.assertEqual(result["verdict"], "refused")
+        self.assertFalse((out / "runtime").exists() or (out / "logs").exists())
 
 
 if __name__ == "__main__":

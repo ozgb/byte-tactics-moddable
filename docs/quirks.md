@@ -34,7 +34,7 @@ mode, the game exits with code 2 if the flags change mid-match.
 and the hash goes into the trace header whenever any flag is on. A `view`
 flag only touches presentation or start-up state, so it isn't hashed.
 
-More on the scenario keys: [`reference/README.md`](../reference/README.md),
+More on the scenario keys: [`docs/scenario-format.md`](scenario-format.md),
 "Quirk flags".
 
 ## Bug fixes

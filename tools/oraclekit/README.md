@@ -11,12 +11,13 @@ sha256 and size, the commit it was cut from, and the kit's version: the pair of 
 | `docs/trace-format.md`, `data/trace_schema.json` | the trace format and its schema | `docs/trace-format.md` |
 | `tools/tracerehash.py` | recomputes every trace hash from a test-mode dump, standard library only | `docs/trace-format.md` |
 | `reference/traces/` | the stored traces, one per scenario | `docs/reference-traces.md` |
-| `reference/scenarios/` | the scenarios the traces come from | `docs/reference-traces.md` |
+| `reference/scenarios/` | the scenarios the traces come from | `docs/scenario-format.md` |
 | `reference/saves/` | the saved games some scenarios load | `docs/reference-traces.md` |
 | `reference/sounds/` | the stored sound logs | `docs/sound-log.md` |
 | `reference/frames/` | the stored frames | `docs/frame-dump.md` |
 | `reference/ui/` | the stored UI logs | `docs/ui-log.md` |
 | `interfaces/` | the subsystem interface headers (the seams) | `docs/module-abi.md` |
+| `docs/scenario-format.md` | the scenario format, the test-mode run and its outputs | itself |
 | `docs/module-abi.md` | the module ABI | itself |
 | `tests/replay/` | the stored per-module replay recordings | `docs/replay-format.md` |
 | `layout.json` | the state block layout (below) | `docs/module-abi.md`, sections 7 to 9 |

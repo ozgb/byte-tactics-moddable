@@ -367,15 +367,16 @@ it is due, the lead runs `uv run tools/fullgate.py run` on the tip. It plays the
 --both-modes --no-cache` (no `--tier`) and then, straight after it on a fresh prefix, `--check --no-cache
 --roundtrip auto`, which saves the block at an early, a middle and the second to last tick of every scenario,
 restores it and carries on, so that state outside the block shows as a divergence from the stored traces. The
-round trip run scans and checks block pointers as the full run does. `run` prints the comment text and posts
-nothing:
+round trip run scans and checks block pointers as the full run does. Last it builds the coverage exe
+(`build/coverage`) and plays `tools/coverage.py --check` on it, so a coverage link that breaks or a stale
+`data/coverage.csv` shows at the next periodic run. `run` prints the comment text and posts nothing:
 
 ```
-Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n> equal
+Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n> equal, coverage: <result>
 ```
 
 The lead posts it on #632 and adds the play-tests (`tools/playtest.py` smoke, full, mp and music) and their results.
-A run that fails appends `, both modes exit <n>` or `, round trip exit <n>`, and names round trip block pointer
+A run that fails appends `, both modes exit <n>`, `, round trip exit <n>` or `, coverage exit <n>`, and names round trip block pointer
 problems in parentheses after the round trip count.
 
 **A periodic failure is fixed afterwards, not by freezing merges.** The lead files it at once as an

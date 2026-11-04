@@ -173,7 +173,10 @@ jobs:
         if: steps.changed.outputs.run == 'true'
         run: |
           uv run tools/test_x87lint.py
+          env -u BT_NO_ZLIB tools/setup_toolchain.sh
+          cmake -S . -B build/modern
           ninja -C build/modern aliases.obj wasmloader
+          ninja -C build/modern $(ninja -C build/modern -t inputs TotalA.exe | grep -vE '(^|/)TotalA\.res$|^\.$')
           link=$(ninja -C build/modern -t commands TotalA.exe | tail -1 | sed 's# "\?[^ ]*TotalA\.res"\?##')
           bash -c "$link"
           uv run tools/x87lint.py --exe build/modern/TotalA.exe

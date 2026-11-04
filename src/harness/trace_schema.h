@@ -2,7 +2,7 @@
 #ifndef TRACE_SCHEMA_H
 #define TRACE_SCHEMA_H
 
-#define TRACE_FORMAT 3
+#define TRACE_FORMAT 4
 
 enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF };
 enum TraceTarget { TT_NONE, TT_HEAP, TT_UNIT, TT_PLAYER, TT_UNITDEF, TT_WEAPONDEF, TT_PROJECTILE,
@@ -1423,10 +1423,6 @@ static const unsigned kGameScalarFieldCount = 14;
 #undef g_meteorTarget
 #pragma push_macro("g_meteorScheduleGap")
 #undef g_meteorScheduleGap
-#pragma push_macro("g_cdPathMismatch")
-#undef g_cdPathMismatch
-#pragma push_macro("g_cdMismatchDefeatTick")
-#undef g_cdMismatchDefeatTick
 #pragma push_macro("g_economyPacketTick")
 #undef g_economyPacketTick
 #pragma push_macro("g_playerTickLoad")
@@ -1454,11 +1450,9 @@ static const TraceGlobal kMeteorGlobals[] = {
 static const unsigned kMeteorGlobalsCount = 13;
 
 static const TraceGlobal kScalarGlobals[] = {
-    { "cdPathMismatch", (const void*)(offsetof(SimGlobals, g_cdPathMismatch)), 4, TF_SCALAR, TT_NONE, 1 },
-    { "cdMismatchDefeatTick", (const void*)(offsetof(SimGlobals, g_cdMismatchDefeatTick)), 4, TF_SCALAR, TT_NONE, 1 },
     { "economyPacketTick", (const void*)(offsetof(SimGlobals, g_economyPacketTick)), 4, TF_SCALAR, TT_NONE, 1 },
 };
-static const unsigned kScalarGlobalsCount = 3;
+static const unsigned kScalarGlobalsCount = 1;
 
 static const TraceGlobal kPathGlobals[] = {
     { "playerTickLoad", (const void*)(offsetof(SimGlobals, g_playerTickLoad)), 40, TF_BYTES, TT_NONE, 1 },
@@ -1471,8 +1465,6 @@ static const unsigned kPathGlobalsCount = 3;
 #pragma pop_macro("g_playerBudgetCap")
 #pragma pop_macro("g_playerTickLoad")
 #pragma pop_macro("g_economyPacketTick")
-#pragma pop_macro("g_cdMismatchDefeatTick")
-#pragma pop_macro("g_cdPathMismatch")
 #pragma pop_macro("g_meteorScheduleGap")
 #pragma pop_macro("g_meteorTarget")
 #pragma pop_macro("g_meteorNextHitTime")

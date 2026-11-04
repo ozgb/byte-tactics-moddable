@@ -29,7 +29,6 @@ struct SimGlobals {
     int g_playerTickLoad[10];
     int g_budgetRefreshCounter;
     unsigned char pad_88[4];
-    int g_cdPathMismatch;
     Ref<ExplodedPiece> g_explodedPieces[100];
     DebrisCache g_debrisMemCache;
     unsigned char pad_234[4];
@@ -63,8 +62,6 @@ struct SimGlobals {
     int g_lastPlaceMetalSum;
     LosTables g_losTables;
     unsigned char pad_be2c[4];
-    int g_mapLoadFlag;
-    unsigned int g_cdMismatchDefeatTick;
     unsigned int g_randomSeed;
     unsigned char pad_be3c[4];
     Quirks g_quirks;
@@ -111,7 +108,6 @@ static_assert(__builtin_offsetof(SimGlobals, pad_81c) - __builtin_offsetof(SimGl
 static_assert(__builtin_offsetof(SimGlobals, g_economyPacketTick) - __builtin_offsetof(SimGlobals, g_packetManager) == 46396, "g_packetManager is followed by g_economyPacketTick");
 static_assert(__builtin_offsetof(SimGlobals, g_lastPlaceMetalSum) - __builtin_offsetof(SimGlobals, g_lastPlaceHeight) == 4, "g_lastPlaceHeight is followed by g_lastPlaceMetalSum");
 static_assert(__builtin_offsetof(SimGlobals, pad_be2c) - __builtin_offsetof(SimGlobals, g_losTables) == 16, "g_losTables is followed by pad_be2c");
-static_assert(__builtin_offsetof(SimGlobals, g_cdMismatchDefeatTick) - __builtin_offsetof(SimGlobals, g_mapLoadFlag) == 4, "g_mapLoadFlag is followed by g_cdMismatchDefeatTick");
 static_assert(__builtin_offsetof(SimGlobals, pad_be3c) - __builtin_offsetof(SimGlobals, g_randomSeed) == 4, "g_randomSeed is followed by pad_be3c");
 static_assert(sizeof(((SimGlobals*)0)->g_missionOrderTableVec) == 16, "g_missionOrderTableVec size");
 static_assert(sizeof(((SimGlobals*)0)->g_movementClasses) == 1024, "g_movementClasses size");
@@ -128,7 +124,6 @@ static_assert(sizeof(((SimGlobals*)0)->g_losTables) == 16, "g_losTables size");
 #define g_playerTickLoad (Sim().g_playerTickLoad)
 #define g_budgetRefreshCounter (Sim().g_budgetRefreshCounter)
 #define pad_88 (Sim().pad_88)
-#define g_cdPathMismatch (Sim().g_cdPathMismatch)
 #define g_explodedPieces (Sim().g_explodedPieces)
 #define g_debrisMemCache (Sim().g_debrisMemCache)
 #define pad_234 (Sim().pad_234)
@@ -162,8 +157,6 @@ static_assert(sizeof(((SimGlobals*)0)->g_losTables) == 16, "g_losTables size");
 #define g_lastPlaceMetalSum (Sim().g_lastPlaceMetalSum)
 #define g_losTables (Sim().g_losTables)
 #define pad_be2c (Sim().pad_be2c)
-#define g_mapLoadFlag (Sim().g_mapLoadFlag)
-#define g_cdMismatchDefeatTick (Sim().g_cdMismatchDefeatTick)
 #define g_randomSeed (Sim().g_randomSeed)
 #define pad_be3c (Sim().pad_be3c)
 #define g_quirks (Sim().g_quirks)

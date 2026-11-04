@@ -538,7 +538,6 @@ unsigned short __stdcall FindUnitTypeId(const char* name)
 // FUNCTION: 0x488be0
 void InitUnitCategories()
 {
-    g_mapLoadFlag = 1;
 }
 
 // FUNCTION: 0x488bf0
@@ -551,7 +550,6 @@ void FreeUnitCategories()
             delete (UnitTypeSet*)it->value;
     }
     s_unitCategories.clear();
-    g_mapLoadFlag = 0;
 }
 
 static UnitCategory* LowerBoundCategory(const char* name)

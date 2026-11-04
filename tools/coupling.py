@@ -112,7 +112,8 @@ source calls, and gives each the functions it can reach:
                 that resolve a seam slot (reason "seam slot filled by ...")
 
 An entry or a method is found among the functions of data/rwsets.csv by its qualified name,
-or by its last name when the array writes it unqualified. A call is listed when the caller's subsystem and a callee's are both sim subsystems and differ,
+or by its last name when the array writes it unqualified. A call through a class declared in interfaces/*.h (a published callback, such as UnitVisitor) is listed as
+a published callback and is not a crossing. A call is listed when the caller's subsystem and a callee's are both sim subsystems and differ,
 or the caller is `game` and the callee is a sim subsystem (the same edges as --seams). Each
 callee class is shown with the `new` sites of it under src/ and the subsystems of their files, as
 the owner of the objects (data/rwsets.csv has no row for a constructor call). A virtual call with no callee found
@@ -398,8 +399,10 @@ class Classes:
         self.bases: dict[str, list[str]] = {}
         self.virtuals: dict[str, list[str]] = {}
         self.arrays: dict[str, list[str]] = {}
+        self.published: set[str] = set()
 
-    def add(self, text: str) -> None:
+    def add(self, text: str, published: bool = False) -> None:
+        """Read the classes of a file; those of a published interface header (interfaces/*.h) are kept in `published`."""
         text = strip_comments(text)
         for name, body in VTABLE_ARRAY.findall(text):
             entries = [re.sub(r"\([^)]*\)", "", e).strip() for e in body.split(",") if e.strip()]
@@ -410,6 +413,8 @@ class Classes:
                 found = VIRTUAL_DECL.search(stmt)
                 if found:
                     methods.append(found.group(1))
+            if published:
+                self.published.add(name)
             if name not in self.virtuals or len(methods) > len(self.virtuals[name]):
                 self.virtuals[name] = methods
                 self.bases[name] = bases
@@ -420,7 +425,7 @@ class Classes:
         for folder in HIERARCHY_DIRS:
             for path in sorted((root / folder).rglob("*")):
                 if path.suffix in (".h", ".cpp", ".hpp"):
-                    out.add(path.read_text(encoding="latin-1"))
+                    out.add(path.read_text(encoding="latin-1"), folder == "interfaces")
         return out
 
     def slots(self, name: str, seen: frozenset = frozenset()) -> list[str]:
@@ -522,8 +527,9 @@ def resolve_slot(classes: Classes, cls: str, method: str, defined: set[str]) -> 
 class VirtualCall:
     """A call the check judges: the caller, what it calls through, the functions it can run and why they were chosen."""
 
-    def __init__(self, caller, file, line, target, how, callees):
+    def __init__(self, caller, file, line, target, how, callees, published=False):
         self.caller, self.file, self.line, self.target, self.how, self.callees = caller, file, line, target, how, callees
+        self.published = published
 
     def key(self):
         return (self.caller, self.target)
@@ -551,7 +557,7 @@ def indirect_calls(rows: list[list[str]], edges: list[tuple[str, str]], classes:
             how = "slot %s of %s" % (slot_of(classes, cls, method), VIEW_FAMILY.get(cls, cls))
         explained[function] |= callees
         line = lines.get((function, file, target), "")
-        out.append(VirtualCall(function, file, line, target, how, callees))
+        out.append(VirtualCall(function, file, line, target, how, callees, cls in classes.published))
     for (function, file), target in sorted(pointer_callers.items()):
         left = edge_targets[function] - explained[function]
         out.append(VirtualCall(function, file, "", "pointer " + target, "hand edge", left))
@@ -577,6 +583,8 @@ def virtual_edges(calls: list[VirtualCall], of: dict, names: dict, files: dict) 
     sim = set(SIM_SUBSYSTEMS)
     out = []
     for call in calls:
+        if call.published:
+            continue
         mine = of.get((call.caller, call.file))
         for callee in sorted(call.callees):
             for to in names.get(callee, []):
@@ -618,7 +626,12 @@ def check_virtual(edges: list[tuple], missing: list[VirtualCall], rows: list[tup
     return problems
 
 
-def virtual_report(edges: list[tuple], owners: dict, missing: list[VirtualCall]) -> str:
+def published_callbacks(calls: list[VirtualCall]) -> list[VirtualCall]:
+    """The virtual calls through a class declared in interfaces/*.h: a published callback, not a crossing."""
+    return [c for c in calls if c.published]
+
+
+def virtual_report(edges: list[tuple], owners: dict, missing: list[VirtualCall], published: list[VirtualCall] = ()) -> str:
     """The crossing calls grouped by caller and callee subsystem: one line per call, then its callees and the `new` sites of their classes."""
     out, group, call = [], None, None
     for e in edges:
@@ -632,6 +645,8 @@ def virtual_report(edges: list[tuple], owners: dict, missing: list[VirtualCall])
         cls = callee.rpartition("::")[0]
         built = "; ".join("%s:%d (%s)" % site for site in owners.get(cls, [])[:4]) or "no `new` site"
         out.append("    -> %s (%s, %s); objects built at %s" % (callee, to, callee_file, built))
+    for call in published:
+        out.append("virtual: published callback %s (%s) %s" % (call.caller, call.file, call.target))
     out.append("virtual: %d crossing calls, %d callers" % (len(edges), len({(e[1], e[4]) for e in edges})))
     for call in missing:
         out.append("virtual: unresolved %s (%s) -> %s" % (call.caller, call.file, call.target))
@@ -868,7 +883,7 @@ def main() -> None:
         edges = virtual_edges(calls, of, names, files)
         missing = unresolved(calls, of)
         if not args.check:
-            print(virtual_report(edges, owners, missing))
+            print(virtual_report(edges, owners, missing, published_callbacks(calls)))
             return
         problems = check_virtual(edges, missing, read_virtual_exceptions())
         print("\n".join(problems) if problems else "virtual: %d crossing calls, all with exceptions" % len(edges))

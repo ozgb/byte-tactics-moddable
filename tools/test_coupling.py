@@ -368,6 +368,22 @@ class VirtualTest(unittest.TestCase):
         self.assertEqual(cp.virtual_edges([call], {("F", "f.cpp"): "platform"}, names, {}), [])
         self.assertEqual(cp.virtual_edges([call], {("F", "f.cpp"): "units"}, names, {}), [])
 
+    def test_a_call_through_a_class_of_interfaces_is_a_published_callback_not_a_crossing(self):
+        classes = cp.Classes()
+        classes.add("class Visitor { public: virtual void Visit(int) = 0; };", published=True)
+        classes.add("class Collector : public Visitor { public: virtual void Visit(int); };")
+        rows = (fn("Caller", "src/map/m.cpp") + [indirect_row("Caller", "src/map/m.cpp", "virtual Visitor::Visit")]
+                + fn("Collector::Visit", "src/orders/o.cpp"))
+        calls = cp.indirect_calls(rows, [], classes, {})
+        of = {("Caller", "src/map/m.cpp"): "map", ("Collector::Visit", "src/orders/o.cpp"): "orders"}
+        names = {"Collector::Visit": ["orders"]}
+        self.assertEqual(cp.virtual_edges(calls, of, names, {}), [])
+        self.assertEqual([c.caller for c in cp.published_callbacks(calls)], ["Caller"])
+        classes.published.clear()
+        calls = cp.indirect_calls(rows, [], classes, {})
+        self.assertEqual(len(cp.virtual_edges(calls, of, names, {})), 1)
+        self.assertEqual(cp.published_callbacks(calls), [])
+
     def test_a_pointer_call_takes_the_hand_edges_no_virtual_call_explains(self):
         rows = fn("P", "src/weapons/w.cpp") + [indirect_row("P", "src/weapons/w.cpp", "indirect via int (*)(void *)")]
         calls = cp.indirect_calls(rows + fn("T", "src/units/t.cpp"), [("P", "T")], classes_of(), {})

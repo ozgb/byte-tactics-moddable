@@ -21,15 +21,6 @@ struct ReclaimableResource {
     float val;
 };
 
-class DamagedAllyCollector {
-public:
-    Player* owner;
-    std::vector<Unit*>* units;
-    Unit* self;
-    DamagedAllyCollector(Player* o, std::vector<Unit*>* v, Unit* s) : owner(o), units(v), self(s) {}
-    virtual void CollectDamagedAlly(Unit* unit);
-};
-
 void __stdcall ClaimFootprintCells(Unit* obj);
 void __stdcall ClaimFootprintsInArea(Point16 pos, Point16 size);
 void __stdcall FUN_0047caf0(void);
@@ -43,7 +34,7 @@ int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, 
 unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y);
 int __stdcall IsPadSlotFree(Unit* pad, int id);
 void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
-void __stdcall VisitObjectsInRange(Vec3* pos, int range, DamagedAllyCollector& visitor);
+void __stdcall VisitObjectsInRange(Vec3* pos, int range, UnitVisitor* visitor);
 
 int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell);
 void __stdcall AddUnitToMap(Unit* obj);

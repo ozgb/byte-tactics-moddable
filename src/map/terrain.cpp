@@ -1105,7 +1105,7 @@ static inline int BucketDistSquared(Vec3* b, Vec3* a)
 }
 
 // FUNCTION: 0x47e890
-void __stdcall VisitObjectsInRange(Vec3* pos, int range, DamagedAllyCollector& visitor)
+void __stdcall VisitObjectsInRange(Vec3* pos, int range, UnitVisitor* visitor)
 {
     int cx1 = ClampBucketMinX(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
     int cy1 = ClampBucketMinZ(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
@@ -1116,7 +1116,7 @@ void __stdcall VisitObjectsInRange(Vec3* pos, int range, DamagedAllyCollector& v
         for (int x = cx1; x <= cx2; x++) {
             for (Unit* o = (*(BucketGrid*)((char*)g_game + 0x1429f)).cells[(*(BucketGrid*)((char*)g_game + 0x1429f)).width * y + x].first; o != 0; o = o->cargoNext) {
                 if (BucketDistSquared(pos, &o->pos) <= range2) {
-                    visitor.CollectDamagedAlly(o);
+                    visitor->Visit(o);
                 }
             }
         }

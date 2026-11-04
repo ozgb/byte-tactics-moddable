@@ -11,6 +11,7 @@
 #include "../interfaces/services.h"
 #include "../interfaces/seams.h"
 #include "../src/game/game_state.h"
+#include "../src/map/feature_spot.h"
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
 #include "../src/harness/replay_services.h"
@@ -3134,6 +3135,59 @@ void MaskedViewSelfTest()
     free(second);
 }
 
+void FeatureTableSelfTest()
+{
+    printf("the feature table\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    Feature* table = (Feature*)SimAlloc(4 * (unsigned)sizeof(Feature));
+    memset((void*)table, 0, 4 * sizeof(Feature));
+    g_game->features = table;
+    g_game->featureCount = 3;
+    table[3].anim.index = 2;
+    unsigned char kinds[1] = { ROK_HANDLE };
+    void* roots[1] = { &table[3].anim };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    Check(strstr(recorder.text.Data(), "Handle#") == nullptr, "a handle of the element one past the count is not named by order");
+    Check(strstr(recorder.text.Data(), "  r Feature#3.anim.index 2\n") != nullptr, "it is named by its site");
+    Check(ReplayResolveObject("Feature#3.anim", nullptr, g_objects, AllocObject) == &table[3].anim, "and the name resolves to it");
+    Check(ReplayResolveObject("Feature#4.anim", nullptr, g_objects, AllocObject) == nullptr, "an element past that is none");
+
+    ResetBlock();
+    g_game->featureCount = 3;
+    Check(ReplayResolveObject("Feature#2", nullptr, g_objects, AllocObject) != nullptr, "an element of a table the replayer allocates resolves");
+    Check(g_game->featureCount == 3, "and the count a recording restored is kept");
+
+    ResetBlock();
+    Feature* defs = (Feature*)SimAlloc(2 * (unsigned)sizeof(Feature));
+    memset((void*)defs, 0, 2 * sizeof(Feature));
+    g_game->features = defs;
+    g_game->featureCount = 2;
+    FeatureSpot* pool = (FeatureSpot*)SimAlloc(2048 * (unsigned)sizeof(FeatureSpot));
+    memset((void*)pool, 0, 2048 * sizeof(FeatureSpot));
+    g_game->spots = pool;
+    Spot* spots = (Spot*)pool;
+    spots[0].feature = 1;
+    unsigned char spotKinds[1] = { ROK_SPOT };
+    void* spotRoots[1] = { &spots[0] };
+    Recorder spot;
+    defs[1].noobject = 1;
+    spots[0].anim.index = 5;
+    spot.Record(spotKinds, spotRoots, 1, sets);
+    Check(strstr(spot.text.Data(), "  r Spot#0.anim.index 5\n") != nullptr, "a spot of a sprite feature records its handle");
+    defs[1].noobject = 0;
+    spot.Record(spotKinds, spotRoots, 1, sets);
+    Check(strstr(spot.text.Data(), "Spot#0.anim") == nullptr, "a spot of a model feature has none");
+    defs[1].noobject = 1;
+    spots[0].anim.index = 5;
+    spot.Record(spotKinds, spotRoots, 1, sets);
+    Check(strstr(spot.text.Data(), "  r Spot#0.anim.index 5\n") != nullptr, "a handle that came back after a model phase is recorded again");
+}
+
 void EmbeddedSiteSelfTest()
 {
     printf("an object embedded at two sites\n");
@@ -3750,6 +3804,7 @@ int SelfTest(const char* file)
     RawPointerSelfTest();
     MaskedViewSelfTest();
     EmbeddedSiteSelfTest();
+    FeatureTableSelfTest();
     UnnamedPtrSelfTest();
     AllOfListSelfTest();
     DeltaTableSelfTest();

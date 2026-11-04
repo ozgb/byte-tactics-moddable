@@ -60,6 +60,8 @@ HEADER_INCLUDES = [
     '"../../interfaces/ref.h"',
     '"../graphics/memory_cache.h"',
     '"../map/los_tables.h"',
+    '"../orders/order_type_entry.h"',
+    '"block_vector.h"',
     '"../network/packet_manager.h"',
     '"../quirks/quirks.h"',
     '"../units/movement_class.h"',
@@ -144,7 +146,15 @@ def load_rows() -> list[Row]:
         row.size = int(row.csv["size"])
         row.type = row.csv["type"]
         row.init = row.csv["init"]
-    return rows
+    return [r for r in rows if not in_vector(r, rows)]
+
+
+def in_vector(row: Row, rows: list[Row]) -> bool:
+    """Whether the row is a raw view into a BlockVector field, which the vector's own members replace."""
+    if not row.interior:
+        return False
+    box = next((r for r in rows if r.leaf == row.container and not r.interior), None)
+    return box is not None and resolve_plain_type(box).startswith("BlockVector<")
 
 
 def as_ref(t: str) -> str:
@@ -191,10 +201,28 @@ def field_rows(rows: list[Row]) -> list[Row]:
     return ordered
 
 
+def string_literal(data: bytes, size: int) -> str:
+    """The C++ string literal of the bytes up to the first NUL, escaped, for a char array of size bytes."""
+    text = data[:size].split(b"\0")[0]
+    out = []
+    for b in text:
+        c = chr(b)
+        if c in '"\\':
+            out.append("\\" + c)
+        elif 0x20 <= b < 0x7f:
+            out.append(c)
+        else:
+            out.append(f"\\{b:03o}")
+    return '"' + "".join(out) + '"'
+
+
 def initialiser(row: Row) -> str:
-    """The default member initialiser of a .data field: the first dword of its init."""
+    """The default member initialiser of a .data field: a string for a char array, else the first dword of its init."""
     if row.csv is None or row.csv["section"] != ".data":
         return ""
+    if re.match(r"^(unsigned |signed )?char\s*\[\d+\]$", resolve_type(row)):
+        text = string_literal(bytes.fromhex(row.init) if row.init else b"", row.size or 0)
+        return "" if text == '""' else f" = {text}"
     value = int.from_bytes(bytes.fromhex(row.init)[:4], "little") if row.init else 0
     return f" = {value}" if value else ""
 
@@ -267,10 +295,18 @@ class Tool:
             self.by_leaf.setdefault(row.leaf, row)
         self.names = sorted(self.by_leaf, key=len, reverse=True)
         self.word = re.compile(r"\b(" + "|".join(re.escape(n) for n in self.names) + r")\b")
+        self.member = re.compile(r"(?:->|\.)\s*(?:" + "|".join(re.escape(n) for n in self.names) + r")\b")
         self.canonical = {leaf: type_key(make_decl(resolve_type(r), leaf), leaf) for leaf, r in self.by_leaf.items()}
         self.changed: list[str] = []
         self.views: list[tuple[str, str]] = []
         self.warnings: list[str] = []
+
+    def names_global(self, code: str) -> bool:
+        """Whether a line of code uses a moved global, not just naming it under push_macro or as a member."""
+        code = strip_code(code)
+        if code.lstrip().startswith(("#pragma", "#undef")):
+            return False
+        return bool(self.word.search(self.member.sub("", code)))
 
     def write(self, path: Path, text: str) -> None:
         old = path.read_text() if path.exists() else None
@@ -358,10 +394,9 @@ class Tool:
             if code.strip().startswith("/*") and "*/" not in code:
                 in_comment = True
                 continue
-            if code.startswith("#define") or code.startswith("#undef") or self.word.search(strip_code(code)):
-                if not code.startswith("#include") and self.word.search(strip_code(code)):
-                    first = n
-                    break
+            if not code.startswith("#include") and self.names_global(code):
+                first = n
+                break
         if first is None:
             return text
         last = -1
@@ -430,7 +465,7 @@ class Tool:
         self.update_globals_csv()
         for rel in self.source_files():
             text = (ROOT / rel).read_text()
-            if self.word.search("\n".join(strip_code(l) for l in text.split("\n"))) or \
+            if any(self.names_global(l) for l in text.split("\n")) or \
                     "MovementClassTable::g_movementClasses" in text:
                 self.rewrite_source(rel)
 

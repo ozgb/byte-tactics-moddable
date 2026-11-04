@@ -91,6 +91,11 @@ jobs:
           python3 tools/test_replay_subsystems.py
           python3 tools/replay_subsystems.py check
 
+      - name: Check the sim globals block is current
+        run: |
+          python3 tools/test_simglobals.py
+          python3 tools/simglobals.py --check
+
   modern-compile:
     name: modern-compile
     runs-on: ubuntu-24.04
@@ -107,6 +112,11 @@ jobs:
       BT_NO_GHIDRA: 1
       BT_NO_ZLIB: 1
     steps:
+      - name: Free the runner SDKs the job doesn't use
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup
+          df -h /
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -188,7 +198,9 @@ jobs:
 
       - name: Build the WASM runtime and the injected wind_meteors module
         if: steps.changed.outputs.run == 'true'
-        run: cmake --build build/modern --target wasm_runtime wasm_runtime_inject
+        run: |
+          cmake --build build/modern --target wasm_runtime wasm_runtime_inject
+          df -h /
 
       - name: Run block_test, ref_test, replay_test and the native and WASM replays under Wine
         if: steps.changed.outputs.run == 'true'

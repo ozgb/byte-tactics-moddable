@@ -23,6 +23,9 @@
 #include "../state/sim_globals.h"
 #include "block_scan.h"
 #include "../state/block.h"
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
 
 #include "../../link/globals.h"
 
@@ -1407,6 +1410,9 @@ static void ResolveQuirks()
 
 void HarnessInit(char* cmdLine)
 {
+#if BT_ACCESS_LOG
+    AccessLogInit();
+#endif
     bool scanVerify = ParseBlockScanVerify(cmdLine);
     ParseBlockScan(cmdLine);
     if (s_blockScan)
@@ -1546,6 +1552,9 @@ static void RoundTripBlock()
 
 void HarnessAfterStep()
 {
+#if BT_ACCESS_LOG
+    AccessLogScope accessWindow(ACCESS_WINDOW_OFF, ACCESS_WINDOW_PRESENTATION);
+#endif
     if (HarnessTestMode()) {
         for (int i = 0; i < s_roundTripCount; i++) {
             if ((unsigned)g_game->ticks == s_roundTrips[i])
@@ -1608,6 +1617,9 @@ void HarnessAfterStep()
         sprintf(text, "testmode: cannot write a replay file%s%s\n", replayError[0] == '\0' ? "" : ": ", replayError);
         Fail(text);
     }
+#if BT_ACCESS_LOG
+    AccessLogFinish();
+#endif
     host_exit(0);
 }
 
@@ -3810,6 +3822,9 @@ void HarnessBeforeStep()
 {
     if (!HarnessTestMode())
         return;
+#if BT_ACCESS_LOG
+    AccessLogScope accessWindow(ACCESS_WINDOW_OFF, ACCESS_WINDOW_PENDING);
+#endif
     unsigned tick = GameU32(GAME_TICK);
     if (s_gameType == 3) {
         for (int i = 0; i < MAX_PLAYERS; i++)
@@ -4095,6 +4110,10 @@ void HarnessPhase(int phase)
     if (!HarnessTestMode() || s_trace == NULL)
         return;
     unsigned tick = GameU32(GAME_TICK);
+#if BT_ACCESS_LOG
+    AccessLogMarker(phase, tick);
+    AccessLogScope accessWindow(ACCESS_WINDOW_OFF, phase < 7 ? phase + 1 : ACCESS_WINDOW_TAIL);
+#endif
     unsigned holdrand = GameHoldrand(RAND_STREAM_MAIN);
     unsigned parkMiller = g_randomSeed;
 

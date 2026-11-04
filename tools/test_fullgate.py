@@ -173,6 +173,12 @@ class CommentTextTest(unittest.TestCase):
                                "coverage: no subsystem fell")
         self.assertEqual(fullgate.last_full_run([comment(text, "2026-11-04T10:00:00Z")]), "abc1234")
 
+    def test_the_host_line_of_the_check_ends_the_comment(self):
+        host = "host: Some CPU (GenuineIntel), Fedora Linux 44 7.2.7, wine-11.0 (Staging)"
+        text = fullgate.comment_text("abc1234", (0, host + "\n" + BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE))
+        self.assertEqual(text.split("\n"), [fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE)), host])
+        self.assertEqual(fullgate.last_full_run([comment(text, "2026-11-04T10:00:00Z")]), "abc1234")
+
     def test_pointer_problems_name_the_mode(self):
         self.assertEqual(fullgate.pointer_result(BOTH_MODES_BAD),
                          "[wasm] all covered by data/block_pointers.csv; [native] 10 block pointer problems")

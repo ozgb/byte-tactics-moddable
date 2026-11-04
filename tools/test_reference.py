@@ -1109,6 +1109,41 @@ class TracediffCommandTest(unittest.TestCase):
         self.assertEqual(cmd[cmd.index("--game-dir") + 1], "/ta")
 
 
+CPUINFO = """processor\t: 0
+vendor_id\t: GenuineIntel
+cpu family\t: 6
+model name\t: 13th Gen Intel(R) Core(TM) i7-13700H
+flags\t\t: fpu vme
+
+processor\t: 1
+vendor_id\t: GenuineIntel
+model name\t: second processor
+"""
+OS_RELEASE = """NAME="Fedora Linux"
+VERSION="44 (Workstation Edition)"
+PRETTY_NAME="Fedora Linux 44 (Workstation Edition)"
+ID=fedora
+"""
+
+
+class HostLineTest(unittest.TestCase):
+    def test_the_cpu_is_the_first_processors_model_and_vendor(self):
+        self.assertEqual(reference.cpu_description(CPUINFO), "13th Gen Intel(R) Core(TM) i7-13700H (GenuineIntel)")
+
+    def test_a_cpuinfo_without_fields_is_unknown(self):
+        self.assertEqual(reference.cpu_description(""), "unknown CPU")
+        self.assertEqual(reference.cpu_description("vendor_id\t: AuthenticAMD\n"), "unknown CPU (AuthenticAMD)")
+
+    def test_the_os_is_the_pretty_name(self):
+        self.assertEqual(reference.os_description(OS_RELEASE), "Fedora Linux 44 (Workstation Edition)")
+        self.assertEqual(reference.os_description("ID=x\n"), "unknown OS")
+
+    def test_the_line_joins_cpu_os_kernel_and_wine(self):
+        self.assertEqual(reference.host_line(CPUINFO, OS_RELEASE, "7.2.7-200.fc44.x86_64", "wine-11.0 (Staging)"),
+                         "host: 13th Gen Intel(R) Core(TM) i7-13700H (GenuineIntel), Fedora Linux 44 (Workstation Edition) "
+                         "7.2.7-200.fc44.x86_64, wine-11.0 (Staging)")
+
+
 class GateCacheTest(unittest.TestCase):
     OPTIONS = {"tier": False, "mode": "wasm", "steps_per_frame": None, "quirks": None, "roundtrip": None, "poison": False}
 
@@ -1138,6 +1173,9 @@ class GateCacheTest(unittest.TestCase):
         patch = mock.patch.dict(os.environ, {reference.CACHE_ENV: str(self.cache)})
         patch.start()
         self.addCleanup(patch.stop)
+        self.wine = mock.patch.object(reference.playtest, "wine_version", return_value="wine-11.0 (Staging)")
+        self.wine.start()
+        self.addCleanup(self.wine.stop)
 
     def key(self, **options):
         return reference.gate_key(self.exe, {**self.OPTIONS, **options}, self.root)
@@ -1194,6 +1232,19 @@ class GateCacheTest(unittest.TestCase):
                             ("quirks", "recommended"), ("roundtrip", "auto"), ("poison", True)):
             self.assertNotEqual(self.key(**{name: value}), base, name)
 
+    def test_the_wine_release_changes_the_key(self):
+        staging = self.key()
+        with mock.patch.object(reference.playtest, "wine_version", return_value="wine-10.0"):
+            stable = self.key()
+        self.assertNotEqual(staging, stable)
+        self.assertEqual(staging, self.key())
+
+    def test_a_pass_under_one_wine_is_not_cached_under_another(self):
+        reference.store_pass(self.key(), "ok a\n", "abc")
+        with mock.patch.object(reference.playtest, "wine_version", return_value="wine-10.0"):
+            self.assertIsNone(reference.cached_pass(self.key()))
+        self.assertIsNotNone(reference.cached_pass(self.key()))
+
     def test_commit_txt_does_not_change_the_key(self):
         base = self.key()
         (self.root / "reference/commit.txt").write_text("c2")
@@ -1221,7 +1272,8 @@ class GateCacheTest(unittest.TestCase):
         argv = ["reference.py", "--check", "--exe", str(self.exe), *extra]
         with mock.patch.object(sys, "argv", argv), mock.patch.object(reference, "ROOT", self.root), \
                 mock.patch.object(reference, "check_traces", check), mock.patch.object(reference, "head_commit", return_value="abc"), \
-                mock.patch.object(reference, "KeyLock", mock.MagicMock()), contextlib.redirect_stdout(io.StringIO()) as out:
+                mock.patch.object(reference, "KeyLock", mock.MagicMock()), \
+                mock.patch.object(reference, "current_host_line", return_value="host: test"), contextlib.redirect_stdout(io.StringIO()) as out:
             try:
                 reference.main()
                 code = 0
@@ -1237,11 +1289,11 @@ class GateCacheTest(unittest.TestCase):
             print("ok a\n1 of 1 equal")
 
         code, out = self.run_main(check)
-        self.assertEqual((code, len(played), out), (0, 1, "ok a\n1 of 1 equal\n"))
+        self.assertEqual((code, len(played), out), (0, 1, "host: test\nok a\n1 of 1 equal\n"))
         code, out = self.run_main(check)
         self.assertEqual((code, len(played)), (0, 1))
         self.assertTrue(out.startswith("cached pass from "))
-        self.assertTrue(out.endswith(" at abc\nok a\n1 of 1 equal\n"))
+        self.assertTrue(out.endswith(" at abc\nhost: test\nok a\n1 of 1 equal\n"))
 
     def test_main_plays_again_with_no_cache_or_other_options(self):
         played = []

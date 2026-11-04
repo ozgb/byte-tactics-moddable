@@ -244,7 +244,7 @@ export WINEARCH=win64
 cmake -S . -B build/modern -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake   # once
 cmake --build build/modern
 cmake --build build/modern --target wasm_runtime   # once, and again after a change to wasm/ or a module's sources
-rm -r build/playtest/prefix     # a fresh prefix; tools/playtest.py makes it again
+rm -r build/playtest/prefix     # a fresh prefix (one template per Wine release lives under it); tools/playtest.py makes it again
 uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta   # the pull request gate
 uv run tools/reference.py --check --both-modes --exe build/modern/TotalA.exe --game-dir ~/.ta   # every scenario, in both module modes: the full gate
 ```

@@ -26,8 +26,9 @@ A second `--check` with the same cache key waits for the first on a key lock (bt
 `--no-lock` takes no slot and no key lock. A scenario with a `load` line starts as soon as the scenario it loads has finished.
 A passing `--check` stores its output under ~/.cache/bt-gate/<key>.txt, the key being a SHA-256 of the exe, the files beside it
 (wasmtime_host.dll, *.wasm, modules.json), reference/{scenarios,traces,sounds,ui,frames,saves}, the four tools that play and compare
-(commit.txt is left out) and the options; a later `--check` with the same key, looked up before the lock and again after it, prints
-`cached pass from <date> at <commit>` and the stored lines and exits 0. `--no-cache` plays anyway.
+(commit.txt is left out), `wine --version` and the options; a later `--check` with the same key, looked up before the lock and again after it, prints
+`cached pass from <date> at <commit>` and the stored lines and exits 0. `--no-cache` plays anyway. A `--check` prints
+`host: <CPU model> (<vendor>), <OS> <kernel>, <wine --version>` before its results (the stored lines have it too).
 
 Every scenario is played with new game allocations zeroed (the game's own -memset=0 switch, through
 tools/playtest.py --testmode). `--check --native-modules` runs the exe's modules as native code (-modules=native) instead of in WASM. `--check --poison` fills them with 0xCD instead (-memset=0xcdcdcdcd); a
@@ -59,6 +60,7 @@ import contextlib
 import fcntl
 import hashlib
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -442,9 +444,49 @@ def gate_key(exe: Path, options: dict[str, object], root: Path = ROOT) -> str:
         digest.update(f"{path.name}\0".encode())
         digest.update(path.read_bytes() if path.is_file() else b"-")
         digest.update(b"\0")
+    digest.update(f"wine={playtest.wine_version()}\0".encode())
     for name in sorted(options):
         digest.update(f"{name}={options[name]!r}\0".encode())
     return digest.hexdigest()
+
+
+def cpu_description(cpuinfo: str) -> str:
+    """`<model name> (<vendor_id>)` from the text of /proc/cpuinfo (its first processor), or `unknown CPU`."""
+    fields: dict[str, str] = {}
+    for line in cpuinfo.splitlines():
+        name, _, value = line.partition(":")
+        if name.strip() in ("model name", "vendor_id") and name.strip() not in fields:
+            fields[name.strip()] = " ".join(value.split())
+    model, vendor = fields.get("model name"), fields.get("vendor_id")
+    if model and vendor:
+        return f"{model} ({vendor})"
+    return model or (f"unknown CPU ({vendor})" if vendor else "unknown CPU")
+
+
+def os_description(os_release: str) -> str:
+    """PRETTY_NAME from the text of /etc/os-release, or `unknown OS`."""
+    for line in os_release.splitlines():
+        name, _, value = line.partition("=")
+        if name.strip() == "PRETTY_NAME":
+            return value.strip().strip("\"'") or "unknown OS"
+    return "unknown OS"
+
+
+def host_line(cpuinfo: str, os_release: str, kernel: str, wine: str) -> str:
+    """`host: <CPU model> (<vendor>), <OS> <kernel>, <wine --version>`."""
+    return f"host: {cpu_description(cpuinfo)}, {os_description(os_release)} {kernel}, {wine or 'no wine'}"
+
+
+def read_text(path: str) -> str:
+    try:
+        return Path(path).read_text(errors="replace")
+    except OSError:
+        return ""
+
+
+def current_host_line() -> str:
+    """The host line of this machine."""
+    return host_line(read_text("/proc/cpuinfo"), read_text("/etc/os-release"), platform.release(), playtest.wine_version())
 
 
 def cached_pass(key: str) -> str | None:
@@ -1658,6 +1700,7 @@ def main() -> None:
         tee = Tee(sys.stdout)
         sys.stdout = tee
         try:
+            print(current_host_line(), flush=True)
             check_traces(exe, args.game_dir, args.parallel, args.tier, args.poison, args.steps_per_frame,
                          args.quirks, args.save_blockptrs, args.roundtrip, args.both_modes)
         finally:

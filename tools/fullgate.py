@@ -180,7 +180,8 @@ def comment_text(sha: str, check: tuple[int, str], roundtrip: tuple[int, str], c
     for name, status in (("both modes", code), ("round trip", trip_code), ("coverage", cov_code)):
         if status != 0:
             text += f", {name} exit {1 if status == BUILD_FAILED else status}"
-    return text
+    host = next((line for line in output.splitlines() if line.startswith("host: ")), None)
+    return f"{text}\n{host}" if host else text
 
 
 def play(args: list[str], log: Path | None, what: str) -> tuple[int, str]:

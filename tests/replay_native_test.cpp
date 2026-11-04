@@ -2711,6 +2711,55 @@ void ShapeSelfTest()
     t.Free();
 }
 
+void InOutRunnerSelfTest()
+{
+    printf("in/out arguments through the runner\n");
+    ResetBlock();
+    LoadCall("  a first (5)\n  a second (6)\n  o first (8)\n  o second (0)\n  o result 8\n");
+    BeginCompare();
+    Run_fixture_Query();
+    After_fixture_Query();
+    Check(g_diffs == 0, "a struct in/out recording replays equal");
+    LoadCall("  a first (5)\n  a second null\n  o first (8)\n  o result 8\n");
+    BeginCompare();
+    Run_fixture_Query();
+    After_fixture_Query();
+    Check(g_diffs == 0, "and so does one with a null pointer, which has no o line");
+    LoadCall("  a first (5)\n  a second null\n  o first (9)\n  o result 8\n");
+    BeginCompare();
+    Run_fixture_Query();
+    After_fixture_Query();
+    printf("a struct that came out differently: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "first") == 0, "a replayed value that differs is reported at the argument");
+    LoadCall("  a first (5)\n  a second null\n  o first (8)\n  o second (0)\n  o result 8\n");
+    BeginCompare();
+    Run_fixture_Query();
+    After_fixture_Query();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "second") == 0, "an o line for a pointer that was null is a difference");
+    LoadCall("  a first (5)\n  a second null\n  o first (8)\n  o result 7\n");
+    BeginCompare();
+    Run_fixture_Query();
+    After_fixture_Query();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "result") == 0, "and the result is compared after the values");
+
+    LoadCall("  a p2 (5)\n  a p3 null\n  a p4 (7)\n  o p2 (10)\n  o p4 (8)\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Measure();
+    After_fixture_Measure();
+    Check(g_diffs == 0, "a scalar in/out recording replays equal");
+    LoadCall("  a p2 (5)\n  a p3 (-3)\n  a p4 (7)\n  o p2 (10)\n  o p3 (-4)\n  o p4 (8)\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Measure();
+    After_fixture_Measure();
+    Check(g_diffs == 0, "with every pointer set too");
+    LoadCall("  a p2 (5)\n  a p3 null\n  a p4 (7)\n  o p2 (10)\n  o p4 (9)\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Measure();
+    After_fixture_Measure();
+    printf("a scalar that came out differently: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "p4") == 0, "a replayed scalar that differs is reported at the argument");
+}
+
 void CallbackSelfTest()
 {
     printf("callbacks\n");
@@ -4803,6 +4852,7 @@ int SelfTest(const char* file)
     ArraySelfTest();
     FormSelfTest();
     ShapeSelfTest();
+    InOutRunnerSelfTest();
     PolymorphicSelfTest();
     RefsSelfTest();
     BasedTableSelfTest();

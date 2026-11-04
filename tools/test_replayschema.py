@@ -1477,7 +1477,7 @@ class InsideSites(unittest.TestCase):
         self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 11;", text)
+        self.assertIn("kReplayInsideSiteCount = 12;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
@@ -1783,7 +1783,7 @@ class ElementForms(unittest.TestCase):
         text = files[rs.FIXTURE_SCHEMA_H]
         self.assertIn('    { ROK_FIXTUREGROUP, ROK_FIXTUREOWNER, offsetof(FixtureOwner, groups), "groups[]", sizeof(FixtureGroup), 4, 1 },', text)
         self.assertTrue(self.row(text, '    { "FixtureGroup", sizeof(FixtureGroup), RS_STATE, RT_ORDER,'))
-        self.assertEqual([t["kind"] for t in model["tables"] if t["kind"].startswith("Fixture")], ["FixtureCell", "FixtureLane"])
+        self.assertEqual([t["kind"] for t in model["tables"] if t["kind"].startswith("Fixture")], ["FixtureCell", "FixtureLane", "FixtureEye"])
 
     def test_a_table_behind_a_ref_field_is_checked(self):
         cases = (({"base": {"object": "Nowhere", "field": "groups"}, "count": 4}, "the base Nowhere is no state kind"),
@@ -1855,6 +1855,252 @@ class ElementForms(unittest.TestCase):
         body = body[:body.index("\n}\n")]
         self.assertIn("ImportObject(line, ROK_FIXTURECB, a2);", body)
         del slot
+
+
+class CapacityTables(unittest.TestCase):
+    """A table with a live count and room for more: a `capacity`, and `"alloc": "module"` for memory the module frees."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def table(self, ann, **change):
+        ann["objects"]["FixtureEye"]["table"].update(change)
+        return ann
+
+    def test_the_committed_fixtures_have_no_errors(self):
+        self.assertEqual(self.generated()[1], [])
+
+    def test_a_global_table_has_a_capacity_and_the_module_flag(self):
+        files, _, model = self.generated()
+        eyes = {t["kind"]: t for t in model["tables"]}["FixtureEye"]
+        self.assertEqual((eyes["module"], eyes["alloc"], eyes["capacity"]), (True, 0, [{"const": 4}, {"const": 1}]))
+        self.assertEqual(eyes["count"], [{"member": "hotRadarCount", "shift": 0}, {"const": 1}])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("{ 0, 1, offsetof(Game, hotRadar), { { offsetof(Game, hotRadarCount), (unsigned char)sizeof(((Game*)nullptr)->hotRadarCount), 0 }, { 1, 0, 0 } }, 0, "
+                      "{ { 4, 0, 0 }, { 1, 0, 0 } }, 1, 1 },", text)
+        self.assertIn("{ 0, 1, offsetof(Game, p1b8a), { { 9000, 0, 0 }, { 1, 0, 0 } }, 9000 },", text)
+
+    def test_a_capacity_may_be_a_member(self):
+        ann = self.table(annotations(), capacity="hotRadarCount")
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn("0, { { offsetof(Game, hotRadarCount), (unsigned char)sizeof(((Game*)nullptr)->hotRadarCount), 0 }, { 1, 0, 0 } }, 1, 1 },", files[rs.SCHEMA_H])
+
+    def test_a_table_without_a_capacity_has_the_old_row(self):
+        ann = self.table(annotations(), alloc=3)
+        del ann["objects"]["FixtureEye"]["table"]["capacity"]
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn("{ 0, 1, offsetof(Game, hotRadar), { { offsetof(Game, hotRadarCount), (unsigned char)sizeof(((Game*)nullptr)->hotRadarCount), 0 }, { 1, 0, 0 } }, 3 },", files[rs.SCHEMA_H])
+
+    def test_a_global_table_with_a_capacity_is_checked(self):
+        ann = annotations()
+        del ann["objects"]["FixtureEye"]["table"]["capacity"]
+        self.has(ann, "FixtureEye table: \"alloc\": \"module\" needs a capacity")
+        self.has(self.table(annotations(), alloc=4), "a table with a capacity has no integer alloc")
+        self.has(self.table(annotations(), alloc="elsewhere"), "FixtureEye table: a table with a capacity has no integer alloc")
+        self.has(self.table(annotations(), ref=False), "only a ref table can be allocated by the module")
+        self.has(self.table(annotations(), capacity=0), "the capacity is positive")
+        self.has(self.table(annotations(), count=9, capacity=4), "the count 9 is more than the capacity 4")
+        self.has(self.table(annotations(), capacity="a*b*c"), "the length `a*b*c`")
+
+    def test_the_count_and_the_capacity_are_recorded_block_fields(self):
+        ann = annotations()
+        del ann["game_fields"]["hotRadarCount"]
+        self.has(ann, "FixtureEye table: the count names hotRadarCount, which is no tracked field of Game")
+        self.has(self.table(annotations(), capacity="count_14367"), "FixtureEye table: the capacity names count_14367, which is no tracked field of Game")
+
+    def test_a_slot_that_reaches_the_table_reads_the_capacity_member(self):
+        ann = self.table(annotations(), capacity="hotRadarCount")
+        ann["rules"].append({"kind": "field_escape", "target": "Game::hotRadar", "rule": "all-of", "object": "FixtureEye", "note": "test"})
+        errors = rs.generate(rs.read_rows() + [row("UpdateResourceSharing", "field_escape", "Game::hotRadar")], ann)[1]
+        self.assertTrue(any("economy.UpdateResourceSharing reaches FixtureEye, whose capacity is Game.hotRadarCount" in e for e in errors), errors)
+        ann["subsystems"]["economy"]["slots"].setdefault("UpdateResourceSharing", {})["reads"] = ["Game.hotRadarCount"]
+        errors = rs.generate(rs.read_rows() + [row("UpdateResourceSharing", "field_escape", "Game::hotRadar")], ann)[1]
+        self.assertEqual([e for e in errors if "reaches" in e], [])
+
+    def test_a_table_behind_a_ref_field_has_a_capacity_that_is_a_member_of_the_owner(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        site = model["sites"]["FixtureNode"][0]
+        self.assertEqual((site["capped"], site["module"], site["room"]), (True, True, [{"member": "capacity", "shift": 0}, {"const": 1}]))
+        self.assertIn('    { ROK_FIXTURENODE, ROK_FIXTUREHEAP, offsetof(FixtureHeap, pool), "pool[]", sizeof(FixtureNode), 0, 1, 1, '
+                      '{ { offsetof(FixtureHeap, capacity), (unsigned char)sizeof(((FixtureHeap*)nullptr)->capacity), 0 }, { 1, 0, 0 } }, 1 },', files[rs.SCHEMA_H])
+
+    def test_a_table_behind_a_ref_field_may_have_a_constant_capacity(self):
+        ann = annotations()
+        ann["objects"]["FixtureNode"]["table"]["capacity"] = 6
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn('"pool[]", sizeof(FixtureNode), 6, 1, 1, { { 6, 0, 0 }, { 1, 0, 0 } }, 1 },', files[rs.SCHEMA_H])
+
+    def test_a_table_behind_a_ref_field_with_a_capacity_is_checked(self):
+        def table(**change):
+            ann = annotations()
+            ann["objects"]["FixtureNode"]["table"].update(change)
+            return ann
+        self.has(table(count="nowhere"), "the count nowhere is no integer field of FixtureHeap")
+        self.has(table(capacity="nowhere"), "the capacity nowhere is no integer field of FixtureHeap")
+        self.has(table(capacity="pool"), "the capacity pool is no integer field of FixtureHeap")
+        self.has(table(capacity=0), "the capacity is a positive integer or a member of FixtureHeap")
+        self.has(table(count=9, capacity=4), "the count 9 is more than the capacity 4")
+        self.has(table(alloc="elsewhere"), "the alloc of a table with a capacity is \"module\", or absent")
+        ann = annotations()
+        del ann["objects"]["FixtureNode"]["table"]["capacity"]
+        self.has(ann, "only a table with a capacity has an alloc")
+        ann = annotations()
+        del ann["objects"]["FixtureNode"]["table"]["count"]
+        self.has(ann, "FixtureNode table: the count is an integer or the name of a member of FixtureHeap")
+
+    def test_a_table_behind_a_ref_field_without_alloc_uses_the_replayers_allocator(self):
+        ann = annotations()
+        del ann["objects"]["FixtureNode"]["table"]["alloc"]
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn('"pool[]", sizeof(FixtureNode), 0, 1, 0, { { offsetof(FixtureHeap, capacity)', files[rs.SCHEMA_H])
+
+
+class SelfPointers(unittest.TestCase):
+    """A field that points into its own object: a member (never a line), or an element of the array a member holds (written as the index)."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, kind, name):
+        return next(f for f in ann["objects"][kind]["fields"] if f["name"] == name)
+
+    def test_a_self_pointer_is_a_row_of_the_self_table(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("static const ReplaySelfSpec kReplaySelfs[] = {\n    { offsetof(FixtureEye, pos), 0 },\n    { offsetof(FixtureEye, flag), 0 },\n"
+                      "    { offsetof(FixtureHeap, pool), sizeof(FixtureNode) },\n};", text)
+        row = [l for l in text.split("\n") if l.startswith('    { "screen", offsetof(FixtureEye, screen)')][0]
+        self.assertTrue(row.endswith("RK_SELF, 0, 0, 0, {}, 0, 0, 1 },"), row)
+        self.assertEqual([(x["name"], x["member"], x["index"]) for x in model["selfs"]], [("screen", "pos", False), ("flagPtr", "flag", False), ("top", "pool", True)])
+
+    def test_an_index_has_its_own_kind_and_a_target(self):
+        files, _, _ = self.generated()
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "top", offsetof(FixtureHeap, top)')][0]
+        self.assertTrue(row.endswith("RK_SELFINDEX, ROK_FIXTURENODE, 0, 0, {}, 0, 0, 3 },"), row)
+
+    def test_the_header_checks_that_a_self_pointer_is_a_ref_to_a_member_that_exists(self):
+        text = self.generated()[0][rs.SCHEMA_H]
+        self.assertIn('static_assert(sizeof(((FixtureEye*)nullptr)->screen) == sizeof(unsigned), "FixtureEye::screen is a Ref");', text)
+        self.assertIn('static_assert(sizeof(((FixtureEye*)nullptr)->pos) >= 1,', text)
+
+    def test_the_real_schema_has_no_self_pointer_and_an_empty_table(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        self.assertIn("static const ReplaySelfSpec kReplaySelfs[] = {\n    { 0, 0 },\n};", files[rs.SCHEMA_H])
+
+    def test_a_self_pointer_is_never_walked(self):
+        self.assertNotIn("self", rs.WALKABLE)
+        self.assertNotIn("selfindex", rs.WALKABLE)
+
+    def test_a_self_field_is_checked(self):
+        ann = annotations()
+        self.field(ann, "FixtureEye", "screen")["target"] = "FixtureNode"
+        self.has(ann, "FixtureEye.screen: a self pointer to a member has no `target`")
+        ann = annotations()
+        self.field(ann, "FixtureEye", "screen")["extra"] = 1
+        self.has(ann, "FixtureEye.screen: a self field is")
+        ann = annotations()
+        del self.field(ann, "FixtureEye", "screen")["member"]
+        self.has(ann, "FixtureEye.screen: the `member` of a self field is the name of a member of FixtureEye")
+        ann = annotations()
+        self.field(ann, "FixtureEye", "screen")["member"] = "pos x"
+        self.has(ann, "FixtureEye.screen: the `member` of a self field is the name of a member of FixtureEye")
+        ann = annotations()
+        self.field(ann, "FixtureEye", "screen")["index"] = "yes"
+        self.has(ann, "FixtureEye.screen: `index` is true or false")
+
+    def test_an_index_names_the_ref_field_that_holds_the_array(self):
+        ann = annotations()
+        del self.field(ann, "FixtureHeap", "top")["target"]
+        self.has(ann, "FixtureHeap.top: the target of a self index is the state kind of the array's elements")
+        ann = annotations()
+        self.field(ann, "FixtureHeap", "top")["member"] = "used"
+        self.has(ann, "FixtureHeap.top: the member used is no ref field of FixtureHeap that comes earlier and leads to FixtureNode")
+        ann = annotations()
+        self.field(ann, "FixtureHeap", "top")["member"] = "nowhere"
+        self.has(ann, "FixtureHeap.top: the member nowhere is no ref field")
+        ann = annotations()
+        fields = ann["objects"]["FixtureHeap"]["fields"]
+        fields.append(fields.pop(next(i for i, f in enumerate(fields) if f["name"] == "pool")))
+        self.has(ann, "FixtureHeap.top: the member pool is no ref field of FixtureHeap that comes earlier")
+        ann = annotations()
+        self.field(ann, "FixtureHeap", "pool")["target"] = "FixtureEye"
+        self.has(ann, "FixtureHeap.top: the member pool is no ref field of FixtureHeap that comes earlier and leads to FixtureNode")
+
+    def test_only_a_state_kind_has_a_self_pointer(self):
+        ann = annotations()
+        ann["objects"]["Vec3"]["fields"].append({"name": "x", "kind": "self", "member": "y"})
+        self.has(ann, "only the fields of a state kind are self pointers")
+
+    def test_a_self_pointer_may_have_aliases(self):
+        ann = annotations()
+        self.field(ann, "FixtureEye", "screen")["aliases"] = ["FixtureEye::screenAlias"]
+        self.assertEqual(self.generated(ann)[1], [])
+
+    def test_a_row_on_a_self_pointer_is_an_object_field(self):
+        model, errors = build([row("UpdatePlayerEconomy", "field_read", "FixtureEye::screen")])
+        names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
+        s = model["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]
+        self.assertIn("FixtureEye.screen", [names[i] for i in s["objectReads"]])
+
+
+class RefCTypes(unittest.TestCase):
+    """A ref whose C type differs from its target kind: `Ref<char>` to a state kind."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def owner(self, ann):
+        return next(f for f in ann["objects"]["FixtureEye"]["fields"] if f["name"] == "owner")
+
+    def test_the_header_checks_the_declared_type(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        self.assertIn('static_assert(__is_same(decltype(((FixtureEye*)nullptr)->owner), Ref<char>), "FixtureEye::owner is a Ref<char>");', files[rs.SCHEMA_H])
+
+    def test_a_ref_without_a_ctype_is_not_checked_for_its_type(self):
+        ann = annotations()
+        del self.owner(ann)["ctype"]
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertNotIn("FixtureEye::owner is a Ref", files[rs.SCHEMA_H])
+
+    def test_the_target_is_the_kind_whatever_the_ctype(self):
+        files, _, model = self.generated()
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "owner", offsetof(FixtureEye, owner)')][0]
+        self.assertIn("RK_REF, ROK_FIXTUREVIEW,", row)
+
+    def test_an_array_of_refs_checks_its_ctype_too(self):
+        ann = annotations()
+        next(f for f in ann["objects"]["FixtureManager"]["fields"] if f["name"] == "timers")["ctype"] = "FixtureTimerBase"
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn("FixtureManager::timers holds Ref<FixtureTimerBase>", files[rs.SCHEMA_H])
+
+    def test_the_ctype_is_checked(self):
+        ann = annotations()
+        self.owner(ann)["ctype"] = "Ref<char>"
+        self.has(ann, "FixtureEye.owner: the `ctype` is the C type that the Ref holds")
+        ann = annotations()
+        self.owner(ann)["kind"] = "ptr"
+        self.has(ann, "FixtureEye.owner: only a ref or an array of refs has a `ctype`")
 
 
 class Committed(unittest.TestCase):

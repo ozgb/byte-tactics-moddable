@@ -768,6 +768,42 @@ bool ReplayFieldIsCondition(const ReplayObjectField& f)
     return &f >= kReplayObjectFields && &f < kReplayObjectFields + kReplayObjectFieldCount && reads[&f - kReplayObjectFields] != 0;
 }
 
+namespace {
+
+void AddCallbackName(ReplayText& t, unsigned callback, const void* p, bool assign)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    unsigned kind = REPLAY_HANDLE_CALLBACK + callback;
+    unsigned ordinal = assign ? g_replayHandles.Of(kind, p) : g_replayHandles.Find(kind, p);
+    t.Add(kReplayCallbacks[callback].handle);
+    if (ordinal == 0) {
+        t.Add("#?");
+        return;
+    }
+    t.AddChar('#');
+    t.AddUnsigned(ordinal);
+}
+
+void* BindCallbackName(unsigned callback, const char* value, ReplayAllocFn alloc)
+{
+    const char* handle = kReplayCallbacks[callback].handle;
+    size_t length = strlen(handle);
+    if (strncmp(value, handle, length) != 0 || value[length] != '#' || value[length + 1] < '1' || value[length + 1] > '9')
+        return nullptr;
+    const char* digits = value + length + 1;
+    for (const char* p = digits; *p != '\0'; p++) {
+        if (*p < '0' || *p > '9')
+            return nullptr;
+    }
+    ReplayBindCallbackFn bind = ReplayBindCallbackHook();
+    return bind == nullptr ? nullptr : bind(callback, (unsigned)atoi(digits), alloc);
+}
+
+}
+
 bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, ReplayObjectTable& table, bool assign, ReplayText& out)
 {
     out.Clear();
@@ -829,6 +865,12 @@ bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, Rep
         break;
     case RK_PTR:
         ReplayAddObjectName(out, table, f.target, *(void* const*)at, assign);
+        break;
+    case RK_CBREF:
+        AddCallbackName(out, f.target, BlockAt(*(const unsigned*)at), assign);
+        break;
+    case RK_CBPTR:
+        AddCallbackName(out, f.target, *(void* const*)at, assign);
         break;
     case RK_UNITID:
         out.AddUnsigned(*(const unsigned short*)at);
@@ -1125,6 +1167,20 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
                 return false;
         }
         *(void**)at = target;
+        break;
+    }
+    case RK_CBREF:
+    case RK_CBPTR: {
+        void* target = nullptr;
+        if (strcmp(value, "null") != 0) {
+            target = BindCallbackName(f.target, value, alloc);
+            if (target == nullptr)
+                return false;
+        }
+        if (f.kind == RK_CBPTR)
+            *(void**)at = target;
+        else
+            *(unsigned*)at = target == nullptr ? 0u : (unsigned)((const char*)target - (const char*)SimBlockBase());
         break;
     }
     default:
@@ -2242,6 +2298,14 @@ bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTabl
     return *q == ')' && q[1] == '\0';
 }
 
+ReplayOrdinals g_replayHandles;
+
+ReplayBindCallbackFn& ReplayBindCallbackHook()
+{
+    static ReplayBindCallbackFn hook;
+    return hook;
+}
+
 namespace {
 
 enum { MAX_ACTIVE_CALLBACKS = 8 };
@@ -2260,7 +2324,7 @@ ReplayCallbackScope* FindScope(const void* object)
 
 }
 
-ReplayCallbackScope::ReplayCallbackScope() : active(false), callback(0), object(nullptr), original(nullptr), ordinal(0), table(nullptr)
+ReplayCallbackScope::ReplayCallbackScope() : active(false), callback(0), object(nullptr), original(nullptr), ordinal(0), indent(4), table(nullptr)
 {
 }
 
@@ -2270,7 +2334,7 @@ ReplayCallbackScope::~ReplayCallbackScope()
     lines.Free();
 }
 
-void ReplayCallbackScope::Start(unsigned id, void* target, unsigned number, ReplayObjectTable& names, const void* thunkVtable)
+void ReplayCallbackScope::Start(unsigned id, void* target, unsigned number, ReplayObjectTable& names, const void* thunkVtable, unsigned width)
 {
     if (active || target == nullptr)
         return;
@@ -2283,6 +2347,7 @@ void ReplayCallbackScope::Start(unsigned id, void* target, unsigned number, Repl
     callback = id;
     object = target;
     ordinal = number;
+    indent = width;
     table = &names;
     original = *(const void* const*)target;
     *(const void**)target = thunkVtable;
@@ -2313,7 +2378,7 @@ ReplayCallbackCall::ReplayCallbackCall(const void* target, unsigned method) : sc
         ReplayFail("a callback made inside a callback of an import is not recorded");
     s_callbackDepth++;
     const ReplayCallbackType& type = kReplayCallbacks[found->callback];
-    text.Add("\n    c ");
+    text.Add(found->indent == 2 ? "\n  c " : "\n    c ");
     text.Add(type.handle);
     text.AddChar('#');
     text.AddUnsigned(found->ordinal);

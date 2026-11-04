@@ -299,3 +299,25 @@ unsigned ReplayOrdinals::Of(unsigned kind, const void* object)
     objects[kind][count[kind]++] = object;
     return count[kind];
 }
+
+unsigned ReplayOrdinals::Find(unsigned kind, const void* object) const
+{
+    if (object == nullptr || kind >= KINDS)
+        return 0;
+    for (unsigned i = 0; i < count[kind]; i++) {
+        if (objects[kind][i] == object)
+            return i + 1;
+    }
+    return 0;
+}
+
+void ReplayOrdinals::Bind(unsigned kind, unsigned ordinal, const void* object)
+{
+    if (kind >= KINDS || ordinal == 0 || ordinal > CAPACITY) {
+        ReplayFail("a handle ordinal that cannot be bound");
+        return;
+    }
+    while (count[kind] < ordinal)
+        objects[kind][count[kind]++] = nullptr;
+    objects[kind][ordinal - 1] = object;
+}

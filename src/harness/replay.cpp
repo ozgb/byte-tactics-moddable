@@ -26,6 +26,8 @@ namespace {
 
 enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK, OBJ_CALLBACK };
 
+static_assert(OBJ_CALLBACK == REPLAY_HANDLE_CALLBACK, "the callback handles are numbered as the object fields number them");
+
 struct Recording {
     Recording() : on(true), windowed(false), first(0), last(0) {}
     bool on;
@@ -60,7 +62,6 @@ int s_tick;
 ReplayText s_call;
 ReplayText s_tail;
 ReplayText s_field;
-ReplayOrdinals s_ordinals;
 ReplaySnapshots s_snapshots;
 ReplayText s_nested;
 bool s_nestedSlot;
@@ -80,7 +81,7 @@ void AddStream(ReplayText& t, int stream)
 void AddHandle(ReplayText& t, unsigned kind, const void* p)
 {
     static const char* const names[] = { "file", "rec", "bank" };
-    unsigned ordinal = s_ordinals.Of(kind, p);
+    unsigned ordinal = g_replayHandles.Of(kind, p);
     if (ordinal == 0) {
         t.Add("null");
         return;
@@ -170,7 +171,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
     s_recording = !r.windowed || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
     if (!s_recording)
         return;
-    s_ordinals.Reset();
+    g_replayHandles.Reset();
     s_snapshots.Reset();
     s_nested.Clear();
     s_call.Clear();
@@ -408,10 +409,30 @@ void ImportHandle(ReplayText& t, unsigned kind, const void* p)
 void ImportCallback(ReplayText& t, ReplayCallbackScope& scope, unsigned callback, void* object)
 {
     unsigned kind = OBJ_CALLBACK + callback;
-    unsigned ordinal = s_ordinals.Of(kind, object);
+    unsigned ordinal = g_replayHandles.Of(kind, object);
     t.AddChar(' ');
     AddHandle(t, kind, object);
     scope.Start(callback, object, ordinal, Table(), ReplayThunkVtable(callback));
+}
+
+void ArgCallback(ReplayText& t, const char* name, ReplayCallbackScope& scope, unsigned callback, void* object)
+{
+    unsigned kind = OBJ_CALLBACK + callback;
+    unsigned ordinal = g_replayHandles.Of(kind, object);
+    t.Add("  a ");
+    t.Add(name);
+    t.AddChar(' ');
+    AddHandle(t, kind, object);
+    t.AddChar('\n');
+    scope.Start(callback, object, ordinal, Table(), ReplayThunkVtable(callback), 2);
+}
+
+void ArgCallbackExit(ReplayText& t, const ReplayCallbackScope& scope)
+{
+    if (scope.Lines().Size() == 0)
+        return;
+    t.Add(scope.Lines().Data() + 1);
+    t.AddChar('\n');
 }
 
 void ImportObject(ReplayText& t, unsigned kind, const void* p)

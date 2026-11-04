@@ -56,6 +56,8 @@ class ReplayOrdinals {
 public:
     void Reset();
     unsigned Of(unsigned kind, const void* object);
+    unsigned Find(unsigned kind, const void* object) const;
+    void Bind(unsigned kind, unsigned ordinal, const void* object);
 
 private:
     enum { KINDS = 16, CAPACITY = 4096 };

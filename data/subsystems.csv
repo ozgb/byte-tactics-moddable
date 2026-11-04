@@ -4555,6 +4555,7 @@ ReplayFindObjectField,src/harness/replay_objects.cpp,harness,folder:src/harness/
 ReplayFindObjectKind,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayFirstSnapshotDifference,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayFormatObjectField,src/harness/replay_objects.cpp,harness,folder:src/harness/,
+ReplayGateRef,src/state/block.cpp,game,default,
 ReplayImport::AddArg,src/harness/replay.h,harness,folder:src/harness/,
 ReplayImport::Answered,src/harness/replay.h,harness,folder:src/harness/,
 ReplayImport::AnsweredPointer,src/harness/replay.h,harness,folder:src/harness/,

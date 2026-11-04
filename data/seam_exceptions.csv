@@ -4,4 +4,3 @@ units,CobScript::RunThread,virtual Callback::Complete,"TODO(#685): the COB VM re
 units,CobScript::RunThread,virtual CobScript::ExplodeLegacy,"TODO(#685): the COB VM reaches the aim callback and the explosion methods of weapons through vtables, add seam slots on weapons"
 units,CobScript::RunThread,virtual CobScript::ExplodePiece,"TODO(#685): the COB VM reaches the aim callback and the explosion methods of weapons through vtables, add seam slots on weapons"
 units,CobScript::StartScriptWithArgsByIndex,virtual Callback::Complete,"TODO(#685): the COB VM reaches the aim callback and the explosion methods of weapons through vtables, add seam slots on weapons"
-weapons,UpdateUnitWeapons,"virtual pointer indirect via int (*)(void *, void *, void *, void *) __attribute__((stdcall))","TODO(#687): weapons call GetWeaponTargetUnit through a function pointer, add a seam slot on targeting"

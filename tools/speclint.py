@@ -12,8 +12,9 @@ Runs on a spec writer's machine, because it reads src/, include/ and lib/. A spe
   * a run of more than --run tokens that also appears in a source file, unless it holds fewer than three
     distinct words (a list of kinds such as `int, int, int, int` is not a copy).
 
-String literals and comments are taken out of the source first, and text in double quotes out of the spec, so that
-observable data (saved-game keys, messages, file names) isn't counted against the identifier and token-run rules. Prints one line per problem and exits 1 when there is any.
+String literals and comments are taken out of the source first, and a double-quoted span out of the spec only when its
+content is observable data: a string literal of the source or text found in the kit. Any other quoted span is linted
+as ordinary text. Prints one line per problem and exits 1 when there is any.
 """
 
 from __future__ import annotations
@@ -82,19 +83,25 @@ def kit_text(kit: Path) -> str:
     return "\n".join(parts)
 
 
-def unquoted(line: str) -> str:
-    """A line with its double-quoted spans blanked out."""
-    return QUOTED.sub(lambda m: " " * len(m.group(0)), line)
+def unquoted(line: str, literals: set[str], kit: str) -> str:
+    """A line with its double-quoted spans blanked out when they are source literals or kit text, else only their quotes."""
+    def blank(m: re.Match) -> str:
+        inner = m.group(0)[1:-1]
+        if inner in literals or (inner and inner in kit):
+            return " " * len(m.group(0))
+        return " " + inner + " "
+    return QUOTED.sub(blank, line)
 
 
-def lint(spec: str, source_ids: set[str], kit_ids: set[str], source_runs: set[int], run: int) -> list[tuple[int, str]]:
+def lint(spec: str, source_ids: set[str], kit_ids: set[str], source_runs: set[int], run: int,
+         literals: set[str], kit: str) -> list[tuple[int, str]]:
     """The problems of a spec's text, as (line number, message)."""
     problems: list[tuple[int, str]] = []
     lines = spec.splitlines()
     for number, line in enumerate(lines, 1):
         for m in ADDRESS.finditer(line):
             problems.append((number, f"address or marker {m.group(0)!r}"))
-        for word in sorted(identifiers(unquoted(line)) & source_ids - kit_ids):
+        for word in sorted(identifiers(unquoted(line, literals, kit)) & source_ids - kit_ids):
             problems.append((number, f"identifier {word!r} is in the source but not in the kit"))
     in_fence = None
     for number, line in enumerate(lines, 1):
@@ -110,7 +117,7 @@ def lint(spec: str, source_ids: set[str], kit_ids: set[str], source_runs: set[in
     spec_tokens = []
     token_lines = []
     for number, line in enumerate(lines, 1):
-        for t in tokens(unquoted(line)):
+        for t in tokens(unquoted(line, literals, kit)):
             spec_tokens.append(t)
             token_lines.append(number)
     stretches: list[list[int]] = []
@@ -128,15 +135,18 @@ def lint(spec: str, source_ids: set[str], kit_ids: set[str], source_runs: set[in
     return sorted(problems)
 
 
-def source_index(root: Path, run: int) -> tuple[set[str], set[int]]:
-    """The identifiers of the source files, and the hashes of their runs of run + 1 tokens."""
+def source_index(root: Path, run: int) -> tuple[set[str], set[int], set[str]]:
+    """The identifiers of the source files, the hashes of their runs of run + 1 tokens, and their string literals."""
     ids: set[str] = set()
     hashes: set[int] = set()
+    literals: set[str] = set()
     for path in source_files(root):
-        text = code_only(path.read_text(encoding="utf-8", errors="replace"))
+        raw = path.read_text(encoding="utf-8", errors="replace")
+        literals |= {m.group(0)[1:-1] for m in C_LITERALS.finditer(raw) if m.group(0)[0] == '"' and len(m.group(0)) > 2}
+        text = code_only(raw)
         ids |= identifiers(text)
         hashes |= runs(tokens(text), run + 1)
-    return ids, hashes
+    return ids, hashes, literals
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -149,9 +159,10 @@ def main(argv: list[str] | None = None) -> int:
     if not (args.kit / "MANIFEST.json").is_file():
         print(f"speclint: {args.kit} has no MANIFEST.json: pass an oraclekit.py export", file=sys.stderr)
         return 2
-    source_ids, source_runs = source_index(args.root, args.run)
-    problems = lint(args.spec.read_text(encoding="utf-8"), source_ids, identifiers(kit_text(args.kit)),
-                    source_runs, args.run)
+    source_ids, source_runs, literals = source_index(args.root, args.run)
+    kit = kit_text(args.kit)
+    problems = lint(args.spec.read_text(encoding="utf-8"), source_ids, identifiers(kit), source_runs, args.run,
+                    literals, kit)
     for number, message in problems:
         print(f"{args.spec}:{number}: {message}")
     if problems:

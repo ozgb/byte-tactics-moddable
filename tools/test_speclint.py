@@ -49,19 +49,21 @@ class Lint(unittest.TestCase):
         root = Path(self.tmp.name)
         (root / "src" / "map").mkdir(parents=True)
         (root / "src" / "map" / "meteors.cpp").write_text(SOURCE)
-        self.kit = root / "kit"
-        (self.kit / "docs").mkdir(parents=True)
-        (self.kit / "docs" / "kit.md").write_text(KIT_DOC)
-        (self.kit / "MANIFEST.json").write_text(json.dumps({"files": []}))
+        self.kit_dir = root / "kit"
+        (self.kit_dir / "docs").mkdir(parents=True)
+        (self.kit_dir / "docs" / "kit.md").write_text(KIT_DOC)
+        (self.kit_dir / "MANIFEST.json").write_text(json.dumps({"files": []}))
         self.root = root
-        self.ids, self.runs = speclint.source_index(root, speclint.DEFAULT_RUN)
-        self.kit_ids = speclint.identifiers(speclint.kit_text(self.kit))
+        self.ids, self.runs, self.literals = speclint.source_index(root, speclint.DEFAULT_RUN)
+        self.kit = speclint.kit_text(self.kit_dir)
+        self.kit_ids = speclint.identifiers(self.kit)
 
     def tearDown(self):
         self.tmp.cleanup()
 
     def lint(self, text):
-        return [m for _, m in speclint.lint(text, self.ids, self.kit_ids, self.runs, speclint.DEFAULT_RUN)]
+        return [m for _, m in speclint.lint(text, self.ids, self.kit_ids, self.runs, speclint.DEFAULT_RUN,
+                                      self.literals, self.kit)]
 
     def test_clean_spec_passes(self):
         self.assertEqual(self.lint(CLEAN), [])
@@ -94,7 +96,15 @@ class Lint(unittest.TestCase):
         self.assertEqual(self.lint("`g_meteorNextStrike` and `RAND_STREAM_MAIN`."), [])
 
     def test_quoted_identifier_passes(self):
-        self.assertEqual(self.lint('The saved item "localTargetZ" is written.'), [])
+        self.assertEqual(self.lint('The message "Hey, hoser!  The default meteor shower data was bogus!" is shown.'), [])
+
+    def test_quoted_kit_text_passes(self):
+        self.assertEqual(self.lint('The stream is named "RAND_STREAM_MAIN" in the kit.'), [])
+
+    def test_quoted_source_statement_is_refused(self):
+        copied = '"localTargetZ = (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->height / 0x8000);"'
+        self.assertTrue(any("matches the source" in m for m in self.lint(f"The target is {copied}")))
+        self.assertTrue(any("localTargetZ" in m for m in self.lint('The item "localTargetZ" is set.')))
 
     def test_fence_without_text(self):
         self.assertTrue(any("only `text`" in m for m in self.lint("```c\nint x;\n```\n")))
@@ -128,9 +138,9 @@ class Lint(unittest.TestCase):
     def test_main_exit_codes(self):
         spec = self.root / "spec.md"
         spec.write_text(CLEAN)
-        self.assertEqual(speclint.main([str(spec), "--kit", str(self.kit), "--root", str(self.root)]), 0)
+        self.assertEqual(speclint.main([str(spec), "--kit", str(self.kit_dir), "--root", str(self.root)]), 0)
         spec.write_text("It reads DAT_005119b8.")
-        self.assertEqual(speclint.main([str(spec), "--kit", str(self.kit), "--root", str(self.root)]), 1)
+        self.assertEqual(speclint.main([str(spec), "--kit", str(self.kit_dir), "--root", str(self.root)]), 1)
 
 
 if __name__ == "__main__":

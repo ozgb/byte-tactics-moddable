@@ -33,7 +33,8 @@ Evidence, per (writer, reader, item, phase), counted in the column `count`:
   read-unwritten    the item was read in this window and nobody wrote it there (writer `-`)
   write-unread      the last write to the item in the window was not followed by a read of it before the
                     window ended (reader `-`); every read counts, also the writer's own
-  ordered           consecutive draws from one random stream (item `rng.main`, `rng.load`), or consecutive
+  ordered           consecutive draws from one random stream (item `rng.parkMiller` for RandomInt, `rng.crtHoldrand` and
+                    `rng.crtLoad` for GameRand's main and load streams), or consecutive
                     emitted sound records (`sound`) or UI records (`ui`), by different subsystems in one
                     window; writer is the earlier, reader the later
 
@@ -584,7 +585,8 @@ def build_items(info: MapInfo, map_path: Path, layouts: Layouts, rows: list[dict
     stats["heap_rows"] = sum(len(v) for v in heap.values())
     for ra in sorted(namer.ranks):
         rank, count = namer.ranks[ra]
-        candidates = heap.get(code_map.function(ra))
+        function = code_map.function(ra)
+        candidates = heap.get(function) or heap.get(sources.base_name(function)) or heap.get(blockpointers.demangle(function))
         if not candidates:
             continue
         if len(candidates) != count and len(candidates) > 1:

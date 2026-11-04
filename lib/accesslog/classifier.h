@@ -37,7 +37,7 @@ private:
     struct Stream {
         unsigned stamp, sub;
     };
-    enum { kStreams = 4 };
+    enum { kStreams = 8 };
 
     void Count(unsigned writer, unsigned reader, unsigned item, unsigned evidence, unsigned tick, unsigned amount);
     Slot* Find(unsigned writer, unsigned reader, unsigned item, unsigned label, unsigned evidence, unsigned* index);

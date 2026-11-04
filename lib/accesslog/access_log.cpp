@@ -49,7 +49,7 @@ struct Section {
     unsigned start, end, flags;
 };
 struct Stats {
-    unsigned long long accesses, noSubsystem, ignored, code, constants, other, unresolvedImage, unresolvedBlock, writes, ranges, rangeCapped;
+    unsigned long long accesses, noSubsystem, ignored, code, constants, other, unresolvedImage, unresolvedBlock, writes, ranges, rangeCapped, draws, sounds, uiRecords;
 };
 struct Slot {
     unsigned ra, sub;
@@ -72,7 +72,7 @@ Slot g_attrCache[1 << 16];
 
 unsigned g_itemCount;
 const char** g_itemNames;
-unsigned g_idUnresolvedImage, g_idUnresolvedBlock, g_idRng[2], g_idSound, g_idUi;
+unsigned g_idUnresolvedImage, g_idUnresolvedBlock, g_idRng[3], g_idSound, g_idUi;
 Type* g_types;
 unsigned g_typeCount;
 Region* g_statics;
@@ -208,15 +208,17 @@ NS void LoadItems(const unsigned char* data)
     g_idUnresolvedBlock = strings + 1;
     g_idRng[0] = strings + 2;
     g_idRng[1] = strings + 3;
-    g_idSound = strings + 4;
-    g_idUi = strings + 5;
+    g_idRng[2] = strings + 4;
+    g_idSound = strings + 5;
+    g_idUi = strings + 6;
     g_itemNames[g_idUnresolvedImage] = "unresolved:image";
     g_itemNames[g_idUnresolvedBlock] = "unresolved:block";
-    g_itemNames[g_idRng[0]] = "rng.main";
-    g_itemNames[g_idRng[1]] = "rng.load";
+    g_itemNames[g_idRng[0]] = "rng.parkMiller";
+    g_itemNames[g_idRng[1]] = "rng.crtHoldrand";
+    g_itemNames[g_idRng[2]] = "rng.crtLoad";
     g_itemNames[g_idSound] = "sound";
     g_itemNames[g_idUi] = "ui";
-    g_itemCount = strings + 6;
+    g_itemCount = strings + 7;
     g_typeCount = r.U32();
     g_types = (Type*)Zeroed(sizeof(Type) * (g_typeCount + 1));
     for (unsigned i = 0; i < g_typeCount; i++) {
@@ -835,7 +837,8 @@ NS void AccessLogEmit(int kind, void* ra)
     unsigned sub = Attribute(ra);
     if (sub == kIgnored)
         return;
-    g_classifier.Ordered(kind == 0 ? 2 : 3, kind == 0 ? g_idSound : g_idUi, sub, g_tick);
+    (kind == 0 ? g_stats.sounds : g_stats.uiRecords)++;
+    g_classifier.Ordered(kind == 0 ? 3 : 4, kind == 0 ? g_idSound : g_idUi, sub, g_tick);
 }
 
 NS void AccessLogDraw(int stream, void* ra)
@@ -845,7 +848,8 @@ NS void AccessLogDraw(int stream, void* ra)
     unsigned sub = Attribute(ra);
     if (sub == kIgnored)
         return;
-    unsigned s = stream == 0 ? 0 : 1;
+    unsigned s = (unsigned)stream < 3 ? (unsigned)stream : 2;
+    g_stats.draws++;
     g_classifier.Ordered(s, g_idRng[s], sub, g_tick);
 }
 
@@ -896,6 +900,7 @@ NS void AccessLogFinish()
                  {"code", g_stats.code}, {"constants_unnamed", g_stats.constants}, {"other_memory", g_stats.other},
                  {"unresolved_image", g_stats.unresolvedImage}, {"unresolved_block", g_stats.unresolvedBlock},
                  {"writes", g_stats.writes}, {"range_calls", g_stats.ranges}, {"range_capped", g_stats.rangeCapped},
+                 {"random_draws", g_stats.draws}, {"sound_records", g_stats.sounds}, {"ui_records", g_stats.uiRecords},
                  {"edges", n}, {"overflow", g_classifier.Overflowed() ? 1u : 0u}, {"allocations", g_allocSeq}};
     for (unsigned i = 0; i < sizeof lines / sizeof lines[0]; i++) {
         stats.Add(lines[i].name);

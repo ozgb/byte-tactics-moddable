@@ -5,6 +5,9 @@
 #include "../state/sim_globals.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
 
 #include "../../link/globals.h"
 #include "math.h"
@@ -40,6 +43,9 @@ int __stdcall RandomInt(int range)
     call.Int(range);
     if (range < 2)
         return call.Result(0);
+#if BT_ACCESS_LOG
+    AccessLogDraw(0, __builtin_return_address(0));
+#endif
 
     unsigned int seed = g_randomSeed;
     unsigned int q = seed / 127773;

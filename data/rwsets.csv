@@ -1265,23 +1265,23 @@ address,function,file,kind,target
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,global_read,kSim
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Vec3 *, int, Vec3 **, float *, Vec3 **, float *) __attribute__((stdcall)) [MapSeam::PickRandomReclaimableResourcesInRadius]"
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,call,operator->
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,call,push_back
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,DamagedAllyCollector::owner
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,DamagedAllyCollector::self
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,DamagedAllyCollector::units
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,Player::allied
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,Player::index
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,Unit::buildLeft
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,Unit::def
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,Unit::flags
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,Unit::health
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,Unit::lastAttackerSlot
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,Unit::lastDamageType
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,Unit::player
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,field_read,UnitDef::maxHealth
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,function,
-0x405d90,DamagedAllyCollector::CollectDamagedAlly,src/orders/unit_orders.cpp,global_read,kZeroFloatOrders@src/orders/unit_orders.cpp
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,call,operator->
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,call,push_back
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,DamagedAllyCollector::owner
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,DamagedAllyCollector::self
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,DamagedAllyCollector::units
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,Player::allied
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,Player::index
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,Unit::buildLeft
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,Unit::def
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,Unit::flags
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,Unit::health
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,Unit::lastAttackerSlot
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,Unit::lastDamageType
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,Unit::player
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,UnitDef::maxHealth
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,function,
+0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,global_read,kZeroFloatOrders@src/orders/unit_orders.cpp
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,call,IssueAttackOrder
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,call,RandomInt
@@ -25152,7 +25152,6 @@ address,function,file,kind,target
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,global_read,g_game
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,indirect_call,virtual ClaimFootprintVisitor::ClaimFootprint
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,ClampBucketCoord
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,Visit
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,operator Unit *
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,operator UnitBucket *
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,deref_read,*BucketGrid
@@ -25165,6 +25164,7 @@ address,function,file,kind,target
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,Vec3::z
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,function,
 0x47e750,VisitObjectsInRect,src/map/terrain.cpp,global_read,g_game
+0x47e750,VisitObjectsInRect,src/map/terrain.cpp,indirect_call,virtual UnitVisitor::Visit
 0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,BucketDistSquared
 0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampBucketMaxX
 0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampBucketMaxZ
@@ -25181,7 +25181,7 @@ address,function,file,kind,target
 0x47e890,VisitObjectsInRange,src/map/terrain.cpp,field_read,UnitBucket::first
 0x47e890,VisitObjectsInRange,src/map/terrain.cpp,function,
 0x47e890,VisitObjectsInRange,src/map/terrain.cpp,global_read,g_game
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,indirect_call,virtual DamagedAllyCollector::CollectDamagedAlly
+0x47e890,VisitObjectsInRange,src/map/terrain.cpp,indirect_call,virtual UnitVisitor::Visit
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,RandomInt
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,SimAlloc
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,operator Feature *
@@ -44427,7 +44427,7 @@ address,function,file,kind,target
 ,DamageTable::LowerBound,src/weapons/weapon_types.cpp,field_read,StringRef::ptr
 ,DamageTable::LowerBound,src/weapons/weapon_types.cpp,function,
 ,DamageTableEntry::DamageTableEntry,src/map/los_tables.h,function,
-,DamagedAllyCollector::DamagedAllyCollector,src/map/terrain.h,function,
+,DamagedAllyCollector::DamagedAllyCollector,src/orders/damaged_ally_collector.h,function,
 ,DeactivateConditionsNative,src/seams/native.cpp,call,MissionConditions::Deactivate
 ,DeactivateConditionsNative,src/seams/native.cpp,function,
 ,DebrisCache::AllocBytes,src/weapons/debris_cache.cpp,call,Release
@@ -58699,7 +58699,6 @@ address,function,file,kind,target
 ,VisitMoveClasses,src/harness/harness.cpp,function,
 ,VisitMoveClasses,src/harness/harness.cpp,global_read,kMoveClassTable@src/harness/trace_schema.h
 ,VisitObjectsInRangeNative,src/seams/native.cpp,call,VisitObjectsInRange
-,VisitObjectsInRangeNative,src/seams/native.cpp,deref_read,*DamagedAllyCollector
 ,VisitObjectsInRangeNative,src/seams/native.cpp,function,
 ,VisitOrders,src/harness/harness.cpp,call,EndSection
 ,VisitOrders,src/harness/harness.cpp,call,HashByte

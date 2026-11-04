@@ -1,2 +1,1 @@
 subsystem,function,symbol,reason
-map,VisitObjectsInRange,virtual DamagedAllyCollector::CollectDamagedAlly,"TODO(#686): map visits objects in range through a collector class of orders, add a seam slot on orders"

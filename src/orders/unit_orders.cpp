@@ -2,6 +2,7 @@ struct Unit;
 
 #include "../units/unit_type_set.h"
 #include "unit_orders.h"
+#include "damaged_ally_collector.h"
 namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
 }
@@ -1232,7 +1233,7 @@ int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
 }
 
 // FUNCTION: 0x405d90
-void DamagedAllyCollector::CollectDamagedAlly(Unit* unit)
+void DamagedAllyCollector::Visit(Unit* unit)
 {
     if (unit == self) return;
     unsigned int index = 0;
@@ -1810,7 +1811,7 @@ int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
                 std::vector<Unit*> units;
                 int range = unit->def->range << 16;
                 DamagedAllyCollector collector(unit->player, &units, unit);
-                g_seams.map->VisitObjectsInRange(&unit->pos, range, (UnitVisitor*)&collector);
+                g_seams.map->VisitObjectsInRange(&unit->pos, range, &collector);
                 if (!units.empty()) {
                     Unit* target = units[RandomInt(units.size())];
                     if (unit->player->allied[target->player->index]) {

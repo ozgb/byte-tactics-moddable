@@ -300,7 +300,7 @@ static char* __stdcall GetNameSlotNative(Mission* mission, int index)
 
 static void __stdcall VisitObjectsInRangeNative(Vec3* pos, int range, UnitVisitor* visitor)
 {
-    VisitObjectsInRange(pos, range, *(DamagedAllyCollector*)visitor);
+    VisitObjectsInRange(pos, range, visitor);
 }
 
 static void __fastcall SpatialBucketPrependUnitNative(SpatialBucket* self, int unusedEdx, Unit* unit)

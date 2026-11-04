@@ -2112,7 +2112,6 @@ map,game,shared_write,Unit::flags,4
 map,game,shared_write,Vec3::x,5
 map,game,shared_write,Vec3::y,3
 map,game,shared_write,Vec3::z,5
-map,harness,call,Visit,1
 map,harness,shared_write,Game::net,1
 map,harness,shared_write,Point16::x,1
 map,harness,shared_write,Point16::y,1
@@ -2139,7 +2138,7 @@ map,los_radar,shared_write,Vec3::z,10
 map,network,shared_write,Game::list_391ed,1
 map,network,shared_write,Game::net,6
 map,network,shared_write,Unit::flags,3
-map,orders,indirect,DamagedAllyCollector::CollectDamagedAlly,1
+map,orders,indirect,DamagedAllyCollector::Visit,1
 map,orders,indirect,GroundAllyVisitor::CollectGroundAlly,1
 map,orders,indirect,RepairableUnitVisitor::CollectRepairableUnit,1
 map,orders,shared_write,Fixed::value,9

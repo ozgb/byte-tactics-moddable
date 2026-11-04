@@ -43060,9 +43060,12 @@ address,function,file,kind,target
 ,AddFront,src/orders/order_list.cpp,function,
 ,AddHandle,src/harness/replay.cpp,call,ReplayOrdinals::Of
 ,AddHandle,src/harness/replay.cpp,call,ReplayText::Add
+,AddHandle,src/harness/replay.cpp,call,ReplayText::AddChar
 ,AddHandle,src/harness/replay.cpp,call,ReplayText::AddUnsigned
+,AddHandle,src/harness/replay.cpp,field_read,ReplayCallbackType::handle
 ,AddHandle,src/harness/replay.cpp,function,
 ,AddHandle,src/harness/replay.cpp,global_maybe_written,s_ordinals
+,AddHandle,src/harness/replay.cpp,global_read,kReplayCallbacks@src/harness/replay_schema.h
 ,AddHandle,src/harness/replay.cpp,global_read,names@AddHandle
 ,AddHex,src/harness/replay_objects.cpp,call,ReplayText::AddChar
 ,AddHex,src/harness/replay_objects.cpp,deref_read,*unsigned char
@@ -45282,6 +45285,9 @@ address,function,file,kind,target
 ,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,field_read,WeaponFirePacket::targetUnitId
 ,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,function,
 ,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,global_read,g_game
+,FindScope,src/harness/replay_objects.cpp,call,ReplayCallbackScope::Object
+,FindScope,src/harness/replay_objects.cpp,function,
+,FindScope,src/harness/replay_objects.cpp,global_read,s_scopes
 ,FindScriptNative,src/seams/native.cpp,call,CobScript::FindScript
 ,FindScriptNative,src/seams/native.cpp,function,
 ,FindSetGadgetRowsEntry,src/gui/gui.cpp,call,strncmp
@@ -45391,6 +45397,19 @@ address,function,file,kind,target
 ,FormatArray,src/harness/replay_objects.cpp,field_read,ReplayObjectField::array
 ,FormatArray,src/harness/replay_objects.cpp,function,
 ,FormatArray,src/harness/replay_objects.cpp,global_read,kReplayArrays@src/harness/replay_schema.h
+,FormatCode,src/harness/replay_objects.cpp,call,ReplayFail
+,FormatCode,src/harness/replay_objects.cpp,call,ReplayText::Add
+,FormatCode,src/harness/replay_objects.cpp,call,ReplayText::AddChar
+,FormatCode,src/harness/replay_objects.cpp,call,ReplayText::AddUnsigned
+,FormatCode,src/harness/replay_objects.cpp,call,sprintf
+,FormatCode,src/harness/replay_objects.cpp,deref_read,*void
+,FormatCode,src/harness/replay_objects.cpp,field_read,ReplayCodeTable::count
+,FormatCode,src/harness/replay_objects.cpp,field_read,ReplayCodeTable::entries
+,FormatCode,src/harness/replay_objects.cpp,field_read,ReplayCodeTable::name
+,FormatCode,src/harness/replay_objects.cpp,field_read,ReplayObjectField::name
+,FormatCode,src/harness/replay_objects.cpp,field_read,ReplayObjectField::target
+,FormatCode,src/harness/replay_objects.cpp,function,
+,FormatCode,src/harness/replay_objects.cpp,global_read,kReplayCodeTables@src/harness/replay_schema.h
 ,FormatPath,src/harness/harness.cpp,call,__builtin_va_end
 ,FormatPath,src/harness/harness.cpp,call,__builtin_va_start
 ,FormatPath,src/harness/harness.cpp,call,vsprintf
@@ -47814,6 +47833,14 @@ address,function,file,kind,target
 ,ImportBytes,src/harness/replay.cpp,call,ReplayBytes
 ,ImportBytes,src/harness/replay.cpp,call,ReplayText::AddChar
 ,ImportBytes,src/harness/replay.cpp,function,
+,ImportCallback,src/harness/replay.cpp,call,AddHandle
+,ImportCallback,src/harness/replay.cpp,call,ReplayCallbackScope::Start
+,ImportCallback,src/harness/replay.cpp,call,ReplayOrdinals::Of
+,ImportCallback,src/harness/replay.cpp,call,ReplayText::AddChar
+,ImportCallback,src/harness/replay.cpp,call,ReplayThunkVtable
+,ImportCallback,src/harness/replay.cpp,call,Table
+,ImportCallback,src/harness/replay.cpp,function,
+,ImportCallback,src/harness/replay.cpp,global_maybe_written,s_ordinals
 ,ImportError,src/wasm/wind_meteors_glue.cpp,call,sprintf
 ,ImportError,src/wasm/wind_meteors_glue.cpp,function,
 ,ImportError,src/wasm/wind_meteors_glue.cpp,global_escape,s_error
@@ -53296,7 +53323,6 @@ address,function,file,kind,target
 ,RecOrdersAiSearchGoalSetWaypoints,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(AiSearchGoal *, Point16 *, int) __attribute__((stdcall)) [OrdersSeam::AiSearchGoalSetWaypoints]"
 ,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,ArgObject
-,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,ArgPending
 ,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecOrdersAppendOrder,src/harness/replay_hooks.inc,field_read,OrdersSeam::AppendOrder
@@ -53395,6 +53421,7 @@ address,function,file,kind,target
 ,RecOrdersLoadOrder,src/harness/replay_hooks.inc,function,
 ,RecOrdersLoadOrder,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersLoadOrder,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersLoadOrder,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersLoadOrder,src/harness/replay_hooks.inc,indirect_call,"indirect via Order *(*const)(Unit *, HapiBank *, char *) __attribute__((stdcall)) [OrdersSeam::LoadOrder]"
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,ArgValue
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -53414,6 +53441,7 @@ address,function,file,kind,target
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,function,
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersNewOrder,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,indirect_call,"indirect via Order *(*const)(MissionType, Unit *, void *, int, int, int) __attribute__((stdcall)) [OrdersSeam::NewOrder]"
 ,RecOrdersNewUnitMotion,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersNewUnitMotion,src/harness/replay_hooks.inc,call,ArgObject
@@ -53424,7 +53452,8 @@ address,function,file,kind,target
 ,RecOrdersNewUnitMotion,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersNewUnitMotion,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersNewUnitMotion,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [OrdersSeam::NewUnitMotion]
-,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,call,Add
+,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,call,ArgValue
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53433,7 +53462,8 @@ address,function,file,kind,target
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersOrderFxAddFlags,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(OrderFx *, int) __attribute__((stdcall)) [OrdersSeam::OrderFxAddFlags]"
-,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,call,Add
+,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,call,ArgValue
 ,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53443,6 +53473,8 @@ address,function,file,kind,target
 ,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersOrderFxApproxDist,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(OrderFx *, int, int) __attribute__((stdcall)) [OrdersSeam::OrderFxApproxDist]"
+,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,call,Add
+,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,call,ArgPending
 ,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53451,7 +53483,8 @@ address,function,file,kind,target
 ,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersOrderFxFillGoalCells,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(OrderFx *, std::vector<Point16, std::allocator<Point16>> *) __attribute__((stdcall)) [OrdersSeam::OrderFxFillGoalCells]"
-,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,call,Add
+,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,call,ArgValue
 ,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53471,7 +53504,8 @@ address,function,file,kind,target
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(char *, Unit *, int) __attribute__((stdcall)) [OrdersSeam::QueueBuildOrder]"
-,RecOrdersReattachFxToUnit,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersReattachFxToUnit,src/harness/replay_hooks.inc,call,Add
+,RecOrdersReattachFxToUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersReattachFxToUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersReattachFxToUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecOrdersReattachFxToUnit,src/harness/replay_hooks.inc,field_read,OrdersSeam::ReattachFxToUnit
@@ -53517,7 +53551,6 @@ address,function,file,kind,target
 ,RecOrdersSerializeOrderToSave,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersSerializeOrderToSave,src/harness/replay_hooks.inc,call,ArgHandle
 ,RecOrdersSerializeOrderToSave,src/harness/replay_hooks.inc,call,ArgObject
-,RecOrdersSerializeOrderToSave,src/harness/replay_hooks.inc,call,ArgPending
 ,RecOrdersSerializeOrderToSave,src/harness/replay_hooks.inc,call,ArgValue
 ,RecOrdersSerializeOrderToSave,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersSerializeOrderToSave,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -55124,6 +55157,7 @@ address,function,file,kind,target
 ,ReplaceFlagField,src/units/unit_types.cpp,function,
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,call,InsideTable
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,call,ReplayAddWeapon
+,ReplayAddObjectName,src/harness/replay_objects.cpp,call,ReplayConcreteKind
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,call,ReplayObjectTable::Find
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,call,ReplayObjectTable::Name
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,call,ReplayText::Add
@@ -55134,6 +55168,7 @@ address,function,file,kind,target
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::scope
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::table
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,function,
+,ReplayAddObjectName,src/harness/replay_objects.cpp,global_read,kReplayObjectKindCount@src/harness/replay_schema.h
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
 ,ReplayAddStruct,src/harness/replay_objects.cpp,call,ReplayFormatObjectField
 ,ReplayAddStruct,src/harness/replay_objects.cpp,call,ReplayText::Add
@@ -55205,6 +55240,80 @@ address,function,file,kind,target
 ,ReplayBytes,src/harness/replay_values.h,call,ReplayText::AddChar
 ,ReplayBytes,src/harness/replay_values.h,deref_read,*unsigned char
 ,ReplayBytes,src/harness/replay_values.h,function,
+,ReplayCallbackCall::Active,src/harness/replay_objects.h,field_read,ReplayCallbackCall::scope
+,ReplayCallbackCall::Active,src/harness/replay_objects.h,function,
+,ReplayCallbackCall::Original,src/harness/replay_objects.cpp,deref_read,*void
+,ReplayCallbackCall::Original,src/harness/replay_objects.cpp,field_read,ReplayCallbackCall::scope
+,ReplayCallbackCall::Original,src/harness/replay_objects.cpp,field_read,ReplayCallbackScope::original
+,ReplayCallbackCall::Original,src/harness/replay_objects.cpp,function,
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,call,FindScope
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,call,ReplayFail
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,call,ReplayText::Add
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,call,ReplayText::AddChar
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,call,ReplayText::AddUnsigned
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,call,abort
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,deref_read,*char
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_maybe_written,ReplayCallbackCall::text
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackCall::scope
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackScope::callback
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackScope::ordinal
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackType::handle
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackType::methods
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,function,
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,global_read,kReplayCallbacks@src/harness/replay_schema.h
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,global_read,s_callbackDepth
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,global_write,s_callbackDepth
+,ReplayCallbackCall::Space,src/harness/replay_objects.h,call,ReplayText::AddChar
+,ReplayCallbackCall::Space,src/harness/replay_objects.h,field_maybe_written,ReplayCallbackCall::text
+,ReplayCallbackCall::Space,src/harness/replay_objects.h,function,
+,ReplayCallbackCall::Table,src/harness/replay_objects.h,deref_read,*ReplayObjectTable
+,ReplayCallbackCall::Table,src/harness/replay_objects.h,field_read,ReplayCallbackCall::scope
+,ReplayCallbackCall::Table,src/harness/replay_objects.h,field_read,ReplayCallbackScope::table
+,ReplayCallbackCall::Table,src/harness/replay_objects.h,function,
+,ReplayCallbackCall::Text,src/harness/replay_objects.h,field_read,ReplayCallbackCall::text
+,ReplayCallbackCall::Text,src/harness/replay_objects.h,function,
+,ReplayCallbackCall::~ReplayCallbackCall,src/harness/replay_objects.cpp,call,ReplayText::AddText
+,ReplayCallbackCall::~ReplayCallbackCall,src/harness/replay_objects.cpp,call,ReplayText::Free
+,ReplayCallbackCall::~ReplayCallbackCall,src/harness/replay_objects.cpp,field_maybe_written,ReplayCallbackCall::text
+,ReplayCallbackCall::~ReplayCallbackCall,src/harness/replay_objects.cpp,field_maybe_written,ReplayCallbackScope::lines
+,ReplayCallbackCall::~ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackCall::scope
+,ReplayCallbackCall::~ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackCall::text
+,ReplayCallbackCall::~ReplayCallbackCall,src/harness/replay_objects.cpp,function,
+,ReplayCallbackCall::~ReplayCallbackCall,src/harness/replay_objects.cpp,global_read,s_callbackDepth
+,ReplayCallbackCall::~ReplayCallbackCall,src/harness/replay_objects.cpp,global_write,s_callbackDepth
+,ReplayCallbackDepth,src/harness/replay_objects.cpp,function,
+,ReplayCallbackDepth,src/harness/replay_objects.cpp,global_read,s_callbackDepth
+,ReplayCallbackScope::Lines,src/harness/replay_objects.h,field_read,ReplayCallbackScope::lines
+,ReplayCallbackScope::Lines,src/harness/replay_objects.h,function,
+,ReplayCallbackScope::Object,src/harness/replay_objects.h,field_read,ReplayCallbackScope::object
+,ReplayCallbackScope::Object,src/harness/replay_objects.h,function,
+,ReplayCallbackScope::ReplayCallbackScope,src/harness/replay_objects.cpp,function,
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,call,FindScope
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,call,abort
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,deref_read,*void
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,deref_write,*void
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,field_read,ReplayCallbackScope::active
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,field_write,ReplayCallbackScope::active
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,field_write,ReplayCallbackScope::callback
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,field_write,ReplayCallbackScope::object
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,field_write,ReplayCallbackScope::ordinal
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,field_write,ReplayCallbackScope::original
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,field_write,ReplayCallbackScope::table
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,function,
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,global_read,s_scopes
+,ReplayCallbackScope::Start,src/harness/replay_objects.cpp,global_write,s_scopes
+,ReplayCallbackScope::Stop,src/harness/replay_objects.cpp,deref_write,*void
+,ReplayCallbackScope::Stop,src/harness/replay_objects.cpp,field_read,ReplayCallbackScope::active
+,ReplayCallbackScope::Stop,src/harness/replay_objects.cpp,field_read,ReplayCallbackScope::object
+,ReplayCallbackScope::Stop,src/harness/replay_objects.cpp,field_read,ReplayCallbackScope::original
+,ReplayCallbackScope::Stop,src/harness/replay_objects.cpp,field_write,ReplayCallbackScope::active
+,ReplayCallbackScope::Stop,src/harness/replay_objects.cpp,function,
+,ReplayCallbackScope::Stop,src/harness/replay_objects.cpp,global_read,s_scopes
+,ReplayCallbackScope::Stop,src/harness/replay_objects.cpp,global_write,s_scopes
+,ReplayCallbackScope::~ReplayCallbackScope,src/harness/replay_objects.cpp,call,ReplayCallbackScope::Stop
+,ReplayCallbackScope::~ReplayCallbackScope,src/harness/replay_objects.cpp,call,ReplayText::Free
+,ReplayCallbackScope::~ReplayCallbackScope,src/harness/replay_objects.cpp,field_maybe_written,ReplayCallbackScope::lines
+,ReplayCallbackScope::~ReplayCallbackScope,src/harness/replay_objects.cpp,function,
 ,ReplayCalls,src/harness/replay.h,function,
 ,ReplayCalls,src/harness/replay.h,global_read,calls@ReplayCalls
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,call,ReplayEmitField
@@ -55220,6 +55329,20 @@ address,function,file,kind,target
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,field_read,ReplayReach::object
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,function,
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,global_read,kReplayObjectFields@src/harness/replay_schema.h
+,ReplayClearFailure,src/harness/replay_objects.cpp,function,
+,ReplayClearFailure,src/harness/replay_objects.cpp,global_write,s_failure
+,ReplayConcreteKind,src/harness/replay_objects.cpp,call,ReplayFail
+,ReplayConcreteKind,src/harness/replay_objects.cpp,call,sprintf
+,ReplayConcreteKind,src/harness/replay_objects.cpp,deref_read,*void
+,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::name
+,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyCount
+,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyFirst
+,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::vtable
+,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::vtableName
+,ReplayConcreteKind,src/harness/replay_objects.cpp,function,
+,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKindCount@src/harness/replay_schema.h
+,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
+,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayPolyKinds@src/harness/replay_schema.h
 ,ReplayConfigure,src/harness/replay.cpp,call,_snprintf
 ,ReplayConfigure,src/harness/replay.cpp,call,operator new
 ,ReplayConfigure,src/harness/replay.cpp,call,sscanf
@@ -55244,6 +55367,14 @@ address,function,file,kind,target
 ,ReplayEmitField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::kind
 ,ReplayEmitField,src/harness/replay_objects.cpp,function,
 ,ReplayEmitField,src/harness/replay_objects.cpp,global_read,kReplayArrays@src/harness/replay_schema.h
+,ReplayFail,src/harness/replay_objects.cpp,call,strncpy
+,ReplayFail,src/harness/replay_objects.cpp,function,
+,ReplayFail,src/harness/replay_objects.cpp,global_maybe_written,s_failure
+,ReplayFail,src/harness/replay_objects.cpp,global_read,s_failure
+,ReplayFail,src/harness/replay_objects.cpp,global_write,s_failure
+,ReplayFailure,src/harness/replay_objects.cpp,function,
+,ReplayFailure,src/harness/replay_objects.cpp,global_escape,s_failure
+,ReplayFailure,src/harness/replay_objects.cpp,global_read,s_failure
 ,ReplayFieldView,src/harness/replay_objects.cpp,field_read,ReplayField::array
 ,ReplayFieldView,src/harness/replay_objects.cpp,field_read,ReplayField::kind
 ,ReplayFieldView,src/harness/replay_objects.cpp,field_read,ReplayField::name
@@ -55270,6 +55401,7 @@ address,function,file,kind,target
 ,ReplayFindObjectKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,call,BlockAt
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,call,FormatArray
+,ReplayFormatObjectField,src/harness/replay_objects.cpp,call,FormatCode
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,call,ReplayAddObjectName
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,call,ReplayAddWeapon
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,call,ReplayText::Add
@@ -55288,6 +55420,7 @@ address,function,file,kind,target
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,deref_read,*unsigned char
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,deref_read,*unsigned int
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,deref_read,*unsigned short
+,ReplayFormatObjectField,src/harness/replay_objects.cpp,deref_read,*void
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::kind
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::offset
 ,ReplayFormatObjectField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::size
@@ -55354,6 +55487,11 @@ address,function,file,kind,target
 ,ReplayInstall,src/harness/replay.cpp,global_read,s_rec
 ,ReplayIsArrayText,src/harness/replay_objects.cpp,deref_read,*char
 ,ReplayIsArrayText,src/harness/replay_objects.cpp,function,
+,ReplayKindFits,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyCount
+,ReplayKindFits,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyFirst
+,ReplayKindFits,src/harness/replay_objects.cpp,function,
+,ReplayKindFits,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
+,ReplayKindFits,src/harness/replay_objects.cpp,global_read,kReplayPolyKinds@src/harness/replay_schema.h
 ,ReplayKnown::Changed,src/harness/replay_text.cpp,call,ReplayKnown::Find
 ,ReplayKnown::Changed,src/harness/replay_text.cpp,call,ReplayKnown::Set
 ,ReplayKnown::Changed,src/harness/replay_text.cpp,call,strcmp
@@ -55500,18 +55638,23 @@ address,function,file,kind,target
 ,ReplayResolveObject,src/harness/replay_objects.cpp,call,strlen
 ,ReplayResolveObject,src/harness/replay_objects.cpp,deref_read,*char
 ,ReplayResolveObject,src/harness/replay_objects.cpp,deref_write,*unsigned int
+,ReplayResolveObject,src/harness/replay_objects.cpp,deref_write,*void
 ,ReplayResolveObject,src/harness/replay_objects.cpp,field_escape,Game::weapons
 ,ReplayResolveObject,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::insideOffset
+,ReplayResolveObject,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyCount
 ,ReplayResolveObject,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::scope
 ,ReplayResolveObject,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::size
 ,ReplayResolveObject,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::table
+,ReplayResolveObject,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::vtable
 ,ReplayResolveObject,src/harness/replay_objects.cpp,function,
 ,ReplayResolveObject,src/harness/replay_objects.cpp,global_read,g_game
 ,ReplayResolveObject,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
 ,ReplayResolveObject,src/harness/replay_objects.cpp,indirect_call,indirect via void *(*)(unsigned int) __attribute__((stdcall)) [alloc]
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,ParseHex8
+,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,ReplayKindFits
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,ReplayParseWeapon
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,ReplayResolveObject
+,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,RestoreCode
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,SimBlockBase
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,atoi
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,memset
@@ -55598,6 +55741,33 @@ address,function,file,kind,target
 ,ReplayText::Reserve,src/harness/replay_text.cpp,function,
 ,ReplayText::Size,src/harness/replay_text.cpp,field_read,ReplayText::used
 ,ReplayText::Size,src/harness/replay_text.cpp,function,
+,ReplayThunkVtable,src/harness/replay_callbacks.h,deref_read,*void
+,ReplayThunkVtable,src/harness/replay_callbacks.h,function,
+,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Original
+,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Space
+,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Text
+,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::~ReplayCallbackCall
+,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,call,ReplayValue
+,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,function,
+,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,indirect_call,"indirect via void (*)(void *, int) __attribute__((thiscall))"
+,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayAddObjectName
+,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Original
+,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Space
+,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Table
+,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Text
+,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::~ReplayCallbackCall
+,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayText::Add
+,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayValue
+,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,function,
+,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,indirect_call,"indirect via int (*)(void *, Unit *) __attribute__((thiscall))"
+,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayAddObjectName
+,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Original
+,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Space
+,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Table
+,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Text
+,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::~ReplayCallbackCall
+,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,function,
+,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,indirect_call,"indirect via void (*)(void *, Unit *) __attribute__((thiscall))"
 ,ReplayValue,src/harness/replay_values.h,call,ReplayText::Add
 ,ReplayValue,src/harness/replay_values.h,call,ReplayText::AddChar
 ,ReplayValue,src/harness/replay_values.h,call,ReplayText::AddF32
@@ -55639,8 +55809,10 @@ address,function,file,kind,target
 ,ReplayWalk,src/harness/replay_objects.cpp,global_read,deferred@ReplayWalk
 ,ReplayWalk,src/harness/replay_objects.cpp,global_read,kReplayObjectFields@src/harness/replay_schema.h
 ,ReplayWalk,src/harness/replay_objects.cpp,global_write,deferred@ReplayWalk
+,ReplayWrite,src/harness/replay.cpp,call,ReplayFailure
 ,ReplayWrite,src/harness/replay.cpp,call,ReplayText::Data
 ,ReplayWrite,src/harness/replay.cpp,call,ReplayText::Size
+,ReplayWrite,src/harness/replay.cpp,call,_snprintf
 ,ReplayWrite,src/harness/replay.cpp,call,fclose
 ,ReplayWrite,src/harness/replay.cpp,call,fopen
 ,ReplayWrite,src/harness/replay.cpp,call,fputs
@@ -55738,6 +55910,19 @@ address,function,file,kind,target
 ,ResolveUnitTypeKey,src/orders/order_queue.cpp,global_read,g_game
 ,ResolveUnitTypeKey,src/orders/order_queue.cpp,global_read,g_seams
 ,ResolveUnitTypeKey,src/orders/order_queue.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
+,RestoreCode,src/harness/replay_objects.cpp,call,strcmp
+,RestoreCode,src/harness/replay_objects.cpp,call,strlen
+,RestoreCode,src/harness/replay_objects.cpp,call,strncmp
+,RestoreCode,src/harness/replay_objects.cpp,call,strtoul
+,RestoreCode,src/harness/replay_objects.cpp,deref_read,*char
+,RestoreCode,src/harness/replay_objects.cpp,deref_read,*void
+,RestoreCode,src/harness/replay_objects.cpp,deref_write,*void
+,RestoreCode,src/harness/replay_objects.cpp,field_read,ReplayCodeTable::count
+,RestoreCode,src/harness/replay_objects.cpp,field_read,ReplayCodeTable::entries
+,RestoreCode,src/harness/replay_objects.cpp,field_read,ReplayCodeTable::name
+,RestoreCode,src/harness/replay_objects.cpp,field_read,ReplayObjectField::target
+,RestoreCode,src/harness/replay_objects.cpp,function,
+,RestoreCode,src/harness/replay_objects.cpp,global_read,kReplayCodeTables@src/harness/replay_schema.h
 ,RestoreMouseTrails,src/host/win32/window.cpp,call,SystemParametersInfoA
 ,RestoreMouseTrails,src/host/win32/window.cpp,function,
 ,RestoreMouseTrails,src/host/win32/window.cpp,global_read,g_mouseTrailsSaved
@@ -56520,7 +56705,9 @@ address,function,file,kind,target
 ,SlotScope::Open,src/harness/replay.cpp,function,
 ,SlotScope::Open,src/harness/replay.cpp,global_read,s_recording
 ,SlotScope::SlotScope,src/harness/replay.cpp,call,IsImportOf
+,SlotScope::SlotScope,src/harness/replay.cpp,call,ReplayCallbackDepth
 ,SlotScope::SlotScope,src/harness/replay.cpp,call,ReplayCalls
+,SlotScope::SlotScope,src/harness/replay.cpp,call,ReplayFail
 ,SlotScope::SlotScope,src/harness/replay.cpp,call,SlotEnter
 ,SlotScope::SlotScope,src/harness/replay.cpp,field_write,<anon>::SlotScope::role
 ,SlotScope::SlotScope,src/harness/replay.cpp,function,
@@ -57715,6 +57902,7 @@ address,function,file,kind,target
 ,Visit,src/harness/block_scan.cpp,global_read,g_words
 ,Visit,src/harness/block_scan.cpp,global_write,g_words
 ,Visit,src/harness/replay_objects.cpp,call,PointerHash
+,Visit,src/harness/replay_objects.cpp,call,ReplayConcreteKind
 ,Visit,src/harness/replay_objects.cpp,call,ReplayInsideTable
 ,Visit,src/harness/replay_objects.cpp,call,ReplayObjectTable::Name
 ,Visit,src/harness/replay_objects.cpp,call,abort
@@ -57730,6 +57918,7 @@ address,function,file,kind,target
 ,Visit,src/harness/replay_objects.cpp,field_write,ReplayReach::object
 ,Visit,src/harness/replay_objects.cpp,field_write,ReplayReach::slots
 ,Visit,src/harness/replay_objects.cpp,function,
+,Visit,src/harness/replay_objects.cpp,global_read,kReplayObjectKindCount@src/harness/replay_schema.h
 ,Visit,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
 ,VisitBlob,src/harness/harness.cpp,call,DumpPrefix
 ,VisitBlob,src/harness/harness.cpp,call,HashBuf

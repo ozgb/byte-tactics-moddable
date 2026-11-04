@@ -1324,6 +1324,8 @@ bool ReplayApplyVector(const ReplayObjectField& f, void* object, const char* key
                     if (target == nullptr || !ReplayKindFits(spec.kind, found))
                         return false;
                 }
+                if (view.data == nullptr)
+                    return false;
                 ((unsigned*)view.data)[i] = target == nullptr ? 0u : (unsigned)((const char*)target - (const char*)SimBlockBase());
             }
             return true;
@@ -1362,6 +1364,8 @@ bool ReplayApplyVector(const ReplayObjectField& f, void* object, const char* key
             return false;
         memcpy(hex + index * width, p, run);
         if (memory) {
+            if (data == nullptr)
+                return false;
             for (unsigned i = 0; i < run / 2; i++)
                 data[index * spec.size + i] = (unsigned char)(HexDigit(p[i * 2]) << 4 | HexDigit(p[i * 2 + 1]));
         }

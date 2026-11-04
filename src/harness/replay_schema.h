@@ -285,29 +285,57 @@ enum ReplayObjectKindId {
     ROK_COUNT
 };
 
+inline const void* ReplayVtable(unsigned kind)
+{
+    switch (kind) {
+    case ROK_APPROACHRADIUS:
+        return g_approachRadiusVtable;
+    case ROK_RINGAPPROACH:
+        return g_ringApproachVtable;
+    case ROK_PATHORDER:
+        return g_pathOrderVtable;
+    default:
+        return nullptr;
+    }
+}
+
+inline const char* ReplayVtableName(unsigned kind)
+{
+    switch (kind) {
+    case ROK_APPROACHRADIUS:
+        return "g_approachRadiusVtable";
+    case ROK_RINGAPPROACH:
+        return "g_ringApproachVtable";
+    case ROK_PATHORDER:
+        return "g_pathOrderVtable";
+    default:
+        return "";
+    }
+}
+
 static const ReplayObjectKind kReplayObjectKinds[] = {
-    { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "Unit", sizeof(Unit), RS_STATE, 2, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "UnitDef", sizeof(UnitDef), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "weapondef", sizeof(WeaponDef), RS_INDEX, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "MeteorParams", sizeof(MeteorParams), RS_VALUE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "UnitResources", sizeof(UnitResources), RS_STATE, RT_ORDER, 1, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot", nullptr, "", 0, 0 },
-    { "PlayerInfo", sizeof(PlayerInfo), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "Cell", sizeof(Cell), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "CobScript", sizeof(CobScript), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "UnitMotion", sizeof(UnitMotion), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "Vec3", sizeof(Vec3), RS_VALUE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "Projectile", sizeof(Projectile), RS_STATE, 3, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "MovementClass", sizeof(MovementClass), RS_STATE, 4, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "Point16", sizeof(Point16), RS_VALUE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "MissionType", sizeof(MissionType), RS_VALUE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "Angles16", sizeof(Angles16), RS_VALUE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "OrderFx", sizeof(OrderFx), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 3 },
-    { "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, "", g_approachRadiusVtable, "g_approachRadiusVtable", 0, 0 },
-    { "RingApproach", sizeof(RingApproach), RS_STATE, RT_ORDER, 0, 0, 0, "", g_ringApproachVtable, "g_ringApproachVtable", 0, 0 },
-    { "PathOrder", sizeof(PathOrder), RS_STATE, RT_ORDER, 0, 0, 0, "", g_pathOrderVtable, "g_pathOrderVtable", 0, 0 },
-    { "Order", sizeof(Order), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
-    { "OrderTableEntry", sizeof(OrderTableEntry), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, "", 0, 0 },
+    { "Unit", sizeof(Unit), RS_STATE, 2, 0, 0, 0, "", 0, 0 },
+    { "UnitDef", sizeof(UnitDef), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "weapondef", sizeof(WeaponDef), RS_INDEX, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "MeteorParams", sizeof(MeteorParams), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "UnitResources", sizeof(UnitResources), RS_STATE, RT_ORDER, 1, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot", 0, 0 },
+    { "PlayerInfo", sizeof(PlayerInfo), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "Cell", sizeof(Cell), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "CobScript", sizeof(CobScript), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "UnitMotion", sizeof(UnitMotion), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "Vec3", sizeof(Vec3), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "Projectile", sizeof(Projectile), RS_STATE, 3, 0, 0, 0, "", 0, 0 },
+    { "MovementClass", sizeof(MovementClass), RS_STATE, 4, 0, 0, 0, "", 0, 0 },
+    { "Point16", sizeof(Point16), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "MissionType", sizeof(MissionType), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "Angles16", sizeof(Angles16), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "OrderFx", sizeof(OrderFx), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 3 },
+    { "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "RingApproach", sizeof(RingApproach), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "PathOrder", sizeof(PathOrder), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "Order", sizeof(Order), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "OrderTableEntry", sizeof(OrderTableEntry), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
 };
 static const unsigned kReplayObjectKindCount = 22;
 

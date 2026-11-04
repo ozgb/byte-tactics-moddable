@@ -888,7 +888,17 @@ def render_schema(ann: dict, model: dict) -> str:
     L += ["    RF_%s," % upper(f["name"]) for f in fields]
     L += ["};", "", "enum ReplayObjectKindId {"]
     L += ["    ROK_%s," % upper(o["name"]) for o in objects]
-    L += ["    ROK_COUNT", "};", "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
+    L += ["    ROK_COUNT", "};", "", "inline const void* ReplayVtable(unsigned kind)", "{", "    switch (kind) {"]
+    for o in objects:
+        if o.get("vtable"):
+            L.append("    case ROK_%s:" % upper(o["name"]))
+            L.append("        return %s;" % o["vtable"])
+    L += ["    default:", "        return nullptr;", "    }", "}", "", "inline const char* ReplayVtableName(unsigned kind)", "{", "    switch (kind) {"]
+    for o in objects:
+        if o.get("vtable"):
+            L.append("    case ROK_%s:" % upper(o["name"]))
+            L.append('        return "%s";' % o["vtable"])
+    L += ["    default:", '        return "";', "    }", "}", "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
     scope = {"state": "RS_STATE", "index": "RS_INDEX", "value": "RS_VALUE"}
     kind_id = {o["name"]: "ROK_" + upper(o["name"]) for o in objects}
     types = {o["name"]: o["type"] for o in objects}
@@ -906,9 +916,8 @@ def render_schema(ann: dict, model: dict) -> str:
             tail = '1, %s, offsetof(%s, %s), "%s"' % (kind_id[inside["kind"]], container, inside["member"], inside["member"])
         else:
             tail = '0, 0, 0, ""'
-        vtable = '%s, "%s"' % (o["vtable"], o["vtable"]) if o.get("vtable") else 'nullptr, ""'
         first, count = poly_at.get(o["name"], (0, 0))
-        L.append('    { "%s", sizeof(%s), %s, %s, %s, %s, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), tail, vtable, first, count))
+        L.append('    { "%s", sizeof(%s), %s, %s, %s, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), tail, first, count))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
           "static const unsigned char kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
           "enum ReplayCallbackId {"]
@@ -1657,14 +1666,14 @@ def render_callbacks(model: dict) -> str:
     L.append("")
     for c in model["callbacks"]:
         name = c["name"]
-        L += ["class ReplayThunk_%s : public %s {" % (name, name), "public:"]
+        L += ["class ReplayThunk%s : public %s {" % (name, name), "public:"]
         for m in c["methods"]:
-            L.append("    virtual %s %s(%s);" % (m.get("ret", "void"), m["name"], callback_signature(m)))
+            L.append("    %s %s(%s) override;" % (m.get("ret", "void"), m["name"], callback_signature(m)))
         L += ["};", ""]
         for index, m in enumerate(c["methods"]):
             ret = m.get("ret", "void")
             args = m.get("args", [])
-            L += ["inline %s ReplayThunk_%s::%s(%s)" % (ret, name, m["name"], callback_signature(m)), "{",
+            L += ["inline %s ReplayThunk%s::%s(%s)" % (ret, name, m["name"], callback_signature(m)), "{",
                   "    ReplayCallbackCall call(this, %d);" % index]
             for i, a in enumerate(args):
                 v = "a%d" % i
@@ -1693,7 +1702,7 @@ def render_callbacks(model: dict) -> str:
             L += ["}", ""]
     L += ["inline const void* ReplayThunkVtable(unsigned callback)", "{", "    switch (callback) {"]
     for c in model["callbacks"]:
-        L += ["    case RCB_%s: {" % upper(c["name"]), "        ReplayThunk_%s probe;" % c["name"], "        return *(const void* const*)(const void*)&probe;", "    }"]
+        L += ["    case RCB_%s: {" % upper(c["name"]), "        ReplayThunk%s probe;" % c["name"], "        return *reinterpret_cast<const void* const*>(&probe);", "    }"]
     L += ["    }", "    return nullptr;", "}", "", "#endif", ""]
     return "\n".join(L)
 

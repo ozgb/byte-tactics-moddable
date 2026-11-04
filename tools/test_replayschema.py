@@ -477,9 +477,11 @@ class Polymorphic(unittest.TestCase):
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
         self.assertIn("extern void (* const g_approachRadiusVtable[])();", text)
-        self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, "", g_approachRadiusVtable, "g_approachRadiusVtable", 0, 0 },', text)
+        self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },', text)
+        self.assertIn("    case ROK_APPROACHRADIUS:\n        return g_approachRadiusVtable;", text)
+        self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', text)
         base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
-        self.assertTrue(base.endswith('nullptr, "", 0, 3 },'), base)
+        self.assertTrue(base.endswith('"", 0, 3 },'), base)
         self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };", text)
         self.assertIn('static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");', text)
         self.assertIn('static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");', text)
@@ -611,8 +613,8 @@ class Callbacks(unittest.TestCase):
     def test_the_recorder_gets_a_class_that_records_and_forwards_each_method(self):
         files, _, _ = self.generated()
         text = files[rs.CALLBACKS_H]
-        self.assertIn("class ReplayThunk_UnitScanVisitor : public UnitScanVisitor {", text)
-        self.assertIn("inline int ReplayThunk_UnitScanVisitor::VisitUnit(Unit* a0)", text)
+        self.assertIn("class ReplayThunkUnitScanVisitor : public UnitScanVisitor {", text)
+        self.assertIn("inline int ReplayThunkUnitScanVisitor::VisitUnit(Unit* a0)", text)
         self.assertIn("ReplayAddObjectName(call.Text(), call.Table(), ROK_UNIT, a0, true);", text)
         self.assertIn("typedef int (__thiscall* Method)(void*, Unit*);", text)
         self.assertIn("int result = ((Method)call.Original(0))(this, a0);", text)

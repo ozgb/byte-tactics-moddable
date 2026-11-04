@@ -2293,10 +2293,10 @@ void PolymorphicSelfTest()
     SetVtable(rebuiltArea, g_approachRadiusVtable);
 
     printf("a vtable of no kind\n");
-    static void* unknown[2];
+    static void* stray[2];
     ApproachRadius* odd = (ApproachRadius*)SimAlloc(sizeof(ApproachRadius));
     memset((void*)odd, 0, sizeof(ApproachRadius));
-    *(const void**)odd = (const void*)unknown;
+    *(const void**)odd = (const void*)stray;
     first->attached = odd;
     ReplayClearFailure();
     recorder.Record(kinds, roots, 2, sets);

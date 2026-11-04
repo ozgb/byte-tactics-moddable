@@ -50,8 +50,6 @@ struct ReplayObjectKind {
     unsigned char insideKind;
     unsigned insideOffset;
     const char* insideName;
-    const void* vtable;
-    const char* vtableName;
     unsigned char polyFirst;
     unsigned char polyCount;
 };

@@ -8,12 +8,12 @@
 #include "../game/victory_conditions.h"
 #include "../units/cob_types.h"
 
-class ReplayThunk_UnitVisitor : public UnitVisitor {
+class ReplayThunkUnitVisitor : public UnitVisitor {
 public:
-    virtual void Visit(Unit* a0);
+    void Visit(Unit* a0) override;
 };
 
-inline void ReplayThunk_UnitVisitor::Visit(Unit* a0)
+inline void ReplayThunkUnitVisitor::Visit(Unit* a0)
 {
     ReplayCallbackCall call(this, 0);
     call.Space();
@@ -22,12 +22,12 @@ inline void ReplayThunk_UnitVisitor::Visit(Unit* a0)
     ((Method)call.Original(0))(this, a0);
 }
 
-class ReplayThunk_UnitScanVisitor : public UnitScanVisitor {
+class ReplayThunkUnitScanVisitor : public UnitScanVisitor {
 public:
-    virtual int VisitUnit(Unit* a0);
+    int VisitUnit(Unit* a0) override;
 };
 
-inline int ReplayThunk_UnitScanVisitor::VisitUnit(Unit* a0)
+inline int ReplayThunkUnitScanVisitor::VisitUnit(Unit* a0)
 {
     ReplayCallbackCall call(this, 0);
     call.Space();
@@ -39,12 +39,12 @@ inline int ReplayThunk_UnitScanVisitor::VisitUnit(Unit* a0)
     return result;
 }
 
-class ReplayThunk_Callback : public Callback {
+class ReplayThunkCallback : public Callback {
 public:
-    virtual void Complete(int a0);
+    void Complete(int a0) override;
 };
 
-inline void ReplayThunk_Callback::Complete(int a0)
+inline void ReplayThunkCallback::Complete(int a0)
 {
     ReplayCallbackCall call(this, 0);
     call.Space();
@@ -57,16 +57,16 @@ inline const void* ReplayThunkVtable(unsigned callback)
 {
     switch (callback) {
     case RCB_UNITVISITOR: {
-        ReplayThunk_UnitVisitor probe;
-        return *(const void* const*)(const void*)&probe;
+        ReplayThunkUnitVisitor probe;
+        return *reinterpret_cast<const void* const*>(&probe);
     }
     case RCB_UNITSCANVISITOR: {
-        ReplayThunk_UnitScanVisitor probe;
-        return *(const void* const*)(const void*)&probe;
+        ReplayThunkUnitScanVisitor probe;
+        return *reinterpret_cast<const void* const*>(&probe);
     }
     case RCB_CALLBACK: {
-        ReplayThunk_Callback probe;
-        return *(const void* const*)(const void*)&probe;
+        ReplayThunkCallback probe;
+        return *reinterpret_cast<const void* const*>(&probe);
     }
     }
     return nullptr;

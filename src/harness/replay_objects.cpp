@@ -164,13 +164,13 @@ unsigned ReplayConcreteKind(unsigned kind, const void* p)
     const void* vptr = *(const void* const*)p;
     for (unsigned i = 0; i < base.polyCount; i++) {
         unsigned concrete = kReplayPolyKinds[base.polyFirst + i];
-        if (kReplayObjectKinds[concrete].vtable == vptr)
+        if (ReplayVtable(concrete) == vptr)
             return concrete;
     }
     const char* symbol = nullptr;
     for (unsigned k = 0; k < kReplayObjectKindCount; k++) {
-        if (kReplayObjectKinds[k].vtable != nullptr && kReplayObjectKinds[k].vtable == vptr)
-            symbol = kReplayObjectKinds[k].vtableName;
+        if (ReplayVtable(k) != nullptr && ReplayVtable(k) == vptr)
+            symbol = ReplayVtableName(k);
     }
     char message[200];
     if (symbol != nullptr)
@@ -663,8 +663,8 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
         if (p == nullptr && ordinal != 0 && alloc != nullptr) {
             p = alloc(kReplayObjectKinds[kind].size);
             memset(p, 0, kReplayObjectKinds[kind].size);
-            if (kReplayObjectKinds[kind].vtable != nullptr)
-                *(const void**)p = kReplayObjectKinds[kind].vtable;
+            if (ReplayVtable(kind) != nullptr)
+                *(const void**)p = ReplayVtable(kind);
             table.Bind((unsigned)kind, ordinal, p);
         }
     }
@@ -1355,10 +1355,12 @@ void ReplayCallbackScope::Stop()
     *(const void**)object = original;
 }
 
-ReplayCallbackCall::ReplayCallbackCall(const void* target, unsigned method) : scope(FindScope(target))
+ReplayCallbackCall::ReplayCallbackCall(const void* target, unsigned method) : scope(nullptr)
 {
-    if (scope == nullptr)
+    ReplayCallbackScope* found = FindScope(target);
+    if (found == nullptr)
         abort();
+    scope = found;
     if (s_callbackDepth != 0)
         ReplayFail("a callback made inside a callback of an import is not recorded");
     s_callbackDepth++;

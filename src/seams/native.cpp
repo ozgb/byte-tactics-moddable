@@ -12,6 +12,7 @@
 #include "../game/unit_resources.h"
 #include "../units/movement_class.h"
 #include "../units/cob_script.h"
+#include "../units/cob_types.h"
 #include "../util/vec3.h"
 #include "../map/mission.h"
 #include "../map/spatial_bucket.h"
@@ -551,6 +552,16 @@ static AiSearchGoal* __stdcall UnitMotionClaimRepathNative(UnitMotion* motion)
     return motion->ClaimRepath();
 }
 
+static void __stdcall WeaponAimCobCompleteNative(Callback* callback, int result)
+{
+    callback->Complete(result);
+}
+
+static void __stdcall CobScriptExplodePieceNative(CobScript* script, int piece, unsigned int flags)
+{
+    script->ExplodePiece(piece, flags);
+}
+
 static void __fastcall RunSearchesNative(Pathfinder* self)
 {
     self->RunSearches();
@@ -824,6 +835,8 @@ void InstallNativeSeams()
     s_weapons.InitUnitWeaponSlots = InitUnitWeaponSlots;
     s_weapons.RemoveUnitProjectiles = RemoveUnitProjectiles;
     s_weapons.UpdateUnitWeapons = UpdateUnitWeapons;
+    s_weapons.WeaponAimCobComplete = WeaponAimCobCompleteNative;
+    s_weapons.CobScriptExplodePiece = CobScriptExplodePieceNative;
     s_ai.ReactToAttack = ReactToAttack;
     s_ai.MarkOwnerNetDirtyFromDamageSplit = MarkOwnerNetDirtyFromDamageSplitNative;
     s_orders.AppendOrder = AppendOrder;

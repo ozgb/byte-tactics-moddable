@@ -1,10 +1,6 @@
 subsystem,function,symbol,reason
 map,VisitObjectsInRange,virtual DamagedAllyCollector::CollectDamagedAlly,"TODO(#686): map visits objects in range through a collector class of orders, add a seam slot on orders"
 units,ClearUnitRefs,virtual OrderBase::OrStatusFlags,"TODO(#684): units reach the order and motion objects of orders through their vtables, add seam slots on orders"
-units,CobScript::RunThread,virtual Callback::Complete,"TODO(#685): the COB VM reaches the aim callback and the explosion methods of weapons through vtables, add seam slots on weapons"
-units,CobScript::RunThread,virtual CobScript::ExplodeLegacy,"TODO(#685): the COB VM reaches the aim callback and the explosion methods of weapons through vtables, add seam slots on weapons"
-units,CobScript::RunThread,virtual CobScript::ExplodePiece,"TODO(#685): the COB VM reaches the aim callback and the explosion methods of weapons through vtables, add seam slots on weapons"
-units,CobScript::StartScriptWithArgsByIndex,virtual Callback::Complete,"TODO(#685): the COB VM reaches the aim callback and the explosion methods of weapons through vtables, add seam slots on weapons"
 units,NotifyUnitRefs,virtual OrderBase::OrStatusFlags,"TODO(#684): units reach the order and motion objects of orders through their vtables, add seam slots on orders"
 units,ReceiveUnitStates,virtual MotionSerializer::ReadFrom,"TODO(#684): units reach the order and motion objects of orders through their vtables, add seam slots on orders"
 units,Unit::SetStateBits,virtual OrderBase::OrStatusFlags,"TODO(#684): units reach the order and motion objects of orders through their vtables, add seam slots on orders"

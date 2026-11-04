@@ -514,6 +514,38 @@ GafFrame* __stdcall GetGafSequenceFrame(Handle* player)
     return o;
 }
 
+void __stdcall InitGafSequence(Handle* player, GafEntry* entry, int index)
+{
+    ReplayText t;
+    StartImport(t, RI_INIT_GAF_SEQUENCE);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_HANDLE, player, false);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_FRAMETABLE, entry, false);
+    Space(t);
+    t.AddInt((int)index);
+    const char* r = Enter(t);
+    ApplyReach((void*)player, ROK_HANDLE, ".index");
+    ApplyReach((void*)player, ROK_HANDLE, ".value");
+    ApplyReach((void*)player, ROK_HANDLE, ".kind");
+    ApplyReach((void*)player, ROK_HANDLE, ".src");
+    (void)r;
+}
+
+int __stdcall StepGafSequence(Handle* player)
+{
+    ReplayText t;
+    StartImport(t, RI_STEP_GAF_SEQUENCE);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_HANDLE, player, false);
+    const char* result = Enter(t);
+    ApplyReach((void*)player, ROK_HANDLE, ".index");
+    ApplyReach((void*)player, ROK_HANDLE, ".value");
+    ApplyReach((void*)player, ROK_HANDLE, ".kind");
+    ApplyReach((void*)player, ROK_HANDLE, ".src");
+    return atoi(result);
+}
+
 void* __stdcall Load3do(char* path)
 {
     ReplayText t;

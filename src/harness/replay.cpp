@@ -537,6 +537,28 @@ void ImportResultObjectReach(ReplayText& t, unsigned kind, const void* p, unsign
     va_end(names);
 }
 
+void ImportObjectOuts(ReplayText& t, unsigned kind, const void* p, unsigned count, ...)
+{
+    if (p == nullptr)
+        return;
+    va_list names;
+    va_start(names, count);
+    for (unsigned n = 0; n < count; n++) {
+        const char* name = va_arg(names, const char*);
+        const ReplayObjectField* f = ReplayFindObjectField(kind, name);
+        if (f == nullptr)
+            continue;
+        t.Add("\n  o ");
+        ReplayAddObjectName(t, Table(), kind, p, true);
+        t.AddChar('.');
+        t.Add(name);
+        t.AddChar(' ');
+        ReplayFormatObjectField(*f, p, Table(), true, s_field);
+        t.Add(s_field.Data());
+    }
+    va_end(names);
+}
+
 void ImportResultPending(ReplayText& t)
 {
     t.Add(" = ?");

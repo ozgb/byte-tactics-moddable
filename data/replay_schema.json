@@ -1193,7 +1193,25 @@
    "Handle": {
     "type": "Handle",
     "scope": "state",
-    "fields": []
+    "fields": [
+     {
+      "name": "index",
+      "kind": "u16"
+     },
+     {
+      "name": "value",
+      "kind": "u16"
+     },
+     {
+      "name": "kind",
+      "kind": "u8"
+     },
+     {
+      "name": "src",
+      "kind": "ptr",
+      "target": "FrameTable"
+     }
+    ]
    }
   },
   "rules": [
@@ -2994,6 +3012,52 @@
     ]
    },
    {
+    "name": "InitGafSequence",
+    "id": "RI_INIT_GAF_SEQUENCE",
+    "declaration": "void __stdcall InitGafSequence(Handle* player, GafEntry* entry, int index);",
+    "args": [
+     {
+      "mode": "object",
+      "param": "player",
+      "kind": "Handle",
+      "reach": [
+       "index",
+       "value",
+       "kind",
+       "src"
+      ]
+     },
+     {
+      "mode": "object",
+      "param": "entry",
+      "kind": "FrameTable"
+     },
+     {
+      "mode": "int",
+      "param": "index"
+     }
+    ]
+   },
+   {
+    "name": "StepGafSequence",
+    "id": "RI_STEP_GAF_SEQUENCE",
+    "declaration": "int __stdcall StepGafSequence(Handle* player);",
+    "args": [
+     {
+      "mode": "object",
+      "param": "player",
+      "kind": "Handle",
+      "reach": [
+       "index",
+       "value",
+       "kind",
+       "src"
+      ]
+     }
+    ],
+    "result": "int"
+   },
+   {
     "name": "Load3do",
     "id": "RI_LOAD_3DO",
     "declaration": "void* __stdcall Load3do(char* path);",
@@ -3281,7 +3345,7 @@
   {"name": "FrameTable", "type": "FrameTable", "scope": "state", "table": null, "inside": null, "fields": [{"name": "count", "kind": "u16"}]},
   {"name": "GafFrame", "type": "GafFrame", "scope": "state", "table": null, "inside": null, "fields": [{"name": "width", "kind": "u16"}, {"name": "height", "kind": "u16"}, {"name": "xOffset", "kind": "i16"}, {"name": "yOffset", "kind": "i16"}, {"name": "transparency", "kind": "u8"}]},
   {"name": "Object3do", "type": "Object3do", "scope": "state", "table": null, "inside": null, "fields": [{"name": "vertexCount", "kind": "i32"}, {"name": "box_x", "kind": "i32"}, {"name": "box_y", "kind": "i32"}, {"name": "box_z", "kind": "i32"}]},
-  {"name": "Handle", "type": "Handle", "scope": "state", "table": null, "inside": null, "fields": []}
+  {"name": "Handle", "type": "Handle", "scope": "state", "table": null, "inside": null, "fields": [{"name": "index", "kind": "u16"}, {"name": "value", "kind": "u16"}, {"name": "kind", "kind": "u8"}, {"name": "src", "kind": "ptr", "target": "FrameTable"}]}
  ],
  "subsystems": {
   "wind_meteors": {
@@ -3319,9 +3383,9 @@
    }
   },
   "features": {
-   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [2, 0], "status": "pending", "imports": [], "pending": {"untracked": 23, "ruleless": 7, "unresolvedSlots": [], "unannotatedArgs": ["InitFeatureAnimPool(info)", "PlaceFeature(pos)", "PlaceFeature(rot)", "PlaceFeature result", "ReclaimFeature(pos)", "GetFootprintCentre(cell)", "GetFootprintCentre(def)"]}},
+   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [2, 0], "status": "pending", "imports": [], "pending": {"untracked": 22, "ruleless": 7, "unresolvedSlots": [], "unannotatedArgs": ["InitFeatureAnimPool(info)", "PlaceFeature(pos)", "PlaceFeature(rot)", "PlaceFeature result", "ReclaimFeature(pos)", "GetFootprintCentre(cell)", "GetFootprintCentre(def)"]}},
    "slots": {
-    "UpdateFeatures": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateFeatures"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Unit.cell", "Unit.footprint"], "objectWrites": [], "allOf": null, "args": [], "result": null, "native": "UpdateFeatures"},
+    "UpdateFeatures": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateFeatures"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Unit.cell", "Unit.footprint", "Handle.src"], "objectWrites": [], "allOf": null, "args": [], "result": null, "native": "UpdateFeatures"},
     "LoadFeatureFileList": {"conv": "__stdcall", "ret": "void", "functions": ["LoadFeatureFileList"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [], "result": null, "native": "LoadFeatureFileList"},
     "FreeFeatureFileList": {"conv": "__stdcall", "ret": "void", "functions": ["FreeFeatureFileList"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [], "result": null, "native": "FreeFeatureFileList"},
     "NopAfterFeatureEnum": {"conv": "__stdcall", "ret": "void", "functions": ["NopAfterFeatureEnum"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [], "result": null, "native": "NopAfterFeatureEnum"},

@@ -38203,6 +38203,9 @@ address,function,file,kind,target
 0x4b8ae0,FrameFromSurface,src/graphics/gaf.cpp,field_write,GafFrame::yOffset
 0x4b8ae0,FrameFromSurface,src/graphics/gaf.cpp,function,
 0x4b8b30,InitGafSequence,src/graphics/gaf.cpp,call,GafDurationAt
+0x4b8b30,InitGafSequence,src/graphics/gaf.cpp,call,ReplayImport::Int
+0x4b8b30,InitGafSequence,src/graphics/gaf.cpp,call,ReplayImport::Ptr
+0x4b8b30,InitGafSequence,src/graphics/gaf.cpp,call,ReplayImport::~ReplayImport
 0x4b8b30,InitGafSequence,src/graphics/gaf.cpp,field_read,GafSequencePlayer::index
 0x4b8b30,InitGafSequence,src/graphics/gaf.cpp,field_read,GafSequenceRecord::count
 0x4b8b30,InitGafSequence,src/graphics/gaf.cpp,field_read,GafSequenceRecord::kind
@@ -38211,6 +38214,9 @@ address,function,file,kind,target
 0x4b8b30,InitGafSequence,src/graphics/gaf.cpp,field_write,GafSequencePlayer::src
 0x4b8b30,InitGafSequence,src/graphics/gaf.cpp,field_write,GafSequencePlayer::value
 0x4b8b30,InitGafSequence,src/graphics/gaf.cpp,function,
+0x4b8b90,StepGafSequence,src/graphics/gaf.cpp,call,ReplayImport::Ptr
+0x4b8b90,StepGafSequence,src/graphics/gaf.cpp,call,ReplayImport::Result
+0x4b8b90,StepGafSequence,src/graphics/gaf.cpp,call,ReplayImport::~ReplayImport
 0x4b8b90,StepGafSequence,src/graphics/gaf.cpp,field_read,GafDurationEntry::value
 0x4b8b90,StepGafSequence,src/graphics/gaf.cpp,field_read,GafSequencePlayer::index
 0x4b8b90,StepGafSequence,src/graphics/gaf.cpp,field_read,GafSequencePlayer::kind
@@ -48053,6 +48059,18 @@ address,function,file,kind,target
 ,ImportObject,src/harness/replay.cpp,call,ReplayText::AddChar
 ,ImportObject,src/harness/replay.cpp,call,Table
 ,ImportObject,src/harness/replay.cpp,function,
+,ImportObjectOuts,src/harness/replay.cpp,call,ReplayAddObjectName
+,ImportObjectOuts,src/harness/replay.cpp,call,ReplayFindObjectField
+,ImportObjectOuts,src/harness/replay.cpp,call,ReplayFormatObjectField
+,ImportObjectOuts,src/harness/replay.cpp,call,ReplayText::Add
+,ImportObjectOuts,src/harness/replay.cpp,call,ReplayText::AddChar
+,ImportObjectOuts,src/harness/replay.cpp,call,ReplayText::Data
+,ImportObjectOuts,src/harness/replay.cpp,call,Table
+,ImportObjectOuts,src/harness/replay.cpp,call,__builtin_va_end
+,ImportObjectOuts,src/harness/replay.cpp,call,__builtin_va_start
+,ImportObjectOuts,src/harness/replay.cpp,deref_read,*ReplayObjectField
+,ImportObjectOuts,src/harness/replay.cpp,function,
+,ImportObjectOuts,src/harness/replay.cpp,global_read,s_field
 ,ImportOutBytes,src/harness/replay.cpp,call,ReplayBytes
 ,ImportOutBytes,src/harness/replay.cpp,call,ReplayText::Add
 ,ImportOutBytes,src/harness/replay.cpp,call,ReplayText::AddChar
@@ -55865,6 +55883,7 @@ address,function,file,kind,target
 ,ReplayImportEnd,src/harness/replay_services.inc,call,AddSnapshot
 ,ReplayImportEnd,src/harness/replay_services.inc,call,AddSpace
 ,ReplayImportEnd,src/harness/replay_services.inc,call,AddStream
+,ReplayImportEnd,src/harness/replay_services.inc,call,ImportObjectOuts
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ImportResultObject
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ImportResultObjectReach
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddArgs
@@ -56108,6 +56127,7 @@ address,function,file,kind,target
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,deref_write,*unsigned char
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,deref_write,*unsigned int
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,deref_write,*unsigned short
+,ReplayRestoreObjectField,src/harness/replay_objects.cpp,deref_write,*void
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::kind
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::offset
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::size

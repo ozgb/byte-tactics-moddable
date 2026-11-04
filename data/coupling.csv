@@ -504,9 +504,9 @@ game,harness,call,HarnessStepsPerFrame,1
 game,harness,call,ReplayImport::Answered,5
 game,harness,call,ReplayImport::AnsweredPointer,3
 game,harness,call,ReplayImport::Int,5
-game,harness,call,ReplayImport::Ptr,4
-game,harness,call,ReplayImport::Result,1
-game,harness,call,ReplayImport::~ReplayImport,6
+game,harness,call,ReplayImport::Ptr,5
+game,harness,call,ReplayImport::Result,2
+game,harness,call,ReplayImport::~ReplayImport,7
 game,harness,shared_write,Game::difficulty,2
 game,harness,shared_write,Game::endGameFlags,2
 game,harness,shared_write,Game::endGameVictory,2
@@ -3832,10 +3832,10 @@ presentation,harness,call,HarnessUiGroup,2
 presentation,harness,call,HarnessUiOrder,2
 presentation,harness,call,HarnessUiQueue,1
 presentation,harness,call,HarnessViewRand,19
-presentation,harness,call,ReplayImport::Int,1
-presentation,harness,call,ReplayImport::Ptr,6
+presentation,harness,call,ReplayImport::Int,2
+presentation,harness,call,ReplayImport::Ptr,7
 presentation,harness,call,ReplayImport::Result,1
-presentation,harness,call,ReplayImport::~ReplayImport,6
+presentation,harness,call,ReplayImport::~ReplayImport,7
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::endGameVictory,2
 presentation,harness,shared_write,Game::numPlayers,2

@@ -58,7 +58,7 @@ BLOCK_KINDS = {"field_read": "r", "field_write": "w", "global_read": "r", "globa
 OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "rw"}
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
-               "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR"}
+               "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR", "ptr": "PTR"}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?(\w+)(?:>>(\d+))?\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
@@ -284,7 +284,9 @@ def check_polymorphic(ann: dict) -> list[str]:
     for name, spec in kinds.items():
         for f in spec["fields"]:
             where = "%s.%s" % (name, f["name"])
-            base = kinds.get(f.get("target")) if f["kind"] in ("ref", "embed", "unitid") else None
+            base = kinds.get(f.get("target")) if f["kind"] in ("ref", "embed", "unitid", "ptr") else None
+            if f["kind"] == "ptr" and (base is None or base["scope"] != "state"):
+                errors.append("%s: a ptr field points at a state kind of the schema" % where)
             if "poly" in f:
                 if f["kind"] != "ref" or f.get("target") != f["poly"] or base is None or "kinds" not in base:
                     errors.append("%s: `poly` names the base kind that the ref points at" % where)
@@ -1023,8 +1025,8 @@ def render_schema(ann: dict, model: dict) -> str:
         member = f.get("member", f["name"])
         t = types[f["object"]]
         size = f.get("size")
-        size_text = str(size) if size else "sizeof(((%s*)nullptr)->%s)" % (t, member)
-        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid") or (f["kind"] == "vector" and f.get("target")) else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
+        size_text = str(size) if size else "sizeof(void*)" if f["kind"] == "ptr" else "sizeof(((%s*)nullptr)->%s)" % (t, member)
+        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr") or (f["kind"] == "vector" and f.get("target")) else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
         extra = ", %d" % (f.get("array") or f.get("vector")) if f.get("array") or f.get("vector") else ""
         L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %d, %d, %d, %d%s },' % (
             f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target, range_end.get(i, 0), range_begin.get(i, 0),
@@ -1047,6 +1049,8 @@ def render_schema(ann: dict, model: dict) -> str:
             L.append('static_assert(__is_same(%s::value_type, %s), "%s::%s holds %s");' % (access, v["ctype"], t, f["name"], v["ctype"]))
         elif f["kind"] == "code":
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a code pointer");' % (t, member, t, f["name"]))
+        elif f["kind"] == "ptr":
+            L.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s::%s is a raw pointer");' % (t, member, t, f["name"]))
         elif f.get("size") is None:
             want = {"i32": 4, "u32": 4, "u16": 2, "i16": 2, "f32": 4, "flags": 4, "ref": 4, "point16": 4, "weapon": 4, "u8": 1, "f64": 8, "unitid": 2}[f["kind"]]
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, want, t, f["name"]))
@@ -1771,6 +1775,12 @@ def check_service_specs(services: list[dict], ann: dict) -> list[str]:
                 errors.append("%s: the argument %s needs a `kind` that is an object kind of the schema" % (where, a["param"]))
             elif m == "handle" and a.get("kind") not in HANDLE_KINDS:
                 errors.append("%s: the argument %s needs a `kind` of file, rec or bank" % (where, a["param"]))
+            if "reach" in a:
+                if m != "object":
+                    errors.append("%s: the argument %s has a `reach` and is not an object" % (where, a.get("param")))
+                for f in a["reach"]:
+                    if not any(x["name"] == f for x in kinds.get(a.get("kind"), {"fields": []})["fields"]):
+                        errors.append("%s: the reach of %s names %s, which is no field of %s" % (where, a.get("param"), f, a.get("kind")))
         res = s.get("result")
         if res is not None and res not in SERVICE_RESULTS:
             errors.append("%s: the result %s is none of %s" % (where, res, ", ".join(sorted(SERVICE_RESULTS))))
@@ -1895,6 +1905,7 @@ def render_service_end(services: list[dict]) -> str:
                 L.append("        ReplayAddArgs(t, (const CommandArgs*)a[%d].v.p);" % i)
         res = s.get("result")
         pointer = "(c.result.kind == 1 ? c.result.v.p : nullptr)"
+        outs_after = [(i, a) for i, a in enumerate(s["args"]) if a.get("reach")]
         if res == "snapshot":
             L.append("        AddSnapshot(t, %s, (unsigned)a[%d].v.i);" % (pointer, index[s["bytes"]]))
         elif res == "int":
@@ -1917,6 +1928,8 @@ def render_service_end(services: list[dict]) -> str:
         elif res == "alloc":
             tag = "(const char*)a[%d].v.p" % index[s["tag"]] if s.get("tag") else "nullptr"
             L.append("        AddAlloc(t, %s, %s);" % (pointer, tag))
+        for i, a in outs_after:
+            L.append("        ImportObjectOuts(t, ROK_%s, a[%d].v.p, %d, %s);" % (upper(a["kind"]), i, len(a["reach"]), ", ".join('"%s"' % f for f in a["reach"])))
         if s.get("nested"):
             L.append("        t.AddText(s_nested);")
             L.append("        s_nested.Clear();")
@@ -1953,6 +1966,9 @@ def service_result_lines(s: dict, ctx: str) -> list[str]:
     """The lines after Enter: the outs and effects of a definition, then the result."""
     L = []
     res = s.get("result")
+    for i, a in enumerate(s["args"]):
+        for f in a.get("reach", []):
+            L.append('ApplyReach((void*)%s, ROK_%s, ".%s");' % (service_arg_expr(s, i, ctx), upper(a["kind"]), f))
     if ctx == "definition":
         for o in s.get("outs", []):
             if "member" in o:

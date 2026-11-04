@@ -983,6 +983,50 @@ class ReentrantServices(unittest.TestCase):
         self.assertTrue(any("a re-entrant service has an int or no result" in e for e in self.generated(ann)[1]))
 
 
+class RawPointers(unittest.TestCase):
+    """A ptr field is a raw pointer to a named object, and a service writes the fields of its object argument as o lines."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def spec(self, name, ann=None):
+        return [s for s in (ann or annotations())["services"] if s["name"] == name][0]
+
+    def field(self, ann):
+        return [f for f in ann["objects"]["Handle"]["fields"] if f["name"] == "src"][0]
+
+    def test_a_ptr_field_has_its_own_kind_and_a_target(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn('{ "src", offsetof(Handle, src), sizeof(void*), ROK_HANDLE, RK_PTR, ROK_FRAMETABLE,', text)
+        self.assertIn('static_assert(__is_pointer(decltype(((Handle*)nullptr)->src)), "Handle::src is a raw pointer");', text)
+
+    def test_a_ptr_is_not_walked(self):
+        self.assertNotIn("ptr", rs.WALKABLE)
+
+    def test_a_ptr_to_a_value_kind_is_an_error(self):
+        ann = annotations()
+        self.field(ann)["target"] = "Vec3"
+        self.assertTrue(any("Handle.src: a ptr field points at a state kind of the schema" in e for e in self.generated(ann)[1]))
+
+    def test_the_cursor_services_write_the_fields_of_the_handle(self):
+        text = rs.render_service_end([self.spec("InitGafSequence"), self.spec("StepGafSequence")])
+        out = 'ImportObjectOuts(t, ROK_HANDLE, a[0].v.p, 4, "index", "value", "kind", "src");'
+        self.assertEqual(text.count(out), 2)
+        self.assertIn("ReplayAddObjectName(t, Table(), ROK_FRAMETABLE, a[1].v.p, true);", text)
+        answers = rs.render_service_answers([self.spec("InitGafSequence")])
+        self.assertIn('ApplyReach((void*)player, ROK_HANDLE, ".src");', answers)
+
+    def test_the_reach_of_an_argument_names_fields_of_its_kind(self):
+        ann = annotations()
+        self.spec("StepGafSequence", ann)["args"][0]["reach"] = ["nowhere"]
+        self.assertTrue(any("service StepGafSequence: the reach of player names nowhere, which is no field of Handle" in e for e in self.generated(ann)[1]))
+        ann = annotations()
+        self.spec("InitGafSequence", ann)["args"][2]["reach"] = ["x"]
+        self.assertTrue(any("service InitGafSequence: the argument index has a `reach` and is not an object" in e for e in self.generated(ann)[1]))
+
+
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
         files, errors, model = rs.generate(rs.read_rows())

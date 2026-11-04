@@ -540,8 +540,12 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "box_x", offsetof(Object3do, box_x), sizeof(((Object3do*)nullptr)->box_x), ROK_OBJECT3DO, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
     { "box_y", offsetof(Object3do, box_y), sizeof(((Object3do*)nullptr)->box_y), ROK_OBJECT3DO, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
     { "box_z", offsetof(Object3do, box_z), sizeof(((Object3do*)nullptr)->box_z), ROK_OBJECT3DO, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
+    { "index", offsetof(Handle, index), sizeof(((Handle*)nullptr)->index), ROK_HANDLE, RK_U16, 0, 0, 0, 0, 0, 0, 0 },
+    { "value", offsetof(Handle, value), sizeof(((Handle*)nullptr)->value), ROK_HANDLE, RK_U16, 0, 0, 0, 0, 0, 0, 0 },
+    { "kind", offsetof(Handle, kind), sizeof(((Handle*)nullptr)->kind), ROK_HANDLE, RK_U8, 0, 0, 0, 0, 0, 0, 0 },
+    { "src", offsetof(Handle, src), sizeof(((Handle*)nullptr)->src), ROK_HANDLE, RK_PTR, ROK_FRAMETABLE, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 167;
+static const unsigned kReplayObjectFieldCount = 171;
 
 static const unsigned short kReplayReachFields[] = { 45, 49, 108, 109, 110, 36, 34, 37, 45, 50, 52, 79 };
 
@@ -712,6 +716,10 @@ static_assert(sizeof(((Object3do*)nullptr)->vertexCount) == 4, "Object3do::verte
 static_assert(sizeof(((Object3do*)nullptr)->box_x) == 4, "Object3do::box_x has the size the schema says");
 static_assert(sizeof(((Object3do*)nullptr)->box_y) == 4, "Object3do::box_y has the size the schema says");
 static_assert(sizeof(((Object3do*)nullptr)->box_z) == 4, "Object3do::box_z has the size the schema says");
+static_assert(sizeof(((Handle*)nullptr)->index) == 2, "Handle::index has the size the schema says");
+static_assert(sizeof(((Handle*)nullptr)->value) == 2, "Handle::value has the size the schema says");
+static_assert(sizeof(((Handle*)nullptr)->kind) == 1, "Handle::kind has the size the schema says");
+static_assert(sizeof(((Handle*)nullptr)->src) == sizeof(void*), "Handle::src is a raw pointer");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");
@@ -1151,7 +1159,7 @@ static const unsigned short kReplayEconomySpendEnergyAndMetalObjReads[] = { 2, 3
 static const unsigned short kReplayEconomySpendEnergyAndMetalObjWrites[] = { 2, 3, 93, 99 };
 static const unsigned char kReplayFeaturesUpdateFeaturesReads[] = { 0, 1, 2, 17, 33, 34, 35 };
 static const unsigned char kReplayFeaturesUpdateFeaturesWrites[] = { 33, 34, 35 };
-static const unsigned short kReplayFeaturesUpdateFeaturesObjReads[] = { 40, 41 };
+static const unsigned short kReplayFeaturesUpdateFeaturesObjReads[] = { 40, 41, 170 };
 static const unsigned short kReplayFeaturesPlaceMissionFeaturesObjReads[] = { 40, 41 };
 static const unsigned char kReplayFeaturesStampFeatureMetalReads[] = { 1, 2 };
 static const unsigned short kReplayFeaturesStampFeatureMetalObjWrites[] = { 107 };
@@ -1405,7 +1413,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "SpendEnergy", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomySpendEnergyObjReads, 3, kReplayEconomySpendEnergyObjWrites, 2, 0 },
     { "SpendMetal", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomySpendMetalObjReads, 3, kReplayEconomySpendMetalObjWrites, 2, 0 },
     { "SpendEnergyAndMetal", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomySpendEnergyAndMetalObjReads, 5, kReplayEconomySpendEnergyAndMetalObjWrites, 4, 0 },
-    { "UpdateFeatures", SUB_FEATURES, kReplayFeaturesUpdateFeaturesReads, 7, kReplayFeaturesUpdateFeaturesWrites, 3, kReplayFeaturesUpdateFeaturesObjReads, 2, nullptr, 0, 0 },
+    { "UpdateFeatures", SUB_FEATURES, kReplayFeaturesUpdateFeaturesReads, 7, kReplayFeaturesUpdateFeaturesWrites, 3, kReplayFeaturesUpdateFeaturesObjReads, 3, nullptr, 0, 0 },
     { "LoadFeatureFileList", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "FreeFeatureFileList", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "NopAfterFeatureEnum", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },

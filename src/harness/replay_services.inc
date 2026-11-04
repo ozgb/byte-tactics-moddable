@@ -391,6 +391,25 @@ void ReplayImportEnd(ReplayImport& c)
         ImportResultObjectReach(t, ROK_GAFFRAME, (c.result.kind == 1 ? c.result.v.p : nullptr), 5, "width", "height", "xOffset", "yOffset", "transparency");
         break;
     }
+    case RI_INIT_GAF_SEQUENCE:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_HANDLE, a[0].v.p, true);
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_FRAMETABLE, a[1].v.p, true);
+        AddSpace(t);
+        t.AddInt(a[2].v.i);
+        ImportObjectOuts(t, ROK_HANDLE, a[0].v.p, 4, "index", "value", "kind", "src");
+        break;
+    }
+    case RI_STEP_GAF_SEQUENCE:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_HANDLE, a[0].v.p, true);
+        AddResult(t, c.result);
+        ImportObjectOuts(t, ROK_HANDLE, a[0].v.p, 4, "index", "value", "kind", "src");
+        break;
+    }
     case RI_LOAD_3DO:
     {
         AddSpace(t);

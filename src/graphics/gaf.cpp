@@ -489,6 +489,10 @@ static inline unsigned short GafDurationAt(GafSequenceRecord* s, unsigned short 
 // FUNCTION: 0x4b8b30
 void __stdcall InitGafSequence(GafSequencePlayer* ref, GafSequenceRecord* src, int index)
 {
+    ReplayImport call(RI_INIT_GAF_SEQUENCE);
+    call.Ptr(ref);
+    call.Ptr(src);
+    call.Int(index);
     ref->index = index < src->count ? index : 0;
     ref->src = src;
     ref->value = GafDurationAt(src, ref->index);
@@ -498,6 +502,8 @@ void __stdcall InitGafSequence(GafSequencePlayer* ref, GafSequenceRecord* src, i
 // FUNCTION: 0x4b8b90
 int __stdcall StepGafSequence(GafSequencePlayer* ref)
 {
+    ReplayImport call(RI_STEP_GAF_SEQUENCE);
+    call.Ptr(ref);
     GafSequenceRecord* src = ref->src;
     if (src) {
         if (ref->value < 2) {
@@ -507,15 +513,15 @@ int __stdcall StepGafSequence(GafSequencePlayer* ref)
                     ref->index = 0;
                 } else {
                     ref->src = 0;
-                    return 1;
+                    return call.Result(1);
                 }
             }
             ref->value = src->entries[ref->index].value;
-            return 1;
+            return call.Result(1);
         }
         ref->value--;
     }
-    return 0;
+    return call.Result(0);
 }
 
 struct GafSequencePlayerSigned {

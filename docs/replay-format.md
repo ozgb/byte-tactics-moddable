@@ -330,7 +330,9 @@ themselves. The annotation, for `Player::explored` and `Game::visibilityMask`:
 ```
 
 `elem` is the element type (its size is what counts: the elements are written as the bytes of memory), and `length` is an
-integer, or one or two factors joined by `*`, each a member of the object, `member>>k`, or an integer. A member is one, two or
+integer, or one or two factors joined by `*`, each a member of the object, `member>>k`, `member+a` or `member+a>>k`, or an integer. The
+addend comes before the shift, as in C: `(count+0xff)>>8` is the `(count + 0xff) >> 8` words that `grid.dirty` holds, where `count>>8` is a word short
+whenever the count is not a multiple of 256. A member is one, two or
 four bytes. The length is read from the object each time the array is written, so the members it names have to be recorded
 (`exploredSize` is a field of `Player`) for the replayer to know the length at the call.
 
@@ -568,7 +570,8 @@ sets). The annotations hold what no header says:
   through `weapondef#N`; `fields` adds the object fields it lists under `reads` and `writes` (`Unit.extraction`,
   `UnitResources.energyMake`), so that a write through a pointer is recorded as a `w` line of the field it lands on;
   `all-of` makes every slot of a table kind a root of the call (`Game::players` is walked by index), and a slot may have the rule for
-  several kinds. `replayschema.py
+  several kinds. A rule's `reads` and `writes` may also name block fields, `Game.visibilityMask` or `SimGlobals.g_x`, which join the slot's read and write sets: a write
+  through a `*short` or a `memset` into `Game` is a `w` line of the field it lands on. `replayschema.py
   --check` fails for a row of a subsystem function with no rule and for a rule that matches no row.
 - `objects`' extras: `table` (an object, see Objects) names a kind by its index in a table, `inside` (a list of `{"kind": "Unit",
   "member": "resourceSlot"}`) names every member of another kind that the kind lives in (`Unit#17.resourceSlot`), a field of kind
@@ -591,6 +594,8 @@ sets). The annotations hold what no header says:
   on a `unitid` field and on a `units` argument. An object reached through it is recorded with only the listed fields, and
   the walk follows only the listed pointers, so `Unit.def` with `UnitDef.flags1` is depth 2. `replayschema.py --check` fails
   when the depth is not the one the list has, or a name is no field.
+- `reads` and `writes` of a slot's annotation: block fields (`Game.width`) added to the slot's read and write sets, for what the function rows do not show, as a write to
+  `Game` through a pointer, or the factors of a product count. `replayschema.py --check` fails for a name that is no block field.
 - A field a slot writes through a pointer it cannot name exactly (a weapon slot picked by an index) is also in its read set,
   so that a change made outside the seam is recorded at the entry as an `r` line, not mistaken for a write of the module.
 - `exempt_types`: `{"OpenHeap": "reason"}`, a struct type that is no kind and is genuinely local (a stack copy read from a bank, a

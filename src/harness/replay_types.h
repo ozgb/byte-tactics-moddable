@@ -11,6 +11,7 @@ struct ReplayFactor {
     unsigned offset;
     unsigned char size;
     unsigned char shift;
+    unsigned add;
 };
 
 struct ReplayLength {

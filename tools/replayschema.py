@@ -71,7 +71,7 @@ FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
                "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR", "ptr": "PTR", "refs": "REFS", "embeds": "EMBEDS"}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
-FACTOR = re.compile(r"^\(?(\w+)(?:>>(\d+))?\)?$")
+FACTOR = re.compile(r"^\(?\s*(\w+)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
            "bool", "float", "double", "Point16", "Vec3", "RandStream"}
 BARE_POINTER = re.compile(r"^\*(float|double|short|int|long|unsigned short|unsigned int|unsigned char|char)$")
@@ -177,8 +177,15 @@ def block_tables(ann: dict):
     return game, sim
 
 
+def parse_addend(text: str | None) -> int:
+    """The integer of a `+k` in a length factor, decimal or 0x hexadecimal."""
+    if not text:
+        return 0
+    return int(text, 16) if text.lower().startswith("0x") else int(text)
+
+
 def parse_length(expr, where: str, errors: list[str]) -> list[dict]:
-    """The two factors of a length expression: an integer, or `member`, `member>>k` or an integer, once or twice, joined by `*`."""
+    """The two factors of a length expression: an integer, or `member`, `member>>k`, `member+a` or `member+a>>k` (the addend before the shift), once or twice, joined by `*`."""
     parts = [str(expr)] if isinstance(expr, int) else [p.strip() for p in str(expr).split("*")]
     if not 1 <= len(parts) <= 2:
         errors.append("%s: the length `%s` is not one or two factors joined by *" % (where, expr))
@@ -189,9 +196,9 @@ def parse_length(expr, where: str, errors: list[str]) -> list[dict]:
         if p.isdigit():
             out.append({"const": int(p)})
         elif m:
-            out.append({"member": m.group(1), "shift": int(m.group(2) or 0)})
+            out.append({"member": m.group(1), "shift": int(m.group(3) or 0), **({"add": parse_addend(m.group(2))} if m.group(2) else {})})
         else:
-            errors.append("%s: the factor `%s` of the length is no integer, member or member>>k" % (where, p))
+            errors.append("%s: the factor `%s` of the length is no integer, member, member>>k, member+a or member+a>>k" % (where, p))
             out.append({"const": 1})
     while len(out) < 2:
         out.append({"const": 1})
@@ -201,7 +208,8 @@ def parse_length(expr, where: str, errors: list[str]) -> list[dict]:
 def render_factor(f: dict, owner: str) -> str:
     if "const" in f:
         return "{ %d, 0, 0 }" % f["const"]
-    return "{ offsetof(%s, %s), (unsigned char)sizeof(((%s*)nullptr)->%s), %d }" % (owner, f["member"], owner, f["member"], f["shift"])
+    add = ", %du" % f["add"] if f.get("add") else ""
+    return "{ offsetof(%s, %s), (unsigned char)sizeof(((%s*)nullptr)->%s), %d%s }" % (owner, f["member"], owner, f["member"], f["shift"], add)
 
 
 def render_length(length: list[dict], owner: str) -> str:
@@ -1073,11 +1081,12 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             obj_reads, obj_writes = set(), set()
             draws = False
             all_of: list[str] = []
-            for name in [] if skipped else note.get("reads", []):
-                if name not in field_index:
-                    errors.append("%s.%s: the extra read %s is no block field" % (sub, s["name"], name))
-                else:
-                    reads.add(name)
+            for tag, extra in (("reads", reads), ("writes", writes)):
+                for name in [] if skipped else note.get(tag, []):
+                    if name not in field_index:
+                        errors.append("%s.%s: the extra %s %s is no block field" % (sub, s["name"], tag[:-1], name))
+                    else:
+                        extra.add(name)
             through = {} if skipped else note.get("through", {})
             errors += [] if skipped else check_through("%s.%s" % (sub, s["name"]), through, by_function)
             closure = list(functions)
@@ -1137,10 +1146,12 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                     obj_reads.add(i)
                                     obj_writes.add(i)
                         elif rule["rule"] == "fields":
-                            for tag, into in (("reads", obj_reads), ("writes", obj_writes)):
+                            for tag, into, block in (("reads", obj_reads, reads), ("writes", obj_writes, writes)):
                                 for name in rule.get(tag, []):
                                     k, fname = name.split(".", 1)
-                                    if (k, fname) not in object_index:
+                                    if name in field_index:
+                                        block.add(name)
+                                    elif (k, fname) not in object_index:
                                         errors.append("the rule for %s %s names the unknown field %s" % (kind, target, name))
                                     else:
                                         into.add(object_index[(k, fname)])

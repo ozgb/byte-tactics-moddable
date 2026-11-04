@@ -45,7 +45,7 @@ unsigned FactorValue(const ReplayFactor& f, const void* object)
         return f.offset;
     const unsigned char* at = (const unsigned char*)object + f.offset;
     unsigned v = f.size == 1 ? *at : f.size == 2 ? *(const unsigned short*)at : *(const unsigned*)at;
-    return v >> f.shift;
+    return (v + f.add) >> f.shift;
 }
 
 unsigned HexDigit(char c)

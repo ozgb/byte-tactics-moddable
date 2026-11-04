@@ -237,6 +237,66 @@ class Rules(unittest.TestCase):
         self.assertTrue(int(end[-5]) == 0 and int(end[-4]) > 0, end)
 
 
+class WritesThroughPointers(unittest.TestCase):
+    """A slot note may add `writes` as well as `reads`, and a `fields` rule may name block fields."""
+
+    def slot(self, ann, rows, name="UpdateWind"):
+        model, errors = build(rows, ann)
+        return model["subsystems"]["wind_meteors"]["slots"][name], errors
+
+    def test_a_slot_note_adds_block_fields_to_the_write_set(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]["writes"] = ["Game.visibilityMask", "Game.width"]
+        s, errors = self.slot(ann, [])
+        self.assertEqual([e for e in errors if "UpdateWind" in e], [])
+        self.assertIn("Game.visibilityMask", s["writes"])
+        self.assertIn("Game.width", s["writes"])
+        self.assertNotIn("Game.visibilityMask", s["reads"])
+
+    def test_the_write_set_keeps_the_order_of_the_field_table(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]["writes"] = ["Game.visibilityMask", "Game.width"]
+        s, _ = self.slot(ann, [])
+        order = [f["name"] for f in build([], ann)[0]["fields"]]
+        self.assertEqual(s["writes"], sorted(s["writes"], key=order.index))
+
+    def test_a_slot_note_write_must_be_a_block_field(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]["writes"] = ["Game.nowhere"]
+        _, errors = self.slot(ann, [])
+        self.assertTrue(any("wind_meteors.UpdateWind: the extra write Game.nowhere is no block field" in e for e in errors), errors)
+
+    def test_a_slot_note_read_is_still_checked(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]["reads"] = ["Game.nowhere"]
+        _, errors = self.slot(ann, [])
+        self.assertTrue(any("wind_meteors.UpdateWind: the extra read Game.nowhere is no block field" in e for e in errors), errors)
+
+    def test_a_fields_rule_names_block_fields_in_reads_and_writes(self):
+        ann = annotations()
+        ann["rules"].append({"kind": "deref_write", "target": "*short", "rule": "fields", "reads": ["Game.width"], "writes": ["Game.visibilityMask", "Player.energy"],
+                             "functions": ["UpdateMeteors"], "note": "test"})
+        s, errors = self.slot(ann, [row("UpdateMeteors", "deref_write", "*short")], "UpdateMeteors")
+        self.assertEqual([e for e in errors if "unknown field" in e or "UpdateMeteors" in e], [])
+        self.assertIn("Game.visibilityMask", s["writes"])
+        self.assertIn("Game.width", s["reads"])
+        model, _ = build([row("UpdateMeteors", "deref_write", "*short")], ann)
+        names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
+        self.assertIn("Player.energy", [names[i] for i in s["objectWrites"]])
+
+    def test_a_fields_rule_still_rejects_an_unknown_name(self):
+        ann = annotations()
+        ann["rules"].append({"kind": "deref_write", "target": "*short", "rule": "fields", "writes": ["Game.nowhere"], "functions": ["UpdateMeteors"], "note": "test"})
+        _, errors = self.slot(ann, [row("UpdateMeteors", "deref_write", "*short")], "UpdateMeteors")
+        self.assertTrue(any("the rule for deref_write *short names the unknown field Game.nowhere" in e for e in errors), errors)
+
+    def test_the_committed_schema_is_unchanged_by_the_forms(self):
+        files, errors, _ = rs.generate(rs.read_rows())
+        self.assertEqual(errors, [])
+        for path, text in files.items():
+            self.assertEqual(path.read_text(), text, path)
+
+
 class Services(unittest.TestCase):
     def test_a_declaration_the_header_lacks_is_an_error(self):
         ann = annotations()
@@ -566,8 +626,30 @@ class Tables(unittest.TestCase):
         self.assertEqual(rs.parse_length("width*(height>>4)", "t", errors), [{"member": "width", "shift": 0}, {"member": "height", "shift": 4}])
         self.assertEqual(errors, [])
         rs.parse_length("a*b*c", "t", errors)
-        rs.parse_length("a+1", "t", errors)
+        rs.parse_length("a-1", "t", errors)
         self.assertEqual(len(errors), 2, errors)
+
+    def test_a_factor_may_add_before_it_shifts(self):
+        errors = []
+        self.assertEqual(rs.parse_length("(count+255)>>8", "t", errors), [{"member": "count", "shift": 8, "add": 255}, {"const": 1}])
+        self.assertEqual(rs.parse_length("count+0xff>>8", "t", errors)[0], {"member": "count", "shift": 8, "add": 255})
+        self.assertEqual(rs.parse_length("(width+1)*height", "t", errors), [{"member": "width", "shift": 0, "add": 1}, {"member": "height", "shift": 0}])
+        self.assertEqual(rs.parse_length("n+010", "t", errors)[0], {"member": "n", "shift": 0, "add": 10})
+        self.assertEqual(errors, [])
+        rs.parse_length("a+b", "t", errors)
+        self.assertEqual(len(errors), 1, errors)
+
+    def test_an_addend_is_rendered_after_the_shift_and_only_when_there_is_one(self):
+        self.assertEqual(rs.render_factor({"member": "count", "shift": 8, "add": 255}, "Grid"),
+                         "{ offsetof(Grid, count), (unsigned char)sizeof(((Grid*)nullptr)->count), 8, 255u }")
+        self.assertEqual(rs.render_factor({"member": "count", "shift": 8}, "Grid"), "{ offsetof(Grid, count), (unsigned char)sizeof(((Grid*)nullptr)->count), 8 }")
+
+    def test_an_array_length_with_an_addend_is_in_the_generated_table(self):
+        ann = annotations()
+        ann["game_fields"]["visibilityMask"]["length"] = "(width+0xff)>>8"
+        files, errors, _ = rs.generate(rs.read_rows(), ann)
+        self.assertEqual(errors, [])
+        self.assertIn("{ offsetof(Game, width), (unsigned char)sizeof(((Game*)nullptr)->width), 8, 255u }", files[rs.SCHEMA_H])
 
 
 class ProductCounts(unittest.TestCase):

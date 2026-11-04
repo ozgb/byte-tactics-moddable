@@ -2599,6 +2599,9 @@
     "kind": "field_escape",
     "target": "Game::featureCount",
     "rule": "fields",
+    "functions": [
+     "ResolveFeatureLinks"
+    ],
     "note": "count points at Game.featureCount, a block field the slot's reads name"
    },
    {

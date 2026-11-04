@@ -34,6 +34,16 @@ with open(os.environ["STUB_SEEN"], "a") as f:
 """
 
 
+CHECK_STUB = """import os, sys
+with open(os.environ["STUB_SEEN_CHECKS"], "a") as f:
+    f.write("KIND " + " ".join(sys.argv[1:]) + "\\n")
+message = os.environ.get("STUB_KIND_FAIL", "")
+if message:
+    print(message)
+    sys.exit(1)
+"""
+
+
 def make_zip(files: dict[str, bytes]) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w") as z:
@@ -123,6 +133,15 @@ class Base(unittest.TestCase):
         self.result = self.dir / "stub-result.json"
         self.seen = self.dir / "seen.txt"
         self.set_result(EQUAL)
+        self.checks = self.dir / "checks.txt"
+        os.environ["STUB_SEEN_CHECKS"] = str(self.checks)
+        for attr, kind in (("CHECK_MODULE", "MODULE"), ("VERIFY_FUEL", "FUEL")):
+            script = self.dir / f"stub-{kind.lower()}.py"
+            script.write_text(CHECK_STUB.replace("KIND", kind).replace("STUB_KIND_FAIL", f"STUB_{kind}_FAIL"))
+            self.addCleanup(setattr, gatebtm, attr, getattr(gatebtm, attr))
+            setattr(gatebtm, attr, script)
+            os.environ.pop(f"STUB_{kind}_FAIL", None)
+            self.addCleanup(os.environ.pop, f"STUB_{kind}_FAIL", None)
         os.environ["STUB_RESULT"], os.environ["STUB_SEEN"] = str(self.result), str(self.seen)
         self.state = self.dir / "state" / "judged.json"
 
@@ -236,6 +255,82 @@ class ArtifactTests(Base):
         self.fake.permissions = {"w": "write"}
         self.run_pass()
         self.assertEqual(self.seen.read_text(), "\0asm|wind_meteors\n")
+
+
+class ModuleCheckTests(Base):
+    def pass_through(self):
+        self.fake.pulls = [pull(1, "w")]
+        self.fake.permissions = {"w": "write"}
+        return self.run_pass()
+
+    def refused_and_not_judged(self, kind, message, shown):
+        os.environ[f"STUB_{kind}_FAIL"] = message
+        code, out = self.pass_through()
+        self.assertEqual(code, 0, out)
+        (_, body, _), = self.fake.posts
+        self.assertEqual(body, "refused: " + shown)
+        self.assertFalse(self.seen.exists())
+        return self.checks.read_text()
+
+    def test_a_good_module_passes_both_checks_and_is_judged(self):
+        code, out = self.pass_through()
+        self.assertEqual(code, 0, out)
+        first, second = self.checks.read_text().splitlines()
+        self.assertTrue(first.startswith("MODULE check-module ") and first.endswith("module.wasm --name wind_meteors"), first)
+        self.assertTrue(second.startswith("FUEL ") and second.endswith("module.wasm --verify"), second)
+        self.assertEqual(self.seen.read_text(), "\0asm|wind_meteors\n")
+        self.assertEqual(self.fake.posts[0][1], gatebtm.summary(EQUAL))
+
+    def test_a_module_that_fails_check_module_is_refused_not_judged(self):
+        seen = self.refused_and_not_judged("MODULE", "imports env.clock_time_get, which no module may import\nsecond line", "check-module: imports env.clock_time_get, which no module may import")
+        self.assertNotIn("FUEL", seen)
+
+    def test_a_module_that_fails_the_fuel_rule_is_refused_not_judged(self):
+        seen = self.refused_and_not_judged("FUEL", "FAIL line 9 writes the counter outside the metering code", "fuel rule 1: line 9 writes the counter outside the metering code")
+        self.assertIn("MODULE", seen)
+
+    def test_a_refusal_is_recorded_like_a_verdict(self):
+        os.environ["STUB_FUEL_FAIL"] = "FAIL x"
+        self.pass_through()
+        self.assertEqual(json.loads(self.state.read_text()), {"1": SHA})
+
+    def test_the_first_line_is_plain_text(self):
+        os.environ["STUB_MODULE_FAIL"] = "imports `@everyone` \u202e" + "x" * 500
+        self.pass_through()
+        body = self.fake.posts[0][1]
+        self.assertTrue(body.startswith("refused: check-module: imports ?"))
+        self.assertNotIn("@", body)
+        self.assertLessEqual(len(body), 260)
+
+    def test_local_refuses_and_does_not_judge(self):
+        module = self.dir / "m.wasm"
+        module.write_bytes(b"\0asm")
+        os.environ["STUB_FUEL_FAIL"] = "FAIL does not export __fuel_set once, as a defined function"
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = gatebtm.run_local(module, "wind_meteors", None, False, self.stub)
+        self.assertEqual(code, 1)
+        self.assertEqual(out.getvalue().strip(), "refused: fuel rule 1: does not export __fuel_set once, as a defined function")
+        self.assertFalse(self.seen.exists())
+
+    def test_a_check_that_cannot_run_refuses(self):
+        gatebtm.CHECK_MODULE = self.dir / "absent.py"
+        code, out = self.pass_through()
+        self.assertTrue(self.fake.posts[0][1].startswith("refused: check-module: "))
+        self.assertFalse(self.seen.exists())
+
+
+class RealChecksTests(unittest.TestCase):
+    MODULE = gatebtm.ROOT / "build" / "modern" / "wind_meteors.wasm"
+
+    @unittest.skipUnless(MODULE.is_file(), "build/modern/wind_meteors.wasm is not built")
+    def test_the_metered_module_passes_and_a_changed_one_does_not(self):
+        self.assertIsNone(gatebtm.vet_module(self.MODULE, "wind_meteors"))
+        with tempfile.TemporaryDirectory(prefix="test-gatebtm-") as d:
+            bad = Path(d) / "module.wasm"
+            bad.write_bytes(self.MODULE.read_bytes()[:-1])
+            self.assertIsNotNone(gatebtm.vet_module(bad, "wind_meteors"))
+            self.assertIsNotNone(gatebtm.vet_module(self.MODULE, "no_such_subsystem"))
 
 
 class SummaryTests(unittest.TestCase):

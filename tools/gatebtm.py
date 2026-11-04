@@ -7,7 +7,9 @@ One pass over the open pull requests. It reads, per pull request, the number, th
 commit, and nothing else: never the title, description, comments, reviews, files or diffs. A pull request is eligible when its
 author has write, maintain or admin permission, or it has the label `gate`; an ineligible one is skipped without being read
 further. The module is the `module` artifact of the pull request's CI run for the head commit (exactly `module.wasm` and
-`subsystem`), downloaded into a fresh directory, judged by `tools/oraclegate.py`, and the summary of its `result.json` is posted
+`subsystem`), downloaded into a fresh directory, checked itself (the artifact comes from the pull request's own workflow, so it is
+not trusted: `wasm_modules.py check-module` for the window, imports, exports and size, and `wasm_fuel.py --verify` for fuel rule
+version 1; a module either refuses is posted as `refused: <first problem>` and nothing is judged), judged by `tools/oraclegate.py`, and the summary of its `result.json` is posted
 as a comment with the gate's own btm token (`gate-token`, read by `broker.read_token`, never the host's `gh` login). The judged
 (pull request, head commit) pairs are kept in a state file, so a pair is judged once and no comment is read.
 
@@ -37,6 +39,9 @@ import broker
 
 ROOT = Path(__file__).resolve().parent.parent
 ORACLEGATE = ROOT / "tools" / "oraclegate.py"
+CHECK_MODULE = ROOT / "tools" / "wasm_modules.py"
+VERIFY_FUEL = ROOT / "tools" / "wasm_fuel.py"
+CHECK_TIMEOUT = 300
 DEFAULT_STATE = Path.home() / ".cache" / "bt-gate-btm" / "judged.json"
 DEFAULT_TOKEN_FILE = broker.DEFAULT_TOKEN_FILE.with_name("gate-token")
 WRITE_PERMISSIONS = ("write", "maintain", "admin")
@@ -177,6 +182,35 @@ def find_artifact(api: Api, sha: str) -> int | None:
     return None
 
 
+def first_problem(label: str, run: subprocess.CompletedProcess) -> str:
+    """`label: ` and the first line a failed check printed, cut to printable ASCII: the line can carry names from the module."""
+    lines = [x.strip() for x in (run.stdout + "\n" + run.stderr).splitlines() if x.strip()]
+    text = re.sub(r"^FAIL ", "", lines[0] if lines else f"exit {run.returncode}")
+    return f"{label}: " + re.sub(r"[^ -~]|[`@<>|*]", "?", text)[:200]
+
+
+def vet_module(module: Path, subsystem: str) -> str | None:
+    """None when the module passes both checks of the module itself, else the first problem: the artifact is the pull request's own."""
+    checks = (("check-module", [sys.executable, str(CHECK_MODULE), "check-module", str(module), "--name", subsystem]),
+              ("fuel rule 1", [sys.executable, str(VERIFY_FUEL), str(module), "--verify"]))
+    for label, cmd in checks:
+        try:
+            run = subprocess.run(cmd, capture_output=True, text=True, errors="replace", cwd=ROOT, timeout=CHECK_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            return f"{label}: timed out"
+        if run.returncode:
+            return first_problem(label, run)
+    return None
+
+
+def judge_module(module: Path, subsystem: str, out: Path, game_dir: str | None, full: bool, judge: Path | None = None) -> dict:
+    """A refused result when the module fails its own checks, else oraclegate's result."""
+    problem = vet_module(module, subsystem)
+    if problem is not None:
+        return {"verdict": "refused", "message": problem}
+    return run_oraclegate(module, subsystem, out, game_dir, full, judge)
+
+
 def run_oraclegate(module: Path, subsystem: str, out: Path, game_dir: str | None, full: bool, judge: Path | None = None) -> dict:
     cmd = [sys.executable, str(judge or ORACLEGATE), str(module), "--subsystem", subsystem, "--out", str(out)]
     if game_dir:
@@ -237,7 +271,7 @@ def save_state(path: Path, state: dict[str, str]):
 
 
 def judge_pull(api: Api, pull: dict, game_dir: str | None, full: bool, judge: Path | None) -> dict | None:
-    """Download the pull request's artifact into a fresh directory and judge it. None when there is nothing to judge."""
+    """Download the pull request's artifact into a fresh directory, check the module and judge it. None when there is nothing to judge."""
     artifact = find_artifact(api, pull["sha"])
     if artifact is None:
         print(f"#{pull['number']} skipped: no module artifact for the head commit")
@@ -246,7 +280,7 @@ def judge_pull(api: Api, pull: dict, game_dir: str | None, full: bool, judge: Pa
     try:
         blob = api.download(f"/repos/{api.repo}/actions/artifacts/{artifact}/zip", ZIP_LIMIT)
         module, subsystem = unpack(blob, work, known_subsystems())
-        return run_oraclegate(module, subsystem, work / "out", game_dir, full, judge)
+        return judge_module(module, subsystem, work / "out", game_dir, full, judge)
     finally:
         shutil.rmtree(work, ignore_errors=True)
 
@@ -289,7 +323,7 @@ def run_local(module: Path, subsystem: str, game_dir: str | None, full: bool, ju
     try:
         copy = work / "module.wasm"
         shutil.copyfile(module, copy)
-        result = run_oraclegate(copy, subsystem, work / "out", game_dir, full, judge)
+        result = judge_module(copy, subsystem, work / "out", game_dir, full, judge)
     except (Error, OSError, ValueError) as err:
         print(f"gatebtm: {err}", file=sys.stderr)
         return 2

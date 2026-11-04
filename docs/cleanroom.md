@@ -264,6 +264,12 @@ and posts one verdict comment on each. The host never builds contributor code.
 - **What it reads:** from the list of open pull requests, the number, the author's login, the label names and the head commit,
   dropped to those four fields as it is parsed. It never requests a title, description, comment, review, file or diff, and it
   never reads comments, so a judged pair is kept in a state file (`~/.cache/bt-gate-btm/judged.json`, `--state`) and skipped.
+- **The module is not trusted:** btm's workflow runs from the pull request's head, so an eligible pull request can upload any
+  module. Before anything is judged, the tool runs `wasm_modules.py check-module FILE --name SUBSYSTEM` (window, table, imports,
+  exports, kinds, size budget) and `wasm_fuel.py FILE --verify` (fuel rule version 1 in the module itself: one mutable i64
+  counter, neither imported nor exported; `__fuel_set` and `__fuel_get` as the pass writes them; the pass's own decrement at the
+  top of every function and loop body; no other write to the counter). A module that fails either is posted as `refused: <first
+  problem line>` (printable ASCII, cut to 200 characters), recorded like a verdict, and not played. `--local` does the same.
 - **The verdict:** `tools/oraclegate.py` judges the module (`--game-dir`, `--full` are passed on). The comment is built from
   `result.json`'s fields alone: the verdict, the first differing scenario, tick, phase and field, the counts and the names of
   the checks that are not equal. No value of either side and no free text goes in.

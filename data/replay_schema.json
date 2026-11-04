@@ -2791,6 +2791,30 @@
         "mode": "pending"
        }
       }
+     },
+     "QueryScript": {
+      "args": {
+       "p2": {
+        "mode": "value",
+        "dir": "inout",
+        "nullable": true
+       },
+       "p3": {
+        "mode": "value",
+        "dir": "inout",
+        "nullable": true
+       },
+       "p4": {
+        "mode": "value",
+        "dir": "inout",
+        "nullable": true
+       },
+       "p5": {
+        "mode": "value",
+        "dir": "inout",
+        "nullable": true
+       }
+      }
      }
     }
    },
@@ -4168,7 +4192,7 @@
    }
   },
   "units": {
-   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [1, 7], "status": "pending", "imports": [], "pending": {"untracked": 95, "ruleless": 30, "unresolvedSlots": ["MovementClassGet", "MovementClassInBounds", "UnitTypeSetAddTypeOrCategory", "UnitRefUnlink"], "unannotatedArgs": ["StartScriptWithArgs(callback)", "StartScript(callback)", "QueryScript(p2)", "QueryScript(p3)", "QueryScript(p4)", "QueryScript(p5)", "GetAimFromPosition(out)", "UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "GetNanoPiecePosition(out)", "GetPieceAngles result", "UnitRefUnlink(ref)", "StartScriptWithArgsByIndex(callback)", "UpdateObjectState(unit)"]}},
+   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [1, 7], "status": "pending", "imports": [], "pending": {"untracked": 95, "ruleless": 30, "unresolvedSlots": ["MovementClassGet", "MovementClassInBounds", "UnitTypeSetAddTypeOrCategory", "UnitRefUnlink"], "unannotatedArgs": ["StartScriptWithArgs(callback)", "StartScript(callback)", "GetAimFromPosition(out)", "UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "GetNanoPiecePosition(out)", "GetPieceAngles result", "UnitRefUnlink(ref)", "StartScriptWithArgsByIndex(callback)", "UpdateObjectState(unit)"]}},
    "slots": {
     "UpdateAllUnits": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateAllUnits"], "reads": ["Game.ticks", "Game.flags_2a44", "Game.seaLevel"], "writes": [], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.type", "Player.index", "Unit.health", "Unit.buildLeft", "Unit.def", "Unit.player", "Unit.script", "Unit.unitDefIndex", "Unit.motion"], "objectWrites": [], "allOf": ["Player"], "args": [], "result": null, "native": "UpdateAllUnits"},
     "GetGroundHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetGroundHeight"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos", "axes": "xz"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetGroundHeight"},
@@ -4181,7 +4205,7 @@
     "RefreshMovedUnits": {"conv": "__stdcall", "ret": "void", "functions": ["MovementClass::RefreshMovedUnits"], "reads": ["Game.ticks"], "writes": [], "objectReads": ["MovementClass.lastTick"], "objectWrites": ["MovementClass.lastTick"], "allOf": [], "args": [{"name": "self", "type": "MovementClass*", "line": "self", "mode": "object", "kind": "MovementClass"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "RefreshMovedUnits"},
     "RefreshUnitIfStale": {"conv": "__stdcall", "ret": "void", "functions": ["MovementClass::RefreshUnitIfStale"], "reads": [], "writes": [], "objectReads": ["MovementClass.lastTick"], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "MovementClass*", "line": "self", "mode": "object", "kind": "MovementClass"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "RefreshUnitIfStale"},
     "StartScript": {"conv": "__stdcall", "ret": "int", "functions": ["CobScript::StartScript"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "script", "type": "CobScript*", "line": "script", "mode": "object", "kind": "CobScript"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "callback", "type": "Callback*", "line": "callback", "mode": "pending"}, {"name": "update", "type": "int", "line": "update", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "StartScript"},
-    "QueryScript": {"conv": "__stdcall", "ret": "int", "functions": ["CobScript::QueryScript"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "script", "type": "CobScript*", "line": "script", "mode": "object", "kind": "CobScript"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "p2", "type": "int*", "line": "p2", "mode": "pending"}, {"name": "p3", "type": "int*", "line": "p3", "mode": "pending"}, {"name": "p4", "type": "int*", "line": "p4", "mode": "pending"}, {"name": "p5", "type": "int*", "line": "p5", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "QueryScript"},
+    "QueryScript": {"conv": "__stdcall", "ret": "int", "functions": ["CobScript::QueryScript"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "script", "type": "CobScript*", "line": "script", "mode": "object", "kind": "CobScript"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "p2", "type": "int*", "line": "p2", "mode": "value", "dir": "inout", "nullable": true}, {"name": "p3", "type": "int*", "line": "p3", "mode": "value", "dir": "inout", "nullable": true}, {"name": "p4", "type": "int*", "line": "p4", "mode": "value", "dir": "inout", "nullable": true}, {"name": "p5", "type": "int*", "line": "p5", "mode": "value", "dir": "inout", "nullable": true}], "result": {"type": "int", "mode": "scalar"}, "native": "QueryScript"},
     "GetAimFromPosition": {"conv": "__stdcall", "ret": "void", "functions": ["GetAimFromPosition"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "out", "type": "Vec3*", "line": "out", "mode": "pending"}, {"name": "weapon", "type": "unsigned char", "line": "weapon", "mode": "scalar"}], "result": null, "native": "GetAimFromPosition"},
     "GetPieceOffset": {"conv": "__stdcall", "ret": "Vec3", "functions": ["GetPieceOffset"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "piece", "type": "int", "line": "piece", "mode": "scalar"}], "result": {"type": "Vec3", "mode": "scalar"}, "native": "GetPieceOffset"},
     "GetPiecePosition": {"conv": "__stdcall", "ret": "Vec3", "functions": ["GetPiecePosition"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "piece", "type": "int", "line": "piece", "mode": "scalar"}], "result": {"type": "Vec3", "mode": "scalar"}, "native": "GetPiecePosition"},

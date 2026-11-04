@@ -551,6 +551,11 @@ void ApplyInOut(void* dst, const char* name, unsigned kind)
         ReplayParseValue(kind, value, dst, g_objects, nullptr);
 }
 
+template <class T> void AddInOutScalar(ReplayText& t, const T* p)
+{
+    ReplayAddInOutScalar(t, p);
+}
+
 template <class T> void ApplyValues(std::vector<T, std::allocator<T> >* out, const char* name, unsigned kind)
 {
     const char* list = OutExact(name);
@@ -784,6 +789,52 @@ void CompareInOut(const char* name, unsigned kind, const void* object)
     }
     ReplayText value;
     ReplayAddValue(value, kind, object, g_objects);
+    HashText(value.Data());
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff(name, recorded, value.Data());
+    value.Free();
+}
+
+bool InnerOfParentheses(const char* text, char* inner, unsigned size)
+{
+    size_t n = strlen(text);
+    if (n < 2 || text[0] != '(' || text[n - 1] != ')' || n - 1 > size)
+        return false;
+    memcpy(inner, text + 1, n - 2);
+    inner[n - 2] = '\0';
+    return true;
+}
+
+template <class T> void ApplyInOutScalar(T* dst, const char* name)
+{
+    const char* value = OutExact(name);
+    char inner[64];
+    if (value != nullptr && dst != nullptr && InnerOfParentheses(value, inner, sizeof inner))
+        ParseScalar(inner, *dst);
+}
+
+template <class T> T* ParseInOutScalar(const char* name, T* storage)
+{
+    const char* value = ArgLine(name);
+    char inner[64];
+    if (value == nullptr || !InnerOfParentheses(value, inner, sizeof inner))
+        return nullptr;
+    ParseScalar(inner, *storage);
+    return storage;
+}
+
+template <class T> void CompareInOutScalar(const char* name, const T* object)
+{
+    const char* recorded = OutLine(name);
+    if (object == nullptr) {
+        if (recorded != nullptr)
+            Diff(name, recorded, "no line");
+        return;
+    }
+    ReplayText value;
+    ReplayAddInOutScalar(value, object);
     HashText(value.Data());
     if (recorded == nullptr)
         recorded = "no such line";
@@ -1225,6 +1276,26 @@ int __stdcall SpendMetalSlot(UnitResources* self, float amount)
 int __stdcall SpendEnergyAndMetalSlot(UnitResources* self, float energy, float metal)
 {
     return self->SpendEnergyAndMetal(energy, metal);
+}
+
+int __stdcall Native_fixture_Query(FixtureAmount* first, FixtureAmount* second)
+{
+    if (first != nullptr)
+        first->amount += 3;
+    if (second != nullptr)
+        second->amount = 0;
+    return first != nullptr ? first->amount : -1;
+}
+
+int __stdcall Native_fixture_Measure(int* p2, short* p3, unsigned char* p4)
+{
+    if (p2 != nullptr)
+        *p2 *= 2;
+    if (p3 != nullptr)
+        *p3 = (short)(*p3 - 1);
+    if (p4 != nullptr)
+        *p4 = (unsigned char)(*p4 + 1);
+    return 1;
 }
 
 #include "replay_slots.h"
@@ -2587,7 +2658,106 @@ void ShapeSelfTest()
     BeginCompare();
     CompareInOut("p2", ROK_FIXTUREAMOUNT, nullptr);
     Check(g_diffs == 1, "an o line for a null pointer is a difference");
+
+    printf("a scalar in/out value\n");
+    int count = 5;
+    short level = -3;
+    unsigned char flag = 7;
+    t.Clear();
+    AddInOutScalar(t, &count);
+    Check(strcmp(t.Data(), "(5)") == 0, "an int going in is its value in parentheses");
+    t.Clear();
+    AddInOutScalar(t, &level);
+    Check(strcmp(t.Data(), "(-3)") == 0, "and a short is signed");
+    t.Clear();
+    AddInOutScalar(t, &flag);
+    Check(strcmp(t.Data(), "(7)") == 0, "and an unsigned char is not a character");
+    t.Clear();
+    AddInOutScalar(t, (int*)nullptr);
+    Check(strcmp(t.Data(), "null") == 0, "and a null pointer is null");
+    LoadCall("  i fixture.Measure (5) null (7) = 1\n  o p2 (9)\n  o p4 (250)\n");
+    BeginImport();
+    int measuredCount = 5;
+    unsigned char measuredFlag = 7;
+    int measured = Imp_fixture_Measure(&measuredCount, nullptr, &measuredFlag);
+    Check(g_diffs == 0 && measured == 1 && measuredCount == 9 && measuredFlag == 250, "the stub passes the values in and writes each o line back through its pointer");
+    LoadCall("  i fixture.Measure (5) null (7) = 1\n  o p2 (9)\n");
+    BeginImport();
+    int untouchedCount = 5;
+    short strayLevel = -3;
+    unsigned char untouchedFlag = 7;
+    Imp_fixture_Measure(&untouchedCount, &strayLevel, &untouchedFlag);
+    printf("a pointer where null was recorded: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.Measure") == 0 && untouchedFlag == 7, "is reported, and a pointer with no o line is left alone");
+    LoadCall("  a p2 (5)\n  a p3 null\n  a p4 (7)\n  o p2 (9)\n  o p4 (8)\n");
+    int slotCount = 0;
+    int* slotCountPtr = ParseInOutScalar("p2", &slotCount);
+    short slotLevel = 0;
+    short* slotLevelPtr = ParseInOutScalar("p3", &slotLevel);
+    unsigned char slotFlag = 0;
+    unsigned char* slotFlagPtr = ParseInOutScalar("p4", &slotFlag);
+    Check(slotCountPtr == &slotCount && slotCount == 5 && slotLevelPtr == nullptr && slotFlagPtr == &slotFlag && slotFlag == 7, "the replayer passes each value by address, and null as a null pointer");
+    slotCount = 9;
+    slotFlag = 8;
+    BeginCompare();
+    CompareInOutScalar("p2", slotCountPtr);
+    CompareInOutScalar("p3", slotLevelPtr);
+    CompareInOutScalar("p4", slotFlagPtr);
+    Check(g_diffs == 0, "and the values the slot leaves are compared with the o lines");
+    slotFlag = 9;
+    CompareInOutScalar("p4", slotFlagPtr);
+    printf("a changed scalar: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "p4") == 0, "a different value is reported at the argument");
     t.Free();
+}
+
+void InOutRunnerSelfTest()
+{
+    printf("in/out arguments through the runner\n");
+    ResetBlock();
+    LoadCall("  a first (5)\n  a second (6)\n  o first (8)\n  o second (0)\n  o result 8\n");
+    BeginCompare();
+    Run_fixture_Query();
+    After_fixture_Query();
+    Check(g_diffs == 0, "a struct in/out recording replays equal");
+    LoadCall("  a first (5)\n  a second null\n  o first (8)\n  o result 8\n");
+    BeginCompare();
+    Run_fixture_Query();
+    After_fixture_Query();
+    Check(g_diffs == 0, "and so does one with a null pointer, which has no o line");
+    LoadCall("  a first (5)\n  a second null\n  o first (9)\n  o result 8\n");
+    BeginCompare();
+    Run_fixture_Query();
+    After_fixture_Query();
+    printf("a struct that came out differently: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "first") == 0, "a replayed value that differs is reported at the argument");
+    LoadCall("  a first (5)\n  a second null\n  o first (8)\n  o second (0)\n  o result 8\n");
+    BeginCompare();
+    Run_fixture_Query();
+    After_fixture_Query();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "second") == 0, "an o line for a pointer that was null is a difference");
+    LoadCall("  a first (5)\n  a second null\n  o first (8)\n  o result 7\n");
+    BeginCompare();
+    Run_fixture_Query();
+    After_fixture_Query();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "result") == 0, "and the result is compared after the values");
+
+    LoadCall("  a p2 (5)\n  a p3 null\n  a p4 (7)\n  o p2 (10)\n  o p4 (8)\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Measure();
+    After_fixture_Measure();
+    Check(g_diffs == 0, "a scalar in/out recording replays equal");
+    LoadCall("  a p2 (5)\n  a p3 (-3)\n  a p4 (7)\n  o p2 (10)\n  o p3 (-4)\n  o p4 (8)\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Measure();
+    After_fixture_Measure();
+    Check(g_diffs == 0, "with every pointer set too");
+    LoadCall("  a p2 (5)\n  a p3 null\n  a p4 (7)\n  o p2 (10)\n  o p4 (9)\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Measure();
+    After_fixture_Measure();
+    printf("a scalar that came out differently: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "p4") == 0, "a replayed scalar that differs is reported at the argument");
 }
 
 void CallbackSelfTest()
@@ -4682,6 +4852,7 @@ int SelfTest(const char* file)
     ArraySelfTest();
     FormSelfTest();
     ShapeSelfTest();
+    InOutRunnerSelfTest();
     PolymorphicSelfTest();
     RefsSelfTest();
     BasedTableSelfTest();

@@ -720,6 +720,43 @@
    "result": {
     "mode": "scalar"
    }
+  },
+  "Measure": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "int*",
+     "name": "p2"
+    },
+    {
+     "type": "short*",
+     "name": "p3"
+    },
+    {
+     "type": "unsigned char*",
+     "name": "p4"
+    }
+   ],
+   "args": {
+    "p2": {
+     "mode": "value",
+     "dir": "inout",
+     "nullable": true
+    },
+    "p3": {
+     "mode": "value",
+     "dir": "inout",
+     "nullable": true
+    },
+    "p4": {
+     "mode": "value",
+     "dir": "inout",
+     "nullable": true
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
   }
  },
  "inside": {

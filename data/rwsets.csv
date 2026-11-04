@@ -54800,8 +54800,9 @@ address,function,file,kind,target
 ,RecUnitsPoseUnitModel,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsPoseUnitModel,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [UnitsSeam::PoseUnitModel]
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,Add
+,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ArgInOutScalar
+,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ArgInOutScalarExit
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ArgPending
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ArgValue
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope

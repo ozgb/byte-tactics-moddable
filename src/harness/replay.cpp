@@ -327,6 +327,26 @@ void ArgInOutExit(ReplayText& t, const char* name, unsigned kind, const void* p)
     t.AddChar('\n');
 }
 
+template <class T> void ArgInOutScalar(ReplayText& t, const char* name, const T* p)
+{
+    t.Add("  a ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddInOutScalar(t, p);
+    t.AddChar('\n');
+}
+
+template <class T> void ArgInOutScalarExit(ReplayText& t, const char* name, const T* p)
+{
+    if (p == nullptr)
+        return;
+    t.Add("  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddInOutScalar(t, p);
+    t.AddChar('\n');
+}
+
 void ArgValueStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p)
 {
     t.Add("  ");
@@ -445,6 +465,22 @@ void ImportOutInOut(ReplayText& t, const char* name, unsigned kind, const void* 
     t.Add(name);
     t.AddChar(' ');
     ReplayAddValue(t, kind, p, Table());
+}
+
+template <class T> void ImportInOutScalar(ReplayText& t, const T* p)
+{
+    t.AddChar(' ');
+    ReplayAddInOutScalar(t, p);
+}
+
+template <class T> void ImportOutInOutScalar(ReplayText& t, const char* name, const T* p)
+{
+    if (p == nullptr)
+        return;
+    t.Add("\n  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddInOutScalar(t, p);
 }
 
 template <class T> void ImportOutValues(ReplayText& t, const char* name, unsigned kind, const std::vector<T, std::allocator<T> >* values)

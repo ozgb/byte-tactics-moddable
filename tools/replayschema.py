@@ -15,6 +15,8 @@ Outputs:
     tests/replay_schema_fixtures.h  the same tables with the test-only kinds of tests/replay_fixtures.json added, which replay_schema.h
                                     includes when BT_REPLAY_FIXTURES is defined (only the tests' build defines it)
     tests/replay_vtables_fixtures.cpp the vtable of each concrete kind of that schema
+    tests/replay_shapes.h             the import stubs and the runners of the fixture slots of tests/replay_fixtures.json
+    tests/replay_fixture_hooks.inc    the recording wrappers of those slots, compiled by tests/replay_fixture_recorder.cpp
     src/harness/replay_hooks.inc    the recording copy of every seam table, with the argument and import hooks
     tests/replay_slots.h            the slot runners, import stubs and native seam tables of the replayer
     src/harness/replay_services.h   the ids and names of the services imports (GameRand, RandomInt, the TDF and command classes)
@@ -60,6 +62,7 @@ JSON_OUT = ROOT / "data/replay_schema.json"
 FIXTURES_JSON = ROOT / "tests/replay_fixtures.json"
 FIXTURE_SCHEMA_H = ROOT / "tests/replay_schema_fixtures.h"
 FIXTURE_VTABLES_CPP = ROOT / "tests/replay_vtables_fixtures.cpp"
+FIXTURE_HOOKS_INC = ROOT / "tests/replay_fixture_hooks.inc"
 SIM_GLOBALS_H = ROOT / "src/state/sim_globals.h"
 FORMAT = 2
 
@@ -950,6 +953,12 @@ RESULT_MODES = {"scalar", "object", "text", "weapon", "value", "pending"}
 
 
 CAST_MODES = {"object", "struct", "structs", "vec3"}
+SCALAR_INOUT = {"int*", "unsigned int*", "short*", "unsigned short*", "unsigned char*"}
+
+
+def is_scalar_inout(a: dict) -> bool:
+    """A pointer to a scalar that is read and written back: `{"mode": "value", "dir": "inout"}` with no kind."""
+    return a["mode"] == "value" and a.get("dir") == "inout"
 
 
 def check_vector_arg(where: str, a: dict, label: str, kinds: dict, errors: list[str]) -> None:
@@ -1035,7 +1044,14 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: %s needs a `count` that names another argument" % (where, label))
             elif args[names.index(count)]["type"] not in INTEGER_ARGS:
                 errors.append("%s: the count %s of %s is no integer" % (where, count, a["name"]))
+        elif is_scalar_inout(a):
+            if "kind" in a:
+                errors.append("%s: %s is a scalar in/out value, which takes no `kind`" % (where, label))
+            if a["type"] not in SCALAR_INOUT:
+                errors.append("%s: %s is %s, and a scalar in/out value is a pointer to one of %s" % (where, label, a["type"], ", ".join(sorted(SCALAR_INOUT))))
         elif a["mode"] == "value":
+            if "dir" in a:
+                errors.append("%s: %s is a value with the direction %s, and only inout is allowed on a value" % (where, label, a["dir"]))
             value_kind(a, label, False)
         elif a["mode"] == "callback":
             entry = ann.get("callbacks", {}).get(a.get("callback"))
@@ -1938,6 +1954,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
                 L.append('        ImportOutValues(line, "%s", ROK_%s, a%d);' % (a["line"], upper(a["elem"]["kind"]), i))
             elif a["mode"] == "struct" and a.get("dir") == "inout":
                 L.append('        ImportOutInOut(line, "%s", ROK_%s, %s);' % (a["line"], upper(a["kind"]), arg_var(a, i)))
+            elif is_scalar_inout(a):
+                L.append('        ImportOutInOutScalar(line, "%s", %s);' % (a["line"], arg_var(a, i)))
         L.append("        FinishImport(line);")
         L.append("    }")
     if nest:
@@ -2012,6 +2030,12 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
     elif mode == "structs":
         if phase == "a":
             return ['ArgStructs(s_call, "%s", ROK_%s, %s, (int)a%d);' % (line, upper(a["kind"]), var, a.get("countIndex", 0))]
+    elif is_scalar_inout(a):
+        if phase == "a":
+            return ['ArgInOutScalar(s_call, "%s", %s);' % (line, var)]
+        if phase == "i":
+            return ["ImportInOutScalar(line, %s);" % var]
+        return ['ArgInOutScalarExit(s_tail, "%s", %s);' % (line, var)]
     elif mode == "value":
         if phase == "a":
             return ['ArgValueStruct(s_call, "a", "%s", ROK_%s, &%s);' % (line, upper(a["kind"]), var)]
@@ -2129,7 +2153,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -2210,6 +2234,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             pass
         elif m == "struct" and a.get("dir") == "inout":
             L.append("    Space(t);\n    AddInOut(t, ROK_%s, %s);" % (upper(a["kind"]), v))
+        elif is_scalar_inout(a):
+            L.append("    Space(t);\n    AddInOutScalar(t, %s);" % v)
         elif m == "vec3":
             L.append('    Space(t);\n    t.Add("%s=");\n    AddVec3%s(t, %s);' % (a.get("label", a["line"]), "Xz" if a.get("axes") == "xz" else "", v))
         elif m == "callback":
@@ -2237,6 +2263,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append('    ApplyValues(a%d, "%s", ROK_%s);' % (i, a["line"], upper(a["elem"]["kind"])))
         elif a["mode"] == "struct" and a.get("dir") == "inout":
             L.append('    ApplyInOut(%s, "%s", ROK_%s);' % (arg_var(a, i), a["line"], upper(a["kind"])))
+        elif is_scalar_inout(a):
+            L.append('    ApplyInOutScalar(%s, "%s");' % (arg_var(a, i), a["line"]))
     res = s["result"]
     if res is None:
         L.append("    (void)r;")
@@ -2260,7 +2288,7 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
     return L
 
 
-def runner(sub: str, slot: str, s: dict) -> list[str]:
+def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]:
     names = [a["name"] for a in s["args"]]
     for a in s["args"]:
         if a.get("count") in names:
@@ -2319,6 +2347,15 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
             counted = s["args"][a.get("countIndex", 0)]
             L.append("    StructsHolder %s;\n    %s.Parse(\"%s\", ROK_%s, ArgScalar<int>(\"%s\"));" % (v, v, line, upper(a["kind"]), counted["line"]))
             call.append("(%s*)%s.data" % (arg_type(a)[:-1], v))
+        elif is_scalar_inout(a):
+            g = "g_inout_%s_%s_%d" % (sub, slot, i)
+            head += ["%s %s;" % (t[:-1], g), "bool %s_null;" % g]
+            L.append("    %s = 0;" % g)
+            L.append('    %s %s = ParseInOutScalar("%s", &%s);' % (t, v, line, g))
+            L.append("    %s_null = %s == nullptr;" % (g, v))
+            closing.append(line + " ")
+            after.append('    CompareInOutScalar("%s", %s_null ? nullptr : &%s);' % (line, g, g))
+            call.append(v)
         elif m == "value":
             L.append("    %s %s = %s();\n    ParseValueArg(\"%s\", ROK_%s, &%s);" % (t, v, t, line, upper(a["kind"]), v))
             call.append(v)
@@ -2332,7 +2369,7 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
     if res is not None and res["mode"] in ("scalar", "object", "value"):
         closing.append("result")
     L.append("    SetClosing(%s);" % (", ".join('"%s"' % c for c in closing) if closing else "nullptr"))
-    expr = "g_seams.%s->%s(%s)" % (sub, slot, ", ".join(call))
+    expr = "%s(%s)" % (target or "g_seams.%s->%s" % (sub, slot), ", ".join(call))
     if res is None:
         L.append("    " + expr + ";")
     else:
@@ -2954,15 +2991,51 @@ def shape_slots(ann: dict) -> tuple[list[dict], list[str]]:
         result = classify_result(spec["ret"], spec.get("result"), ann)
         errors += check_forms("fixtures.%s" % name, args, result, ann)
         errors += ["fixtures.%s: the argument %s has no mode" % (name, a["name"]) for a in args if a["mode"] == "pending"]
-        out.append({"name": name, "conv": spec.get("conv", "__stdcall"), "ret": spec["ret"], "params": [p["type"] for p in params], "args": args, "result": result})
+        out.append({"name": name, "conv": spec.get("conv", "__stdcall"), "ret": spec["ret"], "params": [p["type"] for p in params], "rawParams": [p["type"] for p in params], "args": args, "result": result})
     return out, errors
 
 
+RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv"}
+
+
+def runnable(s: dict) -> bool:
+    """The replayer's runner can pass every argument of the slot and compare its result."""
+    return all(a["mode"] in RUNNER_ARG_MODES for a in s["args"]) and (s["result"] is None or s["result"]["mode"] in ("scalar", "object", "value"))
+
+
+def native_name(slot: str) -> str:
+    return "Native_fixture_" + slot
+
+
 def render_shapes(ann: dict) -> str:
-    L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers", ""]
+    L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers, which define Native_fixture_<Slot> for each runner", ""]
     slots, _ = shape_slots(ann)
     for s in slots:
         L += import_stub("fixture", s["name"], s)
+    for s in slots:
+        if runnable(s):
+            L += runner("fixture", s["name"], s, native_name(s["name"]))
+    return "\n".join(L)
+
+
+def render_fixture_hooks(ann: dict, model: dict) -> str:
+    """The recording wrappers of the fixture slots, which tests/replay_fixture_recorder.cpp compiles inside replay.cpp's anonymous namespace."""
+    L = [GENERATED, "", "// included by tests/replay_fixture_recorder.cpp inside a second anonymous namespace after replay.cpp", ""]
+    slots, _ = shape_slots(ann)
+    objects = {o["name"]: o for o in model["objects"]}
+    L.append("enum {")
+    L.append("    SUB_FIXTURE = SUB_COUNT,")
+    for n, s in enumerate(slots):
+        L.append("    RSL_FIXTURE_%s = RSL_COUNT%s%s" % (upper(s["name"]), " + %d" % n if n else "", "," if n + 1 < len(slots) else ""))
+    L += ["};", "", "struct FixtureSeam {"]
+    for s in slots:
+        L.append("    %s (%s* %s)(%s);" % (s["ret"], s["conv"], s["name"], ", ".join(s["params"])))
+    L += ["};", "", "const FixtureSeam* s_inner_fixture;", ""]
+    for s in slots:
+        L += wrapper("fixture", {}, s["name"], s, objects, True)
+    L.append("FixtureSeam s_rec_fixture = {")
+    L += ["    Rec%s%s," % (camel("fixture"), s["name"]) for s in slots]
+    L += ["};", ""]
     return "\n".join(L)
 
 
@@ -2998,6 +3071,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         CALLBACKS_H: render_callbacks(model),
         CALLBACKS_SLOTS: render_callback_players(model),
         SHAPES_SLOTS: render_shapes(fixture_ann),
+        FIXTURE_HOOKS_INC: render_fixture_hooks(fixture_ann, fixture_model),
         JSON_OUT: json_text(ann, model),
     }
     return files, errors, model

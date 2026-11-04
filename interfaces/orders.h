@@ -7,6 +7,8 @@ template<class T, class A> class vector;
 }
 
 class AiSearchGoal;
+class BitReader;
+class OrderBase;
 class OrderFx;
 class HapiBank;
 class UnitMotion;
@@ -19,7 +21,7 @@ class MissionType;
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
 #define ORDERS_VERSION_MAJOR 1
 // Minor version of the orders interface, changed when a slot is added.
-#define ORDERS_VERSION_MINOR 9
+#define ORDERS_VERSION_MINOR 10
 
 // Unit orders and command queues.
 struct OrdersSeam {
@@ -83,6 +85,10 @@ struct OrdersSeam {
     int (__stdcall* OrderFxApproxDist)(OrderFx* self, int x, int y);
     // Takes the path search goal of a unit's movement that waits for a new search, or 0 when there is none. Hooks: none.
     AiSearchGoal* (__stdcall* UnitMotionClaimRepath)(UnitMotion* motion);
+    // Sets status flags on an order that listens to a unit, through the status handler of its kind. Hooks: none.
+    void (__stdcall* OrderOrStatusFlags)(OrderBase* order, unsigned int flags);
+    // Reads the network state of a unit's movement from a packet, through the goal that moves it. Hooks: none.
+    void (__stdcall* UnitMotionReadNetState)(UnitMotion* motion, BitReader* reader);
 };
 
 #endif

@@ -27848,6 +27848,7 @@ address,function,file,kind,target
 0x489690,PathOrderAttach::SetUnit,src/units/unit_targets.cpp,field_write,PathOrderAttach::owner
 0x489690,PathOrderAttach::SetUnit,src/units/unit_targets.cpp,field_write,Unit::head
 0x489690,PathOrderAttach::SetUnit,src/units/unit_targets.cpp,function,
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,call,get
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,call,operator Unit *
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,call,operator bool
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,call,operator!=
@@ -27858,13 +27859,16 @@ address,function,file,kind,target
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,deref_write,*Ref<UnitRef>
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_escape,Unit::head
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_escape,UnitRef::next
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_read,OrdersSeam::OrderOrStatusFlags
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_read,Seams::orders
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_read,UnitRef::listener
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_read,UnitRef::next
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_read,UnitRef::owner
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_write,UnitRef::next
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_write,UnitRef::owner
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,function,
-0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,indirect_call,virtual OrderBase::OrStatusFlags
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,global_read,g_seams
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,call,get
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,call,operator Unit *
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,call,operator bool
@@ -27876,6 +27880,8 @@ address,function,file,kind,target
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,deref_write,*Ref<UnitRef>
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_escape,Unit::head
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_escape,UnitRef::next
+0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_read,OrdersSeam::OrderOrStatusFlags
+0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_read,Seams::orders
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_read,Unit::head
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_read,UnitRef::listener
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_read,UnitRef::next
@@ -27883,16 +27889,19 @@ address,function,file,kind,target
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_write,UnitRef::next
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_write,UnitRef::owner
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,function,
-0x489740,ClearUnitRefs,src/units/unit_targets.cpp,indirect_call,virtual OrderBase::OrStatusFlags
+0x489740,ClearUnitRefs,src/units/unit_targets.cpp,global_read,g_seams
+0x489740,ClearUnitRefs,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,get
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,operator UnitRef *
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,operator bool
-0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,operator->
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,OrdersSeam::OrderOrStatusFlags
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,Seams::orders
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,Unit::head
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,UnitRef::listener
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,UnitRef::next
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,function,
-0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,indirect_call,virtual OrderBase::OrStatusFlags
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,global_read,g_seams
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 0x4897e0,Unit::ChooseWeapon,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::flags
 0x4897e0,Unit::ChooseWeapon,src/units/unit_targets.cpp,function,
 0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,call,Unit::ReleaseWeapons
@@ -28396,23 +28405,26 @@ address,function,file,kind,target
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,RecordUnitSpeech
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,Unit::GetState
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,get
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator OrderBase *
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator PathOrderAttach *
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator bool
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator->
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,NetworkSeam::SendActivateFlags
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,OrdersSeam::OrderOrStatusFlags
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,PathOrderAttach::next
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,PathOrderAttach::value
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Player::active
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Player::type
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Seams::network
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Seams::orders
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Unit::head
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Unit::player
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Unit::script
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_write,Unit::activateFlags
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,function,
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,global_read,g_seams
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,indirect_call,"indirect via void (*)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [NetworkSeam::SendActivateFlags]
-0x48b090,Unit::SetStateBits,src/units/unit.cpp,indirect_call,virtual OrderBase::OrStatusFlags
 0x48b200,WriteUnitState,src/units/unit_position.cpp,call,BitWriter::GrowBuffer
 0x48b200,WriteUnitState,src/units/unit_position.cpp,call,BitWriter::WriteBits
 0x48b200,WriteUnitState,src/units/unit_position.cpp,call,operator bool
@@ -28524,7 +28536,6 @@ address,function,file,kind,target
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator Unit *
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator UnitMotion *
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator bool
-0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator->
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator=
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator==
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,deref_escape,*Unit
@@ -28533,6 +28544,7 @@ address,function,file,kind,target
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_escape,Unit::angles
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Game::maxUnitsSetting
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Game::unitDefCountBits
+0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,OrdersSeam::UnitMotionReadNetState
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,OrdersSeam::UpdateMotion
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Player::unitsBegin
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Player::unitsEnd
@@ -28543,7 +28555,6 @@ address,function,file,kind,target
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Unit::playerIndex
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Unit::pos
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Unit::unitDefIndex
-0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,UnitMotion::player
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_write,<anon>::dword
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_write,BitReader::bit
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_write,BitReader::data
@@ -28555,8 +28566,8 @@ address,function,file,kind,target
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_write,Spawn::type
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,function,
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,global_read,g_seams
+0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,indirect_call,"indirect via void (*)(UnitMotion *, BitReader *) __attribute__((stdcall)) [OrdersSeam::UnitMotionReadNetState]"
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,indirect_call,"indirect via void (*)(UnitMotion *, int, Unit *) __attribute__((fastcall)) [OrdersSeam::UpdateMotion]"
-0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,indirect_call,virtual MotionSerializer::ReadFrom
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,call,GetMapCellAtPosition
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,call,IsUnitVisibleToPlayer
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,call,operator Unit *
@@ -47226,6 +47237,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxApproxDist
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxFillGoalCells
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxIsGoal
+,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderOrStatusFlags
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::QueueBuildOrder
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::ReattachFxToUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::RegisterAllOrderTypes
@@ -47234,6 +47246,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::SaveMotion
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::SerializeOrderToSave
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::UnitMotionClaimRepath
+,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::UnitMotionReadNetState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::UpdateMotion
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::AbortIfGoalMatch
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Create
@@ -47601,6 +47614,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxApproxDist
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxFillGoalCells
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxIsGoal
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderOrStatusFlags
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersQueueBuildOrder
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersReattachFxToUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersRegisterAllOrderTypes
@@ -47609,6 +47623,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersSaveMotion
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersSerializeOrderToSave
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersUnitMotionClaimRepath
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersUnitMotionReadNetState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersUpdateMotion
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingAbortIfGoalMatch
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingCreate
@@ -48275,6 +48290,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxApproxDist
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxFillGoalCells
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxIsGoal
+,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderOrStatusFlags
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::QueueBuildOrder
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::ReattachFxToUnit
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::RegisterAllOrderTypes
@@ -48283,6 +48299,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::SaveMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::SerializeOrderToSave
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::UnitMotionClaimRepath
+,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::UnitMotionReadNetState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::UpdateMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::AbortIfGoalMatch
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Create
@@ -48684,6 +48701,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxApproxDistNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxFillGoalCellsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxIsGoalNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderOrStatusFlagsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ParseDownloadableAiWeightScripts
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PickRandomReclaimableResourcesInRadius
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PlaceFeature
@@ -48768,6 +48786,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,TransferEnergy
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,TransferMetal
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitMotionClaimRepathNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitMotionReadNetStateNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitRefUnlinkNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitTypeSetAddTypeOrCategoryNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateAllUnits
@@ -50351,6 +50370,8 @@ address,function,file,kind,target
 ,OrderKindName,src/harness/harness.cpp,deref_read,*unsigned char
 ,OrderKindName,src/harness/harness.cpp,function,
 ,OrderKindName,src/harness/harness.cpp,global_maybe_written,g_missionOrderTableVec
+,OrderOrStatusFlagsNative,src/seams/native.cpp,function,
+,OrderOrStatusFlagsNative,src/seams/native.cpp,indirect_call,virtual OrderBase::OrStatusFlags
 ,OrderPosYUnset,src/harness/harness.cpp,call,OrderKindName
 ,OrderPosYUnset,src/harness/harness.cpp,call,strcmp
 ,OrderPosYUnset,src/harness/harness.cpp,function,
@@ -53470,6 +53491,15 @@ address,function,file,kind,target
 ,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(OrderFx *, int, int) __attribute__((stdcall)) [OrdersSeam::OrderFxIsGoal]"
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,call,ArgValue
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,field_read,OrdersSeam::OrderOrStatusFlags
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,function,
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,global_read,s_call
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,ArgValue
@@ -53545,6 +53575,16 @@ address,function,file,kind,target
 ,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,indirect_call,indirect via AiSearchGoal *(*const)(UnitMotion *) __attribute__((stdcall)) [OrdersSeam::UnitMotionClaimRepath]
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,call,Add
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,call,ArgObject
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,field_read,OrdersSeam::UnitMotionReadNetState
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,function,
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,global_read,s_call
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitMotion *, BitReader *) __attribute__((stdcall)) [OrdersSeam::UnitMotionReadNetState]"
 ,RecOrdersUpdateMotion,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersUpdateMotion,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersUpdateMotion,src/harness/replay_hooks.inc,call,ArgValue
@@ -57282,8 +57322,14 @@ address,function,file,kind,target
 ,UnitMotion::ClaimRepath,src/orders/order_list.cpp,field_read,UnitMotion::obj
 ,UnitMotion::ClaimRepath,src/orders/order_list.cpp,function,
 ,UnitMotion::ClaimRepath,src/orders/order_list.cpp,indirect_call,virtual PathGoalVtableView::v6
+,UnitMotion::ReadNetState,src/orders/order_list.cpp,call,operator->
+,UnitMotion::ReadNetState,src/orders/order_list.cpp,field_read,UnitMotion::obj
+,UnitMotion::ReadNetState,src/orders/order_list.cpp,function,
+,UnitMotion::ReadNetState,src/orders/order_list.cpp,indirect_call,virtual PathGoalVtableView::v9
 ,UnitMotionClaimRepathNative,src/seams/native.cpp,call,UnitMotion::ClaimRepath
 ,UnitMotionClaimRepathNative,src/seams/native.cpp,function,
+,UnitMotionReadNetStateNative,src/seams/native.cpp,call,UnitMotion::ReadNetState
+,UnitMotionReadNetStateNative,src/seams/native.cpp,function,
 ,UnitOf,src/ingame/sim_event_drain.cpp,call,operator Unit *
 ,UnitOf,src/ingame/sim_event_drain.cpp,deref_escape,*Unit
 ,UnitOf,src/ingame/sim_event_drain.cpp,field_read,Game::units

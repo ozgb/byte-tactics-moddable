@@ -15,6 +15,7 @@
 #include "../util/tdf.h"
 #include "../../interfaces/services.h"
 #include "squad.h"
+#include "../../interfaces/seams.h"
 
 class UnitRef;
 
@@ -204,7 +205,7 @@ void UnitRef::ClearRef(void)
 {
     Unit* saved = owner;
     if (listener)
-        listener->OrStatusFlags(8);
+        g_seams.orders->OrderOrStatusFlags(listener.get(), 8);
     if (owner == saved && owner) {
         Ref<UnitRef>* pp = (Ref<UnitRef>*)&owner->head;
         while (*pp != this)
@@ -221,7 +222,7 @@ void __stdcall ClearUnitRefs(Unit* obj)
     for (UnitRef* n = (UnitRef*)obj->head.get(); n != 0; n = (UnitRef*)obj->head.get()) {
         Unit* saved = n->owner;
         if (n->listener)
-            n->listener->OrStatusFlags(8);
+            g_seams.orders->OrderOrStatusFlags(n->listener.get(), 8);
         if (n->owner == saved && n->owner) {
             Ref<UnitRef>* pp = (Ref<UnitRef>*)&n->owner->head;
             while (*pp != n)
@@ -238,7 +239,7 @@ void __stdcall NotifyUnitRefs(Unit* obj, int event)
 {
     for (UnitRef* n = (UnitRef*)obj->head.get(); n != 0; n = n->next) {
         if (n->listener)
-            n->listener->OrStatusFlags(event);
+            g_seams.orders->OrderOrStatusFlags(n->listener.get(), event);
     }
 }
 

@@ -849,8 +849,10 @@ and files; the commands group is `Translate`, `CommandArgs::InitArgs` and `Compu
 and the tag are compared), `SimFree`, `RecordSimEvent` (kind, flags, args and count), `SimCaptureAlloc` and the slot lookups `FindSlotByDpid` and
 `GetSlotDpid`; the load reads are `LoadGaf`, `LoadAnimGaf`, `FindGafEntry`, `GetGafFrame`, `GetGafSequenceFrame`, `Load3do`, `LoadObject3d` and
 `GetObjectHeight`, with results that are objects of the load kinds `Gaf`, `FrameTable`, `GafFrame` and `Object3do` and the fields that
-the subsystems read as the `reach`. The `HAPI_*` file calls and the boxes of `HapiBank` are not services: they are slots of the `files` seam
-and an import of the subsystems that call them, recorded as any import is. A hook records only for the thread that opened the slot, so
+the subsystems read as the `reach`. The `HAPI_*` file calls and the boxes of `HapiBank` are not services of this group. The bank operations of a
+saved game that a module calls are the imports `services.HapiBank_OpenAccount`, `services.HapiBank_SetIntegerItem` and
+`services.HapiBank_GetIntegerItem` (the bank as a `handle`, `docs/module-abi.md` section 9.3), and the other slots of the `files` seam,
+the box reads and seeks, are recorded as `files.<Slot>` imports, as any import is. A hook records only for the thread that opened the slot, so
 the calls of the loading thread or the drawing code that overlap a slot are not its calls.
 
 A service whose definition is in a source that the replayer links (`SimAlloc`, `SimAllocTagged` and `SimFree`, which `block.cpp` defines) is not

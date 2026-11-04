@@ -7,9 +7,9 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 7
+#define SERVICES_VERSION_MINOR 8
 
-// Returns a random number in [0, range) from the main stream of the game logic.
+// Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
 // Shows the message in the window of the display and ends the program.
 void __stdcall FatalError(char* message);
@@ -261,6 +261,8 @@ public:
     char* GetArg(int index, char* default_val);
     // Returns the argument at an index as an integer, or the default when there is none.
     int GetIntArg(int index, int default_val);
+    // Returns the number of arguments, the command name included.
+    int Count();
     // Returns the argument at an index as a float, or the default when there is none.
     float GetFloatArg(int index, float default_val);
     // Clears the arguments and returns the list.

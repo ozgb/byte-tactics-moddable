@@ -6131,6 +6131,7 @@ wind_meteors,orders,shared_write,Vec3::z,84
 wind_meteors,pathfinding,shared_write,Point16::x,7
 wind_meteors,pathfinding,shared_write,Point16::y,7
 wind_meteors,platform,call,BuildDataPath,1
+wind_meteors,platform,call,CommandArgs::Count,1
 wind_meteors,platform,call,CommandArgs::GetIntArg,1
 wind_meteors,platform,call,FatalError,1
 wind_meteors,platform,call,RandomInt,1

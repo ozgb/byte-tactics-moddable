@@ -260,6 +260,14 @@ IMPORT(CommandArgsGetIntArgImport)
     return nullptr;
 }
 
+IMPORT(CommandArgsCountImport)
+{
+    (void)user;
+    NEED("CommandArgs_Count", 0);
+    a[0].i32 = ((CommandArgs*)Linear(a[0].i32))->Count();
+    return nullptr;
+}
+
 IMPORT(HapiBankOpenAccountImport)
 {
     (void)user;
@@ -337,6 +345,7 @@ const ImportDef kImports[] = {
     {"services", "TdfRecord_GetFieldDouble", "iid>d", TdfRecordGetFieldDoubleImport},
     {"services", "TdfRecord_GetFieldString", "iiiii>i", TdfRecordGetFieldStringImport},
     {"services", "CommandArgs_GetIntArg", "iii>i", CommandArgsGetIntArgImport},
+    {"services", "CommandArgs_Count", "i>i", CommandArgsCountImport},
     {"services", "HapiBank_OpenAccount", "ii>i", HapiBankOpenAccountImport},
     {"services", "HapiBank_SetIntegerItem", "iii>i", HapiBankSetIntegerItemImport},
     {"services", "HapiBank_GetIntegerItem", "iii>i", HapiBankGetIntegerItemImport},

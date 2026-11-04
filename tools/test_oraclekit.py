@@ -5,14 +5,18 @@
 
 import hashlib
 import json
+import os
 import posixpath
 import re
+import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 import oraclekit
+import wasm_fuel
 
 ROOT = oraclekit.ROOT
 OUTSIDE_URL = re.compile(r"^https?://github\.com/ozgb/byte-tactics-moddable/(blob|tree)/", re.I)
@@ -23,6 +27,51 @@ INLINE_LINK = re.compile(r"!?\[[^\]\n]*\]\(\s*(<[^>\n]*>|[^)\s]*)[^)\n]*\)")
 REFERENCE_LINK = re.compile(r"^ {0,3}\[[^\]\n]+\]:\s*(<[^>\n]*>|\S+)", re.M)
 
 CONTENTS = [("file", "docs/a.md", ""), ("dir", "data", "")]
+MODULES_TEXT = json.dumps({
+    "tools": {"clang": "1"},
+    "modules": [{"name": "m", "exports": ["Go"], "cxx": ["wasm/m/module.cpp", "src/map/m.cpp"], "c": ["lib/bitexact/t.c"],
+                 "imports": {"services": {"Rand": [["int"], "int"]}}}],
+}) + "\n"
+UNNAMED_DUMP = """*** Dumping AST Record Layout
+         0 | struct W::(unnamed union)::(unnamed at /a/w.h:7:9)
+     0:0-0 |   unsigned int first
+     0:5-5 |   unsigned int meteor
+     1:0-0 |   unsigned int ninth
+           | [sizeof=4, align=1,
+           |  nvsize=4, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | union W::(unnamed at /a/w.h:5:5)
+         0 |   unsigned int value
+         0 |   struct W::(unnamed union)::(unnamed at /a/w.h:7:9) b
+     0:0-0 |     unsigned int first
+     0:5-5 |     unsigned int meteor
+     1:0-0 |     unsigned int ninth
+           | [sizeof=4, align=1,
+           |  nvsize=4, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | union W::(unnamed at /a/w.h:12:5)
+         0 |   float pitch
+         0 |   int other
+           | [sizeof=4, align=1,
+           |  nvsize=4, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct W
+         0 |   char[4] name
+         4 |   union W::(unnamed at /a/w.h:5:5) flags
+         4 |     unsigned int value
+         4 |     struct W::(unnamed union)::(unnamed at /a/w.h:7:9) b
+     4:0-0 |       unsigned int first
+     4:5-5 |       unsigned int meteor
+     5:0-0 |       unsigned int ninth
+         8 |   union W::(unnamed at /a/w.h:12:5) angle
+         8 |     float pitch
+         8 |     int other
+           | [sizeof=12, align=1,
+           |  nvsize=12, nvalign=1]
+"""
 
 
 def on_disk(root: Path, entry: str) -> list[tuple[str, str]]:
@@ -65,7 +114,7 @@ def git(root: Path, *args: str) -> None:
 def repo(tmp: str, extra: dict[str, str] | None = None) -> Path:
     root = Path(tmp)
     files = {"docs/a.md": "alpha\n", "data/x.json": "{}\n", "data/y/z.txt": "z\n", oraclekit.README_SOURCE: "readme\n",
-             oraclekit.LAYOUT_REFS: "function\n", **(extra or {})}
+             oraclekit.LAYOUT_REFS: "function\n", oraclekit.MODULES: MODULES_TEXT, **(extra or {})}
     for path, text in files.items():
         (root / path).parent.mkdir(parents=True, exist_ok=True)
         (root / path).write_text(text)
@@ -112,7 +161,7 @@ class OracleKitTest(unittest.TestCase):
             kit = Path(out) / "k"
             manifest = run_export(root, kit)
             paths = [f["path"] for f in manifest["files"]]
-            self.assertEqual(paths, sorted(["docs/a.md", "data/x.json", "data/y/z.txt", "data/layout_refs.csv", "layout.json", "README.md"]))
+            self.assertEqual(paths, sorted(["docs/a.md", "data/x.json", "data/y/z.txt", "data/layout_refs.csv", "layout.json", "README.md", "wasm/modules.json"]))
             by_path = {f["path"]: f for f in manifest["files"]}
             self.assertEqual(by_path["docs/a.md"]["sha256"], hashlib.sha256(b"alpha\n").hexdigest())
             self.assertEqual(by_path["docs/a.md"]["size"], 6)
@@ -196,6 +245,147 @@ class OracleKitTest(unittest.TestCase):
         self.assertEqual(oraclekit.clean_type("union W::(anonymous at /a/b/c.h:24:5) "), "union W::(anonymous) ")
         self.assertEqual(oraclekit.clean_type("struct W::(unnamed union)::(unnamed at /a/c.h:61:9)"),
                          "struct W::(unnamed union)::(unnamed)")
+
+
+class ModuleManifestTest(unittest.TestCase):
+    def test_the_kit_manifest_drops_the_source_fields_and_keeps_the_rest(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp)
+            run_export(root, Path(out) / "k")
+            kit = json.loads((Path(out) / "k" / "wasm" / "modules.json").read_text())
+            entry = kit["modules"][0]
+            self.assertNotIn("cxx", entry)
+            self.assertNotIn("c", entry)
+            want = json.loads(MODULES_TEXT)
+            for field in oraclekit.MODULE_SOURCE_FIELDS:
+                del want["modules"][0][field]
+            self.assertEqual(kit, want)
+            self.assertEqual(oraclekit.verify(Path(out) / "k"), [])
+
+    def test_a_manifest_that_still_names_a_source_is_refused(self):
+        text = json.dumps({"modules": [{"name": "m", "note": "see src/map/m.cpp"}]}) + "\n"
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {oraclekit.MODULES: text})
+            with self.assertRaises(oraclekit.Refusal) as e:
+                run_export(root, Path(out) / "k")
+            self.assertIn("wasm/modules.json", str(e.exception))
+            self.assertIn("src/", str(e.exception))
+            self.assertFalse((Path(out) / "k").exists())
+
+    def test_a_repository_without_the_manifest_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp)
+            git(root, "rm", "-q", oraclekit.MODULES)
+            git(root, "commit", "-q", "-m", "drop")
+            with self.assertRaises(oraclekit.Refusal) as e:
+                run_export(root, Path(out) / "k")
+            self.assertIn("wasm/modules.json", str(e.exception))
+
+    def test_the_real_manifest_exports_without_a_source_name(self):
+        kit = oraclekit.kit_modules((ROOT / oraclekit.MODULES).read_bytes())
+        self.assertEqual(oraclekit.names_source(kit), [])
+        document = json.loads(kit)
+        for entry in document["modules"]:
+            self.assertFalse(set(oraclekit.MODULE_SOURCE_FIELDS) & set(entry), entry["name"])
+        meteors = next(e for e in document["modules"] if e["name"] == "wind_meteors")
+        self.assertEqual(meteors["imports"]["services"]["CommandArgs_Count"], [["scratch"], "int"])
+        self.assertEqual(meteors["exports"][:2], ["UpdateWind", "UpdateMeteors"])
+        self.assertEqual(document["majors"]["services"], 1)
+
+    def test_the_name_check_finds_paths_and_files(self):
+        for text in ("src/a", "x lib/b", "a.cpp", "m.h ", "orig/TotalA.exe", "build/tools"):
+            self.assertTrue(oraclekit.names_source(text.encode()), text)
+        for text in ("wasm-ld", "once per call", "the .wasm file", "sub/src", "0xF0000", "wasm/modules.json"):
+            self.assertEqual(oraclekit.names_source(text.encode()), [], text)
+
+
+FUEL_MODULE = """(module
+  (import "env" "g" (func $g (param i32) (result i32)))
+  (memory 1)
+  (func $inner (param $n i32) (result i32)
+    (local $i i32)
+    loop $l
+      local.get $i
+      i32.const 1
+      i32.add
+      local.tee $i
+      local.get $n
+      i32.lt_s
+      br_if $l
+    end
+    local.get $i)
+  (func (export "run") (param i32) (result i32)
+    local.get 0
+    call $inner
+    call $g))
+"""
+
+
+def find_wasm_tools() -> str | None:
+    repo_copy = ROOT / "build" / "tools" / "bin" / "wasm-tools"
+    return os.environ.get("WASM_TOOLS") or (str(repo_copy) if repo_copy.exists() else shutil.which("wasm-tools"))
+
+
+class FuelPassTest(unittest.TestCase):
+    def test_the_fuel_pass_is_on_the_contents_list_and_names_no_source(self):
+        self.assertTrue(oraclekit.listed(oraclekit.FUEL_PASS))
+        self.assertEqual(oraclekit.names_source((ROOT / oraclekit.FUEL_PASS).read_bytes()), [])
+
+    def test_a_pass_that_names_a_source_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {oraclekit.FUEL_PASS: 'ROOT = "build/tools"\n'})
+            with self.assertRaises(oraclekit.Refusal) as e:
+                oraclekit.export(root, Path(out) / "k", True, {}, CONTENTS + [("file", oraclekit.FUEL_PASS, "")])
+            self.assertIn(oraclekit.FUEL_PASS, str(e.exception))
+            self.assertFalse((Path(out) / "k").exists())
+
+    def test_the_exported_pass_runs_alone_and_meters_like_the_repository_pass(self):
+        tools = find_wasm_tools()
+        if tools is None:
+            self.skipTest("wasm-tools is not installed")
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {oraclekit.FUEL_PASS: (ROOT / oraclekit.FUEL_PASS).read_text()})
+            run_fuel = Path(out) / "k"
+            oraclekit.export(root, run_fuel, True, {}, CONTENTS + [("file", oraclekit.FUEL_PASS, "")])
+            alone = run_fuel / oraclekit.FUEL_PASS
+            module = Path(out) / "m.wasm"
+            module.write_bytes(subprocess.run([tools, "parse", "-"], input=FUEL_MODULE.encode(), capture_output=True,
+                                              check=True).stdout)
+            metered = Path(out) / "metered.wasm"
+            env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+            result = subprocess.run([sys.executable, "-I", str(alone), str(module), "-o", str(metered), "--wasm-tools", tools],
+                                    cwd=out, env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(metered.read_bytes(), wasm_fuel.instrument(module.read_bytes(), tools))
+            self.assertNotEqual(metered.read_bytes(), module.read_bytes())
+            checked = subprocess.run([sys.executable, "-I", str(alone), str(metered), "--check", "--wasm-tools", tools],
+                                     cwd=out, env=env, capture_output=True, text=True)
+            self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+
+
+class UnnamedBitsTest(unittest.TestCase):
+    def test_the_bits_of_an_unnamed_union_are_listed_under_the_field(self):
+        entry = oraclekit.record_entry(UNNAMED_DUMP, "W", 12)
+        fields = {f["name"]: f for f in entry["fields"]}
+        self.assertEqual(fields["flags"]["type"], "W::(unnamed)")
+        self.assertEqual(fields["flags"]["bits"], [{"name": "first", "bit": 0, "width": 1}, {"name": "meteor", "bit": 5, "width": 1},
+                                                   {"name": "ninth", "bit": 8, "width": 1}])
+        self.assertNotIn("bits", fields["angle"])
+        self.assertNotIn("bits", fields["name"])
+
+    def test_the_real_layout_names_the_meteor_bit(self):
+        for build in ("build/datack", "build/modern"):
+            if (ROOT / build / "compile_commands.json").exists():
+                break
+        else:
+            self.skipTest("no build directory with compile_commands.json")
+        layout = oraclekit.generate_layout(ROOT, ROOT / build)
+        flags = next(f for f in layout["records"]["WeaponDef"]["fields"] if f["name"] == "flags")
+        self.assertIn({"name": "meteor", "bit": 5, "width": 1}, flags["bits"])
+        self.assertEqual(len(flags["bits"]), 32)
+        unnamed = [f for e in layout["records"].values() for f in e["fields"] if "(unnamed)" in f["type"] or "(anonymous)" in f["type"]]
+        self.assertGreater(len(unnamed), 0)
+        self.assertTrue(all(b["width"] >= 1 for f in unnamed for b in f.get("bits", [])))
 
 
 class KitDocumentsTest(unittest.TestCase):

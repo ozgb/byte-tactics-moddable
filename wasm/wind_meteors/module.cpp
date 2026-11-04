@@ -37,6 +37,7 @@ IMPORT("services", "HapiBank_OpenAccount") int service_HapiBank_OpenAccount(Hapi
 IMPORT("services", "HapiBank_SetIntegerItem") int service_HapiBank_SetIntegerItem(HapiBank* self, const char* name, int value);
 IMPORT("services", "HapiBank_GetIntegerItem") int service_HapiBank_GetIntegerItem(HapiBank* self, char* name, int def);
 IMPORT("services", "CommandArgs_GetIntArg") int service_CommandArgs_GetIntArg(CommandArgs* self, int index, int def);
+IMPORT("services", "CommandArgs_Count") int service_CommandArgs_Count(CommandArgs* self);
 IMPORT("weapons", "SpawnProjectile") int weapons_SpawnProjectile(WeaponDef* weapon, Vec3* pos, Vec3* vel, int flag);
 IMPORT("weapons", "FindWeaponByName") WeaponDef* weapons_FindWeaponByName(char* name);
 }
@@ -60,6 +61,7 @@ int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
     return service_TdfRecord_GetFieldString(this, dst, key, size, def);
 }
 int CommandArgs::GetIntArg(int index, int def) { return service_CommandArgs_GetIntArg(this, index, def); }
+int CommandArgs::Count() { return service_CommandArgs_Count(this); }
 
 SimGlobals& SimCreate() { __builtin_trap(); }
 

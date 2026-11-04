@@ -1,9 +1,11 @@
 """Fuel metering for a wasm module: count the module's own work in code compiled into it, so every host stops it at the same point.
 
-    uv run tools/wasm_fuel.py module.wasm -o metered.wasm [--wasm-tools PATH]
-    uv run tools/wasm_fuel.py metered.wasm --check
+    python3 wasm_fuel.py module.wasm -o metered.wasm [--wasm-tools PATH]
+    python3 wasm_fuel.py metered.wasm --check
 
-The rule (version 1, recorded as "fuel" in wasm/modules.json):
+The pass uses only the standard library and wasm-tools, found at --wasm-tools, in $WASM_TOOLS or on PATH.
+
+The rule (version 1, the "fuel" entry of the module manifest):
 
     The counter drops by 1 at each function entry and at the top of each loop body: once per call and once
     per iteration. When it goes below zero the module executes `unreachable`.
@@ -16,7 +18,7 @@ running out of fuel. The counter starts at the largest i64 so that a start funct
 
 The global, the two functions and the two exports are added after everything the module has, so no function, global,
 table or data index moves, and neither does the layout of memory or the table. Types are only added at the end. The
-pass prints the module with wasm-tools (the version pinned in wasm/modules.json), inserts the metering instructions
+pass prints the module with wasm-tools (the version the manifest pins as tools.wasm-tools), inserts the metering instructions
 into the text, and parses it back: the printer names every function and label by its index, and the parser reads
 every encoding wasm-ld, rustc and the toolchains after them write, so the pass needs no opcode table of its own.
 The parse drops the name section.
@@ -42,18 +44,15 @@ INITIAL = (1 << 63) - 1
 METER = ["global.get " + COUNTER, "i64.const 1", "i64.sub", "global.set " + COUNTER,
          "global.get " + COUNTER, "i64.const 0", "i64.lt_s", "if", "  unreachable", "end"]
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-WASM_TOOLS = os.path.join(ROOT, "build", "tools", "bin", "wasm-tools")
-
 
 class FuelError(Exception):
     pass
 
 
 def find_wasm_tools(path=None):
-    found = path or os.environ.get("WASM_TOOLS") or (WASM_TOOLS if os.path.exists(WASM_TOOLS) else shutil.which("wasm-tools"))
+    found = path or os.environ.get("WASM_TOOLS") or shutil.which("wasm-tools")
     if not found:
-        raise FuelError("wasm-tools not found: cargo install wasm-tools --locked --root build/tools")
+        raise FuelError("wasm-tools not found: pass --wasm-tools, set WASM_TOOLS or put wasm-tools on PATH")
     return found
 
 

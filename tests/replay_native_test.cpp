@@ -1015,6 +1015,8 @@ const char* EnterNested(const ReplayText& actual)
 
 #include "replay_services.h"
 
+int CommandArgs::Count() { return count; }
+
 namespace {
 
 struct NestedScope {

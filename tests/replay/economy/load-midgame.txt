@@ -7581,6 +7581,8 @@ call 900 Reset
   w Unit#1.resourceSlot.metalUsePrev f32:0x00000000
   w Unit#1.resourceSlot.player Player#0
 call 900 UpdateMetalExtraction
+  r Game.width 224
+  r Game.height 102
   r Unit#1.def UnitDef#34
   r Unit#1.extraction f32:0x00000000
   r Unit#1.cell (15,11)
@@ -7660,24 +7662,24 @@ call 900 UpdateMetalExtraction
   r Unit#2.script CobScript#3
   r UnitDef#78.extractsMetal f32:0x3a83126f
   a unit Unit#2
-  i los_radar.GetMapCell 33 19 = Cell#1
-  o Cell#1.metal 223
-  i los_radar.GetMapCell 34 19 = Cell#2
-  o Cell#2.metal 223
-  i los_radar.GetMapCell 35 19 = Cell#3
-  o Cell#3.metal 223
-  i los_radar.GetMapCell 33 20 = Cell#4
-  o Cell#4.metal 223
-  i los_radar.GetMapCell 34 20 = Cell#5
-  o Cell#5.metal 223
-  i los_radar.GetMapCell 35 20 = Cell#6
-  o Cell#6.metal 223
-  i los_radar.GetMapCell 33 21 = Cell#7
-  o Cell#7.metal 223
-  i los_radar.GetMapCell 34 21 = Cell#8
-  o Cell#8.metal 223
-  i los_radar.GetMapCell 35 21 = Cell#9
-  o Cell#9.metal 223
+  i los_radar.GetMapCell 33 19 = Cell#4289
+  o Cell#4289.metal 223
+  i los_radar.GetMapCell 34 19 = Cell#4290
+  o Cell#4290.metal 223
+  i los_radar.GetMapCell 35 19 = Cell#4291
+  o Cell#4291.metal 223
+  i los_radar.GetMapCell 33 20 = Cell#4513
+  o Cell#4513.metal 223
+  i los_radar.GetMapCell 34 20 = Cell#4514
+  o Cell#4514.metal 223
+  i los_radar.GetMapCell 35 20 = Cell#4515
+  o Cell#4515.metal 223
+  i los_radar.GetMapCell 33 21 = Cell#4737
+  o Cell#4737.metal 223
+  i los_radar.GetMapCell 34 21 = Cell#4738
+  o Cell#4738.metal 223
+  i los_radar.GetMapCell 35 21 = Cell#4739
+  o Cell#4739.metal 223
   i units.StartScriptWithArgs CobScript#3 "SetSpeed" ? 0 1 2016 0 0 0 = 1
   w Unit#2.extraction f32:0x40010625
 call 900 LoadUnitAccounts
@@ -26450,24 +26452,24 @@ call 1170 UpdateMetalExtraction
   r Unit#252.script CobScript#5
   r UnitDef#208.extractsMetal f32:0x3a83126f
   a unit Unit#252
-  i los_radar.GetMapCell 185 78 = Cell#10
-  o Cell#10.metal 223
-  i los_radar.GetMapCell 186 78 = Cell#11
-  o Cell#11.metal 223
-  i los_radar.GetMapCell 187 78 = Cell#12
-  o Cell#12.metal 223
-  i los_radar.GetMapCell 185 79 = Cell#13
-  o Cell#13.metal 223
-  i los_radar.GetMapCell 186 79 = Cell#14
-  o Cell#14.metal 223
-  i los_radar.GetMapCell 187 79 = Cell#15
-  o Cell#15.metal 223
-  i los_radar.GetMapCell 185 80 = Cell#16
-  o Cell#16.metal 223
-  i los_radar.GetMapCell 186 80 = Cell#17
-  o Cell#17.metal 223
-  i los_radar.GetMapCell 187 80 = Cell#18
-  o Cell#18.metal 223
+  i los_radar.GetMapCell 185 78 = Cell#17657
+  o Cell#17657.metal 223
+  i los_radar.GetMapCell 186 78 = Cell#17658
+  o Cell#17658.metal 223
+  i los_radar.GetMapCell 187 78 = Cell#17659
+  o Cell#17659.metal 223
+  i los_radar.GetMapCell 185 79 = Cell#17881
+  o Cell#17881.metal 223
+  i los_radar.GetMapCell 186 79 = Cell#17882
+  o Cell#17882.metal 223
+  i los_radar.GetMapCell 187 79 = Cell#17883
+  o Cell#17883.metal 223
+  i los_radar.GetMapCell 185 80 = Cell#18105
+  o Cell#18105.metal 223
+  i los_radar.GetMapCell 186 80 = Cell#18106
+  o Cell#18106.metal 223
+  i los_radar.GetMapCell 187 80 = Cell#18107
+  o Cell#18107.metal 223
   i units.StartScriptWithArgs CobScript#5 "SetSpeed" ? 0 1 2016 0 0 0 = 1
   w Unit#252.extraction f32:0x40010625
 call 1170 UpdatePlayerEconomy

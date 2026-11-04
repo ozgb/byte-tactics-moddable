@@ -1,0 +1,3 @@
+api.anthropic.com
+index.crates.io
+static.crates.io

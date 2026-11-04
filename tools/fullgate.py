@@ -2,16 +2,22 @@
 
     uv run tools/fullgate.py                          # print the count and whether the full run is due
     uv run tools/fullgate.py due                      # the same, exit 1 when the count is CADENCE or more
+    uv run tools/fullgate.py run                      # play the full suite and the round trip, print the comment text
     uv run tools/fullgate.py --no-fetch               # do not fetch origin/moddable first
     uv run tools/fullgate.py --comments-json FILE     # tracking issue comments from a file (gh's --json comments)
     uv run tools/test_fullgate.py                     # tests, on a temporary repository and fake comments
 
 The pull request gate plays the tier; the full `reference.py --check` runs on the tip of moddable once every
 CADENCE merges that needed a gate (issue #631). The lead runs it when `due` exits 1, then comments on tracking
-issue #632: `Full gate on <sha>: <n> of <n> equal, block pointers: <result>`. The newest comment of that
-form names the last full run. The merges counted are the first-parent merge commits `Merge pull request #N`
+issue #632: `Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n>
+equal`. The newest comment of that form names the last full run. The merges counted are the first-parent merge commits `Merge pull request #N`
 on origin/moddable after that sha whose diff against their first parent touches GATE_PATHS, the paths
 reference/README.md, "Gate", says need a gate (test_fullgate.py checks the two agree).
+
+`run` plays `reference.py --check --both-modes --no-cache` and then, straight after it, `--check --no-cache
+--roundtrip auto` (the same exe, a fresh Wine prefix for each), prints their output to stderr and the text of the
+comment to stdout (or to --out FILE), and exits with the first nonzero status of the two. Posting stays with the lead.
+The round trip run scans block pointers too; the comment names them only when they are not all covered.
 
 The comments are read through `bwai-outside gh issue -R ozgb/byte-tactics-moddable view 632 --json comments`,
 or through the command in FULLGATE_GH (split like a shell line, the issue arguments appended) or from
@@ -26,6 +32,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -50,6 +57,10 @@ GATE_PATHS = (
 )
 FULL_RUN = re.compile(r"\s*Full gate on ([0-9a-fA-F]{7,40})\b")
 MERGE_SUBJECT = re.compile(r"Merge pull request #(\d+)\b")
+EQUAL_LINE = re.compile(r"^(\d+) of (\d+) scenarios equal, total ", re.MULTILINE)
+POINTERS_OK = re.compile(r"^(?:\[(\w+)\] )?block pointers: all covered by ", re.MULTILINE)
+POINTERS_BAD = re.compile(r"^(?:\[(\w+)\] )?(\d+) problems with the pointers out of the block", re.MULTILINE)
+CHECK_COMMAND = ["uv", "run", "tools/reference.py", "--check", "--no-cache"]
 
 
 def fail(message: str, code: int = 1):
@@ -113,12 +124,92 @@ def merges_since(sha: str) -> list[tuple[int, str, bool]]:
     return merges
 
 
+def equal_count(output: str) -> str:
+    """`<n> of <n>` from the `<n> of <n> scenarios equal` line of a reference.py --check run, or `not finished`."""
+    match = EQUAL_LINE.search(output)
+    return f"{match.group(1)} of {match.group(2)}" if match else "not finished"
+
+
+def pointer_result(output: str) -> str:
+    """The block pointer field of a reference.py --check run: what it printed for each mode, or `not reported`."""
+    ok = [m.group(1) or "" for m in POINTERS_OK.finditer(output)]
+    bad = {m.group(1) or "": int(m.group(2)) for m in POINTERS_BAD.finditer(output)}
+    modes = list(dict.fromkeys(ok + list(bad)))
+    if not modes:
+        return "not reported"
+    if not bad:
+        return "all covered by data/block_pointers.csv" + (" in both modes" if modes != [""] else "")
+    parts = []
+    for mode in modes:
+        what = f"{bad[mode]} block pointer problems" if mode in bad else "all covered by data/block_pointers.csv"
+        parts.append(f"[{mode}] {what}" if mode else what)
+    return "; ".join(parts)
+
+
+def comment_text(sha: str, check: tuple[int, str], roundtrip: tuple[int, str]) -> str:
+    """The comment for issue #632 from the exit status and output of the both-modes run and of the round trip run."""
+    (code, output), (trip_code, trip_output) = check, roundtrip
+    text = (f"Full gate on {sha}: {equal_count(output)} equal (both modes), block pointers: {pointer_result(output)}, "
+            f"round trip: {equal_count(trip_output)} equal")
+    trip_pointers = pointer_result(trip_output)
+    if "problems" in trip_pointers:
+        text += f" (block pointers: {trip_pointers})"
+    for name, status in (("both modes", code), ("round trip", trip_code)):
+        if status != 0:
+            text += f", {name} exit {status}"
+    return text
+
+
+def play(args: list[str], log: Path | None, what: str) -> tuple[int, str]:
+    """Run reference.py --check with `args`, copying its output to stderr (and to `log`) as it comes; (exit status, output)."""
+    command = CHECK_COMMAND + args
+    print(f"fullgate: {what}: {' '.join(command)}", file=sys.stderr, flush=True)
+    process = subprocess.Popen(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    lines = []
+    for line in process.stdout:
+        sys.stderr.write(line)
+        lines.append(line)
+    process.wait()
+    output = "".join(lines)
+    if log is not None:
+        with log.open("a") as handle:
+            handle.write(f"== {what}\n{output}== exit {process.returncode}\n")
+    return process.returncode, output
+
+
+def run(args: argparse.Namespace) -> int:
+    """Play the both-modes check, then the round trip check, and print the comment for issue #632."""
+    sha = args.sha or git("rev-parse", "HEAD").strip()
+    exe = ["--exe", args.exe] + (["--game-dir", args.game_dir] if args.game_dir else [])
+    log = Path(args.log) if args.log else None
+    results = []
+    for what, extra in (("both modes", ["--both-modes"]), ("round trip", ["--roundtrip", "auto"])):
+        shutil.rmtree(ROOT / "build/playtest/prefix", ignore_errors=True)
+        started = time.time()
+        results.append(play(exe + extra, log, what))
+        seconds = int(time.time() - started)
+        print(f"fullgate: {what} took {seconds // 60}:{seconds % 60:02d}", file=sys.stderr, flush=True)
+    text = comment_text(sha, *results)
+    if args.out:
+        Path(args.out).write_text(text + "\n")
+    print(text)
+    return next((code for code, _ in results if code != 0), 0)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("command", nargs="?", choices=["due"], help="exit 1 when the full run is due")
+    parser.add_argument("command", nargs="?", choices=["due", "run"],
+                        help="due: exit 1 when the full run is due; run: play the full suite and the round trip")
     parser.add_argument("--no-fetch", action="store_true", help=f"do not fetch {BRANCH} first")
     parser.add_argument("--comments-json", metavar="FILE", help="issue comments as JSON, instead of gh")
+    parser.add_argument("--exe", default="build/modern/TotalA.exe", help="run: the exe to play")
+    parser.add_argument("--game-dir", default=os.path.expanduser("~/.ta"), help="run: the game directory")
+    parser.add_argument("--sha", help="run: the commit the comment names, default HEAD")
+    parser.add_argument("--out", metavar="FILE", help="run: also write the comment text to FILE")
+    parser.add_argument("--log", metavar="FILE", help="run: append both runs' output to FILE")
     args = parser.parse_args()
+    if args.command == "run":
+        return run(args)
 
     sha = last_full_run(read_comments(args.comments_json))
     if sha is None:

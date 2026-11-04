@@ -155,7 +155,7 @@ after a field: settings.cpp's `password` is 71 KB) is attributed only what the a
 A subscript with a literal index of a primitive array is that one element. Any other subscript
 is the whole array if it is at most OVERLAY_BYTES (64) long, else its first byte, because
 the AST cannot tell which element a computed index reaches. Passing the array to a call or taking its
-address names its start, as before. Only a file whose `g_game` is declared as a pointer to
+address names its start, as before. Only a file whose `g_game` (declared in the file or in link/globals.h) is a pointer to
 its own `struct Game` counts: font.cpp declares a `struct Game` for the object `GetDisplay()`
 returns and has no `g_game`, so its `Game::` accesses name no region.
 
@@ -179,6 +179,7 @@ import csv
 import difflib
 import io
 import json
+import os
 import re
 import subprocess
 import sys
@@ -196,6 +197,7 @@ from rwsets import ROOT, Analyzer, Walker, is_pointer, record_name, strip, type_
 GLOBALS = ROOT / "data/globals.csv"
 GAME_LOGIC = ROOT / "data/game_logic.csv"
 GAME_HEADER = ROOT / "src" / "game" / "game.h"
+GLOBALS_HEADER = (ROOT / "link" / "globals.h").resolve()
 OUT = ROOT / "data/state_classes.csv"
 COLUMNS = ["name", "address", "kind", "proposed", "class", "rule", "phases_write", "phases_read",
            "presentation", "load_write", "writers", "readers", "note"]
@@ -249,6 +251,8 @@ class Field:
     start: int
     end: int = 0
     bits: bool = False
+    bit_low: int = 0
+    bit_high: int = 0
 
 
 def layout_fields(text: str, record: str) -> tuple[int, list[Field]] | None:
@@ -270,7 +274,7 @@ def layout_fields(text: str, record: str) -> tuple[int, list[Field]] | None:
         m = LAYOUT_LINE.match(line)
         if not m:
             break
-        start, low, _, indent, body = m.groups()
+        start, low, high, indent, body = m.groups()
         depth = (len(indent) - 1) // 2
         while stack and stack[-1][0] >= depth:
             stack.pop()
@@ -281,7 +285,8 @@ def layout_fields(text: str, record: str) -> tuple[int, list[Field]] | None:
             continue
         name = body.rsplit(None, 1)[-1]
         type_ = RECORD_KEYWORD.sub("", body[:-len(name)].strip())
-        fields.append(Field(name, type_, int(start), bits=low is not None))
+        fields.append(Field(name, type_, int(start), bits=low is not None,
+                            bit_low=int(low or 0), bit_high=int(high or 0)))
     starts = sorted({f.start for f in fields} | {size})
     for f in fields:
         f.end = next(s for s in starts if s > f.start) if f.start < size else f.start
@@ -592,6 +597,13 @@ class StateAnalyzer(Analyzer):
         self.pointers: dict[str, dict[str, str]] = defaultdict(dict)
         self.static_types: dict[str, str] = {}
         self.game_var = ""
+
+    def relative(self, file: str) -> str | None:
+        """The project path of a file, link/globals.h too: it declares `g_game` for the files that include it."""
+        rel = super().relative(file)
+        if rel is None and os.path.realpath(file) == str(GLOBALS_HEADER):
+            return os.path.relpath(GLOBALS_HEADER, self.root)
+        return rel
 
     def declare(self, node: dict, owner: str | None) -> None:
         super().declare(node, owner)

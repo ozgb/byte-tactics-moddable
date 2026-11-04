@@ -3904,6 +3904,9 @@ void __stdcall HarnessUiOrder(unsigned char kind, int remove, const Unit* unit, 
 {
     if (!UiLive())
         return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(1, __builtin_return_address(0));
+#endif
     const char* name = UiOrderName(kind);
     UiLineStart("order");
     fprintf(s_ui, " %s unit %u target ", name, UiUnitIndex(unit));
@@ -3931,6 +3934,9 @@ void __stdcall HarnessUiQueue(const char* name, const Unit* unit, int count)
 {
     if (!UiLive())
         return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(1, __builtin_return_address(0));
+#endif
     UiLineStart("qbuild");
     fprintf(s_ui, " %u %s %d\n", UiUnitIndex(unit), name, count);
 }
@@ -3939,6 +3945,9 @@ void __stdcall HarnessUiCancel(unsigned char kind, const Unit* unit)
 {
     if (!UiLive())
         return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(1, __builtin_return_address(0));
+#endif
     UiLineStart("cancel");
     fprintf(s_ui, " %s unit %u\n", UiOrderName(kind), UiUnitIndex(unit));
 }
@@ -3962,6 +3971,9 @@ void __stdcall HarnessUiGroup(const char* what, int group)
 {
     if (!UiLive())
         return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(1, __builtin_return_address(0));
+#endif
     UiLineStart(what);
     fprintf(s_ui, " %d", group);
     UiListUnits(group, 0);
@@ -4032,6 +4044,9 @@ void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, 
 {
     if (!HarnessTestMode() || s_sound == nullptr)
         return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(0, __builtin_return_address(0));
+#endif
     char text[33];
     const char* name = file;
     if (name == nullptr && index >= 0 && index < g_game->soundCount && index < 256) {

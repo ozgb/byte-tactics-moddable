@@ -75,6 +75,22 @@ class Suite(unittest.TestCase):
         suite = oraclegate.parse_suite("ok   a (10 ticks, 0:01)\n", 1, ["a"])
         self.assertEqual(oraclegate.verdict_of(suite, {}), "failed")
 
+    def test_a_block_pointer_failure_names_its_reason_and_no_code(self):
+        report = ("ok   a (10 ticks, 0:01)\n1 of 1 scenarios equal, total 0:02\n"
+                  "BLOCK POINTER ui-keys: ?Insert@?$BlockVector@ULosStep@@@@QAEXXZ offset 0xd -> ?_Insert@std@@ (holder not listed)\n"
+                  "1 problems with the pointers out of the block; add them to data/block_pointers.csv (uv run tools/blockpointers.py --from <dir>, see reference/README.md)\n")
+        suite = oraclegate.parse_suite(report, 1, ["a"])
+        self.assertEqual(suite["other_checks"], {"status": "failed", "reason": "block-pointer"})
+        self.assertEqual(oraclegate.verdict_of(suite, {}), "failed")
+        self.assertNotIn("BlockVector", json.dumps(suite))
+        self.assertNotIn("0xd", json.dumps(suite))
+        labelled = oraclegate.parse_suite(report.replace("1 problems", "[native] 1 problems"), 1, ["a"])
+        self.assertEqual(labelled["other_checks"]["reason"], "block-pointer")
+
+    def test_another_failed_check_has_no_reason(self):
+        suite = oraclegate.parse_suite("ok   a (10 ticks, 0:01)\nsound logs: 0 of 1 equal, 1 differ\n", 1, ["a"])
+        self.assertEqual(suite["other_checks"], {"status": "failed"})
+
     def test_all_equal(self):
         suite = oraclegate.parse_suite("ok   a (10 ticks, 0:01)\n", 0, ["a"])
         self.assertEqual(oraclegate.verdict_of(suite, {"wind_meteors/x": {"status": "equal"}}), "equal")

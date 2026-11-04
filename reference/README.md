@@ -425,6 +425,10 @@ whatever its offset and target; a heap address in any other holder fails the gat
 `blockpointers.py --check` fails on a holder with pair rows that lacks one of them. A holder the scans have not met
 yet is added by hand as a `*`/`*` row, with its class and a note.
 
+Every allocating member function of a `BlockVector<T>` in the linker map whose T has no pointer or Ref field in the layout has a
+wildcard row too: `blockpointers.py --check` with a map fails on one without it. Plain data can read as a heap address on one run and not
+on the next, because where the heap lies differs from run to run. A T with a pointer or Ref field gets no new row, and its words stay judged.
+
 ## Zero fill and poison mode
 
 Game memory comes from `GameAlloc` (and `operator new`, which calls it), which is plain

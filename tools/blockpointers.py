@@ -65,6 +65,9 @@ target_offsets `-`, and a note; regeneration keeps it as written and builds the 
 Wildcard rows are keyed by (holder, class) where pair rows are keyed by (holder, target), and sort
 with the rest: holder, then wildcard rows first, by class. `--check` fails on a holder with pair rows
 that lacks a wildcard row for one of their classes or for not-a-pointer.
+Every allocating member function of a `BlockVector<T>` in the linker map whose T has no pointer or Ref field in the layout
+needs a wildcard row: `--check` with a map (beside the exe, or `--map`) fails on one without it. A T with such a field gets
+none, and its words stay judged. Bytes of plain data can look like a heap address on one run and not on the next.
 """
 
 import argparse
@@ -98,6 +101,10 @@ OFFSET_TOKEN = re.compile(r"^(%s)(?:\+(%s)\*k)?$" % (HEX, HEX))
 TARGET_OFFSETS = re.compile(r"^%s(?:-%s)?$" % (HEX, HEX))
 csv.field_size_limit(1 << 28)
 LAYOUT_FLAG = ["-Xclang", "-fdump-record-layouts-complete"]
+VECTOR_MEMBER = re.compile(r"\?(?:[A-Za-z_]\w*@|\?[0-9A-Z])\?\$BlockVector@(E|F|[UV]\w+|U\?\$Ref@[UV]\w+@@)@@")
+VECTOR_PRIMITIVES = {"E": "unsigned char", "F": "short"}
+ELEMENT_HEADERS = ("src/map/los_lines.h", "src/map/los_tables.h", "src/ai/player_ai.h", "src/orders/order_type_entry.h")
+POINTER_FIELD = re.compile(r"\*|\bRef<|vtable pointer")
 
 
 @dataclass
@@ -632,6 +639,84 @@ def check_rows(text: str) -> list[str]:
     return problems
 
 
+def vector_element(function: str) -> str | None:
+    """The element type (as C++ spells it) of an allocating `BlockVector<T>` member named by its decorated symbol, else None."""
+    m = VECTOR_MEMBER.match(function)
+    if not m:
+        return None
+    code = m.group(1)
+    if code.startswith("U?$Ref@"):
+        return "Ref<%s>" % code[len("U?$Ref@") + 1:-2]
+    return VECTOR_PRIMITIVES.get(code, code[1:])
+
+
+def vector_holders(namer: Namer) -> dict[str, str]:
+    """The functions of the map that call an allocator and are members of a `BlockVector<T>`, each with its element type."""
+    found = {}
+    for site in namer.ranks:
+        function = namer.code.function(site)
+        element = vector_element(function)
+        if element is not None:
+            found[function] = element
+    return dict(sorted(found.items()))
+
+
+def pointer_fields(layout_text: str, record: str) -> list[str] | None:
+    """The members of `record` (nested ones too) whose layout line shows a pointer, a Ref or a vtable pointer; None with no layout."""
+    if record.startswith("Ref<"):
+        return [record]
+    head = re.search(r"^ *0 \| (?:struct|class|union) %s\n" % re.escape(record), layout_text, re.M)
+    if not head:
+        return None
+    found = []
+    for line in layout_text[head.end():].split("\n"):
+        if "[sizeof=" in line:
+            break
+        body = line.partition("|")[2].strip()
+        if POINTER_FIELD.search(body):
+            found.append(body)
+    return found
+
+
+def element_layouts(build_dir: Path, types: list[str]) -> str:
+    """The record layouts clang prints for these types, from probes that include the headers that declare them."""
+    import rwsets
+    _, argv, directory = rwsets.compile_commands(build_dir, [])[0]
+    i = argv.index("--")
+    dump = argv.index("-ast-dump=json")
+    flags = argv[:dump - 1] + argv[dump + 1:i]
+    out = []
+    for name in types:
+        with tempfile.TemporaryDirectory() as tmp:
+            probe = Path(tmp) / "probe.cpp"
+            probe.write_text("".join('#include "%s"\n' % (ROOT / h) for h in ELEMENT_HEADERS)
+                             + 'static_assert(sizeof(%s) > 0, "");\n' % name)
+            out.append(subprocess.run(flags + LAYOUT_FLAG + ["--", str(probe)], cwd=directory, capture_output=True,
+                                      text=True, errors="replace").stdout)
+    return "\n".join(out)
+
+
+def unlisted_vector_holders(namer: Namer, rows: list[dict], layouts: str | None = None) -> list[str]:
+    """One line for each allocating `BlockVector<T>` member of the map that has no wildcard row and whose T has no pointer or Ref field in the layout (or no layout).
+
+    An element with such a field is left without a row on purpose: its words stay judged."""
+    listed = {r["holder"] for r in rows if is_wild(r)}
+    lines = []
+    for function, element in vector_holders(namer).items():
+        if function in listed:
+            continue
+        if element in VECTOR_PRIMITIVES.values():
+            fields = []
+        else:
+            fields = None if layouts is None else pointer_fields(layouts, element)
+        if fields:
+            continue
+        seen = "its layout is not available" if fields is None else "it has no pointer or Ref field"
+        lines.append("%s: a BlockVector<%s> member that allocates has no `*` row in data/block_pointers.csv; review the "
+                     "element type (%s) and add a not-a-pointer row" % (function, element, seen))
+    return lines
+
+
 def uncovered(scanned: list[Resolved], rows: list[dict]) -> list[Resolved]:
     """The scanned words whose holder has no wildcard row, one per distinct word."""
     holders = {r["holder"] for r in rows if is_wild(r)}
@@ -752,6 +837,21 @@ def main() -> None:
                      "and merge the saved scans with --from")
     if args.check:
         problems = check_rows(OUT.read_text()) if OUT.exists() else ["%s does not exist" % OUT]
+        map_path = args.map or args.exe.with_suffix(".map")
+        if OUT.exists() and map_path.is_file():
+            namer = load_namer(map_path)
+            rows = read_rows()
+            missing = [f for f in vector_holders(namer) if f not in {r["holder"] for r in rows if is_wild(r)}]
+            layouts = None
+            if missing:
+                try:
+                    layouts = element_layouts(args.build_dir or default_build_dir(),
+                                              sorted({vector_holders(namer)[f] for f in missing}))
+                except (OSError, IndexError, subprocess.SubprocessError, ValueError):
+                    layouts = None
+            problems += unlisted_vector_holders(namer, rows, layouts)
+        else:
+            print("blockpointers: no linker map beside the exe; the block vector holders are not checked")
         for p in problems[:40]:
             print(p)
         if problems:

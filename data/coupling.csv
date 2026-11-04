@@ -943,7 +943,6 @@ game,presentation,call,ScanDirectory,1
 game,presentation,call,SelectUnitsInBox,1
 game,presentation,call,SetAnimsPath,1
 game,presentation,call,SetBrightness,2
-game,presentation,call,SetBypassDriveScan,1
 game,presentation,call,SetCameraPosition,2
 game,presentation,call,SetCommandLineUnusedFlagL,1
 game,presentation,call,SetCurrentFont,1

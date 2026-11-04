@@ -337,7 +337,6 @@ int g_contourSpacing;
 int g_contourOffset;
 unsigned int g_netStatsTick;
 unsigned int g_byteRatesTick;
-int g_cdBypassDriveScan;
 Game* g_game;
 int g_endGameGlamourSoundStarted;
 char g_frontendErrorText[256];

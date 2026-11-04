@@ -385,7 +385,6 @@ address,size,file,symbol,status,similarity
 0x41d3b0,59,src/ingame/camera.cpp,?SaveCameraPosition@@YGXH@Z,matched,100.0
 0x41d3f0,161,src/ingame/camera.cpp,?RestoreCameraPosition@@YGXH@Z,matched,100.0
 0x41d4a0,12,src/ingame/camera.cpp,?SetCommandLineUnusedFlagL@@YGXH@Z,matched,100.0
-0x41d4b0,12,src/ingame/camera.cpp,?SetBypassDriveScan@@YGXH@Z,matched,100.0
 0x41d4c0,471,src/game/cd_check.cpp,?RegisterDataArchives@@YGXXZ,matched,100.0
 0x41d6a0,271,src/game/cd_check.cpp,?FindGameCdDrive@@YGDH@Z,matched,100.0
 0x41d7b0,229,src/game/cd_check.cpp,?BuildCdFilePath@@YGPADPADPBD11@Z,matched,100.0

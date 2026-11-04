@@ -1846,7 +1846,6 @@ presentation,SetBlueTable,src/graphics/palette.cpp,0,0,0,0,0,0,?SetBlueTable@@YG
 presentation,SetBuildCountText,src/ingame/control_panel.cpp,0,0,0,0,0,0,?SetBuildCountText@@YGXPAUGui@@GH@Z,1,
 presentation,SetButtonStage,src/gui/gui.cpp,1,0,0,0,0,0,?SetButtonStage@@YGHPAUGui@@HD@Z,0,
 presentation,SetButtonStageByName,src/gui/gui.cpp,1,0,0,0,0,0,?SetButtonStageByName@@YGHPAUGui@@PADD@Z,0,
-presentation,SetBypassDriveScan,src/ingame/camera.cpp,1,0,0,0,0,0,?SetBypassDriveScan@@YGXH@Z,0,
 presentation,SetColour,src/graphics/font.cpp,1,0,0,0,0,0,?SetColour@@YGXHH@Z,0,
 presentation,SetCommandLineUnusedFlagL,src/ingame/camera.cpp,1,0,0,0,0,0,?SetCommandLineUnusedFlagL@@YGXH@Z,0,
 presentation,SetControlTextByName,src/gui/gui.cpp,1,0,0,0,0,0,?SetControlTextByName@@YGXPAUGui@@PAD1@Z,0,

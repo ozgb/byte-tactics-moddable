@@ -53,9 +53,10 @@ Rows, one per (holder, target), sorted by holder, then target (a `*` target firs
                   address; it shows in few runs or at varying target offsets, and needs a note)
   note            free text
 
-`class` and `note` are kept by regeneration, by (holder, target). Addresses outside the block differ
-from run to run, so the pair rows can never be complete: they are the record, and `reference.py
---check` plays the scan on and fails only on a word whose holder has no wildcard row.
+`class` and `note` are kept by regeneration, by (holder, target), else by holder and a shared offset when
+a target was renamed. Addresses outside the block differ from run to run, so the pair rows can never be
+complete: they are the record, and `reference.py --check` plays the scan on and fails only on a word
+whose holder has no wildcard row.
 
 Wildcard rows. A holder has one row with `*` as its offsets and `*` as its target for each class of
 its pair rows, and one for not-a-pointer (the words that only look like addresses). `*` is no other
@@ -544,11 +545,26 @@ def read_rows(path: Path = OUT) -> list[dict]:
         return list(csv.DictReader(f))
 
 
+def offset_starts(offsets: str) -> set[str]:
+    """The first offset of each term of an offsets column: `0xa+0x4*k 0x20` gives 0xa and 0x20."""
+    return {term.split("+")[0] for term in offsets.split()}
+
+
 def merge_kept(rows: list[dict], old: list[dict]) -> list[dict]:
-    """The rows with the class and note the old file had for the same row_key."""
+    """The rows with the class and note the old file had for the same row_key. A pair row with none (its target
+    was renamed) takes them from the old rows of its holder with an offset in common, when those agree."""
     kept = {row_key(r): r for r in old}
+    by_holder: dict[str, list[tuple[set[str], dict]]] = {}
+    for r in old:
+        if not is_wild(r):
+            by_holder.setdefault(r["holder"], []).append((offset_starts(r["offsets"]), r))
     for row in rows:
         before = kept.get(row_key(row))
+        if not before and not is_wild(row):
+            starts = offset_starts(row["offsets"])
+            same = [r for s, r in by_holder.get(row["holder"], []) if s & starts]
+            if same and len({tuple(r[c] for c in KEPT) for r in same}) == 1:
+                before = same[0]
         if before:
             for column in KEPT:
                 row[column] = before[column]

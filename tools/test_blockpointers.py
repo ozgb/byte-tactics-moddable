@@ -246,8 +246,15 @@ class FoldTest(unittest.TestCase):
 class KeptTest(unittest.TestCase):
     def test_merge_kept(self):
         old = [row("H", "T", cls="moves-in", note="n")]
-        new = bp.merge_kept([row("H", "T", cls="", note=""), row("H", "U", cls="", note="")], old)
+        new = bp.merge_kept([row("H", "T", cls="", note=""), row("H", "U", "0x40", cls="", note="")], old)
         self.assertEqual([(r["class"], r["note"]) for r in new], [("moves-in", "n"), ("", "")])
+
+    def test_merge_kept_by_offsets_when_target_renamed(self):
+        old = [row("H", "Old", "0x4", cls="not-a-pointer", note="n"), row("H", "A", "0x8", cls="outside", note="a"),
+               row("H", "B", "0x8", cls="moves-in", note="b")]
+        new = bp.merge_kept([row("H", "New", "0x4+0x2*k", cls="", note=""), row("H", "C", "0x8", cls="", note=""),
+                             row("G", "New", "0x4", cls="", note="")], old)
+        self.assertEqual([(r["class"], r["note"]) for r in new], [("not-a-pointer", "n"), ("", ""), ("", "")])
 
     def test_differences_ignore_kept(self):
         a = [row("H", "T", cls="outside")]

@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TRACE_FORMAT = 3
+TRACE_FORMAT = 4
 TYPES = ROOT / "include/ta_types.h"
 OUT = ROOT / "src/harness/trace_schema.h"
 
@@ -835,8 +835,6 @@ GAME_SCALARS: list[tuple[str, int, int, str | None, int]] = [
 ]
 
 SCALAR_GLOBALS: list[tuple[str, str, int, str | None]] = [
-    ("cdPathMismatch", "g_cdPathMismatch", 4, None),
-    ("cdMismatchDefeatTick", "g_cdMismatchDefeatTick", 4, None),
     ("economyPacketTick", "g_economyPacketTick", 4, None),
 ]
 
@@ -869,7 +867,6 @@ METEOR_GLOBALS: list[tuple[str, str, int, str | None]] = [
     ("scheduleGap", "g_meteorScheduleGap", 4, None),
 ]
 GLOBAL_DECLS: dict[str, str] = {
-    "g_cdMismatchDefeatTick": "unsigned int g_cdMismatchDefeatTick",
     "g_playerTickLoad": "int g_playerTickLoad[10]",
     "g_playerBudgetCap": "int g_playerBudgetCap[10]",
 }

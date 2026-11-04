@@ -81,7 +81,7 @@ void AddStream(ReplayText& t, int stream)
 void AddHandle(ReplayText& t, unsigned kind, const void* p)
 {
     static const char* const names[] = { "file", "rec", "bank" };
-    unsigned ordinal = g_replayHandles.Of(kind, p);
+    unsigned ordinal = ReplayHandles().Of(kind, p);
     if (ordinal == 0) {
         t.Add("null");
         return;
@@ -171,7 +171,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
     s_recording = !r.windowed || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
     if (!s_recording)
         return;
-    g_replayHandles.Reset();
+    ReplayHandles().Reset();
     s_snapshots.Reset();
     s_nested.Clear();
     s_call.Clear();
@@ -409,7 +409,7 @@ void ImportHandle(ReplayText& t, unsigned kind, const void* p)
 void ImportCallback(ReplayText& t, ReplayCallbackScope& scope, unsigned callback, void* object)
 {
     unsigned kind = OBJ_CALLBACK + callback;
-    unsigned ordinal = g_replayHandles.Of(kind, object);
+    unsigned ordinal = ReplayHandles().Of(kind, object);
     t.AddChar(' ');
     AddHandle(t, kind, object);
     scope.Start(callback, object, ordinal, Table(), ReplayThunkVtable(callback));
@@ -418,7 +418,7 @@ void ImportCallback(ReplayText& t, ReplayCallbackScope& scope, unsigned callback
 void ArgCallback(ReplayText& t, const char* name, ReplayCallbackScope& scope, unsigned callback, void* object)
 {
     unsigned kind = OBJ_CALLBACK + callback;
-    unsigned ordinal = g_replayHandles.Of(kind, object);
+    unsigned ordinal = ReplayHandles().Of(kind, object);
     t.Add("  a ");
     t.Add(name);
     t.AddChar(' ');

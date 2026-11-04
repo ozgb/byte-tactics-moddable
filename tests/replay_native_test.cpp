@@ -316,7 +316,7 @@ void AddObject(ReplayText& t, unsigned kind, const void* p)
                 ordinal = (unsigned)i + 1;
         }
     } else {
-        ordinal = g_replayHandles.Of(kind, p);
+        ordinal = ReplayHandles().Of(kind, p);
     }
     if (ordinal == 0) {
         t.Add("null");
@@ -1224,7 +1224,7 @@ void ResetHeld()
 void BeginHeld()
 {
     ResetHeld();
-    g_replayHandles.Reset();
+    ReplayHandles().Reset();
 }
 
 HeldCallback* FindHeld(const void* object)
@@ -1318,7 +1318,7 @@ void* BindHeld(unsigned callback, unsigned ordinal, ReplayAllocFn alloc)
     h.ordinal = ordinal;
     h.object = object;
     h.count = 0;
-    g_replayHandles.Bind(REPLAY_HANDLE_CALLBACK + callback, ordinal, object);
+    ReplayHandles().Bind(REPLAY_HANDLE_CALLBACK + callback, ordinal, object);
     return object;
 }
 
@@ -2798,7 +2798,7 @@ void BeginImport()
 {
     g_cursor = g_callFirst + 1;
     g_importIndex = 0;
-    g_replayHandles.Reset();
+    ReplayHandles().Reset();
     BeginCompare();
 }
 
@@ -3197,7 +3197,7 @@ void HeldCallbackSelfTest()
     Check(g_heldCount == 3 && g_held[0].count == 1 && g_held[1].count == 1 && g_held[2].count == 1, "each callback object was bound at its line and got its call");
     FixtureNotify* holder = (FixtureNotify*)ReplayResolveObject("FixtureNotify#1", nullptr, g_objects, AllocObject);
     Check(holder != nullptr && holder->hook == g_held[0].object && holder->link.get() == g_held[1].object, "the fields hold the objects of the lines");
-    Check(g_replayHandles.Find(REPLAY_HANDLE_CALLBACK + RCB_CALLBACK, g_held[2].object) == 3, "and the argument has the number the recording gave it");
+    Check(ReplayHandles().Find(REPLAY_HANDLE_CALLBACK + RCB_CALLBACK, g_held[2].object) == 3, "and the argument has the number the recording gave it");
     ReplayText value;
     ReplayFormatObjectField(*ReplayFindObjectField(ROK_FIXTURENOTIFY, "hook"), holder, g_objects, false, value);
     Check(strcmp(value.Data(), "callback#1") == 0, "a field that holds a callback is written as its handle");
@@ -3454,7 +3454,7 @@ void SnapshotSelfTest()
     LoadCall(body);
     g_cursor = g_callFirst + 1;
     g_importIndex = 0;
-    g_replayHandles.Reset();
+    ReplayHandles().Reset();
     memset(g_snapshotData, 0, sizeof g_snapshotData);
     g_captureUsed = 0;
     BeginCompare();

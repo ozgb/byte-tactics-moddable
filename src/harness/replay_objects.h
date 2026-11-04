@@ -6,7 +6,7 @@
 
 enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384, REPLAY_HANDLE_CALLBACK = 3 };
 
-extern ReplayOrdinals g_replayHandles;
+ReplayOrdinals& ReplayHandles();
 
 class ReplayObjectTable {
 public:

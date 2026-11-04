@@ -777,7 +777,7 @@ void AddCallbackName(ReplayText& t, unsigned callback, const void* p, bool assig
         return;
     }
     unsigned kind = REPLAY_HANDLE_CALLBACK + callback;
-    unsigned ordinal = assign ? g_replayHandles.Of(kind, p) : g_replayHandles.Find(kind, p);
+    unsigned ordinal = assign ? ReplayHandles().Of(kind, p) : ReplayHandles().Find(kind, p);
     t.Add(kReplayCallbacks[callback].handle);
     if (ordinal == 0) {
         t.Add("#?");
@@ -2298,7 +2298,11 @@ bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTabl
     return *q == ')' && q[1] == '\0';
 }
 
-ReplayOrdinals g_replayHandles;
+ReplayOrdinals& ReplayHandles()
+{
+    static ReplayOrdinals handles;
+    return handles;
+}
 
 ReplayBindCallbackFn& ReplayBindCallbackHook()
 {

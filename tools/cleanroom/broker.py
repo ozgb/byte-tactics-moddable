@@ -327,11 +327,11 @@ def history_blobs(bare, sha):
 
 
 def content_refusal(bare, sha, manifest, wasm_digests):
-    """Return why the commit's history holds a forbidden blob (the path, never content), or None."""
+    """Return (path, reason) for a forbidden blob in the commit's history (never its content), or None."""
     cache = {}
     for blob, path in history_blobs(bare, sha):
         if path.lower().endswith(".wasm"):
-            return f"{path} is a .wasm file"
+            return path, "is a .wasm file"
         if blob not in cache:
             data = git(["--git-dir", str(bare), "cat-file", "blob", blob], text=False)
             if data.returncode:
@@ -339,9 +339,9 @@ def content_refusal(bare, sha, manifest, wasm_digests):
             cache[blob] = (hashlib.sha256(data.stdout).hexdigest(), len(data.stdout))
         digest, size = cache[blob]
         if size and digest in manifest:
-            return f"{path} is a file of the canary manifest"
+            return path, "is a file of the canary manifest"
         if size and digest in wasm_digests:
-            return f"{path} is a build wasm module"
+            return path, "is a build wasm module"
     return None
 
 
@@ -354,7 +354,11 @@ def push_branches(session, token_file, remote, repo=DEFAULT_REPO, api_base=DEFAU
     bare = session / "bare" / REPO_NAME
     state_file = session / PUSH_STATE
     state = json.loads(state_file.read_text()) if state_file.exists() else {"pushed": {}, "pr": {}}
-    pending = {r: sha for r, sha in bare_branches(bare).items() if state["pushed"].get(r) != sha}
+    state.setdefault("refused", {})
+    pending = {
+        r: sha for r, sha in bare_branches(bare).items()
+        if state["pushed"].get(r) != sha and state["refused"].get(r, {}).get("commit") != sha
+    }
     need_pr = [r for r in bare_branches(bare) if r not in state["pr"] and r in state["pushed"] and r not in pending]
     if not pending and not need_pr:
         return
@@ -374,11 +378,16 @@ def push_branches(session, token_file, remote, repo=DEFAULT_REPO, api_base=DEFAU
             log(session, f"push refused for {ref}: no {MANIFEST_NAME} in the session, so no check")
             continue
         try:
-            why = content_refusal(bare, sha, manifest, wasm_digests)
+            found = content_refusal(bare, sha, manifest, wasm_digests)
         except (RuntimeError, OSError) as err:
-            why = f"the content check failed: {err}"
-        if why:
-            log(session, f"push refused for {ref}: {why}")
+            log(session, f"push refused for {ref}: the content check failed: {err}")
+            continue
+        if found:
+            path, reason = found
+            log(session, f"push refused for {ref}: {path} {reason}")
+            state["refused"][ref] = {"commit": sha, "path": path, "reason": reason}
+            state_file.write_text(json.dumps(state, sort_keys=True) + "\n")
+            write_push_refusals(session / "inbox", state["refused"])
             continue
         result = git(
             ["--git-dir", str(bare), "-c", "credential.helper=", "-c", "core.askPass=", "push", remote, f"{sha}:{ref}"],
@@ -503,6 +512,10 @@ def write_result(inbox, request_id, result):
     tmp = inbox / f".{request_id}.tmp"
     tmp.write_text(json.dumps(result, sort_keys=True) + "\n")
     os.replace(tmp, inbox / f"{request_id}.json")
+
+
+def write_push_refusals(inbox, refused):
+    write_result(inbox, "push", {"refused": [refused[ref] for ref in sorted(refused)]})
 
 
 def process_mailbox(session, gate=None):

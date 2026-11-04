@@ -1044,16 +1044,14 @@ struct Deferred {
     unsigned short field[MAX_DEFERRED];
 };
 
-void Expand(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned at, const unsigned short* fields, unsigned fieldCount, Deferred& deferred)
+void ExpandObject(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned kind, unsigned char* base, const unsigned short* limit, unsigned limitCount,
+                  const unsigned short* fields, unsigned fieldCount, Deferred& deferred)
 {
-    const unsigned short* list = reach.limit[at] != nullptr ? reach.limit[at] : fields;
-    unsigned count = reach.limit[at] != nullptr ? reach.limitCount[at] : fieldCount;
-    const unsigned short* limit = reach.limit[at];
-    unsigned limitCount = reach.limitCount[at];
-    unsigned char* base = (unsigned char*)reach.object[at];
+    const unsigned short* list = limit != nullptr ? limit : fields;
+    unsigned count = limit != nullptr ? limitCount : fieldCount;
     for (unsigned i = 0; i < count; i++) {
         const ReplayObjectField& field = kReplayObjectFields[list[i]];
-        if (field.object != reach.kind[at] || !Walkable(field) || !ReplayFieldLive(field, base))
+        if (field.object != kind || !Walkable(field) || !ReplayFieldLive(field, base))
             continue;
         if (field.kind == RK_EMBED) {
             Visit(reach, table, assign, field.target, base + field.offset, limit, limitCount);
@@ -1094,6 +1092,59 @@ void Expand(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned 
     }
 }
 
+void Expand(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned at, const unsigned short* fields, unsigned fieldCount, Deferred& deferred)
+{
+    ExpandObject(reach, table, assign, reach.kind[at], (unsigned char*)reach.object[at], reach.limit[at], reach.limitCount[at], fields, fieldCount, deferred);
+}
+
+void VisitDeferred(ReplayReach& reach, ReplayObjectTable& table, bool assign, Deferred& deferred)
+{
+    for (; deferred.done < deferred.count; deferred.done++) {
+        const ReplayObjectField& field = kReplayObjectFields[deferred.field[deferred.done]];
+        Visit(reach, table, assign, field.target, deferred.object[deferred.done], kReplayReachFields + field.reachFirst, field.reachCount);
+    }
+}
+
+void ExpandDeltaTable(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned kind, const unsigned short* fields, unsigned fieldCount, Deferred& deferred)
+{
+    unsigned char* base;
+    unsigned count;
+    unsigned stride;
+    if (!TableSpan(kind, &base, &count, &stride))
+        return;
+    for (unsigned i = 0; i < count; i++) {
+        ExpandObject(reach, table, assign, kind, base + i * stride, nullptr, 0, fields, fieldCount, deferred);
+        VisitDeferred(reach, table, assign, deferred);
+    }
+}
+
+bool ReachHas(const ReplayReach& reach, unsigned kind, const void* object)
+{
+    for (unsigned slot = PointerHash(object) % REPLAY_REACH_HASH; reach.slots[slot] >= 0; slot = (slot + 1) % REPLAY_REACH_HASH) {
+        if (reach.object[reach.slots[slot]] == object && reach.kind[reach.slots[slot]] == kind)
+            return true;
+    }
+    return false;
+}
+
+}
+
+unsigned ReplayDeltaCount(const ReplayReach& reach)
+{
+    return reach.deltaCount;
+}
+
+bool ReplayDeltaTable(const ReplayReach& reach, unsigned index, unsigned* kind, unsigned char** base, unsigned* count, unsigned* stride)
+{
+    if (index >= reach.deltaCount)
+        return false;
+    *kind = reach.deltaKind[index];
+    return TableSpan(*kind, base, count, stride);
+}
+
+bool ReplayInReachObject(const ReplayReach& reach, unsigned kind, const void* object)
+{
+    return ReachHas(reach, kind, object);
 }
 
 bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex)
@@ -1111,11 +1162,35 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
                 const unsigned short* rootLimit, unsigned rootLimitCount)
 {
     reach.count = 0;
+    reach.deltaCount = 0;
     memset(reach.slots, 0xff, sizeof reach.slots);
+    unsigned short fields[MAX_WALK_FIELDS];
+    unsigned fieldCount = WalkFields(sets, fields);
+    static Deferred deferred;
+    deferred.count = 0;
+    deferred.done = 0;
     for (unsigned i = 0; i < rootCount; i++)
         Visit(reach, table, assign, rootKinds[i], roots[i], rootLimit, rootLimitCount);
-    if (sets.allOf != 0) {
-        unsigned kind = sets.allOf - 1u;
+    for (unsigned pass = 0; pass < 2 && g_game != nullptr; pass++) {
+        const unsigned char* set = pass == 0 ? sets.reads : sets.writes;
+        unsigned count = pass == 0 ? sets.readCount : sets.writeCount;
+        for (unsigned i = 0; i < count; i++) {
+            const ReplayField& f = kReplayFields[set[i]];
+            if (f.kind == RK_REF && f.base == RB_GAME)
+                Visit(reach, table, assign, f.target, BlockAt(*(const unsigned*)((const unsigned char*)g_game + f.offset)), nullptr, 0);
+        }
+    }
+    for (unsigned a = 0; a < sets.allOfCount; a++) {
+        unsigned kind = sets.allOf[a];
+        if (kReplayObjectKinds[kind].delta != 0) {
+            if (reach.deltaCount == sizeof reach.deltaKind) {
+                ReplayFail("a slot is all-of over more delta kinds than the walk holds");
+                continue;
+            }
+            reach.deltaKind[reach.deltaCount++] = (unsigned char)kind;
+            ExpandDeltaTable(reach, table, assign, kind, fields, fieldCount, deferred);
+            continue;
+        }
         unsigned char* base;
         unsigned count;
         unsigned stride;
@@ -1124,40 +1199,61 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
                 Visit(reach, table, assign, (unsigned char)kind, base + i * stride, nullptr, 0);
         }
     }
-    unsigned short fields[MAX_WALK_FIELDS];
-    unsigned fieldCount = WalkFields(sets, fields);
-    static Deferred deferred;
-    deferred.count = 0;
-    deferred.done = 0;
     unsigned at = 0;
     for (;;) {
         for (; at < reach.count; at++)
             Expand(reach, table, assign, at, fields, fieldCount, deferred);
         if (deferred.done == deferred.count)
             break;
-        for (; deferred.done < deferred.count; deferred.done++) {
-            const ReplayObjectField& field = kReplayObjectFields[deferred.field[deferred.done]];
-            Visit(reach, table, assign, field.target, deferred.object[deferred.done], kReplayReachFields + field.reachFirst, field.reachCount);
-        }
+        VisitDeferred(reach, table, assign, deferred);
     }
+}
+
+namespace {
+
+enum { MAX_DELTA_FIELDS = 128 };
+
+void CaptureObject(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, const ReplayReach* reach, unsigned at, unsigned kind, void* object,
+                   const unsigned short* set, unsigned count, char tag, ReplayText& key, ReplayText& value)
+{
+    for (unsigned i = 0; i < count; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[set[i]];
+        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_UNITID || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
+            continue;
+        ReplayObjectFieldKey(key, table, true, kind, object, f);
+        if (!ReplayFieldLive(f, object)) {
+            if (known.Get(key.Data()) != nullptr)
+                known.Set(key.Data(), "");
+            continue;
+        }
+        ReplayEmitField(out, known, table, tag, key.Data(), f, object, value);
+    }
+}
+
 }
 
 void ReplayCaptureObjects(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, const ReplayReach& reach, const unsigned short* set, unsigned count, char tag)
 {
     ReplayText key;
     ReplayText value;
-    for (unsigned at = 0; at < reach.count; at++) {
-        for (unsigned i = 0; i < count; i++) {
-            const ReplayObjectField& f = kReplayObjectFields[set[i]];
-            if (f.object != reach.kind[at] || f.kind == RK_EMBED || f.kind == RK_UNITID || !ReplayInReach(reach, at, set[i]))
-                continue;
-            ReplayObjectFieldKey(key, table, true, reach.kind[at], reach.object[at], f);
-            if (!ReplayFieldLive(f, reach.object[at])) {
-                if (known.Get(key.Data()) != nullptr)
-                    known.Set(key.Data(), "");
-                continue;
-            }
-            ReplayEmitField(out, known, table, tag, key.Data(), f, reach.object[at], value);
+    for (unsigned at = 0; at < reach.count; at++)
+        CaptureObject(out, known, table, &reach, at, reach.kind[at], reach.object[at], set, count, tag, key, value);
+    for (unsigned d = 0; d < reach.deltaCount; d++) {
+        unsigned kind;
+        unsigned char* base;
+        unsigned elements;
+        unsigned stride;
+        unsigned short mine[MAX_DELTA_FIELDS];
+        unsigned n = 0;
+        for (unsigned i = 0; i < count && n < MAX_DELTA_FIELDS; i++) {
+            if (kReplayObjectFields[set[i]].object == reach.deltaKind[d])
+                mine[n++] = set[i];
+        }
+        if (!ReplayDeltaTable(reach, d, &kind, &base, &elements, &stride))
+            continue;
+        for (unsigned e = 0; e < elements; e++) {
+            if (!ReachHas(reach, kind, base + e * stride))
+                CaptureObject(out, known, table, nullptr, 0, kind, base + e * stride, mine, n, tag, key, value);
         }
     }
     key.Free();
@@ -1172,6 +1268,7 @@ ReplayObjectField ReplayFieldView(const ReplayField& f)
     view.size = f.size;
     view.kind = f.kind;
     view.array = f.array;
+    view.target = f.target;
     return view;
 }
 

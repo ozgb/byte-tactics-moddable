@@ -335,6 +335,22 @@ def check_inside(ann: dict) -> list[str]:
     return errors
 
 
+def check_delta(ann: dict) -> list[str]:
+    """Errors for `delta`: true on a state kind with a table, recorded as changed elements when a slot is all-of over it."""
+    errors = []
+    for name, spec in ann["objects"].items():
+        if "delta" not in spec:
+            continue
+        where = "%s delta" % name
+        if spec["delta"] is not True:
+            errors.append("%s: `delta` is true, or absent" % where)
+        if not spec.get("table"):
+            errors.append("%s: only a kind with a table can be a delta" % where)
+        if spec["scope"] != "state" or spec.get("inside") or spec.get("kinds") or spec.get("vtable"):
+            errors.append("%s: a delta kind is a state kind with no sites, kinds or vtable" % where)
+    return errors
+
+
 CALLBACK_ARG_MODES = {"scalar", "text", "object", "value"}
 
 
@@ -496,8 +512,6 @@ def resolve_field_reaches(ann: dict, object_fields: list, object_index: dict, ta
         if f["kind"] == "unitid":
             where = "%s.%s" % (f["object"], f["name"])
             errors += resolve_reach(where, f, f["target"], ann, object_fields, object_index, table)
-            if not f.get("when"):
-                errors.append("%s: a unitid field names the field and the value that make it an id" % where)
     return errors
 
 
@@ -737,7 +751,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     game, sim = block_tables(ann)
     errors = check_sim_names(sim)
     arrays: list[dict] = []
-    fields = field_table(game, sim, arrays, errors)
+    fields = field_table(game, sim, arrays, errors, ann["objects"])
     field_index = {f["name"]: i for i, f in enumerate(fields)}
     objects = []
     object_fields = []
@@ -747,7 +761,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for kind in kind_names:
         spec = ann["objects"][kind]
         entry = {"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")}
-        for key in ("vtable", "kinds"):
+        for key in ("vtable", "kinds", "delta"):
             if spec.get(key):
                 entry[key] = spec[key]
         objects.append(entry)
@@ -792,6 +806,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     errors += resolve_field_reaches(ann, object_fields, object_index, reach_table)
     errors += resolve_conditions(ann, object_fields, object_index)
     errors += check_inside(ann)
+    errors += check_delta(ann)
     by_function: dict[str, list[dict]] = {}
     for r in rows:
         by_function.setdefault(r["function"], []).append(r)
@@ -845,7 +860,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             reads, writes = set(), set()
             obj_reads, obj_writes = set(), set()
             draws = False
-            all_of = None
+            all_of: list[str] = []
             for name in [] if skipped else note.get("reads", []):
                 if name not in field_index:
                     errors.append("%s.%s: the extra read %s is no block field" % (sub, s["name"], name))
@@ -899,9 +914,12 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                     else:
                                         into.add(object_index[(k, fname)])
                         elif rule["rule"] == "all-of":
-                            if all_of is not None and all_of != rule["object"]:
-                                errors.append("%s: the slot %s has rules for two all-of kinds" % (sub, s["name"]))
-                            all_of = rule["object"]
+                            if not ann["objects"].get(rule["object"], {}).get("table"):
+                                message = "the all-of rule names %s, which is no table kind of the schema" % rule["object"]
+                                if message not in errors:
+                                    errors.append(message)
+                            elif rule["object"] not in all_of:
+                                all_of.append(rule["object"])
             if draws:
                 reads.update(RNG_FIELDS)
                 writes.update(RNG_FIELDS)
@@ -922,7 +940,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             entry = {
                 "conv": s["conv"], "ret": s["ret"], "functions": functions,
                 "reads": [f for f in order if f in reads], "writes": [f for f in order if f in writes],
-                "objectReads": sorted(obj_reads), "objectWrites": sorted(obj_writes), "allOf": all_of,
+                "objectReads": sorted(obj_reads), "objectWrites": sorted(obj_writes), "allOf": [k for k in kind_names if k in all_of],
                 "args": args, "result": result, "native": note.get("native", s["name"]),
             }
             if skipped:
@@ -978,13 +996,32 @@ def check_sim_names(sim: dict) -> list[str]:
     return ["SimGlobals has no member %s" % n for n in sim if n + ";" not in text and n not in known.fields]
 
 
-def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str]) -> list[dict]:
+def check_game_ref(name: str, spec: dict, leaf: dict | None, kinds: dict, errors: list[str]) -> dict:
+    """The field entry of a Game member that is a ref: its target is a state kind with no table, named at first sight."""
+    where = "Game.%s" % name
+    target = spec.get("target")
+    if set(spec) - {"kind", "target"}:
+        errors.append("%s: a ref field of Game is {\"kind\": \"ref\", \"target\": KIND}" % where)
+    found = kinds.get(target)
+    if found is None or found["scope"] != "state":
+        errors.append("%s: the target %s is no state kind of the schema" % (where, target))
+    elif found.get("table") or found.get("inside") or found.get("kinds"):
+        errors.append("%s: the target %s has a table, sites or kinds, and is named by them, not at first sight" % (where, target))
+    if leaf is None or leaf["size"] != 4:
+        raise Error("Game has no field %s of 4 bytes for a ref" % name)
+    return {"name": "Game." + name, "base": "game", "offset": leaf["offset"], "size": 4, "kind": "ref", "target": target}
+
+
+def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], kinds: dict | None = None) -> list[dict]:
     schema = traceschema.Schema()
     layout = {l["name"]: l for l in schema.layout("Game")[0]}
     fields = []
     for name, kind in game.items():
         leaf = layout.get(name)
         spec = kind if isinstance(kind, dict) else None
+        if spec is not None and spec.get("kind") == "ref":
+            fields.append(check_game_ref(name, spec, leaf, kinds or {}, errors))
+            continue
         if spec is not None:
             array = check_array("Game.%s" % name, spec, "Game", errors)
             array["member"] = name
@@ -1058,11 +1095,13 @@ def render_schema(ann: dict, model: dict) -> str:
         L.append("static const void* const kReplayCode%s[] = {" % pascal(t["name"]))
         L += ["    (const void*)%s," % fn for fn in t["entries"]]
         L.append("};")
-    L += ["", "static const ReplayField kReplayFields[] = {"]
+    L += ["", "enum ReplayObjectKindId {"]
+    L += ["    ROK_%s," % upper(o["name"]) for o in objects]
+    L += ["    ROK_COUNT", "};", "", "static const ReplayField kReplayFields[] = {"]
     for f in fields:
         base = {"game": "RB_GAME", "sim": "RB_SIM", "rng": "RB_RNG"}[f["base"]]
         offset = "offsetof(SimGlobals, %s)" % f["offset"] if f["base"] == "sim" else "%d" % f["offset"]
-        extra = ", %d" % f["array"] if f.get("array") else ""
+        extra = ", %d" % f["array"] if f.get("array") else ", 0, ROK_%s" % upper(f["target"]) if f["kind"] == "ref" else ""
         L.append('    { "%s", %s, %d, %s, RK_%s%s },' % (f["name"], offset, f["size"], base, FIELD_KINDS[f["kind"]], extra))
     L += ["};", "static const unsigned kReplayFieldCount = %d;" % len(fields), ""]
     L += ["static const ReplayArraySpec kReplayArrays[] = {"]
@@ -1097,9 +1136,7 @@ def render_schema(ann: dict, model: dict) -> str:
         L.append('#pragma pop_macro("%s")' % name)
     L += ["", "enum ReplayFieldIndex {"]
     L += ["    RF_%s," % upper(f["name"]) for f in fields]
-    L += ["};", "", "enum ReplayObjectKindId {"]
-    L += ["    ROK_%s," % upper(o["name"]) for o in objects]
-    L += ["    ROK_COUNT", "};", "", "static const ReplayVectorSpec kReplayVectors[] = {"]
+    L += ["};", "", "static const ReplayVectorSpec kReplayVectors[] = {"]
     for v in vectors:
         L.append("    { %s, %s, sizeof(%s) }," % (VECTOR_MODES[v["mode"]], "ROK_" + upper(v["kind"]) if v["kind"] else "0", v["ctype"]))
     if not vectors:
@@ -1126,7 +1163,7 @@ def render_schema(ann: dict, model: dict) -> str:
     for o in objects:
         first, count = poly_at.get(o["name"], (0, 0))
         inside_first, inside_count = site_at[o["name"]]
-        L.append('    { "%s", sizeof(%s), %s, %s, %d, %d, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count))
+        L.append('    { "%s", sizeof(%s), %s, %s, %d, %d, %d, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True)))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
           "static const unsigned char kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
           "enum ReplayCallbackId {"]
@@ -1207,6 +1244,8 @@ def render_schema(ann: dict, model: dict) -> str:
     for sub, spec in subsystems.items():
         for slot, s in spec["slots"].items():
             base = "kReplay%s%s" % (re.sub(r"[^A-Za-z0-9]", "", sub.title()), slot)
+            if s["allOf"]:
+                L.append("static const unsigned char %sAllOf[] = { %s };" % (base, ", ".join("ROK_" + upper(k) for k in s["allOf"])))
             for tag, names, kindname, idx in (("Reads", s["reads"], "unsigned char", [fields_index(fields, n) for n in s["reads"]]),
                                               ("Writes", s["writes"], "unsigned char", [fields_index(fields, n) for n in s["writes"]]),
                                               ("ObjReads", s["objectReads"], "unsigned short", s["objectReads"]),
@@ -1221,8 +1260,8 @@ def render_schema(ann: dict, model: dict) -> str:
             return ("%s%s" % (base, tag) if items else "nullptr", len(items))
         r, w = ref("Reads", s["reads"]), ref("Writes", s["writes"])
         ro, wo = ref("ObjReads", s["objectReads"]), ref("ObjWrites", s["objectWrites"])
-        every = "ROK_%s + 1" % upper(s["allOf"]) if s.get("allOf") else "0"
-        L.append('    { "%s", SUB_%s, %s, %d, %s, %d, %s, %d, %s, %d, %s },' % (slot, upper(sub), r[0], r[1], w[0], w[1], ro[0], ro[1], wo[0], wo[1], every))
+        every = ref("AllOf", s["allOf"])
+        L.append('    { "%s", SUB_%s, %s, %d, %s, %d, %s, %d, %s, %d, %s, %d },' % (slot, upper(sub), r[0], r[1], w[0], w[1], ro[0], ro[1], wo[0], wo[1], every[0], every[1]))
     L += ["};", "static const unsigned kReplaySlotCount = RSL_COUNT;", "", "static const ReplaySubsystem kReplaySubsystems[] = {"]
     first = 0
     for sub, spec in subsystems.items():

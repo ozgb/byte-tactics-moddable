@@ -1309,6 +1309,34 @@ void __stdcall RecWeaponsUpdateUnitWeapons(Unit* a0)
     }
 }
 
+void __stdcall RecWeaponsWeaponAimCobComplete(Callback* a0, int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_WEAPONS_WEAPONAIMCOBCOMPLETE, SUB_WEAPONS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "callback");
+        ArgValue(s_call, "result", a1);
+    }
+    s_inner_weapons->WeaponAimCobComplete(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecWeaponsCobScriptExplodePiece(CobScript* a0, int a1, unsigned int a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_WEAPONS_COBSCRIPTEXPLODEPIECE, SUB_WEAPONS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "piece", a1);
+        ArgValue(s_call, "flags", a2);
+    }
+    s_inner_weapons->CobScriptExplodePiece(a0, a1, a2);
+    if (scope.Open()) {
+    }
+}
+
 void __stdcall RecTargetingSetWeaponTargetUnit(Unit* a0, Unit* a1, int a2)
 {
     ReplayRoots roots;
@@ -5520,6 +5548,10 @@ void HookSeams(const bool* on)
         s_rec_weapons.RemoveUnitProjectiles = RecWeaponsRemoveUnitProjectiles;
     if (on[SUB_WEAPONS])
         s_rec_weapons.UpdateUnitWeapons = RecWeaponsUpdateUnitWeapons;
+    if (on[SUB_WEAPONS])
+        s_rec_weapons.WeaponAimCobComplete = RecWeaponsWeaponAimCobComplete;
+    if (on[SUB_WEAPONS])
+        s_rec_weapons.CobScriptExplodePiece = RecWeaponsCobScriptExplodePiece;
     if (on[SUB_TARGETING])
         s_rec_targeting.SetWeaponTargetUnit = RecTargetingSetWeaponTargetUnit;
     if (on[SUB_TARGETING])

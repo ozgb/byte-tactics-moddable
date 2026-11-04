@@ -36691,11 +36691,14 @@ address,function,file,kind,target
 0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,field_escape,CobScript::channels
 0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,field_read,Channel::sp
 0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,field_read,CobScript::activeCount
+0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,field_read,Seams::weapons
+0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,field_read,WeaponsSeam::WeaponAimCobComplete
 0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,field_write,Channel::callback
 0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,field_write,Channel::sp
 0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,field_write,Channel::stack
 0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,function,
-0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,indirect_call,virtual Callback::Complete
+0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,global_read,g_seams
+0x4b0b00,CobScript::StartScriptWithArgsByIndex,src/units/cob.cpp,indirect_call,"indirect via void (*)(Callback *, int) __attribute__((stdcall)) [WeaponsSeam::WeaponAimCobComplete]"
 0x4b0bc0,CobScript::QueryScript,src/units/cob.cpp,call,CobScript::FindScript
 0x4b0bc0,CobScript::QueryScript,src/units/cob.cpp,call,CobScript::QueryScriptByIndex
 0x4b0bc0,CobScript::QueryScript,src/units/cob.cpp,function,
@@ -36733,10 +36736,10 @@ address,function,file,kind,target
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,call,CobScript::Wake
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,call,RandomInt
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,call,abs
+0x4b0da0,CobScript::RunThread,src/units/cob.cpp,call,operator Callback *
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,call,operator Piece *
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,call,operator bool
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,call,operator int *
-0x4b0da0,CobScript::RunThread,src/units/cob.cpp,call,operator->
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,deref_read,*int
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,deref_write,*int
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_escape,Channel::stack
@@ -36762,6 +36765,9 @@ address,function,file,kind,target
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_read,Piece::turn
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_read,Piece::turnSpeed
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_read,ScriptTable::code
+0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_read,Seams::weapons
+0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_read,WeaponsSeam::CobScriptExplodePiece
+0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_read,WeaponsSeam::WeaponAimCobComplete
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_write,Channel::axis
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_write,Channel::delay
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_write,Channel::pc
@@ -36781,10 +36787,11 @@ address,function,file,kind,target
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_write,Piece::turn
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,field_write,Piece::turnSpeed
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,function,
-0x4b0da0,CobScript::RunThread,src/units/cob.cpp,indirect_call,virtual Callback::Complete
+0x4b0da0,CobScript::RunThread,src/units/cob.cpp,global_read,g_seams
+0x4b0da0,CobScript::RunThread,src/units/cob.cpp,indirect_call,"indirect via void (*)(Callback *, int) __attribute__((stdcall)) [WeaponsSeam::WeaponAimCobComplete]"
+0x4b0da0,CobScript::RunThread,src/units/cob.cpp,indirect_call,"indirect via void (*)(CobScript *, int, unsigned int) __attribute__((stdcall)) [WeaponsSeam::CobScriptExplodePiece]"
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,indirect_call,virtual CobScript::EmitSfx
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,indirect_call,virtual CobScript::ExplodeLegacy
-0x4b0da0,CobScript::RunThread,src/units/cob.cpp,indirect_call,virtual CobScript::ExplodePiece
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,indirect_call,virtual CobScript::GetPieceRotation
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,indirect_call,virtual CobScript::GetPieceTranslation
 0x4b0da0,CobScript::RunThread,src/units/cob.cpp,indirect_call,virtual CobScript::PlaySoundNoop
@@ -44029,6 +44036,8 @@ address,function,file,kind,target
 ,CobScript::Wake,src/units/cob_script.h,field_read,Channel::waiting
 ,CobScript::Wake,src/units/cob_script.h,field_write,Channel::state
 ,CobScript::Wake,src/units/cob_script.h,function,
+,CobScriptExplodePieceNative,src/seams/native.cpp,function,
+,CobScriptExplodePieceNative,src/seams/native.cpp,indirect_call,virtual CobScript::ExplodePiece
 ,CollectMode,src/host/win32/display.cpp,deref_escape,*host_display_mode
 ,CollectMode,src/host/win32/display.cpp,field_read,DDSURFACEDESC::dwHeight
 ,CollectMode,src/host/win32/display.cpp,field_read,DDSURFACEDESC::dwWidth
@@ -47266,6 +47275,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::AllocWeaponArray
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::ApplyAreaDamageAt
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::ClaimWeapons
+,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::CobScriptExplodePiece
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::DamageUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::DetonateUnitWeapon
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindFeatureAtPos
@@ -47284,6 +47294,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::UpdateExplosions
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::UpdateProjectiles
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::UpdateUnitWeapons
+,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::WeaponAimCobComplete
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::WeaponCanReachPos
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::WeaponCanReachUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::CmdMeteor
@@ -47625,6 +47636,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsAllocWeaponArray
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsApplyAreaDamageAt
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsClaimWeapons
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsCobScriptExplodePiece
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsDamageUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsDetonateUnitWeapon
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindFeatureAtPos
@@ -47643,6 +47655,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsUpdateExplosions
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsUpdateProjectiles
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsUpdateUnitWeapons
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsWeaponAimCobComplete
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsWeaponCanReachPos
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsWeaponCanReachUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsCmdMeteor
@@ -48304,6 +48317,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::AllocWeaponArray
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::ApplyAreaDamageAt
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::ClaimWeapons
+,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::CobScriptExplodePiece
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::DamageUnit
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::DetonateUnitWeapon
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::FindFeatureAtPos
@@ -48322,6 +48336,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::UpdateExplosions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::UpdateProjectiles
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::UpdateUnitWeapons
+,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::WeaponAimCobComplete
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::WeaponCanReachPos
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::WeaponCanReachUnit
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::CmdMeteor
@@ -48393,6 +48408,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdShareMapping
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdShareRadar
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdWeight
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,CobScriptExplodePieceNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ComputeMapChecksumNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountDirectoryEntries
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CreateObjectState
@@ -48692,6 +48708,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateWind
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateWindOnStream
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,VisitObjectsInRangeNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponAimCobCompleteNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponCanReachPos
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponCanReachUnit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WriteBufferToFile
@@ -54397,6 +54414,16 @@ address,function,file,kind,target
 ,RecWeaponsClaimWeapons,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWeaponsClaimWeapons,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsClaimWeapons,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
+,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,call,Add
+,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,call,ArgObject
+,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,call,ArgValue
+,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,field_read,WeaponsSeam::CobScriptExplodePiece
+,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,function,
+,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,global_read,s_call
+,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,global_read,s_inner_weapons
+,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(CobScript *, int, unsigned int) __attribute__((stdcall)) [WeaponsSeam::CobScriptExplodePiece]"
 ,RecWeaponsDamageUnit,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsDamageUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsDamageUnit,src/harness/replay_hooks.inc,call,ArgValue
@@ -54564,6 +54591,15 @@ address,function,file,kind,target
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [WeaponsSeam::UpdateUnitWeapons]
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,call,ArgPending
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,call,ArgValue
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,field_read,WeaponsSeam::WeaponAimCobComplete
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,function,
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,global_read,s_call
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,global_read,s_inner_weapons
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Callback *, int) __attribute__((stdcall)) [WeaponsSeam::WeaponAimCobComplete]"
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ArgPending
@@ -58120,6 +58156,8 @@ address,function,file,kind,target
 ,WalkFields,src/harness/replay_objects.cpp,function,
 ,WalkFields,src/harness/replay_objects.cpp,global_read,kReplayObjectFields@src/harness/replay_schema.h
 ,Walkable,src/harness/replay_objects.cpp,function,
+,WeaponAimCobCompleteNative,src/seams/native.cpp,function,
+,WeaponAimCobCompleteNative,src/seams/native.cpp,indirect_call,virtual Callback::Complete
 ,WhereText,src/wasm/modules.cpp,call,sprintf
 ,WhereText,src/wasm/modules.cpp,call,strcat
 ,WhereText,src/wasm/modules.cpp,call,strlen

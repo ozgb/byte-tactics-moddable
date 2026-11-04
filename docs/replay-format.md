@@ -41,9 +41,10 @@ call and has no line of its own. The lines of a call, indented by two spaces, in
 | Line | Meaning |
 |---|---|
 | `r <field> <value>` | a field of the slot's read set that differs from the last known value of that field |
-| `a <name> <value>` | an argument of the slot that is not in the block (`params.radius`, `bank`, `args[0]`, `stream`, a scalar, `player`) |
+| `a <name> <value>` | an argument of the slot that is not in the block (`params.radius`, `bank`, `args[0]`, `stream`, a scalar, `player`, a callback `done callback#3`) |
 | `i <import> <arguments> = <result>` | one import call, in call order; its index is its position among the `i` lines of the call |
 | `c <handle>#<n>.<Method> <arguments> [= <result>]` | indented by four spaces, right after an `i` line and before its `o` lines: one call the import made on a callback object it was given, in call order (see Callbacks) |
+| `c <handle>#<n>.<Method> <arguments> [= <result>]` | indented by two spaces, after the `i` lines and before the closing `o` lines: one call the module made during the slot on a callback object it holds or was given, in call order (see Callbacks, "A callback held in state") |
 | `o <name> <value>` | right after an `i` line: a value the import wrote through a pointer argument (`o dst "text"`, `o dst x:0102`) or reached through its result (`o weapondef#17.flags 0x00000001`, `o Cell#1.metal 12`) |
 | `w <field> <value>` | a field of the slot's write set that differs from the last known value after the call |
 | `o <name> <value>` | last in the call: a value the slot wrote through its own pointer argument, or `o result <value>` for its result |
@@ -558,6 +559,60 @@ matched the `i` line and before it applies the `o` lines. It compares each resul
 `<import>.c[<k>]` (`import 0 map.VisitObjectsInRange.c[1]: recorded 0, replayed 1`), and a call recorded on another handle than the
 object's at the same place.
 
+### A callback held in state
+
+A callback object can also be state the module keeps: the argument of a slot (`StartScript` takes a `Callback*` and the channel it starts calls back when the
+script ends), or a pointer in an object (`Weapon::aimCob`). Two forms name one.
+
+A slot argument of mode `callback` (the same note as an import's, `{"mode": "callback", "callback": "Callback"}`) is `a <name> <handle>#<n>`, or `a <name> null`.
+A `ref` or `ptr` field that holds one has a `callback` key and no `target`, which names the interface and keeps `target` for an array of block-held structs:
+
+```json
+{"name": "hook", "kind": "ptr", "callback": "Callback"}
+{"name": "link", "kind": "ref", "callback": "Callback"}
+```
+
+It is written `callback#2` or `null` in an `r`, `w` or `o` line, as `Kind#N` is, and the walk does not follow it. The tool rejects `callback` on any other
+field kind (the key of a `ref` field of `Game`, the `elem` of a vector, a result, an argument of another mode), on a field of a value kind, and with a
+`target`; it checks the interface against `callbacks` and, in the generated tables, that the member is a `Callback*` for a `ptr` and a `Ref<Callback>` for a `ref`.
+The field kinds are `RK_CBPTR` and `RK_CBREF` there, and a `when` cannot read through one.
+
+The handle is numbered as the handles of an import are, by first use in the outermost call, and an object is named once, by the line that first
+names it (`r FixtureNotify#1.hook callback#1`, `a done callback#3`). The replayer binds `callback#N` when it parses that line, not when the module first
+calls it, so a restored object has the number the recorder gave it. The numbers belong to one call: the replayer builds a new object for each handle of each
+call, so a call whose module calls a held callback has the `r` or `a` line that names it.
+
+The calls the module makes on the object during the slot are `c` lines indented by two spaces, as the `a` and `r` lines are, after the `i` lines and before
+the closing `o` lines, with the arguments and result the `c` lines of an import have:
+
+```
+  r FixtureNotify#1.hook callback#1
+  a holder FixtureNotify#1
+  a done callback#3
+  c callback#1.Complete 5
+  c callback#3.Complete 10
+  o result 5
+```
+
+The replayer builds the object itself, one class per interface that the tool writes into `tests/replay_callbacks.h` (`ReplayHeldCallback`: the methods of the
+interface, each recording its call, the object in the block so that a `Ref` can name it), and stores it in the field or passes it to the slot. Each call
+the module makes on it is written as the recorder writes it, named by handle, method and arguments, and returns the result of the recording's call at that
+position (an empty one when there is none). After the slot returns, the replayer compares each object's calls with the `c` lines of its handle, in order,
+and reports a difference at `<handle>#<n>.<Method>`:
+
+```
+callback#3.Complete: recorded Complete 11, replayed Complete 10
+callback#1.Complete: recorded Complete 5, replayed no call (missing)
+callback#3.Complete: recorded no call (extra), replayed Complete 10
+```
+
+A `c` line whose handle no `r` or `a` line of the call names is fatal, as is a call on a callback object that none of the call's lines named.
+The result a held object returns is the recorded one, so it is not compared; the module's behaviour after it is, through the `w` and `o` lines.
+
+The recorder writes the `a` line of a slot argument, opens a scope for the slot (the object's vptr is the recorder's while the slot runs, as for an import)
+and writes its calls as these `c` lines, and writes the `r` value of a field. It opens no scope for an object that only a field holds, so the calls it gets
+are not recorded until a real site is annotated (#714).
+
 ## Vectors
 
 A field that is a `BlockVector<T>` (the first, last and end words of the block heap, 16 bytes with its padding) is a field of kind
@@ -725,6 +780,7 @@ sets). The annotations hold what no header says:
 | `weapon` | `WeaponDef*` | `weapondef#17` |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for an import that reads only those (`GetGroundHeight`); with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
 | `callback` | `UnitVisitor*` and the like, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
+| `callback` | `Callback*` and the like, a slot's argument | `a done callback#3` or `a done null`, and a `c` line for each call the module made on it during the slot (see "A callback held in state") |
 | `vector` (`dir: out`) | `std::vector<Point16>*` an import fills, `{"mode": "vector", "dir": "out", "elem": {"mode": "value", "kind": "Point16"}}` | `o goals [(3,4),(5,6)]` after the import line: the whole vector, each element as the by-value form writes it, `[]` when it is empty; the stub pushes the elements |
 | `units` (`dir: out`) | `std::vector<Unit*>*` an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
@@ -771,12 +827,13 @@ Each slot of `fixtures` is classified as a slot of a subsystem is, and the tool 
 is exercised by the tests and `replayschema.py --check` keeps them current:
 
 - `tests/replay_shapes.h`: the import stub of the slot (`Imp_fixture_<Slot>`, which the self-tests call as the module would), and, for a slot whose
-  arguments the runner can pass (the modes `scalar`, `stream`, `text`, `handle`, `object`, `struct`, `structs`, `value` and `argv`, with a scalar, object or value result),
+  arguments the runner can pass (the modes `scalar`, `stream`, `text`, `handle`, `object`, `struct`, `structs`, `value`, `argv` and `callback`, with a scalar, object or value result),
   its runner `Run_fixture_<Slot>` and `After_fixture_<Slot>`, which call `Native_fixture_<Slot>`, a function that `tests/replay_native_test.cpp` defines. A self-test loads the
   lines of a call, runs the pair and checks `g_diffs` and the first key.
 - `tests/replay_fixture_hooks.inc`: the recording wrapper of the slot (`RecFixture<Slot>`) and a `FixtureSeam` table of them. `tests/replay_fixture_recorder.cpp` includes
   `replay.cpp` with `BT_REPLAY_FIXTURES` defined and then this file in a second anonymous namespace, so the wrappers are compiled with the recorder's own helpers.
-  The translation unit is a compile check, built by the `replay_native_test` target and linked into no exe.
+  The translation unit is a compile check, built by the `replay_native_test` target and linked into no exe. A fixture slot with a `callback` argument is
+  wrapped as a slot (the `a` line and the `c` lines of the slot); any other is wrapped as an import, whose lines the stub reads.
 
 ### Services
 
@@ -903,7 +960,8 @@ chunks, deltas and a null, for an object and a block field, with a changed eleme
 struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
 `Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
 is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and raw pointer fields (a `Handle` whose `src` is a `ptr`, rebuilt and compared, with a changed `src` reported at `Handle#1.src`; a `ptr` to an object no line named, restored to an empty copy) and masked views (a union whose live view switches on a masked bit, or on a bit of another object, with the dead view neither written, compared nor restored) and an object embedded at two sites (named by its site in the walk and in a service line, and restored inside its container) and services (the files, commands, sim plumbing, load reads and GAF cursors, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
-second object, with a changed result reported at `import 0 fixture.Scan.c[0]`). Three
+second object, with a changed result reported at `import 0 fixture.Scan.c[0]`) and callbacks held in state (a `FixtureNotify` whose `ptr` and `ref` hold a callback and a slot
+that gets a third: the module's calls on them replay equal, and a different, a missing, an extra and a misplaced call are each reported at `callback#3.Complete`). Three
 more use the `Fixture*` kinds: a table with a capacity (`FixtureEye`, written past its live count, restored without a store into the count, allocated by the module's `operator new`
 and freed by the test with `operator delete`), pointers into an object's own members (a `FixtureEye` moved by assignment between calls, and a `FixtureHeap` whose `top` is an index into its
 own `pool`, which the module grows), and a write to a `Game` field through a pointer, reported at the field. With a

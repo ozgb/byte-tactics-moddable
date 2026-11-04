@@ -403,8 +403,8 @@ scenarios with it.
 resolves the sites with the linker map beside the exe
 (`build/modern/TotalA.map`) and compares every row with `data/block_pointers.csv`, after printing the trace
 results. A word whose holder the file has no wildcard row for (see below), or a scenario with no `blockptrs.txt`,
-is printed (scenario, holder, offset, target) and `--check` exits 1. `--tier` does not check the pointers: the names of repeated sites are numbered over the scenarios played, so the
-tier prints `block pointers: full suite only` and the full `--check` is where they are checked.
+is printed (scenario, holder, offset, target) and `--check` exits 1. `--tier` checks the pointers of its scenarios the same way: a site is named by its rank among its function's
+allocator calls in the exe, not by the scans, so a tier run names its rows as the full suite does.
 `--save-blockptrs <dir>` writes each scenario's file to `<dir>/<scenario>.txt`, and
 `uv run tools/blockpointers.py --from <dir>` regenerates the data file from them, keeping the hand-set `class` and
 `note` columns; without `--from` it plays the suite itself with the scan on every tick, which is how the list
@@ -458,20 +458,27 @@ it compares the runs that differed.
 uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta
 ```
 
-`--tier` is the same `--check` restricted to the 26 scenarios of the `GATE_TIER` constant of
-`tools/reference.py`, 37750 ticks of the suite's 322,770 (11.7%), none longer than 12,600. It is the
+`--tier` is the same `--check` restricted to the 30 scenarios of the `GATE_TIER` constant of
+`tools/reference.py`, 33,910 ticks of the suite's 324,610 (10.4%), none longer than 9000. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how
 many scenarios were equal and at which commit; a failure prints the same `tools/tracediff.py` report
-as the full run. `--tier` goes with `--check` and `--exe`, and `--traces` rejects it. It does not
-check the block pointers, since repeated sites are numbered over the scenarios played; the full
-suite does.
+as the full run. `--tier` goes with `--check` and `--exe`, and `--traces` rejects it. It checks the
+block pointers of its scenarios against data/block_pointers.csv, since the names do not depend on the scenarios played.
 
 The tier was chosen greedily from a coverage run of the suite (tools/coverage.py): the scenario
-adding the most lines per tick (a floor of 600 ticks each), until one adds fewer than 20, with at
-least one game of 8 players. `uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir
+adding the most lines per tick (a floor of 600 ticks each), until one adds fewer than 20, starting
+from the forced 8-player game `eight-full-moon` and leaving out every scenario longer than 9000 ticks
+(`--choose-tier --eight eight-full-moon --max-ticks 9000`). The rule's pick differs from the earlier 26:
+the `ui-*` scenarios (`ui-keys`, `ui-groups`, `ui-build-menu`, `ui-build-place`,
+`ui-left-click-orders`) come in, and `eight-pincushion-teams` (12,600 ticks) and `orders-factory` go out. `uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir
 ~/.ta --tier` plays the tier on the coverage build, prints its lines and functions as a share of the
 full suite's in `data/coverage.csv`, and exits 1 below 96% of the lines. Run it when a scenario is
 added or removed and when the tier changes.
+
+`uv run tools/coverage.py --exe build/coverage/TotalA.exe --choose-tier` (`--runs DIR`, `--max-ticks N`, `--eight NAME`) plays
+nothing: it reproduces this rule from the per-scenario profiles a coverage run left in `build/coverage-run/` and prints the
+scenarios it takes, with their players, ticks and new lines, and their lines and functions as a share of the union of every
+scenario's. `--max-ticks` leaves out the scenarios longer than N ticks; `--eight` takes the named 8-player game first, as the only one.
 
 `uv run tools/coverage.py --slots ai` (repeatable, or `all`; `--runs DIR`, `--json FILE`) plays nothing: it reads the per-scenario
 profiles a coverage run left in `build/coverage-run/` and prints, for each slot of `interfaces/ai.h`, the scenarios that enter
@@ -488,7 +495,7 @@ upper bound. Replay parts pick their recordings from it.
 | console-features | 2 | 300 |
 | console-sight | 2 | 200 |
 | console-units | 2 | 300 |
-| eight-pincushion-teams | 8 | 12600 |
+| eight-full-moon | 8 | 9000 |
 | hailstorm-los-off | 2 | 150 |
 | load-midgame | 0 | 900 |
 | mission-radius | 0 | 2700 |
@@ -497,7 +504,6 @@ upper bound. Replay parts pick their recordings from it.
 | orders-air-fights | 2 | 1500 |
 | orders-air-repair | 2 | 900 |
 | orders-build-patrol | 2 | 600 |
-| orders-factory | 2 | 1500 |
 | orders-guard-attacked | 2 | 600 |
 | orders-guard-reclaim | 2 | 600 |
 | orders-immediate | 2 | 1000 |
@@ -506,6 +512,11 @@ upper bound. Replay parts pick their recordings from it.
 | orders-tier2-vader | 2 | 420 |
 | save-midgame | 2 | 1800 |
 | sensors-floating-teeth-los-off | 2 | 400 |
+| ui-build-menu | 2 | 200 |
+| ui-build-place | 2 | 200 |
+| ui-groups | 2 | 300 |
+| ui-keys | 2 | 300 |
+| ui-left-click-orders | 2 | 260 |
 | units-transport-ship | 2 | 200 |
 
 `tools/tracediff.py --ignore-view-seed` accepts traces whose headers differ only

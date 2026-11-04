@@ -747,11 +747,25 @@ class GateTierTest(unittest.TestCase):
         self.assertIn("gate tier passed: 26 scenarios equal at 0123456789ab", text)
         self.assertNotIn("not the gate", text)
 
-    def test_block_pointers_are_left_to_the_full_suite(self):
+    def test_block_pointers_are_checked_on_the_tier(self):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), mock.patch.object(reference.blockpointers, "check_scans", return_value=[]) as check:
+            self.assertEqual(reference.report_block_pointers(Path("TotalA.exe"), {"a": "text"}, None), 0)
+        check.assert_called_once()
+        self.assertEqual(out.getvalue().strip(), "block pointers: all covered by data/block_pointers.csv (1 scenarios)")
+
+    def test_a_scan_row_the_csv_does_not_cover_fails(self):
+        out = io.StringIO()
+        missing = ["a: holder not listed: 0x1234 at 0x4 -> T"]
+        with contextlib.redirect_stdout(out), mock.patch.object(reference.blockpointers, "check_scans", return_value=missing):
+            self.assertEqual(reference.report_block_pointers(Path("TotalA.exe"), {"a": "text"}, None), 1)
+        self.assertIn("BLOCK POINTER a: holder not listed", out.getvalue())
+
+    def test_a_scenario_with_no_scan_fails(self):
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            self.assertEqual(reference.report_block_pointers(Path("TotalA.exe"), {}, True, None), 0)
-        self.assertEqual(out.getvalue().strip(), "block pointers: full suite only")
+            self.assertEqual(reference.report_block_pointers(Path("TotalA.exe"), {"a": None}, None), 1)
+        self.assertIn("a: no blockptrs.txt", out.getvalue())
 
 
 class CheckStopsAtFirstDifferenceTest(unittest.TestCase):

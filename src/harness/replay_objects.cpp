@@ -562,20 +562,6 @@ bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, Rep
     case RK_UNITID:
         out.AddUnsigned(*(const unsigned short*)at);
         break;
-    case RK_RAWBYTES: {
-        const unsigned char* bytes = *(const unsigned char* const*)at;
-        if (bytes == nullptr) {
-            out.Add("null");
-            break;
-        }
-        char hex[4];
-        out.Add("x:");
-        for (unsigned i = 0; i < f.size; i++) {
-            sprintf(hex, "%02x", bytes[i]);
-            out.Add(hex);
-        }
-        break;
-    }
     case RK_ARRAY:
         FormatArray(f, object, out);
         break;
@@ -719,26 +705,6 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
         return false;
     case RK_CODE:
         return RestoreCode(f, value, (const void**)at);
-    case RK_RAWBYTES: {
-        unsigned char** slot = (unsigned char**)at;
-        if (strcmp(value, "null") == 0) {
-            *slot = nullptr;
-            break;
-        }
-        if (*slot == nullptr) {
-            if (alloc == nullptr)
-                return false;
-            *slot = (unsigned char*)alloc(f.size);
-            memset(*slot, 0, f.size);
-        }
-        if (strncmp(value, "x:", 2) != 0)
-            return false;
-        for (unsigned i = 0; i < f.size && strlen(value + 2 + i * 2) >= 2; i++) {
-            const char* h = value + 2 + i * 2;
-            (*slot)[i] = (unsigned char)((h[0] <= '9' ? h[0] - '0' : h[0] - 'a' + 10) << 4 | (h[1] <= '9' ? h[1] - '0' : h[1] - 'a' + 10));
-        }
-        break;
-    }
     case RK_FLAGS:
         *(unsigned*)at = strncmp(value, "0x", 2) == 0 ? ParseHex8(value + 2) : 0;
         break;

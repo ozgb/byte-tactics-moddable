@@ -125,6 +125,7 @@
 #include "../units/unit.h"
 #include "../units/unit_def.h"
 #include "../units/unit_script.h"
+#include "../units/unit_type_set.h"
 #include "../util/angles.h"
 #include "../util/mouse_event.h"
 #include "../util/point.h"
@@ -2552,6 +2553,8 @@ static_assert(sizeof(UnitScript) == 1348, "");
 static_assert(offsetof(UnitScript, state) == 1344, "");
 static_assert(sizeof(UnitTypeInt) == 4, "");
 static_assert(offsetof(UnitTypeInt, unknown_0) == 0, "");
+static_assert(sizeof(UnitTypeSet) == 64, "");
+static_assert(offsetof(UnitTypeSet, bits) == 0, "");
 static_assert(sizeof(V4i) == 16, "");
 static_assert(offsetof(V4i, data1) == 0, "");
 static_assert(offsetof(V4i, data2) == 4, "");

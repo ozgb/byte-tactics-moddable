@@ -3406,7 +3406,7 @@ static void VisitUnitDefs()
         VisitU32(path, idCount);
         VisitRaw(path, (const unsigned char*)ids, idCount * 2);
         for (unsigned m = 0; m < 4; m++) {
-            unsigned mask = ReadU32At((unsigned)d, m < 3 ? DEF_WEAPON_CATEGORIES + m * 4 : DEF_CATEGORIES);
+            unsigned mask = ReadRefAt((unsigned)d, m < 3 ? DEF_WEAPON_CATEGORIES + m * 4 : DEF_CATEGORIES);
             FormatPath(path, "defs[%u].categories[%u]", i, m);
             HashByte(mask != 0);
             if (mask != 0)

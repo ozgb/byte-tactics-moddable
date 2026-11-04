@@ -58,7 +58,7 @@ BLOCK_KINDS = {"field_read": "r", "field_write": "w", "global_read": "r", "globa
 OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "rw"}
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
-               "unitid": "UNITID", "rawbytes": "RAWBYTES", "array": "ARRAY", "code": "CODE"}
+               "unitid": "UNITID", "array": "ARRAY", "code": "CODE"}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?(\w+)(?:>>(\d+))?\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
@@ -951,8 +951,6 @@ def render_schema(ann: dict, model: dict) -> str:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s has the size of its kind");' % (t, member, types[f["target"]], t, f["name"]))
         elif f["kind"] == "bytes":
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, f["size"], t, f["name"]))
-        elif f["kind"] == "rawbytes":
-            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a pointer");' % (t, member, t, f["name"]))
         elif f["kind"] == "array":
             continue
         elif f["kind"] == "code":

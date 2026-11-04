@@ -7,6 +7,7 @@
 
 struct WeaponDef;
 class MovementClass;
+class UnitTypeSet;
 
 class UnitDef {
 public:
@@ -151,8 +152,8 @@ public:
     unsigned char buildMenuPageCount;
     unsigned char mobile;
     char defaultmissiontype;
-    unsigned int* weaponCategories[3];
-    unsigned int* categories;
+    Ref<UnitTypeSet> weaponCategories[3];
+    Ref<UnitTypeSet> categories;
     union {
         unsigned int flags1;
         unsigned char flags1Byte;

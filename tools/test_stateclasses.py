@@ -36,6 +36,7 @@ LAYOUT = """*** Dumping AST Record Layout
 
 SOURCE = """struct Settings { int speed; int volume; };
 struct Unit { int hp; Settings settings; Unit* next; int pad[2]; };
+struct Mask { int bits[16]; };
 struct Game { char unknown_0[4]; int tick; int more; char blob[100]; char small[4]; };
 extern "C" { void* malloc(unsigned); void* calloc(unsigned, unsigned); }
 void* operator new(unsigned, void* where) { return where; }
@@ -78,6 +79,7 @@ void StoreStatic() { static char* s; s = (char*)malloc(32); }
 void StoreLocal() { char* b; b = (char*)malloc(32); (void)b; }
 template <class T> struct Ref { unsigned offset; Ref() = default; Ref(T* p) { offset = (unsigned)p; } T* get() const { return (T*)offset; } };
 struct Slots { Ref<char> cells; };
+struct Holder { Mask* raw; Ref<Mask> ref; Ref<Mask> refs[3]; int* other; Mask direct; };
 void StoreRef(Slots* s, unsigned n) { s->cells = new (kSim) char[n]; }
 char g_end[4];
 long Bound() { char* p = 0; return (long)p < (long)g_end; }
@@ -167,6 +169,10 @@ class ScanTest(unittest.TestCase):
         self.assertEqual(self.scan["fields"]["Unit"], {"hp": "int", "settings": "Settings", "next": "",
                                                        "pad": "int"})
 
+    def test_pointer_fields_name_the_record_they_point_at_through_a_pointer_or_a_ref(self):
+        self.assertEqual(self.scan["pointers"]["Holder"], {"raw": "Mask", "ref": "Mask", "refs": "Mask", "other": "int"})
+        self.assertEqual(self.scan["pointers"]["Unit"], {"next": "Unit"})
+
     def test_new_and_new_array_sites(self):
         self.assertEqual([(a, w) for a, w, *_ in self.by_name["Plain"]["allocs"]], [("new", "Unit"), ("new[]", "Unit")])
 
@@ -225,6 +231,27 @@ def ev(**kw):
     values["has_write"] = values["has_write"] or bool(values["phases_write"] or values["load_write"]
                                                       or values["pres_write"] or values["other_write"])
     return sc.Evidence(**values)
+
+
+class ThroughPointersTest(unittest.TestCase):
+    POINTERS = {"Holder": {"raw": "Mask", "ref": "Mask", "other": "int"}}
+
+    def items(self, *rows):
+        return sc.Items([["", function, "a.cpp", kind, target] for function, kind, target in rows], [])
+
+    def test_a_reader_of_a_pointer_reads_what_it_points_at(self):
+        items = self.items(("Find", "field_read", "Holder::raw"), ("Scan", "field_read", "Holder::ref"))
+        self.assertEqual(sc.read_through_pointers(items, self.POINTERS, "Mask").reads, {"Find", "Scan"})
+
+    def test_a_write_of_a_pointer_is_no_write_of_the_object(self):
+        items = self.items(("Load", "field_write", "Holder::raw"), ("Load", "field_maybe_written", "Holder::ref"))
+        total = sc.read_through_pointers(items, self.POINTERS, "Mask")
+        self.assertEqual((total.reads, total.writes), (set(), {}))
+
+    def test_a_pointer_to_another_record_or_a_primitive_is_not_followed(self):
+        items = self.items(("Find", "field_read", "Holder::raw"), ("Peek", "field_read", "Holder::other"))
+        self.assertEqual(sc.read_through_pointers(items, self.POINTERS, "Other").reads, set())
+        self.assertEqual(sc.read_through_pointers(items, self.POINTERS, "int").reads, set())
 
 
 class RuleTest(unittest.TestCase):

@@ -1338,7 +1338,6 @@ address,function,file,kind,target
 0x4061a0,ParkOrder,src/orders/unit_orders.cpp,field_write,Order::pos
 0x4061a0,ParkOrder,src/orders/unit_orders.cpp,function,
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,AppendOrder
-0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,Contains
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,GetOrderType
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,IssueAttackOrder
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,Offset
@@ -1349,6 +1348,7 @@ address,function,file,kind,target
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,Order::Target
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,UnitTypeSet::Contains
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,get
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,operator Order *
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,operator Unit *
@@ -1549,9 +1549,9 @@ address,function,file,kind,target
 0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,field_write,UnitNetDirtyFlagsView::flag5
 0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,field_write,UnitNetDirtyFlagsView::flag6
 0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,function,
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,Contains
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,RandomInt
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,RecordUnitSpeech
+0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,UnitTypeSet::Contains
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,operator bool
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,operator->
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_escape,Unit::weapons
@@ -1979,8 +1979,8 @@ address,function,file,kind,target
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetPos]"
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
-0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,Contains
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,RetargetWeapon
+0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,UnitTypeSet::Contains
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,operator Unit *
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,operator bool
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,operator!=
@@ -2502,19 +2502,16 @@ address,function,file,kind,target
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,field_read,Vec::z
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,function,
 0x40b530,GetFactoriesInRadius,src/ai/ai_player.cpp,global_read,g_playerAI
-0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,Bits::Test
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,RandomInt
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,UnitSwapEraseVector::EraseSwapBack
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,UnitTypeSet::Contains
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,begin
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,empty
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,operator->
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,size
-0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,deref_read,*Bits
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,deref_read,*Unit
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,deref_read,*unsigned char
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_escape,Unit::pos
-0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_escape,UnitDef::categories
-0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_escape,UnitDef::weaponCategories
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,AiSeam::GetVisibleEnemiesInRadius
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Game::matchFlags
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Player::active
@@ -2527,8 +2524,10 @@ address,function,file,kind,target
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Unit::player
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Unit::playerIndex
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Unit::unitDefIndex
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,UnitDef::categories
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,UnitDef::flags1
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,UnitDef::range
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,UnitDef::weaponCategories
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Vec3::x
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Vec3::z
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,WeaponsSeam::GetWeaponRange
@@ -3291,7 +3290,6 @@ address,function,file,kind,target
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,AddVec3
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,AppendOrder
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,AppendOrderToTail
-0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,Contains
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,Direction
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,GetHeadingBetween
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,GetOrderType
@@ -3305,6 +3303,7 @@ address,function,file,kind,target
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
+0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,UnitTypeSet::Contains
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,get
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,operator WeaponDef *
@@ -9425,7 +9424,7 @@ address,function,file,kind,target
 0x42be30,AddDownloadBuildOptions,src/units/unit_types.cpp,global_read,g_game
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,FindMovementClass
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,FixedField
-0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,GetCategoryMask
+0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,GetLoadCategoryMask
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,GetLocalizedString
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,MovementClass::ReadMoveInfo
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,MovementClass::~MovementClass
@@ -27731,6 +27730,8 @@ address,function,file,kind,target
 0x488b10,FindUnitTypeId,src/units/unit_commands.cpp,global_read,g_game
 0x488be0,InitUnitCategories,src/units/unit_commands.cpp,function,
 0x488be0,InitUnitCategories,src/units/unit_commands.cpp,global_write,g_mapLoadFlag
+0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,call,SimFree
+0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,call,SimOwns
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,call,begin
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,call,clear
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,call,end
@@ -27739,10 +27740,10 @@ address,function,file,kind,target
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,function,
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,global_maybe_written,s_unitCategories@src/units/unit_commands.cpp
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,global_write,g_mapLoadFlag
+0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,LowerBoundCategory
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,StringRef::~StringRef
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,UnitCategory::~UnitCategory
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,_strcmpi
-0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,begin
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,end
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,insert
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,operator new
@@ -27751,7 +27752,7 @@ address,function,file,kind,target
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,function,
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,global_maybe_written,s_unitCategories@src/units/unit_commands.cpp
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,call,FindByName
-0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,call,GetCategoryMask
+0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,call,FindCategoryMask
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,call,get
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,deref_write,*int
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,field_read,Game::defs
@@ -27761,11 +27762,11 @@ address,function,file,kind,target
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,field_write,UnitTypeSet::bits
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,function,
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,global_read,g_game
-0x488e70,UnitDef::AddToCategories,src/units/unit_types.cpp,call,GetCategoryMask
+0x488e70,UnitDef::AddToCategories,src/units/unit_types.cpp,call,GetLoadCategoryMask
 0x488e70,UnitDef::AddToCategories,src/units/unit_types.cpp,call,bx_sscanf
-0x488e70,UnitDef::AddToCategories,src/units/unit_types.cpp,deref_read,*unsigned int
-0x488e70,UnitDef::AddToCategories,src/units/unit_types.cpp,deref_write,*unsigned int
 0x488e70,UnitDef::AddToCategories,src/units/unit_types.cpp,field_read,UnitDef::id
+0x488e70,UnitDef::AddToCategories,src/units/unit_types.cpp,field_read,UnitTypeSet::bits
+0x488e70,UnitDef::AddToCategories,src/units/unit_types.cpp,field_write,UnitTypeSet::bits
 0x488e70,UnitDef::AddToCategories,src/units/unit_types.cpp,function,
 0x488f30,GetEnergyUse,src/units/unit_commands.cpp,field_read,Game::tidal
 0x488f30,GetEnergyUse,src/units/unit_commands.cpp,field_read,Game::windStrength
@@ -27847,6 +27848,7 @@ address,function,file,kind,target
 0x489690,PathOrderAttach::SetUnit,src/units/unit_targets.cpp,field_write,PathOrderAttach::owner
 0x489690,PathOrderAttach::SetUnit,src/units/unit_targets.cpp,field_write,Unit::head
 0x489690,PathOrderAttach::SetUnit,src/units/unit_targets.cpp,function,
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,call,get
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,call,operator Unit *
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,call,operator bool
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,call,operator!=
@@ -27857,13 +27859,16 @@ address,function,file,kind,target
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,deref_write,*Ref<UnitRef>
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_escape,Unit::head
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_escape,UnitRef::next
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_read,OrdersSeam::OrderOrStatusFlags
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_read,Seams::orders
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_read,UnitRef::listener
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_read,UnitRef::next
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_read,UnitRef::owner
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_write,UnitRef::next
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,field_write,UnitRef::owner
 0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,function,
-0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,indirect_call,virtual OrderBase::OrStatusFlags
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,global_read,g_seams
+0x4896f0,UnitRef::ClearRef,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,call,get
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,call,operator Unit *
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,call,operator bool
@@ -27875,6 +27880,8 @@ address,function,file,kind,target
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,deref_write,*Ref<UnitRef>
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_escape,Unit::head
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_escape,UnitRef::next
+0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_read,OrdersSeam::OrderOrStatusFlags
+0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_read,Seams::orders
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_read,Unit::head
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_read,UnitRef::listener
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_read,UnitRef::next
@@ -27882,16 +27889,19 @@ address,function,file,kind,target
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_write,UnitRef::next
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,field_write,UnitRef::owner
 0x489740,ClearUnitRefs,src/units/unit_targets.cpp,function,
-0x489740,ClearUnitRefs,src/units/unit_targets.cpp,indirect_call,virtual OrderBase::OrStatusFlags
+0x489740,ClearUnitRefs,src/units/unit_targets.cpp,global_read,g_seams
+0x489740,ClearUnitRefs,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,get
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,operator UnitRef *
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,operator bool
-0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,call,operator->
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,OrdersSeam::OrderOrStatusFlags
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,Seams::orders
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,Unit::head
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,UnitRef::listener
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,field_read,UnitRef::next
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,function,
-0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,indirect_call,virtual OrderBase::OrStatusFlags
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,global_read,g_seams
+0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 0x4897e0,Unit::ChooseWeapon,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::flags
 0x4897e0,Unit::ChooseWeapon,src/units/unit_targets.cpp,function,
 0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,call,Unit::ReleaseWeapons
@@ -28395,23 +28405,26 @@ address,function,file,kind,target
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,RecordUnitSpeech
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,Unit::GetState
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,get
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator OrderBase *
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator PathOrderAttach *
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator bool
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,call,operator->
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,NetworkSeam::SendActivateFlags
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,OrdersSeam::OrderOrStatusFlags
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,PathOrderAttach::next
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,PathOrderAttach::value
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Player::active
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Player::type
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Seams::network
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Seams::orders
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Unit::head
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Unit::player
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_read,Unit::script
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,field_write,Unit::activateFlags
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,function,
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,global_read,g_seams
+0x48b090,Unit::SetStateBits,src/units/unit.cpp,indirect_call,"indirect via void (*)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [NetworkSeam::SendActivateFlags]
-0x48b090,Unit::SetStateBits,src/units/unit.cpp,indirect_call,virtual OrderBase::OrStatusFlags
 0x48b200,WriteUnitState,src/units/unit_position.cpp,call,BitWriter::GrowBuffer
 0x48b200,WriteUnitState,src/units/unit_position.cpp,call,BitWriter::WriteBits
 0x48b200,WriteUnitState,src/units/unit_position.cpp,call,operator bool
@@ -28523,7 +28536,6 @@ address,function,file,kind,target
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator Unit *
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator UnitMotion *
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator bool
-0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator->
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator=
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator==
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,deref_escape,*Unit
@@ -28532,6 +28544,7 @@ address,function,file,kind,target
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_escape,Unit::angles
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Game::maxUnitsSetting
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Game::unitDefCountBits
+0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,OrdersSeam::UnitMotionReadNetState
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,OrdersSeam::UpdateMotion
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Player::unitsBegin
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Player::unitsEnd
@@ -28542,7 +28555,6 @@ address,function,file,kind,target
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Unit::playerIndex
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Unit::pos
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,Unit::unitDefIndex
-0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_read,UnitMotion::player
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_write,<anon>::dword
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_write,BitReader::bit
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_write,BitReader::data
@@ -28554,8 +28566,8 @@ address,function,file,kind,target
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,field_write,Spawn::type
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,function,
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,global_read,g_seams
+0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,indirect_call,"indirect via void (*)(UnitMotion *, BitReader *) __attribute__((stdcall)) [OrdersSeam::UnitMotionReadNetState]"
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,indirect_call,"indirect via void (*)(UnitMotion *, int, Unit *) __attribute__((fastcall)) [OrdersSeam::UpdateMotion]"
-0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,indirect_call,virtual MotionSerializer::ReadFrom
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,call,GetMapCellAtPosition
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,call,IsUnitVisibleToPlayer
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp,call,operator Unit *
@@ -43387,9 +43399,6 @@ address,function,file,kind,target
 ,BitReader::ReadBit,interfaces/services.h,field_write,BitReader::bit
 ,BitReader::ReadBit,interfaces/services.h,field_write,BitReader::index
 ,BitReader::ReadBit,interfaces/services.h,function,
-,Bits::Test,src/units/unit_targets.cpp,deref_read,*unsigned int
-,Bits::Test,src/units/unit_targets.cpp,field_read,Bits::words
-,Bits::Test,src/units/unit_targets.cpp,function,
 ,BlockAt,src/harness/replay_objects.cpp,call,SimBlockBase
 ,BlockAt,src/harness/replay_objects.cpp,function,
 ,BlockBase,src/harness/replay.cpp,field_read,ReplayField::base
@@ -44188,12 +44197,6 @@ address,function,file,kind,target
 ,ConsoleWordIsUnitType,src/harness/harness.cpp,call,GameU32
 ,ConsoleWordIsUnitType,src/harness/harness.cpp,call,_stricmp
 ,ConsoleWordIsUnitType,src/harness/harness.cpp,function,
-,Contains,src/ai/ai_player.cpp,deref_read,*unsigned int
-,Contains,src/ai/ai_player.cpp,function,
-,Contains,src/orders/unit_orders.cpp,deref_read,*unsigned int
-,Contains,src/orders/unit_orders.cpp,function,
-,Contains,src/orders/vtol_orders.cpp,deref_read,*unsigned int
-,Contains,src/orders/vtol_orders.cpp,function,
 ,ContinueArgs,src/ingame/sim_event_drain.cpp,deref_write,*unsigned int
 ,ContinueArgs,src/ingame/sim_event_drain.cpp,field_read,SimEvent::args
 ,ContinueArgs,src/ingame/sim_event_drain.cpp,field_read,SimEvent::flags
@@ -45102,6 +45105,13 @@ address,function,file,kind,target
 ,FindByName,src/units/unit_commands.cpp,call,_strcmpi
 ,FindByName,src/units/unit_commands.cpp,field_escape,UnitDefNameKeyView::name
 ,FindByName,src/units/unit_commands.cpp,function,
+,FindCategoryMask,src/units/unit_commands.cpp,call,LowerBoundCategory
+,FindCategoryMask,src/units/unit_commands.cpp,call,_strcmpi
+,FindCategoryMask,src/units/unit_commands.cpp,call,end
+,FindCategoryMask,src/units/unit_commands.cpp,field_read,StringRef::data
+,FindCategoryMask,src/units/unit_commands.cpp,field_read,UnitCategory::value
+,FindCategoryMask,src/units/unit_commands.cpp,function,
+,FindCategoryMask,src/units/unit_commands.cpp,global_maybe_written,s_unitCategories@src/units/unit_commands.cpp
 ,FindCdPlayerWindow,src/host/win32/music.cpp,call,GetClassNameA
 ,FindCdPlayerWindow,src/host/win32/music.cpp,call,strcmp
 ,FindCdPlayerWindow,src/host/win32/music.cpp,deref_write,*void
@@ -45984,6 +45994,17 @@ address,function,file,kind,target
 ,GetLineGadgetRect,src/gui/gui.cpp,field_write,Rect::right
 ,GetLineGadgetRect,src/gui/gui.cpp,field_write,Rect::top
 ,GetLineGadgetRect,src/gui/gui.cpp,function,
+,GetLoadCategoryMask,src/units/unit_commands.cpp,call,LowerBoundCategory
+,GetLoadCategoryMask,src/units/unit_commands.cpp,call,SimAllocTagged
+,GetLoadCategoryMask,src/units/unit_commands.cpp,call,StringRef::~StringRef
+,GetLoadCategoryMask,src/units/unit_commands.cpp,call,UnitCategory::~UnitCategory
+,GetLoadCategoryMask,src/units/unit_commands.cpp,call,_strcmpi
+,GetLoadCategoryMask,src/units/unit_commands.cpp,call,end
+,GetLoadCategoryMask,src/units/unit_commands.cpp,call,insert
+,GetLoadCategoryMask,src/units/unit_commands.cpp,field_read,StringRef::data
+,GetLoadCategoryMask,src/units/unit_commands.cpp,field_read,UnitCategory::value
+,GetLoadCategoryMask,src/units/unit_commands.cpp,function,
+,GetLoadCategoryMask,src/units/unit_commands.cpp,global_maybe_written,s_unitCategories@src/units/unit_commands.cpp
 ,GetMissionIndexNative,src/seams/native.cpp,call,Mission::GetMissionIndex
 ,GetMissionIndexNative,src/seams/native.cpp,function,
 ,GetMissionNameNative,src/seams/native.cpp,call,Mission::GetMissionName
@@ -47242,6 +47263,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxApproxDist
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxFillGoalCells
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderFxIsGoal
+,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::OrderOrStatusFlags
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::QueueBuildOrder
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::ReattachFxToUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::RegisterAllOrderTypes
@@ -47250,6 +47272,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::SaveMotion
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::SerializeOrderToSave
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::UnitMotionClaimRepath
+,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::UnitMotionReadNetState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::UpdateMotion
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::AbortIfGoalMatch
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Create
@@ -47617,6 +47640,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxApproxDist
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxFillGoalCells
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderFxIsGoal
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersOrderOrStatusFlags
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersQueueBuildOrder
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersReattachFxToUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersRegisterAllOrderTypes
@@ -47625,6 +47649,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersSaveMotion
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersSerializeOrderToSave
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersUnitMotionClaimRepath
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersUnitMotionReadNetState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersUpdateMotion
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingAbortIfGoalMatch
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingCreate
@@ -48299,6 +48324,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxApproxDist
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxFillGoalCells
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderFxIsGoal
+,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::OrderOrStatusFlags
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::QueueBuildOrder
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::ReattachFxToUnit
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::RegisterAllOrderTypes
@@ -48307,6 +48333,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::SaveMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::SerializeOrderToSave
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::UnitMotionClaimRepath
+,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::UnitMotionReadNetState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::UpdateMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::AbortIfGoalMatch
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Create
@@ -48708,6 +48735,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxApproxDistNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxFillGoalCellsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxIsGoalNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderOrStatusFlagsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ParseDownloadableAiWeightScripts
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PickRandomReclaimableResourcesInRadius
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PlaceFeature
@@ -48792,6 +48820,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,TransferEnergy
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,TransferMetal
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitMotionClaimRepathNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitMotionReadNetStateNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitRefUnlinkNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitTypeSetAddTypeOrCategoryNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateAllUnits
@@ -49504,6 +49533,12 @@ address,function,file,kind,target
 ,LowerBound,src/util/tdf.cpp,call,operator()
 ,LowerBound,src/util/tdf.cpp,field_read,StringRef::ptr
 ,LowerBound,src/util/tdf.cpp,function,
+,LowerBoundCategory,src/units/unit_commands.cpp,call,_strcmpi
+,LowerBoundCategory,src/units/unit_commands.cpp,call,begin
+,LowerBoundCategory,src/units/unit_commands.cpp,call,end
+,LowerBoundCategory,src/units/unit_commands.cpp,field_read,StringRef::data
+,LowerBoundCategory,src/units/unit_commands.cpp,function,
+,LowerBoundCategory,src/units/unit_commands.cpp,global_maybe_written,s_unitCategories@src/units/unit_commands.cpp
 ,LzssCompress,src/files/files_api.h,field_read,FilesSeam::LzssCompress
 ,LzssCompress,src/files/files_api.h,field_read,Seams::files
 ,LzssCompress,src/files/files_api.h,function,
@@ -50369,6 +50404,8 @@ address,function,file,kind,target
 ,OrderKindName,src/harness/harness.cpp,deref_read,*unsigned char
 ,OrderKindName,src/harness/harness.cpp,function,
 ,OrderKindName,src/harness/harness.cpp,global_maybe_written,g_missionOrderTableVec
+,OrderOrStatusFlagsNative,src/seams/native.cpp,function,
+,OrderOrStatusFlagsNative,src/seams/native.cpp,indirect_call,virtual OrderBase::OrStatusFlags
 ,OrderPosYUnset,src/harness/harness.cpp,call,OrderKindName
 ,OrderPosYUnset,src/harness/harness.cpp,call,strcmp
 ,OrderPosYUnset,src/harness/harness.cpp,function,
@@ -53494,6 +53531,15 @@ address,function,file,kind,target
 ,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersOrderFxIsGoal,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(OrderFx *, int, int) __attribute__((stdcall)) [OrdersSeam::OrderFxIsGoal]"
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,call,ArgValue
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,field_read,OrdersSeam::OrderOrStatusFlags
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,function,
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,global_read,s_call
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersOrderOrStatusFlags,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersQueueBuildOrder,src/harness/replay_hooks.inc,call,ArgValue
@@ -53569,6 +53615,16 @@ address,function,file,kind,target
 ,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersUnitMotionClaimRepath,src/harness/replay_hooks.inc,indirect_call,indirect via AiSearchGoal *(*const)(UnitMotion *) __attribute__((stdcall)) [OrdersSeam::UnitMotionClaimRepath]
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,call,Add
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,call,ArgObject
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,field_read,OrdersSeam::UnitMotionReadNetState
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,function,
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,global_read,s_call
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersUnitMotionReadNetState,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitMotion *, BitReader *) __attribute__((stdcall)) [OrdersSeam::UnitMotionReadNetState]"
 ,RecOrdersUpdateMotion,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersUpdateMotion,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersUpdateMotion,src/harness/replay_hooks.inc,call,ArgValue
@@ -55664,7 +55720,6 @@ address,function,file,kind,target
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,strncmp
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,strtoul
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,deref_read,*char
-,ReplayRestoreObjectField,src/harness/replay_objects.cpp,deref_read,*unsigned char
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,deref_write,*int
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,deref_write,*short
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,deref_write,*unsigned char
@@ -55675,7 +55730,6 @@ address,function,file,kind,target
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::size
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::target
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,function,
-,ReplayRestoreObjectField,src/harness/replay_objects.cpp,indirect_call,indirect via void *(*)(unsigned int) __attribute__((stdcall)) [alloc]
 ,ReplayRoots::ReplayRoots,src/harness/replay.cpp,function,
 ,ReplayText::Add,src/harness/replay_text.cpp,call,ReplayText::Reserve
 ,ReplayText::Add,src/harness/replay_text.cpp,call,memcpy
@@ -57469,8 +57523,14 @@ address,function,file,kind,target
 ,UnitMotion::ClaimRepath,src/orders/order_list.cpp,field_read,UnitMotion::obj
 ,UnitMotion::ClaimRepath,src/orders/order_list.cpp,function,
 ,UnitMotion::ClaimRepath,src/orders/order_list.cpp,indirect_call,virtual PathGoalVtableView::v6
+,UnitMotion::ReadNetState,src/orders/order_list.cpp,call,operator->
+,UnitMotion::ReadNetState,src/orders/order_list.cpp,field_read,UnitMotion::obj
+,UnitMotion::ReadNetState,src/orders/order_list.cpp,function,
+,UnitMotion::ReadNetState,src/orders/order_list.cpp,indirect_call,virtual PathGoalVtableView::v9
 ,UnitMotionClaimRepathNative,src/seams/native.cpp,call,UnitMotion::ClaimRepath
 ,UnitMotionClaimRepathNative,src/seams/native.cpp,function,
+,UnitMotionReadNetStateNative,src/seams/native.cpp,call,UnitMotion::ReadNetState
+,UnitMotionReadNetStateNative,src/seams/native.cpp,function,
 ,UnitOf,src/ingame/sim_event_drain.cpp,call,operator Unit *
 ,UnitOf,src/ingame/sim_event_drain.cpp,deref_escape,*Unit
 ,UnitOf,src/ingame/sim_event_drain.cpp,field_read,Game::units
@@ -57544,6 +57604,8 @@ address,function,file,kind,target
 ,UnitSyncMap::~UnitSyncMap,src/network/unit_sync.cpp,global_write,g_unitSyncMapNilRefs
 ,UnitSyncMapLess::operator(),src/network/unit_sync_state.h,function,
 ,UnitSyncPlayer::UnitSyncPlayer,src/network/unit_sync_state.h,function,
+,UnitTypeSet::Contains,src/units/unit_type_set.h,field_read,UnitTypeSet::bits
+,UnitTypeSet::Contains,src/units/unit_type_set.h,function,
 ,UnitTypeSet::UnitTypeSet,src/units/unit_type_set.h,call,memset
 ,UnitTypeSet::UnitTypeSet,src/units/unit_type_set.h,function,
 ,UnitTypeSetAddTypeOrCategoryNative,src/seams/native.cpp,call,UnitTypeSet::AddTypeOrCategory

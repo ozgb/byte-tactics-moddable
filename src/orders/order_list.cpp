@@ -652,6 +652,9 @@ public:
     virtual void v4(Vec3* a, Vec3* b, short* heading);
     virtual int v5();
     virtual AiSearchGoal* v6();
+    virtual int v7();
+    virtual void v8();
+    virtual void v9(BitReader* reader);
 };
 
 #include "../units/sfx_occupy.h"
@@ -1609,6 +1612,11 @@ void UnitMotion::DestroyObject()
 AiSearchGoal* UnitMotion::ClaimRepath()
 {
     return obj->v6();
+}
+
+void UnitMotion::ReadNetState(BitReader* reader)
+{
+    obj->v9(reader);
 }
 
 // FUNCTION: 0x43dd20

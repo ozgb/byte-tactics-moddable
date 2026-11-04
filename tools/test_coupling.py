@@ -433,7 +433,9 @@ class VirtualDataTest(unittest.TestCase):
         callers = {e[1] for e in edges}
         self.assertTrue(all(not c.startswith("Pathfinder::") for c in callers))
         self.assertNotIn("UnitMotion::DestroyObject", callers)
-        self.assertIn("ReceiveUnitStates", callers)
+        for fn in ("ReceiveUnitStates", "ClearUnitRefs", "NotifyUnitRefs", "Unit::SetStateBits", "UnitRef::ClearRef",
+                   "UnitRef::Unlink"):
+            self.assertNotIn(fn, callers)
 
 
 class DataTest(unittest.TestCase):

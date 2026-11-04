@@ -330,6 +330,16 @@ def value_record(type_name: str, fields: dict[str, dict[str, str]]) -> str | Non
     return text if text in fields else None
 
 
+POINTEE = re.compile(r"^(?:const\s+)?(?:(?:struct|class)\s+)?([\w:]+)\s*\*+\s*(?:const)?$|^(?:const\s+)?Ref<\s*(?:const\s+)?([\w:]+)\s*>$")
+
+
+def pointee_name(t: dict) -> str:
+    """The record a field points at, through a raw pointer or a Ref (arrays allowed), else empty."""
+    text = re.sub(r"\[[^\]]*\]", "", type_text(t)).strip()
+    m = POINTEE.match(text)
+    return (m.group(1) or m.group(2)) if m else ""
+
+
 def by_value_name(t: dict) -> str:
     """The record name of a field's type when it holds the record by value, else empty."""
     text = type_text(t)
@@ -579,6 +589,7 @@ class StateAnalyzer(Analyzer):
         super().__init__(root)
         self.view: dict[str, tuple[int, int]] = {}
         self.fields: dict[str, dict[str, str]] = defaultdict(dict)
+        self.pointers: dict[str, dict[str, str]] = defaultdict(dict)
         self.static_types: dict[str, str] = {}
         self.game_var = ""
 
@@ -597,6 +608,8 @@ class StateAnalyzer(Analyzer):
         for child in node.get("inner", ()):
             if child["kind"] == "FieldDecl" and child.get("name"):
                 self.fields[name][child["name"]] = by_value_name(child["type"])
+                if pointee_name(child["type"]):
+                    self.pointers[name][child["name"]] = pointee_name(child["type"])
             elif child["kind"] == "CXXRecordDecl" and not child.get("name"):
                 self.collect_fields(child, name)
 
@@ -627,7 +640,8 @@ def scan(job: tuple[Path, list[str], str]) -> dict:
     if not owns_game:
         for fn in functions:
             fn["regions"] = []
-    return {"functions": functions, "fields": dict(unit.fields), "static_types": unit.static_types}
+    return {"functions": functions, "fields": dict(unit.fields), "pointers": dict(unit.pointers),
+            "static_types": unit.static_types}
 
 
 def scan_source(path: Path, root: Path) -> dict:
@@ -883,6 +897,21 @@ class Items:
         return total
 
 
+def read_through_pointers(items: "Items", pointers: dict[str, dict[str, str]], type_name: str) -> Access:
+    """The readers of every field that points at a record of this type: they read what it points at.
+
+    A write of the pointer is no write of the object (load stores the pointer, then nothing writes the object).
+    """
+    total = Access()
+    if type_name in PRIMITIVES:
+        return total
+    for record, members in pointers.items():
+        for name, target in members.items():
+            if target == type_name:
+                total.reads |= items.access.get(("field", "%s::%s" % (record, name)), Access()).reads
+    return total
+
+
 def region_access(region: dict, spans: dict) -> Access:
     """The accesses to the region: a read or write whose byte range overlaps it, or a weak one starting in it.
 
@@ -901,12 +930,15 @@ def rows_of(rwsets_rows: list[list[str]], graph: hazards.Graph, globals_rows: li
     """Every row of data/state_classes.csv (class and note empty), sorted."""
     walks = Walks(rwsets_rows, graph)
     fields: dict[str, dict[str, str]] = defaultdict(dict)
+    pointers: dict[str, dict[str, str]] = defaultdict(dict)
     static_types: dict[str, str] = {}
     functions: dict[tuple, dict] = {}
     spans: dict[tuple, Access] = defaultdict(Access)
     for scan_result in scans:
         for record, members in scan_result["fields"].items():
             fields[record].update(members)
+        for record, members in scan_result.get("pointers", {}).items():
+            pointers[record].update(members)
         static_types.update(scan_result["static_types"])
         for fn in scan_result["functions"]:
             functions.setdefault((fn["function"], fn["file"], fn["start"]), fn)
@@ -923,6 +955,8 @@ def rows_of(rwsets_rows: list[list[str]], graph: hazards.Graph, globals_rows: li
         total = Access()
         total.merge(access)
         total.merge(items.for_type(type_name, fields))
+        if allocator is not None:
+            total.merge(read_through_pointers(items, pointers, type_name))
         weak = {f for f, strong in total.writes.items() if not strong}
         out.append(make_row(kind, name, address, evidence(total, walks), platform_reason(name, type_name, allocator),
                             weak, unknown))

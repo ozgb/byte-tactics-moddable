@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "../state/block.h"
+#include "unit_type_set.h"
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
@@ -432,13 +433,13 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             MissionHolder m(buf);
             unitdef->defaultmissiontype = m.mission.index;
             parser.current->GetFieldString(buf, "wpri_badTargetCategory", 100, g_noneString);
-            unitdef->weaponCategories[0] = (unsigned int*)GetCategoryMask(buf);
+            unitdef->weaponCategories[0] = GetLoadCategoryMask(buf);
             parser.current->GetFieldString(buf, "wsec_badTargetCategory", 100, g_noneString);
-            unitdef->weaponCategories[1] = (unsigned int*)GetCategoryMask(buf);
+            unitdef->weaponCategories[1] = GetLoadCategoryMask(buf);
             parser.current->GetFieldString(buf, "wspe_badTargetCategory", 100, g_noneString);
-            unitdef->weaponCategories[2] = (unsigned int*)GetCategoryMask(buf);
+            unitdef->weaponCategories[2] = GetLoadCategoryMask(buf);
             parser.current->GetFieldString(buf, "noChaseCategory", 100, g_noneString);
-            unitdef->categories = (unsigned int*)GetCategoryMask(buf);
+            unitdef->categories = GetLoadCategoryMask(buf);
             if (parser.current
                     ->GetFieldString(unitdef->objectname, "objectname", 0x20, DAT_005119b8) == 0) {
                 strcpy(unitdef->objectname, unitdef->unitname);
@@ -1106,12 +1107,10 @@ void UnitDef::AddToCategories(char* names)
         do {
             names += n;
             unsigned short team = this->id;
-            unsigned int* mask = (unsigned int*)GetCategoryMask(buf);
-            mask[team >> 5] |= 1 << (team & 0x1f);
+            GetLoadCategoryMask(buf)->bits[team >> 5] |= 1 << (team & 0x1f);
         } while (sscanf(names, " %s %n", buf, &n) == 1);
     }
     unsigned short team = this->id;
-    unsigned int* all = (unsigned int*)GetCategoryMask("ALL");
-    all[team >> 5] |= 1 << (team & 0x1f);
+    GetLoadCategoryMask("ALL")->bits[team >> 5] |= 1 << (team & 0x1f);
 }
 #pragma auto_inline(on)

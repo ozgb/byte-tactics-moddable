@@ -4,7 +4,7 @@
 #include "replay_text.h"
 #include "replay_types.h"
 
-enum { REPLAY_UNIT_POOL = 5001, REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384 };
+enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384 };
 
 class ReplayObjectTable {
 public:
@@ -34,6 +34,17 @@ struct ReplayReach {
 };
 
 typedef void* (*ReplayAllocFn)(unsigned size);
+
+unsigned ReplayLengthOf(const ReplayLength& length, const void* object);
+ReplayObjectField ReplayFieldView(const ReplayField& f);
+void ReplayEmitField(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, char tag, const char* key, const ReplayObjectField& f, const void* object, ReplayText& scratch);
+bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc);
+void ReplayArrayDiff(const char* recorded, const char* replayed, ReplayText& out);
+bool ReplayIsArrayText(const char* text);
+void ReplayAddStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, ReplayObjectTable& table);
+void ReplayAddStructs(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, int count, ReplayObjectTable& table);
+void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table);
+bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTable& table, ReplayAllocFn alloc);
 
 bool ReplayInsideTable(unsigned kind, const void* p);
 void ReplayAddWeapon(ReplayText& t, const void* p);

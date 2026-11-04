@@ -45,7 +45,9 @@ Contents:
   `tools.wasmtime` of the fixture manifest, and the game embeds the 50.0.0 C API on its Pulley
   interpreter. Behaviour that the document states does not depend on the engine's back end.
 - "The reference's checks" are `tools/wasm_modules.py` (`build`, `check`, `imports`, `statics`,
-  `adapters`) and `tools/wasm_fuel.py`. They are the executable form of the rules below.
+  `adapters`) and `tools/wasm_fuel.py`. They are the executable form of the rules below. The data kit carries
+  `wasm/modules.json` (the game manifest, section 4) and `tools/wasm_fuel.py` (the fuel pass, section 11);
+  it does not carry `tools/wasm_modules.py`.
 
 ## 2. The shared memory and table
 
@@ -138,9 +140,18 @@ and `N` the manifest's `stack_size`:
 --import-memory --import-table --global-base=D --table-base=T --no-stack-first --no-entry -zstack-size=N
 ```
 
-- `--no-stack-first` is required: without it lld puts every module's stack at address 0.
+- The stack must come after the data, inside the window (section 2.2); the loader never looks at it, and the
+  reference's `build` and `check-module` refuse a module whose stack leaves the window. `wasm-ld` at the version
+  `tools.clang` pins (22.1.8) spells this `--no-stack-first`; without it lld puts every module's stack at
+  address 0. That linker's `wasm-ld --help` lists both `--stack-first` (the default) and `--no-stack-first`. A
+  linker whose help does not list the option cannot be told what to do here: check its help, and check the result,
+  which is the first `i32.const` global (`__stack_pointer`) lying inside the window.
 - Do not pass `--allow-undefined`. Every function the module does not define must be one of its
-  declared imports (section 9), so a missing definition is a link error, not a runtime trap.
+  declared imports (section 9), so a missing definition is a link error, not a runtime trap. This is a
+  convention: what the loader and the checks depend on is that the module has no import outside its entry's
+  list, and a function left undefined by `--allow-undefined` becomes an import from `env`, which the
+  `imports` check refuses and the loader cannot instantiate (the host defines nothing in `env` but the memory
+  and the table). A build that passes it still fails, later and with a less direct message.
 - Do not pass `--max-memory` or `--shared-memory`. The module has no threads and no atomics.
 - `--gc-sections` is recommended, so that only the slots and what they reach remain.
 - Pass `--export=<name>` for each data word of section 8 if the source does not export it already.
@@ -154,6 +165,18 @@ cargo rustc --release --locked --target wasm32-unknown-unknown -- \
   -C link-arg=--global-base=D -C link-arg=--table-base=T \
   -C link-arg=--no-stack-first -C link-arg=--no-entry -C link-arg=-zstack-size=N
 ```
+
+A rustc build meets the rules of this section as follows (checked with rustc 1.99.1, the version
+`tools.rustc` of the fixture manifest pins; `cargo rustc ... -- --print link-args` prints the link line of any
+other version, which is the thing to read):
+
+| What rustc does | Who depends on the rule | What a build does |
+| --- | --- | --- |
+| passes `--stack-first` before the `-C link-arg` options | the checks (the stack inside the window); not the loader | nothing else: the last of the two options wins, and the `-C link-arg` options come after rustc's own, so `--no-stack-first` takes effect (and `-zstack-size=N` wins over rustc's `-z stack-size=1048576` the same way) |
+| passes `--allow-undefined` (a rustc that does; 1.99.1 does not) | nobody: a convention (see above) | may leave it; an undefined function shows up as an `env` import that `imports` refuses. The rule stays, for the clearer message |
+| exports `__heap_base` and `__data_end` (a rustc that does; 1.99.1 does not) | the checks: the exports must equal the entry's `exports` plus `data` plus the two fuel functions, exactly (section 9.1). The loader ignores extra exports | must not export them. lld has no option that takes back an `--export`, so a build whose rustc adds them filters those two arguments out of the link line with a linker wrapper (`-C linker=`) and calls the real linker with the rest |
+
+The unmodified commands above link the fixture with rustc 1.99.1 with no wrapper, and the fixture's `check` passes.
 
 The crate is `no_std`, of crate type `cdylib`, with `panic = "abort"` in the release profile and a
 `#[panic_handler]`. The reference uses stable rustc; stable rustc cannot emit a dynamic-linking side
@@ -261,7 +284,7 @@ A number must be a non-negative integer.
 | `imports` | `{group: {import: [[argument kinds], result kind]}}` | loader (adapters); checks |
 | `fuel_budget` | fuel per tick, section 11 | host; checks |
 | `size_budget` | the most bytes the `.wasm` may be | checks |
-| `cxx`, `c` | source files of the module in the reference repository | the reference build only |
+| `cxx`, `c` | source files of the module in the reference repository | the reference build only; the kit's manifest leaves them out |
 
 A kind is one of `int`, `f64`, `void` (a result only), `linear`, `block`, `scratch`, `handle`
 (section 7). A signature has at most 16 arguments and at most one result. `exports` and `data`
@@ -397,7 +420,8 @@ behaviour is the contract the existing module was built against.
   scratch area is a fatal error.
 - A `scratch` slot argument is always such a copy. All copies start at the scratch base, so a slot
   has at most one `scratch` argument. The module reads such an object only through the import that
-  takes it (`CommandArgs_GetIntArg`); its raw bytes are for the engine.
+  takes it (`CommandArgs_GetIntArg`, `CommandArgs_Count`); its raw bytes and the offsets inside them are for the
+  engine, which is free to change them.
 - An import's `linear` argument is checked to lie inside the memory (not past its size); an
   argument outside it is a trap that names the import and the argument index. The check does not
   look at how many bytes the callee will use, so the module is responsible for passing a buffer big
@@ -489,7 +513,7 @@ signatures are `signatures.services` of the manifest.
 | Import | Signature (kinds) | Behaviour |
 | --- | --- | --- |
 | `GameRand` | `[int] -> int` | advances the named random stream and returns the next value, 0 to 0x7fff; the stream's state is in the block |
-| `RandomInt` | `[int] -> int` | a random number in `[0, range)` from the main stream |
+| `RandomInt` | `[int] -> int` | a random number in `[0, range)` from a generator of its own, whose state is `rng.seed` in the recordings and is not a game logic stream (`rng.main`, `rng.load`); a range below 2 gives 0 and leaves the generator alone |
 | `FatalError` | `[linear] -> void` | ends the game with the NUL-terminated message after the call unwinds (section 13); does not return to the module |
 | `BuildDataPath` | `[linear, linear, linear, linear] -> linear` | builds `dir/name.ext` below the data directory into the buffer (first argument) and returns the buffer's address; the host traps if the result is not the buffer |
 | `TdfFile_Construct` | `[linear] -> void` | builds an empty `TdfFile` in place |
@@ -500,9 +524,13 @@ signatures are `signatures.services` of the manifest.
 | `TdfRecord_GetFieldDouble` | `[handle, linear, f64] -> f64` | reads a double field, or the default |
 | `TdfRecord_GetFieldString` | `[handle, linear, linear, int, linear] -> int` | copies a field's text into a buffer (arguments: record, destination, key, size, default) |
 | `CommandArgs_GetIntArg` | `[scratch, int, int] -> int` | reads argument *index* of a console command as an integer, or the default |
+| `CommandArgs_Count` | `[scratch] -> int` | the number of arguments of a console command, its name included (`meteor 1` has 2); the recordings carry it as the `a args.count` line |
 | `HapiBank_OpenAccount` | `[handle, linear] -> int` | opens the named account of a saved-game bank |
 | `HapiBank_SetIntegerItem` | `[handle, linear, int] -> int` | writes an integer item of the open account |
 | `HapiBank_GetIntegerItem` | `[handle, linear, int] -> int` | reads an integer item, or the default |
+
+The services interface is at major 1 and minor 8 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+`interfaces/services.h`). `CommandArgs_Count` came with minor 8, an addition: a module built without it needs nothing.
 
 A service never returns a native address. A service that finds something outside what it may reach
 (a pointer outside the memory, an unknown handle) traps with a message that names it (section 13).
@@ -581,9 +609,13 @@ An implementation applies it to the finished module, after linking:
   the layout of memory and the table is the same. The reference pass adds the counter global, the
   two functions and the two exports after everything the module already has. It refuses a module that
   is already metered, since a second counter would burn twice per step.
-- `tools/wasm_fuel.py` is the reference pass. It reads and writes a module through `wasm-tools`.
-  The reference's `build` runs it as the last step of building a game module, and `check` and
-  `imports` verify the surface (the two exports present, no counter exported, no imported global).
+- `tools/wasm_fuel.py` is the reference pass, and the data kit carries it as a standalone script (standard
+  library and `wasm-tools` only, no game source): `python3 wasm_fuel.py module.wasm -o metered.wasm`, with
+  `wasm-tools` at `tools.wasm-tools` of the manifest, found by `--wasm-tools`, `$WASM_TOOLS` or `PATH`. An
+  implementation may run it or write its own pass from the rule above: the gate accepts a module by the surface
+  (the exports, the counter not exported, no imported global) and by the fuel the module burns against its budget, never
+  by how the pass was made. The reference's `build` runs the pass as the last step of building a game module, and
+  `check` and `imports` verify the surface (the two exports present, no counter exported, no imported global).
 
 Fuel counts the function entries and loop iterations of a module's own code, so it depends on the
 final code: a different compiler, an inlining decision or a different optimisation level changes it.

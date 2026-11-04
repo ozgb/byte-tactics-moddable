@@ -27,6 +27,9 @@ extern "C" int __cdecl bx_rand(void* state);
 extern "C" int __cdecl bx_ScaledSin(short angle, int scale);
 extern "C" int __cdecl bx_ScaledCos(short angle, int scale);
 
+void* __cdecl operator new(unsigned int size);
+void __cdecl operator delete(void* p);
+
 
 void* GetAllocLock()
 {
@@ -169,7 +172,7 @@ const char* g_outValues[MAX_OUTS];
 int g_outCount;
 unsigned g_hash;
 int g_importsTotal;
-const char* g_closing[3];
+const char* g_closing[8];
 unsigned char g_rootKinds[REPLAY_MAX_ROOTS];
 void* g_rootObjects[REPLAY_MAX_ROOTS];
 unsigned g_rootCount;
@@ -415,7 +418,7 @@ bool ClosingLine(const char* line)
 {
     if (strncmp(line + 4, "snapshot#", 9) == 0)
         return true;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 8; i++) {
         if (g_closing[i] != nullptr && strncmp(line + 4, g_closing[i], strlen(g_closing[i])) == 0)
             return true;
     }
@@ -534,6 +537,31 @@ void ApplyBytes(void* dst, int length, const char* name)
     const char* value = OutValue(name);
     if (value != nullptr && dst != nullptr)
         ReplayParseBytes(value, dst, length);
+}
+
+void AddInOut(ReplayText& t, unsigned kind, const void* p)
+{
+    ReplayAddInOut(t, kind, p, g_objects);
+}
+
+void ApplyInOut(void* dst, const char* name, unsigned kind)
+{
+    const char* value = OutExact(name);
+    if (value != nullptr && dst != nullptr)
+        ReplayParseValue(kind, value, dst, g_objects, nullptr);
+}
+
+template <class T> void ApplyValues(std::vector<T, std::allocator<T> >* out, const char* name, unsigned kind)
+{
+    const char* list = OutExact(name);
+    if (list == nullptr || out == nullptr || list[0] != '[')
+        return;
+    char piece[128];
+    for (const char* cursor = list; ReplayNextListValue(&cursor, piece, sizeof piece);) {
+        T value = T();
+        if (ReplayParseValue(kind, piece, &value, g_objects, nullptr))
+            out->push_back(value);
+    }
 }
 
 void ApplyReach(void* object, unsigned kind, const char* suffix)
@@ -737,6 +765,33 @@ void CompareStruct(const char* name, unsigned kind, const void* object)
     value.Free();
 }
 
+void* ParseInOut(const char* name, unsigned kind, void* storage)
+{
+    const char* value = ArgLine(name);
+    if (value == nullptr || strcmp(value, "null") == 0)
+        return nullptr;
+    ReplayParseValue(kind, value, storage, g_objects, nullptr);
+    return storage;
+}
+
+void CompareInOut(const char* name, unsigned kind, const void* object)
+{
+    const char* recorded = OutLine(name);
+    if (object == nullptr) {
+        if (recorded != nullptr)
+            Diff(name, recorded, "no line");
+        return;
+    }
+    ReplayText value;
+    ReplayAddValue(value, kind, object, g_objects);
+    HashText(value.Data());
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff(name, recorded, value.Data());
+    value.Free();
+}
+
 void CompareObjectResult(unsigned kind, const void* object)
 {
     ReplayText value;
@@ -784,11 +839,16 @@ void ParseArgv(ArgvHolder& holder)
     }
 }
 
-void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr)
+void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr, const char* d = nullptr, const char* e = nullptr, const char* f = nullptr, const char* g = nullptr, const char* h = nullptr)
 {
     g_closing[0] = a;
     g_closing[1] = b;
     g_closing[2] = c;
+    g_closing[3] = d;
+    g_closing[4] = e;
+    g_closing[5] = f;
+    g_closing[6] = g;
+    g_closing[7] = h;
 }
 
 }
@@ -1168,6 +1228,7 @@ int __stdcall SpendEnergyAndMetalSlot(UnitResources* self, float energy, float m
 }
 
 #include "replay_slots.h"
+#include "replay_shapes.h"
 
 void ResetBlock()
 {
@@ -1331,7 +1392,7 @@ void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* o
 {
     for (unsigned i = 0; i < count; i++) {
         const ReplayObjectField& f = kReplayObjectFields[set[i]];
-        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_EMBEDS || f.kind == RK_UNITID || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
+        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_EMBEDS || f.kind == RK_UNITID || f.kind == RK_SELF || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
             continue;
         if (!ReplayFieldLive(f, object))
             continue;
@@ -2394,6 +2455,139 @@ void BeginImport()
     g_importIndex = 0;
     g_ordinals.Reset();
     BeginCompare();
+}
+
+void ShapeSelfTest()
+{
+    printf("an out vector of value structs\n");
+    ResetBlock();
+    ReplayText t;
+    std::vector<FixtureSpan, std::allocator<FixtureSpan> > spans;
+    FixtureSpan first = { 3, 4 };
+    FixtureSpan second = { -5, 6 };
+    spans.push_back(first);
+    spans.push_back(second);
+    ReplayAddValueList(t, ROK_FIXTURESPAN, &spans[0], (unsigned)spans.size(), g_objects);
+    Check(strcmp(t.Data(), "[(3,4),(-5,6)]") == 0, "a vector of values is a list of values in parentheses");
+    t.Clear();
+    ReplayAddValueList(t, ROK_FIXTURESPAN, nullptr, 0, g_objects);
+    Check(strcmp(t.Data(), "[]") == 0, "an empty vector is []");
+    LoadCall("  i fixture.FillGoals 7\n  o goals [(3,4),(-5,6)]\n");
+    BeginImport();
+    std::vector<FixtureSpan, std::allocator<FixtureSpan> > goals;
+    Imp_fixture_FillGoals(7, &goals);
+    Check(g_diffs == 0 && goals.size() == 2 && goals[0].from == 3 && goals[0].to == 4 && goals[1].from == -5 && goals[1].to == 6, "the stub pushes the recorded elements");
+    LoadCall("  i fixture.FillGoals 7\n  o goals []\n");
+    BeginImport();
+    std::vector<FixtureSpan, std::allocator<FixtureSpan> > none;
+    Imp_fixture_FillGoals(7, &none);
+    Check(g_diffs == 0 && none.empty(), "and none for an empty list");
+    LoadCall("  i fixture.FillGoals 7\n  o goals [(3,4),(-5,6)]\n");
+    BeginImport();
+    std::vector<FixtureSpan, std::allocator<FixtureSpan> > other;
+    Imp_fixture_FillGoals(8, &other);
+    printf("a changed argument: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.FillGoals") == 0, "an import with another argument is reported");
+
+    printf("a void* argument with a cast\n");
+    LoadCall("  i fixture.PlaceAt pos=(1,2,3) = 5\n");
+    BeginImport();
+    Vec3 place = { 1, 2, 3 };
+    int placed = Imp_fixture_PlaceAt(&place);
+    Check(g_diffs == 0 && placed == 5, "the stub reads the Vec3 behind the void* and returns the recorded result");
+    LoadCall("  i fixture.PlaceAt pos=(1,2,3) = 5\n");
+    BeginImport();
+    Vec3 moved = { 1, 2, 4 };
+    Imp_fixture_PlaceAt(&moved);
+    printf("a changed vector: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.PlaceAt") == 0, "a different Vec3 behind the pointer is reported");
+
+    printf("an array sized by a state field\n");
+    ResetBlock();
+    Player* view = (Player*)SimAlloc(sizeof(Player));
+    memset((void*)view, 0, sizeof(Player));
+    view->unitCount = 3;
+    g_game->slowest = view;
+    int ids[4] = { 1, 2, 3, 4 };
+    LoadCall("  i fixture.ReadIds x:010000000200000003000000 = 1\n");
+    BeginImport();
+    int read = Imp_fixture_ReadIds(ids);
+    Check(g_diffs == 0 && read == 1, "the stub writes as many elements as the field says");
+    view->unitCount = 2;
+    LoadCall("  i fixture.ReadIds x:010000000200000003000000 = 1\n");
+    BeginImport();
+    Imp_fixture_ReadIds(ids);
+    printf("a changed length: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.ReadIds") == 0, "a length that follows the field is reported when the field differs");
+    g_game->slowest = (Player*)nullptr;
+    LoadCall("  i fixture.ReadIds x: = 1\n");
+    BeginImport();
+    Imp_fixture_ReadIds(ids);
+    Check(g_diffs == 0, "a null ref is a length of 0");
+    g_game->slowest = view;
+    LoadCall("  i fixture.FillIds ? = 8\n  o ids x:0a0000000b000000\n");
+    BeginImport();
+    int filled[4] = { 0, 0, 0, 0 };
+    Imp_fixture_FillIds(filled);
+    Check(g_diffs == 0 && filled[0] == 10 && filled[1] == 11 && filled[2] == 0, "the stub fills the buffer by the same length");
+
+    printf("a nullable in/out value\n");
+    FixtureAmount amount = { 5 };
+    t.Clear();
+    AddInOut(t, ROK_FIXTUREAMOUNT, &amount);
+    Check(strcmp(t.Data(), "(5)") == 0, "a value going in is its fields in parentheses");
+    t.Clear();
+    AddInOut(t, ROK_FIXTUREAMOUNT, nullptr);
+    Check(strcmp(t.Data(), "null") == 0, "and a null pointer is null");
+    LoadCall("  i fixture.Query (5) null = 9\n  o first (8)\n");
+    BeginImport();
+    FixtureAmount in = { 5 };
+    int queried = Imp_fixture_Query(&in, nullptr);
+    Check(g_diffs == 0 && queried == 9 && in.amount == 8, "the stub passes the value in and writes the o line back");
+    LoadCall("  i fixture.Query (5) (6) = 0\n  o first (8)\n  o second (9)\n");
+    BeginImport();
+    FixtureAmount left = { 5 };
+    FixtureAmount right = { 6 };
+    Imp_fixture_Query(&left, &right);
+    Check(g_diffs == 0 && left.amount == 8 && right.amount == 9, "each pointer takes its own o line");
+    LoadCall("  i fixture.Query (5) null = 9\n  o first (8)\n");
+    BeginImport();
+    FixtureAmount stray = { 5 };
+    FixtureAmount extra = { 1 };
+    Imp_fixture_Query(&stray, &extra);
+    printf("a null that was not recorded: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.Query") == 0, "a pointer where null was recorded is reported");
+    LoadCall("  i fixture.Query (5) null = 9\n  o first (8)\n  o second (3)\n");
+    SetClosing("second ");
+    BeginImport();
+    FixtureAmount shut = { 5 };
+    Imp_fixture_Query(&shut, nullptr);
+    Check(g_outCount == 1, "an o line named by the closing list is the call's, not the import's");
+    SetClosing(nullptr);
+
+    printf("in/out of the slot under replay\n");
+    LoadCall("  a p2 (5)\n  o p2 (8)\n");
+    FixtureAmount storage = { 0 };
+    FixtureAmount* passed = (FixtureAmount*)ParseInOut("p2", ROK_FIXTUREAMOUNT, &storage);
+    Check(passed == &storage && storage.amount == 5, "the value goes to the slot by address");
+    storage.amount = 8;
+    BeginCompare();
+    CompareInOut("p2", ROK_FIXTUREAMOUNT, passed);
+    Check(g_diffs == 0, "and the value it leaves is compared with the o line");
+    storage.amount = 9;
+    CompareInOut("p2", ROK_FIXTUREAMOUNT, passed);
+    printf("a changed value: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "p2") == 0, "a different value is reported at the argument");
+    LoadCall("  a p2 null\n");
+    Check(ParseInOut("p2", ROK_FIXTUREAMOUNT, &storage) == nullptr, "null goes to the slot as a null pointer");
+    BeginCompare();
+    CompareInOut("p2", ROK_FIXTUREAMOUNT, nullptr);
+    Check(g_diffs == 0, "and has no o line to compare");
+    LoadCall("  a p2 null\n  o p2 (1)\n");
+    BeginCompare();
+    CompareInOut("p2", ROK_FIXTUREAMOUNT, nullptr);
+    Check(g_diffs == 1, "an o line for a null pointer is a difference");
+    t.Free();
 }
 
 void CallbackSelfTest()
@@ -4236,6 +4430,250 @@ void EmbeddedPolymorphicSelfTest()
     free(text);
 }
 
+unsigned OffsetOf(const void* p)
+{
+    return (unsigned)((const char*)p - (const char*)SimBlockBase());
+}
+
+FixtureEye* MakeEyes(unsigned live)
+{
+    FixtureEye* eyes = (FixtureEye*)operator new(4 * (unsigned)sizeof(FixtureEye));
+    memset((void*)eyes, 0, 4 * sizeof(FixtureEye));
+    for (unsigned i = 0; i < 4; i++) {
+        eyes[i].screen.offset = OffsetOf(&eyes[i].pos);
+        eyes[i].flagPtr.offset = OffsetOf(&eyes[i].flag);
+    }
+    g_game->hotRadar.offset = OffsetOf(eyes);
+    g_game->hotRadarCount = (int)live;
+    return eyes;
+}
+
+void CapacityTableSelfTest()
+{
+    printf("a table with a live count and a capacity\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureView* view = (FixtureView*)Fresh(sizeof(FixtureView));
+    view->flags = 4;
+    FixtureEye* eyes = MakeEyes(2);
+    eyes[0].owner.offset = OffsetOf(view);
+    eyes[0].x = 1;
+    eyes[1].x = 2;
+    eyes[3].x = 9;
+    eyes[3].pos.x = 5;
+    eyes[3].pos.y = 6;
+    unsigned short fields[7] = { FieldIndex(ROK_FIXTUREEYE, "owner"), FieldIndex(ROK_FIXTUREEYE, "screen"), FieldIndex(ROK_FIXTUREEYE, "x"), FieldIndex(ROK_FIXTUREEYE, "flag"),
+                                 FieldIndex(ROK_FIXTUREEYE, "flagPtr"), FieldIndex(ROK_FIXTUREEYE, "pos"), FieldIndex(ROK_FIXTUREVIEW, "flags") };
+    unsigned char every[1] = { ROK_FIXTUREEYE };
+    ReplaySlotSets sets = { "capacity", 0, nullptr, 0, nullptr, 0, fields, 7, fields, 7, every, 1 };
+    unsigned char kinds[1] = { ROK_FIXTUREEYE };
+    void* roots[1] = { &eyes[3] };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(ReplayFailure() == nullptr, "the walk reaches the elements without a failure");
+    Check(strstr(text, "  r FixtureEye#3.x 9\n") != nullptr && strstr(text, "  r FixtureEye#3.pos (5,6)\n") != nullptr, "an element past the live count is named by its index");
+    Check(strstr(text, "FixtureEye#?") == nullptr && strstr(text, "FixtureEye#2") == nullptr, "and no pointer into the table is unnamed");
+    Check(CountLines(text, "  r FixtureEye#") == 12, "the all-of walk records the live elements, and the root the one past them");
+    Check(strstr(text, "  r FixtureEye#0.owner FixtureView#1\n") != nullptr && strstr(text, "  r FixtureView#1.flags 4\n") != nullptr, "a ref with a ctype is written as any ref is");
+    Check(strstr(text, "screen") == nullptr && strstr(text, "flagPtr") == nullptr, "a self pointer is never a line");
+
+    ResetBlock();
+    Check(RestoreField(kReplayFields[RF_GAME_HOTRADARCOUNT], "2"), "the live count restores as a recorded field");
+    RestoreText(text, sets);
+    FixtureEye* rebuilt = (FixtureEye*)g_game->hotRadar.get();
+    Check(rebuilt != nullptr, "the table is allocated when a line first names an element");
+    if (rebuilt == nullptr) {
+        free(text);
+        return;
+    }
+    Check(g_game->hotRadarCount == 2, "the replayer stores nothing into the live count");
+    Check(!SimOwns(rebuilt), "the table is the module's own memory, from its operator new");
+    Check(rebuilt[3].x == 9 && rebuilt[3].pos.x == 5 && rebuilt[3].pos.y == 6 && rebuilt[0].x == 1 && rebuilt[1].x == 2, "the elements are restored, past the live count too");
+    Check(rebuilt[0].owner.get() == (char*)ReplayResolveObject("FixtureView#1", nullptr, g_objects, AllocObject), "the ref with a ctype leads to its object");
+    unsigned found = 0;
+    Check(ReplayResolveObject("FixtureEye#3", &found, g_objects, AllocObject) == &rebuilt[3] && found == ROK_FIXTUREEYE, "an index below the capacity names its element");
+    Check(ReplayResolveObject("FixtureEye#4", nullptr, g_objects, AllocObject) == nullptr, "and one past the capacity names nothing");
+    g_rootKinds[0] = ROK_FIXTUREEYE;
+    g_rootObjects[0] = &rebuilt[3];
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored table compares equal");
+    rebuilt[3].x = 8;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureEye#3.x") == 0, "a change past the live count is reported at its element");
+    rebuilt[3].x = 9;
+    if (!SimOwns(rebuilt)) {
+        operator delete(rebuilt);
+        g_game->hotRadar.offset = 0;
+    }
+    free(text);
+}
+
+void SelfPointerSelfTest()
+{
+    printf("pointers into an object's own members\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureEye* eyes = MakeEyes(2);
+    eyes[0].x = 1;
+    eyes[1].x = 2;
+    eyes[1].flag = 7;
+    eyes[1].pos.x = 3;
+    unsigned short fields[5] = { FieldIndex(ROK_FIXTUREEYE, "screen"), FieldIndex(ROK_FIXTUREEYE, "x"), FieldIndex(ROK_FIXTUREEYE, "flag"), FieldIndex(ROK_FIXTUREEYE, "flagPtr"),
+                                 FieldIndex(ROK_FIXTUREEYE, "pos") };
+    unsigned char every[1] = { ROK_FIXTUREEYE };
+    ReplaySlotSets sets = { "self", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1 };
+    Recorder recorder;
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* first = strdup(recorder.text.Data());
+    Check(CountLines(first, "  r FixtureEye#") == 6 && strstr(first, "screen") == nullptr && strstr(first, "flagPtr") == nullptr, "a self pointer to a member is no line");
+
+    eyes[0] = eyes[1];
+    Check(eyes[0].screen.get() == &eyes[1].pos && eyes[0].flagPtr.get() == &eyes[1].flag, "an assignment copies the pointers, which now lead into the other element");
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* second = strdup(recorder.text.Data());
+    printf("%s", second);
+    Check(strstr(second, "  r FixtureEye#0.x 2\n") != nullptr && strstr(second, "  r FixtureEye#0.flag 7\n") != nullptr && CountLines(second, "  r ") == 3, "only the data that moved is recorded");
+
+    ResetBlock();
+    Check(RestoreField(kReplayFields[RF_GAME_HOTRADARCOUNT], "2"), "the count restores");
+    RestoreText(first, sets);
+    FixtureEye* rebuilt = (FixtureEye*)g_game->hotRadar.get();
+    Check(rebuilt != nullptr, "the table is rebuilt");
+    if (rebuilt == nullptr) {
+        free(first);
+        free(second);
+        return;
+    }
+    Check(rebuilt[0].screen.get() == &rebuilt[0].pos && rebuilt[0].flagPtr.get() == &rebuilt[0].flag, "the replayer sets each pointer to the member of its own object");
+    Check(rebuilt[1].screen.get() == &rebuilt[1].pos && rebuilt[1].flagPtr.get() == &rebuilt[1].flag, "in every element it names");
+    rebuilt[0] = rebuilt[1];
+    Check(rebuilt[0].screen.get() == &rebuilt[1].pos, "the replayed module moves an element by assignment, and the pointer leads into the other one");
+    RestoreText(second, sets);
+    Check(rebuilt[0].screen.get() == &rebuilt[0].pos && rebuilt[0].flagPtr.get() == &rebuilt[0].flag && rebuilt[0].x == 2 && rebuilt[0].flag == 7, "the next call's lines name the element again, and set its pointers");
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the self pointers are neither compared nor a difference");
+    if (!SimOwns(rebuilt)) {
+        operator delete(rebuilt);
+        g_game->hotRadar.offset = 0;
+    }
+    free(first);
+    free(second);
+
+    printf("an index into the object's own array\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureHeap* heap = (FixtureHeap*)Fresh(sizeof(FixtureHeap));
+    FixtureNode* nodes = (FixtureNode*)Fresh(4 * (unsigned)sizeof(FixtureNode));
+    for (int i = 0; i < 4; i++) {
+        nodes[i].key = 10 * i;
+        nodes[i].pri = (short)i;
+    }
+    heap->capacity = 4;
+    heap->used = 3;
+    heap->pool = nodes;
+    heap->top = &nodes[2];
+    unsigned short heapFields[6] = { FieldIndex(ROK_FIXTUREHEAP, "capacity"), FieldIndex(ROK_FIXTUREHEAP, "used"), FieldIndex(ROK_FIXTUREHEAP, "pool"), FieldIndex(ROK_FIXTUREHEAP, "top"),
+                                     FieldIndex(ROK_FIXTURENODE, "key"), FieldIndex(ROK_FIXTURENODE, "pri") };
+    ReplaySlotSets heapSets = { "heap", 0, nullptr, 0, nullptr, 0, heapFields, 6, heapFields, 6 };
+    unsigned char kinds[2] = { ROK_FIXTUREHEAP, ROK_FIXTURENODE };
+    void* roots[2] = { heap, &nodes[2] };
+    Recorder heapRecorder;
+    heapRecorder.Record(kinds, roots, 2, heapSets);
+    char* one = strdup(heapRecorder.text.Data());
+    printf("%s", one);
+    Check(strstr(one, "  r FixtureHeap#1.top 2\n") != nullptr, "a pointer into the array is written as its index");
+    Check(strstr(one, "  r FixtureHeap#1.pool[2].key 20\n") != nullptr, "and the element it leads to under its own name");
+    heap->top = &nodes[3];
+    heapRecorder.Record(kinds, roots, 2, heapSets);
+    char* two = strdup(heapRecorder.text.Data());
+    Check(strcmp(two, "  r FixtureHeap#1.top 3\n") == 0, "a change of the pointer is one line");
+    FixtureNode* grown = (FixtureNode*)Fresh(8 * (unsigned)sizeof(FixtureNode));
+    memcpy((void*)grown, nodes, 4 * sizeof(FixtureNode));
+    heap->pool = grown;
+    heap->capacity = 8;
+    heap->top = &grown[3];
+    roots[1] = &grown[2];
+    heapRecorder.Record(kinds, roots, 2, heapSets);
+    char* three = strdup(heapRecorder.text.Data());
+    Check(strcmp(three, "  r FixtureHeap#1.capacity 8\n") == 0, "an array that moves with its pointer into it records no line for the pointer");
+
+    ResetBlock();
+    RestoreText(one, heapSets);
+    FixtureHeap* back = (FixtureHeap*)ReplayResolveObject("FixtureHeap#1", nullptr, g_objects, AllocObject);
+    Check(back != nullptr && back->pool.get() != nullptr, "the heap is rebuilt");
+    if (back == nullptr || back->pool.get() == nullptr) {
+        free(one);
+        free(two);
+        free(three);
+        return;
+    }
+    Check(!SimOwns(back->pool.get()) && back->top.get() == back->pool.get() + 2 && back->pool.get()[2].key == 20, "the index is the element of the array the replayer made");
+    RestoreText(two, heapSets);
+    RestoreText(three, heapSets);
+    Check(back->top.get() == back->pool.get() + 3 && back->capacity == 8, "a later index replaces it");
+    g_rootKinds[0] = ROK_FIXTUREHEAP;
+    g_rootObjects[0] = back;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&heapSets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored heap compares equal");
+    back->top.offset = OffsetOf(back->pool.get() + 1);
+    BeginCompare();
+    CompareObjects(&heapSets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureHeap#1.top") == 0 && strstr(g_detail.Data(), "recorded 3, replayed 1") != nullptr, "a pointer to another element is reported at the field, as indexes");
+    back->top.offset = OffsetOf(back->pool.get() + 3);
+    Check(!ReplayRestoreObjectField(*ReplayFindObjectField(ROK_FIXTUREHEAP, "top"), back, "?", g_objects, nullptr), "a pointer that no index names is refused");
+    if (!SimOwns(back->pool.get())) {
+        operator delete(back->pool.get());
+        back->pool.offset = 0;
+    }
+    free(one);
+    free(two);
+    free(three);
+}
+
+void GameWriteSelfTest()
+{
+    printf("a write to Game through a pointer\n");
+    ResetBlock();
+    ReplayClearFailure();
+    const ReplayField& f = kReplayFields[RF_GAME_HOTRADARCOUNT];
+    g_game->hotRadarCount = 2;
+    ReplayKnown known;
+    ReplayText entry;
+    ReplayText exit;
+    ReplayText scratch;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayEmitField(entry, known, *table, 'r', f.name, ReplayFieldView(f), BlockBase(f), scratch);
+    int* through = &g_game->hotRadarCount;
+    *through = 3;
+    ReplayEmitField(exit, known, *table, 'w', f.name, ReplayFieldView(f), BlockBase(f), scratch);
+    Check(strcmp(entry.Data(), "  r Game.hotRadarCount 2\n") == 0 && strcmp(exit.Data(), "  w Game.hotRadarCount 3\n") == 0, "a write through a pointer is a w line of the field it lands on");
+
+    ResetBlock();
+    Check(RestoreField(f, "2"), "the entry value restores");
+    through = &g_game->hotRadarCount;
+    *through = 4;
+    ReplayText now;
+    FormatField(f, now);
+    BeginCompare();
+    if (strcmp("3", now.Data()) != 0)
+        Diff("Game.hotRadarCount", "3", now.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Game.hotRadarCount") == 0 && strstr(g_detail.Data(), "recorded 3, replayed 4") != nullptr, "a different write is reported at the field");
+    now.Free();
+    entry.Free();
+    exit.Free();
+    scratch.Free();
+    delete table;
+}
+
 int SelfTest(const char* file)
 {
     static const char* const names[] = { "", "an import with other arguments", "an extra import", "a missing import" };
@@ -4243,6 +4681,7 @@ int SelfTest(const char* file)
     TableSelfTest();
     ArraySelfTest();
     FormSelfTest();
+    ShapeSelfTest();
     PolymorphicSelfTest();
     RefsSelfTest();
     BasedTableSelfTest();
@@ -4268,6 +4707,9 @@ int SelfTest(const char* file)
     UnconditionedUnitIdSelfTest();
     GameRefSelfTest();
     ExecuteCommandSelfTest();
+    CapacityTableSelfTest();
+    SelfPointerSelfTest();
+    GameWriteSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

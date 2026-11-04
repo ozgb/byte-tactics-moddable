@@ -237,6 +237,66 @@ class Rules(unittest.TestCase):
         self.assertTrue(int(end[-5]) == 0 and int(end[-4]) > 0, end)
 
 
+class WritesThroughPointers(unittest.TestCase):
+    """A slot note may add `writes` as well as `reads`, and a `fields` rule may name block fields."""
+
+    def slot(self, ann, rows, name="UpdateWind"):
+        model, errors = build(rows, ann)
+        return model["subsystems"]["wind_meteors"]["slots"][name], errors
+
+    def test_a_slot_note_adds_block_fields_to_the_write_set(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]["writes"] = ["Game.visibilityMask", "Game.width"]
+        s, errors = self.slot(ann, [])
+        self.assertEqual([e for e in errors if "UpdateWind" in e], [])
+        self.assertIn("Game.visibilityMask", s["writes"])
+        self.assertIn("Game.width", s["writes"])
+        self.assertNotIn("Game.visibilityMask", s["reads"])
+
+    def test_the_write_set_keeps_the_order_of_the_field_table(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]["writes"] = ["Game.visibilityMask", "Game.width"]
+        s, _ = self.slot(ann, [])
+        order = [f["name"] for f in build([], ann)[0]["fields"]]
+        self.assertEqual(s["writes"], sorted(s["writes"], key=order.index))
+
+    def test_a_slot_note_write_must_be_a_block_field(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]["writes"] = ["Game.nowhere"]
+        _, errors = self.slot(ann, [])
+        self.assertTrue(any("wind_meteors.UpdateWind: the extra write Game.nowhere is no block field" in e for e in errors), errors)
+
+    def test_a_slot_note_read_is_still_checked(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]["reads"] = ["Game.nowhere"]
+        _, errors = self.slot(ann, [])
+        self.assertTrue(any("wind_meteors.UpdateWind: the extra read Game.nowhere is no block field" in e for e in errors), errors)
+
+    def test_a_fields_rule_names_block_fields_in_reads_and_writes(self):
+        ann = annotations()
+        ann["rules"].append({"kind": "deref_write", "target": "*short", "rule": "fields", "reads": ["Game.width"], "writes": ["Game.visibilityMask", "Player.energy"],
+                             "functions": ["UpdateMeteors"], "note": "test"})
+        s, errors = self.slot(ann, [row("UpdateMeteors", "deref_write", "*short")], "UpdateMeteors")
+        self.assertEqual([e for e in errors if "unknown field" in e or "UpdateMeteors" in e], [])
+        self.assertIn("Game.visibilityMask", s["writes"])
+        self.assertIn("Game.width", s["reads"])
+        model, _ = build([row("UpdateMeteors", "deref_write", "*short")], ann)
+        names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
+        self.assertIn("Player.energy", [names[i] for i in s["objectWrites"]])
+
+    def test_a_fields_rule_still_rejects_an_unknown_name(self):
+        ann = annotations()
+        ann["rules"].append({"kind": "deref_write", "target": "*short", "rule": "fields", "writes": ["Game.nowhere"], "functions": ["UpdateMeteors"], "note": "test"})
+        _, errors = self.slot(ann, [row("UpdateMeteors", "deref_write", "*short")], "UpdateMeteors")
+        self.assertTrue(any("the rule for deref_write *short names the unknown field Game.nowhere" in e for e in errors), errors)
+
+    def test_the_committed_schema_is_unchanged_by_the_forms(self):
+        files, errors, _ = rs.generate(rs.read_rows())
+        self.assertEqual(errors, [])
+        for path, text in files.items():
+            self.assertEqual(path.read_text(), text, path)
+
+
 class Services(unittest.TestCase):
     def test_a_declaration_the_header_lacks_is_an_error(self):
         ann = annotations()
@@ -566,8 +626,30 @@ class Tables(unittest.TestCase):
         self.assertEqual(rs.parse_length("width*(height>>4)", "t", errors), [{"member": "width", "shift": 0}, {"member": "height", "shift": 4}])
         self.assertEqual(errors, [])
         rs.parse_length("a*b*c", "t", errors)
-        rs.parse_length("a+1", "t", errors)
+        rs.parse_length("a-1", "t", errors)
         self.assertEqual(len(errors), 2, errors)
+
+    def test_a_factor_may_add_before_it_shifts(self):
+        errors = []
+        self.assertEqual(rs.parse_length("(count+255)>>8", "t", errors), [{"member": "count", "shift": 8, "add": 255}, {"const": 1}])
+        self.assertEqual(rs.parse_length("count+0xff>>8", "t", errors)[0], {"member": "count", "shift": 8, "add": 255})
+        self.assertEqual(rs.parse_length("(width+1)*height", "t", errors), [{"member": "width", "shift": 0, "add": 1}, {"member": "height", "shift": 0}])
+        self.assertEqual(rs.parse_length("n+010", "t", errors)[0], {"member": "n", "shift": 0, "add": 10})
+        self.assertEqual(errors, [])
+        rs.parse_length("a+b", "t", errors)
+        self.assertEqual(len(errors), 1, errors)
+
+    def test_an_addend_is_rendered_after_the_shift_and_only_when_there_is_one(self):
+        self.assertEqual(rs.render_factor({"member": "count", "shift": 8, "add": 255}, "Grid"),
+                         "{ offsetof(Grid, count), (unsigned char)sizeof(((Grid*)nullptr)->count), 8, 255u }")
+        self.assertEqual(rs.render_factor({"member": "count", "shift": 8}, "Grid"), "{ offsetof(Grid, count), (unsigned char)sizeof(((Grid*)nullptr)->count), 8 }")
+
+    def test_an_array_length_with_an_addend_is_in_the_generated_table(self):
+        ann = annotations()
+        ann["game_fields"]["visibilityMask"]["length"] = "(width+0xff)>>8"
+        files, errors, _ = rs.generate(rs.read_rows(), ann)
+        self.assertEqual(errors, [])
+        self.assertIn("{ offsetof(Game, width), (unsigned char)sizeof(((Game*)nullptr)->width), 8, 255u }", files[rs.SCHEMA_H])
 
 
 class ProductCounts(unittest.TestCase):
@@ -687,7 +769,7 @@ class StructForms(unittest.TestCase):
         ann = annotations()
         ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["nullable"] = True
         _, errors, _ = self.generated(ann)
-        self.assertTrue(any("only a struct in can be nullable" in e for e in errors), errors)
+        self.assertTrue(any("only a struct in or inout can be nullable" in e for e in errors), errors)
 
     def test_an_array_of_structs_is_a_pointer_and_a_count(self):
         files, errors, _ = self.generated(self.targeting(mode="structs", count="weapon"))
@@ -1395,7 +1477,7 @@ class InsideSites(unittest.TestCase):
         self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 11;", text)
+        self.assertIn("kReplayInsideSiteCount = 12;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
@@ -1624,6 +1706,188 @@ class GameRefs(unittest.TestCase):
             self.generated(ann)
 
 
+class ArgumentShapes(unittest.TestCase):
+    """#765: an out vector of value structs, a cast on a void*, an array sized by a state path, and a nullable in/out value."""
+
+    SPANS = "std::vector<FixtureSpan, std::allocator<FixtureSpan> >*"
+    VECTOR = {"mode": "vector", "dir": "out", "elem": {"mode": "value", "kind": "FixtureSpan"}}
+    INOUT = {"mode": "struct", "kind": "FixtureAmount", "dir": "inout", "nullable": True}
+
+    def slot(self, params, notes, ret="void", result=None):
+        ann = annotations()
+        args = [rs.classify_arg({"type": t, "name": n}, notes.get(n), ann) for t, n in params]
+        res = rs.classify_result(ret, result, ann)
+        return {"args": args, "result": res, "ret": ret, "conv": "__stdcall", "params": [t for t, _ in params]}, ann
+
+    def errors(self, params, notes, ret="void", result=None):
+        s, ann = self.slot(params, notes, ret, result)
+        return rs.check_forms("x.Y", s["args"], s["result"], ann)
+
+    def generated(self, ann):
+        return rs.generate(rs.read_rows(), ann)
+
+    def test_an_out_vector_is_recorded_after_the_import_line_and_pushed_by_the_stub(self):
+        s, _ = self.slot([("int", "owner"), (self.SPANS, "goals")], {"goals": self.VECTOR})
+        wrapper = "\n".join(rs.wrapper("orders", {}, "Fill", s, {}, True))
+        self.assertIn('ImportOutValues(line, "goals", ROK_FIXTURESPAN, a1);', wrapper)
+        self.assertNotIn("ImportPending", wrapper)
+        stub = "\n".join(rs.import_stub("orders", "Fill", s))
+        self.assertIn('ApplyValues(a1, "goals", ROK_FIXTURESPAN);', stub)
+        self.assertNotIn('"?"', stub)
+
+    def test_an_out_vector_is_in_no_argument_line_of_the_slot(self):
+        s, _ = self.slot([(self.SPANS, "goals")], {"goals": self.VECTOR})
+        for phase in "aio":
+            self.assertEqual(rs.arg_out(s["args"][0], 0, phase, {}), [])
+
+    def test_an_out_vector_is_an_out_vector_of_values_of_its_own_type(self):
+        self.assertEqual(self.errors([(self.SPANS, "goals")], {"goals": self.VECTOR}), [])
+        cases = [(dict(self.VECTOR, dir="in"), self.SPANS, "only a vector out is recorded"),
+                 ({"mode": "vector", "dir": "out"}, self.SPANS, "needs an `elem` of mode value"),
+                 (dict(self.VECTOR, elem={"mode": "object", "kind": "Unit"}), self.SPANS, "needs an `elem` of mode value"),
+                 (dict(self.VECTOR, elem={"mode": "value", "kind": "Unit"}), self.SPANS, "needs a `kind` that is a value kind"),
+                 (dict(self.VECTOR, elem={"mode": "value", "kind": "Point16"}), self.SPANS,
+                  "is %s, and a vector of the kind Point16 is std::vector<Point16, std::allocator<Point16> >*" % self.SPANS)]
+        for note, ctype, want in cases:
+            errors = self.errors([(ctype, "goals")], {"goals": note})
+            self.assertTrue(any(want in e for e in errors), (note, errors))
+
+    def test_a_void_pointer_is_refused_without_a_cast_and_takes_the_modes_of_its_kind_with_one(self):
+        note = {"mode": "struct", "kind": "Vec3", "dir": "in", "nullable": True}
+        errors = self.errors([("void*", "pos")], {"pos": note})
+        self.assertTrue(any("the argument pos is void*, and the kind Vec3 is Vec3*" in e for e in errors), errors)
+        self.assertEqual(self.errors([("void*", "pos")], {"pos": dict(note, cast="Vec3*")}), [])
+
+    def test_a_cast_is_applied_in_the_recorder_the_stub_and_the_runner(self):
+        s, _ = self.slot([("void*", "pos")], {"pos": {"mode": "struct", "kind": "Vec3", "dir": "in", "nullable": True, "cast": "Vec3*"}})
+        self.assertEqual(rs.arg_out(s["args"][0], 0, "a", {}), ['ArgStruct(s_call, "a", "pos", ROK_VEC3, ((Vec3*)a0));'])
+        runner = "\n".join(rs.runner("orders", "NewOrder", s))
+        self.assertIn('Vec3* p0 = (Vec3*)ParseStructOpt("pos", ROK_VEC3, &p0_value);', runner)
+        v, _ = self.slot([("void*", "pos")], {"pos": {"mode": "vec3", "label": "pos", "cast": "Vec3*"}})
+        self.assertIn("AddVec3(t, ((Vec3*)a0));", "\n".join(rs.import_stub("orders", "Place", v)))
+        self.assertEqual(rs.arg_out(v["args"][0], 0, "i", {}), ['ImportVec3(line, "pos", ((Vec3*)a0));'])
+
+    def test_a_cast_is_for_a_void_pointer_and_a_pointer_mode(self):
+        note = {"mode": "struct", "kind": "Vec3", "dir": "in", "cast": "Vec3*"}
+        errors = self.errors([("Vec3*", "pos")], {"pos": note})
+        self.assertTrue(any("is Vec3*, and only a void* argument takes a `cast`" in e for e in errors), errors)
+        errors = self.errors([("void*", "pos")], {"pos": dict(note, cast="Vec3")})
+        self.assertTrue(any("the `cast` of the argument pos is a pointer type other than void*" in e for e in errors), errors)
+        errors = self.errors([("void*", "pos")], {"pos": {"mode": "scalar", "cast": "Vec3*"}})
+        self.assertTrue(any("has a `cast` and the mode scalar" in e for e in errors), errors)
+
+    def test_a_cast_kind_that_does_not_fit_is_an_error(self):
+        errors = self.errors([("void*", "pos")], {"pos": {"mode": "struct", "kind": "Point16", "dir": "in", "cast": "Vec3*"}})
+        self.assertTrue(any("the argument pos is Vec3*, and the kind Point16 is Point16*" in e for e in errors), errors)
+
+    def ids(self, mode, length, **extra):
+        return self.slot([("void*", "ids")], {"ids": dict({"mode": mode, "length": length}, **extra)}, "int", {"mode": "scalar"})
+
+    def test_a_length_that_is_a_state_path_is_read_from_the_state_at_the_call(self):
+        s, _ = self.ids("bytes-in", "Game.net.unitCount", elem="i32")
+        lines, expr = rs.length_parts(s["args"][0], 0)
+        self.assertEqual(lines, ["const auto* l0_0 = ReplayStep(g_game);",
+                                 "const auto* l0_1 = l0_0 != nullptr ? ReplayStep(l0_0->net) : nullptr;",
+                                 "int len0 = l0_1 != nullptr ? (int)l0_1->unitCount : 0;"])
+        self.assertEqual(expr, "(len0 * 4)")
+        wrapper = "\n".join(rs.wrapper("units", {}, "Read", s, {}, True))
+        self.assertIn("int len0 = l0_1 != nullptr ? (int)l0_1->unitCount : 0;", wrapper)
+        self.assertLess(wrapper.index("int len0"), wrapper.index("ReplayText line;"))
+        self.assertIn("ImportBytes(line, a0, (len0 * 4));", wrapper)
+        stub = "\n".join(rs.import_stub("units", "Read", s))
+        self.assertIn("AddBytes(t, a0, (len0 * 4));", stub)
+
+    def test_a_state_path_without_elem_is_a_length_in_bytes(self):
+        s, _ = self.ids("bytes-out", "Game.width")
+        lines, expr = rs.length_parts(s["args"][0], 0)
+        self.assertEqual((len(lines), expr), (2, "len0"))
+        wrapper = "\n".join(rs.wrapper("units", {}, "Fill", s, {}, True))
+        self.assertIn('ImportOutBytes(line, "ids", a0, (int)result, len0);', wrapper)
+        self.assertIn('ApplyBytes(a0, len0, "ids");', "\n".join(rs.import_stub("units", "Fill", s)))
+
+    def test_a_length_that_is_an_argument_is_what_it_was(self):
+        s, _ = self.slot([("void*", "src"), ("int", "len")], {"src": {"mode": "bytes-in", "length": "len"}}, "int", {"mode": "scalar"})
+        self.assertEqual(self.errors([("void*", "src"), ("int", "len")], {"src": {"mode": "bytes-in", "length": "len"}}, "int", {"mode": "scalar"}), [])
+        wrapper = "\n".join(rs.wrapper("files", {}, "Write", s, {}, True))
+        self.assertIn("ImportBytes(line, a0, a1);", wrapper)
+        self.assertNotIn("ReplayStep", wrapper)
+
+    def test_a_length_names_an_integer_argument_or_a_path_through_game(self):
+        cases = [("nothing", "needs a `length` that names another argument or a path through Game"),
+                 ("ids", "needs a `length` that names another argument or a path through Game"),
+                 ("name", "is no integer"),
+                 ("Other.net.unitCount", "needs a `length` that names another argument or a path through Game"),
+                 ("Game.nowhere.unitCount", "starts at nowhere, which is no member of Game")]
+        for length, want in cases:
+            errors = self.errors([("void*", "ids"), ("char*", "name")], {"ids": {"mode": "bytes-in", "length": length}}, "int", {"mode": "scalar"})
+            self.assertTrue(any(want in e for e in errors), (length, errors))
+        errors = self.errors([("void*", "ids")], {"ids": {"mode": "bytes-in", "length": "Game.width", "elem": "i128"}}, "int", {"mode": "scalar"})
+        self.assertTrue(any("the `elem` of the argument ids is one of" in e for e in errors), errors)
+
+    def test_an_in_out_value_goes_in_as_a_value_and_comes_out_as_an_o_line(self):
+        s, _ = self.slot([("FixtureAmount*", "count")], {"count": self.INOUT})
+        a = s["args"][0]
+        self.assertEqual(rs.arg_out(a, 0, "a", {}), ['ArgInOut(s_call, "count", ROK_FIXTUREAMOUNT, a0);'])
+        self.assertEqual(rs.arg_out(a, 0, "i", {}), ["ImportInOut(line, ROK_FIXTUREAMOUNT, a0);"])
+        self.assertEqual(rs.arg_out(a, 0, "o", {}), ['ArgInOutExit(s_tail, "count", ROK_FIXTUREAMOUNT, a0);'])
+        wrapper = "\n".join(rs.wrapper("units", {}, "Query", s, {}, True))
+        self.assertIn('ImportOutInOut(line, "count", ROK_FIXTUREAMOUNT, a0);', wrapper)
+        stub = "\n".join(rs.import_stub("units", "Query", s))
+        self.assertIn("AddInOut(t, ROK_FIXTUREAMOUNT, a0);", stub)
+        self.assertIn('ApplyInOut(a0, "count", ROK_FIXTUREAMOUNT);', stub)
+
+    def test_the_replayer_passes_an_in_out_value_by_address_or_null_and_compares_it_after(self):
+        s, _ = self.slot([("FixtureAmount*", "count")], {"count": self.INOUT}, "int", {"mode": "scalar"})
+        runner = "\n".join(rs.runner("units", "Query", s))
+        self.assertIn('FixtureAmount* p0 = (FixtureAmount*)ParseInOut("count", ROK_FIXTUREAMOUNT, &g_inout_units_Query_0);', runner)
+        self.assertIn('SetClosing("count ", "result");', runner)
+        self.assertIn('CompareInOut("count", ROK_FIXTUREAMOUNT, g_inout_units_Query_0_null ? nullptr : &g_inout_units_Query_0);', runner)
+        self.assertIn("g_seams.units->Query(p0)", runner)
+
+    def test_an_in_out_value_can_be_nullable_and_an_out_value_cannot(self):
+        self.assertEqual(self.errors([("FixtureAmount*", "count")], {"count": self.INOUT}), [])
+        self.assertEqual(self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, nullable=False)}), [])
+        errors = self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, dir="out")})
+        self.assertTrue(any("only a struct in or inout can be nullable" in e for e in errors), errors)
+        errors = self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, dir="both")})
+        self.assertTrue(any("has the direction both" in e for e in errors), errors)
+
+    def test_an_in_out_value_is_of_a_value_kind_of_its_own_type(self):
+        errors = self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, kind="Player")})
+        self.assertTrue(any("needs a `kind` that is a value kind" in e for e in errors), errors)
+        errors = self.errors([("int*", "count")], {"count": self.INOUT})
+        self.assertTrue(any("the argument count is int*, and the kind FixtureAmount is FixtureAmount*" in e for e in errors), errors)
+
+    def test_a_slot_with_an_in_out_value_gets_an_after_function(self):
+        ann = annotations()
+        ann["subsystems"]["targeting"]["slots"]["SetWeaponTargetPos"]["args"]["pos"] = {"mode": "struct", "kind": "Vec3", "dir": "inout", "nullable": True}
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        slots = files[rs.SLOTS_H]
+        self.assertIn("void After_targeting_SetWeaponTargetPos()", slots)
+        self.assertIn('if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SetWeaponTargetPos") == 0)\n        After_targeting_SetWeaponTargetPos();', slots)
+        self.assertIn('ArgInOut(s_call, "pos", ROK_VEC3, a1);', files[rs.HOOKS_H])
+
+    def test_the_fixture_slots_are_stubs_of_the_native_self_test(self):
+        files, errors, _ = self.generated(annotations())
+        self.assertEqual(errors, [])
+        text = files[rs.SHAPES_SLOTS]
+        for want in ('void __stdcall Imp_fixture_FillGoals(int a0, %s a1)' % self.SPANS, 'ApplyValues(a1, "goals", ROK_FIXTURESPAN);',
+                     "int __stdcall Imp_fixture_PlaceAt(void* a0)", "AddVec3(t, ((Vec3*)a0));",
+                     "int __stdcall Imp_fixture_Query(FixtureAmount* a0, FixtureAmount* a1)", 'ApplyInOut(a1, "second", ROK_FIXTUREAMOUNT);',
+                     "int __stdcall Imp_fixture_ReadIds(void* a0)", "AddBytes(t, a0, (len0 * 4));",
+                     "int __stdcall Imp_fixture_FillIds(void* a0)", 'ApplyBytes(a0, (len0 * 4), "ids");'):
+            self.assertIn(want, text)
+
+    def test_a_fixture_slot_is_checked_like_a_slot(self):
+        fixtures = json.loads(rs.FIXTURES_JSON.read_text())
+        fixtures["fixtures"]["FillGoals"]["args"]["goals"]["dir"] = "in"
+        fixtures["fixtures"]["Query"]["args"]["nowhere"] = {"mode": "scalar"}
+        _, errors, _ = rs.generate(rs.read_rows(), rs.load_annotations(), None, fixtures)
+        self.assertTrue(any("fixtures.FillGoals: the argument goals is a vector, and only a vector out is recorded" in e for e in errors), errors)
+        self.assertTrue(any("fixtures.Query: the note for nowhere names no parameter" in e for e in errors), errors)
+
+
 class ElementForms(unittest.TestCase):
     """Arrays of refs, arrays of embeds, tables behind a ref field, sites in an array element, `vptr` and embedded polymorphic kinds."""
 
@@ -1701,7 +1965,7 @@ class ElementForms(unittest.TestCase):
         text = files[rs.FIXTURE_SCHEMA_H]
         self.assertIn('    { ROK_FIXTUREGROUP, ROK_FIXTUREOWNER, offsetof(FixtureOwner, groups), "groups[]", sizeof(FixtureGroup), 4, 1 },', text)
         self.assertTrue(self.row(text, '    { "FixtureGroup", sizeof(FixtureGroup), RS_STATE, RT_ORDER,'))
-        self.assertEqual([t["kind"] for t in model["tables"] if t["kind"].startswith("Fixture")], ["FixtureCell", "FixtureLane"])
+        self.assertEqual([t["kind"] for t in model["tables"] if t["kind"].startswith("Fixture")], ["FixtureCell", "FixtureLane", "FixtureEye"])
 
     def test_a_table_behind_a_ref_field_is_checked(self):
         cases = (({"base": {"object": "Nowhere", "field": "groups"}, "count": 4}, "the base Nowhere is no state kind"),
@@ -1773,6 +2037,252 @@ class ElementForms(unittest.TestCase):
         body = body[:body.index("\n}\n")]
         self.assertIn("ImportObject(line, ROK_FIXTURECB, a2);", body)
         del slot
+
+
+class CapacityTables(unittest.TestCase):
+    """A table with a live count and room for more: a `capacity`, and `"alloc": "module"` for memory the module frees."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def table(self, ann, **change):
+        ann["objects"]["FixtureEye"]["table"].update(change)
+        return ann
+
+    def test_the_committed_fixtures_have_no_errors(self):
+        self.assertEqual(self.generated()[1], [])
+
+    def test_a_global_table_has_a_capacity_and_the_module_flag(self):
+        files, _, model = self.generated()
+        eyes = {t["kind"]: t for t in model["tables"]}["FixtureEye"]
+        self.assertEqual((eyes["module"], eyes["alloc"], eyes["capacity"]), (True, 0, [{"const": 4}, {"const": 1}]))
+        self.assertEqual(eyes["count"], [{"member": "hotRadarCount", "shift": 0}, {"const": 1}])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("{ 0, 1, offsetof(Game, hotRadar), { { offsetof(Game, hotRadarCount), (unsigned char)sizeof(((Game*)nullptr)->hotRadarCount), 0 }, { 1, 0, 0 } }, 0, "
+                      "{ { 4, 0, 0 }, { 1, 0, 0 } }, 1, 1 },", text)
+        self.assertIn("{ 0, 1, offsetof(Game, p1b8a), { { 9000, 0, 0 }, { 1, 0, 0 } }, 9000 },", text)
+
+    def test_a_capacity_may_be_a_member(self):
+        ann = self.table(annotations(), capacity="hotRadarCount")
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn("0, { { offsetof(Game, hotRadarCount), (unsigned char)sizeof(((Game*)nullptr)->hotRadarCount), 0 }, { 1, 0, 0 } }, 1, 1 },", files[rs.SCHEMA_H])
+
+    def test_a_table_without_a_capacity_has_the_old_row(self):
+        ann = self.table(annotations(), alloc=3)
+        del ann["objects"]["FixtureEye"]["table"]["capacity"]
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn("{ 0, 1, offsetof(Game, hotRadar), { { offsetof(Game, hotRadarCount), (unsigned char)sizeof(((Game*)nullptr)->hotRadarCount), 0 }, { 1, 0, 0 } }, 3 },", files[rs.SCHEMA_H])
+
+    def test_a_global_table_with_a_capacity_is_checked(self):
+        ann = annotations()
+        del ann["objects"]["FixtureEye"]["table"]["capacity"]
+        self.has(ann, "FixtureEye table: \"alloc\": \"module\" needs a capacity")
+        self.has(self.table(annotations(), alloc=4), "a table with a capacity has no integer alloc")
+        self.has(self.table(annotations(), alloc="elsewhere"), "FixtureEye table: a table with a capacity has no integer alloc")
+        self.has(self.table(annotations(), ref=False), "only a ref table can be allocated by the module")
+        self.has(self.table(annotations(), capacity=0), "the capacity is positive")
+        self.has(self.table(annotations(), count=9, capacity=4), "the count 9 is more than the capacity 4")
+        self.has(self.table(annotations(), capacity="a*b*c"), "the length `a*b*c`")
+
+    def test_the_count_and_the_capacity_are_recorded_block_fields(self):
+        ann = annotations()
+        del ann["game_fields"]["hotRadarCount"]
+        self.has(ann, "FixtureEye table: the count names hotRadarCount, which is no tracked field of Game")
+        self.has(self.table(annotations(), capacity="count_14367"), "FixtureEye table: the capacity names count_14367, which is no tracked field of Game")
+
+    def test_a_slot_that_reaches_the_table_reads_the_capacity_member(self):
+        ann = self.table(annotations(), capacity="hotRadarCount")
+        ann["rules"].append({"kind": "field_escape", "target": "Game::hotRadar", "rule": "all-of", "object": "FixtureEye", "note": "test"})
+        errors = rs.generate(rs.read_rows() + [row("UpdateResourceSharing", "field_escape", "Game::hotRadar")], ann)[1]
+        self.assertTrue(any("economy.UpdateResourceSharing reaches FixtureEye, whose capacity is Game.hotRadarCount" in e for e in errors), errors)
+        ann["subsystems"]["economy"]["slots"].setdefault("UpdateResourceSharing", {})["reads"] = ["Game.hotRadarCount"]
+        errors = rs.generate(rs.read_rows() + [row("UpdateResourceSharing", "field_escape", "Game::hotRadar")], ann)[1]
+        self.assertEqual([e for e in errors if "reaches" in e], [])
+
+    def test_a_table_behind_a_ref_field_has_a_capacity_that_is_a_member_of_the_owner(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        site = model["sites"]["FixtureNode"][0]
+        self.assertEqual((site["capped"], site["module"], site["room"]), (True, True, [{"member": "capacity", "shift": 0}, {"const": 1}]))
+        self.assertIn('    { ROK_FIXTURENODE, ROK_FIXTUREHEAP, offsetof(FixtureHeap, pool), "pool[]", sizeof(FixtureNode), 0, 1, 1, '
+                      '{ { offsetof(FixtureHeap, capacity), (unsigned char)sizeof(((FixtureHeap*)nullptr)->capacity), 0 }, { 1, 0, 0 } }, 1 },', files[rs.SCHEMA_H])
+
+    def test_a_table_behind_a_ref_field_may_have_a_constant_capacity(self):
+        ann = annotations()
+        ann["objects"]["FixtureNode"]["table"]["capacity"] = 6
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn('"pool[]", sizeof(FixtureNode), 6, 1, 1, { { 6, 0, 0 }, { 1, 0, 0 } }, 1 },', files[rs.SCHEMA_H])
+
+    def test_a_table_behind_a_ref_field_with_a_capacity_is_checked(self):
+        def table(**change):
+            ann = annotations()
+            ann["objects"]["FixtureNode"]["table"].update(change)
+            return ann
+        self.has(table(count="nowhere"), "the count nowhere is no integer field of FixtureHeap")
+        self.has(table(capacity="nowhere"), "the capacity nowhere is no integer field of FixtureHeap")
+        self.has(table(capacity="pool"), "the capacity pool is no integer field of FixtureHeap")
+        self.has(table(capacity=0), "the capacity is a positive integer or a member of FixtureHeap")
+        self.has(table(count=9, capacity=4), "the count 9 is more than the capacity 4")
+        self.has(table(alloc="elsewhere"), "the alloc of a table with a capacity is \"module\", or absent")
+        ann = annotations()
+        del ann["objects"]["FixtureNode"]["table"]["capacity"]
+        self.has(ann, "only a table with a capacity has an alloc")
+        ann = annotations()
+        del ann["objects"]["FixtureNode"]["table"]["count"]
+        self.has(ann, "FixtureNode table: the count is an integer or the name of a member of FixtureHeap")
+
+    def test_a_table_behind_a_ref_field_without_alloc_uses_the_replayers_allocator(self):
+        ann = annotations()
+        del ann["objects"]["FixtureNode"]["table"]["alloc"]
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn('"pool[]", sizeof(FixtureNode), 0, 1, 0, { { offsetof(FixtureHeap, capacity)', files[rs.SCHEMA_H])
+
+
+class SelfPointers(unittest.TestCase):
+    """A field that points into its own object: a member (never a line), or an element of the array a member holds (written as the index)."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, kind, name):
+        return next(f for f in ann["objects"][kind]["fields"] if f["name"] == name)
+
+    def test_a_self_pointer_is_a_row_of_the_self_table(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("static const ReplaySelfSpec kReplaySelfs[] = {\n    { offsetof(FixtureEye, pos), 0 },\n    { offsetof(FixtureEye, flag), 0 },\n"
+                      "    { offsetof(FixtureHeap, pool), sizeof(FixtureNode) },\n};", text)
+        row = [l for l in text.split("\n") if l.startswith('    { "screen", offsetof(FixtureEye, screen)')][0]
+        self.assertTrue(row.endswith("RK_SELF, 0, 0, 0, {}, 0, 0, 1 },"), row)
+        self.assertEqual([(x["name"], x["member"], x["index"]) for x in model["selfs"]], [("screen", "pos", False), ("flagPtr", "flag", False), ("top", "pool", True)])
+
+    def test_an_index_has_its_own_kind_and_a_target(self):
+        files, _, _ = self.generated()
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "top", offsetof(FixtureHeap, top)')][0]
+        self.assertTrue(row.endswith("RK_SELFINDEX, ROK_FIXTURENODE, 0, 0, {}, 0, 0, 3 },"), row)
+
+    def test_the_header_checks_that_a_self_pointer_is_a_ref_to_a_member_that_exists(self):
+        text = self.generated()[0][rs.SCHEMA_H]
+        self.assertIn('static_assert(sizeof(((FixtureEye*)nullptr)->screen) == sizeof(unsigned), "FixtureEye::screen is a Ref");', text)
+        self.assertIn('static_assert(sizeof(((FixtureEye*)nullptr)->pos) >= 1,', text)
+
+    def test_the_real_schema_has_no_self_pointer_and_an_empty_table(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        self.assertIn("static const ReplaySelfSpec kReplaySelfs[] = {\n    { 0, 0 },\n};", files[rs.SCHEMA_H])
+
+    def test_a_self_pointer_is_never_walked(self):
+        self.assertNotIn("self", rs.WALKABLE)
+        self.assertNotIn("selfindex", rs.WALKABLE)
+
+    def test_a_self_field_is_checked(self):
+        ann = annotations()
+        self.field(ann, "FixtureEye", "screen")["target"] = "FixtureNode"
+        self.has(ann, "FixtureEye.screen: a self pointer to a member has no `target`")
+        ann = annotations()
+        self.field(ann, "FixtureEye", "screen")["extra"] = 1
+        self.has(ann, "FixtureEye.screen: a self field is")
+        ann = annotations()
+        del self.field(ann, "FixtureEye", "screen")["member"]
+        self.has(ann, "FixtureEye.screen: the `member` of a self field is the name of a member of FixtureEye")
+        ann = annotations()
+        self.field(ann, "FixtureEye", "screen")["member"] = "pos x"
+        self.has(ann, "FixtureEye.screen: the `member` of a self field is the name of a member of FixtureEye")
+        ann = annotations()
+        self.field(ann, "FixtureEye", "screen")["index"] = "yes"
+        self.has(ann, "FixtureEye.screen: `index` is true or false")
+
+    def test_an_index_names_the_ref_field_that_holds_the_array(self):
+        ann = annotations()
+        del self.field(ann, "FixtureHeap", "top")["target"]
+        self.has(ann, "FixtureHeap.top: the target of a self index is the state kind of the array's elements")
+        ann = annotations()
+        self.field(ann, "FixtureHeap", "top")["member"] = "used"
+        self.has(ann, "FixtureHeap.top: the member used is no ref field of FixtureHeap that comes earlier and leads to FixtureNode")
+        ann = annotations()
+        self.field(ann, "FixtureHeap", "top")["member"] = "nowhere"
+        self.has(ann, "FixtureHeap.top: the member nowhere is no ref field")
+        ann = annotations()
+        fields = ann["objects"]["FixtureHeap"]["fields"]
+        fields.append(fields.pop(next(i for i, f in enumerate(fields) if f["name"] == "pool")))
+        self.has(ann, "FixtureHeap.top: the member pool is no ref field of FixtureHeap that comes earlier")
+        ann = annotations()
+        self.field(ann, "FixtureHeap", "pool")["target"] = "FixtureEye"
+        self.has(ann, "FixtureHeap.top: the member pool is no ref field of FixtureHeap that comes earlier and leads to FixtureNode")
+
+    def test_only_a_state_kind_has_a_self_pointer(self):
+        ann = annotations()
+        ann["objects"]["Vec3"]["fields"].append({"name": "x", "kind": "self", "member": "y"})
+        self.has(ann, "only the fields of a state kind are self pointers")
+
+    def test_a_self_pointer_may_have_aliases(self):
+        ann = annotations()
+        self.field(ann, "FixtureEye", "screen")["aliases"] = ["FixtureEye::screenAlias"]
+        self.assertEqual(self.generated(ann)[1], [])
+
+    def test_a_row_on_a_self_pointer_is_an_object_field(self):
+        model, errors = build([row("UpdatePlayerEconomy", "field_read", "FixtureEye::screen")])
+        names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
+        s = model["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]
+        self.assertIn("FixtureEye.screen", [names[i] for i in s["objectReads"]])
+
+
+class RefCTypes(unittest.TestCase):
+    """A ref whose C type differs from its target kind: `Ref<char>` to a state kind."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def owner(self, ann):
+        return next(f for f in ann["objects"]["FixtureEye"]["fields"] if f["name"] == "owner")
+
+    def test_the_header_checks_the_declared_type(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        self.assertIn('static_assert(__is_same(decltype(((FixtureEye*)nullptr)->owner), Ref<char>), "FixtureEye::owner is a Ref<char>");', files[rs.SCHEMA_H])
+
+    def test_a_ref_without_a_ctype_is_not_checked_for_its_type(self):
+        ann = annotations()
+        del self.owner(ann)["ctype"]
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertNotIn("FixtureEye::owner is a Ref", files[rs.SCHEMA_H])
+
+    def test_the_target_is_the_kind_whatever_the_ctype(self):
+        files, _, model = self.generated()
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "owner", offsetof(FixtureEye, owner)')][0]
+        self.assertIn("RK_REF, ROK_FIXTUREVIEW,", row)
+
+    def test_an_array_of_refs_checks_its_ctype_too(self):
+        ann = annotations()
+        next(f for f in ann["objects"]["FixtureManager"]["fields"] if f["name"] == "timers")["ctype"] = "FixtureTimerBase"
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        self.assertIn("FixtureManager::timers holds Ref<FixtureTimerBase>", files[rs.SCHEMA_H])
+
+    def test_the_ctype_is_checked(self):
+        ann = annotations()
+        self.owner(ann)["ctype"] = "Ref<char>"
+        self.has(ann, "FixtureEye.owner: the `ctype` is the C type that the Ref holds")
+        ann = annotations()
+        self.owner(ann)["kind"] = "ptr"
+        self.has(ann, "FixtureEye.owner: only a ref or an array of refs has a `ctype`")
 
 
 class Committed(unittest.TestCase):

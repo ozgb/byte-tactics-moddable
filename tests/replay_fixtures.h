@@ -61,6 +61,15 @@ struct FixtureLane {
     unsigned short flags;
 };
 
+struct FixtureSpan {
+    int from;
+    int to;
+};
+
+struct FixtureAmount {
+    int amount;
+};
+
 struct FixtureHolder {
     int id;
     Handle anim;
@@ -145,6 +154,32 @@ public:
 struct FixtureOrder {
     int id;
     FixtureAttach link;
+};
+
+struct FixtureScreen {
+    short x;
+    short y;
+};
+
+struct FixtureEye {
+    Ref<char> owner;
+    Ref<FixtureScreen> screen;
+    short x;
+    char flag;
+    Ref<char> flagPtr;
+    FixtureScreen pos;
+};
+
+struct FixtureNode {
+    int key;
+    short pri;
+};
+
+struct FixtureHeap {
+    int capacity;
+    int used;
+    Ref<FixtureNode> pool;
+    Ref<FixtureNode> top;
 };
 
 #endif

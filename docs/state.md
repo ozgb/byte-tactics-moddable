@@ -49,14 +49,14 @@ Known limits:
 
 ## Counts
 
-As of the last read of `data/state_classes.csv` (2153 rows):
+As of the last read of `data/state_classes.csv` (2388 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
 
 | kind | sim | view | platform | mixed | const | total |
 |---|---|---|---|---|---|---|
-| global | 76 | 379 | 296 | 0 | 23 | 774 |
-| static | 5 | 14 | 223 | 0 | 6 | 248 |
-| game-region | 120 | 507 | 128 | 39 | 0 | 794 |
-| heap | 212 | 46 | 79 | 0 | 0 | 337 |
+| global | 52 | 353 | 288 | 0 | 61 | 754 |
+| static | 4 | 25 | 495 | 0 | 6 | 530 |
+| game-region | 119 | 490 | 129 | 44 | 0 | 782 |
+| heap | 199 | 44 | 79 | 0 | 0 | 322 |
 
 ## Mixed cases and how to split them
 
@@ -75,40 +75,38 @@ The ten game-region rows with class `mixed`:
 
 ## Presentation writes sim state (#22 crossings)
 
-Found during review. Each needs an order, a message to the driver, or a split of the field.
+Found during review, and re-checked against the code for #783. Functions are cited by name, never by line. Each crossing needs an order, a message to the driver, or a split of the field.
 
-- `HandleBuildPanelClick` (src/ingame/control_panel.cpp:1070-1077) calls `QueueBuildOrder`, then `AdjustBuildCount` (src/orders/order_list.cpp:1076). A click edits a unit's order list directly.
-- `DrawWeaponCoverage` (src/ingame/markers.cpp:564) sets `order->flags |= 0x200000` and `order->cached` while drawing.
+- `HandleBuildPanelClick` (control_panel.cpp) calls `QueueBuildOrderWithSound` (control_panel.cpp), which calls `QueueBuildOrder`, and that calls `AdjustBuildCount` (order_list.cpp). A click edits a unit's order list directly.
+- `DrawWeaponCoverage` (markers.cpp) sets `order->flags_42 |= 0x200000` and `order->cached` while drawing.
 - Console commands and the debug hotkey:
   - `CmdATM`, `CmdNoMetal` and `CmdNoEnergy` write `Player.metal` and `Player.energy`.
-  - `CmdSeaLevel` writes `seaLevel` and `CmdEdge` writes `mapWidth` and `mapHeight` (src/game/console_commands.cpp:843, :731-732).
-  - `CmdControl` and `CmdView` write `localPlayer` and `playerIndex` (console_commands.cpp:854-868), which the tick reads.
+  - `CmdSeaLevel` writes `seaLevel` and `CmdEdge` writes `mapWidth` and `mapHeight` (console_commands.cpp).
+  - `CmdControl` and `CmdView` write `localPlayer` and `playerIndex` (console_commands.cpp), which the tick reads.
   - The cheat toggles write `uiOptionFlags` bits.
   - `CmdILose` and `CmdIWin` write `endGameFlags` and `endGameVictory`.
-  - `CmdMeteor` writes the meteor globals.
-  - `HandleDebugHotkey` (game_dialogs.cpp:1117-1118) writes `Player.metal` and `Player.energy`.
-- `HandleSurrenderChoice` writes `endGameFlags`.
+  - `CmdMeteor` calls `EnableMeteors`, `DisableMeteors` and `StartMeteorShower`, which write the meteor globals.
+  - `HandleDebugHotkey` (game_dialogs.cpp) writes `Player.metal` and `Player.energy`.
+- `HandleSurrenderChoice` (options.cpp) writes `endGameFlags`.
 - The options and keys pause bit is `otherFlags`.
-- The camera clears a `mapFlags` bit that line of sight uses.
-- The end-game screen frees `g_debrisMemCache` (src/frontend/endgame.cpp:1199, 1206).
+- The camera (camera.cpp) clears a `mapFlags` bit that line of sight uses.
 - The lobby writes the packet manager and players before play. That is fine: nothing ticks yet.
-- Not a crossing: `g_explodedPieces`. The draw only clears a slot when `DrawExplodedPiece` returns 0, which it never does (src/weapons/explosions.cpp:753).
+- Not a crossing: `g_explodedPieces`. `DrawExplosions` and `DrawExplodedPieces` (explosions.cpp) only clear a slot when `DrawExplodedPiece` returns 0, which it never does.
+- Not a crossing: `g_debrisMemCache`. The older note said the end-game screen frees it, but the only calls outside the explosion code are `InitMemoryCache` and `FreeMemoryCache` (endgame.cpp), which run at startup and through `atexit`. No commit removed a crossing there: the attribution was wrong when the note was written (6b9479b31).
 
 ## Determinism findings
 
-- **`DrawProjectiles`** (src/weapons/weapons.cpp:3286-3320, the shotKind 7 lightning branch) draws its per-frame jitter from the sim CRT `rand()` stream.
-  - #52 left it there because `data/crt_calls.csv` reaches it through a console-command edge.
-  - No phase reaches it, so the number of sim `rand()` draws depends on frames drawn and visible lightning shots.
-  - In test mode, frames and steps are 1:1, so it is reproducible there. It is still wrong by #52's rule, and is a lead on #122.
-- **`CheckDefeat`** (src/game/victory.cpp:1523-1525): `g_cdMismatchDefeatTick` comes from CRT `rand()` when `g_cdPathMismatch` is set by the CD check (src/game/cd_check.cpp:126).
-- **`g_timeoutTimerStart`** is set from wall-clock `GetTicks()` (src/network/net_game.cpp:2779). This is network only and already a #40 task.
+- **`g_timeoutTimerStart`** is set from wall-clock `GetTicks()` in `CheckPlayerTimeouts` (net_game.cpp), and `IsTimedOut` reads it. This is network only and already a #40 task.
+
+Fixed:
+
+- **`DrawProjectiles`** (weapons.cpp) drew its lightning jitter from the sim CRT `rand()` stream. c1c5fdba8 (`Fix: Draw lightning jitter from the view stream`) moved it to `HarnessViewRand()`.
+- **`CheckDefeat`** (victory.cpp) took `g_cdMismatchDefeatTick` from CRT `rand()` when the CD check set `g_cdPathMismatch`. d6016d686 (`Remove: CD check`) deleted the check, and `MissionConditions::CheckDefeat` now takes a `RandStream` it does not draw from.
 
 ## Limits and left out
 
 - Load-time code is in the load walk, and a destructor's accesses are evidence (`delete` and temporaries are `call` rows in `data/rwsets.csv`). A destructor of a class that is neither user-provided nor virtual is not followed (see the docstring of `tools/rwsets.py`).
 - The classes of clear-cut UI, debug and platform rows rest on the tool's evidence plus names. Rows that matter to the tick were checked against the code.
-- Rows the review marked "unsure" in their notes (check the code before relying on them):
-  - global: `g_mapLoadFlag`.
 - Rows whose proposal changed when #745 made `stateclasses.py` read `link/globals.h` (#749). Each group is not sim for the reason given, so nobody has to audit it again:
   - Load-only rows (`sim: only load code touches it`: `count_147ab`, `entries_147af`, `loadProgress`, `loadPctUnits`, `loadPercent`, `progress_38d73`, `shade`, and the like): the rule proposes sim for a load write that no phase reads. They are art lists and loading-bar bytes that only load and drawing code touch.
   - Chat HUD (`chatHudRing`, `chatHudRing_12ef`, `entries`, `head`, `tail`): `AddMessage` runs in the tick and writes the ring, and only `DrawMessages` reads it, so it is an output of the tick to the screen.

@@ -6,7 +6,8 @@
   "slowest": {
    "kind": "ref",
    "target": "FixtureView"
-  }
+  },
+  "hotRadarCount": "i32"
  },
  "objects": {
   "FixtureView": {
@@ -489,6 +490,236 @@
      "target": "FixtureAttach"
     }
    ]
+  },
+  "FixtureSpan": {
+   "type": "FixtureSpan",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "from",
+     "kind": "i32"
+    },
+    {
+     "name": "to",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureAmount": {
+   "type": "FixtureAmount",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "amount",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureEye": {
+   "type": "FixtureEye",
+   "scope": "state",
+   "table": {
+    "base": "game",
+    "member": "hotRadar",
+    "ref": true,
+    "count": "hotRadarCount",
+    "capacity": 4,
+    "alloc": "module"
+   },
+   "fields": [
+    {
+     "name": "owner",
+     "kind": "ref",
+     "target": "FixtureView",
+     "ctype": "char"
+    },
+    {
+     "name": "screen",
+     "kind": "self",
+     "member": "pos"
+    },
+    {
+     "name": "x",
+     "kind": "i16"
+    },
+    {
+     "name": "flag",
+     "kind": "u8"
+    },
+    {
+     "name": "flagPtr",
+     "kind": "self",
+     "member": "flag"
+    },
+    {
+     "name": "pos",
+     "kind": "point16"
+    }
+   ]
+  },
+  "FixtureNode": {
+   "type": "FixtureNode",
+   "scope": "state",
+   "table": {
+    "base": {
+     "object": "FixtureHeap",
+     "field": "pool"
+    },
+    "count": "used",
+    "capacity": "capacity",
+    "alloc": "module"
+   },
+   "fields": [
+    {
+     "name": "key",
+     "kind": "i32"
+    },
+    {
+     "name": "pri",
+     "kind": "i16"
+    }
+   ]
+  },
+  "FixtureHeap": {
+   "type": "FixtureHeap",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "capacity",
+     "kind": "i32"
+    },
+    {
+     "name": "used",
+     "kind": "i32"
+    },
+    {
+     "name": "pool",
+     "kind": "ref",
+     "target": "FixtureNode"
+    },
+    {
+     "name": "top",
+     "kind": "self",
+     "member": "pool",
+     "index": true,
+     "target": "FixtureNode"
+    }
+   ]
+  }
+ },
+ "fixtures": {
+  "FillGoals": {
+   "ret": "void",
+   "params": [
+    {
+     "type": "int",
+     "name": "owner"
+    },
+    {
+     "type": "std::vector<FixtureSpan, std::allocator<FixtureSpan> >*",
+     "name": "goals"
+    }
+   ],
+   "args": {
+    "owner": {
+     "mode": "scalar"
+    },
+    "goals": {
+     "mode": "vector",
+     "dir": "out",
+     "elem": {
+      "mode": "value",
+      "kind": "FixtureSpan"
+     }
+    }
+   }
+  },
+  "PlaceAt": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "void*",
+     "name": "pos"
+    }
+   ],
+   "args": {
+    "pos": {
+     "mode": "vec3",
+     "label": "pos",
+     "cast": "Vec3*"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "Query": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "FixtureAmount*",
+     "name": "first"
+    },
+    {
+     "type": "FixtureAmount*",
+     "name": "second"
+    }
+   ],
+   "args": {
+    "first": {
+     "mode": "struct",
+     "kind": "FixtureAmount",
+     "dir": "inout",
+     "nullable": true
+    },
+    "second": {
+     "mode": "struct",
+     "kind": "FixtureAmount",
+     "dir": "inout",
+     "nullable": true
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "ReadIds": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "void*",
+     "name": "ids"
+    }
+   ],
+   "args": {
+    "ids": {
+     "mode": "bytes-in",
+     "length": "Game.slowest.unitCount",
+     "elem": "i32"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "FillIds": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "void*",
+     "name": "ids"
+    }
+   ],
+   "args": {
+    "ids": {
+     "mode": "bytes-out",
+     "length": "Game.slowest.unitCount",
+     "elem": "i32"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
   }
  },
  "inside": {

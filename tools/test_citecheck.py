@@ -19,6 +19,15 @@ def tree(tmp: str, note: str) -> Path:
             w = csv.writer(f)
             w.writerow(["key", column])
             w.writerow(["a", note])
+    for name in citecheck.DOCS:
+        (root / name).parent.mkdir(exist_ok=True)
+        (root / name).write_text("# Notes\n\nDrawProjectiles (weapons.cpp) is fine.\n")
+    return root
+
+
+def doc_tree(tmp: str, text: str) -> Path:
+    root = tree(tmp, "Foo (foo.cpp)")
+    (root / citecheck.DOCS[0]).write_text(text)
     return root
 
 
@@ -42,6 +51,22 @@ class CiteCheckTest(unittest.TestCase):
             with open(root / "data" / "type_dupes.csv", "w", newline="") as f:
                 csv.writer(f).writerows([["name", "files"], ["T", "src/units/unit_types.h:4465|src/a.cpp:18"]])
             self.assertEqual(citecheck.check(root), [])
+
+    def test_a_line_citation_in_the_state_document_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            problems = citecheck.check(doc_tree(tmp, "ok\nCmdEdge (src/game/console_commands.cpp:731-732) writes\n"))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("docs/state.md line 2", problems[0])
+
+    def test_a_function_and_file_in_the_state_document_passes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(citecheck.check(doc_tree(tmp, "`CmdEdge` (console_commands.cpp) writes\n")), [])
+
+    def test_a_missing_state_document_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = tree(tmp, "Foo (foo.cpp)")
+            (root / citecheck.DOCS[0]).unlink()
+            self.assertEqual(len(citecheck.check(root)), 1)
 
     def test_the_repository_passes(self):
         self.assertEqual(citecheck.check(Path(__file__).resolve().parent.parent), [])

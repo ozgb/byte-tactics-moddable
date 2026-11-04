@@ -312,10 +312,23 @@ a value kind (`scope: value`, no row of the field sets matches its fields):
 | nullable struct in | `{"mode": "struct", "kind": "Vec3", "dir": "in", "nullable": true}` | `a pos null` for a null pointer, else the lines of the fields; the replayer passes NULL |
 | array of structs in | `{"mode": "structs", "kind": "Point16", "count": "count"}` | `a points[0].x 1`, `a points[0].y 2`, `a points[1].x 3`, and so on for each of `count` elements (`count` names another integer argument); `a points null` and `a points []` for a null pointer and an empty array |
 | struct by value | `{"mode": "value", "kind": "Angles16"}`, for an argument or `result` | `a kind (5)`, `o result (-3,40000,7)`, and in an import line ` (5)` and ` = (-3,40000,7)`: the values of its fields in order, in parentheses, written as the field's kind writes them |
+| nullable in/out value | `{"mode": "struct", "kind": "MissionType", "dir": "inout", "nullable": true}` | the value going in as `(5)`, or `null` for a null pointer, in an import line (` (5)`) and in the `a` lines of a slot (`a count (5)`); the value coming out as `o count (9)`, written only when the pointer is not null. The replayer passes the value by address (or NULL), and the stub of an import writes the `o` line back through the pointer |
 
 `MissionType` (one field, `index`) and `Angles16` (`bank`, `heading`, `pitch`) are the kinds of the by-value form so far. The
 count of the array form is read from the count argument's own line, so the argument must be recorded. A mismatch of a result
 by value is reported at `result`, one of an element at `points[1].y`.
+
+An in/out value (`"dir": "inout"`, `nullable` or not) is the pointer an import or a slot reads and writes back, and the kind is
+the type it points at. Only the value is written, not a line per field: the same text as the by-value form. A slot lists each
+in/out name in the closing names of its call, so that an `o count (9)` line after an import is the import's when the slot does
+not name `count` itself. A mismatch of the value coming out is reported at the argument (`count`).
+
+### A void* argument with a known kind
+
+A `void*` argument that always points at one kind takes `"cast": "Vec3*"` beside its mode: `{"mode": "struct", "kind": "Vec3",
+"dir": "in", "nullable": true, "cast": "Vec3*"}`. The argument then takes the modes of that type (`object`, `struct`, `structs`
+and `vec3`) and the kind is checked against the cast type. The interface keeps `void*`: the generated code casts the parameter to
+the type, in the recorder and in the stub. A `cast` on an argument that is not `void*`, or on a mode that takes no pointer, is an error.
 
 ## Polymorphic objects
 
@@ -570,14 +583,15 @@ sets). The annotations hold what no header says:
 | `text` | `char*` | `a name "text"` |
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
 | `object` | a pointer to a state kind, in | `a player Player#1`, its fields as `r` and `w` |
-| `struct` (`dir` in or out) | a pointer to a value kind, `nullable` when in | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local) |
+| `struct` (`dir` in, out or inout) | a pointer to a value kind, `nullable` when in or inout | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local) |
 | `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `argv` | `CommandArgs*` | `a args.count 2`, `a args[0] "x"` |
-| `bytes-in`, `bytes-out` | `void*` with a `length` argument | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length) |
+| `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
 | `weapon` | `WeaponDef*` | `weapondef#17` |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for an import that reads only those (`GetGroundHeight`); with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
 | `callback` | `UnitVisitor*` and the like, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
+| `vector` (`dir: out`) | `std::vector<Point16>*` an import fills, `{"mode": "vector", "dir": "out", "elem": {"mode": "value", "kind": "Point16"}}` | `o goals [(3,4),(5,6)]` after the import line: the whole vector, each element as the by-value form writes it, `[]` when it is empty; the stub pushes the elements |
 | `units` (`dir: out`) | `std::vector<Unit*>*` an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
 

@@ -1,0 +1,12 @@
+# Game type 1: Brawler Buildup on Easy, the second player's gunships self-destruct, so the victory condition KillAllOfType holds and VictoryTimerRunsOut fires on its timer and the run ends at game over.
+game_seed 471
+crt_seed 1471
+view_seed 2471
+game_type 1
+campaign Battle Tactics - Core Medium
+map Brawler Buildup
+difficulty 0
+ticks 37000
+player0.controller human
+player1.controller human
+order 30 1:all selfdestruct

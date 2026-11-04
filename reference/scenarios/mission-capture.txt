@@ -1,0 +1,13 @@
+# Game type 1: Kaki Island Assault on Easy, an enemy geothermal plant appears beside the human commander, which captures it, so the victory condition CaptureUnitType fires and the run ends at game over.
+game_seed 464
+crt_seed 1464
+view_seed 2464
+game_type 1
+campaign Battle Tactics - Arm Very Short
+map Kaki Island Assault
+difficulty 0
+ticks 1000
+player0.controller human
+player1.controller human
+spawn 2 1 CORGEO 1720 1260
+order 5 0:ARMCOM:1 capture 1:CORGEO:2

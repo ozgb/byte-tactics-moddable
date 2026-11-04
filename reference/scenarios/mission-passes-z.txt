@@ -1,0 +1,13 @@
+# Game type 1: Cutoff in Sector 6895 on Easy, a second human commander appears short of the line and is ordered across it, so the victory condition UnitTypePassesZ fires and the run ends at game over.
+game_seed 465
+crt_seed 1465
+view_seed 2465
+game_type 1
+campaign Battle Tactics - Arm Short
+map Cutoff in Sector 6895
+difficulty 0
+ticks 500
+player0.controller human
+player1.controller human
+spawn 2 0 ARMCOM 1888 2640
+order 5 0:ARMCOM:2 move 1888 2700

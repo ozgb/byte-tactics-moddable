@@ -12,7 +12,7 @@ public:
     std::vector<Unit*>* units;
     Unit* self;
     DamagedAllyCollector(Player* o, std::vector<Unit*>* v, Unit* s) : owner(o), units(v), self(s) {}
-    virtual void Visit(Unit* unit);
+    void Visit(Unit* unit) override;
 };
 
 #endif

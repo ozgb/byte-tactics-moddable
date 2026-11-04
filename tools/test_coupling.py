@@ -306,6 +306,10 @@ class VirtualTest(unittest.TestCase):
         self.assertEqual(classes.arrays["g_fxVtable"], ["Fx::Destroy", "Other::A", "Other::B"])
         self.assertEqual(classes.arrays["g_otherVtable"], ["Odd::Destroy", "Odd::A", "Odd::B"])
 
+    def test_an_override_without_virtual_declares_a_virtual_method(self):
+        classes = classes_of("class C : public B { public: void Run(int x) override; int Size() const override; };")
+        self.assertEqual(classes.virtuals["C"], ["Run", "Size"])
+
     def test_a_comment_does_not_declare_a_virtual_method(self):
         classes = classes_of("class C { public: // virtual int Hidden();\n virtual int Shown(); };")
         self.assertEqual(classes.slots("C"), ["Shown"])

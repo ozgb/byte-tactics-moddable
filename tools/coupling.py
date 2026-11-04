@@ -347,6 +347,7 @@ def check_seams(coupling: list[dict]) -> tuple[list[str], str]:
 HIERARCHY_DIRS = ("src", "interfaces")
 CLASS_HEAD = re.compile(r"\b(?:class|struct)\s+(?:__declspec\([^)]*\)\s*)?(\w+)\s*(?::([^{;]*))?\{")
 VIRTUAL_DECL = re.compile(r"\bvirtual\b[^;(]*?(~?\w+)\s*\(")
+OVERRIDE_DECL = re.compile(r"(~?\w+)\s*\([^;]*\)\s*(?:const\s*)?override\b")
 EXCEPTIONS_CSV = ROOT / "data/seam_exceptions.csv"
 EXCEPTION_COLUMNS = ["subsystem", "function", "symbol", "reason"]
 EXCEPTION_REASON = re.compile(r"TODO\(#[0-9]+\): \S")
@@ -410,7 +411,7 @@ class Classes:
         for name, bases, body in class_bodies(text):
             methods = []
             for stmt in depth_one(body).split(";"):
-                found = VIRTUAL_DECL.search(stmt)
+                found = VIRTUAL_DECL.search(stmt) or OVERRIDE_DECL.search(stmt)
                 if found:
                     methods.append(found.group(1))
             if published:

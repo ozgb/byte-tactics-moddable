@@ -326,7 +326,9 @@ What the loader does **not** check, and the build must:
 
 A conforming build runs those checks. The judge (section 15) runs the reference's own checks on a submitted module before it
 plays: `uv run tools/wasm_modules.py check-module FILE.wasm --name SUBSYSTEM` runs the window and table check, the
-imports, exports and kinds check and the size budget on that one file, against the manifest's entry.
+imports, exports and kinds check, the metering surface and the size budget on that one file, against the manifest's entry. It
+exits 0 when the file passes, 1 when it prints problems, and 2 when the check could not run (an unknown subsystem, no
+`wasm-tools`, an internal error): that is not a verdict on the module.
 
 ## 6. Slots
 
@@ -689,9 +691,9 @@ uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out 
 1. It runs `uv run tools/wasm_modules.py check-module MODULE.wasm --name <subsystem>` on the file: the data, bss and stack
    inside the entry's window and the table entries inside its table range, no import off the manifest's list (no global,
    WASI, clock, random, file or network import), exactly the manifest's exports, the manifest's kinds against the wasm
-   signatures, and the size budget (section 5.2, the checks the loader leaves to the build). A problem ends the run before the
-   game starts: the problems are the result's `message`, the verdict is `refused`. The check of the metering surface and the
-   interface majors are not part of it.
+   signatures, the metering surface, and the size budget (section 5.2, the checks the loader leaves to the build). A problem
+   ends the run before the game starts: the problems are the result's `message`, the verdict is `refused`. The interface
+   majors are not part of it. When the check could not run (exit 2), the run stops with an error and writes no result.
 2. It copies the runtime files of the modern build (the exe, `wasmtime_host.dll`, `modules.json` and every module as built) into
    `DIR/runtime/`, removing what was there, and puts `MODULE.wasm` in the place of `<subsystem>.wasm`. The manifest is kept.
 3. It starts the game on a ten-tick scenario. A refusal of section 5.2 (and any other error before the match, section 13) ends

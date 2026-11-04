@@ -1,6 +1,6 @@
 """Egress proxy for the clean-room sandbox: CONNECT to an allowlist of host:port pairs, logged.
 
-    uv run tools/cleanroom/proxy.py --allow FILE --log FILE [--listen HOST:PORT]
+    uv run tools/cleanroom/proxy.py --allow FILE --log FILE [--listen HOST:PORT | unix:PATH]
     uv run tools/cleanroom/proxy.py --check-log LOG --allow FILE
 
 Only `CONNECT host:port` is served. Any other method gets 403 and a malformed request line gets 400.
@@ -11,13 +11,23 @@ bytes are spliced both ways until either side closes. Every request is one JSON 
 and a tunnel adds a second line with `event: "close"` and the bytes moved. The request header is
 capped at 8 KiB and must arrive within 10 seconds.
 
+A host name that resolves only to loopback, private or link-local addresses gets a 502, so an
+allowed name can't be pointed back at the host or its network. Addresses written in the allowlist
+as IP literals are not checked. `--listen unix:PATH` serves on a Unix socket, which is how the
+session VM reaches the proxy with no network device at all. SIGHUP reopens the log file, so a
+launcher can rename it and start a fresh one.
+
 --check-log exits 1 and prints each logged request whose target is not on the allowlist, else
 prints a summary and exits 0.
 """
 
 import argparse
 import asyncio
+import ipaddress
 import json
+import os
+import signal
+import socket
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -70,6 +80,20 @@ def load_allowlist(path):
     return parse_allowlist(Path(path).read_text())
 
 
+def is_ip_literal(host):
+    try:
+        ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    return True
+
+
+async def resolve_public(host, port):
+    """Return the global addresses of a name, or an empty list."""
+    infos = await asyncio.get_running_loop().getaddrinfo(host, port, type=socket.SOCK_STREAM)
+    return [i[4][0] for i in infos if ipaddress.ip_address(i[4][0].split("%")[0]).is_global]
+
+
 def now():
     return datetime.now(timezone.utc).isoformat()
 
@@ -77,7 +101,12 @@ def now():
 class Proxy:
     def __init__(self, allowed, log_path):
         self.allowed = allowed
+        self.log_path = log_path
         self.log = open(log_path, "a", encoding="utf-8")
+
+    def reopen(self):
+        self.log.close()
+        self.log = open(self.log_path, "a", encoding="utf-8")
 
     def write(self, record):
         self.log.write(json.dumps(record) + "\n")
@@ -95,7 +124,7 @@ class Proxy:
 
     async def handle(self, reader, writer):
         peer = writer.get_extra_info("peername")
-        client = f"{peer[0]}:{peer[1]}" if peer else "?"
+        client = f"{peer[0]}:{peer[1]}" if isinstance(peer, tuple) else "unix"
         record = {"time": now(), "client": client, "method": "", "target": "", "allowed": False, "status": 0}
         try:
             try:
@@ -126,7 +155,13 @@ class Proxy:
                 await self.reply(writer, 403, "Forbidden")
                 return
             try:
-                up_reader, up_writer = await asyncio.wait_for(asyncio.open_connection(*pair), HEADER_TIMEOUT)
+                if is_ip_literal(pair[0]):
+                    addrs = [pair[0]]
+                else:
+                    addrs = await asyncio.wait_for(resolve_public(*pair), HEADER_TIMEOUT)
+                if not addrs:
+                    raise OSError("no public address")
+                up_reader, up_writer = await asyncio.wait_for(asyncio.open_connection(addrs[0], pair[1]), HEADER_TIMEOUT)
             except (OSError, asyncio.TimeoutError):
                 record["allowed"] = True
                 record["status"] = 502
@@ -176,10 +211,16 @@ class Proxy:
                 pass
 
 
-async def start(allowed, log_path, host, port):
-    """Start the proxy and return (server, proxy)."""
+async def start(allowed, log_path, host, port=None):
+    """Start the proxy on host:port, or on the Unix socket path when port is None."""
     proxy = Proxy(allowed, log_path)
-    server = await asyncio.start_server(proxy.handle, host, port, limit=HEADER_CAP)
+    if port is None:
+        if os.path.exists(host):
+            os.remove(host)
+        server = await asyncio.start_unix_server(proxy.handle, host, limit=HEADER_CAP)
+        os.chmod(host, 0o666)
+    else:
+        server = await asyncio.start_server(proxy.handle, host, port, limit=HEADER_CAP)
     return server, proxy
 
 
@@ -207,8 +248,13 @@ def check_log(log_path, allow_path):
 
 
 async def serve(args):
-    host, _, port = args.listen.rpartition(":")
-    server, _ = await start(load_allowlist(args.allow), args.log, host, int(port))
+    if args.listen.startswith("unix:"):
+        host, port = args.listen[5:], None
+    else:
+        host, _, port = args.listen.rpartition(":")
+        port = int(port)
+    server, proxy = await start(load_allowlist(args.allow), args.log, host, port)
+    asyncio.get_running_loop().add_signal_handler(signal.SIGHUP, proxy.reopen)
     async with server:
         await server.serve_forever()
 
@@ -217,7 +263,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--allow", required=True, help="allowlist file, one host[:port] per line")
     ap.add_argument("--log", help="JSON lines log, appended")
-    ap.add_argument("--listen", default="127.0.0.1:3128", help="HOST:PORT (default 127.0.0.1:3128)")
+    ap.add_argument("--listen", default="127.0.0.1:3128", help="HOST:PORT or unix:PATH (default 127.0.0.1:3128)")
     ap.add_argument("--check-log", metavar="LOG", help="check a log against --allow and exit")
     args = ap.parse_args(argv)
     if args.check_log:

@@ -352,6 +352,66 @@ void ReplayImportEnd(ReplayImport& c)
         AddResult(t, c.result);
         break;
     }
+    case RI_LOAD_GAF:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        ImportResultObject(t, ROK_GAF, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_LOAD_ANIM_GAF:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        ImportResultObject(t, ROK_GAF, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_FIND_GAF_ENTRY:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_GAF, a[0].v.p, true);
+        AddSpace(t);
+        t.AddString((const char*)a[1].v.p);
+        ImportResultObjectReach(t, ROK_FRAMETABLE, (c.result.kind == 1 ? c.result.v.p : nullptr), 1, "count");
+        break;
+    }
+    case RI_GET_GAF_FRAME:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_FRAMETABLE, a[0].v.p, true);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        ImportResultObjectReach(t, ROK_GAFFRAME, (c.result.kind == 1 ? c.result.v.p : nullptr), 5, "width", "height", "xOffset", "yOffset", "transparency");
+        break;
+    }
+    case RI_GET_GAF_SEQUENCE_FRAME:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_HANDLE, a[0].v.p, true);
+        ImportResultObjectReach(t, ROK_GAFFRAME, (c.result.kind == 1 ? c.result.v.p : nullptr), 5, "width", "height", "xOffset", "yOffset", "transparency");
+        break;
+    }
+    case RI_LOAD_3DO:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        ImportResultObjectReach(t, ROK_OBJECT3DO, (c.result.kind == 1 ? c.result.v.p : nullptr), 4, "vertexCount", "box_x", "box_y", "box_z");
+        break;
+    }
+    case RI_LOAD_OBJECT_3D:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        ImportResultObjectReach(t, ROK_OBJECT3DO, (c.result.kind == 1 ? c.result.v.p : nullptr), 4, "vertexCount", "box_x", "box_y", "box_z");
+        break;
+    }
+    case RI_GET_OBJECT_HEIGHT:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_OBJECT3DO, a[0].v.p, true);
+        AddResult(t, c.result);
+        break;
+    }
     }
     t.AddChar('\n');
     ReplayCalls() = 1;

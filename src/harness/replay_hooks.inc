@@ -3085,9 +3085,10 @@ void __stdcall RecUnitsPoseUnitModel(Unit* a0)
 ModelState* __stdcall RecUnitsCreateObjectState(Object3do* a0)
 {
     ReplayRoots roots;
+    roots.Add(ROK_OBJECT3DO, a0);
     SlotScope scope(RSL_UNITS_CREATEOBJECTSTATE, SUB_UNITS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "model");
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
     }
     ModelState* result = s_inner_units->CreateObjectState(a0);
     if (scope.Open()) {

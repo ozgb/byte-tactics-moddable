@@ -10,6 +10,7 @@ struct PcxImage {
 
 #include "../files/files_api.h"
 #include "object3do.h"
+#include "../harness/replay.h"
 #include "piece_frame.h"
 #include "../debug/debug_lib.h"
 
@@ -455,12 +456,14 @@ void __stdcall RelocateObject(int delta, Object3do* node)
 // FUNCTION: 0x4cb560
 void* __stdcall Load3do(char* param)
 {
+    ReplayImport call(RI_LOAD_3DO);
+    call.Ptr(param);
     void* result = HAPI_LoadFile(param, 0);
     if (result == 0) {
-        return 0;
+        return call.Result((void*)0);
     }
     RelocateObject((int)result, (Object3do*)result);
-    return result;
+    return call.Result(result);
 }
 
 // FUNCTION: 0x4cb590
@@ -481,6 +484,8 @@ void __stdcall MirrorObject(Object3do* obj)
 // FUNCTION: 0x4cb5f0
 int __stdcall GetObjectHeight(Object3do* node)
 {
+    ReplayImport call(RI_GET_OBJECT_HEIGHT);
+    call.Ptr(node);
     int best = 0;
     for (; node; node = node->sibling) {
         for (int i = 0; i < node->vertexCount; i++) {
@@ -494,7 +499,7 @@ int __stdcall GetObjectHeight(Object3do* node)
                 best = v;
         }
     }
-    return best;
+    return call.Result(best);
 }
 
 #include "pcx.h"

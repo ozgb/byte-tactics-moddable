@@ -39,6 +39,14 @@ enum ReplayImportId {
     RI_SIM_CAPTURE_ALLOC,
     RI_FIND_SLOT_BY_DPID,
     RI_GET_SLOT_DPID,
+    RI_LOAD_GAF,
+    RI_LOAD_ANIM_GAF,
+    RI_FIND_GAF_ENTRY,
+    RI_GET_GAF_FRAME,
+    RI_GET_GAF_SEQUENCE_FRAME,
+    RI_LOAD_3DO,
+    RI_LOAD_OBJECT_3D,
+    RI_GET_OBJECT_HEIGHT,
     RI_COUNT
 };
 
@@ -79,6 +87,14 @@ static const char* const kReplayImportNames[RI_COUNT] = {
     "services.SimCaptureAlloc",
     "services.FindSlotByDpid",
     "services.GetSlotDpid",
+    "services.LoadGaf",
+    "services.LoadAnimGaf",
+    "services.FindGafEntry",
+    "services.GetGafFrame",
+    "services.GetGafSequenceFrame",
+    "services.Load3do",
+    "services.LoadObject3d",
+    "services.GetObjectHeight",
 };
 
 #endif

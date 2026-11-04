@@ -36,6 +36,10 @@
 #pragma pack(push, 1)
 #include "../ai/player_ai.h"
 #pragma pack(pop)
+#include "../graphics/gaf_frame.h"
+#include "../graphics/object3do.h"
+#include "../graphics/handle.h"
+#include "../map/frame_table.h"
 #include "../state/sim_globals.h"
 #include "../state/block.h"
 #include "replay_types.h"
@@ -287,6 +291,11 @@ enum ReplayObjectKindId {
     ROK_KEYEDCELL,
     ROK_PLAYERAI,
     ROK_ALLOC,
+    ROK_GAF,
+    ROK_FRAMETABLE,
+    ROK_GAFFRAME,
+    ROK_OBJECT3DO,
+    ROK_HANDLE,
     ROK_COUNT
 };
 
@@ -323,8 +332,13 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "KeyedCell", sizeof(KeyedCell), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "PlayerAI", sizeof(PlayerAI), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "alloc", sizeof(char), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "Gaf", sizeof(char), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "FrameTable", sizeof(FrameTable), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "GafFrame", sizeof(GafFrame), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "Object3do", sizeof(Object3do), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 26;
+static const unsigned kReplayObjectKindCount = 31;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
@@ -512,8 +526,18 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "visibleUnits", offsetof(PlayerAI, visible.units), sizeof(((PlayerAI*)nullptr)->visible.units), ROK_PLAYERAI, RK_VECTOR, ROK_UNIT, 0, 0, 0, 0, 0, 0, 1 },
     { "cells", offsetof(PlayerAI, cells), sizeof(((PlayerAI*)nullptr)->cells), ROK_PLAYERAI, RK_VECTOR, 0, 0, 0, 0, 0, 0, 0, 2 },
     { "counts", offsetof(PlayerAI, counts), sizeof(((PlayerAI*)nullptr)->counts), ROK_PLAYERAI, RK_VECTOR, 0, 0, 0, 0, 0, 0, 0, 3 },
+    { "count", offsetof(FrameTable, count), sizeof(((FrameTable*)nullptr)->count), ROK_FRAMETABLE, RK_U16, 0, 0, 0, 0, 0, 0, 0 },
+    { "width", offsetof(GafFrame, width), sizeof(((GafFrame*)nullptr)->width), ROK_GAFFRAME, RK_U16, 0, 0, 0, 0, 0, 0, 0 },
+    { "height", offsetof(GafFrame, height), sizeof(((GafFrame*)nullptr)->height), ROK_GAFFRAME, RK_U16, 0, 0, 0, 0, 0, 0, 0 },
+    { "xOffset", offsetof(GafFrame, xOffset), sizeof(((GafFrame*)nullptr)->xOffset), ROK_GAFFRAME, RK_I16, 0, 0, 0, 0, 0, 0, 0 },
+    { "yOffset", offsetof(GafFrame, yOffset), sizeof(((GafFrame*)nullptr)->yOffset), ROK_GAFFRAME, RK_I16, 0, 0, 0, 0, 0, 0, 0 },
+    { "transparency", offsetof(GafFrame, transparency), sizeof(((GafFrame*)nullptr)->transparency), ROK_GAFFRAME, RK_U8, 0, 0, 0, 0, 0, 0, 0 },
+    { "vertexCount", offsetof(Object3do, vertexCount), sizeof(((Object3do*)nullptr)->vertexCount), ROK_OBJECT3DO, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
+    { "box_x", offsetof(Object3do, box_x), sizeof(((Object3do*)nullptr)->box_x), ROK_OBJECT3DO, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
+    { "box_y", offsetof(Object3do, box_y), sizeof(((Object3do*)nullptr)->box_y), ROK_OBJECT3DO, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
+    { "box_z", offsetof(Object3do, box_z), sizeof(((Object3do*)nullptr)->box_z), ROK_OBJECT3DO, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 157;
+static const unsigned kReplayObjectFieldCount = 167;
 
 static const unsigned short kReplayReachFields[] = { 45, 49, 108, 109, 110, 36, 34, 37, 45, 50, 52, 79 };
 
@@ -674,6 +698,16 @@ static_assert(sizeof(decltype(((PlayerAI*)nullptr)->cells)) == 16, "PlayerAI::ce
 static_assert(__is_same(decltype(((PlayerAI*)nullptr)->cells)::value_type, KeyedCell), "PlayerAI::cells holds KeyedCell");
 static_assert(sizeof(decltype(((PlayerAI*)nullptr)->counts)) == 16, "PlayerAI::counts is a block vector");
 static_assert(__is_same(decltype(((PlayerAI*)nullptr)->counts)::value_type, short), "PlayerAI::counts holds short");
+static_assert(sizeof(((FrameTable*)nullptr)->count) == 2, "FrameTable::count has the size the schema says");
+static_assert(sizeof(((GafFrame*)nullptr)->width) == 2, "GafFrame::width has the size the schema says");
+static_assert(sizeof(((GafFrame*)nullptr)->height) == 2, "GafFrame::height has the size the schema says");
+static_assert(sizeof(((GafFrame*)nullptr)->xOffset) == 2, "GafFrame::xOffset has the size the schema says");
+static_assert(sizeof(((GafFrame*)nullptr)->yOffset) == 2, "GafFrame::yOffset has the size the schema says");
+static_assert(sizeof(((GafFrame*)nullptr)->transparency) == 1, "GafFrame::transparency has the size the schema says");
+static_assert(sizeof(((Object3do*)nullptr)->vertexCount) == 4, "Object3do::vertexCount has the size the schema says");
+static_assert(sizeof(((Object3do*)nullptr)->box_x) == 4, "Object3do::box_x has the size the schema says");
+static_assert(sizeof(((Object3do*)nullptr)->box_y) == 4, "Object3do::box_y has the size the schema says");
+static_assert(sizeof(((Object3do*)nullptr)->box_z) == 4, "Object3do::box_z has the size the schema says");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");
@@ -1199,7 +1233,7 @@ static const unsigned char kReplayLosRadarFreeMapResourcesReads[] = { 19 };
 static const unsigned char kReplayLosRadarFreeMapResourcesWrites[] = { 19 };
 static const unsigned char kReplayLosRadarLoadTntMapReads[] = { 1, 2 };
 static const unsigned char kReplayLosRadarRecalculateLineOfSightReads[] = { 1, 2, 17, 19 };
-static const unsigned short kReplayLosRadarRecalculateLineOfSightObjReads[] = { 0, 25, 26, 30, 31, 34, 35, 45, 80 };
+static const unsigned short kReplayLosRadarRecalculateLineOfSightObjReads[] = { 0, 25, 26, 30, 31, 34, 35, 45, 80, 157, 160, 161 };
 static const unsigned char kReplayLosRadarIsUnitVisibleToPlayerReads[] = { 17 };
 static const unsigned short kReplayLosRadarIsUnitVisibleToPlayerObjReads[] = { 34, 35, 36, 37 };
 static const unsigned char kReplayLosRadarGetMapCellAtPositionReads[] = { 1, 2 };
@@ -1211,8 +1245,9 @@ static const unsigned short kReplayLosRadarUpdateUnitLineOfSightObjReads[] = { 3
 static const unsigned char kReplayLosRadarRemoveUnitLineOfSightReads[] = { 17 };
 static const unsigned short kReplayLosRadarRemoveUnitLineOfSightObjReads[] = { 34, 35, 80 };
 static const unsigned char kReplayLosRadarRevealNewUnitReads[] = { 17 };
-static const unsigned short kReplayLosRadarRevealNewUnitObjReads[] = { 34, 35, 80 };
+static const unsigned short kReplayLosRadarRevealNewUnitObjReads[] = { 34, 35, 80, 157, 160, 161 };
 static const unsigned char kReplayLosRadarAddEyeballReads[] = { 0, 17 };
+static const unsigned short kReplayLosRadarAddEyeballObjReads[] = { 157, 160, 161 };
 static const unsigned char kReplayLosRadarRecordRadarUnitsReads[] = { 18 };
 static const unsigned short kReplayLosRadarRecordRadarUnitsObjReads[] = { 23, 45, 119 };
 static const unsigned char kReplayLosRadarRecordRadarMappedReads[] = { 1, 2, 19 };
@@ -1453,15 +1488,15 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "FreeRadar", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "InitRadar", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "LoadTntMap", SUB_LOS_RADAR, kReplayLosRadarLoadTntMapReads, 2, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "RecalculateLineOfSight", SUB_LOS_RADAR, kReplayLosRadarRecalculateLineOfSightReads, 4, nullptr, 0, kReplayLosRadarRecalculateLineOfSightObjReads, 9, nullptr, 0, ROK_PLAYER + 1 },
+    { "RecalculateLineOfSight", SUB_LOS_RADAR, kReplayLosRadarRecalculateLineOfSightReads, 4, nullptr, 0, kReplayLosRadarRecalculateLineOfSightObjReads, 12, nullptr, 0, ROK_PLAYER + 1 },
     { "IsUnitVisibleToPlayer", SUB_LOS_RADAR, kReplayLosRadarIsUnitVisibleToPlayerReads, 1, nullptr, 0, kReplayLosRadarIsUnitVisibleToPlayerObjReads, 4, nullptr, 0, 0 },
     { "GetMapCellAtPosition", SUB_LOS_RADAR, kReplayLosRadarGetMapCellAtPositionReads, 2, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "GetOriginCellAtPosition", SUB_LOS_RADAR, kReplayLosRadarGetOriginCellAtPositionReads, 2, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "UpdateCellHeightRange", SUB_LOS_RADAR, kReplayLosRadarUpdateCellHeightRangeReads, 2, nullptr, 0, kReplayLosRadarUpdateCellHeightRangeObjReads, 2, nullptr, 0, 0 },
     { "UpdateUnitLineOfSight", SUB_LOS_RADAR, kReplayLosRadarUpdateUnitLineOfSightReads, 1, nullptr, 0, kReplayLosRadarUpdateUnitLineOfSightObjReads, 3, nullptr, 0, 0 },
     { "RemoveUnitLineOfSight", SUB_LOS_RADAR, kReplayLosRadarRemoveUnitLineOfSightReads, 1, nullptr, 0, kReplayLosRadarRemoveUnitLineOfSightObjReads, 3, nullptr, 0, 0 },
-    { "RevealNewUnit", SUB_LOS_RADAR, kReplayLosRadarRevealNewUnitReads, 1, nullptr, 0, kReplayLosRadarRevealNewUnitObjReads, 3, nullptr, 0, 0 },
-    { "AddEyeball", SUB_LOS_RADAR, kReplayLosRadarAddEyeballReads, 2, nullptr, 0, nullptr, 0, nullptr, 0, ROK_PLAYER + 1 },
+    { "RevealNewUnit", SUB_LOS_RADAR, kReplayLosRadarRevealNewUnitReads, 1, nullptr, 0, kReplayLosRadarRevealNewUnitObjReads, 6, nullptr, 0, 0 },
+    { "AddEyeball", SUB_LOS_RADAR, kReplayLosRadarAddEyeballReads, 2, nullptr, 0, kReplayLosRadarAddEyeballObjReads, 3, nullptr, 0, ROK_PLAYER + 1 },
     { "RecordRadarUnits", SUB_LOS_RADAR, kReplayLosRadarRecordRadarUnitsReads, 1, nullptr, 0, kReplayLosRadarRecordRadarUnitsObjReads, 3, nullptr, 0, 0 },
     { "RecordRadarMapped", SUB_LOS_RADAR, kReplayLosRadarRecordRadarMappedReads, 3, nullptr, 0, kReplayLosRadarRecordRadarMappedObjReads, 1, nullptr, 0, 0 },
     { "UpdateSensorRadarAndCloak", SUB_LOS_RADAR, kReplayLosRadarUpdateSensorRadarAndCloakReads, 1, nullptr, 0, kReplayLosRadarUpdateSensorRadarAndCloakObjReads, 16, kReplayLosRadarUpdateSensorRadarAndCloakObjWrites, 1, ROK_PLAYER + 1 },

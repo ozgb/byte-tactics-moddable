@@ -2724,6 +2724,50 @@ void SimPlumbingSelfTest()
     Check(g_diffs == 1 && strstr(g_detail.Data(), "[3,5]") != nullptr, "and so are the arguments of an event");
 }
 
+void LoadReadsSelfTest()
+{
+    printf("services: load reads\n");
+    ResetBlock();
+    const char* body =
+        "  i services.LoadAnimGaf \"logos\" = Gaf#1\n"
+        "  i services.FindGafEntry Gaf#1 \"radar\" = FrameTable#1\n"
+        "  o FrameTable#1.count 3\n"
+        "  i services.GetGafFrame FrameTable#1 2 = GafFrame#1\n"
+        "  o GafFrame#1.width 64\n"
+        "  o GafFrame#1.height 32\n"
+        "  o GafFrame#1.xOffset -3\n"
+        "  o GafFrame#1.yOffset 4\n"
+        "  o GafFrame#1.transparency 1\n"
+        "  i services.GetGafFrame FrameTable#1 9 = null\n"
+        "  i services.Load3do \"objects3d\\\\arm.3do\" = Object3do#1\n"
+        "  o Object3do#1.vertexCount 12\n"
+        "  o Object3do#1.box_x -50\n"
+        "  o Object3do#1.box_y 7\n"
+        "  o Object3do#1.box_z 8\n"
+        "  i services.GetObjectHeight Object3do#1 = 88\n";
+    BeginServices(body);
+    void* gaf = LoadAnimGaf("logos");
+    Check(gaf != nullptr && g_objects.Pointer(ROK_GAF, 1) == gaf, "a GAF file is an object the replayer names as the recording does");
+    GafEntry* entry = FindGafEntry((GafArchive*)gaf, "radar");
+    Check(entry != nullptr && ((FrameTable*)entry)->count == 3, "an entry found has the fields the subsystems read");
+    GafFrame* frame = GetGafFrame((FrameTable*)entry, 2);
+    Check(frame != nullptr && frame->width == 64 && frame->height == 32 && frame->xOffset == -3 && frame->yOffset == 4 && frame->transparency == 1, "a frame has its recorded size, offsets and transparency");
+    Check(GetGafFrame((FrameTable*)entry, 9) == nullptr, "a missing frame is null");
+    Object3do* model = (Object3do*)Load3do("objects3d\\arm.3do");
+    Check(model != nullptr && model->vertexCount == 12 && model->box_x == -50 && model->box_y == 7 && model->box_z == 8, "a 3DO model has its recorded box and vertex count");
+    Check(GetObjectHeight(model) == 88, "its height replays");
+    Check(g_diffs == 0 && g_importIndex == 6, "and nothing differs");
+    BeginServices(body);
+    LoadAnimGaf("logos");
+    FindGafEntry((GafArchive*)gaf, "radar");
+    GetGafFrame((FrameTable*)entry, 3);
+    printf("a changed argument: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 2 services.GetGafFrame") == 0, "a changed index is reported at its import");
+    BeginServices(body);
+    LoadAnimGaf("other");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.LoadAnimGaf") == 0, "and so is a changed name");
+}
+
 typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
 
 unsigned CodeIndex(const char* table, const void* function)
@@ -2920,6 +2964,7 @@ int SelfTest(const char* file)
     FilesSelfTest();
     CommandsSelfTest();
     SimPlumbingSelfTest();
+    LoadReadsSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

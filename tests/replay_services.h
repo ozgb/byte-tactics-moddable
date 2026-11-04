@@ -444,6 +444,116 @@ int __stdcall GetSlotDpid(unsigned char index)
     return atoi(result);
 }
 
+GafArchive* __stdcall LoadGaf(const char* path)
+{
+    ReplayText t;
+    StartImport(t, RI_LOAD_GAF);
+    Space(t);
+    t.AddString(path);
+    const char* result = Enter(t);
+    GafArchive* o = (GafArchive*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    return o;
+}
+
+void* __stdcall LoadAnimGaf(char* name)
+{
+    ReplayText t;
+    StartImport(t, RI_LOAD_ANIM_GAF);
+    Space(t);
+    t.AddString(name);
+    const char* result = Enter(t);
+    void* o = (void*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    return o;
+}
+
+GafEntry* __stdcall FindGafEntry(GafArchive* gaf, const char* name)
+{
+    ReplayText t;
+    StartImport(t, RI_FIND_GAF_ENTRY);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_GAF, gaf, false);
+    Space(t);
+    t.AddString(name);
+    const char* result = Enter(t);
+    GafEntry* o = (GafEntry*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_FRAMETABLE, ".count");
+    return o;
+}
+
+GafFrame* __stdcall GetGafFrame(FrameTable* table, int index)
+{
+    ReplayText t;
+    StartImport(t, RI_GET_GAF_FRAME);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_FRAMETABLE, table, false);
+    Space(t);
+    t.AddInt((int)index);
+    const char* result = Enter(t);
+    GafFrame* o = (GafFrame*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_GAFFRAME, ".width");
+    ApplyReach(o, ROK_GAFFRAME, ".height");
+    ApplyReach(o, ROK_GAFFRAME, ".xOffset");
+    ApplyReach(o, ROK_GAFFRAME, ".yOffset");
+    ApplyReach(o, ROK_GAFFRAME, ".transparency");
+    return o;
+}
+
+GafFrame* __stdcall GetGafSequenceFrame(Handle* player)
+{
+    ReplayText t;
+    StartImport(t, RI_GET_GAF_SEQUENCE_FRAME);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_HANDLE, player, false);
+    const char* result = Enter(t);
+    GafFrame* o = (GafFrame*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_GAFFRAME, ".width");
+    ApplyReach(o, ROK_GAFFRAME, ".height");
+    ApplyReach(o, ROK_GAFFRAME, ".xOffset");
+    ApplyReach(o, ROK_GAFFRAME, ".yOffset");
+    ApplyReach(o, ROK_GAFFRAME, ".transparency");
+    return o;
+}
+
+void* __stdcall Load3do(char* path)
+{
+    ReplayText t;
+    StartImport(t, RI_LOAD_3DO);
+    Space(t);
+    t.AddString(path);
+    const char* result = Enter(t);
+    void* o = (void*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_OBJECT3DO, ".vertexCount");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_x");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_y");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_z");
+    return o;
+}
+
+void* __stdcall LoadObject3d(const char* name)
+{
+    ReplayText t;
+    StartImport(t, RI_LOAD_OBJECT_3D);
+    Space(t);
+    t.AddString(name);
+    const char* result = Enter(t);
+    void* o = (void*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_OBJECT3DO, ".vertexCount");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_x");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_y");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_z");
+    return o;
+}
+
+int __stdcall GetObjectHeight(Object3do* model)
+{
+    ReplayText t;
+    StartImport(t, RI_GET_OBJECT_HEIGHT);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_OBJECT3DO, model, false);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
 bool ReplayAnswerImport(ReplayImport& c)
 {
     switch (c.id) {

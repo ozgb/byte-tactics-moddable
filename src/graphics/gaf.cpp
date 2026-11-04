@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include "rect.h"
+#include "../harness/replay.h"
 
 // FUNCTION: 0x4b7e60
 void __stdcall ClipRects(Rect* other, Rect* rect, Rect* bounds)
@@ -50,10 +51,12 @@ struct GafFrameCursor {
 // FUNCTION: 0x4b7ee0
 int __stdcall GetGafSequenceFrame(GafFrameCursor* h)
 {
+    ReplayImport call(RI_GET_GAF_SEQUENCE_FRAME);
+    call.Ptr(h);
     int result = 0;
     if (h->table != 0)
         result = h->table->entries[h->index].value;
-    return result;
+    return (int)call.Result((void*)result);
 }
 
 struct GafFrameCountCursor {
@@ -74,11 +77,14 @@ int __stdcall SetGafSequenceFrame(GafFrameCountCursor* obj, int index)
 // FUNCTION: 0x4b7f30
 int __stdcall GetGafFrame(unsigned short* seq, int frame)
 {
+    ReplayImport call(RI_GET_GAF_FRAME);
+    call.Ptr(seq);
+    call.Int(frame);
     int result = 0;
     if (frame >= 0 && frame < (int)*seq && seq != 0) {
         result = *(int*)((char*)seq + frame * 8 + 0x28);
     }
-    return result;
+    return (int)call.Result((void*)result);
 }
 // FUNCTION: 0x4b7f60
 unsigned short __stdcall GetGafFrameCount(void* ptr)
@@ -561,9 +567,11 @@ struct Blk {
 // FUNCTION: 0x4b8c60
 void* __stdcall LoadGaf(char* name)
 {
+    ReplayImport call(RI_LOAD_GAF);
+    call.Ptr(name);
     int* base = (int*)HAPI_LoadFile(name, 0);
     if (base == 0)
-        return 0;
+        return call.Result((void*)0);
 
     for (int i = 0; i < (short)base[1]; i++) {
         Blk* p = (Blk*)((char*)base + base[3 + i]);
@@ -585,7 +593,7 @@ void* __stdcall LoadGaf(char* name)
             } while (j < (int)p->count);
         }
     }
-    return base;
+    return call.Result((void*)base);
 }
 
 struct GafFileIndex {
@@ -598,14 +606,17 @@ struct GafFileIndex {
 // FUNCTION: 0x4b8d40
 GafSequenceRecord* __stdcall FindGafEntry(GafFileIndex* gaf, const char* name)
 {
+    ReplayImport call(RI_FIND_GAF_ENTRY);
+    call.Ptr(gaf);
+    call.Ptr(name);
     if (gaf) {
         GafSequenceRecord** p = gaf->entries;
         for (int i = 0; i < gaf->count; i++, p++) {
             if (_strcmpi((*p)->name, name) == 0)
-                return *p;
+                return call.Result(*p);
         }
     }
-    return 0;
+    return call.Result((GafSequenceRecord*)0);
 }
 
 #include "../debug/debug_lib.h"

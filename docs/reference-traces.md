@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v20` is the fixed target for anyone writing a new
+The git tag `reference-traces-v21` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v20`**.
+code as a base. This page names the current tag: **`reference-traces-v21`**.
 
 ## What the tag holds
 
@@ -12,7 +12,7 @@ code as a base. This page names the current tag: **`reference-traces-v20`**.
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `src/harness/trace_schema.h`, and the coverage decisions in
   `data/trace_coverage.csv`.
-- The scenario list: `reference/scenarios/`, 73 scenarios, each with its own
+- The scenario list: `reference/scenarios/`, 83 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest per tick
   for each scenario.
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v20`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v20
+git checkout reference-traces-v21
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -134,7 +134,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v20
+git checkout reference-traces-v21
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -207,9 +207,9 @@ What the code shows about the players fields (`LoadPlayers` and `SavePlayers`, s
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v21`
+the digests that should become a target gets a new tag (`reference-traces-v22`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v20`.
+`reference-traces-v21`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -291,12 +291,18 @@ and so on), and this page is updated to name it. The current tag is
   random stream so far, written at the end of each tick where it changed, and the
   `scroll` record in every scenario, not only those with `input` lines
   ([`docs/ui-log.md`](ui-log.md)). Sound logs, frames and the save are those of v19.
+- `reference-traces-v21`: ten more scenarios, `mission-build-unit`, `mission-capture`,
+  `mission-defeat-all-units`, `mission-defeat-of-type`, `mission-defeat-passes-x`,
+  `mission-kill-mobile`, `mission-kill-of-type`, `mission-passes-x`, `mission-passes-z` and
+  `mission-timer` (#764), that play shipped Battle Tactics missions (game type 1) to the campaign
+  victory and defeat conditions the earlier `mission-` scenarios do not reach. The 73 earlier
+  digests, the sound logs, the UI logs, the frames and the save are those of v20.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
-`bt-trace N` does not name which fields are hashed. v1 to v20 are
+`bt-trace N` does not name which fields are hashed. v1 to v21 are
 all `bt-trace 3`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` (and
 `src/harness/trace_schema.h`) at the tag. What makes a new format number is in

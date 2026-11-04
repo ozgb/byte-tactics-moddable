@@ -16,7 +16,7 @@ def row(function, kind, target):
 
 
 def annotations():
-    return copy.deepcopy(rs.load_annotations())
+    return copy.deepcopy(rs.load_annotations(fixtures=True))
 
 
 def build(rows, ann=None, assignment=None):
@@ -1626,6 +1626,28 @@ class Committed(unittest.TestCase):
         self.assertEqual(errors, [])
         for path, want in files.items():
             self.assertEqual(path.read_text(), want, path)
+
+    def test_no_test_kind_is_in_the_committed_schema(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        for path in (rs.JSON_OUT, rs.SCHEMA_H, rs.VTABLES_CPP):
+            self.assertNotIn("Fixture", files[path], path)
+        self.assertIn("FixtureView", files[rs.FIXTURE_SCHEMA_H])
+        self.assertIn('Game.slowest', files[rs.FIXTURE_SCHEMA_H])
+        self.assertIn("BT_REPLAY_FIXTURES", files[rs.SCHEMA_H])
+
+    def test_the_test_schema_adds_its_kinds_after_the_real_ones(self):
+        real, _ = rs.build(rs.load_annotations(), rs.read_rows(), rs.read_assignment())
+        both, _ = rs.build(rs.load_annotations(fixtures=True), rs.read_rows(), rs.read_assignment())
+        names = [o["name"] for o in both["objects"]]
+        self.assertEqual(names[:len(real["objects"])], [o["name"] for o in real["objects"]])
+        self.assertTrue(all(n.startswith("Fixture") for n in names[len(real["objects"]):]))
+        self.assertEqual([f["name"] for f in both["object_fields"][:len(real["object_fields"])]], [f["name"] for f in real["object_fields"]])
+
+    def test_the_test_kinds_are_checked_too(self):
+        ann = annotations()
+        ann["objects"]["FixtureCell"]["delta"] = "yes"
+        files, errors, _ = rs.generate(rs.read_rows(), rs.load_annotations(), None, {"objects": {"FixtureCell": ann["objects"]["FixtureCell"]}, "includes": ["../../tests/replay_fixtures.h"]})
+        self.assertTrue(any("FixtureCell delta" in e for e in errors), errors)
 
     def test_every_simulation_subsystem_is_covered(self):
         files, _, model = rs.generate(rs.read_rows())

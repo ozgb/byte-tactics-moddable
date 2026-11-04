@@ -1,9 +1,9 @@
-#ifndef HARNESS_REPLAY_FIXTURES_H
-#define HARNESS_REPLAY_FIXTURES_H
+#ifndef TESTS_REPLAY_FIXTURES_H
+#define TESTS_REPLAY_FIXTURES_H
 
-#include "../../interfaces/ref.h"
-#include "../graphics/handle.h"
-#include "../map/frame_table.h"
+#include "../interfaces/ref.h"
+#include "../src/graphics/handle.h"
+#include "../src/map/frame_table.h"
 
 struct UnitDef;
 

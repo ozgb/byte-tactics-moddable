@@ -608,6 +608,16 @@ it cannot write is the hook itself, `ReplayImport call(RI_X); call.Int(..)` at t
 those functions are the services themselves, reached by direct calls with no table to wrap, so the hook has to be in the
 function; `replayschema.py --check` fails when a hook's arguments differ from its entry or an entry has no hook.
 
+### The test schema
+
+The kinds the self-tests need and no subsystem has (`FixtureView`, `FixtureCell`, `FixtureHolder` and the like, in the examples of this page) are
+not in `data/replay_schema.json`. `tests/replay_fixtures.json` holds them (`includes`, `game_fields`, `objects`, and `inside` for the sites they add
+to a real kind), `tests/replay_fixtures.h` their structs, and `uv run tools/replayschema.py` writes `tests/replay_schema_fixtures.h`, the tables
+of the real kinds with these appended, and `tests/replay_vtables_fixtures.cpp`. `src/harness/replay_schema.h` includes the first when
+`BT_REPLAY_FIXTURES` is defined, which only the build of `replay_native_test` does, so the exe's recorder has no fixture kind, and no real member of `Game`
+(`Game::slowest`, `p1b8a` and `p1cd5` are the hosts of the fixtures) is declared as anything but what it is. The fixture annotations are checked
+with the rest.
+
 ### Services
 
 Every service is one `i services.<name>` line, written when the function returns, so its pointer arguments show what the function left

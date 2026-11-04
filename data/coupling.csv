@@ -3230,7 +3230,7 @@ platform,units,shared_write,Fixed::value,3
 platform,units,shared_write,Fixed::whole,1
 platform,units,shared_write,Point16::x,7
 platform,units,shared_write,Point16::y,7
-platform,units,shared_write,StringRef::data,3
+platform,units,shared_write,StringRef::data,4
 platform,units,shared_write,TdfFile::current,4
 platform,units,shared_write,UnitDef::scriptChecksum,1
 platform,units,shared_write,Vec3::x,12
@@ -4308,7 +4308,7 @@ presentation,units,shared_write,PlayerInfo::bit6,1
 presentation,units,shared_write,PlayerInfo::side,3
 presentation,units,shared_write,Point16::x,7
 presentation,units,shared_write,Point16::y,7
-presentation,units,shared_write,StringRef::data,3
+presentation,units,shared_write,StringRef::data,4
 presentation,units,shared_write,Unit::angles,6
 presentation,units,shared_write,Unit::attacker,5
 presentation,units,shared_write,Unit::flags,20

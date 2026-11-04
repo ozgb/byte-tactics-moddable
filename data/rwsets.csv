@@ -27752,7 +27752,7 @@ address,function,file,kind,target
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,function,
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,global_maybe_written,s_unitCategories@src/units/unit_commands.cpp
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,call,FindByName
-0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,call,GetCategoryMask
+0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,call,FindCategoryMask
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,call,get
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,deref_write,*int
 0x488d30,UnitTypeSet::AddTypeOrCategory,src/units/unit_commands.cpp,field_read,Game::defs
@@ -45102,6 +45102,13 @@ address,function,file,kind,target
 ,FindByName,src/units/unit_commands.cpp,call,_strcmpi
 ,FindByName,src/units/unit_commands.cpp,field_escape,UnitDefNameKeyView::name
 ,FindByName,src/units/unit_commands.cpp,function,
+,FindCategoryMask,src/units/unit_commands.cpp,call,LowerBoundCategory
+,FindCategoryMask,src/units/unit_commands.cpp,call,_strcmpi
+,FindCategoryMask,src/units/unit_commands.cpp,call,end
+,FindCategoryMask,src/units/unit_commands.cpp,field_read,StringRef::data
+,FindCategoryMask,src/units/unit_commands.cpp,field_read,UnitCategory::value
+,FindCategoryMask,src/units/unit_commands.cpp,function,
+,FindCategoryMask,src/units/unit_commands.cpp,global_maybe_written,s_unitCategories@src/units/unit_commands.cpp
 ,FindCdPlayerWindow,src/host/win32/music.cpp,call,GetClassNameA
 ,FindCdPlayerWindow,src/host/win32/music.cpp,call,strcmp
 ,FindCdPlayerWindow,src/host/win32/music.cpp,deref_write,*void

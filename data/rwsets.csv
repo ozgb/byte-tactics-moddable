@@ -52130,6 +52130,8 @@ address,function,file,kind,target
 ,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,global_read,s_inner_features
 ,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,indirect_call,indirect via unsigned short (*const)(Cell *) __attribute__((stdcall)) [FeaturesSeam::GetCellFeature]
+,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,Add
+,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,ArgObject
 ,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,ArgPending
 ,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,ArgValue
 ,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -52178,6 +52180,7 @@ address,function,file,kind,target
 ,RecFeaturesPlaceFeature,src/harness/replay_hooks.inc,function,
 ,RecFeaturesPlaceFeature,src/harness/replay_hooks.inc,global_read,s_call
 ,RecFeaturesPlaceFeature,src/harness/replay_hooks.inc,global_read,s_inner_features
+,RecFeaturesPlaceFeature,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecFeaturesPlaceFeature,src/harness/replay_hooks.inc,indirect_call,"indirect via Spot *(*const)(Cell *, unsigned short, Vec3 *, Rot16 *, unsigned char) __attribute__((stdcall)) [FeaturesSeam::PlaceFeature]"
 ,RecFeaturesPlaceMissionFeatures,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecFeaturesPlaceMissionFeatures,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -54335,6 +54338,7 @@ address,function,file,kind,target
 ,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,function,
 ,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,global_read,s_call
 ,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,global_read,s_inner_units
+,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecUnitsCreateObjectState,src/harness/replay_hooks.inc,indirect_call,indirect via ModelState *(*const)(Object3do *) __attribute__((stdcall)) [UnitsSeam::CreateObjectState]
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ArgValue
@@ -54413,7 +54417,8 @@ address,function,file,kind,target
 ,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,function,
 ,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::FreeMovementClasses]
-,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,call,ArgPending
+,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,call,Add
+,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsFreeObjectState,src/harness/replay_hooks.inc,field_read,UnitsSeam::FreeObjectState

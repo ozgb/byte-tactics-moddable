@@ -1,3 +1,4 @@
+#define BT_REPLAY_FIXTURES 1
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -11,6 +12,7 @@
 #include "../interfaces/services.h"
 #include "../interfaces/seams.h"
 #include "../src/game/game_state.h"
+#include "../src/map/feature_spot.h"
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
 #include "../src/harness/replay_services.h"
@@ -106,6 +108,11 @@ int __stdcall FixtureOtherNotify(Unit*, Order*, int)
 {
     return 4;
 }
+
+extern void (* const g_fixtureTimerVtable[2])() = { nullptr, nullptr };
+extern void (* const g_fixtureAssaultVtable[2])() = { nullptr, nullptr };
+extern void (* const g_fixtureCbVtable[2])() = { nullptr, nullptr };
+extern void (* const g_fixtureAttachVtable[2])() = { nullptr, nullptr };
 
 namespace {
 
@@ -1292,24 +1299,54 @@ struct Outcome {
     ReplayText log;
 };
 
+struct LineKey {
+    unsigned kind;
+    unsigned ordinal;
+    const char* fieldName;
+    const ReplayObjectField* field;
+    bool vectorElement;
+    bool refsElement;
+    unsigned element;
+    const char* sub;
+    char prefix[96];
+    char object[96];
+};
+
+bool ParseLineKey(const char* name, LineKey& out)
+{
+    out.field = nullptr;
+    out.vectorElement = false;
+    out.refsElement = false;
+    out.element = 0;
+    out.sub = nullptr;
+    const char* base = name;
+    if (ReplayParseKey(name, &out.kind, &out.ordinal, &out.fieldName))
+        out.field = ReplayFindObjectField(out.kind, out.fieldName);
+    if (out.field == nullptr) {
+        if (ReplayParseElementKey(name, out.prefix, sizeof out.prefix, &out.element, &out.sub))
+            out.vectorElement = true;
+        else if (ReplayParseRefsKey(name, out.prefix, sizeof out.prefix, &out.element))
+            out.refsElement = true;
+        else
+            return false;
+        base = out.prefix;
+        if (!ReplayParseKey(base, &out.kind, &out.ordinal, &out.fieldName))
+            return false;
+        out.field = ReplayFindObjectField(out.kind, out.fieldName);
+    }
+    const char* dot = strrchr(base, '.');
+    memcpy(out.object, base, (unsigned)(dot - base));
+    out.object[dot - base] = '\0';
+    return true;
+}
+
 bool RestoreObjectLine(const char* name, const char* value, const char* file, const ReplaySlotSets* sets, const char* line)
 {
-    unsigned kind = 0;
-    unsigned ordinal = 0;
-    const char* fieldName = nullptr;
-    char prefix[96];
-    unsigned element = 0;
-    const char* sub = nullptr;
-    bool inElement = ReplayParseElementKey(name, prefix, sizeof prefix, &element, &sub);
-    const char* base = inElement ? prefix : name;
-    if (!ReplayParseKey(base, &kind, &ordinal, &fieldName))
+    LineKey k;
+    if (!ParseLineKey(name, k))
         return false;
-    char object[48];
-    const char* dot = strrchr(base, '.');
-    memcpy(object, base, (unsigned)(dot - base));
-    object[dot - base] = '\0';
-    void* p = ReplayResolveObject(object, nullptr, g_objects, AllocObject);
-    const ReplayObjectField* f = ReplayFindObjectField(kind, fieldName);
+    void* p = ReplayResolveObject(k.object, nullptr, g_objects, AllocObject);
+    const ReplayObjectField* f = k.field;
     if (p == nullptr || f == nullptr)
         Fatal(file, g_callIndex, "an object line that names no object or field", line);
     if (sets != nullptr && !InObjectSet(sets->objReads, sets->objReadCount, f) && !InObjectSet(sets->objWrites, sets->objWriteCount, f))
@@ -1322,10 +1359,16 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
         return true;
     }
     if (f->kind == RK_VECTOR) {
-        bool applied = inElement ? ReplayApplyVectorElement(*f, p, element, sub, name, value, g_known, true, g_objects, AllocObject)
-                                 : ReplayApplyVector(*f, p, name, value, g_known, true, g_objects, AllocObject);
+        bool applied = k.vectorElement ? ReplayApplyVectorElement(*f, p, k.element, k.sub, name, value, g_known, true, g_objects, AllocObject)
+                                       : ReplayApplyVector(*f, p, name, value, g_known, true, g_objects, AllocObject);
         if (!applied)
             Fatal(file, g_callIndex, "a vector line that cannot be applied", value);
+        return true;
+    }
+    if (f->kind == RK_REFS) {
+        if (!k.refsElement || !ReplayRestoreRefsElement(*f, p, k.element, value, g_objects, AllocObject))
+            Fatal(file, g_callIndex, "a ref line that cannot be applied", value);
+        g_known.Set(name, value);
         return true;
     }
     if (!ReplayRestoreObjectField(*f, p, value, g_objects, AllocObject))
@@ -1336,29 +1379,27 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
 
 bool ObjectLineIsCondition(const char* name)
 {
-    unsigned kind = 0;
-    unsigned ordinal = 0;
-    const char* fieldName = nullptr;
-    char prefix[96];
-    unsigned element = 0;
-    const char* sub = nullptr;
-    if (ReplayParseElementKey(name, prefix, sizeof prefix, &element, &sub) || !ReplayParseKey(name, &kind, &ordinal, &fieldName))
+    LineKey k;
+    if (!ParseLineKey(name, k) || k.vectorElement || k.refsElement)
         return false;
-    const ReplayObjectField* f = ReplayFindObjectField(kind, fieldName);
-    return f != nullptr && ReplayFieldIsCondition(*f);
+    return k.field != nullptr && ReplayFieldIsCondition(*k.field);
 }
 
 void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* object, const unsigned short* set, unsigned count, ReplayText& key, ReplayText& value)
 {
     for (unsigned i = 0; i < count; i++) {
         const ReplayObjectField& f = kReplayObjectFields[set[i]];
-        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_UNITID || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
+        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_EMBEDS || f.kind == RK_UNITID || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
             continue;
         if (!ReplayFieldLive(f, object))
             continue;
         ReplayObjectFieldKey(key, g_objects, false, kind, object, f);
         if (f.kind == RK_VECTOR) {
             ReplayCompareVector(f, object, key.Data(), g_known, g_objects, Diff, HashText);
+            continue;
+        }
+        if (f.kind == RK_REFS) {
+            ReplayCompareRefs(f, object, key.Data(), g_known, g_objects, Diff, HashText);
             continue;
         }
         ReplayFormatObjectField(f, object, g_objects, false, value);
@@ -1376,8 +1417,10 @@ void CompareObjects(const ReplaySlotSets* sets)
     ReplayWalk(g_reach, g_objects, false, *sets, g_rootKinds, g_rootObjects, g_rootCount);
     ReplayText key;
     ReplayText value;
-    for (unsigned at = 0; at < g_reach.count; at++)
-        CompareObject(&g_reach, at, g_reach.kind[at], g_reach.object[at], sets->objWrites, sets->objWriteCount, key, value);
+    for (unsigned at = 0; at < g_reach.count; at++) {
+        if (!ReplayInDeltaTable(g_reach, g_reach.kind[at], g_reach.object[at]))
+            CompareObject(&g_reach, at, g_reach.kind[at], g_reach.object[at], sets->objWrites, sets->objWriteCount, key, value);
+    }
     for (unsigned d = 0; d < ReplayDeltaCount(g_reach); d++) {
         unsigned kind;
         unsigned char* base;
@@ -1385,10 +1428,8 @@ void CompareObjects(const ReplaySlotSets* sets)
         unsigned stride;
         if (!ReplayDeltaTable(g_reach, d, &kind, &base, &elements, &stride))
             continue;
-        for (unsigned e = 0; e < elements; e++) {
-            if (!ReplayInReachObject(g_reach, kind, base + e * stride))
-                CompareObject(nullptr, 0, kind, base + e * stride, sets->objWrites, sets->objWriteCount, key, value);
-        }
+        for (unsigned e = 0; e < elements; e++)
+            CompareObject(nullptr, 0, kind, base + e * stride, sets->objWrites, sets->objWriteCount, key, value);
     }
     key.Free();
     value.Free();
@@ -1411,21 +1452,19 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
         const ReplayObjectField* arrayField = nullptr;
         ReplayObjectField blockView = {};
         if (strchr(name, '#') != nullptr) {
-            unsigned kind = 0;
-            unsigned ordinal = 0;
-            const char* fieldName = nullptr;
-            char prefix[96];
-            unsigned element = 0;
-            const char* sub = nullptr;
-            bool inElement = ReplayParseElementKey(name, prefix, sizeof prefix, &element, &sub);
-            const ReplayObjectField* f = ReplayParseKey(inElement ? prefix : name, &kind, &ordinal, &fieldName) ? ReplayFindObjectField(kind, fieldName) : nullptr;
+            LineKey k;
+            const ReplayObjectField* f = ParseLineKey(name, k) ? k.field : nullptr;
             if (f == nullptr || !InObjectSet(sets->objWrites, sets->objWriteCount, f))
                 Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
             if (f->kind == RK_VECTOR) {
-                bool applied = inElement ? ReplayApplyVectorElement(*f, nullptr, element, sub, name, space + 1, g_known, false, g_objects, nullptr)
-                                         : ReplayApplyVector(*f, nullptr, name, space + 1, g_known, false, g_objects, nullptr);
+                bool applied = k.vectorElement ? ReplayApplyVectorElement(*f, nullptr, k.element, k.sub, name, space + 1, g_known, false, g_objects, nullptr)
+                                               : ReplayApplyVector(*f, nullptr, name, space + 1, g_known, false, g_objects, nullptr);
                 if (!applied)
                     Fatal(file, g_callIndex, "a vector line that cannot be applied", line);
+                continue;
+            }
+            if (f->kind == RK_REFS) {
+                g_known.Set(name, space + 1);
                 continue;
             }
             array = f->kind == RK_ARRAY;
@@ -3325,6 +3364,59 @@ void MaskedViewSelfTest()
     free(second);
 }
 
+void FeatureTableSelfTest()
+{
+    printf("the feature table\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    Feature* table = (Feature*)SimAlloc(4 * (unsigned)sizeof(Feature));
+    memset((void*)table, 0, 4 * sizeof(Feature));
+    g_game->features = table;
+    g_game->featureCount = 3;
+    table[3].anim.index = 2;
+    unsigned char kinds[1] = { ROK_HANDLE };
+    void* roots[1] = { &table[3].anim };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    Check(strstr(recorder.text.Data(), "Handle#") == nullptr, "a handle of the element one past the count is not named by order");
+    Check(strstr(recorder.text.Data(), "  r Feature#3.anim.index 2\n") != nullptr, "it is named by its site");
+    Check(ReplayResolveObject("Feature#3.anim", nullptr, g_objects, AllocObject) == &table[3].anim, "and the name resolves to it");
+    Check(ReplayResolveObject("Feature#4.anim", nullptr, g_objects, AllocObject) == nullptr, "an element past that is none");
+
+    ResetBlock();
+    g_game->featureCount = 3;
+    Check(ReplayResolveObject("Feature#2", nullptr, g_objects, AllocObject) != nullptr, "an element of a table the replayer allocates resolves");
+    Check(g_game->featureCount == 3, "and the count a recording restored is kept");
+
+    ResetBlock();
+    Feature* defs = (Feature*)SimAlloc(2 * (unsigned)sizeof(Feature));
+    memset((void*)defs, 0, 2 * sizeof(Feature));
+    g_game->features = defs;
+    g_game->featureCount = 2;
+    FeatureSpot* pool = (FeatureSpot*)SimAlloc(2048 * (unsigned)sizeof(FeatureSpot));
+    memset((void*)pool, 0, 2048 * sizeof(FeatureSpot));
+    g_game->spots = pool;
+    Spot* spots = (Spot*)pool;
+    spots[0].feature = 1;
+    unsigned char spotKinds[1] = { ROK_SPOT };
+    void* spotRoots[1] = { &spots[0] };
+    Recorder spot;
+    defs[1].noobject = 1;
+    spots[0].anim.index = 5;
+    spot.Record(spotKinds, spotRoots, 1, sets);
+    Check(strstr(spot.text.Data(), "  r Spot#0.anim.index 5\n") != nullptr, "a spot of a sprite feature records its handle");
+    defs[1].noobject = 0;
+    spot.Record(spotKinds, spotRoots, 1, sets);
+    Check(strstr(spot.text.Data(), "Spot#0.anim") == nullptr, "a spot of a model feature has none");
+    defs[1].noobject = 1;
+    spots[0].anim.index = 5;
+    spot.Record(spotKinds, spotRoots, 1, sets);
+    Check(strstr(spot.text.Data(), "  r Spot#0.anim.index 5\n") != nullptr, "a handle that came back after a model phase is recorded again");
+}
+
 void EmbeddedSiteSelfTest()
 {
     printf("an object embedded at two sites\n");
@@ -3580,6 +3672,57 @@ void DeltaTableSelfTest()
     Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureCell#8999.metal") == 0, "a changed element is reported at its index and field");
     free(first);
     free(second);
+}
+
+void DeltaLimitSelfTest()
+{
+    printf("an element of a delta table that a limited reach also names\n");
+    ResetBlock();
+    ReplayClearFailure();
+    const unsigned cells = 9000;
+    FixtureCell* table = (FixtureCell*)SimAlloc(cells * (unsigned)sizeof(FixtureCell));
+    memset((void*)table, 0, cells * sizeof(FixtureCell));
+    g_game->p1b8a = (SideData*)(void*)table;
+    FixtureLane* lanes = (FixtureLane*)SimAlloc(4 * (unsigned)sizeof(FixtureLane));
+    memset((void*)lanes, 0, 4 * sizeof(FixtureLane));
+    g_game->p1cd5 = (SideData*)(void*)lanes;
+    lanes[1].unit = 40;
+    table[40].metal = 9;
+    table[40].flags = 7;
+    table[41].flags = 3;
+    unsigned short fields[4] = { FieldIndex(ROK_FIXTURELANE, "unit"), FieldIndex(ROK_FIXTURELANE, "cell"), FieldIndex(ROK_FIXTURECELL, "metal"), FieldIndex(ROK_FIXTURECELL, "flags") };
+    unsigned char every[2] = { ROK_FIXTURECELL, ROK_FIXTURELANE };
+    ReplaySlotSets sets = { "limit", 0, nullptr, 0, nullptr, 0, fields, 4, fields, 4, every, 2 };
+    Recorder recorder;
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* text = strdup(recorder.text.Data());
+    Check(ReplayFailure() == nullptr, "the walk reaches the table through the lane ids without a failure");
+    Check(strstr(text, "  r FixtureCell#40.metal 9\n") != nullptr, "the limited field of the element a lane names is recorded");
+    Check(strstr(text, "  r FixtureCell#40.flags 7\n") != nullptr, "and so is its other field, which the limit does not list");
+    Check(CountLines(text, "  r FixtureCell#40.") == 2 && CountLines(text, "  r FixtureCell#") == 2 * (int)cells, "each field of each element is written once");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureCell* rebuilt = (FixtureCell*)g_game->p1b8a.get();
+    Check(rebuilt != nullptr && g_game->p1cd5.get() != nullptr && rebuilt[40].flags == 7 && rebuilt[41].flags == 3, "the table is restored");
+    if (rebuilt == nullptr || g_game->p1cd5.get() == nullptr) {
+        free(text);
+        return;
+    }
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored table compares equal");
+    rebuilt[40].flags = 8;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureCell#40.flags") == 0, "a change in the field the limit does not list is reported");
+    rebuilt[40].flags = 7;
+    rebuilt[40].metal = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureCell#40.metal") == 0, "and one in the limited field");
+    free(text);
 }
 
 void UnconditionedUnitIdSelfTest()
@@ -3922,6 +4065,368 @@ void PolymorphicSelfTest()
 }
 }
 
+void* Fresh(unsigned size)
+{
+    void* p = SimAlloc(size);
+    memset(p, 0, size);
+    return p;
+}
+
+void RefsSelfTest()
+{
+    printf("an array of refs\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    FixtureManager* manager = (FixtureManager*)Fresh(sizeof(FixtureManager));
+    FixtureTimer* timer = (FixtureTimer*)Fresh(sizeof(FixtureTimer));
+    FixtureAssault* assault = (FixtureAssault*)Fresh(sizeof(FixtureAssault));
+    SetVtable(timer, ReplayVtable(ROK_FIXTURETIMER));
+    SetVtable(assault, ReplayVtable(ROK_FIXTUREASSAULT));
+    timer->ticks = 5;
+    timer->period = 9;
+    assault->ticks = 7;
+    assault->squad = 2;
+    manager->id = 3;
+    manager->timers[0] = timer;
+    manager->timers[2] = assault;
+
+    unsigned char kinds[1] = { ROK_FIXTUREMANAGER };
+    void* roots[1] = { manager };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* first = strdup(recorder.text.Data());
+    printf("%s", first);
+    Check(ReplayFailure() == nullptr, "every element is a ref, null or an object of a kind of the base");
+    Check(strstr(first, "  r FixtureManager#1.timers[0] FixtureTimer#1\n") != nullptr, "an element that is the base kind is written as that kind");
+    Check(strstr(first, "  r FixtureManager#1.timers[2] FixtureAssault#1\n") != nullptr, "and one that is the derived kind as its own");
+    Check(strstr(first, "  r FixtureManager#1.timers[1] null\n") != nullptr && strstr(first, "  r FixtureManager#1.timers[3] null\n") != nullptr, "a null element is written null");
+    Check(CountLines(first, "  r FixtureManager#1.timers[") == 4 && strstr(first, "FixtureTimerBase#") == nullptr, "each element is a line, and the base is never written");
+    Check(strstr(first, "  r FixtureTimer#1.period 9\n") != nullptr && strstr(first, "  r FixtureAssault#1.squad 2\n") != nullptr, "the walk reaches the objects the elements name");
+
+    manager->timers[3] = timer;
+    recorder.Record(kinds, roots, 1, sets);
+    char* second = strdup(recorder.text.Data());
+    Check(strcmp(second, "  r FixtureManager#1.timers[3] FixtureTimer#1\n") == 0, "an element that changed between calls is one line");
+
+    ResetBlock();
+    RestoreText(first, sets);
+    RestoreText(second, sets);
+    FixtureManager* rebuilt = (FixtureManager*)ReplayResolveObject("FixtureManager#1", nullptr, g_objects, AllocObject);
+    FixtureTimer* rebuiltTimer = (FixtureTimer*)ReplayResolveObject("FixtureTimer#1", nullptr, g_objects, AllocObject);
+    FixtureAssault* rebuiltAssault = (FixtureAssault*)ReplayResolveObject("FixtureAssault#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuiltTimer != nullptr && rebuiltAssault != nullptr, "the objects are rebuilt");
+    if (rebuilt == nullptr || rebuiltTimer == nullptr || rebuiltAssault == nullptr) {
+        free(first);
+        free(second);
+        return;
+    }
+    Check(rebuilt->timers[0].get() == (FixtureTimerBase*)rebuiltTimer && rebuilt->timers[2].get() == (FixtureTimerBase*)rebuiltAssault, "each element leads to its object");
+    Check(rebuilt->timers[1].get() == nullptr && rebuilt->timers[3].get() == (FixtureTimerBase*)rebuiltTimer, "a null stays null, and the changed element is applied");
+    Check(*(const void**)rebuiltTimer == ReplayVtable(ROK_FIXTURETIMER) && *(const void**)rebuiltAssault == ReplayVtable(ROK_FIXTUREASSAULT), "and each has the vtable of its kind");
+    Check(rebuiltTimer->period == 9 && rebuiltAssault->squad == 2 && rebuilt->id == 3, "the fields are restored");
+    g_rootKinds[0] = ROK_FIXTUREMANAGER;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored array compares equal");
+    rebuilt->timers[1] = (FixtureTimerBase*)rebuiltAssault;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed element: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureManager#1.timers[1]") == 0, "a changed element is reported at its index");
+    rebuilt->timers[1] = (FixtureTimerBase*)nullptr;
+    rebuiltAssault->squad = 4;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureAssault#1.squad") == 0, "and a field of an element's object at the object");
+    free(first);
+    free(second);
+}
+
+void BasedTableSelfTest()
+{
+    printf("a table behind a ref field\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    FixtureOwner* owner = (FixtureOwner*)Fresh(sizeof(FixtureOwner));
+    FixtureOwner* other = (FixtureOwner*)Fresh(sizeof(FixtureOwner));
+    FixtureGroup* groups = (FixtureGroup*)Fresh(4 * (unsigned)sizeof(FixtureGroup));
+    FixtureGroup* otherGroups = (FixtureGroup*)Fresh(4 * (unsigned)sizeof(FixtureGroup));
+    FixtureUser* user = (FixtureUser*)Fresh(sizeof(FixtureUser));
+    FixtureUser* otherUser = (FixtureUser*)Fresh(sizeof(FixtureUser));
+    owner->id = 1;
+    owner->groups = groups;
+    other->id = 2;
+    other->groups = otherGroups;
+    groups[2].level = 7;
+    groups[0].mode = 3;
+    otherGroups[1].level = 8;
+    user->tag = 10;
+    user->group = &groups[2];
+    otherUser->tag = 11;
+    otherUser->group = &otherGroups[1];
+
+    unsigned char kinds[4] = { ROK_FIXTUREOWNER, ROK_FIXTUREOWNER, ROK_FIXTUREUSER, ROK_FIXTUREUSER };
+    void* roots[4] = { owner, other, user, otherUser };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 4, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(ReplayFailure() == nullptr, "the walk reaches the elements without a failure");
+    Check(strstr(text, "  r FixtureUser#1.group FixtureOwner#1.groups[2]\n") != nullptr, "a ref into the table names the element by its owner's field and index");
+    Check(strstr(text, "  r FixtureUser#2.group FixtureOwner#2.groups[1]\n") != nullptr, "and an element of another owner by that owner");
+    Check(strstr(text, "  r FixtureOwner#1.groups[2].level 7\n") != nullptr && strstr(text, "  r FixtureOwner#2.groups[1].level 8\n") != nullptr, "the fields of an element are written under that name");
+    Check(strstr(text, "  r FixtureOwner#1.groups FixtureOwner#1.groups[0]\n") != nullptr, "the owner's ref field is the first element");
+    Check(strstr(text, "FixtureGroup#") == nullptr, "no element is named by order");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureOwner* rebuilt = (FixtureOwner*)ReplayResolveObject("FixtureOwner#1", nullptr, g_objects, AllocObject);
+    FixtureOwner* rebuiltOther = (FixtureOwner*)ReplayResolveObject("FixtureOwner#2", nullptr, g_objects, AllocObject);
+    FixtureUser* rebuiltUser = (FixtureUser*)ReplayResolveObject("FixtureUser#1", nullptr, g_objects, AllocObject);
+    FixtureUser* rebuiltOtherUser = (FixtureUser*)ReplayResolveObject("FixtureUser#2", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuiltOther != nullptr && rebuiltUser != nullptr && rebuiltOtherUser != nullptr, "the objects are rebuilt");
+    if (rebuilt == nullptr || rebuiltOther == nullptr || rebuiltUser == nullptr || rebuiltOtherUser == nullptr || rebuilt->groups.get() == nullptr || rebuiltOther->groups.get() == nullptr) {
+        free(text);
+        return;
+    }
+    FixtureGroup* array = rebuilt->groups.get();
+    Check(rebuiltUser->group.get() == array + 2 && rebuiltOtherUser->group.get() == rebuiltOther->groups.get() + 1, "a ref into the table is restored to the right element of the right owner");
+    Check(array != rebuiltOther->groups.get() && array[2].level == 7 && array[0].mode == 3 && rebuiltOther->groups.get()[1].level == 8, "each owner has an array of its own, with the fields in place");
+    Check(ReplayResolveObject("FixtureOwner#1.groups[3]", nullptr, g_objects, AllocObject) == array + 3, "the whole array is allocated at first sight");
+    Check(ReplayResolveObject("FixtureOwner#1.groups[4]", nullptr, g_objects, AllocObject) == nullptr, "and an index past it names nothing");
+    unsigned found = 0;
+    Check(ReplayResolveObject("FixtureOwner#1.groups[1]", &found, g_objects, AllocObject) == array + 1 && found == ROK_FIXTUREGROUP, "a name resolves to the element and its kind");
+    g_rootKinds[0] = ROK_FIXTUREOWNER;
+    g_rootKinds[1] = ROK_FIXTUREOWNER;
+    g_rootKinds[2] = ROK_FIXTUREUSER;
+    g_rootKinds[3] = ROK_FIXTUREUSER;
+    g_rootObjects[0] = rebuilt;
+    g_rootObjects[1] = rebuiltOther;
+    g_rootObjects[2] = rebuiltUser;
+    g_rootObjects[3] = rebuiltOtherUser;
+    g_rootCount = 4;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored table compares equal");
+    array[2].level = 6;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureOwner#1.groups[2].level") == 0, "a changed field is reported under the element's name");
+    array[2].level = 7;
+    rebuiltUser->group = &array[1];
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a ref to another element: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs > 0 && strcmp(g_firstKey, "FixtureUser#1.group") == 0, "a ref that leads to another element is reported at the ref");
+    free(text);
+}
+
+void ElementSiteSelfTest()
+{
+    printf("an object at an array element's site, with a vptr set by hand\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    FixtureRig* rig = (FixtureRig*)Fresh(sizeof(FixtureRig));
+    rig->id = 5;
+    for (int i = 0; i < 3; i++)
+        rig->slots[i].cb.ppVtbl = (void**)ReplayVtable(ROK_FIXTURECB);
+    rig->slots[1].cb.done = 6;
+    rig->slots[2].cb.done = 1;
+    unsigned char kinds[1] = { ROK_FIXTURERIG };
+    void* roots[1] = { rig };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(ReplayFailure() == nullptr, "the vptr of each element is the vtable of the kind");
+    Check(strstr(text, "  r FixtureRig#1.slots[0].cb.done 0\n") != nullptr && strstr(text, "  r FixtureRig#1.slots[1].cb.done 6\n") != nullptr && strstr(text, "  r FixtureRig#1.slots[2].cb.done 1\n") != nullptr, "the walk names each element's object by its site and index");
+    Check(strstr(text, "FixtureCb#") == nullptr && strstr(text, "ppVtbl") == nullptr && strstr(text, "vptr") == nullptr, "no object is named by order, and no vptr is written");
+
+    ReplayText name;
+    ReplayAddObjectName(name, *recorder.table, ROK_FIXTURECB, &rig->slots[1].cb, true);
+    Check(strcmp(name.Data(), "FixtureRig#1.slots[1].cb") == 0, "an argument at an element's site is named by it");
+    name.Clear();
+    ReplayAddObjectName(name, *recorder.table, ROK_FIXTURECB, &rig->slots[2].cb, true);
+    Check(strcmp(name.Data(), "FixtureRig#1.slots[2].cb") == 0, "and another element by its own index");
+    FixtureCb* loose = (FixtureCb*)Fresh(sizeof(FixtureCb));
+    loose->ppVtbl = (void**)ReplayVtable(ROK_FIXTURECB);
+    name.Clear();
+    ReplayAddObjectName(name, *recorder.table, ROK_FIXTURECB, loose, true);
+    Check(strcmp(name.Data(), "FixtureCb#1") == 0, "an object of the kind that is at no site is named by order");
+    name.Clear();
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureRig* rebuilt = (FixtureRig*)ReplayResolveObject("FixtureRig#1", nullptr, g_objects, AllocObject);
+    unsigned kind = 0;
+    FixtureCb* cb = (FixtureCb*)ReplayResolveObject("FixtureRig#1.slots[1].cb", &kind, g_objects, AllocObject);
+    Check(rebuilt != nullptr && cb == &rebuilt->slots[1].cb && kind == ROK_FIXTURECB, "a name of an element's site resolves to the bytes inside the element");
+    if (rebuilt == nullptr || cb == nullptr) {
+        free(text);
+        name.Free();
+        return;
+    }
+    Check(rebuilt->slots[1].cb.done == 6 && rebuilt->slots[2].cb.done == 1 && rebuilt->id == 5, "the fields are restored in place");
+    Check((const void*)rebuilt->slots[0].cb.ppVtbl == ReplayVtable(ROK_FIXTURECB) && (const void*)rebuilt->slots[2].cb.ppVtbl == ReplayVtable(ROK_FIXTURECB), "each element gets the replayer's copy of the vtable");
+    Check(ReplayResolveObject("FixtureRig#1.slots[3].cb", nullptr, g_objects, AllocObject) == nullptr, "an index past the array names nothing");
+    Check(g_objects.Pointer(ROK_FIXTURECB, 1) == nullptr, "no separate object of the kind is allocated");
+    g_rootKinds[0] = ROK_FIXTURERIG;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("%s", g_detail.Data());
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored rig compares equal");
+    rebuilt->slots[2].cb.done = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureRig#1.slots[2].cb.done") == 0, "a changed field is reported at its element");
+
+    static void* stray[2];
+    rebuilt->slots[1].cb.ppVtbl = (void**)stray;
+    ReplayClearFailure();
+    Recorder wrong;
+    wrong.Record(kinds, (void* const*)&rebuilt, 1, sets);
+    printf("a vptr that is not the global: %s\n", ReplayFailure() == nullptr ? "(none)" : ReplayFailure());
+    Check(ReplayFailure() != nullptr && strstr(ReplayFailure(), "FixtureCb has a vptr that is not g_fixtureCbVtable") != nullptr, "a word that is not the global's address is a failure that names the global");
+    ReplayClearFailure();
+    free(text);
+}
+
+void EmbedsSelfTest()
+{
+    printf("an array of embedded structs\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    FixtureScript* script = (FixtureScript*)Fresh(sizeof(FixtureScript));
+    script->id = 9;
+    script->channels[0].pc = 3;
+    script->channels[2].pc = 7;
+    script->channels[2].state = -2;
+    script->channels[3].stack = 99;
+    unsigned char kinds[1] = { ROK_FIXTURESCRIPT };
+    void* roots[1] = { script };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* first = strdup(recorder.text.Data());
+    Check(ReplayFailure() == nullptr, "the elements are embedded objects of the kind");
+    Check(strstr(first, "  r FixtureScript#1.channels[2].pc 7\n") != nullptr && strstr(first, "  r FixtureScript#1.channels[2].state -2\n") != nullptr, "a field of an element is written under the element's index");
+    Check(CountLines(first, "  r FixtureScript#1.channels[") == 12 && strstr(first, "FixtureChannel#") == nullptr, "every field of every element is written once, and none is named by order");
+
+    script->channels[1].pc = 4;
+    recorder.Record(kinds, roots, 1, sets);
+    char* second = strdup(recorder.text.Data());
+    Check(strcmp(second, "  r FixtureScript#1.channels[1].pc 4\n") == 0, "a changed element is written field by field, and only that field");
+
+    ResetBlock();
+    RestoreText(first, sets);
+    RestoreText(second, sets);
+    FixtureScript* rebuilt = (FixtureScript*)ReplayResolveObject("FixtureScript#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->id == 9 && rebuilt->channels[0].pc == 3 && rebuilt->channels[1].pc == 4 && rebuilt->channels[2].state == -2 && rebuilt->channels[3].stack == 99, "the elements are restored in place");
+    Check(rebuilt != nullptr && ReplayResolveObject("FixtureScript#1.channels[3]", nullptr, g_objects, AllocObject) == &rebuilt->channels[3], "an element's name resolves to its bytes");
+    if (rebuilt == nullptr) {
+        free(first);
+        free(second);
+        return;
+    }
+    g_rootKinds[0] = ROK_FIXTURESCRIPT;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("%s", g_detail.Data());
+    Check(g_diffs == 0, "the restored script compares equal");
+    rebuilt->channels[2].pc = 8;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureScript#1.channels[2].pc") == 0, "a changed field is reported at its element");
+    free(first);
+    free(second);
+}
+
+void EmbeddedPolymorphicSelfTest()
+{
+    printf("an embedded polymorphic object\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    FixtureOrder* first = (FixtureOrder*)Fresh(sizeof(FixtureOrder));
+    FixtureOrder* second = (FixtureOrder*)Fresh(sizeof(FixtureOrder));
+    SetVtable(&first->link, ReplayVtable(ROK_FIXTUREATTACH));
+    SetVtable(&second->link, ReplayVtable(ROK_FIXTUREATTACH));
+    first->id = 1;
+    second->id = 2;
+    first->link.owner = first;
+    first->link.next = &second->link;
+    first->link.value = 3;
+    second->link.owner = second;
+    second->link.value = 4;
+    unsigned char kinds[2] = { ROK_FIXTUREORDER, ROK_FIXTUREORDER };
+    void* roots[2] = { first, second };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 2, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(ReplayFailure() == nullptr, "each vptr is the vtable of the kind");
+    Check(strstr(text, "  r FixtureOrder#1.link.owner FixtureOrder#1\n") != nullptr && strstr(text, "  r FixtureOrder#1.link.value 3\n") != nullptr, "the walk names the embedded object by its site");
+    Check(strstr(text, "  r FixtureOrder#1.link.next FixtureOrder#2.link\n") != nullptr, "and a pointer to another one by that one's site");
+    Check(strstr(text, "FixtureAttach#") == nullptr && strstr(text, "vtable") == nullptr, "no object is named by order and no vtable is written");
+    ReplayText name;
+    ReplayAddObjectName(name, *recorder.table, ROK_FIXTUREATTACH, &second->link, true);
+    Check(strcmp(name.Data(), "FixtureOrder#2.link") == 0, "an argument that is the embedded object is named by its site");
+    name.Free();
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureOrder* rebuilt = (FixtureOrder*)ReplayResolveObject("FixtureOrder#1", nullptr, g_objects, AllocObject);
+    FixtureOrder* rebuiltSecond = (FixtureOrder*)ReplayResolveObject("FixtureOrder#2", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuiltSecond != nullptr, "the orders are rebuilt");
+    if (rebuilt == nullptr || rebuiltSecond == nullptr) {
+        free(text);
+        return;
+    }
+    Check(rebuilt->link.next.get() == &rebuiltSecond->link && rebuilt->link.owner.get() == rebuilt && rebuilt->link.value == 3, "the fields and the pointers between the sites are restored");
+    Check(*(const void**)&rebuilt->link == ReplayVtable(ROK_FIXTUREATTACH), "the embedded object gets the vtable of the replayer");
+    g_rootKinds[0] = ROK_FIXTUREORDER;
+    g_rootKinds[1] = ROK_FIXTUREORDER;
+    g_rootObjects[0] = rebuilt;
+    g_rootObjects[1] = rebuiltSecond;
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored orders compare equal");
+    rebuiltSecond->link.value = 5;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureOrder#2.link.value") == 0, "a changed field is reported at the site");
+    rebuiltSecond->link.value = 4;
+    static void* stray[2];
+    SetVtable(&rebuiltSecond->link, stray);
+    ReplayClearFailure();
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a vtable of another kind: %s\n", ReplayFailure() == nullptr ? "(none)" : ReplayFailure());
+    Check(ReplayFailure() != nullptr && strstr(ReplayFailure(), "FixtureAttach has a vptr that is not g_fixtureAttachVtable") != nullptr, "a vptr that is not the kind's vtable is a failure");
+    ReplayClearFailure();
+    free(text);
+}
+
 int SelfTest(const char* file)
 {
     static const char* const names[] = { "", "an import with other arguments", "an extra import", "a missing import" };
@@ -3931,6 +4436,11 @@ int SelfTest(const char* file)
     FormSelfTest();
     ShapeSelfTest();
     PolymorphicSelfTest();
+    RefsSelfTest();
+    BasedTableSelfTest();
+    ElementSiteSelfTest();
+    EmbedsSelfTest();
+    EmbeddedPolymorphicSelfTest();
     CallbackSelfTest();
     VectorSelfTest();
     SnapshotSelfTest();
@@ -3942,9 +4452,11 @@ int SelfTest(const char* file)
     RawPointerSelfTest();
     MaskedViewSelfTest();
     EmbeddedSiteSelfTest();
+    FeatureTableSelfTest();
     UnnamedPtrSelfTest();
     AllOfListSelfTest();
     DeltaTableSelfTest();
+    DeltaLimitSelfTest();
     UnconditionedUnitIdSelfTest();
     GameRefSelfTest();
     ExecuteCommandSelfTest();

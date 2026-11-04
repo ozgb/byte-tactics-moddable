@@ -116,7 +116,7 @@ text as before.
   r FixtureLane#2.level 9
 ```
 
-`replayschema.py --check` fails for an all-of rule whose `object` is not a kind with a `table`.
+`replayschema.py --check` fails for an all-of rule whose `object` is not a kind with a `table` of `Game` or `SimGlobals`.
 
 ### A table recorded as changed elements
 
@@ -124,7 +124,7 @@ A kind with a `table` may also carry `"delta": true`. A slot that is all-of over
 list of objects, which holds 8192, so the table may be as large as the game's (`Game::cells` has `width*height` cells). The walk
 follows the pointer and unit-id fields of each element, and capture and comparison visit the table element by element. The recorder
 writes every field of the slot's sets for every element at the first record, and after that only the fields whose value changed since
-the last line that named them, in the object form. This is #689's changed runs for a table of structs:
+the last line that named them, in the object form. An element that the walk also reaches through a ref with a limit (a `reach` list) is recorded and compared whole, without the limit. This is #689's changed runs for a table of structs:
 
 ```json
 "FixtureCell": {"type": "FixtureCell", "scope": "state", "delta": true,
@@ -251,6 +251,54 @@ A pair of pointer fields that bound a slice of a table is a closed range: the sc
 `u <= end`), not one past it. The end pointer is written as the object it points at, `Unit#249`, like any pointer. The
 walk reaches every unit of `[begin, end]` in table order, whether or not the module's call touched it, because the
 module's loop reads each one; when only one field of the pair is in the slot's sets, only that pointer is followed.
+
+### An array of refs
+
+A field of kind `refs` is an array of `count` refs inside its object (`Ref<SquadTimer> timers[10]`): `{"name": "timers", "kind": "refs", "count": 10, "target":
+"SquadTimer", "poly": "SquadTimer"}`. Each element is a ref, `null` or an object of its kind (a base is named as the concrete kind its vtable says, with
+`poly`, as for a `ref`). The walk follows every element. Every element is written at the first record, and after that a changed element is one
+line named by its index:
+
+```
+  r SquadManager#1.timers[0] SquadTimer#1
+  r SquadManager#1.timers[1] null
+  r SquadManager#1.timers[3] AssaultTimer#2
+```
+
+### An array of embedded structs, and a site inside an element
+
+A field of kind `embeds` is `count` structs of a kind laid out in place (`CobScript::channels`, `OpenHeap::pool`):
+`{"name": "channels", "kind": "embeds", "count": 8, "target": "Channel"}`, and the kind lists the site with `[]` where the index goes:
+`"inside": [{"kind": "CobScript", "member": "channels[]"}]`. An element is named by its site and index, and its fields are written one by one, so a changed element
+is its changed fields: `r CobScript#3.channels[2].pc 7`. The index is read off the address, and the replayer resolves `CobScript#3.channels[2]` to the bytes inside the container.
+
+A member of each element is a site too, when the array is of a struct that is no kind: `{"name": "aimCob", "kind": "embeds", "count": 3, "target": "WeaponAimCobCb",
+"member": "weapons[].aimCob"}` in `Unit`, and `"inside": [{"kind": "Unit", "member": "weapons[].aimCob"}]` in the kind, give `Unit#3.weapons[1].aimCob` in walk lines, service lines and argument values.
+
+### A table behind a ref field
+
+A kind whose elements are an array that a `ref` field of another kind points at (`Player::groups`, 10 `Group`s) is a table with an object as its `base`:
+`"table": {"base": {"object": "Player", "field": "groups"}, "count": 10}`. The kind has no table of its own and is no `delta` or `all-of` kind: each element is named
+by its owner's field and index, `Player#0.groups[3]`, in every line, and `SquadTimer::group`, a ref into it, is written `r SquadTimer#1.group Player#0.groups[3]`.
+The replayer allocates the whole array the first time a line names one of its elements, sets the owner's field to it, and resolves a name to the element. The owner is named before its elements
+(the walk names it, as it reaches the owner first), and an index past `count` names nothing.
+
+### A vtable pointer the code sets by hand
+
+`"vptr": "g_weaponAimCobVtable"` on a kind says that its first word is a pointer to that global (`extern VirtualFunction const g_weaponAimCobVtable[2]` in `src/data/vtables.cpp`) that
+the code stores itself, and that the type has no virtual member. The recorder checks the word whenever it names or walks an object of the kind, and ends the run with `a WeaponAimCobCb has a vptr that
+is not g_weaponAimCobVtable` when it differs. The word is never written; the replayer stores the address of its own copy of the global when it resolves the object.
+
+### An embedded polymorphic object
+
+An `embed` field whose kind has a `vtable` and a site (`Order::link`, a `PathOrderAttach` in the order) is read as a `poly` ref is, with the vtable checked, but stored in place and named by its
+site: `Order#3.link` in lines and arguments (`i units.UnitRefUnlink Order#3.link`), `r Order#3.link.next Order#4.link`. The kind has the `vtable` of its class, and is no kind of a base.
+
+### A pointer that a slot argument carries to an embedded kind
+
+A slot or import argument of another pointer type (`Callback*`) whose object is an embedded kind with a `vptr` is `{"mode": "object", "kind": "WeaponAimCobCb", "line": "callback"}`, and is named by its site,
+`a callback Unit#3.weapons[1].aimCob`, as any object argument is. `mode: callback` stays for the interfaces of `callbacks` with virtual methods, and the import handle that carries
+the same object is named the same way.
 
 ## Values
 
@@ -540,6 +588,9 @@ sets). The annotations hold what no header says:
   `embed` leads to such an object, `range_end_of` marks the end pointer of a closed range, and `aliases` (`Unit::cloakOn`) are
   the other targets of the rows that one field records (a bit field is recorded as its word). `replayschema.py --check` fails for a site
   that is no `embed` field of its container, for one that two kinds claim, and for the old single-site object form.
+- Array forms and hand-made vtables (see An array of refs, An array of embedded structs, A table behind a ref field, A vtable pointer the code sets by hand):
+  field kinds `refs` and `embeds` with a `count`, a `table` whose `base` is `{"object", "field"}`, `inside` members with `[]`, and `vptr` on a kind.
+  `replayschema.py --check` fails for a count that is no positive integer, a base that is no ref field leading to the kind, a site no `embeds` field leads to, and a `vptr` that is no global name, is also a vtable, or is on a kind with a table, kinds or a vtable.
 - `when` (an object, see A condition on a field): `{"field", "equals"}` with an optional `mask`, `via` and `kind`, on a field of
   a state kind. `replayschema.py --check` fails for a field it reads that is not an integer or flags field, that has a `when` of its own, or
   a mask and a value that can never meet.
@@ -621,6 +672,16 @@ result and `o` lines are written. From it the tool writes `src/harness/replay_se
 it cannot write is the hook itself, `ReplayImport call(RI_X); call.Int(..)` at the top of each function in the game source:
 those functions are the services themselves, reached by direct calls with no table to wrap, so the hook has to be in the
 function; `replayschema.py --check` fails when a hook's arguments differ from its entry or an entry has no hook.
+
+### The test schema
+
+The kinds the self-tests need and no subsystem has (`FixtureView`, `FixtureCell`, `FixtureHolder` and the like, in the examples of this page) are
+not in `data/replay_schema.json`. `tests/replay_fixtures.json` holds them (`includes`, `game_fields`, `objects`, and `inside` for the sites they add
+to a real kind), `tests/replay_fixtures.h` their structs, and `uv run tools/replayschema.py` writes `tests/replay_schema_fixtures.h`, the tables
+of the real kinds with these appended, and `tests/replay_vtables_fixtures.cpp`. `src/harness/replay_schema.h` includes the first when
+`BT_REPLAY_FIXTURES` is defined, which only `tests/replay_native_test.cpp` and `tests/replay_objects_fixtures.cpp` (a copy of `replay_objects.cpp` that defines it first) do, so the exe's recorder has no fixture kind, and no real member of `Game`
+(`Game::slowest`, `p1b8a` and `p1cd5` are the hosts of the fixtures) is declared as anything but what it is. The fixture annotations are checked
+with the rest.
 
 ### Services
 
@@ -723,8 +784,10 @@ inside a nested command fails the recording.
 
 `tests/replay_native_test.cpp` replays a recording against the native module (`replay_native_test.exe`, built by
 `cmake --build build/modern --target replay_native_test`, run under Wine in `modern-compile`, with the WASM replays below).
-The subsystem is read from the recording's header; the module sources of a subsystem come from `data/subsystems.csv`
-(`REPLAY_SUBSYSTEMS` in `CMakeLists.txt`).
+The subsystem is read from the recording's header; the module sources of a subsystem come from `data/subsystems.csv`.
+CI replays the recordings of a subsystem once it has an entry in `tests/replay_subsystems.json` (its injected change,
+the recording that change is checked on, and for a WASM module its variant), and `tools/ci_replays.sh` fails naming
+a `tests/replay/` directory with no entry, or an entry with no directory.
 
 ```sh
 wine build/modern/replay_native_test.exe tests/replay/wind_meteors/*.txt

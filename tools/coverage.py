@@ -7,6 +7,7 @@
     uv run tools/coverage.py ... --live-counters FILE                           # default: live_counters.txt beside the exe
     uv run tools/coverage.py --exe E --game-dir D --scenario N... [--parallel N]   # a subset (no --write or --check)
     uv run tools/coverage.py --exe E --game-dir D --tier                        # play reference.GATE_TIER; fail below TIER_LINE_FLOOR of the baseline's lines
+    uv run tools/coverage.py --slots ai --slots all [--runs DIR] [--json FILE]  # which scenarios enter each slot of a subsystem; plays nothing
     uv run tools/test_coverage.py                                               # tests, on hand-written exports
 
 The exe is the coverage build (clang's -fprofile-instr-generate -fcoverage-mapping -fprofile-update=atomic, #385). Every scenario
@@ -16,6 +17,15 @@ or writes no profile exits 1: the coverage of a partial suite is not a baseline.
 (llvm-profdata merge -sparse) into build/coverage-run/merged.profdata, whose path is printed so that
 `llvm-cov show <exe> -instr-profile=<it>` can show the source, and `llvm-cov export -format=text` gives
 the mapping and counts that this tool reads.
+
+Slots. `--slots SUBSYSTEM` (repeatable, or `all`) reads the per-scenario profiles a coverage run left in build/coverage-run/
+(`--runs DIR` names another) and plays nothing. Each slot of interfaces/<subsystem>.h is bound in src/seams/native.cpp by
+`s_<subsystem>.<Slot> = <Function>;`. A `<Slot>Native` function is a `wrapper`, whose entry count is the number of seam calls; any
+other binding is `direct`, and its count also includes the calls from inside the subsystem, so it is an upper bound. Per slot the
+table lists the scenarios that enter it, with entry counts and ticks, fewest ticks first, or `never` (with the reason of the
+function's row in data/coverage.csv, if it has one). Per subsystem it lists a smallest set of scenarios that enters every slot
+some scenario enters: greedy, each step taking the scenario that enters most of the slots still missing, fewest ticks first
+among equals. `--json FILE` writes the same table.
 
 Assignment. data/subsystems.csv keys a function by (name, file). A function of the export gets a plain
 name (tools/blockpointers.py demangle, and `X::X`, `X::~X`, `X::operator<code>` for the decorated
@@ -91,12 +101,16 @@ from pathlib import Path
 import blockpointers
 import coupling
 import reference
+import replayschema
 import tracediff
 
 ROOT = Path(__file__).resolve().parent.parent
 SUBSYSTEMS = ROOT / "data/subsystems.csv"
 OUT = ROOT / "data/coverage.csv"
 RUN_DIR = ROOT / "build/coverage-run"
+NATIVE = ROOT / "src/seams/native.cpp"
+NATIVE_FILE = "native.cpp"
+WRAPPER_SUFFIX = "Native"
 DEFAULT_EXE = ROOT / "build/coverage/TotalA.exe"
 LIVE_COUNTERS = "live_counters.txt"
 UNASSIGNED = "unassigned"
@@ -537,6 +551,128 @@ def export(exe: Path, profdata: Path) -> dict:
         return json.load(out)
 
 
+def parse_bindings(text: str) -> dict[tuple[str, str], str]:
+    """(subsystem, slot) -> function of every `s_<subsystem>.<Slot> = [cast]<Function>;` line of native.cpp."""
+    found = {}
+    for m in re.finditer(r"^\s*s_(\w+)\.(\w+)\s*=\s*(?:\([^;]*\))?\s*(\w+)\s*;", text, re.M):
+        found[(m.group(1), m.group(2))] = m.group(3)
+    return found
+
+
+def read_entry_counts(text: str) -> dict[tuple[str, str], int]:
+    """(file of a static function or empty, plain name) -> entry count, summed over overloads, from `llvm-profdata show --all-functions --counts`."""
+    counts: dict[tuple[str, str], int] = {}
+    key = None
+    for line in text.splitlines():
+        if line.startswith("  ") and not line.startswith("   ") and line.endswith(":"):
+            name = line.strip()[:-1]
+            static = re.match(r"([\w.\-]+\.cpp):", name) if not name.startswith("?") else None
+            key = (static.group(1) if static else "", plain_name(name))
+        elif key and line.strip().startswith("Function count:"):
+            counts[key] = counts.get(key, 0) + int(line.split(":")[1])
+            key = None
+    return counts
+
+
+def function_count(counts: dict[tuple[str, str], int], function: str, wrapper: bool) -> int | None:
+    """The entries of a bound function, or None when the profile has no such function. A wrapper is a static of native.cpp; a direct binding matches the name in any file."""
+    found = [n for (file, name), n in counts.items() if name == function and (file == NATIVE_FILE if wrapper else True)]
+    return sum(found) if found else None
+
+
+def profile_counts(run: Path) -> dict[tuple[str, str], int]:
+    """The entry counts of one scenario's merged profiles (its *.profraw files)."""
+    raws = sorted(run.glob("*.profraw"))
+    with tempfile.TemporaryDirectory() as d:
+        merged = Path(d) / "run.profdata"
+        subprocess.run(["llvm-profdata", "merge", "-sparse", "-o", str(merged), *map(str, raws)], check=True)
+        shown = subprocess.run(["llvm-profdata", "show", "--all-functions", "--counts", str(merged)],
+                               check=True, capture_output=True, text=True).stdout
+    return read_entry_counts(shown)
+
+
+def slot_table(subsystem: str, slots: list[str], bindings: dict[tuple[str, str], str],
+               runs: dict[str, dict[tuple[str, str], int]], ticks: dict[str, int], reasons: dict[str, str]) -> dict:
+    """The table of one subsystem: per slot its function, binding, entering scenarios (fewest ticks first) and never-reason, and the greedy set."""
+    rows = []
+    for slot in slots:
+        function = bindings.get((subsystem, slot))
+        wrapper = bool(function) and function.endswith(WRAPPER_SUFFIX)
+        entering = []
+        for scenario, counts in runs.items():
+            n = function_count(counts, function, wrapper) if function else None
+            if n:
+                entering.append({"scenario": scenario, "count": n, "ticks": ticks.get(scenario, 0)})
+        entering.sort(key=lambda e: (e["ticks"], e["scenario"]))
+        rows.append({"slot": slot, "function": function, "binding": "wrapper" if wrapper else "direct",
+                     "scenarios": entering, "never": not entering, "reason": reasons.get(function or "", "") if not entering else ""})
+    return {"subsystem": subsystem, "slots": rows, "greedy": greedy_set(rows, ticks)}
+
+
+def greedy_set(rows: list[dict], ticks: dict[str, int]) -> list[str]:
+    """Scenarios, picked one at a time by most still-missing slots entered and then fewest ticks, until every slot some scenario enters is."""
+    enters: dict[str, set[str]] = {}
+    for row in rows:
+        for e in row["scenarios"]:
+            enters.setdefault(e["scenario"], set()).add(row["slot"])
+    missing = set().union(*enters.values()) if enters else set()
+    chosen = []
+    while missing:
+        best = min(enters, key=lambda s: (-len(enters[s] & missing), ticks.get(s, 0), s))
+        if not enters[best] & missing:
+            break
+        chosen.append(best)
+        missing -= enters[best]
+    return chosen
+
+
+def render_slots(t: dict) -> str:
+    """The text of one subsystem's table."""
+    lines = [f"{t['subsystem']}: {len(t['slots'])} slots"]
+    for row in t["slots"]:
+        mark = "direct, upper bound" if row["binding"] == "direct" else "wrapper"
+        lines.append(f"  {row['slot']} = {row['function']} ({mark})")
+        if row["never"]:
+            lines.append("    never" + (f": {row['reason']}" if row["reason"] else ""))
+        for e in row["scenarios"]:
+            lines.append(f"    {e['scenario']}  {e['count']}  {e['ticks']} ticks")
+    lines.append("  smallest set: " + (", ".join(t["greedy"]) or "none"))
+    return "\n".join(lines)
+
+
+def never_reasons() -> dict[str, str]:
+    """Function name -> reason of its never-entered row in data/coverage.csv."""
+    out: dict[str, str] = {}
+    for t in read_csv(OUT).values():
+        for (name, _, _), reason in t.reasons.items():
+            out.setdefault(name, reason)
+    return out
+
+
+def slots_main(names: list[str], runs_dir: Path, json_path: Path | None) -> None:
+    """Print the slot tables of the named subsystems (`all` for every seam) from the profiles in runs_dir."""
+    members = {sub: struct for sub, struct in replayschema.seam_members()}
+    wanted = list(members) if "all" in names else names
+    unknown = [n for n in wanted if n not in members]
+    if unknown:
+        sys.exit("coverage: no such subsystem: %s (have %s)" % (", ".join(unknown), ", ".join(members)))
+    dirs = sorted(d for d in runs_dir.iterdir() if d.is_dir() and any(d.glob("*.profraw"))) if runs_dir.is_dir() else []
+    if not dirs:
+        sys.exit(f"coverage: no per-scenario profiles in {runs_dir}; play the suite first")
+    scenarios = reference.scenario_files()
+    ticks = {d.name: reference.scenario_ticks(scenarios[d.name]) for d in dirs if d.name in scenarios}
+    runs = {d.name: profile_counts(d) for d in dirs}
+    bindings = parse_bindings(NATIVE.read_text())
+    reasons = never_reasons() if OUT.is_file() else {}
+    tables = []
+    for sub in wanted:
+        slots = [s["name"] for s in replayschema.parse_interface(sub, members[sub])["slots"]]
+        tables.append(slot_table(sub, slots, bindings, runs, ticks, reasons))
+    print("\n\n".join(render_slots(t) for t in tables))
+    if json_path:
+        json_path.write_text(json.dumps({"runs": str(runs_dir), "subsystems": tables}, indent=1) + "\n")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--exe", type=Path, default=DEFAULT_EXE, help="the coverage build (default build/coverage/TotalA.exe)")
@@ -551,7 +687,14 @@ def main() -> None:
                         help="the counters live code increments, from the coverage link (default: live_counters.txt beside the exe)")
     parser.add_argument("--write", action="store_true", help="write data/coverage.csv")
     parser.add_argument("--check", action="store_true", help="fail if a subsystem's coverage fell below data/coverage.csv")
+    parser.add_argument("--slots", action="append", metavar="SUBSYSTEM",
+                        help="print which scenarios enter each slot of the subsystem (repeatable, or all), from build/coverage-run; plays nothing")
+    parser.add_argument("--runs", type=Path, metavar="DIR", default=RUN_DIR, help="with --slots, the directory of per-scenario profiles")
+    parser.add_argument("--json", type=Path, metavar="FILE", help="with --slots, also write the table as JSON")
     args = parser.parse_args()
+    if args.slots:
+        slots_main(args.slots, args.runs, args.json)
+        return
     if args.tier and (args.scenario or args.write or args.check or args.profdata):
         sys.exit("coverage: --tier plays the tier; it cannot be used with --scenario, --write, --check or --from")
     if args.tier and not OUT.is_file():

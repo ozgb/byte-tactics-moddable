@@ -1,0 +1,645 @@
+{
+ "includes": [
+  "../../tests/replay_fixtures.h"
+ ],
+ "game_fields": {
+  "slowest": {
+   "kind": "ref",
+   "target": "FixtureView"
+  }
+ },
+ "objects": {
+  "FixtureView": {
+   "type": "FixtureView",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "flags",
+     "kind": "u16"
+    },
+    {
+     "name": "count",
+     "kind": "i32",
+     "member": "plain.count",
+     "when": {
+      "field": "flags",
+      "mask": 1,
+      "equals": 0
+     }
+    },
+    {
+     "name": "total",
+     "kind": "i32",
+     "member": "plain.total",
+     "when": {
+      "field": "flags",
+      "mask": 1,
+      "equals": 0
+     }
+    },
+    {
+     "name": "scale",
+     "kind": "f32",
+     "member": "linked.scale",
+     "when": {
+      "field": "flags",
+      "mask": 1,
+      "equals": 1
+     }
+    },
+    {
+     "name": "table",
+     "kind": "ptr",
+     "member": "linked.table",
+     "target": "FrameTable",
+     "when": {
+      "field": "flags",
+      "mask": 1,
+      "equals": 1
+     }
+    },
+    {
+     "name": "def",
+     "kind": "ref",
+     "member": "linked.def",
+     "target": "UnitDef",
+     "when": {
+      "field": "flags",
+      "mask": 1,
+      "equals": 1
+     }
+    }
+   ]
+  },
+  "FixtureSlave": {
+   "type": "FixtureSlave",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "player",
+     "kind": "u8"
+    },
+    {
+     "name": "master",
+     "kind": "ref",
+     "target": "FixtureView"
+    },
+    {
+     "name": "moved",
+     "kind": "i32",
+     "member": "ground.moved",
+     "when": {
+      "via": "player",
+      "kind": "Player",
+      "field": "flags",
+      "mask": 4,
+      "equals": 4
+     }
+    },
+    {
+     "name": "speed",
+     "kind": "f32",
+     "member": "air.speed",
+     "when": {
+      "via": "player",
+      "kind": "Player",
+      "field": "flags",
+      "mask": 4,
+      "equals": 0
+     }
+    },
+    {
+     "name": "low",
+     "kind": "i32",
+     "member": "narrow.low",
+     "when": {
+      "via": "master",
+      "field": "flags",
+      "mask": 2,
+      "equals": 0
+     }
+    },
+    {
+     "name": "high",
+     "kind": "f32",
+     "member": "wide.high",
+     "when": {
+      "via": "master",
+      "field": "flags",
+      "mask": 2,
+      "equals": 2
+     }
+    }
+   ]
+  },
+  "FixtureHolder": {
+   "type": "FixtureHolder",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "anim",
+     "kind": "embed",
+     "target": "Handle"
+    },
+    {
+     "name": "shadow",
+     "kind": "embed",
+     "target": "Handle"
+    }
+   ]
+  },
+  "FixtureCell": {
+   "type": "FixtureCell",
+   "scope": "state",
+   "table": {
+    "base": "game",
+    "member": "p1b8a",
+    "ref": true,
+    "count": 9000,
+    "alloc": 9000
+   },
+   "delta": true,
+   "fields": [
+    {
+     "name": "unit",
+     "kind": "u16"
+    },
+    {
+     "name": "unit2",
+     "kind": "u16"
+    },
+    {
+     "name": "height",
+     "kind": "u8"
+    },
+    {
+     "name": "high",
+     "kind": "u8"
+    },
+    {
+     "name": "low",
+     "kind": "u8"
+    },
+    {
+     "name": "metal",
+     "kind": "u8"
+    },
+    {
+     "name": "feature",
+     "kind": "u16"
+    },
+    {
+     "name": "spot",
+     "kind": "u16"
+    },
+    {
+     "name": "flags",
+     "kind": "u16"
+    },
+    {
+     "name": "occupant",
+     "kind": "unitid",
+     "target": "Unit",
+     "member": "unit",
+     "reach": [
+      "Unit.health"
+     ],
+     "depth": 1
+    },
+    {
+     "name": "occupant2",
+     "kind": "unitid",
+     "target": "Unit",
+     "member": "unit2",
+     "reach": [
+      "Unit.health"
+     ],
+     "depth": 1
+    }
+   ]
+  },
+  "FixtureLane": {
+   "type": "FixtureLane",
+   "scope": "state",
+   "table": {
+    "base": "game",
+    "member": "p1cd5",
+    "ref": true,
+    "count": 4,
+    "alloc": 4
+   },
+   "fields": [
+    {
+     "name": "level",
+     "kind": "i32"
+    },
+    {
+     "name": "unit",
+     "kind": "u16"
+    },
+    {
+     "name": "flags",
+     "kind": "u16"
+    },
+    {
+     "name": "occupant",
+     "kind": "unitid",
+     "target": "Unit",
+     "member": "unit",
+     "reach": [
+      "Unit.health"
+     ],
+     "depth": 1
+    },
+    {
+     "name": "cell",
+     "kind": "unitid",
+     "target": "FixtureCell",
+     "member": "unit",
+     "reach": [
+      "FixtureCell.metal"
+     ],
+     "depth": 1
+    }
+   ]
+  },
+  "FixtureTimerBase": {
+   "type": "FixtureTimerBase",
+   "scope": "state",
+   "kinds": [
+    "FixtureTimer",
+    "FixtureAssault"
+   ],
+   "fields": []
+  },
+  "FixtureTimer": {
+   "type": "FixtureTimer",
+   "scope": "state",
+   "vtable": "g_fixtureTimerVtable",
+   "fields": [
+    {
+     "name": "ticks",
+     "kind": "u16"
+    },
+    {
+     "name": "period",
+     "kind": "u16"
+    }
+   ]
+  },
+  "FixtureAssault": {
+   "type": "FixtureAssault",
+   "scope": "state",
+   "vtable": "g_fixtureAssaultVtable",
+   "fields": [
+    {
+     "name": "ticks",
+     "kind": "u16"
+    },
+    {
+     "name": "squad",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureManager": {
+   "type": "FixtureManager",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "timers",
+     "kind": "refs",
+     "count": 4,
+     "target": "FixtureTimerBase",
+     "poly": "FixtureTimerBase"
+    }
+   ]
+  },
+  "FixtureGroup": {
+   "type": "FixtureGroup",
+   "scope": "state",
+   "table": {
+    "base": {
+     "object": "FixtureOwner",
+     "field": "groups"
+    },
+    "count": 4
+   },
+   "fields": [
+    {
+     "name": "level",
+     "kind": "i32"
+    },
+    {
+     "name": "mode",
+     "kind": "i16"
+    }
+   ]
+  },
+  "FixtureOwner": {
+   "type": "FixtureOwner",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "groups",
+     "kind": "ref",
+     "target": "FixtureGroup"
+    }
+   ]
+  },
+  "FixtureUser": {
+   "type": "FixtureUser",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "tag",
+     "kind": "i32"
+    },
+    {
+     "name": "group",
+     "kind": "ref",
+     "target": "FixtureGroup"
+    }
+   ]
+  },
+  "FixtureCb": {
+   "type": "FixtureCb",
+   "scope": "state",
+   "vptr": "g_fixtureCbVtable",
+   "inside": [
+    {
+     "kind": "FixtureRig",
+     "member": "slots[].cb"
+    }
+   ],
+   "fields": [
+    {
+     "name": "done",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureRig": {
+   "type": "FixtureRig",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "cb",
+     "kind": "embeds",
+     "count": 3,
+     "target": "FixtureCb",
+     "member": "slots[].cb"
+    }
+   ]
+  },
+  "FixtureChannel": {
+   "type": "FixtureChannel",
+   "scope": "state",
+   "inside": [
+    {
+     "kind": "FixtureScript",
+     "member": "channels[]"
+    }
+   ],
+   "fields": [
+    {
+     "name": "pc",
+     "kind": "u16"
+    },
+    {
+     "name": "state",
+     "kind": "i16"
+    },
+    {
+     "name": "stack",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureScript": {
+   "type": "FixtureScript",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "channels",
+     "kind": "embeds",
+     "count": 4,
+     "target": "FixtureChannel"
+    }
+   ]
+  },
+  "FixtureAttach": {
+   "type": "FixtureAttach",
+   "scope": "state",
+   "vtable": "g_fixtureAttachVtable",
+   "inside": [
+    {
+     "kind": "FixtureOrder",
+     "member": "link"
+    }
+   ],
+   "fields": [
+    {
+     "name": "owner",
+     "kind": "ref",
+     "target": "FixtureOrder"
+    },
+    {
+     "name": "next",
+     "kind": "ref",
+     "target": "FixtureAttach"
+    },
+    {
+     "name": "value",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureOrder": {
+   "type": "FixtureOrder",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "link",
+     "kind": "embed",
+     "target": "FixtureAttach"
+    }
+   ]
+  },
+  "FixtureSpan": {
+   "type": "FixtureSpan",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "from",
+     "kind": "i32"
+    },
+    {
+     "name": "to",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureAmount": {
+   "type": "FixtureAmount",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "amount",
+     "kind": "i32"
+    }
+   ]
+  }
+ },
+ "fixtures": {
+  "FillGoals": {
+   "ret": "void",
+   "params": [
+    {
+     "type": "int",
+     "name": "owner"
+    },
+    {
+     "type": "std::vector<FixtureSpan, std::allocator<FixtureSpan> >*",
+     "name": "goals"
+    }
+   ],
+   "args": {
+    "owner": {
+     "mode": "scalar"
+    },
+    "goals": {
+     "mode": "vector",
+     "dir": "out",
+     "elem": {
+      "mode": "value",
+      "kind": "FixtureSpan"
+     }
+    }
+   }
+  },
+  "PlaceAt": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "void*",
+     "name": "pos"
+    }
+   ],
+   "args": {
+    "pos": {
+     "mode": "vec3",
+     "label": "pos",
+     "cast": "Vec3*"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "Query": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "FixtureAmount*",
+     "name": "first"
+    },
+    {
+     "type": "FixtureAmount*",
+     "name": "second"
+    }
+   ],
+   "args": {
+    "first": {
+     "mode": "struct",
+     "kind": "FixtureAmount",
+     "dir": "inout",
+     "nullable": true
+    },
+    "second": {
+     "mode": "struct",
+     "kind": "FixtureAmount",
+     "dir": "inout",
+     "nullable": true
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "ReadIds": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "void*",
+     "name": "ids"
+    }
+   ],
+   "args": {
+    "ids": {
+     "mode": "bytes-in",
+     "length": "Game.slowest.unitCount",
+     "elem": "i32"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "FillIds": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "void*",
+     "name": "ids"
+    }
+   ],
+   "args": {
+    "ids": {
+     "mode": "bytes-out",
+     "length": "Game.slowest.unitCount",
+     "elem": "i32"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  }
+ },
+ "inside": {
+  "Handle": [
+   {
+    "kind": "FixtureHolder",
+    "member": "anim"
+   },
+   {
+    "kind": "FixtureHolder",
+    "member": "shadow"
+   }
+  ]
+ }
+}

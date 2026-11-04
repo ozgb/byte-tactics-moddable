@@ -12,6 +12,9 @@ Outputs:
 
     data/replay_schema.json         the annotations (kept as written) and the generated fields, objects and subsystems
     src/harness/replay_schema.h     the field, object and slot tables
+    tests/replay_schema_fixtures.h  the same tables with the test-only kinds of tests/replay_fixtures.json added, which replay_schema.h
+                                    includes when BT_REPLAY_FIXTURES is defined (only the tests' build defines it)
+    tests/replay_vtables_fixtures.cpp the vtable of each concrete kind of that schema
     src/harness/replay_hooks.inc    the recording copy of every seam table, with the argument and import hooks
     tests/replay_slots.h            the slot runners, import stubs and native seam tables of the replayer
     src/harness/replay_services.h   the ids and names of the services imports (GameRand, RandomInt, the TDF and command classes)
@@ -33,6 +36,7 @@ A slot annotated `"record": false` with a `"reason"` is classified and unrecorde
 """
 
 import argparse
+import copy
 import csv
 import functools
 import json
@@ -41,6 +45,7 @@ import re
 import sys
 from pathlib import Path
 
+import replay_subsystems
 import traceschema
 from rwsets import load_sim_map
 
@@ -52,6 +57,9 @@ SCHEMA_H = ROOT / "src/harness/replay_schema.h"
 HOOKS_H = ROOT / "src/harness/replay_hooks.inc"
 SLOTS_H = ROOT / "tests/replay_slots.h"
 JSON_OUT = ROOT / "data/replay_schema.json"
+FIXTURES_JSON = ROOT / "tests/replay_fixtures.json"
+FIXTURE_SCHEMA_H = ROOT / "tests/replay_schema_fixtures.h"
+FIXTURE_VTABLES_CPP = ROOT / "tests/replay_vtables_fixtures.cpp"
 SIM_GLOBALS_H = ROOT / "src/state/sim_globals.h"
 FORMAT = 2
 
@@ -62,7 +70,7 @@ BLOCK_KINDS = {"field_read": "r", "field_write": "w", "global_read": "r", "globa
 OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "rw"}
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
-               "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR", "ptr": "PTR"}
+               "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR", "ptr": "PTR", "refs": "REFS", "embeds": "EMBEDS"}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?(\w+)(?:>>(\d+))?\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
@@ -90,8 +98,23 @@ def read_assignment(path: Path = SUBSYSTEMS) -> dict[str, list[str]]:
     return out
 
 
-def load_annotations() -> dict:
-    return json.loads(JSON_OUT.read_text())["annotations"]
+def merge_fixtures(ann: dict, fixtures: dict) -> dict:
+    """The annotations with the test-only kinds of tests/replay_fixtures.json added: its includes, game fields and kinds come last, `inside` adds sites to a kind, and its `fixtures` are the slots the replayer's self-tests call."""
+    merged = copy.deepcopy(ann)
+    merged["includes"] += [i for i in fixtures.get("includes", []) if i not in merged["includes"]]
+    merged["game_fields"].update(fixtures.get("game_fields", {}))
+    merged["objects"].update(copy.deepcopy(fixtures.get("objects", {})))
+    merged["fixtures"] = copy.deepcopy(fixtures.get("fixtures", {}))
+    for kind, sites in fixtures.get("inside", {}).items():
+        have = merged["objects"][kind].setdefault("inside", [])
+        have += [x for x in sites if x not in have]
+    return merged
+
+
+def load_annotations(fixtures: bool = False) -> dict:
+    """The annotations of data/replay_schema.json; with `fixtures`, those of the schema that only the tests load as well."""
+    ann = json.loads(JSON_OUT.read_text())["annotations"]
+    return merge_fixtures(ann, json.loads(FIXTURES_JSON.read_text())) if fixtures else ann
 
 
 def seam_members() -> list[tuple[str, str]]:
@@ -232,6 +255,44 @@ def check_vector(where: str, spec: dict, owner: str, ann: dict, errors: list[str
     return out
 
 
+def is_based(spec: dict) -> bool:
+    """A table whose elements are behind a ref field of another kind, `{"base": {"object": K, "field": F}, "count": N}`."""
+    return isinstance(spec.get("table"), dict) and isinstance(spec["table"].get("base"), dict)
+
+
+def is_global_table(spec: dict) -> bool:
+    """A kind named by its index in a table that Game or SimGlobals holds."""
+    return bool(spec.get("table")) and not is_based(spec)
+
+
+def check_based(kind: str, spec: dict, ann: dict, errors: list[str]) -> dict | None:
+    """The site of a kind in a table behind a ref field: the owner's field points at an array of `count` elements, named `Owner#N.field[i]`."""
+    where = "%s table" % kind
+    table = spec["table"]
+    base = table["base"]
+    if set(table) - {"base", "count"} or set(base) != {"object", "field"}:
+        errors.append("%s: a table behind a ref field is {\"base\": {\"object\", \"field\"}, \"count\"}" % where)
+        return None
+    if spec["scope"] != "state" or spec.get("inside") or spec.get("kinds") or spec.get("delta"):
+        errors.append("%s: a kind in a table behind a ref field is a state kind with no sites, kinds or delta" % where)
+    count = table.get("count")
+    if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+        errors.append("%s: the count is a positive integer" % where)
+        return None
+    owner = ann["objects"].get(base["object"])
+    if owner is None or owner["scope"] != "state":
+        errors.append("%s: the base %s is no state kind of the schema" % (where, base["object"]))
+        return None
+    if owner.get("kinds"):
+        errors.append("%s: the base %s is a polymorphic base, which has no fields of its own" % (where, base["object"]))
+    field = next((f for f in owner["fields"] if f["name"] == base["field"]), None)
+    if field is None or field["kind"] != "ref" or field.get("target") != kind:
+        errors.append("%s: the base %s.%s is no ref field that leads to %s" % (where, base["object"], base["field"], kind))
+        return None
+    return {"kind": kind, "container": base["object"], "member": base["field"] + "[]", "offset": field.get("member", field["name"]),
+            "stride": None, "count": count, "ref": True, "field": field["name"]}
+
+
 def check_table(kind: str, spec: dict, errors: list[str]) -> dict:
     where = "%s table" % kind
     base = spec.get("base")
@@ -281,18 +342,18 @@ def check_polymorphic(ann: dict) -> list[str]:
             errors.append("%s: the vtable %s is also the vtable of %s" % (name, spec["vtable"], seen[spec["vtable"]]))
         else:
             seen[spec["vtable"]] = name
-        if spec["scope"] != "state" or spec.get("table") or spec.get("inside"):
-            errors.append("%s: a kind with a vtable is a state kind with no table or inside" % name)
-        if name not in owner:
-            errors.append("%s: has a vtable and is a kind of no base" % name)
+        if spec["scope"] != "state" or spec.get("table"):
+            errors.append("%s: a kind with a vtable is a state kind with no table" % name)
+        if name not in owner and not spec.get("inside"):
+            errors.append("%s: has a vtable and is a kind of no base, and is embedded nowhere" % name)
     for name, spec in kinds.items():
         for f in spec["fields"]:
             where = "%s.%s" % (name, f["name"])
-            base = kinds.get(f.get("target")) if f["kind"] in ("ref", "embed", "unitid", "ptr") else None
+            base = kinds.get(f.get("target")) if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds") else None
             if f["kind"] == "ptr" and (base is None or base["scope"] != "state"):
                 errors.append("%s: a ptr field points at a state kind of the schema" % where)
             if "poly" in f:
-                if f["kind"] != "ref" or f.get("target") != f["poly"] or base is None or "kinds" not in base:
+                if f["kind"] not in ("ref", "refs") or f.get("target") != f["poly"] or base is None or "kinds" not in base:
                     errors.append("%s: `poly` names the base kind that the ref points at" % where)
             elif base is not None and "kinds" in base:
                 errors.append("%s: points at the base kind %s and needs \"poly\": \"%s\"" % (where, f["target"], f["target"]))
@@ -304,12 +365,59 @@ def check_polymorphic(ann: dict) -> list[str]:
     return errors
 
 
-def check_inside(ann: dict) -> list[str]:
-    """Errors for `inside`: a list of the sites {kind, member} that a kind is embedded at, each an embed field of its container."""
+def embeds_member(f: dict) -> str:
+    """The member path of an `embeds` field, with `[]` where the index goes: `channels[]` by default, `weapons[].aimCob` for a member of each element."""
+    return f.get("member", f["name"] + "[]")
+
+
+def check_elements(ann: dict) -> list[str]:
+    """Errors for the array fields of a state kind: `refs` (a count of refs) and `embeds` (a count of structs of a kind, embedded in place)."""
+    errors = []
+    kinds = ann["objects"]
+    for name, spec in kinds.items():
+        for f in spec["fields"]:
+            if f["kind"] not in ("refs", "embeds"):
+                continue
+            where = "%s.%s" % (name, f["name"])
+            count = f.get("count")
+            target = kinds.get(f.get("target"))
+            if spec["scope"] != "state":
+                errors.append("%s: only the fields of a state kind are arrays of refs or embeds" % where)
+            if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+                errors.append("%s: `count` is a positive integer" % where)
+            if target is None or target["scope"] != "state":
+                errors.append("%s: the target %s is no state kind of the schema" % (where, f.get("target")))
+            if f["kind"] == "refs":
+                if "member" in f and not VTABLE_NAME.match(f["member"]):
+                    errors.append("%s: the member of an array of refs is a name" % where)
+                continue
+            member = embeds_member(f)
+            if member.count("[]") != 1 or member.endswith("."):
+                errors.append("%s: the member of an array of embeds has one `[]`, as in `channels[]` or `weapons[].aimCob`" % where)
+            if "poly" in f:
+                errors.append("%s: an array of embeds names one kind, and has no `poly`" % where)
+    return errors
+
+
+def check_inside(ann: dict) -> tuple[dict, list[str]]:
+    """Errors for `inside`, and the sites of each kind.
+
+    A site is {"kind", "member"}: the member of a container that the kind lives in, an `embed` field of the container, or an `embeds` field when the
+    member has `[]` for the index of an element. A kind in a table behind a ref field of another kind (`table` with an object `base`) has that
+    field's elements as its site."""
     errors = []
     kinds = ann["objects"]
     taken: set[tuple[str, str]] = set()
+    sites: dict[str, list[dict]] = {}
     for name, spec in kinds.items():
+        if is_based(spec):
+            based = check_based(name, spec, ann, errors)
+            if based is not None:
+                if (based["container"], based["member"]) in taken:
+                    errors.append("%s table: the site %s.%s is already the site of a kind" % (name, based["container"], based["member"]))
+                taken.add((based["container"], based["member"]))
+                sites[name] = [based]
+            continue
         inside = spec.get("inside")
         if inside is None:
             continue
@@ -327,14 +435,39 @@ def check_inside(ann: dict) -> list[str]:
             if container is None or container["scope"] != "state":
                 errors.append("%s: the site %s.%s is not in a state kind of the schema" % (where, site["kind"], site["member"]))
                 continue
-            if container.get("inside"):
+            if container.get("inside") or is_based(container):
                 errors.append("%s: the container %s is itself inside another kind" % (where, site["kind"]))
             key = (site["kind"], site["member"])
             if key in taken:
                 errors.append("%s: the site %s.%s is already the site of a kind" % (where, key[0], key[1]))
             taken.add(key)
-            if not any(f["kind"] == "embed" and f.get("target") == name and f.get("member", f["name"]) == site["member"] for f in container["fields"]):
-                errors.append("%s: the site %s.%s is no embed field of %s that leads to %s" % (where, key[0], key[1], key[0], name))
+            member = site["member"]
+            array = "[]" in member
+            leads = [f for f in container["fields"] if f.get("target") == name and (
+                (array and f["kind"] == "embeds" and embeds_member(f) == member) or (not array and f["kind"] == "embed" and f.get("member", f["name"]) == member))]
+            if not leads:
+                errors.append("%s: the site %s.%s is no %s field of %s that leads to %s" % (where, key[0], key[1], "embeds" if array else "embed", key[0], name))
+                continue
+            sites.setdefault(name, []).append({"kind": name, "container": site["kind"], "member": member, "offset": member.replace("[]", "[0]"),
+                                               "array": member[:member.index("[]")] if array else None, "count": leads[0]["count"] if array else 1, "ref": False})
+    return sites, errors
+
+
+def check_vptr(ann: dict) -> list[str]:
+    """Errors for `vptr`: the global that holds the vtable of a kind whose first word the code sets by hand."""
+    errors = []
+    taken = {spec["vtable"]: name for name, spec in ann["objects"].items() if isinstance(spec.get("vtable"), str)}
+    for name, spec in ann["objects"].items():
+        if "vptr" not in spec:
+            continue
+        if not isinstance(spec["vptr"], str) or not VTABLE_NAME.match(spec["vptr"]):
+            errors.append("%s: the vptr is the name of a global" % name)
+        elif spec["vptr"] in taken:
+            errors.append("%s: the vptr %s is also the vtable of %s" % (name, spec["vptr"], taken[spec["vptr"]]))
+        else:
+            taken[spec["vptr"]] = name
+        if spec["scope"] != "state" or spec.get("table") or spec.get("kinds") or "vtable" in spec:
+            errors.append("%s: a kind with a vptr is a state kind with no table, kinds or vtable" % name)
     return errors
 
 
@@ -347,8 +480,8 @@ def check_delta(ann: dict) -> list[str]:
         where = "%s delta" % name
         if spec["delta"] is not True:
             errors.append("%s: `delta` is true, or absent" % where)
-        if not spec.get("table"):
-            errors.append("%s: only a kind with a table can be a delta" % where)
+        if not is_global_table(spec):
+            errors.append("%s: only a kind with a table of Game or SimGlobals can be a delta" % where)
         if spec["scope"] != "state" or spec.get("inside") or spec.get("kinds") or spec.get("vtable"):
             errors.append("%s: a delta kind is a state kind with no sites, kinds or vtable" % where)
     return errors
@@ -466,7 +599,7 @@ def object_targets(target: str, ann: dict) -> list[tuple[str, str]]:
     return hits
 
 
-WALKABLE = ("ref", "embed", "unitid", "weapon")
+WALKABLE = ("ref", "embed", "unitid", "weapon", "refs", "embeds")
 MAX_REACH_DEPTH = 2
 
 
@@ -546,7 +679,7 @@ def condition_source(where: str, f: dict, when: dict, object_fields: list, objec
         errors.append("%s: the `via` field %s is a ref, a ptr or an integer that indexes a table" % (where, via))
         return None
     table = ann["objects"].get(when.get("kind"))
-    if table is None or not table.get("table"):
+    if table is None or not is_global_table(table):
         errors.append("%s: the `via` field %s is an integer, and the condition's `kind` names the table kind it indexes" % (where, via))
         return None
     return when["kind"]
@@ -904,15 +1037,16 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     object_fields = []
     tables: list[dict] = []
     vectors: list[dict] = []
+    elems: list[dict] = []
     kind_names = list(ann["objects"])
     for kind in kind_names:
         spec = ann["objects"][kind]
         entry = {"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")}
-        for key in ("vtable", "kinds", "delta"):
+        for key in ("vtable", "vptr", "kinds", "delta"):
             if spec.get(key):
                 entry[key] = spec[key]
         objects.append(entry)
-        if spec.get("table"):
+        if is_global_table(spec):
             if spec["scope"] != "state":
                 errors.append("%s: only a state kind can have a table" % kind)
             tables.append(check_table(kind, spec["table"], errors))
@@ -926,6 +1060,10 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 array["member"] = f.get("member", f["name"])
                 arrays.append(array)
                 entry["array"] = len(arrays)
+            if f["kind"] in ("refs", "embeds"):
+                elems.append({"kind": f["kind"], "count": f["count"] if isinstance(f.get("count"), int) and f["count"] > 0 else 1, "owner": spec["type"],
+                              "member": embeds_member(f) if f["kind"] == "embeds" else f.get("member", f["name"])})
+                entry["elems"] = len(elems)
             if f["kind"] == "vector":
                 where = "%s.%s" % (kind, f["name"])
                 if spec["scope"] != "state":
@@ -952,7 +1090,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     reach_table: list[int] = []
     errors += resolve_field_reaches(ann, object_fields, object_index, reach_table)
     errors += resolve_conditions(ann, object_fields, object_index)
-    errors += check_inside(ann)
+    sites, inside_errors = check_inside(ann)
+    errors += inside_errors + check_elements(ann) + check_vptr(ann)
     errors += check_delta(ann)
     by_function: dict[str, list[dict]] = {}
     for r in rows:
@@ -1084,7 +1223,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                     else:
                                         into.add(object_index[(k, fname)])
                         elif rule["rule"] == "all-of":
-                            if not ann["objects"].get(rule["object"], {}).get("table"):
+                            if not is_global_table(ann["objects"].get(rule["object"], {})):
                                 message = "the all-of rule names %s, which is no table kind of the schema" % rule["object"]
                                 if message not in errors:
                                     errors.append(message)
@@ -1161,7 +1300,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             if slot not in subsystems.get(seam, {}).get("slots", {}) and slot not in subsystems.get(seam, {}).get("unrecorded", {}):
                 errors.append("%s imports %s, which is no slot of the %s interface" % (sub, imp, seam))
     return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table,
-            "arrays": arrays, "tables": tables, "vectors": vectors, "code_tables": code_tables, "callbacks": callbacks,
+            "arrays": arrays, "tables": tables, "vectors": vectors, "elems": elems, "sites": sites, "code_tables": code_tables, "callbacks": callbacks,
             "alloc_tags": ann.get("alloc_tags", {}),
             "kind_types": {k: v["type"] for k, v in ann["objects"].items()}}, errors
 
@@ -1242,9 +1381,29 @@ GENERATED = "// Generated by tools/replayschema.py. Do not edit."
 
 
 def render_schema(ann: dict, model: dict) -> str:
+    """src/harness/replay_schema.h: the tables of the real kinds, or those of tests/replay_schema_fixtures.h when BT_REPLAY_FIXTURES is defined."""
+    text = schema_body(ann, model, "REPLAY_SCHEMA_H")
+    head = "#define REPLAY_SCHEMA_H\n"
+    text = text.replace(head, head + '\n#ifdef BT_REPLAY_FIXTURES\n#include "../../tests/replay_schema_fixtures.h"\n#else\n', 1)
+    tail = "\n#endif\n"
+    return text[:-len(tail)] + "\n#endif\n#endif\n"
+
+
+def fixture_include(path: str) -> str:
+    """An include of a header, spelled from src/harness, as the same file is spelled from tests/."""
+    return os.path.relpath(os.path.normpath("src/harness/" + path), "tests").replace(os.sep, "/")
+
+
+def render_fixture_schema(ann: dict, model: dict) -> str:
+    """tests/replay_schema_fixtures.h: the tables of the real kinds and the test-only kinds, which only the tests' build includes."""
+    text = schema_body(ann, model, "REPLAY_SCHEMA_FIXTURES_H")
+    return re.sub(r'^#include "([^"]+)"$', lambda m: '#include "%s"' % fixture_include(m.group(1)), text, flags=re.M)
+
+
+def schema_body(ann: dict, model: dict, guard: str) -> str:
     fields, objects, ofields, subsystems = model["fields"], model["objects"], model["object_fields"], model["subsystems"]
     sim = ann["sim_fields"]
-    L = [GENERATED, "#ifndef REPLAY_SCHEMA_H", "#define REPLAY_SCHEMA_H", "", "#include <stddef.h>", ""]
+    L = [GENERATED, "#ifndef " + guard, "#define " + guard, "", "#include <stddef.h>", ""]
     L += ['#include "../state/game_rand.h"', "#pragma pack(push, 1)", '#include "../game/game.h"', "#pragma pack(pop)"]
     for inc in ann["includes"]:
         if inc.startswith("pack1:"):
@@ -1317,6 +1476,12 @@ def render_schema(ann: dict, model: dict) -> str:
         L.append("    { %s, %s, sizeof(%s) }," % (VECTOR_MODES[v["mode"]], "ROK_" + upper(v["kind"]) if v["kind"] else "0", v["ctype"]))
     if not vectors:
         L.append("    { RV_OBJECT, 0, 1 },")
+    L += ["};", "", "static const ReplayElemSpec kReplayElems[] = {"]
+    for e in model["elems"]:
+        stride = "sizeof(unsigned)" if e["kind"] == "refs" else "sizeof(((%s*)nullptr)->%s[0])" % (e["owner"], e["member"].split("[]")[0])
+        L.append("    { %d, %s }," % (e["count"], stride))
+    if not model["elems"]:
+        L.append("    { 1, 1 },")
     L += ["};", ""]
     scope = {"state": "RS_STATE", "index": "RS_INDEX", "value": "RS_VALUE"}
     kind_id = {o["name"]: "ROK_" + upper(o["name"]) for o in objects}
@@ -1331,10 +1496,17 @@ def render_schema(ann: dict, model: dict) -> str:
     sites: list[str] = []
     site_at: dict[str, tuple[int, int]] = {}
     for o in objects:
-        listed = [x for x in o["inside"] if isinstance(x, dict) and x.get("kind") in kind_id and "member" in x] if isinstance(o.get("inside"), list) else []
+        listed = model["sites"].get(o["name"], [])
         site_at[o["name"]] = (len(sites) if listed else 0, len(listed))
         for site in listed:
-            sites.append('    { %s, %s, offsetof(%s, %s), "%s" },' % (kind_id[o["name"]], kind_id[site["kind"]], types[site["kind"]], site["member"], site["member"]))
+            container = types[site["container"]]
+            if site.get("ref"):
+                stride = "sizeof(%s)" % o["type"]
+            elif site.get("array"):
+                stride = "sizeof(((%s*)nullptr)->%s[0])" % (container, site["array"])
+            else:
+                stride = "0"
+            sites.append('    { %s, %s, offsetof(%s, %s), "%s", %s, %d, %d },' % (kind_id[o["name"]], kind_id[site["container"]], container, site["offset"], site["member"], stride, site["count"], int(bool(site.get("ref")))))
     L += ["static const ReplayInsideSite kReplayInsideSites[] = {"] + (sites or ['    { 0, 0, 0, "" },']) + ["};", "static const unsigned kReplayInsideSiteCount = %d;" % len(sites), "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
     for o in objects:
         first, count = poly_at.get(o["name"], (0, 0))
@@ -1373,12 +1545,12 @@ def render_schema(ann: dict, model: dict) -> str:
             range_end[begin] = position[(f["object"], f["name"])] + 1
             range_begin[position[(f["object"], f["name"])]] = begin + 1
     for i, f in enumerate(ofields):
-        member = f.get("member", f["name"])
+        member = embeds_member(f).replace("[]", "[0]") if f["kind"] == "embeds" else f.get("member", f["name"])
         t = types[f["object"]]
         size = f.get("size")
         size_text = str(size) if size else "sizeof(void*)" if f["kind"] == "ptr" else "sizeof(((%s*)nullptr)->%s)" % (t, member)
-        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr") or (f["kind"] == "vector" and f.get("target")) else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
-        extra = ", %d" % (f.get("array") or f.get("vector")) if f.get("array") or f.get("vector") else ""
+        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds") or (f["kind"] == "vector" and f.get("target")) else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
+        extra = ", %d" % (f.get("array") or f.get("vector") or f.get("elems")) if f.get("array") or f.get("vector") or f.get("elems") else ""
         when = "{ %d, %d, %s, %du, %d }" % (f["condField"], f.get("condVia", 0), kind_id[f["condKind"]], f.get("condMask", 0xFFFFFFFF), f["condValue"]) if f.get("condField") else "{}"
         L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
             f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target, range_end.get(i, 0), range_begin.get(i, 0),
@@ -1388,6 +1560,16 @@ def render_schema(ann: dict, model: dict) -> str:
     for f in ofields:
         t = types[f["object"]]
         member = f.get("member", f["name"])
+        if f["kind"] == "refs":
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %s * sizeof(unsigned), "%s::%s holds %s refs");' % (t, member, f["count"], t, f["name"], f["count"]))
+            L.append('static_assert(__is_same(decltype(&((%s*)nullptr)->%s[0]), Ref<%s>*), "%s::%s holds Ref<%s>");' % (t, member, types[f["target"]], t, f["name"], types[f["target"]]))
+            continue
+        if f["kind"] == "embeds":
+            mem = embeds_member(f)
+            array = mem.split("[]")[0]
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %s * sizeof(((%s*)nullptr)->%s[0]), "%s::%s holds %s elements");' % (t, array, f["count"], t, array, t, f["name"], f["count"]))
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s has the size of its kind");' % (t, mem.replace("[]", "[0]"), types[f["target"]], t, f["name"]))
+            continue
         if f["kind"] == "embed":
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s has the size of its kind");' % (t, member, types[f["target"]], t, f["name"]))
         elif f["kind"] == "bytes":
@@ -1411,6 +1593,8 @@ def render_schema(ann: dict, model: dict) -> str:
             L.append('static_assert(__is_base_of(%s, %s), "%s is a kind of %s");' % (o["type"], types[k], k, o["name"]))
         if o.get("vtable"):
             L.append('static_assert(__is_polymorphic(%s), "%s has a vtable");' % (o["type"], o["name"]))
+        if o.get("vptr"):
+            L.append('static_assert(!__is_polymorphic(%s) && sizeof(%s) >= sizeof(void*), "%s has a vptr that the code sets by hand");' % (o["type"], o["type"], o["name"]))
     L += ["", "enum ReplaySubsystemId {"]
     L += ["    SUB_%s," % upper(s) for s in subsystems]
     L += ["    SUB_COUNT", "};", "", "enum ReplaySlotId {"]
@@ -2140,7 +2324,7 @@ def function_files() -> dict[str, str]:
 def replay_link_sources() -> set[str]:
     """The source files the replayer links: those of the REPLAY_SUBSYSTEMS and the ones its target lists."""
     text = (ROOT / "CMakeLists.txt").read_text()
-    subs = set(re.search(r"set\(REPLAY_SUBSYSTEMS ([^)]*)\)", text).group(1).split())
+    subs = set(replay_subsystems.load())
     listed = re.search(r"add_library\(replay_native_test_objects OBJECT ([^)]*)\)", text).group(1)
     files = set(re.findall(r"\b(src/[\w/]+\.cpp)\b", listed))
     with SUBSYSTEMS.open(newline="") as f:
@@ -2482,15 +2666,18 @@ def render_service_answers(services: list[dict], linked: set[str] | None = None)
 VTABLES_CPP = ROOT / "src/harness/replay_vtables.cpp"
 
 
-def render_vtables(model: dict) -> str:
+def render_vtables(model: dict, fixtures: bool = False) -> str:
     """The vtable of each concrete kind, by kind id: the externs are here and not in a header."""
-    kinds = [o for o in model["objects"] if o.get("vtable")]
-    L = [GENERATED, '#include "replay_schema.h"', '#include "replay_objects.h"', ""]
-    L += ["extern void (* const %s[])();" % o["vtable"] for o in kinds]
+    kinds = [o for o in model["objects"] if o.get("vtable") or o.get("vptr")]
+    if fixtures:
+        L = [GENERATED, '#include "replay_schema_fixtures.h"', '#include "../src/harness/replay_objects.h"', ""]
+    else:
+        L = [GENERATED, '#include "replay_schema.h"', '#include "replay_objects.h"', ""]
+    L += ["extern void (* const %s[])();" % (o.get("vtable") or o["vptr"]) for o in kinds]
     for fn, ret, expr in (("ReplayVtable", "const void*", "%s"), ("ReplayVtableName", "const char*", '"%s"')):
         L += ["", "%s %s(unsigned kind)" % (ret, fn), "{", "    switch (kind) {"]
         for o in kinds:
-            L += ["    case ROK_%s:" % upper(o["name"]), "        return %s;" % (expr % o["vtable"])]
+            L += ["    case ROK_%s:" % upper(o["name"]), "        return %s;" % (expr % (o.get("vtable") or o["vptr"]))]
         L += ["    default:", "        return %s;" % ("nullptr" if ret == "const void*" else '""'), "    }", "}"]
     return "\n".join(L) + "\n"
 
@@ -2596,7 +2783,7 @@ def render_callback_players(model: dict) -> str:
 
 
 def shape_slots(ann: dict) -> tuple[list[dict], list[str]]:
-    """The fixture slots of `annotations.fixtures`: each classified as a slot of a subsystem is, for the stubs the replayer's self-tests call."""
+    """The fixture slots of `fixtures` in tests/replay_fixtures.json: each classified as a slot of a subsystem is, for the stubs the replayer's self-tests call."""
     out, errors = [], []
     for name, spec in ann.get("fixtures", {}).items():
         params = spec["params"]
@@ -2618,13 +2805,16 @@ def render_shapes(ann: dict) -> str:
     return "\n".join(L)
 
 
-def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: dict | None = None):
+def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: dict | None = None, fixtures: dict | None = None):
     ann = ann or load_annotations()
     assignment = assignment or read_assignment()
     model, errors = build(ann, rows, assignment)
+    fixture_ann = merge_fixtures(ann, fixtures if fixtures is not None else json.loads(FIXTURES_JSON.read_text()))
+    fixture_model, fixture_errors = build(fixture_ann, rows, assignment)
+    errors += [e for e in fixture_errors if e not in errors]
     attach_raw_params(model)
     services = ann["services"]
-    errors += shape_slots(ann)[1]
+    errors += shape_slots(fixture_ann)[1]
     errors += check_service_hooks(services)
     errors += check_service_snapshots(services)
     spec_errors = check_service_specs(services, ann)
@@ -2636,6 +2826,8 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
                    if not any(x["name"] == n or x["name"].startswith(n + "_") for x in services)]
     files = {
         SCHEMA_H: render_schema(ann, model),
+        FIXTURE_SCHEMA_H: render_fixture_schema(fixture_ann, fixture_model),
+        FIXTURE_VTABLES_CPP: render_vtables(fixture_model, True),
         HOOKS_H: render_hooks(ann, model),
         SLOTS_H: render_slots(ann, model),
         SERVICES_H: render_service_ids(services),
@@ -2644,7 +2836,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         VTABLES_CPP: render_vtables(model),
         CALLBACKS_H: render_callbacks(model),
         CALLBACKS_SLOTS: render_callback_players(model),
-        SHAPES_SLOTS: render_shapes(ann),
+        SHAPES_SLOTS: render_shapes(fixture_ann),
         JSON_OUT: json_text(ann, model),
     }
     return files, errors, model

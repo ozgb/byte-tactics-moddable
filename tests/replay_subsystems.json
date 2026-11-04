@@ -1,0 +1,40 @@
+{
+  "wind_meteors": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_GAP_SCALE=31.0",
+      "recording": "meteors-hailstorm.txt",
+      "expect": 2,
+      "field": "SimGlobals.g_meteorScheduleGap"
+    },
+    "self_test": "meteors-hailstorm.txt",
+    "log_names": {
+      "native": "replay_native",
+      "self": "replay_self",
+      "inject": "replay_inject",
+      "wasm": "replay_wasm",
+      "wasm_self": "replay_wasm_self",
+      "wasm_inject": "replay_wasm_inject"
+    },
+    "wasm": {
+      "module": "wind_meteors",
+      "inject_variant": "wind_meteors_inject",
+      "inject_define": "BT_REPLAY_INJECT_GAP_SCALE=31.0"
+    }
+  },
+  "economy": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_WIND_SCALE=3.0",
+      "recording": "duel-shore-to-shore.txt",
+      "expect": 5501,
+      "field": "Player#0.energy"
+    }
+  },
+  "targeting": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_TARGET_SCALE=0x6666",
+      "recording": "skirmish4-long.txt",
+      "expect": 352,
+      "field": "pos.x"
+    }
+  }
+}

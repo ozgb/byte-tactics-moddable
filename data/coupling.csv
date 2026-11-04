@@ -1276,7 +1276,7 @@ harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
 harness,game,call,SaveGameFile,1
 harness,game,call,SimBlockAttach,1
-harness,game,call,SimBlockBase,11
+harness,game,call,SimBlockBase,13
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimOwns,1
 harness,game,shared_write,EconomySeam::UpdateResourceSharing,1

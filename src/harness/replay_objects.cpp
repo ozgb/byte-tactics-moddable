@@ -593,6 +593,9 @@ bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, Rep
     case RK_REF:
         ReplayAddObjectName(out, table, f.target, BlockAt(*(const unsigned*)at), assign);
         break;
+    case RK_PTR:
+        ReplayAddObjectName(out, table, f.target, *(void* const*)at, assign);
+        break;
     case RK_UNITID:
         out.AddUnsigned(*(const unsigned short*)at);
         break;
@@ -803,6 +806,17 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
                 return false;
         }
         *(unsigned*)at = target == nullptr ? 0u : (unsigned)((const char*)target - (const char*)SimBlockBase());
+        break;
+    }
+    case RK_PTR: {
+        void* target = nullptr;
+        if (strcmp(value, "null") != 0) {
+            unsigned kind = 0;
+            target = ReplayResolveObject(value, &kind, table, alloc);
+            if (target == nullptr || !ReplayKindFits(f.target, kind))
+                return false;
+        }
+        *(void**)at = target;
         break;
     }
     default:

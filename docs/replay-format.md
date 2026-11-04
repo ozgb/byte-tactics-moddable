@@ -108,6 +108,16 @@ in table order) numbers the objects named by first appearance, and the replayer 
 `Kind#N` in the block when a line first names it, stores `Ref` pointers as offsets from the block base, and reports a
 changed field at its `Kind#N.field`. A pointer to an object no earlier line named is written `Kind#?`.
 
+A field of kind `ptr` is a raw pointer, not a `Ref`, to an object of a state kind: `{"name": "src", "kind": "ptr", "target": "FrameTable"}`
+for `Handle::src`. It is written exactly as a `ref` is, `FrameTable#N`, `null`, or `FrameTable#?` when no earlier line named the
+object, but the replayer stores the address of its own copy of the object, where a `ref` stores an offset from the block base. The
+walk does not follow a `ptr`, so the object it points at is written only where something else reaches it (an argument, a result).
+
+| Kind | Stored as | Written as |
+|---|---|---|
+| `ref` | an offset from the block base | `Unit#1`, `null` |
+| `ptr` | the address of an object | `FrameTable#1`, `null` |
+
 A pair of pointer fields that bound a slice of a table is a closed range: the schema marks the end field with
 `"range_end_of": "unitsBegin"`, and `Player::unitsEnd` points at the last unit of the player's slice (the walk is
 `u <= end`), not one past it. The end pointer is written as the object it points at, `Unit#249`, like any pointer. The
@@ -126,7 +136,7 @@ module's loop reads each one; when only one field of the pair is in the slot's s
 | Point16 | `(x,y)` |
 | Vec3 | `(x,y,z)` |
 | string | double quotes, C escapes, up to the first NUL |
-| pointer to an object | `Unit#17`, `UnitDef#2`, `weapondef#17`, `Unit#17.resourceSlot`, or `null` |
+| pointer to an object (`ref` or `ptr`) | `Unit#17`, `UnitDef#2`, `weapondef#17`, `Unit#17.resourceSlot`, or `null` |
 | object handed to an import | `file#1`, `rec#2`, `bank#1` |
 | random stream | `main` or `load` |
 
@@ -434,6 +444,7 @@ in them. The line carries the arguments by their modes and the result after ` = 
 | `textn` (`length`) | `"meteor 1\nmeteor 0"` | a text of that many characters, not NUL-terminated |
 | `ints` (`count`) | `[3,4]` | that many words behind a pointer |
 | `object` (`kind`) | `Gaf#1` | an object of a kind of the schema, named by first appearance in the file |
+| `object` (`kind`, `reach`) | `Handle#1` | an object the import writes: its `reach` fields follow the result as `o Handle#1.index 0` lines, and the replayer restores them |
 | `allocated` | `alloc#3`, `PlayerInfo#1`, `alloc#?` | a block that an earlier alloc returned, `alloc#?` when none did |
 | `commandargs` | `["x","y"]` or `null` | the strings of a `CommandArgs` |
 
@@ -450,6 +461,22 @@ An out is an `o` line after the import line: `o dest "Armada"` for a text writte
 (`{"label": "dst", "int": "dst"}`), `o file#1.current rec#1` for a record a file now points at. An entry may also give `pre` lines
 (the replayer builds the formatted text of `FilePrintf` from its own arguments), `effect` lines (the replayer's definition does what
 the function does to its object: `count = 0;` for `InitArgs`), `cast` and `into_size`.
+
+A cursor that a service starts or steps is an `object` argument with a `reach`, so each call records the fields it left in it, a `ptr` among
+them (`InitGafSequence` and `StepGafSequence`, whose `Handle::src` is the entry or `null`):
+
+```
+  i services.InitGafSequence Handle#1 FrameTable#1 0
+  o Handle#1.index 0
+  o Handle#1.value 4
+  o Handle#1.kind 1
+  o Handle#1.src FrameTable#1
+  i services.StepGafSequence Handle#1 = 1
+  o Handle#1.index 1
+  o Handle#1.value 7
+  o Handle#1.kind 1
+  o Handle#1.src FrameTable#1
+```
 
 One line per group, from the self-test:
 
@@ -523,7 +550,7 @@ recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.m
 chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
 struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
 `Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
-is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and services (the files, commands, sim plumbing and load reads, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
+is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and raw pointer fields (a `Handle` whose `src` is a `ptr`, rebuilt and compared, with a changed `src` reported at `Handle#1.src`) and services (the files, commands, sim plumbing, load reads and GAF cursors, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
 second object, with a changed result reported at `import 0 fixture.Scan.c[0]`). With a
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.

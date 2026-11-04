@@ -534,7 +534,7 @@ void ApplyReach(void* object, unsigned kind, const char* suffix)
     const char* value = OutValue(suffix);
     const ReplayObjectField* f = ReplayFindObjectField(kind, suffix + 1);
     if (object != nullptr && value != nullptr && f != nullptr)
-        ReplayRestoreObjectField(*f, object, value, g_objects, nullptr);
+        ReplayRestoreObjectField(*f, object, value, g_objects, AllocObject);
 }
 
 const char* ArgLine(const char* name)
@@ -2847,6 +2847,120 @@ void LoadReadsSelfTest()
     Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.LoadAnimGaf") == 0, "and so is a changed name");
 }
 
+void GafCursorSelfTest()
+{
+    printf("services: GAF cursors\n");
+    ResetBlock();
+    const char* body =
+        "  i services.LoadAnimGaf \"logos\" = Gaf#1\n"
+        "  i services.FindGafEntry Gaf#1 \"radar\" = FrameTable#1\n"
+        "  o FrameTable#1.count 3\n"
+        "  i services.InitGafSequence Handle#1 FrameTable#1 0\n"
+        "  o Handle#1.index 0\n"
+        "  o Handle#1.value 4\n"
+        "  o Handle#1.kind 1\n"
+        "  o Handle#1.src FrameTable#1\n"
+        "  i services.StepGafSequence Handle#1 = 1\n"
+        "  o Handle#1.index 1\n"
+        "  o Handle#1.value 7\n"
+        "  o Handle#1.kind 1\n"
+        "  o Handle#1.src FrameTable#1\n"
+        "  i services.StepGafSequence Handle#1 = 1\n"
+        "  o Handle#1.index 1\n"
+        "  o Handle#1.value 7\n"
+        "  o Handle#1.kind 0\n"
+        "  o Handle#1.src null\n";
+    BeginServices(body);
+    void* gaf = LoadAnimGaf("logos");
+    GafEntry* entry = FindGafEntry((GafArchive*)gaf, "radar");
+    Handle* cursor = (Handle*)ReplayResolveObject("Handle#1", nullptr, g_objects, AllocObject);
+    InitGafSequence(cursor, entry, 0);
+    Check(cursor->index == 0 && cursor->value == 4 && cursor->kind == 1, "a cursor started has the recorded index, value and kind");
+    Check(cursor->src == entry && entry != nullptr, "and its src is the replayer's own copy of the entry, not a block offset");
+    Check(StepGafSequence(cursor) == 1 && cursor->index == 1 && cursor->value == 7 && cursor->src == entry, "a step replays its result and its fields");
+    Check(StepGafSequence(cursor) == 1 && cursor->kind == 0 && cursor->src == nullptr, "a cursor that ran out has a null src");
+    Check(g_diffs == 0 && g_importIndex == 5, "and nothing differs");
+
+    BeginServices(body);
+    LoadAnimGaf("logos");
+    FindGafEntry((GafArchive*)gaf, "radar");
+    InitGafSequence(cursor, nullptr, 0);
+    printf("a changed entry: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 2 services.InitGafSequence") == 0, "an entry that is not the recorded one is reported at the import");
+}
+
+void RawPointerSelfTest()
+{
+    printf("ptr fields\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    Handle* cursor = (Handle*)SimAlloc(sizeof(Handle));
+    FrameTable* table = (FrameTable*)SimAlloc(sizeof(FrameTable));
+    memset((void*)cursor, 0, sizeof(Handle));
+    memset((void*)table, 0, sizeof(FrameTable));
+    cursor->index = 2;
+    cursor->value = 9;
+    cursor->kind = 1;
+    cursor->src = (GafEntry*)table;
+    unsigned char kinds[1] = { ROK_HANDLE };
+    void* roots[1] = { cursor };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    const char* text = recorder.text.Data();
+    printf("%s", text);
+    Check(strstr(text, "  r Handle#1.src FrameTable#1\n") != nullptr, "a ptr is written as the object it points at");
+    Check(strstr(text, "  r Handle#1.index 2\n") != nullptr && strstr(text, "  r Handle#1.value 9\n") != nullptr && strstr(text, "  r Handle#1.kind 1\n") != nullptr, "beside the fields of its object");
+    Check(strstr(text, "0x") == nullptr, "and no address is written");
+
+    ReplayText value;
+    const ReplayObjectField* src = ReplayFindObjectField(ROK_HANDLE, "src");
+    ReplayObjectTable* stranger = new ReplayObjectTable;
+    ReplayFormatObjectField(*src, cursor, *stranger, false, value);
+    Check(strcmp(value.Data(), "FrameTable#?") == 0, "a ptr to an object no line named is Kind#?");
+    cursor->src = nullptr;
+    ReplayFormatObjectField(*src, cursor, *stranger, false, value);
+    Check(strcmp(value.Data(), "null") == 0, "and a null one is null");
+    cursor->src = (GafEntry*)table;
+    value.Free();
+    delete stranger;
+
+    ResetBlock();
+    RestoreText(text, sets);
+    Handle* rebuilt = (Handle*)ReplayResolveObject("Handle#1", nullptr, g_objects, AllocObject);
+    FrameTable* rebuiltTable = (FrameTable*)ReplayResolveObject("FrameTable#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuiltTable != nullptr && rebuilt->index == 2 && rebuilt->value == 9 && rebuilt->kind == 1, "the object is rebuilt");
+    Check(rebuilt->src == (GafEntry*)rebuiltTable, "its ptr is the address of the replayer's own copy");
+    Recorder again;
+    unsigned char againKinds[1] = { ROK_HANDLE };
+    void* againRoots[1] = { rebuilt };
+    again.Record(againKinds, againRoots, 1, sets);
+    Check(strcmp(text, again.text.Data()) == 0, "the rebuilt object records the same text");
+
+    g_rootKinds[0] = ROK_HANDLE;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the unchanged object compares equal");
+    rebuilt->src = (GafEntry*)SimAlloc(sizeof(FrameTable));
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed src: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Handle#1.src") == 0, "a ptr to another object is reported at its Kind#N.field");
+    rebuilt->src = nullptr;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Handle#1.src") == 0, "and so is a null one");
+    rebuilt->src = (GafEntry*)rebuiltTable;
+
+    Check(!ReplayRestoreObjectField(*src, rebuilt, "FrameTable#?", g_objects, nullptr), "a ptr to an unnamed object is refused");
+    Check(!ReplayRestoreObjectField(*src, rebuilt, "Gaf#1", g_objects, AllocObject), "and so is one to another kind");
+    Check(ReplayRestoreObjectField(*src, rebuilt, "null", g_objects, nullptr) && rebuilt->src == nullptr, "null restores as null");
+}
+
 void ExecuteCommandSelfTest()
 {
     printf("services: ExecuteCommandText\n");
@@ -3090,6 +3204,8 @@ int SelfTest(const char* file)
     CommandsSelfTest();
     SimPlumbingSelfTest();
     LoadReadsSelfTest();
+    GafCursorSelfTest();
+    RawPointerSelfTest();
     ExecuteCommandSelfTest();
     if (file == nullptr)
         return 0;

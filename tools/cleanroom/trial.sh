@@ -22,5 +22,7 @@ i=0
 while [ ! -f /srv/inbox/req1.json ] && [ $i -lt 100 ]; do sleep 0.2; i=$((i + 1)); done
 cat /srv/inbox/req1.json
 cd /work
-git push -q host HEAD:refs/heads/session-trial
+git branch -f session-trial HEAD
+git bundle create -q /srv/outbox/.btm.tmp session-trial
+mv /srv/outbox/.btm.tmp /srv/outbox/btm.bundle
 echo "trial: done in $(($(date +%s) - start))s"

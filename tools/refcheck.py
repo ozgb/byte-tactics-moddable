@@ -31,7 +31,9 @@ polymorphic, and the check fails when the two disagree.
 data/outside_pointers.csv (struct,field,holder,offset,words,issue,kind,note) is generated from the
 `outside` rows of data/block_pointers.csv: pointers whose targets are outside the block. A holder that is
 a struct (Game, SimGlobals) is mapped through its record layout to the field that holds each offset; the
-other holders have no struct, so their rows have a blank field and the first offset of the row.
+other holders have no struct, so their rows have a blank field. The first offset of a row drifts between scans,
+so those rows are keyed by (holder, issue, kind): the rows of one holder with one verdict make one outside row,
+at the lowest first offset among them.
 
 A row whose kind is `load` (a pointer into loaded game data: HAPI_LoadFile buffers and what is built from them
 at load) or `code` (a pointer to code in the exe image) is written by hand: --write keeps that kind over the clang
@@ -652,7 +654,13 @@ def note_about(note: str, offsets: list[int]) -> bool:
     return not named or bool(named & set(offsets))
 
 
+NOTED_ISSUE = re.compile(r"moved out by (#\d+)")
+
+
 def outside_issue(note: str, struct: str, top: str, classes: dict[str, str]) -> str:
+    noted = NOTED_ISSUE.search(note)
+    if noted:
+        return noted.group(1)
     if struct == GAME:
         return VIEW_ISSUE if classes.get(top, "") in ("view", "platform") else UNCLASSIFIED
     for pattern, issue in OUTSIDE_ISSUES:
@@ -677,6 +685,10 @@ def merge_contributions(found: list[dict]) -> dict:
     """One outside row from every block-pointer row that feeds its key, whatever their order."""
     if not all(c["late"] for c in found):
         found = [c for c in found if not c["late"]]
+    noted = {m.group(1) for c in found for m in [NOTED_ISSUE.search(c["row"]["note"])] if m}
+    if len(noted) == 1:
+        found = [dict(c, row=dict(c["row"], issue=next(iter(noted)))) if c["row"]["issue"] == VIEW_ISSUE else c
+                 for c in found]
     row = dict(found[0]["row"])
     for c in found[1:]:
         for column in ("holder", "issue", "kind"):
@@ -708,19 +720,35 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
     hand = {(r["struct"], r["field"], r["holder"], "" if r["struct"] else r["offset"]): r["note"] for r in old}
     hand_kinds = {(r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"]): r["kind"]
                   for r in old if r["kind"] in HAND_KINDS}
+    hand_notes: dict[str, list[tuple[str, list[str]]]] = {}
+    for r in old:
+        if not r["struct"] and r["kind"] in HAND_KINDS:
+            hand_notes.setdefault(r["holder"], []).append((r["kind"], r["note"].split(NOTE_JOIN)))
     matched = set()
+
+    def hand_kind_by_note(holder, note):
+        """The hand kind of a holder-only row whose note is this note (or extends it), as the first offset drifts."""
+        for kind, notes in hand_notes.get(holder, []):
+            if any(n.startswith(note) or note.startswith(n) for n in notes if n and note):
+                return kind
+        return None
 
     def add(struct, name, holder, token, words, issue, kind, note, offsets, late=False):
         key = (struct, name) if struct else (holder, token)
         written = hand.get((struct, name, holder, "" if struct else token), "")
         prefix = "%s.%s " % (struct, name)
         pinned = key in hand_kinds and any(n.startswith(prefix) for n in written.split(NOTE_JOIN))
-        if pinned or not note_about(note, offsets):
+        block_note = note
+        needs_own_note = not struct and issue and not written
+        if pinned or (not note_about(note, offsets) and not needs_own_note):
             note = written
-        if key in hand_kinds:
+        if struct and key in hand_kinds:
             kind, issue = hand_kinds[key], ""
             matched.add(key)
-        rkey = (struct, name, holder if not struct else "", token if not struct else "")
+        elif not struct and hand_kind_by_note(holder, block_note):
+            kind, issue = hand_kind_by_note(holder, block_note), ""
+            matched.add(("by-note", holder, kind))
+        rkey = (struct, name, "", "", "", "") if struct else ("", "", holder, "", issue, kind)
         contributions.setdefault(rkey, []).append({
             "row": {"struct": struct, "field": name, "holder": holder, "offset": token, "words": words,
                     "issue": issue, "kind": kind, "note": note},
@@ -766,13 +794,13 @@ def outside_rows(root: Path, locators: dict[str, Locator], classes: dict[str, st
     scanned = {(r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"]) for r in rows.values()}
     for r in old:
         key = (r["struct"], r["field"]) if r["struct"] else (r["holder"], r["offset"])
-        if key in matched:
+        if key in matched or (not r["struct"] and ("by-note", r["holder"], r["kind"]) in matched):
             continue
         if r["kind"] in HAND_KINDS:
             rows.setdefault((r["struct"], r["field"], r["holder"], r["offset"]), {**r, "issue": ""})
         elif r["kind"] in KINDS and re.fullmatch(r"#[0-9]+", r["issue"]) and key not in scanned:
             rows.setdefault((r["struct"], r["field"], r["holder"], r["offset"]), dict(r))
-    return sorted(rows.values(), key=lambda r: (r["struct"], r["field"], r["holder"], r["offset"]))
+    return sorted(rows.values(), key=lambda r: (r["struct"], r["field"], r["holder"], r["offset"], r["issue"], r["kind"]))
 
 
 def render(columns: list[str], rows: list[dict]) -> str:

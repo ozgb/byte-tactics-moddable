@@ -4,6 +4,7 @@
     uv run tools/blockpointers.py --from DIR...      # build from blockptrs files already collected (no Wine)
     uv run tools/blockpointers.py --save-scans DIR   # also write each played scenario's scan to DIR/<scenario>.txt
     uv run tools/blockpointers.py --scenario N...    # play only these (needs --save-scans), to merge later with --from
+    uv run tools/blockpointers.py --from DIR... --prune   # also drop the wildcard rows whose holder is no site of the exe
     uv run tools/blockpointers.py --out F            # write F instead (a dry run; class and note kept from the data file)
     uv run tools/blockpointers.py --check            # CI: the file itself is valid (classes, notes, order)
     uv run tools/blockpointers.py --unclassified     # list the rows with no class
@@ -52,9 +53,10 @@ Rows, one per (holder, target), sorted by holder, then target (a `*` target firs
                   address; it shows in few runs or at varying target offsets, and needs a note)
   note            free text
 
-`class` and `note` are kept by regeneration, by (holder, target). Addresses outside the block differ
-from run to run, so the pair rows can never be complete: they are the record, and `reference.py
---check` plays the scan on and fails only on a word whose holder has no wildcard row.
+`class` and `note` are kept by regeneration, by (holder, target), else by holder and a shared offset when
+a target was renamed. Addresses outside the block differ from run to run, so the pair rows can never be
+complete: they are the record, and `reference.py --check` plays the scan on and fails only on a word
+whose holder has no wildcard row.
 
 Wildcard rows. A holder has one row with `*` as its offsets and `*` as its target for each class of
 its pair rows, and one for not-a-pointer (the words that only look like addresses). `*` is no other
@@ -349,6 +351,25 @@ class Namer:
         return text if start is None else text + " @0x%x" % (address - start)
 
 
+def is_site_holder(namer: Namer, holder: str) -> bool:
+    """Whether a holder name is one the exe can give: `unknown`, a SimGlobals holder, or a function with the
+    allocator call site its ` #k` rank names (`fn`, `fn: tag` or `fn #k`, `fn: tag #k`)."""
+    if holder == "unknown" or holder.split(".", 1)[0].split("+", 1)[0] == SIM_GLOBALS:
+        return True
+    m = re.fullmatch(r"(.*?)(?: #(\d+))?", holder)
+    function = m.group(1).split(": ", 1)[0]
+    rank = int(m.group(2)) if m.group(2) else None
+    counts = {namer.code.function(site): of for site, (_, of) in namer.ranks.items()}
+    if function not in counts:
+        return False
+    return rank is None and counts[function] == 1 or rank is not None and 1 <= rank <= counts[function] > 1
+
+
+def prune_wild(old: list[dict], namer: Namer) -> list[dict]:
+    """The old rows without the wildcard rows whose holder is no site of the exe."""
+    return [r for r in old if not is_wild(r) or is_site_holder(namer, r["holder"])]
+
+
 def load_namer(map_path: Path) -> Namer:
     """The namer for the exe beside a linker map: the map's functions and the exe's allocator call sites."""
     return Namer(load_code_map(map_path), load_call_sites(map_path))
@@ -524,11 +545,28 @@ def read_rows(path: Path = OUT) -> list[dict]:
         return list(csv.DictReader(f))
 
 
+def offset_starts(offsets: str) -> set[str]:
+    """The first offset of each term of an offsets column: `0xa+0x4*k 0x20` gives 0xa and 0x20."""
+    return {term.split("+")[0] for term in offsets.split()}
+
+
 def merge_kept(rows: list[dict], old: list[dict]) -> list[dict]:
-    """The rows with the class and note the old file had for the same row_key."""
+    """The rows with the class and note the old file had for the same row_key. A pair row with none (its target
+    was renamed) takes them from the old rows of its holder with the same offsets, else with an offset in common,
+    when those agree."""
     kept = {row_key(r): r for r in old}
+    by_holder: dict[str, list[tuple[set[str], dict]]] = {}
+    for r in old:
+        if not is_wild(r):
+            by_holder.setdefault(r["holder"], []).append((offset_starts(r["offsets"]), r))
     for row in rows:
         before = kept.get(row_key(row))
+        if not before and not is_wild(row):
+            starts = offset_starts(row["offsets"])
+            held = by_holder.get(row["holder"], [])
+            same = [r for s, r in held if s == starts] or [r for s, r in held if s & starts]
+            if same and len({tuple(r[c] for c in KEPT) for r in same}) == 1:
+                before = same[0]
         if before:
             for column in KEPT:
                 row[column] = before[column]
@@ -699,12 +737,16 @@ def main() -> None:
     parser.add_argument("--game-dir", help="the game's install (default: Steam's)")
     parser.add_argument("--parallel", type=int, metavar="N", help="scenarios played at once")
     parser.add_argument("--build-dir", type=Path, help="compile database for the SimGlobals layout (default build/rwsets)")
+    parser.add_argument("--prune", action="store_true",
+                        help="drop the wildcard rows whose holder is no allocation site of the exe (pair rows come from the scans)")
     parser.add_argument("--out", type=Path, default=OUT, help="write the rows here instead of the data file")
     args = parser.parse_args()
     if args.save_scans and (args.sources or args.check or args.unclassified):
         parser.error("--save-scans saves the scans the tool plays; it cannot be used with --from, --check or --unclassified")
     if args.scenario and (args.sources or args.check or args.unclassified):
         parser.error("--scenario picks the scenarios to play; it cannot be used with --from, --check or --unclassified")
+    if args.prune and (args.check or args.unclassified):
+        parser.error("--prune rewrites the data file; it cannot be used with --check or --unclassified")
     if args.scenario and not args.save_scans:
         parser.error("--scenario plays part of the suite, which must not overwrite the data file: add --save-scans DIR "
                      "and merge the saved scans with --from")
@@ -764,7 +806,8 @@ def main() -> None:
         namer = load_namer(map_path)
     except ValueError as e:
         sys.exit("blockpointers: %s" % e)
-    merged = merge_kept(with_wild(merge(resolve(scans, namer, members)), old), old)
+    kept_wild = prune_wild(old, namer) if args.prune else old
+    merged = merge_kept(with_wild(merge(resolve(scans, namer, members)), kept_wild), old)
     now = {row_key(r) for r in merged}
     lost = [r for r in old if (r["class"] or r["note"]) and row_key(r) not in now]
     args.out.write_text(render(merged))

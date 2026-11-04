@@ -67,6 +67,9 @@ jobs:
       - name: Test the full-suite cadence tool
         run: python3 tools/test_fullgate.py
 
+      - name: Test the module judge
+        run: python3 tools/test_oraclegate.py
+
       - name: Replay schema
         run: |
           python3 tools/test_replayschema.py

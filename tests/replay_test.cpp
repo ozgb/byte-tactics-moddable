@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../src/harness/replay_objects.h"
 #include "../src/harness/replay_text.h"
 
 static int g_failures;
@@ -133,6 +134,26 @@ static void TestOrdinals()
     Check(o.Of(0, &y) == 1, "reset renumbers");
 }
 
+static void TestOrdinalsMany()
+{
+    static char objects[5000];
+    ReplayOrdinals o;
+    o.Reset();
+    ReplayClearFailure();
+    bool all = true;
+    for (unsigned i = 0; i < 1000; i++)
+        all = all && o.Of(1, &objects[i]) == i + 1;
+    Check(all && ReplayFailure() == nullptr, "a thousand handles of one kind in one call are numbered, as a map list of 895 records needs");
+    Check(o.Of(1, &objects[999]) == 1000, "and the last is found again");
+    unsigned i = 1000;
+    while (i < 5000 && ReplayFailure() == nullptr)
+        o.Of(1, &objects[i++]);
+    Check(ReplayFailure() != nullptr && strstr(ReplayFailure(), "more than 4096 handles of kind 1") != nullptr, "past the capacity the failure says which limit and kind, and the recorder does not abort");
+    ReplayClearFailure();
+    Check(o.Of(16, &objects[0]) == 0 && ReplayFailure() != nullptr, "a kind past the table is a failure too");
+    ReplayClearFailure();
+}
+
 int main()
 {
     TestNumbers();
@@ -142,6 +163,7 @@ int main()
     TestKnownMany();
     TestKnownGrows();
     TestOrdinals();
+    TestOrdinalsMany();
     if (g_failures == 0) {
         printf("replay_test: all passed\n");
         return 0;

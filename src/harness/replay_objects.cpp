@@ -120,30 +120,6 @@ bool InsideTable(unsigned kind, const void* p, unsigned* container, int* index)
 
 }
 
-namespace {
-
-char s_failure[240];
-
-}
-
-void ReplayFail(const char* message)
-{
-    if (s_failure[0] == '\0') {
-        strncpy(s_failure, message, sizeof s_failure - 1);
-        s_failure[sizeof s_failure - 1] = '\0';
-    }
-}
-
-const char* ReplayFailure()
-{
-    return s_failure[0] == '\0' ? nullptr : s_failure;
-}
-
-void ReplayClearFailure()
-{
-    s_failure[0] = '\0';
-}
-
 bool ReplayKindFits(unsigned declared, unsigned actual)
 {
     if (declared == actual)
@@ -220,8 +196,15 @@ unsigned ReplayObjectTable::Name(unsigned kind, const void* p)
         return found;
     if (kReplayObjectKinds[kind].table != RT_ORDER)
         return 0;
-    if (kind >= KINDS || count[kind] == REPLAY_MAX_OBJECTS)
-        abort();
+    if (kind >= KINDS || count[kind] == REPLAY_MAX_OBJECTS) {
+        char message[200];
+        if (kind >= KINDS)
+            sprintf(message, "the object table has no room for kind %u: it holds %u kinds", kind, (unsigned)KINDS);
+        else
+            sprintf(message, "more than %u objects of kind %s are named", (unsigned)REPLAY_MAX_OBJECTS, kReplayObjectKinds[kind].name);
+        ReplayFail(message);
+        return 0;
+    }
     Bind(kind, count[kind] + 1, (void*)p);
     return count[kind];
 }
@@ -871,8 +854,10 @@ unsigned WalkFields(const ReplaySlotSets& sets, unsigned short* out)
                 at++;
             if (at < n)
                 continue;
-            if (n == MAX_WALK_FIELDS)
-                abort();
+            if (n == MAX_WALK_FIELDS) {
+                ReplayFail("a slot set names more walkable fields than the walker holds");
+                return n;
+            }
             out[n++] = set[i];
         }
     }
@@ -908,8 +893,12 @@ void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned c
         if (reach.object[reach.slots[slot]] == object && reach.kind[reach.slots[slot]] == kind)
             return;
     }
-    if (reach.count == REPLAY_MAX_OBJECTS)
-        abort();
+    if (reach.count == REPLAY_MAX_OBJECTS) {
+        char message[200];
+        sprintf(message, "the walk reached more than %u objects, at a %s", (unsigned)REPLAY_MAX_OBJECTS, kReplayObjectKinds[kind].name);
+        ReplayFail(message);
+        return;
+    }
     reach.slots[slot] = (short)reach.count;
     if (assign && kReplayObjectKinds[kind].scope == RS_STATE && !ReplayInsideTable(kind, object))
         table.Name(kind, object);
@@ -969,8 +958,14 @@ void Expand(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned 
             unsigned char* units;
             unsigned poolCount;
             unsigned stride;
-            if (id == 0 || !TableSpan(field.target, &units, &poolCount, &stride) || id >= poolCount || deferred.count == MAX_DEFERRED)
+            if (id == 0 || !TableSpan(field.target, &units, &poolCount, &stride) || id >= poolCount)
                 continue;
+            if (deferred.count == MAX_DEFERRED) {
+                char message[200];
+                sprintf(message, "more than %u unit ids are deferred, at %s", (unsigned)MAX_DEFERRED, field.name);
+                ReplayFail(message);
+                continue;
+            }
             deferred.object[deferred.count] = units + id * stride;
             deferred.field[deferred.count++] = list[i];
             continue;

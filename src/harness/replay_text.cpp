@@ -2,7 +2,32 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "replay_objects.h"
 #include "replay_text.h"
+
+namespace {
+
+char s_failure[240];
+
+}
+
+void ReplayFail(const char* message)
+{
+    if (s_failure[0] == '\0') {
+        strncpy(s_failure, message, sizeof s_failure - 1);
+        s_failure[sizeof s_failure - 1] = '\0';
+    }
+}
+
+const char* ReplayFailure()
+{
+    return s_failure[0] == '\0' ? nullptr : s_failure;
+}
+
+void ReplayClearFailure()
+{
+    s_failure[0] = '\0';
+}
 
 void ReplayText::Free()
 {
@@ -255,14 +280,22 @@ unsigned ReplayOrdinals::Of(unsigned kind, const void* object)
 {
     if (object == nullptr)
         return 0;
-    if (kind >= KINDS)
-        abort();
+    if (kind >= KINDS) {
+        char message[200];
+        sprintf(message, "the handle kind %u is past the %u kinds of handle ordinals", kind, (unsigned)KINDS);
+        ReplayFail(message);
+        return 0;
+    }
     for (unsigned i = 0; i < count[kind]; i++) {
         if (objects[kind][i] == object)
             return i + 1;
     }
-    if (count[kind] == CAPACITY)
-        abort();
+    if (count[kind] == CAPACITY) {
+        char message[200];
+        sprintf(message, "more than %u handles of kind %u are numbered", (unsigned)CAPACITY, kind);
+        ReplayFail(message);
+        return 0;
+    }
     objects[kind][count[kind]++] = object;
     return count[kind];
 }

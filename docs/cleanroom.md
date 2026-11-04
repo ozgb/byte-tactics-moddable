@@ -137,6 +137,7 @@ artifact the gate runs. Administration stays off. The token has an expiry date. 
 the file is missing, empty, not owned by you or readable by anyone but its owner, or when the value equals a credential the
 host's Claude Code uses: `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` in the launcher's environment, or the access
 token in `~/.claude/.credentials.json`. The refusal never prints the value.
+When `CLAUDE_CONFIG_DIR` is set in the launcher's environment, the same holds for the token in `$CLAUDE_CONFIG_DIR/.credentials.json`, and a mount or session directory that is, contains or lies inside that directory is refused too (the canary checks that it is absent in the VM).
 
 **Never set `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` on the host**, in a profile or a shell: Claude Code reads
 either one in preference to its normal login, so every host session would use that credential, and the launcher refuses a

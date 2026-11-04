@@ -778,6 +778,18 @@ class CredentialTests(unittest.TestCase):
         self.host.write_text("not json")
         self.read(key)
 
+    def test_token_in_the_claude_config_dir_is_refused(self):
+        config = self.dir / "cfg"
+        config.mkdir()
+        key = make_secret(self.dir, "k", FAKE_TOKEN)
+        environ = {"CLAUDE_CONFIG_DIR": str(config)}
+        self.read(key, environ=environ)
+        (config / ".credentials.json").write_text(json.dumps({"claudeAiOauth": {"accessToken": FAKE_TOKEN}}))
+        with self.assertRaises(ln.Refusal):
+            self.read(key, environ=environ)
+        self.read(key, environ={"CLAUDE_CONFIG_DIR": ""})
+        self.read(key)
+
     def test_refusal_text_does_not_hold_the_value(self):
         key = make_secret(self.dir, "k", FAKE_TOKEN)
         with self.assertRaises(ln.Refusal) as caught:
@@ -808,6 +820,25 @@ class CredentialTests(unittest.TestCase):
         with self.assertRaises(ln.Refusal):
             ln.check_mount(inside, "tree", [self.dir / "repo"], home)
         self.assertIn(str(vault), ln.host_paths([], home))
+
+    def test_claude_config_dir_is_never_mounted(self):
+        home = self.dir / "home"
+        config = self.dir / "elsewhere" / "claude-cfg"
+        (config / "sub").mkdir(parents=True)
+        home.mkdir()
+        (self.dir / "repo").mkdir()
+        self.assertIsNone(ln.claude_config_dir({}))
+        self.assertIsNone(ln.claude_config_dir({"CLAUDE_CONFIG_DIR": ""}))
+        found = ln.claude_config_dir({"CLAUDE_CONFIG_DIR": str(config)})
+        self.assertEqual(found, config.resolve())
+        ln.check_mount(config, "tree", [self.dir / "repo"], home)
+        for bad in (config, config.parent, config / "sub"):
+            with self.assertRaises(ln.Refusal, msg=str(bad)):
+                ln.check_mount(bad, "tree", [self.dir / "repo"], home, config_dir=found)
+        with self.assertRaises(ln.Refusal):
+            ln.check_mount(config / "new", "session", [self.dir / "repo"], home, must_exist=False, config_dir=found)
+        self.assertIn(str(found), ln.host_paths([], home, found))
+        self.assertNotIn(str(found), ln.host_paths([], home))
 
     def test_canary_finds_the_directory_in_the_guest_home(self):
         with tempfile.TemporaryDirectory() as tmp:

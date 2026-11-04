@@ -9,14 +9,14 @@ clean-room tree (read-write at /work), the data kit (read-only at /data), the ma
 runs beside it: it reads a git bundle and the gate requests from the outbox as data.
 
 Refusals, each exit status 2 before any VM exists: a mount that is, contains or sits inside this
-repository (except under build/scratch), another worktree of it, ~/.claude*, ~/.ta, ~/.ssh,
+repository (except under build/scratch), another worktree of it, ~/.claude*, $CLAUDE_CONFIG_DIR, ~/.ta, ~/.ssh,
 ~/.config/gh, ~/.config/bt-cleanroom, ~/.gnupg or ~/source/repos; a tree without its own .git, or one whose git config names
 byte-tactics; overlapping mounts, the session directory included; a session directory that is, contains or sits
 inside this repository or ~/.claude* and the like; a file of the canary manifest in a mount or the
 session directory; an allowlist that
 names GitHub or similar hosts or an IP literal; a credential file that is missing, empty or readable by anyone but its owner,
 or whose value equals a credential the host's Claude Code uses (ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN in the
-launcher's environment, or the token in ~/.claude/.credentials.json); an API key variable not named ANTHROPIC_*. The
+launcher's environment, or the token in ~/.claude/.credentials.json or $CLAUDE_CONFIG_DIR/.credentials.json); an API key variable not named ANTHROPIC_*. The
 credential reaches the agent command as CLAUDE_CODE_OAUTH_TOKEN (oauth) or ANTHROPIC_API_KEY (api-key), by --secret-env. The
 canary checks then run inside the VM, and a failing check stops the session before the agent starts.
 The canary directory is deleted from the VM before the agent starts, and the launch fails if it is
@@ -85,14 +85,22 @@ def repo_roots(repo=REPO):
     return sorted(roots)
 
 
-def forbidden_paths(home):
-    """Return the paths under the home directory that a mount may not overlap."""
+def claude_config_dir(environ):
+    """Return the resolved CLAUDE_CONFIG_DIR of the environment, or None when it is unset or empty."""
+    value = environ.get("CLAUDE_CONFIG_DIR")
+    return Path(value).expanduser().resolve() if value else None
+
+
+def forbidden_paths(home, config_dir=None):
+    """Return the paths that a mount may not overlap: under the home directory, and the Claude config directory when given."""
     paths = [home / p for p in HOME_FORBIDDEN]
     paths.extend(sorted(home.glob(".claude*")))
+    if config_dir is not None:
+        paths.append(config_dir)
     return paths
 
 
-def check_mount(path, role, roots, home, must_exist=True):
+def check_mount(path, role, roots, home, must_exist=True, config_dir=None):
     """Return the resolved mount path, or raise Refusal. A path that does not exist yet passes when must_exist is False."""
     path = Path(path)
     if path.exists() or must_exist:
@@ -108,7 +116,7 @@ def check_mount(path, role, roots, home, must_exist=True):
         scratch = innermost / "build" / "scratch"
         if path == scratch or not inside(path, scratch):
             raise Refusal(f"{role} {path} is inside {innermost}, outside build/scratch")
-    for bad in forbidden_paths(home):
+    for bad in forbidden_paths(home, config_dir):
         if inside(path, bad) or inside(bad, path):
             raise Refusal(f"{role} {path} overlaps {bad}")
     return path
@@ -154,14 +162,19 @@ def check_api_key_env(name):
 
 
 def host_claude_tokens(environ, credentials_file):
-    """Return the credentials the host's Claude Code uses: the two variables and the stored OAuth access token."""
+    """Return the credentials the host's Claude Code uses: the two variables and the stored OAuth access token of ~/.claude and of $CLAUDE_CONFIG_DIR."""
     tokens = {environ[v] for v in HOST_CLAUDE_VARS if environ.get(v)}
-    try:
-        stored = json.loads(Path(credentials_file).read_text())["claudeAiOauth"]["accessToken"]
-        if isinstance(stored, str) and stored:
-            tokens.add(stored)
-    except (OSError, ValueError, KeyError, TypeError):
-        pass
+    files = [Path(credentials_file)]
+    config_dir = claude_config_dir(environ)
+    if config_dir is not None:
+        files.append(config_dir / ".credentials.json")
+    for file in files:
+        try:
+            stored = json.loads(file.read_text())["claudeAiOauth"]["accessToken"]
+            if isinstance(stored, str) and stored:
+                tokens.add(stored)
+        except (OSError, ValueError, KeyError, TypeError):
+            pass
     return tokens
 
 
@@ -261,10 +274,12 @@ def wait_for(path, seconds=15):
     return False
 
 
-def host_paths(roots, home):
+def host_paths(roots, home, config_dir=None):
     paths = [str(p) for p in (home, home / ".claude", home / ".claude.json", home / ".ta", home / ".ssh", home / ".config" / "bt-cleanroom", home / "work")]
     paths += [str(home / "source" / "repos" / n) for n in ("byte-tactics", "byte-tactics-moddable")]
     paths += [str(r) for r in roots]
+    if config_dir is not None:
+        paths.append(str(config_dir))
     return sorted(set(paths))
 
 
@@ -294,7 +309,7 @@ def prepare_guest(name, uid, gid):
     return run(exec_in(name, ["sh", "-c", script]))
 
 
-def run_canary(name, manifest, sock_guest, roots, home, home_guest=GUEST_HOME):
+def run_canary(name, manifest, sock_guest, roots, home, home_guest=GUEST_HOME, config_dir=None):
     for script in GUEST_SCRIPTS:
         r = run([str(SMOLVM), "machine", "cp", str(HERE / script), f"{name}:/opt/canary/{script}"])
         if r.returncode:
@@ -304,7 +319,7 @@ def run_canary(name, manifest, sock_guest, roots, home, home_guest=GUEST_HOME):
         return r.returncode
     argv = ["python3", "/opt/canary/canary.py", "--manifest", "/opt/canary/manifest.txt",
             "--proxy-sock", sock_guest, "--home", home_guest]
-    for p in host_paths(roots, home):
+    for p in host_paths(roots, home, config_dir):
         argv += ["--host-path", p]
     return run(exec_in(name, argv)).returncode
 
@@ -327,6 +342,7 @@ def start_session(args):
     """Validate, start everything, run the agent; return the agent's exit status."""
     home = Path.home()
     roots = repo_roots()
+    config_dir = claude_config_dir(os.environ)
     check_api_key_env(args.api_key_env)
     if args.api_key_env:
         guest_var, secret_value = "ANTHROPIC_API_KEY", os.environ.get(args.api_key_env, "")
@@ -334,8 +350,8 @@ def start_session(args):
             raise Refusal(f"--api-key-env {args.api_key_env} is not set")
     else:
         guest_var, secret_value = read_credential(args.credential_file, args.credential_kind, os.environ, args.host_credentials)
-    tree = check_mount(args.tree, "tree", roots, home)
-    datakit = check_mount(args.datakit, "data kit", roots, home)
+    tree = check_mount(args.tree, "tree", roots, home, config_dir=config_dir)
+    datakit = check_mount(args.datakit, "data kit", roots, home, config_dir=config_dir)
     check_tree(tree)
     allowed_text = Path(args.allow).read_text()
     check_allowlist_text(allowed_text)
@@ -346,7 +362,7 @@ def start_session(args):
         raise Refusal(f"{SMOLVM} is not installed")
     if not os.access("/dev/kvm", os.R_OK | os.W_OK):
         raise Refusal("/dev/kvm is not usable")
-    session = check_mount(args.session, "session", roots, home, must_exist=False)
+    session = check_mount(args.session, "session", roots, home, must_exist=False, config_dir=config_dir)
     session.mkdir(parents=True, exist_ok=True)
     check_disjoint(("tree", tree), ("data kit", datakit), ("session", session))
     broker.prepare(session)
@@ -383,7 +399,7 @@ def start_session(args):
             raise RuntimeError("guest preparation failed")
         relay = ["sh", "-c", "socat TCP-LISTEN:3128,bind=127.0.0.1,fork,reuseaddr UNIX-CONNECT:/srv/proxy.sock"]
         run(exec_in(name, relay, detach=True))
-        code = run_canary(name, manifest, "/srv/proxy.sock", roots, home)
+        code = run_canary(name, manifest, "/srv/proxy.sock", roots, home, config_dir=config_dir)
         if remove_canary(name):
             print(f"launch: {CANARY_DIR} is still in the VM", file=sys.stderr)
             code = code or 4

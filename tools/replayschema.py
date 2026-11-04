@@ -590,6 +590,33 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
     return errors
 
 
+def reached_kinds(slot: dict, object_fields: list[dict]) -> set[str]:
+    """The object kinds a slot's arguments, result and object fields lead to."""
+    kinds = {a["kind"] for a in slot["args"] if a.get("mode") in ("object", "units") and a.get("kind")}
+    if slot["result"] is not None and slot["result"].get("mode") == "object" and slot["result"].get("kind"):
+        kinds.add(slot["result"]["kind"])
+    for i in slot["objectReads"] + slot["objectWrites"]:
+        f = object_fields[i]
+        kinds.add(f["object"])
+        if f.get("target"):
+            kinds.add(f["target"])
+    return kinds
+
+
+def check_product_counts(where: str, slot: dict, tables: list[dict], object_fields: list[dict]) -> list[str]:
+    """Errors for a slot that reaches a table whose count is a product of block fields that its read set lacks."""
+    errors = []
+    reached = reached_kinds(slot, object_fields)
+    for t in tables:
+        if t["kind"] not in reached or not all("member" in f for f in t["count"]):
+            continue
+        for f in t["count"]:
+            name = ("SimGlobals." if t["sim"] else "Game.") + f["member"]
+            if name not in slot["reads"]:
+                errors.append("%s reaches %s, whose count multiplies %s, and the slot's read set lacks it" % (where, t["kind"], name))
+    return errors
+
+
 def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]]) -> dict:
     """The generated model: fields, objects, subsystems, and the errors."""
     game, sim = block_tables(ann)
@@ -688,6 +715,11 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             obj_reads, obj_writes = set(), set()
             draws = False
             all_of = None
+            for name in note.get("reads", []):
+                if name not in field_index:
+                    errors.append("%s.%s: the extra read %s is no block field" % (sub, s["name"], name))
+                else:
+                    reads.add(name)
             for fn in functions:
                 for r in by_function.get(fn, []):
                     kind, target = r["kind"], r["target"]
@@ -763,6 +795,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 "args": args, "result": result, "native": note.get("native", s["name"]),
             }
             slot_list.append((sub, s["name"]))
+            if complete:
+                errors += check_product_counts("%s.%s" % (sub, s["name"]), slots[s["name"]], tables, object_fields)
         done = {k: sorted(v) if isinstance(v, set) else v for k, v in pending.items()}
         subsystems[sub] = {
             "interface": "interfaces/%s.h" % sub, "struct": struct, "version": iface["version"], "status": spec["status"],

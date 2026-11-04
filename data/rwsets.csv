@@ -44989,15 +44989,18 @@ address,function,file,kind,target
 ,EndSection,src/harness/harness.cpp,function,
 ,EnergyAccount,src/game/economy.cpp,field_escape,UnitResources::energyMake
 ,EnergyAccount,src/game/economy.cpp,function,
+,EnsureTable,src/harness/replay_objects.cpp,call,ReplayLengthOf
 ,EnsureTable,src/harness/replay_objects.cpp,call,SimBlockBase
 ,EnsureTable,src/harness/replay_objects.cpp,call,StoreFactor
 ,EnsureTable,src/harness/replay_objects.cpp,call,memset
 ,EnsureTable,src/harness/replay_objects.cpp,deref_read,*unsigned int
 ,EnsureTable,src/harness/replay_objects.cpp,deref_write,*unsigned int
+,EnsureTable,src/harness/replay_objects.cpp,field_read,ReplayFactor::size
 ,EnsureTable,src/harness/replay_objects.cpp,field_read,ReplayLength::first
 ,EnsureTable,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::size
 ,EnsureTable,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::table
 ,EnsureTable,src/harness/replay_objects.cpp,field_read,ReplayTableSpec::alloc
+,EnsureTable,src/harness/replay_objects.cpp,field_read,ReplayTableSpec::count
 ,EnsureTable,src/harness/replay_objects.cpp,field_read,ReplayTableSpec::offset
 ,EnsureTable,src/harness/replay_objects.cpp,field_read,ReplayTableSpec::ref
 ,EnsureTable,src/harness/replay_objects.cpp,field_read,ReplayTableSpec::sim

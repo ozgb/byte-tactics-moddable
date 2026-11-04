@@ -62,7 +62,7 @@ their value forms are the `objects` of the schema:
 | Scope | Kind | `N` | Where it lives |
 |---|---|---|---|
 | state | `UnitDef` and the like | order of first appearance in the file, so it is stable across calls | in the block, linked by `Ref` |
-| state, `table` | `Player`, `Unit`, `Projectile`, `MovementClass` | the index in the table: `Player#3` is `Game::players[3]`, `Unit#17` is slot 17 of the unit pool, `Projectile#3` is `Game::projectiles[3]` | an array in `Game` or `SimGlobals`, or a `Ref` to one |
+| state, `table` | `Player`, `Unit`, `Projectile`, `MovementClass`, `Cell` | the index in the table: `Player#3` is `Game::players[3]`, `Unit#17` is slot 17 of the unit pool, `Projectile#3` is `Game::projectiles[3]`, `Cell#2051` is `Game::cells[2051]`, that is `y*width+x` | an array in `Game` or `SimGlobals`, or a `Ref` to one |
 | state, `inside` | `UnitResources` of a unit | the unit and the member: `Unit#17.resourceSlot` | a member of another kind |
 | index | `weapondef` | the index in `Game::weapons` | in the block's weapon array |
 | value | `MeteorParams`, `Vec3` | none: the lines are written with the argument's name, `params.radius`, `pos.x` | an argument struct of one call |
@@ -89,6 +89,12 @@ The annotation names the table once per kind, in the kind's `table`:
 | `ref` | the member is a `Ref` to the first element; without it the elements are the member |
 | `count` | the number of elements: an integer, or a length expression (see Arrays) over members of the base, `poolCount` |
 | `alloc` | for a `ref` table: the elements the replayer makes, and stores in the count member, when a recording first names an element and the `Ref` is null |
+
+A `ref` table whose `count` is a product of two block fields (`Cell` is `width*height`) has no `alloc`. The replayer allocates the
+product of the fields' current values and stores nothing, since neither factor is the count. The fields must therefore be set before
+the first element is named: `Game.width` and `Game.height` are in the read set of every slot that reaches a `Cell`, so their `r`
+lines come before the first `Cell#N`. A slot's annotation adds a field to its read set with `"reads": ["Game.width", "Game.height"]`,
+and `replayschema.py --check` reports a complete subsystem's slot that reaches such a kind with a factor missing from its read set.
 
 `Player` and `Unit` are instances of this form (`players` is `{"base": "game", "member": "players", "count": 10}`, `units` is a
 `Ref` with `poolCount` and `alloc` 5001), so the text of every committed recording is the same as before the form had a name.

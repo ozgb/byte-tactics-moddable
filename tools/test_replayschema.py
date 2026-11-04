@@ -287,7 +287,7 @@ class Tables(unittest.TestCase):
         self.assertIn("offsetof(Game, projectiles)", text)
         self.assertIn("offsetof(SimGlobals, g_movementClasses.entries)", text)
         self.assertIn('#pragma push_macro("g_movementClasses")', text)
-        self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 3,', text)
+        self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 4,', text)
         self.assertIn('{ "UnitDef", sizeof(UnitDef), RS_STATE, RT_ORDER,', text)
 
     def test_the_size_of_an_inline_table_is_checked_against_its_count(self):
@@ -319,6 +319,38 @@ class Tables(unittest.TestCase):
         rs.parse_length("a*b*c", "t", errors)
         rs.parse_length("a+1", "t", errors)
         self.assertEqual(len(errors), 2, errors)
+
+
+class ProductCounts(unittest.TestCase):
+    """A table counted by a product of block fields needs those fields in the read set of every slot that reaches it."""
+
+    def test_cell_is_a_table_counted_by_width_times_height(self):
+        _, errors, model = rs.generate(rs.read_rows(), annotations())
+        self.assertEqual(errors, [])
+        cell = {t["kind"]: t for t in model["tables"]}["Cell"]
+        self.assertEqual((cell["member"], cell["ref"], cell["alloc"]), ("cells", True, 0))
+        self.assertEqual([f["member"] for f in cell["count"]], ["width", "height"])
+
+    def test_a_slot_that_reaches_the_table_must_read_both_factors(self):
+        ann = annotations()
+        del ann["subsystems"]["economy"]["slots"]["UpdateMetalExtraction"]
+        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        self.assertTrue(any("economy.UpdateMetalExtraction reaches Cell, whose count multiplies Game.width" in e for e in errors), errors)
+        self.assertTrue(any("economy.UpdateMetalExtraction reaches Cell, whose count multiplies Game.height" in e for e in errors), errors)
+
+    def test_one_missing_factor_is_reported_alone(self):
+        ann = annotations()
+        ann["subsystems"]["economy"]["slots"]["UpdateMetalExtraction"]["reads"] = ["Game.width"]
+        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        found = [e for e in errors if "reaches Cell" in e]
+        self.assertEqual(len(found), 1, found)
+        self.assertIn("Game.height", found[0])
+
+    def test_an_extra_read_must_be_a_block_field(self):
+        ann = annotations()
+        ann["subsystems"]["economy"]["slots"]["UpdateMetalExtraction"]["reads"] = ["Game.width", "Game.height", "Game.nothing"]
+        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        self.assertTrue(any("the extra read Game.nothing is no block field" in e for e in errors), errors)
 
 
 class Arrays(unittest.TestCase):

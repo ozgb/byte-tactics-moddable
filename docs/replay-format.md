@@ -63,7 +63,7 @@ their value forms are the `objects` of the schema:
 |---|---|---|---|
 | state | `UnitDef` and the like | order of first appearance in the file, so it is stable across calls | in the block, linked by `Ref` |
 | state, `table` | `Player`, `Unit`, `Projectile`, `MovementClass`, `Cell` | the index in the table: `Player#3` is `Game::players[3]`, `Unit#17` is slot 17 of the unit pool, `Projectile#3` is `Game::projectiles[3]`, `Cell#2051` is `Game::cells[2051]`, that is `y*width+x` | an array in `Game` or `SimGlobals`, or a `Ref` to one |
-| state, `inside` | `UnitResources` of a unit | the unit and the member: `Unit#17.resourceSlot` | a member of another kind |
+| state, `inside` | `UnitResources` of a unit | the site, the unit and the member: `Unit#17.resourceSlot` | a member of another kind (see An object embedded at several sites) |
 | index | `weapondef` | the index in `Game::weapons` | in the block's weapon array |
 | value | `MeteorParams`, `Vec3` | none: the lines are written with the argument's name, `params.radius`, `pos.x` | an argument struct of one call |
 | handle | `file`, `rec`, `bank` | order of first use in the outermost call | the import's own objects, not state |
@@ -109,14 +109,71 @@ in table order) numbers the objects named by first appearance, and the replayer 
 changed field at its `Kind#N.field`. A pointer to an object no earlier line named is written `Kind#?`.
 
 A field of kind `ptr` is a raw pointer, not a `Ref`, to an object of a state kind: `{"name": "src", "kind": "ptr", "target": "FrameTable"}`
-for `Handle::src`. It is written exactly as a `ref` is, `FrameTable#N`, `null`, or `FrameTable#?` when no earlier line named the
-object, but the replayer stores the address of its own copy of the object, where a `ref` stores an offset from the block base. The
-walk does not follow a `ptr`, so the object it points at is written only where something else reaches it (an argument, a result).
+for `Handle::src`. It is written exactly as a `ref` is, `FrameTable#N` or `null`, but the replayer stores the address of its own copy
+of the object, where a `ref` stores an offset from the block base. The walk does not follow a `ptr`, so the object it points at is
+written only where something else reaches it (an argument, a result).
 
 | Kind | Stored as | Written as |
 |---|---|---|
 | `ref` | an offset from the block base | `Unit#1`, `null` |
 | `ptr` | the address of an object | `FrameTable#1`, `null` |
+
+### A pointer to an object no line named
+
+A `ptr` whose target no earlier line named gets the next `Kind#N` of its kind when it is first written, and the walk still does not
+reach the target. A pointer set before the recording starts (a cursor's `src`, set when the game loaded the file) is therefore
+`FrameTable#1` at the first call that records it, and no line carries the fields of `FrameTable#1`. The replayer makes an empty
+object of the kind (every byte zero, as for a `ref` target) when a line first names it, and stores its address; two pointers to
+one object have the same name and the same copy. What the module needs from such an object is recorded as the `o` lines of the import that answers for it. A pointer that no recorded line names is `FrameTable#?`, and restoring it is an error: the
+replayer reports it as a line that cannot be restored.
+
+```
+  r Handle#1.src FrameTable#1
+  r Handle#2.src FrameTable#1
+```
+
+### A condition on a field
+
+A field may carry a `when`, `{"field": F, "mask": M, "equals": V}`: it is live only when `(F & M) == V`, where `F` is a field of
+the same kind that holds an integer or flags (`flags16`, `kind`), and `mask` is optional and means every bit. The walk follows a
+field that is not live no further, and capture, comparison and restore skip it: it is not written as a line, not compared and not
+restored. This is for a union, whose live view depends on a bit, where restoring the dead view would overwrite the bytes of the live
+one. A field that goes dead is forgotten, so when it is live again its line is written again even if its value is the one it had before,
+because the replayer's bytes are by then those of the other view.
+
+`"via": FIELD` reads `F` from another object: the one a `ref` or `ptr` field `FIELD` of the same kind points at, or, for an integer
+field, the element it indexes in the table of the kind named by `"kind"`. An index outside the table, or a null pointer, makes the
+condition false. A `unitid` field has a condition too, which says that its bytes are an id (a value of `-32768` in the next slot),
+and its field is not written as a line.
+
+```json
+{"name": "scale", "kind": "f32", "member": "linked.scale", "when": {"field": "flags", "mask": 1, "equals": 1}},
+{"name": "moved", "kind": "i32", "member": "ground.moved", "when": {"via": "player", "kind": "Player", "field": "flags", "mask": 4, "equals": 4}}
+```
+
+The replayer restores the `r` lines of a call in two passes: first the lines of the fields that a condition reads (`F` and the `via`
+field, of every object), then the rest. A guarded field whose line comes before the line that decides it, in the same object or in
+another one, is therefore restored from the call's own values, not from the previous call's. The object a `via` reads is recorded only
+when the walk reaches it, and the field it reads only when it is in the slot's read set, so a rule of the slot adds them
+(`fields`, with `reads`) when the walk would not.
+
+### An object embedded at several sites
+
+A kind that lives inside another kind lists its sites, `"inside": [{"kind": "Spot", "member": "anim"}, {"kind": "Feature", "member": "anim"}]`,
+and each site is an `embed` field of its container (`{"name": "anim", "kind": "embed", "target": "Handle"}`). An embedded object is named
+by its site, `Spot#3.anim`, in every line that names it: the walk's `r` and `w` lines (`r Spot#3.anim.index 2`), the `i` and `o` lines of a service
+that takes it (`i services.StepGafSequence Spot#3.anim`, `o Spot#3.anim.value 7`) and the argument values. The replayer resolves such a
+name to the bytes at the site inside its container, and never allocates a separate object. A free-standing object of the same kind, one on a
+caller's stack, is named by order as any other, `Handle#1`.
+
+A container named by order (not a table kind) is named before its embedded object is: the walk names it, as it reaches the container first.
+
+```
+  r Spot#3.anim.index 2
+  i services.StepGafSequence Spot#3.anim = 1
+  o Spot#3.anim.value 7
+  i services.StepGafSequence Handle#1 = 1
+```
 
 A pair of pointer fields that bound a slice of a table is a closed range: the schema marks the end field with
 `"range_end_of": "unitsBegin"`, and `Player::unitsEnd` points at the last unit of the player's slice (the walk is
@@ -376,10 +433,14 @@ sets). The annotations hold what no header says:
   `UnitResources.energyMake`), so that a write through a pointer is recorded as a `w` line of the field it lands on;
   `all-of` makes every slot of a table kind a root of the call (`Game::players` is walked by index). `replayschema.py
   --check` fails for a row of a subsystem function with no rule and for a rule that matches no row.
-- `objects`' extras: `table` (an object, see Objects) names a kind by its index in a table, `inside` (`{"kind": "Unit",
-  "member": "resourceSlot"}`) names a kind that lives in a member of another kind (`Unit#17.resourceSlot`), a field of kind
+- `objects`' extras: `table` (an object, see Objects) names a kind by its index in a table, `inside` (a list of `{"kind": "Unit",
+  "member": "resourceSlot"}`) names every member of another kind that the kind lives in (`Unit#17.resourceSlot`), a field of kind
   `embed` leads to such an object, `range_end_of` marks the end pointer of a closed range, and `aliases` (`Unit::cloakOn`) are
-  the other targets of the rows that one field records (a bit field is recorded as its word).
+  the other targets of the rows that one field records (a bit field is recorded as its word). `replayschema.py --check` fails for a site
+  that is no `embed` field of its container, for one that two kinds claim, and for the old single-site object form.
+- `when` (an object, see A condition on a field): `{"field", "equals"}` with an optional `mask`, `via` and `kind`, on a field of
+  a state kind. `replayschema.py --check` fails for a field it reads that is not an integer or flags field, that has a `when` of its own, or
+  a mask and a value that can never meet.
 - Field kinds that point rather than hold a value. `unitid` is a 16-bit unit id (`weapon0TargetX` holds either an x position or
   a unit id; `weapon0TargetUnit` is the same bytes read as an id) that the walker follows to `Unit#<id>`, but only when its `when`
   field (`weapon0TargetZ`) equals the given value (-32768, the sentinel that says the slot holds a unit); it is never written
@@ -561,7 +622,7 @@ recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.m
 chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
 struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
 `Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
-is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and raw pointer fields (a `Handle` whose `src` is a `ptr`, rebuilt and compared, with a changed `src` reported at `Handle#1.src`) and services (the files, commands, sim plumbing, load reads and GAF cursors, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
+is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and raw pointer fields (a `Handle` whose `src` is a `ptr`, rebuilt and compared, with a changed `src` reported at `Handle#1.src`; a `ptr` to an object no line named, restored to an empty copy) and masked views (a union whose live view switches on a masked bit, or on a bit of another object, with the dead view neither written, compared nor restored) and an object embedded at two sites (named by its site in the walk and in a service line, and restored inside its container) and services (the files, commands, sim plumbing, load reads and GAF cursors, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
 second object, with a changed result reported at `import 0 fixture.Scan.c[0]`). With a
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.

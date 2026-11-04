@@ -128,7 +128,6 @@ RUN_TICKS_PER_SECOND = 25
 RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK = 6
 RUN_ATTEMPTS = 2
 GATE_SCAN_EVERY = 8
-BLOCK_POINTERS_TIER_TEXT = "block pointers: full suite only"
 FUEL_FILE = "fuel.txt"
 FUEL: dict[str, dict[str, tuple[int, int]]] = {}
 SOUND_LOGS: dict[str, str | None] = {}
@@ -1314,7 +1313,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         ui_bad += len(ui_names)
         frame_bad += len(frame_names)
         save_bad += len(save_names)
-        pointers += report_block_pointers(exe, mode_view(scans, scenarios, mode), tier, save_blockptrs / mode if save_blockptrs and both_modes else save_blockptrs, label)
+        pointers += report_block_pointers(exe, mode_view(scans, scenarios, mode), save_blockptrs / mode if save_blockptrs and both_modes else save_blockptrs, label)
         pointers += report_fuel(exe, scenarios, mode_view(FUEL, scenarios, mode), mode == "native" if both_modes else None, label)
     if not bad:
         if pointers or sound_bad or ui_bad or frame_bad or save_bad:
@@ -1352,10 +1351,10 @@ def tier_message(count: int, sha: str) -> str:
             f"that reference/README.md, \"Gate\", lists")
 
 
-def report_block_pointers(exe: Path, scans: dict[str, str | None], tier: bool, save: Path | None, label: str = "") -> int:
+def report_block_pointers(exe: Path, scans: dict[str, str | None], save: Path | None, label: str = "") -> int:
     """Print the pointers out of the block that data/block_pointers.csv does not cover; how many there are.
 
-    The names of repeated sites are numbered over the scenarios played, so the gate tier is not checked: block pointers are checked by the full suite only.
+    A site is named by its rank among its function's allocator calls in the exe, not by the scans, so the tier's scenarios are named as the full suite's are.
     With `save`, each scenario's blockptrs.txt is also written there as <scenario>.txt.
     """
     if save is not None:
@@ -1363,9 +1362,6 @@ def report_block_pointers(exe: Path, scans: dict[str, str | None], tier: bool, s
         for name, text in scans.items():
             if text is not None:
                 (save / f"{name}.txt").write_text(text)
-    if tier:
-        print(label + BLOCK_POINTERS_TIER_TEXT)
-        return 0
     problems = blockpointers.check_scans(scans, exe.with_suffix(".map"), blockpointers.default_build_dir())
     for line in problems:
         print(f"{label}BLOCK POINTER {line}")

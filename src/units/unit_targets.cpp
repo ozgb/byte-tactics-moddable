@@ -1,3 +1,4 @@
+#include "unit_type_set.h"
 #include "win_types.h"
 #include "unit_def.h"
 #include "../../interfaces/ref.h"
@@ -635,11 +636,6 @@ void __stdcall AlignUnitToGround(Unit* u)
     }
 }
 
-struct Bits {
-    unsigned* words;
-    int Test(unsigned short index) const { return (words[index>>5]&(1u<<(index&31)))!=0; }
-};
-
 // FUNCTION: 0x40b7b0
 Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
 {
@@ -659,12 +655,12 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
         if((target->flags&0x10000000) && !(target->flags&0x4000) &&
            ((target->def->flags1&0x8000) || ai || (g_game->matchFlags&4)) &&
            ((unit->def->flags1&0x10000000) || g_seams.weapons->WeaponCanReachUnit(unit,target,weapon)) &&
-           (useRange || !((Bits*)&unit->def->categories)->Test(target->unitDefIndex)) &&
+           (useRange || !unit->def->categories->Contains(target->unitDefIndex)) &&
            (!((*(unsigned char*)&unit->weapons[weapon].weapon->flags)&0x80) || !(target->activateFlags&0x10))) {
             int dz=unit->pos.z-target->pos.z;
             int dx=unit->pos.x-target->pos.x;
             int d=RandomInt((int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32));
-            if(((Bits*)unit->def->weaponCategories)[weapon].Test(target->unitDefIndex)) {
+            if(unit->def->weaponCategories[weapon]->Contains(target->unitDefIndex)) {
                 if(d<fallbackDistance) { fallbackDistance=d; fallback=target; }
             } else if(d<bestDistance) { bestDistance=d; best=target; }
         }

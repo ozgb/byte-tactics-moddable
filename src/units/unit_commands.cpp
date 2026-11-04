@@ -1,4 +1,6 @@
 #include <ctype.h>
+#include <new>
+#include "../state/block.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -542,16 +544,19 @@ void InitUnitCategories()
 // FUNCTION: 0x488bf0
 void FreeUnitCategories()
 {
-    for (std::vector<UnitCategory>::iterator it = s_unitCategories.begin(); it != s_unitCategories.end(); it++)
-        delete it->value;
+    for (std::vector<UnitCategory>::iterator it = s_unitCategories.begin(); it != s_unitCategories.end(); it++) {
+        if (SimOwns(it->value))
+            SimFree(it->value);
+        else
+            delete (UnitTypeSet*)it->value;
+    }
     s_unitCategories.clear();
     g_mapLoadFlag = 0;
 }
 
 #include "unit_type_set.h"
 
-// FUNCTION: 0x488c50
-UnitTypeSet* __stdcall GetCategoryMask(char* name)
+static UnitTypeSet* FindOrAddCategory(char* name, bool inBlock)
 {
     UnitCategory* first = s_unitCategories.begin();
     int n = s_unitCategories.end() - first;
@@ -566,9 +571,20 @@ UnitTypeSet* __stdcall GetCategoryMask(char* name)
     if (first != s_unitCategories.end() && _strcmpi(first->name.data, name) == 0)
         return (UnitTypeSet*)first->value;
 
-    UnitTypeSet* p = new UnitTypeSet;
+    UnitTypeSet* p = inBlock ? new (SimAllocTagged("CATEGORY MASK", sizeof(UnitTypeSet))) UnitTypeSet : new UnitTypeSet;
     s_unitCategories.insert(first, UnitCategory(StringRef(name), p));
     return p;
+}
+
+// FUNCTION: 0x488c50
+UnitTypeSet* __stdcall GetCategoryMask(char* name)
+{
+    return FindOrAddCategory(name, false);
+}
+
+UnitTypeSet* __stdcall GetLoadCategoryMask(char* name)
+{
+    return FindOrAddCategory(name, true);
 }
 
 static inline UnitDefNameKeyView* FindByName(UnitDefNameKeyView* first, UnitDefNameKeyView* last, char* text)

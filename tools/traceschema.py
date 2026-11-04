@@ -833,8 +833,8 @@ SYNTHETIC.update({
         unsigned char buildMenuPageCount; // +0x22e
         unsigned char mobile;         // +0x22f
         char defaultmissiontype;      // +0x230
-        UnitTypeSet* weaponCategories[3]; // +0x231
-        UnitTypeSet* categories;      // +0x23d
+        Ref<UnitTypeSet> weaponCategories[3]; // +0x231
+        Ref<UnitTypeSet> categories;      // +0x23d
         unsigned int flags1;          // +0x241
         unsigned int flags2;          // +0x245
     """,

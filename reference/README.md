@@ -403,8 +403,8 @@ scenarios with it.
 resolves the sites with the linker map beside the exe
 (`build/modern/TotalA.map`) and compares every row with `data/block_pointers.csv`, after printing the trace
 results. A word whose holder the file has no wildcard row for (see below), or a scenario with no `blockptrs.txt`,
-is printed (scenario, holder, offset, target) and `--check` exits 1. `--tier` does not check the pointers: the names of repeated sites are numbered over the scenarios played, so the
-tier prints `block pointers: full suite only` and the full `--check` is where they are checked.
+is printed (scenario, holder, offset, target) and `--check` exits 1. `--tier` checks the pointers of its scenarios the same way: a site is named by its rank among its function's
+allocator calls in the exe, not by the scans, so a tier run names its rows as the full suite does.
 `--save-blockptrs <dir>` writes each scenario's file to `<dir>/<scenario>.txt`, and
 `uv run tools/blockpointers.py --from <dir>` regenerates the data file from them, keeping the hand-set `class` and
 `note` columns; without `--from` it plays the suite itself with the scan on every tick, which is how the list
@@ -462,9 +462,8 @@ uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-di
 `tools/reference.py`, 33,910 ticks of the suite's 324,610 (10.4%), none longer than 9000. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how
 many scenarios were equal and at which commit; a failure prints the same `tools/tracediff.py` report
-as the full run. `--tier` goes with `--check` and `--exe`, and `--traces` rejects it. It does not
-check the block pointers, since repeated sites are numbered over the scenarios played; the full
-suite does.
+as the full run. `--tier` goes with `--check` and `--exe`, and `--traces` rejects it. It checks the
+block pointers of its scenarios against data/block_pointers.csv, since the names do not depend on the scenarios played.
 
 The tier was chosen greedily from a coverage run of the suite (tools/coverage.py): the scenario
 adding the most lines per tick (a floor of 600 ticks each), until one adds fewer than 20, starting

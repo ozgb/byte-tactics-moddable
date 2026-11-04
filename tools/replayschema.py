@@ -58,7 +58,7 @@ BLOCK_KINDS = {"field_read": "r", "field_write": "w", "global_read": "r", "globa
 OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "rw"}
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
-               "unitid": "UNITID", "array": "ARRAY", "code": "CODE"}
+               "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR"}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?(\w+)(?:>>(\d+))?\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
@@ -197,6 +197,35 @@ def check_array(where: str, spec: dict, owner: str, errors: list[str]) -> dict:
     if "length" not in spec:
         errors.append("%s: an array needs a `length`" % where)
     return {"elem": SIZES[elem], "ref": bool(spec.get("ref", False)), "length": parse_length(spec.get("length", 0), where, errors), "owner": owner}
+
+
+VECTOR_SCALARS = {"char": 1, "unsigned char": 1, "short": 2, "unsigned short": 2, "int": 4, "unsigned": 4, "unsigned int": 4, "long": 4,
+                  "unsigned long": 4, "float": 4, "double": 8}
+VECTOR_MODES = {"object": "RV_OBJECT", "scalar": "RV_SCALAR", "value": "RV_VALUE"}
+
+
+def check_vector(where: str, spec: dict, owner: str, ann: dict, errors: list[str]) -> dict:
+    """The vector entry of a field: the element mode, the kind or C type, and the C++ type the BlockVector must hold."""
+    elem = spec.get("elem")
+    kinds = ann["objects"]
+    out = {"mode": "object", "kind": "", "ctype": "", "owner": owner, "member": spec.get("member", spec["name"])}
+    if not isinstance(elem, dict) or elem.get("mode") not in VECTOR_MODES:
+        errors.append("%s: a vector needs an `elem` with a mode of %s" % (where, ", ".join(sorted(VECTOR_MODES))))
+        return out
+    out["mode"] = elem["mode"]
+    if elem["mode"] == "scalar":
+        if elem.get("type") not in VECTOR_SCALARS:
+            errors.append("%s: a scalar element needs a `type` of %s" % (where, ", ".join(sorted(VECTOR_SCALARS))))
+        out["ctype"] = elem.get("type", "int")
+    else:
+        target = kinds.get(elem.get("kind"))
+        want = "state" if elem["mode"] == "object" else "value"
+        if target is None or (target["scope"] != want and not (want == "state" and "kinds" in target)):
+            errors.append("%s: a%s element needs a `kind` that is a %s kind of the schema" % (where, "n object" if want == "state" else " value", want))
+        else:
+            out["kind"] = elem["kind"]
+            out["ctype"] = target["type"] if elem["mode"] == "value" else "Ref<%s>" % target["type"]
+    return out
 
 
 def check_table(kind: str, spec: dict, errors: list[str]) -> dict:
@@ -571,6 +600,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     objects = []
     object_fields = []
     tables: list[dict] = []
+    vectors: list[dict] = []
     kind_names = list(ann["objects"])
     for kind in kind_names:
         spec = ann["objects"][kind]
@@ -593,6 +623,14 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 array["member"] = f.get("member", f["name"])
                 arrays.append(array)
                 entry["array"] = len(arrays)
+            if f["kind"] == "vector":
+                where = "%s.%s" % (kind, f["name"])
+                if spec["scope"] != "state":
+                    errors.append("%s: only the fields of a state kind can be vectors" % where)
+                vectors.append(check_vector(where, f, spec["type"], ann, errors))
+                entry["vector"] = len(vectors)
+                if vectors[-1]["mode"] == "object" and vectors[-1]["kind"]:
+                    entry["target"] = vectors[-1]["kind"]
             object_fields.append(entry)
     table_targets = set()
     for t in tables:
@@ -758,7 +796,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             if slot not in subsystems.get(seam, {}).get("slots", {}):
                 errors.append("%s imports %s, which is no slot of the %s interface" % (sub, imp, seam))
     return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table,
-            "arrays": arrays, "tables": tables, "code_tables": code_tables, "callbacks": callbacks,
+            "arrays": arrays, "tables": tables, "vectors": vectors, "code_tables": code_tables, "callbacks": callbacks,
             "kind_types": {k: v["type"] for k, v in ann["objects"].items()}}, errors
 
 
@@ -824,10 +862,13 @@ def render_schema(ann: dict, model: dict) -> str:
     L = [GENERATED, "#ifndef REPLAY_SCHEMA_H", "#define REPLAY_SCHEMA_H", "", "#include <stddef.h>", ""]
     L += ['#include "../state/game_rand.h"', "#pragma pack(push, 1)", '#include "../game/game.h"', "#pragma pack(pop)"]
     for inc in ann["includes"]:
-        L.append('#include "%s"' % inc)
+        if inc.startswith("pack1:"):
+            L += ["#pragma pack(push, 1)", '#include "%s"' % inc[6:], "#pragma pack(pop)"]
+        else:
+            L.append('#include "%s"' % inc)
     L += ['#include "../state/sim_globals.h"', '#include "../state/block.h"', '#include "replay_types.h"', "",
           "#define REPLAY_FORMAT %d" % FORMAT, ""]
-    arrays, tables = model["arrays"], model["tables"]
+    arrays, tables, vectors = model["arrays"], model["tables"], model["vectors"]
     macros = list(sim)
     for t in tables:
         if t["sim"]:
@@ -886,7 +927,12 @@ def render_schema(ann: dict, model: dict) -> str:
     L += ["    RF_%s," % upper(f["name"]) for f in fields]
     L += ["};", "", "enum ReplayObjectKindId {"]
     L += ["    ROK_%s," % upper(o["name"]) for o in objects]
-    L += ["    ROK_COUNT", "};", "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
+    L += ["    ROK_COUNT", "};", "", "static const ReplayVectorSpec kReplayVectors[] = {"]
+    for v in vectors:
+        L.append("    { %s, %s, sizeof(%s) }," % (VECTOR_MODES[v["mode"]], "ROK_" + upper(v["kind"]) if v["kind"] else "0", v["ctype"]))
+    if not vectors:
+        L.append("    { RV_OBJECT, 0, 1 },")
+    L += ["};", "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
     scope = {"state": "RS_STATE", "index": "RS_INDEX", "value": "RS_VALUE"}
     kind_id = {o["name"]: "ROK_" + upper(o["name"]) for o in objects}
     types = {o["name"]: o["type"] for o in objects}
@@ -937,8 +983,8 @@ def render_schema(ann: dict, model: dict) -> str:
         t = types[f["object"]]
         size = f.get("size")
         size_text = str(size) if size else "sizeof(((%s*)nullptr)->%s)" % (t, member)
-        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid") else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
-        extra = ", %d" % f["array"] if f.get("array") else ""
+        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid") or (f["kind"] == "vector" and f.get("target")) else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
+        extra = ", %d" % (f.get("array") or f.get("vector")) if f.get("array") or f.get("vector") else ""
         L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %d, %d, %d, %d%s },' % (
             f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target, range_end.get(i, 0), range_begin.get(i, 0),
             f.get("condField", 0), f.get("condValue", 0), f.get("reachFirst", 0), f.get("reachCount", 0), extra))
@@ -953,6 +999,11 @@ def render_schema(ann: dict, model: dict) -> str:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, f["size"], t, f["name"]))
         elif f["kind"] == "array":
             continue
+        elif f["kind"] == "vector":
+            v = vectors[f["vector"] - 1]
+            access = "decltype(((%s*)nullptr)->%s)" % (t, member)
+            L.append('static_assert(sizeof(%s) == 16, "%s::%s is a block vector");' % (access, t, f["name"]))
+            L.append('static_assert(__is_same(%s::value_type, %s), "%s::%s holds %s");' % (access, v["ctype"], t, f["name"], v["ctype"]))
         elif f["kind"] == "code":
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a code pointer");' % (t, member, t, f["name"]))
         elif f.get("size") is None:

@@ -1074,12 +1074,17 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
     unsigned kind = 0;
     unsigned ordinal = 0;
     const char* fieldName = nullptr;
-    if (!ReplayParseKey(name, &kind, &ordinal, &fieldName))
+    char prefix[96];
+    unsigned element = 0;
+    const char* sub = nullptr;
+    bool inElement = ReplayParseElementKey(name, prefix, sizeof prefix, &element, &sub);
+    const char* base = inElement ? prefix : name;
+    if (!ReplayParseKey(base, &kind, &ordinal, &fieldName))
         return false;
     char object[48];
-    const char* dot = strrchr(name, '.');
-    memcpy(object, name, (unsigned)(dot - name));
-    object[dot - name] = '\0';
+    const char* dot = strrchr(base, '.');
+    memcpy(object, base, (unsigned)(dot - base));
+    object[dot - base] = '\0';
     void* p = ReplayResolveObject(object, nullptr, g_objects, AllocObject);
     const ReplayObjectField* f = ReplayFindObjectField(kind, fieldName);
     if (p == nullptr || f == nullptr)
@@ -1089,6 +1094,13 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
     if (f->kind == RK_ARRAY) {
         if (!ReplayApplyArray(*f, p, name, value, g_known, true, AllocObject))
             Fatal(file, g_callIndex, "an array line that cannot be applied", value);
+        return true;
+    }
+    if (f->kind == RK_VECTOR) {
+        bool applied = inElement ? ReplayApplyVectorElement(*f, p, element, sub, name, value, g_known, true, g_objects, AllocObject)
+                                 : ReplayApplyVector(*f, p, name, value, g_known, true, g_objects, AllocObject);
+        if (!applied)
+            Fatal(file, g_callIndex, "a vector line that cannot be applied", value);
         return true;
     }
     if (!ReplayRestoreObjectField(*f, p, value, g_objects, AllocObject))
@@ -1108,6 +1120,10 @@ void CompareObjects(const ReplaySlotSets* sets)
             if (f.object != g_reach.kind[at] || f.kind == RK_EMBED || f.kind == RK_UNITID || !ReplayInReach(g_reach, at, sets->objWrites[i]))
                 continue;
             ReplayObjectFieldKey(key, g_objects, false, g_reach.kind[at], g_reach.object[at], f);
+            if (f.kind == RK_VECTOR) {
+                ReplayCompareVector(f, g_reach.object[at], key.Data(), g_known, g_objects, Diff, HashText);
+                continue;
+            }
             ReplayFormatObjectField(f, g_reach.object[at], g_objects, false, value);
             HashText(value.Data());
             const char* known = g_known.Get(key.Data());
@@ -1141,9 +1157,20 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
             unsigned kind = 0;
             unsigned ordinal = 0;
             const char* fieldName = nullptr;
-            const ReplayObjectField* f = ReplayParseKey(name, &kind, &ordinal, &fieldName) ? ReplayFindObjectField(kind, fieldName) : nullptr;
+            char prefix[96];
+            unsigned element = 0;
+            const char* sub = nullptr;
+            bool inElement = ReplayParseElementKey(name, prefix, sizeof prefix, &element, &sub);
+            const ReplayObjectField* f = ReplayParseKey(inElement ? prefix : name, &kind, &ordinal, &fieldName) ? ReplayFindObjectField(kind, fieldName) : nullptr;
             if (f == nullptr || !InObjectSet(sets->objWrites, sets->objWriteCount, f))
                 Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
+            if (f->kind == RK_VECTOR) {
+                bool applied = inElement ? ReplayApplyVectorElement(*f, nullptr, element, sub, name, space + 1, g_known, false, g_objects, nullptr)
+                                         : ReplayApplyVector(*f, nullptr, name, space + 1, g_known, false, g_objects, nullptr);
+                if (!applied)
+                    Fatal(file, g_callIndex, "a vector line that cannot be applied", line);
+                continue;
+            }
             array = f->kind == RK_ARRAY;
             arrayField = f;
         } else {
@@ -2190,6 +2217,144 @@ void CallbackSelfTest()
     delete table;
 }
 
+void VectorSelfTest()
+{
+    printf("block vectors\n");
+    ResetBlock();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    Unit* pool = (Unit*)SimAlloc(16 * (unsigned)sizeof(Unit));
+    memset((void*)pool, 0, 16 * sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 16;
+    pool[3].health = 30;
+    pool[9].health = 90;
+    PlayerAI* ai = (PlayerAI*)SimAlloc(sizeof(PlayerAI));
+    memset((void*)ai, 0, sizeof(PlayerAI));
+    ai->index = 4;
+    Ref<Unit> first;
+    first = &pool[3];
+    Ref<Unit> second;
+    second = &pool[9];
+    ai->visible.units.PushBack(first);
+    ai->visible.units.PushBack(second);
+    ai->cells.PushBack(KeyedCell(3, 4, 1.5f));
+    ai->cells.PushBack(KeyedCell(5, 6, 2.5f));
+    ai->counts.PushBack(1);
+    ai->counts.PushBack(2);
+    ai->counts.PushBack(3);
+    Check(ai->counts.Size() == 3 && ai->counts.Capacity() == 4, "the block vector grows as the module's does");
+
+    unsigned char kind = ROK_PLAYERAI;
+    void* root = ai;
+    Recorder recorder;
+    recorder.Record(&kind, &root, 1, sets);
+    ReplayText calls;
+    const char* text = recorder.text.Data();
+    printf("%s", text);
+    Check(strstr(text, "  r PlayerAI#1.visibleUnits [2/2] Unit#3,Unit#9\n") != nullptr, "pointer elements are the length, the capacity and the handles");
+    Check(strstr(text, "  r Unit#9.health 90\n") != nullptr, "and the walker reaches the units held only by the vector");
+    Check(strstr(text, "  r PlayerAI#1.counts [3/4] 0:010002000300\n") != nullptr, "scalar elements are runs, as in an array");
+    Check(strstr(text, "  r PlayerAI#1.cells [2/2]\n  r PlayerAI#1.cells[0].pos (3,4)\n  r PlayerAI#1.cells[0].key f32:0x3fc00000\n  r PlayerAI#1.cells[1].pos (5,6)\n") != nullptr, "struct elements are the bracket and a line per field of each element");
+    calls.AddText(recorder.text);
+    ReplayText firstCall;
+    firstCall.AddText(recorder.text);
+
+    ai->counts[1] = 9;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r PlayerAI#1.counts 1:0900\n") == 0, "a changed scalar element is a delta run, with no length or capacity");
+    calls.AddText(recorder.text);
+    ai->counts.PushBack(4);
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r PlayerAI#1.counts [4/4] 0:01000900030004000\n") != 0 && strstr(recorder.text.Data(), "  r PlayerAI#1.counts [4/4] 0:0100090003000400\n") != nullptr, "a push that grows the length writes the vector again");
+    calls.AddText(recorder.text);
+    ai->counts.PushBack(5);
+    ai->cells.PushBack(KeyedCell(7, 8, 3.5f));
+    ai->visible.units.PushBack(first);
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strstr(recorder.text.Data(), "  r PlayerAI#1.counts [5/8] 0:01000900030004000500\n") != nullptr, "a push that grows the capacity writes both");
+    Check(strstr(recorder.text.Data(), "  r PlayerAI#1.cells [3/4]\n  r PlayerAI#1.cells[2].pos (7,8)\n") != nullptr && strstr(recorder.text.Data(), "cells[0]") == nullptr, "a struct vector that moved writes only the element that is new");
+    Check(strstr(recorder.text.Data(), "  r PlayerAI#1.visibleUnits [3/4] Unit#3,Unit#9,Unit#3\n") != nullptr, "and a pointer vector is written whole");
+    calls.AddText(recorder.text);
+    ai->visible.units.Clear();
+    ai->counts.Clear();
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strstr(recorder.text.Data(), "  r PlayerAI#1.visibleUnits [0/4]\n") != nullptr && strstr(recorder.text.Data(), "  r PlayerAI#1.counts [0/8]\n") != nullptr, "a vector with no elements keeps its capacity");
+    calls.AddText(recorder.text);
+
+    PlayerAI* bare = (PlayerAI*)SimAlloc(sizeof(PlayerAI));
+    memset((void*)bare, 0, sizeof(PlayerAI));
+    void* bareRoot = bare;
+    Recorder empty;
+    empty.Record(&kind, &bareRoot, 1, sets);
+    Check(strstr(empty.text.Data(), "  r PlayerAI#1.counts [0/0]\n") != nullptr && strstr(empty.text.Data(), "  r PlayerAI#1.visibleUnits [0/0]\n") != nullptr && strstr(empty.text.Data(), "  r PlayerAI#1.cells [0/0]\n") != nullptr, "an empty vector is [0/0]");
+
+    ResetBlock();
+    int lines = RestoreText(calls.Data(), sets);
+    Check(lines > 10, "the lines of every call restore");
+    PlayerAI* rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->index == 4, "the object is rebuilt");
+    Check(rebuilt != nullptr && rebuilt->counts.Size() == 0 && rebuilt->counts.Capacity() == 8, "a vector has the length and capacity of the last write");
+    Check(rebuilt != nullptr && rebuilt->cells.Size() == 3 && rebuilt->cells.Capacity() == 4, "a struct vector too");
+    Check(rebuilt != nullptr && rebuilt->cells[0].pos.x == 3 && rebuilt->cells[0].key == 1.5f && rebuilt->cells[2].pos.y == 8 && rebuilt->cells[2].key == 3.5f, "and the elements of every call, the old ones carried over the move");
+    Check(rebuilt != nullptr && rebuilt->visible.units.Size() == 0 && rebuilt->visible.units.Capacity() == 4, "a pointer vector too");
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    Recorder replayed;
+    void* rebuiltRoot = rebuilt;
+    replayed.Record(&kind, &rebuiltRoot, 1, sets);
+    Check(rebuilt != nullptr && strstr(replayed.text.Data(), "  r PlayerAI#1.cells [3/4]\n") != nullptr && strstr(replayed.text.Data(), "  r PlayerAI#1.counts [0/8]\n") != nullptr, "the rebuilt vectors record as they were");
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    g_rootKinds[0] = ROK_PLAYERAI;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the unchanged vectors compare equal");
+    rebuilt->counts.PushBack(7);
+    rebuilt->counts.PushBack(8);
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed length: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "PlayerAI#1.counts.length") == 0 && strstr(g_detail.Data(), "recorded 0, replayed 2") != nullptr, "a longer vector is reported at its length");
+    rebuilt->counts.Clear();
+    rebuilt->counts.Reserve(16);
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "PlayerAI#1.counts.capacity") == 0, "a vector of another capacity is reported at its capacity");
+    rebuilt->cells[1].key = 9.5f;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(strstr(g_detail.Data(), "PlayerAI#1.cells[1].key") != nullptr, "a changed field of a struct element is reported at its element and field");
+    rebuilt->visible.units.PushBack(first);
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(strstr(g_detail.Data(), "PlayerAI#1.visibleUnits.length") != nullptr, "a pointer vector that grew is reported");
+
+    ResetBlock();
+    RestoreText(firstCall.Data(), sets);
+    rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    g_rootObjects[0] = rebuilt;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "a vector restored from its first write compares equal");
+    rebuilt->counts[1] = 5;
+    rebuilt->visible.units[0] = rebuilt->visible.units[1];
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("changed elements: %s\n%s", g_firstKey, g_detail.Data());
+    Check(strstr(g_detail.Data(), "PlayerAI#1.counts[1]: recorded 0200, replayed 0500") != nullptr, "a changed scalar element is reported at its index");
+    Check(strstr(g_detail.Data(), "PlayerAI#1.visibleUnits[0]: recorded Unit#3, replayed Unit#9") != nullptr, "and a changed pointer element");
+    firstCall.Free();
+    calls.Free();
+}
+
 typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
 
 unsigned CodeIndex(const char* table, const void* function)
@@ -2381,6 +2546,7 @@ int SelfTest(const char* file)
     FormSelfTest();
     PolymorphicSelfTest();
     CallbackSelfTest();
+    VectorSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

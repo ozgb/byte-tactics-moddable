@@ -274,6 +274,38 @@ matched the `i` line and before it applies the `o` lines. It compares each resul
 `<import>.c[<k>]` (`import 0 map.VisitObjectsInRange.c[1]: recorded 0, replayed 1`), and a call recorded on another handle than the
 object's at the same place.
 
+## Vectors
+
+A field that is a `BlockVector<T>` (the first, last and end words of the block heap, 16 bytes with its padding) is a field of kind
+`vector`. Its value starts with the length and the capacity in elements, `[<len>/<cap>]`, and an empty vector that has no storage is
+`[0/0]`. The capacity is recorded because the layout of the block heap after later allocations depends on it. The annotation names the
+mode of the elements:
+
+```json
+{"name": "visibleUnits", "kind": "vector", "member": "visible.units", "elem": {"mode": "object", "kind": "Unit"}}
+{"name": "counts", "kind": "vector", "elem": {"mode": "scalar", "type": "short"}}
+{"name": "cells", "kind": "vector", "elem": {"mode": "value", "kind": "KeyedCell"}}
+```
+
+| `elem` | Elements | Lines |
+|---|---|---|
+| `object` with a `kind` | `Ref<T>` to objects of the kind (a polymorphic base is allowed) | `r PlayerAI#1.visibleUnits [2/4] Unit#3,Unit#9`, the handles comma-separated, `null` for a null element, the whole vector at each change |
+| `scalar` with a `type` | the bytes of memory, as for an array | `r PlayerAI#1.counts [3/4] 0:010002000300`; a later call with the same length and capacity is the changed runs, `r PlayerAI#1.counts 1:0900`, and a change of either writes the whole vector again |
+| `value` with a value kind | a struct, a line per field | `r PlayerAI#1.cells [2/2]`, then `r PlayerAI#1.cells[0].pos (3,4)` and `r PlayerAI#1.cells[0].key f32:0x3fc00000` for each field of each element that differs from the last known value |
+
+The tool checks the element type against the C++ `BlockVector<T>` with a `static_assert` in the schema header (`Ref<Unit>`, `short`,
+`KeyedCell`), so a vector of another type is a compile error. A `member` may be a path, as `visible.units` for the vector inside the
+embedded `AiUnitList`. Only the fields of an object are vectors, not the block fields.
+
+The walker reaches the object of every element of an `object` vector through its `Ref`, as it does through a `Ref` field, so the units a
+window holds only in a vector are recorded and restored. For a `value` vector a bracket line whose capacity or length changed is followed by the
+fields of the elements it newly holds, in full, because the recorder cannot know what a new slot held before.
+
+The replayer allocates `cap` elements with `SimAlloc`, which is what `BlockVector` allocates with, stores the three words, and fills the
+elements. A vector of structs whose capacity changes keeps its old elements, as the module's `Insert` does when it moves them. A
+difference is reported at `<field>.length`, `<field>.capacity`, `<field>[<i>]` (the hex of a scalar element or the handle of an object
+element) or `<field>[<i>].<f>` (a field of a struct element), for example `PlayerAI#1.counts.length: recorded 0, replayed 2`.
+
 ## Fields
 
 Block fields are named as `data/rwsets.csv` names them: `Game.windCounter` for `Game::windCounter`,
@@ -377,7 +409,7 @@ recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.m
 chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
 struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
 `Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
-is a code pointer) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
+is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
 second object, with a changed result reported at `import 0 fixture.Scan.c[0]`). With a
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.

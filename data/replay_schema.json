@@ -115,7 +115,8 @@
    "../orders/order_type_entry.h",
    "../orders/unit_orders.h",
    "../orders/vtol_orders.h",
-   "../orders/order_list.h"
+   "../orders/order_list.h",
+   "pack1:../ai/player_ai.h"
   ],
   "objects": {
    "Player": {
@@ -1059,6 +1060,55 @@
      {
       "name": "flags",
       "kind": "u32"
+     }
+    ]
+   },
+   "KeyedCell": {
+    "type": "KeyedCell",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "pos",
+      "kind": "point16"
+     },
+     {
+      "name": "key",
+      "kind": "f32"
+     }
+    ]
+   },
+   "PlayerAI": {
+    "type": "PlayerAI",
+    "scope": "state",
+    "fields": [
+     {
+      "name": "index",
+      "kind": "u8"
+     },
+     {
+      "name": "visibleUnits",
+      "kind": "vector",
+      "member": "visible.units",
+      "elem": {
+       "mode": "object",
+       "kind": "Unit"
+      }
+     },
+     {
+      "name": "cells",
+      "kind": "vector",
+      "elem": {
+       "mode": "value",
+       "kind": "KeyedCell"
+      }
+     },
+     {
+      "name": "counts",
+      "kind": "vector",
+      "elem": {
+       "mode": "scalar",
+       "type": "short"
+      }
      }
     ]
    }
@@ -2493,7 +2543,9 @@
   {"name": "RingApproach", "type": "RingApproach", "scope": "state", "table": null, "inside": null, "vtable": "g_ringApproachVtable", "fields": [{"name": "source", "kind": "ref", "target": "Order"}, {"name": "pos", "kind": "point16"}, {"name": "inner", "kind": "i32"}, {"name": "outer", "kind": "i32"}]},
   {"name": "PathOrder", "type": "PathOrder", "scope": "state", "table": null, "inside": null, "vtable": "g_pathOrderVtable", "fields": [{"name": "source", "kind": "ref", "target": "Order"}, {"name": "approachRadius", "kind": "i16"}, {"name": "altitude", "kind": "i16"}, {"name": "heading", "kind": "i16"}, {"name": "followOffset", "kind": "i32"}]},
   {"name": "Order", "type": "Order", "scope": "state", "table": null, "inside": null, "fields": [{"name": "state", "kind": "u8"}, {"name": "attached", "kind": "ref", "target": "OrderFx", "poly": "OrderFx"}, {"name": "next", "kind": "ref", "target": "Order"}]},
-  {"name": "OrderTableEntry", "type": "OrderTableEntry", "scope": "state", "table": null, "inside": null, "fields": [{"name": "notify", "kind": "code", "table": "orderNotify", "codeTable": 0}, {"name": "markerAnim", "kind": "u8"}, {"name": "flags", "kind": "u32"}]}
+  {"name": "OrderTableEntry", "type": "OrderTableEntry", "scope": "state", "table": null, "inside": null, "fields": [{"name": "notify", "kind": "code", "table": "orderNotify", "codeTable": 0}, {"name": "markerAnim", "kind": "u8"}, {"name": "flags", "kind": "u32"}]},
+  {"name": "KeyedCell", "type": "KeyedCell", "scope": "value", "table": null, "inside": null, "fields": [{"name": "pos", "kind": "point16"}, {"name": "key", "kind": "f32"}]},
+  {"name": "PlayerAI", "type": "PlayerAI", "scope": "state", "table": null, "inside": null, "fields": [{"name": "index", "kind": "u8"}, {"name": "visibleUnits", "kind": "vector", "member": "visible.units", "elem": {"mode": "object", "kind": "Unit"}, "vector": 1, "target": "Unit"}, {"name": "cells", "kind": "vector", "elem": {"mode": "value", "kind": "KeyedCell"}, "vector": 2}, {"name": "counts", "kind": "vector", "elem": {"mode": "scalar", "type": "short"}, "vector": 3}]}
  ],
  "subsystems": {
   "wind_meteors": {
@@ -2554,7 +2606,7 @@
    }
   },
   "ai": {
-   "header": {"interface": "interfaces/ai.h", "struct": "AiSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 20, "ruleless": 4, "unresolvedSlots": ["SquadManagerTickIfActive", "SquadManagerDeleteTimers", "CreateSquadManager"], "unannotatedArgs": ["HasReadyUnitInRange(pos)", "IsPointVisible(pos)", "MarkOwnerNetDirtyFromDamageSplit(self)", "DumpPlayerAI(file)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "SquadManagerTickIfActive(self)", "SquadManagerDeleteTimers(self)", "CmdPlan(args)", "CmdWeight(args)", "CmdLimit(args)"]}},
+   "header": {"interface": "interfaces/ai.h", "struct": "AiSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 27, "ruleless": 4, "unresolvedSlots": ["SquadManagerTickIfActive", "SquadManagerDeleteTimers", "CreateSquadManager"], "unannotatedArgs": ["HasReadyUnitInRange(pos)", "IsPointVisible(pos)", "MarkOwnerNetDirtyFromDamageSplit(self)", "DumpPlayerAI(file)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "SquadManagerTickIfActive(self)", "SquadManagerDeleteTimers(self)", "CmdPlan(args)", "CmdWeight(args)", "CmdLimit(args)"]}},
    "slots": {
     "GetVisibleEnemiesInRadius": {"conv": "__stdcall", "ret": "void", "functions": ["GetVisibleEnemiesInRadius"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}, {"name": "radius", "type": "int", "line": "radius", "mode": "scalar"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}, {"name": "out", "type": "std::vector<Unit*, std::allocator<Unit*> >*", "line": "out", "mode": "units", "dir": "out", "kind": "Unit", "reach": ["Unit.flags", "Unit.def", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.posX", "Unit.posZ", "UnitDef.flags1"], "depth": 2, "reachFirst": 5, "reachCount": 7}], "result": null, "native": "GetVisibleEnemiesInRadius"},
     "HasReadyUnitInRange": {"conv": "__stdcall", "ret": "bool", "functions": ["HasReadyUnitInRange"], "reads": [], "writes": [], "objectReads": ["Unit.flags"], "objectWrites": [], "allOf": null, "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}], "result": {"type": "bool", "mode": "scalar"}, "native": "HasReadyUnitInRange"},

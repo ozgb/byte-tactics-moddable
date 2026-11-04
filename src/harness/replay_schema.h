@@ -33,6 +33,9 @@
 #include "../orders/unit_orders.h"
 #include "../orders/vtol_orders.h"
 #include "../orders/order_list.h"
+#pragma pack(push, 1)
+#include "../ai/player_ai.h"
+#pragma pack(pop)
 #include "../state/sim_globals.h"
 #include "../state/block.h"
 #include "replay_types.h"
@@ -281,7 +284,15 @@ enum ReplayObjectKindId {
     ROK_PATHORDER,
     ROK_ORDER,
     ROK_ORDERTABLEENTRY,
+    ROK_KEYEDCELL,
+    ROK_PLAYERAI,
     ROK_COUNT
+};
+
+static const ReplayVectorSpec kReplayVectors[] = {
+    { RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },
+    { RV_VALUE, ROK_KEYEDCELL, sizeof(KeyedCell) },
+    { RV_SCALAR, 0, sizeof(short) },
 };
 
 static const ReplayObjectKind kReplayObjectKinds[] = {
@@ -308,8 +319,10 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "PathOrder", sizeof(PathOrder), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "Order", sizeof(Order), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "OrderTableEntry", sizeof(OrderTableEntry), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "KeyedCell", sizeof(KeyedCell), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "PlayerAI", sizeof(PlayerAI), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 23;
+static const unsigned kReplayObjectKindCount = 25;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
@@ -486,8 +499,14 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "notify", offsetof(OrderTableEntry, notify), sizeof(((OrderTableEntry*)nullptr)->notify), ROK_ORDERTABLEENTRY, RK_CODE, 0, 0, 0, 0, 0, 0, 0 },
     { "markerAnim", offsetof(OrderTableEntry, markerAnim), sizeof(((OrderTableEntry*)nullptr)->markerAnim), ROK_ORDERTABLEENTRY, RK_U8, 0, 0, 0, 0, 0, 0, 0 },
     { "flags", offsetof(OrderTableEntry, flags), sizeof(((OrderTableEntry*)nullptr)->flags), ROK_ORDERTABLEENTRY, RK_U32, 0, 0, 0, 0, 0, 0, 0 },
+    { "pos", offsetof(KeyedCell, pos), sizeof(((KeyedCell*)nullptr)->pos), ROK_KEYEDCELL, RK_POINT16, 0, 0, 0, 0, 0, 0, 0 },
+    { "key", offsetof(KeyedCell, key), sizeof(((KeyedCell*)nullptr)->key), ROK_KEYEDCELL, RK_F32, 0, 0, 0, 0, 0, 0, 0 },
+    { "index", offsetof(PlayerAI, index), sizeof(((PlayerAI*)nullptr)->index), ROK_PLAYERAI, RK_U8, 0, 0, 0, 0, 0, 0, 0 },
+    { "visibleUnits", offsetof(PlayerAI, visible.units), sizeof(((PlayerAI*)nullptr)->visible.units), ROK_PLAYERAI, RK_VECTOR, ROK_UNIT, 0, 0, 0, 0, 0, 0, 1 },
+    { "cells", offsetof(PlayerAI, cells), sizeof(((PlayerAI*)nullptr)->cells), ROK_PLAYERAI, RK_VECTOR, 0, 0, 0, 0, 0, 0, 0, 2 },
+    { "counts", offsetof(PlayerAI, counts), sizeof(((PlayerAI*)nullptr)->counts), ROK_PLAYERAI, RK_VECTOR, 0, 0, 0, 0, 0, 0, 0, 3 },
 };
-static const unsigned kReplayObjectFieldCount = 151;
+static const unsigned kReplayObjectFieldCount = 157;
 
 static const unsigned short kReplayReachFields[] = { 45, 49, 108, 109, 110, 36, 34, 37, 45, 50, 52, 79 };
 
@@ -639,6 +658,15 @@ static_assert(sizeof(((Order*)nullptr)->next) == 4, "Order::next has the size th
 static_assert(sizeof(((OrderTableEntry*)nullptr)->notify) == sizeof(void*), "OrderTableEntry::notify is a code pointer");
 static_assert(sizeof(((OrderTableEntry*)nullptr)->markerAnim) == 1, "OrderTableEntry::markerAnim has the size the schema says");
 static_assert(sizeof(((OrderTableEntry*)nullptr)->flags) == 4, "OrderTableEntry::flags has the size the schema says");
+static_assert(sizeof(((KeyedCell*)nullptr)->pos) == 4, "KeyedCell::pos has the size the schema says");
+static_assert(sizeof(((KeyedCell*)nullptr)->key) == 4, "KeyedCell::key has the size the schema says");
+static_assert(sizeof(((PlayerAI*)nullptr)->index) == 1, "PlayerAI::index has the size the schema says");
+static_assert(sizeof(decltype(((PlayerAI*)nullptr)->visible.units)) == 16, "PlayerAI::visibleUnits is a block vector");
+static_assert(__is_same(decltype(((PlayerAI*)nullptr)->visible.units)::value_type, Ref<Unit>), "PlayerAI::visibleUnits holds Ref<Unit>");
+static_assert(sizeof(decltype(((PlayerAI*)nullptr)->cells)) == 16, "PlayerAI::cells is a block vector");
+static_assert(__is_same(decltype(((PlayerAI*)nullptr)->cells)::value_type, KeyedCell), "PlayerAI::cells holds KeyedCell");
+static_assert(sizeof(decltype(((PlayerAI*)nullptr)->counts)) == 16, "PlayerAI::counts is a block vector");
+static_assert(__is_same(decltype(((PlayerAI*)nullptr)->counts)::value_type, short), "PlayerAI::counts holds short");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");

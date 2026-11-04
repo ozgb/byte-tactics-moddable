@@ -697,6 +697,66 @@ class Callbacks(unittest.TestCase):
         self.assertTrue(any("the result Widget is void, a scalar or a pointer to a state kind" in e for e in self.errors(ann)))
 
 
+class Vectors(unittest.TestCase):
+    """N8: a BlockVector member is [length/capacity] and its elements, as handles, runs of bytes or lines of fields."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def errors(self, ann):
+        return self.generated(ann)[1]
+
+    def field(self, ann, name):
+        return [f for f in ann["objects"]["PlayerAI"]["fields"] if f["name"] == name][0]
+
+    def test_each_element_mode_has_a_spec_and_a_check_of_the_c_type(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"]],
+                         [("object", "Unit", "Ref<Unit>"), ("value", "KeyedCell", "KeyedCell"), ("scalar", "", "short")])
+        self.assertIn("{ RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },", text)
+        self.assertIn("{ RV_VALUE, ROK_KEYEDCELL, sizeof(KeyedCell) },", text)
+        self.assertIn("{ RV_SCALAR, 0, sizeof(short) },", text)
+        self.assertIn('static_assert(__is_same(decltype(((PlayerAI*)nullptr)->visible.units)::value_type, Ref<Unit>), "PlayerAI::visibleUnits holds Ref<Unit>");', text)
+        self.assertIn('static_assert(sizeof(decltype(((PlayerAI*)nullptr)->cells)) == 16, "PlayerAI::cells is a block vector");', text)
+
+    def test_the_field_row_names_the_vector_and_the_element_kind_to_walk(self):
+        files, _, _ = self.generated()
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "visibleUnits",')][0]
+        self.assertIn("offsetof(PlayerAI, visible.units)", row)
+        self.assertIn("RK_VECTOR, ROK_UNIT,", row)
+        self.assertTrue(row.rstrip(" },").endswith(", 1"), row)
+
+    def test_a_header_that_needs_the_packing_of_the_game_is_included_packed(self):
+        files, _, _ = self.generated()
+        self.assertIn('#pragma pack(push, 1)\n#include "../ai/player_ai.h"\n#pragma pack(pop)', files[rs.SCHEMA_H])
+
+    def test_a_vector_needs_an_element_mode(self):
+        ann = annotations()
+        del self.field(ann, "counts")["elem"]
+        self.assertTrue(any("PlayerAI.counts: a vector needs an `elem` with a mode of object, scalar, value" in e for e in self.errors(ann)))
+        ann = annotations()
+        self.field(ann, "counts")["elem"] = {"mode": "pointer"}
+        self.assertTrue(any("PlayerAI.counts: a vector needs an `elem`" in e for e in self.errors(ann)))
+
+    def test_an_element_names_a_type_or_a_kind_of_its_mode(self):
+        ann = annotations()
+        self.field(ann, "counts")["elem"] = {"mode": "scalar", "type": "Widget"}
+        self.assertTrue(any("a scalar element needs a `type` of" in e for e in self.errors(ann)))
+        ann = annotations()
+        self.field(ann, "visibleUnits")["elem"] = {"mode": "object", "kind": "KeyedCell"}
+        self.assertTrue(any("PlayerAI.visibleUnits: an object element needs a `kind` that is a state kind" in e for e in self.errors(ann)))
+        ann = annotations()
+        self.field(ann, "cells")["elem"] = {"mode": "value", "kind": "Unit"}
+        self.assertTrue(any("PlayerAI.cells: a value element needs a `kind` that is a value kind" in e for e in self.errors(ann)))
+
+    def test_only_the_fields_of_a_state_kind_are_vectors(self):
+        ann = annotations()
+        ann["objects"]["KeyedCell"]["fields"].append({"name": "v", "kind": "vector", "elem": {"mode": "scalar", "type": "int"}})
+        self.assertTrue(any("KeyedCell.v: only the fields of a state kind can be vectors" in e for e in self.errors(ann)))
+
+
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
         files, errors, model = rs.generate(rs.read_rows())

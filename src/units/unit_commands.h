@@ -32,6 +32,7 @@ void __cdecl CreateMissionUnits();
 void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPacket* p);
 unsigned short __stdcall FindUnitTypeId(const char* name);
 UnitTypeSet* __stdcall GetCategoryMask(char* name);
+UnitTypeSet* __stdcall GetLoadCategoryMask(char* name);
 
 void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* table);
 

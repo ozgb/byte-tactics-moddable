@@ -219,11 +219,6 @@ int __stdcall IsCountBelowAiLimit(int, unsigned short, int);
 
 static const float kZeroFloatAi = 0.0f;
 
-static inline int Contains(unsigned int* bits, unsigned short index)
-{
-    return bits[index >> 5] & (1 << (index & 31));
-}
-
 static inline Vec3 Direction(short angle, int scale)
 {
     Vec3 v;
@@ -370,8 +365,8 @@ void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
         (unit->def->flags1&0x10010000) && unit->buildLeft==kZeroFloatAi && !unit->player->allied[attacker->player->index]) {
         int ordered=0;
         if ((!unit->list || (unit->list->flags_42&0x20000)) &&
-            !Contains(unit->def->categories,attacker->unitDefIndex) &&
-            !Contains(unit->def->weaponCategories[0],attacker->unitDefIndex) && g_seams.weapons->WeaponCanReachUnit(unit,attacker,0))
+            !unit->def->categories->Contains(attacker->unitDefIndex) &&
+            !unit->def->weaponCategories[0]->Contains(attacker->unitDefIndex) && g_seams.weapons->WeaponCanReachUnit(unit,attacker,0))
             ordered=g_seams.orders->IssueAttackOrder(unit,attacker,0);
         if (!ordered && (unit->flags&0x300000)) {
             for (unsigned char i=0;i<3;++i) {
@@ -379,7 +374,7 @@ void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
                 if ((weapon->flags&2) && (weapon->flags&0x10) && g_seams.weapons->WeaponCanReachUnit(unit,attacker,i) &&
                     !((unsigned char)(weapon->weapon->flags.value>>26)&1)) {
                     Unit* target=g_seams.targeting->GetWeaponTargetUnit(unit,i);
-                    if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || Contains(unit->def->weaponCategories[i],target->unitDefIndex))
+                    if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || unit->def->weaponCategories[i]->Contains(target->unitDefIndex))
                         g_seams.targeting->SetWeaponTargetUnit(unit,attacker,i);
                 }
             }
@@ -949,7 +944,7 @@ void SquadManager::RetargetWeapons(int force)
                     && (force || !cursor->weapons[w].weapon->flags.b.commandFire)) {
                     Unit* target = g_seams.targeting->GetWeaponTargetUnit(cursor, w);
                     if (target && (player->allied[target->player->index]
-                        || Contains(cursor->def->weaponCategories[w], target->unitDefIndex)
+                        || cursor->def->weaponCategories[w]->Contains(target->unitDefIndex)
                         || (cursor->weapons[w].weapon->flags.b.paralyzer && (target->activateFlags & 0x10))))
                         target = 0;
                     if (!target)

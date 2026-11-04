@@ -1,5 +1,6 @@
 struct Unit;
 
+#include "../units/unit_type_set.h"
 #include "unit_orders.h"
 namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
@@ -1322,8 +1323,6 @@ int __stdcall ParkOrder(Unit* unit,Order* order,int flags)
     }
 }
 
-static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }
-
 static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-ScaledSin(angle,distance); v.y=0; v.z=-ScaledCos(angle,distance); return v; }
 
 // FUNCTION: 0x406780
@@ -1893,14 +1892,14 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
     case 1: {
         Unit* attacker=order->target->attacker;
         if (attacker && !attacker->player.get()->allied[unit->player.get()->index] && (flags & 0x10) &&
-            !Contains(unit->def->categories,attacker->unitDefIndex)) {
+            !unit->def->categories->Contains(attacker->unitDefIndex)) {
             if (IssueAttackOrder(unit,attacker,1)) { order->flags=0; return 3; }
             if (unit->flags & 0x300000) {
                 for (unsigned char i=0;i<3;++i) {
                     UnitWeaponSlot* weapon=&unit->weapons[i];
                     if ((weapon->flags&2) && (weapon->flags&0x10) && !((unsigned char)(((WeaponDef*)weapon->weapon)->flags.value >> 26)&1)) {
                         Unit* target=g_seams.targeting->GetWeaponTargetUnit(unit,i);
-                        if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || Contains(unit->def->weaponCategories[i],target->unitDefIndex))
+                        if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || unit->def->weaponCategories[i]->Contains(target->unitDefIndex))
                             g_seams.targeting->SetWeaponTargetUnit(unit,attacker,i);
                     }
                 }

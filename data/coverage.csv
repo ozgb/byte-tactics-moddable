@@ -1,5 +1,5 @@
 subsystem,function,file,functions,functions_entered,lines,lines_hit,branches,branches_covered,decorated,dead,reason
-ai,*,,102,91,1217,1081,694,576,,33,
+ai,*,,101,90,1214,1078,694,576,,33,
 ai,??G@YG?AUMovableVec3@@ABU0@0@Z,src/ai/ai_player.cpp,0,0,0,0,0,0,??G@YG?AUMovableVec3@@ABU0@0@Z,1,
 ai,AIProfileParser::AIProfileParser,src/ai/ai_profile.cpp,0,0,0,0,0,0,??0AIProfileParser@@QAE@XZ,1,
 ai,AIProfileParser::NextToken,src/ai/ai_profile.cpp,0,0,0,0,0,0,?NextToken@AIProfileParser@@QAEHXZ,1,
@@ -122,7 +122,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,232,159,4683,2575,1782,627,,23,
+game,*,,232,159,4683,2575,1782,628,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -593,7 +593,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,367,311,6430,5286,3196,2071,,24,
+orders,*,,365,309,6426,5282,3196,2071,,24,
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,AiSearchGoal::HasNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,network
 orders,AiSearchGoal::SerializeNetUnitState,src/orders/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,network
@@ -2089,7 +2089,7 @@ seams,LoadMeteorDefaultsNative,src/seams/native.cpp,1,0,0,0,0,0,?LoadMeteorDefau
 seams,MissionExistsNative,src/seams/native.cpp,1,0,0,0,0,0,?MissionExistsNative@@YIHPAVMission@@HH@Z,0,
 seams,SelectMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?SelectMissionNative@@YIHPAVMission@@HH@Z,0,
 seams,SquadManagerDeleteTimersNative,src/seams/native.cpp,1,0,0,0,0,0,?SquadManagerDeleteTimersNative@@YIXPAVSquadManager@@H@Z,0,
-state,*,,566,496,1722,1211,1174,585,,58,
+state,*,,569,499,1730,1218,1184,589,,58,
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1,
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
 state,??8@YG_NABU?$Ref@G@@PAG@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@G@@PAG@Z,0,unused-instance
@@ -2220,7 +2220,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,10,10,132,127,76,56,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,178,146,4254,3656,1738,1280,,32,
+units,*,,180,148,4269,3667,1744,1283,,32,
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0,unused-slot
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,

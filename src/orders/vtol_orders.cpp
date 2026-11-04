@@ -1,5 +1,6 @@
 #include "win_types.h"
 #include <stdio.h>
+#include "../units/unit_type_set.h"
 struct Unit;
 #include "unit_orders.h"
 namespace std {
@@ -195,11 +196,6 @@ static inline void Snap(Vec3* v, Point16 size)
 {
     Point16 c = WorldToCellMul(*v, size);
     CellToWorld(size, c, v);
-}
-
-static inline int Contains(unsigned int* bits, unsigned short index)
-{
-    return bits[index >> 5] & (1 << (index & 31));
 }
 
 static inline void Dummy(void) {}
@@ -1068,7 +1064,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             Unit* attacker=order->target->attacker;
             if (attacker && !attacker->player.get()->allied[unit->player.get()->index]) {
                 if (flags & 0x10) {
-                    if (!Contains(unit->def->categories,attacker->unitDefIndex)) {
+                    if (!unit->def->categories->Contains(attacker->unitDefIndex)) {
                         if (IssueAttackOrder(unit,attacker,1)) { order->flags=0; return 3; }
                         if (unit->flags & 0x300000) {
                             unsigned char i=0;
@@ -1077,7 +1073,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                                 if (!((weapon->flags&2) && weapon->flags&0x10 && ((unsigned char)(((WeaponDef*)weapon->weapon)->flags.value >> 26)&1) == 0)) {
                                 } else {
                                     Unit* target=g_seams.targeting->GetWeaponTargetUnit(unit,i);
-                                    if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || Contains(unit->def->weaponCategories[i],target->unitDefIndex))
+                                    if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || unit->def->weaponCategories[i]->Contains(target->unitDefIndex))
                                         g_seams.targeting->SetWeaponTargetUnit(unit,attacker,i);
                                 }
                                 ++i;

@@ -252,10 +252,11 @@ class TargetingForms(unittest.TestCase):
         _, errors, _ = self.generated(ann)
         self.assertTrue(any("weapon1TargetUnit" in e and "value that make it an id" in e for e in errors), errors)
 
-    def test_a_raw_pointer_is_checked_to_be_a_pointer(self):
+    def test_a_category_mask_is_a_ref_to_an_object_of_the_block(self):
         files, _, _ = self.generated()
-        self.assertIn("UnitDef::categories is a pointer", files[rs.SCHEMA_H])
-        self.assertTrue(any(l.startswith('    { "weaponCategories2"') and "RK_RAWBYTES" in l for l in files[rs.SCHEMA_H].split("\n")))
+        self.assertIn("UnitDef::categories has the size the schema says", files[rs.SCHEMA_H])
+        self.assertTrue(any(l.startswith('    { "weaponCategories2"') and "RK_REF, ROK_UNITTYPESET" in l for l in files[rs.SCHEMA_H].split("\n")))
+        self.assertTrue(any(l.startswith('    { "bits"') and "RK_BYTES" in l for l in files[rs.SCHEMA_H].split("\n")))
 
     def test_two_subsystems_importing_one_slot_get_one_stub(self):
         files, _, _ = self.generated()

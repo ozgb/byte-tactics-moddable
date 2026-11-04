@@ -1,4 +1,6 @@
 #include <ctype.h>
+#include "../state/block.h"
+#include "unit_type_set.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -542,16 +544,17 @@ void InitUnitCategories()
 // FUNCTION: 0x488bf0
 void FreeUnitCategories()
 {
-    for (std::vector<UnitCategory>::iterator it = s_unitCategories.begin(); it != s_unitCategories.end(); it++)
-        delete it->value;
+    for (std::vector<UnitCategory>::iterator it = s_unitCategories.begin(); it != s_unitCategories.end(); it++) {
+        if (SimOwns(it->value))
+            SimFree(it->value);
+        else
+            delete (UnitTypeSet*)it->value;
+    }
     s_unitCategories.clear();
     g_mapLoadFlag = 0;
 }
 
-#include "unit_type_set.h"
-
-// FUNCTION: 0x488c50
-UnitTypeSet* __stdcall GetCategoryMask(char* name)
+static UnitCategory* LowerBoundCategory(const char* name)
 {
     UnitCategory* first = s_unitCategories.begin();
     int n = s_unitCategories.end() - first;
@@ -563,10 +566,36 @@ UnitTypeSet* __stdcall GetCategoryMask(char* name)
         else
             n = n2;
     }
+    return first;
+}
+
+static UnitTypeSet* FindCategoryMask(const char* name)
+{
+    UnitCategory* first = LowerBoundCategory(name);
+    if (first != s_unitCategories.end() && _strcmpi(first->name.data, name) == 0)
+        return (UnitTypeSet*)first->value;
+    return nullptr;
+}
+
+// FUNCTION: 0x488c50
+UnitTypeSet* __stdcall GetCategoryMask(char* name)
+{
+    UnitCategory* first = LowerBoundCategory(name);
     if (first != s_unitCategories.end() && _strcmpi(first->name.data, name) == 0)
         return (UnitTypeSet*)first->value;
 
     UnitTypeSet* p = new UnitTypeSet;
+    s_unitCategories.insert(first, UnitCategory(StringRef(name), p));
+    return p;
+}
+
+UnitTypeSet* __stdcall GetLoadCategoryMask(char* name)
+{
+    UnitCategory* first = LowerBoundCategory(name);
+    if (first != s_unitCategories.end() && _strcmpi(first->name.data, name) == 0)
+        return (UnitTypeSet*)first->value;
+
+    UnitTypeSet* p = (UnitTypeSet*)SimAllocTagged("CATEGORY MASK", sizeof(UnitTypeSet));
     s_unitCategories.insert(first, UnitCategory(StringRef(name), p));
     return p;
 }
@@ -601,9 +630,10 @@ void UnitTypeSet::AddTypeOrCategory(char* text, int* out)
         *out = 1;
         return;
     }
-    UnitTypeSet* other = GetCategoryMask(text);
-    for (int i = 0; i < 16; i++)
-        bits[i] |= other->bits[i];
+    UnitTypeSet* other = FindCategoryMask(text);
+    if (other)
+        for (int i = 0; i < 16; i++)
+            bits[i] |= other->bits[i];
     *out = 0;
 }
 

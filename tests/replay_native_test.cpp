@@ -1302,10 +1302,9 @@ void ObjectSelfTest()
     aimed->health = 77;
     aimed->motion = motion;
     motion->velocity.x = 11;
-    unsigned int* mask = (unsigned int*)SimAlloc(64);
-    memset(mask, 0, 64);
-    mask[0] = 0x12345678u;
-    mask[15] = 0x80000001u;
+    UnitTypeSet* mask = (UnitTypeSet*)SimAlloc(sizeof(UnitTypeSet));
+    mask->bits[0] = 0x12345678;
+    mask->bits[15] = (int)0x80000001u;
     def->categories = mask;
 
     ReplayText text;
@@ -1330,8 +1329,9 @@ void ObjectSelfTest()
     Check(strstr(text.Data(), "  r Unit#6.") == nullptr, "a slot that holds a position, not an id, is not followed");
     Check(strstr(text.Data(), "  r UnitMotion#1.velocityX 11\n") != nullptr, "the reach of the unit leads on to its motion");
     Check(strstr(text.Data(), "weapon0TargetUnit") == nullptr, "a unit-id field is never written as a line");
-    Check(strstr(text.Data(), "  r UnitDef#1.categories x:78563412") != nullptr && strstr(text.Data(), "01000080\n") != nullptr, "the bytes behind a raw pointer are written in hex");
-    Check(strstr(text.Data(), "  r UnitDef#1.weaponCategories0 null\n") != nullptr, "a null raw pointer is null");
+    Check(strstr(text.Data(), "  r UnitDef#1.categories UnitTypeSet#1\n") != nullptr, "a category mask is an object of its own");
+    Check(strstr(text.Data(), "  r UnitTypeSet#1.bits x:78563412") != nullptr && strstr(text.Data(), "01000080\n") != nullptr, "the words of a mask are written in hex");
+    Check(strstr(text.Data(), "  r UnitDef#1.weaponCategories0 null\n") != nullptr, "a null mask is null");
 
     ResetBlock();
     g_callIndex = 0;
@@ -1364,7 +1364,7 @@ void ObjectSelfTest()
     Unit* raimed = (Unit*)ReplayResolveObject("Unit#7", nullptr, g_objects, AllocObject);
     Check(raimed != nullptr && raimed->unitDefIndex == 9 && raimed->motion.get() != nullptr && raimed->motion.get()->velocity.x == 11, "the unit named by an id is rebuilt in its slot, with its motion");
     Check(raimed != nullptr && raimed->health == 0, "and nothing else of it");
-    Check(ra->def.get()->categories != nullptr && ra->def.get()->categories[0] == 0x12345678u && ra->def.get()->categories[15] == 0x80000001u && ra->def.get()->weaponCategories[0] == nullptr, "a raw pointer is rebuilt to bytes the replayer owns");
+    Check(ra->def.get()->categories.get() != nullptr && ra->def.get()->categories->bits[0] == 0x12345678 && ra->def.get()->categories->bits[15] == (int)0x80000001u && ra->def.get()->weaponCategories[0].get() == nullptr, "a mask is rebuilt in the block");
     Check(rebuilt->totalEnergyProduced == 123.5 && rebuilt->allied[3] == 1 && rebuilt->allied[2] == 0, "a double and an array of bytes are restored");
 
     ReplayText again;

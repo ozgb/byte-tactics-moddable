@@ -205,10 +205,7 @@ sets). The annotations hold what no header says:
 - Field kinds that point rather than hold a value. `unitid` is a 16-bit unit id (`weapon0TargetX` holds either an x position or
   a unit id; `weapon0TargetUnit` is the same bytes read as an id) that the walker follows to `Unit#<id>`, but only when its `when`
   field (`weapon0TargetZ`) equals the given value (-32768, the sentinel that says the slot holds a unit); it is never written
-  as a line, and the unit it leads to records only the fields of its `reach`. `rawbytes` is a raw pointer (not a `Ref`) to a
-  fixed number of bytes (`size`) outside the block, written as `x:` and hex or `null`, which the replayer allocates and points
-  at; it is for the category masks of a unit definition, which are heap objects (`new UnitTypeSet` in `GetCategoryMask`)
-  written only while the unit definitions load. A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
+  as a line, and the unit it leads to records only the fields of its `reach`. A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
   are recorded as `r weapondef#17.flags` lines. A field may name a `member` of its type that is not its own name
   (`weapons[1].aimTargetXOrUnitId`, `pos.x`), so that an array element or a part of a `Vec3` is a field.
 - `reach`: a list of `Kind.field` names with an explicit `depth` (the number of objects from the root to the farthest, at most 2),

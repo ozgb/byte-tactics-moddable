@@ -66,6 +66,7 @@ ai,platform,call,ProtectBlockReadOnly,1
 ai,platform,call,ProtectBlockReadWrite,1
 ai,platform,call,RandomInt,12
 ai,platform,call,UnitDef::HasField1ce,1
+ai,platform,call,UnitTypeSet::Contains,2
 ai,platform,call,WorldToCell,2
 ai,platform,call,operator delete,2
 ai,platform,call,operator new,5
@@ -2730,6 +2731,7 @@ orders,platform,call,RandomInt,31
 orders,platform,call,UnitDef::EnergyCost,1
 orders,platform,call,UnitDef::MaxHealth,1
 orders,platform,call,UnitDef::MetalCost,1
+orders,platform,call,UnitTypeSet::Contains,2
 orders,platform,call,WorldToCell,3
 orders,platform,call,copy,3
 orders,platform,call,operator delete,20
@@ -3228,7 +3230,7 @@ platform,units,shared_write,Fixed::value,3
 platform,units,shared_write,Fixed::whole,1
 platform,units,shared_write,Point16::x,7
 platform,units,shared_write,Point16::y,7
-platform,units,shared_write,StringRef::data,1
+platform,units,shared_write,StringRef::data,4
 platform,units,shared_write,TdfFile::current,4
 platform,units,shared_write,UnitDef::scriptChecksum,1
 platform,units,shared_write,Vec3::x,12
@@ -4306,7 +4308,7 @@ presentation,units,shared_write,PlayerInfo::bit6,1
 presentation,units,shared_write,PlayerInfo::side,3
 presentation,units,shared_write,Point16::x,7
 presentation,units,shared_write,Point16::y,7
-presentation,units,shared_write,StringRef::data,1
+presentation,units,shared_write,StringRef::data,4
 presentation,units,shared_write,Unit::angles,6
 presentation,units,shared_write,Unit::attacker,5
 presentation,units,shared_write,Unit::flags,20
@@ -5084,9 +5086,9 @@ targeting,map,shared_write,Vec3::z,12
 targeting,orders,shared_write,Vec3::x,84
 targeting,orders,shared_write,Vec3::y,60
 targeting,orders,shared_write,Vec3::z,84
-targeting,platform,call,Bits::Test,1
 targeting,platform,call,RandomInt,1
 targeting,platform,call,UnitSwapEraseVector::EraseSwapBack,1
+targeting,platform,call,UnitTypeSet::Contains,1
 targeting,platform,shared_write,Vec3::x,22
 targeting,platform,shared_write,Vec3::y,13
 targeting,platform,shared_write,Vec3::z,22
@@ -5236,7 +5238,9 @@ units,game,call,RecordUnitEvent,1
 units,game,call,RecordUnitSpeech,1
 units,game,call,RecordWakeParticles,1
 units,game,call,RecordWhiteSmoke,1
-units,game,call,SimAllocTagged,9
+units,game,call,SimAllocTagged,10
+units,game,call,SimFree,1
+units,game,call,SimOwns,1
 units,game,call,SimRealloc,1
 units,game,shared_write,Angles16::heading,1
 units,game,shared_write,Game::defs,2
@@ -5532,7 +5536,7 @@ units,platform,call,ProtectBlockReadWrite,8
 units,platform,call,RandomInt,2
 units,platform,call,RotateByAngles,2
 units,platform,call,StringRef::Assign,1
-units,platform,call,StringRef::~StringRef,1
+units,platform,call,StringRef::~StringRef,2
 units,platform,call,TdfFile::GetDouble,1
 units,platform,call,TdfFile::GetInt,1
 units,platform,call,TdfFile::GetString,1
@@ -5573,6 +5577,7 @@ units,platform,shared_write,UnitDef::metalCost,1
 units,platform,shared_write,UnitDef::scriptChecksum,1
 units,platform,shared_write,UnitDef::unitname,1
 units,platform,shared_write,UnitDef::weaponHashXor,1
+units,platform,shared_write,UnitTypeSet::bits,1
 units,platform,shared_write,Vec3::x,22
 units,platform,shared_write,Vec3::y,13
 units,platform,shared_write,Vec3::z,22
@@ -5698,6 +5703,7 @@ units,presentation,shared_write,UnitDef::radardistance,1
 units,presentation,shared_write,UnitDef::range,1
 units,presentation,shared_write,UnitDef::sonardistance,1
 units,presentation,shared_write,UnitDef::unitname,7
+units,presentation,shared_write,UnitTypeSet::bits,1
 units,presentation,shared_write,UnitWeaponSlot::stockpile,1
 units,presentation,shared_write,Vec3::x,42
 units,presentation,shared_write,Vec3::y,43

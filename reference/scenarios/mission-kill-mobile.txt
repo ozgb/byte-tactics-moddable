@@ -1,10 +1,10 @@
-# Game type 1: Can Rush on Easy, the second player's units self-destruct, so the victory condition KillAllMobileUnits fires and the run ends at game over.
+# Game type 1: Com Pattern Five on Easy, the second player's units self-destruct, so the victory condition KillAllMobileUnits fires and the run ends at game over.
 game_seed 462
 crt_seed 1462
 view_seed 2462
 game_type 1
-campaign Battle Tactics - Arm Short
-map Can Rush
+campaign Battle Tactics - Arm Long
+map Com Pattern Five
 difficulty 0
 ticks 600
 player0.controller human

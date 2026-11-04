@@ -1,24 +1,3 @@
 bt-sound 1
 0 stop_all - - - - -
-61 play lasrhvy3 -585 - - -
-74 play lasrhvy3 -585 - - -
-75 play lasrhvy3 -585 - - -
-76 play lasrhit1 -585 - - -
-78 play armsml2 -585 - - -
-78 play_file servtny2.WAV -585 - - -
-79 play lasrhit1 -585 - - -
-81 play armsml2 -585 - - -
-84 play armsml2 -585 - - -
-87 play armsml2 -585 - - -
-89 play lasrhvy3 -585 - - -
-90 play lasrhit1 -585 - - -
-92 play lasrhit1 -585 - - -
-92 play lasrhit1 -585 - - -
-95 play lasrhit1 -585 - - -
-100 play lasrhvy3 -585 - - -
-102 play lasrhvy3 -585 - - -
-102 play lasrhit1 -585 - - -
-102 play lasrhit1 -585 - - -
-103 play xplomed2 -585 - - -
-103 play xplomed2 -585 - - -
 194 play Victory Condition -585 - - -

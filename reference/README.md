@@ -201,8 +201,8 @@ seeds) and runs deterministically: two runs give identical traces.
 | mission-defeat-all-units | Between Two Lakes | 2 | 600 | Game type 1 on Easy: every human unit self-destructs, so the defeat condition `AllUnitsKilled` ends the run early |
 | mission-defeat-of-type | Sub Hunting | 2 | 600 | Game type 1 on Easy: both human advanced subs self-destruct, so the defeat condition `AllUnitsKilledOfType` ends the run early |
 | mission-defeat-passes-x | Lightning Recon | 2 | 500 | Game type 1 on Easy: a spawned enemy light kbot is ordered across the line, so the defeat condition `AnyUnitPassesX` ends the run early |
-| mission-kill-mobile | Can Rush | 2 | 600 | Game type 1 on Easy: the second player's units self-destruct, so the victory condition `KillAllMobileUnits` ends the run early |
-| mission-kill-of-type | Attack on Barrack | 2 | 600 | Game type 1 on Easy: the second player's units self-destruct, so the victory conditions `KillAllOfType` and `KillUnitType` end the run early |
+| mission-kill-mobile | Com Pattern Five | 2 | 600 | Game type 1 on Easy: the second player's units self-destruct, so the victory condition `KillAllMobileUnits` ends the run early |
+| mission-kill-of-type | Raid on Vetes | 2 | 600 | Game type 1 on Easy: the second player's units self-destruct, so the victory conditions `KillAllOfType` and `KillUnitType` end the run early |
 | mission-passes-x | Force the Strait | 2 | 800 | Game type 1 on Easy: a spawned human transport ship is ordered across the line, so the victory condition `UnitTypePassesX` ends the run early |
 | mission-passes-z | Cutoff in Sector 6895 | 2 | 500 | Game type 1 on Easy: a spawned human commander is ordered across the line, so the victory condition `UnitTypePassesZ` ends the run early |
 | mission-radius | Battle of Ansapp Sea | 2 | 12000 | Game type 1 on Easy: the human carrier is ordered into the target radius, so the victory condition `MoveUnitToRadius` ends the run early |

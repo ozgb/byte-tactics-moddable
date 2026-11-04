@@ -14,6 +14,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "cleanroom"))
@@ -312,8 +313,37 @@ class LaunchRefusalTests(unittest.TestCase):
     def test_overlapping_mounts(self):
         a = Path(self.tmp.name)
         with self.assertRaises(ln.Refusal):
-            ln.check_disjoint(a, a / "other")
-        ln.check_disjoint(a / "home", a / "other")
+            ln.check_disjoint(("tree", a), ("data kit", a / "other"))
+        with self.assertRaises(ln.Refusal):
+            ln.check_disjoint(("tree", a / "home"), ("data kit", a / "other"), ("session", a / "home" / "s"))
+        ln.check_disjoint(("tree", a / "home"), ("data kit", a / "other"))
+
+    def test_session_directory_gets_the_mount_rules(self):
+        scratch = self.repo / "build" / "scratch" / "t"
+        self.assertEqual(self.mount(scratch, "session"), scratch)
+        for bad in (self.repo / "src", self.home / ".claude", self.repo):
+            with self.assertRaises(ln.Refusal, msg=str(bad)):
+                self.mount(bad, "session")
+        manifest = Path(self.tmp.name) / "m.txt"
+        (self.repo / "src" / "a.c").write_text("secret\n")
+        manifest.write_text(f"{mf.sha256_file(self.repo / 'src' / 'a.c')}  src/a.c\n")
+        (scratch / "copy.txt").write_text("secret\n")
+        with contextlib.redirect_stdout(io.StringIO()):
+            with self.assertRaises(ln.Refusal):
+                ln.check_scan_clean(manifest, scratch)
+
+    def test_canary_directory_must_be_gone_before_the_agent_starts(self):
+        calls = []
+
+        def runner(argv, **kw):
+            calls.append(argv[argv.index("--") + 1:])
+            return subprocess.CompletedProcess(argv, self.still_there if argv[-4] == "test" else 0)
+
+        self.still_there = 0
+        self.assertEqual(ln.remove_canary("vm", runner), 0)
+        self.assertEqual(calls, [["rm", "-rf", "/opt/canary"], ["test", "!", "-e", "/opt/canary"]])
+        self.still_there = 1
+        self.assertEqual(ln.remove_canary("vm", runner), 1)
 
     def test_allowlist_rules(self):
         ln.check_allowlist_text("api.anthropic.com\nindex.crates.io\n")
@@ -347,7 +377,8 @@ class LaunchRefusalTests(unittest.TestCase):
         argv = ln.create_argv("n", "/i.smolmachine", "/t", "/d", "/s", "/p.sock")
         ln.check_argv(argv)
         self.assertNotIn("--net", argv)
-        self.assertEqual(argv.count("-v"), 5)
+        self.assertEqual(argv.count("-v"), 4)
+        self.assertFalse([a for a in argv if "sync" in a])
         for extra in ("--net", "--ssh-agent", "--allow-system-mounts", "--allow-host-loopback"):
             with self.assertRaises(ln.Refusal):
                 ln.check_argv(argv + [extra])
@@ -366,6 +397,18 @@ class CanaryTests(unittest.TestCase):
             self.assertTrue(cn.check_home(tmp)[0])
             os.mkdir(os.path.join(tmp, ".ssh"))
             self.assertFalse(cn.check_home(tmp)[0])
+
+    def test_managed_settings_must_deny_the_web_tools(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "managed-settings.json"
+            self.assertFalse(cn.check_managed_settings(path)[0])
+            for text in ("not json", "{}", '{"permissions": {"deny": ["WebSearch"]}}', '{"permissions": {"allow": ["WebFetch"]}}'):
+                path.write_text(text)
+                self.assertFalse(cn.check_managed_settings(path)[0], text)
+            path.write_text('{"permissions": {"deny": ["WebFetch", "WebSearch", "Bash(x)"]}}')
+            self.assertTrue(cn.check_managed_settings(path)[0])
+            shipped = Path(__file__).resolve().parent / "cleanroom" / "managed-settings.json"
+            self.assertTrue(cn.check_managed_settings(shipped)[0])
 
     def test_scanner_selftest(self):
         self.assertTrue(cn.check_scanner_works(mf.DEFAULT_MAX)[0])
@@ -401,6 +444,69 @@ class CanaryTests(unittest.TestCase):
             records = [json.loads(line) for line in Path(log).read_text().splitlines()]
             self.assertEqual(len(records), len(cn.PROXY_REFUSED))
             self.assertTrue(all(r["status"] == 403 and r["client"] == "unix" for r in records))
+
+
+def client_hello(name):
+    """Return a minimal TLS ClientHello record naming a server."""
+    host = name.encode()
+    sni = b"\0\0" + (len(host) + 5).to_bytes(2, "big") + (len(host) + 3).to_bytes(2, "big") + b"\0" + len(host).to_bytes(2, "big") + host
+    body = b"\3\3" + bytes(32) + b"\0" + b"\0\2\0\x2f" + b"\1\0" + len(sni).to_bytes(2, "big") + sni
+    hello = b"\1" + len(body).to_bytes(3, "big") + body
+    return b"\x16\3\1" + len(hello).to_bytes(2, "big") + hello
+
+
+class SniTests(unittest.TestCase):
+    def test_parse_sni(self):
+        self.assertEqual(px.parse_sni(client_hello("API.Anthropic.com")), "api.anthropic.com")
+        self.assertIsNone(px.parse_sni(b"GET / HTTP/1.1\r\n\r\n"))
+        self.assertIsNone(px.parse_sni(client_hello("x")[:20]))
+        self.assertIsNone(px.parse_sni(b""))
+
+    def test_tunnel_needs_a_matching_server_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = os.path.join(tmp, "log")
+
+            async def one(port, name, echo_port, payload):
+                reader, writer = await asyncio.open_connection("127.0.0.1", port)
+                writer.write(f"CONNECT {name}:{echo_port} HTTP/1.1\r\n\r\n".encode())
+                await asyncio.wait_for(reader.readuntil(b"\r\n\r\n"), 5)
+                writer.write(payload)
+                await writer.drain()
+                data = await asyncio.wait_for(reader.read(len(payload)), 5)
+                writer.close()
+                return data
+
+            async def scenario():
+                async def echo(reader, writer):
+                    while data := await reader.read(1024):
+                        writer.write(data)
+                        await writer.drain()
+                    writer.close()
+
+                echo_server = await asyncio.start_server(echo, "127.0.0.1", 0)
+                echo_port = echo_server.sockets[0].getsockname()[1]
+                server, proxy = await px.start({("api.example.test", echo_port)}, log, "127.0.0.1", 0)
+                port = server.sockets[0].getsockname()[1]
+                good = client_hello("API.example.test")
+                results = [
+                    await one(port, "api.example.test", echo_port, good),
+                    await one(port, "api.example.test", echo_port, client_hello("evil.example.test")),
+                    await one(port, "api.example.test", echo_port, b"GET / HTTP/1.1\r\n\r\n"),
+                ]
+                server.close()
+                echo_server.close()
+                proxy.log.close()
+                return good, results
+
+            async def public(host, port):
+                return ["127.0.0.1"]
+
+            with mock.patch.object(px, "resolve_public", public):
+                good, results = asyncio.run(scenario())
+            self.assertEqual(results, [good, b"", b""])
+            events = [json.loads(line) for line in Path(log).read_text().splitlines()]
+            refused = [r for r in events if r.get("event") == "sni_refused"]
+            self.assertEqual([r["sni"] for r in refused], ["evil.example.test", None])
 
 
 class ProxyHardeningTests(unittest.TestCase):
@@ -487,46 +593,134 @@ class BrokerTests(unittest.TestCase):
         subprocess.run(["git", "-C", str(repo_dir), "add", "f"], check=True, env=env)
         subprocess.run(["git", "-C", str(repo_dir), "commit", "-qm", text], check=True, env=env)
 
-    @unittest.skipUnless(shutil.which("git"), "needs git")
-    def test_sync_fetches_fast_forwards_and_refuses_the_rest(self):
-        work = Path(self.tmp.name) / "work"
+    def make_repo(self, name="work"):
+        work = Path(self.tmp.name) / name
         subprocess.run(["git", "init", "-q", "-b", "main", str(work)], check=True)
-        sync = self.session / "sync" / bk.REPO_NAME
+        return work
+
+    def bundle(self, work, target, *revs):
+        subprocess.run(["git", "-C", str(work), "bundle", "create", "-q", str(target), *revs], check=True)
+
+    def head(self, ref="main"):
         bare = self.session / "bare" / bk.REPO_NAME
-        self.assertEqual(bk.sync_refs(self.session), "")
-        self.commit(work, "one")
-        subprocess.run(["git", "-C", str(work), "push", "-q", str(sync), "main"], check=True)
-        bk.sync_refs(self.session)
-        first = subprocess.run(["git", "--git-dir", str(bare), "rev-parse", "main"], capture_output=True, text=True)
-        self.assertEqual(first.returncode, 0)
-        self.commit(work, "two")
-        subprocess.run(["git", "-C", str(work), "push", "-q", str(sync), "main"], check=True)
-        bk.sync_refs(self.session)
-        second = subprocess.run(["git", "--git-dir", str(bare), "rev-parse", "main"], capture_output=True, text=True)
-        self.assertNotEqual(first.stdout, second.stdout)
-        subprocess.run(["git", "-C", str(work), "checkout", "-q", "--orphan", "other"], check=True)
-        self.commit(work, "three")
-        subprocess.run(["git", "-C", str(work), "push", "-q", "-f", str(sync), "other:main"], check=True)
-        bk.sync_refs(self.session)
-        third = subprocess.run(["git", "--git-dir", str(bare), "rev-parse", "main"], capture_output=True, text=True)
-        self.assertEqual(second.stdout, third.stdout)
+        out = subprocess.run(["git", "--git-dir", str(bare), "rev-parse", "--verify", "-q", ref], capture_output=True, text=True)
+        return out.stdout.strip()
 
     @unittest.skipUnless(shutil.which("git"), "needs git")
-    def test_hook_planted_in_the_sync_repository_does_not_run(self):
-        work = Path(self.tmp.name) / "work"
-        subprocess.run(["git", "init", "-q", "-b", "main", str(work)], check=True)
-        sync = self.session / "sync" / bk.REPO_NAME
+    def test_bundle_fetches_fast_forwards_and_refuses_the_rest(self):
+        work = self.make_repo()
+        outbox = self.session / "outbox" / bk.BUNDLE_NAME
+        self.assertEqual(bk.sync_refs(self.session), "")
         self.commit(work, "one")
-        subprocess.run(["git", "-C", str(work), "push", "-q", str(sync), "main"], check=True)
-        marker = Path(self.tmp.name) / "ran"
-        for hook in ("pre-upload-pack", "post-update", "reference-transaction"):
-            path = sync / "hooks" / hook
-            path.parent.mkdir(exist_ok=True)
-            path.write_text(f"#!/bin/sh\ntouch {marker}\n")
-            path.chmod(0o755)
-        (sync / "config").write_text((sync / "config").read_text() + f"[uploadpack]\n\tpackObjectsHook = {marker}\n")
+        self.bundle(work, outbox, "main")
         bk.sync_refs(self.session)
+        first = self.head()
+        self.assertNotEqual(first, "")
+        self.commit(work, "two")
+        self.bundle(work, outbox, "main")
+        bk.sync_refs(self.session)
+        second = self.head()
+        self.assertNotEqual(first, second)
+        subprocess.run(["git", "-C", str(work), "checkout", "-q", "--orphan", "other"], check=True)
+        self.commit(work, "three")
+        subprocess.run(["git", "-C", str(work), "branch", "-f", "main", "other"], check=True)
+        self.bundle(work, outbox, "main")
+        out = bk.sync_refs(self.session)
+        self.assertEqual(self.head(), second)
+        self.assertIn("rejected", out)
+        self.assertIn("sync refused", (self.session / "broker.log").read_text())
+
+    @unittest.skipUnless(shutil.which("git"), "needs git")
+    def test_unchanged_bundle_is_processed_once(self):
+        work = self.make_repo()
+        self.commit(work, "one")
+        self.bundle(work, self.session / "outbox" / bk.BUNDLE_NAME, "main")
+        bk.sync_refs(self.session)
+        bk.sync_refs(self.session)
+        self.assertEqual((self.session / "broker.log").read_text().count("sync:"), 1)
+
+    @unittest.skipUnless(shutil.which("git"), "needs git")
+    def test_symlinked_bundle_is_refused(self):
+        host = self.make_repo("host")
+        self.commit(host, "SECRET-DECOMPILED")
+        real = Path(self.tmp.name) / "host.bundle"
+        self.bundle(host, real, "main")
+        (self.session / "outbox" / bk.BUNDLE_NAME).symlink_to(real)
+        bk.sync_refs(self.session)
+        self.assertEqual(self.head(), "")
+        self.assertIn("sync refused", (self.session / "broker.log").read_text())
+
+    @unittest.skipUnless(shutil.which("git"), "needs git")
+    def test_bundle_with_prerequisites_the_host_lacks_is_refused(self):
+        host = self.make_repo("host")
+        self.commit(host, "SECRET-DECOMPILED")
+        self.commit(host, "later")
+        self.bundle(host, self.session / "outbox" / bk.BUNDLE_NAME, "main~1..main")
+        bk.sync_refs(self.session)
+        self.assertEqual(self.head(), "")
+        self.assertIn("does not verify", (self.session / "broker.log").read_text())
+
+    @unittest.skipUnless(shutil.which("git"), "needs git")
+    def test_old_sync_repository_attacks_reach_nothing(self):
+        host = self.make_repo("host")
+        self.commit(host, "SECRET-DECOMPILED")
+        sync = self.session / "sync"
+        sync.mkdir()
+        (sync / bk.REPO_NAME).symlink_to(host / ".git")
+        bk.process_mailbox(self.session)
+        bk.sync_refs(self.session)
+        self.assertEqual(self.head(), "")
+        (sync / bk.REPO_NAME).unlink()
+        subprocess.run(["git", "init", "-q", "--bare", str(sync / bk.REPO_NAME)], check=True)
+        info = sync / bk.REPO_NAME / "objects" / "info"
+        info.mkdir(exist_ok=True)
+        (info / "alternates").write_text(str(host / ".git" / "objects") + "\n")
+        bk.sync_refs(self.session)
+        self.assertEqual(self.head(), "")
+        bare = self.session / "bare" / bk.REPO_NAME
+        secret = subprocess.run(["git", "--git-dir", str(bare), "cat-file", "-t", self.host_head(host)], capture_output=True)
+        self.assertNotEqual(secret.returncode, 0)
+
+    def host_head(self, host):
+        return subprocess.run(["git", "-C", str(host), "rev-parse", "main"], capture_output=True, text=True, check=True).stdout.strip()
+
+    @unittest.skipUnless(shutil.which("git"), "needs git")
+    def test_hook_and_config_in_a_bundle_hand_over_do_not_run(self):
+        work = self.make_repo()
+        self.commit(work, "one")
+        marker = Path(self.tmp.name) / "ran"
+        hook = work / ".git" / "hooks" / "reference-transaction"
+        hook.write_text(f"#!/bin/sh\ntouch {marker}\n")
+        hook.chmod(0o755)
+        self.bundle(work, self.session / "outbox" / bk.BUNDLE_NAME, "main")
+        bk.sync_refs(self.session)
+        self.assertNotEqual(self.head(), "")
         self.assertFalse(marker.exists())
+
+    def test_symlinked_request_directory_is_ignored(self):
+        self.request("real")
+        outbox = self.session / "outbox"
+        (outbox / "link").symlink_to(outbox / "real")
+        bk.process_mailbox(self.session)
+        self.assertTrue((self.session / "inbox" / "real.json").exists())
+        self.assertFalse((self.session / "inbox" / "link.json").exists())
+
+    def test_fifo_and_oversized_modules_are_refused(self):
+        self.request("fifo")
+        module = self.session / "outbox" / "fifo" / "module.wasm"
+        module.unlink()
+        os.mkfifo(module)
+        self.request("big")
+        with mock.patch.object(bk, "MAX_WASM", 4):
+            bk.process_mailbox(self.session)
+        for name in ("fifo", "big"):
+            self.assertIn("error", json.loads((self.session / "inbox" / f"{name}.json").read_text()))
+
+    def test_files_in_the_outbox_are_not_requests(self):
+        (self.session / "outbox" / ".btm.tmp").write_text("x")
+        (self.session / "outbox" / bk.BUNDLE_NAME).write_text("x")
+        self.assertEqual(bk.process_mailbox(self.session), [])
+        self.assertEqual(list((self.session / "inbox").iterdir()), [])
 
 
 if __name__ == "__main__":

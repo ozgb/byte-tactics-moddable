@@ -43820,6 +43820,7 @@ address,function,file,kind,target
 ,CanReclaimNative,src/seams/native.cpp,function,
 ,CanRepairNative,src/seams/native.cpp,call,Unit::CanRepair
 ,CanRepairNative,src/seams/native.cpp,function,
+,CaptureObject,src/harness/replay_objects.cpp,call,ForgetEmbedded
 ,CaptureObject,src/harness/replay_objects.cpp,call,ReplayEmitField
 ,CaptureObject,src/harness/replay_objects.cpp,call,ReplayFieldLive
 ,CaptureObject,src/harness/replay_objects.cpp,call,ReplayInReach
@@ -43831,6 +43832,7 @@ address,function,file,kind,target
 ,CaptureObject,src/harness/replay_objects.cpp,deref_read,*unsigned short
 ,CaptureObject,src/harness/replay_objects.cpp,field_read,ReplayObjectField::kind
 ,CaptureObject,src/harness/replay_objects.cpp,field_read,ReplayObjectField::object
+,CaptureObject,src/harness/replay_objects.cpp,field_read,ReplayObjectField::target
 ,CaptureObject,src/harness/replay_objects.cpp,function,
 ,CaptureObject,src/harness/replay_objects.cpp,global_read,kReplayObjectFields@src/harness/replay_schema.h
 ,CaptureObjectSet,src/harness/replay.cpp,call,ReplayCaptureObjects
@@ -44429,6 +44431,14 @@ address,function,file,kind,target
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,field_read,SkirmishPlayer::controller
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,function,
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,global_read,g_game
+,CountTracked,src/harness/replay_objects.cpp,field_read,ReplayFactor::offset
+,CountTracked,src/harness/replay_objects.cpp,field_read,ReplayFactor::size
+,CountTracked,src/harness/replay_objects.cpp,field_read,ReplayField::base
+,CountTracked,src/harness/replay_objects.cpp,field_read,ReplayField::offset
+,CountTracked,src/harness/replay_objects.cpp,field_read,ReplayTableSpec::sim
+,CountTracked,src/harness/replay_objects.cpp,function,
+,CountTracked,src/harness/replay_objects.cpp,global_read,kReplayFieldCount@src/harness/replay_schema.h
+,CountTracked,src/harness/replay_objects.cpp,global_read,kReplayFields@src/harness/replay_schema.h
 ,CountUse,src/state/block.cpp,call,Head
 ,CountUse,src/state/block.cpp,field_read,BlockHeader::highWater
 ,CountUse,src/state/block.cpp,field_read,BlockHeader::inUse
@@ -45031,6 +45041,7 @@ address,function,file,kind,target
 ,EndSection,src/harness/harness.cpp,function,
 ,EnergyAccount,src/game/economy.cpp,field_escape,UnitResources::energyMake
 ,EnergyAccount,src/game/economy.cpp,function,
+,EnsureTable,src/harness/replay_objects.cpp,call,CountTracked
 ,EnsureTable,src/harness/replay_objects.cpp,call,ReplayLengthOf
 ,EnsureTable,src/harness/replay_objects.cpp,call,SimBlockBase
 ,EnsureTable,src/harness/replay_objects.cpp,call,StoreFactor
@@ -45602,6 +45613,20 @@ address,function,file,kind,target
 ,FootprintCentreSmoke,src/map/features.cpp,function,
 ,FootprintCentreSmoke,src/map/features.cpp,global_read,g_seams
 ,FootprintCentreSmoke,src/map/features.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetGroundHeight]
+,ForgetEmbedded,src/harness/replay_objects.cpp,call,ForgetEmbedded
+,ForgetEmbedded,src/harness/replay_objects.cpp,call,ReplayKnown::Get
+,ForgetEmbedded,src/harness/replay_objects.cpp,call,ReplayKnown::Set
+,ForgetEmbedded,src/harness/replay_objects.cpp,call,ReplayText::Add
+,ForgetEmbedded,src/harness/replay_objects.cpp,call,ReplayText::AddChar
+,ForgetEmbedded,src/harness/replay_objects.cpp,call,ReplayText::Data
+,ForgetEmbedded,src/harness/replay_objects.cpp,call,ReplayText::Free
+,ForgetEmbedded,src/harness/replay_objects.cpp,field_read,ReplayObjectField::kind
+,ForgetEmbedded,src/harness/replay_objects.cpp,field_read,ReplayObjectField::name
+,ForgetEmbedded,src/harness/replay_objects.cpp,field_read,ReplayObjectField::object
+,ForgetEmbedded,src/harness/replay_objects.cpp,field_read,ReplayObjectField::target
+,ForgetEmbedded,src/harness/replay_objects.cpp,function,
+,ForgetEmbedded,src/harness/replay_objects.cpp,global_read,kReplayObjectFieldCount@src/harness/replay_schema.h
+,ForgetEmbedded,src/harness/replay_objects.cpp,global_read,kReplayObjectFields@src/harness/replay_schema.h
 ,FormatArray,src/harness/replay_objects.cpp,call,AddHex
 ,FormatArray,src/harness/replay_objects.cpp,call,ArrayData
 ,FormatArray,src/harness/replay_objects.cpp,call,ReplayText::Add
@@ -56117,6 +56142,7 @@ address,function,file,kind,target
 ,ReplayObjectTable::Name,src/harness/replay_objects.cpp,field_read,ReplayObjectTable::count
 ,ReplayObjectTable::Name,src/harness/replay_objects.cpp,function,
 ,ReplayObjectTable::Name,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
+,ReplayObjectTable::Pointer,src/harness/replay_objects.cpp,call,TableRoom
 ,ReplayObjectTable::Pointer,src/harness/replay_objects.cpp,call,TableSpan
 ,ReplayObjectTable::Pointer,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::table
 ,ReplayObjectTable::Pointer,src/harness/replay_objects.cpp,field_read,ReplayObjectTable::count
@@ -57748,8 +57774,14 @@ address,function,file,kind,target
 ,Table,src/harness/replay.cpp,function,
 ,Table,src/harness/replay.cpp,global_read,s_rec
 ,Table,src/harness/replay.cpp,global_read,s_sub
+,TableIndex,src/harness/replay_objects.cpp,call,TableRoom
 ,TableIndex,src/harness/replay_objects.cpp,call,TableSpan
 ,TableIndex,src/harness/replay_objects.cpp,function,
+,TableRoom,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::table
+,TableRoom,src/harness/replay_objects.cpp,field_read,ReplayTableSpec::alloc
+,TableRoom,src/harness/replay_objects.cpp,function,
+,TableRoom,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
+,TableRoom,src/harness/replay_objects.cpp,global_read,kReplayTables@src/harness/replay_schema.h
 ,TableSpan,src/harness/replay_objects.cpp,call,BlockAt
 ,TableSpan,src/harness/replay_objects.cpp,call,ReplayLengthOf
 ,TableSpan,src/harness/replay_objects.cpp,deref_read,*unsigned char

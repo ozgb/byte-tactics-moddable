@@ -391,6 +391,23 @@ class FixedParametersTest(unittest.TestCase):
         self.assertIsNone(rwsets.fixed_parameters("int"))
 
 
+class ProjectFileTest(unittest.TestCase):
+    def test_the_interface_headers_with_called_classes_are_project_files(self):
+        root = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, root, ignore_errors=True)
+        for name in ("interfaces/map.h", "interfaces/services.h", "interfaces/ref.h", "src/a.cpp", "other/b.h"):
+            (root / name).parent.mkdir(parents=True, exist_ok=True)
+            (root / name).write_text("")
+        unit = rwsets.Analyzer(root)
+        relative = {name: unit.relative(str(root / name)) for name in
+                    ("interfaces/map.h", "interfaces/services.h", "interfaces/ref.h", "src/a.cpp", "other/b.h")}
+        self.assertEqual(relative["interfaces/map.h"], "interfaces/map.h")
+        self.assertEqual(relative["interfaces/services.h"], "interfaces/services.h")
+        self.assertEqual(relative["src/a.cpp"], "src/a.cpp")
+        self.assertIsNone(relative["interfaces/ref.h"])
+        self.assertIsNone(relative["other/b.h"])
+
+
 class SimMapTest(unittest.TestCase):
     TEXT = (
         "field,name,container,offset\n"

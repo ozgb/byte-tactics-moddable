@@ -5,15 +5,19 @@
 
 The VM has no network device. Its only way out is a Unix socket to proxy.py on the host. It sees the
 clean-room tree (read-write at /work), the data kit (read-only at /data), the mailbox directories
-/srv/outbox (read-write) and /srv/inbox (read-only), the sync repository /srv/sync (read-write) and
-the proxy socket /srv/proxy.sock. broker.py runs beside it for git sync and the gate mailbox.
+/srv/outbox (read-write) and /srv/inbox (read-only) and the proxy socket /srv/proxy.sock. broker.py
+runs beside it: it reads a git bundle and the gate requests from the outbox as data.
 
 Refusals, each exit status 2 before any VM exists: a mount that is, contains or sits inside this
 repository (except under build/scratch), another worktree of it, ~/.claude*, ~/.ta, ~/.ssh,
 ~/.config/gh, ~/.gnupg or ~/source/repos; a tree without its own .git, or one whose git config names
-byte-tactics; overlapping mounts; a file of the canary manifest in either mount; an allowlist that
+byte-tactics; overlapping mounts, the session directory included; a session directory that is, contains or sits
+inside this repository or ~/.claude* and the like; a file of the canary manifest in a mount or the
+session directory; an allowlist that
 names GitHub or similar hosts or an IP literal; an API key variable not named ANTHROPIC_*. The
 canary checks then run inside the VM, and a failing check stops the session before the agent starts.
+The canary directory is deleted from the VM before the agent starts, and the launch fails if it is
+still there.
 """
 
 import argparse
@@ -50,6 +54,7 @@ DENIED_HOST_SUFFIXES = (
 HOME_FORBIDDEN = (".ta", ".ssh", ".config/gh", ".gnupg", "source/repos")
 GUEST_SCRIPTS = ("canary.py", "manifest.py")
 GUEST_HOME = "/home/agent"
+CANARY_DIR = "/opt/canary"
 FORBIDDEN_FLAGS = ("--net", "--ssh-agent", "--allow-system-mounts", "--allow-host-loopback", "--docker-config", "--nested")
 EXIT_REFUSED = 2
 
@@ -113,9 +118,12 @@ def check_tree(path):
             raise Refusal(f"tree {path} git config names {needle}")
 
 
-def check_disjoint(tree, datakit):
-    if inside(tree, datakit) or inside(datakit, tree):
-        raise Refusal(f"tree {tree} and data kit {datakit} overlap")
+def check_disjoint(*named):
+    """Raise Refusal when any two of the (role, path) pairs overlap."""
+    for i, (role_a, a) in enumerate(named):
+        for role_b, b in named[i + 1:]:
+            if inside(a, b) or inside(b, a):
+                raise Refusal(f"{role_a} {a} and {role_b} {b} overlap")
 
 
 def check_allowlist_text(text):
@@ -154,7 +162,6 @@ def create_argv(name, image, tree, datakit, session, sock, cpus=4, mem=4096):
         "-v", f"{datakit}:/data:ro",
         "-v", f"{session}/outbox:/srv/outbox",
         "-v", f"{session}/inbox:/srv/inbox:ro",
-        "-v", f"{session}/sync:/srv/sync",
         "--mount-socket", f"{sock}:/srv/proxy.sock",
     ]
 
@@ -166,7 +173,7 @@ def check_argv(argv):
             raise Refusal(f"forbidden flag {flag}")
     mounts = [argv[i + 1] for i, a in enumerate(argv) if a in ("-v", "--volume")]
     guests = sorted(m.split(":")[1] for m in mounts)
-    if guests != ["/data", "/srv/inbox", "/srv/outbox", "/srv/sync", "/work"]:
+    if guests != ["/data", "/srv/inbox", "/srv/outbox", "/work"]:
         raise Refusal(f"unexpected mounts: {guests}")
     if argv.count("--mount-socket") != 1:
         raise Refusal("expected exactly one socket mount")
@@ -237,8 +244,7 @@ def prepare_guest(name, uid, gid):
         f"mkdir -p {GUEST_HOME} && chown {uid}:{gid} {GUEST_HOME} && "
         f"echo 'agent:x:{uid}:{gid}::{GUEST_HOME}:/bin/sh' >> /etc/passwd && "
         f"printf '[user]\\n\\tname = Implementer\\n\\temail = implementer@cleanroom.invalid\\n"
-        f"[safe]\\n\\tdirectory = *\\n[remote \"host\"]\\n\\turl = /srv/sync/btm.git\\n"
-        f"\\tfetch = +refs/heads/*:refs/remotes/host/*\\n[init]\\n\\tdefaultBranch = main\\n' > {GUEST_HOME}/.gitconfig && "
+        f"[safe]\\n\\tdirectory = *\\n[init]\\n\\tdefaultBranch = main\\n' > {GUEST_HOME}/.gitconfig && "
         f"chown {uid}:{gid} {GUEST_HOME}/.gitconfig && mkdir -p /opt/canary"
     )
     return run(exec_in(name, ["sh", "-c", script]))
@@ -259,6 +265,12 @@ def run_canary(name, manifest, sock_guest, roots, home, home_guest=GUEST_HOME):
     return run(exec_in(name, argv)).returncode
 
 
+def remove_canary(name, runner=run):
+    """Delete the canary directory from the VM and return 0 only when it is gone."""
+    runner(exec_in(name, ["rm", "-rf", CANARY_DIR]))
+    return runner(exec_in(name, ["test", "!", "-e", CANARY_DIR])).returncode
+
+
 def start_session(args):
     """Validate, start everything, run the agent; return the agent's exit status."""
     home = Path.home()
@@ -267,7 +279,6 @@ def start_session(args):
     tree = check_mount(args.tree, "tree", roots, home)
     datakit = check_mount(args.datakit, "data kit", roots, home)
     check_tree(tree)
-    check_disjoint(tree, datakit)
     allowed_text = Path(args.allow).read_text()
     check_allowlist_text(allowed_text)
     image = Path(args.image).resolve()
@@ -277,12 +288,14 @@ def start_session(args):
         raise Refusal(f"{SMOLVM} is not installed")
     if not os.access("/dev/kvm", os.R_OK | os.W_OK):
         raise Refusal("/dev/kvm is not usable")
-    session = Path(args.session).resolve()
+    session = Path(args.session)
     session.mkdir(parents=True, exist_ok=True)
+    session = check_mount(session, "session", roots, home)
+    check_disjoint(("tree", tree), ("data kit", datakit), ("session", session))
     broker.prepare(session)
     manifest = session / "manifest.txt"
     mf.build(REPO, manifest, [])
-    check_scan_clean(manifest, tree, datakit)
+    check_scan_clean(manifest, tree, datakit, session)
 
     name = f"cr-{os.getpid()}"
     sockdir = Path(tempfile.mkdtemp(prefix="cr-"))
@@ -314,12 +327,15 @@ def start_session(args):
         relay = ["sh", "-c", "socat TCP-LISTEN:3128,bind=127.0.0.1,fork,reuseaddr UNIX-CONNECT:/srv/proxy.sock"]
         run(exec_in(name, relay, detach=True))
         code = run_canary(name, manifest, "/srv/proxy.sock", roots, home)
+        if remove_canary(name):
+            print(f"launch: {CANARY_DIR} is still in the VM", file=sys.stderr)
+            code = code or 4
         t_canary = time.time()
         os.replace(proxy_log, session / "canary-proxy.log")
         proxy.send_signal(signal.SIGHUP)
         print(f"launch: vm up in {t_boot - t0:.1f}s, canary checks in {t_canary - t_boot:.1f}s", flush=True)
         if code:
-            print("launch: a canary check failed: the agent was not started", file=sys.stderr)
+            print("launch: a canary check or the canary cleanup failed: the agent was not started", file=sys.stderr)
             return 3
         secret = [f"ANTHROPIC_API_KEY={args.api_key_env}"] if args.api_key_env else []
         status = run(exec_in(name, args.command, user=f"{uid}:{gid}", env=guest_env(), secret_env=secret)).returncode

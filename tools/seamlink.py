@@ -31,8 +31,9 @@ Anything else is a violation, printed as `subsystem function -> symbol (kind, ow
 kind is code or data, owner is the subsystem that defines a code symbol or the file that
 defines the rest. data/seam_exceptions.csv (subsystem,function,symbol,reason) lists the
 violations that remain, each with a `TODO(#n): ...` reason. --check fails on a violation
-without a row and on a row that no longer occurs, so the list only shrinks. Standard
-library plus tools/objread.py.
+without a row and on a row that no longer occurs, so the list only shrinks. A row whose
+symbol starts with `virtual ` is a virtual call between subsystems, which
+`tools/coupling.py --virtual --check` judges and this tool ignores. Standard library plus tools/objread.py.
 """
 
 import argparse
@@ -69,6 +70,7 @@ HOST_HEADER = "interfaces/host.h"
 BITEXACT_HEADER = "lib/bitexact/bitexact.h"
 SEAM_TABLE = "g_seams"
 REASON = re.compile(r"TODO\(#[0-9]+\): \S")
+VIRTUAL_PREFIX = "virtual "
 REL_DIR32, REL_REL32 = 6, 20
 
 
@@ -437,6 +439,7 @@ def render(rows: list) -> str:
 def check(vs: list, rows: list) -> list:
     """The problems: a violation without a row, a row that no longer occurs, a row without a TODO(#n) reason."""
     problems = []
+    rows = [r for r in rows if not r[2].startswith(VIRTUAL_PREFIX)]
     listed = {(s, f, y) for s, f, y, _ in rows}
     found = set(keys(vs))
     for s, f, y in sorted(found - listed):
@@ -488,6 +491,7 @@ def main(argv=None) -> int:
     if args.write:
         old = {(s, f, y): r for s, f, y, r in read_exceptions(root)}
         rows = [(s, f, y, old.get((s, f, y), "TODO(#0): triage")) for s, f, y in keys(vs)]
+        rows += [(s, f, y, r) for (s, f, y), r in old.items() if y.startswith(VIRTUAL_PREFIX)]
         (root / EXCEPTIONS).write_text(render(rows))
         return 0
     if args.check:

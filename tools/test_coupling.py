@@ -269,6 +269,165 @@ class SeamTest(unittest.TestCase):
                          ("seams", "folder:src/seams/"))
 
 
+HEADER = """
+class Base { public: virtual ~Base(); virtual int Run(int); virtual void Stop(); };
+class Mid : public Base { public: virtual int Run(int); };
+class Leaf : public Mid { public: virtual void Stop(); };
+class __declspec(novtable) Fx { public: virtual ~Fx(); virtual int A(); virtual int B(); };
+class ViewOfBase { public: virtual void v0(int); virtual void v1(); virtual void v2(); };
+extern void* const g_fxVtable[3] = { Fx::Destroy, Other::A, Other::B };
+extern void* const g_otherVtable[3] = { Odd::Destroy, Odd::A, (VirtualFunction)Odd::B };
+"""
+
+
+def classes_of(text=HEADER):
+    classes = cp.Classes()
+    classes.add(text)
+    return classes
+
+
+def indirect_row(caller, file, target):
+    return ["", caller, file, "indirect_call", target]
+
+
+class VirtualTest(unittest.TestCase):
+    def test_bases_slots_and_derived_classes_come_from_the_declarations(self):
+        classes = classes_of()
+        self.assertEqual(classes.bases["Leaf"], ["Mid"])
+        self.assertEqual(classes.slots("Leaf"), ["~", "Run", "Stop"])
+        self.assertEqual(classes.derived("Base"), {"Base", "Mid", "Leaf"})
+        self.assertEqual(classes.ancestors("Leaf"), ["Mid", "Base"])
+
+    def test_a_declspec_does_not_hide_the_class_and_arrays_are_read(self):
+        classes = classes_of()
+        self.assertEqual(classes.slots("Fx"), ["~", "A", "B"])
+        self.assertEqual(classes.arrays["g_fxVtable"], ["Fx::Destroy", "Other::A", "Other::B"])
+        self.assertEqual(classes.arrays["g_otherVtable"], ["Odd::Destroy", "Odd::A", "Odd::B"])
+
+    def test_a_comment_does_not_declare_a_virtual_method(self):
+        classes = classes_of("class C { public: // virtual int Hidden();\n virtual int Shown(); };")
+        self.assertEqual(classes.slots("C"), ["Shown"])
+
+    def test_a_call_runs_the_method_of_every_derived_class_and_the_nearest_base(self):
+        defined = {"Base::Run", "Mid::Run", "Leaf::Stop", "Base::Stop"}
+        classes = classes_of()
+        self.assertEqual(cp.resolve_virtual(classes, "Base", "Run", defined), {"Base::Run", "Mid::Run"})
+        self.assertEqual(cp.resolve_virtual(classes, "Leaf", "Run", defined), {"Mid::Run"})
+        self.assertEqual(cp.resolve_virtual(classes, "Mid", "Stop", defined), {"Leaf::Stop", "Base::Stop"})
+
+    def test_a_destructor_is_named_for_its_class(self):
+        defined = {"Base::~Base", "Leaf::~Leaf"}
+        self.assertEqual(cp.resolve_virtual(classes_of(), "Base", "~Base", defined), {"Base::~Base", "Leaf::~Leaf"})
+
+    def test_a_view_runs_the_slot_of_its_real_class(self):
+        classes = classes_of()
+        old = dict(cp.VIEW_FAMILY)
+        cp.VIEW_FAMILY["ViewOfBase"] = "Base"
+        try:
+            defined = {"Base::~Base", "Mid::Run", "Leaf::Stop", "Base::Stop"}
+            self.assertEqual(cp.resolve_slot(classes, "ViewOfBase", "v0", defined), {"Base::~Base"})
+            self.assertEqual(cp.resolve_slot(classes, "ViewOfBase", "v2", defined), {"Leaf::Stop", "Base::Stop"})
+        finally:
+            cp.VIEW_FAMILY.clear()
+            cp.VIEW_FAMILY.update(old)
+
+    def test_a_hand_made_vtable_runs_its_entry_of_the_slot(self):
+        defined = {"Fx::Destroy", "Other::A", "Other::B"}
+        self.assertEqual(cp.resolve_slot(classes_of(), "Fx", "A", defined), {"Other::A"})
+        self.assertEqual(cp.resolve_slot(classes_of(), "Fx", "~Fx", defined), {"Fx::Destroy"})
+
+    def test_an_unqualified_entry_is_found_by_its_last_name(self):
+        self.assertEqual(cp.entry_functions("OnAimCobReturn", {"WeaponAimCobCb::OnAimCobReturn", "Other"}),
+                         {"WeaponAimCobCb::OnAimCobReturn"})
+        self.assertEqual(cp.entry_functions("A::B", {"C::B"}), set())
+
+    def rows(self):
+        return (fn("Caller", "src/ai/pathfind.cpp") + [indirect_row("Caller", "src/ai/pathfind.cpp", "virtual Base::Run")]
+                + fn("Base::Run", "src/ai/pathfind.cpp") + fn("Mid::Run", "src/orders/order_list.cpp")
+                + fn("Seamed", "src/ai/pathfind.cpp")
+                + [indirect_row("Seamed", "src/ai/pathfind.cpp", "indirect via void (*)(int) [UnitsSeam::Go]")])
+
+    def test_a_call_into_another_subsystem_is_an_edge_and_one_into_its_own_is_not(self):
+        calls = cp.indirect_calls(self.rows(), [], classes_of(), {})
+        of = {("Caller", "src/ai/pathfind.cpp"): "pathfinding", ("Base::Run", "src/ai/pathfind.cpp"): "pathfinding",
+              ("Mid::Run", "src/orders/order_list.cpp"): "orders"}
+        names = {"Base::Run": ["pathfinding"], "Mid::Run": ["orders"]}
+        edges = cp.virtual_edges(calls, of, names, {("Mid::Run", "orders"): {"src/orders/order_list.cpp"}})
+        self.assertEqual([(e[0], e[1], e[5], e[6]) for e in edges], [("pathfinding", "Caller", "Mid::Run", "orders")])
+
+    def test_a_seam_slot_is_not_a_virtual_call(self):
+        calls = cp.indirect_calls(self.rows(), [], classes_of(), {})
+        self.assertEqual([c.caller for c in calls], ["Caller"])
+
+    def test_the_game_may_not_call_into_a_sim_subsystem_but_the_platform_may(self):
+        call = cp.VirtualCall("F", "f.cpp", "", "virtual A::m", "class", {"A::m"})
+        names = {"A::m": ["units"]}
+        self.assertEqual(len(cp.virtual_edges([call], {("F", "f.cpp"): "game"}, names, {})), 1)
+        self.assertEqual(cp.virtual_edges([call], {("F", "f.cpp"): "platform"}, names, {}), [])
+        self.assertEqual(cp.virtual_edges([call], {("F", "f.cpp"): "units"}, names, {}), [])
+
+    def test_a_pointer_call_takes_the_hand_edges_no_virtual_call_explains(self):
+        rows = fn("P", "src/weapons/w.cpp") + [indirect_row("P", "src/weapons/w.cpp", "indirect via int (*)(void *)")]
+        calls = cp.indirect_calls(rows + fn("T", "src/units/t.cpp"), [("P", "T")], classes_of(), {})
+        self.assertEqual([(c.target, c.callees) for c in calls], [("pointer indirect via int (*)(void *)", {"T"})])
+
+    def test_a_virtual_call_with_nothing_to_run_is_unresolved(self):
+        rows = fn("Caller", "src/ai/a.cpp") + [indirect_row("Caller", "src/ai/a.cpp", "virtual Nobody::m")]
+        calls = cp.indirect_calls(rows, [], classes_of(), {})
+        self.assertEqual(len(cp.unresolved(calls, {("Caller", "src/ai/a.cpp"): "ai"})), 1)
+        self.assertEqual(cp.unresolved(calls, {("Caller", "src/ai/a.cpp"): "platform"}), [])
+
+    def edge(self):
+        return [("pathfinding", "Caller", "f.cpp", "9", "virtual Base::Run", "Mid::Run", "orders", "g.cpp", "class")]
+
+    def test_check_passes_with_a_row_and_fails_without(self):
+        row = ("pathfinding", "Caller", "virtual Base::Run", "TODO(#682): seam slot")
+        self.assertEqual(cp.check_virtual(self.edge(), [], [row]), [])
+        problems = cp.check_virtual(self.edge(), [], [])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("not in data/seam_exceptions.csv", problems[0])
+
+    def test_check_fails_on_a_stale_row_a_bad_reason_and_an_unresolved_call(self):
+        stale = ("pathfinding", "Gone", "virtual Base::Run", "TODO(#682): x")
+        self.assertIn("stale", cp.check_virtual([], [], [stale])[0])
+        bad = ("pathfinding", "Caller", "virtual Base::Run", "later")
+        self.assertIn("not TODO", cp.check_virtual(self.edge(), [], [bad])[0])
+        call = cp.VirtualCall("C", "f.cpp", "", "virtual X::m", "class", set())
+        self.assertIn("no function found", cp.check_virtual([], [call], [])[0])
+
+    def test_only_virtual_rows_of_the_exceptions_file_are_read(self):
+        rows = cp.read_virtual_exceptions()
+        for subsystem, function, symbol, reason in rows:
+            self.assertTrue(symbol.startswith("virtual "))
+            self.assertRegex(reason, r"^TODO\(#[0-9]+\): \S")
+
+    def test_the_report_groups_by_subsystems_and_names_where_objects_are_built(self):
+        text = cp.virtual_report(self.edge(), {"Mid": [("src/orders/o.cpp", 5, "orders")]}, [])
+        self.assertIn("pathfinding -> orders", text)
+        self.assertIn("Mid::Run (orders, g.cpp); objects built at src/orders/o.cpp:5 (orders)", text)
+        self.assertIn("1 crossing calls, 1 callers", text)
+
+    def test_new_sites_are_found_with_and_without_a_placement(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "src").mkdir()
+            (Path(tmp) / "src/a.cpp").write_text("x = new (kSim) Goal(u);\ny = new Other(1);\nz = new Goal;\n")
+            sites = cp.construction_sites(Path(tmp), {"Goal"})
+        self.assertEqual(dict(sites), {"Goal": [("src/a.cpp", 1), ("src/a.cpp", 3)]})
+
+
+class VirtualDataTest(unittest.TestCase):
+    def test_the_committed_tree_resolves_every_virtual_call_and_pathfinding_calls_none_across(self):
+        calls, of, names, files, _ = cp.virtual_inputs()
+        self.assertEqual(cp.unresolved(calls, of), [])
+        edges = cp.virtual_edges(calls, of, names, files)
+        callers = {e[1] for e in edges}
+        self.assertTrue(all(not c.startswith("Pathfinder::") for c in callers))
+        self.assertNotIn("UnitMotion::DestroyObject", callers)
+        self.assertIn("ReceiveUnitStates", callers)
+
+
 class DataTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

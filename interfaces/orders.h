@@ -1,6 +1,11 @@
 #ifndef INTERFACES_ORDERS_H
 #define INTERFACES_ORDERS_H
 
+namespace std {
+template<class T> class allocator;
+template<class T, class A> class vector;
+}
+
 class AiSearchGoal;
 class OrderFx;
 class HapiBank;
@@ -14,7 +19,7 @@ class MissionType;
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
 #define ORDERS_VERSION_MAJOR 1
 // Minor version of the orders interface, changed when a slot is added.
-#define ORDERS_VERSION_MINOR 8
+#define ORDERS_VERSION_MINOR 9
 
 // Unit orders and command queues.
 struct OrdersSeam {
@@ -70,6 +75,14 @@ struct OrdersSeam {
     Order* (__stdcall* NewOrder)(MissionType kind, Unit* target, void* pos, int a, int b, int c);
     // Changes the queued count of a unit type in the build list of a unit, by name, and never plays a sound. Hooks: none.
     void (__stdcall* QueueBuildOrder)(char* name, Unit* unit, int count);
+    // Returns 1 when a cell is a goal of an order's target. Hooks: none.
+    int (__stdcall* OrderFxIsGoal)(OrderFx* self, int x, int y);
+    // Appends the goal cells of an order's target to a list. Hooks: none.
+    void (__stdcall* OrderFxFillGoalCells)(OrderFx* self, std::vector<Point16, std::allocator<Point16> >* goals);
+    // Returns the cost of a cell for the path search of an order's target. Hooks: none.
+    int (__stdcall* OrderFxApproxDist)(OrderFx* self, int x, int y);
+    // Takes the path search goal of a unit's movement that waits for a new search, or 0 when there is none. Hooks: none.
+    AiSearchGoal* (__stdcall* UnitMotionClaimRepath)(UnitMotion* motion);
 };
 
 #endif

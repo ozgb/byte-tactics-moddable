@@ -147,7 +147,7 @@ class MovedGlobalsTest(unittest.TestCase):
                       text)
         self.assertIn("(const void*)(offsetof(SimGlobals, g_packetManager) + 0x8), 4, TF_SCALAR, TT_NONE, 1 },", text)
         self.assertNotIn("extern int g_meteorActive;", text)
-        self.assertIn("extern int g_cdPathMismatch;", text)
+        self.assertIn("extern int g_playerBudgetCap[10];", text)
         self.assertIn('#include "../state/sim_globals.h"', text)
         self.assertIn('#pragma push_macro("g_meteorActive")', text)
         self.assertLess(text.index('#undef g_meteorActive'), text.index("kMeteorGlobals[]"))

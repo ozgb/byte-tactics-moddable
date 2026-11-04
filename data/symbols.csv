@@ -401,7 +401,6 @@ address,name
 0x41d3b0,SaveCameraPosition
 0x41d3f0,RestoreCameraPosition
 0x41d4a0,SetCommandLineUnusedFlagL
-0x41d4b0,SetBypassDriveScan
 0x41d4c0,RegisterDataArchives
 0x41d6a0,FindGameCdDrive
 0x41d7b0,BuildCdFilePath
@@ -4368,8 +4367,6 @@ address,name
 0x511dd4,g_contourOffset
 0x511dd8,g_netStatsTick
 0x511ddc,g_byteRatesTick
-0x511de0,g_cdBypassDriveScan
-0x511de4,g_cdPathMismatch
 0x511de8,g_game
 0x511dec,g_endGameGlamourSoundStarted
 0x511df0,g_explodedPieces
@@ -4557,8 +4554,6 @@ address,name
 0x51e69c,g_playLooping
 0x51e6a0,g_losTables
 0x51e6b0,s_unitCategories$S5628
-0x51e6c0,g_mapLoadFlag
-0x51e6c4,g_cdMismatchDefeatTick
 0x51e6c8,g_loadingBarFlashAlpha
 0x51e6cc,DAT_0051e6cc
 0x51e6d0,g_shareDialogPlayerNetIds

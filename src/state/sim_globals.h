@@ -29,7 +29,6 @@ struct SimGlobals {
     int g_playerTickLoad[10];
     int g_budgetRefreshCounter;
     unsigned char DAT_00511a3c[4];
-    int g_cdPathMismatch;
     Ref<ExplodedPiece> g_explodedPieces[100];
     DebrisCache g_debrisMemCache;
     unsigned char DAT_00511fb4[4];
@@ -63,8 +62,6 @@ struct SimGlobals {
     int g_lastPlaceMetalSum;
     LosTables g_losTables;
     unsigned char DAT_0051e6b0[4];
-    int g_mapLoadFlag;
-    unsigned int g_cdMismatchDefeatTick;
     unsigned int g_randomSeed;
     unsigned char DAT_0051fc8c[4];
     Quirks g_quirks;
@@ -111,7 +108,6 @@ static_assert(__builtin_offsetof(SimGlobals, DAT_00512b8c) - __builtin_offsetof(
 static_assert(__builtin_offsetof(SimGlobals, g_economyPacketTick) - __builtin_offsetof(SimGlobals, g_packetManager) == 46396, "g_packetManager is followed by g_economyPacketTick");
 static_assert(__builtin_offsetof(SimGlobals, g_lastPlaceMetalSum) - __builtin_offsetof(SimGlobals, g_lastPlaceHeight) == 4, "g_lastPlaceHeight is followed by g_lastPlaceMetalSum");
 static_assert(__builtin_offsetof(SimGlobals, DAT_0051e6b0) - __builtin_offsetof(SimGlobals, g_losTables) == 16, "g_losTables is followed by DAT_0051e6b0");
-static_assert(__builtin_offsetof(SimGlobals, g_cdMismatchDefeatTick) - __builtin_offsetof(SimGlobals, g_mapLoadFlag) == 4, "g_mapLoadFlag is followed by g_cdMismatchDefeatTick");
 static_assert(__builtin_offsetof(SimGlobals, DAT_0051fc8c) - __builtin_offsetof(SimGlobals, g_randomSeed) == 4, "g_randomSeed is followed by DAT_0051fc8c");
 static_assert(sizeof(((SimGlobals*)0)->g_missionOrderTableVec) == 16, "g_missionOrderTableVec size");
 static_assert(sizeof(((SimGlobals*)0)->g_movementClasses) == 1024, "g_movementClasses size");
@@ -128,7 +124,6 @@ static_assert(sizeof(((SimGlobals*)0)->g_losTables) == 16, "g_losTables size");
 #define g_playerTickLoad (Sim().g_playerTickLoad)
 #define g_budgetRefreshCounter (Sim().g_budgetRefreshCounter)
 #define DAT_00511a3c (Sim().DAT_00511a3c)
-#define g_cdPathMismatch (Sim().g_cdPathMismatch)
 #define g_explodedPieces (Sim().g_explodedPieces)
 #define g_debrisMemCache (Sim().g_debrisMemCache)
 #define DAT_00511fb4 (Sim().DAT_00511fb4)
@@ -162,8 +157,6 @@ static_assert(sizeof(((SimGlobals*)0)->g_losTables) == 16, "g_losTables size");
 #define g_lastPlaceMetalSum (Sim().g_lastPlaceMetalSum)
 #define g_losTables (Sim().g_losTables)
 #define DAT_0051e6b0 (Sim().DAT_0051e6b0)
-#define g_mapLoadFlag (Sim().g_mapLoadFlag)
-#define g_cdMismatchDefeatTick (Sim().g_cdMismatchDefeatTick)
 #define g_randomSeed (Sim().g_randomSeed)
 #define DAT_0051fc8c (Sim().DAT_0051fc8c)
 #define g_quirks (Sim().g_quirks)

@@ -362,7 +362,7 @@ class CheckQuirksTest(unittest.TestCase):
                 d = tmp / name
                 d.mkdir()
                 rows = [f"{t} {ph} {h}" for t, ph, h in phase_hashes]
-                (d / "trace.txt").write_text("bt-trace 3\n" + "\n".join(rows) + "\n")
+                (d / "trace.txt").write_text("bt-trace 4\n" + "\n".join(rows) + "\n")
                 return d
 
             quirk_rows = [(1, "units", "1" * 16), (2, "units", "2" * 16), (2, "players", "9" * 16)]
@@ -779,7 +779,7 @@ class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
         procs, paths, calls, reported = {}, {}, [], []
 
         def rows(items):
-            return "bt-trace 3\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in items)
+            return "bt-trace 4\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in items)
 
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
@@ -838,7 +838,7 @@ class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
 
     def test_a_partial_last_line_is_not_compared(self):
         tail = reference.tracedigest.TraceTail()
-        text = b"bt-trace 3\nseed 1\n1 units " + b"1" * 16 + b"\n2 units " + b"2" * 16 + b"\n3 un"
+        text = b"bt-trace 4\nseed 1\n1 units " + b"1" * 16 + b"\n2 units " + b"2" * 16 + b"\n3 un"
         self.assertEqual(len(tail.feed(text)), 1)
         self.assertEqual(tail.feed(b"its " + b"3" * 16 + b"\n"), [reference.tracedigest.digests([(2, "units", "2" * 16)])[0]])
 
@@ -1023,7 +1023,7 @@ class BothModesTest(unittest.TestCase):
         expected = {"a": (header, reference.tracedigest.digests(good))}
         with tempfile.TemporaryDirectory() as tmp:
             trace = Path(tmp) / "trace.txt"
-            trace.write_text("bt-trace 3\n1 units " + "1" * 16 + "\n2 units " + "9" * 16 + "\n3 units " + "3" * 16 + "\n")
+            trace.write_text("bt-trace 4\n1 units " + "1" * 16 + "\n2 units " + "9" * 16 + "\n3 units " + "3" * 16 + "\n")
             proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
             watch = reference.Watch(expected, lambda pid: trace)
             try:
@@ -1040,7 +1040,7 @@ class BothModesTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             run = Path(tmp) / "run"
             run.mkdir()
-            (run / "trace.txt").write_text("bt-trace 3\ngame_seed 1\ncrt_seed 1\nview_seed 1\n1 units " + "1" * 16 + "\n")
+            (run / "trace.txt").write_text("bt-trace 4\ngame_seed 1\ncrt_seed 1\nview_seed 1\n1 units " + "1" * 16 + "\n")
             (run / "blockptrs.txt").write_text("scan")
             (run / "sound.txt").write_text("header\n")
             (run / reference.UI_FILE).write_text("ui\n")

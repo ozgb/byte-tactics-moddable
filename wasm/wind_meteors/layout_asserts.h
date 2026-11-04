@@ -11,20 +11,20 @@
 #undef g_meteorNextHitTime
 #undef g_meteorTarget
 #undef g_meteorScheduleGap
-static_assert(sizeof(SimGlobals) == 48712, "");
-static_assert(offsetof(SimGlobals, g_meteorNextStrikeTime) == 568, "");
-static_assert(offsetof(SimGlobals, g_meteorWeaponName) == 576, "");
-static_assert(offsetof(SimGlobals, g_meteorSpawnMagnitude) == 608, "");
-static_assert(offsetof(SimGlobals, g_meteorSpawnInterval) == 612, "");
-static_assert(offsetof(SimGlobals, g_meteorActive) == 616, "");
-static_assert(offsetof(SimGlobals, g_meteorStrikeEndTime) == 620, "");
-static_assert(offsetof(SimGlobals, g_meteorOrigin) == 624, "");
-static_assert(offsetof(SimGlobals, g_meteorShowerDuration) == 628, "");
-static_assert(offsetof(SimGlobals, g_meteorWeapon) == 632, "");
-static_assert(offsetof(SimGlobals, g_meteorsEnabled) == 636, "");
-static_assert(offsetof(SimGlobals, g_meteorNextHitTime) == 640, "");
-static_assert(offsetof(SimGlobals, g_meteorTarget) == 644, "");
-static_assert(offsetof(SimGlobals, g_meteorScheduleGap) == 648, "");
+static_assert(sizeof(SimGlobals) == 48700, "");
+static_assert(offsetof(SimGlobals, g_meteorNextStrikeTime) == 564, "");
+static_assert(offsetof(SimGlobals, g_meteorWeaponName) == 572, "");
+static_assert(offsetof(SimGlobals, g_meteorSpawnMagnitude) == 604, "");
+static_assert(offsetof(SimGlobals, g_meteorSpawnInterval) == 608, "");
+static_assert(offsetof(SimGlobals, g_meteorActive) == 612, "");
+static_assert(offsetof(SimGlobals, g_meteorStrikeEndTime) == 616, "");
+static_assert(offsetof(SimGlobals, g_meteorOrigin) == 620, "");
+static_assert(offsetof(SimGlobals, g_meteorShowerDuration) == 624, "");
+static_assert(offsetof(SimGlobals, g_meteorWeapon) == 628, "");
+static_assert(offsetof(SimGlobals, g_meteorsEnabled) == 632, "");
+static_assert(offsetof(SimGlobals, g_meteorNextHitTime) == 636, "");
+static_assert(offsetof(SimGlobals, g_meteorTarget) == 640, "");
+static_assert(offsetof(SimGlobals, g_meteorScheduleGap) == 644, "");
 static_assert(sizeof(Ref<WeaponDef>) == 4, "");
 static_assert(sizeof(MeteorParams) == 48, "");
 static_assert(offsetof(MeteorParams, radius) == 32, "");

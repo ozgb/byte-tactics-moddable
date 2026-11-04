@@ -683,6 +683,25 @@ void After_targeting_ChooseWeapon()
     CompareResult(g_result_targeting_ChooseWeapon);
 }
 
+void PlayNestedCalls(const char* import)
+{
+    NestedScope scope;
+    for (int k = 0; k < scope.count; k++) {
+        scope.Restore();
+        const char* args = nullptr;
+        const char* name = NestedName(scope.line[k], &args);
+        if (CallbackIs(name, "wind_meteors.CmdMeteor")) {
+            ArgvHolder p0;
+            ParseArgsList(&args, p0);
+            g_seams.wind_meteors->CmdMeteor(&p0.args);
+            scope.Restore();
+            CallbackDone(import, k, args, nullptr);
+            continue;
+        }
+        CallbackUnknown(import, k, name);
+    }
+}
+
 bool RunSlot(const char* subsystem, const char* slot)
 {
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "UpdateWind") == 0) {

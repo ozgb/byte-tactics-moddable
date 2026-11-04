@@ -1,6 +1,8 @@
 #ifndef STATE_SIM_RADAR_H
 #define STATE_SIM_RADAR_H
 
+#include "../../interfaces/services.h"
+
 enum : unsigned int { SIM_RADAR_ARENA_BYTES = 2u << 20 };
 
 struct SimRadarArena {
@@ -78,7 +80,5 @@ SimRadarArena& SimCapture();
 void SimCaptureCreate();
 
 void SimCaptureClear();
-
-void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);
 
 #endif

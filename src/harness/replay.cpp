@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "replay_schema.h"
+#include "../../interfaces/host.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
@@ -18,11 +19,12 @@
 #include "replay_types.h"
 #include "replay_values.h"
 #include "replay_objects.h"
+#include "replay_callbacks.h"
 #include "replay.h"
 
 namespace {
 
-enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
+enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK, OBJ_CALLBACK };
 
 struct Recording {
     Recording() : on(true), windowed(false), first(0), last(0) {}
@@ -59,6 +61,9 @@ ReplayText s_call;
 ReplayText s_tail;
 ReplayText s_field;
 ReplayOrdinals s_ordinals;
+ReplaySnapshots s_snapshots;
+ReplayText s_nested;
+bool s_nestedSlot;
 ReplayReach s_reach;
 ReplayRoots s_roots;
 
@@ -74,13 +79,14 @@ void AddStream(ReplayText& t, int stream)
 
 void AddHandle(ReplayText& t, unsigned kind, const void* p)
 {
-    static const char* const names[] = { "file#", "rec#", "bank#" };
+    static const char* const names[] = { "file", "rec", "bank" };
     unsigned ordinal = s_ordinals.Of(kind, p);
     if (ordinal == 0) {
         t.Add("null");
         return;
     }
-    t.Add(names[kind]);
+    t.Add(kind >= OBJ_CALLBACK ? kReplayCallbacks[kind - OBJ_CALLBACK].handle : names[kind]);
+    t.AddChar('#');
     t.AddUnsigned(ordinal);
 }
 
@@ -165,6 +171,8 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
     if (!s_recording)
         return;
     s_ordinals.Reset();
+    s_snapshots.Reset();
+    s_nested.Clear();
     s_call.Clear();
     s_tail.Clear();
     s_roots = roots;
@@ -176,6 +184,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
     const ReplaySlotSets& sets = kReplaySlots[slot];
     CaptureSet(sets.reads, sets.readCount, 'r');
     CaptureObjectSet(sets, true);
+    ReplayOwner() = host_thread_id();
     ReplayCalls() = 1;
 }
 
@@ -199,10 +208,12 @@ void SlotLeave()
     r.out.AddChar('\n');
     r.out.AddText(s_call);
     r.out.AddText(s_tail);
+    s_snapshots.Emit(r.out);
     s_recording = false;
 }
 
 bool IsImportOf(unsigned owner, unsigned slot);
+bool IsNestedSlot(unsigned slot);
 
 class SlotScope {
 public:
@@ -214,9 +225,15 @@ public:
             role = 1;
             s_open = true;
             SlotEnter(slot, sub, roots);
-        } else if (s_recording && ReplayCalls() != 0 && IsImportOf(s_sub, slot)) {
+        } else if (s_recording && ReplayOwned() && IsImportOf(s_sub, slot)) {
             role = 2;
             ReplayCalls() = 0;
+        } else if (s_recording && ReplayNestedDepth() != 0 && !s_nestedSlot && ReplayOwner() == host_thread_id() && IsNestedSlot(slot)) {
+            role = 3;
+            s_nestedSlot = true;
+            ReplayCalls() = 1;
+        } else if (s_recording && ReplayCallbackDepth() != 0 && IsImportOf(s_sub, slot)) {
+            ReplayFail("an import made inside a callback of an import is not recorded");
         }
     }
     ~SlotScope()
@@ -225,6 +242,10 @@ public:
             SlotLeave();
         else if (role == 2)
             ReplayCalls() = 1;
+        else if (role == 3) {
+            s_nestedSlot = false;
+            ReplayCalls() = 0;
+        }
     }
     bool Open() const
     {
@@ -233,6 +254,10 @@ public:
     bool Import() const
     {
         return role == 2;
+    }
+    bool Nested() const
+    {
+        return role == 3;
     }
 
 private:
@@ -338,6 +363,15 @@ void ImportHandle(ReplayText& t, unsigned kind, const void* p)
 {
     t.AddChar(' ');
     AddHandle(t, kind, p);
+}
+
+void ImportCallback(ReplayText& t, ReplayCallbackScope& scope, unsigned callback, void* object)
+{
+    unsigned kind = OBJ_CALLBACK + callback;
+    unsigned ordinal = s_ordinals.Of(kind, object);
+    t.AddChar(' ');
+    AddHandle(t, kind, object);
+    scope.Start(callback, object, ordinal, Table(), ReplayThunkVtable(callback));
 }
 
 void ImportObject(ReplayText& t, unsigned kind, const void* p)
@@ -508,6 +542,18 @@ void ImportResultPending(ReplayText& t)
     t.Add(" = ?");
 }
 
+void ImportArgv(ReplayText& t, const CommandArgs* args)
+{
+    t.AddChar(' ');
+    ReplayAddArgs(t, args);
+}
+
+void FinishNested(ReplayText& line)
+{
+    s_nested.AddText(line);
+    line.Free();
+}
+
 void FinishImport(ReplayText& line)
 {
     s_call.AddText(line);
@@ -524,6 +570,51 @@ namespace {
 void AddSpace(ReplayText& t)
 {
     t.AddChar(' ');
+}
+
+void AddSnapshot(ReplayText& t, const void* buffer, unsigned bytes)
+{
+    t.Add(" = ");
+    if (buffer == nullptr) {
+        t.Add("null");
+        return;
+    }
+    t.Add("snapshot#");
+    t.AddUnsigned(s_snapshots.Add(buffer, bytes));
+}
+
+void AddAllocName(ReplayText& t, const void* p)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    if (Table().Find(ROK_ALLOC, p) != 0) {
+        ReplayAddObjectName(t, Table(), ROK_ALLOC, p, false);
+        return;
+    }
+    for (unsigned i = 0; i < kReplayAllocTagCount; i++) {
+        if (Table().Find(kReplayAllocTags[i].kind, p) != 0) {
+            ReplayAddObjectName(t, Table(), kReplayAllocTags[i].kind, p, false);
+            return;
+        }
+    }
+    t.Add("alloc#?");
+}
+
+void AddAlloc(ReplayText& t, const void* p, const char* tag)
+{
+    t.Add(" = ");
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    unsigned kind = ROK_ALLOC;
+    for (unsigned i = 0; tag != nullptr && i < kReplayAllocTagCount; i++) {
+        if (strcmp(kReplayAllocTags[i].tag, tag) == 0)
+            kind = kReplayAllocTags[i].kind;
+    }
+    ReplayAddObjectName(t, Table(), kind, p, true);
 }
 
 void AddResult(ReplayText& t, const ReplayArg& r)
@@ -563,6 +654,7 @@ int ReplayConfigure(const char* value, char* error, int size)
         _snprintf(error, size, ": needs a first tick of at least 1 and a last tick not before it");
         return 0;
     }
+    ReplayEndHook() = ReplayImportEnd;
     s_rec[sub] = new Recording();
     s_rec[sub]->windowed = fields == 3;
     s_rec[sub]->first = first;
@@ -582,9 +674,13 @@ void ReplayInstall()
         HookSeams(on);
 }
 
-int ReplayWrite()
+int ReplayWrite(char* error, int size)
 {
     int ok = 1;
+    if (ReplayFailure() != nullptr) {
+        _snprintf(error, size, "%s", ReplayFailure());
+        return 0;
+    }
     for (unsigned i = 0; i < SUB_COUNT; i++) {
         if (s_rec[i] == nullptr)
             continue;

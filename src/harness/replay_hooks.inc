@@ -152,7 +152,15 @@ void __stdcall RecWindMeteorsCmdMeteor(CommandArgs* a0)
     if (scope.Open()) {
         ArgArgv(s_call, a0);
     }
+    ReplayText line;
+    if (scope.Nested()) {
+        line.Add("\n    c wind_meteors.CmdMeteor");
+        ImportArgv(line, a0);
+    }
     s_inner_wind_meteors->CmdMeteor(a0);
+    if (scope.Nested()) {
+        FinishNested(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -1510,7 +1518,15 @@ void __stdcall RecLosRadarCmdShareMapping(int a0)
     if (scope.Open()) {
         ArgValue(s_call, "unused", a0);
     }
+    ReplayText line;
+    if (scope.Nested()) {
+        line.Add("\n    c los_radar.CmdShareMapping");
+        ImportValue(line, a0);
+    }
     s_inner_los_radar->CmdShareMapping(a0);
+    if (scope.Nested()) {
+        FinishNested(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -1522,7 +1538,15 @@ void __stdcall RecLosRadarCmdShareRadar(int a0)
     if (scope.Open()) {
         ArgValue(s_call, "unused", a0);
     }
+    ReplayText line;
+    if (scope.Nested()) {
+        line.Add("\n    c los_radar.CmdShareRadar");
+        ImportValue(line, a0);
+    }
     s_inner_los_radar->CmdShareRadar(a0);
+    if (scope.Nested()) {
+        FinishNested(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -1770,9 +1794,10 @@ void __stdcall RecOrdersAiSearchGoalSetWaypoints(AiSearchGoal* a0, Point16* a1, 
 void __stdcall RecOrdersOrderFxAddFlags(OrderFx* a0, int a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
     SlotScope scope(RSL_ORDERS_ORDERFXADDFLAGS, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_ORDERFX, a0);
         ArgValue(s_call, "flags", a1);
     }
     s_inner_orders->OrderFxAddFlags(a0, a1);
@@ -1784,10 +1809,11 @@ void __stdcall RecOrdersAppendOrder(Unit* a0, Order* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
+    roots.Add(ROK_ORDER, a1);
     SlotScope scope(RSL_ORDERS_APPENDORDER, SUB_ORDERS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "owner", ROK_UNIT, a0);
-        ArgPending(s_call, "node");
+        ArgObject(s_call, "node", ROK_ORDER, a1);
     }
     s_inner_orders->AppendOrder(a0, a1);
     if (scope.Open()) {
@@ -1882,9 +1908,10 @@ int __stdcall RecOrdersIssueAttackOrder(Unit* a0, Unit* a1, int a2)
 void __fastcall RecOrdersReattachFxToUnit(Order* a0)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
     SlotScope scope(RSL_ORDERS_REATTACHFXTOUNIT, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "order");
+        ArgObject(s_call, "order", ROK_ORDER, a0);
     }
     s_inner_orders->ReattachFxToUnit(a0);
     if (scope.Open()) {
@@ -1894,10 +1921,11 @@ void __fastcall RecOrdersReattachFxToUnit(Order* a0)
 int __fastcall RecOrdersSerializeOrderToSave(Order* a0, int a1, Unit* a2, HapiBank* a3, char* a4)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
     roots.Add(ROK_UNIT, a2);
     SlotScope scope(RSL_ORDERS_SERIALIZEORDERTOSAVE, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "order");
+        ArgObject(s_call, "order", ROK_ORDER, a0);
         ArgValue(s_call, "unusedEdx", a1);
         ArgObject(s_call, "unit", ROK_UNIT, a2);
         ArgHandle(s_call, "file", OBJ_BANK, a3);
@@ -2081,6 +2109,7 @@ Order* __stdcall RecOrdersLoadOrder(Unit* a0, HapiBank* a1, char* a2)
     }
     Order* result = s_inner_orders->LoadOrder(a0, a1, a2);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ORDER, result, "o");
     }
     return result;
 }
@@ -2113,6 +2142,7 @@ Order* __stdcall RecOrdersNewOrder(MissionType a0, Unit* a1, void* a2, int a3, i
     }
     Order* result = s_inner_orders->NewOrder(a0, a1, a2, a3, a4, a5);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ORDER, result, "o");
     }
     return result;
 }
@@ -2135,9 +2165,10 @@ void __stdcall RecOrdersQueueBuildOrder(char* a0, Unit* a1, int a2)
 int __stdcall RecOrdersOrderFxIsGoal(OrderFx* a0, int a1, int a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
     SlotScope scope(RSL_ORDERS_ORDERFXISGOAL, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_ORDERFX, a0);
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "y", a2);
     }
@@ -2151,9 +2182,10 @@ int __stdcall RecOrdersOrderFxIsGoal(OrderFx* a0, int a1, int a2)
 void __stdcall RecOrdersOrderFxFillGoalCells(OrderFx* a0, std::vector<Point16, std::allocator<Point16> >* a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
     SlotScope scope(RSL_ORDERS_ORDERFXFILLGOALCELLS, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_ORDERFX, a0);
         ArgPending(s_call, "goals");
     }
     s_inner_orders->OrderFxFillGoalCells(a0, a1);
@@ -2164,9 +2196,10 @@ void __stdcall RecOrdersOrderFxFillGoalCells(OrderFx* a0, std::vector<Point16, s
 int __stdcall RecOrdersOrderFxApproxDist(OrderFx* a0, int a1, int a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
     SlotScope scope(RSL_ORDERS_ORDERFXAPPROXDIST, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_ORDERFX, a0);
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "y", a2);
     }
@@ -3076,9 +3109,10 @@ void __stdcall RecUnitsPoseUnitModel(Unit* a0)
 ModelState* __stdcall RecUnitsCreateObjectState(Object3do* a0)
 {
     ReplayRoots roots;
+    roots.Add(ROK_OBJECT3DO, a0);
     SlotScope scope(RSL_UNITS_CREATEOBJECTSTATE, SUB_UNITS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "model");
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
     }
     ModelState* result = s_inner_units->CreateObjectState(a0);
     if (scope.Open()) {
@@ -3559,6 +3593,7 @@ char* __stdcall RecMapGetNameSlot(Mission* a0, int a1)
     }
     char* result = s_inner_map->GetNameSlot(a0, a1);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
     return result;
 }
@@ -3920,6 +3955,7 @@ char* __fastcall RecMapGetCampaignName(Mission* a0)
     }
     char* result = s_inner_map->GetCampaignName(a0);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
     return result;
 }
@@ -3947,6 +3983,7 @@ char* __fastcall RecMapGetMissionName(Mission* a0)
     }
     char* result = s_inner_map->GetMissionName(a0);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
     return result;
 }
@@ -4351,6 +4388,7 @@ char* __stdcall RecFilesGetDriveDirectory(char* a0, char* a1, int a2)
     }
     char* result = s_inner_files->GetDriveDirectory(a0, a1, a2);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
     return result;
 }
@@ -4823,6 +4861,7 @@ char* __stdcall RecFilesBankGetString(HapiBank* a0, char* a1, char* a2)
     }
     char* result = s_inner_files->BankGetString(a0, a1, a2);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
     return result;
 }
@@ -5369,8 +5408,23 @@ bool IsImportOf(unsigned owner, unsigned slot)
     }
 }
 
+bool IsNestedSlot(unsigned slot)
+{
+    switch (slot) {
+    case RSL_WIND_METEORS_CMDMETEOR:
+    case RSL_LOS_RADAR_CMDSHAREMAPPING:
+    case RSL_LOS_RADAR_CMDSHARERADAR:
+        return true;
+    default:
+        return false;
+    }
+}
+
 void HookSeams(const bool* on)
 {
+    bool any = false;
+    for (unsigned i = 0; i < SUB_COUNT; i++)
+        any = any || on[i];
     s_inner_wind_meteors = g_seams.wind_meteors;
     s_rec_wind_meteors = *s_inner_wind_meteors;
     s_inner_economy = g_seams.economy;
@@ -5419,7 +5473,7 @@ void HookSeams(const bool* on)
         s_rec_wind_meteors.SaveMeteors = RecWindMeteorsSaveMeteors;
     if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.LoadMeteors = RecWindMeteorsLoadMeteors;
-    if (on[SUB_WIND_METEORS])
+    if (on[SUB_WIND_METEORS] || any)
         s_rec_wind_meteors.CmdMeteor = RecWindMeteorsCmdMeteor;
     if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.UpdateWindOnStream = RecWindMeteorsUpdateWindOnStream;
@@ -5607,9 +5661,9 @@ void HookSeams(const bool* on)
         s_rec_targeting.ChooseWeapon = RecTargetingChooseWeapon;
     if (on[SUB_LOS_RADAR] || on[SUB_ECONOMY])
         s_rec_los_radar.GetMapCell = RecLosRadarGetMapCell;
-    if (on[SUB_LOS_RADAR])
+    if (on[SUB_LOS_RADAR] || any)
         s_rec_los_radar.CmdShareMapping = RecLosRadarCmdShareMapping;
-    if (on[SUB_LOS_RADAR])
+    if (on[SUB_LOS_RADAR] || any)
         s_rec_los_radar.CmdShareRadar = RecLosRadarCmdShareRadar;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.ClampWorldPosToTerrain = RecLosRadarClampWorldPosToTerrain;

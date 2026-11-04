@@ -43,6 +43,7 @@ call and has no line of its own. The lines of a call, indented by two spaces, in
 | `r <field> <value>` | a field of the slot's read set that differs from the last known value of that field |
 | `a <name> <value>` | an argument of the slot that is not in the block (`params.radius`, `bank`, `args[0]`, `stream`, a scalar, `player`) |
 | `i <import> <arguments> = <result>` | one import call, in call order; its index is its position among the `i` lines of the call |
+| `c <handle>#<n>.<Method> <arguments> [= <result>]` | indented by four spaces, right after an `i` line and before its `o` lines: one call the import made on a callback object it was given, in call order (see Callbacks) |
 | `o <name> <value>` | right after an `i` line: a value the import wrote through a pointer argument (`o dst "text"`, `o dst x:0102`) or reached through its result (`o weapondef#17.flags 0x00000001`, `o Cell#1.metal 12`) |
 | `w <field> <value>` | a field of the slot's write set that differs from the last known value after the call |
 | `o <name> <value>` | last in the call: a value the slot wrote through its own pointer argument, or `o result <value>` for its result |
@@ -172,6 +173,167 @@ a value kind (`scope: value`, no row of the field sets matches its fields):
 count of the array form is read from the count argument's own line, so the argument must be recorded. A mismatch of a result
 by value is reported at `result`, one of an element at `points[1].y`.
 
+## Polymorphic objects
+
+An object with a vptr is written as the concrete kind it is, chosen by comparing the object's vptr with the vtable of each kind
+the base lists: `ApproachRadius#1`, never `OrderFx#1`, and no vptr or address is ever written. The annotation:
+
+```json
+"OrderFx": {"type": "OrderFx", "scope": "state", "kinds": ["ApproachRadius", "RingApproach", "PathOrder"], "fields": []}
+"ApproachRadius": {"type": "ApproachRadius", "scope": "state", "vtable": "g_approachRadiusVtable", "fields": [...]}
+{"name": "attached", "kind": "ref", "target": "OrderFx", "poly": "OrderFx"}
+{"mode": "object", "kind": "OrderFx", "poly": "OrderFx"}
+```
+
+| Key | On | Meaning |
+|---|---|---|
+| `kinds` | a base kind | the concrete kinds the base may be; the base has no fields of its own, its kinds list theirs (the base part included, `source`) |
+| `vtable` | a concrete kind | the global the vptr points at (`extern VirtualFunction const g_approachRadiusVtable[12]` in `src/data/vtables.cpp`); the tool declares it in the schema and `static_assert`s that the type is polymorphic and derives from the base |
+| `poly` | a `ref` field, an object argument or result | names the base the pointer is typed as; it has to be the `target` or `kind`. A pointer to a base without `poly` is an error |
+
+The numbering is per concrete kind, in order of first appearance, as for any state kind. An example of the lines a call holds:
+
+```
+  r Order#1.attached ApproachRadius#1
+  r Order#2.attached RingApproach#1
+  r ApproachRadius#1.radius 40
+  r ApproachRadius#1.source Order#1
+  r RingApproach#1.inner 10
+```
+
+The fields of the object are those of its concrete kind. The replayer allocates `Kind#N` when a line first names it and stores its
+own vtable for that kind as the vptr (the vtable global of the replayer's link, which holds the module sources), so a vtable is
+never replayed as bytes; a `ref` accepts any kind of the base it is typed as. A vptr that matches none of the listed kinds is
+an error: the recorder writes `OrderFx#?`, and the run ends with `cannot write a replay file: an OrderFx has a vtable that is none of
+its kinds` (naming the symbol, `g_pathOrderVtable`, when the vptr is the vtable of another kind of the schema). Only a vtable that is
+a global of the sources can be a kind's vtable. A vtable the compiler emits from a class has no name to compare with.
+
+### Code pointers
+
+A field of kind `code` holds a pointer to a function that is not a vtable. It is written `<table>[<index>]`, the index of the
+function in the named table, or `null`. The tables are the `code_tables` annotation:
+
+```json
+"code_tables": {"orderNotify": {"entries": ["ReadyOrder", "StandbyOrder", ...], "headers": ["src/orders/unit_orders.h", ...],
+                                "fill": "orders.RegisterAllOrderTypes"}}
+{"name": "notify", "kind": "code", "table": "orderNotify"}
+```
+
+```
+  r OrderTableEntry#1.notify orderNotify[44]
+```
+
+`entries` are functions in the order of the table (the `notify` pointers `RegisterAllOrderTypes` copies into `g_missionOrderTableVec`,
+in the order it registers them), each declared in one of the `headers`, which have to be `includes` of the schema. The tool writes the
+table as `(const void*)StopOrder` addresses into the schema header, so the recorder finds the index of the game's function and
+the replayer, linking its own functions, stores its own address for the index. `fill` is the slot (`seam.Slot`) that fills the game's
+table, for the subsystem that owns it. A function that is in none of the entries is an error that names the table (the recorder
+writes `orderNotify[?]`), and an index past the table is refused by the replayer. `GroundPickupOrder` is not an entry, because
+no header declares it with the type its definition has.
+
+## Callbacks
+
+Some imports call back into the recorded subsystem while they run: `map.VisitObjectsInRange` calls `visitor->Visit(unit)` for each
+unit it finds, and the scan visitors of the victory conditions return a result. Each call the import made on the object it was
+given is a `c` line right after the import's `i` line and before its `o` lines, indented as the `i` line plus two spaces, in call order:
+
+```
+  i map.VisitObjectsInRange (100,200) 300 visitor#1
+    c visitor#1.Visit Unit#3
+    c visitor#1.Visit Unit#9
+  i fixture.Scan scanner#1 = 0
+    c scanner#1.VisitUnit Unit#3 = 1
+    c scanner#1.VisitUnit Unit#9 = 0
+```
+
+The object is a handle named by the interface's `handle` and numbered in the outermost call by first use, like `file#1`. The
+arguments and the result are written by the same modes as the arguments of a slot (`scalar`, `text`, `object` and `value`; a result
+is void, a scalar or an object). What a callback writes to the block is not a line of its own, it shows in the `w` lines of the
+outer call, as any write of the module does. The annotation names each interface once, the argument of the import names the
+interface:
+
+```json
+"callbacks": {"UnitScanVisitor": {"header": "src/game/victory_conditions.h", "handle": "scanner",
+              "methods": [{"name": "VisitUnit", "ret": "int", "args": [{"name": "unit", "type": "Unit*", "mode": "object", "kind": "Unit"}]}]}}
+{"mode": "callback", "callback": "UnitVisitor"}
+```
+
+`methods` are the virtual methods of the class in the header, in declaration order (the tool checks the names against the header, and a
+callback interface has no virtual destructor). The tool writes the classes that do the work into `src/harness/replay_callbacks.h`
+and `tests/replay_callbacks.h`. A `callback` argument is allowed on a slot that a subsystem lists in its `imports`, and only there.
+
+The recorder hooks the object's methods for the duration of the import: it points the object's vptr at a class of its own that
+derives from the interface, so each call is recorded and then made on the object's own method, and it puts the vptr back when the
+import returns. The object keeps its address and its identity, so a callback the callee keeps for later (the `Callback` of
+`StartScriptWithArgs`) is the module's own object after the import, and a call it makes later is not part of any import. Two limits end the
+run, naming the call: a callback made inside another callback, and an import made inside a callback, are not recorded, because their
+lines could not be in call order. A callback that frees its own object is put back only when the vptr word still holds the recorder's.
+
+The replayer stub makes the recorded calls in order, on the object the module passed, with the recorded arguments, after it has
+matched the `i` line and before it applies the `o` lines. It compares each result with the recorded one and reports a difference at
+`<import>.c[<k>]` (`import 0 map.VisitObjectsInRange.c[1]: recorded 0, replayed 1`), and a call recorded on another handle than the
+object's at the same place.
+
+## Vectors
+
+A field that is a `BlockVector<T>` (the first, last and end words of the block heap, 16 bytes with its padding) is a field of kind
+`vector`. Its value starts with the length and the capacity in elements, `[<len>/<cap>]`, and an empty vector that has no storage is
+`[0/0]`. The capacity is recorded because the layout of the block heap after later allocations depends on it. The annotation names the
+mode of the elements:
+
+```json
+{"name": "visibleUnits", "kind": "vector", "member": "visible.units", "elem": {"mode": "object", "kind": "Unit"}}
+{"name": "counts", "kind": "vector", "elem": {"mode": "scalar", "type": "short"}}
+{"name": "cells", "kind": "vector", "elem": {"mode": "value", "kind": "KeyedCell"}}
+```
+
+| `elem` | Elements | Lines |
+|---|---|---|
+| `object` with a `kind` | `Ref<T>` to objects of the kind (a polymorphic base is allowed) | `r PlayerAI#1.visibleUnits [2/4] Unit#3,Unit#9`, the handles comma-separated, `null` for a null element, the whole vector at each change |
+| `scalar` with a `type` | the bytes of memory, as for an array | `r PlayerAI#1.counts [3/4] 0:010002000300`; a later call with the same length and capacity is the changed runs, `r PlayerAI#1.counts 1:0900`, and a change of either writes the whole vector again |
+| `value` with a value kind | a struct, a line per field | `r PlayerAI#1.cells [2/2]`, then `r PlayerAI#1.cells[0].pos (3,4)` and `r PlayerAI#1.cells[0].key f32:0x3fc00000` for each field of each element that differs from the last known value |
+
+The tool checks the element type against the C++ `BlockVector<T>` with a `static_assert` in the schema header (`Ref<Unit>`, `short`,
+`KeyedCell`), so a vector of another type is a compile error. A `member` may be a path, as `visible.units` for the vector inside the
+embedded `AiUnitList`. Only the fields of an object are vectors, not the block fields.
+
+The walker reaches the object of every element of an `object` vector through its `Ref`, as it does through a `Ref` field, so the units a
+window holds only in a vector are recorded and restored. For a `value` vector a bracket line whose capacity or length changed is followed by the
+fields of the elements it newly holds, in full, because the recorder cannot know what a new slot held before.
+
+The replayer allocates `cap` elements with `SimAlloc`, which is what `BlockVector` allocates with, stores the three words, and fills the
+elements. A vector of structs whose capacity changes keeps its old elements, as the module's `Insert` does when it moves them. A
+difference is reported at `<field>.length`, `<field>.capacity`, `<field>[<i>]` (the hex of a scalar element or the handle of an object
+element) or `<field>[<i>].<f>` (a field of a struct element), for example `PlayerAI#1.counts.length: recorded 0, replayed 2`.
+
+## Snapshots
+
+Some imports return a buffer that the slot then fills, and the bytes it leaves there are the output that counts: `SimCaptureAlloc(bytes,
+&offset)` hands out a buffer of the capture arena for a radar snapshot. A service whose result is `snapshot` (`"result": "snapshot",
+"bytes": "bytes", "offset": "offset"`, `bytes` naming its int argument and `offset` its skipped out argument) is written with the size
+and a handle, numbered in the outermost call by first use, and the bytes follow at the end of the call:
+
+```
+  i services.SimCaptureAlloc 64 = snapshot#1
+  w Game.timer 0x00000000
+  o snapshot#1 x:0100000002000000...
+```
+
+No line is written for the offset, because it is the replayer's own. After the `w` lines and the closing `o` lines, the call has one
+`o snapshot#<n> x:<bytes>` line per snapshot it allocated, the buffer's bytes as the slot left them, with a long buffer in several
+lines of the same name, in order, of at most 512 bytes (the lines are joined). A null result (the arena was full) is `= null` and has no
+line.
+
+The replayer's answer allocates `bytes` from an arena of its own, zeroed, and returns that pointer and its own offset in `offset`. At
+slot exit it compares each buffer with the recorded bytes and reports a difference at `snapshot#<n>[<byte>]` (recorded and replayed
+byte), at `snapshot#<n>.length` when the sizes differ, and at `snapshot#<n>` when a snapshot was recorded and not allocated, or the
+other way round. The `o snapshot` lines are never the outputs of the import before them. The tool writes the recorder's and the
+replayer's code for a `snapshot` service from its spec; `SimCaptureAlloc` is the one service of the kind, hooked in `sim_radar.cpp`
+with `ReplayImport call(RI_SIM_CAPTURE_ALLOC); call.Int(bytes); call.Ptr(offset);` and `return call.Result(buffer);`. When a module
+links `sim_radar.cpp`, the replayer does not define the function: the answer calls the real one and compares the buffer it returns. The self-test allocates two buffers
+through a function with the signature of `SimCaptureAlloc`, one of 700 bytes, and checks the lines, an equal replay, a changed byte,
+a snapshot the stub did not allocate and a buffer of another size.
+
 ## Fields
 
 Block fields are named as `data/rwsets.csv` names them: `Game.windCounter` for `Game::windCounter`,
@@ -232,6 +394,7 @@ sets). The annotations hold what no header says:
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length) |
 | `weapon` | `WeaponDef*` | `weapondef#17` |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for an import that reads only those (`GetGroundHeight`); with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
+| `callback` | `UnitVisitor*` and the like, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
 | `units` (`dir: out`) | `std::vector<Unit*>*` an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
 
@@ -250,6 +413,86 @@ result and `o` lines are written. From it the tool writes `src/harness/replay_se
 it cannot write is the hook itself, `ReplayImport call(RI_X); call.Int(..)` at the top of each function in the game source:
 those functions are the services themselves, reached by direct calls with no table to wrap, so the hook has to be in the
 function; `replayschema.py --check` fails when a hook's arguments differ from its entry or an entry has no hook.
+
+### Services
+
+Every service is one `i services.<name>` line, written when the function returns, so its pointer arguments show what the function left
+in them. The line carries the arguments by their modes and the result after ` = `:
+
+| Argument `mode` | Written as | Notes |
+|---|---|---|
+| `stream`, `int`, `double`, `text` | `main`, `12`, `f64:0x...`, `"text"` | `text` is up to the first NUL |
+| `handle` (`file`, `rec`, `bank`) | `rec#2` | numbered by first use in the outermost call |
+| `skip` | nothing | an out buffer or `this` that the entry names for its outs and effects |
+| `bytes` (`length`) | `x:0102ff` | the bytes of a buffer, as long as the `length` argument |
+| `textn` (`length`) | `"meteor 1\nmeteor 0"` | a text of that many characters, not NUL-terminated |
+| `ints` (`count`) | `[3,4]` | that many words behind a pointer |
+| `object` (`kind`) | `Gaf#1` | an object of a kind of the schema, named by first appearance in the file |
+| `allocated` | `alloc#3`, `PlayerInfo#1`, `alloc#?` | a block that an earlier alloc returned, `alloc#?` when none did |
+| `commandargs` | `["x","y"]` or `null` | the strings of a `CommandArgs` |
+
+| Result | Written as |
+|---|---|
+| `int`, `double`, `text` | ` = 7`, ` = f64:0x...`, ` = "text"` or ` = null` |
+| `handle` (`kind`) | ` = rec#2` or ` = null` |
+| `object` (`kind`, `ctype`, `reach`) | ` = GafFrame#1`, then `o GafFrame#1.width 64` for each field of the `reach` |
+| `alloc` (`size`, `tag`) | ` = alloc#1`, or ` = PlayerInfo#1` when the annotation `alloc_tags` names the tag |
+| `snapshot` (`bytes`, `offset`) | ` = snapshot#1` (see Snapshots) |
+| `arg` (`param`) | nothing: the function returns the argument (`GetFieldFixed` returns `dst`) |
+
+An out is an `o` line after the import line: `o dest "Armada"` for a text written through a pointer, `o dst 98304` for an int
+(`{"label": "dst", "int": "dst"}`), `o file#1.current rec#1` for a record a file now points at. An entry may also give `pre` lines
+(the replayer builds the formatted text of `FilePrintf` from its own arguments), `effect` lines (the replayer's definition does what
+the function does to its object: `count = 0;` for `InitArgs`), `cast` and `into_size`.
+
+One line per group, from the self-test:
+
+```
+  i services.TdfRecord_FindSubRecord rec#1 "units" = rec#2
+  i services.TdfRecord_GetFieldFixed rec#3 "scale" 5
+  o dst 98304
+  i services.FilePrintf "%d units" "3 units" = 7
+  i services.Translate "key" = "Teksti"
+  i services.ComputeChecksum x:0102ff 3 = 1234567
+  i services.SimAlloc 64 = alloc#1
+  i services.SimAllocTagged "Player Info" 185 = PlayerInfo#1
+  i services.SimFree alloc#1
+  i services.RecordSimEvent 2 1 [3,4] 2
+  i services.FindSlotByDpid 77 = 2
+  i services.GetGafFrame FrameTable#1 2 = GafFrame#1
+  o GafFrame#1.width 64
+```
+
+The services of the files and data group are `FilePrintf` (the format and the formatted text) and the TDF calls that the subsystems make on records
+and files; the commands group is `Translate`, `CommandArgs::InitArgs` and `ComputeChecksum`; sim plumbing is `SimAlloc`, `SimAllocTagged` (the size
+and the tag are compared), `SimFree`, `RecordSimEvent` (kind, flags, args and count), `SimCaptureAlloc` and the slot lookups `FindSlotByDpid` and
+`GetSlotDpid`; the load reads are `LoadGaf`, `LoadAnimGaf`, `FindGafEntry`, `GetGafFrame`, `GetGafSequenceFrame`, `Load3do`, `LoadObject3d` and
+`GetObjectHeight`, with results that are objects of the load kinds `Gaf`, `FrameTable`, `GafFrame` and `Object3do` and the fields that
+the subsystems read as the `reach`. The `HAPI_*` file calls and the boxes of `HapiBank` are not services: they are slots of the `files` seam
+and an import of the subsystems that call them, recorded as any import is. A hook records only for the thread that opened the slot, so
+the calls of the loading thread or the drawing code that overlap a slot are not its calls.
+
+A service whose definition is in a source that the replayer links (`SimAlloc`, `SimAllocTagged` and `SimFree`, which `block.cpp` defines) is not
+defined by the replayer. The hook in the real function asks `call.Answered()`, which is true only while the replayer runs a slot, and the
+generated answer takes the place of the function: it checks the `i` line the module would have written, makes the real allocation and names the
+block as the recording does (`alloc#1`, or the object of the tag's kind) or, for `SimFree`, lets the real free go on. The replayer's own
+allocations are never answered. A service in a source nothing links keeps the definition the tool writes.
+
+`ExecuteCommandText` is re-entrant. The commands it runs through the slots named `Cmd...` are `c` lines after its `i` line, in call order,
+as the calls of a callback are:
+
+```
+  i services.CommandArgs_GetIntArg 1 0 = 1
+  i services.ExecuteCommandText "meteor 1" 8 ["x"] -1 = 1
+    c wind_meteors.CmdMeteor ["meteor","1"]
+```
+
+The arguments of a nested call are written by the modes of a slot argument and the result follows ` = `. What a nested call writes shows in the
+`w` lines of the outer call. The services a nested call makes are ordinary `i` lines, and they come before the `i` line of
+`ExecuteCommandText`, because that line is written when the function returns; the stub finds its own line among them, makes the nested
+calls through the seam table of the module with the cursor set back over those lines, and reports a result that differs at
+`<import>.c[<k>]`. A command that is not a seam slot is not recorded, a slot import of the nested call is not recorded, and a command run
+inside a nested command fails the recording.
 
 ## Replaying
 
@@ -272,7 +515,10 @@ there. Each file is replayed twice and the two results must be identical.
 through the text form and reports a changed field at its `Kind#N.field`. It then does the same for each form that no
 recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.maxSlope`), the sized arrays (whole lines,
 chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
-struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`). With a
+struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
+`Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
+is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and services (the files, commands, sim plumbing and load reads, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
+second object, with a changed result reported at `import 0 fixture.Scan.c[0]`). With a
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 

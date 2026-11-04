@@ -6,19 +6,23 @@
 #pragma pack(pop)
 
 #include "../../interfaces/services.h"
+#include "../harness/replay.h"
+#include "../harness/replay_services.h"
 #include "../../link/globals.h"
 
 #pragma auto_inline(off)
 // FUNCTION: 0x44fe40
 unsigned char __stdcall FindSlotByDpid(int id)
 {
+    ReplayImport call(RI_FIND_SLOT_BY_DPID);
+    call.Int(id);
     if (id != -1) {
         for (unsigned char i = 0; i < 10; i++) {
             if (GetSlotDpid(i) == id)
-                return i;
+                return (unsigned char)call.Result((int)i);
         }
     }
-    return 10;
+    return (unsigned char)call.Result(10);
 }
 #pragma auto_inline(on)
 
@@ -26,9 +30,11 @@ unsigned char __stdcall FindSlotByDpid(int id)
 // FUNCTION: 0x44ffd0
 int __stdcall GetSlotDpid(unsigned char index)
 {
+    ReplayImport call(RI_GET_SLOT_DPID);
+    call.Int((int)index);
     if (index != 10 && g_game->players[index].type != 0)
-        return g_game->players[index].id;
-    return -1;
+        return call.Result((int)g_game->players[index].id);
+    return call.Result(-1);
 }
 #pragma auto_inline(on)
 

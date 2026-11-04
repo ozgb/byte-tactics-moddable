@@ -1601,8 +1601,13 @@ void HarnessAfterStep()
     else
         sprintf(msg, "testmode: reached tick %u\n", s_ticks);
     host_log(msg);
-    if (!ReplayWrite())
-        Fail("testmode: cannot write a replay file\n");
+    char replayError[300];
+    replayError[0] = '\0';
+    if (!ReplayWrite(replayError, sizeof replayError)) {
+        char text[360];
+        sprintf(text, "testmode: cannot write a replay file%s%s\n", replayError[0] == '\0' ? "" : ": ", replayError);
+        Fail(text);
+    }
     host_exit(0);
 }
 

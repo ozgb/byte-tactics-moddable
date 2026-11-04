@@ -1,6 +1,7 @@
 #include <vector>
 #include "commands.h"
 #include "../harness/replay.h"
+#include "../harness/replay_services.h"
 
 class CommandEntry;
 
@@ -78,6 +79,8 @@ CommandEntry::CommandEntry(const StringRef& h, CommandHandlerInit pp) : handle(h
 // FUNCTION: 0x4b73b0
 CommandArgs* CommandArgs::InitArgs()
 {
+    ReplayImport call(RI_INIT_ARGS);
+    call.Ptr(this);
     count = 0;
     return this;
 }
@@ -319,6 +322,12 @@ int __stdcall FindLineEnd(char* text, int length)
 // FUNCTION: 0x4b7a30
 int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mask)
 {
+    ReplayImport call(RI_EXECUTE_COMMAND_TEXT);
+    call.Ptr(text);
+    call.Int(len);
+    call.Ptr(vars);
+    call.Int(mask);
+    call.Nested();
     int result = 0;
     CommandArgs cmd;
     cmd.InitArgs();
@@ -333,7 +342,7 @@ int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mas
         text = end + 1;
         len -= n + 1;
     }
-    return result;
+    return call.Result(result);
 }
 
 // FUNCTION: 0x4b7ac0

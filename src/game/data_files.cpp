@@ -3,6 +3,7 @@
 
 #include "../util/tdf.h"
 #include "../harness/replay.h"
+#include "../harness/replay_services.h"
 
 #pragma pack(push, 1)
 #include "game.h"
@@ -238,11 +239,13 @@ void* __stdcall LoadGaf(char* path);
 // FUNCTION: 0x429700
 void* __stdcall LoadAnimGaf(char* name)
 {
+    ReplayImport call(RI_LOAD_ANIM_GAF);
+    call.Ptr(name);
     char path[256];
     int i;
     for (i = 0; i < g_game->count_147ab; i++) {
         if (_strcmpi(((AnimFileEntry*)g_game->entries_147af)[i].name, name) == 0) {
-            return ((AnimFileEntry*)g_game->entries_147af)[i].gaf;
+            return call.Result(((AnimFileEntry*)g_game->entries_147af)[i].gaf);
         }
     }
     BuildDataPath(path, "anims", name, "GAF");
@@ -255,7 +258,7 @@ void* __stdcall LoadAnimGaf(char* name)
     strcpy(((AnimFileEntry*)g_game->entries_147af)[g_game->count_147ab].name, name);
     ((AnimFileEntry*)g_game->entries_147af)[g_game->count_147ab].gaf = gaf;
     g_game->count_147ab++;
-    return gaf;
+    return call.Result(gaf);
 }
 
 void* __stdcall FindGafEntry(void* gaf, const char* name);
@@ -493,6 +496,8 @@ void __stdcall MirrorObject(void* data);
 // FUNCTION: 0x42a2c0
 void* __stdcall LoadObject3d(const char* name)
 {
+    ReplayImport call(RI_LOAD_OBJECT_3D);
+    call.Ptr(name);
     char path[256];
     BuildDataPath(path, "objects3d", name, "3DO");
     void* data = Load3do(path);
@@ -501,7 +506,7 @@ void* __stdcall LoadObject3d(const char* name)
     }
     MirrorObject(data);
     BindModelTextures((TexturedModel*)data, name);
-    return data;
+    return call.Result(data);
 }
 
 // FUNCTION: 0x42a320

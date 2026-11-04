@@ -501,9 +501,12 @@ game,harness,call,HarnessInit,1
 game,harness,call,HarnessPhase,1
 game,harness,call,HarnessStartSkirmish,1
 game,harness,call,HarnessStepsPerFrame,1
-game,harness,call,ReplayImport::Int,1
+game,harness,call,ReplayImport::Answered,5
+game,harness,call,ReplayImport::AnsweredPointer,3
+game,harness,call,ReplayImport::Int,5
+game,harness,call,ReplayImport::Ptr,4
 game,harness,call,ReplayImport::Result,1
-game,harness,call,ReplayImport::~ReplayImport,1
+game,harness,call,ReplayImport::~ReplayImport,6
 game,harness,shared_write,Game::difficulty,2
 game,harness,shared_write,Game::endGameFlags,2
 game,harness,shared_write,Game::endGameVictory,2
@@ -697,6 +700,7 @@ game,platform,call,QuitApp,1
 game,platform,call,RandomInt,1
 game,platform,call,RegisterCommands,1
 game,platform,call,RegisterDataArchives,2
+game,platform,call,Result,3
 game,platform,call,SeedRandom,1
 game,platform,call,SetCloseHandler,10
 game,platform,call,SetOutOfMemoryHandler,2
@@ -1274,9 +1278,10 @@ harness,game,call,QuirksFlipFirstSim,1
 harness,game,call,QuirksHash,2
 harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
+harness,game,call,ReplayGateRef,6
 harness,game,call,SaveGameFile,1
 harness,game,call,SimBlockAttach,1
-harness,game,call,SimBlockBase,11
+harness,game,call,SimBlockBase,13
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimOwns,1
 harness,game,shared_write,EconomySeam::UpdateResourceSharing,1
@@ -1364,7 +1369,7 @@ harness,network,shared_write,Game::numPlayers,6
 harness,network,shared_write,LoadingFlags::value,1
 harness,network,shared_write,Player::alliedBy,2
 harness,network,shared_write,Player::progress,2
-harness,orders,call,Add,133
+harness,orders,call,Add,139
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,shared_write,AiSeam::GetFactoriesInRadius,7
@@ -1475,6 +1480,7 @@ harness,platform,call,host_mem_reserve,2
 harness,platform,call,host_mutex_create,1
 harness,platform,call,host_mutex_lock,3
 harness,platform,call,host_mutex_unlock,3
+harness,platform,call,host_thread_id,3
 harness,platform,call,host_time_counter,1
 harness,platform,call,operator new,1
 harness,platform,shared_write,Seams::weapons,2
@@ -2078,7 +2084,6 @@ map,features,shared_write,Cell::unit,1
 map,features,shared_write,Game::net,3
 map,features,shared_write,Point16::x,10
 map,features,shared_write,Point16::y,10
-map,features,shared_write,TdfFile::current,2
 map,features,shared_write,Vec3::x,6
 map,features,shared_write,Vec3::y,5
 map,features,shared_write,Vec3::z,6
@@ -2103,7 +2108,6 @@ map,game,shared_write,Grid::height,1
 map,game,shared_write,Grid::width,1
 map,game,shared_write,Point16::x,1
 map,game,shared_write,Point16::y,1
-map,game,shared_write,TdfFile::current,4
 map,game,shared_write,Unit::flags,4
 map,game,shared_write,Vec3::x,5
 map,game,shared_write,Vec3::y,3
@@ -2112,7 +2116,6 @@ map,harness,call,Visit,1
 map,harness,shared_write,Game::net,1
 map,harness,shared_write,Point16::x,1
 map,harness,shared_write,Point16::y,1
-map,harness,shared_write,TdfFile::current,1
 map,harness,shared_write,Vec3::x,2
 map,harness,shared_write,Vec3::y,1
 map,harness,shared_write,Vec3::z,2
@@ -2129,7 +2132,6 @@ map,los_radar,shared_write,Grid::width,3
 map,los_radar,shared_write,Mission::lavaWorld,1
 map,los_radar,shared_write,Point16::x,4
 map,los_radar,shared_write,Point16::y,4
-map,los_radar,shared_write,TdfFile::current,3
 map,los_radar,shared_write,Unit::flags,6
 map,los_radar,shared_write,Vec3::x,10
 map,los_radar,shared_write,Vec3::y,10
@@ -2182,7 +2184,6 @@ map,platform,call,operator==,5
 map,platform,shared_write,Fixed::value,2
 map,platform,shared_write,Point16::x,8
 map,platform,shared_write,Point16::y,8
-map,platform,shared_write,TdfFile::current,20
 map,platform,shared_write,Vec3::x,22
 map,platform,shared_write,Vec3::y,13
 map,platform,shared_write,Vec3::z,22
@@ -2208,7 +2209,6 @@ map,presentation,shared_write,Mission::killMul,1
 map,presentation,shared_write,Mission::timeMul,1
 map,presentation,shared_write,Point16::x,5
 map,presentation,shared_write,Point16::y,5
-map,presentation,shared_write,TdfFile::current,8
 map,presentation,shared_write,Unit::flags,30
 map,presentation,shared_write,Vec3::x,42
 map,presentation,shared_write,Vec3::y,43
@@ -2234,7 +2234,6 @@ map,units,shared_write,MovementClass::height,2
 map,units,shared_write,MovementClass::width,3
 map,units,shared_write,Point16::x,7
 map,units,shared_write,Point16::y,7
-map,units,shared_write,TdfFile::current,4
 map,units,shared_write,Unit::bit2,4
 map,units,shared_write,Unit::cargoNext,2
 map,units,shared_write,Unit::flags,20
@@ -2251,7 +2250,6 @@ map,weapons,shared_write,Mission::lavaWorld,2
 map,weapons,shared_write,Mission::noSeaLevelTrigger,5
 map,weapons,shared_write,Point16::x,1
 map,weapons,shared_write,Point16::y,1
-map,weapons,shared_write,TdfFile::current,1
 map,weapons,shared_write,Unit::flags,6
 map,weapons,shared_write,Vec3::x,27
 map,weapons,shared_write,Vec3::y,27
@@ -2262,7 +2260,6 @@ map,wind_meteors,indirect,MeteorParams::LoadMeteorDefaults,1
 map,wind_meteors,indirect,SetMeteorParams,1
 map,wind_meteors,shared_write,Point16::x,5
 map,wind_meteors,shared_write,Point16::y,5
-map,wind_meteors,shared_write,TdfFile::current,1
 map,wind_meteors,shared_write,Vec3::x,1
 map,wind_meteors,shared_write,Vec3::y,1
 map,wind_meteors,shared_write,Vec3::z,1
@@ -2970,7 +2967,6 @@ platform,features,indirect,CmdFeature,1
 platform,features,shared_write,Fixed::whole,2
 platform,features,shared_write,Point16::x,10
 platform,features,shared_write,Point16::y,10
-platform,features,shared_write,TdfFile::current,2
 platform,features,shared_write,Vec3::x,6
 platform,features,shared_write,Vec3::y,5
 platform,features,shared_write,Vec3::z,6
@@ -3087,7 +3083,6 @@ platform,game,shared_write,Game::data_148eb,1
 platform,game,shared_write,Point16::x,1
 platform,game,shared_write,Point16::y,1
 platform,game,shared_write,Seams::wind_meteors,5
-platform,game,shared_write,TdfFile::current,4
 platform,game,shared_write,Vec3::x,5
 platform,game,shared_write,Vec3::y,3
 platform,game,shared_write,Vec3::z,5
@@ -3095,15 +3090,14 @@ platform,game,shared_write,WindMeteorsSeam::UpdateMeteors,1
 platform,game,shared_write,WindMeteorsSeam::UpdateWind,1
 platform,game,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 platform,harness,call,ReplayImport::Dbl,1
-platform,harness,call,ReplayImport::Int,4
-platform,harness,call,ReplayImport::Ptr,9
-platform,harness,call,ReplayImport::Result,7
-platform,harness,call,ReplayImport::~ReplayImport,11
+platform,harness,call,ReplayImport::Int,13
+platform,harness,call,ReplayImport::Nested,1
+platform,harness,call,ReplayImport::Ptr,29
+platform,harness,call,ReplayImport::Result,14
+platform,harness,call,ReplayImport::~ReplayImport,33
 platform,harness,shared_write,Point16::x,1
 platform,harness,shared_write,Point16::y,1
 platform,harness,shared_write,Seams::wind_meteors,1
-platform,harness,shared_write,TdfFile::current,1
-platform,harness,shared_write,TdfFile::root,1
 platform,harness,shared_write,Vec3::x,2
 platform,harness,shared_write,Vec3::y,1
 platform,harness,shared_write,Vec3::z,2
@@ -3120,7 +3114,6 @@ platform,los_radar,shared_write,Game::loadProgress,1
 platform,los_radar,shared_write,Game::losTable,8
 platform,los_radar,shared_write,Point16::x,4
 platform,los_radar,shared_write,Point16::y,4
-platform,los_radar,shared_write,TdfFile::current,3
 platform,los_radar,shared_write,Vec3::x,10
 platform,los_radar,shared_write,Vec3::y,10
 platform,los_radar,shared_write,Vec3::z,10
@@ -3130,7 +3123,6 @@ platform,map,shared_write,Point16::x,12
 platform,map,shared_write,Point16::y,12
 platform,map,shared_write,Seams::wind_meteors,1
 platform,map,shared_write,StringRef::data,1
-platform,map,shared_write,TdfFile::current,3
 platform,map,shared_write,Vec3::x,12
 platform,map,shared_write,Vec3::y,4
 platform,map,shared_write,Vec3::z,12
@@ -3207,8 +3199,6 @@ platform,presentation,shared_write,Fixed::whole,7
 platform,presentation,shared_write,Point16::x,5
 platform,presentation,shared_write,Point16::y,5
 platform,presentation,shared_write,StringRef::data,5
-platform,presentation,shared_write,TdfFile::current,8
-platform,presentation,shared_write,TdfFile::root,1
 platform,presentation,shared_write,Vec3::x,42
 platform,presentation,shared_write,Vec3::y,43
 platform,presentation,shared_write,Vec3::z,41
@@ -3231,7 +3221,6 @@ platform,units,shared_write,Fixed::whole,1
 platform,units,shared_write,Point16::x,7
 platform,units,shared_write,Point16::y,7
 platform,units,shared_write,StringRef::data,4
-platform,units,shared_write,TdfFile::current,4
 platform,units,shared_write,UnitDef::scriptChecksum,1
 platform,units,shared_write,Vec3::x,12
 platform,units,shared_write,Vec3::y,13
@@ -3249,7 +3238,6 @@ platform,weapons,shared_write,ReachPosVec3::z,2
 platform,weapons,shared_write,ReachUnitVec3::x,2
 platform,weapons,shared_write,ReachUnitVec3::z,2
 platform,weapons,shared_write,StringRef::ptr,5
-platform,weapons,shared_write,TdfFile::current,1
 platform,weapons,shared_write,Vec3::x,27
 platform,weapons,shared_write,Vec3::y,27
 platform,weapons,shared_write,Vec3::z,28
@@ -3260,7 +3248,6 @@ platform,wind_meteors,indirect,CmdMeteor,1
 platform,wind_meteors,shared_write,Point16::x,5
 platform,wind_meteors,shared_write,Point16::y,5
 platform,wind_meteors,shared_write,Seams::wind_meteors,2
-platform,wind_meteors,shared_write,TdfFile::current,1
 platform,wind_meteors,shared_write,Vec3::x,1
 platform,wind_meteors,shared_write,Vec3::y,1
 platform,wind_meteors,shared_write,Vec3::z,1
@@ -3846,6 +3833,10 @@ presentation,harness,call,HarnessUiGroup,2
 presentation,harness,call,HarnessUiOrder,2
 presentation,harness,call,HarnessUiQueue,1
 presentation,harness,call,HarnessViewRand,19
+presentation,harness,call,ReplayImport::Int,1
+presentation,harness,call,ReplayImport::Ptr,6
+presentation,harness,call,ReplayImport::Result,1
+presentation,harness,call,ReplayImport::~ReplayImport,6
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::endGameVictory,2
 presentation,harness,shared_write,Game::numPlayers,2
@@ -4090,6 +4081,7 @@ presentation,platform,call,RegisterCommands,1
 presentation,platform,call,RegisterDataArchives,7
 presentation,platform,call,ReleaseDirectDraw,1
 presentation,platform,call,RemoveTimer,14
+presentation,platform,call,Result,5
 presentation,platform,call,RotateByAngles,3
 presentation,platform,call,SetDefaultCommandHandler,1
 presentation,platform,call,SetMediaNotifyCallback,1

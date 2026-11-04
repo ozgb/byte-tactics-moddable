@@ -80,6 +80,8 @@ jobs:
   modern-compile:
     name: modern-compile
     runs-on: ubuntu-24.04
+    outputs:
+      run: ${{ steps.changed.outputs.run }}
     env:
       LLVM_VERSION: 22.1.8
       LLVM_SHA256: df0e1ecf16caf3489a272a5eea4eec9b0d82878f6477fa309504f918a0006384
@@ -104,7 +106,7 @@ jobs:
           if [ "$EVENT" != pull_request ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           elif git diff --name-only "origin/$BASE_REF...HEAD" |
-              grep -qE '^(src/|tests/|include/|interfaces/|link/|lib/|cmake/|CMakeLists\.txt$|tools/setup_toolchain\.sh$|tools/sources\.py$|tools/rwsets\.py$|tools/test_rwsets\.py$|data/rwsets\.csv$|tools/hazards\.py$|tools/test_hazards\.py$|data/hazards\.csv$|tools/stateclasses\.py$|tools/test_stateclasses\.py$|tools/blockpointers\.py$|tools/test_blockpointers\.py$|data/block_pointers\.csv$|tools/simalloc\.py$|tools/test_simalloc\.py$|data/simalloc_allow\.csv$|tools/test_trace_coverage\.py$|tools/playtest\.py$|tools/test_playtest_dialogs\.py$|tools/tracediff\.py$|tools/traceschema\.py$|tools/test_traceschema\.py$|tools/tracerehash\.py$|tools/test_tracerehash\.py$|tools/testdata/tracerehash/|data/trace_schema\.json$|tools/test_tracediff\.py$|data/trace_coverage\.csv$|data/state_classes\.csv$|tools/typedupes\.py$|tools/test_typedupes\.py$|data/type_dupes\.csv$|tools/refcheck\.py$|tools/layoutasserts\.py$|tools/test_layoutasserts\.py$|tools/refrewrite\.py$|tools/test_refrewrite\.py$|tools/testdata/refrewrite/|tools/test_refcheck\.py$|data/outside_pointers\.csv$|tools/layoutrefs\.py$|tools/test_layoutrefs\.py$|data/layout_refs\.csv$|tools/seamlink\.py$|tools/test_seamlink\.py$|data/seam_exceptions\.csv$|\.github/workflows/ci\.yml$|tools/coupling\.py$|tools/subsystemsdoc\.py$|tools/test_subsystemsdoc\.py$|docs/subsystems\.md$|tools/abidiff\.py$|tools/test_abidiff\.py$|wasm/modules\.json$|tools/aliases\.py$|tools/test_aliases\.py$|data/initialiser_allow\.csv$|tools/test_coupling\.py$|data/subsystems\.csv$|data/coupling\.csv$|data/hazard_edges\.csv$|data/globals\.csv$|data/game_logic\.csv$|tools/headers\.py$|tools/test_headers\.py$|data/headers_left_out\.csv$|data/headers_no_self_include\.csv$|tools/coverage\.py$|tools/test_coverage\.py$|tools/fullgate\.py$|tools/test_fullgate\.py$|data/coverage\.csv$|tools/coverage_runtime\.sh$|tools/tidy\.py$|tools/test_tidy\.py$|\.clang-tidy$|pyproject\.toml$|uv\.lock$)'; then
+              grep -qE '^(src/|tests/|include/|interfaces/|link/|lib/|cmake/|CMakeLists\.txt$|tools/setup_toolchain\.sh$|tools/sources\.py$|tools/rwsets\.py$|tools/test_rwsets\.py$|data/rwsets\.csv$|tools/hazards\.py$|tools/test_hazards\.py$|data/hazards\.csv$|tools/stateclasses\.py$|tools/test_stateclasses\.py$|tools/blockpointers\.py$|tools/test_blockpointers\.py$|data/block_pointers\.csv$|tools/simalloc\.py$|tools/test_simalloc\.py$|data/simalloc_allow\.csv$|tools/test_trace_coverage\.py$|tools/playtest\.py$|tools/test_playtest_dialogs\.py$|tools/tracediff\.py$|tools/traceschema\.py$|tools/test_traceschema\.py$|tools/tracerehash\.py$|tools/test_tracerehash\.py$|tools/testdata/tracerehash/|data/trace_schema\.json$|tools/test_tracediff\.py$|data/trace_coverage\.csv$|data/state_classes\.csv$|tools/typedupes\.py$|tools/test_typedupes\.py$|data/type_dupes\.csv$|tools/refcheck\.py$|tools/layoutasserts\.py$|tools/test_layoutasserts\.py$|tools/refrewrite\.py$|tools/test_refrewrite\.py$|tools/testdata/refrewrite/|tools/test_refcheck\.py$|data/outside_pointers\.csv$|tools/layoutrefs\.py$|tools/test_layoutrefs\.py$|data/layout_refs\.csv$|tools/seamlink\.py$|tools/test_seamlink\.py$|data/seam_exceptions\.csv$|\.github/workflows/ci\.yml$|tools/coupling\.py$|tools/subsystemsdoc\.py$|tools/test_subsystemsdoc\.py$|docs/subsystems\.md$|tools/abidiff\.py$|tools/test_abidiff\.py$|wasm/modules\.json$|tools/aliases\.py$|tools/test_aliases\.py$|data/initialiser_allow\.csv$|tools/test_coupling\.py$|data/subsystems\.csv$|data/coupling\.csv$|data/hazard_edges\.csv$|data/globals\.csv$|data/game_logic\.csv$|tools/headers\.py$|tools/test_headers\.py$|data/headers_left_out\.csv$|data/headers_no_self_include\.csv$|tools/coverage\.py$|tools/test_coverage\.py$|tools/fullgate\.py$|tools/test_fullgate\.py$|data/coverage\.csv$|tools/coverage_runtime\.sh$|tools/ci_replays\.sh$|tools/tidy\.py$|tools/test_tidy\.py$|\.clang-tidy$|pyproject\.toml$|uv\.lock$)'; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -180,34 +182,27 @@ jobs:
           WINEDEBUG: -all
           WINEPREFIX: ${{ runner.temp }}/wineprefix
         run: |
-          set -o pipefail
           sudo dpkg --add-architecture i386
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends wine wine32:i386
-          for t in block_test ref_test replay_test; do
-            wine "build/modern/$t.exe" | tee "$RUNNER_TEMP/$t.log"
-            grep -q "^$t: all passed" "$RUNNER_TEMP/$t.log"
-          done
-          wine build/modern/replay_native_test.exe tests/replay/wind_meteors/*.txt | tee "$RUNNER_TEMP/replay_native.log"
-          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_native.log"
-          wine build/modern/replay_native_test.exe tests/replay/economy/*.txt | tee "$RUNNER_TEMP/replay_economy.log"
-          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_economy.log"
-          wine build/modern/replay_native_test.exe tests/replay/targeting/*.txt | tee "$RUNNER_TEMP/replay_targeting.log"
-          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_targeting.log"
-          wine build/modern/replay_native_test.exe --self-test tests/replay/wind_meteors/meteors-hailstorm.txt | tee "$RUNNER_TEMP/replay_self.log"
-          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_self.log"
-          wine build/modern/replay_inject_test.exe --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/wind_meteors/meteors-hailstorm.txt | tee "$RUNNER_TEMP/replay_inject.log"
-          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_inject.log"
-          wine build/modern/replay_inject_test.exe --expect 5501 Player#0.energy tests/replay/economy/duel-shore-to-shore.txt | tee "$RUNNER_TEMP/replay_economy_inject.log"
-          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_economy_inject.log"
-          wine build/modern/replay_inject_test.exe --expect 352 pos.x tests/replay/targeting/skirmish4-long.txt | tee "$RUNNER_TEMP/replay_targeting_inject.log"
-          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_targeting_inject.log"
-          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm tests/replay/wind_meteors/*.txt | tee "$RUNNER_TEMP/replay_wasm.log"
-          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_wasm.log"
-          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm --self-test tests/replay/wind_meteors/meteors-hailstorm.txt | tee "$RUNNER_TEMP/replay_wasm_self.log"
-          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_wasm_self.log"
-          wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors_inject.wasm --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/wind_meteors/meteors-hailstorm.txt | tee "$RUNNER_TEMP/replay_wasm_inject.log"
-          grep -q "^replay_native_test: all passed" "$RUNNER_TEMP/replay_wasm_inject.log"
+          tools/ci_replays.sh build/modern wine
+
+      - name: Upload the replay binaries
+        if: steps.changed.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: replay-binaries
+          if-no-files-found: error
+          path: |
+            build/modern/block_test.exe
+            build/modern/ref_test.exe
+            build/modern/replay_test.exe
+            build/modern/replay_native_test.exe
+            build/modern/replay_inject_test.exe
+            build/modern/wind_meteors.wasm
+            build/modern/wind_meteors_inject.wasm
+            build/modern/wasmtime_host.dll
+            build/modern/modules.json
 
       - name: Check data/rwsets.csv is current
         if: steps.changed.outputs.run == 'true'
@@ -311,6 +306,35 @@ jobs:
           uv run tools/coupling.py --check
           uv run tools/test_subsystemsdoc.py
           uv run tools/subsystemsdoc.py --check
+
+  replay-hosts:
+    name: replay-hosts (${{ matrix.os }})
+    needs: modern-compile
+    if: needs.modern-compile.outputs.run == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, windows-11-arm]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log the CPU
+        shell: pwsh
+        run: |
+          Write-Output "PROCESSOR_IDENTIFIER=$env:PROCESSOR_IDENTIFIER"
+          (Get-CimInstance Win32_Processor).Name
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: replay-binaries
+          path: replay-binaries
+
+      - name: Replay the recordings
+        run: tools/ci_replays.sh replay-binaries
 
   wasm-modules:
     name: wasm-modules

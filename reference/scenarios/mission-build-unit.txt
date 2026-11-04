@@ -1,0 +1,12 @@
+# Game type 1: Ice Base Baryn on Easy, a finished advanced kbot lab appears beside the human kbot lab, so the victory condition BuildUnitType fires and the run ends at game over.
+game_seed 463
+crt_seed 1463
+view_seed 2463
+game_type 1
+campaign Battle Tactics - Arm Short
+map Ice Base Baryn
+difficulty 0
+ticks 400
+player0.controller human
+player1.controller human
+spawn 10 0 ARMALAB 4240 320

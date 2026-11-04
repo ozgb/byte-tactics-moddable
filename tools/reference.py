@@ -106,6 +106,8 @@ GATE_TIER = (
     "eight-full-moon",
     "hailstorm-los-off",
     "load-midgame",
+    "mission-kill-mobile",
+    "mission-kill-of-type",
     "mission-radius",
     "mission-victory",
     "orders-air",

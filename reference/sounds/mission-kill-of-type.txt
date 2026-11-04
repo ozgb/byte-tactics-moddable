@@ -1,0 +1,4 @@
+bt-sound 1
+0 stop_all - - - - -
+185 play Victory Condition -585 - - -
+186 play Victory Condition -585 - - -

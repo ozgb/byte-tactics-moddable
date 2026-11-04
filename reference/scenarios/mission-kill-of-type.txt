@@ -1,0 +1,12 @@
+# Game type 1: Raid on Vetes on Easy, the second player's units self-destruct, so the victory conditions KillAllOfType and KillUnitType fire and the run ends at game over.
+game_seed 461
+crt_seed 1461
+view_seed 2461
+game_type 1
+campaign Battle Tactics - Arm Short
+map Raid on Vetes
+difficulty 0
+ticks 600
+player0.controller human
+player1.controller human
+order 30 1:all selfdestruct

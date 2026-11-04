@@ -1,0 +1,12 @@
+# Game type 1: Between Two Lakes on Easy, every human unit self-destructs, so the defeat condition AllUnitsKilled fires and the run ends at game over.
+game_seed 467
+crt_seed 1467
+view_seed 2467
+game_type 1
+campaign Battle Tactics - Arm Very Short
+map Between Two Lakes
+difficulty 0
+ticks 600
+player0.controller human
+player1.controller human
+order 30 0:all selfdestruct

@@ -1,0 +1,13 @@
+# Game type 1: Force the Strait on Easy, a second human transport ship appears short of the line and is ordered across it, so the victory condition UnitTypePassesX fires and the run ends at game over.
+game_seed 466
+crt_seed 1466
+view_seed 2466
+game_type 1
+campaign Battle Tactics - Arm Very Short
+map Force the Strait
+difficulty 0
+ticks 800
+player0.controller human
+player1.controller human
+spawn 2 0 ARMTSHIP 5900 1900
+order 5 0:ARMTSHIP:2 move 6010 1900

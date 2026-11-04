@@ -1,0 +1,13 @@
+# Game type 1: Lightning Recon on Easy, an enemy light kbot appears short of the line and is ordered across it, so the defeat condition AnyUnitPassesX fires and the run ends at game over.
+game_seed 469
+crt_seed 1469
+view_seed 2469
+game_type 1
+campaign Battle Tactics - Core Very Short
+map Lightning Recon
+difficulty 0
+ticks 500
+player0.controller human
+player1.controller human
+spawn 2 1 ARMPW 4300 3800
+order 5 1:ARMPW:1 move 4500 3800

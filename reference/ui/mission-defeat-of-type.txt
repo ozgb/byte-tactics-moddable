@@ -1,0 +1,10 @@
+bt-ui 1
+1 scroll 1088 1040
+1 view 1
+1 select -
+31 view 2
+61 view 3
+91 view 4
+121 view 5
+151 view 6
+181 view 7

@@ -1,0 +1,5 @@
+bt-sound 1
+0 stop_all - - - - -
+101 play_file reclaim1.WAV -585 - - -
+499 play Victory Condition -585 - - -
+534 play_file sharmstp.WAV -585 - - -

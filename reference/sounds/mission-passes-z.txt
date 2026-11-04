@@ -1,0 +1,7 @@
+bt-sound 1
+0 stop_all - - - - -
+90 play Victory Condition -585 - - -
+135 play_file kcarmstp.WAV -585 - - -
+202 play lasrfir1 -1585 - - -
+209 play lasrhit2 -1585 - - -
+238 play lasrfir1 -1585 - - -

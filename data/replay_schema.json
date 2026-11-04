@@ -2646,6 +2646,53 @@
       "int": "dst"
      }
     ]
+   },
+   {
+    "name": "Translate",
+    "id": "RI_TRANSLATE",
+    "declaration": "char* __stdcall Translate(const char* key);",
+    "args": [
+     {
+      "mode": "text",
+      "param": "key"
+     }
+    ],
+    "result": "text",
+    "into_size": 1024
+   },
+   {
+    "name": "CommandArgs_InitArgs",
+    "id": "RI_INIT_ARGS",
+    "owner": "CommandArgs",
+    "declaration": "CommandArgs* InitArgs();",
+    "args": [
+     {
+      "mode": "skip",
+      "param": "this"
+     }
+    ],
+    "result": "arg",
+    "param": "this",
+    "effect": [
+     "count = 0;"
+    ]
+   },
+   {
+    "name": "ComputeChecksum",
+    "id": "RI_COMPUTE_CHECKSUM",
+    "declaration": "int __stdcall ComputeChecksum(unsigned char* data, int len);",
+    "args": [
+     {
+      "mode": "bytes",
+      "param": "data",
+      "length": "len"
+     },
+     {
+      "mode": "int",
+      "param": "len"
+     }
+    ],
+    "result": "int"
    }
   ],
   "code_tables": {

@@ -29,6 +29,9 @@ enum ReplayImportId {
     RI_TDF_GET_RECORD_NAME,
     RI_TDF_FIND_FIELD_VALUE,
     RI_TDF_GET_FIELD_FIXED,
+    RI_TRANSLATE,
+    RI_INIT_ARGS,
+    RI_COMPUTE_CHECKSUM,
     RI_COUNT
 };
 
@@ -59,6 +62,9 @@ static const char* const kReplayImportNames[RI_COUNT] = {
     "services.TdfRecord_GetRecordName",
     "services.TdfRecord_FindFieldValue",
     "services.TdfRecord_GetFieldFixed",
+    "services.Translate",
+    "services.CommandArgs_InitArgs",
+    "services.ComputeChecksum",
 };
 
 #endif

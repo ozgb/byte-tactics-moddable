@@ -276,6 +276,27 @@ void ReplayImportEnd(ReplayImport& c)
         t.AddInt(*(const int*)a[1].v.p);
         break;
     }
+    case RI_TRANSLATE:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        t.Add(" = ");
+        t.AddString((const char*)c.result.v.p);
+        break;
+    }
+    case RI_INIT_ARGS:
+    {
+        break;
+    }
+    case RI_COMPUTE_CHECKSUM:
+    {
+        AddSpace(t);
+        ReplayBytes(t, a[0].v.p, a[1].v.i);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddResult(t, c.result);
+        break;
+    }
     }
     t.AddChar('\n');
     ReplayCalls() = 1;

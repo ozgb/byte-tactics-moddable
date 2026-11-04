@@ -19,6 +19,9 @@ void __stdcall ShowErrorBox(const char* message, int unused)
 // FUNCTION: 0x4b6ba0
 int __stdcall ComputeChecksum(unsigned char* data, int len)
 {
+    ReplayImport call(RI_COMPUTE_CHECKSUM);
+    call.Ptr(data);
+    call.Int(len);
     unsigned char a = 0, b = 0, c = 0, d = 0;
     for (int i = 0; i < len; i++, data++) {
         a += *data;
@@ -26,7 +29,7 @@ int __stdcall ComputeChecksum(unsigned char* data, int len)
         c += i ^ *data;
         d ^= i + *data;
     }
-    return (d << 24) | (c << 16) | (b << 8) | a;
+    return call.Result((d << 24) | (c << 16) | (b << 8) | a);
 }
 
 // FUNCTION: 0x4b6c30

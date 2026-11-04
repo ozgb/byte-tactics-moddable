@@ -2628,6 +2628,38 @@ void FilesSelfTest()
     free(file);
 }
 
+void CommandsSelfTest()
+{
+    printf("services: commands\n");
+    const char* body =
+        "  i services.Translate \"key\" = \"Teksti\"\n"
+        "  i services.Translate \"gone\" = null\n"
+        "  i services.CommandArgs_InitArgs\n"
+        "  i services.ComputeChecksum x:0102ff 3 = 1234567\n";
+    BeginServices(body);
+    char* text = Translate("key");
+    Check(text != nullptr && strcmp(text, "Teksti") == 0, "a translation replays as the recorded text");
+    Check(Translate("gone") == nullptr, "and a null one as null");
+    CommandArgs* args = (CommandArgs*)calloc(1, sizeof(CommandArgs));
+    args->count = 4;
+    Check(args->InitArgs() == args && args->count == 0, "InitArgs clears the list and returns it");
+    unsigned char data[3] = { 1, 2, 0xff };
+    Check(ComputeChecksum(data, 3) == 1234567, "a checksum is compared on its bytes and replays");
+    Check(g_diffs == 0 && g_importIndex == 4, "and nothing differs");
+    BeginServices(body);
+    Translate("key");
+    Translate("gone");
+    args->InitArgs();
+    data[2] = 0xfe;
+    ComputeChecksum(data, 3);
+    printf("a changed argument: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 3 services.ComputeChecksum") == 0 && strstr(g_detail.Data(), "x:0102fe") != nullptr, "a changed byte is reported at the import");
+    BeginServices(body);
+    Translate("other");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.Translate") == 0, "and so is a changed key");
+    free(args);
+}
+
 typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
 
 unsigned CodeIndex(const char* table, const void* function)
@@ -2822,6 +2854,7 @@ int SelfTest(const char* file)
     VectorSelfTest();
     SnapshotSelfTest();
     FilesSelfTest();
+    CommandsSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

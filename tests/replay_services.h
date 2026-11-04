@@ -358,7 +358,44 @@ int* TdfRecord::GetFieldFixed(int* dst, char* key, int def)
     const char* dstText = OutValue("dst");
     if (dstText != nullptr && dst != nullptr)
         *dst = atoi(dstText);
+    (void)result;
     return dst;
+}
+
+char* __stdcall Translate(const char* key)
+{
+    ReplayText t;
+    StartImport(t, RI_TRANSLATE);
+    Space(t);
+    t.AddString(key);
+    const char* result = Enter(t);
+    static char text[1024];
+    ParseQuoted(result, text, 1024);
+    if (strcmp(result, "null") == 0)
+        return nullptr;
+    return text;
+}
+
+CommandArgs* CommandArgs::InitArgs()
+{
+    ReplayText t;
+    StartImport(t, RI_INIT_ARGS);
+    const char* result = Enter(t);
+    count = 0;
+    (void)result;
+    return this;
+}
+
+int __stdcall ComputeChecksum(unsigned char* data, int len)
+{
+    ReplayText t;
+    StartImport(t, RI_COMPUTE_CHECKSUM);
+    Space(t);
+    AddBytes(t, data, (int)len);
+    Space(t);
+    t.AddInt((int)len);
+    const char* result = Enter(t);
+    return atoi(result);
 }
 
 bool ReplayAnswerImport(ReplayImport& c)

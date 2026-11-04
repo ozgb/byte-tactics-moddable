@@ -1890,6 +1890,7 @@ def service_result_lines(s: dict, ctx: str) -> list[str]:
     elif res == "alloc":
         L += finish("AllocAnswer(result, (unsigned)%s)" % service_param_expr(s, s["size"], ctx), "ptr")
     elif res == "arg":
+        L.append("(void)result;")
         L += finish(service_param_expr(s, s["param"], ctx), "ptr")
     elif ctx == "definition":
         L.append("(void)r;")

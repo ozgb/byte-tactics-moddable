@@ -78,6 +78,8 @@ CommandEntry::CommandEntry(const StringRef& h, CommandHandlerInit pp) : handle(h
 // FUNCTION: 0x4b73b0
 CommandArgs* CommandArgs::InitArgs()
 {
+    ReplayImport call(RI_INIT_ARGS);
+    call.Ptr(this);
     count = 0;
     return this;
 }

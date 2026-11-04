@@ -772,11 +772,13 @@ void __stdcall LoadTranslations(char* filename, char* section)
 // FUNCTION: 0x4c5740
 char* __stdcall Translate(const char* key)
 {
+    ReplayImport call(RI_TRANSLATE);
+    call.Ptr(key);
     if (key == nullptr)
-        return nullptr;
+        return call.Result((char*)0);
     TranslationTable* c = g_translations;
     if (c == nullptr)
-        return (char*)key;
+        return call.Result((char*)key);
 
     TdfField* first = c->v.begin();
     TdfField* last = c->v.end();
@@ -799,8 +801,8 @@ char* __stdcall Translate(const char* key)
         found = nullptr;
     }
     if (found != nullptr)
-        return *found;
-    return (char*)key;
+        return call.Result(*found);
+    return call.Result((char*)key);
 }
 
 // FUNCTION: 0x4c5840

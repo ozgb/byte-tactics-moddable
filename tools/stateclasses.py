@@ -249,6 +249,8 @@ class Field:
     start: int
     end: int = 0
     bits: bool = False
+    bit_low: int = 0
+    bit_high: int = 0
 
 
 def layout_fields(text: str, record: str) -> tuple[int, list[Field]] | None:
@@ -270,7 +272,7 @@ def layout_fields(text: str, record: str) -> tuple[int, list[Field]] | None:
         m = LAYOUT_LINE.match(line)
         if not m:
             break
-        start, low, _, indent, body = m.groups()
+        start, low, high, indent, body = m.groups()
         depth = (len(indent) - 1) // 2
         while stack and stack[-1][0] >= depth:
             stack.pop()
@@ -281,7 +283,8 @@ def layout_fields(text: str, record: str) -> tuple[int, list[Field]] | None:
             continue
         name = body.rsplit(None, 1)[-1]
         type_ = RECORD_KEYWORD.sub("", body[:-len(name)].strip())
-        fields.append(Field(name, type_, int(start), bits=low is not None))
+        fields.append(Field(name, type_, int(start), bits=low is not None,
+                            bit_low=int(low or 0), bit_high=int(high or 0)))
     starts = sorted({f.start for f in fields} | {size})
     for f in fields:
         f.end = next(s for s in starts if s > f.start) if f.start < size else f.start

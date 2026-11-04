@@ -78,6 +78,9 @@ jobs:
       - name: Test the clean-room proxy and canary manifest
         run: python3 tools/test_cleanroom.py
 
+      - name: Test the spec lint
+        run: python3 tools/test_speclint.py
+
       - name: Data notes cite no line numbers
         run: |
           python3 tools/test_citecheck.py

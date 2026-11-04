@@ -796,6 +796,11 @@ class ChooseTier(unittest.TestCase):
         players = {"a": 2, "e1": 8, "e2": 8}
         self.assertEqual(self.choose(lines, ticks, players, eight="e2"), ["e2", "a"])
 
+    def test_the_named_game_is_the_only_one_of_eight_players(self):
+        lines = self.sets(a=(0, 100), e1=(200, 300), e2=(10, 60))
+        players = {"a": 2, "e1": 8, "e2": 8}
+        self.assertEqual(self.choose(lines, {"a": 600, "e1": 600, "e2": 600}, players, eight="e2"), ["e2", "a"])
+
     def test_the_named_game_must_have_eight_players(self):
         lines = self.sets(a=(0, 100), e1=(10, 40))
         with self.assertRaises(SystemExit):

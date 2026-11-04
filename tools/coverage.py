@@ -71,11 +71,11 @@ removed and when the tier changes.
 Choosing the tier. `--choose-tier` reads the per-scenario profiles a coverage run left in build/coverage-run/ (`--runs DIR` names
 another) and plays nothing. Each scenario's profiles are merged and exported (llvm-cov export), and its set is the (file,
 decorated name, line) of every line of a game function that the scenario hit; the full suite's is the union. The cover is
-greedy: it takes the scenario adding the most lines per tick (a scenario counts for at least CHOOSE_FLOOR_TICKS ticks; ties go
-to fewer ticks, then the name), until the best adds fewer than CHOOSE_MIN_NEW_LINES, and then, if no scenario has
+greedy: it takes the scenario adding the most lines per tick (its ticks are the rows of its stored trace; a scenario counts for at
+least CHOOSE_FLOOR_TICKS; ties go to fewer ticks, then the name), until the best adds fewer than CHOOSE_MIN_NEW_LINES, and then, if no scenario has
 CHOOSE_PLAYERS players, takes the one of them adding the most per tick. A scenario that loads a save comes with its saver.
-`--max-ticks N` leaves out every scenario longer than N, and `--eight NAME` takes NAME (an 8-player scenario) first instead of
-leaving the choice to the rule. It prints the chosen scenarios with their players, ticks and new lines, and the lines and
+`--max-ticks N` leaves out every scenario longer than N, and `--eight NAME` takes NAME (an 8-player scenario) first, as the only one of
+its players, instead of leaving the choice to the rule. It prints the chosen scenarios with their players, ticks and new lines, and the lines and
 functions of the cover as a share of the union.
 
 Unstable functions. A row with `functions` and `dead` 0 and a reason starting `unstable:` marks a live function whose
@@ -708,6 +708,16 @@ def scenario_sets(export_json: dict) -> tuple[set[tuple[str, str, int]], set[tup
     return lines, functions
 
 
+def trace_ticks(name: str, scenario: Path) -> int:
+    """The ticks the scenario plays: the rows of its stored trace (a game that ends early stops before its `ticks` line), else its `ticks` value."""
+    trace = reference.TRACES / f"{name}.txt"
+    if trace.is_file():
+        rows = sum(1 for line in trace.read_text().splitlines() if line[:1].isdigit())
+        if rows:
+            return rows
+    return reference.scenario_ticks(scenario)
+
+
 def scenario_players(path: Path) -> int:
     """The number of players a scenario file declares."""
     return len(set(re.findall(r"^player(\d+)\.side", path.read_text(), re.M)))
@@ -715,7 +725,7 @@ def scenario_players(path: Path) -> int:
 
 def choose_tier(lines: dict[str, set], ticks: dict[str, int], players: dict[str, int], savers: dict[str, str],
                 max_ticks: int | None = None, eight: str | None = None) -> list[tuple[str, int]]:
-    """[(scenario, new lines)] in the order the greedy cover takes them: most new lines per tick (at least CHOOSE_FLOOR_TICKS ticks each) until the best adds fewer than CHOOSE_MIN_NEW_LINES, then the best CHOOSE_PLAYERS-player scenario if none is in. `eight` goes first. A saver follows the loader that loads it. No scenario longer than max_ticks."""
+    """[(scenario, new lines)] in the order the greedy cover takes them: most new lines per tick (at least CHOOSE_FLOOR_TICKS ticks each) until the best adds fewer than CHOOSE_MIN_NEW_LINES, then the best CHOOSE_PLAYERS-player scenario if none is in. `eight` goes first and is the only scenario of CHOOSE_PLAYERS players. A saver follows the loader that loads it. No scenario longer than max_ticks."""
     pool = {n for n in lines if max_ticks is None or ticks[n] <= max_ticks}
     if eight is not None:
         if eight not in lines:
@@ -724,6 +734,8 @@ def choose_tier(lines: dict[str, set], ticks: dict[str, int], players: dict[str,
             sys.exit(f"coverage: {eight} has {players[eight]} players, not {CHOOSE_PLAYERS}")
         if eight not in pool:
             sys.exit(f"coverage: {eight} is longer than --max-ticks {max_ticks}")
+    if eight is not None:
+        pool = {n for n in pool if players[n] < CHOOSE_PLAYERS or n == eight}
     covered: set = set()
     chosen: list[tuple[str, int]] = []
 
@@ -763,7 +775,7 @@ def render_tier(chosen: list[tuple[str, int]], lines: dict[str, set], functions:
     got_lines = set().union(*(lines[n] for n in names))
     got_functions = set().union(*(functions[n] for n in names))
     out = [f"{'scenario':<34}{'players':>8}{'ticks':>8}{'new lines':>10}"]
-    out += [f"{n:<34}{players[n]:>8}{ticks[n]:>8}{new[n]:>10}" for n in sorted(names)]
+    out += [f"{n:<34}{players[n]:>8}{ticks[n]:>8}{new[n]:>10}" for n in names]
     out.append(f"{len(names)} scenarios, {sum(ticks[n] for n in names)} of {sum(ticks.values())} ticks")
     out.append(f"lines: {percent(len(got_lines), len(union_lines))} of the full suite's ({len(got_lines)}/{len(union_lines)})")
     out.append(f"functions: {percent(len(got_functions), len(union_functions))} of the full suite's ({len(got_functions)}/{len(union_functions)})")
@@ -790,7 +802,7 @@ def choose_main(exe: Path, runs_dir: Path, max_ticks: int | None, eight: str | N
         sets = dict(zip(names, pool.map(lambda n: scenario_profile(runs_dir / n, exe), names)))
     lines = {n: s[0] for n, s in sets.items()}
     functions = {n: s[1] for n, s in sets.items()}
-    ticks = {n: reference.scenario_ticks(scenarios[n]) for n in names}
+    ticks = {n: trace_ticks(n, scenarios[n]) for n in names}
     players = {n: scenario_players(scenarios[n]) for n in names}
     savers = {n: tracediff.scenario_load(scenarios[n]) for n in names}
     chosen = choose_tier(lines, ticks, players, savers, max_ticks, eight)

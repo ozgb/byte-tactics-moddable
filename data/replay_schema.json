@@ -88,7 +88,12 @@
    "g_seams": "the seam table, not state",
    "g_extTdf": "a constant string passed to an import",
    "DAT_005119b8": "a constant empty string passed to an import",
-   "Game::units": "the unit table: a unit is named by its slot, Unit#N"
+   "Game::units": "the unit table: a unit is named by its slot, Unit#N",
+   "<anon>::meteor": "a bit of the flags of the weapon FindWeaponByName returns, whose flags are recorded as its result",
+   "<anon>::whole": "the whole-number half of the SumFixed local of UpdateMetalExtraction, a stack variable"
+  },
+  "exempt_types": {
+   "SumFixed": "a union on the stack of UpdateMetalExtraction, summed from map cells and not kept"
   },
   "includes": [
    "../game/los_helpers.h",
@@ -693,51 +698,87 @@
     "fields": [
      {
       "name": "energyMake",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::produced"
+      ]
      },
      {
       "name": "energyUse",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::used"
+      ]
      },
      {
       "name": "energyUsePaid",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::demand"
+      ]
      },
      {
       "name": "energyStall",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::backlog"
+      ]
      },
      {
       "name": "energyMakePrev",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::lastProduced"
+      ]
      },
      {
       "name": "energyUsePrev",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::lastUsed"
+      ]
      },
      {
       "name": "metalMake",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::produced"
+      ]
      },
      {
       "name": "metalUse",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::used"
+      ]
      },
      {
       "name": "metalUsePaid",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::demand"
+      ]
      },
      {
       "name": "metalStall",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::backlog"
+      ]
      },
      {
       "name": "metalMakePrev",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::lastProduced"
+      ]
      },
      {
       "name": "metalUsePrev",
-      "kind": "f32"
+      "kind": "f32",
+      "aliases": [
+       "ResourceAccount::lastUsed"
+      ]
      },
      {
       "name": "player",
@@ -3476,7 +3517,7 @@
   {"name": "UnitDef", "type": "UnitDef", "scope": "state", "table": null, "inside": null, "fields": [{"name": "energymake", "kind": "f32"}, {"name": "windgenerator", "kind": "f32"}, {"name": "tidalgenerator", "kind": "f32"}, {"name": "energyuse", "kind": "f32"}, {"name": "metalmake", "kind": "f32"}, {"name": "extractsMetal", "kind": "f32", "aliases": ["UnitDefMetalWindView::extractsMetal"]}, {"name": "cloakcost", "kind": "f32"}, {"name": "cloakcostmoving", "kind": "f32"}, {"name": "energystorage", "kind": "f32"}, {"name": "metalstorage", "kind": "f32"}, {"name": "makesMetal", "kind": "u8"}, {"name": "flags1", "kind": "flags"}, {"name": "range", "kind": "i16"}, {"name": "categories", "kind": "ref", "target": "UnitTypeSet"}, {"name": "weaponCategories0", "kind": "ref", "member": "weaponCategories[0]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "weaponCategories1", "kind": "ref", "member": "weaponCategories[1]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "weaponCategories2", "kind": "ref", "member": "weaponCategories[2]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}]},
   {"name": "weapondef", "type": "WeaponDef", "scope": "index", "table": null, "inside": null, "fields": [{"name": "flags", "kind": "flags", "member": "flags.value", "aliases": ["WeaponDefTargetView::field_111"]}, {"name": "speed", "kind": "i32", "aliases": ["WeaponDefTargetView::radius"]}]},
   {"name": "MeteorParams", "type": "MeteorParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "name", "kind": "string", "size": 32}, {"name": "radius", "kind": "i32"}, {"name": "density", "kind": "f32"}, {"name": "duration", "kind": "f32"}, {"name": "interval", "kind": "f32"}]},
-  {"name": "UnitResources", "type": "UnitResources", "scope": "state", "table": null, "inside": [{"kind": "Unit", "member": "resourceSlot"}], "fields": [{"name": "energyMake", "kind": "f32"}, {"name": "energyUse", "kind": "f32"}, {"name": "energyUsePaid", "kind": "f32"}, {"name": "energyStall", "kind": "f32"}, {"name": "energyMakePrev", "kind": "f32"}, {"name": "energyUsePrev", "kind": "f32"}, {"name": "metalMake", "kind": "f32"}, {"name": "metalUse", "kind": "f32"}, {"name": "metalUsePaid", "kind": "f32"}, {"name": "metalStall", "kind": "f32"}, {"name": "metalMakePrev", "kind": "f32"}, {"name": "metalUsePrev", "kind": "f32"}, {"name": "player", "kind": "ref", "target": "Player"}]},
+  {"name": "UnitResources", "type": "UnitResources", "scope": "state", "table": null, "inside": [{"kind": "Unit", "member": "resourceSlot"}], "fields": [{"name": "energyMake", "kind": "f32", "aliases": ["ResourceAccount::produced"]}, {"name": "energyUse", "kind": "f32", "aliases": ["ResourceAccount::used"]}, {"name": "energyUsePaid", "kind": "f32", "aliases": ["ResourceAccount::demand"]}, {"name": "energyStall", "kind": "f32", "aliases": ["ResourceAccount::backlog"]}, {"name": "energyMakePrev", "kind": "f32", "aliases": ["ResourceAccount::lastProduced"]}, {"name": "energyUsePrev", "kind": "f32", "aliases": ["ResourceAccount::lastUsed"]}, {"name": "metalMake", "kind": "f32", "aliases": ["ResourceAccount::produced"]}, {"name": "metalUse", "kind": "f32", "aliases": ["ResourceAccount::used"]}, {"name": "metalUsePaid", "kind": "f32", "aliases": ["ResourceAccount::demand"]}, {"name": "metalStall", "kind": "f32", "aliases": ["ResourceAccount::backlog"]}, {"name": "metalMakePrev", "kind": "f32", "aliases": ["ResourceAccount::lastProduced"]}, {"name": "metalUsePrev", "kind": "f32", "aliases": ["ResourceAccount::lastUsed"]}, {"name": "player", "kind": "ref", "target": "Player"}]},
   {"name": "PlayerInfo", "type": "PlayerInfo", "scope": "state", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "u8"}, {"name": "flags_97_wide", "kind": "u16", "aliases": ["PlayerInfo::shareMetal", "PlayerInfo::shareEnergy", "PlayerInfo::shareMapping"]}]},
   {"name": "Cell", "type": "Cell", "scope": "state", "table": {"base": "game", "member": "cells", "ref": true, "count": "width*height"}, "inside": null, "fields": [{"name": "metal", "kind": "u8"}]},
   {"name": "CobScript", "type": "CobScript", "scope": "state", "table": null, "inside": null, "fields": []},

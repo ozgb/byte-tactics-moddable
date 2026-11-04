@@ -348,6 +348,170 @@ class TargetingForms(unittest.TestCase):
         self.assertIn("CompareObjectResult(ROK_UNIT, g_result_targeting_FindWeaponTarget);", files[rs.SLOTS_H])
 
 
+class UnannotatedTypes(unittest.TestCase):
+    ROW = row("UpdatePlayerEconomy", "field_read", "OpenHeap::count")
+
+    def pending(self, rows, ann=None):
+        _, errors = build(rows, ann)
+        return [e for e in errors if "pending types" in e]
+
+    def test_a_field_row_on_a_type_that_is_no_kind_is_an_error_naming_the_row(self):
+        errors = self.pending([self.ROW])
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("economy is complete but has pending types", errors[0])
+        self.assertIn("field_read OpenHeap::count", errors[0])
+
+    def test_a_pending_subsystem_is_not_asked(self):
+        assignment = rs.read_assignment()
+        sub, slot = [(m, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting")
+                     for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
+        _, errors = build([row(slot, "field_read", "OpenHeap::count")])
+        self.assertEqual([e for e in errors if "OpenHeap" in e], [])
+
+    def test_an_exempt_type_resolves_it(self):
+        ann = annotations()
+        ann["exempt_types"] = {"OpenHeap": "a local heap of the search"}
+        self.assertEqual(self.pending([self.ROW], ann), [])
+
+    def test_an_exempt_type_needs_a_reason(self):
+        ann = annotations()
+        ann["exempt_types"] = {"OpenHeap": ""}
+        _, errors = build([self.ROW], ann)
+        self.assertTrue(any("exempt_types: OpenHeap needs a reason" in e for e in errors), errors)
+
+    def test_an_exempt_target_resolves_it(self):
+        ann = annotations()
+        ann["exempt"]["OpenHeap::count"] = "a local"
+        self.assertEqual(self.pending([self.ROW], ann), [])
+
+    def test_an_alias_of_a_kind_field_resolves_it(self):
+        ann = annotations()
+        ann["objects"]["Player"]["fields"][0].setdefault("aliases", []).append("OpenHeap::count")
+        self.assertEqual(self.pending([self.ROW], ann), [])
+
+    def test_a_hand_rule_resolves_it(self):
+        ann = annotations()
+        ann["rules"].append({"kind": "field_read", "target": "OpenHeap::count", "rule": "fields", "reads": ["Player.active"], "note": "x"})
+        self.assertEqual(self.pending([self.ROW], ann), [])
+
+    def test_a_type_of_a_kind_is_not_asked(self):
+        self.assertEqual(self.pending([row("UpdatePlayerEconomy", "field_read", "Player::active")]), [])
+
+    def test_a_seam_table_is_not_asked(self):
+        self.assertEqual(self.pending([row("UpdatePlayerEconomy", "field_read", "Seams::units"), row("UpdatePlayerEconomy", "field_read", "UnitsSeam::SetStateBits")]), [])
+
+    def test_a_service_class_the_subsystem_lists_is_not_asked(self):
+        self.assertEqual(self.pending([row("UpdateMeteors", "field_read", "TdfFile::current"), row("UpdateMeteors", "field_read", "CommandArgs::count")]), [])
+        self.assertEqual(len(self.pending([row("UpdatePlayerEconomy", "field_read", "TdfFile::current")])), 1)
+
+
+class PendingList(unittest.TestCase):
+    def test_every_pending_item_is_printed_one_per_line(self):
+        rows = [row("UpdatePlayerEconomy", "field_read", "Cold%d::x" % i) for i in range(9)]
+        _, errors = build(rows)
+        message = [e for e in errors if "pending types" in e][0]
+        lines = message.split("\n")
+        self.assertEqual(len(lines), 10, message)
+        self.assertEqual(sorted(l.strip() for l in lines[1:]), sorted("field_read Cold%d::x" % i for i in range(9)))
+
+
+class IndirectCalls(unittest.TestCase):
+    SEAM = "indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
+    OTHER = "indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
+    OWN = "indirect via void (*)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWindOnStream]"
+    TABLE = "indirect via int (*)(void *, Order *, unsigned int) __attribute__((stdcall)) [OrderTableEntry::notify]"
+    VIRTUAL = "virtual OrderFx::GetType"
+    CONCRETE = ["ApproachRadius::GetType", "RingApproach::GetType", "PathOrder::GetType"]
+
+    def pending(self, rows, ann=None, slot_name="UpdatePlayerEconomy"):
+        model, errors = build(rows, ann)
+        return [e for e in errors if "pending indirect" in e or "through" in e], model["subsystems"]["economy"]["slots"].get(slot_name)
+
+    def economy(self, **changes):
+        ann = annotations()
+        ann["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"].update(changes)
+        return ann
+
+    def test_a_call_through_an_import_is_accounted_for(self):
+        self.assertEqual(self.pending([row("UpdatePlayerEconomy", "indirect_call", self.SEAM)])[0], [])
+
+    def test_a_call_through_a_seam_it_does_not_import_is_an_error(self):
+        errors, _ = self.pending([row("UpdatePlayerEconomy", "indirect_call", self.OTHER)])
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("economy is complete but has pending indirect", errors[0])
+        self.assertIn("ClearWeaponTarget", errors[0])
+
+    def test_a_call_to_a_slot_of_its_own_seam_needs_the_functions_in_the_closure(self):
+        model, errors = build([row("UpdateWind", "indirect_call", self.OWN)])
+        self.assertEqual([e for e in errors if "pending indirect" in e], [])
+        model, errors = build([row("UpdateMeteors", "indirect_call", self.OWN)])
+        self.assertTrue(any("pending indirect" in e and "UpdateWindOnStream" in e for e in errors), errors)
+
+    def test_a_code_pointer_is_an_error(self):
+        errors, _ = self.pending([row("UpdatePlayerEconomy", "indirect_call", self.TABLE)])
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("OrderTableEntry::notify", errors[0])
+
+    def test_a_vtable_dispatch_needs_the_concrete_functions_in_the_closure(self):
+        rows = [row("UpdatePlayerEconomy", "indirect_call", self.VIRTUAL)] + [row(f, "function", "") for f in self.CONCRETE]
+        errors, _ = self.pending(rows)
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("ApproachRadius::GetType", errors[0])
+        ann = self.economy()
+        ann["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]["functions"] += self.CONCRETE
+        self.assertEqual(self.pending(rows, ann)[0], [])
+
+    def test_one_concrete_function_out_of_the_closure_is_still_an_error(self):
+        rows = [row("UpdatePlayerEconomy", "indirect_call", self.VIRTUAL)] + [row(f, "function", "") for f in self.CONCRETE]
+        ann = self.economy()
+        ann["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]["functions"] += self.CONCRETE[:2]
+        errors, _ = self.pending(rows, ann)
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("PathOrder::GetType", errors[0])
+
+    def test_a_dispatch_on_a_class_that_is_no_kind_is_an_error(self):
+        errors, _ = self.pending([row("UpdatePlayerEconomy", "indirect_call", "virtual DirectPlay::Close")])
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("DirectPlay", errors[0])
+
+    def test_through_adds_the_functions_to_the_closure(self):
+        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE), row("StopOrder", "field_write", "Unit::health")]
+        errors, slot = self.pending(rows, self.economy(through={self.TABLE: ["StopOrder"]}))
+        self.assertEqual(errors, [])
+        model, _ = build(rows, self.economy(through={self.TABLE: ["StopOrder"]}))
+        names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
+        self.assertEqual([names[i] for i in model["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]["objectWrites"]], ["Unit.health"])
+
+    def test_through_may_be_named_by_the_field_in_brackets(self):
+        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE), row("StopOrder", "function", "")]
+        self.assertEqual(self.pending(rows, self.economy(through={"OrderTableEntry::notify": ["StopOrder"]}))[0], [])
+
+    def test_the_functions_of_through_are_held_to_the_same_checks(self):
+        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE), row("StopOrder", "function", ""), row("StopOrder", "indirect_call", self.OTHER)]
+        errors, _ = self.pending(rows, self.economy(through={self.TABLE: ["StopOrder"]}))
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("ClearWeaponTarget", errors[0])
+
+    def test_through_with_a_reason_is_a_call_that_does_nothing(self):
+        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE)]
+        self.assertEqual(self.pending(rows, self.economy(through={self.TABLE: {"reason": "the table is empty on the recorded paths"}}))[0], [])
+
+    def test_through_with_nothing_and_no_reason_is_an_error(self):
+        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE)]
+        for entry in ([], {}):
+            errors, _ = self.pending(rows, self.economy(through={self.TABLE: entry}))
+            self.assertTrue(any("through" in e and "reason" in e for e in errors), errors)
+
+    def test_through_that_names_no_function_is_an_error(self):
+        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE)]
+        errors, _ = self.pending(rows, self.economy(through={self.TABLE: ["NoSuchFunction"]}))
+        self.assertTrue(any("NoSuchFunction" in e and "no function" in e for e in errors), errors)
+
+    def test_through_that_matches_no_row_is_an_error(self):
+        errors, _ = self.pending([], self.economy(through={self.TABLE: {"reason": "x"}}))
+        self.assertTrue(any("matches no indirect_call row" in e for e in errors), errors)
+
+
 class Tables(unittest.TestCase):
     """N1: an object of a kind with a table is Kind#index, where the annotation names the table once."""
 

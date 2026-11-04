@@ -217,10 +217,10 @@ bool IsNestedSlot(unsigned slot);
 
 class SlotScope {
 public:
-    SlotScope(unsigned slot, unsigned sub, const ReplayRoots& roots) : role(0)
+    SlotScope(unsigned slot, unsigned sub, const ReplayRoots& roots, bool recorded = true) : role(0)
     {
         if (!s_open) {
-            if (s_rec[sub] == nullptr)
+            if (s_rec[sub] == nullptr || !recorded)
                 return;
             role = 1;
             s_open = true;

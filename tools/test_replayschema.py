@@ -149,11 +149,44 @@ class Unrecorded(unittest.TestCase):
         _, errors = build([], ann)
         self.assertTrue(any("SetMeteorParams has a reason and is recorded" in e for e in errors), errors)
 
-    def test_a_slot_that_is_not_recorded_cannot_be_imported(self):
+    def imported(self):
         ann = annotations()
-        ann["subsystems"]["files"]["slots"].setdefault("BankOpenAccount", {}).update({"record": False, "reason": "#711"})
+        ann["subsystems"]["weapons"]["slots"]["SpawnProjectile"].update({"record": False, "reason": "#711"})
+        return ann
+
+    def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
+        ann = self.imported()
+        files, errors, model = rs.generate(rs.read_rows(), ann)
+        self.assertEqual([e for e in errors if "matches no row" not in e], [])
+        weapons = model["subsystems"]["weapons"]
+        self.assertNotIn("SpawnProjectile", weapons["slots"])
+        kept = weapons["unrecorded"]["SpawnProjectile"]
+        self.assertEqual([a["mode"] for a in kept["args"]], ["weapon", "vec3", "vec3", "scalar"])
+        self.assertEqual((kept["reads"], kept["writes"], kept["functions"]), ([], [], []))
+        hooks = files[rs.HOOKS_H]
+        self.assertIn("RecWeaponsSpawnProjectile", hooks)
+        self.assertIn("SlotScope scope(RSL_WEAPONS_SPAWNPROJECTILE, SUB_WEAPONS, roots, false);", hooks)
+        self.assertIn('line.Add("  i weapons.SpawnProjectile");', hooks)
+        self.assertIn("s_rec_weapons.SpawnProjectile = RecWeaponsSpawnProjectile;", hooks)
+        self.assertNotIn("on[SUB_WEAPONS] ||", hooks.split("s_rec_weapons.SpawnProjectile")[0].rsplit("if (", 1)[1])
+
+    def test_an_imported_slot_that_is_not_recorded_has_no_recording_slot(self):
+        files, _, model = rs.generate(rs.read_rows(), self.imported())
+        spec = model["subsystems"]["weapons"]
+        self.assertNotIn(("weapons", "SpawnProjectile"), model["slot_list"])
+        self.assertEqual(spec["slots"].keys() & {"SpawnProjectile"}, set())
+        schema = files[rs.SCHEMA_H]
+        self.assertIn("RSL_WEAPONS_SPAWNPROJECTILE,", schema)
+        self.assertIn('{ "SpawnProjectile", SUB_WEAPONS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },', schema)
+
+    def test_a_missing_argument_annotation_on_an_imported_unrecorded_slot_is_reported(self):
+        ann = self.unannotated()
+        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "#711"})
         _, errors = build([], ann)
-        self.assertTrue(any("imports files.BankOpenAccount, which is not recorded" in e for e in errors), errors)
+        self.assertEqual([e for e in errors if "pending" in e], [])
+        ann["subsystems"]["economy"]["imports"].append("wind_meteors.SetMeteorParams")
+        _, errors = build([], ann)
+        self.assertTrue(any("wind_meteors is complete but has pending args" in e and "SetMeteorParams(params)" in e for e in errors), errors)
 
 
 class Rules(unittest.TestCase):

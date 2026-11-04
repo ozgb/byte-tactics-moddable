@@ -697,6 +697,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     members = seam_members()
     unknown = sorted(set(ann["subsystems"]) - {m[0] for m in members})
     errors += ["annotations name the unknown subsystem %s" % s for s in unknown]
+    imported_any = {imp for spec in ann["subsystems"].values() for imp in spec.get("imports", [])}
     for sub, struct in members:
         spec = ann["subsystems"].get(sub)
         if spec is None:
@@ -721,15 +722,17 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     errors.append("%s.%s is not recorded and has no `reason`" % (sub, s["name"]))
                 else:
                     unrecorded[s["name"]] = {"reason": note["reason"], "native": note.get("native", s["name"])}
-                    continue
-            functions = functions_of(s, sub, assignment, note)
-            if not functions:
+                    if "%s.%s" % (sub, s["name"]) not in imported_any:
+                        continue
+            skipped = s["name"] in unrecorded
+            functions = [] if skipped else functions_of(s, sub, assignment, note)
+            if not functions and not skipped:
                 pending["functions"].append(s["name"])
             reads, writes = set(), set()
             obj_reads, obj_writes = set(), set()
             draws = False
             all_of = None
-            for name in note.get("reads", []):
+            for name in [] if skipped else note.get("reads", []):
                 if name not in field_index:
                     errors.append("%s.%s: the extra read %s is no block field" % (sub, s["name"], name))
                 else:
@@ -802,12 +805,16 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     pending["args"].append("%s(%s)" % (s["name"], a["name"]))
             if result is not None and result["mode"] == "pending":
                 pending["args"].append("%s result" % s["name"])
-            slots[s["name"]] = {
+            entry = {
                 "conv": s["conv"], "ret": s["ret"], "functions": functions,
                 "reads": [f for f in order if f in reads], "writes": [f for f in order if f in writes],
                 "objectReads": sorted(obj_reads), "objectWrites": sorted(obj_writes), "allOf": all_of,
                 "args": args, "result": result, "native": note.get("native", s["name"]),
             }
+            if skipped:
+                unrecorded[s["name"]].update(entry)
+                continue
+            slots[s["name"]] = entry
             slot_list.append((sub, s["name"]))
             if complete:
                 errors += check_product_counts("%s.%s" % (sub, s["name"]), slots[s["name"]], tables, object_fields)
@@ -843,9 +850,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for sub, spec in subsystems.items():
         for imp in spec["imports"]:
             seam, slot = imp.split(".")
-            if slot in subsystems.get(seam, {}).get("unrecorded", {}):
-                errors.append("%s imports %s, which is not recorded" % (sub, imp))
-            elif slot not in subsystems.get(seam, {}).get("slots", {}):
+            if slot not in subsystems.get(seam, {}).get("slots", {}) and slot not in subsystems.get(seam, {}).get("unrecorded", {}):
                 errors.append("%s imports %s, which is no slot of the %s interface" % (sub, imp, seam))
     return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table,
             "arrays": arrays, "tables": tables, "vectors": vectors, "code_tables": code_tables, "callbacks": callbacks,
@@ -1078,9 +1083,8 @@ def render_schema(ann: dict, model: dict) -> str:
     L += ["", "enum ReplaySubsystemId {"]
     L += ["    SUB_%s," % upper(s) for s in subsystems]
     L += ["    SUB_COUNT", "};", "", "enum ReplaySlotId {"]
-    for sub, spec in subsystems.items():
-        for slot in spec["slots"]:
-            L.append("    RSL_%s_%s," % (upper(sub), upper(slot)))
+    for sub, slot, _ in slot_table(subsystems):
+        L.append("    RSL_%s_%s," % (upper(sub), upper(slot)))
     L += ["    RSL_COUNT", "};", ""]
     for sub, spec in subsystems.items():
         for slot, s in spec["slots"].items():
@@ -1092,16 +1096,15 @@ def render_schema(ann: dict, model: dict) -> str:
                 if names:
                     L.append("static const %s %s%s[] = { %s };" % (kindname, base, tag, ", ".join(str(i) for i in idx)))
     L += ["", "static const ReplaySlotSets kReplaySlots[] = {"]
-    for si, (sub, spec) in enumerate(subsystems.items()):
-        for slot, s in spec["slots"].items():
-            base = "kReplay%s%s" % (re.sub(r"[^A-Za-z0-9]", "", sub.title()), slot)
+    for sub, slot, s in slot_table(subsystems):
+        base = "kReplay%s%s" % (re.sub(r"[^A-Za-z0-9]", "", sub.title()), slot)
 
-            def ref(tag, items):
-                return ("%s%s" % (base, tag) if items else "nullptr", len(items))
-            r, w = ref("Reads", s["reads"]), ref("Writes", s["writes"])
-            ro, wo = ref("ObjReads", s["objectReads"]), ref("ObjWrites", s["objectWrites"])
-            every = "ROK_%s + 1" % upper(s["allOf"]) if s.get("allOf") else "0"
-            L.append('    { "%s", SUB_%s, %s, %d, %s, %d, %s, %d, %s, %d, %s },' % (slot, upper(sub), r[0], r[1], w[0], w[1], ro[0], ro[1], wo[0], wo[1], every))
+        def ref(tag, items):
+            return ("%s%s" % (base, tag) if items else "nullptr", len(items))
+        r, w = ref("Reads", s["reads"]), ref("Writes", s["writes"])
+        ro, wo = ref("ObjReads", s["objectReads"]), ref("ObjWrites", s["objectWrites"])
+        every = "ROK_%s + 1" % upper(s["allOf"]) if s.get("allOf") else "0"
+        L.append('    { "%s", SUB_%s, %s, %d, %s, %d, %s, %d, %s, %d, %s },' % (slot, upper(sub), r[0], r[1], w[0], w[1], ro[0], ro[1], wo[0], wo[1], every))
     L += ["};", "static const unsigned kReplaySlotCount = RSL_COUNT;", "", "static const ReplaySubsystem kReplaySubsystems[] = {"]
     first = 0
     for sub, spec in subsystems.items():
@@ -1110,6 +1113,21 @@ def render_schema(ann: dict, model: dict) -> str:
         first += n
     L += ["};", "static const unsigned kReplaySubsystemCount = SUB_COUNT;", "", "#endif", ""]
     return "\n".join(L)
+
+
+def imported_unrecorded(spec: dict) -> dict:
+    """The unrecorded slots of a subsystem that some subsystem imports: they keep their arguments and result, for the import hook."""
+    return {n: u for n, u in spec.get("unrecorded", {}).items() if "args" in u}
+
+
+def slot_table(subsystems: dict):
+    """Every slot with an id: the recorded slots in order, then the imported unrecorded ones, which no call line names."""
+    for sub, spec in subsystems.items():
+        for slot, s in spec["slots"].items():
+            yield sub, slot, s
+    for sub, spec in subsystems.items():
+        for slot, s in imported_unrecorded(spec).items():
+            yield sub, slot, s
 
 
 def fields_index(fields: list[dict], name: str) -> int:
@@ -1131,9 +1149,8 @@ def render_hooks(ann: dict, model: dict) -> str:
         L.append("const %s* s_inner_%s;" % (spec["struct"], sub))
         L.append("%s s_rec_%s;" % (spec["struct"], sub))
     L.append("")
-    for sub, spec in subsystems.items():
-        for slot, s in spec["slots"].items():
-            L += wrapper(sub, spec, slot, s, objects, sub + "." + slot in imported)
+    for sub, slot, s in slot_table(subsystems):
+        L += wrapper(sub, subsystems[sub], slot, s, objects, sub + "." + slot in imported, slot in subsystems[sub].get("unrecorded", {}))
     L.append("bool IsImportOf(unsigned owner, unsigned slot)")
     L.append("{")
     L.append("    switch (owner) {")
@@ -1160,20 +1177,21 @@ def render_hooks(ann: dict, model: dict) -> str:
     for sub, spec in subsystems.items():
         L.append("    s_inner_%s = g_seams.%s;" % (sub, sub))
         L.append("    s_rec_%s = *s_inner_%s;" % (sub, sub))
-    for sub, spec in subsystems.items():
-        for slot in spec["slots"]:
-            owners = ["on[SUB_%s]" % upper(sub)] + ["on[SUB_%s]" % upper(o) for o in imported.get(sub + "." + slot, [])]
-            if nestable(slot, spec["slots"][slot]):
-                owners.append("any")
-            L.append("    if (%s)" % " || ".join(owners))
-            L.append("        s_rec_%s.%s = Rec%s%s;" % (sub, slot, camel(sub), slot))
+    for sub, slot, s in slot_table(subsystems):
+        spec = subsystems[sub]
+        unrecorded = slot in spec.get("unrecorded", {})
+        owners = ([] if unrecorded else ["on[SUB_%s]" % upper(sub)]) + ["on[SUB_%s]" % upper(o) for o in imported.get(sub + "." + slot, [])]
+        if not unrecorded and nestable(slot, s):
+            owners.append("any")
+        L.append("    if (%s)" % " || ".join(owners))
+        L.append("        s_rec_%s.%s = Rec%s%s;" % (sub, slot, camel(sub), slot))
     for sub in subsystems:
         L.append("    g_seams.%s = &s_rec_%s;" % (sub, sub))
     L += ["}", ""]
     return "\n".join(L)
 
 
-def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: bool) -> list[str]:
+def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: bool, unrecorded: bool = False) -> list[str]:
     params = ", ".join("%s a%d" % (raw_type(s, i), i) for i in range(len(s["args"])))
     call_args = ", ".join("a%d" % i for i in range(len(s["args"])))
     rid = "RSL_%s_%s" % (upper(sub), upper(slot))
@@ -1189,13 +1207,13 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     for i, a in enumerate(s["args"]):
         if a["mode"] == "object":
             L.append("    roots.Add(ROK_%s, a%d);" % (upper(a["kind"]), i))
-    L.append("    SlotScope scope(%s, SUB_%s, roots);" % (rid, upper(sub)))
+    L.append("    SlotScope scope(%s, SUB_%s, roots%s);" % (rid, upper(sub), ", false" if unrecorded else ""))
     L.append("    if (scope.Open()) {")
     for i, a in enumerate(s["args"]):
         L += ["        " + x for x in arg_out(a, i, "a", objects)]
     L.append("    }")
     callback_args = [i for i, a in enumerate(s["args"]) if a["mode"] == "callback"]
-    nest = nestable(slot, s)
+    nest = nestable(slot, s) and not unrecorded
     if is_import or nest:
         for i in callback_args:
             L.append("    ReplayCallbackScope cb%d;" % i)
@@ -1391,7 +1409,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for seam, slots in imports.items():
         spec = subsystems[seam]
         for slot in slots:
-            L += import_stub(seam, slot, spec["slots"][slot])
+            L += import_stub(seam, slot, {**spec["slots"], **imported_unrecorded(spec)}[slot])
     for sub, spec in ready.items():
         L.append("%s g_native_%s = {" % (spec["struct"], sub))
         for slot in (x["name"] for x in parse_interface(sub, spec["struct"])["slots"]):
@@ -1649,6 +1667,8 @@ def json_text(ann: dict, model: dict) -> str:
     subs = []
     for sub, spec in model["subsystems"].items():
         head = {k: v for k, v in spec.items() if k != "slots"}
+        if "unrecorded" in head:
+            head["unrecorded"] = {n: json_slot(u, model) if "args" in u else u for n, u in head["unrecorded"].items()}
         lines = ["  %s: {" % json.dumps(sub), '   "header": ' + compact(head) + ",", '   "slots": {']
         lines.append(",\n".join("    %s: %s" % (json.dumps(n), compact(json_slot(s, model))) for n, s in spec["slots"].items()))
         lines += ["   }", "  }"]
@@ -2240,9 +2260,9 @@ def attach_raw_params(model: dict) -> None:
     for sub, spec in model["subsystems"].items():
         iface = parse_interface(sub, spec["struct"])
         for s in iface["slots"]:
-            if s["name"] in spec.get("unrecorded", {}):
+            slot = {**spec["slots"], **imported_unrecorded(spec)}.get(s["name"])
+            if slot is None:
                 continue
-            slot = spec["slots"][s["name"]]
             slot["rawParams"] = [p["type"] for p in s["params"]]
             slot["params"] = [p["type"] for p in s["params"]]
 

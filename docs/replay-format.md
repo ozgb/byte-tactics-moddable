@@ -423,10 +423,13 @@ subsystem with anything pending is an error.
 A slot annotated `"record": false` with a `"reason"` is classified and left out of the recording. The reason is `load class`
 (type loading and presentation-side init and free, which the full traces already cover) or the issue that will record
 the slot (`#711`). The tool makes no recording slot for it, so the recorder passes a call to it straight to the module and
-writes no line, and it checks nothing of it: not its functions, read and write sets, arguments, untracked targets or rules,
-and a rule that only its functions matched is a rule that matches no row. The generated `unrecorded` entry of the
-subsystem lists each such slot with its reason, and the replayer's native table keeps its `native` symbol in place. The tool
-rejects `"record": false` with no `"reason"`, a `"reason"` on a recorded slot, and an `imports` entry naming an unrecorded slot.
+writes no line, and it skips its functions, read and write sets, untracked targets and rules (a rule that only its
+functions matched is a rule that matches no row). A slot that no subsystem imports skips its arguments too. A slot that
+some subsystem lists in `imports`, another seam's or its own, keeps its `args` and `result` annotations, required and checked
+as for a recorded slot, and still gets its import hook: a call made inside a recorded slot is an `i` line, and a call made
+outside one writes nothing. The generated `unrecorded` entry of the subsystem lists each such slot with its reason, and the
+replayer's native table keeps its `native` symbol in place. The tool rejects `"record": false` with no `"reason"` and a
+`"reason"` on a recorded slot.
 
 `uv run tools/replayschema.py` also writes `src/harness/replay_schema.h` (the tables), `src/harness/replay_hooks.inc` (the
 recording copy of every seam table, its argument hooks and the import hooks) and `tests/replay_slots.h` (the slot

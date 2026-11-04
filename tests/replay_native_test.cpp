@@ -365,7 +365,7 @@ bool RestoreField(const ReplayField& f, const char* value)
     if (f.kind == RK_ARRAY)
         return ReplayApplyArray(ReplayFieldView(f), BlockBase(f), f.name, value, g_known, true, AllocObject);
     g_known.Set(f.name, value);
-    return ReplayRestoreObjectField(ReplayFieldView(f), BlockBase(f), value, g_objects, nullptr);
+    return ReplayRestoreObjectField(ReplayFieldView(f), BlockBase(f), value, g_objects, AllocObject);
 }
 
 const ReplayField* FindField(const char* name)
@@ -1290,30 +1290,46 @@ bool ObjectLineIsCondition(const char* name)
     return f != nullptr && ReplayFieldIsCondition(*f);
 }
 
+void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* object, const unsigned short* set, unsigned count, ReplayText& key, ReplayText& value)
+{
+    for (unsigned i = 0; i < count; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[set[i]];
+        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_UNITID || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
+            continue;
+        if (!ReplayFieldLive(f, object))
+            continue;
+        ReplayObjectFieldKey(key, g_objects, false, kind, object, f);
+        if (f.kind == RK_VECTOR) {
+            ReplayCompareVector(f, object, key.Data(), g_known, g_objects, Diff, HashText);
+            continue;
+        }
+        ReplayFormatObjectField(f, object, g_objects, false, value);
+        HashText(value.Data());
+        const char* known = g_known.Get(key.Data());
+        if (known == nullptr)
+            Diff(key.Data(), "no value", value.Data());
+        else if (strcmp(known, value.Data()) != 0)
+            Diff(key.Data(), known, value.Data());
+    }
+}
+
 void CompareObjects(const ReplaySlotSets* sets)
 {
     ReplayWalk(g_reach, g_objects, false, *sets, g_rootKinds, g_rootObjects, g_rootCount);
     ReplayText key;
     ReplayText value;
-    for (unsigned at = 0; at < g_reach.count; at++) {
-        for (unsigned i = 0; i < sets->objWriteCount; i++) {
-            const ReplayObjectField& f = kReplayObjectFields[sets->objWrites[i]];
-            if (f.object != g_reach.kind[at] || f.kind == RK_EMBED || f.kind == RK_UNITID || !ReplayInReach(g_reach, at, sets->objWrites[i]))
-                continue;
-            if (!ReplayFieldLive(f, g_reach.object[at]))
-                continue;
-            ReplayObjectFieldKey(key, g_objects, false, g_reach.kind[at], g_reach.object[at], f);
-            if (f.kind == RK_VECTOR) {
-                ReplayCompareVector(f, g_reach.object[at], key.Data(), g_known, g_objects, Diff, HashText);
-                continue;
-            }
-            ReplayFormatObjectField(f, g_reach.object[at], g_objects, false, value);
-            HashText(value.Data());
-            const char* known = g_known.Get(key.Data());
-            if (known == nullptr)
-                Diff(key.Data(), "no value", value.Data());
-            else if (strcmp(known, value.Data()) != 0)
-                Diff(key.Data(), known, value.Data());
+    for (unsigned at = 0; at < g_reach.count; at++)
+        CompareObject(&g_reach, at, g_reach.kind[at], g_reach.object[at], sets->objWrites, sets->objWriteCount, key, value);
+    for (unsigned d = 0; d < ReplayDeltaCount(g_reach); d++) {
+        unsigned kind;
+        unsigned char* base;
+        unsigned elements;
+        unsigned stride;
+        if (!ReplayDeltaTable(g_reach, d, &kind, &base, &elements, &stride))
+            continue;
+        for (unsigned e = 0; e < elements; e++) {
+            if (!ReplayInReachObject(g_reach, kind, base + e * stride))
+                CompareObject(nullptr, 0, kind, base + e * stride, sets->objWrites, sets->objWriteCount, key, value);
         }
     }
     key.Free();
@@ -3257,6 +3273,235 @@ void UnnamedPtrSelfTest()
     free(text);
 }
 
+unsigned short FieldIndex(unsigned kind, const char* name)
+{
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        if (kReplayObjectFields[i].object == kind && strcmp(kReplayObjectFields[i].name, name) == 0)
+            return (unsigned short)i;
+    }
+    abort();
+}
+
+void AllOfListSelfTest()
+{
+    printf("a slot with two all-of kinds\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureLane* lanes = (FixtureLane*)SimAlloc(4 * (unsigned)sizeof(FixtureLane));
+    memset((void*)lanes, 0, 4 * sizeof(FixtureLane));
+    g_game->p1cd5 = (SideData*)(void*)lanes;
+    g_game->players[1].id = 11;
+    g_game->players[2].id = 12;
+    lanes[2].level = 9;
+    unsigned short fields[2] = { FieldIndex(ROK_PLAYER, "id"), FieldIndex(ROK_FIXTURELANE, "level") };
+    unsigned char both[2] = { ROK_PLAYER, ROK_FIXTURELANE };
+    ReplaySlotSets sets = { "two", 0, nullptr, 0, nullptr, 0, fields, 2, fields, 2, both, 2 };
+    Recorder recorder;
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* text = strdup(recorder.text.Data());
+    Check(ReplayFailure() == nullptr, "the walk reaches both tables without a failure");
+    Check(strstr(text, "  r Player#2.id 12\n") != nullptr, "every element of the first all-of kind is recorded");
+    Check(strstr(text, "  r FixtureLane#2.level 9\n") != nullptr && CountLines(text, "  r FixtureLane#") == 4, "and every element of the second");
+    ReplaySlotSets first = sets;
+    first.allOfCount = 1;
+    Recorder one;
+    one.Record(nullptr, nullptr, 0, first);
+    Check(strstr(one.text.Data(), "FixtureLane") == nullptr && CountLines(one.text.Data(), "  r Player#") == 10, "a slot with one all-of kind records only that kind");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureLane* rebuilt = (FixtureLane*)g_game->p1cd5.get();
+    Check(rebuilt != nullptr && rebuilt[2].level == 9 && g_game->players[2].id == 12, "both tables are restored");
+    if (rebuilt == nullptr) {
+        free(text);
+        return;
+    }
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the unchanged tables compare equal");
+    rebuilt[2].level = 8;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureLane#2.level") == 0, "a change in the second kind is reported");
+    rebuilt[2].level = 9;
+    g_game->players[1].id = 3;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Player#1.id") == 0, "and one in the first");
+    free(text);
+}
+
+void DeltaTableSelfTest()
+{
+    printf("a table of structs recorded as changed elements\n");
+    ResetBlock();
+    ReplayClearFailure();
+    const unsigned cells = 9000;
+    static_assert(sizeof(FixtureCell) == 14, "the fixture cell is 14 bytes");
+    FixtureCell* table = (FixtureCell*)SimAlloc(cells * (unsigned)sizeof(FixtureCell));
+    memset((void*)table, 0, cells * sizeof(FixtureCell));
+    g_game->p1b8a = (SideData*)(void*)table;
+    Unit* pool = (Unit*)SimAlloc(8 * (unsigned)sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 8;
+    pool[3].health = 12;
+    table[40].unit = 3;
+    table[500].metal = 9;
+    unsigned short fields[5] = { FieldIndex(ROK_FIXTURECELL, "unit"), FieldIndex(ROK_FIXTURECELL, "metal"), FieldIndex(ROK_FIXTURECELL, "flags"), FieldIndex(ROK_FIXTURECELL, "occupant"),
+                                 FieldIndex(ROK_UNIT, "health") };
+    unsigned char every[1] = { ROK_FIXTURECELL };
+    ReplaySlotSets sets = { "delta", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1 };
+    Recorder recorder;
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* first = strdup(recorder.text.Data());
+    Check(ReplayFailure() == nullptr, "a table of more elements than the walk holds is recorded");
+    Check(CountLines(first, "  r FixtureCell#") == 3 * (int)cells, "the first record writes every field of every element");
+    Check(strstr(first, "  r FixtureCell#8999.flags 0\n") != nullptr && strstr(first, "  r FixtureCell#500.metal 9\n") != nullptr, "the last element and a set one are in it");
+    Check(strstr(first, "  r Unit#3.health 12\n") != nullptr && strstr(first, "Unit#0") == nullptr, "the unit that a cell names is reached, and id 0 is not");
+
+    table[12].flags = 258;
+    table[7000].metal = 5;
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* second = strdup(recorder.text.Data());
+    printf("%s", second);
+    Check(strcmp(second, "  r FixtureCell#12.flags 258\n  r FixtureCell#7000.metal 5\n") == 0, "the next record writes only the two changed fields");
+    recorder.Record(nullptr, nullptr, 0, sets);
+    Check(recorder.text.Size() == 0, "and the one after it nothing");
+
+    ResetBlock();
+    RestoreText(first, sets);
+    RestoreText(second, sets);
+    FixtureCell* rebuilt = (FixtureCell*)g_game->p1b8a.get();
+    Check(rebuilt != nullptr && rebuilt[7000].metal == 5 && rebuilt[12].flags == 258 && rebuilt[500].metal == 9 && rebuilt[40].unit == 3, "the table is restored from the first record and the delta");
+    if (rebuilt == nullptr) {
+        free(first);
+        free(second);
+        return;
+    }
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored table compares equal");
+    rebuilt[8999].metal = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureCell#8999.metal") == 0, "a changed element is reported at its index and field");
+    free(first);
+    free(second);
+}
+
+void UnconditionedUnitIdSelfTest()
+{
+    printf("a unit id with no condition\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureLane* lanes = (FixtureLane*)SimAlloc(4 * (unsigned)sizeof(FixtureLane));
+    memset((void*)lanes, 0, 4 * sizeof(FixtureLane));
+    g_game->p1cd5 = (SideData*)(void*)lanes;
+    Unit* pool = (Unit*)SimAlloc(8 * (unsigned)sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 8;
+    pool[5].health = 4;
+    lanes[1].unit = 5;
+    lanes[3].unit = 9;
+    unsigned short fields[4] = { FieldIndex(ROK_FIXTURELANE, "unit"), FieldIndex(ROK_FIXTURELANE, "level"), FieldIndex(ROK_FIXTURELANE, "occupant"), FieldIndex(ROK_UNIT, "health") };
+    unsigned char every[1] = { ROK_FIXTURELANE };
+    ReplaySlotSets sets = { "unit", 0, nullptr, 0, nullptr, 0, fields, 4, fields, 4, every, 1 };
+    Recorder recorder;
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* text = strdup(recorder.text.Data());
+    Check(strstr(text, "  r FixtureLane#1.unit 5\n") != nullptr && strstr(text, "  r Unit#5.health 4\n") != nullptr, "a non-zero id is followed to its unit");
+    Check(strstr(text, "  r FixtureLane#2.unit 0\n") != nullptr && strstr(text, "Unit#0") == nullptr, "an id of 0 is no unit");
+    Check(strstr(text, "Unit#9") == nullptr && ReplayFailure() == nullptr, "an id past the pool is skipped");
+    Check(strstr(text, "occupant") == nullptr, "the id field is never a line");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    Unit* rebuilt = (Unit*)ReplayResolveObject("Unit#5", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->health == 4 && ((FixtureLane*)g_game->p1cd5.get())[1].unit == 5, "the unit and the id are rebuilt");
+    if (rebuilt == nullptr || g_game->p1cd5.get() == nullptr) {
+        free(text);
+        return;
+    }
+    g_game->poolCount = 8;
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the restored lanes compare equal");
+    rebuilt->health = 3;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Unit#5.health") == 0, "the unit behind an id is compared");
+    free(text);
+}
+
+void RecordGameFields(Recorder& recorder, const ReplaySlotSets& sets)
+{
+    ReplayText value;
+    recorder.text.Clear();
+    for (unsigned i = 0; i < sets.readCount; i++) {
+        const ReplayField& f = kReplayFields[sets.reads[i]];
+        ReplayEmitField(recorder.text, recorder.known, *recorder.table, 'r', f.name, ReplayFieldView(f), g_game, value);
+    }
+    value.Free();
+    ReplayWalk(*recorder.reach, *recorder.table, true, sets, nullptr, nullptr, 0);
+    ReplayCaptureObjects(recorder.text, recorder.known, *recorder.table, *recorder.reach, sets.objReads, sets.objReadCount, 'r');
+}
+
+void GameRefSelfTest()
+{
+    printf("a ref field of Game\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureView* view = (FixtureView*)SimAlloc(sizeof(FixtureView));
+    memset((void*)view, 0, sizeof(FixtureView));
+    view->flags = 4;
+    g_game->slowest = (Player*)(void*)view;
+    unsigned char reads[1] = { RF_GAME_SLOWEST };
+    unsigned short objects[1] = { FieldIndex(ROK_FIXTUREVIEW, "flags") };
+    ReplaySlotSets sets = { "ref", 0, reads, 1, reads, 1, objects, 1, objects, 1 };
+    Recorder recorder;
+    RecordGameFields(recorder, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(strcmp(text, "  r Game.slowest FixtureView#1\n  r FixtureView#1.flags 4\n") == 0, "the target is named at first sight, and the walk reaches it");
+
+    view->flags = 6;
+    g_game->slowest = (Player*)nullptr;
+    RecordGameFields(recorder, sets);
+    Check(strcmp(recorder.text.Data(), "  r Game.slowest null\n") == 0, "a null ref is written null, and no object follows");
+
+    ResetBlock();
+    char* line = strchr(text, '\n');
+    *line = '\0';
+    Check(RestoreField(kReplayFields[RF_GAME_SLOWEST], strchr(text + 4, ' ') + 1), "the ref line restores");
+    *line = '\n';
+    RestoreText(line + 1, sets);
+    FixtureView* rebuilt = (FixtureView*)g_game->slowest.get();
+    Check(rebuilt != nullptr && rebuilt->flags == 4, "the replayer allocates the target and restores its fields");
+    if (rebuilt == nullptr) {
+        free(text);
+        return;
+    }
+    ReplayText now;
+    FormatField(kReplayFields[RF_GAME_SLOWEST], now);
+    Check(strcmp(now.Data(), "FixtureView#1") == 0, "the restored ref is written as it was");
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the target compares equal through the Game field");
+    rebuilt->flags = 5;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureView#1.flags") == 0, "a changed field of the target is reported");
+    Check(RestoreField(kReplayFields[RF_GAME_SLOWEST], "null") && g_game->slowest.get() == nullptr, "null restores as null");
+    FormatField(kReplayFields[RF_GAME_SLOWEST], now);
+    Check(strcmp(now.Data(), "null") == 0, "and is written null");
+    now.Free();
+    free(text);
+}
+
 void ExecuteCommandSelfTest()
 {
     printf("services: ExecuteCommandText\n");
@@ -3505,6 +3750,10 @@ int SelfTest(const char* file)
     MaskedViewSelfTest();
     EmbeddedSiteSelfTest();
     UnnamedPtrSelfTest();
+    AllOfListSelfTest();
+    DeltaTableSelfTest();
+    UnconditionedUnitIdSelfTest();
+    GameRefSelfTest();
     ExecuteCommandSelfTest();
     if (file == nullptr)
         return 0;

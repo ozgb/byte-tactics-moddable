@@ -109,8 +109,8 @@ class NamingTest(unittest.TestCase):
             self.assertEqual(code.function(0x401010), "?insert@?$vector@H@std@@QAEXXZ")
             self.assertEqual(code.function(0x401110), "?insert@?$vector@G@std@@QAEXXZ")
         self.assertEqual(added.function(0x400f10), "?insert@?$vector@F@std@@QAEXXZ")
-        namer = bp.Namer(added, [(0x401010, "T"), (0x401110, "T")])
-        self.assertEqual(namer.name("0x00401110", "T"), "?insert@?$vector@G@std@@QAEXXZ: T")
+        namer = bp.Namer(added)
+        self.assertEqual(namer.name("0x00401110", "T"), "?insert@?$vector@G@std@@QAEXXZ: T @0x10")
 
     def test_shared_plain_names_use_the_decorated_name(self):
         lines = [" 0001:00001000       ?Run@@YAXH@Z   0000000000401000   a.obj",
@@ -121,15 +121,26 @@ class NamingTest(unittest.TestCase):
         self.assertEqual(code.function(0x401110), "?Run@@YAXF@Z")
         self.assertEqual(code.function(0x401210), "Once")
 
-    def test_names_and_numbers(self):
-        sites = [(0x401010, ""), (0x401018, ""), (0x401012, "T"), (0x401014, "T"), (0x401030, "")]
-        namer = bp.Namer(self.code, sites)
-        self.assertEqual(namer.name("0x00401010", "-"), "Alias")
-        self.assertEqual(namer.name("0x00401018", "-"), "Alias #2")
-        self.assertEqual(namer.name("0x00401012", "T"), "Alias: T")
-        self.assertEqual(namer.name("0x00401014", "T"), "Alias: T #2")
-        self.assertEqual(namer.name("0x00401030", "-"), "Setup")
+    def test_names_and_offsets(self):
+        namer = bp.Namer(self.code)
+        self.assertEqual(namer.name("0x00401010", "-"), "Alias @0x10")
+        self.assertEqual(namer.name("0x00401018", "-"), "Alias @0x18")
+        self.assertEqual(namer.name("0x00401012", "T"), "Alias: T @0x12")
+        self.assertEqual(namer.name("0x00401030", "-"), "Setup @0x10")
         self.assertEqual(namer.name("0x00000000", "-"), "unknown")
+        self.assertEqual(namer.name("SimGlobals", "-"), "SimGlobals")
+
+    def test_names_do_not_depend_on_the_sites_a_scan_saw(self):
+        def scan(*sites):
+            lines = ["bt-blockptrs 2", "commit\tabc", "every\t1", "ticks\t1"]
+            lines += ["0x%08x\t-\t0x0\t0x00401200\tNAMES\t1\t0x0\t0x0" % s for s in sites]
+            return bp.parse_scan("\n".join(lines) + "\n", "s")
+
+        every = bp.resolve([scan(0x401004, 0x401008, 0x40100c)], self.code, [])
+        without_middle = bp.resolve([scan(0x401004, 0x40100c)], self.code, [])
+        self.assertEqual(without_middle[1].holder, every[2].holder)
+        self.assertEqual(without_middle[0].holder, every[0].holder)
+        self.assertEqual([r.holder for r in every], ["Alias @0x4", "Alias @0x8", "Alias @0xc"])
 
     def test_resolve_simglobals(self):
         members = bp.simglobals_members(LAYOUT)

@@ -23,8 +23,9 @@ every 8th tick and every tick of the last 64, so the list is best made by playin
 the allocation sites with the linker map and merges the results. It accepts version 2 files only.
 
 Names. A site is a return address in the exe. The map (build/modern/TotalA.map) gives the function
-that contains it, and the tag the caller passed adds `: <tag>`. A function with several sites of one
-tag has them numbered `#2`, `#3` in address order. The function is named by its plain name
+that contains it, and the tag the caller passed adds `: <tag>`. The site's offset in the function is
+appended (`VtolFollowOrder @0x1a3`), so a name is the same in every run, whichever other sites the run
+saw. The function is named by its plain name
 (`Class::method`), except a member of a class template and a plain name that two functions in the map
 share, which take their decorated name (`?insert@?$vector@...`), so that a row moves only when its own
 function does. The objects listed in objs/objects.rsp beside the map say which functions are empty
@@ -174,6 +175,11 @@ class CodeMap:
         i = bisect.bisect_right(self.addresses, address - 1) - 1
         return self.names[i] if i >= 0 else "0x%08x" % address
 
+    def start(self, address: int) -> int | None:
+        """The address of the function that contains the instruction before the return address, or None."""
+        i = bisect.bisect_right(self.addresses, address - 1) - 1
+        return self.addresses[i] if i >= 0 else None
+
 
 MAP_LINE = re.compile(r"^\s*0001:[0-9a-f]{8}\s+(\S+)\s+([0-9a-f]{8,16})\s")
 SKIPPED = ("$", "?catch$", "___ehhandler$")
@@ -254,19 +260,10 @@ def load_code_map(map_path: Path) -> CodeMap:
 
 
 class Namer:
-    """Names allocation sites: function (and tag), with repeats of one name numbered in address order."""
+    """Names allocation sites: function (and tag), then `@0x<offset>`, the site's offset in its function."""
 
-    def __init__(self, code: CodeMap, sites):
-        """`sites` is every (address, tag) the names will be asked for."""
+    def __init__(self, code: CodeMap):
         self.code = code
-        self.numbers: dict[tuple[int, str], int] = {}
-        groups: dict[tuple[str, str], list[int]] = {}
-        for address, tag in set(sites):
-            if address:
-                groups.setdefault((code.function(address), tag), []).append(address)
-        for (_, tag), members in groups.items():
-            for n, address in enumerate(sorted(members), 1):
-                self.numbers[(address, tag)] = n
 
     def name(self, site: str, tag: str) -> str:
         """The name of a site given as `0x%08x` (or SimGlobals, which has no tag)."""
@@ -276,19 +273,10 @@ class Namer:
         if address == 0:
             return "unknown"
         text = self.code.function(address)
-        number = self.numbers.get((address, "" if tag == "-" else tag), 1)
         if tag != "-":
             text += ": " + tag
-        return text + (" #%d" % number if number > 1 else "")
-
-
-def site_pairs(scans: list[Scan]):
-    """Every (address, tag) of a holder or target in the scans (the holder SimGlobals excluded)."""
-    for scan in scans:
-        for r in scan.rows:
-            for site, tag in ((r.holder, r.holder_tag), (r.target, r.target_tag)):
-                if site != SIM_GLOBALS:
-                    yield int(site, 16), "" if tag == "-" else tag
+        start = self.code.start(address)
+        return text if start is None else text + " @0x%x" % (address - start)
 
 
 @dataclass
@@ -352,7 +340,7 @@ class Resolved:
 
 def resolve(scans: list[Scan], code: CodeMap, members: list[Member] | None) -> list[Resolved]:
     """Every scanned row with names."""
-    namer = Namer(code, site_pairs(scans))
+    namer = Namer(code)
     out = []
     for scan in scans:
         for r in scan.rows:

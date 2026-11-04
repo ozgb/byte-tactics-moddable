@@ -158,15 +158,27 @@ jobs:
           curl -LsSf "https://astral.sh/uv/$UV_VERSION/install.sh" | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
+      - name: Cache LLVM ${{ env.LLVM_VERSION }}
+        id: llvm-cache
+        if: steps.changed.outputs.run == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/llvm
+          key: llvm-${{ runner.os }}-${{ env.LLVM_VERSION }}-${{ env.LLVM_SHA256 }}
+
       - name: Install LLVM ${{ env.LLVM_VERSION }}
         if: steps.changed.outputs.run == 'true'
+        env:
+          LLVM_CACHE_HIT: ${{ steps.llvm-cache.outputs.cache-hit }}
         run: |
-          url="https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/LLVM-$LLVM_VERSION-Linux-X64.tar.xz"
-          curl -fSL -o "$RUNNER_TEMP/llvm.tar.xz" "$url"
-          echo "$LLVM_SHA256  $RUNNER_TEMP/llvm.tar.xz" | sha256sum -c -
-          mkdir -p "$HOME/llvm"
-          tar -xJf "$RUNNER_TEMP/llvm.tar.xz" -C "$HOME/llvm" --strip-components=1 --wildcards '*/bin/*' '*/lib/*'
-          rm "$RUNNER_TEMP/llvm.tar.xz"
+          if [ "$LLVM_CACHE_HIT" != true ]; then
+            url="https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/LLVM-$LLVM_VERSION-Linux-X64.tar.xz"
+            curl -fSL --retry 3 --connect-timeout 30 --max-time 600 -o "$RUNNER_TEMP/llvm.tar.xz" "$url"
+            echo "$LLVM_SHA256  $RUNNER_TEMP/llvm.tar.xz" | sha256sum -c -
+            mkdir -p "$HOME/llvm"
+            tar -xJf "$RUNNER_TEMP/llvm.tar.xz" -C "$HOME/llvm" --strip-components=1 --wildcards '*/bin/*' '*/lib/*'
+            rm "$RUNNER_TEMP/llvm.tar.xz"
+          fi
           echo "$HOME/llvm/bin" >> "$GITHUB_PATH"
 
       - name: Cache the MSVC 5 toolchain
@@ -424,14 +436,25 @@ jobs:
           curl -LsSf "https://astral.sh/uv/$UV_VERSION/install.sh" | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
+      - name: Cache LLVM ${{ env.LLVM_VERSION }}
+        id: llvm-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/llvm
+          key: llvm-${{ runner.os }}-${{ env.LLVM_VERSION }}-${{ env.LLVM_SHA256 }}
+
       - name: Install LLVM ${{ env.LLVM_VERSION }}
+        env:
+          LLVM_CACHE_HIT: ${{ steps.llvm-cache.outputs.cache-hit }}
         run: |
-          url="https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/LLVM-$LLVM_VERSION-Linux-X64.tar.xz"
-          curl -fSL -o "$RUNNER_TEMP/llvm.tar.xz" "$url"
-          echo "$LLVM_SHA256  $RUNNER_TEMP/llvm.tar.xz" | sha256sum -c -
-          mkdir -p "$HOME/llvm"
-          tar -xJf "$RUNNER_TEMP/llvm.tar.xz" -C "$HOME/llvm" --strip-components=1 --wildcards '*/bin/*' '*/lib/*'
-          rm "$RUNNER_TEMP/llvm.tar.xz"
+          if [ "$LLVM_CACHE_HIT" != true ]; then
+            url="https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/LLVM-$LLVM_VERSION-Linux-X64.tar.xz"
+            curl -fSL --retry 3 --connect-timeout 30 --max-time 600 -o "$RUNNER_TEMP/llvm.tar.xz" "$url"
+            echo "$LLVM_SHA256  $RUNNER_TEMP/llvm.tar.xz" | sha256sum -c -
+            mkdir -p "$HOME/llvm"
+            tar -xJf "$RUNNER_TEMP/llvm.tar.xz" -C "$HOME/llvm" --strip-components=1 --wildcards '*/bin/*' '*/lib/*'
+            rm "$RUNNER_TEMP/llvm.tar.xz"
+          fi
           echo "$HOME/llvm/bin" >> "$GITHUB_PATH"
 
       - name: Install Rust ${{ env.RUST_VERSION }}

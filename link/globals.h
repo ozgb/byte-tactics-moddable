@@ -258,7 +258,6 @@ extern int g_contourSpacing;
 extern int g_contourOffset;
 extern unsigned int g_netStatsTick;
 extern unsigned int g_byteRatesTick;
-extern int g_cdBypassDriveScan;
 extern Game* g_game;
 extern int g_endGameGlamourSoundStarted;
 extern char g_frontendErrorText[256];

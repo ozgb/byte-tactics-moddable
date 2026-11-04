@@ -358,10 +358,6 @@ int __stdcall ParseCommandLine(char* cmdLine, char* appName)
                 }
                 break;
             }
-            case 'F':
-            case 'f':
-                SetBypassDriveScan(1);
-                break;
             case 'H':
             case 'h':
                 p += 2;

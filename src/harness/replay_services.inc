@@ -139,6 +139,143 @@ void ReplayImportEnd(ReplayImport& c)
         AddResult(t, c.result);
         break;
     }
+    case RI_FILE_PRINTF:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[1].v.p);
+        AddSpace(t);
+        t.AddString((const char*)a[2].v.p);
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_TDF_UNLOAD:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
+        break;
+    }
+    case RI_TDF_SELECT_RECORD_AT:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddResult(t, c.result);
+        {
+            const TdfFile* self = (const TdfFile*)a[0].v.p;
+            t.Add("\n  o ");
+            AddHandle(t, OBJ_FILE, self);
+            t.Add(".current ");
+            AddHandle(t, OBJ_RECORD, self->current);
+        }
+        break;
+    }
+    case RI_TDF_RESET_CURRENT:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
+        {
+            const TdfFile* self = (const TdfFile*)a[0].v.p;
+            t.Add("\n  o ");
+            AddHandle(t, OBJ_FILE, self);
+            t.Add(".current ");
+            AddHandle(t, OBJ_RECORD, self->current);
+        }
+        break;
+    }
+    case RI_TDF_GET_CURRENT:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
+        t.Add(" = ");
+        AddHandle(t, OBJ_RECORD, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_TDF_SET_CURRENT:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[1].v.p);
+        break;
+    }
+    case RI_TDF_FIND_SUB_RECORD:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddString((const char*)a[1].v.p);
+        t.Add(" = ");
+        AddHandle(t, OBJ_RECORD, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_TDF_GET_SUB_RECORD:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        t.Add(" = ");
+        AddHandle(t, OBJ_RECORD, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_TDF_GET_SUB_RECORD_COUNT:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_TDF_GET_FIELD_NAME:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        t.Add(" = ");
+        t.AddString((const char*)c.result.v.p);
+        break;
+    }
+    case RI_TDF_COPY_RECORD_NAME:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddInt(a[2].v.i);
+        t.Add("\n  o dest ");
+        t.AddString((const char*)a[1].v.p);
+        break;
+    }
+    case RI_TDF_GET_RECORD_NAME:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        t.Add(" = ");
+        t.AddString((const char*)c.result.v.p);
+        break;
+    }
+    case RI_TDF_FIND_FIELD_VALUE:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddString((const char*)a[1].v.p);
+        t.Add(" = ");
+        t.AddString((const char*)c.result.v.p);
+        break;
+    }
+    case RI_TDF_GET_FIELD_FIXED:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddString((const char*)a[2].v.p);
+        AddSpace(t);
+        t.AddInt(a[3].v.i);
+        t.Add("\n  o dst ");
+        t.AddInt(*(const int*)a[1].v.p);
+        break;
+    }
     }
     t.AddChar('\n');
     ReplayCalls() = 1;

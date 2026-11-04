@@ -5,6 +5,7 @@
 
 #include "../../interfaces/host.h"
 #include "file_printf.h"
+#include "../harness/replay.h"
 
 int FilePrintf(void* file, const char* fmt, ...)
 {
@@ -26,8 +27,16 @@ int FilePrintf(void* file, const char* fmt, ...)
         if (buf == 0)
             return -1;
     }
-    unsigned int written = host_file_write(file, buf, (unsigned int)len);
+    int result;
+    {
+        ReplayImport call(RI_FILE_PRINTF);
+        call.Ptr(file);
+        call.Ptr(fmt);
+        call.Ptr(buf);
+        unsigned int written = host_file_write(file, buf, (unsigned int)len);
+        result = call.Result(written == (unsigned int)len ? len : -1);
+    }
     if (buf != stack)
         free(buf);
-    return written == (unsigned int)len ? len : -1;
+    return result;
 }

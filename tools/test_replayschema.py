@@ -770,7 +770,7 @@ class Snapshots(unittest.TestCase):
         text = rs.render_service_end([self.spec()])
         self.assertIn("case RI_SIM_CAPTURE_ALLOC:", text)
         self.assertIn("t.AddInt(a[0].v.i);", text)
-        self.assertIn("AddSnapshot(t, c.result.kind == 1 ? c.result.v.p : nullptr, (unsigned)a[0].v.i);", text)
+        self.assertIn("AddSnapshot(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (unsigned)a[0].v.i);", text)
 
     def test_the_offset_is_not_a_line(self):
         text = rs.render_service_end([self.spec()])
@@ -780,7 +780,7 @@ class Snapshots(unittest.TestCase):
         text = rs.render_service_answers([self.spec()])
         self.assertIn("void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)", text)
         self.assertIn("t.AddInt((int)bytes);", text)
-        self.assertIn("return SnapshotAnswer(result, bytes, offset);", text)
+        self.assertIn("return SnapshotAnswer(result, (unsigned)bytes, offset);", text)
 
     def test_a_snapshot_needs_a_size_an_offset_and_a_pointer(self):
         self.assertEqual(rs.check_service_snapshots([self.spec()]), [])

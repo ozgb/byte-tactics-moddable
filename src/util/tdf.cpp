@@ -158,6 +158,8 @@ TdfFile::TdfFile()
 // FUNCTION: 0x4c3240
 void TdfFile::Unload()
 {
+    ReplayImport call(RI_TDF_UNLOAD);
+    call.Ptr(this);
     if (root)
         delete root;
     root = 0;
@@ -188,10 +190,13 @@ int TdfFile::SelectRecord(char* name)
 // FUNCTION: 0x4c3490
 int TdfFile::SelectRecordAt(int index)
 {
+    ReplayImport call(RI_TDF_SELECT_RECORD_AT);
+    call.Ptr(this);
+    call.Int(index);
     TdfRecord* n = current ? current : root;
     TdfRecord* node = n->GetChild(index);
     current = node;
-    return node != 0;
+    return call.Result(node != 0);
 }
 
 // FUNCTION: 0x4c35c0 ??0logic_error@std@@QAE@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z
@@ -206,18 +211,25 @@ int TdfFile::SelectRecordAt(int index)
 // FUNCTION: 0x4c3e10
 void TdfFile::ResetCurrentRecord()
 {
+    ReplayImport call(RI_TDF_RESET_CURRENT);
+    call.Ptr(this);
     current = 0;
 }
 
 // FUNCTION: 0x4c3e20
 int TdfFile::GetCurrentRecord()
 {
-    return (int)current;
+    ReplayImport call(RI_TDF_GET_CURRENT);
+    call.Ptr(this);
+    return (int)call.Result(current);
 }
 
 // FUNCTION: 0x4c3e30
 void TdfFile::SetCurrentRecord(int val)
 {
+    ReplayImport call(RI_TDF_SET_CURRENT);
+    call.Ptr(this);
+    call.Ptr((const void*)val);
     current = (TdfRecord*)val;
 }
 
@@ -346,13 +358,19 @@ void TdfRecord::ComputeRecordChecksum(char* start, char* end)
 // FUNCTION: 0x4c4420
 void TdfRecord::CopyRecordName(char* dest, size_t count)
 {
+    ReplayImport call(RI_TDF_COPY_RECORD_NAME);
+    call.Ptr(this);
+    call.Ptr(dest);
+    call.Int((int)count);
     strncpy(dest, name, count);
 }
 
 // FUNCTION: 0x4c4440
 int TdfRecord::GetRecordName()
 {
-    return (int)name;
+    ReplayImport call(RI_TDF_GET_RECORD_NAME);
+    call.Ptr(this);
+    return (int)call.Result(name);
 }
 
 class StringRefAppendView;
@@ -366,25 +384,33 @@ void ShowSoftwareCursor();
 // FUNCTION: 0x4c4450
 int TdfRecord::GetSubRecordCount()
 {
-    return Kids(this).size();
+    ReplayImport call(RI_TDF_GET_SUB_RECORD_COUNT);
+    call.Ptr(this);
+    return call.Result((int)Kids(this).size());
 }
 
 // FUNCTION: 0x4c4470
 TdfRecord* TdfRecord::FindSubRecord(const char* name)
 {
+    ReplayImport call(RI_TDF_FIND_SUB_RECORD);
+    call.Ptr(this);
+    call.Ptr(name);
     for (std::vector<TdfRecord*>::iterator p = Kids(this).begin(); p < Kids(this).end(); p++) {
         if (_strcmpi((*p)->name, name) == 0)
-            return *p;
+            return call.Result(*p);
     }
-    return 0;
+    return call.Result((TdfRecord*)0);
 }
 
 // FUNCTION: 0x4c44c0
 TdfRecord* TdfRecord::GetSubRecord(int index)
 {
+    ReplayImport call(RI_TDF_GET_SUB_RECORD);
+    call.Ptr(this);
+    call.Int(index);
     if ((unsigned int)index >= Kids(this).size())
-        return 0;
-    return Kids(this).at(index);
+        return call.Result((TdfRecord*)0);
+    return call.Result(Kids(this).at(index));
 }
 
 // FUNCTION: 0x4c45c0
@@ -396,14 +422,17 @@ int TdfRecord::GetFieldCount()
 // FUNCTION: 0x4c45e0
 char* TdfRecord::GetFieldName(int index)
 {
+    ReplayImport call(RI_TDF_GET_FIELD_NAME);
+    call.Ptr(this);
+    call.Int(index);
     if (index < 0 || (unsigned int)index >= Rows(this).size())
-        return 0;
+        return call.Result((char*)0);
     unsigned int i = 0;
     for (std::vector<TdfField>::iterator p = Rows(this).begin(); p < Rows(this).end(); p++, i++) {
         if (i == (unsigned int)index)
-            return p->key.ptr;
+            return call.Result(p->key.ptr);
     }
-    return 0;
+    return call.Result((char*)0);
 }
 
 struct NameLess {
@@ -446,10 +475,13 @@ static inline char* GetString(TdfRecord* table, const char* name)
 // FUNCTION: 0x4c4630
 int TdfRecord::FindFieldValue(char* name)
 {
+    ReplayImport call(RI_TDF_FIND_FIELD_VALUE);
+    call.Ptr(this);
+    call.Ptr(name);
     char** p = Find(this, name);
     if (p)
-        return (int)*p;
-    return 0;
+        return (int)call.Result(*p);
+    return (int)call.Result((char*)0);
 }
 
 // FUNCTION: 0x4c46c0
@@ -481,6 +513,11 @@ double TdfRecord::GetFieldDouble(const char* name, double def)
 // FUNCTION: 0x4c4800
 int* TdfRecord::GetFieldFixed(int* dst, char* key, int def)
 {
+    ReplayImport call(RI_TDF_GET_FIELD_FIXED);
+    call.Ptr(this);
+    call.Ptr(dst);
+    call.Ptr(key);
+    call.Int(def);
     TdfField* lo = Rows(this).begin();
     TdfField* hi = Rows(this).end();
     while (lo != hi) {

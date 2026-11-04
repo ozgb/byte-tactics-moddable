@@ -1111,6 +1111,11 @@
       }
      }
     ]
+   },
+   "alloc": {
+    "type": "char",
+    "scope": "state",
+    "fields": []
    }
   },
   "rules": [
@@ -2347,6 +2352,300 @@
      }
     ],
     "result": "int"
+   },
+   {
+    "name": "FilePrintf",
+    "id": "RI_FILE_PRINTF",
+    "declaration": "int FilePrintf(void* file, const char* fmt, ...);",
+    "args": [
+     {
+      "mode": "skip",
+      "param": "file"
+     },
+     {
+      "mode": "text",
+      "param": "fmt"
+     },
+     {
+      "mode": "text",
+      "param": "formatted"
+     }
+    ],
+    "result": "int",
+    "pre": [
+     "char formatted[2048];",
+     "va_list list;",
+     "va_start(list, fmt);",
+     "_vsnprintf(formatted, sizeof formatted, fmt, list);",
+     "va_end(list);"
+    ]
+   },
+   {
+    "name": "TdfFile_Unload",
+    "id": "RI_TDF_UNLOAD",
+    "owner": "TdfFile",
+    "declaration": "void Unload();",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "file"
+     }
+    ],
+    "effect": [
+     "root = nullptr;",
+     "current = nullptr;",
+     "flags = 0;"
+    ]
+   },
+   {
+    "name": "TdfFile_SelectRecordAt",
+    "id": "RI_TDF_SELECT_RECORD_AT",
+    "owner": "TdfFile",
+    "declaration": "int SelectRecordAt(int index);",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "file"
+     },
+     {
+      "mode": "int",
+      "param": "index"
+     }
+    ],
+    "result": "int",
+    "outs": [
+     {
+      "label": ".current",
+      "member": "current",
+      "handle": "rec",
+      "optional": true
+     }
+    ]
+   },
+   {
+    "name": "TdfFile_ResetCurrentRecord",
+    "id": "RI_TDF_RESET_CURRENT",
+    "owner": "TdfFile",
+    "declaration": "void ResetCurrentRecord();",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "file"
+     }
+    ],
+    "outs": [
+     {
+      "label": ".current",
+      "member": "current",
+      "handle": "rec",
+      "optional": false
+     }
+    ]
+   },
+   {
+    "name": "TdfFile_GetCurrentRecord",
+    "id": "RI_TDF_GET_CURRENT",
+    "owner": "TdfFile",
+    "declaration": "int GetCurrentRecord();",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "file"
+     }
+    ],
+    "result": "handle",
+    "kind": "rec"
+   },
+   {
+    "name": "TdfFile_SetCurrentRecord",
+    "id": "RI_TDF_SET_CURRENT",
+    "owner": "TdfFile",
+    "declaration": "void SetCurrentRecord(int val);",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "file"
+     },
+     {
+      "mode": "handle",
+      "param": "val",
+      "kind": "rec",
+      "cast": "void*"
+     }
+    ],
+    "effect": [
+     "current = (TdfRecord*)val;"
+    ]
+   },
+   {
+    "name": "TdfRecord_FindSubRecord",
+    "id": "RI_TDF_FIND_SUB_RECORD",
+    "owner": "TdfRecord",
+    "declaration": "TdfRecord* FindSubRecord(const char* name);",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "rec"
+     },
+     {
+      "mode": "text",
+      "param": "name"
+     }
+    ],
+    "result": "handle",
+    "kind": "rec"
+   },
+   {
+    "name": "TdfRecord_GetSubRecord",
+    "id": "RI_TDF_GET_SUB_RECORD",
+    "owner": "TdfRecord",
+    "declaration": "TdfRecord* GetSubRecord(int index);",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "rec"
+     },
+     {
+      "mode": "int",
+      "param": "index"
+     }
+    ],
+    "result": "handle",
+    "kind": "rec"
+   },
+   {
+    "name": "TdfRecord_GetSubRecordCount",
+    "id": "RI_TDF_GET_SUB_RECORD_COUNT",
+    "owner": "TdfRecord",
+    "declaration": "int GetSubRecordCount();",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "rec"
+     }
+    ],
+    "result": "int"
+   },
+   {
+    "name": "TdfRecord_GetFieldName",
+    "id": "RI_TDF_GET_FIELD_NAME",
+    "owner": "TdfRecord",
+    "declaration": "char* GetFieldName(int index);",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "rec"
+     },
+     {
+      "mode": "int",
+      "param": "index"
+     }
+    ],
+    "result": "text"
+   },
+   {
+    "name": "TdfRecord_CopyRecordName",
+    "id": "RI_TDF_COPY_RECORD_NAME",
+    "owner": "TdfRecord",
+    "declaration": "void CopyRecordName(char* dest, size_t count);",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "rec"
+     },
+     {
+      "mode": "skip",
+      "param": "dest"
+     },
+     {
+      "mode": "int",
+      "param": "count"
+     }
+    ],
+    "outs": [
+     {
+      "label": "dest",
+      "text": "dest",
+      "size": "count"
+     }
+    ]
+   },
+   {
+    "name": "TdfRecord_GetRecordName",
+    "id": "RI_TDF_GET_RECORD_NAME",
+    "owner": "TdfRecord",
+    "declaration": "int GetRecordName();",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "rec"
+     }
+    ],
+    "result": "text",
+    "cast": "int"
+   },
+   {
+    "name": "TdfRecord_FindFieldValue",
+    "id": "RI_TDF_FIND_FIELD_VALUE",
+    "owner": "TdfRecord",
+    "declaration": "int FindFieldValue(char* name);",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "rec"
+     },
+     {
+      "mode": "text",
+      "param": "name"
+     }
+    ],
+    "result": "text",
+    "cast": "int"
+   },
+   {
+    "name": "TdfRecord_GetFieldFixed",
+    "id": "RI_TDF_GET_FIELD_FIXED",
+    "owner": "TdfRecord",
+    "declaration": "int* GetFieldFixed(int* dst, char* key, int def);",
+    "args": [
+     {
+      "mode": "handle",
+      "param": "this",
+      "kind": "rec"
+     },
+     {
+      "mode": "skip",
+      "param": "dst"
+     },
+     {
+      "mode": "text",
+      "param": "key"
+     },
+     {
+      "mode": "int",
+      "param": "def"
+     }
+    ],
+    "result": "arg",
+    "param": "dst",
+    "outs": [
+     {
+      "label": "dst",
+      "int": "dst"
+     }
+    ]
    }
   ],
   "code_tables": {
@@ -2480,6 +2779,12 @@
      }
     ]
    }
+  },
+  "alloc_tags": {
+   "Player Info": {
+    "kind": "PlayerInfo",
+    "size": 185
+   }
   }
  },
  "fields": [
@@ -2545,7 +2850,8 @@
   {"name": "Order", "type": "Order", "scope": "state", "table": null, "inside": null, "fields": [{"name": "state", "kind": "u8"}, {"name": "attached", "kind": "ref", "target": "OrderFx", "poly": "OrderFx"}, {"name": "next", "kind": "ref", "target": "Order"}]},
   {"name": "OrderTableEntry", "type": "OrderTableEntry", "scope": "state", "table": null, "inside": null, "fields": [{"name": "notify", "kind": "code", "table": "orderNotify", "codeTable": 0}, {"name": "markerAnim", "kind": "u8"}, {"name": "flags", "kind": "u32"}]},
   {"name": "KeyedCell", "type": "KeyedCell", "scope": "value", "table": null, "inside": null, "fields": [{"name": "pos", "kind": "point16"}, {"name": "key", "kind": "f32"}]},
-  {"name": "PlayerAI", "type": "PlayerAI", "scope": "state", "table": null, "inside": null, "fields": [{"name": "index", "kind": "u8"}, {"name": "visibleUnits", "kind": "vector", "member": "visible.units", "elem": {"mode": "object", "kind": "Unit"}, "vector": 1, "target": "Unit"}, {"name": "cells", "kind": "vector", "elem": {"mode": "value", "kind": "KeyedCell"}, "vector": 2}, {"name": "counts", "kind": "vector", "elem": {"mode": "scalar", "type": "short"}, "vector": 3}]}
+  {"name": "PlayerAI", "type": "PlayerAI", "scope": "state", "table": null, "inside": null, "fields": [{"name": "index", "kind": "u8"}, {"name": "visibleUnits", "kind": "vector", "member": "visible.units", "elem": {"mode": "object", "kind": "Unit"}, "vector": 1, "target": "Unit"}, {"name": "cells", "kind": "vector", "elem": {"mode": "value", "kind": "KeyedCell"}, "vector": 2}, {"name": "counts", "kind": "vector", "elem": {"mode": "scalar", "type": "short"}, "vector": 3}]},
+  {"name": "alloc", "type": "char", "scope": "state", "table": null, "inside": null, "fields": []}
  ],
  "subsystems": {
   "wind_meteors": {
@@ -2852,7 +3158,7 @@
     "GetCellMeanHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetCellMeanHeight"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetCellMeanHeight"},
     "RefreshAllPassMaps": {"conv": "__stdcall", "ret": "void", "functions": ["RefreshAllPassMaps"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "a", "type": "Point16", "line": "a", "mode": "scalar"}, {"name": "b", "type": "Point16", "line": "b", "mode": "scalar"}], "result": null, "native": "RefreshAllPassMaps"},
     "GetGameType": {"conv": "__fastcall", "ret": "int", "functions": ["Mission::GetGameType"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetGameType"},
-    "GetNameSlot": {"conv": "__stdcall", "ret": "char*", "functions": ["Mission::GetNameSlot"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}, {"name": "index", "type": "int", "line": "index", "mode": "scalar"}], "result": {"type": "char*", "mode": "text"}, "native": "GetNameSlot"},
+    "GetNameSlot": {"conv": "__stdcall", "ret": "char*", "functions": ["Mission::GetNameSlot"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}, {"name": "index", "type": "int", "line": "index", "mode": "scalar"}], "result": {"type": "char*", "mode": "object", "kind": "alloc"}, "native": "GetNameSlot"},
     "VisitObjectsInRange": {"conv": "__stdcall", "ret": "void", "functions": ["VisitObjectsInRange"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}, {"name": "visitor", "type": "UnitVisitor*", "line": "visitor", "mode": "pending"}], "result": null, "native": "VisitObjectsInRange"},
     "CanBuildAt": {"conv": "__stdcall", "ret": "int", "functions": ["CanBuildAt"], "reads": ["Game.width", "Game.height", "Game.seaLevel"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Cell.metal"], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "UnitDef*", "line": "unit", "mode": "object", "kind": "UnitDef"}, {"name": "cell", "type": "Point16", "line": "cell", "mode": "scalar"}, {"name": "type", "type": "short", "line": "type", "mode": "scalar"}, {"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanBuildAt"},
     "CanPlaceUnitFootprint": {"conv": "__stdcall", "ret": "int", "functions": ["CanPlaceUnitFootprint"], "reads": ["Game.width", "Game.height", "Game.seaLevel"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint"], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "UnitDef*", "line": "unit", "mode": "object", "kind": "UnitDef"}, {"name": "otherTypeId", "type": "unsigned short", "line": "otherTypeId", "mode": "scalar"}, {"name": "cell", "type": "Point16", "line": "cell", "mode": "scalar"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanPlaceUnitFootprint"},
@@ -2878,9 +3184,9 @@
     "SpatialBucketUnlinkUnit": {"conv": "__fastcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "bucket", "type": "SpatialBucket*", "line": "bucket", "mode": "pending"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "SpatialBucketUnlinkUnit"},
     "RefreshPassMap": {"conv": "__fastcall", "ret": "void", "functions": ["MovementClass::RefreshPassMap"], "reads": [], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "MovementClass.footprintX", "MovementClass.width", "MovementClass.height", "MovementClass.cells"], "objectWrites": [], "allOf": null, "args": [{"name": "movementClass", "type": "MovementClass*", "line": "movementClass", "mode": "object", "kind": "MovementClass"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "a", "type": "Point16", "line": "a", "mode": "scalar"}, {"name": "b", "type": "Point16", "line": "b", "mode": "scalar"}], "result": null, "native": "RefreshPassMap"},
     "AdvanceMission": {"conv": "__fastcall", "ret": "int", "functions": ["Mission::AdvanceMission"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "AdvanceMission"},
-    "GetCampaignName": {"conv": "__fastcall", "ret": "char*", "functions": ["Mission::GetCampaignName"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}], "result": {"type": "char*", "mode": "text"}, "native": "GetCampaignName"},
+    "GetCampaignName": {"conv": "__fastcall", "ret": "char*", "functions": ["Mission::GetCampaignName"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}], "result": {"type": "char*", "mode": "object", "kind": "alloc"}, "native": "GetCampaignName"},
     "GetMissionIndex": {"conv": "__fastcall", "ret": "int", "functions": ["Mission::GetMissionIndex"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetMissionIndex"},
-    "GetMissionName": {"conv": "__fastcall", "ret": "char*", "functions": ["Mission::GetMissionName"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}], "result": {"type": "char*", "mode": "text"}, "native": "GetMissionName"},
+    "GetMissionName": {"conv": "__fastcall", "ret": "char*", "functions": ["Mission::GetMissionName"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}], "result": {"type": "char*", "mode": "object", "kind": "alloc"}, "native": "GetMissionName"},
     "GetStartPosition": {"conv": "__fastcall", "ret": "int", "functions": ["Mission::GetStartPosition"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "out", "type": "Vec3*", "line": "out", "mode": "pending"}, {"name": "id", "type": "int", "line": "id", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetStartPosition"},
     "LoadCampaign": {"conv": "__fastcall", "ret": "void", "functions": ["Mission::LoadCampaign"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "file", "type": "char*", "line": "file", "mode": "text"}], "result": null, "native": "LoadCampaign"},
     "LoadMissionByName": {"conv": "__fastcall", "ret": "int", "functions": ["Mission::LoadMissionByName"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "mission", "type": "Mission*", "line": "mission", "mode": "pending"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "LoadMissionByName"},
@@ -2913,7 +3219,7 @@
     "Rename": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "oldName", "type": "char*", "line": "oldName", "mode": "text"}, {"name": "newName", "type": "char*", "line": "newName", "mode": "text"}], "result": null, "native": "Rename"},
     "GetCurrentDriveLetter": {"conv": "__stdcall", "ret": "void", "functions": ["GetCurrentDriveLetter"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "buf", "type": "char*", "line": "buf", "mode": "text"}], "result": null, "native": "GetCurrentDriveLetter"},
     "ChangeDrive": {"conv": "__stdcall", "ret": "int", "functions": ["ChangeDrive"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "drive", "type": "char*", "line": "drive", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "ChangeDrive"},
-    "GetDriveDirectory": {"conv": "__stdcall", "ret": "char*", "functions": ["GetDriveDirectory"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "drive", "type": "char*", "line": "drive", "mode": "text"}, {"name": "buf", "type": "char*", "line": "buf", "mode": "text"}, {"name": "size", "type": "int", "line": "size", "mode": "scalar"}], "result": {"type": "char*", "mode": "text"}, "native": "GetDriveDirectory"},
+    "GetDriveDirectory": {"conv": "__stdcall", "ret": "char*", "functions": ["GetDriveDirectory"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "drive", "type": "char*", "line": "drive", "mode": "text"}, {"name": "buf", "type": "char*", "line": "buf", "mode": "text"}, {"name": "size", "type": "int", "line": "size", "mode": "scalar"}], "result": {"type": "char*", "mode": "object", "kind": "alloc"}, "native": "GetDriveDirectory"},
     "ChangeDirectory": {"conv": "__stdcall", "ret": "void", "functions": ["ChangeDirectory"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "path", "type": "char*", "line": "path", "mode": "text"}], "result": null, "native": "ChangeDirectory"},
     "MatchWildcard": {"conv": "__stdcall", "ret": "int", "functions": ["MatchWildcard"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "str", "type": "char*", "line": "str", "mode": "text"}, {"name": "pat", "type": "char*", "line": "pat", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "MatchWildcard"},
     "FindFirst": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "path", "type": "char*", "line": "path", "mode": "text"}, {"name": "fd", "type": "void*", "line": "fd", "mode": "pending"}, {"name": "state", "type": "int", "line": "state", "mode": "scalar"}, {"name": "recursive", "type": "char", "line": "recursive", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "FindFirst"},
@@ -2944,7 +3250,7 @@
     "BankSetString": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "value", "type": "char*", "line": "value", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "BankSetString"},
     "BankGetInteger": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "def", "type": "int", "line": "def", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "BankGetInteger"},
     "BankGetDouble": {"conv": "__stdcall", "ret": "double", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "def", "type": "double", "line": "def", "mode": "scalar"}], "result": {"type": "double", "mode": "scalar"}, "native": "BankGetDouble"},
-    "BankGetString": {"conv": "__stdcall", "ret": "char*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "def", "type": "char*", "line": "def", "mode": "text"}], "result": {"type": "char*", "mode": "text"}, "native": "BankGetString"},
+    "BankGetString": {"conv": "__stdcall", "ret": "char*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "def", "type": "char*", "line": "def", "mode": "text"}], "result": {"type": "char*", "mode": "object", "kind": "alloc"}, "native": "BankGetString"},
     "BankHasItem": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "BankHasItem"},
     "BankOpenNumberedBox": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "number", "type": "int", "line": "number", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "BankOpenNumberedBox"},
     "BankOpenNamedBox": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "BankOpenNamedBox"},

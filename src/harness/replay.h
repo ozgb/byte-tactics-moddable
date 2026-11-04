@@ -21,13 +21,26 @@ struct ReplayArg {
 struct ReplayImport;
 void ReplayImportEnd(ReplayImport& call);
 
+typedef bool (*ReplayAnswerFn)(ReplayImport& call);
+
+inline ReplayAnswerFn& ReplayAnswerHook()
+{
+    static ReplayAnswerFn hook;
+    return hook;
+}
+
+inline bool& ReplayAnswerBusy()
+{
+    static bool busy;
+    return busy;
+}
+
 struct ReplayImport {
-    explicit ReplayImport(int id) : id(id), active(ReplayCalls() != 0), count(0)
+    explicit ReplayImport(int id) : id(id), active(ReplayCalls() != 0), answering(ReplayAnswerHook() != nullptr && !ReplayAnswerBusy()), count(0)
     {
-        if (active) {
+        result.kind = -1;
+        if (active)
             ReplayCalls() = 0;
-            result.kind = -1;
-        }
     }
     ~ReplayImport()
     {
@@ -36,18 +49,42 @@ struct ReplayImport {
     }
     void Int(int value)
     {
-        if (active)
+        if (active || answering)
             AddArg(0)->v.i = value;
     }
     void Ptr(const void* value)
     {
-        if (active)
+        if (active || answering)
             AddArg(1)->v.p = value;
     }
     void Dbl(double value)
     {
-        if (active)
+        if (active || answering)
             AddArg(2)->v.d = value;
+    }
+    bool Answered()
+    {
+        if (!answering)
+            return false;
+        ReplayAnswerBusy() = true;
+        bool answered = ReplayAnswerHook()(*this);
+        ReplayAnswerBusy() = false;
+        return answered;
+    }
+    void Return(int value)
+    {
+        result.kind = 0;
+        result.v.i = value;
+    }
+    void Return(double value)
+    {
+        result.kind = 2;
+        result.v.d = value;
+    }
+    void Return(const void* value)
+    {
+        result.kind = 1;
+        result.v.p = value;
     }
     int Result(int value)
     {
@@ -75,8 +112,9 @@ struct ReplayImport {
     }
     int id;
     bool active;
+    bool answering;
     int count;
-    ReplayArg args[5];
+    ReplayArg args[8];
     ReplayArg result;
 };
 

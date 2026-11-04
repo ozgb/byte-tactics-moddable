@@ -797,6 +797,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 errors.append("%s imports %s, which is no slot of the %s interface" % (sub, imp, seam))
     return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table,
             "arrays": arrays, "tables": tables, "vectors": vectors, "code_tables": code_tables, "callbacks": callbacks,
+            "alloc_tags": ann.get("alloc_tags", {}),
             "kind_types": {k: v["type"] for k, v in ann["objects"].items()}}, errors
 
 
@@ -970,6 +971,12 @@ def render_schema(ann: dict, model: dict) -> str:
     if not model["code_tables"]:
         L.append("    { \"\", nullptr, 0 },")
     L += ["};", "static const unsigned kReplayCodeTableCount = %d;" % len(model["code_tables"]), "",
+          "static const ReplayAllocTag kReplayAllocTags[] = {"]
+    for tag, spec in model["alloc_tags"].items():
+        L.append('    { "%s", ROK_%s, %d },' % (tag, upper(spec["kind"]), spec["size"]))
+    if not model["alloc_tags"]:
+        L.append('    { "", 0, 0 },')
+    L += ["};", "static const unsigned kReplayAllocTagCount = %d;" % len(model["alloc_tags"]), "",
           "static const ReplayObjectField kReplayObjectFields[] = {"]
     position = {(f["object"], f["name"]): i for i, f in enumerate(ofields)}
     range_end, range_begin = {}, {}
@@ -1596,6 +1603,148 @@ def render_service_ids(services: list[dict]) -> str:
     return "\n".join(L)
 
 
+SERVICE_ARG_MODES = {"stream", "int", "double", "text", "handle", "skip", "bytes", "object", "ints", "allocated"}
+SERVICE_RESULTS = {"int", "double", "text", "snapshot", "handle", "object", "alloc", "arg"}
+HANDLE_KINDS = ("file", "rec", "bank")
+
+
+def service_function(spec: dict) -> str:
+    """The name of the function a spec stands for: `Owner::member` for a member, else the declared name."""
+    name = " ".join(spec["declaration"].split()).rstrip(";").split("(")[0].split()[-1].lstrip("*&")
+    return "%s::%s" % (spec["owner"], name) if spec.get("owner") else name
+
+
+def function_files() -> dict[str, str]:
+    out: dict[str, str] = {}
+    with SUBSYSTEMS.open(newline="") as f:
+        for r in csv.DictReader(f):
+            out.setdefault(r["function"], r["file"])
+    return out
+
+
+def replay_link_sources() -> set[str]:
+    """The source files the replayer links: those of the REPLAY_SUBSYSTEMS and the ones its target lists."""
+    text = (ROOT / "CMakeLists.txt").read_text()
+    subs = set(re.search(r"set\(REPLAY_SUBSYSTEMS ([^)]*)\)", text).group(1).split())
+    listed = re.search(r"add_library\(replay_native_test_objects OBJECT ([^)]*)\)", text).group(1)
+    files = set(re.findall(r"\b(src/[\w/]+\.cpp)\b", listed))
+    with SUBSYSTEMS.open(newline="") as f:
+        for r in csv.DictReader(f):
+            if r["subsystem"] in subs:
+                files.add(r["file"])
+    return files
+
+
+def linked_services(services: list[dict]) -> set[str]:
+    """The names of the services whose definition is in a source the replayer links."""
+    sources = replay_link_sources()
+    files_of = function_files()
+    return {s["name"] for s in services if files_of.get(service_function(s)) in sources or s.get("linked")}
+
+
+def check_service_specs(services: list[dict], ann: dict) -> list[str]:
+    """Errors for the keys of the service specs: modes, the arguments they name, the kinds of objects and handles."""
+    errors = []
+    kinds = ann["objects"]
+    if len({s["name"] for s in services}) != len(services) or len({s["id"] for s in services}) != len(services):
+        errors.append("the services have a name or an id twice")
+    for s in services:
+        where = "service %s" % s["name"]
+        params = {a.get("param"): a for a in s["args"]}
+        for a in s["args"]:
+            m = a["mode"]
+            if m not in SERVICE_ARG_MODES:
+                errors.append("%s: the argument %s has the unknown mode %s" % (where, a.get("param"), m))
+            elif m == "bytes" and params.get(a.get("length"), {}).get("mode") != "int":
+                errors.append("%s: the argument %s needs a `length` that names an int argument" % (where, a["param"]))
+            elif m == "ints" and params.get(a.get("count"), {}).get("mode") != "int":
+                errors.append("%s: the argument %s needs a `count` that names an int argument" % (where, a["param"]))
+            elif m == "object" and (a.get("kind") not in kinds or kinds[a["kind"]]["scope"] == "value"):
+                errors.append("%s: the argument %s needs a `kind` that is an object kind of the schema" % (where, a["param"]))
+            elif m == "handle" and a.get("kind") not in HANDLE_KINDS:
+                errors.append("%s: the argument %s needs a `kind` of file, rec or bank" % (where, a["param"]))
+        res = s.get("result")
+        if res is not None and res not in SERVICE_RESULTS:
+            errors.append("%s: the result %s is none of %s" % (where, res, ", ".join(sorted(SERVICE_RESULTS))))
+        if res == "handle" and s.get("kind") not in HANDLE_KINDS:
+            errors.append("%s: a handle result needs a `kind` of file, rec or bank" % where)
+        if res == "object":
+            if s.get("kind") not in kinds or kinds[s["kind"]]["scope"] == "value" or not s.get("ctype"):
+                errors.append("%s: an object result needs a `kind` of the schema and the `ctype` that the function returns" % where)
+            for f in s.get("reach", []):
+                if not any(x["name"] == f for x in kinds.get(s.get("kind"), {"fields": []})["fields"]):
+                    errors.append("%s: the reach names %s, which is no field of %s" % (where, f, s.get("kind")))
+        if res == "alloc":
+            if params.get(s.get("size"), {}).get("mode") != "int":
+                errors.append("%s: an alloc result needs `size` that names an int argument" % where)
+            if s.get("tag") is not None and params.get(s["tag"], {}).get("mode") != "text":
+                errors.append("%s: an alloc result names its `tag` argument, a text one" % where)
+        if res == "arg" and s.get("param") not in params:
+            errors.append("%s: an arg result names an argument by `param`" % where)
+        if s.get("nested") and res not in ("int", None):
+            errors.append("%s: a re-entrant service has an int or no result" % where)
+    for tag, spec in ann.get("alloc_tags", {}).items():
+        target = kinds.get(spec.get("kind"))
+        if target is None or target["scope"] != "state" or target.get("table") or "kinds" in target:
+            errors.append("the alloc tag %s names a state kind with no table and no kinds" % tag)
+        if not isinstance(spec.get("size"), int):
+            errors.append("the alloc tag %s needs the `size` of one object" % tag)
+    return errors
+
+
+def service_arg_expr(s: dict, i: int, ctx: str) -> str:
+    """The C++ expression of argument i: the parameter in a definition, a field of the call in an answer."""
+    a = s["args"][i]
+    if ctx == "definition":
+        name = a.get("param", "this")
+        return "(%s)%s" % (a["cast"], name) if a.get("cast") else name
+    v = "c.args[%d].v" % i
+    if a["mode"] in ("stream", "int"):
+        return "%s.i" % v
+    if a["mode"] == "double":
+        return "%s.d" % v
+    if a["mode"] == "text":
+        return "(const char*)%s.p" % v
+    return "%s.p" % v
+
+
+def service_param_expr(s: dict, name: str, ctx: str) -> str:
+    for i, a in enumerate(s["args"]):
+        if a.get("param") == name:
+            return service_arg_expr(s, i, ctx)
+    raise Error("the service %s names no argument %s" % (s["name"], name))
+
+
+def service_input_lines(s: dict, ctx: str) -> list[str]:
+    """The lines of C++ that put the arguments into the import line `t` of the replayer."""
+    L = []
+    for i, a in enumerate(s["args"]):
+        m = a["mode"]
+        if m == "skip":
+            continue
+        v = service_arg_expr(s, i, ctx)
+        L.append("Space(t);")
+        if m == "stream":
+            L.append("ReplayValue(t, %s);" % (v if ctx == "definition" else "(RandStream)" + v))
+        elif m == "int":
+            L.append("t.AddInt((int)%s);" % v)
+        elif m == "double":
+            L.append("AddDoubleBits(t, %s);" % v)
+        elif m == "text":
+            L.append("t.AddString(%s);" % v)
+        elif m == "handle":
+            L.append("AddObject(t, %s, %s);" % (handle_id(a["kind"]), v))
+        elif m == "bytes":
+            L.append("AddBytes(t, %s, (int)%s);" % (v, service_param_expr(s, a["length"], ctx)))
+        elif m == "object":
+            L.append("ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), v))
+        elif m == "ints":
+            L.append("ReplayAddWords(t, (const unsigned*)%s, (unsigned)%s);" % (v, service_param_expr(s, a["count"], ctx)))
+        elif m == "allocated":
+            L.append("AddAllocName(t, %s);" % v)
+    return L
+
+
 def render_service_end(services: list[dict]) -> str:
     L = [GENERATED, "", "// included by replay.cpp after the helpers of the import lines", "",
          "void ReplayImportEnd(ReplayImport& c)", "{", "    ReplayText& t = s_call;", "    const ReplayArg* a = c.args;",
@@ -1603,6 +1752,7 @@ def render_service_end(services: list[dict]) -> str:
     for s in services:
         L.append("    case %s:" % s["id"])
         L.append("    {")
+        index = {x.get("param"): j for j, x in enumerate(s["args"])}
         for i, a in enumerate(s["args"]):
             m = a["mode"]
             if m == "skip":
@@ -1618,10 +1768,18 @@ def render_service_end(services: list[dict]) -> str:
                 L.append("        t.AddString((const char*)a[%d].v.p);" % i)
             elif m == "handle":
                 L.append("        AddHandle(t, %s, a[%d].v.p);" % (handle_id(a["kind"]), i))
+            elif m == "bytes":
+                L.append("        ReplayBytes(t, a[%d].v.p, a[%d].v.i);" % (i, index[a["length"]]))
+            elif m == "object":
+                L.append("        ReplayAddObjectName(t, Table(), ROK_%s, a[%d].v.p, true);" % (upper(a["kind"]), i))
+            elif m == "ints":
+                L.append("        ReplayAddWords(t, (const unsigned*)a[%d].v.p, (unsigned)a[%d].v.i);" % (i, index[a["count"]]))
+            elif m == "allocated":
+                L.append("        AddAllocName(t, a[%d].v.p);" % i)
         res = s.get("result")
+        pointer = "(c.result.kind == 1 ? c.result.v.p : nullptr)"
         if res == "snapshot":
-            index = [j for j, a in enumerate(s["args"]) if a.get("param") == s["bytes"]][0]
-            L.append("        AddSnapshot(t, c.result.kind == 1 ? c.result.v.p : nullptr, (unsigned)a[%d].v.i);" % index)
+            L.append("        AddSnapshot(t, %s, (unsigned)a[%d].v.i);" % (pointer, index[s["bytes"]]))
         elif res == "int":
             L.append("        AddResult(t, c.result);")
         elif res == "double":
@@ -1630,7 +1788,22 @@ def render_service_end(services: list[dict]) -> str:
         elif res == "text":
             L.append('        t.Add(" = ");')
             L.append("        t.AddString((const char*)c.result.v.p);")
-        handle_at = [j for j, a in enumerate(s["args"]) if a["mode"] == "handle"]
+        elif res == "handle":
+            L.append('        t.Add(" = ");')
+            L.append("        AddHandle(t, %s, %s);" % (handle_id(s["kind"]), pointer))
+        elif res == "object":
+            reach = s.get("reach", [])
+            if reach:
+                L.append("        ImportResultObjectReach(t, ROK_%s, %s, %d, %s);" % (upper(s["kind"]), pointer, len(reach), ", ".join('"%s"' % f for f in reach)))
+            else:
+                L.append("        ImportResultObject(t, ROK_%s, %s);" % (upper(s["kind"]), pointer))
+        elif res == "alloc":
+            tag = "(const char*)a[%d].v.p" % index[s["tag"]] if s.get("tag") else "nullptr"
+            L.append("        AddAlloc(t, %s, %s);" % (pointer, tag))
+        if s.get("nested"):
+            L.append("        t.AddText(s_nested);")
+            L.append("        s_nested.Clear();")
+        handle_at = [j for j, x in enumerate(s["args"]) if x["mode"] == "handle"]
         for o in s.get("outs", []):
             if "member" in o:
                 L.append("        {")
@@ -1640,68 +1813,126 @@ def render_service_end(services: list[dict]) -> str:
                 L.append('            t.Add("%s ");' % o["label"])
                 L.append("            AddHandle(t, %s, self->%s);" % (handle_id(o["handle"]), o["member"]))
                 L.append("        }")
-            else:
-                index = [j for j, a in enumerate(s["args"]) if a.get("param") == o["text"]][0]
+            elif "int" in o:
                 L.append('        t.Add("\\n  o %s ");' % o["label"])
-                L.append("        t.AddString((const char*)a[%d].v.p);" % index)
+                L.append("        t.AddInt(*(const int*)a[%d].v.p);" % index[o["int"]])
+            else:
+                L.append('        t.Add("\\n  o %s ");' % o["label"])
+                L.append("        t.AddString((const char*)a[%d].v.p);" % index[o["text"]])
         L.append("        break;")
         L.append("    }")
     L += ["    }", "    t.AddChar('\\n');", "    ReplayCalls() = 1;", "}", ""]
     return "\n".join(L)
 
 
-def render_service_answers(services: list[dict]) -> str:
+def service_return_type(s: dict) -> str:
+    head = " ".join(s["declaration"].split()).rstrip(";").split("(")[0]
+    words = head.split()
+    words = [w for w in words if w not in ("__stdcall", "__cdecl", "__fastcall")]
+    return " ".join(words[:-1]) or "void"
+
+
+def service_result_lines(s: dict, ctx: str) -> list[str]:
+    """The lines after Enter: the outs and effects of a definition, then the result."""
+    L = []
+    res = s.get("result")
+    if ctx == "definition":
+        for o in s.get("outs", []):
+            if "member" in o:
+                L.append('const char* %sText = OutValue("%s");' % (o["member"], o["label"]))
+                if o.get("optional"):
+                    L.append("if (%sText != nullptr)\n    %s = ParseRecord(%sText);" % (o["member"], o["member"], o["member"]))
+                else:
+                    L.append("%s = %sText == nullptr ? nullptr : ParseRecord(%sText);" % (o["member"], o["member"], o["member"]))
+            elif "int" in o:
+                L.append('const char* %sText = OutValue("%s");' % (o["int"], o["label"]))
+                L.append("if (%sText != nullptr && %s != nullptr)\n    *%s = atoi(%sText);" % (o["int"], o["int"], o["int"], o["int"]))
+            else:
+                L.append('const char* %sText = OutValue("%s");' % (o["text"], o["label"]))
+                L.append("if (%sText != nullptr)\n    ParseQuoted(%sText, %s, (unsigned)%s);" % (o["text"], o["text"], o["text"], o["size"]))
+        L += list(s.get("effect", []))
+    if s.get("nested"):
+        L.append('PlayNestedCalls("%s");' % ("services." + s["name"]))
+    cast = s.get("cast")
+
+    def finish(expr: str, kind: str) -> list[str]:
+        if ctx == "definition":
+            return ["return %s;" % expr]
+        return ["c.Return(%s);" % expr, "return true;"]
+
+    if res == "snapshot":
+        offset = service_param_expr(s, s["offset"], ctx) if ctx == "definition" else "(unsigned*)" + service_param_expr(s, s["offset"], ctx)
+        L += finish("SnapshotAnswer(result, %s, %s)" % ("(unsigned)" + service_param_expr(s, s["bytes"], ctx), offset), "ptr")
+    elif res == "int":
+        L += finish("(%s)atoi(result)" % cast if cast else "atoi(result)", "int")
+    elif res == "double":
+        L += finish("ParseF64(result)", "dbl")
+    elif res == "text":
+        size = s.get("into_size", 256)
+        if ctx == "definition" and "into" in s:
+            L.append("ParseQuoted(result, %s, %d);" % (s["into"], size))
+            buf = s["into"]
+        else:
+            L.append("static char text[%d];" % size)
+            L.append("ParseQuoted(result, text, %d);" % size)
+            buf = "text"
+        if "into" not in s:
+            L.append("if (strcmp(result, \"null\") == 0)")
+            L += ["    " + x for x in finish("(%s)nullptr" % cast if cast else "nullptr", "ptr")]
+        L += finish("(%s)%s" % (cast, buf) if cast else buf, "ptr")
+    elif res == "handle":
+        L += finish("(%s)ParseHandle(%s, result)" % (service_return_type(s), handle_id(s["kind"])), "ptr")
+    elif res == "object":
+        L.append("%s o = (%s)ReplayResolveObject(result, nullptr, g_objects, AllocObject);" % (s["ctype"], s["ctype"]))
+        for f in s.get("reach", []):
+            L.append('ApplyReach(o, ROK_%s, ".%s");' % (upper(s["kind"]), f))
+        L += finish("o", "ptr")
+    elif res == "alloc":
+        L += finish("AllocAnswer(result, (unsigned)%s)" % service_param_expr(s, s["size"], ctx), "ptr")
+    elif res == "arg":
+        L += finish(service_param_expr(s, s["param"], ctx), "ptr")
+    elif ctx == "definition":
+        L.append("(void)r;")
+    else:
+        L.append("return %s;" % ("false" if s.get("proceed") else "true"))
+    return L
+
+
+def indent(lines: list[str], n: int) -> list[str]:
+    pad = " " * n
+    return [pad + part for line in lines for part in line.split("\n")]
+
+
+def render_service_answers(services: list[dict], linked: set[str] | None = None) -> str:
+    linked = linked or set()
     L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers", ""]
     for s in services:
+        if s["name"] in linked:
+            continue
         declaration = service_declaration(s).rstrip(";")
         owner = s.get("owner")
         if owner:
             short = declaration.split("(")[0].split()[-1]
             declaration = declaration.replace(short + "(", "%s::%s(" % (owner, short), 1)
         L += [declaration, "{"]
-        L += ["    " + stmt for stmt in s.get("pre", [])]
+        L += indent(s.get("pre", []), 4)
         L += ["    ReplayText t;", "    StartImport(t, %s);" % s["id"]]
-        for a in s["args"]:
-            if a["mode"] == "skip":
-                continue
-            v = a.get("param", "this")
-            L.append("    Space(t);")
-            if a["mode"] == "stream":
-                L.append("    ReplayValue(t, %s);" % v)
-            elif a["mode"] == "int":
-                L.append("    t.AddInt((int)%s);" % v)
-            elif a["mode"] == "double":
-                L.append("    AddDoubleBits(t, %s);" % v)
-            elif a["mode"] == "text":
-                L.append("    t.AddString(%s);" % v)
-            elif a["mode"] == "handle":
-                L.append("    AddObject(t, %s, %s);" % (handle_id(a["kind"]), v))
-        res = s.get("result")
-        L.append("    const char* %s = Enter(t);" % ("result" if res else "r"))
-        for o in s.get("outs", []):
-            if "member" in o:
-                L.append('    const char* %sText = OutValue("%s");' % (o["member"], o["label"]))
-                if o.get("optional"):
-                    L.append("    if (%sText != nullptr)\n        %s = ParseRecord(%sText);" % (o["member"], o["member"], o["member"]))
-                else:
-                    L.append("    %s = %sText == nullptr ? nullptr : ParseRecord(%sText);" % (o["member"], o["member"], o["member"]))
-            else:
-                L.append('    const char* %sText = OutValue("%s");' % (o["text"], o["label"]))
-                L.append("    if (%sText != nullptr)\n        ParseQuoted(%sText, %s, (unsigned)%s);" % (o["text"], o["text"], o["text"], o["size"]))
-        L += ["    " + stmt for stmt in s.get("effect", [])]
-        if res == "snapshot":
-            L.append("    return SnapshotAnswer(result, %s, %s);" % (s["bytes"], s["offset"]))
-        elif res == "int":
-            L.append("    return atoi(result);")
-        elif res == "double":
-            L.append("    return ParseF64(result);")
-        elif res == "text":
-            L.append("    ParseQuoted(result, %s, 256);" % s["into"])
-            L.append("    return %s;" % s["into"])
-        else:
-            L.append("    (void)r;")
+        L += indent(service_input_lines(s, "definition"), 4)
+        L.append("    const char* %s = Enter(t);" % ("result" if s.get("result") else "r"))
+        L += indent(service_result_lines(s, "definition"), 4)
         L += ["}", ""]
+    L += ["bool ReplayAnswerImport(ReplayImport& c)", "{", "    switch (c.id) {"]
+    for s in services:
+        if s["name"] not in linked:
+            continue
+        L += ["    case %s: {" % s["id"], "        ReplayText t;", "        StartImport(t, %s);" % s["id"]]
+        L += indent(service_input_lines(s, "answer"), 8)
+        L.append("        const char* %s = Enter(t);" % ("result" if s.get("result") else "r"))
+        L += indent(service_result_lines(s, "answer"), 8)
+        L.append("    }")
+    L += ["    default:", "        return false;", "    }", "}", ""]
     return "\n".join(L)
+
 
 
 VTABLES_CPP = ROOT / "src/harness/replay_vtables.cpp"
@@ -1827,6 +2058,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
     services = ann["services"]
     errors += check_service_hooks(services)
     errors += check_service_snapshots(services)
+    errors += check_service_specs(services, ann)
     for sub, spec in ann["subsystems"].items():
         errors += ["%s lists the service %s, which has no spec" % (sub, n) for n in spec.get("services", [])
                    if not any(x["name"] == n or x["name"].startswith(n + "_") for x in services)]
@@ -1836,7 +2068,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         SLOTS_H: render_slots(ann, model),
         SERVICES_H: render_service_ids(services),
         SERVICES_INC: render_service_end(services),
-        SERVICES_SLOTS: render_service_answers(services),
+        SERVICES_SLOTS: render_service_answers(services, linked_services(services)),
         VTABLES_CPP: render_vtables(model),
         CALLBACKS_H: render_callbacks(model),
         CALLBACKS_SLOTS: render_callback_players(model),

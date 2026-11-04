@@ -15,6 +15,20 @@ enum ReplayImportId {
     RI_TDF_GET_DOUBLE,
     RI_TDF_GET_STRING,
     RI_GET_INT_ARG,
+    RI_FILE_PRINTF,
+    RI_TDF_UNLOAD,
+    RI_TDF_SELECT_RECORD_AT,
+    RI_TDF_RESET_CURRENT,
+    RI_TDF_GET_CURRENT,
+    RI_TDF_SET_CURRENT,
+    RI_TDF_FIND_SUB_RECORD,
+    RI_TDF_GET_SUB_RECORD,
+    RI_TDF_GET_SUB_RECORD_COUNT,
+    RI_TDF_GET_FIELD_NAME,
+    RI_TDF_COPY_RECORD_NAME,
+    RI_TDF_GET_RECORD_NAME,
+    RI_TDF_FIND_FIELD_VALUE,
+    RI_TDF_GET_FIELD_FIXED,
     RI_COUNT
 };
 
@@ -31,6 +45,20 @@ static const char* const kReplayImportNames[RI_COUNT] = {
     "services.TdfRecord_GetFieldDouble",
     "services.TdfRecord_GetFieldString",
     "services.CommandArgs_GetIntArg",
+    "services.FilePrintf",
+    "services.TdfFile_Unload",
+    "services.TdfFile_SelectRecordAt",
+    "services.TdfFile_ResetCurrentRecord",
+    "services.TdfFile_GetCurrentRecord",
+    "services.TdfFile_SetCurrentRecord",
+    "services.TdfRecord_FindSubRecord",
+    "services.TdfRecord_GetSubRecord",
+    "services.TdfRecord_GetSubRecordCount",
+    "services.TdfRecord_GetFieldName",
+    "services.TdfRecord_CopyRecordName",
+    "services.TdfRecord_GetRecordName",
+    "services.TdfRecord_FindFieldValue",
+    "services.TdfRecord_GetFieldFixed",
 };
 
 #endif

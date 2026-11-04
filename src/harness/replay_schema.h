@@ -286,6 +286,7 @@ enum ReplayObjectKindId {
     ROK_ORDERTABLEENTRY,
     ROK_KEYEDCELL,
     ROK_PLAYERAI,
+    ROK_ALLOC,
     ROK_COUNT
 };
 
@@ -321,8 +322,9 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "OrderTableEntry", sizeof(OrderTableEntry), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "KeyedCell", sizeof(KeyedCell), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "PlayerAI", sizeof(PlayerAI), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "alloc", sizeof(char), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 25;
+static const unsigned kReplayObjectKindCount = 26;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
@@ -346,6 +348,11 @@ static const ReplayCodeTable kReplayCodeTables[] = {
     { "orderNotify", kReplayCodeOrderNotify, 65 },
 };
 static const unsigned kReplayCodeTableCount = 1;
+
+static const ReplayAllocTag kReplayAllocTags[] = {
+    { "Player Info", ROK_PLAYERINFO, 185 },
+};
+static const unsigned kReplayAllocTagCount = 1;
 
 static const ReplayObjectField kReplayObjectFields[] = {
     { "active", offsetof(Player, active), sizeof(((Player*)nullptr)->active), ROK_PLAYER, RK_I32, 0, 0, 0, 0, 0, 0, 0 },

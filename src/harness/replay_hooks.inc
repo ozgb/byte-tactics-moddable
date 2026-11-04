@@ -3568,6 +3568,7 @@ char* __stdcall RecMapGetNameSlot(Mission* a0, int a1)
     }
     char* result = s_inner_map->GetNameSlot(a0, a1);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
     return result;
 }
@@ -3929,6 +3930,7 @@ char* __fastcall RecMapGetCampaignName(Mission* a0)
     }
     char* result = s_inner_map->GetCampaignName(a0);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
     return result;
 }
@@ -3956,6 +3958,7 @@ char* __fastcall RecMapGetMissionName(Mission* a0)
     }
     char* result = s_inner_map->GetMissionName(a0);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
     return result;
 }
@@ -4360,6 +4363,7 @@ char* __stdcall RecFilesGetDriveDirectory(char* a0, char* a1, int a2)
     }
     char* result = s_inner_files->GetDriveDirectory(a0, a1, a2);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
     return result;
 }
@@ -4832,6 +4836,7 @@ char* __stdcall RecFilesBankGetString(HapiBank* a0, char* a1, char* a2)
     }
     char* result = s_inner_files->BankGetString(a0, a1, a2);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
     return result;
 }

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -13,6 +14,7 @@
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
 #include "../src/harness/replay_services.h"
+#include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
 #include "../src/harness/replay_values.h"
 #include "../src/harness/replay_objects.h"
@@ -132,7 +134,12 @@ ReplayReach g_reach;
 
 void* AllocObject(unsigned size)
 {
-    return SimAlloc(size);
+    bool& busy = ReplayAnswerBusy();
+    bool was = busy;
+    busy = true;
+    void* p = SimAlloc(size);
+    busy = was;
+    return p;
 }
 
 char* g_text;
@@ -777,6 +784,44 @@ void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr)
 
 namespace {
 
+void AddAllocName(ReplayText& t, const void* p)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    if (g_objects.Find(ROK_ALLOC, p) != 0) {
+        ReplayAddObjectName(t, g_objects, ROK_ALLOC, p, false);
+        return;
+    }
+    for (unsigned i = 0; i < kReplayAllocTagCount; i++) {
+        if (g_objects.Find(kReplayAllocTags[i].kind, p) != 0) {
+            ReplayAddObjectName(t, g_objects, kReplayAllocTags[i].kind, p, false);
+            return;
+        }
+    }
+    t.Add("alloc#?");
+}
+
+void* AllocAnswer(const char* result, unsigned size)
+{
+    if (strcmp(result, "null") == 0)
+        return nullptr;
+    void* p = SimAlloc(size);
+    const char* hash = strchr(result, '#');
+    int kind = hash == nullptr ? -1 : ReplayFindObjectKind(result, (unsigned)(hash - result));
+    if (kind >= 0 && hash[1] != '?')
+        g_objects.Bind((unsigned)kind, (unsigned)atoi(hash + 1), p);
+    return p;
+}
+
+void* ParseHandle(unsigned kind, const char* text)
+{
+    if (kind == OBJ_RECORD)
+        return ParseRecord(text);
+    return strcmp(text, "null") == 0 || kind == OBJ_FILE ? nullptr : &g_bank;
+}
+
 enum { MAX_SNAPSHOTS = 64, CAPTURE_ARENA_BYTES = 1 << 20 };
 unsigned char g_captureArena[CAPTURE_ARENA_BYTES];
 unsigned g_captureUsed;
@@ -1331,7 +1376,10 @@ void ReplayCall(const char* file, Outcome& out)
     g_cursor = first;
     g_hash = 2166136261u;
     g_sets = sets;
-    if (!RunSlot(g_subsystem, slotText))
+    ReplayAnswerHook() = ReplayAnswerImport;
+    bool ran = RunSlot(g_subsystem, slotText);
+    ReplayAnswerHook() = nullptr;
+    if (!ran)
         Fatal(file, g_callIndex, "a slot with no runner", slotText);
     for (int k = g_cursor; k < g_callEnd; k++) {
         if (strncmp(g_lines[k], "  i ", 4) == 0) {
@@ -2526,6 +2574,60 @@ void SnapshotSelfTest()
     recorded.Free();
 }
 
+void BeginServices(const char* body)
+{
+    LoadCall(body);
+    BeginImport();
+}
+
+void FilesSelfTest()
+{
+    printf("services: files and data\n");
+    const char* body =
+        "  i services.TdfFile_SelectRecordAt file#1 0 = 1\n"
+        "  o file#1.current rec#1\n"
+        "  i services.TdfRecord_FindSubRecord rec#1 \"units\" = rec#2\n"
+        "  i services.TdfRecord_GetSubRecordCount rec#2 = 3\n"
+        "  i services.TdfRecord_GetSubRecord rec#2 1 = rec#3\n"
+        "  i services.TdfRecord_GetFieldName rec#3 0 = \"Name\"\n"
+        "  i services.TdfRecord_CopyRecordName rec#3 16\n"
+        "  o dest \"Armada\"\n"
+        "  i services.TdfRecord_GetFieldFixed rec#3 \"scale\" 5\n"
+        "  o dst 98304\n"
+        "  i services.TdfRecord_FindFieldValue rec#3 \"none\" = null\n"
+        "  i services.FilePrintf \"%d units\" \"3 units\" = 7\n";
+    BeginServices(body);
+    TdfFile* file = (TdfFile*)calloc(1, sizeof(TdfFile));
+    Check(file->SelectRecordAt(0) == 1 && file->current == ParseRecord("rec#1"), "a call that moves the current record gives its result and its out");
+    TdfRecord* units = file->current->FindSubRecord("units");
+    Check(units == ParseRecord("rec#2"), "a record found is the one recorded");
+    Check(units->GetSubRecordCount() == 3, "a count replays");
+    TdfRecord* second = units->GetSubRecord(1);
+    Check(second == ParseRecord("rec#3"), "a sub-record by index replays");
+    char* name = second->GetFieldName(0);
+    Check(name != nullptr && strcmp(name, "Name") == 0, "a text result replays");
+    char copy[16] = "";
+    second->CopyRecordName(copy, sizeof copy);
+    Check(strcmp(copy, "Armada") == 0, "a text written through a pointer replays");
+    int fixed = 0;
+    int* back = second->GetFieldFixed(&fixed, "scale", 5);
+    Check(back == &fixed && fixed == 98304, "a number written through a pointer replays and the pointer is returned");
+    Check(second->FindFieldValue("none") == 0, "a null text result is zero");
+    Check(FilePrintf(nullptr, "%d units", 3) == 7, "a formatted text is compared and the result replays");
+    Check(g_diffs == 0 && g_importIndex == 9, "and nothing differs");
+    BeginServices(body);
+    file->SelectRecordAt(0);
+    file->current->FindSubRecord("units");
+    ParseRecord("rec#2")->GetSubRecordCount();
+    ParseRecord("rec#2")->GetSubRecord(2);
+    printf("a changed argument: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 3 services.TdfRecord_GetSubRecord") == 0, "a changed argument is reported at its import");
+    BeginServices("  i services.FilePrintf \"%d units\" \"3 units\" = 7\n");
+    FilePrintf(nullptr, "%d units", 4);
+    Check(g_diffs == 1 && strstr(g_detail.Data(), "\"4 units\"") != nullptr, "and so is a changed formatted text");
+    free(file);
+}
+
 typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
 
 unsigned CodeIndex(const char* table, const void* function)
@@ -2719,6 +2821,7 @@ int SelfTest(const char* file)
     CallbackSelfTest();
     VectorSelfTest();
     SnapshotSelfTest();
+    FilesSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

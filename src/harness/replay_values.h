@@ -111,6 +111,17 @@ inline void ReplayBytes(ReplayText& t, const void* p, int length)
     }
 }
 
+inline void ReplayAddWords(ReplayText& t, const unsigned* p, unsigned count)
+{
+    t.AddChar('[');
+    for (unsigned i = 0; p != nullptr && i < count; i++) {
+        if (i != 0)
+            t.AddChar(',');
+        t.AddUnsigned(p[i]);
+    }
+    t.AddChar(']');
+}
+
 inline void ReplayParseBytes(const char* text, void* dst, int length)
 {
     if (strncmp(text, "x:", 2) != 0)

@@ -61,6 +61,7 @@ ReplayText s_tail;
 ReplayText s_field;
 ReplayOrdinals s_ordinals;
 ReplaySnapshots s_snapshots;
+ReplayText s_nested;
 ReplayReach s_reach;
 ReplayRoots s_roots;
 
@@ -551,6 +552,40 @@ void AddSnapshot(ReplayText& t, const void* buffer, unsigned bytes)
     }
     t.Add("snapshot#");
     t.AddUnsigned(s_snapshots.Add(buffer, bytes));
+}
+
+void AddAllocName(ReplayText& t, const void* p)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    if (Table().Find(ROK_ALLOC, p) != 0) {
+        ReplayAddObjectName(t, Table(), ROK_ALLOC, p, false);
+        return;
+    }
+    for (unsigned i = 0; i < kReplayAllocTagCount; i++) {
+        if (Table().Find(kReplayAllocTags[i].kind, p) != 0) {
+            ReplayAddObjectName(t, Table(), kReplayAllocTags[i].kind, p, false);
+            return;
+        }
+    }
+    t.Add("alloc#?");
+}
+
+void AddAlloc(ReplayText& t, const void* p, const char* tag)
+{
+    t.Add(" = ");
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    unsigned kind = ROK_ALLOC;
+    for (unsigned i = 0; tag != nullptr && i < kReplayAllocTagCount; i++) {
+        if (strcmp(kReplayAllocTags[i].tag, tag) == 0)
+            kind = kReplayAllocTags[i].kind;
+    }
+    ReplayAddObjectName(t, Table(), kind, p, true);
 }
 
 void AddResult(ReplayText& t, const ReplayArg& r)

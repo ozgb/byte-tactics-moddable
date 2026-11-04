@@ -68,6 +68,12 @@ struct ReplayCallbackType {
     const char* const* methods;
 };
 
+struct ReplayAllocTag {
+    const char* tag;
+    unsigned char kind;
+    unsigned size;
+};
+
 struct ReplayCodeTable {
     const char* name;
     const void* const* entries;

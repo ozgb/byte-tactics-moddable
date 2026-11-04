@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import os
 import re
 import struct
 import sys
@@ -513,13 +514,12 @@ def entry_offset(original: bytes, compiled: bytes, upto: int) -> int | None:
     return None
 
 
-def add_entry_symbols(data: bytes, entries: list[tuple[int, str]], symbols: dict[str, int],
-                      original: bool = True) -> bytes:
+def add_entry_symbols(data: bytes, entries: list[tuple[int, str]], symbols: dict[str, int]) -> bytes:
     """The object with a public symbol at each entry: in the section of the
     function holding it, at the instruction the original has at that address.
     The compiler's assembler may encode an instruction differently from the
     original's, so the offset is found by counting instructions, not bytes.
-    Unless original, the entry is at the start of that function: nothing is
+    With BT_NO_ORIG the entry is at the start of that function: nothing is
     read from orig/TotalA.exe."""
     import pefile
     buf = bytearray(data)
@@ -545,7 +545,7 @@ def add_entry_symbols(data: bytes, entries: list[tuple[int, str]], symbols: dict
             if addr is not None and (typ & 0x30) == 0x20:
                 functions.append((addr, secnum, value))
         i += 1 + naux
-    pe = pefile.PE(str(EXE)) if original else None
+    pe = pefile.PE(str(EXE)) if have_original() else None
     base = pe.OPTIONAL_HEADER.ImageBase if pe else 0
     new = bytearray()
     added = 0
@@ -717,7 +717,7 @@ def wanted_initialisers() -> dict[str, list[str]]:
     with PROGRESS.open() as fh:
         rows = {int(r["address"], 16): (r["file"], r["symbol"]) for r in csv.DictReader(fh)}
     wanted: dict[str, list[str]] = defaultdict(list)
-    for fn in original_initialisers():
+    for fn in initialisers():
         if fn in rows:
             wanted[rows[fn][0]].append(rows[fn][1])
     return wanted
@@ -810,15 +810,15 @@ def report_dropped_initialisers(lost: list[tuple[str, str, list[str]]],
 
 
 def patch_objects(objects: list[Path], symbols: dict[str, int], out_dir: Path,
-                  source_of=None, ordered: bool = True, original: bool = True) -> list[Path]:
+                  source_of=None, ordered: bool = True) -> list[Path]:
     """Copies of the objects under out_dir (named for their position) with
     interior globals pointed at their containers; the unchanged ones are
     copied too, so the link takes one directory. Unless ordered, the data is
     not laid out in the original's order (no `<kind>$<address>` sections, no
-    layout.obj). Unless original, orig/TotalA.exe is not read: every initialiser
-    is kept unless data/initialiser_allow.csv allows dropping it, an entry symbol
-    is at the start of its function, and the data is not ordered."""
-    ordered = ordered and original
+    layout.obj). With BT_NO_ORIG, orig/TotalA.exe is not read: the initialisers
+    come from data/initialisers.csv, an entry symbol is at the start of its
+    function, and the data is not ordered."""
+    ordered = ordered and have_original()
     out_dir.mkdir(parents=True, exist_ok=True)
     statics = static_names(symbols)
     for leaf, addr in statics.items():
@@ -843,8 +843,7 @@ def patch_objects(objects: list[Path], symbols: dict[str, int], out_dir: Path,
     interior = interior_references(objects, symbols, extents)
     result = []
     patched = 0
-    wanted = wanted_initialisers() if source_of and original else {}
-    allowed = load_initialiser_allowlist()
+    wanted = wanted_initialisers() if source_of else {}
     kept = dropped = 0
     lost: list[tuple[str, str, list[str]]] = []
     candidates: dict[int, list[tuple[int, int, int]]] = defaultdict(list)
@@ -858,15 +857,11 @@ def patch_objects(objects: list[Path], symbols: dict[str, int], out_dir: Path,
         source = source_of(path) if source_of else None
         entries = entry_points(source) if source is not None else []
         if entries:
-            new = add_entry_symbols(new if new is not None else data, entries, symbols, original)
+            new = add_entry_symbols(new if new is not None else data, entries, symbols)
         patched += new is not None
         if source is not None:
             relative = str(source.relative_to(ROOT))
-            if original:
-                drop = not any(sym.startswith("_$E") for sym in wanted.get(relative, ()))
-            else:
-                drop = all((relative, name) in allowed for name in initialiser_refs(new if new is not None else data))
-            if drop:
+            if not any(sym.startswith("_$E") for sym in wanted.get(relative, ())):
                 before = new if new is not None else data
                 new = drop_initialisers(before)
                 dropped += new != before
@@ -1096,6 +1091,27 @@ EXE = ROOT / "orig/TotalA.exe"
 PROGRESS = ROOT / "data/progress.csv"
 FUNCTIONS = ROOT / "data/functions.csv"
 INITIALISER_ALLOW = ROOT / "data/initialiser_allow.csv"
+INITIALISERS = ROOT / "data/initialisers.csv"
+
+
+def have_original() -> bool:
+    """False when BT_NO_ORIG is set (CI has no orig/TotalA.exe)."""
+    return not os.environ.get("BT_NO_ORIG")
+
+
+def initialisers() -> list[int]:
+    """The functions the original runs before WinMain, from data/initialisers.csv.
+    Unless BT_NO_ORIG, the list is also read from the exe, and a difference is
+    an error."""
+    with INITIALISERS.open() as fh:
+        stored = [int(r["address"], 16) for r in csv.DictReader(fh)]
+    if have_original():
+        found = original_initialisers()
+        if found != stored:
+            sys.exit(f"aliases: data/initialisers.csv differs from the initialiser table of "
+                     f"orig/TotalA.exe: file {[hex(a) for a in stored]}, exe {[hex(a) for a in found]}; "
+                     f"regenerate it with `uv run tools/aliases.py --write-initialisers`")
+    return stored
 
 
 def original_initialisers() -> list[int]:
@@ -1116,6 +1132,17 @@ def original_initialisers() -> list[int]:
         if fn:
             out.append(fn)
     return out
+
+
+def write_initialisers() -> None:
+    """Writes data/initialisers.csv: the address and symbol of each function in the original's table."""
+    with PROGRESS.open() as fh:
+        names = {int(r["address"], 16): r["symbol"] for r in csv.DictReader(fh)}
+    with INITIALISERS.open("w", newline="") as fh:
+        out = csv.writer(fh, lineterminator="\n")
+        out.writerow(["address", "name"])
+        for fn in sorted(original_initialisers()):
+            out.writerow([f"{fn:#x}", names.get(fn, "")])
 
 
 def write_init_object(symbol: str, out: Path) -> None:
@@ -1478,7 +1505,7 @@ def response(arg: str) -> list[Path]:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--objects", nargs="*", default=[], help="object files, or @file listing them")
-    ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--out", type=Path)
     ap.add_argument("--libs", nargs="*", default=[], help="libraries the link takes names from")
     ap.add_argument("--extra-data", action="store_true",
                     help="write C++ defining the globals no object defines, instead of the alias object")
@@ -1494,12 +1521,16 @@ def main() -> None:
                          "--objects is ignored")
     ap.add_argument("--winmain", type=lambda v: int(v, 0), default=None,
                     help="alias _WinMain@16 to the function at this address")
-    ap.add_argument("--no-original", action="store_true",
-                    help="with --patch-dir: do not read orig/TotalA.exe (for CI, which has none): keep every "
-                         "initialiser and add no entry symbols or import thunks; the exe is not the real one")
+    ap.add_argument("--write-initialisers", action="store_true",
+                    help="write data/initialisers.csv from orig/TotalA.exe and exit")
     ap.add_argument("--no-data-order", action="store_true",
                     help="with --patch-dir: do not lay the data out in the original's order")
     args = ap.parse_args()
+    if args.write_initialisers:
+        write_initialisers()
+        return
+    if args.out is None:
+        ap.error("--out is required")
     if args.import_def is not None:
         names = sorted(n[len("__imp_"):] for n in archive_symbols(args.import_def) if n.startswith("__imp_"))
         dll = "WIN32" if args.import_def.stem.upper() == "WINMM" else args.import_def.stem
@@ -1524,8 +1555,7 @@ def main() -> None:
             source = ROOT / Path(*parts[parts.index("src"):]).with_suffix("")
             return source if source.suffix == ".cpp" and source.exists() else None
 
-        objects = patch_objects(objects, symbols, args.patch_dir, source_of, not args.no_data_order,
-                                not args.no_original)
+        objects = patch_objects(objects, symbols, args.patch_dir, source_of, not args.no_data_order)
         (args.patch_dir / "objects.rsp").write_text("\n".join(str(o) for o in objects) + "\n")
     libs: dict[str, str] = {}
     for lib in args.libs:
@@ -1539,8 +1569,8 @@ def main() -> None:
     extra = {new: old for new, old in {**CLANG_RUNTIME, **IMPORT_SPELLINGS}.items() if old in libs}
     aliases = build_aliases(objects, symbols, data_addr, libs, args.out, extra=extra,
                             winmain_addr=args.winmain, data_fallback=True, strip_underscore=True,
-                            thunks={} if args.no_original else import_thunks(libs), placeholder_methods=True, annotated=annotated,
-                            overloads=overloaded_names(symbols))
+                            thunks={} if not have_original() else import_thunks(libs),
+                            placeholder_methods=True, annotated=annotated, overloads=overloaded_names(symbols))
     print(f"aliases: {len(aliases):,} aliases for {len(objects):,} objects", file=sys.stderr)
     if args.patch_dir is not None:
         dropped = drop_duplicates([p for p in objects if p.name != "layout.obj"])

@@ -5,6 +5,7 @@
 
 import contextlib
 import io
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -47,22 +48,53 @@ class InitialiserSymbolsTest(unittest.TestCase):
 
 
 class NoOriginalTest(unittest.TestCase):
-    def patch(self, original: bool) -> list[str]:
+    def patch(self, no_orig: bool) -> list[str]:
         missing = Path(tempfile.gettempdir()) / "no-such-dir" / "TotalA.exe"
+        env = {"BT_NO_ORIG": "1"} if no_orig else {}
         with tempfile.TemporaryDirectory() as tmp, mock.patch.object(aliases, "EXE", missing), \
-                contextlib.redirect_stderr(io.StringIO()):
+                mock.patch.dict("os.environ", env), contextlib.redirect_stderr(io.StringIO()):
+            if not no_orig:
+                os.environ.pop("BT_NO_ORIG", None)
+            listed, progress = Path(tmp) / "initialisers.csv", Path(tmp) / "progress.csv"
+            listed.write_text("address,name\n0x10,_$E1\n")
+            progress.write_text("address,size,file,symbol,status,similarity\n0x10,1,tools/aliases.py,_$E1,matched,100\n")
             src = Path(tmp) / "o.obj"
             src.write_bytes(object_bytes("??__Eg_x@@YAXXZ"))
-            out = aliases.patch_objects([src], {}, Path(tmp) / "out", lambda _: Path(aliases.__file__),
-                                        True, original)
+            with mock.patch.object(aliases, "INITIALISERS", listed), mock.patch.object(aliases, "PROGRESS", progress):
+                out = aliases.patch_objects([src], {}, Path(tmp) / "out", lambda _: Path(aliases.__file__), True)
             return sections_kept(next(p for p in out if p.name.endswith("o.obj")).read_bytes())
 
-    def test_keeps_initialisers_without_reading_the_exe(self):
-        self.assertEqual(self.patch(False), [".text", ".CRT$XCU"])
+    def test_reads_the_list_without_opening_the_exe(self):
+        self.assertEqual(self.patch(True), [".text", ".CRT$XCU"])
 
     def test_default_needs_the_exe(self):
         with self.assertRaises(FileNotFoundError):
-            self.patch(True)
+            self.patch(False)
+
+
+class InitialisersTest(unittest.TestCase):
+    def listed(self, text: str, no_orig: bool, exe: list[int]) -> list[int]:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "initialisers.csv"
+            path.write_text(text)
+            env = {"BT_NO_ORIG": "1"} if no_orig else {}
+            with mock.patch.object(aliases, "INITIALISERS", path), mock.patch.dict("os.environ", env), \
+                    mock.patch.object(aliases, "original_initialisers", return_value=exe) as read:
+                if not no_orig:
+                    os.environ.pop("BT_NO_ORIG", None)
+                found = aliases.initialisers()
+                self.assertEqual(read.called, not no_orig)
+                return found
+
+    def test_no_orig_reads_the_file_only(self):
+        self.assertEqual(self.listed("address,name\n0x10,a\n0x20,\n", True, [99]), [0x10, 0x20])
+
+    def test_matching_exe_passes(self):
+        self.assertEqual(self.listed("address,name\n0x10,a\n", False, [0x10]), [0x10])
+
+    def test_differing_exe_fails(self):
+        with self.assertRaises(SystemExit):
+            self.listed("address,name\n0x10,a\n", False, [0x10, 0x20])
 
 
 class ReportTest(unittest.TestCase):

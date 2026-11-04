@@ -41,6 +41,10 @@
 #include "../graphics/handle.h"
 #include "replay_fixtures.h"
 #include "../map/frame_table.h"
+#include "../map/feature.h"
+#include "../map/spot.h"
+#include "../map/pool.h"
+#include "../graphics/model_types.h"
 #include "../state/sim_globals.h"
 #include "../state/block.h"
 #include "replay_types.h"
@@ -195,6 +199,9 @@ static const ReplayTableSpec kReplayTables[] = {
     { 0, 1, offsetof(Game, cells), { { offsetof(Game, width), (unsigned char)sizeof(((Game*)nullptr)->width), 0 }, { offsetof(Game, height), (unsigned char)sizeof(((Game*)nullptr)->height), 0 } }, 0 },
     { 0, 1, offsetof(Game, projectiles), { { offsetof(Game, projectileCount), (unsigned char)sizeof(((Game*)nullptr)->projectileCount), 0 }, { 1, 0, 0 } }, 1024 },
     { 1, 0, offsetof(SimGlobals, g_movementClasses.entries), { { 32, 0, 0 }, { 1, 0, 0 } }, 0 },
+    { 0, 1, offsetof(Game, features), { { offsetof(Game, featureCount), (unsigned char)sizeof(((Game*)nullptr)->featureCount), 0 }, { 1, 0, 0 } }, 2048 },
+    { 0, 1, offsetof(Game, spots), { { 2048, 0, 0 }, { 1, 0, 0 } }, 2048 },
+    { 0, 0, offsetof(Game, pool), { { 1, 0, 0 }, { 1, 0, 0 } }, 0 },
 };
 
 static_assert(sizeof(((Game*)nullptr)->width) == 1 || sizeof(((Game*)nullptr)->width) == 2 || sizeof(((Game*)nullptr)->width) == 4, "Game::visibilityMask: width is a byte, a short or an int");
@@ -214,6 +221,10 @@ static_assert(sizeof(((Game*)nullptr)->cells) == sizeof(unsigned), "the table of
 static_assert(sizeof(((Game*)nullptr)->projectileCount) == 1 || sizeof(((Game*)nullptr)->projectileCount) == 2 || sizeof(((Game*)nullptr)->projectileCount) == 4, "Projectile: projectileCount is a byte, a short or an int");
 static_assert(sizeof(((Game*)nullptr)->projectiles) == sizeof(unsigned), "the table of Projectile is a Ref");
 static_assert(sizeof(((SimGlobals*)nullptr)->g_movementClasses.entries) == 32 * sizeof(MovementClass), "the table of MovementClass holds 32 elements");
+static_assert(sizeof(((Game*)nullptr)->featureCount) == 1 || sizeof(((Game*)nullptr)->featureCount) == 2 || sizeof(((Game*)nullptr)->featureCount) == 4, "Feature: featureCount is a byte, a short or an int");
+static_assert(sizeof(((Game*)nullptr)->features) == sizeof(unsigned), "the table of Feature is a Ref");
+static_assert(sizeof(((Game*)nullptr)->spots) == sizeof(unsigned), "the table of Spot is a Ref");
+static_assert(sizeof(((Game*)nullptr)->pool) == 1 * sizeof(Pool), "the table of Pool holds 1 elements");
 
 #pragma pop_macro("g_meteorNextStrikeTime")
 #pragma pop_macro("g_meteorWeaponName")
@@ -301,6 +312,10 @@ enum ReplayObjectKindId {
     ROK_GAFFRAME,
     ROK_OBJECT3DO,
     ROK_HANDLE,
+    ROK_FEATURE,
+    ROK_SPOT,
+    ROK_POOL,
+    ROK_MODELSTATE,
     ROK_FIXTUREVIEW,
     ROK_FIXTURESLAVE,
     ROK_FIXTUREHOLDER,
@@ -315,10 +330,14 @@ static const ReplayVectorSpec kReplayVectors[] = {
 
 static const ReplayInsideSite kReplayInsideSites[] = {
     { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot" },
+    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim" },
+    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, shadowAnim), "shadowAnim" },
+    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim" },
+    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow" },
     { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim" },
     { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow" },
 };
-static const unsigned kReplayInsideSiteCount = 3;
+static const unsigned kReplayInsideSiteCount = 7;
 
 static const ReplayObjectKind kReplayObjectKinds[] = {
     { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0 },
@@ -351,12 +370,16 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FrameTable", sizeof(FrameTable), RS_STATE, RT_ORDER, 0, 0, 0, 0 },
     { "GafFrame", sizeof(GafFrame), RS_STATE, RT_ORDER, 0, 0, 0, 0 },
     { "Object3do", sizeof(Object3do), RS_STATE, RT_ORDER, 0, 0, 0, 0 },
-    { "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 1, 2, 0, 0 },
+    { "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 1, 6, 0, 0 },
+    { "Feature", sizeof(Feature), RS_STATE, 6, 0, 0, 0, 0 },
+    { "Spot", sizeof(Spot), RS_STATE, 7, 0, 0, 0, 0 },
+    { "Pool", sizeof(Pool), RS_STATE, 8, 0, 0, 0, 0 },
+    { "ModelState", sizeof(ModelState), RS_STATE, RT_ORDER, 0, 0, 0, 0 },
     { "FixtureView", sizeof(FixtureView), RS_STATE, RT_ORDER, 0, 0, 0, 0 },
     { "FixtureSlave", sizeof(FixtureSlave), RS_STATE, RT_ORDER, 0, 0, 0, 0 },
     { "FixtureHolder", sizeof(FixtureHolder), RS_STATE, RT_ORDER, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 34;
+static const unsigned kReplayObjectKindCount = 38;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
@@ -558,23 +581,74 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "value", offsetof(Handle, value), sizeof(((Handle*)nullptr)->value), ROK_HANDLE, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(Handle, kind), sizeof(((Handle*)nullptr)->kind), ROK_HANDLE, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "src", offsetof(Handle, src), sizeof(void*), ROK_HANDLE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
+    { "name", offsetof(Feature, name), 128, ROK_FEATURE, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "description", offsetof(Feature, description), 20, ROK_FEATURE, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "footprint", offsetof(Feature, footprint), sizeof(((Feature*)nullptr)->footprint), ROK_FEATURE, RK_POINT16, 0, 0, 0, {}, 0, 0 },
+    { "object", offsetof(Feature, object), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_OBJECT3DO, 0, 0, { 200, 0, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "filename", offsetof(Feature, filename), 16, ROK_FEATURE, RK_STRING, 0, 0, 0, { 200, 0, ROK_FEATURE, 1u, 1 }, 0, 0 },
+    { "anims", offsetof(Feature, anims), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_GAF, 0, 0, {}, 0, 0 },
+    { "seq", offsetof(Feature, seq), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
+    { "seqshad", offsetof(Feature, seqshad), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
+    { "seqburn", offsetof(Feature, seqburn), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
+    { "seqburnshad", offsetof(Feature, seqburnshad), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
+    { "seqdie", offsetof(Feature, seqdie), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
+    { "seqdieshad", offsetof(Feature, seqdieshad), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
+    { "seqreclamate", offsetof(Feature, seqreclamate), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
+    { "seqreclamateshad", offsetof(Feature, seqreclamateshad), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
+    { "anim", offsetof(Feature, anim), sizeof(((Feature*)nullptr)->anim), ROK_FEATURE, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
+    { "shadowAnim", offsetof(Feature, shadowAnim), sizeof(((Feature*)nullptr)->shadowAnim), ROK_FEATURE, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
+    { "burnweapon", offsetof(Feature, burnweapon), sizeof(((Feature*)nullptr)->burnweapon), ROK_FEATURE, RK_WEAPON, ROK_WEAPONDEF, 0, 0, {}, 0, 0 },
+    { "burnTime", offsetof(Feature, burnTime), sizeof(((Feature*)nullptr)->burnTime), ROK_FEATURE, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "damage", offsetof(Feature, damage), sizeof(((Feature*)nullptr)->damage), ROK_FEATURE, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "energy", offsetof(Feature, energy), sizeof(((Feature*)nullptr)->energy), ROK_FEATURE, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "metal", offsetof(Feature, metal), sizeof(((Feature*)nullptr)->metal), ROK_FEATURE, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "dead", offsetof(Feature, dead), sizeof(((Feature*)nullptr)->dead), ROK_FEATURE, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "burnt", offsetof(Feature, burnt), sizeof(((Feature*)nullptr)->burnt), ROK_FEATURE, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "reclamate", offsetof(Feature, reclamate), sizeof(((Feature*)nullptr)->reclamate), ROK_FEATURE, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "height", offsetof(Feature, height), sizeof(((Feature*)nullptr)->height), ROK_FEATURE, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "spreadChance", offsetof(Feature, spreadChance), sizeof(((Feature*)nullptr)->spreadChance), ROK_FEATURE, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "seedChance", offsetof(Feature, seedChance), sizeof(((Feature*)nullptr)->seedChance), ROK_FEATURE, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "seedSpread", offsetof(Feature, seedSpread), sizeof(((Feature*)nullptr)->seedSpread), ROK_FEATURE, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "flags16", offsetof(Feature, flags16), sizeof(((Feature*)nullptr)->flags16), ROK_FEATURE, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "prev", offsetof(Spot, prev), sizeof(((Spot*)nullptr)->prev), ROK_SPOT, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "next", offsetof(Spot, next), sizeof(((Spot*)nullptr)->next), ROK_SPOT, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "anim", offsetof(Spot, anim), sizeof(((Spot*)nullptr)->anim), ROK_SPOT, RK_EMBED, ROK_HANDLE, 0, 0, { 200, 215, ROK_FEATURE, 1u, 1 }, 0, 0 },
+    { "shadow", offsetof(Spot, shadow), sizeof(((Spot*)nullptr)->shadow), ROK_SPOT, RK_EMBED, ROK_HANDLE, 0, 0, { 200, 215, ROK_FEATURE, 1u, 1 }, 0, 0 },
+    { "state", offsetof(Spot, state), sizeof(((Spot*)nullptr)->state), ROK_SPOT, RK_REF, ROK_MODELSTATE, 0, 0, { 200, 215, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "posX", offsetof(Spot, pos.x), sizeof(((Spot*)nullptr)->pos.x), ROK_SPOT, RK_I32, 0, 0, 0, { 200, 215, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "posY", offsetof(Spot, pos.y), sizeof(((Spot*)nullptr)->pos.y), ROK_SPOT, RK_I32, 0, 0, 0, { 200, 215, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "posZ", offsetof(Spot, pos.z), sizeof(((Spot*)nullptr)->pos.z), ROK_SPOT, RK_I32, 0, 0, 0, { 200, 215, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "velX", offsetof(Spot, vel.x), sizeof(((Spot*)nullptr)->vel.x), ROK_SPOT, RK_I32, 0, 0, 0, { 200, 215, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "velY", offsetof(Spot, vel.y), sizeof(((Spot*)nullptr)->vel.y), ROK_SPOT, RK_I32, 0, 0, 0, { 200, 215, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "velZ", offsetof(Spot, vel.z), sizeof(((Spot*)nullptr)->vel.z), ROK_SPOT, RK_I32, 0, 0, 0, { 200, 215, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "rot", offsetof(Spot, rot), 6, ROK_SPOT, RK_BYTES, 0, 0, 0, {}, 0, 0 },
+    { "damage", offsetof(Spot, damage), sizeof(((Spot*)nullptr)->damage), ROK_SPOT, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "cell", offsetof(Spot, cell), sizeof(((Spot*)nullptr)->cell), ROK_SPOT, RK_POINT16, 0, 0, 0, {}, 0, 0 },
+    { "feature", offsetof(Spot, feature), sizeof(((Spot*)nullptr)->feature), ROK_SPOT, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "timer", offsetof(Spot, timer), sizeof(((Spot*)nullptr)->timer), ROK_SPOT, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "flags", offsetof(Spot, flags), sizeof(((Spot*)nullptr)->flags), ROK_SPOT, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "entries", offsetof(Pool, entries), sizeof(((Pool*)nullptr)->entries), ROK_POOL, RK_REF, ROK_SPOT, 0, 0, {}, 0, 0 },
+    { "featureUnit", offsetof(Pool, featureUnit), sizeof(((Pool*)nullptr)->featureUnit), ROK_POOL, RK_REF, ROK_ALLOC, 0, 0, {}, 0, 0 },
+    { "usedHead", offsetof(Pool, usedHead), sizeof(((Pool*)nullptr)->usedHead), ROK_POOL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "restHead", offsetof(Pool, restHead), sizeof(((Pool*)nullptr)->restHead), ROK_POOL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "freeHead", offsetof(Pool, freeHead), sizeof(((Pool*)nullptr)->freeHead), ROK_POOL, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "flags", offsetof(FixtureView, flags), sizeof(((FixtureView*)nullptr)->flags), ROK_FIXTUREVIEW, RK_U16, 0, 0, 0, {}, 0, 0 },
-    { "count", offsetof(FixtureView, plain.count), sizeof(((FixtureView*)nullptr)->plain.count), ROK_FIXTUREVIEW, RK_I32, 0, 0, 0, { 172, 0, ROK_FIXTUREVIEW, 1u, 0 }, 0, 0 },
-    { "total", offsetof(FixtureView, plain.total), sizeof(((FixtureView*)nullptr)->plain.total), ROK_FIXTUREVIEW, RK_I32, 0, 0, 0, { 172, 0, ROK_FIXTUREVIEW, 1u, 0 }, 0, 0 },
-    { "scale", offsetof(FixtureView, linked.scale), sizeof(((FixtureView*)nullptr)->linked.scale), ROK_FIXTUREVIEW, RK_F32, 0, 0, 0, { 172, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
-    { "table", offsetof(FixtureView, linked.table), sizeof(void*), ROK_FIXTUREVIEW, RK_PTR, ROK_FRAMETABLE, 0, 0, { 172, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
-    { "def", offsetof(FixtureView, linked.def), sizeof(((FixtureView*)nullptr)->linked.def), ROK_FIXTUREVIEW, RK_REF, ROK_UNITDEF, 0, 0, { 172, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
+    { "count", offsetof(FixtureView, plain.count), sizeof(((FixtureView*)nullptr)->plain.count), ROK_FIXTUREVIEW, RK_I32, 0, 0, 0, { 223, 0, ROK_FIXTUREVIEW, 1u, 0 }, 0, 0 },
+    { "total", offsetof(FixtureView, plain.total), sizeof(((FixtureView*)nullptr)->plain.total), ROK_FIXTUREVIEW, RK_I32, 0, 0, 0, { 223, 0, ROK_FIXTUREVIEW, 1u, 0 }, 0, 0 },
+    { "scale", offsetof(FixtureView, linked.scale), sizeof(((FixtureView*)nullptr)->linked.scale), ROK_FIXTUREVIEW, RK_F32, 0, 0, 0, { 223, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
+    { "table", offsetof(FixtureView, linked.table), sizeof(void*), ROK_FIXTUREVIEW, RK_PTR, ROK_FRAMETABLE, 0, 0, { 223, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
+    { "def", offsetof(FixtureView, linked.def), sizeof(((FixtureView*)nullptr)->linked.def), ROK_FIXTUREVIEW, RK_REF, ROK_UNITDEF, 0, 0, { 223, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
     { "player", offsetof(FixtureSlave, player), sizeof(((FixtureSlave*)nullptr)->player), ROK_FIXTURESLAVE, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "master", offsetof(FixtureSlave, master), sizeof(((FixtureSlave*)nullptr)->master), ROK_FIXTURESLAVE, RK_REF, ROK_FIXTUREVIEW, 0, 0, {}, 0, 0 },
-    { "moved", offsetof(FixtureSlave, ground.moved), sizeof(((FixtureSlave*)nullptr)->ground.moved), ROK_FIXTURESLAVE, RK_I32, 0, 0, 0, { 25, 178, ROK_PLAYER, 4u, 4 }, 0, 0 },
-    { "speed", offsetof(FixtureSlave, air.speed), sizeof(((FixtureSlave*)nullptr)->air.speed), ROK_FIXTURESLAVE, RK_F32, 0, 0, 0, { 25, 178, ROK_PLAYER, 4u, 0 }, 0, 0 },
-    { "low", offsetof(FixtureSlave, narrow.low), sizeof(((FixtureSlave*)nullptr)->narrow.low), ROK_FIXTURESLAVE, RK_I32, 0, 0, 0, { 172, 179, ROK_FIXTUREVIEW, 2u, 0 }, 0, 0 },
-    { "high", offsetof(FixtureSlave, wide.high), sizeof(((FixtureSlave*)nullptr)->wide.high), ROK_FIXTURESLAVE, RK_F32, 0, 0, 0, { 172, 179, ROK_FIXTUREVIEW, 2u, 2 }, 0, 0 },
+    { "moved", offsetof(FixtureSlave, ground.moved), sizeof(((FixtureSlave*)nullptr)->ground.moved), ROK_FIXTURESLAVE, RK_I32, 0, 0, 0, { 25, 229, ROK_PLAYER, 4u, 4 }, 0, 0 },
+    { "speed", offsetof(FixtureSlave, air.speed), sizeof(((FixtureSlave*)nullptr)->air.speed), ROK_FIXTURESLAVE, RK_F32, 0, 0, 0, { 25, 229, ROK_PLAYER, 4u, 0 }, 0, 0 },
+    { "low", offsetof(FixtureSlave, narrow.low), sizeof(((FixtureSlave*)nullptr)->narrow.low), ROK_FIXTURESLAVE, RK_I32, 0, 0, 0, { 223, 230, ROK_FIXTUREVIEW, 2u, 0 }, 0, 0 },
+    { "high", offsetof(FixtureSlave, wide.high), sizeof(((FixtureSlave*)nullptr)->wide.high), ROK_FIXTURESLAVE, RK_F32, 0, 0, 0, { 223, 230, ROK_FIXTUREVIEW, 2u, 2 }, 0, 0 },
     { "id", offsetof(FixtureHolder, id), sizeof(((FixtureHolder*)nullptr)->id), ROK_FIXTUREHOLDER, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "anim", offsetof(FixtureHolder, anim), sizeof(((FixtureHolder*)nullptr)->anim), ROK_FIXTUREHOLDER, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
     { "shadow", offsetof(FixtureHolder, shadow), sizeof(((FixtureHolder*)nullptr)->shadow), ROK_FIXTUREHOLDER, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 186;
+static const unsigned kReplayObjectFieldCount = 237;
 
 static const unsigned short kReplayReachFields[] = { 45, 49, 108, 109, 110, 36, 34, 37, 45, 50, 52, 79 };
 
@@ -749,6 +823,54 @@ static_assert(sizeof(((Handle*)nullptr)->index) == 2, "Handle::index has the siz
 static_assert(sizeof(((Handle*)nullptr)->value) == 2, "Handle::value has the size the schema says");
 static_assert(sizeof(((Handle*)nullptr)->kind) == 1, "Handle::kind has the size the schema says");
 static_assert(__is_pointer(decltype(((Handle*)nullptr)->src)), "Handle::src is a raw pointer");
+static_assert(sizeof(((Feature*)nullptr)->footprint) == 4, "Feature::footprint has the size the schema says");
+static_assert(__is_pointer(decltype(((Feature*)nullptr)->object)), "Feature::object is a raw pointer");
+static_assert(__is_pointer(decltype(((Feature*)nullptr)->anims)), "Feature::anims is a raw pointer");
+static_assert(__is_pointer(decltype(((Feature*)nullptr)->seq)), "Feature::seq is a raw pointer");
+static_assert(__is_pointer(decltype(((Feature*)nullptr)->seqshad)), "Feature::seqshad is a raw pointer");
+static_assert(__is_pointer(decltype(((Feature*)nullptr)->seqburn)), "Feature::seqburn is a raw pointer");
+static_assert(__is_pointer(decltype(((Feature*)nullptr)->seqburnshad)), "Feature::seqburnshad is a raw pointer");
+static_assert(__is_pointer(decltype(((Feature*)nullptr)->seqdie)), "Feature::seqdie is a raw pointer");
+static_assert(__is_pointer(decltype(((Feature*)nullptr)->seqdieshad)), "Feature::seqdieshad is a raw pointer");
+static_assert(__is_pointer(decltype(((Feature*)nullptr)->seqreclamate)), "Feature::seqreclamate is a raw pointer");
+static_assert(__is_pointer(decltype(((Feature*)nullptr)->seqreclamateshad)), "Feature::seqreclamateshad is a raw pointer");
+static_assert(sizeof(((Feature*)nullptr)->anim) == sizeof(Handle), "Feature::anim has the size of its kind");
+static_assert(sizeof(((Feature*)nullptr)->shadowAnim) == sizeof(Handle), "Feature::shadowAnim has the size of its kind");
+static_assert(sizeof(((Feature*)nullptr)->burnweapon) == 4, "Feature::burnweapon has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->burnTime) == 2, "Feature::burnTime has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->damage) == 2, "Feature::damage has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->energy) == 4, "Feature::energy has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->metal) == 4, "Feature::metal has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->dead) == 2, "Feature::dead has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->burnt) == 2, "Feature::burnt has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->reclamate) == 2, "Feature::reclamate has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->height) == 1, "Feature::height has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->spreadChance) == 1, "Feature::spreadChance has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->seedChance) == 1, "Feature::seedChance has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->seedSpread) == 1, "Feature::seedSpread has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->flags16) == 2, "Feature::flags16 has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->prev) == 2, "Spot::prev has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->next) == 2, "Spot::next has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->anim) == sizeof(Handle), "Spot::anim has the size of its kind");
+static_assert(sizeof(((Spot*)nullptr)->shadow) == sizeof(Handle), "Spot::shadow has the size of its kind");
+static_assert(sizeof(((Spot*)nullptr)->state) == 4, "Spot::state has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->pos.x) == 4, "Spot::posX has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->pos.y) == 4, "Spot::posY has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->pos.z) == 4, "Spot::posZ has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->vel.x) == 4, "Spot::velX has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->vel.y) == 4, "Spot::velY has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->vel.z) == 4, "Spot::velZ has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->rot) == 6, "Spot::rot has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->damage) == 2, "Spot::damage has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->cell) == 4, "Spot::cell has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->feature) == 2, "Spot::feature has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->timer) == 1, "Spot::timer has the size the schema says");
+static_assert(sizeof(((Spot*)nullptr)->flags) == 1, "Spot::flags has the size the schema says");
+static_assert(sizeof(((Pool*)nullptr)->entries) == 4, "Pool::entries has the size the schema says");
+static_assert(sizeof(((Pool*)nullptr)->featureUnit) == 4, "Pool::featureUnit has the size the schema says");
+static_assert(sizeof(((Pool*)nullptr)->usedHead) == 4, "Pool::usedHead has the size the schema says");
+static_assert(sizeof(((Pool*)nullptr)->restHead) == 4, "Pool::restHead has the size the schema says");
+static_assert(sizeof(((Pool*)nullptr)->freeHead) == 4, "Pool::freeHead has the size the schema says");
 static_assert(sizeof(((FixtureView*)nullptr)->flags) == 2, "FixtureView::flags has the size the schema says");
 static_assert(sizeof(((FixtureView*)nullptr)->plain.count) == 4, "FixtureView::count has the size the schema says");
 static_assert(sizeof(((FixtureView*)nullptr)->plain.total) == 4, "FixtureView::total has the size the schema says");
@@ -1203,20 +1325,34 @@ static const unsigned short kReplayEconomySpendEnergyAndMetalObjReads[] = { 2, 3
 static const unsigned short kReplayEconomySpendEnergyAndMetalObjWrites[] = { 2, 3, 93, 99 };
 static const unsigned char kReplayFeaturesUpdateFeaturesReads[] = { 0, 1, 2, 17, 33, 34, 35 };
 static const unsigned char kReplayFeaturesUpdateFeaturesWrites[] = { 33, 34, 35 };
-static const unsigned short kReplayFeaturesUpdateFeaturesObjReads[] = { 40, 41, 170 };
-static const unsigned short kReplayFeaturesPlaceMissionFeaturesObjReads[] = { 40, 41 };
+static const unsigned short kReplayFeaturesUpdateFeaturesObjReads[] = { 40, 41, 170, 185, 186, 197, 198, 199, 200, 202, 203, 205, 206, 207, 208, 209, 210, 213, 214, 215, 216, 217, 219, 220 };
+static const unsigned short kReplayFeaturesUpdateFeaturesObjWrites[] = { 185, 186, 202, 203, 205, 206, 207, 208, 209, 210, 213, 215, 220 };
+static const unsigned short kReplayFeaturesResolveFeatureLinksObjReads[] = { 171 };
+static const unsigned short kReplayFeaturesResolveFeatureLinksObjWrites[] = { 171, 192, 193, 194 };
+static const unsigned short kReplayFeaturesInitFeatureAnimPoolObjReads[] = { 217, 218, 219, 220, 221 };
+static const unsigned short kReplayFeaturesInitFeatureAnimPoolObjWrites[] = { 217, 218, 219, 220, 221 };
+static const unsigned short kReplayFeaturesFreeFeaturePoolObjReads[] = { 174, 176, 199, 200, 204, 214, 217, 218, 219, 220 };
+static const unsigned short kReplayFeaturesFreeFeaturePoolObjWrites[] = { 174, 176, 217, 218 };
+static const unsigned short kReplayFeaturesPlaceMissionFeaturesObjReads[] = { 40, 41, 199 };
 static const unsigned char kReplayFeaturesStampFeatureMetalReads[] = { 1, 2 };
+static const unsigned short kReplayFeaturesStampFeatureMetalObjReads[] = { 173, 191, 199 };
 static const unsigned short kReplayFeaturesStampFeatureMetalObjWrites[] = { 107 };
 static const unsigned char kReplayFeaturesGetCellFeatureReads[] = { 1 };
 static const unsigned char kReplayFeaturesPlaceFeatureReads[] = { 1, 2 };
-static const unsigned short kReplayFeaturesPlaceFeatureObjReads[] = { 40, 41 };
+static const unsigned short kReplayFeaturesPlaceFeatureObjReads[] = { 40, 41, 173, 174, 199, 211, 217 };
+static const unsigned short kReplayFeaturesPlaceFeatureObjWrites[] = { 204, 205, 206, 207, 211, 212, 213, 214 };
 static const unsigned char kReplayFeaturesRemoveFeatureReads[] = { 1 };
-static const unsigned short kReplayFeaturesRemoveFeatureObjReads[] = { 40, 41 };
+static const unsigned short kReplayFeaturesRemoveFeatureObjReads[] = { 40, 41, 173, 199, 204, 221 };
+static const unsigned short kReplayFeaturesRemoveFeatureObjWrites[] = { 204, 221 };
 static const unsigned char kReplayFeaturesReclaimFeatureReads[] = { 15 };
-static const unsigned short kReplayFeaturesReclaimFeatureObjReads[] = { 0, 25 };
-static const unsigned short kReplayFeaturesDamageFeatureObjReads[] = { 23 };
-static const unsigned short kReplayFeaturesGetFootprintCentreObjReads[] = { 40, 41 };
+static const unsigned short kReplayFeaturesReclaimFeatureObjReads[] = { 0, 25, 190, 191, 199 };
+static const unsigned short kReplayFeaturesDamageFeatureObjReads[] = { 23, 189, 199, 212, 213 };
+static const unsigned short kReplayFeaturesDamageFeatureObjWrites[] = { 212 };
+static const unsigned short kReplayFeaturesGetFootprintCentreObjReads[] = { 40, 41, 173 };
 static const unsigned char kReplayFeaturesSaveFeaturesReads[] = { 1, 2 };
+static const unsigned short kReplayFeaturesSaveFeaturesObjReads[] = { 167, 170, 171, 179, 180, 181, 182, 183, 184, 199, 205, 206, 207, 211, 212, 215 };
+static const unsigned short kReplayFeaturesLoadFeaturesObjReads[] = { 171 };
+static const unsigned short kReplayFeaturesLoadFeaturesObjWrites[] = { 167, 212, 215 };
 static const unsigned short kReplayAiHasReadyUnitInRangeObjReads[] = { 36 };
 static const unsigned char kReplayAiIsPointVisibleReads[] = { 19 };
 static const unsigned char kReplayAiReactToAttackReads[] = { 0, 33, 34, 35 };
@@ -1246,7 +1382,7 @@ static const unsigned short kReplayWeaponsFindTargetableProjectileObjReads[] = {
 static const unsigned char kReplayWeaponsWeaponCanReachPosReads[] = { 17 };
 static const unsigned short kReplayWeaponsWeaponCanReachPosObjReads[] = { 34, 55, 60, 65, 86 };
 static const unsigned short kReplayWeaponsDamageUnitObjReads[] = { 0, 25, 34, 35, 37, 43, 46 };
-static const unsigned short kReplayWeaponsFindFeatureAtPosObjReads[] = { 40, 41 };
+static const unsigned short kReplayWeaponsFindFeatureAtPosObjReads[] = { 40, 41, 173 };
 static const unsigned short kReplayWeaponsReleaseWeaponsObjReads[] = { 42, 53, 54, 55, 56, 58, 59, 60, 61, 63, 64, 65, 66 };
 static const unsigned short kReplayWeaponsReleaseWeaponsObjWrites[] = { 53, 54, 58, 59, 63, 64 };
 static const unsigned short kReplayWeaponsClaimWeaponsObjReads[] = { 42, 53, 54, 55, 56, 58, 59, 60, 61, 63, 64, 65, 66 };
@@ -1415,9 +1551,10 @@ static const unsigned char kReplayMapRemoveUnitFromMapReads[] = { 1 };
 static const unsigned short kReplayMapRemoveUnitFromMapObjReads[] = { 34, 36, 40, 41, 43 };
 static const unsigned short kReplayMapRemoveUnitFromMapObjWrites[] = { 36 };
 static const unsigned char kReplayMapCanPlaceFootprintAtReads[] = { 1, 2, 17, 19 };
-static const unsigned short kReplayMapCanPlaceFootprintAtObjReads[] = { 34, 40, 41, 43, 47, 79 };
+static const unsigned short kReplayMapCanPlaceFootprintAtObjReads[] = { 34, 40, 41, 43, 47, 79, 199 };
 static const unsigned char kReplayMapPickRandomReclaimableResourcesInRadiusReads[] = { 33, 34, 35 };
 static const unsigned char kReplayMapPickRandomReclaimableResourcesInRadiusWrites[] = { 33, 34, 35 };
+static const unsigned short kReplayMapPickRandomReclaimableResourcesInRadiusObjReads[] = { 190, 191, 199 };
 static const unsigned short kReplayMapForceNeighborFootprintReclaimObjReads[] = { 36, 40, 41 };
 static const unsigned short kReplayMapForceNeighborFootprintReclaimObjWrites[] = { 36 };
 static const unsigned short kReplayMapSetYardOpenObjReads[] = { 34, 36, 40, 41 };
@@ -1457,24 +1594,24 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "SpendEnergy", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomySpendEnergyObjReads, 3, kReplayEconomySpendEnergyObjWrites, 2, 0 },
     { "SpendMetal", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomySpendMetalObjReads, 3, kReplayEconomySpendMetalObjWrites, 2, 0 },
     { "SpendEnergyAndMetal", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomySpendEnergyAndMetalObjReads, 5, kReplayEconomySpendEnergyAndMetalObjWrites, 4, 0 },
-    { "UpdateFeatures", SUB_FEATURES, kReplayFeaturesUpdateFeaturesReads, 7, kReplayFeaturesUpdateFeaturesWrites, 3, kReplayFeaturesUpdateFeaturesObjReads, 3, nullptr, 0, 0 },
+    { "UpdateFeatures", SUB_FEATURES, kReplayFeaturesUpdateFeaturesReads, 7, kReplayFeaturesUpdateFeaturesWrites, 3, kReplayFeaturesUpdateFeaturesObjReads, 24, kReplayFeaturesUpdateFeaturesObjWrites, 13, 0 },
     { "LoadFeatureFileList", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "FreeFeatureFileList", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "NopAfterFeatureEnum", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "ResolveFeatureLinks", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "InitFeatureAnimPool", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "FreeFeaturePool", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "PlaceMissionFeatures", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesPlaceMissionFeaturesObjReads, 2, nullptr, 0, 0 },
-    { "StampFeatureMetal", SUB_FEATURES, kReplayFeaturesStampFeatureMetalReads, 2, nullptr, 0, nullptr, 0, kReplayFeaturesStampFeatureMetalObjWrites, 1, 0 },
+    { "ResolveFeatureLinks", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesResolveFeatureLinksObjReads, 1, kReplayFeaturesResolveFeatureLinksObjWrites, 4, 0 },
+    { "InitFeatureAnimPool", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesInitFeatureAnimPoolObjReads, 5, kReplayFeaturesInitFeatureAnimPoolObjWrites, 5, 0 },
+    { "FreeFeaturePool", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesFreeFeaturePoolObjReads, 10, kReplayFeaturesFreeFeaturePoolObjWrites, 4, 0 },
+    { "PlaceMissionFeatures", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesPlaceMissionFeaturesObjReads, 3, nullptr, 0, 0 },
+    { "StampFeatureMetal", SUB_FEATURES, kReplayFeaturesStampFeatureMetalReads, 2, nullptr, 0, kReplayFeaturesStampFeatureMetalObjReads, 3, kReplayFeaturesStampFeatureMetalObjWrites, 1, 0 },
     { "GetCellFeature", SUB_FEATURES, kReplayFeaturesGetCellFeatureReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "PlaceFeature", SUB_FEATURES, kReplayFeaturesPlaceFeatureReads, 2, nullptr, 0, kReplayFeaturesPlaceFeatureObjReads, 2, nullptr, 0, 0 },
-    { "RemoveFeature", SUB_FEATURES, kReplayFeaturesRemoveFeatureReads, 1, nullptr, 0, kReplayFeaturesRemoveFeatureObjReads, 2, nullptr, 0, 0 },
-    { "ReclaimFeature", SUB_FEATURES, kReplayFeaturesReclaimFeatureReads, 1, nullptr, 0, kReplayFeaturesReclaimFeatureObjReads, 2, nullptr, 0, 0 },
+    { "PlaceFeature", SUB_FEATURES, kReplayFeaturesPlaceFeatureReads, 2, nullptr, 0, kReplayFeaturesPlaceFeatureObjReads, 7, kReplayFeaturesPlaceFeatureObjWrites, 8, 0 },
+    { "RemoveFeature", SUB_FEATURES, kReplayFeaturesRemoveFeatureReads, 1, nullptr, 0, kReplayFeaturesRemoveFeatureObjReads, 6, kReplayFeaturesRemoveFeatureObjWrites, 2, 0 },
+    { "ReclaimFeature", SUB_FEATURES, kReplayFeaturesReclaimFeatureReads, 1, nullptr, 0, kReplayFeaturesReclaimFeatureObjReads, 5, nullptr, 0, 0 },
     { "FindOrLoadFeatureType", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "DamageFeature", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesDamageFeatureObjReads, 1, nullptr, 0, 0 },
-    { "GetFootprintCentre", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesGetFootprintCentreObjReads, 2, nullptr, 0, 0 },
-    { "SaveFeatures", SUB_FEATURES, kReplayFeaturesSaveFeaturesReads, 2, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "LoadFeatures", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
+    { "DamageFeature", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesDamageFeatureObjReads, 5, kReplayFeaturesDamageFeatureObjWrites, 1, 0 },
+    { "GetFootprintCentre", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesGetFootprintCentreObjReads, 3, nullptr, 0, 0 },
+    { "SaveFeatures", SUB_FEATURES, kReplayFeaturesSaveFeaturesReads, 2, nullptr, 0, kReplayFeaturesSaveFeaturesObjReads, 16, nullptr, 0, 0 },
+    { "LoadFeatures", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesLoadFeaturesObjReads, 1, kReplayFeaturesLoadFeaturesObjWrites, 3, 0 },
     { "GetVisibleEnemiesInRadius", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "HasReadyUnitInRange", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiHasReadyUnitInRangeObjReads, 1, nullptr, 0, 0 },
     { "IsPointVisible", SUB_AI, kReplayAiIsPointVisibleReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
@@ -1518,7 +1655,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "InitExplosions", SUB_WEAPONS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "FreeExplosions", SUB_WEAPONS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "DamageUnit", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsDamageUnitObjReads, 7, nullptr, 0, 0 },
-    { "FindFeatureAtPos", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsFindFeatureAtPosObjReads, 2, nullptr, 0, 0 },
+    { "FindFeatureAtPos", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsFindFeatureAtPosObjReads, 3, nullptr, 0, 0 },
     { "ReleaseWeapons", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsReleaseWeaponsObjReads, 13, kReplayWeaponsReleaseWeaponsObjWrites, 6, 0 },
     { "ClaimWeapons", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsClaimWeaponsObjReads, 13, kReplayWeaponsClaimWeaponsObjWrites, 6, 0 },
     { "DetonateUnitWeapon", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsDetonateUnitWeaponObjReads, 2, kReplayWeaponsDetonateUnitWeaponObjWrites, 2, 0 },
@@ -1695,9 +1832,9 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "SnapWorldPosToFootprint", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapSnapWorldPosToFootprintObjReads, 1, nullptr, 0, 0 },
     { "AddUnitToMap", SUB_MAP, kReplayMapAddUnitToMapReads, 3, nullptr, 0, kReplayMapAddUnitToMapObjReads, 9, kReplayMapAddUnitToMapObjWrites, 1, 0 },
     { "RemoveUnitFromMap", SUB_MAP, kReplayMapRemoveUnitFromMapReads, 1, nullptr, 0, kReplayMapRemoveUnitFromMapObjReads, 5, kReplayMapRemoveUnitFromMapObjWrites, 1, 0 },
-    { "CanPlaceFootprintAt", SUB_MAP, kReplayMapCanPlaceFootprintAtReads, 4, nullptr, 0, kReplayMapCanPlaceFootprintAtObjReads, 6, nullptr, 0, 0 },
+    { "CanPlaceFootprintAt", SUB_MAP, kReplayMapCanPlaceFootprintAtReads, 4, nullptr, 0, kReplayMapCanPlaceFootprintAtObjReads, 7, nullptr, 0, 0 },
     { "IsPadSlotFree", SUB_MAP, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "PickRandomReclaimableResourcesInRadius", SUB_MAP, kReplayMapPickRandomReclaimableResourcesInRadiusReads, 3, kReplayMapPickRandomReclaimableResourcesInRadiusWrites, 3, nullptr, 0, nullptr, 0, 0 },
+    { "PickRandomReclaimableResourcesInRadius", SUB_MAP, kReplayMapPickRandomReclaimableResourcesInRadiusReads, 3, kReplayMapPickRandomReclaimableResourcesInRadiusWrites, 3, kReplayMapPickRandomReclaimableResourcesInRadiusObjReads, 3, nullptr, 0, 0 },
     { "ClearFootprintAndUnlink", SUB_MAP, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "ForceNeighborFootprintReclaim", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapForceNeighborFootprintReclaimObjReads, 3, kReplayMapForceNeighborFootprintReclaimObjWrites, 1, 0 },
     { "SetYardOpen", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapSetYardOpenObjReads, 4, kReplayMapSetYardOpenObjWrites, 1, 0 },

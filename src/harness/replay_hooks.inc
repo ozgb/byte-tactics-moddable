@@ -490,6 +490,7 @@ Spot* __stdcall RecFeaturesPlaceFeature(Cell* a0, unsigned short a1, Vec3* a2, R
     }
     Spot* result = s_inner_features->PlaceFeature(a0, a1, a2, a3, a4);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_SPOT, result, "o");
     }
     return result;
 }
@@ -559,10 +560,11 @@ void __stdcall RecFeaturesDamageFeature(Cell* a0, int a1, int a2, WeaponDef* a3)
 Vec3 __stdcall RecFeaturesGetFootprintCentre(Point16* a0, Feature* a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_FEATURE, a1);
     SlotScope scope(RSL_FEATURES_GETFOOTPRINTCENTRE, SUB_FEATURES, roots);
     if (scope.Open()) {
         ArgPending(s_call, "cell");
-        ArgPending(s_call, "def");
+        ArgObject(s_call, "def", ROK_FEATURE, a1);
     }
     Vec3 result = s_inner_features->GetFootprintCentre(a0, a1);
     if (scope.Open()) {
@@ -3116,6 +3118,7 @@ ModelState* __stdcall RecUnitsCreateObjectState(Object3do* a0)
     }
     ModelState* result = s_inner_units->CreateObjectState(a0);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_MODELSTATE, result, "o");
     }
     return result;
 }
@@ -3123,9 +3126,10 @@ ModelState* __stdcall RecUnitsCreateObjectState(Object3do* a0)
 void __stdcall RecUnitsFreeObjectState(ModelState* a0)
 {
     ReplayRoots roots;
+    roots.Add(ROK_MODELSTATE, a0);
     SlotScope scope(RSL_UNITS_FREEOBJECTSTATE, SUB_UNITS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "state");
+        ArgObject(s_call, "state", ROK_MODELSTATE, a0);
     }
     s_inner_units->FreeObjectState(a0);
     if (scope.Open()) {

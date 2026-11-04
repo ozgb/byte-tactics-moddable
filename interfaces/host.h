@@ -430,9 +430,9 @@ struct host_dir_entry {
     unsigned int time_write;
 };
 
-// Lists the entries that match pattern (* and ? wildcards, a path relative to the game directory or absolute), fills entry with the first, and returns the listing's handle, or NULL when nothing matches.
+// Lists the entries that match pattern (* and ? wildcards, a path relative to the game directory or absolute) sorted byte-wise by name with ASCII letters folded to upper case (the order of NTFS and of the reference's FindFirstFile), fills entry with the first, and returns the listing's handle, or NULL when nothing matches.
 void* HOST_CALL host_dir_first(const char* pattern, struct host_dir_entry* entry);
-// Fills entry with the listing's next entry and returns 1, or returns 0 when there are no more.
+// Fills entry with the listing's next entry in that order and returns 1, or returns 0 when there are no more.
 int HOST_CALL host_dir_next(void* dir, struct host_dir_entry* entry);
 // Ends the listing and frees its handle.
 void HOST_CALL host_dir_close(void* dir);

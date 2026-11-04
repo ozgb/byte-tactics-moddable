@@ -7,7 +7,9 @@
 #include "../../../interfaces/host.h"
 
 struct HostDir {
-    long handle;
+    struct host_dir_entry* entries;
+    unsigned int count;
+    unsigned int next;
 };
 
 extern "C" void* HOST_CALL host_file_open_read(const char* path)
@@ -59,10 +61,26 @@ extern "C" void HOST_CALL host_file_close(void* file)
 
 static void FillEntry(const struct _finddata_t* fd, struct host_dir_entry* entry)
 {
+    memset(entry, 0, sizeof(*entry));
     strcpy(entry->name, fd->name);
     entry->attrib = fd->attrib;
     entry->size = fd->size;
     entry->time_write = (unsigned int)fd->time_write;
+}
+
+static int __cdecl CompareEntryNames(const void* a, const void* b)
+{
+    const unsigned char* x = (const unsigned char*)((const struct host_dir_entry*)a)->name;
+    const unsigned char* y = (const unsigned char*)((const struct host_dir_entry*)b)->name;
+    for (;; x++, y++) {
+        int cx = (*x >= 'a' && *x <= 'z') ? *x - 32 : *x;
+        int cy = (*y >= 'a' && *y <= 'z') ? *y - 32 : *y;
+        if (cx != cy)
+            return cx - cy;
+        if (cx == 0)
+            break;
+    }
+    return strcmp(((const struct host_dir_entry*)a)->name, ((const struct host_dir_entry*)b)->name);
 }
 
 extern "C" void* HOST_CALL host_dir_first(const char* pattern, struct host_dir_entry* entry)
@@ -76,23 +94,42 @@ extern "C" void* HOST_CALL host_dir_first(const char* pattern, struct host_dir_e
         _findclose(handle);
         return 0;
     }
-    dir->handle = handle;
-    FillEntry(&fd, entry);
+    dir->entries = 0;
+    dir->count = 0;
+    dir->next = 1;
+    unsigned int capacity = 0;
+    do {
+        if (dir->count == capacity) {
+            capacity = capacity ? capacity * 2 : 64;
+            struct host_dir_entry* grown = (struct host_dir_entry*)realloc(dir->entries, capacity * sizeof(struct host_dir_entry));
+            if (grown == 0) {
+                _findclose(handle);
+                free(dir->entries);
+                free(dir);
+                return 0;
+            }
+            dir->entries = grown;
+        }
+        FillEntry(&fd, &dir->entries[dir->count++]);
+    } while (_findnext(handle, &fd) != -1);
+    _findclose(handle);
+    qsort(dir->entries, dir->count, sizeof(struct host_dir_entry), CompareEntryNames);
+    *entry = dir->entries[0];
     return dir;
 }
 
 extern "C" int HOST_CALL host_dir_next(void* dir, struct host_dir_entry* entry)
 {
-    struct _finddata_t fd;
-    if (_findnext(((HostDir*)dir)->handle, &fd) == -1)
+    HostDir* d = (HostDir*)dir;
+    if (d->next >= d->count)
         return 0;
-    FillEntry(&fd, entry);
+    *entry = d->entries[d->next++];
     return 1;
 }
 
 extern "C" void HOST_CALL host_dir_close(void* dir)
 {
-    _findclose(((HostDir*)dir)->handle);
+    free(((HostDir*)dir)->entries);
     free(dir);
 }
 

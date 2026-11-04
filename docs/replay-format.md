@@ -328,8 +328,9 @@ The replayer's answer allocates `bytes` from an arena of its own, zeroed, and re
 slot exit it compares each buffer with the recorded bytes and reports a difference at `snapshot#<n>[<byte>]` (recorded and replayed
 byte), at `snapshot#<n>.length` when the sizes differ, and at `snapshot#<n>` when a snapshot was recorded and not allocated, or the
 other way round. The `o snapshot` lines are never the outputs of the import before them. The tool writes the recorder's and the
-replayer's code for a `snapshot` service from its spec; the hook in the function, `ReplayImport call(RI_SIM_CAPTURE_ALLOC);
-call.Int(bytes); call.Ptr(offset);` and `return call.Result(buffer);`, belongs to the services issue. The self-test allocates two buffers
+replayer's code for a `snapshot` service from its spec; `SimCaptureAlloc` is the one service of the kind, hooked in `sim_radar.cpp`
+with `ReplayImport call(RI_SIM_CAPTURE_ALLOC); call.Int(bytes); call.Ptr(offset);` and `return call.Result(buffer);`. When a module
+links `sim_radar.cpp`, the replayer does not define the function: the answer calls the real one and compares the buffer it returns. The self-test allocates two buffers
 through a function with the signature of `SimCaptureAlloc`, one of 700 bytes, and checks the lines, an equal replay, a changed byte,
 a snapshot the stub did not allocate and a buffer of another size.
 

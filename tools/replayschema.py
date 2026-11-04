@@ -27,6 +27,7 @@ global), an object field (`Type::member` of an object kind) or something else. A
 tracked by no table and is not exempt is an error for a complete subsystem; a pending subsystem lists what is left
 under `pending`, which its own issue empties. A deref_read or deref_write on a bare scalar pointer and every
 field_escape row needs a hand rule in `annotations.rules`; a rule that matches no row is an error.
+A slot annotated `"record": false` with a `"reason"` is classified and unrecorded: it gets no recording slot and none of the checks above.
 """
 
 import argparse
@@ -708,8 +709,19 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
         errors += ["%s: annotated slot %s is not in interfaces/%s.h" % (sub, n, sub) for n in notes if n not in names]
         slots = {}
         pending = {"untracked": set(), "rules": set(), "functions": [], "args": []}
+        unrecorded = {}
         for s in iface["slots"]:
             note = notes.get(s["name"], {})
+            if "record" in note or "reason" in note:
+                if "record" not in note:
+                    errors.append("%s.%s has a reason and is recorded: `reason` goes with `\"record\": false`" % (sub, s["name"]))
+                elif note["record"] is not False:
+                    errors.append("%s.%s: `record` is only ever false" % (sub, s["name"]))
+                elif not note.get("reason"):
+                    errors.append("%s.%s is not recorded and has no `reason`" % (sub, s["name"]))
+                else:
+                    unrecorded[s["name"]] = {"reason": note["reason"], "native": note.get("native", s["name"])}
+                    continue
             functions = functions_of(s, sub, assignment, note)
             if not functions:
                 pending["functions"].append(s["name"])
@@ -806,6 +818,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
         }
         if spec.get("issue"):
             subsystems[sub]["issue"] = spec["issue"]
+        if unrecorded:
+            subsystems[sub]["unrecorded"] = unrecorded
         left = {k: v for k, v in done.items() if v}
         if complete and left:
             for k, v in left.items():
@@ -829,7 +843,9 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for sub, spec in subsystems.items():
         for imp in spec["imports"]:
             seam, slot = imp.split(".")
-            if slot not in subsystems.get(seam, {}).get("slots", {}):
+            if slot in subsystems.get(seam, {}).get("unrecorded", {}):
+                errors.append("%s imports %s, which is not recorded" % (sub, imp))
+            elif slot not in subsystems.get(seam, {}).get("slots", {}):
                 errors.append("%s imports %s, which is no slot of the %s interface" % (sub, imp, seam))
     return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table,
             "arrays": arrays, "tables": tables, "vectors": vectors, "code_tables": code_tables, "callbacks": callbacks,
@@ -1378,8 +1394,8 @@ def render_slots(ann: dict, model: dict) -> str:
             L += import_stub(seam, slot, spec["slots"][slot])
     for sub, spec in ready.items():
         L.append("%s g_native_%s = {" % (spec["struct"], sub))
-        for slot, s in spec["slots"].items():
-            L.append("    %s," % s["native"])
+        for slot in (x["name"] for x in parse_interface(sub, spec["struct"])["slots"]):
+            L.append("    %s," % (spec["slots"][slot] if slot in spec["slots"] else spec["unrecorded"][slot])["native"])
         L += ["};", ""]
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
@@ -2224,6 +2240,8 @@ def attach_raw_params(model: dict) -> None:
     for sub, spec in model["subsystems"].items():
         iface = parse_interface(sub, spec["struct"])
         for s in iface["slots"]:
+            if s["name"] in spec.get("unrecorded", {}):
+                continue
             slot = spec["slots"][s["name"]]
             slot["rawParams"] = [p["type"] for p in s["params"]]
             slot["params"] = [p["type"] for p in s["params"]]

@@ -109,6 +109,53 @@ class Accounting(unittest.TestCase):
         self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
 
 
+class Unrecorded(unittest.TestCase):
+    def unannotated(self):
+        ann = annotations()
+        del ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["args"]
+        return ann
+
+    def test_a_slot_with_pending_work_passes_only_when_it_is_not_recorded(self):
+        ann = self.unannotated()
+        _, errors = build([], ann)
+        self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
+        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "load class"})
+        model, errors = build([], ann)
+        self.assertEqual([e for e in errors if "matches no row" not in e], [])
+        spec = model["subsystems"]["wind_meteors"]
+        self.assertNotIn("SetMeteorParams", spec["slots"])
+        self.assertEqual(spec["unrecorded"], {"SetMeteorParams": {"reason": "load class", "native": "SetMeteorParams"}})
+        self.assertNotIn(("wind_meteors", "SetMeteorParams"), model["slot_list"])
+
+    def test_the_native_table_keeps_the_slot_in_its_place(self):
+        ann = self.unannotated()
+        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "#711"})
+        model, _ = build([], ann)
+        rs.attach_raw_params(model)
+        text = rs.render_slots(ann, model)
+        table = text.split("g_native_wind_meteors = {")[1].split("};")[0]
+        order = [s["name"] for s in rs.parse_interface("wind_meteors", model["subsystems"]["wind_meteors"]["struct"])["slots"]]
+        self.assertEqual([x.strip(" ,") for x in table.split("\n") if x.strip()], [annotations()["subsystems"]["wind_meteors"]["slots"].get(n, {}).get("native", n) for n in order])
+
+    def test_a_slot_that_is_not_recorded_needs_a_reason(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["record"] = False
+        _, errors = build([], ann)
+        self.assertTrue(any("SetMeteorParams is not recorded and has no `reason`" in e for e in errors), errors)
+
+    def test_a_reason_on_a_recorded_slot_is_an_error(self):
+        ann = annotations()
+        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["reason"] = "load class"
+        _, errors = build([], ann)
+        self.assertTrue(any("SetMeteorParams has a reason and is recorded" in e for e in errors), errors)
+
+    def test_a_slot_that_is_not_recorded_cannot_be_imported(self):
+        ann = annotations()
+        ann["subsystems"]["files"]["slots"].setdefault("BankOpenAccount", {}).update({"record": False, "reason": "#711"})
+        _, errors = build([], ann)
+        self.assertTrue(any("imports files.BankOpenAccount, which is not recorded" in e for e in errors), errors)
+
+
 class Rules(unittest.TestCase):
     def slot(self, rows, name="UpdatePlayerEconomy", sub="economy"):
         model, errors = build(rows)

@@ -671,5 +671,83 @@ class WriteNothingTest(unittest.TestCase):
             self.assertFalse((Path(d) / "coverage.csv").exists())
 
 
+NATIVE_CPP = """
+static void __stdcall ResetNative(UnitResources* self, unsigned char playerIndex) {}
+void InstallNativeSeams() {
+    s_economy.Reset = ResetNative;
+    s_economy.Spend = (int (__stdcall *)(int))SpendEnergy;
+    s_economy.Dead = DeadNative;
+}
+"""
+
+SHOW = """Counters:
+  native.cpp:?ResetNative@@YGXPAVUnitResources@@E@Z:
+    Hash: 0x00f19ca346a2446e
+    Counters: 1
+    Function count: %d
+    Block counts: []
+  ?SpendEnergy@@YGHH@Z:
+    Hash: 0x0000000000000018
+    Counters: 1
+    Function count: %d
+    Block counts: []
+  ?Other@@YGXXZ:
+    Hash: 0x0000000000000018
+    Counters: 1
+    Function count: 9
+    Block counts: []
+Instrumentation level: Front-end
+"""
+
+
+class SlotsTest(unittest.TestCase):
+    runs = {"short": cov.read_entry_counts(SHOW % (3, 0)), "long": cov.read_entry_counts(SHOW % (5, 70)),
+            "other": cov.read_entry_counts(SHOW % (0, 2))}
+    ticks = {"short": 100, "long": 900, "other": 400}
+
+    def table(self, runs=None, slots=("Reset", "Spend", "Dead")):
+        return cov.slot_table("economy", list(slots), cov.parse_bindings(NATIVE_CPP), runs or self.runs, self.ticks,
+                              {"DeadNative": "network"})
+
+    def test_bindings_take_the_function_after_a_cast(self):
+        self.assertEqual(cov.parse_bindings(NATIVE_CPP), {("economy", "Reset"): "ResetNative", ("economy", "Spend"): "SpendEnergy",
+                                                          ("economy", "Dead"): "DeadNative"})
+
+    def test_entry_counts(self):
+        self.assertEqual(self.runs["long"], {("native.cpp", "ResetNative"): 5, ("", "SpendEnergy"): 70, ("", "Other"): 9})
+
+    def test_wrapper_slot_lists_its_scenarios_fewest_ticks_first(self):
+        row = self.table()["slots"][0]
+        self.assertEqual((row["binding"], row["function"]), ("wrapper", "ResetNative"))
+        self.assertEqual([(e["scenario"], e["count"], e["ticks"]) for e in row["scenarios"]], [("short", 3, 100), ("long", 5, 900)])
+
+    def test_direct_slot_is_marked_an_upper_bound(self):
+        t = self.table()
+        row = t["slots"][1]
+        self.assertEqual(row["binding"], "direct")
+        self.assertEqual([e["scenario"] for e in row["scenarios"]], ["other", "long"])
+        self.assertIn("(direct, upper bound)", cov.render_slots(t))
+        self.assertIn("(wrapper)", cov.render_slots(t))
+
+    def test_a_slot_no_scenario_enters_is_never_with_its_reason(self):
+        row = self.table()["slots"][2]
+        self.assertTrue(row["never"])
+        self.assertEqual(row["reason"], "network")
+        self.assertIn("    never: network", cov.render_slots(self.table()))
+
+    def test_greedy_set_takes_the_most_new_slots_then_the_fewest_ticks(self):
+        self.assertEqual(self.table()["greedy"], ["long"])
+        self.assertEqual(self.table({"short": self.runs["short"], "other": self.runs["other"]})["greedy"], ["short", "other"])
+
+    def test_greedy_set_breaks_a_tie_by_ticks(self):
+        runs = {"long": self.runs["long"], "short": cov.read_entry_counts(SHOW % (1, 1))}
+        self.assertEqual(self.table(runs)["greedy"], ["short"])
+
+    def test_a_wrapper_is_not_matched_by_a_function_of_another_file(self):
+        counts = {("elsewhere.cpp", "ResetNative"): 4}
+        self.assertIsNone(cov.function_count(counts, "ResetNative", True))
+        self.assertEqual(cov.function_count(counts, "ResetNative", False), 4)
+
+
 if __name__ == "__main__":
     unittest.main()

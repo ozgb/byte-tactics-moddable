@@ -16,7 +16,7 @@ def row(function, kind, target):
 
 
 def annotations():
-    return copy.deepcopy(rs.load_annotations())
+    return copy.deepcopy(rs.load_annotations(fixtures=True))
 
 
 def build(rows, ann=None, assignment=None):
@@ -761,7 +761,7 @@ class Polymorphic(unittest.TestCase):
         self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', vtables)
         base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
         self.assertTrue(base.endswith('0, 0, 0, 3, 0 },'), base)
-        self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };", text)
+        self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };", text)
         self.assertIn('static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");', text)
         self.assertIn('static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");', text)
 
@@ -1384,14 +1384,14 @@ class InsideSites(unittest.TestCase):
         files, errors, _ = self.generated()
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertIn('    { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot" },', text)
-        self.assertIn('    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim" },', text)
-        self.assertIn('    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, shadowAnim), "shadowAnim" },', text)
-        self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim" },', text)
-        self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow" },', text)
-        self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim" },', text)
-        self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow" },', text)
-        self.assertIn("kReplayInsideSiteCount = 7;", text)
+        self.assertIn('    { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot", 0, 1, 0 },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim", 0, 1, 0 },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, shadowAnim), "shadowAnim", 0, 1, 0 },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim", 0, 1, 0 },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
+        self.assertIn("kReplayInsideSiteCount = 11;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
@@ -1563,12 +1563,12 @@ class DeltaKinds(unittest.TestCase):
         ann = annotations()
         ann["objects"]["Handle"]["delta"] = True
         errors = self.generated(ann)[1]
-        self.assertTrue(any("Handle delta: only a kind with a table can be a delta" in e for e in errors), errors)
+        self.assertTrue(any("Handle delta: only a kind with a table of Game or SimGlobals can be a delta" in e for e in errors), errors)
         self.assertTrue(any("Handle delta: a delta kind is a state kind with no sites, kinds or vtable" in e for e in errors), errors)
         ann = annotations()
         ann["objects"]["Vec3"]["delta"] = True
         errors = self.generated(ann)[1]
-        self.assertTrue(any("Vec3 delta: only a kind with a table can be a delta" in e for e in errors), errors)
+        self.assertTrue(any("Vec3 delta: only a kind with a table of Game or SimGlobals can be a delta" in e for e in errors), errors)
 
     def test_delta_is_true_or_absent(self):
         ann = annotations()
@@ -1620,12 +1620,185 @@ class GameRefs(unittest.TestCase):
             self.generated(ann)
 
 
+class ElementForms(unittest.TestCase):
+    """Arrays of refs, arrays of embeds, tables behind a ref field, sites in an array element, `vptr` and embedded polymorphic kinds."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def errors(self, ann):
+        return self.generated(ann)[1]
+
+    def has(self, ann, text):
+        errors = self.errors(ann)
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def row(self, text, start):
+        return [l for l in text.split("\n") if l.startswith(start)][0]
+
+    def test_the_committed_fixtures_have_no_errors(self):
+        self.assertEqual(self.errors(None), [])
+
+    def test_an_array_of_refs_has_a_count_and_a_stride(self):
+        files, _, model = self.generated()
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn("    { 4, sizeof(unsigned) },", text)
+        self.assertRegex(self.row(text, '    { "timers", offsetof(FixtureManager, timers)'), r"RK_REFS, ROK_FIXTURETIMERBASE, 0, 0, \{\}, 0, 0, \d+ \},")
+        self.assertIn("FixtureManager::timers holds Ref<FixtureTimerBase>", text)
+        self.assertEqual([e["count"] for e in model["elems"] if e["kind"] == "refs"], [4])
+
+    def test_an_array_of_refs_is_checked(self):
+        for change, message in (({"count": 0}, "FixtureManager.timers: `count` is a positive integer"),
+                                ({"count": "4"}, "FixtureManager.timers: `count` is a positive integer"),
+                                ({"target": "Vec3"}, "the target Vec3 is no state kind")):
+            ann = annotations()
+            next(f for f in ann["objects"]["FixtureManager"]["fields"] if f["name"] == "timers").update(change)
+            self.has(ann, message)
+
+    def test_an_array_of_refs_to_a_base_needs_poly(self):
+        ann = annotations()
+        del next(f for f in ann["objects"]["FixtureManager"]["fields"] if f["name"] == "timers")["poly"]
+        self.has(ann, "FixtureManager.timers: points at the base kind FixtureTimerBase and needs \"poly\"")
+        ann = annotations()
+        next(f for f in ann["objects"]["FixtureManager"]["fields"] if f["name"] == "timers").update({"target": "FixtureGroup", "poly": "FixtureGroup"})
+        self.has(ann, "FixtureManager.timers: `poly` names the base kind that the ref points at")
+
+    def test_an_array_of_embeds_is_a_site_with_a_stride(self):
+        files, errors, model = self.generated()
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn('    { ROK_FIXTURECHANNEL, ROK_FIXTURESCRIPT, offsetof(FixtureScript, channels[0]), "channels[]", sizeof(((FixtureScript*)nullptr)->channels[0]), 4, 0 },', text)
+        self.assertIn("FixtureScript::channels holds 4 elements", text)
+        self.assertEqual(model["sites"]["FixtureChannel"][0]["count"], 4)
+
+    def test_a_site_in_an_array_element_names_the_member_of_each_element(self):
+        files, _, _ = self.generated()
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn('    { ROK_FIXTURECB, ROK_FIXTURERIG, offsetof(FixtureRig, slots[0].cb), "slots[].cb", sizeof(((FixtureRig*)nullptr)->slots[0]), 3, 0 },', text)
+        self.assertIn("sizeof(((FixtureRig*)nullptr)->slots[0].cb) == sizeof(FixtureCb)", text)
+
+    def test_a_site_in_an_array_needs_an_embeds_field(self):
+        ann = annotations()
+        ann["objects"]["FixtureCb"]["inside"] = [{"kind": "FixtureRig", "member": "slots[].nowhere"}]
+        self.has(ann, "FixtureCb inside: the site FixtureRig.slots[].nowhere is no embeds field of FixtureRig that leads to FixtureCb")
+        ann = annotations()
+        ann["objects"]["FixtureChannel"]["inside"] = [{"kind": "FixtureScript", "member": "channels"}]
+        self.has(ann, "FixtureChannel inside: the site FixtureScript.channels is no embed field of FixtureScript that leads to FixtureChannel")
+
+    def test_an_array_of_embeds_is_checked(self):
+        for change, message in (({"count": 0}, "FixtureScript.channels: `count` is a positive integer"),
+                                ({"member": "channels"}, "the member of an array of embeds has one `[]`"),
+                                ({"poly": "FixtureChannel"}, "an array of embeds names one kind, and has no `poly`")):
+            ann = annotations()
+            next(f for f in ann["objects"]["FixtureScript"]["fields"] if f["name"] == "channels").update(change)
+            self.has(ann, message)
+
+    def test_a_table_behind_a_ref_field_is_a_site_of_its_owner(self):
+        files, errors, model = self.generated()
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn('    { ROK_FIXTUREGROUP, ROK_FIXTUREOWNER, offsetof(FixtureOwner, groups), "groups[]", sizeof(FixtureGroup), 4, 1 },', text)
+        self.assertTrue(self.row(text, '    { "FixtureGroup", sizeof(FixtureGroup), RS_STATE, RT_ORDER,'))
+        self.assertEqual([t["kind"] for t in model["tables"] if t["kind"].startswith("Fixture")], ["FixtureCell", "FixtureLane"])
+
+    def test_a_table_behind_a_ref_field_is_checked(self):
+        cases = (({"base": {"object": "Nowhere", "field": "groups"}, "count": 4}, "the base Nowhere is no state kind"),
+                 ({"base": {"object": "FixtureOwner", "field": "id"}, "count": 4}, "the base FixtureOwner.id is no ref field that leads to FixtureGroup"),
+                 ({"base": {"object": "FixtureOwner", "field": "groups"}, "count": 0}, "the count is a positive integer"),
+                 ({"base": {"object": "FixtureOwner", "field": "groups", "x": 1}, "count": 4}, "a table behind a ref field is"))
+        for table, message in cases:
+            ann = annotations()
+            ann["objects"]["FixtureGroup"]["table"] = table
+            self.has(ann, message)
+
+    def test_a_table_behind_a_ref_field_is_no_delta_all_of_or_inside_kind(self):
+        ann = annotations()
+        ann["objects"]["FixtureGroup"]["delta"] = True
+        self.has(ann, "FixtureGroup delta: only a kind with a table of Game or SimGlobals can be a delta")
+        ann = annotations()
+        ann["objects"]["FixtureGroup"]["inside"] = [{"kind": "FixtureOwner", "member": "id"}]
+        self.has(ann, "a kind in a table behind a ref field is a state kind with no sites")
+        ann = annotations()
+        ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureGroup", "note": "test"})
+        errors = rs.generate(rs.read_rows() + [row("UpdateResourceSharing", "field_escape", "Game::p1cd5")], ann)[1]
+        self.assertTrue(any("the all-of rule names FixtureGroup, which is no table kind of the schema" in e for e in errors), errors)
+
+    def test_a_vptr_kind_has_its_global_in_the_vtable_functions(self):
+        files, _, _ = self.generated()
+        text = files[rs.FIXTURE_VTABLES_CPP]
+        self.assertIn("extern void (* const g_fixtureCbVtable[])();", text)
+        self.assertIn("case ROK_FIXTURECB:\n        return g_fixtureCbVtable;", text)
+        self.assertIn('return "g_fixtureCbVtable";', text)
+        self.assertIn("FixtureCb has a vptr that the code sets by hand", files[rs.FIXTURE_SCHEMA_H])
+        self.assertNotIn("Fixture", files[rs.VTABLES_CPP])
+
+    def test_a_vptr_is_checked(self):
+        for change, message in (({"vptr": "not a name"}, "FixtureCb: the vptr is the name of a global"),
+                                ({"vptr": "g_fixtureAttachVtable"}, "FixtureCb: the vptr g_fixtureAttachVtable is also the vtable of FixtureAttach"),
+                                ({"vtable": "g_other"}, "FixtureCb: a kind with a vptr is a state kind with no table, kinds or vtable")):
+            ann = annotations()
+            ann["objects"]["FixtureCb"].update(change)
+            self.has(ann, message)
+
+    def test_an_embedded_polymorphic_kind_has_a_vtable_and_a_site(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        self.assertIn("static_assert(__is_polymorphic(FixtureAttach)", files[rs.FIXTURE_SCHEMA_H])
+        self.assertIn('    { ROK_FIXTUREATTACH, ROK_FIXTUREORDER, offsetof(FixtureOrder, link), "link", 0, 1, 0 },', files[rs.FIXTURE_SCHEMA_H])
+        ann = annotations()
+        del ann["objects"]["FixtureAttach"]["inside"]
+        self.has(ann, "FixtureAttach: has a vtable and is a kind of no base, and is embedded nowhere")
+
+    def test_a_pointer_to_an_embedded_kind_is_an_object_argument_named_by_its_site(self):
+        ann = annotations()
+        ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"] = {"args": {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}}
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecWeaponsWeaponAimCobComplete"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('ArgObject(s_call, "callback", ROK_FIXTURECB, a0);', body)
+        self.assertIn("roots.Add(ROK_FIXTURECB, a0);", body)
+
+    def test_an_import_takes_the_same_object_argument(self):
+        ann = annotations()
+        slot = ann["subsystems"]["units"]["slots"]["StartScriptWithArgs"] = {"args": {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}}
+        ann["subsystems"]["weapons"]["imports"] = ann["subsystems"]["weapons"].get("imports", []) + ["units.StartScriptWithArgs"]
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecUnitsStartScriptWithArgs"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("ImportObject(line, ROK_FIXTURECB, a2);", body)
+        del slot
+
+
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
         files, errors, model = rs.generate(rs.read_rows())
         self.assertEqual(errors, [])
         for path, want in files.items():
             self.assertEqual(path.read_text(), want, path)
+
+    def test_no_test_kind_is_in_the_committed_schema(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        for path in (rs.JSON_OUT, rs.SCHEMA_H, rs.VTABLES_CPP):
+            self.assertNotIn("Fixture", files[path], path)
+        self.assertIn("FixtureView", files[rs.FIXTURE_SCHEMA_H])
+        self.assertIn('Game.slowest', files[rs.FIXTURE_SCHEMA_H])
+        self.assertIn("BT_REPLAY_FIXTURES", files[rs.SCHEMA_H])
+
+    def test_the_test_schema_adds_its_kinds_after_the_real_ones(self):
+        real, _ = rs.build(rs.load_annotations(), rs.read_rows(), rs.read_assignment())
+        both, _ = rs.build(rs.load_annotations(fixtures=True), rs.read_rows(), rs.read_assignment())
+        names = [o["name"] for o in both["objects"]]
+        self.assertEqual(names[:len(real["objects"])], [o["name"] for o in real["objects"]])
+        self.assertTrue(all(n.startswith("Fixture") for n in names[len(real["objects"]):]))
+        self.assertEqual([f["name"] for f in both["object_fields"][:len(real["object_fields"])]], [f["name"] for f in real["object_fields"]])
+
+    def test_the_test_kinds_are_checked_too(self):
+        ann = annotations()
+        ann["objects"]["FixtureCell"]["delta"] = "yes"
+        files, errors, _ = rs.generate(rs.read_rows(), rs.load_annotations(), None, {"objects": {"FixtureCell": ann["objects"]["FixtureCell"]}, "includes": ["../../tests/replay_fixtures.h"]})
+        self.assertTrue(any("FixtureCell delta" in e for e in errors), errors)
 
     def test_every_simulation_subsystem_is_covered(self):
         files, _, model = rs.generate(rs.read_rows())

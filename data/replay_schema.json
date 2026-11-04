@@ -27,10 +27,6 @@
     "elem": "u16",
     "ref": true,
     "length": "(width>>1)*(height>>1)"
-   },
-   "slowest": {
-    "kind": "ref",
-    "target": "FixtureView"
    }
   },
   "sim_fields": {
@@ -130,7 +126,6 @@
    "../graphics/gaf_frame.h",
    "../graphics/object3do.h",
    "../graphics/handle.h",
-   "replay_fixtures.h",
    "../map/frame_table.h",
    "../map/feature.h",
    "../map/spot.h",
@@ -1262,14 +1257,6 @@
      {
       "kind": "Spot",
       "member": "shadow"
-     },
-     {
-      "kind": "FixtureHolder",
-      "member": "anim"
-     },
-     {
-      "kind": "FixtureHolder",
-      "member": "shadow"
      }
     ],
     "fields": [
@@ -1764,254 +1751,6 @@
     "type": "ModelState",
     "scope": "state",
     "fields": []
-   },
-   "FixtureView": {
-    "type": "FixtureView",
-    "scope": "state",
-    "fields": [
-     {
-      "name": "flags",
-      "kind": "u16"
-     },
-     {
-      "name": "count",
-      "kind": "i32",
-      "member": "plain.count",
-      "when": {
-       "field": "flags",
-       "mask": 1,
-       "equals": 0
-      }
-     },
-     {
-      "name": "total",
-      "kind": "i32",
-      "member": "plain.total",
-      "when": {
-       "field": "flags",
-       "mask": 1,
-       "equals": 0
-      }
-     },
-     {
-      "name": "scale",
-      "kind": "f32",
-      "member": "linked.scale",
-      "when": {
-       "field": "flags",
-       "mask": 1,
-       "equals": 1
-      }
-     },
-     {
-      "name": "table",
-      "kind": "ptr",
-      "member": "linked.table",
-      "target": "FrameTable",
-      "when": {
-       "field": "flags",
-       "mask": 1,
-       "equals": 1
-      }
-     },
-     {
-      "name": "def",
-      "kind": "ref",
-      "member": "linked.def",
-      "target": "UnitDef",
-      "when": {
-       "field": "flags",
-       "mask": 1,
-       "equals": 1
-      }
-     }
-    ]
-   },
-   "FixtureSlave": {
-    "type": "FixtureSlave",
-    "scope": "state",
-    "fields": [
-     {
-      "name": "player",
-      "kind": "u8"
-     },
-     {
-      "name": "master",
-      "kind": "ref",
-      "target": "FixtureView"
-     },
-     {
-      "name": "moved",
-      "kind": "i32",
-      "member": "ground.moved",
-      "when": {
-       "via": "player",
-       "kind": "Player",
-       "field": "flags",
-       "mask": 4,
-       "equals": 4
-      }
-     },
-     {
-      "name": "speed",
-      "kind": "f32",
-      "member": "air.speed",
-      "when": {
-       "via": "player",
-       "kind": "Player",
-       "field": "flags",
-       "mask": 4,
-       "equals": 0
-      }
-     },
-     {
-      "name": "low",
-      "kind": "i32",
-      "member": "narrow.low",
-      "when": {
-       "via": "master",
-       "field": "flags",
-       "mask": 2,
-       "equals": 0
-      }
-     },
-     {
-      "name": "high",
-      "kind": "f32",
-      "member": "wide.high",
-      "when": {
-       "via": "master",
-       "field": "flags",
-       "mask": 2,
-       "equals": 2
-      }
-     }
-    ]
-   },
-   "FixtureHolder": {
-    "type": "FixtureHolder",
-    "scope": "state",
-    "fields": [
-     {
-      "name": "id",
-      "kind": "i32"
-     },
-     {
-      "name": "anim",
-      "kind": "embed",
-      "target": "Handle"
-     },
-     {
-      "name": "shadow",
-      "kind": "embed",
-      "target": "Handle"
-     }
-    ]
-   },
-   "FixtureCell": {
-    "type": "FixtureCell",
-    "scope": "state",
-    "table": {
-     "base": "game",
-     "member": "p1b8a",
-     "ref": true,
-     "count": 9000,
-     "alloc": 9000
-    },
-    "delta": true,
-    "fields": [
-     {
-      "name": "unit",
-      "kind": "u16"
-     },
-     {
-      "name": "unit2",
-      "kind": "u16"
-     },
-     {
-      "name": "height",
-      "kind": "u8"
-     },
-     {
-      "name": "high",
-      "kind": "u8"
-     },
-     {
-      "name": "low",
-      "kind": "u8"
-     },
-     {
-      "name": "metal",
-      "kind": "u8"
-     },
-     {
-      "name": "feature",
-      "kind": "u16"
-     },
-     {
-      "name": "spot",
-      "kind": "u16"
-     },
-     {
-      "name": "flags",
-      "kind": "u16"
-     },
-     {
-      "name": "occupant",
-      "kind": "unitid",
-      "target": "Unit",
-      "member": "unit",
-      "reach": [
-       "Unit.health"
-      ],
-      "depth": 1
-     },
-     {
-      "name": "occupant2",
-      "kind": "unitid",
-      "target": "Unit",
-      "member": "unit2",
-      "reach": [
-       "Unit.health"
-      ],
-      "depth": 1
-     }
-    ]
-   },
-   "FixtureLane": {
-    "type": "FixtureLane",
-    "scope": "state",
-    "table": {
-     "base": "game",
-     "member": "p1cd5",
-     "ref": true,
-     "count": 4,
-     "alloc": 4
-    },
-    "fields": [
-     {
-      "name": "level",
-      "kind": "i32"
-     },
-     {
-      "name": "unit",
-      "kind": "u16"
-     },
-     {
-      "name": "flags",
-      "kind": "u16"
-     },
-     {
-      "name": "occupant",
-      "kind": "unitid",
-      "target": "Unit",
-      "member": "unit",
-      "reach": [
-       "Unit.health"
-      ],
-      "depth": 1
-     }
-    ]
    }
   },
   "rules": [
@@ -4172,7 +3911,6 @@
   {"name": "Game.uiOptionFlags", "base": "game", "size": 2, "kind": "u16"},
   {"name": "Game.featureCount", "base": "game", "size": 4, "kind": "i32"},
   {"name": "Game.visibilityMask", "base": "game", "size": 4, "kind": "array", "array": 1},
-  {"name": "Game.slowest", "base": "game", "size": 4, "kind": "ref", "target": "FixtureView"},
   {"name": "SimGlobals.g_meteorNextStrikeTime", "base": "sim", "size": 4, "kind": "i32"},
   {"name": "SimGlobals.g_meteorWeaponName", "base": "sim", "size": 32, "kind": "string"},
   {"name": "SimGlobals.g_meteorSpawnMagnitude", "base": "sim", "size": 4, "kind": "i32"},
@@ -4221,16 +3959,11 @@
   {"name": "FrameTable", "type": "FrameTable", "scope": "state", "table": null, "inside": null, "fields": [{"name": "count", "kind": "u16"}]},
   {"name": "GafFrame", "type": "GafFrame", "scope": "state", "table": null, "inside": null, "fields": [{"name": "width", "kind": "u16"}, {"name": "height", "kind": "u16"}, {"name": "xOffset", "kind": "i16"}, {"name": "yOffset", "kind": "i16"}, {"name": "transparency", "kind": "u8"}]},
   {"name": "Object3do", "type": "Object3do", "scope": "state", "table": null, "inside": null, "fields": [{"name": "vertexCount", "kind": "i32"}, {"name": "box_x", "kind": "i32"}, {"name": "box_y", "kind": "i32"}, {"name": "box_z", "kind": "i32"}]},
-  {"name": "Handle", "type": "Handle", "scope": "state", "table": null, "inside": [{"kind": "Feature", "member": "anim"}, {"kind": "Feature", "member": "shadowAnim"}, {"kind": "Spot", "member": "anim"}, {"kind": "Spot", "member": "shadow"}, {"kind": "FixtureHolder", "member": "anim"}, {"kind": "FixtureHolder", "member": "shadow"}], "fields": [{"name": "index", "kind": "u16", "aliases": ["Spot::frame"]}, {"name": "value", "kind": "u16"}, {"name": "kind", "kind": "u8"}, {"name": "src", "kind": "ptr", "target": "FrameTable", "aliases": ["Spot::animIndex"]}]},
+  {"name": "Handle", "type": "Handle", "scope": "state", "table": null, "inside": [{"kind": "Feature", "member": "anim"}, {"kind": "Feature", "member": "shadowAnim"}, {"kind": "Spot", "member": "anim"}, {"kind": "Spot", "member": "shadow"}], "fields": [{"name": "index", "kind": "u16", "aliases": ["Spot::frame"]}, {"name": "value", "kind": "u16"}, {"name": "kind", "kind": "u8"}, {"name": "src", "kind": "ptr", "target": "FrameTable", "aliases": ["Spot::animIndex"]}]},
   {"name": "Feature", "type": "Feature", "scope": "state", "table": {"base": "game", "member": "features", "ref": true, "count": "featureCount", "alloc": 2048}, "inside": null, "fields": [{"name": "name", "kind": "string", "size": 128}, {"name": "description", "kind": "string", "size": 20}, {"name": "footprint", "kind": "point16", "aliases": ["Feature::footprintX", "Feature::footprintZ"]}, {"name": "object", "kind": "ptr", "target": "Object3do", "when": {"field": "flags16", "mask": 1, "equals": 0}, "condMask": 1, "condField": 200, "condValue": 0, "condKind": "Feature"}, {"name": "filename", "kind": "string", "size": 16, "when": {"field": "flags16", "mask": 1, "equals": 1}, "condMask": 1, "condField": 200, "condValue": 1, "condKind": "Feature"}, {"name": "anims", "kind": "ptr", "target": "Gaf"}, {"name": "seq", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::animTable"]}, {"name": "seqshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::shadowTable"]}, {"name": "seqburn", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqburnshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqdie", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqdieshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamate", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamateshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "anim", "kind": "embed", "target": "Handle"}, {"name": "shadowAnim", "kind": "embed", "target": "Handle"}, {"name": "burnweapon", "kind": "weapon"}, {"name": "burnTime", "kind": "u16"}, {"name": "damage", "kind": "u16"}, {"name": "energy", "kind": "f32"}, {"name": "metal", "kind": "f32"}, {"name": "dead", "kind": "u16"}, {"name": "burnt", "kind": "u16"}, {"name": "reclamate", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "spreadChance", "kind": "u8"}, {"name": "seedChance", "kind": "u8"}, {"name": "seedSpread", "kind": "u8"}, {"name": "flags16", "kind": "u16", "aliases": ["Feature::flags", "Feature::flagsHigh", "Feature::lowBits", "Feature::steep", "Feature::drawn", "Feature::over", "Feature::flipAnim", "Feature::flipShadow", "Feature::unknown_bits", "Feature::noobject", "Feature::animating", "Feature::animtrans", "Feature::shadtrans", "Feature::flamable", "Feature::geothermal", "Feature::blocking", "Feature::reclaimable", "Feature::autoreclaimable", "Feature::indestructible", "Feature::nodisplayinfo", "Feature::nodrawundergray", "Feature::bits12"]}]},
   {"name": "Spot", "type": "Spot", "scope": "state", "table": {"base": "game", "member": "spots", "ref": true, "count": 2048, "alloc": 2048}, "inside": null, "fields": [{"name": "prev", "kind": "i16"}, {"name": "next", "kind": "i16"}, {"name": "anim", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::anim"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 215, "condMask": 1, "condField": 200, "condValue": 1, "condKind": "Feature"}, {"name": "shadow", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::shadow"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 215, "condMask": 1, "condField": 200, "condValue": 1, "condKind": "Feature"}, {"name": "state", "kind": "ref", "target": "ModelState", "aliases": ["FeatureSpot::state"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 215, "condMask": 1, "condField": 200, "condValue": 0, "condKind": "Feature"}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 215, "condMask": 1, "condField": 200, "condValue": 0, "condKind": "Feature"}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 215, "condMask": 1, "condField": 200, "condValue": 0, "condKind": "Feature"}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 215, "condMask": 1, "condField": 200, "condValue": 0, "condKind": "Feature"}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 215, "condMask": 1, "condField": 200, "condValue": 0, "condKind": "Feature"}, {"name": "velY", "kind": "i32", "member": "vel.y", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 215, "condMask": 1, "condField": 200, "condValue": 0, "condKind": "Feature"}, {"name": "velZ", "kind": "i32", "member": "vel.z", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 215, "condMask": 1, "condField": 200, "condValue": 0, "condKind": "Feature"}, {"name": "rot", "kind": "bytes", "size": 6, "aliases": ["FeatureSpot::rot"]}, {"name": "damage", "kind": "u16"}, {"name": "cell", "kind": "point16", "aliases": ["Spot::x", "Spot::z", "FeatureSite::x", "FeatureSite::y"]}, {"name": "feature", "kind": "u16", "aliases": ["FeatureSite::entry"]}, {"name": "timer", "kind": "u8", "aliases": ["Spot::burnTime", "Spot::animBits", "Spot::animHi", "Spot::animLo"]}, {"name": "flags", "kind": "u8", "aliases": ["Spot::used", "Spot::reclaimed", "Spot::hasShadow", "Spot::noSend", "Spot::bit4", "Spot::bits5", "FeatureSpot::spotFlags"]}]},
   {"name": "Pool", "type": "Pool", "scope": "state", "table": {"base": "game", "member": "pool", "count": 1}, "inside": null, "fields": [{"name": "entries", "kind": "ref", "target": "Spot"}, {"name": "featureUnit", "kind": "ref", "target": "alloc"}, {"name": "usedHead", "kind": "i32"}, {"name": "restHead", "kind": "i32"}, {"name": "freeHead", "kind": "i32"}]},
-  {"name": "ModelState", "type": "ModelState", "scope": "state", "table": null, "inside": null, "fields": []},
-  {"name": "FixtureView", "type": "FixtureView", "scope": "state", "table": null, "inside": null, "fields": [{"name": "flags", "kind": "u16"}, {"name": "count", "kind": "i32", "member": "plain.count", "when": {"field": "flags", "mask": 1, "equals": 0}, "condMask": 1, "condField": 223, "condValue": 0, "condKind": "FixtureView"}, {"name": "total", "kind": "i32", "member": "plain.total", "when": {"field": "flags", "mask": 1, "equals": 0}, "condMask": 1, "condField": 223, "condValue": 0, "condKind": "FixtureView"}, {"name": "scale", "kind": "f32", "member": "linked.scale", "when": {"field": "flags", "mask": 1, "equals": 1}, "condMask": 1, "condField": 223, "condValue": 1, "condKind": "FixtureView"}, {"name": "table", "kind": "ptr", "member": "linked.table", "target": "FrameTable", "when": {"field": "flags", "mask": 1, "equals": 1}, "condMask": 1, "condField": 223, "condValue": 1, "condKind": "FixtureView"}, {"name": "def", "kind": "ref", "member": "linked.def", "target": "UnitDef", "when": {"field": "flags", "mask": 1, "equals": 1}, "condMask": 1, "condField": 223, "condValue": 1, "condKind": "FixtureView"}]},
-  {"name": "FixtureSlave", "type": "FixtureSlave", "scope": "state", "table": null, "inside": null, "fields": [{"name": "player", "kind": "u8"}, {"name": "master", "kind": "ref", "target": "FixtureView"}, {"name": "moved", "kind": "i32", "member": "ground.moved", "when": {"via": "player", "kind": "Player", "field": "flags", "mask": 4, "equals": 4}, "condVia": 229, "condMask": 4, "condField": 25, "condValue": 4, "condKind": "Player"}, {"name": "speed", "kind": "f32", "member": "air.speed", "when": {"via": "player", "kind": "Player", "field": "flags", "mask": 4, "equals": 0}, "condVia": 229, "condMask": 4, "condField": 25, "condValue": 0, "condKind": "Player"}, {"name": "low", "kind": "i32", "member": "narrow.low", "when": {"via": "master", "field": "flags", "mask": 2, "equals": 0}, "condVia": 230, "condMask": 2, "condField": 223, "condValue": 0, "condKind": "FixtureView"}, {"name": "high", "kind": "f32", "member": "wide.high", "when": {"via": "master", "field": "flags", "mask": 2, "equals": 2}, "condVia": 230, "condMask": 2, "condField": 223, "condValue": 2, "condKind": "FixtureView"}]},
-  {"name": "FixtureHolder", "type": "FixtureHolder", "scope": "state", "table": null, "inside": null, "fields": [{"name": "id", "kind": "i32"}, {"name": "anim", "kind": "embed", "target": "Handle"}, {"name": "shadow", "kind": "embed", "target": "Handle"}]},
-  {"name": "FixtureCell", "type": "FixtureCell", "scope": "state", "table": {"base": "game", "member": "p1b8a", "ref": true, "count": 9000, "alloc": 9000}, "inside": null, "delta": true, "fields": [{"name": "unit", "kind": "u16"}, {"name": "unit2", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "high", "kind": "u8"}, {"name": "low", "kind": "u8"}, {"name": "metal", "kind": "u8"}, {"name": "feature", "kind": "u16"}, {"name": "spot", "kind": "u16"}, {"name": "flags", "kind": "u16"}, {"name": "occupant", "kind": "unitid", "target": "Unit", "member": "unit", "reach": ["Unit.health"], "depth": 1, "reachFirst": 5, "reachCount": 1}, {"name": "occupant2", "kind": "unitid", "target": "Unit", "member": "unit2", "reach": ["Unit.health"], "depth": 1, "reachFirst": 5, "reachCount": 1}]},
-  {"name": "FixtureLane", "type": "FixtureLane", "scope": "state", "table": {"base": "game", "member": "p1cd5", "ref": true, "count": 4, "alloc": 4}, "inside": null, "fields": [{"name": "level", "kind": "i32"}, {"name": "unit", "kind": "u16"}, {"name": "flags", "kind": "u16"}, {"name": "occupant", "kind": "unitid", "target": "Unit", "member": "unit", "reach": ["Unit.health"], "depth": 1, "reachFirst": 5, "reachCount": 1}]}
+  {"name": "ModelState", "type": "ModelState", "scope": "state", "table": null, "inside": null, "fields": []}
  ],
  "subsystems": {
   "wind_meteors": {
@@ -4293,7 +4026,7 @@
   "ai": {
    "header": {"interface": "interfaces/ai.h", "struct": "AiSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 27, "ruleless": 4, "unresolvedSlots": ["SquadManagerTickIfActive", "SquadManagerDeleteTimers", "CreateSquadManager"], "unannotatedArgs": ["HasReadyUnitInRange(pos)", "IsPointVisible(pos)", "MarkOwnerNetDirtyFromDamageSplit(self)", "DumpPlayerAI(file)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "SquadManagerTickIfActive(self)", "SquadManagerDeleteTimers(self)", "CmdPlan(args)", "CmdWeight(args)", "CmdLimit(args)"]}},
    "slots": {
-    "GetVisibleEnemiesInRadius": {"conv": "__stdcall", "ret": "void", "functions": ["GetVisibleEnemiesInRadius"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}, {"name": "radius", "type": "int", "line": "radius", "mode": "scalar"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}, {"name": "out", "type": "std::vector<Unit*, std::allocator<Unit*> >*", "line": "out", "mode": "units", "dir": "out", "kind": "Unit", "reach": ["Unit.flags", "Unit.def", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.posX", "Unit.posZ", "UnitDef.flags1"], "depth": 2, "reachFirst": 6, "reachCount": 7}], "result": null, "native": "GetVisibleEnemiesInRadius"},
+    "GetVisibleEnemiesInRadius": {"conv": "__stdcall", "ret": "void", "functions": ["GetVisibleEnemiesInRadius"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}, {"name": "radius", "type": "int", "line": "radius", "mode": "scalar"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}, {"name": "out", "type": "std::vector<Unit*, std::allocator<Unit*> >*", "line": "out", "mode": "units", "dir": "out", "kind": "Unit", "reach": ["Unit.flags", "Unit.def", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.posX", "Unit.posZ", "UnitDef.flags1"], "depth": 2, "reachFirst": 5, "reachCount": 7}], "result": null, "native": "GetVisibleEnemiesInRadius"},
     "HasReadyUnitInRange": {"conv": "__stdcall", "ret": "bool", "functions": ["HasReadyUnitInRange"], "reads": [], "writes": [], "objectReads": ["Unit.flags"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}], "result": {"type": "bool", "mode": "scalar"}, "native": "HasReadyUnitInRange"},
     "IsPointVisible": {"conv": "__stdcall", "ret": "int", "functions": ["IsPointVisible"], "reads": ["Game.visibilityMask"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsPointVisible"},
     "ReactToAttack": {"conv": "__stdcall", "ret": "void", "functions": ["ReactToAttack"], "reads": ["Game.ticks", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Player.index", "Player.allied", "Unit.buildLeft", "Unit.def", "Unit.player", "Unit.flags", "Unit.unitDefIndex", "Unit.playerIndex", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "UnitDef.flags1", "UnitDef.categories", "UnitDef.weaponCategories0", "UnitDef.weaponCategories1", "UnitDef.weaponCategories2"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "attacker", "type": "Unit*", "line": "attacker", "mode": "object", "kind": "Unit"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "amount", "type": "int", "line": "amount", "mode": "scalar"}], "result": null, "native": "ReactToAttack"},

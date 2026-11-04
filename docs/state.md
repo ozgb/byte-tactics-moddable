@@ -12,7 +12,7 @@ The classes:
 
 - **sim**: simulation state. Goes in the shared state block.
 - **view**: one player's view and the UI. Presentation owns it.
-- **platform**: devices, files, windows, network slots and other host state.
+- **platform**: devices, files, windows, network slots and other host state, and load-time asset inputs that the tick reads but nothing in game logic writes (#683). No tool treats the two differently, so there is no `load` class.
 - **mixed**: used both ways. Split it; the note says how.
 - **const**: read-only input to the sim: nothing writes it, it stays in the image, and `--check` fails if a strong writer appears (in load code or not). A weak writer (a `?` in `writers`, the address taken or the table passed to a function) is allowed when the `note` says what it does with the table; `--check` fails on weak writers with an empty note.
 
@@ -107,6 +107,17 @@ Found during review. Each needs an order, a message to the driver, or a split of
 - Load-time code is in the load walk, and a destructor's accesses are evidence (`delete` and temporaries are `call` rows in `data/rwsets.csv`). A destructor of a class that is neither user-provided nor virtual is not followed (see the docstring of `tools/rwsets.py`).
 - The classes of clear-cut UI, debug and platform rows rest on the tool's evidence plus names. Rows that matter to the tick were checked against the code.
 - Rows the review marked "unsure" in their notes (check the code before relying on them):
-  - game-region: `pad_2851`, `count_14277`, `eyes`, `count_148e7`, `data_148eb`, `interfaceType`, `gameSpeed`, `effectiveGameSpeed`, `net_flags`.
+  - game-region: `pad_2851`, `gameSpeed`, `effectiveGameSpeed`, `net_flags`.
   - global: `DAT_004fc474`, `DAT_004fc978`, `DAT_004fcc48`, `DAT_004fd2e4`, `DAT_004fda70`, `DAT_004fdbe0`, `g_consoleCommands`, `g_cheatCommands`, `DAT_00501fcc`, `g_debugCommands`, `DAT_00502f98`, `DAT_00507b64`, `DAT_00507b68`, `g_rotationMatrix`, `g_emptyStringRefs`, `g_emptyString`, `g_sendCondenser`, `g_receiveCondenser`, `g_netFrameRateConfig`, `g_mapLoadFlag`.
   - heap: `LoadUnitFbi: GameAllocIgnoreTag BUILDING YARD`, the three `Mission::LoadMissionData` sites (MissionFeature, MissionRule, MissionUnit), `FrameQueue::ResetFrames`, `FrameQueue::QueueFrames`, `BuildDerivedLayers: operator new FogCell`, `LoadTntMap` (MAPPED MEMORY, TILE MAP), `CobScript::LoadScriptState` (SavedPiece), `AllocFrame` and the two `AllocDepthFrame` GafFrame sites.
+- Rows whose proposal changed when #745 made `stateclasses.py` read `link/globals.h` (#749). Each group is not sim for the reason given, so nobody has to audit it again:
+  - Load-only rows (`sim: only load code touches it`: `count_147ab`, `entries_147af`, `loadProgress`, `loadPctUnits`, `loadPercent`, `progress_38d73`, `shade`, and the like): the rule proposes sim for a load write that no phase reads. They are art lists and loading-bar bytes that only load and drawing code touch.
+  - Chat HUD (`chatHudRing`, `chatHudRing_12ef`, `entries`, `head`, `tail`): `AddMessage` runs in the tick and writes the ring, and only `DrawMessages` reads it, so it is an output of the tick to the screen.
+  - Network debug knobs (`netSendDropPct`, `compressionDisabled`, class platform): set by console commands and the command line, read only by `NetCondenser::SendPacket`; they change the wire, not game state.
+  - Game-name settings (`gameName`, `gameName_2bc1`, class platform): registry settings copied to the net session. The presentation writes the tool blames on them come from `LoadSettings` declaring `password` as one 71 KB array.
+  - Redraw dirty bits (`viewDirtyFlags`, `flags_142f1`, `bits_142f1` and its pieces, `viewDirtyFlags_142f1`): line-of-sight code sets "redraw the minimap" bits and only drawing reads them.
+  - The `f14353` debug counter (`activeUnitTickCount`): `UpdateAllUnits` counts and only `DrawUnitInfoPanel` shows it.
+  - Camera-follow state (`tracked`, `value_142f3` and its `pad_142f3` pieces, `value_1434b`): the tick writes the followed unit and projectile position and only `UpdateCameraFollow` reads them, so they are outputs of the tick to the camera. `trackedPos` is a Vec3, so the tool's sim writers are type-wide.
+  - Platform rows proposed view (`text_38b53` and `pad_38b53`, `movieCaptureIndex`, `nextMovieFrameTick`, `pendingSaveStore` and `pad_38d6b`): output directories and a save-store handle, files rather than state, which the tool has no rule for outside its name list.
+  - Sim rows proposed mixed (`projectileCount`, `projectiles`, `mapWidth`, `mapHeight`, `featureCount`, `features`, `visibilityMask`, `cells`, `spatialGrid_1429f`, `overflowBucket`, `types`, `unitDefCount`, `list_391ed` and their `pad_` pieces): the presentation write is the `LoadSettings` password-array overlap (+0x2be3 to +0x1434d), a console command (`CmdEdge`), or a load or free routine that code outside the tick also calls (the match shutdown in `src/game/game_state.cpp`). The tick is their reader, and its writes are the ones in `phases_write`; the notes say which.
+  - Alias pieces added by game.h (#211) take the proposal of their own accesses, not of their region: `textLines` (view), `matchFlags` (class mixed, see `uiOptionFlags` above), `p1b8a` and `p1cd5` (slices of `players`).

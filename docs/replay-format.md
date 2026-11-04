@@ -88,7 +88,8 @@ The annotation names the table once per kind, in the kind's `table`:
 | `member` | the member that is the table, or holds it; it may be a path, `g_movementClasses.entries` |
 | `ref` | the member is a `Ref` to the first element; without it the elements are the member |
 | `count` | the number of elements: an integer, or a length expression (see Arrays) over members of the base, `poolCount` |
-| `alloc` | for a `ref` table: the elements the replayer makes, and stores in the count member, when a recording first names an element and the `Ref` is null |
+| `alloc` | for a `ref` table: the elements the replayer makes, and stores in the count member, when a recording first names an element and the `Ref` is null; `"module"` for a table with a `capacity` that the module frees (see A table with a capacity) |
+| `capacity` | the elements there is room for, when `count` is the live part of them: an integer, or a length expression over members of the base (see A table with a capacity) |
 
 A `ref` table whose `count` is a product of two block fields (`Cell` is `width*height`) has no `alloc`. The replayer allocates the
 product of the fields' current values and stores nothing, since neither factor is the count. The fields must therefore be set before
@@ -283,6 +284,75 @@ by its owner's field and index, `Player#0.groups[3]`, in every line, and `SquadT
 The replayer allocates the whole array the first time a line names one of its elements, sets the owner's field to it, and resolves a name to the element. The owner is named before its elements
 (the walk names it, as it reaches the owner first), and an index past `count` names nothing.
 
+### A table with a capacity
+
+A table whose live elements are the first `count` of room for more (`Game::eyes` has `count_14277` live of 20, and `AddEyeball` writes element `count`,
+past the live ones) has a `capacity` beside its `count`. `count` is a member that the recording holds like any block field (a `game_fields` or `sim_fields`
+entry), and the replayer never stores into it: `alloc` stores into the count member, which would overwrite the live count. Elements are named up to the
+capacity, so a pointer to element `count` is `Eye#2`, not `Eye#?`. The all-of walk and the other walks that follow a table go only as far as the live
+count.
+
+```json
+"FixtureEye": {"type": "FixtureEye", "scope": "state",
+               "table": {"base": "game", "member": "hotRadar", "ref": true, "count": "hotRadarCount", "capacity": 4, "alloc": "module"}, "fields": [...]}
+```
+
+| Key | Meaning |
+|---|---|
+| `capacity` | an integer, or a member of the base: the number of elements the table has room for, and the number the replayer allocates when a recording first names an element and the `Ref` is null |
+| `alloc` | absent, and the replayer allocates with its own allocator; `"module"` for a table whose memory the module frees (`GrowNodes` calls `operator delete` on `OpenHeap::pool`), which the replayer allocates with the module's own `operator new` |
+
+A member capacity is read when the table is allocated, so its field must be restored before the first element is named: `replayschema.py --check` fails for a
+complete subsystem's slot that reaches the kind with a capacity member missing from its read set, as for the factors of a product count. The count and the
+capacity members of a table with a capacity must be tracked block fields, and a `capacity` is not combined with an integer `alloc`. `"alloc": "module"` needs a
+`ref` table. A table with no `capacity` is as before.
+
+A table behind a ref field takes the same keys, `{"base": {"object": "OpenHeap", "field": "pool"}, "count": "used", "capacity": "capacity", "alloc": "module"}`,
+where `count` and a member `capacity` name integer fields of the owner. The elements are still named `OpenHeap#1.pool[3]`, up to the capacity, and the
+owner's capacity field must come before the ref field in the owner's list, so that it is restored first. Without a `capacity` the count is a positive integer, as before.
+
+```
+  r Game.hotRadarCount 2
+  r FixtureEye#3.x 9
+  r FixtureEye#3.pos (5,6)
+```
+
+The replayer's table is outside the block, so a ref to it is the difference of two addresses, as any ref the module stores. A replay of a module that
+frees such a table frees the replayer's memory, which is why the module's allocator makes it. The replayer calls the exe's `operator new`, so such a table is for native replays; a WASM
+module has an allocator of its own that the host does not call.
+
+### A pointer into the object itself
+
+A field of kind `self` points into the object that holds it. `{"name": "screen", "kind": "self", "member": "screenPos"}` is `Eye::screen`, a `Ref` to the same
+Eye's `screenPos`. It is never written as a line, never compared, and never restored from a line: the replayer sets it to the address of that member of the
+object itself, whenever a name resolves to the object. An object that the replayed module moves by assignment (`std::remove_if` over the Eyes copies the
+pointer, which then leads into the old element) has it set again by the next line that names it, and a recording from before and after the move is
+the same text.
+
+```json
+{"name": "screen", "kind": "self", "member": "screenPos"},
+{"name": "flagPtr", "kind": "self", "member": "flagB"}
+```
+
+With `"index": true` the field is a pointer to an element of an array: `{"name": "top", "kind": "self", "member": "pool", "index": true, "target": "Node"}` points
+into the array that the `Ref` member `pool` holds. It is written as the index of the element, `r OpenHeap#1.top 2` (`null` for a null pointer, and `?` when the pointer is
+not at the start of an element, which the replayer refuses), and restored as the address of that element of the array the member holds. The array does not move in the text when
+the module reallocates it and re-points the field, since the index is the same. `member` has to be a `ref` field of the same kind, listed before the self field,
+that leads to `target`, a state kind whose size is the stride; the replayer restores it first and the index counts the elements of the array it made.
+
+A self field has a `member` and, only with `index`, a `target`. Both forms are 4-byte `Ref`s; the generated header checks the size.
+
+| Field | Stored as | Written as |
+|---|---|---|
+| `self`, `member` | an offset to the member of the same object | never |
+| `self`, `index` | an offset to the element of the array of the `Ref` member | `2`, `null` |
+
+### A ref with a C type
+
+A `ref` field whose C type is not `Ref` of its target kind has the type in `ctype`: `{"name": "player", "kind": "ref", "target": "Player", "ctype": "char"}` for
+`Eye::player`, a `Ref<char>` that holds a `Player`. The line is written as any ref is, `Player#3`, and the generated header asserts that the member is a `Ref<char>`.
+A `ref` with no `ctype` is checked for its size only, as before. An array of refs (`refs`) takes a `ctype` too, in place of the `Ref` of its target.
+
 ### A vtable pointer the code sets by hand
 
 `"vptr": "g_weaponAimCobVtable"` on a kind says that its first word is a pointer to that global (`extern VirtualFunction const g_weaponAimCobVtable[2]` in `src/data/vtables.cpp`) that
@@ -330,7 +400,9 @@ themselves. The annotation, for `Player::explored` and `Game::visibilityMask`:
 ```
 
 `elem` is the element type (its size is what counts: the elements are written as the bytes of memory), and `length` is an
-integer, or one or two factors joined by `*`, each a member of the object, `member>>k`, or an integer. A member is one, two or
+integer, or one or two factors joined by `*`, each a member of the object, `member>>k`, `member+a` or `member+a>>k`, or an integer. The
+addend comes before the shift, as in C: `(count+0xff)>>8` is the `(count + 0xff) >> 8` words that `grid.dirty` holds, where `count>>8` is a word short
+whenever the count is not a multiple of 256. A member is one, two or
 four bytes. The length is read from the object each time the array is written, so the members it names have to be recorded
 (`exploredSize` is a field of `Player`) for the replayer to know the length at the call.
 
@@ -581,7 +653,8 @@ sets). The annotations hold what no header says:
   through `weapondef#N`; `fields` adds the object fields it lists under `reads` and `writes` (`Unit.extraction`,
   `UnitResources.energyMake`), so that a write through a pointer is recorded as a `w` line of the field it lands on;
   `all-of` makes every slot of a table kind a root of the call (`Game::players` is walked by index), and a slot may have the rule for
-  several kinds. `replayschema.py
+  several kinds. A rule's `reads` and `writes` may also name block fields, `Game.visibilityMask` or `SimGlobals.g_x`, which join the slot's read and write sets: a write
+  through a `*short` or a `memset` into `Game` is a `w` line of the field it lands on. `replayschema.py
   --check` fails for a row of a subsystem function with no rule and for a rule that matches no row.
 - `objects`' extras: `table` (an object, see Objects) names a kind by its index in a table, `inside` (a list of `{"kind": "Unit",
   "member": "resourceSlot"}`) names every member of another kind that the kind lives in (`Unit#17.resourceSlot`), a field of kind
@@ -604,6 +677,8 @@ sets). The annotations hold what no header says:
   on a `unitid` field and on a `units` argument. An object reached through it is recorded with only the listed fields, and
   the walk follows only the listed pointers, so `Unit.def` with `UnitDef.flags1` is depth 2. `replayschema.py --check` fails
   when the depth is not the one the list has, or a name is no field.
+- `reads` and `writes` of a slot's annotation: block fields (`Game.width`) added to the slot's read and write sets, for what the function rows do not show, as a write to
+  `Game` through a pointer, or the factors of a product count. `replayschema.py --check` fails for a name that is no block field.
 - A field a slot writes through a pointer it cannot name exactly (a weapon slot picked by an index) is also in its read set,
   so that a change made outside the seam is recorded at the entry as an `r` line, not mistaken for a write of the module.
 - `exempt_types`: `{"OpenHeap": "reason"}`, a struct type that is no kind and is genuinely local (a stack copy read from a bank, a
@@ -806,7 +881,10 @@ chunks, deltas and a null, for an object and a block field, with a changed eleme
 struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
 `Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
 is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and raw pointer fields (a `Handle` whose `src` is a `ptr`, rebuilt and compared, with a changed `src` reported at `Handle#1.src`; a `ptr` to an object no line named, restored to an empty copy) and masked views (a union whose live view switches on a masked bit, or on a bit of another object, with the dead view neither written, compared nor restored) and an object embedded at two sites (named by its site in the walk and in a service line, and restored inside its container) and services (the files, commands, sim plumbing, load reads and GAF cursors, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
-second object, with a changed result reported at `import 0 fixture.Scan.c[0]`). With a
+second object, with a changed result reported at `import 0 fixture.Scan.c[0]`). Three
+more use the `Fixture*` kinds: a table with a capacity (`FixtureEye`, written past its live count, restored without a store into the count, allocated by the module's `operator new`
+and freed by the test with `operator delete`), pointers into an object's own members (a `FixtureEye` moved by assignment between calls, and a `FixtureHeap` whose `top` is an index into its
+own `pool`, which the module grows), and a write to a `Game` field through a pointer, reported at the field. With a
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 

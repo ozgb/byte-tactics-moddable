@@ -6,7 +6,8 @@
   "slowest": {
    "kind": "ref",
    "target": "FixtureView"
-  }
+  },
+  "hotRadarCount": "i32"
  },
  "objects": {
   "FixtureView": {
@@ -511,6 +512,97 @@
     {
      "name": "amount",
      "kind": "i32"
+    }
+   ]
+  },
+  "FixtureEye": {
+   "type": "FixtureEye",
+   "scope": "state",
+   "table": {
+    "base": "game",
+    "member": "hotRadar",
+    "ref": true,
+    "count": "hotRadarCount",
+    "capacity": 4,
+    "alloc": "module"
+   },
+   "fields": [
+    {
+     "name": "owner",
+     "kind": "ref",
+     "target": "FixtureView",
+     "ctype": "char"
+    },
+    {
+     "name": "screen",
+     "kind": "self",
+     "member": "pos"
+    },
+    {
+     "name": "x",
+     "kind": "i16"
+    },
+    {
+     "name": "flag",
+     "kind": "u8"
+    },
+    {
+     "name": "flagPtr",
+     "kind": "self",
+     "member": "flag"
+    },
+    {
+     "name": "pos",
+     "kind": "point16"
+    }
+   ]
+  },
+  "FixtureNode": {
+   "type": "FixtureNode",
+   "scope": "state",
+   "table": {
+    "base": {
+     "object": "FixtureHeap",
+     "field": "pool"
+    },
+    "count": "used",
+    "capacity": "capacity",
+    "alloc": "module"
+   },
+   "fields": [
+    {
+     "name": "key",
+     "kind": "i32"
+    },
+    {
+     "name": "pri",
+     "kind": "i16"
+    }
+   ]
+  },
+  "FixtureHeap": {
+   "type": "FixtureHeap",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "capacity",
+     "kind": "i32"
+    },
+    {
+     "name": "used",
+     "kind": "i32"
+    },
+    {
+     "name": "pool",
+     "kind": "ref",
+     "target": "FixtureNode"
+    },
+    {
+     "name": "top",
+     "kind": "self",
+     "member": "pool",
+     "index": true,
+     "target": "FixtureNode"
     }
    ]
   }

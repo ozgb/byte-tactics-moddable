@@ -170,5 +170,32 @@ class CheckFailure(unittest.TestCase):
         self.assertFalse((out / "runtime").exists() or (out / "logs").exists())
 
 
+class PrepareRuntime(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+        self.build = self.dir / "build"
+        (self.build / "objs").mkdir(parents=True)
+        for name in (*oraclegate.RUNTIME_FILES, "wind_meteors.wasm"):
+            (self.build / name).write_text("x")
+        (self.build / "modules.json").write_text(json.dumps({"modules": [{"name": "wind_meteors"}]}))
+        (self.build / "objs/objects.rsp").write_text("/abs/a.obj\n")
+        self.module = self.dir / "m.wasm"
+        self.module.write_bytes(b"\0asm\1\0\0\0")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_the_object_list_is_copied_beside_the_map(self):
+        exe = oraclegate.prepare_runtime(self.build, "wind_meteors", self.module, self.dir / "runtime")
+        self.assertEqual((exe.parent / "objs/objects.rsp").read_text(), "/abs/a.obj\n")
+        self.assertTrue((exe.parent / "TotalA.map").is_file())
+
+    def test_a_build_without_the_object_list_is_an_error(self):
+        (self.build / "objs/objects.rsp").unlink()
+        with self.assertRaisesRegex(oraclegate.Error, "objects.rsp"):
+            oraclegate.prepare_runtime(self.build, "wind_meteors", self.module, self.dir / "runtime")
+
+
 if __name__ == "__main__":
     unittest.main()

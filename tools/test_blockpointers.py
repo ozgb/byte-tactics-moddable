@@ -246,8 +246,26 @@ class FoldTest(unittest.TestCase):
 class KeptTest(unittest.TestCase):
     def test_merge_kept(self):
         old = [row("H", "T", cls="moves-in", note="n")]
-        new = bp.merge_kept([row("H", "T", cls="", note=""), row("H", "U", cls="", note="")], old)
+        new = bp.merge_kept([row("H", "T", cls="", note=""), row("H", "U", "0x40", cls="", note="")], old)
         self.assertEqual([(r["class"], r["note"]) for r in new], [("moves-in", "n"), ("", "")])
+
+    def test_merge_kept_by_offsets_when_target_renamed(self):
+        old = [row("H", "Old", "0x4", cls="not-a-pointer", note="n"), row("H", "A", "0x8", cls="outside", note="a"),
+               row("H", "B", "0x8", cls="moves-in", note="b")]
+        new = bp.merge_kept([row("H", "New", "0x4+0x2*k", cls="", note=""), row("H", "C", "0x8", cls="", note=""),
+                             row("G", "New", "0x4", cls="", note="")], old)
+        self.assertEqual([(r["class"], r["note"]) for r in new], [("not-a-pointer", "n"), ("", ""), ("", "")])
+
+    def test_merge_kept_prefers_identical_offsets(self):
+        old = [row("H", "A", "0x4 0x8", cls="outside", note="a"), row("H", "B", "0x8", cls="moves-in", note="b")]
+        new = bp.merge_kept([row("H", "New", "0x4 0x8", cls="", note="")], old)
+        self.assertEqual([(r["class"], r["note"]) for r in new], [("outside", "a")])
+
+    def test_merge_kept_disagreeing_identical_offsets_carry_nothing(self):
+        old = [row("H", "A", "0x4 0x8", cls="outside", note="a"), row("H", "B", "0x4 0x8", cls="moves-in", note="b"),
+               row("H", "C", "0x4", cls="outside", note="a")]
+        new = bp.merge_kept([row("H", "New", "0x4 0x8", cls="", note="")], old)
+        self.assertEqual([(r["class"], r["note"]) for r in new], [("", "")])
 
     def test_differences_ignore_kept(self):
         a = [row("H", "T", cls="outside")]
@@ -322,6 +340,23 @@ class WildcardTest(unittest.TestCase):
         self.assertEqual([(r["target"], r["class"], r["note"]) for r in rows[:3]],
                          [("*", "not-a-pointer", "ids"), ("*", "outside", "pairs"), ("T1", "moves-in", "m")])
         self.assertEqual(bp.with_wild(bp.merge(self.WORDS), rows)[:2], rows[:2])
+
+    def test_prune_keeps_wild_rows_of_exe_sites_only(self):
+        namer = bp.Namer(bp.parse_map(MAP), [0x401004, 0x401008, 0x401030])
+        for holder, kept in [("Alias #1", True), ("Alias: T #2", True), ("Alias #3", False), ("Alias", False),
+                             ("Setup", True), ("Setup: T", True), ("Setup #1", False), ("Gone", False),
+                             ("Gone #1", False), ("unknown", True), ("SimGlobals.a", True), ("SimGlobals", True),
+                             ("SimGlobals+0x4", True)]:
+            self.assertEqual(bp.is_site_holder(namer, holder), kept, holder)
+
+    def test_prune_drops_unscanned_pairs_and_keeps_notes(self):
+        namer = bp.Namer(bp.parse_map(MAP), [0x401030])
+        old = [wild("Setup", "outside", "n"), wild("Gone", "outside", "stale"), row("Setup", "T1", cls="moves-in", note="m"),
+               row("Setup", "T9", note="stale")]
+        words = [resolved("Setup", 0, "T1")]
+        rows = bp.merge_kept(bp.with_wild(bp.merge(words), bp.prune_wild(old, namer)), old)
+        self.assertEqual([(r["holder"], r["target"], r["class"], r["note"]) for r in rows],
+                         [("Setup", "*", "outside", "n"), ("Setup", "T1", "moves-in", "m")])
 
     def test_order_by_class(self):
         self.assertEqual(bp.check_rows(bp.render([wild("A", "moves-in", ""), wild("A"), wild("A", "outside", "")])), [])

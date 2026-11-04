@@ -16,6 +16,8 @@
 #include "replay_types.h"
 #include "replay_objects.h"
 
+void* __cdecl operator new(unsigned int size);
+
 namespace {
 
 unsigned PointerHash(const void* p)
@@ -45,7 +47,7 @@ unsigned FactorValue(const ReplayFactor& f, const void* object)
         return f.offset;
     const unsigned char* at = (const unsigned char*)object + f.offset;
     unsigned v = f.size == 1 ? *at : f.size == 2 ? *(const unsigned short*)at : *(const unsigned*)at;
-    return v >> f.shift;
+    return (v + f.add) >> f.shift;
 }
 
 unsigned HexDigit(char c)
@@ -89,28 +91,38 @@ bool CountTracked(const ReplayTableSpec& spec)
     return false;
 }
 
+void* AllocateTable(const ReplayTableSpec& spec, unsigned size, ReplayAllocFn alloc)
+{
+    void* pool = spec.module ? operator new(size) : alloc(size);
+    memset(pool, 0, size);
+    return pool;
+}
+
 void EnsureTable(unsigned kind, ReplayAllocFn alloc)
 {
     const ReplayTableSpec& spec = kReplayTables[kReplayObjectKinds[kind].table - 1];
     unsigned char* root = spec.sim ? (unsigned char*)g_simGlobals : (unsigned char*)g_game;
     bool product = spec.count.first.size != 0 && spec.count.second.size != 0;
-    if (root == nullptr || !spec.ref || (spec.alloc == 0 && !product) || alloc == nullptr || *(const unsigned*)(root + spec.offset) != 0)
+    if (root == nullptr || !spec.ref || (spec.alloc == 0 && !product && !spec.capped) || alloc == nullptr || *(const unsigned*)(root + spec.offset) != 0)
         return;
-    unsigned elements = product ? ReplayLengthOf(spec.count, root) : spec.alloc;
+    unsigned elements = spec.capped ? ReplayLengthOf(spec.capacity, root) : product ? ReplayLengthOf(spec.count, root) : spec.alloc;
     if (elements == 0)
         return;
-    unsigned size = elements * kReplayObjectKinds[kind].size;
-    unsigned char* pool = (unsigned char*)alloc(size);
-    memset(pool, 0, size);
+    unsigned char* pool = (unsigned char*)AllocateTable(spec, elements * kReplayObjectKinds[kind].size, alloc);
     *(unsigned*)(root + spec.offset) = (unsigned)(pool - (unsigned char*)SimBlockBase());
-    if (!product && !CountTracked(spec))
+    if (!product && !spec.capped && !CountTracked(spec))
         StoreFactor(spec.count.first, root, spec.alloc);
 }
 
 unsigned TableRoom(unsigned kind, unsigned count)
 {
-    unsigned alloc = kReplayTables[kReplayObjectKinds[kind].table - 1].alloc;
-    return count < alloc ? count + 1 : count;
+    const ReplayTableSpec& spec = kReplayTables[kReplayObjectKinds[kind].table - 1];
+    if (spec.capped) {
+        unsigned char* root = spec.sim ? (unsigned char*)g_simGlobals : (unsigned char*)g_game;
+        unsigned room = root == nullptr ? 0 : ReplayLengthOf(spec.capacity, root);
+        return room > count ? room : count;
+    }
+    return count < spec.alloc ? count + 1 : count;
 }
 
 int TableIndex(unsigned kind, const void* p)
@@ -137,6 +149,11 @@ unsigned ContainerCount(const ReplayObjectTable& table, unsigned container)
     return TableSpan(container, &base, &count, &stride) ? count : 0;
 }
 
+unsigned SiteRoom(const ReplayInsideSite& s, const unsigned char* owner)
+{
+    return s.capped ? ReplayLengthOf(s.room, owner) : s.count;
+}
+
 bool InsideSite(const ReplayObjectTable& table, unsigned kind, const void* p, unsigned* site, unsigned* ordinal, unsigned* index)
 {
     const ReplayObjectKind& k = kReplayObjectKinds[kind];
@@ -150,7 +167,7 @@ bool InsideSite(const ReplayObjectTable& table, unsigned kind, const void* p, un
             for (unsigned o = 0; o < owners; o++) {
                 const unsigned char* owner = (const unsigned char*)table.Pointer(s.container, o + 1);
                 const unsigned char* first = owner == nullptr ? nullptr : BlockAt(*(const unsigned*)(owner + s.offset));
-                if (first != nullptr && q >= first && (unsigned)(q - first) % s.stride == 0 && (unsigned)(q - first) / s.stride < s.count) {
+                if (first != nullptr && q >= first && (unsigned)(q - first) % s.stride == 0 && (unsigned)(q - first) / s.stride < SiteRoom(s, owner)) {
                     *site = k.insideFirst + i;
                     *ordinal = o + 1;
                     *index = (unsigned)(q - first) / s.stride;
@@ -570,6 +587,76 @@ bool RestoreCode(const ReplayObjectField& f, const char* value, const void** int
 
 }
 
+namespace {
+
+unsigned SelfWord(const void* address)
+{
+    return (unsigned)((const unsigned char*)address - (const unsigned char*)SimBlockBase());
+}
+
+void FormatSelfIndex(const ReplayObjectField& f, const void* object, ReplayText& out)
+{
+    const ReplaySelfSpec& spec = kReplaySelfs[f.array - 1];
+    const unsigned char* base = (const unsigned char*)object;
+    const unsigned char* at = BlockAt(*(const unsigned*)(base + f.offset));
+    const unsigned char* first = BlockAt(*(const unsigned*)(base + spec.offset));
+    if (at == nullptr) {
+        out.Add("null");
+    } else if (first == nullptr || at < first || (unsigned)(at - first) % spec.stride != 0) {
+        out.Add("?");
+    } else {
+        out.AddUnsigned((unsigned)(at - first) / spec.stride);
+    }
+}
+
+bool RestoreSelfIndex(const ReplayObjectField& f, void* object, const char* value)
+{
+    const ReplaySelfSpec& spec = kReplaySelfs[f.array - 1];
+    unsigned char* base = (unsigned char*)object;
+    if (strcmp(value, "null") == 0) {
+        *(unsigned*)(base + f.offset) = 0;
+        return true;
+    }
+    char* end;
+    unsigned long index = strtoul(value, &end, 10);
+    unsigned char* first = BlockAt(*(const unsigned*)(base + spec.offset));
+    if (end == value || *end != '\0' || first == nullptr || index >= MAX_ARRAY_ELEMENTS)
+        return false;
+    *(unsigned*)(base + f.offset) = SelfWord(first + index * spec.stride);
+    return true;
+}
+
+void FixSelf(unsigned kind, void* object)
+{
+    enum { KINDS = 64, FIELDS = sizeof kReplayObjectFields / sizeof kReplayObjectFields[0] };
+    static unsigned short list[FIELDS];
+    static unsigned short first[KINDS];
+    static unsigned short count[KINDS];
+    static bool built = false;
+    if (!built) {
+        unsigned n = 0;
+        for (unsigned k = 0; k < kReplayObjectKindCount && k < KINDS; k++) {
+            first[k] = (unsigned short)n;
+            for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+                if (kReplayObjectFields[i].object == k && kReplayObjectFields[i].kind == RK_SELF)
+                    list[n++] = (unsigned short)i;
+            }
+            count[k] = (unsigned short)(n - first[k]);
+        }
+        built = true;
+    }
+    if (object == nullptr || kind >= KINDS)
+        return;
+    unsigned char* base = (unsigned char*)object;
+    for (unsigned i = 0; i < count[kind]; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[list[first[kind] + i]];
+        const ReplaySelfSpec& spec = kReplaySelfs[f.array - 1];
+        *(unsigned*)(base + f.offset) = SelfWord(base + spec.offset);
+    }
+}
+
+}
+
 unsigned ReplayLengthOf(const ReplayLength& length, const void* object)
 {
     unsigned long long n = (unsigned long long)FactorValue(length.first, object) * FactorValue(length.second, object);
@@ -755,6 +842,9 @@ bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, Rep
     case RK_VECTOR:
         FormatVector(f, object, table, assign, out);
         break;
+    case RK_SELFINDEX:
+        FormatSelfIndex(f, object, out);
+        break;
     default:
         return false;
     }
@@ -817,7 +907,7 @@ const ReplayInsideSite* ObjectTextSite(const char* text, unsigned length, unsign
         normal[written++] = member[i];
     }
     const ReplayInsideSite* site = SiteNamed((unsigned)kind, normal, written);
-    if (site == nullptr || at >= site->count)
+    if (site == nullptr || (!site->capped && at >= site->count))
         return nullptr;
     *index = at;
     return site;
@@ -884,24 +974,29 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
             table.Bind((unsigned)kind, ordinal, p);
         }
     }
-    if (p == nullptr || site == nullptr)
+    if (p == nullptr)
+        return p;
+    FixSelf((unsigned)kind, p);
+    if (site == nullptr)
         return p;
     unsigned char* first = (unsigned char*)p + site->offset;
     if (site->ref) {
         unsigned* word = (unsigned*)first;
-        if (*word == 0 && alloc != nullptr) {
-            unsigned size = site->count * site->stride;
-            unsigned char* array = (unsigned char*)alloc(size);
+        unsigned room = SiteRoom(*site, (const unsigned char*)p);
+        if (*word == 0 && alloc != nullptr && room != 0) {
+            unsigned size = room * site->stride;
+            unsigned char* array = (unsigned char*)(site->module ? operator new(size) : alloc(size));
             memset(array, 0, size);
             *word = (unsigned)(array - (unsigned char*)SimBlockBase());
         }
         first = BlockAt(*word);
-        if (first == nullptr)
+        if (first == nullptr || element >= room)
             return nullptr;
     }
     p = first + element * site->stride;
     if (ReplayVtable(site->kind) != nullptr)
         *(const void**)p = ReplayVtable(site->kind);
+    FixSelf(site->kind, p);
     return p;
 }
 
@@ -952,7 +1047,10 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
     case RK_REFS:
     case RK_UNITID:
     case RK_ARRAY:
+    case RK_SELF:
         return false;
+    case RK_SELFINDEX:
+        return RestoreSelfIndex(f, object, value);
     case RK_CODE:
         return RestoreCode(f, value, (const void**)at);
     case RK_VECTOR:
@@ -1369,7 +1467,7 @@ void CaptureObject(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table
             ForgetEmbedded(known, key.Data(), f.target);
             continue;
         }
-        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_EMBEDS || f.kind == RK_UNITID || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
+        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_EMBEDS || f.kind == RK_UNITID || f.kind == RK_SELF || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
             continue;
         ReplayObjectFieldKey(key, table, true, kind, object, f);
         if (!ReplayFieldLive(f, object)) {

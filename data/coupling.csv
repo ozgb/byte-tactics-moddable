@@ -1281,7 +1281,7 @@ harness,game,call,QuirksParse,2
 harness,game,call,ReplayGateRef,6
 harness,game,call,SaveGameFile,1
 harness,game,call,SimBlockAttach,1
-harness,game,call,SimBlockBase,15
+harness,game,call,SimBlockBase,16
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimOwns,1
 harness,game,shared_write,EconomySeam::UpdateResourceSharing,1
@@ -1482,7 +1482,7 @@ harness,platform,call,host_mutex_lock,3
 harness,platform,call,host_mutex_unlock,3
 harness,platform,call,host_thread_id,3
 harness,platform,call,host_time_counter,1
-harness,platform,call,operator new,1
+harness,platform,call,operator new,3
 harness,platform,shared_write,Seams::weapons,2
 harness,platform,shared_write,Seams::wind_meteors,2
 harness,platform,shared_write,WeaponsSeam::SpawnProjectile,1

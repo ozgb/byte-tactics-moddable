@@ -247,6 +247,16 @@ class ClangTest(unittest.TestCase):
         return rc.render(rc.OUTSIDE_COLUMNS, rc.outside_rows(
             self.root, {"Game": rc.Locator(self.scan)}, {"view": "view", "items": "sim"}))
 
+    def test_blank_struct_rows_are_keyed_by_holder_and_verdict(self):
+        rows = [("CreateGameObject", "0x4", "Game.view"), ("H", "0x1 0x10", "bitmap: presentation"),
+                ("H", "0x1 0x22", "piece: loaded"), ("G", "0x30 0x34", "same"), ("G", "0x2c", "same")]
+        want = self.shuffled_outside(rows, 0)
+        out = [(r["holder"], r["offset"], r["issue"], r["words"]) for r in csv.DictReader(io.StringIO(want))
+               if not r["struct"]]
+        self.assertEqual(out, [("G", "0x2c", "", "3"), ("H", "0x1", "", "2"), ("H", "0x1", "#392", "2")])
+        for seed in range(1, 10):
+            self.assertEqual(self.shuffled_outside(rows, seed), want)
+
     def test_outside_rows_merge_rows_that_share_a_key(self):
         rows = [("CreateGameObject", "0x4", "Game.view"), ("CreateGameObject", "0x4 0xc", "Game.view (0x4) first"),
                 ("CreateGameObject", "0xc+0x8*k", "Game.items"), ("CreateGameObject", "0xc", "Game.items"),
@@ -278,14 +288,28 @@ class ClangTest(unittest.TestCase):
         again = rc.outside_rows(self.root, {"Game": rc.Locator(self.scan)}, {"view": "view", "items": "sim"})
         self.assertEqual(rc.render(rc.OUTSIDE_COLUMNS, again), want)
 
-    def test_outside_rows_fail_when_rows_with_one_key_disagree(self):
-        rows = [("CreateGameObject", "0x4", "Game.view"), ("H", "0x20", "view presentation"),
-                ("H", "0x20", "damage table")]
-        for seed in range(2):
-            with self.assertRaises(SystemExit) as raised:
-                self.shuffled_outside(rows, seed)
-            self.assertIn("cannot both be right", str(raised.exception))
-            self.assertIn("issue", str(raised.exception))
+    def test_struct_rows_fail_when_rows_with_one_key_disagree(self):
+        def found(issue):
+            row = {"struct": "S", "field": "f", "holder": "H", "offset": "0x4", "words": 1, "issue": issue,
+                   "kind": "int-pointer", "note": ""}
+            return {"row": row, "offsets": [4], "late": False, "pinned": False}
+        with self.assertRaises(SystemExit) as raised:
+            rc.merge_contributions([found("#392"), found("")])
+        self.assertIn("cannot both be right", str(raised.exception))
+        self.assertIn("issue", str(raised.exception))
+
+    def test_an_issue_in_a_note_wins_over_the_view_issue(self):
+        def found(issue, note):
+            row = {"struct": "S", "field": "f", "holder": "H", "offset": "0x4", "words": 1, "issue": issue,
+                   "kind": "pointer", "note": note}
+            return {"row": row, "offsets": [4], "late": False, "pinned": False}
+        for order in ((0, 1), (1, 0)):
+            rows = [found("#615", "moved out by #615"), found("#392", "view")]
+            merged = rc.merge_contributions([rows[i] for i in order])
+            self.assertEqual(merged["issue"], "#615")
+        with self.assertRaises(SystemExit):
+            rc.merge_contributions([found("#615", "moved out by #615"), found("", "")])
+        self.assertEqual(rc.outside_issue("moved out by #615", "Game", "view", {"view": "view"}), "#615")
 
     def test_real_outside_rows_ignore_the_order_of_block_pointers(self):
         real = Path(rc.ROOT) / rc.BLOCK_POINTERS

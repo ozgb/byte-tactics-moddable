@@ -134,8 +134,9 @@ A periodic failure is fixed afterwards, not by freezing merges: the lead files
 it at once as an issue, first in #2's order, with the failing scenario or
 play-test and the merges since the last pass; merges continue, and the next
 periodic run must pass. `--both-modes` plays each scenario in WASM and with native modules in one pool and passes only when
-both equal; a second `--check` on the machine waits for the first (`--no-lock` skips that, for
-runs that are not gates). Run either on a fresh prefix (remove
+both equal; every game of a `--check` holds one of the machine's run slots, so gates share the
+machine's slots, and a second `--check` waits only for a gate with the same cache key (`--no-lock` takes
+no slot and no key lock, for runs that are not gates). Run either on a fresh prefix (remove
 `build/playtest/prefix` first). `reference/README.md`, "Gate", says which
 changes need a gate. Say in the pull request which one you ran.
 

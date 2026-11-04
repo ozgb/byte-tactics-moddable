@@ -103,7 +103,7 @@ GATE_TIER = (
     "console-features",
     "console-sight",
     "console-units",
-    "eight-pincushion-teams",
+    "eight-full-moon",
     "hailstorm-los-off",
     "load-midgame",
     "mission-radius",
@@ -112,7 +112,6 @@ GATE_TIER = (
     "orders-air-fights",
     "orders-air-repair",
     "orders-build-patrol",
-    "orders-factory",
     "orders-guard-attacked",
     "orders-guard-reclaim",
     "orders-immediate",
@@ -121,6 +120,11 @@ GATE_TIER = (
     "orders-tier2-vader",
     "save-midgame",
     "sensors-floating-teeth-los-off",
+    "ui-build-menu",
+    "ui-build-place",
+    "ui-groups",
+    "ui-keys",
+    "ui-left-click-orders",
     "units-transport-ship",
 )
 RUN_SECONDS_BASE = 120

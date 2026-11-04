@@ -70,7 +70,7 @@ def git(args, cwd=None):
     env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     env.update(GIT_ENV)
     return subprocess.run(
-        ["git", "-c", "core.hooksPath=/dev/null", "-c", "transfer.fsckObjects=true", *args],
+        ["git", "-c", "core.hooksPath=/dev/null", "-c", "transfer.fsckObjects=true", "-c", "gc.auto=0", "-c", "maintenance.auto=false", *args],
         cwd=cwd,
         env=env,
         capture_output=True,

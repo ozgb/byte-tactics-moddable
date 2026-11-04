@@ -7,6 +7,7 @@
 import asyncio
 import contextlib
 import http.server
+import hashlib
 import io
 import json
 import os
@@ -939,13 +940,14 @@ class BranchRuleTests(unittest.TestCase):
 class PushHandler(http.server.BaseHTTPRequestHandler):
     requests = []
     status = 201
+    body = b""
 
     def do_POST(self):
         body = self.rfile.read(int(self.headers["Content-Length"]))
         PushHandler.requests.append((self.path, self.headers["Authorization"], json.loads(body)))
         self.send_response(PushHandler.status)
         self.end_headers()
-        self.wfile.write(json.dumps({"html_url": "https://example.invalid/pull/1"}).encode())
+        self.wfile.write(PushHandler.body or json.dumps({"html_url": "https://example.invalid/pull/1"}).encode())
 
     def log_message(self, *args):
         pass
@@ -962,12 +964,16 @@ class PushTests(unittest.TestCase):
         self.remote = self.dir / "remote.git"
         subprocess.run(["git", "init", "-q", "--bare", str(self.remote)], check=True)
         self.token = make_secret(self.dir, "btm-token", FAKE_TOKEN + "\n")
+        self.wasm_dir = self.dir / "wasm"
+        self.wasm_dir.mkdir()
+        (self.session / bk.MANIFEST_NAME).write_text(hashlib.sha256(b"canary").hexdigest() + "  src/canary.cpp\n")
         PushHandler.requests = []
         PushHandler.status = 201
         self.server = http.server.HTTPServer(("127.0.0.1", 0), PushHandler)
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
         self.addCleanup(self.server.server_close)
         self.addCleanup(self.server.shutdown)
+        PushHandler.body = b""
         self.api = f"http://127.0.0.1:{self.server.server_port}"
         self.work = self.dir / "work"
         subprocess.run(["git", "init", "-q", "-b", "main", str(self.work)], check=True)
@@ -979,8 +985,8 @@ class PushTests(unittest.TestCase):
 
     def bundle(self, *branches):
         for b in branches:
-            if b != "main":
-                subprocess.run(["git", "-C", str(self.work), "branch", "-f", b, "main"], check=True)
+            if b != "main" and subprocess.run(["git", "-C", str(self.work), "rev-parse", "-q", "--verify", b], capture_output=True).returncode:
+                subprocess.run(["git", "-C", str(self.work), "branch", b, "main"], check=True)
         subprocess.run(["git", "-C", str(self.work), "bundle", "create", "-q", str(self.session / "outbox" / bk.BUNDLE_NAME), *branches], check=True)
         (self.session / bk.STATE_NAME).unlink(missing_ok=True)
 
@@ -989,7 +995,73 @@ class PushTests(unittest.TestCase):
         return out.split()
 
     def push(self, token_file=None):
-        bk.push_branches(self.session, token_file or self.token, str(self.remote), "ozgb/btm", self.api)
+        bk.push_branches(self.session, token_file or self.token, str(self.remote), "ozgb/btm", self.api, wasm_dirs=[self.wasm_dir])
+
+    def commit_file(self, branch, name, content):
+        env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+               "GIT_COMMITTER_EMAIL": "t@t", "GIT_CONFIG_GLOBAL": "/dev/null"}
+        subprocess.run(["git", "-C", str(self.work), "checkout", "-q", "-B", branch, "main"], check=True)
+        (self.work / name).write_bytes(content)
+        subprocess.run(["git", "-C", str(self.work), "add", name], check=True, env=env)
+        subprocess.run(["git", "-C", str(self.work), "commit", "-qm", "two"], check=True, env=env)
+        subprocess.run(["git", "-C", str(self.work), "checkout", "-q", "main"], check=True)
+
+    def refused(self, branch, content_name="f.txt", content=b"y"):
+        self.commit_file(branch, content_name, content)
+        self.bundle(branch)
+        bk.sync_refs(self.session)
+        self.push()
+        self.assertEqual(self.remote_refs(), [])
+        self.assertEqual(PushHandler.requests, [])
+        self.assertNotIn("refs/heads/" + branch, (self.session / bk.PUSH_STATE).read_text() if (self.session / bk.PUSH_STATE).exists() else "")
+        log = (self.session / "broker.log").read_text()
+        self.assertIn(f"push refused for refs/heads/{branch}", log)
+        self.assertNotIn(content.decode(errors="replace") + "\n", log)
+        return log
+
+    def test_wasm_path_is_refused_whatever_the_case(self):
+        log = self.refused("impl/w", "Mod.WASM", b"not even wasm")
+        self.assertIn("Mod.WASM", log)
+
+    def test_manifest_content_is_refused(self):
+        secret = b"secret source text"
+        (self.session / bk.MANIFEST_NAME).write_text(hashlib.sha256(secret).hexdigest() + "  src/x.cpp\n")
+        log = self.refused("impl/m", "innocent.txt", secret)
+        self.assertIn("innocent.txt", log)
+        self.assertNotIn("src/x.cpp", log)
+
+    def test_build_wasm_content_is_refused(self):
+        (self.wasm_dir / "sub").mkdir(parents=True)
+        (self.wasm_dir / "sub" / "m.wasm").write_bytes(b"\0asm\1\0\0\0module")
+        self.refused("impl/b", "renamed.bin", b"\0asm\1\0\0\0module")
+
+    def test_content_in_an_earlier_commit_is_refused(self):
+        self.commit_file("impl/h", "a.wasm", b"1")
+        subprocess.run(["git", "-C", str(self.work), "checkout", "-q", "impl/h"], check=True)
+        env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+               "GIT_COMMITTER_EMAIL": "t@t", "GIT_CONFIG_GLOBAL": "/dev/null"}
+        subprocess.run(["git", "-C", str(self.work), "rm", "-q", "a.wasm"], check=True, env=env)
+        subprocess.run(["git", "-C", str(self.work), "commit", "-qm", "gone"], check=True, env=env)
+        subprocess.run(["git", "-C", str(self.work), "checkout", "-q", "main"], check=True)
+        self.bundle("impl/h")
+        bk.sync_refs(self.session)
+        self.push()
+        self.assertEqual(self.remote_refs(), [])
+
+    def test_missing_manifest_refuses(self):
+        (self.session / bk.MANIFEST_NAME).unlink()
+        self.bundle("impl/ok")
+        bk.sync_refs(self.session)
+        self.push()
+        self.assertEqual(self.remote_refs(), [])
+        self.assertIn("push refused for refs/heads/impl/ok", (self.session / "broker.log").read_text())
+
+    def test_clean_branch_with_a_commit_still_pushes(self):
+        self.commit_file("impl/clean", "notes.txt", b"fine")
+        self.bundle("impl/clean")
+        bk.sync_refs(self.session)
+        self.push()
+        self.assertEqual(self.remote_refs(), ["refs/heads/impl/clean"])
 
     def test_only_impl_branches_reach_the_bare_repository(self):
         self.bundle("main", "impl/ok", "impl/a/b", "other")
@@ -1014,8 +1086,23 @@ class PushTests(unittest.TestCase):
         self.push()
         self.assertEqual(len(PushHandler.requests), 2)
 
+    def test_other_422_is_retried(self):
+        PushHandler.status = 422
+        PushHandler.body = json.dumps({"message": "Validation Failed", "errors": [{"message": "No commits between main and impl/ok"}]}).encode()
+        self.bundle("impl/ok")
+        bk.sync_refs(self.session)
+        self.push()
+        self.assertEqual(json.loads((self.session / bk.PUSH_STATE).read_text())["pr"], {})
+        self.assertIn("pull request for impl/ok failed", (self.session / "broker.log").read_text())
+        PushHandler.status = 201
+        PushHandler.body = b""
+        self.push()
+        self.assertEqual(len(PushHandler.requests), 2)
+        self.assertIn("refs/heads/impl/ok", json.loads((self.session / bk.PUSH_STATE).read_text())["pr"])
+
     def test_existing_pull_request_is_not_an_error(self):
         PushHandler.status = 422
+        PushHandler.body = json.dumps({"errors": [{"message": "A pull request already exists for ozgb:impl/ok."}]}).encode()
         self.bundle("impl/ok")
         bk.sync_refs(self.session)
         self.push()

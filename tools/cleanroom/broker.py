@@ -27,7 +27,10 @@ Push: after each sync the broker pushes every `refs/heads/impl/<name>` of the ba
 `--btm-token-file` (default `~/.config/bt-cleanroom/btm-token`) at that moment, hands it to git through
 `GIT_ASKPASS` (askpass.sh, which prints an environment variable set on that one process) and to the API in one
 Authorization header. The token is never in the broker's environment, a git config file or a log line. Without a usable
-token file (missing, empty, or readable by group or others) nothing is pushed.
+token file (missing, empty, or readable by group or others) nothing is pushed. Before each push it lists every blob
+in the commit's whole history and refuses the push (logging the ref and the path, never content) when a blob's path
+ends in `.wasm`, when its sha256 is in `SESSION/manifest.txt`, or when it equals a `*.wasm` of the build directories;
+with no manifest nothing is pushed.
 
 `serve` loops until SIGTERM or SIGINT and makes a last pass before it exits. `once` makes one pass.
 """
@@ -60,6 +63,9 @@ ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$")
 SUBSYSTEM_RE = re.compile(r"^[a-z][a-z0-9_-]{0,63}$")
 STUB_VERDICT = "stub: the module was not judged"
 ROOT = Path(__file__).resolve().parents[2]
+WASM_DIRS = (ROOT / "build" / "modern", ROOT / "build" / "wasm-modules")
+MANIFEST_NAME = "manifest.txt"
+NULL_SHA = "0" * 40
 ORACLEGATE = ROOT / "tools" / "oraclegate.py"
 ASKPASS = Path(__file__).resolve().parent / "askpass.sh"
 GATE_TIMEOUT = 4 * 3600
@@ -88,7 +94,7 @@ def log(session, message):
         f.write(f"{stamp()} {message}\n")
 
 
-def git(args, cwd=None, extra_env=None):
+def git(args, cwd=None, extra_env=None, input=None, text=True):
     env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     env.update(GIT_ENV)
     env.update(extra_env or {})
@@ -97,7 +103,8 @@ def git(args, cwd=None, extra_env=None):
         cwd=cwd,
         env=env,
         capture_output=True,
-        text=True,
+        text=text,
+        input=input,
     )
 
 
@@ -263,13 +270,82 @@ def open_pull_request(api_base, repo, token, branch, base="main"):
         with urllib.request.urlopen(request, timeout=60) as response:
             return json.loads(response.read()).get("html_url", "")
     except urllib.error.HTTPError as err:
-        err.close()
-        if err.code == 422:
+        try:
+            detail = err.read(1 << 20)
+        finally:
+            err.close()
+        if err.code == 422 and pull_request_exists(detail):
             return "exists"
         raise
 
 
-def push_branches(session, token_file, remote, repo=DEFAULT_REPO, api_base=DEFAULT_API):
+def pull_request_exists(body):
+    """Return True when a GitHub error body says a pull request already exists."""
+    try:
+        errors = json.loads(body).get("errors", [])
+        return any("A pull request already exists" in str(e.get("message", "")) for e in errors if isinstance(e, dict))
+    except (ValueError, AttributeError, TypeError):
+        return False
+
+
+def read_manifest(path):
+    """Return the set of sha256 values in a canary manifest, or None when there is no manifest."""
+    try:
+        lines = Path(path).read_text().splitlines()
+    except OSError:
+        return None
+    return {line.split(None, 1)[0] for line in lines if line.strip()}
+
+
+def wasm_hashes(directories):
+    """Return the sha256 of every *.wasm under the directories."""
+    found = set()
+    for directory in directories:
+        for path in Path(directory).rglob("*.wasm"):
+            if path.is_file() and not path.is_symlink():
+                found.add(hashlib.sha256(path.read_bytes()).hexdigest())
+    return found
+
+
+def history_blobs(bare, sha):
+    """Return [(blob sha, path)] for every blob any commit reachable from sha adds or changes, under every path it has."""
+    commits = git(["--git-dir", str(bare), "rev-list", sha])
+    if commits.returncode:
+        raise RuntimeError(commits.stderr.strip())
+    diff = git(["--git-dir", str(bare), "diff-tree", "--stdin", "-r", "-m", "--root", "--no-renames", "--no-commit-id", "--raw", "-z"],
+               input=commits.stdout.encode(), text=False)
+    if diff.returncode:
+        raise RuntimeError(diff.stderr.decode(errors="replace").strip())
+    parts = diff.stdout.split(b"\0")
+    blobs = []
+    for i, part in enumerate(parts):
+        if part.startswith(b":") and i + 1 < len(parts):
+            fields = part.decode().split()
+            if fields[1] != "160000" and fields[3] != NULL_SHA:
+                blobs.append((fields[3], parts[i + 1].decode(errors="replace")))
+    return blobs
+
+
+def content_refusal(bare, sha, manifest, wasm_digests):
+    """Return why the commit's history holds a forbidden blob (the path, never content), or None."""
+    cache = {}
+    for blob, path in history_blobs(bare, sha):
+        if path.lower().endswith(".wasm"):
+            return f"{path} is a .wasm file"
+        if blob not in cache:
+            data = git(["--git-dir", str(bare), "cat-file", "blob", blob], text=False)
+            if data.returncode:
+                raise RuntimeError(data.stderr.decode(errors="replace").strip())
+            cache[blob] = (hashlib.sha256(data.stdout).hexdigest(), len(data.stdout))
+        digest, size = cache[blob]
+        if size and digest in manifest:
+            return f"{path} is a file of the canary manifest"
+        if size and digest in wasm_digests:
+            return f"{path} is a build wasm module"
+    return None
+
+
+def push_branches(session, token_file, remote, repo=DEFAULT_REPO, api_base=DEFAULT_API, wasm_dirs=WASM_DIRS):
     """Push the allowed branches of the bare repository to the remote and open a pull request for each new one.
 
     The token is read now, handed to git through GIT_ASKPASS for that push alone and to the API in one header.
@@ -291,7 +367,19 @@ def push_branches(session, token_file, remote, repo=DEFAULT_REPO, api_base=DEFAU
             _unverified_logged.add((str(session), why))
             log(session, f"push skipped: {why}")
         return
+    manifest = read_manifest(session / MANIFEST_NAME)
+    wasm_digests = wasm_hashes(wasm_dirs) if manifest is not None and pending else set()
     for ref, sha in sorted(pending.items()):
+        if manifest is None:
+            log(session, f"push refused for {ref}: no {MANIFEST_NAME} in the session, so no check")
+            continue
+        try:
+            why = content_refusal(bare, sha, manifest, wasm_digests)
+        except (RuntimeError, OSError) as err:
+            why = f"the content check failed: {err}"
+        if why:
+            log(session, f"push refused for {ref}: {why}")
+            continue
         result = git(
             ["--git-dir", str(bare), "-c", "credential.helper=", "-c", "core.askPass=", "push", remote, f"{sha}:{ref}"],
             extra_env={"GIT_ASKPASS": str(ASKPASS), TOKEN_ENV: token},

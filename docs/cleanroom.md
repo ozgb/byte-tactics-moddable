@@ -99,6 +99,9 @@ command by `--secret-env` and never written to disk (see Credentials).
   never in the broker's environment, a git config file or a log line. A token file that is missing, empty or readable
   by group or others means nothing is pushed. A branch is pushed again only when its commit changes, a failed push or
   pull request is retried on the next pass, and `--no-push` turns pushing off.
+  Before each push the broker checks every blob in the branch's history and refuses the push (logging the path, never content,
+  and not recording it, so it is retried only when the commit changes) when a path ends in `.wasm`, a blob's sha256 is in the
+  session's `manifest.txt` or equals a `*.wasm` under `build/modern` or `build/wasm-modules`, or the session has no manifest.
 - **Gate:** the agent creates `/srv/outbox/ID/module.wasm` and `/srv/outbox/ID/subsystem`, then
   `/srv/outbox/ID/ready`. The broker opens the request directory and each file with `O_NOFOLLOW`
   relative to a directory descriptor, checks the opened descriptors (regular files only), reads

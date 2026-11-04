@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "replay_schema.h"
+#include "../../interfaces/host.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"

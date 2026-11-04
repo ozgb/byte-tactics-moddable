@@ -473,6 +473,11 @@ least one game of 8 players. `uv run tools/coverage.py --exe build/coverage/Tota
 full suite's in `data/coverage.csv`, and exits 1 below 96% of the lines. Run it when a scenario is
 added or removed and when the tier changes.
 
+`uv run tools/coverage.py --exe build/coverage/TotalA.exe --choose-tier` (`--runs DIR`, `--max-ticks N`, `--eight NAME`) plays
+nothing: it reproduces this rule from the per-scenario profiles a coverage run left in `build/coverage-run/` and prints the
+scenarios it takes, with their players, ticks and new lines, and their lines and functions as a share of the union of every
+scenario's. `--max-ticks` leaves out the scenarios longer than N ticks; `--eight` takes the named 8-player game first, as the only one.
+
 `uv run tools/coverage.py --slots ai` (repeatable, or `all`; `--runs DIR`, `--json FILE`) plays nothing: it reads the per-scenario
 profiles a coverage run left in `build/coverage-run/` and prints, for each slot of `interfaces/ai.h`, the scenarios that enter
 it with their entry counts and ticks, or `never`, and a smallest set of scenarios that enters every slot some scenario enters.

@@ -188,8 +188,6 @@ jobs:
         if: steps.changed.outputs.run == 'true'
         run: |
           uv run tools/test_x87lint.py
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup
-          df -h .
           env -u BT_NO_ZLIB tools/setup_toolchain.sh
           cmake -S . -B build/x87 -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake -DBT_COMPILE_ONLY=ON
           ninja -C build/x87 aliases.obj wasmloader

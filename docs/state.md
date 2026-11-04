@@ -108,7 +108,6 @@ Found during review. Each needs an order, a message to the driver, or a split of
 - Load-time code is in the load walk, and a destructor's accesses are evidence (`delete` and temporaries are `call` rows in `data/rwsets.csv`). A destructor of a class that is neither user-provided nor virtual is not followed (see the docstring of `tools/rwsets.py`).
 - The classes of clear-cut UI, debug and platform rows rest on the tool's evidence plus names. Rows that matter to the tick were checked against the code.
 - Rows the review marked "unsure" in their notes (check the code before relying on them):
-  - global: `g_mapLoadFlag`.
   - heap: `LoadUnitFbi: GameAllocIgnoreTag BUILDING YARD`, the three `Mission::LoadMissionData` sites (MissionFeature, MissionRule, MissionUnit), `BuildDerivedLayers: operator new FogCell`, `LoadTntMap` (MAPPED MEMORY, TILE MAP), `CobScript::LoadScriptState` (SavedPiece), `AllocFrame` and the two `AllocDepthFrame` GafFrame sites.
 - Rows whose proposal changed when #745 made `stateclasses.py` read `link/globals.h` (#749). Each group is not sim for the reason given, so nobody has to audit it again:
   - Load-only rows (`sim: only load code touches it`: `count_147ab`, `entries_147af`, `loadProgress`, `loadPctUnits`, `loadPercent`, `progress_38d73`, `shade`, and the like): the rule proposes sim for a load write that no phase reads. They are art lists and loading-bar bytes that only load and drawing code touch.

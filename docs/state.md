@@ -60,7 +60,7 @@ As of the last read of `data/state_classes.csv` (2153 rows):
 
 ## Mixed cases and how to split them
 
-The nine game-region rows with class `mixed`:
+The ten game-region rows with class `mixed`:
 
 - `players` (+0x1b63): platform for the net slot, ping, `info` and `name`; sim for the rest (type, units, squads, explored map, resources, alliances).
 - `localPlayer` (+0x2a42): sim reads it as the perspective player. Fix a sim perspective player at match start; keep a separate view local player.
@@ -69,6 +69,7 @@ The nine game-region rows with class `mixed`:
 - `mapFlags` (+0x14281): sim bits for line of sight and mapping mode; the "view needs refresh" bit cleared by the camera becomes view state.
 - `defs` (+0x1439b): view for `soundcategory` and `field_18e`; sim for the rest.
 - `uiOptionFlags` (+0x37f2f): sim bits for treedeath and the cheat toggles (halfshot, shootall, drop, radar); view bits for clock, noshake, selboxes; bit 0 (skip net timeouts) is platform.
+- `net_flags` (+0x38d75, with its aliases `flags_38d75`, `loadingFlags`, `netBits`, `net_bits`): sim bits 0 and 1 (`DropPlayer`) and 2 (`MainLoopTick`, packet 21); bit 3 (start positions assigned, read by the load screen) is platform. Split bits 0 to 2 into a sim word.
 - `otherFlags` (+0x38a51): bit 0 is the pause request, written by the net and the UI. Give it to the driver; the other bits are UI.
 - `net` (+0x391e9): the mission object. Sim for wind, tide, water damage, kill and time multipliers, start positions and the TDF lists; view for names, description, planet and the text fields.
 
@@ -107,9 +108,8 @@ Found during review. Each needs an order, a message to the driver, or a split of
 - Load-time code is in the load walk, and a destructor's accesses are evidence (`delete` and temporaries are `call` rows in `data/rwsets.csv`). A destructor of a class that is neither user-provided nor virtual is not followed (see the docstring of `tools/rwsets.py`).
 - The classes of clear-cut UI, debug and platform rows rest on the tool's evidence plus names. Rows that matter to the tick were checked against the code.
 - Rows the review marked "unsure" in their notes (check the code before relying on them):
-  - game-region: `pad_2851`, `gameSpeed`, `effectiveGameSpeed`, `net_flags`.
-  - global: `DAT_004fc474`, `DAT_004fc978`, `DAT_004fcc48`, `DAT_004fd2e4`, `DAT_004fda70`, `DAT_004fdbe0`, `g_consoleCommands`, `g_cheatCommands`, `DAT_00501fcc`, `g_debugCommands`, `DAT_00502f98`, `DAT_00507b64`, `DAT_00507b68`, `g_rotationMatrix`, `g_emptyStringRefs`, `g_emptyString`, `g_sendCondenser`, `g_receiveCondenser`, `g_netFrameRateConfig`, `g_mapLoadFlag`.
-  - heap: `LoadUnitFbi: GameAllocIgnoreTag BUILDING YARD`, the three `Mission::LoadMissionData` sites (MissionFeature, MissionRule, MissionUnit), `FrameQueue::ResetFrames`, `FrameQueue::QueueFrames`, `BuildDerivedLayers: operator new FogCell`, `LoadTntMap` (MAPPED MEMORY, TILE MAP), `CobScript::LoadScriptState` (SavedPiece), `AllocFrame` and the two `AllocDepthFrame` GafFrame sites.
+  - global: `DAT_004fc474`, `DAT_004fc978`, `DAT_004fcc48`, `DAT_004fd2e4`, `DAT_004fda70`, `DAT_004fdbe0`, `g_consoleCommands`, `g_cheatCommands`, `DAT_00501fcc`, `g_debugCommands`, `DAT_00502f98`, `DAT_00507b64`, `DAT_00507b68`, `g_rotationMatrix`, `g_emptyStringRefs`, `g_emptyString`, `g_mapLoadFlag`.
+  - heap: `LoadUnitFbi: GameAllocIgnoreTag BUILDING YARD`, the three `Mission::LoadMissionData` sites (MissionFeature, MissionRule, MissionUnit), `BuildDerivedLayers: operator new FogCell`, `LoadTntMap` (MAPPED MEMORY, TILE MAP), `CobScript::LoadScriptState` (SavedPiece), `AllocFrame` and the two `AllocDepthFrame` GafFrame sites.
 - Rows whose proposal changed when #745 made `stateclasses.py` read `link/globals.h` (#749). Each group is not sim for the reason given, so nobody has to audit it again:
   - Load-only rows (`sim: only load code touches it`: `count_147ab`, `entries_147af`, `loadProgress`, `loadPctUnits`, `loadPercent`, `progress_38d73`, `shade`, and the like): the rule proposes sim for a load write that no phase reads. They are art lists and loading-bar bytes that only load and drawing code touch.
   - Chat HUD (`chatHudRing`, `chatHudRing_12ef`, `entries`, `head`, `tail`): `AddMessage` runs in the tick and writes the ring, and only `DrawMessages` reads it, so it is an output of the tick to the screen.

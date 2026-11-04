@@ -66,9 +66,6 @@
 #undef g_meteorScheduleGap
 #pragma push_macro("g_movementClasses")
 #undef g_movementClasses
-extern void (* const g_approachRadiusVtable[])();
-extern void (* const g_ringApproachVtable[])();
-extern void (* const g_pathOrderVtable[])();
 static const void* const kReplayCodeOrderNotify[] = {
     (const void*)ReadyOrder,
     (const void*)StandbyOrder,
@@ -284,34 +281,6 @@ enum ReplayObjectKindId {
     ROK_ORDERTABLEENTRY,
     ROK_COUNT
 };
-
-inline const void* ReplayVtable(unsigned kind)
-{
-    switch (kind) {
-    case ROK_APPROACHRADIUS:
-        return g_approachRadiusVtable;
-    case ROK_RINGAPPROACH:
-        return g_ringApproachVtable;
-    case ROK_PATHORDER:
-        return g_pathOrderVtable;
-    default:
-        return nullptr;
-    }
-}
-
-inline const char* ReplayVtableName(unsigned kind)
-{
-    switch (kind) {
-    case ROK_APPROACHRADIUS:
-        return "g_approachRadiusVtable";
-    case ROK_RINGAPPROACH:
-        return "g_ringApproachVtable";
-    case ROK_PATHORDER:
-        return "g_pathOrderVtable";
-    default:
-        return "";
-    }
-}
 
 static const ReplayObjectKind kReplayObjectKinds[] = {
     { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, "", 0, 0 },

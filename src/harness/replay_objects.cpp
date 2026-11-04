@@ -1364,11 +1364,11 @@ ReplayCallbackCall::ReplayCallbackCall(const void* target, unsigned method) : sc
     if (s_callbackDepth != 0)
         ReplayFail("a callback made inside a callback of an import is not recorded");
     s_callbackDepth++;
-    const ReplayCallbackType& type = kReplayCallbacks[scope->callback];
+    const ReplayCallbackType& type = kReplayCallbacks[found->callback];
     text.Add("\n    c ");
     text.Add(type.handle);
     text.AddChar('#');
-    text.AddUnsigned(scope->ordinal);
+    text.AddUnsigned(found->ordinal);
     text.AddChar('.');
     text.Add(type.methods[method]);
 }
@@ -1383,6 +1383,11 @@ ReplayCallbackCall::~ReplayCallbackCall()
 const void* ReplayCallbackCall::Original(unsigned slot) const
 {
     return ((const void* const*)scope->original)[slot];
+}
+
+const void* ReplayVptrOf(const void* object)
+{
+    return *(const void* const*)object;
 }
 
 unsigned ReplayCallbackDepth()

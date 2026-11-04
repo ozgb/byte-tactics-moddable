@@ -476,10 +476,11 @@ class Polymorphic(unittest.TestCase):
         files, errors, model = self.generated()
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertIn("extern void (* const g_approachRadiusVtable[])();", text)
+        vtables = files[rs.VTABLES_CPP]
+        self.assertIn("extern void (* const g_approachRadiusVtable[])();", vtables)
         self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },', text)
-        self.assertIn("    case ROK_APPROACHRADIUS:\n        return g_approachRadiusVtable;", text)
-        self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', text)
+        self.assertIn("    case ROK_APPROACHRADIUS:\n        return g_approachRadiusVtable;", vtables)
+        self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', vtables)
         base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
         self.assertTrue(base.endswith('"", 0, 3 },'), base)
         self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };", text)

@@ -17,6 +17,7 @@ Outputs:
     src/harness/replay_services.h   the ids and names of the services imports (GameRand, RandomInt, the TDF and command classes)
     src/harness/replay_services.inc the recorder's lines for them
     tests/replay_services.h         the replayer's answers for them
+    src/harness/replay_vtables.cpp  the vtable of each concrete kind of a polymorphic base
     src/harness/replay_callbacks.h  the recorder's thunk classes for the callback interfaces
     tests/replay_callbacks.h        the replayer's players for the callbacks an import made
 
@@ -840,9 +841,6 @@ def render_schema(ann: dict, model: dict) -> str:
     macros = list(dict.fromkeys(macros))
     for name in macros:
         L += ['#pragma push_macro("%s")' % name, "#undef %s" % name]
-    for o in objects:
-        if o.get("vtable"):
-            L.append("extern void (* const %s[])();" % o["vtable"])
     for t in model["code_tables"]:
         L.append("static const void* const kReplayCode%s[] = {" % pascal(t["name"]))
         L += ["    (const void*)%s," % fn for fn in t["entries"]]
@@ -888,17 +886,7 @@ def render_schema(ann: dict, model: dict) -> str:
     L += ["    RF_%s," % upper(f["name"]) for f in fields]
     L += ["};", "", "enum ReplayObjectKindId {"]
     L += ["    ROK_%s," % upper(o["name"]) for o in objects]
-    L += ["    ROK_COUNT", "};", "", "inline const void* ReplayVtable(unsigned kind)", "{", "    switch (kind) {"]
-    for o in objects:
-        if o.get("vtable"):
-            L.append("    case ROK_%s:" % upper(o["name"]))
-            L.append("        return %s;" % o["vtable"])
-    L += ["    default:", "        return nullptr;", "    }", "}", "", "inline const char* ReplayVtableName(unsigned kind)", "{", "    switch (kind) {"]
-    for o in objects:
-        if o.get("vtable"):
-            L.append("    case ROK_%s:" % upper(o["name"]))
-            L.append('        return "%s";' % o["vtable"])
-    L += ["    default:", '        return "";', "    }", "}", "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
+    L += ["    ROK_COUNT", "};", "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
     scope = {"state": "RS_STATE", "index": "RS_INDEX", "value": "RS_VALUE"}
     kind_id = {o["name"]: "ROK_" + upper(o["name"]) for o in objects}
     types = {o["name"]: o["type"] for o in objects}
@@ -1646,6 +1634,22 @@ def render_service_answers(services: list[dict]) -> str:
     return "\n".join(L)
 
 
+VTABLES_CPP = ROOT / "src/harness/replay_vtables.cpp"
+
+
+def render_vtables(model: dict) -> str:
+    """The vtable of each concrete kind, by kind id: the externs are here and not in a header."""
+    kinds = [o for o in model["objects"] if o.get("vtable")]
+    L = [GENERATED, '#include "replay_schema.h"', '#include "replay_objects.h"', ""]
+    L += ["extern void (* const %s[])();" % o["vtable"] for o in kinds]
+    for fn, ret, expr in (("ReplayVtable", "const void*", "%s"), ("ReplayVtableName", "const char*", '"%s"')):
+        L += ["", "%s %s(unsigned kind)" % (ret, fn), "{", "    switch (kind) {"]
+        for o in kinds:
+            L += ["    case ROK_%s:" % upper(o["name"]), "        return %s;" % (expr % o["vtable"])]
+        L += ["    default:", "        return %s;" % ("nullptr" if ret == "const void*" else '""'), "    }", "}"]
+    return "\n".join(L) + "\n"
+
+
 CALLBACKS_H = ROOT / "src/harness/replay_callbacks.h"
 CALLBACKS_SLOTS = ROOT / "tests/replay_callbacks.h"
 
@@ -1702,7 +1706,7 @@ def render_callbacks(model: dict) -> str:
             L += ["}", ""]
     L += ["inline const void* ReplayThunkVtable(unsigned callback)", "{", "    switch (callback) {"]
     for c in model["callbacks"]:
-        L += ["    case RCB_%s: {" % upper(c["name"]), "        ReplayThunk%s probe;" % c["name"], "        return *reinterpret_cast<const void* const*>(&probe);", "    }"]
+        L += ["    case RCB_%s: {" % upper(c["name"]), "        ReplayThunk%s probe;" % c["name"], "        return ReplayVptrOf(&probe);", "    }"]
     L += ["    }", "    return nullptr;", "}", "", "#endif", ""]
     return "\n".join(L)
 
@@ -1762,6 +1766,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         SERVICES_H: render_service_ids(services),
         SERVICES_INC: render_service_end(services),
         SERVICES_SLOTS: render_service_answers(services),
+        VTABLES_CPP: render_vtables(model),
         CALLBACKS_H: render_callbacks(model),
         CALLBACKS_SLOTS: render_callback_players(model),
         JSON_OUT: json_text(ann, model),

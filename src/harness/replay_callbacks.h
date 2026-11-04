@@ -58,15 +58,15 @@ inline const void* ReplayThunkVtable(unsigned callback)
     switch (callback) {
     case RCB_UNITVISITOR: {
         ReplayThunkUnitVisitor probe;
-        return *reinterpret_cast<const void* const*>(&probe);
+        return ReplayVptrOf(&probe);
     }
     case RCB_UNITSCANVISITOR: {
         ReplayThunkUnitScanVisitor probe;
-        return *reinterpret_cast<const void* const*>(&probe);
+        return ReplayVptrOf(&probe);
     }
     case RCB_CALLBACK: {
         ReplayThunkCallback probe;
-        return *reinterpret_cast<const void* const*>(&probe);
+        return ReplayVptrOf(&probe);
     }
     }
     return nullptr;

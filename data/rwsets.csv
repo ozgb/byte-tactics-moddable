@@ -55254,11 +55254,11 @@ address,function,file,kind,target
 ,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,call,abort
 ,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,deref_read,*char
 ,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_maybe_written,ReplayCallbackCall::text
-,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackCall::scope
 ,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackScope::callback
 ,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackScope::ordinal
 ,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackType::handle
 ,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_read,ReplayCallbackType::methods
+,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,field_write,ReplayCallbackCall::scope
 ,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,function,
 ,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,global_read,kReplayCallbacks@src/harness/replay_schema.h
 ,ReplayCallbackCall::ReplayCallbackCall,src/harness/replay_objects.cpp,global_read,s_callbackDepth
@@ -55332,13 +55332,13 @@ address,function,file,kind,target
 ,ReplayClearFailure,src/harness/replay_objects.cpp,function,
 ,ReplayClearFailure,src/harness/replay_objects.cpp,global_write,s_failure
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,call,ReplayFail
+,ReplayConcreteKind,src/harness/replay_objects.cpp,call,ReplayVtable
+,ReplayConcreteKind,src/harness/replay_objects.cpp,call,ReplayVtableName
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,call,sprintf
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,deref_read,*void
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::name
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyCount
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyFirst
-,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::vtable
-,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::vtableName
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,function,
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKindCount@src/harness/replay_schema.h
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
@@ -55632,6 +55632,7 @@ address,function,file,kind,target
 ,ReplayResolveObject,src/harness/replay_objects.cpp,call,ReplayFindObjectKind
 ,ReplayResolveObject,src/harness/replay_objects.cpp,call,ReplayObjectTable::Bind
 ,ReplayResolveObject,src/harness/replay_objects.cpp,call,ReplayObjectTable::Pointer
+,ReplayResolveObject,src/harness/replay_objects.cpp,call,ReplayVtable
 ,ReplayResolveObject,src/harness/replay_objects.cpp,call,atoi
 ,ReplayResolveObject,src/harness/replay_objects.cpp,call,memset
 ,ReplayResolveObject,src/harness/replay_objects.cpp,call,strchr
@@ -55645,7 +55646,6 @@ address,function,file,kind,target
 ,ReplayResolveObject,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::scope
 ,ReplayResolveObject,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::size
 ,ReplayResolveObject,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::table
-,ReplayResolveObject,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::vtable
 ,ReplayResolveObject,src/harness/replay_objects.cpp,function,
 ,ReplayResolveObject,src/harness/replay_objects.cpp,global_read,g_game
 ,ReplayResolveObject,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
@@ -55741,33 +55741,33 @@ address,function,file,kind,target
 ,ReplayText::Reserve,src/harness/replay_text.cpp,function,
 ,ReplayText::Size,src/harness/replay_text.cpp,field_read,ReplayText::used
 ,ReplayText::Size,src/harness/replay_text.cpp,function,
-,ReplayThunkVtable,src/harness/replay_callbacks.h,deref_read,*void
+,ReplayThunkCallback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Original
+,ReplayThunkCallback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Space
+,ReplayThunkCallback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Text
+,ReplayThunkCallback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::~ReplayCallbackCall
+,ReplayThunkCallback::Complete,src/harness/replay_callbacks.h,call,ReplayValue
+,ReplayThunkCallback::Complete,src/harness/replay_callbacks.h,function,
+,ReplayThunkCallback::Complete,src/harness/replay_callbacks.h,indirect_call,"indirect via void (*)(void *, int) __attribute__((thiscall))"
+,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayAddObjectName
+,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Original
+,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Space
+,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Table
+,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Text
+,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::~ReplayCallbackCall
+,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayText::Add
+,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayValue
+,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,function,
+,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,indirect_call,"indirect via int (*)(void *, Unit *) __attribute__((thiscall))"
+,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayAddObjectName
+,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Original
+,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Space
+,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Table
+,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Text
+,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::~ReplayCallbackCall
+,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,function,
+,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,indirect_call,"indirect via void (*)(void *, Unit *) __attribute__((thiscall))"
+,ReplayThunkVtable,src/harness/replay_callbacks.h,call,ReplayVptrOf
 ,ReplayThunkVtable,src/harness/replay_callbacks.h,function,
-,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Original
-,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Space
-,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Text
-,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,call,ReplayCallbackCall::~ReplayCallbackCall
-,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,call,ReplayValue
-,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,function,
-,ReplayThunk_Callback::Complete,src/harness/replay_callbacks.h,indirect_call,"indirect via void (*)(void *, int) __attribute__((thiscall))"
-,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayAddObjectName
-,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Original
-,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Space
-,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Table
-,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Text
-,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::~ReplayCallbackCall
-,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayText::Add
-,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayValue
-,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,function,
-,ReplayThunk_UnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,indirect_call,"indirect via int (*)(void *, Unit *) __attribute__((thiscall))"
-,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayAddObjectName
-,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Original
-,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Space
-,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Table
-,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Text
-,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::~ReplayCallbackCall
-,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,function,
-,ReplayThunk_UnitVisitor::Visit,src/harness/replay_callbacks.h,indirect_call,"indirect via void (*)(void *, Unit *) __attribute__((thiscall))"
 ,ReplayValue,src/harness/replay_values.h,call,ReplayText::Add
 ,ReplayValue,src/harness/replay_values.h,call,ReplayText::AddChar
 ,ReplayValue,src/harness/replay_values.h,call,ReplayText::AddF32
@@ -55784,6 +55784,13 @@ address,function,file,kind,target
 ,ReplayValue,src/harness/replay_values.h,field_read,Vec3::y
 ,ReplayValue,src/harness/replay_values.h,field_read,Vec3::z
 ,ReplayValue,src/harness/replay_values.h,function,
+,ReplayVptrOf,src/harness/replay_objects.cpp,deref_read,*void
+,ReplayVptrOf,src/harness/replay_objects.cpp,function,
+,ReplayVtable,src/harness/replay_vtables.cpp,function,
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_approachRadiusVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_pathOrderVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_ringApproachVtable
+,ReplayVtableName,src/harness/replay_vtables.cpp,function,
 ,ReplayWalk,src/harness/replay_objects.cpp,call,Expand
 ,ReplayWalk,src/harness/replay_objects.cpp,call,TableSpan
 ,ReplayWalk,src/harness/replay_objects.cpp,call,Visit

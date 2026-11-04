@@ -2205,9 +2205,9 @@ unsigned CodeIndex(const char* table, const void* function)
     return ~0u;
 }
 
-void SetVtable(void* object, void (*const* vtable)())
+void SetVtable(void* object, const void* vtable)
 {
-    *(const void**)object = (const void*)vtable;
+    *(const void**)object = vtable;
 }
 
 void PolymorphicSelfTest()
@@ -2226,8 +2226,8 @@ void PolymorphicSelfTest()
     RingApproach* ring = (RingApproach*)SimAlloc(sizeof(RingApproach));
     memset((void*)area, 0, sizeof(ApproachRadius));
     memset((void*)ring, 0, sizeof(RingApproach));
-    SetVtable(area, g_approachRadiusVtable);
-    SetVtable(ring, g_ringApproachVtable);
+    SetVtable(area, ReplayVtable(ROK_APPROACHRADIUS));
+    SetVtable(ring, ReplayVtable(ROK_RINGAPPROACH));
     area->source = first;
     area->pos.x = 3;
     area->pos.y = 4;
@@ -2262,7 +2262,7 @@ void PolymorphicSelfTest()
     RingApproach* rebuiltRing = (RingApproach*)ReplayResolveObject("RingApproach#1", nullptr, g_objects, AllocObject);
     Check(rebuiltFirst != nullptr && rebuiltSecond != nullptr && rebuiltArea != nullptr && rebuiltRing != nullptr, "the objects are rebuilt");
     Check(rebuiltFirst->attached.get() == (OrderFx*)rebuiltArea && rebuiltSecond->attached.get() == (OrderFx*)rebuiltRing, "the base pointer leads to the rebuilt kind");
-    Check(*(const void**)rebuiltArea == (const void*)g_approachRadiusVtable && *(const void**)rebuiltRing == (const void*)g_ringApproachVtable, "each is built with the vtable of the replayer");
+    Check(*(const void**)rebuiltArea == ReplayVtable(ROK_APPROACHRADIUS) && *(const void**)rebuiltRing == ReplayVtable(ROK_RINGAPPROACH), "each is built with the vtable of the replayer");
     Check(rebuiltArea->radius == 40 && rebuiltArea->pos.x == 3 && rebuiltRing->outer == 20 && rebuiltFirst->state == 2, "the fields are restored");
     Check(rebuiltArea->source.get() == rebuiltFirst && rebuiltSecond->next.get() == rebuiltFirst, "and the pointers between the kinds");
 
@@ -2285,12 +2285,12 @@ void PolymorphicSelfTest()
     printf("a changed field: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "ApproachRadius#1.radius") == 0, "a changed field of a kind is reported at its kind and field");
     rebuiltArea->radius = 40;
-    SetVtable(rebuiltArea, g_ringApproachVtable);
+    SetVtable(rebuiltArea, ReplayVtable(ROK_RINGAPPROACH));
     BeginCompare();
     CompareObjects(&sets);
     printf("a changed kind: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs > 0 && strncmp(g_firstKey, "Order#1.attached", 16) == 0, "a pointer that leads to another kind is reported at the pointer");
-    SetVtable(rebuiltArea, g_approachRadiusVtable);
+    SetVtable(rebuiltArea, ReplayVtable(ROK_APPROACHRADIUS));
 
     printf("a vtable of no kind\n");
     static void* stray[2];

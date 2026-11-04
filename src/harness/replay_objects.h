@@ -86,6 +86,9 @@ private:
 };
 
 unsigned ReplayCallbackDepth();
+const void* ReplayVptrOf(const void* object);
+const void* ReplayVtable(unsigned kind);
+const char* ReplayVtableName(unsigned kind);
 void ReplayFail(const char* message);
 const char* ReplayFailure();
 void ReplayClearFailure();

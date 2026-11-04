@@ -1,1 +1,10 @@
 subsystem,function,symbol,reason
+weapons,InitExplosions,g_explosion0Duration,TODO(#786): define the explosion sizes in src/weapons/explosions.cpp
+weapons,InitExplosions,g_explosion0StartSize,TODO(#786): define the explosion sizes in src/weapons/explosions.cpp
+weapons,InitExplosions,g_explosion0EndSize,TODO(#786): define the explosion sizes in src/weapons/explosions.cpp
+weapons,InitExplosions,g_explosion1Duration,TODO(#786): define the explosion sizes in src/weapons/explosions.cpp
+weapons,InitExplosions,g_explosion1StartSize,TODO(#786): define the explosion sizes in src/weapons/explosions.cpp
+weapons,InitExplosions,g_explosion1EndSize,TODO(#786): define the explosion sizes in src/weapons/explosions.cpp
+weapons,InitExplosions,g_explosion2Duration,TODO(#786): define the explosion sizes in src/weapons/explosions.cpp
+weapons,InitExplosions,g_explosion2StartSize,TODO(#786): define the explosion sizes in src/weapons/explosions.cpp
+weapons,InitExplosions,g_explosion2EndSize,TODO(#786): define the explosion sizes in src/weapons/explosions.cpp

@@ -305,6 +305,7 @@ def compile_commands(build_dir: Path, only: list[str]) -> list[tuple[str, list[s
     return sorted(out)
 
 
+INTERFACE_FILES = (os.path.join("interfaces", "services.h"), os.path.join("interfaces", "map.h"))
 BLOCK_VECTOR = re.compile(r"^BlockVector<")
 
 
@@ -463,7 +464,7 @@ class Analyzer:
         if file not in self.root_cache:
             real = os.path.realpath(file)
             rel = os.path.relpath(real, self.root)
-            project = rel.startswith(("src" + os.sep, "include" + os.sep)) or rel == os.path.join("interfaces", "services.h")
+            project = rel.startswith(("src" + os.sep, "include" + os.sep)) or rel in INTERFACE_FILES
             self.root_cache[file] = rel if project else None
         return self.root_cache[file]
 

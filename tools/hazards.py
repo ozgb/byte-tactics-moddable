@@ -121,6 +121,7 @@ from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
+import astcache
 import rwsets
 from rwsets import ROOT, Analyzer, Walker, is_pointer, record_name, strip, strip_parens, type_text
 
@@ -134,7 +135,7 @@ ROOTS = ["HandleNetPackets", "UpdateAllUnits", "UpdateProjectiles", "UpdateExplo
          "UpdateFeatures", "StepAllGafSequences", "UpdateWind", "UpdateMeteors", "UpdateResourceSharing"]
 LOAD_ROOTS = ["LoadMatch", "AssignStartPositions"]
 THREAD_ROW_LIMIT = 400
-WARNING_FLAGS = ["-Wuninitialized", "-Wsometimes-uninitialized", "-Wconditional-uninitialized"]
+WARNING_FLAGS = astcache.WARNING_FLAGS
 TIME_CALLS = {"timeGetTime", "GetTickCount", "QueryPerformanceCounter", "QueryPerformanceFrequency",
               "GetSystemTime", "GetSystemTimeAsFileTime", "GetLocalTime", "time", "clock", "localtime",
               "_ftime", "GetTicks", "GetMilliseconds", "GetTimeSeconds", "UpdateTimers", "AddTimer", "host_time_ms",
@@ -573,6 +574,7 @@ def read_hazards(path: Path = HAZARDS) -> list[list]:
 
 def generate(build_dir: Path, jobs: int) -> tuple[list[list], int]:
     """The candidate rows for the whole of src/, and the number of files compiled."""
+    astcache.configure(build_dir)
     commands = rwsets.compile_commands(build_dir, [])
     with ProcessPoolExecutor(max_workers=jobs) as pool:
         results = list(pool.map(scan, [(ROOT, scan_argv(argv), directory) for _, argv, directory in commands],
@@ -596,7 +598,10 @@ def main() -> None:
     parser.add_argument("--unchecked", action="store_true", help="fail if a row has no verdict")
     parser.add_argument("--build-dir", type=Path, default=rwsets.DEFAULT_BUILD_DIR)
     parser.add_argument("--jobs", type=int, default=4)
+    parser.add_argument("--no-astcache", action="store_true", help="run clang on every file instead of sharing dumps")
     args = parser.parse_args()
+    if args.no_astcache:
+        astcache.disable()
     sys.setrecursionlimit(100000)
     old = read_hazards()
     if args.unchecked:

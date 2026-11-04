@@ -117,6 +117,7 @@ from collections.abc import Callable
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
+import astcache
 from sources import ANNOTATION, ROOT
 
 DEFAULT_BUILD_DIR = ROOT / "build/rwsets"
@@ -129,9 +130,12 @@ FUNCTION_KINDS = {"FunctionDecl", "CXXMethodDecl", "CXXConstructorDecl", "CXXDes
                   "CXXConversionDecl"}
 LVALUE_KINDS = {"DeclRefExpr", "MemberExpr", "ArraySubscriptExpr", "ParenExpr"}
 UNEVALUATED = {"UnaryExprOrTypeTraitExpr", "CXXTypeidExpr", "CXXNoexceptExpr"}
-JSON_START = re.compile(r'^\{\n  "id"', re.M)
-CHUNK = re.compile(r"^    \{\n.*?^    \},?\n", re.S | re.M)
-INCLUDED_FROM = re.compile(r'"includedFrom": \{\s*"file": "[^"]*"\s*\}')
+JSON_START = astcache.JSON_START
+CHUNK = astcache.CHUNK
+INCLUDED_FROM = astcache.INCLUDED_FROM
+Position = astcache.Position
+last_position = astcache.last_position
+first_file = astcache.first_file
 SIM_MAP_FILE = ROOT / "src/state/sim_globals.csv"
 SIM_POINTER = "g_simGlobals"
 CAST_KINDS = ("CXXReinterpretCastExpr", "CStyleCastExpr")
@@ -378,65 +382,6 @@ def fixed_parameters(qual_type: str) -> int | None:
         current += ch
     items.append(current.strip())
     return len(items) - 1 if items[-1] == "..." else None
-
-
-class Position:
-    """Follows clang's delta-encoded source locations through a dump in order."""
-
-    def __init__(self, file: str, line: int):
-        self.file = file
-        self.line = line
-
-    def feed(self, loc: dict | None) -> tuple[str, int] | None:
-        """Apply one location (its macro expansion if it has one) and return (file, line)."""
-        if not loc:
-            return None
-        if "spellingLoc" in loc:
-            self.feed(loc["spellingLoc"])
-            loc = loc["expansionLoc"]
-        if "file" in loc:
-            self.file = loc["file"]
-        if "line" in loc:
-            self.line = loc["line"]
-        return self.file, self.line
-
-    def annotate(self, node: dict) -> None:
-        """Set _file, _line and _end on a node and every node under it."""
-        here = self.feed(node.get("loc"))
-        begin = end = None
-        rng = node.get("range")
-        if rng:
-            begin = self.feed(rng.get("begin"))
-            end = self.feed(rng.get("end"))
-        first = here or begin or (self.file, self.line)
-        node["_file"], node["_line"] = first
-        node["_end"] = (end or first)[1]
-        for child in node.get("inner", ()):
-            self.annotate(child)
-
-
-def last_position(chunk: str, file: str, line: int) -> tuple[str, int]:
-    """The (file, line) state after a chunk of dump text."""
-    text = INCLUDED_FROM.sub("", chunk)
-    i = text.rfind('"file": "')
-    if i >= 0:
-        j = text.index('"', i + 9)
-        file = text[i + 9:j]
-    i = text.rfind('"line": ')
-    if i >= 0:
-        m = re.match(r"\d+", text[i + 8:])
-        line = int(m.group())
-    return file, line
-
-
-def first_file(chunk: str) -> str | None:
-    """The file the first location of a chunk names, or None when it repeats the previous one."""
-    text = INCLUDED_FROM.sub("", chunk[:2000])
-    i = text.find('"file": "')
-    c = text.find('"col"')
-    if i < 0 or (0 <= c < i):
-        return None
-    return text[i + 9:text.index('"', i + 9)]
 
 
 class Analyzer:
@@ -868,6 +813,16 @@ def analyse_unit(job: tuple[Path, list[str], str], analyzer: type,
 
     Whatever clang prints before the JSON (record layouts) goes to prepare(unit, text) first."""
     root, argv, directory = job
+    shared = astcache.unit(argv, directory)
+    if shared is not None:
+        unit = analyzer(root)
+        if prepare:
+            prepare(unit, shared.layouts)
+        for file, _, node in shared.chunks:
+            if unit.relative(file) is not None:
+                unit.declare(node, None)
+        unit.assign_markers()
+        return unit, shared.stderr
     run = subprocess.run(argv, cwd=directory, capture_output=True, text=True, errors="replace")
     if run.returncode != 0 and "error:" in run.stderr:
         raise SystemExit("%s: clang-cl failed\n%s" % (argv[-1], run.stderr[-2000:]))
@@ -930,6 +885,7 @@ def analyse_source(path: Path, root: Path) -> list[list[str]]:
 
 
 def generate(build_dir: Path, jobs: int, only: list[str]) -> tuple[str, int]:
+    astcache.configure(build_dir)
     commands = compile_commands(build_dir, only)
     with ProcessPoolExecutor(max_workers=jobs) as pool:
         results = list(pool.map(analyse, [(ROOT, argv, directory) for _, argv, directory in commands],
@@ -949,7 +905,10 @@ def main() -> None:
     parser.add_argument("--build-dir", type=Path, default=DEFAULT_BUILD_DIR)
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--only", nargs="+", default=[], help="print the rows of these files, write nothing")
+    parser.add_argument("--no-astcache", action="store_true", help="run clang on every file instead of sharing dumps")
     args = parser.parse_args()
+    if args.no_astcache:
+        astcache.disable()
     sys.setrecursionlimit(100000)
     started = time.time()
     text, files = generate(args.build_dir, args.jobs, args.only)

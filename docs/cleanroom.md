@@ -123,7 +123,7 @@ when it needs the secret and hands it only to the process that uses it.
 | --- | --- | --- |
 | `anthropic-impl-key` | the implementer's `CLAUDE_CODE_OAUTH_TOKEN` (`claude setup-token`) | `launch.py`, for the agent command |
 | `btm-token` | a fine-grained GitHub token for `ozgb/btm` only | `broker.py`, when it pushes |
-| `gate-token` | (later, #797) the gate agent's own btm token | the gate agent's tooling |
+| `gate-token` | the gate agent's own fine-grained token for `ozgb/btm` | `gatebtm.py`, when a pass starts |
 
 **The btm token:** repository access to `ozgb/btm` and nothing else. Contents read and write (push the session's
 branches), Pull requests read and write (open the pull requests), Metadata read, everything else "No access". Workflows
@@ -268,7 +268,7 @@ and posts one verdict comment on each. The host never builds contributor code.
   `result.json`'s fields alone: the verdict, the first differing scenario, tick, phase and field, the counts and the names of
   the checks that are not equal. No value of either side and no free text goes in.
 - **The token:** REST calls with the scoped btm token only, read at the start of the pass by `broker.read_token` from
-  `--token-file` (default: the broker's `~/.config/bt-cleanroom/btm-token`; a token file readable by group or others is
+  `--token-file` (default `~/.config/bt-cleanroom/gate-token`, the gate's own token; a token file readable by group or others is
   refused). Listing runs and downloading the artifact need Actions read on that token (see "Credentials"). The token goes to the
   API host only: the redirect to the artifact's storage host is followed without it. The host's `gh` login is never used.
 - **`--dry-run`** judges and prints but posts and records nothing.

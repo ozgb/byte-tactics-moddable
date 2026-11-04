@@ -8,7 +8,7 @@ commit, and nothing else: never the title, description, comments, reviews, files
 author has write, maintain or admin permission, or it has the label `gate`; an ineligible one is skipped without being read
 further. The module is the `module` artifact of the pull request's CI run for the head commit (exactly `module.wasm` and
 `subsystem`), downloaded into a fresh directory, judged by `tools/oraclegate.py`, and the summary of its `result.json` is posted
-as a comment with the scoped btm token (the file `tools/cleanroom/broker.py` reads, never the host's `gh` login). The judged
+as a comment with the gate's own btm token (`gate-token`, read by `broker.read_token`, never the host's `gh` login). The judged
 (pull request, head commit) pairs are kept in a state file, so a pair is judged once and no comment is read.
 
 `--local` judges a local module by the same path from the download on and prints the summary; it never posts.
@@ -38,6 +38,7 @@ import broker
 ROOT = Path(__file__).resolve().parent.parent
 ORACLEGATE = ROOT / "tools" / "oraclegate.py"
 DEFAULT_STATE = Path.home() / ".cache" / "bt-gate-btm" / "judged.json"
+DEFAULT_TOKEN_FILE = broker.DEFAULT_TOKEN_FILE.with_name("gate-token")
 WRITE_PERMISSIONS = ("write", "maintain", "admin")
 GATE_LABEL = "gate"
 ARTIFACT_NAME = "module"
@@ -302,7 +303,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--repo", default=broker.DEFAULT_REPO)
     ap.add_argument("--api-base", default=broker.DEFAULT_API)
-    ap.add_argument("--token-file", default=str(broker.DEFAULT_TOKEN_FILE), help="the file holding the scoped btm token, read when the pass starts")
+    ap.add_argument("--token-file", default=str(DEFAULT_TOKEN_FILE), help="the file holding the gate's own btm token, read when the pass starts")
     ap.add_argument("--state", type=Path, default=DEFAULT_STATE, help="the judged (pull request, head commit) pairs")
     ap.add_argument("--game-dir")
     ap.add_argument("--full", action="store_true", help="play the full --check instead of the tier")

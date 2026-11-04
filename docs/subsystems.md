@@ -156,7 +156,7 @@ Coverage: 93.1% of functions (27 of 29), 80.4% of lines, 44.7% of branches; 2 li
 
 Issue #12. 47 functions. `UpdateFeatures` and feature loading, spreading, burning, reclaim and wreckage (`src/map/features*.cpp`).
 
-Coverage: 97.7% of functions (43 of 44), 84.1% of lines, 71.0% of branches; 1 live functions no scenario enters, and 4 more are dead (data/coverage.csv).
+Coverage: 97.7% of functions (43 of 44), 84.3% of lines, 71.9% of branches; 1 live functions no scenario enters, and 4 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (1 of 44 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 43 are entered, 97.7%), by reason:
 
@@ -322,7 +322,7 @@ Coverage: 93.6% of functions (44 of 47), 92.4% of lines, 87.1% of branches; 3 li
 
 Issue #15. 106 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
 
-Coverage: 86.0% of functions (80 of 93), 87.1% of lines, 71.5% of branches; 13 live functions no scenario enters, and 17 more are dead (data/coverage.csv).
+Coverage: 86.0% of functions (80 of 93), 87.1% of lines, 71.4% of branches; 13 live functions no scenario enters, and 17 more are dead (data/coverage.csv).
 
 **weapons, functions no scenario enters** (13 of 93 after the scenarios of `reference/scenarios/`; 80 are entered, 86.0%), by reason:
 
@@ -429,7 +429,7 @@ Coverage: 100.0% of functions (10 of 10), 96.2% of lines, 75.0% of branches; 0 l
 
 Issue #17. 87 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 95.4% of functions (62 of 65), 89.7% of lines, 77.3% of branches; 3 live functions no scenario enters, and 21 more are dead (data/coverage.csv).
+Coverage: 95.4% of functions (62 of 65), 89.7% of lines, 77.1% of branches; 3 live functions no scenario enters, and 21 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (3 of 65 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 62 are entered, 95.4%), by reason:
 
@@ -486,7 +486,7 @@ Coverage: 95.4% of functions (62 of 65), 89.7% of lines, 77.3% of branches; 3 li
 
 Issue #18. 375 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`). The largest subsystem.
 
-Coverage: 84.8% of functions (312 of 368), 82.5% of lines, 65.2% of branches; 56 live functions no scenario enters, and 24 more are dead (data/coverage.csv).
+Coverage: 84.8% of functions (312 of 368), 82.7% of lines, 65.2% of branches; 56 live functions no scenario enters, and 24 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (56 of 368 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421, the ten of #426 and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 312 are entered, 84.8%), by reason:
 
@@ -545,7 +545,7 @@ Coverage: 84.8% of functions (312 of 368), 82.5% of lines, 65.2% of branches; 56
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (212 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 64 functions are called from outside; the busiest are `FindUnitTypeId` (18), `GetNanoPiecePosition` (15), `AttachUnitToPiece` (10). It is called most by game (22 distinct functions) and seams (18). It imports 158 functions, mostly platform (49), presentation (8), seams (26) and files (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 81.5% of functions (150 of 184), 85.9% of lines, 74.0% of branches; 34 live functions no scenario enters, and 32 more are dead (data/coverage.csv). The list of those 34 is under **units, functions no scenario enters** below.
+**units** (212 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 64 functions are called from outside; the busiest are `FindUnitTypeId` (18), `GetNanoPiecePosition` (15), `AttachUnitToPiece` (10). It is called most by game (22 distinct functions) and seams (18). It imports 158 functions, mostly platform (49), presentation (8), seams (26) and files (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 81.5% of functions (150 of 184), 85.9% of lines, 73.8% of branches; 34 live functions no scenario enters, and 32 more are dead (data/coverage.csv). The list of those 34 is under **units, functions no scenario enters** below.
 
 **units, functions no scenario enters** (34 of 184 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 150 are entered, 81.5%), by reason:
 
@@ -559,7 +559,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Unit info dialog only (2): `MakePropList` and its static `spd`.
 - Slot no code calls (1): `AimCobStub` (slot 1 of `g_weaponAimCobVtable`). It returns 0; not explained further.
 
-**players** (143 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 36 functions are called from outside, mostly by game (14) and presentation (10); the busiest are `KillPlayerUnits` (5), `TransferEnergy` (4), `TransferMetal` (4). It imports 67 functions: platform 13, network 6, seams 12, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 67.1% of functions (96 of 143), 69.3% of lines, 58.5% of branches; 47 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 47 follows this paragraph.
+**players** (143 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 36 functions are called from outside, mostly by game (14) and presentation (10); the busiest are `KillPlayerUnits` (5), `TransferEnergy` (4), `TransferMetal` (4). It imports 67 functions: platform 13, network 6, seams 12, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 67.1% of functions (96 of 143), 69.3% of lines, 58.4% of branches; 47 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 47 follows this paragraph.
 
 **players, functions no scenario enters** (47 of 143 after `conditions-dark-side` and `conditions-shore-to-shore` (#420), `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), the six `console-` scenarios (#445), and the ten `mission-` scenarios of #764; 96 are entered, 67.1%), by reason:
 
@@ -570,7 +570,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Shutdown only (1): `FreePlayers` (called from `ShutdownIngameSystems`, which no scenario runs).
 - Entered by the console: `TransferEnergy` and `TransferMetal` (console `Give`, `console-economy`) and `MissionConditions::Deactivate` (console `Kill`, `console-units`) (#445).
 
-**map** (105 functions). No phase root. 51 functions are called from outside, by presentation (24), seams (19), game (10) and orders (7); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 64 functions: platform 28, files 11, los_radar 6, game 3, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 80.9% of functions (76 of 94), 87.2% of lines, 77.1% of branches; 18 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
+**map** (105 functions). No phase root. 51 functions are called from outside, by presentation (24), seams (19), game (10) and orders (7); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 64 functions: platform 28, files 11, los_radar 6, game 3, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 80.9% of functions (76 of 94), 87.1% of lines, 76.9% of branches; 18 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
 
 **map, functions no scenario enters** (18 of 94 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 76 are entered, 80.9%), by reason:
 
@@ -734,18 +734,18 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 |---|---|---|---|---|---|---|
 | **wind_meteors** | 1 of 17 | 5.9% | 1.7% | 0.0% | 16 | 0 |
 | **economy** | 27 of 29 | 93.1% | 80.4% | 44.7% | 2 | 3 |
-| **features** | 43 of 44 | 97.7% | 84.1% | 71.0% | 1 | 4 |
+| **features** | 43 of 44 | 97.7% | 84.3% | 71.9% | 1 | 4 |
 | **ai** | 89 of 100 | 89.0% | 88.8% | 83.4% | 11 | 33 |
 | **pathfinding** | 44 of 47 | 93.6% | 92.4% | 87.1% | 3 | 9 |
-| **weapons** | 80 of 93 | 86.0% | 87.1% | 71.5% | 13 | 17 |
+| **weapons** | 80 of 93 | 86.0% | 87.1% | 71.4% | 13 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 75.0% | 0 | 1 |
-| **los_radar** | 62 of 65 | 95.4% | 89.7% | 77.3% | 3 | 21 |
-| **orders** | 312 of 368 | 84.8% | 82.5% | 65.2% | 56 | 24 |
-| **units** | 150 of 184 | 81.5% | 85.9% | 74.0% | 34 | 32 |
-| **players** | 96 of 143 | 67.1% | 69.3% | 58.5% | 47 | 10 |
-| **map** | 76 of 94 | 80.9% | 87.2% | 77.1% | 18 | 12 |
+| **los_radar** | 62 of 65 | 95.4% | 89.7% | 77.1% | 3 | 21 |
+| **orders** | 312 of 368 | 84.8% | 82.7% | 65.2% | 56 | 24 |
+| **units** | 150 of 184 | 81.5% | 85.9% | 73.8% | 34 | 32 |
+| **players** | 96 of 143 | 67.1% | 69.3% | 58.4% | 47 | 10 |
+| **map** | 76 of 94 | 80.9% | 87.1% | 76.9% | 18 | 12 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
-| game | 160 of 233 | 68.7% | 56.3% | 36.1% | 73 | 23 |
+| game | 160 of 233 | 68.7% | 56.3% | 36.3% | 73 | 23 |
 | network | 54 of 297 | 18.2% | 10.9% | 3.9% | 243 | 74 |
 | platform | 389 of 737 | 52.8% | 40.0% | 26.2% | 348 | 84 |
 | presentation | 567 of 1146 | 49.5% | 37.5% | 29.6% | 579 | 295 |

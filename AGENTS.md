@@ -120,12 +120,20 @@ uv run tools/reference.py --check --both-modes --exe build/modern/TotalA.exe --g
 ```
 
 The tier is a short list of scenarios that covers almost all the code the full
-suite does; it must report every tier scenario equal. The full `--check` is the
-gate instead when a change touches the state block layout, the host interface
-or platform code, `reference/`, the trace format, `tools/reference.py` or
-`tools/playtest.py` (`reference/README.md`, "When the full suite is the gate");
-the lead also runs it on `moddable` every 5 merges
-(`uv run tools/fullgate.py`). `--both-modes` plays each scenario in WASM and with native modules in one pool and passes only when
+suite does; it must report every tier scenario equal. It is the gate of every
+change the gate applies to, the state block layout, the host interface and
+platform code included. The full `--check` is the gate instead only when a
+change regenerates the stored reference data (`reference/` traces, sounds, UI
+logs, frames or saves, or the trace format; `reference/README.md`, "When the
+full suite is the gate"). The play-tests (`tools/playtest.py` smoke, full, mp
+and music) are not part of a pull request's gate: they run with the full
+`--check` on `moddable` when `uv run tools/fullgate.py due` passes (every 5
+gated merges), and the lead reports them in the `Full gate on <sha>` comment
+on #632. #286 is what they catch, and the trade is speed for a later catch.
+A periodic failure is fixed afterwards, not by freezing merges: the lead files
+it at once as an issue, first in #2's order, with the failing scenario or
+play-test and the merges since the last pass; merges continue, and the next
+periodic run must pass. `--both-modes` plays each scenario in WASM and with native modules in one pool and passes only when
 both equal; a second `--check` on the machine waits for the first (`--no-lock` skips that, for
 runs that are not gates). Run either on a fresh prefix (remove
 `build/playtest/prefix` first). `reference/README.md`, "Gate", says which

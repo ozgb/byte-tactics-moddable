@@ -22,7 +22,7 @@ Check it out in its own worktree, never the clone root: `tools/worktree.sh --pr 
 Hold it against each of these, and record a finding for every miss:
 
 - **Spec:** every task in the linked issue is done or listed under "Left out" with a reason you accept, and its "Done when" holds. Nothing outside the issue slipped in.
-- **The gate, re-run by you:** run every check the issue names, in the worktree. A claimed result you couldn't reproduce is a finding. CI's `checks` job must be green.
+- **The gate:** the lead runs it and the pull request reports it; don't re-run it. Run the quick checks yourself (CI, commit format, `commentlint`, the issue's `tools/test_*.py`, hand-set data columns). CI's `checks` job must be green.
 - **Conformity:** behaviour changes only behind a quirk flag that's off by default, or in a mod; with no mods, traces match the reference (the modern build's `reference.py --check --exe`).
 - **The plan's boundaries** (`AGENTS.md` step 3): determinism, state only in the state block, subsystems through seams, presentation through the player view, platform through the host interface.
 - **Correctness:** use the `code-review` skill on the pull request for bugs.
@@ -47,5 +47,6 @@ Groom every issue labelled `needs-grooming`, then every **upcoming** issue: open
 - **Flesh out** an issue whose tasks are too vague: name the files, functions, data and commands, from the code as it stands now.
 - **Split** an issue too big for one pull request into sub-issues of it, each with its own tasks, CI checks and "Done when", and blockers between them. The original stays open as their parent.
 - **Answer** what the lead asked in its `needs-grooming` comment, then remove the label.
+- **Keep the queue full.** The lead may hold up to 10 claims (`docs/team.md`, "Issue states"), so keep at least 10 issues available to claim beyond those it holds: groomed, unblocked, unassigned and not labelled `needs-grooming`. When there are fewer, file and groom the next parts in #2's order until there are 10, or until #2 has nothing left to file. Prefer parts that touch different files, so that they can be worked in parallel.
 
 **Decide** what the plan leaves open. Choose by #2's goals (conformity first, then moddability, then the rest) and its decisions, and the work already merged. Record each decision with its reason on the issue it affects; a decision that shapes more than one issue also goes into #2's decisions. Revise one of #2's decisions only when merged work shows it doesn't hold, and say what showed it.

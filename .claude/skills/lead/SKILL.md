@@ -29,7 +29,7 @@ This step is done when every one of your pull requests is waiting on the maintai
 
 ### 2. Take an issue
 
-Take a new issue only when you have **fewer than three** open pull requests waiting for review and no claimed issue without a pull request.
+Take a new issue while you hold **fewer than 10 claims** (`docs/team.md`, "Issue states": a claim counts until its pull request merges or you release it). Prefer issues that touch different files from the ones you hold; two that regenerate the same files merge one at a time.
 
 1. Find available issues (`docs/team.md`, "Issue states"), using the commands in `AGENTS.md` step 2. Take the earliest in #2's order section.
 2. **Check it's ready.** Read the issue and the code it touches. It's ready when you could start without making a decision the plan doesn't cover, it fits in one reviewable pull request, and its "Done when" is checkable. If not, label it `needs-grooming`, comment what's missing or how it could be split, and pick another.

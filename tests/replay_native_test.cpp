@@ -3655,15 +3655,16 @@ void PolymorphicSelfTest()
     ApproachRadius* odd = (ApproachRadius*)SimAlloc(sizeof(ApproachRadius));
     memset((void*)odd, 0, sizeof(ApproachRadius));
     *(const void**)odd = (const void*)stray;
-    first->attached = odd;
+    rebuiltFirst->attached = odd;
     ReplayClearFailure();
-    recorder.Record(kinds, roots, 2, sets);
-    Check(strstr(recorder.text.Data(), "attached OrderFx#?\n") != nullptr, "the object is not named");
+    Recorder unnamed;
+    unnamed.Record(againKinds, againRoots, 2, sets);
+    Check(strstr(unnamed.text.Data(), "attached OrderFx#?\n") != nullptr, "the object is not named");
     const char* failure = ReplayFailure();
     printf("%s\n", failure == nullptr ? "no failure" : failure);
     Check(failure != nullptr && strstr(failure, "OrderFx") != nullptr, "the failure names the base");
     Check(failure != nullptr && strstr(failure, "0x") == nullptr, "and writes no address");
-    first->attached = area;
+    rebuiltFirst->attached = rebuiltArea;
     ReplayClearFailure();
 
     printf("code pointers\n");

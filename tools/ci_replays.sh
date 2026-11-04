@@ -21,10 +21,14 @@ done
 run replay_native replay_native_test "$bindir/replay_native_test.exe" "$rec"/wind_meteors/*.txt
 run replay_economy replay_native_test "$bindir/replay_native_test.exe" "$rec"/economy/*.txt
 run replay_targeting replay_native_test "$bindir/replay_native_test.exe" "$rec"/targeting/*.txt
-run replay_self replay_native_test "$bindir/replay_native_test.exe" --self-test "$rec/wind_meteors/meteors-hailstorm.txt"
+for _ in $(seq "${REPLAY_SELF_REPEAT:-1}"); do
+  run replay_self replay_native_test "$bindir/replay_native_test.exe" --self-test "$rec/wind_meteors/meteors-hailstorm.txt"
+done
 run replay_inject replay_native_test "$bindir/replay_inject_test.exe" --expect 2 SimGlobals.g_meteorScheduleGap "$rec/wind_meteors/meteors-hailstorm.txt"
 run replay_economy_inject replay_native_test "$bindir/replay_inject_test.exe" --expect 5501 Player#0.energy "$rec/economy/duel-shore-to-shore.txt"
 run replay_targeting_inject replay_native_test "$bindir/replay_inject_test.exe" --expect 352 pos.x "$rec/targeting/skirmish4-long.txt"
 run replay_wasm replay_native_test "$bindir/replay_native_test.exe" --wasm "$bindir/wind_meteors.wasm" "$rec"/wind_meteors/*.txt
-run replay_wasm_self replay_native_test "$bindir/replay_native_test.exe" --wasm "$bindir/wind_meteors.wasm" --self-test "$rec/wind_meteors/meteors-hailstorm.txt"
+for _ in $(seq "${REPLAY_SELF_REPEAT:-1}"); do
+  run replay_wasm_self replay_native_test "$bindir/replay_native_test.exe" --wasm "$bindir/wind_meteors.wasm" --self-test "$rec/wind_meteors/meteors-hailstorm.txt"
+done
 run replay_wasm_inject replay_native_test "$bindir/replay_native_test.exe" --wasm "$bindir/wind_meteors_inject.wasm" --expect 2 SimGlobals.g_meteorScheduleGap "$rec/wind_meteors/meteors-hailstorm.txt"

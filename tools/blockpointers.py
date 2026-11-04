@@ -4,6 +4,7 @@
     uv run tools/blockpointers.py --from DIR...      # build from blockptrs files already collected (no Wine)
     uv run tools/blockpointers.py --save-scans DIR   # also write each played scenario's scan to DIR/<scenario>.txt
     uv run tools/blockpointers.py --scenario N...    # play only these (needs --save-scans), to merge later with --from
+    uv run tools/blockpointers.py --from DIR... --prune   # also drop the wildcard rows whose holder is no site of the exe
     uv run tools/blockpointers.py --out F            # write F instead (a dry run; class and note kept from the data file)
     uv run tools/blockpointers.py --check            # CI: the file itself is valid (classes, notes, order)
     uv run tools/blockpointers.py --unclassified     # list the rows with no class
@@ -347,6 +348,25 @@ class Namer:
             return text if of == 1 else "%s #%d" % (text, rank)
         start = self.code.start(address)
         return text if start is None else text + " @0x%x" % (address - start)
+
+
+def is_site_holder(namer: Namer, holder: str) -> bool:
+    """Whether a holder name is one the exe can give: `unknown`, a SimGlobals holder, or a function with the
+    allocator call site its ` #k` rank names (`fn`, `fn: tag` or `fn #k`, `fn: tag #k`)."""
+    if holder == "unknown" or holder.split(".", 1)[0].split("+", 1)[0] == SIM_GLOBALS:
+        return True
+    m = re.fullmatch(r"(.*?)(?: #(\d+))?", holder)
+    function = m.group(1).split(": ", 1)[0]
+    rank = int(m.group(2)) if m.group(2) else None
+    counts = {namer.code.function(site): of for site, (_, of) in namer.ranks.items()}
+    if function not in counts:
+        return False
+    return rank is None and counts[function] == 1 or rank is not None and 1 <= rank <= counts[function] > 1
+
+
+def prune_wild(old: list[dict], namer: Namer) -> list[dict]:
+    """The old rows without the wildcard rows whose holder is no site of the exe."""
+    return [r for r in old if not is_wild(r) or is_site_holder(namer, r["holder"])]
 
 
 def load_namer(map_path: Path) -> Namer:
@@ -699,12 +719,16 @@ def main() -> None:
     parser.add_argument("--game-dir", help="the game's install (default: Steam's)")
     parser.add_argument("--parallel", type=int, metavar="N", help="scenarios played at once")
     parser.add_argument("--build-dir", type=Path, help="compile database for the SimGlobals layout (default build/rwsets)")
+    parser.add_argument("--prune", action="store_true",
+                        help="drop the wildcard rows whose holder is no allocation site of the exe (pair rows come from the scans)")
     parser.add_argument("--out", type=Path, default=OUT, help="write the rows here instead of the data file")
     args = parser.parse_args()
     if args.save_scans and (args.sources or args.check or args.unclassified):
         parser.error("--save-scans saves the scans the tool plays; it cannot be used with --from, --check or --unclassified")
     if args.scenario and (args.sources or args.check or args.unclassified):
         parser.error("--scenario picks the scenarios to play; it cannot be used with --from, --check or --unclassified")
+    if args.prune and (args.check or args.unclassified):
+        parser.error("--prune rewrites the data file; it cannot be used with --check or --unclassified")
     if args.scenario and not args.save_scans:
         parser.error("--scenario plays part of the suite, which must not overwrite the data file: add --save-scans DIR "
                      "and merge the saved scans with --from")
@@ -764,7 +788,8 @@ def main() -> None:
         namer = load_namer(map_path)
     except ValueError as e:
         sys.exit("blockpointers: %s" % e)
-    merged = merge_kept(with_wild(merge(resolve(scans, namer, members)), old), old)
+    kept_wild = prune_wild(old, namer) if args.prune else old
+    merged = merge_kept(with_wild(merge(resolve(scans, namer, members)), kept_wild), old)
     now = {row_key(r) for r in merged}
     lost = [r for r in old if (r["class"] or r["note"]) and row_key(r) not in now]
     args.out.write_text(render(merged))

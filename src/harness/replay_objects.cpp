@@ -1358,8 +1358,10 @@ void ReplayCallbackScope::Stop()
 ReplayCallbackCall::ReplayCallbackCall(const void* target, unsigned method) : scope(nullptr)
 {
     ReplayCallbackScope* found = FindScope(target);
-    if (found == nullptr)
+    if (found == nullptr) {
         abort();
+        return;
+    }
     scope = found;
     if (s_callbackDepth != 0)
         ReplayFail("a callback made inside a callback of an import is not recorded");

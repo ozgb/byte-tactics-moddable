@@ -2,7 +2,7 @@
 
     uv run tools/fullgate.py                          # print the count and whether the full run is due
     uv run tools/fullgate.py due                      # the same, exit 1 when the count is CADENCE or more
-    uv run tools/fullgate.py run                      # play the full suite and the round trip, print the comment text
+    uv run tools/fullgate.py run                      # play the full suite, the round trip and the coverage check, print the comment text
     uv run tools/fullgate.py --no-fetch               # do not fetch origin/moddable first
     uv run tools/fullgate.py --comments-json FILE     # tracking issue comments from a file (gh's --json comments)
     uv run tools/test_fullgate.py                     # tests, on a temporary repository and fake comments
@@ -10,14 +10,19 @@
 The pull request gate plays the tier; the full `reference.py --check` runs on the tip of moddable once every
 CADENCE merges that needed a gate (issue #631). The lead runs it when `due` exits 1, then comments on tracking
 issue #632: `Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n>
-equal`. The newest comment of that form names the last full run. The merges counted are the first-parent merge commits `Merge pull request #N`
+equal, coverage: <result>`. The newest comment of that form names the last full run. The merges counted are the first-parent merge commits `Merge pull request #N`
 on origin/moddable after that sha whose diff against their first parent touches GATE_PATHS, the paths
 reference/README.md, "Gate", says need a gate (test_fullgate.py checks the two agree).
 
 `run` plays `reference.py --check --both-modes --no-cache` and then, straight after it, `--check --no-cache
 --roundtrip auto` (the same exe, a fresh Wine prefix for each), prints their output to stderr and the text of the
-comment to stdout (or to --out FILE), and exits with the first nonzero status of the two. Posting stays with the lead.
+comment to stdout (or to --out FILE), and exits with the first nonzero status of the three. Posting stays with the lead.
 The round trip run scans block pointers too; the comment names them only when they are not all covered.
+
+After them `run` builds the coverage exe (tools/coverage_runtime.sh, then the BT_COVERAGE=ON build in build/coverage, with its
+wasm_runtime target) and plays `tools/coverage.py --check` on it, so that the next time the coverage link breaks or
+data/coverage.csv goes stale a periodic run says so (issue #770). The comment's coverage field is `no subsystem fell`, or
+`build failed`, or `failed`, or `not finished`.
 
 The comments are read through `bwai-outside gh issue -R ozgb/byte-tactics-moddable view 632 --json comments`,
 or through the command in FULLGATE_GH (split like a shell line, the issue arguments appended) or from
@@ -39,6 +44,7 @@ ROOT = Path(__file__).resolve().parent.parent
 REPO = "ozgb/byte-tactics-moddable"
 TRACKING_ISSUE = 632
 CADENCE = 5
+BUILD_FAILED = -1
 BRANCH = "origin/moddable"
 GATE_PATHS = (
     "src/",
@@ -59,8 +65,16 @@ FULL_RUN = re.compile(r"\s*Full gate on ([0-9a-fA-F]{7,40})\b")
 MERGE_SUBJECT = re.compile(r"Merge pull request #(\d+)\b")
 EQUAL_LINE = re.compile(r"^(\d+) of (\d+) scenarios equal, total ", re.MULTILINE)
 POINTERS_OK = re.compile(r"^(?:\[(\w+)\] )?block pointers: all covered by ", re.MULTILINE)
+COVERAGE_OK = re.compile(r"^coverage: no subsystem fell$", re.MULTILINE)
 POINTERS_BAD = re.compile(r"^(?:\[(\w+)\] )?(\d+) problems with the pointers out of the block", re.MULTILINE)
 CHECK_COMMAND = ["uv", "run", "tools/reference.py", "--check", "--no-cache"]
+COVERAGE_DIR = "build/coverage"
+COVERAGE_BUILD = (
+    ["tools/coverage_runtime.sh"],
+    ["cmake", "-S", ".", "-B", COVERAGE_DIR, "-G", "Ninja", "-DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake", "-DBT_COVERAGE=ON"],
+    ["cmake", "--build", COVERAGE_DIR],
+    ["cmake", "--build", COVERAGE_DIR, "--target", "wasm_runtime"],
+)
 
 
 def fail(message: str, code: int = 1):
@@ -146,23 +160,36 @@ def pointer_result(output: str) -> str:
     return "; ".join(parts)
 
 
-def comment_text(sha: str, check: tuple[int, str], roundtrip: tuple[int, str]) -> str:
-    """The comment for issue #632 from the exit status and output of the both-modes run and of the round trip run."""
-    (code, output), (trip_code, trip_output) = check, roundtrip
+def coverage_result(code: int, output: str) -> str:
+    """The coverage field: `no subsystem fell` for a passing check, else `build failed` (-1), `failed` or `not finished`."""
+    if code == 0 and COVERAGE_OK.search(output):
+        return "no subsystem fell"
+    if code == BUILD_FAILED:
+        return "build failed"
+    return "failed" if output.strip() else "not finished"
+
+
+def comment_text(sha: str, check: tuple[int, str], roundtrip: tuple[int, str], coverage: tuple[int, str]) -> str:
+    """The comment for issue #632 from the exit status and output of the both-modes run, the round trip run and the coverage check."""
+    (code, output), (trip_code, trip_output), (cov_code, cov_output) = check, roundtrip, coverage
     text = (f"Full gate on {sha}: {equal_count(output)} equal (both modes), block pointers: {pointer_result(output)}, "
-            f"round trip: {equal_count(trip_output)} equal")
+            f"round trip: {equal_count(trip_output)} equal, coverage: {coverage_result(cov_code, cov_output)}")
     trip_pointers = pointer_result(trip_output)
     if "problems" in trip_pointers:
         text += f" (block pointers: {trip_pointers})"
-    for name, status in (("both modes", code), ("round trip", trip_code)):
+    for name, status in (("both modes", code), ("round trip", trip_code), ("coverage", cov_code)):
         if status != 0:
-            text += f", {name} exit {status}"
+            text += f", {name} exit {1 if status == BUILD_FAILED else status}"
     return text
 
 
 def play(args: list[str], log: Path | None, what: str) -> tuple[int, str]:
     """Run reference.py --check with `args`, copying its output to stderr (and to `log`) as it comes; (exit status, output)."""
-    command = CHECK_COMMAND + args
+    return stream(CHECK_COMMAND + args, log, what)
+
+
+def stream(command: list[str], log: Path | None, what: str) -> tuple[int, str]:
+    """Run `command` in the repository, copying its output to stderr (and to `log`) as it comes; (exit status, output)."""
     print(f"fullgate: {what}: {' '.join(command)}", file=sys.stderr, flush=True)
     process = subprocess.Popen(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     lines = []
@@ -177,8 +204,19 @@ def play(args: list[str], log: Path | None, what: str) -> tuple[int, str]:
     return process.returncode, output
 
 
+def coverage_check(game_dir: str | None, log: Path | None) -> tuple[int, str]:
+    """Build the coverage exe and play `coverage.py --check` on it; (exit status, output). A failed build is BUILD_FAILED."""
+    for step in COVERAGE_BUILD:
+        code, output = stream(step, log, "coverage build")
+        if code != 0:
+            return BUILD_FAILED, output
+    shutil.rmtree(ROOT / "build/coverage-run", ignore_errors=True)
+    command = ["uv", "run", "tools/coverage.py", "--exe", f"{COVERAGE_DIR}/TotalA.exe", "--check"]
+    return stream(command + (["--game-dir", game_dir] if game_dir else []), log, "coverage")
+
+
 def run(args: argparse.Namespace) -> int:
-    """Play the both-modes check, then the round trip check, and print the comment for issue #632."""
+    """Play the both-modes check, the round trip check and the coverage check, and print the comment for issue #632."""
     sha = args.sha or git("rev-parse", "HEAD").strip()
     exe = ["--exe", args.exe] + (["--game-dir", args.game_dir] if args.game_dir else [])
     log = Path(args.log) if args.log else None
@@ -189,11 +227,16 @@ def run(args: argparse.Namespace) -> int:
         results.append(play(exe + extra, log, what))
         seconds = int(time.time() - started)
         print(f"fullgate: {what} took {seconds // 60}:{seconds % 60:02d}", file=sys.stderr, flush=True)
+    shutil.rmtree(ROOT / "build/playtest/prefix", ignore_errors=True)
+    started = time.time()
+    results.append(coverage_check(args.game_dir, log))
+    seconds = int(time.time() - started)
+    print(f"fullgate: coverage took {seconds // 60}:{seconds % 60:02d}", file=sys.stderr, flush=True)
     text = comment_text(sha, *results)
     if args.out:
         Path(args.out).write_text(text + "\n")
     print(text)
-    return next((code for code, _ in results if code != 0), 0)
+    return next((1 if code == BUILD_FAILED else code for code, _ in results if code != 0), 0)
 
 
 def main() -> int:

@@ -1185,7 +1185,6 @@ game,wind_meteors,shared_write,Vec3::z,1
 harness,ai,shared_write,EconomySeam::GetEnergyUse,4
 harness,ai,shared_write,Game::difficulty,2
 harness,ai,shared_write,Game::playerIndex,1
-harness,ai,shared_write,Game::units,1
 harness,ai,shared_write,LosRadarSeam::GetMapCell,1
 harness,ai,shared_write,LosRadarSeam::IsUnitVisibleToPlayer,1
 harness,ai,shared_write,MapSeam::CanPlaceUnitFootprint,1
@@ -1276,7 +1275,7 @@ harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
 harness,game,call,SaveGameFile,1
 harness,game,call,SimBlockAttach,1
-harness,game,call,SimBlockBase,9
+harness,game,call,SimBlockBase,11
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimOwns,1
 harness,game,shared_write,EconomySeam::UpdateResourceSharing,1
@@ -1287,7 +1286,6 @@ harness,game,shared_write,Game::localPlayer,13
 harness,game,shared_write,Game::mode_391f1,12
 harness,game,shared_write,Game::numPlayers,5
 harness,game,shared_write,Game::playerIndex,8
-harness,game,shared_write,Game::units,3
 harness,game,shared_write,LoadingFlags::value,1
 harness,game,shared_write,LosRadarSeam::ClampWorldPosToTerrain,2
 harness,game,shared_write,LosRadarSeam::ExpireEyeballs,1
@@ -1329,7 +1327,6 @@ harness,los_radar,shared_write,FeaturesSeam::PlaceFeature,1
 harness,los_radar,shared_write,Game::localPlayer,3
 harness,los_radar,shared_write,Game::numPlayers,1
 harness,los_radar,shared_write,Game::playerIndex,14
-harness,los_radar,shared_write,Game::units,4
 harness,los_radar,shared_write,LosRadarSeam::RecalculateLineOfSight,2
 harness,los_radar,shared_write,LosRadarSeam::RecordRadarMapped,1
 harness,los_radar,shared_write,LosRadarSeam::RecordRadarUnits,1
@@ -1351,7 +1348,6 @@ harness,map,shared_write,FeaturesSeam::GetCellFeature,1
 harness,map,shared_write,Game::difficulty,1
 harness,map,shared_write,Game::numPlayers,1
 harness,map,shared_write,Game::playerIndex,1
-harness,map,shared_write,Game::units,5
 harness,map,shared_write,LosRadarSeam::GetMapCell,1
 harness,map,shared_write,LosRadarSeam::GetMapCellAtPosition,1
 harness,map,shared_write,LosRadarSeam::UpdateCellHeightRange,2
@@ -1364,11 +1360,10 @@ harness,network,call,Reset,1
 harness,network,shared_write,Game::localPlayer,19
 harness,network,shared_write,Game::mode_391f1,2
 harness,network,shared_write,Game::numPlayers,6
-harness,network,shared_write,Game::units,2
 harness,network,shared_write,LoadingFlags::value,1
 harness,network,shared_write,Player::alliedBy,2
 harness,network,shared_write,Player::progress,2
-harness,orders,call,Add,126
+harness,orders,call,Add,130
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,shared_write,AiSeam::GetFactoriesInRadius,7
@@ -1380,7 +1375,6 @@ harness,orders,shared_write,FeaturesSeam::RemoveFeature,1
 harness,orders,shared_write,Game::difficulty,1
 harness,orders,shared_write,Game::localPlayer,2
 harness,orders,shared_write,Game::playerIndex,1
-harness,orders,shared_write,Game::units,4
 harness,orders,shared_write,LosRadarSeam::GetMapCellAtPosition,4
 harness,orders,shared_write,LosRadarSeam::GetOriginCellAtPosition,1
 harness,orders,shared_write,LosRadarSeam::UpdateUnitLineOfSight,1
@@ -1543,7 +1537,6 @@ harness,presentation,shared_write,Game::localPlayer,71
 harness,presentation,shared_write,Game::mode_391f1,5
 harness,presentation,shared_write,Game::numPlayers,4
 harness,presentation,shared_write,Game::playerIndex,23
-harness,presentation,shared_write,Game::units,31
 harness,presentation,shared_write,NetworkSeam::BroadcastPlayerInfo,1
 harness,presentation,shared_write,Player::alliedBy,4
 harness,presentation,shared_write,PlayerInfo::energy,1
@@ -1748,7 +1741,6 @@ harness,seams,shared_write,WindMeteorsSeam::UpdateMeteors,1
 harness,seams,shared_write,WindMeteorsSeam::UpdateWind,1
 harness,seams,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 harness,targeting,shared_write,AiSeam::GetVisibleEnemiesInRadius,1
-harness,targeting,shared_write,Game::units,2
 harness,targeting,shared_write,Seams::ai,1
 harness,targeting,shared_write,Seams::units,2
 harness,targeting,shared_write,Seams::weapons,1
@@ -1768,8 +1760,6 @@ harness,units,shared_write,FeaturesSeam::PlaceFeature,1
 harness,units,shared_write,Game::difficulty,2
 harness,units,shared_write,Game::localPlayer,2
 harness,units,shared_write,Game::playerIndex,3
-harness,units,shared_write,Game::poolCount,1
-harness,units,shared_write,Game::units,12
 harness,units,shared_write,LosRadarSeam::AddEyeball,1
 harness,units,shared_write,LosRadarSeam::GetMapCell,1
 harness,units,shared_write,LosRadarSeam::IsUnitVisibleToPlayer,1
@@ -1825,7 +1815,6 @@ harness,weapons,shared_write,EconomySeam::SpendEnergyAndMetal,1
 harness,weapons,shared_write,FeaturesSeam::DamageFeature,1
 harness,weapons,shared_write,FeaturesSeam::GetFootprintCentre,1
 harness,weapons,shared_write,Game::localPlayer,3
-harness,weapons,shared_write,Game::units,4
 harness,weapons,shared_write,LosRadarSeam::GetMapCell,2
 harness,weapons,shared_write,LosRadarSeam::GetMapCellAtPosition,3
 harness,weapons,shared_write,MapSeam::GetCellMeanHeight,2
@@ -5231,8 +5220,6 @@ units,game,shared_write,UnitDef::unitname,2
 units,game,shared_write,Vec3::x,5
 units,game,shared_write,Vec3::y,3
 units,game,shared_write,Vec3::z,5
-units,harness,shared_write,Game::poolCount,2
-units,harness,shared_write,Game::units,2
 units,harness,shared_write,Player::unitsBegin,2
 units,harness,shared_write,Player::unitsEnd,2
 units,harness,shared_write,Point16::x,1

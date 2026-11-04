@@ -4,6 +4,10 @@
 """
 
 import json
+import os
+import subprocess
+import sys
+import tempfile
 import unittest
 
 import wasm_modules as wm
@@ -375,6 +379,86 @@ class AdapterManifestTests(unittest.TestCase):
         text = wm.manifest_text(dict(ADAPTED, adapters=[RAND_ADAPTER, dict(RAND_ADAPTER, name="Log")]))
         self.assertIn('"adapters": [\n    {"interface": "services", "from_major": 1, "name": "Rand", "args": [0], "result": "pass"},\n', text)
         self.assertEqual(json.loads(text)["adapters"][1]["name"], "Log")
+
+
+BUILT = os.path.join(wm.OUT, "wind_meteors.wasm")
+OBJECTS = os.path.join(wm.OUT, "wind_meteors")
+
+
+def relink(entry, game, target):
+    """The stock module's objects linked at the entry's bases and metered, as the build does, without the build's checks."""
+    objects = sorted(os.path.join(OBJECTS, name) for name in os.listdir(OBJECTS) if name.endswith(".o"))
+    exports = [f"--export={data}" for data in entry["data"]]
+    wm.run(["wasm-ld", *wm.link_flags(entry, game["stack_size"]), "--gc-sections", *exports, *objects, "-o", target])
+    with open(target, "rb") as f:
+        linked = f.read()
+    with open(target, "wb") as f:
+        f.write(wm.wasm_fuel.instrument(linked, wm.find_wasm_tools(game["tools"]["wasm-tools"])))
+
+
+@unittest.skipUnless(os.path.exists(BUILT) and os.path.isdir(OBJECTS), "needs uv run tools/wasm_modules.py build first")
+class ModuleFileTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.game = wm.game_manifest()
+        cls.entry = next(m for m in cls.game["modules"] if m["name"] == "wind_meteors")
+        cls.wasm_tools = wm.find_wasm_tools(cls.game["tools"]["wasm-tools"])
+        cls.dir = tempfile.TemporaryDirectory()
+        cls.moved = os.path.join(cls.dir.name, "moved.wasm")
+        relink(dict(cls.entry, data_base=0x40000), cls.game, cls.moved)
+        cls.extra = os.path.join(cls.dir.name, "extra.wasm")
+        with open(BUILT, "rb") as f:
+            text = subprocess.run([cls.wasm_tools, "print", "-"], input=f.read(), capture_output=True, check=True).stdout.decode()
+        first = text.index("(import ")
+        text = text[:first] + '(import "services" "ClockNow" (func (result i32)))\n  ' + text[first:]
+        with open(cls.extra, "wb") as f:
+            f.write(subprocess.run([cls.wasm_tools, "parse", "-"], input=text.encode(), capture_output=True, check=True).stdout)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.dir.cleanup()
+
+    def problems(self, path):
+        return wm.check_module_file(self.game, self.entry, path, self.wasm_tools)
+
+    def test_the_stock_module_passes(self):
+        self.assertEqual(self.problems(BUILT), [])
+
+    def test_a_module_relinked_inside_the_memory_but_outside_its_window_fails(self):
+        problems = self.problems(self.moved)
+        self.assertTrue(any("outside its window 0x30000..0x40000" in p for p in problems), problems)
+
+    def test_an_import_off_the_allowlist_fails(self):
+        problems = self.problems(self.extra)
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("imports services.ClockNow, which its manifest does not list", problems[0])
+
+    def test_a_file_that_is_not_a_module_fails(self):
+        path = os.path.join(self.dir.name, "junk.wasm")
+        with open(path, "wb") as f:
+            f.write(b"not a module")
+        self.assertIn("cannot read the module", self.problems(path)[0])
+
+    def test_the_command_exits_by_the_verdict(self):
+        def run(path):
+            cmd = [sys.executable, os.path.join(wm.ROOT, "tools", "wasm_modules.py"), "check-module", path, "--name", "wind_meteors"]
+            return subprocess.run(cmd, capture_output=True, text=True)
+        stock, moved = run(BUILT), run(self.moved)
+        self.assertEqual((stock.returncode, stock.stdout), (0, "wind_meteors: ok\n"))
+        self.assertEqual(moved.returncode, 1)
+        self.assertIn("outside its window", moved.stdout)
+
+    def test_the_judge_refuses_a_bad_module_before_playing(self):
+        import oraclegate
+
+        out = os.path.join(self.dir.name, "oracle")
+        for path, text in ((self.moved, "outside its window"), (self.extra, "services.ClockNow")):
+            result = oraclegate.judge(oraclegate.Path(path), "wind_meteors", False, oraclegate.Path(self.dir.name) / "no-build",
+                                      oraclegate.Path(out), None)
+            self.assertEqual(result["verdict"], "refused")
+            self.assertIn(text, result["message"])
+            self.assertNotIn("scenarios", result)
+            self.assertFalse(os.path.exists(os.path.join(out, "runtime")))
 
 
 if __name__ == "__main__":

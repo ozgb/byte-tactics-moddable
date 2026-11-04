@@ -262,14 +262,22 @@ pool plays every scenario once in WASM and once native (each line ends its name 
 the sound logs, frames, saves, block pointer scans and fuel are judged per mode and their lines start with the mode),
 and it exits 0 only when both modes do. The first difference in either mode stops every run of the pool, and its `DIFF`
 line names the mode. `--tier` is still one mode, unless it is given `--both-modes` too.
-A `--check` takes an exclusive lock on `$XDG_RUNTIME_DIR/bt-gate.lock` (`/tmp/bt-gate.lock` without it) for its whole run,
-so that a machine plays one gate at a time: a second one prints `waiting for the gate run of <pid> (<worktree>)` and
-starts when the first ends. `--no-lock` skips the lock, for a run that is not a gate.
+Every game run of a `--check` holds one of the machine's run slots for its whole run: `bt-gate-slot-<i>` files in `$XDG_RUNTIME_DIR`
+(`/tmp` without it), each taken with `flock`, so that a slot is free again when its holder dies. There are half the CPUs of them, at most
+`GATE_SLOTS` (10, beside `MAX_PARALLEL`; `BT_GATE_SLOTS` overrides), and all the gates on the machine together play at most that
+many games. `--parallel` still caps one gate's runs. A tier gate keeps its pool busy only at the start (`eight-pincushion-teams` runs 37 to 119
+seconds, the others 15 or less), and one exclusive lock left the other slots idle while the next gate waited: with slots, three tier gates
+started together finish in about 100 seconds against about 160 one after the other (measured on #760 with 20 CPUs: 6 slots 170 seconds, 10 slots 100, 14 slots 88 with each run slower under the load, so
+the default stays at half the CPUs). A run that has to wait prints once, `waiting for a run slot, held by the gates of <pid> (<worktree>), ...`.
+A scenario with a `load` line starts as soon as the scenario it loads has finished (ahead of the scenarios not yet started), so
+`load-midgame` no longer waits for `eight-pincushion-teams`.
+A second `--check` with the same cache key waits for the first on a key lock (`bt-gate-key-<key>.lock`) and then reports its cached pass (below),
+rather than playing the same exe twice. `--no-lock` takes no slot and no key lock, for a run that is not a gate.
 A passing `--check` is cached: its output, date and commit go to `~/.cache/bt-gate/<key>.txt` (shared by every worktree on the machine),
 where the key is a SHA-256 of the exe, `wasmtime_host.dll`, the `.wasm` modules and `modules.json` beside it, `reference/scenarios`, `traces`,
 `sounds`, `ui`, `frames` and `saves`, `tools/playtest/`, `tools/reference.py`, `playtest.py`, `tracediff.py`, `tracedigest.py`, `savefile.py` and `blockpointers.py` with every `tools/` module they import (found from the source), `data/block_pointers.csv`, the `TotalA.map` beside the exe (or its absence), and the options that change what is played
 (tier, mode, `--steps-per-frame`, `--quirks`, `--roundtrip`, `--poison`); the `commit.txt` beside the exe is not part of it. A failing run writes nothing.
-The key is looked up before the lock and again after it, so a run that waited behind a gate of the same inputs reports that gate's pass. On a hit
+The key is looked up before the key lock and again after it, so a run that waited behind a gate of the same inputs reports that gate's pass. On a hit
 `--check` prints `cached pass from <date> at <commit>` and the stored lines and exits 0; this counts as a gate run, and the pull request body says "cached".
 `--no-cache` plays anyway. (A `--both-modes` run exits 1 until #654, so it caches nothing yet.)
 `uv run tools/wasm_modules.py glue-fatal --game-dir ~/.ta` (Wine only, not in CI) runs the exe on a bogus `meteor.tdf` and checks that the module's `FatalError` ends the game with exit code 2 after `wl_call` returned.

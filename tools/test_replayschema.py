@@ -596,7 +596,7 @@ class Tables(unittest.TestCase):
         self.assertIn("offsetof(Game, projectiles)", text)
         self.assertIn("offsetof(SimGlobals, g_movementClasses.entries)", text)
         self.assertIn('#pragma push_macro("g_movementClasses")', text)
-        self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 4,', text)
+        self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 5,', text)
         self.assertIn('{ "UnitDef", sizeof(UnitDef), RS_STATE, RT_ORDER,', text)
 
     def test_the_size_of_an_inline_table_is_checked_against_its_count(self):

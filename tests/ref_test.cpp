@@ -46,10 +46,6 @@ struct Thing {
 static_assert(sizeof(Ref<Thing>) == 4, "size");
 static_assert(__is_trivial(Ref<Thing>) && __is_trivially_copyable(Ref<Thing>), "a Ref is plain data");
 
-void ReplayImportEnd(ReplayImport&)
-{
-}
-
 int main()
 {
     Ref<Thing> zeroInit = {};

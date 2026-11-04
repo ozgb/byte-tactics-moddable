@@ -55695,6 +55695,7 @@ address,function,file,kind,target
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKindCount@src/harness/replay_schema.h
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayPolyKinds@src/harness/replay_schema.h
+,ReplayConfigure,src/harness/replay.cpp,call,ReplayEndHook
 ,ReplayConfigure,src/harness/replay.cpp,call,_snprintf
 ,ReplayConfigure,src/harness/replay.cpp,call,operator new
 ,ReplayConfigure,src/harness/replay.cpp,call,sscanf
@@ -55703,6 +55704,7 @@ address,function,file,kind,target
 ,ReplayConfigure,src/harness/replay.cpp,field_write,Recording::first
 ,ReplayConfigure,src/harness/replay.cpp,field_write,Recording::last
 ,ReplayConfigure,src/harness/replay.cpp,field_write,Recording::windowed
+,ReplayConfigure,src/harness/replay.cpp,fn_ref,ReplayImportEnd
 ,ReplayConfigure,src/harness/replay.cpp,function,
 ,ReplayConfigure,src/harness/replay.cpp,global_read,kReplaySubsystemCount@src/harness/replay_schema.h
 ,ReplayConfigure,src/harness/replay.cpp,global_read,kReplaySubsystems@src/harness/replay_schema.h
@@ -55720,6 +55722,8 @@ address,function,file,kind,target
 ,ReplayEmitField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::kind
 ,ReplayEmitField,src/harness/replay_objects.cpp,function,
 ,ReplayEmitField,src/harness/replay_objects.cpp,global_read,kReplayArrays@src/harness/replay_schema.h
+,ReplayEndHook,src/harness/replay.h,function,
+,ReplayEndHook,src/harness/replay.h,global_read,hook@ReplayEndHook
 ,ReplayFail,src/harness/replay_objects.cpp,call,strncpy
 ,ReplayFail,src/harness/replay_objects.cpp,function,
 ,ReplayFail,src/harness/replay_objects.cpp,global_maybe_written,s_failure
@@ -55834,12 +55838,13 @@ address,function,file,kind,target
 ,ReplayImport::Return,src/harness/replay.h,field_write,<anon>::p
 ,ReplayImport::Return,src/harness/replay.h,field_write,ReplayArg::kind
 ,ReplayImport::Return,src/harness/replay.h,function,
-,ReplayImport::~ReplayImport,src/harness/replay.h,call,ReplayImportEnd
+,ReplayImport::~ReplayImport,src/harness/replay.h,call,ReplayEndHook
 ,ReplayImport::~ReplayImport,src/harness/replay.h,call,ReplayNestedDepth
 ,ReplayImport::~ReplayImport,src/harness/replay.h,deref_read,*ReplayImport
 ,ReplayImport::~ReplayImport,src/harness/replay.h,field_read,ReplayImport::active
 ,ReplayImport::~ReplayImport,src/harness/replay.h,field_read,ReplayImport::nested
 ,ReplayImport::~ReplayImport,src/harness/replay.h,function,
+,ReplayImport::~ReplayImport,src/harness/replay.h,indirect_call,indirect via void (*)(ReplayImport &) __attribute__((stdcall))
 ,ReplayImportEnd,src/harness/replay_services.inc,call,AddAlloc
 ,ReplayImportEnd,src/harness/replay_services.inc,call,AddAllocName
 ,ReplayImportEnd,src/harness/replay_services.inc,call,AddDoubleBits

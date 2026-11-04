@@ -654,6 +654,7 @@ int ReplayConfigure(const char* value, char* error, int size)
         _snprintf(error, size, ": needs a first tick of at least 1 and a last tick not before it");
         return 0;
     }
+    ReplayEndHook() = ReplayImportEnd;
     s_rec[sub] = new Recording();
     s_rec[sub]->windowed = fields == 3;
     s_rec[sub]->first = first;

@@ -2083,7 +2083,6 @@ map,features,shared_write,Cell::unit,1
 map,features,shared_write,Game::net,3
 map,features,shared_write,Point16::x,10
 map,features,shared_write,Point16::y,10
-map,features,shared_write,TdfFile::current,2
 map,features,shared_write,Vec3::x,6
 map,features,shared_write,Vec3::y,5
 map,features,shared_write,Vec3::z,6
@@ -2108,7 +2107,6 @@ map,game,shared_write,Grid::height,1
 map,game,shared_write,Grid::width,1
 map,game,shared_write,Point16::x,1
 map,game,shared_write,Point16::y,1
-map,game,shared_write,TdfFile::current,4
 map,game,shared_write,Unit::flags,4
 map,game,shared_write,Vec3::x,5
 map,game,shared_write,Vec3::y,3
@@ -2117,7 +2115,6 @@ map,harness,call,Visit,1
 map,harness,shared_write,Game::net,1
 map,harness,shared_write,Point16::x,1
 map,harness,shared_write,Point16::y,1
-map,harness,shared_write,TdfFile::current,1
 map,harness,shared_write,Vec3::x,2
 map,harness,shared_write,Vec3::y,1
 map,harness,shared_write,Vec3::z,2
@@ -2134,7 +2131,6 @@ map,los_radar,shared_write,Grid::width,3
 map,los_radar,shared_write,Mission::lavaWorld,1
 map,los_radar,shared_write,Point16::x,4
 map,los_radar,shared_write,Point16::y,4
-map,los_radar,shared_write,TdfFile::current,3
 map,los_radar,shared_write,Unit::flags,6
 map,los_radar,shared_write,Vec3::x,10
 map,los_radar,shared_write,Vec3::y,10
@@ -2187,7 +2183,6 @@ map,platform,call,operator==,5
 map,platform,shared_write,Fixed::value,2
 map,platform,shared_write,Point16::x,8
 map,platform,shared_write,Point16::y,8
-map,platform,shared_write,TdfFile::current,20
 map,platform,shared_write,Vec3::x,22
 map,platform,shared_write,Vec3::y,13
 map,platform,shared_write,Vec3::z,22
@@ -2213,7 +2208,6 @@ map,presentation,shared_write,Mission::killMul,1
 map,presentation,shared_write,Mission::timeMul,1
 map,presentation,shared_write,Point16::x,5
 map,presentation,shared_write,Point16::y,5
-map,presentation,shared_write,TdfFile::current,8
 map,presentation,shared_write,Unit::flags,30
 map,presentation,shared_write,Vec3::x,42
 map,presentation,shared_write,Vec3::y,43
@@ -2239,7 +2233,6 @@ map,units,shared_write,MovementClass::height,2
 map,units,shared_write,MovementClass::width,3
 map,units,shared_write,Point16::x,7
 map,units,shared_write,Point16::y,7
-map,units,shared_write,TdfFile::current,4
 map,units,shared_write,Unit::bit2,4
 map,units,shared_write,Unit::cargoNext,2
 map,units,shared_write,Unit::flags,20
@@ -2256,7 +2249,6 @@ map,weapons,shared_write,Mission::lavaWorld,2
 map,weapons,shared_write,Mission::noSeaLevelTrigger,5
 map,weapons,shared_write,Point16::x,1
 map,weapons,shared_write,Point16::y,1
-map,weapons,shared_write,TdfFile::current,1
 map,weapons,shared_write,Unit::flags,6
 map,weapons,shared_write,Vec3::x,27
 map,weapons,shared_write,Vec3::y,27
@@ -2267,7 +2259,6 @@ map,wind_meteors,indirect,MeteorParams::LoadMeteorDefaults,1
 map,wind_meteors,indirect,SetMeteorParams,1
 map,wind_meteors,shared_write,Point16::x,5
 map,wind_meteors,shared_write,Point16::y,5
-map,wind_meteors,shared_write,TdfFile::current,1
 map,wind_meteors,shared_write,Vec3::x,1
 map,wind_meteors,shared_write,Vec3::y,1
 map,wind_meteors,shared_write,Vec3::z,1
@@ -2975,7 +2966,6 @@ platform,features,indirect,CmdFeature,1
 platform,features,shared_write,Fixed::whole,2
 platform,features,shared_write,Point16::x,10
 platform,features,shared_write,Point16::y,10
-platform,features,shared_write,TdfFile::current,2
 platform,features,shared_write,Vec3::x,6
 platform,features,shared_write,Vec3::y,5
 platform,features,shared_write,Vec3::z,6
@@ -3092,7 +3082,6 @@ platform,game,shared_write,Game::data_148eb,1
 platform,game,shared_write,Point16::x,1
 platform,game,shared_write,Point16::y,1
 platform,game,shared_write,Seams::wind_meteors,5
-platform,game,shared_write,TdfFile::current,4
 platform,game,shared_write,Vec3::x,5
 platform,game,shared_write,Vec3::y,3
 platform,game,shared_write,Vec3::z,5
@@ -3108,8 +3097,6 @@ platform,harness,call,ReplayImport::~ReplayImport,33
 platform,harness,shared_write,Point16::x,1
 platform,harness,shared_write,Point16::y,1
 platform,harness,shared_write,Seams::wind_meteors,1
-platform,harness,shared_write,TdfFile::current,1
-platform,harness,shared_write,TdfFile::root,1
 platform,harness,shared_write,Vec3::x,2
 platform,harness,shared_write,Vec3::y,1
 platform,harness,shared_write,Vec3::z,2
@@ -3126,7 +3113,6 @@ platform,los_radar,shared_write,Game::loadProgress,1
 platform,los_radar,shared_write,Game::losTable,8
 platform,los_radar,shared_write,Point16::x,4
 platform,los_radar,shared_write,Point16::y,4
-platform,los_radar,shared_write,TdfFile::current,3
 platform,los_radar,shared_write,Vec3::x,10
 platform,los_radar,shared_write,Vec3::y,10
 platform,los_radar,shared_write,Vec3::z,10
@@ -3136,7 +3122,6 @@ platform,map,shared_write,Point16::x,12
 platform,map,shared_write,Point16::y,12
 platform,map,shared_write,Seams::wind_meteors,1
 platform,map,shared_write,StringRef::data,1
-platform,map,shared_write,TdfFile::current,3
 platform,map,shared_write,Vec3::x,12
 platform,map,shared_write,Vec3::y,4
 platform,map,shared_write,Vec3::z,12
@@ -3213,8 +3198,6 @@ platform,presentation,shared_write,Fixed::whole,7
 platform,presentation,shared_write,Point16::x,5
 platform,presentation,shared_write,Point16::y,5
 platform,presentation,shared_write,StringRef::data,5
-platform,presentation,shared_write,TdfFile::current,8
-platform,presentation,shared_write,TdfFile::root,1
 platform,presentation,shared_write,Vec3::x,42
 platform,presentation,shared_write,Vec3::y,43
 platform,presentation,shared_write,Vec3::z,41
@@ -3237,7 +3220,6 @@ platform,units,shared_write,Fixed::whole,1
 platform,units,shared_write,Point16::x,7
 platform,units,shared_write,Point16::y,7
 platform,units,shared_write,StringRef::data,4
-platform,units,shared_write,TdfFile::current,4
 platform,units,shared_write,UnitDef::scriptChecksum,1
 platform,units,shared_write,Vec3::x,12
 platform,units,shared_write,Vec3::y,13
@@ -3255,7 +3237,6 @@ platform,weapons,shared_write,ReachPosVec3::z,2
 platform,weapons,shared_write,ReachUnitVec3::x,2
 platform,weapons,shared_write,ReachUnitVec3::z,2
 platform,weapons,shared_write,StringRef::ptr,5
-platform,weapons,shared_write,TdfFile::current,1
 platform,weapons,shared_write,Vec3::x,27
 platform,weapons,shared_write,Vec3::y,27
 platform,weapons,shared_write,Vec3::z,28
@@ -3266,7 +3247,6 @@ platform,wind_meteors,indirect,CmdMeteor,1
 platform,wind_meteors,shared_write,Point16::x,5
 platform,wind_meteors,shared_write,Point16::y,5
 platform,wind_meteors,shared_write,Seams::wind_meteors,2
-platform,wind_meteors,shared_write,TdfFile::current,1
 platform,wind_meteors,shared_write,Vec3::x,1
 platform,wind_meteors,shared_write,Vec3::y,1
 platform,wind_meteors,shared_write,Vec3::z,1

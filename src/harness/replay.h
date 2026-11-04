@@ -44,6 +44,13 @@ void ReplayImportEnd(ReplayImport& call);
 void ReplayFail(const char* message);
 
 typedef bool (*ReplayAnswerFn)(ReplayImport& call);
+typedef void (*ReplayEndFn)(ReplayImport& call);
+
+inline ReplayEndFn& ReplayEndHook()
+{
+    static ReplayEndFn hook = nullptr;
+    return hook;
+}
 
 inline ReplayAnswerFn& ReplayAnswerHook()
 {
@@ -68,8 +75,8 @@ struct ReplayImport {
     {
         if (nested)
             ReplayNestedDepth()--;
-        if (active)
-            ReplayImportEnd(*this);
+        if (active && ReplayEndHook() != nullptr)
+            ReplayEndHook()(*this);
     }
     void Nested()
     {

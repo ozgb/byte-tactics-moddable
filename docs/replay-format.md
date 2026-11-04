@@ -413,6 +413,86 @@ it cannot write is the hook itself, `ReplayImport call(RI_X); call.Int(..)` at t
 those functions are the services themselves, reached by direct calls with no table to wrap, so the hook has to be in the
 function; `replayschema.py --check` fails when a hook's arguments differ from its entry or an entry has no hook.
 
+### Services
+
+Every service is one `i services.<name>` line, written when the function returns, so its pointer arguments show what the function left
+in them. The line carries the arguments by their modes and the result after ` = `:
+
+| Argument `mode` | Written as | Notes |
+|---|---|---|
+| `stream`, `int`, `double`, `text` | `main`, `12`, `f64:0x...`, `"text"` | `text` is up to the first NUL |
+| `handle` (`file`, `rec`, `bank`) | `rec#2` | numbered by first use in the outermost call |
+| `skip` | nothing | an out buffer or `this` that the entry names for its outs and effects |
+| `bytes` (`length`) | `x:0102ff` | the bytes of a buffer, as long as the `length` argument |
+| `textn` (`length`) | `"meteor 1\nmeteor 0"` | a text of that many characters, not NUL-terminated |
+| `ints` (`count`) | `[3,4]` | that many words behind a pointer |
+| `object` (`kind`) | `Gaf#1` | an object of a kind of the schema, named by first appearance in the file |
+| `allocated` | `alloc#3`, `PlayerInfo#1`, `alloc#?` | a block that an earlier alloc returned, `alloc#?` when none did |
+| `commandargs` | `["x","y"]` or `null` | the strings of a `CommandArgs` |
+
+| Result | Written as |
+|---|---|
+| `int`, `double`, `text` | ` = 7`, ` = f64:0x...`, ` = "text"` or ` = null` |
+| `handle` (`kind`) | ` = rec#2` or ` = null` |
+| `object` (`kind`, `ctype`, `reach`) | ` = GafFrame#1`, then `o GafFrame#1.width 64` for each field of the `reach` |
+| `alloc` (`size`, `tag`) | ` = alloc#1`, or ` = PlayerInfo#1` when the annotation `alloc_tags` names the tag |
+| `snapshot` (`bytes`, `offset`) | ` = snapshot#1` (see Snapshots) |
+| `arg` (`param`) | nothing: the function returns the argument (`GetFieldFixed` returns `dst`) |
+
+An out is an `o` line after the import line: `o dest "Armada"` for a text written through a pointer, `o dst 98304` for an int
+(`{"label": "dst", "int": "dst"}`), `o file#1.current rec#1` for a record a file now points at. An entry may also give `pre` lines
+(the replayer builds the formatted text of `FilePrintf` from its own arguments), `effect` lines (the replayer's definition does what
+the function does to its object: `count = 0;` for `InitArgs`), `cast` and `into_size`.
+
+One line per group, from the self-test:
+
+```
+  i services.TdfRecord_FindSubRecord rec#1 "units" = rec#2
+  i services.TdfRecord_GetFieldFixed rec#3 "scale" 5
+  o dst 98304
+  i services.FilePrintf "%d units" "3 units" = 7
+  i services.Translate "key" = "Teksti"
+  i services.ComputeChecksum x:0102ff 3 = 1234567
+  i services.SimAlloc 64 = alloc#1
+  i services.SimAllocTagged "Player Info" 185 = PlayerInfo#1
+  i services.SimFree alloc#1
+  i services.RecordSimEvent 2 1 [3,4] 2
+  i services.FindSlotByDpid 77 = 2
+  i services.GetGafFrame FrameTable#1 2 = GafFrame#1
+  o GafFrame#1.width 64
+```
+
+The services of the files and data group are `FilePrintf` (the format and the formatted text) and the TDF calls that the subsystems make on records
+and files; the commands group is `Translate`, `CommandArgs::InitArgs` and `ComputeChecksum`; sim plumbing is `SimAlloc`, `SimAllocTagged` (the size
+and the tag are compared), `SimFree`, `RecordSimEvent` (kind, flags, args and count), `SimCaptureAlloc` and the slot lookups `FindSlotByDpid` and
+`GetSlotDpid`; the load reads are `LoadGaf`, `LoadAnimGaf`, `FindGafEntry`, `GetGafFrame`, `GetGafSequenceFrame`, `Load3do`, `LoadObject3d` and
+`GetObjectHeight`, with results that are objects of the load kinds `Gaf`, `FrameTable`, `GafFrame` and `Object3do` and the fields that
+the subsystems read as the `reach`. The `HAPI_*` file calls and the boxes of `HapiBank` are not services: they are slots of the `files` seam
+and an import of the subsystems that call them, recorded as any import is. A hook records only for the thread that opened the slot, so
+the calls of the loading thread or the drawing code that overlap a slot are not its calls.
+
+A service whose definition is in a source that the replayer links (`SimAlloc`, `SimAllocTagged` and `SimFree`, which `block.cpp` defines) is not
+defined by the replayer. The hook in the real function asks `call.Answered()`, which is true only while the replayer runs a slot, and the
+generated answer takes the place of the function: it checks the `i` line the module would have written, makes the real allocation and names the
+block as the recording does (`alloc#1`, or the object of the tag's kind) or, for `SimFree`, lets the real free go on. The replayer's own
+allocations are never answered. A service in a source nothing links keeps the definition the tool writes.
+
+`ExecuteCommandText` is re-entrant. The commands it runs through the slots named `Cmd...` are `c` lines after its `i` line, in call order,
+as the calls of a callback are:
+
+```
+  i services.CommandArgs_GetIntArg 1 0 = 1
+  i services.ExecuteCommandText "meteor 1" 8 ["x"] -1 = 1
+    c wind_meteors.CmdMeteor ["meteor","1"]
+```
+
+The arguments of a nested call are written by the modes of a slot argument and the result follows ` = `. What a nested call writes shows in the
+`w` lines of the outer call. The services a nested call makes are ordinary `i` lines, and they come before the `i` line of
+`ExecuteCommandText`, because that line is written when the function returns; the stub finds its own line among them, makes the nested
+calls through the seam table of the module with the cursor set back over those lines, and reports a result that differs at
+`<import>.c[<k>]`. A command that is not a seam slot is not recorded, a slot import of the nested call is not recorded, and a command run
+inside a nested command fails the recording.
+
 ## Replaying
 
 `tests/replay_native_test.cpp` replays a recording against the native module (`replay_native_test.exe`, built by
@@ -436,7 +516,7 @@ recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.m
 chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
 struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
 `Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
-is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
+is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and services (the files, commands, sim plumbing and load reads, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
 second object, with a changed result reported at `import 0 fixture.Scan.c[0]`). With a
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.

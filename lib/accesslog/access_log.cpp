@@ -49,7 +49,7 @@ struct Section {
     unsigned start, end, flags;
 };
 struct Stats {
-    unsigned long long accesses, unknown, ignored, code, constants, other, unresolvedImage, unresolvedBlock, writes, ranges, rangeCapped;
+    unsigned long long accesses, noSubsystem, ignored, code, constants, other, unresolvedImage, unresolvedBlock, writes, ranges, rangeCapped;
 };
 struct Slot {
     unsigned ra, sub;
@@ -509,7 +509,7 @@ NS void Record(int store, unsigned a, unsigned size, void* ra)
         }
         g_stats.accesses++;
         if (sub == 0)
-            g_stats.unknown++;
+            g_stats.noSubsystem++;
         if (store) {
             g_stats.writes++;
             g_classifier.Write(h.item, h.entA, h.entB, sub, g_tick);
@@ -892,7 +892,7 @@ NS void AccessLogFinish()
     struct {
         const char* name;
         unsigned long long value;
-    } lines[] = {{"accesses", g_stats.accesses}, {"unknown_subsystem", g_stats.unknown}, {"ignored_helpers", g_stats.ignored},
+    } lines[] = {{"accesses", g_stats.accesses}, {"unknown_subsystem", g_stats.noSubsystem}, {"ignored_helpers", g_stats.ignored},
                  {"code", g_stats.code}, {"constants_unnamed", g_stats.constants}, {"other_memory", g_stats.other},
                  {"unresolved_image", g_stats.unresolvedImage}, {"unresolved_block", g_stats.unresolvedBlock},
                  {"writes", g_stats.writes}, {"range_calls", g_stats.ranges}, {"range_capped", g_stats.rangeCapped},

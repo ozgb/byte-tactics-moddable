@@ -501,9 +501,12 @@ game,harness,call,HarnessInit,1
 game,harness,call,HarnessPhase,1
 game,harness,call,HarnessStartSkirmish,1
 game,harness,call,HarnessStepsPerFrame,1
-game,harness,call,ReplayImport::Int,1
+game,harness,call,ReplayImport::Answered,5
+game,harness,call,ReplayImport::AnsweredPointer,3
+game,harness,call,ReplayImport::Int,5
+game,harness,call,ReplayImport::Ptr,4
 game,harness,call,ReplayImport::Result,1
-game,harness,call,ReplayImport::~ReplayImport,1
+game,harness,call,ReplayImport::~ReplayImport,6
 game,harness,shared_write,Game::difficulty,2
 game,harness,shared_write,Game::endGameFlags,2
 game,harness,shared_write,Game::endGameVictory,2
@@ -697,6 +700,7 @@ game,platform,call,QuitApp,1
 game,platform,call,RandomInt,1
 game,platform,call,RegisterCommands,1
 game,platform,call,RegisterDataArchives,2
+game,platform,call,Result,3
 game,platform,call,SeedRandom,1
 game,platform,call,SetCloseHandler,10
 game,platform,call,SetOutOfMemoryHandler,2
@@ -1364,7 +1368,7 @@ harness,network,shared_write,Game::numPlayers,6
 harness,network,shared_write,LoadingFlags::value,1
 harness,network,shared_write,Player::alliedBy,2
 harness,network,shared_write,Player::progress,2
-harness,orders,call,Add,138
+harness,orders,call,Add,139
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,shared_write,AiSeam::GetFactoriesInRadius,7
@@ -1475,6 +1479,7 @@ harness,platform,call,host_mem_reserve,2
 harness,platform,call,host_mutex_create,1
 harness,platform,call,host_mutex_lock,3
 harness,platform,call,host_mutex_unlock,3
+harness,platform,call,host_thread_id,3
 harness,platform,call,host_time_counter,1
 harness,platform,call,operator new,1
 harness,platform,shared_write,Seams::weapons,2
@@ -3095,10 +3100,11 @@ platform,game,shared_write,WindMeteorsSeam::UpdateMeteors,1
 platform,game,shared_write,WindMeteorsSeam::UpdateWind,1
 platform,game,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 platform,harness,call,ReplayImport::Dbl,1
-platform,harness,call,ReplayImport::Int,4
-platform,harness,call,ReplayImport::Ptr,9
-platform,harness,call,ReplayImport::Result,7
-platform,harness,call,ReplayImport::~ReplayImport,11
+platform,harness,call,ReplayImport::Int,13
+platform,harness,call,ReplayImport::Nested,1
+platform,harness,call,ReplayImport::Ptr,29
+platform,harness,call,ReplayImport::Result,14
+platform,harness,call,ReplayImport::~ReplayImport,33
 platform,harness,shared_write,Point16::x,1
 platform,harness,shared_write,Point16::y,1
 platform,harness,shared_write,Seams::wind_meteors,1
@@ -3846,6 +3852,10 @@ presentation,harness,call,HarnessUiGroup,2
 presentation,harness,call,HarnessUiOrder,2
 presentation,harness,call,HarnessUiQueue,1
 presentation,harness,call,HarnessViewRand,19
+presentation,harness,call,ReplayImport::Int,1
+presentation,harness,call,ReplayImport::Ptr,6
+presentation,harness,call,ReplayImport::Result,1
+presentation,harness,call,ReplayImport::~ReplayImport,6
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::endGameVictory,2
 presentation,harness,shared_write,Game::numPlayers,2
@@ -4090,6 +4100,7 @@ presentation,platform,call,RegisterCommands,1
 presentation,platform,call,RegisterDataArchives,7
 presentation,platform,call,ReleaseDirectDraw,1
 presentation,platform,call,RemoveTimer,14
+presentation,platform,call,Result,5
 presentation,platform,call,RotateByAngles,3
 presentation,platform,call,SetDefaultCommandHandler,1
 presentation,platform,call,SetMediaNotifyCallback,1

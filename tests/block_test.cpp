@@ -273,6 +273,10 @@ static void RunSpanTests()
     Check(LocateSpan(spans, 0, 0x1000, &off) == 0, "no spans, no match");
 }
 
+void ReplayImportEnd(ReplayImport&)
+{
+}
+
 int main()
 {
     RunSpanTests();

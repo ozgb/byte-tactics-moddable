@@ -53226,6 +53226,8 @@ address,function,file,kind,target
 ,RecMapSetYardOpen,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapSetYardOpen,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int) __attribute__((stdcall)) [MapSeam::SetYardOpen]"
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,Add
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOut
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOutExit
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53233,6 +53235,7 @@ address,function,file,kind,target
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,function,
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_inner_map
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
 ,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,Add
 ,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,ArgObject

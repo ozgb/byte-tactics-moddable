@@ -654,7 +654,13 @@ def note_about(note: str, offsets: list[int]) -> bool:
     return not named or bool(named & set(offsets))
 
 
+NOTED_ISSUE = re.compile(r"moved out by (#\d+)")
+
+
 def outside_issue(note: str, struct: str, top: str, classes: dict[str, str]) -> str:
+    noted = NOTED_ISSUE.search(note)
+    if noted:
+        return noted.group(1)
     if struct == GAME:
         return VIEW_ISSUE if classes.get(top, "") in ("view", "platform") else UNCLASSIFIED
     for pattern, issue in OUTSIDE_ISSUES:
@@ -679,6 +685,10 @@ def merge_contributions(found: list[dict]) -> dict:
     """One outside row from every block-pointer row that feeds its key, whatever their order."""
     if not all(c["late"] for c in found):
         found = [c for c in found if not c["late"]]
+    noted = {m.group(1) for c in found for m in [NOTED_ISSUE.search(c["row"]["note"])] if m}
+    if len(noted) == 1:
+        found = [dict(c, row=dict(c["row"], issue=next(iter(noted)))) if c["row"]["issue"] == VIEW_ISSUE else c
+                 for c in found]
     row = dict(found[0]["row"])
     for c in found[1:]:
         for column in ("holder", "issue", "kind"):

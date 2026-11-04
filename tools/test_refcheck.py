@@ -298,6 +298,19 @@ class ClangTest(unittest.TestCase):
         self.assertIn("cannot both be right", str(raised.exception))
         self.assertIn("issue", str(raised.exception))
 
+    def test_an_issue_in_a_note_wins_over_the_view_issue(self):
+        def found(issue, note):
+            row = {"struct": "S", "field": "f", "holder": "H", "offset": "0x4", "words": 1, "issue": issue,
+                   "kind": "pointer", "note": note}
+            return {"row": row, "offsets": [4], "late": False, "pinned": False}
+        for order in ((0, 1), (1, 0)):
+            rows = [found("#615", "moved out by #615"), found("#392", "view")]
+            merged = rc.merge_contributions([rows[i] for i in order])
+            self.assertEqual(merged["issue"], "#615")
+        with self.assertRaises(SystemExit):
+            rc.merge_contributions([found("#615", "moved out by #615"), found("", "")])
+        self.assertEqual(rc.outside_issue("moved out by #615", "Game", "view", {"view": "view"}), "#615")
+
     def test_real_outside_rows_ignore_the_order_of_block_pointers(self):
         real = Path(rc.ROOT) / rc.BLOCK_POINTERS
         with real.open(newline="") as f:

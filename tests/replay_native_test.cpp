@@ -1278,6 +1278,26 @@ int __stdcall SpendEnergyAndMetalSlot(UnitResources* self, float energy, float m
     return self->SpendEnergyAndMetal(energy, metal);
 }
 
+int __stdcall Native_fixture_Query(FixtureAmount* first, FixtureAmount* second)
+{
+    if (first != nullptr)
+        first->amount += 3;
+    if (second != nullptr)
+        second->amount = 0;
+    return first != nullptr ? first->amount : -1;
+}
+
+int __stdcall Native_fixture_Measure(int* p2, short* p3, unsigned char* p4)
+{
+    if (p2 != nullptr)
+        *p2 *= 2;
+    if (p3 != nullptr)
+        *p3 = (short)(*p3 - 1);
+    if (p4 != nullptr)
+        *p4 = (unsigned char)(*p4 + 1);
+    return 1;
+}
+
 #include "replay_slots.h"
 #include "replay_shapes.h"
 

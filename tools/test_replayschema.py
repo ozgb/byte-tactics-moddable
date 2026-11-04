@@ -1919,6 +1919,32 @@ class ArgumentShapes(unittest.TestCase):
                      "int __stdcall Imp_fixture_Measure(int* a0, short* a1, unsigned char* a2)", 'ApplyInOutScalar(a2, "p4");'):
             self.assertIn(want, text)
 
+    def test_a_fixture_slot_the_runner_can_pass_gets_a_runner_that_calls_a_native_function(self):
+        files, errors, _ = self.generated(annotations())
+        self.assertEqual(errors, [])
+        text = files[rs.SHAPES_SLOTS]
+        for want in ("void Run_fixture_Query()", "void After_fixture_Query()", "g_result_fixture_Query = Native_fixture_Query(p0, p1);",
+                     "void Run_fixture_Measure()", "void After_fixture_Measure()", "g_result_fixture_Measure = Native_fixture_Measure(p0, p1, p2);"):
+            self.assertIn(want, text)
+        for slot in ("FillGoals", "PlaceAt", "ReadIds", "FillIds"):
+            self.assertNotIn("Run_fixture_%s()" % slot, text)
+
+    def test_the_fixture_recorder_wraps_every_fixture_slot_in_the_recorders_own_scope(self):
+        files, errors, _ = self.generated(annotations())
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_HOOKS_INC]
+        for want in ("SUB_FIXTURE = SUB_COUNT,", "RSL_FIXTURE_MEASURE = RSL_COUNT + 5", "int (__stdcall* Measure)(int*, short*, unsigned char*);",
+                     "int __stdcall RecFixtureMeasure(int* a0, short* a1, unsigned char* a2)", "SlotScope scope(RSL_FIXTURE_MEASURE, SUB_FIXTURE, roots);",
+                     'ArgInOutScalar(s_call, "p3", a1);', 'ImportOutInOutScalar(line, "p4", a2);', 'ArgInOutExit(s_tail, "second", ROK_FIXTUREAMOUNT, a1);',
+                     "void __stdcall RecFixtureFillGoals(int a0, std::vector<FixtureSpan, std::allocator<FixtureSpan> >* a1)",
+                     "FixtureSeam s_rec_fixture = {", "    RecFixtureFillIds,"):
+            self.assertIn(want, text)
+
+    def test_a_runner_calls_the_target_it_is_given(self):
+        s, _ = self.slot([("int*", "p2")], {"p2": self.SCALAR_INOUT}, "int", {"mode": "scalar"})
+        runner = "\n".join(rs.runner("fixture", "Measure", s, "Native_fixture_Measure"))
+        self.assertIn("g_result_fixture_Measure = Native_fixture_Measure(p0);", runner)
+
     def test_a_fixture_slot_is_checked_like_a_slot(self):
         fixtures = json.loads(rs.FIXTURES_JSON.read_text())
         fixtures["fixtures"]["FillGoals"]["args"]["goals"]["dir"] = "in"

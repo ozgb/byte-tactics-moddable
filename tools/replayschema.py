@@ -15,6 +15,8 @@ Outputs:
     tests/replay_schema_fixtures.h  the same tables with the test-only kinds of tests/replay_fixtures.json added, which replay_schema.h
                                     includes when BT_REPLAY_FIXTURES is defined (only the tests' build defines it)
     tests/replay_vtables_fixtures.cpp the vtable of each concrete kind of that schema
+    tests/replay_shapes.h             the import stubs and the runners of the fixture slots of tests/replay_fixtures.json
+    tests/replay_fixture_hooks.inc    the recording wrappers of those slots, compiled by tests/replay_fixture_recorder.cpp
     src/harness/replay_hooks.inc    the recording copy of every seam table, with the argument and import hooks
     tests/replay_slots.h            the slot runners, import stubs and native seam tables of the replayer
     src/harness/replay_services.h   the ids and names of the services imports (GameRand, RandomInt, the TDF and command classes)
@@ -60,6 +62,7 @@ JSON_OUT = ROOT / "data/replay_schema.json"
 FIXTURES_JSON = ROOT / "tests/replay_fixtures.json"
 FIXTURE_SCHEMA_H = ROOT / "tests/replay_schema_fixtures.h"
 FIXTURE_VTABLES_CPP = ROOT / "tests/replay_vtables_fixtures.cpp"
+FIXTURE_HOOKS_INC = ROOT / "tests/replay_fixture_hooks.inc"
 SIM_GLOBALS_H = ROOT / "src/state/sim_globals.h"
 FORMAT = 2
 
@@ -2285,7 +2288,7 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
     return L
 
 
-def runner(sub: str, slot: str, s: dict) -> list[str]:
+def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]:
     names = [a["name"] for a in s["args"]]
     for a in s["args"]:
         if a.get("count") in names:
@@ -2366,7 +2369,7 @@ def runner(sub: str, slot: str, s: dict) -> list[str]:
     if res is not None and res["mode"] in ("scalar", "object", "value"):
         closing.append("result")
     L.append("    SetClosing(%s);" % (", ".join('"%s"' % c for c in closing) if closing else "nullptr"))
-    expr = "g_seams.%s->%s(%s)" % (sub, slot, ", ".join(call))
+    expr = "%s(%s)" % (target or "g_seams.%s->%s" % (sub, slot), ", ".join(call))
     if res is None:
         L.append("    " + expr + ";")
     else:
@@ -2988,15 +2991,51 @@ def shape_slots(ann: dict) -> tuple[list[dict], list[str]]:
         result = classify_result(spec["ret"], spec.get("result"), ann)
         errors += check_forms("fixtures.%s" % name, args, result, ann)
         errors += ["fixtures.%s: the argument %s has no mode" % (name, a["name"]) for a in args if a["mode"] == "pending"]
-        out.append({"name": name, "conv": spec.get("conv", "__stdcall"), "ret": spec["ret"], "params": [p["type"] for p in params], "args": args, "result": result})
+        out.append({"name": name, "conv": spec.get("conv", "__stdcall"), "ret": spec["ret"], "params": [p["type"] for p in params], "rawParams": [p["type"] for p in params], "args": args, "result": result})
     return out, errors
 
 
+RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv"}
+
+
+def runnable(s: dict) -> bool:
+    """The replayer's runner can pass every argument of the slot and compare its result."""
+    return all(a["mode"] in RUNNER_ARG_MODES for a in s["args"]) and (s["result"] is None or s["result"]["mode"] in ("scalar", "object", "value"))
+
+
+def native_name(slot: str) -> str:
+    return "Native_fixture_" + slot
+
+
 def render_shapes(ann: dict) -> str:
-    L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers", ""]
+    L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers, which define Native_fixture_<Slot> for each runner", ""]
     slots, _ = shape_slots(ann)
     for s in slots:
         L += import_stub("fixture", s["name"], s)
+    for s in slots:
+        if runnable(s):
+            L += runner("fixture", s["name"], s, native_name(s["name"]))
+    return "\n".join(L)
+
+
+def render_fixture_hooks(ann: dict, model: dict) -> str:
+    """The recording wrappers of the fixture slots, which tests/replay_fixture_recorder.cpp compiles inside replay.cpp's anonymous namespace."""
+    L = [GENERATED, "", "// included by tests/replay_fixture_recorder.cpp inside a second anonymous namespace after replay.cpp", ""]
+    slots, _ = shape_slots(ann)
+    objects = {o["name"]: o for o in model["objects"]}
+    L.append("enum {")
+    L.append("    SUB_FIXTURE = SUB_COUNT,")
+    for n, s in enumerate(slots):
+        L.append("    RSL_FIXTURE_%s = RSL_COUNT%s%s" % (upper(s["name"]), " + %d" % n if n else "", "," if n + 1 < len(slots) else ""))
+    L += ["};", "", "struct FixtureSeam {"]
+    for s in slots:
+        L.append("    %s (%s* %s)(%s);" % (s["ret"], s["conv"], s["name"], ", ".join(s["params"])))
+    L += ["};", "", "const FixtureSeam* s_inner_fixture;", ""]
+    for s in slots:
+        L += wrapper("fixture", {}, s["name"], s, objects, True)
+    L.append("FixtureSeam s_rec_fixture = {")
+    L += ["    Rec%s%s," % (camel("fixture"), s["name"]) for s in slots]
+    L += ["};", ""]
     return "\n".join(L)
 
 
@@ -3032,6 +3071,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         CALLBACKS_H: render_callbacks(model),
         CALLBACKS_SLOTS: render_callback_players(model),
         SHAPES_SLOTS: render_shapes(fixture_ann),
+        FIXTURE_HOOKS_INC: render_fixture_hooks(fixture_ann, fixture_model),
         JSON_OUT: json_text(ann, model),
     }
     return files, errors, model

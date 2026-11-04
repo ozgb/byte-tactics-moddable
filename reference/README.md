@@ -425,11 +425,9 @@ whatever its offset and target; a heap address in any other holder fails the gat
 `blockpointers.py --check` fails on a holder with pair rows that lacks one of them. A holder the scans have not met
 yet is added by hand as a `*`/`*` row, with its class and a note.
 
-The holders that are member functions of a `BlockVector<T>` (the decorated names `?Insert@?$BlockVector@...`, `??0?$BlockVector@...`)
-need no row: the vector's own links are Ref words, and the rest of its buffer is element data (the slack is zeroed), so a word there that
-reads as a heap address is an allocation that landed on the element bytes. Where the heap is differs from run to run (a loaded
-machine moves it), so a vector holder that never matched on one run can match on the next, and `blockpointers.py` leaves it unjudged
-(`is_data_holder`, `uncovered`). The rows already in the file for these holders are kept.
+Every allocating member function of a `BlockVector<T>` in the linker map whose T has no pointer or Ref field in the layout has a
+wildcard row too: `blockpointers.py --check` with a map fails on one without it. Plain data can read as a heap address on one run and not
+on the next, because where the heap lies differs from run to run. A T with a pointer or Ref field gets no new row, and its words stay judged.
 
 ## Zero fill and poison mode
 

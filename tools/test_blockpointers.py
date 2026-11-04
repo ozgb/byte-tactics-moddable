@@ -316,30 +316,59 @@ class MatcherTest(unittest.TestCase):
         self.assertEqual([(m.holder, m.offset, m.target) for m in missing], [("X", 0, "T"), ("P", 0, "T")])
         self.assertIn("holder not listed", bp.describe_uncovered(missing)[0])
 
-    def test_block_vector_holders_are_never_pointer_holders(self):
-        losstep = "?Insert@?$BlockVector@ULosStep@@@@QAEXPAULosStep@@IABU2@@Z"
-        scanned = [resolved(losstep, 0xb, "?_Insert@?$_Tree@HU?$pair@$$CBHH@std@@@std@@"), resolved(losstep, 0xd, "T"),
-                   resolved("??0?$BlockVector@ULosStep@@@@QAE@ABV0@@Z", 0x1d, "T"),
-                   resolved("??4?$BlockVector@VLosLine@@@@QAEAAV0@ABV0@@Z", 0x4, "T")]
-        self.assertEqual(bp.uncovered(scanned, self.ROWS), [])
+    LOS_STEP = "?Insert@?$BlockVector@ULosStep@@@@QAEXPAULosStep@@IABU2@@Z"
+    NAMED = "?Insert@?$BlockVector@UNamed@@@@QAEXPAUNamed@@IABU2@@Z"
 
-    def test_only_block_vector_member_functions_are_data_holders(self):
-        for name in ("?Insert@?$BlockVector@ULosStep@@@@QAEXPAULosStep@@IABU2@@Z", "??0?$BlockVector@VLosLine@@@@QAE@ABV0@@Z",
-                     "?Reserve@?$BlockVector@UOrderTableEntry@@@@QAEXI@Z"):
-            self.assertTrue(bp.is_data_holder(name), name)
-        for name in ("AddOrder", "AddOrder: T #2", "?Use@@YAXAAV?$BlockVector@ULosStep@@@@@Z", "?Insert@?$vector@H@std@@QAEXXZ",
-                     "SimGlobals.g_table", "unknown"):
-            self.assertFalse(bp.is_data_holder(name), name)
-        self.assertEqual([m.holder for m in bp.uncovered([resolved("AddOrder", 0, "T")], self.ROWS)], ["AddOrder"])
-
-    def test_a_scan_that_flagged_a_los_step_vector_is_clean(self):
-        map_text = MAP + " 0001:00001300       ?Insert@?$BlockVector@ULosStep@@@@QAEXPAULosStep@@IABU2@@Z   0000000000401300     a.obj\n"
+    def test_a_los_step_word_is_clean_through_its_row(self):
         scan = SCAN + "0x00401304\t-\t0xd\t0x00401200\tNAMES\t10\t0x0\t0x0\n"
+        map_text = MAP + " 0001:00001300       %s   0000000000401300     a.obj\n" % self.LOS_STEP
         namer = bp.Namer(bp.parse_map(map_text), [0x401304])
-        found = bp.resolve([bp.parse_scan(scan, "ui-keys")], namer, [])
-        stale = [r for r in found if r.holder.startswith("?Insert@?$BlockVector@ULosStep")]
-        self.assertEqual([r.offset for r in stale], [0xd])
-        self.assertEqual(bp.uncovered(stale, []), [])
+        found = [r for r in bp.resolve([bp.parse_scan(scan, "ui-keys")], namer, []) if r.holder == self.LOS_STEP]
+        self.assertEqual([r.offset for r in found], [0xd])
+        self.assertEqual([m.holder for m in bp.uncovered(found, [])], [self.LOS_STEP])
+        self.assertEqual(bp.uncovered(found, [wild(self.LOS_STEP)]), [])
+
+    def test_a_vector_of_an_element_with_a_pointer_is_still_flagged(self):
+        scanned = [resolved(self.NAMED, 0x4, "T")]
+        self.assertEqual([m.holder for m in bp.uncovered(scanned, self.ROWS)], [self.NAMED])
+
+    LAYOUTS = """*** Dumping AST Record Layout
+         0 | struct LosStep
+         0 |   unsigned short a
+         2 |   unsigned short b
+           | [sizeof=4, align=4]
+*** Dumping AST Record Layout
+         0 | struct Named
+         0 |   const char * name
+         4 |   struct StringRef text
+         4 |     Ref<char> first
+         8 |   int value
+           | [sizeof=12, align=4]
+"""
+
+    def test_elements_with_pointer_and_ref_fields_come_from_the_layout(self):
+        self.assertEqual(bp.pointer_fields(self.LAYOUTS, "LosStep"), [])
+        self.assertEqual(bp.pointer_fields(self.LAYOUTS, "Named"), ["const char * name", "Ref<char> first"])
+        self.assertIsNone(bp.pointer_fields(self.LAYOUTS, "Absent"))
+        self.assertEqual(bp.vector_element(self.LOS_STEP), "LosStep")
+        self.assertEqual(bp.vector_element("?Insert@?$BlockVector@E@@QAEXPAEIABE@Z"), "unsigned char")
+        self.assertEqual(bp.vector_element("??0?$BlockVector@VLosLine@@@@QAE@ABV0@@Z"), "LosLine")
+        self.assertEqual(bp.vector_element("?Insert@?$BlockVector@U?$Ref@UUnit@@@@@@QAEXXZ"), "Ref<Unit>")
+        self.assertIsNone(bp.vector_element("?Use@@YAXAAV?$BlockVector@ULosStep@@@@@Z"))
+
+    def test_an_unlisted_allocating_block_vector_member_fails_the_check(self):
+        lines = [" 0001:00001000       %s   0000000000401000   a.obj" % self.LOS_STEP,
+                 " 0001:00001100       %s   0000000000401100   a.obj" % self.NAMED,
+                 " 0001:00001200       ?Insert@?$BlockVector@UListed@@@@QAEXXZ   0000000000401200   a.obj",
+                 " 0001:00001300       ?Size@?$BlockVector@UOther@@@@QBEIXZ   0000000000401300   a.obj"]
+        namer = bp.Namer(bp.parse_map("\n".join(lines)), [0x401004, 0x401104, 0x401204])
+        rows = [wild("?Insert@?$BlockVector@UListed@@@@QAEXXZ")]
+        problems = bp.unlisted_vector_holders(namer, rows, self.LAYOUTS)
+        self.assertEqual(len(problems), 1)
+        self.assertIn(self.LOS_STEP, problems[0])
+        self.assertIn("review the element type", problems[0])
+        self.assertIn("add a not-a-pointer row", problems[0])
+        self.assertEqual(bp.unlisted_vector_holders(namer, rows + [wild(self.LOS_STEP)], self.LAYOUTS), [])
 
     def test_check_scans_missing_file(self):
         problems = bp.check_scans({"eight": None}, bp.ROOT / "none.map", bp.ROOT, [])

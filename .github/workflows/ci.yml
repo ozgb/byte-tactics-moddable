@@ -224,17 +224,44 @@ jobs:
           rm -rf build/x87 toolchain/thirdparty
           df -h .
 
+      - name: Cache Rust ${{ env.RUST_VERSION }}
+        if: steps.changed.outputs.run == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup/toolchains/${{ env.RUST_VERSION }}-x86_64-unknown-linux-gnu
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: rust-${{ runner.os }}-${{ env.RUST_VERSION }}-wasm32-i686gnu-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: rust-${{ runner.os }}-${{ env.RUST_VERSION }}-wasm32-i686gnu-
+
       - name: Install the WASM toolchain
         if: steps.changed.outputs.run == 'true'
         run: |
           sudo apt-get install -y --no-install-recommends gcc-mingw-w64-i686 wabt
-          rustup toolchain install "$RUST_VERSION" --profile minimal --target wasm32-unknown-unknown,i686-pc-windows-gnu
+          installed=
+          for attempt in 1 2 3; do
+            if timeout 180 rustup toolchain install "$RUST_VERSION" --profile minimal --target wasm32-unknown-unknown,i686-pc-windows-gnu; then
+              installed=1
+              break
+            fi
+            echo "rustup toolchain install: attempt $attempt failed or timed out"
+          done
+          [ -n "$installed" ]
           rustup default "$RUST_VERSION"
           url="https://github.com/bytecodealliance/wasm-tools/releases/download/v$WASM_TOOLS_VERSION/wasm-tools-$WASM_TOOLS_VERSION-x86_64-linux.tar.gz"
-          curl -fSL -o "$RUNNER_TEMP/wasm-tools.tar.gz" "$url"
+          curl -fSL --retry 3 --connect-timeout 30 --max-time 300 -o "$RUNNER_TEMP/wasm-tools.tar.gz" "$url"
           echo "$WASM_TOOLS_SHA256  $RUNNER_TEMP/wasm-tools.tar.gz" | sha256sum -c -
           mkdir -p build/tools/bin
           tar -xzf "$RUNNER_TEMP/wasm-tools.tar.gz" -C build/tools/bin --strip-components=1 "wasm-tools-$WASM_TOOLS_VERSION-x86_64-linux/wasm-tools"
+
+      - name: Cache the WASM runtime build
+        if: steps.changed.outputs.run == 'true'
+        uses: actions/cache@v4
+        with:
+          path: build/wasm_host/target
+          key: wasm-host-${{ runner.os }}-${{ env.RUST_VERSION }}-${{ hashFiles('tests/wasm/host/dll/**', 'tools/wasm_host.py') }}
+          restore-keys: wasm-host-${{ runner.os }}-${{ env.RUST_VERSION }}-
 
       - name: Build the WASM runtime and the injected wind_meteors module
         if: steps.changed.outputs.run == 'true'
@@ -457,15 +484,33 @@ jobs:
           fi
           echo "$HOME/llvm/bin" >> "$GITHUB_PATH"
 
+      - name: Cache Rust ${{ env.RUST_VERSION }}
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup/toolchains/${{ env.RUST_VERSION }}-x86_64-unknown-linux-gnu
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: rust-${{ runner.os }}-${{ env.RUST_VERSION }}-wasm32-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: rust-${{ runner.os }}-${{ env.RUST_VERSION }}-wasm32-
+
       - name: Install Rust ${{ env.RUST_VERSION }}
         run: |
-          rustup toolchain install "$RUST_VERSION" --profile minimal --target wasm32-unknown-unknown
+          installed=
+          for attempt in 1 2 3; do
+            if timeout 180 rustup toolchain install "$RUST_VERSION" --profile minimal --target wasm32-unknown-unknown; then
+              installed=1
+              break
+            fi
+            echo "rustup toolchain install: attempt $attempt failed or timed out"
+          done
+          [ -n "$installed" ]
           rustup default "$RUST_VERSION"
 
       - name: Install wasm-tools ${{ env.WASM_TOOLS_VERSION }}
         run: |
           url="https://github.com/bytecodealliance/wasm-tools/releases/download/v$WASM_TOOLS_VERSION/wasm-tools-$WASM_TOOLS_VERSION-x86_64-linux.tar.gz"
-          curl -fSL -o "$RUNNER_TEMP/wasm-tools.tar.gz" "$url"
+          curl -fSL --retry 3 --connect-timeout 30 --max-time 300 -o "$RUNNER_TEMP/wasm-tools.tar.gz" "$url"
           echo "$WASM_TOOLS_SHA256  $RUNNER_TEMP/wasm-tools.tar.gz" | sha256sum -c -
           mkdir -p build/tools/bin
           tar -xzf "$RUNNER_TEMP/wasm-tools.tar.gz" -C build/tools/bin --strip-components=1 "wasm-tools-$WASM_TOOLS_VERSION-x86_64-linux/wasm-tools"

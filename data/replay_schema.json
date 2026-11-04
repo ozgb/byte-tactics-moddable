@@ -2011,6 +2011,30 @@
       "depth": 1
      }
     ]
+   },
+   "FixtureSpan": {
+    "type": "FixtureSpan",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "from",
+      "kind": "i32"
+     },
+     {
+      "name": "to",
+      "kind": "i32"
+     }
+    ]
+   },
+   "FixtureAmount": {
+    "type": "FixtureAmount",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "amount",
+      "kind": "i32"
+     }
+    ]
    }
   },
   "rules": [
@@ -4147,6 +4171,121 @@
     "kind": "PlayerInfo",
     "size": 185
    }
+  },
+  "fixtures": {
+   "FillGoals": {
+    "ret": "void",
+    "params": [
+     {
+      "type": "int",
+      "name": "owner"
+     },
+     {
+      "type": "std::vector<FixtureSpan, std::allocator<FixtureSpan> >*",
+      "name": "goals"
+     }
+    ],
+    "args": {
+     "owner": {
+      "mode": "scalar"
+     },
+     "goals": {
+      "mode": "vector",
+      "dir": "out",
+      "elem": {
+       "mode": "value",
+       "kind": "FixtureSpan"
+      }
+     }
+    }
+   },
+   "PlaceAt": {
+    "ret": "int",
+    "params": [
+     {
+      "type": "void*",
+      "name": "pos"
+     }
+    ],
+    "args": {
+     "pos": {
+      "mode": "vec3",
+      "label": "pos",
+      "cast": "Vec3*"
+     }
+    },
+    "result": {
+     "mode": "scalar"
+    }
+   },
+   "Query": {
+    "ret": "int",
+    "params": [
+     {
+      "type": "FixtureAmount*",
+      "name": "first"
+     },
+     {
+      "type": "FixtureAmount*",
+      "name": "second"
+     }
+    ],
+    "args": {
+     "first": {
+      "mode": "struct",
+      "kind": "FixtureAmount",
+      "dir": "inout",
+      "nullable": true
+     },
+     "second": {
+      "mode": "struct",
+      "kind": "FixtureAmount",
+      "dir": "inout",
+      "nullable": true
+     }
+    },
+    "result": {
+     "mode": "scalar"
+    }
+   },
+   "ReadIds": {
+    "ret": "int",
+    "params": [
+     {
+      "type": "void*",
+      "name": "ids"
+     }
+    ],
+    "args": {
+     "ids": {
+      "mode": "bytes-in",
+      "length": "Game.slowest.unitCount",
+      "elem": "i32"
+     }
+    },
+    "result": {
+     "mode": "scalar"
+    }
+   },
+   "FillIds": {
+    "ret": "int",
+    "params": [
+     {
+      "type": "void*",
+      "name": "ids"
+     }
+    ],
+    "args": {
+     "ids": {
+      "mode": "bytes-out",
+      "length": "Game.slowest.unitCount",
+      "elem": "i32"
+     }
+    },
+    "result": {
+     "mode": "scalar"
+    }
+   }
   }
  },
  "fields": [
@@ -4228,7 +4367,9 @@
   {"name": "FixtureSlave", "type": "FixtureSlave", "scope": "state", "table": null, "inside": null, "fields": [{"name": "player", "kind": "u8"}, {"name": "master", "kind": "ref", "target": "FixtureView"}, {"name": "moved", "kind": "i32", "member": "ground.moved", "when": {"via": "player", "kind": "Player", "field": "flags", "mask": 4, "equals": 4}, "condVia": 229, "condMask": 4, "condField": 25, "condValue": 4, "condKind": "Player"}, {"name": "speed", "kind": "f32", "member": "air.speed", "when": {"via": "player", "kind": "Player", "field": "flags", "mask": 4, "equals": 0}, "condVia": 229, "condMask": 4, "condField": 25, "condValue": 0, "condKind": "Player"}, {"name": "low", "kind": "i32", "member": "narrow.low", "when": {"via": "master", "field": "flags", "mask": 2, "equals": 0}, "condVia": 230, "condMask": 2, "condField": 223, "condValue": 0, "condKind": "FixtureView"}, {"name": "high", "kind": "f32", "member": "wide.high", "when": {"via": "master", "field": "flags", "mask": 2, "equals": 2}, "condVia": 230, "condMask": 2, "condField": 223, "condValue": 2, "condKind": "FixtureView"}]},
   {"name": "FixtureHolder", "type": "FixtureHolder", "scope": "state", "table": null, "inside": null, "fields": [{"name": "id", "kind": "i32"}, {"name": "anim", "kind": "embed", "target": "Handle"}, {"name": "shadow", "kind": "embed", "target": "Handle"}]},
   {"name": "FixtureCell", "type": "FixtureCell", "scope": "state", "table": {"base": "game", "member": "p1b8a", "ref": true, "count": 9000, "alloc": 9000}, "inside": null, "delta": true, "fields": [{"name": "unit", "kind": "u16"}, {"name": "unit2", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "high", "kind": "u8"}, {"name": "low", "kind": "u8"}, {"name": "metal", "kind": "u8"}, {"name": "feature", "kind": "u16"}, {"name": "spot", "kind": "u16"}, {"name": "flags", "kind": "u16"}, {"name": "occupant", "kind": "unitid", "target": "Unit", "member": "unit", "reach": ["Unit.health"], "depth": 1, "reachFirst": 5, "reachCount": 1}, {"name": "occupant2", "kind": "unitid", "target": "Unit", "member": "unit2", "reach": ["Unit.health"], "depth": 1, "reachFirst": 5, "reachCount": 1}]},
-  {"name": "FixtureLane", "type": "FixtureLane", "scope": "state", "table": {"base": "game", "member": "p1cd5", "ref": true, "count": 4, "alloc": 4}, "inside": null, "fields": [{"name": "level", "kind": "i32"}, {"name": "unit", "kind": "u16"}, {"name": "flags", "kind": "u16"}, {"name": "occupant", "kind": "unitid", "target": "Unit", "member": "unit", "reach": ["Unit.health"], "depth": 1, "reachFirst": 5, "reachCount": 1}]}
+  {"name": "FixtureLane", "type": "FixtureLane", "scope": "state", "table": {"base": "game", "member": "p1cd5", "ref": true, "count": 4, "alloc": 4}, "inside": null, "fields": [{"name": "level", "kind": "i32"}, {"name": "unit", "kind": "u16"}, {"name": "flags", "kind": "u16"}, {"name": "occupant", "kind": "unitid", "target": "Unit", "member": "unit", "reach": ["Unit.health"], "depth": 1, "reachFirst": 5, "reachCount": 1}]},
+  {"name": "FixtureSpan", "type": "FixtureSpan", "scope": "value", "table": null, "inside": null, "fields": [{"name": "from", "kind": "i32"}, {"name": "to", "kind": "i32"}]},
+  {"name": "FixtureAmount", "type": "FixtureAmount", "scope": "value", "table": null, "inside": null, "fields": [{"name": "amount", "kind": "i32"}]}
  ],
  "subsystems": {
   "wind_meteors": {

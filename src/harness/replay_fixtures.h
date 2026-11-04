@@ -61,6 +61,15 @@ struct FixtureLane {
     unsigned short flags;
 };
 
+struct FixtureSpan {
+    int from;
+    int to;
+};
+
+struct FixtureAmount {
+    int amount;
+};
+
 struct FixtureHolder {
     int id;
     Handle anim;

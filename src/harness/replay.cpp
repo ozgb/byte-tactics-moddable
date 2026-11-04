@@ -307,6 +307,26 @@ void ArgStructs(ReplayText& t, const char* name, unsigned kind, const void* p, i
     ReplayAddStructs(t, "a", name, kind, p, count, Table());
 }
 
+void ArgInOut(ReplayText& t, const char* name, unsigned kind, const void* p)
+{
+    t.Add("  a ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddInOut(t, kind, p, Table());
+    t.AddChar('\n');
+}
+
+void ArgInOutExit(ReplayText& t, const char* name, unsigned kind, const void* p)
+{
+    if (p == nullptr)
+        return;
+    t.Add("  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddValue(t, kind, p, Table());
+    t.AddChar('\n');
+}
+
 void ArgValueStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p)
 {
     t.Add("  ");
@@ -409,6 +429,30 @@ void ImportValueStruct(ReplayText& t, unsigned kind, const void* p)
 {
     t.AddChar(' ');
     ReplayAddValue(t, kind, p, Table());
+}
+
+void ImportInOut(ReplayText& t, unsigned kind, const void* p)
+{
+    t.AddChar(' ');
+    ReplayAddInOut(t, kind, p, Table());
+}
+
+void ImportOutInOut(ReplayText& t, const char* name, unsigned kind, const void* p)
+{
+    if (p == nullptr)
+        return;
+    t.Add("\n  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddValue(t, kind, p, Table());
+}
+
+template <class T> void ImportOutValues(ReplayText& t, const char* name, unsigned kind, const std::vector<T, std::allocator<T> >* values)
+{
+    t.Add("\n  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddValueList(t, kind, values->empty() ? nullptr : &(*values)[0], (unsigned)values->size(), Table());
 }
 
 void ImportResultValue(ReplayText& t, unsigned kind, const void* p)

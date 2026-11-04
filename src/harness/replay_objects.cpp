@@ -1804,6 +1804,63 @@ void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTab
     value.Free();
 }
 
+void ReplayAddValueList(ReplayText& t, unsigned kind, const void* p, unsigned count, ReplayObjectTable& table)
+{
+    t.AddChar('[');
+    for (unsigned i = 0; i < count; i++) {
+        if (i != 0)
+            t.AddChar(',');
+        ReplayAddValue(t, kind, (const unsigned char*)p + i * kReplayObjectKinds[kind].size, table);
+    }
+    t.AddChar(']');
+}
+
+bool ReplayNextListValue(const char** cursor, char* piece, unsigned size)
+{
+    const char* q = *cursor;
+    if (*q == '[' || *q == ',')
+        q++;
+    if (*q == ']' || *q == '\0')
+        return false;
+    unsigned n = 0;
+    int depth = 0;
+    bool quoted = false;
+    for (; *q != '\0'; q++) {
+        if (quoted) {
+            if (*q == '\\' && q[1] != '\0') {
+                if (n + 2 < size) {
+                    piece[n++] = *q;
+                    piece[n++] = q[1];
+                }
+                q++;
+                continue;
+            }
+            quoted = *q != '"';
+        } else if (*q == '"') {
+            quoted = true;
+        } else if (*q == '(') {
+            depth++;
+        } else if (*q == ')') {
+            depth--;
+        } else if ((*q == ',' || *q == ']') && depth == 0) {
+            break;
+        }
+        if (n + 1 < size)
+            piece[n++] = *q;
+    }
+    piece[n] = '\0';
+    *cursor = q;
+    return true;
+}
+
+void ReplayAddInOut(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table)
+{
+    if (p == nullptr)
+        t.Add("null");
+    else
+        ReplayAddValue(t, kind, p, table);
+}
+
 bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTable& table, ReplayAllocFn alloc)
 {
     if (text[0] != '(')

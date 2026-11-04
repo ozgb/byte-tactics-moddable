@@ -65,6 +65,8 @@ target_offsets `-`, and a note; regeneration keeps it as written and builds the 
 Wildcard rows are keyed by (holder, class) where pair rows are keyed by (holder, target), and sort
 with the rest: holder, then wildcard rows first, by class. `--check` fails on a holder with pair rows
 that lacks a wildcard row for one of their classes or for not-a-pointer.
+The holders that are member functions of a `BlockVector<T>` need no wildcard row (`is_data_holder`): a heap
+address that shows in their buffers is a coincidence with the element bytes, which no run can rule out.
 """
 
 import argparse
@@ -98,6 +100,7 @@ OFFSET_TOKEN = re.compile(r"^(%s)(?:\+(%s)\*k)?$" % (HEX, HEX))
 TARGET_OFFSETS = re.compile(r"^%s(?:-%s)?$" % (HEX, HEX))
 csv.field_size_limit(1 << 28)
 LAYOUT_FLAG = ["-Xclang", "-fdump-record-layouts-complete"]
+DATA_HOLDER = re.compile(r"\?(?:[A-Za-z_]\w*@|\?[0-9A-Z])\?\$BlockVector@")
 
 
 @dataclass
@@ -632,13 +635,23 @@ def check_rows(text: str) -> list[str]:
     return problems
 
 
+def is_data_holder(holder: str) -> bool:
+    """Whether a holder is a member function of a `BlockVector<T>` instantiation, named by its decorated symbol."""
+    return DATA_HOLDER.match(holder) is not None
+
+
 def uncovered(scanned: list[Resolved], rows: list[dict]) -> list[Resolved]:
-    """The scanned words whose holder has no wildcard row, one per distinct word."""
+    """The scanned words whose holder has no wildcard row, one per distinct word.
+
+    The buffer of a block vector holds the elements of the vector (the slack after them is zeroed), and its words are never
+    pointers: the vector's own links are Ref words, offsets into the block. A word of such a buffer that reads as a heap
+    address is the address of an allocation that landed on the element bytes, which depends on where the process heap is on
+    that run, so a holder of that kind is covered without a row and no run can fail on one."""
     holders = {r["holder"] for r in rows if is_wild(r)}
     out = []
     seen = set()
     for s in scanned:
-        if s.holder in holders:
+        if s.holder in holders or is_data_holder(s.holder):
             continue
         key = (s.scenario, s.holder, s.offset, s.target)
         if key not in seen:

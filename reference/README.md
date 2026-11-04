@@ -425,6 +425,12 @@ whatever its offset and target; a heap address in any other holder fails the gat
 `blockpointers.py --check` fails on a holder with pair rows that lacks one of them. A holder the scans have not met
 yet is added by hand as a `*`/`*` row, with its class and a note.
 
+The holders that are member functions of a `BlockVector<T>` (the decorated names `?Insert@?$BlockVector@...`, `??0?$BlockVector@...`)
+need no row: the vector's own links are Ref words, and the rest of its buffer is element data (the slack is zeroed), so a word there that
+reads as a heap address is an allocation that landed on the element bytes. Where the heap is differs from run to run (a loaded
+machine moves it), so a vector holder that never matched on one run can match on the next, and `blockpointers.py` leaves it unjudged
+(`is_data_holder`, `uncovered`). The rows already in the file for these holders are kept.
+
 ## Zero fill and poison mode
 
 Game memory comes from `GameAlloc` (and `operator new`, which calls it), which is plain

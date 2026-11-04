@@ -316,6 +316,31 @@ class MatcherTest(unittest.TestCase):
         self.assertEqual([(m.holder, m.offset, m.target) for m in missing], [("X", 0, "T"), ("P", 0, "T")])
         self.assertIn("holder not listed", bp.describe_uncovered(missing)[0])
 
+    def test_block_vector_holders_are_never_pointer_holders(self):
+        losstep = "?Insert@?$BlockVector@ULosStep@@@@QAEXPAULosStep@@IABU2@@Z"
+        scanned = [resolved(losstep, 0xb, "?_Insert@?$_Tree@HU?$pair@$$CBHH@std@@@std@@"), resolved(losstep, 0xd, "T"),
+                   resolved("??0?$BlockVector@ULosStep@@@@QAE@ABV0@@Z", 0x1d, "T"),
+                   resolved("??4?$BlockVector@VLosLine@@@@QAEAAV0@ABV0@@Z", 0x4, "T")]
+        self.assertEqual(bp.uncovered(scanned, self.ROWS), [])
+
+    def test_only_block_vector_member_functions_are_data_holders(self):
+        for name in ("?Insert@?$BlockVector@ULosStep@@@@QAEXPAULosStep@@IABU2@@Z", "??0?$BlockVector@VLosLine@@@@QAE@ABV0@@Z",
+                     "?Reserve@?$BlockVector@UOrderTableEntry@@@@QAEXI@Z"):
+            self.assertTrue(bp.is_data_holder(name), name)
+        for name in ("AddOrder", "AddOrder: T #2", "?Use@@YAXAAV?$BlockVector@ULosStep@@@@@Z", "?Insert@?$vector@H@std@@QAEXXZ",
+                     "SimGlobals.g_table", "unknown"):
+            self.assertFalse(bp.is_data_holder(name), name)
+        self.assertEqual([m.holder for m in bp.uncovered([resolved("AddOrder", 0, "T")], self.ROWS)], ["AddOrder"])
+
+    def test_a_scan_that_flagged_a_los_step_vector_is_clean(self):
+        map_text = MAP + " 0001:00001300       ?Insert@?$BlockVector@ULosStep@@@@QAEXPAULosStep@@IABU2@@Z   0000000000401300     a.obj\n"
+        scan = SCAN + "0x00401304\t-\t0xd\t0x00401200\tNAMES\t10\t0x0\t0x0\n"
+        namer = bp.Namer(bp.parse_map(map_text), [0x401304])
+        found = bp.resolve([bp.parse_scan(scan, "ui-keys")], namer, [])
+        stale = [r for r in found if r.holder.startswith("?Insert@?$BlockVector@ULosStep")]
+        self.assertEqual([r.offset for r in stale], [0xd])
+        self.assertEqual(bp.uncovered(stale, []), [])
+
     def test_check_scans_missing_file(self):
         problems = bp.check_scans({"eight": None}, bp.ROOT / "none.map", bp.ROOT, [])
         self.assertIn("eight: no blockptrs.txt", problems[0])

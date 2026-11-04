@@ -574,7 +574,7 @@ static UnitTypeSet* FindCategoryMask(const char* name)
     UnitCategory* first = LowerBoundCategory(name);
     if (first != s_unitCategories.end() && _strcmpi(first->name.data, name) == 0)
         return (UnitTypeSet*)first->value;
-    return 0;
+    return nullptr;
 }
 
 // FUNCTION: 0x488c50

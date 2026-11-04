@@ -17,6 +17,10 @@ An exe built from this tree runs its modules in WASM and is given wasmtime_host.
 from its directory (`cmake --build <dir> --target wasm_runtime` makes them); `--native-modules` runs it with
 `-modules=native` instead.
 
+`BT_WINE_BIN=<dir>` puts that directory first on PATH for every Wine command this tool runs (wine, wineboot, wineserver,
+winetricks and the `wine --version` probes), so a second Wine release can be used without replacing the one on PATH. Each
+release keeps its own template prefix, so two releases never rebuild each other's.
+
 `--testmode <file>` instead runs each exe with `-testmode <file>` (a scenario of
 reference/README.md) and passes when it exits with status 0 within
 `--testmode-timeout` seconds. A `--testmode` run uses the game's headless host: no X server,
@@ -38,7 +42,7 @@ Each run has its own (except that a `--testmode` run has no X server or audio si
   its pointer and keyboard belong to nobody else (`--window` makes it a
   nested Xephyr window instead, to watch the game);
 - Wine prefix: a hardlinked copy of a template made once with wineboot
-  (build/playtest/prefix);
+  (build/playtest/prefix/<Wine release>, one template per release);
 - game directory: the game's small files copied from the Steam (or GOG)
   install, its large archives linked;
 - audio sink: a PulseAudio null sink, so the game is silent on the desktop
@@ -344,9 +348,16 @@ class NetNamespace:
                 f.close()
 
 
+def wine_path() -> str:
+    """PATH with $BT_WINE_BIN first, when it is set."""
+    path = os.environ.get("PATH", os.defpath)
+    wine_bin = os.environ.get("BT_WINE_BIN")
+    return f"{wine_bin}{os.pathsep}{path}" if wine_bin else path
+
+
 def wine_env(prefix: Path, display: str = "") -> dict[str, str]:
     env = dict(os.environ)
-    env.update(WINEPREFIX=str(prefix), WINEARCH=os.environ.get("WINEARCH", "win32"), WINEDLLOVERRIDES="mscoree,mshtml=", WINEDEBUG="-all")
+    env.update(PATH=wine_path(), WINEPREFIX=str(prefix), WINEARCH=os.environ.get("WINEARCH", "win32"), WINEDLLOVERRIDES="mscoree,mshtml=", WINEDEBUG="-all")
     env.pop("WAYLAND_DISPLAY", None)
     if display:
         env["DISPLAY"] = display
@@ -355,18 +366,36 @@ def wine_env(prefix: Path, display: str = "") -> dict[str, str]:
     return env
 
 
+def wine_version() -> str:
+    """The output of `wine --version` (with $BT_WINE_BIN applied), or "" when there is no wine."""
+    try:
+        run = subprocess.run(["wine", "--version"], capture_output=True, text=True, env={**os.environ, "PATH": wine_path()})
+    except OSError:
+        return ""
+    return run.stdout.strip()
+
+
+def release_name(version: str) -> str:
+    """A directory name for a `wine --version` output: `wine-11.0 (Staging)` gives `wine-11.0-Staging`."""
+    name = re.sub(r"[^A-Za-z0-9._-]+", "-", version).strip("-")
+    return name or "unknown"
+
+
 def template_prefix() -> Path:
-    """build/playtest/prefix: a fresh 32-bit prefix, made again when Wine changes.
+    """build/playtest/prefix/<release>: a fresh 32-bit prefix for this Wine release, made again when its build changes.
 
     A crash prints winedbg's backtrace to wine.log and ends the process, rather
     than waiting on Wine's crash dialog.
     """
-    path = OUT / "prefix"
-    version = subprocess.run(["wine", "--version"], capture_output=True, text=True).stdout.strip()
-    version += f" (template {TEMPLATE_REVISION})"
+    root = OUT / "prefix"
+    release = wine_version()
+    path = root / release_name(release)
+    version = f"{release} (template {TEMPLATE_REVISION})"
     stamp = path / ".playtest-wine-version"
     if stamp.exists() and stamp.read_text() == version:
         return path
+    if (root / ".playtest-wine-version").exists():
+        shutil.rmtree(root, ignore_errors=True)
     print(f"making the template Wine prefix {path.relative_to(ROOT)} ({version})", flush=True)
     shutil.rmtree(path, ignore_errors=True)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -380,19 +409,19 @@ def template_prefix() -> Path:
 
 
 def directplay_prefix() -> Path:
-    """build/playtest/prefix-directplay: the template with Microsoft's DirectPlay.
+    """build/playtest/prefix/<release>-directplay: the template with Microsoft's DirectPlay.
 
     Wine's own dpwsockx (the TCP/IP service provider) is a stub up to Wine 9 at
     least, so multiplayer needs the native DLLs: winetricks' directplay verb takes
     them from the DirectX June 2010 redistributable (from its cache, or downloaded).
     """
     base = template_prefix()
-    path = OUT / "prefix-directplay"
+    path = base.with_name(f"{base.name}-directplay")
     stamp = path / ".playtest-directplay"
     version = (base / ".playtest-wine-version").read_text()
     if stamp.exists() and stamp.read_text() == version:
         return path
-    if not shutil.which("winetricks"):
+    if not shutil.which("winetricks", path=wine_path()):
         raise SystemExit("multiplayer needs winetricks (sudo apt install winetricks) for native DirectPlay")
     print(f"making {path.relative_to(ROOT)}: winetricks directplay", flush=True)
     shutil.rmtree(path, ignore_errors=True)
@@ -1637,7 +1666,7 @@ def main() -> None:
         ap.error(f"{args.testmode} is not a file")
     tools = (("wine", "Xvfb", "xdpyinfo") if args.xserver else ("wine",)) if args.testmode and not args.scenario else ("Xephyr" if args.window else "Xvfb", "xdotool", "import", "wine", "pactl", "parec")
     for tool in tools:
-        if not shutil.which(tool):
+        if not shutil.which(tool, path=wine_path()):
             raise SystemExit(f"{tool} is not installed")
     exes = resolve_exes(args.exe)
     if not args.native_modules:
@@ -1657,7 +1686,7 @@ def main() -> None:
         check_scenario(sc, screens)
     if any(sc.instances > 1 or sc.directplay for sc in scenarios):
         for tool in NETNS_TOOLS:
-            if not shutil.which(tool):
+            if not shutil.which(tool, path=wine_path()):
                 raise SystemExit(f"{tool} is not installed: a multiplayer run needs {', '.join(NETNS_TOOLS)}")
     game_src = find_game_dir(args.game_dir)
 

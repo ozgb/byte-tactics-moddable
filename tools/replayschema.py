@@ -40,6 +40,7 @@ import re
 import sys
 from pathlib import Path
 
+import replay_subsystems
 import traceschema
 from rwsets import load_sim_map
 
@@ -2027,7 +2028,7 @@ def function_files() -> dict[str, str]:
 def replay_link_sources() -> set[str]:
     """The source files the replayer links: those of the REPLAY_SUBSYSTEMS and the ones its target lists."""
     text = (ROOT / "CMakeLists.txt").read_text()
-    subs = set(re.search(r"set\(REPLAY_SUBSYSTEMS ([^)]*)\)", text).group(1).split())
+    subs = set(replay_subsystems.load())
     listed = re.search(r"add_library\(replay_native_test_objects OBJECT ([^)]*)\)", text).group(1)
     files = set(re.findall(r"\b(src/[\w/]+\.cpp)\b", listed))
     with SUBSYSTEMS.open(newline="") as f:

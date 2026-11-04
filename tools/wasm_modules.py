@@ -422,6 +422,8 @@ def parse_module(data):
         section, i = data[i], i + 1
         size, i = leb(data, i)
         body, end = i, i + size
+        if end > len(data):
+            raise ValueError(f"section {section} runs {end - len(data)} bytes past the end of the file")
         if section == 2:
             count, j = leb(data, body)
             for _ in range(count):
@@ -691,6 +693,8 @@ def check_interface(name, imports, exports, spec, details=None):
         extra, missing = sorted(set(exports) - set(spec["exports"])), sorted(set(spec["exports"]) - set(exports))
         problems.append(f"{name}: exports differ from the manifest: extra {extra}, missing {missing}")
     if details is not None:
+        for field in details.get("imported_exports", []):
+            problems.append(f"{name}: exports {field} as an imported function: a slot must be a function the module defines")
         for module, field in details["globals"]:
             problems.append(f"{name}: imports the global {module}.{field}: a module reads its block base from g_blockBase")
         problems += check_kinds(name, spec, details)
@@ -709,14 +713,24 @@ def module_interface(wasm_tools, path):
     imports = re.findall(r'^\s*\(import "([^"]*)" "([^"]*)"', text, re.M)
     exports = re.findall(r'^\s*\(export "([^"]*)"', text, re.M)
     types = {int(n): body for n, body in re.findall(r"^\s*\(type \(;(\d+);\) \(func([^\n]*)\)\)$", text, re.M)}
-    details = {"globals": re.findall(r'^\s*\(import "([^"]*)" "([^"]*)" \(global', text, re.M), "imports": {}, "exports": {}}
+    details = {"globals": re.findall(r'^\s*\(import "([^"]*)" "([^"]*)" \(global', text, re.M), "imports": {}, "exports": {}, "imported_exports": []}
     for module, field, body in re.findall(r'^\s*\(import "([^"]*)" "([^"]*)" \(func (.*)\)\)$', text, re.M):
         details["imports"][(module, field)] = signature_of(body)
-    funcs = {}
-    for label, typeno, rest in re.findall(r"^\s*\(func (\$\S+) \(;\d+;\) \(type (\d+)\)([^\n]*)$", text, re.M):
-        funcs[label] = signature_of(types[int(typeno)])
-    for field, label in re.findall(r'^\s*\(export "([^"]*)" \(func (\$\S+)\)\)', text, re.M):
-        details["exports"][field] = funcs[label]
+    labels, imported, funcs = {}, set(), {}
+    for label, index in re.findall(r'^\s*\(import "[^"]*" "[^"]*" \(func (?:(\$\S+) )?\(;(\d+);\)', text, re.M):
+        imported.add(int(index))
+        if label:
+            labels[label] = int(index)
+    for label, index, typeno in re.findall(r"^\s*\(func (?:(\$\S+) )?\(;(\d+);\) \(type (\d+)\)", text, re.M):
+        funcs[int(index)] = signature_of(types[int(typeno)])
+        if label:
+            labels[label] = int(index)
+    for field, target in re.findall(r'^\s*\(export "([^"]*)" \(func (\$\S+|\d+)\)\)', text, re.M):
+        index = int(target) if target.isdigit() else labels.get(target)
+        if index in imported or index is None:
+            details["imported_exports"].append(field)
+        else:
+            details["exports"][field] = funcs[index]
     return imports, exports, details
 
 
@@ -734,9 +748,14 @@ def check_module_file(game, entry, path, wasm_tools):
         info = parse_module(data)
     except (ValueError, IndexError) as e:
         return [f"{entry['name']}: cannot read the module: {e}"]
-    if info["stack_top"] is None or not info["segments"] or not info["elements"]:
-        return [f"{entry['name']}: has no stack pointer, data segment or table entry to place"]
-    others = [r for r in fixture_ranges()]
+    missing = []
+    if info["stack_top"] is None:
+        missing.append(f"{entry['name']}: has no stack pointer: its first global is not an i32.const")
+    if not info["segments"]:
+        missing.append(f"{entry['name']}: has no data segment, so its data and stack cannot be placed")
+    if missing:
+        return missing
+    others = list(fixture_ranges())
     others += [(m["name"], m["data_base"], m["data_base"] + game["window"], m["table_base"], m["table_base"] + game["table_slots"])
                for m in game["modules"] if m["name"] != entry["name"]]
     problems = check_window(entry, game, info, others)
@@ -745,17 +764,32 @@ def check_module_file(game, entry, path, wasm_tools):
     except subprocess.CalledProcessError as e:
         return problems + [f"{entry['name']}: wasm-tools cannot read the module: {e.stderr.strip() if e.stderr else e}"]
     problems += check_interface(entry["name"], imports, exports, interface_spec(entry), details)
+    try:
+        problems += [f"{entry['name']}: metering surface: {p}" for p in wasm_fuel.check_unmetered_surface(data, wasm_tools)]
+    except wasm_fuel.FuelError as e:
+        problems.append(f"{entry['name']}: cannot check the metering surface: {e}")
     return problems + check_size(entry, len(data))
 
 
+CANNOT_CHECK = 2
+
+
 def run_check_module(path, name):
-    game = game_manifest()
-    entry = next((m for m in game["modules"] if m["name"] == name), None)
-    if entry is None:
-        sys.exit(f"check-module: the manifest has no module {name} (it has {', '.join(m['name'] for m in game['modules'])})")
-    if not os.path.isfile(path):
-        sys.exit(f"check-module: {path} is not a file")
-    problems = check_module_file(game, entry, path, find_wasm_tools(game["tools"]["wasm-tools"]))
+    """Exit 0 when the file passes, 1 when it breaks a rule, CANNOT_CHECK when the check could not run (not the module's fault)."""
+    try:
+        game = game_manifest()
+        entry = next((m for m in game["modules"] if m["name"] == name), None)
+        if entry is None:
+            raise SystemExit(f"check-module: the manifest has no module {name} (it has {', '.join(m['name'] for m in game['modules'])})")
+        if not os.path.isfile(path):
+            raise SystemExit(f"check-module: {path} is not a file")
+        problems = check_module_file(game, entry, path, find_wasm_tools(game["tools"]["wasm-tools"]))
+    except SystemExit as e:
+        print(e.code, file=sys.stderr)
+        return CANNOT_CHECK
+    except Exception as e:
+        print(f"check-module: could not check {path}: {type(e).__name__}: {e}", file=sys.stderr)
+        return CANNOT_CHECK
     for problem in problems:
         print(problem)
     if problems:
@@ -1230,7 +1264,8 @@ def main():
         return run_glue_fatal(args.exe, args.game_dir)
     if args.command == "check-module":
         if not args.module or not args.name:
-            sys.exit("check-module: needs a .wasm file and --name SUBSYSTEM")
+            print("check-module: needs a .wasm file and --name SUBSYSTEM", file=sys.stderr)
+            return CANNOT_CHECK
         return run_check_module(args.module, args.name)
     if args.command == "build":
         build()

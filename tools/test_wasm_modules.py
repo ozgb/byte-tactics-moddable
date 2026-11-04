@@ -460,6 +460,114 @@ class ModuleFileTests(unittest.TestCase):
             self.assertNotIn("scenarios", result)
             self.assertFalse(os.path.exists(os.path.join(out, "runtime")))
 
+    def edited(self, name, change):
+        text = subprocess.run([self.wasm_tools, "print", BUILT], capture_output=True, text=True, check=True).stdout
+        changed = change(text)
+        self.assertNotEqual(changed, text)
+        path = os.path.join(self.dir.name, name)
+        with open(path, "wb") as f:
+            f.write(subprocess.run([self.wasm_tools, "parse", "-"], input=changed.encode(), capture_output=True, check=True).stdout)
+        return path
+
+    def test_an_export_of_an_imported_function_is_named(self):
+        path = self.edited("imported-export.wasm", lambda t: t.replace('(export "UpdateWind" (func $export_UpdateWind))', '(export "UpdateWind" (func 0))'))
+        problems = self.problems(path)
+        self.assertTrue(any("exports UpdateWind as an imported function" in p for p in problems), problems)
+
+    def test_a_module_without_names_passes(self):
+        path = os.path.join(self.dir.name, "stripped.wasm")
+        subprocess.run([self.wasm_tools, "strip", "-a", BUILT, "-o", path], check=True)
+        self.assertNotIn(b"export_UpdateWind", open(path, "rb").read())
+        self.assertEqual(self.problems(path), [])
+
+    def test_a_module_without_an_element_segment_passes(self):
+        with open(BUILT, "rb") as f:
+            data = f.read()
+        self.assertTrue(wm.parse_module(data)["elements"])
+        text = subprocess.run([self.wasm_tools, "print", "-"], input=data, capture_output=True, check=True).stdout.decode()
+        lines = [line for line in text.split("\n") if not line.lstrip().startswith("(elem ")]
+        self.assertLess(len(lines), len(text.split("\n")))
+        path = os.path.join(self.dir.name, "no-elem.wasm")
+        with open(path, "wb") as f:
+            f.write(subprocess.run([self.wasm_tools, "parse", "-"], input="\n".join(lines).encode(), capture_output=True, check=True).stdout)
+        self.assertEqual(wm.parse_module(open(path, "rb").read())["elements"], [])
+        self.assertEqual(self.problems(path), [])
+
+    def test_exports_without_metering_are_refused(self):
+        path = self.edited("unmetered.wasm", lambda t: t.replace("i64.sub", "i64.add"))
+        problems = self.problems(path)
+        self.assertTrue(any("metering surface: has no metering code" in p for p in problems), problems)
+
+
+class ModuleWithoutPlaces(unittest.TestCase):
+    GAME = wm.game_manifest()
+    ENTRY = GAME["modules"][0]
+
+    def info(self, **changes):
+        return dict({"memory_min": 4, "table_min": 65, "stack_top": 0x30100, "elements": [], "segments": [(0x30000, 16)]}, **changes)
+
+    def run_with(self, info):
+        saved = wm.parse_module
+        wm.parse_module = lambda data: info
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".wasm") as f:
+                return wm.check_module_file(self.GAME, self.ENTRY, f.name, "wasm-tools-is-not-reached")
+        finally:
+            wm.parse_module = saved
+
+    def test_no_stack_pointer_has_its_own_message(self):
+        problems = self.run_with(self.info(stack_top=None))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("has no stack pointer", problems[0])
+
+    def test_no_data_segment_has_its_own_message(self):
+        problems = self.run_with(self.info(segments=[]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("has no data segment", problems[0])
+
+    def test_a_section_past_the_end_is_named(self):
+        with self.assertRaisesRegex(ValueError, "section 11 runs 6 bytes past the end"):
+            wm.parse_module(b"\0asm\1\0\0\0" + bytes([11, 10, 0, 0, 0, 0]))
+
+
+class CheckModuleExit(unittest.TestCase):
+    def run_command(self, *args, env=None):
+        cmd = [sys.executable, os.path.join(wm.ROOT, "tools", "wasm_modules.py"), "check-module", *args]
+        return subprocess.run(cmd, capture_output=True, text=True, env=env)
+
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        self.module = os.path.join(self.dir.name, "m.wasm")
+        with open(self.module, "wb") as f:
+            f.write(b"\0asm\1\0\0\0")
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def test_an_unknown_subsystem_could_not_be_checked(self):
+        r = self.run_command(self.module, "--name", "nope")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("the manifest has no module nope", r.stderr)
+
+    def test_a_missing_wasm_tools_could_not_be_checked(self):
+        r = self.run_command(self.module, "--name", "wind_meteors", env=dict(os.environ, WASM_TOOLS=os.path.join(self.dir.name, "none")))
+        self.assertEqual(r.returncode, 2)
+        self.assertEqual(r.stdout, "")
+
+    def test_a_missing_file_could_not_be_checked(self):
+        self.assertEqual(self.run_command(os.path.join(self.dir.name, "none.wasm"), "--name", "wind_meteors").returncode, 2)
+
+    def test_an_internal_exception_could_not_be_checked(self):
+        def broken(*_args):
+            raise RuntimeError("boom")
+        saved = wm.check_module_file
+        wm.check_module_file = broken
+        try:
+            code = wm.run_check_module(self.module, "wind_meteors")
+        finally:
+            wm.check_module_file = saved
+        self.assertEqual(code, 2)
+
 
 if __name__ == "__main__":
     unittest.main()

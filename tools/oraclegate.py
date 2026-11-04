@@ -100,7 +100,9 @@ def check_module(module: Path, subsystem: str) -> str | None:
     r = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
     if r.returncode == 0:
         return None
-    return ((r.stdout + r.stderr).strip() or f"check-module exited {r.returncode}")[:MESSAGE_LIMIT]
+    if r.returncode != 1:
+        raise Error(f"check-module could not check the module (exit {r.returncode}): {(r.stderr + r.stdout).strip()[-MESSAGE_LIMIT:]}")
+    return ((r.stdout + r.stderr).strip() or "check-module exited 1")[:MESSAGE_LIMIT]
 
 
 def probe(exe: Path, game_dir: str | None, work: Path) -> str | None:
@@ -210,6 +212,8 @@ def stream(cmd: list[str], log: Path) -> tuple[int, str]:
 
 def judge(module: Path, subsystem: str, full: bool, build: Path, out: Path, game_dir: str | None) -> dict:
     started = time.time()
+    for stale in ("runtime", "logs"):
+        shutil.rmtree(out / stale, ignore_errors=True)
     problems = check_module(module, subsystem)
     if problems is not None:
         return build_result(subsystem, module, full, kit_version(), None, None, problems, time.time() - started)

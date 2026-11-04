@@ -48,15 +48,20 @@ struct ReplayField {
     unsigned short array;
 };
 
+struct ReplayInsideSite {
+    unsigned char kind;
+    unsigned char container;
+    unsigned offset;
+    const char* member;
+};
+
 struct ReplayObjectKind {
     const char* name;
     unsigned size;
     unsigned char scope;
     unsigned char table;
-    unsigned char hasInside;
-    unsigned char insideKind;
-    unsigned insideOffset;
-    const char* insideName;
+    unsigned char insideFirst;
+    unsigned char insideCount;
     unsigned char polyFirst;
     unsigned char polyCount;
 };
@@ -80,6 +85,14 @@ struct ReplayCodeTable {
     unsigned count;
 };
 
+struct ReplayCondition {
+    unsigned short field;
+    unsigned short via;
+    unsigned char kind;
+    unsigned mask;
+    int value;
+};
+
 struct ReplayObjectField {
     const char* name;
     unsigned offset;
@@ -89,8 +102,7 @@ struct ReplayObjectField {
     unsigned char target;
     unsigned short rangeEnd;
     unsigned short rangeBegin;
-    unsigned short condField;
-    int condValue;
+    ReplayCondition when;
     unsigned short reachFirst;
     unsigned short reachCount;
     unsigned short array;

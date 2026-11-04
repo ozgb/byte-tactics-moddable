@@ -412,6 +412,21 @@ void ReplayImportEnd(ReplayImport& c)
         AddResult(t, c.result);
         break;
     }
+    case RI_EXECUTE_COMMAND_TEXT:
+    {
+        AddSpace(t);
+        ReplayAddTextN(t, (const char*)a[0].v.p, a[1].v.i);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddSpace(t);
+        ReplayAddArgs(t, (const CommandArgs*)a[2].v.p);
+        AddSpace(t);
+        t.AddInt(a[3].v.i);
+        AddResult(t, c.result);
+        t.AddText(s_nested);
+        s_nested.Clear();
+        break;
+    }
     }
     t.AddChar('\n');
     ReplayCalls() = 1;

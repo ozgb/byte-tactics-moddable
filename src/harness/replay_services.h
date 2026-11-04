@@ -47,6 +47,7 @@ enum ReplayImportId {
     RI_LOAD_3DO,
     RI_LOAD_OBJECT_3D,
     RI_GET_OBJECT_HEIGHT,
+    RI_EXECUTE_COMMAND_TEXT,
     RI_COUNT
 };
 
@@ -95,6 +96,7 @@ static const char* const kReplayImportNames[RI_COUNT] = {
     "services.Load3do",
     "services.LoadObject3d",
     "services.GetObjectHeight",
+    "services.ExecuteCommandText",
 };
 
 #endif

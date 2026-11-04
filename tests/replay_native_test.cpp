@@ -171,6 +171,9 @@ const ReplaySlotSets* g_sets;
 enum { MAX_CALLBACK_LINES = 1024 };
 const char* g_cbLines[MAX_CALLBACK_LINES];
 int g_cbCount;
+int g_cbImportIndex;
+int g_nestedFrom;
+int g_nestedAfter;
 
 char g_fakeRecords[MAX_RECORDS][16];
 HapiBank g_bank;
@@ -418,6 +421,7 @@ const char* Enter(const ReplayText& actual)
     g_importsTotal++;
     g_outCount = 0;
     g_cbCount = 0;
+    g_cbImportIndex = index;
     char key[96];
     const char* space = strchr(actual.Data(), ' ');
     int nameLength = space == nullptr ? (int)strlen(actual.Data()) : (int)(space - actual.Data());
@@ -858,13 +862,88 @@ void* SnapshotAnswer(const char* result, unsigned bytes, unsigned* offset)
 
 }
 
+namespace {
+
+void PlayNestedCalls(const char* import);
+
+
+const char* EnterNested(const ReplayText& actual)
+{
+    const char* space = strchr(actual.Data(), ' ');
+    size_t n = space == nullptr ? strlen(actual.Data()) : (size_t)(space - actual.Data());
+    int at = g_cursor;
+    while (at < g_callEnd && !(strncmp(g_lines[at], "  i ", 4) == 0 && strncmp(g_lines[at] + 4, actual.Data(), n) == 0 && (g_lines[at][4 + n] == ' ' || g_lines[at][4 + n] == '\0')))
+        at++;
+    g_nestedFrom = g_cursor;
+    if (at < g_callEnd)
+        g_cursor = at;
+    const char* result = Enter(actual);
+    g_nestedAfter = g_cursor;
+    return result;
+}
+
+}
+
 #include "replay_services.h"
 
 namespace {
 
+struct NestedScope {
+    NestedScope() : count(g_cbCount), outer(g_cbImportIndex), after(g_nestedAfter)
+    {
+        memcpy(line, g_cbLines, (unsigned)g_cbCount * sizeof g_cbLines[0]);
+        g_cursor = g_nestedFrom;
+    }
+    ~NestedScope() { g_cursor = after; }
+    void Restore() const { g_cbImportIndex = outer; }
+    const char* line[MAX_CALLBACK_LINES];
+    int count;
+    int outer;
+    int after;
+
+private:
+    NestedScope(const NestedScope&);
+    NestedScope& operator=(const NestedScope&);
+};
+
+const char* NestedName(const char* line, const char** args)
+{
+    const char* end = strchr(line, ' ');
+    *args = end == nullptr ? line + strlen(line) : end;
+    return line;
+}
+
+void ParseArgsList(const char** args, ArgvHolder& holder)
+{
+    memset(&holder, 0, sizeof holder);
+    while (**args == ' ')
+        (*args)++;
+    if (**args != '[') {
+        while (**args != '\0' && **args != ' ')
+            (*args)++;
+        return;
+    }
+    (*args)++;
+    while (**args != ']' && **args != '\0') {
+        if (**args == ',') {
+            (*args)++;
+            continue;
+        }
+        if (holder.args.count < 0x14) {
+            *args = ParseQuoted(*args, holder.text[holder.args.count], sizeof holder.text[0]);
+            holder.args.args[holder.args.count] = holder.text[holder.args.count];
+            holder.args.count++;
+        } else {
+            *args = ParseQuoted(*args, holder.text[0], sizeof holder.text[0]);
+        }
+    }
+    if (**args == ']')
+        (*args)++;
+}
+
 void CallbackKey(char* key, const char* import, int k)
 {
-    sprintf(key, "import %d %s.c[%d]", g_importIndex - 1, import, k);
+    sprintf(key, "import %d %s.c[%d]", g_cbImportIndex, import, k);
 }
 
 const char* CallbackMethod(int k, unsigned handle, const void* object, const char* label, const char* import, const char** args)
@@ -2768,6 +2847,52 @@ void LoadReadsSelfTest()
     Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.LoadAnimGaf") == 0, "and so is a changed name");
 }
 
+void ExecuteCommandSelfTest()
+{
+    printf("services: ExecuteCommandText\n");
+    ResetBlock();
+    const char* body =
+        "  i services.CommandArgs_GetIntArg 1 0 = 1\n"
+        "  i services.CommandArgs_GetIntArg 1 0 = 0\n"
+        "  i services.ExecuteCommandText \"meteor 1\\nmeteor 0\" 17 [\"x\"] -1 = 1\n"
+        "    c wind_meteors.CmdMeteor [\"meteor\",\"1\"]\n"
+        "    c wind_meteors.CmdMeteor [\"meteor\",\"0\"]\n"
+        "  i services.RandomInt 5 = 3\n";
+    BeginServices(body);
+    CommandArgs vars;
+    memset(&vars, 0, sizeof vars);
+    char first[2] = "x";
+    vars.args[0] = first;
+    vars.count = 1;
+    const ReplayField* enabled = FindField("SimGlobals.g_meteorsEnabled");
+    ReplayText value;
+    char text[] = "meteor 1\nmeteor 0";
+    int ran = ExecuteCommandText(text, 17, &vars, -1);
+    FormatField(*enabled, value);
+    Check(ran == 1, "the result of the command text replays");
+    Check(strcmp(value.Data(), "0") == 0, "and the nested commands ran in order on the module, the last one leaving meteors off");
+    Check(RandomInt(5) == 3, "the imports after the commands replay from where the commands left the lines");
+    Check(g_diffs == 0 && g_importIndex == 4, "nothing differs, the nested imports and the import itself included");
+
+    BeginServices(body);
+    ExecuteCommandText(text, 17, &vars, 0);
+    printf("a changed mask: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.ExecuteCommandText") == 0, "a changed argument is reported at the import");
+
+    const char* changed =
+        "  i services.CommandArgs_GetIntArg 1 0 = 1\n"
+        "  i services.CommandArgs_GetIntArg 1 0 = 0\n"
+        "  i services.ExecuteCommandText \"meteor 1\\nmeteor 0\" 17 [\"x\"] -1 = 1\n"
+        "    c wind_meteors.CmdMeteor [\"meteor\",\"1\"]\n"
+        "    c wind_meteors.CmdMeteor [\"meteor\",\"0\"] = 5\n";
+    BeginServices(changed);
+    ExecuteCommandText(text, 17, &vars, -1);
+    printf("a changed result: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.ExecuteCommandText.c[1]") == 0, "a result that differs is reported at the call under the import");
+
+    value.Free();
+}
+
 typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
 
 unsigned CodeIndex(const char* table, const void* function)
@@ -2965,6 +3090,7 @@ int SelfTest(const char* file)
     CommandsSelfTest();
     SimPlumbingSelfTest();
     LoadReadsSelfTest();
+    ExecuteCommandSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {
@@ -2981,6 +3107,7 @@ int SelfTest(const char* file)
 
 int main(int argc, char** argv)
 {
+    setvbuf(stdout, nullptr, _IONBF, 0);
     int expectCall = -1;
     const char* expectField = nullptr;
     int arg = 1;

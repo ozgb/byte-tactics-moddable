@@ -3033,6 +3033,32 @@
      }
     ],
     "result": "int"
+   },
+   {
+    "name": "ExecuteCommandText",
+    "id": "RI_EXECUTE_COMMAND_TEXT",
+    "declaration": "int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mask);",
+    "args": [
+     {
+      "mode": "textn",
+      "param": "text",
+      "length": "len"
+     },
+     {
+      "mode": "int",
+      "param": "len"
+     },
+     {
+      "mode": "commandargs",
+      "param": "vars"
+     },
+     {
+      "mode": "int",
+      "param": "mask"
+     }
+    ],
+    "result": "int",
+    "nested": true
    }
   ],
   "code_tables": {

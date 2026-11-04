@@ -554,6 +554,23 @@ int __stdcall GetObjectHeight(Object3do* model)
     return atoi(result);
 }
 
+int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mask)
+{
+    ReplayText t;
+    StartImport(t, RI_EXECUTE_COMMAND_TEXT);
+    Space(t);
+    ReplayAddTextN(t, text, (int)len);
+    Space(t);
+    t.AddInt((int)len);
+    Space(t);
+    ReplayAddArgs(t, (const CommandArgs*)vars);
+    Space(t);
+    t.AddInt((int)mask);
+    const char* result = EnterNested(t);
+    PlayNestedCalls("services.ExecuteCommandText");
+    return atoi(result);
+}
+
 bool ReplayAnswerImport(ReplayImport& c)
 {
     switch (c.id) {

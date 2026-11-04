@@ -898,6 +898,59 @@ class Services(unittest.TestCase):
         self.assertTrue(any("RI_TRANSLATE" in e for e in rs.check_service_hooks(services)))
 
 
+class ReentrantServices(unittest.TestCase):
+    """ExecuteCommandText: the commands it runs are c lines under its i line."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def spec(self):
+        return [s for s in annotations()["services"] if s["name"] == "ExecuteCommandText"][0]
+
+    def test_the_text_and_the_arguments_are_written_by_their_lengths_and_lists(self):
+        text = rs.render_service_end([self.spec()])
+        self.assertIn("ReplayAddTextN(t, (const char*)a[0].v.p, a[1].v.i);", text)
+        self.assertIn("ReplayAddArgs(t, (const CommandArgs*)a[2].v.p);", text)
+        self.assertIn("t.AddText(s_nested);\n        s_nested.Clear();", text)
+
+    def test_the_stub_finds_its_line_among_the_nested_imports_and_plays_the_commands(self):
+        answers = rs.render_service_answers([self.spec()])
+        self.assertIn("const char* result = EnterNested(t);", answers)
+        self.assertIn('PlayNestedCalls("services.ExecuteCommandText");', answers)
+
+    def test_a_command_slot_is_nested_and_a_slot_that_is_not_a_command_is_not(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        slots = model["subsystems"]["wind_meteors"]["slots"]
+        self.assertTrue(rs.nestable("CmdMeteor", slots["CmdMeteor"]))
+        self.assertFalse(rs.nestable("UpdateWind", slots["UpdateWind"]))
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecWindMeteorsCmdMeteor("):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('line.Add("\\n    c wind_meteors.CmdMeteor");', body)
+        self.assertIn("ImportArgv(line, a0);", body)
+        self.assertIn("FinishNested(line);", body)
+        self.assertIn("bool IsNestedSlot(unsigned slot)\n{\n    switch (slot) {\n    case RSL_WIND_METEORS_CMDMETEOR:", hooks)
+        self.assertIn("if (on[SUB_WIND_METEORS] || any)\n        s_rec_wind_meteors.CmdMeteor = RecWindMeteorsCmdMeteor;", hooks)
+
+    def test_the_replayer_makes_the_nested_calls_through_the_seam_table(self):
+        files, _, _ = self.generated()
+        slots = files[rs.SLOTS_H]
+        self.assertIn("void PlayNestedCalls(const char* import)", slots)
+        self.assertIn('if (CallbackIs(name, "wind_meteors.CmdMeteor")) {', slots)
+        self.assertIn("g_seams.wind_meteors->CmdMeteor(&p0.args);", slots)
+
+    def test_a_length_for_the_text_names_an_int_argument(self):
+        ann = annotations()
+        [s for s in ann["services"] if s["name"] == "ExecuteCommandText"][0]["args"][0]["length"] = "nowhere"
+        self.assertTrue(any("service ExecuteCommandText: the argument text needs a `length`" in e for e in self.generated(ann)[1]))
+
+    def test_a_re_entrant_service_has_an_int_result(self):
+        ann = annotations()
+        [s for s in ann["services"] if s["name"] == "ExecuteCommandText"][0]["result"] = "text"
+        self.assertTrue(any("a re-entrant service has an int or no result" in e for e in self.generated(ann)[1]))
+
+
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
         files, errors, model = rs.generate(rs.read_rows())

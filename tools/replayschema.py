@@ -1092,14 +1092,25 @@ def render_hooks(ann: dict, model: dict) -> str:
                 L.append("            return true;")
             L.append("        return false;")
     L += ["    default:", "        return false;", "    }", "}", ""]
+    L += ["bool IsNestedSlot(unsigned slot)", "{", "    switch (slot) {"]
+    for sub, spec in subsystems.items():
+        for slot, s in spec["slots"].items():
+            if nestable(slot, s):
+                L.append("    case RSL_%s_%s:" % (upper(sub), upper(slot)))
+    L += ["        return true;", "    default:", "        return false;", "    }", "}", ""]
     L.append("void HookSeams(const bool* on)")
     L.append("{")
+    L.append("    bool any = false;")
+    L.append("    for (unsigned i = 0; i < SUB_COUNT; i++)")
+    L.append("        any = any || on[i];")
     for sub, spec in subsystems.items():
         L.append("    s_inner_%s = g_seams.%s;" % (sub, sub))
         L.append("    s_rec_%s = *s_inner_%s;" % (sub, sub))
     for sub, spec in subsystems.items():
         for slot in spec["slots"]:
             owners = ["on[SUB_%s]" % upper(sub)] + ["on[SUB_%s]" % upper(o) for o in imported.get(sub + "." + slot, [])]
+            if nestable(slot, spec["slots"][slot]):
+                owners.append("any")
             L.append("    if (%s)" % " || ".join(owners))
             L.append("        s_rec_%s.%s = Rec%s%s;" % (sub, slot, camel(sub), slot))
     for sub in subsystems:
@@ -1130,12 +1141,22 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L += ["        " + x for x in arg_out(a, i, "a", objects)]
     L.append("    }")
     callback_args = [i for i, a in enumerate(s["args"]) if a["mode"] == "callback"]
-    if is_import:
+    nest = nestable(slot, s)
+    if is_import or nest:
         for i in callback_args:
             L.append("    ReplayCallbackScope cb%d;" % i)
         L.append("    ReplayText line;")
-        L.append("    if (scope.Import()) {")
-        L.append('        line.Add("  i %s.%s");' % (sub, slot))
+        if is_import and nest:
+            condition = "scope.Import() || scope.Nested()"
+            head = 'line.Add(scope.Nested() ? "\\n    c %s.%s" : "  i %s.%s");' % (sub, slot, sub, slot)
+        elif is_import:
+            condition = "scope.Import()"
+            head = 'line.Add("  i %s.%s");' % (sub, slot)
+        else:
+            condition = "scope.Nested()"
+            head = 'line.Add("\\n    c %s.%s");' % (sub, slot)
+        L.append("    if (%s) {" % condition)
+        L.append("        " + head)
         for i, a in enumerate(s["args"]):
             L += ["        " + x for x in arg_out(a, i, "i", objects)]
         L.append("    }")
@@ -1162,6 +1183,12 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
                 L.append('        ImportOutUnits(line, "%s", a%d, kReplayReachFields + %d, %d);' % (a["line"], i, a["reachFirst"], a["reachCount"]))
         L.append("        FinishImport(line);")
         L.append("    }")
+    if nest:
+        L.append("    if (scope.Nested()) {")
+        if res is not None:
+            L += ["        " + x for x in result_out(res, objects, "i")]
+        L.append("        FinishNested(line);")
+        L.append("    }")
     L.append("    if (scope.Open()) {")
     for i, a in enumerate(s["args"]):
         L += ["        " + x for x in arg_out(a, i, "o", objects)]
@@ -1172,6 +1199,12 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L.append("    return result;")
     L += ["}", ""]
     return L
+
+
+def nestable(slot: str, s: dict) -> bool:
+    """A command slot can be made inside ExecuteCommandText: its call is a c line under the import, its arguments and result plain values."""
+    res = s["result"]
+    return slot.startswith("Cmd") and all(a["mode"] in ("scalar", "argv", "text", "stream") for a in s["args"]) and (res is None or res["mode"] in ("scalar", "text"))
 
 
 def raw_type(s: dict, i: int) -> str:
@@ -1219,6 +1252,8 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
     elif mode == "argv":
         if phase == "a":
             return ["ArgArgv(s_call, %s);" % var]
+        if phase == "i":
+            return ["ImportArgv(line, %s);" % var]
     elif mode == "weapon":
         if phase == "a":
             return ['ArgWeapon(s_call, "%s", %s);' % (line, var)]
@@ -1311,6 +1346,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             L += runner(sub, slot, s)
+    L += nested_player(ready)
     L.append("bool RunSlot(const char* subsystem, const char* slot)")
     L.append("{")
     for sub, spec in ready.items():
@@ -1341,6 +1377,42 @@ def render_slots(ann: dict, model: dict) -> str:
                 L.append("    g_import_%s.%s = Imp_%s_%s;" % (seam, slot, seam, slot))
     L += ["}", ""]
     return "\n".join(L)
+
+
+def nested_player(ready: dict) -> list[str]:
+    """The replayer's side of ExecuteCommandText: it makes each command the import ran through the seam of the subsystem."""
+    L = ["void PlayNestedCalls(const char* import)", "{", "    NestedScope scope;", "    for (int k = 0; k < scope.count; k++) {",
+         "        scope.Restore();", "        const char* args = nullptr;", "        const char* name = NestedName(scope.line[k], &args);"]
+    for sub, spec in ready.items():
+        for slot, s in spec["slots"].items():
+            if not nestable(slot, s):
+                continue
+            L.append('        if (CallbackIs(name, "%s.%s")) {' % (sub, slot))
+            call = []
+            for i, a in enumerate(s["args"]):
+                v = "p%d" % i
+                if a["mode"] == "argv":
+                    L.append("            ArgvHolder %s;\n            ParseArgsList(&args, %s);" % (v, v))
+                    call.append("&%s.args" % v)
+                elif a["mode"] == "text":
+                    L.append("            char %s_text[256];\n            CallbackText(&args, %s_text, sizeof %s_text);" % (v, v, v))
+                    call.append("%s_text" % v)
+                elif a["mode"] == "stream":
+                    L.append("            RandStream %s = (RandStream)CallbackScalar<int>(&args);" % v)
+                    call.append(v)
+                else:
+                    L.append("            %s %s = CallbackScalar<%s>(&args);" % (a["type"], v, a["type"]))
+                    call.append(v)
+            expr = "g_seams.%s->%s(%s)" % (sub, slot, ", ".join(call))
+            res = s["result"]
+            if res is None:
+                L += ["            %s;" % expr, "            scope.Restore();", "            CallbackDone(import, k, args, nullptr);"]
+            else:
+                L += ["            %s result = %s;" % (s["ret"], expr), "            ReplayText have;", "            ReplayValue(have, result);",
+                      "            scope.Restore();", "            CallbackDone(import, k, args, have.Data());", "            have.Free();"]
+            L += ["            continue;", "        }"]
+    L += ["        CallbackUnknown(import, k, name);", "    }", "}", ""]
+    return L
 
 
 def import_stub(seam: str, slot: str, s: dict) -> list[str]:
@@ -1603,7 +1675,7 @@ def render_service_ids(services: list[dict]) -> str:
     return "\n".join(L)
 
 
-SERVICE_ARG_MODES = {"stream", "int", "double", "text", "handle", "skip", "bytes", "object", "ints", "allocated"}
+SERVICE_ARG_MODES = {"stream", "int", "double", "text", "handle", "skip", "bytes", "object", "ints", "allocated", "textn", "commandargs"}
 SERVICE_RESULTS = {"int", "double", "text", "snapshot", "handle", "object", "alloc", "arg"}
 HANDLE_KINDS = ("file", "rec", "bank")
 
@@ -1656,6 +1728,8 @@ def check_service_specs(services: list[dict], ann: dict) -> list[str]:
             if m not in SERVICE_ARG_MODES:
                 errors.append("%s: the argument %s has the unknown mode %s" % (where, a.get("param"), m))
             elif m == "bytes" and params.get(a.get("length"), {}).get("mode") != "int":
+                errors.append("%s: the argument %s needs a `length` that names an int argument" % (where, a["param"]))
+            elif m == "textn" and params.get(a.get("length"), {}).get("mode") != "int":
                 errors.append("%s: the argument %s needs a `length` that names an int argument" % (where, a["param"]))
             elif m == "ints" and params.get(a.get("count"), {}).get("mode") != "int":
                 errors.append("%s: the argument %s needs a `count` that names an int argument" % (where, a["param"]))
@@ -1742,12 +1816,17 @@ def service_input_lines(s: dict, ctx: str) -> list[str]:
             L.append("ReplayAddWords(t, (const unsigned*)%s, (unsigned)%s);" % (v, service_param_expr(s, a["count"], ctx)))
         elif m == "allocated":
             L.append("AddAllocName(t, %s);" % v)
+        elif m == "textn":
+            L.append("ReplayAddTextN(t, %s, (int)%s);" % (v, service_param_expr(s, a["length"], ctx)))
+        elif m == "commandargs":
+            L.append("ReplayAddArgs(t, (const CommandArgs*)%s);" % v)
     return L
 
 
 def render_service_end(services: list[dict]) -> str:
     L = [GENERATED, "", "// included by replay.cpp after the helpers of the import lines", "",
-         "void ReplayImportEnd(ReplayImport& c)", "{", "    ReplayText& t = s_call;", "    const ReplayArg* a = c.args;",
+         "void ReplayImportEnd(ReplayImport& c)", "{",
+         "    ReplayText& t = s_call;", "    const ReplayArg* a = c.args;",
          '    t.Add("  i ");', "    t.Add(kReplayImportNames[c.id]);", "    switch (c.id) {"]
     for s in services:
         L.append("    case %s:" % s["id"])
@@ -1776,6 +1855,10 @@ def render_service_end(services: list[dict]) -> str:
                 L.append("        ReplayAddWords(t, (const unsigned*)a[%d].v.p, (unsigned)a[%d].v.i);" % (i, index[a["count"]]))
             elif m == "allocated":
                 L.append("        AddAllocName(t, a[%d].v.p);" % i)
+            elif m == "textn":
+                L.append("        ReplayAddTextN(t, (const char*)a[%d].v.p, a[%d].v.i);" % (i, index[a["length"]]))
+            elif m == "commandargs":
+                L.append("        ReplayAddArgs(t, (const CommandArgs*)a[%d].v.p);" % i)
         res = s.get("result")
         pointer = "(c.result.kind == 1 ? c.result.v.p : nullptr)"
         if res == "snapshot":
@@ -1924,7 +2007,7 @@ def render_service_answers(services: list[dict], linked: set[str] | None = None)
         L += indent(s.get("pre", []), 4)
         L += ["    ReplayText t;", "    StartImport(t, %s);" % s["id"]]
         L += indent(service_input_lines(s, "definition"), 4)
-        L.append("    const char* %s = Enter(t);" % ("result" if s.get("result") else "r"))
+        L.append("    const char* %s = %s(t);" % ("result" if s.get("result") else "r", "EnterNested" if s.get("nested") else "Enter"))
         L += indent(service_result_lines(s, "definition"), 4)
         L += ["}", ""]
     L += ["bool ReplayAnswerImport(ReplayImport& c)", "{", "    switch (c.id) {"]

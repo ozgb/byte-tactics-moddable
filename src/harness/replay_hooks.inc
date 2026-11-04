@@ -152,7 +152,15 @@ void __stdcall RecWindMeteorsCmdMeteor(CommandArgs* a0)
     if (scope.Open()) {
         ArgArgv(s_call, a0);
     }
+    ReplayText line;
+    if (scope.Nested()) {
+        line.Add("\n    c wind_meteors.CmdMeteor");
+        ImportArgv(line, a0);
+    }
     s_inner_wind_meteors->CmdMeteor(a0);
+    if (scope.Nested()) {
+        FinishNested(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -1510,7 +1518,15 @@ void __stdcall RecLosRadarCmdShareMapping(int a0)
     if (scope.Open()) {
         ArgValue(s_call, "unused", a0);
     }
+    ReplayText line;
+    if (scope.Nested()) {
+        line.Add("\n    c los_radar.CmdShareMapping");
+        ImportValue(line, a0);
+    }
     s_inner_los_radar->CmdShareMapping(a0);
+    if (scope.Nested()) {
+        FinishNested(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -1522,7 +1538,15 @@ void __stdcall RecLosRadarCmdShareRadar(int a0)
     if (scope.Open()) {
         ArgValue(s_call, "unused", a0);
     }
+    ReplayText line;
+    if (scope.Nested()) {
+        line.Add("\n    c los_radar.CmdShareRadar");
+        ImportValue(line, a0);
+    }
     s_inner_los_radar->CmdShareRadar(a0);
+    if (scope.Nested()) {
+        FinishNested(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -5384,8 +5408,23 @@ bool IsImportOf(unsigned owner, unsigned slot)
     }
 }
 
+bool IsNestedSlot(unsigned slot)
+{
+    switch (slot) {
+    case RSL_WIND_METEORS_CMDMETEOR:
+    case RSL_LOS_RADAR_CMDSHAREMAPPING:
+    case RSL_LOS_RADAR_CMDSHARERADAR:
+        return true;
+    default:
+        return false;
+    }
+}
+
 void HookSeams(const bool* on)
 {
+    bool any = false;
+    for (unsigned i = 0; i < SUB_COUNT; i++)
+        any = any || on[i];
     s_inner_wind_meteors = g_seams.wind_meteors;
     s_rec_wind_meteors = *s_inner_wind_meteors;
     s_inner_economy = g_seams.economy;
@@ -5434,7 +5473,7 @@ void HookSeams(const bool* on)
         s_rec_wind_meteors.SaveMeteors = RecWindMeteorsSaveMeteors;
     if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.LoadMeteors = RecWindMeteorsLoadMeteors;
-    if (on[SUB_WIND_METEORS])
+    if (on[SUB_WIND_METEORS] || any)
         s_rec_wind_meteors.CmdMeteor = RecWindMeteorsCmdMeteor;
     if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.UpdateWindOnStream = RecWindMeteorsUpdateWindOnStream;
@@ -5622,9 +5661,9 @@ void HookSeams(const bool* on)
         s_rec_targeting.ChooseWeapon = RecTargetingChooseWeapon;
     if (on[SUB_LOS_RADAR] || on[SUB_ECONOMY])
         s_rec_los_radar.GetMapCell = RecLosRadarGetMapCell;
-    if (on[SUB_LOS_RADAR])
+    if (on[SUB_LOS_RADAR] || any)
         s_rec_los_radar.CmdShareMapping = RecLosRadarCmdShareMapping;
-    if (on[SUB_LOS_RADAR])
+    if (on[SUB_LOS_RADAR] || any)
         s_rec_los_radar.CmdShareRadar = RecLosRadarCmdShareRadar;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.ClampWorldPosToTerrain = RecLosRadarClampWorldPosToTerrain;

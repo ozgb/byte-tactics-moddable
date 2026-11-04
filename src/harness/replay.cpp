@@ -62,6 +62,7 @@ ReplayText s_field;
 ReplayOrdinals s_ordinals;
 ReplaySnapshots s_snapshots;
 ReplayText s_nested;
+bool s_nestedSlot;
 ReplayReach s_reach;
 ReplayRoots s_roots;
 
@@ -170,6 +171,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
         return;
     s_ordinals.Reset();
     s_snapshots.Reset();
+    s_nested.Clear();
     s_call.Clear();
     s_tail.Clear();
     s_roots = roots;
@@ -210,6 +212,7 @@ void SlotLeave()
 }
 
 bool IsImportOf(unsigned owner, unsigned slot);
+bool IsNestedSlot(unsigned slot);
 
 class SlotScope {
 public:
@@ -224,6 +227,10 @@ public:
         } else if (s_recording && ReplayOwned() && IsImportOf(s_sub, slot)) {
             role = 2;
             ReplayCalls() = 0;
+        } else if (s_recording && ReplayNestedDepth() != 0 && !s_nestedSlot && ReplayOwner() == host_thread_id() && IsNestedSlot(slot)) {
+            role = 3;
+            s_nestedSlot = true;
+            ReplayCalls() = 1;
         } else if (s_recording && ReplayCallbackDepth() != 0 && IsImportOf(s_sub, slot)) {
             ReplayFail("an import made inside a callback of an import is not recorded");
         }
@@ -234,6 +241,10 @@ public:
             SlotLeave();
         else if (role == 2)
             ReplayCalls() = 1;
+        else if (role == 3) {
+            s_nestedSlot = false;
+            ReplayCalls() = 0;
+        }
     }
     bool Open() const
     {
@@ -242,6 +253,10 @@ public:
     bool Import() const
     {
         return role == 2;
+    }
+    bool Nested() const
+    {
+        return role == 3;
     }
 
 private:
@@ -524,6 +539,18 @@ void ImportResultObjectReach(ReplayText& t, unsigned kind, const void* p, unsign
 void ImportResultPending(ReplayText& t)
 {
     t.Add(" = ?");
+}
+
+void ImportArgv(ReplayText& t, const CommandArgs* args)
+{
+    t.AddChar(' ');
+    ReplayAddArgs(t, args);
+}
+
+void FinishNested(ReplayText& line)
+{
+    s_nested.AddText(line);
+    line.Free();
 }
 
 void FinishImport(ReplayText& line)

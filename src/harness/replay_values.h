@@ -1,6 +1,7 @@
 #ifndef HARNESS_REPLAY_VALUES_H
 #define HARNESS_REPLAY_VALUES_H
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "../../interfaces/rand_stream.h"
@@ -109,6 +110,34 @@ inline void ReplayBytes(ReplayText& t, const void* p, int length)
         t.AddChar("0123456789abcdef"[b >> 4]);
         t.AddChar("0123456789abcdef"[b & 15]);
     }
+}
+
+inline void ReplayAddTextN(ReplayText& t, const char* p, int n)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    char* copy = (char*)malloc((unsigned)(n < 0 ? 0 : n) + 1);
+    memcpy(copy, p, (unsigned)(n < 0 ? 0 : n));
+    copy[n < 0 ? 0 : n] = '\0';
+    t.AddString(copy);
+    free(copy);
+}
+
+template <class T> void ReplayAddArgs(ReplayText& t, const T* args)
+{
+    if (args == nullptr) {
+        t.Add("null");
+        return;
+    }
+    t.AddChar('[');
+    for (int i = 0; i < args->count && i < 0x14; i++) {
+        if (i != 0)
+            t.AddChar(',');
+        t.AddString(args->args[i]);
+    }
+    t.AddChar(']');
 }
 
 inline void ReplayAddWords(ReplayText& t, const unsigned* p, unsigned count)

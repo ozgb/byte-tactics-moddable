@@ -15,6 +15,12 @@ inline unsigned int& ReplayOwner()
     return owner;
 }
 
+inline unsigned int& ReplayNestedDepth()
+{
+    static unsigned int depth;
+    return depth;
+}
+
 inline bool ReplayOwned()
 {
     return ReplayCalls() != 0 && ReplayOwner() == host_thread_id();
@@ -35,6 +41,7 @@ struct ReplayArg {
 
 struct ReplayImport;
 void ReplayImportEnd(ReplayImport& call);
+void ReplayFail(const char* message);
 
 typedef bool (*ReplayAnswerFn)(ReplayImport& call);
 
@@ -51,7 +58,7 @@ inline bool& ReplayAnswerBusy()
 }
 
 struct ReplayImport {
-    explicit ReplayImport(int id) : id(id), active(ReplayOwned()), answering(ReplayAnswerHook() != nullptr && !ReplayAnswerBusy()), count(0)
+    explicit ReplayImport(int id) : id(id), active(ReplayOwned()), answering(ReplayAnswerHook() != nullptr && !ReplayAnswerBusy()), nested(false), count(0)
     {
         result.kind = -1;
         if (active)
@@ -59,8 +66,19 @@ struct ReplayImport {
     }
     ~ReplayImport()
     {
+        if (nested)
+            ReplayNestedDepth()--;
         if (active)
             ReplayImportEnd(*this);
+    }
+    void Nested()
+    {
+        if (!active)
+            return;
+        if (ReplayNestedDepth() != 0)
+            ReplayFail("a command run inside a command of ExecuteCommandText is not recorded");
+        nested = true;
+        ReplayNestedDepth()++;
     }
     void Int(int value)
     {
@@ -129,6 +147,7 @@ struct ReplayImport {
     int id;
     bool active;
     bool answering;
+    bool nested;
     int count;
     ReplayArg args[8];
     ReplayArg result;

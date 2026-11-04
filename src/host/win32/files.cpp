@@ -94,7 +94,7 @@ extern "C" void* HOST_CALL host_dir_first(const char* pattern, struct host_dir_e
         _findclose(handle);
         return 0;
     }
-    dir->entries = 0;
+    dir->entries = nullptr;
     dir->count = 0;
     dir->next = 1;
     unsigned int capacity = 0;
@@ -102,11 +102,11 @@ extern "C" void* HOST_CALL host_dir_first(const char* pattern, struct host_dir_e
         if (dir->count == capacity) {
             capacity = capacity ? capacity * 2 : 64;
             struct host_dir_entry* grown = (struct host_dir_entry*)realloc(dir->entries, capacity * sizeof(struct host_dir_entry));
-            if (grown == 0) {
+            if (grown == nullptr) {
                 _findclose(handle);
                 free(dir->entries);
                 free(dir);
-                return 0;
+                return nullptr;
             }
             dir->entries = grown;
         }

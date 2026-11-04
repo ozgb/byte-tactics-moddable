@@ -569,6 +569,14 @@ static UnitCategory* LowerBoundCategory(const char* name)
     return first;
 }
 
+static UnitTypeSet* FindCategoryMask(const char* name)
+{
+    UnitCategory* first = LowerBoundCategory(name);
+    if (first != s_unitCategories.end() && _strcmpi(first->name.data, name) == 0)
+        return (UnitTypeSet*)first->value;
+    return 0;
+}
+
 // FUNCTION: 0x488c50
 UnitTypeSet* __stdcall GetCategoryMask(char* name)
 {
@@ -622,9 +630,10 @@ void UnitTypeSet::AddTypeOrCategory(char* text, int* out)
         *out = 1;
         return;
     }
-    UnitTypeSet* other = GetCategoryMask(text);
-    for (int i = 0; i < 16; i++)
-        bits[i] |= other->bits[i];
+    UnitTypeSet* other = FindCategoryMask(text);
+    if (other)
+        for (int i = 0; i < 16; i++)
+            bits[i] |= other->bits[i];
     *out = 0;
 }
 

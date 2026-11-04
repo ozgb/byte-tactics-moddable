@@ -1,7 +1,7 @@
 """Start a clean-room session VM: exact mounts, no network device, canary checks, then the agent.
 
     uv run tools/cleanroom/launch.py --tree DIR --datakit DIR --image FILE.smolmachine \\
-        [--session DIR] [--api-key-env NAME] [--keep] -- COMMAND [ARG ...]
+        [--session DIR] [--credential-file FILE] [--credential-kind oauth|api-key] [--keep] -- COMMAND [ARG ...]
 
 The VM has no network device. Its only way out is a Unix socket to proxy.py on the host. It sees the
 clean-room tree (read-write at /work), the data kit (read-only at /data), the mailbox directories
@@ -10,11 +10,14 @@ runs beside it: it reads a git bundle and the gate requests from the outbox as d
 
 Refusals, each exit status 2 before any VM exists: a mount that is, contains or sits inside this
 repository (except under build/scratch), another worktree of it, ~/.claude*, ~/.ta, ~/.ssh,
-~/.config/gh, ~/.gnupg or ~/source/repos; a tree without its own .git, or one whose git config names
+~/.config/gh, ~/.config/bt-cleanroom, ~/.gnupg or ~/source/repos; a tree without its own .git, or one whose git config names
 byte-tactics; overlapping mounts, the session directory included; a session directory that is, contains or sits
 inside this repository or ~/.claude* and the like; a file of the canary manifest in a mount or the
 session directory; an allowlist that
-names GitHub or similar hosts or an IP literal; an API key variable not named ANTHROPIC_*. The
+names GitHub or similar hosts or an IP literal; a credential file that is missing, empty or readable by anyone but its owner,
+or whose value equals a credential the host's Claude Code uses (ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN in the
+launcher's environment, or the token in ~/.claude/.credentials.json); an API key variable not named ANTHROPIC_*. The
+credential reaches the agent command as CLAUDE_CODE_OAUTH_TOKEN (oauth) or ANTHROPIC_API_KEY (api-key), by --secret-env. The
 canary checks then run inside the VM, and a failing check stops the session before the agent starts.
 The canary directory is deleted from the VM before the agent starts, and the launch fails if it is
 still there.
@@ -51,7 +54,12 @@ DENIED_HOST_SUFFIXES = (
     "gitlab.com",
     "bitbucket.org",
 )
-HOME_FORBIDDEN = (".ta", ".ssh", ".config/gh", ".gnupg", "source/repos")
+HOME_FORBIDDEN = (".ta", ".ssh", ".config/gh", ".config/bt-cleanroom", ".gnupg", "source/repos")
+DEFAULT_CREDENTIAL = Path.home() / ".config" / "bt-cleanroom" / "anthropic-impl-key"
+HOST_CREDENTIALS = Path.home() / ".claude" / ".credentials.json"
+CREDENTIAL_VARS = {"oauth": "CLAUDE_CODE_OAUTH_TOKEN", "api-key": "ANTHROPIC_API_KEY"}
+HOST_CLAUDE_VARS = ("ANTHROPIC_API_KEY", "CLAUDE_CODE_OAUTH_TOKEN")
+SECRET_HOST_VAR = "BT_CLEANROOM_CREDENTIAL"
 GUEST_SCRIPTS = ("canary.py", "manifest.py")
 GUEST_HOME = "/home/agent"
 CANARY_DIR = "/opt/canary"
@@ -84,11 +92,12 @@ def forbidden_paths(home):
     return paths
 
 
-def check_mount(path, role, roots, home):
-    """Return the resolved mount path, or raise Refusal."""
+def check_mount(path, role, roots, home, must_exist=True):
+    """Return the resolved mount path, or raise Refusal. A path that does not exist yet passes when must_exist is False."""
     path = Path(path)
-    if not path.is_dir():
-        raise Refusal(f"{role} {path} is not a directory")
+    if path.exists() or must_exist:
+        if not path.is_dir():
+            raise Refusal(f"{role} {path} is not a directory")
     path = path.resolve()
     for root in roots:
         if inside(root, path):
@@ -142,6 +151,41 @@ def check_allowlist_text(text):
 def check_api_key_env(name):
     if name is not None and not name.startswith("ANTHROPIC_"):
         raise Refusal(f"--api-key-env {name} is not an ANTHROPIC_* variable")
+
+
+def host_claude_tokens(environ, credentials_file):
+    """Return the credentials the host's Claude Code uses: the two variables and the stored OAuth access token."""
+    tokens = {environ[v] for v in HOST_CLAUDE_VARS if environ.get(v)}
+    try:
+        stored = json.loads(Path(credentials_file).read_text())["claudeAiOauth"]["accessToken"]
+        if isinstance(stored, str) and stored:
+            tokens.add(stored)
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    return tokens
+
+
+def read_credential(path, kind, environ, credentials_file):
+    """Return (guest variable name, value) for the credential file, or raise Refusal."""
+    if kind not in CREDENTIAL_VARS:
+        raise Refusal(f"--credential-kind {kind} is not oauth or api-key")
+    path = Path(path)
+    try:
+        info = path.stat()
+    except OSError as err:
+        raise Refusal(f"credential file {path} is missing: {err.strerror}") from err
+    if not path.is_file():
+        raise Refusal(f"credential file {path} is not a regular file")
+    if info.st_mode & 0o077:
+        raise Refusal(f"credential file {path} is readable by group or others (mode {info.st_mode & 0o777:o}): chmod 600 it")
+    if info.st_uid != os.getuid():
+        raise Refusal(f"credential file {path} is not owned by you")
+    value = path.read_text().strip()
+    if not value:
+        raise Refusal(f"credential file {path} is empty")
+    if value in host_claude_tokens(environ, credentials_file):
+        raise Refusal(f"credential file {path} holds a credential the host's Claude Code uses: make a separate one")
+    return CREDENTIAL_VARS[kind], value
 
 
 def check_scan_clean(manifest, *roots):
@@ -218,7 +262,7 @@ def wait_for(path, seconds=15):
 
 
 def host_paths(roots, home):
-    paths = [str(p) for p in (home, home / ".claude", home / ".claude.json", home / ".ta", home / ".ssh", home / "work")]
+    paths = [str(p) for p in (home, home / ".claude", home / ".claude.json", home / ".ta", home / ".ssh", home / ".config" / "bt-cleanroom", home / "work")]
     paths += [str(home / "source" / "repos" / n) for n in ("byte-tactics", "byte-tactics-moddable")]
     paths += [str(r) for r in roots]
     return sorted(set(paths))
@@ -276,6 +320,12 @@ def start_session(args):
     home = Path.home()
     roots = repo_roots()
     check_api_key_env(args.api_key_env)
+    if args.api_key_env:
+        guest_var, secret_value = "ANTHROPIC_API_KEY", os.environ.get(args.api_key_env, "")
+        if not secret_value:
+            raise Refusal(f"--api-key-env {args.api_key_env} is not set")
+    else:
+        guest_var, secret_value = read_credential(args.credential_file, args.credential_kind, os.environ, args.host_credentials)
     tree = check_mount(args.tree, "tree", roots, home)
     datakit = check_mount(args.datakit, "data kit", roots, home)
     check_tree(tree)
@@ -288,9 +338,8 @@ def start_session(args):
         raise Refusal(f"{SMOLVM} is not installed")
     if not os.access("/dev/kvm", os.R_OK | os.W_OK):
         raise Refusal("/dev/kvm is not usable")
-    session = Path(args.session)
+    session = check_mount(args.session, "session", roots, home, must_exist=False)
     session.mkdir(parents=True, exist_ok=True)
-    session = check_mount(session, "session", roots, home)
     check_disjoint(("tree", tree), ("data kit", datakit), ("session", session))
     broker.prepare(session)
     manifest = session / "manifest.txt"
@@ -337,8 +386,9 @@ def start_session(args):
         if code:
             print("launch: a canary check or the canary cleanup failed: the agent was not started", file=sys.stderr)
             return 3
-        secret = [f"ANTHROPIC_API_KEY={args.api_key_env}"] if args.api_key_env else []
-        status = run(exec_in(name, args.command, user=f"{uid}:{gid}", env=guest_env(), secret_env=secret)).returncode
+        secret = [f"{guest_var}={SECRET_HOST_VAR}"]
+        agent_env = {**os.environ, SECRET_HOST_VAR: secret_value}
+        status = run(exec_in(name, args.command, user=f"{uid}:{gid}", env=guest_env(), secret_env=secret), env=agent_env).returncode
         print(f"launch: agent command exited {status} after {time.time() - t_canary:.1f}s", flush=True)
     finally:
         for p in reversed(procs):
@@ -362,7 +412,10 @@ def main(argv=None):
     ap.add_argument("--image", required=True, help=".smolmachine built from tools/cleanroom/Smolfile")
     ap.add_argument("--allow", default=str(HERE / "allowlist.txt"), help="proxy allowlist")
     ap.add_argument("--session", default=None, help="session directory (default: a new one in a temp dir)")
-    ap.add_argument("--api-key-env", default=None, help="host variable holding the implementer ANTHROPIC_API_KEY")
+    ap.add_argument("--credential-file", default=str(DEFAULT_CREDENTIAL), help="file holding the implementer credential (mode 600)")
+    ap.add_argument("--credential-kind", default="oauth", choices=sorted(CREDENTIAL_VARS), help="oauth: CLAUDE_CODE_OAUTH_TOKEN; api-key: ANTHROPIC_API_KEY")
+    ap.add_argument("--host-credentials", default=str(HOST_CREDENTIALS), help=argparse.SUPPRESS)
+    ap.add_argument("--api-key-env", default=None, help=argparse.SUPPRESS)
     ap.add_argument("--keep", action="store_true", help="leave the machine in place after the command")
     ap.add_argument("command", nargs="+", help="command to run in the VM, after --")
     args = ap.parse_args(argv)

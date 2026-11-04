@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import manifest as mf
 
 FORBIDDEN_ENV = ("GH_TOKEN", "GITHUB_TOKEN", "GH_ENTERPRISE_TOKEN", "SSH_AUTH_SOCK", "GIT_ASKPASS", "SSH_ASKPASS")
-HOME_ENTRIES = (".ssh", ".config/gh", ".git-credentials", ".netrc", ".gnupg", ".claude", ".claude.json", ".ta")
+HOME_ENTRIES = (".ssh", ".config/gh", ".config/bt-cleanroom", ".git-credentials", ".netrc", ".gnupg", ".claude", ".claude.json", ".ta")
 PROXY_REFUSED = (
     "github.com:443",
     "github.com:22",

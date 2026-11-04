@@ -281,10 +281,13 @@ def check_log(log_path, allow_path):
     allowed = load_allowlist(allow_path)
     total = 0
     bad = 0
+    sni = 0
     for line in Path(log_path).read_text().splitlines():
         if not line.strip():
             continue
         record = json.loads(line)
+        if record.get("event") == "sni_refused":
+            sni += 1
         if record.get("event"):
             continue
         total += 1
@@ -292,8 +295,11 @@ def check_log(log_path, allow_path):
         if pair is None or pair not in allowed:
             bad += 1
             print(line)
-    if bad:
-        print(f"proxy log: {bad} of {total} requests are off the allowlist")
+    if sni:
+        print(f"proxy log: {sni} tunnels refused for a server name that is not the target")
+    if bad or sni:
+        if bad:
+            print(f"proxy log: {bad} of {total} requests are off the allowlist")
         return 1
     print(f"proxy log: {total} requests, all on the allowlist")
     return 0

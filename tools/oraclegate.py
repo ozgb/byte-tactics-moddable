@@ -3,7 +3,7 @@
     uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
 
 Refuses the module, before anything plays, when `tools/wasm_modules.py check-module` finds a problem in the file: the window,
-table, imports, exports, kinds or size budget of docs/module-abi.md, section 5.2. Then copies the runtime files of the modern build into a fresh directory with MODULE.wasm in place of the subsystem's module,
+table, imports, exports, kinds or size budget of docs/module-abi.md, section 5.2. Then copies the runtime files of the modern build (and objs/objects.rsp, which the block pointer check reads beside the map) into a fresh directory with MODULE.wasm in place of the subsystem's module,
 starts the game on a short scenario to see whether the loader accepts the module, then plays
 `tools/reference.py --check --tier` (`--full`: the full `--check`) and `tools/replay.py --check --subsystem NAME` on that
 runtime. It writes DIR/result.json, built from the parsed fields of those tools' reports and nothing else: for each scenario
@@ -30,6 +30,7 @@ import replay
 ROOT = Path(__file__).resolve().parent.parent
 FORMAT = 1
 RUNTIME_FILES = ("TotalA.exe", "TotalA.map", "CMakeCache.txt", "wasmtime_host.dll", "modules.json")
+OBJECT_LIST = "objs/objects.rsp"
 PROBE = "game_seed 1\ncrt_seed 2\nview_seed 3\nmap The Pass\nstart_positions fixed\nticks 10\nplayer0.controller human\nplayer0.side Arm\nplayer1.controller ai\nplayer1.side Core\n"
 MESSAGE_LIMIT = 2000
 VALUE_LIMIT = 200
@@ -67,12 +68,17 @@ def manifest_modules(build: Path) -> list[str]:
 
 
 def prepare_runtime(build: Path, subsystem: str, module: Path, directory: Path) -> Path:
-    """A fresh runtime in `directory`: the build's files, the manifest and the other modules as built, `module` as the subsystem's."""
+    """A fresh runtime in `directory`: the build's files, the object list the block pointer check reads beside the map, the manifest and the other modules as built, `module` as the subsystem's."""
     names = manifest_modules(build)
     if subsystem not in names:
         raise Error(f"the manifest has no module {subsystem} (it has {', '.join(names)})")
+    objects = build / OBJECT_LIST
+    if not objects.is_file():
+        raise Error(f"the build has no {OBJECT_LIST}: the block pointer check needs the linked objects")
     shutil.rmtree(directory, ignore_errors=True)
     directory.mkdir(parents=True)
+    (directory / OBJECT_LIST).parent.mkdir()
+    shutil.copy2(objects, directory / OBJECT_LIST)
     for name in RUNTIME_FILES:
         if (build / name).is_file():
             shutil.copy2(build / name, directory / name)

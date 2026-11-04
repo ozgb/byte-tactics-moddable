@@ -1,6 +1,7 @@
-#include <windows.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../../interfaces/host.h"
 #include "access_log.h"
 #include "classifier.h"
 #include "../../src/state/alloc_hooks.h"
@@ -18,6 +19,8 @@ const unsigned kIgnored = 0xFFFF;
 const unsigned kGranules = kBlock / 8;
 const unsigned kEdgeBits = 21;
 const unsigned kSegmentLimit = 4096;
+const unsigned kSectionExecute = 0x20000000u;
+const unsigned kSectionWrite = 0x80000000u;
 
 struct Type {
     unsigned size, count;
@@ -94,20 +97,36 @@ unsigned g_allocSeq;
 unsigned* g_bits0;
 unsigned* g_bits1;
 unsigned* g_bits2;
-CRITICAL_SECTION g_allocLock;
+void* g_allocLock;
+volatile int g_busy;
 __declspec(thread) unsigned g_depth;
 __declspec(thread) unsigned g_curSite;
 
 Classifier g_classifier;
 Stats g_stats;
-HANDLE g_rawFile = INVALID_HANDLE_VALUE;
+void* g_rawFile;
 char* g_rawBuf;
 unsigned g_rawLen;
 const unsigned kRawCap = 1u << 20;
 
+struct Quiet {
+    NS Quiet() { g_busy++; }
+    NS ~Quiet() { g_busy--; }
+};
+
 NS void* Zeroed(unsigned bytes)
 {
-    return HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, bytes);
+    Quiet quiet;
+    void* p = host_mem_alloc(bytes);
+    if (p != 0)
+        memset(p, 0, bytes);
+    return p;
+}
+
+NS void Release(void* p)
+{
+    Quiet quiet;
+    host_mem_free(p);
 }
 
 NS inline unsigned ThreadId()
@@ -119,24 +138,23 @@ NS inline unsigned ThreadId()
 
 NS unsigned char* ReadWhole(const char* path, unsigned* size)
 {
-    HANDLE h = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-    if (h == INVALID_HANDLE_VALUE)
+    Quiet quiet;
+    void* h = host_file_open_read(path);
+    if (h == 0)
         return 0;
-    unsigned n = GetFileSize(h, 0);
-    unsigned char* p = (unsigned char*)Zeroed(n + 1);
-    DWORD got = 0;
-    if (p == 0 || !ReadFile(h, p, n, &got, 0) || got != n)
+    long n = host_file_size(h);
+    unsigned char* p = n < 0 ? 0 : (unsigned char*)Zeroed((unsigned)n + 1);
+    if (p == 0 || host_file_read(h, p, (unsigned)n) != (unsigned)n)
         p = 0;
-    CloseHandle(h);
-    *size = n;
+    host_file_close(h);
+    *size = (unsigned)n;
     return p;
 }
 
 NS void Die(const char* text)
 {
-    DWORD wrote;
-    WriteFile(GetStdHandle(STD_ERROR_HANDLE), text, (DWORD)strlen(text), &wrote, 0);
-    ExitProcess(3);
+    host_log(text);
+    host_exit(3);
 }
 
 struct Reader {
@@ -271,15 +289,29 @@ NS void LoadItems(const unsigned char* data)
 
 NS void LoadImage()
 {
-    HMODULE m = GetModuleHandleA(0);
-    IMAGE_NT_HEADERS* nt = (IMAGE_NT_HEADERS*)((char*)m + ((IMAGE_DOS_HEADER*)m)->e_lfanew);
-    g_imageLo = (unsigned)m;
-    g_imageSize = nt->OptionalHeader.SizeOfImage;
-    IMAGE_SECTION_HEADER* s = IMAGE_FIRST_SECTION(nt);
-    for (unsigned i = 0; i < nt->FileHeader.NumberOfSections && i < 16; i++) {
-        g_sections[g_sectionCount].start = g_imageLo + s[i].VirtualAddress;
-        g_sections[g_sectionCount].end = g_imageLo + s[i].VirtualAddress + s[i].Misc.VirtualSize;
-        g_sections[g_sectionCount].flags = s[i].Characteristics;
+    const void* base = 0;
+    unsigned size = 0;
+    if (!host_image_range(&base, &size))
+        Die("accesslog: no image range\n");
+    const unsigned char* image = (const unsigned char*)base;
+    unsigned nt, count, optional;
+    memcpy(&nt, image + 0x3C, 4);
+    unsigned short sections, optionalSize;
+    memcpy(&sections, image + nt + 6, 2);
+    memcpy(&optionalSize, image + nt + 20, 2);
+    count = sections;
+    optional = optionalSize;
+    g_imageLo = (unsigned)image;
+    g_imageSize = size;
+    const unsigned char* header = image + nt + 24 + optional;
+    for (unsigned i = 0; i < count && i < 16; i++, header += 40) {
+        unsigned virtualSize, virtualAddress, characteristics;
+        memcpy(&virtualSize, header + 8, 4);
+        memcpy(&virtualAddress, header + 12, 4);
+        memcpy(&characteristics, header + 36, 4);
+        g_sections[g_sectionCount].start = g_imageLo + virtualAddress;
+        g_sections[g_sectionCount].end = g_imageLo + virtualAddress + virtualSize;
+        g_sections[g_sectionCount].flags = characteristics;
         g_sectionCount++;
     }
 }
@@ -415,7 +447,7 @@ NS bool Resolve(unsigned a, Hit* h)
     h->entA = 0;
     if (a - g_imageLo < g_imageSize) {
         const Section* s = SectionOf(a);
-        if (s == 0 || (s->flags & IMAGE_SCN_MEM_EXECUTE)) {
+        if (s == 0 || (s->flags & kSectionExecute)) {
             g_stats.code++;
             return false;
         }
@@ -434,7 +466,7 @@ NS bool Resolve(unsigned a, Hit* h)
                 h->end = r->end;
             return true;
         }
-        if (!(s->flags & IMAGE_SCN_MEM_WRITE)) {
+        if (!(s->flags & kSectionWrite)) {
             g_stats.constants++;
             return false;
         }
@@ -481,14 +513,14 @@ NS bool Resolve(unsigned a, Hit* h)
 
 NS void RawLine(const char* kind, unsigned sub, unsigned item, const Hit& h, unsigned a)
 {
-    if (g_rawFile == INVALID_HANDLE_VALUE)
+    if (g_rawFile == 0)
         return;
+    Quiet quiet;
     if (g_rawLen + 256 > kRawCap) {
-        DWORD wrote;
-        WriteFile(g_rawFile, g_rawBuf, g_rawLen, &wrote, 0);
+        host_file_write(g_rawFile, g_rawBuf, g_rawLen);
         g_rawLen = 0;
     }
-    g_rawLen += wsprintfA(g_rawBuf + g_rawLen, "%u %d %s %s %s %08x %u %u\n", g_tick, g_window, kind,
+    g_rawLen += sprintf(g_rawBuf + g_rawLen, "%u %d %s %s %s %08x %u %u\n", g_tick, g_window, kind,
                           sub < g_subCount ? g_subNames[sub] : "-", g_itemNames[item], a, h.entA, h.entB);
 }
 
@@ -532,14 +564,14 @@ NS void Record(int store, unsigned a, unsigned size, void* ra)
 
 NS inline void Touch(int store, void* p, unsigned size, void* ra)
 {
-    if (!g_on || ThreadId() != g_simThread)
+    if (!g_on || g_busy || ThreadId() != g_simThread)
         return;
     Record(store, (unsigned)p, size, ra);
 }
 
 NS void Range_(int store, const void* p, unsigned n, void* ra)
 {
-    if (n == 0 || !g_on || ThreadId() != g_simThread)
+    if (n == 0 || !g_on || g_busy || ThreadId() != g_simThread)
         return;
     g_stats.ranges++;
     Record(store, (unsigned)p, n, ra);
@@ -569,7 +601,7 @@ NS Alloc* NewAlloc()
         Alloc* bigger = (Alloc*)Zeroed(sizeof(Alloc) * g_poolCap);
         if (g_pool != 0) {
             memcpy(bigger, g_pool, sizeof(Alloc) * g_poolCount);
-            HeapFree(GetProcessHeap(), 0, g_pool);
+            Release(g_pool);
         }
         g_pool = bigger;
     }
@@ -578,10 +610,11 @@ NS Alloc* NewAlloc()
 
 NS void __cdecl OnAdded(void* p, unsigned size)
 {
+    Quiet quiet;
     unsigned a = (unsigned)p;
     if (!g_ready || a - g_blockLo >= kBlock)
         return;
-    EnterCriticalSection(&g_allocLock);
+    host_mutex_lock(g_allocLock);
     unsigned site = g_depth > 0 ? g_curSite : 0;
     unsigned lo = 0, hi = g_siteCount;
     while (lo < hi) {
@@ -608,15 +641,16 @@ NS void __cdecl OnAdded(void* p, unsigned size)
     unsigned g = (a - g_blockLo) / 8;
     g_granuleIndex[g] = index;
     SetBit(g);
-    LeaveCriticalSection(&g_allocLock);
+    host_mutex_unlock(g_allocLock);
 }
 
 NS void __cdecl OnRemoved(void* p)
 {
+    Quiet quiet;
     unsigned a = (unsigned)p;
     if (!g_ready || a - g_blockLo >= kBlock)
         return;
-    EnterCriticalSection(&g_allocLock);
+    host_mutex_lock(g_allocLock);
     unsigned g = (a - g_blockLo) / 8;
     unsigned index = g_granuleIndex[g];
     if (index != 0) {
@@ -625,7 +659,7 @@ NS void __cdecl OnRemoved(void* p)
         g_granuleIndex[g] = 0;
         ClearBit(g);
     }
-    LeaveCriticalSection(&g_allocLock);
+    host_mutex_unlock(g_allocLock);
 }
 
 const AllocHooks g_hooks = {OnEnter, OnLeave, OnAdded, OnRemoved};
@@ -640,7 +674,7 @@ struct Out {
             char* bigger = (char*)Zeroed(cap);
             memcpy(bigger, p, len);
             if (p != 0)
-                HeapFree(GetProcessHeap(), 0, p);
+                Release(p);
             p = bigger;
         }
         memcpy(p + len, s, n);
@@ -664,12 +698,12 @@ struct Out {
 
 NS void WriteWhole(const char* path, const Out& out)
 {
-    HANDLE h = CreateFileA(path, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-    if (h == INVALID_HANDLE_VALUE)
+    Quiet quiet;
+    void* h = host_file_create(path, 0);
+    if (h == 0)
         return;
-    DWORD wrote;
-    WriteFile(h, out.p, out.len, &wrote, 0);
-    CloseHandle(h);
+    host_file_write(h, out.p, out.len);
+    host_file_close(h);
 }
 
 const char* const kPhaseNames[] = {"net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors",
@@ -760,25 +794,15 @@ extern "C" NS void __cdecl __asan_set_shadow_f8(unsigned, unsigned) {}
 
 NS void AccessLogInit()
 {
-    char dir[MAX_PATH + 32];
-    DWORD n = GetModuleFileNameA(0, dir, MAX_PATH);
-    while (n > 0 && dir[n - 1] != '\\' && dir[n - 1] != '/')
-        n--;
-    dir[n] = 0;
-    char path[MAX_PATH + 32];
     unsigned size;
-    strcpy(path, dir);
-    strcat(path, "accesslog.attr");
-    unsigned char* attr = ReadWhole(path, &size);
-    strcpy(path, dir);
-    strcat(path, "accesslog.items");
-    unsigned char* items = ReadWhole(path, &size);
+    unsigned char* attr = ReadWhole("accesslog.attr", &size);
+    unsigned char* items = ReadWhole("accesslog.items", &size);
     if (attr == 0 || items == 0)
         Die("accesslog: accesslog.attr and accesslog.items must be beside the exe (tools/accesslog.py tables)\n");
     LoadAttr(attr);
     LoadItems(items);
     LoadImage();
-    InitializeCriticalSection(&g_allocLock);
+    g_allocLock = host_mutex_create();
     g_granuleIndex = (unsigned*)Zeroed(4 * kGranules);
     g_bits0 = (unsigned*)Zeroed(4 * (kGranules / 32 + 1));
     g_bits1 = (unsigned*)Zeroed(4 * (kGranules / 1024 + 1));
@@ -787,10 +811,9 @@ NS void AccessLogInit()
     g_blockLo = (unsigned)SimBlockBase();
     if (!g_classifier.Init(g_itemCount, kEdgeBits, Zeroed))
         Die("accesslog: out of memory\n");
-    char e[8];
-    g_raw = GetEnvironmentVariableA("ACCESSLOG_RAW", e, sizeof e) != 0;
+    g_raw = getenv("ACCESSLOG_RAW") != 0;
     if (g_raw) {
-        g_rawFile = CreateFileA("access.raw.txt", GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+        g_rawFile = host_file_create("access.raw.txt", 0);
         g_rawBuf = (char*)Zeroed(kRawCap);
     }
     g_allocHooks = &g_hooks;
@@ -859,10 +882,9 @@ NS void AccessLogFinish()
         return;
     AccessLogWindow(ACCESS_WINDOW_OFF);
     g_ready = false;
-    if (g_rawFile != INVALID_HANDLE_VALUE) {
-        DWORD wrote;
-        WriteFile(g_rawFile, g_rawBuf, g_rawLen, &wrote, 0);
-        CloseHandle(g_rawFile);
+    if (g_rawFile != 0) {
+        host_file_write(g_rawFile, g_rawBuf, g_rawLen);
+        host_file_close(g_rawFile);
     }
     unsigned total = g_classifier.Slots();
     Row* rows = (Row*)Zeroed(sizeof(Row) * (total / 2 + 1));

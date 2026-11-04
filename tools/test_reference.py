@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -335,8 +336,7 @@ class CheckRoundtripTest(unittest.TestCase):
                     contextlib.redirect_stdout(out):
                 reference.check_traces(Path("x.exe"), None, 1, roundtrip="auto")
         self.assertEqual(seen["text"], "ticks 100\nmap X\nroundtrip 10\nroundtrip 50\nroundtrip 99\n")
-        self.assertIsNone(seen["scans"])
-        self.assertIn("block pointers: not checked with --roundtrip", out.getvalue())
+        self.assertEqual(seen["scans"], {})
 
 
 class CheckQuirksTest(unittest.TestCase):
@@ -599,15 +599,46 @@ class LoadOrderTest(unittest.TestCase):
             results = reference.play_all(Path("x.exe"), scenarios, None, parallel, failed=failed)
         return order, loaded, failed, results
 
-    def test_loader_runs_after_every_scenario_that_loads_nothing(self):
+    def test_loader_runs_after_its_saver_and_before_the_scenarios_not_yet_started(self):
         for parallel in (1, 2, 6):
             with tempfile.TemporaryDirectory() as tmp:
                 order, loaded, failed, results = self.play(self.scenarios(Path(tmp)), parallel)
-            self.assertEqual(order[-1], "loader", parallel)
             self.assertEqual(sorted(order), ["loader", "longer", "plain", "saver"])
+            self.assertLess(order.index("saver"), order.index("loader"), parallel)
             self.assertEqual(failed, {})
             self.assertEqual(loaded, {"loader": {"harness.sav": b"harness.sav of saver", "harness.opt": b"harness.opt of saver"}})
             self.assertIn("loader", results)
+        with tempfile.TemporaryDirectory() as tmp:
+            order, *_ = self.play(self.scenarios(Path(tmp)), 1)
+        self.assertEqual(order, ["longer", "saver", "loader", "plain"])
+
+    def test_a_loader_starts_before_an_unrelated_longer_run_ends(self):
+        started, ended = {}, {}
+        lock = threading.Lock()
+        gate = threading.Event()
+
+        def fake_play_scenario(exe, scenario, game_dir, want=None, poison=False, keep_always=False, scans=None,
+                               scan_every=1, retry_any=False, save_to=None, load_from=None):
+            name = scenario.stem
+            with lock:
+                started[name] = time.monotonic()
+            if name == "longer":
+                gate.wait(10)
+            if save_to is not None:
+                save_to.mkdir(parents=True, exist_ok=True)
+                for file in ("harness.sav", "harness.opt"):
+                    (save_to / file).write_bytes(b"x")
+            if name == "loader":
+                gate.set()
+            with lock:
+                ended[name] = time.monotonic()
+            return {}, [], 0.0, None
+
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(reference.playtest, "template_prefix"), \
+                mock.patch.object(reference, "play_scenario", fake_play_scenario):
+            reference.play_all(Path("x.exe"), self.scenarios(Path(tmp)), None, 3, failed={})
+        self.assertLess(started["loader"], ended["longer"])
+        self.assertGreaterEqual(started["loader"], ended["saver"])
 
     def test_only_a_saver_collects_a_save_and_only_a_loader_gets_one(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -798,12 +829,12 @@ class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
         self.assertEqual(tail.feed(b"its " + b"3" * 16 + b"\n"), [reference.tracedigest.digests([(2, "units", "2" * 16)])[0]])
 
 
-class GateLockTest(unittest.TestCase):
+class KeyLockTest(unittest.TestCase):
     CHILD = (
         "import sys, time\n"
         "from pathlib import Path\n"
         "import reference\n"
-        "with reference.GateLock(Path(sys.argv[1]), Path(sys.argv[2])):\n"
+        "with reference.KeyLock(Path(sys.argv[1]), Path(sys.argv[2])):\n"
         "    print('held', flush=True)\n"
         "    sys.stdin.readline()\n"
     )
@@ -846,18 +877,102 @@ class GateLockTest(unittest.TestCase):
     def test_the_lock_is_free_after_the_holder_leaves(self):
         with tempfile.TemporaryDirectory() as tmp:
             lock = Path(tmp) / "gate.lock"
-            with reference.GateLock(lock, Path("/w")):
+            with reference.KeyLock(lock, Path("/w")):
                 pass
-            with contextlib.redirect_stdout(io.StringIO()) as out, reference.GateLock(lock, Path("/w")):
+            with contextlib.redirect_stdout(io.StringIO()) as out, reference.KeyLock(lock, Path("/w")):
                 pass
             self.assertEqual(out.getvalue(), "")
 
-    def test_the_lock_lives_under_the_runtime_dir_or_tmp(self):
+    def test_the_locks_live_under_the_runtime_dir_or_tmp(self):
         with mock.patch.dict(os.environ, {"XDG_RUNTIME_DIR": "/run/user/1"}):
-            self.assertEqual(reference.lock_path(), Path("/run/user/1") / reference.LOCK_FILE)
+            self.assertEqual(reference.lock_dir(), Path("/run/user/1"))
+            self.assertEqual(reference.key_lock_path("a" * 64), Path("/run/user/1") / ("bt-gate-key-" + "a" * 16 + ".lock"))
         with mock.patch.dict(os.environ):
             os.environ.pop("XDG_RUNTIME_DIR", None)
-            self.assertEqual(reference.lock_path(), Path("/tmp") / reference.LOCK_FILE)
+            self.assertEqual(reference.lock_dir(), Path("/tmp"))
+
+
+class RunSlotsTest(unittest.TestCase):
+    CHILD = (
+        "import sys\n"
+        "from pathlib import Path\n"
+        "import reference\n"
+        "with reference.RunSlots(Path(sys.argv[1]), 2, Path(sys.argv[2])).slot():\n"
+        "    print('held', flush=True)\n"
+        "    sys.stdin.readline()\n"
+    )
+
+    def start(self, directory, worktree, env):
+        return subprocess.Popen([sys.executable, "-c", self.CHILD, str(directory), worktree], stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE, text=True, env=env)
+
+    def release(self, proc):
+        try:
+            proc.stdin.write("\n")
+            proc.stdin.flush()
+        except BrokenPipeError:
+            pass
+        proc.wait(30)
+        proc.stdin.close()
+        proc.stdout.close()
+
+    def test_with_two_slots_the_third_process_waits_until_one_is_released(self):
+        env = dict(os.environ, PYTHONPATH=str(Path(reference.__file__).parent))
+        with tempfile.TemporaryDirectory() as tmp:
+            procs = [self.start(tmp, "/work/a", env), self.start(tmp, "/work/b", env)]
+            try:
+                for proc in procs:
+                    self.assertEqual(proc.stdout.readline().strip(), "held")
+                third = self.start(tmp, "/work/c", env)
+                procs.append(third)
+                said = third.stdout.readline().strip()
+                self.assertTrue(said.startswith("waiting for a run slot, held by the gates of "), said)
+                self.assertIn(f"{procs[0].pid} (/work/a)", said)
+                self.assertIn(f"{procs[1].pid} (/work/b)", said)
+                self.assertIsNone(third.poll())
+                self.release(procs[0])
+                self.assertEqual(third.stdout.readline().strip(), "held")
+            finally:
+                for proc in procs:
+                    if proc.poll() is None:
+                        self.release(proc)
+
+    def test_threads_of_one_process_share_the_slots_and_free_them(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(reference, "SLOT_POLL_SECONDS", 0.01):
+            slots = reference.RunSlots(Path(tmp), 2, Path("/w"))
+            live, most, guard = [0], [0], threading.Lock()
+
+            def run():
+                with slots.slot():
+                    with guard:
+                        live[0] += 1
+                        most[0] = max(most[0], live[0])
+                    time.sleep(0.05)
+                    with guard:
+                        live[0] -= 1
+
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                threads = [threading.Thread(target=run) for _ in range(6)]
+                for t in threads:
+                    t.start()
+                for t in threads:
+                    t.join()
+            self.assertEqual(most[0], 2)
+            self.assertEqual(out.getvalue().count("waiting for a run slot"), 1)
+            with slots.slot():
+                pass
+
+    def test_no_lock_takes_no_slot(self):
+        with mock.patch.object(reference, "GATE_RUN_SLOTS", None):
+            with reference.run_slot():
+                pass
+
+    def test_the_count_comes_from_the_environment_else_the_default(self):
+        with mock.patch.dict(os.environ, {reference.SLOTS_ENV: "3"}):
+            self.assertEqual(reference.gate_slots(), 3)
+        with mock.patch.dict(os.environ):
+            os.environ.pop(reference.SLOTS_ENV, None)
+            self.assertEqual(reference.gate_slots(), reference.GATE_SLOTS)
 
 
 class BothModesTest(unittest.TestCase):
@@ -954,10 +1069,11 @@ class BothModesTest(unittest.TestCase):
         self.assertEqual(sorted(calls), [("a", None), ("b", None), ("c", None)])
         self.assertEqual(sorted(results), ["a", "b", "c"])
 
-    def test_a_loader_is_played_in_its_savers_mode_after_the_others(self):
+    def test_a_loader_is_played_in_its_savers_mode_after_its_saver(self):
         calls, _ = self.play(("wasm", "native"), loads={"c": "a"})
-        order = [call for call in calls]
-        self.assertEqual({order[-2], order[-1]}, {("c", "wasm"), ("c", "native")})
+        for mode in ("wasm", "native"):
+            self.assertLess(calls.index(("a", mode)), calls.index(("c", mode)))
+        self.assertEqual(sorted(calls), sorted((n, m) for n in "abc" for m in ("wasm", "native")))
 
 
 class TracediffCommandTest(unittest.TestCase):
@@ -1086,7 +1202,7 @@ class GateCacheTest(unittest.TestCase):
         argv = ["reference.py", "--check", "--exe", str(self.exe), *extra]
         with mock.patch.object(sys, "argv", argv), mock.patch.object(reference, "ROOT", self.root), \
                 mock.patch.object(reference, "check_traces", check), mock.patch.object(reference, "head_commit", return_value="abc"), \
-                mock.patch.object(reference, "GateLock", mock.MagicMock()), contextlib.redirect_stdout(io.StringIO()) as out:
+                mock.patch.object(reference, "KeyLock", mock.MagicMock()), contextlib.redirect_stdout(io.StringIO()) as out:
             try:
                 reference.main()
                 code = 0
@@ -1124,18 +1240,57 @@ class GateCacheTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertEqual(list(self.cache.glob("*.txt")) if self.cache.exists() else [], [])
 
+    def test_a_second_gate_of_the_same_key_waits_and_reports_the_first_pass(self):
+        played = []
+        started, release = threading.Event(), threading.Event()
+
+        def first(*args):
+            played.append("first")
+            started.set()
+            release.wait(30)
+            print("ok a\n1 of 1 equal")
+
+        def second(*args):
+            played.append("second")
+
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, {"XDG_RUNTIME_DIR": tmp}), \
+                mock.patch.object(sys, "argv", ["reference.py", "--check", "--exe", str(self.exe)]), \
+                mock.patch.object(reference, "ROOT", self.root), mock.patch.object(reference, "head_commit", return_value="abc"), \
+                contextlib.redirect_stdout(io.StringIO()) as out:
+            with mock.patch.object(reference, "check_traces", first):
+                one = threading.Thread(target=reference.main)
+                one.start()
+                self.assertTrue(started.wait(30))
+                with mock.patch.object(reference, "check_traces", second):
+                    two = threading.Thread(target=reference.main)
+                    two.start()
+                    for _ in range(300):
+                        if "waiting for the gate run of" in out.getvalue():
+                            break
+                        time.sleep(0.01)
+                    self.assertIn("waiting for the gate run of", out.getvalue())
+                    self.assertTrue(two.is_alive())
+                    release.set()
+                    one.join(30)
+                    two.join(30)
+        self.assertEqual(played, ["first"])
+        self.assertRegex(out.getvalue(), r"cached pass from .* at abc\n")
+
     def test_a_pass_that_appears_while_waiting_for_the_lock_is_reported(self):
         played = []
         key = self.key(mode="wasm")
 
         class Lock:
+            def __init__(inner, *args):
+                pass
+
             def __enter__(inner):
                 reference.store_pass(key, "ok a\n", "other")
 
             def __exit__(inner, *exc):
                 pass
 
-        with mock.patch.object(reference, "GateLock", Lock):
+        with mock.patch.object(reference, "KeyLock", Lock):
             argv = ["reference.py", "--check", "--exe", str(self.exe)]
             with mock.patch.object(sys, "argv", argv), mock.patch.object(reference, "ROOT", self.root), \
                     mock.patch.object(reference, "check_traces", lambda *a: played.append(a)), \

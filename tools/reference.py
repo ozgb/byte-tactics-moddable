@@ -63,7 +63,6 @@ import tempfile
 import threading
 import time
 from collections.abc import Callable
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -91,6 +90,7 @@ SAVES = ROOT / "reference/saves"
 SAVE_FILE = tracediff.SAVE_FILES[0]
 MAX_PARALLEL = 6
 MAX_PARALLEL_BOTH_MODES = 10
+GATE_SLOTS = 10
 GATE_TIER = (
     "allied-victory",
     "commander-death",
@@ -132,7 +132,10 @@ UI_LOGS: dict[str, str | None] = {}
 FRAME_DUMPS: dict[str, dict[int, bytes]] = {}
 SAVE_BYTES: dict[str, bytes | None] = {}
 MODES = ("wasm", "native")
-LOCK_FILE = "bt-gate.lock"
+SLOT_FILE = "bt-gate-slot-{}"
+KEY_LOCK_FILE = "bt-gate-key-{}.lock"
+SLOTS_ENV = "BT_GATE_SLOTS"
+SLOT_POLL_SECONDS = 0.25
 CACHE_ENV = "BT_GATE_CACHE"
 KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/frames", "reference/saves",
             "tools/playtest")
@@ -360,9 +363,19 @@ def default_modes(both_modes: bool) -> tuple[str | None, ...]:
     return MODES if both_modes else (None,)
 
 
-def lock_path() -> Path:
-    """The file the gate lock is taken on: under $XDG_RUNTIME_DIR, else /tmp."""
-    return Path(os.environ.get("XDG_RUNTIME_DIR") or "/tmp") / LOCK_FILE
+def lock_dir() -> Path:
+    """The directory of the run slots and key locks: $XDG_RUNTIME_DIR, else /tmp."""
+    return Path(os.environ.get("XDG_RUNTIME_DIR") or "/tmp")
+
+
+def gate_slots() -> int:
+    """The number of run slots on the machine: $BT_GATE_SLOTS, else GATE_SLOTS."""
+    return max(1, int(os.environ.get(SLOTS_ENV) or GATE_SLOTS))
+
+
+def key_lock_path(key: str) -> Path:
+    """The file that one gate key's runs are serialised on."""
+    return lock_dir() / KEY_LOCK_FILE.format(key[:16])
 
 
 def cache_dir() -> Path:
@@ -475,40 +488,55 @@ class Tee:
         return "".join(self.parts)
 
 
-class GateLock:
-    """An exclusive lock on one file, held for a whole --check, so that one machine plays one gate at a time.
+def open_lock_file(path: Path) -> int:
+    """Open (creating, world-writable) a lock file."""
+    fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o666)
+    try:
+        os.fchmod(fd, 0o666)
+    except OSError:
+        pass
+    return fd
+
+
+def holder_of(path: Path) -> str:
+    """`<pid> (<worktree>)` of the process whose entry is in a lock file, or `another process` while it has not written it."""
+    for _ in range(20):
+        try:
+            text = path.read_text().strip()
+        except OSError:
+            text = ""
+        if text:
+            pid, _, worktree = text.partition(" ")
+            return f"{pid} ({worktree})"
+        time.sleep(0.1)
+    return "another process"
+
+
+def take(fd: int, worktree: Path) -> None:
+    """Record this process in a lock file it holds."""
+    os.ftruncate(fd, 0)
+    os.write(fd, f"{os.getpid()} {worktree}\n".encode())
+
+
+class KeyLock:
+    """An exclusive lock on one file, held for a whole --check, so that a second gate of the same key waits and then finds the first's cached pass.
 
     The holder writes its pid and worktree into the file; a second process prints who holds it and waits.
     """
 
-    def __init__(self, path: Path | None = None, worktree: Path | None = None):
-        self.path = path or lock_path()
+    def __init__(self, path: Path, worktree: Path | None = None):
+        self.path = path
         self.worktree = worktree or ROOT
         self.fd: int | None = None
 
-    def holder(self) -> str:
-        """`<pid> (<worktree>)` of the process that holds the lock, as it wrote it, or `another process` while it has not."""
-        for _ in range(20):
-            text = self.path.read_text().strip()
-            if text:
-                pid, _, worktree = text.partition(" ")
-                return f"{pid} ({worktree})"
-            time.sleep(0.1)
-        return "another process"
-
-    def __enter__(self) -> "GateLock":
-        self.fd = os.open(self.path, os.O_RDWR | os.O_CREAT, 0o666)
-        try:
-            os.fchmod(self.fd, 0o666)
-        except OSError:
-            pass
+    def __enter__(self) -> "KeyLock":
+        self.fd = open_lock_file(self.path)
         try:
             fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
-            print(f"waiting for the gate run of {self.holder()}", flush=True)
+            print(f"waiting for the gate run of {holder_of(self.path)}", flush=True)
             fcntl.flock(self.fd, fcntl.LOCK_EX)
-        os.ftruncate(self.fd, 0)
-        os.write(self.fd, f"{os.getpid()} {self.worktree}\n".encode())
+        take(self.fd, self.worktree)
         return self
 
     def __exit__(self, *exc) -> None:
@@ -516,6 +544,67 @@ class GateLock:
             os.ftruncate(self.fd, 0)
             os.close(self.fd)
             self.fd = None
+
+
+class RunSlots:
+    """The machine's run slots: `count` files in `directory`, of which every run of every gate holds one (`flock`) for its whole run.
+
+    All gates on the machine together play at most `count` games, and a slot is released when its holder dies.
+    A process that has to wait prints, once, which gates hold the slots.
+    """
+
+    def __init__(self, directory: Path | None = None, count: int | None = None, worktree: Path | None = None):
+        self.directory = directory or lock_dir()
+        self.count = count or gate_slots()
+        self.worktree = worktree or ROOT
+        self.told = False
+        self.guard = threading.Lock()
+
+    def paths(self) -> list[Path]:
+        return [self.directory / SLOT_FILE.format(i) for i in range(self.count)]
+
+    def tell(self) -> None:
+        with self.guard:
+            if self.told:
+                return
+            self.told = True
+        holders = dict.fromkeys(holder_of(p) for p in self.paths() if p.exists() and p.read_text().strip())
+        print(f"waiting for a run slot, held by the gates of {', '.join(holders) or 'other processes'}", flush=True)
+
+    def acquire(self) -> int:
+        """Block until a slot is free, hold it and return its file descriptor."""
+        paths = self.paths()
+        start = os.getpid() % len(paths)
+        while True:
+            for i in range(len(paths)):
+                fd = open_lock_file(paths[(start + i) % len(paths)])
+                try:
+                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    os.close(fd)
+                    continue
+                take(fd, self.worktree)
+                return fd
+            self.tell()
+            time.sleep(SLOT_POLL_SECONDS)
+
+    @contextlib.contextmanager
+    def slot(self):
+        """Hold one slot for the body."""
+        fd = self.acquire()
+        try:
+            yield
+        finally:
+            os.ftruncate(fd, 0)
+            os.close(fd)
+
+
+GATE_RUN_SLOTS: RunSlots | None = None
+
+
+def run_slot():
+    """The context of one run: a slot of GATE_RUN_SLOTS, or nothing while the gate takes none (--no-lock)."""
+    return GATE_RUN_SLOTS.slot() if GATE_RUN_SLOTS is not None else contextlib.nullcontext()
 
 
 def game_trace(pid: int) -> Path | None:
@@ -757,8 +846,8 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
     which they only hardlink. With `expected`, a scenario that differs keeps its trace (see play_scenario).
     With `watch`, scenarios not yet started are skipped once the watch halts, and the runs it stopped are not failures.
 
-    A scenario with a `load` line runs after every scenario that has none, in any mode and with any `parallel`:
-    the scenario it names saves a game (the `save` key), the run's savegame/harness.sav and savegame/harness.opt are copied out of its game
+    The longest scenarios start first; a scenario with a `load` line starts as soon as the scenario it names has finished
+    (ahead of the scenarios not yet started), in its mode and with any `parallel`: the scenario it names saves a game (the `save` key), the run's savegame/harness.sav and savegame/harness.opt are copied out of its game
     copy into a temporary directory, and put into the loading run's own game copy. A loader whose saver is not among
     `scenarios` (see with_savers), failed to run, or wrote no save fails without running, with a message naming both.
     """
@@ -795,11 +884,12 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
             if problem:
                 raise tracediff.Error(problem)
             saver = loads[key]
-            results[key] = play_scenario(exe, scenarios[name], game_dir, (expected or {}).get(name), poison, keep_always, scans, scan_every, retry_any,
-                                         save_to=saves / key if key in loads.values() else None,
-                                         load_from=saves / saver if saver else None,
-                                         **({"watch": watch} if watch is not None else {}),
-                                         **({"mode": mode} if mode is not None else {}))
+            with run_slot():
+                results[key] = play_scenario(exe, scenarios[name], game_dir, (expected or {}).get(name), poison, keep_always, scans, scan_every, retry_any,
+                                             save_to=saves / key if key in loads.values() else None,
+                                             load_from=saves / saver if saver else None,
+                                             **({"watch": watch} if watch is not None else {}),
+                                             **({"mode": mode} if mode is not None else {}))
         except (tracediff.Error, OSError) as e:
             if watch is not None and watch.halted.is_set():
                 return
@@ -816,10 +906,56 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
             return 0
 
     ordered = sorted(keys, key=longest_first)
+    cond = threading.Condition()
+    pending = [k for k in ordered if loads[k] is None]
+    waiting = [k for k in ordered if loads[k] is not None]
+    ready: list[str] = []
+    finished: set[str] = set()
+    running = 0
+    crashes: list[BaseException] = []
+
+    def promote() -> None:
+        """Move the loaders whose saver has finished (or is not played at all) from `waiting` to `ready`; the caller holds `cond`."""
+        for k in list(waiting):
+            if loads[k] not in keys or loads[k] in finished:
+                waiting.remove(k)
+                ready.append(k)
+
+    def worker() -> None:
+        nonlocal running
+        while True:
+            with cond:
+                while True:
+                    promote()
+                    if ready or pending:
+                        break
+                    if not running and not waiting:
+                        return
+                    if not running:
+                        ready.extend(waiting)
+                        waiting.clear()
+                        break
+                    cond.wait()
+                key = ready.pop(0) if ready else pending.pop(0)
+                running += 1
+            try:
+                one(key)
+            except BaseException as e:
+                crashes.append(e)
+            finally:
+                with cond:
+                    running -= 1
+                    finished.add(key)
+                    cond.notify_all()
+
     try:
-        with ThreadPoolExecutor(parallel) as pool:
-            list(pool.map(one, [k for k in ordered if loads[k] is None]))
-            list(pool.map(one, [k for k in ordered if loads[k] is not None]))
+        threads = [threading.Thread(target=worker) for _ in range(parallel)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        if crashes:
+            raise crashes[0]
     finally:
         shutil.rmtree(saves, ignore_errors=True)
     if failures:
@@ -1507,7 +1643,9 @@ def main() -> None:
         if stored is not None:
             report_cached(stored)
             return
-    with contextlib.nullcontext() if args.no_lock else GateLock():
+    global GATE_RUN_SLOTS
+    GATE_RUN_SLOTS = None if args.no_lock else RunSlots()
+    with KeyLock(key_lock_path(key)) if key is not None and not args.no_lock else contextlib.nullcontext():
         if key is not None:
             stored = cached_pass(key)
             if stored is not None:

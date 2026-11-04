@@ -218,7 +218,7 @@ void* ReplayParseWeapon(const char* value)
 
 namespace {
 
-enum { ARRAY_LINE_BYTES = 512, ARRAY_LINE_HEX = 1024, MAX_ARRAY_ELEMENTS = 1 << 24 };
+enum { ARRAY_LINE_BYTES = 512, ARRAY_LINE_TEXT = 1200, MAX_ARRAY_ELEMENTS = 1 << 24 };
 
 void AddHex(ReplayText& t, const unsigned char* p, unsigned bytes)
 {
@@ -317,7 +317,7 @@ void EmitArray(ReplayText& out, ReplayKnown& known, const char* key, char tag, c
     }
     const char* before = ArrayHex(old);
     unsigned width = elem * 2;
-    unsigned used = 0;
+    unsigned lineStart = 0;
     bool open = false;
     for (unsigned i = 0; i < count;) {
         if (memcmp(hex + i * width, before + i * width, width) == 0) {
@@ -327,10 +327,14 @@ void EmitArray(ReplayText& out, ReplayKnown& known, const char* key, char tag, c
         unsigned end = i + 1;
         while (end < count && end - i < perLine && memcmp(hex + end * width, before + end * width, width) != 0)
             end++;
+        if (open && out.Size() - lineStart + 12 + (end - i) * width > ARRAY_LINE_TEXT) {
+            out.AddChar('\n');
+            open = false;
+        }
         if (!open) {
+            lineStart = out.Size();
             ArrayLine(out, tag, key, "");
             open = true;
-            used = 0;
         } else {
             out.AddChar(' ');
         }
@@ -338,12 +342,7 @@ void EmitArray(ReplayText& out, ReplayKnown& known, const char* key, char tag, c
         out.AddChar(':');
         for (unsigned k = 0; k < (end - i) * width; k++)
             out.AddChar(hex[i * width + k]);
-        used += (end - i) * width;
         i = end;
-        if (used >= ARRAY_LINE_HEX) {
-            out.AddChar('\n');
-            open = false;
-        }
     }
     if (open)
         out.AddChar('\n');

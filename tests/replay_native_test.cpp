@@ -1645,6 +1645,37 @@ void ArraySelfTest()
     Check(strstr(g_detail.Data(), "byte 25 of 32") != nullptr, "and at its byte");
     rebuiltClass->cells.get()[6] ^= 0x100u;
 
+    printf("long deltas\n");
+    ResetBlock();
+    Player* wide = &g_game->players[4];
+    wide->exploredSize = 1500;
+    unsigned char* field = (unsigned char*)SimAlloc(1500);
+    for (int i = 0; i < 1500; i++)
+        field[i] = (unsigned char)i;
+    wide->explored = field;
+    unsigned char wideKind = ROK_PLAYER;
+    void* wideRoot = wide;
+    Recorder wideRecorder;
+    ReplayText wideCalls;
+    wideRecorder.Record(&wideKind, &wideRoot, 1, sets);
+    wideCalls.AddText(wideRecorder.text);
+    for (int i = 0; i < 1500; i += 3)
+        field[i] = (unsigned char)(field[i] + 77);
+    wideRecorder.Record(&wideKind, &wideRoot, 1, sets);
+    wideCalls.AddText(wideRecorder.text);
+    Check(CountLines(wideRecorder.text.Data(), "  r Player#4.explored ") >= 3, "a delta of many runs is several lines");
+    Check(LongestLine(wideCalls.Data()) < 1300, "and every line of it is bounded");
+    unsigned char expected[1500];
+    memcpy(expected, field, sizeof expected);
+    ResetBlock();
+    RestoreText(wideCalls.Data(), sets);
+    Player* wideBack = (Player*)ReplayResolveObject("Player#4", nullptr, g_objects, AllocObject);
+    bool same = wideBack != nullptr && wideBack->explored.get() != nullptr;
+    for (int i = 0; same && i < 1500; i++)
+        same = wideBack->explored.get()[i] == expected[i];
+    Check(same, "the runs of every line are applied");
+    wideCalls.Free();
+
     printf("block arrays\n");
     ResetBlock();
     const ReplayField* mask = FindField("Game.visibilityMask");

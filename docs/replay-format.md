@@ -151,8 +151,8 @@ the last known value. A line of an array is one of these:
 | `r Player#3.explored 5:aabb 1000:cc` | a later call: each run of changed elements as `index:elements`, separated by spaces |
 | `r Player#3.explored null` | the `Ref` is null (an inline array is never null) |
 
-A line carries at most 512 bytes of elements, so a long array is several lines with the same name, in order, and a long delta
-is several lines too. `[0]` is an array of no elements. A whole write also follows a null, and a change of length. `w` and `o`
+A whole write puts at most 512 bytes of elements on a line, and a delta line takes no run that would take it past 1,200
+characters, so a long array is several lines with the same name, in order, and a long delta is several lines too. `[0]` is an array of no elements. A whole write also follows a null, and a change of length. `w` and `o`
 lines have the same forms, against the value known after the last `r` or `w` line. The replayer keeps the array in its block
 and applies the runs to it; at the end of the call it is compared with the value the lines made known, and a difference is
 reported at the field, as `byte 25 of 32: recorded 15, replayed 14, 1 bytes differ`.

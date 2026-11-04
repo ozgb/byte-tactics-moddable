@@ -58,7 +58,7 @@ public:
     unsigned Of(unsigned kind, const void* object);
 
 private:
-    enum { KINDS = 16, CAPACITY = 64 };
+    enum { KINDS = 16, CAPACITY = 4096 };
     unsigned count[KINDS];
     const void* objects[KINDS][CAPACITY];
 };

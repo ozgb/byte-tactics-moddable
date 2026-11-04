@@ -5,6 +5,7 @@
 
 import copy
 import json
+import re
 import unittest
 
 import replayschema as rs
@@ -228,8 +229,8 @@ class Rules(unittest.TestCase):
         lines = files[rs.SCHEMA_H].split("\n")
         begin = [l for l in lines if l.startswith('    { "unitsBegin"')][0].rstrip(" },").split(", ")
         end = [l for l in lines if l.startswith('    { "unitsEnd"')][0].rstrip(" },").split(", ")
-        self.assertTrue(int(begin[-6]) > 0 and int(begin[-5]) == 0, begin)
-        self.assertTrue(int(end[-6]) == 0 and int(end[-5]) > 0, end)
+        self.assertTrue(int(begin[-5]) > 0 and int(begin[-4]) == 0, begin)
+        self.assertTrue(int(end[-5]) == 0 and int(end[-4]) > 0, end)
 
 
 class Services(unittest.TestCase):
@@ -591,11 +592,11 @@ class Polymorphic(unittest.TestCase):
         text = files[rs.SCHEMA_H]
         vtables = files[rs.VTABLES_CPP]
         self.assertIn("extern void (* const g_approachRadiusVtable[])();", vtables)
-        self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },', text)
+        self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, 0 },', text)
         self.assertIn("    case ROK_APPROACHRADIUS:\n        return g_approachRadiusVtable;", vtables)
         self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', vtables)
         base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
-        self.assertTrue(base.endswith('"", 0, 3 },'), base)
+        self.assertTrue(base.endswith('0, 0, 0, 3 },'), base)
         self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };", text)
         self.assertIn('static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");', text)
         self.assertIn('static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");', text)
@@ -1105,6 +1106,155 @@ class RawPointers(unittest.TestCase):
         ann = annotations()
         self.spec("InitGafSequence", ann)["args"][2]["reach"] = ["x"]
         self.assertTrue(any("service InitGafSequence: the argument index has a `reach` and is not an object" in e for e in self.generated(ann)[1]))
+
+
+class Conditions(unittest.TestCase):
+    """A `when` on any field: a mask, a value, and an optional `via` field that leads to the object the condition reads."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def field(self, ann, kind, name):
+        return [f for f in ann["objects"][kind]["fields"] if f["name"] == name][0]
+
+    def errors(self, ann, kind, name, when):
+        self.field(ann, kind, name)["when"] = when
+        return self.generated(ann)[1]
+
+    def line(self, text, name, kind):
+        return [l for l in text.split("\n") if l.startswith('    { "%s", offsetof(%s,' % (name, kind))][0]
+
+    def test_a_masked_condition_is_in_the_field_table(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertRegex(self.line(text, "count", "FixtureView"), r"RK_I32, 0, 0, 0, \{ \d+, 0, ROK_FIXTUREVIEW, 1u, 0 \}, 0, 0 \},")
+        self.assertRegex(self.line(text, "scale", "FixtureView"), r"\{ \d+, 0, ROK_FIXTUREVIEW, 1u, 1 \}")
+
+    def test_a_condition_through_a_field_names_that_field_and_the_kind_it_reaches(self):
+        files, _, model = self.generated()
+        text = files[rs.SCHEMA_H]
+        names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
+        moved = self.line(text, "moved", "FixtureSlave")
+        self.assertRegex(moved, r"\{ (\d+), (\d+), ROK_PLAYER, 4u, 4 \}")
+        read, via = [int(x) for x in re.search(r"\{ (\d+), (\d+), ROK_PLAYER", moved).groups()]
+        self.assertEqual((names[read - 1], names[via - 1]), ("Player.flags", "FixtureSlave.player"))
+        low = self.line(text, "low", "FixtureSlave")
+        read, via = [int(x) for x in re.search(r"\{ (\d+), (\d+), ROK_FIXTUREVIEW, 2u, 0 \}", low).groups()]
+        self.assertEqual((names[read - 1], names[via - 1]), ("FixtureView.flags", "FixtureSlave.master"))
+
+    def test_a_condition_without_a_mask_reads_every_bit(self):
+        files, _, _ = self.generated()
+        self.assertRegex(self.line(files[rs.SCHEMA_H], "weapon0TargetUnit", "Unit"), r"RK_UNITID, ROK_UNIT, 0, 0, \{ \d+, 0, ROK_UNIT, 4294967295u, -32768 \}, 0, 5")
+
+    def test_a_field_without_a_condition_has_an_empty_one(self):
+        files, _, _ = self.generated()
+        self.assertIn("ROK_FIXTUREVIEW, RK_U16, 0, 0, 0, {}, 0, 0 },", self.line(files[rs.SCHEMA_H], "flags", "FixtureView"))
+
+    def test_a_mask_and_a_value_that_cannot_meet_are_errors(self):
+        for when, message in (({"field": "flags", "mask": 0, "equals": 0}, "non-zero integer that fits the 2 bytes"),
+                              ({"field": "flags", "mask": 65536, "equals": 0}, "non-zero integer that fits the 2 bytes"),
+                              ({"field": "flags", "mask": 1, "equals": 2}, "can never hold"),
+                              ({"field": "flags", "mask": 1, "equals": -1}, "can never hold"),
+                              ({"field": "flags", "equals": 70000}, "outside the range of FixtureView.flags (0 to 65535)"),
+                              ({"field": "flags", "equals": "1"}, "`equals` of a condition is an integer")):
+            errors = self.errors(annotations(), "FixtureView", "count", when)
+            self.assertTrue(any("FixtureView.count" in e and message in e for e in errors), (when, errors))
+
+    def test_the_field_a_condition_reads_is_an_integer_without_a_condition(self):
+        ann = annotations()
+        errors = self.errors(ann, "FixtureView", "count", {"field": "scale", "equals": 0})
+        self.assertTrue(any("only an integer or flags field can be read" in e for e in errors), errors)
+        errors = self.errors(annotations(), "FixtureView", "count", {"field": "total", "equals": 0})
+        self.assertTrue(any("FixtureView.total, which has a `when` of its own" in e for e in errors), errors)
+        errors = self.errors(annotations(), "FixtureView", "count", {"field": "nowhere", "equals": 0})
+        self.assertTrue(any("nowhere, which is no field of FixtureView" in e for e in errors), errors)
+
+    def test_a_via_names_a_plain_field_that_leads_to_an_object(self):
+        for when, message in (({"via": "nowhere", "field": "flags", "equals": 0}, "nowhere, which is no field of FixtureSlave"),
+                              ({"via": "moved", "field": "flags", "equals": 0}, "the `via` field moved has a `when` of its own"),
+                              ({"via": "player", "field": "flags", "equals": 0}, "the condition's `kind` names the table kind it indexes"),
+                              ({"via": "player", "kind": "UnitDef", "field": "flags1", "equals": 0}, "the condition's `kind` names the table kind it indexes"),
+                              ({"via": "master", "kind": "FixtureView", "field": "flags", "equals": 0}, "leads to its target, and `kind` is for an integer"),
+                              ({"kind": "Player", "field": "flags", "equals": 0}, "there is no `via`")):
+            errors = self.errors(annotations(), "FixtureSlave", "speed", when)
+            self.assertTrue(any("FixtureSlave.speed" in e and message in e for e in errors), (when, errors))
+
+    def test_a_condition_is_a_dictionary_of_known_keys(self):
+        for when in ({"field": "flags"}, {"equals": 1}, {"field": "flags", "equals": 0, "also": 1}, "flags == 0"):
+            errors = self.errors(annotations(), "FixtureView", "count", when)
+            self.assertTrue(any("FixtureView.count: a `when` is" in e for e in errors), (when, errors))
+
+    def test_only_a_state_kind_has_a_condition(self):
+        ann = annotations()
+        self.field(ann, "Vec3", "y")["when"] = {"field": "x", "equals": 0}
+        self.assertTrue(any("Vec3.y: only the field of a state kind has a `when`" in e for e in self.generated(ann)[1]))
+
+    def test_a_unitid_field_still_needs_its_condition(self):
+        ann = annotations()
+        del self.field(ann, "Unit", "weapon0TargetUnit")["when"]
+        self.assertTrue(any("Unit.weapon0TargetUnit: a unitid field names the field and the value that make it an id" in e for e in self.generated(ann)[1]))
+
+
+class InsideSites(unittest.TestCase):
+    """`inside` lists every {kind, member} a kind is embedded at."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def test_each_site_is_a_row_of_the_site_table(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn('    { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot" },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim" },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow" },', text)
+        self.assertIn("kReplayInsideSiteCount = 3;", text)
+
+    def test_a_kind_points_at_its_sites(self):
+        files, _, _ = self.generated()
+        text = files[rs.SCHEMA_H]
+        self.assertIn('{ "UnitResources", sizeof(UnitResources), RS_STATE, RT_ORDER, 0, 1, 0, 0 },', text)
+        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 1, 2, 0, 0 },', text)
+        self.assertIn('{ "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0 },', text)
+
+    def test_the_sites_of_a_kind_are_in_the_model(self):
+        _, _, model = self.generated()
+        handle = [o for o in model["objects"] if o["name"] == "Handle"][0]
+        self.assertEqual(handle["inside"], [{"kind": "FixtureHolder", "member": "anim"}, {"kind": "FixtureHolder", "member": "shadow"}])
+        self.assertIsNone([o for o in model["objects"] if o["name"] == "Unit"][0]["inside"])
+
+    def test_the_single_site_form_is_an_error(self):
+        ann = annotations()
+        ann["objects"]["UnitResources"]["inside"] = {"kind": "Unit", "member": "resourceSlot"}
+        self.assertTrue(any("UnitResources inside: `inside` lists the sites" in e for e in self.generated(ann)[1]))
+
+    def test_a_site_is_an_embed_field_of_a_state_kind(self):
+        ann = annotations()
+        ann["objects"]["Handle"]["inside"].append({"kind": "FixtureHolder", "member": "id"})
+        self.assertTrue(any("Handle inside: the site FixtureHolder.id is no embed field of FixtureHolder that leads to Handle" in e for e in self.generated(ann)[1]))
+        ann = annotations()
+        ann["objects"]["Handle"]["inside"].append({"kind": "Vec3", "member": "x"})
+        self.assertTrue(any("Handle inside: the site Vec3.x is not in a state kind of the schema" in e for e in self.generated(ann)[1]))
+        ann = annotations()
+        ann["objects"]["Handle"]["inside"].append({"kind": "FixtureHolder", "member": "anim", "extra": 1})
+        self.assertTrue(any("Handle inside: a site is" in e for e in self.generated(ann)[1]))
+
+    def test_a_site_belongs_to_one_kind(self):
+        ann = annotations()
+        ann["objects"]["FrameTable"]["inside"] = [{"kind": "FixtureHolder", "member": "anim"}]
+        errors = self.generated(ann)[1]
+        self.assertTrue(any("Handle inside: the site FixtureHolder.anim is already the site of a kind" in e for e in errors), errors)
+
+    def test_a_container_is_not_itself_inside_a_kind_and_a_table_is_not_inside_one(self):
+        ann = annotations()
+        ann["objects"]["FixtureHolder"]["inside"] = [{"kind": "Unit", "member": "resourceSlot"}]
+        errors = self.generated(ann)[1]
+        self.assertTrue(any("Handle inside: the container FixtureHolder is itself inside another kind" in e for e in errors), errors)
+        ann = annotations()
+        ann["objects"]["Cell"]["inside"] = [{"kind": "FixtureHolder", "member": "anim"}]
+        errors = self.generated(ann)[1]
+        self.assertTrue(any("Cell inside: a kind with a table is named by its index" in e for e in errors), errors)
 
 
 class Committed(unittest.TestCase):

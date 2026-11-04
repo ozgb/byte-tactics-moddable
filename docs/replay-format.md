@@ -432,7 +432,7 @@ a value kind (`scope: value`, no row of the field sets matches its fields):
 | nullable struct in | `{"mode": "struct", "kind": "Vec3", "dir": "in", "nullable": true}` | `a pos null` for a null pointer, else the lines of the fields; the replayer passes NULL |
 | array of structs in | `{"mode": "structs", "kind": "Point16", "count": "count"}` | `a points[0].x 1`, `a points[0].y 2`, `a points[1].x 3`, and so on for each of `count` elements (`count` names another integer argument); `a points null` and `a points []` for a null pointer and an empty array |
 | struct by value | `{"mode": "value", "kind": "Angles16"}`, for an argument or `result` | `a kind (5)`, `o result (-3,40000,7)`, and in an import line ` (5)` and ` = (-3,40000,7)`: the values of its fields in order, in parentheses, written as the field's kind writes them |
-| nullable in/out value | `{"mode": "struct", "kind": "MissionType", "dir": "inout", "nullable": true}` | the value going in as `(5)`, or `null` for a null pointer, in an import line (` (5)`) and in the `a` lines of a slot (`a count (5)`); the value coming out as `o count (9)`, written only when the pointer is not null. The replayer passes the value by address (or NULL), and the stub of an import writes the `o` line back through the pointer |
+| nullable in/out struct | `{"mode": "struct", "kind": "MissionType", "dir": "inout", "nullable": true}` | the value going in as `(5)`, or `null` for a null pointer, in an import line (` (5)`) and in the `a` lines of a slot (`a count (5)`); the value coming out as `o count (9)`, written only when the pointer is not null. The replayer passes the value by address (or NULL), and the stub of an import writes the `o` line back through the pointer |
 
 `MissionType` (one field, `index`) and `Angles16` (`bank`, `heading`, `pitch`) are the kinds of the by-value form so far. The
 count of the array form is read from the count argument's own line, so the argument must be recorded. A mismatch of a result
@@ -442,6 +442,13 @@ An in/out value (`"dir": "inout"`, `nullable` or not) is the pointer an import o
 the type it points at. Only the value is written, not a line per field: the same text as the by-value form. A slot lists each
 in/out name in the closing names of its call, so that an `o count (9)` line after an import is the import's when the slot does
 not name `count` itself. A mismatch of the value coming out is reported at the argument (`count`).
+
+A pointer to a scalar (`int*`, `short*`, `unsigned char*`, and the unsigned forms of the first two) that a callee reads and writes back,
+as `QueryScript` does with `p2` to `p5`, is `{"mode": "value", "dir": "inout", "nullable": true}` with no `kind`. The lines are those of the
+struct form with the value in parentheses: `a p2 (5)` going in, `a p3 null` for a null pointer, `o p2 (9)` coming out when the pointer is not
+null (in an import line ` (5)` and ` null`, and `o p2 (9)` after it). The replayer passes the scalar by address, or NULL, and the stub of an
+import writes the `o` line back through the pointer. It is neither `cast`, which stays `void*`, nor a one-field struct kind, which would
+describe an `int` as something it is not. A `value` with a `dir` other than `inout`, a `kind` on an in/out scalar, and a pointer to any other type are errors.
 
 ### A void* argument with a known kind
 
@@ -712,6 +719,7 @@ sets). The annotations hold what no header says:
 | `struct` (`dir` in, out or inout) | a pointer to a value kind, `nullable` when in or inout | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local) |
 | `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
+| `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
 | `argv` | `CommandArgs*` | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
 | `weapon` | `WeaponDef*` | `weapondef#17` |
@@ -754,9 +762,21 @@ The kinds the self-tests need and no subsystem has (`FixtureView`, `FixtureCell`
 not in `data/replay_schema.json`. `tests/replay_fixtures.json` holds them (`includes`, `game_fields`, `objects`, `fixtures` for the slots the self-tests call, and `inside` for the sites they add
 to a real kind), `tests/replay_fixtures.h` their structs, and `uv run tools/replayschema.py` writes `tests/replay_schema_fixtures.h`, the tables
 of the real kinds with these appended, and `tests/replay_vtables_fixtures.cpp`. `src/harness/replay_schema.h` includes the first when
-`BT_REPLAY_FIXTURES` is defined, which only `tests/replay_native_test.cpp` and `tests/replay_objects_fixtures.cpp` (a copy of `replay_objects.cpp` that defines it first) do, so the exe's recorder has no fixture kind, and no real member of `Game`
+`BT_REPLAY_FIXTURES` is defined, which only `tests/replay_native_test.cpp`, `tests/replay_objects_fixtures.cpp` (a copy of `replay_objects.cpp` that defines it first)
+and `tests/replay_fixture_recorder.cpp` (below) do, so the exe's recorder has no fixture kind, and no real member of `Game`
 (`Game::slowest`, `p1b8a` and `p1cd5` are the hosts of the fixtures) is declared as anything but what it is. The fixture annotations are checked
 with the rest.
+
+Each slot of `fixtures` is classified as a slot of a subsystem is, and the tool writes three things for it, so that every form of the format
+is exercised by the tests and `replayschema.py --check` keeps them current:
+
+- `tests/replay_shapes.h`: the import stub of the slot (`Imp_fixture_<Slot>`, which the self-tests call as the module would), and, for a slot whose
+  arguments the runner can pass (the modes `scalar`, `stream`, `text`, `handle`, `object`, `struct`, `structs`, `value` and `argv`, with a scalar, object or value result),
+  its runner `Run_fixture_<Slot>` and `After_fixture_<Slot>`, which call `Native_fixture_<Slot>`, a function that `tests/replay_native_test.cpp` defines. A self-test loads the
+  lines of a call, runs the pair and checks `g_diffs` and the first key.
+- `tests/replay_fixture_hooks.inc`: the recording wrapper of the slot (`RecFixture<Slot>`) and a `FixtureSeam` table of them. `tests/replay_fixture_recorder.cpp` includes
+  `replay.cpp` with `BT_REPLAY_FIXTURES` defined and then this file in a second anonymous namespace, so the wrappers are compiled with the recorder's own helpers.
+  The translation unit is a compile check, built by the `replay_native_test` target and linked into no exe.
 
 ### Services
 

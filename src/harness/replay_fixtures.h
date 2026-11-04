@@ -43,6 +43,24 @@ struct FixtureSlave {
     };
 };
 
+struct FixtureCell {
+    unsigned short unit;
+    unsigned short unit2;
+    unsigned char height;
+    unsigned char high;
+    unsigned char low;
+    unsigned char metal;
+    unsigned short feature;
+    unsigned short spot;
+    unsigned short flags;
+};
+
+struct FixtureLane {
+    int level;
+    unsigned short unit;
+    unsigned short flags;
+};
+
 struct FixtureHolder {
     int id;
     Handle anim;

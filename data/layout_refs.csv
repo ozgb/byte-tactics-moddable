@@ -106,7 +106,7 @@ DefeatAllUnitsKilled::SaveState,0x48f840,src/game/victory.cpp,end-of,g_satisfied
 LiteGoal::LiteGoal,0x4907e0,src/game/victory.cpp,end-of,g_liteGoalVtable,0,g_packedGoalVtable,,none
 ReopenCdAudio,0x490fe0,src/game/game_state.cpp,end-of,g_cachedCdTrackTypes,0,DAT_0051e848,,none
 ReopenCdAudio,0x490fe0,src/game/game_state.cpp,past-end,DAT_0051e848,136,DAT_0051e848,g_cdListsDiscEntries+0xa8,none
-ReopenCdAudio,0x490fe0,src/game/game_state.cpp,past-end,g_cdListsDiscEntries,2752,g_cdListsDiscEntries,g_savegameSideList+0x0,end
+ReopenCdAudio,0x490fe0,src/game/game_state.cpp,past-end,g_cdListsDiscEntries,2752,g_cdListsDiscEntries,g_savegameSideList+0x0,none
 InitGame,0x491200,src/game/game_state.cpp,end-of,g_cdListsKey,0,g_offscreenSurfaceName,,none
 InitGame,0x491200,src/game/game_state.cpp,end-of,g_commonGuiName,0,g_hattFont12Name,,none
 InitGame,0x491200,src/game/game_state.cpp,end-of,g_hattFont11Name,0,g_unitLimitKey,,none

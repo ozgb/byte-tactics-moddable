@@ -44809,6 +44809,7 @@ address,function,file,kind,target
 ,EmitArray,src/harness/replay_objects.cpp,call,ReplayKnown::Set
 ,EmitArray,src/harness/replay_objects.cpp,call,ReplayText::AddChar
 ,EmitArray,src/harness/replay_objects.cpp,call,ReplayText::AddUnsigned
+,EmitArray,src/harness/replay_objects.cpp,call,ReplayText::Size
 ,EmitArray,src/harness/replay_objects.cpp,call,memcmp
 ,EmitArray,src/harness/replay_objects.cpp,call,sprintf
 ,EmitArray,src/harness/replay_objects.cpp,call,strcmp

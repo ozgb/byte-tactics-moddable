@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, economy and targeting have recordings so far. The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, economy, targeting and map have recordings so far. The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -938,6 +938,20 @@ slot but `SetWeaponTargetPos`, `SetWeaponTargetUnit` 315 times, candidates from 
 25750 to 25770 only, where a unit with more than five kills fires at a moving unit (the scale of `GetWeaponTargetPos`). Each
 `GetWeaponTargetPos` that returns nonzero records the `pos` it wrote (`o pos.x`); one that returns 0 leaves the stack local of its caller untouched, so
 nothing is recorded of it.
+
+`replay_inject_test.exe` is also built with `BT_REPLAY_INJECT_MEAN_SHIFT=0` (the `>> 1` that halves the sum of the low and high corners of a cell in `GetCellMeanHeight`), and the divergence is reported at call 7 of `orders-air-repair` and at `result`:
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 7 result tests/replay/map/orders-air-repair.txt
+```
+
+The recordings of map, which is native code in every mode: `ui-build-place` (the whole run: `BuildAllPassMaps` at load, `CanBuildAt`, `SnapWorldPosToFootprint`, `RefreshPassMap`), `orders-air`, ticks 1020 to 1585 only
+(`SetYardOpen`, `SpatialBucketPrependUnit` and `SpatialBucketUnlinkUnit`, `CanPlaceFootprintAt`, `CanBuildAt`) and `orders-air-repair`, ticks 380 to 385 only (`ClearFootprintAndUnlink`, `IsPadSlotFree`, `GetCellMeanHeight`).
+A window cannot start at tick 0, so only a whole run holds the load-time `BuildAllPassMaps`. The first call that names a field of `Cell` writes it for every cell of the table (a map of 224 by 102 cells is about 23,000 lines a field),
+which is most of each file, and after that only the cells a call changed. `ForceNeighborFootprintReclaim` is in no scenario.
+The spatial grid `Game::cells_1429f` is the table of `SpatialBucket` (`width_142a3` times `height_142a7` buckets, included under `pack1:` because the game lays a bucket out in 10 bytes, and listed before `Cell` so that the units
+of a chain are recorded whole before a cell's `occupant` reaches them with a limit), `Game::overflowBucket` is a `ref` to `OverflowBucket`, a kind of the same type with no table, and the unit a cell holds is reached through its
+`occupant` field (a `unitid` over `unit`). A unit whose bucket is the overflow bucket is written `SpatialBucket#?` and cannot be replayed: no committed recording has one. The replayer defines `operator delete` over `SimFree`, as the game does.
 
 ### Against the WASM module
 

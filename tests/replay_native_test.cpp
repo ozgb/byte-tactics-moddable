@@ -15,6 +15,12 @@
 #include "../src/map/feature_spot.h"
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
+#include "../src/map/terrain.h"
+#include "../src/map/mission.h"
+#include "../src/map/spatial_bucket.h"
+#include "../src/map/plot_map.h"
+#include "../src/map/map_list.h"
+#include "../src/units/movement_class.h"
 #include "../src/harness/replay_services.h"
 #include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
@@ -22,6 +28,11 @@
 #include "../src/harness/replay_objects.h"
 #include "../src/harness/replay_callbacks.h"
 #include "replay_wasm.h"
+
+int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
+
+int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player);
+int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
 
 extern "C" int __cdecl bx_rand(void* state);
 extern "C" int __cdecl bx_ScaledSin(short angle, int scale);
@@ -1296,6 +1307,91 @@ int __stdcall Native_fixture_Measure(int* p2, short* p3, unsigned char* p4)
     if (p4 != nullptr)
         *p4 = (unsigned char)(*p4 + 1);
     return 1;
+}
+
+int __fastcall GetGameTypeSlot(Mission* self)
+{
+    return self->GetGameType();
+}
+
+char* __stdcall GetNameSlotSlot(Mission* mission, int index)
+{
+    return mission->GetNameSlot(index);
+}
+
+void __fastcall SpatialBucketPrependUnitSlot(SpatialBucket* self, int unusedEdx, Unit* unit)
+{
+    self->PrependUnit(unit);
+}
+
+void __fastcall SpatialBucketUnlinkUnitSlot(SpatialBucket* self, int unusedEdx, Unit* unit)
+{
+    self->UnlinkUnit(unit);
+}
+
+void __fastcall RefreshPassMapSlot(MovementClass* self, int unusedEdx, Point16 a, Point16 b)
+{
+    self->RefreshPassMap(a, b);
+}
+
+int __fastcall AdvanceMissionSlot(Mission* self)
+{
+    return self->AdvanceMission();
+}
+
+char* __fastcall GetCampaignNameSlot(Mission* self)
+{
+    return self->GetCampaignName();
+}
+
+int __fastcall GetMissionIndexSlot(Mission* self)
+{
+    return self->GetMissionIndex();
+}
+
+char* __fastcall GetMissionNameSlot(Mission* self)
+{
+    return self->GetMissionName();
+}
+
+int __fastcall GetStartPositionSlot(Mission* self, int unusedEdx, Vec3* out, int id)
+{
+    return self->GetStartPosition(out, id);
+}
+
+void __fastcall LoadCampaignSlot(Mission* self, int unusedEdx, char* file)
+{
+    self->LoadCampaign(file);
+}
+
+int __fastcall LoadMissionByNameSlot(Mission* self, int unusedEdx, char* name)
+{
+    return self->LoadMissionByName(name);
+}
+
+int __fastcall MissionExistsSlot(Mission* self, int unusedEdx, int index)
+{
+    return self->MissionExists(index);
+}
+
+void __fastcall RefreshMapListSlot(Mission* self, int unusedEdx, int multiplayer)
+{
+    self->RefreshMapList(multiplayer);
+}
+
+int __fastcall SelectMissionSlot(Mission* self, int unusedEdx, int index)
+{
+    return self->SelectMission(index);
+}
+
+int __fastcall ComputeMapChecksumSlot(Mission* self)
+{
+    return self->ComputeMapChecksum();
+}
+
+int __fastcall GetTerrainLengthSlot(Mission* self)
+{
+    return self->GetTerrainLength();
 }
 
 #include "replay_slots.h"
@@ -4925,4 +5021,13 @@ int main(int argc, char** argv)
     }
     printf("replay_native_test: %d failed\n", g_failures);
     return 1;
+}
+
+void __cdecl operator delete(void* p)
+{
+    if (SimOwns(p)) {
+        SimFree(p);
+        return;
+    }
+    free(p);
 }

@@ -1246,13 +1246,17 @@ static inline Cell* GetCellCachedWidth(int x, int y)
     return nullptr;
 }
 
+#ifndef BT_REPLAY_INJECT_MEAN_SHIFT
+#define BT_REPLAY_INJECT_MEAN_SHIFT 1
+#endif
+
 // FUNCTION: 0x485140
 int __stdcall GetCellMeanHeight(Vec3* p)
 {
     int x = WholePart(p->x) / 16, y = WholePart(p->z) / 16;
     Cell* cell = GetCellCachedWidth(x, y);
     if (cell)
-        return (cell->low + cell->high) >> 1;
+        return (cell->low + cell->high) >> BT_REPLAY_INJECT_MEAN_SHIFT;
     return -1;
 }
 

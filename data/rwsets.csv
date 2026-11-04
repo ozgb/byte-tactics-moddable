@@ -47511,45 +47511,21 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::AddUnitToMap
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::AdvanceMission
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::BuildAllPassMaps
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::CanBuildAt
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::CanPlaceFootprintAt
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::CanPlaceUnitFootprint
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::ClearFootprintAndUnlink
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::ComputeMapChecksum
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::ForceNeighborFootprintReclaim
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::FreeOtaEnumCacheAndMission
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetCampaignName
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetCellMeanHeight
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetGameType
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetMissionIndex
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetMissionName
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetNameSlot
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetStartPosition
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetTerrainLength
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::IsPadSlotFree
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::LoadCampaign
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::LoadMappingData
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::LoadMetalPlotmap
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::LoadMissionByName
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::LoadPlayerFeaturesPlotmap
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::MissionExists
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PickRandomReclaimableResourcesInRadius
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::RefreshAllPassMaps
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::RefreshMapList
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::RefreshPassMap
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::RemoveUnitFromMap
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SaveMappingData
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SaveMetalPlotmap
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SavePlayerFeaturesPlotmap
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SelectMission
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SetMissionType
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SetYardOpen
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SnapWorldPosToFootprint
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SpatialBucketPrependUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SpatialBucketUnlinkUnit
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::VisitObjectsInRange
 ,HookSeams,src/harness/replay_hooks.inc,field_write,NetworkSeam::BroadcastPlayerEconomy
 ,HookSeams,src/harness/replay_hooks.inc,field_write,NetworkSeam::BroadcastPlayerInfo
 ,HookSeams,src/harness/replay_hooks.inc,field_write,NetworkSeam::SendActivateFlags
@@ -47888,45 +47864,21 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapAddUnitToMap
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapAdvanceMission
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapBuildAllPassMaps
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapCanBuildAt
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapCanPlaceFootprintAt
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapCanPlaceUnitFootprint
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapClearFootprintAndUnlink
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapComputeMapChecksum
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapForceNeighborFootprintReclaim
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapFreeOtaEnumCacheAndMission
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetCampaignName
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetCellMeanHeight
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetGameType
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetMissionIndex
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetMissionName
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetNameSlot
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetStartPosition
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetTerrainLength
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapIsPadSlotFree
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapLoadCampaign
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapLoadMappingData
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapLoadMetalPlotmap
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapLoadMissionByName
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapLoadPlayerFeaturesPlotmap
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapMissionExists
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPickRandomReclaimableResourcesInRadius
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapRefreshAllPassMaps
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapRefreshMapList
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapRefreshPassMap
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapRemoveUnitFromMap
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSaveMappingData
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSaveMetalPlotmap
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSavePlayerFeaturesPlotmap
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSelectMission
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSetMissionType
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSetYardOpen
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSnapWorldPosToFootprint
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSpatialBucketPrependUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSpatialBucketUnlinkUnit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapVisitObjectsInRange
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecNetworkBroadcastPlayerEconomy
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecNetworkBroadcastPlayerInfo
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecNetworkSendActivateFlags
@@ -53122,6 +53074,10 @@ address,function,file,kind,target
 ,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RevealNewUnit]
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,ArgValue
+,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,FinishImport
+,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,ImportValue
+,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,field_read,LosRadarSeam::UpdateCellHeightRange
@@ -53153,16 +53109,6 @@ address,function,file,kind,target
 ,RecMapAddUnitToMap,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMapAddUnitToMap,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapAddUnitToMap,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
-,RecMapAdvanceMission,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapAdvanceMission,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapAdvanceMission,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapAdvanceMission,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapAdvanceMission,src/harness/replay_hooks.inc,field_read,MapSeam::AdvanceMission
-,RecMapAdvanceMission,src/harness/replay_hooks.inc,function,
-,RecMapAdvanceMission,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapAdvanceMission,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapAdvanceMission,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapAdvanceMission,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(Mission *) __attribute__((fastcall)) [MapSeam::AdvanceMission]
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,field_read,MapSeam::BuildAllPassMaps
@@ -53182,7 +53128,7 @@ address,function,file,kind,target
 ,RecMapCanBuildAt,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(UnitDef *, Point16, short, Player *) __attribute__((stdcall)) [MapSeam::CanBuildAt]"
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,Add
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ArgPending
+,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53212,16 +53158,6 @@ address,function,file,kind,target
 ,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [MapSeam::ClearFootprintAndUnlink]
-,RecMapComputeMapChecksum,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapComputeMapChecksum,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapComputeMapChecksum,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapComputeMapChecksum,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapComputeMapChecksum,src/harness/replay_hooks.inc,field_read,MapSeam::ComputeMapChecksum
-,RecMapComputeMapChecksum,src/harness/replay_hooks.inc,function,
-,RecMapComputeMapChecksum,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapComputeMapChecksum,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapComputeMapChecksum,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapComputeMapChecksum,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(Mission *) __attribute__((fastcall)) [MapSeam::ComputeMapChecksum]
 ,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,call,Add
 ,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -53231,23 +53167,7 @@ address,function,file,kind,target
 ,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [MapSeam::ForceNeighborFootprintReclaim]
-,RecMapFreeOtaEnumCacheAndMission,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapFreeOtaEnumCacheAndMission,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapFreeOtaEnumCacheAndMission,src/harness/replay_hooks.inc,field_read,MapSeam::FreeOtaEnumCacheAndMission
-,RecMapFreeOtaEnumCacheAndMission,src/harness/replay_hooks.inc,function,
-,RecMapFreeOtaEnumCacheAndMission,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapFreeOtaEnumCacheAndMission,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [MapSeam::FreeOtaEnumCacheAndMission]
-,RecMapGetCampaignName,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapGetCampaignName,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapGetCampaignName,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapGetCampaignName,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapGetCampaignName,src/harness/replay_hooks.inc,field_read,MapSeam::GetCampaignName
-,RecMapGetCampaignName,src/harness/replay_hooks.inc,function,
-,RecMapGetCampaignName,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapGetCampaignName,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapGetCampaignName,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapGetCampaignName,src/harness/replay_hooks.inc,indirect_call,indirect via char *(*const)(Mission *) __attribute__((fastcall)) [MapSeam::GetCampaignName]
-,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ArgPending
+,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53257,67 +53177,6 @@ address,function,file,kind,target
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
-,RecMapGetGameType,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapGetGameType,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapGetGameType,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapGetGameType,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapGetGameType,src/harness/replay_hooks.inc,field_read,MapSeam::GetGameType
-,RecMapGetGameType,src/harness/replay_hooks.inc,function,
-,RecMapGetGameType,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapGetGameType,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapGetGameType,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapGetGameType,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
-,RecMapGetMissionIndex,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapGetMissionIndex,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapGetMissionIndex,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapGetMissionIndex,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapGetMissionIndex,src/harness/replay_hooks.inc,field_read,MapSeam::GetMissionIndex
-,RecMapGetMissionIndex,src/harness/replay_hooks.inc,function,
-,RecMapGetMissionIndex,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapGetMissionIndex,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapGetMissionIndex,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapGetMissionIndex,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(Mission *) __attribute__((fastcall)) [MapSeam::GetMissionIndex]
-,RecMapGetMissionName,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapGetMissionName,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapGetMissionName,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapGetMissionName,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapGetMissionName,src/harness/replay_hooks.inc,field_read,MapSeam::GetMissionName
-,RecMapGetMissionName,src/harness/replay_hooks.inc,function,
-,RecMapGetMissionName,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapGetMissionName,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapGetMissionName,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapGetMissionName,src/harness/replay_hooks.inc,indirect_call,indirect via char *(*const)(Mission *) __attribute__((fastcall)) [MapSeam::GetMissionName]
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,field_read,MapSeam::GetNameSlot
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,function,
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapGetNameSlot,src/harness/replay_hooks.inc,indirect_call,"indirect via char *(*const)(Mission *, int) __attribute__((stdcall)) [MapSeam::GetNameSlot]"
-,RecMapGetStartPosition,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapGetStartPosition,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapGetStartPosition,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapGetStartPosition,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapGetStartPosition,src/harness/replay_hooks.inc,field_read,MapSeam::GetStartPosition
-,RecMapGetStartPosition,src/harness/replay_hooks.inc,function,
-,RecMapGetStartPosition,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapGetStartPosition,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapGetStartPosition,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapGetStartPosition,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Mission *, int, Vec3 *, int) __attribute__((fastcall)) [MapSeam::GetStartPosition]"
-,RecMapGetTerrainLength,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapGetTerrainLength,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapGetTerrainLength,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapGetTerrainLength,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapGetTerrainLength,src/harness/replay_hooks.inc,field_read,MapSeam::GetTerrainLength
-,RecMapGetTerrainLength,src/harness/replay_hooks.inc,function,
-,RecMapGetTerrainLength,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapGetTerrainLength,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapGetTerrainLength,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapGetTerrainLength,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(Mission *) __attribute__((fastcall)) [MapSeam::GetTerrainLength]
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,Add
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,ArgValue
@@ -53329,69 +53188,6 @@ address,function,file,kind,target
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, int) __attribute__((stdcall)) [MapSeam::IsPadSlotFree]"
-,RecMapLoadCampaign,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapLoadCampaign,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapLoadCampaign,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapLoadCampaign,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapLoadCampaign,src/harness/replay_hooks.inc,field_read,MapSeam::LoadCampaign
-,RecMapLoadCampaign,src/harness/replay_hooks.inc,function,
-,RecMapLoadCampaign,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapLoadCampaign,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapLoadCampaign,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Mission *, int, char *) __attribute__((fastcall)) [MapSeam::LoadCampaign]"
-,RecMapLoadMappingData,src/harness/replay_hooks.inc,call,ArgHandle
-,RecMapLoadMappingData,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapLoadMappingData,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapLoadMappingData,src/harness/replay_hooks.inc,field_read,MapSeam::LoadMappingData
-,RecMapLoadMappingData,src/harness/replay_hooks.inc,function,
-,RecMapLoadMappingData,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapLoadMappingData,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapLoadMappingData,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [MapSeam::LoadMappingData]
-,RecMapLoadMetalPlotmap,src/harness/replay_hooks.inc,call,ArgHandle
-,RecMapLoadMetalPlotmap,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapLoadMetalPlotmap,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapLoadMetalPlotmap,src/harness/replay_hooks.inc,field_read,MapSeam::LoadMetalPlotmap
-,RecMapLoadMetalPlotmap,src/harness/replay_hooks.inc,function,
-,RecMapLoadMetalPlotmap,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapLoadMetalPlotmap,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapLoadMetalPlotmap,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [MapSeam::LoadMetalPlotmap]
-,RecMapLoadMissionByName,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapLoadMissionByName,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapLoadMissionByName,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapLoadMissionByName,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapLoadMissionByName,src/harness/replay_hooks.inc,field_read,MapSeam::LoadMissionByName
-,RecMapLoadMissionByName,src/harness/replay_hooks.inc,function,
-,RecMapLoadMissionByName,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapLoadMissionByName,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapLoadMissionByName,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapLoadMissionByName,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Mission *, int, char *) __attribute__((fastcall)) [MapSeam::LoadMissionByName]"
-,RecMapLoadPlayerFeaturesPlotmap,src/harness/replay_hooks.inc,call,ArgHandle
-,RecMapLoadPlayerFeaturesPlotmap,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapLoadPlayerFeaturesPlotmap,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapLoadPlayerFeaturesPlotmap,src/harness/replay_hooks.inc,field_read,MapSeam::LoadPlayerFeaturesPlotmap
-,RecMapLoadPlayerFeaturesPlotmap,src/harness/replay_hooks.inc,function,
-,RecMapLoadPlayerFeaturesPlotmap,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapLoadPlayerFeaturesPlotmap,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapLoadPlayerFeaturesPlotmap,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [MapSeam::LoadPlayerFeaturesPlotmap]
-,RecMapMissionExists,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapMissionExists,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapMissionExists,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapMissionExists,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapMissionExists,src/harness/replay_hooks.inc,field_read,MapSeam::MissionExists
-,RecMapMissionExists,src/harness/replay_hooks.inc,function,
-,RecMapMissionExists,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapMissionExists,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapMissionExists,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapMissionExists,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Mission *, int, int) __attribute__((fastcall)) [MapSeam::MissionExists]"
-,RecMapPickRandomReclaimableResourcesInRadius,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapPickRandomReclaimableResourcesInRadius,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapPickRandomReclaimableResourcesInRadius,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapPickRandomReclaimableResourcesInRadius,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapPickRandomReclaimableResourcesInRadius,src/harness/replay_hooks.inc,field_read,MapSeam::PickRandomReclaimableResourcesInRadius
-,RecMapPickRandomReclaimableResourcesInRadius,src/harness/replay_hooks.inc,function,
-,RecMapPickRandomReclaimableResourcesInRadius,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapPickRandomReclaimableResourcesInRadius,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapPickRandomReclaimableResourcesInRadius,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapPickRandomReclaimableResourcesInRadius,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Vec3 *, int, Vec3 **, float *, Vec3 **, float *) __attribute__((stdcall)) [MapSeam::PickRandomReclaimableResourcesInRadius]"
 ,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53400,15 +53196,6 @@ address,function,file,kind,target
 ,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Point16, Point16) __attribute__((stdcall)) [MapSeam::RefreshAllPassMaps]"
-,RecMapRefreshMapList,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapRefreshMapList,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapRefreshMapList,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapRefreshMapList,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapRefreshMapList,src/harness/replay_hooks.inc,field_read,MapSeam::RefreshMapList
-,RecMapRefreshMapList,src/harness/replay_hooks.inc,function,
-,RecMapRefreshMapList,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapRefreshMapList,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapRefreshMapList,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Mission *, int, int) __attribute__((fastcall)) [MapSeam::RefreshMapList]"
 ,RecMapRefreshPassMap,src/harness/replay_hooks.inc,call,Add
 ,RecMapRefreshPassMap,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMapRefreshPassMap,src/harness/replay_hooks.inc,call,ArgValue
@@ -53428,48 +53215,6 @@ address,function,file,kind,target
 ,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [MapSeam::RemoveUnitFromMap]
-,RecMapSaveMappingData,src/harness/replay_hooks.inc,call,ArgHandle
-,RecMapSaveMappingData,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapSaveMappingData,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapSaveMappingData,src/harness/replay_hooks.inc,field_read,MapSeam::SaveMappingData
-,RecMapSaveMappingData,src/harness/replay_hooks.inc,function,
-,RecMapSaveMappingData,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapSaveMappingData,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapSaveMappingData,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [MapSeam::SaveMappingData]
-,RecMapSaveMetalPlotmap,src/harness/replay_hooks.inc,call,ArgHandle
-,RecMapSaveMetalPlotmap,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapSaveMetalPlotmap,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapSaveMetalPlotmap,src/harness/replay_hooks.inc,field_read,MapSeam::SaveMetalPlotmap
-,RecMapSaveMetalPlotmap,src/harness/replay_hooks.inc,function,
-,RecMapSaveMetalPlotmap,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapSaveMetalPlotmap,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapSaveMetalPlotmap,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [MapSeam::SaveMetalPlotmap]
-,RecMapSavePlayerFeaturesPlotmap,src/harness/replay_hooks.inc,call,ArgHandle
-,RecMapSavePlayerFeaturesPlotmap,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapSavePlayerFeaturesPlotmap,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapSavePlayerFeaturesPlotmap,src/harness/replay_hooks.inc,field_read,MapSeam::SavePlayerFeaturesPlotmap
-,RecMapSavePlayerFeaturesPlotmap,src/harness/replay_hooks.inc,function,
-,RecMapSavePlayerFeaturesPlotmap,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapSavePlayerFeaturesPlotmap,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapSavePlayerFeaturesPlotmap,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [MapSeam::SavePlayerFeaturesPlotmap]
-,RecMapSelectMission,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapSelectMission,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapSelectMission,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapSelectMission,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapSelectMission,src/harness/replay_hooks.inc,field_read,MapSeam::SelectMission
-,RecMapSelectMission,src/harness/replay_hooks.inc,function,
-,RecMapSelectMission,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapSelectMission,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapSelectMission,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapSelectMission,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Mission *, int, int) __attribute__((fastcall)) [MapSeam::SelectMission]"
-,RecMapSetMissionType,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapSetMissionType,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapSetMissionType,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapSetMissionType,src/harness/replay_hooks.inc,field_read,MapSeam::SetMissionType
-,RecMapSetMissionType,src/harness/replay_hooks.inc,function,
-,RecMapSetMissionType,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapSetMissionType,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapSetMissionType,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [MapSeam::SetMissionType]
 ,RecMapSetYardOpen,src/harness/replay_hooks.inc,call,Add
 ,RecMapSetYardOpen,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMapSetYardOpen,src/harness/replay_hooks.inc,call,ArgValue
@@ -53481,18 +53226,19 @@ address,function,file,kind,target
 ,RecMapSetYardOpen,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapSetYardOpen,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int) __attribute__((stdcall)) [MapSeam::SetYardOpen]"
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,Add
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOut
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOutExit
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgPending
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,field_read,MapSeam::SnapWorldPosToFootprint
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,function,
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_inner_map
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
 ,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,Add
 ,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,ArgPending
 ,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53503,7 +53249,6 @@ address,function,file,kind,target
 ,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(SpatialBucket *, int, Unit *) __attribute__((fastcall)) [MapSeam::SpatialBucketPrependUnit]"
 ,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,Add
 ,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,ArgPending
 ,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53512,15 +53257,6 @@ address,function,file,kind,target
 ,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(SpatialBucket *, int, Unit *) __attribute__((fastcall)) [MapSeam::SpatialBucketUnlinkUnit]"
-,RecMapVisitObjectsInRange,src/harness/replay_hooks.inc,call,ArgPending
-,RecMapVisitObjectsInRange,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapVisitObjectsInRange,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapVisitObjectsInRange,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapVisitObjectsInRange,src/harness/replay_hooks.inc,field_read,MapSeam::VisitObjectsInRange
-,RecMapVisitObjectsInRange,src/harness/replay_hooks.inc,function,
-,RecMapVisitObjectsInRange,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapVisitObjectsInRange,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapVisitObjectsInRange,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
 ,RecNetworkBroadcastPlayerEconomy,src/harness/replay_hooks.inc,call,Add
 ,RecNetworkBroadcastPlayerEconomy,src/harness/replay_hooks.inc,call,ArgObject
 ,RecNetworkBroadcastPlayerEconomy,src/harness/replay_hooks.inc,call,SlotScope::Open

@@ -617,7 +617,7 @@ void __stdcall RecAiGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, in
     }
     s_inner_ai->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4);
     if (scope.Import()) {
-        ImportOutUnits(line, "out", a4, kReplayReachFields + 5, 7);
+        ImportOutUnits(line, "out", a4, kReplayReachFields + 11, 7);
         FinishImport(line);
     }
     if (scope.Open()) {
@@ -1687,7 +1687,16 @@ void __stdcall RecLosRadarUpdateCellHeightRange(Point16 a0, Point16 a1)
         ArgValue(s_call, "pos", a0);
         ArgValue(s_call, "size", a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i los_radar.UpdateCellHeightRange");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+    }
     s_inner_los_radar->UpdateCellHeightRange(a0, a1);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -3555,7 +3564,7 @@ int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETCELLMEANHEIGHT, SUB_MAP, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "pos");
+        ArgStruct(s_call, "a", "pos", ROK_VEC3, a0);
     }
     int result = s_inner_map->GetCellMeanHeight(a0);
     if (scope.Open()) {
@@ -3573,49 +3582,6 @@ void __stdcall RecMapRefreshAllPassMaps(Point16 a0, Point16 a1)
         ArgValue(s_call, "b", a1);
     }
     s_inner_map->RefreshAllPassMaps(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-int __fastcall RecMapGetGameType(Mission* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_GETGAMETYPE, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-    }
-    int result = s_inner_map->GetGameType(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-char* __stdcall RecMapGetNameSlot(Mission* a0, int a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_GETNAMESLOT, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-        ArgValue(s_call, "index", a1);
-    }
-    char* result = s_inner_map->GetNameSlot(a0, a1);
-    if (scope.Open()) {
-        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecMapVisitObjectsInRange(Vec3* a0, int a1, UnitVisitor* a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_VISITOBJECTSINRANGE, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "pos");
-        ArgValue(s_call, "range", a1);
-        ArgPending(s_call, "visitor");
-    }
-    s_inner_map->VisitObjectsInRange(a0, a1, a2);
     if (scope.Open()) {
     }
 }
@@ -3668,101 +3634,6 @@ void __stdcall RecMapBuildAllPassMaps()
     }
 }
 
-void __stdcall RecMapFreeOtaEnumCacheAndMission()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_FREEOTAENUMCACHEANDMISSION, SUB_MAP, roots);
-    if (scope.Open()) {
-    }
-    s_inner_map->FreeOtaEnumCacheAndMission();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecMapLoadMappingData(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_LOADMAPPINGDATA, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_map->LoadMappingData(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecMapLoadMetalPlotmap(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_LOADMETALPLOTMAP, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_map->LoadMetalPlotmap(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecMapLoadPlayerFeaturesPlotmap(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_LOADPLAYERFEATURESPLOTMAP, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_map->LoadPlayerFeaturesPlotmap(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecMapSaveMappingData(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_SAVEMAPPINGDATA, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_map->SaveMappingData(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecMapSaveMetalPlotmap(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_SAVEMETALPLOTMAP, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_map->SaveMetalPlotmap(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecMapSavePlayerFeaturesPlotmap(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_SAVEPLAYERFEATURESPLOTMAP, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_map->SavePlayerFeaturesPlotmap(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecMapSetMissionType(int a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_SETMISSIONTYPE, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "type", a0);
-    }
-    s_inner_map->SetMissionType(a0);
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecMapSnapWorldPosToFootprint(UnitDef* a0, Vec3* a1)
 {
     ReplayRoots roots;
@@ -3770,10 +3641,11 @@ void __stdcall RecMapSnapWorldPosToFootprint(UnitDef* a0, Vec3* a1)
     SlotScope scope(RSL_MAP_SNAPWORLDPOSTOFOOTPRINT, SUB_MAP, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNITDEF, a0);
-        ArgPending(s_call, "pos");
+        ArgInOut(s_call, "pos", ROK_VEC3, a1);
     }
     s_inner_map->SnapWorldPosToFootprint(a0, a1);
     if (scope.Open()) {
+        ArgInOutExit(s_tail, "pos", ROK_VEC3, a1);
     }
 }
 
@@ -3810,7 +3682,7 @@ int __stdcall RecMapCanPlaceFootprintAt(Unit* a0, Vec3* a1)
     SlotScope scope(RSL_MAP_CANPLACEFOOTPRINTAT, SUB_MAP, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgPending(s_call, "pos");
+        ArgStruct(s_call, "a", "pos", ROK_VEC3, a1);
     }
     int result = s_inner_map->CanPlaceFootprintAt(a0, a1);
     if (scope.Open()) {
@@ -3829,25 +3701,6 @@ int __stdcall RecMapIsPadSlotFree(Unit* a0, int a1)
         ArgValue(s_call, "id", a1);
     }
     int result = s_inner_map->IsPadSlotFree(a0, a1);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecMapPickRandomReclaimableResourcesInRadius(Vec3* a0, int a1, Vec3** a2, float* a3, Vec3** a4, float* a5)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_PICKRANDOMRECLAIMABLERESOURCESINRADIUS, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "pos");
-        ArgValue(s_call, "range", a1);
-        ArgPending(s_call, "energy");
-        ArgPending(s_call, "energyAmount");
-        ArgPending(s_call, "metal");
-        ArgPending(s_call, "metalAmount");
-    }
-    int result = s_inner_map->PickRandomReclaimableResourcesInRadius(a0, a1, a2, a3, a4, a5);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -3897,10 +3750,11 @@ void __stdcall RecMapSetYardOpen(Unit* a0, int a1)
 void __fastcall RecMapSpatialBucketPrependUnit(SpatialBucket* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_SPATIALBUCKET, a0);
     roots.Add(ROK_UNIT, a2);
     SlotScope scope(RSL_MAP_SPATIALBUCKETPREPENDUNIT, SUB_MAP, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "bucket");
+        ArgObject(s_call, "bucket", ROK_SPATIALBUCKET, a0);
         ArgValue(s_call, "unusedEdx", a1);
         ArgObject(s_call, "unit", ROK_UNIT, a2);
     }
@@ -3912,10 +3766,11 @@ void __fastcall RecMapSpatialBucketPrependUnit(SpatialBucket* a0, int a1, Unit* 
 void __fastcall RecMapSpatialBucketUnlinkUnit(SpatialBucket* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_SPATIALBUCKET, a0);
     roots.Add(ROK_UNIT, a2);
     SlotScope scope(RSL_MAP_SPATIALBUCKETUNLINKUNIT, SUB_MAP, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "bucket");
+        ArgObject(s_call, "bucket", ROK_SPATIALBUCKET, a0);
         ArgValue(s_call, "unusedEdx", a1);
         ArgObject(s_call, "unit", ROK_UNIT, a2);
     }
@@ -3938,183 +3793,6 @@ void __fastcall RecMapRefreshPassMap(MovementClass* a0, int a1, Point16 a2, Poin
     s_inner_map->RefreshPassMap(a0, a1, a2, a3);
     if (scope.Open()) {
     }
-}
-
-int __fastcall RecMapAdvanceMission(Mission* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_ADVANCEMISSION, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-    }
-    int result = s_inner_map->AdvanceMission(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-char* __fastcall RecMapGetCampaignName(Mission* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_GETCAMPAIGNNAME, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-    }
-    char* result = s_inner_map->GetCampaignName(a0);
-    if (scope.Open()) {
-        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
-    }
-    return result;
-}
-
-int __fastcall RecMapGetMissionIndex(Mission* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_GETMISSIONINDEX, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-    }
-    int result = s_inner_map->GetMissionIndex(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-char* __fastcall RecMapGetMissionName(Mission* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_GETMISSIONNAME, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-    }
-    char* result = s_inner_map->GetMissionName(a0);
-    if (scope.Open()) {
-        ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
-    }
-    return result;
-}
-
-int __fastcall RecMapGetStartPosition(Mission* a0, int a1, Vec3* a2, int a3)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_GETSTARTPOSITION, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgPending(s_call, "out");
-        ArgValue(s_call, "id", a3);
-    }
-    int result = s_inner_map->GetStartPosition(a0, a1, a2, a3);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __fastcall RecMapLoadCampaign(Mission* a0, int a1, char* a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_LOADCAMPAIGN, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgValue(s_call, "file", (const char*)a2);
-    }
-    s_inner_map->LoadCampaign(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-int __fastcall RecMapLoadMissionByName(Mission* a0, int a1, char* a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_LOADMISSIONBYNAME, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgValue(s_call, "name", (const char*)a2);
-    }
-    int result = s_inner_map->LoadMissionByName(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __fastcall RecMapMissionExists(Mission* a0, int a1, int a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_MISSIONEXISTS, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgValue(s_call, "index", a2);
-    }
-    int result = s_inner_map->MissionExists(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __fastcall RecMapRefreshMapList(Mission* a0, int a1, int a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_REFRESHMAPLIST, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgValue(s_call, "multiplayer", a2);
-    }
-    s_inner_map->RefreshMapList(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-int __fastcall RecMapSelectMission(Mission* a0, int a1, int a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_SELECTMISSION, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgValue(s_call, "index", a2);
-    }
-    int result = s_inner_map->SelectMission(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __fastcall RecMapComputeMapChecksum(Mission* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_COMPUTEMAPCHECKSUM, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-    }
-    int result = s_inner_map->ComputeMapChecksum(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __fastcall RecMapGetTerrainLength(Mission* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_GETTERRAINLENGTH, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "mission");
-    }
-    int result = s_inner_map->GetTerrainLength(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
 }
 
 FileHandle* __stdcall RecFilesOpenRead(char* a0)
@@ -5411,6 +5089,12 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_UNITS_GETSWEETSPOT)
             return true;
         return false;
+    case SUB_MAP:
+        if (slot == RSL_LOS_RADAR_UPDATECELLHEIGHTRANGE)
+            return true;
+        if (slot == RSL_LOS_RADAR_GETMAPCELL)
+            return true;
+        return false;
     default:
         return false;
     }
@@ -5667,7 +5351,7 @@ void HookSeams(const bool* on)
         s_rec_targeting.FindBestTargetIfFireAtWill = RecTargetingFindBestTargetIfFireAtWill;
     if (on[SUB_TARGETING])
         s_rec_targeting.ChooseWeapon = RecTargetingChooseWeapon;
-    if (on[SUB_LOS_RADAR] || on[SUB_ECONOMY])
+    if (on[SUB_LOS_RADAR] || on[SUB_ECONOMY] || on[SUB_MAP])
         s_rec_los_radar.GetMapCell = RecLosRadarGetMapCell;
     if (on[SUB_LOS_RADAR] || any)
         s_rec_los_radar.CmdShareMapping = RecLosRadarCmdShareMapping;
@@ -5693,7 +5377,7 @@ void HookSeams(const bool* on)
         s_rec_los_radar.GetMapCellAtPosition = RecLosRadarGetMapCellAtPosition;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.GetOriginCellAtPosition = RecLosRadarGetOriginCellAtPosition;
-    if (on[SUB_LOS_RADAR])
+    if (on[SUB_LOS_RADAR] || on[SUB_MAP])
         s_rec_los_radar.UpdateCellHeightRange = RecLosRadarUpdateCellHeightRange;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.UpdateUnitLineOfSight = RecLosRadarUpdateUnitLineOfSight;
@@ -5952,33 +5636,11 @@ void HookSeams(const bool* on)
     if (on[SUB_MAP])
         s_rec_map.RefreshAllPassMaps = RecMapRefreshAllPassMaps;
     if (on[SUB_MAP])
-        s_rec_map.GetGameType = RecMapGetGameType;
-    if (on[SUB_MAP])
-        s_rec_map.GetNameSlot = RecMapGetNameSlot;
-    if (on[SUB_MAP])
-        s_rec_map.VisitObjectsInRange = RecMapVisitObjectsInRange;
-    if (on[SUB_MAP])
         s_rec_map.CanBuildAt = RecMapCanBuildAt;
     if (on[SUB_MAP])
         s_rec_map.CanPlaceUnitFootprint = RecMapCanPlaceUnitFootprint;
     if (on[SUB_MAP])
         s_rec_map.BuildAllPassMaps = RecMapBuildAllPassMaps;
-    if (on[SUB_MAP])
-        s_rec_map.FreeOtaEnumCacheAndMission = RecMapFreeOtaEnumCacheAndMission;
-    if (on[SUB_MAP])
-        s_rec_map.LoadMappingData = RecMapLoadMappingData;
-    if (on[SUB_MAP])
-        s_rec_map.LoadMetalPlotmap = RecMapLoadMetalPlotmap;
-    if (on[SUB_MAP])
-        s_rec_map.LoadPlayerFeaturesPlotmap = RecMapLoadPlayerFeaturesPlotmap;
-    if (on[SUB_MAP])
-        s_rec_map.SaveMappingData = RecMapSaveMappingData;
-    if (on[SUB_MAP])
-        s_rec_map.SaveMetalPlotmap = RecMapSaveMetalPlotmap;
-    if (on[SUB_MAP])
-        s_rec_map.SavePlayerFeaturesPlotmap = RecMapSavePlayerFeaturesPlotmap;
-    if (on[SUB_MAP])
-        s_rec_map.SetMissionType = RecMapSetMissionType;
     if (on[SUB_MAP])
         s_rec_map.SnapWorldPosToFootprint = RecMapSnapWorldPosToFootprint;
     if (on[SUB_MAP])
@@ -5989,8 +5651,6 @@ void HookSeams(const bool* on)
         s_rec_map.CanPlaceFootprintAt = RecMapCanPlaceFootprintAt;
     if (on[SUB_MAP])
         s_rec_map.IsPadSlotFree = RecMapIsPadSlotFree;
-    if (on[SUB_MAP])
-        s_rec_map.PickRandomReclaimableResourcesInRadius = RecMapPickRandomReclaimableResourcesInRadius;
     if (on[SUB_MAP])
         s_rec_map.ClearFootprintAndUnlink = RecMapClearFootprintAndUnlink;
     if (on[SUB_MAP])
@@ -6003,30 +5663,6 @@ void HookSeams(const bool* on)
         s_rec_map.SpatialBucketUnlinkUnit = RecMapSpatialBucketUnlinkUnit;
     if (on[SUB_MAP])
         s_rec_map.RefreshPassMap = RecMapRefreshPassMap;
-    if (on[SUB_MAP])
-        s_rec_map.AdvanceMission = RecMapAdvanceMission;
-    if (on[SUB_MAP])
-        s_rec_map.GetCampaignName = RecMapGetCampaignName;
-    if (on[SUB_MAP])
-        s_rec_map.GetMissionIndex = RecMapGetMissionIndex;
-    if (on[SUB_MAP])
-        s_rec_map.GetMissionName = RecMapGetMissionName;
-    if (on[SUB_MAP])
-        s_rec_map.GetStartPosition = RecMapGetStartPosition;
-    if (on[SUB_MAP])
-        s_rec_map.LoadCampaign = RecMapLoadCampaign;
-    if (on[SUB_MAP])
-        s_rec_map.LoadMissionByName = RecMapLoadMissionByName;
-    if (on[SUB_MAP])
-        s_rec_map.MissionExists = RecMapMissionExists;
-    if (on[SUB_MAP])
-        s_rec_map.RefreshMapList = RecMapRefreshMapList;
-    if (on[SUB_MAP])
-        s_rec_map.SelectMission = RecMapSelectMission;
-    if (on[SUB_MAP])
-        s_rec_map.ComputeMapChecksum = RecMapComputeMapChecksum;
-    if (on[SUB_MAP])
-        s_rec_map.GetTerrainLength = RecMapGetTerrainLength;
     if (on[SUB_FILES])
         s_rec_files.OpenRead = RecFilesOpenRead;
     if (on[SUB_FILES])

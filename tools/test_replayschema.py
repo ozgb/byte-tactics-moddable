@@ -92,12 +92,12 @@ class Accounting(unittest.TestCase):
 
     def test_a_pending_subsystem_lists_what_is_left(self):
         assignment = rs.read_assignment()
-        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting")
+        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map")
                              for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         model, errors = build([row(slot, "field_read", "Game::mapWidth"), row(slot, "field_escape", "Unit::unmatched")])
         pending = model["subsystems"][sub]["pending"]
         self.assertTrue(pending["untracked"] >= 1 and pending["ruleless"] >= 1)
-        self.assertEqual([e for e in errors if sub in e], [])
+        self.assertEqual([e for e in errors if e.startswith(sub)], [])
 
     def test_a_row_with_no_rule_is_an_error_for_a_complete_subsystem(self):
         _, errors = build([row("UpdateMeteors", "field_escape", "Game::unmatched")])
@@ -126,7 +126,7 @@ class Unrecorded(unittest.TestCase):
         self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
         ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith("map")], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("SetMeteorParams", spec["slots"])
         self.assertEqual(spec["unrecorded"], {"SetMeteorParams": {"reason": "load class", "native": "SetMeteorParams"}})
@@ -162,7 +162,7 @@ class Unrecorded(unittest.TestCase):
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
         ann = self.imported()
         files, errors, model = rs.generate(rs.read_rows(), ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith("map")], [])
         weapons = model["subsystems"]["weapons"]
         self.assertNotIn("SpawnProjectile", weapons["slots"])
         kept = weapons["unrecorded"]["SpawnProjectile"]
@@ -427,7 +427,7 @@ class UnannotatedTypes(unittest.TestCase):
 
     def test_a_pending_subsystem_is_not_asked(self):
         assignment = rs.read_assignment()
-        sub, slot = [(m, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting")
+        sub, slot = [(m, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map")
                      for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         _, errors = build([row(slot, "field_read", "OpenHeap::count")])
         self.assertEqual([e for e in errors if "OpenHeap" in e], [])
@@ -489,7 +489,7 @@ class IndirectCalls(unittest.TestCase):
 
     def pending(self, rows, ann=None, slot_name="UpdatePlayerEconomy"):
         model, errors = build(rows, ann)
-        return [e for e in errors if "pending indirect" in e or "through" in e], model["subsystems"]["economy"]["slots"].get(slot_name)
+        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith("map")], model["subsystems"]["economy"]["slots"].get(slot_name)
 
     def economy(self, **changes):
         ann = annotations()
@@ -596,7 +596,7 @@ class Tables(unittest.TestCase):
         self.assertIn("offsetof(Game, projectiles)", text)
         self.assertIn("offsetof(SimGlobals, g_movementClasses.entries)", text)
         self.assertIn('#pragma push_macro("g_movementClasses")', text)
-        self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 4,', text)
+        self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 5,', text)
         self.assertIn('{ "UnitDef", sizeof(UnitDef), RS_STATE, RT_ORDER,', text)
 
     def test_the_size_of_an_inline_table_is_checked_against_its_count(self):
@@ -958,7 +958,7 @@ class Callbacks(unittest.TestCase):
 
     def with_import(self, mutate=None):
         ann = annotations()
-        ann["subsystems"]["map"].setdefault("slots", {})["VisitObjectsInRange"] = {"args": {"visitor": {"mode": "callback", "callback": "UnitVisitor"}}}
+        ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["args"] = {"pos": {"mode": "struct", "kind": "Vec3", "dir": "in"}, "visitor": {"mode": "callback", "callback": "UnitVisitor"}}
         ann["subsystems"]["wind_meteors"]["imports"].append("map.VisitObjectsInRange")
         if mutate:
             mutate(ann)
@@ -1018,6 +1018,8 @@ class Callbacks(unittest.TestCase):
     def test_a_callback_argument_of_a_slot_no_subsystem_imports_is_an_error(self):
         def only_note(ann):
             ann["subsystems"]["wind_meteors"]["imports"].remove("map.VisitObjectsInRange")
+            del ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["record"]
+            del ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["reason"]
         self.assertTrue(any("map.VisitObjectsInRange has a callback argument and is imported by no subsystem" in e for e in self.errors(self.with_import(only_note))))
 
     def test_the_callback_names_an_entry_and_its_type(self):

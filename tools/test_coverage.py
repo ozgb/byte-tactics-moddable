@@ -749,5 +749,100 @@ class SlotsTest(unittest.TestCase):
         self.assertEqual(cov.function_count(counts, "ResetNative", False), 4)
 
 
+class ChooseTier(unittest.TestCase):
+    def sets(self, **spans):
+        return {name: {("f.cpp", "fn", n) for n in range(a, b)} for name, (a, b) in spans.items()}
+
+    def choose(self, lines, ticks, players=None, savers=None, **kw):
+        players = players or {n: 8 for n in lines}
+        return [n for n, _ in cov.choose_tier(lines, ticks, players, savers or {}, **kw)]
+
+    def test_the_most_new_lines_per_tick_goes_first(self):
+        lines = self.sets(big=(0, 100), dense=(100, 160), slow=(200, 260))
+        ticks = {"big": 1000, "dense": 600, "slow": 6000}
+        self.assertEqual(self.choose(lines, ticks, players={"big": 8, "dense": 2, "slow": 2}), ["dense", "big", "slow"])
+
+    def test_a_scenario_counts_for_at_least_the_floor(self):
+        lines = self.sets(tiny=(0, 50), wide=(100, 200))
+        self.assertEqual(self.choose(lines, {"tiny": 10, "wide": 700}), ["wide", "tiny"])
+        lines = self.sets(tiny=(0, 50), wide=(100, 140))
+        self.assertEqual(self.choose(lines, {"tiny": 10, "wide": 700}), ["tiny", "wide"])
+
+    def test_new_lines_are_those_not_yet_covered(self):
+        lines = self.sets(a=(0, 100), b=(80, 130))
+        chosen = cov.choose_tier(lines, {"a": 1000, "b": 1000}, {"a": 8, "b": 2}, {})
+        self.assertEqual(chosen, [("a", 100), ("b", 30)])
+
+    def test_it_stops_when_the_best_adds_fewer_than_twenty(self):
+        lines = {"a": {("f", "x", n) for n in range(100)}, "b": {("f", "x", n) for n in range(100, 119)},
+                 "c": {("f", "x", n) for n in range(200, 220)}}
+        ticks = {"a": 600, "b": 600, "c": 600}
+        self.assertEqual(self.choose(lines, ticks), ["a", "c"])
+
+    def test_a_game_of_eight_players_is_added_when_the_cover_has_none(self):
+        lines = self.sets(a=(0, 100), e1=(10, 40), e2=(10, 60))
+        ticks = {"a": 600, "e1": 600, "e2": 1200}
+        players = {"a": 2, "e1": 8, "e2": 8}
+        self.assertEqual(self.choose(lines, ticks, players), ["a", "e1"])
+
+    def test_it_adds_no_game_of_eight_players_when_the_cover_has_one(self):
+        lines = self.sets(a=(0, 100), e1=(100, 160), e2=(0, 5))
+        players = {"a": 2, "e1": 8, "e2": 8}
+        self.assertEqual(self.choose(lines, {"a": 600, "e1": 600, "e2": 600}, players), ["a", "e1"])
+
+    def test_the_named_game_of_eight_players_goes_first(self):
+        lines = self.sets(a=(0, 100), e1=(10, 40), e2=(10, 60))
+        ticks = {"a": 600, "e1": 600, "e2": 1200}
+        players = {"a": 2, "e1": 8, "e2": 8}
+        self.assertEqual(self.choose(lines, ticks, players, eight="e2"), ["e2", "a"])
+
+    def test_the_named_game_is_the_only_one_of_eight_players(self):
+        lines = self.sets(a=(0, 100), e1=(200, 300), e2=(10, 60))
+        players = {"a": 2, "e1": 8, "e2": 8}
+        self.assertEqual(self.choose(lines, {"a": 600, "e1": 600, "e2": 600}, players, eight="e2"), ["e2", "a"])
+
+    def test_the_named_game_must_have_eight_players(self):
+        lines = self.sets(a=(0, 100), e1=(10, 40))
+        with self.assertRaises(SystemExit):
+            self.choose(lines, {"a": 600, "e1": 600}, {"a": 2, "e1": 8}, eight="a")
+
+    def test_max_ticks_leaves_out_the_longer_scenarios(self):
+        lines = self.sets(a=(0, 100), long=(100, 300), e1=(10, 40), e2=(10, 60))
+        ticks = {"a": 600, "long": 5000, "e1": 6000, "e2": 5000}
+        players = {"a": 2, "long": 2, "e1": 8, "e2": 8}
+        self.assertEqual(self.choose(lines, ticks, players, max_ticks=5000), ["a", "long", "e2"])
+
+    def test_the_named_game_may_not_be_longer_than_max_ticks(self):
+        lines = self.sets(a=(0, 100), e1=(10, 40))
+        with self.assertRaises(SystemExit):
+            self.choose(lines, {"a": 600, "e1": 6000}, {"a": 2, "e1": 8}, eight="e1", max_ticks=5000)
+
+    def test_a_loader_brings_its_saver(self):
+        lines = self.sets(load=(0, 100), save=(0, 10), other=(200, 260))
+        chosen = self.choose(lines, {"load": 600, "save": 600, "other": 600}, savers={"load": "save"})
+        self.assertEqual(chosen, ["load", "save", "other"])
+
+    def test_the_report_names_the_scenarios_and_the_shares(self):
+        lines = self.sets(a=(0, 100), b=(100, 110))
+        functions = {"a": {("f", "x")}, "b": {("f", "y")}}
+        ticks = {"a": 600, "b": 600}
+        text = cov.render_tier(cov.choose_tier(lines, ticks, {"a": 8, "b": 2}, {}), lines, functions, ticks, {"a": 8, "b": 2})
+        self.assertIn("1 scenarios, 600 of 1200 ticks", text)
+        self.assertIn("lines: 90.9% of the full suite's (100/110)", text)
+        self.assertIn("functions: 50.0% of the full suite's (1/2)", text)
+
+    def test_the_sets_of_an_export(self):
+        lines, functions = cov.scenario_sets(EXPORT)
+        self.assertIn((cov.repo_path(path("src/game/economy.cpp")), cov.decorated_name("?Reset@UnitResources@@QAEXXZ"), 10), lines)
+        self.assertNotIn(("src/harness/run.cpp", "Host", 1), lines)
+        self.assertEqual(len(functions), 4)
+
+    def test_the_players_of_a_scenario(self):
+        with tempfile.TemporaryDirectory() as d:
+            scenario = Path(d) / "s.txt"
+            scenario.write_text("player0.side core\nplayer1.side arm\nplayer1.name x\n")
+            self.assertEqual(cov.scenario_players(scenario), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

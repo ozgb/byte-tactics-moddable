@@ -1,13 +1,11 @@
 #ifndef HARNESS_REPLAY_H
 #define HARNESS_REPLAY_H
 
-inline int& ReplayCalls()
-{
-    static int calls;
-    return calls;
-}
+#include "../../interfaces/host.h"
 
 #include "replay_services.h"
+
+#pragma pack(push, 8)
 
 struct ReplayArg {
     int kind;
@@ -20,34 +18,119 @@ struct ReplayArg {
 
 struct ReplayImport;
 void ReplayImportEnd(ReplayImport& call);
+void ReplayFail(const char* message);
+
+typedef bool (*ReplayAnswerFn)(ReplayImport& call);
+typedef void (*ReplayEndFn)(ReplayImport& call);
+
+struct ReplayGate {
+    int calls;
+    unsigned int owner;
+    unsigned int nestedDepth;
+    bool busy;
+    ReplayAnswerFn answer;
+    ReplayEndFn end;
+};
+
+ReplayGate& ReplayGateRef();
+
+inline int& ReplayCalls()
+{
+    return ReplayGateRef().calls;
+}
+
+inline unsigned int& ReplayOwner()
+{
+    return ReplayGateRef().owner;
+}
+
+inline unsigned int& ReplayNestedDepth()
+{
+    return ReplayGateRef().nestedDepth;
+}
+
+inline ReplayAnswerFn& ReplayAnswerHook()
+{
+    return ReplayGateRef().answer;
+}
+
+inline bool& ReplayAnswerBusy()
+{
+    return ReplayGateRef().busy;
+}
+
+inline ReplayEndFn& ReplayEndHook()
+{
+    return ReplayGateRef().end;
+}
+
+inline bool ReplayOwned()
+{
+    return ReplayCalls() != 0 && ReplayOwner() == host_thread_id();
+}
 
 struct ReplayImport {
-    explicit ReplayImport(int id) : id(id), active(ReplayCalls() != 0), count(0)
+    explicit ReplayImport(int id) : id(id), active(ReplayOwned()), answering(ReplayAnswerHook() != nullptr && !ReplayAnswerBusy()), nested(false), count(0)
     {
-        if (active) {
+        result.kind = -1;
+        if (active)
             ReplayCalls() = 0;
-            result.kind = -1;
-        }
     }
     ~ReplayImport()
     {
-        if (active)
-            ReplayImportEnd(*this);
+        if (nested)
+            ReplayNestedDepth()--;
+        if (active && ReplayEndHook() != nullptr)
+            ReplayEndHook()(*this);
+    }
+    void Nested()
+    {
+        if (!active)
+            return;
+        if (ReplayNestedDepth() != 0)
+            ReplayFail("a command run inside a command of ExecuteCommandText is not recorded");
+        nested = true;
+        ReplayNestedDepth()++;
     }
     void Int(int value)
     {
-        if (active)
+        if (active || answering)
             AddArg(0)->v.i = value;
     }
     void Ptr(const void* value)
     {
-        if (active)
+        if (active || answering)
             AddArg(1)->v.p = value;
     }
     void Dbl(double value)
     {
-        if (active)
+        if (active || answering)
             AddArg(2)->v.d = value;
+    }
+    bool Answered()
+    {
+        if (!answering)
+            return false;
+        ReplayAnswerBusy() = true;
+        bool answered = ReplayAnswerHook()(*this);
+        ReplayAnswerBusy() = false;
+        return answered;
+    }
+    void* AnsweredPointer() const { return const_cast<void*>(result.v.p); }
+    void Return(int value)
+    {
+        result.kind = 0;
+        result.v.i = value;
+    }
+    void Return(double value)
+    {
+        result.kind = 2;
+        result.v.d = value;
+    }
+    void Return(const void* value)
+    {
+        result.kind = 1;
+        result.v.p = value;
     }
     int Result(int value)
     {
@@ -75,13 +158,17 @@ struct ReplayImport {
     }
     int id;
     bool active;
+    bool answering;
+    bool nested;
     int count;
-    ReplayArg args[5];
+    ReplayArg args[8];
     ReplayArg result;
 };
 
+#pragma pack(pop)
+
 int ReplayConfigure(const char* value, char* error, int size);
 void ReplayInstall();
-int ReplayWrite();
+int ReplayWrite(char* error, int size);
 
 #endif

@@ -139,6 +139,294 @@ void ReplayImportEnd(ReplayImport& c)
         AddResult(t, c.result);
         break;
     }
+    case RI_FILE_PRINTF:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[1].v.p);
+        AddSpace(t);
+        t.AddString((const char*)a[2].v.p);
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_TDF_UNLOAD:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
+        break;
+    }
+    case RI_TDF_SELECT_RECORD_AT:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddResult(t, c.result);
+        {
+            const TdfFile* self = (const TdfFile*)a[0].v.p;
+            t.Add("\n  o ");
+            AddHandle(t, OBJ_FILE, self);
+            t.Add(".current ");
+            AddHandle(t, OBJ_RECORD, self->current);
+        }
+        break;
+    }
+    case RI_TDF_RESET_CURRENT:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
+        {
+            const TdfFile* self = (const TdfFile*)a[0].v.p;
+            t.Add("\n  o ");
+            AddHandle(t, OBJ_FILE, self);
+            t.Add(".current ");
+            AddHandle(t, OBJ_RECORD, self->current);
+        }
+        break;
+    }
+    case RI_TDF_GET_CURRENT:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
+        t.Add(" = ");
+        AddHandle(t, OBJ_RECORD, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_TDF_SET_CURRENT:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_FILE, a[0].v.p);
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[1].v.p);
+        break;
+    }
+    case RI_TDF_FIND_SUB_RECORD:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddString((const char*)a[1].v.p);
+        t.Add(" = ");
+        AddHandle(t, OBJ_RECORD, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_TDF_GET_SUB_RECORD:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        t.Add(" = ");
+        AddHandle(t, OBJ_RECORD, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_TDF_GET_SUB_RECORD_COUNT:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_TDF_GET_FIELD_NAME:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        t.Add(" = ");
+        t.AddString((const char*)c.result.v.p);
+        break;
+    }
+    case RI_TDF_COPY_RECORD_NAME:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddInt(a[2].v.i);
+        t.Add("\n  o dest ");
+        t.AddString((const char*)a[1].v.p);
+        break;
+    }
+    case RI_TDF_GET_RECORD_NAME:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        t.Add(" = ");
+        t.AddString((const char*)c.result.v.p);
+        break;
+    }
+    case RI_TDF_FIND_FIELD_VALUE:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddString((const char*)a[1].v.p);
+        t.Add(" = ");
+        t.AddString((const char*)c.result.v.p);
+        break;
+    }
+    case RI_TDF_GET_FIELD_FIXED:
+    {
+        AddSpace(t);
+        AddHandle(t, OBJ_RECORD, a[0].v.p);
+        AddSpace(t);
+        t.AddString((const char*)a[2].v.p);
+        AddSpace(t);
+        t.AddInt(a[3].v.i);
+        t.Add("\n  o dst ");
+        t.AddInt(*(const int*)a[1].v.p);
+        break;
+    }
+    case RI_TRANSLATE:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        t.Add(" = ");
+        t.AddString((const char*)c.result.v.p);
+        break;
+    }
+    case RI_INIT_ARGS:
+    {
+        break;
+    }
+    case RI_COMPUTE_CHECKSUM:
+    {
+        AddSpace(t);
+        ReplayBytes(t, a[0].v.p, a[1].v.i);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_SIM_ALLOC:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddAlloc(t, (c.result.kind == 1 ? c.result.v.p : nullptr), nullptr);
+        break;
+    }
+    case RI_SIM_ALLOC_TAGGED:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddAlloc(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (const char*)a[0].v.p);
+        break;
+    }
+    case RI_SIM_FREE:
+    {
+        AddSpace(t);
+        AddAllocName(t, a[0].v.p);
+        break;
+    }
+    case RI_RECORD_SIM_EVENT:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddSpace(t);
+        ReplayAddWords(t, (const unsigned*)a[2].v.p, (unsigned)a[3].v.i);
+        AddSpace(t);
+        t.AddInt(a[3].v.i);
+        break;
+    }
+    case RI_SIM_CAPTURE_ALLOC:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddSnapshot(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (unsigned)a[0].v.i);
+        break;
+    }
+    case RI_FIND_SLOT_BY_DPID:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_GET_SLOT_DPID:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_LOAD_GAF:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        ImportResultObject(t, ROK_GAF, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_LOAD_ANIM_GAF:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        ImportResultObject(t, ROK_GAF, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_FIND_GAF_ENTRY:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_GAF, a[0].v.p, true);
+        AddSpace(t);
+        t.AddString((const char*)a[1].v.p);
+        ImportResultObjectReach(t, ROK_FRAMETABLE, (c.result.kind == 1 ? c.result.v.p : nullptr), 1, "count");
+        break;
+    }
+    case RI_GET_GAF_FRAME:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_FRAMETABLE, a[0].v.p, true);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        ImportResultObjectReach(t, ROK_GAFFRAME, (c.result.kind == 1 ? c.result.v.p : nullptr), 5, "width", "height", "xOffset", "yOffset", "transparency");
+        break;
+    }
+    case RI_GET_GAF_SEQUENCE_FRAME:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_HANDLE, a[0].v.p, true);
+        ImportResultObjectReach(t, ROK_GAFFRAME, (c.result.kind == 1 ? c.result.v.p : nullptr), 5, "width", "height", "xOffset", "yOffset", "transparency");
+        break;
+    }
+    case RI_LOAD_3DO:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        ImportResultObjectReach(t, ROK_OBJECT3DO, (c.result.kind == 1 ? c.result.v.p : nullptr), 4, "vertexCount", "box_x", "box_y", "box_z");
+        break;
+    }
+    case RI_LOAD_OBJECT_3D:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        ImportResultObjectReach(t, ROK_OBJECT3DO, (c.result.kind == 1 ? c.result.v.p : nullptr), 4, "vertexCount", "box_x", "box_y", "box_z");
+        break;
+    }
+    case RI_GET_OBJECT_HEIGHT:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_OBJECT3DO, a[0].v.p, true);
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_EXECUTE_COMMAND_TEXT:
+    {
+        AddSpace(t);
+        ReplayAddTextN(t, (const char*)a[0].v.p, a[1].v.i);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddSpace(t);
+        ReplayAddArgs(t, (const CommandArgs*)a[2].v.p);
+        AddSpace(t);
+        t.AddInt(a[3].v.i);
+        AddResult(t, c.result);
+        t.AddText(s_nested);
+        s_nested.Clear();
+        break;
+    }
     }
     t.AddChar('\n');
     ReplayCalls() = 1;

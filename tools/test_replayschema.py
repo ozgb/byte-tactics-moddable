@@ -464,6 +464,493 @@ class StructForms(unittest.TestCase):
         self.assertTrue(any("unknown mode nonsense" in e for e in errors), errors)
 
 
+class Polymorphic(unittest.TestCase):
+    """N5: a base kind lists its concrete kinds, each concrete kind names its vtable, a code pointer is an index in a table."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def errors(self, ann):
+        return self.generated(ann)[1]
+
+    def test_the_base_lists_its_kinds_and_each_kind_its_vtable(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        vtables = files[rs.VTABLES_CPP]
+        self.assertIn("extern void (* const g_approachRadiusVtable[])();", vtables)
+        self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },', text)
+        self.assertIn("    case ROK_APPROACHRADIUS:\n        return g_approachRadiusVtable;", vtables)
+        self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', vtables)
+        base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
+        self.assertTrue(base.endswith('"", 0, 3 },'), base)
+        self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };", text)
+        self.assertIn('static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");', text)
+        self.assertIn('static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");', text)
+
+    def test_a_pointer_to_the_base_names_the_base_and_its_target_is_the_base(self):
+        files, _, model = self.generated()
+        field = [f for f in model["object_fields"] if (f["object"], f["name"]) == ("Order", "attached")][0]
+        self.assertEqual((field["target"], field["poly"]), ("OrderFx", "OrderFx"))
+        self.assertIn('{ "attached", offsetof(Order, attached), sizeof(((Order*)nullptr)->attached), ROK_ORDER, RK_REF, ROK_ORDERFX,', files[rs.SCHEMA_H])
+
+    def test_an_argument_of_the_base_type_is_recorded_as_the_base(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        arg = model["subsystems"]["orders"]["slots"]["OrderFxAddFlags"]["args"][0]
+        self.assertEqual((arg["mode"], arg["kind"], arg["poly"]), ("object", "OrderFx", "OrderFx"))
+        self.assertIn("roots.Add(ROK_ORDERFX, a0);", files[rs.HOOKS_H])
+
+    def test_an_argument_note_of_the_base_needs_poly(self):
+        ann = annotations()
+        ann["subsystems"]["orders"]["slots"] = {"OrderFxAddFlags": {"args": {"self": {"mode": "object", "kind": "OrderFx"}}}}
+        self.assertTrue(any("the argument self points at the base kind OrderFx and needs" in e for e in self.errors(ann)))
+
+    def test_poly_of_a_kind_that_is_no_base_is_an_error(self):
+        ann = annotations()
+        ann["subsystems"]["orders"]["slots"] = {"AppendOrder": {"args": {"node": {"mode": "object", "kind": "Order", "poly": "Order"}}}}
+        self.assertTrue(any("`poly` of the argument node names the base kind" in e for e in self.errors(ann)))
+
+    def test_a_ref_to_a_base_needs_poly(self):
+        ann = annotations()
+        del [f for f in ann["objects"]["Order"]["fields"] if f["name"] == "attached"][0]["poly"]
+        self.assertTrue(any('Order.attached: points at the base kind OrderFx and needs "poly"' in e for e in self.errors(ann)))
+
+    def test_poly_names_the_target(self):
+        ann = annotations()
+        [f for f in ann["objects"]["Order"]["fields"] if f["name"] == "next"][0]["poly"] = "OrderFx"
+        self.assertTrue(any("Order.next: `poly` names the base kind" in e for e in self.errors(ann)))
+
+    def test_a_base_has_no_fields_and_a_kind_has_a_vtable_and_one_base(self):
+        ann = annotations()
+        ann["objects"]["OrderFx"]["fields"].append({"name": "source", "kind": "ref", "target": "Order"})
+        self.assertTrue(any("OrderFx (base): a base kind has no fields" in e for e in self.errors(ann)))
+        ann = annotations()
+        del ann["objects"]["PathOrder"]["vtable"]
+        self.assertTrue(any("OrderFx (base): the kind PathOrder has no vtable" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["objects"]["Order"]["kinds"] = ["PathOrder"]
+        ann["objects"]["Order"]["fields"] = []
+        self.assertTrue(any("the kind PathOrder is also a kind of OrderFx" in e or "Order (base): the kind PathOrder" in e for e in self.errors(ann)))
+
+    def test_two_kinds_cannot_share_a_vtable(self):
+        ann = annotations()
+        ann["objects"]["RingApproach"]["vtable"] = "g_approachRadiusVtable"
+        self.assertTrue(any("RingApproach: the vtable g_approachRadiusVtable is also the vtable of ApproachRadius" in e for e in self.errors(ann)))
+
+    def test_a_vtable_is_a_name_and_belongs_to_a_kind_of_a_base(self):
+        ann = annotations()
+        ann["objects"]["PathOrder"]["vtable"] = "0x4fd3b8"
+        self.assertTrue(any("PathOrder: the vtable is the name of a global" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["objects"]["OrderFx"]["kinds"].remove("PathOrder")
+        self.assertTrue(any("PathOrder: has a vtable and is a kind of no base" in e for e in self.errors(ann)))
+
+    def test_a_code_field_is_an_index_in_its_table(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("kReplayCodeOrderNotify[] = {", text)
+        self.assertIn("    (const void*)StopOrder,", text)
+        self.assertIn('{ "orderNotify", kReplayCodeOrderNotify, %d },' % len(model["code_tables"][0]["entries"]), text)
+        self.assertIn('static_assert(sizeof(((OrderTableEntry*)nullptr)->notify) == sizeof(void*), "OrderTableEntry::notify is a code pointer");', text)
+        row_ = [l for l in text.split("\n") if l.startswith('    { "notify",')][0]
+        self.assertIn("RK_CODE, 0,", row_)
+
+    def test_the_table_lists_each_function_once_in_the_order_of_registration(self):
+        _, _, model = self.generated()
+        entries = model["code_tables"][0]["entries"]
+        self.assertEqual(len(entries), len(set(entries)))
+        self.assertEqual(entries[0], "ReadyOrder")
+        self.assertLess(entries.index("StandbyOrder"), entries.index("VtolStandbyOrder"))
+        self.assertLess(entries.index("VtolStandbyOrder"), entries.index("StopOrder"))
+
+    def test_a_function_that_no_header_declares_is_an_error(self):
+        ann = annotations()
+        ann["code_tables"]["orderNotify"]["entries"].append("NoSuchOrder")
+        self.assertTrue(any("code table orderNotify: NoSuchOrder is declared in none of its headers" in e for e in self.errors(ann)))
+
+    def test_a_header_of_the_table_is_one_of_the_includes(self):
+        ann = annotations()
+        ann["includes"].remove("../orders/vtol_orders.h")
+        self.assertTrue(any("vtol_orders.h is not one of the schema's `includes`" in e for e in self.errors(ann)))
+
+    def test_the_fill_is_a_slot_of_a_seam(self):
+        for fill in ("RegisterAllOrderTypes", "orders.NoSuchSlot", "nowhere.RegisterAllOrderTypes"):
+            ann = annotations()
+            ann["code_tables"]["orderNotify"]["fill"] = fill
+            self.assertTrue(any("`fill` names a slot of a seam" in e for e in self.errors(ann)), fill)
+
+    def test_a_code_field_names_a_table(self):
+        ann = annotations()
+        [f for f in ann["objects"]["OrderTableEntry"]["fields"] if f["name"] == "notify"][0]["table"] = "nowhere"
+        self.assertTrue(any("OrderTableEntry.notify: a code field names a table" in e for e in self.errors(ann)))
+
+
+class Callbacks(unittest.TestCase):
+    """N6: an import that calls back into the subsystem records each call under its i line, and the stub makes them in order."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def with_import(self, mutate=None):
+        ann = annotations()
+        ann["subsystems"]["map"].setdefault("slots", {})["VisitObjectsInRange"] = {"args": {"visitor": {"mode": "callback", "callback": "UnitVisitor"}}}
+        ann["subsystems"]["wind_meteors"]["imports"].append("map.VisitObjectsInRange")
+        if mutate:
+            mutate(ann)
+        return ann
+
+    def errors(self, ann):
+        return self.generated(ann)[1]
+
+    def test_the_interfaces_are_in_the_schema_with_their_methods(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("RCB_UNITVISITOR,", text)
+        self.assertIn('static const char* const kReplayUnitScanVisitorMethods[] = { "VisitUnit" };', text)
+        self.assertIn('{ "UnitScanVisitor", "scanner", 1, kReplayUnitScanVisitorMethods },', text)
+
+    def test_the_recorder_gets_a_class_that_records_and_forwards_each_method(self):
+        files, _, _ = self.generated()
+        text = files[rs.CALLBACKS_H]
+        self.assertIn("class ReplayThunkUnitScanVisitor : public UnitScanVisitor {", text)
+        self.assertIn("inline int ReplayThunkUnitScanVisitor::VisitUnit(Unit* a0)", text)
+        self.assertIn("ReplayAddObjectName(call.Text(), call.Table(), ROK_UNIT, a0, true);", text)
+        self.assertIn("typedef int (__thiscall* Method)(void*, Unit*);", text)
+        self.assertIn("int result = ((Method)call.Original(0))(this, a0);", text)
+        self.assertIn("ReplayValue(call.Text(), result);", text)
+        self.assertIn("ReplayValue(call.Text(), a0);", text)
+        self.assertIn("case RCB_CALLBACK: {", text)
+
+    def test_the_replayer_gets_a_player_that_calls_the_modules_object(self):
+        files, _, _ = self.generated()
+        text = files[rs.CALLBACKS_SLOTS]
+        self.assertIn("void PlayCallbacks_UnitScanVisitor(void* object, unsigned handle, const char* import)", text)
+        self.assertIn("int result = ((UnitScanVisitor*)object)->VisitUnit(a0);", text)
+        self.assertIn("CallbackDone(import, k, args, have.Data());", text)
+        self.assertIn("CallbackDone(import, k, args, nullptr);", text)
+
+    def test_a_callback_argument_of_an_import_is_recorded_under_the_i_line(self):
+        files, errors, _ = self.generated(self.with_import())
+        self.assertEqual(errors, [])
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecMapVisitObjectsInRange("):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("ReplayCallbackScope cb2;", body)
+        self.assertIn("ImportCallback(line, cb2, RCB_UNITVISITOR, a2);", body)
+        self.assertLess(body.index("s_inner_map->VisitObjectsInRange"), body.index("cb2.Stop();"))
+        self.assertLess(body.index("cb2.Stop();"), body.index("line.AddText(cb2.Lines());"))
+        self.assertLess(body.index("line.AddText(cb2.Lines());"), body.index("FinishImport(line);"))
+
+    def test_the_stub_plays_the_calls_after_it_matches_the_i_line(self):
+        files, _, _ = self.generated(self.with_import())
+        slots = files[rs.SLOTS_H]
+        body = slots[slots.index("Imp_map_VisitObjectsInRange("):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("AddObject(t, OBJ_CALLBACK + RCB_UNITVISITOR, a2);", body)
+        self.assertLess(body.index("Enter(t)"), body.index('PlayCallbacks_UnitVisitor(a2, OBJ_CALLBACK + RCB_UNITVISITOR, "map.VisitObjectsInRange");'))
+
+    def test_a_callback_argument_of_a_slot_no_subsystem_imports_is_an_error(self):
+        def only_note(ann):
+            ann["subsystems"]["wind_meteors"]["imports"].remove("map.VisitObjectsInRange")
+        self.assertTrue(any("map.VisitObjectsInRange has a callback argument and is imported by no subsystem" in e for e in self.errors(self.with_import(only_note))))
+
+    def test_the_callback_names_an_entry_and_its_type(self):
+        def unknown(ann):
+            ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["args"]["visitor"]["callback"] = "Nowhere"
+        self.assertTrue(any("needs a `callback` that is an entry of `callbacks`" in e for e in self.errors(self.with_import(unknown))))
+
+        def wrong(ann):
+            ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["args"]["visitor"]["callback"] = "Callback"
+        self.assertTrue(any("the callback Callback is Callback*" in e for e in self.errors(self.with_import(wrong))))
+
+    def test_the_methods_are_the_virtuals_of_the_class_in_order(self):
+        ann = annotations()
+        ann["callbacks"]["UnitVisitor"]["methods"][0]["name"] = "VisitAll"
+        self.assertTrue(any("callback UnitVisitor: the methods are ['VisitAll'], and the class declares the virtuals ['Visit']" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["callbacks"]["UnitVisitor"]["header"] = "interfaces/units.h"
+        self.assertTrue(any("units.h declares no such class" in e for e in self.errors(ann)))
+
+    def test_a_handle_is_a_name_no_other_handle_has(self):
+        ann = annotations()
+        ann["callbacks"]["Callback"]["handle"] = "visitor"
+        self.assertTrue(any("callback Callback: the handle is a name that no other handle has" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["callbacks"]["Callback"]["handle"] = "bank"
+        self.assertTrue(any("callback Callback: the handle is a name that no other handle has" in e for e in self.errors(ann)))
+
+    def test_an_argument_has_a_mode_a_type_and_a_kind_that_fit(self):
+        ann = annotations()
+        ann["callbacks"]["UnitVisitor"]["methods"][0]["args"][0]["mode"] = "bytes-in"
+        self.assertTrue(any("the argument unit has the mode bytes-in" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["callbacks"]["UnitVisitor"]["methods"][0]["args"][0]["type"] = "Player*"
+        self.assertTrue(any("the argument unit is a pointer to a state kind of the schema" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["callbacks"]["Callback"]["methods"][0]["args"][0]["type"] = "Widget"
+        self.assertTrue(any("the argument result is Widget, which is no scalar" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["callbacks"]["UnitScanVisitor"]["methods"][0]["ret"] = "Widget"
+        self.assertTrue(any("the result Widget is void, a scalar or a pointer to a state kind" in e for e in self.errors(ann)))
+
+
+class Vectors(unittest.TestCase):
+    """N8: a BlockVector member is [length/capacity] and its elements, as handles, runs of bytes or lines of fields."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def errors(self, ann):
+        return self.generated(ann)[1]
+
+    def field(self, ann, name):
+        return [f for f in ann["objects"]["PlayerAI"]["fields"] if f["name"] == name][0]
+
+    def test_each_element_mode_has_a_spec_and_a_check_of_the_c_type(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"]],
+                         [("object", "Unit", "Ref<Unit>"), ("value", "KeyedCell", "KeyedCell"), ("scalar", "", "short")])
+        self.assertIn("{ RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },", text)
+        self.assertIn("{ RV_VALUE, ROK_KEYEDCELL, sizeof(KeyedCell) },", text)
+        self.assertIn("{ RV_SCALAR, 0, sizeof(short) },", text)
+        self.assertIn('static_assert(__is_same(decltype(((PlayerAI*)nullptr)->visible.units)::value_type, Ref<Unit>), "PlayerAI::visibleUnits holds Ref<Unit>");', text)
+        self.assertIn('static_assert(sizeof(decltype(((PlayerAI*)nullptr)->cells)) == 16, "PlayerAI::cells is a block vector");', text)
+
+    def test_the_field_row_names_the_vector_and_the_element_kind_to_walk(self):
+        files, _, _ = self.generated()
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "visibleUnits",')][0]
+        self.assertIn("offsetof(PlayerAI, visible.units)", row)
+        self.assertIn("RK_VECTOR, ROK_UNIT,", row)
+        self.assertTrue(row.rstrip(" },").endswith(", 1"), row)
+
+    def test_a_header_that_needs_the_packing_of_the_game_is_included_packed(self):
+        files, _, _ = self.generated()
+        self.assertIn('#pragma pack(push, 1)\n#include "../ai/player_ai.h"\n#pragma pack(pop)', files[rs.SCHEMA_H])
+
+    def test_a_vector_needs_an_element_mode(self):
+        ann = annotations()
+        del self.field(ann, "counts")["elem"]
+        self.assertTrue(any("PlayerAI.counts: a vector needs an `elem` with a mode of object, scalar, value" in e for e in self.errors(ann)))
+        ann = annotations()
+        self.field(ann, "counts")["elem"] = {"mode": "pointer"}
+        self.assertTrue(any("PlayerAI.counts: a vector needs an `elem`" in e for e in self.errors(ann)))
+
+    def test_an_element_names_a_type_or_a_kind_of_its_mode(self):
+        ann = annotations()
+        self.field(ann, "counts")["elem"] = {"mode": "scalar", "type": "Widget"}
+        self.assertTrue(any("a scalar element needs a `type` of" in e for e in self.errors(ann)))
+        ann = annotations()
+        self.field(ann, "visibleUnits")["elem"] = {"mode": "object", "kind": "KeyedCell"}
+        self.assertTrue(any("PlayerAI.visibleUnits: an object element needs a `kind` that is a state kind" in e for e in self.errors(ann)))
+        ann = annotations()
+        self.field(ann, "cells")["elem"] = {"mode": "value", "kind": "Unit"}
+        self.assertTrue(any("PlayerAI.cells: a value element needs a `kind` that is a value kind" in e for e in self.errors(ann)))
+
+    def test_only_the_fields_of_a_state_kind_are_vectors(self):
+        ann = annotations()
+        ann["objects"]["KeyedCell"]["fields"].append({"name": "v", "kind": "vector", "elem": {"mode": "scalar", "type": "int"}})
+        self.assertTrue(any("KeyedCell.v: only the fields of a state kind can be vectors" in e for e in self.errors(ann)))
+
+
+class Snapshots(unittest.TestCase):
+    """N9: an import that returns a buffer the slot fills is recorded by its size and a handle, and the bytes at slot exit."""
+
+    def spec(self, **changes):
+        out = {"name": "SimCaptureAlloc", "id": "RI_SIM_CAPTURE_ALLOC", "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
+               "args": [{"mode": "int", "param": "bytes"}, {"mode": "skip", "param": "offset"}], "result": "snapshot", "bytes": "bytes", "offset": "offset"}
+        out.update(changes)
+        return out
+
+    def test_the_recorder_writes_the_size_and_the_handle(self):
+        text = rs.render_service_end([self.spec()])
+        self.assertIn("case RI_SIM_CAPTURE_ALLOC:", text)
+        self.assertIn("t.AddInt(a[0].v.i);", text)
+        self.assertIn("AddSnapshot(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (unsigned)a[0].v.i);", text)
+
+    def test_the_offset_is_not_a_line(self):
+        text = rs.render_service_end([self.spec()])
+        self.assertNotIn("offset", text)
+
+    def test_the_replayer_returns_a_buffer_of_its_own_with_its_own_offset(self):
+        text = rs.render_service_answers([self.spec()])
+        self.assertIn("void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)", text)
+        self.assertIn("t.AddInt((int)bytes);", text)
+        self.assertIn("return SnapshotAnswer(result, (unsigned)bytes, offset);", text)
+
+    def test_a_snapshot_needs_a_size_an_offset_and_a_pointer(self):
+        self.assertEqual(rs.check_service_snapshots([self.spec()]), [])
+        self.assertTrue(rs.check_service_snapshots([self.spec(bytes="nowhere")]))
+        self.assertTrue(rs.check_service_snapshots([self.spec(offset="bytes")]))
+        self.assertTrue(rs.check_service_snapshots([self.spec(declaration="int SimCaptureAlloc(unsigned int bytes, unsigned int* offset);")]))
+
+    def test_another_result_is_untouched(self):
+        self.assertEqual(rs.check_service_snapshots([self.spec(result="int")]), [])
+
+
+class Services(unittest.TestCase):
+    """N7: the services of the files, commands, sim plumbing and load groups, through the services annotation."""
+
+    def spec(self, name, ann=None):
+        return [s for s in (ann or annotations())["services"] if s["name"] == name][0]
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def errors(self, ann):
+        return self.generated(ann)[1]
+
+    def test_every_new_service_is_hooked_and_declared(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        names = {s["name"] for s in annotations()["services"]}
+        for name in ("FilePrintf", "TdfRecord_FindSubRecord", "TdfRecord_GetFieldFixed", "Translate", "CommandArgs_InitArgs", "ComputeChecksum",
+                     "SimAlloc", "SimAllocTagged", "SimFree", "RecordSimEvent", "SimCaptureAlloc", "FindSlotByDpid", "GetSlotDpid"):
+            self.assertIn(name, names)
+            self.assertIn("RI_", files[rs.SERVICES_H])
+
+    def test_bytes_and_words_are_written_with_their_lengths(self):
+        text = rs.render_service_end([self.spec("ComputeChecksum"), self.spec("RecordSimEvent")])
+        self.assertIn("ReplayBytes(t, a[0].v.p, a[1].v.i);", text)
+        self.assertIn("ReplayAddWords(t, (const unsigned*)a[2].v.p, (unsigned)a[3].v.i);", text)
+
+    def test_a_handle_result_is_a_record_the_replayer_parses(self):
+        spec = self.spec("TdfRecord_FindSubRecord")
+        self.assertIn("AddHandle(t, OBJ_RECORD, (c.result.kind == 1 ? c.result.v.p : nullptr));", rs.render_service_end([spec]))
+        self.assertIn("return (TdfRecord*)ParseHandle(OBJ_RECORD, result);", rs.render_service_answers([spec]))
+
+    def test_a_number_written_through_a_pointer_is_an_out_line(self):
+        spec = self.spec("TdfRecord_GetFieldFixed")
+        self.assertIn('t.Add("\\n  o dst ");\n        t.AddInt(*(const int*)a[1].v.p);', rs.render_service_end([spec]))
+        answers = rs.render_service_answers([spec])
+        self.assertIn('OutValue("dst")', answers)
+        self.assertIn("*dst = atoi(dstText);", answers)
+        self.assertIn("return dst;", answers)
+
+    def test_a_text_result_that_is_null_is_null(self):
+        self.assertIn('if (strcmp(result, "null") == 0)\n        return nullptr;', rs.render_service_answers([self.spec("Translate")]))
+
+    def test_a_formatted_text_is_an_argument_the_definition_builds(self):
+        answers = rs.render_service_answers([self.spec("FilePrintf")])
+        self.assertIn("va_start(list, fmt);", answers)
+        self.assertIn("t.AddString(formatted);", answers)
+
+    def test_a_service_in_a_source_the_replayer_links_is_answered_not_defined(self):
+        services = annotations()["services"]
+        linked = rs.linked_services(services)
+        self.assertEqual({"SimAlloc", "SimAllocTagged", "SimFree"} - linked, set())
+        answers = rs.render_service_answers(services, linked)
+        self.assertNotIn("void* __cdecl SimAlloc(unsigned int size)\n{", answers)
+        self.assertIn("bool ReplayAnswerImport(ReplayImport& c)", answers)
+        self.assertIn("case RI_SIM_ALLOC: {", answers)
+        self.assertIn("c.Return(AllocAnswer(result, (unsigned)c.args[0].v.i));", answers)
+
+    def test_a_free_goes_on_into_the_real_function(self):
+        answers = rs.render_service_answers(annotations()["services"], rs.linked_services(annotations()["services"]))
+        body = answers[answers.index("case RI_SIM_FREE: {"):]
+        body = body[:body.index("    }\n")]
+        self.assertIn("AddAllocName(t, c.args[0].v.p);", body)
+        self.assertIn("return false;", body)
+
+    def test_an_alloc_is_named_by_its_tag_when_the_annotation_has_one(self):
+        files, _, _ = self.generated()
+        self.assertIn('{ "Player Info", ROK_PLAYERINFO, 185 },', files[rs.SCHEMA_H])
+        self.assertIn("AddAlloc(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (const char*)a[0].v.p);", files[rs.SERVICES_INC])
+
+    def test_an_unknown_mode_or_result_is_an_error(self):
+        ann = annotations()
+        self.spec("Translate", ann)["result"] = "pointer"
+        self.assertTrue(any("service Translate: the result pointer is none of" in e for e in self.errors(ann)))
+        ann = annotations()
+        self.spec("Translate", ann)["args"][0]["mode"] = "wide"
+        self.assertTrue(any("the argument key has the unknown mode wide" in e for e in self.errors(ann)))
+
+    def test_bytes_and_ints_name_an_int_argument(self):
+        ann = annotations()
+        self.spec("ComputeChecksum", ann)["args"][0]["length"] = "nowhere"
+        self.assertTrue(any("service ComputeChecksum: the argument data needs a `length` that names an int argument" in e for e in self.errors(ann)))
+        ann = annotations()
+        self.spec("RecordSimEvent", ann)["args"][2]["count"] = "nowhere"
+        self.assertTrue(any("service RecordSimEvent: the argument args needs a `count`" in e for e in self.errors(ann)))
+
+    def test_an_alloc_needs_its_size_and_its_tags_a_kind_without_a_table(self):
+        ann = annotations()
+        del self.spec("SimAlloc", ann)["size"]
+        self.assertTrue(any("service SimAlloc: an alloc result needs `size`" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["alloc_tags"]["Units"] = {"kind": "Unit", "size": 280}
+        self.assertTrue(any("the alloc tag Units names a state kind with no table" in e for e in self.errors(ann)))
+
+    def test_a_handle_needs_a_kind_of_file_rec_or_bank(self):
+        ann = annotations()
+        self.spec("TdfRecord_FindSubRecord", ann)["kind"] = "gaf"
+        self.assertTrue(any("a handle result needs a `kind` of file, rec or bank" in e for e in self.errors(ann)))
+
+    def test_a_hook_that_gives_other_arguments_is_an_error(self):
+        errors = rs.check_service_hooks(annotations()["services"])
+        self.assertEqual(errors, [])
+        services = annotations()["services"]
+        self.spec("Translate", {"services": services})["args"].append({"mode": "int", "param": "extra"})
+        self.assertTrue(any("RI_TRANSLATE" in e for e in rs.check_service_hooks(services)))
+
+
+class ReentrantServices(unittest.TestCase):
+    """ExecuteCommandText: the commands it runs are c lines under its i line."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def spec(self):
+        return [s for s in annotations()["services"] if s["name"] == "ExecuteCommandText"][0]
+
+    def test_the_text_and_the_arguments_are_written_by_their_lengths_and_lists(self):
+        text = rs.render_service_end([self.spec()])
+        self.assertIn("ReplayAddTextN(t, (const char*)a[0].v.p, a[1].v.i);", text)
+        self.assertIn("ReplayAddArgs(t, (const CommandArgs*)a[2].v.p);", text)
+        self.assertIn("t.AddText(s_nested);\n        s_nested.Clear();", text)
+
+    def test_the_stub_finds_its_line_among_the_nested_imports_and_plays_the_commands(self):
+        answers = rs.render_service_answers([self.spec()])
+        self.assertIn("const char* result = EnterNested(t);", answers)
+        self.assertIn('PlayNestedCalls("services.ExecuteCommandText");', answers)
+
+    def test_a_command_slot_is_nested_and_a_slot_that_is_not_a_command_is_not(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        slots = model["subsystems"]["wind_meteors"]["slots"]
+        self.assertTrue(rs.nestable("CmdMeteor", slots["CmdMeteor"]))
+        self.assertFalse(rs.nestable("UpdateWind", slots["UpdateWind"]))
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecWindMeteorsCmdMeteor("):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('line.Add("\\n    c wind_meteors.CmdMeteor");', body)
+        self.assertIn("ImportArgv(line, a0);", body)
+        self.assertIn("FinishNested(line);", body)
+        self.assertIn("bool IsNestedSlot(unsigned slot)\n{\n    switch (slot) {\n    case RSL_WIND_METEORS_CMDMETEOR:", hooks)
+        self.assertIn("if (on[SUB_WIND_METEORS] || any)\n        s_rec_wind_meteors.CmdMeteor = RecWindMeteorsCmdMeteor;", hooks)
+
+    def test_the_replayer_makes_the_nested_calls_through_the_seam_table(self):
+        files, _, _ = self.generated()
+        slots = files[rs.SLOTS_H]
+        self.assertIn("void PlayNestedCalls(const char* import)", slots)
+        self.assertIn('if (CallbackIs(name, "wind_meteors.CmdMeteor")) {', slots)
+        self.assertIn("g_seams.wind_meteors->CmdMeteor(&p0.args);", slots)
+
+    def test_a_length_for_the_text_names_an_int_argument(self):
+        ann = annotations()
+        [s for s in ann["services"] if s["name"] == "ExecuteCommandText"][0]["args"][0]["length"] = "nowhere"
+        self.assertTrue(any("service ExecuteCommandText: the argument text needs a `length`" in e for e in self.generated(ann)[1]))
+
+    def test_a_re_entrant_service_has_an_int_result(self):
+        ann = annotations()
+        [s for s in ann["services"] if s["name"] == "ExecuteCommandText"][0]["result"] = "text"
+        self.assertTrue(any("a re-entrant service has an int or no result" in e for e in self.generated(ann)[1]))
+
+
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
         files, errors, model = rs.generate(rs.read_rows())

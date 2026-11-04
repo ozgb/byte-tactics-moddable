@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -13,9 +14,11 @@
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
 #include "../src/harness/replay_services.h"
+#include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
 #include "../src/harness/replay_values.h"
 #include "../src/harness/replay_objects.h"
+#include "../src/harness/replay_callbacks.h"
 #include "replay_wasm.h"
 
 extern "C" int __cdecl bx_rand(void* state);
@@ -84,10 +87,30 @@ ConstructedElement::~ConstructedElement()
 {
 }
 
+int __stdcall StopOrder(Unit*, Order*, int)
+{
+    return 1;
+}
+
+int __stdcall MakeSelectableOrder(Unit*, Order*, int)
+{
+    return 2;
+}
+
+int __stdcall WaitOrder(Unit*, Order*, int)
+{
+    return 3;
+}
+
+int __stdcall FixtureOtherNotify(Unit*, Order*, int)
+{
+    return 4;
+}
+
 namespace {
 
 enum { MAX_LINES = 1 << 21, MAX_OUTS = 16384, MAX_RECORDS = 64, TEXT = 512 };
-enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
+enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK, OBJ_CALLBACK };
 
 int g_failures;
 
@@ -111,7 +134,12 @@ ReplayReach g_reach;
 
 void* AllocObject(unsigned size)
 {
-    return SimAlloc(size);
+    bool& busy = ReplayAnswerBusy();
+    bool was = busy;
+    busy = true;
+    void* p = SimAlloc(size);
+    busy = was;
+    return p;
 }
 
 char* g_text;
@@ -139,6 +167,13 @@ unsigned char g_rootKinds[REPLAY_MAX_ROOTS];
 void* g_rootObjects[REPLAY_MAX_ROOTS];
 unsigned g_rootCount;
 const ReplaySlotSets* g_sets;
+
+enum { MAX_CALLBACK_LINES = 1024 };
+const char* g_cbLines[MAX_CALLBACK_LINES];
+int g_cbCount;
+int g_cbImportIndex;
+int g_nestedFrom;
+int g_nestedAfter;
 
 char g_fakeRecords[MAX_RECORDS][16];
 HapiBank g_bank;
@@ -252,7 +287,7 @@ void AddVec3Xz(ReplayText& t, const Vec3* v)
 
 void AddObject(ReplayText& t, unsigned kind, const void* p)
 {
-    static const char* const names[] = { "file#", "rec#", "bank#" };
+    static const char* const names[] = { "file", "rec", "bank" };
     unsigned ordinal;
     if (kind == OBJ_RECORD) {
         ordinal = 0;
@@ -267,7 +302,8 @@ void AddObject(ReplayText& t, unsigned kind, const void* p)
         t.Add("null");
         return;
     }
-    t.Add(names[kind]);
+    t.Add(kind >= OBJ_CALLBACK ? kReplayCallbacks[kind - OBJ_CALLBACK].handle : names[kind]);
+    t.AddChar('#');
     t.AddUnsigned(ordinal);
 }
 
@@ -370,6 +406,8 @@ const char* LastResult(const char* line)
 
 bool ClosingLine(const char* line)
 {
+    if (strncmp(line + 4, "snapshot#", 9) == 0)
+        return true;
     for (int i = 0; i < 3; i++) {
         if (g_closing[i] != nullptr && strncmp(line + 4, g_closing[i], strlen(g_closing[i])) == 0)
             return true;
@@ -382,6 +420,8 @@ const char* Enter(const ReplayText& actual)
     int index = g_importIndex++;
     g_importsTotal++;
     g_outCount = 0;
+    g_cbCount = 0;
+    g_cbImportIndex = index;
     char key[96];
     const char* space = strchr(actual.Data(), ' ');
     int nameLength = space == nullptr ? (int)strlen(actual.Data()) : (int)(space - actual.Data());
@@ -395,6 +435,12 @@ const char* Enter(const ReplayText& actual)
     }
     g_cursor = next + 1;
     const char* recorded = g_lines[next] + 4;
+    while (g_cursor < g_callEnd && strncmp(g_lines[g_cursor], "    c ", 6) == 0) {
+        if (g_cbCount == MAX_CALLBACK_LINES)
+            abort();
+        g_cbLines[g_cbCount++] = g_lines[g_cursor] + 6;
+        g_cursor++;
+    }
     while (g_cursor < g_callEnd && strncmp(g_lines[g_cursor], "  o ", 4) == 0 && !ClosingLine(g_lines[g_cursor])) {
         if (g_outCount < MAX_OUTS) {
             char* name = g_lines[g_cursor] + 4;
@@ -740,7 +786,292 @@ void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr)
 
 }
 
+namespace {
+
+void AddAllocName(ReplayText& t, const void* p)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    if (g_objects.Find(ROK_ALLOC, p) != 0) {
+        ReplayAddObjectName(t, g_objects, ROK_ALLOC, p, false);
+        return;
+    }
+    for (unsigned i = 0; i < kReplayAllocTagCount; i++) {
+        if (g_objects.Find(kReplayAllocTags[i].kind, p) != 0) {
+            ReplayAddObjectName(t, g_objects, kReplayAllocTags[i].kind, p, false);
+            return;
+        }
+    }
+    t.Add("alloc#?");
+}
+
+void* AllocAnswer(const char* result, unsigned size)
+{
+    if (strcmp(result, "null") == 0)
+        return nullptr;
+    void* p = SimAlloc(size);
+    const char* hash = strchr(result, '#');
+    int kind = hash == nullptr ? -1 : ReplayFindObjectKind(result, (unsigned)(hash - result));
+    if (kind >= 0 && hash[1] != '?')
+        g_objects.Bind((unsigned)kind, (unsigned)atoi(hash + 1), p);
+    return p;
+}
+
+void* ParseHandle(unsigned kind, const char* text)
+{
+    if (kind == OBJ_RECORD)
+        return ParseRecord(text);
+    return strcmp(text, "null") == 0 || kind == OBJ_FILE ? nullptr : &g_bank;
+}
+
+enum { MAX_SNAPSHOTS = 64, CAPTURE_ARENA_BYTES = 1 << 20 };
+unsigned char g_captureArena[CAPTURE_ARENA_BYTES];
+unsigned g_captureUsed;
+unsigned char* g_snapshotData[MAX_SNAPSHOTS];
+unsigned g_snapshotBytes[MAX_SNAPSHOTS];
+
+void SnapshotRegister(const char* result, void* buffer, unsigned bytes)
+{
+    if (strncmp(result, "snapshot#", 9) != 0)
+        return;
+    unsigned ordinal = (unsigned)atoi(result + 9);
+    if (ordinal == 0 || ordinal > MAX_SNAPSHOTS)
+        Fatal(g_file, g_callIndex, "a snapshot that the replayer cannot register", result);
+    g_snapshotData[ordinal - 1] = (unsigned char*)buffer;
+    g_snapshotBytes[ordinal - 1] = bytes;
+}
+
+void* SnapshotAnswer(const char* result, unsigned bytes, unsigned* offset)
+{
+    if (strncmp(result, "snapshot#", 9) != 0)
+        return nullptr;
+    unsigned ordinal = (unsigned)atoi(result + 9);
+    unsigned size = (bytes + 7u) & ~7u;
+    if (ordinal == 0 || ordinal > MAX_SNAPSHOTS || g_captureUsed + size > CAPTURE_ARENA_BYTES)
+        Fatal(g_file, g_callIndex, "a snapshot that the replayer cannot allocate", result);
+    *offset = g_captureUsed;
+    unsigned char* at = g_captureArena + g_captureUsed;
+    memset(at, 0, size);
+    g_captureUsed += size;
+    g_snapshotData[ordinal - 1] = at;
+    g_snapshotBytes[ordinal - 1] = bytes;
+    return at;
+}
+
+}
+
+namespace {
+
+void PlayNestedCalls(const char* import);
+
+
+const char* EnterNested(const ReplayText& actual)
+{
+    const char* space = strchr(actual.Data(), ' ');
+    size_t n = space == nullptr ? strlen(actual.Data()) : (size_t)(space - actual.Data());
+    int at = g_cursor;
+    while (at < g_callEnd && !(strncmp(g_lines[at], "  i ", 4) == 0 && strncmp(g_lines[at] + 4, actual.Data(), n) == 0 && (g_lines[at][4 + n] == ' ' || g_lines[at][4 + n] == '\0')))
+        at++;
+    g_nestedFrom = g_cursor;
+    if (at < g_callEnd)
+        g_cursor = at;
+    const char* result = Enter(actual);
+    g_nestedAfter = g_cursor;
+    return result;
+}
+
+}
+
 #include "replay_services.h"
+
+namespace {
+
+struct NestedScope {
+    NestedScope() : count(g_cbCount), outer(g_cbImportIndex), after(g_nestedAfter)
+    {
+        memcpy(line, g_cbLines, (unsigned)g_cbCount * sizeof g_cbLines[0]);
+        g_cursor = g_nestedFrom;
+    }
+    ~NestedScope() { g_cursor = after; }
+    void Restore() const { g_cbImportIndex = outer; }
+    const char* line[MAX_CALLBACK_LINES];
+    int count;
+    int outer;
+    int after;
+
+private:
+    NestedScope(const NestedScope&);
+    NestedScope& operator=(const NestedScope&);
+};
+
+const char* NestedName(const char* line, const char** args)
+{
+    const char* end = strchr(line, ' ');
+    *args = end == nullptr ? line + strlen(line) : end;
+    return line;
+}
+
+void ParseArgsList(const char** args, ArgvHolder& holder)
+{
+    memset(&holder, 0, sizeof holder);
+    while (**args == ' ')
+        (*args)++;
+    if (**args != '[') {
+        while (**args != '\0' && **args != ' ')
+            (*args)++;
+        return;
+    }
+    (*args)++;
+    while (**args != ']' && **args != '\0') {
+        if (**args == ',') {
+            (*args)++;
+            continue;
+        }
+        if (holder.args.count < 0x14) {
+            *args = ParseQuoted(*args, holder.text[holder.args.count], sizeof holder.text[0]);
+            holder.args.args[holder.args.count] = holder.text[holder.args.count];
+            holder.args.count++;
+        } else {
+            *args = ParseQuoted(*args, holder.text[0], sizeof holder.text[0]);
+        }
+    }
+    if (**args == ']')
+        (*args)++;
+}
+
+void CallbackKey(char* key, const char* import, int k)
+{
+    sprintf(key, "import %d %s.c[%d]", g_cbImportIndex, import, k);
+}
+
+const char* CallbackMethod(int k, unsigned handle, const void* object, const char* label, const char* import, const char** args)
+{
+    const char* line = g_cbLines[k];
+    ReplayText want;
+    AddObject(want, handle, object);
+    unsigned n = (unsigned)strlen(want.Data());
+    bool same = strncmp(line, want.Data(), n) == 0 && line[n] == '.';
+    if (!same) {
+        char key[96];
+        char recorded[48];
+        const char* dot = strchr(line, '.');
+        unsigned length = dot == nullptr ? (unsigned)strlen(line) : (unsigned)(dot - line);
+        if (length >= sizeof recorded)
+            length = (unsigned)sizeof recorded - 1;
+        memcpy(recorded, line, length);
+        recorded[length] = '\0';
+        CallbackKey(key, import, k);
+        Diff(key, recorded, want.Data());
+        want.Free();
+        return nullptr;
+    }
+    want.Free();
+    (void)label;
+    const char* method = line + n + 1;
+    const char* end = strchr(method, ' ');
+    *args = end == nullptr ? method + strlen(method) : end;
+    return method;
+}
+
+bool CallbackIs(const char* method, const char* name)
+{
+    size_t n = strlen(name);
+    return strncmp(method, name, n) == 0 && (method[n] == ' ' || method[n] == '\0');
+}
+
+void CallbackToken(const char** p, char* out, unsigned size)
+{
+    const char* q = *p;
+    while (*q == ' ')
+        q++;
+    unsigned n = 0;
+    int depth = 0;
+    bool quoted = false;
+    for (; *q != '\0'; q++) {
+        if (quoted) {
+            if (*q == '\\' && q[1] != '\0') {
+                if (n + 2 < size) {
+                    out[n++] = *q;
+                    out[n++] = q[1];
+                }
+                q++;
+                continue;
+            }
+            quoted = *q != '"';
+        } else if (*q == '"') {
+            quoted = true;
+        } else if (*q == '(') {
+            depth++;
+        } else if (*q == ')') {
+            depth--;
+        } else if (*q == ' ' && depth <= 0) {
+            break;
+        }
+        if (n + 1 < size)
+            out[n++] = *q;
+    }
+    out[n] = '\0';
+    *p = q;
+}
+
+template <class T> T CallbackScalar(const char** args)
+{
+    char token[96];
+    CallbackToken(args, token, sizeof token);
+    T value = T();
+    ParseScalar(token, value);
+    return value;
+}
+
+void CallbackText(const char** args, char* out, unsigned size)
+{
+    while (**args == ' ')
+        (*args)++;
+    *args = ParseQuoted(*args, out, size);
+}
+
+void* CallbackObject(const char** args, unsigned kind)
+{
+    char token[96];
+    CallbackToken(args, token, sizeof token);
+    if (strcmp(token, "null") == 0)
+        return nullptr;
+    unsigned found = 0;
+    void* p = ReplayResolveObject(token, &found, g_objects, AllocObject);
+    if (p == nullptr || !ReplayKindFits(kind, found))
+        Fatal(g_file, g_callIndex, "a callback argument that is no object of its kind", token);
+    return p;
+}
+
+template <class T> T CallbackValue(const char** args, unsigned kind)
+{
+    char token[256];
+    CallbackToken(args, token, sizeof token);
+    return ParseValueText<T>(kind, token);
+}
+
+void CallbackDone(const char* import, int k, const char* rest, const char* have)
+{
+    const char* recorded = strncmp(rest, " = ", 3) == 0 ? rest + 3 : "";
+    const char* replayed = have == nullptr ? "" : have;
+    HashText(replayed);
+    if (strcmp(recorded, replayed) != 0) {
+        char key[96];
+        CallbackKey(key, import, k);
+        Diff(key, recorded[0] == '\0' ? "no result" : recorded, replayed[0] == '\0' ? "no result" : replayed);
+    }
+}
+
+void CallbackUnknown(const char*, int, const char* method)
+{
+    Fatal(g_file, g_callIndex, "a callback method that its interface does not have", method);
+}
+
+}
+
+#include "replay_callbacks.h"
 
 namespace {
 
@@ -845,6 +1176,7 @@ void ResetBlock()
     strcpy(g_extTdf, "tdf");
     g_known.Reset();
     g_objects.Reset();
+    g_captureUsed = 0;
 }
 
 const ReplaySlotSets* FindSlot(const char* subsystem, const char* name)
@@ -907,12 +1239,17 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
     unsigned kind = 0;
     unsigned ordinal = 0;
     const char* fieldName = nullptr;
-    if (!ReplayParseKey(name, &kind, &ordinal, &fieldName))
+    char prefix[96];
+    unsigned element = 0;
+    const char* sub = nullptr;
+    bool inElement = ReplayParseElementKey(name, prefix, sizeof prefix, &element, &sub);
+    const char* base = inElement ? prefix : name;
+    if (!ReplayParseKey(base, &kind, &ordinal, &fieldName))
         return false;
     char object[48];
-    const char* dot = strrchr(name, '.');
-    memcpy(object, name, (unsigned)(dot - name));
-    object[dot - name] = '\0';
+    const char* dot = strrchr(base, '.');
+    memcpy(object, base, (unsigned)(dot - base));
+    object[dot - base] = '\0';
     void* p = ReplayResolveObject(object, nullptr, g_objects, AllocObject);
     const ReplayObjectField* f = ReplayFindObjectField(kind, fieldName);
     if (p == nullptr || f == nullptr)
@@ -922,6 +1259,13 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
     if (f->kind == RK_ARRAY) {
         if (!ReplayApplyArray(*f, p, name, value, g_known, true, AllocObject))
             Fatal(file, g_callIndex, "an array line that cannot be applied", value);
+        return true;
+    }
+    if (f->kind == RK_VECTOR) {
+        bool applied = inElement ? ReplayApplyVectorElement(*f, p, element, sub, name, value, g_known, true, g_objects, AllocObject)
+                                 : ReplayApplyVector(*f, p, name, value, g_known, true, g_objects, AllocObject);
+        if (!applied)
+            Fatal(file, g_callIndex, "a vector line that cannot be applied", value);
         return true;
     }
     if (!ReplayRestoreObjectField(*f, p, value, g_objects, AllocObject))
@@ -941,6 +1285,10 @@ void CompareObjects(const ReplaySlotSets* sets)
             if (f.object != g_reach.kind[at] || f.kind == RK_EMBED || f.kind == RK_UNITID || !ReplayInReach(g_reach, at, sets->objWrites[i]))
                 continue;
             ReplayObjectFieldKey(key, g_objects, false, g_reach.kind[at], g_reach.object[at], f);
+            if (f.kind == RK_VECTOR) {
+                ReplayCompareVector(f, g_reach.object[at], key.Data(), g_known, g_objects, Diff, HashText);
+                continue;
+            }
             ReplayFormatObjectField(f, g_reach.object[at], g_objects, false, value);
             HashText(value.Data());
             const char* known = g_known.Get(key.Data());
@@ -974,9 +1322,20 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
             unsigned kind = 0;
             unsigned ordinal = 0;
             const char* fieldName = nullptr;
-            const ReplayObjectField* f = ReplayParseKey(name, &kind, &ordinal, &fieldName) ? ReplayFindObjectField(kind, fieldName) : nullptr;
+            char prefix[96];
+            unsigned element = 0;
+            const char* sub = nullptr;
+            bool inElement = ReplayParseElementKey(name, prefix, sizeof prefix, &element, &sub);
+            const ReplayObjectField* f = ReplayParseKey(inElement ? prefix : name, &kind, &ordinal, &fieldName) ? ReplayFindObjectField(kind, fieldName) : nullptr;
             if (f == nullptr || !InObjectSet(sets->objWrites, sets->objWriteCount, f))
                 Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
+            if (f->kind == RK_VECTOR) {
+                bool applied = inElement ? ReplayApplyVectorElement(*f, nullptr, element, sub, name, space + 1, g_known, false, g_objects, nullptr)
+                                         : ReplayApplyVector(*f, nullptr, name, space + 1, g_known, false, g_objects, nullptr);
+                if (!applied)
+                    Fatal(file, g_callIndex, "a vector line that cannot be applied", line);
+                continue;
+            }
             array = f->kind == RK_ARRAY;
             arrayField = f;
         } else {
@@ -1008,6 +1367,59 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
     CompareObjects(sets);
 }
 
+void CompareSnapshots()
+{
+    ReplayText hex;
+    for (unsigned n = 0; n < MAX_SNAPSHOTS; n++) {
+        char prefix[32];
+        sprintf(prefix, "  o snapshot#%u x:", n + 1);
+        size_t length = strlen(prefix);
+        bool recorded = false;
+        hex.Clear();
+        for (int k = g_callFirst + 1; k < g_callEnd; k++) {
+            if (strncmp(g_lines[k], prefix, length) == 0) {
+                recorded = true;
+                hex.Add(g_lines[k] + length);
+            }
+        }
+        char key[48];
+        sprintf(key, "snapshot#%u", n + 1);
+        if (g_snapshotData[n] == nullptr) {
+            if (recorded)
+                Diff(key, "a snapshot", "no allocation");
+            continue;
+        }
+        ReplayText actual;
+        ReplayBytes(actual, g_snapshotData[n], g_snapshotBytes[n]);
+        HashText(actual.Data());
+        actual.Free();
+        if (!recorded) {
+            Diff(key, "no snapshot", "bytes");
+            continue;
+        }
+        if (hex.Size() / 2 != g_snapshotBytes[n]) {
+            char a[24];
+            char b[24];
+            sprintf(key, "snapshot#%u.length", n + 1);
+            sprintf(a, "%u", hex.Size() / 2);
+            sprintf(b, "%u", g_snapshotBytes[n]);
+            Diff(key, a, b);
+            continue;
+        }
+        unsigned at = ReplayFirstSnapshotDifference(hex.Data(), g_snapshotData[n], g_snapshotBytes[n]);
+        if (at != ~0u) {
+            char a[8];
+            char b[8];
+            sprintf(key, "snapshot#%u[%u]", n + 1, at);
+            memcpy(a, hex.Data() + at * 2, 2);
+            a[2] = '\0';
+            sprintf(b, "%02x", g_snapshotData[n][at]);
+            Diff(key, a, b);
+        }
+    }
+    hex.Free();
+}
+
 void ReplayCall(const char* file, Outcome& out)
 {
     char* header = g_lines[g_callFirst];
@@ -1026,6 +1438,8 @@ void ReplayCall(const char* file, Outcome& out)
     g_importIndex = 0;
     g_outCount = 0;
     g_rootCount = 0;
+    memset(g_snapshotData, 0, sizeof g_snapshotData);
+    g_captureUsed = 0;
     if (strcmp(tickText, "-") != 0)
         g_game->ticks = atoi(tickText);
 
@@ -1052,7 +1466,10 @@ void ReplayCall(const char* file, Outcome& out)
     g_cursor = first;
     g_hash = 2166136261u;
     g_sets = sets;
-    if (!RunSlot(g_subsystem, slotText))
+    ReplayAnswerHook() = ReplayAnswerImport;
+    bool ran = RunSlot(g_subsystem, slotText);
+    ReplayAnswerHook() = nullptr;
+    if (!ran)
         Fatal(file, g_callIndex, "a slot with no runner", slotText);
     for (int k = g_cursor; k < g_callEnd; k++) {
         if (strncmp(g_lines[k], "  i ", 4) == 0) {
@@ -1065,6 +1482,7 @@ void ReplayCall(const char* file, Outcome& out)
         }
     }
     CompareWrites(file, sets);
+    CompareSnapshots();
     RunAfter(g_subsystem, slotText);
 
     char head[160];
@@ -1850,6 +2268,811 @@ void FormSelfTest()
     Check(g_diffs == 1 && strcmp(g_firstKey, "result") == 0, "a changed result by value is reported at the result");
     t.Free();
 }
+
+class FixtureScan : public UnitScanVisitor {
+public:
+    FixtureScan() : seen(0), sum(0), invert(false) {}
+    virtual int VisitUnit(Unit* unit)
+    {
+        seen++;
+        sum += unit->health;
+        return (unit->health > 50) != invert ? 1 : 0;
+    }
+    int seen;
+    int sum;
+    bool invert;
+};
+
+class FixtureNested : public UnitScanVisitor {
+public:
+    FixtureNested() : inner(0) {}
+    virtual int VisitUnit(Unit* unit)
+    {
+        if (inner++ == 0)
+            VisitUnit(unit);
+        return 0;
+    }
+    int inner;
+};
+
+class FixtureComplete : public Callback {
+public:
+    FixtureComplete() : got(-1) {}
+    virtual void Complete(int result) { got = result; }
+    int got;
+};
+
+void FakeScan(UnitScanVisitor* visitor, Unit* a, Unit* b)
+{
+    visitor->VisitUnit(a);
+    visitor->VisitUnit(b);
+}
+
+void BeginImport()
+{
+    g_cursor = g_callFirst + 1;
+    g_importIndex = 0;
+    g_ordinals.Reset();
+    BeginCompare();
+}
+
+void CallbackSelfTest()
+{
+    printf("callbacks\n");
+    ResetBlock();
+    ReplayClearFailure();
+    Unit* pool = (Unit*)SimAlloc(16 * (unsigned)sizeof(Unit));
+    memset(pool, 0, 16 * sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 16;
+    pool[3].health = 77;
+    pool[9].health = 5;
+
+    FixtureScan module;
+    const void* before = *(const void* const*)&module;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayCallbackScope scope;
+    ReplayOrdinals ordinals;
+    ordinals.Reset();
+    ReplayText line;
+    line.Add("  i fixture.Scan");
+    unsigned kind = OBJ_CALLBACK + RCB_UNITSCANVISITOR;
+    line.Add(" scanner#");
+    line.AddUnsigned(ordinals.Of(kind, &module));
+    scope.Start(RCB_UNITSCANVISITOR, &module, 1, *table, ReplayThunkVtable(RCB_UNITSCANVISITOR));
+    Check(*(const void* const*)&module != before, "while the import runs, the object has the vtable of the recorder");
+    FakeScan(&module, &pool[3], &pool[9]);
+    scope.Stop();
+    Check(*(const void* const*)&module == before, "and its own vtable after it");
+    Check(module.seen == 2 && module.sum == 82, "the object's own method ran for each call");
+    line.Add(" = 0");
+    line.AddText(scope.Lines());
+    line.AddChar('\n');
+    printf("%s", line.Data());
+    Check(strcmp(line.Data(), "  i fixture.Scan scanner#1 = 0\n    c scanner#1.VisitUnit Unit#3 = 1\n    c scanner#1.VisitUnit Unit#9 = 0\n") == 0, "each call is a c line under the i line, in call order, with its arguments and result");
+    Check(ReplayFailure() == nullptr, "and none is a failure");
+
+    FixtureScan after;
+    FakeScan(&after, &pool[3], &pool[9]);
+    Check(scope.Lines().Size() > 0 && after.seen == 2, "a call after the import is not recorded");
+
+    printf("replayed callbacks\n");
+    char body[512];
+    sprintf(body, "%s", line.Data());
+    LoadCall(body);
+    BeginImport();
+    FixtureScan player;
+    ReplayText t;
+    StartImport(t, "fixture.Scan");
+    Space(t);
+    AddObject(t, kind, &player);
+    const char* r = Enter(t);
+    Check(strcmp(r, "0") == 0 && g_cbCount == 2, "the stub finds the recorded calls under the import");
+    PlayCallbacks_UnitScanVisitor(&player, kind, "fixture.Scan");
+    Check(g_diffs == 0, "the recorded calls replay equal");
+    Check(player.seen == 2 && player.sum == 82, "on the module's own object, with the recorded arguments");
+
+    LoadCall(body);
+    BeginImport();
+    FixtureScan inverted;
+    inverted.invert = true;
+    StartImport(t, "fixture.Scan");
+    Space(t);
+    AddObject(t, kind, &inverted);
+    Enter(t);
+    PlayCallbacks_UnitScanVisitor(&inverted, kind, "fixture.Scan");
+    printf("a changed result: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 2 && strcmp(g_firstKey, "import 0 fixture.Scan.c[0]") == 0, "a result that differs is reported at the call under the import");
+    Check(strstr(g_detail.Data(), "c[1]: recorded 0, replayed 1") != nullptr, "with both values, for each call");
+
+    LoadCall("  i fixture.Scan scanner#1 = 0\n    c scanner#2.VisitUnit Unit#3 = 1\n");
+    BeginImport();
+    FixtureScan other;
+    StartImport(t, "fixture.Scan");
+    Space(t);
+    AddObject(t, kind, &other);
+    Enter(t);
+    PlayCallbacks_UnitScanVisitor(&other, kind, "fixture.Scan");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.Scan.c[0]") == 0 && other.seen == 0, "a call on another object than the recorded one is reported and not made");
+
+    LoadCall("  i fixture.Scan scanner#1 = 0\n    c scanner#1.VisitUnit Unit#3\n  o x 1\n");
+    BeginImport();
+    FixtureScan missing;
+    StartImport(t, "fixture.Scan");
+    Space(t);
+    AddObject(t, kind, &missing);
+    Enter(t);
+    Check(g_cbCount == 1 && g_outCount == 1, "the c lines come before the o lines of the import");
+    PlayCallbacks_UnitScanVisitor(&missing, kind, "fixture.Scan");
+    Check(g_diffs == 1 && strstr(g_detail.Data(), "recorded no result, replayed 1") != nullptr, "a call recorded without a result differs from one that returns one");
+
+    printf("void callbacks with a scalar\n");
+    FixtureComplete done;
+    ReplayCallbackScope doneScope;
+    ReplayText doneLine;
+    doneScope.Start(RCB_CALLBACK, &done, 1, *table, ReplayThunkVtable(RCB_CALLBACK));
+    ((Callback*)&done)->Complete(7);
+    doneScope.Stop();
+    doneLine.AddText(doneScope.Lines());
+    Check(strcmp(doneLine.Data(), "\n    c callback#1.Complete 7") == 0, "a call with a scalar argument and no result");
+    Check(done.got == 7, "reaches the object");
+    LoadCall("  i fixture.Complete callback#1\n    c callback#1.Complete 9\n");
+    BeginImport();
+    FixtureComplete played;
+    StartImport(t, "fixture.Complete");
+    Space(t);
+    AddObject(t, OBJ_CALLBACK + RCB_CALLBACK, &played);
+    Enter(t);
+    PlayCallbacks_Callback(&played, OBJ_CALLBACK + RCB_CALLBACK, "fixture.Complete");
+    Check(g_diffs == 0 && played.got == 9, "and replays with the recorded scalar");
+
+    printf("a callback inside a callback\n");
+    FixtureNested nested;
+    ReplayCallbackScope nestedScope;
+    nestedScope.Start(RCB_UNITSCANVISITOR, &nested, 1, *table, ReplayThunkVtable(RCB_UNITSCANVISITOR));
+    ((UnitScanVisitor*)&nested)->VisitUnit(&pool[3]);
+    nestedScope.Stop();
+    printf("%s\n", ReplayFailure() == nullptr ? "no failure" : ReplayFailure());
+    Check(ReplayFailure() != nullptr && strstr(ReplayFailure(), "inside a callback") != nullptr, "is a failure, because its line could not be in call order");
+    ReplayClearFailure();
+    line.Free();
+    doneLine.Free();
+    t.Free();
+    delete table;
+}
+
+void VectorSelfTest()
+{
+    printf("block vectors\n");
+    ResetBlock();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    Unit* pool = (Unit*)SimAlloc(16 * (unsigned)sizeof(Unit));
+    memset((void*)pool, 0, 16 * sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 16;
+    pool[3].health = 30;
+    pool[9].health = 90;
+    PlayerAI* ai = (PlayerAI*)SimAlloc(sizeof(PlayerAI));
+    memset((void*)ai, 0, sizeof(PlayerAI));
+    ai->index = 4;
+    Ref<Unit> first;
+    first = &pool[3];
+    Ref<Unit> second;
+    second = &pool[9];
+    ai->visible.units.PushBack(first);
+    ai->visible.units.PushBack(second);
+    ai->cells.PushBack(KeyedCell(3, 4, 1.5f));
+    ai->cells.PushBack(KeyedCell(5, 6, 2.5f));
+    ai->counts.PushBack(1);
+    ai->counts.PushBack(2);
+    ai->counts.PushBack(3);
+    Check(ai->counts.Size() == 3 && ai->counts.Capacity() == 4, "the block vector grows as the module's does");
+
+    unsigned char kind = ROK_PLAYERAI;
+    void* root = ai;
+    Recorder recorder;
+    recorder.Record(&kind, &root, 1, sets);
+    ReplayText calls;
+    const char* text = recorder.text.Data();
+    printf("%s", text);
+    Check(strstr(text, "  r PlayerAI#1.visibleUnits [2/2] Unit#3,Unit#9\n") != nullptr, "pointer elements are the length, the capacity and the handles");
+    Check(strstr(text, "  r Unit#9.health 90\n") != nullptr, "and the walker reaches the units held only by the vector");
+    Check(strstr(text, "  r PlayerAI#1.counts [3/4] 0:010002000300\n") != nullptr, "scalar elements are runs, as in an array");
+    Check(strstr(text, "  r PlayerAI#1.cells [2/2]\n  r PlayerAI#1.cells[0].pos (3,4)\n  r PlayerAI#1.cells[0].key f32:0x3fc00000\n  r PlayerAI#1.cells[1].pos (5,6)\n") != nullptr, "struct elements are the bracket and a line per field of each element");
+    calls.AddText(recorder.text);
+    ReplayText firstCall;
+    firstCall.AddText(recorder.text);
+
+    ai->counts[1] = 9;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r PlayerAI#1.counts 1:0900\n") == 0, "a changed scalar element is a delta run, with no length or capacity");
+    calls.AddText(recorder.text);
+    ai->counts.PushBack(4);
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r PlayerAI#1.counts [4/4] 0:01000900030004000\n") != 0 && strstr(recorder.text.Data(), "  r PlayerAI#1.counts [4/4] 0:0100090003000400\n") != nullptr, "a push that grows the length writes the vector again");
+    calls.AddText(recorder.text);
+    ai->counts.PushBack(5);
+    ai->cells.PushBack(KeyedCell(7, 8, 3.5f));
+    ai->visible.units.PushBack(first);
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strstr(recorder.text.Data(), "  r PlayerAI#1.counts [5/8] 0:01000900030004000500\n") != nullptr, "a push that grows the capacity writes both");
+    Check(strstr(recorder.text.Data(), "  r PlayerAI#1.cells [3/4]\n  r PlayerAI#1.cells[2].pos (7,8)\n") != nullptr && strstr(recorder.text.Data(), "cells[0]") == nullptr, "a struct vector that moved writes only the element that is new");
+    Check(strstr(recorder.text.Data(), "  r PlayerAI#1.visibleUnits [3/4] Unit#3,Unit#9,Unit#3\n") != nullptr, "and a pointer vector is written whole");
+    calls.AddText(recorder.text);
+    ai->visible.units.Clear();
+    ai->counts.Clear();
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strstr(recorder.text.Data(), "  r PlayerAI#1.visibleUnits [0/4]\n") != nullptr && strstr(recorder.text.Data(), "  r PlayerAI#1.counts [0/8]\n") != nullptr, "a vector with no elements keeps its capacity");
+    calls.AddText(recorder.text);
+
+    PlayerAI* bare = (PlayerAI*)SimAlloc(sizeof(PlayerAI));
+    memset((void*)bare, 0, sizeof(PlayerAI));
+    void* bareRoot = bare;
+    Recorder empty;
+    empty.Record(&kind, &bareRoot, 1, sets);
+    Check(strstr(empty.text.Data(), "  r PlayerAI#1.counts [0/0]\n") != nullptr && strstr(empty.text.Data(), "  r PlayerAI#1.visibleUnits [0/0]\n") != nullptr && strstr(empty.text.Data(), "  r PlayerAI#1.cells [0/0]\n") != nullptr, "an empty vector is [0/0]");
+
+    ResetBlock();
+    int lines = RestoreText(calls.Data(), sets);
+    Check(lines > 10, "the lines of every call restore");
+    PlayerAI* rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->index == 4, "the object is rebuilt");
+    Check(rebuilt != nullptr && rebuilt->counts.Size() == 0 && rebuilt->counts.Capacity() == 8, "a vector has the length and capacity of the last write");
+    Check(rebuilt != nullptr && rebuilt->cells.Size() == 3 && rebuilt->cells.Capacity() == 4, "a struct vector too");
+    Check(rebuilt != nullptr && rebuilt->cells[0].pos.x == 3 && rebuilt->cells[0].key == 1.5f && rebuilt->cells[2].pos.y == 8 && rebuilt->cells[2].key == 3.5f, "and the elements of every call, the old ones carried over the move");
+    Check(rebuilt != nullptr && rebuilt->visible.units.Size() == 0 && rebuilt->visible.units.Capacity() == 4, "a pointer vector too");
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    Recorder replayed;
+    void* rebuiltRoot = rebuilt;
+    replayed.Record(&kind, &rebuiltRoot, 1, sets);
+    Check(rebuilt != nullptr && strstr(replayed.text.Data(), "  r PlayerAI#1.cells [3/4]\n") != nullptr && strstr(replayed.text.Data(), "  r PlayerAI#1.counts [0/8]\n") != nullptr, "the rebuilt vectors record as they were");
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    g_rootKinds[0] = ROK_PLAYERAI;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the unchanged vectors compare equal");
+    rebuilt->counts.PushBack(7);
+    rebuilt->counts.PushBack(8);
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed length: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "PlayerAI#1.counts.length") == 0 && strstr(g_detail.Data(), "recorded 0, replayed 2") != nullptr, "a longer vector is reported at its length");
+    rebuilt->counts.Clear();
+    rebuilt->counts.Reserve(16);
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "PlayerAI#1.counts.capacity") == 0, "a vector of another capacity is reported at its capacity");
+    rebuilt->cells[1].key = 9.5f;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(strstr(g_detail.Data(), "PlayerAI#1.cells[1].key") != nullptr, "a changed field of a struct element is reported at its element and field");
+    rebuilt->visible.units.PushBack(first);
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(strstr(g_detail.Data(), "PlayerAI#1.visibleUnits.length") != nullptr, "a pointer vector that grew is reported");
+
+    ResetBlock();
+    RestoreText(firstCall.Data(), sets);
+    rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    g_rootObjects[0] = rebuilt;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "a vector restored from its first write compares equal");
+    rebuilt->counts[1] = 5;
+    rebuilt->visible.units[0] = rebuilt->visible.units[1];
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("changed elements: %s\n%s", g_firstKey, g_detail.Data());
+    Check(strstr(g_detail.Data(), "PlayerAI#1.counts[1]: recorded 0200, replayed 0500") != nullptr, "a changed scalar element is reported at its index");
+    Check(strstr(g_detail.Data(), "PlayerAI#1.visibleUnits[0]: recorded Unit#3, replayed Unit#9") != nullptr, "and a changed pointer element");
+    firstCall.Free();
+    calls.Free();
+}
+
+unsigned char g_fakeArena[2048];
+unsigned g_fakeUsed;
+
+void* FakeCaptureAlloc(unsigned int bytes, unsigned int* offset)
+{
+    *offset = g_fakeUsed;
+    unsigned char* at = g_fakeArena + g_fakeUsed;
+    g_fakeUsed += (bytes + 7u) & ~7u;
+    return at;
+}
+
+void SnapshotSelfTest()
+{
+    printf("snapshots\n");
+    g_fakeUsed = 0;
+    ReplaySnapshots snapshots;
+    ReplayText recorded;
+    unsigned offset = 0;
+    unsigned char* first = (unsigned char*)FakeCaptureAlloc(20, &offset);
+    recorded.Add("  i services.SimCaptureAlloc 20 = snapshot#");
+    recorded.AddUnsigned(snapshots.Add(first, 20));
+    recorded.AddChar('\n');
+    unsigned char* second = (unsigned char*)FakeCaptureAlloc(700, &offset);
+    recorded.Add("  i services.SimCaptureAlloc 700 = snapshot#");
+    recorded.AddUnsigned(snapshots.Add(second, 700));
+    recorded.AddChar('\n');
+    for (int i = 0; i < 20; i++)
+        first[i] = (unsigned char)(i + 1);
+    for (int i = 0; i < 700; i++)
+        second[i] = (unsigned char)(i * 3);
+    snapshots.Emit(recorded);
+    printf("%.300s\n", recorded.Data());
+    Check(strstr(recorded.Data(), "  i services.SimCaptureAlloc 20 = snapshot#1\n  i services.SimCaptureAlloc 700 = snapshot#2\n  o snapshot#1 x:0102030405060708090a0b0c0d0e0f1011121314\n  o snapshot#2 x:000306") != nullptr, "an import line carries the size and the handle, and each buffer follows as bytes");
+    Check(CountLines(recorded.Data(), "  o snapshot#2 ") == 2, "a long buffer is several lines of the same name, in order");
+    Check(LongestLine(recorded.Data()) < 1100, "and the lines are bounded");
+    Check(strstr(recorded.Data(), "offset") == nullptr, "no line is written for the offset");
+
+    char* body = (char*)malloc(recorded.Size() + 1);
+    strcpy(body, recorded.Data());
+    LoadCall(body);
+    g_cursor = g_callFirst + 1;
+    g_importIndex = 0;
+    g_ordinals.Reset();
+    memset(g_snapshotData, 0, sizeof g_snapshotData);
+    g_captureUsed = 0;
+    BeginCompare();
+    ReplayText t;
+    unsigned char* got[2];
+    unsigned sizes[2] = { 20, 700 };
+    for (int n = 0; n < 2; n++) {
+        StartImport(t, "services.SimCaptureAlloc");
+        Space(t);
+        t.AddUnsigned(sizes[n]);
+        const char* r = Enter(t);
+        got[n] = (unsigned char*)SnapshotAnswer(r, sizes[n], &offset);
+        Check(got[n] != nullptr && g_outCount == 0, "the stub allocates from its own arena and the snapshot lines are not the outputs of the import");
+    }
+    Check(got[0] != nullptr && got[1] != nullptr && got[1] >= got[0] + 24, "two snapshots are two buffers");
+    for (int i = 0; i < 20; i++)
+        got[0][i] = (unsigned char)(i + 1);
+    for (int i = 0; i < 700; i++)
+        got[1][i] = (unsigned char)(i * 3);
+    CompareSnapshots();
+    Check(g_diffs == 0, "the snapshots the slot filled compare equal");
+    got[1][600] ^= 4;
+    BeginCompare();
+    CompareSnapshots();
+    printf("a changed byte: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "snapshot#2[600]") == 0, "a changed byte is reported at its snapshot and byte");
+    got[1][600] ^= 4;
+    memset(g_snapshotData + 1, 0, sizeof g_snapshotData[0]);
+    BeginCompare();
+    CompareSnapshots();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "snapshot#2") == 0, "a snapshot the stub never allocated is reported");
+    g_snapshotData[1] = got[1];
+    g_snapshotBytes[1] = 699;
+    BeginCompare();
+    CompareSnapshots();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "snapshot#2.length") == 0, "and a buffer of another size");
+    g_snapshotBytes[1] = 700;
+    free(body);
+    t.Free();
+    recorded.Free();
+}
+
+void BeginServices(const char* body)
+{
+    LoadCall(body);
+    BeginImport();
+    memset(g_snapshotData, 0, sizeof g_snapshotData);
+}
+
+void FilesSelfTest()
+{
+    printf("services: files and data\n");
+    const char* body =
+        "  i services.TdfFile_SelectRecordAt file#1 0 = 1\n"
+        "  o file#1.current rec#1\n"
+        "  i services.TdfRecord_FindSubRecord rec#1 \"units\" = rec#2\n"
+        "  i services.TdfRecord_GetSubRecordCount rec#2 = 3\n"
+        "  i services.TdfRecord_GetSubRecord rec#2 1 = rec#3\n"
+        "  i services.TdfRecord_GetFieldName rec#3 0 = \"Name\"\n"
+        "  i services.TdfRecord_CopyRecordName rec#3 16\n"
+        "  o dest \"Armada\"\n"
+        "  i services.TdfRecord_GetFieldFixed rec#3 \"scale\" 5\n"
+        "  o dst 98304\n"
+        "  i services.TdfRecord_FindFieldValue rec#3 \"none\" = null\n"
+        "  i services.FilePrintf \"%d units\" \"3 units\" = 7\n";
+    BeginServices(body);
+    TdfFile* file = (TdfFile*)calloc(1, sizeof(TdfFile));
+    Check(file->SelectRecordAt(0) == 1 && file->current == ParseRecord("rec#1"), "a call that moves the current record gives its result and its out");
+    TdfRecord* units = file->current->FindSubRecord("units");
+    Check(units == ParseRecord("rec#2"), "a record found is the one recorded");
+    Check(units->GetSubRecordCount() == 3, "a count replays");
+    TdfRecord* second = units->GetSubRecord(1);
+    Check(second == ParseRecord("rec#3"), "a sub-record by index replays");
+    char* name = second->GetFieldName(0);
+    Check(name != nullptr && strcmp(name, "Name") == 0, "a text result replays");
+    char copy[16] = "";
+    second->CopyRecordName(copy, sizeof copy);
+    Check(strcmp(copy, "Armada") == 0, "a text written through a pointer replays");
+    int fixed = 0;
+    int* back = second->GetFieldFixed(&fixed, "scale", 5);
+    Check(back == &fixed && fixed == 98304, "a number written through a pointer replays and the pointer is returned");
+    Check(second->FindFieldValue("none") == 0, "a null text result is zero");
+    Check(FilePrintf(nullptr, "%d units", 3) == 7, "a formatted text is compared and the result replays");
+    Check(g_diffs == 0 && g_importIndex == 9, "and nothing differs");
+    BeginServices(body);
+    file->SelectRecordAt(0);
+    file->current->FindSubRecord("units");
+    ParseRecord("rec#2")->GetSubRecordCount();
+    ParseRecord("rec#2")->GetSubRecord(2);
+    printf("a changed argument: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 3 services.TdfRecord_GetSubRecord") == 0, "a changed argument is reported at its import");
+    BeginServices("  i services.FilePrintf \"%d units\" \"3 units\" = 7\n");
+    FilePrintf(nullptr, "%d units", 4);
+    Check(g_diffs == 1 && strstr(g_detail.Data(), "\"4 units\"") != nullptr, "and so is a changed formatted text");
+    free(file);
+}
+
+void CommandsSelfTest()
+{
+    printf("services: commands\n");
+    const char* body =
+        "  i services.Translate \"key\" = \"Teksti\"\n"
+        "  i services.Translate \"gone\" = null\n"
+        "  i services.CommandArgs_InitArgs\n"
+        "  i services.ComputeChecksum x:0102ff 3 = 1234567\n";
+    BeginServices(body);
+    char* text = Translate("key");
+    Check(text != nullptr && strcmp(text, "Teksti") == 0, "a translation replays as the recorded text");
+    Check(Translate("gone") == nullptr, "and a null one as null");
+    CommandArgs* args = (CommandArgs*)calloc(1, sizeof(CommandArgs));
+    args->count = 4;
+    Check(args->InitArgs() == args && args->count == 0, "InitArgs clears the list and returns it");
+    unsigned char data[3] = { 1, 2, 0xff };
+    Check(ComputeChecksum(data, 3) == 1234567, "a checksum is compared on its bytes and replays");
+    Check(g_diffs == 0 && g_importIndex == 4, "and nothing differs");
+    BeginServices(body);
+    Translate("key");
+    Translate("gone");
+    args->InitArgs();
+    data[2] = 0xfe;
+    ComputeChecksum(data, 3);
+    printf("a changed argument: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 3 services.ComputeChecksum") == 0 && strstr(g_detail.Data(), "x:0102fe") != nullptr, "a changed byte is reported at the import");
+    BeginServices(body);
+    Translate("other");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.Translate") == 0, "and so is a changed key");
+    free(args);
+}
+
+void SimPlumbingSelfTest()
+{
+    printf("services: sim plumbing\n");
+    ResetBlock();
+    const char* body =
+        "  i services.SimAlloc 64 = alloc#1\n"
+        "  i services.SimAllocTagged \"Player Info\" 185 = PlayerInfo#1\n"
+        "  i services.SimAllocTagged \"Other\" 16 = alloc#2\n"
+        "  i services.SimFree alloc#1\n"
+        "  i services.RecordSimEvent 2 1 [3,4] 2\n"
+        "  i services.FindSlotByDpid 77 = 2\n"
+        "  i services.GetSlotDpid 2 = 77\n"
+        "  i services.SimCaptureAlloc 20 = snapshot#1\n"
+        "  o snapshot#1 x:0102030405060708090a0b0c0d0e0f1011121314\n";
+    BeginServices(body);
+    ReplayAnswerHook() = ReplayAnswerImport;
+    void* first = SimAlloc(64);
+    void* info = SimAllocTagged("Player Info", 185);
+    void* other = SimAllocTagged("Other", 16);
+    Check(first != nullptr && g_objects.Pointer(ROK_ALLOC, 1) == first, "an allocation is the replayer's own memory, named as the recording names it");
+    Check(info != nullptr && g_objects.Pointer(ROK_PLAYERINFO, 1) == info, "an allocation of a tag the annotation names is an object of its kind");
+    Check(other != nullptr && g_objects.Pointer(ROK_ALLOC, 2) == other && other != first, "and another is another block");
+    SimFree(first);
+    ReplayAnswerHook() = nullptr;
+    unsigned args[2] = { 3, 4 };
+    RecordSimEvent(SIM_EVENT_SOUND, 1, args, 2);
+    Check(FindSlotByDpid(77) == 2 && GetSlotDpid(2) == 77, "a slot lookup replays");
+    unsigned offset = 0;
+    unsigned char* snapshot = (unsigned char*)SimCaptureAlloc(20, &offset);
+    for (int i = 0; i < 20; i++)
+        snapshot[i] = (unsigned char)(i + 1);
+    CompareSnapshots();
+    Check(g_diffs == 0 && g_importIndex == 8, "nothing differs, the free and the event included");
+
+    BeginServices(body);
+    ReplayAnswerHook() = ReplayAnswerImport;
+    SimAlloc(65);
+    ReplayAnswerHook() = nullptr;
+    printf("a changed size: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.SimAlloc") == 0, "a changed size is reported at the import");
+    BeginServices(body);
+    ReplayAnswerHook() = ReplayAnswerImport;
+    SimAlloc(64);
+    SimAllocTagged("Player Info", 184);
+    ReplayAnswerHook() = nullptr;
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 services.SimAllocTagged") == 0, "so is a changed size of a tagged one");
+    BeginServices("  i services.RecordSimEvent 2 1 [3,4] 2\n");
+    args[1] = 5;
+    RecordSimEvent(SIM_EVENT_SOUND, 1, args, 2);
+    Check(g_diffs == 1 && strstr(g_detail.Data(), "[3,5]") != nullptr, "and so are the arguments of an event");
+}
+
+void LoadReadsSelfTest()
+{
+    printf("services: load reads\n");
+    ResetBlock();
+    const char* body =
+        "  i services.LoadAnimGaf \"logos\" = Gaf#1\n"
+        "  i services.FindGafEntry Gaf#1 \"radar\" = FrameTable#1\n"
+        "  o FrameTable#1.count 3\n"
+        "  i services.GetGafFrame FrameTable#1 2 = GafFrame#1\n"
+        "  o GafFrame#1.width 64\n"
+        "  o GafFrame#1.height 32\n"
+        "  o GafFrame#1.xOffset -3\n"
+        "  o GafFrame#1.yOffset 4\n"
+        "  o GafFrame#1.transparency 1\n"
+        "  i services.GetGafFrame FrameTable#1 9 = null\n"
+        "  i services.Load3do \"objects3d\\\\arm.3do\" = Object3do#1\n"
+        "  o Object3do#1.vertexCount 12\n"
+        "  o Object3do#1.box_x -50\n"
+        "  o Object3do#1.box_y 7\n"
+        "  o Object3do#1.box_z 8\n"
+        "  i services.GetObjectHeight Object3do#1 = 88\n";
+    BeginServices(body);
+    void* gaf = LoadAnimGaf("logos");
+    Check(gaf != nullptr && g_objects.Pointer(ROK_GAF, 1) == gaf, "a GAF file is an object the replayer names as the recording does");
+    GafEntry* entry = FindGafEntry((GafArchive*)gaf, "radar");
+    Check(entry != nullptr && ((FrameTable*)entry)->count == 3, "an entry found has the fields the subsystems read");
+    GafFrame* frame = GetGafFrame((FrameTable*)entry, 2);
+    Check(frame != nullptr && frame->width == 64 && frame->height == 32 && frame->xOffset == -3 && frame->yOffset == 4 && frame->transparency == 1, "a frame has its recorded size, offsets and transparency");
+    Check(GetGafFrame((FrameTable*)entry, 9) == nullptr, "a missing frame is null");
+    Object3do* model = (Object3do*)Load3do("objects3d\\arm.3do");
+    Check(model != nullptr && model->vertexCount == 12 && model->box_x == -50 && model->box_y == 7 && model->box_z == 8, "a 3DO model has its recorded box and vertex count");
+    Check(GetObjectHeight(model) == 88, "its height replays");
+    Check(g_diffs == 0 && g_importIndex == 6, "and nothing differs");
+    BeginServices(body);
+    LoadAnimGaf("logos");
+    FindGafEntry((GafArchive*)gaf, "radar");
+    GetGafFrame((FrameTable*)entry, 3);
+    printf("a changed argument: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 2 services.GetGafFrame") == 0, "a changed index is reported at its import");
+    BeginServices(body);
+    LoadAnimGaf("other");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.LoadAnimGaf") == 0, "and so is a changed name");
+}
+
+void ExecuteCommandSelfTest()
+{
+    printf("services: ExecuteCommandText\n");
+    ResetBlock();
+    const char* body =
+        "  i services.CommandArgs_GetIntArg 1 0 = 1\n"
+        "  i services.CommandArgs_GetIntArg 1 0 = 0\n"
+        "  i services.ExecuteCommandText \"meteor 1\\nmeteor 0\" 17 [\"x\"] -1 = 1\n"
+        "    c wind_meteors.CmdMeteor [\"meteor\",\"1\"]\n"
+        "    c wind_meteors.CmdMeteor [\"meteor\",\"0\"]\n"
+        "  i services.RandomInt 5 = 3\n";
+    BeginServices(body);
+    CommandArgs vars;
+    memset(&vars, 0, sizeof vars);
+    char first[2] = "x";
+    vars.args[0] = first;
+    vars.count = 1;
+    const ReplayField* enabled = FindField("SimGlobals.g_meteorsEnabled");
+    ReplayText value;
+    char text[] = "meteor 1\nmeteor 0";
+    int ran = ExecuteCommandText(text, 17, &vars, -1);
+    FormatField(*enabled, value);
+    Check(ran == 1, "the result of the command text replays");
+    Check(strcmp(value.Data(), "0") == 0, "and the nested commands ran in order on the module, the last one leaving meteors off");
+    Check(RandomInt(5) == 3, "the imports after the commands replay from where the commands left the lines");
+    Check(g_diffs == 0 && g_importIndex == 4, "nothing differs, the nested imports and the import itself included");
+
+    BeginServices(body);
+    ExecuteCommandText(text, 17, &vars, 0);
+    printf("a changed mask: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.ExecuteCommandText") == 0, "a changed argument is reported at the import");
+
+    const char* changed =
+        "  i services.CommandArgs_GetIntArg 1 0 = 1\n"
+        "  i services.CommandArgs_GetIntArg 1 0 = 0\n"
+        "  i services.ExecuteCommandText \"meteor 1\\nmeteor 0\" 17 [\"x\"] -1 = 1\n"
+        "    c wind_meteors.CmdMeteor [\"meteor\",\"1\"]\n"
+        "    c wind_meteors.CmdMeteor [\"meteor\",\"0\"] = 5\n";
+    BeginServices(changed);
+    ExecuteCommandText(text, 17, &vars, -1);
+    printf("a changed result: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.ExecuteCommandText.c[1]") == 0, "a result that differs is reported at the call under the import");
+
+    value.Free();
+}
+
+typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
+
+unsigned CodeIndex(const char* table, const void* function)
+{
+    for (unsigned t = 0; t < kReplayCodeTableCount; t++) {
+        if (strcmp(kReplayCodeTables[t].name, table) != 0)
+            continue;
+        for (unsigned i = 0; i < kReplayCodeTables[t].count; i++) {
+            if (kReplayCodeTables[t].entries[i] == function)
+                return i;
+        }
+    }
+    return ~0u;
+}
+
+void SetVtable(void* object, const void* vtable)
+{
+    *(const void**)object = vtable;
+}
+
+void PolymorphicSelfTest()
+{
+    printf("polymorphic objects\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    Order* first = (Order*)SimAlloc(sizeof(Order));
+    Order* second = (Order*)SimAlloc(sizeof(Order));
+    memset((void*)first, 0, sizeof(Order));
+    memset((void*)second, 0, sizeof(Order));
+    ApproachRadius* area = (ApproachRadius*)SimAlloc(sizeof(ApproachRadius));
+    RingApproach* ring = (RingApproach*)SimAlloc(sizeof(RingApproach));
+    memset((void*)area, 0, sizeof(ApproachRadius));
+    memset((void*)ring, 0, sizeof(RingApproach));
+    SetVtable(area, ReplayVtable(ROK_APPROACHRADIUS));
+    SetVtable(ring, ReplayVtable(ROK_RINGAPPROACH));
+    area->source = first;
+    area->pos.x = 3;
+    area->pos.y = 4;
+    area->radius = 40;
+    area->radiusSq = 1600;
+    ring->source = second;
+    ring->inner = 10;
+    ring->outer = 20;
+    first->state = 2;
+    first->attached = area;
+    second->attached = ring;
+    second->next = first;
+
+    unsigned char kinds[2] = { ROK_ORDER, ROK_ORDER };
+    void* roots[2] = { first, second };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 2, sets);
+    const char* text = recorder.text.Data();
+    Check(ReplayFailure() == nullptr, "every vtable is one of the kinds");
+    Check(strstr(text, "  r Order#1.attached ApproachRadius#1\n") != nullptr, "a pointer to the base is written as the kind its vtable says");
+    Check(strstr(text, "  r Order#2.attached RingApproach#1\n") != nullptr, "another object of the base is another kind");
+    Check(strstr(text, "  r ApproachRadius#1.radius 40\n") != nullptr && strstr(text, "  r ApproachRadius#1.pos (3,4)\n") != nullptr, "the fields are those of the kind");
+    Check(strstr(text, "  r RingApproach#1.inner 10\n") != nullptr && strstr(text, "  r RingApproach#1.outer 20\n") != nullptr, "and of the other kind");
+    Check(strstr(text, "  r RingApproach#1.source Order#2\n") != nullptr, "a field of the base part is a field of the kind");
+    Check(strstr(text, "OrderFx#") == nullptr && strstr(text, "vtable") == nullptr && strstr(text, "vptr") == nullptr, "neither the base nor the vtable is written");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    Order* rebuiltFirst = (Order*)ReplayResolveObject("Order#1", nullptr, g_objects, AllocObject);
+    Order* rebuiltSecond = (Order*)ReplayResolveObject("Order#2", nullptr, g_objects, AllocObject);
+    ApproachRadius* rebuiltArea = (ApproachRadius*)ReplayResolveObject("ApproachRadius#1", nullptr, g_objects, AllocObject);
+    RingApproach* rebuiltRing = (RingApproach*)ReplayResolveObject("RingApproach#1", nullptr, g_objects, AllocObject);
+    Check(rebuiltFirst != nullptr && rebuiltSecond != nullptr && rebuiltArea != nullptr && rebuiltRing != nullptr, "the objects are rebuilt");
+    Check(rebuiltFirst->attached.get() == (OrderFx*)rebuiltArea && rebuiltSecond->attached.get() == (OrderFx*)rebuiltRing, "the base pointer leads to the rebuilt kind");
+    Check(*(const void**)rebuiltArea == ReplayVtable(ROK_APPROACHRADIUS) && *(const void**)rebuiltRing == ReplayVtable(ROK_RINGAPPROACH), "each is built with the vtable of the replayer");
+    Check(rebuiltArea->radius == 40 && rebuiltArea->pos.x == 3 && rebuiltRing->outer == 20 && rebuiltFirst->state == 2, "the fields are restored");
+    Check(rebuiltArea->source.get() == rebuiltFirst && rebuiltSecond->next.get() == rebuiltFirst, "and the pointers between the kinds");
+
+    Recorder again;
+    unsigned char againKinds[2] = { ROK_ORDER, ROK_ORDER };
+    void* againRoots[2] = { rebuiltFirst, rebuiltSecond };
+    again.Record(againKinds, againRoots, 2, sets);
+    Check(strcmp(text, again.text.Data()) == 0, "the rebuilt objects record the same text");
+
+    memcpy(g_rootKinds, againKinds, 2);
+    g_rootObjects[0] = rebuiltFirst;
+    g_rootObjects[1] = rebuiltSecond;
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the unchanged objects compare equal");
+    rebuiltArea->radius = 41;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed field: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "ApproachRadius#1.radius") == 0, "a changed field of a kind is reported at its kind and field");
+    rebuiltArea->radius = 40;
+    SetVtable(rebuiltArea, ReplayVtable(ROK_RINGAPPROACH));
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed kind: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs > 0 && strncmp(g_firstKey, "Order#1.attached", 16) == 0, "a pointer that leads to another kind is reported at the pointer");
+    SetVtable(rebuiltArea, ReplayVtable(ROK_APPROACHRADIUS));
+
+    printf("a vtable of no kind\n");
+    static void* stray[2];
+    ApproachRadius* odd = (ApproachRadius*)SimAlloc(sizeof(ApproachRadius));
+    memset((void*)odd, 0, sizeof(ApproachRadius));
+    *(const void**)odd = (const void*)stray;
+    first->attached = odd;
+    ReplayClearFailure();
+    recorder.Record(kinds, roots, 2, sets);
+    Check(strstr(recorder.text.Data(), "attached OrderFx#?\n") != nullptr, "the object is not named");
+    const char* failure = ReplayFailure();
+    printf("%s\n", failure == nullptr ? "no failure" : failure);
+    Check(failure != nullptr && strstr(failure, "OrderFx") != nullptr, "the failure names the base");
+    Check(failure != nullptr && strstr(failure, "0x") == nullptr, "and writes no address");
+    first->attached = area;
+    ReplayClearFailure();
+
+    printf("code pointers\n");
+    ResetBlock();
+    OrderTableEntry* entry = (OrderTableEntry*)SimAlloc(sizeof(OrderTableEntry));
+    memset((void*)entry, 0, sizeof(OrderTableEntry));
+    entry->notify = (NotifyFn)MakeSelectableOrder;
+    entry->markerAnim = 2;
+    entry->flags = 0x413;
+    unsigned stop = CodeIndex("orderNotify", (const void*)StopOrder);
+    unsigned selectable = CodeIndex("orderNotify", (const void*)MakeSelectableOrder);
+    unsigned wait = CodeIndex("orderNotify", (const void*)WaitOrder);
+    Check(stop != ~0u && selectable != ~0u && wait != ~0u && stop != selectable && selectable != wait, "the table lists the functions by their order of registration");
+    unsigned char entryKind = ROK_ORDERTABLEENTRY;
+    void* entryRoot = entry;
+    Recorder code;
+    code.Record(&entryKind, &entryRoot, 1, sets);
+    char want[96];
+    sprintf(want, "  r OrderTableEntry#1.notify orderNotify[%u]\n", selectable);
+    Check(strstr(code.text.Data(), want) != nullptr, "a function is written as its index in the table");
+    Check(ReplayFailure() == nullptr, "and a listed function is no failure");
+    entry->notify = nullptr;
+    code.Record(&entryKind, &entryRoot, 1, sets);
+    Check(strstr(code.text.Data(), "  r OrderTableEntry#1.notify null\n") != nullptr, "a null pointer is null");
+    entry->notify = (NotifyFn)MakeSelectableOrder;
+    code.Record(&entryKind, &entryRoot, 1, sets);
+    Check(strstr(code.text.Data(), want) != nullptr, "a pointer that changed is written again");
+    code.Record(&entryKind, &entryRoot, 1, sets);
+    Check(code.text.Size() == 0, "an unchanged pointer is not written again");
+
+    Recorder source;
+    entry->notify = (NotifyFn)WaitOrder;
+    source.Record(&entryKind, &entryRoot, 1, sets);
+    ResetBlock();
+    RestoreText(source.text.Data(), sets);
+    OrderTableEntry* rebuiltEntry = (OrderTableEntry*)ReplayResolveObject("OrderTableEntry#1", nullptr, g_objects, AllocObject);
+    Check(rebuiltEntry != nullptr && rebuiltEntry->notify == (NotifyFn)WaitOrder, "the replayer stores its own function of that index");
+    Check(rebuiltEntry != nullptr && rebuiltEntry->markerAnim == 2 && rebuiltEntry->flags == 0x413, "and the other fields");
+    Recorder replayedCode;
+    void* rebuiltRoot = rebuiltEntry;
+    replayedCode.Record(&entryKind, &rebuiltRoot, 1, sets);
+    Check(strcmp(source.text.Data(), replayedCode.text.Data()) == 0, "the rebuilt entry records the same text");
+    g_rootKinds[0] = ROK_ORDERTABLEENTRY;
+    g_rootObjects[0] = rebuiltEntry;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the same function compares equal");
+    rebuiltEntry->notify = (NotifyFn)StopOrder;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed function: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "OrderTableEntry#1.notify") == 0, "another function is reported at its field");
+    Check(strstr(g_detail.Data(), "recorded orderNotify[") != nullptr && strstr(g_detail.Data(), "replayed orderNotify[") != nullptr, "by the indexes of both");
+    ReplayClearFailure();
+    rebuiltEntry->notify = (NotifyFn)FixtureOtherNotify;
+    replayedCode.Record(&entryKind, &rebuiltRoot, 1, sets);
+    printf("%s\n", ReplayFailure() == nullptr ? "no failure" : ReplayFailure());
+    Check(strstr(replayedCode.text.Data(), "notify orderNotify[?]\n") != nullptr && ReplayFailure() != nullptr && strstr(ReplayFailure(), "orderNotify") != nullptr, "a function of no entry is a failure that names the table");
+    Check(ReplayFailure() != nullptr && strstr(ReplayFailure(), "0x") == nullptr, "and writes no address");
+    ReplayClearFailure();
+    Check(!ReplayRestoreObjectField(*ReplayFindObjectField(ROK_ORDERTABLEENTRY, "notify"), rebuiltEntry, "orderNotify[9999]", g_objects, nullptr), "an index past the table is refused");
+    Check(!ReplayRestoreObjectField(*ReplayFindObjectField(ROK_ORDERTABLEENTRY, "notify"), rebuiltEntry, "other[1]", g_objects, nullptr), "and so is another table");
+}
 }
 
 int SelfTest(const char* file)
@@ -1859,6 +3082,15 @@ int SelfTest(const char* file)
     TableSelfTest();
     ArraySelfTest();
     FormSelfTest();
+    PolymorphicSelfTest();
+    CallbackSelfTest();
+    VectorSelfTest();
+    SnapshotSelfTest();
+    FilesSelfTest();
+    CommandsSelfTest();
+    SimPlumbingSelfTest();
+    LoadReadsSelfTest();
+    ExecuteCommandSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {
@@ -1875,6 +3107,7 @@ int SelfTest(const char* file)
 
 int main(int argc, char** argv)
 {
+    setvbuf(stdout, nullptr, _IONBF, 0);
     int expectCall = -1;
     const char* expectField = nullptr;
     int arg = 1;

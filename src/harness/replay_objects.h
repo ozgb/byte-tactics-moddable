@@ -18,7 +18,7 @@ public:
 private:
     ReplayObjectTable(const ReplayObjectTable&);
     ReplayObjectTable& operator=(const ReplayObjectTable&);
-    enum { KINDS = 16, HASH = 16384 };
+    enum { KINDS = 48, HASH = 16384 };
     unsigned count[KINDS];
     void* objects[KINDS][REPLAY_MAX_OBJECTS];
     short slots[KINDS][HASH];
@@ -39,6 +39,12 @@ unsigned ReplayLengthOf(const ReplayLength& length, const void* object);
 ReplayObjectField ReplayFieldView(const ReplayField& f);
 void ReplayEmitField(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, char tag, const char* key, const ReplayObjectField& f, const void* object, ReplayText& scratch);
 bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc);
+typedef void (*ReplayReportFn)(const char* key, const char* recorded, const char* replayed);
+typedef void (*ReplayHashFn)(const char* text);
+bool ReplayApplyVector(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayObjectTable& table, ReplayAllocFn alloc);
+bool ReplayApplyVectorElement(const ReplayObjectField& f, void* object, unsigned index, const char* sub, const char* fullKey, const char* value, ReplayKnown& known, bool memory, ReplayObjectTable& table, ReplayAllocFn alloc);
+void ReplayCompareVector(const ReplayObjectField& f, const void* object, const char* key, const ReplayKnown& known, ReplayObjectTable& table, ReplayReportFn report, ReplayHashFn hash);
+bool ReplayParseElementKey(const char* key, char* prefix, unsigned size, unsigned* index, const char** sub);
 void ReplayArrayDiff(const char* recorded, const char* replayed, ReplayText& out);
 bool ReplayIsArrayText(const char* text);
 void ReplayAddStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, ReplayObjectTable& table);
@@ -46,6 +52,73 @@ void ReplayAddStructs(ReplayText& t, const char* tag, const char* name, unsigned
 void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table);
 bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTable& table, ReplayAllocFn alloc);
 
+class ReplayCallbackScope {
+public:
+    ReplayCallbackScope();
+    ~ReplayCallbackScope();
+    void Start(unsigned callback, void* object, unsigned ordinal, ReplayObjectTable& table, const void* thunkVtable);
+    void Stop();
+    const ReplayText& Lines() const { return lines; }
+    const void* Object() const { return object; }
+
+private:
+    ReplayCallbackScope(const ReplayCallbackScope&);
+    ReplayCallbackScope& operator=(const ReplayCallbackScope&);
+    friend class ReplayCallbackCall;
+    bool active;
+    unsigned callback;
+    void* object;
+    const void* original;
+    unsigned ordinal;
+    ReplayObjectTable* table;
+    ReplayText lines;
+};
+
+class ReplayCallbackCall {
+public:
+    ReplayCallbackCall(const void* object, unsigned method);
+    ~ReplayCallbackCall();
+    bool Active() const { return scope != nullptr; }
+    void Space() { text.AddChar(' '); }
+    ReplayText& Text() { return text; }
+    ReplayObjectTable& Table() { return *scope->table; }
+    const void* Original(unsigned slot) const;
+
+private:
+    ReplayCallbackCall(const ReplayCallbackCall&);
+    ReplayCallbackCall& operator=(const ReplayCallbackCall&);
+    ReplayCallbackScope* scope;
+    ReplayText text;
+};
+
+enum { REPLAY_MAX_SNAPSHOTS = 64, REPLAY_SNAPSHOT_LINE_BYTES = 512 };
+
+class ReplaySnapshots {
+public:
+    ReplaySnapshots() : count(0) {}
+    void Reset() { count = 0; }
+    unsigned Add(const void* data, unsigned bytes);
+    unsigned Count() const { return count; }
+    const void* Data(unsigned i) const { return data[i]; }
+    unsigned Bytes(unsigned i) const { return bytes[i]; }
+    void Emit(ReplayText& out) const;
+
+private:
+    unsigned count;
+    const void* data[REPLAY_MAX_SNAPSHOTS];
+    unsigned bytes[REPLAY_MAX_SNAPSHOTS];
+};
+
+unsigned ReplayFirstSnapshotDifference(const char* hex, const void* data, unsigned bytes);
+unsigned ReplayCallbackDepth();
+const void* ReplayVptrOf(const void* object);
+const void* ReplayVtable(unsigned kind);
+const char* ReplayVtableName(unsigned kind);
+void ReplayFail(const char* message);
+const char* ReplayFailure();
+void ReplayClearFailure();
+unsigned ReplayConcreteKind(unsigned kind, const void* p);
+bool ReplayKindFits(unsigned declared, unsigned actual);
 bool ReplayInsideTable(unsigned kind, const void* p);
 void ReplayAddWeapon(ReplayText& t, const void* p);
 void* ReplayParseWeapon(const char* value);

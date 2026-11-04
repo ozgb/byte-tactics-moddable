@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 #include "alloc_hooks.h"
+#include "../harness/replay.h"
 
 // The size of the block every sim allocation comes from, in bytes.
 const unsigned int kSimBlockBytes = 32u << 20;
@@ -15,8 +16,13 @@ void* __cdecl SimAlloc(unsigned int size);
 // Allocates like SimAlloc; the tag names the site for the analysis tools and the block ignores it.
 __declspec(noinline) inline void* __cdecl SimAllocTagged(const char* tag, unsigned int size)
 {
+    ReplayImport call(RI_SIM_ALLOC_TAGGED);
+    call.Ptr(tag);
+    call.Int((int)size);
+    if (call.Answered())
+        return call.AnsweredPointer();
     AllocSite site(_ReturnAddress(), tag);
-    return SimAlloc(size);
+    return call.Result(SimAlloc(size));
 }
 
 // Resizes a sim block like realloc, zeroing the bytes beyond the old size.

@@ -168,3 +168,442 @@ int CommandArgs::GetIntArg(int index, int default_val)
     const char* result = Enter(t);
     return atoi(result);
 }
+
+int FilePrintf(void* file, const char* fmt, ...)
+{
+    char formatted[2048];
+    va_list list;
+    va_start(list, fmt);
+    _vsnprintf(formatted, sizeof formatted, fmt, list);
+    va_end(list);
+    ReplayText t;
+    StartImport(t, RI_FILE_PRINTF);
+    Space(t);
+    t.AddString(fmt);
+    Space(t);
+    t.AddString(formatted);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
+void TdfFile::Unload()
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_UNLOAD);
+    Space(t);
+    AddObject(t, OBJ_FILE, this);
+    const char* r = Enter(t);
+    root = nullptr;
+    current = nullptr;
+    flags = 0;
+    (void)r;
+}
+
+int TdfFile::SelectRecordAt(int index)
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_SELECT_RECORD_AT);
+    Space(t);
+    AddObject(t, OBJ_FILE, this);
+    Space(t);
+    t.AddInt((int)index);
+    const char* result = Enter(t);
+    const char* currentText = OutValue(".current");
+    if (currentText != nullptr)
+        current = ParseRecord(currentText);
+    return atoi(result);
+}
+
+void TdfFile::ResetCurrentRecord()
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_RESET_CURRENT);
+    Space(t);
+    AddObject(t, OBJ_FILE, this);
+    const char* r = Enter(t);
+    const char* currentText = OutValue(".current");
+    current = currentText == nullptr ? nullptr : ParseRecord(currentText);
+    (void)r;
+}
+
+int TdfFile::GetCurrentRecord()
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_GET_CURRENT);
+    Space(t);
+    AddObject(t, OBJ_FILE, this);
+    const char* result = Enter(t);
+    return (int)ParseHandle(OBJ_RECORD, result);
+}
+
+void TdfFile::SetCurrentRecord(int val)
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_SET_CURRENT);
+    Space(t);
+    AddObject(t, OBJ_FILE, this);
+    Space(t);
+    AddObject(t, OBJ_RECORD, (void*)val);
+    const char* r = Enter(t);
+    current = (TdfRecord*)val;
+    (void)r;
+}
+
+TdfRecord* TdfRecord::FindSubRecord(const char* name)
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_FIND_SUB_RECORD);
+    Space(t);
+    AddObject(t, OBJ_RECORD, this);
+    Space(t);
+    t.AddString(name);
+    const char* result = Enter(t);
+    return (TdfRecord*)ParseHandle(OBJ_RECORD, result);
+}
+
+TdfRecord* TdfRecord::GetSubRecord(int index)
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_GET_SUB_RECORD);
+    Space(t);
+    AddObject(t, OBJ_RECORD, this);
+    Space(t);
+    t.AddInt((int)index);
+    const char* result = Enter(t);
+    return (TdfRecord*)ParseHandle(OBJ_RECORD, result);
+}
+
+int TdfRecord::GetSubRecordCount()
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_GET_SUB_RECORD_COUNT);
+    Space(t);
+    AddObject(t, OBJ_RECORD, this);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
+char* TdfRecord::GetFieldName(int index)
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_GET_FIELD_NAME);
+    Space(t);
+    AddObject(t, OBJ_RECORD, this);
+    Space(t);
+    t.AddInt((int)index);
+    const char* result = Enter(t);
+    static char text[256];
+    ParseQuoted(result, text, 256);
+    if (strcmp(result, "null") == 0)
+        return nullptr;
+    return text;
+}
+
+void TdfRecord::CopyRecordName(char* dest, size_t count)
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_COPY_RECORD_NAME);
+    Space(t);
+    AddObject(t, OBJ_RECORD, this);
+    Space(t);
+    t.AddInt((int)count);
+    const char* r = Enter(t);
+    const char* destText = OutValue("dest");
+    if (destText != nullptr)
+        ParseQuoted(destText, dest, (unsigned)count);
+    (void)r;
+}
+
+int TdfRecord::GetRecordName()
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_GET_RECORD_NAME);
+    Space(t);
+    AddObject(t, OBJ_RECORD, this);
+    const char* result = Enter(t);
+    static char text[256];
+    ParseQuoted(result, text, 256);
+    if (strcmp(result, "null") == 0)
+        return (int)nullptr;
+    return (int)text;
+}
+
+int TdfRecord::FindFieldValue(char* name)
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_FIND_FIELD_VALUE);
+    Space(t);
+    AddObject(t, OBJ_RECORD, this);
+    Space(t);
+    t.AddString(name);
+    const char* result = Enter(t);
+    static char text[256];
+    ParseQuoted(result, text, 256);
+    if (strcmp(result, "null") == 0)
+        return (int)nullptr;
+    return (int)text;
+}
+
+int* TdfRecord::GetFieldFixed(int* dst, char* key, int def)
+{
+    ReplayText t;
+    StartImport(t, RI_TDF_GET_FIELD_FIXED);
+    Space(t);
+    AddObject(t, OBJ_RECORD, this);
+    Space(t);
+    t.AddString(key);
+    Space(t);
+    t.AddInt((int)def);
+    const char* result = Enter(t);
+    const char* dstText = OutValue("dst");
+    if (dstText != nullptr && dst != nullptr)
+        *dst = atoi(dstText);
+    (void)result;
+    return dst;
+}
+
+char* __stdcall Translate(const char* key)
+{
+    ReplayText t;
+    StartImport(t, RI_TRANSLATE);
+    Space(t);
+    t.AddString(key);
+    const char* result = Enter(t);
+    static char text[1024];
+    ParseQuoted(result, text, 1024);
+    if (strcmp(result, "null") == 0)
+        return nullptr;
+    return text;
+}
+
+CommandArgs* CommandArgs::InitArgs()
+{
+    ReplayText t;
+    StartImport(t, RI_INIT_ARGS);
+    const char* result = Enter(t);
+    count = 0;
+    (void)result;
+    return this;
+}
+
+int __stdcall ComputeChecksum(unsigned char* data, int len)
+{
+    ReplayText t;
+    StartImport(t, RI_COMPUTE_CHECKSUM);
+    Space(t);
+    AddBytes(t, data, (int)len);
+    Space(t);
+    t.AddInt((int)len);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
+void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count)
+{
+    ReplayText t;
+    StartImport(t, RI_RECORD_SIM_EVENT);
+    Space(t);
+    t.AddInt((int)kind);
+    Space(t);
+    t.AddInt((int)flags);
+    Space(t);
+    ReplayAddWords(t, (const unsigned*)args, (unsigned)count);
+    Space(t);
+    t.AddInt((int)count);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)
+{
+    ReplayText t;
+    StartImport(t, RI_SIM_CAPTURE_ALLOC);
+    Space(t);
+    t.AddInt((int)bytes);
+    const char* result = Enter(t);
+    return SnapshotAnswer(result, (unsigned)bytes, offset);
+}
+
+unsigned char __stdcall FindSlotByDpid(int id)
+{
+    ReplayText t;
+    StartImport(t, RI_FIND_SLOT_BY_DPID);
+    Space(t);
+    t.AddInt((int)id);
+    const char* result = Enter(t);
+    return (unsigned char)atoi(result);
+}
+
+int __stdcall GetSlotDpid(unsigned char index)
+{
+    ReplayText t;
+    StartImport(t, RI_GET_SLOT_DPID);
+    Space(t);
+    t.AddInt((int)(int)index);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
+GafArchive* __stdcall LoadGaf(const char* path)
+{
+    ReplayText t;
+    StartImport(t, RI_LOAD_GAF);
+    Space(t);
+    t.AddString(path);
+    const char* result = Enter(t);
+    GafArchive* o = (GafArchive*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    return o;
+}
+
+void* __stdcall LoadAnimGaf(char* name)
+{
+    ReplayText t;
+    StartImport(t, RI_LOAD_ANIM_GAF);
+    Space(t);
+    t.AddString(name);
+    const char* result = Enter(t);
+    void* o = (void*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    return o;
+}
+
+GafEntry* __stdcall FindGafEntry(GafArchive* gaf, const char* name)
+{
+    ReplayText t;
+    StartImport(t, RI_FIND_GAF_ENTRY);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_GAF, gaf, false);
+    Space(t);
+    t.AddString(name);
+    const char* result = Enter(t);
+    GafEntry* o = (GafEntry*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_FRAMETABLE, ".count");
+    return o;
+}
+
+GafFrame* __stdcall GetGafFrame(FrameTable* table, int index)
+{
+    ReplayText t;
+    StartImport(t, RI_GET_GAF_FRAME);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_FRAMETABLE, table, false);
+    Space(t);
+    t.AddInt((int)index);
+    const char* result = Enter(t);
+    GafFrame* o = (GafFrame*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_GAFFRAME, ".width");
+    ApplyReach(o, ROK_GAFFRAME, ".height");
+    ApplyReach(o, ROK_GAFFRAME, ".xOffset");
+    ApplyReach(o, ROK_GAFFRAME, ".yOffset");
+    ApplyReach(o, ROK_GAFFRAME, ".transparency");
+    return o;
+}
+
+GafFrame* __stdcall GetGafSequenceFrame(Handle* player)
+{
+    ReplayText t;
+    StartImport(t, RI_GET_GAF_SEQUENCE_FRAME);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_HANDLE, player, false);
+    const char* result = Enter(t);
+    GafFrame* o = (GafFrame*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_GAFFRAME, ".width");
+    ApplyReach(o, ROK_GAFFRAME, ".height");
+    ApplyReach(o, ROK_GAFFRAME, ".xOffset");
+    ApplyReach(o, ROK_GAFFRAME, ".yOffset");
+    ApplyReach(o, ROK_GAFFRAME, ".transparency");
+    return o;
+}
+
+void* __stdcall Load3do(char* path)
+{
+    ReplayText t;
+    StartImport(t, RI_LOAD_3DO);
+    Space(t);
+    t.AddString(path);
+    const char* result = Enter(t);
+    void* o = (void*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_OBJECT3DO, ".vertexCount");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_x");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_y");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_z");
+    return o;
+}
+
+void* __stdcall LoadObject3d(const char* name)
+{
+    ReplayText t;
+    StartImport(t, RI_LOAD_OBJECT_3D);
+    Space(t);
+    t.AddString(name);
+    const char* result = Enter(t);
+    void* o = (void*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_OBJECT3DO, ".vertexCount");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_x");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_y");
+    ApplyReach(o, ROK_OBJECT3DO, ".box_z");
+    return o;
+}
+
+int __stdcall GetObjectHeight(Object3do* model)
+{
+    ReplayText t;
+    StartImport(t, RI_GET_OBJECT_HEIGHT);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_OBJECT3DO, model, false);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
+int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mask)
+{
+    ReplayText t;
+    StartImport(t, RI_EXECUTE_COMMAND_TEXT);
+    Space(t);
+    ReplayAddTextN(t, text, (int)len);
+    Space(t);
+    t.AddInt((int)len);
+    Space(t);
+    ReplayAddArgs(t, (const CommandArgs*)vars);
+    Space(t);
+    t.AddInt((int)mask);
+    const char* result = EnterNested(t);
+    PlayNestedCalls("services.ExecuteCommandText");
+    return atoi(result);
+}
+
+bool ReplayAnswerImport(ReplayImport& c)
+{
+    switch (c.id) {
+    case RI_SIM_ALLOC: {
+        ReplayText t;
+        StartImport(t, RI_SIM_ALLOC);
+        Space(t);
+        t.AddInt((int)c.args[0].v.i);
+        const char* result = Enter(t);
+        c.Return(AllocAnswer(result, (unsigned)c.args[0].v.i));
+        return true;
+    }
+    case RI_SIM_ALLOC_TAGGED: {
+        ReplayText t;
+        StartImport(t, RI_SIM_ALLOC_TAGGED);
+        Space(t);
+        t.AddString((const char*)c.args[0].v.p);
+        Space(t);
+        t.AddInt((int)c.args[1].v.i);
+        const char* result = Enter(t);
+        c.Return(AllocAnswer(result, (unsigned)c.args[1].v.i));
+        return true;
+    }
+    case RI_SIM_FREE: {
+        ReplayText t;
+        StartImport(t, RI_SIM_FREE);
+        Space(t);
+        AddAllocName(t, c.args[0].v.p);
+        const char* r = Enter(t);
+        (void)r;
+        return false;
+    }
+    default:
+        return false;
+    }
+}

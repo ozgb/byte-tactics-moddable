@@ -1,6 +1,8 @@
 #include "sim_events.h"
 #include "sim_globals.h"
 #include "block.h"
+#include "../harness/replay.h"
+#include "../harness/replay_services.h"
 #include "../../interfaces/services.h"
 #include "../game/game.h"
 #include "../../link/globals.h"
@@ -30,6 +32,13 @@ void SimEventsClear()
 
 void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count)
 {
+    ReplayImport call(RI_RECORD_SIM_EVENT);
+    call.Int((int)kind);
+    call.Int((int)flags);
+    call.Ptr(args);
+    call.Int((int)count);
+    if (call.Answered())
+        return;
     SimEventQueue* queue = g_simEvents;
     if (queue == nullptr) {
         if (HarnessTestMode())

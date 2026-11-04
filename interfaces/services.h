@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 6
+#define SERVICES_VERSION_MINOR 7
 
 // Returns a random number in [0, range) from the main stream of the game logic.
 int __stdcall RandomInt(int range);
@@ -62,6 +62,9 @@ void __stdcall CopyDwordIfNonNull(int* dest, int* src);
 void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int*, HeapEntry*);
 // Moves the top of a heap of path search entries to dest and re-heaps the rest with val.
 void __stdcall PopHeapFirst(HeapEntry* first, HeapEntry* last, HeapEntry* dest, HeapEntry val, int*);
+
+// Hands out size bytes of the capture arena for a snapshot, stores their offset and returns them, or returns null when the arena is full.
+void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);
 
 // Returns the net id of the player in a slot, or -1 for an empty slot.
 int __stdcall GetSlotDpid(unsigned char index);

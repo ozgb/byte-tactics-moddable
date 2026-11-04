@@ -172,6 +172,64 @@ a value kind (`scope: value`, no row of the field sets matches its fields):
 count of the array form is read from the count argument's own line, so the argument must be recorded. A mismatch of a result
 by value is reported at `result`, one of an element at `points[1].y`.
 
+## Polymorphic objects
+
+An object with a vptr is written as the concrete kind it is, chosen by comparing the object's vptr with the vtable of each kind
+the base lists: `ApproachRadius#1`, never `OrderFx#1`, and no vptr or address is ever written. The annotation:
+
+```json
+"OrderFx": {"type": "OrderFx", "scope": "state", "kinds": ["ApproachRadius", "RingApproach", "PathOrder"], "fields": []}
+"ApproachRadius": {"type": "ApproachRadius", "scope": "state", "vtable": "g_approachRadiusVtable", "fields": [...]}
+{"name": "attached", "kind": "ref", "target": "OrderFx", "poly": "OrderFx"}
+{"mode": "object", "kind": "OrderFx", "poly": "OrderFx"}
+```
+
+| Key | On | Meaning |
+|---|---|---|
+| `kinds` | a base kind | the concrete kinds the base may be; the base has no fields of its own, its kinds list theirs (the base part included, `source`) |
+| `vtable` | a concrete kind | the global the vptr points at (`extern VirtualFunction const g_approachRadiusVtable[12]` in `src/data/vtables.cpp`); the tool declares it in the schema and `static_assert`s that the type is polymorphic and derives from the base |
+| `poly` | a `ref` field, an object argument or result | names the base the pointer is typed as; it has to be the `target` or `kind`. A pointer to a base without `poly` is an error |
+
+The numbering is per concrete kind, in order of first appearance, as for any state kind. An example of the lines a call holds:
+
+```
+  r Order#1.attached ApproachRadius#1
+  r Order#2.attached RingApproach#1
+  r ApproachRadius#1.radius 40
+  r ApproachRadius#1.source Order#1
+  r RingApproach#1.inner 10
+```
+
+The fields of the object are those of its concrete kind. The replayer allocates `Kind#N` when a line first names it and stores its
+own vtable for that kind as the vptr (the vtable global of the replayer's link, which holds the module sources), so a vtable is
+never replayed as bytes; a `ref` accepts any kind of the base it is typed as. A vptr that matches none of the listed kinds is
+an error: the recorder writes `OrderFx#?`, and the run ends with `cannot write a replay file: an OrderFx has a vtable that is none of
+its kinds` (naming the symbol, `g_pathOrderVtable`, when the vptr is the vtable of another kind of the schema). Only a vtable that is
+a global of the sources can be a kind's vtable. A vtable the compiler emits from a class has no name to compare with.
+
+### Code pointers
+
+A field of kind `code` holds a pointer to a function that is not a vtable. It is written `<table>[<index>]`, the index of the
+function in the named table, or `null`. The tables are the `code_tables` annotation:
+
+```json
+"code_tables": {"orderNotify": {"entries": ["ReadyOrder", "StandbyOrder", ...], "headers": ["src/orders/unit_orders.h", ...],
+                                "fill": "orders.RegisterAllOrderTypes"}}
+{"name": "notify", "kind": "code", "table": "orderNotify"}
+```
+
+```
+  r OrderTableEntry#1.notify orderNotify[44]
+```
+
+`entries` are functions in the order of the table (the `notify` pointers `RegisterAllOrderTypes` copies into `g_missionOrderTableVec`,
+in the order it registers them), each declared in one of the `headers`, which have to be `includes` of the schema. The tool writes the
+table as `(const void*)StopOrder` addresses into the schema header, so the recorder finds the index of the game's function and
+the replayer, linking its own functions, stores its own address for the index. `fill` is the slot (`seam.Slot`) that fills the game's
+table, for the subsystem that owns it. A function that is in none of the entries is an error that names the table (the recorder
+writes `orderNotify[?]`), and an index past the table is refused by the replayer. `GroundPickupOrder` is not an entry, because
+no header declares it with the type its definition has.
+
 ## Fields
 
 Block fields are named as `data/rwsets.csv` names them: `Game.windCounter` for `Game::windCounter`,

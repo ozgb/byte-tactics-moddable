@@ -29,6 +29,7 @@ field_escape row needs a hand rule in `annotations.rules`; a rule that matches n
 import argparse
 import csv
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -54,7 +55,7 @@ BLOCK_KINDS = {"field_read": "r", "field_write": "w", "global_read": "r", "globa
 OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "rw"}
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
-               "unitid": "UNITID", "rawbytes": "RAWBYTES", "array": "ARRAY"}
+               "unitid": "UNITID", "rawbytes": "RAWBYTES", "array": "ARRAY", "code": "CODE"}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?(\w+)(?:>>(\d+))?\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
@@ -205,6 +206,96 @@ def check_table(kind: str, spec: dict, errors: list[str]) -> dict:
             "owner": "SimGlobals" if base == "sim" else "Game"}
 
 
+VTABLE_NAME = re.compile(r"^[A-Za-z_]\w*$")
+
+
+def check_polymorphic(ann: dict) -> list[str]:
+    """Errors for the N5 keys: `vtable` of a concrete kind, `kinds` of a base, `poly` of a pointer field, `table` of a code field."""
+    errors = []
+    kinds = ann["objects"]
+    tables = ann.get("code_tables", {})
+    owner: dict[str, str] = {}
+    for base, spec in kinds.items():
+        if "kinds" not in spec:
+            continue
+        where = "%s (base)" % base
+        if spec["scope"] != "state" or spec.get("table") or spec.get("inside") or spec.get("vtable"):
+            errors.append("%s: a base kind is a state kind with no table, inside or vtable of its own" % where)
+        if spec["fields"]:
+            errors.append("%s: a base kind has no fields, its kinds have them" % where)
+        if not spec["kinds"]:
+            errors.append("%s: lists no kinds" % where)
+        for name in spec["kinds"]:
+            concrete = kinds.get(name)
+            if concrete is None:
+                errors.append("%s: the kind %s is not an object of the schema" % (where, name))
+            elif "vtable" not in concrete:
+                errors.append("%s: the kind %s has no vtable" % (where, name))
+            elif name in owner:
+                errors.append("%s: the kind %s is also a kind of %s" % (where, name, owner[name]))
+            else:
+                owner[name] = base
+    seen: dict[str, str] = {}
+    for name, spec in kinds.items():
+        if "vtable" not in spec:
+            continue
+        if not isinstance(spec["vtable"], str) or not VTABLE_NAME.match(spec["vtable"]):
+            errors.append("%s: the vtable is the name of a global" % name)
+        elif spec["vtable"] in seen:
+            errors.append("%s: the vtable %s is also the vtable of %s" % (name, spec["vtable"], seen[spec["vtable"]]))
+        else:
+            seen[spec["vtable"]] = name
+        if spec["scope"] != "state" or spec.get("table") or spec.get("inside"):
+            errors.append("%s: a kind with a vtable is a state kind with no table or inside" % name)
+        if name not in owner:
+            errors.append("%s: has a vtable and is a kind of no base" % name)
+    for name, spec in kinds.items():
+        for f in spec["fields"]:
+            where = "%s.%s" % (name, f["name"])
+            base = kinds.get(f.get("target")) if f["kind"] in ("ref", "embed", "unitid") else None
+            if "poly" in f:
+                if f["kind"] != "ref" or f.get("target") != f["poly"] or base is None or "kinds" not in base:
+                    errors.append("%s: `poly` names the base kind that the ref points at" % where)
+            elif base is not None and "kinds" in base:
+                errors.append("%s: points at the base kind %s and needs \"poly\": \"%s\"" % (where, f["target"], f["target"]))
+            if f["kind"] == "code":
+                if f.get("table") not in tables:
+                    errors.append("%s: a code field names a table of `code_tables`" % where)
+                if spec["scope"] != "state":
+                    errors.append("%s: only the fields of a state kind are code pointers" % where)
+    return errors
+
+
+def check_code_tables(ann: dict, members: list[tuple[str, str]]) -> tuple[list[dict], list[str]]:
+    """The code tables: the functions of each in order, every one declared in a listed header, and the slot that fills it."""
+    errors = []
+    out = []
+    includes = ann.get("includes", [])
+    for name, spec in ann.get("code_tables", {}).items():
+        where = "code table %s" % name
+        entries = spec.get("entries", [])
+        if not entries or len(set(entries)) != len(entries):
+            errors.append("%s: needs entries, each once" % where)
+        text = ""
+        for header in spec.get("headers", []):
+            path = ROOT / header
+            if not path.exists():
+                errors.append("%s: the header %s does not exist" % (where, header))
+                continue
+            if os.path.relpath(path, ROOT / "src/harness").replace(os.sep, "/") not in includes:
+                errors.append("%s: the header %s is not one of the schema's `includes`" % (where, header))
+            text += " ".join(path.read_text().split()) + " "
+        for fn in entries:
+            if not re.search(r"\b%s\(" % re.escape(fn), text):
+                errors.append("%s: %s is declared in none of its headers" % (where, fn))
+        fill = spec.get("fill", "")
+        seam, _, slot = fill.partition(".")
+        if seam not in {m[0] for m in members} or slot not in {s["name"] for s in parse_interface(seam, dict((m[0], m[1]) for m in members)[seam])["slots"]}:
+            errors.append("%s: `fill` names a slot of a seam as seam.Slot" % where)
+        out.append({"name": name, "entries": entries, "fill": fill})
+    return out, errors
+
+
 def tracked(target: str, game: dict, sim: dict, aliases: dict | None = None) -> str | None:
     if target.startswith("Game::") and target[6:] in game:
         return "Game." + target[6:]
@@ -319,6 +410,8 @@ def classify_arg(param: dict, note: dict | None, ann: dict) -> dict:
     elif ctype.endswith("*") and ctype[:-1] in {s["type"] for s in ann["objects"].values() if s["scope"] == "state"}:
         kind = [k for k, s in ann["objects"].items() if s["type"] == ctype[:-1]][0]
         out.update({"mode": "object", "kind": kind})
+        if "kinds" in ann["objects"][kind]:
+            out["poly"] = kind
     elif ctype == "WeaponDef*":
         out["mode"] = "weapon"
     else:
@@ -339,6 +432,8 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
     elif ctype.endswith("*") and ctype[:-1] in {s["type"] for s in ann["objects"].values() if s["scope"] == "state"}:
         kind = [k for k, s in ann["objects"].items() if s["type"] == ctype[:-1]][0]
         out.update({"mode": "object", "kind": kind})
+        if "kinds" in ann["objects"][kind]:
+            out["poly"] = kind
     elif ctype == "char*":
         out["mode"] = "text"
     else:
@@ -363,8 +458,18 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
         elif item["type"] != spec["type"] + ("*" if pointer else ""):
             errors.append("%s: %s is %s, and the kind %s is %s" % (where, label, item["type"], item["kind"], spec["type"] + ("*" if pointer else "")))
 
+    def poly_kind(item: dict, label: str) -> None:
+        spec = kinds.get(item.get("kind"))
+        base = spec is not None and "kinds" in spec
+        if base and item.get("poly") != item["kind"]:
+            errors.append("%s: %s points at the base kind %s and needs \"poly\": \"%s\"" % (where, label, item["kind"], item["kind"]))
+        if "poly" in item and (not base or item["poly"] != item["kind"]):
+            errors.append("%s: `poly` of %s names the base kind that it points at" % (where, label))
+
     for a in args:
         label = "the argument %s" % a["name"]
+        if a["mode"] == "object":
+            poly_kind(a, label)
         if a["mode"] not in ARG_MODES:
             errors.append("%s: %s has the unknown mode %s" % (where, label, a["mode"]))
         elif a["mode"] == "struct":
@@ -383,6 +488,8 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
         elif a["mode"] == "value":
             value_kind(a, label, False)
     if result is not None:
+        if result["mode"] == "object":
+            poly_kind(result, "the result")
         if result["mode"] not in RESULT_MODES:
             errors.append("%s: the result has the unknown mode %s" % (where, result["mode"]))
         elif result["mode"] == "value":
@@ -403,7 +510,11 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     kind_names = list(ann["objects"])
     for kind in kind_names:
         spec = ann["objects"][kind]
-        objects.append({"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")})
+        entry = {"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")}
+        for key in ("vtable", "kinds"):
+            if spec.get(key):
+                entry[key] = spec[key]
+        objects.append(entry)
         if spec.get("table"):
             if spec["scope"] != "state":
                 errors.append("%s: only a state kind can have a table" % kind)
@@ -424,6 +535,13 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
         top = t["member"].split(".")[0]
         table_targets.add(top if t["sim"] else "Game::" + top)
     object_index = {(f["object"], f["name"]): i for i, f in enumerate(object_fields)}
+    errors += check_polymorphic(ann)
+    code_tables, code_errors = check_code_tables(ann, seam_members())
+    errors += code_errors
+    code_index = {t["name"]: i for i, t in enumerate(code_tables)}
+    for f in object_fields:
+        if f["kind"] == "code":
+            f["codeTable"] = code_index.get(f.get("table"), 0)
     reach_table: list[int] = []
     errors += resolve_field_reaches(ann, object_fields, object_index, reach_table)
     by_function: dict[str, list[dict]] = {}
@@ -569,7 +687,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             if slot not in subsystems.get(seam, {}).get("slots", {}):
                 errors.append("%s imports %s, which is no slot of the %s interface" % (sub, imp, seam))
     return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table,
-            "arrays": arrays, "tables": tables}, errors
+            "arrays": arrays, "tables": tables, "code_tables": code_tables}, errors
 
 
 def check_sim_names(sim: dict) -> list[str]:
@@ -621,6 +739,10 @@ def camel(name: str) -> str:
     return "".join(part.capitalize() for part in name.split("_"))
 
 
+def pascal(name: str) -> str:
+    return name[:1].upper() + name[1:]
+
+
 GENERATED = "// Generated by tools/replayschema.py. Do not edit."
 
 
@@ -647,6 +769,13 @@ def render_schema(ann: dict, model: dict) -> str:
     macros = list(dict.fromkeys(macros))
     for name in macros:
         L += ['#pragma push_macro("%s")' % name, "#undef %s" % name]
+    for o in objects:
+        if o.get("vtable"):
+            L.append("extern void (* const %s[])();" % o["vtable"])
+    for t in model["code_tables"]:
+        L.append("static const void* const kReplayCode%s[] = {" % pascal(t["name"]))
+        L += ["    (const void*)%s," % fn for fn in t["entries"]]
+        L.append("};")
     L += ["", "static const ReplayField kReplayFields[] = {"]
     for f in fields:
         base = {"game": "RB_GAME", "sim": "RB_SIM", "rng": "RB_RNG"}[f["base"]]
@@ -693,6 +822,12 @@ def render_schema(ann: dict, model: dict) -> str:
     kind_id = {o["name"]: "ROK_" + upper(o["name"]) for o in objects}
     types = {o["name"]: o["type"] for o in objects}
     table_id = {t["kind"]: str(i + 1) for i, t in enumerate(tables)}
+    poly_kinds: list[str] = []
+    poly_at: dict[str, tuple[int, int]] = {}
+    for o in objects:
+        if o.get("kinds"):
+            poly_at[o["name"]] = (len(poly_kinds), len(o["kinds"]))
+            poly_kinds += [kind_id[k] for k in o["kinds"]]
     for o in objects:
         inside = o.get("inside")
         if inside:
@@ -700,8 +835,17 @@ def render_schema(ann: dict, model: dict) -> str:
             tail = '1, %s, offsetof(%s, %s), "%s"' % (kind_id[inside["kind"]], container, inside["member"], inside["member"])
         else:
             tail = '0, 0, 0, ""'
-        L.append('    { "%s", sizeof(%s), %s, %s, %s },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), tail))
+        vtable = '%s, "%s"' % (o["vtable"], o["vtable"]) if o.get("vtable") else 'nullptr, ""'
+        first, count = poly_at.get(o["name"], (0, 0))
+        L.append('    { "%s", sizeof(%s), %s, %s, %s, %s, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), tail, vtable, first, count))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
+          "static const unsigned char kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
+          "static const ReplayCodeTable kReplayCodeTables[] = {"]
+    for t in model["code_tables"]:
+        L.append("    { \"%s\", kReplayCode%s, %d }," % (t["name"], pascal(t["name"]), len(t["entries"])))
+    if not model["code_tables"]:
+        L.append("    { \"\", nullptr, 0 },")
+    L += ["};", "static const unsigned kReplayCodeTableCount = %d;" % len(model["code_tables"]), "",
           "static const ReplayObjectField kReplayObjectFields[] = {"]
     position = {(f["object"], f["name"]): i for i, f in enumerate(ofields)}
     range_end, range_begin = {}, {}
@@ -715,7 +859,7 @@ def render_schema(ann: dict, model: dict) -> str:
         t = types[f["object"]]
         size = f.get("size")
         size_text = str(size) if size else "sizeof(((%s*)nullptr)->%s)" % (t, member)
-        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid") else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else "0")
+        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid") else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
         extra = ", %d" % f["array"] if f.get("array") else ""
         L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %d, %d, %d, %d%s },' % (
             f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[f["kind"]], target, range_end.get(i, 0), range_begin.get(i, 0),
@@ -733,9 +877,16 @@ def render_schema(ann: dict, model: dict) -> str:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a pointer");' % (t, member, t, f["name"]))
         elif f["kind"] == "array":
             continue
+        elif f["kind"] == "code":
+            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a code pointer");' % (t, member, t, f["name"]))
         elif f.get("size") is None:
             want = {"i32": 4, "u32": 4, "u16": 2, "i16": 2, "f32": 4, "flags": 4, "ref": 4, "point16": 4, "weapon": 4, "u8": 1, "f64": 8, "unitid": 2}[f["kind"]]
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, want, t, f["name"]))
+    for o in objects:
+        for k in o.get("kinds", []):
+            L.append('static_assert(__is_base_of(%s, %s), "%s is a kind of %s");' % (o["type"], types[k], k, o["name"]))
+        if o.get("vtable"):
+            L.append('static_assert(__is_polymorphic(%s), "%s has a vtable");' % (o["type"], o["name"]))
     L += ["", "enum ReplaySubsystemId {"]
     L += ["    SUB_%s," % upper(s) for s in subsystems]
     L += ["    SUB_COUNT", "};", "", "enum ReplaySlotId {"]

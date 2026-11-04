@@ -120,6 +120,67 @@ bool InsideTable(unsigned kind, const void* p, unsigned* container, int* index)
 
 }
 
+namespace {
+
+char s_failure[240];
+
+}
+
+void ReplayFail(const char* message)
+{
+    if (s_failure[0] == '\0') {
+        strncpy(s_failure, message, sizeof s_failure - 1);
+        s_failure[sizeof s_failure - 1] = '\0';
+    }
+}
+
+const char* ReplayFailure()
+{
+    return s_failure[0] == '\0' ? nullptr : s_failure;
+}
+
+void ReplayClearFailure()
+{
+    s_failure[0] = '\0';
+}
+
+bool ReplayKindFits(unsigned declared, unsigned actual)
+{
+    if (declared == actual)
+        return true;
+    const ReplayObjectKind& base = kReplayObjectKinds[declared];
+    for (unsigned i = 0; i < base.polyCount; i++) {
+        if (kReplayPolyKinds[base.polyFirst + i] == actual)
+            return true;
+    }
+    return false;
+}
+
+unsigned ReplayConcreteKind(unsigned kind, const void* p)
+{
+    const ReplayObjectKind& base = kReplayObjectKinds[kind];
+    if (base.polyCount == 0 || p == nullptr)
+        return kind;
+    const void* vptr = *(const void* const*)p;
+    for (unsigned i = 0; i < base.polyCount; i++) {
+        unsigned concrete = kReplayPolyKinds[base.polyFirst + i];
+        if (kReplayObjectKinds[concrete].vtable == vptr)
+            return concrete;
+    }
+    const char* symbol = nullptr;
+    for (unsigned k = 0; k < kReplayObjectKindCount; k++) {
+        if (kReplayObjectKinds[k].vtable != nullptr && kReplayObjectKinds[k].vtable == vptr)
+            symbol = kReplayObjectKinds[k].vtableName;
+    }
+    char message[200];
+    if (symbol != nullptr)
+        sprintf(message, "an %s has the vtable %s, which is none of its kinds", base.name, symbol);
+    else
+        sprintf(message, "an %s has a vtable that is none of its kinds and no vtable of the schema", base.name);
+    ReplayFail(message);
+    return kReplayObjectKindCount;
+}
+
 bool ReplayInsideTable(unsigned kind, const void* p)
 {
     unsigned container;
@@ -351,6 +412,51 @@ void EmitArray(ReplayText& out, ReplayKnown& known, const char* key, char tag, c
 
 }
 
+namespace {
+
+void FormatCode(const ReplayObjectField& f, const void* function, ReplayText& out)
+{
+    if (function == nullptr) {
+        out.Add("null");
+        return;
+    }
+    const ReplayCodeTable& table = kReplayCodeTables[f.target];
+    unsigned i = 0;
+    while (i < table.count && table.entries[i] != function)
+        i++;
+    out.Add(table.name);
+    if (i == table.count) {
+        out.Add("[?]");
+        char message[200];
+        sprintf(message, "%s is a code pointer that is none of the entries of the code table %s", f.name, table.name);
+        ReplayFail(message);
+        return;
+    }
+    out.AddChar('[');
+    out.AddUnsigned(i);
+    out.AddChar(']');
+}
+
+bool RestoreCode(const ReplayObjectField& f, const char* value, const void** into)
+{
+    if (strcmp(value, "null") == 0) {
+        *into = nullptr;
+        return true;
+    }
+    const ReplayCodeTable& table = kReplayCodeTables[f.target];
+    size_t n = strlen(table.name);
+    if (strncmp(value, table.name, n) != 0 || value[n] != '[')
+        return false;
+    char* end;
+    unsigned long index = strtoul(value + n + 1, &end, 10);
+    if (end == value + n + 1 || *end != ']' || end[1] != '\0' || index >= table.count)
+        return false;
+    *into = table.entries[index];
+    return true;
+}
+
+}
+
 unsigned ReplayLengthOf(const ReplayLength& length, const void* object)
 {
     unsigned long long n = (unsigned long long)FactorValue(length.first, object) * FactorValue(length.second, object);
@@ -367,6 +473,13 @@ void ReplayAddObjectName(ReplayText& t, ReplayObjectTable& table, unsigned kind,
         ReplayAddWeapon(t, p);
         return;
     }
+    unsigned actual = ReplayConcreteKind(kind, p);
+    if (actual == kReplayObjectKindCount) {
+        t.Add(kReplayObjectKinds[kind].name);
+        t.Add("#?");
+        return;
+    }
+    kind = actual;
     unsigned container;
     int index;
     if (InsideTable(kind, p, &container, &index)) {
@@ -466,6 +579,9 @@ bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, Rep
     case RK_ARRAY:
         FormatArray(f, object, out);
         break;
+    case RK_CODE:
+        FormatCode(f, *(const void* const*)at, out);
+        break;
     default:
         return false;
     }
@@ -537,6 +653,8 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
     if (kReplayObjectKinds[kind].scope == RS_INDEX)
         return ordinal < 256 && g_game != nullptr ? &g_game->weapons[ordinal] : nullptr;
     void* p;
+    if (kReplayObjectKinds[kind].polyCount != 0)
+        return nullptr;
     if (kReplayObjectKinds[kind].table != RT_ORDER) {
         EnsureTable((unsigned)kind, alloc);
         p = table.Pointer((unsigned)kind, ordinal + 1);
@@ -545,6 +663,8 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
         if (p == nullptr && ordinal != 0 && alloc != nullptr) {
             p = alloc(kReplayObjectKinds[kind].size);
             memset(p, 0, kReplayObjectKinds[kind].size);
+            if (kReplayObjectKinds[kind].vtable != nullptr)
+                *(const void**)p = kReplayObjectKinds[kind].vtable;
             table.Bind((unsigned)kind, ordinal, p);
         }
     }
@@ -597,6 +717,8 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
     case RK_UNITID:
     case RK_ARRAY:
         return false;
+    case RK_CODE:
+        return RestoreCode(f, value, (const void**)at);
     case RK_RAWBYTES: {
         unsigned char** slot = (unsigned char**)at;
         if (strcmp(value, "null") == 0) {
@@ -672,7 +794,7 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
         if (strcmp(value, "null") != 0) {
             unsigned kind = 0;
             target = ReplayResolveObject(value, &kind, table, alloc);
-            if (target == nullptr || kind != f.target)
+            if (target == nullptr || !ReplayKindFits(f.target, kind))
                 return false;
         }
         *(unsigned*)at = target == nullptr ? 0u : (unsigned)((const char*)target - (const char*)SimBlockBase());
@@ -758,6 +880,10 @@ void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned c
 {
     if (object == nullptr || kReplayObjectKinds[kind].scope == RS_VALUE)
         return;
+    unsigned actual = ReplayConcreteKind(kind, object);
+    if (actual == kReplayObjectKindCount)
+        return;
+    kind = (unsigned char)actual;
     unsigned slot = PointerHash(object) % REPLAY_REACH_HASH;
     for (; reach.slots[slot] >= 0; slot = (slot + 1) % REPLAY_REACH_HASH) {
         if (reach.object[reach.slots[slot]] == object && reach.kind[reach.slots[slot]] == kind)

@@ -84,6 +84,26 @@ ConstructedElement::~ConstructedElement()
 {
 }
 
+int __stdcall StopOrder(Unit*, Order*, int)
+{
+    return 1;
+}
+
+int __stdcall MakeSelectableOrder(Unit*, Order*, int)
+{
+    return 2;
+}
+
+int __stdcall WaitOrder(Unit*, Order*, int)
+{
+    return 3;
+}
+
+int __stdcall FixtureOtherNotify(Unit*, Order*, int)
+{
+    return 4;
+}
+
 namespace {
 
 enum { MAX_LINES = 1 << 21, MAX_OUTS = 16384, MAX_RECORDS = 64, TEXT = 512 };
@@ -1850,6 +1870,187 @@ void FormSelfTest()
     Check(g_diffs == 1 && strcmp(g_firstKey, "result") == 0, "a changed result by value is reported at the result");
     t.Free();
 }
+
+typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
+
+unsigned CodeIndex(const char* table, const void* function)
+{
+    for (unsigned t = 0; t < kReplayCodeTableCount; t++) {
+        if (strcmp(kReplayCodeTables[t].name, table) != 0)
+            continue;
+        for (unsigned i = 0; i < kReplayCodeTables[t].count; i++) {
+            if (kReplayCodeTables[t].entries[i] == function)
+                return i;
+        }
+    }
+    return ~0u;
+}
+
+void SetVtable(void* object, void (*const* vtable)())
+{
+    *(const void**)object = (const void*)vtable;
+}
+
+void PolymorphicSelfTest()
+{
+    printf("polymorphic objects\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    Order* first = (Order*)SimAlloc(sizeof(Order));
+    Order* second = (Order*)SimAlloc(sizeof(Order));
+    memset((void*)first, 0, sizeof(Order));
+    memset((void*)second, 0, sizeof(Order));
+    ApproachRadius* area = (ApproachRadius*)SimAlloc(sizeof(ApproachRadius));
+    RingApproach* ring = (RingApproach*)SimAlloc(sizeof(RingApproach));
+    memset((void*)area, 0, sizeof(ApproachRadius));
+    memset((void*)ring, 0, sizeof(RingApproach));
+    SetVtable(area, g_approachRadiusVtable);
+    SetVtable(ring, g_ringApproachVtable);
+    area->source = first;
+    area->pos.x = 3;
+    area->pos.y = 4;
+    area->radius = 40;
+    area->radiusSq = 1600;
+    ring->source = second;
+    ring->inner = 10;
+    ring->outer = 20;
+    first->state = 2;
+    first->attached = area;
+    second->attached = ring;
+    second->next = first;
+
+    unsigned char kinds[2] = { ROK_ORDER, ROK_ORDER };
+    void* roots[2] = { first, second };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 2, sets);
+    const char* text = recorder.text.Data();
+    Check(ReplayFailure() == nullptr, "every vtable is one of the kinds");
+    Check(strstr(text, "  r Order#1.attached ApproachRadius#1\n") != nullptr, "a pointer to the base is written as the kind its vtable says");
+    Check(strstr(text, "  r Order#2.attached RingApproach#1\n") != nullptr, "another object of the base is another kind");
+    Check(strstr(text, "  r ApproachRadius#1.radius 40\n") != nullptr && strstr(text, "  r ApproachRadius#1.pos (3,4)\n") != nullptr, "the fields are those of the kind");
+    Check(strstr(text, "  r RingApproach#1.inner 10\n") != nullptr && strstr(text, "  r RingApproach#1.outer 20\n") != nullptr, "and of the other kind");
+    Check(strstr(text, "  r RingApproach#1.source Order#2\n") != nullptr, "a field of the base part is a field of the kind");
+    Check(strstr(text, "OrderFx#") == nullptr && strstr(text, "vtable") == nullptr && strstr(text, "vptr") == nullptr, "neither the base nor the vtable is written");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    Order* rebuiltFirst = (Order*)ReplayResolveObject("Order#1", nullptr, g_objects, AllocObject);
+    Order* rebuiltSecond = (Order*)ReplayResolveObject("Order#2", nullptr, g_objects, AllocObject);
+    ApproachRadius* rebuiltArea = (ApproachRadius*)ReplayResolveObject("ApproachRadius#1", nullptr, g_objects, AllocObject);
+    RingApproach* rebuiltRing = (RingApproach*)ReplayResolveObject("RingApproach#1", nullptr, g_objects, AllocObject);
+    Check(rebuiltFirst != nullptr && rebuiltSecond != nullptr && rebuiltArea != nullptr && rebuiltRing != nullptr, "the objects are rebuilt");
+    Check(rebuiltFirst->attached.get() == (OrderFx*)rebuiltArea && rebuiltSecond->attached.get() == (OrderFx*)rebuiltRing, "the base pointer leads to the rebuilt kind");
+    Check(*(const void**)rebuiltArea == (const void*)g_approachRadiusVtable && *(const void**)rebuiltRing == (const void*)g_ringApproachVtable, "each is built with the vtable of the replayer");
+    Check(rebuiltArea->radius == 40 && rebuiltArea->pos.x == 3 && rebuiltRing->outer == 20 && rebuiltFirst->state == 2, "the fields are restored");
+    Check(rebuiltArea->source.get() == rebuiltFirst && rebuiltSecond->next.get() == rebuiltFirst, "and the pointers between the kinds");
+
+    Recorder again;
+    unsigned char againKinds[2] = { ROK_ORDER, ROK_ORDER };
+    void* againRoots[2] = { rebuiltFirst, rebuiltSecond };
+    again.Record(againKinds, againRoots, 2, sets);
+    Check(strcmp(text, again.text.Data()) == 0, "the rebuilt objects record the same text");
+
+    memcpy(g_rootKinds, againKinds, 2);
+    g_rootObjects[0] = rebuiltFirst;
+    g_rootObjects[1] = rebuiltSecond;
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the unchanged objects compare equal");
+    rebuiltArea->radius = 41;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed field: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "ApproachRadius#1.radius") == 0, "a changed field of a kind is reported at its kind and field");
+    rebuiltArea->radius = 40;
+    SetVtable(rebuiltArea, g_ringApproachVtable);
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed kind: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs > 0 && strncmp(g_firstKey, "Order#1.attached", 16) == 0, "a pointer that leads to another kind is reported at the pointer");
+    SetVtable(rebuiltArea, g_approachRadiusVtable);
+
+    printf("a vtable of no kind\n");
+    static void* unknown[2];
+    ApproachRadius* odd = (ApproachRadius*)SimAlloc(sizeof(ApproachRadius));
+    memset((void*)odd, 0, sizeof(ApproachRadius));
+    *(const void**)odd = (const void*)unknown;
+    first->attached = odd;
+    ReplayClearFailure();
+    recorder.Record(kinds, roots, 2, sets);
+    Check(strstr(recorder.text.Data(), "attached OrderFx#?\n") != nullptr, "the object is not named");
+    const char* failure = ReplayFailure();
+    printf("%s\n", failure == nullptr ? "no failure" : failure);
+    Check(failure != nullptr && strstr(failure, "OrderFx") != nullptr, "the failure names the base");
+    Check(failure != nullptr && strstr(failure, "0x") == nullptr, "and writes no address");
+    first->attached = area;
+    ReplayClearFailure();
+
+    printf("code pointers\n");
+    ResetBlock();
+    OrderTableEntry* entry = (OrderTableEntry*)SimAlloc(sizeof(OrderTableEntry));
+    memset((void*)entry, 0, sizeof(OrderTableEntry));
+    entry->notify = (NotifyFn)MakeSelectableOrder;
+    entry->markerAnim = 2;
+    entry->flags = 0x413;
+    unsigned stop = CodeIndex("orderNotify", (const void*)StopOrder);
+    unsigned selectable = CodeIndex("orderNotify", (const void*)MakeSelectableOrder);
+    unsigned wait = CodeIndex("orderNotify", (const void*)WaitOrder);
+    Check(stop != ~0u && selectable != ~0u && wait != ~0u && stop != selectable && selectable != wait, "the table lists the functions by their order of registration");
+    unsigned char entryKind = ROK_ORDERTABLEENTRY;
+    void* entryRoot = entry;
+    Recorder code;
+    code.Record(&entryKind, &entryRoot, 1, sets);
+    char want[96];
+    sprintf(want, "  r OrderTableEntry#1.notify orderNotify[%u]\n", selectable);
+    Check(strstr(code.text.Data(), want) != nullptr, "a function is written as its index in the table");
+    Check(ReplayFailure() == nullptr, "and a listed function is no failure");
+    entry->notify = nullptr;
+    code.Record(&entryKind, &entryRoot, 1, sets);
+    Check(strstr(code.text.Data(), "  r OrderTableEntry#1.notify null\n") != nullptr, "a null pointer is null");
+    entry->notify = (NotifyFn)MakeSelectableOrder;
+    code.Record(&entryKind, &entryRoot, 1, sets);
+    Check(strstr(code.text.Data(), want) != nullptr, "a pointer that changed is written again");
+    code.Record(&entryKind, &entryRoot, 1, sets);
+    Check(code.text.Size() == 0, "an unchanged pointer is not written again");
+
+    Recorder source;
+    entry->notify = (NotifyFn)WaitOrder;
+    source.Record(&entryKind, &entryRoot, 1, sets);
+    ResetBlock();
+    RestoreText(source.text.Data(), sets);
+    OrderTableEntry* rebuiltEntry = (OrderTableEntry*)ReplayResolveObject("OrderTableEntry#1", nullptr, g_objects, AllocObject);
+    Check(rebuiltEntry != nullptr && rebuiltEntry->notify == (NotifyFn)WaitOrder, "the replayer stores its own function of that index");
+    Check(rebuiltEntry != nullptr && rebuiltEntry->markerAnim == 2 && rebuiltEntry->flags == 0x413, "and the other fields");
+    Recorder replayedCode;
+    void* rebuiltRoot = rebuiltEntry;
+    replayedCode.Record(&entryKind, &rebuiltRoot, 1, sets);
+    Check(strcmp(source.text.Data(), replayedCode.text.Data()) == 0, "the rebuilt entry records the same text");
+    g_rootKinds[0] = ROK_ORDERTABLEENTRY;
+    g_rootObjects[0] = rebuiltEntry;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the same function compares equal");
+    rebuiltEntry->notify = (NotifyFn)StopOrder;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed function: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "OrderTableEntry#1.notify") == 0, "another function is reported at its field");
+    Check(strstr(g_detail.Data(), "recorded orderNotify[") != nullptr && strstr(g_detail.Data(), "replayed orderNotify[") != nullptr, "by the indexes of both");
+    ReplayClearFailure();
+    rebuiltEntry->notify = (NotifyFn)FixtureOtherNotify;
+    replayedCode.Record(&entryKind, &rebuiltRoot, 1, sets);
+    printf("%s\n", ReplayFailure() == nullptr ? "no failure" : ReplayFailure());
+    Check(strstr(replayedCode.text.Data(), "notify orderNotify[?]\n") != nullptr && ReplayFailure() != nullptr && strstr(ReplayFailure(), "orderNotify") != nullptr, "a function of no entry is a failure that names the table");
+    Check(ReplayFailure() != nullptr && strstr(ReplayFailure(), "0x") == nullptr, "and writes no address");
+    ReplayClearFailure();
+    Check(!ReplayRestoreObjectField(*ReplayFindObjectField(ROK_ORDERTABLEENTRY, "notify"), rebuiltEntry, "orderNotify[9999]", g_objects, nullptr), "an index past the table is refused");
+    Check(!ReplayRestoreObjectField(*ReplayFindObjectField(ROK_ORDERTABLEENTRY, "notify"), rebuiltEntry, "other[1]", g_objects, nullptr), "and so is another table");
+}
 }
 
 int SelfTest(const char* file)
@@ -1859,6 +2060,7 @@ int SelfTest(const char* file)
     TableSelfTest();
     ArraySelfTest();
     FormSelfTest();
+    PolymorphicSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

@@ -2,7 +2,7 @@
 #define HARNESS_REPLAY_TYPES_H
 
 enum ReplayBase { RB_GAME, RB_SIM, RB_RNG };
-enum ReplayKind { RK_I32, RK_U32, RK_U16, RK_F32, RK_POINT16, RK_STRING, RK_WEAPON, RK_I16, RK_REF, RK_FLAGS, RK_U8, RK_F64, RK_BYTES, RK_EMBED, RK_UNITID, RK_RAWBYTES, RK_ARRAY };
+enum ReplayKind { RK_I32, RK_U32, RK_U16, RK_F32, RK_POINT16, RK_STRING, RK_WEAPON, RK_I16, RK_REF, RK_FLAGS, RK_U8, RK_F64, RK_BYTES, RK_EMBED, RK_UNITID, RK_RAWBYTES, RK_ARRAY, RK_CODE };
 enum { RT_ORDER = 0 };
 enum ReplayScope { RS_STATE, RS_INDEX, RS_VALUE };
 
@@ -50,6 +50,16 @@ struct ReplayObjectKind {
     unsigned char insideKind;
     unsigned insideOffset;
     const char* insideName;
+    const void* vtable;
+    const char* vtableName;
+    unsigned char polyFirst;
+    unsigned char polyCount;
+};
+
+struct ReplayCodeTable {
+    const char* name;
+    const void* const* entries;
+    unsigned count;
 };
 
 struct ReplayObjectField {

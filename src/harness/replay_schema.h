@@ -25,6 +25,13 @@
 #include "../network/player_info.h"
 #include "../orders/unit_motion.h"
 #include "../weapons/projectile.h"
+#include "../orders/order.h"
+#include "../orders/approach_areas.h"
+#include "../orders/path_order.h"
+#include "../orders/order_type_entry.h"
+#include "../orders/unit_orders.h"
+#include "../orders/vtol_orders.h"
+#include "../orders/order_list.h"
 #include "../state/sim_globals.h"
 #include "../state/block.h"
 #include "replay_types.h"
@@ -59,6 +66,76 @@
 #undef g_meteorScheduleGap
 #pragma push_macro("g_movementClasses")
 #undef g_movementClasses
+extern void (* const g_approachRadiusVtable[])();
+extern void (* const g_ringApproachVtable[])();
+extern void (* const g_pathOrderVtable[])();
+static const void* const kReplayCodeOrderNotify[] = {
+    (const void*)ReadyOrder,
+    (const void*)StandbyOrder,
+    (const void*)StandbyMineOrder,
+    (const void*)MoveGroundOrder,
+    (const void*)FollowGroundOrder,
+    (const void*)SuppressOrder,
+    (const void*)AttackChaseOrder,
+    (const void*)AttackKamikazeOrder,
+    (const void*)AttackSpecialOrder,
+    (const void*)ParkOrder,
+    (const void*)PatrolOrder,
+    (const void*)GroundUnloadOrder,
+    (const void*)TeleportOrder,
+    (const void*)MobileBuildOrder,
+    (const void*)HelpBuildOrder,
+    (const void*)RepairPatrolOrder,
+    (const void*)RepairUnitOrder,
+    (const void*)CaptureOrder,
+    (const void*)ResurrectOrder,
+    (const void*)ReclaimOrder,
+    (const void*)ReclaimUnitOrder,
+    (const void*)RepairUnitNoMoveOrder,
+    (const void*)VtolStandbyOrder,
+    (const void*)VtolMoveOrder,
+    (const void*)VtolLandingOrder,
+    (const void*)VtolPickupOrder,
+    (const void*)VtolUnloadOrder,
+    (const void*)VtolFollowOrder,
+    (const void*)VtolPatrolOrder,
+    (const void*)AirStrikeOrder,
+    (const void*)AirToAirOrder,
+    (const void*)AirToGroundOrder,
+    (const void*)AirToGroundHoverOrder,
+    (const void*)VtolMobileBuildOrder,
+    (const void*)VtolHelpBuildOrder,
+    (const void*)VtolRepairPatrolOrder,
+    (const void*)VtolRepairUnitOrder,
+    (const void*)VtolReclaimOrder,
+    (const void*)VtolReclaimUnitOrder,
+    (const void*)VtolEvadeOrder,
+    (const void*)VtolSeekAttackOrder,
+    (const void*)VtolSeekGuardOrder,
+    (const void*)VtolGetRepairedOrder,
+    (const void*)VtolLandIfCanOrder,
+    (const void*)StopOrder,
+    (const void*)AttackNoMoveOrder,
+    (const void*)ActivateOrder,
+    (const void*)DeactivateOrder,
+    (const void*)CloakOnOrder,
+    (const void*)CloakOffOrder,
+    (const void*)StandingMoveOrder,
+    (const void*)StandingFireOrder,
+    (const void*)BuildingBuildOrder,
+    (const void*)BuildWeaponOrder,
+    (const void*)SelfDestructOrder,
+    (const void*)ParalyzeOrder,
+    (const void*)GetBuiltOrder,
+    (const void*)BeCarriedOrder,
+    (const void*)MakeSelectableOrder,
+    (const void*)WaitOrder,
+    (const void*)WaitForAttackOrder,
+    (const void*)AttackUTypeOrder,
+    (const void*)GuardNoMoveOrder,
+    (const void*)SelfRepairOrder,
+    (const void*)QMoveQPatrolOrder,
+};
 
 static const ReplayField kReplayFields[] = {
     { "Game.ticks", 232007, 4, RB_GAME, RK_I32 },
@@ -199,28 +276,47 @@ enum ReplayObjectKindId {
     ROK_POINT16,
     ROK_MISSIONTYPE,
     ROK_ANGLES16,
+    ROK_ORDERFX,
+    ROK_APPROACHRADIUS,
+    ROK_RINGAPPROACH,
+    ROK_PATHORDER,
+    ROK_ORDER,
+    ROK_ORDERTABLEENTRY,
     ROK_COUNT
 };
 
 static const ReplayObjectKind kReplayObjectKinds[] = {
-    { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, "" },
-    { "Unit", sizeof(Unit), RS_STATE, 2, 0, 0, 0, "" },
-    { "UnitDef", sizeof(UnitDef), RS_STATE, RT_ORDER, 0, 0, 0, "" },
-    { "weapondef", sizeof(WeaponDef), RS_INDEX, RT_ORDER, 0, 0, 0, "" },
-    { "MeteorParams", sizeof(MeteorParams), RS_VALUE, RT_ORDER, 0, 0, 0, "" },
-    { "UnitResources", sizeof(UnitResources), RS_STATE, RT_ORDER, 1, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot" },
-    { "PlayerInfo", sizeof(PlayerInfo), RS_STATE, RT_ORDER, 0, 0, 0, "" },
-    { "Cell", sizeof(Cell), RS_STATE, RT_ORDER, 0, 0, 0, "" },
-    { "CobScript", sizeof(CobScript), RS_STATE, RT_ORDER, 0, 0, 0, "" },
-    { "UnitMotion", sizeof(UnitMotion), RS_STATE, RT_ORDER, 0, 0, 0, "" },
-    { "Vec3", sizeof(Vec3), RS_VALUE, RT_ORDER, 0, 0, 0, "" },
-    { "Projectile", sizeof(Projectile), RS_STATE, 3, 0, 0, 0, "" },
-    { "MovementClass", sizeof(MovementClass), RS_STATE, 4, 0, 0, 0, "" },
-    { "Point16", sizeof(Point16), RS_VALUE, RT_ORDER, 0, 0, 0, "" },
-    { "MissionType", sizeof(MissionType), RS_VALUE, RT_ORDER, 0, 0, 0, "" },
-    { "Angles16", sizeof(Angles16), RS_VALUE, RT_ORDER, 0, 0, 0, "" },
+    { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "Unit", sizeof(Unit), RS_STATE, 2, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "UnitDef", sizeof(UnitDef), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "weapondef", sizeof(WeaponDef), RS_INDEX, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "MeteorParams", sizeof(MeteorParams), RS_VALUE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "UnitResources", sizeof(UnitResources), RS_STATE, RT_ORDER, 1, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot", nullptr, "", 0, 0 },
+    { "PlayerInfo", sizeof(PlayerInfo), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "Cell", sizeof(Cell), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "CobScript", sizeof(CobScript), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "UnitMotion", sizeof(UnitMotion), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "Vec3", sizeof(Vec3), RS_VALUE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "Projectile", sizeof(Projectile), RS_STATE, 3, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "MovementClass", sizeof(MovementClass), RS_STATE, 4, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "Point16", sizeof(Point16), RS_VALUE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "MissionType", sizeof(MissionType), RS_VALUE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "Angles16", sizeof(Angles16), RS_VALUE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "OrderFx", sizeof(OrderFx), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 3 },
+    { "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, "", g_approachRadiusVtable, "g_approachRadiusVtable", 0, 0 },
+    { "RingApproach", sizeof(RingApproach), RS_STATE, RT_ORDER, 0, 0, 0, "", g_ringApproachVtable, "g_ringApproachVtable", 0, 0 },
+    { "PathOrder", sizeof(PathOrder), RS_STATE, RT_ORDER, 0, 0, 0, "", g_pathOrderVtable, "g_pathOrderVtable", 0, 0 },
+    { "Order", sizeof(Order), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
+    { "OrderTableEntry", sizeof(OrderTableEntry), RS_STATE, RT_ORDER, 0, 0, 0, "", nullptr, "", 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 16;
+static const unsigned kReplayObjectKindCount = 22;
+
+static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
+
+static const ReplayCodeTable kReplayCodeTables[] = {
+    { "orderNotify", kReplayCodeOrderNotify, 65 },
+};
+static const unsigned kReplayCodeTableCount = 1;
 
 static const ReplayObjectField kReplayObjectFields[] = {
     { "active", offsetof(Player, active), sizeof(((Player*)nullptr)->active), ROK_PLAYER, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
@@ -354,8 +450,27 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "bank", offsetof(Angles16, bank), sizeof(((Angles16*)nullptr)->bank), ROK_ANGLES16, RK_I16, 0, 0, 0, 0, 0, 0, 0 },
     { "heading", offsetof(Angles16, heading), sizeof(((Angles16*)nullptr)->heading), ROK_ANGLES16, RK_U16, 0, 0, 0, 0, 0, 0, 0 },
     { "pitch", offsetof(Angles16, pitch), sizeof(((Angles16*)nullptr)->pitch), ROK_ANGLES16, RK_I16, 0, 0, 0, 0, 0, 0, 0 },
+    { "source", offsetof(ApproachRadius, source), sizeof(((ApproachRadius*)nullptr)->source), ROK_APPROACHRADIUS, RK_REF, ROK_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "pos", offsetof(ApproachRadius, pos), sizeof(((ApproachRadius*)nullptr)->pos), ROK_APPROACHRADIUS, RK_POINT16, 0, 0, 0, 0, 0, 0, 0 },
+    { "radius", offsetof(ApproachRadius, radius), sizeof(((ApproachRadius*)nullptr)->radius), ROK_APPROACHRADIUS, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
+    { "radiusSq", offsetof(ApproachRadius, radiusSq), sizeof(((ApproachRadius*)nullptr)->radiusSq), ROK_APPROACHRADIUS, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
+    { "source", offsetof(RingApproach, source), sizeof(((RingApproach*)nullptr)->source), ROK_RINGAPPROACH, RK_REF, ROK_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "pos", offsetof(RingApproach, pos), sizeof(((RingApproach*)nullptr)->pos), ROK_RINGAPPROACH, RK_POINT16, 0, 0, 0, 0, 0, 0, 0 },
+    { "inner", offsetof(RingApproach, inner), sizeof(((RingApproach*)nullptr)->inner), ROK_RINGAPPROACH, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
+    { "outer", offsetof(RingApproach, outer), sizeof(((RingApproach*)nullptr)->outer), ROK_RINGAPPROACH, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
+    { "source", offsetof(PathOrder, source), sizeof(((PathOrder*)nullptr)->source), ROK_PATHORDER, RK_REF, ROK_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "approachRadius", offsetof(PathOrder, approachRadius), sizeof(((PathOrder*)nullptr)->approachRadius), ROK_PATHORDER, RK_I16, 0, 0, 0, 0, 0, 0, 0 },
+    { "altitude", offsetof(PathOrder, altitude), sizeof(((PathOrder*)nullptr)->altitude), ROK_PATHORDER, RK_I16, 0, 0, 0, 0, 0, 0, 0 },
+    { "heading", offsetof(PathOrder, heading), sizeof(((PathOrder*)nullptr)->heading), ROK_PATHORDER, RK_I16, 0, 0, 0, 0, 0, 0, 0 },
+    { "followOffset", offsetof(PathOrder, followOffset), sizeof(((PathOrder*)nullptr)->followOffset), ROK_PATHORDER, RK_I32, 0, 0, 0, 0, 0, 0, 0 },
+    { "state", offsetof(Order, state), sizeof(((Order*)nullptr)->state), ROK_ORDER, RK_U8, 0, 0, 0, 0, 0, 0, 0 },
+    { "attached", offsetof(Order, attached), sizeof(((Order*)nullptr)->attached), ROK_ORDER, RK_REF, ROK_ORDERFX, 0, 0, 0, 0, 0, 0 },
+    { "next", offsetof(Order, next), sizeof(((Order*)nullptr)->next), ROK_ORDER, RK_REF, ROK_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "notify", offsetof(OrderTableEntry, notify), sizeof(((OrderTableEntry*)nullptr)->notify), ROK_ORDERTABLEENTRY, RK_CODE, 0, 0, 0, 0, 0, 0, 0 },
+    { "markerAnim", offsetof(OrderTableEntry, markerAnim), sizeof(((OrderTableEntry*)nullptr)->markerAnim), ROK_ORDERTABLEENTRY, RK_U8, 0, 0, 0, 0, 0, 0, 0 },
+    { "flags", offsetof(OrderTableEntry, flags), sizeof(((OrderTableEntry*)nullptr)->flags), ROK_ORDERTABLEENTRY, RK_U32, 0, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 131;
+static const unsigned kReplayObjectFieldCount = 150;
 
 static const unsigned short kReplayReachFields[] = { 45, 49, 108, 109, 110, 36, 34, 37, 45, 50, 52, 79 };
 
@@ -487,6 +602,31 @@ static_assert(sizeof(((MissionType*)nullptr)->index) == 1, "MissionType::index h
 static_assert(sizeof(((Angles16*)nullptr)->bank) == 2, "Angles16::bank has the size the schema says");
 static_assert(sizeof(((Angles16*)nullptr)->heading) == 2, "Angles16::heading has the size the schema says");
 static_assert(sizeof(((Angles16*)nullptr)->pitch) == 2, "Angles16::pitch has the size the schema says");
+static_assert(sizeof(((ApproachRadius*)nullptr)->source) == 4, "ApproachRadius::source has the size the schema says");
+static_assert(sizeof(((ApproachRadius*)nullptr)->pos) == 4, "ApproachRadius::pos has the size the schema says");
+static_assert(sizeof(((ApproachRadius*)nullptr)->radius) == 4, "ApproachRadius::radius has the size the schema says");
+static_assert(sizeof(((ApproachRadius*)nullptr)->radiusSq) == 4, "ApproachRadius::radiusSq has the size the schema says");
+static_assert(sizeof(((RingApproach*)nullptr)->source) == 4, "RingApproach::source has the size the schema says");
+static_assert(sizeof(((RingApproach*)nullptr)->pos) == 4, "RingApproach::pos has the size the schema says");
+static_assert(sizeof(((RingApproach*)nullptr)->inner) == 4, "RingApproach::inner has the size the schema says");
+static_assert(sizeof(((RingApproach*)nullptr)->outer) == 4, "RingApproach::outer has the size the schema says");
+static_assert(sizeof(((PathOrder*)nullptr)->source) == 4, "PathOrder::source has the size the schema says");
+static_assert(sizeof(((PathOrder*)nullptr)->approachRadius) == 2, "PathOrder::approachRadius has the size the schema says");
+static_assert(sizeof(((PathOrder*)nullptr)->altitude) == 2, "PathOrder::altitude has the size the schema says");
+static_assert(sizeof(((PathOrder*)nullptr)->heading) == 2, "PathOrder::heading has the size the schema says");
+static_assert(sizeof(((PathOrder*)nullptr)->followOffset) == 4, "PathOrder::followOffset has the size the schema says");
+static_assert(sizeof(((Order*)nullptr)->state) == 1, "Order::state has the size the schema says");
+static_assert(sizeof(((Order*)nullptr)->attached) == 4, "Order::attached has the size the schema says");
+static_assert(sizeof(((Order*)nullptr)->next) == 4, "Order::next has the size the schema says");
+static_assert(sizeof(((OrderTableEntry*)nullptr)->notify) == sizeof(void*), "OrderTableEntry::notify is a code pointer");
+static_assert(sizeof(((OrderTableEntry*)nullptr)->markerAnim) == 1, "OrderTableEntry::markerAnim has the size the schema says");
+static_assert(sizeof(((OrderTableEntry*)nullptr)->flags) == 4, "OrderTableEntry::flags has the size the schema says");
+static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
+static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
+static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");
+static_assert(__is_polymorphic(ApproachRadius), "ApproachRadius has a vtable");
+static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");
+static_assert(__is_polymorphic(PathOrder), "PathOrder has a vtable");
 
 enum ReplaySubsystemId {
     SUB_WIND_METEORS,
@@ -1025,15 +1165,20 @@ static const unsigned short kReplayLosRadarRecordRadarMappedObjReads[] = { 31 };
 static const unsigned char kReplayLosRadarUpdateSensorRadarAndCloakReads[] = { 0 };
 static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakObjReads[] = { 0, 4, 5, 23, 25, 26, 29, 34, 35, 36, 37, 38, 47, 50, 51, 52 };
 static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakObjWrites[] = { 36 };
+static const unsigned short kReplayOrdersAppendOrderObjWrites[] = { 146 };
+static const unsigned short kReplayOrdersDeleteOrdersObjReads[] = { 146 };
 static const unsigned char kReplayOrdersGetOrderTypeReads[] = { 17 };
 static const unsigned short kReplayOrdersGetOrderTypeObjReads[] = { 26, 29 };
 static const unsigned short kReplayOrdersIssueAttackOrderObjReads[] = { 34, 36, 50, 51, 52 };
-static const unsigned short kReplayOrdersReattachFxToUnitObjReads[] = { 49 };
+static const unsigned short kReplayOrdersReattachFxToUnitObjReads[] = { 49, 145 };
+static const unsigned short kReplayOrdersAddBeCarriedOrderObjReads[] = { 146 };
 static const unsigned char kReplayOrdersRunOrdersReads[] = { 0 };
-static const unsigned short kReplayOrdersRunOrdersObjReads[] = { 0, 25, 34, 35, 48 };
-static const unsigned short kReplayOrdersRunOrdersObjWrites[] = { 48 };
+static const unsigned short kReplayOrdersRunOrdersObjReads[] = { 0, 25, 34, 35, 48, 144, 146, 147 };
+static const unsigned short kReplayOrdersRunOrdersObjWrites[] = { 48, 144 };
 static const unsigned char kReplayOrdersRunSecondaryOrdersReads[] = { 0, 33, 34, 35 };
 static const unsigned char kReplayOrdersRunSecondaryOrdersWrites[] = { 33, 34, 35 };
+static const unsigned short kReplayOrdersRunSecondaryOrdersObjReads[] = { 144, 146, 147 };
+static const unsigned short kReplayOrdersRunSecondaryOrdersObjWrites[] = { 144 };
 static const unsigned short kReplayOrdersLoadMotionObjReads[] = { 43 };
 static const unsigned short kReplayOrdersSaveMotionObjReads[] = { 43 };
 static const unsigned short kReplayOrdersUpdateMotionObjReads[] = { 34 };
@@ -1055,7 +1200,7 @@ static const unsigned short kReplayUnitsKillUnitsOfTypeObjReads[] = { 45 };
 static const unsigned short kReplayUnitsReloadUnitTypeObjReads[] = { 79 };
 static const unsigned short kReplayUnitsKillUnitObjReads[] = { 0, 23, 24, 25, 32, 33, 34, 35, 36, 42, 43, 47 };
 static const unsigned short kReplayUnitsKillUnitObjWrites[] = { 24 };
-static const unsigned short kReplayUnitsSaveUnitsObjReads[] = { 32, 34, 36, 37, 38, 39, 41, 42, 43, 46, 47, 48, 49, 53, 54, 55, 56, 58, 59, 60, 61, 63, 64, 65, 66 };
+static const unsigned short kReplayUnitsSaveUnitsObjReads[] = { 32, 34, 36, 37, 38, 39, 41, 42, 43, 46, 47, 48, 49, 53, 54, 55, 56, 58, 59, 60, 61, 63, 64, 65, 66, 146 };
 static const unsigned short kReplayUnitsSaveUnitsObjWrites[] = { 53, 54, 58, 59, 63, 64 };
 static const unsigned short kReplayUnitsLoadUnitObjReads[] = { 36, 41, 42, 43, 44, 49, 53, 54, 55, 56, 58, 59, 60, 61, 63, 64, 65, 66 };
 static const unsigned short kReplayUnitsLoadUnitObjWrites[] = { 32, 36, 37, 38, 39, 44, 46, 48, 53, 54, 58, 59, 63, 64 };
@@ -1267,17 +1412,17 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "UpdateSensorRadarAndCloak", SUB_LOS_RADAR, kReplayLosRadarUpdateSensorRadarAndCloakReads, 1, nullptr, 0, kReplayLosRadarUpdateSensorRadarAndCloakObjReads, 16, kReplayLosRadarUpdateSensorRadarAndCloakObjWrites, 1, ROK_PLAYER + 1 },
     { "AiSearchGoalSetWaypoints", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "OrderFxAddFlags", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "AppendOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
+    { "AppendOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, kReplayOrdersAppendOrderObjWrites, 1, 0 },
     { "AddOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "DeleteOrders", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
+    { "DeleteOrders", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersDeleteOrdersObjReads, 1, nullptr, 0, 0 },
     { "GetOrderFlags", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "GetOrderType", SUB_ORDERS, kReplayOrdersGetOrderTypeReads, 1, nullptr, 0, kReplayOrdersGetOrderTypeObjReads, 2, nullptr, 0, 0 },
     { "IssueAttackOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersIssueAttackOrderObjReads, 5, nullptr, 0, 0 },
-    { "ReattachFxToUnit", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersReattachFxToUnitObjReads, 1, nullptr, 0, 0 },
+    { "ReattachFxToUnit", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersReattachFxToUnitObjReads, 2, nullptr, 0, 0 },
     { "SerializeOrderToSave", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "AddBeCarriedOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "RunOrders", SUB_ORDERS, kReplayOrdersRunOrdersReads, 1, nullptr, 0, kReplayOrdersRunOrdersObjReads, 5, kReplayOrdersRunOrdersObjWrites, 1, 0 },
-    { "RunSecondaryOrders", SUB_ORDERS, kReplayOrdersRunSecondaryOrdersReads, 4, kReplayOrdersRunSecondaryOrdersWrites, 3, nullptr, 0, nullptr, 0, 0 },
+    { "AddBeCarriedOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersAddBeCarriedOrderObjReads, 1, nullptr, 0, 0 },
+    { "RunOrders", SUB_ORDERS, kReplayOrdersRunOrdersReads, 1, nullptr, 0, kReplayOrdersRunOrdersObjReads, 8, kReplayOrdersRunOrdersObjWrites, 2, 0 },
+    { "RunSecondaryOrders", SUB_ORDERS, kReplayOrdersRunSecondaryOrdersReads, 4, kReplayOrdersRunSecondaryOrdersWrites, 3, kReplayOrdersRunSecondaryOrdersObjReads, 3, kReplayOrdersRunSecondaryOrdersObjWrites, 1, 0 },
     { "DestroyMotionObject", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
     { "LoadMotion", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersLoadMotionObjReads, 1, nullptr, 0, 0 },
     { "SaveMotion", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersSaveMotionObjReads, 1, nullptr, 0, 0 },
@@ -1329,7 +1474,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "ReloadUnitType", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsReloadUnitTypeObjReads, 1, nullptr, 0, 0 },
     { "KillUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsKillUnitObjReads, 12, kReplayUnitsKillUnitObjWrites, 1, 0 },
     { "LoadUnits", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },
-    { "SaveUnits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSaveUnitsObjReads, 25, kReplayUnitsSaveUnitsObjWrites, 6, 0 },
+    { "SaveUnits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSaveUnitsObjReads, 26, kReplayUnitsSaveUnitsObjWrites, 6, 0 },
     { "LoadUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsLoadUnitObjReads, 18, kReplayUnitsLoadUnitObjWrites, 14, 0 },
     { "CreateUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsCreateUnitObjReads, 7, kReplayUnitsCreateUnitObjWrites, 2, 0 },
     { "FindUnitType", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },

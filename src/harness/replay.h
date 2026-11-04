@@ -82,6 +82,6 @@ struct ReplayImport {
 
 int ReplayConfigure(const char* value, char* error, int size);
 void ReplayInstall();
-int ReplayWrite();
+int ReplayWrite(char* error, int size);
 
 #endif

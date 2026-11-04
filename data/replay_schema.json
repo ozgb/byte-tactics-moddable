@@ -107,7 +107,14 @@
    "../map/cell.h",
    "../network/player_info.h",
    "../orders/unit_motion.h",
-   "../weapons/projectile.h"
+   "../weapons/projectile.h",
+   "../orders/order.h",
+   "../orders/approach_areas.h",
+   "../orders/path_order.h",
+   "../orders/order_type_entry.h",
+   "../orders/unit_orders.h",
+   "../orders/vtol_orders.h",
+   "../orders/order_list.h"
   ],
   "objects": {
    "Player": {
@@ -905,6 +912,132 @@
      {
       "name": "pitch",
       "kind": "i16"
+     }
+    ]
+   },
+   "OrderFx": {
+    "type": "OrderFx",
+    "scope": "state",
+    "kinds": [
+     "ApproachRadius",
+     "RingApproach",
+     "PathOrder"
+    ],
+    "fields": []
+   },
+   "ApproachRadius": {
+    "type": "ApproachRadius",
+    "scope": "state",
+    "vtable": "g_approachRadiusVtable",
+    "fields": [
+     {
+      "name": "source",
+      "kind": "ref",
+      "target": "Order"
+     },
+     {
+      "name": "pos",
+      "kind": "point16"
+     },
+     {
+      "name": "radius",
+      "kind": "i32"
+     },
+     {
+      "name": "radiusSq",
+      "kind": "i32"
+     }
+    ]
+   },
+   "RingApproach": {
+    "type": "RingApproach",
+    "scope": "state",
+    "vtable": "g_ringApproachVtable",
+    "fields": [
+     {
+      "name": "source",
+      "kind": "ref",
+      "target": "Order"
+     },
+     {
+      "name": "pos",
+      "kind": "point16"
+     },
+     {
+      "name": "inner",
+      "kind": "i32"
+     },
+     {
+      "name": "outer",
+      "kind": "i32"
+     }
+    ]
+   },
+   "PathOrder": {
+    "type": "PathOrder",
+    "scope": "state",
+    "vtable": "g_pathOrderVtable",
+    "fields": [
+     {
+      "name": "source",
+      "kind": "ref",
+      "target": "Order"
+     },
+     {
+      "name": "approachRadius",
+      "kind": "i16"
+     },
+     {
+      "name": "altitude",
+      "kind": "i16"
+     },
+     {
+      "name": "heading",
+      "kind": "i16"
+     },
+     {
+      "name": "followOffset",
+      "kind": "i32"
+     }
+    ]
+   },
+   "Order": {
+    "type": "Order",
+    "scope": "state",
+    "fields": [
+     {
+      "name": "state",
+      "kind": "u8"
+     },
+     {
+      "name": "attached",
+      "kind": "ref",
+      "target": "OrderFx",
+      "poly": "OrderFx"
+     },
+     {
+      "name": "next",
+      "kind": "ref",
+      "target": "Order"
+     }
+    ]
+   },
+   "OrderTableEntry": {
+    "type": "OrderTableEntry",
+    "scope": "state",
+    "fields": [
+     {
+      "name": "notify",
+      "kind": "code",
+      "table": "orderNotify"
+     },
+     {
+      "name": "markerAnim",
+      "kind": "u8"
+     },
+     {
+      "name": "flags",
+      "kind": "u32"
      }
     ]
    }
@@ -2172,7 +2305,84 @@
     ],
     "result": "int"
    }
-  ]
+  ],
+  "code_tables": {
+   "orderNotify": {
+    "entries": [
+     "ReadyOrder",
+     "StandbyOrder",
+     "StandbyMineOrder",
+     "MoveGroundOrder",
+     "FollowGroundOrder",
+     "SuppressOrder",
+     "AttackChaseOrder",
+     "AttackKamikazeOrder",
+     "AttackSpecialOrder",
+     "ParkOrder",
+     "PatrolOrder",
+     "GroundUnloadOrder",
+     "TeleportOrder",
+     "MobileBuildOrder",
+     "HelpBuildOrder",
+     "RepairPatrolOrder",
+     "RepairUnitOrder",
+     "CaptureOrder",
+     "ResurrectOrder",
+     "ReclaimOrder",
+     "ReclaimUnitOrder",
+     "RepairUnitNoMoveOrder",
+     "VtolStandbyOrder",
+     "VtolMoveOrder",
+     "VtolLandingOrder",
+     "VtolPickupOrder",
+     "VtolUnloadOrder",
+     "VtolFollowOrder",
+     "VtolPatrolOrder",
+     "AirStrikeOrder",
+     "AirToAirOrder",
+     "AirToGroundOrder",
+     "AirToGroundHoverOrder",
+     "VtolMobileBuildOrder",
+     "VtolHelpBuildOrder",
+     "VtolRepairPatrolOrder",
+     "VtolRepairUnitOrder",
+     "VtolReclaimOrder",
+     "VtolReclaimUnitOrder",
+     "VtolEvadeOrder",
+     "VtolSeekAttackOrder",
+     "VtolSeekGuardOrder",
+     "VtolGetRepairedOrder",
+     "VtolLandIfCanOrder",
+     "StopOrder",
+     "AttackNoMoveOrder",
+     "ActivateOrder",
+     "DeactivateOrder",
+     "CloakOnOrder",
+     "CloakOffOrder",
+     "StandingMoveOrder",
+     "StandingFireOrder",
+     "BuildingBuildOrder",
+     "BuildWeaponOrder",
+     "SelfDestructOrder",
+     "ParalyzeOrder",
+     "GetBuiltOrder",
+     "BeCarriedOrder",
+     "MakeSelectableOrder",
+     "WaitOrder",
+     "WaitForAttackOrder",
+     "AttackUTypeOrder",
+     "GuardNoMoveOrder",
+     "SelfRepairOrder",
+     "QMoveQPatrolOrder"
+    ],
+    "headers": [
+     "src/orders/unit_orders.h",
+     "src/orders/vtol_orders.h",
+     "src/orders/order_list.h"
+    ],
+    "fill": "orders.RegisterAllOrderTypes"
+   }
+  }
  },
  "fields": [
   {"name": "Game.ticks", "base": "game", "size": 4, "kind": "i32"},
@@ -2228,7 +2438,13 @@
   {"name": "MovementClass", "type": "MovementClass", "scope": "state", "table": {"base": "sim", "member": "g_movementClasses.entries", "count": 32}, "inside": null, "fields": [{"name": "footprintX", "kind": "i16"}, {"name": "maxSlope", "kind": "u8"}, {"name": "width", "kind": "u32"}, {"name": "height", "kind": "u32"}, {"name": "cells", "kind": "array", "elem": "u32", "ref": true, "length": "width*(height>>4)", "array": 3}, {"name": "lastTick", "kind": "u32"}]},
   {"name": "Point16", "type": "Point16", "scope": "value", "table": null, "inside": null, "fields": [{"name": "x", "kind": "i16"}, {"name": "y", "kind": "i16"}]},
   {"name": "MissionType", "type": "MissionType", "scope": "value", "table": null, "inside": null, "fields": [{"name": "index", "kind": "u8"}]},
-  {"name": "Angles16", "type": "Angles16", "scope": "value", "table": null, "inside": null, "fields": [{"name": "bank", "kind": "i16"}, {"name": "heading", "kind": "u16"}, {"name": "pitch", "kind": "i16"}]}
+  {"name": "Angles16", "type": "Angles16", "scope": "value", "table": null, "inside": null, "fields": [{"name": "bank", "kind": "i16"}, {"name": "heading", "kind": "u16"}, {"name": "pitch", "kind": "i16"}]},
+  {"name": "OrderFx", "type": "OrderFx", "scope": "state", "table": null, "inside": null, "kinds": ["ApproachRadius", "RingApproach", "PathOrder"], "fields": []},
+  {"name": "ApproachRadius", "type": "ApproachRadius", "scope": "state", "table": null, "inside": null, "vtable": "g_approachRadiusVtable", "fields": [{"name": "source", "kind": "ref", "target": "Order"}, {"name": "pos", "kind": "point16"}, {"name": "radius", "kind": "i32"}, {"name": "radiusSq", "kind": "i32"}]},
+  {"name": "RingApproach", "type": "RingApproach", "scope": "state", "table": null, "inside": null, "vtable": "g_ringApproachVtable", "fields": [{"name": "source", "kind": "ref", "target": "Order"}, {"name": "pos", "kind": "point16"}, {"name": "inner", "kind": "i32"}, {"name": "outer", "kind": "i32"}]},
+  {"name": "PathOrder", "type": "PathOrder", "scope": "state", "table": null, "inside": null, "vtable": "g_pathOrderVtable", "fields": [{"name": "source", "kind": "ref", "target": "Order"}, {"name": "approachRadius", "kind": "i16"}, {"name": "altitude", "kind": "i16"}, {"name": "heading", "kind": "i16"}, {"name": "followOffset", "kind": "i32"}]},
+  {"name": "Order", "type": "Order", "scope": "state", "table": null, "inside": null, "fields": [{"name": "state", "kind": "u8"}, {"name": "attached", "kind": "ref", "target": "OrderFx", "poly": "OrderFx"}, {"name": "next", "kind": "ref", "target": "Order"}]},
+  {"name": "OrderTableEntry", "type": "OrderTableEntry", "scope": "state", "table": null, "inside": null, "fields": [{"name": "notify", "kind": "code", "table": "orderNotify", "codeTable": 0}, {"name": "markerAnim", "kind": "u8"}, {"name": "flags", "kind": "u32"}]}
  ],
  "subsystems": {
   "wind_meteors": {
@@ -2289,7 +2505,7 @@
    }
   },
   "ai": {
-   "header": {"interface": "interfaces/ai.h", "struct": "AiSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 20, "ruleless": 4, "unresolvedSlots": ["SquadManagerTickIfActive", "SquadManagerDeleteTimers", "CreateSquadManager"], "unannotatedArgs": ["HasReadyUnitInRange(pos)", "IsPointVisible(pos)", "MarkOwnerNetDirtyFromDamageSplit(self)", "DumpPlayerAI(file)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "SquadManagerTickIfActive(self)", "SquadManagerDeleteTimers(self)", "CmdPlan(args)", "CmdWeight(args)", "CmdLimit(args)"]}},
+   "header": {"interface": "interfaces/ai.h", "struct": "AiSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 21, "ruleless": 4, "unresolvedSlots": ["SquadManagerTickIfActive", "SquadManagerDeleteTimers", "CreateSquadManager"], "unannotatedArgs": ["HasReadyUnitInRange(pos)", "IsPointVisible(pos)", "MarkOwnerNetDirtyFromDamageSplit(self)", "DumpPlayerAI(file)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "SquadManagerTickIfActive(self)", "SquadManagerDeleteTimers(self)", "CmdPlan(args)", "CmdWeight(args)", "CmdLimit(args)"]}},
    "slots": {
     "GetVisibleEnemiesInRadius": {"conv": "__stdcall", "ret": "void", "functions": ["GetVisibleEnemiesInRadius"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}, {"name": "radius", "type": "int", "line": "radius", "mode": "scalar"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}, {"name": "out", "type": "std::vector<Unit*, std::allocator<Unit*> >*", "line": "out", "mode": "units", "dir": "out", "kind": "Unit", "reach": ["Unit.flags", "Unit.def", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.posX", "Unit.posZ", "UnitDef.flags1"], "depth": 2, "reachFirst": 5, "reachCount": 7}], "result": null, "native": "GetVisibleEnemiesInRadius"},
     "HasReadyUnitInRange": {"conv": "__stdcall", "ret": "bool", "functions": ["HasReadyUnitInRange"], "reads": [], "writes": [], "objectReads": ["Unit.flags"], "objectWrites": [], "allOf": null, "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}], "result": {"type": "bool", "mode": "scalar"}, "native": "HasReadyUnitInRange"},
@@ -2396,21 +2612,21 @@
    }
   },
   "orders": {
-   "header": {"interface": "interfaces/orders.h", "struct": "OrdersSeam", "version": [1, 9], "status": "pending", "imports": [], "pending": {"untracked": 16, "ruleless": 4, "unresolvedSlots": ["AiSearchGoalSetWaypoints", "OrderFxAddFlags", "SerializeOrderToSave", "DestroyMotionObject", "NewUnitMotion", "LoadOrder", "MissionTypeFromName", "NewOrder", "OrderFxIsGoal", "OrderFxFillGoalCells", "OrderFxApproxDist", "UnitMotionClaimRepath"], "unannotatedArgs": ["AiSearchGoalSetWaypoints(self)", "AiSearchGoalSetWaypoints(points)", "OrderFxAddFlags(self)", "AppendOrder(node)", "AddOrder(kind)", "AddOrder(pos)", "GetOrderType(pos)", "GetOrderType result", "ReattachFxToUnit(order)", "SerializeOrderToSave(order)", "LoadOrder result", "MissionTypeFromName result", "NewOrder(kind)", "NewOrder(pos)", "NewOrder result", "OrderFxIsGoal(self)", "OrderFxFillGoalCells(self)", "OrderFxFillGoalCells(goals)", "OrderFxApproxDist(self)", "UnitMotionClaimRepath result"]}},
+   "header": {"interface": "interfaces/orders.h", "struct": "OrdersSeam", "version": [1, 9], "status": "pending", "imports": [], "pending": {"untracked": 21, "ruleless": 4, "unresolvedSlots": ["AiSearchGoalSetWaypoints", "OrderFxAddFlags", "SerializeOrderToSave", "DestroyMotionObject", "NewUnitMotion", "LoadOrder", "MissionTypeFromName", "NewOrder", "OrderFxIsGoal", "OrderFxFillGoalCells", "OrderFxApproxDist", "UnitMotionClaimRepath"], "unannotatedArgs": ["AiSearchGoalSetWaypoints(self)", "AiSearchGoalSetWaypoints(points)", "AddOrder(kind)", "AddOrder(pos)", "GetOrderType(pos)", "GetOrderType result", "MissionTypeFromName result", "NewOrder(kind)", "NewOrder(pos)", "OrderFxFillGoalCells(goals)", "UnitMotionClaimRepath result"]}},
    "slots": {
     "AiSearchGoalSetWaypoints": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "AiSearchGoal*", "line": "self", "mode": "pending"}, {"name": "points", "type": "Point16*", "line": "points", "mode": "pending"}, {"name": "count", "type": "int", "line": "count", "mode": "scalar"}], "result": null, "native": "AiSearchGoalSetWaypoints"},
-    "OrderFxAddFlags": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "OrderFx*", "line": "self", "mode": "pending"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}], "result": null, "native": "OrderFxAddFlags"},
-    "AppendOrder": {"conv": "__stdcall", "ret": "void", "functions": ["AppendOrder"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "owner", "type": "Unit*", "line": "owner", "mode": "object", "kind": "Unit"}, {"name": "node", "type": "Order*", "line": "node", "mode": "pending"}], "result": null, "native": "AppendOrder"},
+    "OrderFxAddFlags": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "OrderFx*", "line": "self", "mode": "object", "kind": "OrderFx", "poly": "OrderFx"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}], "result": null, "native": "OrderFxAddFlags"},
+    "AppendOrder": {"conv": "__stdcall", "ret": "void", "functions": ["AppendOrder"], "reads": [], "writes": [], "objectReads": [], "objectWrites": ["Order.next"], "allOf": null, "args": [{"name": "owner", "type": "Unit*", "line": "owner", "mode": "object", "kind": "Unit"}, {"name": "node", "type": "Order*", "line": "node", "mode": "object", "kind": "Order"}], "result": null, "native": "AppendOrder"},
     "AddOrder": {"conv": "__stdcall", "ret": "void", "functions": ["AddOrder"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "kind", "type": "MissionType", "line": "kind", "mode": "pending"}, {"name": "remove", "type": "int", "line": "remove", "mode": "scalar"}, {"name": "owner", "type": "Unit*", "line": "owner", "mode": "object", "kind": "Unit"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}, {"name": "param_6", "type": "int", "line": "param_6", "mode": "scalar"}, {"name": "param_7", "type": "int", "line": "param_7", "mode": "scalar"}], "result": null, "native": "AddOrder"},
-    "DeleteOrders": {"conv": "__stdcall", "ret": "void", "functions": ["DeleteOrders"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "owner", "type": "Unit*", "line": "owner", "mode": "object", "kind": "Unit"}, {"name": "all", "type": "int", "line": "all", "mode": "scalar"}], "result": null, "native": "DeleteOrders"},
+    "DeleteOrders": {"conv": "__stdcall", "ret": "void", "functions": ["DeleteOrders"], "reads": [], "writes": [], "objectReads": ["Order.next"], "objectWrites": [], "allOf": null, "args": [{"name": "owner", "type": "Unit*", "line": "owner", "mode": "object", "kind": "Unit"}, {"name": "all", "type": "int", "line": "all", "mode": "scalar"}], "result": null, "native": "DeleteOrders"},
     "GetOrderFlags": {"conv": "__stdcall", "ret": "int", "functions": ["GetOrderFlags"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetOrderFlags"},
     "GetOrderType": {"conv": "__stdcall", "ret": "MissionType", "functions": ["GetOrderType"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": ["Player.index", "Player.allied"], "objectWrites": [], "allOf": null, "args": [{"name": "mode", "type": "unsigned char", "line": "mode", "mode": "scalar"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}], "result": {"type": "MissionType", "mode": "pending"}, "native": "GetOrderType"},
     "IssueAttackOrder": {"conv": "__stdcall", "ret": "int", "functions": ["IssueAttackOrder"], "reads": [], "writes": [], "objectReads": ["Unit.def", "Unit.flags", "Unit.posX", "Unit.posY", "Unit.posZ"], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}, {"name": "param_3", "type": "int", "line": "param_3", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "IssueAttackOrder"},
-    "ReattachFxToUnit": {"conv": "__fastcall", "ret": "void", "functions": ["Order::ReattachFxToUnit"], "reads": [], "writes": [], "objectReads": ["Unit.motion"], "objectWrites": [], "allOf": null, "args": [{"name": "order", "type": "Order*", "line": "order", "mode": "pending"}], "result": null, "native": "ReattachFxToUnit"},
-    "SerializeOrderToSave": {"conv": "__fastcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "order", "type": "Order*", "line": "order", "mode": "pending"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "SerializeOrderToSave"},
-    "AddBeCarriedOrder": {"conv": "__stdcall", "ret": "void", "functions": ["AddBeCarriedOrder"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "AddBeCarriedOrder"},
-    "RunOrders": {"conv": "__stdcall", "ret": "void", "functions": ["RunOrders"], "reads": ["Game.ticks"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.netDirtyFlags"], "objectWrites": ["Unit.netDirtyFlags"], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "RunOrders"},
-    "RunSecondaryOrders": {"conv": "__stdcall", "ret": "void", "functions": ["RunSecondaryOrders"], "reads": ["Game.ticks", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "RunSecondaryOrders"},
+    "ReattachFxToUnit": {"conv": "__fastcall", "ret": "void", "functions": ["Order::ReattachFxToUnit"], "reads": [], "writes": [], "objectReads": ["Unit.motion", "Order.attached"], "objectWrites": [], "allOf": null, "args": [{"name": "order", "type": "Order*", "line": "order", "mode": "object", "kind": "Order"}], "result": null, "native": "ReattachFxToUnit"},
+    "SerializeOrderToSave": {"conv": "__fastcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "order", "type": "Order*", "line": "order", "mode": "object", "kind": "Order"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "SerializeOrderToSave"},
+    "AddBeCarriedOrder": {"conv": "__stdcall", "ret": "void", "functions": ["AddBeCarriedOrder"], "reads": [], "writes": [], "objectReads": ["Order.next"], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "AddBeCarriedOrder"},
+    "RunOrders": {"conv": "__stdcall", "ret": "void", "functions": ["RunOrders"], "reads": ["Game.ticks"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.netDirtyFlags", "Order.state", "Order.next", "OrderTableEntry.notify"], "objectWrites": ["Unit.netDirtyFlags", "Order.state"], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "RunOrders"},
+    "RunSecondaryOrders": {"conv": "__stdcall", "ret": "void", "functions": ["RunSecondaryOrders"], "reads": ["Game.ticks", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Order.state", "Order.next", "OrderTableEntry.notify"], "objectWrites": ["Order.state"], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "RunSecondaryOrders"},
     "DestroyMotionObject": {"conv": "__fastcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "motion", "type": "UnitMotion*", "line": "motion", "mode": "object", "kind": "UnitMotion"}], "result": null, "native": "DestroyMotionObject"},
     "LoadMotion": {"conv": "__fastcall", "ret": "void", "functions": ["UnitMotion::LoadMotion"], "reads": [], "writes": [], "objectReads": ["Unit.id"], "objectWrites": [], "allOf": null, "args": [{"name": "motion", "type": "UnitMotion*", "line": "motion", "mode": "object", "kind": "UnitMotion"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "LoadMotion"},
     "SaveMotion": {"conv": "__fastcall", "ret": "void", "functions": ["UnitMotion::SaveMotion"], "reads": [], "writes": [], "objectReads": ["Unit.id"], "objectWrites": [], "allOf": null, "args": [{"name": "motion", "type": "UnitMotion*", "line": "motion", "mode": "object", "kind": "UnitMotion"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "SaveMotion"},
@@ -2420,18 +2636,18 @@
     "CreatePathfinder": {"conv": "__stdcall", "ret": "void", "functions": ["CreatePathfinder"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [], "result": null, "native": "CreatePathfinder"},
     "DestroyPathfinder": {"conv": "__stdcall", "ret": "void", "functions": ["DestroyPathfinder"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [], "result": null, "native": "DestroyPathfinder"},
     "NewUnitMotion": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "NewUnitMotion"},
-    "LoadOrder": {"conv": "__stdcall", "ret": "Order*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "Order*", "mode": "pending"}, "native": "LoadOrder"},
+    "LoadOrder": {"conv": "__stdcall", "ret": "Order*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "Order*", "mode": "object", "kind": "Order"}, "native": "LoadOrder"},
     "MissionTypeFromName": {"conv": "__stdcall", "ret": "MissionType", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "MissionType", "mode": "pending"}, "native": "MissionTypeFromName"},
-    "NewOrder": {"conv": "__stdcall", "ret": "Order*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "kind", "type": "MissionType", "line": "kind", "mode": "pending"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}, {"name": "pos", "type": "void*", "line": "pos", "mode": "pending"}, {"name": "a", "type": "int", "line": "a", "mode": "scalar"}, {"name": "b", "type": "int", "line": "b", "mode": "scalar"}, {"name": "c", "type": "int", "line": "c", "mode": "scalar"}], "result": {"type": "Order*", "mode": "pending"}, "native": "NewOrder"},
+    "NewOrder": {"conv": "__stdcall", "ret": "Order*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "kind", "type": "MissionType", "line": "kind", "mode": "pending"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}, {"name": "pos", "type": "void*", "line": "pos", "mode": "pending"}, {"name": "a", "type": "int", "line": "a", "mode": "scalar"}, {"name": "b", "type": "int", "line": "b", "mode": "scalar"}, {"name": "c", "type": "int", "line": "c", "mode": "scalar"}], "result": {"type": "Order*", "mode": "object", "kind": "Order"}, "native": "NewOrder"},
     "QueueBuildOrder": {"conv": "__stdcall", "ret": "void", "functions": ["QueueBuildOrder"], "reads": [], "writes": [], "objectReads": ["Unit.motion"], "objectWrites": [], "allOf": null, "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "count", "type": "int", "line": "count", "mode": "scalar"}], "result": null, "native": "QueueBuildOrder"},
-    "OrderFxIsGoal": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "OrderFx*", "line": "self", "mode": "pending"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "OrderFxIsGoal"},
-    "OrderFxFillGoalCells": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "OrderFx*", "line": "self", "mode": "pending"}, {"name": "goals", "type": "std::vector<Point16, std::allocator<Point16> >*", "line": "goals", "mode": "pending"}], "result": null, "native": "OrderFxFillGoalCells"},
-    "OrderFxApproxDist": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "OrderFx*", "line": "self", "mode": "pending"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "OrderFxApproxDist"},
+    "OrderFxIsGoal": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "OrderFx*", "line": "self", "mode": "object", "kind": "OrderFx", "poly": "OrderFx"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "OrderFxIsGoal"},
+    "OrderFxFillGoalCells": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "OrderFx*", "line": "self", "mode": "object", "kind": "OrderFx", "poly": "OrderFx"}, {"name": "goals", "type": "std::vector<Point16, std::allocator<Point16> >*", "line": "goals", "mode": "pending"}], "result": null, "native": "OrderFxFillGoalCells"},
+    "OrderFxApproxDist": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "self", "type": "OrderFx*", "line": "self", "mode": "object", "kind": "OrderFx", "poly": "OrderFx"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "OrderFxApproxDist"},
     "UnitMotionClaimRepath": {"conv": "__stdcall", "ret": "AiSearchGoal*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "motion", "type": "UnitMotion*", "line": "motion", "mode": "object", "kind": "UnitMotion"}], "result": {"type": "AiSearchGoal*", "mode": "pending"}, "native": "UnitMotionClaimRepath"}
    }
   },
   "units": {
-   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [1, 7], "status": "pending", "imports": [], "pending": {"untracked": 88, "ruleless": 30, "unresolvedSlots": ["MovementClassGet", "MovementClassInBounds", "UnitTypeSetAddTypeOrCategory", "UnitRefUnlink"], "unannotatedArgs": ["StartScriptWithArgs(callback)", "StartScript(callback)", "QueryScript(p2)", "QueryScript(p3)", "QueryScript(p4)", "QueryScript(p5)", "GetAimFromPosition(out)", "UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "GetNanoPiecePosition(out)", "GetPieceAngles result", "UnitRefUnlink(ref)", "StartScriptWithArgsByIndex(callback)", "CreateObjectState(model)", "CreateObjectState result", "FreeObjectState(state)", "UpdateObjectState(unit)"]}},
+   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [1, 7], "status": "pending", "imports": [], "pending": {"untracked": 89, "ruleless": 30, "unresolvedSlots": ["MovementClassGet", "MovementClassInBounds", "UnitTypeSetAddTypeOrCategory", "UnitRefUnlink"], "unannotatedArgs": ["StartScriptWithArgs(callback)", "StartScript(callback)", "QueryScript(p2)", "QueryScript(p3)", "QueryScript(p4)", "QueryScript(p5)", "GetAimFromPosition(out)", "UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "GetNanoPiecePosition(out)", "GetPieceAngles result", "UnitRefUnlink(ref)", "StartScriptWithArgsByIndex(callback)", "CreateObjectState(model)", "CreateObjectState result", "FreeObjectState(state)", "UpdateObjectState(unit)"]}},
    "slots": {
     "UpdateAllUnits": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateAllUnits"], "reads": ["Game.ticks", "Game.flags_2a44", "Game.seaLevel"], "writes": [], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.type", "Player.index", "Unit.health", "Unit.buildLeft", "Unit.def", "Unit.player", "Unit.script", "Unit.unitDefIndex", "Unit.motion"], "objectWrites": [], "allOf": "Player", "args": [], "result": null, "native": "UpdateAllUnits"},
     "GetGroundHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetGroundHeight"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos", "axes": "xz"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetGroundHeight"},
@@ -2467,7 +2683,7 @@
     "ReloadUnitType": {"conv": "__stdcall", "ret": "void", "functions": ["ReloadUnitType"], "reads": [], "writes": [], "objectReads": ["UnitDef.flags1"], "objectWrites": [], "allOf": null, "args": [{"name": "id", "type": "unsigned short", "line": "id", "mode": "scalar"}], "result": null, "native": "ReloadUnitType"},
     "KillUnit": {"conv": "__stdcall", "ret": "void", "functions": ["KillUnit"], "reads": [], "writes": [], "objectReads": ["Player.active", "Player.info", "Player.flags", "Player.type", "Unit.health", "Unit.buildLeft", "Unit.def", "Unit.player", "Unit.flags", "Unit.script", "Unit.id", "Unit.playerIndex"], "objectWrites": ["Player.flags"], "allOf": null, "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "cause", "type": "int", "line": "cause", "mode": "scalar"}], "result": null, "native": "KillUnit"},
     "LoadUnits": {"conv": "__stdcall", "ret": "void", "functions": ["LoadUnits"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "LoadUnits"},
-    "SaveUnits": {"conv": "__stdcall", "ret": "void", "functions": ["SaveUnits"], "reads": [], "writes": [], "objectReads": ["Unit.health", "Unit.def", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.extraction", "Unit.footprint", "Unit.script", "Unit.id", "Unit.killCount", "Unit.playerIndex", "Unit.netDirtyFlags", "Unit.motion", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": null, "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "SaveUnits"},
+    "SaveUnits": {"conv": "__stdcall", "ret": "void", "functions": ["SaveUnits"], "reads": [], "writes": [], "objectReads": ["Unit.health", "Unit.def", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.extraction", "Unit.footprint", "Unit.script", "Unit.id", "Unit.killCount", "Unit.playerIndex", "Unit.netDirtyFlags", "Unit.motion", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Order.next"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": null, "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "SaveUnits"},
     "LoadUnit": {"conv": "__stdcall", "ret": "Unit*", "functions": ["LoadUnit"], "reads": [], "writes": [], "objectReads": ["Unit.flags", "Unit.footprint", "Unit.script", "Unit.id", "Unit.resourceSlot", "Unit.motion", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags"], "objectWrites": ["Unit.health", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.extraction", "Unit.resourceSlot", "Unit.killCount", "Unit.netDirtyFlags", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": null, "args": [{"name": "id", "type": "unsigned short", "line": "id", "mode": "scalar"}, {"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "LoadUnit"},
     "CreateUnit": {"conv": "__stdcall", "ret": "Unit*", "functions": ["CreateUnit"], "reads": [], "writes": [], "objectReads": ["Player.unitsBegin", "Player.unitsEnd", "Player.unitCount", "Player.unitsCreated", "Unit.def", "Unit.unitDefIndex", "UnitDef.flags1"], "objectWrites": ["Player.unitCount", "Player.unitsCreated"], "allOf": null, "args": [{"name": "player", "type": "unsigned char", "line": "player", "mode": "scalar"}, {"name": "typeId", "type": "unsigned short", "line": "typeId", "mode": "scalar"}, {"name": "pos", "type": "Vec3", "line": "pos", "mode": "scalar"}, {"name": "param_4", "type": "int", "line": "param_4", "mode": "scalar"}, {"name": "mode", "type": "int", "line": "mode", "mode": "scalar"}, {"name": "param_6", "type": "int", "line": "param_6", "mode": "scalar"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "CreateUnit"},
     "FindUnitType": {"conv": "__stdcall", "ret": "UnitDef*", "functions": ["FindUnitType"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": null, "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "UnitDef*", "mode": "object", "kind": "UnitDef"}, "native": "FindUnitType"},

@@ -582,9 +582,13 @@ void ReplayInstall()
         HookSeams(on);
 }
 
-int ReplayWrite()
+int ReplayWrite(char* error, int size)
 {
     int ok = 1;
+    if (ReplayFailure() != nullptr) {
+        _snprintf(error, size, "%s", ReplayFailure());
+        return 0;
+    }
     for (unsigned i = 0; i < SUB_COUNT; i++) {
         if (s_rec[i] == nullptr)
             continue;

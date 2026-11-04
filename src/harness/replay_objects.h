@@ -18,7 +18,7 @@ public:
 private:
     ReplayObjectTable(const ReplayObjectTable&);
     ReplayObjectTable& operator=(const ReplayObjectTable&);
-    enum { KINDS = 16, HASH = 16384 };
+    enum { KINDS = 48, HASH = 16384 };
     unsigned count[KINDS];
     void* objects[KINDS][REPLAY_MAX_OBJECTS];
     short slots[KINDS][HASH];
@@ -46,6 +46,11 @@ void ReplayAddStructs(ReplayText& t, const char* tag, const char* name, unsigned
 void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table);
 bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTable& table, ReplayAllocFn alloc);
 
+void ReplayFail(const char* message);
+const char* ReplayFailure();
+void ReplayClearFailure();
+unsigned ReplayConcreteKind(unsigned kind, const void* p);
+bool ReplayKindFits(unsigned declared, unsigned actual);
 bool ReplayInsideTable(unsigned kind, const void* p);
 void ReplayAddWeapon(ReplayText& t, const void* p);
 void* ReplayParseWeapon(const char* value);

@@ -1770,9 +1770,10 @@ void __stdcall RecOrdersAiSearchGoalSetWaypoints(AiSearchGoal* a0, Point16* a1, 
 void __stdcall RecOrdersOrderFxAddFlags(OrderFx* a0, int a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
     SlotScope scope(RSL_ORDERS_ORDERFXADDFLAGS, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_ORDERFX, a0);
         ArgValue(s_call, "flags", a1);
     }
     s_inner_orders->OrderFxAddFlags(a0, a1);
@@ -1784,10 +1785,11 @@ void __stdcall RecOrdersAppendOrder(Unit* a0, Order* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
+    roots.Add(ROK_ORDER, a1);
     SlotScope scope(RSL_ORDERS_APPENDORDER, SUB_ORDERS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "owner", ROK_UNIT, a0);
-        ArgPending(s_call, "node");
+        ArgObject(s_call, "node", ROK_ORDER, a1);
     }
     s_inner_orders->AppendOrder(a0, a1);
     if (scope.Open()) {
@@ -1882,9 +1884,10 @@ int __stdcall RecOrdersIssueAttackOrder(Unit* a0, Unit* a1, int a2)
 void __fastcall RecOrdersReattachFxToUnit(Order* a0)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
     SlotScope scope(RSL_ORDERS_REATTACHFXTOUNIT, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "order");
+        ArgObject(s_call, "order", ROK_ORDER, a0);
     }
     s_inner_orders->ReattachFxToUnit(a0);
     if (scope.Open()) {
@@ -1894,10 +1897,11 @@ void __fastcall RecOrdersReattachFxToUnit(Order* a0)
 int __fastcall RecOrdersSerializeOrderToSave(Order* a0, int a1, Unit* a2, HapiBank* a3, char* a4)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
     roots.Add(ROK_UNIT, a2);
     SlotScope scope(RSL_ORDERS_SERIALIZEORDERTOSAVE, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "order");
+        ArgObject(s_call, "order", ROK_ORDER, a0);
         ArgValue(s_call, "unusedEdx", a1);
         ArgObject(s_call, "unit", ROK_UNIT, a2);
         ArgHandle(s_call, "file", OBJ_BANK, a3);
@@ -2081,6 +2085,7 @@ Order* __stdcall RecOrdersLoadOrder(Unit* a0, HapiBank* a1, char* a2)
     }
     Order* result = s_inner_orders->LoadOrder(a0, a1, a2);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ORDER, result, "o");
     }
     return result;
 }
@@ -2113,6 +2118,7 @@ Order* __stdcall RecOrdersNewOrder(MissionType a0, Unit* a1, void* a2, int a3, i
     }
     Order* result = s_inner_orders->NewOrder(a0, a1, a2, a3, a4, a5);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ORDER, result, "o");
     }
     return result;
 }
@@ -2135,9 +2141,10 @@ void __stdcall RecOrdersQueueBuildOrder(char* a0, Unit* a1, int a2)
 int __stdcall RecOrdersOrderFxIsGoal(OrderFx* a0, int a1, int a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
     SlotScope scope(RSL_ORDERS_ORDERFXISGOAL, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_ORDERFX, a0);
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "y", a2);
     }
@@ -2151,9 +2158,10 @@ int __stdcall RecOrdersOrderFxIsGoal(OrderFx* a0, int a1, int a2)
 void __stdcall RecOrdersOrderFxFillGoalCells(OrderFx* a0, std::vector<Point16, std::allocator<Point16> >* a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
     SlotScope scope(RSL_ORDERS_ORDERFXFILLGOALCELLS, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_ORDERFX, a0);
         ArgPending(s_call, "goals");
     }
     s_inner_orders->OrderFxFillGoalCells(a0, a1);
@@ -2164,9 +2172,10 @@ void __stdcall RecOrdersOrderFxFillGoalCells(OrderFx* a0, std::vector<Point16, s
 int __stdcall RecOrdersOrderFxApproxDist(OrderFx* a0, int a1, int a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
     SlotScope scope(RSL_ORDERS_ORDERFXAPPROXDIST, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_ORDERFX, a0);
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "y", a2);
     }

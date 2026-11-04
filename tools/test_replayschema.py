@@ -463,6 +463,126 @@ class StructForms(unittest.TestCase):
         self.assertTrue(any("unknown mode nonsense" in e for e in errors), errors)
 
 
+class Polymorphic(unittest.TestCase):
+    """N5: a base kind lists its concrete kinds, each concrete kind names its vtable, a code pointer is an index in a table."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def errors(self, ann):
+        return self.generated(ann)[1]
+
+    def test_the_base_lists_its_kinds_and_each_kind_its_vtable(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("extern void (* const g_approachRadiusVtable[])();", text)
+        self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, "", g_approachRadiusVtable, "g_approachRadiusVtable", 0, 0 },', text)
+        base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
+        self.assertTrue(base.endswith('nullptr, "", 0, 3 },'), base)
+        self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };", text)
+        self.assertIn('static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");', text)
+        self.assertIn('static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");', text)
+
+    def test_a_pointer_to_the_base_names_the_base_and_its_target_is_the_base(self):
+        files, _, model = self.generated()
+        field = [f for f in model["object_fields"] if (f["object"], f["name"]) == ("Order", "attached")][0]
+        self.assertEqual((field["target"], field["poly"]), ("OrderFx", "OrderFx"))
+        self.assertIn('{ "attached", offsetof(Order, attached), sizeof(((Order*)nullptr)->attached), ROK_ORDER, RK_REF, ROK_ORDERFX,', files[rs.SCHEMA_H])
+
+    def test_an_argument_of_the_base_type_is_recorded_as_the_base(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        arg = model["subsystems"]["orders"]["slots"]["OrderFxAddFlags"]["args"][0]
+        self.assertEqual((arg["mode"], arg["kind"], arg["poly"]), ("object", "OrderFx", "OrderFx"))
+        self.assertIn("roots.Add(ROK_ORDERFX, a0);", files[rs.HOOKS_H])
+
+    def test_an_argument_note_of_the_base_needs_poly(self):
+        ann = annotations()
+        ann["subsystems"]["orders"]["slots"] = {"OrderFxAddFlags": {"args": {"self": {"mode": "object", "kind": "OrderFx"}}}}
+        self.assertTrue(any("the argument self points at the base kind OrderFx and needs" in e for e in self.errors(ann)))
+
+    def test_poly_of_a_kind_that_is_no_base_is_an_error(self):
+        ann = annotations()
+        ann["subsystems"]["orders"]["slots"] = {"AppendOrder": {"args": {"node": {"mode": "object", "kind": "Order", "poly": "Order"}}}}
+        self.assertTrue(any("`poly` of the argument node names the base kind" in e for e in self.errors(ann)))
+
+    def test_a_ref_to_a_base_needs_poly(self):
+        ann = annotations()
+        del [f for f in ann["objects"]["Order"]["fields"] if f["name"] == "attached"][0]["poly"]
+        self.assertTrue(any('Order.attached: points at the base kind OrderFx and needs "poly"' in e for e in self.errors(ann)))
+
+    def test_poly_names_the_target(self):
+        ann = annotations()
+        [f for f in ann["objects"]["Order"]["fields"] if f["name"] == "next"][0]["poly"] = "OrderFx"
+        self.assertTrue(any("Order.next: `poly` names the base kind" in e for e in self.errors(ann)))
+
+    def test_a_base_has_no_fields_and_a_kind_has_a_vtable_and_one_base(self):
+        ann = annotations()
+        ann["objects"]["OrderFx"]["fields"].append({"name": "source", "kind": "ref", "target": "Order"})
+        self.assertTrue(any("OrderFx (base): a base kind has no fields" in e for e in self.errors(ann)))
+        ann = annotations()
+        del ann["objects"]["PathOrder"]["vtable"]
+        self.assertTrue(any("OrderFx (base): the kind PathOrder has no vtable" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["objects"]["Order"]["kinds"] = ["PathOrder"]
+        ann["objects"]["Order"]["fields"] = []
+        self.assertTrue(any("the kind PathOrder is also a kind of OrderFx" in e or "Order (base): the kind PathOrder" in e for e in self.errors(ann)))
+
+    def test_two_kinds_cannot_share_a_vtable(self):
+        ann = annotations()
+        ann["objects"]["RingApproach"]["vtable"] = "g_approachRadiusVtable"
+        self.assertTrue(any("RingApproach: the vtable g_approachRadiusVtable is also the vtable of ApproachRadius" in e for e in self.errors(ann)))
+
+    def test_a_vtable_is_a_name_and_belongs_to_a_kind_of_a_base(self):
+        ann = annotations()
+        ann["objects"]["PathOrder"]["vtable"] = "0x4fd3b8"
+        self.assertTrue(any("PathOrder: the vtable is the name of a global" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["objects"]["OrderFx"]["kinds"].remove("PathOrder")
+        self.assertTrue(any("PathOrder: has a vtable and is a kind of no base" in e for e in self.errors(ann)))
+
+    def test_a_code_field_is_an_index_in_its_table(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("kReplayCodeOrderNotify[] = {", text)
+        self.assertIn("    (const void*)StopOrder,", text)
+        self.assertIn('{ "orderNotify", kReplayCodeOrderNotify, %d },' % len(model["code_tables"][0]["entries"]), text)
+        self.assertIn('static_assert(sizeof(((OrderTableEntry*)nullptr)->notify) == sizeof(void*), "OrderTableEntry::notify is a code pointer");', text)
+        row_ = [l for l in text.split("\n") if l.startswith('    { "notify",')][0]
+        self.assertIn("RK_CODE, 0,", row_)
+
+    def test_the_table_lists_each_function_once_in_the_order_of_registration(self):
+        _, _, model = self.generated()
+        entries = model["code_tables"][0]["entries"]
+        self.assertEqual(len(entries), len(set(entries)))
+        self.assertEqual(entries[0], "ReadyOrder")
+        self.assertLess(entries.index("StandbyOrder"), entries.index("VtolStandbyOrder"))
+        self.assertLess(entries.index("VtolStandbyOrder"), entries.index("StopOrder"))
+
+    def test_a_function_that_no_header_declares_is_an_error(self):
+        ann = annotations()
+        ann["code_tables"]["orderNotify"]["entries"].append("NoSuchOrder")
+        self.assertTrue(any("code table orderNotify: NoSuchOrder is declared in none of its headers" in e for e in self.errors(ann)))
+
+    def test_a_header_of_the_table_is_one_of_the_includes(self):
+        ann = annotations()
+        ann["includes"].remove("../orders/vtol_orders.h")
+        self.assertTrue(any("vtol_orders.h is not one of the schema's `includes`" in e for e in self.errors(ann)))
+
+    def test_the_fill_is_a_slot_of_a_seam(self):
+        for fill in ("RegisterAllOrderTypes", "orders.NoSuchSlot", "nowhere.RegisterAllOrderTypes"):
+            ann = annotations()
+            ann["code_tables"]["orderNotify"]["fill"] = fill
+            self.assertTrue(any("`fill` names a slot of a seam" in e for e in self.errors(ann)), fill)
+
+    def test_a_code_field_names_a_table(self):
+        ann = annotations()
+        [f for f in ann["objects"]["OrderTableEntry"]["fields"] if f["name"] == "notify"][0]["table"] = "nowhere"
+        self.assertTrue(any("OrderTableEntry.notify: a code field names a table" in e for e in self.errors(ann)))
+
+
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
         files, errors, model = rs.generate(rs.read_rows())

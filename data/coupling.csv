@@ -66,6 +66,7 @@ ai,platform,call,ProtectBlockReadOnly,1
 ai,platform,call,ProtectBlockReadWrite,1
 ai,platform,call,RandomInt,12
 ai,platform,call,UnitDef::HasField1ce,1
+ai,platform,call,UnitTypeSet::Contains,2
 ai,platform,call,WorldToCell,2
 ai,platform,call,operator delete,2
 ai,platform,call,operator new,5
@@ -1363,7 +1364,7 @@ harness,network,shared_write,Game::numPlayers,6
 harness,network,shared_write,LoadingFlags::value,1
 harness,network,shared_write,Player::alliedBy,2
 harness,network,shared_write,Player::progress,2
-harness,orders,call,Add,137
+harness,orders,call,Add,138
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,shared_write,AiSeam::GetFactoriesInRadius,7
@@ -1655,9 +1656,11 @@ harness,seams,shared_write,OrdersSeam::OrderFxAddFlags,1
 harness,seams,shared_write,OrdersSeam::OrderFxApproxDist,1
 harness,seams,shared_write,OrdersSeam::OrderFxFillGoalCells,1
 harness,seams,shared_write,OrdersSeam::OrderFxIsGoal,1
+harness,seams,shared_write,OrdersSeam::OrderOrStatusFlags,1
 harness,seams,shared_write,OrdersSeam::RunOrders,1
 harness,seams,shared_write,OrdersSeam::RunSecondaryOrders,1
 harness,seams,shared_write,OrdersSeam::UnitMotionClaimRepath,1
+harness,seams,shared_write,OrdersSeam::UnitMotionReadNetState,1
 harness,seams,shared_write,OrdersSeam::UpdateMotion,1
 harness,seams,shared_write,PathfindingSeam::AbortIfGoalMatch,1
 harness,seams,shared_write,PathfindingSeam::RunSearches,1
@@ -1795,8 +1798,10 @@ harness,units,shared_write,OrdersSeam::DeleteOrders,1
 harness,units,shared_write,OrdersSeam::DestroyMotionObject,1
 harness,units,shared_write,OrdersSeam::MissionTypeFromName,1
 harness,units,shared_write,OrdersSeam::NewUnitMotion,3
+harness,units,shared_write,OrdersSeam::OrderOrStatusFlags,4
 harness,units,shared_write,OrdersSeam::RunOrders,1
 harness,units,shared_write,OrdersSeam::RunSecondaryOrders,1
+harness,units,shared_write,OrdersSeam::UnitMotionReadNetState,1
 harness,units,shared_write,OrdersSeam::UpdateMotion,2
 harness,units,shared_write,PlayersSeam::KillPlayerUnits,1
 harness,units,shared_write,PlayersSeam::NotifyUnitCreated,2
@@ -1807,7 +1812,7 @@ harness,units,shared_write,Seams::features,2
 harness,units,shared_write,Seams::los_radar,7
 harness,units,shared_write,Seams::map,11
 harness,units,shared_write,Seams::network,6
-harness,units,shared_write,Seams::orders,10
+harness,units,shared_write,Seams::orders,14
 harness,units,shared_write,Seams::players,4
 harness,units,shared_write,Seams::targeting,1
 harness,units,shared_write,Seams::weapons,10
@@ -2726,6 +2731,7 @@ orders,platform,call,RandomInt,31
 orders,platform,call,UnitDef::EnergyCost,1
 orders,platform,call,UnitDef::MaxHealth,1
 orders,platform,call,UnitDef::MetalCost,1
+orders,platform,call,UnitTypeSet::Contains,2
 orders,platform,call,WorldToCell,3
 orders,platform,call,copy,3
 orders,platform,call,operator delete,20
@@ -2841,7 +2847,8 @@ orders,units,shared_write,Fixed::value,3
 orders,units,shared_write,MissionType::index,1
 orders,units,shared_write,Order::flags_42,1
 orders,units,shared_write,Order::next,2
-orders,units,shared_write,PathOrderAttach::next,1
+orders,units,shared_write,PathOrderAttach::next,2
+orders,units,shared_write,PathOrderAttach::owner,1
 orders,units,shared_write,PathOrderAttach::value,1
 orders,units,shared_write,Point16::x,7
 orders,units,shared_write,Point16::y,7
@@ -2850,7 +2857,7 @@ orders,units,shared_write,Unit::buildLeft,10
 orders,units,shared_write,Unit::fireOrder,1
 orders,units,shared_write,Unit::flags,20
 orders,units,shared_write,Unit::group,2
-orders,units,shared_write,Unit::head,6
+orders,units,shared_write,Unit::head,7
 orders,units,shared_write,Unit::health,11
 orders,units,shared_write,Unit::mode,3
 orders,units,shared_write,Unit::moveOrder,1
@@ -3223,7 +3230,7 @@ platform,units,shared_write,Fixed::value,3
 platform,units,shared_write,Fixed::whole,1
 platform,units,shared_write,Point16::x,7
 platform,units,shared_write,Point16::y,7
-platform,units,shared_write,StringRef::data,1
+platform,units,shared_write,StringRef::data,4
 platform,units,shared_write,TdfFile::current,4
 platform,units,shared_write,UnitDef::scriptChecksum,1
 platform,units,shared_write,Vec3::x,12
@@ -4301,7 +4308,7 @@ presentation,units,shared_write,PlayerInfo::bit6,1
 presentation,units,shared_write,PlayerInfo::side,3
 presentation,units,shared_write,Point16::x,7
 presentation,units,shared_write,Point16::y,7
-presentation,units,shared_write,StringRef::data,1
+presentation,units,shared_write,StringRef::data,4
 presentation,units,shared_write,Unit::angles,6
 presentation,units,shared_write,Unit::attacker,5
 presentation,units,shared_write,Unit::flags,20
@@ -4600,9 +4607,11 @@ seams,harness,shared_write,OrdersSeam::OrderFxAddFlags,2
 seams,harness,shared_write,OrdersSeam::OrderFxApproxDist,2
 seams,harness,shared_write,OrdersSeam::OrderFxFillGoalCells,2
 seams,harness,shared_write,OrdersSeam::OrderFxIsGoal,2
+seams,harness,shared_write,OrdersSeam::OrderOrStatusFlags,2
 seams,harness,shared_write,OrdersSeam::RunOrders,2
 seams,harness,shared_write,OrdersSeam::RunSecondaryOrders,2
 seams,harness,shared_write,OrdersSeam::UnitMotionClaimRepath,2
+seams,harness,shared_write,OrdersSeam::UnitMotionReadNetState,2
 seams,harness,shared_write,OrdersSeam::UpdateMotion,2
 seams,harness,shared_write,PathfindingSeam::AbortIfGoalMatch,2
 seams,harness,shared_write,PathfindingSeam::RunSearches,2
@@ -4744,11 +4753,13 @@ seams,orders,call,OrderFx::AddFlags,1
 seams,orders,call,UnitMotion::ClaimRepath,1
 seams,orders,call,UnitMotion::DestroyObject,1
 seams,orders,call,UnitMotion::LoadMotion,1
+seams,orders,call,UnitMotion::ReadNetState,1
 seams,orders,call,UnitMotion::SaveMotion,1
 seams,orders,call,UnitMotion::UpdateMotion,1
 seams,orders,indirect,ApproachRadius::AppendGoalCell,1
 seams,orders,indirect,ApproachRadius::ApproxDistExcess,1
 seams,orders,indirect,ApproachRadius::ContainsCell,1
+seams,orders,indirect,Order::OrStatusFlags,1
 seams,orders,indirect,OrderFx::ApproxDist,1
 seams,orders,indirect,OrderFx::ContainsCell,1
 seams,orders,indirect,OrderFx::FillGoalCells,1
@@ -4758,6 +4769,7 @@ seams,orders,indirect,PointMarker::ContainsCell,1
 seams,orders,indirect,RingApproach::AppendGoalCell,1
 seams,orders,indirect,RingApproach::ApproxDistExcess,1
 seams,orders,indirect,RingApproach::ContainsCell,1
+seams,orders,indirect,UnitMotion::ReadNetState,1
 seams,orders,shared_write,AiSeam::GetFactoriesInRadius,7
 seams,orders,shared_write,AiSeam::GetVisibleEnemiesInRadius,2
 seams,orders,shared_write,EconomySeam::RequestEnergyAndMetal,1
@@ -4974,8 +4986,10 @@ seams,units,shared_write,OrdersSeam::DeleteOrders,1
 seams,units,shared_write,OrdersSeam::DestroyMotionObject,1
 seams,units,shared_write,OrdersSeam::MissionTypeFromName,1
 seams,units,shared_write,OrdersSeam::NewUnitMotion,3
+seams,units,shared_write,OrdersSeam::OrderOrStatusFlags,4
 seams,units,shared_write,OrdersSeam::RunOrders,1
 seams,units,shared_write,OrdersSeam::RunSecondaryOrders,1
+seams,units,shared_write,OrdersSeam::UnitMotionReadNetState,1
 seams,units,shared_write,OrdersSeam::UpdateMotion,2
 seams,units,shared_write,PlayersSeam::KillPlayerUnits,1
 seams,units,shared_write,PlayersSeam::NotifyUnitCreated,2
@@ -4986,7 +5000,7 @@ seams,units,shared_write,Seams::features,2
 seams,units,shared_write,Seams::los_radar,7
 seams,units,shared_write,Seams::map,11
 seams,units,shared_write,Seams::network,6
-seams,units,shared_write,Seams::orders,10
+seams,units,shared_write,Seams::orders,14
 seams,units,shared_write,Seams::players,4
 seams,units,shared_write,Seams::targeting,1
 seams,units,shared_write,Seams::weapons,10
@@ -5072,9 +5086,9 @@ targeting,map,shared_write,Vec3::z,12
 targeting,orders,shared_write,Vec3::x,84
 targeting,orders,shared_write,Vec3::y,60
 targeting,orders,shared_write,Vec3::z,84
-targeting,platform,call,Bits::Test,1
 targeting,platform,call,RandomInt,1
 targeting,platform,call,UnitSwapEraseVector::EraseSwapBack,1
+targeting,platform,call,UnitTypeSet::Contains,1
 targeting,platform,shared_write,Vec3::x,22
 targeting,platform,shared_write,Vec3::y,13
 targeting,platform,shared_write,Vec3::z,22
@@ -5224,7 +5238,9 @@ units,game,call,RecordUnitEvent,1
 units,game,call,RecordUnitSpeech,1
 units,game,call,RecordWakeParticles,1
 units,game,call,RecordWhiteSmoke,1
-units,game,call,SimAllocTagged,9
+units,game,call,SimAllocTagged,10
+units,game,call,SimFree,1
+units,game,call,SimOwns,1
 units,game,call,SimRealloc,1
 units,game,shared_write,Angles16::heading,1
 units,game,shared_write,Game::defs,2
@@ -5403,11 +5419,6 @@ units,network,shared_write,UnitWeaponSlot::firePitch,1
 units,network,shared_write,UnitWeaponSlot::stockpile,1
 units,orders,indirect,AddBeCarriedOrder,1
 units,orders,indirect,DeleteOrders,1
-units,orders,indirect,Order::OrStatusFlags,4
-units,orders,indirect,PackedPosGoal::DeserializeNetUnitState,1
-units,orders,indirect,PathGoal::DeserializeNetUnitState,1
-units,orders,indirect,PathOrderAttach::~PathOrderAttach,1
-units,orders,indirect,PatrolGoal::DeserializeNetUnitState,1
 units,orders,indirect,RunOrders,1
 units,orders,indirect,RunSecondaryOrders,1
 units,orders,shared_write,Angles16::bank,1
@@ -5420,6 +5431,8 @@ units,orders,shared_write,Game::defs,9
 units,orders,shared_write,Game::unitDefCount,4
 units,orders,shared_write,Game::units,4
 units,orders,shared_write,Game::unitsEnd,2
+units,orders,shared_write,PathOrderAttach::next,2
+units,orders,shared_write,PathOrderAttach::owner,12
 units,orders,shared_write,Point16::x,44
 units,orders,shared_write,Point16::y,41
 units,orders,shared_write,Unit::activateFlags,2
@@ -5434,7 +5447,7 @@ units,orders,shared_write,Unit::fireOrder,3
 units,orders,shared_write,Unit::flags,25
 units,orders,shared_write,Unit::footprint,13
 units,orders,shared_write,Unit::group,1
-units,orders,shared_write,Unit::head,3
+units,orders,shared_write,Unit::head,2
 units,orders,shared_write,Unit::health,17
 units,orders,shared_write,Unit::killCount,2
 units,orders,shared_write,Unit::lastAttackerSlot,2
@@ -5523,7 +5536,7 @@ units,platform,call,ProtectBlockReadWrite,8
 units,platform,call,RandomInt,2
 units,platform,call,RotateByAngles,2
 units,platform,call,StringRef::Assign,1
-units,platform,call,StringRef::~StringRef,1
+units,platform,call,StringRef::~StringRef,2
 units,platform,call,TdfFile::GetDouble,1
 units,platform,call,TdfFile::GetInt,1
 units,platform,call,TdfFile::GetString,1
@@ -5564,6 +5577,7 @@ units,platform,shared_write,UnitDef::metalCost,1
 units,platform,shared_write,UnitDef::scriptChecksum,1
 units,platform,shared_write,UnitDef::unitname,1
 units,platform,shared_write,UnitDef::weaponHashXor,1
+units,platform,shared_write,UnitTypeSet::bits,1
 units,platform,shared_write,Vec3::x,22
 units,platform,shared_write,Vec3::y,13
 units,platform,shared_write,Vec3::z,22
@@ -5689,6 +5703,7 @@ units,presentation,shared_write,UnitDef::radardistance,1
 units,presentation,shared_write,UnitDef::range,1
 units,presentation,shared_write,UnitDef::sonardistance,1
 units,presentation,shared_write,UnitDef::unitname,7
+units,presentation,shared_write,UnitTypeSet::bits,1
 units,presentation,shared_write,UnitWeaponSlot::stockpile,1
 units,presentation,shared_write,Vec3::x,42
 units,presentation,shared_write,Vec3::y,43
@@ -5704,6 +5719,7 @@ units,seams,indirect,MissionTypeFromNameNative,1
 units,seams,indirect,NewUnitMotionNative,3
 units,seams,indirect,NotifyUnitCreatedNative,1
 units,seams,indirect,NotifyUnitDiedNative,1
+units,seams,indirect,OrderOrStatusFlagsNative,4
 units,seams,indirect,ReattachFxToUnitNative,1
 units,seams,indirect,RefreshPassMapNative,2
 units,seams,indirect,ReleaseWeaponsNative,1
@@ -5715,6 +5731,7 @@ units,seams,indirect,SaveUnitAccountsNative,1
 units,seams,indirect,SerializeOrderToSaveNative,1
 units,seams,indirect,SpatialBucketPrependUnitNative,1
 units,seams,indirect,SpatialBucketUnlinkUnitNative,1
+units,seams,indirect,UnitMotionReadNetStateNative,1
 units,seams,indirect,UpdateMotionNative,2
 units,seams,indirect,WeaponAimCobCompleteNative,2
 units,seams,shared_write,Unit::motion,1

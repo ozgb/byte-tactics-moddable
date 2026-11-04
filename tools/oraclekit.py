@@ -51,6 +51,7 @@ CONTENTS = [
     ("file", "docs/frame-dump.md", "the frame dump format"),
     ("file", "docs/ui-log.md", "the UI log format"),
     ("file", "docs/reference-traces.md", "how the reference traces are made"),
+    ("file", "docs/scenario-format.md", "the scenario format and the test-mode run"),
     ("dir", "interfaces", "the subsystem interface headers"),
     ("file", "docs/module-abi.md", "the module ABI"),
     ("dir", "tests/replay", "the stored replay recordings"),

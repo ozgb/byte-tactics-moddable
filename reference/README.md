@@ -48,86 +48,22 @@ uses, so both `0x9001F` and Wine's `0xD001F` pass.
 
 ## Scenario format
 
-One `key value` per line. Blank lines and lines starting with `#` are ignored.
-Numbers are decimal, `0x` hex or `0` octal. Unknown keys and values that do not
-parse are errors. A later line for the same key replaces an earlier one.
-Defaults are the ones in `LoadSettings`, never the registry.
+The format of a scenario file (every key, the scripted `order`, `spawn`, `console` and `input` lines, the game
+types, loading and saving a game, the quirk flags, and the end of a run) is specified in
+[docs/scenario-format.md](../docs/scenario-format.md), which the data kit ships. It is the one source: this page
+keeps the commands of the tools that play scenarios.
 
-| Key | Default | Meaning |
-| --- | --- | --- |
-| `game_seed` | 1 | Seed of the game-logic random generator |
-| `crt_seed` | 1 | Seed of the C runtime `rand` |
-| `view_seed` | 1 | Seed of the presentation random generator (screen shake, particles, menu effects) |
-| `fpu_control_word` | `0x9001F` | Expected `_control87` value, ignoring the infinity-control bit; the run exits 2 if it differs |
-| `ticks` | required | Game ticks to play (30 per second of game time) |
-| `steps_per_frame` | 1 | Game ticks run between two drawn frames, 1 to 8; the traces must not depend on it |
-| `frames` | none | Ticks at which a run dumps the frame drawn at the end of that tick's loop pass, ascending, each from 1 to before `ticks`, at most 64 (see `docs/frame-dump.md`); one line only |
-| `quirks` | `3.1c` | Quirk flags for the run, a spec: a preset (`3.1c`, all off; `recommended`, all on) then `+flag` or `-flag` words, as in `recommended -flag` |
-| `quirks_tamper` | none | Test only: flips a quirk flag at this tick, so the freeze check exits 2 (see Quirk flags) |
-| `quirks_reach` | none | Test only: `<tick> <flag name>`, at that tick makes the game reach the guard of `units.ignore-null-death-record`, `ai.patrol-null-enemy-skip` or `units.skip-empty-yardmap` (see Quirk flags) |
-| `save` | none | Saves the game with `SaveGameFile` to `savegame\harness.sav` in the run's game directory after the step of this tick, 1 to `ticks`; one line only |
-| `load` | none | Starts from the game another scenario of the suite saved, by file stem (`load save-midgame`), instead of from the scenario's own map and players; one line only (see Loading a saved game) |
-| `game_type` | 2 | 1: a mission of a campaign, 2: skirmish, 3: multiplayer without a network; one line only (see Game types) |
-| `campaign` | none | Game type 1 only, and required there: the campaign file `camps/<name>.tdf`, the rest of the line (names have spaces) |
-| `map` | required | Map name, the rest of the line (names have spaces); under game type 1 the mission's name in the campaign |
-| `difficulty` | 1 | AI difficulty 0 to 2, one value for all computer players |
-| `commander_death` | 1 | 1: the game ends when a commander dies |
-| `mapping` | 1 | 1: terrain is blacked out until explored (the skirmish menu's "Terrain is blacked out until explored"); 0: the whole map is shown |
-| `line_of_sight` | 1 | 1: line of sight is on |
-| `los_type` | 1 | Line of sight type, 0 or 1 |
-| `start_positions` | `fixed` | `fixed`: player N starts at position N; `random`: shuffled |
-| `local_player` | the first human player, else 0 | Slot whose view the game shows; must be a slot some `player<N>.*` key names |
-| `player<N>.controller` | `ai` | `ai` or `human` (a human does nothing) |
-| `player<N>.side` | N mod 2 (0 is Arm, 1 is Core) | Side name from `sidedata.tdf`, any case |
-| `player<N>.team` | 5 | Ally group 0 to 4; 5 is no team |
-| `player<N>.color` | N | Colour index 0 to 9 |
-| `player<N>.metal` | 1000 | Starting metal |
-| `player<N>.energy` | 1000 | Starting energy |
+## Saving and loading a game
 
-`player<N>.*` keys take N from 0 to 9. A slot exists when any key names it,
-slots no key names are open, and at least 2 slots must exist. The game's player
-count is the highest named slot plus one.
-
-## Loading a saved game
-
-`load <scenario>` names a scenario of the suite by its file stem, one whose `save` line writes the save
-(`reference/scenarios/load-midgame.txt` loads `save-midgame`). The exe reads `savegame\harness.sav` from its
-own game directory and starts the match as the game's load screen does: it sets `pendingSaveStore` and the
-summary items (`Gametype`, `Campaign`, `Side`, `Difficulty`, `Mission`, `Thumbs`, `Players`, `CommanderDeath`,
-`Location`, `Mapping`, `LineOfSight`, `LineOfSightType`) as `SavedGameSelectHandler` does, then the game's own
-`LoadMatch` loads the rest (`LoadPlayerControllers`, `LoadPlayers`, `LoadSavedGameState` and the load side of
-each subsystem). A save that is missing or unreadable, that is not a skirmish (game type 2 only), or whose map
-the game cannot load, exits 2 with a message that names `savegame\harness.sav`. No message box opens.
-
-The saving run also writes `savegame\harness.opt`, the scenario's options table (`g_game->options`) as
-`SetUpSkirmish` filled it for the saver's players. The loading run starts from that table, as a player starts from the
-menu's table, and never clears it; the summary items above then overwrite the fields the save decides. A missing
-`harness.opt`, or one of the wrong size, exits 2 with a message that names `savegame\harness.opt`.
-
-- **Keys it may still set:** `game_seed`, `crt_seed`, `view_seed`, `fpu_control_word`, `ticks`,
-  `steps_per_frame`, `quirks`, `quirks_tamper` and `quirks_reach`. The seeds take effect at load, as in any
-  run (`LoadMatch` reseeds the generators).
-- **Keys it may not set:** the save decides them, so a scenario with a `load` line that sets one exits 2 and
-  names it: `game_type`, `campaign`, `map`, `difficulty`, `commander_death`, `mapping`, `line_of_sight`, `los_type`,
-  `start_positions`, every `player<N>.*` key (the controllers, sides, colours, resources and alliances),
-  `local_player` (the save keeps the human player). `spawn`, `order` and `console` are not accepted either (the
-  scenario has no players of its own to name), and neither is `save`. `map` and the `player<N>.*` keys are
-  not required.
-- **The tick:** the save holds the game's tick counter (`ticks`, in the `GameTime` box that `SavePlayers`
-  writes), so the loaded game continues from the saved tick. The save is made after the step of its tick, so
-  the first row of the trace is tick `saved tick + 1` (901 for `save-midgame`), and the trace has no rows for the ticks before it.
-  `ticks` is the last tick traced, as in every scenario, counted from the start of the game and not from the
-  save: `load-midgame` has `ticks 1800`, like `save-midgame`. The run exits 2 if `ticks` is not greater
-  than the saved tick. The same holds for the tick of `quirks_tamper` and of `quirks_reach`: a tick at or before the
-  saved tick never fires, so the run exits 2.
-- **The save:** it is made by every run of the saving scenario. `--traces` stores the reference's `harness.sav` in
-  `reference/saves/<scenario>.sav` (`harness.opt` is never stored), and `--check` compares the modern build's with it by decoded
-  contents (`tools/savefile.py`, which leaves out the bytes the format takes from the clock or from uninitialised memory) and reports
-  `saves: N of N equal`. `tools/reference.py`
-  (`--check`, `--traces`, and the tools that play the suite) plays every scenario with no `load` line first, then
-  the loading ones; it copies the saving run's `savegame/harness.sav` and `savegame/harness.opt` out of its game copy and places it in the
-  loading run's own game copy before that exe starts (both files are removed from a game copy first, so a file of the install never stands in). The two runs are separate processes. A loading scenario
-  whose saving scenario is not played, fails, or writes no save or no options file fails, with a message that names both.
+The saving run's `harness.sav` is stored by `--traces` in `reference/saves/<scenario>.sav` (`harness.opt` is never
+stored), and `--check` compares the modern build's with it by decoded contents (`tools/savefile.py`, which leaves
+out the bytes the format takes from the clock or from uninitialised memory) and reports `saves: N of N equal`.
+`tools/reference.py` (`--check`, `--traces`, and the tools that play the suite) plays every scenario with no `load`
+line first, then the loading ones; it copies the saving run's `savegame/harness.sav` and `savegame/harness.opt` out
+of its game copy and places them in the loading run's own game copy before that exe starts (both files are removed
+from a game copy first, so a file of the install never stands in). The two runs are separate processes. A loading
+scenario whose saving scenario is not played, fails, or writes no save or no options file fails, with a message that
+names both. `tools/tracediff.py` does both steps for a scenario with a `load` line.
 
 By hand, play the saving scenario with `--collect savegame/harness.sav --collect savegame/harness.opt` (the files land
 in the run's directory), then the loading one with `--put savegame/harness.sav <that file> --put savegame/harness.opt <that file>`:
@@ -137,78 +73,21 @@ WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode
 WINEARCH=win64 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/scenarios/load-midgame.txt --put savegame/harness.sav <run directory>/savegame/harness.sav --put savegame/harness.opt <run directory>/savegame/harness.opt
 ```
 
-`tools/tracediff.py` does both steps for a scenario with a `load` line.
-
-## Game types
-
-`game_type` is the number the game keeps as `Mission::type`. With 2, the default,
-a scenario is a skirmish and nothing below applies.
-
-**Game type 1** loads one mission of a campaign, as the campaign menu does.
-`campaign` names the campaign file in `camps/` without `.tdf` (`Battle Tactics -
-Arm Very Short`, `Arm Campaign`) and `map` the mission's `missionname` in that
-file (`Sub Hunting`, `1: A Hero Returns`), as the mission list shows it. The
-mission's own file gives the units, their owners (`Player=1` is slot 0) and the
-victory and defeat conditions, so a scenario names a slot for every owner the
-mission uses, or the exe stops with `Player number N invalid`. The schema is the
-one 3.1c picks for the campaign difficulty: `difficulty` 0 prefers `Easy`, 1
-`Medium`, 2 `Hard`, and each falls back to the others. The keys the mission
-decides (`commander_death`, `mapping`, `line_of_sight`, `los_type`,
-`start_positions`, `player<N>.metal` and `player<N>.energy`) are errors under
-game type 1, and so is `game_type 1` without `campaign`, or `campaign` without
-`game_type 1`. A campaign or mission name the game does not find exits with
-status 2. Any mission map of `totala4.hpi`, `ccmiss.ccx` and `tactics1.hpi` to
-`tactics8.hpi` can be used, each with the conditions its map file names. The
-conditions are checked for the human slot named by `local_player`.
-
-**Game type 3** runs the multiplayer rules without a network: the harness fills in
-the lobby state the exe expects (every named slot is a connected player, the
-local slot is the host, `player<N>.team` makes the alliances and both sides of
-each alliance agree to it), sets `loadingFlags |= 8` and starts the loading screen
-itself, so the lobby is skipped. Before every step (`HarnessBeforeStep`) it also sets
-every player's load progress to 100. `commander_death`, `mapping`, `line_of_sight`, `los_type`, `start_positions`
-and the `metal` and `energy` of the local slot (which sets every player's start) come
-from the scenario as in a skirmish.
-
-## Game over
-
-A run ends at its last tick, or earlier at game over. When 3.1c sets
-`endGameFlags` to 4 or 0x10 (a victory or defeat after its countdown, a
-commander's death, the last enemy gone) the harness ends the run at the end of
-that tick's step, as at the last tick: it closes `trace.txt`, writes the block
-scan, logs `testmode: game over at tick <n>` and exits 0. The modern build keeps the
-0x10 bit in its own byte, `Game::endGameVictory`, and the trace hashes and dumps
-`endGameFlags` with that byte merged back at 0x10, so the rows are the same.
-`ticks` stays the
-upper bound. The trace holds no marker: it is shorter than `ticks`, and a build
-that ends the game on another tick differs from the reference in length, which
-the comparison reports as a divergence at the first missing row.
-
-The run ends before 3.1c's own frame code sees the flag, which would shut the
-game's systems down and switch to the end-of-game screen. That way every tick that
-ran is traced, and the run never reaches the statistics screen (the
-presentation, not game logic).
-
 ## Quirk flags
 
-The flags are listed in `src/quirks/quirks.def`. A normal run takes a spec with the `-quirks=<spec>`
-switch, in the same syntax as the `quirks` key: a preset, then `+flag` or `-flag` words. With
-no spec every flag is off, which is 3.1c. In test mode the scenario's `quirks` key sets the flags.
+The flags are listed in `src/quirks/quirks.def`. A normal run takes a spec with the `-quirks=<spec>` switch, in the
+same syntax as the `quirks` key (the spec's section 6); with no spec every flag is off, which is 3.1c. In test mode
+the scenario's `quirks` key sets the flags and they are frozen.
 
-In test mode the flags are frozen: the exe checks them before every tick, and if they changed it exits
-2 with `testmode: quirk flags changed at tick <n>`. `reference/tests/quirks-tamper.txt` (a
-`quirks_tamper` line) trips it on purpose, and is expected to exit with that message:
+`reference/tests/quirks-tamper.txt` (a `quirks_tamper` line) trips the freeze check on purpose, and is expected to
+exit with `testmode: quirk flags changed at tick <n>`:
 
 ```sh
 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/tests/quirks-tamper.txt --game-dir ~/.ta
 ```
 
-No stock game data reaches the guards of the first three flags, so a `quirks_reach <tick> <flag name>`
-line makes the exe reach one at that tick: `units.ignore-null-death-record` applies a unit-killed
-record whose unit id is 0, `units.skip-empty-yardmap` runs the commander's COB `set YARD_OPEN`, and
-`ai.patrol-null-enemy-skip` puts a unit in the first computer player's scout squad, sets its rally
-point to the origin and runs its scout timer with every player allied to it, so no enemy is found.
-`reference/tests/quirks-<flag name>.txt` does this for each flag, with `quirks 3.1c +<flag name>`:
+`reference/tests/quirks-<flag name>.txt` reaches the guard of each flag a `quirks_reach` line names, with
+`quirks 3.1c +<flag name>`:
 
 ```sh
 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/tests/quirks-units.ignore-null-death-record.txt --game-dir ~/.ta
@@ -216,180 +95,17 @@ uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/test
 uv run tools/playtest.py --exe build/modern/TotalA.exe --testmode reference/tests/quirks-units.skip-empty-yardmap.txt --game-dir ~/.ta
 ```
 
-Each runs to the last tick. With the `quirks` line removed, the exe faults at the guard's tick, as 3.1c
-does, and the run stops before the last tick.
+Each runs to the last tick. With the `quirks` line removed, the exe faults at the guard's tick, as 3.1c does, and
+the run stops before the last tick.
 
-## Scripted orders
+## UI logs
 
-A scenario can order the units of a `controller human` slot (a human otherwise
-does nothing). One `order` line per order; lines may repeat and accumulate.
-
-```
-order <tick> <unit selector> <kind> <target>
-order 5 0:ARMCOM:1 move 700 300
-order 5 0:ARMCOM:1 build ARMSOLAR 640 260
-order 150 0:ARMCOM:1 reclaim 0:ARMSOLAR:1
-```
-
-- `<tick>` is a game tick from 1 to `ticks`. The order is issued at the start of
-  that tick, before the first phase, so the trace sees its effect in the same
-  tick. Orders on one tick are issued in file order.
-- A unit selector is `<slot>:<unit type>:<n>`, the n-th live unit of that type
-  owned by that slot in pool-index order (the unit type name is the unit's name
-  in the game data, any case), or `<slot>:all`, all of that slot's live units.
-- A target is `x z` in world units, or a unit selector that names one unit
-  (`<slot>:all` is not allowed there). With a unit selector the order is
-  issued as if the cursor were over that unit.
-- Kinds: `move`, `attack`, `patrol`, `guard` and `reclaim` take a target.
-  `build <unit type> x z` takes the unit type before the position.
-- More kinds that take a target, as the order buttons and the cursor modes do:
-  `dgun` (special attack), `unload` (position), `load` (unit), `repair` (unit),
-  `teleport` (position) and `capture` (unit).
-- Kinds that take no target, as the order panel buttons and the self-destruct
-  key do: `stop`, `activate`, `deactivate`, `selfdestruct` (a toggle: it cancels
-  the order if a selected unit already has one), `cloak on` and `cloak off`, and
-  `movestate <n>` and `firestate <n>`, where n is 0, 1 or 2, the value the
-  button passes to the standing order.
-- `qbuild <unit type> [n]` adds n (default 1, at most 99) of a unit type to the
-  build queue of each unit the selector names, as a click in a factory's build
-  menu does. The selector names the factory; the order has no target.
-  `qbuild MAKENUKE` and `qbuild MAKEANTI` queue a missile, as the weapon-build
-  button does; the name goes to the game as written, with no unit type lookup.
-- A `+` before the kind (`+move 700 300`) is the shift key: the order joins the
-  queue instead of replacing the orders, and repeating an identical queued
-  order cancels it.
-
-Each order is issued as a mouse click does: the harness selects the named
-units, sets the order mode and cursor position, and calls the game's
-`IssueOrderToSelection` (`build` calls `IssueMobileBuildOrders`, as a click on a
-build site does, and `qbuild` calls `QueueBuildOrder`). The kinds without a
-target call it with the order's mission type, as the buttons do. The selection is put back afterwards.
-
-A scenario can also create units. One `spawn` line per unit:
-
-```
-spawn <tick> <slot> <unit type> <x> <z>
-spawn 10 1 ARMLAB 640 260
-```
-
-- The unit is created at the start of `<tick>`, before that tick's orders, so an
-  `order` on the same tick can select it. `<slot>` is a player the scenario
-  names (it need not be `human`), `<unit type>` is one exact unit type name (no
-  wildcard) and `x z` is a world position, with the height of the ground there.
-- It is what the console cheat does for one unit: the position is snapped to
-  the unit's footprint, then the unit is created for the slot. A spawned unit is
-  created finished, as the console cheat makes it, so a scenario that spawns
-  tests what the unit does, not how it was built. The tech chain is tested by
-  the scenarios that build.
-
-A bad selector, kind or position, a slot that is not `human` (a `spawn` needs only a named slot), a tick after the
-last tick, an unknown unit type, a build site the game rejects, or a selector
-that names no live unit at its tick exits with status 2 and a message that
-names the line.
-
-## Scripted input
-
-A scenario can send the game raw input, below the UI, so the game's own code turns it into selections and orders.
-One `input` line per event; lines may repeat and accumulate.
-
-```
-input <tick> <event>
-input 18 mouse move 384 240
-input 20 mouse left down 384 240
-input 21 mouse left up 384 240
-input 30 key down ctrl
-input 31 key down 1
-input 32 key up 1
-input 33 key up ctrl
-input 40 char a
-```
-
-- `<tick>` is a game tick from 1 to `ticks`. The event is queued at the start of that tick, after the tick's `order`,
-  `spawn` and `console` lines, and the UI handles it in the next frame, before the phases of tick + 1.
-- Events: `key down <key>` and `key up <key>`; `char <c>`; `mouse move <x> <y>`; `mouse left down <x> <y>`,
-  `mouse left up <x> <y>`, `mouse right down <x> <y>` and `mouse right up <x> <y>`. A mouse position is a window
-  coordinate, `x` from 0 to 639 and `y` from 0 to 479.
-- A `<key>` is a virtual-key code (decimal or `0x` hex, 1 to 255), `shift`, `ctrl`, `alt`, `esc`, `f1` to `f12`, a letter
-  `a` to `z` or a digit `0` to `9`. While Alt is held the key events reach the game as system key events, as Windows
-  sends them.
-- The game reads a letter command from a `char` event, not from a `key` event: the hotkeys `a`, `p`, `s` and `d` need
-  `char a` and so on. The `key` events are for Shift, Ctrl, Alt, Escape and the digits that make and recall groups
-  (Ctrl+1 makes a group, Alt+1 recalls it).
-- The key state and the cursor position the game reads follow the events: a key is held from its `key down` to its
-  `key up`, as a mouse button is held from its `down` to its `up`, and the cursor is where the last mouse event put it.
-  The event time is the tick, not the clock.
-- The game takes one mouse event and one key or `char` event per frame, so a scenario has at most one of each on a
-  tick, and `steps_per_frame` must be 1 (`--steps-per-frame` leaves a scenario with `input` lines at 1). A breach of
-  either, a button released more than 1 tick after its press with no mouse move of at least 32 units from the press position
-  between (the game takes a slow press and release for a click or a box by the wall clock), a bad event, a position outside the window or a tick after the last tick exits with status 2 and a message
-  that names the line.
-- A right-click gives an order only with interface type 1, and a left-click in an order mode only with type 0. A
-  scenario says which it uses with `console 1 +iface 1` or `console 1 +iface 0`; a scenario that does not say plays
-  with type 0.
-- A click on a unit needs the unit's position on the screen. The main view is the rectangle at (128, 32) of the 640 by
-  480 window, so a unit at world `x z` and height `y` is at screen `x - scrollX + 128`, `z - scrollY - y / 2 + 32`.
-  The scroll of slot 0 on The Pass is (304, 32) until the camera moves.
-
-In test mode the exe also writes `ui.txt` beside `trace.txt`: the input it delivered, the orders the UI turned it
-into, the selection and the camera scroll after each tick, and the count of view-stream draws (format and meaning in [docs/ui-log.md](../docs/ui-log.md)). The harness's own
-`order` lines are not logged. `--check` compares each run's `ui.txt` line by line with `reference/ui/<scenario>.txt`
-and reports the first line that differs. It fails when a stored log has no scenario, when a `ui-*` scenario has no
-stored log, and when a `ui-*` scenario's log has no order, queued build, cancel or group line and selects no unit (a
-click that gives nothing is a broken scenario). A scenario with no stored log is only counted. `--traces` copies the
-logs the reference branch wrote into `reference/ui/`.
-
-## Console commands
-
-A scenario can type a console command, as the chat line does. One `console` line per command:
-
-```
-console <tick> +<command> [arguments]
-console 1 +now Film Chris Include Reload Assert
-console 10 +nometal 0 50
-console 12 +armpw 0
-```
-
-- `<tick>` is a game tick from 1 to `ticks`. The line runs at the start of that tick, after the tick's `spawn` and
-  `order` lines, in file order. A tick of 0 or after the last tick exits with status 2.
-- The text after the tick is what a player types in the chat line, with its leading `+` (the line must have one). The
-  harness drops the `+` and calls the game's `ExecuteCommandLine`, as the chat line does, with the mask the chat line
-  computes: 1, or 7 when the cheat code has been typed (bit 1 of `uiOptionFlags`), and with 2 added in a skirmish or
-  multiplayer game (`g_nonCampaignGame`). The harness sets nothing before the call. A command whose mask the line's mask
-  lacks does nothing, as in the game, so a scenario types the cheat code first: `console 1 +now Film Chris Include Reload
-  Assert` sets `uiOptionFlags` bit 1, which enables the debug commands and the unit names below.
-- The text is at most 79 characters, the size of the game's command buffer. The chat path takes the cursor from the
-  mouse; the harness puts it at the fixed world position 640 260 before each console line (`pos`, the cell
-  `point` and `cellFeature`), so `burnone` and `feature` act on the cell there and a unit name creates its unit
-  there. `move <dx> <dz>` shifts the cursor, but the next console line sets it again, so
-  it changes nothing a scenario can see. `give`, `nometal` and `noenergy` take the local player when no slot is given.
-- A unit type name typed alone creates that unit for the slot in its first argument (`armpw 1`), the way the console
-  does through `DefaultCommandHandler` and `MatchWildcard`. The name must be a unit type of the game (any case, no
-  wildcard), so the handler never falls back to its `debugdat` file lookup.
-
-The commands a line may type, by their names in the game's command table (any case):
-
-| Group | Commands |
-| --- | --- |
-| Cheat code | `now` (typed as `now Film Chris Include Reload Assert`) |
-| Resources and players | `atm`, `give`, `nometal`, `noenergy`, `ai`, `control`, `view` |
-| Sharing (they do nothing without a network game) | `sharemetal`, `shareenergy`, `shareall`, `setsharemetal`, `setshareenergy` |
-| Units | `reload`, `kill`, `assign`, `selectable`, `shootall`, `doubleshot`, `halfshot`, a unit type name |
-| Features and the map | `feature`, `burnone`, `burnall`, `treedeath`, `meteor`, `sealevel`, `edge`, `search`, `move`, `drop` |
-| Sight | `los`, `lostype`, `mapping`, `radar`, `nowisee` |
-| Interface | `iface <0 or 1>`: the interface type, 0 for left-click orders and 1 for right-click orders (see Scripted input) |
-| AI | `reloadaiprofiles` |
-| Game end | `iwin`, `ilose` |
-| No effect | `assert`, `dprint`, `mem`, `zbuffer` |
-
-The sharing commands, `assert`, `dprint`, `mem`, `zbuffer`, `assign` (nothing is selected), `selectable`, `drop` and
-`edge` change no field the trace hashes: a scenario types them to enter their functions.
-
-A command that is not in the table, or a first word that is neither a listed command nor a unit type, exits with
-status 2 and a message that names the line. Left out are the display, sound, debugger and host commands,
-`compression` and `netstats` (network statistics), `sharemapping` and `shareradar` (network games only), and two
-commands that touch the file system: `include` (reads `debugdat\include.txt`) and `printweights` (writes the file
-named in its second argument, so the AI weights dump `DumpPlayerAI` is not reachable). `los`, `mapping` and `iface` save the
-game's settings through the host, which writes the run's own registry, and no scenario reads settings from it.
+`--check` compares each run's `ui.txt` line by line with `reference/ui/<scenario>.txt` and reports the first line
+that differs (format and meaning in [docs/ui-log.md](../docs/ui-log.md)). It fails when a stored log has no
+scenario, when a `ui-*` scenario has no stored log, and when a `ui-*` scenario's log has no order, queued build,
+cancel or group line and selects no unit (a click that gives nothing is a broken scenario). A scenario with no
+stored log is only counted. `--traces` copies the logs the reference branch wrote into `reference/ui/`. A scenario
+with `input` lines runs at one step per frame even under `--steps-per-frame`.
 
 ## Traces
 

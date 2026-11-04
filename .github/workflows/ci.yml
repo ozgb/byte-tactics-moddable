@@ -91,6 +91,11 @@ jobs:
           python3 tools/test_replay_subsystems.py
           python3 tools/replay_subsystems.py check
 
+      - name: Check the sim globals block is current
+        run: |
+          python3 tools/test_simglobals.py
+          python3 tools/simglobals.py --check
+
   modern-compile:
     name: modern-compile
     runs-on: ubuntu-24.04

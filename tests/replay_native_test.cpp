@@ -27,6 +27,9 @@ extern "C" int __cdecl bx_rand(void* state);
 extern "C" int __cdecl bx_ScaledSin(short angle, int scale);
 extern "C" int __cdecl bx_ScaledCos(short angle, int scale);
 
+void* __cdecl operator new(unsigned int size);
+void __cdecl operator delete(void* p);
+
 
 void* GetAllocLock()
 {
@@ -1331,7 +1334,7 @@ void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* o
 {
     for (unsigned i = 0; i < count; i++) {
         const ReplayObjectField& f = kReplayObjectFields[set[i]];
-        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_EMBEDS || f.kind == RK_UNITID || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
+        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_EMBEDS || f.kind == RK_UNITID || f.kind == RK_SELF || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
             continue;
         if (!ReplayFieldLive(f, object))
             continue;
@@ -4236,6 +4239,250 @@ void EmbeddedPolymorphicSelfTest()
     free(text);
 }
 
+unsigned OffsetOf(const void* p)
+{
+    return (unsigned)((const char*)p - (const char*)SimBlockBase());
+}
+
+FixtureEye* MakeEyes(unsigned live)
+{
+    FixtureEye* eyes = (FixtureEye*)operator new(4 * (unsigned)sizeof(FixtureEye));
+    memset((void*)eyes, 0, 4 * sizeof(FixtureEye));
+    for (unsigned i = 0; i < 4; i++) {
+        eyes[i].screen.offset = OffsetOf(&eyes[i].pos);
+        eyes[i].flagPtr.offset = OffsetOf(&eyes[i].flag);
+    }
+    g_game->hotRadar.offset = OffsetOf(eyes);
+    g_game->hotRadarCount = (int)live;
+    return eyes;
+}
+
+void CapacityTableSelfTest()
+{
+    printf("a table with a live count and a capacity\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureView* view = (FixtureView*)Fresh(sizeof(FixtureView));
+    view->flags = 4;
+    FixtureEye* eyes = MakeEyes(2);
+    eyes[0].owner.offset = OffsetOf(view);
+    eyes[0].x = 1;
+    eyes[1].x = 2;
+    eyes[3].x = 9;
+    eyes[3].pos.x = 5;
+    eyes[3].pos.y = 6;
+    unsigned short fields[7] = { FieldIndex(ROK_FIXTUREEYE, "owner"), FieldIndex(ROK_FIXTUREEYE, "screen"), FieldIndex(ROK_FIXTUREEYE, "x"), FieldIndex(ROK_FIXTUREEYE, "flag"),
+                                 FieldIndex(ROK_FIXTUREEYE, "flagPtr"), FieldIndex(ROK_FIXTUREEYE, "pos"), FieldIndex(ROK_FIXTUREVIEW, "flags") };
+    unsigned char every[1] = { ROK_FIXTUREEYE };
+    ReplaySlotSets sets = { "capacity", 0, nullptr, 0, nullptr, 0, fields, 7, fields, 7, every, 1 };
+    unsigned char kinds[1] = { ROK_FIXTUREEYE };
+    void* roots[1] = { &eyes[3] };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(ReplayFailure() == nullptr, "the walk reaches the elements without a failure");
+    Check(strstr(text, "  r FixtureEye#3.x 9\n") != nullptr && strstr(text, "  r FixtureEye#3.pos (5,6)\n") != nullptr, "an element past the live count is named by its index");
+    Check(strstr(text, "FixtureEye#?") == nullptr && strstr(text, "FixtureEye#2") == nullptr, "and no pointer into the table is unnamed");
+    Check(CountLines(text, "  r FixtureEye#") == 12, "the all-of walk records the live elements, and the root the one past them");
+    Check(strstr(text, "  r FixtureEye#0.owner FixtureView#1\n") != nullptr && strstr(text, "  r FixtureView#1.flags 4\n") != nullptr, "a ref with a ctype is written as any ref is");
+    Check(strstr(text, "screen") == nullptr && strstr(text, "flagPtr") == nullptr, "a self pointer is never a line");
+
+    ResetBlock();
+    Check(RestoreField(kReplayFields[RF_GAME_HOTRADARCOUNT], "2"), "the live count restores as a recorded field");
+    RestoreText(text, sets);
+    FixtureEye* rebuilt = (FixtureEye*)g_game->hotRadar.get();
+    Check(rebuilt != nullptr, "the table is allocated when a line first names an element");
+    if (rebuilt == nullptr) {
+        free(text);
+        return;
+    }
+    Check(g_game->hotRadarCount == 2, "the replayer stores nothing into the live count");
+    Check(!SimOwns(rebuilt), "the table is the module's own memory, from its operator new");
+    Check(rebuilt[3].x == 9 && rebuilt[3].pos.x == 5 && rebuilt[3].pos.y == 6 && rebuilt[0].x == 1 && rebuilt[1].x == 2, "the elements are restored, past the live count too");
+    Check(rebuilt[0].owner.get() == (char*)ReplayResolveObject("FixtureView#1", nullptr, g_objects, AllocObject), "the ref with a ctype leads to its object");
+    unsigned found = 0;
+    Check(ReplayResolveObject("FixtureEye#3", &found, g_objects, AllocObject) == &rebuilt[3] && found == ROK_FIXTUREEYE, "an index below the capacity names its element");
+    Check(ReplayResolveObject("FixtureEye#4", nullptr, g_objects, AllocObject) == nullptr, "and one past the capacity names nothing");
+    g_rootKinds[0] = ROK_FIXTUREEYE;
+    g_rootObjects[0] = &rebuilt[3];
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored table compares equal");
+    rebuilt[3].x = 8;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureEye#3.x") == 0, "a change past the live count is reported at its element");
+    rebuilt[3].x = 9;
+    if (!SimOwns(rebuilt)) {
+        operator delete(rebuilt);
+        g_game->hotRadar.offset = 0;
+    }
+    free(text);
+}
+
+void SelfPointerSelfTest()
+{
+    printf("pointers into an object's own members\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureEye* eyes = MakeEyes(2);
+    eyes[0].x = 1;
+    eyes[1].x = 2;
+    eyes[1].flag = 7;
+    eyes[1].pos.x = 3;
+    unsigned short fields[5] = { FieldIndex(ROK_FIXTUREEYE, "screen"), FieldIndex(ROK_FIXTUREEYE, "x"), FieldIndex(ROK_FIXTUREEYE, "flag"), FieldIndex(ROK_FIXTUREEYE, "flagPtr"),
+                                 FieldIndex(ROK_FIXTUREEYE, "pos") };
+    unsigned char every[1] = { ROK_FIXTUREEYE };
+    ReplaySlotSets sets = { "self", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1 };
+    Recorder recorder;
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* first = strdup(recorder.text.Data());
+    Check(CountLines(first, "  r FixtureEye#") == 6 && strstr(first, "screen") == nullptr && strstr(first, "flagPtr") == nullptr, "a self pointer to a member is no line");
+
+    eyes[0] = eyes[1];
+    Check(eyes[0].screen.get() == &eyes[1].pos && eyes[0].flagPtr.get() == &eyes[1].flag, "an assignment copies the pointers, which now lead into the other element");
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* second = strdup(recorder.text.Data());
+    printf("%s", second);
+    Check(strstr(second, "  r FixtureEye#0.x 2\n") != nullptr && strstr(second, "  r FixtureEye#0.flag 7\n") != nullptr && CountLines(second, "  r ") == 3, "only the data that moved is recorded");
+
+    ResetBlock();
+    Check(RestoreField(kReplayFields[RF_GAME_HOTRADARCOUNT], "2"), "the count restores");
+    RestoreText(first, sets);
+    FixtureEye* rebuilt = (FixtureEye*)g_game->hotRadar.get();
+    Check(rebuilt != nullptr, "the table is rebuilt");
+    if (rebuilt == nullptr) {
+        free(first);
+        free(second);
+        return;
+    }
+    Check(rebuilt[0].screen.get() == &rebuilt[0].pos && rebuilt[0].flagPtr.get() == &rebuilt[0].flag, "the replayer sets each pointer to the member of its own object");
+    Check(rebuilt[1].screen.get() == &rebuilt[1].pos && rebuilt[1].flagPtr.get() == &rebuilt[1].flag, "in every element it names");
+    rebuilt[0] = rebuilt[1];
+    Check(rebuilt[0].screen.get() == &rebuilt[1].pos, "the replayed module moves an element by assignment, and the pointer leads into the other one");
+    RestoreText(second, sets);
+    Check(rebuilt[0].screen.get() == &rebuilt[0].pos && rebuilt[0].flagPtr.get() == &rebuilt[0].flag && rebuilt[0].x == 2 && rebuilt[0].flag == 7, "the next call's lines name the element again, and set its pointers");
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the self pointers are neither compared nor a difference");
+    if (!SimOwns(rebuilt)) {
+        operator delete(rebuilt);
+        g_game->hotRadar.offset = 0;
+    }
+    free(first);
+    free(second);
+
+    printf("an index into the object's own array\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureHeap* heap = (FixtureHeap*)Fresh(sizeof(FixtureHeap));
+    FixtureNode* nodes = (FixtureNode*)Fresh(4 * (unsigned)sizeof(FixtureNode));
+    for (int i = 0; i < 4; i++) {
+        nodes[i].key = 10 * i;
+        nodes[i].pri = (short)i;
+    }
+    heap->capacity = 4;
+    heap->used = 3;
+    heap->pool = nodes;
+    heap->top = &nodes[2];
+    unsigned short heapFields[6] = { FieldIndex(ROK_FIXTUREHEAP, "capacity"), FieldIndex(ROK_FIXTUREHEAP, "used"), FieldIndex(ROK_FIXTUREHEAP, "pool"), FieldIndex(ROK_FIXTUREHEAP, "top"),
+                                     FieldIndex(ROK_FIXTURENODE, "key"), FieldIndex(ROK_FIXTURENODE, "pri") };
+    ReplaySlotSets heapSets = { "heap", 0, nullptr, 0, nullptr, 0, heapFields, 6, heapFields, 6 };
+    unsigned char kinds[2] = { ROK_FIXTUREHEAP, ROK_FIXTURENODE };
+    void* roots[2] = { heap, &nodes[2] };
+    Recorder heapRecorder;
+    heapRecorder.Record(kinds, roots, 2, heapSets);
+    char* one = strdup(heapRecorder.text.Data());
+    printf("%s", one);
+    Check(strstr(one, "  r FixtureHeap#1.top 2\n") != nullptr, "a pointer into the array is written as its index");
+    Check(strstr(one, "  r FixtureHeap#1.pool[2].key 20\n") != nullptr, "and the element it leads to under its own name");
+    heap->top = &nodes[3];
+    heapRecorder.Record(kinds, roots, 2, heapSets);
+    char* two = strdup(heapRecorder.text.Data());
+    Check(strcmp(two, "  r FixtureHeap#1.top 3\n") == 0, "a change of the pointer is one line");
+    FixtureNode* grown = (FixtureNode*)Fresh(8 * (unsigned)sizeof(FixtureNode));
+    memcpy((void*)grown, nodes, 4 * sizeof(FixtureNode));
+    heap->pool = grown;
+    heap->capacity = 8;
+    heap->top = &grown[3];
+    roots[1] = &grown[2];
+    heapRecorder.Record(kinds, roots, 2, heapSets);
+    char* three = strdup(heapRecorder.text.Data());
+    Check(strcmp(three, "  r FixtureHeap#1.capacity 8\n") == 0, "an array that moves with its pointer into it records no line for the pointer");
+
+    ResetBlock();
+    RestoreText(one, heapSets);
+    FixtureHeap* back = (FixtureHeap*)ReplayResolveObject("FixtureHeap#1", nullptr, g_objects, AllocObject);
+    Check(back != nullptr && back->pool.get() != nullptr, "the heap is rebuilt");
+    if (back == nullptr || back->pool.get() == nullptr) {
+        free(one);
+        free(two);
+        free(three);
+        return;
+    }
+    Check(!SimOwns(back->pool.get()) && back->top.get() == back->pool.get() + 2 && back->pool.get()[2].key == 20, "the index is the element of the array the replayer made");
+    RestoreText(two, heapSets);
+    RestoreText(three, heapSets);
+    Check(back->top.get() == back->pool.get() + 3 && back->capacity == 8, "a later index replaces it");
+    g_rootKinds[0] = ROK_FIXTUREHEAP;
+    g_rootObjects[0] = back;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&heapSets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored heap compares equal");
+    back->top.offset = OffsetOf(back->pool.get() + 1);
+    BeginCompare();
+    CompareObjects(&heapSets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureHeap#1.top") == 0 && strstr(g_detail.Data(), "recorded 3, replayed 1") != nullptr, "a pointer to another element is reported at the field, as indexes");
+    back->top.offset = OffsetOf(back->pool.get() + 3);
+    Check(!ReplayRestoreObjectField(*ReplayFindObjectField(ROK_FIXTUREHEAP, "top"), back, "?", g_objects, nullptr), "a pointer that no index names is refused");
+    if (!SimOwns(back->pool.get())) {
+        operator delete(back->pool.get());
+        back->pool.offset = 0;
+    }
+    free(one);
+    free(two);
+    free(three);
+}
+
+void GameWriteSelfTest()
+{
+    printf("a write to Game through a pointer\n");
+    ResetBlock();
+    ReplayClearFailure();
+    const ReplayField& f = kReplayFields[RF_GAME_HOTRADARCOUNT];
+    g_game->hotRadarCount = 2;
+    ReplayKnown known;
+    ReplayText entry;
+    ReplayText exit;
+    ReplayText scratch;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayEmitField(entry, known, *table, 'r', f.name, ReplayFieldView(f), BlockBase(f), scratch);
+    int* through = &g_game->hotRadarCount;
+    *through = 3;
+    ReplayEmitField(exit, known, *table, 'w', f.name, ReplayFieldView(f), BlockBase(f), scratch);
+    Check(strcmp(entry.Data(), "  r Game.hotRadarCount 2\n") == 0 && strcmp(exit.Data(), "  w Game.hotRadarCount 3\n") == 0, "a write through a pointer is a w line of the field it lands on");
+
+    ResetBlock();
+    Check(RestoreField(f, "2"), "the entry value restores");
+    through = &g_game->hotRadarCount;
+    *through = 4;
+    ReplayText now;
+    FormatField(f, now);
+    BeginCompare();
+    if (strcmp("3", now.Data()) != 0)
+        Diff("Game.hotRadarCount", "3", now.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Game.hotRadarCount") == 0 && strstr(g_detail.Data(), "recorded 3, replayed 4") != nullptr, "a different write is reported at the field");
+    now.Free();
+    entry.Free();
+    exit.Free();
+    scratch.Free();
+    delete table;
+}
+
 int SelfTest(const char* file)
 {
     static const char* const names[] = { "", "an import with other arguments", "an extra import", "a missing import" };
@@ -4268,6 +4515,9 @@ int SelfTest(const char* file)
     UnconditionedUnitIdSelfTest();
     GameRefSelfTest();
     ExecuteCommandSelfTest();
+    CapacityTableSelfTest();
+    SelfPointerSelfTest();
+    GameWriteSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

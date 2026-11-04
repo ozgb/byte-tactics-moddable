@@ -2,7 +2,7 @@
 #define HARNESS_REPLAY_TYPES_H
 
 enum ReplayBase { RB_GAME, RB_SIM, RB_RNG };
-enum ReplayKind { RK_I32, RK_U32, RK_U16, RK_F32, RK_POINT16, RK_STRING, RK_WEAPON, RK_I16, RK_REF, RK_FLAGS, RK_U8, RK_F64, RK_BYTES, RK_EMBED, RK_UNITID, RK_ARRAY, RK_CODE, RK_VECTOR, RK_PTR, RK_REFS, RK_EMBEDS };
+enum ReplayKind { RK_I32, RK_U32, RK_U16, RK_F32, RK_POINT16, RK_STRING, RK_WEAPON, RK_I16, RK_REF, RK_FLAGS, RK_U8, RK_F64, RK_BYTES, RK_EMBED, RK_UNITID, RK_ARRAY, RK_CODE, RK_VECTOR, RK_PTR, RK_REFS, RK_EMBEDS, RK_SELF, RK_SELFINDEX };
 enum ReplayVectorMode { RV_OBJECT, RV_SCALAR, RV_VALUE };
 enum { RT_ORDER = 0 };
 enum ReplayScope { RS_STATE, RS_INDEX, RS_VALUE };
@@ -11,6 +11,7 @@ struct ReplayFactor {
     unsigned offset;
     unsigned char size;
     unsigned char shift;
+    unsigned add;
 };
 
 struct ReplayLength {
@@ -37,6 +38,14 @@ struct ReplayTableSpec {
     unsigned offset;
     ReplayLength count;
     unsigned alloc;
+    ReplayLength capacity;
+    unsigned char capped;
+    unsigned char module;
+};
+
+struct ReplaySelfSpec {
+    unsigned offset;
+    unsigned stride;
 };
 
 struct ReplayField {
@@ -62,6 +71,9 @@ struct ReplayInsideSite {
     unsigned stride;
     unsigned count;
     unsigned char ref;
+    unsigned char module;
+    ReplayLength room;
+    unsigned char capped;
 };
 
 struct ReplayObjectKind {

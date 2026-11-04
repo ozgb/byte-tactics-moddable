@@ -101,12 +101,18 @@ if(BT_ACCESS_LOG)
   set(ACCESS_LOG_OBJECTS "$<TARGET_OBJECTS:accesslog>")
   set(ACCESS_LOG_TARGETS accesslog)
   set(ACCESS_LOG_ALIAS_FLAGS --access-log)
+  set(ACCESS_LOG_TABLES COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/accesslog.py" tables --build-dir "${CMAKE_BINARY_DIR}")
+  set(ACCESS_LOG_TABLE_FILES BYPRODUCTS "${CMAKE_BINARY_DIR}/accesslog.attr" "${CMAKE_BINARY_DIR}/accesslog.items")
+  set(ACCESS_LOG_TABLE_DEPS "${CMAKE_SOURCE_DIR}/tools/accesslog.py" "${CMAKE_SOURCE_DIR}/data/subsystems.csv" "${CMAKE_SOURCE_DIR}/data/state_classes.csv")
   set(ACCESS_LOG_LINK_FLAGS /nodefaultlib:clang_rt.asan.lib /nodefaultlib:clang_rt.asan_cxx.lib
       /nodefaultlib:clang_rt.asan_dynamic.lib /nodefaultlib:clang_rt.asan_dynamic_runtime_thunk.lib)
 else()
   set(ACCESS_LOG_OBJECTS "")
   set(ACCESS_LOG_TARGETS "")
   set(ACCESS_LOG_ALIAS_FLAGS "")
+  set(ACCESS_LOG_TABLES "")
+  set(ACCESS_LOG_TABLE_FILES "")
+  set(ACCESS_LOG_TABLE_DEPS "")
   set(ACCESS_LOG_LINK_FLAGS "")
 endif()
 
@@ -283,7 +289,10 @@ add_custom_command(
           /libpath:${CMAKE_BINARY_DIR}/lib /opt:noref,noicf /incremental:no /brepro /safeseh:no /force:multiple ${ACCESS_LOG_LINK_FLAGS} /map:${CMAKE_BINARY_DIR}/TotalA.map
           "@${CMAKE_BINARY_DIR}/objs/objects.rsp" "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res"
           ${ZLIB_OBJECTS} ${ACCESS_LOG_OBJECTS} ${IMPORT_LIBS} ${SYSTEM_LIBS} $<TARGET_FILE:wasmloader>
+  ${ACCESS_LOG_TABLES}
+  ${ACCESS_LOG_TABLE_FILES}
   DEPENDS game data extra wasmloader ${PROFILE_TARGETS} ${ZLIB_TARGETS} ${ACCESS_LOG_TARGETS} ${ACCESS_LOG_OBJECTS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res" ${IMPORT_LIBS}
+  ${ACCESS_LOG_TABLE_DEPS}
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(TotalA ALL DEPENDS "${CMAKE_BINARY_DIR}/TotalA.exe")
 

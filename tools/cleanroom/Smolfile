@@ -1,0 +1,11 @@
+image = "alpine:3.22"
+cpus = 4
+memory = 4096
+storage = 20
+init = [
+  "apk add --no-cache rust=1.87.0-r1 cargo=1.87.0-r1 rust-wasm=1.87.0-r1 python3 git nodejs npm socat ca-certificates bash",
+  "wget -q -O /tmp/wasm-tools.tar.gz https://github.com/bytecodealliance/wasm-tools/releases/download/v1.262.0/wasm-tools-1.262.0-x86_64-musl.tar.gz",
+  "echo '00de24b559f96f0971b23e45a17896396dddb8109830e8edee11ad55a3ce3517  /tmp/wasm-tools.tar.gz' | sha256sum -c -",
+  "tar -xzf /tmp/wasm-tools.tar.gz -C /tmp && install -m 0755 /tmp/wasm-tools-1.262.0-x86_64-musl/wasm-tools /usr/local/bin/wasm-tools && rm -rf /tmp/wasm-tools*",
+  "npm install -g --ignore-scripts=false @anthropic-ai/claude-code@2.1.311",
+]

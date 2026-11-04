@@ -4,7 +4,9 @@
 """
 
 import csv
+import tempfile
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 
 import coupling as cp
@@ -370,6 +372,12 @@ class VirtualTest(unittest.TestCase):
         rows = fn("P", "src/weapons/w.cpp") + [indirect_row("P", "src/weapons/w.cpp", "indirect via int (*)(void *)")]
         calls = cp.indirect_calls(rows + fn("T", "src/units/t.cpp"), [("P", "T")], classes_of(), {})
         self.assertEqual([(c.target, c.callees) for c in calls], [("pointer indirect via int (*)(void *)", {"T"})])
+
+    def test_a_seam_slot_edge_is_not_a_pointer_target(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "hazard_edges.csv"
+            path.write_text("caller,target,reason\nP,T,\"seam slot filled by InstallNativeSeams, X\"\nP,U,WeaponDef::fire set by H\n")
+            self.assertEqual(cp.seam_slot_edges(path), {("P", "T")})
 
     def test_a_virtual_call_with_nothing_to_run_is_unresolved(self):
         rows = fn("Caller", "src/ai/a.cpp") + [indirect_row("Caller", "src/ai/a.cpp", "virtual Nobody::m")]

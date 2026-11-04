@@ -108,7 +108,8 @@ source calls, and gives each the functions it can reach:
   pointer       a caller with an indirect call that is neither virtual nor a seam slot (a
                 function pointer or a bound member function, such as the thiscall pointer
                 of Order::SetAttachedFx) is taken to reach each hand-resolved target of
-                data/hazard_edges.csv that no virtual call above accounts for
+                data/hazard_edges.csv that no virtual call above accounts for, except the edges
+                that resolve a seam slot (reason "seam slot filled by ...")
 
 An entry or a method is found among the functions of data/rwsets.csv by its qualified name,
 or by its last name when the array writes it unqualified. A call is listed when the caller's subsystem and a callee's are both sim subsystems and differ,
@@ -637,6 +638,12 @@ def virtual_report(edges: list[tuple], owners: dict, missing: list[VirtualCall])
     return "\n".join(out)
 
 
+def seam_slot_edges(path: Path = EDGES) -> set[tuple[str, str]]:
+    """The (caller, target) pairs of data/hazard_edges.csv that resolve a seam slot."""
+    with path.open(newline="") as f:
+        return {(r["caller"], r["target"]) for r in csv.DictReader(f) if r["reason"].startswith("seam slot filled by")}
+
+
 def virtual_inputs(root: Path = ROOT):
     """Everything --virtual reads: the calls, the subsystem maps, the constructors, and the lines of data/hazards.csv."""
     rows, graph = hazards.load_graph()
@@ -652,7 +659,7 @@ def virtual_inputs(root: Path = ROOT):
     for r in read_csv(hazards.HAZARDS):
         if r["kind"] == "indirect_call":
             lines[(r["function"], r["file"], r["target"])] = r["line"]
-    calls = indirect_calls(rows, edges, Classes.read(root), lines)
+    calls = indirect_calls(rows, [e for e in edges if e not in seam_slot_edges()], Classes.read(root), lines)
     classes_hit = {c.rpartition("::")[0] for call in calls for c in call.callees}
     sites = construction_sites(root, classes_hit)
     by_file: dict[str, set[str]] = defaultdict(set)

@@ -2268,7 +2268,6 @@ static_assert(sizeof(StringRef) == 4, "");
 static_assert(offsetof(StringRef, p) == 0, "");
 static_assert(offsetof(StringRef, data) == 0, "");
 static_assert(offsetof(StringRef, ptr) == 0, "");
-static_assert(sizeof(Target) == 4, "");
 static_assert(sizeof(TdfEntries) == 17, "");
 static_assert(offsetof(TdfEntries, less) == 0, "");
 static_assert(offsetof(TdfEntries, v) == 1, "");

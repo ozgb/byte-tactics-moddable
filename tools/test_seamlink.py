@@ -220,6 +220,10 @@ class SeamLinkTest(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn("stale", problems[0])
 
+    def test_a_virtual_row_is_for_the_virtual_check(self):
+        row = ("pathfinding", "Pathfinder::Cost", "virtual Target::Cost", "TODO(#400): seam slot")
+        self.assertEqual(seamlink.check([], [row]), [])
+
     def test_reason_must_name_an_issue(self):
         link = Unit("link/data.cpp", data={"?g_foo@@3HA"})
         vs = self.run_with(self.wind("?g_foo@@3HA"), link)

@@ -83,11 +83,11 @@ void __stdcall PushHeapSiftUp(HeapEntry* first, int hole, int top, HeapEntry val
 extern signed char g_dirDeltaX[];
 extern signed char g_dirDeltaZ[];
 
-class PathPlannerView;
+class PathGoal;
 
 #pragma pack(push, 1)
 struct UnitMotionPlannerView {
-    Ref<PathPlannerView> planner;
+    Ref<PathGoal> planner;
     Ref<MovementClass> owner;
 };
 
@@ -106,17 +106,6 @@ extern Game* g_game;
 
 #include "ai_search_goal.h"
 #include "../state/sim_globals.h"
-
-class PathPlannerView {
-public:
-    virtual void unused0();
-    virtual void unused1();
-    virtual void unused2();
-    virtual void unused3();
-    virtual void unused4();
-    virtual void unused5();
-    virtual AiSearchGoal* GetPath();
-};
 
 inline int Pathfinder::Push(const NodeData& d)
 {
@@ -224,7 +213,7 @@ int __stdcall DirectionFromStep(int dx, int dy)
 __int64 Pathfinder::Estimate(int param1, int param2)
 {
     int a = costScale;
-    return ((__int64)target->Cost(param1, param2) * (__int64)a) >> 0x10;
+    return ((__int64)g_seams.orders->OrderFxApproxDist(target, param1, param2) * (__int64)a) >> 0x10;
 }
 
 // FUNCTION: 0x40da70
@@ -437,7 +426,7 @@ greedy:
 }
 
 // FUNCTION: 0x40e630
-void Pathfinder::StartSearch(Target* t)
+void Pathfinder::StartSearch(OrderFx* t)
 {
     owner = ((UnitMotionPlannerView *)object->motion.get())->owner;
     target = t;
@@ -447,7 +436,7 @@ void Pathfinder::StartSearch(Target* t)
     ClearDirtyCells();
 
     std::vector<Point16> goals;
-    target->GetGoals(goals);
+    g_seams.orders->OrderFxFillGoalCells(target, &goals);
     int bestDist = 0x7fffffff;
     for (Point16* p = goals.begin(); p != goals.end(); p++) {
         MarkGoal(p->x, p->y);
@@ -461,22 +450,22 @@ void Pathfinder::StartSearch(Target* t)
         }
     }
 
-    if (target->IsGoal(start.x, start.y)) {
-        g_seams.orders->OrderFxAddFlags((OrderFx*)target.get(), 0x100);
+    if (g_seams.orders->OrderFxIsGoal(target, start.x, start.y)) {
+        g_seams.orders->OrderFxAddFlags(target.get(), 0x100);
         Finish();
         return;
     }
     int cost = Cost(start.x, start.y);
     if (!grid.InBounds(start.x, start.y)) {
-        g_seams.orders->OrderFxAddFlags((OrderFx*)target.get(), 0x200);
+        g_seams.orders->OrderFxAddFlags(target.get(), 0x200);
         Finish();
         return;
     }
     probe = ProbeStraightPath();
     if (probe == 0) {
-        g_seams.orders->OrderFxAddFlags((OrderFx*)target.get(), 0x100);
+        g_seams.orders->OrderFxAddFlags(target.get(), 0x100);
     } else {
-        g_seams.orders->OrderFxAddFlags((OrderFx*)target.get(), 0x200);
+        g_seams.orders->OrderFxAddFlags(target.get(), 0x200);
         if (probe >= cost) {
             Finish();
             return;
@@ -615,12 +604,12 @@ void Pathfinder::RunSearches()
                 *c = c->get() + 1;
             Unit* u = cursor[player];
             if (((short)u->unitDefIndex) != 0 && ((UnitMotionPlannerView *)u->motion.get()) != 0 && ((UnitMotionPlannerView *)u->motion.get())->owner.get() != 0) {
-                path = ((UnitMotionPlannerView *)u->motion.get())->planner->GetPath();
+                path = g_seams.orders->UnitMotionClaimRepath(u->motion);
                 if (path != 0) {
                     object = u;
                     steps += 100;
                     costScale = g_playerBudgetCap[player];
-                    ((Pathfinder*)this)->StartSearch((Target*)path->target.get());
+                    ((Pathfinder*)this)->StartSearch(path->target);
                 }
             }
         } else if (Size() != 0) {

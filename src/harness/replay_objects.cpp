@@ -10,6 +10,7 @@
 #pragma pack(pop)
 #include "../game/los_helpers.h"
 #include "../network/player.h"
+#include "../state/sim_globals.h"
 #include "../units/unit.h"
 #include "replay_text.h"
 #include "replay_types.h"
@@ -38,30 +39,65 @@ unsigned char* BlockAt(unsigned offset)
     return offset == 0 ? nullptr : (unsigned char*)SimBlockBase() + offset;
 }
 
-bool TableSpan(unsigned table, unsigned char** base, unsigned* count, unsigned* stride)
+unsigned FactorValue(const ReplayFactor& f, const void* object)
 {
-    if (g_game == nullptr)
+    if (f.size == 0)
+        return f.offset;
+    const unsigned char* at = (const unsigned char*)object + f.offset;
+    unsigned v = f.size == 1 ? *at : f.size == 2 ? *(const unsigned short*)at : *(const unsigned*)at;
+    return v >> f.shift;
+}
+
+unsigned HexDigit(char c)
+{
+    return (unsigned)(c <= '9' ? c - '0' : (c | 0x20) - 'a' + 10);
+}
+
+bool TableSpan(unsigned kind, unsigned char** base, unsigned* count, unsigned* stride)
+{
+    unsigned table = kReplayObjectKinds[kind].table;
+    if (table == RT_ORDER)
         return false;
-    if (table == RT_UNITS) {
-        *base = (unsigned char*)g_game->units.get();
-        *count = g_game->poolCount;
-        *stride = (unsigned)sizeof(Unit);
-    } else if (table == RT_PLAYERS) {
-        *base = (unsigned char*)g_game->players;
-        *count = 10;
-        *stride = (unsigned)sizeof(Player);
-    } else {
+    const ReplayTableSpec& spec = kReplayTables[table - 1];
+    unsigned char* root = spec.sim ? (unsigned char*)g_simGlobals : (unsigned char*)g_game;
+    if (root == nullptr)
         return false;
-    }
+    *base = spec.ref ? BlockAt(*(const unsigned*)(root + spec.offset)) : root + spec.offset;
+    *count = ReplayLengthOf(spec.count, root);
+    *stride = kReplayObjectKinds[kind].size;
     return *base != nullptr;
 }
 
-int TableIndex(unsigned table, const void* p)
+void StoreFactor(const ReplayFactor& f, void* object, unsigned value)
+{
+    unsigned char* at = (unsigned char*)object + f.offset;
+    if (f.size == 1)
+        *at = (unsigned char)value;
+    else if (f.size == 2)
+        *(unsigned short*)at = (unsigned short)value;
+    else if (f.size == 4)
+        *(unsigned*)at = value;
+}
+
+void EnsureTable(unsigned kind, ReplayAllocFn alloc)
+{
+    const ReplayTableSpec& spec = kReplayTables[kReplayObjectKinds[kind].table - 1];
+    unsigned char* root = spec.sim ? (unsigned char*)g_simGlobals : (unsigned char*)g_game;
+    if (root == nullptr || !spec.ref || spec.alloc == 0 || alloc == nullptr || *(const unsigned*)(root + spec.offset) != 0)
+        return;
+    unsigned size = spec.alloc * kReplayObjectKinds[kind].size;
+    unsigned char* pool = (unsigned char*)alloc(size);
+    memset(pool, 0, size);
+    *(unsigned*)(root + spec.offset) = (unsigned)(pool - (unsigned char*)SimBlockBase());
+    StoreFactor(spec.count.first, root, spec.alloc);
+}
+
+int TableIndex(unsigned kind, const void* p)
 {
     unsigned char* base;
     unsigned count;
     unsigned stride;
-    if (p == nullptr || !TableSpan(table, &base, &count, &stride))
+    if (p == nullptr || !TableSpan(kind, &base, &count, &stride))
         return -1;
     const unsigned char* q = (const unsigned char*)p;
     if (q < base || (unsigned)(q - base) % stride != 0 || (unsigned)(q - base) / stride >= count)
@@ -74,7 +110,7 @@ bool InsideTable(unsigned kind, const void* p, unsigned* container, int* index)
     const ReplayObjectKind& k = kReplayObjectKinds[kind];
     if (!k.hasInside || p == nullptr)
         return false;
-    int at = TableIndex(kReplayObjectKinds[k.insideKind].table, (const unsigned char*)p - k.insideOffset);
+    int at = TableIndex(k.insideKind, (const unsigned char*)p - k.insideOffset);
     if (at < 0)
         return false;
     *container = k.insideKind;
@@ -104,7 +140,7 @@ unsigned ReplayObjectTable::Find(unsigned kind, const void* p) const
     if (p == nullptr)
         return 0;
     if (kind < kReplayObjectKindCount && kReplayObjectKinds[kind].table != RT_ORDER) {
-        int at = TableIndex(kReplayObjectKinds[kind].table, p);
+        int at = TableIndex(kind, p);
         return at < 0 ? 0 : (unsigned)at + 1;
     }
     for (unsigned i = PointerHash(p);; i = (i + 1) % HASH) {
@@ -135,7 +171,7 @@ void* ReplayObjectTable::Pointer(unsigned kind, unsigned ordinal) const
         unsigned char* base;
         unsigned count;
         unsigned stride;
-        if (ordinal == 0 || !TableSpan(kReplayObjectKinds[kind].table, &base, &count, &stride) || ordinal > count)
+        if (ordinal == 0 || !TableSpan(kind, &base, &count, &stride) || ordinal > count)
             return nullptr;
         return base + (ordinal - 1) * stride;
     }
@@ -178,6 +214,147 @@ void* ReplayParseWeapon(const char* value)
         return nullptr;
     unsigned index = (unsigned)atoi(value + 10);
     return index < 256 && g_game != nullptr ? &g_game->weapons[index] : nullptr;
+}
+
+namespace {
+
+enum { ARRAY_LINE_BYTES = 512, ARRAY_LINE_TEXT = 1200, MAX_ARRAY_ELEMENTS = 1 << 24 };
+
+void AddHex(ReplayText& t, const unsigned char* p, unsigned bytes)
+{
+    for (unsigned i = 0; i < bytes; i++) {
+        t.AddChar("0123456789abcdef"[p[i] >> 4]);
+        t.AddChar("0123456789abcdef"[p[i] & 15]);
+    }
+}
+
+bool ArrayData(const ReplayObjectField& f, const void* object, unsigned char** data, unsigned* count)
+{
+    const ReplayArraySpec& a = kReplayArrays[f.array - 1];
+    unsigned char* at = (unsigned char*)object + f.offset;
+    unsigned n = ReplayLengthOf(a.length, object);
+    if (a.ref) {
+        *data = BlockAt(*(const unsigned*)at);
+        if (*data == nullptr)
+            return false;
+    } else {
+        *data = at;
+        if (n > a.capacity / a.elem)
+            n = a.capacity / a.elem;
+    }
+    *count = n;
+    return true;
+}
+
+void FormatArray(const ReplayObjectField& f, const void* object, ReplayText& out)
+{
+    unsigned char* data;
+    unsigned count;
+    if (!ArrayData(f, object, &data, &count)) {
+        out.Add("null");
+        return;
+    }
+    out.AddChar('[');
+    out.AddUnsigned(count);
+    out.AddChar(']');
+    AddHex(out, data, count * kReplayArrays[f.array - 1].elem);
+}
+
+const char* ArrayHex(const char* text)
+{
+    return strchr(text, ']') + 1;
+}
+
+unsigned ArrayCount(const char* text)
+{
+    return text[0] == '[' ? (unsigned)strtoul(text + 1, nullptr, 10) : 0;
+}
+
+void ArrayLine(ReplayText& out, char tag, const char* key, const char* head)
+{
+    out.Add("  ");
+    out.AddChar(tag);
+    out.AddChar(' ');
+    out.Add(key);
+    out.AddChar(' ');
+    out.Add(head);
+}
+
+void EmitArray(ReplayText& out, ReplayKnown& known, const char* key, char tag, const char* now, unsigned elem)
+{
+    const char* old = known.Get(key);
+    if (old != nullptr && strcmp(old, now) == 0)
+        return;
+    if (strcmp(now, "null") == 0) {
+        ArrayLine(out, tag, key, "null\n");
+        known.Set(key, now);
+        return;
+    }
+    unsigned count = ArrayCount(now);
+    const char* hex = ArrayHex(now);
+    unsigned perLine = (ARRAY_LINE_BYTES + elem - 1) / elem;
+    bool delta = old != nullptr && old[0] == '[' && ArrayCount(old) == count;
+    if (!delta) {
+        char head[24];
+        sprintf(head, "[%u]", count);
+        if (count == 0) {
+            ArrayLine(out, tag, key, head);
+            out.AddChar('\n');
+        }
+        for (unsigned start = 0; start < count; start += perLine) {
+            unsigned n = count - start < perLine ? count - start : perLine;
+            ArrayLine(out, tag, key, start == 0 ? head : "");
+            if (start == 0)
+                out.AddChar(' ');
+            out.AddUnsigned(start);
+            out.AddChar(':');
+            for (unsigned i = 0; i < n * elem * 2; i++)
+                out.AddChar(hex[start * elem * 2 + i]);
+            out.AddChar('\n');
+        }
+        known.Set(key, now);
+        return;
+    }
+    const char* before = ArrayHex(old);
+    unsigned width = elem * 2;
+    unsigned lineStart = 0;
+    bool open = false;
+    for (unsigned i = 0; i < count;) {
+        if (memcmp(hex + i * width, before + i * width, width) == 0) {
+            i++;
+            continue;
+        }
+        unsigned end = i + 1;
+        while (end < count && end - i < perLine && memcmp(hex + end * width, before + end * width, width) != 0)
+            end++;
+        if (open && out.Size() - lineStart + 12 + (end - i) * width > ARRAY_LINE_TEXT) {
+            out.AddChar('\n');
+            open = false;
+        }
+        if (!open) {
+            lineStart = out.Size();
+            ArrayLine(out, tag, key, "");
+            open = true;
+        } else {
+            out.AddChar(' ');
+        }
+        out.AddUnsigned(i);
+        out.AddChar(':');
+        for (unsigned k = 0; k < (end - i) * width; k++)
+            out.AddChar(hex[i * width + k]);
+        i = end;
+    }
+    if (open)
+        out.AddChar('\n');
+    known.Set(key, now);
+}
+
+}
+
+unsigned ReplayLengthOf(const ReplayLength& length, const void* object)
+{
+    unsigned long long n = (unsigned long long)FactorValue(length.first, object) * FactorValue(length.second, object);
+    return n > MAX_ARRAY_ELEMENTS ? MAX_ARRAY_ELEMENTS : (unsigned)n;
 }
 
 void ReplayAddObjectName(ReplayText& t, ReplayObjectTable& table, unsigned kind, const void* p, bool assign)
@@ -272,6 +449,9 @@ bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, Rep
     case RK_UNITID:
         out.AddUnsigned(*(const unsigned short*)at);
         break;
+    case RK_ARRAY:
+        FormatArray(f, object, out);
+        break;
     default:
         return false;
     }
@@ -344,10 +524,7 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
         return ordinal < 256 && g_game != nullptr ? &g_game->weapons[ordinal] : nullptr;
     void* p;
     if (kReplayObjectKinds[kind].table != RT_ORDER) {
-        if (kReplayObjectKinds[kind].table == RT_UNITS && g_game != nullptr && g_game->units.get() == nullptr && alloc != nullptr) {
-            g_game->poolCount = REPLAY_UNIT_POOL;
-            g_game->units = (Unit*)alloc(REPLAY_UNIT_POOL * (unsigned)sizeof(Unit));
-        }
+        EnsureTable((unsigned)kind, alloc);
         p = table.Pointer((unsigned)kind, ordinal + 1);
     } else {
         p = table.Pointer((unsigned)kind, ordinal);
@@ -404,6 +581,7 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
         break;
     case RK_EMBED:
     case RK_UNITID:
+    case RK_ARRAY:
         return false;
     case RK_FLAGS:
         *(unsigned*)at = strncmp(value, "0x", 2) == 0 ? ParseHex8(value + 2) : 0;
@@ -606,7 +784,7 @@ void Expand(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned 
             unsigned char* units;
             unsigned poolCount;
             unsigned stride;
-            if (id == 0 || !TableSpan(RT_UNITS, &units, &poolCount, &stride) || id >= poolCount || deferred.count == MAX_DEFERRED)
+            if (id == 0 || !TableSpan(field.target, &units, &poolCount, &stride) || id >= poolCount || deferred.count == MAX_DEFERRED)
                 continue;
             deferred.object[deferred.count] = units + id * stride;
             deferred.field[deferred.count++] = list[i];
@@ -649,7 +827,7 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
         unsigned char* base;
         unsigned count;
         unsigned stride;
-        if (TableSpan(kReplayObjectKinds[kind].table, &base, &count, &stride)) {
+        if (TableSpan(kind, &base, &count, &stride)) {
             for (unsigned i = 0; i < count; i++)
                 Visit(reach, table, assign, (unsigned char)kind, base + i * stride, nullptr, 0);
         }
@@ -682,18 +860,278 @@ void ReplayCaptureObjects(ReplayText& out, ReplayKnown& known, ReplayObjectTable
             if (f.object != reach.kind[at] || f.kind == RK_EMBED || f.kind == RK_UNITID || !ReplayInReach(reach, at, set[i]))
                 continue;
             ReplayObjectFieldKey(key, table, true, reach.kind[at], reach.object[at], f);
-            ReplayFormatObjectField(f, reach.object[at], table, true, value);
-            if (known.Changed(key.Data(), value.Data())) {
-                out.Add("  ");
-                out.AddChar(tag);
-                out.AddChar(' ');
-                out.Add(key.Data());
-                out.AddChar(' ');
-                out.Add(value.Data());
-                out.AddChar('\n');
-            }
+            ReplayEmitField(out, known, table, tag, key.Data(), f, reach.object[at], value);
         }
     }
     key.Free();
     value.Free();
+}
+
+ReplayObjectField ReplayFieldView(const ReplayField& f)
+{
+    ReplayObjectField view = {};
+    view.name = f.name;
+    view.offset = f.offset;
+    view.size = f.size;
+    view.kind = f.kind;
+    view.array = f.array;
+    return view;
+}
+
+void ReplayEmitField(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, char tag, const char* key, const ReplayObjectField& f, const void* object, ReplayText& scratch)
+{
+    ReplayFormatObjectField(f, object, table, true, scratch);
+    if (f.kind == RK_ARRAY) {
+        EmitArray(out, known, key, tag, scratch.Data(), kReplayArrays[f.array - 1].elem);
+        return;
+    }
+    if (known.Changed(key, scratch.Data())) {
+        out.Add("  ");
+        out.AddChar(tag);
+        out.AddChar(' ');
+        out.Add(key);
+        out.AddChar(' ');
+        out.Add(scratch.Data());
+        out.AddChar('\n');
+    }
+}
+
+bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc)
+{
+    const ReplayArraySpec& a = kReplayArrays[f.array - 1];
+    unsigned char* at = memory ? (unsigned char*)object + f.offset : nullptr;
+    if (strcmp(value, "null") == 0) {
+        if (!a.ref)
+            return false;
+        if (memory)
+            *(unsigned*)at = 0;
+        known.Set(key, "null");
+        return true;
+    }
+    const char* p = value;
+    unsigned count;
+    if (*p == '[') {
+        char* end;
+        count = (unsigned)strtoul(p + 1, &end, 10);
+        if (*end != ']' || count > MAX_ARRAY_ELEMENTS || (!a.ref && count * a.elem > a.capacity))
+            return false;
+        p = end + 1;
+        if (*p == ' ')
+            p++;
+        ReplayText zero;
+        zero.AddChar('[');
+        zero.AddUnsigned(count);
+        zero.AddChar(']');
+        for (unsigned i = 0; i < count * a.elem * 2; i++)
+            zero.AddChar('0');
+        known.Set(key, zero.Data());
+        zero.Free();
+        if (memory) {
+            if (a.ref) {
+                if (count != 0 && alloc == nullptr)
+                    return false;
+                unsigned char* mem = count == 0 ? nullptr : (unsigned char*)alloc(count * a.elem);
+                if (mem != nullptr)
+                    memset(mem, 0, count * a.elem);
+                *(unsigned*)at = mem == nullptr ? 0u : (unsigned)(mem - (unsigned char*)SimBlockBase());
+            } else {
+                memset(at, 0, count * a.elem);
+            }
+        }
+    } else {
+        const char* old = known.Get(key);
+        if (old == nullptr || old[0] != '[')
+            return false;
+        count = ArrayCount(old);
+    }
+    char* text = known.Edit(key);
+    char* hex = text + (ArrayHex(text) - text);
+    unsigned char* data = nullptr;
+    if (memory) {
+        data = a.ref ? BlockAt(*(const unsigned*)at) : at;
+        if (data == nullptr && count != 0)
+            return false;
+    }
+    unsigned width = a.elem * 2;
+    while (*p != '\0') {
+        if (*p == ' ') {
+            p++;
+            continue;
+        }
+        char* end;
+        unsigned long index = strtoul(p, &end, 10);
+        if (*end != ':')
+            return false;
+        p = end + 1;
+        unsigned length = 0;
+        while ((p[length] >= '0' && p[length] <= '9') || (p[length] >= 'a' && p[length] <= 'f'))
+            length++;
+        if (length % width != 0 || (unsigned long long)index * width + length > (unsigned long long)count * width)
+            return false;
+        memcpy(hex + index * width, p, length);
+        if (memory) {
+            for (unsigned i = 0; i < length / 2; i++)
+                data[index * a.elem + i] = (unsigned char)(HexDigit(p[i * 2]) << 4 | HexDigit(p[i * 2 + 1]));
+        }
+        p += length;
+    }
+    return true;
+}
+
+void ReplayArrayDiff(const char* recorded, const char* replayed, ReplayText& out)
+{
+    bool a = recorded[0] == '[';
+    bool b = replayed[0] == '[';
+    if (!a || !b) {
+        out.Add(a ? "recorded an array, replayed " : "recorded ");
+        out.Add(a ? replayed : recorded);
+        out.Add(a ? "" : ", replayed an array");
+        return;
+    }
+    unsigned countA = ArrayCount(recorded);
+    unsigned countB = ArrayCount(replayed);
+    const char* hexA = ArrayHex(recorded);
+    const char* hexB = ArrayHex(replayed);
+    if (countA != countB) {
+        char text[96];
+        sprintf(text, "recorded %u elements, replayed %u", countA, countB);
+        out.Add(text);
+        return;
+    }
+    unsigned length = (unsigned)strlen(hexA);
+    unsigned first = length;
+    unsigned differing = 0;
+    for (unsigned i = 0; i + 1 < length; i += 2) {
+        if (hexA[i] != hexB[i] || hexA[i + 1] != hexB[i + 1]) {
+            if (first == length)
+                first = i / 2;
+            differing++;
+        }
+    }
+    char text[160];
+    sprintf(text, "byte %u of %u: recorded %.2s, replayed %.2s, %u bytes differ", first, length / 2, hexA + first * 2, hexB + first * 2, differing);
+    out.Add(text);
+}
+
+bool ReplayIsArrayText(const char* text)
+{
+    return text[0] == '[' && text[1] >= '0' && text[1] <= '9';
+}
+
+void ReplayAddStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, ReplayObjectTable& table)
+{
+    if (p == nullptr) {
+        t.Add("  ");
+        t.Add(tag);
+        t.AddChar(' ');
+        t.Add(name);
+        t.Add(" null\n");
+        return;
+    }
+    ReplayText value;
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != kind)
+            continue;
+        ReplayFormatObjectField(f, p, table, true, value);
+        t.Add("  ");
+        t.Add(tag);
+        t.AddChar(' ');
+        t.Add(name);
+        t.AddChar('.');
+        t.Add(f.name);
+        t.AddChar(' ');
+        t.Add(value.Data());
+        t.AddChar('\n');
+    }
+    value.Free();
+}
+
+void ReplayAddStructs(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, int count, ReplayObjectTable& table)
+{
+    if (p == nullptr || count <= 0) {
+        t.Add("  ");
+        t.Add(tag);
+        t.AddChar(' ');
+        t.Add(name);
+        t.Add(p == nullptr ? " null\n" : " []\n");
+        return;
+    }
+    for (int i = 0; i < count; i++) {
+        char element[96];
+        sprintf(element, "%.80s[%d]", name, i);
+        ReplayAddStruct(t, tag, element, kind, (const unsigned char*)p + (unsigned)i * kReplayObjectKinds[kind].size, table);
+    }
+}
+
+void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table)
+{
+    ReplayText value;
+    t.AddChar('(');
+    bool first = true;
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != kind)
+            continue;
+        if (!first)
+            t.AddChar(',');
+        first = false;
+        ReplayFormatObjectField(f, p, table, true, value);
+        t.Add(value.Data());
+    }
+    t.AddChar(')');
+    value.Free();
+}
+
+bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTable& table, ReplayAllocFn alloc)
+{
+    if (text[0] != '(')
+        return false;
+    const char* q = text + 1;
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != kind)
+            continue;
+        char piece[256];
+        unsigned n = 0;
+        int depth = 0;
+        bool quoted = false;
+        for (; *q != '\0'; q++) {
+            if (quoted) {
+                if (*q == '\\' && q[1] != '\0') {
+                    if (n + 2 < sizeof piece) {
+                        piece[n++] = *q;
+                        piece[n++] = q[1];
+                    }
+                    q++;
+                    continue;
+                }
+                quoted = *q != '"';
+            } else if (*q == '"') {
+                quoted = true;
+            } else if (*q == '(') {
+                depth++;
+            } else if (*q == ')' && depth == 0) {
+                break;
+            } else if (*q == ')') {
+                depth--;
+            } else if (*q == ',' && depth == 0) {
+                break;
+            }
+            if (n + 1 < sizeof piece)
+                piece[n++] = *q;
+        }
+        piece[n] = '\0';
+        if (!ReplayRestoreObjectField(f, p, piece, table, alloc))
+            return false;
+        bool last = true;
+        for (unsigned j = i + 1; j < kReplayObjectFieldCount; j++)
+            last = last && kReplayObjectFields[j].object != kind;
+        if (last)
+            break;
+        if (*q != ',')
+            return false;
+        q++;
+    }
+    return *q == ')' && q[1] == '\0';
 }

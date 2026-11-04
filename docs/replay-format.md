@@ -61,17 +61,37 @@ their value forms are the `objects` of the schema:
 | Scope | Kind | `N` | Where it lives |
 |---|---|---|---|
 | state | `UnitDef` and the like | order of first appearance in the file, so it is stable across calls | in the block, linked by `Ref` |
-| state, `table` | `Player`, `Unit` | the slot: `Player#3` is `Game::players[3]`, `Unit#17` is slot 17 of the unit table | the array in the block, or the slice of the unit pool |
+| state, `table` | `Player`, `Unit`, `Projectile`, `MovementClass` | the index in the table: `Player#3` is `Game::players[3]`, `Unit#17` is slot 17 of the unit pool, `Projectile#3` is `Game::projectiles[3]` | an array in `Game` or `SimGlobals`, or a `Ref` to one |
 | state, `inside` | `UnitResources` of a unit | the unit and the member: `Unit#17.resourceSlot` | a member of another kind |
 | index | `weapondef` | the index in `Game::weapons` | in the block's weapon array |
 | value | `MeteorParams`, `Vec3` | none: the lines are written with the argument's name, `params.radius`, `pos.x` | an argument struct of one call |
 | handle | `file`, `rec`, `bank` | order of first use in the outermost call | the import's own objects, not state |
 
-A kind with a `table` is named by its slot because the module walks it by address (`for (u = begin; u <= end; u++)`):
-the replayer lays `Unit#N` out at `N` times the unit stride (0x118) in a pool it makes when a recording first names a
-unit, and `Player#N` is in the player array of its `Game`, so a slice of the table is contiguous in the replayer's block
-as it was in the game's. Numbering by first appearance could not rebuild a slice when one of its units had been named
-earlier as an argument.
+A kind with a `table` is named by its index in a table that `Game` or `SimGlobals` holds, because the module walks it by
+address (`for (u = begin; u <= end; u++)`) and reaches its elements by pointer arithmetic (`cell - g_game->cells`). The index
+is zero-based and the same in every recording, wherever an element is first named. The replayer finds `Unit#N` at `N` times
+the unit stride (0x118) in the pool, so a slice of the table is contiguous in its block as it was in the game's. Numbering by
+first appearance could not rebuild a slice when one of its units had been named earlier as an argument. A pointer into the
+table that is not at the start of an element, or past its count, is written `Kind#?`.
+
+The annotation names the table once per kind, in the kind's `table`:
+
+```json
+"Projectile": {"type": "Projectile", "scope": "state",
+               "table": {"base": "game", "member": "projectiles", "ref": true, "count": "projectileCount", "alloc": 1024}, "fields": []}
+```
+
+| Key | Meaning |
+|---|---|
+| `base` | `game` (a member of `Game`) or `sim` (a member of `SimGlobals`) |
+| `member` | the member that is the table, or holds it; it may be a path, `g_movementClasses.entries` |
+| `ref` | the member is a `Ref` to the first element; without it the elements are the member |
+| `count` | the number of elements: an integer, or a length expression (see Arrays) over members of the base, `poolCount` |
+| `alloc` | for a `ref` table: the elements the replayer makes, and stores in the count member, when a recording first names an element and the `Ref` is null |
+
+`Player` and `Unit` are instances of this form (`players` is `{"base": "game", "member": "players", "count": 10}`, `units` is a
+`Ref` with `poolCount` and `alloc` 5001), so the text of every committed recording is the same as before the form had a name.
+The table member is not an untracked target: a row that touches it needs no `exempt` entry.
 
 A pointer field is written as the object it points at (`Unit#1`) or `null`. The reachable objects of a call are the
 object arguments (`a player Player#1`) and every object their pointer fields lead to, following the pointer fields
@@ -105,6 +125,53 @@ module's loop reads each one; when only one field of the pair is in the slot's s
 
 No address, no padding byte, no time and no module mode is ever written.
 
+## Arrays
+
+A field that is an array (kind `array`) has a length that is an expression over other members of the same object (or of
+`Game` or `SimGlobals`, for a block field), and holds either a `Ref` to its elements (`"ref": true`) or the elements
+themselves. The annotation, for `Player::explored` and `Game::visibilityMask`:
+
+```json
+{"name": "explored", "kind": "array", "elem": "u8", "ref": true, "length": "exploredSize"}
+"visibilityMask": {"kind": "array", "elem": "u16", "ref": true, "length": "(width>>1)*(height>>1)"}
+```
+
+`elem` is the element type (its size is what counts: the elements are written as the bytes of memory), and `length` is an
+integer, or one or two factors joined by `*`, each a member of the object, `member>>k`, or an integer. A member is one, two or
+four bytes. The length is read from the object each time the array is written, so the members it names have to be recorded
+(`exploredSize` is a field of `Player`) for the replayer to know the length at the call.
+
+The first use of an array in a recording writes the whole of it, and every later use writes only the elements that differ from
+the last known value. A line of an array is one of these:
+
+| Line | Meaning |
+|---|---|
+| `r Player#3.explored [1500] 0:0108...` | the whole array: its length in elements, then the run at element 0 as hex; the replayer makes the array and zeroes it |
+| `r Player#3.explored 512:0aff...` | the next chunk of the whole array: the index of its first element, then its elements |
+| `r Player#3.explored 5:aabb 1000:cc` | a later call: each run of changed elements as `index:elements`, separated by spaces |
+| `r Player#3.explored null` | the `Ref` is null (an inline array is never null) |
+
+A whole write puts at most 512 bytes of elements on a line, and a delta line takes no run that would take it past 1,200
+characters, so a long array is several lines with the same name, in order, and a long delta is several lines too. `[0]` is an array of no elements. A whole write also follows a null, and a change of length. `w` and `o`
+lines have the same forms, against the value known after the last `r` or `w` line. The replayer keeps the array in its block
+and applies the runs to it; at the end of the call it is compared with the value the lines made known, and a difference is
+reported at the field, as `byte 25 of 32: recorded 15, replayed 14, 1 bytes differ`.
+
+## Struct arguments
+
+A struct argument is recorded by the lines of its fields (`a pos.x 1`), whatever the kind. Three more forms are for structs of
+a value kind (`scope: value`, no row of the field sets matches its fields):
+
+| Form | Annotation | Lines |
+|---|---|---|
+| nullable struct in | `{"mode": "struct", "kind": "Vec3", "dir": "in", "nullable": true}` | `a pos null` for a null pointer, else the lines of the fields; the replayer passes NULL |
+| array of structs in | `{"mode": "structs", "kind": "Point16", "count": "count"}` | `a points[0].x 1`, `a points[0].y 2`, `a points[1].x 3`, and so on for each of `count` elements (`count` names another integer argument); `a points null` and `a points []` for a null pointer and an empty array |
+| struct by value | `{"mode": "value", "kind": "Angles16"}`, for an argument or `result` | `a kind (5)`, `o result (-3,40000,7)`, and in an import line ` (5)` and ` = (-3,40000,7)`: the values of its fields in order, in parentheses, written as the field's kind writes them |
+
+`MissionType` (one field, `index`) and `Angles16` (`bank`, `heading`, `pitch`) are the kinds of the by-value form so far. The
+count of the array form is read from the count argument's own line, so the argument must be recorded. A mismatch of a result
+by value is reported at `result`, one of an element at `points[1].y`.
+
 ## Fields
 
 Block fields are named as `data/rwsets.csv` names them: `Game.windCounter` for `Game::windCounter`,
@@ -131,7 +198,7 @@ sets). The annotations hold what no header says:
   `UnitResources.energyMake`), so that a write through a pointer is recorded as a `w` line of the field it lands on;
   `all-of` makes every slot of a table kind a root of the call (`Game::players` is walked by index). `replayschema.py
   --check` fails for a row of a subsystem function with no rule and for a rule that matches no row.
-- `objects`' extras: `table` (`units` or `players`) names a kind by its slot in a table, `inside` (`{"kind": "Unit",
+- `objects`' extras: `table` (an object, see Objects) names a kind by its index in a table, `inside` (`{"kind": "Unit",
   "member": "resourceSlot"}`) names a kind that lives in a member of another kind (`Unit#17.resourceSlot`), a field of kind
   `embed` leads to such an object, `range_end_of` marks the end pointer of a closed range, and `aliases` (`Unit::cloakOn`) are
   the other targets of the rows that one field records (a bit field is recorded as its word).
@@ -158,7 +225,9 @@ sets). The annotations hold what no header says:
 | `text` | `char*` | `a name "text"` |
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
 | `object` | a pointer to a state kind, in | `a player Player#1`, its fields as `r` and `w` |
-| `struct` (`dir` in or out) | a pointer to a value kind | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local) |
+| `struct` (`dir` in or out) | a pointer to a value kind, `nullable` when in | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local) |
+| `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
+| `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `argv` | `CommandArgs*` | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length) |
 | `weapon` | `WeaponDef*` | `weapondef#17` |
@@ -166,7 +235,7 @@ sets). The annotations hold what no header says:
 | `units` (`dir: out`) | `std::vector<Unit*>*` an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
 
-A result is `scalar`, `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
+A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
 A `pending` subsystem lists in its generated `pending` entry what is left (untracked targets, rows with no rule,
 slots whose functions are not found, arguments with no annotation); its own issue empties that list. A complete
@@ -200,8 +269,11 @@ A call that differs is reported with the first import or field that differs and 
 there. Each file is replayed twice and the two results must be identical.
 
 `--self-test [FILE]` first round-trips a small graph of objects (a `Player` with two `Unit`s sharing a `UnitDef`)
-through the text form and reports a changed field at its `Kind#N.field`; with a recording it then mutates the
-recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
+through the text form and reports a changed field at its `Kind#N.field`. It then does the same for each form that no
+recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.maxSlope`), the sized arrays (whole lines,
+chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
+struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`). With a
+recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 
 The same exe replays economy, whose module is native code in every mode: `replay_inject_test.exe` is built with

@@ -877,6 +877,23 @@ class RealGateTests(unittest.TestCase):
         kept = self.session / "gate" / "r1" / "out" / "logs" / "reference.txt"
         self.assertTrue(kept.exists())
 
+    def test_game_dir_reaches_the_gate_command(self):
+        rec = Path(self.tmp.name) / "argv.json"
+        script = Path(self.tmp.name) / "rec.py"
+        script.write_text(f"import json, sys\nopen({str(rec)!r}, 'w').write(json.dumps(sys.argv))\n")
+        self.request("rg", "x")
+        bk.process_mailbox(self.session, bk.make_gate(self.session, [sys.executable, str(script)], game_dir="/some/game"))
+        argv = json.loads(rec.read_text())
+        self.assertEqual(argv[argv.index("--game-dir") + 1], "/some/game")
+        bk.process_mailbox(self.session, bk.make_gate(self.session, [sys.executable, str(script)]))
+        self.request("rh", "x")
+        bk.process_mailbox(self.session, bk.make_gate(self.session, [sys.executable, str(script)]))
+        self.assertNotIn("--game-dir", json.loads(rec.read_text()))
+
+    def test_launch_forwards_game_dir_to_the_broker(self):
+        self.assertEqual(ln.broker_argv("/s", "/g")[-2:], ["--game-dir", "/g"])
+        self.assertNotIn("--game-dir", ln.broker_argv("/s"))
+
     def test_missing_result_is_an_error_without_the_logs(self):
         self.request("r2", "silent")
         gate = bk.make_gate(self.session, self.fake.command())

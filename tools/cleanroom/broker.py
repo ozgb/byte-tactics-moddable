@@ -1,6 +1,6 @@
 """Host-side broker for a clean-room session: git sync and the gate mailbox.
 
-    uv run tools/cleanroom/broker.py serve --session DIR [--interval SECONDS] [--btm-token-file FILE] [--no-push]
+    uv run tools/cleanroom/broker.py serve --session DIR [--interval SECONDS] [--btm-token-file FILE] [--no-push] [--game-dir DIR]
     uv run tools/cleanroom/broker.py once --session DIR
 
 The session directory holds `outbox/` (the agent writes, the broker reads), `inbox/` (only the
@@ -365,14 +365,15 @@ def stub_gate(wasm, subsystem, request_id):
     }
 
 
-def make_gate(session, command=None, timeout=GATE_TIMEOUT):
+def make_gate(session, command=None, timeout=GATE_TIMEOUT, game_dir=None):
     """Return a gate that runs oraclegate on a module and lets only its result.json cross.
 
     `command` is the argv prefix of the judge (default: this interpreter and tools/oraclegate.py). It runs as
     `command MODULE --subsystem NAME --out DIR` with DIR on the host, outside the mailbox: its logs/ and
-    runtime/ never leave DIR.
+    runtime/ never leave DIR. With `game_dir` it also gets `--game-dir GAME_DIR`.
     """
     prefix = list(command) if command else [sys.executable, str(ORACLEGATE)]
+    extra = ["--game-dir", str(game_dir)] if game_dir else []
 
     def gate(wasm, subsystem, request_id):
         work = Path(session) / "gate" / request_id
@@ -384,7 +385,7 @@ def make_gate(session, command=None, timeout=GATE_TIMEOUT):
         out.mkdir()
         try:
             run = subprocess.run(
-                [*prefix, str(module), "--subsystem", subsystem, "--out", str(out)],
+                [*prefix, str(module), "--subsystem", subsystem, "--out", str(out), *extra],
                 cwd=ROOT, capture_output=True, text=True, timeout=timeout,
             )
         except subprocess.TimeoutExpired:
@@ -478,12 +479,13 @@ def main(argv=None):
     ap.add_argument("--api-base", default=DEFAULT_API)
     ap.add_argument("--no-push", action="store_true", help="do not push branches or open pull requests")
     ap.add_argument("--gate-timeout", type=int, default=GATE_TIMEOUT)
+    ap.add_argument("--game-dir", default=None, help="game directory for the real gate (default: oraclegate looks in Steam/GOG places)")
     args = ap.parse_args(argv)
     prepare(args.session)
     push = None if args.no_push else {
         "token_file": args.btm_token_file, "remote": args.btm_remote, "repo": args.btm_repo, "api_base": args.api_base,
     }
-    gate = make_gate(args.session, timeout=args.gate_timeout)
+    gate = make_gate(args.session, timeout=args.gate_timeout, game_dir=args.game_dir)
     if args.cmd == "once":
         print(json.dumps(one_pass(args.session, push, gate)))
         return 0

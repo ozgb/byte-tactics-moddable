@@ -192,8 +192,11 @@ uv run tools/oraclekit.py export $D/datakit
 git clone https://github.com/ozgb/btm.git $D/tree
 # 3. start the session: the VM, the proxy, the broker (real gate, pushes to ozgb/btm) and the agent command
 uv run tools/cleanroom/launch.py --tree $D/tree --datakit $D/datakit --session $D/session \
-    --image build/scratch/cleanroom-image/cleanroom.smolmachine -- COMMAND
+    --image build/scratch/cleanroom-image/cleanroom.smolmachine --game-dir ~/.ta -- COMMAND
 ```
+
+The real gate needs `--game-dir` when the game is not in a Steam or GOG default place; without it the gate fails with
+"no Total Annihilation install found". `launch.py` forwards it to `broker.py --game-dir`.
 
 1. Builds the image: Rust, wasm-tools and Claude Code, with network, once.
 2. `oraclekit.py export` writes the data kit the agent reads at `/data`; the clone is the agent's `/work`.

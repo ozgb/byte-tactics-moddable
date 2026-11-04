@@ -1,7 +1,7 @@
 """Start a clean-room session VM: exact mounts, no network device, canary checks, then the agent.
 
     uv run tools/cleanroom/launch.py --tree DIR --datakit DIR --image FILE.smolmachine \\
-        [--session DIR] [--credential-file FILE] [--credential-kind oauth|api-key] [--keep] -- COMMAND [ARG ...]
+        [--session DIR] [--credential-file FILE] [--credential-kind oauth|api-key] [--game-dir DIR] [--keep] -- COMMAND [ARG ...]
 
 The VM has no network device. Its only way out is a Unix socket to proxy.py on the host. It sees the
 clean-room tree (read-write at /work), the data kit (read-only at /data), the mailbox directories
@@ -315,6 +315,14 @@ def remove_canary(name, runner=run):
     return runner(exec_in(name, ["test", "!", "-e", CANARY_DIR])).returncode
 
 
+def broker_argv(session, game_dir=None):
+    """Return the argv that starts broker.py for this session, with --game-dir when given."""
+    argv = [sys.executable, str(HERE / "broker.py"), "serve", "--session", str(session)]
+    if game_dir:
+        argv += ["--game-dir", str(game_dir)]
+    return argv
+
+
 def start_session(args):
     """Validate, start everything, run the agent; return the agent's exit status."""
     home = Path.home()
@@ -362,7 +370,7 @@ def start_session(args):
         procs.append(proxy)
         if not wait_for(sock):
             raise RuntimeError("the proxy did not start")
-        procs.append(subprocess.Popen([sys.executable, str(HERE / "broker.py"), "serve", "--session", str(session)]))
+        procs.append(subprocess.Popen(broker_argv(session, args.game_dir)))
         if run(argv).returncode:
             raise RuntimeError("machine create failed")
         created = True
@@ -416,6 +424,7 @@ def main(argv=None):
     ap.add_argument("--credential-kind", default="oauth", choices=sorted(CREDENTIAL_VARS), help="oauth: CLAUDE_CODE_OAUTH_TOKEN; api-key: ANTHROPIC_API_KEY")
     ap.add_argument("--host-credentials", default=str(HOST_CREDENTIALS), help=argparse.SUPPRESS)
     ap.add_argument("--api-key-env", default=None, help=argparse.SUPPRESS)
+    ap.add_argument("--game-dir", default=None, help="game directory the real gate plays on, when it is not in a Steam/GOG place")
     ap.add_argument("--keep", action="store_true", help="leave the machine in place after the command")
     ap.add_argument("command", nargs="+", help="command to run in the VM, after --")
     args = ap.parse_args(argv)

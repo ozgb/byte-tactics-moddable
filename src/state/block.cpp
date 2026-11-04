@@ -280,6 +280,8 @@ void* ReallocLocked(void* p, unsigned int size)
 
 }
 
+ReplayGate g_replayGate;
+
 __declspec(noinline) void* __cdecl SimAlloc(unsigned int size)
 {
     ReplayImport call(RI_SIM_ALLOC);

@@ -55472,10 +55472,12 @@ address,function,file,kind,target
 ,ReplayAddWords,src/harness/replay_values.h,call,ReplayText::AddUnsigned
 ,ReplayAddWords,src/harness/replay_values.h,deref_read,*unsigned int
 ,ReplayAddWords,src/harness/replay_values.h,function,
+,ReplayAnswerBusy,src/harness/replay.h,field_read,ReplayGate::busy
 ,ReplayAnswerBusy,src/harness/replay.h,function,
-,ReplayAnswerBusy,src/harness/replay.h,global_read,busy@ReplayAnswerBusy
+,ReplayAnswerBusy,src/harness/replay.h,global_read,g_replayGate
+,ReplayAnswerHook,src/harness/replay.h,field_read,ReplayGate::answer
 ,ReplayAnswerHook,src/harness/replay.h,function,
-,ReplayAnswerHook,src/harness/replay.h,global_read,hook@ReplayAnswerHook
+,ReplayAnswerHook,src/harness/replay.h,global_read,g_replayGate
 ,ReplayApplyArray,src/harness/replay_objects.cpp,call,ArrayCount
 ,ReplayApplyArray,src/harness/replay_objects.cpp,call,ArrayHex
 ,ReplayApplyArray,src/harness/replay_objects.cpp,call,BlockAt
@@ -55637,8 +55639,9 @@ address,function,file,kind,target
 ,ReplayCallbackScope::~ReplayCallbackScope,src/harness/replay_objects.cpp,call,ReplayText::Free
 ,ReplayCallbackScope::~ReplayCallbackScope,src/harness/replay_objects.cpp,field_maybe_written,ReplayCallbackScope::lines
 ,ReplayCallbackScope::~ReplayCallbackScope,src/harness/replay_objects.cpp,function,
+,ReplayCalls,src/harness/replay.h,field_read,ReplayGate::calls
 ,ReplayCalls,src/harness/replay.h,function,
-,ReplayCalls,src/harness/replay.h,global_read,calls@ReplayCalls
+,ReplayCalls,src/harness/replay.h,global_read,g_replayGate
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,call,ReplayEmitField
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,call,ReplayInReach
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,call,ReplayObjectFieldKey
@@ -55722,8 +55725,9 @@ address,function,file,kind,target
 ,ReplayEmitField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::kind
 ,ReplayEmitField,src/harness/replay_objects.cpp,function,
 ,ReplayEmitField,src/harness/replay_objects.cpp,global_read,kReplayArrays@src/harness/replay_schema.h
+,ReplayEndHook,src/harness/replay.h,field_read,ReplayGate::end
 ,ReplayEndHook,src/harness/replay.h,function,
-,ReplayEndHook,src/harness/replay.h,global_read,hook@ReplayEndHook
+,ReplayEndHook,src/harness/replay.h,global_read,g_replayGate
 ,ReplayFail,src/harness/replay_objects.cpp,call,strncpy
 ,ReplayFail,src/harness/replay_objects.cpp,function,
 ,ReplayFail,src/harness/replay_objects.cpp,global_maybe_written,s_failure
@@ -55971,8 +55975,9 @@ address,function,file,kind,target
 ,ReplayLengthOf,src/harness/replay_objects.cpp,field_read,ReplayLength::first
 ,ReplayLengthOf,src/harness/replay_objects.cpp,field_read,ReplayLength::second
 ,ReplayLengthOf,src/harness/replay_objects.cpp,function,
+,ReplayNestedDepth,src/harness/replay.h,field_read,ReplayGate::nestedDepth
 ,ReplayNestedDepth,src/harness/replay.h,function,
-,ReplayNestedDepth,src/harness/replay.h,global_read,depth@ReplayNestedDepth
+,ReplayNestedDepth,src/harness/replay.h,global_read,g_replayGate
 ,ReplayObjectFieldKey,src/harness/replay_objects.cpp,call,ReplayAddObjectName
 ,ReplayObjectFieldKey,src/harness/replay_objects.cpp,call,ReplayText::Add
 ,ReplayObjectFieldKey,src/harness/replay_objects.cpp,call,ReplayText::AddChar
@@ -56018,8 +56023,9 @@ address,function,file,kind,target
 ,ReplayOwned,src/harness/replay.h,call,ReplayOwner
 ,ReplayOwned,src/harness/replay.h,call,host_thread_id
 ,ReplayOwned,src/harness/replay.h,function,
+,ReplayOwner,src/harness/replay.h,field_read,ReplayGate::owner
 ,ReplayOwner,src/harness/replay.h,function,
-,ReplayOwner,src/harness/replay.h,global_read,owner@ReplayOwner
+,ReplayOwner,src/harness/replay.h,global_read,g_replayGate
 ,ReplayParseBytes,src/harness/replay_values.h,call,strncmp
 ,ReplayParseBytes,src/harness/replay_values.h,deref_read,*char
 ,ReplayParseBytes,src/harness/replay_values.h,deref_write,*unsigned char

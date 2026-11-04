@@ -3,29 +3,6 @@
 
 #include "../../interfaces/host.h"
 
-inline int& ReplayCalls()
-{
-    static int calls;
-    return calls;
-}
-
-inline unsigned int& ReplayOwner()
-{
-    static unsigned int owner = 0;
-    return owner;
-}
-
-inline unsigned int& ReplayNestedDepth()
-{
-    static unsigned int depth = 0;
-    return depth;
-}
-
-inline bool ReplayOwned()
-{
-    return ReplayCalls() != 0 && ReplayOwner() == host_thread_id();
-}
-
 #include "replay_services.h"
 
 #pragma pack(push, 8)
@@ -46,22 +23,50 @@ void ReplayFail(const char* message);
 typedef bool (*ReplayAnswerFn)(ReplayImport& call);
 typedef void (*ReplayEndFn)(ReplayImport& call);
 
-inline ReplayEndFn& ReplayEndHook()
+struct ReplayGate {
+    int calls;
+    unsigned int owner;
+    unsigned int nestedDepth;
+    bool busy;
+    ReplayAnswerFn answer;
+    ReplayEndFn end;
+};
+
+extern ReplayGate g_replayGate;
+
+inline int& ReplayCalls()
 {
-    static ReplayEndFn hook = nullptr;
-    return hook;
+    return g_replayGate.calls;
+}
+
+inline unsigned int& ReplayOwner()
+{
+    return g_replayGate.owner;
+}
+
+inline unsigned int& ReplayNestedDepth()
+{
+    return g_replayGate.nestedDepth;
 }
 
 inline ReplayAnswerFn& ReplayAnswerHook()
 {
-    static ReplayAnswerFn hook = nullptr;
-    return hook;
+    return g_replayGate.answer;
 }
 
 inline bool& ReplayAnswerBusy()
 {
-    static bool busy = false;
-    return busy;
+    return g_replayGate.busy;
+}
+
+inline ReplayEndFn& ReplayEndHook()
+{
+    return g_replayGate.end;
+}
+
+inline bool ReplayOwned()
+{
+    return ReplayCalls() != 0 && ReplayOwner() == host_thread_id();
 }
 
 struct ReplayImport {

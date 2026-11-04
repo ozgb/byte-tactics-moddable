@@ -10,4 +10,3 @@ units,ReceiveUnitStates,virtual MotionSerializer::ReadFrom,"TODO(#684): units re
 units,Unit::SetStateBits,virtual OrderBase::OrStatusFlags,"TODO(#684): units reach the order and motion objects of orders through their vtables, add seam slots on orders"
 units,UnitRef::ClearRef,virtual OrderBase::OrStatusFlags,"TODO(#684): units reach the order and motion objects of orders through their vtables, add seam slots on orders"
 units,UnitRef::Unlink,virtual PathOrderAttach::~PathOrderAttach,"TODO(#684): units reach the order and motion objects of orders through their vtables, add seam slots on orders"
-weapons,UpdateUnitWeapons,"virtual pointer indirect via int (*)(void *, void *, void *, void *) __attribute__((stdcall))","TODO(#687): weapons call GetWeaponTargetUnit through a function pointer, add a seam slot on targeting"

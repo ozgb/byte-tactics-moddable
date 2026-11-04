@@ -672,10 +672,11 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "unit", offsetof(FixtureLane, unit), sizeof(((FixtureLane*)nullptr)->unit), ROK_FIXTURELANE, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "flags", offsetof(FixtureLane, flags), sizeof(((FixtureLane*)nullptr)->flags), ROK_FIXTURELANE, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "occupant", offsetof(FixtureLane, unit), sizeof(((FixtureLane*)nullptr)->unit), ROK_FIXTURELANE, RK_UNITID, ROK_UNIT, 0, 0, {}, 5, 1 },
+    { "cell", offsetof(FixtureLane, unit), sizeof(((FixtureLane*)nullptr)->unit), ROK_FIXTURELANE, RK_UNITID, ROK_FIXTURECELL, 0, 0, {}, 6, 1 },
 };
-static const unsigned kReplayObjectFieldCount = 252;
+static const unsigned kReplayObjectFieldCount = 253;
 
-static const unsigned short kReplayReachFields[] = { 45, 49, 108, 109, 110, 32, 36, 34, 37, 45, 50, 52, 79 };
+static const unsigned short kReplayReachFields[] = { 45, 49, 108, 109, 110, 32, 242, 36, 34, 37, 45, 50, 52, 79 };
 
 static_assert(sizeof(((Player*)nullptr)->active) == 4, "Player::active has the size the schema says");
 static_assert(sizeof(((Player*)nullptr)->id) == 4, "Player::id has the size the schema says");
@@ -926,6 +927,7 @@ static_assert(sizeof(((FixtureLane*)nullptr)->level) == 4, "FixtureLane::level h
 static_assert(sizeof(((FixtureLane*)nullptr)->unit) == 2, "FixtureLane::unit has the size the schema says");
 static_assert(sizeof(((FixtureLane*)nullptr)->flags) == 2, "FixtureLane::flags has the size the schema says");
 static_assert(sizeof(((FixtureLane*)nullptr)->unit) == 2, "FixtureLane::occupant has the size the schema says");
+static_assert(sizeof(((FixtureLane*)nullptr)->unit) == 2, "FixtureLane::cell has the size the schema says");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");

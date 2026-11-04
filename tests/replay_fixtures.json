@@ -254,6 +254,16 @@
       "Unit.health"
      ],
      "depth": 1
+    },
+    {
+     "name": "cell",
+     "kind": "unitid",
+     "target": "FixtureCell",
+     "member": "unit",
+     "reach": [
+      "FixtureCell.metal"
+     ],
+     "depth": 1
     }
    ]
   }

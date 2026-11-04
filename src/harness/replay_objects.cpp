@@ -1118,15 +1118,6 @@ void ExpandDeltaTable(ReplayReach& reach, ReplayObjectTable& table, bool assign,
     }
 }
 
-bool ReachHas(const ReplayReach& reach, unsigned kind, const void* object)
-{
-    for (unsigned slot = PointerHash(object) % REPLAY_REACH_HASH; reach.slots[slot] >= 0; slot = (slot + 1) % REPLAY_REACH_HASH) {
-        if (reach.object[reach.slots[slot]] == object && reach.kind[reach.slots[slot]] == kind)
-            return true;
-    }
-    return false;
-}
-
 }
 
 unsigned ReplayDeltaCount(const ReplayReach& reach)
@@ -1142,9 +1133,19 @@ bool ReplayDeltaTable(const ReplayReach& reach, unsigned index, unsigned* kind, 
     return TableSpan(*kind, base, count, stride);
 }
 
-bool ReplayInReachObject(const ReplayReach& reach, unsigned kind, const void* object)
+bool ReplayInDeltaTable(const ReplayReach& reach, unsigned kind, const void* object)
 {
-    return ReachHas(reach, kind, object);
+    for (unsigned d = 0; d < reach.deltaCount; d++) {
+        unsigned char* base;
+        unsigned count;
+        unsigned stride;
+        if (reach.deltaKind[d] != kind || !TableSpan(kind, &base, &count, &stride))
+            continue;
+        const unsigned char* q = (const unsigned char*)object;
+        if (q >= base && (unsigned)(q - base) % stride == 0 && (unsigned)(q - base) / stride < count)
+            return true;
+    }
+    return false;
 }
 
 bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex)
@@ -1236,8 +1237,10 @@ void ReplayCaptureObjects(ReplayText& out, ReplayKnown& known, ReplayObjectTable
 {
     ReplayText key;
     ReplayText value;
-    for (unsigned at = 0; at < reach.count; at++)
-        CaptureObject(out, known, table, &reach, at, reach.kind[at], reach.object[at], set, count, tag, key, value);
+    for (unsigned at = 0; at < reach.count; at++) {
+        if (!ReplayInDeltaTable(reach, reach.kind[at], reach.object[at]))
+            CaptureObject(out, known, table, &reach, at, reach.kind[at], reach.object[at], set, count, tag, key, value);
+    }
     for (unsigned d = 0; d < reach.deltaCount; d++) {
         unsigned kind;
         unsigned char* base;
@@ -1251,10 +1254,8 @@ void ReplayCaptureObjects(ReplayText& out, ReplayKnown& known, ReplayObjectTable
         }
         if (!ReplayDeltaTable(reach, d, &kind, &base, &elements, &stride))
             continue;
-        for (unsigned e = 0; e < elements; e++) {
-            if (!ReachHas(reach, kind, base + e * stride))
-                CaptureObject(out, known, table, nullptr, 0, kind, base + e * stride, mine, n, tag, key, value);
-        }
+        for (unsigned e = 0; e < elements; e++)
+            CaptureObject(out, known, table, nullptr, 0, kind, base + e * stride, mine, n, tag, key, value);
     }
     key.Free();
     value.Free();

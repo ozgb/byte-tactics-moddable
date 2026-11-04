@@ -1318,8 +1318,10 @@ void CompareObjects(const ReplaySlotSets* sets)
     ReplayWalk(g_reach, g_objects, false, *sets, g_rootKinds, g_rootObjects, g_rootCount);
     ReplayText key;
     ReplayText value;
-    for (unsigned at = 0; at < g_reach.count; at++)
-        CompareObject(&g_reach, at, g_reach.kind[at], g_reach.object[at], sets->objWrites, sets->objWriteCount, key, value);
+    for (unsigned at = 0; at < g_reach.count; at++) {
+        if (!ReplayInDeltaTable(g_reach, g_reach.kind[at], g_reach.object[at]))
+            CompareObject(&g_reach, at, g_reach.kind[at], g_reach.object[at], sets->objWrites, sets->objWriteCount, key, value);
+    }
     for (unsigned d = 0; d < ReplayDeltaCount(g_reach); d++) {
         unsigned kind;
         unsigned char* base;
@@ -1327,10 +1329,8 @@ void CompareObjects(const ReplaySlotSets* sets)
         unsigned stride;
         if (!ReplayDeltaTable(g_reach, d, &kind, &base, &elements, &stride))
             continue;
-        for (unsigned e = 0; e < elements; e++) {
-            if (!ReplayInReachObject(g_reach, kind, base + e * stride))
-                CompareObject(nullptr, 0, kind, base + e * stride, sets->objWrites, sets->objWriteCount, key, value);
-        }
+        for (unsigned e = 0; e < elements; e++)
+            CompareObject(nullptr, 0, kind, base + e * stride, sets->objWrites, sets->objWriteCount, key, value);
     }
     key.Free();
     value.Free();
@@ -3391,6 +3391,57 @@ void DeltaTableSelfTest()
     free(second);
 }
 
+void DeltaLimitSelfTest()
+{
+    printf("an element of a delta table that a limited reach also names\n");
+    ResetBlock();
+    ReplayClearFailure();
+    const unsigned cells = 9000;
+    FixtureCell* table = (FixtureCell*)SimAlloc(cells * (unsigned)sizeof(FixtureCell));
+    memset((void*)table, 0, cells * sizeof(FixtureCell));
+    g_game->p1b8a = (SideData*)(void*)table;
+    FixtureLane* lanes = (FixtureLane*)SimAlloc(4 * (unsigned)sizeof(FixtureLane));
+    memset((void*)lanes, 0, 4 * sizeof(FixtureLane));
+    g_game->p1cd5 = (SideData*)(void*)lanes;
+    lanes[1].unit = 40;
+    table[40].metal = 9;
+    table[40].flags = 7;
+    table[41].flags = 3;
+    unsigned short fields[4] = { FieldIndex(ROK_FIXTURELANE, "unit"), FieldIndex(ROK_FIXTURELANE, "cell"), FieldIndex(ROK_FIXTURECELL, "metal"), FieldIndex(ROK_FIXTURECELL, "flags") };
+    unsigned char every[2] = { ROK_FIXTURECELL, ROK_FIXTURELANE };
+    ReplaySlotSets sets = { "limit", 0, nullptr, 0, nullptr, 0, fields, 4, fields, 4, every, 2 };
+    Recorder recorder;
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* text = strdup(recorder.text.Data());
+    Check(ReplayFailure() == nullptr, "the walk reaches the table through the lane ids without a failure");
+    Check(strstr(text, "  r FixtureCell#40.metal 9\n") != nullptr, "the limited field of the element a lane names is recorded");
+    Check(strstr(text, "  r FixtureCell#40.flags 7\n") != nullptr, "and so is its other field, which the limit does not list");
+    Check(CountLines(text, "  r FixtureCell#40.") == 2 && CountLines(text, "  r FixtureCell#") == 2 * (int)cells, "each field of each element is written once");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureCell* rebuilt = (FixtureCell*)g_game->p1b8a.get();
+    Check(rebuilt != nullptr && g_game->p1cd5.get() != nullptr && rebuilt[40].flags == 7 && rebuilt[41].flags == 3, "the table is restored");
+    if (rebuilt == nullptr || g_game->p1cd5.get() == nullptr) {
+        free(text);
+        return;
+    }
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored table compares equal");
+    rebuilt[40].flags = 8;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureCell#40.flags") == 0, "a change in the field the limit does not list is reported");
+    rebuilt[40].flags = 7;
+    rebuilt[40].metal = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureCell#40.metal") == 0, "and one in the limited field");
+    free(text);
+}
+
 void UnconditionedUnitIdSelfTest()
 {
     printf("a unit id with no condition\n");
@@ -3753,6 +3804,7 @@ int SelfTest(const char* file)
     UnnamedPtrSelfTest();
     AllOfListSelfTest();
     DeltaTableSelfTest();
+    DeltaLimitSelfTest();
     UnconditionedUnitIdSelfTest();
     GameRefSelfTest();
     ExecuteCommandSelfTest();

@@ -18,6 +18,7 @@ void UpdateMeteorShower(int tickCount)
     if (g_meteorNextStrike <= (unsigned int)tickCount) {
         localTargetZ = (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->height / 0x8000);
     }
+    StartScript(script, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
     FatalError("Hey, hoser!  The default meteor shower data was bogus!");
 }
 """
@@ -110,6 +111,9 @@ class Lint(unittest.TestCase):
 
     def test_copied_string_literal_passes(self):
         self.assertEqual(self.lint("`Hey, hoser!  The default meteor shower data was bogus!`"), [])
+
+    def test_run_of_few_words_passes(self):
+        self.assertEqual(self.lint("The kinds are `[block, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]`."), [])
 
     def test_one_problem_per_copied_run(self):
         copied = "localTargetZ = (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->height / 0x8000);"

@@ -9,7 +9,8 @@ Runs on a spec writer's machine, because it reads src/, include/ and lib/. A spe
   * an address of the exe (0x4xxxxx or 0x5xxxxx), a FUN_ or DAT_ name, or a FUNCTION: or GLOBAL: marker;
   * an identifier (a name with an underscore, an inner capital or a digit) found in the source but nowhere in the kit;
   * a fenced code block whose info string isn't `text`;
-  * a run of more than --run tokens that also appears in a source file.
+  * a run of more than --run tokens that also appears in a source file, unless it holds fewer than three
+    distinct words (a list of kinds such as `int, int, int, int` is not a copy).
 
 String literals and comments are taken out of the source first, and text in double quotes out of the spec, so that
 observable data (saved-game keys, messages, file names) isn't counted against the identifier and token-run rules. Prints one line per problem and exits 1 when there is any.
@@ -26,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE_DIRS = ("src", "include", "lib")
 SOURCE_SUFFIXES = {".c", ".cpp", ".h", ".hpp", ".inc"}
 DEFAULT_RUN = 8
+MIN_RUN_WORDS = 3
 
 ADDRESS = re.compile(r"\b0x[45][0-9a-fA-F]{5}\b|\b(?:FUN|DAT)_[0-9a-fA-F]{6,8}\b|\b(?:FUNCTION|GLOBAL):")
 IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
@@ -119,6 +121,8 @@ def lint(spec: str, source_ids: set[str], kit_ids: set[str], source_runs: set[in
             else:
                 stretches.append([i, i + run])
     for start, end in stretches:
+        if len({t for t in spec_tokens[start:end + 1] if IDENTIFIER.fullmatch(t) or t.isdigit()}) < MIN_RUN_WORDS:
+            continue
         problems.append((token_lines[start], f"a run of {end - start + 1} tokens matches the source: "
                          f"{' '.join(spec_tokens[start:end + 1])!r}"))
     return sorted(problems)

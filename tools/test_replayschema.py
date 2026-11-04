@@ -1371,21 +1371,27 @@ class InsideSites(unittest.TestCase):
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
         self.assertIn('    { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot" },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim" },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, shadowAnim), "shadowAnim" },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim" },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow" },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim" },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow" },', text)
-        self.assertIn("kReplayInsideSiteCount = 3;", text)
+        self.assertIn("kReplayInsideSiteCount = 7;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
         text = files[rs.SCHEMA_H]
         self.assertIn('{ "UnitResources", sizeof(UnitResources), RS_STATE, RT_ORDER, 0, 1, 0, 0 },', text)
-        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 1, 2, 0, 0 },', text)
+        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 1, 6, 0, 0 },', text)
         self.assertIn('{ "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0 },', text)
 
     def test_the_sites_of_a_kind_are_in_the_model(self):
         _, _, model = self.generated()
         handle = [o for o in model["objects"] if o["name"] == "Handle"][0]
-        self.assertEqual(handle["inside"], [{"kind": "FixtureHolder", "member": "anim"}, {"kind": "FixtureHolder", "member": "shadow"}])
+        self.assertEqual(handle["inside"], [{"kind": "Feature", "member": "anim"}, {"kind": "Feature", "member": "shadowAnim"},
+                                            {"kind": "Spot", "member": "anim"}, {"kind": "Spot", "member": "shadow"},
+                                            {"kind": "FixtureHolder", "member": "anim"}, {"kind": "FixtureHolder", "member": "shadow"}])
         self.assertIsNone([o for o in model["objects"] if o["name"] == "Unit"][0]["inside"])
 
     def test_the_single_site_form_is_an_error(self):
@@ -1419,6 +1425,59 @@ class InsideSites(unittest.TestCase):
         ann["objects"]["Cell"]["inside"] = [{"kind": "FixtureHolder", "member": "anim"}]
         errors = self.generated(ann)[1]
         self.assertTrue(any("Cell inside: a kind with a table is named by its index" in e for e in errors), errors)
+
+
+class FeatureKinds(unittest.TestCase):
+    """Feature, Spot and Pool, and the views they hold."""
+
+    def field(self, kind, name):
+        return [f for f in annotations()["objects"][kind]["fields"] if f["name"] == name][0]
+
+    def test_the_tables_are_the_arrays_of_the_game(self):
+        kinds = annotations()["objects"]
+        self.assertEqual(kinds["Feature"]["table"], {"base": "game", "member": "features", "ref": True, "count": "featureCount", "alloc": 2048})
+        self.assertEqual(kinds["Spot"]["table"], {"base": "game", "member": "spots", "ref": True, "count": 2048, "alloc": 2048})
+        self.assertEqual(kinds["Pool"]["table"], {"base": "game", "member": "pool", "count": 1})
+        self.assertEqual(kinds["ModelState"]["fields"], [])
+        self.assertEqual(self.field("Spot", "state")["target"], "ModelState")
+
+    def test_the_two_sides_of_a_union_are_never_live_together(self):
+        sprite = {"field": "flags16", "mask": 1, "equals": 1}
+        model = {"field": "flags16", "mask": 1, "equals": 0}
+        self.assertEqual(self.field("Feature", "filename")["when"], sprite)
+        self.assertEqual(self.field("Feature", "object")["when"], model)
+        via = {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1}
+        for name in ("anim", "shadow"):
+            self.assertEqual(self.field("Spot", name)["when"], dict(via, equals=1))
+        for name in ("state", "posX", "posY", "posZ", "velX", "velY", "velZ"):
+            self.assertEqual(self.field("Spot", name)["when"], dict(via, equals=0))
+
+    def test_a_view_is_an_alias_of_the_field_it_is_recorded_as(self):
+        ann = annotations()
+        self.assertEqual(rs.object_targets("Feature::noobject", ann), [("Feature", "flags16")])
+        self.assertEqual(rs.object_targets("Feature::footprintX", ann), [("Feature", "footprint")])
+        self.assertEqual(rs.object_targets("Feature::animIds", ann), [("Feature", n) for n in ("seqburn", "seqburnshad", "seqdie", "seqdieshad", "seqreclamate", "seqreclamateshad")])
+        self.assertEqual(rs.object_targets("Spot::pos2", ann), [("Spot", "posX"), ("Spot", "posY"), ("Spot", "posZ")])
+        self.assertEqual(rs.object_targets("Spot::frame", ann), [("Handle", "index")])
+        self.assertEqual(rs.object_targets("Spot::animIndex", ann), [("Handle", "src")])
+        self.assertEqual(rs.object_targets("Spot::animHi", ann), [("Spot", "timer")])
+
+    def test_every_row_of_the_features_functions_on_these_kinds_names_a_field(self):
+        ann = annotations()
+        kinds = {"Feature", "Spot", "Pool", "Handle"}
+        functions = set(rs.read_assignment()["features"])
+        left = sorted({"%s %s" % (r["function"], r["target"]) for r in rs.read_rows()
+                       if r["function"] in functions and r["kind"] in rs.OBJECT_KINDS and r["target"].split("::")[0] in kinds and not rs.object_targets(r["target"], ann)})
+        self.assertEqual(left, [])
+
+    def test_the_rows_that_need_a_rule_have_one(self):
+        ann = annotations()
+        have = {(r["kind"], r["target"]) for r in ann["rules"]}
+        for want in (("field_escape", "Feature::name"), ("field_escape", "FeatureName::name"), ("field_escape", "Game::anim"), ("field_escape", "Game::featureCount"),
+                     ("field_escape", "Spot::frame"), ("deref_read", "*int"), ("deref_write", "*unsigned short")):
+            self.assertIn(want, have)
+        _, _, model = rs.generate(rs.read_rows(), ann)
+        self.assertEqual(model["subsystems"]["features"]["pending"]["ruleless"], 0)
 
 
 class Committed(unittest.TestCase):

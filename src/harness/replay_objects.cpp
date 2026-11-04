@@ -79,6 +79,16 @@ void StoreFactor(const ReplayFactor& f, void* object, unsigned value)
         *(unsigned*)at = value;
 }
 
+bool CountTracked(const ReplayTableSpec& spec)
+{
+    for (unsigned i = 0; i < kReplayFieldCount; i++) {
+        const ReplayField& f = kReplayFields[i];
+        if (spec.count.first.size != 0 && f.base == (spec.sim ? RB_SIM : RB_GAME) && f.offset == spec.count.first.offset)
+            return true;
+    }
+    return false;
+}
+
 void EnsureTable(unsigned kind, ReplayAllocFn alloc)
 {
     const ReplayTableSpec& spec = kReplayTables[kReplayObjectKinds[kind].table - 1];
@@ -93,8 +103,14 @@ void EnsureTable(unsigned kind, ReplayAllocFn alloc)
     unsigned char* pool = (unsigned char*)alloc(size);
     memset(pool, 0, size);
     *(unsigned*)(root + spec.offset) = (unsigned)(pool - (unsigned char*)SimBlockBase());
-    if (!product)
+    if (!product && !CountTracked(spec))
         StoreFactor(spec.count.first, root, spec.alloc);
+}
+
+unsigned TableRoom(unsigned kind, unsigned count)
+{
+    unsigned alloc = kReplayTables[kReplayObjectKinds[kind].table - 1].alloc;
+    return count < alloc ? count + 1 : count;
 }
 
 int TableIndex(unsigned kind, const void* p)
@@ -104,6 +120,7 @@ int TableIndex(unsigned kind, const void* p)
     unsigned stride;
     if (p == nullptr || !TableSpan(kind, &base, &count, &stride))
         return -1;
+    count = TableRoom(kind, count);
     const unsigned char* q = (const unsigned char*)p;
     if (q < base || (unsigned)(q - base) % stride != 0 || (unsigned)(q - base) / stride >= count)
         return -1;
@@ -282,7 +299,7 @@ void* ReplayObjectTable::Pointer(unsigned kind, unsigned ordinal) const
         unsigned char* base;
         unsigned count;
         unsigned stride;
-        if (ordinal == 0 || !TableSpan(kind, &base, &count, &stride) || ordinal > count)
+        if (ordinal == 0 || !TableSpan(kind, &base, &count, &stride) || ordinal > TableRoom(kind, count))
             return nullptr;
         return base + (ordinal - 1) * stride;
     }
@@ -1324,11 +1341,34 @@ namespace {
 
 enum { MAX_DELTA_FIELDS = 128 };
 
+void ForgetEmbedded(ReplayKnown& known, const char* prefix, unsigned kind)
+{
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != kind)
+            continue;
+        ReplayText key;
+        key.Add(prefix);
+        key.AddChar('.');
+        key.Add(f.name);
+        if (known.Get(key.Data()) != nullptr)
+            known.Set(key.Data(), "");
+        if (f.kind == RK_EMBED)
+            ForgetEmbedded(known, key.Data(), f.target);
+        key.Free();
+    }
+}
+
 void CaptureObject(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, const ReplayReach* reach, unsigned at, unsigned kind, void* object,
                    const unsigned short* set, unsigned count, char tag, ReplayText& key, ReplayText& value)
 {
     for (unsigned i = 0; i < count; i++) {
         const ReplayObjectField& f = kReplayObjectFields[set[i]];
+        if (f.object == kind && f.kind == RK_EMBED && !ReplayFieldLive(f, object) && (reach == nullptr || ReplayInReach(*reach, at, set[i]))) {
+            ReplayObjectFieldKey(key, table, true, kind, object, f);
+            ForgetEmbedded(known, key.Data(), f.target);
+            continue;
+        }
         if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_EMBEDS || f.kind == RK_UNITID || (reach != nullptr && !ReplayInReach(*reach, at, set[i])))
             continue;
         ReplayObjectFieldKey(key, table, true, kind, object, f);

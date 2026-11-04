@@ -62,7 +62,8 @@ A pull request body names the gate tier it ran: `--tier` (the scenarios of `GATE
 Only the maintainer merges. A branch doesn't have to contain `moddable`'s head to be merged: what matters is that the tree the maintainer tested is the tree that lands. Updating a branch changes its head, which sends it back for review, so nobody updates one without a reason.
 
 - **Merge as it stands** when GitHub reports no conflicts and the commits the branch lacks touch none of its files and none of the tools its gate runs. Check with `git diff --name-only $(git merge-base origin/moddable <head>) origin/moddable`.
-- **Update first** when there are conflicts, or when those commits touch the pull request's files or its gate's tools. The maintainer makes this a must-change finding naming the overlapping commits. The lead merges `origin/moddable` into the branch, re-runs the gate and pushes. Merge rather than rebase: `git-safe push` refuses force-pushes.
+- **Test the merge** when those commits do overlap the pull request but git merges them cleanly and the pull request is approved on content. The maintainer merges `origin/moddable` into the head in a review worktree, runs the pull request's data checks and tests on that tree, and merges through GitHub if they pass. The lead pushes no update and no extra CI round runs.
+- **Update first** when there are conflicts, when the merged tree needs regenerated files (a data `--check` or a counts test fails on it), or when the pull request's gate is a trace gate whose inputs the commits touch. The maintainer makes this a must-change finding naming the overlapping commits. The lead merges `origin/moddable` into the branch, re-runs the gate and pushes. Merge rather than rebase: `git-safe push` refuses force-pushes.
 
 ## Labels
 

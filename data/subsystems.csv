@@ -3133,6 +3133,7 @@ CommandLineNumber::~CommandLineNumber,src/debug/debug_lib.cpp,platform,folder:sr
 CommandLineSwitch::~CommandLineSwitch,src/debug/command_line.h,platform,folder:src/debug/,
 CommandNameLess::operator(),src/util/commands.cpp,platform,folder:src/util/,
 CommandNameNotEqual::operator(),src/util/commands.cpp,platform,folder:src/util/,
+CompareEntryNames,src/host/win32/files.cpp,platform,folder:src/host/,
 CompareOut,src/harness/block_scan.cpp,harness,folder:src/harness/,
 CompareSpans,src/harness/block_scan.cpp,harness,folder:src/harness/,
 ComputeMapChecksumNative,src/seams/native.cpp,seams,folder:src/seams/,

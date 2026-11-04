@@ -5,13 +5,15 @@
 Runs inside the VM under a plain python3, next to manifest.py, before the agent starts. Prints
 `PASS name` or `FAIL name: why` per check and exits 1 if any failed. The checks: host paths do not
 exist, no default route, no direct DNS or TCP to the internet, the proxy refuses GitHub and other
-forbidden targets, no credentials in the environment or the home directory, no file of the
-manifest anywhere in the scan roots (default /), and the scanner itself finds a planted file.
+forbidden targets, no credentials in the environment or the home directory, managed Claude Code
+settings that deny WebSearch and WebFetch, no file of the manifest anywhere in the scan roots
+(default /), and the scanner itself finds a planted file.
 """
 
 import argparse
 import contextlib
 import io
+import json
 import os
 import socket
 import sys
@@ -33,6 +35,8 @@ PROXY_REFUSED = (
     "127.0.0.1:22",
     "169.254.169.254:80",
 )
+MANAGED_SETTINGS = "/etc/claude-code/managed-settings.json"
+REQUIRED_DENIES = ("WebSearch", "WebFetch")
 DIRECT_TARGETS = (("140.82.112.4", 443), ("1.1.1.1", 443), ("8.8.8.8", 53))
 
 
@@ -104,6 +108,17 @@ def check_home(home):
     return (not found, f"present in {home}: {found}" if found else "")
 
 
+def check_managed_settings(path):
+    """Require the managed settings file to deny the web tools."""
+    try:
+        settings = json.loads(Path(path).read_text())
+        deny = settings["permissions"]["deny"]
+    except (OSError, ValueError, KeyError, TypeError) as err:
+        return False, f"{path} is missing or has no permissions.deny: {err}"
+    missing = [t for t in REQUIRED_DENIES if t not in deny]
+    return (not missing, f"{path} does not deny {missing}" if missing else "")
+
+
 def check_manifest_scan(manifest, roots, max_bytes):
     out = io.StringIO()
     with contextlib.redirect_stdout(out):
@@ -136,6 +151,7 @@ def run(args):
         ("proxy refuses github and other targets", lambda: check_proxy_refuses(args.proxy_sock)),
         ("no credentials in the environment", check_environment),
         ("no credentials in the home directory", lambda: check_home(args.home)),
+        ("managed settings deny web search and fetch", lambda: check_managed_settings(args.managed_settings)),
         ("scanner finds a planted file", lambda: check_scanner_works(args.max_bytes)),
         ("no file of the manifest is visible", lambda: check_manifest_scan(args.manifest, args.scan_root, args.max_bytes)),
     ]
@@ -158,6 +174,7 @@ def main(argv=None):
     ap.add_argument("--host-path", action="append", default=[])
     ap.add_argument("--home", default=os.path.expanduser("~"))
     ap.add_argument("--scan-root", action="append", default=None)
+    ap.add_argument("--managed-settings", default=MANAGED_SETTINGS)
     ap.add_argument("--max-bytes", type=int, default=mf.DEFAULT_MAX)
     args = ap.parse_args(argv)
     args.scan_root = args.scan_root or ["/"]

@@ -8,6 +8,8 @@ mkdir -p "$out"
 "$smolvm" machine create --net --name "$name" -s "$here/Smolfile"
 trap '"$smolvm" machine delete --name "$name" --force >/dev/null 2>&1 || true' EXIT
 "$smolvm" machine start --name "$name"
+"$smolvm" machine exec --name "$name" -- mkdir -p /etc/claude-code
+"$smolvm" machine cp "$here/managed-settings.json" "$name:/etc/claude-code/managed-settings.json"
 "$smolvm" machine exec --name "$name" -- sh -c 'rustc --version && wasm-tools --version && claude --version'
 "$smolvm" machine stop --name "$name"
 "$smolvm" pack create --from-vm "$name" -o "$out/cleanroom"

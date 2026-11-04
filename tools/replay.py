@@ -1,7 +1,7 @@
 """Record, check and compare the seam call recordings of the subsystems (docs/replay-format.md).
 
     uv run tools/replay.py --record --exe build/modern/TotalA.exe --out DIR [--subsystem NAME]... [--native-modules] [--window FIRST LAST] [SCENARIO...]
-    uv run tools/replay.py --check --exe build/modern/TotalA.exe [--subsystem NAME]... [--native-modules] [SCENARIO...]
+    uv run tools/replay.py --check --exe build/modern/TotalA.exe [--subsystem NAME]... [--native-modules] [--json FILE] [SCENARIO...]
     uv run tools/replay.py --compare DIR_A DIR_B
 
 `--record` plays each scenario of reference/scenarios/ (a name or a path; with none, the scenarios that
@@ -9,7 +9,8 @@ tests/replay/<subsystem>/ holds a recording of) under Wine, on a copy that ends 
 per subsystem, and writes <DIR>/<subsystem>/<scenario>.txt. `--subsystem` (repeatable) picks the subsystems; the
 default is every subsystem that has a tests/replay/<subsystem>/ directory. `--native-modules` plays the modules as
 native code (-modules=native). `--check` records into a temporary directory and fails when a recording differs from
-the one in tests/replay/. `--compare` fails when two directories do not hold the same files with the same bytes, and
+the one in tests/replay/; `--json FILE` also writes, per recording, `equal` or the first difference as the played run has it
+(call tick, slot, kind and name of the line, and its value; never the stored line), the form tools/oraclegate.py reads. `--compare` fails when two directories do not hold the same files with the same bytes, and
 names the first differing line.
 """
 
@@ -101,6 +102,31 @@ def first_difference(a: str, b: str) -> str | None:
         if x != y:
             return f"line {i + 1}: {x!r} / {y!r}"
     return "the files differ"
+
+
+def divergence(stored: str, got: str) -> dict:
+    """The first difference of two recordings described from `got` alone: the line number, the tick and slot of the call it is in,
+    and the kind, name and value of the line (None for a line `got` does not have). {"status": "equal"} when they are the same."""
+    if stored == got:
+        return {"status": "equal"}
+    a, b = stored.split("\n"), got.split("\n")
+    at = next((i for i in range(max(len(a), len(b))) if (a[i] if i < len(a) else None) != (b[i] if i < len(b) else None)), 0)
+    call = next((b[j] for j in range(min(at, len(b) - 1), -1, -1) if b[j].startswith("call ")), "")
+    ticks, _, slot = call[5:].partition(" ")
+    line = b[at] if at < len(b) else None
+    found = {"status": "differs", "line": at + 1, "tick": int(ticks) if ticks.isdigit() else None, "slot": slot or None,
+             "kind": None, "field": None, "value": None}
+    if line is None or not line.strip():
+        return found
+    text = line.strip()
+    if text.startswith("call "):
+        _, _, ticks, slot = (text.split(" ") + ["", ""])[:4]
+        found.update(kind="call", tick=int(ticks) if ticks.isdigit() else None, slot=slot or None, field=slot or None)
+        return found
+    kind, _, rest = text.partition(" ")
+    field, _, value = rest.partition(" ")
+    found.update(kind=kind, field=field, value=value)
+    return found
 
 
 def check_form(text: str, subsystem: str = "wind_meteors") -> list[str]:
@@ -217,11 +243,14 @@ def main() -> int:
     ap.add_argument("--subsystem", action="append", default=[])
     ap.add_argument("--native-modules", action="store_true")
     ap.add_argument("--window", nargs=2, type=int, metavar=("FIRST", "LAST"))
+    ap.add_argument("--json", type=Path, metavar="FILE", help="--check: write the verdict of each recording to FILE")
     ap.add_argument("--parallel", type=int, default=2)
     args = ap.parse_args()
     modes = [bool(args.record), bool(args.check), bool(args.compare)]
     if sum(modes) != 1:
         ap.error("give exactly one of --record, --check and --compare")
+    if args.json and not args.check:
+        ap.error("--json needs --check")
     try:
         if args.compare:
             found = compare(Path(args.compare[0]), Path(args.compare[1]))
@@ -253,6 +282,7 @@ def main() -> int:
         with tempfile.TemporaryDirectory(prefix="replay-", dir=ROOT / "build/scratch") as tmp:
             record(exe, plan, args.game_dir, args.native_modules, None, Path(tmp), args.parallel)
             bad = 0
+            verdicts: dict[str, dict] = {}
             for name, subs in plan.items():
                 for subsystem in subs:
                     stored = RECORDINGS / subsystem / (scenario_path(name).stem + ".txt")
@@ -260,6 +290,10 @@ def main() -> int:
                     diff = first_difference(stored.read_text(), got) if stored.is_file() else "no stored recording"
                     print(f"{subsystem}/{stored.name}: {'equal' if diff is None else 'differs, ' + diff}")
                     bad += diff is not None
+                    verdicts[f"{subsystem}/{stored.stem}"] = divergence(stored.read_text(), got) if stored.is_file() else {"status": "differs", "line": 0}
+            if args.json:
+                args.json.parent.mkdir(parents=True, exist_ok=True)
+                args.json.write_text(json.dumps(verdicts, indent=1, sort_keys=True) + "\n")
             return 1 if bad else 0
     except (Error, tracediff.Error) as e:
         print(f"replay: {e}", file=sys.stderr)

@@ -1256,6 +1256,8 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
         Fatal(file, g_callIndex, "an object line that names no object or field", line);
     if (sets != nullptr && !InObjectSet(sets->objReads, sets->objReadCount, f) && !InObjectSet(sets->objWrites, sets->objWriteCount, f))
         Fatal(file, g_callIndex, "field is not in the object sets of the slot", name);
+    if (!ReplayFieldLive(*f, p))
+        return true;
     if (f->kind == RK_ARRAY) {
         if (!ReplayApplyArray(*f, p, name, value, g_known, true, AllocObject))
             Fatal(file, g_callIndex, "an array line that cannot be applied", value);
@@ -1274,6 +1276,20 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
     return true;
 }
 
+bool ObjectLineIsCondition(const char* name)
+{
+    unsigned kind = 0;
+    unsigned ordinal = 0;
+    const char* fieldName = nullptr;
+    char prefix[96];
+    unsigned element = 0;
+    const char* sub = nullptr;
+    if (ReplayParseElementKey(name, prefix, sizeof prefix, &element, &sub) || !ReplayParseKey(name, &kind, &ordinal, &fieldName))
+        return false;
+    const ReplayObjectField* f = ReplayFindObjectField(kind, fieldName);
+    return f != nullptr && ReplayFieldIsCondition(*f);
+}
+
 void CompareObjects(const ReplaySlotSets* sets)
 {
     ReplayWalk(g_reach, g_objects, false, *sets, g_rootKinds, g_rootObjects, g_rootCount);
@@ -1283,6 +1299,8 @@ void CompareObjects(const ReplaySlotSets* sets)
         for (unsigned i = 0; i < sets->objWriteCount; i++) {
             const ReplayObjectField& f = kReplayObjectFields[sets->objWrites[i]];
             if (f.object != g_reach.kind[at] || f.kind == RK_EMBED || f.kind == RK_UNITID || !ReplayInReach(g_reach, at, sets->objWrites[i]))
+                continue;
+            if (!ReplayFieldLive(f, g_reach.object[at]))
                 continue;
             ReplayObjectFieldKey(key, g_objects, false, g_reach.kind[at], g_reach.object[at], f);
             if (f.kind == RK_VECTOR) {
@@ -1444,24 +1462,27 @@ void ReplayCall(const char* file, Outcome& out)
         g_game->ticks = atoi(tickText);
 
     int first = g_callFirst + 1;
-    for (int k = first; k < g_callEnd; k++) {
-        char* line = g_lines[k];
-        if (strncmp(line, "  r ", 4) != 0)
-            continue;
-        char* space = strchr(line + 4, ' ');
-        if (space == nullptr)
-            Fatal(file, g_callIndex, "bad read line", line);
-        *space = '\0';
-        if (strchr(line + 4, '#') != nullptr) {
-            RestoreObjectLine(line + 4, space + 1, file, sets, line);
-        } else {
-            const ReplayField* f = FindField(line + 4);
-            if (f == nullptr || !InSet(sets->reads, sets->readCount, f))
-                Fatal(file, g_callIndex, "field is not in the read set of the slot", line + 4);
-            if (!RestoreField(*f, space + 1))
-                Fatal(file, g_callIndex, "a value that cannot be restored", space + 1);
+    for (int pass = 0; pass < 2; pass++) {
+        for (int k = first; k < g_callEnd; k++) {
+            char* line = g_lines[k];
+            if (strncmp(line, "  r ", 4) != 0)
+                continue;
+            char* space = strchr(line + 4, ' ');
+            if (space == nullptr)
+                Fatal(file, g_callIndex, "bad read line", line);
+            *space = '\0';
+            bool object = strchr(line + 4, '#') != nullptr;
+            if (object && ObjectLineIsCondition(line + 4) == (pass == 0)) {
+                RestoreObjectLine(line + 4, space + 1, file, sets, line);
+            } else if (!object && pass == 0) {
+                const ReplayField* f = FindField(line + 4);
+                if (f == nullptr || !InSet(sets->reads, sets->readCount, f))
+                    Fatal(file, g_callIndex, "field is not in the read set of the slot", line + 4);
+                if (!RestoreField(*f, space + 1))
+                    Fatal(file, g_callIndex, "a value that cannot be restored", space + 1);
+            }
+            *space = ' ';
         }
-        *space = ' ';
     }
     g_cursor = first;
     g_hash = 2166136261u;
@@ -1855,15 +1876,19 @@ private:
 int RestoreText(const char* text, const ReplaySlotSets& sets)
 {
     char* copy = (char*)malloc(strlen(text) + 1);
-    strcpy(copy, text);
     int lines = 0;
-    for (char* p = copy; *p != '\0'; lines++) {
-        char* end = strchr(p, '\n');
-        *end = '\0';
-        char* space = strchr(p + 4, ' ');
-        *space = '\0';
-        Check(RestoreObjectLine(p + 4, space + 1, "self-test", &sets, p), "a recorded line restores");
-        p = end + 1;
+    for (int pass = 0; pass < 2; pass++) {
+        strcpy(copy, text);
+        for (char* p = copy; *p != '\0'; p = strchr(p, '\0') + 1) {
+            char* end = strchr(p, '\n');
+            *end = '\0';
+            char* space = strchr(p + 4, ' ');
+            *space = '\0';
+            if (ObjectLineIsCondition(p + 4) == (pass == 0))
+                Check(RestoreObjectLine(p + 4, space + 1, "self-test", &sets, p), "a recorded line restores");
+            lines += pass == 0 ? 1 : 0;
+            p = end;
+        }
     }
     free(copy);
     return lines;
@@ -2961,6 +2986,277 @@ void RawPointerSelfTest()
     Check(ReplayRestoreObjectField(*src, rebuilt, "null", g_objects, nullptr) && rebuilt->src == nullptr, "null restores as null");
 }
 
+void MaskedViewSelfTest()
+{
+    printf("masked views\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    FixtureView* view = (FixtureView*)SimAlloc(sizeof(FixtureView));
+    FrameTable* frames = (FrameTable*)SimAlloc(sizeof(FrameTable));
+    UnitDef* def = (UnitDef*)SimAlloc(sizeof(UnitDef));
+    memset((void*)view, 0, sizeof(FixtureView));
+    memset((void*)frames, 0, sizeof(FrameTable));
+    memset((void*)def, 0, sizeof(UnitDef));
+    frames->count = 3;
+    view->flags = 0x0100;
+    view->plain.count = 7;
+    view->plain.total = 9;
+    view->linked.def = Ref<UnitDef>(def);
+    unsigned char kinds[1] = { ROK_FIXTUREVIEW };
+    void* roots[1] = { view };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* plain = strdup(recorder.text.Data());
+    printf("%s", plain);
+    Check(strstr(plain, "  r FixtureView#1.flags 256\n") != nullptr, "a bit outside the mask does not choose the view");
+    Check(strstr(plain, "  r FixtureView#1.count 7\n") != nullptr && strstr(plain, "  r FixtureView#1.total 9\n") != nullptr, "the live view is written");
+    Check(strstr(plain, "FixtureView#1.scale") == nullptr && strstr(plain, "FixtureView#1.table") == nullptr && strstr(plain, "FixtureView#1.def") == nullptr, "and the dead one is not");
+    Check(strstr(plain, "UnitDef#") == nullptr, "a ref of the dead view is not followed");
+
+    view->flags = 0x0101;
+    view->linked.scale = 1.5f;
+    view->linked.table = frames;
+    view->linked.def = Ref<UnitDef>(def);
+    recorder.Record(kinds, roots, 1, sets);
+    char* linked = strdup(recorder.text.Data());
+    printf("%s", linked);
+    Check(strstr(linked, "  r FixtureView#1.flags 257\n") != nullptr && strstr(linked, "  r FixtureView#1.scale f32:0x3fc00000\n") != nullptr, "the other view is written when the bit is set");
+    Check(strstr(linked, "  r FixtureView#1.table FrameTable#1\n") != nullptr && strstr(linked, "  r FixtureView#1.def UnitDef#1\n") != nullptr, "its ptr and ref too");
+    Check(strstr(linked, "FixtureView#1.count") == nullptr && strstr(linked, "FixtureView#1.total") == nullptr, "and the first view is not");
+
+    view->flags = 0x0100;
+    view->plain.count = 7;
+    view->plain.total = 9;
+    recorder.Record(kinds, roots, 1, sets);
+    char* again = strdup(recorder.text.Data());
+    printf("%s", again);
+    Check(strstr(again, "  r FixtureView#1.count 7\n") != nullptr && strstr(again, "  r FixtureView#1.total 9\n") != nullptr, "a view that comes back is written again, though its values are those it had before");
+
+    ResetBlock();
+    RestoreText(plain, sets);
+    FixtureView* rebuilt = (FixtureView*)ReplayResolveObject("FixtureView#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->flags == 0x0100 && rebuilt->plain.count == 7 && rebuilt->plain.total == 9, "the live view is restored");
+    const ReplayObjectField* scale = ReplayFindObjectField(ROK_FIXTUREVIEW, "scale");
+    Check(ReplayRestoreObjectField(*scale, rebuilt, "f32:0x40000000", g_objects, AllocObject) && rebuilt->plain.count == 7, "a value for a dead field is not restored");
+    Check(RestoreObjectLine("FixtureView#1.scale", "f32:0x40000000", "self-test", &sets, "r FixtureView#1.scale f32:0x40000000") && rebuilt->plain.count == 7, "nor is a line for one");
+    g_rootKinds[0] = ROK_FIXTUREVIEW;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the dead view is not compared, so the object compares equal");
+
+    RestoreText(linked, sets);
+    FrameTable* rebuiltFrames = (FrameTable*)ReplayResolveObject("FrameTable#1", nullptr, g_objects, AllocObject);
+    UnitDef* rebuiltDef = (UnitDef*)ReplayResolveObject("UnitDef#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt->flags == 0x0101 && rebuilt->linked.scale == 1.5f, "the other view is restored");
+    Check(rebuilt->linked.table == rebuiltFrames && rebuilt->linked.def.get() == rebuiltDef, "with its ptr and its ref");
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "and compares equal");
+
+    RestoreText(again, sets);
+    Check(rebuilt->flags == 0x0100 && rebuilt->plain.count == 7 && rebuilt->plain.total == 9, "the first view is restored again over the bytes of the other");
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "and compares equal");
+    free(plain);
+    free(linked);
+    free(again);
+
+    ResetBlock();
+    printf("masked view through another object\n");
+    FixtureSlave* slave = (FixtureSlave*)SimAlloc(sizeof(FixtureSlave));
+    FixtureView* master = (FixtureView*)SimAlloc(sizeof(FixtureView));
+    memset((void*)slave, 0, sizeof(FixtureSlave));
+    memset((void*)master, 0, sizeof(FixtureView));
+    Player* player = &g_game->players[3];
+    player->flags = 0x0014;
+    slave->player = 3;
+    slave->master = Ref<FixtureView>(master);
+    slave->ground.moved = 5;
+    slave->narrow.low = 11;
+    unsigned char slaveKinds[2] = { ROK_FIXTURESLAVE, ROK_PLAYER };
+    void* slaveRoots[2] = { slave, player };
+    Recorder through;
+    through.Record(slaveKinds, slaveRoots, 2, sets);
+    char* first = strdup(through.text.Data());
+    Check(strstr(first, "  r FixtureSlave#1.moved 5\n") != nullptr && strstr(first, "  r FixtureSlave#1.low 11\n") != nullptr, "a field is written when the object it reads says so");
+    Check(strstr(first, "FixtureSlave#1.speed") == nullptr && strstr(first, "FixtureSlave#1.high") == nullptr, "and the other views are not");
+    Check(strstr(first, "FixtureSlave#1.moved") < strstr(first, "  r Player#3.flags 20\n"), "the line of a guarded field comes before the line it reads");
+
+    player->flags = 0;
+    master->flags = 2;
+    slave->air.speed = 2.5f;
+    slave->wide.high = 0.5f;
+    through.Record(slaveKinds, slaveRoots, 2, sets);
+    char* second = strdup(through.text.Data());
+    Check(strstr(second, "  r FixtureSlave#1.speed f32:0x40200000\n") != nullptr && strstr(second, "  r FixtureSlave#1.high f32:0x3f000000\n") != nullptr, "the views switch with the bits of the objects it reads");
+    Check(strstr(second, "FixtureSlave#1.moved") == nullptr && strstr(second, "FixtureSlave#1.low") == nullptr, "and the old ones are not written");
+
+    ResetBlock();
+    RestoreText(first, sets);
+    FixtureSlave* rebuiltSlave = (FixtureSlave*)ReplayResolveObject("FixtureSlave#1", nullptr, g_objects, AllocObject);
+    Check(rebuiltSlave != nullptr && rebuiltSlave->player == 3 && rebuiltSlave->ground.moved == 5 && rebuiltSlave->narrow.low == 11, "the fields that read another object are restored after the fields they read");
+    g_rootKinds[0] = ROK_FIXTURESLAVE;
+    g_rootObjects[0] = rebuiltSlave;
+    g_rootKinds[1] = ROK_PLAYER;
+    g_rootObjects[1] = &g_game->players[3];
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "and compare equal");
+    RestoreText(second, sets);
+    Check(rebuiltSlave->air.speed == 2.5f && rebuiltSlave->wide.high == 0.5f, "the other views are restored");
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "and compare equal");
+    free(first);
+    free(second);
+}
+
+void EmbeddedSiteSelfTest()
+{
+    printf("an object embedded at two sites\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    FixtureHolder* holder = (FixtureHolder*)SimAlloc(sizeof(FixtureHolder));
+    FrameTable* frames = (FrameTable*)SimAlloc(sizeof(FrameTable));
+    Handle* loose = (Handle*)SimAlloc(sizeof(Handle));
+    memset((void*)holder, 0, sizeof(FixtureHolder));
+    memset((void*)frames, 0, sizeof(FrameTable));
+    memset((void*)loose, 0, sizeof(Handle));
+    holder->id = 4;
+    holder->anim.index = 2;
+    holder->anim.value = 9;
+    holder->anim.kind = 1;
+    holder->anim.src = (GafEntry*)frames;
+    holder->shadow.index = 5;
+    holder->shadow.value = 6;
+    holder->shadow.kind = 1;
+    holder->shadow.src = (GafEntry*)frames;
+    unsigned char kinds[1] = { ROK_FIXTUREHOLDER };
+    void* roots[1] = { holder };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(strstr(text, "  r FixtureHolder#1.anim.index 2\n") != nullptr && strstr(text, "  r FixtureHolder#1.anim.value 9\n") != nullptr, "the walk names an embedded object by its site");
+    Check(strstr(text, "  r FixtureHolder#1.shadow.index 5\n") != nullptr && strstr(text, "  r FixtureHolder#1.shadow.src FrameTable#1\n") != nullptr, "and the other site by its own");
+    Check(strstr(text, "Handle#") == nullptr, "and no embedded object is named by order");
+    ReplayText name;
+    ReplayAddObjectName(name, *recorder.table, ROK_HANDLE, &holder->anim, true);
+    Check(strcmp(name.Data(), "FixtureHolder#1.anim") == 0, "an argument at the first site is named by it");
+    name.Clear();
+    ReplayAddObjectName(name, *recorder.table, ROK_HANDLE, &holder->shadow, true);
+    Check(strcmp(name.Data(), "FixtureHolder#1.shadow") == 0, "an argument at the second site is named by it");
+    name.Clear();
+    ReplayAddObjectName(name, *recorder.table, ROK_HANDLE, loose, true);
+    Check(strcmp(name.Data(), "Handle#1") == 0, "an object of the kind that is embedded nowhere is named by order");
+    name.Free();
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureHolder* rebuilt = (FixtureHolder*)ReplayResolveObject("FixtureHolder#1", nullptr, g_objects, AllocObject);
+    unsigned found = 0;
+    Check(ReplayResolveObject("FixtureHolder#1.shadow", &found, g_objects, AllocObject) == &rebuilt->shadow && found == ROK_HANDLE, "a name of a site resolves to the bytes inside its object");
+    Check(rebuilt->id == 4 && rebuilt->anim.index == 2 && rebuilt->anim.value == 9 && rebuilt->shadow.index == 5 && rebuilt->shadow.value == 6, "and the fields are restored there");
+    Check(g_objects.Pointer(ROK_HANDLE, 1) == nullptr, "no separate object of the kind is allocated");
+    g_rootKinds[0] = ROK_FIXTUREHOLDER;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the restored object compares equal");
+    free(text);
+
+    const char* body =
+        "  i services.LoadAnimGaf \"logos\" = Gaf#1\n"
+        "  i services.FindGafEntry Gaf#1 \"radar\" = FrameTable#1\n"
+        "  o FrameTable#1.count 3\n"
+        "  i services.InitGafSequence FixtureHolder#1.anim FrameTable#1 0\n"
+        "  o FixtureHolder#1.anim.index 0\n"
+        "  o FixtureHolder#1.anim.value 4\n"
+        "  o FixtureHolder#1.anim.kind 1\n"
+        "  o FixtureHolder#1.anim.src FrameTable#1\n"
+        "  i services.InitGafSequence FixtureHolder#1.shadow FrameTable#1 0\n"
+        "  o FixtureHolder#1.shadow.index 1\n"
+        "  o FixtureHolder#1.shadow.value 8\n"
+        "  o FixtureHolder#1.shadow.kind 1\n"
+        "  o FixtureHolder#1.shadow.src FrameTable#1\n";
+    ResetBlock();
+    BeginServices(body);
+    void* gaf = LoadAnimGaf("logos");
+    GafEntry* entry = FindGafEntry((GafArchive*)gaf, "radar");
+    FixtureHolder* served = (FixtureHolder*)ReplayResolveObject("FixtureHolder#1", nullptr, g_objects, AllocObject);
+    InitGafSequence(&served->anim, entry, 0);
+    InitGafSequence(&served->shadow, entry, 0);
+    Check(served->anim.value == 4 && served->shadow.value == 8 && served->shadow.index == 1, "a service line names each site, and writes the object inside");
+    Check(g_diffs == 0 && g_importIndex == 4, "the replayed call names them the same, so nothing differs");
+    Check(g_objects.Pointer(ROK_HANDLE, 1) == nullptr, "and no separate object of the kind is allocated");
+
+    BeginServices(body);
+    LoadAnimGaf("logos");
+    FindGafEntry((GafArchive*)gaf, "radar");
+    InitGafSequence(&served->shadow, entry, 0);
+    printf("the other site: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 2 services.InitGafSequence") == 0, "a call at the other site is reported at the import");
+}
+
+void UnnamedPtrSelfTest()
+{
+    printf("a ptr to an object no line named\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    FixtureView* view = (FixtureView*)SimAlloc(sizeof(FixtureView));
+    Handle* cursor = (Handle*)SimAlloc(sizeof(Handle));
+    FrameTable* frames = (FrameTable*)SimAlloc(sizeof(FrameTable));
+    memset((void*)view, 0, sizeof(FixtureView));
+    memset((void*)cursor, 0, sizeof(Handle));
+    memset((void*)frames, 0, sizeof(FrameTable));
+    frames->count = 3;
+    view->flags = 1;
+    view->linked.table = frames;
+    cursor->src = (GafEntry*)frames;
+    unsigned char kinds[2] = { ROK_FIXTUREVIEW, ROK_HANDLE };
+    void* roots[2] = { view, cursor };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 2, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(strstr(text, "  r FixtureView#1.table FrameTable#1\n") != nullptr, "a ptr is named when it is first seen, and the walk does not reach its object");
+    Check(strstr(text, "  r Handle#1.src FrameTable#1\n") != nullptr, "another ptr to it has the same name");
+    Check(strstr(text, "FrameTable#1.count") == nullptr && strstr(text, "#?") == nullptr, "the object is not recorded, and no pointer is unnamed");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureView* rebuilt = (FixtureView*)ReplayResolveObject("FixtureView#1", nullptr, g_objects, AllocObject);
+    Handle* rebuiltCursor = (Handle*)ReplayResolveObject("Handle#1", nullptr, g_objects, AllocObject);
+    FrameTable* empty = (FrameTable*)ReplayResolveObject("FrameTable#1", nullptr, g_objects, AllocObject);
+    Check(empty != nullptr && empty->count == 0, "the replayer makes an empty object of the kind");
+    Check(rebuilt->linked.table == empty && (FrameTable*)rebuiltCursor->src == empty, "and both ptrs hold its address");
+    g_rootKinds[0] = ROK_FIXTUREVIEW;
+    g_rootObjects[0] = rebuilt;
+    g_rootKinds[1] = ROK_HANDLE;
+    g_rootObjects[1] = rebuiltCursor;
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the restored objects compare equal");
+    const ReplayObjectField* table = ReplayFindObjectField(ROK_FIXTUREVIEW, "table");
+    Check(!ReplayRestoreObjectField(*table, rebuilt, "FrameTable#?", g_objects, AllocObject), "a ptr that is still unnamed is refused");
+    free(text);
+}
+
 void ExecuteCommandSelfTest()
 {
     printf("services: ExecuteCommandText\n");
@@ -3206,6 +3502,9 @@ int SelfTest(const char* file)
     LoadReadsSelfTest();
     GafCursorSelfTest();
     RawPointerSelfTest();
+    MaskedViewSelfTest();
+    EmbeddedSiteSelfTest();
+    UnnamedPtrSelfTest();
     ExecuteCommandSelfTest();
     if (file == nullptr)
         return 0;

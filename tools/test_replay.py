@@ -53,6 +53,10 @@ class Form(unittest.TestCase):
         self.assertTrue(replay.check_form(GOOD.replace("call 1 UpdateWind\n", "  r Game.width 1\n")))
         self.assertTrue(replay.check_form(GOOD[:-1]))
         self.assertTrue(replay.check_form(GOOD.replace("  r Game", "  x Game")))
+        held = GOOD.replace("  i services", "  a done callback#1\n  c callback#1.Complete 5\n  i services")
+        self.assertEqual(replay.check_form(held), [])
+        self.assertTrue(replay.check_form(held.replace("  c callback", "  c")))
+        self.assertTrue(replay.check_form(held.replace("  c callback", "  cx callback")))
 
 
 class Difference(unittest.TestCase):

@@ -14,11 +14,12 @@ public:
     unsigned Name(unsigned kind, const void* p);
     void* Pointer(unsigned kind, unsigned ordinal) const;
     void Bind(unsigned kind, unsigned ordinal, void* p);
+    unsigned Count(unsigned kind) const { return count[kind]; }
 
 private:
     ReplayObjectTable(const ReplayObjectTable&);
     ReplayObjectTable& operator=(const ReplayObjectTable&);
-    enum { KINDS = 48, HASH = 16384 };
+    enum { KINDS = 64, HASH = 16384 };
     unsigned count[KINDS];
     void* objects[KINDS][REPLAY_MAX_OBJECTS];
     short slots[KINDS][HASH];
@@ -47,6 +48,9 @@ bool ReplayApplyVector(const ReplayObjectField& f, void* object, const char* key
 bool ReplayApplyVectorElement(const ReplayObjectField& f, void* object, unsigned index, const char* sub, const char* fullKey, const char* value, ReplayKnown& known, bool memory, ReplayObjectTable& table, ReplayAllocFn alloc);
 void ReplayCompareVector(const ReplayObjectField& f, const void* object, const char* key, const ReplayKnown& known, ReplayObjectTable& table, ReplayReportFn report, ReplayHashFn hash);
 bool ReplayParseElementKey(const char* key, char* prefix, unsigned size, unsigned* index, const char** sub);
+bool ReplayParseRefsKey(const char* key, char* prefix, unsigned size, unsigned* index);
+bool ReplayRestoreRefsElement(const ReplayObjectField& f, void* object, unsigned index, const char* value, ReplayObjectTable& table, ReplayAllocFn alloc);
+void ReplayCompareRefs(const ReplayObjectField& f, const void* object, const char* key, const ReplayKnown& known, ReplayObjectTable& table, ReplayReportFn report, ReplayHashFn hash);
 void ReplayArrayDiff(const char* recorded, const char* replayed, ReplayText& out);
 bool ReplayIsArrayText(const char* text);
 void ReplayAddStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, ReplayObjectTable& table);
@@ -137,7 +141,7 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
 bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex);
 unsigned ReplayDeltaCount(const ReplayReach& reach);
 bool ReplayDeltaTable(const ReplayReach& reach, unsigned index, unsigned* kind, unsigned char** base, unsigned* count, unsigned* stride);
-bool ReplayInReachObject(const ReplayReach& reach, unsigned kind, const void* object);
+bool ReplayInDeltaTable(const ReplayReach& reach, unsigned kind, const void* object);
 void ReplayCaptureObjects(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, const ReplayReach& reach, const unsigned short* set, unsigned count, char tag);
 void ReplayObjectFieldKey(ReplayText& key, ReplayObjectTable& table, bool assign, unsigned kind, const void* object, const ReplayObjectField& f);
 bool ReplayParseKey(const char* key, unsigned* kind, unsigned* ordinal, const char** field);

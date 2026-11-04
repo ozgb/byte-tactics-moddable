@@ -465,6 +465,12 @@ least one game of 8 players. `uv run tools/coverage.py --exe build/coverage/Tota
 full suite's in `data/coverage.csv`, and exits 1 below 96% of the lines. Run it when a scenario is
 added or removed and when the tier changes.
 
+`uv run tools/coverage.py --slots ai` (repeatable, or `all`; `--runs DIR`, `--json FILE`) plays nothing: it reads the per-scenario
+profiles a coverage run left in `build/coverage-run/` and prints, for each slot of `interfaces/ai.h`, the scenarios that enter
+it with their entry counts and ticks, or `never`, and a smallest set of scenarios that enters every slot some scenario enters.
+A `<Slot>Native` binding is a wrapper (its count is the number of seam calls); any other binding is direct, and its count is an
+upper bound. Replay parts pick their recordings from it.
+
 | Name | Players | Ticks |
 | --- | ---: | ---: |
 | allied-victory | 4 | 360 |

@@ -1,6 +1,6 @@
 #include <ctype.h>
-#include <new>
 #include "../state/block.h"
+#include "unit_type_set.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -554,9 +554,7 @@ void FreeUnitCategories()
     g_mapLoadFlag = 0;
 }
 
-#include "unit_type_set.h"
-
-static UnitTypeSet* FindOrAddCategory(char* name, bool inBlock)
+static UnitCategory* LowerBoundCategory(const char* name)
 {
     UnitCategory* first = s_unitCategories.begin();
     int n = s_unitCategories.end() - first;
@@ -568,23 +566,30 @@ static UnitTypeSet* FindOrAddCategory(char* name, bool inBlock)
         else
             n = n2;
     }
-    if (first != s_unitCategories.end() && _strcmpi(first->name.data, name) == 0)
-        return (UnitTypeSet*)first->value;
-
-    UnitTypeSet* p = inBlock ? new (SimAllocTagged("CATEGORY MASK", sizeof(UnitTypeSet))) UnitTypeSet : new UnitTypeSet;
-    s_unitCategories.insert(first, UnitCategory(StringRef(name), p));
-    return p;
+    return first;
 }
 
 // FUNCTION: 0x488c50
 UnitTypeSet* __stdcall GetCategoryMask(char* name)
 {
-    return FindOrAddCategory(name, false);
+    UnitCategory* first = LowerBoundCategory(name);
+    if (first != s_unitCategories.end() && _strcmpi(first->name.data, name) == 0)
+        return (UnitTypeSet*)first->value;
+
+    UnitTypeSet* p = new UnitTypeSet;
+    s_unitCategories.insert(first, UnitCategory(StringRef(name), p));
+    return p;
 }
 
 UnitTypeSet* __stdcall GetLoadCategoryMask(char* name)
 {
-    return FindOrAddCategory(name, true);
+    UnitCategory* first = LowerBoundCategory(name);
+    if (first != s_unitCategories.end() && _strcmpi(first->name.data, name) == 0)
+        return (UnitTypeSet*)first->value;
+
+    UnitTypeSet* p = (UnitTypeSet*)SimAllocTagged("CATEGORY MASK", sizeof(UnitTypeSet));
+    s_unitCategories.insert(first, UnitCategory(StringRef(name), p));
+    return p;
 }
 
 static inline UnitDefNameKeyView* FindByName(UnitDefNameKeyView* first, UnitDefNameKeyView* last, char* text)

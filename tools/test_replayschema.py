@@ -4,9 +4,13 @@
 """
 
 import copy
+import csv
 import json
 import re
+import tempfile
 import unittest
+from pathlib import Path
+from unittest import mock
 
 import replayschema as rs
 
@@ -1811,6 +1815,23 @@ class Committed(unittest.TestCase):
         exports = [m for m in manifest["modules"] if m["name"] == "wind_meteors"][0]["exports"]
         _, _, model = rs.generate(rs.read_rows())
         self.assertEqual(sorted(exports), sorted(model["subsystems"]["wind_meteors"]["slots"]))
+
+
+class LinkSources(unittest.TestCase):
+    def test_reads_the_subsystems_from_the_json_list(self):
+        import replay_subsystems
+
+        listed = set(replay_subsystems.load())
+        with rs.SUBSYSTEMS.open(newline="") as f:
+            rows = list(csv.DictReader(f))
+        other = next(r for r in rows if r["subsystem"] not in listed)
+        self.assertNotIn(other["file"], rs.replay_link_sources())
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "replay_subsystems.json"
+            path.write_text(json.dumps({other["subsystem"]: {}}))
+            real = replay_subsystems.load
+            with mock.patch.object(replay_subsystems, "load", lambda: real(path)):
+                self.assertIn(other["file"], rs.replay_link_sources())
 
 
 if __name__ == "__main__":

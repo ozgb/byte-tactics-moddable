@@ -282,10 +282,23 @@ add_custom_command(
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(replay_test DEPENDS "${CMAKE_BINARY_DIR}/replay_test.exe")
 
-set(REPLAY_SUBSYSTEMS wind_meteors economy targeting)
-set(REPLAY_INJECT_wind_meteors BT_REPLAY_INJECT_GAP_SCALE=31.0)
-set(REPLAY_INJECT_economy BT_REPLAY_INJECT_WIND_SCALE=3.0)
-set(REPLAY_INJECT_targeting BT_REPLAY_INJECT_TARGET_SCALE=0x6666)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/tests/replay_subsystems.json")
+file(READ "${CMAKE_SOURCE_DIR}/tests/replay_subsystems.json" REPLAY_SUBSYSTEMS_JSON)
+set(REPLAY_SUBSYSTEMS)
+set(REPLAY_WASM_INJECT_COMMANDS)
+string(JSON replay_count LENGTH "${REPLAY_SUBSYSTEMS_JSON}")
+math(EXPR replay_last "${replay_count} - 1")
+foreach(index RANGE ${replay_last})
+  string(JSON subsystem MEMBER "${REPLAY_SUBSYSTEMS_JSON}" ${index})
+  list(APPEND REPLAY_SUBSYSTEMS ${subsystem})
+  string(JSON REPLAY_INJECT_${subsystem} GET "${REPLAY_SUBSYSTEMS_JSON}" ${subsystem} inject define)
+  string(JSON wasm_variant ERROR_VARIABLE wasm_missing GET "${REPLAY_SUBSYSTEMS_JSON}" ${subsystem} wasm inject_variant)
+  if(NOT wasm_missing)
+    string(JSON wasm_define GET "${REPLAY_SUBSYSTEMS_JSON}" ${subsystem} wasm inject_define)
+    list(APPEND REPLAY_WASM_INJECT_COMMANDS COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build-variant --define ${wasm_define} --name ${wasm_variant}
+         COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/build/wasm-modules/${wasm_variant}.wasm" "${CMAKE_BINARY_DIR}/${wasm_variant}.wasm")
+  endif()
+endforeach()
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/data/subsystems.csv")
 set(REPLAY_MODULE_SOURCES)
 set(REPLAY_INJECT_DEFINITIONS)
@@ -370,7 +383,6 @@ add_custom_target(wasm_runtime
   USES_TERMINAL)
 
 add_custom_target(wasm_runtime_inject
-  COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build-variant --define BT_REPLAY_INJECT_GAP_SCALE=31.0 --name wind_meteors_inject
-  COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/build/wasm-modules/wind_meteors_inject.wasm" "${CMAKE_BINARY_DIR}/wind_meteors_inject.wasm"
+  ${REPLAY_WASM_INJECT_COMMANDS}
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   USES_TERMINAL)

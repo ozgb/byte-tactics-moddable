@@ -770,8 +770,10 @@ inside a nested command fails the recording.
 
 `tests/replay_native_test.cpp` replays a recording against the native module (`replay_native_test.exe`, built by
 `cmake --build build/modern --target replay_native_test`, run under Wine in `modern-compile`, with the WASM replays below).
-The subsystem is read from the recording's header; the module sources of a subsystem come from `data/subsystems.csv`
-(`REPLAY_SUBSYSTEMS` in `CMakeLists.txt`).
+The subsystem is read from the recording's header; the module sources of a subsystem come from `data/subsystems.csv`.
+CI replays the recordings of a subsystem once it has an entry in `tests/replay_subsystems.json` (its injected change,
+the recording that change is checked on, and for a WASM module its variant), and `tools/ci_replays.sh` fails naming
+a `tests/replay/` directory with no entry, or an entry with no directory.
 
 ```sh
 wine build/modern/replay_native_test.exe tests/replay/wind_meteors/*.txt

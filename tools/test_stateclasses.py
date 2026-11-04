@@ -629,6 +629,24 @@ class DataTest(unittest.TestCase):
     def test_the_file_has_every_kind(self):
         self.assertEqual({r["kind"] for r in self.rows}, set(sc.KINDS))
 
+    def test_the_counts_table_of_docs_state_md_matches_the_file(self):
+        counts: dict[tuple[str, str], int] = {}
+        for r in self.rows:
+            counts[(r["kind"], r["class"])] = counts.get((r["kind"], r["class"]), 0) + 1
+        want = {}
+        for kind in sc.KINDS:
+            cells = [counts.get((kind, c), 0) for c in sc.CLASSES]
+            want[kind] = cells + [sum(cells)]
+        doc = (Path(__file__).resolve().parent.parent / "docs" / "state.md").read_text()
+        header = ["kind"] + list(sc.CLASSES) + ["total"]
+        got = {}
+        for line in doc.split("## Counts")[1].split("\n## ")[0].splitlines():
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if line.startswith("|") and cells[0] in sc.KINDS:
+                got[cells[0]] = [int(c) for c in cells[1:]]
+        self.assertEqual(got, want, "docs/state.md Counts table is stale: columns %s, %d rows" % (header, len(self.rows)))
+        self.assertIn("(%d rows)" % len(self.rows), doc)
+
 
 if __name__ == "__main__":
     unittest.main()

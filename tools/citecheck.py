@@ -1,11 +1,11 @@
-"""Fail when a hand-written note in data/ cites a source file by line number.
+"""Fail when a hand-written note in data/ or docs/state.md cites a source file by line number.
 
     python3 tools/citecheck.py               # check the repository
     python3 tools/citecheck.py --root DIR    # check another tree
 
 A line range goes stale when code moves, and a function name does not, so a note cites
 `Name (file.cpp)`, never `file.cpp:12-34`. NOTES names the note column of each data file
-whose text people write. Columns a tool generates from the source (type_dupes.files,
+whose text people write, and DOCS names the documents checked line by line. Columns a tool generates from the source (type_dupes.files,
 globals.defined, hazards.file and line) are not listed and may hold `file:line` text.
 Prints one line per citation and exits 1 if there are any. Standard library only.
 """
@@ -23,12 +23,23 @@ NOTES = {
     "trace_coverage.csv": "evidence",
     "simalloc_allow.csv": "reason",
 }
+DOCS = ["docs/state.md"]
 CITATION = re.compile(r"\.(?:cpp|h):[0-9]")
 
 
 def check(root: Path) -> list[str]:
-    """One message for each note that has a `file.cpp:N` citation."""
+    """One message for each note or document line that has a `file.cpp:N` citation."""
     problems = []
+    for name in DOCS:
+        path = root / name
+        if not path.exists():
+            problems.append("%s: missing" % path)
+            continue
+        for number, line in enumerate(path.read_text().splitlines(), 1):
+            hit = CITATION.search(line)
+            if hit:
+                problems.append("%s line %d: cites a line (%s); cite the function and file instead"
+                                % (name, number, line[max(0, hit.start() - 30):hit.end() + 10]))
     for name, column in NOTES.items():
         path = root / "data" / name
         if not path.exists():

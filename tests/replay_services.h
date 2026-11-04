@@ -398,9 +398,84 @@ int __stdcall ComputeChecksum(unsigned char* data, int len)
     return atoi(result);
 }
 
+void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count)
+{
+    ReplayText t;
+    StartImport(t, RI_RECORD_SIM_EVENT);
+    Space(t);
+    t.AddInt((int)kind);
+    Space(t);
+    t.AddInt((int)flags);
+    Space(t);
+    ReplayAddWords(t, (const unsigned*)args, (unsigned)count);
+    Space(t);
+    t.AddInt((int)count);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)
+{
+    ReplayText t;
+    StartImport(t, RI_SIM_CAPTURE_ALLOC);
+    Space(t);
+    t.AddInt((int)bytes);
+    const char* result = Enter(t);
+    return SnapshotAnswer(result, (unsigned)bytes, offset);
+}
+
+unsigned char __stdcall FindSlotByDpid(int id)
+{
+    ReplayText t;
+    StartImport(t, RI_FIND_SLOT_BY_DPID);
+    Space(t);
+    t.AddInt((int)id);
+    const char* result = Enter(t);
+    return (unsigned char)atoi(result);
+}
+
+int __stdcall GetSlotDpid(unsigned char index)
+{
+    ReplayText t;
+    StartImport(t, RI_GET_SLOT_DPID);
+    Space(t);
+    t.AddInt((int)(int)index);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
 bool ReplayAnswerImport(ReplayImport& c)
 {
     switch (c.id) {
+    case RI_SIM_ALLOC: {
+        ReplayText t;
+        StartImport(t, RI_SIM_ALLOC);
+        Space(t);
+        t.AddInt((int)c.args[0].v.i);
+        const char* result = Enter(t);
+        c.Return(AllocAnswer(result, (unsigned)c.args[0].v.i));
+        return true;
+    }
+    case RI_SIM_ALLOC_TAGGED: {
+        ReplayText t;
+        StartImport(t, RI_SIM_ALLOC_TAGGED);
+        Space(t);
+        t.AddString((const char*)c.args[0].v.p);
+        Space(t);
+        t.AddInt((int)c.args[1].v.i);
+        const char* result = Enter(t);
+        c.Return(AllocAnswer(result, (unsigned)c.args[1].v.i));
+        return true;
+    }
+    case RI_SIM_FREE: {
+        ReplayText t;
+        StartImport(t, RI_SIM_FREE);
+        Space(t);
+        AddAllocName(t, c.args[0].v.p);
+        const char* r = Enter(t);
+        (void)r;
+        return false;
+    }
     default:
         return false;
     }

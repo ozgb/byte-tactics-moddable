@@ -297,6 +297,61 @@ void ReplayImportEnd(ReplayImport& c)
         AddResult(t, c.result);
         break;
     }
+    case RI_SIM_ALLOC:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddAlloc(t, (c.result.kind == 1 ? c.result.v.p : nullptr), nullptr);
+        break;
+    }
+    case RI_SIM_ALLOC_TAGGED:
+    {
+        AddSpace(t);
+        t.AddString((const char*)a[0].v.p);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddAlloc(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (const char*)a[0].v.p);
+        break;
+    }
+    case RI_SIM_FREE:
+    {
+        AddSpace(t);
+        AddAllocName(t, a[0].v.p);
+        break;
+    }
+    case RI_RECORD_SIM_EVENT:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddSpace(t);
+        ReplayAddWords(t, (const unsigned*)a[2].v.p, (unsigned)a[3].v.i);
+        AddSpace(t);
+        t.AddInt(a[3].v.i);
+        break;
+    }
+    case RI_SIM_CAPTURE_ALLOC:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddSnapshot(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (unsigned)a[0].v.i);
+        break;
+    }
+    case RI_FIND_SLOT_BY_DPID:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_GET_SLOT_DPID:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddResult(t, c.result);
+        break;
+    }
     }
     t.AddChar('\n');
     ReplayCalls() = 1;

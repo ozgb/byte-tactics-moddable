@@ -828,6 +828,17 @@ unsigned g_captureUsed;
 unsigned char* g_snapshotData[MAX_SNAPSHOTS];
 unsigned g_snapshotBytes[MAX_SNAPSHOTS];
 
+void SnapshotRegister(const char* result, void* buffer, unsigned bytes)
+{
+    if (strncmp(result, "snapshot#", 9) != 0)
+        return;
+    unsigned ordinal = (unsigned)atoi(result + 9);
+    if (ordinal == 0 || ordinal > MAX_SNAPSHOTS)
+        Fatal(g_file, g_callIndex, "a snapshot that the replayer cannot register", result);
+    g_snapshotData[ordinal - 1] = (unsigned char*)buffer;
+    g_snapshotBytes[ordinal - 1] = bytes;
+}
+
 void* SnapshotAnswer(const char* result, unsigned bytes, unsigned* offset)
 {
     if (strncmp(result, "snapshot#", 9) != 0)
@@ -2578,6 +2589,7 @@ void BeginServices(const char* body)
 {
     LoadCall(body);
     BeginImport();
+    memset(g_snapshotData, 0, sizeof g_snapshotData);
 }
 
 void FilesSelfTest()
@@ -2658,6 +2670,58 @@ void CommandsSelfTest()
     Translate("other");
     Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.Translate") == 0, "and so is a changed key");
     free(args);
+}
+
+void SimPlumbingSelfTest()
+{
+    printf("services: sim plumbing\n");
+    ResetBlock();
+    const char* body =
+        "  i services.SimAlloc 64 = alloc#1\n"
+        "  i services.SimAllocTagged \"Player Info\" 185 = PlayerInfo#1\n"
+        "  i services.SimAllocTagged \"Other\" 16 = alloc#2\n"
+        "  i services.SimFree alloc#1\n"
+        "  i services.RecordSimEvent 2 1 [3,4] 2\n"
+        "  i services.FindSlotByDpid 77 = 2\n"
+        "  i services.GetSlotDpid 2 = 77\n"
+        "  i services.SimCaptureAlloc 20 = snapshot#1\n"
+        "  o snapshot#1 x:0102030405060708090a0b0c0d0e0f1011121314\n";
+    BeginServices(body);
+    ReplayAnswerHook() = ReplayAnswerImport;
+    void* first = SimAlloc(64);
+    void* info = SimAllocTagged("Player Info", 185);
+    void* other = SimAllocTagged("Other", 16);
+    Check(first != nullptr && g_objects.Pointer(ROK_ALLOC, 1) == first, "an allocation is the replayer's own memory, named as the recording names it");
+    Check(info != nullptr && g_objects.Pointer(ROK_PLAYERINFO, 1) == info, "an allocation of a tag the annotation names is an object of its kind");
+    Check(other != nullptr && g_objects.Pointer(ROK_ALLOC, 2) == other && other != first, "and another is another block");
+    SimFree(first);
+    ReplayAnswerHook() = nullptr;
+    unsigned args[2] = { 3, 4 };
+    RecordSimEvent(SIM_EVENT_SOUND, 1, args, 2);
+    Check(FindSlotByDpid(77) == 2 && GetSlotDpid(2) == 77, "a slot lookup replays");
+    unsigned offset = 0;
+    unsigned char* snapshot = (unsigned char*)SimCaptureAlloc(20, &offset);
+    for (int i = 0; i < 20; i++)
+        snapshot[i] = (unsigned char)(i + 1);
+    CompareSnapshots();
+    Check(g_diffs == 0 && g_importIndex == 8, "nothing differs, the free and the event included");
+
+    BeginServices(body);
+    ReplayAnswerHook() = ReplayAnswerImport;
+    SimAlloc(65);
+    ReplayAnswerHook() = nullptr;
+    printf("a changed size: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.SimAlloc") == 0, "a changed size is reported at the import");
+    BeginServices(body);
+    ReplayAnswerHook() = ReplayAnswerImport;
+    SimAlloc(64);
+    SimAllocTagged("Player Info", 184);
+    ReplayAnswerHook() = nullptr;
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 services.SimAllocTagged") == 0, "so is a changed size of a tagged one");
+    BeginServices("  i services.RecordSimEvent 2 1 [3,4] 2\n");
+    args[1] = 5;
+    RecordSimEvent(SIM_EVENT_SOUND, 1, args, 2);
+    Check(g_diffs == 1 && strstr(g_detail.Data(), "[3,5]") != nullptr, "and so are the arguments of an event");
 }
 
 typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
@@ -2855,6 +2919,7 @@ int SelfTest(const char* file)
     SnapshotSelfTest();
     FilesSelfTest();
     CommandsSelfTest();
+    SimPlumbingSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

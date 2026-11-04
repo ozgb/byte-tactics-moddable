@@ -280,12 +280,16 @@ void* ReallocLocked(void* p, unsigned int size)
 
 __declspec(noinline) void* __cdecl SimAlloc(unsigned int size)
 {
+    ReplayImport call(RI_SIM_ALLOC);
+    call.Int((int)size);
+    if (call.Answered())
+        return call.AnsweredPointer();
     AllocSite site(_ReturnAddress(), 0);
     Guard guard;
     void* p = AllocLocked(size);
     if (g_allocHooks != 0)
         g_allocHooks->added(p, size);
-    return p;
+    return call.Result(p);
 }
 
 __declspec(noinline) void* __cdecl SimRealloc(void* p, unsigned int size)
@@ -305,6 +309,10 @@ __declspec(noinline) void* __cdecl SimRealloc(void* p, unsigned int size)
 void __cdecl SimFree(void* p)
 {
     if (p == 0)
+        return;
+    ReplayImport call(RI_SIM_FREE);
+    call.Ptr(p);
+    if (call.Answered())
         return;
     Guard guard;
     if (g_allocHooks != 0)

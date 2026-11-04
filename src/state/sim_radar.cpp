@@ -1,6 +1,7 @@
 #include "sim_radar.h"
 #include "sim_globals.h"
 #include "block.h"
+#include "../harness/replay.h"
 #include "../../interfaces/services.h"
 
 static SimRadarArena* g_simRadar;
@@ -27,6 +28,11 @@ void SimCaptureClear()
 
 void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)
 {
+    ReplayImport call(RI_SIM_CAPTURE_ALLOC);
+    call.Int((int)bytes);
+    call.Ptr(offset);
+    if (call.Answered())
+        return call.AnsweredPointer();
     SimRadarArena* arena = g_simRadar;
     if (arena == nullptr) {
         if (HarnessTestMode())
@@ -44,5 +50,5 @@ void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)
     arena->used += size;
     if (arena->used > arena->highWater)
         arena->highWater = arena->used;
-    return arena->bytes + *offset;
+    return call.Result(arena->bytes + *offset);
 }

@@ -32,6 +32,13 @@ enum ReplayImportId {
     RI_TRANSLATE,
     RI_INIT_ARGS,
     RI_COMPUTE_CHECKSUM,
+    RI_SIM_ALLOC,
+    RI_SIM_ALLOC_TAGGED,
+    RI_SIM_FREE,
+    RI_RECORD_SIM_EVENT,
+    RI_SIM_CAPTURE_ALLOC,
+    RI_FIND_SLOT_BY_DPID,
+    RI_GET_SLOT_DPID,
     RI_COUNT
 };
 
@@ -65,6 +72,13 @@ static const char* const kReplayImportNames[RI_COUNT] = {
     "services.Translate",
     "services.CommandArgs_InitArgs",
     "services.ComputeChecksum",
+    "services.SimAlloc",
+    "services.SimAllocTagged",
+    "services.SimFree",
+    "services.RecordSimEvent",
+    "services.SimCaptureAlloc",
+    "services.FindSlotByDpid",
+    "services.GetSlotDpid",
 };
 
 #endif

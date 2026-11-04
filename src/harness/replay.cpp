@@ -181,6 +181,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
     const ReplaySlotSets& sets = kReplaySlots[slot];
     CaptureSet(sets.reads, sets.readCount, 'r');
     CaptureObjectSet(sets, true);
+    ReplayOwner() = host_thread_id();
     ReplayCalls() = 1;
 }
 
@@ -220,7 +221,7 @@ public:
             role = 1;
             s_open = true;
             SlotEnter(slot, sub, roots);
-        } else if (s_recording && ReplayCalls() != 0 && IsImportOf(s_sub, slot)) {
+        } else if (s_recording && ReplayOwned() && IsImportOf(s_sub, slot)) {
             role = 2;
             ReplayCalls() = 0;
         } else if (s_recording && ReplayCallbackDepth() != 0 && IsImportOf(s_sub, slot)) {

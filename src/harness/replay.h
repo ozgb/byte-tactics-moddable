@@ -1,13 +1,28 @@
 #ifndef HARNESS_REPLAY_H
 #define HARNESS_REPLAY_H
 
+#include "../../interfaces/host.h"
+
 inline int& ReplayCalls()
 {
     static int calls;
     return calls;
 }
 
+inline unsigned int& ReplayOwner()
+{
+    static unsigned int owner;
+    return owner;
+}
+
+inline bool ReplayOwned()
+{
+    return ReplayCalls() != 0 && ReplayOwner() == host_thread_id();
+}
+
 #include "replay_services.h"
+
+#pragma pack(push, 8)
 
 struct ReplayArg {
     int kind;
@@ -36,7 +51,7 @@ inline bool& ReplayAnswerBusy()
 }
 
 struct ReplayImport {
-    explicit ReplayImport(int id) : id(id), active(ReplayCalls() != 0), answering(ReplayAnswerHook() != nullptr && !ReplayAnswerBusy()), count(0)
+    explicit ReplayImport(int id) : id(id), active(ReplayOwned()), answering(ReplayAnswerHook() != nullptr && !ReplayAnswerBusy()), count(0)
     {
         result.kind = -1;
         if (active)
@@ -71,6 +86,7 @@ struct ReplayImport {
         ReplayAnswerBusy() = false;
         return answered;
     }
+    void* AnsweredPointer() const { return const_cast<void*>(result.v.p); }
     void Return(int value)
     {
         result.kind = 0;
@@ -117,6 +133,8 @@ struct ReplayImport {
     ReplayArg args[8];
     ReplayArg result;
 };
+
+#pragma pack(pop)
 
 int ReplayConfigure(const char* value, char* error, int size);
 void ReplayInstall();

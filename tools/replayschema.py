@@ -1551,7 +1551,7 @@ def check_service_hooks(services: list[dict]) -> list[str]:
     """Errors for a `ReplayImport call(RI_X);` in the game sources whose arguments differ from the spec."""
     errors = []
     found = {}
-    for path in sorted((ROOT / "src").rglob("*.cpp")):
+    for path in sorted(list((ROOT / "src").rglob("*.cpp")) + list((ROOT / "src").rglob("*.h"))):
         if "harness" in path.parts:
             continue
         lines = path.read_text(errors="replace").split("\n")
@@ -1860,9 +1860,13 @@ def service_result_lines(s: dict, ctx: str) -> list[str]:
             return ["return %s;" % expr]
         return ["c.Return(%s);" % expr, "return true;"]
 
-    if res == "snapshot":
-        offset = service_param_expr(s, s["offset"], ctx) if ctx == "definition" else "(unsigned*)" + service_param_expr(s, s["offset"], ctx)
-        L += finish("SnapshotAnswer(result, %s, %s)" % ("(unsigned)" + service_param_expr(s, s["bytes"], ctx), offset), "ptr")
+    if res == "snapshot" and ctx == "answer":
+        size = "(unsigned)" + service_param_expr(s, s["bytes"], ctx)
+        L.append("void* buffer = %s(%s, (unsigned*)%s);" % (service_function(s), size, service_param_expr(s, s["offset"], ctx)))
+        L.append("SnapshotRegister(result, buffer, %s);" % size)
+        L += finish("buffer", "ptr")
+    elif res == "snapshot":
+        L += finish("SnapshotAnswer(result, %s, %s)" % ("(unsigned)" + service_param_expr(s, s["bytes"], ctx), service_param_expr(s, s["offset"], ctx)), "ptr")
     elif res == "int":
         L += finish("(%s)atoi(result)" % cast if cast else "atoi(result)", "int")
     elif res == "double":
@@ -1895,6 +1899,7 @@ def service_result_lines(s: dict, ctx: str) -> list[str]:
     elif ctx == "definition":
         L.append("(void)r;")
     else:
+        L.append("(void)r;")
         L.append("return %s;" % ("false" if s.get("proceed") else "true"))
     return L
 

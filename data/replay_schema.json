@@ -2693,6 +2693,123 @@
      }
     ],
     "result": "int"
+   },
+   {
+    "name": "SimAlloc",
+    "id": "RI_SIM_ALLOC",
+    "declaration": "void* __cdecl SimAlloc(unsigned int size);",
+    "linked": true,
+    "args": [
+     {
+      "mode": "int",
+      "param": "size"
+     }
+    ],
+    "result": "alloc",
+    "size": "size",
+    "header": "src/state/block.h"
+   },
+   {
+    "name": "SimAllocTagged",
+    "id": "RI_SIM_ALLOC_TAGGED",
+    "header": "src/state/block.h",
+    "declaration": "void* __cdecl SimAllocTagged(const char* tag, unsigned int size)",
+    "linked": true,
+    "args": [
+     {
+      "mode": "text",
+      "param": "tag"
+     },
+     {
+      "mode": "int",
+      "param": "size"
+     }
+    ],
+    "result": "alloc",
+    "size": "size",
+    "tag": "tag"
+   },
+   {
+    "name": "SimFree",
+    "id": "RI_SIM_FREE",
+    "declaration": "void __cdecl SimFree(void* p);",
+    "linked": true,
+    "proceed": true,
+    "args": [
+     {
+      "mode": "allocated",
+      "param": "p"
+     }
+    ],
+    "header": "src/state/block.h"
+   },
+   {
+    "name": "RecordSimEvent",
+    "id": "RI_RECORD_SIM_EVENT",
+    "declaration": "void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count);",
+    "args": [
+     {
+      "mode": "int",
+      "param": "kind"
+     },
+     {
+      "mode": "int",
+      "param": "flags"
+     },
+     {
+      "mode": "ints",
+      "param": "args",
+      "count": "count"
+     },
+     {
+      "mode": "int",
+      "param": "count"
+     }
+    ]
+   },
+   {
+    "name": "SimCaptureAlloc",
+    "id": "RI_SIM_CAPTURE_ALLOC",
+    "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
+    "args": [
+     {
+      "mode": "int",
+      "param": "bytes"
+     },
+     {
+      "mode": "skip",
+      "param": "offset"
+     }
+    ],
+    "result": "snapshot",
+    "bytes": "bytes",
+    "offset": "offset"
+   },
+   {
+    "name": "FindSlotByDpid",
+    "id": "RI_FIND_SLOT_BY_DPID",
+    "declaration": "unsigned char __stdcall FindSlotByDpid(int id);",
+    "args": [
+     {
+      "mode": "int",
+      "param": "id"
+     }
+    ],
+    "result": "int",
+    "cast": "unsigned char"
+   },
+   {
+    "name": "GetSlotDpid",
+    "id": "RI_GET_SLOT_DPID",
+    "declaration": "int __stdcall GetSlotDpid(unsigned char index);",
+    "args": [
+     {
+      "mode": "int",
+      "param": "index",
+      "cast": "int"
+     }
+    ],
+    "result": "int"
    }
   ],
   "code_tables": {

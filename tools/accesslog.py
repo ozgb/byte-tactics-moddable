@@ -364,21 +364,26 @@ def layouts_of(build_dir: Path) -> Layouts:
     return Layouts(text)
 
 
+SCOPE = r"(?:\?A0x[0-9A-Fa-f]+|[^@?]+)"
+
+
 def symbol_keys(name: str) -> list[tuple[str, str]]:
-    """The keys a map symbol answers to when a row of state_classes.csv looks for it."""
+    """The keys a map symbol answers to when a row of state_classes.csv looks for it: its whole name, the
+    variable's name, the qualified name `Owner::name`, and for a function's static `name@Function`; a
+    namespace the compiler numbers (`?A0x...`) is left out."""
     keys = [("name", name)]
     if name.startswith("_") and not name.startswith("__"):
         keys.append(("name", name[1:]))
-    m = re.match(r"\?([^@?]+)@((?:[^@?]+@)*)@[0-9]", name)
+    m = re.match(r"\?(%s)@((?:%s@)*)@[0-9]" % (r"[^@?]+", SCOPE), name)
     if m:
-        scopes = [s for s in m.group(2).split("@") if s]
+        scopes = [s for s in m.group(2).split("@") if s and not s.startswith("?A0x")]
         keys.append(("var", m.group(1)))
         if scopes:
             keys.append(("qualified", "::".join(reversed(scopes)) + "::" + m.group(1)))
-    m = re.match(r"\?([^@?]+)@\?\d+\?\?([^@?]+)@((?:[^@?]+@)*)@", name)
+    m = re.match(r"\?([^@?]+)@\?\d+\?\?([^@?]+)@((?:%s@)*)@" % SCOPE, name)
     if m:
-        scopes = [s for s in m.group(3).split("@") if s]
-        keys.append(("local", "%s@%s" % (m.group(1), "::".join(reversed(scopes + [m.group(2)])))))
+        scopes = [s for s in m.group(3).split("@") if s and not s.startswith("?A0x")]
+        keys.append(("local", "%s@%s" % (m.group(1), "::".join(list(reversed(scopes)) + [m.group(2)]))))
         keys.append(("localvar", m.group(1)))
     return keys
 

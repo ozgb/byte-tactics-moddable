@@ -195,8 +195,18 @@ seeds) and runs deterministically: two runs give identical traces.
 | eight-pincushion-teams | Pincushion | 8 | 12600 | Eight players on Pincushion in four allied pairs, seven minutes |
 | long-great-divide-2p | Great Divide | 2 | 54000 | Two players on Great Divide for 54000 ticks (thirty minutes), a long run that no commander death ends |
 | long-greenhaven-8p | Greenhaven | 8 | 54000 | Eight players on Greenhaven in two allied teams of four for 54000 ticks (thirty minutes), a long run |
+| mission-build-unit | Ice Base Baryn | 2 | 400 | Game type 1 on Easy: a finished advanced kbot lab is spawned beside the human lab, so the victory condition `BuildUnitType` ends the run early |
+| mission-capture | Kaki Island Assault | 2 | 1000 | Game type 1 on Easy: the human commander captures a spawned enemy geothermal plant (`capture`), so the victory condition `CaptureUnitType` ends the run early |
 | mission-defeat | Sub Hunting | 2 | 2400 | Game type 1, the Arm Very Short campaign on Easy: the human sonar buoy self-destructs, so a defeat condition ends the run early |
+| mission-defeat-all-units | Between Two Lakes | 2 | 600 | Game type 1 on Easy: every human unit self-destructs, so the defeat condition `AllUnitsKilled` ends the run early |
+| mission-defeat-of-type | Sub Hunting | 2 | 600 | Game type 1 on Easy: both human advanced subs self-destruct, so the defeat condition `AllUnitsKilledOfType` ends the run early |
+| mission-defeat-passes-x | Lightning Recon | 2 | 500 | Game type 1 on Easy: a spawned enemy light kbot is ordered across the line, so the defeat condition `AnyUnitPassesX` ends the run early |
+| mission-kill-mobile | Can Rush | 2 | 600 | Game type 1 on Easy: the second player's units self-destruct, so the victory condition `KillAllMobileUnits` ends the run early |
+| mission-kill-of-type | Attack on Barrack | 2 | 600 | Game type 1 on Easy: the second player's units self-destruct, so the victory conditions `KillAllOfType` and `KillUnitType` end the run early |
+| mission-passes-x | Force the Strait | 2 | 800 | Game type 1 on Easy: a spawned human transport ship is ordered across the line, so the victory condition `UnitTypePassesX` ends the run early |
+| mission-passes-z | Cutoff in Sector 6895 | 2 | 500 | Game type 1 on Easy: a spawned human commander is ordered across the line, so the victory condition `UnitTypePassesZ` ends the run early |
 | mission-radius | Battle of Ansapp Sea | 2 | 12000 | Game type 1 on Easy: the human carrier is ordered into the target radius, so the victory condition `MoveUnitToRadius` ends the run early |
+| mission-timer | Brawler Buildup | 2 | 37000 | Game type 1 on Easy: the second player's gunships self-destruct, so `KillAllOfType` holds and the victory condition `VictoryTimerRunsOut` ends the run at tick 36210 |
 | mission-victory | Sub Hunting | 2 | 2400 | Game type 1 on Hard: the second player's subs self-destruct, so a victory condition ends the run early |
 | orders-build-patrol | The Pass | 2 | 600 | Human Arm commander builds a solar collector, then patrols (`build`, `patrol`) |
 | orders-guard-reclaim | The Pass | 2 | 600 | Human Arm commander builds a solar collector, guards it, then reclaims it (`build`, `guard`, `reclaim`) |
@@ -459,8 +469,8 @@ it compares the runs that differed.
 uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta
 ```
 
-`--tier` is the same `--check` restricted to the 30 scenarios of the `GATE_TIER` constant of
-`tools/reference.py`, 33,910 ticks of the suite's 324,610 (10.4%), none longer than 9000. It is the
+`--tier` is the same `--check` restricted to the 32 scenarios of the `GATE_TIER` constant of
+`tools/reference.py`, 34,630 ticks of the suite's 364,120 (9.5%), none longer than 9000. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how
 many scenarios were equal and at which commit; a failure prints the same `tools/tracediff.py` report
 as the full run. `--tier` goes with `--check` and `--exe`, and `--traces` rejects it. It checks the
@@ -475,6 +485,12 @@ the `ui-*` scenarios (`ui-keys`, `ui-groups`, `ui-build-menu`, `ui-build-place`,
 ~/.ta --tier` plays the tier on the coverage build, prints its lines and functions as a share of the
 full suite's in `data/coverage.csv`, and exits 1 below 96% of the lines. Run it when a scenario is
 added or removed and when the tier changes.
+
+With the ten `mission-` scenarios of #764 in the suite, the rule takes `mission-build-unit`, `mission-capture`,
+`mission-defeat-passes-x`, `mission-kill-mobile`, `mission-kill-of-type`, `mission-passes-x` and `mission-passes-z`, and no longer needs
+`conditions-dark-side`, `mission-victory` and `orders-guard-attacked`, which stay in the tier. Only `mission-kill-mobile` and
+`mission-kill-of-type` are in it: the other five draw extra numbers from the view random stream before tick 1, so their UI logs
+sometimes differ under load, and they wait for #829.
 
 `uv run tools/coverage.py --exe build/coverage/TotalA.exe --choose-tier` (`--runs DIR`, `--max-ticks N`, `--eight NAME`) plays
 nothing: it reproduces this rule from the per-scenario profiles a coverage run left in `build/coverage-run/` and prints the
@@ -499,6 +515,8 @@ upper bound. Replay parts pick their recordings from it.
 | eight-full-moon | 8 | 9000 |
 | hailstorm-los-off | 2 | 150 |
 | load-midgame | 0 | 900 |
+| mission-kill-mobile | 0 | 360 |
+| mission-kill-of-type | 0 | 360 |
 | mission-radius | 0 | 2700 |
 | mission-victory | 0 | 360 |
 | orders-air | 2 | 4600 |

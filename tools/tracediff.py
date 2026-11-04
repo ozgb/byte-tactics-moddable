@@ -40,6 +40,8 @@ error, a failed run or traces that cannot be compared (different seeds or
 scenario).
 """
 
+from __future__ import annotations
+
 import argparse
 import re
 import shutil

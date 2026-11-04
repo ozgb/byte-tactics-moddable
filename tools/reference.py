@@ -37,7 +37,8 @@ stored trace. It builds no reference and is not the gate.
 
 `--check --exe <exe> --roundtrip T[,T...]` (or `auto`: early, middle and last tick minus one of each scenario) adds `roundtrip T`
 lines to every scenario: at the end of tick T the run copies the sim block and continues from the copy at another base address
-(modules run natively; with WASM modules the block is scrambled and restored in place). The traces must equal the stored ones.
+(modules run natively; with WASM modules the block is scrambled and restored in place). The traces must equal the stored ones,
+and the block pointers are scanned and checked as in any full `--check`.
 
 `--traces` checks out origin/reference in build/reference/branch, runs that
 branch's own `tools/reference.py HEAD --traces` there (it links the matching
@@ -1108,7 +1109,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     off_results: dict[str, tuple] = {}
     off_failed: dict[str, str] = {}
     failed: dict[str, str] = {}
-    scans: dict[str, str | None] | None = {} if quirks is None and roundtrip is None else None
+    scans: dict[str, str | None] | None = {} if quirks is None else None
     watch = Watch(expected) if quirks is None else None
     watching = threading.Event()
 
@@ -1173,10 +1174,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         ui_bad += len(ui_names)
         frame_bad += len(frame_names)
         save_bad += len(save_names)
-        if scans is None:
-            print(f"{label}block pointers: not checked with --roundtrip (the scan names allocations by address)")
-        else:
-            pointers += report_block_pointers(exe, mode_view(scans, scenarios, mode), tier, save_blockptrs / mode if save_blockptrs and both_modes else save_blockptrs, label)
+        pointers += report_block_pointers(exe, mode_view(scans, scenarios, mode), tier, save_blockptrs / mode if save_blockptrs and both_modes else save_blockptrs, label)
         pointers += report_fuel(exe, scenarios, mode_view(FUEL, scenarios, mode), mode == "native" if both_modes else None, label)
     if not bad:
         if pointers or sound_bad or ui_bad or frame_bad or save_bad:

@@ -551,6 +551,11 @@ void ApplyInOut(void* dst, const char* name, unsigned kind)
         ReplayParseValue(kind, value, dst, g_objects, nullptr);
 }
 
+template <class T> void AddInOutScalar(ReplayText& t, const T* p)
+{
+    ReplayAddInOutScalar(t, p);
+}
+
 template <class T> void ApplyValues(std::vector<T, std::allocator<T> >* out, const char* name, unsigned kind)
 {
     const char* list = OutExact(name);
@@ -784,6 +789,52 @@ void CompareInOut(const char* name, unsigned kind, const void* object)
     }
     ReplayText value;
     ReplayAddValue(value, kind, object, g_objects);
+    HashText(value.Data());
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff(name, recorded, value.Data());
+    value.Free();
+}
+
+bool InnerOfParentheses(const char* text, char* inner, unsigned size)
+{
+    size_t n = strlen(text);
+    if (n < 2 || text[0] != '(' || text[n - 1] != ')' || n - 1 > size)
+        return false;
+    memcpy(inner, text + 1, n - 2);
+    inner[n - 2] = '\0';
+    return true;
+}
+
+template <class T> void ApplyInOutScalar(T* dst, const char* name)
+{
+    const char* value = OutExact(name);
+    char inner[64];
+    if (value != nullptr && dst != nullptr && InnerOfParentheses(value, inner, sizeof inner))
+        ParseScalar(inner, *dst);
+}
+
+template <class T> T* ParseInOutScalar(const char* name, T* storage)
+{
+    const char* value = ArgLine(name);
+    char inner[64];
+    if (value == nullptr || !InnerOfParentheses(value, inner, sizeof inner))
+        return nullptr;
+    ParseScalar(inner, *storage);
+    return storage;
+}
+
+template <class T> void CompareInOutScalar(const char* name, const T* object)
+{
+    const char* recorded = OutLine(name);
+    if (object == nullptr) {
+        if (recorded != nullptr)
+            Diff(name, recorded, "no line");
+        return;
+    }
+    ReplayText value;
+    ReplayAddInOutScalar(value, object);
     HashText(value.Data());
     if (recorded == nullptr)
         recorded = "no such line";
@@ -2587,6 +2638,56 @@ void ShapeSelfTest()
     BeginCompare();
     CompareInOut("p2", ROK_FIXTUREAMOUNT, nullptr);
     Check(g_diffs == 1, "an o line for a null pointer is a difference");
+
+    printf("a scalar in/out value\n");
+    int count = 5;
+    short level = -3;
+    unsigned char flag = 7;
+    t.Clear();
+    AddInOutScalar(t, &count);
+    Check(strcmp(t.Data(), "(5)") == 0, "an int going in is its value in parentheses");
+    t.Clear();
+    AddInOutScalar(t, &level);
+    Check(strcmp(t.Data(), "(-3)") == 0, "and a short is signed");
+    t.Clear();
+    AddInOutScalar(t, &flag);
+    Check(strcmp(t.Data(), "(7)") == 0, "and an unsigned char is not a character");
+    t.Clear();
+    AddInOutScalar(t, (int*)nullptr);
+    Check(strcmp(t.Data(), "null") == 0, "and a null pointer is null");
+    LoadCall("  i fixture.Measure (5) null (7) = 1\n  o p2 (9)\n  o p4 (250)\n");
+    BeginImport();
+    int measuredCount = 5;
+    unsigned char measuredFlag = 7;
+    int measured = Imp_fixture_Measure(&measuredCount, nullptr, &measuredFlag);
+    Check(g_diffs == 0 && measured == 1 && measuredCount == 9 && measuredFlag == 250, "the stub passes the values in and writes each o line back through its pointer");
+    LoadCall("  i fixture.Measure (5) null (7) = 1\n  o p2 (9)\n");
+    BeginImport();
+    int untouchedCount = 5;
+    short strayLevel = -3;
+    unsigned char untouchedFlag = 7;
+    Imp_fixture_Measure(&untouchedCount, &strayLevel, &untouchedFlag);
+    printf("a pointer where null was recorded: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.Measure") == 0 && untouchedFlag == 7, "is reported, and a pointer with no o line is left alone");
+    LoadCall("  a p2 (5)\n  a p3 null\n  a p4 (7)\n  o p2 (9)\n  o p4 (8)\n");
+    int slotCount = 0;
+    int* slotCountPtr = ParseInOutScalar("p2", &slotCount);
+    short slotLevel = 0;
+    short* slotLevelPtr = ParseInOutScalar("p3", &slotLevel);
+    unsigned char slotFlag = 0;
+    unsigned char* slotFlagPtr = ParseInOutScalar("p4", &slotFlag);
+    Check(slotCountPtr == &slotCount && slotCount == 5 && slotLevelPtr == nullptr && slotFlagPtr == &slotFlag && slotFlag == 7, "the replayer passes each value by address, and null as a null pointer");
+    slotCount = 9;
+    slotFlag = 8;
+    BeginCompare();
+    CompareInOutScalar("p2", slotCountPtr);
+    CompareInOutScalar("p3", slotLevelPtr);
+    CompareInOutScalar("p4", slotFlagPtr);
+    Check(g_diffs == 0, "and the values the slot leaves are compared with the o lines");
+    slotFlag = 9;
+    CompareInOutScalar("p4", slotFlagPtr);
+    printf("a changed scalar: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "p4") == 0, "a different value is reported at the argument");
     t.Free();
 }
 

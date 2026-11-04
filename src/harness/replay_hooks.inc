@@ -2490,13 +2490,17 @@ int __stdcall RecUnitsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, int
     if (scope.Open()) {
         ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
         ArgValue(s_call, "name", (const char*)a1);
-        ArgPending(s_call, "p2");
-        ArgPending(s_call, "p3");
-        ArgPending(s_call, "p4");
-        ArgPending(s_call, "p5");
+        ArgInOutScalar(s_call, "p2", a2);
+        ArgInOutScalar(s_call, "p3", a3);
+        ArgInOutScalar(s_call, "p4", a4);
+        ArgInOutScalar(s_call, "p5", a5);
     }
     int result = s_inner_units->QueryScript(a0, a1, a2, a3, a4, a5);
     if (scope.Open()) {
+        ArgInOutScalarExit(s_tail, "p2", a2);
+        ArgInOutScalarExit(s_tail, "p3", a3);
+        ArgInOutScalarExit(s_tail, "p4", a4);
+        ArgInOutScalarExit(s_tail, "p5", a5);
         ArgValue(s_tail, "result", result, "o");
     }
     return result;

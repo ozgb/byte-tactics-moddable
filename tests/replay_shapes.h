@@ -64,3 +64,20 @@ int __stdcall Imp_fixture_FillIds(void* a0)
     ApplyBytes(a0, (len0 * 4), "ids");
     return ParseResult<int>(r);
 }
+
+int __stdcall Imp_fixture_Measure(int* a0, short* a1, unsigned char* a2)
+{
+    ReplayText t;
+    StartImport(t, "fixture.Measure");
+    Space(t);
+    AddInOutScalar(t, a0);
+    Space(t);
+    AddInOutScalar(t, a1);
+    Space(t);
+    AddInOutScalar(t, a2);
+    const char* r = Enter(t);
+    ApplyInOutScalar(a0, "p2");
+    ApplyInOutScalar(a1, "p3");
+    ApplyInOutScalar(a2, "p4");
+    return ParseResult<int>(r);
+}

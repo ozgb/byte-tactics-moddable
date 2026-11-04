@@ -113,6 +113,17 @@ inline void ReplayValue(ReplayText& t, const Vec3* v)
     ReplayValue(t, *v);
 }
 
+template <class T> void ReplayAddInOutScalar(ReplayText& t, const T* p)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    t.AddChar('(');
+    ReplayValue(t, *p);
+    t.AddChar(')');
+}
+
 inline void ReplayBytes(ReplayText& t, const void* p, int length)
 {
     t.Add("x:");

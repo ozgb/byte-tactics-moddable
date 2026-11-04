@@ -1712,6 +1712,7 @@ class ArgumentShapes(unittest.TestCase):
     SPANS = "std::vector<FixtureSpan, std::allocator<FixtureSpan> >*"
     VECTOR = {"mode": "vector", "dir": "out", "elem": {"mode": "value", "kind": "FixtureSpan"}}
     INOUT = {"mode": "struct", "kind": "FixtureAmount", "dir": "inout", "nullable": True}
+    SCALAR_INOUT = {"mode": "value", "dir": "inout", "nullable": True}
 
     def slot(self, params, notes, ret="void", result=None):
         ann = annotations()
@@ -1858,6 +1859,44 @@ class ArgumentShapes(unittest.TestCase):
         errors = self.errors([("int*", "count")], {"count": self.INOUT})
         self.assertTrue(any("the argument count is int*, and the kind FixtureAmount is FixtureAmount*" in e for e in errors), errors)
 
+    def test_a_scalar_in_out_value_is_the_value_in_parentheses_and_an_o_line(self):
+        s, _ = self.slot([("int*", "p2")], {"p2": self.SCALAR_INOUT})
+        a = s["args"][0]
+        self.assertEqual(rs.arg_out(a, 0, "a", {}), ['ArgInOutScalar(s_call, "p2", a0);'])
+        self.assertEqual(rs.arg_out(a, 0, "i", {}), ["ImportInOutScalar(line, a0);"])
+        self.assertEqual(rs.arg_out(a, 0, "o", {}), ['ArgInOutScalarExit(s_tail, "p2", a0);'])
+        wrapper = "\n".join(rs.wrapper("units", {}, "Query", s, {}, True))
+        self.assertIn('ImportOutInOutScalar(line, "p2", a0);', wrapper)
+        stub = "\n".join(rs.import_stub("units", "Query", s))
+        self.assertIn("AddInOutScalar(t, a0);", stub)
+        self.assertIn('ApplyInOutScalar(a0, "p2");', stub)
+
+    def test_the_replayer_passes_a_scalar_in_out_value_by_address_or_null_and_compares_it_after(self):
+        s, _ = self.slot([("unsigned char*", "p4")], {"p4": self.SCALAR_INOUT}, "int", {"mode": "scalar"})
+        runner = "\n".join(rs.runner("units", "Query", s))
+        self.assertIn('unsigned char* p0 = ParseInOutScalar("p4", &g_inout_units_Query_0);', runner)
+        self.assertIn('SetClosing("p4 ", "result");', runner)
+        self.assertIn('CompareInOutScalar("p4", g_inout_units_Query_0_null ? nullptr : &g_inout_units_Query_0);', runner)
+        self.assertIn("g_seams.units->Query(p0)", runner)
+
+    def test_a_scalar_in_out_value_is_a_pointer_to_a_scalar_without_a_kind(self):
+        for ctype in ("int*", "short*", "unsigned char*", "unsigned short*", "unsigned int*"):
+            self.assertEqual(self.errors([(ctype, "p2")], {"p2": self.SCALAR_INOUT}), [], ctype)
+        for ctype in ("long*", "char*", "float*", "int"):
+            errors = self.errors([(ctype, "p2")], {"p2": self.SCALAR_INOUT})
+            self.assertTrue(any("a scalar in/out value is a pointer to one of" in e for e in errors), (ctype, errors))
+        errors = self.errors([("int*", "p2")], {"p2": dict(self.SCALAR_INOUT, kind="FixtureAmount")})
+        self.assertTrue(any("a scalar in/out value, which takes no `kind`" in e for e in errors), errors)
+        errors = self.errors([("FixtureAmount", "p2")], {"p2": {"mode": "value", "kind": "FixtureAmount", "dir": "out"}})
+        self.assertTrue(any("only inout is allowed on a value" in e for e in errors), errors)
+
+    def test_query_script_takes_its_four_values_as_scalar_in_out(self):
+        files, errors, model = self.generated(annotations())
+        self.assertEqual(errors, [])
+        args = model["subsystems"]["units"]["slots"]["QueryScript"]["args"]
+        self.assertEqual([a["mode"] for a in args[2:]], ["value"] * 4)
+        self.assertIn('ArgInOutScalar(s_call, "p5", a5);', files[rs.HOOKS_H])
+
     def test_a_slot_with_an_in_out_value_gets_an_after_function(self):
         ann = annotations()
         ann["subsystems"]["targeting"]["slots"]["SetWeaponTargetPos"]["args"]["pos"] = {"mode": "struct", "kind": "Vec3", "dir": "inout", "nullable": True}
@@ -1876,7 +1915,8 @@ class ArgumentShapes(unittest.TestCase):
                      "int __stdcall Imp_fixture_PlaceAt(void* a0)", "AddVec3(t, ((Vec3*)a0));",
                      "int __stdcall Imp_fixture_Query(FixtureAmount* a0, FixtureAmount* a1)", 'ApplyInOut(a1, "second", ROK_FIXTUREAMOUNT);',
                      "int __stdcall Imp_fixture_ReadIds(void* a0)", "AddBytes(t, a0, (len0 * 4));",
-                     "int __stdcall Imp_fixture_FillIds(void* a0)", 'ApplyBytes(a0, (len0 * 4), "ids");'):
+                     "int __stdcall Imp_fixture_FillIds(void* a0)", 'ApplyBytes(a0, (len0 * 4), "ids");',
+                     "int __stdcall Imp_fixture_Measure(int* a0, short* a1, unsigned char* a2)", 'ApplyInOutScalar(a2, "p4");'):
             self.assertIn(want, text)
 
     def test_a_fixture_slot_is_checked_like_a_slot(self):

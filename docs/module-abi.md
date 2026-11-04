@@ -324,7 +324,9 @@ What the loader does **not** check, and the build must:
   budget, and that the interface majors and signatures agree with the headers (the reference's
   `check`).
 
-A conforming build runs those checks.
+A conforming build runs those checks. The judge (section 15) runs the reference's own checks on a submitted module before it
+plays: `uv run tools/wasm_modules.py check-module FILE.wasm --name SUBSYSTEM` runs the window and table check, the
+imports, exports and kinds check and the size budget on that one file, against the manifest's entry.
 
 ## 6. Slots
 
@@ -684,13 +686,19 @@ submitted module in place of the default one, and writes a result that holds ver
 uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
 ```
 
-1. It copies the runtime files of the modern build (the exe, `wasmtime_host.dll`, `modules.json` and every module as built) into
+1. It runs `uv run tools/wasm_modules.py check-module MODULE.wasm --name <subsystem>` on the file: the data, bss and stack
+   inside the entry's window and the table entries inside its table range, no import off the manifest's list (no global,
+   WASI, clock, random, file or network import), exactly the manifest's exports, the manifest's kinds against the wasm
+   signatures, and the size budget (section 5.2, the checks the loader leaves to the build). A problem ends the run before the
+   game starts: the problems are the result's `message`, the verdict is `refused`. The check of the metering surface and the
+   interface majors are not part of it.
+2. It copies the runtime files of the modern build (the exe, `wasmtime_host.dll`, `modules.json` and every module as built) into
    `DIR/runtime/`, removing what was there, and puts `MODULE.wasm` in the place of `<subsystem>.wasm`. The manifest is kept.
-2. It starts the game on a ten-tick scenario. A refusal of section 5.2 (and any other error before the match, section 13) ends
-   that start, and the loader's message is the result: `refused`. The checks of section 5.2 are the loader's; the tool does not
-   repeat them. A module linked at another base inside the memory is not refused (section 5.2): it is judged like any other, and
-   differs where its data is not where the loader zeroed it.
-3. It plays `tools/reference.py --check --tier` on that runtime (`--full`: the full `--check`), and then
+3. It starts the game on a ten-tick scenario. A refusal of section 5.2 (and any other error before the match, section 13) ends
+   that start, and the loader's message is the result: `refused`. A module linked at another base inside its window is not
+   refused by either step (section 5.2): it is judged like any other, and differs where its data is not where the loader zeroed
+   it.
+4. It plays `tools/reference.py --check --tier` on that runtime (`--full`: the full `--check`), and then
    `tools/replay.py --check --subsystem <subsystem>` on the recordings of `tests/replay/<subsystem>/`. The comparisons are theirs.
    The shared gate lock is kept, a cached pass is not used, and the key of the cache covers the module, so a cached pass could
    not stand for another one.
@@ -705,7 +713,7 @@ uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out 
 | `module` | `sha256` and `bytes` of the submitted file |
 | `kit` | `interfaces` and `reference_traces`: the newest `interfaces-v*` and `reference-traces-v*` tags |
 | `seconds` | wall time of the run |
-| `message` | with `refused`: the loader's message, and no `scenarios` or `recordings` |
+| `message` | with `refused`: the problems `check-module` found or the loader's message, and no `scenarios` or `recordings` |
 | `scenarios` | by scenario name: `status` and, for `differs`, `tick`, `phase`, `field` and `value` |
 | `recordings` | by `<subsystem>/<recording>`: `status` and, for `differs`, `line`, `tick`, `phase` (the slot), `kind`, `field` and `value` |
 

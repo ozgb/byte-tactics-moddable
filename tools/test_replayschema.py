@@ -583,6 +583,116 @@ class Polymorphic(unittest.TestCase):
         self.assertTrue(any("OrderTableEntry.notify: a code field names a table" in e for e in self.errors(ann)))
 
 
+class Callbacks(unittest.TestCase):
+    """N6: an import that calls back into the subsystem records each call under its i line, and the stub makes them in order."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def with_import(self, mutate=None):
+        ann = annotations()
+        ann["subsystems"]["map"].setdefault("slots", {})["VisitObjectsInRange"] = {"args": {"visitor": {"mode": "callback", "callback": "UnitVisitor"}}}
+        ann["subsystems"]["wind_meteors"]["imports"].append("map.VisitObjectsInRange")
+        if mutate:
+            mutate(ann)
+        return ann
+
+    def errors(self, ann):
+        return self.generated(ann)[1]
+
+    def test_the_interfaces_are_in_the_schema_with_their_methods(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("RCB_UNITVISITOR,", text)
+        self.assertIn('static const char* const kReplayUnitScanVisitorMethods[] = { "VisitUnit" };', text)
+        self.assertIn('{ "UnitScanVisitor", "scanner", 1, kReplayUnitScanVisitorMethods },', text)
+
+    def test_the_recorder_gets_a_class_that_records_and_forwards_each_method(self):
+        files, _, _ = self.generated()
+        text = files[rs.CALLBACKS_H]
+        self.assertIn("class ReplayThunk_UnitScanVisitor : public UnitScanVisitor {", text)
+        self.assertIn("inline int ReplayThunk_UnitScanVisitor::VisitUnit(Unit* a0)", text)
+        self.assertIn("ReplayAddObjectName(call.Text(), call.Table(), ROK_UNIT, a0, true);", text)
+        self.assertIn("typedef int (__thiscall* Method)(void*, Unit*);", text)
+        self.assertIn("int result = ((Method)call.Original(0))(this, a0);", text)
+        self.assertIn("ReplayValue(call.Text(), result);", text)
+        self.assertIn("ReplayValue(call.Text(), a0);", text)
+        self.assertIn("case RCB_CALLBACK: {", text)
+
+    def test_the_replayer_gets_a_player_that_calls_the_modules_object(self):
+        files, _, _ = self.generated()
+        text = files[rs.CALLBACKS_SLOTS]
+        self.assertIn("void PlayCallbacks_UnitScanVisitor(void* object, unsigned handle, const char* import)", text)
+        self.assertIn("int result = ((UnitScanVisitor*)object)->VisitUnit(a0);", text)
+        self.assertIn("CallbackDone(import, k, args, have.Data());", text)
+        self.assertIn("CallbackDone(import, k, args, nullptr);", text)
+
+    def test_a_callback_argument_of_an_import_is_recorded_under_the_i_line(self):
+        files, errors, _ = self.generated(self.with_import())
+        self.assertEqual(errors, [])
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecMapVisitObjectsInRange("):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("ReplayCallbackScope cb2;", body)
+        self.assertIn("ImportCallback(line, cb2, RCB_UNITVISITOR, a2);", body)
+        self.assertLess(body.index("s_inner_map->VisitObjectsInRange"), body.index("cb2.Stop();"))
+        self.assertLess(body.index("cb2.Stop();"), body.index("line.AddText(cb2.Lines());"))
+        self.assertLess(body.index("line.AddText(cb2.Lines());"), body.index("FinishImport(line);"))
+
+    def test_the_stub_plays_the_calls_after_it_matches_the_i_line(self):
+        files, _, _ = self.generated(self.with_import())
+        slots = files[rs.SLOTS_H]
+        body = slots[slots.index("Imp_map_VisitObjectsInRange("):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("AddObject(t, OBJ_CALLBACK + RCB_UNITVISITOR, a2);", body)
+        self.assertLess(body.index("Enter(t)"), body.index('PlayCallbacks_UnitVisitor(a2, OBJ_CALLBACK + RCB_UNITVISITOR, "map.VisitObjectsInRange");'))
+
+    def test_a_callback_argument_of_a_slot_no_subsystem_imports_is_an_error(self):
+        def only_note(ann):
+            ann["subsystems"]["wind_meteors"]["imports"].remove("map.VisitObjectsInRange")
+        self.assertTrue(any("map.VisitObjectsInRange has a callback argument and is imported by no subsystem" in e for e in self.errors(self.with_import(only_note))))
+
+    def test_the_callback_names_an_entry_and_its_type(self):
+        def unknown(ann):
+            ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["args"]["visitor"]["callback"] = "Nowhere"
+        self.assertTrue(any("needs a `callback` that is an entry of `callbacks`" in e for e in self.errors(self.with_import(unknown))))
+
+        def wrong(ann):
+            ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["args"]["visitor"]["callback"] = "Callback"
+        self.assertTrue(any("the callback Callback is Callback*" in e for e in self.errors(self.with_import(wrong))))
+
+    def test_the_methods_are_the_virtuals_of_the_class_in_order(self):
+        ann = annotations()
+        ann["callbacks"]["UnitVisitor"]["methods"][0]["name"] = "VisitAll"
+        self.assertTrue(any("callback UnitVisitor: the methods are ['VisitAll'], and the class declares the virtuals ['Visit']" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["callbacks"]["UnitVisitor"]["header"] = "interfaces/units.h"
+        self.assertTrue(any("units.h declares no such class" in e for e in self.errors(ann)))
+
+    def test_a_handle_is_a_name_no_other_handle_has(self):
+        ann = annotations()
+        ann["callbacks"]["Callback"]["handle"] = "visitor"
+        self.assertTrue(any("callback Callback: the handle is a name that no other handle has" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["callbacks"]["Callback"]["handle"] = "bank"
+        self.assertTrue(any("callback Callback: the handle is a name that no other handle has" in e for e in self.errors(ann)))
+
+    def test_an_argument_has_a_mode_a_type_and_a_kind_that_fit(self):
+        ann = annotations()
+        ann["callbacks"]["UnitVisitor"]["methods"][0]["args"][0]["mode"] = "bytes-in"
+        self.assertTrue(any("the argument unit has the mode bytes-in" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["callbacks"]["UnitVisitor"]["methods"][0]["args"][0]["type"] = "Player*"
+        self.assertTrue(any("the argument unit is a pointer to a state kind of the schema" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["callbacks"]["Callback"]["methods"][0]["args"][0]["type"] = "Widget"
+        self.assertTrue(any("the argument result is Widget, which is no scalar" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["callbacks"]["UnitScanVisitor"]["methods"][0]["ret"] = "Widget"
+        self.assertTrue(any("the result Widget is void, a scalar or a pointer to a state kind" in e for e in self.errors(ann)))
+
+
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
         files, errors, model = rs.generate(rs.read_rows())

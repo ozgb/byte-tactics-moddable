@@ -16,6 +16,7 @@
 #include "../src/harness/replay_text.h"
 #include "../src/harness/replay_values.h"
 #include "../src/harness/replay_objects.h"
+#include "../src/harness/replay_callbacks.h"
 #include "replay_wasm.h"
 
 extern "C" int __cdecl bx_rand(void* state);
@@ -107,7 +108,7 @@ int __stdcall FixtureOtherNotify(Unit*, Order*, int)
 namespace {
 
 enum { MAX_LINES = 1 << 21, MAX_OUTS = 16384, MAX_RECORDS = 64, TEXT = 512 };
-enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
+enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK, OBJ_CALLBACK };
 
 int g_failures;
 
@@ -159,6 +160,10 @@ unsigned char g_rootKinds[REPLAY_MAX_ROOTS];
 void* g_rootObjects[REPLAY_MAX_ROOTS];
 unsigned g_rootCount;
 const ReplaySlotSets* g_sets;
+
+enum { MAX_CALLBACK_LINES = 1024 };
+const char* g_cbLines[MAX_CALLBACK_LINES];
+int g_cbCount;
 
 char g_fakeRecords[MAX_RECORDS][16];
 HapiBank g_bank;
@@ -272,7 +277,7 @@ void AddVec3Xz(ReplayText& t, const Vec3* v)
 
 void AddObject(ReplayText& t, unsigned kind, const void* p)
 {
-    static const char* const names[] = { "file#", "rec#", "bank#" };
+    static const char* const names[] = { "file", "rec", "bank" };
     unsigned ordinal;
     if (kind == OBJ_RECORD) {
         ordinal = 0;
@@ -287,7 +292,8 @@ void AddObject(ReplayText& t, unsigned kind, const void* p)
         t.Add("null");
         return;
     }
-    t.Add(names[kind]);
+    t.Add(kind >= OBJ_CALLBACK ? kReplayCallbacks[kind - OBJ_CALLBACK].handle : names[kind]);
+    t.AddChar('#');
     t.AddUnsigned(ordinal);
 }
 
@@ -402,6 +408,7 @@ const char* Enter(const ReplayText& actual)
     int index = g_importIndex++;
     g_importsTotal++;
     g_outCount = 0;
+    g_cbCount = 0;
     char key[96];
     const char* space = strchr(actual.Data(), ' ');
     int nameLength = space == nullptr ? (int)strlen(actual.Data()) : (int)(space - actual.Data());
@@ -415,6 +422,12 @@ const char* Enter(const ReplayText& actual)
     }
     g_cursor = next + 1;
     const char* recorded = g_lines[next] + 4;
+    while (g_cursor < g_callEnd && strncmp(g_lines[g_cursor], "    c ", 6) == 0) {
+        if (g_cbCount == MAX_CALLBACK_LINES)
+            abort();
+        g_cbLines[g_cbCount++] = g_lines[g_cursor] + 6;
+        g_cursor++;
+    }
     while (g_cursor < g_callEnd && strncmp(g_lines[g_cursor], "  o ", 4) == 0 && !ClosingLine(g_lines[g_cursor])) {
         if (g_outCount < MAX_OUTS) {
             char* name = g_lines[g_cursor] + 4;
@@ -761,6 +774,140 @@ void SetClosing(const char* a, const char* b = nullptr, const char* c = nullptr)
 }
 
 #include "replay_services.h"
+
+namespace {
+
+void CallbackKey(char* key, const char* import, int k)
+{
+    sprintf(key, "import %d %s.c[%d]", g_importIndex - 1, import, k);
+}
+
+const char* CallbackMethod(int k, unsigned handle, const void* object, const char* label, const char* import, const char** args)
+{
+    const char* line = g_cbLines[k];
+    ReplayText want;
+    AddObject(want, handle, object);
+    unsigned n = (unsigned)strlen(want.Data());
+    bool same = strncmp(line, want.Data(), n) == 0 && line[n] == '.';
+    if (!same) {
+        char key[96];
+        char recorded[48];
+        const char* dot = strchr(line, '.');
+        unsigned length = dot == nullptr ? (unsigned)strlen(line) : (unsigned)(dot - line);
+        if (length >= sizeof recorded)
+            length = (unsigned)sizeof recorded - 1;
+        memcpy(recorded, line, length);
+        recorded[length] = '\0';
+        CallbackKey(key, import, k);
+        Diff(key, recorded, want.Data());
+        want.Free();
+        return nullptr;
+    }
+    want.Free();
+    (void)label;
+    const char* method = line + n + 1;
+    const char* end = strchr(method, ' ');
+    *args = end == nullptr ? method + strlen(method) : end;
+    return method;
+}
+
+bool CallbackIs(const char* method, const char* name)
+{
+    size_t n = strlen(name);
+    return strncmp(method, name, n) == 0 && (method[n] == ' ' || method[n] == '\0');
+}
+
+void CallbackToken(const char** p, char* out, unsigned size)
+{
+    const char* q = *p;
+    while (*q == ' ')
+        q++;
+    unsigned n = 0;
+    int depth = 0;
+    bool quoted = false;
+    for (; *q != '\0'; q++) {
+        if (quoted) {
+            if (*q == '\\' && q[1] != '\0') {
+                if (n + 2 < size) {
+                    out[n++] = *q;
+                    out[n++] = q[1];
+                }
+                q++;
+                continue;
+            }
+            quoted = *q != '"';
+        } else if (*q == '"') {
+            quoted = true;
+        } else if (*q == '(') {
+            depth++;
+        } else if (*q == ')') {
+            depth--;
+        } else if (*q == ' ' && depth <= 0) {
+            break;
+        }
+        if (n + 1 < size)
+            out[n++] = *q;
+    }
+    out[n] = '\0';
+    *p = q;
+}
+
+template <class T> T CallbackScalar(const char** args)
+{
+    char token[96];
+    CallbackToken(args, token, sizeof token);
+    T value = T();
+    ParseScalar(token, value);
+    return value;
+}
+
+void CallbackText(const char** args, char* out, unsigned size)
+{
+    while (**args == ' ')
+        (*args)++;
+    *args = ParseQuoted(*args, out, size);
+}
+
+void* CallbackObject(const char** args, unsigned kind)
+{
+    char token[96];
+    CallbackToken(args, token, sizeof token);
+    if (strcmp(token, "null") == 0)
+        return nullptr;
+    unsigned found = 0;
+    void* p = ReplayResolveObject(token, &found, g_objects, AllocObject);
+    if (p == nullptr || !ReplayKindFits(kind, found))
+        Fatal(g_file, g_callIndex, "a callback argument that is no object of its kind", token);
+    return p;
+}
+
+template <class T> T CallbackValue(const char** args, unsigned kind)
+{
+    char token[256];
+    CallbackToken(args, token, sizeof token);
+    return ParseValueText<T>(kind, token);
+}
+
+void CallbackDone(const char* import, int k, const char* rest, const char* have)
+{
+    const char* recorded = strncmp(rest, " = ", 3) == 0 ? rest + 3 : "";
+    const char* replayed = have == nullptr ? "" : have;
+    HashText(replayed);
+    if (strcmp(recorded, replayed) != 0) {
+        char key[96];
+        CallbackKey(key, import, k);
+        Diff(key, recorded[0] == '\0' ? "no result" : recorded, replayed[0] == '\0' ? "no result" : replayed);
+    }
+}
+
+void CallbackUnknown(const char*, int, const char* method)
+{
+    Fatal(g_file, g_callIndex, "a callback method that its interface does not have", method);
+}
+
+}
+
+#include "replay_callbacks.h"
 
 namespace {
 
@@ -1871,6 +2018,178 @@ void FormSelfTest()
     t.Free();
 }
 
+class FixtureScan : public UnitScanVisitor {
+public:
+    FixtureScan() : seen(0), sum(0), invert(false) {}
+    virtual int VisitUnit(Unit* unit)
+    {
+        seen++;
+        sum += unit->health;
+        return (unit->health > 50) != invert ? 1 : 0;
+    }
+    int seen;
+    int sum;
+    bool invert;
+};
+
+class FixtureNested : public UnitScanVisitor {
+public:
+    FixtureNested() : inner(0) {}
+    virtual int VisitUnit(Unit* unit)
+    {
+        if (inner++ == 0)
+            VisitUnit(unit);
+        return 0;
+    }
+    int inner;
+};
+
+class FixtureComplete : public Callback {
+public:
+    FixtureComplete() : got(-1) {}
+    virtual void Complete(int result) { got = result; }
+    int got;
+};
+
+void FakeScan(UnitScanVisitor* visitor, Unit* a, Unit* b)
+{
+    visitor->VisitUnit(a);
+    visitor->VisitUnit(b);
+}
+
+void BeginImport()
+{
+    g_cursor = g_callFirst + 1;
+    g_importIndex = 0;
+    g_ordinals.Reset();
+    BeginCompare();
+}
+
+void CallbackSelfTest()
+{
+    printf("callbacks\n");
+    ResetBlock();
+    ReplayClearFailure();
+    Unit* pool = (Unit*)SimAlloc(16 * (unsigned)sizeof(Unit));
+    memset(pool, 0, 16 * sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 16;
+    pool[3].health = 77;
+    pool[9].health = 5;
+
+    FixtureScan module;
+    const void* before = *(const void* const*)&module;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayCallbackScope scope;
+    ReplayOrdinals ordinals;
+    ordinals.Reset();
+    ReplayText line;
+    line.Add("  i fixture.Scan");
+    unsigned kind = OBJ_CALLBACK + RCB_UNITSCANVISITOR;
+    line.Add(" scanner#");
+    line.AddUnsigned(ordinals.Of(kind, &module));
+    scope.Start(RCB_UNITSCANVISITOR, &module, 1, *table, ReplayThunkVtable(RCB_UNITSCANVISITOR));
+    Check(*(const void* const*)&module != before, "while the import runs, the object has the vtable of the recorder");
+    FakeScan(&module, &pool[3], &pool[9]);
+    scope.Stop();
+    Check(*(const void* const*)&module == before, "and its own vtable after it");
+    Check(module.seen == 2 && module.sum == 82, "the object's own method ran for each call");
+    line.Add(" = 0");
+    line.AddText(scope.Lines());
+    line.AddChar('\n');
+    printf("%s", line.Data());
+    Check(strcmp(line.Data(), "  i fixture.Scan scanner#1 = 0\n    c scanner#1.VisitUnit Unit#3 = 1\n    c scanner#1.VisitUnit Unit#9 = 0\n") == 0, "each call is a c line under the i line, in call order, with its arguments and result");
+    Check(ReplayFailure() == nullptr, "and none is a failure");
+
+    FixtureScan after;
+    FakeScan(&after, &pool[3], &pool[9]);
+    Check(scope.Lines().Size() > 0 && after.seen == 2, "a call after the import is not recorded");
+
+    printf("replayed callbacks\n");
+    char body[512];
+    sprintf(body, "%s", line.Data());
+    LoadCall(body);
+    BeginImport();
+    FixtureScan player;
+    ReplayText t;
+    StartImport(t, "fixture.Scan");
+    Space(t);
+    AddObject(t, kind, &player);
+    const char* r = Enter(t);
+    Check(strcmp(r, "0") == 0 && g_cbCount == 2, "the stub finds the recorded calls under the import");
+    PlayCallbacks_UnitScanVisitor(&player, kind, "fixture.Scan");
+    Check(g_diffs == 0, "the recorded calls replay equal");
+    Check(player.seen == 2 && player.sum == 82, "on the module's own object, with the recorded arguments");
+
+    LoadCall(body);
+    BeginImport();
+    FixtureScan inverted;
+    inverted.invert = true;
+    StartImport(t, "fixture.Scan");
+    Space(t);
+    AddObject(t, kind, &inverted);
+    Enter(t);
+    PlayCallbacks_UnitScanVisitor(&inverted, kind, "fixture.Scan");
+    printf("a changed result: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 2 && strcmp(g_firstKey, "import 0 fixture.Scan.c[0]") == 0, "a result that differs is reported at the call under the import");
+    Check(strstr(g_detail.Data(), "c[1]: recorded 0, replayed 1") != nullptr, "with both values, for each call");
+
+    LoadCall("  i fixture.Scan scanner#1 = 0\n    c scanner#2.VisitUnit Unit#3 = 1\n");
+    BeginImport();
+    FixtureScan other;
+    StartImport(t, "fixture.Scan");
+    Space(t);
+    AddObject(t, kind, &other);
+    Enter(t);
+    PlayCallbacks_UnitScanVisitor(&other, kind, "fixture.Scan");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 fixture.Scan.c[0]") == 0 && other.seen == 0, "a call on another object than the recorded one is reported and not made");
+
+    LoadCall("  i fixture.Scan scanner#1 = 0\n    c scanner#1.VisitUnit Unit#3\n  o x 1\n");
+    BeginImport();
+    FixtureScan missing;
+    StartImport(t, "fixture.Scan");
+    Space(t);
+    AddObject(t, kind, &missing);
+    Enter(t);
+    Check(g_cbCount == 1 && g_outCount == 1, "the c lines come before the o lines of the import");
+    PlayCallbacks_UnitScanVisitor(&missing, kind, "fixture.Scan");
+    Check(g_diffs == 1 && strstr(g_detail.Data(), "recorded no result, replayed 1") != nullptr, "a call recorded without a result differs from one that returns one");
+
+    printf("void callbacks with a scalar\n");
+    FixtureComplete done;
+    ReplayCallbackScope doneScope;
+    ReplayText doneLine;
+    doneScope.Start(RCB_CALLBACK, &done, 1, *table, ReplayThunkVtable(RCB_CALLBACK));
+    ((Callback*)&done)->Complete(7);
+    doneScope.Stop();
+    doneLine.AddText(doneScope.Lines());
+    Check(strcmp(doneLine.Data(), "\n    c callback#1.Complete 7") == 0, "a call with a scalar argument and no result");
+    Check(done.got == 7, "reaches the object");
+    LoadCall("  i fixture.Complete callback#1\n    c callback#1.Complete 9\n");
+    BeginImport();
+    FixtureComplete played;
+    StartImport(t, "fixture.Complete");
+    Space(t);
+    AddObject(t, OBJ_CALLBACK + RCB_CALLBACK, &played);
+    Enter(t);
+    PlayCallbacks_Callback(&played, OBJ_CALLBACK + RCB_CALLBACK, "fixture.Complete");
+    Check(g_diffs == 0 && played.got == 9, "and replays with the recorded scalar");
+
+    printf("a callback inside a callback\n");
+    FixtureNested nested;
+    ReplayCallbackScope nestedScope;
+    nestedScope.Start(RCB_UNITSCANVISITOR, &nested, 1, *table, ReplayThunkVtable(RCB_UNITSCANVISITOR));
+    ((UnitScanVisitor*)&nested)->VisitUnit(&pool[3]);
+    nestedScope.Stop();
+    printf("%s\n", ReplayFailure() == nullptr ? "no failure" : ReplayFailure());
+    Check(ReplayFailure() != nullptr && strstr(ReplayFailure(), "inside a callback") != nullptr, "is a failure, because its line could not be in call order");
+    ReplayClearFailure();
+    line.Free();
+    doneLine.Free();
+    t.Free();
+    delete table;
+}
+
 typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
 
 unsigned CodeIndex(const char* table, const void* function)
@@ -2061,6 +2380,7 @@ int SelfTest(const char* file)
     ArraySelfTest();
     FormSelfTest();
     PolymorphicSelfTest();
+    CallbackSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

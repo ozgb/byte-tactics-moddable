@@ -18,11 +18,12 @@
 #include "replay_types.h"
 #include "replay_values.h"
 #include "replay_objects.h"
+#include "replay_callbacks.h"
 #include "replay.h"
 
 namespace {
 
-enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK };
+enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK, OBJ_CALLBACK };
 
 struct Recording {
     Recording() : on(true), windowed(false), first(0), last(0) {}
@@ -74,13 +75,14 @@ void AddStream(ReplayText& t, int stream)
 
 void AddHandle(ReplayText& t, unsigned kind, const void* p)
 {
-    static const char* const names[] = { "file#", "rec#", "bank#" };
+    static const char* const names[] = { "file", "rec", "bank" };
     unsigned ordinal = s_ordinals.Of(kind, p);
     if (ordinal == 0) {
         t.Add("null");
         return;
     }
-    t.Add(names[kind]);
+    t.Add(kind >= OBJ_CALLBACK ? kReplayCallbacks[kind - OBJ_CALLBACK].handle : names[kind]);
+    t.AddChar('#');
     t.AddUnsigned(ordinal);
 }
 
@@ -217,6 +219,8 @@ public:
         } else if (s_recording && ReplayCalls() != 0 && IsImportOf(s_sub, slot)) {
             role = 2;
             ReplayCalls() = 0;
+        } else if (s_recording && ReplayCallbackDepth() != 0 && IsImportOf(s_sub, slot)) {
+            ReplayFail("an import made inside a callback of an import is not recorded");
         }
     }
     ~SlotScope()
@@ -338,6 +342,15 @@ void ImportHandle(ReplayText& t, unsigned kind, const void* p)
 {
     t.AddChar(' ');
     AddHandle(t, kind, p);
+}
+
+void ImportCallback(ReplayText& t, ReplayCallbackScope& scope, unsigned callback, void* object)
+{
+    unsigned kind = OBJ_CALLBACK + callback;
+    unsigned ordinal = s_ordinals.Of(kind, object);
+    t.AddChar(' ');
+    AddHandle(t, kind, object);
+    scope.Start(callback, object, ordinal, Table(), ReplayThunkVtable(callback));
 }
 
 void ImportObject(ReplayText& t, unsigned kind, const void* p)

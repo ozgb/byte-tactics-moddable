@@ -313,6 +313,22 @@ static const unsigned kReplayObjectKindCount = 22;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
+enum ReplayCallbackId {
+    RCB_UNITVISITOR,
+    RCB_UNITSCANVISITOR,
+    RCB_CALLBACK,
+    RCB_COUNT
+};
+
+static const char* const kReplayUnitVisitorMethods[] = { "Visit" };
+static const char* const kReplayUnitScanVisitorMethods[] = { "VisitUnit" };
+static const char* const kReplayCallbackMethods[] = { "Complete" };
+static const ReplayCallbackType kReplayCallbacks[] = {
+    { "UnitVisitor", "visitor", 1, kReplayUnitVisitorMethods },
+    { "UnitScanVisitor", "scanner", 1, kReplayUnitScanVisitorMethods },
+    { "Callback", "callback", 1, kReplayCallbackMethods },
+};
+
 static const ReplayCodeTable kReplayCodeTables[] = {
     { "orderNotify", kReplayCodeOrderNotify, 65 },
 };

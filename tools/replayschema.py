@@ -17,6 +17,8 @@ Outputs:
     src/harness/replay_services.h   the ids and names of the services imports (GameRand, RandomInt, the TDF and command classes)
     src/harness/replay_services.inc the recorder's lines for them
     tests/replay_services.h         the replayer's answers for them
+    src/harness/replay_callbacks.h  the recorder's thunk classes for the callback interfaces
+    tests/replay_callbacks.h        the replayer's players for the callbacks an import made
 
 A slot's reads are field_read, global_read and global_maybe_written rows; its writes are field_write, global_write and
 global_maybe_written rows, over the functions behind the slot. A row names a block field (Game member or SimGlobals
@@ -266,6 +268,61 @@ def check_polymorphic(ann: dict) -> list[str]:
     return errors
 
 
+CALLBACK_ARG_MODES = {"scalar", "text", "object", "value"}
+
+
+def callback_virtuals(entry: dict, name: str, errors: list[str]) -> list[str]:
+    """The virtual methods of the class in the header, in declaration order."""
+    path = ROOT / entry["header"]
+    if not path.exists():
+        errors.append("callback %s: the header %s does not exist" % (name, entry["header"]))
+        return []
+    text = re.sub(r"//[^\n]*", "", re.sub(r"/\*.*?\*/", "", path.read_text(), flags=re.S))
+    m = re.search(r"\b(?:class|struct)\s+%s\b[^;{]*\{(.*?)\n\};" % re.escape(name), text, re.S)
+    if not m:
+        errors.append("callback %s: %s declares no such class" % (name, entry["header"]))
+        return []
+    return re.findall(r"\bvirtual\b[^;{]*?(~?\w+)\s*\(", m.group(1))
+
+
+def check_callbacks(ann: dict) -> tuple[list[dict], list[str]]:
+    """The callback interfaces: each method listed once in declaration order, with the modes of its arguments and its result."""
+    errors = []
+    out = []
+    handles = {"file", "rec", "bank"}
+    kinds = ann["objects"]
+    for name, entry in ann.get("callbacks", {}).items():
+        where = "callback %s" % name
+        handle = entry.get("handle", "")
+        if not VTABLE_NAME.match(handle) or handle in handles:
+            errors.append("%s: the handle is a name that no other handle has" % where)
+        handles.add(handle)
+        virtuals = callback_virtuals(entry, name, errors)
+        methods = entry.get("methods", [])
+        if virtuals and [m["name"] for m in methods] != virtuals:
+            errors.append("%s: the methods are %s, and the class declares the virtuals %s" % (where, [m["name"] for m in methods], virtuals))
+        if any(v.startswith("~") for v in virtuals):
+            errors.append("%s: a callback interface has no virtual destructor" % where)
+        for m in methods:
+            label = "%s.%s" % (where, m["name"])
+            for a in m.get("args", []):
+                if a.get("mode") not in CALLBACK_ARG_MODES:
+                    errors.append("%s: the argument %s has the mode %s, and callbacks take %s" % (label, a.get("name"), a.get("mode"), ", ".join(sorted(CALLBACK_ARG_MODES))))
+                elif a["mode"] == "object" and (a.get("kind") not in kinds or a["type"] != kinds[a["kind"]]["type"] + "*" or kinds[a["kind"]]["scope"] == "value"):
+                    errors.append("%s: the argument %s is a pointer to a state kind of the schema" % (label, a["name"]))
+                elif a["mode"] == "value" and (a.get("kind") not in kinds or kinds[a["kind"]]["scope"] != "value" or a["type"] != kinds[a["kind"]]["type"]):
+                    errors.append("%s: the argument %s is a value kind of the schema by value" % (label, a["name"]))
+                elif a["mode"] == "scalar" and a["type"] not in SCALARS:
+                    errors.append("%s: the argument %s is %s, which is no scalar" % (label, a["name"], a["type"]))
+                elif a["mode"] == "text" and normalise(a["type"]) != "char*":
+                    errors.append("%s: the argument %s of mode text is a char*" % (label, a["name"]))
+            ret = m.get("ret", "void")
+            if ret != "void" and ret not in SCALARS and not (ret.endswith("*") and ret[:-1] in {s["type"] for s in kinds.values() if s["scope"] == "state"}):
+                errors.append("%s: the result %s is void, a scalar or a pointer to a state kind" % (label, ret))
+        out.append({"name": name, "header": entry.get("header", ""), "handle": handle, "methods": methods})
+    return out, errors
+
+
 def check_code_tables(ann: dict, members: list[tuple[str, str]]) -> tuple[list[dict], list[str]]:
     """The code tables: the functions of each in order, every one declared in a listed header, and the slot that fills it."""
     errors = []
@@ -441,7 +498,7 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
     return out
 
 
-ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "pending"}
+ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "callback", "pending"}
 RESULT_MODES = {"scalar", "object", "text", "weapon", "value", "pending"}
 
 
@@ -487,6 +544,12 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: the count %s of %s is no integer" % (where, count, a["name"]))
         elif a["mode"] == "value":
             value_kind(a, label, False)
+        elif a["mode"] == "callback":
+            entry = ann.get("callbacks", {}).get(a.get("callback"))
+            if entry is None:
+                errors.append("%s: %s needs a `callback` that is an entry of `callbacks`" % (where, label))
+            elif a["type"] != a["callback"] + "*":
+                errors.append("%s: %s is %s, and the callback %s is %s*" % (where, label, a["type"], a["callback"], a["callback"]))
     if result is not None:
         if result["mode"] == "object":
             poly_kind(result, "the result")
@@ -536,6 +599,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
         table_targets.add(top if t["sim"] else "Game::" + top)
     object_index = {(f["object"], f["name"]): i for i, f in enumerate(object_fields)}
     errors += check_polymorphic(ann)
+    callbacks, callback_errors = check_callbacks(ann)
+    errors += callback_errors
     code_tables, code_errors = check_code_tables(ann, seam_members())
     errors += code_errors
     code_index = {t["name"]: i for i, t in enumerate(code_tables)}
@@ -679,6 +744,11 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             seam, slot = imp.split(".")
             if seam not in {m[0] for m in members}:
                 errors.append("%s imports from the unknown seam %s" % (sub, seam))
+    imported_slots = {imp for spec in ann["subsystems"].values() for imp in spec.get("imports", [])}
+    for sub, spec in subsystems.items():
+        for slot, s in spec["slots"].items():
+            if any(a["mode"] == "callback" for a in s["args"]) and "%s.%s" % (sub, slot) not in imported_slots:
+                errors.append("%s.%s has a callback argument and is imported by no subsystem, and a callback is recorded only in an import" % (sub, slot))
     stale = sorted("%s %s" % (r["kind"], r["target"]) for i, r in enumerate(ann["rules"]) if i not in used_rules)
     errors += ["the rule for %s matches no row of a subsystem function" % s for s in stale]
     for sub, spec in subsystems.items():
@@ -687,7 +757,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             if slot not in subsystems.get(seam, {}).get("slots", {}):
                 errors.append("%s imports %s, which is no slot of the %s interface" % (sub, imp, seam))
     return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table,
-            "arrays": arrays, "tables": tables, "code_tables": code_tables}, errors
+            "arrays": arrays, "tables": tables, "code_tables": code_tables, "callbacks": callbacks,
+            "kind_types": {k: v["type"] for k, v in ann["objects"].items()}}, errors
 
 
 def check_sim_names(sim: dict) -> list[str]:
@@ -840,7 +911,17 @@ def render_schema(ann: dict, model: dict) -> str:
         L.append('    { "%s", sizeof(%s), %s, %s, %s, %s, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), tail, vtable, first, count))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
           "static const unsigned char kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
-          "static const ReplayCodeTable kReplayCodeTables[] = {"]
+          "enum ReplayCallbackId {"]
+    L += ["    RCB_%s," % upper(c["name"]) for c in model["callbacks"]]
+    L += ["    RCB_COUNT", "};", ""]
+    for c in model["callbacks"]:
+        L.append("static const char* const kReplay%sMethods[] = { %s };" % (c["name"], ", ".join('"%s"' % m["name"] for m in c["methods"])))
+    L.append("static const ReplayCallbackType kReplayCallbacks[] = {")
+    for c in model["callbacks"]:
+        L.append('    { "%s", "%s", %d, kReplay%sMethods },' % (c["name"], c["handle"], len(c["methods"]), c["name"]))
+    if not model["callbacks"]:
+        L.append('    { "", "", 0, nullptr },')
+    L += ["};", "", "static const ReplayCodeTable kReplayCodeTables[] = {"]
     for t in model["code_tables"]:
         L.append("    { \"%s\", kReplayCode%s, %d }," % (t["name"], pascal(t["name"]), len(t["entries"])))
     if not model["code_tables"]:
@@ -995,7 +1076,10 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     for i, a in enumerate(s["args"]):
         L += ["        " + x for x in arg_out(a, i, "a", objects)]
     L.append("    }")
+    callback_args = [i for i, a in enumerate(s["args"]) if a["mode"] == "callback"]
     if is_import:
+        for i in callback_args:
+            L.append("    ReplayCallbackScope cb%d;" % i)
         L.append("    ReplayText line;")
         L.append("    if (scope.Import()) {")
         L.append('        line.Add("  i %s.%s");' % (sub, slot))
@@ -1009,9 +1093,13 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     else:
         L.append("    %s result = %s;" % (ret, inner))
     if is_import:
+        for i in callback_args:
+            L.append("    cb%d.Stop();" % i)
         L.append("    if (scope.Import()) {")
         if res is not None:
             L += ["        " + x for x in result_out(res, objects, "i")]
+        for i in callback_args:
+            L.append("        line.AddText(cb%d.Lines());" % i)
         for i, a in enumerate(s["args"]):
             if a["mode"] == "bytes-out":
                 L.append('        ImportOutBytes(line, "%s", a%d, (int)result, a%d);' % (a["line"], i, a["lengthIndex"]))
@@ -1092,6 +1180,9 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
             return ['ImportVec3%s(line, "%s", %s);' % ("Xz" if a.get("axes") == "xz" else "", a.get("label", line), var)]
     elif mode == "units":
         return []
+    elif mode == "callback":
+        if phase == "i":
+            return ["ImportCallback(line, cb%d, RCB_%s, a%d);" % (i, upper(a["callback"]), i)]
     elif mode == "bytes-in":
         if phase == "a":
             return ['ArgPending(s_call, "%s");' % line]
@@ -1223,6 +1314,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             pass
         elif m == "vec3":
             L.append('    Space(t);\n    t.Add("%s=");\n    AddVec3%s(t, %s);' % (a.get("label", a["line"]), "Xz" if a.get("axes") == "xz" else "", v))
+        elif m == "callback":
+            L.append("    Space(t);\n    AddObject(t, OBJ_CALLBACK + RCB_%s, %s);" % (upper(a["callback"]), v))
         elif m == "object":
             L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), v))
         elif m == "bytes-in":
@@ -1232,6 +1325,9 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
         else:
             L.append("    Space(t);\n    t.Add(\"?\");")
     L.append("    const char* r = Enter(t);")
+    for i, a in enumerate(s["args"]):
+        if a["mode"] == "callback":
+            L.append('    PlayCallbacks_%s(a%d, OBJ_CALLBACK + RCB_%s, "%s.%s");' % (a["callback"], i, upper(a["callback"]), seam, slot))
     for i, a in enumerate(s["args"]):
         if a["mode"] == "bytes-out":
             L.append('    ApplyBytes(a%d, a%d, "%s");' % (i, a["lengthIndex"], a["line"]))
@@ -1541,6 +1637,105 @@ def render_service_answers(services: list[dict]) -> str:
     return "\n".join(L)
 
 
+CALLBACKS_H = ROOT / "src/harness/replay_callbacks.h"
+CALLBACKS_SLOTS = ROOT / "tests/replay_callbacks.h"
+
+
+def callback_include(header: str, base: str) -> str:
+    return os.path.relpath(ROOT / header, ROOT / base).replace(os.sep, "/")
+
+
+def callback_signature(m: dict) -> str:
+    return ", ".join("%s a%d" % (a["type"], i) for i, a in enumerate(m.get("args", [])))
+
+
+def render_callbacks(model: dict) -> str:
+    """The recorder's side of a callback: a class per interface that records the call and forwards it to the object's own method."""
+    L = [GENERATED, "#ifndef HARNESS_REPLAY_CALLBACKS_H", "#define HARNESS_REPLAY_CALLBACKS_H", "", '#include "replay_objects.h"', '#include "replay_values.h"']
+    for c in model["callbacks"]:
+        L.append('#include "%s"' % callback_include(c["header"], "src/harness"))
+    L.append("")
+    for c in model["callbacks"]:
+        name = c["name"]
+        L += ["class ReplayThunk_%s : public %s {" % (name, name), "public:"]
+        for m in c["methods"]:
+            L.append("    virtual %s %s(%s);" % (m.get("ret", "void"), m["name"], callback_signature(m)))
+        L += ["};", ""]
+        for index, m in enumerate(c["methods"]):
+            ret = m.get("ret", "void")
+            args = m.get("args", [])
+            L += ["inline %s ReplayThunk_%s::%s(%s)" % (ret, name, m["name"], callback_signature(m)), "{",
+                  "    ReplayCallbackCall call(this, %d);" % index]
+            for i, a in enumerate(args):
+                v = "a%d" % i
+                L.append("    call.Space();")
+                if a["mode"] == "scalar":
+                    L.append("    ReplayValue(call.Text(), %s);" % v)
+                elif a["mode"] == "text":
+                    L.append("    call.Text().AddString((const char*)%s);" % v)
+                elif a["mode"] == "object":
+                    L.append("    ReplayAddObjectName(call.Text(), call.Table(), ROK_%s, %s, true);" % (upper(a["kind"]), v))
+                else:
+                    L.append("    ReplayAddValue(call.Text(), ROK_%s, &%s, call.Table());" % (upper(a["kind"]), v))
+            types = ", ".join(["void*"] + [a["type"] for a in args])
+            L.append("    typedef %s (__thiscall* Method)(%s);" % (ret, types))
+            call = "((Method)call.Original(%d))(%s)" % (index, ", ".join(["this"] + ["a%d" % i for i in range(len(args))]))
+            if ret == "void":
+                L.append("    %s;" % call)
+            else:
+                L.append("    %s result = %s;" % (ret, call))
+                L.append('    call.Text().Add(" = ");')
+                if ret.endswith("*"):
+                    L.append("    ReplayAddObjectName(call.Text(), call.Table(), ROK_%s, result, true);" % upper([k for k, o in model["kind_types"].items() if o == ret[:-1]][0]))
+                else:
+                    L.append("    ReplayValue(call.Text(), result);")
+                L.append("    return result;")
+            L += ["}", ""]
+    L += ["inline const void* ReplayThunkVtable(unsigned callback)", "{", "    switch (callback) {"]
+    for c in model["callbacks"]:
+        L += ["    case RCB_%s: {" % upper(c["name"]), "        ReplayThunk_%s probe;" % c["name"], "        return *(const void* const*)(const void*)&probe;", "    }"]
+    L += ["    }", "    return nullptr;", "}", "", "#endif", ""]
+    return "\n".join(L)
+
+
+def render_callback_players(model: dict) -> str:
+    """The replayer's side of a callback: it makes each recorded call on the module's own object and compares the result."""
+    L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers", ""]
+    for c in model["callbacks"]:
+        name = c["name"]
+        L += ["void PlayCallbacks_%s(void* object, unsigned handle, const char* import)" % name, "{",
+              "    for (int k = 0; k < g_cbCount; k++) {", "        const char* args = nullptr;",
+              '        const char* method = CallbackMethod(k, handle, object, "%s", import, &args);' % c["handle"],
+              "        if (method == nullptr)", "            continue;"]
+        for m in c["methods"]:
+            ret = m.get("ret", "void")
+            L.append('        if (CallbackIs(method, "%s")) {' % m["name"])
+            for i, a in enumerate(m.get("args", [])):
+                v = "a%d" % i
+                if a["mode"] == "scalar":
+                    L.append("            %s %s = CallbackScalar<%s>(&args);" % (a["type"], v, a["type"]))
+                elif a["mode"] == "text":
+                    L.append("            char %s_text[256];\n            CallbackText(&args, %s_text, sizeof %s_text);\n            char* %s = %s_text;" % (v, v, v, v, v))
+                elif a["mode"] == "object":
+                    L.append("            %s %s = (%s)CallbackObject(&args, ROK_%s);" % (a["type"], v, a["type"], upper(a["kind"])))
+                else:
+                    L.append("            %s %s = CallbackValue<%s>(&args, ROK_%s);" % (a["type"], v, a["type"], upper(a["kind"])))
+            call = "((%s*)object)->%s(%s)" % (name, m["name"], ", ".join("a%d" % i for i in range(len(m.get("args", [])))))
+            if ret == "void":
+                L += ["            %s;" % call, "            CallbackDone(import, k, args, nullptr);"]
+            else:
+                L += ["            %s result = %s;" % (ret, call), "            ReplayText have;"]
+                if ret.endswith("*"):
+                    L.append("            ReplayAddObjectName(have, g_objects, ROK_%s, result, false);" % upper([k for k, o in model["kind_types"].items() if o == ret[:-1]][0]))
+                else:
+                    L.append("            ReplayValue(have, result);")
+                L += ["            CallbackDone(import, k, args, have.Data());", "            have.Free();"]
+            L.append("            continue;")
+            L.append("        }")
+        L += ["        CallbackUnknown(import, k, method);", "    }", "}", ""]
+    return "\n".join(L)
+
+
 def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: dict | None = None):
     ann = ann or load_annotations()
     assignment = assignment or read_assignment()
@@ -1558,6 +1753,8 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         SERVICES_H: render_service_ids(services),
         SERVICES_INC: render_service_end(services),
         SERVICES_SLOTS: render_service_answers(services),
+        CALLBACKS_H: render_callbacks(model),
+        CALLBACKS_SLOTS: render_callback_players(model),
         JSON_OUT: json_text(ann, model),
     }
     return files, errors, model

@@ -43,6 +43,7 @@ call and has no line of its own. The lines of a call, indented by two spaces, in
 | `r <field> <value>` | a field of the slot's read set that differs from the last known value of that field |
 | `a <name> <value>` | an argument of the slot that is not in the block (`params.radius`, `bank`, `args[0]`, `stream`, a scalar, `player`) |
 | `i <import> <arguments> = <result>` | one import call, in call order; its index is its position among the `i` lines of the call |
+| `c <handle>#<n>.<Method> <arguments> [= <result>]` | indented by four spaces, right after an `i` line and before its `o` lines: one call the import made on a callback object it was given, in call order (see Callbacks) |
 | `o <name> <value>` | right after an `i` line: a value the import wrote through a pointer argument (`o dst "text"`, `o dst x:0102`) or reached through its result (`o weapondef#17.flags 0x00000001`, `o Cell#1.metal 12`) |
 | `w <field> <value>` | a field of the slot's write set that differs from the last known value after the call |
 | `o <name> <value>` | last in the call: a value the slot wrote through its own pointer argument, or `o result <value>` for its result |
@@ -230,6 +231,49 @@ table, for the subsystem that owns it. A function that is in none of the entries
 writes `orderNotify[?]`), and an index past the table is refused by the replayer. `GroundPickupOrder` is not an entry, because
 no header declares it with the type its definition has.
 
+## Callbacks
+
+Some imports call back into the recorded subsystem while they run: `map.VisitObjectsInRange` calls `visitor->Visit(unit)` for each
+unit it finds, and the scan visitors of the victory conditions return a result. Each call the import made on the object it was
+given is a `c` line right after the import's `i` line and before its `o` lines, indented as the `i` line plus two spaces, in call order:
+
+```
+  i map.VisitObjectsInRange (100,200) 300 visitor#1
+    c visitor#1.Visit Unit#3
+    c visitor#1.Visit Unit#9
+  i fixture.Scan scanner#1 = 0
+    c scanner#1.VisitUnit Unit#3 = 1
+    c scanner#1.VisitUnit Unit#9 = 0
+```
+
+The object is a handle named by the interface's `handle` and numbered in the outermost call by first use, like `file#1`. The
+arguments and the result are written by the same modes as the arguments of a slot (`scalar`, `text`, `object` and `value`; a result
+is void, a scalar or an object). What a callback writes to the block is not a line of its own, it shows in the `w` lines of the
+outer call, as any write of the module does. The annotation names each interface once, the argument of the import names the
+interface:
+
+```json
+"callbacks": {"UnitScanVisitor": {"header": "src/game/victory_conditions.h", "handle": "scanner",
+              "methods": [{"name": "VisitUnit", "ret": "int", "args": [{"name": "unit", "type": "Unit*", "mode": "object", "kind": "Unit"}]}]}}
+{"mode": "callback", "callback": "UnitVisitor"}
+```
+
+`methods` are the virtual methods of the class in the header, in declaration order (the tool checks the names against the header, and a
+callback interface has no virtual destructor). The tool writes the classes that do the work into `src/harness/replay_callbacks.h`
+and `tests/replay_callbacks.h`. A `callback` argument is allowed on a slot that a subsystem lists in its `imports`, and only there.
+
+The recorder hooks the object's methods for the duration of the import: it points the object's vptr at a class of its own that
+derives from the interface, so each call is recorded and then made on the object's own method, and it puts the vptr back when the
+import returns. The object keeps its address and its identity, so a callback the callee keeps for later (the `Callback` of
+`StartScriptWithArgs`) is the module's own object after the import, and a call it makes later is not part of any import. Two limits end the
+run, naming the call: a callback made inside another callback, and an import made inside a callback, are not recorded, because their
+lines could not be in call order. A callback that frees its own object is put back only when the vptr word still holds the recorder's.
+
+The replayer stub makes the recorded calls in order, on the object the module passed, with the recorded arguments, after it has
+matched the `i` line and before it applies the `o` lines. It compares each result with the recorded one and reports a difference at
+`<import>.c[<k>]` (`import 0 map.VisitObjectsInRange.c[1]: recorded 0, replayed 1`), and a call recorded on another handle than the
+object's at the same place.
+
 ## Fields
 
 Block fields are named as `data/rwsets.csv` names them: `Game.windCounter` for `Game::windCounter`,
@@ -293,6 +337,7 @@ sets). The annotations hold what no header says:
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length) |
 | `weapon` | `WeaponDef*` | `weapondef#17` |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for an import that reads only those (`GetGroundHeight`); with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
+| `callback` | `UnitVisitor*` and the like, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
 | `units` (`dir: out`) | `std::vector<Unit*>*` an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
 
@@ -333,7 +378,10 @@ there. Each file is replayed twice and the two results must be identical.
 through the text form and reports a changed field at its `Kind#N.field`. It then does the same for each form that no
 recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.maxSlope`), the sized arrays (whole lines,
 chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
-struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`). With a
+struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
+`Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
+is a code pointer) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
+second object, with a changed result reported at `import 0 fixture.Scan.c[0]`). With a
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 

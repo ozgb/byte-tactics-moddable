@@ -1295,3 +1295,95 @@ bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTabl
     }
     return *q == ')' && q[1] == '\0';
 }
+
+namespace {
+
+enum { MAX_ACTIVE_CALLBACKS = 8 };
+
+ReplayCallbackScope* s_scopes[MAX_ACTIVE_CALLBACKS];
+unsigned s_callbackDepth;
+
+ReplayCallbackScope* FindScope(const void* object)
+{
+    for (unsigned i = 0; i < MAX_ACTIVE_CALLBACKS; i++) {
+        if (s_scopes[i] != nullptr && s_scopes[i]->Object() == object)
+            return s_scopes[i];
+    }
+    return nullptr;
+}
+
+}
+
+ReplayCallbackScope::ReplayCallbackScope() : active(false), callback(0), object(nullptr), original(nullptr), ordinal(0), table(nullptr)
+{
+}
+
+ReplayCallbackScope::~ReplayCallbackScope()
+{
+    Stop();
+    lines.Free();
+}
+
+void ReplayCallbackScope::Start(unsigned id, void* target, unsigned number, ReplayObjectTable& names, const void* thunkVtable)
+{
+    if (active || target == nullptr)
+        return;
+    unsigned slot = 0;
+    while (slot < MAX_ACTIVE_CALLBACKS && s_scopes[slot] != nullptr)
+        slot++;
+    if (slot == MAX_ACTIVE_CALLBACKS || FindScope(target) != nullptr)
+        abort();
+    active = true;
+    callback = id;
+    object = target;
+    ordinal = number;
+    table = &names;
+    original = *(const void* const*)target;
+    *(const void**)target = thunkVtable;
+    s_scopes[slot] = this;
+}
+
+void ReplayCallbackScope::Stop()
+{
+    if (!active)
+        return;
+    active = false;
+    for (unsigned i = 0; i < MAX_ACTIVE_CALLBACKS; i++) {
+        if (s_scopes[i] == this)
+            s_scopes[i] = nullptr;
+    }
+    *(const void**)object = original;
+}
+
+ReplayCallbackCall::ReplayCallbackCall(const void* target, unsigned method) : scope(FindScope(target))
+{
+    if (scope == nullptr)
+        abort();
+    if (s_callbackDepth != 0)
+        ReplayFail("a callback made inside a callback of an import is not recorded");
+    s_callbackDepth++;
+    const ReplayCallbackType& type = kReplayCallbacks[scope->callback];
+    text.Add("\n    c ");
+    text.Add(type.handle);
+    text.AddChar('#');
+    text.AddUnsigned(scope->ordinal);
+    text.AddChar('.');
+    text.Add(type.methods[method]);
+}
+
+ReplayCallbackCall::~ReplayCallbackCall()
+{
+    scope->lines.AddText(text);
+    s_callbackDepth--;
+    text.Free();
+}
+
+const void* ReplayCallbackCall::Original(unsigned slot) const
+{
+    return ((const void* const*)scope->original)[slot];
+}
+
+unsigned ReplayCallbackDepth()
+{
+    return s_callbackDepth;
+}

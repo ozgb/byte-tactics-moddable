@@ -2382,6 +2382,61 @@
     ],
     "fill": "orders.RegisterAllOrderTypes"
    }
+  },
+  "callbacks": {
+   "UnitVisitor": {
+    "header": "interfaces/map.h",
+    "handle": "visitor",
+    "methods": [
+     {
+      "name": "Visit",
+      "ret": "void",
+      "args": [
+       {
+        "name": "unit",
+        "type": "Unit*",
+        "mode": "object",
+        "kind": "Unit"
+       }
+      ]
+     }
+    ]
+   },
+   "UnitScanVisitor": {
+    "header": "src/game/victory_conditions.h",
+    "handle": "scanner",
+    "methods": [
+     {
+      "name": "VisitUnit",
+      "ret": "int",
+      "args": [
+       {
+        "name": "unit",
+        "type": "Unit*",
+        "mode": "object",
+        "kind": "Unit"
+       }
+      ]
+     }
+    ]
+   },
+   "Callback": {
+    "header": "src/units/cob_types.h",
+    "handle": "callback",
+    "methods": [
+     {
+      "name": "Complete",
+      "ret": "void",
+      "args": [
+       {
+        "name": "result",
+        "type": "int",
+        "mode": "scalar"
+       }
+      ]
+     }
+    ]
+   }
   }
  },
  "fields": [

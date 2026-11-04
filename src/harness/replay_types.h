@@ -56,6 +56,13 @@ struct ReplayObjectKind {
     unsigned char polyCount;
 };
 
+struct ReplayCallbackType {
+    const char* name;
+    const char* handle;
+    unsigned methodCount;
+    const char* const* methods;
+};
+
 struct ReplayCodeTable {
     const char* name;
     const void* const* entries;

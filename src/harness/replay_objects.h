@@ -46,6 +46,46 @@ void ReplayAddStructs(ReplayText& t, const char* tag, const char* name, unsigned
 void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table);
 bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTable& table, ReplayAllocFn alloc);
 
+class ReplayCallbackScope {
+public:
+    ReplayCallbackScope();
+    ~ReplayCallbackScope();
+    void Start(unsigned callback, void* object, unsigned ordinal, ReplayObjectTable& table, const void* thunkVtable);
+    void Stop();
+    const ReplayText& Lines() const { return lines; }
+    const void* Object() const { return object; }
+
+private:
+    ReplayCallbackScope(const ReplayCallbackScope&);
+    ReplayCallbackScope& operator=(const ReplayCallbackScope&);
+    friend class ReplayCallbackCall;
+    bool active;
+    unsigned callback;
+    void* object;
+    const void* original;
+    unsigned ordinal;
+    ReplayObjectTable* table;
+    ReplayText lines;
+};
+
+class ReplayCallbackCall {
+public:
+    ReplayCallbackCall(const void* object, unsigned method);
+    ~ReplayCallbackCall();
+    bool Active() const { return scope != nullptr; }
+    void Space() { text.AddChar(' '); }
+    ReplayText& Text() { return text; }
+    ReplayObjectTable& Table() { return *scope->table; }
+    const void* Original(unsigned slot) const;
+
+private:
+    ReplayCallbackCall(const ReplayCallbackCall&);
+    ReplayCallbackCall& operator=(const ReplayCallbackCall&);
+    ReplayCallbackScope* scope;
+    ReplayText text;
+};
+
+unsigned ReplayCallbackDepth();
 void ReplayFail(const char* message);
 const char* ReplayFailure();
 void ReplayClearFailure();

@@ -178,7 +178,7 @@ class Unrecorded(unittest.TestCase):
         self.assertEqual(spec["slots"].keys() & {"SpawnProjectile"}, set())
         schema = files[rs.SCHEMA_H]
         self.assertIn("RSL_WEAPONS_SPAWNPROJECTILE,", schema)
-        self.assertIn('{ "SpawnProjectile", SUB_WEAPONS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, 0 },', schema)
+        self.assertIn('{ "SpawnProjectile", SUB_WEAPONS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },', schema)
 
     def test_a_missing_argument_annotation_on_an_imported_unrecorded_slot_is_reported(self):
         ann = self.unannotated()
@@ -218,7 +218,7 @@ class Rules(unittest.TestCase):
 
     def test_an_all_of_rule_makes_every_slot_of_the_table_a_root(self):
         s = self.slot([row("UpdateResourceSharing", "field_escape", "Game::players")], "UpdateResourceSharing")
-        self.assertEqual(s["allOf"], "Player")
+        self.assertEqual(s["allOf"], ["Player"])
 
     def test_a_member_a_state_type_does_not_record_is_unaccounted_for(self):
         _, errors = build([row("UpdatePlayerEconomy", "field_read", "Player::noSuchMember")])
@@ -323,7 +323,7 @@ class TargetingForms(unittest.TestCase):
         _, errors, _ = self.generated(ann)
         self.assertTrue(any("unknown field Unit.noSuchField" in e for e in errors), errors)
 
-    def test_a_unit_id_field_names_the_value_that_makes_it_an_id(self):
+    def test_a_unit_id_field_may_name_the_value_that_makes_it_an_id(self):
         files, _, _ = self.generated()
         row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "weapon0TargetUnit"')][0]
         self.assertIn("RK_UNITID", row)
@@ -331,7 +331,7 @@ class TargetingForms(unittest.TestCase):
         ann = annotations()
         del [f for f in ann["objects"]["Unit"]["fields"] if f["name"] == "weapon1TargetUnit"][0]["when"]
         _, errors, _ = self.generated(ann)
-        self.assertTrue(any("weapon1TargetUnit" in e and "value that make it an id" in e for e in errors), errors)
+        self.assertEqual(errors, [])
 
     def test_a_category_mask_is_a_ref_to_an_object_of_the_block(self):
         files, _, _ = self.generated()
@@ -756,11 +756,11 @@ class Polymorphic(unittest.TestCase):
         text = files[rs.SCHEMA_H]
         vtables = files[rs.VTABLES_CPP]
         self.assertIn("extern void (* const g_approachRadiusVtable[])();", vtables)
-        self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, 0 },', text)
+        self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },', text)
         self.assertIn("    case ROK_APPROACHRADIUS:\n        return g_approachRadiusVtable;", vtables)
         self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', vtables)
         base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
-        self.assertTrue(base.endswith('0, 0, 0, 3 },'), base)
+        self.assertTrue(base.endswith('0, 0, 0, 3, 0 },'), base)
         self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };", text)
         self.assertIn('static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");', text)
         self.assertIn('static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");', text)
@@ -1354,10 +1354,24 @@ class Conditions(unittest.TestCase):
         self.field(ann, "Vec3", "y")["when"] = {"field": "x", "equals": 0}
         self.assertTrue(any("Vec3.y: only the field of a state kind has a `when`" in e for e in self.generated(ann)[1]))
 
-    def test_a_unitid_field_still_needs_its_condition(self):
+    def test_a_unitid_field_needs_no_condition(self):
         ann = annotations()
         del self.field(ann, "Unit", "weapon0TargetUnit")["when"]
-        self.assertTrue(any("Unit.weapon0TargetUnit: a unitid field names the field and the value that make it an id" in e for e in self.generated(ann)[1]))
+        files, errors, _ = self.generated(ann)
+        self.assertEqual(errors, [])
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "weapon0TargetUnit"')][0]
+        self.assertIn("RK_UNITID, ROK_UNIT, 0, 0, {},", row)
+
+    def test_a_unitid_field_without_a_condition_still_needs_its_reach(self):
+        ann = annotations()
+        del self.field(ann, "FixtureLane", "occupant")["reach"]
+        self.assertTrue(any("FixtureLane.occupant needs a reach list" in e for e in self.generated(ann)[1]))
+
+    def test_the_committed_lane_has_a_unitid_without_a_condition(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "occupant", offsetof(FixtureLane, unit)')][0]
+        self.assertIn("RK_UNITID, ROK_UNIT, 0, 0, {},", row)
 
 
 class InsideSites(unittest.TestCase):
@@ -1382,9 +1396,9 @@ class InsideSites(unittest.TestCase):
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
         text = files[rs.SCHEMA_H]
-        self.assertIn('{ "UnitResources", sizeof(UnitResources), RS_STATE, RT_ORDER, 0, 1, 0, 0 },', text)
-        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 1, 6, 0, 0 },', text)
-        self.assertIn('{ "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0 },', text)
+        self.assertIn('{ "UnitResources", sizeof(UnitResources), RS_STATE, RT_ORDER, 0, 1, 0, 0, 0 },', text)
+        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 1, 6, 0, 0, 0 },', text)
+        self.assertIn('{ "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0, 0 },', text)
 
     def test_the_sites_of_a_kind_are_in_the_model(self):
         _, _, model = self.generated()
@@ -1478,6 +1492,132 @@ class FeatureKinds(unittest.TestCase):
             self.assertIn(want, have)
         _, _, model = rs.generate(rs.read_rows(), ann)
         self.assertEqual(model["subsystems"]["features"]["pending"]["ruleless"], 0)
+
+
+class AllOfKinds(unittest.TestCase):
+    """A slot names every all-of kind it reaches."""
+
+    def rules(self, extra=()):
+        ann = annotations()
+        ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureLane", "note": "test"})
+        ann["rules"].append({"kind": "field_escape", "target": "Game::p1b8a", "rule": "all-of", "object": "FixtureCell", "note": "test"})
+        rows = [row("UpdateResourceSharing", "field_escape", t) for t in ("Game::p1cd5", "Game::players", "Game::p1b8a")]
+        model, errors = build(rows + list(extra), ann)
+        return model["subsystems"]["economy"]["slots"]["UpdateResourceSharing"], errors
+
+    def test_a_slot_lists_every_all_of_kind_in_kind_order(self):
+        s, errors = self.rules()
+        self.assertEqual([e for e in errors if "all-of" in e], [])
+        self.assertEqual(s["allOf"], ["Player", "FixtureCell", "FixtureLane"])
+
+    def test_a_kind_named_twice_is_listed_once(self):
+        s, errors = self.rules([row("UpdateResourceSharing", "field_escape", "Game::players")])
+        self.assertEqual([e for e in errors if "all-of" in e], [])
+        self.assertEqual(s["allOf"], ["Player", "FixtureCell", "FixtureLane"])
+
+    def test_the_generated_slot_has_a_list_of_kinds(self):
+        ann = annotations()
+        ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureLane", "note": "test"})
+        files, errors, _ = rs.generate(rs.read_rows() + [row("UpdateResourceSharing", "field_escape", "Game::p1cd5")], ann)
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("kReplayEconomyUpdateResourceSharingAllOf[] = { ROK_PLAYER, ROK_FIXTURELANE };", text)
+        slot = [l for l in text.split("\n") if l.startswith('    { "UpdateResourceSharing", SUB_ECONOMY')][0]
+        self.assertTrue(slot.endswith("kReplayEconomyUpdateResourceSharingAllOf, 2 },"), slot)
+
+    def test_a_slot_with_one_kind_is_a_list_of_one(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        text = files[rs.SCHEMA_H]
+        self.assertIn("kReplayEconomyUpdateResourceSharingAllOf[] = { ROK_PLAYER };", text)
+        slot = [l for l in text.split("\n") if l.startswith('    { "UpdateResourceSharing", SUB_ECONOMY')][0]
+        self.assertTrue(slot.endswith("kReplayEconomyUpdateResourceSharingAllOf, 1 },"), slot)
+
+    def test_a_slot_with_none_has_no_list(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        slot = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "UpdatePlayerEconomy", SUB_ECONOMY')][0]
+        self.assertTrue(slot.endswith("nullptr, 0 },"), slot)
+
+    def test_a_kind_with_no_table_is_an_error(self):
+        ann = annotations()
+        ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "Vec3", "note": "test"})
+        _, errors = build([row("UpdateResourceSharing", "field_escape", "Game::p1cd5")], ann)
+        self.assertTrue(any("the all-of rule names Vec3, which is no table kind of the schema" in e for e in errors), errors)
+
+
+class DeltaKinds(unittest.TestCase):
+    """`delta` on a table kind."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def test_the_kind_row_says_it_is_a_delta(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertTrue(any(l.startswith('    { "FixtureCell", sizeof(FixtureCell), RS_STATE,') and l.endswith(", 0, 0, 0, 0, 1 },") for l in text.split("\n")))
+        self.assertTrue(any(l.startswith('    { "FixtureLane", sizeof(FixtureLane), RS_STATE,') and l.endswith(", 0, 0, 0, 0, 0 },") for l in text.split("\n")))
+        self.assertTrue([o for o in model["objects"] if o["name"] == "FixtureCell"][0]["delta"])
+        self.assertNotIn("delta", [o for o in model["objects"] if o["name"] == "Player"][0])
+
+    def test_a_delta_kind_is_a_state_kind_with_a_table(self):
+        ann = annotations()
+        ann["objects"]["Handle"]["delta"] = True
+        errors = self.generated(ann)[1]
+        self.assertTrue(any("Handle delta: only a kind with a table can be a delta" in e for e in errors), errors)
+        self.assertTrue(any("Handle delta: a delta kind is a state kind with no sites, kinds or vtable" in e for e in errors), errors)
+        ann = annotations()
+        ann["objects"]["Vec3"]["delta"] = True
+        errors = self.generated(ann)[1]
+        self.assertTrue(any("Vec3 delta: only a kind with a table can be a delta" in e for e in errors), errors)
+
+    def test_delta_is_true_or_absent(self):
+        ann = annotations()
+        ann["objects"]["FixtureCell"]["delta"] = "yes"
+        self.assertTrue(any("FixtureCell delta: `delta` is true, or absent" in e for e in self.generated(ann)[1]))
+
+
+class GameRefs(unittest.TestCase):
+    """A `ref` field of Game."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def test_the_field_has_a_target_in_the_field_table(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        row = [l for l in text.split("\n") if l.startswith('    { "Game.slowest"')][0]
+        self.assertTrue(row.endswith("RK_REF, 0, ROK_FIXTUREVIEW },"), row)
+        self.assertLess(text.index("ROK_FIXTUREVIEW,\n"), text.index("kReplayFields[] = {"))
+        field = [f for f in model["fields"] if f["name"] == "Game.slowest"][0]
+        self.assertEqual((field["kind"], field["target"], field["size"]), ("ref", "FixtureView", 4))
+
+    def test_a_scalar_field_has_no_target(self):
+        files, _, _ = self.generated()
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "Game.ticks"')][0]
+        self.assertTrue(row.endswith("RK_I32 },"), row)
+
+    def test_the_target_is_a_state_kind_named_at_first_sight(self):
+        for target, message in (("Nowhere", "the target Nowhere is no state kind of the schema"),
+                                ("Vec3", "the target Vec3 is no state kind of the schema"),
+                                ("Unit", "the target Unit has a table, sites or kinds"),
+                                ("Handle", "the target Handle has a table, sites or kinds"),
+                                ("OrderFx", "the target OrderFx has a table, sites or kinds")):
+            ann = annotations()
+            ann["game_fields"]["slowest"]["target"] = target
+            errors = self.generated(ann)[1]
+            self.assertTrue(any("Game.slowest: " + message in e for e in errors), (target, errors))
+
+    def test_a_ref_field_has_no_other_keys(self):
+        ann = annotations()
+        ann["game_fields"]["slowest"]["elem"] = "u8"
+        self.assertTrue(any("Game.slowest: a ref field of Game is" in e for e in self.generated(ann)[1]))
+
+    def test_a_ref_field_is_four_bytes(self):
+        ann = annotations()
+        ann["game_fields"]["flags_2a44"] = {"kind": "ref", "target": "FixtureView"}
+        with self.assertRaises(rs.Error):
+            self.generated(ann)
 
 
 class Committed(unittest.TestCase):

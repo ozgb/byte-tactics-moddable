@@ -617,7 +617,7 @@ void __stdcall RecAiGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, in
     }
     s_inner_ai->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4);
     if (scope.Import()) {
-        ImportOutUnits(line, "out", a4, kReplayReachFields + 5, 7);
+        ImportOutUnits(line, "out", a4, kReplayReachFields + 6, 7);
         FinishImport(line);
     }
     if (scope.Open()) {

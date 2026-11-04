@@ -3,6 +3,7 @@
     uv run tools/wasm_modules.py build     # build/wasm-modules/c.wasm, rust.wasm and wind_meteors.wasm
     uv run tools/wasm_modules.py build-variant --define NAME=VALUE --name NAME   # wind_meteors.wasm built with the defines, as build/wasm-modules/NAME.wasm
     uv run tools/wasm_modules.py check     # run both fixtures in one wasmtime memory and table
+    uv run tools/wasm_modules.py check-module FILE.wasm --name SUBSYSTEM   # the window, imports, exports, kinds and size of one built file
     uv run tools/wasm_modules.py imports   # check every built module's imports and exports
     uv run tools/wasm_modules.py statics   # run wind_meteors for 2000 ticks and check its statics never change
     uv run tools/wasm_modules.py adapters  # run the loader's adapters and refusals over tests/wasm/adapters
@@ -29,6 +30,10 @@ module's functions stay and every import is one the module code declares. It com
 freestanding headers of wasm/include, not MSVC 5's. The build fails when the module's window (data,
 bss and stack, as linked) leaves its manifest window or meets a fixture's, or when its table entries
 leave the module's table range.
+
+check-module runs the window and table check, the imports check and the size budget on one .wasm file
+against the game manifest's entry for --name, prints each problem and exits 1 on any; tools/oraclegate.py runs it
+before it plays a submitted module.
 
 imports reads each built module's import and export sections with the pinned wasm-tools (found in
 build/tools/bin, install it with `cargo install wasm-tools --version <pin> --locked --root
@@ -715,10 +720,54 @@ def module_interface(wasm_tools, path):
     return imports, exports, details
 
 
+def interface_spec(entry):
+    """The imports, exports and slots a built module of this manifest entry must have."""
+    return {"imports": entry["imports"], "exports": entry["exports"] + entry["data"] + list(wasm_fuel.EXPORTS), "slots": entry["slots"]}
+
+
+def check_module_file(game, entry, path, wasm_tools):
+    """Every build-time problem of the .wasm file at path against the game manifest's entry: the window, table and memory, the
+    imports, exports and kinds, and the size budget. Needs no link map and no build directory."""
+    with open(path, "rb") as f:
+        data = f.read()
+    try:
+        info = parse_module(data)
+    except (ValueError, IndexError) as e:
+        return [f"{entry['name']}: cannot read the module: {e}"]
+    if info["stack_top"] is None or not info["segments"] or not info["elements"]:
+        return [f"{entry['name']}: has no stack pointer, data segment or table entry to place"]
+    others = [r for r in fixture_ranges()]
+    others += [(m["name"], m["data_base"], m["data_base"] + game["window"], m["table_base"], m["table_base"] + game["table_slots"])
+               for m in game["modules"] if m["name"] != entry["name"]]
+    problems = check_window(entry, game, info, others)
+    try:
+        imports, exports, details = module_interface(wasm_tools, path)
+    except subprocess.CalledProcessError as e:
+        return problems + [f"{entry['name']}: wasm-tools cannot read the module: {e.stderr.strip() if e.stderr else e}"]
+    problems += check_interface(entry["name"], imports, exports, interface_spec(entry), details)
+    return problems + check_size(entry, len(data))
+
+
+def run_check_module(path, name):
+    game = game_manifest()
+    entry = next((m for m in game["modules"] if m["name"] == name), None)
+    if entry is None:
+        sys.exit(f"check-module: the manifest has no module {name} (it has {', '.join(m['name'] for m in game['modules'])})")
+    if not os.path.isfile(path):
+        sys.exit(f"check-module: {path} is not a file")
+    problems = check_module_file(game, entry, path, find_wasm_tools(game["tools"]["wasm-tools"]))
+    for problem in problems:
+        print(problem)
+    if problems:
+        return 1
+    print(f"{name}: ok")
+    return 0
+
+
 def run_imports():
     game = game_manifest()
     wasm_tools = find_wasm_tools(game["tools"]["wasm-tools"])
-    specs = {m["name"]: {"imports": m["imports"], "exports": m["exports"] + m["data"] + list(wasm_fuel.EXPORTS), "slots": m["slots"]} for m in game["modules"]}
+    specs = {m["name"]: interface_spec(m) for m in game["modules"]}
     for entry in manifest()["modules"]:
         specs[entry["name"]] = {"imports": {}, "exports": FIXTURE_EXPORTS}
     failures = []
@@ -1170,14 +1219,19 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["build", "build-variant", "check", "imports", "statics", "adapters", "fatal", "glue-fatal"])
+    parser.add_argument("command", choices=["build", "build-variant", "check", "check-module", "imports", "statics", "adapters", "fatal", "glue-fatal"])
+    parser.add_argument("module", nargs="?", help="check-module: the .wasm file to check")
     parser.add_argument("--exe", default=os.path.join(ROOT, "build", "modern", "TotalA.exe"), help="glue-fatal: the exe to run")
     parser.add_argument("--define", action="append", default=[], help="build-variant: NAME=VALUE for the wind_meteors compile")
-    parser.add_argument("--name", help="build-variant: the variant's name, build/wasm-modules/NAME.wasm")
+    parser.add_argument("--name", help="build-variant: the variant's name, build/wasm-modules/NAME.wasm; check-module: the subsystem the file is for")
     parser.add_argument("--game-dir", help="glue-fatal: the game's install (default: Steam's)")
     args = parser.parse_args()
     if args.command == "glue-fatal":
         return run_glue_fatal(args.exe, args.game_dir)
+    if args.command == "check-module":
+        if not args.module or not args.name:
+            sys.exit("check-module: needs a .wasm file and --name SUBSYSTEM")
+        return run_check_module(args.module, args.name)
     if args.command == "build":
         build()
         return 0

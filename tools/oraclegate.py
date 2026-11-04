@@ -2,7 +2,8 @@
 
     uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
 
-Copies the runtime files of the modern build into a fresh directory with MODULE.wasm in place of the subsystem's module,
+Refuses the module, before anything plays, when `tools/wasm_modules.py check-module` finds a problem in the file: the window,
+table, imports, exports, kinds or size budget of docs/module-abi.md, section 5.2. Then copies the runtime files of the modern build into a fresh directory with MODULE.wasm in place of the subsystem's module,
 starts the game on a short scenario to see whether the loader accepts the module, then plays
 `tools/reference.py --check --tier` (`--full`: the full `--check`) and `tools/replay.py --check --subsystem NAME` on that
 runtime. It writes DIR/result.json, built from the parsed fields of those tools' reports and nothing else: for each scenario
@@ -91,6 +92,15 @@ def refusal(wine_log: str) -> str | None:
                 end += 1
             return "\n".join(lines[start:end]).strip()[:MESSAGE_LIMIT]
     return None
+
+
+def check_module(module: Path, subsystem: str) -> str | None:
+    """The problems `wasm_modules.py check-module` finds in the file (a subprocess, as the build runs it), None when there are none."""
+    cmd = [sys.executable, str(ROOT / "tools/wasm_modules.py"), "check-module", str(module), "--name", subsystem]
+    r = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
+    if r.returncode == 0:
+        return None
+    return ((r.stdout + r.stderr).strip() or f"check-module exited {r.returncode}")[:MESSAGE_LIMIT]
 
 
 def probe(exe: Path, game_dir: str | None, work: Path) -> str | None:
@@ -200,6 +210,9 @@ def stream(cmd: list[str], log: Path) -> tuple[int, str]:
 
 def judge(module: Path, subsystem: str, full: bool, build: Path, out: Path, game_dir: str | None) -> dict:
     started = time.time()
+    problems = check_module(module, subsystem)
+    if problems is not None:
+        return build_result(subsystem, module, full, kit_version(), None, None, problems, time.time() - started)
     exe = prepare_runtime(build, subsystem, module, out / "runtime")
     (out / "logs").mkdir(parents=True, exist_ok=True)
     kit = kit_version()

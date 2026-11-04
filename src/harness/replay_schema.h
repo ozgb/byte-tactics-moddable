@@ -191,6 +191,7 @@ static const ReplayArraySpec kReplayArrays[] = {
 static const ReplayTableSpec kReplayTables[] = {
     { 0, 0, offsetof(Game, players), { { 10, 0, 0 }, { 1, 0, 0 } }, 0 },
     { 0, 1, offsetof(Game, units), { { offsetof(Game, poolCount), (unsigned char)sizeof(((Game*)nullptr)->poolCount), 0 }, { 1, 0, 0 } }, 5001 },
+    { 0, 1, offsetof(Game, cells), { { offsetof(Game, width), (unsigned char)sizeof(((Game*)nullptr)->width), 0 }, { offsetof(Game, height), (unsigned char)sizeof(((Game*)nullptr)->height), 0 } }, 0 },
     { 0, 1, offsetof(Game, projectiles), { { offsetof(Game, projectileCount), (unsigned char)sizeof(((Game*)nullptr)->projectileCount), 0 }, { 1, 0, 0 } }, 1024 },
     { 1, 0, offsetof(SimGlobals, g_movementClasses.entries), { { 32, 0, 0 }, { 1, 0, 0 } }, 0 },
 };
@@ -206,6 +207,9 @@ static_assert(sizeof(((MovementClass*)nullptr)->cells) == sizeof(unsigned), "Mov
 static_assert(sizeof(((Game*)nullptr)->players) == 10 * sizeof(Player), "the table of Player holds 10 elements");
 static_assert(sizeof(((Game*)nullptr)->poolCount) == 1 || sizeof(((Game*)nullptr)->poolCount) == 2 || sizeof(((Game*)nullptr)->poolCount) == 4, "Unit: poolCount is a byte, a short or an int");
 static_assert(sizeof(((Game*)nullptr)->units) == sizeof(unsigned), "the table of Unit is a Ref");
+static_assert(sizeof(((Game*)nullptr)->width) == 1 || sizeof(((Game*)nullptr)->width) == 2 || sizeof(((Game*)nullptr)->width) == 4, "Cell: width is a byte, a short or an int");
+static_assert(sizeof(((Game*)nullptr)->height) == 1 || sizeof(((Game*)nullptr)->height) == 2 || sizeof(((Game*)nullptr)->height) == 4, "Cell: height is a byte, a short or an int");
+static_assert(sizeof(((Game*)nullptr)->cells) == sizeof(unsigned), "the table of Cell is a Ref");
 static_assert(sizeof(((Game*)nullptr)->projectileCount) == 1 || sizeof(((Game*)nullptr)->projectileCount) == 2 || sizeof(((Game*)nullptr)->projectileCount) == 4, "Projectile: projectileCount is a byte, a short or an int");
 static_assert(sizeof(((Game*)nullptr)->projectiles) == sizeof(unsigned), "the table of Projectile is a Ref");
 static_assert(sizeof(((SimGlobals*)nullptr)->g_movementClasses.entries) == 32 * sizeof(MovementClass), "the table of MovementClass holds 32 elements");
@@ -313,13 +317,13 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "MeteorParams", sizeof(MeteorParams), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "UnitResources", sizeof(UnitResources), RS_STATE, RT_ORDER, 1, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot", 0, 0 },
     { "PlayerInfo", sizeof(PlayerInfo), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
-    { "Cell", sizeof(Cell), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
+    { "Cell", sizeof(Cell), RS_STATE, 3, 0, 0, 0, "", 0, 0 },
     { "CobScript", sizeof(CobScript), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "UnitMotion", sizeof(UnitMotion), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "Vec3", sizeof(Vec3), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "UnitTypeSet", sizeof(UnitTypeSet), RS_STATE, RT_ORDER, 0, 0, 0, "", 0, 0 },
-    { "Projectile", sizeof(Projectile), RS_STATE, 3, 0, 0, 0, "", 0, 0 },
-    { "MovementClass", sizeof(MovementClass), RS_STATE, 4, 0, 0, 0, "", 0, 0 },
+    { "Projectile", sizeof(Projectile), RS_STATE, 4, 0, 0, 0, "", 0, 0 },
+    { "MovementClass", sizeof(MovementClass), RS_STATE, 5, 0, 0, 0, "", 0, 0 },
     { "Point16", sizeof(Point16), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "MissionType", sizeof(MissionType), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
     { "Angles16", sizeof(Angles16), RS_VALUE, RT_ORDER, 0, 0, 0, "", 0, 0 },
@@ -1127,6 +1131,7 @@ static const unsigned short kReplayEconomyGetEnergyUseObjReads[] = { 69, 70, 71 
 static const unsigned char kReplayEconomyUpdatePlayerEconomyReads[] = { 0, 10, 14, 15 };
 static const unsigned short kReplayEconomyUpdatePlayerEconomyObjReads[] = { 0, 2, 3, 4, 5, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22, 24, 25, 33, 34, 36, 37, 38, 39, 44, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104 };
 static const unsigned short kReplayEconomyUpdatePlayerEconomyObjWrites[] = { 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 39, 44, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103 };
+static const unsigned char kReplayEconomyUpdateMetalExtractionReads[] = { 1, 2 };
 static const unsigned short kReplayEconomyUpdateMetalExtractionObjReads[] = { 34, 39, 40, 41, 42, 73, 107 };
 static const unsigned short kReplayEconomyUpdateMetalExtractionObjWrites[] = { 39 };
 static const unsigned short kReplayEconomyResetObjWrites[] = { 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104 };
@@ -1391,7 +1396,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "UpdateResourceSharing", SUB_ECONOMY, kReplayEconomyUpdateResourceSharingReads, 2, nullptr, 0, kReplayEconomyUpdateResourceSharingObjReads, 15, nullptr, 0, ROK_PLAYER + 1 },
     { "GetEnergyUse", SUB_ECONOMY, kReplayEconomyGetEnergyUseReads, 2, nullptr, 0, kReplayEconomyGetEnergyUseObjReads, 3, nullptr, 0, 0 },
     { "UpdatePlayerEconomy", SUB_ECONOMY, kReplayEconomyUpdatePlayerEconomyReads, 4, nullptr, 0, kReplayEconomyUpdatePlayerEconomyObjReads, 49, kReplayEconomyUpdatePlayerEconomyObjWrites, 28, 0 },
-    { "UpdateMetalExtraction", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomyUpdateMetalExtractionObjReads, 7, kReplayEconomyUpdateMetalExtractionObjWrites, 1, 0 },
+    { "UpdateMetalExtraction", SUB_ECONOMY, kReplayEconomyUpdateMetalExtractionReads, 2, nullptr, 0, kReplayEconomyUpdateMetalExtractionObjReads, 7, kReplayEconomyUpdateMetalExtractionObjWrites, 1, 0 },
     { "Reset", SUB_ECONOMY, nullptr, 0, nullptr, 0, nullptr, 0, kReplayEconomyResetObjWrites, 13, ROK_PLAYER + 1 },
     { "SaveUnitAccounts", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomySaveUnitAccountsObjReads, 13, kReplayEconomySaveUnitAccountsObjWrites, 2, 0 },
     { "LoadUnitAccounts", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomyLoadUnitAccountsObjReads, 3, kReplayEconomyLoadUnitAccountsObjWrites, 12, 0 },

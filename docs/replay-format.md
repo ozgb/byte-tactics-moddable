@@ -665,7 +665,7 @@ The kinds the self-tests need and no subsystem has (`FixtureView`, `FixtureCell`
 not in `data/replay_schema.json`. `tests/replay_fixtures.json` holds them (`includes`, `game_fields`, `objects`, and `inside` for the sites they add
 to a real kind), `tests/replay_fixtures.h` their structs, and `uv run tools/replayschema.py` writes `tests/replay_schema_fixtures.h`, the tables
 of the real kinds with these appended, and `tests/replay_vtables_fixtures.cpp`. `src/harness/replay_schema.h` includes the first when
-`BT_REPLAY_FIXTURES` is defined, which only the build of `replay_native_test` does, so the exe's recorder has no fixture kind, and no real member of `Game`
+`BT_REPLAY_FIXTURES` is defined, which only `tests/replay_native_test.cpp` and `tests/replay_objects_fixtures.cpp` (a copy of `replay_objects.cpp` that defines it first) do, so the exe's recorder has no fixture kind, and no real member of `Game`
 (`Game::slowest`, `p1b8a` and `p1cd5` are the hosts of the fixtures) is declared as anything but what it is. The fixture annotations are checked
 with the rest.
 

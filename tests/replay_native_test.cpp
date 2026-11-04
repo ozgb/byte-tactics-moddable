@@ -1,3 +1,4 @@
+#define BT_REPLAY_FIXTURES 1
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>

@@ -659,7 +659,8 @@ def virtual_inputs(root: Path = ROOT):
     for r in read_csv(hazards.HAZARDS):
         if r["kind"] == "indirect_call":
             lines[(r["function"], r["file"], r["target"])] = r["line"]
-    calls = indirect_calls(rows, [e for e in edges if e not in seam_slot_edges()], Classes.read(root), lines)
+    slot_edges = seam_slot_edges()
+    calls = indirect_calls(rows, [e for e in edges if e not in slot_edges], Classes.read(root), lines)
     classes_hit = {c.rpartition("::")[0] for call in calls for c in call.callees}
     sites = construction_sites(root, classes_hit)
     by_file: dict[str, set[str]] = defaultdict(set)

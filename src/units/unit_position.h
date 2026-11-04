@@ -21,7 +21,6 @@ public:
     virtual void v6();
     virtual int v7();
     virtual void WriteTo(BitWriter* stream);
-    virtual void ReadFrom(BitReader* reader);
 };
 
 void __stdcall SnapUnitToGround(Unit* unit);

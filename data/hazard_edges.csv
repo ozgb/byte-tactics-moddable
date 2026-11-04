@@ -124,7 +124,7 @@ OrderFx::ContainsUnit,OrderFx::ContainsCell,"ContainsUnit is used only by OrderF
 OrderFx::ContainsUnit,PointMarker::ContainsCell,"ContainsUnit is used only by OrderFx and PointMarker, g_pointMarkerVtable (src/data/vtables.cpp)"
 PathOrder::IsComplete,PathOrder::FillWorldPos,"v8 of the PathOrder vtable (IsComplete is used only by it), g_pathOrderVtable (src/data/vtables.cpp)"
 ClearAllWeaponTargets,ClearWeaponTarget,"seam slot filled by InstallNativeSeams, TargetingSeam::ClearWeaponTarget, ClearTargets_0043b7c0 (src/orders/order_list.cpp), src/seams/native.cpp"
-ClearUnitRefs,Order::OrStatusFlags,"slot 0 of Order; listener is the Order stored by Order constructor, src/orders/order_list.cpp"
+ClearUnitRefs,OrderOrStatusFlagsNative,"seam slot filled by InstallNativeSeams, OrdersSeam::OrderOrStatusFlags, ClearUnitRefs (src/units/unit_targets.cpp), src/seams/native.cpp"
 ClearWeaponTarget,FindScriptNative,"seam slot filled by InstallNativeSeams, UnitsSeam::FindScript, ClearWeaponTarget (src/units/unit_targets.cpp), src/seams/native.cpp"
 ClearWeaponTarget,StartScriptWithArgsNative,"seam slot filled by InstallNativeSeams, UnitsSeam::StartScriptWithArgs, ClearWeaponTarget (src/units/unit_targets.cpp), src/seams/native.cpp"
 CloseTopScreen,Choice3DialogHandler,Layer::handler assigned at src/gui/dialogs.cpp
@@ -713,7 +713,7 @@ MobileBuildOrder,SnapWorldPosToFootprint,"seam slot filled by InstallNativeSeams
 MovementClass::RefreshMovedUnits,RefreshPassMapNative,"seam slot filled by InstallNativeSeams, MapSeam::RefreshPassMap, src/units/movement_class.cpp, src/seams/native.cpp"
 MovementClass::RefreshUnitIfStale,RefreshPassMapNative,"seam slot filled by InstallNativeSeams, MapSeam::RefreshPassMap, MovementClass::RefreshUnitIfStale (src/units/movement_class.cpp), src/seams/native.cpp"
 NanoParticles::Init,NanoParticles::Emit,"Emit() on this, NanoParticles has no subclass, src/graphics/particles.cpp"
-NotifyUnitRefs,Order::OrStatusFlags,"slot 0 of Order; listener is the Order stored by Order constructor, src/orders/order_list.cpp"
+NotifyUnitRefs,OrderOrStatusFlagsNative,"seam slot filled by InstallNativeSeams, OrdersSeam::OrderOrStatusFlags, NotifyUnitRefs (src/units/unit_targets.cpp), src/seams/native.cpp"
 ClampKnobPosAndNotify,HandleEffectsVolumeSlider,slider callback assigned at src/frontend/options.cpp
 ClampKnobPosAndNotify,HandleGameSpeedSlider,slider callback assigned at src/frontend/options.cpp
 ClampKnobPosAndNotify,HandleGammaSlider,slider callback assigned at src/frontend/options.cpp
@@ -967,9 +967,7 @@ ReadUnitState,UpdateUnitLineOfSight,"seam slot filled by InstallNativeSeams, Los
 RebuildAIFeatureCells,RebuildFeatureCells,"seam slot filled by InstallNativeSeams, AiSeam::RebuildFeatureCells, RebuildAIFeatureCells (src/game/players.cpp), src/seams/native.cpp"
 RecalculateLineOfSight,RecordRadarUnits,"seam slot filled by InstallNativeSeams, LosRadarSeam::RecordRadarUnits, RecalculateLineOfSight (src/map/line_of_sight.cpp), src/seams/native.cpp"
 RecalculateLineOfSight,RecordRadarMapped,"seam slot filled by InstallNativeSeams, LosRadarSeam::RecordRadarMapped, RecalculateLineOfSight (src/map/line_of_sight.cpp), src/seams/native.cpp"
-ReceiveUnitStates,PackedPosGoal::DeserializeNetUnitState,"slot 9 DeserializeNetUnitState; PlayerData is the PathGoal family, src/orders/order_targets.cpp"
-ReceiveUnitStates,PathGoal::DeserializeNetUnitState,"slot 9 DeserializeNetUnitState; PlayerData is the PathGoal family, src/orders/order_targets.cpp"
-ReceiveUnitStates,PatrolGoal::DeserializeNetUnitState,"slot 9 DeserializeNetUnitState; PlayerData is the PathGoal family, src/orders/order_targets.cpp"
+ReceiveUnitStates,UnitMotionReadNetStateNative,"seam slot filled by InstallNativeSeams, OrdersSeam::UnitMotionReadNetState, ReceiveUnitStates (src/units/unit_position.cpp), src/seams/native.cpp"
 ReceiveUnitStates,UpdateMotionNative,"seam slot filled by InstallNativeSeams, OrdersSeam::UpdateMotion, ReceiveUnitStates (src/units/unit_position.cpp), src/seams/native.cpp"
 ReclaimFeature,GetGameTypeNative,"seam slot filled by InstallNativeSeams, MapSeam::GetGameType, ReclaimFeature (src/map/features.cpp), src/seams/native.cpp"
 ReclaimFeature,GetMapCell,"seam slot filled by InstallNativeSeams, LosRadarSeam::GetMapCell, ReclaimFeature (src/map/features.cpp), src/seams/native.cpp"
@@ -1237,7 +1235,7 @@ TimedSubParticles::Init,TimedSubParticles::Emit,"Emit() on this, TimedSubParticl
 TransferEnergy,SpendMetalNative,"seam slot filled by InstallNativeSeams, EconomySeam::SpendMetal, TransferEnergy (src/game/players.cpp), src/seams/native.cpp"
 TransferMetal,SpendEnergyNative,"seam slot filled by InstallNativeSeams, EconomySeam::SpendEnergy, TransferMetal (src/game/players.cpp), src/seams/native.cpp"
 Unguarded_insert,CompareUnitTypeNames,"the comparator passed by LoadUnitTypes, src/units/unit_types.cpp"
-Unit::SetStateBits,Order::OrStatusFlags,"slot 0 of Order; listener is the Order stored by Order constructor, src/orders/order_list.cpp"
+Unit::SetStateBits,OrderOrStatusFlagsNative,"seam slot filled by InstallNativeSeams, OrdersSeam::OrderOrStatusFlags, Unit::SetStateBits (src/units/unit.cpp), src/seams/native.cpp"
 UnitList::ForEach,DefeatAllUnitsKilled::VisitUnit,"classes derived from Listener_0048ff40 (int VisitUnit), src/game/victory.cpp"
 UnitList::ForEach,DefeatAllUnitsKilledOfType::VisitUnit,"classes derived from Listener_0048ff40 (int VisitUnit), src/game/victory.cpp"
 UnitList::ForEach,DefeatAnyUnitPassesX::VisitUnit,"classes derived from Listener_0048ff40 (int VisitUnit), src/game/victory.cpp"
@@ -1272,7 +1270,7 @@ UnitMotion::UpdatePosition,GetPiecePosition,"seam slot filled by InstallNativeSe
 UnitMotion::UpdatePosition,RemoveUnitFromMap,"seam slot filled by InstallNativeSeams, MapSeam::RemoveUnitFromMap, UnitMotion::UpdatePosition (src/orders/order_list.cpp), src/seams/native.cpp"
 UnitMotion::UpdatePosition,SetUnitPosition,"seam slot filled by InstallNativeSeams, UnitsSeam::SetUnitPosition, UnitMotion::UpdatePosition (src/orders/order_list.cpp), src/seams/native.cpp"
 UnitMotion::UpdatePosition,UpdateUnitLineOfSight,"seam slot filled by InstallNativeSeams, LosRadarSeam::UpdateUnitLineOfSight, UnitMotion::UpdatePosition (src/orders/order_list.cpp), src/seams/native.cpp"
-UnitRef::ClearRef,Order::OrStatusFlags,"slot 0 of Order; listener is the Order stored by Order constructor, src/orders/order_list.cpp"
+UnitRef::ClearRef,OrderOrStatusFlagsNative,"seam slot filled by InstallNativeSeams, OrdersSeam::OrderOrStatusFlags, UnitRef::ClearRef (src/units/unit_targets.cpp), src/seams/native.cpp"
 UnitRef::Unlink,PathOrderAttach::~PathOrderAttach,"qualified call of the destructor, UnitRef::Unlink (src/units/unit_targets.cpp)"
 UnitScript::DropUnit,CanPlaceUnitFootprint,"seam slot filled by InstallNativeSeams, MapSeam::CanPlaceUnitFootprint, UnitScript::DropUnit (src/units/unit_script.cpp), src/seams/native.cpp"
 UnitScript::EmitSfx,IsUnitVisibleToPlayer,"seam slot filled by InstallNativeSeams, LosRadarSeam::IsUnitVisibleToPlayer, UnitScript::EmitSfx (src/units/unit_script.cpp), src/seams/native.cpp"
@@ -1548,6 +1546,11 @@ OrderFxApproxDistNative,PointMarker::ApproxDist,"slot 7 of the OrderFx family, s
 OrderFxApproxDistNative,RingApproach::ApproxDistExcess,"slot 7 of the OrderFx family, src/data/vtables.cpp"
 UnitMotion::ClaimRepath,AiSearchGoal::TryClaimRepath,v6 TryClaimRepath; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
 UnitMotion::ClaimRepath,PathGoal::TryClaimRepath,v6 TryClaimRepath; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
+OrderOrStatusFlagsNative,Order::OrStatusFlags,"slot 0 of Order; listener is the Order stored by Order constructor, src/orders/order_list.cpp"
+UnitMotionReadNetStateNative,UnitMotion::ReadNetState,"direct call of the method the slot holds, src/seams/native.cpp"
+UnitMotion::ReadNetState,PackedPosGoal::DeserializeNetUnitState,"v9 DeserializeNetUnitState; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp"
+UnitMotion::ReadNetState,PathGoal::DeserializeNetUnitState,"v9 DeserializeNetUnitState; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp"
+UnitMotion::ReadNetState,PatrolGoal::DeserializeNetUnitState,"v9 DeserializeNetUnitState; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp"
 CobScript::RunThread,WeaponAimCobCompleteNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::WeaponAimCobComplete, CobScript::RunThread (src/units/cob.cpp), src/seams/native.cpp"
 CobScript::StartScriptWithArgsByIndex,WeaponAimCobCompleteNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::WeaponAimCobComplete, CobScript::StartScriptWithArgsByIndex (src/units/cob.cpp), src/seams/native.cpp"
 CobScript::RunThread,CobScriptExplodePieceNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::CobScriptExplodePiece, CobScript::RunThread (src/units/cob.cpp), src/seams/native.cpp"

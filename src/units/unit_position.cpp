@@ -516,7 +516,7 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
             spawn.tail.dword = *(Tail32*)&unit->angles;
             CreateUnitFromPacket(unit->playerIndex, &spawn);
         }
-        unit->motion->player->ReadFrom(&reader);
+        g_seams.orders->UnitMotionReadNetState(unit->motion, &reader);
         index = (short)reader.ReadBits(0x10);
     }
 

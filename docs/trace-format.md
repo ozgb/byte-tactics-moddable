@@ -5,7 +5,7 @@ digest files. It is enough to compute every row of `trace.txt` from the game sta
 recompute the same rows from a `dump.txt`. It is written in terms of the state block layout and
 `data/trace_schema.json`, so an engine in any language can follow it without the reference's source.
 
-The format is `bt-trace 4`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
+The format is `bt-trace 3`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
 
 Contents:
 
@@ -56,7 +56,7 @@ Contents:
 Plain text, LF line endings. The header is seven lines, in this order:
 
 ```
-bt-trace 4
+bt-trace 3
 commit <40 lowercase hex digits, or "unknown">
 scenario <the path as given to the run>
 game_seed <decimal>
@@ -120,7 +120,7 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 
 | Key | Meaning |
 | --- | --- |
-| `trace_format` | The format number, 4. |
+| `trace_format` | The format number, 3. |
 | `targets` | The pointer target names with their numeric `tag` (used in section 5). |
 | `tables` | Table name to table, sorted by name. |
 | `game_scalars` | Fields of the game record hashed in the `game` section (section 8.1), in hash order. |
@@ -988,8 +988,8 @@ It is written as 16 lowercase hex digits. A test-mode tick has 8 rows, so the st
 The digest file is:
 
 ```
-bt-digest 4
-trace_format bt-trace 4
+bt-digest 3
+trace_format bt-trace 3
 commit <40 hex digits, or unknown>
 scenario <path>
 game_seed <n>
@@ -1003,7 +1003,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 ## 10. dump.txt
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
-every hashed value of that one tick, after each phase of the tick. The first line is `bt-dump 4`; every
+every hashed value of that one tick, after each phase of the tick. The first line is `bt-dump 3`; every
 other line is
 
 ```
@@ -1108,7 +1108,7 @@ To recompute a hash from the dump:
 
 ## 12. Format numbers
 
-`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 4.
+`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 3.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

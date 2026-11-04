@@ -1,5 +1,5 @@
 {
-  "trace_format": 4,
+  "trace_format": 3,
   "targets": [{"tag": 1, "name": "heap"}, {"tag": 2, "name": "unit"}, {"tag": 3, "name": "player"}, {"tag": 4, "name": "unitdef"}, {"tag": 5, "name": "weapondef"}, {"tag": 6, "name": "projectile"}, {"tag": 7, "name": "feature"}, {"tag": 8, "name": "piece"}, {"tag": 9, "name": "rec"}, {"tag": 10, "name": "node"}, {"tag": 11, "name": "moveclass"}, {"tag": 12, "name": "order"}, {"tag": 13, "name": "orderfx"}, {"tag": 14, "name": "link"}],
   "tables": {
     "AiSearchGoal": {

@@ -80,8 +80,8 @@ def parse_dump(text: str) -> dict[tuple[int, str], list[tuple[str, str]]]:
     lines = text.split("\n")
     if lines and lines[-1] == "":
         lines.pop()
-    if not lines or lines[0] != "bt-dump 4":
-        raise Error("not a bt-dump 4 file")
+    if not lines or lines[0] != "bt-dump 3":
+        raise Error("not a bt-dump 3 file")
     blocks: dict[tuple[int, str], list[tuple[str, str]]] = {}
     for n, line in enumerate(lines[1:], 2):
         parts = line.split(" ", 3)

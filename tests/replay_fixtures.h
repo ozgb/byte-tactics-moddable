@@ -4,6 +4,7 @@
 #include "../interfaces/ref.h"
 #include "../src/graphics/handle.h"
 #include "../src/map/frame_table.h"
+#include "../src/units/cob_types.h"
 
 struct UnitDef;
 
@@ -168,6 +169,12 @@ struct FixtureEye {
     char flag;
     Ref<char> flagPtr;
     FixtureScreen pos;
+};
+
+struct FixtureNotify {
+    int id;
+    Callback* hook;
+    Ref<Callback> link;
 };
 
 struct FixtureNode {

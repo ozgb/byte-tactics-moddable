@@ -9,7 +9,8 @@ enum {
     RSL_FIXTURE_QUERY = RSL_COUNT + 2,
     RSL_FIXTURE_READIDS = RSL_COUNT + 3,
     RSL_FIXTURE_FILLIDS = RSL_COUNT + 4,
-    RSL_FIXTURE_MEASURE = RSL_COUNT + 5
+    RSL_FIXTURE_MEASURE = RSL_COUNT + 5,
+    RSL_FIXTURE_NOTIFY = RSL_COUNT + 6
 };
 
 struct FixtureSeam {
@@ -19,6 +20,7 @@ struct FixtureSeam {
     int (__stdcall* ReadIds)(void*);
     int (__stdcall* FillIds)(void*);
     int (__stdcall* Measure)(int*, short*, unsigned char*);
+    int (__stdcall* Notify)(FixtureNotify*, Callback*, int);
 };
 
 const FixtureSeam* s_inner_fixture;
@@ -182,6 +184,26 @@ int __stdcall RecFixtureMeasure(int* a0, short* a1, unsigned char* a2)
     return result;
 }
 
+int __stdcall RecFixtureNotify(FixtureNotify* a0, Callback* a1, int a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_FIXTURENOTIFY, a0);
+    SlotScope scope(RSL_FIXTURE_NOTIFY, SUB_FIXTURE, roots);
+    ReplayCallbackScope held1;
+    if (scope.Open()) {
+        ArgObject(s_call, "holder", ROK_FIXTURENOTIFY, a0);
+        ArgCallback(s_call, "done", held1, RCB_CALLBACK, a1);
+        ArgValue(s_call, "amount", a2);
+    }
+    int result = s_inner_fixture->Notify(a0, a1, a2);
+    held1.Stop();
+    if (scope.Open()) {
+        ArgCallbackExit(s_tail, held1);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 FixtureSeam s_rec_fixture = {
     RecFixtureFillGoals,
     RecFixturePlaceAt,
@@ -189,4 +211,5 @@ FixtureSeam s_rec_fixture = {
     RecFixtureReadIds,
     RecFixtureFillIds,
     RecFixtureMeasure,
+    RecFixtureNotify,
 };

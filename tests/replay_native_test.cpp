@@ -177,7 +177,6 @@ int g_importIndex;
 int g_diffs;
 char g_firstKey[96];
 ReplayText g_detail;
-ReplayOrdinals g_ordinals;
 const char* g_outNames[MAX_OUTS];
 const char* g_outValues[MAX_OUTS];
 int g_outCount;
@@ -317,7 +316,7 @@ void AddObject(ReplayText& t, unsigned kind, const void* p)
                 ordinal = (unsigned)i + 1;
         }
     } else {
-        ordinal = g_ordinals.Of(kind, p);
+        ordinal = ReplayHandles().Of(kind, p);
     }
     if (ordinal == 0) {
         t.Add("null");
@@ -1200,11 +1199,176 @@ void CallbackUnknown(const char*, int, const char* method)
     Fatal(g_file, g_callIndex, "a callback method that its interface does not have", method);
 }
 
+enum { MAX_HELD = 16, MAX_HELD_CALLS = 64 };
+
+struct HeldCallback {
+    unsigned callback;
+    unsigned ordinal;
+    const void* object;
+    int count;
+    char* call[MAX_HELD_CALLS];
+};
+
+HeldCallback g_held[MAX_HELD];
+int g_heldCount;
+
+void ResetHeld()
+{
+    for (int i = 0; i < g_heldCount; i++) {
+        for (int k = 0; k < g_held[i].count; k++)
+            free(g_held[i].call[k]);
+    }
+    g_heldCount = 0;
+}
+
+void BeginHeld()
+{
+    ResetHeld();
+    ReplayHandles().Reset();
+}
+
+HeldCallback* FindHeld(const void* object)
+{
+    for (int i = 0; i < g_heldCount; i++) {
+        if (g_held[i].object == object)
+            return &g_held[i];
+    }
+    return nullptr;
+}
+
+void HeldPrefix(const HeldCallback& h, char* out)
+{
+    sprintf(out, "%s#%u.", kReplayCallbacks[h.callback].handle, h.ordinal);
+}
+
+const char* RecordedHeldCall(const HeldCallback& h, int k)
+{
+    char prefix[64];
+    HeldPrefix(h, prefix);
+    size_t n = strlen(prefix);
+    int seen = 0;
+    for (int i = g_callFirst + 1; i < g_callEnd; i++) {
+        if (strncmp(g_lines[i], "  c ", 4) == 0 && strncmp(g_lines[i] + 4, prefix, n) == 0 && seen++ == k)
+            return g_lines[i] + 4;
+    }
+    return nullptr;
+}
+
+bool HeldMatches(const char* recorded, const char* made)
+{
+    size_t n = strlen(made);
+    return strncmp(recorded, made, n) == 0 && (recorded[n] == '\0' || strncmp(recorded + n, " = ", 3) == 0);
+}
+
+class HeldCall {
+public:
+    HeldCall(unsigned callback, const void* object, const char* method) : entry(FindHeld(object))
+    {
+        if (entry == nullptr)
+            Fatal(g_file, g_callIndex, "a call on a callback that no r or a line of the call names", method);
+        char prefix[64];
+        HeldPrefix(*entry, prefix);
+        (void)callback;
+        text.Add(prefix);
+        text.Add(method);
+    }
+    ~HeldCall() { text.Free(); }
+    void Space() { text.AddChar(' '); }
+    ReplayText& Text() { return text; }
+    const char* Finish()
+    {
+        if (entry->count == MAX_HELD_CALLS)
+            Fatal(g_file, g_callIndex, "more calls on one callback than the replayer keeps", text.Data());
+        char* made = (char*)malloc(text.Size() + 1);
+        strcpy(made, text.Data());
+        int k = entry->count++;
+        entry->call[k] = made;
+        HashText(made);
+        const char* recorded = RecordedHeldCall(*entry, k);
+        if (recorded == nullptr || !HeldMatches(recorded, made))
+            return "";
+        const char* result = recorded + strlen(made);
+        return result[0] == '\0' ? result : result + 3;
+    }
+
+private:
+    HeldCall(const HeldCall&);
+    HeldCall& operator=(const HeldCall&);
+    HeldCallback* entry;
+    ReplayText text;
+};
+
 }
 
 #include "replay_callbacks.h"
 
 namespace {
+
+void* BindHeld(unsigned callback, unsigned ordinal, ReplayAllocFn alloc)
+{
+    for (int i = 0; i < g_heldCount; i++) {
+        if (g_held[i].callback == callback && g_held[i].ordinal == ordinal)
+            return (void*)g_held[i].object;
+    }
+    if (g_heldCount == MAX_HELD)
+        Fatal(g_file, g_callIndex, "more callbacks held in one call than the replayer keeps", kReplayCallbacks[callback].name);
+    void* object = NewHeldCallback(callback, alloc(HeldCallbackSize(callback)));
+    HeldCallback& h = g_held[g_heldCount++];
+    h.callback = callback;
+    h.ordinal = ordinal;
+    h.object = object;
+    h.count = 0;
+    ReplayHandles().Bind(REPLAY_HANDLE_CALLBACK + callback, ordinal, object);
+    return object;
+}
+
+void* ArgCallback(const char* name, unsigned callback)
+{
+    const char* value = ArgLine(name);
+    if (value == nullptr || strcmp(value, "null") == 0)
+        return nullptr;
+    const char* handle = kReplayCallbacks[callback].handle;
+    size_t n = strlen(handle);
+    unsigned ordinal = strncmp(value, handle, n) == 0 && value[n] == '#' ? (unsigned)atoi(value + n + 1) : 0;
+    if (ordinal == 0)
+        Fatal(g_file, g_callIndex, "an argument that is no callback of its interface", value);
+    return BindHeld(callback, ordinal, AllocObject);
+}
+
+void CompareHeld()
+{
+    for (int k = g_callFirst + 1; k < g_callEnd; k++) {
+        if (strncmp(g_lines[k], "  c ", 4) != 0)
+            continue;
+        bool named = false;
+        for (int i = 0; i < g_heldCount; i++) {
+            char prefix[64];
+            HeldPrefix(g_held[i], prefix);
+            named = named || strncmp(g_lines[k] + 4, prefix, strlen(prefix)) == 0;
+        }
+        if (!named)
+            Fatal(g_file, g_callIndex, "a c line for a callback that no r or a line of the call names", g_lines[k]);
+    }
+    for (int i = 0; i < g_heldCount; i++) {
+        const HeldCallback& h = g_held[i];
+        char prefix[64];
+        HeldPrefix(h, prefix);
+        size_t n = strlen(prefix);
+        for (int k = 0;; k++) {
+            const char* recorded = RecordedHeldCall(h, k);
+            const char* made = k < h.count ? h.call[k] : nullptr;
+            if (recorded == nullptr && made == nullptr)
+                break;
+            if (recorded != nullptr && made != nullptr && HeldMatches(recorded, made))
+                continue;
+            const char* named = recorded != nullptr ? recorded : made;
+            const char* space = strchr(named + n, ' ');
+            char key[96];
+            sprintf(key, "%.*s", (int)(space == nullptr ? strlen(named) : (size_t)(space - named)), named);
+            Diff(key, recorded == nullptr ? "no call (extra)" : recorded + n, made == nullptr ? "no call (missing)" : made + n);
+        }
+    }
+}
 
 bool RestoreObjectLine(const char* name, const char* value, const char* file, const ReplaySlotSets* sets, const char* line);
 
@@ -1298,6 +1462,17 @@ int __stdcall Native_fixture_Query(FixtureAmount* first, FixtureAmount* second)
     if (second != nullptr)
         second->amount = 0;
     return first != nullptr ? first->amount : -1;
+}
+
+int __stdcall Native_fixture_Notify(FixtureNotify* holder, Callback* done, int amount)
+{
+    if (holder != nullptr && holder->hook != nullptr)
+        holder->hook->Complete(amount);
+    if (done != nullptr)
+        done->Complete(amount * 2);
+    if (holder != nullptr && holder->link.get() != nullptr)
+        holder->link->Complete(amount * 3);
+    return amount;
 }
 
 int __stdcall Native_fixture_Measure(int* p2, short* p3, unsigned char* p4)
@@ -1737,7 +1912,7 @@ void ReplayCall(const char* file, Outcome& out)
     g_diffs = 0;
     g_firstKey[0] = '\0';
     g_detail.Clear();
-    g_ordinals.Reset();
+    BeginHeld();
     g_importIndex = 0;
     g_outCount = 0;
     g_rootCount = 0;
@@ -1790,6 +1965,7 @@ void ReplayCall(const char* file, Outcome& out)
     CompareWrites(file, sets);
     CompareSnapshots();
     RunAfter(g_subsystem, slotText);
+    CompareHeld();
 
     char head[160];
     sprintf(head, "call %d %s %s", g_callIndex, tickText, sets->name);
@@ -2622,7 +2798,7 @@ void BeginImport()
 {
     g_cursor = g_callFirst + 1;
     g_importIndex = 0;
-    g_ordinals.Reset();
+    ReplayHandles().Reset();
     BeginCompare();
 }
 
@@ -2983,6 +3159,121 @@ void CallbackSelfTest()
     delete table;
 }
 
+void RestoreCallLines()
+{
+    for (int k = g_callFirst + 1; k < g_callEnd; k++) {
+        char* line = g_lines[k];
+        if (strncmp(line, "  r ", 4) != 0)
+            continue;
+        char* space = strchr(line + 4, ' ');
+        *space = '\0';
+        Check(RestoreObjectLine(line + 4, space + 1, "self-test", nullptr, line), "a recorded line restores");
+        *space = ' ';
+    }
+}
+
+void RunNotify(const char* body)
+{
+    LoadCall(body);
+    BeginCompare();
+    BeginHeld();
+    RestoreCallLines();
+    Run_fixture_Notify();
+    After_fixture_Notify();
+    CompareHeld();
+}
+
+const char* const kNotifyHeld = "  r FixtureNotify#1.id 7\n  r FixtureNotify#1.hook callback#1\n  r FixtureNotify#1.link callback#2\n  a holder FixtureNotify#1\n  a done callback#3\n  a amount 5\n";
+
+void HeldCallbackSelfTest()
+{
+    printf("callbacks held in state\n");
+    ResetBlock();
+    ReplayClearFailure();
+    char body[1024];
+    sprintf(body, "%s  c callback#1.Complete 5\n  c callback#3.Complete 10\n  c callback#2.Complete 15\n  o result 5\n", kNotifyHeld);
+    RunNotify(body);
+    Check(g_diffs == 0, "the calls a module makes on a held ptr, a held ref and an argument replay equal");
+    Check(g_heldCount == 3 && g_held[0].count == 1 && g_held[1].count == 1 && g_held[2].count == 1, "each callback object was bound at its line and got its call");
+    FixtureNotify* holder = (FixtureNotify*)ReplayResolveObject("FixtureNotify#1", nullptr, g_objects, AllocObject);
+    Check(holder != nullptr && holder->hook == g_held[0].object && holder->link.get() == g_held[1].object, "the fields hold the objects of the lines");
+    Check(ReplayHandles().Find(REPLAY_HANDLE_CALLBACK + RCB_CALLBACK, g_held[2].object) == 3, "and the argument has the number the recording gave it");
+    ReplayText value;
+    ReplayFormatObjectField(*ReplayFindObjectField(ROK_FIXTURENOTIFY, "hook"), holder, g_objects, false, value);
+    Check(strcmp(value.Data(), "callback#1") == 0, "a field that holds a callback is written as its handle");
+    ReplayFormatObjectField(*ReplayFindObjectField(ROK_FIXTURENOTIFY, "link"), holder, g_objects, false, value);
+    Check(strcmp(value.Data(), "callback#2") == 0, "a ref as well");
+    value.Free();
+
+    printf("a different call\n");
+    sprintf(body, "%s  c callback#1.Complete 5\n  c callback#3.Complete 11\n  c callback#2.Complete 15\n  o result 5\n", kNotifyHeld);
+    RunNotify(body);
+    printf("%s: %s\n%s", "a different argument", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "callback#3.Complete") == 0, "is reported at the handle and the method");
+    Check(strstr(g_detail.Data(), "recorded Complete 11, replayed Complete 10") != nullptr, "with both calls");
+
+    printf("a missing call\n");
+    sprintf(body, "%s  c callback#1.Complete 5\n  c callback#1.Complete 5\n  c callback#3.Complete 10\n  c callback#2.Complete 15\n  o result 5\n", kNotifyHeld);
+    RunNotify(body);
+    printf("%s: %s\n%s", "a missing call", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "callback#1.Complete") == 0 && strstr(g_detail.Data(), "replayed no call (missing)") != nullptr, "is reported at the handle, as a call that the module did not make");
+
+    printf("an extra call\n");
+    sprintf(body, "%s  c callback#1.Complete 5\n  c callback#2.Complete 15\n  o result 5\n", kNotifyHeld);
+    RunNotify(body);
+    printf("%s: %s\n%s", "an extra call", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "callback#3.Complete") == 0 && strstr(g_detail.Data(), "recorded no call (extra), replayed Complete 10") != nullptr, "is reported at the handle, with the call the recording does not have");
+
+    printf("a call on another handle\n");
+    sprintf(body, "%s  c callback#2.Complete 5\n  c callback#3.Complete 10\n  c callback#2.Complete 15\n  o result 5\n", kNotifyHeld);
+    RunNotify(body);
+    printf("%s: %s\n%s", "another handle", g_firstKey, g_detail.Data());
+    Check(g_diffs == 3 && strcmp(g_firstKey, "callback#1.Complete") == 0, "is reported on the handles it concerns, the first in the order they were bound");
+
+    printf("null fields and a null argument\n");
+    RunNotify("  r FixtureNotify#1.hook null\n  r FixtureNotify#1.link null\n  a holder FixtureNotify#1\n  a done null\n  a amount 5\n  o result 5\n");
+    Check(g_diffs == 0 && g_heldCount == 0, "bind nothing and replay equal");
+
+    printf("a result of a held callback\n");
+    Unit* pool = (Unit*)SimAlloc(16 * (unsigned)sizeof(Unit));
+    memset(pool, 0, 16 * sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 16;
+    LoadCall("  c scanner#1.VisitUnit Unit#3 = 1\n  c scanner#1.VisitUnit Unit#9 = 0\n");
+    BeginCompare();
+    BeginHeld();
+    Check(ReplayResolveObject("Unit#3", nullptr, g_objects, AllocObject) == &pool[3], "the units are named as in a recording");
+    UnitScanVisitor* scanner = (UnitScanVisitor*)BindHeld(RCB_UNITSCANVISITOR, 1, AllocObject);
+    int first = scanner->VisitUnit(&pool[3]);
+    int second = scanner->VisitUnit(&pool[9]);
+    CompareHeld();
+    Check(g_diffs == 0 && first == 1 && second == 0, "is the recorded result, and the calls replay equal");
+    scanner->VisitUnit(&pool[3]);
+    CompareHeld();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "scanner#1.VisitUnit") == 0, "and a call past the recorded ones is extra");
+
+    printf("the recorder's side\n");
+    ReplayObjectTable* table = new ReplayObjectTable;
+    FixtureComplete module;
+    ReplayCallbackScope scope;
+    scope.Start(RCB_CALLBACK, &module, 1, *table, ReplayThunkVtable(RCB_CALLBACK), 2);
+    ((Callback*)&module)->Complete(7);
+    scope.Stop();
+    Check(strcmp(scope.Lines().Data(), "\n  c callback#1.Complete 7") == 0 && module.got == 7, "a call made during a slot is a c line indented as the slot's lines");
+    BeginHeld();
+    FixtureNotify recorded;
+    memset(&recorded, 0, sizeof recorded);
+    recorded.hook = &module;
+    ReplayText field;
+    ReplayFormatObjectField(*ReplayFindObjectField(ROK_FIXTURENOTIFY, "hook"), &recorded, *table, false, field);
+    Check(strcmp(field.Data(), "callback#?") == 0, "an object no line named has no number, as any object");
+    ReplayFormatObjectField(*ReplayFindObjectField(ROK_FIXTURENOTIFY, "hook"), &recorded, *table, true, field);
+    Check(strcmp(field.Data(), "callback#1") == 0, "and the first line that names it numbers it");
+    field.Free();
+    delete table;
+    ResetHeld();
+}
+
 void VectorSelfTest()
 {
     printf("block vectors\n");
@@ -3163,7 +3454,7 @@ void SnapshotSelfTest()
     LoadCall(body);
     g_cursor = g_callFirst + 1;
     g_importIndex = 0;
-    g_ordinals.Reset();
+    ReplayHandles().Reset();
     memset(g_snapshotData, 0, sizeof g_snapshotData);
     g_captureUsed = 0;
     BeginCompare();
@@ -4958,6 +5249,7 @@ int SelfTest(const char* file)
     EmbedsSelfTest();
     EmbeddedPolymorphicSelfTest();
     CallbackSelfTest();
+    HeldCallbackSelfTest();
     VectorSelfTest();
     SnapshotSelfTest();
     FilesSelfTest();
@@ -4996,6 +5288,7 @@ int SelfTest(const char* file)
 int main(int argc, char** argv)
 {
     setvbuf(stdout, nullptr, _IONBF, 0);
+    ReplayBindCallbackHook() = BindHeld;
     int expectCall = -1;
     const char* expectField = nullptr;
     int arg = 1;

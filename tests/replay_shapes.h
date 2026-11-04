@@ -82,6 +82,21 @@ int __stdcall Imp_fixture_Measure(int* a0, short* a1, unsigned char* a2)
     return ParseResult<int>(r);
 }
 
+int __stdcall Imp_fixture_Notify(FixtureNotify* a0, Callback* a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "fixture.Notify");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_FIXTURENOTIFY, a0, false);
+    Space(t);
+    AddObject(t, OBJ_CALLBACK + RCB_CALLBACK, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    PlayCallbacks_Callback(a1, OBJ_CALLBACK + RCB_CALLBACK, "fixture.Notify");
+    return ParseResult<int>(r);
+}
+
 FixtureAmount g_inout_fixture_Query_0;
 bool g_inout_fixture_Query_0_null;
 FixtureAmount g_inout_fixture_Query_1;
@@ -136,4 +151,20 @@ void After_fixture_Measure()
     CompareInOutScalar("p3", g_inout_fixture_Measure_1_null ? nullptr : &g_inout_fixture_Measure_1);
     CompareInOutScalar("p4", g_inout_fixture_Measure_2_null ? nullptr : &g_inout_fixture_Measure_2);
     CompareResult(g_result_fixture_Measure);
+}
+
+int g_result_fixture_Notify;
+
+void Run_fixture_Notify()
+{
+    FixtureNotify* p0 = (FixtureNotify*)ArgObject("holder", ROK_FIXTURENOTIFY);
+    Callback* p1 = (Callback*)ArgCallback("done", RCB_CALLBACK);
+    int p2 = ArgScalar<int>("amount");
+    SetClosing("result");
+    g_result_fixture_Notify = Native_fixture_Notify(p0, p1, p2);
+}
+
+void After_fixture_Notify()
+{
+    CompareResult(g_result_fixture_Notify);
 }

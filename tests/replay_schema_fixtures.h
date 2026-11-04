@@ -217,6 +217,7 @@ enum ReplayObjectKindId {
     ROK_FIXTUREEYE,
     ROK_FIXTURENODE,
     ROK_FIXTUREHEAP,
+    ROK_FIXTURENOTIFY,
     ROK_COUNT
 };
 
@@ -489,8 +490,9 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FixtureEye", sizeof(FixtureEye), RS_STATE, 12, 0, 0, 0, 0, 0 },
     { "FixtureNode", sizeof(FixtureNode), RS_STATE, RT_ORDER, 11, 1, 0, 0, 0 },
     { "FixtureHeap", sizeof(FixtureHeap), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureNotify", sizeof(FixtureNotify), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 61;
+static const unsigned kReplayObjectKindCount = 62;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };
 
@@ -852,8 +854,11 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "used", offsetof(FixtureHeap, used), sizeof(((FixtureHeap*)nullptr)->used), ROK_FIXTUREHEAP, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pool", offsetof(FixtureHeap, pool), sizeof(((FixtureHeap*)nullptr)->pool), ROK_FIXTUREHEAP, RK_REF, ROK_FIXTURENODE, 0, 0, {}, 0, 0 },
     { "top", offsetof(FixtureHeap, top), sizeof(((FixtureHeap*)nullptr)->top), ROK_FIXTUREHEAP, RK_SELFINDEX, ROK_FIXTURENODE, 0, 0, {}, 0, 0, 3 },
+    { "id", offsetof(FixtureNotify, id), sizeof(((FixtureNotify*)nullptr)->id), ROK_FIXTURENOTIFY, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "hook", offsetof(FixtureNotify, hook), sizeof(void*), ROK_FIXTURENOTIFY, RK_CBPTR, RCB_CALLBACK, 0, 0, {}, 0, 0 },
+    { "link", offsetof(FixtureNotify, link), sizeof(((FixtureNotify*)nullptr)->link), ROK_FIXTURENOTIFY, RK_CBREF, RCB_CALLBACK, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 331;
+static const unsigned kReplayObjectFieldCount = 334;
 
 static const unsigned short kReplayReachFields[] = { 47, 51, 138, 139, 140, 38, 37, 0, 25, 51, 141, 34, 280, 38, 36, 39, 47, 52, 54, 87 };
 
@@ -1191,6 +1196,9 @@ static_assert(sizeof(((FixtureHeap*)nullptr)->used) == 4, "FixtureHeap::used has
 static_assert(sizeof(((FixtureHeap*)nullptr)->pool) == 4, "FixtureHeap::pool has the size the schema says");
 static_assert(sizeof(((FixtureHeap*)nullptr)->top) == sizeof(unsigned), "FixtureHeap::top is a Ref");
 static_assert(sizeof(((FixtureHeap*)nullptr)->pool) >= 1, "FixtureHeap::pool is a member of its own object");
+static_assert(sizeof(((FixtureNotify*)nullptr)->id) == 4, "FixtureNotify::id has the size the schema says");
+static_assert(__is_same(decltype(((FixtureNotify*)nullptr)->hook), Callback*), "FixtureNotify::hook holds a Callback*");
+static_assert(__is_same(decltype(((FixtureNotify*)nullptr)->link), Ref<Callback>), "FixtureNotify::link holds a Ref<Callback>");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");

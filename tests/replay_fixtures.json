@@ -605,6 +605,26 @@
      "target": "FixtureNode"
     }
    ]
+  },
+  "FixtureNotify": {
+   "type": "FixtureNotify",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "hook",
+     "kind": "ptr",
+     "callback": "Callback"
+    },
+    {
+     "name": "link",
+     "kind": "ref",
+     "callback": "Callback"
+    }
+   ]
   }
  },
  "fixtures": {
@@ -752,6 +772,32 @@
      "mode": "value",
      "dir": "inout",
      "nullable": true
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "Notify": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "FixtureNotify*",
+     "name": "holder"
+    },
+    {
+     "type": "Callback*",
+     "name": "done"
+    },
+    {
+     "type": "int",
+     "name": "amount"
+    }
+   ],
+   "args": {
+    "done": {
+     "mode": "callback",
+     "callback": "Callback"
     }
    },
    "result": {

@@ -55,3 +55,68 @@ void PlayCallbacks_Callback(void* object, unsigned handle, const char* import)
         CallbackUnknown(import, k, method);
     }
 }
+
+class ReplayHeldUnitVisitor : public UnitVisitor {
+public:
+    void Visit(Unit* a0) override;
+};
+
+inline void ReplayHeldUnitVisitor::Visit(Unit* a0)
+{
+    HeldCall call(RCB_UNITVISITOR, (const UnitVisitor*)this, "Visit");
+    call.Space();
+    ReplayAddObjectName(call.Text(), g_objects, ROK_UNIT, a0, false);
+    call.Finish();
+}
+
+class ReplayHeldUnitScanVisitor : public UnitScanVisitor {
+public:
+    int VisitUnit(Unit* a0) override;
+};
+
+inline int ReplayHeldUnitScanVisitor::VisitUnit(Unit* a0)
+{
+    HeldCall call(RCB_UNITSCANVISITOR, (const UnitScanVisitor*)this, "VisitUnit");
+    call.Space();
+    ReplayAddObjectName(call.Text(), g_objects, ROK_UNIT, a0, false);
+    return ParseResult<int>(call.Finish());
+}
+
+class ReplayHeldCallback : public Callback {
+public:
+    void Complete(int a0) override;
+};
+
+inline void ReplayHeldCallback::Complete(int a0)
+{
+    HeldCall call(RCB_CALLBACK, (const Callback*)this, "Complete");
+    call.Space();
+    ReplayValue(call.Text(), a0);
+    call.Finish();
+}
+
+inline void* NewHeldCallback(unsigned callback, void* memory)
+{
+    switch (callback) {
+    case RCB_UNITVISITOR:
+        return (UnitVisitor*)new (memory) ReplayHeldUnitVisitor;
+    case RCB_UNITSCANVISITOR:
+        return (UnitScanVisitor*)new (memory) ReplayHeldUnitScanVisitor;
+    case RCB_CALLBACK:
+        return (Callback*)new (memory) ReplayHeldCallback;
+    }
+    return nullptr;
+}
+
+inline unsigned HeldCallbackSize(unsigned callback)
+{
+    switch (callback) {
+    case RCB_UNITVISITOR:
+        return sizeof(ReplayHeldUnitVisitor);
+    case RCB_UNITSCANVISITOR:
+        return sizeof(ReplayHeldUnitScanVisitor);
+    case RCB_CALLBACK:
+        return sizeof(ReplayHeldCallback);
+    }
+    return 0;
+}

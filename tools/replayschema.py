@@ -24,7 +24,7 @@ Outputs:
     tests/replay_services.h         the replayer's answers for them
     src/harness/replay_vtables.cpp  the vtable of each concrete kind of a polymorphic base
     src/harness/replay_callbacks.h  the recorder's thunk classes for the callback interfaces
-    tests/replay_callbacks.h        the replayer's players for the callbacks an import made
+    tests/replay_callbacks.h        the replayer's players for the callbacks an import made, and its classes for the callbacks a module holds
 
 A slot's reads are field_read, global_read and global_maybe_written rows; its writes are field_write, global_write and
 global_maybe_written rows, over the functions behind the slot. A row names a block field (Game member or SimGlobals
@@ -74,7 +74,7 @@ OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "r
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
                "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR", "ptr": "PTR", "refs": "REFS", "embeds": "EMBEDS",
-               "self": "SELF", "selfindex": "SELFINDEX"}
+               "self": "SELF", "selfindex": "SELFINDEX", "cbref": "CBREF", "cbptr": "CBPTR"}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?\s*(\w+)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
@@ -420,6 +420,8 @@ def check_polymorphic(ann: dict) -> list[str]:
     for name, spec in kinds.items():
         for f in spec["fields"]:
             where = "%s.%s" % (name, f["name"])
+            if "callback" in f:
+                continue
             base = kinds.get(f.get("target")) if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds") else None
             if f["kind"] == "ptr" and (base is None or base["scope"] != "state"):
                 errors.append("%s: a ptr field points at a state kind of the schema" % where)
@@ -475,7 +477,9 @@ SELF_KEYS = {"name", "kind", "member", "index", "target", "aliases"}
 
 
 def field_kind(f: dict) -> str:
-    """The key of FIELD_KINDS for an object field: a self pointer written as an index is a kind of its own."""
+    """The key of FIELD_KINDS for an object field: a self pointer written as an index, and a ref or ptr that holds a callback, are kinds of their own."""
+    if f.get("callback") is not None and f["kind"] in ("ref", "ptr"):
+        return "cb" + f["kind"]
     return "selfindex" if f["kind"] == "self" and f.get("index") else f["kind"]
 
 
@@ -613,6 +617,29 @@ def check_delta(ann: dict) -> list[str]:
 
 
 CALLBACK_ARG_MODES = {"scalar", "text", "object", "value"}
+CALLBACK_FIELD_KEYS = {"name", "kind", "callback", "member"}
+
+
+def check_callback_fields(ann: dict) -> list[str]:
+    """Errors for the `callback` key of a field: it names an interface of `callbacks` and belongs on a ref or ptr field of a state kind, which then has no target."""
+    errors = []
+    for name, spec in ann["objects"].items():
+        for f in spec["fields"]:
+            where = "%s.%s" % (name, f["name"])
+            if "callback" in f:
+                if f["kind"] not in ("ref", "ptr"):
+                    errors.append("%s: the `callback` key is for a ref or ptr field, and this one is %s" % (where, f["kind"]))
+                elif f["callback"] not in ann.get("callbacks", {}):
+                    errors.append("%s: the `callback` %s is no entry of `callbacks`" % (where, f["callback"]))
+                elif set(f) - CALLBACK_FIELD_KEYS:
+                    errors.append("%s: a field that holds a callback is {\"name\", \"kind\", \"callback\"} with an optional \"member\", and has no %s"
+                                  % (where, ", ".join(sorted(set(f) - CALLBACK_FIELD_KEYS))))
+                if spec["scope"] != "state":
+                    errors.append("%s: only the fields of a state kind hold callbacks" % where)
+            for key in ("elem",):
+                if isinstance(f.get(key), dict) and "callback" in f[key]:
+                    errors.append("%s: the `callback` key is for a ref or ptr field, and not for the elements of a %s" % (where, f["kind"]))
+    return errors
 
 
 def callback_virtuals(entry: dict, name: str, errors: list[str]) -> list[str]:
@@ -650,6 +677,8 @@ def check_callbacks(ann: dict) -> tuple[list[dict], list[str]]:
         for m in methods:
             label = "%s.%s" % (where, m["name"])
             for a in m.get("args", []):
+                if "callback" in a:
+                    errors.append("%s: the argument %s has a `callback` key, which a callback's arguments do not take" % (label, a.get("name")))
                 if a.get("mode") not in CALLBACK_ARG_MODES:
                     errors.append("%s: the argument %s has the mode %s, and callbacks take %s" % (label, a.get("name"), a.get("mode"), ", ".join(sorted(CALLBACK_ARG_MODES))))
                 elif a["mode"] == "object" and (a.get("kind") not in kinds or a["type"] != kinds[a["kind"]]["type"] + "*" or kinds[a["kind"]]["scope"] == "value"):
@@ -796,6 +825,9 @@ def condition_source(where: str, f: dict, when: dict, object_fields: list, objec
         errors.append("%s: the `via` field %s has a `when` of its own" % (where, via))
         return None
     f["condVia"] = object_index[(f["object"], via)] + 1
+    if "callback" in v:
+        errors.append("%s: the `via` field %s holds a callback, which has no fields to read" % (where, via))
+        return None
     if v["kind"] in ("ref", "ptr"):
         if "kind" in when:
             errors.append("%s: the `via` field %s leads to its target, and `kind` is for an integer" % (where, via))
@@ -969,6 +1001,8 @@ def check_vector_arg(where: str, a: dict, label: str, kinds: dict, errors: list[
     if not isinstance(elem, dict) or elem.get("mode") != "value":
         errors.append("%s: %s needs an `elem` of mode value" % (where, label))
         return
+    if "callback" in elem:
+        errors.append("%s: the `callback` key is for the argument of a callback, and not for the elements of %s" % (where, label))
     spec = kinds.get(elem.get("kind"))
     if spec is None or spec["scope"] != "value":
         errors.append("%s: the element of %s needs a `kind` that is a value kind of the schema" % (where, label))
@@ -1023,6 +1057,8 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: the `cast` of %s is a pointer type other than void*" % (where, label))
             elif a["mode"] not in CAST_MODES:
                 errors.append("%s: %s has a `cast` and the mode %s, and a cast is for %s" % (where, label, a["mode"], ", ".join(sorted(CAST_MODES))))
+        if "callback" in a and a["mode"] != "callback":
+            errors.append("%s: %s has the mode %s and a `callback` key, which only the mode callback takes" % (where, label, a["mode"]))
         if a["mode"] not in ARG_MODES:
             errors.append("%s: %s has the unknown mode %s" % (where, label, a["mode"]))
         elif a["mode"] == "struct":
@@ -1060,6 +1096,8 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
             elif a["type"] != a["callback"] + "*":
                 errors.append("%s: %s is %s, and the callback %s is %s*" % (where, label, a["type"], a["callback"], a["callback"]))
     if result is not None:
+        if "callback" in result:
+            errors.append("%s: the result has a `callback` key, which only the argument of mode callback takes" % where)
         if result["mode"] == "object":
             poly_kind(result, "the result")
         if result["mode"] not in RESULT_MODES:
@@ -1232,7 +1270,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
         top = t["member"].split(".")[0]
         table_targets.add(top if t["sim"] else "Game::" + top)
     object_index = {(f["object"], f["name"]): i for i, f in enumerate(object_fields)}
-    errors += check_polymorphic(ann)
+    errors += check_polymorphic(ann) + check_callback_fields(ann)
     callbacks, callback_errors = check_callbacks(ann)
     errors += callback_errors
     code_tables, code_errors = check_code_tables(ann, seam_members())
@@ -1444,11 +1482,6 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             seam, slot = imp.split(".")
             if seam not in {m[0] for m in members}:
                 errors.append("%s imports from the unknown seam %s" % (sub, seam))
-    imported_slots = {imp for spec in ann["subsystems"].values() for imp in spec.get("imports", [])}
-    for sub, spec in subsystems.items():
-        for slot, s in spec["slots"].items():
-            if any(a["mode"] == "callback" for a in s["args"]) and "%s.%s" % (sub, slot) not in imported_slots:
-                errors.append("%s.%s has a callback argument and is imported by no subsystem, and a callback is recorded only in an import" % (sub, slot))
     stale = sorted("%s %s" % (r["kind"], r["target"]) for i, r in enumerate(ann["rules"]) if i not in used_rules)
     errors += ["the rule for %s matches no row of a subsystem function" % s for s in stale]
     for sub, spec in subsystems.items():
@@ -1718,7 +1751,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         t = types[f["object"]]
         size = f.get("size")
         size_text = str(size) if size else "sizeof(void*)" if f["kind"] == "ptr" else "sizeof(((%s*)nullptr)->%s)" % (t, member)
-        target = kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
+        target = "RCB_%s" % upper(f["callback"]) if field_kind(f) in ("cbref", "cbptr") else kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
         extra = ", %d" % (f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec")) if f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec") else ""
         when = "{ %d, %d, %s, %du, %d }" % (f["condField"], f.get("condVia", 0), kind_id[f["condKind"]], f.get("condMask", 0xFFFFFFFF), f["condValue"]) if f.get("condField") else "{}"
         L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
@@ -1738,6 +1771,10 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             ctype = f.get("ctype", types[f["target"]])
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %s * sizeof(unsigned), "%s::%s holds %s refs");' % (t, member, f["count"], t, f["name"], f["count"]))
             L.append('static_assert(__is_same(decltype(&((%s*)nullptr)->%s[0]), Ref<%s>*), "%s::%s holds Ref<%s>");' % (t, member, ctype, t, f["name"], ctype))
+            continue
+        if field_kind(f) in ("cbref", "cbptr"):
+            held = f["callback"] + "*" if f["kind"] == "ptr" else "Ref<%s>" % f["callback"]
+            L.append('static_assert(__is_same(decltype(((%s*)nullptr)->%s), %s), "%s::%s holds a %s");' % (t, member, held, t, f["name"], held))
             continue
         if f["kind"] == "ref" and f.get("ctype"):
             L.append('static_assert(__is_same(decltype(((%s*)nullptr)->%s), Ref<%s>), "%s::%s is a Ref<%s>");' % (t, member, f["ctype"], t, f["name"], f["ctype"]))
@@ -1902,11 +1939,17 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         if a["mode"] == "object":
             L.append("    roots.Add(ROK_%s, a%d);" % (upper(a["kind"]), i))
     L.append("    SlotScope scope(%s, SUB_%s, roots%s);" % (rid, upper(sub), ", false" if unrecorded else ""))
+    callback_args = [i for i, a in enumerate(s["args"]) if a["mode"] == "callback"]
+    held_args = [] if is_import else callback_args
+    for i in held_args:
+        L.append("    ReplayCallbackScope held%d;" % i)
     L.append("    if (scope.Open()) {")
     for i, a in enumerate(s["args"]):
-        L += ["        " + x for x in arg_out(a, i, "a", objects)]
+        if i in held_args:
+            L.append('        ArgCallback(s_call, "%s", held%d, RCB_%s, a%d);' % (a["line"], i, upper(a["callback"]), i))
+        else:
+            L += ["        " + x for x in arg_out(a, i, "a", objects)]
     L.append("    }")
-    callback_args = [i for i, a in enumerate(s["args"]) if a["mode"] == "callback"]
     nest = nestable(slot, s) and not unrecorded
     if is_import or nest:
         for i in callback_args:
@@ -1964,7 +2007,11 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             L += ["        " + x for x in result_out(res, objects, "i")]
         L.append("        FinishNested(line);")
         L.append("    }")
+    for i in held_args:
+        L.append("    held%d.Stop();" % i)
     L.append("    if (scope.Open()) {")
+    for i in held_args:
+        L.append("        ArgCallbackExit(s_tail, held%d);" % i)
     for i, a in enumerate(s["args"]):
         L += ["        " + x for x in arg_out(a, i, "o", objects)]
     if res is not None and res["mode"] in ("scalar", "object", "value"):
@@ -2362,6 +2409,9 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
         elif m == "argv":
             L.append("    ArgvHolder %s;\n    ParseArgv(%s);" % (v, v))
             call.append("&%s.args" % v)
+        elif m == "callback":
+            L.append('    %s %s = (%s)ArgCallback("%s", RCB_%s);' % (t, v, t, line, upper(a["callback"])))
+            call.append(v)
         else:
             L.append("    ArgPending();")
             call.append("0")
@@ -2943,7 +2993,7 @@ def render_callbacks(model: dict) -> str:
 
 
 def render_callback_players(model: dict) -> str:
-    """The replayer's side of a callback: it makes each recorded call on the module's own object and compares the result."""
+    """The replayer's side of a callback: it makes each recorded call on the module's own object and compares the result, and for a callback that the module holds, a class that records the calls the module makes on it."""
     L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers", ""]
     for c in model["callbacks"]:
         name = c["name"]
@@ -2977,6 +3027,41 @@ def render_callback_players(model: dict) -> str:
             L.append("            continue;")
             L.append("        }")
         L += ["        CallbackUnknown(import, k, method);", "    }", "}", ""]
+    for c in model["callbacks"]:
+        name = c["name"]
+        L += ["class ReplayHeld%s : public %s {" % (name, name), "public:"]
+        for m in c["methods"]:
+            L.append("    %s %s(%s) override;" % (m.get("ret", "void"), m["name"], callback_signature(m)))
+        L += ["};", ""]
+        for m in c["methods"]:
+            ret = m.get("ret", "void")
+            L += ["inline %s ReplayHeld%s::%s(%s)" % (ret, name, m["name"], callback_signature(m)), "{",
+                  '    HeldCall call(RCB_%s, (const %s*)this, "%s");' % (upper(name), name, m["name"])]
+            for i, a in enumerate(m.get("args", [])):
+                v = "a%d" % i
+                L.append("    call.Space();")
+                if a["mode"] == "scalar":
+                    L.append("    ReplayValue(call.Text(), %s);" % v)
+                elif a["mode"] == "text":
+                    L.append("    call.Text().AddString((const char*)%s);" % v)
+                elif a["mode"] == "object":
+                    L.append("    ReplayAddObjectName(call.Text(), g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), v))
+                else:
+                    L.append("    ReplayAddValue(call.Text(), ROK_%s, &%s, g_objects);" % (upper(a["kind"]), v))
+            if ret == "void":
+                L.append("    call.Finish();")
+            elif ret.endswith("*"):
+                L.append("    return (%s)ReplayResolveObject(call.Finish(), nullptr, g_objects, AllocObject);" % ret)
+            else:
+                L.append("    return ParseResult<%s>(call.Finish());" % ret)
+            L += ["}", ""]
+    L += ["inline void* NewHeldCallback(unsigned callback, void* memory)", "{", "    switch (callback) {"]
+    for c in model["callbacks"]:
+        L += ["    case RCB_%s:" % upper(c["name"]), "        return (%s*)new (memory) ReplayHeld%s;" % (c["name"], c["name"])]
+    L += ["    }", "    return nullptr;", "}", "", "inline unsigned HeldCallbackSize(unsigned callback)", "{", "    switch (callback) {"]
+    for c in model["callbacks"]:
+        L += ["    case RCB_%s:" % upper(c["name"]), "        return sizeof(ReplayHeld%s);" % c["name"]]
+    L += ["    }", "    return 0;", "}", ""]
     return "\n".join(L)
 
 
@@ -2995,7 +3080,7 @@ def shape_slots(ann: dict) -> tuple[list[dict], list[str]]:
     return out, errors
 
 
-RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv"}
+RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "callback"}
 
 
 def runnable(s: dict) -> bool:
@@ -3032,7 +3117,7 @@ def render_fixture_hooks(ann: dict, model: dict) -> str:
         L.append("    %s (%s* %s)(%s);" % (s["ret"], s["conv"], s["name"], ", ".join(s["params"])))
     L += ["};", "", "const FixtureSeam* s_inner_fixture;", ""]
     for s in slots:
-        L += wrapper("fixture", {}, s["name"], s, objects, True)
+        L += wrapper("fixture", {}, s["name"], s, objects, not any(a["mode"] == "callback" for a in s["args"]))
     L.append("FixtureSeam s_rec_fixture = {")
     L += ["    Rec%s%s," % (camel("fixture"), s["name"]) for s in slots]
     L += ["};", ""]

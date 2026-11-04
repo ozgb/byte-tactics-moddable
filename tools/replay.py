@@ -142,7 +142,7 @@ def check_form(text: str, subsystem: str = "wind_meteors") -> list[str]:
     for n, line in enumerate(lines[2:-1], 3):
         if line.startswith("call "):
             inside = True
-        elif not (inside and len(line) > 4 and line.startswith("  ") and line[2] in "raiow" and line[3] == " "):
+        elif not (inside and len(line) > 4 and line.startswith("  ") and line[2] in "raciow" and line[3] == " "):
             problems.append(f"line {n} is neither a call nor a line of one: {line!r}")
     return problems
 

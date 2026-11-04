@@ -4,7 +4,9 @@
 #include "replay_text.h"
 #include "replay_types.h"
 
-enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384 };
+enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384, REPLAY_HANDLE_CALLBACK = 3 };
+
+ReplayOrdinals& ReplayHandles();
 
 class ReplayObjectTable {
 public:
@@ -37,6 +39,9 @@ struct ReplayReach {
 };
 
 typedef void* (*ReplayAllocFn)(unsigned size);
+typedef void* (*ReplayBindCallbackFn)(unsigned callback, unsigned ordinal, ReplayAllocFn alloc);
+
+ReplayBindCallbackFn& ReplayBindCallbackHook();
 
 unsigned ReplayLengthOf(const ReplayLength& length, const void* object);
 ReplayObjectField ReplayFieldView(const ReplayField& f);
@@ -65,7 +70,7 @@ class ReplayCallbackScope {
 public:
     ReplayCallbackScope();
     ~ReplayCallbackScope();
-    void Start(unsigned callback, void* object, unsigned ordinal, ReplayObjectTable& table, const void* thunkVtable);
+    void Start(unsigned callback, void* object, unsigned ordinal, ReplayObjectTable& table, const void* thunkVtable, unsigned indent = 4);
     void Stop();
     const ReplayText& Lines() const { return lines; }
     const void* Object() const { return object; }
@@ -79,6 +84,7 @@ private:
     void* object;
     const void* original;
     unsigned ordinal;
+    unsigned indent;
     ReplayObjectTable* table;
     ReplayText lines;
 };

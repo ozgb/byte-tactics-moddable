@@ -1015,12 +1015,99 @@ class Callbacks(unittest.TestCase):
         self.assertIn("AddObject(t, OBJ_CALLBACK + RCB_UNITVISITOR, a2);", body)
         self.assertLess(body.index("Enter(t)"), body.index('PlayCallbacks_UnitVisitor(a2, OBJ_CALLBACK + RCB_UNITVISITOR, "map.VisitObjectsInRange");'))
 
-    def test_a_callback_argument_of_a_slot_no_subsystem_imports_is_an_error(self):
+    def test_a_callback_argument_of_a_slot_no_subsystem_imports_is_recorded_as_an_a_line(self):
         def only_note(ann):
             ann["subsystems"]["wind_meteors"]["imports"].remove("map.VisitObjectsInRange")
             del ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["record"]
             del ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["reason"]
-        self.assertTrue(any("map.VisitObjectsInRange has a callback argument and is imported by no subsystem" in e for e in self.errors(self.with_import(only_note))))
+        files, errors, _ = self.generated(self.with_import(only_note))
+        self.assertFalse([e for e in errors if "callback argument" in e])
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecMapVisitObjectsInRange("):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("ReplayCallbackScope held2;", body)
+        self.assertIn('ArgCallback(s_call, "visitor", held2, RCB_UNITVISITOR, a2);', body)
+        self.assertLess(body.index("s_inner_map->VisitObjectsInRange"), body.index("held2.Stop();"))
+        self.assertLess(body.index("held2.Stop();"), body.index("ArgCallbackExit(s_tail, held2);"))
+        self.assertNotIn("ImportCallback", body)
+
+    def test_the_runner_of_a_slot_binds_its_callback_argument_by_the_line(self):
+        files, _, _ = self.generated()
+        shapes = files[rs.SHAPES_SLOTS]
+        body = shapes[shapes.index("void Run_fixture_Notify()"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('Callback* p1 = (Callback*)ArgCallback("done", RCB_CALLBACK);', body)
+        self.assertIn("Native_fixture_Notify(p0, p1, p2)", body)
+        hooks = files[rs.FIXTURE_HOOKS_INC]
+        wrapper = hooks[hooks.index("RecFixtureNotify("):]
+        wrapper = wrapper[:wrapper.index("\n}\n")]
+        self.assertIn('ArgCallback(s_call, "done", held1, RCB_CALLBACK, a1);', wrapper)
+        self.assertIn("ArgCallbackExit(s_tail, held1);", wrapper)
+
+    def test_the_replayer_gets_a_class_per_interface_that_records_the_calls_it_gets(self):
+        files, _, _ = self.generated()
+        text = files[rs.CALLBACKS_SLOTS]
+        self.assertIn("class ReplayHeldUnitScanVisitor : public UnitScanVisitor {", text)
+        self.assertIn('HeldCall call(RCB_UNITSCANVISITOR, (const UnitScanVisitor*)this, "VisitUnit");', text)
+        self.assertIn("ReplayAddObjectName(call.Text(), g_objects, ROK_UNIT, a0, false);", text)
+        self.assertIn("return ParseResult<int>(call.Finish());", text)
+        self.assertIn('HeldCall call(RCB_CALLBACK, (const Callback*)this, "Complete");', text)
+        self.assertIn("return (UnitScanVisitor*)new (memory) ReplayHeldUnitScanVisitor;", text)
+        self.assertIn("return sizeof(ReplayHeldCallback);", text)
+
+    def test_a_ref_or_ptr_field_that_holds_a_callback_is_a_field_kind_of_its_own(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn('ROK_FIXTURENOTIFY, RK_CBPTR, RCB_CALLBACK,', text)
+        self.assertIn('ROK_FIXTURENOTIFY, RK_CBREF, RCB_CALLBACK,', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureNotify*)nullptr)->hook), Callback*), "FixtureNotify::hook holds a Callback*");', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureNotify*)nullptr)->link), Ref<Callback>), "FixtureNotify::link holds a Ref<Callback>");', text)
+
+    def test_the_callback_key_of_a_field_is_for_a_ref_or_ptr_and_names_an_entry(self):
+        def field(ann, name):
+            return [f for f in ann["objects"]["FixtureNotify"]["fields"] if f["name"] == name][0]
+        ann = annotations()
+        field(ann, "id")["callback"] = "Callback"
+        self.assertTrue(any("FixtureNotify.id: the `callback` key is for a ref or ptr field, and this one is i32" in e for e in self.errors(ann)))
+        ann = annotations()
+        field(ann, "hook")["callback"] = "Nowhere"
+        self.assertTrue(any("FixtureNotify.hook: the `callback` Nowhere is no entry of `callbacks`" in e for e in self.errors(ann)))
+        ann = annotations()
+        field(ann, "hook")["target"] = "Unit"
+        self.assertTrue(any("FixtureNotify.hook: a field that holds a callback is" in e and "target" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["objects"]["FixtureNotify"]["scope"] = "value"
+        self.assertTrue(any("FixtureNotify.hook: only the fields of a state kind hold callbacks" in e for e in self.errors(ann)))
+
+    def fixture_errors(self, mutate):
+        fixtures = json.loads(rs.FIXTURES_JSON.read_text())
+        mutate(fixtures["fixtures"])
+        return rs.generate(rs.read_rows(), annotations(), fixtures=fixtures)[1]
+
+    def test_the_callback_key_is_rejected_on_the_other_forms(self):
+        ann = annotations()
+        ann["game_fields"]["slowest"]["callback"] = "Callback"
+        self.assertTrue(any("Game.slowest: a ref field of Game is" in e for e in self.errors(ann)))
+        errors = self.fixture_errors(lambda f: f["Query"]["args"]["first"].update(callback="Callback"))
+        self.assertTrue(any("fixtures.Query: the argument first has the mode struct and a `callback` key" in e for e in errors))
+        errors = self.fixture_errors(lambda f: f["Notify"]["args"]["done"].update(callback="Nowhere"))
+        self.assertTrue(any("fixtures.Notify: the argument done needs a `callback` that is an entry of `callbacks`" in e for e in errors))
+        errors = self.fixture_errors(lambda f: f["FillGoals"]["args"]["goals"]["elem"].update(callback="Callback"))
+        self.assertTrue(any("fixtures.FillGoals: the `callback` key is for the argument of a callback" in e for e in errors))
+        errors = self.fixture_errors(lambda f: f["Query"]["result"].update(callback="Callback"))
+        self.assertTrue(any("fixtures.Query: the result has a `callback` key" in e for e in errors))
+        ann = annotations()
+        ann["callbacks"]["Callback"]["methods"][0]["args"][0]["callback"] = "Callback"
+        self.assertTrue(any("callback Callback.Complete: the argument result has a `callback` key" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["objects"]["FixtureNotify"]["fields"][0]["elem"] = {"mode": "object", "kind": "Unit", "callback": "Callback"}
+        self.assertTrue(any("the `callback` key is for a ref or ptr field, and not for the elements" in e for e in self.errors(ann)))
+
+    def test_a_condition_cannot_read_through_a_field_that_holds_a_callback(self):
+        ann = annotations()
+        ann["objects"]["FixtureNotify"]["fields"].append({"name": "late", "kind": "i32", "when": {"via": "hook", "field": "id", "equals": 1}})
+        self.assertTrue(any("the `via` field hook holds a callback" in e for e in self.errors(ann)))
 
     def test_the_callback_names_an_entry_and_its_type(self):
         def unknown(ann):

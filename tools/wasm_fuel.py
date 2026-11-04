@@ -2,6 +2,7 @@
 
     uv run tools/wasm_fuel.py module.wasm -o metered.wasm [--wasm-tools PATH]
     uv run tools/wasm_fuel.py metered.wasm --check
+    uv run tools/wasm_fuel.py metered.wasm --verify
 
 The rule (version 1, recorded as "fuel" in wasm/modules.json):
 
@@ -20,6 +21,12 @@ pass prints the module with wasm-tools (the version pinned in wasm/modules.json)
 into the text, and parses it back: the printer names every function and label by its index, and the parser reads
 every encoding wasm-ld, rustc and the toolchains after them write, so the pass needs no opcode table of its own.
 The parse drops the name section.
+
+--check looks only at the metered surface (the counter is not imported or exported, the two functions are exported). --verify checks the
+rule itself, for a module this pass did not necessarily produce (the btm gate, tools/gatebtm.py, runs it on a submitted module): on the
+printed text, exactly one counter (the global `__fuel_get` reads: a defined mutable i64, starting at the largest i64, neither imported
+nor exported), `__fuel_set` and `__fuel_get` doing only what the pass writes, every other defined function and every loop body beginning
+with the pass's own METER sequence, and no other instruction writing the counter. It prints each problem as FAIL and exits 1 on any.
 
 Running the pass on a module that is already metered is refused, since a second counter would burn twice per step.
 """
@@ -138,16 +145,139 @@ def check_unmetered_surface(wasm, wasm_tools=None):
     return problems
 
 
+def parse_verify_text(text):
+    """The globals, functions, loops and exports of printed text, for verify_text."""
+    name = r'\$(?:"(?:[^"\\]|\\.)*"|[^\s()]+)'
+    names, imported, defined, exports = {}, 0, {}, []
+    for label, index in re.findall(rf'^  \(import "(?:[^"\\]|\\.)*" "(?:[^"\\]|\\.)*" \(global (?:({name}) )?\(;(\d+);\)', text, re.M):
+        imported += 1
+        if label:
+            names[label] = int(index)
+    for label, index, rest in re.findall(rf"^  \(global (?:({name}) )?\(;(\d+);\) (.*)\)$", text, re.M):
+        defined[int(index)] = rest
+        if label:
+            names[label] = int(index)
+    funcs = {label: int(index) for label, index in re.findall(rf"^  \(func ({name}) \(;(\d+);\)", text, re.M)}
+    funcs.update({label: int(index) for label, index in re.findall(rf'^  \(import "(?:[^"\\]|\\.)*" "(?:[^"\\]|\\.)*" \(func ({name}) \(;(\d+);\)', text, re.M)})
+    for export, kind, ref in re.findall(rf'^\s*\(export "((?:[^"\\]|\\.)*)" \((func|global) ({name}|\d+)\)', text, re.M):
+        exports.append((export, kind, ref))
+    return names, funcs, imported, defined, exports
+
+
+def verify_text(text):
+    """Reasons the printed module breaks fuel rule version 1; [] when it keeps it."""
+    problems = []
+    names, funcs, imported, defined, exports = parse_verify_text(text)
+
+    def resolve(token, table=None):
+        token = token.strip()
+        return int(token) if token.isdigit() else (names if table is None else table).get(token)
+
+    lines = text.split("\n")
+    functions = {}
+    index = 0
+    while index < len(lines):
+        header = lines[index]
+        index += 1
+        if not re.match(r"^  \(func ", header):
+            continue
+        number = re.search(r"\(;(\d+);\)", header)
+        body = []
+        start = index
+        if open_parens(header) > 0:
+            while index < len(lines) and lines[index] != "  )":
+                index += 1
+            body = [re.sub(r"\s*;;.*$", "", line.strip()) for line in lines[start:index]]
+        if number is None:
+            problems.append("has a function without an index")
+        else:
+            functions[int(number.group(1))] = (header, body, start)
+    exported = {}
+    for name in EXPORTS:
+        found = [(kind, ref) for export, kind, ref in exports if export == name]
+        if len(found) != 1 or found[0][0] != "func" or resolve(found[0][1], funcs) not in functions:
+            problems.append(f"does not export {name} once, as a defined function")
+        else:
+            exported[name] = resolve(found[0][1], funcs)
+    if len(exported) != len(EXPORTS):
+        return problems
+    get_body = functions[exported[GET_EXPORT]][1]
+    counter = resolve(get_body[0].split(None, 1)[1]) if len(get_body) == 1 and get_body[0].startswith("global.get ") else None
+    if counter is None:
+        return problems + [f"{GET_EXPORT} does not just read one global"]
+    initial = defined.get(counter)
+    if counter < imported or initial is None:
+        problems.append("the counter is an imported global")
+    elif initial != f"(mut i64) i64.const {INITIAL}":
+        problems.append(f"the counter is not a mutable i64 starting at {INITIAL}")
+    for export, kind, ref in exports:
+        if kind == "global" and resolve(ref) == counter:
+            problems.append(f"exports the counter as {export}")
+    set_header, set_body, set_start = functions[exported[SET_EXPORT]]
+    if "(param i64)" not in set_header or "(result" in set_header or set_header.count("(param") != 1:
+        problems.append(f"{SET_EXPORT} is not (i64) -> ()")
+    if len(set_body) != 2 or set_body[0] != "local.get 0" or not set_body[1].startswith("global.set ") or resolve(set_body[1].split(None, 1)[1]) != counter:
+        problems.append(f"{SET_EXPORT} does more than store the counter")
+    if "(param" in functions[exported[GET_EXPORT]][0] or "(result i64)" not in functions[exported[GET_EXPORT]][0]:
+        problems.append(f"{GET_EXPORT} is not () -> i64")
+    allowed = {set_start + 1}
+
+    def metered(at, what):
+        """Check the METER sequence stripped of its label comments at line `at`; its writes are allowed."""
+        got = [re.sub(r"\s*;;.*$", "", line.strip()) for line in lines[at:at + len(METER)]]
+        for n, (want, have) in enumerate(zip(METER, got)):
+            want = want.strip()
+            if want.startswith("global."):
+                op, _, ref = have.partition(" ")
+                ok = op == want.split()[0] and resolve(ref) == counter
+            else:
+                ok = have == want
+            if not ok:
+                problems.append(f"{what} does not begin with the metering code")
+                return
+        allowed.add(at + 3)
+
+    skip = set(exported.values())
+    for number, (header, body, start) in sorted(functions.items()):
+        if number in skip or not body:
+            continue
+        at = start
+        while at < len(lines) and re.match(r"^    \(local ", lines[at]):
+            at += 1
+        metered(at, f"function {number}")
+    for at, line in enumerate(lines):
+        if re.match(r"^\s+loop\b", line):
+            metered(at + 1, f"the loop at line {at + 1}")
+    for at, line in enumerate(lines):
+        match = re.match(r"^\s+global\.set (.*)$", line)
+        if match and resolve(match.group(1)) == counter and at not in allowed:
+            problems.append(f"line {at + 1} writes the counter outside the metering code")
+    return problems
+
+
+def verify(wasm, wasm_tools=None):
+    """Reasons a module breaks fuel rule version 1, from the module's own printed text."""
+    return verify_text(tool(find_wasm_tools(wasm_tools), ["print", "-"], wasm).decode())
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("module")
     parser.add_argument("-o", "--output")
     parser.add_argument("--wasm-tools")
     parser.add_argument("--check", action="store_true", help="check a metered module's surface instead of metering it")
+    parser.add_argument("--verify", action="store_true", help="check that a module keeps fuel rule version 1, whoever metered it")
     args = parser.parse_args()
     with open(args.module, "rb") as f:
         data = f.read()
     try:
+        if args.verify:
+            problems = verify(data, args.wasm_tools)
+            for problem in problems:
+                print("FAIL", problem)
+            if not problems:
+                print(f"{args.module}: fuel rule version {VERSION} kept")
+            return 1 if problems else 0
         if args.check:
             problems = check_unmetered_surface(data, args.wasm_tools)
             for problem in problems:

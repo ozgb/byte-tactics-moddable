@@ -123,6 +123,17 @@ IMPORTS_COUNTER = """
   (func (export "__fuel_get") (result i64) i64.const 0))
 """
 
+UNMETERED_WITH_HAND_WRITTEN_EXPORTS = """
+(module
+  (global $c (mut i64) (i64.const 9223372036854775807))
+  (func $f (export "run") (result i32) i32.const 1)
+  (func (export "__fuel_set") (param i64) local.get 0 global.set $c)
+  (func (export "__fuel_get") (result i64) global.get $c))
+"""
+
+METER_BLOCK = (r"[ ]+" + r"\n[ ]+".join(re.escape(line).replace(re.escape(wf.COUNTER), r"\S+").replace("if", r"if(?: ;; label = @\d+)?")
+                                      for line in wf.METER) + r"\n")
+
 LOOP_WITH_PARAM = """
 (module
   (func (export "run") (result i32)
@@ -285,6 +296,68 @@ class Meter(unittest.TestCase):
         problems = wf.check_unmetered_surface(assemble(IMPORTS_COUNTER), wasm_tools())
         self.assertTrue(any("imports the global" in p for p in problems), problems)
         self.assertTrue(wf.check_unmetered_surface(self.original, wasm_tools()))
+
+    def edited(self, edit):
+        return assemble(edit(disassemble(self.metered)))
+
+    def problems(self, wasm):
+        return wf.verify(wasm, wasm_tools())
+
+    def test_verify_passes_what_the_pass_metered(self):
+        self.assertEqual(self.problems(self.metered), [])
+        self.assertEqual(self.problems(wf.instrument(assemble(LOOP_WITH_PARAM), wasm_tools())), [])
+
+    def test_verify_fails_an_unmetered_module(self):
+        self.assertTrue(self.problems(self.original))
+
+    def test_verify_fails_hand_written_exports_on_an_unmetered_module(self):
+        wasm = assemble(UNMETERED_WITH_HAND_WRITTEN_EXPORTS)
+        self.assertEqual(wf.check_unmetered_surface(wasm, wasm_tools()), ["has no metering code"])
+        self.assertTrue(any("metering code" in p for p in self.problems(wasm)), self.problems(wasm))
+
+    def test_verify_fails_a_function_without_the_decrement(self):
+        wasm = self.edited(lambda text: re.sub(METER_BLOCK, "", text, count=1))
+        self.assertTrue(any("function" in p and "metering code" in p for p in self.problems(wasm)), self.problems(wasm))
+
+    def test_verify_fails_a_loop_without_the_decrement(self):
+        wasm = self.edited(lambda text: re.sub(r"(\n[ ]+loop[^\n]*\n)" + METER_BLOCK, r"\1", text, count=1))
+        self.assertTrue(any("loop" in p and "metering code" in p for p in self.problems(wasm)), self.problems(wasm))
+
+    def test_verify_fails_a_changed_decrement(self):
+        wasm = self.edited(lambda text: text.replace("i64.const 1\n", "i64.const 0\n", 1))
+        self.assertTrue(self.problems(wasm))
+
+    def test_verify_fails_a_second_write_to_the_counter(self):
+        def edit(text):
+            write = "    i64.const 99\n    global.set " + re.search(r"global\.set (\S+)", text).group(1) + "\n"
+            return re.sub(r"(\(func [^\n]*\(param i32\) \(result i32\)\n(?:.*\n){10})", lambda m: m.group(1) + write, text, count=1)
+        wasm = self.edited(edit)
+        self.assertTrue(any("writes the counter" in p for p in self.problems(wasm)), self.problems(wasm))
+
+    def test_verify_fails_an_exported_counter(self):
+        def edit(text):
+            counter = re.search(r"global\.set (\S+)", text).group(1)
+            return text.replace('  (export "__fuel_set"', f'  (export "c" (global {counter}))\n  (export "__fuel_set"', 1)
+        self.assertTrue(any("exports the counter" in p for p in self.problems(self.edited(edit))))
+
+    def test_verify_fails_an_imported_counter(self):
+        wasm = assemble(IMPORTS_COUNTER)
+        self.assertTrue(self.problems(wasm))
+
+    def test_verify_fails_a_set_that_does_more(self):
+        def edit(text):
+            return re.sub(r"(local\.get 0\n\s+global\.set \S+)", r"\1\n    local.get 0\n    global.set 0", text, count=1)
+        self.assertTrue(any("__fuel_set" in p for p in self.problems(self.edited(edit))))
+
+    def test_verify_main_exits_nonzero_on_a_refusal(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            for name, wasm, code in (("good.wasm", self.metered, 0), ("bad.wasm", self.original, 1)):
+                path = os.path.join(d, name)
+                with open(path, "wb") as f:
+                    f.write(wasm)
+                run = subprocess.run([sys.executable, os.path.join(HERE, "wasm_fuel.py"), path, "--verify"], capture_output=True, text=True)
+                self.assertEqual(run.returncode, code, run.stdout)
 
     def test_the_manifest_records_the_rule(self):
         with open(os.path.join(wf.ROOT, "wasm", "modules.json")) as f:

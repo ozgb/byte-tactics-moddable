@@ -27,6 +27,7 @@
 #include "../units/sfx_occupy.h"
 #include "../orders/unit_motion.h"
 #include "../orders/order.h"
+#include "../orders/order_base.h"
 #include "../util/angles.h"
 
 struct Player;
@@ -551,6 +552,16 @@ static AiSearchGoal* __stdcall UnitMotionClaimRepathNative(UnitMotion* motion)
     return motion->ClaimRepath();
 }
 
+static void __stdcall OrderOrStatusFlagsNative(OrderBase* order, unsigned int flags)
+{
+    order->OrStatusFlags(flags);
+}
+
+static void __stdcall UnitMotionReadNetStateNative(UnitMotion* motion, BitReader* reader)
+{
+    motion->ReadNetState(reader);
+}
+
 static void __fastcall RunSearchesNative(Pathfinder* self)
 {
     self->RunSearches();
@@ -785,6 +796,8 @@ void InstallNativeSeams()
     s_orders.OrderFxFillGoalCells = OrderFxFillGoalCellsNative;
     s_orders.OrderFxApproxDist = OrderFxApproxDistNative;
     s_orders.UnitMotionClaimRepath = UnitMotionClaimRepathNative;
+    s_orders.OrderOrStatusFlags = OrderOrStatusFlagsNative;
+    s_orders.UnitMotionReadNetState = UnitMotionReadNetStateNative;
     s_units.MovementClassGet = MovementClassGetNative;
     s_units.MovementClassInBounds = MovementClassInBoundsNative;
     s_units.RefreshMovedUnits = RefreshMovedUnitsNative;

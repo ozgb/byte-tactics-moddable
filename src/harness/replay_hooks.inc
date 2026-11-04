@@ -2161,6 +2161,33 @@ AiSearchGoal* __stdcall RecOrdersUnitMotionClaimRepath(UnitMotion* a0)
     return result;
 }
 
+void __stdcall RecOrdersOrderOrStatusFlags(OrderBase* a0, unsigned int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ORDERS_ORDERORSTATUSFLAGS, SUB_ORDERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "order");
+        ArgValue(s_call, "flags", a1);
+    }
+    s_inner_orders->OrderOrStatusFlags(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecOrdersUnitMotionReadNetState(UnitMotion* a0, BitReader* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
+    SlotScope scope(RSL_ORDERS_UNITMOTIONREADNETSTATE, SUB_ORDERS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
+        ArgPending(s_call, "reader");
+    }
+    s_inner_orders->UnitMotionReadNetState(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
 void __stdcall RecUnitsUpdateAllUnits()
 {
     ReplayRoots roots;
@@ -5640,6 +5667,10 @@ void HookSeams(const bool* on)
         s_rec_orders.OrderFxApproxDist = RecOrdersOrderFxApproxDist;
     if (on[SUB_ORDERS])
         s_rec_orders.UnitMotionClaimRepath = RecOrdersUnitMotionClaimRepath;
+    if (on[SUB_ORDERS])
+        s_rec_orders.OrderOrStatusFlags = RecOrdersOrderOrStatusFlags;
+    if (on[SUB_ORDERS])
+        s_rec_orders.UnitMotionReadNetState = RecOrdersUnitMotionReadNetState;
     if (on[SUB_UNITS])
         s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
     if (on[SUB_UNITS] || on[SUB_TARGETING])

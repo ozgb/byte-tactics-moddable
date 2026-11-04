@@ -235,7 +235,7 @@ void Unit::SetStateBits(int mask, int set)
                 RecordUnitSpeech(this, 0xe, SIM_SPEECH_KIND_TEXT);
                 for (link = head; link; link = link->next) {
                     if (link->value)
-                        link->value->OrStatusFlags(0x10000);
+                        g_seams.orders->OrderOrStatusFlags(link->value, 0x10000);
                 }
             }
             if (lost & 4)

@@ -11,6 +11,7 @@ class MotionSerializer;
 class MovementClass;
 
 class PathGoal;
+class BitReader;
 class AiSearchGoal;
 class OrderFx;
 class BlockMap;
@@ -74,6 +75,7 @@ public:
     UnitMotion(Unit* unit);
     void DestroyObject();
     AiSearchGoal* ClaimRepath();
+    void ReadNetState(BitReader* reader);
     void UpdateMotion(Unit* u);
     void ApplyClampedTurnDelta(Unit* unit, short amount);
     void SaveMotion(Unit* unit, HapiBank* file);

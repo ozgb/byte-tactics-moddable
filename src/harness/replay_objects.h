@@ -26,6 +26,8 @@ private:
 
 struct ReplayReach {
     unsigned count;
+    unsigned deltaCount;
+    unsigned char deltaKind[8];
     unsigned char kind[REPLAY_MAX_OBJECTS];
     void* object[REPLAY_MAX_OBJECTS];
     const unsigned short* limit[REPLAY_MAX_OBJECTS];
@@ -133,6 +135,9 @@ void* ReplayResolveObject(const char* text, unsigned* kind, ReplayObjectTable& t
 void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned char* rootKinds, void* const* roots, unsigned rootCount,
                 const unsigned short* rootLimit = nullptr, unsigned rootLimitCount = 0);
 bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex);
+unsigned ReplayDeltaCount(const ReplayReach& reach);
+bool ReplayDeltaTable(const ReplayReach& reach, unsigned index, unsigned* kind, unsigned char** base, unsigned* count, unsigned* stride);
+bool ReplayInReachObject(const ReplayReach& reach, unsigned kind, const void* object);
 void ReplayCaptureObjects(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, const ReplayReach& reach, const unsigned short* set, unsigned count, char tag);
 void ReplayObjectFieldKey(ReplayText& key, ReplayObjectTable& table, bool assign, unsigned kind, const void* object, const ReplayObjectField& f);
 bool ReplayParseKey(const char* key, unsigned* kind, unsigned* ordinal, const char** field);

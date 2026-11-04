@@ -55,7 +55,7 @@ gh api repos/ozgb/byte-tactics-moddable/pulls/<PR> --jq .head.sha
 
 A pull request **needs review** when it is open, not a draft, and its head SHA differs from the SHA in its latest verdict (or it has none). Pushing new commits is how the author asks for another review: no label or mention is needed.
 
-A pull request body names the gate tier it ran: `--tier` (the scenarios of `GATE_TIER`, the gate of most changes) or the full `--check` (the gate of the changes that `reference/README.md`, "When the full suite is the gate", lists, and of the run that makes `tools/fullgate.py due` pass). A body that names only `--tier` for a change on that list is sent back.
+A pull request body names the gate tier it ran: `--tier` (the scenarios of `GATE_TIER`, the gate of every change the gate applies to) or the full `--check` (the gate only of a change that regenerates the stored reference data, as `reference/README.md`, "When the full suite is the gate", says). A body that names only `--tier` for such a change is sent back. The play-tests are not part of a pull request's gate: they run with the full `--check` on `moddable` when `uv run tools/fullgate.py due` passes.
 
 ## Branches behind `moddable`
 
@@ -73,7 +73,7 @@ Only the maintainer merges. A branch doesn't have to contain `moddable`'s head t
 ## Issue states
 
 - **Available:** open, no assignee, no open blockers (`blocked_by` API, mirrored in the "Blocked by" line), not labelled `needs-grooming`.
-- **Claimed:** assigned, with a "Lead: Claimed" comment. One claim at a time per lead, or two while the first only waits on Wine runs, when the two touch different files; the first one's pull request comes first in review.
+- **Claimed:** assigned, with a "Lead: Claimed" comment. The lead holds up to 10 claims at a time, counting each from its claim until its pull request merges or it is released. Claims that change the same files, such as the replay schema or the generated `data/` files, still merge one at a time, oldest pull request first.
 - **Done:** closed by the merged pull request's `Closes #N`.
 
 Blockers are kept in two places that must agree: the `blocked_by` dependency API, which tools query, and the "**Blocked by:**" line at the top of the body, which people read. Whoever changes one changes the other.

@@ -46,6 +46,7 @@ struct ReplayField {
     unsigned char base;
     unsigned char kind;
     unsigned short array;
+    unsigned char target;
 };
 
 struct ReplayInsideSite {
@@ -64,6 +65,7 @@ struct ReplayObjectKind {
     unsigned char insideCount;
     unsigned char polyFirst;
     unsigned char polyCount;
+    unsigned char delta;
 };
 
 struct ReplayCallbackType {
@@ -119,7 +121,8 @@ struct ReplaySlotSets {
     unsigned objReadCount;
     const unsigned short* objWrites;
     unsigned objWriteCount;
-    unsigned char allOf;
+    const unsigned char* allOf;
+    unsigned allOfCount;
 };
 
 struct ReplaySubsystem {

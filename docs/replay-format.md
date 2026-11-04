@@ -98,6 +98,49 @@ and `replayschema.py --check` reports a complete subsystem's slot that reaches s
 
 `Player` and `Unit` are instances of this form (`players` is `{"base": "game", "member": "players", "count": 10}`, `units` is a
 `Ref` with `poolCount` and `alloc` 5001), so the text of every committed recording is the same as before the form had a name.
+
+### Several all-of tables in one slot
+
+A rule with `"rule": "all-of"` makes every element of a table kind a root of the call. A slot may have such a rule for several kinds: the
+walk reaches every element of each, in the order of the kinds in the schema, and the slot lists them as `allOf` in the generated
+`data/replay_schema.json`. Each kind is captured, compared and restored as one kind is. A slot with one all-of kind records the same
+text as before.
+
+```json
+{"kind": "field_escape", "target": "Game::players", "rule": "all-of", "object": "Player"},
+{"kind": "field_escape", "target": "Game::lanes", "rule": "all-of", "object": "FixtureLane"}
+```
+
+```
+  r Player#2.id 12
+  r FixtureLane#2.level 9
+```
+
+`replayschema.py --check` fails for an all-of rule whose `object` is not a kind with a `table`.
+
+### A table recorded as changed elements
+
+A kind with a `table` may also carry `"delta": true`. A slot that is all-of over a delta kind does not put its elements in the walk's
+list of objects, which holds 8192, so the table may be as large as the game's (`Game::cells` has `width*height` cells). The walk
+follows the pointer and unit-id fields of each element, and capture and comparison visit the table element by element. The recorder
+writes every field of the slot's sets for every element at the first record, and after that only the fields whose value changed since
+the last line that named them, in the object form. This is #689's changed runs for a table of structs:
+
+```json
+"FixtureCell": {"type": "FixtureCell", "scope": "state", "delta": true,
+                "table": {"base": "game", "member": "p1b8a", "ref": true, "count": 9000, "alloc": 9000}, "fields": []}
+```
+
+```
+  r FixtureCell#40.unit 3
+  r FixtureCell#500.metal 9
+  r FixtureCell#12.flags 258
+  r FixtureCell#7000.metal 5
+```
+
+The first two lines are among the 27,000 of the first record (three fields of 9000 cells); the last two are all of the second. A delta kind
+is a state kind with a table, and no `inside`, `kinds` or `vtable`. An element that the walk also reached by a pointer is recorded once.
+A kind that is not a delta, or a slot that is not all-of over it, behaves as before.
 The table member is not an untracked target: a row that touches it needs no `exempt` entry.
 
 A pointer field is written as the object it points at (`Unit#1`) or `null`. The reachable objects of a call are the
@@ -143,8 +186,11 @@ because the replayer's bytes are by then those of the other view.
 
 `"via": FIELD` reads `F` from another object: the one a `ref` or `ptr` field `FIELD` of the same kind points at, or, for an integer
 field, the element it indexes in the table of the kind named by `"kind"`. An index outside the table, or a null pointer, makes the
-condition false. A `unitid` field has a condition too, which says that its bytes are an id (a value of `-32768` in the next slot),
-and its field is not written as a line.
+condition false. A `unitid` field may have a condition too, which says that its bytes are an id (a value of `-32768` in the next slot),
+and its field is not written as a line. A `unitid` field with no `when` holds an id whenever its value is not 0: `{"name": "occupant",
+"kind": "unitid", "target": "Unit", "member": "unit", "reach": ["Unit.health"], "depth": 1}` leads the walk from a cell to
+the unit that stands on it (`r Unit#5.health 4`), and an id of 0, or one past the unit pool, leads nowhere. The bytes themselves are
+recorded by a field of an integer kind over the same `member` (`unit`).
 
 ```json
 {"name": "scale", "kind": "f32", "member": "linked.scale", "when": {"field": "flags", "mask": 1, "equals": 1}},
@@ -414,6 +460,23 @@ Block fields are named as `data/rwsets.csv` names them: `Game.windCounter` for `
 generator streams of the block head and `g_randomSeed`; they are in the sets of the slots that draw.
 `weapondef#17.flags` is the flags word of a weapon the module reads through a pointer it was given.
 
+### A ref field of Game
+
+A member of `Game` that is a `Ref` to one object may be a field: `"slowest": {"kind": "ref", "target": "FixtureView"}` in `game_fields`.
+It is written as a `ref` is, `Game.slowest FixtureView#1` or `null`, and the object is named at first sight, as the target of a `ptr` is.
+The replayer allocates the empty object when a line first names it, and stores its offset. When the field is in a slot's read or write
+set the walk reaches the object, so its fields in the object sets are recorded, as for any `ref`; a `null` leaves them out.
+
+```
+  r Game.slowest FixtureView#1
+  r FixtureView#1.flags 4
+  r Game.slowest null
+```
+
+The target is a state kind with no `table`, `inside`, `kinds` or `vtable`, because only such a kind is named by first sight, and
+`replayschema.py --check` fails otherwise. A pointer to a separate object of a table kind (an overflow bucket that is not in its table) is
+`Kind#?` and cannot be rebuilt, so it needs a kind of its own.
+
 ## The schema and its annotations
 
 `data/replay_schema.json` has the `annotations` (written by hand, kept as written by the tool) and the generated
@@ -431,7 +494,8 @@ sets). The annotations hold what no header says:
   and of `Unit::footprint`). `whole-object` records every field of the named object; `index-array` records the weapon array
   through `weapondef#N`; `fields` adds the object fields it lists under `reads` and `writes` (`Unit.extraction`,
   `UnitResources.energyMake`), so that a write through a pointer is recorded as a `w` line of the field it lands on;
-  `all-of` makes every slot of a table kind a root of the call (`Game::players` is walked by index). `replayschema.py
+  `all-of` makes every slot of a table kind a root of the call (`Game::players` is walked by index), and a slot may have the rule for
+  several kinds. `replayschema.py
   --check` fails for a row of a subsystem function with no rule and for a rule that matches no row.
 - `objects`' extras: `table` (an object, see Objects) names a kind by its index in a table, `inside` (a list of `{"kind": "Unit",
   "member": "resourceSlot"}`) names every member of another kind that the kind lives in (`Unit#17.resourceSlot`), a field of kind
@@ -453,6 +517,23 @@ sets). The annotations hold what no header says:
   when the depth is not the one the list has, or a name is no field.
 - A field a slot writes through a pointer it cannot name exactly (a weapon slot picked by an index) is also in its read set,
   so that a change made outside the seam is recorded at the entry as an `r` line, not mistaken for a write of the module.
+- `exempt_types`: `{"OpenHeap": "reason"}`, a struct type that is no kind and is genuinely local (a stack copy read from a bank, a
+  union summed in a local). A field row (`field_read`, `field_write`, `field_maybe_written`) of a complete subsystem on a type that
+  is none of these is an error naming the row (`field_read OpenHeap::count`): the type of a kind or of a value kind, an alias of a kind's field
+  (`aliases`), a type in `exempt_types`, a target in `exempt` (one member of a type, for an anonymous struct: `<anon>::whole`), a hand rule for
+  the row, the table of a seam (`Seams`, `UnitsSeam`), or a service class the subsystem lists in `services` (`TdfFile`, `CommandArgs`). A type with no
+  reason is an error. A pending subsystem is not asked.
+- `indirect_call` rows of a complete subsystem. Every `indirect_call` row of a function behind a recorded slot, and of every function
+  `through` adds, is an error (`pending indirect`) unless one of these accounts for it: a call through a seam table (`[UnitsSeam::SetStateBits]`)
+  to a slot the subsystem lists in `imports`, or to a slot of its own seam whose functions are all behind the slot being checked; a
+  `virtual Class::Method` dispatch where `Class` is a kind with `kinds` (`poly`) or a kind with a `vtable`, and the `Method` of each concrete kind's type is
+  among the functions (a concrete type that defines no `Method` of its own is not asked, and the base's own `Method` is asked only when some concrete
+  type does not define one); or a `through` entry in the slot's annotation.
+- `through` (a slot annotation): `{"<row target>": ["fn", ...]}` adds the named functions to the slot, so that their sets and their own
+  `indirect_call` rows count as the slot's, for a table of code pointers such as `g_missionOrderTableVec[].notify`.
+  `{"<row target>": {"reason": "..."}}` says that the call does nothing on the recorded paths. The key is the whole target of the row
+  or the name in its last brackets (`OrderTableEntry::notify`). `replayschema.py --check` fails for an entry with no functions and no reason, a function that is
+  none of the rows' functions, and a key that matches no `indirect_call` row of the slot.
 - `subsystems.<name>`: `status` (`complete` or `pending`, with the `issue` that completes it), the `imports` (slots of
   other seams the subsystem calls) and per slot the `functions` behind it, the `native` symbol the replayer calls,
   and how each pointer argument is recorded:
@@ -479,7 +560,7 @@ A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by i
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
 A `pending` subsystem lists in its generated `pending` entry what is left (untracked targets, rows with no rule,
 slots whose functions are not found, arguments with no annotation); its own issue empties that list. A complete
-subsystem with anything pending is an error.
+subsystem with anything pending is an error, and the error prints every pending item, one per line.
 
 A slot annotated `"record": false` with a `"reason"` is classified and left out of the recording. The reason is `load class`
 (type loading and presentation-side init and free, which the full traces already cover) or the issue that will record

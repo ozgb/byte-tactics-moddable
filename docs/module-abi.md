@@ -23,7 +23,8 @@ Contents:
 12. [No hidden state](#12-no-hidden-state)
 13. [Errors and traps](#13-errors-and-traps)
 14. [Worked example: the Rust fixture](#14-worked-example-the-rust-fixture)
-15. [Appendix: values in the manifests](#15-appendix-values-in-the-manifests)
+15. [Judging a module](#15-judging-a-module)
+16. [Appendix: values in the manifests](#16-appendix-values-in-the-manifests)
 
 ## 1. Conventions
 
@@ -680,7 +681,51 @@ The fixture manifest gives it: `memory_pages` 4, `table_size` 64, `window` 65536
 The same fixture's C counterpart is linked at `data_base` 131072 and `table_base` 32, so both fit
 in one memory and one table side by side; the fixture manifest's windows and ranges do not overlap.
 
-## 15. Appendix: values in the manifests
+## 15. Judging a module
+
+`tools/oraclegate.py` judges a module by behaviour alone. It plays the suite and the subsystem's stored recordings with the
+submitted module in place of the default one, and writes a result that holds verdicts and the module's own values.
+
+```sh
+uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
+```
+
+1. It copies the runtime files of the modern build (the exe, `wasmtime_host.dll`, `modules.json` and every module as built) into
+   `DIR/runtime/`, removing what was there, and puts `MODULE.wasm` in the place of `<subsystem>.wasm`. The manifest is kept.
+2. It starts the game on a ten-tick scenario. A refusal of section 5.2 (and any other error before the match, section 13) ends
+   that start, and the loader's message is the result: `refused`. The checks of section 5.2 are the loader's; the tool does not
+   repeat them. A module linked at another base inside the memory is not refused (section 5.2): it is judged like any other, and
+   differs where its data is not where the loader zeroed it.
+3. It plays `tools/reference.py --check --tier` on that runtime (`--full`: the full `--check`), and then
+   `tools/replay.py --check --subsystem <subsystem>` on the recordings of `tests/replay/<subsystem>/`. The comparisons are theirs.
+   The shared gate lock is kept, a cached pass is not used, and the key of the cache covers the module, so a cached pass could
+   not stand for another one.
+
+`DIR/result.json` (default `build/oracle/result.json`) is built from fields parsed out of the two reports, never from their text:
+
+| Field | Meaning |
+| --- | --- |
+| `format` | 1 |
+| `verdict` | `equal`, `differs`, `failed` (a run did not finish, or a check other than the traces failed) or `refused` |
+| `subsystem`, `suite` | the subsystem, and `tier` or `full` |
+| `module` | `sha256` and `bytes` of the submitted file |
+| `kit` | `interfaces` and `reference_traces`: the newest `interfaces-v*` and `reference-traces-v*` tags |
+| `seconds` | wall time of the run |
+| `message` | with `refused`: the loader's message, and no `scenarios` or `recordings` |
+| `scenarios` | by scenario name: `status` and, for `differs`, `tick`, `phase`, `field` and `value` |
+| `recordings` | by `<subsystem>/<recording>`: `status` and, for `differs`, `line`, `tick`, `phase` (the slot), `kind`, `field` and `value` |
+
+A `status` is `equal`, `differs`, `failed` (the scenario did not run to its end) or `not_judged` (the run stopped at the first
+divergence before this scenario was reported). Only the first divergence of a run carries `phase`, `field` and `value` for a
+scenario: the others have their `tick`. A `value` is what the module produced; the reference's value, its memory and anything of
+the build other than the names of the traced fields are never in the file. The raw reports are kept in `DIR/logs/` for the host
+and are not part of the result.
+
+Exit status: 0 when everything is equal, 1 when something differs or failed, 2 when the loader refused the module.
+
+#519 wires the tool to the sandbox's mailbox: a submitted module goes in, and `result.json` comes back.
+
+## 16. Appendix: values in the manifests
 
 The values below are read from the files named; they are copied here for orientation only.
 

@@ -2064,7 +2064,10 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
     services = ann["services"]
     errors += check_service_hooks(services)
     errors += check_service_snapshots(services)
-    errors += check_service_specs(services, ann)
+    spec_errors = check_service_specs(services, ann)
+    errors += spec_errors
+    if spec_errors:
+        services = []
     for sub, spec in ann["subsystems"].items():
         errors += ["%s lists the service %s, which has no spec" % (sub, n) for n in spec.get("services", [])
                    if not any(x["name"] == n or x["name"].startswith(n + "_") for x in services)]

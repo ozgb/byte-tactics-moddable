@@ -761,7 +761,7 @@ class Snapshots(unittest.TestCase):
     """N9: an import that returns a buffer the slot fills is recorded by its size and a handle, and the bytes at slot exit."""
 
     def spec(self, **changes):
-        out = {"name": "SimCaptureAlloc", "id": "RI_SIM_CAPTURE_ALLOC", "header": "src/state/sim_radar.h", "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
+        out = {"name": "SimCaptureAlloc", "id": "RI_SIM_CAPTURE_ALLOC", "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
                "args": [{"mode": "int", "param": "bytes"}, {"mode": "skip", "param": "offset"}], "result": "snapshot", "bytes": "bytes", "offset": "offset"}
         out.update(changes)
         return out
@@ -790,6 +790,112 @@ class Snapshots(unittest.TestCase):
 
     def test_another_result_is_untouched(self):
         self.assertEqual(rs.check_service_snapshots([self.spec(result="int")]), [])
+
+
+class Services(unittest.TestCase):
+    """N7: the services of the files, commands, sim plumbing and load groups, through the services annotation."""
+
+    def spec(self, name, ann=None):
+        return [s for s in (ann or annotations())["services"] if s["name"] == name][0]
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def errors(self, ann):
+        return self.generated(ann)[1]
+
+    def test_every_new_service_is_hooked_and_declared(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        names = {s["name"] for s in annotations()["services"]}
+        for name in ("FilePrintf", "TdfRecord_FindSubRecord", "TdfRecord_GetFieldFixed", "Translate", "CommandArgs_InitArgs", "ComputeChecksum",
+                     "SimAlloc", "SimAllocTagged", "SimFree", "RecordSimEvent", "SimCaptureAlloc", "FindSlotByDpid", "GetSlotDpid"):
+            self.assertIn(name, names)
+            self.assertIn("RI_", files[rs.SERVICES_H])
+
+    def test_bytes_and_words_are_written_with_their_lengths(self):
+        text = rs.render_service_end([self.spec("ComputeChecksum"), self.spec("RecordSimEvent")])
+        self.assertIn("ReplayBytes(t, a[0].v.p, a[1].v.i);", text)
+        self.assertIn("ReplayAddWords(t, (const unsigned*)a[2].v.p, (unsigned)a[3].v.i);", text)
+
+    def test_a_handle_result_is_a_record_the_replayer_parses(self):
+        spec = self.spec("TdfRecord_FindSubRecord")
+        self.assertIn("AddHandle(t, OBJ_RECORD, (c.result.kind == 1 ? c.result.v.p : nullptr));", rs.render_service_end([spec]))
+        self.assertIn("return (TdfRecord*)ParseHandle(OBJ_RECORD, result);", rs.render_service_answers([spec]))
+
+    def test_a_number_written_through_a_pointer_is_an_out_line(self):
+        spec = self.spec("TdfRecord_GetFieldFixed")
+        self.assertIn('t.Add("\\n  o dst ");\n        t.AddInt(*(const int*)a[1].v.p);', rs.render_service_end([spec]))
+        answers = rs.render_service_answers([spec])
+        self.assertIn('OutValue("dst")', answers)
+        self.assertIn("*dst = atoi(dstText);", answers)
+        self.assertIn("return dst;", answers)
+
+    def test_a_text_result_that_is_null_is_null(self):
+        self.assertIn('if (strcmp(result, "null") == 0)\n        return nullptr;', rs.render_service_answers([self.spec("Translate")]))
+
+    def test_a_formatted_text_is_an_argument_the_definition_builds(self):
+        answers = rs.render_service_answers([self.spec("FilePrintf")])
+        self.assertIn("va_start(list, fmt);", answers)
+        self.assertIn("t.AddString(formatted);", answers)
+
+    def test_a_service_in_a_source_the_replayer_links_is_answered_not_defined(self):
+        services = annotations()["services"]
+        linked = rs.linked_services(services)
+        self.assertEqual({"SimAlloc", "SimAllocTagged", "SimFree"} - linked, set())
+        answers = rs.render_service_answers(services, linked)
+        self.assertNotIn("void* __cdecl SimAlloc(unsigned int size)\n{", answers)
+        self.assertIn("bool ReplayAnswerImport(ReplayImport& c)", answers)
+        self.assertIn("case RI_SIM_ALLOC: {", answers)
+        self.assertIn("c.Return(AllocAnswer(result, (unsigned)c.args[0].v.i));", answers)
+
+    def test_a_free_goes_on_into_the_real_function(self):
+        answers = rs.render_service_answers(annotations()["services"], rs.linked_services(annotations()["services"]))
+        body = answers[answers.index("case RI_SIM_FREE: {"):]
+        body = body[:body.index("    }\n")]
+        self.assertIn("AddAllocName(t, c.args[0].v.p);", body)
+        self.assertIn("return false;", body)
+
+    def test_an_alloc_is_named_by_its_tag_when_the_annotation_has_one(self):
+        files, _, _ = self.generated()
+        self.assertIn('{ "Player Info", ROK_PLAYERINFO, 185 },', files[rs.SCHEMA_H])
+        self.assertIn("AddAlloc(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (const char*)a[0].v.p);", files[rs.SERVICES_INC])
+
+    def test_an_unknown_mode_or_result_is_an_error(self):
+        ann = annotations()
+        self.spec("Translate", ann)["result"] = "pointer"
+        self.assertTrue(any("service Translate: the result pointer is none of" in e for e in self.errors(ann)))
+        ann = annotations()
+        self.spec("Translate", ann)["args"][0]["mode"] = "wide"
+        self.assertTrue(any("the argument key has the unknown mode wide" in e for e in self.errors(ann)))
+
+    def test_bytes_and_ints_name_an_int_argument(self):
+        ann = annotations()
+        self.spec("ComputeChecksum", ann)["args"][0]["length"] = "nowhere"
+        self.assertTrue(any("service ComputeChecksum: the argument data needs a `length` that names an int argument" in e for e in self.errors(ann)))
+        ann = annotations()
+        self.spec("RecordSimEvent", ann)["args"][2]["count"] = "nowhere"
+        self.assertTrue(any("service RecordSimEvent: the argument args needs a `count`" in e for e in self.errors(ann)))
+
+    def test_an_alloc_needs_its_size_and_its_tags_a_kind_without_a_table(self):
+        ann = annotations()
+        del self.spec("SimAlloc", ann)["size"]
+        self.assertTrue(any("service SimAlloc: an alloc result needs `size`" in e for e in self.errors(ann)))
+        ann = annotations()
+        ann["alloc_tags"]["Units"] = {"kind": "Unit", "size": 280}
+        self.assertTrue(any("the alloc tag Units names a state kind with no table" in e for e in self.errors(ann)))
+
+    def test_a_handle_needs_a_kind_of_file_rec_or_bank(self):
+        ann = annotations()
+        self.spec("TdfRecord_FindSubRecord", ann)["kind"] = "gaf"
+        self.assertTrue(any("a handle result needs a `kind` of file, rec or bank" in e for e in self.errors(ann)))
+
+    def test_a_hook_that_gives_other_arguments_is_an_error(self):
+        errors = rs.check_service_hooks(annotations()["services"])
+        self.assertEqual(errors, [])
+        services = annotations()["services"]
+        self.spec("Translate", {"services": services})["args"].append({"mode": "int", "param": "extra"})
+        self.assertTrue(any("RI_TRANSLATE" in e for e in rs.check_service_hooks(services)))
 
 
 class Committed(unittest.TestCase):

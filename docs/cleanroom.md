@@ -153,7 +153,7 @@ file that holds the same value.
 - Hosts: the allowlist (`api.anthropic.com` and the crates.io hosts) should be enough for OAuth. The first session's
   `proxy.log` shows whether Claude Code needs another host.
 
-**Host deny rules:** to keep a host agent from reading the secrets by accident, add this to `~/.claude/settings.json`
+**Host deny rules:** to keep a host agent from reading the secrets by accident, add this to `$CLAUDE_CONFIG_DIR/settings.json` (default `~/.claude/settings.json`)
 (a guard against accidents, not a boundary: every agent runs as the same user, and a separate Unix user for the broker
 would be the real one):
 

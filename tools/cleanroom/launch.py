@@ -56,7 +56,6 @@ DENIED_HOST_SUFFIXES = (
 )
 HOME_FORBIDDEN = (".ta", ".ssh", ".config/gh", ".config/bt-cleanroom", ".gnupg", "source/repos")
 DEFAULT_CREDENTIAL = Path.home() / ".config" / "bt-cleanroom" / "anthropic-impl-key"
-HOST_CREDENTIALS = Path.home() / ".claude" / ".credentials.json"
 CREDENTIAL_VARS = {"oauth": "CLAUDE_CODE_OAUTH_TOKEN", "api-key": "ANTHROPIC_API_KEY"}
 HOST_CLAUDE_VARS = ("ANTHROPIC_API_KEY", "CLAUDE_CODE_OAUTH_TOKEN")
 SECRET_HOST_VAR = "BT_CLEANROOM_CREDENTIAL"
@@ -161,10 +160,14 @@ def check_api_key_env(name):
         raise Refusal(f"--api-key-env {name} is not an ANTHROPIC_* variable")
 
 
-def host_claude_tokens(environ, credentials_file):
+def default_host_credentials():
+    return Path.home() / ".claude" / ".credentials.json"
+
+
+def host_claude_tokens(environ, credentials_file=None):
     """Return the credentials the host's Claude Code uses: the two variables and the stored OAuth access token of ~/.claude and of $CLAUDE_CONFIG_DIR."""
     tokens = {environ[v] for v in HOST_CLAUDE_VARS if environ.get(v)}
-    files = [Path(credentials_file)]
+    files = [Path(credentials_file) if credentials_file else default_host_credentials()]
     config_dir = claude_config_dir(environ)
     if config_dir is not None:
         files.append(config_dir / ".credentials.json")
@@ -438,7 +441,7 @@ def main(argv=None):
     ap.add_argument("--session", default=None, help="session directory (default: a new one in a temp dir)")
     ap.add_argument("--credential-file", default=str(DEFAULT_CREDENTIAL), help="file holding the implementer credential (mode 600)")
     ap.add_argument("--credential-kind", default="oauth", choices=sorted(CREDENTIAL_VARS), help="oauth: CLAUDE_CODE_OAUTH_TOKEN; api-key: ANTHROPIC_API_KEY")
-    ap.add_argument("--host-credentials", default=str(HOST_CREDENTIALS), help=argparse.SUPPRESS)
+    ap.add_argument("--host-credentials", default=None, help=argparse.SUPPRESS)
     ap.add_argument("--api-key-env", default=None, help=argparse.SUPPRESS)
     ap.add_argument("--game-dir", default=None, help="game directory the real gate plays on, when it is not in a Steam/GOG place")
     ap.add_argument("--keep", action="store_true", help="leave the machine in place after the command")

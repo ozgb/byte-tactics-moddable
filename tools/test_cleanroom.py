@@ -790,6 +790,13 @@ class CredentialTests(unittest.TestCase):
         self.read(key, environ={"CLAUDE_CONFIG_DIR": ""})
         self.read(key)
 
+    def test_default_host_credentials_follow_home_at_call_time(self):
+        home = self.dir / "home"
+        (home / ".claude").mkdir(parents=True)
+        (home / ".claude" / ".credentials.json").write_text(json.dumps({"claudeAiOauth": {"accessToken": FAKE_TOKEN}}))
+        with mock.patch.dict(os.environ, {"HOME": str(home)}):
+            self.assertEqual(ln.host_claude_tokens({}), {FAKE_TOKEN})
+
     def test_refusal_text_does_not_hold_the_value(self):
         key = make_secret(self.dir, "k", FAKE_TOKEN)
         with self.assertRaises(ln.Refusal) as caught:

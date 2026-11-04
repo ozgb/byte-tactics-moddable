@@ -152,6 +152,14 @@ BOTH_MODES_BAD = """145 of 146 scenarios equal, total 5:34
 [wasm] block pointers: all covered by data/block_pointers.csv (73 scenarios)
 [native] 10 problems with the pointers out of the block; add them to data/block_pointers.csv
 """
+COVERAGE = """profile: build/coverage-run/merged.profdata
+excluded (harness, build, outside the repository): 880 functions
+unassigned: 0 functions
+coverage: no subsystem fell
+"""
+COVERAGE_FELL = """coverage fell:
+ai functions: 80.0% (80/100) fell from 90.0% (90/100)
+"""
 ROUND_TRIP = """73 of 73 scenarios equal, total 3:02
 block pointers: all covered by data/block_pointers.csv (73 scenarios)
 """
@@ -159,9 +167,10 @@ block pointers: all covered by data/block_pointers.csv (73 scenarios)
 
 class CommentTextTest(unittest.TestCase):
     def test_all_equal(self):
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE))
         self.assertEqual(text, "Full gate on abc1234: 146 of 146 equal (both modes), block pointers: "
-                               "all covered by data/block_pointers.csv in both modes, round trip: 73 of 73 equal")
+                               "all covered by data/block_pointers.csv in both modes, round trip: 73 of 73 equal, "
+                               "coverage: no subsystem fell")
         self.assertEqual(fullgate.last_full_run([comment(text, "2026-11-04T10:00:00Z")]), "abc1234")
 
     def test_pointer_problems_name_the_mode(self):
@@ -170,18 +179,51 @@ class CommentTextTest(unittest.TestCase):
 
     def test_round_trip_divergence_and_exit_status(self):
         trip = "70 of 73 scenarios equal, total 3:02\n"
-        text = fullgate.comment_text("abc1234", (1, BOTH_MODES_BAD), (1, trip))
+        text = fullgate.comment_text("abc1234", (1, BOTH_MODES_BAD), (1, trip), (0, COVERAGE))
         self.assertIn("145 of 146 equal (both modes)", text)
-        self.assertTrue(text.endswith("round trip: 70 of 73 equal, both modes exit 1, round trip exit 1"))
+        self.assertTrue(text.endswith("round trip: 70 of 73 equal, coverage: no subsystem fell, both modes exit 1, round trip exit 1"))
 
     def test_a_run_that_did_not_finish(self):
-        text = fullgate.comment_text("abc1234", (1, ""), (0, ROUND_TRIP))
+        text = fullgate.comment_text("abc1234", (1, ""), (0, ROUND_TRIP), (0, COVERAGE))
         self.assertIn("not finished equal (both modes), block pointers: not reported", text)
 
     def test_round_trip_pointer_problems_are_named(self):
         trip = "73 of 73 scenarios equal, total 3:02\n2 problems with the pointers out of the block; add them\n"
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (1, trip))
-        self.assertTrue(text.endswith("round trip: 73 of 73 equal (block pointers: 2 block pointer problems), round trip exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (1, trip), (0, COVERAGE))
+        self.assertTrue(text.endswith("round trip: 73 of 73 equal, coverage: no subsystem fell (block pointers: 2 block pointer problems), round trip exit 1"))
+
+    def test_coverage_fall_names_the_status(self):
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (1, COVERAGE_FELL))
+        self.assertTrue(text.endswith("round trip: 73 of 73 equal, coverage: failed, coverage exit 1"))
+
+    def test_coverage_build_failure_and_no_output(self):
+        self.assertEqual(fullgate.coverage_result(fullgate.BUILD_FAILED, "FAILED: link\n"), "build failed")
+        self.assertEqual(fullgate.coverage_result(1, ""), "not finished")
+        self.assertEqual(fullgate.coverage_result(0, COVERAGE), "no subsystem fell")
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (fullgate.BUILD_FAILED, "x"))
+        self.assertTrue(text.endswith("coverage: build failed, coverage exit 1"))
+
+    def test_coverage_check_builds_then_plays(self):
+        calls = []
+
+        def fake_stream(command, log, what):
+            calls.append(command)
+            return (0, COVERAGE) if command[:3] == ["uv", "run", "tools/coverage.py"] else (0, "")
+
+        with unittest.mock.patch.object(fullgate, "stream", fake_stream), unittest.mock.patch.object(
+                fullgate.shutil, "rmtree"):
+            self.assertEqual(fullgate.coverage_check("g", None), (0, COVERAGE))
+        self.assertEqual(calls[:-1], list(fullgate.COVERAGE_BUILD))
+        self.assertEqual(calls[-1][-3:], ["--check", "--game-dir", "g"])
+        calls.clear()
+
+        def failing_build(command, log, what):
+            calls.append(command)
+            return 1, "link failed\n"
+
+        with unittest.mock.patch.object(fullgate, "stream", failing_build):
+            self.assertEqual(fullgate.coverage_check("g", None), (fullgate.BUILD_FAILED, "link failed\n"))
+        self.assertEqual(len(calls), 1)
 
     def test_single_mode_pointers(self):
         out = "73 of 73 scenarios equal, total 1:00\nblock pointers: all covered by data/block_pointers.csv (73 scenarios)\n"
@@ -199,6 +241,7 @@ class CommentTextTest(unittest.TestCase):
         sys.argv = ["fullgate.py", "run", "--sha", "abc1234", "--exe", "x.exe", "--game-dir", ""]
         try:
             with unittest.mock.patch.object(fullgate, "play", fake_play), unittest.mock.patch.object(
+                    fullgate, "coverage_check", lambda game_dir, log: (0, COVERAGE)), unittest.mock.patch.object(
                     fullgate.shutil, "rmtree"), contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
                 code = fullgate.main()
         finally:
@@ -207,7 +250,7 @@ class CommentTextTest(unittest.TestCase):
         self.assertEqual([what for what, _ in played], ["both modes", "round trip"])
         self.assertEqual(played[0][1], ["--exe", "x.exe", "--both-modes"])
         self.assertEqual(played[1][1], ["--exe", "x.exe", "--roundtrip", "auto"])
-        self.assertIn("round trip: 73 of 73 equal", out.getvalue())
+        self.assertIn("round trip: 73 of 73 equal, coverage: no subsystem fell", out.getvalue())
 
 
 class GatePathsTest(unittest.TestCase):

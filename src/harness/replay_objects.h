@@ -104,7 +104,7 @@ enum { REPLAY_MAX_SNAPSHOTS = 64, REPLAY_SNAPSHOT_LINE_BYTES = 512 };
 
 class ReplaySnapshots {
 public:
-    ReplaySnapshots() : count(0) {}
+    constexpr ReplaySnapshots() : count(0), data(), bytes() {}
     void Reset() { count = 0; }
     unsigned Add(const void* data, unsigned bytes);
     unsigned Count() const { return count; }

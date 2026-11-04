@@ -367,15 +367,16 @@ it is due, the lead runs `uv run tools/fullgate.py run` on the tip. It plays the
 --both-modes --no-cache` (no `--tier`) and then, straight after it on a fresh prefix, `--check --no-cache
 --roundtrip auto`, which saves the block at an early, a middle and the second to last tick of every scenario,
 restores it and carries on, so that state outside the block shows as a divergence from the stored traces. The
-round trip run scans and checks block pointers as the full run does. `run` prints the comment text and posts
-nothing:
+round trip run scans and checks block pointers as the full run does. Last it builds the coverage exe
+(`build/coverage`) and plays `tools/coverage.py --check` on it, so a coverage link that breaks or a stale
+`data/coverage.csv` shows at the next periodic run. `run` prints the comment text and posts nothing:
 
 ```
-Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n> equal
+Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n> equal, coverage: <result>
 ```
 
 The lead posts it on #632 and adds the play-tests (`tools/playtest.py` smoke, full, mp and music) and their results.
-A run that fails appends `, both modes exit <n>` or `, round trip exit <n>`, and names round trip block pointer
+A run that fails appends `, both modes exit <n>`, `, round trip exit <n>` or `, coverage exit <n>`, and names round trip block pointer
 problems in parentheses after the round trip count.
 
 **A periodic failure is fixed afterwards, not by freezing merges.** The lead files it at once as an
@@ -403,8 +404,8 @@ scenarios with it.
 resolves the sites with the linker map beside the exe
 (`build/modern/TotalA.map`) and compares every row with `data/block_pointers.csv`, after printing the trace
 results. A word whose holder the file has no wildcard row for (see below), or a scenario with no `blockptrs.txt`,
-is printed (scenario, holder, offset, target) and `--check` exits 1. `--tier` does not check the pointers: the names of repeated sites are numbered over the scenarios played, so the
-tier prints `block pointers: full suite only` and the full `--check` is where they are checked.
+is printed (scenario, holder, offset, target) and `--check` exits 1. `--tier` checks the pointers of its scenarios the same way: a site is named by its rank among its function's
+allocator calls in the exe, not by the scans, so a tier run names its rows as the full suite does.
 `--save-blockptrs <dir>` writes each scenario's file to `<dir>/<scenario>.txt`, and
 `uv run tools/blockpointers.py --from <dir>` regenerates the data file from them, keeping the hand-set `class` and
 `note` columns; without `--from` it plays the suite itself with the scan on every tick, which is how the list
@@ -462,9 +463,8 @@ uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-di
 `tools/reference.py`, 33,910 ticks of the suite's 324,610 (10.4%), none longer than 9000. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how
 many scenarios were equal and at which commit; a failure prints the same `tools/tracediff.py` report
-as the full run. `--tier` goes with `--check` and `--exe`, and `--traces` rejects it. It does not
-check the block pointers, since repeated sites are numbered over the scenarios played; the full
-suite does.
+as the full run. `--tier` goes with `--check` and `--exe`, and `--traces` rejects it. It checks the
+block pointers of its scenarios against data/block_pointers.csv, since the names do not depend on the scenarios played.
 
 The tier was chosen greedily from a coverage run of the suite (tools/coverage.py): the scenario
 adding the most lines per tick (a floor of 600 ticks each), until one adds fewer than 20, starting

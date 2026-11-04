@@ -17,7 +17,7 @@ A function counts as a member function when any of these holds:
 
 Each declaration or definition of a free function with an explicit calling
 convention is resolved to an address by the name in data/symbols.csv (or
-FUN_xxxxxxxx), or by a `// FUNCTION:` marker above a definition. With --names, a
+FUN_xxxxxxxx), or by a `// FUNCTION:` marker directly above a definition. With --names, a
 name that is the leaf of a member function is also reported: it may be an
 unrelated function that shares the name. A __fastcall function that reads edx
 too, or takes no stack arguments, is not a hit: clang passes it as MSVC does.
@@ -138,8 +138,8 @@ def declarations(root: Path, implicit: bool = False):
                 m = DECL.match(line)
                 if m and "::" not in line.split("(")[0]:
                     yield path.relative_to(root), number, m.group(1), m.group(2), marker
-                if line.strip():
-                    marker = None if m else marker if line.lstrip().startswith("//") else None
+                if not line.strip() or not line.lstrip().startswith("//"):
+                    marker = None
 
 
 def scan(root: Path = ROOT, asm: bool = True, implicit: bool = False, names_only: bool = False):

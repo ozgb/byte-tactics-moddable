@@ -32,36 +32,36 @@ struct ReplayGate {
     ReplayEndFn end;
 };
 
-extern ReplayGate g_replayGate;
+ReplayGate& ReplayGateRef();
 
 inline int& ReplayCalls()
 {
-    return g_replayGate.calls;
+    return ReplayGateRef().calls;
 }
 
 inline unsigned int& ReplayOwner()
 {
-    return g_replayGate.owner;
+    return ReplayGateRef().owner;
 }
 
 inline unsigned int& ReplayNestedDepth()
 {
-    return g_replayGate.nestedDepth;
+    return ReplayGateRef().nestedDepth;
 }
 
 inline ReplayAnswerFn& ReplayAnswerHook()
 {
-    return g_replayGate.answer;
+    return ReplayGateRef().answer;
 }
 
 inline bool& ReplayAnswerBusy()
 {
-    return g_replayGate.busy;
+    return ReplayGateRef().busy;
 }
 
 inline ReplayEndFn& ReplayEndHook()
 {
-    return g_replayGate.end;
+    return ReplayGateRef().end;
 }
 
 inline bool ReplayOwned()

@@ -280,7 +280,11 @@ void* ReallocLocked(void* p, unsigned int size)
 
 }
 
-ReplayGate g_replayGate;
+ReplayGate& ReplayGateRef()
+{
+    static ReplayGate gate;
+    return gate;
+}
 
 __declspec(noinline) void* __cdecl SimAlloc(unsigned int size)
 {

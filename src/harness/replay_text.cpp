@@ -210,6 +210,12 @@ const char* ReplayKnown::Get(const char* name) const
     return at < 0 ? nullptr : entries[at].value;
 }
 
+char* ReplayKnown::Edit(const char* name)
+{
+    int at = Find(name);
+    return at < 0 ? nullptr : entries[at].value;
+}
+
 bool ReplayKnown::Changed(const char* name, const char* value)
 {
     int at = Find(name);

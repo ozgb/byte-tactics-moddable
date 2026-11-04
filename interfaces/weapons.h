@@ -6,11 +6,13 @@ struct Vec3;
 struct Point16;
 struct WeaponDef;
 struct Projectile;
+struct Callback;
+class CobScript;
 
 // Major version of the weapons interface, changed when a slot is removed or its signature changes.
 #define WEAPONS_VERSION_MAJOR 1
 // Minor version of the weapons interface, changed when a slot is added.
-#define WEAPONS_VERSION_MINOR 4
+#define WEAPONS_VERSION_MINOR 5
 
 // Projectiles and explosions.
 struct WeaponsSeam {
@@ -60,6 +62,10 @@ struct WeaponsSeam {
     void (__stdcall* RemoveUnitProjectiles)(Unit* unit);
     // Aims and fires a unit's weapons for one tick. Hooks: none.
     void (__stdcall* UpdateUnitWeapons)(Unit* unit);
+    // Tells a weapon's aim callback that its aim script returned, with the script's result. Hooks: none.
+    void (__stdcall* WeaponAimCobComplete)(Callback* callback, int result);
+    // Blows a piece of a unit off its model, as the explode-piece opcode of a script does. Hooks: none.
+    void (__stdcall* CobScriptExplodePiece)(CobScript* script, int piece, unsigned int flags);
 };
 
 #endif

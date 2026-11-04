@@ -665,11 +665,12 @@ void __stdcall RecAiReactToAttack(Unit* a0, Unit* a1, int a2)
 void __fastcall RecAiMarkOwnerNetDirtyFromDamageSplit(SquadManager* a0, int a1, Projectile* a2, int a3, int a4)
 {
     ReplayRoots roots;
+    roots.Add(ROK_PROJECTILE, a2);
     SlotScope scope(RSL_AI_MARKOWNERNETDIRTYFROMDAMAGESPLIT, SUB_AI, roots);
     if (scope.Open()) {
         ArgPending(s_call, "self");
         ArgValue(s_call, "unusedEdx", a1);
-        ArgPending(s_call, "projectile");
+        ArgObject(s_call, "projectile", ROK_PROJECTILE, a2);
         ArgValue(s_call, "enemyDamage", a3);
         ArgValue(s_call, "friendlyDamage", a4);
     }
@@ -1104,6 +1105,7 @@ Projectile* __stdcall RecWeaponsFindTargetableProjectile(Unit* a0, unsigned int 
     }
     Projectile* result = s_inner_weapons->FindTargetableProjectile(a0, a1);
     if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_PROJECTILE, result, "o");
     }
     return result;
 }
@@ -1305,6 +1307,34 @@ void __stdcall RecWeaponsUpdateUnitWeapons(Unit* a0)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
     }
     s_inner_weapons->UpdateUnitWeapons(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecWeaponsWeaponAimCobComplete(Callback* a0, int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_WEAPONS_WEAPONAIMCOBCOMPLETE, SUB_WEAPONS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "callback");
+        ArgValue(s_call, "result", a1);
+    }
+    s_inner_weapons->WeaponAimCobComplete(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecWeaponsCobScriptExplodePiece(CobScript* a0, int a1, unsigned int a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_WEAPONS_COBSCRIPTEXPLODEPIECE, SUB_WEAPONS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "piece", a1);
+        ArgValue(s_call, "flags", a2);
+    }
+    s_inner_weapons->CobScriptExplodePiece(a0, a1, a2);
     if (scope.Open()) {
     }
 }
@@ -2338,9 +2368,10 @@ void __stdcall RecUnitsSetStateBits(Unit* a0, int a1, int a2)
 int __stdcall RecUnitsMovementClassGet(MovementClass* a0, int a1, int a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_MOVEMENTCLASS, a0);
     SlotScope scope(RSL_UNITS_MOVEMENTCLASSGET, SUB_UNITS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "y", a2);
     }
@@ -2354,9 +2385,10 @@ int __stdcall RecUnitsMovementClassGet(MovementClass* a0, int a1, int a2)
 int __stdcall RecUnitsMovementClassInBounds(MovementClass* a0, unsigned int a1, unsigned int a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_MOVEMENTCLASS, a0);
     SlotScope scope(RSL_UNITS_MOVEMENTCLASSINBOUNDS, SUB_UNITS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "y", a2);
     }
@@ -2370,10 +2402,11 @@ int __stdcall RecUnitsMovementClassInBounds(MovementClass* a0, unsigned int a1, 
 void __stdcall RecUnitsRefreshMovedUnits(MovementClass* a0, Unit* a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_MOVEMENTCLASS, a0);
     roots.Add(ROK_UNIT, a1);
     SlotScope scope(RSL_UNITS_REFRESHMOVEDUNITS, SUB_UNITS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
         ArgObject(s_call, "unit", ROK_UNIT, a1);
     }
     s_inner_units->RefreshMovedUnits(a0, a1);
@@ -2384,10 +2417,11 @@ void __stdcall RecUnitsRefreshMovedUnits(MovementClass* a0, Unit* a1)
 void __stdcall RecUnitsRefreshUnitIfStale(MovementClass* a0, Unit* a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_MOVEMENTCLASS, a0);
     roots.Add(ROK_UNIT, a1);
     SlotScope scope(RSL_UNITS_REFRESHUNITIFSTALE, SUB_UNITS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
         ArgObject(s_call, "unit", ROK_UNIT, a1);
     }
     s_inner_units->RefreshUnitIfStale(a0, a1);
@@ -3850,9 +3884,10 @@ void __fastcall RecMapSpatialBucketUnlinkUnit(SpatialBucket* a0, int a1, Unit* a
 void __fastcall RecMapRefreshPassMap(MovementClass* a0, int a1, Point16 a2, Point16 a3)
 {
     ReplayRoots roots;
+    roots.Add(ROK_MOVEMENTCLASS, a0);
     SlotScope scope(RSL_MAP_REFRESHPASSMAP, SUB_MAP, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "movementClass");
+        ArgObject(s_call, "movementClass", ROK_MOVEMENTCLASS, a0);
         ArgValue(s_call, "unusedEdx", a1);
         ArgValue(s_call, "a", a2);
         ArgValue(s_call, "b", a3);
@@ -5092,10 +5127,11 @@ void __stdcall RecNetworkSendProjectileDetonated(Unit* a0, Projectile* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
+    roots.Add(ROK_PROJECTILE, a1);
     SlotScope scope(RSL_NETWORK_SENDPROJECTILEDETONATED, SUB_NETWORK, roots);
     if (scope.Open()) {
         ArgObject(s_call, "attacker", ROK_UNIT, a0);
-        ArgPending(s_call, "projectile");
+        ArgObject(s_call, "projectile", ROK_PROJECTILE, a1);
     }
     s_inner_network->SendProjectileDetonated(a0, a1);
     if (scope.Open()) {
@@ -5547,6 +5583,10 @@ void HookSeams(const bool* on)
         s_rec_weapons.RemoveUnitProjectiles = RecWeaponsRemoveUnitProjectiles;
     if (on[SUB_WEAPONS])
         s_rec_weapons.UpdateUnitWeapons = RecWeaponsUpdateUnitWeapons;
+    if (on[SUB_WEAPONS])
+        s_rec_weapons.WeaponAimCobComplete = RecWeaponsWeaponAimCobComplete;
+    if (on[SUB_WEAPONS])
+        s_rec_weapons.CobScriptExplodePiece = RecWeaponsCobScriptExplodePiece;
     if (on[SUB_TARGETING])
         s_rec_targeting.SetWeaponTargetUnit = RecTargetingSetWeaponTargetUnit;
     if (on[SUB_TARGETING])

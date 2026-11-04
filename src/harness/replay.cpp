@@ -6,9 +6,12 @@
 #include <vector>
 
 #include "replay_schema.h"
+#include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/rand_stream.h"
+#include "../game/los_helpers.h"
+#include "../state/game_rand.h"
 #include "../util/vec3.h"
 #include "../units/unit.h"
 #include "replay_text.h"
@@ -99,52 +102,46 @@ void AddVec3(ReplayText& t, const Vec3* v)
 #pragma push_macro("g_randomSeed")
 #undef g_randomSeed
 
-bool FormatField(const ReplayField& f, ReplayText& out)
+unsigned RandomSeed()
 {
-    out.Clear();
-    const unsigned char* at = nullptr;
-    if (f.base == RB_GAME) {
-        if (g_game == nullptr)
-            return false;
-        at = (const unsigned char*)g_game + f.offset;
-    } else if (f.base == RB_SIM) {
-        if (g_simGlobals == nullptr)
-            return false;
-        at = (const unsigned char*)g_simGlobals + f.offset;
-    } else {
-        if (SimBlockBase() == nullptr)
-            return false;
-        if (f.offset == 2) {
-            if (g_simGlobals == nullptr)
-                return false;
-            out.AddHex32(g_simGlobals->g_randomSeed);
-        } else {
-            out.AddHex32(GameHoldrand((RandStream)f.offset));
-        }
-        return true;
-    }
-    ReplayObjectField view = { f.name, 0, f.size, 0, f.kind, 0 };
-    return ReplayFormatObjectField(view, at, Table(), true, out);
+    return g_simGlobals->g_randomSeed;
 }
 
 #pragma pop_macro("g_randomSeed")
+
+const unsigned char* BlockBase(const ReplayField& f)
+{
+    if (f.base == RB_GAME)
+        return (const unsigned char*)g_game;
+    return f.base == RB_SIM ? (const unsigned char*)g_simGlobals : nullptr;
+}
 
 void CaptureSet(const unsigned char* set, unsigned count, char tag)
 {
     Recording& r = *s_rec[s_sub];
     for (unsigned i = 0; i < count; i++) {
         const ReplayField& f = kReplayFields[set[i]];
-        if (set[i] == RF_GAME_TICKS || !FormatField(f, s_field))
+        if (set[i] == RF_GAME_TICKS)
             continue;
-        if (r.known.Changed(f.name, s_field.Data())) {
-            s_call.Add("  ");
-            s_call.AddChar(tag);
-            s_call.AddChar(' ');
-            s_call.Add(f.name);
-            s_call.AddChar(' ');
-            s_call.Add(s_field.Data());
-            s_call.AddChar('\n');
+        if (f.base == RB_RNG) {
+            if (SimBlockBase() == nullptr || (f.offset == 2 && g_simGlobals == nullptr))
+                continue;
+            s_field.Clear();
+            s_field.AddHex32(f.offset == 2 ? RandomSeed() : GameHoldrand((RandStream)f.offset));
+            if (r.known.Changed(f.name, s_field.Data())) {
+                s_call.Add("  ");
+                s_call.AddChar(tag);
+                s_call.AddChar(' ');
+                s_call.Add(f.name);
+                s_call.AddChar(' ');
+                s_call.Add(s_field.Data());
+                s_call.AddChar('\n');
+            }
+            continue;
         }
+        if (BlockBase(f) == nullptr)
+            continue;
+        ReplayEmitField(s_call, r.known, r.table, tag, f.name, ReplayFieldView(f), BlockBase(f), s_field);
     }
 }
 
@@ -277,21 +274,23 @@ void ArgObject(ReplayText& t, const char* name, unsigned kind, const void* p, co
 
 void ArgStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p)
 {
-    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
-        const ReplayObjectField& f = kReplayObjectFields[i];
-        if (f.object != kind)
-            continue;
-        ReplayFormatObjectField(f, p, Table(), true, s_field);
-        t.Add("  ");
-        t.Add(tag);
-        t.AddChar(' ');
-        t.Add(name);
-        t.AddChar('.');
-        t.Add(f.name);
-        t.AddChar(' ');
-        t.Add(s_field.Data());
-        t.AddChar('\n');
-    }
+    ReplayAddStruct(t, tag, name, kind, p, Table());
+}
+
+void ArgStructs(ReplayText& t, const char* name, unsigned kind, const void* p, int count)
+{
+    ReplayAddStructs(t, "a", name, kind, p, count, Table());
+}
+
+void ArgValueStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p)
+{
+    t.Add("  ");
+    t.Add(tag);
+    t.AddChar(' ');
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddValue(t, kind, p, Table());
+    t.AddChar('\n');
 }
 
 void ArgArgv(ReplayText& t, const CommandArgs* args)
@@ -370,6 +369,18 @@ void ImportVec3Xz(ReplayText& t, const char* label, const Vec3* v)
     t.AddChar(',');
     t.AddInt(v->z);
     t.AddChar(')');
+}
+
+void ImportValueStruct(ReplayText& t, unsigned kind, const void* p)
+{
+    t.AddChar(' ');
+    ReplayAddValue(t, kind, p, Table());
+}
+
+void ImportResultValue(ReplayText& t, unsigned kind, const void* p)
+{
+    t.Add(" = ");
+    ReplayAddValue(t, kind, p, Table());
 }
 
 void ImportPending(ReplayText& t)

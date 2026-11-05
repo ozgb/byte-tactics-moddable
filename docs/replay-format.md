@@ -945,7 +945,8 @@ economy:
 - `UpdatePlayerEconomy` for a player of type 3: type 3 is a remote network player, which only a lobby with network players creates.
 - `UpdatePlayerEconomy` for a unit whose resource slot belongs to another player than the one settled: every unit is created in its owner's part of the unit table and `Reset` ties the slot to that owner, so only a corrupt save could differ.
 - `LoadUnitAccounts` with a missing box: every saved unit has its account box, so only a save from an older build lacks one.
-- The false sides of `SpendEnergy`, `SpendMetal` and `SpendEnergyAndMetal` (not enough in stock): the callers check the stock first.
+- The false sides of `SpendMetal`, `SpendEnergyAndMetal` and the `SpendEnergy` of `TransferMetal` (not enough in stock): their callers check the stock first (`TransferEnergy` and `TransferMetal` cap the amount at the stock in `players.cpp`, and the shot in `UpdateUnitWeapons` fires only when both stocks cover it, `weapons.cpp`).
+- The false side of `SpendEnergy` in the cloak payment of `UpdatePlayerEconomy` (a cloaked unit that cannot pay, which `units.SetStateBits <unit> 4 0` records and which decloaks it): the payment has no stock check, but the one cloaked unit of the recordings, `Unit#3` of `edges-economy-targeting`, pays at all eight calls (ticks 30 to 240, `units.SetStateBits Unit#3 4 1`) from the 60000 energy of `player0.energy`, and no scenario runs a cloaked unit out of energy.
 - An extractor with no COB script: every shipped extractor has one.
 
 targeting:
@@ -955,7 +956,8 @@ targeting:
 - `SetWeaponTargetUnit` with a null target: 3.1c faults on it.
 - `FindWeaponTarget` rejecting a candidate that is not alive or is dying: the candidate list holds only live units, so neither check can fail.
 - `FindWeaponTarget` with the menu option bit 4 of the match flags set: no scenario key sets it.
-- `GetWeaponTargetPos` with the lead condition "the weapon slot has no weapon" failing alone: the setters check it first.
+- `GetWeaponTargetPos` with the lead condition "the weapon slot has no weapon" failing alone: its only caller, `UpdateUnitWeapons`, skips a slot without bit 2 (`weapons.cpp:1529`), and bit 2 means "has a weapon" (`InitUnitWeaponSlots`, `weapons.cpp:1495`).
+- `Unit::ChooseWeapon` returning 1 or 2 (weapon slot 0 empty, slot 1 or 2 defined): no shipped unit has that shape. Checked by reading every `units/*.fbi` and `weapons/*.tdf` of the 30 archives of `~/.ta` (`totala1` to `totala4`, `tactics1` to `tactics8`, `worlds`, `rev31.gp3`, the `.ufo` and `.ccx` files) with the `Hpi` reader of `tools/tdfnumbers.py`: no unit has `weapon1` empty or `noweapon` and `weapon2` or `weapon3` naming a weapon of nonzero `ID`.
 - `GetWeaponTargetPos` with a cruise weapon, or a weapon of speed 0, and a unit with more than five kills (the other lead conditions are met): not reached by the scenario suite; it would need a veteran missile silo or bomber.
 - `ai.GetVisibleEnemiesInRadiusList`: it has no 3.1c call site, only the vector form `ai.GetVisibleEnemiesInRadius` is called, which the recordings carry.
 - A unit target with `unitDefIndex` 0 where the second condition of the guard (the aim target field being nonzero) is false: that condition is always true there.

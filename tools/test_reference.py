@@ -70,6 +70,53 @@ class SoundLogTest(unittest.TestCase):
         self.assertEqual(differing, ["a"])
 
 
+class EventsLogTest(unittest.TestCase):
+    LOG = "bt-events 1\n0 load smoke 0x0 1 2 3 15 900 9\n5 units sound 0x0 0 0\n5 players radar_units 0x0 0800000000000000\n"
+
+    def test_equal_logs(self):
+        self.assertIsNone(reference.events_difference(self.LOG, self.LOG))
+
+    def test_first_differing_line_names_tick_and_phase(self):
+        got = self.LOG.replace("sound 0x0 0 0", "sound 0x0 1 0")
+        self.assertEqual(reference.events_difference(self.LOG, got),
+                         "events line 3 (tick 5, phase units): stored `5 units sound 0x0 0 0`, got `5 units sound 0x0 1 0`")
+
+    def test_a_different_header_has_no_tick(self):
+        self.assertEqual(reference.events_difference(self.LOG, self.LOG.replace("bt-events 1", "bt-events 2")),
+                         "events line 1: stored `bt-events 1`, got `bt-events 2`")
+
+    def test_a_longer_log_differs_at_the_extra_line(self):
+        self.assertEqual(reference.events_difference(self.LOG, self.LOG + "6 meteors message 0x0 0 1\n"),
+                         "events line 5 (tick 6, phase meteors): only the got log has it (`6 meteors message 0x0 0 1`)")
+        short = self.LOG.rsplit("5 players", 1)[0]
+        self.assertEqual(reference.events_difference(self.LOG, short),
+                         "events line 4 (tick 5, phase players): only the stored log has it (`5 players radar_units 0x0 0800000000000000`)")
+
+    def test_a_dropped_line_is_a_difference(self):
+        got = self.LOG + "6 players dropped 3\n"
+        self.assertIn("only the got log has it (`6 players dropped 3`)", reference.events_difference(self.LOG, got))
+
+    def test_report_counts_unstored_logs_and_fails_only_on_stored_ones(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "same.txt").write_text(self.LOG)
+            (directory / "other.txt").write_text(self.LOG)
+            scenarios = {n: Path(n) for n in ("same", "other", "none")}
+            logs = {"same": self.LOG, "other": self.LOG + "x\n", "none": self.LOG}
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                differing, lines = reference.events_report(scenarios, logs, directory)
+        self.assertEqual(differing, ["other"])
+        self.assertIn("1 of 3 equal, 1 differ, 1 with no stored log", lines[-1])
+
+    def test_a_run_with_no_event_log_differs_from_a_stored_one(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "a.txt").write_text(self.LOG)
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                differing, _ = reference.events_report({"a": Path("a")}, {"a": None}, directory)
+        self.assertEqual(differing, ["a"])
+
+
 class UiLogTest(unittest.TestCase):
     LOG = "bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n22 select 1\n"
 
@@ -334,6 +381,7 @@ class CheckRoundtripTest(unittest.TestCase):
                     mock.patch.object(reference, "play_all", fake_play_all), \
                     mock.patch.object(reference, "sound_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "ui_report", lambda *a: ([], [])), \
+                    mock.patch.object(reference, "events_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "report_fuel", lambda *a: 0), \
                     contextlib.redirect_stdout(out):
                 reference.check_traces(Path("x.exe"), None, 1, roundtrip="auto")

@@ -109,6 +109,10 @@ cancel or group line and selects no unit (a click that gives nothing is a broken
 stored log is only counted. `--traces` copies the logs the reference branch wrote into `reference/ui/`. A scenario
 with `input` lines runs at one step per frame even under `--steps-per-frame`.
 
+## Event logs
+
+`--check` compares each run's `events.txt` line by line with `reference/events/<scenario>.txt` when that file exists, and `--traces` copies the logs the reference branch wrote into `reference/events/` (format in [docs/events-log.md](../docs/events-log.md)).
+
 ## Traces
 
 In test mode the exe writes `trace.txt` in its working directory: a hash of the

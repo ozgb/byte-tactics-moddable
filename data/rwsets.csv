@@ -46476,10 +46476,10 @@ address,function,file,kind,target
 ,GetUnitDefTable,src/network/unit_sync.cpp,function,
 ,GetUnitDefTable,src/network/unit_sync.cpp,global_read,g_game
 ,GetVisibleEnemiesInRadiusListNative,src/seams/native.cpp,call,GetVisibleEnemiesInRadius
+,GetVisibleEnemiesInRadiusListNative,src/seams/native.cpp,call,operator=
 ,GetVisibleEnemiesInRadiusListNative,src/seams/native.cpp,call,operator[]
 ,GetVisibleEnemiesInRadiusListNative,src/seams/native.cpp,call,size
-,GetVisibleEnemiesInRadiusListNative,src/seams/native.cpp,deref_write,*unsigned int
-,GetVisibleEnemiesInRadiusListNative,src/seams/native.cpp,field_read,Ref<Unit>::offset
+,GetVisibleEnemiesInRadiusListNative,src/seams/native.cpp,deref_write,*Ref<Unit>
 ,GetVisibleEnemiesInRadiusListNative,src/seams/native.cpp,function,
 ,GetVisibleEnemiesInRadiusNative,src/seams/native.cpp,call,GetVisibleEnemiesInRadius
 ,GetVisibleEnemiesInRadiusNative,src/seams/native.cpp,function,
@@ -52010,7 +52010,7 @@ address,function,file,kind,target
 ,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,global_read,s_call
 ,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,global_read,s_tail
-,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, const Vec3 *, int, int, Unit **, int) __attribute__((stdcall)) [AiSeam::GetVisibleEnemiesInRadiusList]"
+,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, const Vec3 *, int, int, Ref<Unit> *, int) __attribute__((stdcall)) [AiSeam::GetVisibleEnemiesInRadiusList]"
 ,RecAiHasReadyUnitInRange,src/harness/replay_hooks.inc,call,ArgPending
 ,RecAiHasReadyUnitInRange,src/harness/replay_hooks.inc,call,ArgValue
 ,RecAiHasReadyUnitInRange,src/harness/replay_hooks.inc,call,SlotScope::Open

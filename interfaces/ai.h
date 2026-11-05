@@ -6,6 +6,7 @@ template<class T> class allocator;
 template<class T, class A> class vector;
 }
 
+template <class T> struct Ref;
 struct Unit;
 struct Player;
 struct Vec3;
@@ -66,8 +67,8 @@ struct AiSeam {
     void (__stdcall* CmdWeight)(CommandArgs* args);
     // Runs the "limit" console command, which sets the build limits of unit types. Hooks: none.
     void (__stdcall* CmdLimit)(CommandArgs* args);
-    // Writes to out, as block offsets, the first capacity of the enemies a player sees within a radius of a position and returns how many there are. Hooks: none.
-    int (__stdcall* GetVisibleEnemiesInRadiusList)(int player, const Vec3* pos, int radius, int flags, Unit** out, int capacity);
+    // Writes to out, as Ref<Unit>, the first capacity of the enemies a player sees within a radius of a position and returns how many there are. Hooks: none.
+    int (__stdcall* GetVisibleEnemiesInRadiusList)(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);
 };
 
 #endif

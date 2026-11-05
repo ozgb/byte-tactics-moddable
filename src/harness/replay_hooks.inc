@@ -915,7 +915,7 @@ void __stdcall RecAiCmdLimit(CommandArgs* a0)
     }
 }
 
-int __stdcall RecAiGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Unit** a4, int a5)
+int __stdcall RecAiGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_GETVISIBLEENEMIESINRADIUSLIST, SUB_AI, roots);

@@ -13,6 +13,15 @@ tools/oraclekit/README.md). `MANIFEST.json` lists each file's path, sha256 and s
 pair of tags; without both on the commit `export` refuses, and with --untagged it writes `"version": null`.
 Any path under FORBIDDEN, and any file the table does not list, is refused with its path named, and so is a
 generated file or the fuel pass that still names a source (SOURCE_NAME).
+
+`layout.json` carries no `layout_refs`: they name the decompilation's functions, files and globals, and the globals
+are not records of the state block. After the files are written, `leak_check` runs tools/speclint.py's address,
+identifier and token-run rules over every text file of the kit and the export fails on a hit. The fenced-block rule
+is not applied: the kit documents use `sh` and `json` fences for commands and schema examples. The identifiers a
+file may use are those the kit's structured data defines (`allowed_identifiers`: the json, the interface headers and
+everything under reference/ and tests/replay/), never the checked text itself. The interface headers declare the names
+and are the source's own declarations, so only the address rule applies to them, and the export strips their
+address-marker lines (`// FUNCTION: 0x...`, `// GLOBAL: 0x...`) before the check and the manifest digests.
 """
 
 from __future__ import annotations
@@ -28,6 +37,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import speclint
+
 ROOT = Path(__file__).resolve().parent.parent
 TOOL_VERSION = 1
 MANIFEST = "MANIFEST.json"
@@ -38,7 +49,6 @@ MODULES = "wasm/modules.json"
 FUEL_PASS = "tools/wasm_fuel.py"
 MODULE_SOURCE_FIELDS = ("cxx", "c")
 SOURCE_NAME = re.compile(r"(?<![\w.-])(?:src|include|orig|lib|build|cmake)/|\.(?:cpp|c|h)\b")
-LAYOUT_REFS = "data/layout_refs.csv"
 FORBIDDEN = ("src/", "include/", "orig/", "lib/", "build/", "cmake/")
 TAG_PATTERNS = {"interfaces": re.compile(r"^interfaces-v(\d+)$"),
                 "reference_traces": re.compile(r"^reference-traces-v(\d+)$")}
@@ -197,11 +207,6 @@ def verify(out: Path) -> list[str]:
     return problems
 
 
-def layout_refs_rows(root: Path) -> list[dict]:
-    """The rows of data/layout_refs.csv."""
-    return list(csv.DictReader(io.StringIO(blob(root, LAYOUT_REFS).decode(), newline="")))
-
-
 ANONYMOUS = re.compile(r"\((anonymous|unnamed)(?: \w+)? at [^)]*\)")
 SIZE_PROBE = re.compile(r"char\[(\d+)\] s(\d+)$", re.M)
 
@@ -283,7 +288,7 @@ def fill_sizes(includes: list[str], records: dict[str, dict], flags: list[str], 
 
 
 def generate_layout(root: Path, build_dir: Path, run=None) -> dict:
-    """The layout.json document: every record the block holds, the role-tagged records and the layout_refs rows."""
+    """The layout.json document: every record the block holds and the role-tagged records."""
     import layoutasserts
     run = run or layoutasserts.run_clang
     names, homes, cpp_only = layoutasserts.block_types()
@@ -306,7 +311,7 @@ def generate_layout(root: Path, build_dir: Path, run=None) -> dict:
         raise SystemExit("oraclekit: %d of %d field sizes could not be read from clang" % (total - unsized, total))
     for role, name in ROLES.items():
         records[name]["role"] = role
-    return {"layout_version": 1, "records": records, "layout_refs": layout_refs_rows(root)}
+    return {"layout_version": 1, "records": records}
 
 
 def kit_modules(data: bytes) -> bytes:
@@ -331,6 +336,65 @@ def check_names(files: dict[str, bytes]) -> None:
             raise Refusal("refused: %s names the source: %s" % (path, ", ".join(found)))
 
 
+STRUCTURED_DIRS = ("interfaces/", "tests/replay/", "reference/")
+DECLARED_DIRS = ("interfaces/",)
+
+
+def text_of(data: bytes) -> str | None:
+    """The text of a file, None when it is binary."""
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return None
+
+
+def structured(path: str) -> bool:
+    """Whether a kit file defines names: the json, the interface headers, the stored reference data and the recordings."""
+    return path.endswith(".json") or path.startswith(STRUCTURED_DIRS)
+
+
+def structured_text(files: dict[str, bytes]) -> str:
+    """The text of the kit's files that define names, and the kit's own file names."""
+    parts = [path.replace("/", " ") for path in files]
+    for path in sorted(files):
+        if structured(path) and (text := text_of(files[path])) is not None:
+            parts.append(text)
+    return "\n".join(parts)
+
+
+def allowed_identifiers(files: dict[str, bytes]) -> set[str]:
+    """The identifiers the kit defines: layout.json record and field names, the trace schema's field names, the manifest's names,
+    the interface headers' names, the replay and scenario names, and the kit's file names; not the names in a kit document."""
+    return speclint.identifiers(structured_text(files))
+
+
+def leak_check(files: dict[str, bytes], root: Path, run: int = speclint.DEFAULT_RUN, index=None) -> list[str]:
+    """One line per hit of speclint's address, identifier and token-run rules over every text file of the export."""
+    source_ids, source_runs, literals = index if index is not None else speclint.source_index(root, run)
+    kit = structured_text(files)
+    allowed = speclint.identifiers(kit)
+    hits: list[str] = []
+    for path in sorted(files):
+        text = text_of(files[path])
+        if text is None:
+            continue
+        for number, message in speclint.lint(text, source_ids, allowed, source_runs, run, literals, kit):
+            if message.startswith("fenced block"):
+                continue
+            if path.startswith(DECLARED_DIRS) and not message.startswith("address or marker"):
+                continue
+            hits.append("%s:%d: %s" % (path, number, message))
+    return hits
+
+
+MARKER_LINE = re.compile(rb"^[ \t]*//[ \t]*(?:FUNCTION|GLOBAL):[ \t]*0x[0-9a-fA-F]+.*(?:\r?\n|$)", re.M)
+
+
+def strip_markers(path: str, data: bytes) -> bytes:
+    """An interface header without its whole `// FUNCTION:` and `// GLOBAL:` address-marker lines; other files as they are."""
+    return MARKER_LINE.sub(b"", data) if path.startswith(DECLARED_DIRS) else data
+
+
 def check_target(out: Path) -> None:
     """Refuse a target that is a file or a directory with something in it."""
     if out.exists() and not out.is_dir():
@@ -339,12 +403,12 @@ def check_target(out: Path) -> None:
         raise Refusal("refused: %s is not empty" % out)
 
 
-def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, lister=tracked) -> dict:
-    """Write the kit to `out` and return its manifest. Nothing is written when the export is refused."""
+def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, lister=tracked, leaks=None) -> dict:
+    """Write the kit to `out` and return its manifest. Nothing is written when the export is refused or leaks (`leaks` replaces leak_check in tests)."""
     paths = select(root, contents, lister)
     tags = version_tags(root)
     version = check_tags(tags, untagged)
-    files = {p: blob(root, p) for p in paths}
+    files = {p: strip_markers(p, blob(root, p)) for p in paths}
     files[LAYOUT] = (json.dumps(layout, indent=1, sort_keys=False) + "\n").encode()
     try:
         files[MODULES] = kit_modules(blob(root, MODULES))
@@ -352,6 +416,9 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
         raise Refusal("refused: %s has no tracked file" % MODULES)
     check_names(files)
     files[README] = blob(root, README_SOURCE)
+    hits = (leaks or leak_check)(files, root)
+    if hits:
+        raise Refusal("refused: the kit leaks the decompilation:\n" + "\n".join(hits))
     manifest = manifest_of(files, git(root, "rev-parse", "HEAD").strip(), tags, version)
     check_target(out)
     for path, data in files.items():

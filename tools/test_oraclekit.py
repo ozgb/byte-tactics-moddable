@@ -114,7 +114,7 @@ def git(root: Path, *args: str) -> None:
 def repo(tmp: str, extra: dict[str, str] | None = None) -> Path:
     root = Path(tmp)
     files = {"docs/a.md": "alpha\n", "data/x.json": "{}\n", "data/y/z.txt": "z\n", oraclekit.README_SOURCE: "readme\n",
-             oraclekit.LAYOUT_REFS: "function\n", oraclekit.MODULES: MODULES_TEXT, **(extra or {})}
+             "data/layout_refs.csv": "function\n", oraclekit.MODULES: MODULES_TEXT, **(extra or {})}
     for path, text in files.items():
         (root / path).parent.mkdir(parents=True, exist_ok=True)
         (root / path).write_text(text)
@@ -436,6 +436,93 @@ class KitDocumentsTest(unittest.TestCase):
         self.assertGreater(len(keys), 20)
         missing = ["%s (used by %s)" % (key, scenario) for key, scenario in sorted(keys.items()) if "`%s`" % key not in spec]
         self.assertEqual(missing, [])
+
+
+LEAK_SOURCE = """\
+// FUNCTION: 0x437de0
+void UpdateMeteorShower(int tickCount)
+{
+    if (g_meteorNextStrike <= (unsigned int)tickCount) {
+        localTargetZ = (int)((__int64)GameRand(RAND_STREAM_MAIN) * g_game->height / 0x8000);
+        StartScript(script, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+    }
+}
+"""
+LEAK_LAYOUT = json.dumps({"records": {"Game": {"fields": [{"name": "height"}, {"name": "meteorTimer"}]}}})
+
+
+def leak_files(doc: str) -> dict[str, bytes]:
+    return {"layout.json": LEAK_LAYOUT.encode(), "docs/a.md": doc.encode(), "reference/frames/f.bin": b"\xff\xfe0x437de0"}
+
+
+class LeakCheckTest(unittest.TestCase):
+    def check(self, doc: str) -> list[str]:
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "meteors.cpp").write_text(LEAK_SOURCE)
+            return oraclekit.leak_check(leak_files(doc), Path(tmp))
+
+    def test_a_clean_document_passes(self):
+        self.assertEqual(self.check("# a\n\nThe `meteorTimer` field of `Game` counts down; `height` is the map height.\n\n```sh\nuv run tools/x.py\n```\n"), [])
+
+    def test_an_address_is_a_hit_and_binary_files_are_skipped(self):
+        hits = self.check("The strike is at 0x437de0.\n")
+        self.assertEqual(len(hits), 1)
+        self.assertTrue(hits[0].startswith("docs/a.md:1:") and "0x437de0" in hits[0], hits)
+
+    def test_a_source_identifier_is_a_hit_and_a_layout_name_is_not(self):
+        hits = self.check("Use `UpdateMeteorShower` and `meteorTimer`.\n")
+        self.assertEqual(len(hits), 1)
+        self.assertIn("UpdateMeteorShower", hits[0])
+
+    def test_a_name_in_the_checked_document_does_not_allow_itself(self):
+        files = leak_files("The `g_meteorNextStrike` global.\n")
+        self.assertNotIn("g_meteorNextStrike", oraclekit.allowed_identifiers(files))
+
+    def test_a_long_token_run_of_the_source_is_a_hit(self):
+        hits = self.check("Call StartScript(script, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0) now.\n")
+        self.assertTrue(any("tokens matches the source" in h for h in hits), hits)
+
+    def test_fenced_blocks_of_any_kind_are_allowed(self):
+        self.assertEqual(self.check("```json\n{\"a\": 1}\n```\n"), [])
+
+    def test_interface_headers_are_checked_for_addresses_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "meteors.cpp").write_text(LEAK_SOURCE)
+            header = "void UpdateMeteorShower(int tickCount);\nCall StartScript(script, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);\n"
+            files = {**leak_files("ok\n"), "interfaces/m.h": header.encode()}
+            self.assertEqual(oraclekit.leak_check(files, Path(tmp)), [])
+            files["interfaces/m.h"] = (header + "// FUNCTION: 0x437de0\n").encode()
+            self.assertEqual(len(oraclekit.leak_check(files, Path(tmp))), 2)
+
+    def test_the_export_strips_address_marker_lines_from_interfaces(self):
+        header = "int a;\n    // FUNCTION: 0x4c54a0 ??0X@@QAE@XZ\nint b;\n// GLOBAL: 0x4fc490\n// kept comment\n"
+        self.assertEqual(oraclekit.strip_markers("interfaces/x.h", header.encode()), b"int a;\nint b;\n// kept comment\n")
+        self.assertEqual(oraclekit.strip_markers("docs/x.md", header.encode()), header.encode())
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {"interfaces/x.h": header})
+            kit = Path(out) / "k"
+            manifest = oraclekit.export(root, kit, True, {"records": {}}, CONTENTS + [("dir", "interfaces", "")])
+            stripped = (kit / "interfaces" / "x.h").read_bytes()
+            self.assertNotIn(b"0x4c54a0", stripped)
+            entry = next(f for f in manifest["files"] if f["path"] == "interfaces/x.h")
+            self.assertEqual(entry["sha256"], hashlib.sha256(stripped).hexdigest())
+
+    def test_stored_reference_data_defines_names(self):
+        files = {**leak_files("ok\n"), "reference/sounds/a.txt": b"count1 6\n"}
+        self.assertIn("count1", oraclekit.allowed_identifiers(files))
+
+    def test_a_leaking_document_stops_the_export_before_it_writes(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {"docs/a.md": "see 0x437de0\n"})
+            kit = Path(out) / "k"
+            with self.assertRaises(oraclekit.Refusal) as caught:
+                run_export(root, kit)
+            self.assertIn("docs/a.md:1:", str(caught.exception))
+            self.assertFalse(kit.exists())
 
 
 if __name__ == "__main__":

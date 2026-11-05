@@ -560,7 +560,7 @@ For each interface in the module's `majors`:
 - The **same** major: nothing to do.
 - An **older** major: for each slot (own interface) or import (a group) of the module, compare its
   signature with the manifest's current one. Equal: nothing to do. Different: the manifest must
-  have an adapter for `(interface, from_major, name)`. With none, the load is refused with an error
+  have an adapter for the interface, the older major and the name. With none, the load is refused with an error
   naming the module, the interface, the slot or import and both majors. An adapter the loader cannot
   build (below) is refused with the reason.
 

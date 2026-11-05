@@ -19,9 +19,9 @@ class TdfFile;
 struct PlayersSeam {
     // Advances every player's state for one tick.
     void (__stdcall* UpdatePlayers)(void);
-    // Moves metal from one player to another, clamped to what the sender has, and announces it when flag is set. Hooks: none.
-    void (__stdcall* TransferMetal)(unsigned char from, unsigned char to, float amount, int flag);
     // Moves energy from one player to another, clamped to what the sender has, and announces it when flag is set. Hooks: none.
+    void (__stdcall* TransferMetal)(unsigned char from, unsigned char to, float amount, int flag);
+    // Moves metal from one player to another, clamped to what the sender has, and announces it when flag is set. Hooks: none.
     void (__stdcall* TransferEnergy)(unsigned char from, unsigned char to, float amount, int flag);
     // Returns the energy a player makes per tick. Hooks: none.
     float (__stdcall* GetEnergyIncome)(Player* player);

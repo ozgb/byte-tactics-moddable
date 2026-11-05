@@ -11,7 +11,10 @@ stored access-log summaries.
 This is step 4 of #830 (#838). Its input is data/access_phases/<scenario>.<kind>.csv.gz, written by
 tools/accesslog.py (#835) next to the edges file that tools/depclass.py (#836) reads, with the rows of the
 `presentation` window dropped or, for a row that touches it, its count dropped (the frames drawn between two ticks
-follow the wall clock), gzipped with a zero mtime and sorted. The kinds:
+follow the wall clock), gzipped with a zero mtime and sorted. A cross row whose reader is `presentation` is dropped
+by --store whatever its phases: whether and how often presentation reads follows the wall clock, and
+data/presentation_reads.csv (#839) records those reads, by presence per run. So two --store runs of the same build
+give the same bytes. The kinds:
 
   cross    writer,reader,item,phase_from,phase_to,evidence,count,first_tick. A read in phase_to of an item last written
            in phase_from by another subsystem. `read-after-write` has phase_from before phase_to in the same tick;
@@ -25,8 +28,14 @@ follow the wall clock), gzipped with a zero mtime and sorted. The kinds:
            of the edges files; tools/depclass.py reads it with them and classes its rows `ordered`.
 
 data/phase_dependencies.csv has the columns writer,reader,item,phase_from,phase_to,class,runs,example,flags, sorted. A
-row is an edge between two different simulation subsystems (coupling.SIM_SUBSYSTEMS) across phases, and also, with
-phase_to `presentation`, from a simulation subsystem to `presentation`. Items `unresolved:*` are dropped. The class is
+row is an edge between two different simulation subsystems (coupling.SIM_SUBSYSTEMS, as tools/depclass.py counts
+them) across phases. A row whose reader is `presentation` is left out of it and of data/phase_boundaries.csv, in
+--write and in --check alike, because the stored files no longer hold it and data/presentation_reads.csv covers it. A row
+whose writer is `presentation` and whose reader is a simulation subsystem stays in it, and --check fails on each such
+row with a message that names it: presentation must not feed the simulation except through the player view. --write
+refuses too: it prints the same message, returns 1 and writes none of the four files, so that a violation is not
+committed as if it were data. A row with any other writer outside the simulation subsystems is dropped. Items
+`unresolved:*` are dropped. The class is
 `immediate` when a run shows a read in phase_to of what phase_from wrote earlier in the tick (the reader needs the
 writer's phase to come first), and `carried` when a run shows a read in phase_to of what phase_from, a later phase,
 wrote in the tick before (the reader needs the writer's phase to come after it; the order of a tick's phases is
@@ -37,7 +46,7 @@ data/phase_boundaries.csv has one row per boundary between two windows of a tick
 mode runs marker 0, so there is no `net` window), `1|2` to `6|7`, `7|tail` and `tail|presentation`. `needed` is `yes`
 when an `immediate` row spans it (phase_from up to the boundary, phase_to after it; for `tail|presentation`, a row
 whose phase_to is `presentation`), `edges` counts those rows, `direct` counts those that span no other boundary (phase_from just before it, phase_to just after; for
-`tail|presentation`, all of them), `carried` counts the `carried` rows that span it the
+`tail|presentation`, all of them; no row ends in `presentation` unless its reader is a simulation subsystem), `carried` counts the `carried` rows that span it the
 other way (phase_to up to the boundary, phase_from after it), and `mergeable` is `yes` when both are 0: no state
 that the runs saw crosses it, so the two windows could be merged or run in the other order without a read seeing a
 different value. `example` is the `example` of the spanning `immediate` row with the most runs. If the contract were
@@ -115,6 +124,8 @@ def reduce_rows(kind: str, rows: list[dict]) -> list[dict]:
     """The rows of a phase file as stored: without what follows the wall clock, sorted."""
     keep = []
     for r in rows:
+        if kind == "cross" and r["reader"] == PRESENTATION:
+            continue
         if kind == "cross" and PRESENTATION in (r["phase_from"], r["phase_to"]):
             r = {**r, "count": "0"}
         elif kind == "draws" and r["pass"] == PRESENTATION:
@@ -170,17 +181,16 @@ def phase_dependencies(cross: dict[str, list[dict]], coupling_rows: list[dict]) 
         for r in rows:
             writer, reader, item = r["writer"], r["reader"], r["item"]
             cls = EVIDENCE_CLASS[r["evidence"]]
-            to_presentation = r["phase_to"] == PRESENTATION and reader == PRESENTATION
-            if writer not in sim or writer == reader or item.startswith("unresolved:"):
+            if writer == reader or item.startswith("unresolved:") or reader not in sim:
                 continue
-            if reader not in sim and not to_presentation:
+            if writer not in sim and writer != PRESENTATION:
                 continue
             hit(hits, (writer, reader, item, r["phase_from"], r["phase_to"], cls), scenario, int(r["first_tick"]))
     pairs = {(c["from"], c["to"]) for c in coupling_rows}
     out = []
     for key, runs in hits.items():
         writer, reader = key[0], key[1]
-        flags = depclass.DYNAMIC_ONLY if reader in sim and (writer, reader) not in pairs else ""
+        flags = depclass.DYNAMIC_ONLY if (writer, reader) not in pairs else ""
         out.append({"writer": writer, "reader": reader, "item": key[2], "phase_from": key[3], "phase_to": key[4],
                     "class": key[5], "runs": len(runs), "example": best_example(runs), "flags": flags})
     return sorted(out, key=lambda r: (r["writer"], r["reader"], r["item"], r["phase_from"], r["phase_to"], r["class"]))
@@ -276,6 +286,9 @@ def problems_of(directory: Path, tables: dict[str, list[dict]]) -> list[str]:
         for name in sorted(set(names) - have):
             problems.append("no summary data/access_phases/%s.%s.csv.gz for reference/scenarios/%s.txt" % (name, kind, name))
     for r in tables["phase_dependencies"]:
+        if r["writer"] == PRESENTATION:
+            problems.append("phase_dependencies row %s -> %s, item %s, %s to %s (%s): presentation feeds the simulation, "
+                            "which it may do only through the player view" % (r["writer"], r["reader"], r["item"], r["phase_from"], r["phase_to"], r["class"]))
         for phase in (r["phase_from"], r["phase_to"]):
             if phase not in PHASE_INDEX:
                 problems.append("phase_dependencies row with an unknown phase %s" % phase)
@@ -331,6 +344,10 @@ def main() -> int:
         return 0
     tables = build(PHASES_DIR, depclass.read_coupling(depclass.COUPLING_CSV.read_text()))
     if args.write:
+        problems = [p for p in problems_of(PHASES_DIR, tables) if "presentation feeds" in p]
+        if problems:
+            print("\n".join(problems))
+            return 1
         for name, (path, columns) in OUTPUTS.items():
             path.write_text(render_rows(columns, tables[name]))
         print("phaseclass: " + ", ".join("%d %s" % (len(tables[n]), n) for n in OUTPUTS))

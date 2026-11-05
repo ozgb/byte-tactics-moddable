@@ -51,9 +51,21 @@ class PhaseDependencies(unittest.TestCase):
                     "units,game,Unit::x,units,players,%s,1" % RAW, "units,weapons,unresolved:block,units,players,%s,1" % RAW)
         self.assertEqual(rows, [])
 
-    def test_a_simulation_writer_to_the_presentation_reader_is_kept_only_in_the_presentation_window(self):
-        rows = deps("units,presentation,Unit::x,tail,presentation,%s,1" % RAW, "units,presentation,Unit::x,units,players,%s,1" % RAW)
-        self.assertEqual([(r["phase_from"], r["phase_to"], r["flags"]) for r in rows], [("tail", "presentation", "")])
+    def test_a_presentation_reader_is_left_out(self):
+        rows = deps("units,presentation,Unit::x,tail,presentation,%s,1" % RAW, "units,presentation,Unit::x,units,players,%s,1" % RAW,
+                    "units,weapons,Unit::x,units,players,%s,1" % RAW)
+        self.assertEqual([r["reader"] for r in rows], ["weapons"])
+        boundaries = by_key(pc.phase_boundaries(rows), "boundary")
+        self.assertEqual((boundaries["tail|presentation"]["needed"], boundaries["tail|presentation"]["edges"]), ("no", 0))
+
+    def test_a_presentation_writer_and_sim_reader_row_stays_and_fails_the_check(self):
+        rows = deps("presentation,weapons,Unit::x,units,players,%s,1" % RAW, "presentation,game,Unit::x,units,players,%s,1" % RAW)
+        self.assertEqual([(r["writer"], r["reader"]) for r in rows], [("presentation", "weapons")])
+        with tempfile.TemporaryDirectory() as t:
+            tables = {"phase_dependencies": rows, "phase_boundaries": pc.phase_boundaries(rows), "pass_reads": []}
+            problems = [p for p in pc.problems_of(Path(t), tables) if "presentation feeds" in p]
+            self.assertEqual(len(problems), 1)
+            self.assertIn("presentation -> weapons, item Unit::x, units to players", problems[0])
 
     def test_runs_example_and_both_classes_of_one_key(self):
         a = cross("units,weapons,Unit::x,units,players,%s,9" % RAW)
@@ -96,7 +108,7 @@ class Boundaries(unittest.TestCase):
         self.assertEqual(rows["2|3"]["carried"], 1)
 
     def test_the_presentation_boundary_counts_the_rows_that_end_in_it(self):
-        rows = self.rows("units,presentation,Unit::x,units,presentation,%s,2" % RAW)
+        rows = self.rows("units,weapons,Unit::x,units,presentation,%s,2" % RAW)
         self.assertEqual((rows["tail|presentation"]["needed"], rows["tail|presentation"]["edges"]), ("yes", 1))
         self.assertEqual([r["needed"] for k, r in rows.items() if k not in ("0|1", "tail|presentation")], ["no"] * 7)
 
@@ -150,7 +162,7 @@ class Store(unittest.TestCase):
             src, dst = Path(t) / "src", Path(t) / "dst"
             src.mkdir()
             (src / "s.edges.csv").write_text("writer,reader,item,phase,evidence,count,first_tick\n")
-            (src / "s.cross.csv").write_text(CROSS + 'b,c,"i",tail,presentation,read-after-write,99,4\na,c,"i",units,tail,read-after-write,7,2\n')
+            (src / "s.cross.csv").write_text(CROSS + 'b,c,"i",tail,presentation,read-after-write,99,4\nb,presentation,"i",tail,units,read-after-write,5,4\na,c,"i",units,tail,read-after-write,7,2\n')
             (src / "s.draws.csv").write_text(DRAWS + 'presentation,rng.parkMiller,game,"F",1,1,1,9,1,0,""\nunits,rng.parkMiller,game,"F",1,1,1,9,1,0,""\n')
             (src / "s.pass.csv").write_text(PASS + 'units,"i",ai,"F",same-record,1,1\n')
             (src / "s.ordered.csv").write_text("writer,reader,item,phase,evidence,count,first_tick\na,b,\"sim-event\",presentation,ordered,5,1\na,b,\"sim-event\",units,ordered,5,1\n")
@@ -160,6 +172,7 @@ class Store(unittest.TestCase):
             self.assertEqual(first, {p.name: p.read_bytes() for p in dst.iterdir()})
             cross_rows = pc.load_kind(dst, "cross")["s"]
             self.assertEqual([(r["writer"], r["count"]) for r in cross_rows], [("a", "7"), ("b", "0")])
+            self.assertNotIn("presentation", [r["reader"] for r in cross_rows])
             self.assertEqual([r["pass"] for r in pc.load_kind(dst, "draws")["s"]], ["units"])
             self.assertEqual([r["phase"] for r in pc.load_kind(dst, "ordered")["s"]], ["units"])
             self.assertIn(b"s.cross.csv.gz", b" ".join(k.encode() for k in first))
@@ -187,6 +200,8 @@ class DepclassChecksThePhaseFiles(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             outputs = {n: (Path(t) / p.name, c) for n, (p, c) in pc.OUTPUTS.items()}
             tables = pc.build(pc.PHASES_DIR, depclass.read_coupling(depclass.COUPLING_CSV.read_text()))
+            tables["phase_dependencies"] = [r for r in tables["phase_dependencies"] if r["writer"] != pc.PRESENTATION]
+            tables["phase_boundaries"] = pc.phase_boundaries(tables["phase_dependencies"])
             for name, (path, columns) in outputs.items():
                 path.write_text(pc.render_rows(columns, tables[name]))
             self.assertEqual(pc.check(pc.PHASES_DIR, tables, outputs), [])

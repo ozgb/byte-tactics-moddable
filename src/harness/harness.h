@@ -4,6 +4,7 @@
 struct Unit;
 
 void __stdcall HarnessInit(char* cmdLine);
+void __stdcall HarnessExit();
 unsigned __stdcall HarnessStepsPerFrame();
 unsigned __stdcall HarnessGameSeed(unsigned live);
 unsigned __stdcall HarnessCrtSeed(unsigned live);

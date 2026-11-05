@@ -1387,6 +1387,42 @@ static void ParseQuirksSwitch(char* cmdLine)
     }
 }
 
+static int s_recordSwitch = 0;
+
+static void ParseRecordSwitch(char* cmdLine)
+{
+    for (char* p = cmdLine; *p != '\0'; p++) {
+        if ((p[0] == '-' || p[0] == '/') && _strnicmp(p + 1, "record", 6) == 0 && isspace((unsigned char)p[7])
+            && (p == cmdLine || isspace((unsigned char)p[-1]))) {
+            char* q = p + 7;
+            while (*q == ' ' || *q == '\t')
+                q++;
+            char* start = q;
+            while (*q != '\0' && !isspace((unsigned char)*q))
+                q++;
+            char spec[100];
+            int n = (int)(q - start);
+            if (n == 0 || n >= (int)sizeof spec)
+                Fail("-record: needs <subsystem>[:first:last]\n");
+            memcpy(spec, start, n);
+            spec[n] = '\0';
+            for (char* c = spec; *c != '\0'; c++) {
+                if (*c == ':')
+                    *c = ' ';
+            }
+            char detail[200];
+            if (!ReplayConfigure(spec, detail, sizeof detail)) {
+                char msg[300];
+                sprintf(msg, "-record%s\n", detail);
+                Fail(msg);
+            }
+            s_recordSwitch = 1;
+            memset(p, ' ', q - p);
+            p = q - 1;
+        }
+    }
+}
+
 static void ResolveQuirks()
 {
     Quirks set;
@@ -1406,6 +1442,19 @@ static void ResolveQuirks()
     }
     g_quirks = set;
     s_quirkHash = QuirksHash(g_quirks);
+}
+
+void HarnessExit()
+{
+    if (!s_recordSwitch)
+        return;
+    char error[300];
+    error[0] = '\0';
+    if (!ReplayWrite(error, sizeof error)) {
+        char text[360];
+        sprintf(text, "-record: cannot write a replay file%s%s\n", error[0] == '\0' ? "" : ": ", error);
+        Fail(text);
+    }
 }
 
 void HarnessInit(char* cmdLine)
@@ -1432,7 +1481,9 @@ void HarnessInit(char* cmdLine)
     }
     if (flag == NULL) {
         s_viewState = (unsigned)time(0);
+        ParseRecordSwitch(cmdLine);
         ResolveQuirks();
+        ReplayInstall();
         return;
     }
     ParseTestDump(cmdLine);

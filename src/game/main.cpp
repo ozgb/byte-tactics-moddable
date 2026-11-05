@@ -241,6 +241,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         }
     }
 
+    HarnessExit();
     if (g_displayContext.flags.bits.quitting) {
         ShutdownMouse();
         ShutdownGame();

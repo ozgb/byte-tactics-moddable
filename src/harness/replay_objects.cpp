@@ -55,6 +55,64 @@ unsigned HexDigit(char c)
     return (unsigned)(c <= '9' ? c - '0' : (c | 0x20) - 'a' + 10);
 }
 
+unsigned DecodeQuoted(const char* value, unsigned char* out, unsigned size)
+{
+    unsigned n = 0;
+    const char* p = value;
+    if (*p == '"')
+        p++;
+    for (; *p != '\0' && *p != '"'; p++) {
+        char c = *p;
+        if (c == '\\') {
+            p++;
+            if (*p == 'n')
+                c = '\n';
+            else if (*p == 'r')
+                c = '\r';
+            else if (*p == 't')
+                c = '\t';
+            else if (*p == 'x') {
+                unsigned v = 0;
+                for (int i = 1; i <= 2; i++) {
+                    char d = p[i];
+                    v = v << 4 | (unsigned)(d <= '9' ? d - '0' : d - 'a' + 10);
+                }
+                c = (char)v;
+                p += 2;
+            } else
+                c = *p;
+        }
+        if (n < size)
+            out[n++] = (unsigned char)c;
+    }
+    return n;
+}
+
+void AddCString(ReplayText& out, bool ref, const unsigned char* slot)
+{
+    out.AddString(ref ? (const char*)BlockAt(*(const unsigned*)slot) : *(const char* const*)slot);
+
+}
+
+bool StoreCString(bool ref, unsigned char* slot, const char* value, ReplayAllocFn alloc)
+{
+    unsigned char* text = nullptr;
+    if (strcmp(value, "null") != 0) {
+        if (value[0] != '"' || alloc == nullptr)
+            return false;
+        unsigned size = (unsigned)strlen(value);
+        text = (unsigned char*)alloc(size + 1);
+        if (text == nullptr)
+            return false;
+        text[DecodeQuoted(value, text, size)] = '\0';
+    }
+    if (ref)
+        *(unsigned*)slot = text == nullptr ? 0u : (unsigned)(text - (unsigned char*)SimBlockBase());
+    else
+        *(unsigned char**)slot = text;
+    return true;
+}
+
 bool TableSpan(unsigned kind, unsigned char** base, unsigned* count, unsigned* stride)
 {
     unsigned table = kReplayObjectKinds[kind].table;
@@ -519,6 +577,35 @@ void AddBracket(ReplayText& out, unsigned length, unsigned capacity)
     out.AddChar(']');
 }
 
+unsigned char* StringsAt(const ReplayObjectField& f, const void* object)
+{
+    const ReplayArraySpec& a = kReplayArrays[f.array - 1];
+    unsigned char* at = (unsigned char*)object + f.offset;
+    if (a.raw)
+        return *(unsigned char**)at;
+    return a.ref ? BlockAt(*(const unsigned*)at) : at;
+}
+
+unsigned StringsLength(const ReplayObjectField& f, const void* object)
+{
+    const ReplayArraySpec& a = kReplayArrays[f.array - 1];
+    unsigned n = ReplayLengthOf(a.length, object);
+    unsigned room = a.ref || a.raw ? n : a.capacity / (unsigned)sizeof(unsigned);
+    return n < room ? n : room;
+}
+
+void FormatCStrings(const ReplayObjectField& f, const void* object, ReplayText& out)
+{
+    const ReplayArraySpec& a = kReplayArrays[f.array - 1];
+    if ((a.ref || a.raw) && StringsAt(f, object) == nullptr) {
+        out.Add("null");
+        return;
+    }
+    out.AddChar('[');
+    out.AddUnsigned(StringsLength(f, object));
+    out.AddChar(']');
+}
+
 void FormatVector(const ReplayObjectField& f, const void* object, ReplayObjectTable& table, bool assign, ReplayText& out)
 {
     VectorView view = ViewOf(f, object);
@@ -877,6 +964,13 @@ bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, Rep
     case RK_SELFINDEX:
         FormatSelfIndex(f, object, out);
         break;
+    case RK_CSTRING:
+    case RK_CSTRINGREF:
+        AddCString(out, f.kind == RK_CSTRINGREF, at);
+        break;
+    case RK_CSTRINGS:
+        FormatCStrings(f, object, out);
+        break;
     default:
         return false;
     }
@@ -1079,8 +1173,12 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
     case RK_REFS:
     case RK_UNITID:
     case RK_ARRAY:
+    case RK_CSTRINGS:
     case RK_SELF:
         return false;
+    case RK_CSTRING:
+    case RK_CSTRINGREF:
+        return StoreCString(f.kind == RK_CSTRINGREF, at, value, alloc);
     case RK_SELFINDEX:
         return RestoreSelfIndex(f, object, value);
     case RK_CODE:
@@ -1098,38 +1196,10 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
         ((short*)at)[1] = (short)y;
         break;
     }
-    case RK_STRING: {
+    case RK_STRING:
         memset(at, 0, f.size);
-        unsigned n = 0;
-        const char* p = value;
-        if (*p == '"')
-            p++;
-        for (; *p != '\0' && *p != '"'; p++) {
-            char c = *p;
-            if (c == '\\') {
-                p++;
-                if (*p == 'n')
-                    c = '\n';
-                else if (*p == 'r')
-                    c = '\r';
-                else if (*p == 't')
-                    c = '\t';
-                else if (*p == 'x') {
-                    unsigned v = 0;
-                    for (int i = 1; i <= 2; i++) {
-                        char d = p[i];
-                        v = v << 4 | (unsigned)(d <= '9' ? d - '0' : d - 'a' + 10);
-                    }
-                    c = (char)v;
-                    p += 2;
-                } else
-                    c = *p;
-            }
-            if (n < f.size)
-                at[n++] = (unsigned char)c;
-        }
+        DecodeQuoted(value, at, f.size);
         break;
-    }
     case RK_WEAPON: {
         void* weapon = ReplayParseWeapon(value);
         if (weapon == nullptr && strcmp(value, "null") != 0)
@@ -1625,6 +1695,22 @@ void EmitVector(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, c
     if (spec.mode == RV_OBJECT)
         return;
     VectorView view = ViewOf(f, object);
+    if (spec.mode == RV_CSTRING || spec.mode == RV_CSTRINGREF) {
+        ReplayText text;
+        ReplayText name;
+        for (unsigned i = 0; i < view.length; i++) {
+            text.Clear();
+            AddCString(text, spec.mode == RV_CSTRINGREF, view.data + i * view.size);
+            ElementKey(name, key, i);
+            if (i >= before)
+                known.Set(name.Data(), text.Data());
+            if (i >= before || known.Changed(name.Data(), text.Data()))
+                EmitLine(out, tag, name.Data(), text.Data());
+        }
+        text.Free();
+        name.Free();
+        return;
+    }
     ReplayText value;
     for (unsigned i = 0; i < view.length; i++) {
         for (unsigned k = 0; k < kReplayObjectFieldCount; k++) {
@@ -1644,6 +1730,31 @@ void EmitVector(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, c
     value.Free();
 }
 
+void EmitCStrings(ReplayText& out, ReplayKnown& known, char tag, const char* key, const ReplayObjectField& f, const void* object, const char* now)
+{
+    bool whole = known.Changed(key, now);
+    if (whole)
+        EmitLine(out, tag, key, now);
+    if (now[0] != '[')
+        return;
+    const unsigned char* data = StringsAt(f, object);
+    bool ref = kReplayArrays[f.array - 1].strings == 2;
+    unsigned length = StringsLength(f, object);
+    ReplayText text;
+    ReplayText name;
+    for (unsigned i = 0; i < length; i++) {
+        text.Clear();
+        AddCString(text, ref, data + i * sizeof(unsigned));
+        ElementKey(name, key, i);
+        if (whole)
+            known.Set(name.Data(), text.Data());
+        if (whole || known.Changed(name.Data(), text.Data()))
+            EmitLine(out, tag, name.Data(), text.Data());
+    }
+    text.Free();
+    name.Free();
+}
+
 }
 
 void ReplayEmitField(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, char tag, const char* key, const ReplayObjectField& f, const void* object, ReplayText& scratch)
@@ -1653,6 +1764,10 @@ void ReplayEmitField(ReplayText& out, ReplayKnown& known, ReplayObjectTable& tab
         return;
     }
     ReplayFormatObjectField(f, object, table, true, scratch);
+    if (f.kind == RK_CSTRINGS) {
+        EmitCStrings(out, known, tag, key, f, object, scratch.Data());
+        return;
+    }
     if (f.kind == RK_ARRAY) {
         EmitArray(out, known, key, tag, scratch.Data(), kReplayArrays[f.array - 1].elem);
         return;
@@ -1785,6 +1900,11 @@ bool ParseBracket(const char** p, unsigned* length, unsigned* capacity)
     return true;
 }
 
+bool IsElementwise(unsigned mode)
+{
+    return mode == RV_VALUE || mode == RV_CSTRING || mode == RV_CSTRINGREF;
+}
+
 void StoreWords(unsigned char* at, const unsigned char* data, unsigned length, unsigned capacity, unsigned size)
 {
     unsigned* words = (unsigned*)(at + 4);
@@ -1833,7 +1953,7 @@ bool ReplayApplyVector(const ReplayObjectField& f, void* object, const char* key
                 data = capacity == 0 ? nullptr : (unsigned char*)alloc(capacity * spec.size);
                 if (data != nullptr)
                     memset(data, 0, capacity * spec.size);
-                if (data != nullptr && old.data != nullptr && spec.mode == RV_VALUE)
+                if (data != nullptr && old.data != nullptr && IsElementwise(spec.mode))
                     memcpy(data, old.data, (old.length < length ? old.length : length) * spec.size);
             } else if (spec.mode == RV_SCALAR) {
                 memset(data, 0, capacity * spec.size);
@@ -1865,7 +1985,7 @@ bool ReplayApplyVector(const ReplayObjectField& f, void* object, const char* key
             }
             return true;
         }
-        if (spec.mode == RV_VALUE)
+        if (IsElementwise(spec.mode))
             return true;
     } else {
         const char* old = known.Get(key);
@@ -1924,6 +2044,99 @@ bool ReplayApplyVectorElement(const ReplayObjectField& f, void* object, unsigned
     return ReplayRestoreObjectField(*ef, view.data + index * view.size, value, table, alloc);
 }
 
+bool ReplayApplyVectorString(const ReplayObjectField& f, void* object, unsigned index, const char* fullKey, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc)
+{
+    const ReplayVectorSpec& spec = kReplayVectors[f.array - 1];
+    if (spec.mode != RV_CSTRING && spec.mode != RV_CSTRINGREF)
+        return false;
+    known.Set(fullKey, value);
+    if (!memory)
+        return true;
+    VectorView view = ViewOf(f, object);
+    return index < view.length && StoreCString(spec.mode == RV_CSTRINGREF, view.data + index * view.size, value, alloc);
+}
+
+bool ReplayApplyCStrings(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc)
+{
+    const ReplayArraySpec& a = kReplayArrays[f.array - 1];
+    unsigned char* at = (unsigned char*)object + f.offset;
+    bool stored = a.ref || a.raw;
+    if (strcmp(value, "null") == 0) {
+        if (!stored)
+            return false;
+        if (memory)
+            *(unsigned*)at = 0;
+        known.Set(key, value);
+        return true;
+    }
+    char* end = nullptr;
+    unsigned long count = value[0] == '[' ? strtoul(value + 1, &end, 10) : 0;
+    if (value[0] != '[' || *end != ']' || end[1] != '\0' || count > MAX_ARRAY_ELEMENTS || (!stored && count * sizeof(unsigned) > a.capacity))
+        return false;
+    known.Set(key, value);
+    if (!memory)
+        return true;
+    if (!stored) {
+        memset(at, 0, count * sizeof(unsigned));
+        return true;
+    }
+    if (count != 0 && alloc == nullptr)
+        return false;
+    unsigned char* mem = count == 0 ? nullptr : (unsigned char*)alloc((unsigned)count * sizeof(unsigned));
+    if (mem != nullptr)
+        memset(mem, 0, count * sizeof(unsigned));
+    if (a.raw)
+        *(unsigned char**)at = mem;
+    else
+        *(unsigned*)at = mem == nullptr ? 0u : (unsigned)(mem - (unsigned char*)SimBlockBase());
+    return true;
+}
+
+bool ReplayApplyCStringsElement(const ReplayObjectField& f, void* object, const char* key, unsigned index, const char* fullKey, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc)
+{
+    const char* bracket = known.Get(key);
+    if (bracket == nullptr || bracket[0] != '[' || index >= (unsigned)strtoul(bracket + 1, nullptr, 10))
+        return false;
+    known.Set(fullKey, value);
+    if (!memory)
+        return true;
+    unsigned char* data = StringsAt(f, object);
+    return data != nullptr && StoreCString(kReplayArrays[f.array - 1].strings == 2, data + index * sizeof(unsigned), value, alloc);
+}
+
+void ReplayCompareCStrings(const ReplayObjectField& f, const void* object, const char* key, const ReplayKnown& known, ReplayReportFn report, ReplayHashFn hash)
+{
+    ReplayText now;
+    FormatCStrings(f, object, now);
+    hash(now.Data());
+    const char* recorded = known.Get(key);
+    if (recorded == nullptr || strcmp(recorded, now.Data()) != 0) {
+        report(key, recorded == nullptr ? "no value" : recorded, now.Data());
+        now.Free();
+        return;
+    }
+    now.Free();
+    if (recorded[0] != '[')
+        return;
+    const unsigned char* data = StringsAt(f, object);
+    bool ref = kReplayArrays[f.array - 1].strings == 2;
+    unsigned length = StringsLength(f, object);
+    ReplayText text;
+    char name[200];
+    for (unsigned i = 0; i < length; i++) {
+        text.Clear();
+        AddCString(text, ref, data + i * sizeof(unsigned));
+        hash(text.Data());
+        sprintf(name, "%.180s[%u]", key, i);
+        const char* want = known.Get(name);
+        if (want == nullptr)
+            report(name, "no value", text.Data());
+        else if (strcmp(want, text.Data()) != 0)
+            report(name, want, text.Data());
+    }
+    text.Free();
+}
+
 void ReplayCompareVector(const ReplayObjectField& f, const void* object, const char* key, const ReplayKnown& known, ReplayObjectTable& table, ReplayReportFn report, ReplayHashFn hash)
 {
     const ReplayVectorSpec& spec = kReplayVectors[f.array - 1];
@@ -1979,6 +2192,20 @@ void ReplayCompareVector(const ReplayObjectField& f, const void* object, const c
             }
         }
         value.Free();
+    } else if (spec.mode == RV_CSTRING || spec.mode == RV_CSTRINGREF) {
+        ReplayText text;
+        for (unsigned i = 0; i < common; i++) {
+            text.Clear();
+            AddCString(text, spec.mode == RV_CSTRINGREF, view.data + i * view.size);
+            hash(text.Data());
+            sprintf(name, "%.180s[%u]", key, i);
+            const char* want = known.Get(name);
+            if (want == nullptr)
+                report(name, "no value", text.Data());
+            else if (strcmp(want, text.Data()) != 0)
+                report(name, want, text.Data());
+        }
+        text.Free();
     } else if (spec.mode == RV_SCALAR) {
         const char* want = p;
         const char* have = strchr(now.Data(), ']') + 1;

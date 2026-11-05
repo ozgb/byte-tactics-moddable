@@ -383,6 +383,7 @@ the same object is named the same way.
 | Point16 | `(x,y)` |
 | Vec3 | `(x,y,z)` |
 | string | double quotes, C escapes, up to the first NUL |
+| string behind a pointer (`cstring`) | the same, or `null` for a null pointer |
 | pointer to an object (`ref` or `ptr`) | `Unit#17`, `UnitDef#2`, `weapondef#17`, `Unit#17.resourceSlot`, or `null` |
 | object handed to an import | `file#1`, `rec#2`, `bank#1` |
 | random stream | `main` or `load` |
@@ -644,6 +645,46 @@ The replayer allocates `cap` elements with `SimAlloc`, which is what `BlockVecto
 elements. A vector of structs whose capacity changes keeps its old elements, as the module's `Insert` does when it moves them. A
 difference is reported at `<field>.length`, `<field>.capacity`, `<field>[<i>]` (the hex of a scalar element or the handle of an object
 element) or `<field>[<i>].<f>` (a field of a struct element), for example `PlayerAI#1.counts.length: recorded 0, replayed 2`.
+
+## Strings behind pointers
+
+A field that holds a pointer to a NUL-terminated string is a field of kind `cstring`: `{"name": "label", "kind": "cstring"}` for a `char*` (or `const char*`),
+and with `"ref": true` for a `Ref<char>`. It is written as the text, in double quotes with C escapes, as an inline `string` is, or `null` for a null pointer, and
+is recorded when it changes since the last line that named it, as any field is:
+
+```
+  r FixtureNamed#1.name "alpha"
+  r FixtureNamed#1.ident "tag \"1\"\n"
+  r FixtureNamed#1.name "beta"
+  r FixtureNamed#1.name null
+```
+
+The replayer allocates the string (with its own allocator, as it allocates an array) and stores the address, or the offset from the block base for a `Ref<char>`, so each
+line leaves a new string. The value must be quoted, and a line that has no allocator to allocate with is refused. A difference is reported at the field, as
+`FixtureNamed#1.name: recorded "beta", replayed "Beta"`; the text is compared, never the address. A walk never follows a string. The generated header checks that
+the member is a pointer to `char` (or a `Ref<char>`).
+
+An array of strings has `"elem": "cstring"` (a `char*` per element) or `"elem": "cstring_ref"` (a `Ref<char>`), and the `ref`, `length` and capacity of any array.
+Its storage is the elements in the object, a `Ref` to them (`"ref": true`), or, with `"raw": true`, a plain pointer to them (`char** names`):
+
+```json
+{"name": "names", "kind": "array", "elem": "cstring", "raw": true, "length": "count"}
+```
+
+It is written as its length in brackets, `r Script#1.names [3]` (`null` when the storage pointer is null), and each element is a line named by its index, `r Script#1.names[0] "idle"`,
+every element after the bracket line, and after that only the elements that changed. The replayer allocates the elements (zeroed, so a null string) when it reads the bracket line. `raw` and the string
+elements are for the fields of an object, not for `Game` or `SimGlobals`, and `raw` is only for strings.
+
+A vector of strings is `{"name": "words", "kind": "vector", "elem": {"mode": "cstring"}}`, with `"ref": true` in the element for `BlockVector<Ref<char>>`. It is written as a
+vector of structs is: the bracket `r Script#1.words [2/4]`, and a line per element named by its index, `r Script#1.words[1] "run"`, for each element that is new or changed since the last
+line that named it, and the replayer keeps the old elements when the capacity changes. A difference is reported at `<field>.length`, `<field>.capacity` or `<field>[<i>]`.
+
+| Annotation | Holds | Written as |
+|---|---|---|
+| `{"kind": "cstring"}` | `char*` | `"text"`, `null` |
+| `{"kind": "cstring", "ref": true}` | `Ref<char>` | `"text"`, `null` |
+| `{"kind": "array", "elem": "cstring"}`, `"cstring_ref"` | `length` strings | `[3]`, then `names[0] "text"` per element |
+| `{"kind": "vector", "elem": {"mode": "cstring"}}`, with `"ref": true` | `BlockVector<char*>` | `[2/4]`, then `words[0] "text"` per element |
 
 ## Snapshots
 

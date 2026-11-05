@@ -643,6 +643,60 @@
      "kind": "i32"
     }
    ]
+  },
+  "FixtureNamed": {
+   "type": "FixtureNamed",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "count",
+     "kind": "i32"
+    },
+    {
+     "name": "name",
+     "kind": "cstring"
+    },
+    {
+     "name": "ident",
+     "kind": "cstring",
+     "ref": true
+    },
+    {
+     "name": "words",
+     "kind": "array",
+     "elem": "cstring",
+     "raw": true,
+     "length": "count"
+    },
+    {
+     "name": "refWords",
+     "kind": "array",
+     "elem": "cstring_ref",
+     "ref": true,
+     "length": "count"
+    },
+    {
+     "name": "fixed",
+     "kind": "array",
+     "elem": "cstring",
+     "length": "count"
+    },
+    {
+     "name": "list",
+     "kind": "vector",
+     "elem": {
+      "mode": "cstring"
+     }
+    },
+    {
+     "name": "idents",
+     "kind": "vector",
+     "elem": {
+      "mode": "cstring",
+      "ref": true
+     }
+    }
+   ]
   }
  },
  "fixtures": {

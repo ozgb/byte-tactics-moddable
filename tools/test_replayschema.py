@@ -1166,7 +1166,7 @@ class Vectors(unittest.TestCase):
         files, errors, model = self.generated()
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"]],
+        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"][:3]],
                          [("object", "Unit", "Ref<Unit>"), ("value", "KeyedCell", "KeyedCell"), ("scalar", "", "short")])
         self.assertIn("{ RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },", text)
         self.assertIn("{ RV_VALUE, ROK_KEYEDCELL, sizeof(KeyedCell) },", text)
@@ -1188,7 +1188,7 @@ class Vectors(unittest.TestCase):
     def test_a_vector_needs_an_element_mode(self):
         ann = annotations()
         del self.field(ann, "counts")["elem"]
-        self.assertTrue(any("PlayerAI.counts: a vector needs an `elem` with a mode of object, scalar, value" in e for e in self.errors(ann)))
+        self.assertTrue(any("PlayerAI.counts: a vector needs an `elem` with a mode of cstring, object, scalar, value" in e for e in self.errors(ann)))
         ann = annotations()
         self.field(ann, "counts")["elem"] = {"mode": "pointer"}
         self.assertTrue(any("PlayerAI.counts: a vector needs an `elem`" in e for e in self.errors(ann)))
@@ -2439,6 +2439,95 @@ class RefCTypes(unittest.TestCase):
         ann = annotations()
         self.owner(ann)["kind"] = "ptr"
         self.has(ann, "FixtureEye.owner: only a ref or an array of refs has a `ctype`")
+
+
+class CStrings(unittest.TestCase):
+    """A pointer to a NUL-terminated string is a field kind, and the element kind of an array and a vector."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, name):
+        return next(f for f in ann["objects"]["FixtureNamed"]["fields"] if f["name"] == name)
+
+    def row(self, text, name):
+        return [l for l in text.split("\n") if l.startswith('    { "%s", offsetof(FixtureNamed, %s)' % (name, name))][0]
+
+    def test_a_char_pointer_and_a_ref_to_char_are_kinds_of_their_own(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn("RK_CSTRING, 0,", self.row(text, "name"))
+        self.assertIn("RK_CSTRINGREF, 0,", self.row(text, "ident"))
+
+    def test_the_header_checks_the_declared_types(self):
+        text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
+        self.assertIn('__is_same(__remove_cv(__remove_pointer(decltype(((FixtureNamed*)nullptr)->name))), char), "FixtureNamed::name is a char pointer");', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->ident), Ref<char>), "FixtureNamed::ident is a Ref<char>");', text)
+
+    def test_an_array_of_strings_is_one_field_with_its_storage_in_the_spec(self):
+        files, _, model = self.generated()
+        text = files[rs.FIXTURE_SCHEMA_H]
+        for name, spec in (("words", "{ 4, 0, 0, "), ("refWords", "{ 4, 1, 0, "), ("fixed", "{ 4, 0, sizeof(((FixtureNamed*)nullptr)->fixed), ")):
+            self.assertIn("RK_CSTRINGS,", self.row(text, name))
+            self.assertTrue(any(l.startswith("    " + spec) and "FixtureNamed, count" in l for l in text.split("\n")), (name, spec))
+        self.assertIn("{ 1, 0, 0 } }, 1, 1 },", text)
+        self.assertIn("{ 1, 0, 0 } }, 0, 2 },", text)
+        self.assertIn("{ 1, 0, 0 } }, 0, 1 },", text)
+        self.assertEqual([(a["raw"], a["strings"], a["ref"]) for a in model["arrays"][-3:]], [(True, 1, False), (False, 2, True), (False, 1, False)])
+
+    def test_the_header_checks_the_storage_and_the_element_type_of_an_array(self):
+        text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
+        self.assertIn('static_assert(__is_same(decltype(&((FixtureNamed*)nullptr)->words[0]), char**), "FixtureNamed::words holds char*");', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->refWords), Ref<Ref<char>>), "FixtureNamed::refWords is a Ref<Ref<char>>");', text)
+        self.assertIn('static_assert(sizeof(((FixtureNamed*)nullptr)->fixed) % 4 == 0, "FixtureNamed::fixed holds whole elements");', text)
+
+    def test_a_vector_of_strings_has_a_mode_for_each_pointer_type(self):
+        files, _, _ = self.generated()
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn("    { RV_CSTRING, 0, sizeof(char*) },\n    { RV_CSTRINGREF, 0, sizeof(Ref<char>) },", text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->list)::value_type, char*), "FixtureNamed::list holds char*");', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->idents)::value_type, Ref<char>), "FixtureNamed::idents holds Ref<char>");', text)
+
+    def test_the_real_schema_has_none_of_it(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        self.assertNotIn("CSTRING", files[rs.SCHEMA_H].replace("#include", ""))
+        self.assertEqual(files[rs.JSON_OUT].count("cstring"), 0)
+
+    def test_a_walk_never_follows_a_string(self):
+        for kind in ("cstring", "cstringref", "cstrings"):
+            self.assertNotIn(kind, rs.WALKABLE)
+
+    def test_a_string_array_is_checked(self):
+        ann = annotations()
+        self.field(ann, "words")["raw"] = "yes"
+        self.has(ann, "FixtureNamed.words: `raw` is true on an array of strings that has no `ref`")
+        ann = annotations()
+        self.field(ann, "refWords")["raw"] = True
+        self.has(ann, "FixtureNamed.refWords: `raw` is true on an array of strings that has no `ref`")
+        ann = annotations()
+        del self.field(ann, "fixed")["length"]
+        self.has(ann, "FixtureNamed.fixed: an array needs a `length`")
+        ann = annotations()
+        ann["game_fields"]["visibilityMask"]["elem"] = "cstring"
+        self.has(ann, "Game.visibilityMask: only the field of an object is an array of strings")
+
+    def test_raw_is_for_strings(self):
+        ann = annotations()
+        ann["objects"]["Player"]["fields"].append({"name": "explored", "kind": "array", "elem": "u8", "raw": True, "length": "exploredSize"})
+        self.has(ann, "Player.explored: `raw` is true on an array of strings")
+
+    def test_a_string_vector_element_is_checked(self):
+        ann = annotations()
+        self.field(ann, "list")["elem"] = {"mode": "cstring", "kind": "Unit"}
+        self.has(ann, "FixtureNamed.list: a string element is")
+        ann = annotations()
+        self.field(ann, "idents")["elem"]["ref"] = "yes"
+        self.has(ann, "FixtureNamed.idents: a string element is")
 
 
 class Committed(unittest.TestCase):

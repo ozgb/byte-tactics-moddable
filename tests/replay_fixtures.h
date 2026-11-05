@@ -4,6 +4,7 @@
 #include "../interfaces/ref.h"
 #include "../src/graphics/handle.h"
 #include "../src/map/frame_table.h"
+#include "../src/state/block_vector.h"
 #include "../src/units/cob_types.h"
 
 struct UnitDef;
@@ -191,6 +192,17 @@ struct FixtureHeap {
     int used;
     Ref<FixtureNode> pool;
     Ref<FixtureNode> top;
+};
+
+struct FixtureNamed {
+    int count;
+    char* name;
+    Ref<char> ident;
+    char** words;
+    Ref<Ref<char> > refWords;
+    char* fixed[3];
+    BlockVector<char*> list;
+    BlockVector<Ref<char> > idents;
 };
 
 #endif

@@ -74,7 +74,9 @@ OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "r
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
                "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR", "ptr": "PTR", "refs": "REFS", "embeds": "EMBEDS",
-               "self": "SELF", "selfindex": "SELFINDEX", "cbref": "CBREF", "cbptr": "CBPTR"}
+               "self": "SELF", "selfindex": "SELFINDEX", "cbref": "CBREF", "cbptr": "CBPTR", "cstring": "CSTRING", "cstringref": "CSTRINGREF",
+               "cstrings": "CSTRINGS"}
+STRING_ELEMS = {"cstring": (1, "char*"), "cstring_ref": (2, "Ref<char>")}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?\s*(\w+)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
@@ -227,20 +229,29 @@ def factor_asserts(length: list[dict], owner: str, where: str) -> list[str]:
             % (owner, f["member"], owner, f["member"], owner, f["member"], where, f["member"]) for f in length if "member" in f]
 
 
-def check_array(where: str, spec: dict, owner: str, errors: list[str]) -> dict:
+def check_array(where: str, spec: dict, owner: str, errors: list[str], object_field: bool = False) -> dict:
     """The array entry of a field: element size, storage, capacity source and the parsed length. Errors for what is missing."""
     elem = spec.get("elem")
-    if elem not in SIZES:
-        errors.append("%s: an array needs an `elem` of %s" % (where, ", ".join(sorted(SIZES))))
+    strings = STRING_ELEMS[elem][0] if elem in STRING_ELEMS else 0
+    if strings:
+        if not object_field:
+            errors.append("%s: only the field of an object is an array of strings" % where)
+    elif elem not in SIZES:
+        errors.append("%s: an array needs an `elem` of %s" % (where, ", ".join(sorted(list(SIZES) + list(STRING_ELEMS)))))
         elem = "u8"
     if "length" not in spec:
         errors.append("%s: an array needs a `length`" % where)
-    return {"elem": SIZES[elem], "ref": bool(spec.get("ref", False)), "length": parse_length(spec.get("length", 0), where, errors), "owner": owner}
+    raw = spec.get("raw", False) is True
+    if "raw" in spec and (not strings or spec["raw"] is not True or spec.get("ref")):
+        errors.append("%s: `raw` is true on an array of strings that has no `ref`, and says the field is a plain pointer to the elements" % where)
+    return {"elem": 4 if strings else SIZES[elem], "ref": bool(spec.get("ref", False)), "raw": raw, "strings": strings,
+            "length": parse_length(spec.get("length", 0), where, errors), "owner": owner}
 
 
 VECTOR_SCALARS = {"char": 1, "unsigned char": 1, "short": 2, "unsigned short": 2, "int": 4, "unsigned": 4, "unsigned int": 4, "long": 4,
                   "unsigned long": 4, "float": 4, "double": 8}
-VECTOR_MODES = {"object": "RV_OBJECT", "scalar": "RV_SCALAR", "value": "RV_VALUE"}
+VECTOR_MODES = {"object": "RV_OBJECT", "scalar": "RV_SCALAR", "value": "RV_VALUE", "cstring": "RV_CSTRING"}
+VECTOR_ENUMS = dict(VECTOR_MODES, cstringref="RV_CSTRINGREF")
 
 
 def check_vector(where: str, spec: dict, owner: str, ann: dict, errors: list[str]) -> dict:
@@ -252,7 +263,12 @@ def check_vector(where: str, spec: dict, owner: str, ann: dict, errors: list[str
         errors.append("%s: a vector needs an `elem` with a mode of %s" % (where, ", ".join(sorted(VECTOR_MODES))))
         return out
     out["mode"] = elem["mode"]
-    if elem["mode"] == "scalar":
+    if elem["mode"] == "cstring":
+        if set(elem) - {"mode", "ref"} or not isinstance(elem.get("ref", False), bool):
+            errors.append("%s: a string element is {\"mode\": \"cstring\"} with an optional \"ref\": true for Ref<char>" % where)
+        out["mode"] = "cstringref" if elem.get("ref") is True else "cstring"
+        out["ctype"] = "Ref<char>" if elem.get("ref") is True else "char*"
+    elif elem["mode"] == "scalar":
         if elem.get("type") not in VECTOR_SCALARS:
             errors.append("%s: a scalar element needs a `type` of %s" % (where, ", ".join(sorted(VECTOR_SCALARS))))
         out["ctype"] = elem.get("type", "int")
@@ -477,9 +493,13 @@ SELF_KEYS = {"name", "kind", "member", "index", "target", "aliases"}
 
 
 def field_kind(f: dict) -> str:
-    """The key of FIELD_KINDS for an object field: a self pointer written as an index, and a ref or ptr that holds a callback, are kinds of their own."""
+    """The key of FIELD_KINDS for an object field: a self pointer written as an index, a ref or ptr that holds a callback, a string behind a Ref and an array of strings are kinds of their own."""
     if f.get("callback") is not None and f["kind"] in ("ref", "ptr"):
         return "cb" + f["kind"]
+    if f["kind"] == "cstring" and f.get("ref") is True:
+        return "cstringref"
+    if f["kind"] == "array" and f.get("elem") in STRING_ELEMS:
+        return "cstrings"
     return "selfindex" if f["kind"] == "self" and f.get("index") else f["kind"]
 
 
@@ -1240,7 +1260,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 where = "%s.%s" % (kind, f["name"])
                 if spec["scope"] != "state":
                     errors.append("%s: only the fields of a state kind can be arrays" % where)
-                array = check_array(where, f, spec["type"], errors)
+                array = check_array(where, f, spec["type"], errors, True)
                 array["member"] = f.get("member", f["name"])
                 arrays.append(array)
                 entry["array"] = len(arrays)
@@ -1631,8 +1651,9 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     L += ["};", "static const unsigned kReplayFieldCount = %d;" % len(fields), ""]
     L += ["static const ReplayArraySpec kReplayArrays[] = {"]
     for a in arrays:
-        capacity = "0" if a["ref"] else "sizeof(((%s*)nullptr)->%s)" % (a["owner"], a["member"])
-        L.append("    { %d, %d, %s, %s }," % (a["elem"], int(a["ref"]), capacity, render_length(a["length"], a["owner"])))
+        capacity = "0" if a["ref"] or a["raw"] else "sizeof(((%s*)nullptr)->%s)" % (a["owner"], a["member"])
+        strings = ", %d, %d" % (int(a["raw"]), a["strings"]) if a["strings"] else ""
+        L.append("    { %d, %d, %s, %s%s }," % (a["elem"], int(a["ref"]), capacity, render_length(a["length"], a["owner"]), strings))
     if not arrays:
         L.append("    { 1, 0, 0, { { 1, 0, 0 }, { 1, 0, 0 } } },")
     L += ["};", "", "static const ReplayTableSpec kReplayTables[] = {"]
@@ -1645,7 +1666,16 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     kind_type = {o["name"]: o["type"] for o in objects}
     for a in arrays:
         L += factor_asserts(a["length"], a["owner"], "%s::%s" % (a["owner"], a["member"]))
-        if a["ref"]:
+        if a["strings"]:
+            held = STRING_ELEMS["cstring" if a["strings"] == 1 else "cstring_ref"][1]
+            at = "((%s*)nullptr)->%s" % (a["owner"], a["member"])
+            if a["ref"]:
+                L.append('static_assert(__is_same(decltype(%s), Ref<%s>), "%s::%s is a Ref<%s>");' % (at, held, a["owner"], a["member"], held))
+            else:
+                L.append('static_assert(__is_same(decltype(&%s[0]), %s*), "%s::%s holds %s");' % (at, held, a["owner"], a["member"], held))
+                if not a["raw"]:
+                    L.append('static_assert(sizeof(%s) %% %d == 0, "%s::%s holds whole elements");' % (at, a["elem"], a["owner"], a["member"]))
+        elif a["ref"]:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(unsigned), "%s::%s is a Ref");' % (a["owner"], a["member"], a["owner"], a["member"]))
         else:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) %% %d == 0, "%s::%s holds whole elements");' % (a["owner"], a["member"], a["elem"], a["owner"], a["member"]))
@@ -1666,7 +1696,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     L += ["    RF_%s," % upper(f["name"]) for f in fields]
     L += ["};", "", "static const ReplayVectorSpec kReplayVectors[] = {"]
     for v in vectors:
-        L.append("    { %s, %s, sizeof(%s) }," % (VECTOR_MODES[v["mode"]], "ROK_" + upper(v["kind"]) if v["kind"] else "0", v["ctype"]))
+        L.append("    { %s, %s, sizeof(%s) }," % (VECTOR_ENUMS[v["mode"]], "ROK_" + upper(v["kind"]) if v["kind"] else "0", v["ctype"]))
     if not vectors:
         L.append("    { RV_OBJECT, 0, 1 },")
     L += ["};", "", "static const ReplayElemSpec kReplayElems[] = {"]
@@ -1799,6 +1829,12 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a code pointer");' % (t, member, t, f["name"]))
         elif f["kind"] == "ptr":
             L.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s::%s is a raw pointer");' % (t, member, t, f["name"]))
+        elif f["kind"] == "cstring":
+            at = "decltype(((%s*)nullptr)->%s)" % (t, member)
+            if f.get("ref") is True:
+                L.append('static_assert(__is_same(%s, Ref<char>), "%s::%s is a Ref<char>");' % (at, t, f["name"]))
+            else:
+                L.append('static_assert(__is_pointer(%s) && __is_same(__remove_cv(__remove_pointer(%s)), char), "%s::%s is a char pointer");' % (at, at, t, f["name"]))
         elif f.get("size") is None:
             want = {"i32": 4, "u32": 4, "u16": 2, "i16": 2, "f32": 4, "flags": 4, "ref": 4, "point16": 4, "weapon": 4, "u8": 1, "f64": 8, "unitid": 2}[f["kind"]]
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, want, t, f["name"]))

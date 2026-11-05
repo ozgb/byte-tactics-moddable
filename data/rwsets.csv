@@ -53412,6 +53412,7 @@ address,function,file,kind,target
 ,RecNetworkSendFeatureBurning,src/harness/replay_hooks.inc,global_read,s_call
 ,RecNetworkSendFeatureBurning,src/harness/replay_hooks.inc,global_read,s_inner_network
 ,RecNetworkSendFeatureBurning,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, int) __attribute__((stdcall)) [NetworkSeam::SendFeatureBurning]"
+,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,call,Add
 ,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,call,ArgValue
 ,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,call,ArgWeapon
 ,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -54808,6 +54809,7 @@ address,function,file,kind,target
 ,RecWeaponsAllocWeaponArray,src/harness/replay_hooks.inc,function,
 ,RecWeaponsAllocWeaponArray,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsAllocWeaponArray,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WeaponsSeam::AllocWeaponArray]
+,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,call,ArgPending
 ,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,call,ArgWeapon
 ,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -54966,6 +54968,7 @@ address,function,file,kind,target
 ,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [WeaponsSeam::RemoveUnitProjectiles]
+,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ArgValue
 ,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ArgWeapon

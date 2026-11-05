@@ -40,8 +40,8 @@ build/tools/bin, install it with `cargo install wasm-tools --version <pin> --loc
 build/tools`, or on PATH). A game-logic module may import only env.memory, env.__indirect_function_table,
 the interface imports and engine services its manifest lists, and no global, WASI, clock, random, file or
 network import; it must export exactly the manifest's slots and the data the loader fills. The manifest records each import's
-parameter and result kinds (int, f64, void, linear, block, scratch, handle) and each slot's parameter kinds; imports checks them
-against the wasm signatures: the same count, f64 only where the wasm type is f64, and no other kind where it is.
+parameter and result kinds (int, f32, f64, void, linear, block, scratch, handle) and each slot's parameter kinds; imports checks them
+against the wasm signatures: the same count, f32 only where the wasm type is f32, f64 only where it is f64, and no other kind where it is.
 
 statics runs wind_meteors under the pinned wasmtime package with the manifest's block layout: a memory of
 memory_pages pages, a Game and a SimGlobals zeroed in the block (with the
@@ -112,7 +112,7 @@ CXX_FLAGS = [
 ]
 C_FLAGS = ["--target=wasm32", "-O2", "-w", "-ffreestanding", "-fno-builtin", "-ffp-contract=off", "-fwrapv", "-fno-strict-aliasing",
            "-ffunction-sections", "-fdata-sections", "-nostdinc"]
-KINDS = {"int", "f64", "linear", "block", "scratch", "handle"}
+KINDS = {"int", "f32", "f64", "linear", "block", "scratch", "handle"}
 INTERFACES = os.path.join(ROOT, "interfaces")
 MAJOR_MACRO = re.compile(r"^\s*#\s*define\s+(\w+)_VERSION_MAJOR\s+(\d+)", re.M)
 EXPANDED = {(), ("modules",), ("modules", "*"), ("modules", "*", "slots"), ("modules", "*", "imports"), ("modules", "*", "imports", "*"),
@@ -634,6 +634,11 @@ def check_fuel_manifest(pins):
     return problems
 
 
+def kind_wasm(kind):
+    """The wasm type a manifest kind has at the boundary."""
+    return kind if kind in ("f32", "f64") else "i32"
+
+
 def check_kinds(name, spec, details):
     """Reasons the manifest's kinds for the imports and slots disagree with the wasm signatures in details."""
     problems = []
@@ -648,12 +653,12 @@ def check_kinds(name, spec, details):
             found.append(f"{name}: {label}: the manifest has {len(params)} parameters, the wasm signature {len(wasm_params)}")
         else:
             for index, (kind, wasm) in enumerate(zip(params, wasm_params)):
-                if kind not in KINDS or (kind == "f64") != (wasm == "f64"):
+                if kind not in KINDS or kind_wasm(kind) != wasm:
                     found.append(f"{name}: {label}: parameter {index} is {kind!r} in the manifest and {wasm} in wasm")
         if result == "void":
             if wasm_result != "void":
                 found.append(f"{name}: {label}: the manifest result is void, the wasm result {wasm_result}")
-        elif result not in KINDS or (result == "f64") != (wasm_result == "f64") or wasm_result == "void":
+        elif result not in KINDS or kind_wasm(result) != wasm_result:
             found.append(f"{name}: {label}: the result is {result!r} in the manifest and {wasm_result} in wasm")
         return found
 

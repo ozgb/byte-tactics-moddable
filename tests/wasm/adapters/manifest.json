@@ -17,7 +17,9 @@
       "RunMul": [["int"], "int"],
       "RunNote": [["int"], "int"],
       "RunTick": [["int"], "int"],
-      "RunEcho": [["int"], "int"]
+      "RunEcho": [["int"], "int"],
+      "FloatSame": [["f32"], "f32"],
+      "RunFloat": [["f32"], "f32"]
     },
     "calc_host": {
       "Mix": [["int", "linear"], "int"],
@@ -25,7 +27,8 @@
       "Mul": [["int", "int"], "int"],
       "Note": [["int"], "void"],
       "Tick": [["int"], "int"],
-      "Echo": [["int"], "int"]
+      "Echo": [["int"], "int"],
+      "FloatEcho": [["f32"], "f32"]
     }
   },
   "adapters": [
@@ -79,7 +82,7 @@
       "majors": {"calc": 2, "calc_host": 3},
       "data_base": 131072,
       "table_base": 32,
-      "exports": ["Swap", "Add3", "Scale", "Count", "Poke", "Same", "RunMix", "RunNeg", "RunMul", "RunNote", "RunTick", "RunEcho"],
+      "exports": ["Swap", "Add3", "Scale", "Count", "Poke", "Same", "RunMix", "RunNeg", "RunMul", "RunNote", "RunTick", "RunEcho", "FloatSame", "RunFloat"],
       "slots": {
         "Swap": [["int", "linear"], "int"],
         "Add3": [["int", "int", "int"], "int"],
@@ -92,7 +95,9 @@
         "RunMul": [["int"], "int"],
         "RunNote": [["int"], "int"],
         "RunTick": [["int"], "int"],
-        "RunEcho": [["int"], "int"]
+        "RunEcho": [["int"], "int"],
+        "FloatSame": [["f32"], "f32"],
+        "RunFloat": [["f32"], "f32"]
       },
       "imports": {
         "calc_host": {
@@ -101,7 +106,8 @@
           "Mul": [["int", "int"], "int"],
           "Note": [["int"], "void"],
           "Tick": [["int"], "int"],
-          "Echo": [["int"], "int"]
+          "Echo": [["int"], "int"],
+          "FloatEcho": [["f32"], "f32"]
         }
       }
     }

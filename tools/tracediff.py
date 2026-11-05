@@ -3,6 +3,8 @@
     uv run tools/tracediff.py A/TotalA.exe B/TotalA.exe --scenario reference/scenarios/skirmish2.txt
     uv run tools/tracediff.py --traces a/trace.txt b/trace.txt
     uv run tools/tracediff.py --dumps a/dump.txt b/dump.txt --at 900 units
+    uv run tools/tracediff.py A/TotalA.exe B/TotalA.exe --scenario reference/scenarios/skirmish2.txt --events
+    uv run tools/tracediff.py --event-logs a/events.txt b/events.txt
 
 Runs both exes on the scenario under Wine (tools/playtest.py --testmode), compares
 the trace.txt each writes and reports the first tick and phase whose hashes differ.
@@ -453,11 +455,12 @@ def save_put(saved: Path, loader: str, saver: str) -> dict[str, Path]:
 
 
 def play_loading(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
-                 poison: bool = False, xserver: bool = False) -> Path:
+                 poison: bool = False, xserver: bool = False, collect: tuple[str, ...] = ()) -> Path:
     """`play`, but a scenario with a `load` line first plays the scenario it names, from the same directory, and gets its save."""
     saver = scenario_load(scenario)
+    extra = {"collect": collect} if collect else {}
     if saver is None:
-        return play(exe, scenario, game_dir, dump, timeout, poison, xserver=xserver)
+        return play(exe, scenario, game_dir, dump, timeout, poison, xserver=xserver, **extra)
     saver_path = scenario.parent / f"{saver}.txt"
     if not saver_path.is_file():
         raise Error(f"{scenario.stem}: load {saver}: there is no scenario {saver_path}")
@@ -472,13 +475,57 @@ def play_loading(exe: Path, scenario: Path, game_dir: str | None, dump: int | No
         finally:
             shutil.rmtree(run.parent, ignore_errors=True)
         return play(exe, scenario, game_dir, dump, timeout, poison, put=save_put(Path(scratch), scenario.stem, saver),
-                    xserver=xserver)
+                    xserver=xserver, **extra)
 
 
 def need(run: Path, name: str) -> Path:
     if not (run / name).is_file():
         raise Error(f"{run} has no {name}: does the exe write traces?")
     return run / name
+
+
+def event_where(line: str) -> str:
+    """The tick and phase of an events.txt record, as ` (tick T, phase P)`, or an empty string for a line that has none (the header)."""
+    words = line.split(" ", 2)
+    if len(words) == 3 and words[0].isdigit():
+        return f" (tick {words[0]}, phase {words[1]})"
+    return ""
+
+
+def event_difference(a: str, b: str) -> str | None:
+    """Where two sim event logs first differ (a line number, its tick and phase, both records), or None when they are equal."""
+    want, have = a.splitlines(), b.splitlines()
+    for number, (x, y) in enumerate(zip(want, have), 1):
+        if x != y:
+            return f"event record at line {number}{event_where(x) or event_where(y)}: a `{x}`, b `{y}`"
+    if len(want) != len(have):
+        number = min(len(want), len(have)) + 1
+        longer, which = (want, "a") if len(want) > len(have) else (have, "b")
+        return f"event record at line {number}{event_where(longer[number - 1])}: only {which} has it (`{longer[number - 1]}`)"
+    return None
+
+
+def print_event_difference(a: str, b: str) -> int:
+    """Print the first record where two event logs differ (or that they are equal); 1 when they differ."""
+    diff = event_difference(a, b)
+    print(diff or f"event logs identical ({len(a.splitlines())} lines)")
+    return 1 if diff else 0
+
+
+def compare_events(args: argparse.Namespace) -> int:
+    """Play both exes on the scenario and print the first record of their event logs that differs."""
+    exes = [Path(e).resolve() for e in args.exe]
+    scenarios = [Path(s).resolve() for s in args.scenario]
+    scenarios *= 2 if len(scenarios) == 1 else 1
+    poison = [False, args.poison_b]
+    xserver = [args.reference == "a", args.reference == "b"]
+    runs = [play_loading(e, s, args.game_dir, None, None, p, x, collect=("events.txt",))
+            for e, s, p, x in zip(exes, scenarios, poison, xserver)]
+    logs = [(run / "events.txt").read_text() if (run / "events.txt").is_file() else None for run in runs]
+    for side, log in zip("ab", logs):
+        if log is None:
+            raise Error(f"the run of {side} wrote no events.txt")
+    return print_event_difference(logs[0], logs[1])
 
 
 def compare(args: argparse.Namespace) -> int:
@@ -516,13 +563,18 @@ def main() -> int:
                     help="the side whose dump came from the reference build: its leaf names are translated to the modern ones")
     ap.add_argument("--reference-ref", default=DEFAULT_REFERENCE_REF, metavar="REF",
                     help=f"the git ref whose {SCHEMA_PATH} names the reference's leaves (default {DEFAULT_REFERENCE_REF})")
+    ap.add_argument("--events", action="store_true",
+                    help="with two exes: compare their sim event logs (docs/events-log.md) and name the first differing record")
+    ap.add_argument("--event-logs", nargs=2, metavar=("A", "B"), help="compare two events.txt files, without running")
     ap.add_argument("--traces", nargs=2, metavar=("A", "B"), help="compare two trace.txt files, without running")
     ap.add_argument("--dumps", nargs=2, metavar=("A", "B"), help="diff two dump.txt files, with --at")
     ap.add_argument("--at", nargs=2, metavar=("TICK", "PHASE"), help="--dumps: the tick and phase to diff")
     args = ap.parse_args()
-    modes = [bool(args.traces), bool(args.dumps), bool(args.exe)]
+    modes = [bool(args.traces), bool(args.dumps), bool(args.exe), bool(args.event_logs)]
     if sum(modes) != 1:
-        ap.error("give two exes with --scenario, or --traces A B, or --dumps A B --at TICK PHASE")
+        ap.error("give two exes with --scenario, or --traces A B, or --dumps A B --at TICK PHASE, or --event-logs A B")
+    if args.events and not args.exe:
+        ap.error("--events needs two exes and --scenario")
     if args.exe and (len(args.exe) != 2 or not args.scenario):
         ap.error("two exes and --scenario are required")
     if args.exe and len(args.scenario) > 2:
@@ -544,6 +596,8 @@ def main() -> int:
                 return 0
             print_divergence(*div)
             return 1
+        if args.event_logs:
+            return print_event_difference(*(Path(p).read_text() for p in args.event_logs))
         if args.dumps:
             maps = load_maps(args.reference_ref) if args.reference else None
             diffs = diff_dumps(Path(args.dumps[0]), Path(args.dumps[1]), int(args.at[0]), args.at[1],
@@ -552,7 +606,7 @@ def main() -> int:
             print(f"  phase function: {describe_phase(args.at[1])}")
             print_diff(diffs)
             return 1 if diffs else 0
-        return compare(args)
+        return compare_events(args) if args.events else compare(args)
     except (Error, OSError) as e:
         print(f"tracediff: {e}", file=sys.stderr)
         return 2

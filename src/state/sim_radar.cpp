@@ -1,4 +1,5 @@
 #include "sim_radar.h"
+#include <string.h>
 #include "sim_globals.h"
 #include "block.h"
 #include "../harness/replay.h"
@@ -51,5 +52,6 @@ void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)
     arena->used += size;
     if (arena->used > arena->highWater)
         arena->highWater = arena->used;
+    memset(arena->bytes + *offset, 0, size);
     return call.Result(arena->bytes + *offset);
 }

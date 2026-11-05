@@ -311,6 +311,7 @@ A test-mode run writes these files in its working directory. Two builds conform 
 | `dump.txt` | a run with `-testdump <tick>`: every hashed field after each phase of that tick | `docs/trace-format.md`, section 10 | not stored |
 | `sound.txt` | every run: the sounds the game asks to start or stop | `docs/sound-log.md` | `reference/sounds/<scenario>.txt` |
 | `ui.txt` | every run: the input delivered, the orders it turned into, the selection and the camera after each tick | `docs/ui-log.md` | `reference/ui/<scenario>.txt` |
+| `events.txt` | every run: the sim events the presentation drains, with the tick and the drain that delivered each | `docs/events-log.md` | `reference/events/<scenario>.txt` (the digest of the log) |
 | `frames/<tick>.bin` | a run whose scenario has a `frames` line: one file per listed tick | `docs/frame-dump.md` | `reference/frames/<scenario>/<tick>.bin` |
 | `savegame\harness.sav`, `savegame\harness.opt` | a run whose scenario has a `save` line | section 5 | `reference/saves/<scenario>.sav` (the `.opt` file is not stored) |
 | `replay-<subsystem>.txt` | a run with `record` lines | `docs/replay-format.md` | `tests/replay/<subsystem>/<scenario>.txt` |

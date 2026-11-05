@@ -1,6 +1,7 @@
 #include "sim_events.h"
 #include "sim_globals.h"
 #include "block.h"
+#include "../harness/harness.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "../../interfaces/services.h"
@@ -62,6 +63,7 @@ void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsig
     }
     for (unsigned int r = 0; r < records; r++) {
         SimEvent& e = q.records[q.tail % SIM_EVENT_CAPACITY];
+        HarnessSimEventSlot(q.tail);
         e.kind = kind;
         e.flags = (unsigned short)(r == 0 ? flags : (flags | SIM_EVENT_CONTINUED));
         e.tick = (unsigned int)g_game->ticks;

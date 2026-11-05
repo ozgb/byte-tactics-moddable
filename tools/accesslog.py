@@ -44,6 +44,19 @@ file, except for the rows of the `presentation` window: how many frames the game
 follows the wall clock, so their counts (and the first tick of a rare one) change from run to run. `run
 --twice` plays a scenario again and checks that every other row is equal.
 
+`<scenario>.presentation.csv` (step 5 of #830, tools/presreads.py) lists what the `presentation` window reads, at
+function grain: item,reader,function,windows,events,container (the item's variable, global, region of Game or
+allocation: the row of state_classes.csv an item refined to `Type::field` lies in). `windows` is the number of presentation windows (the span
+between one tick's HarnessAfterStep and the next HarnessBeforeStep, which holds however many frames the main loop
+draws) in which the function read the item. `events` lists `kind:count` pairs: the kinds of SimEvent that the tick
+before the window emitted (read from the SimEventQueue at each phase marker, before the drain that follows it), with
+`count` the number of those windows that followed a tick which emitted the kind. Kind 0 stands for events emitted
+after the last marker (in the tail), which the drain consumes before HarnessAfterStep. The function names come
+from accesslog.funcs, which `tables` writes next to the other two. The stats file gains presentation_windows,
+presentation_active_windows (windows in which anything was read), presentation_rows and presentation_kind_K
+(the windows that followed a tick which emitted kind K, whether or not anything was read). The windows and counts follow
+the wall clock like the edges file's presentation rows, so tools/presreads.py keeps only what is stable.
+
 `<scenario>.stats.txt` counts the accesses by attribution (unknown functions, ignored helpers) and by
 resolution (unresolved items, accesses to code or constants that no row names). `--raw` writes every access
 of the scenario to `<scenario>.raw.txt` (ACCESSLOG_RAW=1), for debugging only.
@@ -101,8 +114,10 @@ SIM_GLOBALS_HEADER = ROOT / "src/state/sim_globals.h"
 SIM_GLOBALS_CSV = ROOT / "src/state/sim_globals.csv"
 ATTR_NAME = "accesslog.attr"
 ITEMS_NAME = "accesslog.items"
+FUNCS_NAME = "accesslog.funcs"
 ATTR_MAGIC = b"ALAT"
 ITEMS_MAGIC = b"ALIT"
+FUNCS_MAGIC = b"ALFN"
 UNKNOWN = "unknown"
 IGNORED = 0xFFFF
 NONE = 0xFFFFFFFF
@@ -120,7 +135,7 @@ LAYOUT_FLAGS = ["--target=i686-pc-windows-msvc", "/nologo", "-fms-compatibility"
                 "-fsyntax-only", "-Xclang", "-fdump-record-layouts-complete"]
 HEAP_ROW = re.compile(r"^(?P<function>.+?): (?P<allocator>new\[\]|new|operator new|\w+)(?: (?P<what>.*?))?(?: #\d+)?$")
 TAG_TYPES = {"UNIT MEMORY": "Unit", "WEAPON ARRAY": "Projectile"}
-OUTPUT_FILES = ("access.edges.csv", "access.stats.txt")
+OUTPUT_FILES = ("access.edges.csv", "access.stats.txt", "access.presentation.csv")
 RAW_FILE = "access.raw.txt"
 REF_HELPER = re.compile(r"\$(?:Pod)?Ref@")
 
@@ -235,6 +250,24 @@ def attribution_table(info: MapInfo, rows: Subsystems) -> tuple[list[str], list[
         else:
             ranges.append((address, end, sub))
     return subs, ranges, counts
+
+
+def function_table(info: MapInfo) -> list[tuple[int, int, str]]:
+    """[(start, end, name)] of every function of the map, sorted: the names accesslog.funcs holds, as blockpointers
+    demangles them."""
+    addresses, names, _ = function_names(info)
+    code_end = max((a for s, o, _, a, _ in info.symbols if info.sections.get(s, (0, "", ""))[2] == "CODE"), default=0) + 0x1000
+    return [(a, addresses[i + 1] if i + 1 < len(addresses) else code_end, blockpointers.demangle(names[i]))
+            for i, a in enumerate(addresses)]
+
+
+def pack_funcs(funcs: list[tuple[int, int, str]]) -> bytes:
+    """The bytes of accesslog.funcs."""
+    out = [FUNCS_MAGIC, struct.pack("<I", len(funcs))]
+    for start, end, name in funcs:
+        b = name.encode()
+        out.append(struct.pack("<IIH", start, end, len(b)) + b)
+    return b"".join(out)
 
 
 def pack_attr(subs: list[str], ranges: list[tuple[int, int, int]]) -> bytes:
@@ -607,6 +640,7 @@ def tables(build_dir: Path) -> None:
     info = parse_map(map_path.read_text(errors="replace"))
     subs, ranges, counts = attribution_table(info, read_subsystems())
     (build_dir / ATTR_NAME).write_bytes(pack_attr(subs, ranges))
+    (build_dir / FUNCS_NAME).write_bytes(pack_funcs(function_table(info)))
     items, stats = build_items(info, map_path, layouts_of(build_dir), read_csv(STATE_CLASSES), read_csv(GLOBALS))
     (build_dir / ITEMS_NAME).write_bytes(items.pack())
     print("accesslog: %(functions)d functions, %(unknown)d unknown, %(ignored)d ignored" % counts, file=sys.stderr)
@@ -632,7 +666,7 @@ def play(exe: Path, scenario: Path, game_dir: Path, tables_dir: Path | None, raw
     argv = [sys.executable, str(ROOT / "tools/playtest.py"), "--exe", str(exe), "--game-dir", str(game_dir),
             "--testmode", str(scenario), "--native-modules", "--testmode-timeout", str(timeout)]
     if tables_dir is not None:
-        for name in (ATTR_NAME, ITEMS_NAME):
+        for name in (ATTR_NAME, ITEMS_NAME, FUNCS_NAME):
             argv += ["--put", name, str(tables_dir / name)]
         for name in OUTPUT_FILES + (RAW_FILE,) * raw:
             argv += ["--collect", name]
@@ -693,7 +727,7 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
         why = trace_difference(directory / "trace.txt", stored)
         print("%s: %s" % (name, "trace EQUAL to reference/traces/%s.txt" % name if why is None else "trace DIFFERS, " + why))
         failed += why is not None
-        for suffix, source in (("edges.csv", "access.edges.csv"), ("stats.txt", "access.stats.txt"), ("raw.txt", RAW_FILE)):
+        for suffix, source in (("edges.csv", "access.edges.csv"), ("stats.txt", "access.stats.txt"), ("presentation.csv", "access.presentation.csv"), ("raw.txt", RAW_FILE)):
             if (directory / source).is_file():
                 shutil.copyfile(directory / source, out / ("%s.%s" % (name, suffix)))
         if twice:

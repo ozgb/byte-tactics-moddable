@@ -412,6 +412,31 @@ class LayoutTest(unittest.TestCase):
         self.assertEqual(types, 1)
 
 
+class PresentationTest(unittest.TestCase):
+    def test_funcs_round_trip(self):
+        data = al.pack_funcs([(0x401000, 0x401040, "Draw"), (0x401040, 0x401100, "Unit::Move")])
+        self.assertEqual(data[:4], al.FUNCS_MAGIC)
+        count, start, end, length = struct.unpack_from("<IIIH", data, 4)
+        self.assertEqual((count, start, end, length), (2, 0x401000, 0x401040, 4))
+        self.assertEqual(data[18:22], b"Draw")
+
+    def test_function_table_covers_the_code_symbols_by_address(self):
+        table = al.function_table(al.parse_map(MAP))
+        self.assertEqual([a for a, _, _ in table], sorted(a for a, _, _ in table))
+        for (_, end, _), (start, _, _) in zip(table, table[1:]):
+            self.assertEqual(end, start)
+
+    def test_the_presentation_file_is_put_collected_and_kept(self):
+        self.assertIn("access.presentation.csv", al.OUTPUT_FILES)
+        self.assertIn("accesslog.funcs", al.FUNCS_NAME)
+        source = Path(al.__file__).read_text()
+        self.assertIn('("presentation.csv", "access.presentation.csv")', source)
+        self.assertIn("FUNCS_NAME", source.split("def play(")[1].split("def steady(")[0])
+        runtime = (ROOT / "lib/accesslog/access_log.cpp").read_text()
+        self.assertIn('WriteWhole("access.presentation.csv", out)', runtime)
+        self.assertIn("out.Add(\"item,reader,function,windows,events,container\\n\")", runtime)
+
+
 class RunTest(unittest.TestCase):
     def test_equal_and_different_traces(self):
         with tempfile.TemporaryDirectory() as tmp:

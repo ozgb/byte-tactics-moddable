@@ -102,7 +102,7 @@ if(BT_ACCESS_LOG)
   set(ACCESS_LOG_TARGETS accesslog)
   set(ACCESS_LOG_ALIAS_FLAGS --access-log)
   set(ACCESS_LOG_TABLES COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/accesslog.py" tables --build-dir "${CMAKE_BINARY_DIR}")
-  set(ACCESS_LOG_TABLE_FILES BYPRODUCTS "${CMAKE_BINARY_DIR}/accesslog.attr" "${CMAKE_BINARY_DIR}/accesslog.items")
+  set(ACCESS_LOG_TABLE_FILES BYPRODUCTS "${CMAKE_BINARY_DIR}/accesslog.attr" "${CMAKE_BINARY_DIR}/accesslog.items" "${CMAKE_BINARY_DIR}/accesslog.funcs")
   set(ACCESS_LOG_TABLE_DEPS "${CMAKE_SOURCE_DIR}/tools/accesslog.py" "${CMAKE_SOURCE_DIR}/data/subsystems.csv" "${CMAKE_SOURCE_DIR}/data/state_classes.csv")
   set(ACCESS_LOG_LINK_FLAGS /nodefaultlib:clang_rt.asan.lib /nodefaultlib:clang_rt.asan_cxx.lib
       /nodefaultlib:clang_rt.asan_dynamic.lib /nodefaultlib:clang_rt.asan_dynamic_runtime_thunk.lib)

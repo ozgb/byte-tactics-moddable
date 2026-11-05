@@ -28980,6 +28980,7 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,call,HapiBank::OpenAccount
 0x497180,LoadMatch,src/game/game_load.cpp,call,HarnessCrtSeed
 0x497180,LoadMatch,src/game/game_load.cpp,call,HarnessGameSeed
+0x497180,LoadMatch,src/game/game_load.cpp,call,HarnessLoadEnded
 0x497180,LoadMatch,src/game/game_load.cpp,call,InitPlayerResources
 0x497180,LoadMatch,src/game/game_load.cpp,call,LoadBattleAssets
 0x497180,LoadMatch,src/game/game_load.cpp,call,LoadGuiLayer
@@ -29135,6 +29136,8 @@ address,function,file,kind,target
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,HAPINET_guaranteepackets
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,HAPI_LoadFile
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,HandleNetPackets
+0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,HarnessAwaitLoadAndEndFrame
+0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,HarnessLoadBegins
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,LoadPictureCached
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,LockScreen
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,MainLoopTick
@@ -44273,6 +44276,11 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_sound@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_trace@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_ui@src/harness/harness.cpp
+,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,call,MsgWaitForMultipleObjects
+,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,call,PeekMessageA
+,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,function,
+,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,global_maybe_written,s_loadEnded@src/harness/harness.cpp
+,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,global_read,s_loadEnded@src/harness/harness.cpp
 ,HarnessBankString,src/harness/harness_bank.cpp,call,HapiBank::GetStringItem
 ,HarnessBankString,src/harness/harness_bank.cpp,function,
 ,HarnessBeforeStep,src/harness/harness.cpp,call,DeliverScriptedInput
@@ -44431,6 +44439,13 @@ address,function,file,kind,target
 ,HarnessKeyState,src/harness/harness.cpp,global_read,s_keyDown@src/harness/harness.cpp
 ,HarnessKeyState,src/harness/harness.cpp,global_read,s_keyPressed@src/harness/harness.cpp
 ,HarnessKeyState,src/harness/harness.cpp,global_write,s_keyPressed@src/harness/harness.cpp
+,HarnessLoadBegins,src/harness/harness.cpp,call,CreateEventA
+,HarnessLoadBegins,src/harness/harness.cpp,function,
+,HarnessLoadBegins,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
+,HarnessLoadBegins,src/harness/harness.cpp,global_write,s_loadEnded@src/harness/harness.cpp
+,HarnessLoadEnded,src/harness/harness.cpp,call,SetEvent
+,HarnessLoadEnded,src/harness/harness.cpp,function,
+,HarnessLoadEnded,src/harness/harness.cpp,global_read,s_loadEnded@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,call,GameU32
 ,HarnessPhase,src/harness/harness.cpp,call,VisitExplosions
 ,HarnessPhase,src/harness/harness.cpp,call,VisitFeatures

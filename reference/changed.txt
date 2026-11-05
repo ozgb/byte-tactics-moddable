@@ -98,6 +98,7 @@
 0x495e90 HandleGameKey
 0x496bb0 MenuFrame
 0x497180 LoadMatch
+0x497f40 LoadingScreenFrame
 0x49be60 DrawProjectiles
 0x49e830 GameMain
 0x49f6c0 PlayWavFromDisk

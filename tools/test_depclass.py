@@ -102,7 +102,8 @@ DEFERRABLE = [{"writer": "units", "reader": "weapons", "item": "Unit::x", "phase
 def check_row(result: str = "equal", scenarios: int = 83) -> dict:
     """A row of dependency_checks.csv for the deferrable edge of DEFERRABLE."""
     return {"writer": "units", "reader": "weapons", "item": "Unit::x", "phase": "units", "group": "g1",
-            "scenarios": str(scenarios), "result": result}
+            "scenarios": str(scenarios), "result": result, "scenarios_counted": "82", "defer_held": "0",
+            "defer_third_stores": "4"}
 
 
 class Confirm(unittest.TestCase):
@@ -124,8 +125,15 @@ class Confirm(unittest.TestCase):
         self.assertEqual(len(out), 1)
         self.assertIn("82 of 83", out[0])
 
+    def test_missing_counts_fail(self):
+        row = check_row()
+        row["defer_held"] = ""
+        out = dc.unconfirmed(DEFERRABLE, [row], 83)
+        self.assertEqual(len(out), 1)
+        self.assertIn("defer_held", out[0])
+
     def test_read_checks(self):
-        text = ",".join(dc.CHECK_COLUMNS) + '\nunits,weapons,Unit::x,units,g1,83,equal\n'
+        text = ",".join(dc.CHECK_COLUMNS) + '\nunits,weapons,Unit::x,units,g1,83,equal,82,0,4\n'
         self.assertEqual(dc.read_checks(text), [check_row()])
 
 

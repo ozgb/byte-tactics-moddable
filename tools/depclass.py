@@ -48,10 +48,15 @@ on a tie. For deferrable it is the later of the two rows' first ticks (when the 
 `flags` holds `dynamic-only` when data/coupling.csv has no row of any kind from the writer to the reader: the
 runs found a dependency that the static analysis did not.
 
-data/dependency_checks.csv has the columns writer,reader,item,phase,group,scenarios,result, sorted like
+data/dependency_checks.csv has the columns writer,reader,item,phase,group,scenarios,result,scenarios_counted,defer_held,
+defer_third_stores, sorted like
 data/dependencies.csv: one row per deferrable edge, from the full-suite run of the build with BT_DEFER_WRITES
 (tools/accesslog.py, #837) that held back that edge's writes to the end of the phase. `group` names the edges run
-together, `scenarios` is how many scenarios the run compared and `result` is `equal` or `diverged`. It is an input of
+together, `scenarios` is how many scenarios the run compared and `result` is `equal` or `diverged`. `defer_held` and
+`defer_third_stores` are the barrier's counters summed over `scenarios_counted` scenarios of the group's run (the same for every
+edge of a group; the scenario that loads another's save is not counted): how often a
+reader's load met a byte whose write was held back (0 means the barrier never changed what a reader saw), and how often a
+subsystem other than the writer and reader stored to such a byte. They show how strong the confirmation is. It is an input of
 `--check` only: `--check` fails on a deferrable edge with no `equal` row that compared every scenario of reference/traces.
 
 Coupling edges used. The `shared_write` rows of data/coupling.csv between two simulation subsystems (from writes,
@@ -93,7 +98,7 @@ SCENARIOS = ROOT / "reference/scenarios"
 OUTPUT = ROOT / "data/dependencies.csv"
 CHECKS_CSV = ROOT / "data/dependency_checks.csv"
 TRACES = ROOT / "reference/traces"
-CHECK_COLUMNS = ["writer", "reader", "item", "phase", "group", "scenarios", "result"]
+CHECK_COLUMNS = ["writer", "reader", "item", "phase", "group", "scenarios", "result", "scenarios_counted", "defer_held", "defer_third_stores"]
 COLUMNS = ["writer", "reader", "item", "phase", "class", "runs", "example", "flags"]
 SIM = frozenset(coupling.SIM_SUBSYSTEMS)
 NONE = "-"
@@ -248,8 +253,11 @@ def read_checks(text: str) -> list[dict]:
 
 def unconfirmed(rows: list[dict], checks: list[dict], suite: int) -> list[str]:
     """One message per deferrable edge of rows that no `equal` check row covers with a run of the whole suite."""
+    def counted(c: dict) -> bool:
+        return all((c.get(k) or "").isdigit() for k in ("scenarios_counted", "defer_held", "defer_third_stores"))
+
     confirmed = {(c["writer"], c["reader"], c["item"], c["phase"]) for c in checks
-                 if c["result"] == "equal" and int(c["scenarios"]) >= suite}
+                 if c["result"] == "equal" and int(c["scenarios"]) >= suite and counted(c)}
     seen = {(c["writer"], c["reader"], c["item"], c["phase"]): c for c in checks}
     out = []
     for r in rows:
@@ -261,8 +269,10 @@ def unconfirmed(rows: list[dict], checks: list[dict], suite: int) -> list[str]:
             why = "no row in data/dependency_checks.csv"
         elif c["result"] != "equal":
             why = "its run in group %s %s" % (c["group"], c["result"])
-        else:
+        elif int(c["scenarios"]) < suite:
             why = "its run compared %s of %d scenarios" % (c["scenarios"], suite)
+        else:
+            why = "its row in group %s has no scenarios_counted, defer_held and defer_third_stores" % c["group"]
         out.append("deferrable edge %s -> %s on %s in %s is not confirmed: %s" % (key[0], key[1], key[2], key[3], why))
     return out
 

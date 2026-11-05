@@ -24,8 +24,6 @@ a new scenario needs no cherry-pick to `reference`. It refuses to replace
 `reference/traces/` unless the trace names equal the scenario names, and the
 error lists the missing and the extra ones.
 
-The test-mode wait for the loading thread (`HarnessAwaitLoadAndEndFrame`) is not on the `reference` branch, so a `--traces` run there is still exposed to the number of loading frames: under load it can write a tick-1 `view` count one draw too high, and a regenerated `reference/ui/` count must equal the stored one (the count of a run on an idle machine).
-
 ## Running a scenario
 
 The exe takes a scenario file with `-testmode`. It starts a skirmish from the

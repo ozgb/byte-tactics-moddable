@@ -498,6 +498,19 @@ class LeakCheckTest(unittest.TestCase):
             files["interfaces/m.h"] = (header + "// FUNCTION: 0x437de0\n").encode()
             self.assertEqual(len(oraclekit.leak_check(files, Path(tmp))), 2)
 
+    def test_the_export_strips_address_marker_lines_from_interfaces(self):
+        header = "int a;\n    // FUNCTION: 0x4c54a0 ??0X@@QAE@XZ\nint b;\n// GLOBAL: 0x4fc490\n// kept comment\n"
+        self.assertEqual(oraclekit.strip_markers("interfaces/x.h", header.encode()), b"int a;\nint b;\n// kept comment\n")
+        self.assertEqual(oraclekit.strip_markers("docs/x.md", header.encode()), header.encode())
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {"interfaces/x.h": header})
+            kit = Path(out) / "k"
+            manifest = oraclekit.export(root, kit, True, {"records": {}}, CONTENTS + [("dir", "interfaces", "")])
+            stripped = (kit / "interfaces" / "x.h").read_bytes()
+            self.assertNotIn(b"0x4c54a0", stripped)
+            entry = next(f for f in manifest["files"] if f["path"] == "interfaces/x.h")
+            self.assertEqual(entry["sha256"], hashlib.sha256(stripped).hexdigest())
+
     def test_stored_reference_data_defines_names(self):
         files = {**leak_files("ok\n"), "reference/sounds/a.txt": b"count1 6\n"}
         self.assertIn("count1", oraclekit.allowed_identifiers(files))

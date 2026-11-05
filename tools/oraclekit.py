@@ -20,7 +20,8 @@ identifier and token-run rules over every text file of the kit and the export fa
 is not applied: the kit documents use `sh` and `json` fences for commands and schema examples. The identifiers a
 file may use are those the kit's structured data defines (`allowed_identifiers`: the json, the interface headers and
 everything under reference/ and tests/replay/), never the checked text itself. The interface headers declare the names
-and are the source's own declarations, so only the address rule applies to them.
+and are the source's own declarations, so only the address rule applies to them, and the export strips their
+address-marker lines (`// FUNCTION: 0x...`, `// GLOBAL: 0x...`) before the check and the manifest digests.
 """
 
 from __future__ import annotations
@@ -386,6 +387,14 @@ def leak_check(files: dict[str, bytes], root: Path, run: int = speclint.DEFAULT_
     return hits
 
 
+MARKER_LINE = re.compile(rb"^[ \t]*//[ \t]*(?:FUNCTION|GLOBAL):[ \t]*0x[0-9a-fA-F]+.*(?:\r?\n|$)", re.M)
+
+
+def strip_markers(path: str, data: bytes) -> bytes:
+    """An interface header without its whole `// FUNCTION:` and `// GLOBAL:` address-marker lines; other files as they are."""
+    return MARKER_LINE.sub(b"", data) if path.startswith(DECLARED_DIRS) else data
+
+
 def check_target(out: Path) -> None:
     """Refuse a target that is a file or a directory with something in it."""
     if out.exists() and not out.is_dir():
@@ -399,7 +408,7 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     paths = select(root, contents, lister)
     tags = version_tags(root)
     version = check_tags(tags, untagged)
-    files = {p: blob(root, p) for p in paths}
+    files = {p: strip_markers(p, blob(root, p)) for p in paths}
     files[LAYOUT] = (json.dumps(layout, indent=1, sort_keys=False) + "\n").encode()
     try:
         files[MODULES] = kit_modules(blob(root, MODULES))

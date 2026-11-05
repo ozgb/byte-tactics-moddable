@@ -935,6 +935,31 @@ calls through the seam table of the module with the cursor set back over those l
 `<import>.c[<k>]`. A command that is not a seam slot is not recorded, a slot import of the nested call is not recorded, and a command run
 inside a nested command fails the recording.
 
+## Not recorded
+
+No scenario reaches these paths of economy and targeting, and no recording holds them. Each has its reason.
+
+economy:
+
+- `UpdateResourceSharing`: it acts only in a network game, and test mode runs every player on one machine.
+- `UpdatePlayerEconomy` for a player of type 3: type 3 is a remote network player, which only a lobby with network players creates.
+- `UpdatePlayerEconomy` for a unit whose resource slot belongs to another player than the one settled: every unit is created in its owner's part of the unit table and `Reset` ties the slot to that owner, so only a corrupt save could differ.
+- `LoadUnitAccounts` with a missing box: every saved unit has its account box, so only a save from an older build lacks one.
+- The false sides of `SpendEnergy`, `SpendMetal` and `SpendEnergyAndMetal` (not enough in stock): the callers check the stock first.
+- An extractor with no COB script: every shipped extractor has one.
+
+targeting:
+
+- `ChooseWeapon` returning 1 or 2: no shipped unit has weapon slot 0 empty and slot 1 or 2 defined.
+- `SetWeaponTargetPos` with a z of -32768: it needs a world z of 32768, and scenarios and the harness reject positions off the map.
+- `SetWeaponTargetUnit` with a null target: 3.1c faults on it.
+- `FindWeaponTarget` rejecting a candidate that is not alive or is dying: the candidate list holds only live units, so neither check can fail.
+- `FindWeaponTarget` with the menu option bit 4 of the match flags set: no scenario key sets it.
+- `GetWeaponTargetPos` with the lead condition "the weapon slot has no weapon" failing alone: the setters check it first.
+- `GetWeaponTargetPos` with a cruise weapon, or a weapon of speed 0, and a unit with more than five kills (the other lead conditions are met): not reached by the scenario suite; it would need a veteran missile silo or bomber.
+- `ai.GetVisibleEnemiesInRadiusList`: it has no 3.1c call site, only the vector form `ai.GetVisibleEnemiesInRadius` is called, which the recordings carry.
+- A unit target with `unitDefIndex` 0 where the second condition of the guard (the aim target field being nonzero) is false: that condition is always true there.
+
 ## Replaying
 
 `tests/replay_native_test.cpp` replays a recording against the native module (`replay_native_test.exe`, built by
@@ -981,7 +1006,12 @@ wine build/modern/replay_inject_test.exe --expect 5501 Player#0.energy tests/rep
 The recordings of economy and the scenarios they come from: `duel-shore-to-shore` (wind generators from tick 1620, metal
 extractors from tick 480), `duel-coast-to-coast` (tidal generators from tick 3330, extractors) and `load-midgame` (the
 accounts read back from a saved game, `LoadUnitAccounts`, and extractors) and `ten-ring-atoll`, ticks 6270 to 6270 only, where
-the first metal maker earns income (the `makesMetal` branch of `UpdatePlayerEconomy`). `UpdatePlayerEconomy` walks every unit of the
+the first metal maker earns income (the `makesMetal` branch of `UpdatePlayerEconomy`). `save-midgame`, ticks 900 to 900 only, holds
+`SaveUnitAccounts` (each unit's account box written through `files.BankOpenNamedBox`, `files.BankSeekBox` and `files.BankWriteBox`),
+`console-economy`, ticks 40 to 100 only, holds `SpendMetal` and `SpendEnergy` (the console `give` commands), and
+`edges-economy-targeting` (the whole run, 260 ticks) holds `RequestEnergy` (repairs), `SpendEnergyAndMetal` (shots), a cloak payment in
+`UpdatePlayerEconomy` (`units.SetStateBits`), an extractor whose footprint hangs over the map edge (`los_radar.GetMapCell` returns null)
+and `Reset` of a resource slot for player index 2. `UpdatePlayerEconomy` walks every unit of the
 player's slice of the unit table on each call, so a recording carries the `r` lines of all the slice at the first call and the
 changes after it.
 
@@ -996,7 +1026,11 @@ wine build/modern/replay_inject_test.exe --expect 352 pos.x tests/replay/targeti
 The recordings of targeting, which is native code in every mode: `orders-guard-attacked` (units that guard and are attacked: every
 slot but `SetWeaponTargetPos`, `SetWeaponTargetUnit` 315 times, candidates from `ai.GetVisibleEnemiesInRadius`, `ChooseWeapon`),
 `orders-tier2-spider` (`SetWeaponTargetPos` 8 times, and the ground positions of `GetWeaponTargetPos`) and `skirmish4-long`, ticks
-25750 to 25770 only, where a unit with more than five kills fires at a moving unit (the scale of `GetWeaponTargetPos`). Each
+25750 to 25770 only, where a unit with more than five kills fires at a moving unit (the scale of `GetWeaponTargetPos`). `console-units` (the whole run) holds a
+unit target whose `unitDefIndex` is 0, so `GetWeaponTargetPos` returns 0 and the target is cleared. `edges-economy-targeting` (the whole run, 260 ticks) holds
+a search with more than 50 candidates, candidates at the same spot (`services.RandomInt` of 0), a unit with fire order 0, a kamikaze unit
+among the candidates, a paralyzer weapon against a paralyzed target, a veteran commander (more than five kills) aiming at a building,
+the D-gun (`SetWeaponTargetPos` on weapon 2), and an aim at ground under the sea (`units.GetGroundHeight` returns 1). Each
 `GetWeaponTargetPos` that returns nonzero records the `pos` it wrote (`o pos.x`); one that returns 0 leaves the stack local of its caller untouched, so
 nothing is recorded of it.
 

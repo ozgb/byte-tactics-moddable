@@ -4337,7 +4337,7 @@ presentation,wind_meteors,shared_write,Vec3::x,1
 presentation,wind_meteors,shared_write,Vec3::y,1
 presentation,wind_meteors,shared_write,Vec3::z,1
 seams,ai,call,GetFactoriesInRadius,1
-seams,ai,call,GetVisibleEnemiesInRadius,1
+seams,ai,call,GetVisibleEnemiesInRadius,2
 seams,ai,call,SquadManager::DeleteTimers,1
 seams,ai,call,SquadManager::MarkOwnerNetDirtyFromDamageSplit,1
 seams,ai,call,SquadManager::TickIfActive,1

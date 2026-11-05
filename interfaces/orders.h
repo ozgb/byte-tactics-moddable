@@ -23,6 +23,19 @@ class MissionType;
 // Minor version of the orders interface, changed when a slot is added.
 #define ORDERS_VERSION_MINOR 10
 
+// Order flag: the order has a target unit.
+#define ORDER_FLAG_TARGET 0x200
+// Order flag: the order has a position.
+#define ORDER_FLAG_POSITION 0x400
+// Order flag: the order announces its status once when it starts.
+#define ORDER_FLAG_ANNOUNCE 0x2000
+// Order flag: a unit with this first order counts as idle.
+#define ORDER_FLAG_IDLE 0x20000
+// Order flag: the order goes in the second order list of its unit.
+#define ORDER_FLAG_SECOND_LIST 0x40000
+// Order flag: a unit with this first order raises no under attack line.
+#define ORDER_FLAG_NO_UNDERATTACK_LINE 0x80
+
 // Unit orders and command queues.
 struct OrdersSeam {
     // Gives a path search goal the waypoints a search found (thiscall in 3.1c, this first). Hooks: none.

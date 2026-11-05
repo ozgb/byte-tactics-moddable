@@ -407,6 +407,7 @@ startPos,presentation,DrawBattleFrame,startPos,1,
 startPos,presentation,DrawUnitInfoPanel,startPos,0,
 ticks,game,RecordSimEvent,ticks,0,-
 ticks,game,RunGameSteps,ticks,1,
+ticks,harness,HarnessSimEventSlot,ticks,0,-
 ticks,harness,HarnessSoundEvent,ticks,0,
 ticks,harness,HarnessUiCancel,ticks,0,-
 ticks,harness,HarnessUiOrder,ticks,0,

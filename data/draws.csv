@@ -1,33 +1,33 @@
 pass,stream,subsystem,function,entities,draws_min,draws_max,ticks,start_state,evidence,example
 features,rng.crtHoldrand,features,UpdateFeatures,56,2,2,6461,fixed,,ui-keys@99
 features,rng.parkMiller,ai,ReactToAttack,1,1,1,1,fixed,,orders-guard-attacked@270
-features,rng.parkMiller,features,SpreadFire,2,1,8,155,depends-on-earlier,FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;SimEventsCreate: GameAllocIgnoreTag SimEventQueue;FeatureAnimEntry::next,mission-timer@268
-features,rng.parkMiller,features,StartFeatureBurning,2,1,5,117,depends-on-earlier,FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;SimEventsCreate: GameAllocIgnoreTag SimEventQueue;FeatureAnimEntry::next,mission-timer@268
+features,rng.parkMiller,features,SpreadFire,2,1,8,155,depends-on-earlier,FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;SimEventsCreate: GameAllocIgnoreTag SimEventQueue;unresolved:image,mission-timer@268
+features,rng.parkMiller,features,StartFeatureBurning,2,1,5,117,depends-on-earlier,FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;SimEventsCreate: GameAllocIgnoreTag SimEventQueue;unresolved:image,mission-timer@268
 features.anim,rng.parkMiller,features,UpdateFeatures,1,1,1,5659,fixed,,duel-great-divide@4
 meteors,rng.crtHoldrand,wind_meteors,UpdateMeteors,1,2,6,547,start-state,,hailstorm-los-off@1
-players,rng.parkMiller,ai,??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,2,1,2,60,depends-on-earlier,Unit::flags;unresolved:block;unknown_1b8e;SquadManager::SquadManager: new BuildTimer,mission-kill-of-type@90
+players,rng.parkMiller,ai,??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,2,1,2,60,depends-on-earlier,unresolved:block;unresolved:image;Unit::flags;unknown_1b8e,mission-kill-of-type@90
 players,rng.parkMiller,ai,??0SpatialTimer@@QAE@PAVSquadManager@@PAX@Z,3,1,1,13898,fixed,,combat-deaths@30
-players,rng.parkMiller,ai,??0SquadScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,2,1,8,3034,depends-on-earlier,SquadManager::countdown;SquadManager::SquadManager: new BuildTimer;unresolved:block;Unit::flags,ten-lava-run@30
-players,rng.parkMiller,ai,ChooseBuildOption,10,1,144,2517,depends-on-earlier,unknown_1b8e;unresolved:block;PlayerAI::centre;SquadManager::SquadManager: new BuildTimer,mission-kill-of-type@30
-players,rng.parkMiller,ai,FindBuildPosition,9,1,10,1568,depends-on-earlier,unknown_1b8e;PlayerAI::centre;SquadManager::SquadManager: new BuildTimer;SquadManager::countdown,combat-deaths@90
-players,rng.parkMiller,ai,PlayerAI::FindRandomPlacementCell,5,3,938,1728,depends-on-earlier,unknown_1b8e;SquadManager::SquadManager: new BuildTimer;SquadManager::countdown;unresolved:block,console-economy@90
+players,rng.parkMiller,ai,??0SquadScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,2,1,8,3034,depends-on-earlier,unresolved:image;SquadManager::countdown;SquadManager::SquadManager: new BuildTimer;Unit::flags,ten-lava-run@30
+players,rng.parkMiller,ai,ChooseBuildOption,10,1,144,2517,depends-on-earlier,unknown_1b8e;unresolved:image;unresolved:block;SquadManager::SquadManager: new BuildTimer,mission-kill-of-type@30
+players,rng.parkMiller,ai,FindBuildPosition,9,1,10,1568,depends-on-earlier,unresolved:image;unknown_1b8e;SquadManager::SquadManager: new BuildTimer;SquadManager::countdown,combat-deaths@90
+players,rng.parkMiller,ai,PlayerAI::FindRandomPlacementCell,5,3,938,1728,depends-on-earlier,unresolved:image;unknown_1b8e;SquadManager::SquadManager: new BuildTimer;SquadManager::countdown,console-economy@90
 players,rng.parkMiller,ai,ScoutTimer::OnTimer,1,1,1,19,fixed,,long-greenhaven-8p@12420
 players,rng.parkMiller,ai,UpdatePlayerAI,10,1,1,12135,fixed,,allied-victory@30
-players,rng.parkMiller,targeting,FindWeaponTarget,3,1,250,1732,depends-on-earlier,SquadManager::cursor;SquadManager::countdown;g_allocSerial;g_liveAllocCount,edges-economy-targeting@31
+players,rng.parkMiller,targeting,FindWeaponTarget,3,1,250,1732,depends-on-earlier,unresolved:image;SquadManager::cursor;SquadManager::countdown;g_allocSerial,edges-economy-targeting@31
 projectiles,rng.parkMiller,ai,ReactToAttack,5,1,1,820,fixed,,edges-economy-targeting@36
-projectiles,rng.parkMiller,features,StartFeatureBurning,1,1,3,123,depends-on-earlier,Projectile::angles;Projectile::position;Projectile::speed;SimEventsCreate: GameAllocIgnoreTag SimEventQueue,ui-keys@99
+projectiles,rng.parkMiller,features,StartFeatureBurning,1,1,3,123,depends-on-earlier,Projectile::angles;Projectile::position;Projectile::speed;unresolved:image,ui-keys@99
 projectiles,rng.parkMiller,weapons,UpdateProjectiles,3,1,1,3040,fixed,,orders-guard-attacked@53
-units,rng.parkMiller,ai,ReactToAttack,1,1,2,4,depends-on-earlier,Unit::f_1f;f14353;NewUnitScript: new UnitScript;Unit::f_57,edges-economy-targeting@244
-units,rng.parkMiller,features,StartFeatureBurning,1,4,51,2,depends-on-earlier,Unit::def;Unit::f_1f;f14353;unknown_1cd9,mission-kill-of-type@185
-units,rng.parkMiller,map,PickRandomReclaimableResourcesInRadius,2,3,6,1216,depends-on-earlier,NewUnitScript: new UnitScript;Unit::f_1f;f14353;Unit::f_57,mission-kill-of-type@128
+units,rng.parkMiller,ai,ReactToAttack,1,1,2,4,depends-on-earlier,Unit::f_1f;f14353;unresolved:image;NewUnitScript: new UnitScript,edges-economy-targeting@244
+units,rng.parkMiller,features,StartFeatureBurning,1,4,51,2,depends-on-earlier,Unit::def;f14353;unknown_1cd9;unresolved:image,mission-kill-of-type@185
+units,rng.parkMiller,map,PickRandomReclaimableResourcesInRadius,2,3,6,1216,depends-on-earlier,Unit::f_1f;f14353;unresolved:image;Unit::f_57,mission-kill-of-type@128
 units,rng.parkMiller,orders,AirStrikeOrder,1,1,1,29,fixed,,orders-air-fights@1000
 units,rng.parkMiller,orders,AirToAirOrder,1,1,1,11,fixed,,long-greenhaven-8p@37596
 units,rng.parkMiller,orders,AirToGroundHoverOrder,1,1,1,9,fixed,,long-greenhaven-8p@47671
 units,rng.parkMiller,orders,AirToGroundOrder,2,1,1,225,fixed,,orders-air-fights@112
 units,rng.parkMiller,orders,AttackChaseOrder,10,1,1,773,fixed,,console-units@76
-units,rng.parkMiller,orders,AttackUTypeOrder,7,1,9,24,depends-on-earlier,Unit::f_1f;f14353;NewUnitScript: new UnitScript;Unit::def,mission-build-unit@151
+units,rng.parkMiller,orders,AttackUTypeOrder,7,1,9,24,depends-on-earlier,f14353;NewUnitScript: new UnitScript;Unit::def;Unit::f_1f,mission-build-unit@151
 units,rng.parkMiller,orders,FollowGroundOrder,7,1,1,20,fixed,,mission-capture@1
-units,rng.parkMiller,orders,GuardNoMoveOrder,7,1,58,263,depends-on-earlier,NewUnitScript: new UnitScript;Unit::f_1f;f14353;Unit::field_18,mission-build-unit@32
+units,rng.parkMiller,orders,GuardNoMoveOrder,7,1,58,263,depends-on-earlier,Unit::f_1f;f14353;NewUnitScript: new UnitScript;Unit::field_18,mission-build-unit@32
 units,rng.parkMiller,orders,PatrolOrder,6,1,1,44,fixed,,mission-capture@17
 units,rng.parkMiller,orders,ReclaimOrder,2,1,1,333,fixed,,eight-pincushion-teams@11753
 units,rng.parkMiller,orders,RepairPatrolOrder,2,1,1,18,fixed,,skirmish4-long@17331
@@ -39,17 +39,17 @@ units,rng.parkMiller,orders,StandbyMineOrder,1,1,1,9,fixed,,edges-economy-target
 units,rng.parkMiller,orders,StandbyOrder,71,1,1,29001,fixed,,allied-victory@3
 units,rng.parkMiller,orders,SuppressOrder,1,1,1,3,fixed,,edges-economy-targeting@11
 units,rng.parkMiller,orders,VtolFollowOrder,18,1,1,17,fixed,,mission-timer@1
-units,rng.parkMiller,orders,VtolLandIfCanOrder,2,1,25,117,depends-on-earlier,Unit::f_1f;f14353;Unit::f_57;NewUnitScript: new UnitScript,mission-timer@186
+units,rng.parkMiller,orders,VtolLandIfCanOrder,2,1,25,117,depends-on-earlier,f14353;Unit::f_1f;Unit::f_57;unresolved:image,mission-timer@186
 units,rng.parkMiller,orders,VtolLandingOrder,1,1,1,2,fixed,,orders-air-repair@382
 units,rng.parkMiller,orders,VtolRepairPatrolOrder,2,1,1,16,fixed,,skirmish4-long@24415
 units,rng.parkMiller,orders,VtolSeekAttackOrder,1,1,2,3,depends-on-earlier,NewUnitScript: new UnitScript;Unit::f_1f;Unit::f_57;f14353,orders-air-fights@873
 units,rng.parkMiller,orders,VtolSeekGuardOrder,1,1,1,3,fixed,,orders-air-repair@382
 units,rng.parkMiller,orders,VtolStandbyOrder,6,1,1,159,fixed,,mission-kill-of-type@3
-units,rng.parkMiller,targeting,FindWeaponTarget,9,1,100,802,depends-on-earlier,f14353;NewUnitScript: new UnitScript;Unit::f_1f;Unit::f_57,mission-build-unit@36
-units,rng.parkMiller,units,CobScript::RunThread,10,1,2,11641,depends-on-earlier,Unit::f_1f;f14353;NewUnitScript: new UnitScript;Unit::f_57,mission-kill-of-type@3
-units,rng.parkMiller,units,InitUnitFromType,3,1,2,1915,depends-on-earlier,Unit::f_1f;f14353;NewUnitScript: new UnitScript;Unit::f_57,conditions-shore-to-shore@6
+units,rng.parkMiller,targeting,FindWeaponTarget,9,1,100,802,depends-on-earlier,f14353;Unit::f_1f;NewUnitScript: new UnitScript;Unit::f_57,mission-build-unit@36
+units,rng.parkMiller,units,CobScript::RunThread,10,1,2,11641,depends-on-earlier,f14353;Unit::f_1f;NewUnitScript: new UnitScript;Unit::f_57,mission-kill-of-type@3
+units,rng.parkMiller,units,InitUnitFromType,3,1,2,1915,depends-on-earlier,Unit::f_1f;f14353;Unit::f_57;NewUnitScript: new UnitScript,conditions-shore-to-shore@6
 units,rng.parkMiller,weapons,BreakPieceIntoDebris,21,16,392,125,depends-on-earlier,f14353;Unit::f_1f;NewUnitScript: new UnitScript;Unit::f_57,mission-build-unit@71
-units,rng.parkMiller,weapons,FireTurretWeapon,3,2,4,2177,depends-on-earlier,f14353;Unit::f_1f;NewUnitScript: new UnitScript;Unit::field_18,mission-build-unit@39
+units,rng.parkMiller,weapons,FireTurretWeapon,3,2,4,2177,depends-on-earlier,f14353;Unit::f_1f;Unit::field_18;NewUnitScript: new UnitScript,mission-build-unit@39
 units,rng.parkMiller,weapons,UnitScript::ExplodePiece,52,6,96,172,depends-on-earlier,f14353;Unit::f_1f;NewUnitScript: new UnitScript;Unit::f_57,mission-build-unit@71
 wind,rng.crtHoldrand,wind_meteors,UpdateWindOnStream,1,1,1,1335,fixed,,allied-victory@1
 wind,rng.parkMiller,wind_meteors,UpdateWindOnStream,1,2,2,1258,fixed,,allied-victory@1

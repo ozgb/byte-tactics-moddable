@@ -341,8 +341,8 @@ projectiles,Projectile::owner,weapons,UpdateProjectiles,other-record,4,orders-gu
 projectiles,Projectile::piece,weapons,CompactProjectiles,other-record,6,orders-guard-attacked@59
 projectiles,Projectile::piece,weapons,CompactProjectiles,same-record,4,mission-build-unit@131
 projectiles,Projectile::piece,weapons,UpdateProjectiles,other-record,4,orders-guard-attacked@163
-projectiles,Projectile::position,game,SoundHeardMask,other-record,1,mission-radius@1711
 projectiles,Projectile::position,los_radar,GetMapCellAtPosition,other-record,1,mission-radius@1711
+projectiles,Projectile::position,los_radar,SoundHeardMask,other-record,1,mission-radius@1711
 projectiles,Projectile::position,weapons,AddExplosionEffect,other-record,1,mission-radius@1711
 projectiles,Projectile::position,weapons,ApplyAreaDamage,other-record,1,mission-radius@1711
 projectiles,Projectile::position,weapons,CompactProjectiles,other-record,6,orders-guard-attacked@86
@@ -489,12 +489,12 @@ units,FeatureAnimEntry::src,weapons,ApplyAreaDamage,same-record,3,mission-kill-m
 units,FeatureAnimEntry::state,features,RemoveFeature,other-record,1,long-great-divide-2p@35389
 units,Group::units,ai,SetUnitSquad,other-record,9,mission-build-unit@71
 units,Group::units,ai,SetUnitSquad,same-record,14,mission-build-unit@1
-units,InitPlayerSlot: operator new unsigned char,game,SoundHeardMask,other-record,5,orders-air-fights@445
-units,InitPlayerSlot: operator new unsigned char,game,SoundHeardMask,same-record,5,orders-air-fights@445
 units,InitPlayerSlot: operator new unsigned char,los_radar,AddLineOfSight,same-record,12,mission-build-unit@1
 units,InitPlayerSlot: operator new unsigned char,los_radar,IsUnitVisibleToPlayer,other-record,6,mission-capture@41
 units,InitPlayerSlot: operator new unsigned char,los_radar,IsVisibleByMask,other-record,6,mission-capture@41
 units,InitPlayerSlot: operator new unsigned char,los_radar,RemoveLineOfSight,same-record,17,mission-build-unit@1
+units,InitPlayerSlot: operator new unsigned char,los_radar,SoundHeardMask,other-record,5,orders-air-fights@445
+units,InitPlayerSlot: operator new unsigned char,los_radar,SoundHeardMask,same-record,5,orders-air-fights@445
 units,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,RevealAroundUnit,same-record,8,mission-kill-of-type@99
 units,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,map,CanPlaceFootprintAt,same-record,1,long-greenhaven-8p@29335
 units,LoadTntMap: operator new int #2,economy,UpdateMetalExtraction,same-record,3,skirmish4-long@13614
@@ -1580,7 +1580,7 @@ units,Unit::unknown_c0,economy,UnitResources::RequestEnergyAndMetal,other-record
 units,Unit::unknown_c0,economy,UnitResources::SpendEnergyAndMetal,other-record,12,edges-economy-targeting@36
 units,Unit::unknown_d8,economy,UnitResources::RequestEnergyAndMetal,other-record,19,mission-kill-of-type@99
 units,Unit::unknown_d8,economy,UnitResources::SpendEnergyAndMetal,other-record,12,edges-economy-targeting@36
-units,Unit::unknown_e0,economy,UnitResources::RequestEnergyAndMetal,other-record,15,mission-kill-of-type@99
+units,Unit::unknown_e0,economy,UnitResources::RequestEnergyAndMetal,other-record,16,mission-kill-of-type@99
 units,Unit::weapon,targeting,GetWeaponTargetPos,other-record,5,orders-air-fights@161
 units,Unit::weapon,weapons,AllocProjectile,other-record,1,skirmish4-long@23596
 units,Unit::weapon,weapons,ComputeProjectileTime,other-record,1,skirmish4-long@23596
@@ -1812,11 +1812,11 @@ units,VtolRepairUnitOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other
 units,VtolRepairUnitOrder: new PathOrder,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@53387
 units,VtolRepairUnitOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,2,long-great-divide-2p@49628
 units,VtolStandbyOrder: new PathOrder,orders,RunOrders,other-record,3,mission-timer@187
-units,bits_14281,game,SoundHeardMask,same-record,3,skirmish4-long@21458
 units,bits_14281,los_radar,AddEyeball,same-record,9,mission-build-unit@1
 units,bits_14281,los_radar,AddLineOfSight,same-record,10,mission-build-unit@1
 units,bits_14281,los_radar,RemoveLineOfSight,same-record,7,mission-capture@1
 units,bits_14281,los_radar,RevealNewUnit,same-record,4,skirmish4@8735
+units,bits_14281,los_radar,SoundHeardMask,same-record,3,skirmish4-long@21458
 units,bits_14281,los_radar,UpdateLineOfSight,same-record,17,mission-build-unit@1
 units,bits_14281,units,ApplyUnitDeath,same-record,1,edges-economy-targeting@245
 units,bits_142f1,los_radar,AddLineOfSight,same-record,10,mission-build-unit@1
@@ -1840,10 +1840,10 @@ units,list_1421b,features,PlaceFeature,same-record,5,mission-build-unit@1
 units,pad_14213,features,AllocFeatureSpot,same-record,9,mission-build-unit@1
 units,pad_1df4,ai,SetUnitSquad,same-record,5,edges-economy-targeting@117
 units,pad_1df4,economy,UnitResources::SpendEnergyAndMetal,same-record,2,long-greenhaven-8p@22214
-units,pad_1df4,game,SoundHeardMask,same-record,4,console-units@150
 units,pad_1df4,los_radar,AddLineOfSight,same-record,4,eight-full-moon@8022
 units,pad_1df4,los_radar,RemoveLineOfSight,same-record,5,edges-economy-targeting@117
 units,pad_1df4,los_radar,RevealAroundUnit,same-record,4,eight-full-moon@8022
+units,pad_1df4,los_radar,SoundHeardMask,same-record,4,console-units@150
 units,pad_1df4,map,AddUnitToMap,same-record,2,long-greenhaven-8p@19831
 units,pad_1df4,map,ClaimFootprintCells,same-record,2,edges-economy-targeting@117
 units,pad_1df4,network,BroadcastBuilderLink,same-record,2,eight-full-moon@8081
@@ -1883,12 +1883,12 @@ units,projectileCount,weapons,RemoveUnitProjectiles,same-record,3,mission-build-
 units,unknown_1b8e,ai,ReactToAttack,same-record,1,mission-defeat-all-units@185
 units,unknown_1b8e,ai,SetUnitSquad,same-record,10,mission-build-unit@1
 units,unknown_1b8e,economy,UnitResources::SpendEnergyAndMetal,same-record,9,edges-economy-targeting@36
-units,unknown_1b8e,game,SoundHeardMask,same-record,10,edges-economy-targeting@36
 units,unknown_1b8e,los_radar,AddLineOfSight,same-record,13,mission-build-unit@1
 units,unknown_1b8e,los_radar,IsUnitVisibleToPlayer,same-record,2,mission-radius@1464
 units,unknown_1b8e,los_radar,IsVisibleByMask,same-record,2,mission-radius@1464
 units,unknown_1b8e,los_radar,RemoveLineOfSight,same-record,12,mission-build-unit@1
 units,unknown_1b8e,los_radar,RevealAroundUnit,same-record,13,mission-build-unit@1
+units,unknown_1b8e,los_radar,SoundHeardMask,same-record,10,edges-economy-targeting@36
 units,unknown_1b8e,map,AddUnitToMap,same-record,4,orders-air-fights@161
 units,unknown_1b8e,map,ClaimFootprintCells,same-record,4,edges-economy-targeting@245
 units,unknown_1b8e,network,BroadcastPacket,same-record,10,mission-build-unit@1
@@ -1921,9 +1921,9 @@ units,unknown_1b8e,weapons,UpdateUnitWeapons,same-record,10,edges-economy-target
 units,unknown_1cd9,ai,ReactToAttack,same-record,4,mission-kill-mobile@180
 units,unknown_1cd9,ai,SetUnitSquad,same-record,9,mission-build-unit@71
 units,unknown_1cd9,economy,UnitResources::SpendEnergyAndMetal,same-record,4,mission-build-unit@119
-units,unknown_1cd9,game,SoundHeardMask,same-record,6,mission-build-unit@119
 units,unknown_1cd9,los_radar,AddLineOfSight,same-record,7,mission-kill-of-type@99
 units,unknown_1cd9,los_radar,RemoveLineOfSight,same-record,11,mission-build-unit@71
+units,unknown_1cd9,los_radar,SoundHeardMask,same-record,6,mission-build-unit@119
 units,unknown_1cd9,map,AddUnitToMap,same-record,1,long-great-divide-2p@53692
 units,unknown_1cd9,map,ClaimFootprintCells,same-record,2,edges-economy-targeting@245
 units,unknown_1cd9,network,BroadcastPacket,same-record,10,mission-build-unit@71
@@ -1984,14 +1984,14 @@ units.players,FeatureAnimEntry::next,features,AllocFeatureSpot,other-record,5,mi
 units.players,FeatureAnimEntry::prev,features,AllocFeatureSpot,other-record,5,mission-build-unit@1
 units.players,FeatureAnimEntry::src,weapons,ApplyAreaDamage,other-record,2,long-greenhaven-8p@28388
 units.players,Group::units,ai,SetUnitSquad,other-record,9,mission-build-unit@1
-units.players,InitPlayerSlot: operator new unsigned char,game,SoundHeardMask,other-record,5,orders-air-fights@211
-units.players,InitPlayerSlot: operator new unsigned char,game,SoundHeardMask,same-record,5,orders-air-fights@211
 units.players,InitPlayerSlot: operator new unsigned char,los_radar,AddLineOfSight,other-record,10,mission-capture@236
 units.players,InitPlayerSlot: operator new unsigned char,los_radar,IsUnitVisibleToPlayer,other-record,2,long-greenhaven-8p@21629
 units.players,InitPlayerSlot: operator new unsigned char,los_radar,IsUnitVisibleToPlayer,same-record,6,mission-capture@1
 units.players,InitPlayerSlot: operator new unsigned char,los_radar,IsVisibleByMask,other-record,2,long-greenhaven-8p@21629
 units.players,InitPlayerSlot: operator new unsigned char,los_radar,IsVisibleByMask,same-record,5,mission-capture@1
 units.players,InitPlayerSlot: operator new unsigned char,los_radar,RemoveLineOfSight,other-record,13,mission-build-unit@1
+units.players,InitPlayerSlot: operator new unsigned char,los_radar,SoundHeardMask,other-record,5,orders-air-fights@211
+units.players,InitPlayerSlot: operator new unsigned char,los_radar,SoundHeardMask,same-record,5,orders-air-fights@211
 units.players,IssueAttackOrder: new Order #2,seams,OrderOrStatusFlagsNative,other-record,1,edges-economy-targeting@245
 units.players,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,RevealAroundUnit,same-record,9,mission-capture@147
 units.players,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,map,CanPlaceFootprintAt,same-record,1,long-greenhaven-8p@25957
@@ -3066,13 +3066,13 @@ units.players,VtolReclaimOrder: new PathOrder,orders,PathOrder::IsComplete,other
 units.players,VtolRepairPatrolOrder: new Order,orders,PackedGoal::TickTowardGoal,other-record,2,long-greenhaven-8p@28881
 units.players,VtolRepairPatrolOrder: new Order,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@28881
 units.players,VtolStandbyOrder: new PathOrder,orders,RunOrders,other-record,1,long-greenhaven-8p@26010
-units.players,bits_14281,game,SoundHeardMask,same-record,6,edges-economy-targeting@245
 units.players,bits_14281,los_radar,AddLineOfSight,same-record,7,mission-capture@147
 units.players,bits_14281,los_radar,IsUnitVisibleToPlayer,same-record,6,mission-capture@1
 units.players,bits_14281,los_radar,IsVisibleByMask,same-record,5,mission-capture@1
 units.players,bits_14281,los_radar,RemoveLineOfSight,same-record,11,mission-build-unit@1
 units.players,bits_14281,los_radar,RevealAroundUnit,same-record,7,mission-capture@147
 units.players,bits_14281,los_radar,RevealNewUnit,same-record,6,mission-capture@236
+units.players,bits_14281,los_radar,SoundHeardMask,same-record,6,edges-economy-targeting@245
 units.players,bits_14281,los_radar,UpdateLineOfSight,same-record,19,mission-build-unit@1
 units.players,bits_14281,units,ApplyUnitDeath,same-record,9,mission-build-unit@1
 units.players,count_1491b,weapons,AddExplosionEffect,same-record,6,edges-economy-targeting@245
@@ -3092,10 +3092,10 @@ units.players,pad_14213,features,AllocFeatureSpot,same-record,5,mission-build-un
 units.players,pad_1df4,ai,SetUnitSquad,same-record,4,six-yerrot-mountains@1185
 units.players,pad_1df4,economy,UnitResources::SpendEnergyAndMetal,same-record,3,eight-full-moon@8021
 units.players,pad_1df4,features,ReclaimFeature,same-record,1,long-greenhaven-8p@24381
-units.players,pad_1df4,game,SoundHeardMask,same-record,3,eight-full-moon@8021
 units.players,pad_1df4,los_radar,AddLineOfSight,same-record,6,ten-lava-run@697
 units.players,pad_1df4,los_radar,RemoveLineOfSight,same-record,5,ten-lava-run@697
 units.players,pad_1df4,los_radar,RevealAroundUnit,same-record,6,ten-lava-run@697
+units.players,pad_1df4,los_radar,SoundHeardMask,same-record,3,eight-full-moon@8021
 units.players,pad_1df4,map,AddUnitToMap,same-record,2,long-greenhaven-8p@22224
 units.players,pad_1df4,map,ClaimFootprintCells,same-record,1,long-greenhaven-8p@11587
 units.players,pad_1df4,network,BroadcastBuilderLink,same-record,2,eight-greenhaven@4808
@@ -3132,9 +3132,9 @@ units.players,projectileCount,weapons,FireDroppedWeapon,same-record,1,long-green
 units.players,projectileCount,weapons,FireVLaunchProjectile,same-record,1,mission-radius@1671
 units.players,projectileCount,weapons,RemoveUnitProjectiles,same-record,4,edges-economy-targeting@114
 units.players,unknown_1b8e,features,ReclaimFeature,same-record,1,long-great-divide-2p@33881
-units.players,unknown_1b8e,game,SoundHeardMask,same-record,9,edges-economy-targeting@70
 units.players,unknown_1b8e,los_radar,IsUnitVisibleToPlayer,same-record,5,mission-defeat-all-units@186
 units.players,unknown_1b8e,los_radar,IsVisibleByMask,same-record,5,mission-defeat-all-units@186
+units.players,unknown_1b8e,los_radar,SoundHeardMask,same-record,9,edges-economy-targeting@70
 units.players,unknown_1b8e,map,AddUnitToMap,same-record,1,long-greenhaven-8p@49975
 units.players,unknown_1b8e,map,ClaimFootprintCells,same-record,2,long-great-divide-2p@45805
 units.players,unknown_1b8e,network,BroadcastBuilderLink,same-record,2,long-greenhaven-8p@14221
@@ -3162,9 +3162,9 @@ units.players,unknown_1b8e,weapons,DamageUnit,same-record,6,edges-economy-target
 units.players,unknown_1b8e,weapons,DetonateProjectile,same-record,2,orders-air-repair@382
 units.players,unknown_1cd9,ai,SetUnitSquad,same-record,3,edges-economy-targeting@245
 units.players,unknown_1cd9,economy,UnitResources::SpendEnergyAndMetal,same-record,1,long-great-divide-2p@49026
-units.players,unknown_1cd9,game,SoundHeardMask,same-record,3,long-greenhaven-8p@22141
 units.players,unknown_1cd9,los_radar,AddLineOfSight,same-record,1,long-great-divide-2p@48775
 units.players,unknown_1cd9,los_radar,RemoveLineOfSight,same-record,3,edges-economy-targeting@245
+units.players,unknown_1cd9,los_radar,SoundHeardMask,same-record,3,long-greenhaven-8p@22141
 units.players,unknown_1cd9,network,BroadcastPacket,same-record,3,edges-economy-targeting@245
 units.players,unknown_1cd9,orders,DamagedAllyCollector::Visit,same-record,1,long-great-divide-2p@39882
 units.players,unknown_1cd9,orders,RepairPatrolOrder,same-record,1,long-great-divide-2p@39882

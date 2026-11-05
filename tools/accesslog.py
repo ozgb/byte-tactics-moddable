@@ -136,7 +136,8 @@ LAYOUT_FLAGS = ["--target=i686-pc-windows-msvc", "/nologo", "-fms-compatibility"
                 "-fsyntax-only", "-Xclang", "-fdump-record-layouts-complete"]
 HEAP_ROW = re.compile(r"^(?P<function>.+?): (?P<allocator>new\[\]|new|operator new|\w+)(?: (?P<what>.*?))?(?: #\d+)?$")
 TAG_TYPES = {"UNIT MEMORY": "Unit", "WEAPON ARRAY": "Projectile"}
-OUTPUT_FILES = ("access.edges.csv", "access.stats.txt", "access.presentation.csv")
+OUTPUT_FILES = ("access.edges.csv", "access.stats.txt", "access.presentation.csv", "access.cross.csv", "access.draws.csv", "access.pass.csv",
+                "access.ordered.csv")
 RAW_FILE = "access.raw.txt"
 REF_HELPER = re.compile(r"\$(?:Pod)?Ref@")
 
@@ -747,7 +748,9 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
         why = trace_difference(directory / "trace.txt", stored)
         print("%s: %s" % (name, "trace EQUAL to reference/traces/%s.txt" % name if why is None else "trace DIFFERS, " + why))
         failed += why is not None
-        for suffix, source in (("edges.csv", "access.edges.csv"), ("stats.txt", "access.stats.txt"), ("presentation.csv", "access.presentation.csv"), ("raw.txt", RAW_FILE)):
+        for suffix, source in (("edges.csv", "access.edges.csv"), ("stats.txt", "access.stats.txt"), ("presentation.csv", "access.presentation.csv"),
+                               ("cross.csv", "access.cross.csv"), ("draws.csv", "access.draws.csv"), ("pass.csv", "access.pass.csv"),
+                               ("ordered.csv", "access.ordered.csv"), ("raw.txt", RAW_FILE)):
             if (directory / source).is_file():
                 shutil.copyfile(directory / source, out / ("%s.%s" % (name, suffix)))
         if twice:

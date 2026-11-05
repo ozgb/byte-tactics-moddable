@@ -881,9 +881,16 @@ static inline SmokePos SmokeAt(Spot* spot, Feature* f)
     p.y.f.whole += ((unsigned short)frame->yOffset - Rand(h >> 1)) * 2 - ((unsigned short)(h >> 2) << 1);
     return p;
 }
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
+
 // FUNCTION: 0x424050
 void __stdcall UpdateFeatures()
 {
+#if BT_ACCESS_LOG
+    AccessLogPassScope accessPass(ACCESS_PASS_FEATURES);
+#endif
     Feature* types = g_game->features;
     for (int k = 0; k < g_game->featureCount; k++) {
         if (types[k].animating) {
@@ -911,6 +918,9 @@ void __stdcall UpdateFeatures()
     int smoke = (unsigned int)g_game->ticks % 3 == 0;
     int i = g_game->pool.usedHead;
     while (i != -1) {
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         Spot* spot = &g_game->pool.entries[i];
         Feature* f = &g_game->features[spot->feature];
         int next = spot->prev;

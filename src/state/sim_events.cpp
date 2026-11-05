@@ -30,8 +30,15 @@ void SimEventsClear()
     q.dropped = 0;
 }
 
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
+
 void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count)
 {
+#if BT_ACCESS_LOG
+    AccessLogSimEvent(__builtin_return_address(0));
+#endif
     ReplayImport call(RI_RECORD_SIM_EVENT);
     call.Int((int)kind);
     call.Int((int)flags);

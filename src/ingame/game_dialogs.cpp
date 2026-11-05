@@ -946,6 +946,9 @@ void OpenMain2Layout()
 
 #include "../../interfaces/ref.h"
 #include "../harness/harness.h"
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
 
 // FUNCTION: 0x495230
 void UpdateFramePacing()
@@ -1058,25 +1061,49 @@ void __stdcall RunGameSteps(int showStats)
         DrainSimEvents();
         g_seams.wind_meteors->UpdateMeteors();
         HarnessPhase(7);
+#if BT_ACCESS_LOG
+        AccessLogPassScope tailPass(ACCESS_PASS_TAIL);
+#endif
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         DrainSimEvents();
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         UpdateCameraFollow();
         AccumulateProfileTime(&g_game->timers, 8);
 
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         UpdateParticles();
         AccumulateProfileTime(&g_game->timers, 6);
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         g_seams.players->UpdateBlink();
         AccumulateProfileTime(&g_game->timers, 8);
 
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         Player* shown = &g_game->players[g_game->playerIndex];
         if (shown->displayTimer < g_game->ticks)
             shown->displayTimer += 0x1e;
         g_seams.los_radar->ExpireEyeballs();
 
         if (showStats && g_usePacketManager != 0) {
+#if BT_ACCESS_LOG
+            AccessLogEntity();
+#endif
             g_seams.economy->UpdateResourceSharing(&g_game->players[g_game->localPlayer]);
             g_packetManager.SendAllQueued(0);
             AccumulateProfileTime(&g_game->timers, 0);
         }
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         DrainSimEvents();
         HarnessAfterStep();
     }

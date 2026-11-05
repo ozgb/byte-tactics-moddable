@@ -107,9 +107,17 @@ void __cdecl UpdateWind()
     g_seams.wind_meteors->UpdateWindOnStream(RAND_STREAM_MAIN);
 }
 
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
+
 // FUNCTION: 0x490c40
 void __cdecl UpdateWindOnStream(RandStream stream)
 {
+#if BT_ACCESS_LOG
+    AccessLogPassScope accessPass(ACCESS_PASS_WIND);
+    AccessLogEntity();
+#endif
     if (g_game->windCounter < ((unsigned int)g_game->ticks)) {
         g_game->windCounter += ((int)((__int64)GameRand(stream) * 10 / 0x8000) + 5) * 30;
 

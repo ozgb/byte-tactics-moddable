@@ -5103,6 +5103,44 @@ void CapacityTableSelfTest()
     free(text);
 }
 
+void TrackedCountSelfTest()
+{
+    printf("a table with a tracked count and a recorded alloc count\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureTally* tally = (FixtureTally*)Fresh(6 * sizeof(FixtureTally));
+    for (int i = 0; i < 6; i++)
+        tally[i].value = 10 * (i + 1);
+    g_game->list_1435f.offset = OffsetOf(tally);
+    g_game->count_14367 = 3;
+    unsigned short fields[1] = { FieldIndex(ROK_FIXTURETALLY, "value") };
+    unsigned char reads[1] = { RF_GAME_COUNT_14367 };
+    unsigned char every[1] = { ROK_FIXTURETALLY };
+    ReplaySlotSets tracked = { "tracked", 0, reads, 1, nullptr, 0, fields, 1, fields, 1, every, 1 };
+    Recorder recorder;
+    recorder.Record(nullptr, nullptr, 0, tracked);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(CountLines(text, "  r FixtureTally#") == 3, "the all-of walk records the live elements");
+
+    ResetBlock();
+    Check(RestoreField(kReplayFields[RF_GAME_COUNT_14367], "3"), "the tracked count restores as recorded data");
+    RestoreText(text, tracked);
+    FixtureTally* rebuilt = (FixtureTally*)g_game->list_1435f.get();
+    Check(rebuilt != nullptr && g_game->count_14367 == 3, "the table is allocated and the replayer leaves the restored count");
+    Check(rebuilt != nullptr && rebuilt[2].value == 30, "the elements are restored");
+    unsigned found = 0;
+    Check(ReplayResolveObject("FixtureTally#3", &found, g_objects, AllocObject) == (rebuilt == nullptr ? nullptr : &rebuilt[3]), "the element one past the tracked count is named");
+    Check(ReplayResolveObject("FixtureTally#4", nullptr, g_objects, AllocObject) == nullptr, "and one past that names nothing");
+
+    ResetBlock();
+    ReplaySlotSets plain = { "plain", 0, nullptr, 0, nullptr, 0, fields, 1, fields, 1, every, 1 };
+    RestoreText("  r FixtureTally#5.value 60\n", plain);
+    rebuilt = (FixtureTally*)g_game->list_1435f.get();
+    Check(rebuilt != nullptr && rebuilt[5].value == 60 && g_game->count_14367 == 6 && ReplayResolveObject("FixtureTally#5", nullptr, g_objects, AllocObject) == &rebuilt[5], "a recording that does not track the count gets the alloc count, which sizes the elements it names");
+    free(text);
+}
+
 void SelfPointerSelfTest()
 {
     printf("pointers into an object's own members\n");
@@ -5300,6 +5338,7 @@ int SelfTest(const char* file)
     GameRefSelfTest();
     ExecuteCommandSelfTest();
     CapacityTableSelfTest();
+    TrackedCountSelfTest();
     SelfPointerSelfTest();
     GameWriteSelfTest();
     if (file == nullptr)

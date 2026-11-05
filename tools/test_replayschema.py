@@ -2121,7 +2121,7 @@ class ElementForms(unittest.TestCase):
         text = files[rs.FIXTURE_SCHEMA_H]
         self.assertIn('    { ROK_FIXTUREGROUP, ROK_FIXTUREOWNER, offsetof(FixtureOwner, groups), "groups[]", sizeof(FixtureGroup), 4, 1 },', text)
         self.assertTrue(self.row(text, '    { "FixtureGroup", sizeof(FixtureGroup), RS_STATE, RT_ORDER,'))
-        self.assertEqual([t["kind"] for t in model["tables"] if t["kind"].startswith("Fixture")], ["FixtureCell", "FixtureLane", "FixtureEye"])
+        self.assertEqual([t["kind"] for t in model["tables"] if t["kind"].startswith("Fixture")], ["FixtureCell", "FixtureLane", "FixtureEye", "FixtureTally"])
 
     def test_a_table_behind_a_ref_field_is_checked(self):
         cases = (({"base": {"object": "Nowhere", "field": "groups"}, "count": 4}, "the base Nowhere is no state kind"),
@@ -2250,7 +2250,7 @@ class CapacityTables(unittest.TestCase):
         ann = annotations()
         del ann["game_fields"]["hotRadarCount"]
         self.has(ann, "FixtureEye table: the count names hotRadarCount, which is no tracked field of Game")
-        self.has(self.table(annotations(), capacity="count_14367"), "FixtureEye table: the capacity names count_14367, which is no tracked field of Game")
+        self.has(self.table(annotations(), capacity="autoFollowTicks"), "FixtureEye table: the capacity names autoFollowTicks, which is no tracked field of Game")
 
     def test_a_slot_that_reaches_the_table_reads_the_capacity_member(self):
         ann = self.table(annotations(), capacity="hotRadarCount")

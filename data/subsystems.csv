@@ -3164,7 +3164,6 @@ CountAllianceInHandleBattleRoomClick,src/frontend/multi.cpp,presentation,present
 CountAllianceInOpenAlliesDialog,src/frontend/multi.cpp,presentation,presentation,
 CountDirectoryEntries,src/files/files_api.h,files,folder:src/files/,
 CountHumanSlots,src/frontend/skirmish_menu.cpp,presentation,presentation,
-CountTracked,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 CountUse,src/state/block.cpp,game,default,
 CreatePathfinderNative,src/seams/native.cpp,seams,folder:src/seams/,
 CreateSquadManagerNative,src/seams/native.cpp,seams,folder:src/seams/,

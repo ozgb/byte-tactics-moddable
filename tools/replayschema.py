@@ -1407,7 +1407,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                 if f["object"] == rule["object"]:
                                     obj_reads.add(i)
                                     obj_writes.add(i)
-                        elif rule["rule"] == "fields":
+                        elif rule["rule"] in ("fields", "all-of"):
                             for tag, into, block in (("reads", obj_reads, reads), ("writes", obj_writes, writes)):
                                 for name in rule.get(tag, []):
                                     k, fname = name.split(".", 1)
@@ -1417,7 +1417,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                         errors.append("the rule for %s %s names the unknown field %s" % (kind, target, name))
                                     else:
                                         into.add(object_index[(k, fname)])
-                        elif rule["rule"] == "all-of":
+                        if rule["rule"] == "all-of":
                             if not is_global_table(ann["objects"].get(rule["object"], {})):
                                 message = "the all-of rule names %s, which is no table kind of the schema" % rule["object"]
                                 if message not in errors:

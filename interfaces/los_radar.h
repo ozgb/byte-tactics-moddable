@@ -56,7 +56,7 @@ struct LosRadarSeam {
     void (__stdcall* RecordRadarMapped)(void);
     // Updates which units radar, sonar and cloaking show and hide for each player. Hooks: none.
     void (__stdcall* UpdateSensorRadarAndCloak)(void);
-    // the players who hear a sound at `at`: bit p set when player p has explored, or with LOS on, sees the cell
+    // Returns the players who hear a sound at `at`: bit p set when player p has explored, or with LOS on, sees the cell. Hooks: none.
     unsigned int (__stdcall* SoundHeardMask)(const Vec3* at);
 };
 

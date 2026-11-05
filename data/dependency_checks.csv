@@ -1,0 +1,29 @@
+writer,reader,item,phase,group,scenarios,result
+ai,orders,Unit::group,units,g1,83,equal
+features,orders,FeatureAnimEntry::bytes_10,units,g2,83,equal
+features,orders,Unit::metal,units,g2,83,equal
+features,weapons,FeatureAnimEntry::bytes_8,projectiles,g1,83,equal
+los_radar,ai,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,players,g1,83,equal
+los_radar,pathfinding,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,players,g3,83,equal
+los_radar,players,bits_142f1,tail,g1,83,equal
+orders,ai,Unit::group,units,g3,83,equal
+orders,features,Unit::metal,units,g1,83,equal
+orders,los_radar,Order::pos,units,g1,83,equal
+orders,players,Unit::pos,units,g1,83,equal
+orders,players,Unit::zFraction,units,g1,83,equal
+orders,units,Order::z,units,g4,83,equal
+orders,units,Unit::metal,units,g4,83,equal
+orders,weapons,Unit::list,projectiles,g1,83,equal
+targeting,weapons,Unit::current,players,g1,83,equal
+units,ai,Unit::activateFlags,units,g1,83,equal
+units,features,FeatureAnimEntry::bytes_10,units,g1,83,equal
+units,orders,Unit::activateFlags,units,g3,83,equal
+units,orders,Unit::killCount,units,g3,83,equal
+units,orders,Unit::metal,units,g3,83,equal
+units,players,Unit::yFraction,units,g1,83,equal
+units,weapons,FeatureAnimEntry::bytes_10,units,g3,83,equal
+weapons,ai,Unit::lastDamageType,features,g1,83,equal
+weapons,ai,Unit::lastDamageType,units,g1,83,equal
+weapons,orders,Unit::attacker,units,g3,83,equal
+weapons,orders,Unit::field_1e,units,g3,83,equal
+weapons,orders,Unit::lastDamageType,units,g3,83,equal

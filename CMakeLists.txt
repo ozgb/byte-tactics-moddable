@@ -67,6 +67,7 @@ target_compile_options(wasmloader PRIVATE
   -vfsoverlay "${CMAKE_BINARY_DIR}/overlay.json")
 
 option(BT_COVERAGE "Build the game with clang source-based coverage" OFF)
+option(BT_ACCESS_LOG "Build the game with access-log callbacks for test mode (use build/access)" OFF)
 set(COMPILER_RT_DIR "${CMAKE_SOURCE_DIR}/build/compiler-rt" CACHE PATH "compiler-rt checkout for the coverage runtime")
 
 add_library(game OBJECT ${SOURCES})
@@ -82,6 +83,38 @@ foreach(target game data)
   target_include_directories(${target} SYSTEM PRIVATE "${MSVC5_INCLUDE}")
   target_compile_options(${target} PRIVATE ${GAME_COMPILE_OPTIONS})
 endforeach()
+
+if(BT_ACCESS_LOG)
+  set(ACCESS_LOG_OPTIONS
+    -fsanitize=address -fsanitize-address-use-after-return=never
+    "SHELL:/clang:-mllvm /clang:-asan-instrumentation-with-call-threshold=0"
+    "SHELL:/clang:-mllvm /clang:-asan-globals=0"
+    "SHELL:/clang:-mllvm /clang:-asan-stack=0"
+    "SHELL:/clang:-mllvm /clang:-asan-opt=0")
+  foreach(target game data)
+    target_compile_options(${target} PRIVATE ${ACCESS_LOG_OPTIONS})
+  endforeach()
+  target_compile_definitions(game PRIVATE BT_ACCESS_LOG=1)
+  add_library(accesslog OBJECT lib/accesslog/access_log.cpp)
+  target_include_directories(accesslog SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+  target_compile_options(accesslog PRIVATE ${GAME_COMPILE_OPTIONS})
+  set(ACCESS_LOG_OBJECTS "$<TARGET_OBJECTS:accesslog>")
+  set(ACCESS_LOG_TARGETS accesslog)
+  set(ACCESS_LOG_ALIAS_FLAGS --access-log)
+  set(ACCESS_LOG_TABLES COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/accesslog.py" tables --build-dir "${CMAKE_BINARY_DIR}")
+  set(ACCESS_LOG_TABLE_FILES BYPRODUCTS "${CMAKE_BINARY_DIR}/accesslog.attr" "${CMAKE_BINARY_DIR}/accesslog.items")
+  set(ACCESS_LOG_TABLE_DEPS "${CMAKE_SOURCE_DIR}/tools/accesslog.py" "${CMAKE_SOURCE_DIR}/data/subsystems.csv" "${CMAKE_SOURCE_DIR}/data/state_classes.csv")
+  set(ACCESS_LOG_LINK_FLAGS /nodefaultlib:clang_rt.asan.lib /nodefaultlib:clang_rt.asan_cxx.lib
+      /nodefaultlib:clang_rt.asan_dynamic.lib /nodefaultlib:clang_rt.asan_dynamic_runtime_thunk.lib)
+else()
+  set(ACCESS_LOG_OBJECTS "")
+  set(ACCESS_LOG_TARGETS "")
+  set(ACCESS_LOG_ALIAS_FLAGS "")
+  set(ACCESS_LOG_TABLES "")
+  set(ACCESS_LOG_TABLE_FILES "")
+  set(ACCESS_LOG_TABLE_DEPS "")
+  set(ACCESS_LOG_LINK_FLAGS "")
+endif()
 
 if(BT_COVERAGE)
   set(PROFILE_DIR "${COMPILER_RT_DIR}/compiler-rt/lib/profile")
@@ -244,19 +277,22 @@ endif()
 add_custom_command(
   OUTPUT "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/objs/objects.rsp" ${LIVE_COUNTERS_OUTPUT}
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/aliases.py"
-          --objects "@${CMAKE_BINARY_DIR}/alias_objects.rsp" --libs ${SYSTEM_LIBS} ${IMPORT_LIBS} ${ZLIB_OBJECTS}
-          --winmain 0x49e830 ${DATA_ORDER_FLAG} --patch-dir "${CMAKE_BINARY_DIR}/objs" ${LIVE_COUNTERS_FLAG} --out "${CMAKE_BINARY_DIR}/aliases.obj"
-  DEPENDS game data extra bitexact ${PROFILE_TARGETS} ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> ${IMPORT_LIBS}
+          --objects "@${CMAKE_BINARY_DIR}/alias_objects.rsp" --libs ${SYSTEM_LIBS} ${IMPORT_LIBS} ${ZLIB_OBJECTS} ${ACCESS_LOG_OBJECTS}
+          --winmain 0x49e830 ${DATA_ORDER_FLAG} ${ACCESS_LOG_ALIAS_FLAGS} --patch-dir "${CMAKE_BINARY_DIR}/objs" ${LIVE_COUNTERS_FLAG} --out "${CMAKE_BINARY_DIR}/aliases.obj"
+  DEPENDS game data extra bitexact ${PROFILE_TARGETS} ${ZLIB_TARGETS} ${ACCESS_LOG_TARGETS} ${ACCESS_LOG_OBJECTS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> ${IMPORT_LIBS}
           "${CMAKE_SOURCE_DIR}/tools/aliases.py"
   VERBATIM COMMAND_EXPAND_LISTS)
 
 add_custom_command(
   OUTPUT "${CMAKE_BINARY_DIR}/TotalA.exe"
   COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:windows,4.0 /base:0x400000 /fixed /dynamicbase:no /largeaddressaware:no /errorlimit:0 /entry:WinMainCRTStartup /include:_WinMainCRTStartup /out:${CMAKE_BINARY_DIR}/TotalA.exe
-          /libpath:${CMAKE_BINARY_DIR}/lib /opt:noref,noicf /incremental:no /brepro /safeseh:no /force:multiple /map:${CMAKE_BINARY_DIR}/TotalA.map
+          /libpath:${CMAKE_BINARY_DIR}/lib /opt:noref,noicf /incremental:no /brepro /safeseh:no /force:multiple ${ACCESS_LOG_LINK_FLAGS} /map:${CMAKE_BINARY_DIR}/TotalA.map
           "@${CMAKE_BINARY_DIR}/objs/objects.rsp" "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res"
-          ${ZLIB_OBJECTS} ${IMPORT_LIBS} ${SYSTEM_LIBS} $<TARGET_FILE:wasmloader>
-  DEPENDS game data extra wasmloader ${PROFILE_TARGETS} ${ZLIB_TARGETS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res" ${IMPORT_LIBS}
+          ${ZLIB_OBJECTS} ${ACCESS_LOG_OBJECTS} ${IMPORT_LIBS} ${SYSTEM_LIBS} $<TARGET_FILE:wasmloader>
+  ${ACCESS_LOG_TABLES}
+  ${ACCESS_LOG_TABLE_FILES}
+  DEPENDS game data extra wasmloader ${PROFILE_TARGETS} ${ZLIB_TARGETS} ${ACCESS_LOG_TARGETS} ${ACCESS_LOG_OBJECTS} $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:data> $<TARGET_OBJECTS:extra> "${CMAKE_BINARY_DIR}/aliases.obj" "${CMAKE_BINARY_DIR}/TotalA.res" ${IMPORT_LIBS}
+  ${ACCESS_LOG_TABLE_DEPS}
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(TotalA ALL DEPENDS "${CMAKE_BINARY_DIR}/TotalA.exe")
 

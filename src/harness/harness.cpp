@@ -23,6 +23,9 @@
 #include "../state/sim_globals.h"
 #include "block_scan.h"
 #include "../state/block.h"
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
 
 #include "../../link/globals.h"
 
@@ -1407,6 +1410,9 @@ static void ResolveQuirks()
 
 void HarnessInit(char* cmdLine)
 {
+#if BT_ACCESS_LOG
+    AccessLogInit();
+#endif
     bool scanVerify = ParseBlockScanVerify(cmdLine);
     ParseBlockScan(cmdLine);
     if (s_blockScan)
@@ -1546,6 +1552,9 @@ static void RoundTripBlock()
 
 void HarnessAfterStep()
 {
+#if BT_ACCESS_LOG
+    AccessLogScope accessWindow(ACCESS_WINDOW_OFF, ACCESS_WINDOW_PRESENTATION);
+#endif
     if (HarnessTestMode()) {
         for (int i = 0; i < s_roundTripCount; i++) {
             if ((unsigned)g_game->ticks == s_roundTrips[i])
@@ -1608,6 +1617,9 @@ void HarnessAfterStep()
         sprintf(text, "testmode: cannot write a replay file%s%s\n", replayError[0] == '\0' ? "" : ": ", replayError);
         Fail(text);
     }
+#if BT_ACCESS_LOG
+    AccessLogFinish();
+#endif
     host_exit(0);
 }
 
@@ -3810,6 +3822,9 @@ void HarnessBeforeStep()
 {
     if (!HarnessTestMode())
         return;
+#if BT_ACCESS_LOG
+    AccessLogScope accessWindow(ACCESS_WINDOW_OFF, ACCESS_WINDOW_PENDING);
+#endif
     unsigned tick = GameU32(GAME_TICK);
     if (s_gameType == 3) {
         for (int i = 0; i < MAX_PLAYERS; i++)
@@ -3889,6 +3904,9 @@ void __stdcall HarnessUiOrder(unsigned char kind, int remove, const Unit* unit, 
 {
     if (!UiLive())
         return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(1, __builtin_return_address(0));
+#endif
     const char* name = UiOrderName(kind);
     UiLineStart("order");
     fprintf(s_ui, " %s unit %u target ", name, UiUnitIndex(unit));
@@ -3916,6 +3934,9 @@ void __stdcall HarnessUiQueue(const char* name, const Unit* unit, int count)
 {
     if (!UiLive())
         return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(1, __builtin_return_address(0));
+#endif
     UiLineStart("qbuild");
     fprintf(s_ui, " %u %s %d\n", UiUnitIndex(unit), name, count);
 }
@@ -3924,6 +3945,9 @@ void __stdcall HarnessUiCancel(unsigned char kind, const Unit* unit)
 {
     if (!UiLive())
         return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(1, __builtin_return_address(0));
+#endif
     UiLineStart("cancel");
     fprintf(s_ui, " %s unit %u\n", UiOrderName(kind), UiUnitIndex(unit));
 }
@@ -3947,6 +3971,9 @@ void __stdcall HarnessUiGroup(const char* what, int group)
 {
     if (!UiLive())
         return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(1, __builtin_return_address(0));
+#endif
     UiLineStart(what);
     fprintf(s_ui, " %d", group);
     UiListUnits(group, 0);
@@ -4017,6 +4044,9 @@ void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, 
 {
     if (!HarnessTestMode() || s_sound == nullptr)
         return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(0, __builtin_return_address(0));
+#endif
     char text[33];
     const char* name = file;
     if (name == nullptr && index >= 0 && index < g_game->soundCount && index < 256) {
@@ -4095,6 +4125,10 @@ void HarnessPhase(int phase)
     if (!HarnessTestMode() || s_trace == NULL)
         return;
     unsigned tick = GameU32(GAME_TICK);
+#if BT_ACCESS_LOG
+    AccessLogMarker(phase, tick);
+    AccessLogScope accessWindow(ACCESS_WINDOW_OFF, phase < 7 ? phase + 1 : ACCESS_WINDOW_TAIL);
+#endif
     unsigned holdrand = GameHoldrand(RAND_STREAM_MAIN);
     unsigned parkMiller = g_randomSeed;
 

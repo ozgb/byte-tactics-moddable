@@ -786,12 +786,20 @@ def load_initialiser_allowlist() -> dict[tuple[str, str], set[str]]:
         return {(r["file"], r["symbol"]): set(r["refs"].split()) for r in csv.DictReader(fh)}
 
 
+IGNORED_REFERENCES: tuple[str, ...] = ()
+
+
 def report_dropped_initialisers(lost: list[tuple[str, str, list[str]]],
                                 allowed: dict[tuple[str, str], set[str]]) -> None:
     """Exits non-zero, naming each dynamic initialiser the link would drop that
-    is not allowed, or whose references differ from the allowed row's."""
+    is not allowed, or whose references differ from the allowed row's. A reference
+    to a symbol that starts with one of IGNORED_REFERENCES (`--access-log` sets
+    the access log's `asan_` callbacks) is not counted, and one to `asan_memcpy`,
+    `asan_memset` or `asan_memmove` counts as the CRT function it stands for."""
     bad = False
     for file, symbol, refs in lost:
+        refs = [re.sub(r"^_+asan_(mem\w+)$", r"_\1", r) for r in refs]
+        refs = [r for r in refs if not r.lstrip("_").startswith(IGNORED_REFERENCES)]
         if (file, symbol) not in allowed:
             print(f"aliases: dropped dynamic initialiser {symbol} in {file}", file=sys.stderr)
             bad = True
@@ -1525,7 +1533,12 @@ def main() -> None:
                     help="write data/initialisers.csv from orig/TotalA.exe and exit")
     ap.add_argument("--no-data-order", action="store_true",
                     help="with --patch-dir: do not lay the data out in the original's order")
+    ap.add_argument("--access-log", action="store_true",
+                    help="with --patch-dir: the objects call the access log's asan_ callbacks, which no initialiser check counts")
     args = ap.parse_args()
+    if args.access_log:
+        global IGNORED_REFERENCES
+        IGNORED_REFERENCES = ("asan_",)
     if args.write_initialisers:
         write_initialisers()
         return

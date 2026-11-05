@@ -3,6 +3,9 @@
 #include "block.h"
 #include "../harness/replay.h"
 #include "../../lib/bitexact/bitexact.h"
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
 
 static bx_rand_state* Stream(RandStream stream)
 {
@@ -11,6 +14,9 @@ static bx_rand_state* Stream(RandStream stream)
 
 int __cdecl GameRand(RandStream stream)
 {
+#if BT_ACCESS_LOG
+    AccessLogDraw((int)stream + 1, __builtin_return_address(0));
+#endif
     ReplayImport call(RI_GAME_RAND);
     call.Int(stream);
     return call.Result(bx_rand(Stream(stream)));

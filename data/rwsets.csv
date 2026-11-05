@@ -31751,6 +31751,7 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [PlayersSeam::LoadPlayerControllers]
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(RandStream) __attribute__((stdcall)) [PlayersSeam::UpdatePlayersOnStream]
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
+0x497c70,LoadThreadMain,src/game/game_load.cpp,call,HarnessLoadEnded
 0x497c70,LoadThreadMain,src/game/game_load.cpp,call,LoadMatch
 0x497c70,LoadThreadMain,src/game/game_load.cpp,call,_exception_info
 0x497c70,LoadThreadMain,src/game/game_load.cpp,call,host_crash_report
@@ -31806,6 +31807,8 @@ address,function,file,kind,target
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,GetTicks
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,HAPI_LoadFile
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,HandleNetPackets
+0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,HarnessAwaitLoadAndEndFrame
+0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,HarnessLoadBegins
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,LoadPictureCached
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,LockScreen
 0x497f40,LoadingScreenFrame,src/game/game_load.cpp,call,MainLoopTick
@@ -46859,6 +46862,9 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_sound@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_trace@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_ui@src/harness/harness.cpp
+,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,call,host_event_wait
+,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,function,
+,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,global_read,s_loadEnded@src/harness/harness.cpp
 ,HarnessBeforeStep,src/harness/harness.cpp,call,DeliverScriptedInput
 ,HarnessBeforeStep,src/harness/harness.cpp,call,Fail
 ,HarnessBeforeStep,src/harness/harness.cpp,call,GameU32
@@ -46949,6 +46955,13 @@ address,function,file,kind,target
 ,HarnessInit,src/harness/harness.cpp,global_read,s_fpuControlWord@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,global_read,s_viewSeed@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,global_write,s_viewState@src/harness/harness.cpp
+,HarnessLoadBegins,src/harness/harness.cpp,call,HarnessTestMode
+,HarnessLoadBegins,src/harness/harness.cpp,call,host_event_create
+,HarnessLoadBegins,src/harness/harness.cpp,function,
+,HarnessLoadBegins,src/harness/harness.cpp,global_write,s_loadEnded@src/harness/harness.cpp
+,HarnessLoadEnded,src/harness/harness.cpp,call,host_event_set
+,HarnessLoadEnded,src/harness/harness.cpp,function,
+,HarnessLoadEnded,src/harness/harness.cpp,global_read,s_loadEnded@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,call,GameHoldrand
 ,HarnessPhase,src/harness/harness.cpp,call,GameU32
 ,HarnessPhase,src/harness/harness.cpp,call,HarnessTestMode

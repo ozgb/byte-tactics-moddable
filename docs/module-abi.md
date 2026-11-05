@@ -434,9 +434,8 @@ behaviour is the contract the existing module was built against.
 ### 7.3 A buffer the caller supplies
 
 A slot that returns a list of objects takes a buffer from the caller, so that no native container
-layout is part of the contract. `ai.GetVisibleEnemiesInRadiusList(int player, const Vec3* pos, int
-radius, int flags, Unit** out, int capacity) -> int` (kinds `[int, linear, int, int, linear, int]
--> int`) is the slot of this form.
+layout is part of the contract. `ai.GetVisibleEnemiesInRadiusList` (kinds `[int, linear, int, int, linear, int] -> int`: the player, a
+position, a radius, flags, the output buffer and its capacity in units) is the slot of this form.
 
 - It returns the number of units found, which may be above `capacity`.
 - It writes the first `min(count, capacity)` units to `out`, each as a block offset (section 7.1), in

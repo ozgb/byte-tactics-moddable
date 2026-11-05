@@ -122,7 +122,10 @@ tick), `ui-action` (read when the player acts), `after-event` (read after one ki
 `per-player-filter` (units, features, projectiles and their kin, as line of sight shows them) or `all-players`; a `runs`
 of 0 means no scenario showed the read.
 
-The files leave out what has no behavioural name: the `unobserved` edges that the code makes by calling through a
-function pointer (they name a function, not an item), and the rows of items that `layout.json` and the rest of the kit do
-not define (a table or a heap block that no record of the layout holds). The random stream of the game's generator is `rng`
-here, as in the trace format.
+Three kinds of item are named by what they are, not by the code that touches them. An `unobserved` row flagged `indirect`
+is a call from the writer's subsystem into the reader's through a function pointer: its item is the slot, written
+`interface.Slot` (the interface of `interfaces/` and the slot of its table, as in `economy.GetEnergyUse`), or `call` when no
+interface declares it. A block of memory that the game allocates is named by its state class (`sim`, `view`, `platform`,
+`mixed` or `const`: whether the simulation holds it), or `heap` when it has none. The random stream of
+the game's generator is `rng`, as in the trace format. The files leave out the rows of items that `layout.json` and the rest of
+the kit do not define (a table that no record of the layout holds).

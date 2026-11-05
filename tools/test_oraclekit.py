@@ -79,6 +79,7 @@ COUPLING_DATA = {
                              "ai,units,Unit::flags,players,immediate,3,a@1,\n"
                              "ai,units,g_hiddenTable,players,immediate,2,a@2,\n"
                              "ai,orders,DeleteOrders,-,unobserved,0,,indirect\n"
+                             "ai,units,MysteryCall,-,unobserved,0,,indirect\n"
                              "ai,orders,Unit::orders,-,unobserved,0,,\n"
                              "-,units,rng.parkMiller,players,ordered,1,a@3,\n",
     "data/phase_dependencies.csv": "writer,reader,item,phase_from,phase_to,class,runs,example,flags\n"
@@ -94,12 +95,15 @@ COUPLING_DATA = {
                            "units,g_hiddenTable,ai,ReactToAttack,other-record,1,a@3\n",
     "data/presentation_reads.csv": "item,reader,pattern,covered_by_event,visibility,runs\n"
                                    "Unit::flags,presentation,unknown,,all-players,0\n"
-                                   "Build: operator new int,map,unknown,,own,1\n",
+                                   "Build: operator new int,map,unknown,,own,1\n"
+                                   "Make: new Order,map,unknown,,own,2\n",
     "data/dependency_checks.csv": "writer,reader,item,phase,group,scenarios,result,scenarios_counted,defer_held,defer_third_stores\n"
                                   "ai,units,Unit::flags,players,g1,3,equal,3,0,0\n",
 }
+COUPLING_EXTRA = {"interfaces/orders.h": "struct OrdersSeam {\n    void (__stdcall* DeleteOrders)(int all);\n};\n",
+                  "data/state_classes.csv": "name,address,kind,proposed,class\nMake: new Order,0x0,heap,,sim\n"}
 COUPLING_LAYOUT = {"records": {"Unit": {"fields": [{"name": "flags"}, {"name": "orders"}]}}}
-COUPLING_SOURCE = "int ReactToAttack(int a) { return a; }\nint ChooseBuildOption(int a) { return a; }\nint g_hiddenTable[4];\n"
+COUPLING_SOURCE = "int MysteryCall(int a) { return a; }\nint ReactToAttack(int a) { return a; }\nint ChooseBuildOption(int a) { return a; }\nint g_hiddenTable[4];\n"
 
 
 def on_disk(root: Path, entry: str) -> list[tuple[str, str]]:
@@ -142,7 +146,7 @@ def git(root: Path, *args: str) -> None:
 def repo(tmp: str, extra: dict[str, str] | None = None) -> Path:
     root = Path(tmp)
     files = {"docs/a.md": "alpha\n", "data/x.json": "{}\n", "data/y/z.txt": "z\n", oraclekit.README_SOURCE: "readme\n",
-             "data/layout_refs.csv": "function\n", oraclekit.MODULES: MODULES_TEXT, **COUPLING_DATA, **(extra or {})}
+             "data/layout_refs.csv": "function\n", oraclekit.MODULES: MODULES_TEXT, **COUPLING_DATA, **COUPLING_EXTRA, **(extra or {})}
     for path, text in files.items():
         (root / path).parent.mkdir(parents=True, exist_ok=True)
         (root / path).write_text(text)
@@ -554,9 +558,9 @@ class LeakCheckTest(unittest.TestCase):
             self.assertFalse(kit.exists())
 
 
-def coupling_export(tmp: str, out: Path) -> tuple[Path, dict[str, str]]:
+def coupling_export(tmp: str, out: Path, counts: dict | None = None) -> tuple[Path, dict[str, str]]:
     root = repo(tmp, {"src/a.cpp": COUPLING_SOURCE})
-    oraclekit.export(root, out, True, COUPLING_LAYOUT, CONTENTS)
+    oraclekit.export(root, out, True, COUPLING_LAYOUT, CONTENTS + [("dir", "interfaces", "")], counts=counts)
     return root, {p.name: p.read_text() for p in (out / oraclekit.COUPLING_DIR).glob("*.csv")}
 
 
@@ -574,35 +578,43 @@ class CouplingTest(unittest.TestCase):
             self.assertEqual([l.split(",")[3] for l in lines[1:]], ["1", "2"])
             self.assertTrue(lines[1].startswith("units,rng,ai,1,"))
 
-    def test_draws_evidence_keeps_only_defined_items(self):
+    def test_draws_evidence_renames_allocations_and_drops_undefined_items(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             _, files = coupling_export(tmp, Path(out) / "k")
-            self.assertTrue(files["draws.csv"].splitlines()[2].endswith("depends-on-earlier,Unit::flags,a@2"))
+            self.assertTrue(files["draws.csv"].splitlines()[2].endswith("depends-on-earlier,Unit::flags;heap,a@2"))
 
     def test_pass_reads_drop_the_function_and_merge(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             _, files = coupling_export(tmp, Path(out) / "k")
             self.assertEqual(files["pass_reads.csv"], "pass,item,reader,evidence,runs,example\nunits,Unit::flags,ai,same-record,5,a@2\n")
 
-    def test_the_indirect_rows_are_dropped_and_the_other_unobserved_rows_stay(self):
+    def test_indirect_rows_are_kept_with_the_slot_or_call_as_item(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             _, files = coupling_export(tmp, Path(out) / "k")
             rows = files["dependencies.csv"].splitlines()
-            self.assertNotIn("DeleteOrders", files["dependencies.csv"])
+            self.assertNotIn(",DeleteOrders,", files["dependencies.csv"])
+            self.assertIn("ai,orders,orders.DeleteOrders,-,unobserved,0,,indirect", rows)
+            self.assertIn("ai,units,call,-,unobserved,0,,indirect", rows)
             self.assertIn("ai,orders,Unit::orders,-,unobserved,0,,", rows)
             self.assertNotIn("g_hiddenTable", files["dependencies.csv"])
             self.assertIn("-,units,rng,players,ordered,1,a@3,", rows)
 
-    def test_presentation_rows_of_allocations_are_dropped(self):
+    def test_allocation_sites_take_a_state_class_or_heap_and_the_renames_are_counted(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
-            _, files = coupling_export(tmp, Path(out) / "k")
-            self.assertEqual(len(files["presentation_reads.csv"].splitlines()), 2)
+            counts: dict[str, int] = {}
+            _, files = coupling_export(tmp, Path(out) / "k", counts)
+            rows = files["presentation_reads.csv"].splitlines()
+            self.assertIn("heap,map,unknown,,own,1", rows)
+            self.assertIn("sim,map,unknown,,own,2", rows)
+            self.assertEqual(counts, {"slot": 1, "call": 1, "state class": 1, "heap": 2})
+            self.assertEqual(oraclekit.renames(counts), "oraclekit: renamed 1 indirect items to interface.Slot, 1 to call, "
+                                                       "1 allocation sites to a state class, 2 to heap")
 
     def test_no_function_name_is_exported_and_the_leak_check_passes(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             root, files = coupling_export(tmp, Path(out) / "k")
             text = "".join(files.values())
-            for name in ("ReactToAttack", "ChooseBuildOption", "DeleteOrders", "g_hiddenTable", "parkMiller"):
+            for name in ("ReactToAttack", "ChooseBuildOption", "MysteryCall", "g_hiddenTable", "parkMiller"):
                 self.assertNotIn(name, text)
             kit = {p: b for p, b in ((q.relative_to(Path(out) / "k").as_posix(), q.read_bytes())
                                      for q in (Path(out) / "k").rglob("*") if q.is_file())}

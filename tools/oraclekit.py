@@ -27,10 +27,12 @@ The dependency classification and the presentation reads (#840) are derived into
 COUPLING, in behavioural terms only: state items, phases, subsystems, classes, run counts and examples of the form
 `scenario@tick`. The `function` column of data/draws.csv becomes a `site` number within its pass, stream and subsystem, and
 the one of data/pass_reads.csv is dropped (rows that differ only by it merge, with the most runs of any of them). The
-`unobserved` rows of data/dependencies.csv flagged `indirect` have a function as their item and are dropped. A row
-whose item is no state the kit defines (a name that `allowed_identifiers` lacks, or an allocation labelled by the function
-that made it) is dropped, and so is such an entry of the evidence of draws.csv; the random stream `rng.parkMiller` is
-written `rng`, as the trace format names it. The leak check then covers these files like any other.
+`indirect` rows of data/dependencies.csv have a function as their item: it becomes `interface.Slot` (the interface header
+that declares the slot, a dot, the slot) or `call` when no header has it. An item that names an allocation site by the
+function that made it becomes the state class of data/state_classes.csv, or `heap` when it has none. A row whose item the
+kit does not define (a name that `allowed_identifiers` lacks) is dropped, and so is such an entry of the evidence of
+draws.csv; the random stream `rng.parkMiller` is written `rng`, as the trace format names it. `export` prints how many
+items each rename touched. The leak check then covers these files like any other.
 """
 
 from __future__ import annotations
@@ -58,7 +60,7 @@ MODULES = "wasm/modules.json"
 COUPLING_DIR = "coupling"
 COUPLING = ("dependencies", "phase_dependencies", "phase_boundaries", "draws", "pass_reads", "presentation_reads",
             "dependency_checks")
-ALLOCATION_ITEM = re.compile(r": |\(|@@|::~|^\?")
+ALLOCATION_ITEM = re.compile(r": ")
 STREAM_NAMES = {"rng.parkMiller": "rng"}
 FUEL_PASS = "tools/wasm_fuel.py"
 MODULE_SOURCE_FIELDS = ("cxx", "c")
@@ -345,72 +347,110 @@ def csv_bytes(header: list[str], rows: list[dict[str, str]]) -> bytes:
     return out.getvalue().encode()
 
 
-def behavioural(item: str, known: set[str]) -> bool:
-    """Whether an item names state: not an allocation labelled by the function that made it, and every identifier in it defined by the kit."""
-    return not ALLOCATION_ITEM.search(item) and speclint.identifiers(item) <= known
+class Names:
+    """What the coupling files may call an item: the identifiers the kit defines, the slots of each interface, the state class of each allocation site, and the renames made."""
+
+    def __init__(self, known: set[str], seams: dict[str, set[str]], classes: dict[str, str]):
+        self.known = known
+        self.seams = seams
+        self.classes = classes
+        self.counts = {"slot": 0, "call": 0, "state class": 0, "heap": 0}
+
+    def slot(self, function: str, writer: str, reader: str) -> str:
+        """`interface.Slot` for a function called through a seam, the reader's interface first; `call` when no interface has it."""
+        owners = [i for i in (reader, writer) if function in self.seams.get(i, ())]
+        owners = owners or [i for i, slots in sorted(self.seams.items()) if function in slots]
+        if owners and (len(owners) == 1 or owners[0] in (reader, writer)):
+            self.counts["slot"] += 1
+            return "%s.%s" % (owners[0], function)
+        self.counts["call"] += 1
+        return "call"
+
+    def allocation(self, item: str) -> str:
+        """The state class of an allocation site named by the function that made it, else `heap`."""
+        name = self.classes.get(item)
+        self.counts["state class" if name else "heap"] += 1
+        return name or "heap"
+
+    def item(self, item: str) -> str | None:
+        """The behavioural name of an item, None when the kit does not define it."""
+        item = STREAM_NAMES.get(item, item)
+        if ALLOCATION_ITEM.search(item):
+            return self.allocation(item)
+        return item if speclint.identifiers(item) <= self.known else None
 
 
-def stream_name(item: str) -> str:
-    """The item with the random stream the trace calls `rng` under that name."""
-    return STREAM_NAMES.get(item, item)
-
-
-def keep_items(rows: list[dict[str, str]], known: set[str]) -> list[dict[str, str]]:
-    """The rows whose `item` is behavioural, stream names renamed."""
+def keep_items(rows: list[dict[str, str]], names: Names) -> list[dict[str, str]]:
+    """The rows whose `item` has a behavioural name, renamed; an `indirect` row's item becomes its seam slot."""
     kept = []
     for r in rows:
         if "item" in r:
-            r["item"] = stream_name(r["item"])
-            if not behavioural(r["item"], known):
+            if "indirect" in r.get("flags", "").split(";"):
+                r["item"] = names.slot(r["item"], r["writer"], r["reader"])
+            elif (item := names.item(r["item"])) is None:
                 continue
+            else:
+                r["item"] = item
         kept.append(r)
     return kept
 
 
-def kit_dependencies(data: bytes, known: set[str]) -> bytes:
-    """data/dependencies.csv without its `indirect` rows (the item is a function called through a pointer) and the rows of items the kit does not define."""
+def kit_items(data: bytes, names: Names) -> bytes:
+    """A CSV file with an `item` column, its items renamed and the rows of items the kit does not define dropped."""
     header, rows = csv_rows(data)
-    return csv_bytes(header, keep_items([r for r in rows if "indirect" not in r["flags"].split(";")], known))
+    return csv_bytes(header, keep_items(rows, names))
 
 
-def kit_draws(data: bytes, known: set[str]) -> bytes:
-    """data/draws.csv with `function` replaced by `site`, the number of the row within its pass, stream and subsystem, and the evidence reduced to the items the kit defines."""
+def kit_draws(data: bytes, names: Names) -> bytes:
+    """data/draws.csv with `function` replaced by `site`, the number of the row within its pass, stream and subsystem, and the evidence items renamed."""
     header, rows = csv_rows(data)
     count: dict[tuple[str, str, str], int] = {}
     for r in rows:
-        r["stream"] = stream_name(r["stream"])
+        r["stream"] = STREAM_NAMES.get(r["stream"], r["stream"])
         key = (r["pass"], r["stream"], r["subsystem"])
         count[key] = count.get(key, 0) + 1
         r["site"] = str(count[key])
-        r["evidence"] = ";".join(e for e in r["evidence"].split(";") if e and behavioural(e, known))
+        found = [names.item(e) for e in r["evidence"].split(";") if e]
+        r["evidence"] = ";".join(dict.fromkeys(e for e in found if e))
     return csv_bytes([("site" if c == "function" else c) for c in header], rows)
 
 
-def kit_pass_reads(data: bytes, known: set[str]) -> bytes:
+def kit_pass_reads(data: bytes, names: Names) -> bytes:
     """data/pass_reads.csv without `function`: rows of one pass, item, reader and evidence merge, with the most runs and its example."""
     header, rows = csv_rows(data)
     merged: dict[tuple[str, str, str, str], dict[str, str]] = {}
-    for r in keep_items(rows, known):
+    for r in keep_items(rows, names):
         key = (r["pass"], r["item"], r["reader"], r["evidence"])
         if key not in merged or int(r["runs"]) > int(merged[key]["runs"]):
             merged[key] = r
     return csv_bytes([c for c in header if c != "function"], [merged[k] for k in sorted(merged)])
 
 
-def kit_items(data: bytes, known: set[str]) -> bytes:
-    """A CSV file with an `item` column, without the rows of items the kit does not define."""
-    header, rows = csv_rows(data)
-    return csv_bytes(header, keep_items(rows, known))
+COUPLING_KIT = {"draws": kit_draws, "pass_reads": kit_pass_reads, "phase_boundaries": lambda data, names: data}
+SLOT = re.compile(r"\(\s*(?:__\w+\s*)?\*\s*(\w+)\s*\)")
 
 
-COUPLING_KIT = {"dependencies": kit_dependencies, "draws": kit_draws, "pass_reads": kit_pass_reads,
-                "phase_boundaries": lambda data, known: data}
+def interface_slots(root: Path) -> dict[str, set[str]]:
+    """The slot names of each interface header, by the header's name without its suffix."""
+    return {Path(p).stem: set(SLOT.findall(blob(root, p).decode()))
+            for p, _ in tracked(root, "interfaces") if p.endswith(".h")}
 
 
-def coupling_files(read, known: set[str]) -> dict[str, bytes]:
-    """The kit's coupling/ files, derived from the data/ CSV files `read(path)` returns; `known` is what the rest of the kit defines."""
-    return {"%s/%s.csv" % (COUPLING_DIR, name): COUPLING_KIT.get(name, kit_items)(read("data/%s.csv" % name), known)
+def state_classes(data: bytes) -> dict[str, str]:
+    """The class of each variable, region and allocation site of data/state_classes.csv."""
+    return {r["name"]: r["class"] for r in csv_rows(data)[1]}
+
+
+def coupling_files(read, names: Names) -> dict[str, bytes]:
+    """The kit's coupling/ files, derived from the data/ CSV files `read(path)` returns."""
+    return {"%s/%s.csv" % (COUPLING_DIR, name): COUPLING_KIT.get(name, kit_items)(read("data/%s.csv" % name), names)
             for name in COUPLING}
+
+
+def renames(counts: dict[str, int]) -> str:
+    """One line with the number of items renamed to a seam slot, `call`, a state class and `heap`."""
+    return "oraclekit: renamed %d indirect items to interface.Slot, %d to call, %d allocation sites to a state class, %d to heap" % (
+        counts["slot"], counts["call"], counts["state class"], counts["heap"])
 
 
 def kit_modules(data: bytes) -> bytes:
@@ -502,7 +542,7 @@ def check_target(out: Path) -> None:
         raise Refusal("refused: %s is not empty" % out)
 
 
-def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, lister=tracked, leaks=None) -> dict:
+def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, lister=tracked, leaks=None, counts=None) -> dict:
     """Write the kit to `out` and return its manifest. Nothing is written when the export is refused or leaks (`leaks` replaces leak_check in tests)."""
     paths = select(root, contents, lister)
     tags = version_tags(root)
@@ -514,7 +554,10 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     except subprocess.CalledProcessError:
         raise Refusal("refused: %s has no tracked file" % MODULES)
     check_names(files)
-    files.update(coupling_files(lambda path: blob(root, path), allowed_identifiers(files)))
+    names = Names(allowed_identifiers(files), interface_slots(root), state_classes(blob(root, "data/state_classes.csv")))
+    files.update(coupling_files(lambda path: blob(root, path), names))
+    if counts is not None:
+        counts.update(names.counts)
     files[README] = blob(root, README_SOURCE)
     hits = (leaks or leak_check)(files, root)
     if hits:
@@ -541,12 +584,14 @@ def main() -> None:
         check_target(args.dir)
         select(ROOT)
         check_tags(version_tags(ROOT), args.untagged)
-        manifest = export(ROOT, args.dir, args.untagged, generate_layout(ROOT, args.build_dir))
+        counts: dict[str, int] = {}
+        manifest = export(ROOT, args.dir, args.untagged, generate_layout(ROOT, args.build_dir), counts=counts)
     except Refusal as e:
         sys.exit("oraclekit: " + str(e))
     problems = verify(args.dir)
     if problems:
         sys.exit("oraclekit: the export does not match its manifest:\n" + "\n".join(problems))
+    print(renames(counts))
     print("oraclekit: wrote %d files and %s to %s (version %s)" % (
         len(manifest["files"]), MANIFEST, args.dir, manifest["version"]))
 

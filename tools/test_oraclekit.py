@@ -633,7 +633,7 @@ class SimEventKitTest(unittest.TestCase):
         for n in (1, 2, 3):
             self.assertIn("docs/scenario-format.md", by_term["game type %d" % n]["kit_reference"])
             self.assertIn("layout.json Player.type", by_term["player type %d" % n]["kit_reference"])
-        self.assertIn("Nothing in the game produces it", by_term["kill type 7"]["definition"])
+        self.assertIn("isfeature", by_term["kill type 7"]["definition"])
         self.assertIn("nothing else sets it", by_term["match flag 2"]["definition"])
 
     def test_a_definition_the_page_does_not_use_stops_the_export(self):

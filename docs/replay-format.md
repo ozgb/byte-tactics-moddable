@@ -45,8 +45,8 @@ would, and `tools/replay.py --check` cannot play it again, so `tests/replay/play
 (`"<subsystem>/<name>": "<the command that records it>"`) and `--check`, the default plan and `tools/oraclegate.py` leave it out.
 CI replays it with the others (`tools/ci_replays.sh`). `tools/test_replay.py` checks its arithmetic: every
 `players.TransferMetal` and `players.TransferEnergy` amount in `tests/replay/economy/mp-sharing.txt` must equal
-`ShareAmount` (`src/network/resource_share.h`) of the stock, share level, capacity and partner stock the recording knows,
-computed the way the x87 does at 53-bit precision, bit for bit. `UpdateResourceSharing` passes the metal share to
+the share amount of the stock, share level, capacity and partner stock the recording knows (a third of the stock above the level for
+metal, half for energy, at most the partner's room), computed the way the x87 does at 53-bit precision, bit for bit. `UpdateResourceSharing` passes the metal share to
 `players.TransferEnergy` and the energy share to `players.TransferMetal`.
 
 ## Lines

@@ -293,6 +293,17 @@ static void __stdcall GetVisibleEnemiesInRadiusNative(int player, const Vec3* po
     GetVisibleEnemiesInRadius(player, (const Vec*)pos, radius, flags, out);
 }
 
+static int __stdcall GetVisibleEnemiesInRadiusListNative(int player, const Vec3* pos, int radius, int flags, Unit** out, int capacity)
+{
+    std::vector<Unit*> found;
+    GetVisibleEnemiesInRadius(player, (const Vec*)pos, radius, flags, &found);
+    int count = (int)found.size();
+    unsigned int* offsets = (unsigned int*)out;
+    for (int i = 0; i < count && i < capacity; i++)
+        offsets[i] = Ref<Unit>(found[i]).offset;
+    return count;
+}
+
 static char* __stdcall GetNameSlotNative(Mission* mission, int index)
 {
     return mission->GetNameSlot(index);
@@ -832,6 +843,7 @@ void InstallNativeSeams()
     s_weapons.GetWeaponRange = GetWeaponRangeNative;
     s_weapons.WeaponCanReachUnit = WeaponCanReachUnit;
     s_ai.GetVisibleEnemiesInRadius = GetVisibleEnemiesInRadiusNative;
+    s_ai.GetVisibleEnemiesInRadiusList = GetVisibleEnemiesInRadiusListNative;
     s_weapons.FindTargetableProjectile = FindTargetableProjectile;
     s_weapons.WeaponCanReachPos = WeaponCanReachPos;
     s_weapons.AllocWeaponArray = AllocWeaponArray;

@@ -16,7 +16,7 @@ class CommandArgs;
 // Major version of the ai interface, changed when a slot is removed or its signature changes.
 #define AI_VERSION_MAJOR 3
 // Minor version of the ai interface, changed when a slot is added.
-#define AI_VERSION_MINOR 0
+#define AI_VERSION_MINOR 1
 
 // Computer player decisions.
 struct AiSeam {
@@ -66,6 +66,8 @@ struct AiSeam {
     void (__stdcall* CmdWeight)(CommandArgs* args);
     // Runs the "limit" console command, which sets the build limits of unit types. Hooks: none.
     void (__stdcall* CmdLimit)(CommandArgs* args);
+    // Writes to out, as block offsets, the first capacity of the enemies a player sees within a radius of a position and returns how many there are. Hooks: none.
+    int (__stdcall* GetVisibleEnemiesInRadiusList)(int player, const Vec3* pos, int radius, int flags, Unit** out, int capacity);
 };
 
 #endif

@@ -84,7 +84,7 @@ const unsigned kPresentationPass = 14;
 const unsigned kPassDepth = 8;
 struct PassFrame {
     int pass;
-    unsigned entOrd, floor;
+    unsigned entOrd;
 };
 const unsigned kKinds = 40;
 const unsigned kPresBits = 16;
@@ -756,7 +756,7 @@ NS void FlushEntity()
     g_entTaint = false;
 }
 
-NS void NotePassRead(unsigned item, unsigned sub, void* ra, unsigned flags)
+NS void NotePassRead(unsigned item, unsigned sub, void* ra, unsigned flags, unsigned level)
 {
     unsigned f = FunctionOf(ra);
     if (g_funcRng != 0 && g_funcRng[f])
@@ -765,7 +765,7 @@ NS void NotePassRead(unsigned item, unsigned sub, void* ra, unsigned flags)
     if (!g_entTaint)
         g_entTaint = true;
     AddTaint(g_taint, &g_taintN, item);
-    unsigned pass = (unsigned)g_pass;
+    unsigned pass = (unsigned)(level < g_passDepth ? g_passStack[level].pass : g_pass);
     unsigned h = (pass * 40503u) ^ (item * 3266489917u) ^ (sub * 2246822519u) ^ (f * 2654435761u) ^ (evidence * 668265263u);
     h ^= h >> 15;
     unsigned mask = (1u << kPassBits) - 1;
@@ -1110,7 +1110,7 @@ NS void Record(int store, unsigned a, unsigned size, void* ra)
         } else {
             unsigned flags = g_classifier.Read(h.item, h.entA, h.entB, sub, g_tick);
             if ((flags & READ_EARLIER_ENTITY) != 0 && g_passReads != 0)
-                NotePassRead(h.item, sub, ra, flags);
+                NotePassRead(h.item, sub, ra, flags, g_classifier.MatchLevel());
         }
         if (g_raw)
             RawLine(store ? "W" : "R", sub, h.item, h, cursor);
@@ -1143,9 +1143,9 @@ NS void EnterPass(int pass)
     PassFrame* f = &g_passStack[g_passDepth++];
     f->pass = g_pass;
     f->entOrd = g_entOrd;
-    f->floor = g_classifier.Floor();
     g_pass = pass;
     g_entOrd = ++g_ordCounter;
+    g_classifier.PushLevel();
     g_classifier.Entity(g_entOrd, g_entOrd);
 }
 
@@ -1162,7 +1162,7 @@ NS void LeavePass()
     PassFrame* f = &g_passStack[--g_passDepth];
     g_pass = f->pass;
     g_entOrd = f->entOrd;
-    g_classifier.Entity(f->entOrd, f->floor);
+    g_classifier.PopLevel();
 }
 
 NS void NextEntity()

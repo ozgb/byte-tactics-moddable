@@ -34,10 +34,24 @@ public:
     void Ordered(unsigned stream, unsigned item, unsigned sub, unsigned tick);
     void Entity(unsigned ordinal, unsigned base)
     {
-        entity = ordinal;
-        floor = base;
+        level[depth].entity = ordinal;
+        level[depth].floor = base;
     }
-    unsigned Floor() const { return floor; }
+    void PushLevel()
+    {
+        if (depth < kLevels - 1)
+            depth++;
+        level[depth].entity = 0;
+        level[depth].floor = 0;
+    }
+    void PopLevel()
+    {
+        if (depth > 0)
+            depth--;
+    }
+    unsigned Floor() const { return level[depth].floor; }
+    unsigned Depth() const { return depth; }
+    unsigned MatchLevel() const { return matchLevel; }
     unsigned Slots() const { return slots; }
     bool Edge(unsigned slot, ClassifierEdge* out) const;
     bool Overflowed() const { return overflow; }
@@ -74,8 +88,13 @@ private:
     unsigned label = 0;
     unsigned epoch = 1;
     unsigned window = 0;
-    unsigned entity = 0;
-    unsigned floor = 0;
+    struct Level {
+        unsigned entity, floor;
+    };
+    static const unsigned kLevels = 9;
+    Level level[kLevels] = {};
+    unsigned depth = 0;
+    unsigned matchLevel = 0;
     unsigned windowLabels[2][kWindows] = {};
     unsigned current = 0;
     bool overflow = false;
@@ -142,8 +161,11 @@ inline void Classifier::BeginWindow(unsigned lab)
     stamp++;
     label = lab;
     writtenCount = 0;
-    entity = 0;
-    floor = 0;
+    depth = 0;
+    for (unsigned i = 0; i < kLevels; i++) {
+        level[i].entity = 0;
+        level[i].floor = 0;
+    }
     if (lab == kPendingLabel) {
         epoch++;
         current ^= 1;
@@ -200,7 +222,13 @@ inline unsigned Classifier::Read(unsigned item, unsigned entA, unsigned entB, un
         if (s->writer != sub || s->entA != entA || s->entB != entB)
             Count(s->writer, sub, item, EVIDENCE_RAW, tick, 1);
         s->read = 1;
-        if (s->writerOrd > floor && s->writerOrd < entity) {
+        unsigned d = depth + 1;
+        while (d-- > 0) {
+            if (s->writerOrd > level[d].floor && s->writerOrd < level[d].entity)
+                break;
+        }
+        if (d != (unsigned)-1) {
+            matchLevel = d;
             flags |= READ_EARLIER_ENTITY;
             if (s->entA == entA && s->entB == entB)
                 flags |= READ_SAME_RECORD;
@@ -229,7 +257,7 @@ inline void Classifier::Write(unsigned item, unsigned entA, unsigned entB, unsig
     s->writer = sub;
     s->entA = entA;
     s->entB = entB;
-    s->writerOrd = entity;
+    s->writerOrd = level[depth].entity;
     s->tickEpoch = epoch;
     s->tickWriter = sub;
     s->tickWin = window;

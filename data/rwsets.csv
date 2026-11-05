@@ -1203,6 +1203,8 @@ address,function,file,kind,target
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,DeleteOrders
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,GetOrderFlags
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,GetWeaponTargetUnit
+0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,HarnessEventSpeech
+0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,HarnessEventSuppress
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,IssueAttackOrder
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,NotifyUnitRefs
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,QueueUnitSpeechIfNotVisible
@@ -1483,7 +1485,9 @@ address,function,file,kind,target
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player_408100.cpp,global_read,g_game
 0x408600,ScoutTimer::ScoutTimer,src/ai/ai_player.cpp,function,
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player_408620.cpp,call,ChooseBuildOption
+0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player_408620.cpp,call,HarnessEventWords
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player_408620.cpp,call,QueueBuildOrder
+0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player_408620.cpp,deref_read,*unsigned char
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player_408620.cpp,field_maybe_written,Item_00408620::name
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player_408620.cpp,field_read,BuildTimer::player
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player_408620.cpp,field_read,Game::unitDefs
@@ -1500,6 +1504,7 @@ address,function,file,kind,target
 0x408670,UpdateConverter,src/ai/ai_player.cpp,global_read,Zero_004fc968@src/ai/ai_player.cpp
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,ChooseBuildOption
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,GetNetEnergy
+0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,HarnessEventWords
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,QueueBuildOrder
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,RandomInt
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,Unit::SetStateBits
@@ -1518,6 +1523,7 @@ address,function,file,kind,target
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::economy
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::flags
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::list
+0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::playerIndex
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,UnitDef::count
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,UnitDef::makesMetal
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_write,SquadTimer::next
@@ -4312,6 +4318,7 @@ address,function,file,kind,target
 0x418ca0,CmdShootAll,src/game/console_commands.cpp,global_read,g_game
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,call,AddMessage
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,call,BroadcastPlayerInfo
+0x418cd0,CmdShareMetal,src/game/share_commands.cpp,call,HarnessEventWords
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,call,sprintf
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,field_read,Game::netGameFlags
@@ -4322,6 +4329,7 @@ address,function,file,kind,target
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,global_read,g_game
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,call,AddMessage
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,call,BroadcastPlayerInfo
+0x418d90,CmdShareEnergy,src/game/share_commands.cpp,call,HarnessEventWords
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,call,sprintf
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,field_read,Game::netGameFlags
@@ -4332,6 +4340,7 @@ address,function,file,kind,target
 0x418d90,CmdShareEnergy,src/game/share_commands.cpp,global_read,g_game
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,AddMessage
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,BroadcastPlayerInfo
+0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,HarnessEventWords
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,sprintf
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,field_read,Game::netGameFlags
@@ -4342,6 +4351,7 @@ address,function,file,kind,target
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,global_read,g_game
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,call,AddMessage
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,call,BroadcastPlayerInfo
+0x418f10,ToggleShareLos,src/game/share_commands.cpp,call,HarnessEventWords
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,call,sprintf
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,field_read,Game::netGameFlags
@@ -4352,6 +4362,7 @@ address,function,file,kind,target
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,global_read,g_game
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,call,AddMessage
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,call,BroadcastPlayerInfo
+0x418fd0,CmdShareRadar,src/game/share_commands.cpp,call,HarnessEventWords
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,call,sprintf
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,field_read,Game::netGameFlags
@@ -4370,6 +4381,7 @@ address,function,file,kind,target
 0x419090,CmdShareAll,src/game/share_commands.cpp,global_read,g_game
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,call,AddMessage
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,call,CommandArgs::GetIntArg
+0x419340,CmdSetShareMetal,src/game/share_commands.cpp,call,HarnessEventWords
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,call,sprintf
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,field_escape,Game::players
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,field_read,Game::localPlayer
@@ -4380,6 +4392,7 @@ address,function,file,kind,target
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,global_read,g_game
 0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,call,AddMessage
 0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,call,CommandArgs::GetIntArg
+0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,call,HarnessEventWords
 0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,call,sprintf
 0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,field_escape,Game::players
 0x419400,CmdSetShareEnergy,src/game/share_commands.cpp,field_read,Game::localPlayer
@@ -4791,6 +4804,8 @@ address,function,file,kind,target
 0x41b2e0,RefreshSelectionOrders,src/ingame/control_panel_41b2e0.cpp,global_read,g_game
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,AttachUnitToPiece
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,BroadcastBuilderLink
+0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,HarnessEventUnit
+0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,HarnessEventWords
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,IsScreenNamed
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,MarkChanged
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,call,RefreshBuildCountTexts
@@ -4895,6 +4910,7 @@ address,function,file,kind,target
 0x41c060,OpenBuildMenuPage,src/ingame/control_panel.cpp,field_write,UnitFlagsBits::page
 0x41c060,OpenBuildMenuPage,src/ingame/control_panel.cpp,function,
 0x41c060,OpenBuildMenuPage,src/ingame/control_panel.cpp,global_read,g_game
+0x41c110,MarkSelectionOrdersDirty,src/ingame/control_panel.cpp,call,HarnessEventUnit
 0x41c110,MarkSelectionOrdersDirty,src/ingame/control_panel.cpp,field_read,Game::localPlayer
 0x41c110,MarkSelectionOrdersDirty,src/ingame/control_panel.cpp,field_read,Orders::raw
 0x41c110,MarkSelectionOrdersDirty,src/ingame/control_panel.cpp,field_read,Unit::playerIndex
@@ -4902,6 +4918,7 @@ address,function,file,kind,target
 0x41c110,MarkSelectionOrdersDirty,src/ingame/control_panel.cpp,field_write,Orders::raw
 0x41c110,MarkSelectionOrdersDirty,src/ingame/control_panel.cpp,function,
 0x41c110,MarkSelectionOrdersDirty,src/ingame/control_panel.cpp,global_read,g_game
+0x41c150,UpdateBuildMenuIfFocusUnit,src/ingame/control_panel.cpp,call,HarnessEventUnit
 0x41c150,UpdateBuildMenuIfFocusUnit,src/ingame/control_panel.cpp,call,RefreshBuildCountTexts
 0x41c150,UpdateBuildMenuIfFocusUnit,src/ingame/control_panel.cpp,field_maybe_written,Game::gui
 0x41c150,UpdateBuildMenuIfFocusUnit,src/ingame/control_panel.cpp,field_read,Game::unitIndex
@@ -5000,6 +5017,7 @@ address,function,file,kind,target
 0x41c5e0,StartScreenShake,src/ingame/control_panel.cpp,field_write,Game::value_14333
 0x41c5e0,StartScreenShake,src/ingame/control_panel.cpp,function,
 0x41c5e0,StartScreenShake,src/ingame/control_panel.cpp,global_read,g_game
+0x41c640,AccumulateScreenShake,src/ingame/control_panel.cpp,call,HarnessEventWords
 0x41c640,AccumulateScreenShake,src/ingame/control_panel.cpp,field_read,Game::flags_1434e
 0x41c640,AccumulateScreenShake,src/ingame/control_panel.cpp,field_read,Game::sum_x
 0x41c640,AccumulateScreenShake,src/ingame/control_panel.cpp,field_read,Game::sum_y
@@ -6115,6 +6133,7 @@ address,function,file,kind,target
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,DrawExplodedPieceFaces
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,EmitJitteredThrustParticles
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,EmitWhiteSmoke
+0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,HarnessEventSuppress
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,RotateByAngles
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,deref_maybe_written,*Vec3
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,field_read,ExplodedPiece::b0
@@ -14522,6 +14541,7 @@ address,function,file,kind,target
 0x450240,PickNewHost,src/network/net_game.cpp,global_read,g_game
 0x450380,AnnouncePlayerLeft,src/network/net_game.cpp,call,AddMessage
 0x450380,AnnouncePlayerLeft,src/network/net_game.cpp,call,FindPlayerIndex_00450380
+0x450380,AnnouncePlayerLeft,src/network/net_game.cpp,call,HarnessEventWords
 0x450380,AnnouncePlayerLeft,src/network/net_game.cpp,call,HarnessViewRand
 0x450380,AnnouncePlayerLeft,src/network/net_game.cpp,call,Translate
 0x450380,AnnouncePlayerLeft,src/network/net_game.cpp,call,sprintf
@@ -15286,6 +15306,7 @@ address,function,file,kind,target
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,call,HAPINET_updategameinfo
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,call,HandlePing
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,call,HandlePlayerEconomy
+0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,call,HarnessEventSuppress
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,call,InGame
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,call,InfoPacket
 0x453d40,HandleNetPackets,src/network/net_game_453d40.cpp,call,IsColorFree
@@ -18832,6 +18853,7 @@ address,function,file,kind,target
 0x464f80,UpdatePlayers,src/game/players_464290.cpp,call,FindUnitTypeId
 0x464f80,UpdatePlayers,src/game/players_464290.cpp,call,FocusCommander
 0x464f80,UpdatePlayers,src/game/players_464290.cpp,call,GetCellMeanHeight
+0x464f80,UpdatePlayers,src/game/players_464290.cpp,call,HarnessEventWords
 0x464f80,UpdatePlayers,src/game/players_464290.cpp,call,LoadGuiLayer
 0x464f80,UpdatePlayers,src/game/players_464290.cpp,call,Mission::GetGameType
 0x464f80,UpdatePlayers,src/game/players_464290.cpp,call,MissionConditions::CheckDefeat
@@ -19151,6 +19173,7 @@ address,function,file,kind,target
 0x466b70,CalcRadarViewportRect,src/map/radar.cpp,field_read,Game::viewWidthTiles
 0x466b70,CalcRadarViewportRect,src/map/radar.cpp,function,
 0x466b70,CalcRadarViewportRect,src/map/radar.cpp,global_read,g_game
+0x466c20,UpdateRadarMapped,src/map/radar.cpp,call,HarnessRadarMapped
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,deref_read,*unsigned char
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,deref_read,*unsigned short
 0x466c20,UpdateRadarMapped,src/map/radar.cpp,deref_write,*unsigned char
@@ -19178,6 +19201,7 @@ address,function,file,kind,target
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,DrawPixel
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,DrawSurface
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,GetGafFrame
+0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,HarnessRadarUnits
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,OnRadar_00466dc0
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,Player_Get
 0x466dc0,DrawRadarUnits,src/map/radar.cpp,call,ScaleY_00466dc0
@@ -20885,12 +20909,14 @@ address,function,file,kind,target
 0x471f90,DrawParticleList,src/graphics/particles.cpp,global_read,g_game
 0x471f90,DrawParticleList,src/graphics/particles.cpp,indirect_call,virtual Listener_00471f90::Slot2
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,call,Add
+0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,call,HarnessEventPtrs
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,call,operator new
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,field_read,Game::lists_00471fd0
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,function,
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,global_read,g_game
 0x471fd0,EmitTeleportParticles,src/graphics/particles.cpp,indirect_call,virtual TeleportParticles::Init
 0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,call,Add_004720d0
+0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,call,HarnessEventPtrs
 0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,call,operator new
 0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,call,operator=
 0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,deref_read,*Vec3_004720d0
@@ -20901,6 +20927,7 @@ address,function,file,kind,target
 0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,function,
 0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,global_read,g_game
 0x4720d0,EmitNanoParticles,src/graphics/particles.cpp,indirect_call,virtual NanoParticles::Init
+0x472200,EmitReverseNanoParticles,src/graphics/particles.cpp,call,HarnessEventPtrs
 0x472200,EmitReverseNanoParticles,src/graphics/particles.cpp,call,ParticleLists::Add
 0x472200,EmitReverseNanoParticles,src/graphics/particles.cpp,call,operator new
 0x472200,EmitReverseNanoParticles,src/graphics/particles.cpp,call,operator=
@@ -20911,24 +20938,28 @@ address,function,file,kind,target
 0x472200,EmitReverseNanoParticles,src/graphics/particles.cpp,function,
 0x472200,EmitReverseNanoParticles,src/graphics/particles.cpp,global_read,g_game
 0x472200,EmitReverseNanoParticles,src/graphics/particles.cpp,indirect_call,virtual NanoParticles::Init
+0x472330,EmitThrustParticles,src/graphics/particles.cpp,call,HarnessEventPtrs
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,call,Lists_00472330::Add
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,call,operator new
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,field_read,Game::lists_00472330
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,function,
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,global_read,g_game
 0x472330,EmitThrustParticles,src/graphics/particles.cpp,indirect_call,virtual ThrustParticles::Init
+0x472430,EmitWakeParticles,src/graphics/particles.cpp,call,HarnessEventPtrs
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,call,Lists_00472430::Add
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,call,operator new
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,field_read,Game::lists_00472430
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,function,
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,global_read,g_game
 0x472430,EmitWakeParticles,src/graphics/particles.cpp,indirect_call,virtual WakeParticles::Init
+0x472530,EmitBubbles,src/graphics/particles.cpp,call,HarnessEventPtrs
 0x472530,EmitBubbles,src/graphics/particles.cpp,call,Lists_00472530::Add
 0x472530,EmitBubbles,src/graphics/particles.cpp,call,operator new
 0x472530,EmitBubbles,src/graphics/particles.cpp,field_read,Game::lists_00472530
 0x472530,EmitBubbles,src/graphics/particles.cpp,function,
 0x472530,EmitBubbles,src/graphics/particles.cpp,global_read,g_game
 0x472530,EmitBubbles,src/graphics/particles.cpp,indirect_call,virtual WakeParticles::Init
+0x472630,EmitSmoke,src/graphics/particles_472630.cpp,call,HarnessEventPtrs
 0x472630,EmitSmoke,src/graphics/particles_472630.cpp,call,ParticleLists::Add
 0x472630,EmitSmoke,src/graphics/particles_472630.cpp,call,operator new
 0x472630,EmitSmoke,src/graphics/particles_472630.cpp,field_read,Game::lists
@@ -20941,12 +20972,14 @@ address,function,file,kind,target
 0x472720,EmitTimedBlackSmoke,src/graphics/particles_472630.cpp,function,
 0x472720,EmitTimedBlackSmoke,src/graphics/particles_472630.cpp,global_read,g_game
 0x472720,EmitTimedBlackSmoke,src/graphics/particles_472630.cpp,indirect_call,virtual SmokeParticles::Init
+0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,call,HarnessEventPtrs
 0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,call,ParticleLists::Add
 0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,call,operator new
 0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,field_read,Game::lists
 0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,function,
 0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,global_read,g_game
 0x472810,EmitWhiteSmoke,src/graphics/particles_472630.cpp,indirect_call,virtual SmokeParticles::Init
+0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,call,HarnessEventPtrs
 0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,call,ParticleLists::Add
 0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,call,operator new
 0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,deref_read,*ParticleLists
@@ -20954,6 +20987,7 @@ address,function,file,kind,target
 0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,function,
 0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,global_read,g_game
 0x4728f0,EmitBlackSmoke,src/graphics/particles_472630.cpp,indirect_call,virtual SmokeParticles::Init
+0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,call,HarnessEventPtrs
 0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,call,ParticleLists::Add
 0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,call,operator new
 0x4729d0,EmitWeaponSmoke,src/graphics/particles_472630.cpp,deref_read,*ParticleLists
@@ -20971,6 +21005,7 @@ address,function,file,kind,target
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,function,
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,global_read,g_game
 0x472ab0,EmitJitteredThrustParticles,src/graphics/particles.cpp,indirect_call,virtual ThrustParticles::Init
+0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,call,HarnessEventPtrs
 0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,call,ParticleLists::Add
 0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,call,operator new
 0x472c50,EmitTimedSubParticles,src/graphics/particles_472630.cpp,deref_read,*ParticleLists
@@ -22595,6 +22630,7 @@ address,function,file,kind,target
 0x47bbb0,OpenSkirmishMenu,src/frontend/skirmish_menu.cpp,global_maybe_written,g_mediumGadgetName
 0x47bbb0,OpenSkirmishMenu,src/frontend/skirmish_menu.cpp,global_read,g_game
 0x47bd70,AnnounceForcesDestroyed,src/frontend/skirmish_menu.cpp,call,AddMessage
+0x47bd70,AnnounceForcesDestroyed,src/frontend/skirmish_menu.cpp,call,HarnessEventWords
 0x47bd70,AnnounceForcesDestroyed,src/frontend/skirmish_menu.cpp,call,HarnessViewRand
 0x47bd70,AnnounceForcesDestroyed,src/frontend/skirmish_menu.cpp,call,Translate
 0x47bd70,AnnounceForcesDestroyed,src/frontend/skirmish_menu.cpp,call,sprintf
@@ -23338,6 +23374,7 @@ address,function,file,kind,target
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,Game::Current
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,GetLocalDpid
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,GetMapCell
+0x47f300,PlaySoundAt,src/sound/sound.cpp,call,HarnessEventSoundAt
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,HarnessSoundEvent
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,MapContains
 0x47f300,PlaySoundAt,src/sound/sound.cpp,call,PlaySoundByIndex
@@ -23384,6 +23421,8 @@ address,function,file,kind,target
 0x47f300,PlaySoundAt,src/sound/sound.cpp,global_read,g_noDirectSound
 0x47f300,PlaySoundAt,src/sound/sound.cpp,global_read,g_useWindowsSound
 0x47f610,PlaySoundAtByName,src/sound/sound.cpp,call,FindSound
+0x47f610,PlaySoundAtByName,src/sound/sound.cpp,call,HarnessEventSoundAt
+0x47f610,PlaySoundAtByName,src/sound/sound.cpp,call,HarnessEventSuppress
 0x47f610,PlaySoundAtByName,src/sound/sound.cpp,call,PlaySoundAt
 0x47f610,PlaySoundAtByName,src/sound/sound.cpp,function,
 0x47f680,PlayNextSpeech,src/sound/sound.cpp,call,GameFreeThunk
@@ -23410,6 +23449,7 @@ address,function,file,kind,target
 0x47f750,StopAllSounds,src/sound/sound.cpp,global_read,g_game
 0x47f750,StopAllSounds,src/sound/sound.cpp,global_read,g_noDirectSound
 0x47f750,StopAllSounds,src/sound/sound.cpp,global_read,g_useWindowsSound
+0x47f780,QueueUnitSpeech,src/sound/sound.cpp,call,HarnessEventSpeech
 0x47f780,QueueUnitSpeech,src/sound/sound.cpp,call,SpeechQueue::EnqueueSpeech
 0x47f780,QueueUnitSpeech,src/sound/sound.cpp,call,Translate
 0x47f780,QueueUnitSpeech,src/sound/sound.cpp,field_read,Game::playerIndex
@@ -23427,6 +23467,7 @@ address,function,file,kind,target
 0x47f850,QueueUnitSpeechIfNotVisible,src/sound/sound.cpp,call,QueueUnitSpeech
 0x47f850,QueueUnitSpeechIfNotVisible,src/sound/sound.cpp,function,
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,call,GameFreeThunk
+0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,call,HarnessEventUnit
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,call,operator=
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,deref_read,*SpeechEntry
 0x47f8c0,RemoveSpeechOfUnit,src/sound/sound.cpp,deref_read,*int
@@ -24890,6 +24931,7 @@ address,function,file,kind,target
 0x4864b0,KillUnit,src/units/units_485010.cpp,call,BroadcastPacket
 0x4864b0,KillUnit,src/units/units_485010.cpp,call,CobScript::QueryScript
 0x4864b0,KillUnit,src/units/units_485010.cpp,call,GetSlotDpid
+0x4864b0,KillUnit,src/units/units_485010.cpp,call,HarnessEventWords
 0x4864b0,KillUnit,src/units/units_485010.cpp,call,KillPlayerUnits
 0x4864b0,KillUnit,src/units/units_485010.cpp,call,PopUntilNamedLayout
 0x4864b0,KillUnit,src/units/units_485010.cpp,call,_strcmpi
@@ -24941,6 +24983,7 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units_485010.cpp,call,FindSlotByDpid
 0x4866d0,ApplyUnitDeath,src/units/units_485010.cpp,call,FlashScorePanelKillLoss
 0x4866d0,ApplyUnitDeath,src/units/units_485010.cpp,call,FreeObjectState
+0x4866d0,ApplyUnitDeath,src/units/units_485010.cpp,call,HarnessEventWords
 0x4866d0,ApplyUnitDeath,src/units/units_485010.cpp,call,Mission::GetGameType
 0x4866d0,ApplyUnitDeath,src/units/units_485010.cpp,call,MissionConditions::NotifyUnitDied
 0x4866d0,ApplyUnitDeath,src/units/units_485010.cpp,call,RemoveSpeechOfUnit
@@ -25692,6 +25735,7 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,CobScript::StartScriptWithArgs
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,FUN_004b70ef
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,FUN_004b7123
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,HarnessEventWords
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,MarkRecentlyDamaged
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,ReactToAttack
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,operator new
@@ -26317,6 +26361,7 @@ address,function,file,kind,target
 0x48c320,MarkLocalVisibleUnits,src/ingame/selection.cpp,field_write,UnitFlags::state
 0x48c320,MarkLocalVisibleUnits,src/ingame/selection.cpp,function,
 0x48c320,MarkLocalVisibleUnits,src/ingame/selection.cpp,global_read,g_game
+0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,call,HarnessEventSuppress
 0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,call,PlaySoundByName
 0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,call,PopUntilNamedLayout
 0x48c390,SelectUnitsInBox,src/ingame/selection.cpp,call,QueueUnitSpeech
@@ -26377,6 +26422,7 @@ address,function,file,kind,target
 0x48c6a0,HitTestUnitScreenHull,src/ingame/selection.cpp,field_write,Vec3::z
 0x48c6a0,HitTestUnitScreenHull,src/ingame/selection.cpp,function,
 0x48c6a0,HitTestUnitScreenHull,src/ingame/selection.cpp,global_read,g_game
+0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,call,HarnessEventSuppress
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,call,PopUntilNamedLayout
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,call,QueueUnitSpeech
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,deref_escape,*Unit
@@ -26401,6 +26447,7 @@ address,function,file,kind,target
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,field_write,UnitFlags::selected
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,function,
 0x48c7f0,ClickSelectHoverUnit,src/ingame/selection.cpp,global_read,g_game
+0x48c9b0,DeselectIfIneligible,src/ingame/selection.cpp,call,HarnessEventUnit
 0x48c9b0,DeselectIfIneligible,src/ingame/selection.cpp,field_read,Orders_37ebe::byte
 0x48c9b0,DeselectIfIneligible,src/ingame/selection.cpp,field_read,Unit::buildLeft
 0x48c9b0,DeselectIfIneligible,src/ingame/selection.cpp,field_read,Unit::carrier
@@ -26546,6 +26593,7 @@ address,function,file,kind,target
 0x48d4d0,FocusNextLocalUnit,src/ingame/selection.cpp,global_read,g_game
 0x48d630,FocusCommander,src/ingame/selection.cpp,call,CenterCameraOnMapPosition
 0x48d630,FocusCommander,src/ingame/selection.cpp,call,ClearCameraFollowState
+0x48d630,FocusCommander,src/ingame/selection.cpp,call,HarnessEventWords
 0x48d630,FocusCommander,src/ingame/selection.cpp,call,PopUntilNamedLayout
 0x48d630,FocusCommander,src/ingame/selection.cpp,call,SelectStopOrder
 0x48d630,FocusCommander,src/ingame/selection.cpp,call,strcmp
@@ -26676,6 +26724,7 @@ address,function,file,kind,target
 0x48ea10,MissionCondition::OnUnitDied,src/game/victory.cpp,function,
 0x48ea20,MissionCondition::OnUnitCaptured,src/game/victory.cpp,function,
 0x48ea30,MissionCondition::OnUnitCreated,src/game/victory.cpp,function,
+0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,call,HarnessEventWords
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,call,PlaySoundByName
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,call,_strcmpi
 0x48ea40,VictoryKillEnemyCommander::OnUnitDied,src/game/victory.cpp,field_escape,PlayerName::commander
@@ -26706,6 +26755,7 @@ address,function,file,kind,target
 0x48eb00,VictoryKillEnemyCommander::LoadState,src/game/victory.cpp,global_maybe_written,g_celebratedKey
 0x48eb00,VictoryKillEnemyCommander::LoadState,src/game/victory.cpp,global_maybe_written,g_killEnemyCommanderKey
 0x48eb00,VictoryKillEnemyCommander::LoadState,src/game/victory.cpp,global_maybe_written,g_satisfiedKey
+0x48eb40,VictoryDestroyAllUnits::IsSatisfied,src/game/victory.cpp,call,HarnessEventWords
 0x48eb40,VictoryDestroyAllUnits::IsSatisfied,src/game/victory.cpp,call,PlaySoundByName
 0x48eb40,VictoryDestroyAllUnits::IsSatisfied,src/game/victory.cpp,field_read,Game::field_1df2
 0x48eb40,VictoryDestroyAllUnits::IsSatisfied,src/game/victory.cpp,field_read,MissionCondition::celebrated
@@ -26729,6 +26779,7 @@ address,function,file,kind,target
 0x48ec00,VictoryKillAllMobileUnits::VisitUnit,src/game/victory.cpp,field_read,VictoryKillAllMobileUnits::numUnits
 0x48ec00,VictoryKillAllMobileUnits::VisitUnit,src/game/victory.cpp,field_write,VictoryKillAllMobileUnits::numUnits
 0x48ec00,VictoryKillAllMobileUnits::VisitUnit,src/game/victory.cpp,function,
+0x48ec20,VictoryKillAllMobileUnits::OnUnitDied,src/game/victory.cpp,call,HarnessEventWords
 0x48ec20,VictoryKillAllMobileUnits::OnUnitDied,src/game/victory.cpp,call,PlaySoundByName
 0x48ec20,VictoryKillAllMobileUnits::OnUnitDied,src/game/victory.cpp,call,UnitList::ForEach
 0x48ec20,VictoryKillAllMobileUnits::OnUnitDied,src/game/victory.cpp,field_maybe_written,Game::units2
@@ -26757,6 +26808,7 @@ address,function,file,kind,target
 0x48ed00,VictoryKillAllMobileUnits::LoadState,src/game/victory.cpp,field_write,MissionCondition::satisfied
 0x48ed00,VictoryKillAllMobileUnits::LoadState,src/game/victory.cpp,field_write,VictoryKillAllMobileUnits::numUnits
 0x48ed00,VictoryKillAllMobileUnits::LoadState,src/game/victory.cpp,function,
+0x48ed50,VictoryBuildUnitType::VisitUnit,src/game/victory.cpp,call,HarnessEventWords
 0x48ed50,VictoryBuildUnitType::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
 0x48ed50,VictoryBuildUnitType::VisitUnit,src/game/victory.cpp,field_read,MissionCondition::celebrated
 0x48ed50,VictoryBuildUnitType::VisitUnit,src/game/victory.cpp,field_read,MissionCondition::satisfied
@@ -26788,6 +26840,7 @@ address,function,file,kind,target
 0x48ee70,VictoryBuildUnitType::LoadState,src/game/victory.cpp,global_maybe_written,g_buildUnitTypeKey
 0x48ee70,VictoryBuildUnitType::LoadState,src/game/victory.cpp,global_maybe_written,g_celebratedKey
 0x48ee70,VictoryBuildUnitType::LoadState,src/game/victory.cpp,global_maybe_written,g_satisfiedKey
+0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,HarnessEventWords
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,PlaySoundByName
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,call,_strcmpi
 0x48eeb0,VictoryCaptureUnitType::OnUnitCaptured,src/game/victory.cpp,field_escape,UnitType::name
@@ -26814,6 +26867,7 @@ address,function,file,kind,target
 0x48ef80,VictoryKillAllOfType::VisitUnit,src/game/victory.cpp,field_write,VictoryKillAllOfType::count
 0x48ef80,VictoryKillAllOfType::VisitUnit,src/game/victory.cpp,function,
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,FindUnitTypeId
+0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,HarnessEventWords
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,PlaySoundByName
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,UnitList::ForEach
 0x48efb0,VictoryKillAllOfType::OnUnitDied,src/game/victory.cpp,call,_strcmpi
@@ -26842,6 +26896,7 @@ address,function,file,kind,target
 0x48f0b0,VictoryKillAllOfType::LoadState,src/game/victory.cpp,field_write,MissionCondition::celebrated
 0x48f0b0,VictoryKillAllOfType::LoadState,src/game/victory.cpp,field_write,MissionCondition::satisfied
 0x48f0b0,VictoryKillAllOfType::LoadState,src/game/victory.cpp,function,
+0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,HarnessEventWords
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,PlaySoundByName
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,call,_strcmpi
 0x48f0f0,VictoryKillUnitType::OnUnitDied,src/game/victory.cpp,field_escape,UnitType::name
@@ -26883,6 +26938,7 @@ address,function,file,kind,target
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,Vec3::z
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,VictoryMoveUnitToRadius::radius
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,function,
+0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,HarnessEventWords
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,_strcmpi
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,field_escape,UnitType::name
@@ -26908,6 +26964,7 @@ address,function,file,kind,target
 0x48f330,VictoryMoveUnitToRadius::LoadState,src/game/victory.cpp,field_write,MissionCondition::celebrated
 0x48f330,VictoryMoveUnitToRadius::LoadState,src/game/victory.cpp,field_write,MissionCondition::satisfied
 0x48f330,VictoryMoveUnitToRadius::LoadState,src/game/victory.cpp,function,
+0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,HarnessEventWords
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,_strcmpi
 0x48f370,VictoryUnitTypePassesX::VisitUnit,src/game/victory.cpp,call,abs
@@ -26937,6 +26994,7 @@ address,function,file,kind,target
 0x48f480,VictoryUnitTypePassesX::LoadState,src/game/victory.cpp,field_write,MissionCondition::celebrated
 0x48f480,VictoryUnitTypePassesX::LoadState,src/game/victory.cpp,field_write,MissionCondition::satisfied
 0x48f480,VictoryUnitTypePassesX::LoadState,src/game/victory.cpp,function,
+0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,HarnessEventWords
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,PlaySoundByName
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,_strcmpi
 0x48f4c0,VictoryUnitTypePassesZ::VisitUnit,src/game/victory.cpp,call,abs
@@ -28480,6 +28538,7 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/dialogs_493340.cpp,call,HarnessAfterStep
 0x495490,RunGameSteps,src/ingame/dialogs_493340.cpp,call,HarnessBeforeStep
 0x495490,RunGameSteps,src/ingame/dialogs_493340.cpp,call,HarnessPhase
+0x495490,RunGameSteps,src/ingame/dialogs_493340.cpp,call,HarnessRecordPhase
 0x495490,RunGameSteps,src/ingame/dialogs_493340.cpp,call,PacketManager::SendAllQueued
 0x495490,RunGameSteps,src/ingame/dialogs_493340.cpp,call,StepAllGafSequences
 0x495490,RunGameSteps,src/ingame/dialogs_493340.cpp,call,UpdateBlink
@@ -42964,6 +43023,24 @@ address,function,file,kind,target
 ,Entry_40d670::Entry_40d670,src/ai/pathfind.cpp,field_read,Entry_40d670::key
 ,Entry_40d670::Entry_40d670,src/ai/pathfind.cpp,field_read,Entry_40d670::value
 ,Entry_40d670::Entry_40d670,src/ai/pathfind.cpp,function,
+,EventCount,src/harness/harness.cpp,call,Fail
+,EventCount,src/harness/harness.cpp,field_read,EventLogKind::args
+,EventCount,src/harness/harness.cpp,function,
+,EventCount,src/harness/harness.cpp,global_read,g_eventLogKinds@src/harness/harness.cpp
+,EventHead,src/harness/harness.cpp,call,Fail
+,EventHead,src/harness/harness.cpp,call,fprintf
+,EventHead,src/harness/harness.cpp,field_read,EventLogKind::name
+,EventHead,src/harness/harness.cpp,field_read,Game::ticks
+,EventHead,src/harness/harness.cpp,function,
+,EventHead,src/harness/harness.cpp,global_read,g_eventLogKinds@src/harness/harness.cpp
+,EventHead,src/harness/harness.cpp,global_read,g_game
+,EventHead,src/harness/harness.cpp,global_read,s_eventPhase@src/harness/harness.cpp
+,EventHead,src/harness/harness.cpp,global_read,s_eventPhaseNames@src/harness/harness.cpp
+,EventHead,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
+,EventOpen,src/harness/harness.cpp,function,
+,EventOpen,src/harness/harness.cpp,global_read,s_eventSuppress@src/harness/harness.cpp
+,EventOpen,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
+,EventOpen,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,Expired::operator(),src/map/line_of_sight.cpp,field_read,Eye::expires
 ,Expired::operator(),src/map/line_of_sight.cpp,field_read,Game::gameTick
 ,Expired::operator(),src/map/line_of_sight.cpp,function,
@@ -44177,6 +44254,7 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,function,
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,g_game
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_frameCount@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_frameNext@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_frameTicks@src/harness/harness.cpp
@@ -44190,6 +44268,8 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_ui@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_dump@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_write,s_eventPhase@src/harness/harness.cpp
+,HarnessAfterStep,src/harness/harness.cpp,global_write,s_events@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_sound@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_trace@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_ui@src/harness/harness.cpp
@@ -44217,6 +44297,7 @@ address,function,file,kind,target
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_spawnCount@src/harness/harness.cpp
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_spawns@src/harness/harness.cpp
 ,HarnessBeforeStep,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
+,HarnessBeforeStep,src/harness/harness.cpp,global_write,s_eventPhase@src/harness/harness.cpp
 ,HarnessBeforeStep,src/harness/harness.cpp,global_write,s_uiMute@src/harness/harness.cpp
 ,HarnessConditionClass,src/game/victory.cpp,deref_read,*void
 ,HarnessConditionClass,src/game/victory.cpp,function,
@@ -44237,6 +44318,59 @@ address,function,file,kind,target
 ,HarnessDispatchInput,src/harness/harness.cpp,global_write,s_injectMs@src/harness/harness.cpp
 ,HarnessDispatchInput,src/harness/harness.cpp,global_write,s_injecting@src/harness/harness.cpp
 ,HarnessDispatchInput,src/harness/harness.cpp,global_write,s_pendingCount@src/harness/harness.cpp
+,HarnessEventBuffer,src/harness/harness.cpp,call,EventOpen
+,HarnessEventBuffer,src/harness/harness.cpp,function,
+,HarnessEventBuffer,src/harness/harness.cpp,global_escape,s_eventBuffer@src/harness/harness.cpp
+,HarnessEventPtrs,src/harness/harness.cpp,call,EventCount
+,HarnessEventPtrs,src/harness/harness.cpp,call,EventHead
+,HarnessEventPtrs,src/harness/harness.cpp,call,EventOpen
+,HarnessEventPtrs,src/harness/harness.cpp,call,__builtin_va_end
+,HarnessEventPtrs,src/harness/harness.cpp,call,__builtin_va_start
+,HarnessEventPtrs,src/harness/harness.cpp,call,fprintf
+,HarnessEventPtrs,src/harness/harness.cpp,deref_read,*int
+,HarnessEventPtrs,src/harness/harness.cpp,function,
+,HarnessEventPtrs,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
+,HarnessEventRadar,src/harness/harness.cpp,call,EventHead
+,HarnessEventRadar,src/harness/harness.cpp,call,EventOpen
+,HarnessEventRadar,src/harness/harness.cpp,call,fputc
+,HarnessEventRadar,src/harness/harness.cpp,deref_read,*unsigned char
+,HarnessEventRadar,src/harness/harness.cpp,function,
+,HarnessEventRadar,src/harness/harness.cpp,global_read,digits@HarnessEventRadar
+,HarnessEventRadar,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
+,HarnessEventSoundAt,src/harness/harness.cpp,call,EventHead
+,HarnessEventSoundAt,src/harness/harness.cpp,call,EventOpen
+,HarnessEventSoundAt,src/harness/harness.cpp,call,HeardMask
+,HarnessEventSoundAt,src/harness/harness.cpp,call,fprintf
+,HarnessEventSoundAt,src/harness/harness.cpp,deref_read,*int
+,HarnessEventSoundAt,src/harness/harness.cpp,function,
+,HarnessEventSoundAt,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
+,HarnessEventSpeech,src/harness/harness.cpp,call,EventHead
+,HarnessEventSpeech,src/harness/harness.cpp,call,EventOpen
+,HarnessEventSpeech,src/harness/harness.cpp,call,fprintf
+,HarnessEventSpeech,src/harness/harness.cpp,call,strcmp
+,HarnessEventSpeech,src/harness/harness.cpp,deref_read,*unsigned int
+,HarnessEventSpeech,src/harness/harness.cpp,deref_read,*unsigned short
+,HarnessEventSpeech,src/harness/harness.cpp,function,
+,HarnessEventSpeech,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
+,HarnessEventSpeech,src/harness/harness.cpp,global_read,s_speechTexts@src/harness/harness.cpp
+,HarnessEventSuppress,src/harness/harness.cpp,function,
+,HarnessEventSuppress,src/harness/harness.cpp,global_read,s_eventSuppress@src/harness/harness.cpp
+,HarnessEventSuppress,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
+,HarnessEventSuppress,src/harness/harness.cpp,global_write,s_eventSuppress@src/harness/harness.cpp
+,HarnessEventUnit,src/harness/harness.cpp,call,EventHead
+,HarnessEventUnit,src/harness/harness.cpp,call,EventOpen
+,HarnessEventUnit,src/harness/harness.cpp,call,fprintf
+,HarnessEventUnit,src/harness/harness.cpp,deref_read,*unsigned short
+,HarnessEventUnit,src/harness/harness.cpp,function,
+,HarnessEventUnit,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
+,HarnessEventWords,src/harness/harness.cpp,call,EventCount
+,HarnessEventWords,src/harness/harness.cpp,call,EventHead
+,HarnessEventWords,src/harness/harness.cpp,call,EventOpen
+,HarnessEventWords,src/harness/harness.cpp,call,__builtin_va_end
+,HarnessEventWords,src/harness/harness.cpp,call,__builtin_va_start
+,HarnessEventWords,src/harness/harness.cpp,call,fprintf
+,HarnessEventWords,src/harness/harness.cpp,function,
+,HarnessEventWords,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,Fail
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,GameU32
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,MakeDirectoryPath
@@ -44316,6 +44450,7 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_dumpEnabled@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_dumpTick@src/harness/harness.cpp
+,HarnessPhase,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_hashHi@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_hashLo@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_phaseNames@src/harness/harness.cpp
@@ -44324,6 +44459,7 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_ui@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_write,s_dumpNow@src/harness/harness.cpp
+,HarnessPhase,src/harness/harness.cpp,global_write,s_eventPhase@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_write,s_hashHi@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_write,s_hashLo@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_write,s_tracePhase@src/harness/harness.cpp
@@ -44334,6 +44470,82 @@ address,function,file,kind,target
 ,HarnessPoseObject,src/harness/harness.cpp,deref_write,*int
 ,HarnessPoseObject,src/harness/harness.cpp,deref_write,*short
 ,HarnessPoseObject,src/harness/harness.cpp,function,
+,HarnessRadarMapped,src/map/radar.cpp,call,HarnessEventBuffer
+,HarnessRadarMapped,src/map/radar.cpp,call,HarnessEventRadar
+,HarnessRadarMapped,src/map/radar.cpp,deref_read,*unsigned char
+,HarnessRadarMapped,src/map/radar.cpp,deref_read,*unsigned short
+,HarnessRadarMapped,src/map/radar.cpp,deref_write,*int
+,HarnessRadarMapped,src/map/radar.cpp,deref_write,*unsigned char
+,HarnessRadarMapped,src/map/radar.cpp,field_escape,Game::players
+,HarnessRadarMapped,src/map/radar.cpp,field_read,ByteMap_00466dc0::data
+,HarnessRadarMapped,src/map/radar.cpp,field_read,Game::mapHeightTiles
+,HarnessRadarMapped,src/map/radar.cpp,field_read,Game::mapWidthTiles
+,HarnessRadarMapped,src/map/radar.cpp,field_read,Game::playerIndex
+,HarnessRadarMapped,src/map/radar.cpp,field_read,Game::visibilityMask
+,HarnessRadarMapped,src/map/radar.cpp,function,
+,HarnessRadarMapped,src/map/radar.cpp,global_read,g_game
+,HarnessRadarProjectile,src/map/radar.cpp,call,OnRadar_00466dc0
+,HarnessRadarProjectile,src/map/radar.cpp,deref_read,*int
+,HarnessRadarProjectile,src/map/radar.cpp,deref_read,*short
+,HarnessRadarProjectile,src/map/radar.cpp,deref_write,*int
+,HarnessRadarProjectile,src/map/radar.cpp,field_read,Flags111_00466dc0::all
+,HarnessRadarProjectile,src/map/radar.cpp,field_read,Game::playerIndex
+,HarnessRadarProjectile,src/map/radar.cpp,field_read,Projectile_00466dc0::shot
+,HarnessRadarProjectile,src/map/radar.cpp,field_read,Tail_00466dc0::owner
+,HarnessRadarProjectile,src/map/radar.cpp,field_read,Tail_00466dc0::player
+,HarnessRadarProjectile,src/map/radar.cpp,field_read,Unit::playerIndex
+,HarnessRadarProjectile,src/map/radar.cpp,function,
+,HarnessRadarProjectile,src/map/radar.cpp,global_read,g_game
+,HarnessRadarUnitShown,src/map/radar.cpp,field_read,Flags110_00466dc0::all
+,HarnessRadarUnitShown,src/map/radar.cpp,field_read,Game::playerIndex
+,HarnessRadarUnitShown,src/map/radar.cpp,field_read,Unit::playerIndex
+,HarnessRadarUnitShown,src/map/radar.cpp,field_read,Unit::unitDefIndex
+,HarnessRadarUnitShown,src/map/radar.cpp,function,
+,HarnessRadarUnitShown,src/map/radar.cpp,global_read,g_game
+,HarnessRadarUnits,src/map/radar.cpp,call,HarnessEventBuffer
+,HarnessRadarUnits,src/map/radar.cpp,call,HarnessEventRadar
+,HarnessRadarUnits,src/map/radar.cpp,call,HarnessRadarProjectile
+,HarnessRadarUnits,src/map/radar.cpp,call,HarnessRadarUnitShown
+,HarnessRadarUnits,src/map/radar.cpp,call,Player_Get
+,HarnessRadarUnits,src/map/radar.cpp,deref_write,*int
+,HarnessRadarUnits,src/map/radar.cpp,deref_write,*short
+,HarnessRadarUnits,src/map/radar.cpp,deref_write,*unsigned char
+,HarnessRadarUnits,src/map/radar.cpp,deref_write,*unsigned int
+,HarnessRadarUnits,src/map/radar.cpp,deref_write,*unsigned short
+,HarnessRadarUnits,src/map/radar.cpp,field_escape,Unit::weapons
+,HarnessRadarUnits,src/map/radar.cpp,field_read,<anon>::bit0
+,HarnessRadarUnits,src/map/radar.cpp,field_read,<anon>::bit1
+,HarnessRadarUnits,src/map/radar.cpp,field_read,<anon>::bit30
+,HarnessRadarUnits,src/map/radar.cpp,field_read,<anon>::bit9
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Flags241_00466dc0::bit29
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Game::projectileCount
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Game::projectiles
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Game::units
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Game::unitsEnd
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Player::info
+,HarnessRadarUnits,src/map/radar.cpp,field_read,PlayerInfo::color
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Tail_00466dc0::player
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Unit::activateFlags
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Unit::def
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Unit::id
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Unit::playerIndex
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Unit::recentlyDamagedTimer
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Unit::xWhole
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Unit::yWhole
+,HarnessRadarUnits,src/map/radar.cpp,field_read,Unit::zWhole
+,HarnessRadarUnits,src/map/radar.cpp,field_read,UnitType_00466dc0::flags2
+,HarnessRadarUnits,src/map/radar.cpp,field_read,UnitType_00466dc0::radardistance
+,HarnessRadarUnits,src/map/radar.cpp,field_read,UnitType_00466dc0::radardistancejam
+,HarnessRadarUnits,src/map/radar.cpp,field_read,UnitType_00466dc0::sonardistance
+,HarnessRadarUnits,src/map/radar.cpp,field_read,UnitType_00466dc0::sonardistancejam
+,HarnessRadarUnits,src/map/radar.cpp,field_read,UnitWeaponSlot::stockpile
+,HarnessRadarUnits,src/map/radar.cpp,field_read,UnitWeaponSlot::weapon
+,HarnessRadarUnits,src/map/radar.cpp,field_read,WeaponDef::coverage
+,HarnessRadarUnits,src/map/radar.cpp,function,
+,HarnessRadarUnits,src/map/radar.cpp,global_read,g_game
+,HarnessRecordPhase,src/harness/harness.cpp,function,
+,HarnessRecordPhase,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
+,HarnessRecordPhase,src/harness/harness.cpp,global_write,s_eventPhase@src/harness/harness.cpp
 ,HarnessSetCursorPos,src/harness/harness.cpp,call,InputScenario
 ,HarnessSetCursorPos,src/harness/harness.cpp,call,SetCursorPos
 ,HarnessSetCursorPos,src/harness/harness.cpp,function,
@@ -44436,6 +44648,18 @@ address,function,file,kind,target
 ,HashU32,src/harness/harness.cpp,call,HashBuf
 ,HashU32,src/harness/harness.cpp,function,
 ,Head_0043a1f0::Head_0043a1f0,src/orders/order_queue_4384a0.cpp,function,
+,HeardMask,src/harness/harness.cpp,call,GetMapCell
+,HeardMask,src/harness/harness.cpp,deref_read,*int
+,HeardMask,src/harness/harness.cpp,deref_read,*unsigned char
+,HeardMask,src/harness/harness.cpp,deref_read,*unsigned short
+,HeardMask,src/harness/harness.cpp,field_escape,Game::players
+,HeardMask,src/harness/harness.cpp,field_read,ByteMap_00408090::data
+,HeardMask,src/harness/harness.cpp,field_read,Game::mapFlags
+,HeardMask,src/harness/harness.cpp,field_read,Game::visibilityMask
+,HeardMask,src/harness/harness.cpp,field_read,MapSize_00408090::height
+,HeardMask,src/harness/harness.cpp,field_read,MapSize_00408090::width
+,HeardMask,src/harness/harness.cpp,function,
+,HeardMask,src/harness/harness.cpp,global_read,g_game
 ,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_read,Hits_0049a120::features
 ,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_read,Hits_0049a120::numFeatures
 ,Hits_0049a120::AddFeature,src/weapons/weapons.cpp,field_write,Hits_0049a120::features
@@ -46299,18 +46523,21 @@ address,function,file,kind,target
 ,OpenTrace,src/harness/harness.cpp,call,setvbuf
 ,OpenTrace,src/harness/harness.cpp,call,strcpy
 ,OpenTrace,src/harness/harness.cpp,function,
+,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_eventsBuffer@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_scenarioPath@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_soundBuffer@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_uiBuffer@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_crtSeed@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_dumpEnabled@src/harness/harness.cpp
+,OpenTrace,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_gameSeed@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_sound@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_ui@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_viewSeed@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_write,s_dump@src/harness/harness.cpp
+,OpenTrace,src/harness/harness.cpp,global_write,s_events@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_write,s_sound@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_write,s_trace@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_write,s_ui@src/harness/harness.cpp
@@ -47828,6 +48055,7 @@ address,function,file,kind,target
 ,SettleResourceAccount,src/game/economy_401360.cpp,function,
 ,ShareEnergy,src/game/share_commands.cpp,call,AddMessage
 ,ShareEnergy,src/game/share_commands.cpp,call,BroadcastPlayerInfo
+,ShareEnergy,src/game/share_commands.cpp,call,HarnessEventWords
 ,ShareEnergy,src/game/share_commands.cpp,call,sprintf
 ,ShareEnergy,src/game/share_commands.cpp,field_read,Game::localPlayer
 ,ShareEnergy,src/game/share_commands.cpp,field_read,Game::netGameFlags
@@ -47838,6 +48066,7 @@ address,function,file,kind,target
 ,ShareEnergy,src/game/share_commands.cpp,global_read,g_game
 ,ShareMapping,src/game/share_commands.cpp,call,AddMessage
 ,ShareMapping,src/game/share_commands.cpp,call,BroadcastPlayerInfo
+,ShareMapping,src/game/share_commands.cpp,call,HarnessEventWords
 ,ShareMapping,src/game/share_commands.cpp,call,sprintf
 ,ShareMapping,src/game/share_commands.cpp,field_read,Game::localPlayer
 ,ShareMapping,src/game/share_commands.cpp,field_read,Game::netGameFlags
@@ -47848,6 +48077,7 @@ address,function,file,kind,target
 ,ShareMapping,src/game/share_commands.cpp,global_read,g_game
 ,ShareMetal,src/game/share_commands.cpp,call,AddMessage
 ,ShareMetal,src/game/share_commands.cpp,call,BroadcastPlayerInfo
+,ShareMetal,src/game/share_commands.cpp,call,HarnessEventWords
 ,ShareMetal,src/game/share_commands.cpp,call,sprintf
 ,ShareMetal,src/game/share_commands.cpp,field_read,Game::localPlayer
 ,ShareMetal,src/game/share_commands.cpp,field_read,Game::netGameFlags
@@ -47858,6 +48088,7 @@ address,function,file,kind,target
 ,ShareMetal,src/game/share_commands.cpp,global_read,g_game
 ,ShareRadar,src/game/share_commands.cpp,call,AddMessage
 ,ShareRadar,src/game/share_commands.cpp,call,BroadcastPlayerInfo
+,ShareRadar,src/game/share_commands.cpp,call,HarnessEventWords
 ,ShareRadar,src/game/share_commands.cpp,call,sprintf
 ,ShareRadar,src/game/share_commands.cpp,field_read,Game::localPlayer
 ,ShareRadar,src/game/share_commands.cpp,field_read,Game::netGameFlags

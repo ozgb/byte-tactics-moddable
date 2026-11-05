@@ -18,7 +18,9 @@ generated file or the fuel pass that still names a source (SOURCE_NAME).
 are not records of the state block. After the files are written, `leak_check` runs tools/speclint.py's address,
 identifier and token-run rules over every text file of the kit and the export fails on a hit. The fenced-block rule
 is not applied: the kit documents use `sh` and `json` fences for commands and schema examples. The identifiers a
-file may use are those the kit's structured data defines (`allowed_identifiers`), never the checked text itself.
+file may use are those the kit's structured data defines (`allowed_identifiers`: the json, the interface headers and
+everything under reference/ and tests/replay/), never the checked text itself. The interface headers declare the names
+and are the source's own declarations, so only the address rule applies to them.
 """
 
 from __future__ import annotations
@@ -333,7 +335,8 @@ def check_names(files: dict[str, bytes]) -> None:
             raise Refusal("refused: %s names the source: %s" % (path, ", ".join(found)))
 
 
-STRUCTURED_DIRS = ("interfaces/", "tests/replay/", "reference/scenarios/")
+STRUCTURED_DIRS = ("interfaces/", "tests/replay/", "reference/")
+DECLARED_DIRS = ("interfaces/",)
 
 
 def text_of(data: bytes) -> str | None:
@@ -345,7 +348,7 @@ def text_of(data: bytes) -> str | None:
 
 
 def structured(path: str) -> bool:
-    """Whether a kit file defines names: the layout, the schemas, the manifest, the interface headers, the recordings and scenarios."""
+    """Whether a kit file defines names: the json, the interface headers, the stored reference data and the recordings."""
     return path.endswith(".json") or path.startswith(STRUCTURED_DIRS)
 
 
@@ -376,6 +379,8 @@ def leak_check(files: dict[str, bytes], root: Path, run: int = speclint.DEFAULT_
             continue
         for number, message in speclint.lint(text, source_ids, allowed, source_runs, run, literals, kit):
             if message.startswith("fenced block"):
+                continue
+            if path.startswith(DECLARED_DIRS) and not message.startswith("address or marker"):
                 continue
             hits.append("%s:%d: %s" % (path, number, message))
     return hits

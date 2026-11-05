@@ -487,6 +487,21 @@ class LeakCheckTest(unittest.TestCase):
     def test_fenced_blocks_of_any_kind_are_allowed(self):
         self.assertEqual(self.check("```json\n{\"a\": 1}\n```\n"), [])
 
+    def test_interface_headers_are_checked_for_addresses_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "meteors.cpp").write_text(LEAK_SOURCE)
+            header = "void UpdateMeteorShower(int tickCount);\nCall StartScript(script, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);\n"
+            files = {**leak_files("ok\n"), "interfaces/m.h": header.encode()}
+            self.assertEqual(oraclekit.leak_check(files, Path(tmp)), [])
+            files["interfaces/m.h"] = (header + "// FUNCTION: 0x437de0\n").encode()
+            self.assertEqual(len(oraclekit.leak_check(files, Path(tmp))), 2)
+
+    def test_stored_reference_data_defines_names(self):
+        files = {**leak_files("ok\n"), "reference/sounds/a.txt": b"count1 6\n"}
+        self.assertIn("count1", oraclekit.allowed_identifiers(files))
+
     def test_a_leaking_document_stops_the_export_before_it_writes(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             root = repo(tmp, {"docs/a.md": "see 0x437de0\n"})

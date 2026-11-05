@@ -6325,8 +6325,6 @@ address,function,file,kind,target
 0x41d3f0,RestoreCameraPosition,src/ingame/camera.cpp,global_read,g_game
 0x41d4a0,SetCommandLineUnusedFlagL,src/ingame/camera.cpp,function,
 0x41d4a0,SetCommandLineUnusedFlagL,src/ingame/camera.cpp,global_write,g_commandLineUnusedFlagL
-0x41d4b0,SetBypassDriveScan,src/ingame/camera.cpp,function,
-0x41d4b0,SetBypassDriveScan,src/ingame/camera.cpp,global_write,g_cdBypassDriveScan
 0x41d4c0,RegisterDataArchives,src/game/cd_check.cpp,call,ChdirToExeDirectory
 0x41d4c0,RegisterDataArchives,src/game/cd_check.cpp,call,HAPI_AddArchive
 0x41d4c0,RegisterDataArchives,src/game/cd_check.cpp,call,HAPI_DropMissingArchives
@@ -27741,7 +27739,6 @@ address,function,file,kind,target
 0x488b10,FindUnitTypeId,src/units/unit_commands.cpp,function,
 0x488b10,FindUnitTypeId,src/units/unit_commands.cpp,global_read,g_game
 0x488be0,InitUnitCategories,src/units/unit_commands.cpp,function,
-0x488be0,InitUnitCategories,src/units/unit_commands.cpp,global_write,g_mapLoadFlag
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,call,SimFree
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,call,SimOwns
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,call,begin
@@ -27751,7 +27748,6 @@ address,function,file,kind,target
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,field_read,UnitCategory::value
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,function,
 0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,global_maybe_written,s_unitCategories@src/units/unit_commands.cpp
-0x488bf0,FreeUnitCategories,src/units/unit_commands.cpp,global_write,g_mapLoadFlag
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,LowerBoundCategory
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,StringRef::~StringRef
 0x488c50,GetCategoryMask,src/units/unit_commands.cpp,call,UnitCategory::~UnitCategory
@@ -33600,7 +33596,6 @@ address,function,file,kind,target
 0x49eda0,GameEntry,src/game/main.cpp,function,
 0x49ee30,ParseCommandLine,src/game/main.cpp,call,IsDebugKeyword
 0x49ee30,ParseCommandLine,src/game/main.cpp,call,Onl_LoadConfigFile
-0x49ee30,ParseCommandLine,src/game/main.cpp,call,SetBypassDriveScan
 0x49ee30,ParseCommandLine,src/game/main.cpp,call,SetCommandLineUnusedFlagL
 0x49ee30,ParseCommandLine,src/game/main.cpp,call,SetDirectConnectAddress
 0x49ee30,ParseCommandLine,src/game/main.cpp,call,SetDirectPlayProvider

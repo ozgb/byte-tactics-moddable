@@ -124,9 +124,3 @@ void __stdcall SetCommandLineUnusedFlagL(int val)
 {
     g_commandLineUnusedFlagL = val;
 }
-
-// FUNCTION: 0x41d4b0
-void __stdcall SetBypassDriveScan(int val)
-{
-    g_cdBypassDriveScan = val;
-}

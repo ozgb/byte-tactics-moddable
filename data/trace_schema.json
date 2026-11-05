@@ -1584,8 +1584,6 @@
       {"name": "scheduleGap", "size": 4, "kind": "scalar", "target": null}
     ],
     "game": [
-      {"name": "cdPathMismatch", "size": 4, "kind": "scalar", "target": null},
-      {"name": "cdMismatchDefeatTick", "size": 4, "kind": "scalar", "target": null},
       {"name": "economyPacketTick", "size": 4, "kind": "scalar", "target": null}
     ],
     "pathfinder": [

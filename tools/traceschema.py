@@ -886,8 +886,6 @@ GAME_SCALARS: list[tuple[str, int, int, str | None, int]] = [
 ]
 
 SCALAR_GLOBALS: list[tuple[str, str, int, str | None]] = [
-    ("cdPathMismatch", "g_cdPathMismatch", 4, None),
-    ("cdMismatchDefeatTick", "g_cdMismatchDefeatTick", 4, None),
     ("economyPacketTick", "g_economyPacketTick", 4, None),
 ]
 
@@ -921,7 +919,6 @@ METEOR_GLOBALS: list[tuple[str, str, int, str | None]] = [
 ]
 REF_GLOBALS = REF_FIELDS
 GLOBAL_DECLS: dict[str, str] = {
-    "g_cdMismatchDefeatTick": "unsigned int g_cdMismatchDefeatTick",
     "g_playerTickLoad": "int g_playerTickLoad[10]",
     "g_playerBudgetCap": "int g_playerBudgetCap[10]",
 }

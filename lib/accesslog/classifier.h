@@ -32,7 +32,12 @@ public:
     unsigned Read(unsigned item, unsigned entA, unsigned entB, unsigned sub, unsigned tick);
     void Write(unsigned item, unsigned entA, unsigned entB, unsigned sub, unsigned tick);
     void Ordered(unsigned stream, unsigned item, unsigned sub, unsigned tick);
-    void Entity(unsigned ordinal) { entity = ordinal; }
+    void Entity(unsigned ordinal, unsigned base)
+    {
+        entity = ordinal;
+        floor = base;
+    }
+    unsigned Floor() const { return floor; }
     unsigned Slots() const { return slots; }
     bool Edge(unsigned slot, ClassifierEdge* out) const;
     bool Overflowed() const { return overflow; }
@@ -70,6 +75,7 @@ private:
     unsigned epoch = 1;
     unsigned window = 0;
     unsigned entity = 0;
+    unsigned floor = 0;
     unsigned windowLabels[2][kWindows] = {};
     unsigned current = 0;
     bool overflow = false;
@@ -137,6 +143,7 @@ inline void Classifier::BeginWindow(unsigned lab)
     label = lab;
     writtenCount = 0;
     entity = 0;
+    floor = 0;
     if (lab == kPendingLabel) {
         epoch++;
         current ^= 1;
@@ -193,7 +200,7 @@ inline unsigned Classifier::Read(unsigned item, unsigned entA, unsigned entB, un
         if (s->writer != sub || s->entA != entA || s->entB != entB)
             Count(s->writer, sub, item, EVIDENCE_RAW, tick, 1);
         s->read = 1;
-        if (s->writerOrd != 0 && s->writerOrd < entity) {
+        if (s->writerOrd > floor && s->writerOrd < entity) {
             flags |= READ_EARLIER_ENTITY;
             if (s->entA == entA && s->entB == entB)
                 flags |= READ_SAME_RECORD;

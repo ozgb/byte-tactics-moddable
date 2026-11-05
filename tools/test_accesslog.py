@@ -99,7 +99,7 @@ int main()
         else if (op == 'L') { scanf("%u", &a); c.ResolveLabel(a); }
         else if (op == 'E') { scanf("%u", &a); c.EndWindow(a); }
         else if (op == 'r') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); fprintf(stderr, "%u\n", c.Read(a, b, d, e, f)); }
-        else if (op == 'n') { scanf("%u", &a); c.Entity(a); }
+        else if (op == 'n') { scanf("%u", &a); c.Entity(a, 0); }
         else if (op == 'w') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); c.Write(a, b, d, e, f); }
         else if (op == 'o') { scanf("%u %u %u %u", &a, &b, &d, &e); c.Ordered(a, b, d, e); }
     }

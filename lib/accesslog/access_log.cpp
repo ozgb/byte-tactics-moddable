@@ -78,7 +78,14 @@ const unsigned kDrawBits = 13;
 const unsigned kPassBits = 16;
 const unsigned kEntDraws = 32;
 const char* const kPassNames[] = {"other", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail",
+                                  "features.anim", "explosions.pieces", "explosions.debris", "units.players", "players.los",
                                   "presentation"};
+const unsigned kPresentationPass = 14;
+const unsigned kPassDepth = 8;
+struct PassFrame {
+    int pass;
+    unsigned entOrd, floor;
+};
 const unsigned kKinds = 40;
 const unsigned kPresBits = 16;
 struct PresEntry {
@@ -120,6 +127,9 @@ const char** g_itemNames;
 unsigned g_idUnresolvedImage, g_idUnresolvedBlock, g_idRng[3], g_idSound, g_idUi, g_idSimEvent;
 int g_pass;
 unsigned g_entOrd;
+unsigned g_ordCounter;
+unsigned g_passDepth;
+PassFrame g_passStack[kPassDepth];
 EntDraw g_ent[kEntDraws];
 unsigned g_entN;
 bool g_entTaint;
@@ -1124,21 +1134,43 @@ NS void ProcessSimEvent()
         g_classifier.Ordered(5, g_idSimEvent, sub, g_tick);
 }
 
-NS void SetPass(int pass)
+NS void EnterPass(int pass)
 {
     if (g_draws != 0)
         FlushEntity();
+    if (g_passDepth == kPassDepth)
+        Die("accesslog: passes nest deeper than the pass stack\n");
+    PassFrame* f = &g_passStack[g_passDepth++];
+    f->pass = g_pass;
+    f->entOrd = g_entOrd;
+    f->floor = g_classifier.Floor();
     g_pass = pass;
-    g_entOrd = 0;
-    g_classifier.Entity(0);
+    g_entOrd = ++g_ordCounter;
+    g_classifier.Entity(g_entOrd, g_entOrd);
+}
+
+NS void LeavePass()
+{
+    if (g_draws != 0)
+        FlushEntity();
+    if (g_passDepth == 0) {
+        g_pass = ACCESS_PASS_NONE;
+        g_entOrd = 0;
+        g_classifier.Entity(0, 0);
+        return;
+    }
+    PassFrame* f = &g_passStack[--g_passDepth];
+    g_pass = f->pass;
+    g_entOrd = f->entOrd;
+    g_classifier.Entity(f->entOrd, f->floor);
 }
 
 NS void NextEntity()
 {
     if (g_draws != 0)
         FlushEntity();
-    g_entOrd++;
-    g_classifier.Entity(g_entOrd);
+    g_entOrd = ++g_ordCounter;
+    g_classifier.Entity(g_entOrd, g_classifier.Floor());
 }
 
 NS bool Mark(unsigned a)
@@ -1152,9 +1184,9 @@ NS bool Mark(unsigned a)
     } else if (offset == ACCESS_MARK_ENTITY) {
         NextEntity();
     } else if (offset == ACCESS_MARK_PASS_END) {
-        SetPass(ACCESS_PASS_NONE);
+        LeavePass();
     } else if (offset >= ACCESS_MARK_PASS) {
-        SetPass((int)(offset - ACCESS_MARK_PASS));
+        EnterPass((int)(offset - ACCESS_MARK_PASS));
     }
     return true;
 }
@@ -1560,6 +1592,8 @@ NS void AccessLogWindow(int window)
         FlushEntity();
     g_pass = ACCESS_PASS_NONE;
     g_entOrd = 0;
+    g_ordCounter = 0;
+    g_passDepth = 0;
 #if BT_DEFER_WRITES
     DeferFlush();
 #endif
@@ -1634,7 +1668,7 @@ NS void AccessLogDraw(int stream, void* ra)
     g_classifier.Ordered(s, g_idRng[s], sub, g_tick);
     if (g_draws == 0)
         return;
-    unsigned pass = g_pass != ACCESS_PASS_NONE ? (unsigned)g_pass : g_window == ACCESS_WINDOW_PRESENTATION ? 9u : 0u;
+    unsigned pass = g_pass != ACCESS_PASS_NONE ? (unsigned)g_pass : g_window == ACCESS_WINDOW_PRESENTATION ? kPresentationPass : 0u;
     unsigned func = FunctionOf(ra);
     EntDraw* e = 0;
     for (unsigned i = 0; i < g_entN; i++)

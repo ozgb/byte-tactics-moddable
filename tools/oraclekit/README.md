@@ -52,7 +52,7 @@ decision for #180, not for the clean room.
 and type (a bit-field has `bit_offset` and `bit_width` in place of a size; `bases` and `vptr` appear when the
 record has them). A field whose type is an unnamed union or struct (`WeaponDef::(unnamed)`) lists the bit-fields
 inside it as `bits`: each is `{name, bit, width}`, with `bit` counted from the first bit of the field (`WeaponDef.flags`
-has `meteor` at bit 5). It ends with the rows of `data/layout_refs.csv` as `layout_refs`.
+has `meteor` at bit 5). It carries no cross-references to the decompilation (the export leaves out `data/layout_refs.csv`).
 
 `docs/module-abi.md` names five records by role only. Each carries a `"role"` key in `layout.json`:
 

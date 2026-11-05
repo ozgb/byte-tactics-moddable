@@ -101,7 +101,7 @@ def lint(spec: str, source_ids: set[str], kit_ids: set[str], source_runs: set[in
     for number, line in enumerate(lines, 1):
         for m in ADDRESS.finditer(line):
             problems.append((number, f"address or marker {m.group(0)!r}"))
-        for word in sorted(identifiers(unquoted(line, literals, kit)) & source_ids - kit_ids):
+        for word in sorted((identifiers(unquoted(line, literals, kit)) & source_ids) - kit_ids):
             problems.append((number, f"identifier {word!r} is in the source but not in the kit"))
     in_fence = None
     for number, line in enumerate(lines, 1):

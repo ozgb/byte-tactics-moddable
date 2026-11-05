@@ -4,6 +4,7 @@
 #include "../interfaces/ref.h"
 #include "../src/state/block.h"
 #include "../src/ai/energy_rating.h"
+#include "../src/network/resource_share.h"
 
 void* GetAllocLock()
 {
@@ -52,6 +53,13 @@ static double g_energyUse;
 static double __stdcall FakeEnergyUse(UnitDef*)
 {
     return g_energyUse;
+}
+
+static unsigned BitsOf(float value)
+{
+    unsigned bits;
+    memcpy(&bits, &value, sizeof(bits));
+    return bits;
 }
 
 static int RatingAt(float energyCost, float windStrength, float windGenerator)
@@ -134,6 +142,12 @@ int main()
 
     Check(RatingAt(536.0f, 0.0156f, 30.0f) == 1, "the cost product is stored to 32 bits before the subtraction");
     Check(RatingAt(104.0f, 0.0084f, 30.0f) == 0, "the energy use is subtracted unrounded");
+
+    Check(BitsOf(ShareMetalAmount(860641.4375f, 300444.46875f, 2000000.0f, 0.0f)) == 0x48365b15u, "the metal share is the unrounded difference times a third, stored once");
+    Check(BitsOf(ShareMetalAmount(918230.75f, 290541.28125f, 209229.84375f, 0.0f)) == 0x484c5375u, "a metal share just under the capacity room is stored from the unrounded product");
+    Check(BitsOf(ShareMetalAmount(813324.125f, 220410.484375f, 197637.890625f, 0.0f)) == 0x48410179u, "a metal share a hair under the capacity room is stored from the unrounded product");
+    Check(BitsOf(ShareMetalAmount(860641.4375f, 300444.46875f, 1000.0f, 600.25f)) == 0x43c7e000u, "a metal share above the room is limited to the room");
+    Check(BitsOf(ShareEnergyAmount(1048576.25f, 100.1328125f, 4000000.0f, 0.0f)) == 0x48fff9c2u, "the energy share is half the difference");
 
     printf(g_failures ? "FAILED\n" : "ref_test: all passed\n");
     return g_failures != 0;

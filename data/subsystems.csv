@@ -4757,6 +4757,9 @@ SettingGetString,src/host/settings_io.h,platform,folder:src/host/,
 SettingSetBlob,src/host/settings_io.h,platform,folder:src/host/,
 SettingSetInt,src/host/settings_io.h,platform,folder:src/host/,
 SettingSetString,src/host/settings_io.h,platform,folder:src/host/,
+ShareAmount,src/network/resource_share.h,economy,file:src/network/,economy
+ShareEnergyAmount,src/network/resource_share.h,economy,file:src/network/,economy
+ShareMetalAmount,src/network/resource_share.h,economy,file:src/network/,economy
 ShowContinueWatchingDialog,src/ingame/game_dialogs.cpp,presentation,presentation,
 ShowSelectBox,src/ingame/info_panel.cpp,presentation,presentation,
 SightTilesClamped,src/map/line_of_sight.cpp,los_radar,file:src/map/line_of_sight,

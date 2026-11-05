@@ -3822,6 +3822,7 @@ int CountRemotePlayers()
 }
 
 #include "../../interfaces/seams.h"
+#include "resource_share.h"
 
 // FUNCTION: 0x457d30
 void __stdcall UpdateResourceSharing(Player* player)
@@ -3847,10 +3848,7 @@ void __stdcall UpdateResourceSharing(Player* player)
             }
         }
         if (found != player && player->metal > player->shareMetal) {
-            float amount = (player->metal - player->shareMetal) * 0.33333334f;
-            float limit = found->metalCapacity - found->metal;
-            float result = amount < limit ? amount : limit;
-            amount = result;
+            float amount = ShareMetalAmount(player->metal, player->shareMetal, found->metalCapacity, found->metal);
             g_seams.players->TransferEnergy(player->index, found->index, amount, 1);
         }
 
@@ -3871,10 +3869,7 @@ void __stdcall UpdateResourceSharing(Player* player)
             }
         }
         if (found != player && player->energy > player->shareEnergy) {
-            float amount = (player->energy - player->shareEnergy) * 0.5f;
-            float limit = found->energyCapacity - found->energy;
-            float result = amount < limit ? amount : limit;
-            amount = result;
+            float amount = ShareEnergyAmount(player->energy, player->shareEnergy, found->energyCapacity, found->energy);
             g_seams.players->TransferMetal(player->index, found->index, amount, 1);
         }
     }

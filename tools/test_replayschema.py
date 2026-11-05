@@ -92,7 +92,7 @@ class Accounting(unittest.TestCase):
 
     def test_a_pending_subsystem_lists_what_is_left(self):
         assignment = rs.read_assignment()
-        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map")
+        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map", "weapons")
                              for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         model, errors = build([row(slot, "field_read", "Game::mapWidth"), row(slot, "field_escape", "Unit::unmatched")])
         pending = model["subsystems"][sub]["pending"]
@@ -126,7 +126,7 @@ class Unrecorded(unittest.TestCase):
         self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
         ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith("map")], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("SetMeteorParams", spec["slots"])
         self.assertEqual(spec["unrecorded"], {"SetMeteorParams": {"reason": "load class", "native": "SetMeteorParams"}})
@@ -162,7 +162,7 @@ class Unrecorded(unittest.TestCase):
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
         ann = self.imported()
         files, errors, model = rs.generate(rs.read_rows(), ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith("map")], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons"))], [])
         weapons = model["subsystems"]["weapons"]
         self.assertNotIn("SpawnProjectile", weapons["slots"])
         kept = weapons["unrecorded"]["SpawnProjectile"]
@@ -456,7 +456,7 @@ class UnannotatedTypes(unittest.TestCase):
 
     def test_a_pending_subsystem_is_not_asked(self):
         assignment = rs.read_assignment()
-        sub, slot = [(m, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map")
+        sub, slot = [(m, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map", "weapons")
                      for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         _, errors = build([row(slot, "field_read", "OpenHeap::count")])
         self.assertEqual([e for e in errors if "OpenHeap" in e], [])
@@ -518,7 +518,7 @@ class IndirectCalls(unittest.TestCase):
 
     def pending(self, rows, ann=None, slot_name="UpdatePlayerEconomy"):
         model, errors = build(rows, ann)
-        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith("map")], model["subsystems"]["economy"]["slots"].get(slot_name)
+        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "weapons"))], model["subsystems"]["economy"]["slots"].get(slot_name)
 
     def economy(self, **changes):
         ann = annotations()
@@ -1606,7 +1606,7 @@ class InsideSites(unittest.TestCase):
         self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 12;", text)
+        self.assertIn("kReplayInsideSiteCount = 13;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
@@ -2212,7 +2212,7 @@ class ElementForms(unittest.TestCase):
 
     def test_a_pointer_to_an_embedded_kind_is_an_object_argument_named_by_its_site(self):
         ann = annotations()
-        ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"] = {"args": {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}}
+        ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"]["args"] = {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
@@ -2783,6 +2783,39 @@ class LinkSources(unittest.TestCase):
             real = replay_subsystems.load
             with mock.patch.object(replay_subsystems, "load", lambda: real(path)):
                 self.assertIn(other["file"], rs.replay_link_sources())
+
+
+class CompleteImports(unittest.TestCase):
+    """A complete subsystem that imports a slot of another complete one is replayed against the import stubs, not the other module."""
+
+    def generated(self):
+        files, errors, _ = rs.generate(rs.read_rows(), annotations())
+        self.assertEqual(errors, [])
+        return files
+
+    def test_the_importer_binds_the_stubs_of_a_complete_seam(self):
+        text = self.generated()[rs.SLOTS_H]
+        body = text[text.index('if (strcmp(g_subsystem, "weapons") == 0) {'):]
+        body = body[:body.index("    }\n")]
+        self.assertIn("g_seams.targeting = &g_import_targeting;", body)
+        self.assertIn("g_import_targeting.GetWeaponTargetPos = Imp_targeting_GetWeaponTargetPos;", body)
+        self.assertIn("g_seams.economy = &g_import_economy;", body)
+
+    def test_a_subsystem_with_no_complete_import_binds_nothing_more(self):
+        text = self.generated()[rs.SLOTS_H]
+        self.assertNotIn('strcmp(g_subsystem, "economy") == 0) {', text)
+
+    def test_a_vec3_the_slot_fills_is_an_out_line_of_the_import(self):
+        files = self.generated()
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecTargetingGetWeaponTargetPos"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('if (result != 0) ImportOutVec3(line, "pos", a1);', body)
+        slots = files[rs.SLOTS_H]
+        stub = slots[slots.index("Imp_targeting_GetWeaponTargetPos("):]
+        stub = stub[:stub.index("\n}\n")]
+        self.assertIn('ApplyVec3(a1, "pos");', stub)
+        self.assertNotIn('t.Add("?")', stub)
 
 
 if __name__ == "__main__":

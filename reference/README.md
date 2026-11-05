@@ -190,6 +190,7 @@ seeds) and runs deterministically: two runs give identical traces.
 | duel-great-divide | Great Divide | 2 | 3600 | Two Arm players on Great Divide, random start positions, two minutes |
 | duel-pass-dark | The Pass | 2 | 2700 | Two players on The Pass with the map unmapped and line of sight off, ninety seconds |
 | duel-shore-to-shore | Shore to Shore | 2 | 2700 | Arm against Core on Shore to Shore with 5000 metal and energy, no commander death, difficulty 0 |
+| edges-economy-targeting | The Pass | 3 | 260 | Economy and targeting edge cases: an extractor over the map edge, a slot 2 unit, a cloak payment, a veteran commander against a building, a swarm of more than 50 targets for an AI unit, stacked units, a paralyzer, a kamikaze unit, a fire order of 0, and an attack on ground under the sea (`sealevel`) |
 | eight-full-moon | Full Moon | 8 | 9000 | Eight players on Full Moon, alternating sides, five minutes |
 | eight-greenhaven | Greenhaven | 8 | 5400 | Eight Arm players on Greenhaven, random start positions, three minutes |
 | eight-pincushion-teams | Pincushion | 8 | 12600 | Eight players on Pincushion in four allied pairs, seven minutes |

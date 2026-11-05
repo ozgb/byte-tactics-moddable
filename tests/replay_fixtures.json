@@ -1031,6 +1031,19 @@
     "mode": "scalar"
    }
   },
+  "Strike": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "WeaponDef*",
+     "name": "weapon"
+    }
+   ],
+   "args": {},
+   "result": {
+    "mode": "scalar"
+   }
+  },
   "Notify": {
    "ret": "int",
    "params": [

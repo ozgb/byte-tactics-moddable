@@ -82,6 +82,16 @@ int __stdcall Imp_fixture_Measure(int* a0, short* a1, unsigned char* a2)
     return ParseResult<int>(r);
 }
 
+int __stdcall Imp_fixture_Strike(WeaponDef* a0)
+{
+    ReplayText t;
+    StartImport(t, "fixture.Strike");
+    Space(t);
+    ReplayAddWeapon(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
 int __stdcall Imp_fixture_Notify(FixtureNotify* a0, Callback* a1, int a2)
 {
     ReplayText t;
@@ -151,6 +161,20 @@ void After_fixture_Measure()
     CompareInOutScalar("p3", g_inout_fixture_Measure_1_null ? nullptr : &g_inout_fixture_Measure_1);
     CompareInOutScalar("p4", g_inout_fixture_Measure_2_null ? nullptr : &g_inout_fixture_Measure_2);
     CompareResult(g_result_fixture_Measure);
+}
+
+int g_result_fixture_Strike;
+
+void Run_fixture_Strike()
+{
+    WeaponDef* p0 = (WeaponDef*)ArgWeapon("weapon");
+    SetClosing("result");
+    g_result_fixture_Strike = Native_fixture_Strike(p0);
+}
+
+void After_fixture_Strike()
+{
+    CompareResult(g_result_fixture_Strike);
 }
 
 int g_result_fixture_Notify;

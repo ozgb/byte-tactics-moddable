@@ -791,6 +791,16 @@ class StructForms(unittest.TestCase):
         self.assertIn('Vec3* p1 = (Vec3*)ParseStructOpt("pos", ROK_VEC3, &p1_value);', body)
         self.assertIn("g_seams.targeting->SetWeaponTargetPos(p0, p1, p2)", body)
 
+    def test_a_weapon_argument_is_a_root_and_is_resolved_by_the_runner(self):
+        weapon = {"name": "weapon", "type": "WeaponDef*", "line": "weapon", "mode": "weapon"}
+        slot = {"conv": "__stdcall", "ret": "void", "args": [weapon, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}], "result": None}
+        body = "\n".join(rs.runner("features", "Hit", slot))
+        self.assertIn('WeaponDef* p0 = (WeaponDef*)ArgWeapon("weapon");', body)
+        self.assertNotIn("ArgPending", body)
+        self.assertIn("g_seams.features->Hit(p0, p1)", body)
+        hook = "\n".join(rs.wrapper("features", {}, "Hit", slot, {}, False))
+        self.assertIn("roots.Add(ROK_WEAPONDEF, a0);", hook)
+
     def test_a_struct_that_is_not_nullable_is_passed_by_address(self):
         files, _, _ = self.generated(annotations())
         self.assertIn("g_seams.targeting->SetWeaponTargetPos(p0, &p1, p2)", files[rs.SLOTS_H])

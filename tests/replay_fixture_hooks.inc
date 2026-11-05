@@ -10,7 +10,8 @@ enum {
     RSL_FIXTURE_READIDS = RSL_COUNT + 3,
     RSL_FIXTURE_FILLIDS = RSL_COUNT + 4,
     RSL_FIXTURE_MEASURE = RSL_COUNT + 5,
-    RSL_FIXTURE_NOTIFY = RSL_COUNT + 6
+    RSL_FIXTURE_STRIKE = RSL_COUNT + 6,
+    RSL_FIXTURE_NOTIFY = RSL_COUNT + 7
 };
 
 struct FixtureSeam {
@@ -20,6 +21,7 @@ struct FixtureSeam {
     int (__stdcall* ReadIds)(void*);
     int (__stdcall* FillIds)(void*);
     int (__stdcall* Measure)(int*, short*, unsigned char*);
+    int (__stdcall* Strike)(WeaponDef*);
     int (__stdcall* Notify)(FixtureNotify*, Callback*, int);
 };
 
@@ -184,6 +186,30 @@ int __stdcall RecFixtureMeasure(int* a0, short* a1, unsigned char* a2)
     return result;
 }
 
+int __stdcall RecFixtureStrike(WeaponDef* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_WEAPONDEF, a0);
+    SlotScope scope(RSL_FIXTURE_STRIKE, SUB_FIXTURE, roots);
+    if (scope.Open()) {
+        ArgWeapon(s_call, "weapon", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i fixture.Strike");
+        ImportWeapon(line, a0);
+    }
+    int result = s_inner_fixture->Strike(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 int __stdcall RecFixtureNotify(FixtureNotify* a0, Callback* a1, int a2)
 {
     ReplayRoots roots;
@@ -211,5 +237,6 @@ FixtureSeam s_rec_fixture = {
     RecFixtureReadIds,
     RecFixtureFillIds,
     RecFixtureMeasure,
+    RecFixtureStrike,
     RecFixtureNotify,
 };

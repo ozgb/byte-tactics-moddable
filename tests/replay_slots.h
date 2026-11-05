@@ -313,6 +313,22 @@ void __stdcall Imp_ai_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, 
     (void)r;
 }
 
+int __stdcall Imp_ai_GetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "ai.GetVisibleEnemiesInRadius");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    t.Add("pos=");
+    AddVec3(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    return EnterList(t, a4, a5);
+}
+
 WindMeteorsSeam g_native_wind_meteors = {
     UpdateWind,
     UpdateMeteors,
@@ -1219,4 +1235,5 @@ void BindSeams()
     g_import_players.TransferMetal = Imp_players_TransferMetal;
     g_seams.ai = &g_import_ai;
     g_import_ai.GetVisibleEnemiesInRadius = Imp_ai_GetVisibleEnemiesInRadius;
+    g_import_ai.GetVisibleEnemiesInRadiusList = Imp_ai_GetVisibleEnemiesInRadiusList;
 }

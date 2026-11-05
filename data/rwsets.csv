@@ -52014,8 +52014,8 @@ address,function,file,kind,target
 ,RecAiGetVisibleEnemiesInRadius,src/harness/replay_hooks.inc,global_read,s_call
 ,RecAiGetVisibleEnemiesInRadius,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiGetVisibleEnemiesInRadius,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, const Vec3 *, int, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetVisibleEnemiesInRadius]"
-,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,call,ArgPending
 ,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,call,ArgValue
+,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecAiGetVisibleEnemiesInRadiusList,src/harness/replay_hooks.inc,field_read,AiSeam::GetVisibleEnemiesInRadiusList

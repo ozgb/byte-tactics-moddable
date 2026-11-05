@@ -14,6 +14,7 @@ import struct
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import accesslog as al
@@ -471,6 +472,57 @@ class RunTest(unittest.TestCase):
             self.assertIn("2 edge rows, 2 items (1 unresolved:*)", lines[0])
             self.assertIn("1.0000%", lines[1])
             self.assertIn("x2.0", lines[2])
+
+
+class LoadedSaveTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.scenarios = self.root / "scenarios"
+        self.scenarios.mkdir()
+        (self.scenarios / "saver.txt").write_text("scenario saver\n")
+        (self.scenarios / "loader.txt").write_text("scenario loader\nload saver\n")
+        (self.scenarios / "plain.txt").write_text("scenario plain\n")
+        self.calls = []
+
+    def fake_play(self, exe, scenario, game_dir, tables_dir, raw, timeout, put=None, collect=()):
+        self.calls.append((scenario.stem, dict(put or {}), tuple(collect)))
+        directory = self.root / ("run%d" % len(self.calls))
+        for name in collect:
+            (directory / name).parent.mkdir(parents=True, exist_ok=True)
+            (directory / name).write_text(scenario.stem + name)
+        return directory, 1.0
+
+    def test_a_load_line_plays_the_saving_scenario_first_and_puts_its_save_into_the_loading_run(self):
+        build = self.root / "build"
+        build.mkdir()
+        with mock.patch.object(al, "play", self.fake_play):
+            put = al.loaded_save(build, self.scenarios / "loader.txt", self.root, 5.0)
+        self.assertEqual([c[0] for c in self.calls], ["saver"])
+        self.assertEqual(self.calls[0][2], tuple(al.tracediff.SAVE_FILES))
+        self.assertEqual(sorted(put), sorted(al.tracediff.SAVE_FILES))
+        for dest, source in put.items():
+            self.assertEqual(source.read_text(), "saver" + dest)
+            self.assertEqual(source.parent, build / "access" / "save" / "loader")
+        self.assertEqual(al.loaded_save(build, self.scenarios / "plain.txt", self.root, 5.0), {})
+        self.assertEqual(len(self.calls), 1)
+
+    def test_run_plays_the_saving_scenario_before_the_loading_one(self):
+        build = self.root / "build"
+        build.mkdir()
+        scenario = self.scenarios / "loader.txt"
+        with mock.patch.object(al, "play", self.fake_play), mock.patch.object(al, "ROOT", self.root), \
+                mock.patch.object(al, "trace_difference", return_value=None), \
+                mock.patch.object(al, "summarise", return_value=[]):
+            (self.root / "reference/scenarios").mkdir(parents=True)
+            (self.root / "reference/traces").mkdir(parents=True)
+            (self.root / "reference/scenarios/loader.txt").write_text(scenario.read_text())
+            (self.root / "reference/scenarios/saver.txt").write_text("scenario saver\n")
+            (self.root / "reference/traces/loader.txt").write_text("")
+            self.assertEqual(al.run(build, ["loader"], self.root, False, False, None, 5.0), 0)
+        self.assertEqual([c[0] for c in self.calls], ["saver", "loader"])
+        self.assertEqual(sorted(self.calls[1][1]), sorted(al.tracediff.SAVE_FILES))
 
 
 if __name__ == "__main__":

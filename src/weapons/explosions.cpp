@@ -749,6 +749,8 @@ int __stdcall UpdateExplodedPiece(ExplodedPiece* obj)
     return 1;
 }
 
+#include "../harness/harness_events.h"
+
 // FUNCTION: 0x421550
 int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj)
 {
@@ -760,7 +762,9 @@ int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj)
         buf[0] = inner->pos.x;
         buf[1] = inner->pos.y;
         buf[2] = inner->pos.z;
+        HarnessEventSuppress(1);
         EmitWhiteSmoke(buf, 9);
+        HarnessEventSuppress(0);
     }
     if (obj->b0) {
         buf[0] = inner->pos.x;

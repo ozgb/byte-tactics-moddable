@@ -1066,6 +1066,9 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int param);
 void __stdcall PopUntilNamedLayout(int param);
 void __stdcall KillPlayerUnits(unsigned char player);
 
+#include "../harness/harness_event_kinds.h"
+void __cdecl HarnessEventWords(int kind, unsigned flags, int count, ...);
+
 // FUNCTION: 0x4864b0
 void __stdcall KillUnit(Unit* unit, int param_2)
 {
@@ -1113,6 +1116,7 @@ void __stdcall KillUnit(Unit* unit, int param_2)
         ApplyUnitDeath(&cmd, 1);
         if (same && g_game->battleCommanderDeath != 0 && unit->player->active != 0 &&
             (unit->player->type == 1 || unit->player->type == 2)) {
+            HarnessEventWords(HEV_POP_TO_GAME_LAYOUT, 0, 1, 1);
             PopUntilNamedLayout(1);
             KillPlayerUnits(unit->playerIndex);
         }
@@ -1203,8 +1207,10 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
             }
             if (unit->attacker != 0 && unit->buildLeft == 0.0f && unit->playerIndex != unit->lastAttackerSlot)
                 unit->attacker->killCount++;
-            if (unit->lastAttackerSlot == g_game->localPlayer)
+            if (unit->lastAttackerSlot == g_game->localPlayer) {
+                HarnessEventWords(HEV_CD_ACTIVITY, 0, 3, 5, unit->lastAttackerSlot, unit->lastAttackerSlot);
                 AddCdActivitySample(5);
+            }
             credited = 1;
         }
         break;
@@ -1265,10 +1271,13 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
                     char text[100];
                     sprintf(text, Translate(g_takenLeadFormat), rec->name,
                             g_game->battleCommanderDeath == 2 ? rec->commanderKills : rec->kills);
+                    HarnessEventWords(HEV_PLAYER_TOOK_LEAD, 0, 2, rec->index,
+                                      g_game->battleCommanderDeath == 2 ? rec->commanderKills : rec->kills);
                     AddMessage(text, 2, 0, 10);
                 }
             }
         }
+        HarnessEventWords(HEV_SCORE_FLASH, 0, 2, unit->lastAttackerSlot, unit->player->index);
         if (g_game->b7)
             FlashScorePanelKillLoss(unit->lastAttackerSlot, unit->player->index);
     }

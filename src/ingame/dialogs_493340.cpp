@@ -1251,6 +1251,7 @@ void UpdateFramePacing()
 void HarnessAfterStep();
 void HarnessBeforeStep();
 void HarnessPhase(int phase);
+void __stdcall HarnessRecordPhase(int phase);
 
 // Runs one game update per pending time step (g_game->simStepsPending), profiling each
 // phase into g_game->profileTimingBars.acc[]; the profile object also lives at +0x38d85 with
@@ -1270,6 +1271,7 @@ void __stdcall RunGameSteps(int showStats)
             HarnessPhase(0);
             g_game->profileTimingBars.AccumulateProfileTime(0);
         }
+        HarnessRecordPhase(1);
         g_seams.units->UpdateAllUnits();
         HarnessPhase(1);
         g_game->profileTimingBars.AccumulateProfileTime(1);

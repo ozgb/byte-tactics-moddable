@@ -492,6 +492,8 @@ void __stdcall AddCdActivitySample(int flag);
 int __cdecl FUN_004b7123(unsigned short idx, int scale);
 int __cdecl FUN_004b70ef(short idx, int scale);
 
+#include "../harness/harness_events.h"
+
 // Applies one damage/heal packet (type 0xb, 9 bytes: the type byte, the victim
 // unit id at +1, the attacker unit id at +3, an amount at +5, the heading byte
 // at +7 and the damage kind at +8) to the victim. Here `unit` is the victim and
@@ -533,8 +535,10 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
         unsigned char c = target->playerIndex;
         unit->lastAttackerSlot = c;
         unit->attacker = target;
-        if (target->playerIndex == g_game->localPlayer || unit->playerIndex == g_game->localPlayer)
+        if (target->playerIndex == g_game->localPlayer || unit->playerIndex == g_game->localPlayer) {
+            HarnessEventWords(HEV_CD_ACTIVITY, 0, 3, 1, target->playerIndex, unit->playerIndex);
             AddCdActivitySample(1);
+        }
     }
 
     if (ev->damageKind == 2) {

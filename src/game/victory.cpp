@@ -597,6 +597,8 @@ extern char g_killEnemyCommanderKey[]; // "VictoryCondition_KillEnemyCommander"
 extern char g_satisfiedKey[]; // "Satisfied"
 extern char g_celebratedKey[]; // "Celebrated"
 
+#include "../harness/harness_events.h"
+
 // Slot 1 of the "kill enemy commander" victory condition (vtable 0x4fd960,
 // compare 0x48f6b0 and 0x48ec20): when a unit of player index 1 is named after its
 // owner, marks the condition met and announces it once.
@@ -607,6 +609,7 @@ void VictoryKillEnemyCommander::OnUnitDied(Unit* unit)
         if (_strcmpi(unit->def->name, g_game->sideDefs[unit->player->owner->side].commander) == 0) {
             satisfied = 1;
             if (celebrated == 0) {
+                HarnessEventWords(HEV_SOUND, 0, 2, 0, 0);
                 PlaySoundByName("Victory Condition", 0);
                 celebrated = 1;
             }
@@ -644,6 +647,7 @@ int VictoryDestroyAllUnits::IsSatisfied()
 {
     if (g_game->field_1df2 == 0) {
         if (celebrated == 0) {
+            HarnessEventWords(HEV_SOUND, 0, 2, 0, 0);
             PlaySoundByName("Victory Condition", 0);
             celebrated = 1;
         }
@@ -702,6 +706,7 @@ void VictoryKillAllMobileUnits::OnUnitDied(Unit* unit)
         if (numUnits <= 1) {
             satisfied = 1;
             if (celebrated == 0) {
+                HarnessEventWords(HEV_SOUND, 0, 2, 0, 0);
                 PlaySoundByName("Victory Condition", 0);
                 celebrated = 1;
             }
@@ -740,6 +745,7 @@ int VictoryBuildUnitType::VisitUnit(Unit* unit)
     if (unit->unitDefIndex == id && unit->buildLeft == 0.0f) {
         satisfied = 1;
         if (celebrated == 0) {
+            HarnessEventWords(HEV_SOUND, 0, 2, 0, 0);
             PlaySoundByName("Victory Condition", 0);
             celebrated = 1;
         }
@@ -787,6 +793,7 @@ void VictoryCaptureUnitType::OnUnitCaptured(Unit* unit)
     if (unit->playerIndex == 1 && _strcmpi(name, unit->def->name) == 0) {
         satisfied = 1;
         if (celebrated == 0) {
+            HarnessEventWords(HEV_SOUND, 0, 2, 0, 0);
             PlaySoundByName("Victory Condition", 0);
             celebrated = 1;
         }
@@ -835,6 +842,7 @@ void VictoryKillAllOfType::OnUnitDied(Unit* unit)
         if (count <= 1) {
             satisfied = 1;
             if (celebrated == 0) {
+                HarnessEventWords(HEV_SOUND, 0, 2, 0, 0);
                 PlaySoundByName("Victory Condition", 0);
                 celebrated = 1;
             }
@@ -874,6 +882,7 @@ void VictoryKillUnitType::OnUnitDied(Unit* unit)
         if (--numLeftToKill <= 0) {
             satisfied = 1;
             if (celebrated == 0) {
+                HarnessEventWords(HEV_SOUND, 0, 2, 0, 0);
                 PlaySoundByName("Victory Condition", 0);
                 celebrated = 1;
             }
@@ -927,6 +936,7 @@ void VictoryMoveUnitToRadius::VisitUnit(Unit* unit)
             && (unit->carrier == 0 || (unit->carrier->flags & 0x40000000))) {
             satisfied = 1;
             if (celebrated == 0) {
+                HarnessEventWords(HEV_SOUND, 0, 2, 0, 0);
                 PlaySoundByName("Victory Condition", 0);
                 celebrated = 1;
             }
@@ -962,6 +972,7 @@ int VictoryUnitTypePassesX::VisitUnit(Unit* unit)
         if (abs(unit->cell - x) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
+                HarnessEventWords(HEV_SOUND, 0, 2, 0, 0);
                 PlaySoundByName("Victory Condition", 0);
                 celebrated = 1;
             }
@@ -1011,6 +1022,7 @@ int VictoryUnitTypePassesZ::VisitUnit(Unit* unit)
         if (abs(unit->field_78 - z) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
+                HarnessEventWords(HEV_SOUND, 0, 2, 0, 0);
                 PlaySoundByName("Victory Condition", 0);
                 celebrated = 1;
             }

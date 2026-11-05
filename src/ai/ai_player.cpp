@@ -780,6 +780,8 @@ void SquadManager::MarkOwnerNetDirtyFromDamageSplit(Obj_00406f50* obj, int a, in
     }
 }
 
+#include "../harness/harness_events.h"
+
 // FUNCTION: 0x406f80
 void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
 {
@@ -809,7 +811,12 @@ void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
         }
     }
     if (!(GetOrderFlags(unit)&0x80) && (unit->lastAttackerSlot!=unit->playerIndex || unit->lastDamageType==1))
+    {
+        HarnessEventSpeech(unit,2,0,HEV_SPEECH_IF_NOT_VISIBLE);
+        HarnessEventSuppress(1);
         QueueUnitSpeechIfNotVisible(unit,2,0);
+        HarnessEventSuppress(0);
+    }
 }
 
 // FUNCTION: 0x4071f0
@@ -1190,8 +1197,10 @@ void BuildTimer::OnTimer()
                     u->SetStateBits(1, 0);
             } else if (u->def->count && !u->list) {
                 unsigned short id = ChooseBuildOption(player, u);
-                if (id)
+                if (id) {
+                    HarnessEventWords(HEV_BUILD_QUEUE_SOUND, 0, 2, u->playerIndex, 1);
                     QueueBuildOrder((char*)&g_game->unitDefs[id].unitname[0], u, 1);
+                }
             }
         }
     }

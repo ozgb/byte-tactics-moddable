@@ -517,9 +517,12 @@ struct Access_00476710 : Vec_004739b0 {
     static UfillFn_004739b0 fn;
 };
 
+#include "../harness/harness_events.h"
+
 // FUNCTION: 0x472630
 void __stdcall EmitSmoke(Vec3_00472630* pos, int emitPeriod, int lifetime, short index)
 {
+    HarnessEventPtrs(HEV_SMOKE, (const int*)pos, 3, (const int*)0, 0, 3, emitPeriod, lifetime, (int)index);
     ParticleLists* owner = g_game->lists;
     SmokeParticles* e = new SmokeParticles;
     if (e) {
@@ -542,6 +545,7 @@ void __stdcall EmitTimedBlackSmoke(Vec3_00472720* pos, int emitPeriod, int lifet
 // FUNCTION: 0x472810
 void __stdcall EmitWhiteSmoke(Vec3_00472810* pos, short index)
 {
+    HarnessEventPtrs(HEV_WHITE_SMOKE, (const int*)pos, 3, (const int*)0, 0, 1, (int)index);
     ParticleLists* owner = g_game->lists;
     SmokeParticles* e = new SmokeParticles;
     if (e) {
@@ -553,6 +557,7 @@ void __stdcall EmitWhiteSmoke(Vec3_00472810* pos, short index)
 // FUNCTION: 0x4728f0
 void __stdcall EmitBlackSmoke(Vec3_00474cd0* p, short index)
 {
+    HarnessEventPtrs(HEV_BLACK_SMOKE, (const int*)p, 3, (const int*)0, 0, 1, (int)index);
     // The list owner is read through a reference before the allocation, so
     // g_game and its +0x38d77 field are loaded ahead of the pool call and stay
     // live across it.
@@ -567,6 +572,7 @@ void __stdcall EmitBlackSmoke(Vec3_00474cd0* p, short index)
 // FUNCTION: 0x4729d0
 void __stdcall EmitWeaponSmoke(Vec3_00474cd0* p, short index)
 {
+    HarnessEventPtrs(HEV_WEAPON_SMOKE, (const int*)p, 3, (const int*)0, 0, 1, (int)index);
     ParticleLists& l = *g_game->lists;
     SmokeParticles* e = new SmokeParticles;
     if (e) {
@@ -578,6 +584,7 @@ void __stdcall EmitWeaponSmoke(Vec3_00474cd0* p, short index)
 // FUNCTION: 0x472c50
 void __stdcall EmitTimedSubParticles(Vec3_00475150* p, short index)
 {
+    HarnessEventPtrs(HEV_TIMED_SUB_PARTICLES, (const int*)p, 3, (const int*)0, 0, 1, (int)index);
     ParticleLists& l = *g_game->lists;
     TimedSubParticles* e = new TimedSubParticles;
     if (e) {

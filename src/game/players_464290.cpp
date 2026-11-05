@@ -792,6 +792,8 @@ static const double kNegSeven = -0.7;
 static const double kNegHalf = -0.5;
 static const float kHundred = 100.0f;
 
+#include "../harness/harness_events.h"
+
 // FUNCTION: 0x464f80
 void __stdcall UpdatePlayers()
 {
@@ -1037,6 +1039,7 @@ void __stdcall UpdatePlayers()
                     RecalculateLineOfSight(1);
                     BroadcastPlayerInfo();
                     if (CountActiveAIPlayers() == 0) {
+                        HarnessEventWords(HEV_WATCH_PROMPT, 0, 1, bl);
                         Screen* dlg = LoadGuiLayer(&g_game->gui, "YESORNO.GUI", 0x900);
                         if (dlg != 0) {
                             SetKeyboardInput(&g_game->gui, 1);
@@ -1054,6 +1057,7 @@ void __stdcall UpdatePlayers()
                     }
                     if (CountCombatPlayers() <= 0)
                         goto skip508;
+                    HarnessEventWords(HEV_WATCH_MODE_NOTICE, 0, 1, bl);
                     OpenMessageBox(&g_game->gui,
                                  Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
                                  500, 1, 1);

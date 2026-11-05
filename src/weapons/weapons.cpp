@@ -2154,11 +2154,21 @@ static inline void Remove(Projectile* p)
     p->flagBits.dead = 1;
 }
 
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
+
 // FUNCTION: 0x49b720
 void UpdateProjectiles()
 {
+#if BT_ACCESS_LOG
+    AccessLogPassScope accessPass(ACCESS_PASS_PROJECTILES);
+#endif
     int n = g_game->projectileCount;
     for (int i = 0; i < n; i++) {
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         Projectile* p = &g_game->projectiles[i];
         WeaponDef* type = p->type;
         int oldY = p->positionWords.yWhole;

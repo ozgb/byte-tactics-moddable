@@ -503,9 +503,16 @@ void __stdcall UpdatePlayers()
     g_seams.players->UpdatePlayersOnStream(RAND_STREAM_MAIN);
 }
 
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
+
 // FUNCTION: 0x464f80
 void __stdcall UpdatePlayersOnStream(RandStream stream)
 {
+#if BT_ACCESS_LOG
+    AccessLogPassScope accessPass(ACCESS_PASS_PLAYERS);
+#endif
     g_seams.pathfinding->RunSearches(g_game->pathfinder);
     unsigned char bl = 0;
     for (;;) {
@@ -534,6 +541,9 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
                 goto next_bl;
         }
 
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         if (pi->ai != 0)
             g_seams.ai->SquadManagerTickIfActive(pi->ai, 0);
 

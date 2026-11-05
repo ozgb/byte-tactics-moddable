@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 #include "../../interfaces/host.h"
 #include "access_log.h"
 #include "classifier.h"
@@ -11,6 +12,8 @@
 
 void* __cdecl SimBlockBase();
 void __cdecl SimBlockInit();
+
+AccessMarks g_accessMarks;
 
 namespace {
 
@@ -62,6 +65,20 @@ struct Func {
     unsigned start, end;
     const char* name;
 };
+struct EntDraw {
+    unsigned pass, stream, sub, func, count, tainted, taintN, taint[4];
+};
+struct DrawAgg {
+    unsigned used, pass, stream, sub, func, minDraws, maxDraws, ticks, maxEntities, entities, lastTick, firstTick, tainted, taintN, taint[4];
+};
+struct PassRead {
+    unsigned used, pass, item, sub, func, evidence, count, firstTick;
+};
+const unsigned kDrawBits = 13;
+const unsigned kPassBits = 16;
+const unsigned kEntDraws = 32;
+const char* const kPassNames[] = {"other", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail",
+                                  "presentation"};
 const unsigned kKinds = 40;
 const unsigned kPresBits = 16;
 struct PresEntry {
@@ -100,7 +117,21 @@ unsigned g_kindWindows[kKinds];
 
 unsigned g_itemCount;
 const char** g_itemNames;
-unsigned g_idUnresolvedImage, g_idUnresolvedBlock, g_idRng[3], g_idSound, g_idUi;
+unsigned g_idUnresolvedImage, g_idUnresolvedBlock, g_idRng[3], g_idSound, g_idUi, g_idSimEvent;
+int g_pass;
+unsigned g_entOrd;
+EntDraw g_ent[kEntDraws];
+unsigned g_entN;
+bool g_entTaint;
+unsigned g_taintN;
+unsigned g_taint[4];
+DrawAgg* g_draws;
+unsigned g_drawsUsed;
+PassRead* g_passReads;
+unsigned g_passReadsUsed;
+bool g_phaseOverflow;
+bool g_simPending;
+unsigned char* g_funcRng;
 Type* g_types;
 unsigned g_typeCount;
 Region* g_statics;
@@ -241,7 +272,7 @@ NS void LoadItems(const unsigned char* data)
 {
     Reader r = {data + 4};
     unsigned strings = r.U32();
-    g_itemNames = (const char**)Zeroed(sizeof(char*) * (strings + 8));
+    g_itemNames = (const char**)Zeroed(sizeof(char*) * (strings + 9));
     for (unsigned i = 0; i < strings; i++) {
         unsigned n = r.U16();
         g_itemNames[i] = CopyString(r.p, n);
@@ -254,6 +285,7 @@ NS void LoadItems(const unsigned char* data)
     g_idRng[2] = strings + 4;
     g_idSound = strings + 5;
     g_idUi = strings + 6;
+    g_idSimEvent = strings + 7;
     g_itemNames[g_idUnresolvedImage] = "unresolved:image";
     g_itemNames[g_idUnresolvedBlock] = "unresolved:block";
     g_itemNames[g_idRng[0]] = "rng.parkMiller";
@@ -261,7 +293,8 @@ NS void LoadItems(const unsigned char* data)
     g_itemNames[g_idRng[2]] = "rng.crtLoad";
     g_itemNames[g_idSound] = "sound";
     g_itemNames[g_idUi] = "ui";
-    g_itemCount = strings + 7;
+    g_itemNames[g_idSimEvent] = "sim-event";
+    g_itemCount = strings + 8;
     g_typeCount = r.U32();
     g_types = (Type*)Zeroed(sizeof(Type) * (g_typeCount + 1));
     for (unsigned i = 0; i < g_typeCount; i++) {
@@ -325,6 +358,12 @@ NS void LoadFuncs(const unsigned char* data)
         r.p += n;
     }
     g_pres = (PresEntry*)Zeroed(sizeof(PresEntry) << kPresBits);
+    g_funcRng = (unsigned char*)Zeroed(g_funcCount + 1);
+    const char* rng[] = {"RandomInt", "GameRand", "GameHoldrand", "GameSrand", "SeedRandom"};
+    for (unsigned i = 0; i < g_funcCount; i++)
+        for (unsigned k = 0; k < sizeof rng / sizeof rng[0]; k++)
+            if (strcmp(g_funcs[i].name, rng[k]) == 0)
+                g_funcRng[i + 1] = 1;
 }
 
 NS void LoadImage()
@@ -637,6 +676,113 @@ NS void RawLine(const char* kind, unsigned sub, unsigned item, const Hit& h, uns
                           sub < g_subCount ? g_subNames[sub] : "-", g_itemNames[item], a, h.entA, h.entB);
 }
 
+NS DrawAgg* FindDraw(unsigned pass, unsigned stream, unsigned sub, unsigned func)
+{
+    unsigned h = (pass * 40503u) ^ (stream * 3266489917u) ^ (sub * 2246822519u) ^ (func * 2654435761u);
+    h ^= h >> 15;
+    unsigned mask = (1u << kDrawBits) - 1;
+    for (unsigned n = 0; n <= mask; n++) {
+        DrawAgg* a = &g_draws[(h + n) & mask];
+        if (a->used == 0) {
+            if (g_drawsUsed >= mask - (mask >> 3)) {
+                g_phaseOverflow = true;
+                return 0;
+            }
+            a->used = 1;
+            a->pass = pass;
+            a->stream = stream;
+            a->sub = sub;
+            a->func = func;
+            g_drawsUsed++;
+            return a;
+        }
+        if (a->pass == pass && a->stream == stream && a->sub == sub && a->func == func)
+            return a;
+    }
+    g_phaseOverflow = true;
+    return 0;
+}
+
+NS void AddTaint(unsigned* list, unsigned* n, unsigned item)
+{
+    for (unsigned i = 0; i < *n; i++)
+        if (list[i] == item)
+            return;
+    if (*n < 4)
+        list[(*n)++] = item;
+}
+
+NS void FlushEntity()
+{
+    for (unsigned i = 0; i < g_entN; i++) {
+        const EntDraw& e = g_ent[i];
+        DrawAgg* a = FindDraw(e.pass, e.stream, e.sub, e.func);
+        if (a == 0)
+            continue;
+        if (a->ticks == 0 || a->lastTick != g_tick + 1) {
+            a->ticks++;
+            a->entities = 0;
+            a->lastTick = g_tick + 1;
+            if (a->ticks == 1) {
+                a->firstTick = g_tick;
+                a->minDraws = e.count;
+            }
+        }
+        if (e.count < a->minDraws)
+            a->minDraws = e.count;
+        if (e.count > a->maxDraws)
+            a->maxDraws = e.count;
+        a->entities++;
+        if (a->entities > a->maxEntities)
+            a->maxEntities = a->entities;
+        if (e.tainted) {
+            a->tainted = 1;
+            for (unsigned k = 0; k < e.taintN; k++)
+                AddTaint(a->taint, &a->taintN, e.taint[k]);
+        }
+    }
+    g_entN = 0;
+    g_taintN = 0;
+    g_entTaint = false;
+}
+
+NS void NotePassRead(unsigned item, unsigned sub, void* ra, unsigned flags)
+{
+    unsigned f = FunctionOf(ra);
+    if (g_funcRng != 0 && g_funcRng[f])
+        return;
+    unsigned evidence = (flags & READ_SAME_RECORD) ? 0 : 1;
+    if (!g_entTaint)
+        g_entTaint = true;
+    AddTaint(g_taint, &g_taintN, item);
+    unsigned pass = (unsigned)g_pass;
+    unsigned h = (pass * 40503u) ^ (item * 3266489917u) ^ (sub * 2246822519u) ^ (f * 2654435761u) ^ (evidence * 668265263u);
+    h ^= h >> 15;
+    unsigned mask = (1u << kPassBits) - 1;
+    for (unsigned n = 0; n <= mask; n++) {
+        PassRead* r = &g_passReads[(h + n) & mask];
+        if (r->used == 0) {
+            if (g_passReadsUsed >= mask - (mask >> 3)) {
+                g_phaseOverflow = true;
+                return;
+            }
+            r->used = 1;
+            r->pass = pass;
+            r->item = item;
+            r->sub = sub;
+            r->func = f;
+            r->evidence = evidence;
+            r->firstTick = g_tick;
+            g_passReadsUsed++;
+        } else if (r->pass != pass || r->item != item || r->sub != sub || r->func != f || r->evidence != evidence) {
+            continue;
+        }
+        r->count++;
+        return;
+    }
+    g_phaseOverflow = true;
+}
+
 NS void Record(int store, unsigned a, unsigned size, void* ra)
 {
     unsigned sub = Attribute(ra);
@@ -663,7 +809,9 @@ NS void Record(int store, unsigned a, unsigned size, void* ra)
             g_stats.writes++;
             g_classifier.Write(h.item, h.entA, h.entB, sub, g_tick);
         } else {
-            g_classifier.Read(h.item, h.entA, h.entB, sub, g_tick);
+            unsigned flags = g_classifier.Read(h.item, h.entA, h.entB, sub, g_tick);
+            if ((flags & READ_EARLIER_ENTITY) != 0 && g_passReads != 0)
+                NotePassRead(h.item, sub, ra, flags);
         }
         if (g_raw)
             RawLine(store ? "W" : "R", sub, h.item, h, cursor);
@@ -677,9 +825,56 @@ NS void Record(int store, unsigned a, unsigned size, void* ra)
     }
 }
 
+NS void ProcessSimEvent()
+{
+    if (!g_simPending)
+        return;
+    g_simPending = false;
+    unsigned sub = Attribute((void*)g_accessMarks.simCaller);
+    if (sub != kIgnored)
+        g_classifier.Ordered(5, g_idSimEvent, sub, g_tick);
+}
+
+NS void SetPass(int pass)
+{
+    if (g_draws != 0)
+        FlushEntity();
+    g_pass = pass;
+    g_entOrd = 0;
+    g_classifier.Entity(0);
+}
+
+NS void NextEntity()
+{
+    if (g_draws != 0)
+        FlushEntity();
+    g_entOrd++;
+    g_classifier.Entity(g_entOrd);
+}
+
+NS bool Mark(unsigned a)
+{
+    unsigned offset = a - (unsigned)&g_accessMarks;
+    if (offset >= sizeof g_accessMarks)
+        return false;
+    if (offset == offsetof(AccessMarks, simCaller)) {
+        ProcessSimEvent();
+        g_simPending = true;
+    } else if (offset == ACCESS_MARK_ENTITY) {
+        NextEntity();
+    } else if (offset == ACCESS_MARK_PASS_END) {
+        SetPass(ACCESS_PASS_NONE);
+    } else if (offset >= ACCESS_MARK_PASS) {
+        SetPass((int)(offset - ACCESS_MARK_PASS));
+    }
+    return true;
+}
+
 NS inline void Touch(int store, void* p, unsigned size, void* ra)
 {
     if (!g_on || g_busy || ThreadId() != g_simThread)
+        return;
+    if (store && Mark((unsigned)p))
         return;
     Record(store, (unsigned)p, size, ra);
 }
@@ -823,7 +1018,8 @@ NS void WriteWhole(const char* path, const Out& out)
 
 const char* const kPhaseNames[] = {"net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors",
                                    "tail", "presentation", "pending"};
-const char* const kEvidenceNames[] = {"read-after-write", "read-unwritten", "write-unread", "ordered"};
+const char* const kEvidenceNames[] = {"read-after-write", "read-unwritten", "write-unread", "ordered", "read-after-write",
+                                      "read-before-write"};
 
 const char* SubName(unsigned sub)
 {
@@ -845,6 +1041,8 @@ int __cdecl CompareRows(const void* x, const void* y)
         c = strcmp(g_itemNames[a.item], g_itemNames[b.item]);
     if (c == 0)
         c = strcmp(kPhaseNames[a.label], kPhaseNames[b.label]);
+    if (c == 0)
+        c = strcmp(kPhaseNames[a.from], kPhaseNames[b.from]);
     if (c == 0)
         c = strcmp(kEvidenceNames[a.evidence], kEvidenceNames[b.evidence]);
     return c;
@@ -901,6 +1099,70 @@ NS void WritePresentation()
         out.Add("\"\n");
     }
     WriteWhole("access.presentation.csv", out);
+}
+
+NS void WriteDraws()
+{
+    Out out = {0, 0, 0};
+    out.Add("pass,stream,subsystem,function,entities,draws_min,draws_max,ticks,first_tick,tainted,items\n");
+    for (unsigned i = 0; i < (1u << kDrawBits); i++) {
+        const DrawAgg* a = &g_draws[i];
+        if (a->used == 0)
+            continue;
+        out.Add(kPassNames[a->pass]);
+        out.Add(",");
+        out.Add(g_itemNames[g_idRng[a->stream]]);
+        out.Add(",");
+        out.Add(SubName(a->sub));
+        out.Add(",\"");
+        out.Add(a->func == 0 ? "-" : g_funcs[a->func - 1].name);
+        out.Add("\",");
+        out.Num(a->maxEntities);
+        out.Add(",");
+        out.Num(a->minDraws);
+        out.Add(",");
+        out.Num(a->maxDraws);
+        out.Add(",");
+        out.Num(a->ticks);
+        out.Add(",");
+        out.Num(a->firstTick);
+        out.Add(",");
+        out.Num(a->tainted);
+        out.Add(",\"");
+        for (unsigned k = 0; k < a->taintN; k++) {
+            if (k != 0)
+                out.Add(";");
+            out.Add(g_itemNames[a->taint[k]]);
+        }
+        out.Add("\"\n");
+    }
+    WriteWhole("access.draws.csv", out);
+}
+
+NS void WritePassReads()
+{
+    Out out = {0, 0, 0};
+    out.Add("pass,item,reader,function,evidence,count,first_tick\n");
+    for (unsigned i = 0; i < (1u << kPassBits); i++) {
+        const PassRead* r = &g_passReads[i];
+        if (r->used == 0)
+            continue;
+        out.Add(kPassNames[r->pass]);
+        out.Add(",\"");
+        out.Add(g_itemNames[r->item]);
+        out.Add("\",");
+        out.Add(SubName(r->sub));
+        out.Add(",\"");
+        out.Add(r->func == 0 ? "-" : g_funcs[r->func - 1].name);
+        out.Add("\",");
+        out.Add(r->evidence == 0 ? "same-record" : "other-record");
+        out.Add(",");
+        out.Num(r->count);
+        out.Add(",");
+        out.Num(r->firstTick);
+        out.Add("\n");
+    }
+    WriteWhole("access.pass.csv", out);
 }
 
 }
@@ -983,6 +1245,8 @@ NS void AccessLogInit()
     g_blockLo = (unsigned)SimBlockBase();
     if (!g_classifier.Init(g_itemCount, kEdgeBits, Zeroed))
         Die("accesslog: out of memory\n");
+    g_draws = (DrawAgg*)Zeroed(sizeof(DrawAgg) << kDrawBits);
+    g_passReads = (PassRead*)Zeroed(sizeof(PassRead) << kPassBits);
     g_raw = getenv("ACCESSLOG_RAW") != 0;
     if (g_raw) {
         g_rawFile = host_file_create("access.raw.txt", 0);
@@ -996,6 +1260,11 @@ NS void AccessLogWindow(int window)
 {
     if (!g_ready)
         return;
+    ProcessSimEvent();
+    if (g_draws != 0)
+        FlushEntity();
+    g_pass = ACCESS_PASS_NONE;
+    g_entOrd = 0;
     if (g_started && g_window != ACCESS_WINDOW_OFF)
         g_classifier.EndWindow(g_tick);
     if (g_window == ACCESS_WINDOW_PRESENTATION && window != ACCESS_WINDOW_PRESENTATION) {
@@ -1062,6 +1331,34 @@ NS void AccessLogDraw(int stream, void* ra)
     unsigned s = (unsigned)stream < 3 ? (unsigned)stream : 2;
     g_stats.draws++;
     g_classifier.Ordered(s, g_idRng[s], sub, g_tick);
+    if (g_draws == 0)
+        return;
+    unsigned pass = g_pass != ACCESS_PASS_NONE ? (unsigned)g_pass : g_window == ACCESS_WINDOW_PRESENTATION ? 9u : 0u;
+    unsigned func = FunctionOf(ra);
+    EntDraw* e = 0;
+    for (unsigned i = 0; i < g_entN; i++)
+        if (g_ent[i].pass == pass && g_ent[i].stream == s && g_ent[i].sub == sub && g_ent[i].func == func)
+            e = &g_ent[i];
+    if (e == 0) {
+        if (g_entN == kEntDraws) {
+            g_phaseOverflow = true;
+            return;
+        }
+        e = &g_ent[g_entN++];
+        e->pass = pass;
+        e->stream = s;
+        e->sub = sub;
+        e->func = func;
+        e->count = 0;
+        e->tainted = 0;
+        e->taintN = 0;
+    }
+    e->count++;
+    if (g_entTaint) {
+        e->tainted = 1;
+        for (unsigned k = 0; k < g_taintN; k++)
+            AddTaint(e->taint, &e->taintN, g_taint[k]);
+    }
 }
 
 NS void AccessLogFinish()
@@ -1084,24 +1381,42 @@ NS void AccessLogFinish()
     qsort(rows, n, sizeof(Row), CompareRows);
     Out out = {0, 0, 0};
     out.Add("writer,reader,item,phase,evidence,count,first_tick\n");
+    Out cross = {0, 0, 0};
+    cross.Add("writer,reader,item,phase_from,phase_to,evidence,count,first_tick\n");
+    Out events = {0, 0, 0};
+    events.Add("writer,reader,item,phase,evidence,count,first_tick\n");
+    unsigned crossRows = 0, edgeRows = 0;
     for (unsigned i = 0; i < n; i++) {
         const ClassifierEdge& e = rows[i].e;
-        out.Add(SubName(e.writer));
-        out.Add(",");
-        out.Add(SubName(e.reader));
-        out.Add(",\"");
-        out.Add(g_itemNames[e.item]);
-        out.Add("\",");
-        out.Add(kPhaseNames[e.label]);
-        out.Add(",");
-        out.Add(kEvidenceNames[e.evidence]);
-        out.Add(",");
-        out.Num(e.count);
-        out.Add(",");
-        out.Num(e.firstTick);
-        out.Add("\n");
+        bool isEvent = e.item == g_idSimEvent;
+        Out& o = isEvent ? events : e.evidence >= EVIDENCE_CROSS ? cross : out;
+        crossRows += !isEvent && e.evidence >= EVIDENCE_CROSS;
+        edgeRows += !isEvent && e.evidence < EVIDENCE_CROSS;
+        o.Add(SubName(e.writer));
+        o.Add(",");
+        o.Add(SubName(e.reader));
+        o.Add(",\"");
+        o.Add(g_itemNames[e.item]);
+        o.Add("\",");
+        if (!isEvent && e.evidence >= EVIDENCE_CROSS) {
+            o.Add(kPhaseNames[e.from]);
+            o.Add(",");
+        }
+        o.Add(kPhaseNames[e.label]);
+        o.Add(",");
+        o.Add(kEvidenceNames[e.evidence]);
+        o.Add(",");
+        o.Num(e.count);
+        o.Add(",");
+        o.Num(e.firstTick);
+        o.Add("\n");
     }
     WriteWhole("access.edges.csv", out);
+    WriteWhole("access.cross.csv", cross);
+    WriteWhole("access.ordered.csv", events);
+    FlushEntity();
+    WriteDraws();
+    WritePassReads();
     Out stats = {0, 0, 0};
     struct {
         const char* name;
@@ -1111,7 +1426,8 @@ NS void AccessLogFinish()
                  {"unresolved_image", g_stats.unresolvedImage}, {"unresolved_block", g_stats.unresolvedBlock},
                  {"writes", g_stats.writes}, {"range_calls", g_stats.ranges}, {"range_capped", g_stats.rangeCapped},
                  {"random_draws", g_stats.draws}, {"sound_records", g_stats.sounds}, {"ui_records", g_stats.uiRecords},
-                 {"edges", n}, {"overflow", g_classifier.Overflowed() ? 1u : 0u}, {"allocations", g_allocSeq},
+                 {"edges", edgeRows}, {"cross_rows", crossRows}, {"draw_rows", g_drawsUsed}, {"pass_read_rows", g_passReadsUsed},
+                 {"phase_overflow", g_phaseOverflow ? 1u : 0u}, {"overflow", g_classifier.Overflowed() ? 1u : 0u}, {"allocations", g_allocSeq},
                  {"presentation_windows", g_presWindows}, {"presentation_active_windows", g_presActiveWindows},
                  {"presentation_rows", g_presUsed}, {"presentation_overflow", g_presOverflow ? 1u : 0u}};
     for (unsigned i = 0; i < sizeof lines / sizeof lines[0]; i++) {

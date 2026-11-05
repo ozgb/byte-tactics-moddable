@@ -57,6 +57,28 @@ presentation_active_windows (windows in which anything was read), presentation_r
 (the windows that followed a tick which emitted kind K, whether or not anything was read). The windows and counts follow
 the wall clock like the edges file's presentation rows, so tools/presreads.py keeps only what is stable.
 
+Step 4 of #830 (#838, tools/phaseclass.py) adds four files, next to the edges file and with its policy (rows that follow the
+wall clock are dropped when stored, in data/access_phases):
+
+  `<scenario>.cross.csv`    writer,reader,item,phase_from,phase_to,evidence,count,first_tick: a read in a later window of
+                            the tick of what another subsystem wrote in phase_from (`read-after-write`), or in a later
+                            phase of the tick before (`read-before-write`, with the writer's phase after the reader's). A
+                            subsystem's reads of its own writes are not recorded. Only the last write of an item counts.
+  `<scenario>.draws.csv`    pass,stream,subsystem,function,entities,draws_min,draws_max,ticks,first_tick,tainted,items:
+                            the draws of each random stream by the function that called the generator, per entity of
+                            the pass in a tick.
+  `<scenario>.pass.csv`     pass,item,reader,function,evidence,count,first_tick: reads, in a pass, of an item that an
+                            earlier entity of the pass wrote.
+  `<scenario>.ordered.csv`  the `sim-event` rows of the edges format: emissions to the sim event queue (RecordSimEvent)
+                            by different subsystems in one window, attributed to the sim caller. They are kept apart
+                            so that the edges file is the one #835 and #836 defined.
+
+A pass is the top-level loop of a phase entry function (units, projectiles, explosions, players, features, wind,
+meteors) or the steps of the tail; an entity is one turn of that loop. The game's sources mark them with stores to
+`g_accessMarks` (lib/accesslog/access_log.h): a store is a callback like any other and, unlike a call, leaves the
+compiled code's register use alone, so the counts of the edges file do not move. The marks sit where a mark costs no
+reload: a mark before `--g_game->scanIndex` in UpdateFeatures added a load of g_game a tick.
+
 `<scenario>.stats.txt` counts the accesses by attribution (unknown functions, ignored helpers) and by
 resolution (unresolved items, accesses to code or constants that no row names). `--raw` writes every access
 of the scenario to `<scenario>.raw.txt` (ACCESSLOG_RAW=1), for debugging only.
@@ -136,7 +158,8 @@ LAYOUT_FLAGS = ["--target=i686-pc-windows-msvc", "/nologo", "-fms-compatibility"
                 "-fsyntax-only", "-Xclang", "-fdump-record-layouts-complete"]
 HEAP_ROW = re.compile(r"^(?P<function>.+?): (?P<allocator>new\[\]|new|operator new|\w+)(?: (?P<what>.*?))?(?: #\d+)?$")
 TAG_TYPES = {"UNIT MEMORY": "Unit", "WEAPON ARRAY": "Projectile"}
-OUTPUT_FILES = ("access.edges.csv", "access.stats.txt", "access.presentation.csv")
+OUTPUT_FILES = ("access.edges.csv", "access.stats.txt", "access.presentation.csv", "access.cross.csv", "access.draws.csv", "access.pass.csv",
+                "access.ordered.csv")
 RAW_FILE = "access.raw.txt"
 REF_HELPER = re.compile(r"\$(?:Pod)?Ref@")
 
@@ -703,6 +726,28 @@ def loaded_save(build_dir: Path, scenario: Path, game_dir: Path, timeout: float)
     return tracediff.save_put(kept, scenario.stem, saver)
 
 
+OVERFLOW_COUNTERS = ("overflow", "phase_overflow", "presentation_overflow")
+
+
+def overflowed(name: str, stats: str) -> list[str]:
+    """One message for each overflow counter of a stats file that is above 0: a full table drops rows without a trace."""
+    counts = {}
+    for line in stats.splitlines():
+        key, _, value = line.partition(" ")
+        counts[key] = value
+    return ["%s: the counter %s is %s in its stats: a table overflowed and rows were dropped" % (name, c, counts[c])
+            for c in OVERFLOW_COUNTERS if counts.get(c, "0") != "0"]
+
+
+def check_stats(name: str, stats: Path) -> None:
+    """Exit with a message naming the scenario and the counter when its stats file shows an overflow."""
+    if not stats.is_file():
+        return
+    problems = overflowed(name, stats.read_text())
+    if problems:
+        raise SystemExit("accesslog: " + "\n".join(problems))
+
+
 def steady(edges: Path) -> list[str]:
     """The lines of an edges file that do not depend on how many frames the run drew between ticks."""
     return [line for line in edges.read_text().splitlines() if ",presentation," not in line]
@@ -746,8 +791,11 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
         directory, seconds = play(build_dir / "TotalA.exe", scenario, game_dir, build_dir, raw, timeout, put)
         why = trace_difference(directory / "trace.txt", stored)
         print("%s: %s" % (name, "trace EQUAL to reference/traces/%s.txt" % name if why is None else "trace DIFFERS, " + why))
+        check_stats(name, directory / "access.stats.txt")
         failed += why is not None
-        for suffix, source in (("edges.csv", "access.edges.csv"), ("stats.txt", "access.stats.txt"), ("presentation.csv", "access.presentation.csv"), ("raw.txt", RAW_FILE)):
+        for suffix, source in (("edges.csv", "access.edges.csv"), ("stats.txt", "access.stats.txt"), ("presentation.csv", "access.presentation.csv"),
+                               ("cross.csv", "access.cross.csv"), ("draws.csv", "access.draws.csv"), ("pass.csv", "access.pass.csv"),
+                               ("ordered.csv", "access.ordered.csv"), ("raw.txt", RAW_FILE)):
             if (directory / source).is_file():
                 shutil.copyfile(directory / source, out / ("%s.%s" % (name, suffix)))
         if twice:

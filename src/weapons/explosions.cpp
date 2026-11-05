@@ -318,10 +318,20 @@ void __stdcall ExplodeUnitPieces(Unit* unit)
     }
 }
 
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
+
 // FUNCTION: 0x420f30
 void UpdateExplosions()
 {
+#if BT_ACCESS_LOG
+    AccessLogPassScope accessPass(ACCESS_PASS_EXPLOSIONS);
+#endif
     for (int i = 0; i < 100; i++) {
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         if (g_explodedPieces[i] != 0 && UpdateExplodedPiece(g_explodedPieces[i]) == 0)
             g_explodedPieces[i] = 0;
     }
@@ -331,6 +341,9 @@ void UpdateExplosions()
     DebrisView* base = d;
     int n;
     for (n = 0; n < *pCount; n++, d++) {
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         if (d->obj != 0) {
             Vec3 old = d->pos;
             d->pos.x += d->size.x + d->vel.x;

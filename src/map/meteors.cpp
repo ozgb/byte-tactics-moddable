@@ -101,9 +101,17 @@ static inline void StartShower()
     g_meteorOrigin = AddPoints(MakePoint(offsetX, offsetZ), g_meteorTarget);
 }
 
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
+
 // FUNCTION: 0x437de0
 void UpdateMeteors()
 {
+#if BT_ACCESS_LOG
+    AccessLogPassScope accessPass(ACCESS_PASS_METEORS);
+    AccessLogEntity();
+#endif
     if (g_meteorNextStrikeTime <= (unsigned int)g_game->ticks) {
         StartShower();
         if (g_meteorsEnabled == 0)

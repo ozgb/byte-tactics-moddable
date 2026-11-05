@@ -90,7 +90,7 @@ static void* Alloc(unsigned n) { return calloc(n, 1); }
 int main()
 {
     Classifier c;
-    if (!c.Init(64, 12, Alloc))
+    if (!c.Init(64, 16, Alloc))
         return 2;
     char op;
     unsigned a, b, d, e, f;
@@ -98,7 +98,8 @@ int main()
         if (op == 'B') { scanf("%u", &a); c.BeginWindow(a); }
         else if (op == 'L') { scanf("%u", &a); c.ResolveLabel(a); }
         else if (op == 'E') { scanf("%u", &a); c.EndWindow(a); }
-        else if (op == 'r') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); c.Read(a, b, d, e, f); }
+        else if (op == 'r') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); fprintf(stderr, "%u\n", c.Read(a, b, d, e, f)); }
+        else if (op == 'n') { scanf("%u", &a); c.Entity(a); }
         else if (op == 'w') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); c.Write(a, b, d, e, f); }
         else if (op == 'o') { scanf("%u %u %u %u", &a, &b, &d, &e); c.Ordered(a, b, d, e); }
     }
@@ -113,17 +114,24 @@ int main()
         if (x.reader != y.reader) return x.reader < y.reader;
         if (x.item != y.item) return x.item < y.item;
         if (x.label != y.label) return x.label < y.label;
+        if (x.from != y.from) return x.from < y.from;
         return x.evidence < y.evidence;
     });
     for (auto& x : edges)
-        printf("%u %u %u %u %u %u %u\n", x.writer, x.reader, x.item, x.label, x.evidence, x.count, x.firstTick);
+    {
+        printf("%u %u %u %u %u %u %u", x.writer, x.reader, x.item, x.label, x.evidence, x.count, x.firstTick);
+        if (x.evidence >= EVIDENCE_CROSS)
+            printf(" %u", x.from);
+        printf("\n");
+    }
     return c.Overflowed() ? 3 : 0;
 }
 """
 
 NO_SUB = 0xFFFF
 PENDING = 10
-RAW, UNWRITTEN, UNREAD, ORDERED = range(4)
+RAW, UNWRITTEN, UNREAD, ORDERED, CROSS, CARRIED = range(6)
+EARLIER_ENTITY, SAME_RECORD = 1, 2
 
 
 class ReferenceClassifier:
@@ -136,9 +144,15 @@ class ReferenceClassifier:
         self.streams = {}
         self.stamp = 1
         self.label = 0
+        self.epoch = 1
+        self.window = 0
+        self.current = 0
+        self.window_labels = [[0] * 32, [0] * 32]
+        self.entity = 0
+        self.flags = []
 
-    def count(self, writer, reader, item, evidence, tick):
-        key = (writer, reader, item, self.label, evidence)
+    def count(self, writer, reader, item, evidence, tick, frm=0):
+        key = (writer, reader, item, self.label, frm, evidence)
         if key in self.edges and self.edges[key][0] > 0:
             self.edges[key][0] += 1
         else:
@@ -148,17 +162,26 @@ class ReferenceClassifier:
         self.stamp += 1
         self.label = label
         self.written = []
+        self.entity = 0
+        if label == PENDING:
+            self.epoch += 1
+            self.current ^= 1
+            self.window = 0
+        elif self.window < 31:
+            self.window += 1
+        self.window_labels[self.current][self.window] = label
 
     def resolve(self, label):
         if self.label != PENDING:
             return
         self.label = label
+        self.window_labels[self.current][self.window] = label
         for key in [k for k in self.edges if k[3] == PENDING]:
             count, first = self.edges[key]
             if count == 0:
                 continue
             self.edges[key][0] = 0
-            to = key[:3] + (label, key[4])
+            to = key[:3] + (label,) + key[4:]
             if to in self.edges and self.edges[to][0] > 0:
                 self.edges[to][0] += count
                 self.edges[to][1] = min(self.edges[to][1], first)
@@ -172,21 +195,41 @@ class ReferenceClassifier:
                 self.count(s["writer"], NO_SUB, item, UNREAD, tick)
         self.written = []
 
+    def item_state(self, item):
+        return self.state.setdefault(item, {"stamp": 0, "writer": 0, "ent": (0, 0), "read": 0, "ord": 0,
+                                            "epoch": 0, "wsub": 0, "win": 0})
+
     def read(self, item, a, b, sub, tick):
-        s = self.state.setdefault(item, {"stamp": 0, "writer": 0, "ent": (0, 0), "read": 0})
+        s = self.item_state(item)
+        flags = 0
         if s["stamp"] == self.stamp:
             if s["writer"] != sub or s["ent"] != (a, b):
                 self.count(s["writer"], sub, item, RAW, tick)
             s["read"] = 1
+            if s["ord"] != 0 and s["ord"] < self.entity:
+                flags |= EARLIER_ENTITY
+                if s["ent"] == (a, b):
+                    flags |= SAME_RECORD
         else:
             self.count(NO_SUB, sub, item, UNWRITTEN, tick)
+            if s["epoch"] == self.epoch and s["wsub"] != sub:
+                self.count(s["wsub"], sub, item, CROSS, tick, self.window_labels[self.current][s["win"]])
+            elif s["epoch"] != 0 and s["epoch"] + 1 == self.epoch and s["wsub"] != sub:
+                frm = self.window_labels[self.current ^ 1][s["win"]]
+                if self.label == PENDING or frm > self.label:
+                    self.count(s["wsub"], sub, item, CARRIED, tick, frm)
+        self.flags.append(flags)
 
     def write(self, item, a, b, sub, tick):
-        s = self.state.setdefault(item, {"stamp": 0, "writer": 0, "ent": (0, 0), "read": 0})
+        s = self.item_state(item)
         if s["stamp"] != self.stamp:
             s["stamp"] = self.stamp
             self.written.append(item)
         s["writer"], s["ent"], s["read"] = sub, (a, b), 0
+        s["ord"], s["epoch"], s["wsub"], s["win"] = self.entity, self.epoch, sub, self.window
+
+    def set_entity(self, ordinal):
+        self.entity = ordinal
 
     def ordered(self, stream, item, sub, tick):
         last = self.streams.get(stream)
@@ -196,14 +239,15 @@ class ReferenceClassifier:
 
     def lines(self):
         rows = sorted((k, v) for k, v in self.edges.items() if v[0] > 0)
-        return ["%u %u %u %u %u %u %u" % (k[0], k[1], k[2], k[3], k[4], v[0], v[1]) for k, v in rows]
+        return ["%u %u %u %u %u %u %u" % (k[0], k[1], k[2], k[3], k[5], v[0], v[1]) + (" %u" % k[4] if k[5] >= CROSS else "")
+                for k, v in rows]
 
 
 def feed(script, reference):
     """Run a script (a list of tuples) through the Python reference and return the C++ driver's text for it."""
     for op, *args in script:
         {"B": reference.begin, "L": reference.resolve, "E": reference.end, "r": reference.read, "w": reference.write,
-         "o": reference.ordered}[op](*args)
+         "o": reference.ordered, "n": reference.set_entity}[op](*args)
     return "\n".join("%s %s" % (op, " ".join(str(a) for a in args)) for op, *args in script) + "\n"
 
 
@@ -229,6 +273,7 @@ class ClassifierTest(unittest.TestCase):
         text = feed(script, reference)
         run = subprocess.run([str(self.exe)], input=text, capture_output=True, text=True, check=True)
         self.assertEqual(run.stdout.splitlines(), reference.lines())
+        self.assertEqual([int(x) for x in run.stderr.split()], reference.flags)
         return reference.lines()
 
     def test_read_after_write_by_another_subsystem(self):
@@ -271,25 +316,117 @@ class ClassifierTest(unittest.TestCase):
         self.assertIn("1 2 1 0 0 1 9", lines)
         self.assertEqual([line for line in lines if line.split()[3] == str(PENDING)], [])
 
+    def test_a_later_phase_reads_what_an_earlier_one_wrote(self):
+        lines = self.both([("B", PENDING), ("w", 5, 0, 0, 1, 1), ("L", 1), ("E", 1), ("B", 2), ("r", 5, 0, 0, 2, 2), ("E", 2)])
+        self.assertIn("1 2 5 2 %u 1 2 1" % CROSS, lines)
+        self.assertIn("%u 2 5 2 %u 1 2" % (NO_SUB, UNWRITTEN), lines)
+
+    def test_the_same_subsystem_reading_an_earlier_phase_write_is_no_cross_edge(self):
+        lines = self.both([("B", PENDING), ("w", 5, 0, 0, 1, 1), ("L", 1), ("E", 1), ("B", 2), ("r", 5, 0, 0, 1, 2), ("E", 2)])
+        self.assertEqual([line for line in lines if line.split()[4] == str(CROSS)], [])
+
+    def test_a_write_of_the_pending_window_keeps_the_phase_it_resolves_to(self):
+        lines = self.both([("B", PENDING), ("w", 5, 0, 0, 1, 1), ("L", 1), ("E", 1), ("B", 3), ("r", 5, 0, 0, 2, 2), ("E", 2)])
+        self.assertIn("1 2 5 3 %u 1 2 1" % CROSS, lines)
+
+    def test_the_last_write_of_the_tick_is_the_one_a_later_phase_reads(self):
+        lines = self.both([("B", PENDING), ("w", 5, 0, 0, 1, 1), ("L", 1), ("E", 1), ("B", 2), ("w", 5, 0, 0, 3, 2), ("E", 2),
+                           ("B", 4), ("r", 5, 0, 0, 2, 2), ("E", 2)])
+        self.assertIn("3 2 5 4 %u 1 2 2" % CROSS, lines)
+        self.assertNotIn("1 2 5 4 %u 1 2 1" % CROSS, lines)
+
+    def test_a_read_of_the_last_ticks_later_phase_write_is_carried(self):
+        lines = self.both([("B", PENDING), ("L", 1), ("E", 1), ("B", 4), ("w", 5, 0, 0, 1, 1), ("E", 1),
+                           ("B", PENDING), ("r", 5, 0, 0, 2, 2), ("L", 1), ("E", 2)])
+        self.assertIn("1 2 5 1 %u 1 2 4" % CARRIED, lines)
+
+    def test_a_carried_read_of_an_earlier_phase_write_is_not_recorded(self):
+        lines = self.both([("B", PENDING), ("L", 1), ("E", 1), ("B", 4), ("w", 5, 0, 0, 1, 1), ("E", 1),
+                           ("B", PENDING), ("L", 1), ("E", 2), ("B", 5), ("r", 5, 0, 0, 2, 2), ("E", 2)])
+        self.assertEqual([line for line in lines if line.split()[4] == str(CARRIED)], [])
+
+    def test_a_write_two_ticks_ago_is_no_evidence(self):
+        lines = self.both([("B", PENDING), ("L", 1), ("w", 5, 0, 0, 1, 1), ("E", 1), ("B", PENDING), ("L", 1), ("E", 2),
+                           ("B", PENDING), ("r", 5, 0, 0, 2, 3), ("L", 1), ("E", 3)])
+        self.assertEqual([line for line in lines if int(line.split()[4]) >= CROSS], [])
+
+    def test_the_entity_ordinal_of_the_writer_tells_an_earlier_entity_from_the_same_one(self):
+        self.both([("B", 2), ("n", 1), ("w", 5, 7, 7, 1, 1), ("r", 5, 7, 7, 1, 1), ("n", 2), ("r", 5, 7, 7, 1, 1),
+                   ("r", 5, 8, 8, 1, 1), ("w", 5, 8, 8, 1, 1), ("r", 5, 8, 8, 1, 1), ("E", 1)])
+        reference = ReferenceClassifier()
+        feed([("B", 2), ("n", 1), ("w", 5, 7, 7, 1, 1), ("r", 5, 7, 7, 1, 1), ("n", 2), ("r", 5, 7, 7, 1, 1),
+              ("r", 5, 8, 8, 1, 1), ("w", 5, 8, 8, 1, 1), ("r", 5, 8, 8, 1, 1), ("E", 1)], reference)
+        self.assertEqual(reference.flags, [0, EARLIER_ENTITY | SAME_RECORD, EARLIER_ENTITY, 0])
+
+    def test_a_write_outside_every_entity_is_no_earlier_entity(self):
+        reference = ReferenceClassifier()
+        feed([("B", 2), ("w", 5, 0, 0, 1, 1), ("n", 3), ("r", 5, 0, 0, 1, 1), ("E", 1)], reference)
+        self.assertEqual(reference.flags, [0])
+        self.both([("B", 2), ("w", 5, 0, 0, 1, 1), ("n", 3), ("r", 5, 0, 0, 1, 1), ("E", 1)])
+
+    def test_a_new_window_starts_outside_every_entity(self):
+        self.both([("B", 2), ("n", 4), ("w", 5, 0, 0, 1, 1), ("E", 1), ("B", 3), ("w", 6, 0, 0, 1, 1), ("n", 1), ("r", 6, 0, 0, 1, 1), ("E", 1)])
+
     def test_a_long_random_sequence_agrees_with_the_reference(self):
         rng = random.Random(835)
         script = []
         tick = 0
         for _ in range(300):
             tick += 1
-            label = rng.choice([PENDING, 1, 2, 3, 8, 9])
+            label = rng.choice([PENDING, PENDING, 1, 2, 3, 8, 9])
             script.append(("B", label))
             for _ in range(rng.randrange(1, 60)):
-                kind = rng.choice("rrrwwo")
+                kind = rng.choice("rrrwwon")
                 item, sub = rng.randrange(40), rng.randrange(5)
                 if kind == "o":
                     script.append(("o", rng.randrange(4), 60 + rng.randrange(4), sub, tick))
+                elif kind == "n":
+                    script.append(("n", rng.randrange(5)))
                 else:
                     script.append((kind, item, rng.randrange(3), rng.randrange(3), sub, tick))
             if label == PENDING:
                 script.append(("L", rng.choice([0, 1])))
             script.append(("E", tick))
-        self.both(script)
+        lines = self.both(script)
+        kinds = {int(line.split()[4]) for line in lines}
+        self.assertTrue({CROSS, CARRIED} <= kinds)
+
+
+class OverflowTest(unittest.TestCase):
+    STATS = "accesses 5\noverflow %d\nphase_overflow %d\npresentation_overflow %d\nwrites 1\n"
+
+    def test_each_counter_above_zero_fails_the_scenario(self):
+        for counter in range(3):
+            values = [0, 0, 0]
+            values[counter] = 2
+            with tempfile.TemporaryDirectory() as t:
+                path = Path(t) / "s.stats.txt"
+                path.write_text(self.STATS % tuple(values))
+                with self.assertRaises(SystemExit) as caught:
+                    al.check_stats("scen", path)
+                self.assertIn("scen", str(caught.exception))
+                self.assertIn(al.OVERFLOW_COUNTERS[counter] + " is 2", str(caught.exception))
+
+    def test_all_counters_at_zero_pass(self):
+        with tempfile.TemporaryDirectory() as t:
+            path = Path(t) / "s.stats.txt"
+            path.write_text(self.STATS % (0, 0, 0))
+            al.check_stats("scen", path)
+        self.assertEqual(al.overflowed("scen", self.STATS % (0, 0, 0)), [])
+
+    def test_the_store_paths_fail_on_an_overflow(self):
+        import depclass
+        import phaseclass
+
+        with tempfile.TemporaryDirectory() as t:
+            src = Path(t) / "src"
+            src.mkdir()
+            (src / "s.edges.csv").write_text("writer,reader,item,phase,evidence,count,first_tick\n")
+            (src / "s.stats.txt").write_text(self.STATS % (0, 1, 0))
+            for store in (depclass.store, phaseclass.store):
+                with self.assertRaises(SystemExit) as caught:
+                    store(src, Path(t) / "dst")
+                self.assertIn("s: the counter phase_overflow", str(caught.exception))
 
 
 class MapTest(unittest.TestCase):

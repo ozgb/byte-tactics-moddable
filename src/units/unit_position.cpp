@@ -259,9 +259,16 @@ static inline int PlayerMore(unsigned char i)
     return 1;
 }
 
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
+
 // FUNCTION: 0x48ad30
 void __stdcall UpdateAllUnits(void)
 {
+#if BT_ACCESS_LOG
+    AccessLogPassScope accessPass(ACCESS_PASS_UNITS);
+#endif
     int* cnt;
     unsigned char i;
     int off;
@@ -282,6 +289,9 @@ void __stdcall UpdateAllUnits(void)
             Unit* u = p->unitsBegin;
             while (u <= last) {
                     if (u->unitDefIndex != 0) {
+#if BT_ACCESS_LOG
+                        AccessLogEntity();
+#endif
                         (*cnt)++;
                         UpdateWindGenerator(u);
                         if (p->active != 0) {

@@ -5,6 +5,7 @@
     uv run tools/depclass.py --write         # writes data/dependencies.csv from data/access/*.edges.csv
     uv run tools/depclass.py --check         # fail if data/dependencies.csv differs from what the stored summaries regenerate,
                                              # if a scenario has no summary, or if a coupling.csv edge has no row
+                                             # (and the same for the four files of tools/phaseclass.py)
     uv run tools/test_depclass.py            # tests, on synthetic summaries
 
 This is step 2 of #830. Its input is data/access/<scenario>.edges.csv.gz, one file per scenario of
@@ -12,7 +13,9 @@ reference/scenarios, which tools/accesslog.py (#835) writes (columns writer,read
 first_tick). The stored files are the output of `accesslog.py run` with the rows of the `presentation` window
 dropped (their counts follow the wall clock; #839 reads them) and gzipped with a zero mtime, so that the same
 rows give the same bytes; `tail` is kept and is classified as a phase.
-This tool reads only those files, data/coupling.csv and the names of reference/scenarios, never build/.
+The ordered rows of the sim event queue (item `sim-event`, step 4's data/access_phases/<scenario>.ordered.csv.gz, in the
+format of the edges files) are read with them: the order of the events that two subsystems queue in one phase is the
+state, like the order of their draws. This tool reads only those files, data/coupling.csv and the names of reference/scenarios, never build/.
 
 Simulation subsystems are coupling.SIM_SUBSYSTEMS: wind_meteors, economy, features, ai, pathfinding, weapons,
 targeting, los_radar, orders, units, players, map. A row whose writer or reader is anything else (game, network,
@@ -74,6 +77,8 @@ import sources
 
 ROOT = sources.ROOT
 ACCESS_DIR = ROOT / "data/access"
+ORDERED_DIR = ROOT / "data/access_phases"
+ORDERED_SUFFIX = ".ordered.csv.gz"
 SUFFIX = ".edges.csv"
 COUPLING_CSV = ROOT / "data/coupling.csv"
 SCENARIOS = ROOT / "reference/scenarios"
@@ -81,7 +86,7 @@ OUTPUT = ROOT / "data/dependencies.csv"
 COLUMNS = ["writer", "reader", "item", "phase", "class", "runs", "example", "flags"]
 SIM = frozenset(coupling.SIM_SUBSYSTEMS)
 NONE = "-"
-ORDERED_ITEMS = ("sound", "ui")
+ORDERED_ITEMS = ("sound", "ui", "sim-event")
 ORDERED_PREFIX = "rng."
 DYNAMIC_ONLY = "dynamic-only"
 RANK = {"ordered": 0, "immediate": 1, "deferrable": 2, "read-only": 3, "unobserved": 4}
@@ -97,14 +102,24 @@ def read_summary(text: str) -> list[dict]:
     return [{**r, "first_tick": int(r["first_tick"])} for r in csv.DictReader(io.StringIO(text))]
 
 
-def load_summaries(directory: Path) -> dict[str, list[dict]]:
-    """Scenario name to the rows of its stored edges file."""
-    return {p.name[: -len(SUFFIX + ".gz")]: read_summary(gzip.decompress(p.read_bytes()).decode())
-            for p in sorted(directory.glob("*" + SUFFIX + ".gz"))}
+def load_summaries(directory: Path, ordered: Path | None = None) -> dict[str, list[dict]]:
+    """Scenario name to the rows of its stored edges file, and of its stored ordered file in `ordered`, if it has one."""
+    out = {p.name[: -len(SUFFIX + ".gz")]: read_summary(gzip.decompress(p.read_bytes()).decode())
+           for p in sorted(directory.glob("*" + SUFFIX + ".gz"))}
+    if ordered is not None:
+        for name, rows in out.items():
+            extra = ordered / (name + ORDERED_SUFFIX)
+            if extra.is_file():
+                rows.extend(read_summary(gzip.decompress(extra.read_bytes()).decode()))
+    return out
 
 
 def store(source: Path, directory: Path) -> int:
     """Keep each edges file of source (accesslog.py's output) in directory, gzipped, without the presentation rows."""
+    import accesslog
+
+    for stats in sorted(source.glob("*.stats.txt")):
+        accesslog.check_stats(stats.name[: -len(".stats.txt")], stats)
     directory.mkdir(exist_ok=True)
     count = 0
     for path in sorted(source.glob("*" + SUFFIX)):
@@ -215,12 +230,12 @@ def main() -> int:
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--store", type=Path, metavar="DIR", help="store the edges files of DIR in data/access")
     mode.add_argument("--write", action="store_true", help="write data/dependencies.csv")
-    mode.add_argument("--check", action="store_true", help="fail if data/dependencies.csv is stale or a coupling edge has no row")
+    mode.add_argument("--check", action="store_true", help="fail if data/dependencies.csv or a phase file (tools/phaseclass.py) is stale or a coupling edge has no row")
     args = ap.parse_args()
     if args.store:
         print("depclass: stored %d summaries" % store(args.store, ACCESS_DIR))
         return 0
-    summaries = load_summaries(ACCESS_DIR)
+    summaries = load_summaries(ACCESS_DIR, ORDERED_DIR)
     coupling_rows = read_coupling(COUPLING_CSV.read_text())
     rows = classify(summaries, coupling_rows)
     text = render(rows)
@@ -237,10 +252,13 @@ def main() -> int:
     if have != text:
         diff = difflib.unified_diff(have.splitlines(), text.splitlines(), "data/dependencies.csv", "regenerated", lineterm="", n=0)
         problems.append("data/dependencies.csv differs from the stored summaries (uv run tools/depclass.py --write):\n" + "\n".join(list(diff)[:40]))
+    import phaseclass
+
+    problems += phaseclass.check_stored()
     if problems:
         print("\n".join(problems))
         return 1
-    print("depclass: data/dependencies.csv matches %d summaries, %d rows" % (len(summaries), len(rows)))
+    print("depclass: data/dependencies.csv matches %d summaries, %d rows; the phase files match" % (len(summaries), len(rows)))
     return 0
 
 

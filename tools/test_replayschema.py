@@ -373,6 +373,35 @@ class TargetingForms(unittest.TestCase):
         self.assertIn("ImportOutUnits(line, \"out\", a4, kReplayReachFields + %d, 7);" % out["reachFirst"], files[rs.HOOKS_H])
         self.assertIn("ApplyUnits(a4, \"out\");", files[rs.SLOTS_H])
 
+    def test_a_unit_buffer_slot_is_played_as_the_recorded_vector_form(self):
+        files, errors, model = self.generated()
+        self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadiusList" in e], [])
+        slot = model["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadiusList"]
+        self.assertEqual(slot["playsAs"], "GetVisibleEnemiesInRadius")
+        self.assertEqual([a["mode"] for a in slot["args"]], ["scalar", "vec3", "scalar", "scalar", "units-buffer", "scalar"])
+        self.assertNotIn("GetVisibleEnemiesInRadiusList(pos)", model["subsystems"]["ai"]["pending"]["unannotatedArgs"])
+        self.assertNotIn("GetVisibleEnemiesInRadiusList(out)", model["subsystems"]["ai"]["pending"]["unannotatedArgs"])
+        stub = files[rs.SLOTS_H]
+        body = stub[stub.index("Imp_ai_GetVisibleEnemiesInRadiusList"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('StartImport(t, "ai.GetVisibleEnemiesInRadius");', body)
+        self.assertIn("return EnterList(t, a4, a5);", body)
+        self.assertIn("g_import_ai.GetVisibleEnemiesInRadiusList = Imp_ai_GetVisibleEnemiesInRadiusList;", stub)
+
+    def test_a_unit_buffer_needs_a_slot_to_play_as_and_a_capacity(self):
+        ann = annotations()
+        del ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"]
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("has a unit buffer and no `playsAs`" in e for e in errors), errors)
+        ann = annotations()
+        ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"] = "HasReadyUnitInRange"
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("`playsAs` HasReadyUnitInRange takes the arguments" in e for e in errors), errors)
+        ann = annotations()
+        ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadiusList"]["args"]["out"]["capacity"] = "pos"
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("needs a `capacity` that names an integer argument" in e for e in errors), errors)
+
     def test_a_reach_deeper_than_its_depth_is_an_error(self):
         ann = annotations()
         out = ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]

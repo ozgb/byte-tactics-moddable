@@ -1000,7 +1000,7 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
     return out
 
 
-ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "vector", "callback", "pending"}
+ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "units-buffer", "vector", "callback", "pending"}
 STATE_PATH = re.compile(r"^Game(\.[A-Za-z_]\w*)+$")
 
 
@@ -1119,6 +1119,12 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: %s is an out struct, and only a struct in or inout can be nullable" % (where, label))
         elif a["mode"] == "vector":
             check_vector_arg(where, a, label, kinds, errors)
+        elif a["mode"] == "units-buffer":
+            if a.get("dir") != "out" or a.get("kind") not in kinds:
+                errors.append("%s: %s is a unit buffer, which is `dir: out` and names a `kind`" % (where, label))
+            count = a.get("capacity")
+            if count not in names or count == a["name"] or args[names.index(count)]["type"] not in INTEGER_ARGS:
+                errors.append("%s: %s needs a `capacity` that names an integer argument" % (where, label))
         elif a["mode"] in ("bytes-in", "bytes-out"):
             check_length(where, a, label, args, errors)
         elif a["mode"] == "structs":
@@ -1157,9 +1163,21 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
     return errors
 
 
+def check_plays_as(where: str, target: str, args: list[dict], slots: dict) -> list[str]:
+    """Errors for `playsAs`: the slot must be recorded before it, and take the same arguments besides the buffer and its capacity."""
+    if target not in slots:
+        return ["%s: `playsAs` names %s, which is no recorded slot that comes before it in the interface" % (where, target)]
+    extra = {a["name"] for a in args if a["mode"] == "units-buffer"} | {a.get("capacity") for a in args if a["mode"] == "units-buffer"}
+    mine = [(a["name"], a["mode"], a.get("label")) for a in args if a["name"] not in extra]
+    theirs = [(a["name"], a["mode"], a.get("label")) for a in slots[target]["args"] if a["mode"] not in ("units", "vector")]
+    if mine != theirs:
+        return ["%s: `playsAs` %s takes the arguments %s, and the slot takes %s besides its buffer and capacity" % (where, target, theirs, mine)]
+    return []
+
+
 def reached_kinds(slot: dict, object_fields: list[dict]) -> set[str]:
     """The object kinds a slot's arguments, result, all-of tables and object fields lead to."""
-    kinds = {a["kind"] for a in slot["args"] if a.get("mode") in ("object", "units") and a.get("kind")}
+    kinds = {a["kind"] for a in slot["args"] if a.get("mode") in ("object", "units", "units-buffer") and a.get("kind")}
     if slot["result"] is not None and slot["result"].get("mode") == "object" and slot["result"].get("kind"):
         kinds.add(slot["result"]["kind"])
     kinds.update(slot["allOf"])
@@ -1518,12 +1536,18 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 pending["args"].append("%s result" % s["name"])
             for into in (obj_reads, obj_writes):
                 into.update(blobs[i] for i in list(into) if i in blobs)
+            if "playsAs" in note:
+                errors += check_plays_as("%s.%s" % (sub, s["name"]), note["playsAs"], args, slots)
+            elif any(a["mode"] == "units-buffer" for a in args):
+                errors.append("%s.%s has a unit buffer and no `playsAs`, the slot whose recorded form it replays" % (sub, s["name"]))
             entry = {
                 "conv": s["conv"], "ret": s["ret"], "functions": functions,
                 "reads": [f for f in order if f in reads], "writes": [f for f in order if f in writes],
                 "objectReads": sorted(obj_reads), "objectWrites": sorted(obj_writes), "allOf": [k for k in kind_names if k in all_of],
                 "args": args, "result": result, "native": note.get("native", s["name"]),
             }
+            if "playsAs" in note:
+                entry["playsAs"] = note["playsAs"]
             if skipped:
                 unrecorded[s["name"]].update(entry)
                 continue
@@ -2221,7 +2245,7 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
             return ['ArgVec3(s_call, "%s", %s);' % (line, var)]
         if phase == "i":
             return ['ImportVec3%s(line, "%s", %s);' % ("Xz" if a.get("axes") == "xz" else "", a.get("label", line), var)]
-    elif mode == "units" or mode == "vector":
+    elif mode in ("units", "units-buffer", "vector"):
         return []
     elif mode == "callback":
         if phase == "i":
@@ -2289,10 +2313,15 @@ def render_slots(ann: dict, model: dict) -> str:
             seam, slot = imp.split(".")
             if slot not in imports.setdefault(seam, []):
                 imports[seam].append(slot)
+    replays = {}
     for seam, slots in imports.items():
         spec = subsystems[seam]
         for slot in slots:
             L += import_stub(seam, slot, {**spec["slots"], **imported_unrecorded(spec)}[slot])
+        for slot, s in spec["slots"].items():
+            if s.get("playsAs") in slots:
+                replays.setdefault(seam, []).append(slot)
+                L += list_stub(seam, slot, s)
     for sub, spec in ready.items():
         L.append("%s g_native_%s = {" % (spec["struct"], sub))
         for slot in (x["name"] for x in parse_interface(sub, spec["struct"])["slots"]):
@@ -2328,7 +2357,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for seam, slots in imports.items():
         if seam not in ready:
             L.append("    g_seams.%s = &g_import_%s;" % (seam, seam))
-            for slot in slots:
+            for slot in slots + replays.get(seam, []):
                 L.append("    g_import_%s.%s = Imp_%s_%s;" % (seam, slot, seam, slot))
     L += ["}", ""]
     return "\n".join(L)
@@ -2367,6 +2396,27 @@ def nested_player(ready: dict) -> list[str]:
                       "            scope.Restore();", "            CallbackDone(import, k, args, have.Data());", "            have.Free();"]
             L += ["            continue;", "        }"]
     L += ["        CallbackUnknown(import, k, name);", "    }", "}", ""]
+    return L
+
+
+def list_stub(seam: str, slot: str, s: dict) -> list[str]:
+    """The stub of a slot that fills a caller's buffer: it asks for the recorded import of its `playsAs` slot and answers the module from that line."""
+    params = ", ".join("%s a%d" % (s["params"][i], i) for i in range(len(s["args"])))
+    names = [a["name"] for a in s["args"]]
+    buffer = [i for i, a in enumerate(s["args"]) if a["mode"] == "units-buffer"][0]
+    capacity = names.index(s["args"][buffer]["capacity"])
+    L = ["%s %s Imp_%s_%s(%s)" % (s["ret"], s["conv"], seam, slot, params), "{", "    ReplayText t;", '    StartImport(t, "%s.%s");' % (seam, s["playsAs"])]
+    for i, a in enumerate(s["args"]):
+        if i in (buffer, capacity):
+            continue
+        if a["mode"] == "scalar":
+            L.append("    Space(t);\n    ReplayValue(t, a%d);" % i)
+        elif a["mode"] == "vec3":
+            L.append('    Space(t);\n    t.Add("%s=");\n    AddVec3(t, a%d);' % (a.get("label", a["line"]), i))
+        else:
+            raise Error("%s.%s: the argument %s of a slot that plays as another has the mode %s" % (seam, slot, a["name"], a["mode"]))
+    L.append("    return EnterList(t, a%d, a%d);" % (buffer, capacity))
+    L += ["}", ""]
     return L
 
 

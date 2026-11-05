@@ -921,10 +921,9 @@ int __stdcall RecAiGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2,
     SlotScope scope(RSL_AI_GETVISIBLEENEMIESINRADIUSLIST, SUB_AI, roots);
     if (scope.Open()) {
         ArgValue(s_call, "player", a0);
-        ArgPending(s_call, "pos");
+        ArgVec3(s_call, "pos", a1);
         ArgValue(s_call, "radius", a2);
         ArgValue(s_call, "flags", a3);
-        ArgPending(s_call, "out");
         ArgValue(s_call, "capacity", a5);
     }
     int result = s_inner_ai->GetVisibleEnemiesInRadiusList(a0, a1, a2, a3, a4, a5);

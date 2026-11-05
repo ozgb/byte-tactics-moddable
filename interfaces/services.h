@@ -124,7 +124,7 @@ enum SimEventKind : unsigned short {
     SIM_EVENT_CD_ACTIVITY = 12,
     // A side's forces are all destroyed: the player index.
     SIM_EVENT_FORCES_DESTROYED = 13,
-    // The score panel flashes a kill and a loss: the killer's slot and the loser's player index, -1 for none.
+    // The score panel flashes a kill and a loss: the killer's player index (never 10, none) and the loser's player index.
     SIM_EVENT_SCORE_FLASH = 14,
     // The orders panel of a unit needs a refresh: the unit index.
     SIM_EVENT_SELECTION_ORDERS_DIRTY = 15,

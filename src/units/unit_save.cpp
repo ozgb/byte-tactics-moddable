@@ -243,7 +243,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
         do {
             sprintf(name, "u%04xm%04x", unit->id, k);
             Order* p = g_seams.orders->LoadOrder(unit, file, name);
-            if (p->flags_42 & 0x40000) {
+            if (p->flags_42 & ORDER_FLAG_SECOND_LIST) {
                 *special = p;
                 special = &p->next;
             } else {

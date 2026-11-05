@@ -845,7 +845,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", order->target, &order->pos, 0, 0, 0));
         return 5;
     }
-    if (order->target == 0 && (order->flags_42 & 0x200)) {
+    if (order->target == 0 && (order->flags_42 & ORDER_FLAG_TARGET)) {
         if (order->next == 0)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", 0, &unit->pos, 0, 0, 0));
         return 5;
@@ -1096,7 +1096,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                 (order->target->def->flags1&0x40) && order->target->list &&
                 (order->target->list->flags_42&0x100000) && unit!=order->target->list->target) {
                 int building = order->target->list->kind=="MobileBuild" || order->target->list->kind=="BuildingBuild" || order->target->list->kind=="VTOL_MobileBuild";
-                int actionable = ((order->target->list->flags_42&0x200) && order->target->list->target) || (order->target->list->flags_42&0x400);
+                int actionable = ((order->target->list->flags_42&ORDER_FLAG_TARGET) && order->target->list->target) || (order->target->list->flags_42&ORDER_FLAG_POSITION);
                 MissionType kind;
                 if (!building && actionable) {
                     kind=order->target->list->kind;
@@ -1368,7 +1368,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         return 5;
     }
     Unit* target = order->target;
-    if (!target && (order->flags_42 & 0x200)) {
+    if (!target && (order->flags_42 & ORDER_FLAG_TARGET)) {
         if (!order->next)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", 0, &unit->pos, 0, 0, 0));
         return 5;
@@ -1510,7 +1510,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", order->target, &order->pos, 0, 0, 0));
         return 5;
     }
-    if (order->target == 0 && (order->flags_42 & 0x200)) {
+    if (order->target == 0 && (order->flags_42 & ORDER_FLAG_TARGET)) {
         if (*(int*)&order->next == 0)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", 0, &unit->pos, 0, 0, 0));
         return 5;
@@ -1958,7 +1958,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", order->target, &order->pos, 0, 0, 0));
         return 5;
     }
-    if (order->target == 0 && (order->flags_42 & 0x200)) {
+    if (order->target == 0 && (order->flags_42 & ORDER_FLAG_TARGET)) {
         if (*(int*)&order->next == 0)
             AppendOrderToTail(unit, new (kSim) Order("VTOL_SEEKATTACK", 0, &unit->pos, 0, 0, 0));
         return 5;

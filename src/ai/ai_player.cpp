@@ -364,7 +364,7 @@ void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
     if (attacker && unit->player->active && (unit->player->type==1 || unit->player->type==2) &&
         (unit->def->flags1&0x10010000) && unit->buildLeft==kZeroFloatAi && !unit->player->allied[attacker->player->index]) {
         int ordered=0;
-        if ((!unit->list || (unit->list->flags_42&0x20000)) &&
+        if ((!unit->list || (unit->list->flags_42&ORDER_FLAG_IDLE)) &&
             !unit->def->categories->Contains(attacker->unitDefIndex) &&
             !unit->def->weaponCategories[0]->Contains(attacker->unitDefIndex) && g_seams.weapons->WeaponCanReachUnit(unit,attacker,0))
             ordered=g_seams.orders->IssueAttackOrder(unit,attacker,0);
@@ -380,7 +380,7 @@ void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
             }
         }
     }
-    if (!(g_seams.orders->GetOrderFlags(unit)&0x80) && (unit->lastAttackerSlot!=unit->playerIndex || unit->lastDamageType==1))
+    if (!(g_seams.orders->GetOrderFlags(unit)&ORDER_FLAG_NO_UNDERATTACK_LINE) && (unit->lastAttackerSlot!=unit->playerIndex || unit->lastDamageType==1))
         RecordUnitSpeech(unit,2,SIM_SPEECH_KIND_TEXT,SIM_EVENT_SPEECH_IF_NOT_VISIBLE);
 }
 

@@ -497,6 +497,7 @@ game,harness,call,HarnessAfterStep,1
 game,harness,call,HarnessAwaitLoadAndEndFrame,1
 game,harness,call,HarnessBeforeStep,1
 game,harness,call,HarnessCrtSeed,2
+game,harness,call,HarnessExit,1
 game,harness,call,HarnessGameSeed,1
 game,harness,call,HarnessInit,1
 game,harness,call,HarnessLoadBegins,1

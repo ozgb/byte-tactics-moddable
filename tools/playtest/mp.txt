@@ -7,6 +7,12 @@
 # after 8 minutes and the host wins. If a commander dies first, the game ends
 # there; the winner of that game may be left on the single player menu, and
 # leaves it by Previous Menu.
+#
+# The host allies with the guest in the battle room and, in the game, shares all
+# above 100 metal and 600 energy (/shareall, /setsharemetal, /setshareenergy), so
+# UpdateResourceSharing moves stock to the guest, who spends it on Kbots. The host
+# tops its own stock up with +atm, the guest never does. With `--record economy`
+# the host's run writes replay-economy.txt (docs/replay-format.md).
 instances 2
 directplay
 reg PlayMovie dword 0
@@ -66,6 +72,9 @@ sleep 0.5
 @2 click 510 416
 @2 waitfor battle_room 30
 sleep 3
+@1 click 220 98
+sleep 1
+@1 shot ally_set
 @2 click 488 78
 sleep 3
 @1 click 488 78
@@ -79,10 +88,16 @@ sleep 3
 @1 shot mp_start
 @2 shot mp_start
 
-# --- both build a Kbot lab
+# --- the host shares what it holds above 100 with its ally
 on skirmish_end goto game_over
+@1 chat +shareall
+sleep 1
+@1 chat +setsharemetal 100
+sleep 1
+@1 chat +setshareenergy 600
+sleep 1
+# --- both build a Kbot lab
 @1 chat +atm
-@2 chat +atm
 @1 click 380 203
 @2 click 380 203
 sleep 1
@@ -97,7 +112,7 @@ sleep 0.5
 sleep 1
 @1 shot mp_lab_placed
 @2 shot mp_lab_placed
-repeat 5 @1 chat +atm ; @2 chat +atm ; sleep 9
+repeat 5 @1 chat +atm ; sleep 9
 # --- each lab builds 12 Kbots, rally point on its own base
 @1 click 330 300
 @2 click 330 300
@@ -115,7 +130,7 @@ sleep 1
 @2 shot mp_queued
 @1 key Escape
 @2 key Escape
-repeat 30 @1 chat +atm ; @2 chat +atm ; sleep 9
+repeat 30 @1 chat +atm ; sleep 9
 @1 shot mp_late
 @2 shot mp_late
 

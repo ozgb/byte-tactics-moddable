@@ -9,7 +9,7 @@ tests/replay/<subsystem>/ holds a recording of) under Wine, on a copy that ends 
 per subsystem, and writes <DIR>/<subsystem>/<scenario>.txt. `--subsystem` (repeatable) picks the subsystems; the
 default is every subsystem that has a tests/replay/<subsystem>/ directory. `--native-modules` plays the modules as
 native code (-modules=native). `--check` records into a temporary directory and fails when a recording differs from
-the one in tests/replay/; `--json FILE` also writes, per recording, `equal` or the first difference as the played run has it
+the one in tests/replay/ (not the play-test recordings that tests/replay/playtests.json lists); `--json FILE` also writes, per recording, `equal` or the first difference as the played run has it
 (call tick, slot, kind and name of the line, and its value; never the stored line), the form tools/oraclegate.py reads. `--compare` fails when two directories do not hold the same files with the same bytes, and
 names the first differing line.
 """
@@ -30,6 +30,7 @@ SCENARIOS = ROOT / "reference/scenarios"
 RECORDINGS = ROOT / "tests/replay"
 SCHEMA = ROOT / "data/replay_schema.json"
 WINDOWS = RECORDINGS / "windows.json"
+PLAYTESTS = RECORDINGS / "playtests.json"
 FORMAT = 2
 RUN_SECONDS_BASE = 120
 RUN_TICKS_PER_SECOND = 25
@@ -61,9 +62,23 @@ def default_subsystems() -> list[str]:
     return [s for s in schema_versions() if (RECORDINGS / s).is_dir()]
 
 
+def playtest_recordings() -> dict[str, str]:
+    """The stored recordings that a play-test made, not a scenario: "<subsystem>/<name>" -> the command that records it.
+    --check does not record them again."""
+    if not PLAYTESTS.is_file():
+        return {}
+    return json.loads(PLAYTESTS.read_text())
+
+
+def scenario_recordings(subsystem: str) -> list[Path]:
+    """The stored recordings of the subsystem that a scenario of reference/scenarios/ makes."""
+    skipped = playtest_recordings()
+    return [p for p in sorted((RECORDINGS / subsystem).glob("*.txt")) if f"{subsystem}/{p.stem}" not in skipped]
+
+
 def recorded_names(subsystems: list[str]) -> list[str]:
     """The scenarios tests/replay/ holds a recording of, for any of the subsystems."""
-    return sorted({p.stem for s in subsystems for p in (RECORDINGS / s).glob("*.txt")})
+    return sorted({p.stem for s in subsystems for p in scenario_recordings(s)})
 
 
 def stored_windows() -> dict[str, tuple[int, int]]:
@@ -226,7 +241,7 @@ def plan_for(subsystems: list[str], names: list[str] | None) -> dict[str, list[s
         return {n: list(subsystems) for n in names}
     plan: dict[str, list[str]] = {}
     for s in subsystems:
-        for p in sorted((RECORDINGS / s).glob("*.txt")):
+        for p in scenario_recordings(s):
             plan.setdefault(p.stem, []).append(s)
     return dict(sorted(plan.items()))
 

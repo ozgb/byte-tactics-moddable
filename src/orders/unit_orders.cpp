@@ -11,6 +11,7 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int 
 #include <stdio.h>
 #include <math.h>
 #include <memory.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -98,6 +99,7 @@ inline int Order::Advance(int distance) {
 }
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/orders.h"
 
 #include "../../link/globals.h"
 

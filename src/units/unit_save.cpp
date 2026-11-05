@@ -146,6 +146,7 @@ void __stdcall LoadUnits(HapiBank* file)
 }
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/orders.h"
 
 // FUNCTION: 0x487080
 Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)

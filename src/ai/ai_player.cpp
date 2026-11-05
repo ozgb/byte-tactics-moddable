@@ -200,6 +200,7 @@ void __stdcall ScaleUnitWeights(int player, UnitTypeSet* set, float value, int c
 void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_4);
 #include "ai_player.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/orders.h"
 #include "../quirks/quirks.h"
 #include "../state/sim_globals.h"
 #include "../state/sim_effects.h"

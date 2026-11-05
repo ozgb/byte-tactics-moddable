@@ -81,6 +81,7 @@ struct Point16FromShorts : Point16 {
 
 #include "../util/angles.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/orders.h"
 
 #include "../network/player.h"
 

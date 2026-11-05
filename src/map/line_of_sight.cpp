@@ -179,6 +179,25 @@ Cell* __stdcall GetMapCell(int x, int y)
     return 0;
 }
 
+unsigned int __stdcall SoundHeardMask(const Vec3* at)
+{
+    if (GetMapCell(at->x / (1 << 20), at->z / (1 << 20)) == nullptr)
+        return 0;
+    int tx = (short)(at->x >> 16) >> 5;
+    int ty = ((short)(at->z >> 16) - ((short)(at->y >> 16) >> 1)) >> 5;
+    unsigned int mask = 0;
+    for (int p = 0; p < 10; p++) {
+        Player* player = &g_game->players[p];
+        if (tx >= (unsigned int)player->exploredWidth || ty >= (unsigned int)player->exploredHeight)
+            continue;
+        int cell = player->exploredWidth * ty + tx;
+        bool heard = (g_game->mapFlags & 2) == 2 ? player->explored[cell] != 0 : (g_game->visibilityMask[cell] & (1 << p)) != 0;
+        if (heard)
+            mask |= 1u << p;
+    }
+    return mask;
+}
+
 // FUNCTION: 0x4815a0
 Cell* __stdcall GetMapCellAtPosition(Vec3* pos)
 {

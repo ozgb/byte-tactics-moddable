@@ -85,6 +85,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SCENARIOS = ROOT / "tools/playtest"
 OUT = ROOT / "build/playtest"
 WASM_RUNTIME = ("wasmtime_host.dll", "wind_meteors.wasm", "modules.json")
+ACCESS_LOG_FILES = ("accesslog.attr", "accesslog.items", "accesslog.defer")
 NATIVE_MODULES_SWITCH = "-modules=native"
 ZERO_FILL_SWITCH = "-memset=0"
 POISON_SWITCH = "-memset=0xcdcdcdcd"
@@ -491,6 +492,9 @@ class Instance:
         shutil.copy2(exe, self.game / "TotalA.exe")
         if runs_wasm_modules(exe) and not self.run.native_modules:
             for name in WASM_RUNTIME:
+                shutil.copy2(exe.parent / name, self.game / name)
+        for name in ACCESS_LOG_FILES:
+            if (exe.parent / name).is_file():
                 shutil.copy2(exe.parent / name, self.game / name)
         if self.run.testmode:
             shutil.copyfile(self.run.testmode, self.game / "testmode.txt")

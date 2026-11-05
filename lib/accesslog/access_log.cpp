@@ -782,6 +782,291 @@ NS void NotePassRead(unsigned item, unsigned sub, void* ra, unsigned flags)
     }
     g_phaseOverflow = true;
 }
+#if BT_DEFER_WRITES
+const unsigned kMaxDeferEdges = 32;
+const unsigned kDeferNew = 1;
+const unsigned kDeferOld = 2;
+
+struct DeferEdge {
+    unsigned writer, reader, phase;
+};
+struct DeferEntry {
+    unsigned addr, slot;
+    unsigned short edge;
+    unsigned char oldv, newv, state;
+};
+struct DeferStats {
+    unsigned long long created, held, applied, superseded, thirdStores, freed;
+};
+
+DeferEdge g_deferEdges[kMaxDeferEdges];
+unsigned g_deferEdgeCount;
+unsigned* g_itemEdges;
+bool* g_isWriter;
+DeferEntry* g_dEntries;
+unsigned g_dCount, g_dCap;
+unsigned* g_dTable;
+unsigned g_dTableSize;
+DeferStats g_dStats;
+
+NS inline unsigned DeferHash(unsigned addr) { return (addr * 2654435761u) >> 7; }
+
+NS DeferEntry* DeferFind(unsigned addr)
+{
+    if (g_dCount == 0)
+        return 0;
+    unsigned mask = g_dTableSize - 1;
+    for (unsigned s = DeferHash(addr) & mask;; s = (s + 1) & mask) {
+        unsigned v = g_dTable[s];
+        if (v == 0)
+            return 0;
+        if (g_dEntries[v - 1].addr == addr)
+            return &g_dEntries[v - 1];
+    }
+}
+
+NS void DeferPlace(unsigned index)
+{
+    unsigned mask = g_dTableSize - 1;
+    unsigned s = DeferHash(g_dEntries[index].addr) & mask;
+    while (g_dTable[s] != 0)
+        s = (s + 1) & mask;
+    g_dTable[s] = index + 1;
+    g_dEntries[index].slot = s;
+}
+
+NS DeferEntry* DeferAdd(unsigned addr)
+{
+    if (g_dCount == g_dCap) {
+        g_dCap = g_dCap ? g_dCap * 2 : 1u << 12;
+        DeferEntry* bigger = (DeferEntry*)Zeroed(sizeof(DeferEntry) * g_dCap);
+        if (g_dEntries != 0) {
+            memcpy(bigger, g_dEntries, sizeof(DeferEntry) * g_dCount);
+            Release(g_dEntries);
+        }
+        g_dEntries = bigger;
+    }
+    if ((g_dCount + 1) * 2 > g_dTableSize) {
+        unsigned size = g_dTableSize ? g_dTableSize * 2 : 1u << 13;
+        if (g_dTable != 0)
+            Release(g_dTable);
+        g_dTable = (unsigned*)Zeroed(4 * size);
+        g_dTableSize = size;
+        for (unsigned i = 0; i < g_dCount; i++)
+            DeferPlace(i);
+    }
+    DeferEntry* e = &g_dEntries[g_dCount];
+    e->addr = addr;
+    DeferPlace(g_dCount);
+    g_dCount++;
+    return e;
+}
+
+NS inline volatile unsigned char* DeferByte(const DeferEntry* e) { return (volatile unsigned char*)e->addr; }
+
+NS void DeferFlush()
+{
+    for (unsigned i = 0; i < g_dCount; i++) {
+        DeferEntry* e = &g_dEntries[i];
+        if (e->state == kDeferOld) {
+            *DeferByte(e) = e->newv;
+            g_dStats.applied++;
+        }
+        g_dTable[e->slot] = 0;
+        e->state = 0;
+    }
+    g_dCount = 0;
+}
+
+NS void DeferTouch(DeferEntry* e, int store, unsigned sub)
+{
+    if (e->state == 0)
+        return;
+    if (sub == g_deferEdges[e->edge].reader) {
+        if (!store) {
+            if (e->state == kDeferNew) {
+                e->newv = *DeferByte(e);
+                *DeferByte(e) = e->oldv;
+                e->state = kDeferOld;
+                g_dStats.held++;
+            }
+        } else {
+            if (e->state == kDeferOld) {
+                *DeferByte(e) = e->newv;
+                g_dStats.applied++;
+            }
+            e->state = 0;
+            g_dStats.superseded++;
+        }
+        return;
+    }
+    if (e->state == kDeferOld) {
+        *DeferByte(e) = e->newv;
+        e->state = kDeferNew;
+        g_dStats.applied++;
+    }
+    if (store && sub != g_deferEdges[e->edge].writer)
+        g_dStats.thirdStores++;
+}
+
+NS void DeferCreate(unsigned addr, unsigned edge)
+{
+    DeferEntry* e = DeferFind(addr);
+    if (e == 0)
+        e = DeferAdd(addr);
+    else if (e->state != 0)
+        return;
+    e->edge = (unsigned short)edge;
+    e->oldv = *(volatile unsigned char*)addr;
+    e->newv = e->oldv;
+    e->state = kDeferNew;
+    g_dStats.created++;
+}
+
+NS unsigned DeferPhase()
+{
+    if (g_window == ACCESS_WINDOW_PENDING)
+        return 1;
+    return g_window >= 1 && g_window <= ACCESS_WINDOW_TAIL ? (unsigned)g_window : 0;
+}
+
+NS void DeferAccess(int store, unsigned a, unsigned size, unsigned sub)
+{
+    unsigned phase = DeferPhase();
+    if (phase == 0 || g_deferEdgeCount == 0)
+        return;
+    unsigned n = size ? size : 1;
+    unsigned end = a + n;
+    if (g_dCount != 0) {
+        if (n > g_dCount) {
+            for (unsigned i = 0; i < g_dCount; i++)
+                if (g_dEntries[i].addr - a < n)
+                    DeferTouch(&g_dEntries[i], store, sub);
+        } else {
+            for (unsigned b = a; b < end; b++) {
+                DeferEntry* e = DeferFind(b);
+                if (e != 0)
+                    DeferTouch(e, store, sub);
+            }
+        }
+    }
+    if (!store || sub >= g_subCount || !g_isWriter[sub])
+        return;
+    for (unsigned cursor = a; cursor < end;) {
+        Hit h;
+        if (!Resolve(cursor, &h)) {
+            cursor = n <= 16 ? cursor + 1 : (cursor | 0xFFF) + 1;
+            continue;
+        }
+        unsigned stop = h.end > cursor ? h.end : cursor + 1;
+        if (stop > end)
+            stop = end;
+        unsigned mask = g_itemEdges[h.item];
+        for (unsigned e = 0; mask != 0; e++, mask >>= 1) {
+            if ((mask & 1) && g_deferEdges[e].writer == sub && g_deferEdges[e].phase == phase)
+                for (unsigned b = cursor; b < stop; b++)
+                    DeferCreate(b, e);
+        }
+        cursor = stop;
+    }
+}
+
+NS void DeferDrop(unsigned start, unsigned size)
+{
+    for (unsigned i = 0; i < g_dCount; i++) {
+        DeferEntry* e = &g_dEntries[i];
+        if (e->state != 0 && e->addr - start < size) {
+            if (e->state == kDeferOld)
+                *DeferByte(e) = e->newv;
+            e->state = 0;
+            g_dStats.freed++;
+        }
+    }
+}
+
+NS unsigned DeferSub(const char* name, unsigned n)
+{
+    for (unsigned i = 0; i < g_subCount; i++)
+        if (strlen(g_subNames[i]) == n && memcmp(g_subNames[i], name, n) == 0)
+            return i;
+    Die("accesslog: a subsystem in the defer file is not in accesslog.attr\n");
+    return 0;
+}
+
+NS unsigned DeferPhaseOf(const char* name, unsigned n)
+{
+    static const char* const names[] = {"net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail"};
+    for (unsigned i = 0; i < 9; i++)
+        if (strlen(names[i]) == n && memcmp(names[i], name, n) == 0)
+            return i;
+    Die("accesslog: a phase in the defer file is not a phase name\n");
+    return 0;
+}
+
+NS void DeferLoad()
+{
+    g_itemEdges = (unsigned*)Zeroed(4 * (g_itemCount + 1));
+    g_isWriter = (bool*)Zeroed(g_subCount + 1);
+    const char* path = getenv("ACCESSLOG_DEFER");
+    if (path == 0)
+        path = "accesslog.defer";
+    unsigned size;
+    unsigned char* text = ReadWhole(path, &size);
+    if (text == 0)
+        Die("accesslog: the defer file accesslog.defer (or $ACCESSLOG_DEFER) is missing; BT_DEFER_WRITES builds read the edges to hold back from it\n");
+    const unsigned char* p = text;
+    const unsigned char* stop = text + size;
+    while (p < stop) {
+        const unsigned char* lineEnd = p;
+        while (lineEnd < stop && *lineEnd != '\n')
+            lineEnd++;
+        const unsigned char* line = p;
+        const unsigned char* next = lineEnd < stop ? lineEnd + 1 : lineEnd;
+        if (lineEnd > line && lineEnd[-1] == '\r')
+            lineEnd--;
+        p = next;
+        if (lineEnd == line || (lineEnd - line >= 7 && memcmp(line, "writer,", 7) == 0))
+            continue;
+        const unsigned char* c1 = line;
+        while (c1 < lineEnd && *c1 != ',')
+            c1++;
+        const unsigned char* c2 = c1 + 1;
+        while (c2 < lineEnd && *c2 != ',')
+            c2++;
+        const unsigned char* c4 = lineEnd;
+        while (c4 > c2 && *c4 != ',')
+            c4--;
+        if (c1 >= lineEnd || c2 >= lineEnd || c4 <= c2)
+            Die("accesslog: a line of the defer file is not writer,reader,item,phase\n");
+        if (g_deferEdgeCount == kMaxDeferEdges)
+            Die("accesslog: too many edges in the defer file\n");
+        DeferEdge* edge = &g_deferEdges[g_deferEdgeCount];
+        edge->writer = DeferSub((const char*)line, (unsigned)(c1 - line));
+        edge->reader = DeferSub((const char*)c1 + 1, (unsigned)(c2 - c1 - 1));
+        edge->phase = DeferPhaseOf((const char*)c4 + 1, (unsigned)(lineEnd - c4 - 1));
+        const char* item = (const char*)c2 + 1;
+        unsigned itemLen = (unsigned)(c4 - c2 - 1);
+        if (itemLen >= 2 && item[0] == '"' && item[itemLen - 1] == '"') {
+            item++;
+            itemLen -= 2;
+        }
+        bool found = false;
+        for (unsigned i = 0; i < g_itemCount; i++) {
+            if (g_itemNames[i] == 0 || strlen(g_itemNames[i]) != itemLen || memcmp(g_itemNames[i], item, itemLen) != 0)
+                continue;
+            for (unsigned other = 0; other < g_deferEdgeCount; other++)
+                if ((g_itemEdges[i] >> other & 1) && g_deferEdges[other].phase == edge->phase)
+                    Die("accesslog: two edges of the defer file share an item and a phase\n");
+            g_itemEdges[i] |= 1u << g_deferEdgeCount;
+            found = true;
+        }
+        if (!found)
+            Die("accesslog: an item in the defer file is not in accesslog.items\n");
+        g_isWriter[edge->writer] = true;
+        g_deferEdgeCount++;
+    }
+}
+#endif
 
 NS void Record(int store, unsigned a, unsigned size, void* ra)
 {
@@ -790,6 +1075,10 @@ NS void Record(int store, unsigned a, unsigned size, void* ra)
         g_stats.ignored++;
         return;
     }
+#if BT_DEFER_WRITES
+    DeferAccess(store, a, size, sub);
+    return;
+#endif
     unsigned end = a + (size ? size : 1);
     unsigned cursor = a;
     for (unsigned n = 0; cursor < end; n++) {
@@ -964,6 +1253,9 @@ NS void __cdecl OnRemoved(void* p)
     unsigned g = (a - g_blockLo) / 8;
     unsigned index = g_granuleIndex[g];
     if (index != 0) {
+#if BT_DEFER_WRITES
+        DeferDrop(g_pool[index - 1].start, g_pool[index - 1].size);
+#endif
         g_pool[index - 1].next = g_poolFree;
         g_poolFree = index;
         g_granuleIndex[g] = 0;
@@ -1252,6 +1544,9 @@ NS void AccessLogInit()
         g_rawFile = host_file_create("access.raw.txt", 0);
         g_rawBuf = (char*)Zeroed(kRawCap);
     }
+#if BT_DEFER_WRITES
+    DeferLoad();
+#endif
     g_allocHooks = &g_hooks;
     g_ready = true;
 }
@@ -1265,6 +1560,9 @@ NS void AccessLogWindow(int window)
         FlushEntity();
     g_pass = ACCESS_PASS_NONE;
     g_entOrd = 0;
+#if BT_DEFER_WRITES
+    DeferFlush();
+#endif
     if (g_started && g_window != ACCESS_WINDOW_OFF)
         g_classifier.EndWindow(g_tick);
     if (g_window == ACCESS_WINDOW_PRESENTATION && window != ACCESS_WINDOW_PRESENTATION) {
@@ -1301,6 +1599,9 @@ NS void AccessLogMarker(int phase, unsigned tick)
 {
     if (!g_ready)
         return;
+#if BT_DEFER_WRITES
+    DeferFlush();
+#endif
     g_tick = tick;
     g_lastMarkerTick = tick;
     if (g_pres != 0)
@@ -1443,6 +1744,20 @@ NS void AccessLogFinish()
         stats.Num(g_kindWindows[k]);
         stats.Add("\n");
     }
+#if BT_DEFER_WRITES
+    struct {
+        const char* name;
+        unsigned long long value;
+    } held[] = {{"defer_edges", g_deferEdgeCount}, {"defer_created", g_dStats.created}, {"defer_held", g_dStats.held},
+                {"defer_applied", g_dStats.applied}, {"defer_superseded", g_dStats.superseded},
+                {"defer_third_stores", g_dStats.thirdStores}, {"defer_freed", g_dStats.freed}};
+    for (unsigned i = 0; i < sizeof held / sizeof held[0]; i++) {
+        stats.Add(held[i].name);
+        stats.Add(" ");
+        stats.Num(held[i].value);
+        stats.Add("\n");
+    }
+#endif
     WriteWhole("access.stats.txt", stats);
     if (g_pres != 0)
         WritePresentation();

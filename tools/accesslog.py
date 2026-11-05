@@ -89,6 +89,12 @@ SimOwns, which Ref<T>::get calls) are ignored by address, so a Ref<T> dereferenc
 that made it: the helper's own load of the block base is skipped and the access through the pointer is
 instrumented in the caller.
 
+The option BT_DEFER_WRITES (with BT_ACCESS_LOG, build dir build/defer, never the gate build; #837) turns the callbacks into
+a write barrier for the edges named in accesslog.defer, one `writer,reader,item,phase` row per line (the columns of
+data/dependencies.csv; $ACCESSLOG_DEFER names another file): it holds each such write back from the reader's loads until the
+phase ends, and the classifier is off. tools/playtest.py copies accesslog.attr, accesslog.items and accesslog.defer from beside
+the exe, so `reference.py --check --native-modules --exe build/defer/TotalA.exe` plays the whole suite against it.
+
 `tables` writes accesslog.attr and accesslog.items next to the exe after the link, from TotalA.map,
 data/subsystems.csv, data/state_classes.csv, data/globals.csv and the record layouts clang prints for
 src/state/layout_asserts.cpp and src/state/sim_globals.h. `run` plays each scenario in test mode with

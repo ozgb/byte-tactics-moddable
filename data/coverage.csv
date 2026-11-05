@@ -390,7 +390,7 @@ network,GetPlayerSlot,src/network/net_game.cpp,0,0,0,0,0,0,?GetPlayerSlot@@YGEPA
 network,GetRejectReasonText,src/network/net_game.cpp,1,0,0,0,0,0,?GetRejectReasonText@@YGPADH@Z,0,menu
 network,GetSessionGuidInstance,src/network/online_report.cpp,1,0,0,0,0,0,?GetSessionGuidInstance@@YGHH@Z,0,network
 network,GetUnitDefTable,src/network/unit_sync.cpp,0,0,0,0,0,0,?GetUnitDefTable@@YGPAVUnitDef@@XZ,1,
-network,HandleNetPackets,src/network/net_game.cpp,1,0,0,0,0,0,?HandleNetPackets@@YGHXZ,0,network: only the loading frames of a network game reach it; test mode waits for the load in one frame (#885)
+network,HandleNetPackets,src/network/net_game.cpp,1,0,0,0,0,0,?HandleNetPackets@@YGHXZ,0,network: test mode reached it only in the loading frames that it skips since #885 (one wait); no scenario enters its other callers (the main loop's wait branch; the lobby; the end-game screen; the in-game dialogs)
 network,HandlePing,src/network/net_game.cpp,1,0,0,0,0,0,?HandlePing@@YGXPAULatencyPacket@@@Z,0,network
 network,HandlePlayerEconomy,src/network/net_game.cpp,1,0,0,0,0,0,?HandlePlayerEconomy@@YGXPAUPlayerViewStatePacket@@PAUPlayer@@@Z,0,network
 network,HandleTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?HandleTimeoutDialog@@YGXPAUGui@@@Z,0,network
@@ -473,7 +473,7 @@ network,PacketManager::QueueOnChannel,src/network/packets.cpp,1,0,0,0,0,0,?Queue
 network,PacketManager::QueuePacket,src/network/packets.cpp,1,0,0,0,0,0,?QueuePacket@PacketManager@@QAEHHHPAXI@Z,0,network
 network,PacketManager::ReleaseAllChannels,src/network/packets.cpp,0,0,0,0,0,0,?ReleaseAllChannels@PacketManager@@QAEXXZ,1,
 network,PacketManager::ReleaseChannel,src/network/packets.cpp,0,0,0,0,0,0,?ReleaseChannel@PacketManager@@QAEXH@Z,1,
-network,PacketManager::SendAllQueued,src/network/packets.cpp,1,0,0,0,0,0,?SendAllQueued@PacketManager@@QAEHH@Z,0,network: only the loading frames of a network game reach it; test mode waits for the load in one frame (#885)
+network,PacketManager::SendAllQueued,src/network/packets.cpp,1,0,0,0,0,0,?SendAllQueued@PacketManager@@QAEHH@Z,0,network: test mode reached it only in the loading frames that it skips since #885 (one wait); no scenario enters its other callers (the main loop's wait branch; the lobby; the in-game dialogs)
 network,PacketManager::SendFrameState,src/network/packets.cpp,0,0,0,0,0,0,?SendFrameState@PacketManager@@QAEHHPAUFrameStateMsg@@@Z,1,
 network,PacketManager::SetDefaultSendPacing,src/network/packets.cpp,1,0,0,0,0,0,?SetDefaultSendPacing@PacketManager@@QAEXH@Z,0,network
 network,PacketManager::~PacketManager,src/state/sim_globals.cpp,1,0,0,0,0,0,??1PacketManager@@UAE@XZ,0,shutdown
@@ -527,11 +527,11 @@ network,ScrollToNextMessageUnit,src/network/net_chat.cpp,1,0,0,0,0,0,?ScrollToNe
 network,SendAlliance,src/network/net_game.cpp,0,0,0,0,0,0,?SendAlliance@@YGHHHDH@Z,1,
 network,SendChatMessage,src/network/net_chat.cpp,1,0,0,0,0,0,?SendChatMessage@@YGXPAUPlayer@@PADH1@Z,0,menu
 network,SendChatPacket,src/network/net_game.cpp,1,0,0,0,0,0,?SendChatPacket@@YGHPAD@Z,0,menu
-network,SendLoadProgress,src/network/net_game.cpp,1,0,0,0,0,0,?SendLoadProgress@@YGXXZ,0,network: only the loading frames of a network game reach it; test mode waits for the load in one frame (#885)
+network,SendLoadProgress,src/network/net_game.cpp,1,0,0,0,0,0,?SendLoadProgress@@YGXXZ,0,network: only the loading frames reach it (LoadingScreenFrame); test mode waits for the load in one frame since #885
 network,SendLobbySyncRequests,src/network/net_game.cpp,1,0,0,0,0,0,?SendLobbySyncRequests@@YGXXZ,0,network
 network,SendNetHeartbeat,src/network/net_game.cpp,1,0,0,0,0,0,?SendNetHeartbeat@@YGXXZ,0,menu
 network,SendPacket,src/network/unit_sync.cpp,0,0,0,0,0,0,?SendPacket@@YGXIPAUUnitSyncPacket@@@Z,1,
-network,SendProbe,src/network/net_game.cpp,1,0,0,0,0,0,?SendProbe@@YGXHH@Z,0,network: only the loading frames of a network game reach it; test mode waits for the load in one frame (#885)
+network,SendProbe,src/network/net_game.cpp,1,0,0,0,0,0,?SendProbe@@YGXHH@Z,0,network: test mode reached it only in the loading frames that it skips since #885 (one wait); no scenario enters its other caller (the main loop's wait branch)
 network,SendScriptCallNoArgs,src/network/net_game.cpp,0,0,0,0,0,0,?SendScriptCallNoArgs@@YGHPAUUnit@@F@Z,1,
 network,SendScriptCallNoArgsByName,src/network/net_game.cpp,0,0,0,0,0,0,?SendScriptCallNoArgsByName@@YGHPAUUnit@@PAD@Z,1,
 network,SendShareMapInfo,src/network/net_game.cpp,1,0,0,0,0,0,?SendShareMapInfo@@YGXEE@Z,0,menu

@@ -654,7 +654,7 @@ When the queue is full, a test-mode run ends with a fatal error naming the queue
 
 The radar events carry no values in the record: sim appends a snapshot to the radar arena, a second buffer of the state block (2 MiB, one allocation tagged `SIM RADAR`, classed `view`, in no trace), and records the snapshot's offset. A units snapshot is 8 bytes and 48 bytes per unit the radar shows and 12 bytes per projectile it shows. A mapped snapshot is 12 bytes and one byte per half-resolution map cell. The drain draws from the snapshots in order and, when the queue is empty, empties the arena. A full arena ends a test-mode run with a fatal error, as a full queue does, and drops the snapshot when playing.
 
-To add a kind of event: add its name and the meaning of its arguments to `SimEventKind` in `interfaces/services.h`, record it in sim, and handle it in the drain of presentation.
+To add a kind of event: add its name and the meaning of its arguments to `SimEventKind` in `interfaces/services.h`, record it in sim, handle it in the drain of presentation, and add its section to docs/sim-events.md.
 
 The kinds, with the arguments of each and what the drain does:
 

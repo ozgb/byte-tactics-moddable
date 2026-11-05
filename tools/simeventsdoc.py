@@ -17,7 +17,7 @@ The files that read or define the queue (NOT_RECORDERS) name every kind without 
 (`Phases: none.` for a kind that is never recorded). Prose about a phase goes in another line of the section.
 
 The phases are static reachability over the call graph of data/rwsets.csv with the hand-resolved edges of
-data/hazard_edges.csv the virtual calls tools/coupling.py resolves to the functions they can run, and a call of a virtual method as a call of each override in a derived class. A function of the sources that holds a `SIM_EVENT_` kind name in its body (a recording wrapper,
+data/hazard_edges.csv, the virtual calls tools/coupling.py resolves to the functions they can run, and a call of a virtual method as a call of each override in a derived class. A function of the sources that holds a `SIM_EVENT_` kind name in its body (a recording wrapper,
 or the function that records directly) records that kind. A kind is recorded from a phase when a root of that phase
 (the roots of hazards.ROOTS, labelled as in stateclasses.PHASE_LABELS) reaches, by `call` rows, a function that calls
 a wrapper of the kind or is itself a recorder. The walk stops at presentation code as stateclasses.Walks does, except
@@ -214,7 +214,7 @@ def problems(names: list[str], doc: str) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--check", action="store_true", help="fail if a kind has no section or a section names no kind")
+    parser.add_argument("--check", action="store_true", help="fail if a kind has no section, a section names no kind, or a Phases line differs from the call graph")
     parser.add_argument("--phases", action="store_true", help="print the computed phases of each kind")
     parser.add_argument("--header", type=Path, default=HEADER, help="the header (default interfaces/services.h)")
     parser.add_argument("--doc", type=Path, default=DOC, help="the doc (default docs/sim-events.md)")

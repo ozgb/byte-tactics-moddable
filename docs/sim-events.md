@@ -86,23 +86,23 @@ Value 1.
 
 Flags: bit 0, the unit speaks only while it is off screen (set for slot 2 only).
 
-Recorded when a unit announces something, only while the unit exists and is not already dying. Units placed at the start of a match speak at once. The voice slot (argument 1) is a line kind of the table "Speech line kinds" below, and the sim records it from these places:
+Recorded when a unit announces something. The sim records nothing for a unit that does not exist or is already dying (the unit's alive flag 0x10000000 clear, or its dying flag 0x4000 set). Units placed at the start of a match speak at once. The voice slot (argument 1) is a line kind of the table "Speech line kinds" below. Where a unit is named, it is the unit of the event. The sim records each slot from these places:
 
-- 2, underattack: a unit takes damage and the attacker is not the unit's own player or the damage type is 1, and the unit's order flags do not have bit 7 set. This is the one place that sets flag bit 0.
-- 3, activate and 4, deactivate: the unit's activation state gains or loses bit 0.
-- 14, cloak and 15, uncloak: the unit's activation state gains or loses bit 2 (value 4), which the economy sets from whether a cloaked unit pays its cloak cost each tick.
-- 5, ok: an order whose status flag 0x2000 is set announces its status the first time its step runs, with the text of the order ("Attacking", "Building", "Guarding", "Loading", "Patrolling", "Reclaiming", "Repairing", "Unloading" and the like, the texts table below), and clears the flag.
-- 6, arrived: a move order (ground or air) arrives, and a kamikaze attack reaches its target.
-- 7, cant: an order fails or is refused. The text names the reason: the failure and refusal texts of the speech texts table (capture failed, construction terminated or stopped, reclamation failed, repairs unsuccessful, resurrection failed, "I can't get there", "Unable to create any more units", transport and landing failures, and so on).
-- 8, unitcomplete: a construction or resurrection order finishes ("Building complete", "Resurrection complete"), and a build order ends with the default text.
-- 9, build: a build order starts constructing ("Starting construction").
-- 10, repair: a repair order finishes ("Unit repaired").
-- 11, working: a reclaim, resurrect or capture order starts work on its target.
-- 12, load: a pickup order (ground or air) begins loading.
-- 13, unload: an unload order begins unloading, or the unit to unload is not carried.
-- 16, capture: a capture order starts.
-- 17 to 22, count5 to count0: one for each tick of the self-destruct countdown, from 5 down to 0, with the default text. The slot is 22 for the count at 0.
-- 23, canceldestruct: a self-destruct order is cancelled.
+- 2, underattack: when damage of any damage kind except 10 (a heal, which returns at once) and except 11 (which skips the reaction to the attack) is applied to a unit that exists and is not dying. The test is made inside the reaction to the attack, which runs before the damage event updates the unit's last damage type and last attacker slot. So the test uses the last attacker slot and the last damage type of the previous damage event (or the unit's initial values at the first), not those of the event that caused the reaction. The line is recorded when the unit's order flags do not have bit 7 (0x80) set and either that previous attacker slot is not the unit's own player or that previous damage type is 1. The event has flag bit 0 set.
+- 3, activate and 4, deactivate: when the unit's activation bits change and bit 0 (value 1) of them is gained or lost.
+- 14, cloak and 15, uncloak: when the activation bits change and bit 2 (value 4) is gained or lost. The economy sets that bit each tick from whether a cloaked unit pays its cloak cost.
+- 5, ok: when an order whose status flag 0x2000 is set runs its first step. The flag is cleared by the record, so each order announces once. The text is the one the order gives (Attacking, Building, Guarding, Loading, Loading unit, Patrolling, Preparing for transport, Reclaiming, Repairing, Unloading) or the kind's own text.
+- 6, arrived: when a ground move order or a kamikaze attack order is stepped with call flag 0x20 set (the unit has arrived), and when an air move order reaches its last state and has no next order (an air move with a next order records nothing).
+- 7, cant: when an order fails or is refused, with the text that names the reason (the failure and refusal texts of the speech texts table).
+- 8, unitcomplete: when a build order finishes (kind's own text on the factory build order), when a mobile or air build or help-build finishes ("Building complete") and when a resurrect order finishes ("Resurrection complete").
+- 9, build: when construction starts ("Starting construction").
+- 10, repair: when a repair finishes ("Unit repaired").
+- 11, working: when a capture, reclaim or resurrect order has found its target and is about to start work.
+- 12, load: for a ground transport, each time it starts a pickup attempt (state 2 of the pickup order, up to three attempts); for an air transport, once after the cargo has been attached to its piece.
+- 13, unload: for a ground transport, when the unit being unloaded is no longer carried by the transport, which is after the drop; for an air transport, after the cargo has been detached and the transport has climbed away.
+- 16, capture: when a capture order has finished and the captured unit has been given to the capturing unit's player.
+- 17 to 22, count5 to count0: one for each step of a self-destruct order, whose countdown starts at the unit definition's self-destruct countdown (which must be greater than 0; with 0 the order destroys the unit at once and records nothing). Each step records the slot 22 minus the current count (count 0 gives slot 22, count 5 gives slot 17) and then, for a count above 0, waits 30 ticks; at count 0 it waits a random number of ticks drawn with the sim random stream (a value from 0 to 14) and then destroys the unit with kill type 3. A countdown above 5 reads past the end of the six-entry table of slots, which is unspecified.
+- 23, canceldestruct: when a self-destruct order that has not finished is stepped with call flag 2 (the order is cancelled) and the unit is not dying.
 
 No call site records slot 0 or slot 1 (select, which the interface handles).
 
@@ -139,7 +139,15 @@ Value 3.
 
 Flags: none. Two records (ten arguments).
 
-Recorded each time a build, repair or resurrect step of a builder adds progress to its target (and each time the repair and resurrect steps of an air builder do the same). The origin is the nanolathe point of the builder and the box is the target's bounding box at its position. The flow runs from the origin to the box.
+Recorded by these orders, once for each step that does the following. The origin is the nanolathe point of the builder unless the site says otherwise; the box is the target's position plus the model's extents: the low corner adds the minimum x and z (and also the minimum y at the sites marked "full box"), the high corner adds the maximum x, y and z, so at the other sites the low y is the target's own y.
+
+- Factory build (a builder that creates a unit and builds it in place): each step that adds build progress to the unit it is building.
+- Mobile build, help-build and air mobile build and air help-build (all "full box"): each step that adds build progress.
+- Ground repair (unit repairs another unit within range), repair without moving, and the repair of a unit by another unit (the order whose origin is the other unit's nanolathe point and whose box is the repaired unit's): each step in which the repair progress call adds health.
+- Air repair: each step that runs the repair progress call, whether or not it added progress.
+- Resurrect: each step of the countdown while the countdown is not 0 (the countdown decrements on each step). The box is the footprint of the feature being resurrected: its low corner is the feature's cell, at the ground height there, and its high corner adds the footprint size in cells and the feature's height.
+
+There is no air resurrect. The flow runs from the origin to the box.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -157,7 +165,11 @@ Value 4.
 
 Flags: none. Two records (ten arguments).
 
-Recorded each time a reclaim or capture step of a builder works on its target. The box is the target's bounding box at its position; the origin is the nanolathe point of the builder. A reclaim order of a unit or feature records two of these in one tick.
+Recorded by these orders. The origin is the nanolathe point of the builder. For a unit target the box is the unit's position plus its model extents (the low corner adds minimum x and z, the high corner adds maximum x, y and z).
+
+- Capture: each step while the order's elapsed time is below its duration and the target is not moving, one event.
+- Reclaim of a unit (ground and air): each step in which the unit is within build range and can be reclaimed, one event.
+- Reclaim of a feature: each step while the order's remaining time is above 15 for a ground builder, or above 30 for an air builder, two identical events. The box is the feature's footprint: its low corner is the feature's cell at the ground height there, and its high corner adds the footprint size in cells and the feature's height.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -170,13 +182,13 @@ Value 5.
 | Argument | Type | Meaning |
 |---|---|---|
 | 0 to 2 | position | The start, the position of a unit that is moved. |
-| 3 to 5 | position | The end, the position the unit is moved to. |
+| 3 to 5 | position | The end: the order's position, plus the moved unit's position, minus the teleporter's position (each unit keeps its offset from the teleporter). |
 | 6 | integer | The lifetime in ticks. Always 30. |
 | 7 | integer | The particle list. Always 5. |
 
 Flags: none.
 
-Recorded once for each unit other than the teleporter inside the teleporter's bounding box when a teleport order runs, as that unit is moved to the destination of the order.
+Recorded when a teleport order runs (once, in its only step), once for each slot of the unit table other than the teleporter whose position lies inside the box of the teleporter: the teleporter's position plus the minimum model extents of its definition (low corner) and plus the maximum extents (high corner), compared on x, y and z, inclusive. The scan does not test whether the slot holds a living unit, so a free slot whose stale position lies in the box records too. The event is recorded just before that slot's position is set to the end position.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -196,7 +208,7 @@ Value 6.
 
 Flags: none. Two records (nine arguments).
 
-Recorded when a unit's script emits effect 0 (lifetime 6) or effect 1 (lifetime 7) from a piece. The start and end are the piece's two positions.
+Recorded when a unit's script emits effect 0 (lifetime 6) or effect 1 (lifetime 7) from a piece. The start and end are the piece's two offsets from the unit's position (the second offset has its z subtracted as the first does). The script effect is dropped, with nothing recorded, unless the unit is visible to the player being viewed (the sim's player index for the viewing machine); this depends on the local machine's viewed player.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -215,7 +227,7 @@ Value 7.
 
 Flags: none.
 
-Recorded when a unit's script emits effect 2 (period 16), 3 (period 8), 4 (period 16, positions swapped) or 5 (period 8, positions swapped) from a piece.
+Recorded when a unit's script emits effect 2 (period 16), 3 (period 8), 4 (period 16, positions swapped) or 5 (period 8, positions swapped) from a piece. The positions are the piece's two offsets from the unit's position. The script effect is dropped, with nothing recorded, unless the unit is visible to the player being viewed (the sim's player index for the viewing machine); this depends on the local machine's viewed player.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -234,7 +246,7 @@ Value 8.
 
 Flags: none.
 
-Recorded when a unit's script emits effect 0x103 from a piece. The start is the piece's position and the end is the same position at the sea level height.
+Recorded when a unit's script emits effect 0x103 from a piece. The start is the piece's position (the unit's position plus the piece's position, with z subtracted) and the end has the same x and z at the sea level height. The script effect is dropped, with nothing recorded, unless the unit is visible to the player being viewed (the sim's player index for the viewing machine); this depends on the local machine's viewed player.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -251,7 +263,7 @@ Value 9.
 
 Flags: none.
 
-Recorded when a unit fires a weapon whose definition has the start smoke property, once for each shot.
+Recorded when a unit fires a line-of-sight, vertical-launch or ballistic weapon whose definition has the start smoke property. It is recorded once the projectile slot has been allocated (the projectile table holds fewer than 300 projectiles; with no free slot the shot is not fired and nothing is recorded) and after the fire script and the recoil script have been started. The position is the firing position the fire step was given. Projectiles dropped by an air unit, projectiles created by the motion of another projectile, meteors and projectiles created from a received network fire packet do not record it.
 
 Phases: net (0), units (1), match load.
 
@@ -286,7 +298,7 @@ Value 11.
 
 Flags: none.
 
-Recorded once for each detonation of a projectile that is not discarded without effect, with the shake magnitude of the weapon definition as both offsets and its shake duration as the strength, whatever the values (they may be 0).
+Recorded once for each detonation of a projectile, with the shake magnitude of the weapon definition as both offsets and its shake duration as the strength, whatever the values (they may be 0). A detonation records nothing when the network game option that disables the sea level trigger is set, the impact cell is below sea level and no unit was hit.
 
 Phases: net (0), units (1), projectiles (2), features (5), match load.
 
@@ -304,7 +316,12 @@ Value 12.
 
 Flags: none.
 
-Recorded in two cases. When a unit takes damage from an attacker and either the attacker's player or the victim's player is the local player: amount 1, the attacker's player, the victim's player. When a unit dies and is credited as a kill by the local player: amount 5, the killer's slot twice.
+Recorded in two cases.
+
+- A hit: when damage is applied to a unit that exists and is not dying, with damage kind other than 10 (kinds 2 and 11 do record), from a damage record that names an attacker unit, and either the attacker's player or the victim's player is the local player. The arguments are 1, the attacker's player and the victim's player.
+- A kill: when a unit with a player dies with kill type 1 or 6, or kill type 5 with a last attacker slot that is neither 10 nor the unit's own player, and the unit's last attacker slot is the local player. The arguments are 5 and the last attacker slot twice. It records for the local player's own units and for unfinished units too, and never for kill type 3.
+
+Both tests use the local player, so the event differs between machines.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -337,7 +354,14 @@ Value 14.
 
 Flags: none.
 
-Recorded when a unit dies and the death is credited to an attacker that is another player.
+Recorded when a unit's death is credited and its last attacker slot is not 10. A death is credited by its kill type:
+
+- Kill types 1 and 6: credited whenever the unit has a player, including when the last attacker slot is the unit's own player.
+- Kill type 5: credited only when the last attacker slot is neither 10 nor the unit's own player, and then as kill types 1 and 6 are.
+- Kill type 3: credited when the unit has a player and the local player does not share vision with that player. This depends on the local player, so it differs between machines, which can desynchronise the score lists of the machines.
+- Other kill types are never credited.
+
+Arguments are then the last attacker slot and the unit's player.
 
 Phases: net (0), units (1), match load.
 
@@ -353,7 +377,16 @@ Value 15.
 
 Flags: none.
 
-Recorded when what a unit's orders panel shows changes: when the unit's activation state changes (any bit that can announce speech), and when a build, repair, reclaim, resurrect or capture order starts, finishes or is terminated, including the same orders of air builders.
+Recorded in these cases:
+
+- Any change of the unit's activation byte (all eight bits, including bits 3 and 4), after the change.
+- A help-build order is cancelled (call flag 2) or starts building.
+- A mobile build order is terminated (call flag 8), cancelled (call flag 2) or starts building (after "Starting construction").
+- An air mobile build order or air help-build order is cancelled, is terminated (including terminated by hostile action) or starts building.
+- A resurrect order creates the unit (after the target's build left is set to 0 and its health to 1).
+- A get-built order is stepped while its unit's build left is 0.
+
+Repair, reclaim and capture orders never record it.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -369,7 +402,15 @@ Value 16.
 
 Flags: none.
 
-Recorded when the build counts shown for a builder change: when a build order starts, stops or finishes, when construction of a unit is finished (recorded for the builder), and when a stockpiled weapon of the unit is fired.
+Recorded for the builder in these cases:
+
+- A factory build order is called with flag 2 (cancel): when it has a target, construction is finished for the target first (the last case below), then the event is recorded again before the order ends.
+- A factory build order is called with flag 8 (stop), after its build count is decremented.
+- A factory build order has started building a new unit, after the unit is created and attached.
+- A factory build order finishes the unit (after construction is finished for it and the build count is decremented).
+- A stockpile order adds a stockpiled weapon to the unit (state 2, after the stockpile count and the build count change).
+- A weapon with a stockpile is fired and the unit's stockpile is decremented.
+- Construction of a unit is finished for the builder, which requires the builder to exist and have a build list in its definition and the target to exist. This runs from the factory order above, from the interface and from the network packet that finishes construction.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -385,7 +426,7 @@ Value 17.
 
 Flags: none.
 
-Recorded when a unit is attached to a transporter or detached from it, after its state has changed.
+Recorded at the end of an attach order, after the unit's carrier and motion mode have been set, when the unit exists, does not have unit flag 0x20000000 (a structure), carries no cargo of its own, and the order's target is either none (the unit is detached) or an existing unit other than the unit that is itself not carried. Attaching and detaching both record it.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -401,7 +442,7 @@ Value 18.
 
 Flags: none.
 
-Recorded when construction of a unit is finished, the unit's player is a human or computer-controlled player and the finished unit has the player's focus flag (0x20000000). The screen is 0, the build menu.
+Recorded when construction of a unit is finished (see `SIM_EVENT_BUILD_MENU_UPDATE`), the builder exists and has a build list in its definition, the target exists, the target's player is active and of type 1 or 2, and the target unit has its unit flag 0x20000000 set (the unit is a structure that stays in place). The screen is 0, the build menu.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -417,7 +458,7 @@ Value 19.
 
 Flags: none.
 
-Recorded when the end-game countdown of the local player ends in a match whose commander-death setting is "Deathmatch" (value 2; 0 is "Game Continues", 1 is "Game Ends"), after a new commander has been created for the local player at a random place of the map and the line of sight has been recalculated.
+Recorded in the players phase, in the 30-tick update of the local player, when the game type is not 1 (not a campaign mission), the player is inactive or its info flag 0x40 is clear, the defeat check of the mission conditions passes, the end-game countdown (4 at the first pass, decremented on each later pass) has run below 0, and the commander-death setting is "Deathmatch" (value 2; 0 is "Game Continues", 1 is "Game Ends"). The sim then creates a new commander for the local player at a random place found with the sim random stream, adds the starting storage, recalculates the line of sight and records the event.
 
 Phases: players (4), match load.
 
@@ -450,7 +491,7 @@ Value 21.
 
 Flags: none.
 
-Recorded when a credited kill moves a player to rank 0 on the score list, in a skirmish or multiplayer game (game types 2 and 3).
+Recorded when a credited death (as for `SIM_EVENT_SCORE_FLASH`, with the last attacker slot not 10) moves the attacker to rank 0 on the score list. The attacker's player must be active, of type 1, 2 or 3, with index not 10 and rank above 0 before the move; the game type must be 2 or 3; and the attacker's count (the commander kills in Deathmatch, else the kills) must exceed the count of a player of type other than 0 whose watch flag is clear and whose rank is 0. The kills in the argument are counted after the kill that was just credited (kill types 1, 5 and 6 add one; kill type 3 adds none).
 
 Phases: net (0), units (1), match load.
 
@@ -499,7 +540,7 @@ Value 25.
 
 Flags: none.
 
-Recorded when a defeated player of a multiplayer game (game type 3) who was not rejected is placed in watch mode, is the local player, no AI player is active, and the host's "Watching" option is "Allowed".
+Recorded on the same path as `SIM_EVENT_FOCUS_COMMANDER` (the local player's 30-tick update, game type not 1, the defeat check passing and the end-game countdown run below 0) when the commander-death setting is not "Deathmatch". In a multiplayer game (game type 3) with the local player not rejected, when the host's "Watching" option is "Allowed" or an AI player is active, the local player is placed in watch mode (its watch flag is set), the line of sight is recalculated, and if no AI player is active the event is recorded. In any other case the match ends instead and nothing is recorded.
 
 Phases: players (4), match load.
 
@@ -515,7 +556,7 @@ Value 26.
 
 Flags: none.
 
-Recorded when a defeated player of a multiplayer game (game type 3) who was not rejected is placed in watch mode, is the local player, an AI player is active, and combat players remain.
+Recorded on the same path as `SIM_EVENT_WATCH_PROMPT`, when an AI player is active (instead of the prompt) and at least one combat player remains.
 
 Phases: players (4), match load.
 
@@ -534,7 +575,10 @@ Value 27.
 
 Flags: none.
 
-Recorded in two cases. When a unit leaves a corpse and the wreck is placed as a feature (period 15, lifetime 900). When an explosion effect is added on land, above sea level (period 7, lifetime 15).
+Recorded in two cases.
+
+- A wreck: when a unit dies with wreckage level above 0 and the wreck, after following the next-wreck chain one step for each level above 1, has an id below 0xfffb, the unit's cell exists, and the kill type is not 7. Above sea level (the ground height at the unit is above the sea level) it is recorded whether or not the wreck was placed. At or below sea level it is recorded only when placing the wreck failed; a wreck that was placed under water records no smoke. The position is the unit's position; period 15, lifetime 900.
+- An explosion effect: when fewer than 300 explosion effects exist, the caller's flag is 0, and the whole part of the effect's y is above the sea level. The flag is 0 for an impact on a cell that is not below sea level, for explosions that a unit script makes from a piece, and for two debris paths; it is 1 for an impact on a cell below sea level, for the splash of a projectile crossing the sea level and for the other debris paths. Period 7, lifetime 15.
 
 Phases: net (0), units (1), projectiles (2), explosions (3), players (4), features (5), meteors (7), match load.
 
@@ -551,7 +595,13 @@ Value 28.
 
 Flags: none.
 
-Recorded when a projectile with an end smoke property detonates, when a projectile ends its flight without exploding, once in each tick a projectile with a smoke trail is past its next smoke time (the trail), once in each tick a burning feature is due to smoke (list 5), and when a unit's script emits a white smoke effect from a piece.
+Recorded in these cases:
+
+- A projectile detonates with the end smoke property, and the detonation is not the water case (the impact cell is not below sea level, or a unit was hit). Over a cell below sea level with no unit hit no white smoke is recorded.
+- A ballistic projectile with a non-zero lifetime reaches the end of its time (its time is not later than the current tick), has no burn-blow property, and is removed without exploding.
+- A projectile with the smoke trail property that is alive after its step, whose time is later than the current tick and whose next smoke tick is earlier than the current tick; the next smoke tick then advances by the weapon's smoke rate. The position is the projectile's position and the list is 9.
+- A burning feature with no 3D object (a sprite feature whose spot flag bit 0 is set), when the tick counter is divisible by 3. The list is 5. The position is the centre of the feature's footprint, offset by two draws of the sim random stream scaled by the size and offset of the current animation frame.
+- A unit's script emits effect 0x101 from a piece, at the piece's position (the unit's position plus the piece's position, with z subtracted), subject to the visibility test of the other script effects, which depends on the viewed player of the local machine.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -568,7 +618,7 @@ Value 29.
 
 Flags: none.
 
-Recorded when a unit's script emits a black smoke effect from a piece.
+Recorded when a unit's script emits effect 0x102 from a piece, at the piece's position (the unit's position plus the piece's position, with z subtracted). The script effect is dropped, with nothing recorded, unless the unit is visible to the player being viewed (the sim's player index for the viewing machine); this depends on the local machine's viewed player.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
@@ -586,9 +636,13 @@ Value 30.
 
 Flags: none.
 
-Recorded when a weapon fires (the weapon's sound), when a projectile hits (the weapon's hit sound) or lands in water (its water sound), and when a projectile of a burst weapon with a sound trigger spawns the next shot.
+Recorded in these cases:
 
-The set of players is decided by the logic when it records: 0 if the position is not on the map, else each player for whom the position is explored (when the map shows explored areas) or in sight (otherwise).
+- When a projectile is created (all projectile creation: unit weapons, meteors, projectiles from received network fire packets), with the weapon's sound. This is recorded unconditionally, including a sound index of 0.
+- When a projectile of a burst weapon with the sound trigger property spawns the next projectile of its burst, only if a projectile slot was allocated for it; the position is the burst projectile's position, after it was moved to the weapon piece when the burst rate is 5 or more or its remaining burst count is odd.
+- When a projectile detonates (see `SIM_EVENT_SCREEN_SHAKE` for when a detonation records anything): the water sound when the impact cell is below sea level and no unit was hit, otherwise the hit sound.
+
+The set of players who hear it (argument 4) is decided when it is recorded. It is 0 if the position's map cell (x and z divided by 16 world units) does not exist. Otherwise each player 0 to 9 is in the set when the position's cell in that player's explored map is inside the map: the position's whole x divided by 32, and its whole z minus half its whole y divided by 32 (the position projected by its height), indexes the map; the player is in the set when, with the map flag 2 set, that player's explored map entry is non-zero, and with it clear, the player's bit in the visibility mask of that cell is set.
 
 Phases: net (0), units (1), projectiles (2), features (5), meteors (7), match load.
 
@@ -606,7 +660,7 @@ Value 31.
 
 Flags: none.
 
-Recorded when a feature starts burning (sound name 1, at the feature's cell).
+Recorded when a feature starts burning (sound name 1), at the position of the feature's cell: x and z are the cell coordinates shifted left by 20 and y is the cell's height shifted left by 16.
 
 Phases: net (0), units (1), projectiles (2), features (5), match load.
 
@@ -622,7 +676,7 @@ Value 32.
 
 Flags: none.
 
-Recorded when a unit dies, after its orders are deleted.
+Recorded when a death is applied to a unit that exists, after the dead unit's orders are deleted.
 
 Phases: net (0), units (1), match load.
 
@@ -635,11 +689,11 @@ Value 33.
 | Argument | Type | Meaning |
 |---|---|---|
 | 0 | message text number | A number of the message texts table. |
-| 1 | integer | The value: for a toggle, 0 for off and not 0 for on; for a threshold, the number. |
+| 1 | integer | The value. Texts 0 to 4: 0 for off, not 0 for on (the share-metal value is 0 or 1, the share-energy value is 0 or 4, share-mapping 0 or 32, share-radar 0 or 64, share-LOS 0 or 1). Texts 5 and 6: the number the command was given. |
 
 Flags: none.
 
-Recorded when a console command sets sharing: a toggle of sharing metal, energy, mapping, line of sight or radar (texts 0 to 4, the value is the new state), or a threshold of metal or energy (texts 5 and 6, the value is the argument of the command).
+Recorded by a console command run by the local player, only in a network game (the net game flag 1 set): the toggles of sharing metal, energy, mapping, line of sight and radar (texts 0 to 4), with the new state, and the commands that set the thresholds for sharing metal and energy (texts 5 and 6), with the first argument of the command as given. The command that toggles all sharing records four events: metal, energy, mapping and radar (not line of sight). The radar toggle's value is the player's share-radar flag bit (64), tested after the toggle.
 
 Phases: match load, outside the steps.
 
@@ -655,9 +709,15 @@ Value 34.
 
 Flags: none.
 
-Recorded for the viewed player's radar. The snapshot is 8 bytes (the unit count and the projectile count, u32 each), then 48 bytes for each unit the radar shows (colour, damage and range flags, radar, sonar and jammer distances, weapon coverage for units with interceptors), then 12 bytes for each projectile the radar shows (x, y, kind, colour). The units shown and the projectiles shown are decided by the logic when it records.
+Recorded for the viewed player (the player index of the viewing machine), once in each tick for each pass of the players phase over that player (the player must be active, of type 1, 2 or 3, with index not 10), before that player's 30-tick update, and again after each line-of-sight recalculation. If the radar arena has no room the snapshot is not taken and no event is recorded.
 
-It is recorded once for each pass of the players phase over the viewed player, and when the line of sight is recalculated.
+The snapshot is 8 bytes: the unit count and the projectile count (u32 each). Then come the unit records, then the projectile records.
+
+A unit record is 48 bytes: slot u16 (index in the unit table), id u16, whole part of x i16, 2 reserved bytes, y scaled i32 (the whole part of z minus half the whole part of y), colour u8 (the player's colour), flags u8 (1 recently damaged, 2 shows ranges: the unit's activation bit 0 is set or its definition's flag 4 of the second flags byte is clear, 4 has interceptors), radar distance i16, sonar distance i16, radar jam distance i16, sonar jam distance i16, 2 reserved bytes, then three weapon records of 12 bytes (coverage i32, interceptor u8, stocked u8, 2 reserved), which are non-zero only for a unit whose definition has the interceptor flag and for a slot that has a weapon. A unit is included when its definition index is not 0 and either radar is enabled (the map flags 1 and 2 are both clear, or the match flag 2 is set), or the unit has a flag in 0x300, or it belongs to the viewed player.
+
+A projectile record is 12 bytes: x i32 (whole part), y i32 (whole z minus half the whole y), kind u8 (1 for an ordinary projectile, 2 for a nuclear one), colour u8 (the owner's colour for kind 2, else 0), 2 reserved bytes. An ordinary projectile (weapon flags 0x60000000 clear) is included unless its weapon has flag 0x40, and when it is on the radar (explored by the viewed player when the map flag 2 is set, else visible to the viewed player) or owned by the viewed player. Any other projectile is included when it is on the radar or its attacker belongs to the viewed player.
+
+The units and projectiles shown depend on the viewed player, so they differ between machines.
 
 Phases: players (4), match load.
 
@@ -673,7 +733,9 @@ Value 35.
 
 Flags: none.
 
-Recorded only when the map's explored or visible cells changed since the last snapshot (the change flag is then cleared). The snapshot is 12 bytes (width, height and cell count of the half-resolution map, u32 each) then one byte for each half-resolution map cell: hidden, explored, or in sight now, for the viewed player.
+Recorded only when the map-changed flag is set, which clears it. A snapshot is attempted in the 30-tick update of the viewed player in the players phase (after its sensors are updated) and after each line-of-sight recalculation. If the radar arena has no room, nothing is recorded.
+
+The snapshot is 12 bytes: the width and the height of the full map and the cell count (u32 each; the cell count is half the width times half the height, each rounded down), then one byte for each of those cells in order: 0 (hidden) when the viewed player's bit in the cell's visibility mask is clear, otherwise 1 (explored) when the viewed player's explored entry for the cell is non-zero, otherwise 2 (in sight now). The viewed player differs between machines.
 
 Phases: players (4), match load.
 

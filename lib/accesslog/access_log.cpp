@@ -1567,14 +1567,54 @@ NS unsigned SiteWithin(void (*function)())
     return 0;
 }
 
+struct PreHook {
+    unsigned queues, arenas;
+};
+
+NS void __cdecl CountExisting(void*, unsigned size, void* ctx)
+{
+    PreHook* c = (PreHook*)ctx;
+    if (size == sizeof(SimEventQueue))
+        c->queues++;
+    else if (size == sizeof(SimRadarArena))
+        c->arenas++;
+}
+
+NS unsigned SiteOfCreator(void (*function)(), unsigned size)
+{
+    unsigned site = SiteWithin(function);
+    if (site == 0) {
+        char text[128];
+        sprintf(text, "accesslog: no allocation site follows the creator of the pre-hook chunk of %u bytes\n", size);
+        Die(text);
+    }
+    return site;
+}
+
 NS void __cdecl AdoptExisting(void* payload, unsigned size, void*)
 {
     unsigned site = 0;
     if (size == sizeof(SimEventQueue))
-        site = SiteWithin(SimEventsCreate);
+        site = SiteOfCreator(SimEventsCreate, size);
     else if (size == sizeof(SimRadarArena))
-        site = SiteWithin(SimCaptureCreate);
+        site = SiteOfCreator(SimCaptureCreate, size);
     AddAlloc((unsigned)payload, size, site);
+}
+
+NS void AdoptPreHookChunks()
+{
+    PreHook c = {0, 0};
+    SimBlockForEach(CountExisting, &c);
+    char text[128];
+    if (c.queues > 1) {
+        sprintf(text, "accesslog: %u pre-hook chunks have the size of the sim event queue (%u bytes)\n", c.queues, (unsigned)sizeof(SimEventQueue));
+        Die(text);
+    }
+    if (c.arenas > 1) {
+        sprintf(text, "accesslog: %u pre-hook chunks have the size of the sim radar arena (%u bytes)\n", c.arenas, (unsigned)sizeof(SimRadarArena));
+        Die(text);
+    }
+    SimBlockForEach(AdoptExisting, 0);
 }
 
 NS void AccessLogInit()
@@ -1610,7 +1650,7 @@ NS void AccessLogInit()
 #if BT_DEFER_WRITES
     DeferLoad();
 #endif
-    SimBlockForEach(AdoptExisting, 0);
+    AdoptPreHookChunks();
     g_allocHooks = &g_hooks;
     g_ready = true;
 }

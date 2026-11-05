@@ -1,0 +1,52 @@
+# Edge cases for the targeting recording: the ground aimed at under a sea level equal to its height, a human unit that picks an enemy building because of shootall, and a laser tower that kills fourteen patrolling constructors in turn, so that the lead of a veteran is checked at 4, 5 and 6 kills; 1300 ticks.
+game_seed 907
+crt_seed 1907
+view_seed 2907
+map The Pass
+start_positions fixed
+ticks 1300
+commander_death 0
+player0.controller human
+player0.side Arm
+player0.metal 30000
+player0.energy 60000
+player1.controller human
+player1.side Arm
+player2.controller human
+player2.side Core
+player2.metal 30000
+player2.energy 60000
+console 1 +now Film Chris Include Reload Assert
+console 8 +sealevel 1
+spawn 5 2 CORSOLAR 700 380
+order 10 0:ARMCOM:1 dgun 850 300
+console 60 +shootall
+spawn 5 0 ARMHLT 3300 1290
+spawn 5 2 CORCK 3330 1290
+spawn 5 2 CORCK 3340 1290
+spawn 5 2 CORCK 3350 1290
+spawn 5 2 CORCK 3360 1290
+spawn 5 2 CORCK 3370 1290
+spawn 5 2 CORCK 3380 1290
+spawn 5 2 CORCK 3390 1290
+spawn 5 2 CORCK 3400 1290
+spawn 5 2 CORCK 3410 1290
+spawn 5 2 CORCK 3420 1290
+spawn 5 2 CORCK 3430 1290
+spawn 5 2 CORCK 3440 1290
+spawn 5 2 CORCK 3450 1290
+spawn 5 2 CORCK 3460 1290
+order 6 2:CORCK:1 patrol 3330 1325
+order 6 2:CORCK:2 patrol 3340 1325
+order 6 2:CORCK:3 patrol 3350 1325
+order 6 2:CORCK:4 patrol 3360 1325
+order 6 2:CORCK:5 patrol 3370 1325
+order 6 2:CORCK:6 patrol 3380 1325
+order 6 2:CORCK:7 patrol 3390 1325
+order 6 2:CORCK:8 patrol 3400 1325
+order 6 2:CORCK:9 patrol 3410 1325
+order 6 2:CORCK:10 patrol 3420 1325
+order 6 2:CORCK:11 patrol 3430 1325
+order 6 2:CORCK:12 patrol 3440 1325
+order 6 2:CORCK:13 patrol 3450 1325
+order 6 2:CORCK:14 patrol 3460 1325

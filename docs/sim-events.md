@@ -4,7 +4,8 @@ The sim events are how the game logic tells the presentation what happened in a 
 
 ## Conventions
 
-- **Phases.** A tick runs the phases `units` (1), `projectiles` (2), `explosions` (3), `players` (4), `features` (5), `wind` (6) and `meteors` (7), in this order, after a `net` phase (0) that handles network packets. A kind lists the phases in which it can be recorded. "Outside a step" means recorded between ticks: when a match is set up, when a console command or an interface action runs, and when a match is shut down.
+- **Phases.** A tick runs the phases `net` (0, network packets), `units` (1), `projectiles` (2), `explosions` (3), `players` (4), `features` (5), `wind` (6) and `meteors` (7), in this order, and then the resource sharing of network play (8) at the end of the step. Two more labels are used: `match load` (the code that builds the match state) and `outside the steps` (code that records the event and that no phase and no match load reaches in the call graph: console commands, interface actions, match shutdown, and code nothing calls).
+- **"Can be emitted in".** The `Phases:` line of a kind lists the phases from which a path of calls reaches a record of that kind. It means a path exists in the static call graph of the game logic, not that a scenario has shown it. The event log of the reference scenarios will show which kinds the scenarios reach. A tool checks each `Phases:` line against the call graph.
 - **Units** are referred to by their index in the unit table of the state block, never by address. A unit index in an argument is only meaningful while that unit exists; the presentation checks whether it is still alive.
 - **Players** are referred to by their index (0 to 9 for the ten player slots). The value 10 means no player. Where a kind says network id, the argument is the player's network identifier, not a slot.
 - **Positions** are three consecutive arguments, x, y and z, each a signed 32-bit value stored in an unsigned argument, in the same fixed-point world coordinates as unit positions in the state block (16 fractional bits; y is height). Where a kind lists a position as "(3)", it takes three arguments.
@@ -71,6 +72,8 @@ The kinds are 1 to 35 except 24, which is not used. Each section is headed by th
 
 Value 0. Marks an empty record. It is never recorded and has no arguments, no flags and no phase.
 
+Phases: none.
+
 ### SIM_EVENT_UNIT_SPEECH
 
 Value 1.
@@ -81,11 +84,29 @@ Value 1.
 | 1 | integer | The kind of line: the voice slot, as the unit's sound category names it. |
 | 2 | speech text number | 0 for the text of the line's kind, or a number of the speech texts table. |
 
-Flags: bit 0, the unit speaks only while it is off screen.
+Flags: bit 0, the unit speaks only while it is off screen (set for slot 2 only).
 
-Recorded when a unit announces something: it is given or finishes an order (starting construction, building complete, construction stopped or terminated, capture, reclaim, repair, resurrection, transport, landing and unloading successes and failures, patrolling, guarding, attacking, a refused order such as "I can't get there"), when it is activated or deactivated, when it gains or loses state bit 2 (kinds 14 and 15), and when an attacked unit reacts to damage from another player or from a damage type 1 (kind 2, with flag bit 0). The logic records it only while the unit exists and is not already dying. Units placed at the start of a match speak at once, outside a step.
+Recorded when a unit announces something, only while the unit exists and is not already dying. Units placed at the start of a match speak at once. The voice slot (argument 1) is a line kind of the table "Speech line kinds" below, and the sim records it from these places:
 
-Phases: units (orders, activation, damage reactions), players (activation changes made by the economy and the AI for the players' units), and outside a step (units placed at the start of a match, an order given from the interface).
+- 2, underattack: a unit takes damage and the attacker is not the unit's own player or the damage type is 1, and the unit's order flags do not have bit 7 set. This is the one place that sets flag bit 0.
+- 3, activate and 4, deactivate: the unit's activation state gains or loses bit 0.
+- 14, cloak and 15, uncloak: the unit's activation state gains or loses bit 2 (value 4), which the economy sets from whether a cloaked unit pays its cloak cost each tick.
+- 5, ok: an order whose status flag 0x2000 is set announces its status the first time its step runs, with the text of the order ("Attacking", "Building", "Guarding", "Loading", "Patrolling", "Reclaiming", "Repairing", "Unloading" and the like, the texts table below), and clears the flag.
+- 6, arrived: a move order (ground or air) arrives, and a kamikaze attack reaches its target.
+- 7, cant: an order fails or is refused. The text names the reason: the failure and refusal texts of the speech texts table (capture failed, construction terminated or stopped, reclamation failed, repairs unsuccessful, resurrection failed, "I can't get there", "Unable to create any more units", transport and landing failures, and so on).
+- 8, unitcomplete: a construction or resurrection order finishes ("Building complete", "Resurrection complete"), and a build order ends with the default text.
+- 9, build: a build order starts constructing ("Starting construction").
+- 10, repair: a repair order finishes ("Unit repaired").
+- 11, working: a reclaim, resurrect or capture order starts work on its target.
+- 12, load: a pickup order (ground or air) begins loading.
+- 13, unload: an unload order begins unloading, or the unit to unload is not carried.
+- 16, capture: a capture order starts.
+- 17 to 22, count5 to count0: one for each tick of the self-destruct countdown, from 5 down to 0, with the default text. The slot is 22 for the count at 0.
+- 23, canceldestruct: a self-destruct order is cancelled.
+
+No call site records slot 0 or slot 1 (select, which the interface handles).
+
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation says the line only for a unit of the local player, and drops it when the unit has died by then or, with flag bit 0, is on screen. The line enters a queue that keeps one line per kind, ordered by priority.
 
@@ -102,7 +123,7 @@ Flags: none.
 
 Recorded when a victory condition of the mission is first satisfied, once for each condition (sound name 0). The conditions are: the enemy commander is killed, all enemy units are destroyed, all mobile enemy units are killed, a unit of the given type is built, a unit of the given type is captured, all units of a type are killed, a unit of a type is killed, a unit reaches a radius, a unit of a type passes a given x, a unit of a type passes a given z.
 
-Phases: units (when a unit dies or is captured and the condition is tested on that unit), players (when the conditions are tested against the units each tick).
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation plays the sound by name.
 
@@ -118,9 +139,9 @@ Value 3.
 
 Flags: none. Two records (ten arguments).
 
-Recorded while a builder works on a build, repair or resurrect order, each time the order's step runs. The flow runs from the origin to the box.
+Recorded each time a build, repair or resurrect step of a builder adds progress to its target (and each time the repair and resurrect steps of an air builder do the same). The origin is the nanolathe point of the builder and the box is the target's bounding box at its position. The flow runs from the origin to the box.
 
-Phases: units.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation draws a beam of particles flowing from the origin to the box.
 
@@ -136,9 +157,9 @@ Value 4.
 
 Flags: none. Two records (ten arguments).
 
-Recorded while a builder works on a reclaim or capture order, each time the order's step runs. A reclaim order of a unit or feature records two of these in one tick.
+Recorded each time a reclaim or capture step of a builder works on its target. The box is the target's bounding box at its position; the origin is the nanolathe point of the builder. A reclaim order of a unit or feature records two of these in one tick.
 
-Phases: units.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation draws a beam of particles flowing from the box to the origin.
 
@@ -148,16 +169,16 @@ Value 5.
 
 | Argument | Type | Meaning |
 |---|---|---|
-| 0 to 2 | position | The start, the position of the unit. |
-| 3 to 5 | position | The end, the destination of the teleport. |
+| 0 to 2 | position | The start, the position of a unit that is moved. |
+| 3 to 5 | position | The end, the position the unit is moved to. |
 | 6 | integer | The lifetime in ticks. Always 30. |
 | 7 | integer | The particle list. Always 5. |
 
 Flags: none.
 
-Recorded when a unit executes a teleport order, once, as the unit is moved.
+Recorded once for each unit other than the teleporter inside the teleporter's bounding box when a teleport order runs, as that unit is moved to the destination of the order.
 
-Phases: units.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation draws sparks flying from the start to the end.
 
@@ -175,9 +196,9 @@ Value 6.
 
 Flags: none. Two records (nine arguments).
 
-Recorded when a unit's script emits a thrust effect from a piece (lifetime 6 for one of the two thrust effects, 7 for the other).
+Recorded when a unit's script emits effect 0 (lifetime 6) or effect 1 (lifetime 7) from a piece. The start and end are the piece's two positions.
 
-Phases: units.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation streams a jet plume from the start to the end.
 
@@ -194,9 +215,9 @@ Value 7.
 
 Flags: none.
 
-Recorded when a unit's script emits a wake effect from a piece. There are four wake effects in two sizes (period 16 and period 8), each with the piece's two positions in either order.
+Recorded when a unit's script emits effect 2 (period 16), 3 (period 8), 4 (period 16, positions swapped) or 5 (period 8, positions swapped) from a piece.
 
-Phases: units.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation trails a wake from the start to the end.
 
@@ -213,9 +234,9 @@ Value 8.
 
 Flags: none.
 
-Recorded when a unit's script emits an underwater bubble effect from a piece.
+Recorded when a unit's script emits effect 0x103 from a piece. The start is the piece's position and the end is the same position at the sea level height.
 
-Phases: units.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation raises bubbles from the start to the end.
 
@@ -230,9 +251,9 @@ Value 9.
 
 Flags: none.
 
-Recorded when a unit fires a weapon whose definition has the start smoke property, once for each shot (each of the three firing paths records it).
+Recorded when a unit fires a weapon whose definition has the start smoke property, once for each shot.
 
-Phases: units.
+Phases: net (0), units (1), match load.
 
 The presentation puffs smoke at the position.
 
@@ -247,9 +268,9 @@ Value 10.
 
 Flags: none.
 
-Recorded when a feature whose definition has a geothermal vent is placed on the map. This happens for every such feature when a match is loaded (so the first drain of a match can hold hundreds), and again whenever such a feature is placed during play, as when a burnt feature replaces a feature.
+Recorded when a feature whose definition has a geothermal vent is placed on the map. This happens for every such feature when a match is loaded (so the first drain of a match can hold hundreds), and again whenever such a feature is placed later, as when a burnt feature replaces a feature that burned down.
 
-Phases: outside a step (match load), features and projectiles (a feature replaced by its burnt version).
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation starts a timed plume of particles rising over the vent.
 
@@ -265,9 +286,9 @@ Value 11.
 
 Flags: none.
 
-Recorded when a projectile detonates, once for each detonation, with the shake magnitude of the weapon definition as both offsets, whatever the magnitude (it may be 0).
+Recorded once for each detonation of a projectile that is not discarded without effect, with the shake magnitude of the weapon definition as both offsets and its shake duration as the strength, whatever the values (they may be 0).
 
-Phases: projectiles, units (a dying unit's weapon detonating).
+Phases: net (0), units (1), projectiles (2), features (5), match load.
 
 The presentation adds the shake to the screen's shake, unless the player turned screen shake off.
 
@@ -285,7 +306,7 @@ Flags: none.
 
 Recorded in two cases. When a unit takes damage from an attacker and either the attacker's player or the victim's player is the local player: amount 1, the attacker's player, the victim's player. When a unit dies and is credited as a kill by the local player: amount 5, the killer's slot twice.
 
-Phases: units, projectiles, players (wherever a unit takes damage or dies).
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation counts the amount in the disc activity meter, which picks the music, when either player is the local player.
 
@@ -299,9 +320,9 @@ Value 13.
 
 Flags: none.
 
-Recorded when a unit dies and it was the last unit of its player, in a game of the team-less multiplayer type (game type 2).
+Recorded when a unit dies and it was the last unit of its player, in a skirmish (game type 2).
 
-Phases: units, projectiles, players, and outside a step (match shutdown), wherever a unit dies.
+Phases: net (0), units (1), match load.
 
 The presentation prints the message that the side's forces are destroyed, in the side's name, with one of three texts chosen from the view random stream.
 
@@ -318,7 +339,7 @@ Flags: none.
 
 Recorded when a unit dies and the death is credited to an attacker that is another player.
 
-Phases: units, projectiles, players, wherever a unit dies.
+Phases: net (0), units (1), match load.
 
 The presentation flashes the kill and the loss on the score panel, when the player's options show the score panel.
 
@@ -332,9 +353,9 @@ Value 15.
 
 Flags: none.
 
-Recorded when what a unit's orders panel shows changes: when a unit's activation, or its state bit 2, changes, when a build, repair, reclaim, resurrect or capture order starts, ends or is terminated, and when an order of the unit is replaced.
+Recorded when what a unit's orders panel shows changes: when the unit's activation state changes (any bit that can announce speech), and when a build, repair, reclaim, resurrect or capture order starts, finishes or is terminated, including the same orders of air builders.
 
-Phases: units, players (state changes made by the economy and the AI).
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation redraws the orders panel if the unit is selected and belongs to the local player.
 
@@ -348,9 +369,9 @@ Value 16.
 
 Flags: none.
 
-Recorded when the build counts of a factory or builder change: when a build order is queued, finishes or is cancelled, when construction of a unit ends, and when a unit of a stockpiling weapon fires.
+Recorded when the build counts shown for a builder change: when a build order starts, stops or finishes, when construction of a unit is finished (recorded for the builder), and when a stockpiled weapon of the unit is fired.
 
-Phases: units, net (a build finished by a network packet), outside a step (an interface action).
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation writes the queued build counts into the build menu if the unit is the one it shows.
 
@@ -364,9 +385,9 @@ Value 17.
 
 Flags: none.
 
-Recorded when a unit is attached to or detached from a transporter, after its state changed.
+Recorded when a unit is attached to a transporter or detached from it, after its state has changed.
 
-Phases: units, net.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation removes the unit from the selection when it can no longer be selected (unfinished, in transit, or carried by a transport that may not carry it).
 
@@ -380,9 +401,9 @@ Value 18.
 
 Flags: none.
 
-Recorded when construction of a unit is finished for a player who is human or computer-controlled and the unit is the one the player has focus on (screen 0, the build menu).
+Recorded when construction of a unit is finished, the unit's player is a human or computer-controlled player and the finished unit has the player's focus flag (0x20000000). The screen is 0, the build menu.
 
-Phases: units, net, outside a step.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation marks the GUI as changed when that screen is on top.
 
@@ -396,9 +417,9 @@ Value 19.
 
 Flags: none.
 
-Recorded when the local player's commander is created anew after a defeat countdown, in a match whose commander-death setting is 2, after the line of sight is recalculated.
+Recorded when the end-game countdown of the local player ends in a match whose commander-death setting is "Deathmatch" (value 2; 0 is "Game Continues", 1 is "Game Ends"), after a new commander has been created for the local player at a random place of the map and the line of sight has been recalculated.
 
-Phases: players.
+Phases: players (4), match load.
 
 The presentation centres the camera on the commander of the viewed player and, with the flag set, selects it and closes the open screens.
 
@@ -412,9 +433,9 @@ Value 20.
 
 Flags: none.
 
-Recorded when a commander of a human or computer-controlled player is killed in a match whose commander-death setting is on, just before that player's units are killed.
+Recorded when the commander of a human or computer-controlled player is killed in a match whose commander-death setting is "Game Ends" or "Deathmatch" (not 0), just before all that player's units are killed.
 
-Phases: units, projectiles, players, wherever a unit is killed; and outside a step (match shutdown).
+Phases: net (0), units (1), match load.
 
 The presentation closes the screens above the game screen, unless a dialog is open and the flag is 0.
 
@@ -425,13 +446,13 @@ Value 21.
 | Argument | Type | Meaning |
 |---|---|---|
 | 0 | player index | The player who has taken the lead. |
-| 1 | integer | The kills that put it there: the commander kills when the commander-death setting is 2, else the kills. |
+| 1 | integer | The kills that put it there: the commander kills when the commander-death setting is "Deathmatch", else the kills. |
 
 Flags: none.
 
-Recorded when a kill moves a player to rank 0 on the score list, in a team-less or team multiplayer game (game types 2 and 3).
+Recorded when a credited kill moves a player to rank 0 on the score list, in a skirmish or multiplayer game (game types 2 and 3).
 
-Phases: units, projectiles, players, wherever a unit dies.
+Phases: net (0), units (1), match load.
 
 The presentation prints the message that the player has taken the lead, in the player's name and with the kills.
 
@@ -445,9 +466,9 @@ Value 22.
 
 Flags: none.
 
-Recorded when a unit dies and it was the last unit of its player, in a game of team multiplayer type (game type 3).
+Recorded when a unit dies and it was the last unit of its player, in a multiplayer game (game type 3).
 
-Phases: units, projectiles, players, wherever a unit dies.
+Phases: net (0), units (1), match load.
 
 The presentation prints that the player left the game, in the player's name, with one of eight texts chosen from the view random stream, unless the local player was rejected or no slot has the id.
 
@@ -462,9 +483,9 @@ Value 23.
 
 Flags: none.
 
-Recorded when a computer-controlled player queues a build order on an idle factory.
+Recorded when a computer-controlled player queues a build order on a factory that has no queue, from the AI's build timer (once every 30 ticks for each of its units) and from the code that issues a first order to an idle factory.
 
-Phases: players (the AI of the players phase).
+Phases: players (4), match load, outside the steps.
 
 The presentation plays the add sound of the build menu when the player is the one shown, and the subtract sound when the change is not positive.
 
@@ -478,9 +499,9 @@ Value 25.
 
 Flags: none.
 
-Recorded when a defeated player in a team multiplayer game (game type 3) who is not rejected may keep watching, is the local player and hosts no AI player that is still alive.
+Recorded when a defeated player of a multiplayer game (game type 3) who was not rejected is placed in watch mode, is the local player, no AI player is active, and the host's "Watching" option is "Allowed".
 
-Phases: players.
+Phases: players (4), match load.
 
 The presentation asks the local player whether to keep watching, when the player is the local player.
 
@@ -494,9 +515,9 @@ Value 26.
 
 Flags: none.
 
-Recorded when a defeated player in a team multiplayer game (game type 3) is the local player and hosts AI players that are still alive, and there are combat players left.
+Recorded when a defeated player of a multiplayer game (game type 3) who was not rejected is placed in watch mode, is the local player, an AI player is active, and combat players remain.
 
-Phases: players.
+Phases: players (4), match load.
 
 The presentation tells the local player that hosting AI players that are still alive keeps the match going, when the player is the local player.
 
@@ -515,7 +536,7 @@ Flags: none.
 
 Recorded in two cases. When a unit leaves a corpse and the wreck is placed as a feature (period 15, lifetime 900). When an explosion effect is added on land, above sea level (period 7, lifetime 15).
 
-Phases: units, projectiles (wherever an explosion effect is added or a unit leaves a corpse).
+Phases: net (0), units (1), projectiles (2), explosions (3), players (4), features (5), meteors (7), match load.
 
 The presentation starts a smoke plume. The smoke picks its animation frames from the view random stream.
 
@@ -532,7 +553,7 @@ Flags: none.
 
 Recorded when a projectile with an end smoke property detonates, when a projectile ends its flight without exploding, once in each tick a projectile with a smoke trail is past its next smoke time (the trail), once in each tick a burning feature is due to smoke (list 5), and when a unit's script emits a white smoke effect from a piece.
 
-Phases: units, projectiles, features.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation puffs white smoke at the position.
 
@@ -549,7 +570,7 @@ Flags: none.
 
 Recorded when a unit's script emits a black smoke effect from a piece.
 
-Phases: units.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
 
 The presentation puffs black smoke at the position.
 
@@ -569,7 +590,7 @@ Recorded when a weapon fires (the weapon's sound), when a projectile hits (the w
 
 The set of players is decided by the logic when it records: 0 if the position is not on the map, else each player for whom the position is explored (when the map shows explored areas) or in sight (otherwise).
 
-Phases: units (a weapon firing), projectiles (hits and burst spawns).
+Phases: net (0), units (1), projectiles (2), features (5), meteors (7), match load.
 
 The presentation plays the sound at the position, when the sound settings allow it and the local player is in the set. With 3D sound off, a sound off screen plays quieter.
 
@@ -587,7 +608,7 @@ Flags: none.
 
 Recorded when a feature starts burning (sound name 1, at the feature's cell).
 
-Phases: features, projectiles, and units (a feature set alight by a weapon), and outside a step (a feature set alight at match load).
+Phases: net (0), units (1), projectiles (2), features (5), match load.
 
 The presentation plays the named sound at the position with the checks of `SIM_EVENT_SOUND_AT`.
 
@@ -603,7 +624,7 @@ Flags: none.
 
 Recorded when a unit dies, after its orders are deleted.
 
-Phases: units, projectiles, players, wherever a unit dies; and outside a step (match shutdown).
+Phases: net (0), units (1), match load.
 
 The presentation drops the unit's pending lines from the speech queue.
 
@@ -620,7 +641,7 @@ Flags: none.
 
 Recorded when a console command sets sharing: a toggle of sharing metal, energy, mapping, line of sight or radar (texts 0 to 4, the value is the new state), or a threshold of metal or energy (texts 5 and 6, the value is the argument of the command).
 
-Phases: outside a step (console commands run between ticks).
+Phases: match load, outside the steps.
 
 The presentation puts the line in the message log: the text with ON or OFF for a toggle, or with the number.
 
@@ -638,7 +659,7 @@ Recorded for the viewed player's radar. The snapshot is 8 bytes (the unit count 
 
 It is recorded once for each pass of the players phase over the viewed player, and when the line of sight is recalculated.
 
-Phases: players, and outside a step (a line of sight recalculation by a console command or at match load).
+Phases: players (4), match load.
 
 The presentation draws the radar picture from the snapshot.
 
@@ -654,11 +675,15 @@ Flags: none.
 
 Recorded only when the map's explored or visible cells changed since the last snapshot (the change flag is then cleared). The snapshot is 12 bytes (width, height and cell count of the half-resolution map, u32 each) then one byte for each half-resolution map cell: hidden, explored, or in sight now, for the viewed player.
 
-Phases: players (after the viewed player's sensors are updated), and outside a step (a line of sight recalculation).
+Phases: players (4), match load.
 
 The presentation marks the cells on the radar picture as explored or hidden.
 
 ## Tables
+
+### Speech line kinds
+
+Argument 1 of `SIM_EVENT_UNIT_SPEECH` is one of these 24 line kinds, with the sound it plays and the text it shows, if any: 0 none, 1 "select", 2 "underattack" ("Under Attack"), 3 "activate", 4 "deactivate", 5 "ok", 6 "arrived" ("Arrived"), 7 "cant" ("Cannot Comply"), 8 "unitcomplete" ("Nanolathe Complete"), 9 "build", 10 "repair", 11 "working", 12 "load", 13 "unload", 14 "cloak" ("Cloaked"), 15 "uncloak" ("Visible"), 16 "capture", 17 "count5" ("five"), 18 "count4" ("four"), 19 "count3" ("three"), 20 "count2" ("two"), 21 "count1" ("one"), 22 "count0" ("zero"), 23 "canceldestruct" ("Self destruct terminated").
 
 ### Speech texts
 

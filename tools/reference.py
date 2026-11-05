@@ -20,6 +20,8 @@ scenarios named in GATE_TIER, the pull request gate (tools/coverage.py --tier ch
 
 `--check --both-modes` plays every scenario once in WASM and once with `-modules=native` in one pool (each line names its
 mode, the sound logs and block pointer scans are kept apart per mode) and passes only when both modes equal the stored traces.
+An exe with accesslog.attr beside it (an access-log build, tools/accesslog.py) is played without the block pointer scan, and
+the check prints `block pointers: not scanned, access-log build` instead of the block pointer report.
 Every game run of a `--check` holds one of the machine's run slots (files bt-gate-slot-<i> in $XDG_RUNTIME_DIR, else /tmp, each
 taken with flock; half the CPUs and at most GATE_SLOTS of them, $BT_GATE_SLOTS overrides), so that all the gates on a machine together
 play at most that many games: gates run at the same time and fill the slots one gate's longest scenario leaves idle, where one
@@ -1478,6 +1480,8 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         save_bad += len(save_names)
         if scans is not None:
             pointers += report_block_pointers(exe, mode_view(scans, scenarios, mode), save_blockptrs / mode if save_blockptrs and both_modes else save_blockptrs, label)
+        elif instrumented:
+            print(f"{label}block pointers: not scanned, access-log build")
         pointers += report_fuel(exe, scenarios, mode_view(FUEL, scenarios, mode), mode == "native" if both_modes else None, label)
     if not bad:
         if pointers or sound_bad or ui_bad or frame_bad or save_bad:

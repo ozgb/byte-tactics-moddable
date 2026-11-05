@@ -104,6 +104,7 @@ CONTENTS = [
     ("file", "docs/replay-format.md", "the replay format"),
     ("file", SIM_EVENTS_PAGE, "the sim event queue and its kinds, with the terms it uses defined"),
     ("file", "data/replay_schema.json", "the annotations of the replay format"),
+    ("file", "docs/ai-ratings.md", "numeric details of the computer player's ratings"),
 ]
 
 ROLES = {

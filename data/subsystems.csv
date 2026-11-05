@@ -4544,6 +4544,7 @@ ReplayApplyVectorElement,src/harness/replay_objects.cpp,harness,folder:src/harne
 ReplayApplyVectorString,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayArrayDiff,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayBindCallbackHook,src/harness/replay_objects.cpp,harness,folder:src/harness/,
+ReplayBlobKey,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayBytes,src/harness/replay_values.h,harness,folder:src/harness/,
 ReplayCallbackCall::Active,src/harness/replay_objects.h,harness,folder:src/harness/,
 ReplayCallbackCall::Original,src/harness/replay_objects.cpp,harness,folder:src/harness/,

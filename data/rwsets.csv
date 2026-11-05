@@ -45121,7 +45121,7 @@ address,function,file,kind,target
 ,EmitVector,src/harness/replay_objects.cpp,call,ReplayText::Data
 ,EmitVector,src/harness/replay_objects.cpp,call,ReplayText::Free
 ,EmitVector,src/harness/replay_objects.cpp,call,ViewOf
-,EmitVector,src/harness/replay_objects.cpp,call,sprintf
+,EmitVector,src/harness/replay_objects.cpp,call,_snprintf
 ,EmitVector,src/harness/replay_objects.cpp,field_read,ReplayObjectField::array
 ,EmitVector,src/harness/replay_objects.cpp,field_read,ReplayObjectField::kind
 ,EmitVector,src/harness/replay_objects.cpp,field_read,ReplayObjectField::name
@@ -55562,6 +55562,7 @@ address,function,file,kind,target
 ,ReplayApplyBlob,src/harness/replay_objects.cpp,call,ReplayFindObjectKind
 ,ReplayApplyBlob,src/harness/replay_objects.cpp,call,ReplayKnown::Get
 ,ReplayApplyBlob,src/harness/replay_objects.cpp,call,ReplayObjectTable::Bind
+,ReplayApplyBlob,src/harness/replay_objects.cpp,call,_snprintf
 ,ReplayApplyBlob,src/harness/replay_objects.cpp,call,atoi
 ,ReplayApplyBlob,src/harness/replay_objects.cpp,call,memcpy
 ,ReplayApplyBlob,src/harness/replay_objects.cpp,call,strchr
@@ -55676,6 +55677,18 @@ address,function,file,kind,target
 ,ReplayArrayDiff,src/harness/replay_objects.cpp,function,
 ,ReplayBindCallbackHook,src/harness/replay_objects.cpp,function,
 ,ReplayBindCallbackHook,src/harness/replay_objects.cpp,global_read,hook@ReplayBindCallbackHook
+,ReplayBlobKey,src/harness/replay_objects.cpp,call,ReplayObjectTable::Find
+,ReplayBlobKey,src/harness/replay_objects.cpp,call,ReplayText::Add
+,ReplayBlobKey,src/harness/replay_objects.cpp,call,ReplayText::AddChar
+,ReplayBlobKey,src/harness/replay_objects.cpp,call,ReplayText::AddUnsigned
+,ReplayBlobKey,src/harness/replay_objects.cpp,call,ReplayText::Clear
+,ReplayBlobKey,src/harness/replay_objects.cpp,deref_read,*void
+,ReplayBlobKey,src/harness/replay_objects.cpp,field_read,ReplayObjectField::offset
+,ReplayBlobKey,src/harness/replay_objects.cpp,field_read,ReplayObjectField::target
+,ReplayBlobKey,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::name
+,ReplayBlobKey,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::table
+,ReplayBlobKey,src/harness/replay_objects.cpp,function,
+,ReplayBlobKey,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
 ,ReplayBytes,src/harness/replay_values.h,call,ReplayText::Add
 ,ReplayBytes,src/harness/replay_values.h,call,ReplayText::AddChar
 ,ReplayBytes,src/harness/replay_values.h,deref_read,*unsigned char
@@ -55782,7 +55795,7 @@ address,function,file,kind,target
 ,ReplayCompareCStrings,src/harness/replay_objects.cpp,call,ReplayText::Free
 ,ReplayCompareCStrings,src/harness/replay_objects.cpp,call,StringsAt
 ,ReplayCompareCStrings,src/harness/replay_objects.cpp,call,StringsLength
-,ReplayCompareCStrings,src/harness/replay_objects.cpp,call,sprintf
+,ReplayCompareCStrings,src/harness/replay_objects.cpp,call,_snprintf
 ,ReplayCompareCStrings,src/harness/replay_objects.cpp,call,strcmp
 ,ReplayCompareCStrings,src/harness/replay_objects.cpp,deref_read,*char
 ,ReplayCompareCStrings,src/harness/replay_objects.cpp,field_read,ReplayArraySpec::strings
@@ -55795,7 +55808,7 @@ address,function,file,kind,target
 ,ReplayCompareRefs,src/harness/replay_objects.cpp,call,ReplayKnown::Get
 ,ReplayCompareRefs,src/harness/replay_objects.cpp,call,ReplayText::Data
 ,ReplayCompareRefs,src/harness/replay_objects.cpp,call,ReplayText::Free
-,ReplayCompareRefs,src/harness/replay_objects.cpp,call,sprintf
+,ReplayCompareRefs,src/harness/replay_objects.cpp,call,_snprintf
 ,ReplayCompareRefs,src/harness/replay_objects.cpp,call,strcmp
 ,ReplayCompareRefs,src/harness/replay_objects.cpp,field_read,ReplayElemSpec::count
 ,ReplayCompareRefs,src/harness/replay_objects.cpp,field_read,ReplayObjectField::array
@@ -55813,6 +55826,7 @@ address,function,file,kind,target
 ,ReplayCompareVector,src/harness/replay_objects.cpp,call,ReplayText::Data
 ,ReplayCompareVector,src/harness/replay_objects.cpp,call,ReplayText::Free
 ,ReplayCompareVector,src/harness/replay_objects.cpp,call,ViewOf
+,ReplayCompareVector,src/harness/replay_objects.cpp,call,_snprintf
 ,ReplayCompareVector,src/harness/replay_objects.cpp,call,memcpy
 ,ReplayCompareVector,src/harness/replay_objects.cpp,call,sprintf
 ,ReplayCompareVector,src/harness/replay_objects.cpp,call,strchr
@@ -55875,18 +55889,16 @@ address,function,file,kind,target
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,EmitCStrings
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,EmitRefs
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,EmitVector
+,ReplayEmitField,src/harness/replay_objects.cpp,call,ReplayBlobKey
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,ReplayFormatObjectField
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,ReplayKnown::Changed
-,ReplayEmitField,src/harness/replay_objects.cpp,call,ReplayKnown::Set
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,ReplayText::Add
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,ReplayText::AddChar
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,ReplayText::Data
-,ReplayEmitField,src/harness/replay_objects.cpp,call,sprintf
-,ReplayEmitField,src/harness/replay_objects.cpp,deref_read,*unsigned int
+,ReplayEmitField,src/harness/replay_objects.cpp,call,ReplayText::Free
 ,ReplayEmitField,src/harness/replay_objects.cpp,field_read,ReplayArraySpec::elem
 ,ReplayEmitField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::array
 ,ReplayEmitField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::kind
-,ReplayEmitField,src/harness/replay_objects.cpp,field_read,ReplayObjectField::offset
 ,ReplayEmitField,src/harness/replay_objects.cpp,function,
 ,ReplayEmitField,src/harness/replay_objects.cpp,global_read,kReplayArrays@src/harness/replay_schema.h
 ,ReplayEndHook,src/harness/replay.h,call,ReplayGateRef

@@ -3,7 +3,7 @@ stored access-log summaries.
 
     uv run tools/accesslog.py run --build-dir build/access <every scenario>
     uv run tools/phaseclass.py --store build/access/access    # keeps the four phase files of each scenario, gzipped
-    uv run tools/phaseclass.py --write       # writes data/phase_dependencies.csv, phase_boundaries.csv, draws.csv, pass_reads.csv
+    uv run tools/phaseclass.py --write       # writes data/phase_dependencies.csv, phase_boundaries.csv, draws.csv, pass_reads.csv, presentation_feeds.csv
     uv run tools/phaseclass.py --check       # fail if one of them differs from what the stored files regenerate, or if a
                                              # scenario lacks a file, or if a phase boundary or pass has no row
     uv run tools/test_phaseclass.py          # tests, on synthetic files
@@ -32,15 +32,26 @@ row is an edge between two different simulation subsystems (coupling.SIM_SUBSYST
 them) across phases. A row whose reader is `presentation` is left out of it and of data/phase_boundaries.csv, in
 --write and in --check alike, because the stored files no longer hold it and data/presentation_reads.csv covers it. A row
 whose writer is `presentation` and whose reader is a simulation subsystem stays in it, and --check fails on each such
-row with a message that names it: presentation must not feed the simulation except through the player view. --write
-refuses too: it prints the same message, returns 1 and writes none of the four files, so that a violation is not
-committed as if it were data. A row with any other writer outside the simulation subsystems is dropped. Items
-`unresolved:*` are dropped. The class is
+row is a presentation feed: presentation must not feed the simulation except through the player view, so each feed
+is listed with its reason in data/presentation_feeds.csv (below) until the player view carries it. A row with any
+other writer outside the simulation subsystems is dropped. Items `unresolved:*` are dropped. The class is
 `immediate` when a run shows a read in phase_to of what phase_from wrote earlier in the tick (the reader needs the
 writer's phase to come first), and `carried` when a run shows a read in phase_to of what phase_from, a later phase,
 wrote in the tick before (the reader needs the writer's phase to come after it; the order of a tick's phases is
 the state). A key with both in different runs has both rows. `runs`, `example` and `flags` are as in
 data/dependencies.csv; `dynamic-only` is set from data/coupling.csv in the same way.
+
+data/presentation_feeds.csv has the columns writer,reader,item,phase,example,reason, sorted: one row per presentation
+feed, that is per writer `presentation`, reader (a simulation subsystem), item and `phase`, which is the phase_to of the
+cross rows, the phase in which the simulation read what presentation wrote (phase_from is where the log last saw the
+write, which differs between runs of one feed and between its `immediate` and `carried` rows, so phase_to is the stable
+part). `example` is the `<scenario>@<tick>` of the smallest tick over those rows. `reason` is written by hand. The
+feeds are not rows of data/phase_dependencies.csv and the boundaries do not count them: the feeds file is their
+record, and the two files hold the edges between simulation subsystems, and the reads of presentation are left to
+data/presentation_reads.csv. --write keeps the reason of each feed that still occurs, adds the feeds that are new with an
+empty reason and drops the ones no run shows. --check fails on a feed that is not listed, on a listed one that no run
+shows any more (stale) and on a listed one with an empty reason, naming each, and on a file that differs from what --write
+gives.
 
 data/phase_boundaries.csv has one row per boundary between two windows of a tick: `0|1` (absent: no scenario of the test
 mode runs marker 0, so there is no `net` window), `1|2` to `6|7`, `7|tail` and `tail|presentation`. `needed` is `yes`
@@ -86,6 +97,7 @@ PHASE_DEPENDENCIES = ROOT / "data/phase_dependencies.csv"
 PHASE_BOUNDARIES = ROOT / "data/phase_boundaries.csv"
 DRAWS = ROOT / "data/draws.csv"
 PASS_READS = ROOT / "data/pass_reads.csv"
+PRESENTATION_FEEDS = ROOT / "data/presentation_feeds.csv"
 KINDS = ("cross", "draws", "pass", "ordered")
 PHASE_NAMES = ["net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail", "presentation"]
 PHASE_INDEX = {name: i for i, name in enumerate(PHASE_NAMES)}
@@ -103,6 +115,8 @@ BOUNDARY_COLUMNS = ["boundary", "needed", "edges", "direct", "carried", "mergeab
 DRAWS_COLUMNS = ["pass", "stream", "subsystem", "function", "entities", "draws_min", "draws_max", "ticks", "start_state",
                  "evidence", "example"]
 PASS_READS_COLUMNS = ["pass", "item", "reader", "function", "evidence", "runs", "example"]
+FEEDS_COLUMNS = ["writer", "reader", "item", "phase", "example", "reason"]
+CROSS_COLUMNS = ["writer", "reader", "item", "phase_from", "phase_to", "evidence", "count", "first_tick"]
 EVIDENCE_ITEMS = 4
 
 
@@ -196,6 +210,47 @@ def phase_dependencies(cross: dict[str, list[dict]], coupling_rows: list[dict]) 
     return sorted(out, key=lambda r: (r["writer"], r["reader"], r["item"], r["phase_from"], r["phase_to"], r["class"]))
 
 
+def feed_key(row: dict) -> tuple:
+    """The identity of a presentation feed."""
+    return (row["writer"], row["reader"], row["item"], row["phase"])
+
+
+def example_tick(example: str) -> tuple:
+    """The sort key of a `<scenario>@<tick>` example: tick, then scenario."""
+    scenario, tick = example.rsplit("@", 1)
+    return (int(tick), scenario)
+
+
+def feed_rows(deps: list[dict], listed: list[dict]) -> list[dict]:
+    """The rows of data/presentation_feeds.csv for the rows of phase_dependencies() and the listed feeds: the reasons of the listed ones are kept."""
+    reasons = {feed_key(r): r["reason"] for r in listed}
+    groups: dict[tuple, list[str]] = defaultdict(list)
+    for r in deps:
+        if r["writer"] == PRESENTATION:
+            groups[(r["writer"], r["reader"], r["item"], r["phase_to"])].append(r["example"])
+    return [dict(zip(FEEDS_COLUMNS, key + (min(examples, key=example_tick), reasons.get(key, ""))))
+            for key, examples in sorted(groups.items())]
+
+
+def feed_problems(feeds: list[dict], listed: list[dict]) -> list[str]:
+    """What is wrong with the listed feeds: the feeds in feeds that are not listed, the listed ones that are stale, and the listed ones without a reason."""
+    have = {feed_key(r) for r in listed}
+    seen = {feed_key(r) for r in feeds}
+    problems = []
+    for r in feeds:
+        if feed_key(r) not in have:
+            problems.append("presentation feeds the simulation and the feed is not listed in data/presentation_feeds.csv: %s -> %s, item %s, read in %s (%s)" %
+                            (r["writer"], r["reader"], r["item"], r["phase"], r["example"]))
+    for r in listed:
+        if feed_key(r) not in seen:
+            problems.append("data/presentation_feeds.csv lists a feed that no run shows any more (stale): %s -> %s, item %s, read in %s" %
+                            (r["writer"], r["reader"], r["item"], r["phase"]))
+        elif not r["reason"].strip():
+            problems.append("data/presentation_feeds.csv lists a feed with an empty reason: %s -> %s, item %s, read in %s" %
+                            (r["writer"], r["reader"], r["item"], r["phase"]))
+    return problems
+
+
 def boundary_names() -> list[tuple[str, int, int]]:
     """The boundary labels with the indexes of the windows they separate, in tick order."""
     labels = lambda i: str(i) if i < PHASE_INDEX["tail"] else PHASE_NAMES[i]
@@ -286,9 +341,6 @@ def problems_of(directory: Path, tables: dict[str, list[dict]]) -> list[str]:
         for name in sorted(set(names) - have):
             problems.append("no summary data/access_phases/%s.%s.csv.gz for reference/scenarios/%s.txt" % (name, kind, name))
     for r in tables["phase_dependencies"]:
-        if r["writer"] == PRESENTATION:
-            problems.append("phase_dependencies row %s -> %s, item %s, %s to %s (%s): presentation feeds the simulation, "
-                            "which it may do only through the player view" % (r["writer"], r["reader"], r["item"], r["phase_from"], r["phase_to"], r["class"]))
         for phase in (r["phase_from"], r["phase_to"]):
             if phase not in PHASE_INDEX:
                 problems.append("phase_dependencies row with an unknown phase %s" % phase)
@@ -302,16 +354,21 @@ def problems_of(directory: Path, tables: dict[str, list[dict]]) -> list[str]:
     return problems
 
 
-def build(directory: Path, coupling_rows: list[dict]) -> dict[str, list[dict]]:
-    """All four tables from the stored files of directory."""
-    deps = phase_dependencies(load_kind(directory, "cross"), coupling_rows)
-    return {"phase_dependencies": deps, "phase_boundaries": phase_boundaries(deps), "draws": draws(load_kind(directory, "draws")),
+def build(directory: Path, coupling_rows: list[dict], listed: list[dict] | None = None) -> dict[str, list[dict]]:
+    """All five tables from the stored files of directory and the listed feeds; `feeds_listed` is the listed feeds, not a table."""
+    listed = listed or []
+    every = phase_dependencies(load_kind(directory, "cross"), coupling_rows)
+    deps = [r for r in every if r["writer"] != PRESENTATION]
+    return {"phase_dependencies": deps, "phase_boundaries": phase_boundaries(deps), "presentation_feeds": feed_rows(every, listed),
+            "feeds_listed": listed, "draws": draws(load_kind(directory, "draws")),
             "pass_reads": pass_reads(load_kind(directory, "pass"))}
 
 
 def check(directory: Path, tables: dict[str, list[dict]], outputs: dict[str, tuple[Path, list[str]]] | None = None) -> list[str]:
-    """The problems with the stored files and the four data files: what problems_of finds, and each data file that differs from its rows."""
+    """The problems with the stored files and the five data files: what problems_of finds, the feeds that are unlisted, stale or without a reason, and each data file that differs from its rows."""
     problems = problems_of(directory, tables)
+    if "feeds_listed" in tables:
+        problems += feed_problems(tables["presentation_feeds"], tables["feeds_listed"])
     for name, (path, columns) in (outputs or OUTPUTS).items():
         text = render_rows(columns, tables[name])
         have = path.read_text() if path.is_file() else ""
@@ -322,32 +379,34 @@ def check(directory: Path, tables: dict[str, list[dict]], outputs: dict[str, tup
     return problems
 
 
+def stored_tables() -> dict[str, list[dict]]:
+    """build() on the stored files of data/access_phases, the coupling rows of data/coupling.csv and data/presentation_feeds.csv."""
+    listed = read_rows(PRESENTATION_FEEDS.read_text()) if PRESENTATION_FEEDS.is_file() else []
+    return build(PHASES_DIR, depclass.read_coupling(depclass.COUPLING_CSV.read_text()), listed)
+
+
 def check_stored() -> list[str]:
-    """check() on the stored files of data/access_phases and the coupling rows of data/coupling.csv."""
-    tables = build(PHASES_DIR, depclass.read_coupling(depclass.COUPLING_CSV.read_text()))
-    return check(PHASES_DIR, tables)
+    """check() on stored_tables()."""
+    return check(PHASES_DIR, stored_tables())
 
 
 OUTPUTS = {"phase_dependencies": (PHASE_DEPENDENCIES, PHASE_DEPENDENCIES_COLUMNS), "phase_boundaries": (PHASE_BOUNDARIES, BOUNDARY_COLUMNS),
-           "draws": (DRAWS, DRAWS_COLUMNS), "pass_reads": (PASS_READS, PASS_READS_COLUMNS)}
+           "draws": (DRAWS, DRAWS_COLUMNS), "pass_reads": (PASS_READS, PASS_READS_COLUMNS),
+           "presentation_feeds": (PRESENTATION_FEEDS, FEEDS_COLUMNS)}
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--store", type=Path, metavar="DIR", help="store the phase files of DIR in data/access_phases")
-    mode.add_argument("--write", action="store_true", help="write the four data files")
+    mode.add_argument("--write", action="store_true", help="write the five data files")
     mode.add_argument("--check", action="store_true", help="fail if a data file is stale or a boundary or pass has no row")
     args = ap.parse_args()
     if args.store:
         print("phaseclass: stored %d scenarios" % store(args.store, PHASES_DIR))
         return 0
-    tables = build(PHASES_DIR, depclass.read_coupling(depclass.COUPLING_CSV.read_text()))
+    tables = stored_tables()
     if args.write:
-        problems = [p for p in problems_of(PHASES_DIR, tables) if "presentation feeds" in p]
-        if problems:
-            print("\n".join(problems))
-            return 1
         for name, (path, columns) in OUTPUTS.items():
             path.write_text(render_rows(columns, tables[name]))
         print("phaseclass: " + ", ".join("%d %s" % (len(tables[n]), n) for n in OUTPUTS))

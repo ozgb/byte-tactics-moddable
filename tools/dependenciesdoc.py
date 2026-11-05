@@ -5,7 +5,7 @@
     uv run tools/test_dependenciesdoc.py       # tests, on synthetic inputs
 
 The inputs are data/dependencies.csv, phase_dependencies.csv, phase_boundaries.csv, draws.csv, pass_reads.csv,
-dependency_checks.csv and presentation_reads.csv, the scenario names of reference/scenarios and
+dependency_checks.csv, presentation_reads.csv and presentation_feeds.csv, the scenario names of reference/scenarios and
 coupling.SIM_SUBSYSTEMS. Every number of the doc comes from them. The prose of the limits section is fixed in this file.
 """
 
@@ -61,6 +61,11 @@ def read_csv(path: Path) -> list[dict]:
         return list(csv.DictReader(handle))
 
 
+def read_optional(path: Path) -> list[dict]:
+    """The rows of a csv file, none when the file does not exist."""
+    return read_csv(path) if path.is_file() else []
+
+
 def load(data: Path = DATA, scenarios: Path = SCENARIOS) -> dict:
     """Read every input file into one dict."""
     names = sorted(p.stem for p in scenarios.iterdir() if p.is_file())
@@ -72,6 +77,7 @@ def load(data: Path = DATA, scenarios: Path = SCENARIOS) -> dict:
         "passreads": read_csv(data / "pass_reads.csv"),
         "checks": read_csv(data / "dependency_checks.csv"),
         "pres": read_csv(data / "presentation_reads.csv"),
+        "feeds": read_optional(data / "presentation_feeds.csv"),
         "sims": list(coupling.SIM_SUBSYSTEMS),
         "scenarios": len(names),
     }
@@ -290,6 +296,21 @@ def section(sub: str, d: dict) -> list[str]:
     return out + [""]
 
 
+def feeds_section(feeds: list[dict]) -> list[str]:
+    """The lines of the section on the state that presentation writes and the simulation reads."""
+    out = ["## Presentation feeds", "",
+           "Presentation must not feed the simulation except through the player view. The rows below are the state that "
+           "presentation wrote and a simulation subsystem read in some run, each with the reason that it is allowed for now "
+           "(data/presentation_feeds.csv, %d rows; tools/phaseclass.py --check fails on a feed that is not listed there). "
+           "Routing them through the player view is a follow-up, not done." % len(feeds), ""]
+    if feeds:
+        out += table(["writer", "reader", "item", "read in", "example", "reason"],
+                     [[r["writer"], r["reader"], code(r["item"]), r["phase"], r["example"], cell(r["reason"])] for r in feeds])
+    else:
+        out.append("There are none.")
+    return out + [""]
+
+
 def render(d: dict) -> str:
     """Return the text of docs/dependencies.md for the data in d."""
     deps, sims = d["deps"], d["sims"]
@@ -372,6 +393,7 @@ def render(d: dict) -> str:
     rows = [[p] + [str(counts[(p, v)]) for v in visibilities] + [str(sum(counts[(p, v)] for v in visibilities))] for p in patterns]
     rows.append(["all"] + [str(sum(counts[(p, v)] for p in patterns)) for v in visibilities] + [str(len(d["pres"]))])
     out += table(["pattern"] + visibilities + ["all"], rows) + [""]
+    out += feeds_section(d["feeds"])
     out += ["## Limits and known gaps", ""] + LIMITS.splitlines() + [""]
     for s in sims:
         out += section(s, d)

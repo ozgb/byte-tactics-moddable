@@ -58,14 +58,9 @@ class PhaseDependencies(unittest.TestCase):
         boundaries = by_key(pc.phase_boundaries(rows), "boundary")
         self.assertEqual((boundaries["tail|presentation"]["needed"], boundaries["tail|presentation"]["edges"]), ("no", 0))
 
-    def test_a_presentation_writer_and_sim_reader_row_stays_and_fails_the_check(self):
+    def test_a_presentation_writer_and_sim_reader_row_is_kept_by_phase_dependencies(self):
         rows = deps("presentation,weapons,Unit::x,units,players,%s,1" % RAW, "presentation,game,Unit::x,units,players,%s,1" % RAW)
         self.assertEqual([(r["writer"], r["reader"]) for r in rows], [("presentation", "weapons")])
-        with tempfile.TemporaryDirectory() as t:
-            tables = {"phase_dependencies": rows, "phase_boundaries": pc.phase_boundaries(rows), "pass_reads": []}
-            problems = [p for p in pc.problems_of(Path(t), tables) if "presentation feeds" in p]
-            self.assertEqual(len(problems), 1)
-            self.assertIn("presentation -> weapons, item Unit::x, units to players", problems[0])
 
     def test_runs_example_and_both_classes_of_one_key(self):
         a = cross("units,weapons,Unit::x,units,players,%s,9" % RAW)
@@ -78,6 +73,62 @@ class PhaseDependencies(unittest.TestCase):
         rows = pc.phase_dependencies({"a": cross("units,weapons,Unit::x,units,players,%s,1" % RAW,
                                                  "units,ai,Unit::x,units,players,%s,1" % RAW)}, coupling)
         self.assertEqual({r["reader"]: r["flags"] for r in rows}, {"weapons": depclass.DYNAMIC_ONLY, "ai": ""})
+
+
+def feed(item="Unit::x", phase="players", reason="why", example="a@1", reader="weapons"):
+    """A row of data/presentation_feeds.csv."""
+    return {"writer": "presentation", "reader": reader, "item": item, "phase": phase, "example": example, "reason": reason}
+
+
+def feed_tables(listed: list[dict], *lines: str) -> dict:
+    """The tables of one scenario with the cross rows of `lines`, the listed feeds given."""
+    with tempfile.TemporaryDirectory() as t:
+        d = Path(t)
+        (d / "a.cross.csv.gz").write_bytes(gzip.compress(pc.render_rows(pc.CROSS_COLUMNS, cross(*lines)).encode(), 9, mtime=0))
+        return pc.build(d, [], listed)
+
+
+class PresentationFeeds(unittest.TestCase):
+    LINES = ("presentation,weapons,Unit::x,units,players,%s,5" % RAW, "presentation,weapons,Unit::x,tail,players,%s,3" % BEFORE,
+             "units,ai,Unit::y,units,players,%s,7" % RAW)
+
+    def problems(self, listed):
+        tables = feed_tables(listed, *self.LINES)
+        return tables, pc.feed_problems(tables["presentation_feeds"], tables["feeds_listed"])
+
+    def test_the_feeds_are_one_row_per_phase_to_and_out_of_the_phase_files(self):
+        tables, _ = self.problems([])
+        self.assertEqual([(r["item"], r["phase"], r["example"], r["reason"]) for r in tables["presentation_feeds"]], [("Unit::x", "players", "a@3", "")])
+        self.assertEqual([r["writer"] for r in tables["phase_dependencies"]], ["units"])
+        self.assertEqual(sum(r["edges"] for r in tables["phase_boundaries"]), 3)
+
+    def test_an_unlisted_feed_fails_with_the_row_named(self):
+        _, problems = self.problems([])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("presentation -> weapons, item Unit::x, read in players (a@3)", problems[0])
+        self.assertIn("not listed", problems[0])
+
+    def test_a_listed_feed_passes_and_keeps_its_reason(self):
+        tables, problems = self.problems([feed(reason="Selection")])
+        self.assertEqual(problems, [])
+        self.assertEqual(tables["presentation_feeds"][0]["reason"], "Selection")
+
+    def test_a_stale_feed_fails_and_is_dropped_from_the_regenerated_rows(self):
+        tables, problems = self.problems([feed(reason="Selection"), feed(item="Unit::gone", reason="Old")])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("stale", problems[0])
+        self.assertIn("item Unit::gone", problems[0])
+        self.assertEqual([r["item"] for r in tables["presentation_feeds"]], ["Unit::x"])
+
+    def test_an_empty_reason_fails(self):
+        _, problems = self.problems([feed(reason=" ")])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("empty reason", problems[0])
+
+    def test_check_includes_the_feed_problems(self):
+        tables = feed_tables([], *self.LINES)
+        with tempfile.TemporaryDirectory() as t:
+            self.assertTrue(any("not listed" in p for p in pc.check(Path(t), tables, {})))
 
 
 class Boundaries(unittest.TestCase):
@@ -200,8 +251,8 @@ class DepclassChecksThePhaseFiles(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             outputs = {n: (Path(t) / p.name, c) for n, (p, c) in pc.OUTPUTS.items()}
             tables = pc.build(pc.PHASES_DIR, depclass.read_coupling(depclass.COUPLING_CSV.read_text()))
-            tables["phase_dependencies"] = [r for r in tables["phase_dependencies"] if r["writer"] != pc.PRESENTATION]
-            tables["phase_boundaries"] = pc.phase_boundaries(tables["phase_dependencies"])
+            tables["feeds_listed"] = [{**r, "reason": "x"} for r in tables["presentation_feeds"]]
+            tables["presentation_feeds"] = tables["feeds_listed"]
             for name, (path, columns) in outputs.items():
                 path.write_text(pc.render_rows(columns, tables[name]))
             self.assertEqual(pc.check(pc.PHASES_DIR, tables, outputs), [])

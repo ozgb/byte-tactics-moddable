@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "../state/block.h"
+#include "energy_rating.h"
 #include "../../interfaces/ref.h"
 #include <string.h>
 #include <stdlib.h>
@@ -1207,7 +1208,7 @@ void PlayerAI::ComputeBaseWeights()
             x = 0;
         x = min(x, 100);
         e->a = x;
-        e->c = (char)max(0.0f, min(100.0f, def->energyCost * -0.0025f - g_seams.economy->GetEnergyUse(def) * 5.0f));
+        e->c = ComputeEnergyRating(def->energyCost, g_seams.economy->GetEnergyUse, def);
 #ifdef __clang__
         e->b = (char)max(0.0f, min(100.0f, (double)(float)((double)def->metalCost * -0.02f + (def->makesMetal ? 25 : 0)) + (def->extractsMetal != 0.0f ? 100 : 0)));
 #else

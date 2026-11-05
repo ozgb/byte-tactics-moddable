@@ -3,6 +3,7 @@
 
 #include "../interfaces/ref.h"
 #include "../src/state/block.h"
+#include "../src/ai/energy_rating.h"
 
 void* GetAllocLock()
 {
@@ -45,6 +46,19 @@ struct Thing {
 
 static_assert(sizeof(Ref<Thing>) == 4, "size");
 static_assert(__is_trivial(Ref<Thing>) && __is_trivially_copyable(Ref<Thing>), "a Ref is plain data");
+
+static double g_energyUse;
+
+static double __stdcall FakeEnergyUse(UnitDef*)
+{
+    return g_energyUse;
+}
+
+static int RatingAt(float energyCost, float windStrength, float windGenerator)
+{
+    g_energyUse = -((double)windStrength * (double)windGenerator);
+    return ComputeEnergyRating(energyCost, FakeEnergyUse, 0);
+}
 
 int main()
 {
@@ -117,6 +131,9 @@ int main()
     (void)inside;
     (void)nul;
     (void)below;
+
+    Check(RatingAt(536.0f, 0.0156f, 30.0f) == 1, "the cost product is stored to 32 bits before the subtraction");
+    Check(RatingAt(104.0f, 0.0084f, 30.0f) == 0, "the energy use is subtracted unrounded");
 
     printf(g_failures ? "FAILED\n" : "ref_test: all passed\n");
     return g_failures != 0;

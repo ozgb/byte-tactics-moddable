@@ -4,7 +4,7 @@
 #include "../../interfaces/ref.h"
 
 struct Player;
-struct UnitInfo;
+struct Unit;
 class HapiBank;
 
 class UnitResources {
@@ -23,8 +23,8 @@ public:
     float metalUsePrev;
     Ref<Player> player;
 
-    void SaveUnitAccounts(UnitInfo* info, HapiBank* file);
-    void LoadUnitAccounts(UnitInfo* info, HapiBank* file);
+    void SaveUnitAccounts(Unit* info, HapiBank* file);
+    void LoadUnitAccounts(Unit* info, HapiBank* file);
     void Reset(unsigned char playerIndex);
     int RequestEnergy(UnitResources* r, float amount);
     int RequestEnergyAndMetal(float dx, float dy);

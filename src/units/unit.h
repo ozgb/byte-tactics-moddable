@@ -111,7 +111,7 @@ struct Unit {
             unsigned short dirty : 1;
             unsigned short : 13;
         };
-        short netDirtyFlags;
+        unsigned short netDirtyFlags;
     };
     union {
         struct {

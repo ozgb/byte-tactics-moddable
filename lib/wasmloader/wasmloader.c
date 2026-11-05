@@ -728,7 +728,7 @@ int wl_define_import(wl_loader* loader, const char* module, const char* name, co
 
 static int is_kind(const char* kind)
 {
-    return !strcmp(kind, "int") || !strcmp(kind, "f64") || !strcmp(kind, "linear") || !strcmp(kind, "block")
+    return !strcmp(kind, "int") || !strcmp(kind, "f32") || !strcmp(kind, "f64") || !strcmp(kind, "linear") || !strcmp(kind, "block")
         || !strcmp(kind, "scratch") || !strcmp(kind, "handle");
 }
 
@@ -777,6 +777,9 @@ static int same_sig(const wl_sig* a, const wl_sig* b)
 
 static char kind_letter(const char* kind)
 {
+    if (!strcmp(kind, "f32")) {
+        return 'f';
+    }
     return !strcmp(kind, "f64") ? 'd' : 'i';
 }
 

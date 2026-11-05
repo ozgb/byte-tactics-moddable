@@ -532,7 +532,7 @@ void Run_economy_Reset()
 void Run_economy_SaveUnitAccounts()
 {
     UnitResources* p0 = (UnitResources*)ArgObject("self", ROK_UNITRESOURCES);
-    UnitInfo* p1 = (UnitInfo*)ArgObject("info", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("info", ROK_UNIT);
     HapiBank* p2 = (HapiBank*)ArgHandle("file");
     SetClosing(nullptr);
     g_seams.economy->SaveUnitAccounts(p0, p1, p2);
@@ -541,7 +541,7 @@ void Run_economy_SaveUnitAccounts()
 void Run_economy_LoadUnitAccounts()
 {
     UnitResources* p0 = (UnitResources*)ArgObject("self", ROK_UNITRESOURCES);
-    UnitInfo* p1 = (UnitInfo*)ArgObject("info", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("info", ROK_UNIT);
     HapiBank* p2 = (HapiBank*)ArgHandle("file");
     SetClosing(nullptr);
     g_seams.economy->LoadUnitAccounts(p0, p1, p2);

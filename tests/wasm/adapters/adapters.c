@@ -67,6 +67,12 @@ static const char* host_echo(void* user, wasmtime_val_raw_t* a)
     return NULL;
 }
 
+static const char* host_float_echo(void* user, wasmtime_val_raw_t* a)
+{
+    (void)user;
+    return NULL;
+}
+
 static wl_loader* start(const char* dll, int define_imports)
 {
     wl_config config;
@@ -86,7 +92,8 @@ static wl_loader* start(const char* dll, int define_imports)
     if (define_imports
         && !(wl_define_import(loader, "calc_host", "Mix", "ii>i", host_mix, NULL) && wl_define_import(loader, "calc_host", "Neg", "i>i", host_neg, NULL)
              && wl_define_import(loader, "calc_host", "Mul", "ii>i", host_mul, NULL) && wl_define_import(loader, "calc_host", "Note", "i>", host_note, NULL)
-             && wl_define_import(loader, "calc_host", "Tick", "i>i", host_tick, NULL) && wl_define_import(loader, "calc_host", "Echo", "i>i", host_echo, NULL))) {
+             && wl_define_import(loader, "calc_host", "Tick", "i>i", host_tick, NULL) && wl_define_import(loader, "calc_host", "Echo", "i>i", host_echo, NULL)
+             && wl_define_import(loader, "calc_host", "FloatEcho", "f>f", host_float_echo, NULL))) {
         fprintf(stderr, "%s\n", wl_error(loader));
         exit(2);
     }
@@ -128,6 +135,22 @@ static void check(wl_loader* loader, wl_module* module, const char* tag, const c
     if (slot(loader, module, name, a0, a1, a2, &result)) {
         expect(label, result, want);
     }
+}
+
+static void check_float_bits(wl_loader* loader, wl_module* module, const char* name, unsigned bits)
+{
+    wasmtime_func_t func;
+    wasmtime_val_raw_t raw[1];
+    char label[96];
+    memset(raw, 0, sizeof raw);
+    raw[0].i32 = (int)bits;
+    sprintf(label, "current %s(0x%08x) bits", name, bits);
+    if (!wl_export_func(loader, module, name, &func) || !wl_call(loader, module, &func, raw, 1)) {
+        fprintf(stderr, "FAIL %s: %s\n", name, wl_error(loader));
+        failures++;
+        return;
+    }
+    expect(label, (long)(unsigned)raw[0].i32, (long)bits);
 }
 
 static int memory_word(wl_loader* loader, unsigned address)
@@ -205,7 +228,15 @@ static void run_modules(const char* dll, const char* manifest, const char* wasm_
     check(loader, current, "current", "RunTick", 3, 0, 0, 3);
     expect("current Tick reached the host", ticks, 2);
     check(loader, current, "current", "RunEcho", 1, 0, 0, 1001);
-    expect("current table entries filled", wl_table_filled(current), 12);
+    {
+        static const unsigned floats[] = {0x3fc00000u, 0x7fa00001u, 0x00000001u, 0xffc12345u, 0x80000000u};
+        unsigned i;
+        for (i = 0; i < sizeof floats / sizeof floats[0]; i++) {
+            check_float_bits(loader, current, "FloatSame", floats[i]);
+            check_float_bits(loader, current, "RunFloat", floats[i]);
+        }
+    }
+    expect("current table entries filled", wl_table_filled(current), 14);
     wl_destroy(loader);
 }
 
@@ -254,6 +285,11 @@ static void run_refusals(const char* dll, const char* wasm_dir)
            "{\"interface\":\"calc_host\",\"from_major\":2,\"name\":\"Neg\",\"args\":[0],\"result\":\"pass\"}],"
            MODULE(OLD_HOST, "{}", "{\"calc_host\":{\"Neg\":[[\"int\"],\"int\"]}}"),
            1, "the adapter for import Neg of interface calc_host (major 2 to 3) is refused: args[0]: the caller's int parameter 0 cannot become the callee's f64 parameter without code");
+    refuse(dll, wasm_dir, "import adapter joining an f64 to an f32",
+           HEAD "\"signatures\":{\"calc_host\":{\"Neg\":[[\"f32\"],\"int\"]}},\"adapters\":["
+           "{\"interface\":\"calc_host\",\"from_major\":2,\"name\":\"Neg\",\"args\":[0],\"result\":\"pass\"}],"
+           MODULE(OLD_HOST, "{}", "{\"calc_host\":{\"Neg\":[[\"f64\"],\"int\"]}}"),
+           1, "the adapter for import Neg of interface calc_host (major 2 to 3) is refused: args[0]: the caller's f64 parameter 0 cannot become the callee's f32 parameter without code");
     refuse(dll, wasm_dir, "constant into a linear parameter",
            HEAD "\"signatures\":{\"calc\":{\"Scale\":[[\"int\"],\"int\"]}},\"adapters\":["
            "{\"interface\":\"calc\",\"from_major\":1,\"name\":\"Scale\",\"args\":[0,{\"const\":3}],\"result\":\"pass\"}],"

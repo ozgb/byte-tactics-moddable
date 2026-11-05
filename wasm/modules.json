@@ -12,7 +12,7 @@
   "table_slots": 32,
   "majors": {
     "ai": 3,
-    "economy": 1,
+    "economy": 2,
     "features": 2,
     "files": 1,
     "host": 2,
@@ -31,6 +31,39 @@
     "wind_meteors": 1
   },
   "signatures": {
+    "ai": {
+      "GetVisibleEnemiesInRadiusList": [["int", "linear", "int", "int", "linear", "int"], "int"]
+    },
+    "economy": {
+      "UpdateResourceSharing": [["block"], "void"],
+      "GetEnergyUse": [["block"], "f32"],
+      "UpdatePlayerEconomy": [["block"], "void"],
+      "UpdateMetalExtraction": [["block"], "void"],
+      "Reset": [["block", "int"], "void"],
+      "SaveUnitAccounts": [["block", "block", "handle"], "void"],
+      "LoadUnitAccounts": [["block", "block", "handle"], "void"],
+      "RequestEnergy": [["block", "block", "f32"], "int"],
+      "RequestEnergyAndMetal": [["block", "f32", "f32"], "int"],
+      "SpendEnergy": [["block", "f32"], "int"],
+      "SpendMetal": [["block", "f32"], "int"],
+      "SpendEnergyAndMetal": [["block", "f32", "f32"], "int"]
+    },
+    "files": {
+      "BankOpenNamedBox": [["handle", "linear"], "int"],
+      "BankSeekBox": [["handle", "int"], "void"],
+      "BankReadBox": [["handle", "linear", "int"], "int"],
+      "BankWriteBox": [["handle", "linear", "int"], "int"]
+    },
+    "los_radar": {
+      "GetMapCell": [["int", "int"], "block"]
+    },
+    "network": {
+      "SendShareMapInfo": [["int", "int"], "void"]
+    },
+    "players": {
+      "TransferMetal": [["int", "int", "f32", "int"], "void"],
+      "TransferEnergy": [["int", "int", "f32", "int"], "void"]
+    },
     "services": {
       "GameRand": [["int"], "int"],
       "RandomInt": [["int"], "int"],
@@ -49,9 +82,29 @@
       "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
       "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"]
     },
+    "targeting": {
+      "SetWeaponTargetUnit": [["block", "block", "int"], "void"],
+      "SetWeaponTargetPos": [["block", "linear", "int"], "void"],
+      "ClearWeaponTarget": [["block", "int"], "void"],
+      "ResetWeaponTarget": [["block", "int"], "void"],
+      "GetWeaponTargetUnit": [["block", "int"], "block"],
+      "GetWeaponTargetPos": [["block", "linear", "int"], "int"],
+      "FindWeaponTarget": [["block", "int", "int"], "block"],
+      "FindBestTargetIfFireAtWill": [["block"], "block"],
+      "ChooseWeapon": [["block"], "int"]
+    },
+    "units": {
+      "GetGroundHeight": [["linear"], "int"],
+      "GetSweetSpot": [["block", "linear"], "void"],
+      "FindScript": [["block", "linear"], "int"],
+      "StartScriptWithArgs": [["block", "linear", "linear", "int", "int", "int", "int", "int", "int"], "int"],
+      "SetStateBits": [["block", "int", "int"], "void"]
+    },
     "weapons": {
       "SpawnProjectile": [["block", "linear", "linear", "int"], "int"],
-      "FindWeaponByName": [["linear"], "block"]
+      "FindWeaponByName": [["linear"], "block"],
+      "GetWeaponRange": [["block", "int"], "int"],
+      "WeaponCanReachUnit": [["block", "block", "int"], "int"]
     },
     "wind_meteors": {
       "UpdateWind": [[], "void"],

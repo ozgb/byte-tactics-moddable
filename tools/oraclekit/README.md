@@ -22,6 +22,7 @@ sha256 and size, the commit it was cut from, and the kit's version: the pair of 
 | `wasm/modules.json` | the module manifest of the game: the loader's numbers, the signatures and each module's entry | `docs/module-abi.md`, section 4 |
 | `tools/wasm_fuel.py` | the fuel pass: meters a finished module by the rule of ABI 11, standard library and `wasm-tools` only | `docs/module-abi.md`, section 11 |
 | `tests/replay/` | the stored per-module replay recordings | `docs/replay-format.md` |
+| `data/replay_schema.json` | the annotations and the fields, objects and slots the recordings name | `docs/replay-format.md` |
 | `layout.json` | the state block layout (below) | `docs/module-abi.md`, sections 7 to 9 |
 
 ## Presentation is not a module

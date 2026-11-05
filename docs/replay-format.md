@@ -784,6 +784,8 @@ sets). The annotations hold what no header says:
 | `units` (`dir: out`) | a vector of `Unit` pointers an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
 
+A `bytes-in` import line carries the bytes the call passed in, so a `files.BankWriteBox` line is `i files.BankWriteBox bank#1 x:0102 2 = 2`: the handle, the bytes written, the length, then the result. It has no `o` line. A `bytes-out` import has no bytes in its line: `files.BankReadBox` shows `?` for the destination and the bytes arrive in the `o dst x:...` line after it, as long as the result. No stored recording has a `BankWriteBox` line yet (the save path is uncovered, #856).
+
 A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
 A `pending` subsystem lists in its generated `pending` entry what is left (untracked targets, rows with no rule,

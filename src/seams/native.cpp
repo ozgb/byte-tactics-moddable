@@ -3,6 +3,7 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/network.h"
+#include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include "../network/player.h"
 #include "../game/game.h"
@@ -128,12 +129,12 @@ static void __stdcall ResetNative(UnitResources* self, unsigned char playerIndex
     self->Reset(playerIndex);
 }
 
-static void __stdcall SaveUnitAccountsNative(UnitResources* self, UnitInfo* info, HapiBank* file)
+static void __stdcall SaveUnitAccountsNative(UnitResources* self, Unit* info, HapiBank* file)
 {
     self->SaveUnitAccounts(info, file);
 }
 
-static void __stdcall LoadUnitAccountsNative(UnitResources* self, UnitInfo* info, HapiBank* file)
+static void __stdcall LoadUnitAccountsNative(UnitResources* self, Unit* info, HapiBank* file)
 {
     self->LoadUnitAccounts(info, file);
 }
@@ -291,6 +292,16 @@ static int __stdcall GetWeaponRangeNative(Unit* unit, unsigned int weapon)
 static void __stdcall GetVisibleEnemiesInRadiusNative(int player, const Vec3* pos, int radius, int flags, std::vector<Unit*>* out)
 {
     GetVisibleEnemiesInRadius(player, (const Vec*)pos, radius, flags, out);
+}
+
+static int __stdcall GetVisibleEnemiesInRadiusListNative(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity)
+{
+    std::vector<Unit*> found;
+    GetVisibleEnemiesInRadius(player, (const Vec*)pos, radius, flags, &found);
+    int count = (int)found.size();
+    for (int i = 0; i < count && i < capacity; i++)
+        out[i] = found[i];
+    return count;
 }
 
 static char* __stdcall GetNameSlotNative(Mission* mission, int index)
@@ -832,6 +843,7 @@ void InstallNativeSeams()
     s_weapons.GetWeaponRange = GetWeaponRangeNative;
     s_weapons.WeaponCanReachUnit = WeaponCanReachUnit;
     s_ai.GetVisibleEnemiesInRadius = GetVisibleEnemiesInRadiusNative;
+    s_ai.GetVisibleEnemiesInRadiusList = GetVisibleEnemiesInRadiusListNative;
     s_weapons.FindTargetableProjectile = FindTargetableProjectile;
     s_weapons.WeaponCanReachPos = WeaponCanReachPos;
     s_weapons.AllocWeaponArray = AllocWeaponArray;

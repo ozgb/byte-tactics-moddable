@@ -245,7 +245,7 @@ void __stdcall RecEconomyReset(UnitResources* a0, unsigned char a1)
     }
 }
 
-void __stdcall RecEconomySaveUnitAccounts(UnitResources* a0, UnitInfo* a1, HapiBank* a2)
+void __stdcall RecEconomySaveUnitAccounts(UnitResources* a0, Unit* a1, HapiBank* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITRESOURCES, a0);
@@ -261,7 +261,7 @@ void __stdcall RecEconomySaveUnitAccounts(UnitResources* a0, UnitInfo* a1, HapiB
     }
 }
 
-void __stdcall RecEconomyLoadUnitAccounts(UnitResources* a0, UnitInfo* a1, HapiBank* a2)
+void __stdcall RecEconomyLoadUnitAccounts(UnitResources* a0, Unit* a1, HapiBank* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITRESOURCES, a0);
@@ -913,6 +913,25 @@ void __stdcall RecAiCmdLimit(CommandArgs* a0)
     s_inner_ai->CmdLimit(a0);
     if (scope.Open()) {
     }
+}
+
+int __stdcall RecAiGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_AI_GETVISIBLEENEMIESINRADIUSLIST, SUB_AI, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+        ArgPending(s_call, "pos");
+        ArgValue(s_call, "radius", a2);
+        ArgValue(s_call, "flags", a3);
+        ArgPending(s_call, "out");
+        ArgValue(s_call, "capacity", a5);
+    }
+    int result = s_inner_ai->GetVisibleEnemiesInRadiusList(a0, a1, a2, a3, a4, a5);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
 }
 
 void __fastcall RecPathfindingRunSearches(Pathfinder* a0)
@@ -5275,6 +5294,8 @@ void HookSeams(const bool* on)
         s_rec_ai.CmdWeight = RecAiCmdWeight;
     if (on[SUB_AI])
         s_rec_ai.CmdLimit = RecAiCmdLimit;
+    if (on[SUB_AI])
+        s_rec_ai.GetVisibleEnemiesInRadiusList = RecAiGetVisibleEnemiesInRadiusList;
     if (on[SUB_PATHFINDING])
         s_rec_pathfinding.RunSearches = RecPathfindingRunSearches;
     if (on[SUB_PATHFINDING])

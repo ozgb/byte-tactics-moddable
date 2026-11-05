@@ -1420,12 +1420,12 @@ void __stdcall ResetSlot(UnitResources* self, unsigned char playerIndex)
     self->Reset(playerIndex);
 }
 
-void __stdcall SaveUnitAccountsSlot(UnitResources* self, UnitInfo* info, HapiBank* file)
+void __stdcall SaveUnitAccountsSlot(UnitResources* self, Unit* info, HapiBank* file)
 {
     self->SaveUnitAccounts(info, file);
 }
 
-void __stdcall LoadUnitAccountsSlot(UnitResources* self, UnitInfo* info, HapiBank* file)
+void __stdcall LoadUnitAccountsSlot(UnitResources* self, Unit* info, HapiBank* file)
 {
     self->LoadUnitAccounts(info, file);
 }

@@ -123,6 +123,25 @@ class KindTests(unittest.TestCase):
         spec = dict(SPEC_KINDS, imports={"weapons": {"SpawnProjectile": [["f64", "linear"], "int"]}, "services": SPEC_KINDS["imports"]["services"]})
         self.assertTrue(self.problems(spec))
 
+    def test_f32_must_match_the_wasm_type(self):
+        def spec_of(params, result):
+            return dict(SPEC_KINDS, imports={"weapons": SPEC_KINDS["imports"]["weapons"], "services": {"Scale": [params, result]}})
+
+        def problems_of(params, result, wasm_params, wasm_result):
+            imports = dict(DETAILS["imports"])
+            imports[("services", "Scale")] = (wasm_params, wasm_result)
+            return wm.check_kinds("m", spec_of(params, result), dict(DETAILS, imports=imports))
+
+        self.assertEqual(problems_of(["handle", "f32"], "f32", ["i32", "f32"], "f32"), [])
+        self.assertEqual(problems_of(["handle", "f64"], "f64", ["i32", "f64"], "f64"), [])
+        self.assertTrue(problems_of(["handle", "f32"], "f32", ["i32", "f64"], "f64"))
+        self.assertTrue(problems_of(["handle", "f64"], "f64", ["i32", "f32"], "f32"))
+        self.assertTrue(problems_of(["handle", "f32"], "f32", ["i32", "i32"], "i32"))
+        self.assertTrue(problems_of(["handle", "int"], "int", ["i32", "f32"], "f32"))
+        self.assertTrue(any("parameter 1 is 'int' in the manifest and f32" in p for p in problems_of(["handle", "int"], "f32", ["i32", "f32"], "f32")))
+        self.assertTrue(any("the result is 'int' in the manifest and f32" in p for p in problems_of(["handle", "f32"], "int", ["i32", "f32"], "f32")))
+        self.assertTrue(any("the result is 'f32' in the manifest and f64" in p for p in problems_of(["handle", "f64"], "f32", ["i32", "f64"], "f64")))
+
     def test_result_kind_must_match(self):
         spec = dict(SPEC_KINDS, imports={"weapons": {"SpawnProjectile": [["block", "linear"], "void"]}, "services": SPEC_KINDS["imports"]["services"]})
         self.assertTrue(any("result is void" in p for p in self.problems(spec)))

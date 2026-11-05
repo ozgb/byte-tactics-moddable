@@ -73,6 +73,7 @@ CONTENTS = [
     ("file", FUEL_PASS, "the fuel pass of ABI 11, standard library and wasm-tools only"),
     ("dir", "tests/replay", "the stored replay recordings"),
     ("file", "docs/replay-format.md", "the replay format"),
+    ("file", "data/replay_schema.json", "the annotations of the replay format"),
 ]
 
 ROLES = {
@@ -83,6 +84,7 @@ ROLES = {
     "weapon": "WeaponDef",
 }
 ROLE_HEADERS = ["src/state/sim_globals.h", "src/map/meteors.h"]
+EXTRA_RECORDS = ["UnitWeaponSlot"]
 
 
 class Refusal(Exception):
@@ -296,7 +298,7 @@ def generate_layout(root: Path, build_dir: Path, run=None) -> dict:
     includes = layoutasserts.include_order(homes)
     extra = [Path(layoutasserts.os.path.relpath(root / h, layoutasserts.OUT_DIR)).as_posix() for h in ROLE_HEADERS]
     includes = includes + [i for i in extra if i not in includes]
-    wanted = set(homes) | set(ROLES.values())
+    wanted = set(homes) | set(ROLES.values()) | set(EXTRA_RECORDS)
     probe = run(flags, directory, layoutasserts.emit(includes, []), True)
     if layoutasserts.DIAGNOSTIC.findall(probe.stderr) or probe.returncode:
         raise SystemExit("oraclekit: the headers do not compile together:\n" + "\n".join(probe.stderr.splitlines()[:20]))

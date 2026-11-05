@@ -316,6 +316,15 @@ A differing scenario's run is kept: its `trace.txt` (and `dump.txt`, if any) is 
 `build/scratch/check-<scenario>-<time>/`, and the `DIFF` line ends with that path, so a one-off
 divergence can be diagnosed later with the file mode of `tools/tracediff.py` against a good run.
 
+A run that ends before its trace should (the stored trace's last tick; a scenario's `ticks` line may be longer, since some
+scenarios end by victory or defeat) is not a divergence: the check prints an `EARLY` line instead of `DIFF`, for example
+`EARLY long-greenhaven-8p [wasm]: ended at tick 21396 of 54000 (exit code 2), host said wine.log: <line> [kept: build/scratch/...]`.
+It names the last tick whose lines are all in `trace.txt` (a cut last line is not a tick), the stored last tick, how the game ended
+(`exit code N`, `signal SIGKILL`, `timeout` or `exit status unknown`, from the run's `result.json`) and, when the run left one, the
+host's fatal line (a trap, out of fuel or crash message from `crash.txt` or Wine's stderr, `wine.log`; `docs/module-abi.md` section 13).
+An early exit fails the check and halts the pool like a `DIFF`, but tracediff is not run, because there is no complete trace to compare.
+The kept directory then also holds `result.json`, `crash.txt` and `wine.log`.
+
 `tools/playtest.py` polls every 5 seconds for an error dialog and fails the run at once, with the
 kind in the reason, `result.json` and `failed.png`: `dialog-directx` (a dialog-sized window before
 tick 1: "Environment Initialization Failed"), `dialog-crt` (the "Microsoft Visual C++ Runtime

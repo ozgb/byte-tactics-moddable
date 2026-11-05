@@ -109,6 +109,10 @@ cancel or group line and selects no unit (a click that gives nothing is a broken
 stored log is only counted. `--traces` copies the logs the reference branch wrote into `reference/ui/`. A scenario
 with `input` lines runs at one step per frame even under `--steps-per-frame`.
 
+## Event logs
+
+`--check` makes the digest of each run's `events.txt` and compares it line by line with `reference/events/<scenario>.txt` when that file exists, and `--traces` writes the digests of the logs the reference branch wrote into `reference/events/` (the stored files are digests, as the traces are: a tick, a phase, a record count and a hash for each run of records; format in [docs/events-log.md](../docs/events-log.md)). When a digest differs, the check plays the reference build of the stored traces and the exe, and names the first differing record (`tools/tracediff.py --events`).
+
 ## Traces
 
 In test mode the exe writes `trace.txt` in its working directory: a hash of the

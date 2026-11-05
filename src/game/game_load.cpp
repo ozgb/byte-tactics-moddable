@@ -435,6 +435,7 @@ void __cdecl LoadThreadMain(void* param)
 {
     __try {
         LoadMatch(param);
+        HarnessLoadEnded();
     } __except (host_crash_report(GetExceptionInformation(), "Load Thread"), EXCEPTION_CONTINUE_SEARCH) {
     }
 }
@@ -595,6 +596,7 @@ void LoadingScreenFrame(void)
             }
             g_game->slots_29a4.flag40[i] = (pi->active != 0 && (pi->data->flags_9b & 0x40) != 0) ? 1 : 0;
         }
+        HarnessLoadBegins();
         if (!host_thread_start(LoadThreadMain, 0, 0)) {
             FatalError("Unable to start the loading thread!");
         }
@@ -604,6 +606,8 @@ void LoadingScreenFrame(void)
         memset(g_loadingBarPrevPercent, 0, 6);
         (*(volatile union LoadingFlags*)&g_game->loadingFlags).bits.started = 1;
         OnlineUnload();
+        if (HarnessAwaitLoadAndEndFrame())
+            return;
     }
     if ((*(volatile union LoadingFlags*)&g_game->loadingFlags).bits.loaded) {
         StopAllSounds();

@@ -317,6 +317,7 @@ void ReplayObjectTable::Reset()
 {
     for (unsigned k = 0; k < KINDS; k++) {
         count[k] = 0;
+        empty[k] = HASH;
         memset(slots[k], 0xff, sizeof slots[k]);
     }
 }
@@ -392,7 +393,26 @@ void ReplayObjectTable::Bind(unsigned kind, unsigned ordinal, void* p)
     unsigned i = PointerHash(p);
     while (slots[kind][i] >= 0)
         i = (i + 1) % HASH;
+    if (slots[kind][i] == -1)
+        empty[kind]--;
     slots[kind][i] = (short)(ordinal - 1);
+    if (empty[kind] < HASH / 4)
+        Rebuild(kind);
+}
+
+void ReplayObjectTable::Rebuild(unsigned kind)
+{
+    memset(slots[kind], 0xff, sizeof slots[kind]);
+    empty[kind] = HASH;
+    for (unsigned at = 0; at < count[kind]; at++) {
+        if (objects[kind][at] == nullptr)
+            continue;
+        unsigned i = PointerHash(objects[kind][at]);
+        while (slots[kind][i] >= 0)
+            i = (i + 1) % HASH;
+        slots[kind][i] = (short)at;
+        empty[kind]--;
+    }
 }
 
 void ReplayAddWeapon(ReplayText& t, const void* p)

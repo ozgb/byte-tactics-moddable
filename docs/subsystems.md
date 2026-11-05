@@ -10,14 +10,14 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5283 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5287 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
 | subsystem | functions | issue |
 |---|---|---|
 | [wind_meteors](#wind_meteors) | 17 | #9 |
-| [economy](#economy) | 35 | #11 |
+| [economy](#economy) | 39 | #11 |
 | [features](#features) | 47 | #12 |
 | [ai](#ai) | 129 | #13 |
 | [pathfinding](#pathfinding) | 55 | #14 |
@@ -97,7 +97,7 @@ Coverage: 5.9% of functions (1 of 17), 1.8% of lines, 0.0% of branches; 16 live 
 
 ## economy
 
-Issue #11. 35 functions. The resource accounts (`UnitResources`), `UpdatePlayerEconomy`, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`, `UpdateResourceSharing` in `src/network/net_game.cpp`).
+Issue #11. 39 functions. The resource accounts (`UnitResources`), `UpdatePlayerEconomy`, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`, `UpdateResourceSharing` in `src/network/net_game.cpp`).
 
 Coverage: 93.1% of functions (27 of 29), 79.2% of lines, 45.1% of branches; 2 live functions no scenario enters, and 3 more are dead (data/coverage.csv).
 

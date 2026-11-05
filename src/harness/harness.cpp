@@ -20,6 +20,7 @@
 #include "../../interfaces/seams.h"
 #include "../quirks/quirks.h"
 #include "../wasm/modules.h"
+#include "../state/sim_events.h"
 #include "../state/sim_globals.h"
 #include "block_scan.h"
 #include "../state/block.h"
@@ -92,6 +93,12 @@ static FILE* s_trace = NULL;
 static FILE* s_dump = NULL;
 static FILE* s_sound = nullptr;
 static char s_soundBuffer[4096];
+static FILE* s_events = nullptr;
+static char s_eventsBuffer[4096];
+static const char* const s_recordPhaseNames[9] = { "net", "units", "projectiles", "explosions", "players", "features",
+                                                   "wind", "meteors", "sharing" };
+static int s_recordPhase = -1;
+static const char* s_eventPhases[SIM_EVENT_CAPACITY];
 static FILE* s_ui = nullptr;
 static char s_uiBuffer[4096];
 static int s_uiMute = 0;
@@ -1625,6 +1632,7 @@ static void RoundTripBlock()
 
 void HarnessAfterStep()
 {
+    s_recordPhase = -1;
 #if BT_ACCESS_LOG
     AccessLogScope accessWindow(ACCESS_WINDOW_OFF, ACCESS_WINDOW_PRESENTATION);
 #endif
@@ -1666,6 +1674,9 @@ void HarnessAfterStep()
         fclose(s_dump);
     if (s_sound != nullptr)
         fclose(s_sound);
+    if (s_events != nullptr)
+        fclose(s_events);
+    s_events = nullptr;
     if (s_ui != nullptr)
         fclose(s_ui);
     s_ui = nullptr;
@@ -3895,6 +3906,7 @@ void HarnessBeforeStep()
 {
     if (!HarnessTestMode())
         return;
+    s_recordPhase = 0;
 #if BT_ACCESS_LOG
     AccessLogScope accessWindow(ACCESS_WINDOW_OFF, ACCESS_WINDOW_PENDING);
 #endif
@@ -4113,6 +4125,39 @@ static void UiEndOfTick()
     }
 }
 
+bool HarnessEventLogOpen()
+{
+    return HarnessTestMode() && s_events != nullptr;
+}
+
+void __stdcall HarnessRecordPhase(int phase)
+{
+    if (HarnessTestMode())
+        s_recordPhase = phase;
+}
+
+void __stdcall HarnessSimEventSlot(unsigned slot)
+{
+    if (!HarnessTestMode())
+        return;
+    if (s_recordPhase >= 0)
+        s_eventPhases[slot % SIM_EVENT_CAPACITY] = s_recordPhaseNames[s_recordPhase];
+    else
+        s_eventPhases[slot % SIM_EVENT_CAPACITY] = g_game->ticks == 0 ? "load" : "outside";
+}
+
+const char* HarnessSimEventPhase(unsigned slot)
+{
+    const char* label = s_eventPhases[slot % SIM_EVENT_CAPACITY];
+    return label != nullptr ? label : "outside";
+}
+
+void HarnessEventText(const char* text)
+{
+    if (HarnessEventLogOpen())
+        fputs(text, s_events);
+}
+
 void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position)
 {
     if (!HarnessTestMode() || s_sound == nullptr)
@@ -4197,6 +4242,7 @@ void HarnessPhase(int phase)
 {
     if (!HarnessTestMode() || s_trace == NULL)
         return;
+    s_recordPhase = phase + 1;
     unsigned tick = GameU32(GAME_TICK);
 #if BT_ACCESS_LOG
     AccessLogMarker(phase, tick);
@@ -4232,6 +4278,8 @@ void HarnessPhase(int phase)
         fflush(s_trace);
         if (s_sound != nullptr)
             fflush(s_sound);
+        if (s_events != nullptr)
+            fflush(s_events);
         if (s_ui != nullptr)
             fflush(s_ui);
         if (s_dumpNow)
@@ -4274,6 +4322,11 @@ static void OpenTrace(unsigned controlWord)
         Fail("testmode: cannot write sound.txt\n");
     setvbuf(s_sound, s_soundBuffer, _IOFBF, sizeof s_soundBuffer);
     fprintf(s_sound, "bt-sound 1\n");
+    s_events = fopen("events.txt", "wb");
+    if (s_events == nullptr)
+        Fail("testmode: cannot write events.txt\n");
+    setvbuf(s_events, s_eventsBuffer, _IOFBF, sizeof s_eventsBuffer);
+    fprintf(s_events, "bt-events 1\n");
     s_ui = fopen("ui.txt", "wb");
     if (s_ui == nullptr)
         Fail("testmode: cannot write ui.txt\n");

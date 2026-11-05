@@ -7,7 +7,7 @@
 `--check --exe` plays every scenario in reference/scenarios/ (`--parallel N` at a
 time, default half the CPUs and at most 6 (10 with `--both-modes`), under Wine through tools/playtest.py)
 and compares the digest of each tick (tools/tracedigest.py) with the stored one. It also compares
-each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md), and each run's ui.txt with reference/ui/<scenario>.txt the same way (docs/ui-log.md).
+each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md), each run's ui.txt with reference/ui/<scenario>.txt the same way (docs/ui-log.md), and the digest of each run's events.txt with reference/events/<scenario>.txt the same way (docs/events-log.md), naming the first differing record by playing the reference build.
 A scenario with a `frames` line also has its frame dumps compared, byte for byte, with reference/frames/<scenario>/ (docs/frame-dump.md); a missing stored frame fails.
 It also compares the harness.sav of each scenario with a `save` line with
 reference/saves/<scenario>.sav, when that file exists, by decoded contents (tools/savefile.py leaves out the bytes taken from the clock or from uninitialised memory).
@@ -29,7 +29,7 @@ exclusive lock made them queue. A run that waits for a slot prints once which ga
 A second `--check` with the same cache key waits for the first on a key lock (bt-gate-key-<key>.lock) and then reports its cached pass.
 `--no-lock` takes no slot and no key lock. A scenario with a `load` line starts as soon as the scenario it loads has finished.
 A passing `--check` stores its output under ~/.cache/bt-gate/<key>.txt, the key being a SHA-256 of the exe, the files beside it
-(wasmtime_host.dll, *.wasm, modules.json), reference/{scenarios,traces,sounds,ui,frames,saves}, the four tools that play and compare
+(wasmtime_host.dll, *.wasm, modules.json), reference/{scenarios,traces,sounds,ui,events,frames,saves}, the four tools that play and compare
 (commit.txt is left out) and the options; a later `--check` with the same key, looked up before the lock and again after it, prints
 `cached pass from <date> at <commit>` and the stored lines and exits 0. `--no-cache` plays anyway.
 
@@ -51,7 +51,7 @@ and the block pointers are scanned and checked as in any full `--check`.
 `--traces` checks out origin/reference in build/reference/branch, runs that
 branch's own `tools/reference.py HEAD --traces` there (it links the matching
 build with the original compiler and plays the scenarios), and copies the
-traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ (if it wrote any), the UI logs it wrote into reference/ui/, the
+traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ (if it wrote any), the UI logs it wrote into reference/ui/, the sim event logs it wrote into reference/events/ (if it wrote any), the
 frames it wrote into reference/frames/ (if it wrote any) and the saves it wrote into reference/saves/ (if it wrote any).
 Set WINEARCH=win64 for Wine; `--game-dir` names the game's
 install.
@@ -78,6 +78,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import blockpointers
+import eventdigest
 import playtest
 import savefile
 import tracediff
@@ -91,6 +92,8 @@ SOUNDS = ROOT / "reference/sounds"
 SOUND_FILE = "sound.txt"
 UIS = ROOT / "reference/ui"
 UI_FILE = "ui.txt"
+EVENTS = ROOT / "reference/events"
+EVENTS_FILE = "events.txt"
 UI_PREFIX = "ui-"
 UI_EFFECTS = ("order", "qbuild", "cancel", "group", "groupsel")
 FRAMES = ROOT / "reference/frames"
@@ -149,6 +152,7 @@ FUEL_FILE = "fuel.txt"
 FUEL: dict[str, dict[str, tuple[int, int]]] = {}
 SOUND_LOGS: dict[str, str | None] = {}
 UI_LOGS: dict[str, str | None] = {}
+EVENT_LOGS: dict[str, str | None] = {}
 FRAME_DUMPS: dict[str, dict[int, bytes]] = {}
 SAVE_BYTES: dict[str, bytes | None] = {}
 MODES = ("wasm", "native")
@@ -157,10 +161,10 @@ KEY_LOCK_FILE = "bt-gate-key-{}.lock"
 SLOTS_ENV = "BT_GATE_SLOTS"
 SLOT_POLL_SECONDS = 0.25
 CACHE_ENV = "BT_GATE_CACHE"
-KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/frames", "reference/saves",
+KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/events", "reference/frames", "reference/saves",
             "tools/playtest")
 KEY_TOOLS = ("tools/reference.py", "tools/playtest.py", "tools/tracediff.py", "tools/tracedigest.py", "tools/savefile.py",
-             "tools/blockpointers.py")
+             "tools/blockpointers.py", "tools/eventdigest.py", "tools/tracerehash.py")
 KEY_DATA = ("data/block_pointers.csv",)
 KEY_RUNTIME_FILES = ("wasmtime_host.dll", "modules.json")
 RETRY_DIALOG = "dialog-directx"
@@ -292,7 +296,7 @@ def keep_run(run: Path, scenario: str, suffix: str = "", logs: bool = False) -> 
     """
     kept = ROOT / "build/scratch" / f"check-{scenario}{suffix}-{time.strftime('%Y%m%d-%H%M%S')}"
     kept.mkdir(parents=True, exist_ok=True)
-    names = ["trace.txt", SOUND_FILE, UI_FILE, "dump.txt", "blockptrs.txt"]
+    names = ["trace.txt", SOUND_FILE, UI_FILE, EVENTS_FILE, "dump.txt", "blockptrs.txt"]
     if logs:
         names += ["result.json", "crash.txt", *sorted(p.name for p in run.glob("wine*.log"))]
     for name in names:
@@ -909,7 +913,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     for attempt in range(RUN_ATTEMPTS):
         try:
             frame_files = tuple(f"frames/{tick}.bin" for tick in scenario_frames(scenario))
-            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, *frame_files, *dict.fromkeys(
+            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, EVENTS_FILE, *frame_files, *dict.fromkeys(
                 (*(tracediff.SAVE_FILES if save_to is not None else ()), *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if watch is not None:
                 extra["started"] = watch.started(key)
@@ -942,6 +946,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         SOUND_LOGS[key] = sound_log.read_text() if sound_log.is_file() else None
         ui_log = run / UI_FILE
         UI_LOGS[key] = ui_log.read_text() if ui_log.is_file() else None
+        events_log = run / EVENTS_FILE
+        EVENT_LOGS[key] = event_digest(events_log)
         FRAME_DUMPS[key] = {tick: (run / "frames" / f"{tick}.bin").read_bytes()
                             for tick in scenario_frames(scenario) if (run / "frames" / f"{tick}.bin").is_file()}
         if scenario_saves(scenario):
@@ -1230,6 +1236,40 @@ def sound_report(scenarios: dict[str, Path], logs: dict[str, str | None], direct
     return differing, lines
 
 
+def event_digest(log: Path) -> str | None:
+    """The digest text of the run's events.txt (eventdigest.digest_text), None when the run wrote none; a log that cannot be digested gives its error as the text."""
+    if not log.is_file():
+        return None
+    try:
+        return eventdigest.digest_text(log.read_text(encoding="latin-1"))
+    except eventdigest.Error as e:
+        return f"unreadable: {e}\n"
+
+
+def events_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path) -> tuple[list[str], list[str]]:
+    """(the scenarios whose sim event digest differs from reference/events/, the report lines): stored digests missing are only counted.
+
+    `logs` hold each run's digest text (eventdigest.digest_text)."""
+    differing: list[str] = []
+    lines: list[str] = []
+    unstored: list[str] = []
+    equal = 0
+    for name in scenarios:
+        stored = directory / f"{name}.txt"
+        if not stored.is_file():
+            unstored.append(name)
+            continue
+        got = logs.get(name)
+        diff = eventdigest.digest_difference(stored.read_text(), got) if got is not None else f"the run wrote no {EVENTS_FILE}"
+        if diff:
+            differing.append(name)
+            lines.append(f"DIFF {name} {diff}")
+        else:
+            equal += 1
+    lines.append(f"event digests: {equal} of {len(scenarios)} equal, {len(differing)} differ, {len(unstored)} with no stored digest in {directory.relative_to(ROOT)}")
+    return differing, lines
+
+
 def ui_difference(stored: str, got: str) -> str | None:
     """Where two UI logs first differ (a line number with both lines), or None when they are equal."""
     want, have = stored.splitlines(), got.splitlines()
@@ -1467,20 +1507,26 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
                 bad.append(key)
     total = len(scenarios) * len(modes)
     print(f"{total - len(bad)} of {total} scenarios equal, total {clock(wall)}")
-    sound_bad = ui_bad = frame_bad = save_bad = 0
+    sound_bad = ui_bad = events_bad = frame_bad = save_bad = 0
     pointers = 0
+    first_events: tuple[str, str] | None = None
     for mode in modes:
         label = f"[{mode}] " if both_modes else ""
         sound_names, sound_lines = sound_report(scenarios, mode_view(SOUND_LOGS, scenarios, mode), SOUNDS)
         print("\n".join(label + line for line in sound_lines))
         ui_names, ui_lines = ui_report(scenarios, mode_view(UI_LOGS, scenarios, mode), UIS)
         print("\n".join(label + line for line in ui_lines))
+        events_names, events_lines = events_report(scenarios, mode_view(EVENT_LOGS, scenarios, mode), EVENTS)
+        print("\n".join(label + line for line in events_lines))
         frame_names, frame_lines = frame_report(scenarios, mode_view(FRAME_DUMPS, scenarios, mode), FRAMES)
         print("\n".join(label + line for line in frame_lines))
         save_names, save_lines = save_report(scenarios, mode_view(SAVE_BYTES, scenarios, mode), SAVES)
         print("\n".join(label + line for line in save_lines))
         sound_bad += len(sound_names)
         ui_bad += len(ui_names)
+        events_bad += len(events_names)
+        if events_names and first_events is None:
+            first_events = (events_names[0], mode)
         frame_bad += len(frame_names)
         save_bad += len(save_names)
         if scans is not None:
@@ -1489,7 +1535,9 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
             print(f"{label}block pointers: not scanned, access-log build")
         pointers += report_fuel(exe, scenarios, mode_view(FUEL, scenarios, mode), mode == "native" if both_modes else None, label)
     if not bad:
-        if pointers or sound_bad or ui_bad or frame_bad or save_bad:
+        if first_events is not None:
+            report_event_records(first_events[0], first_events[1], expected, exe, scenarios, poison, game_dir)
+        if pointers or sound_bad or ui_bad or events_bad or frame_bad or save_bad:
             sys.exit(1)
         if tier:
             print(tier_message(len(scenarios), head_commit()))
@@ -1510,6 +1558,20 @@ def report_divergence(name: str, expected: dict[str, tuple], exe: Path, scenario
     ref_dir = build_cached(sha)
     subprocess.run(tracediff_command(ref_dir / "TotalA.exe", exe, scenarios[name], poison, game_dir))
     sys.exit(1)
+
+
+def report_event_records(name: str, mode: str, expected: dict[str, tuple], exe: Path, scenarios: dict[str, Path],
+                         poison: bool, game_dir: str | None) -> None:
+    """Play the reference build of the scenario's stored trace and the exe on `name`, and print the first record of their event logs that differs."""
+    sha = expected[name][0].get("commit", "unknown")
+    print(f"\nevent records for {name}: a = the reference at {sha}, b = {exe} ({mode})", flush=True)
+    if resolve_quiet(sha) is None:
+        fail(f"{name}: the trace's commit {sha} is not in this repository")
+    ref_dir = build_cached(sha)
+    if mode == "native":
+        os.environ["BT_NATIVE_MODULES"] = "1"
+    cmd = tracediff_command(ref_dir / "TotalA.exe", exe, scenarios[name], poison, game_dir) + ["--events"]
+    subprocess.run(cmd)
 
 
 def head_commit() -> str:
@@ -1693,6 +1755,20 @@ def copy_ui(directory: Path) -> None:
     print(f"{len(logs)} UI logs copied to {UIS.relative_to(ROOT)}")
 
 
+def copy_events(directory: Path) -> None:
+    """Replace reference/events/ by the digests of the sim event logs the reference branch checkout `directory` wrote (none written leaves it as it is)."""
+    logs = sorted((directory / "reference/events").glob("*.txt"))
+    if not logs:
+        print("the reference branch wrote no event logs; reference/events/ is untouched")
+        return
+    EVENTS.mkdir(parents=True, exist_ok=True)
+    for old in EVENTS.glob("*.txt"):
+        old.unlink()
+    for path in logs:
+        (EVENTS / path.name).write_text(eventdigest.digest_text(path.read_text(encoding="latin-1")))
+    print(f"{len(logs)} event digests written to {EVENTS.relative_to(ROOT)}")
+
+
 def write_traces(game_dir: str | None, parallel: int) -> None:
     directory = reference_branch()
     branch_scenarios = directory / "reference/scenarios"
@@ -1718,6 +1794,7 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
     copy_frames(directory / "reference/frames")
     copy_saves(directory)
     copy_ui(directory)
+    copy_events(directory)
     sounds = sorted((directory / "reference/sounds").glob("*.txt"))
     if not sounds:
         print("the reference branch wrote no sound logs; reference/sounds/ is untouched")

@@ -503,6 +503,8 @@ game,harness,call,HarnessInit,1
 game,harness,call,HarnessLoadBegins,1
 game,harness,call,HarnessLoadEnded,1
 game,harness,call,HarnessPhase,1
+game,harness,call,HarnessRecordPhase,1
+game,harness,call,HarnessSimEventSlot,1
 game,harness,call,HarnessStartSkirmish,1
 game,harness,call,HarnessStepsPerFrame,1
 game,harness,call,ReplayImport::Answered,5
@@ -518,7 +520,7 @@ game,harness,shared_write,Game::localPlayer,3
 game,harness,shared_write,Game::mode_391f1,1
 game,harness,shared_write,Game::numPlayers,2
 game,harness,shared_write,Game::playerIndex,1
-game,harness,shared_write,Game::ticks,2
+game,harness,shared_write,Game::ticks,3
 game,harness,shared_write,Game::uiOptionFlags,1
 game,harness,shared_write,LoadingFlags::value,1
 game,harness,shared_write,Player::allied,1
@@ -1057,7 +1059,7 @@ game,presentation,shared_write,Game::mode_391f1,5
 game,presentation,shared_write,Game::numPlayers,4
 game,presentation,shared_write,Game::playerIndex,23
 game,presentation,shared_write,Game::seaLevel,4
-game,presentation,shared_write,Game::ticks,36
+game,presentation,shared_write,Game::ticks,37
 game,presentation,shared_write,Game::uiOptionFlags,2
 game,presentation,shared_write,Game::version,3
 game,presentation,shared_write,MapViewFlags::bit0,1
@@ -1074,11 +1076,13 @@ game,presentation,shared_write,PlayerInfo::flags_9b,10
 game,presentation,shared_write,PlayerInfo::side,18
 game,presentation,shared_write,Point16::x,5
 game,presentation,shared_write,Point16::y,5
-game,presentation,shared_write,SimEvent::args,12
-game,presentation,shared_write,SimEvent::flags,3
-game,presentation,shared_write,SimEvent::kind,1
-game,presentation,shared_write,SimEventQueue::head,2
-game,presentation,shared_write,SimEventQueue::tail,2
+game,presentation,shared_write,SimEvent::args,13
+game,presentation,shared_write,SimEvent::flags,4
+game,presentation,shared_write,SimEvent::kind,2
+game,presentation,shared_write,SimEvent::tick,1
+game,presentation,shared_write,SimEventQueue::dropped,1
+game,presentation,shared_write,SimEventQueue::head,3
+game,presentation,shared_write,SimEventQueue::tail,3
 game,presentation,shared_write,Unit::flags,30
 game,presentation,shared_write,Unit::health,3
 game,presentation,shared_write,UnitDef::flags1,6
@@ -1457,7 +1461,7 @@ harness,pathfinding,shared_write,UnitsSeam::RefreshUnitIfStale,2
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
-harness,platform,call,HarnessTestMode,11
+harness,platform,call,HarnessTestMode,14
 harness,platform,call,IsMemSet,1
 harness,platform,call,ModulesCheckStatics,1
 harness,platform,call,ModulesHideSwitch,1
@@ -1995,8 +1999,9 @@ los_radar,presentation,shared_write,Game::visibilityMask,2
 los_radar,presentation,shared_write,MapViewFlags::raw,2
 los_radar,presentation,shared_write,Point16::x,5
 los_radar,presentation,shared_write,Point16::y,5
-los_radar,presentation,shared_write,RadarDrawCapture::projectileCount,1
-los_radar,presentation,shared_write,RadarDrawCapture::unitCount,1
+los_radar,presentation,shared_write,RadarDrawCapture::projectileCount,2
+los_radar,presentation,shared_write,RadarDrawCapture::unitCount,2
+los_radar,presentation,shared_write,RadarMappedCapture::cells,1
 los_radar,presentation,shared_write,RadarMappedCapture::height,1
 los_radar,presentation,shared_write,RadarMappedCapture::width,1
 los_radar,presentation,shared_write,RadarProjectileCapture::color,1
@@ -3770,7 +3775,7 @@ presentation,game,call,ShutdownIngameAndQuit,1
 presentation,game,call,ShutdownIngameSystems,1
 presentation,game,call,SimAlloc,1
 presentation,game,call,SimBlockTrack,3
-presentation,game,call,SimCapture,1
+presentation,game,call,SimCapture,2
 presentation,game,call,SimCaptureClear,1
 presentation,game,call,SimEvents,1
 presentation,game,call,StepGafSequence,1
@@ -3818,7 +3823,10 @@ presentation,game,shared_write,Unit::flags,4
 presentation,game,shared_write,Vec3::x,5
 presentation,game,shared_write,Vec3::y,3
 presentation,game,shared_write,Vec3::z,5
+presentation,harness,call,HarnessEventLogOpen,1
+presentation,harness,call,HarnessEventText,1
 presentation,harness,call,HarnessFrameDrawn,1
+presentation,harness,call,HarnessSimEventPhase,1
 presentation,harness,call,HarnessSoundEvent,6
 presentation,harness,call,HarnessUiCancel,1
 presentation,harness,call,HarnessUiGroup,2

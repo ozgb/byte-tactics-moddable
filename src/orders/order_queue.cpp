@@ -1,4 +1,5 @@
 #include "../../interfaces/seams.h"
+#include "../../interfaces/orders.h"
 #include "../units/unit_def.h"
 #include "../../interfaces/ref.h"
 #include <stdio.h>
@@ -83,7 +84,7 @@ extern int __cdecl _strcmpi(const char*, const char*);
 
 static inline void InsertBefore(Unit* p, Order* child, Order* before)
 {
-    Ref<Order>* link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
+    Ref<Order>* link = (child->flags_42 & ORDER_FLAG_SECOND_LIST) ? &p->list2 : &p->list;
     while (*link != before) {
         link = &(*link)->next;
     }
@@ -115,7 +116,7 @@ void __stdcall AddBeCarriedOrder(Unit* p)
         }
         Order* child =
             new (kSim) Order("BECARRIED", p->carrier, 0, 0, 0, 0);
-        InsertBefore(p, child, (child->flags_42 & 0x40000) ? p->list2 : p->list);
+        InsertBefore(p, child, (child->flags_42 & ORDER_FLAG_SECOND_LIST) ? p->list2 : p->list);
     }
 }
 
@@ -226,8 +227,8 @@ void Order::OrStatusFlags(unsigned int param_1)
 // FUNCTION: 0x438880
 void Order::AnnounceStatusIfFlagged(SimSpeechText text)
 {
-    if (flags_42 & 0x2000) {
-        flags_42 &= ~0x2000;
+    if (flags_42 & ORDER_FLAG_ANNOUNCE) {
+        flags_42 &= ~ORDER_FLAG_ANNOUNCE;
         RecordUnitSpeech(unit, 5, text);
     }
 }
@@ -351,7 +352,7 @@ void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 void Order::MergeFlagsFromTable(int k)
 {
     kind.index = k;
-    flags_42 = ((g_missionOrderTableVec[k & 0xff].flags ^ flags_42) & 0x600) ^ g_missionOrderTableVec[kind.index].flags;
+    flags_42 = ((g_missionOrderTableVec[k & 0xff].flags ^ flags_42) & (ORDER_FLAG_TARGET | ORDER_FLAG_POSITION)) ^ g_missionOrderTableVec[kind.index].flags;
 }
 
 // FUNCTION: 0x438be0

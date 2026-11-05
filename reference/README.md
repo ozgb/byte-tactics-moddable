@@ -447,9 +447,13 @@ whatever its offset and target; a heap address in any other holder fails the gat
 `blockpointers.py --check` fails on a holder with pair rows that lacks one of them. A holder the scans have not met
 yet is added by hand as a `*`/`*` row, with its class and a note.
 
-Every allocating member function of a `BlockVector<T>` in the linker map whose T has no pointer or Ref field in the layout has a
-wildcard row too: `blockpointers.py --check` with a map fails on one without it. Plain data can read as a heap address on one run and not
-on the next, because where the heap lies differs from run to run. A T with a pointer or Ref field gets no new row, and its words stay judged.
+Every allocating member function of a `BlockVector<T>` in the linker map has a wildcard row too: `blockpointers.py --check`
+with a map fails on one without it, and on one whose T has no layout to judge it by. Plain data can read as a heap address
+on one run and not on the next, because where the heap lies differs from run to run. Where T has a pointer, `Ref` or vtable
+field, its wildcard row covers only the misaligned words: a word whose offset in the allocation, modulo sizeof(T), is the
+offset of one of those fields is judged, and the gate fails on it unless a pair row of the holder has its target and an
+offsets entry that holds its offset. The wildcard row of such a holder is `not-a-pointer`, and its pair rows of another class
+need no wildcard row.
 
 ## Zero fill and poison mode
 

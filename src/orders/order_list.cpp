@@ -81,6 +81,7 @@ struct Point16FromShorts : Point16 {
 
 #include "../util/angles.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/orders.h"
 
 #include "../network/player.h"
 
@@ -300,7 +301,7 @@ const char* __stdcall GetOrderName(Unit* obj)
 Order* __stdcall FindOrderByType(Unit* obj, unsigned char kind)
 {
     Order* n;
-    if (g_missionOrderTableVec[kind].flags & 0x40000)
+    if (g_missionOrderTableVec[kind].flags & ORDER_FLAG_SECOND_LIST)
         n = obj->list2;
     else
         n = obj->list;
@@ -353,7 +354,7 @@ void __stdcall DeleteOrders(Unit* owner, int all)
 void __stdcall DeleteOrder(Unit* owner, Order* node)
 {
     Order* first = owner->list;
-    Ref<Order>* link = (node->flags_42 & 0x40000) ? &owner->list2 : &owner->list;
+    Ref<Order>* link = (node->flags_42 & ORDER_FLAG_SECOND_LIST) ? &owner->list2 : &owner->list;
     for (Order* n = *link; n != 0; n = n->next) {
         if (n == node) {
             *link = node->next;
@@ -386,7 +387,7 @@ void __stdcall MoveOrderToTail(char* param_1, char* param_2)
 
 static inline void InsertBefore(Unit* p, Order* child, Order* before)
 {
-    Ref<Order>* link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
+    Ref<Order>* link = (child->flags_42 & ORDER_FLAG_SECOND_LIST) ? &p->list2 : &p->list;
     while (*link != before) {
         link = &(*link)->next;
     }
@@ -438,10 +439,10 @@ Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
     next = 0;
     attached = 0;
     if (o == 0)
-        flags_42 &= ~0x200;
+        flags_42 &= ~ORDER_FLAG_TARGET;
     if (p == 0)
-        flags_42 &= ~0x400;
-    if (!(flags_42 & 0x200))
+        flags_42 &= ~ORDER_FLAG_POSITION;
+    if (!(flags_42 & ORDER_FLAG_TARGET))
         link.SetUnit(0);
 }
 
@@ -489,7 +490,7 @@ int __stdcall OrderTypeNameLess(int param_1, char* param_2)
 void __stdcall InsertOrderBefore(Unit* owner, Order* node,
                             Order* before)
 {
-    Ref<Order>* link = (node->flags_42 & 0x40000) ? &owner->list2
+    Ref<Order>* link = (node->flags_42 & ORDER_FLAG_SECOND_LIST) ? &owner->list2
                                                    : &owner->list;
     while (*link != before)
         link = &(*link)->next;
@@ -503,7 +504,7 @@ void __stdcall InsertOrderBefore(Unit* owner, Order* node,
 // FUNCTION: 0x43acb0
 void __stdcall AppendOrder(Unit* owner, Order* node)
 {
-    unsigned int which = node->flags_42 & 0x40000;
+    unsigned int which = node->flags_42 & ORDER_FLAG_SECOND_LIST;
     Order* before = which ? owner->list2 : owner->list;
     Ref<Order>* link = which ? &owner->list2 : &owner->list;
     while (*link != before) {
@@ -520,7 +521,7 @@ void __stdcall AppendOrder(Unit* owner, Order* node)
 // FUNCTION: 0x43ad10
 void __stdcall AppendOrderToTail(Unit* owner, Order* node)
 {
-    Ref<Order>* link = (node->flags_42 & 0x40000) ? &owner->list2 : &owner->list;
+    Ref<Order>* link = (node->flags_42 & ORDER_FLAG_SECOND_LIST) ? &owner->list2 : &owner->list;
     for (Order* n = *link; n != 0; n = n->next)
         link = &n->next;
     *link = node;
@@ -587,14 +588,14 @@ static inline void PruneUsed(Unit* owner)
         if (!(n->flags_42 & 0x4000))
             break;
         Order* node = n;
-        RemoveFromList((node->flags_42 & 0x40000) ? &owner->list2 : base, node, owner->list);
+        RemoveFromList((node->flags_42 & ORDER_FLAG_SECOND_LIST) ? &owner->list2 : base, node, owner->list);
     }
 }
 
 static inline void AddFront(Unit* owner, Order* node)
 {
-    Order* before = (node->flags_42 & 0x40000) ? owner->list2 : owner->list;
-    Ref<Order>* link = (node->flags_42 & 0x40000) ? &owner->list2 : &owner->list;
+    Order* before = (node->flags_42 & ORDER_FLAG_SECOND_LIST) ? owner->list2 : owner->list;
+    Ref<Order>* link = (node->flags_42 & ORDER_FLAG_SECOND_LIST) ? &owner->list2 : &owner->list;
     while (*link != before)
         link = &(*link)->next;
     *link = node;
@@ -615,12 +616,12 @@ void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target,
     if (remove == 0 && !(obj->flags_42 & 0x40))
         PruneLoose(&owner->list, owner->list);
 
-    if (!(obj->flags_42 & 0x40000))
+    if (!(obj->flags_42 & ORDER_FLAG_SECOND_LIST))
         PruneUsed(owner);
 
     obj->flags_42 |= 1;
     if (remove == 0)
-        obj->flags_42 |= 0x2000;
+        obj->flags_42 |= ORDER_FLAG_ANNOUNCE;
 
     if (obj->flags_42 & 0x40020)
         AddFront(owner, obj);
@@ -678,7 +679,7 @@ static inline int Matches(Order* node, unsigned char kind, int id, int* pos)
 static inline void RemoveNode(Unit* owner, Order* node, Order* first)
 {
     Ref<Order>* link = &owner->list;
-    if (node->flags_42 & 0x40000) {
+    if (node->flags_42 & ORDER_FLAG_SECOND_LIST) {
         link = &owner->list2;
     }
     for (Order* n = *link; n != 0; n = n->next) {
@@ -729,7 +730,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
 {
     Order* node;
     if (amount > 0) {
-        if (g_missionOrderTableVec[kind & 0xff].flags & 0x40000)
+        if (g_missionOrderTableVec[kind & 0xff].flags & ORDER_FLAG_SECOND_LIST)
             node = owner->list2;
         else
             node = owner->list;
@@ -745,7 +746,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
     }
     for (;;) {
         Order* found = 0;
-        if (g_missionOrderTableVec[kind & 0xff].flags & 0x40000)
+        if (g_missionOrderTableVec[kind & 0xff].flags & ORDER_FLAG_SECOND_LIST)
             node = owner->list2;
         else
             node = owner->list;
@@ -762,7 +763,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
         Order* first = owner->list;
         amount += found->count;
         Ref<Order>* link = &owner->list;
-        if (found->flags_42 & 0x40000)
+        if (found->flags_42 & ORDER_FLAG_SECOND_LIST)
             link = &owner->list2;
         for (node = *link; node != 0; node = node->next) {
             if (node == found) {
@@ -779,7 +780,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
 
 static inline void Insert(Unit* unit, Order* cmd, Order* before)
 {
-    unsigned int which = cmd->flags_42 & 0x40000;
+    unsigned int which = cmd->flags_42 & ORDER_FLAG_SECOND_LIST;
     Order* last = which ? unit->list2 : unit->list;
     Ref<Order>* link = which ? &unit->list2 : &unit->list;
     while (*link != before) {
@@ -808,14 +809,14 @@ int __stdcall IssueAttackOrder(Unit* unit, Unit* target, int param_3)
     if ((unit->flags & 0xc0000) == 0x40000 && !param_3) {
         MissionType kind2 = GetOrderType(2, unit, 0, (Vec3*)&unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
-        Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
+        Insert(unit, cmd, (cmd->flags_42 & ORDER_FLAG_SECOND_LIST) ? unit->list2 : unit->list);
         Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->maneuverleashlength);
         cmd2->start.x = PosXWhole(unit);
         cmd2->start.y = PosZWhole(unit);
-        Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
+        Insert(unit, cmd2, (cmd2->flags_42 & ORDER_FLAG_SECOND_LIST) ? unit->list2 : unit->list);
     } else {
         Order* cmd3 = new (kSim) Order(kind, target, 0, 0, 0, 0);
-        Insert(unit, cmd3, (cmd3->flags_42 & 0x40000) ? unit->list2 : unit->list);
+        Insert(unit, cmd3, (cmd3->flags_42 & ORDER_FLAG_SECOND_LIST) ? unit->list2 : unit->list);
     }
     return 1;
 }
@@ -830,24 +831,24 @@ int __stdcall IssueRepairOrder(Unit* unit, Unit* target, int param_3)
     if (f == 0 && !param_3) {
         MissionType kind2 = GetOrderType(2, unit, 0, (Vec3*)&unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
-        Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
+        Insert(unit, cmd, (cmd->flags_42 & ORDER_FLAG_SECOND_LIST) ? unit->list2 : unit->list);
         Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->range);
         cmd2->start.x = PosXWhole(unit);
         cmd2->start.y = PosZWhole(unit);
-        Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
+        Insert(unit, cmd2, (cmd2->flags_42 & ORDER_FLAG_SECOND_LIST) ? unit->list2 : unit->list);
         return 1;
     } else if (f == 0x40000 && !param_3) {
         MissionType kind2 = GetOrderType(2, unit, 0, (Vec3*)&unit->pos);
         Order* cmd = new (kSim) Order(kind2, 0, &unit->pos, 0, 0, 0);
-        Insert(unit, cmd, (cmd->flags_42 & 0x40000) ? unit->list2 : unit->list);
+        Insert(unit, cmd, (cmd->flags_42 & ORDER_FLAG_SECOND_LIST) ? unit->list2 : unit->list);
         Order* cmd2 = new (kSim) Order(kind, target, 0, 0, 0, ((UnitDefMoveView*)unit->def.get())->maneuverleashlength);
         cmd2->start.x = PosXWhole(unit);
         cmd2->start.y = PosZWhole(unit);
-        Insert(unit, cmd2, (cmd2->flags_42 & 0x40000) ? unit->list2 : unit->list);
+        Insert(unit, cmd2, (cmd2->flags_42 & ORDER_FLAG_SECOND_LIST) ? unit->list2 : unit->list);
         return 1;
     } else if (f == 0x80000 && !param_3) {
         Order* cmd3 = new (kSim) Order(kind, target, 0, 0, 0, 0);
-        Insert(unit, cmd3, (cmd3->flags_42 & 0x40000) ? unit->list2 : unit->list);
+        Insert(unit, cmd3, (cmd3->flags_42 & ORDER_FLAG_SECOND_LIST) ? unit->list2 : unit->list);
         return 1;
     } else {
         return 0;
@@ -859,7 +860,7 @@ void __stdcall EnqueueOrderType(Unit* p, unsigned char type)
 {
     Order* child = new (kSim) Order(type, 0, 0, 0, 0, 0);
     child->flags_42 |= 0x4000;
-    InsertBefore(p, child, (child->flags_42 & 0x40000) ? p->list2 : p->list);
+    InsertBefore(p, child, (child->flags_42 & ORDER_FLAG_SECOND_LIST) ? p->list2 : p->list);
 }
 
 void __stdcall MoveOrderToTail(Unit* owner, Order* node)
@@ -882,7 +883,7 @@ static void InsertCommand(Unit* p, unsigned char type)
 {
     Order* child = new (kSim) Order(type, 0, 0, 0, 0, 0);
     child->flags_42 |= 0x4000;
-    InsertOrderBefore(p, child, (child->flags_42 & 0x40000) ? p->list2 : p->list);
+    InsertOrderBefore(p, child, (child->flags_42 & ORDER_FLAG_SECOND_LIST) ? p->list2 : p->list);
 }
 
 static void DelayOrderWake(Order* node, int n)
@@ -968,7 +969,7 @@ void __stdcall RunOrders(Unit* unit)
 static void RemoveAndDelete(Unit* p, Order* child)
 {
     Order* first = p->list;
-    Ref<Order>* link = (child->flags_42 & 0x40000) ? &p->list2 : &p->list;
+    Ref<Order>* link = (child->flags_42 & ORDER_FLAG_SECOND_LIST) ? &p->list2 : &p->list;
     Order* node = *link;
     while (node != 0) {
         if (node == child) {

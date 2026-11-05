@@ -1738,7 +1738,7 @@ static_assert(offsetof(OrderFx, source) == 4, "");
 static_assert(sizeof(OrderTableEntry) == 25, "");
 static_assert(offsetof(OrderTableEntry, value) == 0, "");
 static_assert(offsetof(OrderTableEntry, notify) == 4, "");
-static_assert(offsetof(OrderTableEntry, unknown_8) == 8, "");
+static_assert(offsetof(OrderTableEntry, draw) == 8, "");
 static_assert(offsetof(OrderTableEntry, drawMask) == 12, "");
 static_assert(offsetof(OrderTableEntry, markerAnim) == 16, "");
 static_assert(offsetof(OrderTableEntry, flags) == 17, "");

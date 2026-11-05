@@ -11,6 +11,7 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int 
 #include <stdio.h>
 #include <math.h>
 #include <memory.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -98,6 +99,7 @@ inline int Order::Advance(int distance) {
 }
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/orders.h"
 
 #include "../../link/globals.h"
 
@@ -106,6 +108,7 @@ void __stdcall RegisterOrderTypes(void* table, int id);
 struct UnitOrderTypeView;
 struct FixedPosView;
 #include "order_dispatch.h"
+#include "order_type_entry.h"
 #include "order_queue.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
                            int a, int b, int c);
@@ -664,28 +667,12 @@ int __stdcall QMoveQPatrolOrder(int unused1, void* order, int unused3)
     return 6;
 }
 
-struct Unit;
-struct Order;
-struct View;
-struct Pos;
-
-#pragma pack(push, 1)
-struct UnitOrderType {
-    const char* status;
-    int (__stdcall* run)(Unit* unit, Order* order, int flags);
-    void (__stdcall* draw)(void* surface, View* view, Order* order, Pos* out, int flag);
-    int target;
-    unsigned int flags;
-    unsigned char internal;
-    const char* name;
-};
-#pragma pack(pop)
 
 // FUNCTION: 0x403180
 void RegisterUnitOrders()
 {
 #ifdef __clang__
-    extern const UnitOrderType g_unitOrders[23];
+    extern const OrderTableEntry g_unitOrders[23];
     RegisterOrderTypes((void*)g_unitOrders, 0x17);
 #else
     extern char g_unitOrders[];
@@ -1403,7 +1390,7 @@ static inline Vec3 Sub(const Vec3& a,const Vec3& b) { Vec3 r; r.x=a.x-b.x; r.y=a
 void RegisterGroundOrders()
 {
 #ifdef __clang__
-    extern const UnitOrderType g_groundOrders[22];
+    extern const OrderTableEntry g_groundOrders[22];
     RegisterOrderTypes((void*)g_groundOrders, 0x16);
 #else
     extern char g_groundOrders[];
@@ -1525,88 +1512,94 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
 
 
 // GLOBAL: 0x4fc490
-extern const UnitOrderType g_unitOrders[23] = {
-    {"Stopping", StopOrder, 0, 0, 0x13, 0, "Stop"},
-    {"Attacking", AttackNoMoveOrder, DrawWeaponCoverage, 8, 0x28001, 0, "Attack_NoMove"},
-    {"Activate", (int (__stdcall *)(Unit *, Order *, int))ActivateOrder, 0, 0, 0x1006013, 0, "Activate"},
-    {"Deactivate", (int (__stdcall *)(Unit *, Order *, int))DeactivateOrder, 0, 0, 0x1006013, 0, "Deactivate"},
-    {"Cloaking", (int (__stdcall *)(Unit *, Order *, int))CloakOnOrder, 0, 0, 0x1006013, 0, "Cloak_On"},
-    {"Decloaking", (int (__stdcall *)(Unit *, Order *, int))CloakOffOrder, 0, 0, 0x1006013, 0, "Cloak_Off"},
-    {"Acknowledged", StandingMoveOrder, 0, 0, 0x1006013, 0, "Standing_MoveOrder"},
-    {"Acknowledged", StandingFireOrder, 0, 0, 0x1006013, 0, "Standing_FireOrder"},
-    {"Nanolathing", BuildingBuildOrder, 0, 0, 0x10010c13, 0, "BuildingBuild"},
-    {"Nanolathing", BuildWeaponOrder, 0, 0, 0xc014013, 0, "BuildWeapon"},
-    {"SELF DESTRUCT ENGAGED", SelfDestructOrder, 0, 0, 0x4004013, 0, "SelfDestruct"},
-    {"SELF DESTRUCT ENGAGED", SelfDestructOrder, 0, 0, 0x13, 0, "SelfDestructFG"},
-    {"Paralyzed", ParalyzeOrder, 0, 0, 0x2413, 0, "Paralyze"},
-    {"Under construction", (int (__stdcall *)(Unit *, Order *, int))GetBuiltOrder, 0, 0, 0x22413, 0, "GetBuilt"},
-    {"Being transported", BeCarriedOrder, 0, 0, 0x2413, 0, "BeCarried"},
-    {"Unit is available", MakeSelectableOrder, 0, 0, 0x413, 0, "MakeSelectable"},
-    {"Waiting", WaitOrder, 0, 0, 0x413, 0, "Wait"},
-    {"Waiting for attack", (int (__stdcall *)(Unit *, Order *, int))WaitForAttackOrder, 0, 0, 0x20413, 0, "WaitForAttack"},
-    {"Attacking", AttackUTypeOrder, 0, 0, 0x413, 0, "AttackUType"},
-    {"Ready", GuardNoMoveOrder, 0, 0, 0x2013, 0, "Guard_NoMove"},
-    {"Repairing", SelfRepairOrder, 0, 0, 0x20413, 1, "SelfRepair"},
-    {"Ready with orders", (int (__stdcall *)(Unit *, Order *, int))QMoveQPatrolOrder, DrawPathAnim, 2, 0x4000e, 0, "QMove"},
-    {"Ready with orders", (int (__stdcall *)(Unit *, Order *, int))QMoveQPatrolOrder, DrawPathAnim, 2, 0x40007, 0, "QPatrol"},
+extern const OrderTableEntry g_unitOrders[23] = {
+    {"Stopping", StopOrder, 0, 0, 0x13, 0x0, "Stop"},
+    {"Attacking", AttackNoMoveOrder, DrawWeaponCoverage, 8, 0x1, 0x280, "Attack_NoMove"},
+    {"Activate", (int (__stdcall *)(Unit *, Order *, int))ActivateOrder, 0, 0, 0x13, 0x10060, "Activate"},
+    {"Deactivate", (int (__stdcall *)(Unit *, Order *, int))DeactivateOrder, 0, 0, 0x13, 0x10060, "Deactivate"},
+    {"Cloaking", (int (__stdcall *)(Unit *, Order *, int))CloakOnOrder, 0, 0, 0x13, 0x10060, "Cloak_On"},
+    {"Decloaking", (int (__stdcall *)(Unit *, Order *, int))CloakOffOrder, 0, 0, 0x13, 0x10060, "Cloak_Off"},
+    {"Acknowledged", StandingMoveOrder, 0, 0, 0x13, 0x10060, "Standing_MoveOrder"},
+    {"Acknowledged", StandingFireOrder, 0, 0, 0x13, 0x10060, "Standing_FireOrder"},
+    {"Nanolathing", BuildingBuildOrder, 0, 0, 0x13, 0x10010c, "BuildingBuild"},
+    {"Nanolathing", BuildWeaponOrder, 0, 0, 0x13, 0xc0140, "BuildWeapon"},
+    {"SELF DESTRUCT ENGAGED", SelfDestructOrder, 0, 0, 0x13, 0x40040, "SelfDestruct"},
+    {"SELF DESTRUCT ENGAGED", SelfDestructOrder, 0, 0, 0x13, 0x0, "SelfDestructFG"},
+    {"Paralyzed", ParalyzeOrder, 0, 0, 0x13, 0x24, "Paralyze"},
+    {"Under construction", (int (__stdcall *)(Unit *, Order *, int))GetBuiltOrder, 0, 0, 0x13, 0x224, "GetBuilt"},
+    {"Being transported", BeCarriedOrder, 0, 0, 0x13, 0x24, "BeCarried"},
+    {"Unit is available", MakeSelectableOrder, 0, 0, 0x13, 0x4, "MakeSelectable"},
+    {"Waiting", WaitOrder, 0, 0, 0x13, 0x4, "Wait"},
+    {"Waiting for attack", (int (__stdcall *)(Unit *, Order *, int))WaitForAttackOrder, 0, 0, 0x13, 0x204, "WaitForAttack"},
+    {"Attacking", AttackUTypeOrder, 0, 0, 0x13, 0x4, "AttackUType"},
+    {"Ready", GuardNoMoveOrder, 0, 0, 0x13, 0x20, "Guard_NoMove"},
+    {"Repairing", SelfRepairOrder, 0, 0, 0x13, 0x1000204, "SelfRepair"},
+    {"Ready with orders", (int (__stdcall *)(Unit *, Order *, int))QMoveQPatrolOrder, DrawPathAnim, 2, 0xe, 0x400, "QMove"},
+    {"Ready with orders", (int (__stdcall *)(Unit *, Order *, int))QMoveQPatrolOrder, DrawPathAnim, 2, 0x7, 0x400, "QPatrol"},
 };
+static_assert(sizeof(g_unitOrders) == 23 * sizeof(OrderTableEntry), "");
 
 // GLOBAL: 0x4fc6e8
-extern const UnitOrderType g_groundOrders[22] = {
-    {"Standby", StandbyOrder, 0, 0x10, 0x200000f, 0, "Standby"},
-    {"Standby", StandbyMineOrder, 0, 0x10, 0x200000f, 1, "Standby_Mine"},
-    {"Moving", MoveGroundOrder, DrawPathAnim, 0x12, 0x4020e, 0, "Move_Ground"},
-    {"Guarding", FollowGroundOrder, DrawPathAnim, 0x12, 0x20005, 0, "Follow_Ground"},
-    {"Suppressing fire", (int (__stdcall *)(Unit *, Order *, int))SuppressOrder, DrawWeaponCoverage, 8, 0x41001, 0, "Suppress"},
-    {"Attacking", (int (__stdcall *)(Unit *, Order *, int))AttackChaseOrder, DrawWeaponCoverage, 8, 0x28001, 0, "Attack_Chase"},
-    {"Attacking", (int (__stdcall *)(Unit *, Order *, int))AttackKamikazeOrder, DrawWeaponCoverage, 8, 0x60001, 0, "Attack_Kamikaze"},
-    {"Annihilating", AttackSpecialOrder, DrawWeaponCoverage, 8, 0x68001, 0, "AttackSpecial"},
-    {"Parking", ParkOrder, 0, 0, 0xe, 0, "Park"},
-    {"Patrolling", PatrolOrder, DrawPathAnim, 0x12, 0x41207, 0, "Patrol"},
-    {"Loading", GroundPickupOrder, DrawWeaponCoverage, 8, 0x2000c, 0, "Ground_Pickup"},
-    {"Unloading", GroundUnloadOrder, DrawWeaponCoverage, 8, 0x4000d, 0, "Ground_Unload"},
-    {"Teleporting", TeleportOrder, DrawWeaponCoverage, 8, 0x60009, 0, "Teleport"},
-    {"Nanolathing", MobileBuildOrder, DrawBuildFootprint, 0x13, 0x10050800, 0, "MobileBuild"},
-    {"Nanolathing", HelpBuildOrder, DrawWeaponCoverage, 0x18, 0x10020806, 0, "HelpBuild"},
-    {"Repair patrol", RepairPatrolOrder, DrawPathAnim, 0x12, 0x41207, 0, "RepairPatrol"},
-    {"Repairing", RepairUnitOrder, DrawPathAnim, 0x12, 0x10020006, 0, "RepairUnit"},
-    {"Capturing", (int (__stdcall *)(Unit *, Order *, int))CaptureOrder, DrawWeaponCoverage, 8, 0x20004, 0, "Capture"},
-    {"Resurrecting", ResurrectOrder, DrawPathAnim, 0x12, 0x2000b, 0, "Resurrect"},
-    {"Reclaiming", ReclaimOrder, DrawPathAnim, 0x12, 0x1008000b, 0, "Reclaim"},
-    {"Reclaiming", (int (__stdcall *)(Unit *, Order *, int))ReclaimUnitOrder, DrawPathAnim, 0x12, 0x1002000b, 0, "ReclaimUnit"},
-    {"Repairing", RepairUnitNoMoveOrder, DrawWeaponCoverage, 0x18, 0x20006, 0, "RepairUnitNoMove"},
+extern const OrderTableEntry g_groundOrders[22] = {
+    {"Standby", StandbyOrder, 0, 0x10, 0xf, 0x20000, "Standby"},
+    {"Standby", StandbyMineOrder, 0, 0x10, 0xf, 0x1020000, "Standby_Mine"},
+    {"Moving", MoveGroundOrder, DrawPathAnim, 0x12, 0xe, 0x402, "Move_Ground"},
+    {"Guarding", FollowGroundOrder, DrawPathAnim, 0x12, 0x5, 0x200, "Follow_Ground"},
+    {"Suppressing fire", (int (__stdcall *)(Unit *, Order *, int))SuppressOrder, DrawWeaponCoverage, 8, 0x1, 0x410, "Suppress"},
+    {"Attacking", (int (__stdcall *)(Unit *, Order *, int))AttackChaseOrder, DrawWeaponCoverage, 8, 0x1, 0x280, "Attack_Chase"},
+    {"Attacking", (int (__stdcall *)(Unit *, Order *, int))AttackKamikazeOrder, DrawWeaponCoverage, 8, 0x1, 0x600, "Attack_Kamikaze"},
+    {"Annihilating", AttackSpecialOrder, DrawWeaponCoverage, 8, 0x1, 0x680, "AttackSpecial"},
+    {"Parking", ParkOrder, 0, 0, 0xe, 0x0, "Park"},
+    {"Patrolling", PatrolOrder, DrawPathAnim, 0x12, 0x7, 0x412, "Patrol"},
+    {"Loading", GroundPickupOrder, DrawWeaponCoverage, 8, 0xc, 0x200, "Ground_Pickup"},
+    {"Unloading", GroundUnloadOrder, DrawWeaponCoverage, 8, 0xd, 0x400, "Ground_Unload"},
+    {"Teleporting", TeleportOrder, DrawWeaponCoverage, 8, 0x9, 0x600, "Teleport"},
+    {"Nanolathing", MobileBuildOrder, DrawBuildFootprint, 0x13, 0x0, 0x100508, "MobileBuild"},
+    {"Nanolathing", HelpBuildOrder, DrawWeaponCoverage, 0x18, 0x6, 0x100208, "HelpBuild"},
+    {"Repair patrol", RepairPatrolOrder, DrawPathAnim, 0x12, 0x7, 0x412, "RepairPatrol"},
+    {"Repairing", RepairUnitOrder, DrawPathAnim, 0x12, 0x6, 0x100200, "RepairUnit"},
+    {"Capturing", (int (__stdcall *)(Unit *, Order *, int))CaptureOrder, DrawWeaponCoverage, 8, 0x4, 0x200, "Capture"},
+    {"Resurrecting", ResurrectOrder, DrawPathAnim, 0x12, 0xb, 0x200, "Resurrect"},
+    {"Reclaiming", ReclaimOrder, DrawPathAnim, 0x12, 0xb, 0x100800, "Reclaim"},
+    {"Reclaiming", (int (__stdcall *)(Unit *, Order *, int))ReclaimUnitOrder, DrawPathAnim, 0x12, 0xb, 0x100200, "ReclaimUnit"},
+    {"Repairing", RepairUnitNoMoveOrder, DrawWeaponCoverage, 0x18, 0x6, 0x200, "RepairUnitNoMove"},
 };
+static_assert(sizeof(g_groundOrders) == 22 * sizeof(OrderTableEntry), "");
 
 // GLOBAL: 0x4fca18
-extern const UnitOrderType g_vtolOrders[22] = {
-    {"Standby", VtolStandbyOrder, 0, 0, 0x200000f, 0, "VTOL_Standby"},
-    {"Moving", VtolMoveOrder, DrawPathAnim, 2, 0x4020e, 0, "VTOL_Move"},
-    {"Landing", VtolLandingOrder, DrawWeaponCoverage, 8, 0x6000e, 0, "VTOL_Landing"},
-    {"Loading", VtolPickupOrder, DrawWeaponCoverage, 8, 0x20008, 0, "VTOL_Pickup"},
-    {"Unloading", VtolUnloadOrder, DrawWeaponCoverage, 8, 0x40009, 0, "VTOL_Unload"},
-    {"Guarding", VtolFollowOrder, DrawPathAnim, 2, 0x20005, 0, "VTOL_Follow"},
-    {"Patrolling", VtolPatrolOrder, DrawPathAnim, 2, 0x41207, 0, "VTOL_Patrol"},
-    {"Airstrike", (int (__stdcall *)(Unit *, Order *, int))AirStrikeOrder, DrawWeaponCoverage, 8, 0x60002, 0, "AirStrike"},
-    {"Engaging target", AirToAirOrder, DrawWeaponCoverage, 8, 0x20001, 0, "AirToAir"},
-    {"Engaging target", AirToGroundOrder, DrawWeaponCoverage, 8, 0x20001, 0, "AirToGround"},
-    {"Engaging target", AirToGroundHoverOrder, DrawWeaponCoverage, 8, 0x20001, 0, "AirToGroundHover"},
-    {"Nanolathing", VtolMobileBuildOrder, DrawBuildFootprint, 3, 0x10050800, 0, "VTOL_MobileBuild"},
-    {"Nanolathing", VtolHelpBuildOrder, DrawWeaponCoverage, 8, 0x10020806, 0, "VTOL_HelpBuild"},
-    {"Repair patrol", (int (__stdcall *)(Unit *, Order *, int))VtolRepairPatrolOrder, DrawPathAnim, 2, 0x41207, 0, "VTOL_RepairPatrol"},
-    {"Repairing", VtolRepairUnitOrder, DrawPathAnim, 2, 0x10020006, 0, "VTOL_RepairUnit"},
-    {"Reclaiming", VtolReclaimOrder, DrawPathAnim, 2, 0x1008000b, 0, "VTOL_Reclaim"},
-    {"Reclaiming", (int (__stdcall *)(Unit *, Order *, int))VtolReclaimUnitOrder, DrawPathAnim, 2, 0x1002000b, 0, "VTOL_ReclaimUnit"},
-    {"Evading", VtolEvadeOrder, 0, 0, 0x13, 0, "VTOL_Evade"},
-    {"Seeking to attack", VtolSeekAttackOrder, 0, 0, 0x60013, 0, "VTOL_SeekAttack"},
-    {"Seeking to guard", VtolSeekGuardOrder, 0, 0, 0x60013, 0, "VTOL_SeekGuard"},
-    {"Under repair", VtolGetRepairedOrder, 0, 0, 0x20013, 0, "VTOL_GetRepaired"},
-    {"Seeking to land", VtolLandIfCanOrder, 0, 0, 0x40013, 0, "VTOL_LandIfCan"},
+extern const OrderTableEntry g_vtolOrders[22] = {
+    {"Standby", VtolStandbyOrder, 0, 0, 0xf, 0x20000, "VTOL_Standby"},
+    {"Moving", VtolMoveOrder, DrawPathAnim, 2, 0xe, 0x402, "VTOL_Move"},
+    {"Landing", VtolLandingOrder, DrawWeaponCoverage, 8, 0xe, 0x600, "VTOL_Landing"},
+    {"Loading", VtolPickupOrder, DrawWeaponCoverage, 8, 0x8, 0x200, "VTOL_Pickup"},
+    {"Unloading", VtolUnloadOrder, DrawWeaponCoverage, 8, 0x9, 0x400, "VTOL_Unload"},
+    {"Guarding", VtolFollowOrder, DrawPathAnim, 2, 0x5, 0x200, "VTOL_Follow"},
+    {"Patrolling", VtolPatrolOrder, DrawPathAnim, 2, 0x7, 0x412, "VTOL_Patrol"},
+    {"Airstrike", (int (__stdcall *)(Unit *, Order *, int))AirStrikeOrder, DrawWeaponCoverage, 8, 0x2, 0x600, "AirStrike"},
+    {"Engaging target", AirToAirOrder, DrawWeaponCoverage, 8, 0x1, 0x200, "AirToAir"},
+    {"Engaging target", AirToGroundOrder, DrawWeaponCoverage, 8, 0x1, 0x200, "AirToGround"},
+    {"Engaging target", AirToGroundHoverOrder, DrawWeaponCoverage, 8, 0x1, 0x200, "AirToGroundHover"},
+    {"Nanolathing", VtolMobileBuildOrder, DrawBuildFootprint, 3, 0x0, 0x100508, "VTOL_MobileBuild"},
+    {"Nanolathing", VtolHelpBuildOrder, DrawWeaponCoverage, 8, 0x6, 0x100208, "VTOL_HelpBuild"},
+    {"Repair patrol", (int (__stdcall *)(Unit *, Order *, int))VtolRepairPatrolOrder, DrawPathAnim, 2, 0x7, 0x412, "VTOL_RepairPatrol"},
+    {"Repairing", VtolRepairUnitOrder, DrawPathAnim, 2, 0x6, 0x100200, "VTOL_RepairUnit"},
+    {"Reclaiming", VtolReclaimOrder, DrawPathAnim, 2, 0xb, 0x100800, "VTOL_Reclaim"},
+    {"Reclaiming", (int (__stdcall *)(Unit *, Order *, int))VtolReclaimUnitOrder, DrawPathAnim, 2, 0xb, 0x100200, "VTOL_ReclaimUnit"},
+    {"Evading", VtolEvadeOrder, 0, 0, 0x13, 0x0, "VTOL_Evade"},
+    {"Seeking to attack", VtolSeekAttackOrder, 0, 0, 0x13, 0x600, "VTOL_SeekAttack"},
+    {"Seeking to guard", VtolSeekGuardOrder, 0, 0, 0x13, 0x600, "VTOL_SeekGuard"},
+    {"Under repair", VtolGetRepairedOrder, 0, 0, 0x13, 0x200, "VTOL_GetRepaired"},
+    {"Seeking to land", VtolLandIfCanOrder, 0, 0, 0x13, 0x400, "VTOL_LandIfCan"},
 };
+static_assert(sizeof(g_vtolOrders) == 22 * sizeof(OrderTableEntry), "");
 
 // GLOBAL: 0x4fd288
-extern const UnitOrderType g_readyOrder[1] = {
-    {"Ready", (int (__stdcall *)(Unit *, Order *, int))ReadyOrder, 0, 0, 0xf, 0, ""},
+extern const OrderTableEntry g_readyOrder[1] = {
+    {"Ready", (int (__stdcall *)(Unit *, Order *, int))ReadyOrder, 0, 0, 0xf, 0x0, ""},
 };
+static_assert(sizeof(g_readyOrder) == 1 * sizeof(OrderTableEntry), "");
+static_assert(sizeof(OrderTableEntry) == 25, "");
+static_assert(offsetof(OrderTableEntry, draw) == 8 && offsetof(OrderTableEntry, drawMask) == 12 && offsetof(OrderTableEntry, markerAnim) == 16 && offsetof(OrderTableEntry, flags) == 17 && offsetof(OrderTableEntry, name) == 21, "");
 
 extern const int kAlignPad = 0;
 
@@ -1920,7 +1913,7 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
             int building=order->target->list->kind=="MobileBuild" ||
                          order->target->list->kind=="BuildingBuild";
             Order* other=order->target->list;
-            int actionable=((other->flags_42&0x200) && other->target) || (other->flags_42&0x400);
+            int actionable=((other->flags_42&ORDER_FLAG_TARGET) && other->target) || (other->flags_42&ORDER_FLAG_POSITION);
             MissionType kind;
             if (!building && actionable) {
                 order->SetAttachedFx(0);

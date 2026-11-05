@@ -2,12 +2,15 @@
 #define ORDER_TYPE_ENTRY_H
 
 struct Order;
+struct Unit;
+struct View;
+struct Pos;
 
 #pragma pack(push, 1)
 struct OrderTableEntry {
     const char* value;
-    int (__stdcall* notify)(void* unit, Order* obj, unsigned int code);
-    char unknown_8[0xc - 8];
+    int (__stdcall* notify)(Unit* unit, Order* order, int code);
+    void (__stdcall* draw)(void* surface, View* view, Order* order, Pos* out, int flag);
     int drawMask;
     unsigned char markerAnim;
     unsigned int flags;

@@ -29,6 +29,7 @@ address,function,file,kind,target
 0x401180,UnitResources::RequestEnergy,src/game/economy.cpp,field_write,UnitResources::energyUse
 0x401180,UnitResources::RequestEnergy,src/game/economy.cpp,field_write,UnitResources::energyUsePaid
 0x401180,UnitResources::RequestEnergy,src/game/economy.cpp,function,
+0x4011c0,UnitResources::RequestEnergyAndMetal,src/game/economy.cpp,call,StallsAllowRequest
 0x4011c0,UnitResources::RequestEnergyAndMetal,src/game/economy.cpp,field_read,UnitResources::energyStall
 0x4011c0,UnitResources::RequestEnergyAndMetal,src/game/economy.cpp,field_read,UnitResources::energyUse
 0x4011c0,UnitResources::RequestEnergyAndMetal,src/game/economy.cpp,field_read,UnitResources::energyUsePaid
@@ -80,12 +81,15 @@ address,function,file,kind,target
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,AddIncomeD
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,AddIncomeDB
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,AddIncomeW
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,CloakCostPayable
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,EnergyAccount
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,MetalAccount
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,SettleResourceAccount
-0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,UnitResources::SpendEnergy
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,SettlementBacklogCovered
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,SettlementDemandCovered
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,UseEnergy
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,UseEnergyD
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,X87EqTest40
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,get
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,operator Unit *
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,call,operator->
@@ -141,6 +145,7 @@ address,function,file,kind,target
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_read,UnitResources::metalStall
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_read,UnitResources::metalUse
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_read,UnitResources::metalUsePaid
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_read,UnitResources::player
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_read,UnitsSeam::SetStateBits
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_write,Player::energy
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_write,Player::energyCapacity
@@ -156,6 +161,7 @@ address,function,file,kind,target
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_write,Player::totalEnergyProduced
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_write,Player::totalMetalConsumed
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_write,Player::totalMetalProduced
+0x401360,UpdatePlayerEconomy,src/game/economy.cpp,field_write,UnitResources::energyUse
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,function,
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,global_read,g_game
 0x401360,UpdatePlayerEconomy,src/game/economy.cpp,global_read,g_seams
@@ -17684,6 +17690,8 @@ address,function,file,kind,target
 0x457cb0,CountCombatPlayers,src/game/players.cpp,field_read,PlayerInfo::kind
 0x457cb0,CountCombatPlayers,src/game/players.cpp,function,
 0x457cb0,CountCombatPlayers,src/game/players.cpp,global_read,g_game
+0x457d30,UpdateResourceSharing,src/network/net_game.cpp,call,EnergyRecipientPoorer
+0x457d30,UpdateResourceSharing,src/network/net_game.cpp,call,MetalRecipientPoorer
 0x457d30,UpdateResourceSharing,src/network/net_game.cpp,call,ShareEnergyAmount
 0x457d30,UpdateResourceSharing,src/network/net_game.cpp,call,ShareMetalAmount
 0x457d30,UpdateResourceSharing,src/network/net_game.cpp,call,operator->
@@ -44258,6 +44266,8 @@ address,function,file,kind,target
 ,ClearTrackedProjectile,src/weapons/weapons.cpp,global_read,g_game
 ,ClearWindowedFlag,src/graphics/display.cpp,field_write,Display::windowed
 ,ClearWindowedFlag,src/graphics/display.cpp,function,
+,CloakCostPayable,src/util/x87_compare.h,call,X87LeTest41
+,CloakCostPayable,src/util/x87_compare.h,function,
 ,CmdLimitSlot,src/game/console_commands.cpp,field_read,AiSeam::CmdLimit
 ,CmdLimitSlot,src/game/console_commands.cpp,field_read,Seams::ai
 ,CmdLimitSlot,src/game/console_commands.cpp,function,
@@ -45153,6 +45163,8 @@ address,function,file,kind,target
 ,EndSection,src/harness/harness.cpp,function,
 ,EnergyAccount,src/game/economy.cpp,field_escape,UnitResources::energyMake
 ,EnergyAccount,src/game/economy.cpp,function,
+,EnergyRecipientPoorer,src/util/x87_compare.h,call,X87LtTest01
+,EnergyRecipientPoorer,src/util/x87_compare.h,function,
 ,EnsureTable,src/harness/replay_objects.cpp,call,AllocateTable
 ,EnsureTable,src/harness/replay_objects.cpp,call,ReplayLengthOf
 ,EnsureTable,src/harness/replay_objects.cpp,call,SimBlockBase
@@ -50172,6 +50184,8 @@ address,function,file,kind,target
 ,MeasureTruncatedText,src/gui/dialogs.cpp,function,
 ,MetalAccount,src/game/economy.cpp,field_escape,UnitResources::metalMake
 ,MetalAccount,src/game/economy.cpp,function,
+,MetalRecipientPoorer,src/util/x87_compare.h,call,X87LtTest01
+,MetalRecipientPoorer,src/util/x87_compare.h,function,
 ,Min,src/debug/debug_lib.cpp,field_read,FreeBlockNode::left
 ,Min,src/debug/debug_lib.cpp,function,
 ,Min,src/debug/debug_lib.cpp,global_read,DAT_00528a54
@@ -57306,6 +57320,7 @@ address,function,file,kind,target
 ,SettingSetInt,src/host/settings_io.h,function,
 ,SettingSetString,src/host/settings_io.h,call,host_setting_set
 ,SettingSetString,src/host/settings_io.h,function,
+,ShareAmount,src/network/resource_share.h,call,X87LtTest01
 ,ShareAmount,src/network/resource_share.h,function,
 ,ShareEnergyAmount,src/network/resource_share.h,call,ShareAmount
 ,ShareEnergyAmount,src/network/resource_share.h,function,
@@ -57733,6 +57748,8 @@ address,function,file,kind,target
 ,StackTop,src/wasm/modules.cpp,deref_read,*unsigned char
 ,StackTop,src/wasm/modules.cpp,deref_write,*unsigned int
 ,StackTop,src/wasm/modules.cpp,function,
+,StallsAllowRequest,src/util/x87_compare.h,call,X87LeTest41
+,StallsAllowRequest,src/util/x87_compare.h,function,
 ,Start,src/wasm/modules.cpp,call,LoaderFatal
 ,Start,src/wasm/modules.cpp,call,ModulesFatal
 ,Start,src/wasm/modules.cpp,call,ReadFile

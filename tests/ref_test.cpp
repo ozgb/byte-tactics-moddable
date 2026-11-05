@@ -5,6 +5,7 @@
 #include "../src/state/block.h"
 #include "../src/ai/energy_rating.h"
 #include "../src/network/resource_share.h"
+#include "../src/util/x87_compare.h"
 
 void* GetAllocLock()
 {
@@ -148,6 +149,33 @@ int main()
     Check(BitsOf(ShareMetalAmount(813324.125f, 220410.484375f, 197637.890625f, 0.0f)) == 0x48410179u, "a metal share a hair under the capacity room is stored from the unrounded product");
     Check(BitsOf(ShareMetalAmount(860641.4375f, 300444.46875f, 1000.0f, 600.25f)) == 0x43c7e000u, "a metal share above the room is limited to the room");
     Check(BitsOf(ShareEnergyAmount(1048576.25f, 100.1328125f, 4000000.0f, 0.0f)) == 0x48fff9c2u, "the energy share is half the difference");
+
+    const float nan = __builtin_nanf("");
+    const float inf = __builtin_inff();
+    Check(StallsAllowRequest(nan, 0.0f), "a NaN energy stall grants the request");
+    Check(StallsAllowRequest(0.0f, nan), "a NaN metal stall grants the request");
+    Check(StallsAllowRequest(0.0f, -0.0f) && StallsAllowRequest(-1.0f, -inf), "stalls at or below zero grant the request");
+    Check(!StallsAllowRequest(1.0f, 0.0f) && !StallsAllowRequest(0.0f, 1.0f) && !StallsAllowRequest(inf, 0.0f), "a positive stall refuses the request");
+    Check(CloakCostPayable(5.0f, nan), "a NaN energy stock pays the cloak");
+    Check(CloakCostPayable(5.0f, 5.0f) && CloakCostPayable(5.0f, inf) && CloakCostPayable(0.0f, -0.0f), "an energy stock covering the cloak pays");
+    Check(!CloakCostPayable(5.0f, 4.0f) && !CloakCostPayable(5.0f, -inf), "an energy stock below the cloak refuses");
+    Check(SettlementBacklogCovered(nan, 1.0f) && SettlementBacklogCovered(1.0f, nan), "a NaN backlog or supply covers the backlog");
+    Check(SettlementBacklogCovered(1.0f, 1.0f) && SettlementBacklogCovered(0.0f, -0.0f) && SettlementBacklogCovered(1.0f, inf), "a backlog within the supply is covered");
+    Check(!SettlementBacklogCovered(2.0f, 1.0f) && !SettlementBacklogCovered(inf, 1.0), "a backlog above the supply is not covered");
+    Check(SettlementDemandCovered(nan, 1.0) && SettlementDemandCovered(1.0f, (double)nan), "a NaN demand or remainder covers the demand");
+    Check(SettlementDemandCovered(1.0f, 1.0) && SettlementDemandCovered(0.0f, -0.0) && SettlementDemandCovered(1.0f, (double)inf), "a demand within the remainder is covered");
+    Check(!SettlementDemandCovered(2.0f, 1.0) && !SettlementDemandCovered(inf, 1.0), "a demand above the remainder is not covered");
+    Check(MetalRecipientPoorer(nan, 5.0f) && MetalRecipientPoorer(5.0f, nan), "a NaN metal stock is chosen as the recipient");
+    Check(MetalRecipientPoorer(1.0f, 2.0f) && MetalRecipientPoorer(-inf, 0.0f), "a poorer metal stock is chosen");
+    Check(!MetalRecipientPoorer(2.0f, 2.0f) && !MetalRecipientPoorer(0.0f, -0.0f) && !MetalRecipientPoorer(inf, 1.0f), "an equal or richer metal stock is not chosen");
+    Check(EnergyRecipientPoorer(nan, 5.0f) && EnergyRecipientPoorer(5.0f, nan), "a NaN energy stock is chosen as the recipient");
+    Check(EnergyRecipientPoorer(1.0f, 2.0f) && EnergyRecipientPoorer(-inf, 0.0f), "a poorer energy stock is chosen");
+    Check(!EnergyRecipientPoorer(2.0f, 2.0f) && !EnergyRecipientPoorer(0.0f, -0.0f) && !EnergyRecipientPoorer(inf, 1.0f), "an equal or richer energy stock is not chosen");
+    Check(BitsOf(ShareMetalAmount(300.0f, 0.0f, nan, 0.0f)) == 0x42c80000u, "a NaN capacity room takes the amount");
+    float nanShare = ShareEnergyAmount(nan, 0.0f, 1000.0f, 0.0f);
+    Check(nanShare != nanShare, "a NaN product takes the amount, not the room");
+    Check(BitsOf(ShareMetalAmount(300.0f, 0.0f, 1000.0f, 0.0f)) == 0x42c80000u && BitsOf(ShareMetalAmount(300.0f, 0.0f, 50.0f, 0.0f)) == 0x42480000u && BitsOf(ShareMetalAmount(300.0f, 0.0f, 100.0f, 0.0f)) == 0x42c80000u, "ordered shares take the smaller of amount and room");
+    Check(X87EqTest40(nan, 0.0f) && X87EqTest40(0.0f, -0.0f) && !X87EqTest40(1.0f, 0.0f) && !X87EqTest40(inf, 0.0f), "a NaN build left counts as zero");
 
     printf(g_failures ? "FAILED\n" : "ref_test: all passed\n");
     return g_failures != 0;

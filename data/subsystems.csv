@@ -3123,6 +3123,7 @@ ClearGlyphOffsets,src/gui/gui.cpp,presentation,presentation,
 ClearPlayerSlotInRemovePlayer,src/network/net_game.cpp,network,file:src/network/,
 ClearTrackedProjectile,src/weapons/weapons.cpp,weapons,file:src/weapons/,
 ClearWindowedFlag,src/graphics/display.cpp,platform,presentation,platform
+CloakCostPayable,src/util/x87_compare.h,economy,folder:src/util/,economy
 CmdLimitSlot,src/game/console_commands.cpp,game,default:src/game/,
 CmdMeteorSlot,src/game/console_commands.cpp,wind_meteors,name:Meteor,
 CmdMeteorThunk,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
@@ -3253,6 +3254,7 @@ EmptyShutdownPreCleanupThunk,src/wasm/wind_meteors_glue.cpp,platform,folder:src/
 EnableMeteorsThunk,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 EndSection,src/harness/harness.cpp,harness,folder:src/harness/,
 EnergyAccount,src/game/economy.cpp,economy,file:src/game/economy,
+EnergyRecipientPoorer,src/util/x87_compare.h,economy,folder:src/util/,economy
 EnsureTable,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 EnterHarnessTestMode,src/util/test_mode.cpp,platform,folder:src/util/,
 EnterLoadingFrontend,src/harness/harness.cpp,harness,folder:src/harness/,
@@ -3876,6 +3878,7 @@ MeasureProgressBarText,src/gui/gui.cpp,presentation,presentation,
 MeasureTextInputText,src/gui/gui.cpp,presentation,presentation,
 MeasureTruncatedText,src/gui/dialogs.cpp,presentation,presentation,
 MetalAccount,src/game/economy.cpp,economy,file:src/game/economy,
+MetalRecipientPoorer,src/util/x87_compare.h,economy,folder:src/util/,economy
 Min,src/debug/debug_lib.cpp,platform,folder:src/debug/,
 MissionCondition::MissionCondition,src/game/mission_conditions.h,players,name:MissionCondition,
 MissionConditions::~MissionConditions,src/game/mission_conditions.h,players,name:MissionCondition,
@@ -4831,6 +4834,7 @@ SquadTimer::~SquadTimer,src/ai/squad_timer.h,ai,file:src/ai/,
 Square,src/orders/vtol_orders.cpp,orders,file:src/orders/,
 SquaredDistance,src/orders/unit_orders.cpp,orders,file:src/orders/,
 StackTop,src/wasm/modules.cpp,platform,folder:src/wasm/,
+StallsAllowRequest,src/util/x87_compare.h,economy,folder:src/util/,economy
 Start,src/wasm/modules.cpp,platform,folder:src/wasm/,
 StartScriptNative,src/seams/native.cpp,seams,folder:src/seams/,
 StartScriptWithArgsByIndexNative,src/seams/native.cpp,seams,folder:src/seams/,

@@ -1725,10 +1725,16 @@ void EmitVector(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, c
             const ReplayObjectField& ef = kReplayObjectFields[k];
             if (ef.object != spec.kind)
                 continue;
-            char sub[160];
-            sprintf(sub, "%s[%u].%s", key, i, ef.name);
-            ReplayFormatObjectField(ef, view.data + i * view.size, table, true, value);
+            char sub[256];
+            sprintf(sub, "%.200s[%u].%s", key, i, ef.name);
             bool fresh = i >= before;
+            ReplayFormatObjectField(ef, view.data + i * view.size, table, true, value);
+            if (ef.kind == RK_VECTOR) {
+                if (fresh)
+                    known.Set(sub, "");
+                EmitVector(out, known, table, tag, sub, ef, view.data + i * view.size, value.Data());
+                continue;
+            }
             if (fresh)
                 known.Set(sub, value.Data());
             if (fresh || known.Changed(sub, value.Data()))
@@ -2076,14 +2082,38 @@ bool ReplayApplyVectorElement(const ReplayObjectField& f, void* object, unsigned
     const ReplayVectorSpec& spec = kReplayVectors[f.array - 1];
     if (spec.mode != RV_VALUE)
         return false;
-    known.Set(fullKey, value);
-    if (!memory)
-        return true;
-    VectorView view = ViewOf(f, object);
-    const ReplayObjectField* ef = ReplayFindObjectField(spec.kind, sub);
-    if (ef == nullptr || index >= view.length)
+    const char* open = strchr(sub, '[');
+    char name[64];
+    size_t length = open == nullptr ? strlen(sub) : (size_t)(open - sub);
+    if (length >= sizeof name)
         return false;
-    return ReplayRestoreObjectField(*ef, view.data + index * view.size, value, table, alloc);
+    memcpy(name, sub, length);
+    name[length] = '\0';
+    const ReplayObjectField* ef = ReplayFindObjectField(spec.kind, name);
+    if (ef == nullptr)
+        return false;
+    unsigned char* element = nullptr;
+    if (memory) {
+        VectorView view = ViewOf(f, object);
+        if (index >= view.length)
+            return false;
+        element = view.data + index * view.size;
+    }
+    if (open == nullptr) {
+        if (ef->kind == RK_VECTOR)
+            return ReplayApplyVector(*ef, element, fullKey, value, known, memory, table, alloc);
+        known.Set(fullKey, value);
+        return !memory || ReplayRestoreObjectField(*ef, element, value, table, alloc);
+    }
+    char* end;
+    unsigned long at = strtoul(open + 1, &end, 10);
+    if (ef->kind != RK_VECTOR || end == open + 1 || *end != ']')
+        return false;
+    if (end[1] == '\0')
+        return ReplayApplyVectorString(*ef, element, (unsigned)at, fullKey, value, known, memory, alloc);
+    if (end[1] != '.')
+        return false;
+    return ReplayApplyVectorElement(*ef, element, (unsigned)at, end + 2, fullKey, value, known, memory, table, alloc);
 }
 
 bool ReplayApplyVectorString(const ReplayObjectField& f, void* object, unsigned index, const char* fullKey, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc)
@@ -2223,7 +2253,11 @@ void ReplayCompareVector(const ReplayObjectField& f, const void* object, const c
                 const ReplayObjectField& ef = kReplayObjectFields[k];
                 if (ef.object != spec.kind)
                     continue;
-                sprintf(name, "%s[%u].%s", key, i, ef.name);
+                sprintf(name, "%.150s[%u].%s", key, i, ef.name);
+                if (ef.kind == RK_VECTOR) {
+                    ReplayCompareVector(ef, view.data + i * view.size, name, known, table, report, hash);
+                    continue;
+                }
                 ReplayFormatObjectField(ef, view.data + i * view.size, table, false, value);
                 hash(value.Data());
                 const char* want = known.Get(name);

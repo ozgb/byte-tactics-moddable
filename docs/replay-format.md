@@ -646,6 +646,30 @@ elements. A vector of structs whose capacity changes keeps its old elements, as 
 difference is reported at `<field>.length`, `<field>.capacity`, `<field>[<i>]` (the hex of a scalar element or the handle of an object
 element) or `<field>[<i>].<f>` (a field of a struct element), for example `PlayerAI#1.counts.length: recorded 0, replayed 2`.
 
+### Vectors of vectors
+
+A value kind may have `vector` fields of its own, so the element of a vector can hold vectors, to any depth. `{"name": "mids", "kind": "vector", "elem": {"mode": "value", "kind": "Mid"}}`
+in the object, `"Mid": {"type": "Mid", "scope": "value", "fields": [{"name": "leaves", "kind": "vector", "elem": {"mode": "value", "kind": "Leaf"}}, ...]}`, and a `Leaf` with
+`{"name": "steps", "kind": "vector", "elem": {"mode": "scalar", "type": "short"}}` are three deep. A vector in an element is written as any vector is, with the element's path in its name,
+and its own elements are lines under that path:
+
+```
+  r Nest#1.mids [2/2]
+  r Nest#1.mids[0].tag 10
+  r Nest#1.mids[0].leaves [2/2]
+  r Nest#1.mids[0].leaves[1].kind 1
+  r Nest#1.mids[0].leaves[1].steps [2/2] 0:01000200
+  r Nest#1.mids[1].leaves[0].steps 1:0900
+```
+
+The rules of a vector hold at every level. An element that is new (past the length of the last bracket line) is written in full, its inner vectors and theirs included, because the recorder cannot know
+what its slot held before; an old element writes only what changed, so one inner element that changed is the one line `r Nest#1.mids[1].leaves[0].steps 1:0900`. A change of an inner vector's length or capacity writes
+its bracket, and, for a vector of structs or strings, the elements it newly holds. The replayer keeps the old elements, inner vectors included, when a capacity changes. A difference is reported at the path,
+`Nest#1.mids[0].leaves[2].kind`, `Nest#1.mids[1].leaves[0].steps[1]`, `Nest#1.mids[0].leaves[1].steps.length`. The walker follows the `object` vectors of an object, not those inside a vector of structs.
+
+A kind that derives from `BlockVector<T>` (`LosTable` is a `BlockVector<LosLine>`) is its own vector: its field has `"base": true` and no `member`, and sits at offset 0, `{"name": "lines", "kind": "vector", "base": true,
+"elem": {"mode": "value", "kind": "Line"}}`. The generated header checks `Type::value_type`, and that the kind is as big as a block vector.
+
 ## Strings behind pointers
 
 A field that holds a pointer to a NUL-terminated string is a field of kind `cstring`: `{"name": "label", "kind": "cstring"}` for a `char*` (or `const char*`),

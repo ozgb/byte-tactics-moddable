@@ -212,4 +212,24 @@ struct FixtureProgram {
     int* plain;
 };
 
+struct FixtureLeaf {
+    int kind;
+    BlockVector<short> steps;
+    BlockVector<char*> names;
+};
+
+struct FixtureMid {
+    int tag;
+    BlockVector<FixtureLeaf> leaves;
+};
+
+struct FixtureRow : public BlockVector<short> {
+};
+
+struct FixtureNest {
+    int id;
+    BlockVector<FixtureMid> mids;
+    BlockVector<FixtureRow> rows;
+};
+
 #endif

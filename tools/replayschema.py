@@ -1302,8 +1302,12 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 entry["selfspec"] = len(selfs)
             if f["kind"] == "vector":
                 where = "%s.%s" % (kind, f["name"])
-                if spec["scope"] != "state":
-                    errors.append("%s: only the fields of a state kind can be vectors" % where)
+                if spec["scope"] == "index":
+                    errors.append("%s: only the fields of a state or value kind can be vectors" % where)
+                if f.get("base") is True and "member" in f:
+                    errors.append("%s: a vector that is the base class of its kind has no `member`" % where)
+                if "base" in f and f["base"] is not True:
+                    errors.append("%s: `base` is true, for a kind that derives from BlockVector" % where)
                 vectors.append(check_vector(where, f, spec["type"], ann, errors))
                 entry["vector"] = len(vectors)
                 if vectors[-1]["mode"] == "object" and vectors[-1]["kind"]:
@@ -1822,12 +1826,13 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         member = embeds_member(f).replace("[]", "[0]") if f["kind"] == "embeds" else f["name"] if f["kind"] == "self" else f.get("member", f["name"])
         t = types[f["object"]]
         size = f.get("size")
-        size_text = str(size) if size else "sizeof(void*)" if f["kind"] in ("ptr", "blob") else "sizeof(((%s*)nullptr)->%s)" % (t, member)
+        derived = f["kind"] == "vector" and f.get("base") is True
+        size_text = str(size) if size else "sizeof(%s)" % t if derived else "sizeof(void*)" if f["kind"] in ("ptr", "blob") else "sizeof(((%s*)nullptr)->%s)" % (t, member)
         target = "RCB_%s" % upper(f["callback"]) if field_kind(f) in ("cbref", "cbptr") else kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds", "blob") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
         extra = ", %d" % (f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec")) if f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec") else ""
         when = "{ %d, %d, %s, %du, %d }" % (f["condField"], f.get("condVia", 0), kind_id[f["condKind"]], f.get("condMask", 0xFFFFFFFF), f["condValue"]) if f.get("condField") else "{}"
-        L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
-            f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[field_kind(f)], target, range_end.get(i, 0), range_begin.get(i, 0),
+        L.append('    { "%s", %s, %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
+            f["name"], "0" if derived else "offsetof(%s, %s)" % (t, member), size_text, kind_id[f["object"]], FIELD_KINDS[field_kind(f)], target, range_end.get(i, 0), range_begin.get(i, 0),
             when, f.get("reachFirst", 0), f.get("reachCount", 0), extra))
     L += ["};", "static const unsigned kReplayObjectFieldCount = %d;" % len(ofields), ""]
     L += ["static const unsigned short kReplayReachFields[] = { %s };" % ", ".join(str(i) for i in model["reach_table"] or [0]), ""]
@@ -1864,7 +1869,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             continue
         elif f["kind"] == "vector":
             v = vectors[f["vector"] - 1]
-            access = "decltype(((%s*)nullptr)->%s)" % (t, member)
+            access = t if f.get("base") is True else "decltype(((%s*)nullptr)->%s)" % (t, member)
             L.append('static_assert(sizeof(%s) == 16, "%s::%s is a block vector");' % (access, t, f["name"]))
             L.append('static_assert(__is_same(%s::value_type, %s), "%s::%s holds %s");' % (access, v["ctype"], t, f["name"], v["ctype"]))
         elif f["kind"] == "code":

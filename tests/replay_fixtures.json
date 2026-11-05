@@ -728,6 +728,90 @@
      "target": "alloc"
     }
    ]
+  },
+  "FixtureNest": {
+   "type": "FixtureNest",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "mids",
+     "kind": "vector",
+     "elem": {
+      "mode": "value",
+      "kind": "FixtureMid"
+     }
+    },
+    {
+     "name": "rows",
+     "kind": "vector",
+     "elem": {
+      "mode": "value",
+      "kind": "FixtureRow"
+     }
+    }
+   ]
+  },
+  "FixtureMid": {
+   "type": "FixtureMid",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "tag",
+     "kind": "i32"
+    },
+    {
+     "name": "leaves",
+     "kind": "vector",
+     "elem": {
+      "mode": "value",
+      "kind": "FixtureLeaf"
+     }
+    }
+   ]
+  },
+  "FixtureLeaf": {
+   "type": "FixtureLeaf",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "kind",
+     "kind": "i32"
+    },
+    {
+     "name": "steps",
+     "kind": "vector",
+     "elem": {
+      "mode": "scalar",
+      "type": "short"
+     }
+    },
+    {
+     "name": "names",
+     "kind": "vector",
+     "elem": {
+      "mode": "cstring"
+     }
+    }
+   ]
+  },
+  "FixtureRow": {
+   "type": "FixtureRow",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "cells",
+     "kind": "vector",
+     "base": true,
+     "elem": {
+      "mode": "scalar",
+      "type": "short"
+     }
+    }
+   ]
   }
  },
  "fixtures": {

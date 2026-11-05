@@ -1204,10 +1204,10 @@ class Vectors(unittest.TestCase):
         self.field(ann, "cells")["elem"] = {"mode": "value", "kind": "Unit"}
         self.assertTrue(any("PlayerAI.cells: a value element needs a `kind` that is a value kind" in e for e in self.errors(ann)))
 
-    def test_only_the_fields_of_a_state_kind_are_vectors(self):
+    def test_only_the_fields_of_a_state_or_value_kind_are_vectors(self):
         ann = annotations()
-        ann["objects"]["KeyedCell"]["fields"].append({"name": "v", "kind": "vector", "elem": {"mode": "scalar", "type": "int"}})
-        self.assertTrue(any("KeyedCell.v: only the fields of a state kind can be vectors" in e for e in self.errors(ann)))
+        ann["objects"]["weapondef"]["fields"].append({"name": "v", "kind": "vector", "elem": {"mode": "scalar", "type": "int"}})
+        self.assertTrue(any("weapondef.v: only the fields of a state or value kind can be vectors" in e for e in self.errors(ann)))
 
 
 class Snapshots(unittest.TestCase):
@@ -2585,6 +2585,47 @@ class Blobs(unittest.TestCase):
         ann = annotations()
         self.field(ann, "entries")["target"] = "Unit"
         self.has(ann, "FixtureProgram.entries: the target Unit of a blob has a table")
+
+
+class NestedVectors(unittest.TestCase):
+    """A value kind may have vector fields, so a vector holds vectors to any depth; a kind that derives from BlockVector is its own vector."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, kind, name):
+        return next(f for f in ann["objects"][kind]["fields"] if f["name"] == name)
+
+    def test_a_value_kind_has_vector_rows_like_a_state_kind(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn('{ "leaves", offsetof(FixtureMid, leaves), sizeof(((FixtureMid*)nullptr)->leaves), ROK_FIXTUREMID, RK_VECTOR,', text)
+        self.assertIn('{ "steps", offsetof(FixtureLeaf, steps),', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureMid*)nullptr)->leaves)::value_type, FixtureLeaf), "FixtureMid::leaves holds FixtureLeaf");', text)
+
+    def test_the_kind_that_is_a_vector_has_its_field_at_offset_zero(self):
+        text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
+        self.assertIn('{ "cells", 0, sizeof(FixtureRow), ROK_FIXTUREROW, RK_VECTOR,', text)
+        self.assertIn('static_assert(sizeof(FixtureRow) == 16, "FixtureRow::cells is a block vector");', text)
+        self.assertIn('static_assert(__is_same(FixtureRow::value_type, short), "FixtureRow::cells holds short");', text)
+
+    def test_the_real_schema_has_a_vector_in_no_value_kind(self):
+        _, _, model = rs.generate(rs.read_rows())
+        scopes = {o["name"]: o["scope"] for o in model["objects"]}
+        self.assertEqual([f for f in model["object_fields"] if f["kind"] == "vector" and scopes[f["object"]] == "value"], [])
+
+    def test_base_is_checked(self):
+        ann = annotations()
+        self.field(ann, "FixtureRow", "cells")["member"] = "cells"
+        self.has(ann, "FixtureRow.cells: a vector that is the base class of its kind has no `member`")
+        ann = annotations()
+        self.field(ann, "FixtureRow", "cells")["base"] = "yes"
+        self.has(ann, "FixtureRow.cells: `base` is true")
 
 
 class Committed(unittest.TestCase):

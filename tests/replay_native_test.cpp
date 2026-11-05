@@ -5498,6 +5498,111 @@ void BlobSelfTest()
     calls.Free();
 }
 
+void NestedVectorSelfTest()
+{
+    printf("vectors of vectors\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureNest* nest = (FixtureNest*)Fresh(sizeof(FixtureNest));
+    new (&nest->mids) BlockVector<FixtureMid>();
+    new (&nest->rows) BlockVector<FixtureRow>();
+    nest->id = 7;
+    for (int m = 0; m < 2; m++) {
+        FixtureMid mid;
+        new (&mid) FixtureMid();
+        mid.tag = 10 + m;
+        for (int l = 0; l < 2; l++) {
+            FixtureLeaf leaf;
+            new (&leaf) FixtureLeaf();
+            leaf.kind = 100 * m + l;
+            leaf.steps.PushBack((short)(m + l));
+            leaf.steps.PushBack((short)(m + l + 1));
+            leaf.names.PushBack(BlockText(l == 0 ? "a" : "b"));
+            mid.leaves.PushBack(leaf);
+        }
+        nest->mids.PushBack(mid);
+    }
+    FixtureRow row;
+    new (&row) FixtureRow();
+    row.PushBack(4);
+    row.PushBack(5);
+    nest->rows.PushBack(row);
+
+    static const char* const fieldNames[3] = { "id", "mids", "rows" };
+    unsigned short fields[3];
+    for (int i = 0; i < 3; i++)
+        fields[i] = FieldIndex(ROK_FIXTURENEST, fieldNames[i]);
+    ReplaySlotSets sets = { "nest", 0, nullptr, 0, nullptr, 0, fields, 3, fields, 3 };
+    unsigned char kind = ROK_FIXTURENEST;
+    void* root = nest;
+    Recorder recorder;
+    ReplayText calls;
+    recorder.Record(&kind, &root, 1, sets);
+    printf("%s", recorder.text.Data());
+    const char* first = recorder.text.Data();
+    Check(strstr(first, "  r FixtureNest#1.mids [2/2]\n  r FixtureNest#1.mids[0].tag 10\n  r FixtureNest#1.mids[0].leaves [2/2]\n  r FixtureNest#1.mids[0].leaves[0].kind 0\n") != nullptr,
+          "a vector inside an element is a bracket under the element's path, and its elements are lines under it");
+    Check(strstr(first, "  r FixtureNest#1.mids[1].leaves[1].kind 101\n  r FixtureNest#1.mids[1].leaves[1].steps [2/2] 0:02000300\n  r FixtureNest#1.mids[1].leaves[1].names [1/1]\n  r FixtureNest#1.mids[1].leaves[1].names[0] \"b\"\n") != nullptr,
+          "to any depth, a scalar vector as a run and a vector of strings as lines");
+    Check(strstr(first, "  r FixtureNest#1.rows [1/1]\n  r FixtureNest#1.rows[0].cells [2/2] 0:04000500\n") != nullptr, "an element that is itself a vector is its field named for its base");
+    calls.AddText(recorder.text);
+
+    nest->mids[1].leaves[0].steps[1] = 9;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r FixtureNest#1.mids[1].leaves[0].steps 1:0900\n") == 0, "one inner element that changed is one line, at its path");
+    calls.AddText(recorder.text);
+    nest->mids[0].leaves[1].names[0] = BlockText("z");
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r FixtureNest#1.mids[0].leaves[1].names[0] \"z\"\n") == 0, "and so is a string");
+    calls.AddText(recorder.text);
+    FixtureLeaf extra;
+    new (&extra) FixtureLeaf();
+    extra.kind = 5;
+    extra.steps.PushBack(1);
+    nest->mids[0].leaves.PushBack(extra);
+    recorder.Record(&kind, &root, 1, sets);
+    printf("%s", recorder.text.Data());
+    Check(strstr(recorder.text.Data(), "  r FixtureNest#1.mids[0].leaves [3/4]\n  r FixtureNest#1.mids[0].leaves[2].kind 5\n  r FixtureNest#1.mids[0].leaves[2].steps [1/1] 0:0100\n") != nullptr && strstr(recorder.text.Data(), "leaves[0]") == nullptr, "a vector that grew writes its new element in full");
+    calls.AddText(recorder.text);
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    FixtureNest* rebuilt = (FixtureNest*)ReplayResolveObject("FixtureNest#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->mids.Size() == 2 && rebuilt->mids[0].leaves.Size() == 3 && rebuilt->mids[0].leaves.Capacity() == 4, "the replayer rebuilds the vectors at every depth");
+    Check(rebuilt != nullptr && rebuilt->mids[1].leaves[0].steps.Size() == 2 && rebuilt->mids[1].leaves[0].steps[1] == 9 && rebuilt->mids[1].leaves[1].kind == 101, "with the inner element that changed");
+    Check(rebuilt != nullptr && strcmp(rebuilt->mids[0].leaves[1].names[0], "z") == 0 && rebuilt->mids[0].leaves[2].steps[0] == 1 && rebuilt->mids[0].leaves[0].steps[1] == 1, "and the strings, the new element, and the old ones carried over the growth");
+    Check(rebuilt != nullptr && rebuilt->rows.Size() == 1 && rebuilt->rows[0].Size() == 2 && rebuilt->rows[0][1] == 5, "a vector that is an element too");
+
+    g_rootKinds[0] = ROK_FIXTURENEST;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored vectors compare equal");
+    rebuilt->mids[1].leaves[0].steps[1] = 8;
+    rebuilt->mids[0].leaves[2].kind = 6;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("changed inner elements: %s\n%s", g_firstKey, g_detail.Data());
+    Check(strstr(g_detail.Data(), "FixtureNest#1.mids[1].leaves[0].steps[1]: recorded 0900, replayed 0800") != nullptr, "an inner element is reported at its path");
+    Check(strstr(g_detail.Data(), "FixtureNest#1.mids[0].leaves[2].kind: recorded 5, replayed 6") != nullptr && g_diffs == 2, "and so is a field of an inner struct");
+    rebuilt->mids[1].leaves[0].steps[1] = 9;
+    rebuilt->mids[0].leaves[2].kind = 5;
+    rebuilt->mids[0].leaves[1].steps.PushBack(3);
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 2 && strcmp(g_firstKey, "FixtureNest#1.mids[0].leaves[1].steps.length") == 0 && strstr(g_detail.Data(), "FixtureNest#1.mids[0].leaves[1].steps.capacity") != nullptr, "an inner vector of another length is reported at its length, and its capacity");
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    Recorder replayed;
+    rebuilt = (FixtureNest*)ReplayResolveObject("FixtureNest#1", nullptr, g_objects, AllocObject);
+    void* rebuiltRoot = rebuilt;
+    replayed.Record(&kind, &rebuiltRoot, 1, sets);
+    Check(strstr(replayed.text.Data(), "  r FixtureNest#1.mids[0].leaves [3/4]\n") != nullptr && strstr(replayed.text.Data(), "  r FixtureNest#1.mids[1].leaves[0].steps [2/2] 0:01000900\n") != nullptr, "the rebuilt object records the vectors as they were");
+    calls.Free();
+}
+
 void GameWriteSelfTest()
 {
     printf("a write to Game through a pointer\n");
@@ -5573,6 +5678,7 @@ int SelfTest(const char* file)
     SelfPointerSelfTest();
     CStringSelfTest();
     BlobSelfTest();
+    NestedVectorSelfTest();
     GameWriteSelfTest();
     if (file == nullptr)
         return 0;

@@ -221,6 +221,10 @@ enum ReplayObjectKindId {
     ROK_FIXTURETALLY,
     ROK_FIXTURENAMED,
     ROK_FIXTUREPROGRAM,
+    ROK_FIXTURENEST,
+    ROK_FIXTUREMID,
+    ROK_FIXTURELEAF,
+    ROK_FIXTUREROW,
     ROK_COUNT
 };
 
@@ -423,6 +427,12 @@ static const ReplayVectorSpec kReplayVectors[] = {
     { RV_SCALAR, 0, sizeof(short) },
     { RV_CSTRING, 0, sizeof(char*) },
     { RV_CSTRINGREF, 0, sizeof(Ref<char>) },
+    { RV_VALUE, ROK_FIXTUREMID, sizeof(FixtureMid) },
+    { RV_VALUE, ROK_FIXTUREROW, sizeof(FixtureRow) },
+    { RV_VALUE, ROK_FIXTURELEAF, sizeof(FixtureLeaf) },
+    { RV_SCALAR, 0, sizeof(short) },
+    { RV_CSTRING, 0, sizeof(char*) },
+    { RV_SCALAR, 0, sizeof(short) },
 };
 
 static const ReplayElemSpec kReplayElems[] = {
@@ -520,8 +530,12 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FixtureTally", sizeof(FixtureTally), RS_STATE, 13, 0, 0, 0, 0, 0 },
     { "FixtureNamed", sizeof(FixtureNamed), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
     { "FixtureProgram", sizeof(FixtureProgram), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureNest", sizeof(FixtureNest), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureMid", sizeof(FixtureMid), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureLeaf", sizeof(FixtureLeaf), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureRow", sizeof(FixtureRow), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 65;
+static const unsigned kReplayObjectKindCount = 69;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };
 
@@ -901,8 +915,17 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "bits", offsetof(FixtureProgram, bits), sizeof(void*), ROK_FIXTUREPROGRAM, RK_PTR, ROK_ALLOC, 0, 0, {}, 0, 0 },
     { "bits[]", offsetof(FixtureProgram, bits), sizeof(void*), ROK_FIXTUREPROGRAM, RK_BLOB, ROK_ALLOC, 0, 0, {}, 0, 0, 9 },
     { "plain", offsetof(FixtureProgram, plain), sizeof(void*), ROK_FIXTUREPROGRAM, RK_PTR, ROK_ALLOC, 0, 0, {}, 0, 0 },
+    { "id", offsetof(FixtureNest, id), sizeof(((FixtureNest*)nullptr)->id), ROK_FIXTURENEST, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "mids", offsetof(FixtureNest, mids), sizeof(((FixtureNest*)nullptr)->mids), ROK_FIXTURENEST, RK_VECTOR, 0, 0, 0, {}, 0, 0, 6 },
+    { "rows", offsetof(FixtureNest, rows), sizeof(((FixtureNest*)nullptr)->rows), ROK_FIXTURENEST, RK_VECTOR, 0, 0, 0, {}, 0, 0, 7 },
+    { "tag", offsetof(FixtureMid, tag), sizeof(((FixtureMid*)nullptr)->tag), ROK_FIXTUREMID, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "leaves", offsetof(FixtureMid, leaves), sizeof(((FixtureMid*)nullptr)->leaves), ROK_FIXTUREMID, RK_VECTOR, 0, 0, 0, {}, 0, 0, 8 },
+    { "kind", offsetof(FixtureLeaf, kind), sizeof(((FixtureLeaf*)nullptr)->kind), ROK_FIXTURELEAF, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "steps", offsetof(FixtureLeaf, steps), sizeof(((FixtureLeaf*)nullptr)->steps), ROK_FIXTURELEAF, RK_VECTOR, 0, 0, 0, {}, 0, 0, 9 },
+    { "names", offsetof(FixtureLeaf, names), sizeof(((FixtureLeaf*)nullptr)->names), ROK_FIXTURELEAF, RK_VECTOR, 0, 0, 0, {}, 0, 0, 10 },
+    { "cells", 0, sizeof(FixtureRow), ROK_FIXTUREROW, RK_VECTOR, 0, 0, 0, {}, 0, 0, 11 },
 };
-static const unsigned kReplayObjectFieldCount = 349;
+static const unsigned kReplayObjectFieldCount = 358;
 
 static const unsigned short kReplayReachFields[] = { 47, 51, 138, 139, 140, 38, 37, 0, 25, 51, 141, 34, 280, 38, 36, 39, 47, 52, 54, 87 };
 
@@ -1255,6 +1278,21 @@ static_assert(sizeof(((FixtureProgram*)nullptr)->count) == 4, "FixtureProgram::c
 static_assert(__is_pointer(decltype(((FixtureProgram*)nullptr)->entries)), "FixtureProgram::entries is a raw pointer");
 static_assert(__is_pointer(decltype(((FixtureProgram*)nullptr)->bits)), "FixtureProgram::bits is a raw pointer");
 static_assert(__is_pointer(decltype(((FixtureProgram*)nullptr)->plain)), "FixtureProgram::plain is a raw pointer");
+static_assert(sizeof(((FixtureNest*)nullptr)->id) == 4, "FixtureNest::id has the size the schema says");
+static_assert(sizeof(decltype(((FixtureNest*)nullptr)->mids)) == 16, "FixtureNest::mids is a block vector");
+static_assert(__is_same(decltype(((FixtureNest*)nullptr)->mids)::value_type, FixtureMid), "FixtureNest::mids holds FixtureMid");
+static_assert(sizeof(decltype(((FixtureNest*)nullptr)->rows)) == 16, "FixtureNest::rows is a block vector");
+static_assert(__is_same(decltype(((FixtureNest*)nullptr)->rows)::value_type, FixtureRow), "FixtureNest::rows holds FixtureRow");
+static_assert(sizeof(((FixtureMid*)nullptr)->tag) == 4, "FixtureMid::tag has the size the schema says");
+static_assert(sizeof(decltype(((FixtureMid*)nullptr)->leaves)) == 16, "FixtureMid::leaves is a block vector");
+static_assert(__is_same(decltype(((FixtureMid*)nullptr)->leaves)::value_type, FixtureLeaf), "FixtureMid::leaves holds FixtureLeaf");
+static_assert(sizeof(((FixtureLeaf*)nullptr)->kind) == 4, "FixtureLeaf::kind has the size the schema says");
+static_assert(sizeof(decltype(((FixtureLeaf*)nullptr)->steps)) == 16, "FixtureLeaf::steps is a block vector");
+static_assert(__is_same(decltype(((FixtureLeaf*)nullptr)->steps)::value_type, short), "FixtureLeaf::steps holds short");
+static_assert(sizeof(decltype(((FixtureLeaf*)nullptr)->names)) == 16, "FixtureLeaf::names is a block vector");
+static_assert(__is_same(decltype(((FixtureLeaf*)nullptr)->names)::value_type, char*), "FixtureLeaf::names holds char*");
+static_assert(sizeof(FixtureRow) == 16, "FixtureRow::cells is a block vector");
+static_assert(__is_same(FixtureRow::value_type, short), "FixtureRow::cells holds short");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");

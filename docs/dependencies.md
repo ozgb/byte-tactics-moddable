@@ -93,9 +93,9 @@ From data/phase_boundaries.csv. `needed` is `yes` when an `immediate` row spans 
 
 Each deferrable edge was held back to the end of its phase in a full-suite run (data/dependency_checks.csv) and the traces compared. The runs confirm the rule and the barrier within the suite's coverage.
 
-Results: 30 equal.
+Results: 31 equal.
 
-`defer_held` is 0 for every one of the 30 edges in 4 groups (332 scenario runs counted in all): in no run did a reader meet a write that the barrier held back.
+`defer_held` is 0 for every one of the 31 edges in 5 groups (415 scenario runs counted in all): in no run did a reader meet a write that the barrier held back.
 
 The runs add no evidence on paths the suite does not reach. The control (tests/defer/immediate-control.defer) shows that the barrier changes a trace on an immediate edge, so the barrier can change what a run shows.
 
@@ -105,6 +105,7 @@ The runs add no evidence on paths the suite does not reach. The control (tests/d
 | g2 | 4 | 84 | 83 | equal | 0 | 0 |
 | g3 | 9 | 84 | 83 | equal | 0 | 1688 |
 | g4 | 3 | 84 | 83 | equal | 0 | 0 |
+| g5 | 1 | 84 | 83 | equal | 0 | 0 |
 
 ## Presentation reads
 
@@ -1696,7 +1697,7 @@ The 15 groups with the most rows are shown.
 | orders -> players | `Unit::pos` | units | g1 | 84 | equal | 0 | 0 |
 | orders -> players | `Unit::zFraction` | units | g1 | 84 | equal | 0 | 0 |
 | orders -> units | `Order::z` | units | g4 | 84 | equal | 0 | 0 |
-| orders -> units | `PathOrder::pos_z` | units | no run | - | - | - | - |
+| orders -> units | `PathOrder::pos_z` | units | g5 | 84 | equal | 0 | 0 |
 | orders -> units | `Unit::metal` | units | g4 | 84 | equal | 0 | 0 |
 | orders -> weapons | `Order::kind` | projectiles | g4 | 84 | equal | 0 | 0 |
 | units -> orders | `Unit::activateFlags` | units | g3 | 84 | equal | 0 | 1688 |
@@ -1905,7 +1906,7 @@ The 15 groups with the most rows are shown.
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
 | orders -> units | `Order::z` | units | g4 | 84 | equal | 0 | 0 |
-| orders -> units | `PathOrder::pos_z` | units | no run | - | - | - | - |
+| orders -> units | `PathOrder::pos_z` | units | g5 | 84 | equal | 0 | 0 |
 | orders -> units | `Unit::metal` | units | g4 | 84 | equal | 0 | 0 |
 | units -> ai | `Unit::activateFlags` | units | g1 | 84 | equal | 0 | 0 |
 | units -> features | `FeatureAnimEntry::bytes_10` | units | g1 | 84 | equal | 0 | 0 |

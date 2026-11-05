@@ -740,6 +740,10 @@ class Found:
     elapsed: float
     kept: Path | None
     early: bool = False
+    trace: Path | None = None
+    tick: int = 0
+    stored: str = ""
+    got: str = ""
 
 
 class Watch:
@@ -792,15 +796,20 @@ class Watch:
             run.seen += 1
             if want[index:index + 1] != [got]:
                 diff = first_difference(want[index:index + 1], [got])
-                self.halt(name, diff, run.seen, time.time() - run.started, keep_run(run.path.parent, name))
+                self.halt(name, diff, run.seen, time.time() - run.started, keep_run(run.path.parent, name),
+                          trace=run.path, digest=(*want[index], got[1]) if index < len(want) else None)
                 return
 
-    def halt(self, name: str, diff: str, ticks: int, elapsed: float, kept: Path | None, early: bool = False) -> None:
-        """Record the first difference (or, with `early`, early exit, `diff` being its report line) and stop every running scenario (the first call wins)."""
+    def halt(self, name: str, diff: str, ticks: int, elapsed: float, kept: Path | None, early: bool = False,
+             trace: Path | None = None, digest: tuple[int, str, str] | None = None) -> None:
+        """Record the first difference (or, with `early`, early exit, `diff` being its report line) and stop every running scenario (the first call wins).
+
+        `trace` is the file that the watch read, and `digest` the (tick, stored, got) of the difference.
+        """
         with self.lock:
             if self.found:
                 return
-            self.found = Found(name, diff, ticks, elapsed, kept, early)
+            self.found = Found(name, diff, ticks, elapsed, kept, early, trace, *(digest or (0, "", "")))
             self.halted.set()
             procs = [r.proc for r in self.live.values()]
         for proc in procs:
@@ -817,6 +826,23 @@ class Watch:
         timer = threading.Timer(STOP_SECONDS, lambda: proc.poll() is None and proc.kill())
         timer.daemon = True
         timer.start()
+
+
+def recheck(found: Found) -> str | None:
+    """After a halt, what the kept trace.txt holds at the tick that the watch found different: a line to print, or None when the file agrees with the watch."""
+    if found.early or not found.kept or not found.stored:
+        return None
+    try:
+        data = (found.kept / "trace.txt").read_bytes()
+        done = dict(tracedigest.TraceTail().feed(data))
+    except (OSError, tracedigest.Error):
+        return f"recheck: cannot read {found.kept.name}/trace.txt"
+    if found.tick not in done:
+        return f"recheck: the kept trace does not reach tick {found.tick}"
+    if done[found.tick] == found.stored:
+        return (f"the watch read a different value than the file now holds: tick {found.tick}, stored {found.stored}, "
+                f"the watch read {found.got} from {found.trace}, the kept file holds {done[found.tick]}")
+    return None
 
 
 def scenario_saves(scenario: Path) -> bool:
@@ -1392,7 +1418,11 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     if watch is not None and watch.found and len(results) < len(scenarios) * len(modes):
         found = watch.found
         where = f" [kept: {found.kept.relative_to(ROOT)}]" if found.kept else ""
-        print(found.diff if found.early else f"DIFF {found.name} ({found.ticks} ticks, {clock(found.elapsed)}) {found.diff}{where}")
+        trace = f" [trace: {shown(found.trace)}]" if found.trace else ""
+        print(found.diff if found.early else f"DIFF {found.name} ({found.ticks} ticks, {clock(found.elapsed)}) {found.diff}{trace}{where}")
+        note = recheck(found)
+        if note:
+            print(note)
         print(f"stopped: {len(scenarios) * len(modes) - len(results)} scenarios not finished")
         if found.early:
             print("tracediff not run: the run ended early, so there is no complete trace to compare")

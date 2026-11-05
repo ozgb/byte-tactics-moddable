@@ -1218,6 +1218,61 @@ class BothModesTest(unittest.TestCase):
         self.assertEqual(sorted(calls), sorted((n, m) for n in "abc" for m in ("wasm", "native")))
 
 
+class RecheckTest(unittest.TestCase):
+    HEADER = "bt-trace 3\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
+
+    def rows(self, tick_values):
+        return "".join(f"{t} units {v * 16}\n" for t, v in tick_values)
+
+    def found(self, tmp, kept_text, watch_text):
+        """Run a Watch over `watch_text` (the live trace), keeping a trace.txt of `kept_text` in place of the real copy."""
+        good = reference.tracedigest.digests([(t, "units", v * 16) for t, v in ((1, "1"), (2, "2"), (3, "3"))])
+        live = Path(tmp) / "work/i1/game/trace.txt"
+        live.parent.mkdir(parents=True)
+        live.write_text(self.HEADER + watch_text)
+        kept = Path(tmp) / "kept"
+        kept.mkdir()
+        (kept / "trace.txt").write_text(self.HEADER + kept_text)
+        proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+        watch = reference.Watch({"a": ({}, good)}, lambda pid: live)
+        try:
+            with mock.patch.object(reference, "keep_run", lambda *a, **k: kept):
+                watch.started("a")(proc)
+                watch.poll()
+        finally:
+            proc.kill()
+            proc.wait()
+        return watch.found, live
+
+    def test_the_file_holding_the_stored_digest_says_the_watch_read_another_value(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            found, live = self.found(tmp, self.rows([(1, "1"), (2, "2"), (3, "3")]), self.rows([(1, "1"), (2, "9"), (3, "3")]))
+            self.assertEqual((found.tick, found.trace), (2, live))
+            self.assertNotEqual(found.stored, found.got)
+            note = reference.recheck(found)
+            self.assertIn("the watch read a different value than the file now holds", note)
+            self.assertIn("tick 2", note)
+            self.assertIn(found.stored, note)
+            self.assertIn(found.got, note)
+            self.assertIn(str(live), note)
+
+    def test_the_file_holding_the_watchs_value_keeps_the_diff(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            text = self.rows([(1, "1"), (2, "9"), (3, "3")])
+            found, _ = self.found(tmp, text, text)
+            self.assertIsNone(reference.recheck(found))
+
+    def test_a_file_that_stops_short_of_the_tick_says_so(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            found, _ = self.found(tmp, self.rows([(1, "1")]) + "2 units " + "2" * 5, self.rows([(1, "1"), (2, "9"), (3, "3")]))
+            self.assertIn("does not reach tick 2", reference.recheck(found))
+
+    def test_the_diff_line_names_the_trace_the_watch_read(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            found, live = self.found(tmp, self.rows([(1, "1")]), self.rows([(1, "1"), (2, "9"), (3, "3")]))
+            self.assertEqual(reference.shown(found.trace), live)
+
+
 class TracediffCommandTest(unittest.TestCase):
     def test_names_the_reference_side(self):
         cmd = reference.tracediff_command(Path("a/TotalA.exe"), Path("b/TotalA.exe"), Path("s.txt"), False, None)

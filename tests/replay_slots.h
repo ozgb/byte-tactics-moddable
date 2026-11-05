@@ -509,7 +509,7 @@ void Run_economy_UpdateResourceSharing()
     g_seams.economy->UpdateResourceSharing(p0);
 }
 
-float g_result_economy_GetEnergyUse;
+double g_result_economy_GetEnergyUse;
 
 void Run_economy_GetEnergyUse()
 {

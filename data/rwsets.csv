@@ -2127,8 +2127,9 @@ address,function,file,kind,target
 0x4095d0,RateUnitType,src/ai/ai_player.cpp,field_read,WeaponDefRatingView::range
 0x4095d0,RateUnitType,src/ai/ai_player.cpp,function,
 0x4095d0,RateUnitType,src/ai/ai_player.cpp,global_read,g_seams
-0x4095d0,RateUnitType,src/ai/ai_player.cpp,indirect_call,indirect via float (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
+0x4095d0,RateUnitType,src/ai/ai_player.cpp,indirect_call,indirect via double (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,BlockVector::Resize
+0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,ComputeEnergyRating
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,RateUnitTypeForWeights
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,UnitDef::HasField1ce
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,operator UnitDef *
@@ -2168,7 +2169,7 @@ address,function,file,kind,target
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,function,
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,global_read,g_game
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,global_read,g_seams
-0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,indirect_call,indirect via float (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
+0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,indirect_call,indirect via double (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,BlockVector::Begin
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,operator[]
@@ -2415,7 +2416,7 @@ address,function,file,kind,target
 0x40ad70,ProbeUnitDefEnergyRate,src/ai/ai_player.cpp,field_read,Seams::economy
 0x40ad70,ProbeUnitDefEnergyRate,src/ai/ai_player.cpp,function,
 0x40ad70,ProbeUnitDefEnergyRate,src/ai/ai_player.cpp,global_read,g_seams
-0x40ad70,ProbeUnitDefEnergyRate,src/ai/ai_player.cpp,indirect_call,indirect via float (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
+0x40ad70,ProbeUnitDefEnergyRate,src/ai/ai_player.cpp,indirect_call,indirect via double (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
 0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,call,BlockVector::Begin
 0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,call,BlockVector::End
 0x40ad80,GetVisibleEnemiesInRadius,src/ai/ai_player.cpp,call,Unit::Ready
@@ -44379,6 +44380,8 @@ address,function,file,kind,target
 ,CompareOut,src/harness/block_scan.cpp,function,
 ,CompareSpans,src/harness/block_scan.cpp,field_read,Span::start
 ,CompareSpans,src/harness/block_scan.cpp,function,
+,ComputeEnergyRating,src/ai/energy_rating.h,function,
+,ComputeEnergyRating,src/ai/energy_rating.h,indirect_call,indirect via double (*)(UnitDef *) __attribute__((stdcall)) [getEnergyUse]
 ,ComputeMapChecksumNative,src/seams/native.cpp,call,Mission::ComputeMapChecksum
 ,ComputeMapChecksumNative,src/seams/native.cpp,function,
 ,ConditionClassOf,src/harness/harness.cpp,call,HarnessConditionClass
@@ -51558,7 +51561,7 @@ address,function,file,kind,target
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,field_read,UnitDef::metalCost
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,function,
 ,RateUnitTypeForWeights,src/ai/ai_player.cpp,global_read,g_seams
-,RateUnitTypeForWeights,src/ai/ai_player.cpp,indirect_call,indirect via float (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
+,RateUnitTypeForWeights,src/ai/ai_player.cpp,indirect_call,indirect via double (*)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
 ,ReachPosLineOfFire,src/weapons/weapons.cpp,call,SolveLaunchAngle
 ,ReachPosLineOfFire,src/weapons/weapons.cpp,call,operator-
 ,ReachPosLineOfFire,src/weapons/weapons.cpp,field_read,Fixed::value
@@ -52143,7 +52146,7 @@ address,function,file,kind,target
 ,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,global_read,s_call
 ,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,global_read,s_inner_economy
 ,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,global_read,s_tail
-,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,indirect_call,indirect via float (*const)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
+,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,indirect_call,indirect via double (*const)(UnitDef *) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
 ,RecEconomyLoadUnitAccounts,src/harness/replay_hooks.inc,call,Add
 ,RecEconomyLoadUnitAccounts,src/harness/replay_hooks.inc,call,ArgHandle
 ,RecEconomyLoadUnitAccounts,src/harness/replay_hooks.inc,call,ArgObject

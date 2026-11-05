@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem economy 2.0
+subsystem economy 3.0
 call 6270 RequestEnergyAndMetal
   r Unit#1001.resourceSlot.energyUse f32:0x43518098
   r Unit#1001.resourceSlot.energyUsePaid f32:0x00000000

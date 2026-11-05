@@ -8,7 +8,7 @@ class HapiBank;
 class UnitResources;
 
 // Major version of the economy interface, changed when a slot is removed or its signature changes.
-#define ECONOMY_VERSION_MAJOR 2
+#define ECONOMY_VERSION_MAJOR 3
 // Minor version of the economy interface, changed when a slot is added.
 #define ECONOMY_VERSION_MINOR 0
 
@@ -16,8 +16,8 @@ class UnitResources;
 struct EconomySeam {
     // Sends the given player's resource sharing changes to the other players.
     void (__stdcall* UpdateResourceSharing)(Player* player);
-    // Returns the energy a unit type uses, or minus the energy it makes from wind or tide. Hooks: none.
-    float (__stdcall* GetEnergyUse)(UnitDef* def);
+    // Returns the energy a unit type uses, or minus the energy it makes from wind or tide, as the exact product, not rounded to 32 bits. Hooks: none.
+    double (__stdcall* GetEnergyUse)(UnitDef* def);
     // Settles one player's units for a tick: charges their energy use and adds their income. Hooks: ResourceIncome, StatsAccumulate.
     void (__stdcall* UpdatePlayerEconomy)(Player* player);
     // Sets a metal extractor's rate from the metal under its footprint and tells its script. Hooks: none.

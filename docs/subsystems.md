@@ -10,7 +10,7 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5264 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5265 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -19,7 +19,7 @@ The subsystems and the issue each maps to:
 | [wind_meteors](#wind_meteors) | 17 | #9 |
 | [economy](#economy) | 32 | #11 |
 | [features](#features) | 47 | #12 |
-| [ai](#ai) | 128 | #13 |
+| [ai](#ai) | 129 | #13 |
 | [pathfinding](#pathfinding) | 55 | #14 |
 | [weapons](#weapons) | 106 | #15 |
 | [targeting](#targeting) | 11 | #16 |
@@ -212,7 +212,7 @@ Coverage: 97.7% of functions (43 of 44), 84.5% of lines, 71.9% of branches; 1 li
 
 ## ai
 
-Issue #13. 128 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
+Issue #13. 129 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
 Coverage: 89.0% of functions (89 of 100), 88.7% of lines, 83.6% of branches; 11 live functions no scenario enters, and 33 more are dead (data/coverage.csv).
 

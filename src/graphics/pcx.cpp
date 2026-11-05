@@ -341,7 +341,7 @@ int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
     if (game->useOverrideSurface == 0)
         return 0;
 
-    const char* sep = flag ? g_pathSepBackslash : DAT_005119b8;
+    const char* sep = flag ? g_pathSepBackslash : g_emptyText;
     sprintf(filename, "%s%s%s*.pcx", dirPath, sep, namePrefix);
 
     int handle = HAPI_FindFirst(filename, &fd, -1, 1);
@@ -354,7 +354,7 @@ int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
         HAPI_FindClose(handle);
     }
 
-    sep = flag ? g_pathSepBackslash : DAT_005119b8;
+    sep = flag ? g_pathSepBackslash : g_emptyText;
     sprintf(filename, "%s%s%s%04i.pcx", dirPath, sep, namePrefix, best + 1);
 
     Surface* bitmap = game->overrideSurface;

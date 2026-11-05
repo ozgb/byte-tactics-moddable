@@ -187,11 +187,11 @@ int __stdcall LoadUnitInfo()
                 return 0;
             }
             GetLocalizedString(&parser, u->name, "name", 0x20, 0);
-            parser.GetString(u->unitname, "unitname", 0x20, DAT_005119b8);
-            parser.GetString(u->side, "side", 0x1e, DAT_005119b8);
-            parser.GetString(u->aiWeight, "ai_weight", 0x40, DAT_005119b8);
-            parser.GetString(u->aiLimit, "ai_limit", 0x40, DAT_005119b8);
-            if (parser.GetString(u->objectname, "objectname", 0x20, DAT_005119b8) == 0)
+            parser.GetString(u->unitname, "unitname", 0x20, g_emptyText);
+            parser.GetString(u->side, "side", 0x1e, g_emptyText);
+            parser.GetString(u->aiWeight, "ai_weight", 0x40, g_emptyText);
+            parser.GetString(u->aiLimit, "ai_limit", 0x40, g_emptyText);
+            if (parser.GetString(u->objectname, "objectname", 0x20, g_emptyText) == 0)
                 strcpy(u->objectname, u->unitname);
             u->energyCost = (float)parser.GetInt("buildcostenergy", 0);
             u->metalCost = (float)parser.GetInt("buildcostmetal", 0);
@@ -426,10 +426,10 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             goto FINISH;
         }
         {
-            parser.current->GetFieldString(unitdef->unitname, "unitname", 0x20, DAT_005119b8);
+            parser.current->GetFieldString(unitdef->unitname, "unitname", 0x20, g_emptyText);
             GetLocalizedString(&parser, unitdef->name, "name", 0x20, 0);
             GetLocalizedString(&parser, unitdef->description, "description", 0x40, 0);
-            parser.current->GetFieldString(buf, "defaultmissiontype", 100, DAT_005119b8);
+            parser.current->GetFieldString(buf, "defaultmissiontype", 100, g_emptyText);
             MissionHolder m(buf);
             unitdef->defaultmissiontype = m.mission.index;
             parser.current->GetFieldString(buf, "wpri_badTargetCategory", 100, g_noneString);
@@ -441,7 +441,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             parser.current->GetFieldString(buf, "noChaseCategory", 100, g_noneString);
             unitdef->categories = GetLoadCategoryMask(buf);
             if (parser.current
-                    ->GetFieldString(unitdef->objectname, "objectname", 0x20, DAT_005119b8) == 0) {
+                    ->GetFieldString(unitdef->objectname, "objectname", 0x20, g_emptyText) == 0) {
                 strcpy(unitdef->objectname, unitdef->unitname);
             }
             unitdef->energyCost = (float)parser.current->GetFieldInt("buildcostenergy", 0);
@@ -621,10 +621,10 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
                 unitdef->selfdestructcountdown = atoi(countdown);
             else
                 unitdef->selfdestructcountdown = 5;
-            parser.current->GetFieldString(buf, "category", 100, DAT_005119b8);
+            parser.current->GetFieldString(buf, "category", 100, g_emptyText);
             unitdef->AddToCategories(buf);
             int found = parser.current
-                    ->GetFieldString(buf, "soundcategory", 100, DAT_005119b8);
+                    ->GetFieldString(buf, "soundcategory", 100, g_emptyText);
             if (found) {
                 int sound;
                 for (sound = 0; sound < g_game->entry_count; sound++) {
@@ -639,11 +639,11 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             }
         SOUND_DONE:
             unitdef->corpse = -1;
-            if (parser.current->GetFieldString(buf, "corpse", 100, DAT_005119b8))
+            if (parser.current->GetFieldString(buf, "corpse", 100, g_emptyText))
                 unitdef->corpse = g_seams.features->FindOrLoadFeatureType(buf);
             unitdef->movementclass = 0;
             if (parser.current
-                    ->GetFieldString(buf, "movementclass", 100, DAT_005119b8))
+                    ->GetFieldString(buf, "movementclass", 100, g_emptyText))
                 unitdef->movementclass = FindMovementClass(buf);
             MovementClass movement;
             MovementClass* move = (MovementClass*)unitdef->movementclass;
@@ -660,20 +660,20 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             unitdef->maxslopevelocity = (int)(((__int64)unitdef->maxvelocity << 16) /
                                              ((unitdef->maxslope + 1) * 0x10000));
             WeaponDef* defaultWeapon = g_game->weapons;
-            parser.current->GetFieldString(weapon, "weapon1", 128, DAT_005119b8);
+            parser.current->GetFieldString(weapon, "weapon1", 128, g_emptyText);
             WeaponDef* weapon1 = g_seams.weapons->FindWeaponByName(weapon);
             unitdef->weapons[0] = weapon1 ? weapon1 : defaultWeapon;
-            parser.current->GetFieldString(weapon, "weapon2", 128, DAT_005119b8);
+            parser.current->GetFieldString(weapon, "weapon2", 128, g_emptyText);
             WeaponDef* weapon2 = g_seams.weapons->FindWeaponByName(weapon);
             unitdef->weapons[1] = weapon2 ? weapon2 : defaultWeapon;
-            parser.current->GetFieldString(weapon, "weapon3", 128, DAT_005119b8);
+            parser.current->GetFieldString(weapon, "weapon3", 128, g_emptyText);
             WeaponDef* weapon3 = g_seams.weapons->FindWeaponByName(weapon);
             unitdef->weapons[2] = weapon3 ? weapon3 : defaultWeapon;
-            parser.current->GetFieldString(weapon, "explodeas", 128, DAT_005119b8);
+            parser.current->GetFieldString(weapon, "explodeas", 128, g_emptyText);
             WeaponDef* explodeas = g_seams.weapons->FindWeaponByName(weapon);
             unitdef->explodeas = explodeas ? explodeas : defaultWeapon;
             parser.current
-                ->GetFieldString(weapon, "selfdestructas", 128, DAT_005119b8);
+                ->GetFieldString(weapon, "selfdestructas", 128, g_emptyText);
             WeaponDef* selfdestructas = g_seams.weapons->FindWeaponByName(weapon);
             unitdef->selfdestructas = selfdestructas ? selfdestructas : defaultWeapon;
             if (unitdef->weapons[0].get() == defaultWeapon &&
@@ -685,7 +685,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             unitdef->yardmap = 0;
             if (unitdef->mobile == 0) {
                 parser.current
-                    ->GetFieldString(yard, "YardMap", 1024, DAT_005119b8);
+                    ->GetFieldString(yard, "YardMap", 1024, g_emptyText);
                 unitdef->yardmap = (char*)SimAllocTagged(
                     "BUILDING YARD",
                     unitdef->footprintx * unitdef->footprintz);
@@ -799,7 +799,7 @@ void LoadUnitTypes() {
             sprintf(classbuf, "CLASS%d", i);
             parser.ResetCurrentRecord();
             if (parser.SelectRecord(classbuf)) {
-                parser.current->GetFieldString(classbuf, "name", 100, DAT_005119b8);
+                parser.current->GetFieldString(classbuf, "name", 100, g_emptyText);
                 cls->name = (int*)GameStrdup(classbuf);
                 cls->ReadMoveInfo((TdfParserView*)&parser);
             }
@@ -951,7 +951,7 @@ void LoadUnitTypes() {
                     int count = 0;
                     int k = 1;
                     sprintf(objpath, "canbuild%d", k);
-                    while (parser2.current->GetFieldString(valbuf, objpath, 0x20, DAT_005119b8)) {
+                    while (parser2.current->GetFieldString(valbuf, objpath, 0x20, g_emptyText)) {
                         short val = FindUnitTypeId(valbuf);
                         if (val != 0) {
                             list[count] = val;
@@ -1045,13 +1045,13 @@ void LoadDownloadMenus()
                     break;
                 g_game->buildLists[i].count = j + 1;
                 char* buf = unitbuf;
-                if (parser.current->GetFieldString(unitbuf, "UNITMENU", 0x20, DAT_005119b8)) {
+                if (parser.current->GetFieldString(unitbuf, "UNITMENU", 0x20, g_emptyText)) {
                     for (unsigned short u = 0; u < g_game->unitDefCount; u++) {
                         if (_strcmpi(g_game->defs[u].unitname, buf) == 0) {
                             g_game->buildLists[i].entries[j].typeId = u;
                             g_game->buildLists[i].entries[j].page = (unsigned char)parser.current->GetFieldInt("MENU", 0);
                             g_game->buildLists[i].entries[j].slot = (unsigned char)parser.current->GetFieldInt("BUTTON", 0);
-                            parser.current->GetFieldString(g_game->buildLists[i].entries[j].name, "UNITNAME", 0x20, DAT_005119b8);
+                            parser.current->GetFieldString(g_game->buildLists[i].entries[j].name, "UNITNAME", 0x20, g_emptyText);
                             break;
                         }
                     }

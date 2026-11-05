@@ -300,7 +300,7 @@ Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name)
 // FUNCTION: 0x4a0090
 void __stdcall UpdateHelpText(Gui* obj)
 {
-    char* text = DAT_005119b8;
+    char* text = g_emptyText;
     if (obj->hoverGadgetIndex != -1) {
         obj->prevHoverGadget = obj->hoverGadgetIndex;
         text = obj->layer->entries[obj->hoverGadgetIndex].helpKey;

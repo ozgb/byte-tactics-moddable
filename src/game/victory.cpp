@@ -15,9 +15,9 @@
 #include "victory.h"
 #include "mission_conditions.h"
 
-typedef void* SimView_DAT_005119b8;
-#undef DAT_005119b8
-#define DAT_005119b8 (*reinterpret_cast<SimView_DAT_005119b8*>(&Sim().DAT_005119b8))
+typedef void* SimView_g_emptyText;
+#undef g_emptyText
+#define g_emptyText (*reinterpret_cast<SimView_g_emptyText*>(&Sim().g_emptyText))
 
 struct Unit;
 class HapiBank;
@@ -128,37 +128,37 @@ void MissionConditions::RegisterConditions(ConditionParams* p)
     if (r3 != 0) {
         AddCondition(victory, &victoryCount, new (kSim) VictoryKillAllMobileUnits);
     }
-    int r4 = p->reader->GetFieldString(buf, "BuildUnitType", 0x100, (char*)&DAT_005119b8);
+    int r4 = p->reader->GetFieldString(buf, "BuildUnitType", 0x100, (char*)&g_emptyText);
     if (r4 != 0) {
         AddCondition(victory, &victoryCount, new (kSim) VictoryBuildUnitType(buf));
     }
-    int r5 = p->reader->GetFieldString(buf, "CaptureUnitType", 0x100, (char*)&DAT_005119b8);
+    int r5 = p->reader->GetFieldString(buf, "CaptureUnitType", 0x100, (char*)&g_emptyText);
     if (r5 != 0) {
         AddCondition(victory, &victoryCount, new (kSim) VictoryCaptureUnitType(buf));
     }
-    int r6 = p->reader->GetFieldString(buf, "KillAllOfType", 0x100, (char*)&DAT_005119b8);
+    int r6 = p->reader->GetFieldString(buf, "KillAllOfType", 0x100, (char*)&g_emptyText);
     if (r6 != 0) {
         AddCondition(victory, &victoryCount, new (kSim) VictoryKillAllOfType(buf));
     }
-    int r7 = p->reader->GetFieldString(buf, "KillUnitType", 0x100, (char*)&DAT_005119b8);
+    int r7 = p->reader->GetFieldString(buf, "KillUnitType", 0x100, (char*)&g_emptyText);
     if (r7 != 0) {
         int n;
         sscanf(buf, "%[a-zA-Z],%i", stype, &n);
         AddCondition(victory, &victoryCount, new (kSim) VictoryKillUnitType(stype, n));
     }
-    int r8 = p->reader->GetFieldString(buf, "MoveUnitToRadius", 0x100, (char*)&DAT_005119b8);
+    int r8 = p->reader->GetFieldString(buf, "MoveUnitToRadius", 0x100, (char*)&g_emptyText);
     if (r8 != 0) {
         int a, b, c;
         sscanf(buf, "%[a-zA-Z],%i,%i,%i", stype, &a, &b, &c);
         AddCondition(victory, &victoryCount, new (kSim) VictoryMoveUnitToRadius(stype, a, b, c));
     }
-    int r9 = p->reader->GetFieldString(buf, "UnitTypePassesX", 0x100, (char*)&DAT_005119b8);
+    int r9 = p->reader->GetFieldString(buf, "UnitTypePassesX", 0x100, (char*)&g_emptyText);
     if (r9 != 0) {
         int n;
         sscanf(buf, "%[a-zA-Z],%i", stype, &n);
         AddCondition(victory, &victoryCount, new (kSim) VictoryUnitTypePassesX(stype, n));
     }
-    int r10 = p->reader->GetFieldString(buf, "UnitTypePassesZ", 0x100, (char*)&DAT_005119b8);
+    int r10 = p->reader->GetFieldString(buf, "UnitTypePassesZ", 0x100, (char*)&g_emptyText);
     if (r10 != 0) {
         int n;
         sscanf(buf, "%[a-zA-Z],%i", stype, &n);
@@ -178,11 +178,11 @@ void MissionConditions::RegisterConditions(ConditionParams* p)
     if (r12 != 0) {
         AddCondition(defeat, &defeatCount, new (kSim) DefeatAllUnitsKilled);
     }
-    int r13 = p->reader->GetFieldString(buf, "AllUnitsKilledOfType", 0x100, (char*)&DAT_005119b8);
+    int r13 = p->reader->GetFieldString(buf, "AllUnitsKilledOfType", 0x100, (char*)&g_emptyText);
     if (r13 != 0) {
         AddCondition(defeat, &defeatCount, new (kSim) DefeatAllUnitsKilledOfType(buf));
     }
-    int r14 = p->reader->GetFieldString(buf, "UnitTypeKilled", 0x100, (char*)&DAT_005119b8);
+    int r14 = p->reader->GetFieldString(buf, "UnitTypeKilled", 0x100, (char*)&g_emptyText);
     if (r14 != 0) {
         int n;
         sscanf(buf, "%[a-zA-Z],%i", stype, &n);

@@ -325,7 +325,7 @@ void BuildAllPassMaps(void)
     } while (p < (int)&g_movementClasses + (int)sizeof(MovementClassTable));
 
     int progress = 100;
-    unsigned int* q = (unsigned int*)DAT_00512370;
+    unsigned int* q = (unsigned int*)g_movementClassEntries;
     do {
         if (q[-6] != 0) {
             unsigned int h = (unsigned int)g_game->height;
@@ -345,7 +345,7 @@ void BuildAllPassMaps(void)
             g_game->progress_38d73 = progress / count;
         }
         q += 8;
-    } while ((int)q < (int)DAT_00512370 + (int)sizeof(MovementClassTable));
+    } while ((int)q < (int)g_movementClassEntries + (int)sizeof(MovementClassTable));
 
     g_game->progress_38d73 = 100;
 }
@@ -368,12 +368,12 @@ static inline void FreeC(int p)
 // FUNCTION: 0x440a00
 void FreeMovementClasses(void)
 {
-    int p = (int)DAT_00512370;
+    int p = (int)g_movementClassEntries;
     do {
         FreeA(p);
         FreeC(p);
         p += 0x20;
-    } while (p < (int)DAT_00512370 + (int)sizeof(MovementClassTable));
+    } while (p < (int)g_movementClassEntries + (int)sizeof(MovementClassTable));
 }
 
 // FUNCTION: 0x440a40

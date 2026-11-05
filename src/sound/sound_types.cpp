@@ -43,9 +43,9 @@ int __stdcall ReadSoundEntry(TdfFile* source, char* key, int* out)
     char value[0x40];
     char textKey[0x100];
 
-    if (source->current->GetFieldString(value, key, 0x40, DAT_005119b8) != 0) {
+    if (source->current->GetFieldString(value, key, 0x40, g_emptyText) != 0) {
         sprintf(textKey, "%s%s", key, "text");
-        if (source->current->GetFieldString(text, textKey, 0x40, DAT_005119b8) == 0)
+        if (source->current->GetFieldString(text, textKey, 0x40, g_emptyText) == 0)
             text[0] = 0;
         out[1] = GameReallocTagged(out[1], g_sayChoiceArrayName, (out[0] + 1) * 0x40);
         out[2] = GameReallocTagged(out[2], g_sayChoiceArrayName, (out[0] + 1) * 0x40);
@@ -130,7 +130,7 @@ void LoadAllSound()
         int more = obj.SelectRecordAt(i);
         while (more) {
             obj.current->CopyRecordName(name, 0x20);
-            if (obj.current->GetFieldString(value, "sound", 0x100, DAT_005119b8))
+            if (obj.current->GetFieldString(value, "sound", 0x100, g_emptyText))
                 LoadSoundByName(name, value);
             i++;
             obj.ResetCurrentRecord();

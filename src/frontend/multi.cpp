@@ -731,7 +731,7 @@ int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut)
         memset(buf1, 0, sizeof(buf1));
         char* s = g_modemInfo;
         if (s == 0) {
-            s = DAT_005119b8;
+            s = g_emptyText;
         }
         strcpy(buf1, s);
         elements[1].guid = DPAID_Modem;
@@ -748,7 +748,7 @@ int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut)
         elements[0].data = &g_dpspGuidTcpip;
         char* t = GetGadgetText(&g_game->gui, "ADDRESS", 0);
         if (t == 0) {
-            t = DAT_005119b8;
+            t = g_emptyText;
         }
         strcpy(buf3, t);
         elements[1].guid = DPAID_INet;
@@ -3552,7 +3552,7 @@ void CopySelectedGameName()
     if (games->u.list.selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games->u.list.selected)) != 0 && strlen(name) != 0)
         SetGadgetText(menu, index, name);
     else
-        SetGadgetText(menu, index, DAT_005119b8);
+        SetGadgetText(menu, index, g_emptyText);
     MarkChanged(&g_game->gui);
 }
 
@@ -3595,7 +3595,7 @@ void* __stdcall ListSaveGameFiles(int* out)
     int count = CountDirectoryEntries(path, 0);
     *out = count;
     if (count == 0) {
-        ConfigureListBoxByName(&g_game->gui, g_gamesGadgetName, DAT_005119b8, 0, 0);
+        ConfigureListBoxByName(&g_game->gui, g_gamesGadgetName, g_emptyText, 0, 0);
         return 0;
     }
     g_saveListFileNames = (char*)GameAllocIgnoreTag(g_savegameNamesName, count << 8);
@@ -3618,7 +3618,7 @@ void __stdcall ShowSelectedSaveGame(Gui* unused1, Gadget* unused2)
     if (games->u.list.selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games->u.list.selected)) != 0 && strlen(name) != 0)
         SetGadgetText(menu, index, name);
     else
-        SetGadgetText(menu, index, DAT_005119b8);
+        SetGadgetText(menu, index, g_emptyText);
     MarkChanged(&g_game->gui);
 }
 
@@ -3669,7 +3669,7 @@ void __stdcall HandleSaveGameClick(Gui* menu)
             strlen(name) != 0)
             SetGadgetText(menu2, index, name);
         else
-            SetGadgetText(menu2, index, DAT_005119b8);
+            SetGadgetText(menu2, index, g_emptyText);
         MarkChanged(&g_game->gui);
         return;
     }
@@ -3730,7 +3730,7 @@ void __stdcall OpenSaveGameDialog()
     if (games2->u.list.selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games2->u.list.selected)) != 0 && strlen(name) != 0)
         SetGadgetText(menu, index2, name);
     else
-        SetGadgetText(menu, index2, DAT_005119b8);
+        SetGadgetText(menu, index2, g_emptyText);
     MarkChanged(&g_game->gui);
 
     BeginTextEdit(&g_game->gui, index);
@@ -3782,7 +3782,7 @@ void OpenLoadListDialog()
     if (games->u.list.selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games->u.list.selected)) != 0 && strlen(name) != 0)
         SetGadgetText(menu, index, name);
     else
-        SetGadgetText(menu, index, DAT_005119b8);
+        SetGadgetText(menu, index, g_emptyText);
     MarkChanged(&g_game->gui);
     SetKeyboardInput(&g_game->gui, 1);
     OrLabelAttribs();

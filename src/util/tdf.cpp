@@ -333,7 +333,7 @@ StringRef TdfRecord::MakeTrimmedString(char* start, char* end)
         p++;
     start = p;
     if (start >= end) {
-        StringRef empty(DAT_005119b8);
+        StringRef empty(g_emptyText);
         return empty;
     }
     char* last = end - 1;
@@ -748,7 +748,7 @@ void __stdcall LoadTranslations(char* filename, char* section)
             index = 0;
             while (f.SelectRecordAt(index)) {
                 f.current->CopyRecordName(name, 0xff);
-                f.current->GetFieldString(value, g_language, 0xff, DAT_005119b8);
+                f.current->GetFieldString(value, g_language, 0xff, g_emptyText);
                 if (strlen(value) != 0) {
                     StringRef key(name);
                     TdfField* e;
@@ -831,9 +831,9 @@ int __stdcall GetLocalizedString(TdfFile* file, char* dst, char* key, size_t siz
         if (r) return 1;
         return file->current->GetFieldString(dst, key, size, def);
     }
-    r = file->current->GetFieldString(dst, full, size, DAT_005119b8);
+    r = file->current->GetFieldString(dst, full, size, g_emptyText);
     if (r) return 1;
-    return file->current->GetFieldString(dst, key, size, DAT_005119b8);
+    return file->current->GetFieldString(dst, key, size, g_emptyText);
 }
 
 // FUNCTION: 0x4c59d0

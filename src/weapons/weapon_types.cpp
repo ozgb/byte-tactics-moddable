@@ -96,7 +96,7 @@ void __stdcall LoadWeaponType(TdfRecord* parser) {
     char* id = (char*)parser->GetRecordName();
     WeaponDef* w = &g_game->weapons[parser->GetFieldInt("ID", -1)];
     strcpy(w->name, id);
-    parser->GetFieldString(w->description, "name", 0x40, DAT_005119b8);
+    parser->GetFieldString(w->description, "name", 0x40, g_emptyText);
 
     w->speed =
         (int)(parser->GetFieldDouble("weaponvelocity", 0.0) * 2184.5333333333333);
@@ -169,7 +169,7 @@ void __stdcall LoadWeaponType(TdfRecord* parser) {
     w->shakeDuration = (int)(parser->GetFieldDouble("shakeduration", 0.0) * 30.0);
 
     char model[0x100];
-    if (parser->GetFieldString(model, "model", 0x100, DAT_005119b8) != 0) {
+    if (parser->GetFieldString(model, "model", 0x100, g_emptyText) != 0) {
         unsigned char i;
         unsigned char count = w->index;
         for (i = 0; i < count; i++) {
@@ -194,8 +194,8 @@ void __stdcall LoadWeaponType(TdfRecord* parser) {
 model_done:
     w->explosionSeq = 0;
     char gaf[0x100];
-    if (parser->GetFieldString(gaf, "explosiongaf", 0x100, DAT_005119b8) != 0 &&
-        parser->GetFieldString(model, "explosionart", 0x100, DAT_005119b8) != 0) {
+    if (parser->GetFieldString(gaf, "explosiongaf", 0x100, g_emptyText) != 0 &&
+        parser->GetFieldString(model, "explosionart", 0x100, g_emptyText) != 0) {
         void* a = LoadAnimGaf(gaf);
         void* r = FindGafEntry(a, model);
         *(unsigned char*)((char*)r + 2) = 0;
@@ -203,33 +203,33 @@ model_done:
     }
     w->splash = 0;
     if (*(int*)((char*)g_game->net.get() + 0xd44) != 0) {
-        if (parser->GetFieldString(gaf, "lavaexplosiongaf", 0x100, DAT_005119b8) != 0 &&
-            parser->GetFieldString(model, "lavaexplosionart", 0x100, DAT_005119b8) != 0) {
+        if (parser->GetFieldString(gaf, "lavaexplosiongaf", 0x100, g_emptyText) != 0 &&
+            parser->GetFieldString(model, "lavaexplosionart", 0x100, g_emptyText) != 0) {
             void* a = LoadAnimGaf(gaf);
             void* r = FindGafEntry(a, model);
             *(unsigned char*)((char*)r + 2) = 0;
             w->splash = r;
         }
     } else {
-        if (parser->GetFieldString(gaf, "waterexplosiongaf", 0x100, DAT_005119b8) != 0 &&
-            parser->GetFieldString(model, "waterexplosionart", 0x100, DAT_005119b8) != 0) {
+        if (parser->GetFieldString(gaf, "waterexplosiongaf", 0x100, g_emptyText) != 0 &&
+            parser->GetFieldString(model, "waterexplosionart", 0x100, g_emptyText) != 0) {
             void* a = LoadAnimGaf(gaf);
             void* r = FindGafEntry(a, model);
             *(unsigned char*)((char*)r + 2) = 0;
             w->splash = r;
         }
     }
-    if (parser->GetFieldString(model, "soundstart", 0x100, DAT_005119b8) != 0) {
+    if (parser->GetFieldString(model, "soundstart", 0x100, g_emptyText) != 0) {
         w->sound = (unsigned short)LoadSoundByName(0, model);
     } else {
         w->sound = 0xffff;
     }
-    if (parser->GetFieldString(model, "soundhit", 0x100, DAT_005119b8) != 0) {
+    if (parser->GetFieldString(model, "soundhit", 0x100, g_emptyText) != 0) {
         w->soundHit = (unsigned short)LoadSoundByName(0, model);
     } else {
         w->soundHit = 0xffff;
     }
-    if (parser->GetFieldString(model, "soundwater", 0x100, DAT_005119b8) != 0) {
+    if (parser->GetFieldString(model, "soundwater", 0x100, g_emptyText) != 0) {
         w->soundWater = (unsigned short)LoadSoundByName(0, model);
     } else {
         w->soundWater = 0xffff;

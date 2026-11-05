@@ -15,13 +15,16 @@ What is compared, per struct or class the header defines:
            full signature and calling convention
   layout   the member offsets, member types and size, for a struct with data members or a class with
            a vtable pointer, bases or data members (a pure function table is covered by its slots)
+  entries  for services.h only: every free function and non-virtual member function (static ones too),
+           keyed `Class::Method` or the plain name, with its return type, parameter types and const-ness;
+           order doesn't matter, as a module imports them by name
   version  the `_VERSION_MAJOR` and `_VERSION_MINOR` macros
 
 Every change is classed, and the class decides which bump it needs:
 
-  additive  a slot or a field appended at the end, a new struct, or a stand-in retype (below):
+  additive  a slot or a field appended at the end, an entry added, a new struct, or a stand-in retype (below):
             needs a minor bump, or a major bump
-  breaking  a slot removed, reordered, inserted before the end or retyped: needs a major bump, and an
+  breaking  a slot or an entry removed, reordered, inserted before the end or retyped: needs a major bump, and an
             adapter for each changed slot unless no module was built against the old major
   layout    a field that moves or changes size: fails whatever the bump
 
@@ -56,7 +59,10 @@ the newest `interfaces-v*` tag; until one exists, the merge base of HEAD and ori
 """
 
 import argparse
+import atexit
+import functools
 import json
+import os
 import re
 import subprocess
 import sys
@@ -66,6 +72,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+MSVC_INCLUDE = ROOT / "toolchain" / "msvc5-sp3" / "INCLUDE"
 BASE_BRANCH = "origin/moddable"
 MODULES_JSON = ROOT / "wasm" / "modules.json"
 CLANG = ["clang-cl", "--target=i686-pc-windows-msvc", "/nologo", "-TP", "-fms-compatibility",
@@ -74,8 +81,10 @@ CLANG = ["clang-cl", "--target=i686-pc-windows-msvc", "/nologo", "-TP", "-fms-co
 MAJOR = re.compile(r"^\s*#\s*define\s+(\w+)_VERSION_MAJOR\s+(\d+)", re.M)
 MINOR = re.compile(r"^\s*#\s*define\s+(\w+)_VERSION_MINOR\s+(\d+)", re.M)
 CALLCONV = re.compile(r"\s*__attribute__\(\((\w+)\)\)\s*$")
+NAMED_ENTRIES = {"services"}
 LAYOUT_START = re.compile(r"^\*\*\* Dumping AST Record Layout\s*$", re.M)
 LAYOUT_MEMBER = re.compile(r"^\s*(\d+(?::\d+-\d+)?)\s*\|(\s*)(.*?)\s*$")
+ANONYMOUS = re.compile(r"\(anonymous((?: \w+)?) at [^)]*\)")
 LAYOUT_SIZE = re.compile(r"^\s*\|\s*\[sizeof=(\d+), align=(\d+)")
 STAND_IN = re.compile(r"(?:(?:const|volatile) )*(?:int|void|char) \*(?: (?:const|volatile))*")
 POINTER = re.compile(r".*\*(?: (?:const|volatile))*$")
@@ -99,6 +108,7 @@ class Interface:
     major: int = 0
     minor: int = 0
     slots: dict = field(default_factory=dict)
+    entries: dict = field(default_factory=dict)
     layouts: dict = field(default_factory=dict)
 
 
@@ -136,25 +146,56 @@ def split_top(text: str) -> list[str]:
 def parse_signature(text: str, is_pointer: bool) -> Signature:
     """A Signature from clang's type text: `R (*)(P, Q) __attribute__((cc))`, or `R (P, Q)` for a method."""
     conv = ""
+    qualifiers = ""
+    if not is_pointer:
+        while True:
+            tail = re.search(r"\s+(const|volatile|noexcept)\s*$", text)
+            if tail is None:
+                break
+            qualifiers = " " + tail.group(1) + qualifiers
+            text = text[:tail.start()]
     found = CALLCONV.search(text)
     if found:
         conv = found.group(1)
         text = text[:found.start()]
-    opener = "(*)(" if is_pointer else " ("
-    head = text.index(opener)
-    ret = text[:head].strip()
-    body = text[head + len(opener):]
-    depth = 1
-    for i, c in enumerate(body):
-        depth += (c == "(") - (c == ")")
+    if is_pointer:
+        head = text.index("(*)(")
+        ret = text[:head].strip()
+        body = text[head + len("(*)("):]
+        depth = 1
+        for i, c in enumerate(body):
+            depth += (c == "(") - (c == ")")
+            if depth == 0:
+                body = body[:i]
+                break
+        return Signature(ret, tuple(split_top(body)), conv)
+    text = text.rstrip()
+    depth = 0
+    for i in range(len(text) - 1, -1, -1):
+        depth += (text[i] == ")") - (text[i] == "(")
         if depth == 0:
-            body = body[:i]
             break
-    return Signature(ret, tuple(split_top(body)), conv)
+    ret, body = text[:i].strip(), text[i + 1:-1]
+    return Signature(ret, tuple(split_top(body)), conv + qualifiers)
 
 
 def is_function_pointer(qual: str) -> bool:
     return "(*)(" in qual
+
+
+@functools.cache
+def system_include() -> list[str]:
+    """clang-cl flags for the MSVC 5 headers, through lower-case symlinks (the toolchain's file names are upper case); none without the toolchain."""
+    if not MSVC_INCLUDE.is_dir():
+        return []
+    tmp = tempfile.TemporaryDirectory(prefix="abidiff-inc-")
+    atexit.register(tmp.cleanup)
+    for here, _, names in os.walk(MSVC_INCLUDE):
+        target = Path(tmp.name) / Path(here).relative_to(MSVC_INCLUDE).as_posix().lower()
+        target.mkdir(parents=True, exist_ok=True)
+        for name in names:
+            (target / name.lower()).symlink_to(Path(here) / name)
+    return ["-imsvc", tmp.name]
 
 
 def clang_dump(header: Path, scratch: Path) -> tuple[dict, str]:
@@ -162,7 +203,7 @@ def clang_dump(header: Path, scratch: Path) -> tuple[dict, str]:
     scratch.mkdir(parents=True, exist_ok=True)
     unit = scratch / "unit.cpp"
     unit.write_text('#include "%s"\n' % header.as_posix())
-    run = subprocess.run(CLANG + ["--", str(unit)], capture_output=True, text=True, errors="replace")
+    run = subprocess.run(CLANG + system_include() + ["--", str(unit)], capture_output=True, text=True, errors="replace")
     found = JSON_START.search(run.stdout)
     if run.returncode != 0 or found is None:
         raise SystemExit("%s: clang-cl failed\n%s" % (header, run.stderr[-2000:]))
@@ -186,7 +227,7 @@ def parse_layouts(text: str) -> dict:
             if name is None:
                 name = re.sub(r"^(struct|class|union) ", "", found.group(3))
                 continue
-            members.append((found.group(1), len(found.group(2)), found.group(3)))
+            members.append((found.group(1), len(found.group(2)), ANONYMOUS.sub(r"(anonymous\1)", found.group(3))))
         if name is not None and size is not None:
             out[name] = (tuple(members), size[0], size[1])
     return out
@@ -202,7 +243,16 @@ def load_interface(header: Path, scratch: Path) -> Interface:
     iface.major, iface.minor = int(major.group(2)), int(minor.group(2))
     tree, layout_text = clang_dump(header, scratch)
     layouts = parse_layouts(layout_text)
+    named = header.stem in NAMED_ENTRIES
+    found_entries: dict[str, list[Signature]] = {}
+    here = None
     for node in tree["inner"]:
+        loc = node.get("loc", {})
+        file = loc.get("file") or (loc.get("spellingLoc") or {}).get("file") or (loc.get("expansionLoc") or {}).get("file")
+        here = file or here
+        in_header = here == header.as_posix()
+        if named and in_header and node["kind"] == "FunctionDecl" and not node.get("isImplicit"):
+            add_entry(found_entries, node["name"], node, "")
         if node.get("isImplicit") or node["kind"] != "CXXRecordDecl" or "name" not in node:
             continue
         if not node.get("completeDefinition"):
@@ -216,11 +266,24 @@ def load_interface(header: Path, scratch: Path) -> Interface:
                 data = True
             elif kind == "CXXMethodDecl" and member.get("virtual"):
                 slots.append((member["name"], parse_signature(qual, False)))
+            elif kind == "CXXMethodDecl" and named and in_header and not member.get("isImplicit"):
+                add_entry(found_entries, "%s::%s" % (node["name"], member["name"]), member, " static" if member.get("storageClass") == "static" else "")
         has_vtable = any(m["kind"] == "CXXMethodDecl" and m.get("virtual") for m in node.get("inner", []))
         iface.slots[node["name"]] = slots
         if data or has_vtable or node.get("bases"):
             iface.layouts[node["name"]] = layouts.get(node["name"])
+    for name, sigs in found_entries.items():
+        for sig in sigs:
+            iface.entries[name if len(sigs) == 1 else "%s(%s)" % (name, ", ".join(sig.params))] = sig
     return iface
+
+
+def add_entry(found: dict, name: str, node: dict, extra: str) -> None:
+    """Record a free function or a non-virtual member under its name; an overload keeps every distinct signature."""
+    sig = parse_signature(node.get("type", {}).get("qualType", ""), False)
+    sig = Signature(sig.ret, sig.params, sig.conv + extra)
+    if sig not in found.setdefault(name, []):
+        found[name].append(sig)
 
 
 def keeps_slot(old: str, new: str) -> bool:
@@ -272,6 +335,19 @@ def compare_slots(record: str, old: list, new: list, tagged: bool) -> list[Chang
     return out
 
 
+def compare_entries(old: dict, new: dict) -> list[Change]:
+    """Named entries (free functions and non-virtual members): removed or retyped is breaking, added is additive."""
+    out = []
+    for name, sig in old.items():
+        slot = (name.replace("::", "_"),)
+        if name not in new:
+            out.append(Change("breaking", "entry removed: %s" % name, slot))
+        elif new[name] != sig:
+            out.append(Change("breaking", "%s: %s -> %s" % (name, sig.text(), new[name].text()), slot))
+    out += [Change("additive", "new entry: %s" % name) for name in new if name not in old]
+    return out
+
+
 def compare_layout(record: str, old: tuple, new: tuple) -> list[Change]:
     if old is None or new is None:
         return [Change("layout", "no layout from clang for %s" % record)] if old != new else []
@@ -298,7 +374,7 @@ def compare_interfaces(old: Interface, new: Interface, tagged: bool) -> list[Cha
     for record, layout in new.layouts.items():
         if record in old.layouts:
             changes += compare_layout(record, old.layouts[record], layout)
-    return changes
+    return changes + compare_entries(old.entries, new.entries)
 
 
 def built_against(manifest: dict | None, interface: str, major: int) -> list[str]:

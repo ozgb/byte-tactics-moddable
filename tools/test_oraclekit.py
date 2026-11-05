@@ -26,7 +26,7 @@ CODE_SPAN = re.compile(r"`[^`\n]*`")
 INLINE_LINK = re.compile(r"!?\[[^\]\n]*\]\(\s*(<[^>\n]*>|[^)\s]*)[^)\n]*\)")
 REFERENCE_LINK = re.compile(r"^ {0,3}\[[^\]\n]+\]:\s*(<[^>\n]*>|\S+)", re.M)
 
-CONTENTS = [("file", "docs/a.md", ""), ("dir", "data", "")]
+CONTENTS = [("file", "docs/a.md", ""), ("file", "data/x.json", ""), ("dir", "data/y", ""), ("file", "data/layout_refs.csv", "")]
 MODULES_TEXT = json.dumps({
     "tools": {"clang": "1"},
     "modules": [{"name": "m", "exports": ["Go"], "cxx": ["wasm/m/module.cpp", "src/map/m.cpp"], "c": ["lib/bitexact/t.c"],
@@ -74,6 +74,34 @@ UNNAMED_DUMP = """*** Dumping AST Record Layout
 """
 
 
+COUPLING_DATA = {
+    "data/dependencies.csv": "writer,reader,item,phase,class,runs,example,flags\n"
+                             "ai,units,Unit::flags,players,immediate,3,a@1,\n"
+                             "ai,units,g_hiddenTable,players,immediate,2,a@2,\n"
+                             "ai,orders,DeleteOrders,-,unobserved,0,,indirect\n"
+                             "ai,orders,Unit::orders,-,unobserved,0,,\n"
+                             "-,units,rng.parkMiller,players,ordered,1,a@3,\n",
+    "data/phase_dependencies.csv": "writer,reader,item,phase_from,phase_to,class,runs,example,flags\n"
+                                   "ai,map,Unit::flags,players,units,carried,3,a@1,\n",
+    "data/phase_boundaries.csv": "boundary,needed,edges,direct,carried,mergeable,example\n1|2,yes,3,1,2,no,a@1\n",
+    "data/draws.csv": "pass,stream,subsystem,function,entities,draws_min,draws_max,ticks,start_state,evidence,example\n"
+                      "units,rng.parkMiller,ai,ReactToAttack,1,1,1,3,fixed,,a@1\n"
+                      "units,rng.parkMiller,ai,ChooseBuildOption,2,1,9,5,depends-on-earlier,"
+                      "Unit::flags;SquadManager: new BuildTimer;g_hiddenTable,a@2\n",
+    "data/pass_reads.csv": "pass,item,reader,function,evidence,runs,example\n"
+                           "units,Unit::flags,ai,ReactToAttack,same-record,2,a@1\n"
+                           "units,Unit::flags,ai,ChooseBuildOption,same-record,5,a@2\n"
+                           "units,g_hiddenTable,ai,ReactToAttack,other-record,1,a@3\n",
+    "data/presentation_reads.csv": "item,reader,pattern,covered_by_event,visibility,runs\n"
+                                   "Unit::flags,presentation,unknown,,all-players,0\n"
+                                   "Build: operator new int,map,unknown,,own,1\n",
+    "data/dependency_checks.csv": "writer,reader,item,phase,group,scenarios,result,scenarios_counted,defer_held,defer_third_stores\n"
+                                  "ai,units,Unit::flags,players,g1,3,equal,3,0,0\n",
+}
+COUPLING_LAYOUT = {"records": {"Unit": {"fields": [{"name": "flags"}, {"name": "orders"}]}}}
+COUPLING_SOURCE = "int ReactToAttack(int a) { return a; }\nint ChooseBuildOption(int a) { return a; }\nint g_hiddenTable[4];\n"
+
+
 def on_disk(root: Path, entry: str) -> list[tuple[str, str]]:
     """The working tree's files under a contents entry, as `oraclekit.tracked` lists the committed ones."""
     base = root / entry
@@ -114,7 +142,7 @@ def git(root: Path, *args: str) -> None:
 def repo(tmp: str, extra: dict[str, str] | None = None) -> Path:
     root = Path(tmp)
     files = {"docs/a.md": "alpha\n", "data/x.json": "{}\n", "data/y/z.txt": "z\n", oraclekit.README_SOURCE: "readme\n",
-             "data/layout_refs.csv": "function\n", oraclekit.MODULES: MODULES_TEXT, **(extra or {})}
+             "data/layout_refs.csv": "function\n", oraclekit.MODULES: MODULES_TEXT, **COUPLING_DATA, **(extra or {})}
     for path, text in files.items():
         (root / path).parent.mkdir(parents=True, exist_ok=True)
         (root / path).write_text(text)
@@ -161,7 +189,8 @@ class OracleKitTest(unittest.TestCase):
             kit = Path(out) / "k"
             manifest = run_export(root, kit)
             paths = [f["path"] for f in manifest["files"]]
-            self.assertEqual(paths, sorted(["docs/a.md", "data/x.json", "data/y/z.txt", "data/layout_refs.csv", "layout.json", "README.md", "wasm/modules.json"]))
+            self.assertEqual(paths, sorted(["docs/a.md", "data/x.json", "data/y/z.txt", "data/layout_refs.csv", "layout.json", "README.md", "wasm/modules.json"] +
+                                                  ["coupling/%s.csv" % n for n in oraclekit.COUPLING]))
             by_path = {f["path"]: f for f in manifest["files"]}
             self.assertEqual(by_path["docs/a.md"]["sha256"], hashlib.sha256(b"alpha\n").hexdigest())
             self.assertEqual(by_path["docs/a.md"]["size"], 6)
@@ -213,12 +242,12 @@ class OracleKitTest(unittest.TestCase):
     def test_a_tracked_symlink_is_refused(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             root = repo(tmp, {"src/game.cpp": "secret\n"})
-            (root / "data" / "link.txt").symlink_to("../src/game.cpp")
-            git(root, "add", "data/link.txt")
+            (root / "data" / "y" / "link.txt").symlink_to("../src/game.cpp")
+            git(root, "add", "data/y/link.txt")
             git(root, "commit", "-q", "-m", "link")
             with self.assertRaises(oraclekit.Refusal) as e:
                 run_export(root, Path(out) / "k")
-            self.assertIn("data/link.txt", str(e.exception))
+            self.assertIn("data/y/link.txt", str(e.exception))
             self.assertIn("120000", str(e.exception))
             self.assertFalse((Path(out) / "k").exists())
 
@@ -523,6 +552,69 @@ class LeakCheckTest(unittest.TestCase):
                 run_export(root, kit)
             self.assertIn("docs/a.md:1:", str(caught.exception))
             self.assertFalse(kit.exists())
+
+
+def coupling_export(tmp: str, out: Path) -> tuple[Path, dict[str, str]]:
+    root = repo(tmp, {"src/a.cpp": COUPLING_SOURCE})
+    oraclekit.export(root, out, True, COUPLING_LAYOUT, CONTENTS)
+    return root, {p.name: p.read_text() for p in (out / oraclekit.COUPLING_DIR).glob("*.csv")}
+
+
+class CouplingTest(unittest.TestCase):
+    def test_the_coupling_files_are_exported(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            _, files = coupling_export(tmp, Path(out) / "k")
+            self.assertEqual(sorted(files), sorted(n + ".csv" for n in oraclekit.COUPLING))
+
+    def test_the_function_column_of_draws_becomes_a_site_number(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            _, files = coupling_export(tmp, Path(out) / "k")
+            lines = files["draws.csv"].splitlines()
+            self.assertEqual(lines[0], "pass,stream,subsystem,site,entities,draws_min,draws_max,ticks,start_state,evidence,example")
+            self.assertEqual([l.split(",")[3] for l in lines[1:]], ["1", "2"])
+            self.assertTrue(lines[1].startswith("units,rng,ai,1,"))
+
+    def test_draws_evidence_keeps_only_defined_items(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            _, files = coupling_export(tmp, Path(out) / "k")
+            self.assertTrue(files["draws.csv"].splitlines()[2].endswith("depends-on-earlier,Unit::flags,a@2"))
+
+    def test_pass_reads_drop_the_function_and_merge(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            _, files = coupling_export(tmp, Path(out) / "k")
+            self.assertEqual(files["pass_reads.csv"], "pass,item,reader,evidence,runs,example\nunits,Unit::flags,ai,same-record,5,a@2\n")
+
+    def test_the_indirect_rows_are_dropped_and_the_other_unobserved_rows_stay(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            _, files = coupling_export(tmp, Path(out) / "k")
+            rows = files["dependencies.csv"].splitlines()
+            self.assertNotIn("DeleteOrders", files["dependencies.csv"])
+            self.assertIn("ai,orders,Unit::orders,-,unobserved,0,,", rows)
+            self.assertNotIn("g_hiddenTable", files["dependencies.csv"])
+            self.assertIn("-,units,rng,players,ordered,1,a@3,", rows)
+
+    def test_presentation_rows_of_allocations_are_dropped(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            _, files = coupling_export(tmp, Path(out) / "k")
+            self.assertEqual(len(files["presentation_reads.csv"].splitlines()), 2)
+
+    def test_no_function_name_is_exported_and_the_leak_check_passes(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root, files = coupling_export(tmp, Path(out) / "k")
+            text = "".join(files.values())
+            for name in ("ReactToAttack", "ChooseBuildOption", "DeleteOrders", "g_hiddenTable", "parkMiller"):
+                self.assertNotIn(name, text)
+            kit = {p: b for p, b in ((q.relative_to(Path(out) / "k").as_posix(), q.read_bytes())
+                                     for q in (Path(out) / "k").rglob("*") if q.is_file())}
+            self.assertEqual(oraclekit.leak_check(kit, root), [])
+
+    def test_the_leak_check_fails_on_the_unfiltered_files(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root, _ = coupling_export(tmp, Path(out) / "k")
+            raw = {"layout.json": json.dumps(COUPLING_LAYOUT).encode(),
+                   "coupling/draws.csv": COUPLING_DATA["data/draws.csv"].encode()}
+            hits = oraclekit.leak_check(raw, root)
+            self.assertTrue(any("ReactToAttack" in h for h in hits), hits)
 
 
 if __name__ == "__main__":

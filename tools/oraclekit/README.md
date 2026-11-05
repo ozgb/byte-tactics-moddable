@@ -24,6 +24,7 @@ sha256 and size, the commit it was cut from, and the kit's version: the pair of 
 | `tests/replay/` | the stored per-module replay recordings | `docs/replay-format.md` |
 | `data/replay_schema.json` | the annotations and the fields, objects and slots the recordings name | `docs/replay-format.md` |
 | `layout.json` | the state block layout (below) | `docs/module-abi.md`, sections 7 to 9 |
+| `coupling/` | what the subsystems read of each other's state, and what presentation reads (below) | itself |
 
 ## Presentation is not a module
 
@@ -66,3 +67,62 @@ has `meteor` at bit 5). It carries no cross-references to the decompilation (the
 | `weapon` | `WeaponDef` | the first argument of `weapons.SpawnProjectile` and the result of `weapons.FindWeaponByName`, section 9.2 |
 
 A pointer field stored in the block is a `Ref<T>`: a 32-bit block offset (section 7.1).
+
+## What the subsystems depend on
+
+`coupling/` holds what the reference's 83 scenarios showed of how the subsystems depend on each other's state. A
+subsystem is one of `wind_meteors`, `economy`, `features`, `ai`, `pathfinding`, `weapons`, `targeting`, `los_radar`,
+`orders`, `units`, `players` and `map`. An item is a field of a record of `layout.json` (`Type::field`), a random stream
+(`rng.*`), `sound`, `ui`, or a region of the block that the layout leaves unnamed. A phase is a window of a tick:
+`net`, `players`, `units` and the others the trace format lists, `tail`, then `presentation`. An example is
+`scenario@tick`: a scenario of `reference/scenarios/` and the tick at which the row was first seen. The files are CSV
+with a header row, sorted. The edge between two subsystems is the writer of an item and its reader (`-` for no writer).
+
+| File | Columns |
+| --- | --- |
+| `coupling/dependencies.csv` | `writer`, `reader`, `item`, `phase`, `class`, `runs`, `example`, `flags` |
+| `coupling/phase_dependencies.csv` | `writer`, `reader`, `item`, `phase_from`, `phase_to`, `class`, `runs`, `example`, `flags` |
+| `coupling/phase_boundaries.csv` | `boundary`, `needed`, `edges`, `direct`, `carried`, `mergeable`, `example` |
+| `coupling/draws.csv` | `pass`, `stream`, `subsystem`, `site`, `entities`, `draws_min`, `draws_max`, `ticks`, `start_state`, `evidence`, `example` |
+| `coupling/pass_reads.csv` | `pass`, `item`, `reader`, `evidence`, `runs`, `example` |
+| `coupling/presentation_reads.csv` | `item`, `reader`, `pattern`, `covered_by_event`, `visibility`, `runs` |
+| `coupling/dependency_checks.csv` | `writer`, `reader`, `item`, `phase`, `group`, `scenarios`, `result`, `scenarios_counted`, `defer_held`, `defer_third_stores` |
+
+`runs` counts the scenarios that show the row in its class; `example` is one of them. `flags` is `dynamic-only` when
+the runs found a dependency that no static reading of the code predicts. The classes of `dependencies.csv`, the first
+that applies:
+
+| Class | Meaning |
+| --- | --- |
+| `ordered` | the item is a random stream, the sound log or the UI log, or the events queued: the order of the draws or emissions is the state, whichever subsystem comes first |
+| `immediate` | a run shows the reader reading the item after the writer wrote it in the same phase: the writer must run first |
+| `deferrable` | the reader read the item before the writer wrote it, and no one read the writer's value before the phase ended: the write could wait until the end of the phase. `dependency_checks.csv` has the confirmation, a run of every scenario with such writes held back to the end of the phase |
+| `read-only` | writer `-`: the reader reads the item and no run shows anyone writing it in that phase |
+| `unobserved` | the code can pass the item between the two subsystems but no scenario does, so the runs say nothing about it; its phase is `-`, `runs` is 0 and `example` is empty |
+
+`phase_dependencies.csv` is the same across phases, with `class` `immediate` (the reader of `phase_to` read what
+`phase_from` wrote earlier in the tick: the writer's phase comes first) or `carried` (the reader read what a later
+phase wrote in the tick before: the order of the phases is the state); a `phase_to` of `presentation` is a read by the
+view. `phase_boundaries.csv` has a row per boundary between two windows (`1|2`, `7|tail`, `tail|presentation`):
+`needed` is `yes` when an `immediate` row crosses it, `edges`, `direct` and `carried` count the rows that cross it, and
+`mergeable` is `yes` when no row of either kind does; boundary `0|1` is `absent` because no scenario has a `net` window.
+
+`draws.csv` has one row per pass, stream and draw site: `entities` is the most entities that drew in one tick,
+`draws_min` and `draws_max` the least and most draws of one entity in a tick, `ticks` the ticks with a draw, and
+`start_state` is `fixed` (every entity drew the same number every tick), `start-state` (the number varies but no
+entity read a field that an earlier entity of the pass wrote before its last draw) or `depends-on-earlier` (with those
+items in `evidence`). `site` numbers the rows of one pass, stream and subsystem. `pass_reads.csv` lists the items that
+an entity of a pass read after an earlier entity of the pass wrote them: `same-record` when the write was to the same
+record, `other-record` when it was to the same field of another record (weaker); a pass with none has item `-` and
+evidence `none`. `runs` is the most scenarios that any one reader showed.
+
+`presentation_reads.csv` lists the items that the view reads between ticks. `pattern` is `every-frame` (read every
+tick), `ui-action` (read when the player acts), `after-event` (read after one kind of sim event, named in
+`covered_by_event` as in `interfaces/services.h`) or `unknown`; `visibility` is `own` (the player's own records),
+`per-player-filter` (units, features, projectiles and their kin, as line of sight shows them) or `all-players`; a `runs`
+of 0 means no scenario showed the read.
+
+The files leave out what has no behavioural name: the `unobserved` edges that the code makes by calling through a
+function pointer (they name a function, not an item), and the rows of items that `layout.json` and the rest of the kit do
+not define (a table or a heap block that no record of the layout holds). The random stream of the game's generator is `rng`
+here, as in the trace format.

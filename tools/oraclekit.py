@@ -22,6 +22,15 @@ file may use are those the kit's structured data defines (`allowed_identifiers`:
 everything under reference/ and tests/replay/), never the checked text itself. The interface headers declare the names
 and are the source's own declarations, so only the address rule applies to them, and the export strips their
 address-marker lines (`// FUNCTION: 0x...`, `// GLOBAL: 0x...`) before the check and the manifest digests.
+
+The dependency classification and the presentation reads (#840) are derived into `coupling/` from the seven CSV files of
+COUPLING, in behavioural terms only: state items, phases, subsystems, classes, run counts and examples of the form
+`scenario@tick`. The `function` column of data/draws.csv becomes a `site` number within its pass, stream and subsystem, and
+the one of data/pass_reads.csv is dropped (rows that differ only by it merge, with the most runs of any of them). The
+`unobserved` rows of data/dependencies.csv flagged `indirect` have a function as their item and are dropped. A row
+whose item is no state the kit defines (a name that `allowed_identifiers` lacks, or an allocation labelled by the function
+that made it) is dropped, and so is such an entry of the evidence of draws.csv; the random stream `rng.parkMiller` is
+written `rng`, as the trace format names it. The leak check then covers these files like any other.
 """
 
 from __future__ import annotations
@@ -46,6 +55,11 @@ LAYOUT = "layout.json"
 README = "README.md"
 README_SOURCE = "tools/oraclekit/README.md"
 MODULES = "wasm/modules.json"
+COUPLING_DIR = "coupling"
+COUPLING = ("dependencies", "phase_dependencies", "phase_boundaries", "draws", "pass_reads", "presentation_reads",
+            "dependency_checks")
+ALLOCATION_ITEM = re.compile(r": |\(|@@|::~|^\?")
+STREAM_NAMES = {"rng.parkMiller": "rng"}
 FUEL_PASS = "tools/wasm_fuel.py"
 MODULE_SOURCE_FIELDS = ("cxx", "c")
 SOURCE_NAME = re.compile(r"(?<![\w.-])(?:src|include|orig|lib|build|cmake)/|\.(?:cpp|c|h)\b")
@@ -316,6 +330,89 @@ def generate_layout(root: Path, build_dir: Path, run=None) -> dict:
     return {"layout_version": 1, "records": records}
 
 
+def csv_rows(data: bytes) -> tuple[list[str], list[dict[str, str]]]:
+    """The header and the rows of a CSV file."""
+    reader = csv.DictReader(io.StringIO(data.decode()))
+    return list(reader.fieldnames or []), list(reader)
+
+
+def csv_bytes(header: list[str], rows: list[dict[str, str]]) -> bytes:
+    """A CSV file of the rows, in the header's column order, with \\n line ends."""
+    out = io.StringIO()
+    writer = csv.DictWriter(out, header, lineterminator="\n", extrasaction="ignore")
+    writer.writeheader()
+    writer.writerows(rows)
+    return out.getvalue().encode()
+
+
+def behavioural(item: str, known: set[str]) -> bool:
+    """Whether an item names state: not an allocation labelled by the function that made it, and every identifier in it defined by the kit."""
+    return not ALLOCATION_ITEM.search(item) and speclint.identifiers(item) <= known
+
+
+def stream_name(item: str) -> str:
+    """The item with the random stream the trace calls `rng` under that name."""
+    return STREAM_NAMES.get(item, item)
+
+
+def keep_items(rows: list[dict[str, str]], known: set[str]) -> list[dict[str, str]]:
+    """The rows whose `item` is behavioural, stream names renamed."""
+    kept = []
+    for r in rows:
+        if "item" in r:
+            r["item"] = stream_name(r["item"])
+            if not behavioural(r["item"], known):
+                continue
+        kept.append(r)
+    return kept
+
+
+def kit_dependencies(data: bytes, known: set[str]) -> bytes:
+    """data/dependencies.csv without its `indirect` rows (the item is a function called through a pointer) and the rows of items the kit does not define."""
+    header, rows = csv_rows(data)
+    return csv_bytes(header, keep_items([r for r in rows if "indirect" not in r["flags"].split(";")], known))
+
+
+def kit_draws(data: bytes, known: set[str]) -> bytes:
+    """data/draws.csv with `function` replaced by `site`, the number of the row within its pass, stream and subsystem, and the evidence reduced to the items the kit defines."""
+    header, rows = csv_rows(data)
+    count: dict[tuple[str, str, str], int] = {}
+    for r in rows:
+        r["stream"] = stream_name(r["stream"])
+        key = (r["pass"], r["stream"], r["subsystem"])
+        count[key] = count.get(key, 0) + 1
+        r["site"] = str(count[key])
+        r["evidence"] = ";".join(e for e in r["evidence"].split(";") if e and behavioural(e, known))
+    return csv_bytes([("site" if c == "function" else c) for c in header], rows)
+
+
+def kit_pass_reads(data: bytes, known: set[str]) -> bytes:
+    """data/pass_reads.csv without `function`: rows of one pass, item, reader and evidence merge, with the most runs and its example."""
+    header, rows = csv_rows(data)
+    merged: dict[tuple[str, str, str, str], dict[str, str]] = {}
+    for r in keep_items(rows, known):
+        key = (r["pass"], r["item"], r["reader"], r["evidence"])
+        if key not in merged or int(r["runs"]) > int(merged[key]["runs"]):
+            merged[key] = r
+    return csv_bytes([c for c in header if c != "function"], [merged[k] for k in sorted(merged)])
+
+
+def kit_items(data: bytes, known: set[str]) -> bytes:
+    """A CSV file with an `item` column, without the rows of items the kit does not define."""
+    header, rows = csv_rows(data)
+    return csv_bytes(header, keep_items(rows, known))
+
+
+COUPLING_KIT = {"dependencies": kit_dependencies, "draws": kit_draws, "pass_reads": kit_pass_reads,
+                "phase_boundaries": lambda data, known: data}
+
+
+def coupling_files(read, known: set[str]) -> dict[str, bytes]:
+    """The kit's coupling/ files, derived from the data/ CSV files `read(path)` returns; `known` is what the rest of the kit defines."""
+    return {"%s/%s.csv" % (COUPLING_DIR, name): COUPLING_KIT.get(name, kit_items)(read("data/%s.csv" % name), known)
+            for name in COUPLING}
+
+
 def kit_modules(data: bytes) -> bytes:
     """The module manifest of the kit: wasm/modules.json without the fields of a module entry that name its source files."""
     manifest = json.loads(data)
@@ -417,6 +514,7 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     except subprocess.CalledProcessError:
         raise Refusal("refused: %s has no tracked file" % MODULES)
     check_names(files)
+    files.update(coupling_files(lambda path: blob(root, path), allowed_identifiers(files)))
     files[README] = blob(root, README_SOURCE)
     hits = (leaks or leak_check)(files, root)
     if hits:

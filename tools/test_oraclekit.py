@@ -238,6 +238,52 @@ class OracleKitTest(unittest.TestCase):
             with self.assertRaises(oraclekit.Refusal):
                 run_export(root, Path(out) / "a", untagged=False)
 
+    def test_a_traces_tag_on_an_earlier_commit_is_taken(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {"reference/t.csv": "1\n"})
+            git(root, "tag", "reference-traces-v9")
+            git(root, "tag", "reference-traces-v10")
+            first = oraclekit.git(root, "rev-parse", "HEAD").strip()
+            (root / "docs" / "a.md").write_text("changed\n")
+            git(root, "commit", "-q", "-am", "y")
+            git(root, "tag", "interfaces-v1")
+            manifest = run_export(root, Path(out) / "k", untagged=False)
+            self.assertEqual(manifest["version"], {"interfaces": "interfaces-v1", "reference_traces": "reference-traces-v10"})
+            self.assertEqual(manifest["tags"], manifest["version"])
+            self.assertEqual(manifest["tag_commits"], {"interfaces": oraclekit.git(root, "rev-parse", "HEAD").strip(), "reference_traces": first})
+
+    def test_a_reference_change_after_the_traces_tag_is_refused_by_name(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {"reference/t.csv": "1\n", "reference/README.md": "r\n"})
+            git(root, "tag", "reference-traces-v1")
+            (root / "reference" / "t.csv").write_text("2\n")
+            git(root, "commit", "-q", "-am", "y")
+            git(root, "tag", "interfaces-v1")
+            with self.assertRaises(oraclekit.Refusal) as e:
+                run_export(root, Path(out) / "k", untagged=False)
+            self.assertIn("reference/t.csv", str(e.exception))
+            self.assertNotIn("README.md", str(e.exception))
+            self.assertFalse((Path(out) / "k").exists())
+            self.assertIsNone(run_export(root, Path(out) / "u")["version"])
+
+    def test_a_markdown_change_under_reference_is_accepted(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {"reference/t.csv": "1\n", "reference/README.md": "r\n"})
+            git(root, "tag", "reference-traces-v1")
+            (root / "reference" / "README.md").write_text("changed\n")
+            git(root, "commit", "-q", "-am", "y")
+            git(root, "tag", "interfaces-v1")
+            manifest = run_export(root, Path(out) / "k", untagged=False)
+            self.assertEqual(manifest["version"]["reference_traces"], "reference-traces-v1")
+
+    def test_a_missing_interfaces_tag_on_head_is_still_refused(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp)
+            git(root, "tag", "reference-traces-v1")
+            with self.assertRaises(oraclekit.Refusal) as e:
+                run_export(root, Path(out) / "k", untagged=False)
+            self.assertIn("interfaces", str(e.exception))
+
     def test_a_non_empty_target_is_refused(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             root = repo(tmp)

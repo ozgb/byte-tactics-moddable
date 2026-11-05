@@ -9,8 +9,11 @@ The kit is the files of CONTENTS (the table below) in their own paths, `layout.j
 layout, generated from the modern build's types like tools/layoutasserts.py), `wasm/modules.json` (the
 module manifest of the game without the fields that name the source files) and `README.md` (from
 tools/oraclekit/README.md). `MANIFEST.json` lists each file's path, sha256 and size, the commit, the
-`interfaces-v*` and `reference-traces-v*` tags at it and the tool's version. The kit's version is the
-pair of tags; without both on the commit `export` refuses, and with --untagged it writes `"version": null`.
+`interfaces-v*` and `reference-traces-v*` tags with the commit of each (`tag_commits`) and the tool's version. The
+kit's version is the pair of tags: the `interfaces-v*` tag must be on the commit, and the `reference-traces-v*` tag is
+the highest (by number) reachable from it. Without both `export` refuses, and so it does when a file under
+reference/ other than a .md file differs between the traces tag and the commit (each path is named). With --untagged
+neither check applies and it writes `"version": null`.
 Any path under FORBIDDEN, and any file the table does not list, is refused with its path named, and so is a
 generated file or the fuel pass that still names a source (SOURCE_NAME).
 
@@ -184,14 +187,33 @@ def select(root: Path, contents=None, lister=tracked) -> list[str]:
     return sorted(set(out))
 
 
+def highest(names: list[str], pattern: re.Pattern) -> str | None:
+    """The name matching `pattern` with the highest number (v23 before v100), None when none match."""
+    hits = [(int(m.group(1)), n) for n in names if (m := pattern.match(n))]
+    return max(hits)[1] if hits else None
+
+
 def version_tags(root: Path) -> dict[str, str | None]:
-    """The highest interfaces-v* and reference-traces-v* tag on HEAD, each None when absent."""
-    names = git(root, "tag", "--points-at", "HEAD").split()
+    """The interfaces-v* tag on HEAD and the highest reference-traces-v* tag reachable from HEAD, each None when absent."""
     out: dict[str, str | None] = {}
-    for key, pattern in TAG_PATTERNS.items():
-        hits = [(int(m.group(1)), n) for n in names if (m := pattern.match(n))]
-        out[key] = max(hits)[1] if hits else None
+    out["interfaces"] = highest(git(root, "tag", "--points-at", "HEAD").split(), TAG_PATTERNS["interfaces"])
+    out["reference_traces"] = highest(git(root, "tag", "--merged", "HEAD").split(), TAG_PATTERNS["reference_traces"])
     return out
+
+
+def tag_commits(root: Path, tags: dict[str, str | None]) -> dict[str, str | None]:
+    """The commit each tag names, None for a missing tag."""
+    return {k: git(root, "rev-list", "-n", "1", v).strip() if v else None for k, v in tags.items()}
+
+
+def check_traces(root: Path, tags: dict[str, str | None], untagged: bool) -> None:
+    """Refuse when a file under reference/ other than a .md file differs between the traces tag and HEAD."""
+    if untagged or tags["reference_traces"] is None:
+        return
+    names = git(root, "diff", "--name-only", tags["reference_traces"], "HEAD", "--", "reference/").splitlines()
+    changed = [n for n in names if not n.endswith(".md")]
+    if changed:
+        raise Refusal("refused: %s differs from HEAD in:\n%s" % (tags["reference_traces"], "\n".join(changed)))
 
 
 def check_tags(tags: dict[str, str | None], untagged: bool) -> dict | None:
@@ -210,12 +232,13 @@ def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def manifest_of(files: dict[str, bytes], commit: str, tags: dict, version: dict | None) -> dict:
-    """The manifest: each file's path, sha256 and size, then the commit, the tags, the version and the tool version."""
+def manifest_of(files: dict[str, bytes], commit: str, tags: dict, version: dict | None, commits: dict | None = None) -> dict:
+    """The manifest: each file's path, sha256 and size, then the commit, the tags with their commits, the version and the tool version."""
     return {
         "tool_version": TOOL_VERSION,
         "commit": commit,
         "tags": tags,
+        "tag_commits": commits if commits is not None else {k: None for k in tags},
         "version": version,
         "files": [{"path": p, "sha256": digest(files[p]), "size": len(files[p])} for p in sorted(files)],
     }
@@ -750,6 +773,7 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     paths = select(root, contents, lister)
     tags = version_tags(root)
     version = check_tags(tags, untagged)
+    check_traces(root, tags, untagged)
     files = {p: strip_markers(p, blob(root, p)) for p in paths}
     files[LAYOUT] = (json.dumps(layout, indent=1, sort_keys=False) + "\n").encode()
     try:
@@ -773,7 +797,7 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     hits = (leaks or leak_check)(files, root)
     if hits:
         raise Refusal("refused: the kit leaks the decompilation:\n" + "\n".join(hits))
-    manifest = manifest_of(files, git(root, "rev-parse", "HEAD").strip(), tags, version)
+    manifest = manifest_of(files, git(root, "rev-parse", "HEAD").strip(), tags, version, tag_commits(root, tags))
     check_target(out)
     for path, data in files.items():
         target = out / path

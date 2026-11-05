@@ -548,7 +548,9 @@ The services interface is at major 1 and minor 8 in the headers (`SERVICES_VERSI
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter
-types and const-ness. An entry removed or retyped is breaking and needs a major bump; one added needs the minor bump.
+types, const-ness, calling convention and `static`. An entry removed or retyped is breaking and needs a major bump; one
+added needs the minor bump. An overload added to a name that had one signature is breaking too, since both signatures
+would map to the same `Class_Method` import.
 The baseline is the newest `interfaces-v*` tag, `interfaces-v2` from this change on, the first that has `services.h`.
 
 A service never returns a native address. A service that finds something outside what it may reach

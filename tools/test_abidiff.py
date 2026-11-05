@@ -335,6 +335,16 @@ class ServicesEntriesTest(unittest.TestCase):
         self.assertEqual(judged(old, services("void Put(char* a); void Put(int a);")).summary, "ok (no change)")
         self.assertFalse(judged(old, services("void Put(int a);", minor=1)).ok)
 
+    def test_an_added_overload_is_one_breaking_change(self):
+        old = services("void Put(int a);")
+        result = judged(old, services("void Put(int a); void Put(char* a);", minor=1))
+        self.assertFalse(result.ok)
+        self.assertIn("breaking change needs a major bump", result.summary)
+        self.assertEqual(result.details, ["Args::Put: overloaded (2 signatures), one import name"])
+        back = judged(services("void Put(int a); void Put(char* a);"), services("void Put(int a);", minor=1))
+        self.assertFalse(back.ok)
+        self.assertEqual(back.details, ["Args::Put: no longer overloaded (1 signature), 2 removed"])
+
     def test_other_headers_are_not_judged_by_entries(self):
         old = header([SLOT_A]) + "void Free(int a);\n"
         new = header([SLOT_A]) + "void Free(char a);\n"

@@ -338,13 +338,29 @@ def compare_slots(record: str, old: list, new: list, tagged: bool) -> list[Chang
 def compare_entries(old: dict, new: dict) -> list[Change]:
     """Named entries (free functions and non-virtual members): removed or retyped is breaking, added is additive."""
     out = []
+    overloaded = {}
+    for name in old:
+        if name not in new and any(k.startswith(name + "(") for k in new):
+            overloaded[name] = [k for k in new if k.startswith(name + "(")]
+    single = {}
+    for key in old:
+        base = key.split("(")[0]
+        if "(" in key and base in new:
+            single.setdefault(base, []).append(key)
+    for name, keys in overloaded.items():
+        out.append(Change("breaking", "%s: overloaded (%d signatures), one import name" % (name, len(keys)), (name.replace("::", "_"),)))
+    for name, keys in single.items():
+        out.append(Change("breaking", "%s: no longer overloaded (1 signature), %d removed" % (name, len(keys)), (name.replace("::", "_"),)))
+    skip = set(overloaded) | {k for keys in overloaded.values() for k in keys} | set(single) | {k for keys in single.values() for k in keys}
     for name, sig in old.items():
+        if name in skip:
+            continue
         slot = (name.replace("::", "_"),)
         if name not in new:
             out.append(Change("breaking", "entry removed: %s" % name, slot))
         elif new[name] != sig:
             out.append(Change("breaking", "%s: %s -> %s" % (name, sig.text(), new[name].text()), slot))
-    out += [Change("additive", "new entry: %s" % name) for name in new if name not in old]
+    out += [Change("additive", "new entry: %s" % name) for name in new if name not in old and name not in skip]
     return out
 
 

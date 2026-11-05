@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, economy, targeting and map have recordings so far. The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, economy, targeting, map and weapons have recordings so far. The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -535,7 +535,9 @@ function in the named table, or `null`. The tables are the `code_tables` annotat
 in the order it registers them), each declared in one of the `headers`, which have to be `includes` of the schema. The tool writes the
 table as addresses of the game's functions in the schema header, so the recorder finds the index of the game's function and
 the replayer, linking its own functions, stores its own address for the index. `fill` is the slot (`seam.Slot`) that fills the game's
-table, for the subsystem that owns it. A function that is in none of the entries is an error that names the table (the recorder
+table, for the subsystem that owns it. A kind of the `index` scope cannot hold a code field (`WeaponDef.fire` is set by `SetWeaponFireHandler` at load, to one of four functions): a second kind
+of the same C type, `WeaponFire`, is a state kind with a `table` over the array (`{"base": "game", "member": "weapons", "count": 256}`, no `ref`) and `fire` as its only field, and a rule with `"rule": "all-of"` on `WeaponDef::fire` makes every weapon a root of the call, so `WeaponFire#17.fire` is
+the handler of `weapondef#17`. The table is recorded whole at the first call that reads it (256 lines) and by changes after that. A function that is in none of the entries is an error that names the table (the recorder
 writes `orderNotify[?]`), and an index past the table is refused by the replayer. One order function is not an entry, because
 no header declares it with the type its definition has.
 
@@ -881,6 +883,8 @@ sets). The annotations hold what no header says:
   `Game` through a pointer, or the factors of a product count. `replayschema.py --check` fails for a name that is no block field.
 - A field a slot writes through a pointer it cannot name exactly (a weapon slot picked by an index) is also in its read set,
   so that a change made outside the seam is recorded at the entry as an `r` line, not mistaken for a write of the module.
+  The same goes for a field the module writes only some of the time (the `workTime` of a unit, the fields of a new projectile): a field in the write set and not in
+  the read set would show a change made outside the seam, such as the move of a projectile by `UpdateProjectiles`, as a `w` line the module never made. A rule on the `field_write` row of the field with `reads` naming it puts the field in the read set.
 - `exempt_types`: `{"OpenHeap": "reason"}`, a struct type that is no kind and is genuinely local (a stack copy read from a bank, a
   union summed in a local). A field row (`field_read`, `field_write`, `field_maybe_written`) of a complete subsystem on a type that
   is none of these is an error naming the row (`field_read OpenHeap.count`): the type of a kind or of a value kind, an alias of a kind's field
@@ -909,7 +913,7 @@ sets). The annotations hold what no header says:
 | `text` | `char*` | `a name "text"` |
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
 | `object` | a pointer to a state kind, in | `a player Player#1`, its fields as `r` and `w` |
-| `struct` (`dir` in, out or inout) | a pointer to a value kind, `nullable` when in or inout | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local) |
+| `struct` (`dir` in, out or inout) | a pointer to a value kind, `nullable` when in or inout | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local); a `Vec3` out of an import is the `o <name> (x,y,z)` line a `vec3` out argument writes, only when `when` holds, and its stub writes it (`weapons` imports `targeting.GetWeaponTargetPos`) |
 | `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
@@ -1108,6 +1112,14 @@ targeting:
 - `ai.GetVisibleEnemiesInRadiusList`: it has no 3.1c call site, only the vector form `ai.GetVisibleEnemiesInRadius` is called, which the recordings carry. The replayer answers a call of it from the next recorded vector line with the same player, position, radius and flags: it writes the first `capacity` units of the recorded list, in order, and returns the recorded count; a repeat with the same arguments and a larger capacity, after a count above the capacity, is answered from the same line and takes no further import, and any other extra call is a divergence.
 - A unit target with `unitDefIndex` 0 where the second condition of the guard (the aim target field being nonzero) is false: that condition is always true there.
 
+weapons:
+
+- A shot of a `FireVLaunchWeapon` weapon (an interceptor or a missile): no scenario launches a missile, so `FindTargetableProjectile` returns null at every one of its calls in `orders-weapon-build`, and `FireVLaunchProjectile`, `Projectile.interceptedProjectile` and the `FindTargetableProjectile` call of `FireVLaunchWeapon` are never reached by a shot. The slot, its walk of the projectile table and its reads of the unit's weapon slots are recorded.
+- `FireDroppedWeapon`: the bomber of `orders-air-fights` carries a dropped weapon but never fires it in the recorded window.
+- `network.SendWeaponFire` and `network.SendUnitDamage`, and the `Game.netGameFlags` branch that calls them: they act only in a network game.
+- `DamageUnit` of kind 2, the hit of a paralyzer weapon (the `orders.MissionTypeFromName`, `orders.NewOrder` and `orders.AppendOrder` imports): no recorded call has that kind.
+- The burst of a weapon: a burst is counted down by `UpdateProjectiles` (#711), not by the fire control; `Projectile.active` is only set to the burst count when the shot is made.
+
 ## Replaying
 
 `tests/replay_native_test.cpp` replays a recording against the native module (`replay_native_test.exe`, built by
@@ -1195,6 +1207,24 @@ which is most of each file, and after that only the cells a call changed. `Force
 The spatial grid `Game.cells_1429f` is the table of `SpatialBucket` (`width_142a3` times `height_142a7` buckets, included under `pack1:` because the game lays a bucket out in 10 bytes, and listed before `Cell` so that the units
 of a chain are recorded whole before a cell's `occupant` reaches them with a limit), `Game.overflowBucket` is a `ref` to `OverflowBucket`, a kind of the same type with no table, and the unit a cell holds is reached through its
 `occupant` field (a `unitid` over `unit`). A unit whose bucket is the overflow bucket is written `SpatialBucket#?` and cannot be replayed: no committed recording has one. The replayer defines `operator delete` over `SimFree`, as the game does.
+
+`replay_inject_test.exe` is also built with the reload-base injection of 150 (the 120 of `(120 - q) * reloadTime`, the reload of a weapon scaled by the health of the unit, in `UpdateUnitWeapons`), and the divergence is reported at call 295 of `orders-guard-attacked` and at `Unit#2.weapon0ReloadTimer`, the first shot of the recording (recorded 12, replayed 15):
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 295 Unit#2.weapon0ReloadTimer tests/replay/weapons/orders-guard-attacked.txt
+```
+
+The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), all in a window of ticks (a window cannot start at tick 0):
+
+- `orders-guard-attacked`, ticks 1 to 250: two walkers (turret weapons) and a fighter (a line-of-sight weapon) guard and are attacked; `UpdateUnitWeapons` aims through the script (`units.StartScriptWithArgs` `AimPrimary`, `WeaponAimCobComplete` 39 times, `network.SendScriptCallByName`), fires (`economy.SpendEnergyAndMetal`, `services.RandomInt` for the spread, the reload timer set and counted down), and `WeaponCanReachUnit`, `GetWeaponRange`, `ClaimWeapons` and `ReleaseWeapons` (index 3 too) and `DamageUnit` (the repair of a unit, kind 10) are called.
+- `orders-air-fights`, ticks 100 to 260: fighters shoot at each other (the line-of-sight handler, `WeaponAimCobComplete` 22 times, `WeaponCanReachUnit`).
+- `orders-weapon-build`, ticks 700 to 780: an anti-nuke silo with an interceptor weapon, `FindTargetableProjectile` (3 calls, null) and the walk of the projectile table, and `UpdateUnitWeapons` of the units that have no target.
+- `combat-deaths`, ticks 850 to 1000: a solar plant and a laser tower self-destruct, `DamageUnit` with 30000 damage (`ai.ReactToAttack`, `units.MarkRecentlyDamaged`).
+
+`Game.projectiles` is a table of 300 projectiles (the 300 of the game's `projectileCount < 300` guard), every element a root of `UpdateUnitWeapons` and `FindTargetableProjectile`, so a shot made at index `projectileCount` finds its element and the first call records all 300 with every field the slot reads (about 8,000 lines). `Game.tracked` and `Game.value_142f3`, which `InitProjectile` writes and reads for the camera, are `exempt`.
+The recorder's walker holds 128 walkable fields in a slot set.
+
+A subsystem that imports a slot of another complete subsystem (`weapons` imports `targeting.GetWeaponTargetPos` and `economy.SpendEnergyAndMetal`, and `targeting` and `wind_meteors` import `weapons` slots) is replayed against the import stubs of that seam, not against the other module: `BindSeams` binds the stubs of the seams a recording's subsystem imports from, after the native tables.
 
 ### Against the WASM module
 

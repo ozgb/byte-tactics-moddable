@@ -370,6 +370,65 @@ class MatcherTest(unittest.TestCase):
         self.assertIn("add a not-a-pointer row", problems[0])
         self.assertEqual(bp.unlisted_vector_holders(namer, rows + [wild(self.LOS_STEP)], self.LAYOUTS), [])
 
+    PACKED = """*** Dumping AST Record Layout
+         0 | struct Packed
+         0 |   const char * value
+         4 |   unsigned char flag
+         5 |   char * name
+           | [sizeof=9, align=1]
+"""
+
+    def judged(self, layouts, function=None):
+        function = function or self.NAMED
+        namer = bp.Namer(bp.parse_map(" 0001:00001100       %s   0000000000401100   a.obj" % function), [0x401104])
+        return bp.judged_holders(namer, layouts)
+
+    def test_judged_holders_know_the_slot_offsets_and_the_size(self):
+        self.assertEqual(self.judged(self.LAYOUTS), {self.NAMED: (12, frozenset({0, 4}))})
+        packed = "?Insert@?$BlockVector@UPacked@@@@QAEXXZ"
+        self.assertEqual(self.judged(self.LAYOUTS + self.PACKED, packed), {packed: (9, frozenset({0, 5}))})
+        self.assertEqual(self.judged(self.LAYOUTS, self.LOS_STEP), {})
+        self.assertEqual(self.judged(self.LAYOUTS, "?Insert@?$BlockVector@UAbsent@@@@QAEXXZ"),
+                         {"?Insert@?$BlockVector@UAbsent@@@@QAEXXZ": None})
+
+    def test_a_field_offset_word_without_a_pair_row_is_uncovered(self):
+        judged = self.judged(self.LAYOUTS)
+        rows = [wild(self.NAMED)]
+        words = [resolved(self.NAMED, 0x18 + 4, "T"), resolved(self.NAMED, 0x18, "T")]
+        self.assertEqual([m.offset for m in bp.uncovered(words, rows, judged)], [0x1c, 0x18])
+        rows.append(row(self.NAMED, "T", "0x4+0xc*k"))
+        self.assertEqual([m.offset for m in bp.uncovered(words, rows, judged)], [0x18])
+        rows.append(row(self.NAMED, "U", "0x18"))
+        self.assertEqual([m.offset for m in bp.uncovered(words, rows, judged)], [0x18])
+
+    def test_a_misaligned_word_is_covered_by_the_wildcard(self):
+        judged = self.judged(self.LAYOUTS)
+        words = [resolved(self.NAMED, 0x12, "T"), resolved(self.NAMED, 0x1b, "T")]
+        self.assertEqual(bp.uncovered(words, [wild(self.NAMED)], judged), [])
+        self.assertEqual(len(bp.uncovered(words, [], judged)), 2)
+
+    def test_a_packed_element_is_judged_at_its_own_offsets(self):
+        packed = "?Insert@?$BlockVector@UPacked@@@@QAEXXZ"
+        judged = self.judged(self.LAYOUTS + self.PACKED, packed)
+        words = [resolved(packed, 9 * 3 + 5, "T"), resolved(packed, 9 * 3 + 4, "T"), resolved(packed, 9 * 3 + 1, "T")]
+        self.assertEqual([m.offset for m in bp.uncovered(words, [wild(packed)], judged)], [32])
+
+    def test_a_judged_holder_with_no_layout_is_never_covered(self):
+        absent = "?Insert@?$BlockVector@UAbsent@@@@QAEXXZ"
+        judged = self.judged(self.LAYOUTS, absent)
+        self.assertEqual(len(bp.uncovered([resolved(absent, 1, "T")], [wild(absent)], judged)), 1)
+        namer = bp.Namer(bp.parse_map(" 0001:00001100       %s   0000000000401100   a.obj" % absent), [0x401104])
+        self.assertEqual(len(bp.vectors_without_layout(namer, [wild(absent)], self.LAYOUTS)), 1)
+        self.assertEqual(bp.vectors_without_layout(namer, [], self.LAYOUTS), [])
+
+    def test_a_judged_holder_has_a_not_a_pointer_wildcard_and_needs_no_other(self):
+        rows = [wild(self.NAMED), wild(self.NAMED, "outside", "x"), row(self.NAMED, "T", "0x0")]
+        text = bp.render(sorted(rows, key=bp.row_order))
+        self.assertEqual(bp.check_rows(text, {self.NAMED})[0].count("not-a-pointer"), 1)
+        rows = [wild(self.NAMED), row(self.NAMED, "T", "0x0")]
+        self.assertEqual(bp.check_rows(bp.render(sorted(rows, key=bp.row_order)), {self.NAMED}), [])
+        self.assertIn("no `*` row of class outside", bp.check_rows(bp.render(sorted(rows, key=bp.row_order)))[0])
+
     def test_check_scans_missing_file(self):
         problems = bp.check_scans({"eight": None}, bp.ROOT / "none.map", bp.ROOT, [])
         self.assertIn("eight: no blockptrs.txt", problems[0])

@@ -65,9 +65,14 @@ target_offsets `-`, and a note; regeneration keeps it as written and builds the 
 Wildcard rows are keyed by (holder, class) where pair rows are keyed by (holder, target), and sort
 with the rest: holder, then wildcard rows first, by class. `--check` fails on a holder with pair rows
 that lacks a wildcard row for one of their classes or for not-a-pointer.
-Every allocating member function of a `BlockVector<T>` in the linker map whose T has no pointer or Ref field in the layout
-needs a wildcard row: `--check` with a map (beside the exe, or `--map`) fails on one without it. A T with such a field gets
-none, and its words stay judged. Bytes of plain data can look like a heap address on one run and not on the next.
+Every allocating member function of a `BlockVector<T>` in the linker map needs a wildcard row: `--check` with a map (beside
+the exe, or `--map`) fails on a holder without it, and on a holder whose T has no layout to judge it by. Bytes of plain data
+can look like a heap address on one run and not on the next. The rule holds both ways. A T with no pointer, `Ref` or vtable
+field in the layout has a wildcard row that covers every word. A T with such a field has one that covers only the words whose
+offset in the allocation, modulo sizeof(T), is not the offset of one of those fields (a packed T works the same way): the
+misaligned words that straddle fields. A word at a field's offset is judged: a pair row of the holder with the same target
+and an offsets entry that holds the word's offset must cover it, or the scan fails the gate (`check_scans`). A wildcard
+row of such a holder has the class not-a-pointer, and its pair rows of any other class need no wildcard row.
 """
 
 import argparse
@@ -103,7 +108,7 @@ csv.field_size_limit(1 << 28)
 LAYOUT_FLAG = ["-Xclang", "-fdump-record-layouts-complete"]
 VECTOR_MEMBER = re.compile(r"\?(?:[A-Za-z_]\w*@|\?[0-9A-Z])\?\$BlockVector@(E|F|[UV]\w+|U\?\$Ref@[UV]\w+@@)@@")
 VECTOR_PRIMITIVES = {"E": "unsigned char", "F": "short"}
-ELEMENT_HEADERS = ("src/map/los_lines.h", "src/map/los_tables.h", "src/ai/player_ai.h", "src/orders/order_type_entry.h")
+ELEMENT_HEADERS = ("src/util/vec3.h", "src/map/los_lines.h", "src/map/los_tables.h", "src/ai/player_ai.h", "src/orders/order_type_entry.h")
 POINTER_FIELD = re.compile(r"\*|\bRef<|vtable pointer")
 
 
@@ -588,8 +593,10 @@ def differences(have: list[dict], want: list[dict]) -> list[str]:
                                      lineterm="", n=0))
 
 
-def check_rows(text: str) -> list[str]:
-    """What is wrong with the text of data/block_pointers.csv: columns, values, classes, notes, order."""
+def check_rows(text: str, judged: set[str] | frozenset[str] = frozenset()) -> list[str]:
+    """What is wrong with the text of data/block_pointers.csv: columns, values, classes, notes, order.
+
+    The wildcard row of a `judged` holder (see judged_holders) is not-a-pointer, and its other classes need none."""
     reader = csv.reader(io.StringIO(text))
     table = list(reader)
     if not table or table[0] != COLUMNS:
@@ -629,11 +636,16 @@ def check_rows(text: str) -> list[str]:
         if previous is not None and key <= previous:
             problems.append("%s: rows must be sorted by holder then target, without repeats" % where)
         previous = key
+        if wild and row["holder"] in judged and row["class"] != "not-a-pointer":
+            problems.append("%s: a `*` row of a holder with pointer fields covers only its misaligned words, so its class "
+                            "is not-a-pointer" % where)
         if row["class"] in CLASSES:
             classes = (wilds if wild else pairs).setdefault(row["holder"], set())
             classes.add(row["class"])
     for holder, classes in sorted(pairs.items()):
         for cls in sorted(classes | {"not-a-pointer"}):
+            if holder in judged and cls != "not-a-pointer":
+                continue
             if cls not in wilds.get(holder, set()):
                 problems.append("%s: no `*` row of class %s for its pair rows" % (holder, cls))
     return problems
@@ -663,19 +675,8 @@ def vector_holders(namer: Namer) -> dict[str, str]:
 
 def pointer_fields(layout_text: str, record: str) -> list[str] | None:
     """The members of `record` (nested ones too) whose layout line shows a pointer, a Ref or a vtable pointer; None with no layout."""
-    if record.startswith("Ref<"):
-        return [record]
-    head = re.search(r"^ *0 \| (?:struct|class|union) %s\n" % re.escape(record), layout_text, re.M)
-    if not head:
-        return None
-    found = []
-    for line in layout_text[head.end():].split("\n"):
-        if "[sizeof=" in line:
-            break
-        body = line.partition("|")[2].strip()
-        if POINTER_FIELD.search(body):
-            found.append(body)
-    return found
+    slots = pointer_slots(layout_text, record)
+    return None if slots is None else list(slots[1].values())
 
 
 def element_layouts(build_dir: Path, types: list[str]) -> str:
@@ -694,6 +695,21 @@ def element_layouts(build_dir: Path, types: list[str]) -> str:
             out.append(subprocess.run(flags + LAYOUT_FLAG + ["--", str(probe)], cwd=directory, capture_output=True,
                                       text=True, errors="replace").stdout)
     return "\n".join(out)
+
+
+LAYOUT_CACHE: dict[tuple, str | None] = {}
+
+
+def vector_layouts(namer: Namer, build_dir: Path) -> str | None:
+    """The layouts of the element types of the map's block vector members; None when the probe fails."""
+    elements = sorted({e for e in vector_holders(namer).values() if e not in VECTOR_PRIMITIVES.values()})
+    key = (str(build_dir), tuple(elements))
+    if key not in LAYOUT_CACHE:
+        try:
+            LAYOUT_CACHE[key] = element_layouts(build_dir, elements) if elements else ""
+        except (OSError, IndexError, subprocess.SubprocessError, ValueError):
+            LAYOUT_CACHE[key] = None
+    return LAYOUT_CACHE[key]
 
 
 def unlisted_vector_holders(namer: Namer, rows: list[dict], layouts: str | None = None) -> list[str]:
@@ -717,14 +733,84 @@ def unlisted_vector_holders(namer: Namer, rows: list[dict], layouts: str | None 
     return lines
 
 
-def uncovered(scanned: list[Resolved], rows: list[dict]) -> list[Resolved]:
-    """The scanned words whose holder has no wildcard row, one per distinct word."""
+def pointer_slots(layout_text: str, record: str) -> tuple[int, dict[int, str]] | None:
+    """The size of `record` and its pointer, Ref and vtable slots (offset to layout line); None with no layout."""
+    if record.startswith("Ref<"):
+        return 4, {0: record}
+    head = re.search(r"^ *0 \| (?:struct|class|union) %s\n" % re.escape(record), layout_text, re.M)
+    if not head:
+        return None
+    slots: dict[int, str] = {}
+    for line in layout_text[head.end():].split("\n"):
+        size = re.search(r"\[sizeof=(\d+)", line)
+        if size:
+            return int(size.group(1)), slots
+        left, _, body = line.partition("|")
+        body = body.strip()
+        if POINTER_FIELD.search(body) and re.match(r"\s*\d+", left):
+            count = re.search(r"\[(\d+)\]", body)
+            for i in range(int(count.group(1)) if count else 1):
+                slots[int(re.match(r"\s*(\d+)", left).group(1)) + 4 * i] = body
+    return None
+
+
+def judged_holders(namer: Namer, layouts: str | None) -> dict[str, tuple[int, frozenset[int]] | None]:
+    """The allocating `BlockVector<T>` members whose T has pointer slots: (sizeof(T), slot offsets), None where T has no layout."""
+    found: dict[str, tuple[int, frozenset[int]] | None] = {}
+    for function, element in vector_holders(namer).items():
+        if element in VECTOR_PRIMITIVES.values():
+            continue
+        slots = None if layouts is None else pointer_slots(layouts, element)
+        if slots is None:
+            found[function] = None
+        elif slots[1]:
+            found[function] = (slots[0], frozenset(slots[1]))
+    return found
+
+
+def vectors_without_layout(namer: Namer, rows: list[dict], layouts: str | None) -> list[str]:
+    """One line for each allocating `BlockVector<T>` member with a `*` row whose T has no layout to judge its words by."""
+    listed = {r["holder"] for r in rows if is_wild(r)}
+    return ["%s: a `*` row covers a BlockVector<%s> member whose element has no layout, so its pointer fields are not known"
+            % (function, vector_holders(namer)[function])
+            for function, slots in judged_holders(namer, layouts).items() if slots is None and function in listed]
+
+
+def offset_in(spec: str, offset: int) -> bool:
+    """Whether an offsets cell (`0x10 0x24+0x8*k`) holds the offset."""
+    for token in spec.split():
+        m = OFFSET_TOKEN.match(token)
+        if not m:
+            continue
+        start = int(m.group(1), 16)
+        if m.group(2) is None:
+            if offset == start:
+                return True
+        elif offset >= start and (offset - start) % int(m.group(2), 16) == 0:
+            return True
+    return False
+
+
+def uncovered(scanned: list[Resolved], rows: list[dict],
+              judged: dict[str, tuple[int, frozenset[int]] | None] | None = None) -> list[Resolved]:
+    """The scanned words no row covers, one per distinct word.
+
+    A holder with a wildcard row covers every word, except in a `judged` holder (see judged_holders): there a word at a
+    pointer slot's offset needs a pair row of its target, and every word is uncovered where T has no layout."""
     holders = {r["holder"] for r in rows if is_wild(r)}
+    judged = judged or {}
     out = []
     seen = set()
     for s in scanned:
         if s.holder in holders:
-            continue
+            if s.holder not in judged:
+                continue
+            slots = judged[s.holder]
+            if slots is not None and s.offset % slots[0] not in slots[1]:
+                continue
+            if slots is not None and any(r["holder"] == s.holder and r["target"] == s.target and not is_wild(r)
+                                         and offset_in(r["offsets"], s.offset) for r in rows):
+                continue
         key = (s.scenario, s.holder, s.offset, s.target)
         if key not in seen:
             seen.add(key)
@@ -761,7 +847,12 @@ def check_scans(texts: dict[str, str | None], map_path: Path, build_dir: Path,
     needs_layout = any(r.holder == SIM_GLOBALS for s in scans for r in s.rows)
     members = load_members(build_dir) if needs_layout else []
     listed = read_rows() if rows is None else rows
-    missing = uncovered(resolve(scans, namer, members), listed)
+    resolved = resolve(scans, namer, members)
+    held = vector_holders(namer)
+    judged = {}
+    if any(r.holder in held for r in resolved):
+        judged = judged_holders(namer, vector_layouts(namer, build_dir))
+    missing = uncovered(resolved, listed, judged)
     return problems + describe_uncovered(missing)
 
 
@@ -836,21 +927,18 @@ def main() -> None:
         parser.error("--scenario plays part of the suite, which must not overwrite the data file: add --save-scans DIR "
                      "and merge the saved scans with --from")
     if args.check:
-        problems = check_rows(OUT.read_text()) if OUT.exists() else ["%s does not exist" % OUT]
         map_path = args.map or args.exe.with_suffix(".map")
-        if OUT.exists() and map_path.is_file():
+        text = OUT.read_text() if OUT.exists() else None
+        if text is not None and map_path.is_file():
             namer = load_namer(map_path)
             rows = read_rows()
-            missing = [f for f in vector_holders(namer) if f not in {r["holder"] for r in rows if is_wild(r)}]
-            layouts = None
-            if missing:
-                try:
-                    layouts = element_layouts(args.build_dir or default_build_dir(),
-                                              sorted({vector_holders(namer)[f] for f in missing}))
-                except (OSError, IndexError, subprocess.SubprocessError, ValueError):
-                    layouts = None
+            layouts = vector_layouts(namer, args.build_dir or default_build_dir())
+            judged = judged_holders(namer, layouts)
+            problems = check_rows(text, frozenset(h for h, v in judged.items() if v is not None))
             problems += unlisted_vector_holders(namer, rows, layouts)
+            problems += vectors_without_layout(namer, rows, layouts)
         else:
+            problems = check_rows(text) if text is not None else ["%s does not exist" % OUT]
             print("blockpointers: no linker map beside the exe; the block vector holders are not checked")
         for p in problems[:40]:
             print(p)

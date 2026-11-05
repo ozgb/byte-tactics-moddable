@@ -2063,6 +2063,7 @@ seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapCheck
 seams,DestroyPathfinderNative,src/seams/native.cpp,1,0,0,0,0,0,?DestroyPathfinderNative@@YGXPAVPathfinder@@@Z,0,
 seams,GetMissionIndexNative,src/seams/native.cpp,1,0,0,0,0,0,?GetMissionIndexNative@@YIHPAVMission@@@Z,0,
 seams,GetTerrainLengthNative,src/seams/native.cpp,1,0,0,0,0,0,?GetTerrainLengthNative@@YIHPAVMission@@@Z,0,
+seams,GetVisibleEnemiesInRadiusListNative,src/seams/native.cpp,1,0,0,0,0,0,?GetVisibleEnemiesInRadiusListNative@@YGHHPBUVec3@@HHPAU?$Ref@UUnit@@@@H@Z,0,"kit: ai.GetVisibleEnemiesInRadiusList, added for the oracle kit (#823); no 3.1c code calls the slot"
 seams,LoadCampaignNative,src/seams/native.cpp,1,0,0,0,0,0,?LoadCampaignNative@@YIXPAVMission@@HPAD@Z,0,
 seams,LoadMeteorDefaultsNative,src/seams/native.cpp,1,0,0,0,0,0,?LoadMeteorDefaultsNative@@YIXPAVMeteorParams@@@Z,0,
 seams,MissionExistsNative,src/seams/native.cpp,1,0,0,0,0,0,?MissionExistsNative@@YIHPAVMission@@HH@Z,0,

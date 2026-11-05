@@ -289,7 +289,10 @@ def render(d: dict) -> str:
            "tools/accesslog.py)." % (len(sims), d["scenarios"]), "",
            "## Classes", "",
            "An edge is a writer, a reader, an item and a phase. The class is the first that applies:", "",
-           "- **ordered**: the order of draws from a random stream, sounds or UI records is the state, whichever subsystem comes first.",
+           "- **ordered**: the order of draws from a random stream, sounds or UI records is the state, whichever subsystem comes first. "
+           "The streams are items (`rng.parkMiller` for RandomInt, `rng.crtHoldrand` and `rng.crtLoad` for GameRand), so two "
+           "subsystems that draw from one stream in a phase already have an `ordered` row; the draws tables below add the counts "
+           "per entity, not new edges.",
            "- **immediate**: some run shows a read of the item after the writer wrote it in the same phase. The writer must run first.",
            "- **deferrable**: the reader read before the writer wrote, and nobody read the writer's value before the phase "
            "ended. The write could be queued to the end of the phase.",

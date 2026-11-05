@@ -4,6 +4,7 @@
 """
 
 import contextlib
+import datetime
 import io
 import json
 import os
@@ -891,6 +892,40 @@ class GateTierTest(unittest.TestCase):
         self.assertIn("a: no blockptrs.txt", out.getvalue())
 
 
+class GameTraceTest(unittest.TestCase):
+    START = 1_800_000_000.0
+
+    def name(self, offset: float, pid: int = 77) -> str:
+        t = datetime.datetime.fromtimestamp(self.START + offset)
+        return t.strftime("%Y%m%d-%H%M%S") + f"-{pid}-smoke"
+
+    def locate(self, *offsets: float) -> Path | None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            for o in offsets:
+                (out / "work" / self.name(o)).mkdir(parents=True)
+            with mock.patch.object(reference.playtest, "OUT", out):
+                found = reference.game_trace(77, self.START)
+            return found.relative_to(out / "work") if found else None
+
+    def test_stale_directory_is_ignored(self):
+        self.assertIsNone(self.locate(-60))
+
+    def test_own_directory_is_found(self):
+        self.assertEqual(self.locate(3), Path(self.name(3)) / "i1/game/trace.txt")
+        self.assertEqual(self.locate(0), Path(self.name(0)) / "i1/game/trace.txt")
+
+    def test_new_directory_wins_over_stale(self):
+        self.assertEqual(self.locate(-60, 2), Path(self.name(2)) / "i1/game/trace.txt")
+
+    def test_other_pid_is_ignored(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            (out / "work" / self.name(1, pid=78)).mkdir(parents=True)
+            with mock.patch.object(reference.playtest, "OUT", out):
+                self.assertIsNone(reference.game_trace(77, self.START))
+
+
 class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
     NAMES = ("a", "b", "c")
 
@@ -939,7 +974,7 @@ class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
                     mock.patch.object(reference, "scenario_files", lambda: files), \
                     mock.patch.object(reference, "TRACES", tmp / "traces"), \
                     mock.patch.object(reference, "WATCH_SECONDS", 0.05), \
-                    mock.patch.object(reference, "game_trace", lambda pid: paths.get(pid)), \
+                    mock.patch.object(reference, "game_trace", lambda pid, started: paths.get(pid)), \
                     mock.patch.object(reference, "scenario_ticks", lambda s: 4), \
                     mock.patch.object(reference, "scenario_frames", lambda s: []), \
                     mock.patch.object(reference, "scenario_saves", lambda s: False), \
@@ -1148,7 +1183,7 @@ class BothModesTest(unittest.TestCase):
             trace = Path(tmp) / "trace.txt"
             trace.write_text("bt-trace 3\n1 units " + "1" * 16 + "\n2 units " + "9" * 16 + "\n3 units " + "3" * 16 + "\n")
             proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
-            watch = reference.Watch(expected, lambda pid: trace)
+            watch = reference.Watch(expected, lambda pid, started: trace)
             try:
                 watch.started("a [native]")(proc)
                 watch.poll()
@@ -1234,7 +1269,7 @@ class RecheckTest(unittest.TestCase):
         kept.mkdir()
         (kept / "trace.txt").write_text(self.HEADER + kept_text)
         proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
-        watch = reference.Watch({"a": ({}, good)}, lambda pid: live)
+        watch = reference.Watch({"a": ({}, good)}, lambda pid, started: live)
         try:
             with mock.patch.object(reference, "keep_run", lambda *a, **k: kept):
                 watch.started("a")(proc)

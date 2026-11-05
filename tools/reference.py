@@ -710,12 +710,24 @@ def run_slot():
     return GATE_RUN_SLOTS.slot() if GATE_RUN_SLOTS is not None else contextlib.nullcontext()
 
 
-def game_trace(pid: int) -> Path | None:
-    """The trace.txt that the playtest.py process `pid` has its exe write, or None before the run has a game directory."""
+GAME_TRACE_SLACK = 1.0
+
+
+def game_trace(pid: int, started: float) -> Path | None:
+    """The trace.txt that the playtest.py process `pid`, started at `started` (time.time()), has its exe write, or None before the run has a game directory.
+
+    A directory named for an earlier session (a killed playtest.py whose pid came round again) is skipped. The name
+    holds the session's local time to the second, truncated, so it can read up to a second before the real time.
+    """
     work = playtest.OUT / "work"
     if not work.is_dir():
         return None
-    found = sorted(d for d in work.iterdir() if re.match(rf"\d{{8}}-\d{{6}}-{pid}-", d.name))
+    found = []
+    for d in work.iterdir():
+        m = re.match(rf"(\d{{8}}-\d{{6}})-{pid}-", d.name)
+        if m and datetime.strptime(m[1], "%Y%m%d-%H%M%S").timestamp() >= started - GAME_TRACE_SLACK:
+            found.append(d)
+    found.sort()
     return found[-1] / "i1/game/trace.txt" if found else None
 
 
@@ -749,7 +761,7 @@ class Found:
 class Watch:
     """Compares each running scenario's trace.txt, as it grows, with the stored digests, and stops every run at the first difference."""
 
-    def __init__(self, expected: dict[str, tuple], locate: Callable[[int], Path | None] | None = None):
+    def __init__(self, expected: dict[str, tuple], locate: Callable[[int, float], Path | None] | None = None):
         self.expected = expected
         self.locate = locate or game_trace
         self.lock = threading.Lock()
@@ -783,7 +795,7 @@ class Watch:
                 continue
 
     def check(self, name: str, run: LiveRun) -> None:
-        run.path = run.path or self.locate(run.proc.pid)
+        run.path = run.path or self.locate(run.proc.pid, run.started)
         if run.path is None:
             return
         with run.path.open("rb") as f:

@@ -1172,9 +1172,6 @@ SetMissionType,0xd36,HAPI_LoadFile,42,85420,0x800-0x3ce8,not-a-pointer,Mission t
 SetMissionType,0xc1d 0xc20,LoadTntMap: TILE SET #3,3,66600,0x225cc2-0x4effe0,not-a-pointer,Mission table words that only look like addresses
 SetMissionType,0xa08,SmokeParticles::Emit,1,45,0x20,not-a-pointer,Mission table words that only look like addresses
 SetMissionType,0xa08,TdfFile::LoadFile #3,3,3375,0x0,not-a-pointer,Mission table words that only look like addresses
-SimGlobals.DAT_005119b8,*,*,0,0,-,not-a-pointer,"the 8-byte gap before g_playerAI, whose unaligned word at +6 takes the low half of g_playerAI[0]"
-SimGlobals.DAT_005119b8,0x6,LoadTntMap: TILE SET #3,3,36360,0xffe0,not-a-pointer,"the 8-byte gap before g_playerAI, whose unaligned word at +6 takes the low half of g_playerAI[0]"
-SimGlobals.DAT_00512350,*,*,0,0,-,not-a-pointer,"the 8-byte gap before g_movementClasses, whose unaligned word at +6 takes the low half of entries[0].name"
 SimGlobals.g_cdMismatchDefeatTick,*,*,0,0,-,not-a-pointer,"g_cdMismatchDefeatTick: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_cdMismatchDefeatTick,0x2,AllocAlphaTable: ALPHA TABLE,3,8,0x4310,not-a-pointer,"g_cdMismatchDefeatTick: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_cdMismatchDefeatTick,0x2 0x3,AllocDepthFrame: CompositeBuffer,9,93,0xc3e0-0x94ee0,not-a-pointer,"g_cdMismatchDefeatTick: integers (ticks, counts, seed) that only look like addresses"
@@ -1202,6 +1199,8 @@ SimGlobals.g_debrisMemCache,*,*,0,0,-,not-a-pointer,words of SimGlobals.g_debris
 SimGlobals.g_debrisMemCache,0x6,HAPI_LoadFile,1,3585,0x18ea,not-a-pointer,words of SimGlobals.g_debrisMemCache that only look like addresses
 SimGlobals.g_economyPacketTick,*,*,0,0,-,not-a-pointer,"g_economyPacketTick: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_economyPacketTick,0x1,CMemoryCache::InitCache: CMemoryCache CCH,1,29,0x22ffe0,not-a-pointer,"g_economyPacketTick: integers (ticks, counts, seed) that only look like addresses"
+SimGlobals.g_emptyText,*,*,0,0,-,not-a-pointer,"the 8-byte gap before g_playerAI, whose unaligned word at +6 takes the low half of g_playerAI[0]"
+SimGlobals.g_emptyText,0x6,LoadTntMap: TILE SET #3,3,36360,0xffe0,not-a-pointer,"the 8-byte gap before g_playerAI, whose unaligned word at +6 takes the low half of g_playerAI[0]"
 SimGlobals.g_explodedPieces,*,*,0,0,-,not-a-pointer,words of SimGlobals.g_explodedPieces that only look like addresses
 SimGlobals.g_explodedPieces,0x8e,CMemoryCache::InitCache: CMemoryCache CCH,1,176,0x4ffe0-0x50028,not-a-pointer,Exploded piece table words at odd offsets: they straddle two pointers and only look like addresses
 SimGlobals.g_explodedPieces,0x8a,HAPI_LoadFile,1,37,0x16848,not-a-pointer,Exploded piece table words at odd offsets: they straddle two pointers and only look like addresses
@@ -1298,6 +1297,7 @@ SimGlobals.g_randomSeed,0x0,LoadTntMap: SORT UNIT LIST #7,2,6,0xbdc-0x242e,not-a
 SimGlobals.g_randomSeed,0x0,LoadTntMap: TILE MAP #1,2,19,0x1544-0x44af0,not-a-pointer,"g_randomSeed: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_randomSeed,0x0,LoadTntMap: TILE SET #3,24,507,0x8b3b-0xa25ecc,not-a-pointer,"g_randomSeed: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_randomSeed,0x0,NanoParticles::Emit,2,7,0x7-0x1c9,not-a-pointer,"g_randomSeed: integers (ticks, counts, seed) that only look like addresses"
+SimGlobals.pad_2a0,*,*,0,0,-,not-a-pointer,"the 8-byte gap before g_movementClasses, whose unaligned word at +6 takes the low half of entries[0].name"
 VtolFollowOrder #1,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolFollowOrder #2,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolFollowOrder #3,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"

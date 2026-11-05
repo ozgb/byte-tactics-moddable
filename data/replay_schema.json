@@ -105,7 +105,7 @@
    "g_game": "the pointer to the game record, not state",
    "g_seams": "the seam table, not state",
    "g_extTdf": "a constant string passed to an import",
-   "DAT_005119b8": "a constant empty string passed to an import",
+   "g_emptyText": "a constant empty string passed to an import",
    "Game::units": "the unit table: a unit is named by its slot, Unit#N",
    "<anon>::meteor": "a bit of the flags of the weapon FindWeaponByName returns, whose flags are recorded as its result",
    "<anon>::whole": "the whole-number half of the SumFixed local of UpdateMetalExtraction, a stack variable",

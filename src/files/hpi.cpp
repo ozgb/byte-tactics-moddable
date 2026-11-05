@@ -1653,7 +1653,7 @@ void __stdcall HAPI_ResolveShadowedFiles(void)
                     HAPI_ClearShadowFlags(list->entries[j].dir);
             }
         }
-        HAPI_MarkShadowedFiles(DAT_005119b8, -1, 1);
+        HAPI_MarkShadowedFiles(g_emptyText, -1, 1);
     }
 }
 

@@ -1503,7 +1503,7 @@ address,function,file,kind,target
 0x406c90,CmdPlan,src/ai/ai_player.cpp,field_read,CommandArgs::count
 0x406c90,CmdPlan,src/ai/ai_player.cpp,field_read,Game::difficulty
 0x406c90,CmdPlan,src/ai/ai_player.cpp,function,
-0x406c90,CmdPlan,src/ai/ai_player.cpp,global_maybe_written,DAT_005119b8
+0x406c90,CmdPlan,src/ai/ai_player.cpp,global_maybe_written,g_emptyText
 0x406c90,CmdPlan,src/ai/ai_player.cpp,global_read,g_game
 0x406c90,CmdPlan,src/ai/ai_player.cpp,global_write,g_aiCommandsEnabled
 0x406da0,EnableAICommands,src/ai/ai_player.cpp,function,
@@ -1517,7 +1517,7 @@ address,function,file,kind,target
 0x406db0,CmdWeight,src/ai/ai_player.cpp,field_read,Seams::units
 0x406db0,CmdWeight,src/ai/ai_player.cpp,field_read,UnitsSeam::UnitTypeSetAddTypeOrCategory
 0x406db0,CmdWeight,src/ai/ai_player.cpp,function,
-0x406db0,CmdWeight,src/ai/ai_player.cpp,global_maybe_written,DAT_005119b8
+0x406db0,CmdWeight,src/ai/ai_player.cpp,global_maybe_written,g_emptyText
 0x406db0,CmdWeight,src/ai/ai_player.cpp,global_read,g_aiCommandsEnabled
 0x406db0,CmdWeight,src/ai/ai_player.cpp,global_read,g_game
 0x406db0,CmdWeight,src/ai/ai_player.cpp,global_read,g_seams
@@ -1531,7 +1531,7 @@ address,function,file,kind,target
 0x406e40,CmdLimit,src/ai/ai_player.cpp,field_read,Seams::units
 0x406e40,CmdLimit,src/ai/ai_player.cpp,field_read,UnitsSeam::UnitTypeSetAddTypeOrCategory
 0x406e40,CmdLimit,src/ai/ai_player.cpp,function,
-0x406e40,CmdLimit,src/ai/ai_player.cpp,global_maybe_written,DAT_005119b8
+0x406e40,CmdLimit,src/ai/ai_player.cpp,global_maybe_written,g_emptyText
 0x406e40,CmdLimit,src/ai/ai_player.cpp,global_read,g_aiCommandsEnabled
 0x406e40,CmdLimit,src/ai/ai_player.cpp,global_read,g_game
 0x406e40,CmdLimit,src/ai/ai_player.cpp,global_read,g_seams
@@ -4599,7 +4599,7 @@ address,function,file,kind,target
 0x416310,CmdAssign,src/game/console_commands.cpp,field_maybe_written,Game::view
 0x416310,CmdAssign,src/game/console_commands.cpp,field_read,MissionType::index
 0x416310,CmdAssign,src/game/console_commands.cpp,function,
-0x416310,CmdAssign,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x416310,CmdAssign,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x416310,CmdAssign,src/game/console_commands.cpp,global_read,g_game
 0x416370,CmdAssert,src/game/console_commands.cpp,function,
 0x416380,CmdDPrint,src/game/console_commands.cpp,function,
@@ -4623,7 +4623,7 @@ address,function,file,kind,target
 0x4163d0,CmdFeature,src/game/console_commands.cpp,field_read,Point16::y
 0x4163d0,CmdFeature,src/game/console_commands.cpp,field_read,Seams::los_radar
 0x4163d0,CmdFeature,src/game/console_commands.cpp,function,
-0x4163d0,CmdFeature,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x4163d0,CmdFeature,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x4163d0,CmdFeature,src/game/console_commands.cpp,global_read,g_game
 0x4163d0,CmdFeature,src/game/console_commands.cpp,global_read,g_seams
 0x4163d0,CmdFeature,src/game/console_commands.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
@@ -4726,7 +4726,7 @@ address,function,file,kind,target
 0x416780,CmdSearch,src/game/console_commands.cpp,field_write,Pathfinder::baseScale
 0x416780,CmdSearch,src/game/console_commands.cpp,field_write,Pathfinder::stepsPerTick
 0x416780,CmdSearch,src/game/console_commands.cpp,function,
-0x416780,CmdSearch,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x416780,CmdSearch,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x416780,CmdSearch,src/game/console_commands.cpp,global_read,g_game
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,call,Sound::PlayCdTrack
@@ -4752,7 +4752,7 @@ address,function,file,kind,target
 0x416860,CmdMove,src/game/console_commands.cpp,field_write,Vec3::x
 0x416860,CmdMove,src/game/console_commands.cpp,field_write,Vec3::z
 0x416860,CmdMove,src/game/console_commands.cpp,function,
-0x416860,CmdMove,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x416860,CmdMove,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x416860,CmdMove,src/game/console_commands.cpp,global_read,g_game
 0x4168d0,CmdLogo,src/game/console_commands.cpp,call,AddMessage
 0x4168d0,CmdLogo,src/game/console_commands.cpp,call,CMemoryCache::FlushCache
@@ -4828,7 +4828,7 @@ address,function,file,kind,target
 0x416bd0,CmdGive,src/game/console_commands.cpp,field_read,PlayersSeam::TransferMetal
 0x416bd0,CmdGive,src/game/console_commands.cpp,field_read,Seams::players
 0x416bd0,CmdGive,src/game/console_commands.cpp,function,
-0x416bd0,CmdGive,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x416bd0,CmdGive,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x416bd0,CmdGive,src/game/console_commands.cpp,global_read,g_game
 0x416bd0,CmdGive,src/game/console_commands.cpp,global_read,g_seams
 0x416bd0,CmdGive,src/game/console_commands.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float, int) __attribute__((stdcall)) [PlayersSeam::TransferEnergy]"
@@ -4883,7 +4883,7 @@ address,function,file,kind,target
 0x416e90,CmdNow,src/game/console_commands.cpp,field_read,Game::uiOptionFlags
 0x416e90,CmdNow,src/game/console_commands.cpp,field_write,Game::uiOptionFlags
 0x416e90,CmdNow,src/game/console_commands.cpp,function,
-0x416e90,CmdNow,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x416e90,CmdNow,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x416e90,CmdNow,src/game/console_commands.cpp,global_read,g_game
 0x417030,CmdDoubleShot,src/game/console_commands.cpp,deref_read,*unsigned short
 0x417030,CmdDoubleShot,src/game/console_commands.cpp,deref_write,*unsigned short
@@ -4955,7 +4955,7 @@ address,function,file,kind,target
 0x417330,CmdFilm,src/game/console_commands.cpp,field_write,Game::path
 0x417330,CmdFilm,src/game/console_commands.cpp,field_write,Game::valueSet
 0x417330,CmdFilm,src/game/console_commands.cpp,function,
-0x417330,CmdFilm,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x417330,CmdFilm,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x417330,CmdFilm,src/game/console_commands.cpp,global_read,g_game
 0x4173e0,CmdFilmSpeed,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x4173e0,CmdFilmSpeed,src/game/console_commands.cpp,call,SaveSettings
@@ -4970,7 +4970,7 @@ address,function,file,kind,target
 0x417430,CmdSave,src/game/console_commands.cpp,call,sprintf
 0x417430,CmdSave,src/game/console_commands.cpp,field_read,CommandArgs::count
 0x417430,CmdSave,src/game/console_commands.cpp,function,
-0x417430,CmdSave,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x417430,CmdSave,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x417490,CmdReload,src/game/console_commands.cpp,call,CommandArgs::GetArg
 0x417490,CmdReload,src/game/console_commands.cpp,field_read,CommandArgs::count
 0x417490,CmdReload,src/game/console_commands.cpp,field_read,Seams::units
@@ -4978,7 +4978,7 @@ address,function,file,kind,target
 0x417490,CmdReload,src/game/console_commands.cpp,field_read,UnitsSeam::KillUnitsOfType
 0x417490,CmdReload,src/game/console_commands.cpp,field_read,UnitsSeam::ReloadUnitType
 0x417490,CmdReload,src/game/console_commands.cpp,function,
-0x417490,CmdReload,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x417490,CmdReload,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x417490,CmdReload,src/game/console_commands.cpp,global_read,g_seams
 0x417490,CmdReload,src/game/console_commands.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
 0x417490,CmdReload,src/game/console_commands.cpp,indirect_call,indirect via void (*)(short) __attribute__((stdcall)) [UnitsSeam::KillUnitsOfType]
@@ -5043,7 +5043,7 @@ address,function,file,kind,target
 0x417600,CmdMakePoster,src/game/console_commands.cpp,field_read,Game::scrollY
 0x417600,CmdMakePoster,src/game/console_commands.cpp,field_write,Game::lastTick
 0x417600,CmdMakePoster,src/game/console_commands.cpp,function,
-0x417600,CmdMakePoster,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x417600,CmdMakePoster,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x417600,CmdMakePoster,src/game/console_commands.cpp,global_read,g_game
 0x417760,CmdMeteor,src/game/console_commands.cpp,call,CommandArgs::Count
 0x417760,CmdMeteor,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
@@ -5066,7 +5066,7 @@ address,function,file,kind,target
 0x4177e0,CmdInclude,src/game/console_commands.cpp,field_read,Game::pos
 0x4177e0,CmdInclude,src/game/console_commands.cpp,field_write,Game::pos
 0x4177e0,CmdInclude,src/game/console_commands.cpp,function,
-0x4177e0,CmdInclude,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x4177e0,CmdInclude,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x4177e0,CmdInclude,src/game/console_commands.cpp,global_read,g_game
 0x417890,DefaultCommandHandler,src/game/console_commands.cpp,call,CommandArgs::GetArg
 0x417890,DefaultCommandHandler,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
@@ -5097,7 +5097,7 @@ address,function,file,kind,target
 0x417890,DefaultCommandHandler,src/game/console_commands.cpp,field_write,Vec3::x
 0x417890,DefaultCommandHandler,src/game/console_commands.cpp,field_write,Vec3::z
 0x417890,DefaultCommandHandler,src/game/console_commands.cpp,function,
-0x417890,DefaultCommandHandler,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x417890,DefaultCommandHandler,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x417890,DefaultCommandHandler,src/game/console_commands.cpp,global_read,g_game
 0x417890,DefaultCommandHandler,src/game/console_commands.cpp,global_read,g_seams
 0x417890,DefaultCommandHandler,src/game/console_commands.cpp,indirect_call,"indirect via Unit *(*)(unsigned char, unsigned short, Vec3, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
@@ -5273,7 +5273,7 @@ address,function,file,kind,target
 0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,field_read,Player::type
 0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,field_read,Seams::ai
 0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,function,
-0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,global_maybe_written,DAT_005119b8
+0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,global_read,g_game
 0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,global_read,g_seams
 0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,indirect_call,"indirect via void (*)(int, void *) __attribute__((stdcall)) [AiSeam::DumpPlayerAI]"
@@ -7534,7 +7534,7 @@ address,function,file,kind,target
 0x4224b0,LoadFeatureType,src/map/features.cpp,field_write,Handle::src
 0x4224b0,LoadFeatureType,src/map/features.cpp,field_write,Handle::value
 0x4224b0,LoadFeatureType,src/map/features.cpp,function,
-0x4224b0,LoadFeatureType,src/map/features.cpp,global_maybe_written,DAT_005119b8
+0x4224b0,LoadFeatureType,src/map/features.cpp,global_maybe_written,g_emptyText
 0x4224b0,LoadFeatureType,src/map/features.cpp,global_read,g_game
 0x4224b0,LoadFeatureType,src/map/features.cpp,global_read,g_seams
 0x4224b0,LoadFeatureType,src/map/features.cpp,indirect_call,indirect via WeaponDef *(*)(char *) __attribute__((stdcall)) [WeaponsSeam::FindWeaponByName]
@@ -7562,7 +7562,7 @@ address,function,file,kind,target
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,field_write,Feature::reclamate
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,field_write,Game::loadPercent
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,function,
-0x422ea0,ResolveFeatureLinks,src/map/features.cpp,global_maybe_written,DAT_005119b8
+0x422ea0,ResolveFeatureLinks,src/map/features.cpp,global_maybe_written,g_emptyText
 0x422ea0,ResolveFeatureLinks,src/map/features.cpp,global_read,g_game
 0x423160,PlaceMissionFeatures,src/map/features.cpp,call,FindFeatureType
 0x423160,PlaceMissionFeatures,src/map/features.cpp,call,LoadFeatureType
@@ -8718,7 +8718,7 @@ address,function,file,kind,target
 0x429000,CheckGpfVersion,src/game/data_files.cpp,field_escape,Game::menu
 0x429000,CheckGpfVersion,src/game/data_files.cpp,field_read,TdfFile::current
 0x429000,CheckGpfVersion,src/game/data_files.cpp,function,
-0x429000,CheckGpfVersion,src/game/data_files.cpp,global_maybe_written,DAT_005119b8
+0x429000,CheckGpfVersion,src/game/data_files.cpp,global_maybe_written,g_emptyText
 0x429000,CheckGpfVersion,src/game/data_files.cpp,global_read,g_game
 0x4290f0,BuildDataPath,src/game/data_files.cpp,call,GetPreferredLanguage
 0x4290f0,BuildDataPath,src/game/data_files.cpp,call,HAPI_CloseFile
@@ -8761,7 +8761,7 @@ address,function,file,kind,target
 0x429470,LoadSoundByName,src/game/data_files.cpp,field_write,Game::soundCount
 0x429470,LoadSoundByName,src/game/data_files.cpp,field_write,Game::sounds
 0x429470,LoadSoundByName,src/game/data_files.cpp,function,
-0x429470,LoadSoundByName,src/game/data_files.cpp,global_escape,DAT_005119b8
+0x429470,LoadSoundByName,src/game/data_files.cpp,global_escape,g_emptyText
 0x429470,LoadSoundByName,src/game/data_files.cpp,global_read,g_game
 0x4295b0,LoadRadarPic,src/game/data_files.cpp,call,AllocFrame
 0x4295b0,LoadRadarPic,src/game/data_files.cpp,call,HAPI_CloseFile
@@ -8902,7 +8902,7 @@ address,function,file,kind,target
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::src3
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::vismasks
 0x429870,LoadGameResources,src/game/data_files.cpp,function,
-0x429870,LoadGameResources,src/game/data_files.cpp,global_maybe_written,DAT_005119b8
+0x429870,LoadGameResources,src/game/data_files.cpp,global_maybe_written,g_emptyText
 0x429870,LoadGameResources,src/game/data_files.cpp,global_read,g_game
 0x42a010,FreeAnimFiles,src/game/data_files.cpp,call,GameFreeThunk
 0x42a010,FreeAnimFiles,src/game/data_files.cpp,field_read,AnimFileEntry::gaf
@@ -9107,7 +9107,7 @@ address,function,file,kind,target
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,field_write,UnitDef::wacky
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,field_write,UnitDef::weaponHashXor
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,function,
-0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,global_maybe_written,DAT_005119b8
+0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,global_maybe_written,g_emptyText
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,global_read,g_game
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,global_read,s_weaponTdfParsers@src/units/unit_types.cpp
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,global_write,s_weaponTdfAllocCount@src/units/unit_types.cpp
@@ -9564,7 +9564,7 @@ address,function,file,kind,target
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,field_write,UnitDef::windgenerator
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,field_write,UnitDef::yardmap
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,function,
-0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,global_maybe_written,DAT_005119b8
+0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,global_maybe_written,g_emptyText
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,global_maybe_written,g_noneString
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,global_read,g_game
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,global_read,g_seams
@@ -9661,7 +9661,7 @@ address,function,file,kind,target
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,fn_ref,CompareUnitTypeNames
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,function,
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,global_escape,MovementClassTable::g_movementClasses
-0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,global_maybe_written,DAT_005119b8
+0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,global_maybe_written,g_emptyText
 0x42d2e0,LoadUnitTypes,src/units/unit_types.cpp,global_read,g_game
 0x42db60,CompareUnitTypeNames,src/units/unit_types.cpp,call,_strcmpi
 0x42db60,CompareUnitTypeNames,src/units/unit_types.cpp,function,
@@ -9735,7 +9735,7 @@ address,function,file,kind,target
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,UnitDef::buildMenuPageCount
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,field_write,UnitDef::downloadable
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,function,
-0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,global_maybe_written,DAT_005119b8
+0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,global_maybe_written,g_emptyText
 0x42dcf0,LoadDownloadMenus,src/units/unit_types.cpp,global_read,g_game
 0x42e120,FreeDownloadMenus,src/units/unit_types.cpp,call,GameFreeThunk
 0x42e120,FreeDownloadMenus,src/units/unit_types.cpp,call,get
@@ -9906,7 +9906,7 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_write,WeaponDef::tolerance
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_write,WeaponDef::turnRate
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,function,
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_maybe_written,DAT_005119b8
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_maybe_written,g_emptyText
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_read,g_game
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_read,kSim
 0x42f3a0,FreeWeaponTypes,src/weapons/weapon_types.cpp,call,DamageTable::~DamageTable
@@ -9933,7 +9933,7 @@ address,function,file,kind,target
 0x42f450,ReadSoundEntry,src/sound/sound_types.cpp,deref_write,*int
 0x42f450,ReadSoundEntry,src/sound/sound_types.cpp,field_read,TdfFile::current
 0x42f450,ReadSoundEntry,src/sound/sound_types.cpp,function,
-0x42f450,ReadSoundEntry,src/sound/sound_types.cpp,global_maybe_written,DAT_005119b8
+0x42f450,ReadSoundEntry,src/sound/sound_types.cpp,global_maybe_written,g_emptyText
 0x42f450,ReadSoundEntry,src/sound/sound_types.cpp,global_maybe_written,g_sayChoiceArrayName
 0x42f580,LoadSoundCategories,src/sound/sound_types.cpp,call,BuildDataPath
 0x42f580,LoadSoundCategories,src/sound/sound_types.cpp,call,GameAllocIgnoreTag
@@ -9981,7 +9981,7 @@ address,function,file,kind,target
 0x42f7e0,LoadAllSound,src/sound/sound_types.cpp,field_read,TdfFile::current
 0x42f7e0,LoadAllSound,src/sound/sound_types.cpp,field_write,Game::soundCount
 0x42f7e0,LoadAllSound,src/sound/sound_types.cpp,function,
-0x42f7e0,LoadAllSound,src/sound/sound_types.cpp,global_maybe_written,DAT_005119b8
+0x42f7e0,LoadAllSound,src/sound/sound_types.cpp,global_maybe_written,g_emptyText
 0x42f7e0,LoadAllSound,src/sound/sound_types.cpp,global_read,g_game
 0x42f8c0,FreeSounds,src/sound/sound_types.cpp,call,FreeSoundCategories
 0x42f8c0,FreeSounds,src/sound/sound_types.cpp,call,FreeSoundSet
@@ -10257,7 +10257,7 @@ address,function,file,kind,target
 0x431a60,LoadSideData,src/game/side_data.cpp,field_write,SideDef::metalColor
 0x431a60,LoadSideData,src/game/side_data.cpp,field_write,SideDef::sideNumber
 0x431a60,LoadSideData,src/game/side_data.cpp,function,
-0x431a60,LoadSideData,src/game/side_data.cpp,global_maybe_written,DAT_005119b8
+0x431a60,LoadSideData,src/game/side_data.cpp,global_maybe_written,g_emptyText
 0x431a60,LoadSideData,src/game/side_data.cpp,global_read,g_game
 0x432520,OpenSummaryBank,src/game/settings_campaign.cpp,call,HapiBank::CloseBank
 0x432520,OpenSummaryBank,src/game/settings_campaign.cpp,call,HapiBank::InitBank
@@ -10510,7 +10510,7 @@ address,function,file,kind,target
 0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,field_write,LosStep::a
 0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,field_write,LosStep::b
 0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,function,
-0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,global_maybe_written,DAT_005119b8
+0x4336f0,LosLine::LoadLosLine,src/map/los_tables.cpp,global_maybe_written,g_emptyText
 0x4339c0,LosLine::GetLosLineStepCount,src/map/los_tables.cpp,call,BlockVector::Size
 0x4339c0,LosLine::GetLosLineStepCount,src/map/los_tables.cpp,function,
 0x4339e0,LosLine::GetLosLineStep,src/map/los_tables.cpp,call,operator[]
@@ -10610,7 +10610,7 @@ address,function,file,kind,target
 0x434f70,Mission::Mission,src/map/map_list.cpp,field_write,Mission::unitCount
 0x434f70,Mission::Mission,src/map/map_list.cpp,field_write,Mission::units
 0x434f70,Mission::Mission,src/map/map_list.cpp,function,
-0x434f70,Mission::Mission,src/map/map_list.cpp,global_maybe_written,DAT_005119b8
+0x434f70,Mission::Mission,src/map/map_list.cpp,global_maybe_written,g_emptyText
 0x434ff0,Mission::~Mission,src/map/map_list.cpp,call,GameFreeThunk
 0x434ff0,Mission::~Mission,src/map/map_list.cpp,call,operator MissionConditions *
 0x434ff0,Mission::~Mission,src/map/map_list.cpp,call,operator MissionFeature *
@@ -10658,7 +10658,7 @@ address,function,file,kind,target
 0x435110,Mission::LoadCampaign,src/map/map_list.cpp,field_write,Mission::missionIndex
 0x435110,Mission::LoadCampaign,src/map/map_list.cpp,field_write,Mission::tntChecksum
 0x435110,Mission::LoadCampaign,src/map/map_list.cpp,function,
-0x435110,Mission::LoadCampaign,src/map/map_list.cpp,global_maybe_written,DAT_005119b8
+0x435110,Mission::LoadCampaign,src/map/map_list.cpp,global_maybe_written,g_emptyText
 0x4352b0,Mission::GetCampaignName,src/map/map_list.cpp,call,strlen
 0x4352b0,Mission::GetCampaignName,src/map/map_list.cpp,field_escape,Mission::campaign
 0x4352b0,Mission::GetCampaignName,src/map/map_list.cpp,function,
@@ -10697,7 +10697,7 @@ address,function,file,kind,target
 0x435430,Mission::BuildCampaignFilePath,src/map/map_list.cpp,call,strcat
 0x435430,Mission::BuildCampaignFilePath,src/map/map_list.cpp,call,strlen
 0x435430,Mission::BuildCampaignFilePath,src/map/map_list.cpp,function,
-0x435430,Mission::BuildCampaignFilePath,src/map/map_list.cpp,global_maybe_written,DAT_005119b8
+0x435430,Mission::BuildCampaignFilePath,src/map/map_list.cpp,global_maybe_written,g_emptyText
 0x4356c0,Mission::GetNameSlot,src/map/map_list.cpp,call,strlen
 0x4356c0,Mission::GetNameSlot,src/map/map_list.cpp,field_escape,Mission::names
 0x4356c0,Mission::GetNameSlot,src/map/map_list.cpp,function,
@@ -10884,7 +10884,7 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Mission::waterDamage
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Mission::waterDoesDamage
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,function,
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,global_maybe_written,DAT_005119b8
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,global_maybe_written,g_emptyText
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,global_read,g_game
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,global_read,g_seams
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,indirect_call,indirect via MissionConditions *(*)() __attribute__((stdcall)) [PlayersSeam::NewConditions]
@@ -10913,7 +10913,7 @@ address,function,file,kind,target
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,field_read,TdfFile::current
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,field_write,TdfFile::current
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,function,
-0x436860,Mission::SelectSchema,src/map/map_list.cpp,global_maybe_written,DAT_005119b8
+0x436860,Mission::SelectSchema,src/map/map_list.cpp,global_maybe_written,g_emptyText
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,global_read,g_game
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,global_read,len@Mission::SelectSchema
 0x436c30,Mission::LoadMissionData,src/map/map_list.cpp,call,GameFreeThunk
@@ -10976,7 +10976,7 @@ address,function,file,kind,target
 0x436c30,Mission::LoadMissionData,src/map/map_list.cpp,field_write,MissionUnit::y
 0x436c30,Mission::LoadMissionData,src/map/map_list.cpp,field_write,MissionUnit::z
 0x436c30,Mission::LoadMissionData,src/map/map_list.cpp,function,
-0x436c30,Mission::LoadMissionData,src/map/map_list.cpp,global_maybe_written,DAT_005119b8
+0x436c30,Mission::LoadMissionData,src/map/map_list.cpp,global_maybe_written,g_emptyText
 0x436c30,Mission::LoadMissionData,src/map/map_list.cpp,global_read,len@Mission::LoadMissionData
 0x437280,Mission::FreeMissionData,src/map/map_list.cpp,call,GameFreeThunk
 0x437280,Mission::FreeMissionData,src/map/map_list.cpp,call,operator MissionFeature *
@@ -11272,7 +11272,7 @@ address,function,file,kind,target
 0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,field_write,MeteorParams::radius
 0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,function,
 0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,global_escape,g_extTdf
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,global_maybe_written,DAT_005119b8
+0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,global_maybe_written,g_emptyText
 0x4384a0,AddBeCarriedOrder,src/orders/order_queue.cpp,call,InsertBefore
 0x4384a0,AddBeCarriedOrder,src/orders/order_queue.cpp,call,Order::~Order
 0x4384a0,AddBeCarriedOrder,src/orders/order_queue.cpp,call,operator Order *
@@ -12863,13 +12863,13 @@ address,function,file,kind,target
 0x440940,BuildAllPassMaps,src/units/movement_class.cpp,field_read,Game::width
 0x440940,BuildAllPassMaps,src/units/movement_class.cpp,field_write,Game::progress_38d73
 0x440940,BuildAllPassMaps,src/units/movement_class.cpp,function,
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,global_escape,DAT_00512370
+0x440940,BuildAllPassMaps,src/units/movement_class.cpp,global_escape,g_movementClassEntries
 0x440940,BuildAllPassMaps,src/units/movement_class.cpp,global_escape,g_movementClasses
 0x440940,BuildAllPassMaps,src/units/movement_class.cpp,global_read,g_game
 0x440a00,FreeMovementClasses,src/units/movement_class.cpp,call,FreeA
 0x440a00,FreeMovementClasses,src/units/movement_class.cpp,call,FreeC
 0x440a00,FreeMovementClasses,src/units/movement_class.cpp,function,
-0x440a00,FreeMovementClasses,src/units/movement_class.cpp,global_escape,DAT_00512370
+0x440a00,FreeMovementClasses,src/units/movement_class.cpp,global_escape,g_movementClassEntries
 0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,call,MovementClass::RefreshPassMap
 0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
 0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::name
@@ -13096,11 +13096,11 @@ address,function,file,kind,target
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,field_write,SerialPortConfig::unknown_8
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,field_write,SerialPortConfig::unknown_c
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,function,
-0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,global_escape,DAT_005119b8
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,global_escape,g_dpspGuidIpx
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,global_escape,g_dpspGuidModem
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,global_escape,g_dpspGuidSerial
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,global_escape,g_dpspGuidTcpip
+0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,global_escape,g_emptyText
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,global_escape,g_serialPortNumber
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,global_read,DPAID_ComPort
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,global_read,DPAID_INet
@@ -14874,7 +14874,7 @@ address,function,file,kind,target
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,field_read,Gui::layer
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,field_read,Layer::entries
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,function,
-0x44b330,CopySelectedGameName,src/frontend/multi.cpp,global_maybe_written,DAT_005119b8
+0x44b330,CopySelectedGameName,src/frontend/multi.cpp,global_maybe_written,g_emptyText
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,global_read,g_game
 0x44b330,CopySelectedGameName,src/frontend/multi.cpp,global_read,g_saveListDisplayNames
 0x44b3c0,HandleLoadListClick,src/frontend/multi.cpp,call,ClearSelectedGadget
@@ -14914,7 +14914,7 @@ address,function,file,kind,target
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_escape,g_savegameDescsName
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_escape,g_savegameNamesName
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_escape,g_star
-0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_maybe_written,DAT_005119b8
+0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_maybe_written,g_emptyText
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_maybe_written,g_gamesGadgetName
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_read,g_game
 0x44b4e0,ListSaveGameFiles,src/frontend/multi.cpp,global_read,g_saveListDisplayNames
@@ -14934,7 +14934,7 @@ address,function,file,kind,target
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,field_read,Gui::layer
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,field_read,Layer::entries
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,function,
-0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,global_maybe_written,DAT_005119b8
+0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,global_maybe_written,g_emptyText
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,global_read,g_game
 0x44b600,ShowSelectedSaveGame,src/frontend/multi.cpp,global_read,g_saveListDisplayNames
 0x44b690,HandleSaveGameClick,src/frontend/multi.cpp,call,BuildDataPath
@@ -14967,7 +14967,7 @@ address,function,file,kind,target
 0x44b690,HandleSaveGameClick,src/frontend/multi.cpp,field_read,Layer::entries
 0x44b690,HandleSaveGameClick,src/frontend/multi.cpp,field_write,<anon>::bit_38a51
 0x44b690,HandleSaveGameClick,src/frontend/multi.cpp,function,
-0x44b690,HandleSaveGameClick,src/frontend/multi.cpp,global_maybe_written,DAT_005119b8
+0x44b690,HandleSaveGameClick,src/frontend/multi.cpp,global_maybe_written,g_emptyText
 0x44b690,HandleSaveGameClick,src/frontend/multi.cpp,global_read,g_game
 0x44b690,HandleSaveGameClick,src/frontend/multi.cpp,global_read,g_saveListDisplayNames
 0x44b690,HandleSaveGameClick,src/frontend/multi.cpp,global_read,g_saveListFileNames
@@ -15010,7 +15010,7 @@ address,function,file,kind,target
 0x44b990,OpenSaveGameDialog,src/frontend/multi.cpp,fn_ref,HandleSaveGameClick
 0x44b990,OpenSaveGameDialog,src/frontend/multi.cpp,fn_ref,ShowSelectedSaveGame
 0x44b990,OpenSaveGameDialog,src/frontend/multi.cpp,function,
-0x44b990,OpenSaveGameDialog,src/frontend/multi.cpp,global_maybe_written,DAT_005119b8
+0x44b990,OpenSaveGameDialog,src/frontend/multi.cpp,global_maybe_written,g_emptyText
 0x44b990,OpenSaveGameDialog,src/frontend/multi.cpp,global_read,g_game
 0x44b990,OpenSaveGameDialog,src/frontend/multi.cpp,global_read,g_saveListDisplayNames
 0x44b990,OpenSaveGameDialog,src/frontend/multi.cpp,global_read,g_saveListFileNames
@@ -15050,7 +15050,7 @@ address,function,file,kind,target
 0x44bc10,OpenLoadListDialog,src/frontend/multi.cpp,fn_ref,HandleLoadListClick
 0x44bc10,OpenLoadListDialog,src/frontend/multi.cpp,fn_ref,ShowSelectedSaveGame
 0x44bc10,OpenLoadListDialog,src/frontend/multi.cpp,function,
-0x44bc10,OpenLoadListDialog,src/frontend/multi.cpp,global_maybe_written,DAT_005119b8
+0x44bc10,OpenLoadListDialog,src/frontend/multi.cpp,global_maybe_written,g_emptyText
 0x44bc10,OpenLoadListDialog,src/frontend/multi.cpp,global_read,g_game
 0x44bc10,OpenLoadListDialog,src/frontend/multi.cpp,global_read,g_saveListDisplayNames
 0x44bc10,OpenLoadListDialog,src/frontend/multi.cpp,global_read,g_saveListFileNames
@@ -16487,7 +16487,7 @@ address,function,file,kind,target
 0x451180,UpdateNetGameInfo,src/network/net_game.cpp,field_read,PlayerInfo::started
 0x451180,UpdateNetGameInfo,src/network/net_game.cpp,field_write,<anon>::flag_475_5
 0x451180,UpdateNetGameInfo,src/network/net_game.cpp,function,
-0x451180,UpdateNetGameInfo,src/network/net_game.cpp,global_maybe_written,DAT_005119b8
+0x451180,UpdateNetGameInfo,src/network/net_game.cpp,global_maybe_written,g_emptyText
 0x451180,UpdateNetGameInfo,src/network/net_game.cpp,global_read,g_game
 0x451220,CreateLocalPlayer,src/network/net_game.cpp,call,FindPlayerInUse
 0x451220,CreateLocalPlayer,src/network/net_game.cpp,call,GetTicks
@@ -16542,7 +16542,7 @@ address,function,file,kind,target
 0x451540,CreateNetGame,src/network/net_game.cpp,field_write,Game::numPlayers
 0x451540,CreateNetGame,src/network/net_game.cpp,field_write,PlayerInfo::host
 0x451540,CreateNetGame,src/network/net_game.cpp,function,
-0x451540,CreateNetGame,src/network/net_game.cpp,global_maybe_written,DAT_005119b8
+0x451540,CreateNetGame,src/network/net_game.cpp,global_maybe_written,g_emptyText
 0x451540,CreateNetGame,src/network/net_game.cpp,global_read,g_game
 0x4515d0,EnumPlayersCallback,src/network/net_game.cpp,call,AddNetPlayer
 0x4515d0,EnumPlayersCallback,src/network/net_game.cpp,call,GetSlotDpid
@@ -16659,7 +16659,7 @@ address,function,file,kind,target
 0x4517b0,JoinNetGame,src/network/net_game.cpp,field_write,SideDataPacket::type
 0x4517b0,JoinNetGame,src/network/net_game.cpp,fn_ref,EnumPlayersCallback
 0x4517b0,JoinNetGame,src/network/net_game.cpp,function,
-0x4517b0,JoinNetGame,src/network/net_game.cpp,global_escape,DAT_005119b8
+0x4517b0,JoinNetGame,src/network/net_game.cpp,global_escape,g_emptyText
 0x4517b0,JoinNetGame,src/network/net_game.cpp,global_escape,g_onlineLobbyPlayerName
 0x4517b0,JoinNetGame,src/network/net_game.cpp,global_maybe_written,g_packetManager
 0x4517b0,JoinNetGame,src/network/net_game.cpp,global_read,g_game
@@ -17009,7 +17009,7 @@ address,function,file,kind,target
 0x4538f0,HandleTimeoutDialog,src/network/net_game.cpp,field_read,Layer::entries
 0x4538f0,HandleTimeoutDialog,src/network/net_game.cpp,field_write,<anon>::dirty
 0x4538f0,HandleTimeoutDialog,src/network/net_game.cpp,function,
-0x4538f0,HandleTimeoutDialog,src/network/net_game.cpp,global_escape,DAT_005119b8
+0x4538f0,HandleTimeoutDialog,src/network/net_game.cpp,global_escape,g_emptyText
 0x4538f0,HandleTimeoutDialog,src/network/net_game.cpp,global_read,g_game
 0x4538f0,HandleTimeoutDialog,src/network/net_game.cpp,global_read,g_loungeChatter
 0x4538f0,HandleTimeoutDialog,src/network/net_game.cpp,global_read,g_timeoutPlayerDpid
@@ -17224,8 +17224,8 @@ address,function,file,kind,target
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_escape,g_integrityBreachText
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_escape,g_playerDisconnectedText
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_escape,g_playerMessageFormat
-0x453d40,HandleNetPackets,src/network/net_game.cpp,global_maybe_written,DAT_005119b8
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_maybe_written,g_allySoundName
+0x453d40,HandleNetPackets,src/network/net_game.cpp,global_maybe_written,g_emptyText
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_maybe_written,g_packetManager
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_read,g_game
 0x453d40,HandleNetPackets,src/network/net_game.cpp,global_read,g_usePacketManager
@@ -19413,7 +19413,7 @@ address,function,file,kind,target
 0x45f8c0,FillHelpPage,src/frontend/options.cpp,field_write,HelpPageLines::first
 0x45f8c0,FillHelpPage,src/frontend/options.cpp,field_write,HelpPageLines::last
 0x45f8c0,FillHelpPage,src/frontend/options.cpp,function,
-0x45f8c0,FillHelpPage,src/frontend/options.cpp,global_maybe_written,DAT_005119b8
+0x45f8c0,FillHelpPage,src/frontend/options.cpp,global_maybe_written,g_emptyText
 0x45f8c0,FillHelpPage,src/frontend/options.cpp,global_read,g_helpDialogBaseGadgetCount
 0x45fac0,HandleHelpClick,src/frontend/options.cpp,call,ClearSelectedGadget
 0x45fac0,HandleHelpClick,src/frontend/options.cpp,call,FillHelpPage
@@ -20443,7 +20443,7 @@ address,function,file,kind,target
 0x463e50,SendChatMessage,src/network/net_chat.cpp,field_maybe_written,Player::fullName
 0x463e50,SendChatMessage,src/network/net_chat.cpp,field_read,Game::net
 0x463e50,SendChatMessage,src/network/net_chat.cpp,function,
-0x463e50,SendChatMessage,src/network/net_chat.cpp,global_escape,DAT_005119b8
+0x463e50,SendChatMessage,src/network/net_chat.cpp,global_escape,g_emptyText
 0x463e50,SendChatMessage,src/network/net_chat.cpp,global_read,g_game
 0x463ef0,ExpireOldestMessage,src/network/net_chat.cpp,deref_read,*ChatHudEntry
 0x463ef0,ExpireOldestMessage,src/network/net_chat.cpp,field_escape,Game::entries
@@ -20590,7 +20590,7 @@ address,function,file,kind,target
 0x4644d0,ResetPlayerSlots,src/game/players.cpp,field_write,PlayerInfo::side
 0x4644d0,ResetPlayerSlots,src/game/players.cpp,field_write,PlayerInfo::started
 0x4644d0,ResetPlayerSlots,src/game/players.cpp,function,
-0x4644d0,ResetPlayerSlots,src/game/players.cpp,global_escape,DAT_005119b8
+0x4644d0,ResetPlayerSlots,src/game/players.cpp,global_escape,g_emptyText
 0x4644d0,ResetPlayerSlots,src/game/players.cpp,global_read,g_game
 0x464700,InitPlayerSlot,src/game/players.cpp,call,SimAlloc
 0x464700,InitPlayerSlot,src/game/players.cpp,call,memset
@@ -23667,7 +23667,7 @@ address,function,file,kind,target
 0x476a60,BuildCampaignNameList,src/frontend/campaign_menu.cpp,field_escape,SideDef::name
 0x476a60,BuildCampaignNameList,src/frontend/campaign_menu.cpp,field_read,TdfFile::current
 0x476a60,BuildCampaignNameList,src/frontend/campaign_menu.cpp,function,
-0x476a60,BuildCampaignNameList,src/frontend/campaign_menu.cpp,global_maybe_written,DAT_005119b8
+0x476a60,BuildCampaignNameList,src/frontend/campaign_menu.cpp,global_maybe_written,g_emptyText
 0x476a60,BuildCampaignNameList,src/frontend/campaign_menu.cpp,global_read,g_game
 0x476c70,StartBriefingNarration,src/frontend/campaign_menu.cpp,call,Mission::GetNameSlot
 0x476c70,StartBriefingNarration,src/frontend/campaign_menu.cpp,call,StreamSoundDelayed
@@ -23746,8 +23746,8 @@ address,function,file,kind,target
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,field_write,Gadget::colours
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,field_write,Gadget::tab
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,function,
-0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,global_escape,DAT_005119b8
-0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,global_maybe_written,DAT_005119b8
+0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,global_escape,g_emptyText
+0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,global_maybe_written,g_emptyText
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,global_read,g_briefingBaseGadgetCount
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,global_read,g_briefingPageIndex
 0x476ef0,DrawHelpPage,src/frontend/campaign_menu.cpp,global_read,g_briefingPaginateReset
@@ -29161,7 +29161,7 @@ address,function,file,kind,target
 0x48e010,MissionConditions::RegisterConditions,src/game/victory.cpp,field_read,MissionConditions::defeatCount
 0x48e010,MissionConditions::RegisterConditions,src/game/victory.cpp,field_read,MissionConditions::victoryCount
 0x48e010,MissionConditions::RegisterConditions,src/game/victory.cpp,function,
-0x48e010,MissionConditions::RegisterConditions,src/game/victory.cpp,global_escape,DAT_005119b8
+0x48e010,MissionConditions::RegisterConditions,src/game/victory.cpp,global_escape,g_emptyText
 0x48e010,MissionConditions::RegisterConditions,src/game/victory.cpp,global_read,kSim
 0x48ea00,MissionCondition::IsSatisfied,src/game/victory.cpp,field_read,MissionCondition::satisfied
 0x48ea00,MissionCondition::IsSatisfied,src/game/victory.cpp,function,
@@ -30433,9 +30433,9 @@ address,function,file,kind,target
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,field_write,Buf::diffs
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,field_write,Buf::gametype
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,function,
-0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,global_escape,DAT_005119b8
+0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,global_escape,g_emptyText
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,global_escape,g_savegameRadarFrame
-0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,global_maybe_written,DAT_005119b8
+0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,global_maybe_written,g_emptyText
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,global_read,g_game
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,global_read,g_savegameDescs
 0x491ec0,ShowSavedGameInfo,src/game/savegame.cpp,global_read,g_savegameDir
@@ -30560,7 +30560,7 @@ address,function,file,kind,target
 0x492b10,ListSavedGames,src/game/savegame.cpp,deref_write,*int
 0x492b10,ListSavedGames,src/game/savegame.cpp,field_maybe_written,Game::gui
 0x492b10,ListSavedGames,src/game/savegame.cpp,function,
-0x492b10,ListSavedGames,src/game/savegame.cpp,global_maybe_written,DAT_005119b8
+0x492b10,ListSavedGames,src/game/savegame.cpp,global_maybe_written,g_emptyText
 0x492b10,ListSavedGames,src/game/savegame.cpp,global_read,g_game
 0x492b10,ListSavedGames,src/game/savegame.cpp,global_read,g_savegameDescs
 0x492b10,ListSavedGames,src/game/savegame.cpp,global_read,g_savegameDir
@@ -31250,7 +31250,7 @@ address,function,file,kind,target
 0x495930,BuildScreenshotPath,src/ingame/keys.cpp,deref_read,*char
 0x495930,BuildScreenshotPath,src/ingame/keys.cpp,field_escape,ScreenshotFindData::name
 0x495930,BuildScreenshotPath,src/ingame/keys.cpp,function,
-0x495930,BuildScreenshotPath,src/ingame/keys.cpp,global_read,DAT_005119b8
+0x495930,BuildScreenshotPath,src/ingame/keys.cpp,global_read,g_emptyText
 0x495930,BuildScreenshotPath,src/ingame/keys.cpp,global_read,g_pathSepBackslash
 0x495a30,WriteScreenshot,src/ingame/keys.cpp,call,AllocFrame
 0x495a30,WriteScreenshot,src/ingame/keys.cpp,call,BmpWriter::Close
@@ -33566,9 +33566,9 @@ address,function,file,kind,target
 0x49e830,GameMain,src/game/main.cpp,fn_ref,ReleaseDisplayAfterCrash
 0x49e830,GameMain,src/game/main.cpp,fn_ref,ReopenCdAudio
 0x49e830,GameMain,src/game/main.cpp,function,
-0x49e830,GameMain,src/game/main.cpp,global_escape,DAT_005119b8
 0x49e830,GameMain,src/game/main.cpp,global_escape,g_cdShellValueName
 0x49e830,GameMain,src/game/main.cpp,global_escape,g_displayContext
+0x49e830,GameMain,src/game/main.cpp,global_escape,g_emptyText
 0x49e830,GameMain,src/game/main.cpp,global_escape,g_preferredLanguage
 0x49e830,GameMain,src/game/main.cpp,global_escape,g_translationFile
 0x49e830,GameMain,src/game/main.cpp,global_maybe_written,g_displayContext
@@ -33793,7 +33793,7 @@ address,function,file,kind,target
 0x4a0090,UpdateHelpText,src/gui/gui.cpp,field_write,Gui::changed
 0x4a0090,UpdateHelpText,src/gui/gui.cpp,field_write,Gui::prevHoverGadget
 0x4a0090,UpdateHelpText,src/gui/gui.cpp,function,
-0x4a0090,UpdateHelpText,src/gui/gui.cpp,global_escape,DAT_005119b8
+0x4a0090,UpdateHelpText,src/gui/gui.cpp,global_escape,g_emptyText
 0x4a0180,FindGadgetChecked_C,src/gui/gui.cpp,call,FatalError
 0x4a0180,FindGadgetChecked_C,src/gui/gui.cpp,call,FindEntry
 0x4a0180,FindGadgetChecked_C,src/gui/gui.cpp,deref_escape,*Gadget
@@ -36098,7 +36098,7 @@ address,function,file,kind,target
 0x4ad350,ReadCommonSection,src/gui/gui_file.cpp,field_write,GuiFileCommonFields::xpos
 0x4ad350,ReadCommonSection,src/gui/gui_file.cpp,field_write,GuiFileCommonFields::ypos
 0x4ad350,ReadCommonSection,src/gui/gui_file.cpp,function,
-0x4ad350,ReadCommonSection,src/gui/gui_file.cpp,global_maybe_written,DAT_005119b8
+0x4ad350,ReadCommonSection,src/gui/gui_file.cpp,global_maybe_written,g_emptyText
 0x4ad4f0,WritePanelFields,src/gui/gui_file.cpp,call,HAPI_WriteFile
 0x4ad4f0,WritePanelFields,src/gui/gui_file.cpp,call,WriteKeyValue
 0x4ad4f0,WritePanelFields,src/gui/gui_file.cpp,call,WriteTabs
@@ -36128,7 +36128,7 @@ address,function,file,kind,target
 0x4ad890,ReadPanelFields,src/gui/gui_file.cpp,field_write,ReadPanelFieldsRecord::revision
 0x4ad890,ReadPanelFields,src/gui/gui_file.cpp,field_write,ReadPanelFieldsRecord::totalGadgets
 0x4ad890,ReadPanelFields,src/gui/gui_file.cpp,function,
-0x4ad890,ReadPanelFields,src/gui/gui_file.cpp,global_maybe_written,DAT_005119b8
+0x4ad890,ReadPanelFields,src/gui/gui_file.cpp,global_maybe_written,g_emptyText
 0x4ad980,WriteStatusField,src/gui/gui_file.cpp,call,HAPI_WriteFile
 0x4ad980,WriteStatusField,src/gui/gui_file.cpp,call,_itoa
 0x4ad980,WriteStatusField,src/gui/gui_file.cpp,call,sprintf
@@ -36165,7 +36165,7 @@ address,function,file,kind,target
 0x4adc70,ReadButtonFields,src/gui/gui_file.cpp,field_write,ReadButtonFieldsRecord::stages
 0x4adc70,ReadButtonFields,src/gui/gui_file.cpp,field_write,ReadButtonFieldsRecord::status
 0x4adc70,ReadButtonFields,src/gui/gui_file.cpp,function,
-0x4adc70,ReadButtonFields,src/gui/gui_file.cpp,global_maybe_written,DAT_005119b8
+0x4adc70,ReadButtonFields,src/gui/gui_file.cpp,global_maybe_written,g_emptyText
 0x4add60,WriteListBoxFields,src/gui/gui_file.cpp,call,HAPI_WriteFile
 0x4add60,WriteListBoxFields,src/gui/gui_file.cpp,call,_itoa
 0x4add60,WriteListBoxFields,src/gui/gui_file.cpp,call,sprintf
@@ -36195,7 +36195,7 @@ address,function,file,kind,target
 0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,field_read,ReadTextInputFieldsSource::tdf
 0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,field_write,ReadTextInputFieldsRecord::maxchars
 0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,function,
-0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,global_maybe_written,DAT_005119b8
+0x4adf10,ReadTextInputFields,src/gui/gui_file.cpp,global_maybe_written,g_emptyText
 0x4adf90,WriteSliderFields,src/gui/gui_file.cpp,call,HAPI_WriteFile
 0x4adf90,WriteSliderFields,src/gui/gui_file.cpp,call,_itoa
 0x4adf90,WriteSliderFields,src/gui/gui_file.cpp,call,sprintf
@@ -36218,7 +36218,7 @@ address,function,file,kind,target
 0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,field_write,SliderFieldsRecord::sliderCallback
 0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,field_write,SliderFieldsRecord::thick
 0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,function,
-0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,global_maybe_written,DAT_005119b8
+0x4ae170,ReadSliderFields,src/gui/gui_file.cpp,global_maybe_written,g_emptyText
 0x4ae230,WriteTextLinkFields,src/gui/gui_file.cpp,call,HAPI_WriteFile
 0x4ae230,WriteTextLinkFields,src/gui/gui_file.cpp,call,WriteTabsInline
 0x4ae230,WriteTextLinkFields,src/gui/gui_file.cpp,call,sprintf
@@ -36237,7 +36237,7 @@ address,function,file,kind,target
 0x4ae300,ReadTextLinkFields,src/gui/gui_file.cpp,field_write,ReadTextLinkFieldsRecord::hotkey
 0x4ae300,ReadTextLinkFields,src/gui/gui_file.cpp,field_write,ReadTextLinkFieldsRecord::link
 0x4ae300,ReadTextLinkFields,src/gui/gui_file.cpp,function,
-0x4ae300,ReadTextLinkFields,src/gui/gui_file.cpp,global_maybe_written,DAT_005119b8
+0x4ae300,ReadTextLinkFields,src/gui/gui_file.cpp,global_maybe_written,g_emptyText
 0x4ae380,WriteHotOrNotField,src/gui/gui_file.cpp,call,HAPI_WriteFile
 0x4ae380,WriteHotOrNotField,src/gui/gui_file.cpp,call,_itoa
 0x4ae380,WriteHotOrNotField,src/gui/gui_file.cpp,call,sprintf
@@ -36257,7 +36257,7 @@ address,function,file,kind,target
 0x4ae4b0,ReadFontFilenameField,src/gui/gui_file.cpp,field_maybe_written,ReadFontFilenameFieldRecord::text
 0x4ae4b0,ReadFontFilenameField,src/gui/gui_file.cpp,field_read,ReadFontFilenameFieldSource::tdf
 0x4ae4b0,ReadFontFilenameField,src/gui/gui_file.cpp,function,
-0x4ae4b0,ReadFontFilenameField,src/gui/gui_file.cpp,global_maybe_written,DAT_005119b8
+0x4ae4b0,ReadFontFilenameField,src/gui/gui_file.cpp,global_maybe_written,g_emptyText
 0x4ae4e0,WriteSurfFilenameField,src/gui/gui_file.cpp,call,HAPI_WriteFile
 0x4ae4e0,WriteSurfFilenameField,src/gui/gui_file.cpp,call,sprintf
 0x4ae4e0,WriteSurfFilenameField,src/gui/gui_file.cpp,call,strlen
@@ -36267,7 +36267,7 @@ address,function,file,kind,target
 0x4ae550,ReadSurfFilenameField,src/gui/gui_file.cpp,field_maybe_written,ReadSurfFilenameFieldRecord::text
 0x4ae550,ReadSurfFilenameField,src/gui/gui_file.cpp,field_read,ReadSurfFilenameFieldSource::tdf
 0x4ae550,ReadSurfFilenameField,src/gui/gui_file.cpp,function,
-0x4ae550,ReadSurfFilenameField,src/gui/gui_file.cpp,global_maybe_written,DAT_005119b8
+0x4ae550,ReadSurfFilenameField,src/gui/gui_file.cpp,global_maybe_written,g_emptyText
 0x4ae580,WriteNuttinField,src/gui/gui_file.cpp,call,HAPI_WriteFile
 0x4ae580,WriteNuttinField,src/gui/gui_file.cpp,call,_itoa
 0x4ae580,WriteNuttinField,src/gui/gui_file.cpp,call,sprintf
@@ -36336,7 +36336,7 @@ address,function,file,kind,target
 0x4aeac0,ReadGuiFile,src/gui/gui_file.cpp,field_write,GuiFileRangeTail::sliderCallback
 0x4aeac0,ReadGuiFile,src/gui/gui_file.cpp,field_write,GuiFileRangeTail::thick
 0x4aeac0,ReadGuiFile,src/gui/gui_file.cpp,function,
-0x4aeac0,ReadGuiFile,src/gui/gui_file.cpp,global_maybe_written,DAT_005119b8
+0x4aeac0,ReadGuiFile,src/gui/gui_file.cpp,global_maybe_written,g_emptyText
 0x4aeda0,FreeGafSlot,src/gui/gui_file.cpp,call,GameFreeThunk
 0x4aeda0,FreeGafSlot,src/gui/gui_file.cpp,field_read,Gui::values
 0x4aeda0,FreeGafSlot,src/gui/gui_file.cpp,field_write,Gui::language
@@ -37898,7 +37898,7 @@ address,function,file,kind,target
 0x4b7900,ExecuteCommand,src/util/commands.cpp,field_read,CommandHandlerSlot::mask
 0x4b7900,ExecuteCommand,src/util/commands.cpp,field_read,StringRef::data
 0x4b7900,ExecuteCommand,src/util/commands.cpp,function,
-0x4b7900,ExecuteCommand,src/util/commands.cpp,global_maybe_written,DAT_005119b8
+0x4b7900,ExecuteCommand,src/util/commands.cpp,global_maybe_written,g_emptyText
 0x4b7900,ExecuteCommand,src/util/commands.cpp,global_read,g_defaultCommandHandler
 0x4b7900,ExecuteCommand,src/util/commands.cpp,global_read,g_defaultCommandMask
 0x4b7900,ExecuteCommand,src/util/commands.cpp,indirect_call,indirect via void (*)(void *) __attribute__((stdcall))
@@ -39340,7 +39340,7 @@ address,function,file,kind,target
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_read,OPENHAPIFILE::node
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,field_write,ArchiveEntry::flags
 0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,function,
-0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,global_maybe_written,DAT_005119b8
+0x4be320,HAPI_ResolveShadowedFiles,src/files/hpi.cpp,global_maybe_written,g_emptyText
 0x4be3b0,HAPI_ClearShadowFlags,src/files/hpi.cpp,call,HAPI_ClearShadowFlags
 0x4be3b0,HAPI_ClearShadowFlags,src/files/hpi.cpp,field_read,ArchiveDirectory::count
 0x4be3b0,HAPI_ClearShadowFlags,src/files/hpi.cpp,field_read,ArchiveDirectory::entries
@@ -40143,7 +40143,7 @@ address,function,file,kind,target
 0x4c4340,TdfRecord::MakeTrimmedString,src/util/tdf.cpp,deref_read,*char
 0x4c4340,TdfRecord::MakeTrimmedString,src/util/tdf.cpp,deref_write,*char
 0x4c4340,TdfRecord::MakeTrimmedString,src/util/tdf.cpp,function,
-0x4c4340,TdfRecord::MakeTrimmedString,src/util/tdf.cpp,global_escape,DAT_005119b8
+0x4c4340,TdfRecord::MakeTrimmedString,src/util/tdf.cpp,global_escape,g_emptyText
 0x4c43f0,TdfRecord::ComputeRecordChecksum,src/util/tdf.cpp,call,ComputeChecksum
 0x4c43f0,TdfRecord::ComputeRecordChecksum,src/util/tdf.cpp,field_write,TdfRecord::text
 0x4c43f0,TdfRecord::ComputeRecordChecksum,src/util/tdf.cpp,function,
@@ -40292,7 +40292,7 @@ address,function,file,kind,target
 0x4c54f0,LoadTranslations,src/util/tdf.cpp,field_read,TdfFile::current
 0x4c54f0,LoadTranslations,src/util/tdf.cpp,function,
 0x4c54f0,LoadTranslations,src/util/tdf.cpp,global_escape,g_language
-0x4c54f0,LoadTranslations,src/util/tdf.cpp,global_maybe_written,DAT_005119b8
+0x4c54f0,LoadTranslations,src/util/tdf.cpp,global_maybe_written,g_emptyText
 0x4c54f0,LoadTranslations,src/util/tdf.cpp,global_maybe_written,g_language
 0x4c54f0,LoadTranslations,src/util/tdf.cpp,global_read,g_quirks
 0x4c54f0,LoadTranslations,src/util/tdf.cpp,global_read,g_translations
@@ -40323,7 +40323,7 @@ address,function,file,kind,target
 0x4c58a0,GetLocalizedString,src/util/tdf.cpp,field_read,TdfFile::current
 0x4c58a0,GetLocalizedString,src/util/tdf.cpp,function,
 0x4c58a0,GetLocalizedString,src/util/tdf.cpp,global_escape,g_language
-0x4c58a0,GetLocalizedString,src/util/tdf.cpp,global_maybe_written,DAT_005119b8
+0x4c58a0,GetLocalizedString,src/util/tdf.cpp,global_maybe_written,g_emptyText
 0x4c59d0,TdfFieldVector::Insert,src/util/tdf.cpp,call,insert
 0x4c59d0,TdfFieldVector::Insert,src/util/tdf.cpp,function,
 0x4c5ba0,TdfFieldVector::GetPairCount,src/util/tdf.cpp,call,size
@@ -41175,7 +41175,7 @@ address,function,file,kind,target
 0x4cb170,SaveScreenshot,src/graphics/pcx.cpp,field_read,tagPALETTEENTRY::peGreen
 0x4cb170,SaveScreenshot,src/graphics/pcx.cpp,field_read,tagPALETTEENTRY::peRed
 0x4cb170,SaveScreenshot,src/graphics/pcx.cpp,function,
-0x4cb170,SaveScreenshot,src/graphics/pcx.cpp,global_read,DAT_005119b8
+0x4cb170,SaveScreenshot,src/graphics/pcx.cpp,global_read,g_emptyText
 0x4cb170,SaveScreenshot,src/graphics/pcx.cpp,global_read,g_pathSepBackslash
 0x4cb2f0,AveragePrimitiveY,src/graphics/pcx.cpp,deref_read,*unsigned short
 0x4cb2f0,AveragePrimitiveY,src/graphics/pcx.cpp,field_read,Object3do::vertices
@@ -49705,14 +49705,14 @@ address,function,file,kind,target
 ,LoadFeatureSeq,src/map/features.cpp,call,TdfRecord::GetFieldString
 ,LoadFeatureSeq,src/map/features.cpp,deref_write,*AnimSrc
 ,LoadFeatureSeq,src/map/features.cpp,function,
-,LoadFeatureSeq,src/map/features.cpp,global_maybe_written,DAT_005119b8
+,LoadFeatureSeq,src/map/features.cpp,global_maybe_written,g_emptyText
 ,LoadFeatureSeqOnce,src/map/features.cpp,call,FindOptionalGafEntry
 ,LoadFeatureSeqOnce,src/map/features.cpp,call,TdfRecord::GetFieldString
 ,LoadFeatureSeqOnce,src/map/features.cpp,deref_read,*AnimSrc
 ,LoadFeatureSeqOnce,src/map/features.cpp,deref_write,*AnimSrc
 ,LoadFeatureSeqOnce,src/map/features.cpp,field_write,AnimSrc::kind
 ,LoadFeatureSeqOnce,src/map/features.cpp,function,
-,LoadFeatureSeqOnce,src/map/features.cpp,global_maybe_written,DAT_005119b8
+,LoadFeatureSeqOnce,src/map/features.cpp,global_maybe_written,g_emptyText
 ,LoadMeteorDefaultsNative,src/seams/native.cpp,call,MeteorParams::LoadMeteorDefaults
 ,LoadMeteorDefaultsNative,src/seams/native.cpp,function,
 ,LoadMeteorDefaultsThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
@@ -50139,7 +50139,7 @@ address,function,file,kind,target
 ,MovableVec3::Scale,src/ai/ai_player.cpp,field_write,MovableVec3::z
 ,MovableVec3::Scale,src/ai/ai_player.cpp,function,
 ,MoveClasses,src/harness/harness.cpp,function,
-,MoveClasses,src/harness/harness.cpp,global_escape,DAT_00512370
+,MoveClasses,src/harness/harness.cpp,global_escape,g_movementClassEntries
 ,MoveOrderToTail,src/orders/order_list.cpp,call,operator Order *
 ,MoveOrderToTail,src/orders/order_list.cpp,call,operator=
 ,MoveOrderToTail,src/orders/order_list.cpp,deref_read,*Ref<Order>

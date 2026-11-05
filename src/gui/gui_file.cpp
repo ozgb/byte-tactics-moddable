@@ -203,7 +203,7 @@ void __stdcall ReadCommonSection(GuiFileCommonFields* obj, TdfFile* tree)
     if (tree->SelectRecord("COMMON") == 1) {
         obj->id = (unsigned char)tree->current->GetFieldInt("id", 0);
         obj->assoc = (unsigned char)tree->current->GetFieldInt("assoc", 0);
-        tree->current->GetFieldString(obj->name, "name", 0x10, DAT_005119b8);
+        tree->current->GetFieldString(obj->name, "name", 0x10, g_emptyText);
         obj->xpos = (short)tree->current->GetFieldInt("xpos", 0);
         obj->ypos = (short)tree->current->GetFieldInt("ypos", 0);
         obj->width = (short)tree->current->GetFieldInt("width", 0);
@@ -215,7 +215,7 @@ void __stdcall ReadCommonSection(GuiFileCommonFields* obj, TdfFile* tree)
         obj->fontnumber = (unsigned char)tree->current->GetFieldInt("fontnumber", 0);
         obj->active = (unsigned char)tree->current->GetFieldInt("active", 0);
         obj->commonattribs = (unsigned char)tree->current->GetFieldInt("commonattribs", 0);
-        tree->current->GetFieldString(obj->help, "help", 0x80, DAT_005119b8);
+        tree->current->GetFieldString(obj->help, "help", 0x80, g_emptyText);
         memset(obj->help, 0, 0x81);
         strncpy(obj->help, Translate(obj->help), 0x80);
         int gf = tree->current->GetFieldInt("gaffile", 0);
@@ -331,10 +331,10 @@ struct ReadPanelFieldsRecord {
 void __stdcall ReadPanelFields(ReadPanelFieldsRecord* obj, TdfFile* src)
 {
     obj->totalGadgets = (short)src->current->GetFieldInt("totalgadgets", 0);
-    src->current->GetFieldString(obj->panel, "panel", 0x10, DAT_005119b8);
-    src->current->GetFieldString(obj->crdefault, "crdefault", 0x10, DAT_005119b8);
-    src->current->GetFieldString(obj->escdefault, "escdefault", 0x10, DAT_005119b8);
-    src->current->GetFieldString(obj->defaultfocus, "defaultfocus", 0x10, DAT_005119b8);
+    src->current->GetFieldString(obj->panel, "panel", 0x10, g_emptyText);
+    src->current->GetFieldString(obj->crdefault, "crdefault", 0x10, g_emptyText);
+    src->current->GetFieldString(obj->escdefault, "escdefault", 0x10, g_emptyText);
+    src->current->GetFieldString(obj->defaultfocus, "defaultfocus", 0x10, g_emptyText);
     if (src->SelectRecord("VERSION") == 1) {
         obj->major = (char)src->current->GetFieldInt("major", 0);
         obj->minor = (char)src->current->GetFieldInt("minor", 0);
@@ -454,10 +454,10 @@ void __stdcall ReadButtonFields(ReadButtonFieldsRecord* obj, ReadButtonFieldsSou
 {
     obj->status = (short)src->tdf->GetFieldInt("status", 0);
     memset(obj->text, 0, 0x80);
-    src->tdf->GetFieldString(obj->text, "text", 0x80, DAT_005119b8);
+    src->tdf->GetFieldString(obj->text, "text", 0x80, g_emptyText);
     strncpy(obj->text, Translate(obj->text), 0x80);
     char local[20];
-    src->tdf->GetFieldString(local, "quickkey", 0x13, DAT_005119b8);
+    src->tdf->GetFieldString(local, "quickkey", 0x13, g_emptyText);
     if (isalpha((unsigned char)local[0]))
         obj->quickkey = (unsigned char)local[0];
     else
@@ -556,7 +556,7 @@ void __stdcall ReadTextInputFields(ReadTextInputFieldsRecord* obj, ReadTextInput
     obj->maxchars = src->tdf->GetFieldInt("maxchars", 0);
     if (obj->maxchars > 0x80)
         obj->maxchars = 0x80;
-    src->tdf->GetFieldString(obj->text, "text", 0x80, DAT_005119b8);
+    src->tdf->GetFieldString(obj->text, "text", 0x80, g_emptyText);
     strcpy(obj->text, Translate(obj->text));
 }
 
@@ -623,7 +623,7 @@ void __stdcall ReadSliderFields(SliderFieldsRecord* obj, ReadSliderFieldsSource*
     obj->knobpos = src->tdf->GetFieldInt("knobpos", 0);
     obj->knobsize = src->tdf->GetFieldInt("knobsize", 0);
     obj->sliderCallback = 0;
-    src->tdf->GetFieldString(obj->text, "text", 0x80, DAT_005119b8);
+    src->tdf->GetFieldString(obj->text, "text", 0x80, g_emptyText);
     strcpy(obj->text, Translate(obj->text));
 }
 
@@ -665,9 +665,9 @@ void __stdcall ReadTextLinkFields(ReadTextLinkFieldsRecord* obj, ReadTextLinkFie
     obj->hotkey = 0;
     obj->link[0] = 0;
     memset(obj->text, 0, sizeof(obj->text));
-    src->tdf->GetFieldString(obj->text, "text", 0x80, DAT_005119b8);
+    src->tdf->GetFieldString(obj->text, "text", 0x80, g_emptyText);
     strncpy(obj->text, Translate(obj->text), 0x7f);
-    src->tdf->GetFieldString(obj->link, "link", 0x10, DAT_005119b8);
+    src->tdf->GetFieldString(obj->link, "link", 0x10, g_emptyText);
 }
 
 struct WriteHotOrNotFieldRecord {
@@ -738,7 +738,7 @@ struct ReadFontFilenameFieldRecord {
 // FUNCTION: 0x4ae4b0
 void __stdcall ReadFontFilenameField(ReadFontFilenameFieldRecord* obj, ReadFontFilenameFieldSource* src)
 {
-    src->tdf->GetFieldString(obj->text, "filename", 0x20, DAT_005119b8);
+    src->tdf->GetFieldString(obj->text, "filename", 0x20, g_emptyText);
 }
 
 struct WriteSurfFilenameFieldRecord {
@@ -773,7 +773,7 @@ struct ReadSurfFilenameFieldRecord {
 // FUNCTION: 0x4ae550
 void __stdcall ReadSurfFilenameField(ReadSurfFilenameFieldRecord* obj, ReadSurfFilenameFieldSource* src)
 {
-    src->tdf->GetFieldString(obj->text, "filename", 0x20, DAT_005119b8);
+    src->tdf->GetFieldString(obj->text, "filename", 0x20, g_emptyText);
 }
 
 #pragma pack(push, 1)
@@ -978,7 +978,7 @@ int __stdcall ReadGuiFile(GuiFileGadget* obj, char* name)
                 e->tail.s34.maxchars = (short)parser.current->GetFieldInt("maxchars", 0);
                 if (e->tail.s34.maxchars > 0x80)
                     e->tail.s34.maxchars = 0x80;
-                parser.current->GetFieldString(e->body.text, "text", 0x80, DAT_005119b8);
+                parser.current->GetFieldString(e->body.text, "text", 0x80, g_emptyText);
                 strcpy(e->body.text, Translate(e->body.text));
                 break;
             case 4:
@@ -987,16 +987,16 @@ int __stdcall ReadGuiFile(GuiFileGadget* obj, char* name)
                 e->tail.s34.knobpos = (short)parser.current->GetFieldInt("knobpos", 0);
                 e->tail.s34.knobsize = (short)parser.current->GetFieldInt("knobsize", 0);
                 e->tail.s34.sliderCallback = 0;
-                parser.current->GetFieldString(e->body.text, "text", 0x80, DAT_005119b8);
+                parser.current->GetFieldString(e->body.text, "text", 0x80, g_emptyText);
                 strcpy(e->body.text, Translate(e->body.text));
                 break;
             case 5:
                 e->tail.s5.link[0] = 0;
                 e->tail.s5.hotkey = 0;
                 memset(e->body.text, 0, sizeof(e->body.text));
-                parser.current->GetFieldString(e->body.text, "text", 0x80, DAT_005119b8);
+                parser.current->GetFieldString(e->body.text, "text", 0x80, g_emptyText);
                 strncpy(e->body.text, Translate(e->body.text), 0x7f);
-                parser.current->GetFieldString(e->tail.s5.link, "link", 0x10, DAT_005119b8);
+                parser.current->GetFieldString(e->tail.s5.link, "link", 0x10, g_emptyText);
                 break;
             case 6:
                 {
@@ -1005,10 +1005,10 @@ int __stdcall ReadGuiFile(GuiFileGadget* obj, char* name)
                 }
                 break;
             case 7:
-                parser.current->GetFieldString(e->body.text, "filename", 0x20, DAT_005119b8);
+                parser.current->GetFieldString(e->body.text, "filename", 0x20, g_emptyText);
                 break;
             case 8:
-                parser.current->GetFieldString(e->body.text, "filename", 0x20, DAT_005119b8);
+                parser.current->GetFieldString(e->body.text, "filename", 0x20, g_emptyText);
                 break;
             case 10:
                 e->body.nuttin = parser.current->GetFieldInt("nuttin", 0);

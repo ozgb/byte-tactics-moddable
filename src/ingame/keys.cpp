@@ -125,7 +125,7 @@ void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name,
             needSep = true;
         }
     }
-    sprintf(out, "%s%s%s*.%s", dir, needSep ? g_pathSepBackslash : DAT_005119b8, name, ext);
+    sprintf(out, "%s%s%s*.%s", dir, needSep ? g_pathSepBackslash : g_emptyText, name, ext);
     int handle = HAPI_FindFirst(out, &fd, -1, 1);
     if (handle >= 0) {
         do {
@@ -136,7 +136,7 @@ void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name,
         } while (HAPI_FindNext(handle, &fd) == 0);
         HAPI_FindClose(handle);
     }
-    sprintf(out, "%s%s%s%04i.%s", dir, needSep ? g_pathSepBackslash : DAT_005119b8, name, max + 1, ext);
+    sprintf(out, "%s%s%s%04i.%s", dir, needSep ? g_pathSepBackslash : g_emptyText, name, max + 1, ext);
 }
 
 // FUNCTION: 0x495a30

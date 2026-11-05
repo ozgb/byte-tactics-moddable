@@ -279,10 +279,10 @@ void __stdcall CmdPlan(CommandArgs* args)
 {
     g_aiCommandsEnabled = 0;
     for (int i = 1; i < args->count; ++i) {
-        if (!_strcmpi(args->GetArg(1, DAT_005119b8), "any")) g_aiCommandsEnabled = 1;
-        if (g_game->difficulty == 0 && !_strcmpi(args->GetArg(i, DAT_005119b8), "easy")) g_aiCommandsEnabled = 1;
-        if (g_game->difficulty == 1 && !_strcmpi(args->GetArg(i, DAT_005119b8), "medium")) g_aiCommandsEnabled = 1;
-        if (g_game->difficulty == 2 && !_strcmpi(args->GetArg(i, DAT_005119b8), "hard")) g_aiCommandsEnabled = 1;
+        if (!_strcmpi(args->GetArg(1, g_emptyText), "any")) g_aiCommandsEnabled = 1;
+        if (g_game->difficulty == 0 && !_strcmpi(args->GetArg(i, g_emptyText), "easy")) g_aiCommandsEnabled = 1;
+        if (g_game->difficulty == 1 && !_strcmpi(args->GetArg(i, g_emptyText), "medium")) g_aiCommandsEnabled = 1;
+        if (g_game->difficulty == 2 && !_strcmpi(args->GetArg(i, g_emptyText), "hard")) g_aiCommandsEnabled = 1;
     }
 }
 
@@ -301,7 +301,7 @@ void __stdcall CmdWeight(CommandArgs* args)
         int count;
         UnitTypeSet set;
         memset(&set, 0, sizeof(set));
-        g_seams.units->UnitTypeSetAddTypeOrCategory(&set, args->GetArg(1, DAT_005119b8), &count);
+        g_seams.units->UnitTypeSetAddTypeOrCategory(&set, args->GetArg(1, g_emptyText), &count);
         float value = args->GetFloatArg(2, 0);
         for (char i = 0; i < 10; i++) {
             if (g_game->players[i].ai != 0) {
@@ -318,7 +318,7 @@ void __stdcall CmdLimit(CommandArgs* args)
         int count;
         UnitTypeSet set;
         memset(&set, 0, sizeof(set));
-        g_seams.units->UnitTypeSetAddTypeOrCategory(&set, args->GetArg(1, DAT_005119b8), &count);
+        g_seams.units->UnitTypeSetAddTypeOrCategory(&set, args->GetArg(1, g_emptyText), &count);
         int value = args->GetIntArg(2, 0);
         for (char i = 0; i < 10; i++) {
             if (g_game->players[i].active != 0 && g_game->players[i].type == 2) {

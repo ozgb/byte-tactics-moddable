@@ -1800,7 +1800,7 @@ void __stdcall FillHelpPage(Gui* sub, int page, int lineCount)
             if (pp->first < pp->last) {
                 do {
                     wsprintfA(key, "Line%d", pp->first);
-                    if (parser.current->GetFieldString(value, key, 0x80, DAT_005119b8)) {
+                    if (parser.current->GetFieldString(value, key, 0x80, g_emptyText)) {
                         AddLine(pp, layer, value, y);
                         y += 0x12;
                     }

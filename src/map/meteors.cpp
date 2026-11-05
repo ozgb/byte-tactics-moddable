@@ -187,7 +187,7 @@ void MeteorParams::LoadMeteorDefaults()
     BuildDataPath(path, "gamedata", "meteor", g_extTdf);
     if (parser.LoadFile(path)
         && parser.SelectRecord("Default")) {
-        if (parser.current->GetFieldString((char*)this, "MeteorWeapon", 0x20, DAT_005119b8)) {
+        if (parser.current->GetFieldString((char*)this, "MeteorWeapon", 0x20, g_emptyText)) {
             radius = parser.current->GetFieldInt("MeteorRadius", 0);
             density = (float)parser.current->GetFieldDouble("MeteorDensity", 0.0);
             duration = (float)parser.current->GetFieldDouble("MeteorDuration", 0.0);

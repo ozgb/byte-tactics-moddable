@@ -532,6 +532,11 @@ signatures are `signatures.services` of the manifest.
 The services interface is at major 1 and minor 8 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
 `interfaces/services.h`). `CommandArgs_Count` came with minor 8, an addition: a module built without it needs nothing.
 
+`tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
+`Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter
+types and const-ness. An entry removed or retyped is breaking and needs a major bump; one added needs the minor bump.
+The baseline is the newest `interfaces-v*` tag, `interfaces-v2` from this change on, the first that has `services.h`.
+
 A service never returns a native address. A service that finds something outside what it may reach
 (a pointer outside the memory, an unknown handle) traps with a message that names it (section 13).
 

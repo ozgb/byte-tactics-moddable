@@ -37,13 +37,13 @@ def manifest(built: int | None = 1, adapters: tuple = (), other: dict | None = N
             "adapters": [{"interface": "t", "from_major": 1, "name": name, "args": [], "result": "void"} for name in adapters]}
 
 
-def verdict(old: str, new: str, tagged: bool = True, modules: dict | None = None) -> abidiff.Result:
+def verdict(old: str, new: str, tagged: bool = True, modules: dict | None = None, name: str = "t") -> abidiff.Result:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         (root / "old").mkdir()
         (root / "new").mkdir()
-        (root / "old/t.h").write_text(old)
-        (root / "new/t.h").write_text(new)
+        (root / ("old/%s.h" % name)).write_text(old)
+        (root / ("new/%s.h" % name)).write_text(new)
         (result,) = abidiff.diff_dirs(root / "old", root / "new", tagged, modules)
     return result
 
@@ -263,6 +263,82 @@ class VersionTest(unittest.TestCase):
         old = base % (0, "")
         self.assertTrue(verdict(old, base % (1, "virtual void B() = 0;")).ok)
         self.assertFalse(verdict(old, base % (0, "virtual void B() = 0;")).ok)
+
+
+def services(members: str, free: str = "", minor: int = 0, major: int = 1) -> str:
+    return """#define SERVICES_VERSION_MAJOR %d
+#define SERVICES_VERSION_MINOR %d
+class Args { public: int count; %s };
+%s
+""" % (major, minor, members, free)
+
+
+def judged(old: str, new: str) -> abidiff.Result:
+    return verdict(old, new, name="services", modules=manifest(built=None))
+
+
+class ServicesEntriesTest(unittest.TestCase):
+    members = "int Get(int i); static int Sum(int a, int b); int Size() const;"
+    free = "int __stdcall Roll(int range); void Fail(char* message);"
+
+    def test_unchanged_in_any_order(self):
+        old = services(self.members, self.free)
+        self.assertEqual(judged(old, old).summary, "ok (no change)")
+        reordered = services("int Size() const; static int Sum(int a, int b); int Get(int i);",
+                             "void Fail(char* message); int __stdcall Roll(int range);")
+        self.assertEqual(judged(old, reordered).summary, "ok (no change)")
+
+    def test_an_added_member_needs_the_minor(self):
+        old = services(self.members)
+        new = self.members + " void Clear();"
+        self.assertEqual(judged(old, services(new, minor=1)).summary, "ok (additive, minor 0->1)")
+        result = judged(old, services(new))
+        self.assertFalse(result.ok)
+        self.assertEqual(result.summary, "FAIL (additive change needs a minor bump, version is 1.0 -> 1.0)")
+        self.assertIn("new entry: Args::Clear", result.details)
+
+    def test_a_removed_member_is_breaking(self):
+        old = services(self.members)
+        new = "int Get(int i); int Size() const;"
+        for bump in ({"minor": 1}, {}):
+            result = judged(old, services(new, **bump))
+            self.assertFalse(result.ok)
+            self.assertIn("breaking change needs a major bump", result.summary)
+            self.assertIn("entry removed: Args::Sum", result.details)
+        self.assertTrue(judged(old, services(new, major=2)).ok)
+
+    def test_a_retyped_member_is_breaking(self):
+        old = services(self.members)
+        for changed in ("int Get(unsigned i); static int Sum(int a, int b); int Size() const;",
+                        "int Get(int i); static int Sum(int a, int b); int Size();",
+                        "int Get(int i); int Sum(int a, int b); int Size() const;",
+                        "int Get(int i); static int Sum(int a, int b); long Size() const;"):
+            result = judged(old, services(changed, minor=1))
+            self.assertFalse(result.ok, changed)
+            self.assertIn("breaking change needs a major bump", result.summary)
+
+    def test_a_free_function_is_added_removed_and_retyped(self):
+        old = services(self.members, self.free)
+        added = judged(old, services(self.members, self.free + " void Extra();", minor=1))
+        self.assertEqual(added.summary, "ok (additive, minor 0->1)")
+        self.assertFalse(judged(old, services(self.members, self.free + " void Extra();")).ok)
+        removed = judged(old, services(self.members, "int __stdcall Roll(int range);", minor=1))
+        self.assertFalse(removed.ok)
+        self.assertIn("entry removed: Fail", removed.details)
+        for changed in ("int __stdcall Roll(unsigned range); void Fail(char* message);",
+                        "int Roll(int range); void Fail(char* message);",
+                        "int __stdcall Roll(int range); void Fail(const char* message);"):
+            self.assertFalse(judged(old, services(self.members, changed, minor=1)).ok, changed)
+
+    def test_overloads_are_told_apart(self):
+        old = services("void Put(int a); void Put(char* a);")
+        self.assertEqual(judged(old, services("void Put(char* a); void Put(int a);")).summary, "ok (no change)")
+        self.assertFalse(judged(old, services("void Put(int a);", minor=1)).ok)
+
+    def test_other_headers_are_not_judged_by_entries(self):
+        old = header([SLOT_A]) + "void Free(int a);\n"
+        new = header([SLOT_A]) + "void Free(char a);\n"
+        self.assertEqual(verdict(old, new).summary, "ok (no change)")
 
 
 if __name__ == "__main__":

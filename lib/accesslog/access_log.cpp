@@ -7,6 +7,8 @@
 #include "classifier.h"
 #include "../../src/state/alloc_hooks.h"
 #include "../../src/state/sim_events.h"
+#include "../../src/state/sim_radar.h"
+#include "../../src/state/block.h"
 
 #define NS __attribute__((no_sanitize("address")))
 
@@ -1239,14 +1241,8 @@ NS Alloc* NewAlloc()
     return &g_pool[g_poolCount++];
 }
 
-NS void __cdecl OnAdded(void* p, unsigned size)
+NS void AddAlloc(unsigned a, unsigned size, unsigned site)
 {
-    Quiet quiet;
-    unsigned a = (unsigned)p;
-    if (!g_ready || a - g_blockLo >= kBlock)
-        return;
-    host_mutex_lock(g_allocLock);
-    unsigned site = g_depth > 0 ? g_curSite : 0;
     unsigned lo = 0, hi = g_siteCount;
     while (lo < hi) {
         unsigned mid = (lo + hi) / 2;
@@ -1278,6 +1274,16 @@ NS void __cdecl OnAdded(void* p, unsigned size)
     unsigned g = (a - g_blockLo) / 8;
     g_granuleIndex[g] = index;
     SetBit(g);
+}
+
+NS void __cdecl OnAdded(void* p, unsigned size)
+{
+    Quiet quiet;
+    unsigned a = (unsigned)p;
+    if (!g_ready || a - g_blockLo >= kBlock)
+        return;
+    host_mutex_lock(g_allocLock);
+    AddAlloc(a, size, g_depth > 0 ? g_curSite : 0);
     host_mutex_unlock(g_allocLock);
 }
 
@@ -1552,6 +1558,25 @@ extern "C" NS void __cdecl __asan_handle_no_return(void) {}
 extern "C" NS void __cdecl __asan_set_shadow_00(unsigned, unsigned) {}
 extern "C" NS void __cdecl __asan_set_shadow_f8(unsigned, unsigned) {}
 
+NS unsigned SiteWithin(void (*function)())
+{
+    unsigned start = (unsigned)function;
+    for (unsigned i = 0; i < g_siteCount; i++)
+        if (g_sites[i].ra > start && g_sites[i].ra - start < 0x100)
+            return g_sites[i].ra;
+    return 0;
+}
+
+NS void __cdecl AdoptExisting(void* payload, unsigned size, void*)
+{
+    unsigned site = 0;
+    if (size == sizeof(SimEventQueue))
+        site = SiteWithin(SimEventsCreate);
+    else if (size == sizeof(SimRadarArena))
+        site = SiteWithin(SimCaptureCreate);
+    AddAlloc((unsigned)payload, size, site);
+}
+
 NS void AccessLogInit()
 {
     unsigned size;
@@ -1585,6 +1610,7 @@ NS void AccessLogInit()
 #if BT_DEFER_WRITES
     DeferLoad();
 #endif
+    SimBlockForEach(AdoptExisting, 0);
     g_allocHooks = &g_hooks;
     g_ready = true;
 }

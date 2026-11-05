@@ -135,7 +135,7 @@ void ResetPlayerSlots()
         p->info->host = 0;
         p->info->color = (char)i;
         p->info->side = 0;
-        strcpy(p->info->map, DAT_005119b8);
+        strcpy(p->info->map, g_emptyText);
         p->ai = 0;
         p->lobbyDataSynced = 0;
         p->syncTick = 0;

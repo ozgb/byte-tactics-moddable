@@ -218,7 +218,7 @@ void LosLine::LoadLosLine(TdfFile* obj, short line, short mode)
     char buf[0x200];
 
     sprintf(name, "line%d", line + 1);
-    if (obj->current->GetFieldString(buf, name, 0x200, DAT_005119b8) != 0) {
+    if (obj->current->GetFieldString(buf, name, 0x200, g_emptyText) != 0) {
         char* tok = strtok(buf, ", ");
         if (tok == 0)
             return;

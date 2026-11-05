@@ -66,8 +66,8 @@ void __stdcall SendChatMessage(Player* from, char* text, int key, char* to)
 {
     char buf[200];
 
-    sprintf(buf, "<%s%s%s> %s", from->fullName, to ? "->" : DAT_005119b8,
-            to ? to : DAT_005119b8, text);
+    sprintf(buf, "<%s%s%s> %s", from->fullName, to ? "->" : g_emptyText,
+            to ? to : g_emptyText, text);
     SendChatPacket(buf);
     if (g_game->net->GetGameType() == 3) {
         ReportGameChat(buf);

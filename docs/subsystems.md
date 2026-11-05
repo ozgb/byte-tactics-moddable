@@ -79,7 +79,7 @@ Coverage: 5.9% of functions (1 of 17), 1.7% of lines, 0.0% of branches; 16 live 
 
 **Sim reads.** 13 items only read, 13 named. The most used (`g_game`, the root pointer, left out):
 
-`Game::ticks` (mixed); `Game::height` (sim); `Game::width` (sim); `Seams::weapons` (sim); `g_meteorWeaponName` (sim); `DAT_005119b8` (sim); `Game::weapons` (sim); `Game::windSpeedDenominator` (sim); `Game::windSpeedMax` (sim)
+`Game::ticks` (mixed); `Game::height` (sim); `Game::width` (sim); `Seams::weapons` (sim); `g_meteorWeaponName` (sim); `g_emptyText` (sim); `Game::weapons` (sim); `Game::windSpeedDenominator` (sim); `Game::windSpeedMax` (sim)
 
 **Draft interface.**
 
@@ -194,7 +194,7 @@ Coverage: 97.7% of functions (43 of 44), 84.3% of lines, 71.9% of branches; 1 li
 
 **Sim reads.** 63 items only read, 63 named. The most used (`g_game`, the root pointer, left out):
 
-`LosRadarSeam::GetMapCell` (sim); `Seams::los_radar` (sim); `Game::width` (sim); `Game::cells` (mixed); `DAT_005119b8` (sim); `Feature::name` (sim); `Game::height` (sim); `Game::spots` (sim); `Seams::map` (sim); `Feature::flags` (sim); `Feature::footprint` (sim); `Spot::anim` (sim)
+`LosRadarSeam::GetMapCell` (sim); `Seams::los_radar` (sim); `Game::width` (sim); `Game::cells` (mixed); `g_emptyText` (sim); `Feature::name` (sim); `Game::height` (sim); `Game::spots` (sim); `Seams::map` (sim); `Feature::flags` (sim); `Feature::footprint` (sim); `Spot::anim` (sim)
 
 **Draft interface.**
 

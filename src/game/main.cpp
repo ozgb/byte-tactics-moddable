@@ -192,9 +192,9 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     int shellRead = host_setting_get(HOST_SCOPE_SYSTEM, g_audioCdShellKey, NULL, HOST_SETTING_STRING, buf40, (unsigned int*)&size20);
     if (shellRead != HOST_SETTING_NO_ACCESS) {
         if (shellRead == 1) {
-            host_setting_set(HOST_SCOPE_SYSTEM, g_audioCdShellKey, NULL, HOST_SETTING_STRING, DAT_005119b8, 1);
+            host_setting_set(HOST_SCOPE_SYSTEM, g_audioCdShellKey, NULL, HOST_SETTING_STRING, g_emptyText, 1);
         } else {
-            strcpy(buf40, DAT_005119b8);
+            strcpy(buf40, g_emptyText);
         }
         size14 = 0x32;
         ReadGameRegistryValue(g_cdShellValueName, buf74, (unsigned int *)((int*)&size14));
@@ -247,7 +247,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
     if (host_setting_set(HOST_SCOPE_SYSTEM, g_audioCdShellKey, NULL, HOST_SETTING_STRING, buf40, 0)
         != HOST_SETTING_NO_ACCESS) {
-        strcpy(buf40, DAT_005119b8);
+        strcpy(buf40, g_emptyText);
         WriteGameRegistryValue((void *)g_cdShellValueName, buf40, 0x32);
     }
     ShutdownEnvironment(&g_displayContext);

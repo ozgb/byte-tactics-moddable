@@ -1816,7 +1816,7 @@ enum {
 
 static unsigned char* MoveClasses()
 {
-    return (unsigned char*)DAT_00512370 - 0x18;
+    return (unsigned char*)g_movementClassEntries - 0x18;
 }
 
 typedef Ref<unsigned char> SimView_g_explodedPieces[EXPLODED_SLOTS];

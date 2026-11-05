@@ -259,6 +259,8 @@ uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-di
 uv run tools/reference.py --check --both-modes --exe build/modern/TotalA.exe --game-dir ~/.ta   # every scenario, in both module modes: the full gate
 ```
 
+A pull request that adds a seam slot also runs `uv run tools/coverage.py --exe build/coverage/TotalA.exe --game-dir ~/.ta --check`, because the tier doesn't run it (that is how #860 missed a fall in the seams row).
+
 The gate is the modern build's `--check`: every scenario it plays must report equal. There are two tiers:
 `--tier` plays the scenarios of `GATE_TIER` (see "Gate tier" below) and is the gate of a pull request; the
 full `--check` plays all of them and is the gate of the changes in "When the full suite is the gate".

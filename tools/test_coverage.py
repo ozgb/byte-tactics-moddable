@@ -504,6 +504,45 @@ class UnstableTest(unittest.TestCase):
         self.assertEqual(marked.unstable, [proc])
 
 
+class KitTest(unittest.TestCase):
+    NEVER = ("Never", "src/game/economy.cpp", "?Never@@YAXXZ")
+    RESET = ("UnitResources::Reset", "src/game/economy.cpp", "?Reset@UnitResources@@QAEXXZ")
+    REASON = "kit: ai.Never, added for the oracle kit (#823); no 3.1c code calls the slot"
+
+    def totals(self, key):
+        return cov.summarize(EXPORT, KEY, NAME, None, None, {("economy", *key): self.REASON})[0]["economy"]
+
+    def test_a_kit_row_is_counted_apart(self):
+        plain = cov.summarize(EXPORT, KEY, NAME)[0]["economy"]
+        kit = self.totals(self.NEVER)
+        self.assertEqual((plain.functions, kit.functions), (2, 1))
+        self.assertEqual(kit.kit, [self.NEVER])
+        self.assertEqual(kit.never_entered, [])
+        self.assertEqual(kit.reasons, {self.NEVER: self.REASON})
+        self.assertIn("economy Never (src/game/economy.cpp)", cov.kit_list({"economy": kit}))
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "coverage.csv"
+            cov.write_csv({"economy": kit}, out)
+            back = cov.read_csv(out)
+        self.assertEqual(back["economy"].kit, [self.NEVER])
+        self.assertEqual(cov.kit_keys(back), {("economy", *self.NEVER): self.REASON})
+
+    def test_a_kit_row_outside_seams_or_on_a_non_native_is_rejected(self):
+        natives = {"GetNative"}
+        rows = lambda sub, name: {sub: cov.Totals(kit=[(name, "src/seams/native.cpp", "?F@@YAXXZ")])}
+        self.assertEqual(cov.misplaced_kit(rows("seams", "GetNative"), natives), "")
+        self.assertIn("economy Never", cov.misplaced_kit(rows("economy", "Never"), natives))
+        self.assertIn("seams Other", cov.misplaced_kit(rows("seams", "Other"), natives))
+        self.assertIn("seams GetNative", cov.misplaced_kit(rows("seams", "GetNative"), set()))
+
+    def test_an_entered_kit_row_fails_the_check(self):
+        entered = self.totals(self.RESET)
+        self.assertEqual(entered.kit, [])
+        self.assertEqual(entered.functions, 2)
+        self.assertIn("the reason is wrong and the function counts again", cov.entered_kit({"economy": entered}))
+        self.assertEqual(cov.entered_kit({"economy": self.totals(self.NEVER)}), "")
+
+
 class PlaySuiteTest(unittest.TestCase):
     def test_attempt_clears_the_scenarios_old_profiles(self):
         seen = []

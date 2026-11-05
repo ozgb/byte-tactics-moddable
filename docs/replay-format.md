@@ -689,7 +689,7 @@ its bracket, and, for a vector of structs or strings, the elements it newly hold
 `Nest#1.mids[0].leaves[2].kind`, `Nest#1.mids[1].leaves[0].steps[1]`, `Nest#1.mids[0].leaves[1].steps.length`. The walker follows the `object` vectors of an object, not those inside a vector of structs.
 
 A kind that derives from `BlockVector<T>` (`LosTable` is a `BlockVector<LosLine>`) is its own vector: its field has `"base": true` and no `member`, and sits at offset 0, `{"name": "lines", "kind": "vector", "base": true,
-"elem": {"mode": "value", "kind": "Line"}}`. The generated header checks `Type::value_type`, and that the kind is as big as a block vector.
+"elem": {"mode": "value", "kind": "Line"}}`. The generated header checks the vector's element type, and that the kind is as big as a block vector.
 
 ## Strings behind pointers
 

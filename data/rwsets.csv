@@ -11807,8 +11807,8 @@ address,function,file,kind,target
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,global_read,g_seams
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *) __attribute__((stdcall)) [UnitsSeam::FindScript]"
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(CobScript *, int, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgsByIndex]"
+0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(Unit *, Order *, int) __attribute__((stdcall)) [OrderTableEntry::notify]"
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(Unit *, short, char, int, int, int, int) __attribute__((stdcall)) [NetworkSeam::SendScriptCall]"
-0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(void *, Order *, unsigned int) __attribute__((stdcall)) [OrderTableEntry::notify]"
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,indirect via void (*)(UnitRef *) __attribute__((fastcall)) [UnitsSeam::UnitRefUnlink]
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,virtual OrderFx::~OrderFx
@@ -12147,7 +12147,7 @@ address,function,file,kind,target
 0x43b7c0,RunOrders,src/orders/order_list.cpp,function,
 0x43b7c0,RunOrders,src/orders/order_list.cpp,global_read,g_game
 0x43b7c0,RunOrders,src/orders/order_list.cpp,global_read,g_missionOrderTableVec@src/orders/order_list.cpp
-0x43b7c0,RunOrders,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(void *, Order *, unsigned int) __attribute__((stdcall)) [OrderTableEntry::notify]"
+0x43b7c0,RunOrders,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(Unit *, Order *, int) __attribute__((stdcall)) [OrderTableEntry::notify]"
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,call,RandomInt
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,call,RemoveAndDelete
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,call,operator Order *
@@ -12168,7 +12168,7 @@ address,function,file,kind,target
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,function,
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,global_read,g_game
 0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,global_read,g_missionOrderTableVec@src/orders/order_list.cpp
-0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(void *, Order *, unsigned int) __attribute__((stdcall)) [OrderTableEntry::notify]"
+0x43bad0,RunSecondaryOrders,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(Unit *, Order *, int) __attribute__((stdcall)) [OrderTableEntry::notify]"
 0x43bc90,RegisterOrderTypes,src/orders/order_list.cpp,call,BlockVector::Begin
 0x43bc90,RegisterOrderTypes,src/orders/order_list.cpp,call,BlockVector::End
 0x43bc90,RegisterOrderTypes,src/orders/order_list.cpp,call,BlockVector::PushBack

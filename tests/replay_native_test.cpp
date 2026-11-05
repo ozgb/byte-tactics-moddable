@@ -4475,7 +4475,7 @@ void ExecuteCommandSelfTest()
     value.Free();
 }
 
-typedef int(__stdcall* NotifyFn)(void*, Order*, unsigned int);
+typedef int(__stdcall* NotifyFn)(Unit*, Order*, int);
 
 unsigned CodeIndex(const char* table, const void* function)
 {

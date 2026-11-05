@@ -78,6 +78,7 @@ COUPLING_DATA = {
     "data/dependencies.csv": "writer,reader,item,phase,class,runs,example,flags\n"
                              "ai,units,Unit::flags,players,immediate,3,a@1,\n"
                              "ai,units,g_hiddenTable,players,immediate,2,a@2,\n"
+                             "ai,units,g_otherTable,players,immediate,7,a@9,\n"
                              "ai,orders,DeleteOrders,-,unobserved,0,,indirect\n"
                              "ai,units,MysteryCall,-,unobserved,0,,indirect\n"
                              "ai,orders,Unit::orders,-,unobserved,0,,\n"
@@ -101,7 +102,8 @@ COUPLING_DATA = {
                                   "ai,units,Unit::flags,players,g1,3,equal,3,0,0\n",
 }
 COUPLING_EXTRA = {"interfaces/orders.h": "struct OrdersSeam {\n    void (__stdcall* DeleteOrders)(int all);\n};\n",
-                  "data/state_classes.csv": "name,address,kind,proposed,class\nMake: new Order,0x0,heap,,sim\n"}
+                  "data/state_classes.csv": "name,address,kind,proposed,class\nMake: new Order,0x0,heap,,sim\n"
+                                           "g_hiddenTable,0x0,global,,const\ng_otherTable,0x0,global,,const\n"}
 COUPLING_LAYOUT = {"records": {"Unit": {"fields": [{"name": "flags"}, {"name": "orders"}]}}}
 COUPLING_SOURCE = "int MysteryCall(int a) { return a; }\nint ReactToAttack(int a) { return a; }\nint ChooseBuildOption(int a) { return a; }\nint g_hiddenTable[4];\n"
 
@@ -581,12 +583,12 @@ class CouplingTest(unittest.TestCase):
     def test_draws_evidence_renames_allocations_and_drops_undefined_items(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             _, files = coupling_export(tmp, Path(out) / "k")
-            self.assertTrue(files["draws.csv"].splitlines()[2].endswith("depends-on-earlier,Unit::flags;heap,a@2"))
+            self.assertTrue(files["draws.csv"].splitlines()[2].endswith("depends-on-earlier,Unit::flags;heap;const,a@2"))
 
     def test_pass_reads_drop_the_function_and_merge(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             _, files = coupling_export(tmp, Path(out) / "k")
-            self.assertEqual(files["pass_reads.csv"], "pass,item,reader,evidence,runs,example\nunits,Unit::flags,ai,same-record,5,a@2\n")
+            self.assertEqual(files["pass_reads.csv"], "pass,item,reader,evidence,runs,example\nunits,Unit::flags,ai,same-record,5,a@2\nunits,const,ai,other-record,1,a@3\n")
 
     def test_indirect_rows_are_kept_with_the_slot_or_call_as_item(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
@@ -597,6 +599,8 @@ class CouplingTest(unittest.TestCase):
             self.assertIn("ai,units,call,-,unobserved,0,,indirect", rows)
             self.assertIn("ai,orders,Unit::orders,-,unobserved,0,,", rows)
             self.assertNotIn("g_hiddenTable", files["dependencies.csv"])
+            self.assertIn("ai,units,const,players,immediate,7,a@9,", rows)
+            self.assertEqual(sum(r.startswith("ai,units,const,") for r in rows), 1)
             self.assertIn("-,units,rng,players,ordered,1,a@3,", rows)
 
     def test_allocation_sites_take_a_state_class_or_heap_and_the_renames_are_counted(self):
@@ -606,9 +610,12 @@ class CouplingTest(unittest.TestCase):
             rows = files["presentation_reads.csv"].splitlines()
             self.assertIn("heap,map,unknown,,own,1", rows)
             self.assertIn("sim,map,unknown,,own,2", rows)
-            self.assertEqual(counts, {"slot": 1, "call": 1, "state class": 1, "heap": 2})
+            self.assertEqual(counts, {"slot": 1, "call": 1, "state class": 1, "heap": 2, "undefined class": 4,
+                                      "undefined heap": 0, "merged": 2})
             self.assertEqual(oraclekit.renames(counts), "oraclekit: renamed 1 indirect items to interface.Slot, 1 to call, "
-                                                       "1 allocation sites to a state class, 2 to heap")
+                                                       "1 allocation sites to a state class, 2 to heap\n"
+                                                       "oraclekit: renamed 4 undefined items to a state class, 0 to heap; "
+                                                       "merged 2 rows that then shared a key")
 
     def test_no_function_name_is_exported_and_the_leak_check_passes(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:

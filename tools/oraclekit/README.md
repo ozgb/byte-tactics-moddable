@@ -127,5 +127,7 @@ is a call from the writer's subsystem into the reader's through a function point
 `interface.Slot` (the interface of `interfaces/` and the slot of its table, as in `economy.GetEnergyUse`), or `call` when no
 interface declares it. A block of memory that the game allocates is named by its state class (`sim`, `view`, `platform`,
 `mixed` or `const`: whether the simulation holds it), or `heap` when it has none. The random stream of
-the game's generator is `rng`, as in the trace format. The files leave out the rows of items that `layout.json` and the rest of
-the kit do not define (a table that no record of the layout holds).
+the game's generator is `rng`, as in the trace format. An item that `layout.json` and the rest of
+the kit do not define (a table that no record of the layout holds) is named by the state class of the table or record it lies
+in, or `heap`. Rows that share a key after these names merge into one, with the most runs and its example, so a row stands
+for every edge of that kind between the two subsystems.

@@ -29,9 +29,10 @@ COUPLING, in behavioural terms only: state items, phases, subsystems, classes, r
 the one of data/pass_reads.csv is dropped (rows that differ only by it merge, with the most runs of any of them). The
 `indirect` rows of data/dependencies.csv have a function as their item: it becomes `interface.Slot` (the interface header
 that declares the slot, a dot, the slot) or `call` when no header has it. An item that names an allocation site by the
-function that made it becomes the state class of data/state_classes.csv, or `heap` when it has none. A row whose item the
-kit does not define (a name that `allowed_identifiers` lacks) is dropped, and so is such an entry of the evidence of
-draws.csv; the random stream `rng.parkMiller` is written `rng`, as the trace format names it. `export` prints how many
+function that made it becomes the state class of data/state_classes.csv, or `heap` when it has none. An item the
+kit does not define (a name that `allowed_identifiers` lacks) becomes the state class of its row in that file, or of its
+type, or `heap`, and so does such an entry of the evidence of draws.csv; rows that then share a key merge, keeping the most
+runs and its example; the random stream `rng.parkMiller` is written `rng`, as the trace format names it. `export` prints how many
 items each rename touched. The leak check then covers these files like any other.
 """
 
@@ -354,7 +355,7 @@ class Names:
         self.known = known
         self.seams = seams
         self.classes = classes
-        self.counts = {"slot": 0, "call": 0, "state class": 0, "heap": 0}
+        self.counts = {"slot": 0, "call": 0, "state class": 0, "heap": 0, "undefined class": 0, "undefined heap": 0, "merged": 0}
 
     def slot(self, function: str, writer: str, reader: str) -> str:
         """`interface.Slot` for a function called through a seam, the reader's interface first; `call` when no interface has it."""
@@ -372,36 +373,57 @@ class Names:
         self.counts["state class" if name else "heap"] += 1
         return name or "heap"
 
-    def item(self, item: str) -> str | None:
-        """The behavioural name of an item, None when the kit does not define it."""
+    def item(self, item: str) -> str:
+        """The behavioural name of an item: the item, or the state class that holds it (`heap` when none does) when the kit does not define it."""
         item = STREAM_NAMES.get(item, item)
         if ALLOCATION_ITEM.search(item):
             return self.allocation(item)
-        return item if speclint.identifiers(item) <= self.known else None
+        if speclint.identifiers(item) <= self.known:
+            return item
+        name = self.classes.get(item) or self.classes.get(item.split("::", 1)[0])
+        self.counts["undefined class" if name else "undefined heap"] += 1
+        return name or "heap"
 
 
-def keep_items(rows: list[dict[str, str]], names: Names) -> list[dict[str, str]]:
-    """The rows whose `item` has a behavioural name, renamed; an `indirect` row's item becomes its seam slot."""
-    kept = []
+MERGE_KEYS = {
+    "dependencies": ("writer", "reader", "item", "phase", "class"),
+    "phase_dependencies": ("writer", "reader", "item", "phase_from", "phase_to", "class"),
+    "pass_reads": ("pass", "item", "reader", "evidence"),
+    "presentation_reads": ("item", "reader", "pattern", "covered_by_event", "visibility"),
+    "dependency_checks": ("writer", "reader", "item", "phase", "group"),
+}
+
+
+def keep_items(rows: list[dict[str, str]], names: Names, key: tuple[str, ...] = ()) -> list[dict[str, str]]:
+    """The rows with their items renamed (an `indirect` row's item becomes its seam slot); rows that then share `key` merge into the one with the most runs, its flags joined."""
+    out: dict[tuple, dict[str, str]] = {}
     for r in rows:
-        if "item" in r:
-            if "indirect" in r.get("flags", "").split(";"):
-                r["item"] = names.slot(r["item"], r["writer"], r["reader"])
-            elif (item := names.item(r["item"])) is None:
-                continue
-            else:
-                r["item"] = item
-        kept.append(r)
-    return kept
+        if "indirect" in r.get("flags", "").split(";"):
+            r["item"] = names.slot(r["item"], r["writer"], r["reader"])
+        elif "item" in r:
+            r["item"] = names.item(r["item"])
+        k = tuple(r[c] for c in key) if key else (id(r),)
+        if k not in out:
+            out[k] = r
+            continue
+        names.counts["merged"] += 1
+        old = out[k]
+        flags = ";".join(sorted({*old.get("flags", "").split(";"), *r.get("flags", "").split(";")} - {""}))
+        if int(r.get("runs") or 0) > int(old.get("runs") or 0):
+            old, r = r, old
+        if "flags" in old:
+            old["flags"] = flags
+        out[k] = old
+    return list(out.values())
 
 
-def kit_items(data: bytes, names: Names) -> bytes:
-    """A CSV file with an `item` column, its items renamed and the rows of items the kit does not define dropped."""
+def kit_items(data: bytes, names: Names, name: str = "") -> bytes:
+    """A CSV file with an `item` column, its items renamed and the rows that then share a key merged."""
     header, rows = csv_rows(data)
-    return csv_bytes(header, keep_items(rows, names))
+    return csv_bytes(header, keep_items(rows, names, MERGE_KEYS.get(name, ())))
 
 
-def kit_draws(data: bytes, names: Names) -> bytes:
+def kit_draws(data: bytes, names: Names, name: str = "") -> bytes:
     """data/draws.csv with `function` replaced by `site`, the number of the row within its pass, stream and subsystem, and the evidence items renamed."""
     header, rows = csv_rows(data)
     count: dict[tuple[str, str, str], int] = {}
@@ -410,23 +432,18 @@ def kit_draws(data: bytes, names: Names) -> bytes:
         key = (r["pass"], r["stream"], r["subsystem"])
         count[key] = count.get(key, 0) + 1
         r["site"] = str(count[key])
-        found = [names.item(e) for e in r["evidence"].split(";") if e]
-        r["evidence"] = ";".join(dict.fromkeys(e for e in found if e))
+        r["evidence"] = ";".join(dict.fromkeys(names.item(e) for e in r["evidence"].split(";") if e))
     return csv_bytes([("site" if c == "function" else c) for c in header], rows)
 
 
-def kit_pass_reads(data: bytes, names: Names) -> bytes:
+def kit_pass_reads(data: bytes, names: Names, name: str = "") -> bytes:
     """data/pass_reads.csv without `function`: rows of one pass, item, reader and evidence merge, with the most runs and its example."""
     header, rows = csv_rows(data)
-    merged: dict[tuple[str, str, str, str], dict[str, str]] = {}
-    for r in keep_items(rows, names):
-        key = (r["pass"], r["item"], r["reader"], r["evidence"])
-        if key not in merged or int(r["runs"]) > int(merged[key]["runs"]):
-            merged[key] = r
-    return csv_bytes([c for c in header if c != "function"], [merged[k] for k in sorted(merged)])
+    merged = keep_items(rows, names, MERGE_KEYS["pass_reads"])
+    return csv_bytes([c for c in header if c != "function"], sorted(merged, key=lambda r: tuple(r[c] for c in MERGE_KEYS["pass_reads"])))
 
 
-COUPLING_KIT = {"draws": kit_draws, "pass_reads": kit_pass_reads, "phase_boundaries": lambda data, names: data}
+COUPLING_KIT = {"draws": kit_draws, "pass_reads": kit_pass_reads, "phase_boundaries": lambda data, names, name="": data}
 SLOT = re.compile(r"\(\s*(?:__\w+\s*)?\*\s*(\w+)\s*\)")
 
 
@@ -443,14 +460,16 @@ def state_classes(data: bytes) -> dict[str, str]:
 
 def coupling_files(read, names: Names) -> dict[str, bytes]:
     """The kit's coupling/ files, derived from the data/ CSV files `read(path)` returns."""
-    return {"%s/%s.csv" % (COUPLING_DIR, name): COUPLING_KIT.get(name, kit_items)(read("data/%s.csv" % name), names)
+    return {"%s/%s.csv" % (COUPLING_DIR, name): COUPLING_KIT.get(name, kit_items)(read("data/%s.csv" % name), names, name)
             for name in COUPLING}
 
 
 def renames(counts: dict[str, int]) -> str:
-    """One line with the number of items renamed to a seam slot, `call`, a state class and `heap`."""
-    return "oraclekit: renamed %d indirect items to interface.Slot, %d to call, %d allocation sites to a state class, %d to heap" % (
-        counts["slot"], counts["call"], counts["state class"], counts["heap"])
+    """Two lines: the items renamed to a seam slot, `call`, a state class and `heap`; then the undefined items renamed and the rows merged."""
+    return ("oraclekit: renamed %d indirect items to interface.Slot, %d to call, %d allocation sites to a state class, %d to heap\n"
+            "oraclekit: renamed %d undefined items to a state class, %d to heap; merged %d rows that then shared a key" % (
+                counts["slot"], counts["call"], counts["state class"], counts["heap"],
+                counts["undefined class"], counts["undefined heap"], counts["merged"]))
 
 
 def kit_modules(data: bytes) -> bytes:

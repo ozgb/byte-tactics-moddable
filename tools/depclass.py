@@ -35,7 +35,7 @@ data/dependencies.csv has the columns writer,reader,item,phase,class,runs,exampl
   read-only   writer `-`, reader a simulation subsystem: the reader reads the item in the phase in some run and no
               run shows the item written in that phase by anyone (any subsystem, simulation or not).
   unobserved  an edge of data/coupling.csv between two simulation subsystems that no run enters (writer, reader and
-              item with a row in no phase, in any class above), with phase `-`, runs 0 and example `-`.
+              item with a row in no phase, in any class above), with phase `-`, runs 0 and an empty example.
 
 `runs` is the number of scenarios that show the edge in the class it is given. `example` is
 `<scenario>@<first_tick>`: the scenario with the smallest first tick among those runs, the alphabetically first
@@ -43,11 +43,12 @@ on a tie. For deferrable it is the later of the two rows' first ticks (when the 
 `flags` holds `dynamic-only` when data/coupling.csv has no row of any kind from the writer to the reader: the
 runs found a dependency that the static analysis did not.
 
-Coupling edges used. Only the `shared_write` rows of data/coupling.csv (from writes, to reads or writes the item
-`target`) are state edges and can be unobserved: `from` is the writer and `to` the reader. The `call` rows between
-simulation subsystems are none (tools/coupling.py --seams fails on one), and the `indirect` rows are calls through
-seam slots and function pointers: they carry no state item, the access log records no calls, so they have no row
-here.
+Coupling edges used. The `shared_write` rows of data/coupling.csv between two simulation subsystems (from writes,
+to reads or writes the item `target`) are state edges: one the runs never enter is `unobserved`. The `indirect`
+rows between two simulation subsystems are calls through a seam slot or a function pointer, with a function as
+`target`. The access log records data accesses and no calls, so these edges are unobserved by construction: each
+gets an `unobserved` row with the flag `indirect`. The `call` rows between simulation subsystems are none
+(tools/coupling.py --seams fails on one). `unobserved` rows have an empty `example`.
 
 Gaps. No scenario of the test mode runs marker 0 of a tick, so the `net` phase has no rows. 304 static and 130
 global rows of data/state_classes.csv have no symbol in the map and never appear as items, so a coupling edge on one
@@ -119,6 +120,11 @@ def read_coupling(text: str) -> list[dict]:
     return list(csv.DictReader(io.StringIO(text)))
 
 
+def is_sim_edge(row: dict) -> bool:
+    """Whether a coupling row is a shared_write or indirect edge between two different simulation subsystems."""
+    return row["kind"] in ("shared_write", "indirect") and row["from"] in SIM and row["to"] in SIM and row["from"] != row["to"]
+
+
 def classify(summaries: dict[str, list[dict]], coupling_rows: list[dict]) -> list[dict]:
     """The rows of data/dependencies.csv for the summaries of the scenarios and the rows of data/coupling.csv."""
     hits: dict[tuple, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(dict))
@@ -177,10 +183,9 @@ def classify(summaries: dict[str, list[dict]], coupling_rows: list[dict]) -> lis
         out.append({"writer": key[0], "reader": key[1], "item": key[2], "phase": key[3], "class": cls,
                     "runs": len(runs), "example": "%s@%d" % (example[0], example[1]), "flags": flags})
     for r in coupling_rows:
-        if r["kind"] == "shared_write" and r["from"] in SIM and r["to"] in SIM and r["from"] != r["to"] \
-                and (r["from"], r["to"], r["target"]) not in entered:
+        if is_sim_edge(r) and (r["kind"] == "indirect" or (r["from"], r["to"], r["target"]) not in entered):
             out.append({"writer": r["from"], "reader": r["to"], "item": r["target"], "phase": NONE,
-                        "class": "unobserved", "runs": 0, "example": NONE, "flags": ""})
+                        "class": "unobserved", "runs": 0, "example": "", "flags": "indirect" if r["kind"] == "indirect" else ""})
     return sorted(out, key=lambda r: (r["writer"], r["reader"], r["item"], r["phase"], r["class"]))
 
 
@@ -199,11 +204,10 @@ def missing_scenarios(summaries: dict[str, list[dict]]) -> list[str]:
 
 
 def uncovered(rows: list[dict], coupling_rows: list[dict]) -> list[tuple[str, str, str]]:
-    """The shared_write edges between simulation subsystems of coupling.csv that have no row in rows."""
+    """The shared_write and indirect edges between simulation subsystems of coupling.csv that have no row in rows."""
     have = {(r["writer"], r["reader"], r["item"]) for r in rows}
     return sorted({(c["from"], c["to"], c["target"]) for c in coupling_rows
-                   if c["kind"] == "shared_write" and c["from"] in SIM and c["to"] in SIM and c["from"] != c["to"]
-                   and (c["from"], c["to"], c["target"]) not in have})
+                   if is_sim_edge(c) and (c["from"], c["to"], c["target"]) not in have})
 
 
 def main() -> int:

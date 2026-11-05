@@ -87,10 +87,12 @@ class Classify(unittest.TestCase):
                          ("units", "game", "shared_write", "Unit::z"), ("units", "weapons", "indirect", "F"))
         rows = dc.classify({"a": a}, edges)
         r = by_edge(rows)[("units", "weapons", "Unit::y", "-")]
-        self.assertEqual((r["class"], r["runs"], r["example"]), ("unobserved", 0, "-"))
-        self.assertEqual(len(rows), 2)
+        self.assertEqual((r["class"], r["runs"], r["example"], r["flags"]), ("unobserved", 0, "", ""))
+        ind = by_edge(rows)[("units", "weapons", "F", "-")]
+        self.assertEqual((ind["class"], ind["flags"]), ("unobserved", "indirect"))
+        self.assertEqual(len(rows), 3)
         self.assertEqual(dc.uncovered(rows, edges), [])
-        self.assertEqual(dc.uncovered([], edges), [("units", "weapons", "Unit::x"), ("units", "weapons", "Unit::y")])
+        self.assertEqual(dc.uncovered([], edges), [("units", "weapons", "F"), ("units", "weapons", "Unit::x"), ("units", "weapons", "Unit::y")])
 
 
 class Store(unittest.TestCase):

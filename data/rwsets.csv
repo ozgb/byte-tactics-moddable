@@ -17684,6 +17684,8 @@ address,function,file,kind,target
 0x457cb0,CountCombatPlayers,src/game/players.cpp,field_read,PlayerInfo::kind
 0x457cb0,CountCombatPlayers,src/game/players.cpp,function,
 0x457cb0,CountCombatPlayers,src/game/players.cpp,global_read,g_game
+0x457d30,UpdateResourceSharing,src/network/net_game.cpp,call,ShareEnergyAmount
+0x457d30,UpdateResourceSharing,src/network/net_game.cpp,call,ShareMetalAmount
 0x457d30,UpdateResourceSharing,src/network/net_game.cpp,call,operator->
 0x457d30,UpdateResourceSharing,src/network/net_game.cpp,field_escape,Game::players
 0x457d30,UpdateResourceSharing,src/network/net_game.cpp,field_read,Game::netGameFlags
@@ -57222,6 +57224,11 @@ address,function,file,kind,target
 ,SettingSetInt,src/host/settings_io.h,function,
 ,SettingSetString,src/host/settings_io.h,call,host_setting_set
 ,SettingSetString,src/host/settings_io.h,function,
+,ShareAmount,src/network/resource_share.h,function,
+,ShareEnergyAmount,src/network/resource_share.h,call,ShareAmount
+,ShareEnergyAmount,src/network/resource_share.h,function,
+,ShareMetalAmount,src/network/resource_share.h,call,ShareAmount
+,ShareMetalAmount,src/network/resource_share.h,function,
 ,ShowContinueWatchingDialog,src/ingame/game_dialogs.cpp,call,LoadGuiLayer
 ,ShowContinueWatchingDialog,src/ingame/game_dialogs.cpp,call,RenderLayer
 ,ShowContinueWatchingDialog,src/ingame/game_dialogs.cpp,call,SetKeyboardInput

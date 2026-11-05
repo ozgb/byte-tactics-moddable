@@ -1508,6 +1508,28 @@ int HarnessViewRand()
     return (s_viewState >> 16) & 0x7fff;
 }
 
+static void* s_loadEnded = nullptr;
+
+void HarnessLoadBegins()
+{
+    if (HarnessTestMode())
+        s_loadEnded = host_event_create(1, 0);
+}
+
+void HarnessLoadEnded()
+{
+    if (s_loadEnded != nullptr)
+        host_event_set(s_loadEnded);
+}
+
+int HarnessAwaitLoadAndEndFrame()
+{
+    if (s_loadEnded == nullptr)
+        return 0;
+    host_event_wait(s_loadEnded, HOST_WAIT_FOREVER);
+    return 1;
+}
+
 void HarnessStartSkirmish()
 {
     if (!HarnessTestMode() || s_started)

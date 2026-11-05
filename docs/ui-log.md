@@ -133,3 +133,4 @@ from. It is absolute: a single line reads on its own, and a build that skips or 
 later line. The check names the first tick where the counts differ, so a lost draw is found at the tick it is lost, not at the shake
 tick many ticks later. Draws are counted in the order of the game's own calls; the count says how many draws were made, and the
 `scroll` records say whether they went to the same consumers.
+In test mode the load completes before the first frame after it starts, so the number of frames drawn before tick 1, and with it the draws those frames make, is fixed and does not depend on how fast the machine loads.

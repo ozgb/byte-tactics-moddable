@@ -5,6 +5,7 @@
 #include "access_log.h"
 #include "classifier.h"
 #include "../../src/state/alloc_hooks.h"
+#include "../../src/state/sim_events.h"
 
 #define NS __attribute__((no_sanitize("address")))
 
@@ -42,7 +43,7 @@ struct Alloc {
     unsigned start, size, item, type, stride, seq, next;
 };
 struct Hit {
-    unsigned item, entA, entB, end;
+    unsigned item, container, entA, entB, end;
 };
 struct Range {
     unsigned start, end;
@@ -56,6 +57,16 @@ struct Stats {
 };
 struct Slot {
     unsigned ra, sub;
+};
+struct Func {
+    unsigned start, end;
+    const char* name;
+};
+const unsigned kKinds = 40;
+const unsigned kPresBits = 16;
+struct PresEntry {
+    unsigned item, container, func, sub, stamp, windows;
+    unsigned kinds[kKinds];
 };
 
 volatile int g_on;
@@ -72,6 +83,20 @@ const char** g_subNames;
 Range* g_ranges;
 unsigned g_rangeCount;
 Slot g_attrCache[1 << 16];
+
+Func* g_funcs;
+unsigned g_funcCount;
+Slot g_funcCache[1 << 14];
+PresEntry* g_pres;
+unsigned g_presUsed;
+unsigned g_presStamp;
+unsigned g_presWindows, g_presActiveWindows;
+bool g_presActive;
+bool g_presOverflow;
+unsigned char g_tickKinds[kKinds];
+unsigned char g_prevKinds[kKinds];
+unsigned g_seenTail;
+unsigned g_kindWindows[kKinds];
 
 unsigned g_itemCount;
 const char** g_itemNames;
@@ -287,6 +312,21 @@ NS void LoadItems(const unsigned char* data)
     }
 }
 
+NS void LoadFuncs(const unsigned char* data)
+{
+    Reader r = {data + 4};
+    g_funcCount = r.U32();
+    g_funcs = (Func*)Zeroed(sizeof(Func) * (g_funcCount + 1));
+    for (unsigned i = 0; i < g_funcCount; i++) {
+        g_funcs[i].start = r.U32();
+        g_funcs[i].end = r.U32();
+        unsigned n = r.U16();
+        g_funcs[i].name = CopyString(r.p, n);
+        r.p += n;
+    }
+    g_pres = (PresEntry*)Zeroed(sizeof(PresEntry) << kPresBits);
+}
+
 NS void LoadImage()
 {
     const void* base = 0;
@@ -339,6 +379,78 @@ NS inline unsigned Attribute(void* ra)
     return sub;
 }
 
+NS unsigned FunctionOf(void* ra)
+{
+    unsigned r = (unsigned)ra;
+    Slot* slot = &g_funcCache[(r * 2654435761u) >> 18];
+    if (slot->ra == r)
+        return slot->sub;
+    unsigned a = r - 1;
+    unsigned lo = 0, hi = g_funcCount;
+    while (lo < hi) {
+        unsigned mid = (lo + hi) / 2;
+        if (g_funcs[mid].start <= a)
+            lo = mid + 1;
+        else
+            hi = mid;
+    }
+    unsigned f = lo > 0 && a < g_funcs[lo - 1].end ? lo : 0;
+    slot->ra = r;
+    slot->sub = f;
+    return f;
+}
+
+NS void NotePresentationRead(unsigned item, unsigned container, void* ra, unsigned sub)
+{
+    unsigned f = FunctionOf(ra);
+    unsigned h = (item * 40503u) ^ (f * 2654435761u) ^ (sub * 2246822519u) ^ (container * 3266489917u);
+    h ^= h >> 15;
+    unsigned mask = (1u << kPresBits) - 1;
+    for (unsigned n = 0; n <= mask; n++) {
+        PresEntry* e = &g_pres[(h + n) & mask];
+        if (e->func == 0) {
+            if (g_presUsed >= mask - (mask >> 3)) {
+                g_presOverflow = true;
+                return;
+            }
+            e->item = item;
+            e->container = container;
+            e->func = f + 1;
+            e->sub = sub;
+            g_presUsed++;
+        } else if (e->item != item || e->container != container || e->func != f + 1 || e->sub != sub) {
+            continue;
+        }
+        if (e->stamp != g_presStamp) {
+            e->stamp = g_presStamp;
+            e->windows++;
+            for (unsigned k = 0; k < kKinds; k++)
+                e->kinds[k] += g_prevKinds[k];
+        }
+        g_presActive = true;
+        return;
+    }
+    g_presOverflow = true;
+}
+
+NS void ReadEventKinds(bool atMarker)
+{
+    Quiet quiet;
+    SimEventQueue& q = SimEvents();
+    unsigned tail = q.tail;
+    if (atMarker) {
+        for (unsigned i = q.head; i != tail; i++) {
+            const SimEvent& e = q.records[i % SIM_EVENT_CAPACITY];
+            if (e.flags & SIM_EVENT_CONTINUED)
+                continue;
+            g_tickKinds[e.kind < kKinds ? e.kind : kKinds - 1] = 1;
+        }
+    } else if (tail > g_seenTail) {
+        g_tickKinds[0] = 1;
+    }
+    g_seenTail = tail;
+}
+
 NS inline unsigned FieldIndex(const Type* t, unsigned off)
 {
     if (t->byteMap != 0)
@@ -357,6 +469,7 @@ NS inline unsigned FieldIndex(const Type* t, unsigned off)
 NS void RefineInRegion(unsigned item, unsigned type, unsigned stride, unsigned start, unsigned end, unsigned off, unsigned a, Hit* h)
 {
     h->item = item;
+    h->container = item;
     h->entB = 0;
     h->end = start + end;
     if (type == kNone || stride == 0)
@@ -470,7 +583,7 @@ NS bool Resolve(unsigned a, Hit* h)
             g_stats.constants++;
             return false;
         }
-        h->item = g_idUnresolvedImage;
+        h->item = h->container = g_idUnresolvedImage;
         h->entB = 0;
         h->end = a + 1;
         g_stats.unresolvedImage++;
@@ -501,7 +614,7 @@ NS bool Resolve(unsigned a, Hit* h)
                 g_stats.unresolvedBlock++;
             return true;
         }
-        h->item = g_idUnresolvedBlock;
+        h->item = h->container = g_idUnresolvedBlock;
         h->entB = 0;
         h->end = a + 1;
         g_stats.unresolvedBlock++;
@@ -542,6 +655,8 @@ NS void Record(int store, unsigned a, unsigned size, void* ra)
             continue;
         }
         g_stats.accesses++;
+        if (!store && g_window == ACCESS_WINDOW_PRESENTATION && g_pres != 0)
+            NotePresentationRead(h.item, h.container, ra, sub);
         if (sub == 0)
             g_stats.noSubsystem++;
         if (store) {
@@ -735,6 +850,59 @@ int __cdecl CompareRows(const void* x, const void* y)
     return c;
 }
 
+int __cdecl ComparePres(const void* x, const void* y)
+{
+    const PresEntry* a = *(const PresEntry* const*)x;
+    const PresEntry* b = *(const PresEntry* const*)y;
+    int c = strcmp(g_itemNames[a->item], g_itemNames[b->item]);
+    if (c == 0)
+        c = strcmp(SubName(a->sub), SubName(b->sub));
+    if (c == 0)
+        c = strcmp(g_itemNames[a->container], g_itemNames[b->container]);
+    if (c == 0)
+        c = strcmp(a->func == 1 ? "-" : g_funcs[a->func - 2].name, b->func == 1 ? "-" : g_funcs[b->func - 2].name);
+    return c;
+}
+
+NS void WritePresentation()
+{
+    PresEntry** rows = (PresEntry**)Zeroed(sizeof(PresEntry*) * (g_presUsed + 1));
+    unsigned n = 0;
+    for (unsigned i = 0; i < (1u << kPresBits); i++)
+        if (g_pres[i].func != 0)
+            rows[n++] = &g_pres[i];
+    qsort(rows, n, sizeof(PresEntry*), ComparePres);
+    Out out = {0, 0, 0};
+    out.Add("item,reader,function,windows,events,container\n");
+    for (unsigned i = 0; i < n; i++) {
+        const PresEntry* e = rows[i];
+        out.Add("\"");
+        out.Add(g_itemNames[e->item]);
+        out.Add("\",");
+        out.Add(SubName(e->sub));
+        out.Add(",\"");
+        out.Add(e->func == 1 ? "-" : g_funcs[e->func - 2].name);
+        out.Add("\",");
+        out.Num(e->windows);
+        out.Add(",");
+        bool first = true;
+        for (unsigned k = 0; k < kKinds; k++) {
+            if (e->kinds[k] == 0)
+                continue;
+            if (!first)
+                out.Add(";");
+            first = false;
+            out.Num(k);
+            out.Add(":");
+            out.Num(e->kinds[k]);
+        }
+        out.Add(",\"");
+        out.Add(g_itemNames[e->container]);
+        out.Add("\"\n");
+    }
+    WriteWhole("access.presentation.csv", out);
+}
+
 }
 
 #define ACCESS_CALLBACK(N)                                                                                 \
@@ -801,6 +969,10 @@ NS void AccessLogInit()
         Die("accesslog: accesslog.attr and accesslog.items must be beside the exe (tools/accesslog.py tables)\n");
     LoadAttr(attr);
     LoadItems(items);
+    unsigned funcSize;
+    unsigned char* funcs = ReadWhole("accesslog.funcs", &funcSize);
+    if (funcs != 0)
+        LoadFuncs(funcs);
     LoadImage();
     g_allocLock = host_mutex_create();
     g_granuleIndex = (unsigned*)Zeroed(4 * kGranules);
@@ -826,6 +998,20 @@ NS void AccessLogWindow(int window)
         return;
     if (g_started && g_window != ACCESS_WINDOW_OFF)
         g_classifier.EndWindow(g_tick);
+    if (g_window == ACCESS_WINDOW_PRESENTATION && window != ACCESS_WINDOW_PRESENTATION) {
+        g_presWindows++;
+        g_presActiveWindows += g_presActive;
+        for (unsigned k = 0; k < kKinds; k++)
+            g_kindWindows[k] += g_prevKinds[k];
+    }
+    if (window == ACCESS_WINDOW_PRESENTATION && g_pres != 0) {
+        ReadEventKinds(false);
+        memcpy(g_prevKinds, g_tickKinds, sizeof g_prevKinds);
+        g_presStamp++;
+        g_presActive = false;
+    }
+    if (window == ACCESS_WINDOW_PENDING)
+        memset(g_tickKinds, 0, sizeof g_tickKinds);
     if (window == ACCESS_WINDOW_PENDING)
         g_tick = g_lastMarkerTick + 1;
     g_window = window;
@@ -848,6 +1034,8 @@ NS void AccessLogMarker(int phase, unsigned tick)
         return;
     g_tick = tick;
     g_lastMarkerTick = tick;
+    if (g_pres != 0)
+        ReadEventKinds(true);
     if (g_window == ACCESS_WINDOW_PENDING)
         g_classifier.ResolveLabel(phase == 0 ? 0 : 1);
     g_on = 0;
@@ -923,12 +1111,23 @@ NS void AccessLogFinish()
                  {"unresolved_image", g_stats.unresolvedImage}, {"unresolved_block", g_stats.unresolvedBlock},
                  {"writes", g_stats.writes}, {"range_calls", g_stats.ranges}, {"range_capped", g_stats.rangeCapped},
                  {"random_draws", g_stats.draws}, {"sound_records", g_stats.sounds}, {"ui_records", g_stats.uiRecords},
-                 {"edges", n}, {"overflow", g_classifier.Overflowed() ? 1u : 0u}, {"allocations", g_allocSeq}};
+                 {"edges", n}, {"overflow", g_classifier.Overflowed() ? 1u : 0u}, {"allocations", g_allocSeq},
+                 {"presentation_windows", g_presWindows}, {"presentation_active_windows", g_presActiveWindows},
+                 {"presentation_rows", g_presUsed}, {"presentation_overflow", g_presOverflow ? 1u : 0u}};
     for (unsigned i = 0; i < sizeof lines / sizeof lines[0]; i++) {
         stats.Add(lines[i].name);
         stats.Add(" ");
         stats.Num(lines[i].value);
         stats.Add("\n");
     }
+    for (unsigned k = 0; k < kKinds; k++) {
+        stats.Add("presentation_kind_");
+        stats.Num(k);
+        stats.Add(" ");
+        stats.Num(g_kindWindows[k]);
+        stats.Add("\n");
+    }
     WriteWhole("access.stats.txt", stats);
+    if (g_pres != 0)
+        WritePresentation();
 }

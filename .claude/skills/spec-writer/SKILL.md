@@ -33,7 +33,7 @@ This step is done when you can say, for every slot, its imports in order and its
 
 ## 2. Write
 
-Write `specs/<subsystem>.md` in the btm clone, on a branch `spec-<subsystem>`, section by section to the template. Use only the kit's names. Quote observable data exactly. Every claim of exact behaviour (a draw, a rounding, a width) goes in section 5 or is referenced from there.
+Write `specs/<subsystem>.md` in the btm clone, on a branch `spec-<subsystem>`, section by section to the template. Use only the kit's names. Quote observable data exactly. The `### Events` subsection of section 2 comes from `uv run tools/simeventsdoc.py --emitters` (the kinds the subsystem's code records, or `None.`); write each kind's "when" from the code that records it and its guard, as behaviour in the spec's own terms, citing the kit's `docs/sim-events.md` for the rest. A spec that uses one of that page's terms cites its Terms section. Every claim of exact behaviour (a draw, a rounding, a width) goes in section 5 or is referenced from there.
 
 This step is done when every slot of the interface has its subsection and the manifest entry is complete.
 

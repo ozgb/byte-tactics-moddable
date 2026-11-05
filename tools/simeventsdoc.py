@@ -2,7 +2,13 @@
 
     uv run tools/simeventsdoc.py --check    # fail, naming each problem, if the doc and the kinds differ
     uv run tools/simeventsdoc.py --phases   # print the computed phases of each kind
+    uv run tools/simeventsdoc.py --emitters # print, for each subsystem, the kinds its code records
     uv run tools/test_simeventsdoc.py       # tests, on synthetic inputs
+
+--emitters prints one line per subsystem of data/subsystems.csv, `<subsystem>: KIND, KIND` in the order of the enum, or
+`<subsystem>: none`. A subsystem records a kind when one of its functions (by data/subsystems.csv) holds the kind's name in
+its body or calls a function that does (a recording wrapper); a call into another subsystem's slot does not count, that
+subsystem records it. A function that holds a kind name and that data/subsystems.csv does not map is printed to stderr.
 
 The kinds are the enumerators of `enum SimEventKind` in interfaces/services.h. The heading convention of the doc: a kind
 has a section when a heading of level 2 or 3 (`## NAME` or `### NAME`) is exactly the enumerator's name, with nothing
@@ -28,6 +34,7 @@ not say a scenario reaches it.
 """
 
 import argparse
+import csv
 import re
 import sys
 from pathlib import Path
@@ -114,6 +121,48 @@ def recorders(sources: dict[str, str], names: list[str]) -> dict[str, set[str]]:
             for token in set(KIND_TOKEN.findall(body)) & known:
                 out[token].add(function)
     return out
+
+
+def emitters(names: list[str], sources: dict[str, str], rows: list[list[str]], edges: list[tuple[str, str]],
+             subsystems: list[dict]) -> tuple[dict[str, list[str]], list[str]]:
+    """The kinds recorded by the code of each subsystem (in the order of names), and the recorders no subsystem maps.
+
+    `subsystems` has the rows of data/subsystems.csv (function, file, subsystem). A recorder is mapped by its name and the
+    path of its file, else by its name alone; a caller of a recorder is mapped by its name."""
+    graph = hazards.Graph(rows, edges)
+    callers: dict[str, set[str]] = {}
+    for function, targets in graph.calls.items():
+        for target in targets:
+            callers.setdefault(target, set()).add(function)
+    by_name: dict[str, set[str]] = {}
+    by_file: dict[tuple[str, str], set[str]] = {}
+    for row in subsystems:
+        by_name.setdefault(row["function"], set()).add(row["subsystem"])
+        by_name.setdefault(row["function"].split("::")[-1], set()).add(row["subsystem"])
+        by_file.setdefault((row["function"].split("::")[-1], row["file"]), set()).add(row["subsystem"])
+    known = set(names)
+    out: dict[str, set[str]] = {row["subsystem"]: set() for row in subsystems}
+    unmapped: set[str] = set()
+    for path, text in sources.items():
+        if Path(path).name in NOT_RECORDERS:
+            continue
+        for function, body in function_bodies(text):
+            held = set(KIND_TOKEN.findall(body)) & known
+            if not held:
+                continue
+            owners: set[str] = set()
+            for key, owner in by_file.items():
+                if key[0] == function and path.endswith(key[1]):
+                    owners |= owner
+            owners = owners or by_name.get(function, set())
+            if not owners:
+                unmapped.add(function)
+            for subsystem in owners:
+                out.setdefault(subsystem, set()).update(held)
+            for caller in callers.get(function, ()):
+                for subsystem in by_name.get(caller, ()):
+                    out.setdefault(subsystem, set()).update(held)
+    return {s: [n for n in names if n in kinds_of] for s, kinds_of in sorted(out.items())}, sorted(unmapped)
 
 
 def computed_phases(names: list[str], sources: dict[str, str], rows: list[list[str]], edges: list[tuple[str, str]]) -> dict:
@@ -216,17 +265,27 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true", help="fail if a kind has no section, a section names no kind, or a Phases line differs from the call graph")
     parser.add_argument("--phases", action="store_true", help="print the computed phases of each kind")
+    parser.add_argument("--emitters", action="store_true", help="print the kinds recorded by the code of each subsystem")
     parser.add_argument("--header", type=Path, default=HEADER, help="the header (default interfaces/services.h)")
     parser.add_argument("--doc", type=Path, default=DOC, help="the doc (default docs/sim-events.md)")
     args = parser.parse_args()
-    if args.check == args.phases:
-        sys.exit("simeventsdoc: pass exactly one of --check and --phases")
+    if args.check + args.phases + args.emitters != 1:
+        sys.exit("simeventsdoc: pass exactly one of --check, --phases and --emitters")
     names = kinds(args.header.read_text())
     sources = {str(p): p.read_text(errors="replace") for p in sorted(SRC.rglob("*")) if p.suffix in (".h", ".cpp", ".inc")}
     rows, graph = hazards.load_graph()
     edges = hazards.read_edges(hazards.EDGES, graph.functions)
     edges += [(call.caller, callee) for call in coupling.virtual_inputs()[0] for callee in sorted(call.callees)]
     edges += override_edges(rows, coupling.Classes.read(ROOT))
+    if args.emitters:
+        with coupling.SUBSYSTEMS_CSV.open(newline="") as f:
+            table = list(csv.DictReader(f))
+        found, unmapped = emitters(names, sources, rows, edges, table)
+        for subsystem, kinds_of in found.items():
+            print("%s: %s" % (subsystem, ", ".join(kinds_of) or "none"))
+        for function in unmapped:
+            print("simeventsdoc: recorder %s has no row in data/subsystems.csv" % function, file=sys.stderr)
+        return
     phases = computed_phases(names, sources, rows, edges)
     if args.phases:
         for name in names:

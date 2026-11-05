@@ -98,6 +98,35 @@ class Recorders(unittest.TestCase):
         self.assertEqual(sd.recorders(src, NAMES)["SIM_EVENT_SOUND"], set())
 
 
+class Emitters(unittest.TestCase):
+    table = [
+        {"function": "Root", "file": "src/a.cpp", "subsystem": "economy"},
+        {"function": "Leaf", "file": "src/a.cpp", "subsystem": "units"},
+        {"function": "Other", "file": "src/a.cpp", "subsystem": "orders"},
+        {"function": "RecordSound", "file": "src/state/sim_effects.h", "subsystem": "game"},
+        {"function": "RecordSmoke", "file": "src/state/sim_effects.h", "subsystem": "game"},
+        {"function": "Idle", "file": "src/b.cpp", "subsystem": "ai"},
+    ]
+
+    def test_recorders_and_their_callers_own_the_kinds(self):
+        got, unmapped = sd.emitters(NAMES, SOURCES, ROWS, [], self.table)
+        self.assertEqual(got["game"], ["SIM_EVENT_SOUND", "SIM_EVENT_SMOKE"])
+        self.assertEqual(got["units"], ["SIM_EVENT_SOUND"])
+        self.assertEqual(got["orders"], ["SIM_EVENT_SMOKE"])
+        self.assertEqual(unmapped, [])
+
+    def test_a_call_into_another_subsystem_does_not_count(self):
+        got, _ = sd.emitters(NAMES, SOURCES, ROWS, [], self.table)
+        self.assertEqual(got["economy"], [])
+        self.assertEqual(got["ai"], [])
+
+    def test_an_unmapped_recorder_is_listed(self):
+        sources = dict(SOURCES, **{"src/c.cpp": "void Stray()\n{\n    Record(SIM_EVENT_SOUND);\n}\n"})
+        got, unmapped = sd.emitters(NAMES, sources, ROWS, [], self.table)
+        self.assertEqual(unmapped, ["Stray"])
+        self.assertEqual(got["game"], ["SIM_EVENT_SOUND", "SIM_EVENT_SMOKE"])
+
+
 class Phases(unittest.TestCase):
     def setUp(self):
         self.patch = mock.patch.object(sd.sc, "Walks")

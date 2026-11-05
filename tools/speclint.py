@@ -10,7 +10,17 @@ Runs on a spec writer's machine, because it reads src/, include/ and lib/. A spe
   * an identifier (a name with an underscore, an inner capital or a digit) found in the source but nowhere in the kit;
   * a fenced code block whose info string isn't `text`;
   * a run of more than --run tokens that also appears in a source file, unless it holds fewer than three
-    distinct words (a list of kinds such as `int, int, int, int` is not a copy).
+    distinct words (a list of kinds such as `int, int, int, int` is not a copy);
+  * no `### Events` heading between the `## 2.` and `## 3.` headings (a file named TEMPLATE.md is exempt from this and the
+    next rule, and its placeholder `SIM_EVENT_NAME` from the rule after, because it describes the subsection);
+  * an Events subsection that neither names a `SIM_EVENT_` kind nor holds `None.`, or that names a kind and does not
+    contain `docs/sim-events.md`;
+  * a `SIM_EVENT_` name anywhere that is not a `kind` of the kit's interfaces/sim_events.csv (read as a table; a kit
+    without that file is refused once);
+  * a use of a term of the Terms section of the kit's docs/sim-events.md (compared in lower case, with hex numbers as their
+    values, as whole words) in a spec that nowhere contains the sentence "`docs/sim-events.md`, Terms": a spec that
+    uses an internal term cites the section rather than defining it again. The terms are read from the table after the
+    page's `## Terms` heading, the one part of the page that is read.
 
 String literals and comments are taken out of the source first, and a double-quoted span out of the spec only when its
 content is observable data: a string literal of the source or text found in the kit. Any other quoted span is linted
@@ -20,6 +30,7 @@ as ordinary text. Prints one line per problem and exits 1 when there is any.
 from __future__ import annotations
 
 import argparse
+import csv
 import re
 import sys
 from pathlib import Path
@@ -135,6 +146,99 @@ def lint(spec: str, source_ids: set[str], kit_ids: set[str], source_runs: set[in
     return sorted(problems)
 
 
+EVENT_KIND = re.compile(r"SIM_EVENT_[A-Z0-9_]+")
+HEX = re.compile(r"\b0x[0-9a-fA-F]+\b")
+EVENTS_TABLE = "interfaces/sim_events.csv"
+EVENTS_PAGE = "docs/sim-events.md"
+TERMS_CITATION = "`docs/sim-events.md`, Terms"
+SECTION_TWO = re.compile(r"^## 2\.")
+SECTION_THREE = re.compile(r"^## 3\.")
+EVENTS_HEADING = re.compile(r"^### Events\s*$")
+
+
+def norm_term(text: str) -> str:
+    """A term or text as compared: lower case, hex numbers as decimal, runs of white space as one space."""
+    return " ".join(HEX.sub(lambda m: str(int(m.group(0), 16)), text.lower()).split())
+
+
+def event_kinds(kit: Path) -> set[str] | None:
+    """The `kind` column of the kit's interfaces/sim_events.csv, None when the kit has no such file."""
+    path = kit / EVENTS_TABLE
+    if not path.is_file():
+        return None
+    with path.open(newline="", encoding="utf-8") as f:
+        return {row["kind"] for row in csv.DictReader(f)}
+
+
+def page_terms(kit: Path) -> list[str]:
+    """The terms of the table after `## Terms` in the kit's docs/sim-events.md (the first cell of each row), normalised."""
+    path = kit / EVENTS_PAGE
+    if not path.is_file():
+        return []
+    terms = []
+    in_terms = False
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("## "):
+            in_terms = line.strip() == "## Terms"
+        elif in_terms and line.startswith("|"):
+            cell = line.strip().strip("|").split("|")[0].strip()
+            if cell and cell != "Term" and not set(cell) <= {"-", ":", " "}:
+                terms.append(norm_term(cell))
+    return terms
+
+
+def events_section(lines: list[str]) -> tuple[int, list[str]] | None:
+    """The line number and text lines of the `### Events` subsection between `## 2.` and `## 3.`, None when absent."""
+    inside = False
+    start = None
+    body: list[str] = []
+    for number, line in enumerate(lines, 1):
+        if SECTION_TWO.match(line):
+            inside = True
+        elif SECTION_THREE.match(line):
+            break
+        elif inside and EVENTS_HEADING.match(line):
+            start = number
+        elif inside and start is not None and line.startswith("#"):
+            break
+        elif start is not None:
+            body.append(line)
+    return None if start is None else (start, body)
+
+
+def event_problems(spec: str, kinds: set[str] | None, terms: list[str], template: bool = False) -> list[tuple[int, str]]:
+    """The problems of a spec's sim event kinds and of its use of the page's terms, as (line number, message)."""
+    problems: list[tuple[int, str]] = []
+    lines = spec.splitlines()
+    section = events_section(lines)
+    if not template:
+        if section is None:
+            problems.append((1, "no `### Events` subsection between `## 2.` and `## 3.`"))
+        else:
+            start, body = section
+            text = "\n".join(body)
+            named = EVENT_KIND.findall(text)
+            if not named and "None." not in text:
+                problems.append((start, "the Events subsection names no `SIM_EVENT_` kind and does not say `None.`"))
+            if named and EVENTS_PAGE not in text:
+                problems.append((start, f"the Events subsection names kinds and does not cite `{EVENTS_PAGE}`"))
+    if kinds is None:
+        problems.append((1, f"the kit has no {EVENTS_TABLE}: the sim event kinds cannot be checked"))
+    else:
+        for number, line in enumerate(lines, 1):
+            for name in EVENT_KIND.findall(line):
+                if name not in kinds and not (template and name == "SIM_EVENT_NAME"):
+                    problems.append((number, f"{name} is not a kind in {EVENTS_TABLE}"))
+    if TERMS_CITATION not in spec:
+        for number, line in enumerate(lines, 1):
+            text = norm_term(line)
+            for term in terms:
+                if re.search(r"(?<![\w-])" + re.escape(term) + r"(?!\w)", text):
+                    problems.append((number, f"the term {term!r} is defined in the Terms section of {EVENTS_PAGE}: "
+                                     f"cite {TERMS_CITATION} rather than defining it"))
+    return problems
+
+
 def source_index(root: Path, run: int) -> tuple[set[str], set[int], set[str]]:
     """The identifiers of the source files, the hashes of their runs of run + 1 tokens, and their string literals."""
     ids: set[str] = set()
@@ -163,6 +267,8 @@ def main(argv: list[str] | None = None) -> int:
     kit = kit_text(args.kit)
     problems = lint(args.spec.read_text(encoding="utf-8"), source_ids, identifiers(kit), source_runs, args.run,
                     literals, kit)
+    problems = sorted(problems + event_problems(args.spec.read_text(encoding="utf-8"), event_kinds(args.kit),
+                                                page_terms(args.kit), args.spec.name == "TEMPLATE.md"))
     for number, message in problems:
         print(f"{args.spec}:{number}: {message}")
     if problems:

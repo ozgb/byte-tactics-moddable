@@ -98,7 +98,7 @@ unsigned* g_bits0;
 unsigned* g_bits1;
 unsigned* g_bits2;
 void* g_allocLock;
-volatile int g_busy;
+__declspec(thread) int g_busy;
 __declspec(thread) unsigned g_depth;
 __declspec(thread) unsigned g_curSite;
 

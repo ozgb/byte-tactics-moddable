@@ -17,6 +17,9 @@ An exe built from this tree runs its modules in WASM and is given wasmtime_host.
 from its directory (`cmake --build <dir> --target wasm_runtime` makes them); `--native-modules` runs it with
 `-modules=native` instead.
 
+`--record <subsystem>[:first:last]` runs instance 1 of a scenario with the game's `-record` switch and copies the
+`replay-<subsystem>.txt` it writes when it exits to the run's directory (docs/replay-format.md, "A play-test recording").
+
 `--testmode <file>` instead runs each exe with `-testmode <file>` (a scenario of
 reference/README.md) and passes when it exits with status 0 within
 `--testmode-timeout` seconds. A `--testmode` run uses the game's headless host: no X server,
@@ -109,6 +112,7 @@ SOUND_LEVEL = 200
 PREFIX_WRITTEN = ("system.reg", "user.reg", "userdef.reg", ".update-timestamp")
 TEMPLATE_REVISION = 2
 FRAMEDUMP_SWITCH = "-framedump"
+RECORD_SWITCH = "-record"
 FRAMEDUMP_KEY = "Scroll_Lock"
 FRAMEDUMP_TIMEOUT = 10.0
 FRAMEDUMP_RETRY = 2.5
@@ -481,7 +485,7 @@ class Instance:
         self.base.mkdir(parents=True, exist_ok=True)
         link_prefix(template, self.prefix)
         copy_game(game_src, self.game)
-        for stale in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt"):
+        for stale in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt", *self.run.recordings()):
             (self.game / stale).unlink(missing_ok=True)
         shutil.rmtree(self.game / "frames", ignore_errors=True)
         for dest, _ in self.run.put:
@@ -577,6 +581,8 @@ class Instance:
             args += ["-d"]
         if self.dumps_frames():
             args += [FRAMEDUMP_SWITCH]
+        if self.run.record and self.index == 1:
+            args += [RECORD_SWITCH, self.run.record]
         if self.run.testmode and self.run.blockscan:
             args += ["-blockscan" if self.run.blockscan == 1 else f"-blockscan={self.run.blockscan}"]
             if self.run.blockscan_verify:
@@ -804,6 +810,11 @@ class Instance:
                 _live.remove(self)
 
     def collect_traces(self) -> None:
+        if self.index == 1:
+            for name in self.run.recordings():
+                if (self.game / name).is_file():
+                    shutil.copyfile(self.game / name, self.run.out / name)
+                    self.run.notes.append(f"{name}: {self.run.out / name}")
         if not self.run.testmode:
             return
         for name in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt", CRASH_FILE):
@@ -1020,7 +1031,7 @@ class Run:
                  testdump: int | None = None, poison: bool = False, blockscan: int = 0,
                  windowed: bool = False, put: list[tuple[str, Path]] | None = None,
                  collect: list[str] | None = None, xserver: bool = False, native_modules: bool = False,
-                 framedump: bool = False, blockscan_verify: bool = False):
+                 framedump: bool = False, blockscan_verify: bool = False, record: str | None = None):
         self.number = number
         self.name = name
         self.scenario = scenario
@@ -1040,6 +1051,7 @@ class Run:
         self.xserver = xserver
         self.native_modules = native_modules
         self.framedump = framedump
+        self.record = record
         self.put = put or []
         self.collect = collect or []
         self.instances = [Instance(self, i + 1) for i in range(scenario.instances)]
@@ -1054,6 +1066,10 @@ class Run:
         self.events: list[str] = []
         self.started = False
         self.duration = 0.0
+
+    def recordings(self) -> list[str]:
+        """The file the game writes for --record, as a list (empty without it)."""
+        return [f"replay-{self.record.split(':')[0]}.txt"] if self.record else []
 
     def needs_netns(self) -> bool:
         return self.scenario.instances > 1 or self.scenario.directplay
@@ -1357,6 +1373,16 @@ class Run:
         (self.out / "result.json").write_text(json.dumps(data, indent=1) + "\n")
 
 
+def check_record(spec: str, known: set[str]) -> str | None:
+    """Why spec is not a -record value (`<subsystem>` or `<subsystem>:<first tick>:<last tick>`), or None when it is."""
+    parts = spec.split(":")
+    if parts[0] not in known:
+        return f"{parts[0]} is not a simulation subsystem"
+    if len(parts) not in (1, 3) or (len(parts) == 3 and not (parts[1].isdigit() and parts[2].isdigit() and 1 <= int(parts[1]) <= int(parts[2]))):
+        return "needs <subsystem> or <subsystem>:<first tick>:<last tick>, the first tick at least 1 and not after the last"
+    return None
+
+
 def runs_wasm_modules(exe: Path) -> bool:
     """Is exe a build of this tree (it has its CMake build directory beside it), which runs its modules in WASM unless told otherwise?"""
     return (exe.parent / "CMakeCache.txt").is_file()
@@ -1578,6 +1604,8 @@ def main() -> None:
                     help="run the exes of this tree with -framedump: each `shot` step dumps the frame last presented to <run>/<name>.bin, and runs of one scenario are compared")
     ap.add_argument("--windowed", action="store_true",
                     help="start each game in windowed mode (the game's -d switch; default full screen)")
+    ap.add_argument("--record", metavar="SUBSYSTEM[:FIRST:LAST]",
+                    help="run instance 1 with -record, and copy the replay-<subsystem>.txt it writes at exit to the run's directory (an exe of this tree; docs/replay-format.md)")
     ap.add_argument("--list", action="store_true", help="list the scenarios")
     ap.add_argument("--signature", nargs="+", metavar="NAME GEOMETRY IMAGE",
                     help="print a screens.txt line for an area of screenshots of one screen")
@@ -1610,6 +1638,12 @@ def main() -> None:
         ap.error("--window cannot be used with --testmode (a test-mode run has no window)")
     if args.testdump is not None and not args.testmode:
         ap.error("--testdump needs --testmode")
+    if args.record:
+        if args.testmode:
+            ap.error("--record does not apply to --testmode (a scenario has a record line)")
+        problem = check_record(args.record, set(json.loads((ROOT / "data/replay_schema.json").read_text())["subsystems"]))
+        if problem:
+            ap.error(f"--record: {problem}")
     if (args.blockscan or args.blockscan_every) and not args.testmode:
         ap.error("--blockscan and --blockscan-every need --testmode")
     if args.blockscan_verify and not (args.blockscan or args.blockscan_every):
@@ -1702,7 +1736,7 @@ def main() -> None:
                                 args.poison and sc is testmode, scan_every if sc is testmode else 0,
                                 args.windowed, put if sc is testmode else None,
                                 args.collect if sc is testmode else None, args.xserver and sc is testmode,
-                                args.native_modules, args.framedump, args.blockscan_verify))
+                                args.native_modules, args.framedump, args.blockscan_verify, args.record))
     parallel = args.parallel or min(3, len(runs))
     template = template_prefix()
     dplay = directplay_prefix() if any(sc.directplay for sc in scenarios) else None

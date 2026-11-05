@@ -27,6 +27,28 @@ uv run tools/replay.py --compare DIR_A DIR_B
 `--check` records again and fails when a recording of `tests/replay/` differs. `--compare` fails when two
 directories differ and names the first differing line. Record on a fresh Wine prefix, as the gate runs.
 
+## A play-test recording
+
+A subsystem that only a network game reaches (`UpdateResourceSharing` returns unless `Game.netGameFlags` bit 0 is set, and a
+transfer needs a remote partner) is recorded in a play-test instead of a scenario. A normal run (no `-testmode`) of an exe built
+from this tree takes the switch `-record <subsystem>[:<first tick>:<last tick>]`, which does what the `record` line does (the
+window is optional) and writes `replay-<subsystem>.txt` when the game exits through its main loop. A run without the switch is
+unchanged. The play-test passes it to instance 1:
+
+```sh
+uv run tools/playtest.py --exe build/modern/TotalA.exe --scenario mp --record economy[:FIRST:LAST] --game-dir DIR
+```
+
+`tools/playtest.py` copies the file to the run's directory (`build/playtest/<session>/mp-modern/replay-economy.txt`), and it is
+committed under `tests/replay/<subsystem>/` like any recording. A play-test has no reference trace to show that the game ran as 3.1c
+would, and `tools/replay.py --check` cannot play it again, so `tests/replay/playtests.json` lists each one
+(`"<subsystem>/<name>": "<the command that records it>"`) and `--check`, the default plan and `tools/oraclegate.py` leave it out.
+CI replays it with the others (`tools/ci_replays.sh`). `tools/test_replay.py` checks its arithmetic: every
+`players.TransferMetal` and `players.TransferEnergy` amount in `tests/replay/economy/mp-sharing.txt` must equal
+`ShareAmount` (`src/network/resource_share.h`) of the stock, share level, capacity and partner stock the recording knows,
+computed the way the x87 does at 53-bit precision, bit for bit. `UpdateResourceSharing` passes the metal share to
+`players.TransferEnergy` and the energy share to `players.TransferMetal`.
+
 ## Lines
 
 Text, LF line endings. The header is two lines: `bt-replay 2` and `subsystem wind_meteors 1.2` (the interface

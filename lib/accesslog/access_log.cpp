@@ -1269,6 +1269,12 @@ NS void __cdecl OnAdded(void* p, unsigned size)
         al->stride = 0;
     }
     al->seq = ++g_allocSeq;
+    if (ThreadId() == g_simThread) {
+        g_classifier.ForgetWriter(al->item);
+        if (al->type != kNone && al->stride != 0)
+            for (unsigned f = 0; f < g_types[al->type].count; f++)
+                g_classifier.ForgetWriter(g_types[al->type].fields[3 * f + 2]);
+    }
     unsigned g = (a - g_blockLo) / 8;
     g_granuleIndex[g] = index;
     SetBit(g);

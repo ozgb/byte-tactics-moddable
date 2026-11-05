@@ -49,6 +49,14 @@ public:
         if (depth > 0)
             depth--;
     }
+    void ForgetWriter(unsigned item)
+    {
+        ItemState* s = &state[item];
+        s->stamp = 0;
+        s->tickEpoch = 0;
+        s->tickWriter = 0;
+        s->writerOrd = 0;
+    }
     unsigned Floor() const { return level[depth].floor; }
     unsigned Depth() const { return depth; }
     unsigned MatchLevel() const { return matchLevel; }
@@ -210,6 +218,7 @@ inline void Classifier::EndWindow(unsigned tick)
         ItemState* s = &state[written[i]];
         if (!s->read)
             Count(s->writer, kNoSub, written[i], EVIDENCE_UNREAD, tick, 1);
+        s->read = 1;
     }
     writtenCount = 0;
 }
@@ -252,7 +261,8 @@ inline void Classifier::Write(unsigned item, unsigned entA, unsigned entB, unsig
     ItemState* s = &state[item];
     if (s->stamp != stamp) {
         s->stamp = stamp;
-        written[writtenCount++] = item;
+        if (writtenCount < items)
+            written[writtenCount++] = item;
     }
     s->writer = sub;
     s->entA = entA;

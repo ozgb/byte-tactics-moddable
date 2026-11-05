@@ -4,7 +4,6 @@ AiSearchGoal::count,presentation,unknown,,all-players,0
 BroadcastToggleFlags::b0,presentation,ui-action,,all-players,0
 BuildMenuPage::count,presentation,unknown,,all-players,6
 BuildMenuPage::entries,presentation,unknown,,all-players,6
-DAT_005119b8,presentation,unknown,,all-players,1
 Debris::angle_x,platform,ui-action,,per-player-filter,7
 Debris::angle_y,platform,ui-action,,per-player-filter,7
 Debris::angle_z,platform,ui-action,,per-player-filter,7
@@ -390,6 +389,7 @@ features,presentation,every-frame,,per-player-filter,83
 flagsByte_3923b,presentation,ui-action,,all-players,0
 flags_2a44,presentation,ui-action,,all-players,0
 flags_38d75,presentation,every-frame,,all-players,83
+g_emptyText,presentation,unknown,,all-players,1
 g_explodedPieces,presentation,every-frame,,per-player-filter,83
 g_lastPlaceHeight,presentation,unknown,,all-players,1
 g_lastPlaceMetalSum,map,unknown,,all-players,1

@@ -1,7 +1,6 @@
 item,reader,function,container,every,after
 BuildMenuPage::count,presentation,DisableUnavailableBuildMenuEntries,LoadDownloadMenus: GameAllocIgnoreTag BuildMenuPage,0,-
 BuildMenuPage::entries,presentation,DisableUnavailableBuildMenuEntries,LoadDownloadMenus: GameAllocIgnoreTag BuildMenuPage,0,-
-DAT_005119b8,presentation,??0StringRef@@QAE@PBD@Z,DAT_005119b8,0,-
 Feature::animTable,presentation,BlitFeatureGaf,LoadFeatureType: realloc Feature,1,
 Feature::flags16,presentation,BlitFeatureGaf,LoadFeatureType: realloc Feature,1,
 Feature::flagsHigh,presentation,DrawBattleFrame,LoadFeatureType: realloc Feature,1,
@@ -349,6 +348,7 @@ defs,units,FindUnitTypeId,defs,0,
 features,presentation,BlitFeatureGaf,features,1,
 features,presentation,DrawBattleFrame,features,1,
 flags_38d75,presentation,UpdateCdCategoryByActivity,flags_38d75,1,
+g_emptyText,presentation,??0StringRef@@QAE@PBD@Z,g_emptyText,0,-
 g_explodedPieces,presentation,DrawExplosions,g_explodedPieces,1,
 g_missionOrderTableVec,orders,??0MissionType@@QAE@PBD@Z,g_missionOrderTableVec,0,
 g_missionOrderTableVec,orders,??0Order@@QAE@EHHHHH@Z,g_missionOrderTableVec,0,-

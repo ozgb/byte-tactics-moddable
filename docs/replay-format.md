@@ -901,7 +901,7 @@ sets). The annotations hold what no header says:
 | `units` (`dir: out`) | a vector of `Unit` pointers an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
 
-A `bytes-in` import line carries the bytes the call passed in, so a `files.BankWriteBox` line is `i files.BankWriteBox bank#1 x:0102 2 = 2`: the handle, the bytes written, the length, then the result. It has no `o` line. A `bytes-out` import has no bytes in its line: `files.BankReadBox` shows `?` for the destination and the bytes arrive in the `o dst x:...` line after it, as long as the result. No stored recording has a `BankWriteBox` line yet (the save path is uncovered, #856).
+A `bytes-in` import line carries the bytes the call passed in, so a `files.BankWriteBox` line is `i files.BankWriteBox bank#1 x:0102 2 = 2`: the handle, the bytes written, the length, then the result. It has no `o` line. A `bytes-out` import has no bytes in its line: `files.BankReadBox` shows `?` for the destination and the bytes arrive in the `o dst x:...` line after it, as long as the result. The `BankWriteBox` lines of the recordings are in `tests/replay/economy/save-midgame.txt` (8 lines, under `SaveUnitAccounts`).
 
 A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
@@ -1099,8 +1099,8 @@ A call that differs is reported with the first import or field that differs and 
 there. Each file is replayed twice and the two results must be identical.
 
 `--self-test [FILE]` first round-trips a small graph of objects (a `Player` with two `Unit`s sharing a `UnitDef`)
-through the text form and reports a changed field at its `Kind#N.field`. It then does the same for each form that no
-recording uses yet: the indexed tables (`Projectile#3.speed`, `MovementClass#5.maxSlope`), the sized arrays (whole lines,
+through the text form and reports a changed field at its `Kind#N.field`. It then does the same for each form of the text
+format, whether or not a recording uses it: the indexed tables (`Projectile#3.speed`, `MovementClass#5.maxSlope`), the sized arrays (whole lines,
 chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
 struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
 `Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`

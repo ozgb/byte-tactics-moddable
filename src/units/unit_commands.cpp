@@ -639,16 +639,16 @@ struct UnitDef;
 #include "../units/unit_def.h"
 
 // FUNCTION: 0x488f30
-float __stdcall GetEnergyUse(UnitDef* def)
+double __stdcall GetEnergyUse(UnitDef* def)
 {
     if (def->energyuse != 0.0) {
         return def->energyuse;
     }
     if (def->windgenerator > 0.0f) {
-        return -(g_game->windStrength * def->windgenerator);
+        return -((double)g_game->windStrength * (double)def->windgenerator);
     }
     if (def->tidalgenerator > 0.0f) {
-        return -(g_game->tidal * def->tidalgenerator);
+        return -((double)g_game->tidal * (double)def->tidalgenerator);
     }
     return 0.0f;
 }

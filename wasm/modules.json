@@ -12,7 +12,7 @@
   "table_slots": 32,
   "majors": {
     "ai": 3,
-    "economy": 2,
+    "economy": 3,
     "features": 2,
     "files": 1,
     "host": 2,
@@ -36,7 +36,7 @@
     },
     "economy": {
       "UpdateResourceSharing": [["block"], "void"],
-      "GetEnergyUse": [["block"], "f32"],
+      "GetEnergyUse": [["block"], "f64"],
       "UpdatePlayerEconomy": [["block"], "void"],
       "UpdateMetalExtraction": [["block"], "void"],
       "Reset": [["block", "int"], "void"],

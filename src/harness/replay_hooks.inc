@@ -190,7 +190,7 @@ void __stdcall RecEconomyUpdateResourceSharing(Player* a0)
     }
 }
 
-float __stdcall RecEconomyGetEnergyUse(UnitDef* a0)
+double __stdcall RecEconomyGetEnergyUse(UnitDef* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITDEF, a0);
@@ -198,7 +198,7 @@ float __stdcall RecEconomyGetEnergyUse(UnitDef* a0)
     if (scope.Open()) {
         ArgObject(s_call, "def", ROK_UNITDEF, a0);
     }
-    float result = s_inner_economy->GetEnergyUse(a0);
+    double result = s_inner_economy->GetEnergyUse(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }

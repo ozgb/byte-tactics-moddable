@@ -1312,6 +1312,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     errors.append("%s: `base` is true, for a kind that derives from BlockVector" % where)
                 vectors.append(check_vector(where, f, spec["type"], ann, errors))
                 entry["vector"] = len(vectors)
+                if spec["scope"] == "value" and vectors[-1]["mode"] == "object":
+                    errors.append("%s: a vector of objects in a value kind is not followed by the walker; use a `value` or `scalar` element" % where)
                 if vectors[-1]["mode"] == "object" and vectors[-1]["kind"]:
                     entry["target"] = vectors[-1]["kind"]
             object_fields.append(entry)

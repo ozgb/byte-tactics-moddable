@@ -2619,6 +2619,12 @@ class NestedVectors(unittest.TestCase):
         scopes = {o["name"]: o["scope"] for o in model["objects"]}
         self.assertEqual([f for f in model["object_fields"] if f["kind"] == "vector" and scopes[f["object"]] == "value"], [])
 
+    def test_an_object_vector_in_a_value_kind_is_refused(self):
+        ann = annotations()
+        self.assertEqual(ann["objects"]["FixtureMid"]["scope"], "value")
+        self.field(ann, "FixtureMid", "leaves")["elem"] = {"mode": "object", "kind": "FixtureProgram"}
+        self.has(ann, "FixtureMid.leaves: a vector of objects in a value kind is not followed by the walker")
+
     def test_base_is_checked(self):
         ann = annotations()
         self.field(ann, "FixtureRow", "cells")["member"] = "cells"

@@ -105,6 +105,12 @@ class Coverage(unittest.TestCase):
         counts = cov.region_lines([region(10, 1, 14, 2, 4), region(12, 5, 12, 20, 0)], {0})
         self.assertEqual(counts, {10: 4, 11: 4, 12: 4, 13: 4, 14: 4})
 
+    def test_skipped_region_lines_are_not_code(self):
+        regions = [region(1, 1, 9, 2, 4), region(3, 1, 5, 7, 0, kind=2)]
+        self.assertEqual(cov.region_lines(regions, {0}), {1: 4, 2: 4, 6: 4, 7: 4, 8: 4, 9: 4})
+        self.assertEqual(cov.region_lines(regions + [region(5, 8, 5, 12, 4)], {0}), {1: 4, 2: 4, 5: 4, 6: 4, 7: 4, 8: 4, 9: 4})
+        self.assertEqual(cov.region_lines([region(1, 1, 9, 2, 4), region(3, 1, 5, 7, 0, 1, 2)], {0}), cov.region_lines([region(1, 1, 9, 2, 4)], {0}))
+
     def test_rare_branch_on_one_line_of_an_executed_body(self):
         counts = cov.region_lines([region(1, 1, 5, 2, 4), region(3, 5, 3, 20, 0)], {0})
         self.assertEqual(counts[3], 4)

@@ -143,6 +143,7 @@ SORTED = ("ai", "economy", "features", "files", "game", "los_radar", "map", "net
 METRICS = (("functions", "functions", "functions_entered"), ("lines", "lines", "lines_hit"),
            ("branches", "branches", "branches_covered"))
 CODE_REGION = 0
+SKIPPED_REGION = 2
 UNSTABLE = "unstable:"
 KIT = "kit:"
 KIT_SUBSYSTEM = "seams"
@@ -257,7 +258,7 @@ def read_live_counters(path: Path) -> set[str]:
 
 
 def region_lines(regions: list[list[int]], primary: set[int]) -> dict[int, int]:
-    """Line -> count over the code regions in the primary file: the larger of the innermost covering region's count and the largest count of the regions starting on the line."""
+    """Line -> count over the code regions in the primary file: the larger of the innermost covering region's count and the largest count of the regions starting on the line, without the lines a skipped region covers unless a code region starts on them."""
     starts: dict[int, int] = {}
     wrapped: dict[int, tuple[tuple[int, int], int]] = {}
     for r in regions:
@@ -271,6 +272,10 @@ def region_lines(regions: list[list[int]], primary: set[int]) -> dict[int, int]:
             if (first, col) >= wrapped.get(line, ((0, 0), 0))[0]:
                 wrapped[line] = ((first, col), count)
     counts = {line: count for line, (_, count) in wrapped.items()}
+    for r in regions:
+        if r[REGION_KIND] == SKIPPED_REGION and r[REGION_FILE_ID] in primary:
+            for line in range(r[0], r[2] + 1):
+                counts.pop(line, None)
     for line, count in starts.items():
         counts[line] = max(counts.get(line, 0), count)
     return counts

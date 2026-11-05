@@ -39,7 +39,7 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 
 ## Tightly coupled groups
 
-These are the largest sets of simulation subsystems joined by `immediate` or `ordered` edges. Each must stay one ordered pass per phase. They are the connected components, of two or more members, of the undirected graph of those edges, per phase and over all phases.
+These are the largest sets of simulation subsystems joined by `immediate` or `ordered` edges. Each must stay one ordered pass per phase. They are the connected components, of two or more members, of the undirected graph of those edges, per phase and over all phases. The random streams need no rule of their own: two subsystems that draw from one stream in a phase have an `ordered` row on it, so the streams are already in the groups. Under each phase, `streams` lists the subsystems that the `rng.*` rows join.
 
 **Phase `explosions`**:
 
@@ -52,10 +52,12 @@ These are the largest sets of simulation subsystems joined by `immediate` or `or
 **Phase `players`**:
 
 - 10 members: economy, ai, pathfinding, weapons, targeting, los_radar, orders, units, players, map
+- streams: 2 `ordered` rows on `rng.*` join ai, targeting
 
 **Phase `projectiles`**:
 
 - 8 members: features, ai, weapons, targeting, los_radar, orders, units, map
+- streams: 6 `ordered` rows on `rng.*` join features, ai, weapons
 
 **Phase `tail`**:
 
@@ -64,10 +66,12 @@ These are the largest sets of simulation subsystems joined by `immediate` or `or
 **Phase `units`**:
 
 - 10 members: economy, features, ai, weapons, targeting, los_radar, orders, units, players, map
+- streams: 23 `ordered` rows on `rng.*` join features, ai, weapons, targeting, orders, units, map
 
 **All phases together**:
 
 - 11 members: economy, features, ai, pathfinding, weapons, targeting, los_radar, orders, units, players, map
+- streams: 31 `ordered` rows on `rng.*` join features, ai, weapons, targeting, orders, units, map
 
 ## Phase boundaries
 

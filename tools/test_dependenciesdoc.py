@@ -47,6 +47,13 @@ class Groups(unittest.TestCase):
     def test_non_sim_rows_ignored(self):
         self.assertEqual(dd.tight_groups([dep("-", "a", "immediate"), dep("game", "a", "immediate")], SIMS), {})
 
+    def test_stream_members(self):
+        deps = [dep("c", "a", "ordered", "units", "rng.parkMiller"), dep("a", "b", "ordered", "units", "rng.crtHoldrand"),
+                dep("d", "e", "ordered", "units", "sound"), dep("a", "d", "immediate", "units", "rng.parkMiller")]
+        got = dd.stream_members(deps, SIMS)
+        self.assertEqual(got["units"], (2, "a, b, c"))
+        self.assertEqual(got["all"], (2, "a, b, c"))
+
 
 class Cut(unittest.TestCase):
     def test_rule(self):

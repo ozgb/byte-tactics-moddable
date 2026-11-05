@@ -94,6 +94,20 @@ def table(header: list[str], rows: list[list[str]]) -> list[str]:
     return out
 
 
+def stream_members(deps: list[dict], sims: list[str]) -> dict[str, tuple[int, str]]:
+    """Per phase and over all phases, the number of `ordered` rows on a random stream and the subsystems they join."""
+    rows: dict[str, list[dict]] = {}
+    for r in deps:
+        if r["class"] == "ordered" and r["item"].startswith("rng.") and r["writer"] in sims and r["reader"] in sims:
+            rows.setdefault(r["phase"], []).append(r)
+            rows.setdefault("all", []).append(r)
+    out = {}
+    for phase, rs in rows.items():
+        members = {r["writer"] for r in rs} | {r["reader"] for r in rs}
+        out[phase] = (len(rs), ", ".join(s for s in sims if s in members))
+    return out
+
+
 def tight_groups(deps: list[dict], sims: list[str]) -> dict[str, list[list[str]]]:
     """Return the groups of two or more subsystems joined by immediate or ordered edges, per phase and in the union."""
     edges: dict[str, set] = defaultdict(set)
@@ -314,8 +328,11 @@ def render(d: dict) -> str:
     out += ["## Tightly coupled groups", "",
             "These are the largest sets of simulation subsystems joined by `immediate` or `ordered` edges. Each must stay one "
             "ordered pass per phase. They are the connected components, of two or more members, of the undirected graph "
-            "of those edges, per phase and over all phases.", ""]
+            "of those edges, per phase and over all phases. The random streams need no rule of their own: two subsystems "
+            "that draw from one stream in a phase have an `ordered` row on it, so the streams are already in the groups. "
+            "Under each phase, `streams` lists the subsystems that the `rng.*` rows join.", ""]
     groups = tight_groups(deps, sims)
+    streams = stream_members(deps, sims)
     if not groups:
         out += ["There are none.", ""]
     for phase, gs in groups.items():
@@ -323,6 +340,8 @@ def render(d: dict) -> str:
         out.append("**%s**:" % title)
         out.append("")
         out += ["- %d members: %s" % (len(g), ", ".join(g)) for g in gs]
+        if streams.get(phase):
+            out.append("- streams: %d `ordered` rows on `rng.*` join %s" % streams[phase])
         out.append("")
     out += ["## Phase boundaries", "",
             "From data/phase_boundaries.csv. `needed` is `yes` when an `immediate` row spans the boundary. `direct` rows "

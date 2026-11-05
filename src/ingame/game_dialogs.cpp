@@ -1034,6 +1034,7 @@ void __stdcall RunGameSteps(int showStats)
             HarnessPhase(0);
             AccumulateProfileTime(&g_game->timers, 0);
         }
+        HarnessRecordPhase(1);
         g_seams.units->UpdateAllUnits();
         UpdateAutoFollow();
         HarnessPhase(1);

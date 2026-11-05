@@ -18,7 +18,10 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import eventdigest
 import reference
+import tracediff
+import tracerehash
 
 
 class NameMismatchTest(unittest.TestCase):
@@ -68,6 +71,96 @@ class SoundLogTest(unittest.TestCase):
             with mock.patch.object(reference, "ROOT", directory.parent):
                 differing, _ = reference.sound_report({"a": Path("a")}, {"a": None}, directory)
         self.assertEqual(differing, ["a"])
+
+
+class EventsLogTest(unittest.TestCase):
+    LOG = "bt-events 1\n0 load smoke 0x0 1 2 3 15 900 9\n5 units sound 0x0 0 0\n5 units sound 0x0 1 0\n5 players radar_units 0x0 0800000000000000\n"
+    DIGEST = eventdigest.digest_text(LOG)
+
+    def test_the_digest_has_a_line_for_each_tick_and_phase(self):
+        lines = self.DIGEST.splitlines()
+        self.assertEqual(lines[:2], ["bt-event-digest 1", "log bt-events 1"])
+        self.assertEqual([line.rsplit(" ", 1)[0] for line in lines[2:]], ["0 load 1", "5 units 2", "5 players 1"])
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{16}", line.rsplit(" ", 1)[1]) for line in lines[2:]))
+
+    def test_the_hash_is_the_trace_hash_of_the_records_bytes(self):
+        hasher = tracerehash.Hasher()
+        hasher.run(b"0 load smoke 0x0 1 2 3 15 900 9\n")
+        self.assertEqual(self.DIGEST.splitlines()[2], f"0 load 1 {hasher.h:016x}")
+
+    def test_equal_digests(self):
+        self.assertIsNone(eventdigest.digest_difference(self.DIGEST, eventdigest.digest_text(self.LOG)))
+
+    def test_a_changed_record_changes_the_hash_of_its_tick_and_phase(self):
+        got = eventdigest.digest_text(self.LOG.replace("sound 0x0 1 0", "sound 0x0 2 0"))
+        diff = eventdigest.digest_difference(self.DIGEST, got)
+        self.assertTrue(diff.startswith("events digest line 4 (tick 5, phase units): stored `5 units 2 "), diff)
+
+    def test_a_missing_or_extra_record_changes_the_count(self):
+        got = eventdigest.digest_text(self.LOG.replace("5 units sound 0x0 1 0\n", ""))
+        self.assertIn("(tick 5, phase units): stored `5 units 2 ", eventdigest.digest_difference(self.DIGEST, got))
+        self.assertIn(" got `5 units 1 ", eventdigest.digest_difference(self.DIGEST, got))
+
+    def test_a_different_header_differs_on_the_second_line(self):
+        got = eventdigest.digest_text(self.LOG.replace("bt-events 1", "bt-events 2"))
+        self.assertEqual(eventdigest.digest_difference(self.DIGEST, got),
+                         "events digest line 2: stored `log bt-events 1`, got `log bt-events 2`")
+
+    def test_a_longer_digest_differs_at_the_extra_line(self):
+        got = eventdigest.digest_text(self.LOG + "6 meteors message 0x0 0 1\n")
+        self.assertIn("line 6 (tick 6, phase meteors): only the got digest has it (`6 meteors 1 ", eventdigest.digest_difference(self.DIGEST, got))
+
+    def test_a_dropped_line_is_a_record_of_its_phase(self):
+        got = eventdigest.digest_text(self.LOG + "5 players dropped 3\n")
+        self.assertIn("(tick 5, phase players): stored `5 players 1 ", eventdigest.digest_difference(self.DIGEST, got))
+        self.assertIn(" got `5 players 2 ", eventdigest.digest_difference(self.DIGEST, got))
+
+    def test_a_radar_snapshot_is_covered_byte_for_byte(self):
+        got = eventdigest.digest_text(self.LOG.replace("0800000000000000", "0800000000000001"))
+        self.assertIn("(tick 5, phase players)", eventdigest.digest_difference(self.DIGEST, got))
+
+    def test_a_log_without_a_header_or_a_phase_is_refused(self):
+        with self.assertRaises(eventdigest.Error):
+            eventdigest.digest_text("0 load smoke 0x0\n")
+        with self.assertRaises(eventdigest.Error):
+            eventdigest.digest_text("bt-events 1\nbroken\n")
+
+    def test_record_difference_names_the_record(self):
+        got = self.LOG.replace("sound 0x0 1 0", "sound 0x0 2 0")
+        self.assertEqual(tracediff.event_difference(self.LOG, got),
+                         "event record at line 4 (tick 5, phase units): a `5 units sound 0x0 1 0`, b `5 units sound 0x0 2 0`")
+        self.assertIsNone(tracediff.event_difference(self.LOG, self.LOG))
+        self.assertEqual(tracediff.event_difference(self.LOG, self.LOG + "6 meteors message 0x0 0 1\n"),
+                         "event record at line 6 (tick 6, phase meteors): only b has it (`6 meteors message 0x0 0 1`)")
+
+    def test_report_counts_unstored_digests_and_fails_only_on_stored_ones(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "same.txt").write_text(self.DIGEST)
+            (directory / "other.txt").write_text(self.DIGEST)
+            scenarios = {n: Path(n) for n in ("same", "other", "none")}
+            logs = {"same": self.DIGEST, "other": eventdigest.digest_text(self.LOG + "6 meteors message 0x0 0 1\n"), "none": self.DIGEST}
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                differing, lines = reference.events_report(scenarios, logs, directory)
+        self.assertEqual(differing, ["other"])
+        self.assertIn("1 of 3 equal, 1 differ, 1 with no stored digest", lines[-1])
+
+    def test_a_run_with_no_event_log_differs_from_a_stored_one(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "a.txt").write_text(self.DIGEST)
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                differing, _ = reference.events_report({"a": Path("a")}, {"a": None}, directory)
+        self.assertEqual(differing, ["a"])
+
+    def test_copy_events_writes_digests_not_logs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src, dest = Path(tmp) / "branch", Path(tmp) / "events"
+            (src / "reference/events").mkdir(parents=True)
+            (src / "reference/events/a.txt").write_text(self.LOG)
+            with mock.patch.object(reference, "EVENTS", dest), mock.patch.object(reference, "ROOT", Path(tmp)):
+                reference.copy_events(src)
+            self.assertEqual((dest / "a.txt").read_text(), self.DIGEST)
 
 
 class UiLogTest(unittest.TestCase):
@@ -334,6 +427,7 @@ class CheckRoundtripTest(unittest.TestCase):
                     mock.patch.object(reference, "play_all", fake_play_all), \
                     mock.patch.object(reference, "sound_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "ui_report", lambda *a: ([], [])), \
+                    mock.patch.object(reference, "events_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "report_fuel", lambda *a: 0), \
                     contextlib.redirect_stdout(out):
                 reference.check_traces(Path("x.exe"), None, 1, roundtrip="auto")

@@ -16,6 +16,7 @@
 #include "../state/sim_radar.h"
 #include "radar.h"
 #include "../../interfaces/services.h"
+#include "../harness/harness.h"
 #include "../units/unit.h"
 #include "../util/vec3.h"
 
@@ -237,14 +238,138 @@ static void DrainBuildQueueSound(const SimEvent& e)
     PlaySoundByName((int)e.args[1] > 0 ? addSound : subSound, 0);
 }
 
+struct EventLogKind {
+    const char* name;
+    unsigned int args;
+};
+
+static const EventLogKind g_eventLogKinds[36] = {
+    { nullptr, 0 },
+    { "unit_speech", 3 },
+    { "sound", 2 },
+    { "nano_particles", 10 },
+    { "reverse_nano_particles", 10 },
+    { "teleport_particles", 8 },
+    { "thrust_particles", 9 },
+    { "wake_particles", 8 },
+    { "bubbles", 8 },
+    { "weapon_smoke", 4 },
+    { "timed_sub_particles", 4 },
+    { "screen_shake", 3 },
+    { "cd_activity", 3 },
+    { "forces_destroyed", 1 },
+    { "score_flash", 2 },
+    { "selection_orders_dirty", 1 },
+    { "build_menu_update", 1 },
+    { "deselect_if_ineligible", 1 },
+    { "gui_changed_if_screen", 1 },
+    { "focus_commander", 1 },
+    { "pop_to_game_layout", 1 },
+    { "player_took_lead", 2 },
+    { "player_left", 1 },
+    { "build_queue_sound", 2 },
+    { nullptr, 0 },
+    { "watch_prompt", 1 },
+    { "watch_mode_notice", 1 },
+    { "smoke", 6 },
+    { "white_smoke", 4 },
+    { "black_smoke", 4 },
+    { "sound_at", 5 },
+    { "sound_at_name", 5 },
+    { "remove_unit_speech", 1 },
+    { "message", 2 },
+    { "radar_units", 0 },
+    { "radar_mapped", 0 },
+};
+
+static void EventLogPut(const char* text)
+{
+    HarnessEventText(text);
+}
+
+static void EventLogRadar(const unsigned char* at, unsigned int size)
+{
+    static const char digits[] = "0123456789abcdef";
+    char chunk[129];
+    while (size != 0) {
+        unsigned int n = size < 64 ? size : 64;
+        for (unsigned int i = 0; i < n; i++) {
+            chunk[2 * i] = digits[at[i] >> 4];
+            chunk[2 * i + 1] = digits[at[i] & 15];
+        }
+        chunk[2 * n] = '\0';
+        EventLogPut(chunk);
+        at += n;
+        size -= n;
+    }
+}
+
+static void EventLogDropped(const SimEventQueue& q)
+{
+    static unsigned int seen = 0;
+    if (q.dropped < seen)
+        seen = 0;
+    if (q.dropped == seen)
+        return;
+    seen = q.dropped;
+    char buf[96];
+    sprintf(buf, "%u %s dropped %u\n", (unsigned int)g_game->ticks, g_game->ticks == 0 ? "load" : "outside", q.dropped);
+    EventLogPut(buf);
+}
+
+static void EventLogRecord(const SimEventQueue& q, const SimEvent& e, unsigned int slot)
+{
+    const EventLogKind* kind = e.kind < 36 && g_eventLogKinds[e.kind].name != nullptr ? &g_eventLogKinds[e.kind] : nullptr;
+    char buf[160];
+    if (kind == nullptr)
+        sprintf(buf, "%u %s kind%u 0x%x", e.tick, HarnessSimEventPhase(slot), (unsigned int)e.kind, (unsigned int)(e.flags & 0x7fff));
+    else
+        sprintf(buf, "%u %s %s 0x%x", e.tick, HarnessSimEventPhase(slot), kind->name, (unsigned int)(e.flags & 0x7fff));
+    EventLogPut(buf);
+    if (e.kind == SIM_EVENT_RADAR_UNITS || e.kind == SIM_EVENT_RADAR_MAPPED) {
+        const unsigned char* at = SimCapture().bytes + e.args[0];
+        unsigned int size;
+        if (e.kind == SIM_EVENT_RADAR_UNITS) {
+            const RadarDrawCapture* c = (const RadarDrawCapture*)at;
+            size = sizeof(RadarDrawCapture) + c->unitCount * sizeof(RadarUnitCapture) + c->projectileCount * sizeof(RadarProjectileCapture);
+        } else {
+            size = sizeof(RadarMappedCapture) + ((const RadarMappedCapture*)at)->cells;
+        }
+        EventLogPut(" ");
+        EventLogRadar(at, size);
+        EventLogPut("\n");
+        return;
+    }
+    unsigned int all[12] = {};
+    for (unsigned int i = 0; i < 6; i++)
+        all[i] = e.args[i];
+    if (q.head != q.tail && (q.records[q.head % SIM_EVENT_CAPACITY].flags & SIM_EVENT_CONTINUED)) {
+        const SimEvent& next = q.records[q.head % SIM_EVENT_CAPACITY];
+        for (unsigned int i = 0; i < 6; i++)
+            all[6 + i] = next.args[i];
+    }
+    unsigned int count = kind == nullptr ? 6 : kind->args;
+    for (unsigned int i = 0; i < count; i++) {
+        sprintf(buf, " %u", all[i]);
+        EventLogPut(buf);
+    }
+    EventLogPut("\n");
+}
+
 void DrainSimEvents()
 {
     SimEventQueue& q = SimEvents();
+    const bool logging = HarnessEventLogOpen();
+    if (logging)
+        EventLogDropped(q);
     while (q.head != q.tail) {
-        const SimEvent e = q.records[q.head % SIM_EVENT_CAPACITY];
+        const unsigned int slot = q.head % SIM_EVENT_CAPACITY;
+        const SimEvent e = q.records[slot];
         q.head++;
         if (e.flags & SIM_EVENT_CONTINUED)
             continue;
+        if (logging)
+            EventLogRecord(q, e, slot);
         switch (e.kind) {
         case SIM_EVENT_UNIT_SPEECH:
             DrainUnitSpeech(e);

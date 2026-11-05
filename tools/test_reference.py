@@ -5,6 +5,7 @@
 
 import contextlib
 import io
+import json
 import os
 import re
 import subprocess
@@ -498,6 +499,128 @@ class ScanRunTest(unittest.TestCase):
     def test_without_retry_any_a_game_fault_fails_at_once(self):
         timeouts, _, _ = self.run_scenario({}, 1, False, ["x: dialog-r6025 pure virtual"])
         self.assertEqual(len(timeouts), 1)
+
+
+class EarlyExitTest(unittest.TestCase):
+    HEADER = "bt-trace 3\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
+
+    @staticmethod
+    def rows(first, last):
+        return "".join(f"{tick} units {tick:016x}\n" for tick in range(first, last + 1))
+
+    def stored(self, ticks):
+        header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
+        rows = [(tick, "units", f"{tick:016x}") for tick in range(1, ticks + 1)]
+        return header, reference.tracedigest.digests(rows)
+
+    def play(self, trace_text, ticks=5, result=None, wine_log=None, want=True):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            run = root / "play/run"
+            run.mkdir(parents=True)
+            (run / "trace.txt").write_text(trace_text)
+            if result is not None:
+                (run / "result.json").write_text(json.dumps(result))
+            if wine_log is not None:
+                (run / "wine.log").write_text(wine_log)
+            (root / "s.txt").write_text(f"ticks {ticks}\n")
+            with mock.patch.object(reference, "ROOT", root), \
+                    mock.patch.object(reference.tracediff, "play", lambda *a, **k: run), \
+                    mock.patch.dict(reference.SOUND_LOGS), mock.patch.dict(reference.UI_LOGS), mock.patch.dict(reference.FUEL), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                try:
+                    out = reference.play_scenario(Path("x.exe"), root / "s.txt", None, self.stored(ticks) if want else None, mode="wasm")
+                except reference.EarlyExit as e:
+                    kept = list((root / "build/scratch").glob("check-s-wasm-*"))
+                    return e, sorted(p.name for p in kept[0].iterdir()) if kept else []
+                return out, []
+
+    def test_a_cut_trace_is_an_early_exit_with_its_exit_code_and_host_message(self):
+        trace = self.HEADER + self.rows(1, 3) + "4 units 00000"
+        early, kept = self.play(trace, result={"exit_codes": [2], "reason": ""}, wine_log="noise\nmodule trapped at tick 4: out of fuel\n")
+        self.assertIsInstance(early, reference.EarlyExit)
+        text = str(early)
+        self.assertRegex(text, r"^EARLY s \[wasm\]: ended at tick 3 of 5 \(exit code 2\), host said wine.log: module trapped at tick 4: out of fuel")
+        self.assertRegex(text, r"\[kept: build/scratch/check-s-wasm-[\d-]+\]$")
+        self.assertEqual(kept, ["result.json", "trace.txt", "wine.log"])
+
+    def test_a_trace_that_stops_at_a_line_end_short_of_the_count_is_early(self):
+        early, _ = self.play(self.HEADER + self.rows(1, 3), result={"exit_codes": [-9], "reason": ""})
+        self.assertIn("ended at tick 3 of 5 (signal SIGKILL)", str(early))
+
+    def test_a_timeout_and_a_missing_result_are_named(self):
+        early, _ = self.play(self.HEADER + self.rows(1, 2), result={"exit_codes": [None], "reason": "the game still runs after 900s"})
+        self.assertIn("(timeout)", str(early))
+        early, _ = self.play(self.HEADER + self.rows(1, 2))
+        self.assertIn("(exit status unknown)", str(early))
+
+    def test_a_cut_line_in_the_next_tick_leaves_the_last_tick_whole(self):
+        self.assertEqual(reference.trace_end(self.write(self.HEADER + self.rows(1, 3) + "4 un")), (3, True))
+        self.assertEqual(reference.trace_end(self.write(self.HEADER + self.rows(1, 3) + "3 units 00")), (2, True))
+        self.assertEqual(reference.trace_end(self.write(self.HEADER + self.rows(1, 3))), (3, False))
+
+    def write(self, text):
+        handle = tempfile.NamedTemporaryFile("w", delete=False)
+        self.addCleanup(os.unlink, handle.name)
+        handle.write(text)
+        handle.close()
+        return Path(handle.name)
+
+    def test_a_full_length_trace_with_a_different_digest_is_a_difference_not_an_early_exit(self):
+        trace = self.HEADER + self.rows(1, 4) + "5 units " + "f" * 16 + "\n"
+        (header, digests, _, kept), _ = self.play(trace)
+        self.assertEqual(len(digests), 5)
+        self.assertIn("tick 5", reference.difference(self.stored(5), header, digests))
+        self.assertIsNotNone(kept)
+
+    def test_a_trace_that_ends_exactly_at_the_count_is_not_early(self):
+        (header, digests, _, kept), _ = self.play(self.HEADER + self.rows(1, 5))
+        self.assertEqual(len(digests), 5)
+        self.assertIsNone(reference.difference(self.stored(5), header, digests))
+        self.assertIsNone(kept)
+
+    def test_a_scenario_that_ends_by_design_before_its_ticks_is_not_early(self):
+        (_, digests, _, _), _ = self.play(self.HEADER + self.rows(1, 3), ticks=100, want=False)
+        self.assertEqual(len(digests), 3)
+
+    def test_the_stored_length_not_the_tick_count_is_the_end(self):
+        stored = self.stored(3)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            run = root / "play/run"
+            run.mkdir(parents=True)
+            (run / "trace.txt").write_text(self.HEADER + self.rows(1, 3))
+            (root / "s.txt").write_text("ticks 100\n")
+            with mock.patch.object(reference, "ROOT", root), \
+                    mock.patch.object(reference.tracediff, "play", lambda *a, **k: run), \
+                    mock.patch.dict(reference.SOUND_LOGS), mock.patch.dict(reference.UI_LOGS), mock.patch.dict(reference.FUEL):
+                _, digests, _, kept = reference.play_scenario(Path("x.exe"), root / "s.txt", None, stored)
+        self.assertEqual(len(digests), 3)
+        self.assertIsNone(kept)
+
+    def test_a_failed_run_with_a_short_trace_is_an_early_exit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            run = root / "build/playtest/20260101-000000-1/run"
+            run.mkdir(parents=True)
+            (run / "trace.txt").write_text(self.HEADER + self.rows(1, 2))
+            (run / "result.json").write_text(json.dumps({"exit_codes": [-11], "reason": "crash"}))
+            message = "playtest.py failed for x.exe (exit 1):\n\nlogs and screenshots: build/playtest/20260101-000000-1/\n"
+            (root / "s.txt").write_text("ticks 5\n")
+
+            def fake_play(*a, **k):
+                raise reference.tracediff.Error(message)
+
+            with mock.patch.object(reference, "ROOT", root), mock.patch.object(reference.tracediff, "play", fake_play), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                with self.assertRaises(reference.EarlyExit) as raised:
+                    reference.play_scenario(Path("x.exe"), root / "s.txt", None, self.stored(5), retry_any=False)
+            self.assertIn("ended at tick 2 of 5 (signal SIGSEGV)", str(raised.exception))
+
+    def test_an_early_exit_halts_the_watch_and_skips_tracediff(self):
+        watch = reference.Watch({})
+        watch.halt("s [wasm]", "EARLY s [wasm]: ended at tick 3 of 5 (exit code 2)", 3, 1.0, None, early=True)
+        self.assertTrue(watch.found.early)
 
 
 class FailedAttemptTest(unittest.TestCase):
@@ -1093,6 +1216,61 @@ class BothModesTest(unittest.TestCase):
         for mode in ("wasm", "native"):
             self.assertLess(calls.index(("a", mode)), calls.index(("c", mode)))
         self.assertEqual(sorted(calls), sorted((n, m) for n in "abc" for m in ("wasm", "native")))
+
+
+class RecheckTest(unittest.TestCase):
+    HEADER = "bt-trace 3\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
+
+    def rows(self, tick_values):
+        return "".join(f"{t} units {v * 16}\n" for t, v in tick_values)
+
+    def found(self, tmp, kept_text, watch_text):
+        """Run a Watch over `watch_text` (the live trace), keeping a trace.txt of `kept_text` in place of the real copy."""
+        good = reference.tracedigest.digests([(t, "units", v * 16) for t, v in ((1, "1"), (2, "2"), (3, "3"))])
+        live = Path(tmp) / "work/i1/game/trace.txt"
+        live.parent.mkdir(parents=True)
+        live.write_text(self.HEADER + watch_text)
+        kept = Path(tmp) / "kept"
+        kept.mkdir()
+        (kept / "trace.txt").write_text(self.HEADER + kept_text)
+        proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+        watch = reference.Watch({"a": ({}, good)}, lambda pid: live)
+        try:
+            with mock.patch.object(reference, "keep_run", lambda *a, **k: kept):
+                watch.started("a")(proc)
+                watch.poll()
+        finally:
+            proc.kill()
+            proc.wait()
+        return watch.found, live
+
+    def test_the_file_holding_the_stored_digest_says_the_watch_read_another_value(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            found, live = self.found(tmp, self.rows([(1, "1"), (2, "2"), (3, "3")]), self.rows([(1, "1"), (2, "9"), (3, "3")]))
+            self.assertEqual((found.tick, found.trace), (2, live))
+            self.assertNotEqual(found.stored, found.got)
+            note = reference.recheck(found)
+            self.assertIn("the watch read a different value than the file now holds", note)
+            self.assertIn("tick 2", note)
+            self.assertIn(found.stored, note)
+            self.assertIn(found.got, note)
+            self.assertIn(str(live), note)
+
+    def test_the_file_holding_the_watchs_value_keeps_the_diff(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            text = self.rows([(1, "1"), (2, "9"), (3, "3")])
+            found, _ = self.found(tmp, text, text)
+            self.assertIsNone(reference.recheck(found))
+
+    def test_a_file_that_stops_short_of_the_tick_says_so(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            found, _ = self.found(tmp, self.rows([(1, "1")]) + "2 units " + "2" * 5, self.rows([(1, "1"), (2, "9"), (3, "3")]))
+            self.assertIn("does not reach tick 2", reference.recheck(found))
+
+    def test_the_diff_line_names_the_trace_the_watch_read(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            found, live = self.found(tmp, self.rows([(1, "1")]), self.rows([(1, "1"), (2, "9"), (3, "3")]))
+            self.assertEqual(reference.shown(found.trace), live)
 
 
 class TracediffCommandTest(unittest.TestCase):

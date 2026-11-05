@@ -11,6 +11,8 @@ each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when th
 A scenario with a `frames` line also has its frame dumps compared, byte for byte, with reference/frames/<scenario>/ (docs/frame-dump.md); a missing stored frame fails.
 It also compares the harness.sav of each scenario with a `save` line with
 reference/saves/<scenario>.sav, when that file exists, by decoded contents (tools/savefile.py leaves out the bytes taken from the clock or from uninitialised memory).
+A run that ends before the stored trace does is reported as `EARLY <scenario>: ended at tick T of N (<exit code, signal or timeout>)`, with
+the host's fatal line if the run left one, and fails the check without running tracediff (reference/README.md).
 On the first difference it builds the reference from the commit the trace
 records, prints tools/tracediff.py's report for that scenario and exits 1. A
 missing or extra trace or scenario exits 1. `--tier` restricts `--check` to the
@@ -58,9 +60,11 @@ import ast
 import contextlib
 import fcntl
 import hashlib
+import json
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -274,14 +278,89 @@ def difference(want: tuple[dict[str, str], list[tuple[int, str]]], header: dict[
     return diff
 
 
-def keep_run(run: Path, scenario: str, suffix: str = "") -> Path:
-    """Copy the run's trace.txt (and dump.txt and blockptrs.txt, if any) to build/scratch/check-<scenario>-<time>/."""
+def keep_run(run: Path, scenario: str, suffix: str = "", logs: bool = False) -> Path:
+    """Copy the run's trace.txt (and dump.txt and blockptrs.txt, if any) to build/scratch/check-<scenario>-<time>/.
+
+    With `logs`, also the run's result.json, crash.txt and Wine's stderr (wine.log), which hold the host's last words.
+    """
     kept = ROOT / "build/scratch" / f"check-{scenario}{suffix}-{time.strftime('%Y%m%d-%H%M%S')}"
     kept.mkdir(parents=True, exist_ok=True)
-    for name in ("trace.txt", SOUND_FILE, UI_FILE, "dump.txt", "blockptrs.txt"):
+    names = ["trace.txt", SOUND_FILE, UI_FILE, "dump.txt", "blockptrs.txt"]
+    if logs:
+        names += ["result.json", "crash.txt", *sorted(p.name for p in run.glob("wine*.log"))]
+    for name in names:
         if (run / name).is_file():
             shutil.copy2(run / name, kept / name)
     return kept
+
+
+HOST_MESSAGE = re.compile(r"trapped|out of fuel|fatal|statics|Unhandled exception|page fault|purecall", re.I)
+
+
+class EarlyExit(tracediff.Error):
+    """A run that ended before its trace did; str() is the report line."""
+
+
+def trace_end(path: Path) -> tuple[int, bool]:
+    """The last tick that a trace.txt holds whole, and whether its last line is cut (the file does not end in a newline).
+
+    A cut line belongs to its tick when it starts with that tick's number and a space, and that tick is then not whole.
+    """
+    data = path.read_bytes()
+    cut = bool(data) and not data.endswith(b"\n")
+    body, _, fragment = data.rpartition(b"\n") if cut else (data, b"", b"")
+    last = 0
+    for line in reversed(body[-4096:].decode(errors="replace").splitlines()):
+        row = tracediff.parse_row(line)
+        if row:
+            last = row[0]
+            break
+    if cut and fragment.split(b" ")[0] == str(last).encode() and b" " in fragment:
+        last -= 1
+    return last, cut
+
+
+def exit_description(run: Path) -> str:
+    """How the game ended, from the run's result.json: `timeout`, `signal SIGKILL`, `exit code 2` or `exit status unknown`."""
+    try:
+        result = json.loads((run / "result.json").read_text())
+    except (OSError, ValueError):
+        return "exit status unknown"
+    if "still runs after" in str(result.get("reason", "")):
+        return "timeout"
+    codes = [c for c in result.get("exit_codes", []) if c is not None]
+    if not codes:
+        return "exit status unknown"
+    code = codes[0]
+    if code < 0:
+        try:
+            return f"signal {signal.Signals(-code).name}"
+        except ValueError:
+            return f"signal {-code}"
+    return f"exit code {code}" + (f" (0x{code:X})" if code > 255 else "")
+
+
+def host_message(run: Path) -> str | None:
+    """The first line of the run's crash.txt or wine logs that looks like the host's fatal message, cut to 200 characters, or None."""
+    for name in ("crash.txt", *sorted(p.name for p in run.glob("wine*.log"))):
+        try:
+            lines = (run / name).read_text(errors="replace").splitlines()
+        except OSError:
+            continue
+        for line in lines:
+            if HOST_MESSAGE.search(line):
+                return f"{name}: {line.strip()[:200]}"
+    return None
+
+
+def early_exit(run: Path, key: str, end: int, kept: Path | None) -> EarlyExit:
+    """The EarlyExit for a run that ended at the last whole tick of its trace.txt, short of `end`; `kept` is where its files are kept."""
+    last, _ = trace_end(run / "trace.txt")
+    text = f"EARLY {key}: ended at tick {last} of {end} ({exit_description(run)})"
+    host = host_message(run)
+    if host:
+        text += f", host said {host}"
+    return EarlyExit(text + (f" [kept: {kept.relative_to(ROOT)}]" if kept else ""))
 
 
 def keep_failed_attempt(error: Exception, scenario: str) -> Path | None:
@@ -293,6 +372,21 @@ def keep_failed_attempt(error: Exception, scenario: str) -> Path | None:
     kept = ROOT / "build/scratch" / f"check-{scenario}-failed-{time.strftime('%Y%m%d-%H%M%S')}"
     shutil.copytree(ROOT / m[1], kept, dirs_exist_ok=True)
     return kept
+
+
+def failed_early(error: Exception, scenario: str, key: str, end: int) -> EarlyExit | None:
+    """The EarlyExit for a failed run whose session (named in `error`) holds a trace that stops short of tick `end`, else None.
+
+    The session is kept as keep_failed_attempt does.
+    """
+    m = re.search(r"^logs and screenshots: (.+)/$", str(error), re.M)
+    if not m or not (ROOT / m[1]).is_dir():
+        return None
+    runs = [d for d in (ROOT / m[1]).iterdir() if (d / "trace.txt").is_file()]
+    if len(runs) != 1 or trace_end(runs[0] / "trace.txt")[0] >= end:
+        return None
+    kept = keep_failed_attempt(error, scenario)
+    return early_exit(runs[0], key, end, kept)
 
 
 def should_retry(message: str) -> bool:
@@ -645,6 +739,11 @@ class Found:
     ticks: int
     elapsed: float
     kept: Path | None
+    early: bool = False
+    trace: Path | None = None
+    tick: int = 0
+    stored: str = ""
+    got: str = ""
 
 
 class Watch:
@@ -697,15 +796,20 @@ class Watch:
             run.seen += 1
             if want[index:index + 1] != [got]:
                 diff = first_difference(want[index:index + 1], [got])
-                self.halt(name, diff, run.seen, time.time() - run.started, keep_run(run.path.parent, name))
+                self.halt(name, diff, run.seen, time.time() - run.started, keep_run(run.path.parent, name),
+                          trace=run.path, digest=(*want[index], got[1]) if index < len(want) else None)
                 return
 
-    def halt(self, name: str, diff: str, ticks: int, elapsed: float, kept: Path | None) -> None:
-        """Record the first difference and stop every running scenario (the first call wins)."""
+    def halt(self, name: str, diff: str, ticks: int, elapsed: float, kept: Path | None, early: bool = False,
+             trace: Path | None = None, digest: tuple[int, str, str] | None = None) -> None:
+        """Record the first difference (or, with `early`, early exit, `diff` being its report line) and stop every running scenario (the first call wins).
+
+        `trace` is the file that the watch read, and `digest` the (tick, stored, got) of the difference.
+        """
         with self.lock:
             if self.found:
                 return
-            self.found = Found(name, diff, ticks, elapsed, kept)
+            self.found = Found(name, diff, ticks, elapsed, kept, early, trace, *(digest or (0, "", "")))
             self.halted.set()
             procs = [r.proc for r in self.live.values()]
         for proc in procs:
@@ -722,6 +826,23 @@ class Watch:
         timer = threading.Timer(STOP_SECONDS, lambda: proc.poll() is None and proc.kill())
         timer.daemon = True
         timer.start()
+
+
+def recheck(found: Found) -> str | None:
+    """After a halt, what the kept trace.txt holds at the tick that the watch found different: a line to print, or None when the file agrees with the watch."""
+    if found.early or not found.kept or not found.stored:
+        return None
+    try:
+        data = (found.kept / "trace.txt").read_bytes()
+        done = dict(tracedigest.TraceTail().feed(data))
+    except (OSError, tracedigest.Error):
+        return f"recheck: cannot read {found.kept.name}/trace.txt"
+    if found.tick not in done:
+        return f"recheck: the kept trace does not reach tick {found.tick}"
+    if done[found.tick] == found.stored:
+        return (f"the watch read a different value than the file now holds: tick {found.tick}, stored {found.stored}, "
+                f"the watch read {found.got} from {found.trace}, the kept file holds {done[found.tick]}")
+    return None
 
 
 def scenario_saves(scenario: Path) -> bool:
@@ -764,6 +885,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     ticks = scenario_ticks(scenario)
     rate = RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK if scans is not None and scan_every == 1 else RUN_TICKS_PER_SECOND
     timeout = RUN_SECONDS_BASE + ticks / rate
+    end = want[1][-1][0] if want is not None and want[1] else ticks
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
@@ -780,6 +902,11 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
             break
         except tracediff.Error as e:
             if (watch is not None and watch.halted.is_set()) or attempt == RUN_ATTEMPTS - 1 or not (retry_any or should_retry(str(e))):
+                early = failed_early(e, scenario.stem, key, end) if want is not None and not (watch is not None and watch.halted.is_set()) else None
+                if early is not None:
+                    if watch is not None:
+                        watch.halt(key, str(early), 0, time.time() - t0, None, early=True)
+                    raise early from e
                 raise
             failed = keep_failed_attempt(e, scenario.stem)
             where = f" [failed attempt kept: {failed.relative_to(ROOT)}]" if failed else ""
@@ -801,7 +928,15 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         if scenario_saves(scenario):
             saved = run / SAVE_FILE
             SAVE_BYTES[key] = saved.read_bytes() if saved.is_file() else None
-        header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
+        trace = tracediff.need(run, "trace.txt")
+        last, cut = trace_end(trace)
+        if cut or (want is not None and last < end):
+            kept = keep_run(run, scenario.stem, f"-{mode}" if mode else "", logs=True)
+            early = early_exit(run, key, end, kept)
+            if watch is not None:
+                watch.halt(key, str(early), last, elapsed, kept, early=True)
+            raise early
+        header, rows = tracediff.parse_trace(trace)
         for seed in ("game_seed", "crt_seed", "view_seed"):
             if seed not in header:
                 raise tracediff.Error(f"{scenario}: the trace has no {seed} line")
@@ -902,9 +1037,11 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
         except (tracediff.Error, OSError) as e:
             if watch is not None and watch.halted.is_set():
                 return
-            errors[key] = last_lines(e, 5)
+            errors[key] = str(e) if isinstance(e, EarlyExit) else last_lines(e, 5)
             if failed is not None:
                 failed[key] = errors[key]
+            elif isinstance(e, EarlyExit):
+                failures.append(str(e))
             else:
                 failures.append(f"{key}: failed to run, playtest.py ended with:\n    {last_lines(e, 5)}")
 
@@ -1281,8 +1418,15 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     if watch is not None and watch.found and len(results) < len(scenarios) * len(modes):
         found = watch.found
         where = f" [kept: {found.kept.relative_to(ROOT)}]" if found.kept else ""
-        print(f"DIFF {found.name} ({found.ticks} ticks, {clock(found.elapsed)}) {found.diff}{where}")
+        trace = f" [trace: {shown(found.trace)}]" if found.trace else ""
+        print(found.diff if found.early else f"DIFF {found.name} ({found.ticks} ticks, {clock(found.elapsed)}) {found.diff}{trace}{where}")
+        note = recheck(found)
+        if note:
+            print(note)
         print(f"stopped: {len(scenarios) * len(modes) - len(results)} scenarios not finished")
+        if found.early:
+            print("tracediff not run: the run ended early, so there is no complete trace to compare")
+            sys.exit(1)
         if mode_of(found.name) == "native":
             os.environ["BT_NATIVE_MODULES"] = "1"
         report_divergence(untag(found.name), expected, exe, scenarios, poison, game_dir)

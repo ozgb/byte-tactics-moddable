@@ -3160,6 +3160,9 @@
    },
    "weapons": {
     "status": "pending",
+    "imports": [
+     "los_radar.SoundHeardMask"
+    ],
     "slots": {
      "SpawnProjectile": {
       "args": {
@@ -3395,7 +3398,10 @@
     }
    },
    "features": {
-    "status": "pending"
+    "status": "pending",
+    "imports": [
+     "los_radar.SoundHeardMask"
+    ]
    },
    "ai": {
     "status": "pending",
@@ -3453,6 +3459,15 @@
        "reach": [
         "metal"
        ]
+      }
+     },
+     "SoundHeardMask": {
+      "args": {
+       "at": {
+        "mode": "struct",
+        "kind": "Vec3",
+        "dir": "in"
+       }
       }
      }
     }
@@ -5111,7 +5126,7 @@
    }
   },
   "features": {
-   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [2, 0], "status": "pending", "imports": [], "pending": {"untracked": 15, "ruleless": 0, "unresolvedSlots": [], "unannotatedArgs": ["InitFeatureAnimPool(info)", "PlaceFeature(pos)", "PlaceFeature(rot)", "ReclaimFeature(pos)", "GetFootprintCentre(cell)"]}},
+   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [2, 0], "status": "pending", "imports": ["los_radar.SoundHeardMask"], "pending": {"untracked": 15, "ruleless": 0, "unresolvedSlots": [], "unannotatedArgs": ["InitFeatureAnimPool(info)", "PlaceFeature(pos)", "PlaceFeature(rot)", "ReclaimFeature(pos)", "GetFootprintCentre(cell)"]}},
    "slots": {
     "UpdateFeatures": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateFeatures"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Unit.cell", "Unit.footprint", "Cell.unit", "Cell.feature", "Cell.flags", "Handle.src", "Feature.anim", "Feature.shadowAnim", "Feature.seedChance", "Feature.seedSpread", "Feature.flags16", "Spot.prev", "Spot.anim", "Spot.shadow", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.velX", "Spot.velY", "Spot.velZ", "Spot.cell", "Spot.feature", "Spot.timer", "Spot.flags", "Pool.entries", "Pool.usedHead", "Pool.restHead"], "objectWrites": ["Feature.anim", "Feature.shadowAnim", "Spot.anim", "Spot.shadow", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.velX", "Spot.velY", "Spot.velZ", "Spot.cell", "Spot.timer", "Pool.restHead"], "allOf": [], "args": [], "result": null, "native": "UpdateFeatures"},
     "LoadFeatureFileList": {"conv": "__stdcall", "ret": "void", "functions": ["LoadFeatureFileList"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "LoadFeatureFileList"},
@@ -5172,7 +5187,7 @@
    }
   },
   "weapons": {
-   "header": {"interface": "interfaces/weapons.h", "struct": "WeaponsSeam", "version": [1, 5], "status": "pending", "imports": [], "pending": {"untracked": 44, "ruleless": 23, "unresolvedSlots": ["WeaponAimCobComplete", "CobScriptExplodePiece"], "unannotatedArgs": ["ApplyAreaDamageAt(pos)", "WeaponCanReachPos(from)", "WeaponCanReachPos(to)", "FindFeatureAtPos(pos)", "FindFeatureAtPos(cell)", "FindFeatureAtPos(size)", "WeaponAimCobComplete(callback)"]}},
+   "header": {"interface": "interfaces/weapons.h", "struct": "WeaponsSeam", "version": [1, 5], "status": "pending", "imports": ["los_radar.SoundHeardMask"], "pending": {"untracked": 44, "ruleless": 23, "unresolvedSlots": ["WeaponAimCobComplete", "CobScriptExplodePiece"], "unannotatedArgs": ["ApplyAreaDamageAt(pos)", "WeaponCanReachPos(from)", "WeaponCanReachPos(to)", "FindFeatureAtPos(pos)", "FindFeatureAtPos(cell)", "FindFeatureAtPos(size)", "WeaponAimCobComplete(callback)"]}},
    "slots": {
     "UpdateProjectiles": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateProjectiles"], "reads": ["Game.ticks", "Game.seaLevel", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon2Def", "weapondef.speed", "Cell.high", "Projectile.speed", "Projectile.spawnTick", "Projectile.attacker", "Projectile.active"], "objectWrites": ["Projectile.speed", "Projectile.spawnTick", "Projectile.active"], "allOf": [], "args": [], "result": null, "native": "UpdateProjectiles"},
     "UpdateExplosions": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateExplosions"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateExplosions"},
@@ -5216,7 +5231,7 @@
    }
   },
   "los_radar": {
-   "header": {"interface": "interfaces/los_radar.h", "struct": "LosRadarSeam", "version": [2, 0], "status": "pending", "imports": [], "pending": {"untracked": 45, "ruleless": 25, "unresolvedSlots": ["FreeRadar", "InitRadar"], "unannotatedArgs": ["ClampWorldPosToTerrain(out)", "GetMapCellAtPosition(pos)", "GetOriginCellAtPosition(pos)", "AddEyeball(src)"]}},
+   "header": {"interface": "interfaces/los_radar.h", "struct": "LosRadarSeam", "version": [2, 1], "status": "pending", "imports": [], "pending": {"untracked": 45, "ruleless": 25, "unresolvedSlots": ["FreeRadar", "InitRadar"], "unannotatedArgs": ["ClampWorldPosToTerrain(out)", "GetMapCellAtPosition(pos)", "GetOriginCellAtPosition(pos)", "AddEyeball(src)"]}},
    "slots": {
     "GetMapCell": {"conv": "__stdcall", "ret": "Cell*", "functions": ["GetMapCell"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "Cell*", "mode": "object", "kind": "Cell", "reach": ["metal"]}, "native": "GetMapCell"},
     "CmdShareMapping": {"conv": "__stdcall", "ret": "void", "functions": ["CmdShareMapping"], "reads": ["Game.flags_2a44"], "writes": [], "objectReads": ["Player.info", "PlayerInfo.flags_97_wide"], "objectWrites": ["PlayerInfo.flags_97_wide"], "allOf": [], "args": [{"name": "unused", "type": "int", "line": "unused", "mode": "scalar"}], "result": null, "native": "CmdShareMapping"},
@@ -5238,7 +5253,8 @@
     "AddEyeball": {"conv": "__stdcall", "ret": "void", "functions": ["AddEyeball"], "reads": ["Game.ticks", "Game.seaLevel", "Game.playerIndex"], "writes": [], "objectReads": ["FrameTable.count", "GafFrame.xOffset", "GafFrame.yOffset"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "src", "type": "Vec3*", "line": "src", "mode": "pending"}, {"name": "a", "type": "int", "line": "a", "mode": "scalar"}, {"name": "b", "type": "int", "line": "b", "mode": "scalar"}, {"name": "c", "type": "int", "line": "c", "mode": "scalar"}], "result": null, "native": "AddEyeball"},
     "RecordRadarUnits": {"conv": "__stdcall", "ret": "void", "functions": ["RecordRadarUnits"], "reads": ["Game.uiOptionFlags"], "writes": [], "objectReads": ["Player.info", "Unit.unitDefIndex", "Projectile.owner"], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "RecordRadarUnits"},
     "RecordRadarMapped": {"conv": "__stdcall", "ret": "void", "functions": ["RecordRadarMapped"], "reads": ["Game.width", "Game.height", "Game.visibilityMask", "Game.playerIndex"], "writes": [], "objectReads": ["Player.explored"], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "RecordRadarMapped"},
-    "UpdateSensorRadarAndCloak": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateSensorRadarAndCloak"], "reads": ["Game.ticks", "Game.mapFlags", "Game.playerIndex"], "writes": [], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.info", "Player.type", "Player.index", "Player.allied", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ"], "objectWrites": ["Unit.flags"], "allOf": ["Player"], "args": [], "result": null, "native": "UpdateSensorRadarAndCloak"}
+    "UpdateSensorRadarAndCloak": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateSensorRadarAndCloak"], "reads": ["Game.ticks", "Game.mapFlags", "Game.playerIndex"], "writes": [], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.info", "Player.type", "Player.index", "Player.allied", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ"], "objectWrites": ["Unit.flags"], "allOf": ["Player"], "args": [], "result": null, "native": "UpdateSensorRadarAndCloak"},
+    "SoundHeardMask": {"conv": "__stdcall", "ret": "unsigned int", "functions": ["SoundHeardMask"], "reads": ["Game.visibilityMask", "Game.mapFlags"], "writes": [], "objectReads": ["Player.explored", "Player.exploredWidth", "Player.exploredHeight"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "at", "type": "Vec3*", "line": "at", "mode": "struct", "kind": "Vec3", "dir": "in"}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "SoundHeardMask"}
    }
   },
   "orders": {

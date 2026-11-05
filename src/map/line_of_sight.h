@@ -21,6 +21,7 @@ struct Rec {
 
 void __stdcall FreeLosTables();
 Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
+unsigned int __stdcall SoundHeardMask(const Vec3* at);
 Cell* __stdcall GetOriginCellAtPosition(Vec3* pos);
 void __stdcall RemoveUnitLineOfSight(Unit* unit);
 int __stdcall IsEyeballExpired(Eye* obj);

@@ -47675,6 +47675,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecordRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RemoveUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RevealNewUnit
+,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::SoundHeardMask
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateCellHeightRange
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateUnitLineOfSight
@@ -48029,6 +48030,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecordRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRemoveUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRevealNewUnit
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarSoundHeardMask
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateCellHeightRange
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateUnitLineOfSight
@@ -48723,6 +48725,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RecordRadarUnits
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RemoveUnitLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RevealNewUnit
+,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::SoundHeardMask
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateCellHeightRange
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateUnitLineOfSight
@@ -49291,6 +49294,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetYardOpen
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetupPlayerSlot
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SnapWorldPosToFootprint
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,SoundHeardMask
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SpatialBucketPrependUnitNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SpatialBucketUnlinkUnitNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SpawnProjectile
@@ -53260,6 +53264,20 @@ address,function,file,kind,target
 ,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RevealNewUnit]
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ArgStruct
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ArgValue
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,FinishImport
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ImportResult
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,field_read,LosRadarSeam::SoundHeardMask
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,function,
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,global_read,s_call
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,global_read,s_tail
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,indirect_call,indirect via unsigned int (*const)(const Vec3 *) __attribute__((stdcall)) [LosRadarSeam::SoundHeardMask]
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,FinishImport
 ,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,ImportValue
@@ -55355,12 +55373,18 @@ address,function,file,kind,target
 ,RecordSound,src/state/sim_effects.h,function,
 ,RecordSoundAt,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordSoundAt,src/state/sim_effects.h,call,SimEventPut
-,RecordSoundAt,src/state/sim_effects.h,call,SoundHeardMask
+,RecordSoundAt,src/state/sim_effects.h,field_read,LosRadarSeam::SoundHeardMask
+,RecordSoundAt,src/state/sim_effects.h,field_read,Seams::los_radar
 ,RecordSoundAt,src/state/sim_effects.h,function,
+,RecordSoundAt,src/state/sim_effects.h,global_read,g_seams
+,RecordSoundAt,src/state/sim_effects.h,indirect_call,indirect via unsigned int (*)(const Vec3 *) __attribute__((stdcall)) [LosRadarSeam::SoundHeardMask]
 ,RecordSoundAtName,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordSoundAtName,src/state/sim_effects.h,call,SimEventPut
-,RecordSoundAtName,src/state/sim_effects.h,call,SoundHeardMask
+,RecordSoundAtName,src/state/sim_effects.h,field_read,LosRadarSeam::SoundHeardMask
+,RecordSoundAtName,src/state/sim_effects.h,field_read,Seams::los_radar
 ,RecordSoundAtName,src/state/sim_effects.h,function,
+,RecordSoundAtName,src/state/sim_effects.h,global_read,g_seams
+,RecordSoundAtName,src/state/sim_effects.h,indirect_call,indirect via unsigned int (*)(const Vec3 *) __attribute__((stdcall)) [LosRadarSeam::SoundHeardMask]
 ,RecordTeleportParticles,src/state/sim_effects.h,call,RecordSimEvent
 ,RecordTeleportParticles,src/state/sim_effects.h,call,SimEventPut
 ,RecordTeleportParticles,src/state/sim_effects.h,function,
@@ -57653,25 +57677,22 @@ address,function,file,kind,target
 ,SortOrderTableEntries,src/orders/order_list.cpp,call,_Sort_0_0043bc90
 ,SortOrderTableEntries,src/orders/order_list.cpp,call,_Val_type
 ,SortOrderTableEntries,src/orders/order_list.cpp,function,
-,SoundHeardMask,src/state/sim_sound.cpp,call,operator unsigned char *
-,SoundHeardMask,src/state/sim_sound.cpp,call,operator unsigned short *
-,SoundHeardMask,src/state/sim_sound.cpp,deref_read,*unsigned char
-,SoundHeardMask,src/state/sim_sound.cpp,deref_read,*unsigned short
-,SoundHeardMask,src/state/sim_sound.cpp,field_escape,Game::players
-,SoundHeardMask,src/state/sim_sound.cpp,field_read,Game::mapFlags
-,SoundHeardMask,src/state/sim_sound.cpp,field_read,Game::visibilityMask
-,SoundHeardMask,src/state/sim_sound.cpp,field_read,LosRadarSeam::GetMapCell
-,SoundHeardMask,src/state/sim_sound.cpp,field_read,Player::explored
-,SoundHeardMask,src/state/sim_sound.cpp,field_read,Player::exploredHeight
-,SoundHeardMask,src/state/sim_sound.cpp,field_read,Player::exploredWidth
-,SoundHeardMask,src/state/sim_sound.cpp,field_read,Seams::los_radar
-,SoundHeardMask,src/state/sim_sound.cpp,field_read,Vec3::x
-,SoundHeardMask,src/state/sim_sound.cpp,field_read,Vec3::y
-,SoundHeardMask,src/state/sim_sound.cpp,field_read,Vec3::z
-,SoundHeardMask,src/state/sim_sound.cpp,function,
-,SoundHeardMask,src/state/sim_sound.cpp,global_read,g_game
-,SoundHeardMask,src/state/sim_sound.cpp,global_read,g_seams
-,SoundHeardMask,src/state/sim_sound.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
+,SoundHeardMask,src/map/line_of_sight.cpp,call,GetMapCell
+,SoundHeardMask,src/map/line_of_sight.cpp,call,operator unsigned char *
+,SoundHeardMask,src/map/line_of_sight.cpp,call,operator unsigned short *
+,SoundHeardMask,src/map/line_of_sight.cpp,deref_read,*unsigned char
+,SoundHeardMask,src/map/line_of_sight.cpp,deref_read,*unsigned short
+,SoundHeardMask,src/map/line_of_sight.cpp,field_escape,Game::players
+,SoundHeardMask,src/map/line_of_sight.cpp,field_read,Game::mapFlags
+,SoundHeardMask,src/map/line_of_sight.cpp,field_read,Game::visibilityMask
+,SoundHeardMask,src/map/line_of_sight.cpp,field_read,Player::explored
+,SoundHeardMask,src/map/line_of_sight.cpp,field_read,Player::exploredHeight
+,SoundHeardMask,src/map/line_of_sight.cpp,field_read,Player::exploredWidth
+,SoundHeardMask,src/map/line_of_sight.cpp,field_read,Vec3::x
+,SoundHeardMask,src/map/line_of_sight.cpp,field_read,Vec3::y
+,SoundHeardMask,src/map/line_of_sight.cpp,field_read,Vec3::z
+,SoundHeardMask,src/map/line_of_sight.cpp,function,
+,SoundHeardMask,src/map/line_of_sight.cpp,global_read,g_game
 ,SpanErase,src/harness/block_scan.cpp,call,SpanLowerBound
 ,SpanErase,src/harness/block_scan.cpp,call,memmove
 ,SpanErase,src/harness/block_scan.cpp,deref_maybe_written,*Span

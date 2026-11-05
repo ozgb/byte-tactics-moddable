@@ -1129,6 +1129,7 @@ enum ReplaySlotId {
     RSL_LOS_RADAR_RECORDRADARUNITS,
     RSL_LOS_RADAR_RECORDRADARMAPPED,
     RSL_LOS_RADAR_UPDATESENSORRADARANDCLOAK,
+    RSL_LOS_RADAR_SOUNDHEARDMASK,
     RSL_ORDERS_AISEARCHGOALSETWAYPOINTS,
     RSL_ORDERS_ORDERFXADDFLAGS,
     RSL_ORDERS_APPENDORDER,
@@ -1530,6 +1531,9 @@ static const unsigned char kReplayLosRadarUpdateSensorRadarAndCloakAllOf[] = { R
 static const unsigned char kReplayLosRadarUpdateSensorRadarAndCloakReads[] = { 0, 21, 22 };
 static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakObjReads[] = { 0, 4, 5, 23, 25, 26, 29, 36, 37, 38, 39, 40, 49, 52, 53, 54 };
 static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakObjWrites[] = { 38 };
+static const unsigned char kReplayLosRadarSoundHeardMaskAllOf[] = { ROK_PLAYER };
+static const unsigned char kReplayLosRadarSoundHeardMaskReads[] = { 20, 21 };
+static const unsigned short kReplayLosRadarSoundHeardMaskObjReads[] = { 31, 32, 33 };
 static const unsigned short kReplayOrdersAppendOrderObjWrites[] = { 185 };
 static const unsigned short kReplayOrdersDeleteOrdersObjReads[] = { 185 };
 static const unsigned char kReplayOrdersGetOrderTypeReads[] = { 17 };
@@ -1829,6 +1833,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "RecordRadarUnits", SUB_LOS_RADAR, kReplayLosRadarRecordRadarUnitsReads, 1, nullptr, 0, kReplayLosRadarRecordRadarUnitsObjReads, 3, nullptr, 0, nullptr, 0 },
     { "RecordRadarMapped", SUB_LOS_RADAR, kReplayLosRadarRecordRadarMappedReads, 4, nullptr, 0, kReplayLosRadarRecordRadarMappedObjReads, 1, nullptr, 0, nullptr, 0 },
     { "UpdateSensorRadarAndCloak", SUB_LOS_RADAR, kReplayLosRadarUpdateSensorRadarAndCloakReads, 3, nullptr, 0, kReplayLosRadarUpdateSensorRadarAndCloakObjReads, 16, kReplayLosRadarUpdateSensorRadarAndCloakObjWrites, 1, kReplayLosRadarUpdateSensorRadarAndCloakAllOf, 1 },
+    { "SoundHeardMask", SUB_LOS_RADAR, kReplayLosRadarSoundHeardMaskReads, 2, nullptr, 0, kReplayLosRadarSoundHeardMaskObjReads, 3, nullptr, 0, kReplayLosRadarSoundHeardMaskAllOf, 1 },
     { "AiSearchGoalSetWaypoints", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "OrderFxAddFlags", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "AppendOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, kReplayOrdersAppendOrderObjWrites, 1, nullptr, 0 },
@@ -2055,13 +2060,13 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "pathfinding", 1, 2, 0, 66, 4 },
     { "weapons", 1, 5, 0, 70, 25 },
     { "targeting", 1, 1, 1, 95, 9 },
-    { "los_radar", 2, 0, 0, 104, 21 },
-    { "orders", 1, 10, 0, 125, 32 },
-    { "units", 1, 7, 0, 157, 58 },
-    { "players", 1, 5, 0, 215, 29 },
-    { "map", 3, 0, 1, 244, 16 },
-    { "files", 2, 0, 0, 260, 58 },
-    { "network", 1, 0, 0, 318, 22 },
+    { "los_radar", 2, 1, 0, 104, 22 },
+    { "orders", 1, 10, 0, 126, 32 },
+    { "units", 1, 7, 0, 158, 58 },
+    { "players", 1, 5, 0, 216, 29 },
+    { "map", 3, 0, 1, 245, 16 },
+    { "files", 2, 0, 0, 261, 58 },
+    { "network", 1, 0, 0, 319, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

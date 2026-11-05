@@ -33508,6 +33508,7 @@ address,function,file,kind,target
 0x49e830,GameMain,src/game/main.cpp,call,EmptyPreFrontendInitHook
 0x49e830,GameMain,src/game/main.cpp,call,GameSrand
 0x49e830,GameMain,src/game/main.cpp,call,HarnessCrtSeed
+0x49e830,GameMain,src/game/main.cpp,call,HarnessExit
 0x49e830,GameMain,src/game/main.cpp,call,HarnessInit
 0x49e830,GameMain,src/game/main.cpp,call,InitDebugSupport
 0x49e830,GameMain,src/game/main.cpp,call,InitDisplayDefaults
@@ -47011,6 +47012,11 @@ address,function,file,kind,target
 ,HarnessEventText,src/harness/harness.cpp,call,fputs
 ,HarnessEventText,src/harness/harness.cpp,function,
 ,HarnessEventText,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
+,HarnessExit,src/harness/harness.cpp,call,Fail
+,HarnessExit,src/harness/harness.cpp,call,ReplayWrite
+,HarnessExit,src/harness/harness.cpp,call,sprintf
+,HarnessExit,src/harness/harness.cpp,function,
+,HarnessExit,src/harness/harness.cpp,global_read,s_recordSwitch@src/harness/harness.cpp
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,Fail
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,GameU32
 ,HarnessFrameDrawn,src/harness/harness.cpp,call,HarnessTestMode
@@ -47041,6 +47047,7 @@ address,function,file,kind,target
 ,HarnessInit,src/harness/harness.cpp,call,ParseBlockScan
 ,HarnessInit,src/harness/harness.cpp,call,ParseBlockScanVerify
 ,HarnessInit,src/harness/harness.cpp,call,ParseQuirksSwitch
+,HarnessInit,src/harness/harness.cpp,call,ParseRecordSwitch
 ,HarnessInit,src/harness/harness.cpp,call,ParseTestDump
 ,HarnessInit,src/harness/harness.cpp,call,ReadScenario
 ,HarnessInit,src/harness/harness.cpp,call,ReplayInstall
@@ -51008,6 +51015,17 @@ address,function,file,kind,target
 ,ParseRange,src/harness/harness.cpp,call,ParseNumber
 ,ParseRange,src/harness/harness.cpp,call,sprintf
 ,ParseRange,src/harness/harness.cpp,function,
+,ParseRecordSwitch,src/harness/harness.cpp,call,Fail
+,ParseRecordSwitch,src/harness/harness.cpp,call,ReplayConfigure
+,ParseRecordSwitch,src/harness/harness.cpp,call,_strnicmp
+,ParseRecordSwitch,src/harness/harness.cpp,call,isspace
+,ParseRecordSwitch,src/harness/harness.cpp,call,memcpy
+,ParseRecordSwitch,src/harness/harness.cpp,call,memset
+,ParseRecordSwitch,src/harness/harness.cpp,call,sprintf
+,ParseRecordSwitch,src/harness/harness.cpp,deref_read,*char
+,ParseRecordSwitch,src/harness/harness.cpp,deref_write,*char
+,ParseRecordSwitch,src/harness/harness.cpp,function,
+,ParseRecordSwitch,src/harness/harness.cpp,global_write,s_recordSwitch@src/harness/harness.cpp
 ,ParseScreenCoordinate,src/harness/harness.cpp,call,FailLine
 ,ParseScreenCoordinate,src/harness/harness.cpp,call,ParseNumber
 ,ParseScreenCoordinate,src/harness/harness.cpp,call,sprintf

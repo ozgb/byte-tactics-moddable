@@ -162,6 +162,10 @@ struct FixtureScreen {
     short y;
 };
 
+struct FixtureTally {
+    int value;
+};
+
 struct FixtureEye {
     Ref<char> owner;
     Ref<FixtureScreen> screen;

@@ -7,7 +7,8 @@
    "kind": "ref",
    "target": "FixtureView"
   },
-  "hotRadarCount": "i32"
+  "hotRadarCount": "i32",
+  "count_14367": "i32"
  },
  "objects": {
   "FixtureView": {
@@ -623,6 +624,23 @@
      "name": "link",
      "kind": "ref",
      "callback": "Callback"
+    }
+   ]
+  },
+  "FixtureTally": {
+   "type": "FixtureTally",
+   "scope": "state",
+   "table": {
+    "base": "game",
+    "member": "list_1435f",
+    "ref": true,
+    "count": "count_14367",
+    "alloc": 6
+   },
+   "fields": [
+    {
+     "name": "value",
+     "kind": "i32"
     }
    ]
   }

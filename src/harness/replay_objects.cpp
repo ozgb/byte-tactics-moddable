@@ -81,16 +81,6 @@ void StoreFactor(const ReplayFactor& f, void* object, unsigned value)
         *(unsigned*)at = value;
 }
 
-bool CountTracked(const ReplayTableSpec& spec)
-{
-    for (unsigned i = 0; i < kReplayFieldCount; i++) {
-        const ReplayField& f = kReplayFields[i];
-        if (spec.count.first.size != 0 && f.base == (spec.sim ? RB_SIM : RB_GAME) && f.offset == spec.count.first.offset)
-            return true;
-    }
-    return false;
-}
-
 void* AllocateTable(const ReplayTableSpec& spec, unsigned size, ReplayAllocFn alloc)
 {
     void* pool = spec.module ? operator new(size) : alloc(size);
@@ -110,7 +100,7 @@ void EnsureTable(unsigned kind, ReplayAllocFn alloc)
         return;
     unsigned char* pool = (unsigned char*)AllocateTable(spec, elements * kReplayObjectKinds[kind].size, alloc);
     *(unsigned*)(root + spec.offset) = (unsigned)(pool - (unsigned char*)SimBlockBase());
-    if (!product && !spec.capped && !CountTracked(spec))
+    if (!product && !spec.capped && ReplayLengthOf(spec.count, root) == 0)
         StoreFactor(spec.count.first, root, spec.alloc);
 }
 

@@ -44495,14 +44495,6 @@ address,function,file,kind,target
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,field_read,SkirmishPlayer::controller
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,function,
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,global_read,g_game
-,CountTracked,src/harness/replay_objects.cpp,field_read,ReplayFactor::offset
-,CountTracked,src/harness/replay_objects.cpp,field_read,ReplayFactor::size
-,CountTracked,src/harness/replay_objects.cpp,field_read,ReplayField::base
-,CountTracked,src/harness/replay_objects.cpp,field_read,ReplayField::offset
-,CountTracked,src/harness/replay_objects.cpp,field_read,ReplayTableSpec::sim
-,CountTracked,src/harness/replay_objects.cpp,function,
-,CountTracked,src/harness/replay_objects.cpp,global_read,kReplayFieldCount@src/harness/replay_schema.h
-,CountTracked,src/harness/replay_objects.cpp,global_read,kReplayFields@src/harness/replay_schema.h
 ,CountUse,src/state/block.cpp,call,Head
 ,CountUse,src/state/block.cpp,field_read,BlockHeader::highWater
 ,CountUse,src/state/block.cpp,field_read,BlockHeader::inUse
@@ -45121,7 +45113,6 @@ address,function,file,kind,target
 ,EnergyAccount,src/game/economy.cpp,field_escape,UnitResources::energyMake
 ,EnergyAccount,src/game/economy.cpp,function,
 ,EnsureTable,src/harness/replay_objects.cpp,call,AllocateTable
-,EnsureTable,src/harness/replay_objects.cpp,call,CountTracked
 ,EnsureTable,src/harness/replay_objects.cpp,call,ReplayLengthOf
 ,EnsureTable,src/harness/replay_objects.cpp,call,SimBlockBase
 ,EnsureTable,src/harness/replay_objects.cpp,call,StoreFactor

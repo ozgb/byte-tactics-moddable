@@ -73,7 +73,7 @@ runs showed for other fields of Type, else from a heap row of state_classes.csv 
 members of struct Game in src/game/game.h; a type whose containers are all sim or mixed is sim (or mixed), one whose
 containers are none is not; with the two kinds mixed, or with no container, the item is left out and counted.
 
-Limits: the evidence is the 83 scenarios' test mode, native modules only (see accesslog.py); a window is a tick's whole
+Limits: the evidence is the 84 scenarios' test mode, native modules only (see accesslog.py); a window is a tick's whole
 stretch of main-loop work, so `every-frame` means every tick's, not every drawn frame's; the wall clock makes the
 rare reads (timers, flashes) come and go between two runs of a scenario.
 """

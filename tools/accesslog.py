@@ -103,6 +103,7 @@ from pathlib import Path
 import blockpointers
 import sources
 import stateclasses
+import tracediff
 import tracedigest
 
 ROOT = sources.ROOT
@@ -661,10 +662,15 @@ def trace_difference(trace: Path, reference: Path) -> str | None:
     return "%d ticks, stored %d" % (len(have), len(want))
 
 
-def play(exe: Path, scenario: Path, game_dir: Path, tables_dir: Path | None, raw: bool, timeout: float) -> tuple[Path, float]:
+def play(exe: Path, scenario: Path, game_dir: Path, tables_dir: Path | None, raw: bool, timeout: float,
+         put: dict[str, Path] | None = None, collect: tuple[str, ...] = ()) -> tuple[Path, float]:
     """Play a scenario in test mode with native modules; the run's directory under build/playtest and the seconds."""
     argv = [sys.executable, str(ROOT / "tools/playtest.py"), "--exe", str(exe), "--game-dir", str(game_dir),
             "--testmode", str(scenario), "--native-modules", "--testmode-timeout", str(timeout)]
+    for dest, source in (put or {}).items():
+        argv += ["--put", dest, str(source)]
+    for name in collect:
+        argv += ["--collect", name]
     if tables_dir is not None:
         for name in (ATTR_NAME, ITEMS_NAME, FUNCS_NAME):
             argv += ["--put", name, str(tables_dir / name)]
@@ -682,6 +688,19 @@ def play(exe: Path, scenario: Path, game_dir: Path, tables_dir: Path | None, raw
     if not directories:
         raise SystemExit("accesslog: %s left no trace.txt" % scenario.stem)
     return directories[0], float(json.loads((directories[0] / "result.json").read_text())["seconds"])
+
+
+def loaded_save(build_dir: Path, scenario: Path, game_dir: Path, timeout: float) -> dict[str, Path]:
+    """The files that place the save of the scenario named by `scenario`'s load line (an empty map when it has none): the
+    saving scenario plays first, on the instrumented exe, and its savegame files are kept in build_dir/access/save/<scenario>."""
+    saver = tracediff.scenario_load(scenario)
+    if saver is None:
+        return {}
+    directory, _ = play(build_dir / "TotalA.exe", scenario.parent / (saver + ".txt"), game_dir, build_dir, False, timeout,
+                        collect=tracediff.SAVE_FILES)
+    kept = build_dir / "access" / "save" / scenario.stem
+    tracediff.copy_save(directory, kept)
+    return tracediff.save_put(kept, scenario.stem, saver)
 
 
 def steady(edges: Path) -> list[str]:
@@ -723,7 +742,8 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
         stored = ROOT / "reference/traces" / (name + ".txt")
         if not scenario.is_file() or not stored.is_file():
             raise SystemExit("accesslog: no scenario or stored trace named %s" % name)
-        directory, seconds = play(build_dir / "TotalA.exe", scenario, game_dir, build_dir, raw, timeout)
+        put = loaded_save(build_dir, scenario, game_dir, timeout)
+        directory, seconds = play(build_dir / "TotalA.exe", scenario, game_dir, build_dir, raw, timeout, put)
         why = trace_difference(directory / "trace.txt", stored)
         print("%s: %s" % (name, "trace EQUAL to reference/traces/%s.txt" % name if why is None else "trace DIFFERS, " + why))
         failed += why is not None
@@ -731,7 +751,7 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
             if (directory / source).is_file():
                 shutil.copyfile(directory / source, out / ("%s.%s" % (name, suffix)))
         if twice:
-            again, _ = play(build_dir / "TotalA.exe", scenario, game_dir, build_dir, False, timeout)
+            again, _ = play(build_dir / "TotalA.exe", scenario, game_dir, build_dir, False, timeout, put)
             same = steady(again / "access.edges.csv") == steady(out / (name + ".edges.csv"))
             print("%s: two runs give %s edges file, presentation rows left out" % (name, "the same" if same else "DIFFERENT"))
             failed += not same

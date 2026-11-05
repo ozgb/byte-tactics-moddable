@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <vector>
+#include <algorithm>
 
 #include "../src/harness/replay_schema.h"
 #include "../src/files/files_bank.h"
@@ -1785,6 +1786,8 @@ bool ObjectLineIsCondition(const char* name)
     return k.field != nullptr && ReplayFieldIsCondition(*k.field);
 }
 
+std::vector<void*> g_blobSeen;
+
 void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* object, const unsigned short* set, unsigned count, ReplayText& key, ReplayText& value)
 {
     for (unsigned i = 0; i < count; i++) {
@@ -1806,18 +1809,31 @@ void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* o
             ReplayCompareCStrings(f, object, key.Data(), g_known, Diff, HashText);
             continue;
         }
+        ReplayText bytes;
+        const char* lookup = key.Data();
+        if (f.kind == RK_BLOB && ReplayBlobKey(f, object, g_objects, bytes)) {
+            void* target = *(void**)((unsigned char*)object + f.offset);
+            if (std::find(g_blobSeen.begin(), g_blobSeen.end(), target) != g_blobSeen.end()) {
+                bytes.Free();
+                continue;
+            }
+            g_blobSeen.push_back(target);
+            lookup = bytes.Data();
+        }
         ReplayFormatObjectField(f, object, g_objects, false, value);
         HashText(value.Data());
-        const char* known = g_known.Get(key.Data());
+        const char* known = g_known.Get(lookup);
         if (known == nullptr)
             Diff(key.Data(), "no value", value.Data());
         else if (strcmp(known, value.Data()) != 0)
             Diff(key.Data(), known, value.Data());
+        bytes.Free();
     }
 }
 
 void CompareObjects(const ReplaySlotSets* sets)
 {
+    g_blobSeen.clear();
     ReplayWalk(g_reach, g_objects, false, *sets, g_rootKinds, g_rootObjects, g_rootCount);
     ReplayText key;
     ReplayText value;
@@ -5551,6 +5567,127 @@ void BlobSelfTest()
     calls.Free();
 }
 
+void SharedBlobSelfTest()
+{
+    printf("two holders of one blob\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureProgram* first = (FixtureProgram*)Fresh(sizeof(FixtureProgram));
+    FixtureProgram* second = (FixtureProgram*)Fresh(sizeof(FixtureProgram));
+    int* entries = (int*)Fresh(5 * (unsigned)sizeof(int));
+    for (int i = 0; i < 5; i++)
+        entries[i] = 10 * (i + 1);
+    first->count = second->count = 5;
+    first->entries = second->entries = entries;
+    static const char* const fieldNames[3] = { "count", "entries", "entries[]" };
+    unsigned short fields[3];
+    for (int i = 0; i < 3; i++)
+        fields[i] = FieldIndex(ROK_FIXTUREPROGRAM, fieldNames[i]);
+    ReplaySlotSets sets = { "program", 0, nullptr, 0, nullptr, 0, fields, 3, fields, 3 };
+    unsigned char kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTUREPROGRAM };
+    void* roots[2] = { first, second };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 2, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    const char* bytes = strstr(text, "FixtureProgram#1.entries[] [20]");
+    Check(bytes != nullptr && strstr(bytes + 31, "[20]") == nullptr, "the bytes of a target are written once");
+    Check(strstr(text, "  r FixtureProgram#2.entries alloc#1\n") != nullptr && strstr(text, "FixtureProgram#2.entries[]") == nullptr, "the second holder names the target and writes no bytes");
+    entries[1] = 77;
+    recorder.Record(kinds, roots, 2, sets);
+    Check(strcmp(recorder.text.Data(), "  r FixtureProgram#1.entries[] 4:4d\n") == 0, "a changed byte is one delta, whoever holds the target");
+    char* changed = strdup(recorder.text.Data());
+
+    ResetBlock();
+    RestoreText(text, sets);
+    RestoreText(changed, sets);
+    FixtureProgram* rebuiltFirst = (FixtureProgram*)ReplayResolveObject("FixtureProgram#1", nullptr, g_objects, AllocObject);
+    FixtureProgram* rebuiltSecond = (FixtureProgram*)ReplayResolveObject("FixtureProgram#2", nullptr, g_objects, AllocObject);
+    Check(rebuiltFirst != nullptr && rebuiltSecond != nullptr && rebuiltFirst->entries != nullptr && rebuiltFirst->entries == rebuiltSecond->entries, "the holders replay to the same block");
+    Check(rebuiltFirst != nullptr && rebuiltFirst->entries != nullptr && rebuiltFirst->entries[1] == 77 && rebuiltFirst->entries[4] == 50, "with its bytes");
+    Check(rebuiltFirst != nullptr && g_objects.Pointer(ROK_ALLOC, 1) == rebuiltFirst->entries, "and the name still leads to it");
+    g_rootKinds[0] = ROK_FIXTUREPROGRAM;
+    g_rootKinds[1] = ROK_FIXTUREPROGRAM;
+    g_rootObjects[0] = rebuiltFirst;
+    g_rootObjects[1] = rebuiltSecond;
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the shared bytes compare equal for both");
+    if (rebuiltFirst != nullptr && rebuiltFirst->entries != nullptr) {
+        rebuiltFirst->entries[3] = 1;
+        BeginCompare();
+        CompareObjects(&sets);
+        printf("a changed shared byte: %s\n%s", g_firstKey, g_detail.Data());
+        Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureProgram#1.entries[]") == 0, "a changed byte is reported once");
+    }
+    free(text);
+    free(changed);
+}
+
+void EmptyTargetSelfTest()
+{
+    printf("empty targets that are not null\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureProgram* program = (FixtureProgram*)Fresh(sizeof(FixtureProgram));
+    FixtureNamed* named = (FixtureNamed*)Fresh(sizeof(FixtureNamed));
+    new (&named->list) BlockVector<char*>();
+    new (&named->idents) BlockVector<Ref<char> >();
+    program->count = 0;
+    program->entries = (int*)Fresh(1);
+    named->count = 0;
+    named->words = (char**)Fresh(1);
+    static const char* const programNames[3] = { "count", "entries", "entries[]" };
+    unsigned short programFields[3];
+    for (int i = 0; i < 3; i++)
+        programFields[i] = FieldIndex(ROK_FIXTUREPROGRAM, programNames[i]);
+    unsigned short namedFields[2] = { FieldIndex(ROK_FIXTURENAMED, "count"), FieldIndex(ROK_FIXTURENAMED, "words") };
+    unsigned short fields[5];
+    memcpy(fields, programFields, sizeof programFields);
+    memcpy(fields + 3, namedFields, sizeof namedFields);
+    ReplaySlotSets sets = { "empty", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5 };
+    unsigned char kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTURENAMED };
+    void* roots[2] = { program, named };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 2, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(strstr(text, "  r FixtureProgram#1.entries alloc#1\n  r FixtureProgram#1.entries[] [0]") != nullptr, "an empty blob is named, with no bytes");
+    Check(strstr(text, "  r FixtureNamed#1.words [0]\n") != nullptr, "an empty array of strings is a length of nothing");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureProgram* rebuiltProgram = (FixtureProgram*)ReplayResolveObject("FixtureProgram#1", nullptr, g_objects, AllocObject);
+    FixtureNamed* rebuiltNamed = (FixtureNamed*)ReplayResolveObject("FixtureNamed#1", nullptr, g_objects, AllocObject);
+    Check(rebuiltProgram != nullptr && rebuiltProgram->entries != nullptr, "a non-null empty blob is not null when replayed");
+    Check(rebuiltProgram != nullptr && rebuiltProgram->entries != nullptr && g_objects.Pointer(ROK_ALLOC, 1) == rebuiltProgram->entries, "and the name leads to it");
+    Check(rebuiltNamed != nullptr && rebuiltNamed->words != nullptr, "nor is a non-null empty array of strings");
+    g_rootKinds[0] = ROK_FIXTUREPROGRAM;
+    g_rootKinds[1] = ROK_FIXTURENAMED;
+    g_rootObjects[0] = rebuiltProgram;
+    g_rootObjects[1] = rebuiltNamed;
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "both compare equal");
+    free(text);
+}
+
+void RebindSelfTest()
+{
+    printf("a name bound again\n");
+    ResetBlock();
+    static char cells[64];
+    for (unsigned i = 0; i < 20000; i++)
+        g_objects.Bind(ROK_ALLOC, 1, cells + i % 64);
+    Check(g_objects.Find(ROK_ALLOC, cells + 19999 % 64) == 1, "the last pointer bound to a name is found by it");
+    Check(g_objects.Find(ROK_ALLOC, cells + 19998 % 64) == 0, "and the one it replaced is not");
+    Check(g_objects.Pointer(ROK_ALLOC, 1) == cells + 19999 % 64, "the name leads to the last one, after more rebinds than the table has slots");
+    g_objects.Bind(ROK_ALLOC, 2, cells);
+    Check(g_objects.Find(ROK_ALLOC, cells) == 2 && g_objects.Find(ROK_ALLOC, cells + 19999 % 64) == 1, "another name is still told apart");
+}
+
 void NestedVectorSelfTest()
 {
     printf("vectors of vectors\n");
@@ -5840,6 +5977,9 @@ int SelfTest(const char* file)
     SelfPointerSelfTest();
     CStringSelfTest();
     BlobSelfTest();
+    SharedBlobSelfTest();
+    EmptyTargetSelfTest();
+    RebindSelfTest();
     NestedVectorSelfTest();
     SimVectorSelfTest();
     GameWriteSelfTest();

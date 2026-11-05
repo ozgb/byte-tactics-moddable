@@ -10,7 +10,7 @@ enum { REPLAY_OBJECT_KINDS = 96 };
 enum { REPLAY_OBJECT_KINDS = 64 };
 #endif
 
-enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384, REPLAY_HANDLE_CALLBACK = 3 };
+enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384, REPLAY_HANDLE_CALLBACK = 3, REPLAY_KEY_BYTES = 512 };
 
 ReplayOrdinals& ReplayHandles();
 
@@ -53,6 +53,7 @@ unsigned ReplayLengthOf(const ReplayLength& length, const void* object);
 ReplayObjectField ReplayFieldView(const ReplayField& f);
 void ReplayEmitField(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, char tag, const char* key, const ReplayObjectField& f, const void* object, ReplayText& scratch);
 bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc);
+bool ReplayBlobKey(const ReplayObjectField& f, const void* object, const ReplayObjectTable& table, ReplayText& out);
 bool ReplayApplyBlob(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayObjectTable& table, ReplayAllocFn alloc);
 typedef void (*ReplayReportFn)(const char* key, const char* recorded, const char* replayed);
 typedef void (*ReplayHashFn)(const char* text);

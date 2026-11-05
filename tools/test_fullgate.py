@@ -119,6 +119,23 @@ class FullGateTest(unittest.TestCase):
         self.assertEqual(fullgate.last_full_run(comments), self.base)
         self.assertEqual(fullgate.last_full_run(list(reversed(comments))), self.base)
 
+    def test_a_signed_full_gate_comment_counts(self):
+        comments = [
+            comment("Full gate on aaaaaaa: 65 of 65 equal", "2026-11-01T10:00:00Z"),
+            comment("Lead: Full gate on " + self.base + ": 65 of 65 equal", "2026-11-02T10:00:00Z"),
+        ]
+        self.assertEqual(fullgate.last_full_run(comments), self.base)
+        signed = [comment("Maintainer: Full gate on bbbbbbb\n\nCommit bbbbbbb", "2026-11-03T10:00:00Z")]
+        self.assertEqual(fullgate.last_full_run(signed), "bbbbbbb")
+
+    def test_a_quoted_full_gate_line_does_not_count(self):
+        comments = [
+            comment("Full gate on " + self.base + ": 65 of 65 equal", "2026-11-01T10:00:00Z"),
+            comment("Lead: the run before was\n\nFull gate on aaaaaaa: 65 of 65 equal", "2026-11-02T10:00:00Z"),
+            comment("Reviewer: Full gate on ccccccc", "2026-11-03T10:00:00Z"),
+        ]
+        self.assertEqual(fullgate.last_full_run(comments), self.base)
+
     def test_a_merge_before_the_full_run_is_not_counted(self):
         merge_pr(self.repo, 100, "src/game/c.cpp")
         before = git(self.repo, "rev-parse", "HEAD")

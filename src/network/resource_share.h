@@ -1,16 +1,18 @@
 #ifndef NETWORK_RESOURCE_SHARE_H
 #define NETWORK_RESOURCE_SHARE_H
 
+#include "../util/x87_compare.h"
+
 inline float ShareAmount(float stock, float keep, float factor, float capacity, float partnerStock)
 {
 #ifdef __clang__
     double product = ((double)stock - (double)keep) * (double)factor;
     double limit = (double)capacity - (double)partnerStock;
-    return product < limit ? (float)product : (float)limit;
+    return X87LtTest01(product, limit) ? (float)product : (float)limit;
 #else
     float amount = (stock - keep) * factor;
     float limit = capacity - partnerStock;
-    return amount < limit ? amount : limit;
+    return X87LtTest01(amount, limit) ? amount : limit;
 #endif
 }
 

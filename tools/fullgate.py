@@ -61,7 +61,7 @@ GATE_PATHS = (
     "tools/reference.py",
     "tools/playtest.py",
 )
-FULL_RUN = re.compile(r"\s*Full gate on ([0-9a-fA-F]{7,40})\b")
+FULL_RUN = re.compile(r"\s*(?:(?:Lead|Maintainer):\s*)?Full gate on ([0-9a-fA-F]{7,40})\b")
 MERGE_SUBJECT = re.compile(r"Merge pull request #(\d+)\b")
 EQUAL_LINE = re.compile(r"^(\d+) of (\d+) scenarios equal, total ", re.MULTILINE)
 POINTERS_OK = re.compile(r"^(?:\[(\w+)\] )?block pointers: all covered by ", re.MULTILINE)

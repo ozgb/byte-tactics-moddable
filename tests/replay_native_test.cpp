@@ -721,6 +721,17 @@ void* ArgObject(const char* name, unsigned kind)
     return p;
 }
 
+void* ArgWeapon(const char* name)
+{
+    const char* value = ArgLine(name);
+    void* p = value == nullptr ? nullptr : ReplayParseWeapon(value);
+    if (p != nullptr && g_rootCount < REPLAY_MAX_ROOTS) {
+        g_rootKinds[g_rootCount] = ROK_WEAPONDEF;
+        g_rootObjects[g_rootCount++] = p;
+    }
+    return p;
+}
+
 void ParseStruct(const char* name, unsigned kind, void* object)
 {
     for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
@@ -1532,6 +1543,14 @@ int __stdcall Native_fixture_Query(FixtureAmount* first, FixtureAmount* second)
     if (second != nullptr)
         second->amount = 0;
     return first != nullptr ? first->amount : -1;
+}
+
+int __stdcall Native_fixture_Strike(WeaponDef* weapon)
+{
+    if (weapon == nullptr)
+        return -1;
+    weapon->speed += 1;
+    return weapon->speed;
 }
 
 int __stdcall Native_fixture_Notify(FixtureNotify* holder, Callback* done, int amount)
@@ -3227,6 +3246,49 @@ void InOutRunnerSelfTest()
     After_fixture_Measure();
     printf("a scalar that came out differently: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "p4") == 0, "a replayed scalar that differs is reported at the argument");
+}
+
+void WeaponArgumentSelfTest()
+{
+    printf("a weapon as an argument\n");
+    unsigned short field[1] = { 0 };
+    bool found = false;
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        if (kReplayObjectFields[i].object == ROK_WEAPONDEF && strcmp(kReplayObjectFields[i].name, "speed") == 0) {
+            field[0] = (unsigned short)i;
+            found = true;
+        }
+    }
+    Check(found, "the weapon definition has a speed field");
+    if (!found)
+        return;
+    ReplaySlotSets sets = { "Strike", 0, nullptr, 0, nullptr, 0, field, 1, field, 1 };
+    const char* calls[3] = { "  r weapondef#3.speed 7\n  a weapon weapondef#3\n  w weapondef#3.speed 8\n  o result 8\n",
+                             "  r weapondef#3.speed 7\n  a weapon weapondef#3\n  w weapondef#3.speed 9\n  o result 8\n",
+                             "  a weapon null\n  o result -1\n" };
+    for (int n = 0; n < 3; n++) {
+        ResetBlock();
+        LoadCall(calls[n]);
+        for (int k = 1; k < g_lineCount; k++) {
+            char* space = strchr(g_lines[k] + 4, ' ');
+            if (strncmp(g_lines[k], "  r ", 4) == 0 && space != nullptr) {
+                *space = '\0';
+                RestoreObjectLine(g_lines[k] + 4, space + 1, "self-test", &sets, g_lines[k]);
+                *space = ' ';
+            }
+        }
+        g_rootCount = 0;
+        BeginCompare();
+        Run_fixture_Strike();
+        CompareWrites("self-test", &sets);
+        After_fixture_Strike();
+        if (n == 0)
+            Check(g_diffs == 0 && g_rootCount == 1, "a weapon with its recorded field replays equal, as a root of the slot");
+        else if (n == 1)
+            Check(g_diffs == 1 && strcmp(g_firstKey, "weapondef#3.speed") == 0, "a weapon field that came out differently is reported at that field");
+        else
+            Check(g_diffs == 0 && g_rootCount == 0, "a null weapon stays null");
+    }
 }
 
 void CallbackSelfTest()
@@ -6033,6 +6095,7 @@ int SelfTest(const char* file)
     ShapeSelfTest();
     EnemyListSelfTest();
     InOutRunnerSelfTest();
+    WeaponArgumentSelfTest();
     PolymorphicSelfTest();
     RefsSelfTest();
     BasedTableSelfTest();

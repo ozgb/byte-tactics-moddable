@@ -545,6 +545,7 @@ void __stdcall RecFeaturesDamageFeature(Cell* a0, int a1, int a2, WeaponDef* a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_CELL, a0);
+    roots.Add(ROK_WEAPONDEF, a3);
     SlotScope scope(RSL_FEATURES_DAMAGEFEATURE, SUB_FEATURES, roots);
     if (scope.Open()) {
         ArgObject(s_call, "cell", ROK_CELL, a0);
@@ -1006,6 +1007,7 @@ void __stdcall RecWeaponsUpdateExplosions()
 int __stdcall RecWeaponsSpawnProjectile(WeaponDef* a0, Vec3* a1, Vec3* a2, int a3)
 {
     ReplayRoots roots;
+    roots.Add(ROK_WEAPONDEF, a0);
     SlotScope scope(RSL_WEAPONS_SPAWNPROJECTILE, SUB_WEAPONS, roots);
     if (scope.Open()) {
         ArgWeapon(s_call, "weapon", a0);
@@ -1057,6 +1059,7 @@ WeaponDef* __stdcall RecWeaponsFindWeaponByName(char* a0)
 void __stdcall RecWeaponsApplyAreaDamageAt(WeaponDef* a0, Vec3* a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_WEAPONDEF, a0);
     SlotScope scope(RSL_WEAPONS_APPLYAREADAMAGEAT, SUB_WEAPONS, roots);
     if (scope.Open()) {
         ArgWeapon(s_call, "weapon", a0);
@@ -4884,6 +4887,7 @@ void __stdcall RecNetworkSendProjectileDetonated(Unit* a0, Projectile* a1)
 void __stdcall RecNetworkSendFeatureHit(WeaponDef* a0, int a1, int a2)
 {
     ReplayRoots roots;
+    roots.Add(ROK_WEAPONDEF, a0);
     SlotScope scope(RSL_NETWORK_SENDFEATUREHIT, SUB_NETWORK, roots);
     if (scope.Open()) {
         ArgWeapon(s_call, "weapon", a0);

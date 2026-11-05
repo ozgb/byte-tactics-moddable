@@ -2078,6 +2078,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     for i, a in enumerate(s["args"]):
         if a["mode"] == "object":
             L.append("    roots.Add(ROK_%s, a%d);" % (upper(a["kind"]), i))
+        elif a["mode"] == "weapon":
+            L.append("    roots.Add(ROK_WEAPONDEF, a%d);" % i)
     L.append("    SlotScope scope(%s, SUB_%s, roots%s);" % (rid, upper(sub), ", false" if unrecorded else ""))
     callback_args = [i for i, a in enumerate(s["args"]) if a["mode"] == "callback"]
     held_args = [] if is_import else callback_args
@@ -2571,6 +2573,9 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             call.append(v)
         elif m == "value":
             L.append("    %s %s = %s();\n    ParseValueArg(\"%s\", ROK_%s, &%s);" % (t, v, t, line, upper(a["kind"]), v))
+            call.append(v)
+        elif m == "weapon":
+            L.append('    WeaponDef* %s = (WeaponDef*)ArgWeapon("%s");' % (v, line))
             call.append(v)
         elif m == "argv":
             L.append("    ArgvHolder %s;\n    ParseArgv(%s);" % (v, v))
@@ -3246,7 +3251,7 @@ def shape_slots(ann: dict) -> tuple[list[dict], list[str]]:
     return out, errors
 
 
-RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "callback"}
+RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "callback", "weapon"}
 
 
 def runnable(s: dict) -> bool:

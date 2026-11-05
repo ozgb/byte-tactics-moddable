@@ -893,7 +893,7 @@ sets). The annotations hold what no header says:
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
 | `argv` | `CommandArgs*` | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
-| `weapon` | `WeaponDef*` | `weapondef#17` |
+| `weapon` | `WeaponDef*` | `weapondef#17`, or `null`; as a slot argument `a weapon weapondef#17` and, before it, an `r weapondef#17.speed 40` line for each `WeaponDef` field in the read set of the slot (the weapon is a root of the walk) |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for an import that reads only those (`GetGroundHeight`); with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
 | `callback` | `UnitVisitor*` and the like, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
 | `callback` | `Callback*` and the like, a slot's argument | `a done callback#3` or `a done null`, and a `c` line for each call the module made on it during the slot (see "A callback held in state") |
@@ -906,6 +906,12 @@ A `bytes-in` import line carries the bytes the call passed in, so a `files.BankW
 
 A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
+
+A `weapon` argument of a slot is recorded as `a weapon weapondef#17`, or `a weapon null`, and the weapon is a root of the slot's walk: the
+fields of `WeaponDef` in the slot's read set are `r weapondef#17.<field>` lines before the call, as for a weapon the slot reaches through a unit, and
+those in its write set are `w` lines after it. The replayer resolves `weapondef#17` to `&g_game->weapons[17]`, restores its `r` fields
+before the call and passes that pointer; `null` stays a null pointer. A field that differs on replay is reported as `weapondef#17.<field>`.
+
 A `pending` subsystem lists in its generated `pending` entry what is left (untracked targets, rows with no rule,
 slots whose functions are not found, arguments with no annotation); its own issue empties that list. A complete
 subsystem with anything pending is an error, and the error prints every pending item, one per line.

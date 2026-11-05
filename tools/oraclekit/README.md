@@ -2,7 +2,8 @@
 
 This is everything Milestone 2 (#180) may read of the reference. `MANIFEST.json` lists every file with its
 sha256 and size, the commit it was cut from, and the kit's version: the pair of tags (`interfaces-v*`,
-`reference-traces-v*`) at that commit. A kit with `"version": null` is a trial and is not to be built against.
+`reference-traces-v*`) with the commit of each in `tag_commits`. The interfaces tag is on that commit; the traces tag is the
+highest one reachable from it, and no file under `reference/` other than a `.md` file differs between the two. A kit with `"version": null` is a trial and is not to be built against.
 
 ## What each part is
 

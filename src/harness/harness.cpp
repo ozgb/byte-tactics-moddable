@@ -1478,6 +1478,34 @@ int HarnessViewRand()
     return (s_viewState >> 16) & 0x7fff;
 }
 
+static HANDLE s_loadEnded = NULL;
+
+void HarnessLoadBegins()
+{
+    if (s_testMode)
+        s_loadEnded = CreateEventA(NULL, TRUE, FALSE, NULL);
+}
+
+void HarnessLoadEnded()
+{
+    if (s_loadEnded != NULL)
+        SetEvent(s_loadEnded);
+}
+
+int HarnessAwaitLoadAndEndFrame()
+{
+    if (s_loadEnded == NULL)
+        return 0;
+    for (;;) {
+        DWORD r = MsgWaitForMultipleObjects(1, &s_loadEnded, FALSE, INFINITE, QS_SENDMESSAGE);
+        if (r != WAIT_OBJECT_0 + 1)
+            break;
+        MSG msg;
+        PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE);
+    }
+    return 1;
+}
+
 void HarnessStartSkirmish()
 {
     if (!s_testMode || s_started)

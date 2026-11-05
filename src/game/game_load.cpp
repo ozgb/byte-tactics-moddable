@@ -428,6 +428,9 @@ void UpdateExplosions(void);
 void __stdcall SeedRandom(int x);
 unsigned HarnessGameSeed(unsigned live);
 unsigned HarnessCrtSeed(unsigned live);
+void HarnessLoadBegins();
+void HarnessLoadEnded();
+int HarnessAwaitLoadAndEndFrame();
 void __stdcall SleepMilliseconds(int x);
 int __stdcall RandomInt(int x);
 unsigned char __stdcall FindHostSlot();
@@ -809,6 +812,7 @@ tail:
     RebuildAIFeatureCells();
 
     g_game->loadingFlags.value |= 2;
+    HarnessLoadEnded();
 }
 //
 // Kept as written, each for the registers it gives:
@@ -997,6 +1001,7 @@ void LoadingScreenFrame(void)
             }
             g_game->slots.flag40[i] = (pi->active != 0 && (pi->data->flags_9b & 0x40) != 0) ? 1 : 0;
         }
+        HarnessLoadBegins();
         if (!StartThread(LoadThreadMain, 0, 0)) {
             FatalError("Unable to start the loading thread!");
         }
@@ -1007,6 +1012,8 @@ void LoadingScreenFrame(void)
         memset(&g_loadingBarPrevPercent, 0, 6);
         g_game->loadingFlags.bits.started = 1;
         OnlineUnload();
+        if (HarnessAwaitLoadAndEndFrame())
+            return;
     }
     if (g_game->loadingFlags.bits.loaded) {
         StopAllSounds();

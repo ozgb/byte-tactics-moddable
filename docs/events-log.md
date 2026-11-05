@@ -49,13 +49,61 @@ logs have no such line and any one is a difference.
 
 The label of a `dropped` line is `load` or `outside` by the same rule, as it is written by the drain that sees the count rise.
 
+## The digest
+
+`reference/events/<scenario>.txt` stores the digest of the log, not the log (the logs of the
+scenarios are over a gigabyte). `tools/eventdigest.py` makes the digest from a full log. The
+first line is `bt-event-digest 1`, the digest format version. The second line is `log `
+followed by the first line of the log (`log bt-events 1`). Every other line covers one run of
+records with the same tick and the same phase, taken in the order of the log:
+
+    <tick> <phase> <count> <hash>
+
+| Field | Meaning |
+| --- | --- |
+| `tick`, `phase` | The tick and the phase of the records, as they appear in the log. A tick and phase that the log has again after other records have their own line, in the order of the log. |
+| `count` | The number of records in the run (decimal). |
+| `hash` | The 64-bit hash of the run's bytes, as 16 lowercase hexadecimal digits. |
+
+The hash is the one of the traces (`docs/trace-format.md`, section 3: the 64-bit FNV-1a variant
+with the offset basis `0xcbf29ce484222325`, whose step on each whole 8-byte word is the word
+step), applied once to the run's bytes as one run of bytes, written `HB(bytes)`. The bytes are
+the text of the run's records exactly as the log has them: for each record, the whole line
+from the tick to the last token, without the line feed, then one line feed (byte `0x0a`).
+Nothing is added between records and the tick and phase are part of each record's bytes.
+
+What the digest covers, therefore:
+
+- Every field of every record: the tick, the phase, the kind, the flags and every argument.
+- The content of a radar snapshot: the hexadecimal token of a `radar_units` or `radar_mapped`
+  record is part of the record's line, so every byte of the snapshot is in the hash.
+- A `dropped` line: it is a record of its tick and phase like any other, so it is counted in
+  `count` and its text is in the hash. A reference run never drops an event, so a run that has
+  one differs from the stored digest in the count and in the hash of that line's phase.
+- The order of the records in a run, and the order of the runs.
+- The header line, through the second line of the digest.
+
+Two logs have the same digest only if they are equal, up to a collision of the 64-bit hash of
+one run.
+
 ## What the check compares
 
-For each scenario, the check compares the log of a run with the stored log of the
-same scenario, line by line and byte by byte, including the header line. Two logs
-are equal when they have the same lines in the same order. The first line that
-differs is reported with its number, its tick and phase, and both texts; a log that is
-longer or shorter than the other differs at the first line only one of them has.
+For each scenario, the check makes the digest of the run's log and compares it with the stored
+digest line by line, including the first two lines. Two digests are equal when they have the
+same lines in the same order. The first line that differs is reported with its number, its tick
+and phase, and both lines, which hold the counts and the hashes: a different count shows a
+missing or an extra event in that phase, and a digest that is longer or shorter than the other
+differs at the first line only one of them has.
 
-A scenario with no stored log is not compared, and is counted in the summary. The
-check runs in the tier as it does in the full suite.
+A scenario with no stored digest is not compared, and is counted in the summary. The check
+runs in the tier as it does in the full suite.
+
+## Naming the record
+
+A digest names a tick and a phase, not a record. When a scenario's digest differs, the check
+then plays the reference build of the stored traces and the build under test on that scenario
+with `tools/tracediff.py A B --scenario S --events`, which compares the two full logs line by
+line and prints the number of the first record that differs, its tick and phase, and both
+records (or the record only one log has). `tools/tracediff.py --event-logs A B` does the same
+for two logs that are already written. A build that has the reference's logs can do the same
+with its own tools: the full log of a scenario is what a test-mode run writes.

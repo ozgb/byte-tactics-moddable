@@ -111,7 +111,7 @@ with `input` lines runs at one step per frame even under `--steps-per-frame`.
 
 ## Event logs
 
-`--check` compares each run's `events.txt` line by line with `reference/events/<scenario>.txt` when that file exists, and `--traces` copies the logs the reference branch wrote into `reference/events/` (format in [docs/events-log.md](../docs/events-log.md)).
+`--check` makes the digest of each run's `events.txt` and compares it line by line with `reference/events/<scenario>.txt` when that file exists, and `--traces` writes the digests of the logs the reference branch wrote into `reference/events/` (the stored files are digests, as the traces are: a tick, a phase, a record count and a hash for each run of records; format in [docs/events-log.md](../docs/events-log.md)). When a digest differs, the check plays the reference build of the stored traces and the exe, and names the first differing record (`tools/tracediff.py --events`).
 
 ## Traces
 

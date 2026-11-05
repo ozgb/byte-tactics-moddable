@@ -28073,9 +28073,9 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_write,Unit::lastAttackerSlot
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_write,Unit::lastDamageType
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,function,
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_escape,s_paralyze_00508d80
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_maybe_written,s_HitByWeapon_00508d74
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_maybe_written,s_TakeDamage_00508d68
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_escape,g_paralyzeMissionName
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_maybe_written,g_hitByWeaponScriptName
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_maybe_written,g_takeDamageScriptName
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_read,g_game
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_read,g_seams
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,indirect via MissionType (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]

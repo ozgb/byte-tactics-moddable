@@ -350,7 +350,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
                 Player* owner = unit->player;
                 if (owner->active && (owner->type == 1 || owner->type == 2)) {
                     if (!(unit->def->flags1 & 0x4000000)) {
-                        MissionType kind = g_seams.orders->MissionTypeFromName(s_paralyze_00508d80);
+                        MissionType kind = g_seams.orders->MissionTypeFromName(g_paralyzeMissionName);
                         Order* e = unit->list;
                         if (e && e->kind == kind) {
                             e->ticks += ticks;
@@ -374,13 +374,13 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
         if (ev->damageKind == 1) {
             int a = ScaledCos((unsigned short)(ev->headingByte << 8), 400);
             int b = ScaledSin((short)(ev->headingByte << 8), 400);
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), s_HitByWeapon_00508d74, 0, 0, 2, a, b, 0, 0);
+            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), g_hitByWeaponScriptName, 0, 0, 2, a, b, 0, 0);
             int pct = unit->health * 100 / unit->def->maxHealth;
             if (pct < 0)
                 pct = 0;
             if (pct > 100)
                 pct = 100;
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), s_TakeDamage_00508d68, 0, 0, 1, pct, 0, 0, 0);
+            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), g_takeDamageScriptName, 0, 0, 1, pct, 0, 0, 0);
         }
     }
 }

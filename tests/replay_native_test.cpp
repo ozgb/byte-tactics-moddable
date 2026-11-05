@@ -99,9 +99,9 @@ int __cdecl ScaledCos(int angle, int scale)
 
 char* g_fireScriptNames[4] = {(char*)"FirePrimary", (char*)"FireSecondary", (char*)"FireTertiary"};
 char* g_aimScriptNames[3] = {(char*)"AimPrimary", (char*)"AimSecondary", (char*)"AimTertiary"};
-char s_TakeDamage_00508d68[12] = "TakeDamage";
-char s_HitByWeapon_00508d74[12] = "HitByWeapon";
-char s_paralyze_00508d80[12] = "paralyze";
+char g_takeDamageScriptName[12] = "TakeDamage";
+char g_hitByWeaponScriptName[12] = "HitByWeapon";
+char g_paralyzeMissionName[12] = "paralyze";
 
 extern "C" int __cdecl bx_AngleOfVector(int x, int z);
 

@@ -238,9 +238,9 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x508ab4,g_noDirectSoundKey,.data,16,gap,string,char[],1,0,1,one type,1,,s_NoDirectSound_00508ab4,,,4e6f446972656374536f756e64000000
 0x508be8,g_killedScriptName,.data,8,gap,string,char[],1,0,1,one type,1,,s_Killed_00508be8,,,4b696c6c65640000
 0x508bf0,g_takenLeadFormat,.data,36,gap,string,char[],1,0,1,one type,1,,s__s_has_taken_the_lead_with__d_ki_00508bf0,,,2573206861732074616b656e20746865206c6561642077697468202564206b696c6c7300
-0x508d68,s_TakeDamage_00508d68,.data,12,gap,string,char[],1,0,1,one type,1,,s_TakeDamage_00508d68,,,54616b6544616d6167650000
-0x508d74,s_HitByWeapon_00508d74,.data,12,gap,string,char[],1,0,1,one type,1,,s_HitByWeapon_00508d74,,,4869744279576561706f6e00
-0x508d80,s_paralyze_00508d80,.data,12,gap,string,char[],1,0,1,one type,1,,s_paralyze_00508d80,,,706172616c797a6500000000
+0x508d68,g_takeDamageScriptName,.data,12,gap,string,char[],1,0,1,one type,1,,s_TakeDamage_00508d68,,,54616b6544616d6167650000
+0x508d74,g_hitByWeaponScriptName,.data,12,gap,string,char[],1,0,1,one type,1,,s_HitByWeapon_00508d74,,,4869744279576561706f6e00
+0x508d80,g_paralyzeMissionName,.data,12,gap,string,char[],1,0,1,one type,1,,s_paralyze_00508d80,,,706172616c797a6500000000
 0x508d8c,s_SelectMultipleUnits_00508d8c,.data,20,gap,string,char[],1,0,1,one type,1,,s_SelectMultipleUnits_00508d8c,,,53656c6563744d756c7469706c65556e69747300
 0x508f24,g_celebratedKey,.data,12,gap,string,char[],1,0,1,one type,1,,s_Celebrated_00508f24,,,43656c656272617465640000
 0x508f30,g_satisfiedKey,.data,12,gap,string,char[],1,0,1,one type,1,,s_Satisfied_00508f30,,,536174697366696564000000

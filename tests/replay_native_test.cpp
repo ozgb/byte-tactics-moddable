@@ -2549,6 +2549,37 @@ void ArraySelfTest()
     Check(strstr(g_detail.Data(), "byte 25 of 32") != nullptr, "and at its byte");
     rebuiltClass->cells.get()[6] ^= 0x100u;
 
+    printf("a pass map whose height is not a multiple of 16\n");
+    ResetBlock();
+    MovementClass* partial = &MovementEntries()[3];
+    partial->width = 4;
+    partial->height = 20;
+    unsigned* rows = (unsigned*)SimAlloc(8 * 4);
+    for (int i = 0; i < 8; i++)
+        rows[i] = 0x01010101u * (unsigned)(i + 1);
+    partial->cells = rows;
+    unsigned char partialKind = ROK_MOVEMENTCLASS;
+    void* partialRoot = partial;
+    Recorder partialRecorder;
+    partialRecorder.Record(&partialKind, &partialRoot, 1, sets);
+    ReplayText partialCalls;
+    partialCalls.AddText(partialRecorder.text);
+    Check(strstr(partialRecorder.text.Data(), "  r MovementClass#3.cells [8] 0:01010101") != nullptr, "the whole allocation is recorded, the last row included");
+    ResetBlock();
+    RestoreText(partialCalls.Data(), sets);
+    MovementClass* partialRebuilt = (MovementClass*)ReplayResolveObject("MovementClass#3", nullptr, g_objects, AllocObject);
+    g_rootKinds[0] = ROK_MOVEMENTCLASS;
+    g_rootObjects[0] = partialRebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the last row compares equal after the restore");
+    partialRebuilt->cells.get()[7] ^= 1u;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "MovementClass#3.cells") == 0, "a one-word change in the last row is reported");
+    Check(strstr(g_detail.Data(), "byte 28 of 32") != nullptr, "at its byte");
+
     printf("long deltas\n");
     ResetBlock();
     Player* wide = &g_game->players[4];

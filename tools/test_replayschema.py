@@ -1166,7 +1166,7 @@ class Vectors(unittest.TestCase):
         files, errors, model = self.generated()
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"][:3]],
+        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"] if v["owner"] == "PlayerAI"],
                          [("object", "Unit", "Ref<Unit>"), ("value", "KeyedCell", "KeyedCell"), ("scalar", "", "short")])
         self.assertIn("{ RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },", text)
         self.assertIn("{ RV_VALUE, ROK_KEYEDCELL, sizeof(KeyedCell) },", text)
@@ -1179,7 +1179,7 @@ class Vectors(unittest.TestCase):
         row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "visibleUnits",')][0]
         self.assertIn("offsetof(PlayerAI, visible.units)", row)
         self.assertIn("RK_VECTOR, ROK_UNIT,", row)
-        self.assertTrue(row.rstrip(" },").endswith(", 1"), row)
+        self.assertTrue(row.rstrip(" },").endswith(", %d" % (1 + len(rs.load_annotations(fixtures=True)["fixture_sim"]))), row)
 
     def test_a_header_that_needs_the_packing_of_the_game_is_included_packed(self):
         files, _, _ = self.generated()

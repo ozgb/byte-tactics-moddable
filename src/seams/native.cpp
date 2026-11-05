@@ -719,7 +719,7 @@ static int __stdcall BankReadBoxNative(HapiBank* self, void* dst, int len)
     return ((AccountBank*)self)->ReadBox(dst, len);
 }
 
-static int __stdcall BankWriteBoxNative(HapiBank* self, void* src, int len)
+static int __stdcall BankWriteBoxNative(HapiBank* self, const void* src, int len)
 {
     return ((AccountBank*)self)->WriteBox(src, len);
 }

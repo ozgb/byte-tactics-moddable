@@ -4689,7 +4689,7 @@ int __stdcall RecFilesBankReadBox(HapiBank* a0, void* a1, int a2)
     return result;
 }
 
-int __stdcall RecFilesBankWriteBox(HapiBank* a0, void* a1, int a2)
+int __stdcall RecFilesBankWriteBox(HapiBank* a0, const void* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKWRITEBOX, SUB_FILES, roots);

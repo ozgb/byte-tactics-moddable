@@ -754,7 +754,7 @@ int AccountBank::ReadBox(void* dst, int len)
 }
 
 // FUNCTION: 0x4b4cf0
-int AccountBank::WriteBox(void* src, int len)
+int AccountBank::WriteBox(const void* src, int len)
 {
     SafeDepositBox* c = &bank->accounts[bank->current].boxes[bank->accounts[bank->current].currentBox];
     int need = len + c->pos;

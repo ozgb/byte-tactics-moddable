@@ -33,7 +33,7 @@ public:
     void SeekBox(int pos);
     int SeekBoxEnd();
     int ReadBox(void* dst, int len);
-    int WriteBox(void* src, int len);
+    int WriteBox(const void* src, int len);
     void WriteAuditFile(char* filename);
 };
 

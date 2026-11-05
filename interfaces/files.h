@@ -7,7 +7,7 @@ class HapiBank;
 struct FileNameList;
 
 // Major version of the files interface, changed when a slot is removed or its signature changes.
-#define FILES_VERSION_MAJOR 1
+#define FILES_VERSION_MAJOR 2
 // Minor version of the files interface, changed when a slot is added.
 #define FILES_VERSION_MINOR 0
 
@@ -128,7 +128,7 @@ struct FilesSeam {
     // Reads up to len bytes from the open box into dst and returns the number read, 0 at its end (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* BankReadBox)(HapiBank* self, void* dst, int len);
     // Writes len bytes from src to the open box at its position, growing it, and returns len (thiscall in 3.1c, this first). Hooks: none.
-    int (__stdcall* BankWriteBox)(HapiBank* self, void* src, int len);
+    int (__stdcall* BankWriteBox)(HapiBank* self, const void* src, int len);
 };
 
 #endif

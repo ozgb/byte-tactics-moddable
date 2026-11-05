@@ -95,6 +95,48 @@ class Classify(unittest.TestCase):
         self.assertEqual(dc.uncovered([], edges), [("units", "weapons", "F"), ("units", "weapons", "Unit::x"), ("units", "weapons", "Unit::y")])
 
 
+DEFERRABLE = [{"writer": "units", "reader": "weapons", "item": "Unit::x", "phase": "units", "class": "deferrable"},
+              {"writer": "ai", "reader": "units", "item": "Unit::y", "phase": "units", "class": "immediate"}]
+
+
+def check_row(result: str = "equal", scenarios: int = 83) -> dict:
+    """A row of dependency_checks.csv for the deferrable edge of DEFERRABLE."""
+    return {"writer": "units", "reader": "weapons", "item": "Unit::x", "phase": "units", "group": "g1",
+            "scenarios": str(scenarios), "result": result, "scenarios_counted": "82", "defer_held": "0",
+            "defer_third_stores": "4"}
+
+
+class Confirm(unittest.TestCase):
+    def test_confirmed_passes(self):
+        self.assertEqual(dc.unconfirmed(DEFERRABLE, [check_row()], 83), [])
+
+    def test_missing_fails(self):
+        out = dc.unconfirmed(DEFERRABLE, [], 83)
+        self.assertEqual(len(out), 1)
+        self.assertIn("units -> weapons on Unit::x in units", out[0])
+
+    def test_diverged_fails(self):
+        out = dc.unconfirmed(DEFERRABLE, [check_row("diverged")], 83)
+        self.assertEqual(len(out), 1)
+        self.assertIn("diverged", out[0])
+
+    def test_partial_suite_fails(self):
+        out = dc.unconfirmed(DEFERRABLE, [check_row(scenarios=82)], 83)
+        self.assertEqual(len(out), 1)
+        self.assertIn("82 of 83", out[0])
+
+    def test_missing_counts_fail(self):
+        row = check_row()
+        row["defer_held"] = ""
+        out = dc.unconfirmed(DEFERRABLE, [row], 83)
+        self.assertEqual(len(out), 1)
+        self.assertIn("defer_held", out[0])
+
+    def test_read_checks(self):
+        text = ",".join(dc.CHECK_COLUMNS) + '\nunits,weapons,Unit::x,units,g1,83,equal,82,0,4\n'
+        self.assertEqual(dc.read_checks(text), [check_row()])
+
+
 class Store(unittest.TestCase):
     def test_store_drops_presentation_and_is_reproducible(self):
         with tempfile.TemporaryDirectory() as t:

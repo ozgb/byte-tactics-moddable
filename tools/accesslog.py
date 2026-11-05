@@ -89,6 +89,14 @@ SimOwns, which Ref<T>::get calls) are ignored by address, so a Ref<T> dereferenc
 that made it: the helper's own load of the block base is skipped and the access through the pointer is
 instrumented in the caller.
 
+The option BT_DEFER_WRITES (with BT_ACCESS_LOG, build dir build/defer, never the gate build; #837) turns the callbacks into
+a write barrier for the edges named in accesslog.defer, one `writer,reader,item,phase` row per line (the columns of
+data/dependencies.csv; $ACCESSLOG_DEFER names another file): it holds each such write back from the reader's loads until the
+phase ends, and the classifier is off. tools/playtest.py copies accesslog.attr, accesslog.items and accesslog.defer from beside
+the exe, so `reference.py --check --native-modules --exe build/defer/TotalA.exe` plays the whole suite against it. The control,
+`accesslog.py run --build-dir build/defer --defer tests/defer/immediate-control.defer mission-build-unit`, holds back the write
+of an immediate edge: it must print `trace DIFFERS` (exit 1) and leave `defer_held` above 0 in build/defer/access/mission-build-unit.stats.txt.
+
 `tables` writes accesslog.attr and accesslog.items next to the exe after the link, from TotalA.map,
 data/subsystems.csv, data/state_classes.csv, data/globals.csv and the record layouts clang prints for
 src/state/layout_asserts.cpp and src/state/sim_globals.h. `run` plays each scenario in test mode with
@@ -777,7 +785,8 @@ def summarise(name: str, edges: Path, stats: Path, seconds: float, baseline: flo
     return lines
 
 
-def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: bool, baseline: Path | None, timeout: float) -> int:
+def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: bool, baseline: Path | None, timeout: float,
+        defer: Path | None = None) -> int:
     """Play each scenario instrumented, keep its edges, and check its trace against reference/traces."""
     out = build_dir / "access"
     out.mkdir(exist_ok=True)
@@ -787,7 +796,9 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
         stored = ROOT / "reference/traces" / (name + ".txt")
         if not scenario.is_file() or not stored.is_file():
             raise SystemExit("accesslog: no scenario or stored trace named %s" % name)
-        put = loaded_save(build_dir, scenario, game_dir, timeout)
+        put = dict(loaded_save(build_dir, scenario, game_dir, timeout) or {})
+        if defer is not None:
+            put["accesslog.defer"] = defer
         directory, seconds = play(build_dir / "TotalA.exe", scenario, game_dir, build_dir, raw, timeout, put)
         why = trace_difference(directory / "trace.txt", stored)
         print("%s: %s" % (name, "trace EQUAL to reference/traces/%s.txt" % name if why is None else "trace DIFFERS, " + why))
@@ -826,11 +837,13 @@ def main() -> int:
     r.add_argument("--twice", action="store_true", help="play each scenario twice and check the two edge files are equal")
     r.add_argument("--baseline", type=Path, metavar="EXE", help="also play with this uninstrumented exe, for the wall time")
     r.add_argument("--timeout", type=float, default=1800)
+    r.add_argument("--defer", type=Path, metavar="FILE", help="a BT_DEFER_WRITES build: the edges to hold back, instead of build-dir/accesslog.defer")
     args = ap.parse_args()
     if args.command == "tables":
         tables(args.build_dir.resolve())
         return 0
-    return run(args.build_dir.resolve(), args.scenarios, args.game_dir, args.raw, args.twice, args.baseline, args.timeout)
+    return run(args.build_dir.resolve(), args.scenarios, args.game_dir, args.raw, args.twice, args.baseline, args.timeout,
+               args.defer.resolve() if args.defer else None)
 
 
 if __name__ == "__main__":

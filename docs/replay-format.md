@@ -686,6 +686,37 @@ line that named it, and the replayer keeps the old elements when the capacity ch
 | `{"kind": "array", "elem": "cstring"}`, `"cstring_ref"` | `length` strings | `[3]`, then `names[0] "text"` per element |
 | `{"kind": "vector", "elem": {"mode": "cstring"}}`, with `"ref": true` | `BlockVector<char*>` | `[2/4]`, then `words[0] "text"` per element |
 
+## Bytes behind a pointer
+
+A `ptr` may carry `"blob": {"length": EXPRESSION}`: the pointer leads to bytes the module reads (a block of bytecode), and the recording holds them.
+The length is an expression over members of the same object, as an array's is (an integer, or one or two factors of `member`, `member>>k`, `member+a` or `member+a>>k`,
+joined by `*`), in bytes: `count*4` for `int* entries` of `count` ints.
+
+```json
+{"name": "entries", "kind": "ptr", "target": "alloc", "blob": {"length": "count*4"}},
+{"name": "bits", "kind": "ptr", "target": "alloc", "blob": {"length": "(count+7)>>3"}}
+```
+
+The pointer is written as any `ptr` is, `alloc#1`, and the bytes are a second field of the object, named `entries[]` (the field name and `[]`), written as an array of bytes is,
+whole at the first sight of the pointer's target and a run of changed bytes after that:
+
+```
+  r FixtureProgram#1.count 5
+  r FixtureProgram#1.entries alloc#1
+  r FixtureProgram#1.entries[] [20] 0:0a000000140000001e0000002800000032000000
+  r FixtureProgram#1.entries[] 8:4d
+  r FixtureProgram#1.entries alloc#4
+  r FixtureProgram#1.entries[] [20] 0:0a000000140000004d0000002800000032000000
+```
+
+A pointer to another block writes all its bytes again, even when they are the same, since the replayer's new target is empty until a line fills it; a null pointer is `null` on both lines;
+a change of the length is a new bracket. The line of the bytes follows the line of the pointer, and the members of the length have to be recorded (in the slot's
+sets), as an array's have. Both fields are in a slot's sets when the pointer is, and the target is a state kind named at first sight, as for a `Game` ref (`alloc` is one): no table, sites, kinds or vtable.
+
+The replayer allocates the bytes, zeroed, when it reads a bracket line, fills them from the lines, stores the pointer, and names the new block with the ordinal the pointer's line gave, so the pointer still
+compares as the object it was named. A difference is reported at `FixtureProgram#1.entries[]` as an array's is (`byte 12 of 24: recorded 28, replayed 01`). A `ptr` with no `blob` is as before:
+an empty copy of its target kind (see A pointer to an object no line named), and no bytes.
+
 ## Snapshots
 
 Some imports return a buffer that the slot then fills, and the bytes it leaves there are the output that counts: `SimCaptureAlloc(bytes,

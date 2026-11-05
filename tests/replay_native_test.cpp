@@ -1705,6 +1705,11 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
             Fatal(file, g_callIndex, "an array line that cannot be applied", value);
         return true;
     }
+    if (f->kind == RK_BLOB) {
+        if (!ReplayApplyBlob(*f, p, name, value, g_known, true, g_objects, AllocObject))
+            Fatal(file, g_callIndex, "a blob line that cannot be applied", value);
+        return true;
+    }
     if (f->kind == RK_VECTOR) {
         bool applied = k.vectorElement ? ReplayApplyVectorElement(*f, p, k.element, k.sub, name, value, g_known, true, g_objects, AllocObject)
                        : k.refsElement ? ReplayApplyVectorString(*f, p, k.element, name, value, g_known, true, AllocObject)
@@ -1825,6 +1830,11 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
             }
             if (f->kind == RK_REFS || f->kind == RK_CSTRINGS) {
                 g_known.Set(name, space + 1);
+                continue;
+            }
+            if (f->kind == RK_BLOB) {
+                if (!ReplayApplyBlob(*f, nullptr, name, space + 1, g_known, false, g_objects, nullptr))
+                    Fatal(file, g_callIndex, "a blob line that cannot be applied", line);
                 continue;
             }
             array = f->kind == RK_ARRAY;
@@ -5395,6 +5405,99 @@ void CStringSelfTest()
     free(three);
 }
 
+void BlobSelfTest()
+{
+    printf("bytes behind a pointer\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureProgram* program = (FixtureProgram*)Fresh(sizeof(FixtureProgram));
+    program->count = 5;
+    int* entries = (int*)Fresh(5 * (unsigned)sizeof(int));
+    for (int i = 0; i < 5; i++)
+        entries[i] = 10 * (i + 1);
+    unsigned char* bits = (unsigned char*)Fresh(1);
+    bits[0] = 0xa5;
+    program->entries = entries;
+    program->bits = bits;
+    program->plain = (int*)Fresh(8);
+    static const char* const fieldNames[6] = { "count", "entries", "entries[]", "bits", "bits[]", "plain" };
+    unsigned short fields[6];
+    for (int i = 0; i < 6; i++)
+        fields[i] = FieldIndex(ROK_FIXTUREPROGRAM, fieldNames[i]);
+    ReplaySlotSets sets = { "program", 0, nullptr, 0, nullptr, 0, fields, 6, fields, 6 };
+    unsigned char kind = ROK_FIXTUREPROGRAM;
+    void* root = program;
+    Recorder recorder;
+    ReplayText calls;
+    recorder.Record(&kind, &root, 1, sets);
+    printf("%s", recorder.text.Data());
+    Check(strstr(recorder.text.Data(), "  r FixtureProgram#1.entries alloc#1\n  r FixtureProgram#1.entries[] [20] 0:0a000000140000001e00000028000000320000") != nullptr,
+          "a blob is its pointer, as any ptr is, and its bytes as an array's are, with the length the other fields give");
+    Check(strstr(recorder.text.Data(), "  r FixtureProgram#1.bits alloc#2\n  r FixtureProgram#1.bits[] [1] 0:a5\n") != nullptr, "a length may add before it shifts");
+    Check(strstr(recorder.text.Data(), "  r FixtureProgram#1.plain alloc#3\n") != nullptr && strstr(recorder.text.Data(), "plain[]") == nullptr, "a ptr with no blob is its name only");
+    calls.AddText(recorder.text);
+
+    recorder.Record(&kind, &root, 1, sets);
+    Check(recorder.text.Size() == 0, "bytes that did not change are not written again");
+    entries[2] = 77;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r FixtureProgram#1.entries[] 8:4d\n") == 0, "a changed byte is a delta run of one byte, as in an array");
+    calls.AddText(recorder.text);
+
+    int* moved = (int*)Fresh(5 * (unsigned)sizeof(int));
+    memcpy(moved, entries, 5 * sizeof(int));
+    program->entries = moved;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strstr(recorder.text.Data(), "  r FixtureProgram#1.entries alloc#4\n  r FixtureProgram#1.entries[] [20] 0:0a000000140000004d000000") != nullptr, "a pointer to another block writes all its bytes, though they are the same");
+    calls.AddText(recorder.text);
+
+    program->count = 6;
+    int* longer = (int*)Fresh(6 * (unsigned)sizeof(int));
+    memcpy(longer, moved, 5 * sizeof(int));
+    longer[5] = 99;
+    program->entries = longer;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strstr(recorder.text.Data(), "  r FixtureProgram#1.count 6\n  r FixtureProgram#1.entries alloc#5\n  r FixtureProgram#1.entries[] [24] 0:") != nullptr && strstr(recorder.text.Data(), "bits[]") == nullptr, "a longer length is a new bracket");
+    calls.AddText(recorder.text);
+    program->entries = nullptr;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r FixtureProgram#1.entries null\n  r FixtureProgram#1.entries[] null\n") == 0, "a null pointer is null, twice");
+    program->entries = longer;
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    FixtureProgram* rebuilt = (FixtureProgram*)ReplayResolveObject("FixtureProgram#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->count == 6 && rebuilt->entries != nullptr && rebuilt->entries != longer, "the replayer allocates the bytes");
+    Check(rebuilt != nullptr && rebuilt->entries != nullptr && rebuilt->entries[0] == 10 && rebuilt->entries[2] == 77 && rebuilt->entries[5] == 99, "fills them, and the module reads them through an offset");
+    Check(rebuilt != nullptr && rebuilt->bits != nullptr && rebuilt->bits[0] == 0xa5, "of every blob");
+    Check(rebuilt != nullptr && rebuilt->plain != nullptr, "a ptr with no blob is an empty copy");
+    g_rootKinds[0] = ROK_FIXTUREPROGRAM;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored bytes compare equal, and the pointer is still the object it was named");
+    rebuilt->entries[3] = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed byte: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureProgram#1.entries[]") == 0 && strstr(g_detail.Data(), "byte 12 of 24") != nullptr, "a changed byte is reported at the blob, with its offset");
+    rebuilt->entries[3] = 40;
+    rebuilt->count = 5;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs >= 1 && strstr(g_detail.Data(), "FixtureProgram#1.entries[]") != nullptr && strstr(g_detail.Data(), "recorded 24 elements, replayed 20") != nullptr, "a blob of another length is reported");
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    Recorder replayed;
+    rebuilt = (FixtureProgram*)ReplayResolveObject("FixtureProgram#1", nullptr, g_objects, AllocObject);
+    void* rebuiltRoot = rebuilt;
+    replayed.Record(&kind, &rebuiltRoot, 1, sets);
+    Check(strstr(replayed.text.Data(), "  r FixtureProgram#1.entries[] [24] 0:0a00000014000000") != nullptr, "the rebuilt object records its bytes again");
+    calls.Free();
+}
+
 void GameWriteSelfTest()
 {
     printf("a write to Game through a pointer\n");
@@ -5469,6 +5572,7 @@ int SelfTest(const char* file)
     TrackedCountSelfTest();
     SelfPointerSelfTest();
     CStringSelfTest();
+    BlobSelfTest();
     GameWriteSelfTest();
     if (file == nullptr)
         return 0;

@@ -75,7 +75,7 @@ FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
                "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR", "ptr": "PTR", "refs": "REFS", "embeds": "EMBEDS",
                "self": "SELF", "selfindex": "SELFINDEX", "cbref": "CBREF", "cbptr": "CBPTR", "cstring": "CSTRING", "cstringref": "CSTRINGREF",
-               "cstrings": "CSTRINGS"}
+               "cstrings": "CSTRINGS", "blob": "BLOB"}
 STRING_ELEMS = {"cstring": (1, "char*"), "cstring_ref": (2, "Ref<char>")}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?\s*(\w+)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
@@ -545,6 +545,34 @@ def check_ctype(ann: dict) -> list[str]:
                 errors.append("%s: only a ref or an array of refs has a `ctype`" % where)
             elif not isinstance(f["ctype"], str) or not re.match(r"^[A-Za-z_][\w ]*(::[A-Za-z_]\w*)*$", f["ctype"]):
                 errors.append("%s: the `ctype` is the C type that the Ref holds, `char`" % where)
+    return errors
+
+
+def check_blobs(ann: dict) -> list[str]:
+    """Errors for `blob`, the length of the bytes a `ptr` leads to: a state kind that is named at first sight, and a length over members of the owner."""
+    errors = []
+    kinds = ann["objects"]
+    for name, spec in kinds.items():
+        for f in spec["fields"]:
+            if "blob" not in f:
+                continue
+            where = "%s.%s" % (name, f["name"])
+            blob = f["blob"]
+            if f["kind"] != "ptr":
+                errors.append("%s: only a ptr has a `blob`" % where)
+            if not isinstance(blob, dict) or set(blob) != {"length"}:
+                errors.append("%s: a blob is {\"length\": EXPRESSION}" % where)
+                continue
+            if spec["scope"] != "state":
+                errors.append("%s: only the fields of a state kind are blobs" % where)
+            target = kinds.get(f.get("target"))
+            if target is not None and (target["scope"] != "state" or target.get("table") or target.get("inside") or target.get("kinds") or target.get("vtable")):
+                errors.append("%s: the target %s of a blob has a table, sites or kinds, and is named by them, not at first sight" % (where, f["target"]))
+            if f.get("callback") is not None:
+                errors.append("%s: a blob is not a callback" % where)
+            local = []
+            parse_length(blob["length"], where, local)
+            errors += local
     return errors
 
 
@@ -1242,6 +1270,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     vectors: list[dict] = []
     elems: list[dict] = []
     selfs: list[dict] = []
+    blobs: dict[int, int] = {}
     kind_names = list(ann["objects"])
     for kind in kind_names:
         spec = ann["objects"][kind]
@@ -1280,6 +1309,15 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 if vectors[-1]["mode"] == "object" and vectors[-1]["kind"]:
                     entry["target"] = vectors[-1]["kind"]
             object_fields.append(entry)
+            if f["kind"] == "ptr" and isinstance(f.get("blob"), dict) and "length" in f["blob"]:
+                where = "%s.%s" % (kind, f["name"])
+                member = f.get("member", f["name"])
+                arrays.append({"elem": 1, "ref": False, "raw": True, "strings": 0, "length": parse_length(f["blob"]["length"], where, []), "owner": spec["type"], "member": member})
+                blob = {"name": f["name"] + "[]", "kind": "blob", "object": kind, "member": member, "target": f["target"], "array": len(arrays)}
+                if "when" in f:
+                    blob["when"] = f["when"]
+                object_fields.append(blob)
+                blobs[len(object_fields) - 2] = len(object_fields) - 1
     for t in tables:
         prefix = "SimGlobals." if t["sim"] else "Game."
         for tag, length in (("count", t["count"]), ("capacity", t["capacity"] or [])):
@@ -1304,7 +1342,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     errors += resolve_conditions(ann, object_fields, object_index)
     sites, inside_errors = check_inside(ann)
     errors += inside_errors + check_elements(ann) + check_vptr(ann)
-    errors += check_delta(ann) + check_ctype(ann)
+    errors += check_delta(ann) + check_ctype(ann) + check_blobs(ann)
     by_function: dict[str, list[dict]] = {}
     for r in rows:
         by_function.setdefault(r["function"], []).append(r)
@@ -1467,6 +1505,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     pending["args"].append("%s(%s)" % (s["name"], a["name"]))
             if result is not None and result["mode"] == "pending":
                 pending["args"].append("%s result" % s["name"])
+            for into in (obj_reads, obj_writes):
+                into.update(blobs[i] for i in list(into) if i in blobs)
             entry = {
                 "conv": s["conv"], "ret": s["ret"], "functions": functions,
                 "reads": [f for f in order if f in reads], "writes": [f for f in order if f in writes],
@@ -1652,7 +1692,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     L += ["static const ReplayArraySpec kReplayArrays[] = {"]
     for a in arrays:
         capacity = "0" if a["ref"] or a["raw"] else "sizeof(((%s*)nullptr)->%s)" % (a["owner"], a["member"])
-        strings = ", %d, %d" % (int(a["raw"]), a["strings"]) if a["strings"] else ""
+        strings = ", %d, %d" % (int(a["raw"]), a["strings"]) if a["strings"] or a["raw"] else ""
         L.append("    { %d, %d, %s, %s%s }," % (a["elem"], int(a["ref"]), capacity, render_length(a["length"], a["owner"]), strings))
     if not arrays:
         L.append("    { 1, 0, 0, { { 1, 0, 0 }, { 1, 0, 0 } } },")
@@ -1675,6 +1715,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
                 L.append('static_assert(__is_same(decltype(&%s[0]), %s*), "%s::%s holds %s");' % (at, held, a["owner"], a["member"], held))
                 if not a["raw"]:
                     L.append('static_assert(sizeof(%s) %% %d == 0, "%s::%s holds whole elements");' % (at, a["elem"], a["owner"], a["member"]))
+        elif a["raw"]:
+            continue
         elif a["ref"]:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(unsigned), "%s::%s is a Ref");' % (a["owner"], a["member"], a["owner"], a["member"]))
         else:
@@ -1780,8 +1822,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         member = embeds_member(f).replace("[]", "[0]") if f["kind"] == "embeds" else f["name"] if f["kind"] == "self" else f.get("member", f["name"])
         t = types[f["object"]]
         size = f.get("size")
-        size_text = str(size) if size else "sizeof(void*)" if f["kind"] == "ptr" else "sizeof(((%s*)nullptr)->%s)" % (t, member)
-        target = "RCB_%s" % upper(f["callback"]) if field_kind(f) in ("cbref", "cbptr") else kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
+        size_text = str(size) if size else "sizeof(void*)" if f["kind"] in ("ptr", "blob") else "sizeof(((%s*)nullptr)->%s)" % (t, member)
+        target = "RCB_%s" % upper(f["callback"]) if field_kind(f) in ("cbref", "cbptr") else kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds", "blob") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
         extra = ", %d" % (f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec")) if f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec") else ""
         when = "{ %d, %d, %s, %du, %d }" % (f["condField"], f.get("condVia", 0), kind_id[f["condKind"]], f.get("condMask", 0xFFFFFFFF), f["condValue"]) if f.get("condField") else "{}"
         L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
@@ -1818,7 +1860,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s has the size of its kind");' % (t, member, types[f["target"]], t, f["name"]))
         elif f["kind"] == "bytes":
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, f["size"], t, f["name"]))
-        elif f["kind"] == "array":
+        elif f["kind"] in ("array", "blob"):
             continue
         elif f["kind"] == "vector":
             v = vectors[f["vector"] - 1]

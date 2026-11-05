@@ -697,6 +697,37 @@
      }
     }
    ]
+  },
+  "FixtureProgram": {
+   "type": "FixtureProgram",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "count",
+     "kind": "i32"
+    },
+    {
+     "name": "entries",
+     "kind": "ptr",
+     "target": "alloc",
+     "blob": {
+      "length": "count*4"
+     }
+    },
+    {
+     "name": "bits",
+     "kind": "ptr",
+     "target": "alloc",
+     "blob": {
+      "length": "(count+7)>>3"
+     }
+    },
+    {
+     "name": "plain",
+     "kind": "ptr",
+     "target": "alloc"
+    }
+   ]
   }
  },
  "fixtures": {

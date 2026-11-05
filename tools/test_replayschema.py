@@ -2478,7 +2478,7 @@ class CStrings(unittest.TestCase):
         self.assertIn("{ 1, 0, 0 } }, 1, 1 },", text)
         self.assertIn("{ 1, 0, 0 } }, 0, 2 },", text)
         self.assertIn("{ 1, 0, 0 } }, 0, 1 },", text)
-        self.assertEqual([(a["raw"], a["strings"], a["ref"]) for a in model["arrays"][-3:]], [(True, 1, False), (False, 2, True), (False, 1, False)])
+        self.assertEqual([(a["raw"], a["strings"], a["ref"]) for a in model["arrays"][-5:-2]], [(True, 1, False), (False, 2, True), (False, 1, False)])
 
     def test_the_header_checks_the_storage_and_the_element_type_of_an_array(self):
         text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
@@ -2528,6 +2528,63 @@ class CStrings(unittest.TestCase):
         ann = annotations()
         self.field(ann, "idents")["elem"]["ref"] = "yes"
         self.has(ann, "FixtureNamed.idents: a string element is")
+
+
+class Blobs(unittest.TestCase):
+    """A ptr with a blob records the bytes it leads to, as the array of a companion field named `<field>[]`."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, name):
+        return next(f for f in ann["objects"]["FixtureProgram"]["fields"] if f["name"] == name)
+
+    def test_a_blob_is_a_companion_field_right_after_its_pointer(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        names = [f["name"] for f in model["object_fields"] if f["object"] == "FixtureProgram"]
+        self.assertEqual(names, ["count", "entries", "entries[]", "bits", "bits[]", "plain"])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        row = [l for l in text.split("\n") if l.startswith('    { "entries[]", offsetof(FixtureProgram, entries)')][0]
+        self.assertIn("RK_BLOB, ROK_ALLOC,", row)
+        self.assertTrue(row.endswith(", 8 },"), row)
+
+    def test_the_bytes_are_a_raw_array_with_the_length_expression(self):
+        text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
+        self.assertIn("(unsigned char)sizeof(((FixtureProgram*)nullptr)->count), 0 }, { 4, 0, 0 } }, 1, 0 },", text)
+        self.assertIn("(unsigned char)sizeof(((FixtureProgram*)nullptr)->count), 3, 7u }, { 1, 0, 0 } }, 1, 0 },", text)
+
+    def test_a_ptr_without_a_blob_has_no_companion(self):
+        _, _, model = self.generated()
+        self.assertNotIn("plain[]", [f["name"] for f in model["object_fields"]])
+
+    def test_a_row_that_names_the_pointer_brings_the_bytes_into_the_set(self):
+        model, _ = build([row("UpdatePlayerEconomy", "field_read", "FixtureProgram::entries")])
+        names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
+        s = model["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]
+        self.assertEqual([names[i] for i in s["objectReads"]], ["FixtureProgram.entries", "FixtureProgram.entries[]"])
+
+    def test_the_real_schema_has_none_of_it(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        self.assertNotIn("RK_BLOB", files[rs.SCHEMA_H])
+
+    def test_a_blob_is_checked(self):
+        ann = annotations()
+        self.field(ann, "count")["blob"] = {"length": "count"}
+        self.has(ann, "FixtureProgram.count: only a ptr has a `blob`")
+        ann = annotations()
+        self.field(ann, "entries")["blob"] = {"size": 4}
+        self.has(ann, "FixtureProgram.entries: a blob is {\"length\": EXPRESSION}")
+        ann = annotations()
+        self.field(ann, "entries")["blob"] = {"length": "count*count*2"}
+        self.has(ann, "FixtureProgram.entries: the length `count*count*2` is not one or two factors")
+        ann = annotations()
+        self.field(ann, "entries")["target"] = "Unit"
+        self.has(ann, "FixtureProgram.entries: the target Unit of a blob has a table")
 
 
 class Committed(unittest.TestCase):

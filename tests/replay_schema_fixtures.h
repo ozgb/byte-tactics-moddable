@@ -220,6 +220,7 @@ enum ReplayObjectKindId {
     ROK_FIXTURENOTIFY,
     ROK_FIXTURETALLY,
     ROK_FIXTURENAMED,
+    ROK_FIXTUREPROGRAM,
     ROK_COUNT
 };
 
@@ -284,6 +285,8 @@ static const ReplayArraySpec kReplayArrays[] = {
     { 4, 0, 0, { { offsetof(FixtureNamed, count), (unsigned char)sizeof(((FixtureNamed*)nullptr)->count), 0 }, { 1, 0, 0 } }, 1, 1 },
     { 4, 1, 0, { { offsetof(FixtureNamed, count), (unsigned char)sizeof(((FixtureNamed*)nullptr)->count), 0 }, { 1, 0, 0 } }, 0, 2 },
     { 4, 0, sizeof(((FixtureNamed*)nullptr)->fixed), { { offsetof(FixtureNamed, count), (unsigned char)sizeof(((FixtureNamed*)nullptr)->count), 0 }, { 1, 0, 0 } }, 0, 1 },
+    { 1, 0, 0, { { offsetof(FixtureProgram, count), (unsigned char)sizeof(((FixtureProgram*)nullptr)->count), 0 }, { 4, 0, 0 } }, 1, 0 },
+    { 1, 0, 0, { { offsetof(FixtureProgram, count), (unsigned char)sizeof(((FixtureProgram*)nullptr)->count), 3, 7u }, { 1, 0, 0 } }, 1, 0 },
 };
 
 static const ReplayTableSpec kReplayTables[] = {
@@ -320,6 +323,8 @@ static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->refWords), Ref<Ref<ch
 static_assert(sizeof(((FixtureNamed*)nullptr)->count) == 1 || sizeof(((FixtureNamed*)nullptr)->count) == 2 || sizeof(((FixtureNamed*)nullptr)->count) == 4, "FixtureNamed::fixed: count is a byte, a short or an int");
 static_assert(__is_same(decltype(&((FixtureNamed*)nullptr)->fixed[0]), char**), "FixtureNamed::fixed holds char*");
 static_assert(sizeof(((FixtureNamed*)nullptr)->fixed) % 4 == 0, "FixtureNamed::fixed holds whole elements");
+static_assert(sizeof(((FixtureProgram*)nullptr)->count) == 1 || sizeof(((FixtureProgram*)nullptr)->count) == 2 || sizeof(((FixtureProgram*)nullptr)->count) == 4, "FixtureProgram::entries: count is a byte, a short or an int");
+static_assert(sizeof(((FixtureProgram*)nullptr)->count) == 1 || sizeof(((FixtureProgram*)nullptr)->count) == 2 || sizeof(((FixtureProgram*)nullptr)->count) == 4, "FixtureProgram::bits: count is a byte, a short or an int");
 static_assert(sizeof(((Game*)nullptr)->players) == 10 * sizeof(Player), "the table of Player holds 10 elements");
 static_assert(sizeof(((Game*)nullptr)->poolCount) == 1 || sizeof(((Game*)nullptr)->poolCount) == 2 || sizeof(((Game*)nullptr)->poolCount) == 4, "Unit: poolCount is a byte, a short or an int");
 static_assert(sizeof(((Game*)nullptr)->units) == sizeof(unsigned), "the table of Unit is a Ref");
@@ -514,8 +519,9 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FixtureNotify", sizeof(FixtureNotify), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
     { "FixtureTally", sizeof(FixtureTally), RS_STATE, 13, 0, 0, 0, 0, 0 },
     { "FixtureNamed", sizeof(FixtureNamed), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureProgram", sizeof(FixtureProgram), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 64;
+static const unsigned kReplayObjectKindCount = 65;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };
 
@@ -889,8 +895,14 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "fixed", offsetof(FixtureNamed, fixed), sizeof(((FixtureNamed*)nullptr)->fixed), ROK_FIXTURENAMED, RK_CSTRINGS, 0, 0, 0, {}, 0, 0, 7 },
     { "list", offsetof(FixtureNamed, list), sizeof(((FixtureNamed*)nullptr)->list), ROK_FIXTURENAMED, RK_VECTOR, 0, 0, 0, {}, 0, 0, 4 },
     { "idents", offsetof(FixtureNamed, idents), sizeof(((FixtureNamed*)nullptr)->idents), ROK_FIXTURENAMED, RK_VECTOR, 0, 0, 0, {}, 0, 0, 5 },
+    { "count", offsetof(FixtureProgram, count), sizeof(((FixtureProgram*)nullptr)->count), ROK_FIXTUREPROGRAM, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "entries", offsetof(FixtureProgram, entries), sizeof(void*), ROK_FIXTUREPROGRAM, RK_PTR, ROK_ALLOC, 0, 0, {}, 0, 0 },
+    { "entries[]", offsetof(FixtureProgram, entries), sizeof(void*), ROK_FIXTUREPROGRAM, RK_BLOB, ROK_ALLOC, 0, 0, {}, 0, 0, 8 },
+    { "bits", offsetof(FixtureProgram, bits), sizeof(void*), ROK_FIXTUREPROGRAM, RK_PTR, ROK_ALLOC, 0, 0, {}, 0, 0 },
+    { "bits[]", offsetof(FixtureProgram, bits), sizeof(void*), ROK_FIXTUREPROGRAM, RK_BLOB, ROK_ALLOC, 0, 0, {}, 0, 0, 9 },
+    { "plain", offsetof(FixtureProgram, plain), sizeof(void*), ROK_FIXTUREPROGRAM, RK_PTR, ROK_ALLOC, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 343;
+static const unsigned kReplayObjectFieldCount = 349;
 
 static const unsigned short kReplayReachFields[] = { 47, 51, 138, 139, 140, 38, 37, 0, 25, 51, 141, 34, 280, 38, 36, 39, 47, 52, 54, 87 };
 
@@ -1239,6 +1251,10 @@ static_assert(sizeof(decltype(((FixtureNamed*)nullptr)->list)) == 16, "FixtureNa
 static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->list)::value_type, char*), "FixtureNamed::list holds char*");
 static_assert(sizeof(decltype(((FixtureNamed*)nullptr)->idents)) == 16, "FixtureNamed::idents is a block vector");
 static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->idents)::value_type, Ref<char>), "FixtureNamed::idents holds Ref<char>");
+static_assert(sizeof(((FixtureProgram*)nullptr)->count) == 4, "FixtureProgram::count has the size the schema says");
+static_assert(__is_pointer(decltype(((FixtureProgram*)nullptr)->entries)), "FixtureProgram::entries is a raw pointer");
+static_assert(__is_pointer(decltype(((FixtureProgram*)nullptr)->bits)), "FixtureProgram::bits is a raw pointer");
+static_assert(__is_pointer(decltype(((FixtureProgram*)nullptr)->plain)), "FixtureProgram::plain is a raw pointer");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");

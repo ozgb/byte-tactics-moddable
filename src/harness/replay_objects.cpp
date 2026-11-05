@@ -426,7 +426,11 @@ bool ArrayData(const ReplayObjectField& f, const void* object, unsigned char** d
     const ReplayArraySpec& a = kReplayArrays[f.array - 1];
     unsigned char* at = (unsigned char*)object + f.offset;
     unsigned n = ReplayLengthOf(a.length, object);
-    if (a.ref) {
+    if (a.raw) {
+        *data = *(unsigned char**)at;
+        if (*data == nullptr)
+            return false;
+    } else if (a.ref) {
         *data = BlockAt(*(const unsigned*)at);
         if (*data == nullptr)
             return false;
@@ -705,7 +709,7 @@ bool RestoreSelfIndex(const ReplayObjectField& f, void* object, const char* valu
 
 void FixSelf(unsigned kind, void* object)
 {
-    enum { KINDS = 64, FIELDS = sizeof kReplayObjectFields / sizeof kReplayObjectFields[0] };
+    enum { KINDS = REPLAY_OBJECT_KINDS, FIELDS = sizeof kReplayObjectFields / sizeof kReplayObjectFields[0] };
     static unsigned short list[FIELDS];
     static unsigned short first[KINDS];
     static unsigned short count[KINDS];
@@ -971,6 +975,9 @@ bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, Rep
     case RK_CSTRINGS:
         FormatCStrings(f, object, out);
         break;
+    case RK_BLOB:
+        FormatArray(f, object, out);
+        break;
     default:
         return false;
     }
@@ -1174,6 +1181,7 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
     case RK_UNITID:
     case RK_ARRAY:
     case RK_CSTRINGS:
+    case RK_BLOB:
     case RK_SELF:
         return false;
     case RK_CSTRING:
@@ -1768,6 +1776,16 @@ void ReplayEmitField(ReplayText& out, ReplayKnown& known, ReplayObjectTable& tab
         EmitCStrings(out, known, tag, key, f, object, scratch.Data());
         return;
     }
+    if (f.kind == RK_BLOB) {
+        char marker[200];
+        sprintf(marker, "%.180s@", key);
+        char word[16];
+        sprintf(word, "%08x", *(const unsigned*)((const unsigned char*)object + f.offset));
+        if (known.Changed(marker, word))
+            known.Set(key, "");
+        EmitArray(out, known, key, tag, scratch.Data(), 1);
+        return;
+    }
     if (f.kind == RK_ARRAY) {
         EmitArray(out, known, key, tag, scratch.Data(), kReplayArrays[f.array - 1].elem);
         return;
@@ -1792,7 +1810,7 @@ bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key,
     const ReplayArraySpec& a = kReplayArrays[f.array - 1];
     unsigned char* at = memory ? (unsigned char*)object + f.offset : nullptr;
     if (strcmp(value, "null") == 0) {
-        if (!a.ref)
+        if (!a.ref && !a.raw)
             return false;
         if (memory)
             *(unsigned*)at = 0;
@@ -1804,7 +1822,7 @@ bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key,
     if (*p == '[') {
         char* end;
         count = (unsigned)strtoul(p + 1, &end, 10);
-        if (*end != ']' || count > MAX_ARRAY_ELEMENTS || (!a.ref && count * a.elem > a.capacity))
+        if (*end != ']' || count > MAX_ARRAY_ELEMENTS || (!a.ref && !a.raw && count * a.elem > a.capacity))
             return false;
         p = end + 1;
         if (*p == ' ')
@@ -1818,13 +1836,16 @@ bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key,
         known.Set(key, zero.Data());
         zero.Free();
         if (memory) {
-            if (a.ref) {
+            if (a.ref || a.raw) {
                 if (count != 0 && alloc == nullptr)
                     return false;
                 unsigned char* mem = count == 0 ? nullptr : (unsigned char*)alloc(count * a.elem);
                 if (mem != nullptr)
                     memset(mem, 0, count * a.elem);
-                *(unsigned*)at = mem == nullptr ? 0u : (unsigned)(mem - (unsigned char*)SimBlockBase());
+                if (a.raw)
+                    *(unsigned char**)at = mem;
+                else
+                    *(unsigned*)at = mem == nullptr ? 0u : (unsigned)(mem - (unsigned char*)SimBlockBase());
             } else {
                 memset(at, 0, count * a.elem);
             }
@@ -1839,7 +1860,7 @@ bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key,
     char* hex = text + (ArrayHex(text) - text);
     unsigned char* data = nullptr;
     if (memory) {
-        data = a.ref ? BlockAt(*(const unsigned*)at) : at;
+        data = a.raw ? *(unsigned char**)at : a.ref ? BlockAt(*(const unsigned*)at) : at;
         if (data == nullptr && count != 0)
             return false;
     }
@@ -1866,6 +1887,27 @@ bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key,
         }
         p += length;
     }
+    return true;
+}
+
+bool ReplayApplyBlob(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayObjectTable& table, ReplayAllocFn alloc)
+{
+    if (!ReplayApplyArray(f, object, key, value, known, memory, alloc))
+        return false;
+    size_t length = strlen(key);
+    if (!memory || value[0] != '[' || length < 3 || strcmp(key + length - 2, "[]") != 0)
+        return true;
+    char pointer[200];
+    if (length - 2 >= sizeof pointer)
+        return false;
+    memcpy(pointer, key, length - 2);
+    pointer[length - 2] = '\0';
+    const char* named = known.Get(pointer);
+    const char* hash = named == nullptr ? nullptr : strchr(named, '#');
+    int kind = hash == nullptr ? -1 : ReplayFindObjectKind(named, (unsigned)(hash - named));
+    unsigned ordinal = hash == nullptr ? 0u : (unsigned)atoi(hash + 1);
+    if (kind >= 0 && ordinal != 0 && kReplayObjectKinds[kind].table == RT_ORDER)
+        table.Bind((unsigned)kind, ordinal, *(void**)((unsigned char*)object + f.offset));
     return true;
 }
 

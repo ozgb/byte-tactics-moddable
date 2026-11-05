@@ -205,4 +205,11 @@ struct FixtureNamed {
     BlockVector<Ref<char> > idents;
 };
 
+struct FixtureProgram {
+    int count;
+    int* entries;
+    unsigned char* bits;
+    int* plain;
+};
+
 #endif

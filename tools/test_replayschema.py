@@ -635,6 +635,7 @@ class Tables(unittest.TestCase):
         self.assertEqual(rs.parse_length("count+0xff>>8", "t", errors)[0], {"member": "count", "shift": 8, "add": 255})
         self.assertEqual(rs.parse_length("(width+1)*height", "t", errors), [{"member": "width", "shift": 0, "add": 1}, {"member": "height", "shift": 0}])
         self.assertEqual(rs.parse_length("n+010", "t", errors)[0], {"member": "n", "shift": 0, "add": 10})
+        self.assertEqual(rs.parse_length("width*(height+15>>4)", "t", errors), [{"member": "width", "shift": 0}, {"member": "height", "shift": 4, "add": 15}])
         self.assertEqual(errors, [])
         rs.parse_length("a+b", "t", errors)
         self.assertEqual(len(errors), 1, errors)
@@ -703,7 +704,7 @@ class Arrays(unittest.TestCase):
         files, _, _ = self.generated()
         text = files[rs.SCHEMA_H]
         self.assertIn("{ 4, 1, 0, { { offsetof(MovementClass, width), (unsigned char)sizeof(((MovementClass*)nullptr)->width), 0 }, "
-                      "{ offsetof(MovementClass, height), (unsigned char)sizeof(((MovementClass*)nullptr)->height), 4 } } }", text)
+                      "{ offsetof(MovementClass, height), (unsigned char)sizeof(((MovementClass*)nullptr)->height), 4, 15u } } }", text)
         self.assertIn("{ 2, 1, 0, { { offsetof(Game, width), (unsigned char)sizeof(((Game*)nullptr)->width), 1 }, "
                       "{ offsetof(Game, height), (unsigned char)sizeof(((Game*)nullptr)->height), 1 } } }", text)
 

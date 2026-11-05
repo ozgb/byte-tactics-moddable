@@ -1175,7 +1175,7 @@
       "kind": "array",
       "elem": "u32",
       "ref": true,
-      "length": "width*(height>>4)",
+      "length": "width*(height+15>>4)",
       "aliases": [
        "MovementClassBuildView::cells"
       ]
@@ -4991,7 +4991,7 @@
   {"name": "Vec3", "type": "Vec3", "scope": "value", "table": null, "inside": null, "fields": [{"name": "x", "kind": "i32"}, {"name": "y", "kind": "i32"}, {"name": "z", "kind": "i32"}]},
   {"name": "UnitTypeSet", "type": "UnitTypeSet", "scope": "state", "table": null, "inside": null, "fields": [{"name": "bits", "kind": "bytes", "size": 64}]},
   {"name": "Projectile", "type": "Projectile", "scope": "state", "table": {"base": "game", "member": "projectiles", "ref": true, "count": "projectileCount", "alloc": 1024}, "inside": null, "fields": [{"name": "speed", "kind": "i32"}, {"name": "spawnTick", "kind": "i32"}, {"name": "attacker", "kind": "ref", "target": "Unit"}, {"name": "active", "kind": "i16"}, {"name": "owner", "kind": "u8"}]},
-  {"name": "MovementClass", "type": "MovementClass", "scope": "state", "table": {"base": "sim", "member": "g_movementClasses.entries", "count": 32}, "inside": null, "fields": [{"name": "footprintX", "kind": "i16", "aliases": ["MovementClassBuildView::footprintX"]}, {"name": "maxSlope", "kind": "u8"}, {"name": "width", "kind": "u32", "aliases": ["MovementClassBuildView::width"]}, {"name": "height", "kind": "u32", "aliases": ["MovementClassBuildView::height"]}, {"name": "cells", "kind": "array", "elem": "u32", "ref": true, "length": "width*(height>>4)", "aliases": ["MovementClassBuildView::cells"], "array": 4}, {"name": "lastTick", "kind": "u32"}, {"name": "name", "kind": "ptr", "target": "alloc", "aliases": []}, {"name": "footprintZ", "kind": "i16", "aliases": ["MovementClassBuildView::footprintZ"]}, {"name": "maxWaterDepth", "kind": "i16"}, {"name": "minWaterDepth", "kind": "i16"}, {"name": "badSlope", "kind": "u8"}, {"name": "maxWaterSlope", "kind": "u8"}, {"name": "badWaterSlope", "kind": "u8"}]},
+  {"name": "MovementClass", "type": "MovementClass", "scope": "state", "table": {"base": "sim", "member": "g_movementClasses.entries", "count": 32}, "inside": null, "fields": [{"name": "footprintX", "kind": "i16", "aliases": ["MovementClassBuildView::footprintX"]}, {"name": "maxSlope", "kind": "u8"}, {"name": "width", "kind": "u32", "aliases": ["MovementClassBuildView::width"]}, {"name": "height", "kind": "u32", "aliases": ["MovementClassBuildView::height"]}, {"name": "cells", "kind": "array", "elem": "u32", "ref": true, "length": "width*(height+15>>4)", "aliases": ["MovementClassBuildView::cells"], "array": 4}, {"name": "lastTick", "kind": "u32"}, {"name": "name", "kind": "ptr", "target": "alloc", "aliases": []}, {"name": "footprintZ", "kind": "i16", "aliases": ["MovementClassBuildView::footprintZ"]}, {"name": "maxWaterDepth", "kind": "i16"}, {"name": "minWaterDepth", "kind": "i16"}, {"name": "badSlope", "kind": "u8"}, {"name": "maxWaterSlope", "kind": "u8"}, {"name": "badWaterSlope", "kind": "u8"}]},
   {"name": "Point16", "type": "Point16", "scope": "value", "table": null, "inside": null, "fields": [{"name": "x", "kind": "i16"}, {"name": "y", "kind": "i16"}]},
   {"name": "MissionType", "type": "MissionType", "scope": "value", "table": null, "inside": null, "fields": [{"name": "index", "kind": "u8"}]},
   {"name": "Angles16", "type": "Angles16", "scope": "value", "table": null, "inside": null, "fields": [{"name": "bank", "kind": "i16"}, {"name": "heading", "kind": "u16"}, {"name": "pitch", "kind": "i16"}]},

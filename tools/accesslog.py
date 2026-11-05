@@ -726,6 +726,28 @@ def loaded_save(build_dir: Path, scenario: Path, game_dir: Path, timeout: float)
     return tracediff.save_put(kept, scenario.stem, saver)
 
 
+OVERFLOW_COUNTERS = ("overflow", "phase_overflow", "presentation_overflow")
+
+
+def overflowed(name: str, stats: str) -> list[str]:
+    """One message for each overflow counter of a stats file that is above 0: a full table drops rows without a trace."""
+    counts = {}
+    for line in stats.splitlines():
+        key, _, value = line.partition(" ")
+        counts[key] = value
+    return ["%s: the counter %s is %s in its stats: a table overflowed and rows were dropped" % (name, c, counts[c])
+            for c in OVERFLOW_COUNTERS if counts.get(c, "0") != "0"]
+
+
+def check_stats(name: str, stats: Path) -> None:
+    """Exit with a message naming the scenario and the counter when its stats file shows an overflow."""
+    if not stats.is_file():
+        return
+    problems = overflowed(name, stats.read_text())
+    if problems:
+        raise SystemExit("accesslog: " + "\n".join(problems))
+
+
 def steady(edges: Path) -> list[str]:
     """The lines of an edges file that do not depend on how many frames the run drew between ticks."""
     return [line for line in edges.read_text().splitlines() if ",presentation," not in line]
@@ -769,6 +791,7 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
         directory, seconds = play(build_dir / "TotalA.exe", scenario, game_dir, build_dir, raw, timeout, put)
         why = trace_difference(directory / "trace.txt", stored)
         print("%s: %s" % (name, "trace EQUAL to reference/traces/%s.txt" % name if why is None else "trace DIFFERS, " + why))
+        check_stats(name, directory / "access.stats.txt")
         failed += why is not None
         for suffix, source in (("edges.csv", "access.edges.csv"), ("stats.txt", "access.stats.txt"), ("presentation.csv", "access.presentation.csv"),
                                ("cross.csv", "access.cross.csv"), ("draws.csv", "access.draws.csv"), ("pass.csv", "access.pass.csv"),

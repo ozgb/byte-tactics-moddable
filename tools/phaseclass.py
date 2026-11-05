@@ -127,6 +127,10 @@ def reduce_rows(kind: str, rows: list[dict]) -> list[dict]:
 
 def store(source: Path, directory: Path) -> int:
     """Keep each phase file of source (accesslog.py's output) in directory, reduced and gzipped; the number of scenarios."""
+    import accesslog
+
+    for stats in sorted(source.glob("*.stats.txt")):
+        accesslog.check_stats(stats.name[: -len(".stats.txt")], stats)
     directory.mkdir(exist_ok=True)
     names = sorted(p.name[: -len(".edges.csv")] for p in source.glob("*.edges.csv"))
     for name in names:

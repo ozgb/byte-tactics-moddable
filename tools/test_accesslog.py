@@ -392,6 +392,43 @@ class ClassifierTest(unittest.TestCase):
         self.assertTrue({CROSS, CARRIED} <= kinds)
 
 
+class OverflowTest(unittest.TestCase):
+    STATS = "accesses 5\noverflow %d\nphase_overflow %d\npresentation_overflow %d\nwrites 1\n"
+
+    def test_each_counter_above_zero_fails_the_scenario(self):
+        for counter in range(3):
+            values = [0, 0, 0]
+            values[counter] = 2
+            with tempfile.TemporaryDirectory() as t:
+                path = Path(t) / "s.stats.txt"
+                path.write_text(self.STATS % tuple(values))
+                with self.assertRaises(SystemExit) as caught:
+                    al.check_stats("scen", path)
+                self.assertIn("scen", str(caught.exception))
+                self.assertIn(al.OVERFLOW_COUNTERS[counter] + " is 2", str(caught.exception))
+
+    def test_all_counters_at_zero_pass(self):
+        with tempfile.TemporaryDirectory() as t:
+            path = Path(t) / "s.stats.txt"
+            path.write_text(self.STATS % (0, 0, 0))
+            al.check_stats("scen", path)
+        self.assertEqual(al.overflowed("scen", self.STATS % (0, 0, 0)), [])
+
+    def test_the_store_paths_fail_on_an_overflow(self):
+        import depclass
+        import phaseclass
+
+        with tempfile.TemporaryDirectory() as t:
+            src = Path(t) / "src"
+            src.mkdir()
+            (src / "s.edges.csv").write_text("writer,reader,item,phase,evidence,count,first_tick\n")
+            (src / "s.stats.txt").write_text(self.STATS % (0, 1, 0))
+            for store in (depclass.store, phaseclass.store):
+                with self.assertRaises(SystemExit) as caught:
+                    store(src, Path(t) / "dst")
+                self.assertIn("s: the counter phase_overflow", str(caught.exception))
+
+
 class MapTest(unittest.TestCase):
     def setUp(self):
         self.info = al.parse_map(MAP)

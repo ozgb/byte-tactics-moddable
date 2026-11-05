@@ -116,6 +116,10 @@ def load_summaries(directory: Path, ordered: Path | None = None) -> dict[str, li
 
 def store(source: Path, directory: Path) -> int:
     """Keep each edges file of source (accesslog.py's output) in directory, gzipped, without the presentation rows."""
+    import accesslog
+
+    for stats in sorted(source.glob("*.stats.txt")):
+        accesslog.check_stats(stats.name[: -len(".stats.txt")], stats)
     directory.mkdir(exist_ok=True)
     count = 0
     for path in sorted(source.glob("*" + SUFFIX)):

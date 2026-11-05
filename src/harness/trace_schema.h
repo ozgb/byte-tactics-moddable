@@ -1414,8 +1414,6 @@ extern int g_meteorsEnabled;
 extern int g_meteorNextHitTime;
 extern Point16 g_meteorTarget;
 extern int g_meteorScheduleGap;
-extern int g_cdPathMismatch;
-extern unsigned int g_cdMismatchDefeatTick;
 extern int g_economyPacketTick;
 extern int g_playerTickLoad[10];
 extern int g_playerBudgetCap[10];
@@ -1439,11 +1437,9 @@ static const TraceGlobal kMeteorGlobals[] = {
 static const unsigned kMeteorGlobalsCount = 13;
 
 static const TraceGlobal kScalarGlobals[] = {
-    { "cdPathMismatch", &g_cdPathMismatch, 4, TF_SCALAR, TT_NONE },
-    { "cdMismatchDefeatTick", &g_cdMismatchDefeatTick, 4, TF_SCALAR, TT_NONE },
     { "economyPacketTick", &g_economyPacketTick, 4, TF_SCALAR, TT_NONE },
 };
-static const unsigned kScalarGlobalsCount = 3;
+static const unsigned kScalarGlobalsCount = 1;
 
 static const TraceGlobal kPathGlobals[] = {
     { "playerTickLoad", &g_playerTickLoad, 40, TF_BYTES, TT_NONE },

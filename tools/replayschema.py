@@ -105,10 +105,12 @@ def read_assignment(path: Path = SUBSYSTEMS) -> dict[str, list[str]]:
 
 
 def merge_fixtures(ann: dict, fixtures: dict) -> dict:
-    """The annotations with the test-only kinds of tests/replay_fixtures.json added: its includes, game fields and kinds come last, `inside` adds sites to a kind, and its `fixtures` are the slots the replayer's self-tests call."""
+    """The annotations with the test-only kinds of tests/replay_fixtures.json added: its includes, game fields, sim fields (that no slot reads or writes) and kinds come last, `inside` adds sites to a kind, and its `fixtures` are the slots the replayer's self-tests call."""
     merged = copy.deepcopy(ann)
     merged["includes"] += [i for i in fixtures.get("includes", []) if i not in merged["includes"]]
     merged["game_fields"].update(fixtures.get("game_fields", {}))
+    merged["sim_fields"].update(fixtures.get("sim_fields", {}))
+    merged["fixture_sim"] = list(fixtures.get("sim_fields", {}))
     merged["objects"].update(copy.deepcopy(fixtures.get("objects", {})))
     merged["fixtures"] = copy.deepcopy(fixtures.get("fixtures", {}))
     for kind, sites in fixtures.get("inside", {}).items():
@@ -1262,12 +1264,12 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     game, sim = block_tables(ann)
     errors = check_sim_names(sim)
     arrays: list[dict] = []
-    fields = field_table(game, sim, arrays, errors, ann["objects"])
+    vectors: list[dict] = []
+    fields = field_table(game, sim, arrays, errors, ann["objects"], vectors, ann)
     field_index = {f["name"]: i for i, f in enumerate(fields)}
     objects = []
     object_fields = []
     tables: list[dict] = []
-    vectors: list[dict] = []
     elems: list[dict] = []
     selfs: list[dict] = []
     blobs: dict[int, int] = {}
@@ -1354,6 +1356,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     rules_of: dict[tuple[str, str], list[int]] = {}
     for i, r in enumerate(ann["rules"]):
         rules_of.setdefault((r["kind"], r["target"]), []).append(i)
+    fixture_only = {"SimGlobals." + n for n in ann.get("fixture_sim", [])}
     state_types = {spec["type"] for spec in ann["objects"].values() if spec["scope"] == "state"}
     kind_types = {spec["type"] for spec in ann["objects"].values()}
     exempt_types = ann.get("exempt_types", {})
@@ -1423,7 +1426,9 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                         draws = True
                     if kind in BLOCK_KINDS:
                         name = tracked(target, game, sim, ann.get("game_aliases"))
-                        if name is not None:
+                        if name in fixture_only:
+                            pass
+                        elif name is not None:
                             if "r" in BLOCK_KINDS[kind]:
                                 reads.add(name)
                             if "w" in BLOCK_KINDS[kind]:
@@ -1581,13 +1586,28 @@ def check_game_ref(name: str, spec: dict, leaf: dict | None, kinds: dict, errors
     return {"name": "Game." + name, "base": "game", "offset": leaf["offset"], "size": 4, "kind": "ref", "target": target}
 
 
-def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], kinds: dict | None = None) -> list[dict]:
+def block_vector(name: str, spec: dict, owner: str, vectors: list[dict], ann: dict | None, errors: list[str]) -> dict:
+    """The field entry of a SimGlobals member that is a BlockVector: the element mode of an object's vector field, written as a field of the block."""
+    where = "%s.%s" % (owner, name)
+    if set(spec) - {"kind", "elem", "size"}:
+        errors.append("%s: a vector field of the block is {\"kind\": \"vector\", \"elem\": ELEMENT}" % where)
+    vectors.append(check_vector(where, dict(spec, name=name), owner, ann or {"objects": {}}, errors))
+    entry = {"name": "%s.%s" % (owner, name), "base": "sim", "offset": name, "size": 16, "kind": "vector", "vector": len(vectors)}
+    if vectors[-1]["mode"] == "object" and vectors[-1]["kind"]:
+        entry["target"] = vectors[-1]["kind"]
+    return entry
+
+
+def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], kinds: dict | None = None, vectors: list[dict] | None = None, ann: dict | None = None) -> list[dict]:
     schema = traceschema.Schema()
     layout = {l["name"]: l for l in schema.layout("Game")[0]}
     fields = []
     for name, kind in game.items():
         leaf = layout.get(name)
         spec = kind if isinstance(kind, dict) else None
+        if spec is not None and spec.get("kind") == "vector":
+            errors.append("Game.%s: a vector is a member of SimGlobals, not of Game" % name)
+            continue
         if spec is not None and spec.get("kind") == "ref":
             fields.append(check_game_ref(name, spec, leaf, kinds or {}, errors))
             continue
@@ -1606,6 +1626,9 @@ def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], ki
             raise Error("Game has no field %s of %d bytes" % (name, SIZES[kind]))
         fields.append({"name": "Game." + name, "base": "game", "offset": leaf["offset"], "size": leaf["size"], "kind": kind})
     for name, spec in sim.items():
+        if isinstance(spec, dict) and spec.get("kind") == "vector":
+            fields.append(block_vector(name, spec, "SimGlobals", vectors if vectors is not None else [], ann, errors))
+            continue
         if isinstance(spec, dict):
             array = check_array("SimGlobals.%s" % name, spec, "SimGlobals", errors)
             array["member"] = name
@@ -1691,6 +1714,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         base = {"game": "RB_GAME", "sim": "RB_SIM", "rng": "RB_RNG"}[f["base"]]
         offset = "offsetof(SimGlobals, %s)" % f["offset"] if f["base"] == "sim" else "%d" % f["offset"]
         extra = ", %d" % f["array"] if f.get("array") else ", 0, ROK_%s" % upper(f["target"]) if f["kind"] == "ref" else ""
+        if f["kind"] == "vector":
+            extra = ", %d%s" % (f["vector"], ", ROK_%s" % upper(f["target"]) if f.get("target") else "")
         L.append('    { "%s", %s, %d, %s, RK_%s%s },' % (f["name"], offset, f["size"], base, FIELD_KINDS[f["kind"]], extra))
     L += ["};", "static const unsigned kReplayFieldCount = %d;" % len(fields), ""]
     L += ["static const ReplayArraySpec kReplayArrays[] = {"]
@@ -1735,6 +1760,12 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d * sizeof(%s), "the table of %s holds %d elements");' % (t["owner"], t["member"], n, kind_type[t["kind"]], t["kind"], n))
         elif t["ref"]:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(unsigned), "the table of %s is a Ref");' % (t["owner"], t["member"], t["kind"]))
+    for f in fields:
+        if f["kind"] == "vector":
+            v = vectors[f["vector"] - 1]
+            access = "decltype(((SimGlobals*)nullptr)->%s)" % f["offset"]
+            L.append('static_assert(sizeof(%s) == 16, "%s is a block vector");' % (access, f["name"]))
+            L.append('static_assert(__is_same(%s::value_type, %s), "%s holds %s");' % (access, v["ctype"], f["name"], v["ctype"]))
     L.append("")
     for name in macros:
         L.append('#pragma pop_macro("%s")' % name)

@@ -635,7 +635,7 @@ mode of the elements:
 
 The tool checks the element type against the C++ `BlockVector<T>` with a `static_assert` in the schema header (`Ref<Unit>`, `short`,
 `KeyedCell`), so a vector of another type is a compile error. A `member` may be a path, as `visible.units` for the vector inside the
-embedded `AiUnitList`. Only the fields of an object are vectors, not the block fields.
+embedded `AiUnitList`. A `BlockVector` member of `SimGlobals` is a vector too (see A vector in the sim globals); `Game` has none.
 
 The walker reaches the object of every element of an `object` vector through its `Ref`, as it does through a `Ref` field, so the units a
 window holds only in a vector are recorded and restored. For a `value` vector a bracket line whose capacity or length changed is followed by the
@@ -645,6 +645,27 @@ The replayer allocates `cap` elements with `SimAlloc`, which is what `BlockVecto
 elements. A vector of structs whose capacity changes keeps its old elements, as the module's `Insert` does when it moves them. A
 difference is reported at `<field>.length`, `<field>.capacity`, `<field>[<i>]` (the hex of a scalar element or the handle of an object
 element) or `<field>[<i>].<f>` (a field of a struct element), for example `PlayerAI#1.counts.length: recorded 0, replayed 2`.
+
+### A vector in the sim globals
+
+A `SimGlobals` member that is a `BlockVector` (`g_losTables`, `g_missionOrderTableVec`) is a block field of kind `vector`, with the `elem` an object's vector field has, in `sim_fields`:
+
+```json
+"g_losTables": {"kind": "vector", "elem": {"mode": "value", "kind": "LosTable"}}
+```
+
+It is named as a block field is, `SimGlobals.g_losTables`, and written exactly as an object's vector is: the bracket, and the elements under their path, at every depth (a `LosTable` is
+a vector of `LosLine`s, each a vector of steps):
+
+```
+  r SimGlobals.g_losTables [4/4]
+  r SimGlobals.g_losTables[3].lines [6/6]
+  r SimGlobals.g_losTables[3].lines[5].steps [2/2]
+  r SimGlobals.g_losTables[3].lines[5].steps[1].b 9
+```
+
+A slot that reads or writes the global has it in its `reads` or `writes`, and the walker follows the elements of an `object` vector of a global as it follows those of an object's. A difference is reported at
+`SimGlobals.g_losTables[3].lines[5].steps[0].b`. The generated header checks that the member is a block vector of the type of the element. A `Game` member cannot be a vector.
 
 ### Vectors of vectors
 

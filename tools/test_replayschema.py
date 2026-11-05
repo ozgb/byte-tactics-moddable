@@ -2628,6 +2628,59 @@ class NestedVectors(unittest.TestCase):
         self.has(ann, "FixtureRow.cells: `base` is true")
 
 
+class SimVectors(unittest.TestCase):
+    """A BlockVector member of SimGlobals is a field of kind vector, written as an object's vector field is."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def test_the_field_row_names_the_vector_spec(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn('{ "SimGlobals.g_losTables", offsetof(SimGlobals, g_losTables), 16, RB_SIM, RK_VECTOR, 1 },', text)
+        self.assertIn('{ "SimGlobals.g_missionOrderTableVec", offsetof(SimGlobals, g_missionOrderTableVec), 16, RB_SIM, RK_VECTOR, 2 },', text)
+        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"][:2]], [("value", "FixtureLosTable", "LosTable"), ("value", "FixtureOrderEntry", "OrderTableEntry")])
+
+    def test_the_header_checks_the_member_type(self):
+        text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
+        self.assertIn('static_assert(sizeof(decltype(((SimGlobals*)nullptr)->g_losTables)) == 16, "SimGlobals.g_losTables is a block vector");', text)
+        self.assertIn('static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_losTables)::value_type, LosTable), "SimGlobals.g_losTables holds LosTable");', text)
+        self.assertIn('static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_missionOrderTableVec)::value_type, OrderTableEntry)', text)
+
+    def test_the_real_schema_has_no_vector_in_the_block(self):
+        files, _, model = rs.generate(rs.read_rows())
+        self.assertEqual([f["name"] for f in model["fields"] if f["kind"] == "vector"], [])
+
+    def test_a_test_only_global_is_in_no_slot_set(self):
+        real, _ = rs.build(rs.load_annotations(), rs.read_rows(), rs.read_assignment())
+        both, _ = rs.build(rs.load_annotations(fixtures=True), rs.read_rows(), rs.read_assignment())
+        for sub, spec in both["subsystems"].items():
+            for slot, s in spec["slots"].items():
+                self.assertEqual(s["reads"], real["subsystems"][sub]["slots"][slot]["reads"], (sub, slot))
+                self.assertEqual(s["writes"], real["subsystems"][sub]["slots"][slot]["writes"], (sub, slot))
+
+    def test_a_vector_field_of_the_block_is_checked(self):
+        ann = annotations()
+        ann["sim_fields"]["g_losTables"]["extra"] = 1
+        self.has(ann, "SimGlobals.g_losTables: a vector field of the block is")
+        ann = annotations()
+        del ann["sim_fields"]["g_losTables"]["elem"]
+        self.has(ann, "SimGlobals.g_losTables: a vector needs an `elem`")
+        ann = annotations()
+        ann["sim_fields"]["g_losTables"]["elem"]["kind"] = "Unit"
+        self.has(ann, "SimGlobals.g_losTables: a value element needs a `kind` that is a value kind")
+
+    def test_a_game_member_is_not_a_vector(self):
+        ann = annotations()
+        ann["game_fields"]["tidal"] = {"kind": "vector", "elem": {"mode": "scalar", "type": "int"}}
+        self.has(ann, "Game.tidal: a vector is a member of SimGlobals, not of Game")
+
+
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
         files, errors, model = rs.generate(rs.read_rows())

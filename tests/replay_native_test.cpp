@@ -397,6 +397,46 @@ const ReplayField* FindField(const char* name)
     return nullptr;
 }
 
+const ReplayField* FindBlockField(const char* name)
+{
+    const char* open = strchr(name, '[');
+    if (open == nullptr)
+        return FindField(name);
+    char base[96];
+    size_t length = (size_t)(open - name);
+    if (length >= sizeof base)
+        return nullptr;
+    memcpy(base, name, length);
+    base[length] = '\0';
+    const ReplayField* f = FindField(base);
+    return f != nullptr && f->kind == RK_VECTOR ? f : nullptr;
+}
+
+bool ApplyBlockVector(const ReplayField& f, const char* name, const char* value, bool memory)
+{
+    ReplayObjectField view = ReplayFieldView(f);
+    unsigned char* object = memory ? BlockBase(f) : nullptr;
+    if (memory && object == nullptr)
+        return false;
+    const char* open = strchr(name, '[');
+    if (open == nullptr)
+        return ReplayApplyVector(view, object, name, value, g_known, memory, g_objects, memory ? AllocObject : nullptr);
+    char* end;
+    unsigned long at = strtoul(open + 1, &end, 10);
+    if (end == open + 1 || *end != ']')
+        return false;
+    if (end[1] == '\0')
+        return ReplayApplyVectorString(view, object, (unsigned)at, name, value, g_known, memory, memory ? AllocObject : nullptr);
+    if (end[1] != '.')
+        return false;
+    return ReplayApplyVectorElement(view, object, (unsigned)at, end + 2, name, value, g_known, memory, g_objects, memory ? AllocObject : nullptr);
+}
+
+void CompareBlockVector(const ReplayField& f)
+{
+    ReplayCompareVector(ReplayFieldView(f), BlockBase(f), f.name, g_known, g_objects, Diff, HashText);
+}
+
 bool InSet(const unsigned char* set, unsigned count, const ReplayField* f)
 {
     for (unsigned i = 0; i < count; i++) {
@@ -1840,9 +1880,14 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
             array = f->kind == RK_ARRAY;
             arrayField = f;
         } else {
-            const ReplayField* f = FindField(name);
+            const ReplayField* f = FindBlockField(name);
             if (f == nullptr || !InSet(sets->writes, sets->writeCount, f))
                 Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
+            if (f->kind == RK_VECTOR) {
+                if (!ApplyBlockVector(*f, name, space + 1, false))
+                    Fatal(file, g_callIndex, "a vector line that cannot be applied", line);
+                continue;
+            }
             blockView = ReplayFieldView(*f);
             array = f->kind == RK_ARRAY;
             arrayField = &blockView;
@@ -1856,6 +1901,10 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
     }
     for (unsigned i = 0; i < sets->writeCount; i++) {
         const ReplayField& f = kReplayFields[sets->writes[i]];
+        if (f.kind == RK_VECTOR) {
+            CompareBlockVector(f);
+            continue;
+        }
         FormatField(f, value);
         HashText(value.Data());
         const char* known = g_known.Get(f.name);
@@ -1958,11 +2007,15 @@ void ReplayCall(const char* file, Outcome& out)
             if (object && ObjectLineIsCondition(line + 4) == (pass == 0)) {
                 RestoreObjectLine(line + 4, space + 1, file, sets, line);
             } else if (!object && pass == 0) {
-                const ReplayField* f = FindField(line + 4);
+                const ReplayField* f = FindBlockField(line + 4);
                 if (f == nullptr || !InSet(sets->reads, sets->readCount, f))
                     Fatal(file, g_callIndex, "field is not in the read set of the slot", line + 4);
-                if (!RestoreField(*f, space + 1))
+                if (f->kind == RK_VECTOR) {
+                    if (!ApplyBlockVector(*f, line + 4, space + 1, true))
+                        Fatal(file, g_callIndex, "a vector line that cannot be applied", space + 1);
+                } else if (!RestoreField(*f, space + 1)) {
                     Fatal(file, g_callIndex, "a value that cannot be restored", space + 1);
+                }
             }
             *space = ' ';
         }
@@ -5603,6 +5656,115 @@ void NestedVectorSelfTest()
     calls.Free();
 }
 
+#pragma push_macro("g_losTables")
+#undef g_losTables
+
+LosTables& LosTablesOf()
+{
+    return g_simGlobals->g_losTables;
+}
+
+#pragma pop_macro("g_losTables")
+
+#pragma push_macro("g_missionOrderTableVec")
+#undef g_missionOrderTableVec
+
+BlockVector<OrderTableEntry>& OrderEntriesOf()
+{
+    return g_simGlobals->g_missionOrderTableVec;
+}
+
+#pragma pop_macro("g_missionOrderTableVec")
+
+int RestoreBlockText(const char* text)
+{
+    char* copy = (char*)malloc(strlen(text) + 1);
+    strcpy(copy, text);
+    int lines = 0;
+    for (char* p = copy; *p != '\0'; p = strchr(p, '\0') + 1) {
+        char* end = strchr(p, '\n');
+        *end = '\0';
+        char* space = strchr(p + 4, ' ');
+        *space = '\0';
+        const ReplayField* f = FindBlockField(p + 4);
+        Check(f != nullptr && ApplyBlockVector(*f, p + 4, space + 1, true), "a block line restores");
+        lines++;
+        p = end;
+    }
+    free(copy);
+    return lines;
+}
+
+void SimVectorSelfTest()
+{
+    printf("a block vector in the sim globals\n");
+    ResetBlock();
+    ReplayClearFailure();
+    for (int t = 0; t < 4; t++) {
+        LosTable table;
+        new (&table) LosTable();
+        if (t == 3) {
+            table.Resize(6);
+            LosStep first = { 1, 2 };
+            LosStep second = { 3, 4 };
+            table[5].PushBack(first);
+            table[5].PushBack(second);
+        }
+        LosTablesOf().PushBack(table);
+    }
+    OrderTableEntry entry;
+    memset(&entry, 0, sizeof entry);
+    entry.value = BlockText("stop");
+    entry.drawMask = 5;
+    OrderEntriesOf().PushBack(entry);
+
+    const ReplayField& tables = kReplayFields[RF_SIMGLOBALS_G_LOSTABLES];
+    const ReplayField& orders = kReplayFields[RF_SIMGLOBALS_G_MISSIONORDERTABLEVEC];
+    Check(tables.kind == RK_VECTOR && orders.kind == RK_VECTOR, "a BlockVector global is a field of kind vector");
+    ReplayKnown known;
+    ReplayText out;
+    ReplayText scratch;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayEmitField(out, known, *table, 'r', tables.name, ReplayFieldView(tables), BlockBase(tables), scratch);
+    ReplayEmitField(out, known, *table, 'r', orders.name, ReplayFieldView(orders), BlockBase(orders), scratch);
+    printf("%s", out.Data());
+    Check(strstr(out.Data(), "  r SimGlobals.g_losTables [4/4]\n  r SimGlobals.g_losTables[0].lines [0/0]\n") != nullptr, "it is written as an object's vector is, under the name of the global");
+    Check(strstr(out.Data(), "  r SimGlobals.g_losTables[3].lines [6/6]\n") != nullptr && strstr(out.Data(), "  r SimGlobals.g_losTables[3].lines[5].steps [2/2]\n  r SimGlobals.g_losTables[3].lines[5].steps[0].a 1\n"
+                                                                                                                   "  r SimGlobals.g_losTables[3].lines[5].steps[0].b 2\n  r SimGlobals.g_losTables[3].lines[5].steps[1].a 3\n") != nullptr,
+          "and its elements, three deep, by path");
+    Check(strstr(out.Data(), "  r SimGlobals.g_missionOrderTableVec [1/1]\n  r SimGlobals.g_missionOrderTableVec[0].value \"stop\"\n  r SimGlobals.g_missionOrderTableVec[0].name null\n  r SimGlobals.g_missionOrderTableVec[0].drawMask 5\n") != nullptr, "a struct with strings too");
+    char* one = strdup(out.Data());
+    LosTablesOf()[3][5][1].b = 9;
+    out.Clear();
+    ReplayEmitField(out, known, *table, 'r', tables.name, ReplayFieldView(tables), BlockBase(tables), scratch);
+    Check(strcmp(out.Data(), "  r SimGlobals.g_losTables[3].lines[5].steps[1].b 9\n") == 0, "one element that changed is one line");
+    char* two = strdup(out.Data());
+
+    ResetBlock();
+    int lines = RestoreBlockText(one);
+    RestoreBlockText(two);
+    Check(lines >= 20 && LosTablesOf().Size() == 4 && LosTablesOf()[3].Size() == 6 && LosTablesOf()[3][5].Size() == 2, "the replayer rebuilds the vectors in the globals");
+    Check(LosTablesOf()[3][5][0].a == 1 && LosTablesOf()[3][5][1].a == 3 && LosTablesOf()[3][5][1].b == 9, "and their elements");
+    Check(OrderEntriesOf().Size() == 1 && strcmp(OrderEntriesOf()[0].value, "stop") == 0 && OrderEntriesOf()[0].name == nullptr && OrderEntriesOf()[0].drawMask == 5, "with the strings");
+    BeginCompare();
+    CompareBlockVector(tables);
+    CompareBlockVector(orders);
+    Check(g_diffs == 0, "the restored globals compare equal");
+    LosTablesOf()[3][5][0].b = 7;
+    OrderEntriesOf()[0].value = BlockText("go");
+    BeginCompare();
+    CompareBlockVector(tables);
+    CompareBlockVector(orders);
+    printf("%s", g_detail.Data());
+    Check(strstr(g_detail.Data(), "SimGlobals.g_losTables[3].lines[5].steps[0].b: recorded 2, replayed 7") != nullptr, "a changed inner element is reported at its path");
+    Check(strstr(g_detail.Data(), "SimGlobals.g_missionOrderTableVec[0].value: recorded \"stop\", replayed \"go\"") != nullptr && g_diffs == 2, "and a changed string");
+    free(one);
+    free(two);
+    out.Free();
+    scratch.Free();
+    delete table;
+}
+
 void GameWriteSelfTest()
 {
     printf("a write to Game through a pointer\n");
@@ -5679,6 +5841,7 @@ int SelfTest(const char* file)
     CStringSelfTest();
     BlobSelfTest();
     NestedVectorSelfTest();
+    SimVectorSelfTest();
     GameWriteSelfTest();
     if (file == nullptr)
         return 0;

@@ -601,7 +601,8 @@ class SimEventKitTest(unittest.TestCase):
         keys, hexes = oraclekit.page_terms(self.page)
         for key in ("call flag 2", "call flag 8", "call flag 32", "state 2 of the pickup order", "state 2", "kill type 7",
                     "damage kind 10", "damage kind 11", "damage kind 2", "damage kind 1", "map flag 1", "map flag 2", "match flag 2",
-                    "net game flag 1", "spot flag bit 0", "activation bit 0", "activation bit 2"):
+                    "net game flag 1", "spot flag bit 0", "activation bit 0", "activation bit 2",
+                    "game type 1", "game type 2", "game type 3", "player type 1", "player type 2", "player type 3"):
             self.assertIn(key, keys)
         for number in (0x2000, 0x10000000, 0x4000, 0x20000000, 0x20, 0x300, 0x60000000):
             self.assertIn(number, hexes)
@@ -618,12 +619,22 @@ class SimEventKitTest(unittest.TestCase):
                             ("The unit has flag 0x1234.", "0x1234"),
                             ("The unit dies with kill type 9.", "kill type 9"),
                             ("Hit by damage kind 12.", "damage kind 12"),
+                            ("The game type must be 4.", "game type 4"),
+                            ("A player of type 4 stays.", "player type 4"),
                             ("The map flag 4 is set.", "map flag 4"),
                             ("A step called with flag 16.", "call flag 16")):
             with self.assertRaises(oraclekit.Refusal) as caught:
                 oraclekit.kit_page(self.page + "\n" + added + "\n", self.terms)
             self.assertIn(term, str(caught.exception))
             self.assertIn("has no row", str(caught.exception))
+
+    def test_the_player_and_game_types_are_defined_by_what_they_are(self):
+        by_term = {r["term"]: r for r in self.terms}
+        for n in (1, 2, 3):
+            self.assertIn("docs/scenario-format.md", by_term["game type %d" % n]["kit_reference"])
+            self.assertIn("layout.json Player.type", by_term["player type %d" % n]["kit_reference"])
+        self.assertIn("Nothing in the game produces it", by_term["kill type 7"]["definition"])
+        self.assertIn("nothing else sets it", by_term["match flag 2"]["definition"])
 
     def test_a_definition_the_page_does_not_use_stops_the_export(self):
         rows = self.terms + [{"term": "kill type 12", "definition": "A kill.", "kit_reference": ""}]

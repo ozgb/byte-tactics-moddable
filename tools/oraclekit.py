@@ -578,6 +578,8 @@ TERM_PATTERNS = [
     (re.compile(r"\bdamage (?:kind|type)s? (?:other than |except |is )?(\d+)(?: and except (\d+))?"), "damage kind {}"),
     (re.compile(r"\(kinds (\d+) and (\d+) do record\)"), "damage kind {}"),
     (re.compile(r"\bmap flags? (\d+)(?: and (\d+))?"), "map flag {}"),
+    (re.compile(r"\bgame types? (?:is not |not |must be )?(\d+(?:(?: or |, )\d+)*)"), "game type {}"),
+    (re.compile(r"\bof type (\d+(?:(?:, | or )\d+)*)"), "player type {}"),
     (re.compile(r"\bmatch flag (\d+)"), "match flag {}"),
     (re.compile(r"\bnet game flag (\d+)"), "net game flag {}"),
     (re.compile(r"\bspot flag bit (\d+)"), "spot flag bit {}"),

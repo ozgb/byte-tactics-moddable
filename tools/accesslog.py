@@ -57,6 +57,28 @@ presentation_active_windows (windows in which anything was read), presentation_r
 (the windows that followed a tick which emitted kind K, whether or not anything was read). The windows and counts follow
 the wall clock like the edges file's presentation rows, so tools/presreads.py keeps only what is stable.
 
+Step 4 of #830 (#838, tools/phaseclass.py) adds four files, next to the edges file and with its policy (rows that follow the
+wall clock are dropped when stored, in data/access_phases):
+
+  `<scenario>.cross.csv`    writer,reader,item,phase_from,phase_to,evidence,count,first_tick: a read in a later window of
+                            the tick of what another subsystem wrote in phase_from (`read-after-write`), or in a later
+                            phase of the tick before (`read-before-write`, with the writer's phase after the reader's). A
+                            subsystem's reads of its own writes are not recorded. Only the last write of an item counts.
+  `<scenario>.draws.csv`    pass,stream,subsystem,function,entities,draws_min,draws_max,ticks,first_tick,tainted,items:
+                            the draws of each random stream by the function that called the generator, per entity of
+                            the pass in a tick.
+  `<scenario>.pass.csv`     pass,item,reader,function,evidence,count,first_tick: reads, in a pass, of an item that an
+                            earlier entity of the pass wrote.
+  `<scenario>.ordered.csv`  the `sim-event` rows of the edges format: emissions to the sim event queue (RecordSimEvent)
+                            by different subsystems in one window, attributed to the sim caller. They are kept apart
+                            so that the edges file is the one #835 and #836 defined.
+
+A pass is the top-level loop of a phase entry function (units, projectiles, explosions, players, features, wind,
+meteors) or the steps of the tail; an entity is one turn of that loop. The game's sources mark them with stores to
+`g_accessMarks` (lib/accesslog/access_log.h): a store is a callback like any other and, unlike a call, leaves the
+compiled code's register use alone, so the counts of the edges file do not move. The marks sit where a mark costs no
+reload: a mark before `--g_game->scanIndex` in UpdateFeatures added a load of g_game a tick.
+
 `<scenario>.stats.txt` counts the accesses by attribution (unknown functions, ignored helpers) and by
 resolution (unresolved items, accesses to code or constants that no row names). `--raw` writes every access
 of the scenario to `<scenario>.raw.txt` (ACCESSLOG_RAW=1), for debugging only.

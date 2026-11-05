@@ -12,7 +12,9 @@ reference/scenarios, which tools/accesslog.py (#835) writes (columns writer,read
 first_tick). The stored files are the output of `accesslog.py run` with the rows of the `presentation` window
 dropped (their counts follow the wall clock; #839 reads them) and gzipped with a zero mtime, so that the same
 rows give the same bytes; `tail` is kept and is classified as a phase.
-This tool reads only those files, data/coupling.csv and the names of reference/scenarios, never build/.
+The ordered rows of the sim event queue (item `sim-event`, step 4's data/access_phases/<scenario>.ordered.csv.gz, in the
+format of the edges files) are read with them: the order of the events that two subsystems queue in one phase is the
+state, like the order of their draws. This tool reads only those files, data/coupling.csv and the names of reference/scenarios, never build/.
 
 Simulation subsystems are coupling.SIM_SUBSYSTEMS: wind_meteors, economy, features, ai, pathfinding, weapons,
 targeting, los_radar, orders, units, players, map. A row whose writer or reader is anything else (game, network,
@@ -74,6 +76,8 @@ import sources
 
 ROOT = sources.ROOT
 ACCESS_DIR = ROOT / "data/access"
+ORDERED_DIR = ROOT / "data/access_phases"
+ORDERED_SUFFIX = ".ordered.csv.gz"
 SUFFIX = ".edges.csv"
 COUPLING_CSV = ROOT / "data/coupling.csv"
 SCENARIOS = ROOT / "reference/scenarios"
@@ -97,10 +101,16 @@ def read_summary(text: str) -> list[dict]:
     return [{**r, "first_tick": int(r["first_tick"])} for r in csv.DictReader(io.StringIO(text))]
 
 
-def load_summaries(directory: Path) -> dict[str, list[dict]]:
-    """Scenario name to the rows of its stored edges file."""
-    return {p.name[: -len(SUFFIX + ".gz")]: read_summary(gzip.decompress(p.read_bytes()).decode())
-            for p in sorted(directory.glob("*" + SUFFIX + ".gz"))}
+def load_summaries(directory: Path, ordered: Path | None = None) -> dict[str, list[dict]]:
+    """Scenario name to the rows of its stored edges file, and of its stored ordered file in `ordered`, if it has one."""
+    out = {p.name[: -len(SUFFIX + ".gz")]: read_summary(gzip.decompress(p.read_bytes()).decode())
+           for p in sorted(directory.glob("*" + SUFFIX + ".gz"))}
+    if ordered is not None:
+        for name, rows in out.items():
+            extra = ordered / (name + ORDERED_SUFFIX)
+            if extra.is_file():
+                rows.extend(read_summary(gzip.decompress(extra.read_bytes()).decode()))
+    return out
 
 
 def store(source: Path, directory: Path) -> int:
@@ -220,7 +230,7 @@ def main() -> int:
     if args.store:
         print("depclass: stored %d summaries" % store(args.store, ACCESS_DIR))
         return 0
-    summaries = load_summaries(ACCESS_DIR)
+    summaries = load_summaries(ACCESS_DIR, ORDERED_DIR)
     coupling_rows = read_coupling(COUPLING_CSV.read_text())
     rows = classify(summaries, coupling_rows)
     text = render(rows)

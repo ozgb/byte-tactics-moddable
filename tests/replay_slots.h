@@ -137,7 +137,7 @@ int __stdcall Imp_files_BankReadBox(HapiBank* a0, void* a1, int a2)
     return ParseResult<int>(r);
 }
 
-int __stdcall Imp_files_BankWriteBox(HapiBank* a0, void* a1, int a2)
+int __stdcall Imp_files_BankWriteBox(HapiBank* a0, const void* a1, int a2)
 {
     ReplayText t;
     StartImport(t, "files.BankWriteBox");

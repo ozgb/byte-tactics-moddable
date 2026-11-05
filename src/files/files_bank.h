@@ -81,7 +81,7 @@ public:
     {
         return g_seams.files->BankReadBox(this, dst, len);
     }
-    int WriteBox(void* src, int len)
+    int WriteBox(const void* src, int len)
     {
         return g_seams.files->BankWriteBox(this, src, len);
     }

@@ -11,9 +11,9 @@ address,function,file,kind,target
 0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,call,HapiBank::SeekBox
 0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,call,HapiBank::WriteBox
 0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,call,sprintf
-0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,field_maybe_written,UnitResources::energyMake
-0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,field_maybe_written,UnitResources::metalMake
 0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,field_read,Unit::id
+0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,field_read,UnitResources::energyMake
+0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,field_read,UnitResources::metalMake
 0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,function,
 0x401110,UnitResources::LoadUnitAccounts,src/game/economy.cpp,call,HapiBank::OpenNamedBox
 0x401110,UnitResources::LoadUnitAccounts,src/game/economy.cpp,call,HapiBank::ReadBox
@@ -46839,7 +46839,7 @@ address,function,file,kind,target
 ,HapiBank::WriteBox,src/files/files_bank.h,field_read,Seams::files
 ,HapiBank::WriteBox,src/files/files_bank.h,function,
 ,HapiBank::WriteBox,src/files/files_bank.h,global_read,g_seams
-,HapiBank::WriteBox,src/files/files_bank.h,indirect_call,"indirect via int (*)(HapiBank *, void *, int) __attribute__((stdcall)) [FilesSeam::BankWriteBox]"
+,HapiBank::WriteBox,src/files/files_bank.h,indirect_call,"indirect via int (*)(HapiBank *, const void *, int) __attribute__((stdcall)) [FilesSeam::BankWriteBox]"
 ,HapiBankGetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,HapiBank::GetIntegerItem
 ,HapiBankGetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,HapiBankGetIntegerItemImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
@@ -52688,7 +52688,7 @@ address,function,file,kind,target
 ,RecFilesBankWriteBox,src/harness/replay_hooks.inc,global_read,s_call
 ,RecFilesBankWriteBox,src/harness/replay_hooks.inc,global_read,s_inner_files
 ,RecFilesBankWriteBox,src/harness/replay_hooks.inc,global_read,s_tail
-,RecFilesBankWriteBox,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(HapiBank *, void *, int) __attribute__((stdcall)) [FilesSeam::BankWriteBox]"
+,RecFilesBankWriteBox,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(HapiBank *, const void *, int) __attribute__((stdcall)) [FilesSeam::BankWriteBox]"
 ,RecFilesChangeDirectory,src/harness/replay_hooks.inc,call,ArgValue
 ,RecFilesChangeDirectory,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecFilesChangeDirectory,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope

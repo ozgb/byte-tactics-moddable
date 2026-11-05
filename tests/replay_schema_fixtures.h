@@ -1746,7 +1746,6 @@ static const unsigned short kReplayEconomyUpdateMetalExtractionObjWrites[] = { 4
 static const unsigned char kReplayEconomyResetAllOf[] = { ROK_PLAYER };
 static const unsigned short kReplayEconomyResetObjWrites[] = { 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121 };
 static const unsigned short kReplayEconomySaveUnitAccountsObjReads[] = { 45, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120 };
-static const unsigned short kReplayEconomySaveUnitAccountsObjWrites[] = { 109, 115 };
 static const unsigned short kReplayEconomyLoadUnitAccountsObjReads[] = { 45, 109, 115 };
 static const unsigned short kReplayEconomyLoadUnitAccountsObjWrites[] = { 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120 };
 static const unsigned short kReplayEconomyRequestEnergyObjReads[] = { 110, 111, 112 };
@@ -2087,7 +2086,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "UpdatePlayerEconomy", SUB_ECONOMY, kReplayEconomyUpdatePlayerEconomyReads, 4, nullptr, 0, kReplayEconomyUpdatePlayerEconomyObjReads, 49, kReplayEconomyUpdatePlayerEconomyObjWrites, 28, nullptr, 0 },
     { "UpdateMetalExtraction", SUB_ECONOMY, kReplayEconomyUpdateMetalExtractionReads, 2, nullptr, 0, kReplayEconomyUpdateMetalExtractionObjReads, 7, kReplayEconomyUpdateMetalExtractionObjWrites, 1, nullptr, 0 },
     { "Reset", SUB_ECONOMY, nullptr, 0, nullptr, 0, nullptr, 0, kReplayEconomyResetObjWrites, 13, kReplayEconomyResetAllOf, 1 },
-    { "SaveUnitAccounts", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomySaveUnitAccountsObjReads, 13, kReplayEconomySaveUnitAccountsObjWrites, 2, nullptr, 0 },
+    { "SaveUnitAccounts", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomySaveUnitAccountsObjReads, 13, nullptr, 0, nullptr, 0 },
     { "LoadUnitAccounts", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomyLoadUnitAccountsObjReads, 3, kReplayEconomyLoadUnitAccountsObjWrites, 12, nullptr, 0 },
     { "RequestEnergy", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomyRequestEnergyObjReads, 3, kReplayEconomyRequestEnergyObjWrites, 2, nullptr, 0 },
     { "RequestEnergyAndMetal", SUB_ECONOMY, nullptr, 0, nullptr, 0, kReplayEconomyRequestEnergyAndMetalObjReads, 6, kReplayEconomyRequestEnergyAndMetalObjWrites, 4, nullptr, 0 },
@@ -2426,7 +2425,7 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "units", 1, 7, 0, 157, 58 },
     { "players", 1, 5, 0, 215, 29 },
     { "map", 3, 0, 1, 244, 16 },
-    { "files", 1, 0, 0, 260, 58 },
+    { "files", 2, 0, 0, 260, 58 },
     { "network", 1, 0, 0, 318, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;

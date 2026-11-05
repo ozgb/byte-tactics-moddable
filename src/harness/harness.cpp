@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <float.h>
 #include <time.h>
+#include <stdarg.h>
 
 #define Mission MissionView
 #define TdfRecord TdfRecordView
@@ -16,6 +17,7 @@
 #include "../map/mission.h"
 #include "condition_class.h"
 #include "../../interfaces/seams.h"
+#include "harness_events.h"
 
 extern Game* g_game;
 
@@ -85,6 +87,10 @@ static FILE* s_dump = NULL;
 static FILE* s_sound = NULL;
 static char s_soundBuffer[4096];
 static FILE* s_ui = NULL;
+static FILE* s_events = NULL;
+static char s_eventsBuffer[4096];
+static int s_eventPhase = -1;
+static int s_eventSuppress = 0;
 static char s_uiBuffer[4096];
 static int s_uiMute = 0;
 enum { FRAME_LIMIT = 64 };
@@ -1492,6 +1498,7 @@ static void UiEndOfTick();
 
 void HarnessAfterStep()
 {
+    s_eventPhase = -1;
     if (s_testMode && s_saveLine != 0 && (unsigned)g_game->ticks == s_saveTick) {
         char directory[] = "savegame";
         char path[] = "savegame\\harness.sav";
@@ -1522,6 +1529,9 @@ void HarnessAfterStep()
         fclose(s_dump);
     if (s_sound != NULL)
         fclose(s_sound);
+    if (s_events != NULL)
+        fclose(s_events);
+    s_events = NULL;
     if (s_ui != NULL)
         fclose(s_ui);
     s_ui = NULL;
@@ -3619,6 +3629,7 @@ void HarnessBeforeStep()
 {
     if (!s_testMode)
         return;
+    s_eventPhase = 0;
     unsigned tick = GameU32(GAME_TICK);
     int i;
     if (s_gameType == 3) {
@@ -3821,6 +3832,246 @@ static void UiEndOfTick()
     }
 }
 
+struct EventLogKind {
+    const char* name;
+    unsigned int args;
+};
+
+static const EventLogKind g_eventLogKinds[36] = {
+    { NULL, 0 },
+    { "unit_speech", 3 },
+    { "sound", 2 },
+    { "nano_particles", 10 },
+    { "reverse_nano_particles", 10 },
+    { "teleport_particles", 8 },
+    { "thrust_particles", 9 },
+    { "wake_particles", 8 },
+    { "bubbles", 8 },
+    { "weapon_smoke", 4 },
+    { "timed_sub_particles", 4 },
+    { "screen_shake", 3 },
+    { "cd_activity", 3 },
+    { "forces_destroyed", 1 },
+    { "score_flash", 2 },
+    { "selection_orders_dirty", 1 },
+    { "build_menu_update", 1 },
+    { "deselect_if_ineligible", 1 },
+    { "gui_changed_if_screen", 1 },
+    { "focus_commander", 1 },
+    { "pop_to_game_layout", 1 },
+    { "player_took_lead", 2 },
+    { "player_left", 1 },
+    { "build_queue_sound", 2 },
+    { NULL, 0 },
+    { "watch_prompt", 1 },
+    { "watch_mode_notice", 1 },
+    { "smoke", 6 },
+    { "white_smoke", 4 },
+    { "black_smoke", 4 },
+    { "sound_at", 5 },
+    { "sound_at_name", 5 },
+    { "remove_unit_speech", 1 },
+    { "message", 2 },
+    { "radar_units", 0 },
+    { "radar_mapped", 0 },
+};
+
+static const char* const s_speechTexts[44] = {
+    NULL,
+    "Attacking",
+    "Building",
+    "Building complete",
+    "Capture failed",
+    "Capturing",
+    "Construction stopped",
+    "Construction terminated",
+    "Construction terminated by hostile action",
+    "Guarding",
+    "I can't get there",
+    "I can't reach the construction site",
+    "Landing",
+    "Landing aborted",
+    "Landing aborted: all pads are occupied",
+    "Landing aborted: no pads available",
+    "Landing failed",
+    "Loading",
+    "Loading unit",
+    "Patrolling",
+    "Preparing for transport",
+    "Reclaiming",
+    "Reclamation failed",
+    "Repair aborted.",
+    "Repairing",
+    "Repair mission failed",
+    "Repairs unsuccessful.",
+    "Ressurection failed",
+    "Resurrection complete",
+    "Resurrection failed",
+    "Starting construction",
+    "Target area was blocked",
+    "That unit cannot be captured",
+    "That unit cannot be reclaimed",
+    "That unit is a cloud of vapor and cannot be captured",
+    "Transport mission failed",
+    "Unable to create any more units",
+    "Unable to unload unit",
+    "Unit is too heavy to transport",
+    "Unit is too large to transport",
+    "Unit repaired",
+    "Unloading",
+    "Unloading process is proceeding non-optimally",
+    "Waiting for target area to clear",
+};
+
+static const char* const s_eventPhaseNames[9] = { "net", "units", "projectiles", "explosions", "players", "features",
+                                                  "wind", "meteors", "sharing" };
+static unsigned char s_eventBuffer[0x200000];
+
+void __stdcall HarnessRecordPhase(int phase)
+{
+    if (s_testMode)
+        s_eventPhase = phase;
+}
+
+void __stdcall HarnessEventSuppress(int on)
+{
+    if (s_testMode)
+        s_eventSuppress += on != 0 ? 1 : -1;
+}
+
+static int EventOpen()
+{
+    return s_testMode && s_events != NULL && s_eventSuppress == 0;
+}
+
+static void EventHead(int kind, unsigned flags)
+{
+    const char* phase = s_eventPhase >= 0 ? s_eventPhaseNames[s_eventPhase] : (g_game->ticks == 0 ? "load" : "outside");
+    if (kind < 1 || kind > 35 || g_eventLogKinds[kind].name == NULL)
+        Fail("testmode: an event of an unknown kind\n");
+    fprintf(s_events, "%u %s %s 0x%x", (unsigned int)g_game->ticks, phase, g_eventLogKinds[kind].name, flags & 0x7fff);
+}
+
+static void EventCount(int kind, int count)
+{
+    if ((unsigned int)count != g_eventLogKinds[kind].args)
+        Fail("testmode: an event with the wrong number of arguments\n");
+}
+
+void __cdecl HarnessEventWords(int kind, unsigned flags, int count, ...)
+{
+    if (!EventOpen())
+        return;
+    va_list list;
+    int i;
+    EventHead(kind, flags);
+    EventCount(kind, count);
+    va_start(list, count);
+    for (i = 0; i < count; i++)
+        fprintf(s_events, " %u", va_arg(list, unsigned int));
+    va_end(list);
+    fprintf(s_events, "\n");
+}
+
+void __cdecl HarnessEventPtrs(int kind, const int* a, int na, const int* b, int nb, int ntail, ...)
+{
+    if (!EventOpen())
+        return;
+    va_list list;
+    int i;
+    EventHead(kind, 0);
+    EventCount(kind, na + nb + ntail);
+    for (i = 0; i < na; i++)
+        fprintf(s_events, " %u", (unsigned int)a[i]);
+    for (i = 0; i < nb; i++)
+        fprintf(s_events, " %u", (unsigned int)b[i]);
+    va_start(list, ntail);
+    for (i = 0; i < ntail; i++)
+        fprintf(s_events, " %u", va_arg(list, unsigned int));
+    va_end(list);
+    fprintf(s_events, "\n");
+}
+
+void __stdcall HarnessEventUnit(int kind, const void* unit)
+{
+    if (!EventOpen())
+        return;
+    EventHead(kind, 0);
+    fprintf(s_events, " %u\n", (unsigned int)*(const unsigned short*)((const char*)unit + 0xa8));
+}
+
+void __stdcall HarnessEventSpeech(const void* unit, int slot, const char* text, unsigned flags)
+{
+    if (!EventOpen())
+        return;
+    unsigned int unitFlags = *(const unsigned int*)((const char*)unit + 0x110);
+    if (!(unitFlags & 0x10000000) || (unitFlags & 0x4000))
+        return;
+    unsigned int number = 0;
+    if (text != NULL) {
+        number = 0xffffffff;
+        for (int i = 1; i < 44; i++) {
+            if (strcmp(text, s_speechTexts[i]) == 0) {
+                number = i;
+                break;
+            }
+        }
+    }
+    EventHead(HEV_UNIT_SPEECH, flags);
+    fprintf(s_events, " %u %u %u\n", (unsigned int)*(const unsigned short*)((const char*)unit + 0xa8), (unsigned int)slot, number);
+}
+
+Cell* __stdcall GetMapCell(int x, int y);
+
+static unsigned int HeardMask(const int* at)
+{
+    if (GetMapCell(at[0] / (1 << 20), at[2] / (1 << 20)) == NULL)
+        return 0;
+    int tx = (short)(at[0] >> 16) >> 5;
+    int ty = ((short)(at[2] >> 16) - ((short)(at[1] >> 16) >> 1)) >> 5;
+    unsigned int mask = 0;
+    for (int p = 0; p < 10; p++) {
+        Player* player = &g_game->players[p];
+        if (tx >= (unsigned int)player->explored.size.width || ty >= (unsigned int)player->explored.size.height)
+            continue;
+        int cell = (int)player->explored.size.width * ty + tx;
+        int heard = (g_game->mapFlags & 2) == 2 ? player->explored.data[cell] != 0 : (g_game->visibilityMask[cell] & (1 << p)) != 0;
+        if (heard)
+            mask |= 1u << p;
+    }
+    return mask;
+}
+
+void __stdcall HarnessEventSoundAt(int kind, int sound, const int* pos)
+{
+    if (!EventOpen())
+        return;
+    EventHead(kind, 0);
+    fprintf(s_events, " %u %u %u %u %u\n", (unsigned int)sound, (unsigned int)pos[0], (unsigned int)pos[1], (unsigned int)pos[2],
+            HeardMask(pos));
+}
+
+unsigned char* __stdcall HarnessEventBuffer(void)
+{
+    return EventOpen() ? s_eventBuffer : NULL;
+}
+
+void __stdcall HarnessEventRadar(int kind, const unsigned char* bytes, int size)
+{
+    static const char digits[] = "0123456789abcdef";
+    int i;
+    if (!EventOpen())
+        return;
+    EventHead(kind, 0);
+    fputc(' ', s_events);
+    for (i = 0; i < size; i++) {
+        fputc(digits[bytes[i] >> 4], s_events);
+        fputc(digits[bytes[i] & 15], s_events);
+    }
+    fputc('\n', s_events);
+}
+
+
 void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position)
 {
     if (!s_testMode || s_sound == NULL)
@@ -3907,6 +4158,7 @@ void HarnessPhase(int phase)
 {
     if (!s_testMode || s_trace == NULL)
         return;
+    s_eventPhase = phase + 1;
     unsigned tick = GameU32(GAME_TICK);
 #ifdef BX_ROUTE
     unsigned holdrand = bx_game_holdrand();
@@ -3944,6 +4196,8 @@ void HarnessPhase(int phase)
         fflush(s_trace);
         if (s_sound != NULL)
             fflush(s_sound);
+        if (s_events != NULL)
+            fflush(s_events);
         if (s_ui != NULL)
             fflush(s_ui);
         if (s_dumpNow)
@@ -3990,6 +4244,11 @@ static void OpenTrace(unsigned controlWord)
         Fail("testmode: cannot write ui.txt\n");
     setvbuf(s_ui, s_uiBuffer, _IOFBF, sizeof s_uiBuffer);
     fprintf(s_ui, "bt-ui 1\n");
+    s_events = fopen("events.txt", "wb");
+    if (s_events == NULL)
+        Fail("testmode: cannot write events.txt\n");
+    setvbuf(s_events, s_eventsBuffer, _IOFBF, sizeof s_eventsBuffer);
+    fprintf(s_events, "bt-events 1\n");
     fprintf(s_trace, "bt-trace %d\ncommit %s\nscenario %s\ngame_seed %u\ncrt_seed %u\nview_seed %u\n"
                      "fpu_control_word 0x%05X\n",
             TRACE_FORMAT, commit, s_scenarioPath, s_gameSeed, s_crtSeed, s_viewSeed, controlWord);

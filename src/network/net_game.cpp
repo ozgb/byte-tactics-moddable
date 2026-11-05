@@ -701,12 +701,15 @@ static inline unsigned char FindPlayerIndex_00450380(int id)
 
 int HarnessViewRand();
 
+#include "../harness/harness_events.h"
+
 // Announces that the player with the given id has left, unless the local
 // player is flagged. The index search was an inlined helper and appears twice
 // in the original (see 0x44fed0, which has the same shape).
 // FUNCTION: 0x450380
 void __stdcall AnnouncePlayerLeft(int id)
 {
+    HarnessEventWords(HEV_PLAYER_LEFT, 0, 1, id);
     char buf[200];
     if (g_game->players[g_game->localPlayer].rejectReason == 1)
         return;

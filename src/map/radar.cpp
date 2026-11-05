@@ -493,11 +493,40 @@ void __stdcall CalcRadarViewportRect(int* param_1)
     param_1[3] = g_game->sizeY * g_game->viewHeightTiles * 16 / g_game->mapPixelHeight + param_1[1] - 1;
 }
 
+#include "../harness/harness_events.h"
+
+static void HarnessRadarMapped(void)
+{
+    unsigned char* buffer = HarnessEventBuffer();
+    if (buffer == 0)
+        return;
+    Player* t = &g_game->players[g_game->playerIndex];
+    unsigned int mask = 1 << g_game->playerIndex;
+    int halfWidth = g_game->mapWidthTiles / 2;
+    int halfHeight = g_game->mapHeightTiles / 2;
+    unsigned int cells = (unsigned int)(halfWidth * halfHeight);
+    int* head = (int*)buffer;
+    head[0] = g_game->mapWidthTiles;
+    head[1] = g_game->mapHeightTiles;
+    head[2] = (int)cells;
+    unsigned char* out = buffer + 12;
+    for (unsigned int i = 0; i < cells; i++) {
+        if (!(unsigned short)(g_game->visibilityMask[i] & mask))
+            out[i] = 0;
+        else if (t->explored.data[i])
+            out[i] = 1;
+        else
+            out[i] = 2;
+    }
+    HarnessEventRadar(HEV_RADAR_MAPPED, buffer, 12 + (int)cells);
+}
+
 // FUNCTION: 0x466c20
 void UpdateRadarMapped()
 {
     if (g_game->timer.word.flags.mapChanged) {
         g_game->timer.word.flags.mapChanged = 0;
+        HarnessRadarMapped();
         unsigned char fog = g_game->fogColor;
         Player* t = &g_game->players[g_game->playerIndex];
         unsigned int mask = 1 << g_game->playerIndex;
@@ -581,9 +610,111 @@ static inline int ScaleY_00466dc0(Unit* u)
     return ((int)u->zWhole - ((int)u->yWhole >> 1)) * (int)g_game->minimapGadgetH;
 }
 
+static int HarnessRadarProjectile(Projectile_00466dc0* p, int* px, int* py)
+{
+    short* q = (short*)((char*)p + 0xa);
+    *px = q[-2];
+    *py = q[2] - ((int)q[0] >> 1);
+    if ((p->shot->flags.all & 0x60000000) == 0) {
+        if ((p->shot->flags.all & 0x40) != 0)
+            return 0;
+        if (!OnRadar_00466dc0(*px, *py) && ((Tail_00466dc0*)q)->player != g_game->playerIndex)
+            return 0;
+        return 1;
+    }
+    if (!OnRadar_00466dc0(*px, *py) && ((Tail_00466dc0*)q)->owner->playerIndex != g_game->playerIndex)
+        return 0;
+    return 2;
+}
+
+static int HarnessRadarUnitShown(Unit* u, int enabled)
+{
+    return u->unitDefIndex != 0 && (enabled != 0 || (u->flags.all & 0x300) != 0 || u->playerIndex == g_game->playerIndex);
+}
+
+static void HarnessRadarUnits(void)
+{
+    unsigned char* buffer = HarnessEventBuffer();
+    if (buffer == 0)
+        return;
+    int enabled;
+    if (g_game->mapFlags.bits.bit0 || g_game->mapFlags.bits.bit1)
+        enabled = 0;
+    else
+        enabled = 1;
+    if (g_game->uiOptionFlags.bits.bit9)
+        enabled = 1;
+    unsigned int unitCount = 0;
+    unsigned int projectileCount = 0;
+    Unit* u;
+    int i;
+    int px;
+    int py;
+    for (u = g_game->units; u != 0 && u <= g_game->unitsEnd; u = (Unit*)((char*)u + 0x118)) {
+        if (HarnessRadarUnitShown(u, enabled))
+            unitCount++;
+    }
+    for (i = 0; i < g_game->projectileCount; i++) {
+        if (HarnessRadarProjectile((Projectile_00466dc0*)((char*)g_game->projectiles + i * 0x6b), &px, &py) != 0)
+            projectileCount++;
+    }
+    unsigned int size = 8 + unitCount * 48 + projectileCount * 12;
+    for (i = 0; i < (int)size; i++)
+        buffer[i] = 0;
+    *(unsigned int*)buffer = unitCount;
+    *(unsigned int*)(buffer + 4) = projectileCount;
+    unsigned char* out = buffer + 8;
+    for (u = g_game->units; u != 0 && u <= g_game->unitsEnd; u = (Unit*)((char*)u + 0x118)) {
+        if (!HarnessRadarUnitShown(u, enabled))
+            continue;
+        UnitType_00466dc0* type = u->def;
+        unsigned char flags = 0;
+        *(unsigned short*)(out + 0) = (unsigned short)(((char*)u - (char*)g_game->units) / 0x118);
+        *(unsigned short*)(out + 2) = (unsigned short)u->id;
+        *(short*)(out + 4) = u->xWhole;
+        *(int*)(out + 8) = (int)u->zWhole - ((int)u->yWhole >> 1);
+        out[12] = Player_Get(u->playerIndex)->info->color;
+        if (u->recentlyDamagedTimer != 0)
+            flags |= 1;
+        if ((u->activateFlags & 1) != 0 || (type->flags2 & 4) == 0)
+            flags |= 2;
+        if (type->flags1.bit29)
+            flags |= 4;
+        out[13] = flags;
+        *(short*)(out + 14) = type->radardistance;
+        *(short*)(out + 16) = type->sonardistance;
+        *(short*)(out + 18) = type->radardistancejam;
+        *(short*)(out + 20) = type->sonardistancejam;
+        if (type->flags1.bit29) {
+            for (int w = 0; w < 3; w++) {
+                UnitWeaponSlot* slot = &u->weapons[w];
+                if (slot->weapon == 0)
+                    continue;
+                *(int*)(out + 24 + w * 8) = slot->weapon->coverage;
+                out[24 + w * 8 + 4] = (unsigned char)slot->weapon->flags.bits.bit30;
+                out[24 + w * 8 + 5] = slot->stockpile != 0;
+            }
+        }
+        out += 48;
+    }
+    for (i = 0; i < g_game->projectileCount; i++) {
+        Projectile_00466dc0* p = (Projectile_00466dc0*)((char*)g_game->projectiles + i * 0x6b);
+        int kind = HarnessRadarProjectile(p, &px, &py);
+        if (kind == 0)
+            continue;
+        *(int*)(out + 0) = px;
+        *(int*)(out + 4) = py;
+        out[8] = (unsigned char)kind;
+        out[9] = kind == 2 ? Player_Get(((Tail_00466dc0*)((char*)p + 0xa))->player)->info->color : 0;
+        out += 12;
+    }
+    HarnessEventRadar(HEV_RADAR_UNITS, buffer, (int)size);
+}
+
 // FUNCTION: 0x466dc0
 void DrawRadarUnits(void)
 {
+    HarnessRadarUnits();
     unsigned char* base = (unsigned char*)g_game + 0xdcb;
     unsigned short* out = g_game->hotRadarUnitList;
 

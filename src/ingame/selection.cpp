@@ -473,6 +473,8 @@ extern char s_SelectMultipleUnits_00508d8c[];
 
 int __stdcall PlaySoundByName(char* msg, int a);
 
+#include "../harness/harness_events.h"
+
 // FUNCTION: 0x48c390
 int __stdcall SelectUnitsInBox(void* param_1)
 {
@@ -524,7 +526,9 @@ int __stdcall SelectUnitsInBox(void* param_1)
     if (!count)
         return 0;
     if (count == 1) {
+        HarnessEventSuppress(1);
         QueueUnitSpeech(last, 1, 0);
+        HarnessEventSuppress(0);
         return 1;
     }
     PlaySoundByName(s_SelectMultipleUnits_00508d8c, 0);
@@ -604,8 +608,11 @@ void __stdcall ClickSelectHoverUnit(Param_0048c7f0* param)
 
     if (param->flags & 4) {
         unit->flags.selected = !unit->flags.selected;
-        if (unit->flags.selected)
+        if (unit->flags.selected) {
+            HarnessEventSuppress(1);
             QueueUnitSpeech(unit, 1, 0);
+            HarnessEventSuppress(0);
+        }
         g_game->unitIndex = 0;
         g_game->ordersPanelFlags.flags |= 0x10;
         return;
@@ -621,13 +628,16 @@ void __stdcall ClickSelectHoverUnit(Param_0048c7f0* param)
             u->flags.raw = u->flags.raw & 0xffffff7f | 0x40;
     }
     unit->flags.raw |= 0x10;
+    HarnessEventSuppress(1);
     QueueUnitSpeech(unit, 1, 0);
+    HarnessEventSuppress(0);
     g_game->ordersPanelFlags.flags |= 0x10;
 }
 
 // FUNCTION: 0x48c9b0
 void __stdcall DeselectIfIneligible(Unit* unit)
 {
+    HarnessEventUnit(HEV_DESELECT_IF_INELIGIBLE, unit);
     unsigned int flags = unit->flags.raw;
     if (flags & 0x10) {
         if (!(flags & 0x20) || unit->buildLeft != 0.0f || unit->postTransferHoldoff != 0
@@ -899,6 +909,7 @@ void __cdecl ClearCameraFollowState(void);
 // FUNCTION: 0x48d630
 void __stdcall FocusCommander(int param_1)
 {
+    HarnessEventWords(HEV_FOCUS_COMMANDER, 0, 1, param_1);
     Player* team = &g_game->players[g_game->playerIndex];
     char* playerName = g_game->sideDefs[team->info->side].name;
     Unit* last = team->unitsEnd;

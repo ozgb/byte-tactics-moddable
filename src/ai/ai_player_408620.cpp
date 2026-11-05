@@ -31,12 +31,16 @@ public:
     void TryIssueIdleFactoryBuildOrder(Obj_00408620* unit);
 };
 
+#include "../harness/harness_events.h"
+
 // FUNCTION: 0x408620
 void BuildTimer::TryIssueIdleFactoryBuildOrder(Obj_00408620* unit)
 {
     if (unit->orders != 0)
         return;
     unsigned short idx = ChooseBuildOption(player, unit);
-    if (idx != 0)
+    if (idx != 0) {
+        HarnessEventWords(HEV_BUILD_QUEUE_SOUND, 0, 2, *((unsigned char*)unit + 0xff), 1);
         QueueBuildOrder(g_game->unitDefs[idx].name, unit, 1);
+    }
 }

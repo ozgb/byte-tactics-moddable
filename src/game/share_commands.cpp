@@ -34,6 +34,8 @@ void BroadcastPlayerInfo();
 
 extern char g_fxEventPoolBlocked;
 
+#include "../harness/harness_events.h"
+
 // Chat command: toggles the local player's ShareMetal bit and prints the new
 // state ("ON"/"OFF"); compare the sibling toggles 0x4194d0 and 0x419400.
 // FUNCTION: 0x418cd0
@@ -46,6 +48,7 @@ void __stdcall CmdShareMetal(int unused)
         sprintf(buf, "Toggled ShareMetal to: %s",
                 (g_game->players[g_game->localPlayer].info->shareMetal != 0)
                     ? "ON" : "OFF");
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 0, (int)(g_game->players[g_game->localPlayer].info->shareMetal != 0));
         AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
@@ -63,6 +66,7 @@ void __stdcall CmdShareEnergy(int unused)
         sprintf(buf, "Toggled ShareEnergy to: %s",
                 (g_game->players[g_game->localPlayer].info->flags_97_wide & 4)
                     ? "ON" : "OFF");
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 1, (int)(g_game->players[g_game->localPlayer].info->flags_97_wide & 4));
         AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
@@ -80,6 +84,7 @@ void __stdcall CmdShareMapping(int unused)
         sprintf(buf, "Toggled ShareMapping to: %s",
                 (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x20)
                     ? "ON" : "OFF");
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 2, (int)(g_game->players[g_game->localPlayer].info->flags_97_wide & 0x20));
         AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
@@ -96,6 +101,7 @@ void __stdcall ToggleShareLos(int unused)
         sprintf(buf, "Toggled ShareLOS to: %s",
                 (g_game->players[g_game->localPlayer].info->shareLOS != 0)
                     ? "ON" : "OFF");
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 3, (int)(g_game->players[g_game->localPlayer].info->shareLOS != 0));
         AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
@@ -113,6 +119,7 @@ void __stdcall CmdShareRadar(int unused)
         sprintf(buf, "Toggled ShareRadar to: %s",
                 (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x40)
                     ? "ON" : "OFF");
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 4, (int)(g_game->players[g_game->localPlayer].info->flags_97_wide & 0x40));
         AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
@@ -132,6 +139,7 @@ static inline void ShareMetal(int unused)
         sprintf(buf, "Toggled ShareMetal to: %s",
                 (g_game->players[g_game->localPlayer].info->flags_97_wide & 2)
                     ? "ON" : "OFF");
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 0, (int)((g_game->players[g_game->localPlayer].info->flags_97_wide & 2) != 0));
         AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
@@ -146,6 +154,7 @@ static inline void ShareEnergy(int unused)
         sprintf(buf, "Toggled ShareEnergy to: %s",
                 (g_game->players[g_game->localPlayer].info->flags_97_wide & 4)
                     ? "ON" : "OFF");
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 1, (int)(g_game->players[g_game->localPlayer].info->flags_97_wide & 4));
         AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
@@ -160,6 +169,7 @@ static inline void ShareMapping(int unused)
         sprintf(buf, "Toggled ShareMapping to: %s",
                 (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x20)
                     ? "ON" : "OFF");
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 2, (int)(g_game->players[g_game->localPlayer].info->flags_97_wide & 0x20));
         AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
@@ -174,6 +184,7 @@ static inline void ShareRadar(int unused)
         sprintf(buf, "Toggled ShareRadar to: %s",
                 (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x40)
                     ? "ON" : "OFF");
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 4, (int)(g_game->players[g_game->localPlayer].info->flags_97_wide & 0x40));
         AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
@@ -202,6 +213,7 @@ void __stdcall CmdSetShareMetal(CommandArgs* args)
         // after the next call's pushes.
         p->shareMetal = __min(p->metalCapacity, (float)args->GetIntArg(1, 0));
         sprintf(buf, "OK.  Will share metal if above %d", args->GetIntArg(1, 0));
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 5, args->GetIntArg(1, 0));
         AddMessage(buf, 2, 0, 10);
     }
 }
@@ -219,6 +231,7 @@ void __stdcall CmdSetShareEnergy(CommandArgs* args)
         // after the next call's pushes.
         p->shareEnergy = __min(p->energyCapacity, (float)args->GetIntArg(1, 0));
         sprintf(buf, "OK.  Will share energy if above %d", args->GetIntArg(1, 0));
+        HarnessEventWords(HEV_MESSAGE, 0, 2, 6, args->GetIntArg(1, 0));
         AddMessage(buf, 2, 0, 10);
     }
 }

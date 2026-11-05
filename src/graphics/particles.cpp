@@ -1360,6 +1360,8 @@ static void __stdcall Add(Lists_00471fd0* l, short index, ParticleSystem* p)
     l->lists[index].push_back(p);
 }
 
+#include "../harness/harness_events.h"
+
 // The same shape as 0x471340 (ParticleLists::AddTeleportParticles), but a free
 // function: the owner of the ten lists comes from g_game->lists (+0x38d77)
 // instead of `this`. The list is picked by the fourth argument, a short; the
@@ -1367,6 +1369,7 @@ static void __stdcall Add(Lists_00471fd0* l, short index, ParticleSystem* p)
 // FUNCTION: 0x471fd0
 void __stdcall EmitTeleportParticles(int posA, int posB, int lifetime, short index)
 {
+    HarnessEventPtrs(HEV_TELEPORT_PARTICLES, (const int*)posA, 3, (const int*)posB, 3, 2, lifetime, (int)index);
     Lists_00471fd0* l = g_game->lists_00471fd0;
     TeleportParticles* p = new TeleportParticles;
     if (p) {
@@ -1400,6 +1403,7 @@ static void Add_004720d0(Lists_004720d0* lists, short index, ParticleSystem* p)
 // FUNCTION: 0x4720d0
 void __stdcall EmitNanoParticles(Vec3_004720d0* p, void* posB, short index)
 {
+    HarnessEventPtrs(HEV_NANO_PARTICLES, (const int*)p, 3, (const int*)posB, 6, 1, (int)index);
     // A struct whose address escapes: keeps the dead second copy's stores.
     Ctx_004720d0 ctx;
     ctx.a = *p;
@@ -1421,6 +1425,7 @@ void __stdcall EmitNanoParticles(Vec3_004720d0* p, void* posB, short index)
 // FUNCTION: 0x472200
 void __stdcall EmitReverseNanoParticles(Pos_00472200* targetBounds, Vec3* origin, short index)
 {
+    HarnessEventPtrs(HEV_REVERSE_NANO_PARTICLES, (const int*)targetBounds, 6, (const int*)origin, 3, 1, (int)index);
     Pos_00472200 pos;
     pos.a = *origin;
     pos.b = *origin;
@@ -1444,6 +1449,7 @@ void __stdcall EmitReverseNanoParticles(Pos_00472200* targetBounds, Vec3* origin
 void __stdcall EmitThrustParticles(int posA, int posB, int period, int lifetime,
                             short index)
 {
+    HarnessEventPtrs(HEV_THRUST_PARTICLES, (const int*)posA, 3, (const int*)posB, 3, 3, period, lifetime, (int)index);
     // Bound to a local at the top: g_game is loaded before the prologue pushes.
     Lists_00472330* lists = g_game->lists_00472330;
     ThrustParticles* p = new ThrustParticles;
@@ -1462,6 +1468,7 @@ void __stdcall EmitThrustParticles(int posA, int posB, int period, int lifetime,
 // FUNCTION: 0x472430
 void __stdcall EmitWakeParticles(int posA, int posB, int period, short index)
 {
+    HarnessEventPtrs(HEV_WAKE_PARTICLES, (const int*)posA, 3, (const int*)posB, 3, 2, period, (int)index);
     Lists_00472430* l = g_game->lists_00472430;
     WakeParticles* p = new WakeParticles;
     if (p) {
@@ -1480,6 +1487,7 @@ void __stdcall EmitWakeParticles(int posA, int posB, int period, short index)
 // FUNCTION: 0x472530
 void __stdcall EmitBubbles(int posA, int posB, int period, short index)
 {
+    HarnessEventPtrs(HEV_BUBBLES, (const int*)posA, 3, (const int*)posB, 3, 2, period, (int)index);
     // Local read before the new: otherwise g_game is reloaded after the virtual call.
     Lists_00472530* l = g_game->lists_00472530;
     WakeParticles* p = new WakeParticles;

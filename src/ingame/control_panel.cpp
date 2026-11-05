@@ -1248,6 +1248,8 @@ Unit* GetBuildMenuFocusUnit()
     return 0;
 }
 
+#include "../harness/harness_events.h"
+
 // Finished-construction notification: marks the target as no longer being
 // built (clears its build progress and sets flag 0x2000), updates the
 // BUILDER.GUI panel or starts the builder's nanolathe, syncs two unit-type
@@ -1264,6 +1266,7 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
         if (target->player->active != 0
             && (target->player->type == 1 || target->player->type == 2)) {
             if (target->flags.raw & 0x20000000) {
+                HarnessEventWords(HEV_GUI_CHANGED_IF_SCREEN, 0, 1, 0);
                 if (IsScreenNamed(&g_game->gui, "BUILDER.GUI"))
                     MarkChanged(&g_game->gui);
             } else {
@@ -1273,6 +1276,7 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
         }
         if (target->def->flags.bits.flag_18)
             target->SetStateBits(1, 1);
+        HarnessEventUnit(HEV_BUILD_MENU_UPDATE, unit);
         if (g_game->unitIndex == unit->id)
             RefreshBuildCountTexts(&g_game->gui, unit);
         if (target->def->flags.bits.flag_24) {
@@ -1476,6 +1480,7 @@ void __stdcall OpenBuildMenuPage(int page)
 // FUNCTION: 0x41c110
 void __stdcall MarkSelectionOrdersDirty(Unit* unit)
 {
+    HarnessEventUnit(HEV_SELECTION_ORDERS_DIRTY, unit);
     if (unit->playerIndex == g_game->localPlayer && (unit->flags.lo & 0x10)) {
         g_game->ordersPanelFlags.raw |= 0x10;
     }
@@ -1484,6 +1489,7 @@ void __stdcall MarkSelectionOrdersDirty(Unit* unit)
 // FUNCTION: 0x41c150
 void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit)
 {
+    HarnessEventUnit(HEV_BUILD_MENU_UPDATE, unit);
     Game* g = g_game;
     unsigned short val1 = g->unitIndex;
     unsigned short val2 = unit->id;
@@ -1675,6 +1681,7 @@ void __stdcall StartScreenShake(int dx, int dy, int value)
 // FUNCTION: 0x41c640
 void __stdcall AccumulateScreenShake(int dx, int dy, int value)
 {
+    HarnessEventWords(HEV_SCREEN_SHAKE, 0, 3, dx, dy, value);
     if ((g_game->uiOptionFlags & 0x10) == 0) {
         if ((g_game->flags_1434e & 1) == 0) {
             g_game->sum_x = 0;

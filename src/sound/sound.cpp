@@ -459,6 +459,8 @@ static inline int MapContains(unsigned int w, unsigned int h, int tx, int ty)
     return tx < w && ty < h;
 }
 
+#include "../harness/harness_events.h"
+
 // Plays the sound at sounds[index] when the position is visible to the local
 // player: explored (fog) map when g_game->mapFlags has bit 1 set, the shared
 // per-player visibility mask otherwise. Sends the 0x13 packet first when
@@ -467,6 +469,7 @@ static inline int MapContains(unsigned int w, unsigned int h, int tx, int ty)
 // FUNCTION: 0x47f300
 int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
 {
+    HarnessEventSoundAt(HEV_SOUND_AT, index, (const int*)pos);
     if (g_useWindowsSound)
         return PlaySoundByIndex(index, param_3);
     if (index == 0xffff)
@@ -554,7 +557,10 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
 // FUNCTION: 0x47f610
 void __stdcall PlaySoundAtByName(char* name, int param_2, int param_3)
 {
+    HarnessEventSoundAt(HEV_SOUND_AT_NAME, 1, (const int*)param_2);
+    HarnessEventSuppress(1);
     PlaySoundAt(FindSound(name), (Pos_0047f300*)param_2, param_3);
+    HarnessEventSuppress(0);
 }
 
 // Ages the sound driver held in g_speechQueue: if the list is not empty, and
@@ -602,6 +608,7 @@ void StopAllSounds()
 // FUNCTION: 0x47f780
 void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text)
 {
+    HarnessEventSpeech(unit, kind, text, 0);
     if (unit->playerIndex == g_game->playerIndex && (unit->flags & 0x10000000) && !(unit->flags & 0x4000)) {
         if (text == 0) {
             text = g_speechTypes[kind].text;
@@ -635,6 +642,7 @@ void __stdcall QueueUnitSpeechIfNotVisible(Unit* unit, int kind, char* text)
 // FUNCTION: 0x47f8c0
 void __stdcall RemoveSpeechOfUnit(int id)
 {
+    HarnessEventUnit(HEV_REMOVE_UNIT_SPEECH, (const void*)id);
     int* count = &g_speechQueue->count;
     SpeechEntry* entries = g_speechQueue->entries;
     int i = 0;

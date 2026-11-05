@@ -483,6 +483,8 @@ static inline int CommandAllowed(unsigned char* bytes)
 
 // Stays in its own file: the dispatch loop's register allocation follows the
 // original translation unit's symbol ids, which the gathered file changes.
+#include "../harness/harness_events.h"
+
 // FUNCTION: 0x453d40
 int HandleNetPackets()
 {
@@ -836,8 +838,11 @@ int HandleNetPackets()
             Packet_0047f0c0* sound = (Packet_0047f0c0*)packet;
             if (sound->flag)
                 PlaySoundByIndex(sound->index, 0);
-            else
+            else {
+                HarnessEventSuppress(1);
                 PlaySoundAt(sound->index, packet + 6, 0);
+                HarnessEventSuppress(0);
+            }
             break;
         }
         case 20: {

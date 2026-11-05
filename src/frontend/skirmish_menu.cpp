@@ -1283,11 +1283,14 @@ void __stdcall AddMessage(char* text, int key, int value, unsigned char last);
 
 int HarnessViewRand();
 
+#include "../harness/harness_events.h"
+
 // Announces that a player's forces were destroyed: "<Core|Arm> <random
 // message>", using one of three (translated) messages.
 // FUNCTION: 0x47bd70
 void __stdcall AnnounceForcesDestroyed(Player* player)
 {
+    HarnessEventWords(HEV_FORCES_DESTROYED, 0, 1, player->index);
     char buf[200];
     const char* side = "Core";
     if (!player->info->side)

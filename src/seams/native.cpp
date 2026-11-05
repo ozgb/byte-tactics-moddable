@@ -808,6 +808,7 @@ void InstallNativeSeams()
     s_los_radar.RecordRadarUnits = RecordRadarUnits;
     s_los_radar.RecordRadarMapped = RecordRadarMapped;
     s_los_radar.UpdateSensorRadarAndCloak = UpdateSensorRadarAndCloak;
+    s_los_radar.SoundHeardMask = SoundHeardMask;
     s_pathfinding.RunSearches = RunSearchesNative;
     s_pathfinding.AbortIfGoalMatch = AbortIfGoalMatchNative;
     s_pathfinding.Destroy = DestroyPathfinderNative;

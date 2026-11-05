@@ -5,6 +5,7 @@
 #include "../orders/box.h"
 #include "../util/vec3.h"
 #include "sim_events.h"
+#include "../../interfaces/seams.h"
 
 inline void SimEventPut(unsigned int* args, unsigned int at, const Vec3& v)
 {
@@ -231,13 +232,11 @@ inline void RecordBlackSmoke(const Vec3& at, short list)
     RecordPointParticles(SIM_EVENT_BLACK_SMOKE, at, list);
 }
 
-unsigned int SoundHeardMask(const Vec3& at);
-
 inline void RecordSoundAt(int index, const Vec3& at)
 {
     unsigned int args[5] = {(unsigned int)index};
     SimEventPut(args, 1, at);
-    args[4] = SoundHeardMask(at);
+    args[4] = g_seams.los_radar->SoundHeardMask(&at);
     RecordSimEvent(SIM_EVENT_SOUND_AT, 0, args, 5);
 }
 
@@ -245,7 +244,7 @@ inline void RecordSoundAtName(SimSoundName name, const Vec3& at)
 {
     unsigned int args[5] = {name};
     SimEventPut(args, 1, at);
-    args[4] = SoundHeardMask(at);
+    args[4] = g_seams.los_radar->SoundHeardMask(&at);
     RecordSimEvent(SIM_EVENT_SOUND_AT_NAME, 0, args, 5);
 }
 

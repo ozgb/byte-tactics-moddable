@@ -979,6 +979,8 @@ ReclaimUnitOrder,CanReclaimNative,"seam slot filled by InstallNativeSeams, Units
 ReclaimUnitOrder,ClaimWeaponsNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::ClaimWeapons, ReclaimUnitOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
 ReclaimUnitOrder,DamageUnit,"seam slot filled by InstallNativeSeams, WeaponsSeam::DamageUnit, ReclaimUnitOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
 ReclaimUnitOrder,GetNanoPiecePosition,"seam slot filled by InstallNativeSeams, UnitsSeam::GetNanoPiecePosition, ReclaimUnitOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
+RecordSoundAt,SoundHeardMask,"seam slot filled by InstallNativeSeams, LosRadarSeam::SoundHeardMask, RecordSoundAt (src/state/sim_effects.h), src/seams/native.cpp"
+RecordSoundAtName,SoundHeardMask,"seam slot filled by InstallNativeSeams, LosRadarSeam::SoundHeardMask, RecordSoundAtName (src/state/sim_effects.h), src/seams/native.cpp"
 RemoveFeature,RefreshAllPassMaps,"seam slot filled by InstallNativeSeams, MapSeam::RefreshAllPassMaps, RemoveFeature (src/map/features.cpp), src/seams/native.cpp"
 RemoveFeature,FreeObjectState,"seam slot filled by InstallNativeSeams, UnitsSeam::FreeObjectState, RemoveFeature (src/map/features.cpp), src/seams/native.cpp"
 RemoveUnitFromMap,UpdateCellHeightRange,"seam slot filled by InstallNativeSeams, LosRadarSeam::UpdateCellHeightRange, RemoveUnitFromMap (src/map/terrain.cpp), src/seams/native.cpp"

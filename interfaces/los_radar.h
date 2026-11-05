@@ -10,7 +10,7 @@ struct Point16;
 // Major version of the los_radar interface, changed when a slot is removed or its signature changes.
 #define LOS_RADAR_VERSION_MAJOR 2
 // Minor version of the los_radar interface, changed when a slot is added.
-#define LOS_RADAR_VERSION_MINOR 0
+#define LOS_RADAR_VERSION_MINOR 1
 
 // Line of sight and radar.
 struct LosRadarSeam {
@@ -56,6 +56,8 @@ struct LosRadarSeam {
     void (__stdcall* RecordRadarMapped)(void);
     // Updates which units radar, sonar and cloaking show and hide for each player. Hooks: none.
     void (__stdcall* UpdateSensorRadarAndCloak)(void);
+    // Returns the players who hear a sound at `at`: bit p set when player p has explored, or with LOS on, sees the cell. Hooks: none.
+    unsigned int (__stdcall* SoundHeardMask)(const Vec3* at);
 };
 
 #endif

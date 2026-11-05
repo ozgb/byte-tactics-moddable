@@ -4,7 +4,13 @@
 #include "replay_text.h"
 #include "replay_types.h"
 
-enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384, REPLAY_HANDLE_CALLBACK = 3 };
+#ifdef BT_REPLAY_FIXTURES
+enum { REPLAY_OBJECT_KINDS = 96 };
+#else
+enum { REPLAY_OBJECT_KINDS = 64 };
+#endif
+
+enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384, REPLAY_HANDLE_CALLBACK = 3, REPLAY_KEY_BYTES = 512 };
 
 ReplayOrdinals& ReplayHandles();
 
@@ -21,7 +27,7 @@ public:
 private:
     ReplayObjectTable(const ReplayObjectTable&);
     ReplayObjectTable& operator=(const ReplayObjectTable&);
-    enum { KINDS = 64, HASH = 16384 };
+    enum { KINDS = REPLAY_OBJECT_KINDS, HASH = 16384 };
     unsigned count[KINDS];
     void* objects[KINDS][REPLAY_MAX_OBJECTS];
     short slots[KINDS][HASH];
@@ -47,11 +53,17 @@ unsigned ReplayLengthOf(const ReplayLength& length, const void* object);
 ReplayObjectField ReplayFieldView(const ReplayField& f);
 void ReplayEmitField(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, char tag, const char* key, const ReplayObjectField& f, const void* object, ReplayText& scratch);
 bool ReplayApplyArray(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc);
+bool ReplayBlobKey(const ReplayObjectField& f, const void* object, const ReplayObjectTable& table, ReplayText& out);
+bool ReplayApplyBlob(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayObjectTable& table, ReplayAllocFn alloc);
 typedef void (*ReplayReportFn)(const char* key, const char* recorded, const char* replayed);
 typedef void (*ReplayHashFn)(const char* text);
 bool ReplayApplyVector(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayObjectTable& table, ReplayAllocFn alloc);
 bool ReplayApplyVectorElement(const ReplayObjectField& f, void* object, unsigned index, const char* sub, const char* fullKey, const char* value, ReplayKnown& known, bool memory, ReplayObjectTable& table, ReplayAllocFn alloc);
 void ReplayCompareVector(const ReplayObjectField& f, const void* object, const char* key, const ReplayKnown& known, ReplayObjectTable& table, ReplayReportFn report, ReplayHashFn hash);
+bool ReplayApplyVectorString(const ReplayObjectField& f, void* object, unsigned index, const char* fullKey, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc);
+bool ReplayApplyCStrings(const ReplayObjectField& f, void* object, const char* key, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc);
+bool ReplayApplyCStringsElement(const ReplayObjectField& f, void* object, const char* key, unsigned index, const char* fullKey, const char* value, ReplayKnown& known, bool memory, ReplayAllocFn alloc);
+void ReplayCompareCStrings(const ReplayObjectField& f, const void* object, const char* key, const ReplayKnown& known, ReplayReportFn report, ReplayHashFn hash);
 bool ReplayParseElementKey(const char* key, char* prefix, unsigned size, unsigned* index, const char** sub);
 bool ReplayParseRefsKey(const char* key, char* prefix, unsigned size, unsigned* index);
 bool ReplayRestoreRefsElement(const ReplayObjectField& f, void* object, unsigned index, const char* value, ReplayObjectTable& table, ReplayAllocFn alloc);

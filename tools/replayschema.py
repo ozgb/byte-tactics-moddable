@@ -74,7 +74,9 @@ OBJECT_KINDS = {"field_read": "r", "field_write": "w", "field_maybe_written": "r
 FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F32", "point16": "POINT16", "string": "STRING",
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
                "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR", "ptr": "PTR", "refs": "REFS", "embeds": "EMBEDS",
-               "self": "SELF", "selfindex": "SELFINDEX", "cbref": "CBREF", "cbptr": "CBPTR"}
+               "self": "SELF", "selfindex": "SELFINDEX", "cbref": "CBREF", "cbptr": "CBPTR", "cstring": "CSTRING", "cstringref": "CSTRINGREF",
+               "cstrings": "CSTRINGS", "blob": "BLOB"}
+STRING_ELEMS = {"cstring": (1, "char*"), "cstring_ref": (2, "Ref<char>")}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?\s*(\w+)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
@@ -103,10 +105,12 @@ def read_assignment(path: Path = SUBSYSTEMS) -> dict[str, list[str]]:
 
 
 def merge_fixtures(ann: dict, fixtures: dict) -> dict:
-    """The annotations with the test-only kinds of tests/replay_fixtures.json added: its includes, game fields and kinds come last, `inside` adds sites to a kind, and its `fixtures` are the slots the replayer's self-tests call."""
+    """The annotations with the test-only kinds of tests/replay_fixtures.json added: its includes, game fields, sim fields (that no slot reads or writes) and kinds come last, `inside` adds sites to a kind, and its `fixtures` are the slots the replayer's self-tests call."""
     merged = copy.deepcopy(ann)
     merged["includes"] += [i for i in fixtures.get("includes", []) if i not in merged["includes"]]
     merged["game_fields"].update(fixtures.get("game_fields", {}))
+    merged["sim_fields"].update(fixtures.get("sim_fields", {}))
+    merged["fixture_sim"] = list(fixtures.get("sim_fields", {}))
     merged["objects"].update(copy.deepcopy(fixtures.get("objects", {})))
     merged["fixtures"] = copy.deepcopy(fixtures.get("fixtures", {}))
     for kind, sites in fixtures.get("inside", {}).items():
@@ -227,20 +231,29 @@ def factor_asserts(length: list[dict], owner: str, where: str) -> list[str]:
             % (owner, f["member"], owner, f["member"], owner, f["member"], where, f["member"]) for f in length if "member" in f]
 
 
-def check_array(where: str, spec: dict, owner: str, errors: list[str]) -> dict:
+def check_array(where: str, spec: dict, owner: str, errors: list[str], object_field: bool = False) -> dict:
     """The array entry of a field: element size, storage, capacity source and the parsed length. Errors for what is missing."""
     elem = spec.get("elem")
-    if elem not in SIZES:
-        errors.append("%s: an array needs an `elem` of %s" % (where, ", ".join(sorted(SIZES))))
+    strings = STRING_ELEMS[elem][0] if elem in STRING_ELEMS else 0
+    if strings:
+        if not object_field:
+            errors.append("%s: only the field of an object is an array of strings" % where)
+    elif elem not in SIZES:
+        errors.append("%s: an array needs an `elem` of %s" % (where, ", ".join(sorted(list(SIZES) + list(STRING_ELEMS)))))
         elem = "u8"
     if "length" not in spec:
         errors.append("%s: an array needs a `length`" % where)
-    return {"elem": SIZES[elem], "ref": bool(spec.get("ref", False)), "length": parse_length(spec.get("length", 0), where, errors), "owner": owner}
+    raw = spec.get("raw", False) is True
+    if "raw" in spec and (not strings or spec["raw"] is not True or spec.get("ref")):
+        errors.append("%s: `raw` is true on an array of strings that has no `ref`, and says the field is a plain pointer to the elements" % where)
+    return {"elem": 4 if strings else SIZES[elem], "ref": bool(spec.get("ref", False)), "raw": raw, "strings": strings,
+            "length": parse_length(spec.get("length", 0), where, errors), "owner": owner}
 
 
 VECTOR_SCALARS = {"char": 1, "unsigned char": 1, "short": 2, "unsigned short": 2, "int": 4, "unsigned": 4, "unsigned int": 4, "long": 4,
                   "unsigned long": 4, "float": 4, "double": 8}
-VECTOR_MODES = {"object": "RV_OBJECT", "scalar": "RV_SCALAR", "value": "RV_VALUE"}
+VECTOR_MODES = {"object": "RV_OBJECT", "scalar": "RV_SCALAR", "value": "RV_VALUE", "cstring": "RV_CSTRING"}
+VECTOR_ENUMS = dict(VECTOR_MODES, cstringref="RV_CSTRINGREF")
 
 
 def check_vector(where: str, spec: dict, owner: str, ann: dict, errors: list[str]) -> dict:
@@ -252,7 +265,12 @@ def check_vector(where: str, spec: dict, owner: str, ann: dict, errors: list[str
         errors.append("%s: a vector needs an `elem` with a mode of %s" % (where, ", ".join(sorted(VECTOR_MODES))))
         return out
     out["mode"] = elem["mode"]
-    if elem["mode"] == "scalar":
+    if elem["mode"] == "cstring":
+        if set(elem) - {"mode", "ref"} or not isinstance(elem.get("ref", False), bool):
+            errors.append("%s: a string element is {\"mode\": \"cstring\"} with an optional \"ref\": true for Ref<char>" % where)
+        out["mode"] = "cstringref" if elem.get("ref") is True else "cstring"
+        out["ctype"] = "Ref<char>" if elem.get("ref") is True else "char*"
+    elif elem["mode"] == "scalar":
         if elem.get("type") not in VECTOR_SCALARS:
             errors.append("%s: a scalar element needs a `type` of %s" % (where, ", ".join(sorted(VECTOR_SCALARS))))
         out["ctype"] = elem.get("type", "int")
@@ -477,9 +495,13 @@ SELF_KEYS = {"name", "kind", "member", "index", "target", "aliases"}
 
 
 def field_kind(f: dict) -> str:
-    """The key of FIELD_KINDS for an object field: a self pointer written as an index, and a ref or ptr that holds a callback, are kinds of their own."""
+    """The key of FIELD_KINDS for an object field: a self pointer written as an index, a ref or ptr that holds a callback, a string behind a Ref and an array of strings are kinds of their own."""
     if f.get("callback") is not None and f["kind"] in ("ref", "ptr"):
         return "cb" + f["kind"]
+    if f["kind"] == "cstring" and f.get("ref") is True:
+        return "cstringref"
+    if f["kind"] == "array" and f.get("elem") in STRING_ELEMS:
+        return "cstrings"
     return "selfindex" if f["kind"] == "self" and f.get("index") else f["kind"]
 
 
@@ -525,6 +547,34 @@ def check_ctype(ann: dict) -> list[str]:
                 errors.append("%s: only a ref or an array of refs has a `ctype`" % where)
             elif not isinstance(f["ctype"], str) or not re.match(r"^[A-Za-z_][\w ]*(::[A-Za-z_]\w*)*$", f["ctype"]):
                 errors.append("%s: the `ctype` is the C type that the Ref holds, `char`" % where)
+    return errors
+
+
+def check_blobs(ann: dict) -> list[str]:
+    """Errors for `blob`, the length of the bytes a `ptr` leads to: a state kind that is named at first sight, and a length over members of the owner."""
+    errors = []
+    kinds = ann["objects"]
+    for name, spec in kinds.items():
+        for f in spec["fields"]:
+            if "blob" not in f:
+                continue
+            where = "%s.%s" % (name, f["name"])
+            blob = f["blob"]
+            if f["kind"] != "ptr":
+                errors.append("%s: only a ptr has a `blob`" % where)
+            if not isinstance(blob, dict) or set(blob) != {"length"}:
+                errors.append("%s: a blob is {\"length\": EXPRESSION}" % where)
+                continue
+            if spec["scope"] != "state":
+                errors.append("%s: only the fields of a state kind are blobs" % where)
+            target = kinds.get(f.get("target"))
+            if target is not None and (target["scope"] != "state" or target.get("table") or target.get("inside") or target.get("kinds") or target.get("vtable")):
+                errors.append("%s: the target %s of a blob has a table, sites or kinds, and is named by them, not at first sight" % (where, f["target"]))
+            if f.get("callback") is not None:
+                errors.append("%s: a blob is not a callback" % where)
+            local = []
+            parse_length(blob["length"], where, local)
+            errors += local
     return errors
 
 
@@ -1232,14 +1282,15 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     game, sim = block_tables(ann)
     errors = check_sim_names(sim)
     arrays: list[dict] = []
-    fields = field_table(game, sim, arrays, errors, ann["objects"])
+    vectors: list[dict] = []
+    fields = field_table(game, sim, arrays, errors, ann["objects"], vectors, ann)
     field_index = {f["name"]: i for i, f in enumerate(fields)}
     objects = []
     object_fields = []
     tables: list[dict] = []
-    vectors: list[dict] = []
     elems: list[dict] = []
     selfs: list[dict] = []
+    blobs: dict[int, int] = {}
     kind_names = list(ann["objects"])
     for kind in kind_names:
         spec = ann["objects"][kind]
@@ -1258,7 +1309,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 where = "%s.%s" % (kind, f["name"])
                 if spec["scope"] != "state":
                     errors.append("%s: only the fields of a state kind can be arrays" % where)
-                array = check_array(where, f, spec["type"], errors)
+                array = check_array(where, f, spec["type"], errors, True)
                 array["member"] = f.get("member", f["name"])
                 arrays.append(array)
                 entry["array"] = len(arrays)
@@ -1271,13 +1322,28 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 entry["selfspec"] = len(selfs)
             if f["kind"] == "vector":
                 where = "%s.%s" % (kind, f["name"])
-                if spec["scope"] != "state":
-                    errors.append("%s: only the fields of a state kind can be vectors" % where)
+                if spec["scope"] == "index":
+                    errors.append("%s: only the fields of a state or value kind can be vectors" % where)
+                if f.get("base") is True and "member" in f:
+                    errors.append("%s: a vector that is the base class of its kind has no `member`" % where)
+                if "base" in f and f["base"] is not True:
+                    errors.append("%s: `base` is true, for a kind that derives from BlockVector" % where)
                 vectors.append(check_vector(where, f, spec["type"], ann, errors))
                 entry["vector"] = len(vectors)
+                if spec["scope"] == "value" and vectors[-1]["mode"] == "object":
+                    errors.append("%s: a vector of objects in a value kind is not followed by the walker; use a `value` or `scalar` element" % where)
                 if vectors[-1]["mode"] == "object" and vectors[-1]["kind"]:
                     entry["target"] = vectors[-1]["kind"]
             object_fields.append(entry)
+            if f["kind"] == "ptr" and isinstance(f.get("blob"), dict) and "length" in f["blob"]:
+                where = "%s.%s" % (kind, f["name"])
+                member = f.get("member", f["name"])
+                arrays.append({"elem": 1, "ref": False, "raw": True, "strings": 0, "length": parse_length(f["blob"]["length"], where, []), "owner": spec["type"], "member": member})
+                blob = {"name": f["name"] + "[]", "kind": "blob", "object": kind, "member": member, "target": f["target"], "array": len(arrays)}
+                if "when" in f:
+                    blob["when"] = f["when"]
+                object_fields.append(blob)
+                blobs[len(object_fields) - 2] = len(object_fields) - 1
     for t in tables:
         prefix = "SimGlobals." if t["sim"] else "Game."
         for tag, length in (("count", t["count"]), ("capacity", t["capacity"] or [])):
@@ -1302,7 +1368,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     errors += resolve_conditions(ann, object_fields, object_index)
     sites, inside_errors = check_inside(ann)
     errors += inside_errors + check_elements(ann) + check_vptr(ann)
-    errors += check_delta(ann) + check_ctype(ann)
+    errors += check_delta(ann) + check_ctype(ann) + check_blobs(ann)
     by_function: dict[str, list[dict]] = {}
     for r in rows:
         by_function.setdefault(r["function"], []).append(r)
@@ -1310,6 +1376,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     rules_of: dict[tuple[str, str], list[int]] = {}
     for i, r in enumerate(ann["rules"]):
         rules_of.setdefault((r["kind"], r["target"]), []).append(i)
+    fixture_only = {"SimGlobals." + n for n in ann.get("fixture_sim", [])}
     state_types = {spec["type"] for spec in ann["objects"].values() if spec["scope"] == "state"}
     kind_types = {spec["type"] for spec in ann["objects"].values()}
     exempt_types = ann.get("exempt_types", {})
@@ -1379,7 +1446,9 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                         draws = True
                     if kind in BLOCK_KINDS:
                         name = tracked(target, game, sim, ann.get("game_aliases"))
-                        if name is not None:
+                        if name in fixture_only:
+                            pass
+                        elif name is not None:
                             if "r" in BLOCK_KINDS[kind]:
                                 reads.add(name)
                             if "w" in BLOCK_KINDS[kind]:
@@ -1465,6 +1534,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     pending["args"].append("%s(%s)" % (s["name"], a["name"]))
             if result is not None and result["mode"] == "pending":
                 pending["args"].append("%s result" % s["name"])
+            for into in (obj_reads, obj_writes):
+                into.update(blobs[i] for i in list(into) if i in blobs)
             if "playsAs" in note:
                 errors += check_plays_as("%s.%s" % (sub, s["name"]), note["playsAs"], args, slots)
             elif any(a["mode"] == "units-buffer" for a in args):
@@ -1541,13 +1612,28 @@ def check_game_ref(name: str, spec: dict, leaf: dict | None, kinds: dict, errors
     return {"name": "Game." + name, "base": "game", "offset": leaf["offset"], "size": 4, "kind": "ref", "target": target}
 
 
-def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], kinds: dict | None = None) -> list[dict]:
+def block_vector(name: str, spec: dict, owner: str, vectors: list[dict], ann: dict | None, errors: list[str]) -> dict:
+    """The field entry of a SimGlobals member that is a BlockVector: the element mode of an object's vector field, written as a field of the block."""
+    where = "%s.%s" % (owner, name)
+    if set(spec) - {"kind", "elem", "size"}:
+        errors.append("%s: a vector field of the block is {\"kind\": \"vector\", \"elem\": ELEMENT}" % where)
+    vectors.append(check_vector(where, dict(spec, name=name), owner, ann or {"objects": {}}, errors))
+    entry = {"name": "%s.%s" % (owner, name), "base": "sim", "offset": name, "size": 16, "kind": "vector", "vector": len(vectors)}
+    if vectors[-1]["mode"] == "object" and vectors[-1]["kind"]:
+        entry["target"] = vectors[-1]["kind"]
+    return entry
+
+
+def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], kinds: dict | None = None, vectors: list[dict] | None = None, ann: dict | None = None) -> list[dict]:
     schema = traceschema.Schema()
     layout = {l["name"]: l for l in schema.layout("Game")[0]}
     fields = []
     for name, kind in game.items():
         leaf = layout.get(name)
         spec = kind if isinstance(kind, dict) else None
+        if spec is not None and spec.get("kind") == "vector":
+            errors.append("Game.%s: a vector is a member of SimGlobals, not of Game" % name)
+            continue
         if spec is not None and spec.get("kind") == "ref":
             fields.append(check_game_ref(name, spec, leaf, kinds or {}, errors))
             continue
@@ -1566,6 +1652,9 @@ def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], ki
             raise Error("Game has no field %s of %d bytes" % (name, SIZES[kind]))
         fields.append({"name": "Game." + name, "base": "game", "offset": leaf["offset"], "size": leaf["size"], "kind": kind})
     for name, spec in sim.items():
+        if isinstance(spec, dict) and spec.get("kind") == "vector":
+            fields.append(block_vector(name, spec, "SimGlobals", vectors if vectors is not None else [], ann, errors))
+            continue
         if isinstance(spec, dict):
             array = check_array("SimGlobals.%s" % name, spec, "SimGlobals", errors)
             array["member"] = name
@@ -1651,12 +1740,15 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         base = {"game": "RB_GAME", "sim": "RB_SIM", "rng": "RB_RNG"}[f["base"]]
         offset = "offsetof(SimGlobals, %s)" % f["offset"] if f["base"] == "sim" else "%d" % f["offset"]
         extra = ", %d" % f["array"] if f.get("array") else ", 0, ROK_%s" % upper(f["target"]) if f["kind"] == "ref" else ""
+        if f["kind"] == "vector":
+            extra = ", %d%s" % (f["vector"], ", ROK_%s" % upper(f["target"]) if f.get("target") else "")
         L.append('    { "%s", %s, %d, %s, RK_%s%s },' % (f["name"], offset, f["size"], base, FIELD_KINDS[f["kind"]], extra))
     L += ["};", "static const unsigned kReplayFieldCount = %d;" % len(fields), ""]
     L += ["static const ReplayArraySpec kReplayArrays[] = {"]
     for a in arrays:
-        capacity = "0" if a["ref"] else "sizeof(((%s*)nullptr)->%s)" % (a["owner"], a["member"])
-        L.append("    { %d, %d, %s, %s }," % (a["elem"], int(a["ref"]), capacity, render_length(a["length"], a["owner"])))
+        capacity = "0" if a["ref"] or a["raw"] else "sizeof(((%s*)nullptr)->%s)" % (a["owner"], a["member"])
+        strings = ", %d, %d" % (int(a["raw"]), a["strings"]) if a["strings"] or a["raw"] else ""
+        L.append("    { %d, %d, %s, %s%s }," % (a["elem"], int(a["ref"]), capacity, render_length(a["length"], a["owner"]), strings))
     if not arrays:
         L.append("    { 1, 0, 0, { { 1, 0, 0 }, { 1, 0, 0 } } },")
     L += ["};", "", "static const ReplayTableSpec kReplayTables[] = {"]
@@ -1669,7 +1761,18 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     kind_type = {o["name"]: o["type"] for o in objects}
     for a in arrays:
         L += factor_asserts(a["length"], a["owner"], "%s::%s" % (a["owner"], a["member"]))
-        if a["ref"]:
+        if a["strings"]:
+            held = STRING_ELEMS["cstring" if a["strings"] == 1 else "cstring_ref"][1]
+            at = "((%s*)nullptr)->%s" % (a["owner"], a["member"])
+            if a["ref"]:
+                L.append('static_assert(__is_same(decltype(%s), Ref<%s>), "%s::%s is a Ref<%s>");' % (at, held, a["owner"], a["member"], held))
+            else:
+                L.append('static_assert(__is_same(decltype(&%s[0]), %s*), "%s::%s holds %s");' % (at, held, a["owner"], a["member"], held))
+                if not a["raw"]:
+                    L.append('static_assert(sizeof(%s) %% %d == 0, "%s::%s holds whole elements");' % (at, a["elem"], a["owner"], a["member"]))
+        elif a["raw"]:
+            continue
+        elif a["ref"]:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(unsigned), "%s::%s is a Ref");' % (a["owner"], a["member"], a["owner"], a["member"]))
         else:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) %% %d == 0, "%s::%s holds whole elements");' % (a["owner"], a["member"], a["elem"], a["owner"], a["member"]))
@@ -1683,6 +1786,12 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d * sizeof(%s), "the table of %s holds %d elements");' % (t["owner"], t["member"], n, kind_type[t["kind"]], t["kind"], n))
         elif t["ref"]:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(unsigned), "the table of %s is a Ref");' % (t["owner"], t["member"], t["kind"]))
+    for f in fields:
+        if f["kind"] == "vector":
+            v = vectors[f["vector"] - 1]
+            access = "decltype(((SimGlobals*)nullptr)->%s)" % f["offset"]
+            L.append('static_assert(sizeof(%s) == 16, "%s is a block vector");' % (access, f["name"]))
+            L.append('static_assert(__is_same(%s::value_type, %s), "%s holds %s");' % (access, v["ctype"], f["name"], v["ctype"]))
     L.append("")
     for name in macros:
         L.append('#pragma pop_macro("%s")' % name)
@@ -1690,7 +1799,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     L += ["    RF_%s," % upper(f["name"]) for f in fields]
     L += ["};", "", "static const ReplayVectorSpec kReplayVectors[] = {"]
     for v in vectors:
-        L.append("    { %s, %s, sizeof(%s) }," % (VECTOR_MODES[v["mode"]], "ROK_" + upper(v["kind"]) if v["kind"] else "0", v["ctype"]))
+        L.append("    { %s, %s, sizeof(%s) }," % (VECTOR_ENUMS[v["mode"]], "ROK_" + upper(v["kind"]) if v["kind"] else "0", v["ctype"]))
     if not vectors:
         L.append("    { RV_OBJECT, 0, 1 },")
     L += ["};", "", "static const ReplayElemSpec kReplayElems[] = {"]
@@ -1774,12 +1883,13 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         member = embeds_member(f).replace("[]", "[0]") if f["kind"] == "embeds" else f["name"] if f["kind"] == "self" else f.get("member", f["name"])
         t = types[f["object"]]
         size = f.get("size")
-        size_text = str(size) if size else "sizeof(void*)" if f["kind"] == "ptr" else "sizeof(((%s*)nullptr)->%s)" % (t, member)
-        target = "RCB_%s" % upper(f["callback"]) if field_kind(f) in ("cbref", "cbptr") else kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
+        derived = f["kind"] == "vector" and f.get("base") is True
+        size_text = str(size) if size else "sizeof(%s)" % t if derived else "sizeof(void*)" if f["kind"] in ("ptr", "blob") else "sizeof(((%s*)nullptr)->%s)" % (t, member)
+        target = "RCB_%s" % upper(f["callback"]) if field_kind(f) in ("cbref", "cbptr") else kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds", "blob") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
         extra = ", %d" % (f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec")) if f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec") else ""
         when = "{ %d, %d, %s, %du, %d }" % (f["condField"], f.get("condVia", 0), kind_id[f["condKind"]], f.get("condMask", 0xFFFFFFFF), f["condValue"]) if f.get("condField") else "{}"
-        L.append('    { "%s", offsetof(%s, %s), %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
-            f["name"], t, member, size_text, kind_id[f["object"]], FIELD_KINDS[field_kind(f)], target, range_end.get(i, 0), range_begin.get(i, 0),
+        L.append('    { "%s", %s, %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
+            f["name"], "0" if derived else "offsetof(%s, %s)" % (t, member), size_text, kind_id[f["object"]], FIELD_KINDS[field_kind(f)], target, range_end.get(i, 0), range_begin.get(i, 0),
             when, f.get("reachFirst", 0), f.get("reachCount", 0), extra))
     L += ["};", "static const unsigned kReplayObjectFieldCount = %d;" % len(ofields), ""]
     L += ["static const unsigned short kReplayReachFields[] = { %s };" % ", ".join(str(i) for i in model["reach_table"] or [0]), ""]
@@ -1812,17 +1922,23 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s has the size of its kind");' % (t, member, types[f["target"]], t, f["name"]))
         elif f["kind"] == "bytes":
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, f["size"], t, f["name"]))
-        elif f["kind"] == "array":
+        elif f["kind"] in ("array", "blob"):
             continue
         elif f["kind"] == "vector":
             v = vectors[f["vector"] - 1]
-            access = "decltype(((%s*)nullptr)->%s)" % (t, member)
+            access = t if f.get("base") is True else "decltype(((%s*)nullptr)->%s)" % (t, member)
             L.append('static_assert(sizeof(%s) == 16, "%s::%s is a block vector");' % (access, t, f["name"]))
             L.append('static_assert(__is_same(%s::value_type, %s), "%s::%s holds %s");' % (access, v["ctype"], t, f["name"], v["ctype"]))
         elif f["kind"] == "code":
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a code pointer");' % (t, member, t, f["name"]))
         elif f["kind"] == "ptr":
             L.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s::%s is a raw pointer");' % (t, member, t, f["name"]))
+        elif f["kind"] == "cstring":
+            at = "decltype(((%s*)nullptr)->%s)" % (t, member)
+            if f.get("ref") is True:
+                L.append('static_assert(__is_same(%s, Ref<char>), "%s::%s is a Ref<char>");' % (at, t, f["name"]))
+            else:
+                L.append('static_assert(__is_pointer(%s) && __is_same(__remove_cv(__remove_pointer(%s)), char), "%s::%s is a char pointer");' % (at, at, t, f["name"]))
         elif f.get("size") is None:
             want = {"i32": 4, "u32": 4, "u16": 2, "i16": 2, "f32": 4, "flags": 4, "ref": 4, "point16": 4, "weapon": 4, "u8": 1, "f64": 8, "unitid": 2}[f["kind"]]
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %d, "%s::%s has the size the schema says");' % (t, member, want, t, f["name"]))

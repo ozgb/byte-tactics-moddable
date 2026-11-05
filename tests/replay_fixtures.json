@@ -643,6 +643,241 @@
      "kind": "i32"
     }
    ]
+  },
+  "FixtureNamed": {
+   "type": "FixtureNamed",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "count",
+     "kind": "i32"
+    },
+    {
+     "name": "name",
+     "kind": "cstring"
+    },
+    {
+     "name": "ident",
+     "kind": "cstring",
+     "ref": true
+    },
+    {
+     "name": "words",
+     "kind": "array",
+     "elem": "cstring",
+     "raw": true,
+     "length": "count"
+    },
+    {
+     "name": "refWords",
+     "kind": "array",
+     "elem": "cstring_ref",
+     "ref": true,
+     "length": "count"
+    },
+    {
+     "name": "fixed",
+     "kind": "array",
+     "elem": "cstring",
+     "length": "count"
+    },
+    {
+     "name": "list",
+     "kind": "vector",
+     "elem": {
+      "mode": "cstring"
+     }
+    },
+    {
+     "name": "idents",
+     "kind": "vector",
+     "elem": {
+      "mode": "cstring",
+      "ref": true
+     }
+    }
+   ]
+  },
+  "FixtureProgram": {
+   "type": "FixtureProgram",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "count",
+     "kind": "i32"
+    },
+    {
+     "name": "entries",
+     "kind": "ptr",
+     "target": "alloc",
+     "blob": {
+      "length": "count*4"
+     }
+    },
+    {
+     "name": "bits",
+     "kind": "ptr",
+     "target": "alloc",
+     "blob": {
+      "length": "(count+7)>>3"
+     }
+    },
+    {
+     "name": "plain",
+     "kind": "ptr",
+     "target": "alloc"
+    }
+   ]
+  },
+  "FixtureNest": {
+   "type": "FixtureNest",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "mids",
+     "kind": "vector",
+     "elem": {
+      "mode": "value",
+      "kind": "FixtureMid"
+     }
+    },
+    {
+     "name": "rows",
+     "kind": "vector",
+     "elem": {
+      "mode": "value",
+      "kind": "FixtureRow"
+     }
+    }
+   ]
+  },
+  "FixtureMid": {
+   "type": "FixtureMid",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "tag",
+     "kind": "i32"
+    },
+    {
+     "name": "leaves",
+     "kind": "vector",
+     "elem": {
+      "mode": "value",
+      "kind": "FixtureLeaf"
+     }
+    }
+   ]
+  },
+  "FixtureLeaf": {
+   "type": "FixtureLeaf",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "kind",
+     "kind": "i32"
+    },
+    {
+     "name": "steps",
+     "kind": "vector",
+     "elem": {
+      "mode": "scalar",
+      "type": "short"
+     }
+    },
+    {
+     "name": "names",
+     "kind": "vector",
+     "elem": {
+      "mode": "cstring"
+     }
+    }
+   ]
+  },
+  "FixtureRow": {
+   "type": "FixtureRow",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "cells",
+     "kind": "vector",
+     "base": true,
+     "elem": {
+      "mode": "scalar",
+      "type": "short"
+     }
+    }
+   ]
+  },
+  "FixtureLosTable": {
+   "type": "LosTable",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "lines",
+     "kind": "vector",
+     "base": true,
+     "elem": {
+      "mode": "value",
+      "kind": "FixtureLosLine"
+     }
+    }
+   ]
+  },
+  "FixtureLosLine": {
+   "type": "LosLine",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "steps",
+     "kind": "vector",
+     "base": true,
+     "elem": {
+      "mode": "value",
+      "kind": "FixtureLosStep"
+     }
+    }
+   ]
+  },
+  "FixtureLosStep": {
+   "type": "LosStep",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "a",
+     "kind": "u16"
+    },
+    {
+     "name": "b",
+     "kind": "u16"
+    }
+   ]
+  },
+  "FixtureOrderEntry": {
+   "type": "OrderTableEntry",
+   "scope": "value",
+   "fields": [
+    {
+     "name": "value",
+     "kind": "cstring"
+    },
+    {
+     "name": "name",
+     "kind": "cstring"
+    },
+    {
+     "name": "drawMask",
+     "kind": "i32"
+    },
+    {
+     "name": "flags",
+     "kind": "u32"
+    }
+   ]
   }
  },
  "fixtures": {
@@ -834,5 +1069,21 @@
     "member": "shadow"
    }
   ]
+ },
+ "sim_fields": {
+  "g_losTables": {
+   "kind": "vector",
+   "elem": {
+    "mode": "value",
+    "kind": "FixtureLosTable"
+   }
+  },
+  "g_missionOrderTableVec": {
+   "kind": "vector",
+   "elem": {
+    "mode": "value",
+    "kind": "FixtureOrderEntry"
+   }
+  }
  }
 }

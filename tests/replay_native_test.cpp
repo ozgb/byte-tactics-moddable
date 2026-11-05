@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <vector>
+#include <algorithm>
 
 #include "../src/harness/replay_schema.h"
 #include "../src/files/files_bank.h"
@@ -395,6 +396,46 @@ const ReplayField* FindField(const char* name)
             return &kReplayFields[i];
     }
     return nullptr;
+}
+
+const ReplayField* FindBlockField(const char* name)
+{
+    const char* open = strchr(name, '[');
+    if (open == nullptr)
+        return FindField(name);
+    char base[96];
+    size_t length = (size_t)(open - name);
+    if (length >= sizeof base)
+        return nullptr;
+    memcpy(base, name, length);
+    base[length] = '\0';
+    const ReplayField* f = FindField(base);
+    return f != nullptr && f->kind == RK_VECTOR ? f : nullptr;
+}
+
+bool ApplyBlockVector(const ReplayField& f, const char* name, const char* value, bool memory)
+{
+    ReplayObjectField view = ReplayFieldView(f);
+    unsigned char* object = memory ? BlockBase(f) : nullptr;
+    if (memory && object == nullptr)
+        return false;
+    const char* open = strchr(name, '[');
+    if (open == nullptr)
+        return ReplayApplyVector(view, object, name, value, g_known, memory, g_objects, memory ? AllocObject : nullptr);
+    char* end;
+    unsigned long at = strtoul(open + 1, &end, 10);
+    if (end == open + 1 || *end != ']')
+        return false;
+    if (end[1] == '\0')
+        return ReplayApplyVectorString(view, object, (unsigned)at, name, value, g_known, memory, memory ? AllocObject : nullptr);
+    if (end[1] != '.')
+        return false;
+    return ReplayApplyVectorElement(view, object, (unsigned)at, end + 2, name, value, g_known, memory, g_objects, memory ? AllocObject : nullptr);
+}
+
+void CompareBlockVector(const ReplayField& f)
+{
+    ReplayCompareVector(ReplayFieldView(f), BlockBase(f), f.name, g_known, g_objects, Diff, HashText);
 }
 
 bool InSet(const unsigned char* set, unsigned count, const ReplayField* f)
@@ -1734,11 +1775,24 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
             Fatal(file, g_callIndex, "an array line that cannot be applied", value);
         return true;
     }
+    if (f->kind == RK_BLOB) {
+        if (!ReplayApplyBlob(*f, p, name, value, g_known, true, g_objects, AllocObject))
+            Fatal(file, g_callIndex, "a blob line that cannot be applied", value);
+        return true;
+    }
     if (f->kind == RK_VECTOR) {
         bool applied = k.vectorElement ? ReplayApplyVectorElement(*f, p, k.element, k.sub, name, value, g_known, true, g_objects, AllocObject)
+                       : k.refsElement ? ReplayApplyVectorString(*f, p, k.element, name, value, g_known, true, AllocObject)
                                        : ReplayApplyVector(*f, p, name, value, g_known, true, g_objects, AllocObject);
         if (!applied)
             Fatal(file, g_callIndex, "a vector line that cannot be applied", value);
+        return true;
+    }
+    if (f->kind == RK_CSTRINGS) {
+        bool applied = k.refsElement ? ReplayApplyCStringsElement(*f, p, k.prefix, k.element, name, value, g_known, true, AllocObject)
+                                     : ReplayApplyCStrings(*f, p, name, value, g_known, true, AllocObject);
+        if (!applied)
+            Fatal(file, g_callIndex, "a string array line that cannot be applied", value);
         return true;
     }
     if (f->kind == RK_REFS) {
@@ -1761,6 +1815,8 @@ bool ObjectLineIsCondition(const char* name)
     return k.field != nullptr && ReplayFieldIsCondition(*k.field);
 }
 
+std::vector<void*> g_blobSeen;
+
 void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* object, const unsigned short* set, unsigned count, ReplayText& key, ReplayText& value)
 {
     for (unsigned i = 0; i < count; i++) {
@@ -1778,18 +1834,35 @@ void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* o
             ReplayCompareRefs(f, object, key.Data(), g_known, g_objects, Diff, HashText);
             continue;
         }
+        if (f.kind == RK_CSTRINGS) {
+            ReplayCompareCStrings(f, object, key.Data(), g_known, Diff, HashText);
+            continue;
+        }
+        ReplayText bytes;
+        const char* lookup = key.Data();
+        if (f.kind == RK_BLOB && ReplayBlobKey(f, object, g_objects, bytes)) {
+            void* target = *(void**)((unsigned char*)object + f.offset);
+            if (std::find(g_blobSeen.begin(), g_blobSeen.end(), target) != g_blobSeen.end()) {
+                bytes.Free();
+                continue;
+            }
+            g_blobSeen.push_back(target);
+            lookup = bytes.Data();
+        }
         ReplayFormatObjectField(f, object, g_objects, false, value);
         HashText(value.Data());
-        const char* known = g_known.Get(key.Data());
+        const char* known = g_known.Get(lookup);
         if (known == nullptr)
             Diff(key.Data(), "no value", value.Data());
         else if (strcmp(known, value.Data()) != 0)
             Diff(key.Data(), known, value.Data());
+        bytes.Free();
     }
 }
 
 void CompareObjects(const ReplaySlotSets* sets)
 {
+    g_blobSeen.clear();
     ReplayWalk(g_reach, g_objects, false, *sets, g_rootKinds, g_rootObjects, g_rootCount);
     ReplayText key;
     ReplayText value;
@@ -1834,21 +1907,32 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
                 Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
             if (f->kind == RK_VECTOR) {
                 bool applied = k.vectorElement ? ReplayApplyVectorElement(*f, nullptr, k.element, k.sub, name, space + 1, g_known, false, g_objects, nullptr)
+                               : k.refsElement ? ReplayApplyVectorString(*f, nullptr, k.element, name, space + 1, g_known, false, nullptr)
                                                : ReplayApplyVector(*f, nullptr, name, space + 1, g_known, false, g_objects, nullptr);
                 if (!applied)
                     Fatal(file, g_callIndex, "a vector line that cannot be applied", line);
                 continue;
             }
-            if (f->kind == RK_REFS) {
+            if (f->kind == RK_REFS || f->kind == RK_CSTRINGS) {
                 g_known.Set(name, space + 1);
+                continue;
+            }
+            if (f->kind == RK_BLOB) {
+                if (!ReplayApplyBlob(*f, nullptr, name, space + 1, g_known, false, g_objects, nullptr))
+                    Fatal(file, g_callIndex, "a blob line that cannot be applied", line);
                 continue;
             }
             array = f->kind == RK_ARRAY;
             arrayField = f;
         } else {
-            const ReplayField* f = FindField(name);
+            const ReplayField* f = FindBlockField(name);
             if (f == nullptr || !InSet(sets->writes, sets->writeCount, f))
                 Fatal(file, g_callIndex, "field is not in the write set of the slot", line);
+            if (f->kind == RK_VECTOR) {
+                if (!ApplyBlockVector(*f, name, space + 1, false))
+                    Fatal(file, g_callIndex, "a vector line that cannot be applied", line);
+                continue;
+            }
             blockView = ReplayFieldView(*f);
             array = f->kind == RK_ARRAY;
             arrayField = &blockView;
@@ -1862,6 +1946,10 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
     }
     for (unsigned i = 0; i < sets->writeCount; i++) {
         const ReplayField& f = kReplayFields[sets->writes[i]];
+        if (f.kind == RK_VECTOR) {
+            CompareBlockVector(f);
+            continue;
+        }
         FormatField(f, value);
         HashText(value.Data());
         const char* known = g_known.Get(f.name);
@@ -1965,11 +2053,15 @@ void ReplayCall(const char* file, Outcome& out)
             if (object && ObjectLineIsCondition(line + 4) == (pass == 0)) {
                 RestoreObjectLine(line + 4, space + 1, file, sets, line);
             } else if (!object && pass == 0) {
-                const ReplayField* f = FindField(line + 4);
+                const ReplayField* f = FindBlockField(line + 4);
                 if (f == nullptr || !InSet(sets->reads, sets->readCount, f))
                     Fatal(file, g_callIndex, "field is not in the read set of the slot", line + 4);
-                if (!RestoreField(*f, space + 1))
+                if (f->kind == RK_VECTOR) {
+                    if (!ApplyBlockVector(*f, line + 4, space + 1, true))
+                        Fatal(file, g_callIndex, "a vector line that cannot be applied", space + 1);
+                } else if (!RestoreField(*f, space + 1)) {
                     Fatal(file, g_callIndex, "a value that cannot be restored", space + 1);
+                }
             }
             *space = ' ';
         }
@@ -5340,6 +5432,549 @@ void SelfPointerSelfTest()
     free(three);
 }
 
+char* BlockText(const char* text)
+{
+    char* p = (char*)SimAlloc((unsigned)strlen(text) + 1);
+    strcpy(p, text);
+    return p;
+}
+
+void CStringSelfTest()
+{
+    printf("strings behind pointers\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureNamed* named = (FixtureNamed*)Fresh(sizeof(FixtureNamed));
+    new (&named->list) BlockVector<char*>();
+    new (&named->idents) BlockVector<Ref<char> >();
+    named->count = 2;
+    named->name = BlockText("alpha");
+    named->ident = BlockText("tag \"1\"\n");
+    char** words = (char**)Fresh(2 * (unsigned)sizeof(char*));
+    words[0] = BlockText("one");
+    words[1] = BlockText("two");
+    named->words = words;
+    Ref<char>* refWords = (Ref<char>*)Fresh(2 * (unsigned)sizeof(Ref<char>));
+    refWords[0] = BlockText("r0");
+    refWords[1] = BlockText("r1");
+    named->refWords = refWords;
+    named->fixed[0] = BlockText("f0");
+    named->fixed[1] = BlockText("f1");
+    named->list.PushBack(BlockText("l0"));
+    named->list.PushBack(BlockText("l1"));
+    named->idents.PushBack(Ref<char>(BlockText("i0")));
+    static const char* const fieldNames[8] = { "count", "name", "ident", "words", "refWords", "fixed", "list", "idents" };
+    unsigned short fields[8];
+    for (int i = 0; i < 8; i++)
+        fields[i] = FieldIndex(ROK_FIXTURENAMED, fieldNames[i]);
+    ReplaySlotSets sets = { "named", 0, nullptr, 0, nullptr, 0, fields, 8, fields, 8 };
+    unsigned char kind = ROK_FIXTURENAMED;
+    void* root = named;
+    Recorder recorder;
+    recorder.Record(&kind, &root, 1, sets);
+    char* one = strdup(recorder.text.Data());
+    printf("%s", one);
+    Check(strstr(one, "  r FixtureNamed#1.name \"alpha\"\n") != nullptr, "a char* is its text");
+    Check(strstr(one, "  r FixtureNamed#1.ident \"tag \\\"1\\\"\\n\"\n") != nullptr, "a Ref<char> is its text, with C escapes");
+    Check(strstr(one, "  r FixtureNamed#1.words [2]\n  r FixtureNamed#1.words[0] \"one\"\n  r FixtureNamed#1.words[1] \"two\"\n") != nullptr, "an array of strings is its length and a line per element");
+    Check(strstr(one, "  r FixtureNamed#1.refWords [2]\n  r FixtureNamed#1.refWords[0] \"r0\"\n  r FixtureNamed#1.refWords[1] \"r1\"\n") != nullptr && strstr(one, "  r FixtureNamed#1.fixed [2]\n  r FixtureNamed#1.fixed[0] \"f0\"\n") != nullptr, "whether it is held by a Ref, a pointer or in the object");
+    Check(strstr(one, "  r FixtureNamed#1.list [2/2]\n  r FixtureNamed#1.list[0] \"l0\"\n  r FixtureNamed#1.list[1] \"l1\"\n") != nullptr, "a vector of strings is the bracket and a line per element");
+    Check(strstr(one, "  r FixtureNamed#1.idents [1/1]\n  r FixtureNamed#1.idents[0] \"i0\"\n") != nullptr, "and so is one of Ref<char>");
+
+    named->name = BlockText("beta");
+    words[1] = BlockText("TWO");
+    named->list.PushBack(BlockText("l2"));
+    recorder.Record(&kind, &root, 1, sets);
+    char* two = strdup(recorder.text.Data());
+    printf("%s", two);
+    Check(strcmp(two, "  r FixtureNamed#1.name \"beta\"\n  r FixtureNamed#1.words[1] \"TWO\"\n  r FixtureNamed#1.list [3/4]\n  r FixtureNamed#1.list[2] \"l2\"\n") == 0, "a string that changed between calls is one line, and a vector that grew writes only its new element");
+    recorder.Record(&kind, &root, 1, sets);
+    Check(recorder.text.Size() == 0, "strings that did not change are not written again");
+    named->name = nullptr;
+    named->ident = nullptr;
+    named->words = nullptr;
+    recorder.Record(&kind, &root, 1, sets);
+    char* three = strdup(recorder.text.Data());
+    Check(strcmp(three, "  r FixtureNamed#1.name null\n  r FixtureNamed#1.ident null\n  r FixtureNamed#1.words null\n") == 0, "a null pointer is null");
+
+    ResetBlock();
+    RestoreText(one, sets);
+    RestoreText(two, sets);
+    FixtureNamed* rebuilt = (FixtureNamed*)ReplayResolveObject("FixtureNamed#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->name != nullptr && strcmp(rebuilt->name, "beta") == 0, "the replayer allocates the string, with the text of the last line");
+    Check(rebuilt != nullptr && strcmp(rebuilt->ident.get(), "tag \"1\"\n") == 0, "and the string behind a Ref");
+    Check(rebuilt != nullptr && rebuilt->words != nullptr && strcmp(rebuilt->words[0], "one") == 0 && strcmp(rebuilt->words[1], "TWO") == 0, "the array of strings");
+    Check(rebuilt != nullptr && strcmp(rebuilt->refWords.get()[1].get(), "r1") == 0 && strcmp(rebuilt->fixed[1], "f1") == 0 && rebuilt->fixed[2] == nullptr, "by a Ref and in the object");
+    Check(rebuilt != nullptr && rebuilt->list.Size() == 3 && rebuilt->list.Capacity() == 4 && strcmp(rebuilt->list[0], "l0") == 0 && strcmp(rebuilt->list[2], "l2") == 0, "and the vector, its old elements carried over its growth");
+    Check(rebuilt != nullptr && rebuilt->idents.Size() == 1 && strcmp(rebuilt->idents[0].get(), "i0") == 0, "and the vector of Ref<char>");
+
+    Recorder replayed;
+    void* rebuiltRoot = rebuilt;
+    replayed.Record(&kind, &rebuiltRoot, 1, sets);
+    Check(strcmp(replayed.text.Data(), one) != 0 && strstr(replayed.text.Data(), "  r FixtureNamed#1.name \"beta\"\n") != nullptr && strstr(replayed.text.Data(), "  r FixtureNamed#1.list [3/4]\n") != nullptr, "the rebuilt object records as it was");
+
+    g_rootKinds[0] = ROK_FIXTURENAMED;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored strings compare equal");
+    rebuilt->name[0] = 'B';
+    rebuilt->words[1][0] = 'W';
+    rebuilt->list[1] = rebuilt->list[0];
+    rebuilt->idents[0] = Ref<char>(rebuilt->name);
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("changed strings: %s\n%s", g_firstKey, g_detail.Data());
+    Check(strstr(g_detail.Data(), "FixtureNamed#1.name: recorded \"beta\", replayed \"Beta\"") != nullptr, "a changed string is reported at the field");
+    Check(strstr(g_detail.Data(), "FixtureNamed#1.words[1]: recorded \"TWO\", replayed \"WWO\"") != nullptr, "an element of an array at its index");
+    Check(strstr(g_detail.Data(), "FixtureNamed#1.list[1]: recorded \"l1\", replayed \"l0\"") != nullptr && strstr(g_detail.Data(), "FixtureNamed#1.idents[0]: recorded \"i0\", replayed \"Beta\"") != nullptr, "and of a vector");
+    Check(g_diffs == 4, "and nothing else");
+    rebuilt->name = nullptr;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(strstr(g_detail.Data(), "FixtureNamed#1.name: recorded \"beta\", replayed null") != nullptr, "a null pointer where a string was recorded is a difference");
+    Check(!ReplayRestoreObjectField(*ReplayFindObjectField(ROK_FIXTURENAMED, "name"), rebuilt, "alpha", g_objects, AllocObject), "a value that is not quoted is refused");
+    Check(!ReplayRestoreObjectField(*ReplayFindObjectField(ROK_FIXTURENAMED, "name"), rebuilt, "\"x\"", g_objects, nullptr), "and so is a string with no allocator");
+
+    ResetBlock();
+    RestoreText(one, sets);
+    RestoreText(three, sets);
+    rebuilt = (FixtureNamed*)ReplayResolveObject("FixtureNamed#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->name == nullptr && rebuilt->ident.get() == nullptr && rebuilt->words == nullptr, "a null line restores a null pointer, and a null array");
+    free(one);
+    free(two);
+    free(three);
+}
+
+void BlobSelfTest()
+{
+    printf("bytes behind a pointer\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureProgram* program = (FixtureProgram*)Fresh(sizeof(FixtureProgram));
+    program->count = 5;
+    int* entries = (int*)Fresh(5 * (unsigned)sizeof(int));
+    for (int i = 0; i < 5; i++)
+        entries[i] = 10 * (i + 1);
+    unsigned char* bits = (unsigned char*)Fresh(1);
+    bits[0] = 0xa5;
+    program->entries = entries;
+    program->bits = bits;
+    program->plain = (int*)Fresh(8);
+    static const char* const fieldNames[6] = { "count", "entries", "entries[]", "bits", "bits[]", "plain" };
+    unsigned short fields[6];
+    for (int i = 0; i < 6; i++)
+        fields[i] = FieldIndex(ROK_FIXTUREPROGRAM, fieldNames[i]);
+    ReplaySlotSets sets = { "program", 0, nullptr, 0, nullptr, 0, fields, 6, fields, 6 };
+    unsigned char kind = ROK_FIXTUREPROGRAM;
+    void* root = program;
+    Recorder recorder;
+    ReplayText calls;
+    recorder.Record(&kind, &root, 1, sets);
+    printf("%s", recorder.text.Data());
+    Check(strstr(recorder.text.Data(), "  r FixtureProgram#1.entries alloc#1\n  r FixtureProgram#1.entries[] [20] 0:0a000000140000001e00000028000000320000") != nullptr,
+          "a blob is its pointer, as any ptr is, and its bytes as an array's are, with the length the other fields give");
+    Check(strstr(recorder.text.Data(), "  r FixtureProgram#1.bits alloc#2\n  r FixtureProgram#1.bits[] [1] 0:a5\n") != nullptr, "a length may add before it shifts");
+    Check(strstr(recorder.text.Data(), "  r FixtureProgram#1.plain alloc#3\n") != nullptr && strstr(recorder.text.Data(), "plain[]") == nullptr, "a ptr with no blob is its name only");
+    calls.AddText(recorder.text);
+
+    recorder.Record(&kind, &root, 1, sets);
+    Check(recorder.text.Size() == 0, "bytes that did not change are not written again");
+    entries[2] = 77;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r FixtureProgram#1.entries[] 8:4d\n") == 0, "a changed byte is a delta run of one byte, as in an array");
+    calls.AddText(recorder.text);
+
+    int* moved = (int*)Fresh(5 * (unsigned)sizeof(int));
+    memcpy(moved, entries, 5 * sizeof(int));
+    program->entries = moved;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strstr(recorder.text.Data(), "  r FixtureProgram#1.entries alloc#4\n  r FixtureProgram#1.entries[] [20] 0:0a000000140000004d000000") != nullptr, "a pointer to another block writes all its bytes, though they are the same");
+    calls.AddText(recorder.text);
+
+    program->count = 6;
+    int* longer = (int*)Fresh(6 * (unsigned)sizeof(int));
+    memcpy(longer, moved, 5 * sizeof(int));
+    longer[5] = 99;
+    program->entries = longer;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strstr(recorder.text.Data(), "  r FixtureProgram#1.count 6\n  r FixtureProgram#1.entries alloc#5\n  r FixtureProgram#1.entries[] [24] 0:") != nullptr && strstr(recorder.text.Data(), "bits[]") == nullptr, "a longer length is a new bracket");
+    calls.AddText(recorder.text);
+    program->entries = nullptr;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r FixtureProgram#1.entries null\n  r FixtureProgram#1.entries[] null\n") == 0, "a null pointer is null, twice");
+    program->entries = longer;
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    FixtureProgram* rebuilt = (FixtureProgram*)ReplayResolveObject("FixtureProgram#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->count == 6 && rebuilt->entries != nullptr && rebuilt->entries != longer, "the replayer allocates the bytes");
+    Check(rebuilt != nullptr && rebuilt->entries != nullptr && rebuilt->entries[0] == 10 && rebuilt->entries[2] == 77 && rebuilt->entries[5] == 99, "fills them, and the module reads them through an offset");
+    Check(rebuilt != nullptr && rebuilt->bits != nullptr && rebuilt->bits[0] == 0xa5, "of every blob");
+    Check(rebuilt != nullptr && rebuilt->plain != nullptr, "a ptr with no blob is an empty copy");
+    g_rootKinds[0] = ROK_FIXTUREPROGRAM;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored bytes compare equal, and the pointer is still the object it was named");
+    rebuilt->entries[3] = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("a changed byte: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureProgram#1.entries[]") == 0 && strstr(g_detail.Data(), "byte 12 of 24") != nullptr, "a changed byte is reported at the blob, with its offset");
+    rebuilt->entries[3] = 40;
+    rebuilt->count = 5;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs >= 1 && strstr(g_detail.Data(), "FixtureProgram#1.entries[]") != nullptr && strstr(g_detail.Data(), "recorded 24 elements, replayed 20") != nullptr, "a blob of another length is reported");
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    Recorder replayed;
+    rebuilt = (FixtureProgram*)ReplayResolveObject("FixtureProgram#1", nullptr, g_objects, AllocObject);
+    void* rebuiltRoot = rebuilt;
+    replayed.Record(&kind, &rebuiltRoot, 1, sets);
+    Check(strstr(replayed.text.Data(), "  r FixtureProgram#1.entries[] [24] 0:0a00000014000000") != nullptr, "the rebuilt object records its bytes again");
+    calls.Free();
+}
+
+void SharedBlobSelfTest()
+{
+    printf("two holders of one blob\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureProgram* first = (FixtureProgram*)Fresh(sizeof(FixtureProgram));
+    FixtureProgram* second = (FixtureProgram*)Fresh(sizeof(FixtureProgram));
+    int* entries = (int*)Fresh(5 * (unsigned)sizeof(int));
+    for (int i = 0; i < 5; i++)
+        entries[i] = 10 * (i + 1);
+    first->count = second->count = 5;
+    first->entries = second->entries = entries;
+    static const char* const fieldNames[3] = { "count", "entries", "entries[]" };
+    unsigned short fields[3];
+    for (int i = 0; i < 3; i++)
+        fields[i] = FieldIndex(ROK_FIXTUREPROGRAM, fieldNames[i]);
+    ReplaySlotSets sets = { "program", 0, nullptr, 0, nullptr, 0, fields, 3, fields, 3 };
+    unsigned char kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTUREPROGRAM };
+    void* roots[2] = { first, second };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 2, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    const char* bytes = strstr(text, "FixtureProgram#1.entries[] [20]");
+    Check(bytes != nullptr && strstr(bytes + 31, "[20]") == nullptr, "the bytes of a target are written once");
+    Check(strstr(text, "  r FixtureProgram#2.entries alloc#1\n") != nullptr && strstr(text, "FixtureProgram#2.entries[]") == nullptr, "the second holder names the target and writes no bytes");
+    entries[1] = 77;
+    recorder.Record(kinds, roots, 2, sets);
+    Check(strcmp(recorder.text.Data(), "  r FixtureProgram#1.entries[] 4:4d\n") == 0, "a changed byte is one delta, whoever holds the target");
+    char* changed = strdup(recorder.text.Data());
+
+    ResetBlock();
+    RestoreText(text, sets);
+    RestoreText(changed, sets);
+    FixtureProgram* rebuiltFirst = (FixtureProgram*)ReplayResolveObject("FixtureProgram#1", nullptr, g_objects, AllocObject);
+    FixtureProgram* rebuiltSecond = (FixtureProgram*)ReplayResolveObject("FixtureProgram#2", nullptr, g_objects, AllocObject);
+    Check(rebuiltFirst != nullptr && rebuiltSecond != nullptr && rebuiltFirst->entries != nullptr && rebuiltFirst->entries == rebuiltSecond->entries, "the holders replay to the same block");
+    Check(rebuiltFirst != nullptr && rebuiltFirst->entries != nullptr && rebuiltFirst->entries[1] == 77 && rebuiltFirst->entries[4] == 50, "with its bytes");
+    Check(rebuiltFirst != nullptr && g_objects.Pointer(ROK_ALLOC, 1) == rebuiltFirst->entries, "and the name still leads to it");
+    g_rootKinds[0] = ROK_FIXTUREPROGRAM;
+    g_rootKinds[1] = ROK_FIXTUREPROGRAM;
+    g_rootObjects[0] = rebuiltFirst;
+    g_rootObjects[1] = rebuiltSecond;
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the shared bytes compare equal for both");
+    if (rebuiltFirst != nullptr && rebuiltFirst->entries != nullptr) {
+        rebuiltFirst->entries[3] = 1;
+        BeginCompare();
+        CompareObjects(&sets);
+        printf("a changed shared byte: %s\n%s", g_firstKey, g_detail.Data());
+        Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureProgram#1.entries[]") == 0, "a changed byte is reported once");
+    }
+    free(text);
+    free(changed);
+}
+
+void EmptyTargetSelfTest()
+{
+    printf("empty targets that are not null\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureProgram* program = (FixtureProgram*)Fresh(sizeof(FixtureProgram));
+    FixtureNamed* named = (FixtureNamed*)Fresh(sizeof(FixtureNamed));
+    new (&named->list) BlockVector<char*>();
+    new (&named->idents) BlockVector<Ref<char> >();
+    program->count = 0;
+    program->entries = (int*)Fresh(1);
+    named->count = 0;
+    named->words = (char**)Fresh(1);
+    static const char* const programNames[3] = { "count", "entries", "entries[]" };
+    unsigned short programFields[3];
+    for (int i = 0; i < 3; i++)
+        programFields[i] = FieldIndex(ROK_FIXTUREPROGRAM, programNames[i]);
+    unsigned short namedFields[2] = { FieldIndex(ROK_FIXTURENAMED, "count"), FieldIndex(ROK_FIXTURENAMED, "words") };
+    unsigned short fields[5];
+    memcpy(fields, programFields, sizeof programFields);
+    memcpy(fields + 3, namedFields, sizeof namedFields);
+    ReplaySlotSets sets = { "empty", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5 };
+    unsigned char kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTURENAMED };
+    void* roots[2] = { program, named };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 2, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(strstr(text, "  r FixtureProgram#1.entries alloc#1\n  r FixtureProgram#1.entries[] [0]") != nullptr, "an empty blob is named, with no bytes");
+    Check(strstr(text, "  r FixtureNamed#1.words [0]\n") != nullptr, "an empty array of strings is a length of nothing");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureProgram* rebuiltProgram = (FixtureProgram*)ReplayResolveObject("FixtureProgram#1", nullptr, g_objects, AllocObject);
+    FixtureNamed* rebuiltNamed = (FixtureNamed*)ReplayResolveObject("FixtureNamed#1", nullptr, g_objects, AllocObject);
+    Check(rebuiltProgram != nullptr && rebuiltProgram->entries != nullptr, "a non-null empty blob is not null when replayed");
+    Check(rebuiltProgram != nullptr && rebuiltProgram->entries != nullptr && g_objects.Pointer(ROK_ALLOC, 1) == rebuiltProgram->entries, "and the name leads to it");
+    Check(rebuiltNamed != nullptr && rebuiltNamed->words != nullptr, "nor is a non-null empty array of strings");
+    g_rootKinds[0] = ROK_FIXTUREPROGRAM;
+    g_rootKinds[1] = ROK_FIXTURENAMED;
+    g_rootObjects[0] = rebuiltProgram;
+    g_rootObjects[1] = rebuiltNamed;
+    g_rootCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "both compare equal");
+    free(text);
+}
+
+void RebindSelfTest()
+{
+    printf("a name bound again\n");
+    ResetBlock();
+    static char cells[64];
+    for (unsigned i = 0; i < 20000; i++)
+        g_objects.Bind(ROK_ALLOC, 1, cells + i % 64);
+    Check(g_objects.Find(ROK_ALLOC, cells + 19999 % 64) == 1, "the last pointer bound to a name is found by it");
+    Check(g_objects.Find(ROK_ALLOC, cells + 19998 % 64) == 0, "and the one it replaced is not");
+    Check(g_objects.Pointer(ROK_ALLOC, 1) == cells + 19999 % 64, "the name leads to the last one, after more rebinds than the table has slots");
+    g_objects.Bind(ROK_ALLOC, 2, cells);
+    Check(g_objects.Find(ROK_ALLOC, cells) == 2 && g_objects.Find(ROK_ALLOC, cells + 19999 % 64) == 1, "another name is still told apart");
+}
+
+void NestedVectorSelfTest()
+{
+    printf("vectors of vectors\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureNest* nest = (FixtureNest*)Fresh(sizeof(FixtureNest));
+    new (&nest->mids) BlockVector<FixtureMid>();
+    new (&nest->rows) BlockVector<FixtureRow>();
+    nest->id = 7;
+    for (int m = 0; m < 2; m++) {
+        FixtureMid mid;
+        new (&mid) FixtureMid();
+        mid.tag = 10 + m;
+        for (int l = 0; l < 2; l++) {
+            FixtureLeaf leaf;
+            new (&leaf) FixtureLeaf();
+            leaf.kind = 100 * m + l;
+            leaf.steps.PushBack((short)(m + l));
+            leaf.steps.PushBack((short)(m + l + 1));
+            leaf.names.PushBack(BlockText(l == 0 ? "a" : "b"));
+            mid.leaves.PushBack(leaf);
+        }
+        nest->mids.PushBack(mid);
+    }
+    FixtureRow row;
+    new (&row) FixtureRow();
+    row.PushBack(4);
+    row.PushBack(5);
+    nest->rows.PushBack(row);
+
+    static const char* const fieldNames[3] = { "id", "mids", "rows" };
+    unsigned short fields[3];
+    for (int i = 0; i < 3; i++)
+        fields[i] = FieldIndex(ROK_FIXTURENEST, fieldNames[i]);
+    ReplaySlotSets sets = { "nest", 0, nullptr, 0, nullptr, 0, fields, 3, fields, 3 };
+    unsigned char kind = ROK_FIXTURENEST;
+    void* root = nest;
+    Recorder recorder;
+    ReplayText calls;
+    recorder.Record(&kind, &root, 1, sets);
+    printf("%s", recorder.text.Data());
+    const char* first = recorder.text.Data();
+    Check(strstr(first, "  r FixtureNest#1.mids [2/2]\n  r FixtureNest#1.mids[0].tag 10\n  r FixtureNest#1.mids[0].leaves [2/2]\n  r FixtureNest#1.mids[0].leaves[0].kind 0\n") != nullptr,
+          "a vector inside an element is a bracket under the element's path, and its elements are lines under it");
+    Check(strstr(first, "  r FixtureNest#1.mids[1].leaves[1].kind 101\n  r FixtureNest#1.mids[1].leaves[1].steps [2/2] 0:02000300\n  r FixtureNest#1.mids[1].leaves[1].names [1/1]\n  r FixtureNest#1.mids[1].leaves[1].names[0] \"b\"\n") != nullptr,
+          "to any depth, a scalar vector as a run and a vector of strings as lines");
+    Check(strstr(first, "  r FixtureNest#1.rows [1/1]\n  r FixtureNest#1.rows[0].cells [2/2] 0:04000500\n") != nullptr, "an element that is itself a vector is its field named for its base");
+    calls.AddText(recorder.text);
+
+    nest->mids[1].leaves[0].steps[1] = 9;
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r FixtureNest#1.mids[1].leaves[0].steps 1:0900\n") == 0, "one inner element that changed is one line, at its path");
+    calls.AddText(recorder.text);
+    nest->mids[0].leaves[1].names[0] = BlockText("z");
+    recorder.Record(&kind, &root, 1, sets);
+    Check(strcmp(recorder.text.Data(), "  r FixtureNest#1.mids[0].leaves[1].names[0] \"z\"\n") == 0, "and so is a string");
+    calls.AddText(recorder.text);
+    FixtureLeaf extra;
+    new (&extra) FixtureLeaf();
+    extra.kind = 5;
+    extra.steps.PushBack(1);
+    nest->mids[0].leaves.PushBack(extra);
+    recorder.Record(&kind, &root, 1, sets);
+    printf("%s", recorder.text.Data());
+    Check(strstr(recorder.text.Data(), "  r FixtureNest#1.mids[0].leaves [3/4]\n  r FixtureNest#1.mids[0].leaves[2].kind 5\n  r FixtureNest#1.mids[0].leaves[2].steps [1/1] 0:0100\n") != nullptr && strstr(recorder.text.Data(), "leaves[0]") == nullptr, "a vector that grew writes its new element in full");
+    calls.AddText(recorder.text);
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    FixtureNest* rebuilt = (FixtureNest*)ReplayResolveObject("FixtureNest#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->mids.Size() == 2 && rebuilt->mids[0].leaves.Size() == 3 && rebuilt->mids[0].leaves.Capacity() == 4, "the replayer rebuilds the vectors at every depth");
+    Check(rebuilt != nullptr && rebuilt->mids[1].leaves[0].steps.Size() == 2 && rebuilt->mids[1].leaves[0].steps[1] == 9 && rebuilt->mids[1].leaves[1].kind == 101, "with the inner element that changed");
+    Check(rebuilt != nullptr && strcmp(rebuilt->mids[0].leaves[1].names[0], "z") == 0 && rebuilt->mids[0].leaves[2].steps[0] == 1 && rebuilt->mids[0].leaves[0].steps[1] == 1, "and the strings, the new element, and the old ones carried over the growth");
+    Check(rebuilt != nullptr && rebuilt->rows.Size() == 1 && rebuilt->rows[0].Size() == 2 && rebuilt->rows[0][1] == 5, "a vector that is an element too");
+
+    g_rootKinds[0] = ROK_FIXTURENEST;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored vectors compare equal");
+    rebuilt->mids[1].leaves[0].steps[1] = 8;
+    rebuilt->mids[0].leaves[2].kind = 6;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("changed inner elements: %s\n%s", g_firstKey, g_detail.Data());
+    Check(strstr(g_detail.Data(), "FixtureNest#1.mids[1].leaves[0].steps[1]: recorded 0900, replayed 0800") != nullptr, "an inner element is reported at its path");
+    Check(strstr(g_detail.Data(), "FixtureNest#1.mids[0].leaves[2].kind: recorded 5, replayed 6") != nullptr && g_diffs == 2, "and so is a field of an inner struct");
+    rebuilt->mids[1].leaves[0].steps[1] = 9;
+    rebuilt->mids[0].leaves[2].kind = 5;
+    rebuilt->mids[0].leaves[1].steps.PushBack(3);
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 2 && strcmp(g_firstKey, "FixtureNest#1.mids[0].leaves[1].steps.length") == 0 && strstr(g_detail.Data(), "FixtureNest#1.mids[0].leaves[1].steps.capacity") != nullptr, "an inner vector of another length is reported at its length, and its capacity");
+
+    ResetBlock();
+    RestoreText(calls.Data(), sets);
+    Recorder replayed;
+    rebuilt = (FixtureNest*)ReplayResolveObject("FixtureNest#1", nullptr, g_objects, AllocObject);
+    void* rebuiltRoot = rebuilt;
+    replayed.Record(&kind, &rebuiltRoot, 1, sets);
+    Check(strstr(replayed.text.Data(), "  r FixtureNest#1.mids[0].leaves [3/4]\n") != nullptr && strstr(replayed.text.Data(), "  r FixtureNest#1.mids[1].leaves[0].steps [2/2] 0:01000900\n") != nullptr, "the rebuilt object records the vectors as they were");
+    calls.Free();
+}
+
+#pragma push_macro("g_losTables")
+#undef g_losTables
+
+LosTables& LosTablesOf()
+{
+    return g_simGlobals->g_losTables;
+}
+
+#pragma pop_macro("g_losTables")
+
+#pragma push_macro("g_missionOrderTableVec")
+#undef g_missionOrderTableVec
+
+BlockVector<OrderTableEntry>& OrderEntriesOf()
+{
+    return g_simGlobals->g_missionOrderTableVec;
+}
+
+#pragma pop_macro("g_missionOrderTableVec")
+
+int RestoreBlockText(const char* text)
+{
+    char* copy = (char*)malloc(strlen(text) + 1);
+    strcpy(copy, text);
+    int lines = 0;
+    for (char* p = copy; *p != '\0'; p = strchr(p, '\0') + 1) {
+        char* end = strchr(p, '\n');
+        *end = '\0';
+        char* space = strchr(p + 4, ' ');
+        *space = '\0';
+        const ReplayField* f = FindBlockField(p + 4);
+        Check(f != nullptr && ApplyBlockVector(*f, p + 4, space + 1, true), "a block line restores");
+        lines++;
+        p = end;
+    }
+    free(copy);
+    return lines;
+}
+
+void SimVectorSelfTest()
+{
+    printf("a block vector in the sim globals\n");
+    ResetBlock();
+    ReplayClearFailure();
+    for (int t = 0; t < 4; t++) {
+        LosTable table;
+        new (&table) LosTable();
+        if (t == 3) {
+            table.Resize(6);
+            LosStep first = { 1, 2 };
+            LosStep second = { 3, 4 };
+            table[5].PushBack(first);
+            table[5].PushBack(second);
+        }
+        LosTablesOf().PushBack(table);
+    }
+    OrderTableEntry entry;
+    memset(&entry, 0, sizeof entry);
+    entry.value = BlockText("stop");
+    entry.drawMask = 5;
+    OrderEntriesOf().PushBack(entry);
+
+    const ReplayField& tables = kReplayFields[RF_SIMGLOBALS_G_LOSTABLES];
+    const ReplayField& orders = kReplayFields[RF_SIMGLOBALS_G_MISSIONORDERTABLEVEC];
+    Check(tables.kind == RK_VECTOR && orders.kind == RK_VECTOR, "a BlockVector global is a field of kind vector");
+    ReplayKnown known;
+    ReplayText out;
+    ReplayText scratch;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayEmitField(out, known, *table, 'r', tables.name, ReplayFieldView(tables), BlockBase(tables), scratch);
+    ReplayEmitField(out, known, *table, 'r', orders.name, ReplayFieldView(orders), BlockBase(orders), scratch);
+    printf("%s", out.Data());
+    Check(strstr(out.Data(), "  r SimGlobals.g_losTables [4/4]\n  r SimGlobals.g_losTables[0].lines [0/0]\n") != nullptr, "it is written as an object's vector is, under the name of the global");
+    Check(strstr(out.Data(), "  r SimGlobals.g_losTables[3].lines [6/6]\n") != nullptr && strstr(out.Data(), "  r SimGlobals.g_losTables[3].lines[5].steps [2/2]\n  r SimGlobals.g_losTables[3].lines[5].steps[0].a 1\n"
+                                                                                                                   "  r SimGlobals.g_losTables[3].lines[5].steps[0].b 2\n  r SimGlobals.g_losTables[3].lines[5].steps[1].a 3\n") != nullptr,
+          "and its elements, three deep, by path");
+    Check(strstr(out.Data(), "  r SimGlobals.g_missionOrderTableVec [1/1]\n  r SimGlobals.g_missionOrderTableVec[0].value \"stop\"\n  r SimGlobals.g_missionOrderTableVec[0].name null\n  r SimGlobals.g_missionOrderTableVec[0].drawMask 5\n") != nullptr, "a struct with strings too");
+    char* one = strdup(out.Data());
+    LosTablesOf()[3][5][1].b = 9;
+    out.Clear();
+    ReplayEmitField(out, known, *table, 'r', tables.name, ReplayFieldView(tables), BlockBase(tables), scratch);
+    Check(strcmp(out.Data(), "  r SimGlobals.g_losTables[3].lines[5].steps[1].b 9\n") == 0, "one element that changed is one line");
+    char* two = strdup(out.Data());
+
+    ResetBlock();
+    int lines = RestoreBlockText(one);
+    RestoreBlockText(two);
+    Check(lines >= 20 && LosTablesOf().Size() == 4 && LosTablesOf()[3].Size() == 6 && LosTablesOf()[3][5].Size() == 2, "the replayer rebuilds the vectors in the globals");
+    Check(LosTablesOf()[3][5][0].a == 1 && LosTablesOf()[3][5][1].a == 3 && LosTablesOf()[3][5][1].b == 9, "and their elements");
+    Check(OrderEntriesOf().Size() == 1 && strcmp(OrderEntriesOf()[0].value, "stop") == 0 && OrderEntriesOf()[0].name == nullptr && OrderEntriesOf()[0].drawMask == 5, "with the strings");
+    BeginCompare();
+    CompareBlockVector(tables);
+    CompareBlockVector(orders);
+    Check(g_diffs == 0, "the restored globals compare equal");
+    LosTablesOf()[3][5][0].b = 7;
+    OrderEntriesOf()[0].value = BlockText("go");
+    BeginCompare();
+    CompareBlockVector(tables);
+    CompareBlockVector(orders);
+    printf("%s", g_detail.Data());
+    Check(strstr(g_detail.Data(), "SimGlobals.g_losTables[3].lines[5].steps[0].b: recorded 2, replayed 7") != nullptr, "a changed inner element is reported at its path");
+    Check(strstr(g_detail.Data(), "SimGlobals.g_missionOrderTableVec[0].value: recorded \"stop\", replayed \"go\"") != nullptr && g_diffs == 2, "and a changed string");
+    free(one);
+    free(two);
+    out.Free();
+    scratch.Free();
+    delete table;
+}
+
 void GameWriteSelfTest()
 {
     printf("a write to Game through a pointer\n");
@@ -5414,6 +6049,13 @@ int SelfTest(const char* file)
     CapacityTableSelfTest();
     TrackedCountSelfTest();
     SelfPointerSelfTest();
+    CStringSelfTest();
+    BlobSelfTest();
+    SharedBlobSelfTest();
+    EmptyTargetSelfTest();
+    RebindSelfTest();
+    NestedVectorSelfTest();
+    SimVectorSelfTest();
     GameWriteSelfTest();
     if (file == nullptr)
         return 0;

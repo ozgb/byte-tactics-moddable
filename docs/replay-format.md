@@ -383,6 +383,7 @@ the same object is named the same way.
 | Point16 | `(x,y)` |
 | Vec3 | `(x,y,z)` |
 | string | double quotes, C escapes, up to the first NUL |
+| string behind a pointer (`cstring`) | the same, or `null` for a null pointer |
 | pointer to an object (`ref` or `ptr`) | `Unit#17`, `UnitDef#2`, `weapondef#17`, `Unit#17.resourceSlot`, or `null` |
 | object handed to an import | `file#1`, `rec#2`, `bank#1` |
 | random stream | `main` or `load` |
@@ -634,7 +635,7 @@ mode of the elements:
 
 The tool checks the element type against the C++ `BlockVector<T>` with a `static_assert` in the schema header (`Ref<Unit>`, `short`,
 `KeyedCell`), so a vector of another type is a compile error. A `member` may be a path, as `visible.units` for the vector inside the
-embedded `AiUnitList`. Only the fields of an object are vectors, not the block fields.
+embedded `AiUnitList`. A `BlockVector` member of `SimGlobals` is a vector too (see A vector in the sim globals); `Game` has none.
 
 The walker reaches the object of every element of an `object` vector through its `Ref`, as it does through a `Ref` field, so the units a
 window holds only in a vector are recorded and restored. For a `value` vector a bracket line whose capacity or length changed is followed by the
@@ -644,6 +645,122 @@ The replayer allocates `cap` elements with `SimAlloc`, which is what `BlockVecto
 elements. A vector of structs whose capacity changes keeps its old elements, as the module's `Insert` does when it moves them. A
 difference is reported at `<field>.length`, `<field>.capacity`, `<field>[<i>]` (the hex of a scalar element or the handle of an object
 element) or `<field>[<i>].<f>` (a field of a struct element), for example `PlayerAI#1.counts.length: recorded 0, replayed 2`.
+
+### A vector in the sim globals
+
+A `SimGlobals` member that is a `BlockVector` (`g_losTables`, `g_missionOrderTableVec`) is a block field of kind `vector`, with the `elem` an object's vector field has, in `sim_fields`:
+
+```json
+"g_losTables": {"kind": "vector", "elem": {"mode": "value", "kind": "LosTable"}}
+```
+
+It is named as a block field is, `SimGlobals.g_losTables`, and written exactly as an object's vector is: the bracket, and the elements under their path, at every depth (a `LosTable` is
+a vector of `LosLine`s, each a vector of steps):
+
+```
+  r SimGlobals.g_losTables [4/4]
+  r SimGlobals.g_losTables[3].lines [6/6]
+  r SimGlobals.g_losTables[3].lines[5].steps [2/2]
+  r SimGlobals.g_losTables[3].lines[5].steps[1].b 9
+```
+
+A slot that reads or writes the global has it in its `reads` or `writes`, and the walker follows the elements of an `object` vector of a global as it follows those of an object's. A difference is reported at
+`SimGlobals.g_losTables[3].lines[5].steps[0].b`. The generated header checks that the member is a block vector of the type of the element. A `Game` member cannot be a vector.
+
+### Vectors of vectors
+
+A value kind may have `vector` fields of its own, so the element of a vector can hold vectors, to any depth. `{"name": "mids", "kind": "vector", "elem": {"mode": "value", "kind": "Mid"}}`
+in the object, `"Mid": {"type": "Mid", "scope": "value", "fields": [{"name": "leaves", "kind": "vector", "elem": {"mode": "value", "kind": "Leaf"}}, ...]}`, and a `Leaf` with
+`{"name": "steps", "kind": "vector", "elem": {"mode": "scalar", "type": "short"}}` are three deep. A vector in an element is written as any vector is, with the element's path in its name,
+and its own elements are lines under that path:
+
+```
+  r Nest#1.mids [2/2]
+  r Nest#1.mids[0].tag 10
+  r Nest#1.mids[0].leaves [2/2]
+  r Nest#1.mids[0].leaves[1].kind 1
+  r Nest#1.mids[0].leaves[1].steps [2/2] 0:01000200
+  r Nest#1.mids[1].leaves[0].steps 1:0900
+```
+
+The rules of a vector hold at every level. An element that is new (past the length of the last bracket line) is written in full, its inner vectors and theirs included, because the recorder cannot know
+what its slot held before; an old element writes only what changed, so one inner element that changed is the one line `r Nest#1.mids[1].leaves[0].steps 1:0900`. A change of an inner vector's length or capacity writes
+its bracket, and, for a vector of structs or strings, the elements it newly holds. The replayer keeps the old elements, inner vectors included, when a capacity changes. A difference is reported at the path,
+`Nest#1.mids[0].leaves[2].kind`, `Nest#1.mids[1].leaves[0].steps[1]`, `Nest#1.mids[0].leaves[1].steps.length`. The walker follows the `object` vectors of an object, not those inside a vector of structs, so the generator refuses an `object` vector in a value kind with an error until the walker follows it.
+
+A kind that derives from `BlockVector<T>` (`LosTable` is a `BlockVector<LosLine>`) is its own vector: its field has `"base": true` and no `member`, and sits at offset 0, `{"name": "lines", "kind": "vector", "base": true,
+"elem": {"mode": "value", "kind": "Line"}}`. The generated header checks the vector's element type, and that the kind is as big as a block vector.
+
+## Strings behind pointers
+
+A field that holds a pointer to a NUL-terminated string is a field of kind `cstring`: `{"name": "label", "kind": "cstring"}` for a `char*` (or `const char*`),
+and with `"ref": true` for a `Ref<char>`. It is written as the text, in double quotes with C escapes, as an inline `string` is, or `null` for a null pointer, and
+is recorded when it changes since the last line that named it, as any field is:
+
+```
+  r FixtureNamed#1.name "alpha"
+  r FixtureNamed#1.ident "tag \"1\"\n"
+  r FixtureNamed#1.name "beta"
+  r FixtureNamed#1.name null
+```
+
+The replayer allocates the string (with its own allocator, as it allocates an array) and stores the address, or the offset from the block base for a `Ref<char>`, so each
+line leaves a new string. The value must be quoted, and a line that has no allocator to allocate with is refused. A difference is reported at the field, as
+`FixtureNamed#1.name: recorded "beta", replayed "Beta"`; the text is compared, never the address. A walk never follows a string. The generated header checks that
+the member is a pointer to `char` (or a `Ref<char>`).
+
+An array of strings has `"elem": "cstring"` (a `char*` per element) or `"elem": "cstring_ref"` (a `Ref<char>`), and the `ref`, `length` and capacity of any array.
+Its storage is the elements in the object, a `Ref` to them (`"ref": true`), or, with `"raw": true`, a plain pointer to them (`char** names`):
+
+```json
+{"name": "names", "kind": "array", "elem": "cstring", "raw": true, "length": "count"}
+```
+
+It is written as its length in brackets, `r Script#1.names [3]` (`null` when the storage pointer is null), and each element is a line named by its index, `r Script#1.names[0] "idle"`,
+every element after the bracket line, and after that only the elements that changed. The replayer allocates the elements (zeroed, so a null string) when it reads the bracket line. `raw` and the string
+elements are for the fields of an object, not for `Game` or `SimGlobals`, and `raw` is only for strings.
+
+A vector of strings is `{"name": "words", "kind": "vector", "elem": {"mode": "cstring"}}`, with `"ref": true` in the element for `BlockVector<Ref<char>>`. It is written as a
+vector of structs is: the bracket `r Script#1.words [2/4]`, and a line per element named by its index, `r Script#1.words[1] "run"`, for each element that is new or changed since the last
+line that named it, and the replayer keeps the old elements when the capacity changes. A difference is reported at `<field>.length`, `<field>.capacity` or `<field>[<i>]`.
+
+| Annotation | Holds | Written as |
+|---|---|---|
+| `{"kind": "cstring"}` | `char*` | `"text"`, `null` |
+| `{"kind": "cstring", "ref": true}` | `Ref<char>` | `"text"`, `null` |
+| `{"kind": "array", "elem": "cstring"}`, `"cstring_ref"` | `length` strings | `[3]`, then `names[0] "text"` per element |
+| `{"kind": "vector", "elem": {"mode": "cstring"}}`, with `"ref": true` | `BlockVector<char*>` | `[2/4]`, then `words[0] "text"` per element |
+
+## Bytes behind a pointer
+
+A `ptr` may carry `"blob": {"length": EXPRESSION}`: the pointer leads to bytes the module reads (a block of bytecode), and the recording holds them.
+The length is an expression over members of the same object, as an array's is (an integer, or one or two factors of `member`, `member>>k`, `member+a` or `member+a>>k`,
+joined by `*`), in bytes: `count*4` for `int* entries` of `count` ints.
+
+```json
+{"name": "entries", "kind": "ptr", "target": "alloc", "blob": {"length": "count*4"}},
+{"name": "bits", "kind": "ptr", "target": "alloc", "blob": {"length": "(count+7)>>3"}}
+```
+
+The pointer is written as any `ptr` is, `alloc#1`, and the bytes are a second field of the object, named `entries[]` (the field name and `[]`), written as an array of bytes is,
+whole at the first sight of the pointer's target and a run of changed bytes after that:
+
+```
+  r FixtureProgram#1.count 5
+  r FixtureProgram#1.entries alloc#1
+  r FixtureProgram#1.entries[] [20] 0:0a000000140000001e0000002800000032000000
+  r FixtureProgram#1.entries[] 8:4d
+  r FixtureProgram#1.entries alloc#4
+  r FixtureProgram#1.entries[] [20] 0:0a000000140000004d0000002800000032000000
+```
+
+The bytes are kept per target, not per holder: a second pointer to a target that has been written writes no bytes and replays to the same block, and a changed byte is one delta line and one difference. A pointer to another block writes all its bytes again, even when they are the same, since the replayer's new target is empty until a line fills it; a null pointer is `null` on both lines;
+a change of the length is a new bracket. The line of the bytes follows the line of the pointer, and the members of the length have to be recorded (in the slot's
+sets), as an array's have. Both fields are in a slot's sets when the pointer is, and the target is a state kind named at first sight, as for a `Game` ref (`alloc` is one): no table, sites, kinds or vtable.
+
+The replayer allocates the bytes, zeroed, when it reads a bracket line, fills them from the lines, stores the pointer, and names the new block with the ordinal the pointer's line gave, so the pointer still
+compares as the object it was named. A difference is reported at `FixtureProgram#1.entries[]` as an array's is (`byte 12 of 24: recorded 28, replayed 01`). A `ptr` with no `blob` is as before:
+an empty copy of its target kind (see A pointer to an object no line named), and no bytes.
 
 ## Snapshots
 

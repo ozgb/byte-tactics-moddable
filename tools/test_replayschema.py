@@ -1195,7 +1195,7 @@ class Vectors(unittest.TestCase):
         files, errors, model = self.generated()
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"]],
+        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"] if v["owner"] == "PlayerAI"],
                          [("object", "Unit", "Ref<Unit>"), ("value", "KeyedCell", "KeyedCell"), ("scalar", "", "short")])
         self.assertIn("{ RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },", text)
         self.assertIn("{ RV_VALUE, ROK_KEYEDCELL, sizeof(KeyedCell) },", text)
@@ -1208,7 +1208,7 @@ class Vectors(unittest.TestCase):
         row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "visibleUnits",')][0]
         self.assertIn("offsetof(PlayerAI, visible.units)", row)
         self.assertIn("RK_VECTOR, ROK_UNIT,", row)
-        self.assertTrue(row.rstrip(" },").endswith(", 1"), row)
+        self.assertTrue(row.rstrip(" },").endswith(", %d" % (1 + len(rs.load_annotations(fixtures=True)["fixture_sim"]))), row)
 
     def test_a_header_that_needs_the_packing_of_the_game_is_included_packed(self):
         files, _, _ = self.generated()
@@ -1217,7 +1217,7 @@ class Vectors(unittest.TestCase):
     def test_a_vector_needs_an_element_mode(self):
         ann = annotations()
         del self.field(ann, "counts")["elem"]
-        self.assertTrue(any("PlayerAI.counts: a vector needs an `elem` with a mode of object, scalar, value" in e for e in self.errors(ann)))
+        self.assertTrue(any("PlayerAI.counts: a vector needs an `elem` with a mode of cstring, object, scalar, value" in e for e in self.errors(ann)))
         ann = annotations()
         self.field(ann, "counts")["elem"] = {"mode": "pointer"}
         self.assertTrue(any("PlayerAI.counts: a vector needs an `elem`" in e for e in self.errors(ann)))
@@ -1233,10 +1233,10 @@ class Vectors(unittest.TestCase):
         self.field(ann, "cells")["elem"] = {"mode": "value", "kind": "Unit"}
         self.assertTrue(any("PlayerAI.cells: a value element needs a `kind` that is a value kind" in e for e in self.errors(ann)))
 
-    def test_only_the_fields_of_a_state_kind_are_vectors(self):
+    def test_only_the_fields_of_a_state_or_value_kind_are_vectors(self):
         ann = annotations()
-        ann["objects"]["KeyedCell"]["fields"].append({"name": "v", "kind": "vector", "elem": {"mode": "scalar", "type": "int"}})
-        self.assertTrue(any("KeyedCell.v: only the fields of a state kind can be vectors" in e for e in self.errors(ann)))
+        ann["objects"]["weapondef"]["fields"].append({"name": "v", "kind": "vector", "elem": {"mode": "scalar", "type": "int"}})
+        self.assertTrue(any("weapondef.v: only the fields of a state or value kind can be vectors" in e for e in self.errors(ann)))
 
 
 class Snapshots(unittest.TestCase):
@@ -2468,6 +2468,252 @@ class RefCTypes(unittest.TestCase):
         ann = annotations()
         self.owner(ann)["kind"] = "ptr"
         self.has(ann, "FixtureEye.owner: only a ref or an array of refs has a `ctype`")
+
+
+class CStrings(unittest.TestCase):
+    """A pointer to a NUL-terminated string is a field kind, and the element kind of an array and a vector."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, name):
+        return next(f for f in ann["objects"]["FixtureNamed"]["fields"] if f["name"] == name)
+
+    def row(self, text, name):
+        return [l for l in text.split("\n") if l.startswith('    { "%s", offsetof(FixtureNamed, %s)' % (name, name))][0]
+
+    def test_a_char_pointer_and_a_ref_to_char_are_kinds_of_their_own(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn("RK_CSTRING, 0,", self.row(text, "name"))
+        self.assertIn("RK_CSTRINGREF, 0,", self.row(text, "ident"))
+
+    def test_the_header_checks_the_declared_types(self):
+        text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
+        self.assertIn('__is_same(__remove_cv(__remove_pointer(decltype(((FixtureNamed*)nullptr)->name))), char), "FixtureNamed::name is a char pointer");', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->ident), Ref<char>), "FixtureNamed::ident is a Ref<char>");', text)
+
+    def test_an_array_of_strings_is_one_field_with_its_storage_in_the_spec(self):
+        files, _, model = self.generated()
+        text = files[rs.FIXTURE_SCHEMA_H]
+        for name, spec in (("words", "{ 4, 0, 0, "), ("refWords", "{ 4, 1, 0, "), ("fixed", "{ 4, 0, sizeof(((FixtureNamed*)nullptr)->fixed), ")):
+            self.assertIn("RK_CSTRINGS,", self.row(text, name))
+            self.assertTrue(any(l.startswith("    " + spec) and "FixtureNamed, count" in l for l in text.split("\n")), (name, spec))
+        self.assertIn("{ 1, 0, 0 } }, 1, 1 },", text)
+        self.assertIn("{ 1, 0, 0 } }, 0, 2 },", text)
+        self.assertIn("{ 1, 0, 0 } }, 0, 1 },", text)
+        self.assertEqual([(a["raw"], a["strings"], a["ref"]) for a in model["arrays"][-5:-2]], [(True, 1, False), (False, 2, True), (False, 1, False)])
+
+    def test_the_header_checks_the_storage_and_the_element_type_of_an_array(self):
+        text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
+        self.assertIn('static_assert(__is_same(decltype(&((FixtureNamed*)nullptr)->words[0]), char**), "FixtureNamed::words holds char*");', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->refWords), Ref<Ref<char>>), "FixtureNamed::refWords is a Ref<Ref<char>>");', text)
+        self.assertIn('static_assert(sizeof(((FixtureNamed*)nullptr)->fixed) % 4 == 0, "FixtureNamed::fixed holds whole elements");', text)
+
+    def test_a_vector_of_strings_has_a_mode_for_each_pointer_type(self):
+        files, _, _ = self.generated()
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn("    { RV_CSTRING, 0, sizeof(char*) },\n    { RV_CSTRINGREF, 0, sizeof(Ref<char>) },", text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->list)::value_type, char*), "FixtureNamed::list holds char*");', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->idents)::value_type, Ref<char>), "FixtureNamed::idents holds Ref<char>");', text)
+
+    def test_the_real_schema_has_none_of_it(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        self.assertNotIn("CSTRING", files[rs.SCHEMA_H].replace("#include", ""))
+        self.assertEqual(files[rs.JSON_OUT].count("cstring"), 0)
+
+    def test_a_walk_never_follows_a_string(self):
+        for kind in ("cstring", "cstringref", "cstrings"):
+            self.assertNotIn(kind, rs.WALKABLE)
+
+    def test_a_string_array_is_checked(self):
+        ann = annotations()
+        self.field(ann, "words")["raw"] = "yes"
+        self.has(ann, "FixtureNamed.words: `raw` is true on an array of strings that has no `ref`")
+        ann = annotations()
+        self.field(ann, "refWords")["raw"] = True
+        self.has(ann, "FixtureNamed.refWords: `raw` is true on an array of strings that has no `ref`")
+        ann = annotations()
+        del self.field(ann, "fixed")["length"]
+        self.has(ann, "FixtureNamed.fixed: an array needs a `length`")
+        ann = annotations()
+        ann["game_fields"]["visibilityMask"]["elem"] = "cstring"
+        self.has(ann, "Game.visibilityMask: only the field of an object is an array of strings")
+
+    def test_raw_is_for_strings(self):
+        ann = annotations()
+        ann["objects"]["Player"]["fields"].append({"name": "explored", "kind": "array", "elem": "u8", "raw": True, "length": "exploredSize"})
+        self.has(ann, "Player.explored: `raw` is true on an array of strings")
+
+    def test_a_string_vector_element_is_checked(self):
+        ann = annotations()
+        self.field(ann, "list")["elem"] = {"mode": "cstring", "kind": "Unit"}
+        self.has(ann, "FixtureNamed.list: a string element is")
+        ann = annotations()
+        self.field(ann, "idents")["elem"]["ref"] = "yes"
+        self.has(ann, "FixtureNamed.idents: a string element is")
+
+
+class Blobs(unittest.TestCase):
+    """A ptr with a blob records the bytes it leads to, as the array of a companion field named `<field>[]`."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, name):
+        return next(f for f in ann["objects"]["FixtureProgram"]["fields"] if f["name"] == name)
+
+    def test_a_blob_is_a_companion_field_right_after_its_pointer(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        names = [f["name"] for f in model["object_fields"] if f["object"] == "FixtureProgram"]
+        self.assertEqual(names, ["count", "entries", "entries[]", "bits", "bits[]", "plain"])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        row = [l for l in text.split("\n") if l.startswith('    { "entries[]", offsetof(FixtureProgram, entries)')][0]
+        self.assertIn("RK_BLOB, ROK_ALLOC,", row)
+        self.assertTrue(row.endswith(", 8 },"), row)
+
+    def test_the_bytes_are_a_raw_array_with_the_length_expression(self):
+        text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
+        self.assertIn("(unsigned char)sizeof(((FixtureProgram*)nullptr)->count), 0 }, { 4, 0, 0 } }, 1, 0 },", text)
+        self.assertIn("(unsigned char)sizeof(((FixtureProgram*)nullptr)->count), 3, 7u }, { 1, 0, 0 } }, 1, 0 },", text)
+
+    def test_a_ptr_without_a_blob_has_no_companion(self):
+        _, _, model = self.generated()
+        self.assertNotIn("plain[]", [f["name"] for f in model["object_fields"]])
+
+    def test_a_row_that_names_the_pointer_brings_the_bytes_into_the_set(self):
+        model, _ = build([row("UpdatePlayerEconomy", "field_read", "FixtureProgram::entries")])
+        names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
+        s = model["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]
+        self.assertEqual([names[i] for i in s["objectReads"]], ["FixtureProgram.entries", "FixtureProgram.entries[]"])
+
+    def test_the_real_schema_has_none_of_it(self):
+        files, _, _ = rs.generate(rs.read_rows())
+        self.assertNotIn("RK_BLOB", files[rs.SCHEMA_H])
+
+    def test_a_blob_is_checked(self):
+        ann = annotations()
+        self.field(ann, "count")["blob"] = {"length": "count"}
+        self.has(ann, "FixtureProgram.count: only a ptr has a `blob`")
+        ann = annotations()
+        self.field(ann, "entries")["blob"] = {"size": 4}
+        self.has(ann, "FixtureProgram.entries: a blob is {\"length\": EXPRESSION}")
+        ann = annotations()
+        self.field(ann, "entries")["blob"] = {"length": "count*count*2"}
+        self.has(ann, "FixtureProgram.entries: the length `count*count*2` is not one or two factors")
+        ann = annotations()
+        self.field(ann, "entries")["target"] = "Unit"
+        self.has(ann, "FixtureProgram.entries: the target Unit of a blob has a table")
+
+
+class NestedVectors(unittest.TestCase):
+    """A value kind may have vector fields, so a vector holds vectors to any depth; a kind that derives from BlockVector is its own vector."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, kind, name):
+        return next(f for f in ann["objects"][kind]["fields"] if f["name"] == name)
+
+    def test_a_value_kind_has_vector_rows_like_a_state_kind(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn('{ "leaves", offsetof(FixtureMid, leaves), sizeof(((FixtureMid*)nullptr)->leaves), ROK_FIXTUREMID, RK_VECTOR,', text)
+        self.assertIn('{ "steps", offsetof(FixtureLeaf, steps),', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureMid*)nullptr)->leaves)::value_type, FixtureLeaf), "FixtureMid::leaves holds FixtureLeaf");', text)
+
+    def test_the_kind_that_is_a_vector_has_its_field_at_offset_zero(self):
+        text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
+        self.assertIn('{ "cells", 0, sizeof(FixtureRow), ROK_FIXTUREROW, RK_VECTOR,', text)
+        self.assertIn('static_assert(sizeof(FixtureRow) == 16, "FixtureRow::cells is a block vector");', text)
+        self.assertIn('static_assert(__is_same(FixtureRow::value_type, short), "FixtureRow::cells holds short");', text)
+
+    def test_the_real_schema_has_a_vector_in_no_value_kind(self):
+        _, _, model = rs.generate(rs.read_rows())
+        scopes = {o["name"]: o["scope"] for o in model["objects"]}
+        self.assertEqual([f for f in model["object_fields"] if f["kind"] == "vector" and scopes[f["object"]] == "value"], [])
+
+    def test_an_object_vector_in_a_value_kind_is_refused(self):
+        ann = annotations()
+        self.assertEqual(ann["objects"]["FixtureMid"]["scope"], "value")
+        self.field(ann, "FixtureMid", "leaves")["elem"] = {"mode": "object", "kind": "FixtureProgram"}
+        self.has(ann, "FixtureMid.leaves: a vector of objects in a value kind is not followed by the walker")
+
+    def test_base_is_checked(self):
+        ann = annotations()
+        self.field(ann, "FixtureRow", "cells")["member"] = "cells"
+        self.has(ann, "FixtureRow.cells: a vector that is the base class of its kind has no `member`")
+        ann = annotations()
+        self.field(ann, "FixtureRow", "cells")["base"] = "yes"
+        self.has(ann, "FixtureRow.cells: `base` is true")
+
+
+class SimVectors(unittest.TestCase):
+    """A BlockVector member of SimGlobals is a field of kind vector, written as an object's vector field is."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def test_the_field_row_names_the_vector_spec(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn('{ "SimGlobals.g_losTables", offsetof(SimGlobals, g_losTables), 16, RB_SIM, RK_VECTOR, 1 },', text)
+        self.assertIn('{ "SimGlobals.g_missionOrderTableVec", offsetof(SimGlobals, g_missionOrderTableVec), 16, RB_SIM, RK_VECTOR, 2 },', text)
+        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"][:2]], [("value", "FixtureLosTable", "LosTable"), ("value", "FixtureOrderEntry", "OrderTableEntry")])
+
+    def test_the_header_checks_the_member_type(self):
+        text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
+        self.assertIn('static_assert(sizeof(decltype(((SimGlobals*)nullptr)->g_losTables)) == 16, "SimGlobals.g_losTables is a block vector");', text)
+        self.assertIn('static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_losTables)::value_type, LosTable), "SimGlobals.g_losTables holds LosTable");', text)
+        self.assertIn('static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_missionOrderTableVec)::value_type, OrderTableEntry)', text)
+
+    def test_the_real_schema_has_no_vector_in_the_block(self):
+        files, _, model = rs.generate(rs.read_rows())
+        self.assertEqual([f["name"] for f in model["fields"] if f["kind"] == "vector"], [])
+
+    def test_a_test_only_global_is_in_no_slot_set(self):
+        real, _ = rs.build(rs.load_annotations(), rs.read_rows(), rs.read_assignment())
+        both, _ = rs.build(rs.load_annotations(fixtures=True), rs.read_rows(), rs.read_assignment())
+        for sub, spec in both["subsystems"].items():
+            for slot, s in spec["slots"].items():
+                self.assertEqual(s["reads"], real["subsystems"][sub]["slots"][slot]["reads"], (sub, slot))
+                self.assertEqual(s["writes"], real["subsystems"][sub]["slots"][slot]["writes"], (sub, slot))
+
+    def test_a_vector_field_of_the_block_is_checked(self):
+        ann = annotations()
+        ann["sim_fields"]["g_losTables"]["extra"] = 1
+        self.has(ann, "SimGlobals.g_losTables: a vector field of the block is")
+        ann = annotations()
+        del ann["sim_fields"]["g_losTables"]["elem"]
+        self.has(ann, "SimGlobals.g_losTables: a vector needs an `elem`")
+        ann = annotations()
+        ann["sim_fields"]["g_losTables"]["elem"]["kind"] = "Unit"
+        self.has(ann, "SimGlobals.g_losTables: a value element needs a `kind` that is a value kind")
+
+    def test_a_game_member_is_not_a_vector(self):
+        ann = annotations()
+        ann["game_fields"]["tidal"] = {"kind": "vector", "elem": {"mode": "scalar", "type": "int"}}
+        self.has(ann, "Game.tidal: a vector is a member of SimGlobals, not of Game")
 
 
 class Committed(unittest.TestCase):

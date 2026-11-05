@@ -85,6 +85,10 @@
 #undef g_lastPlaceHeight
 #pragma push_macro("g_lastPlaceMetalSum")
 #undef g_lastPlaceMetalSum
+#pragma push_macro("g_losTables")
+#undef g_losTables
+#pragma push_macro("g_missionOrderTableVec")
+#undef g_missionOrderTableVec
 #pragma push_macro("g_movementClasses")
 #undef g_movementClasses
 static const void* const kReplayCodeOrderNotify[] = {
@@ -219,6 +223,16 @@ enum ReplayObjectKindId {
     ROK_FIXTUREHEAP,
     ROK_FIXTURENOTIFY,
     ROK_FIXTURETALLY,
+    ROK_FIXTURENAMED,
+    ROK_FIXTUREPROGRAM,
+    ROK_FIXTURENEST,
+    ROK_FIXTUREMID,
+    ROK_FIXTURELEAF,
+    ROK_FIXTUREROW,
+    ROK_FIXTURELOSTABLE,
+    ROK_FIXTURELOSLINE,
+    ROK_FIXTURELOSSTEP,
+    ROK_FIXTUREORDERENTRY,
     ROK_COUNT
 };
 
@@ -269,17 +283,24 @@ static const ReplayField kReplayFields[] = {
     { "SimGlobals.g_meteorScheduleGap", offsetof(SimGlobals, g_meteorScheduleGap), 4, RB_SIM, RK_I32 },
     { "SimGlobals.g_lastPlaceHeight", offsetof(SimGlobals, g_lastPlaceHeight), 4, RB_SIM, RK_I32 },
     { "SimGlobals.g_lastPlaceMetalSum", offsetof(SimGlobals, g_lastPlaceMetalSum), 4, RB_SIM, RK_I32 },
+    { "SimGlobals.g_losTables", offsetof(SimGlobals, g_losTables), 16, RB_SIM, RK_VECTOR, 1 },
+    { "SimGlobals.g_missionOrderTableVec", offsetof(SimGlobals, g_missionOrderTableVec), 16, RB_SIM, RK_VECTOR, 2 },
     { "rng.main", 0, 4, RB_RNG, RK_U32 },
     { "rng.load", 1, 4, RB_RNG, RK_U32 },
     { "rng.seed", 2, 4, RB_RNG, RK_U32 },
 };
-static const unsigned kReplayFieldCount = 49;
+static const unsigned kReplayFieldCount = 51;
 
 static const ReplayArraySpec kReplayArrays[] = {
     { 2, 1, 0, { { offsetof(Game, width), (unsigned char)sizeof(((Game*)nullptr)->width), 1 }, { offsetof(Game, height), (unsigned char)sizeof(((Game*)nullptr)->height), 1 } } },
     { 1, 1, 0, { { offsetof(Player, exploredSize), (unsigned char)sizeof(((Player*)nullptr)->exploredSize), 0 }, { 1, 0, 0 } } },
     { 1, 1, 0, { { offsetof(UnitDef, footprintx), (unsigned char)sizeof(((UnitDef*)nullptr)->footprintx), 0 }, { offsetof(UnitDef, footprintz), (unsigned char)sizeof(((UnitDef*)nullptr)->footprintz), 0 } } },
     { 4, 1, 0, { { offsetof(MovementClass, width), (unsigned char)sizeof(((MovementClass*)nullptr)->width), 0 }, { offsetof(MovementClass, height), (unsigned char)sizeof(((MovementClass*)nullptr)->height), 4, 15u } } },
+    { 4, 0, 0, { { offsetof(FixtureNamed, count), (unsigned char)sizeof(((FixtureNamed*)nullptr)->count), 0 }, { 1, 0, 0 } }, 1, 1 },
+    { 4, 1, 0, { { offsetof(FixtureNamed, count), (unsigned char)sizeof(((FixtureNamed*)nullptr)->count), 0 }, { 1, 0, 0 } }, 0, 2 },
+    { 4, 0, sizeof(((FixtureNamed*)nullptr)->fixed), { { offsetof(FixtureNamed, count), (unsigned char)sizeof(((FixtureNamed*)nullptr)->count), 0 }, { 1, 0, 0 } }, 0, 1 },
+    { 1, 0, 0, { { offsetof(FixtureProgram, count), (unsigned char)sizeof(((FixtureProgram*)nullptr)->count), 0 }, { 4, 0, 0 } }, 1, 0 },
+    { 1, 0, 0, { { offsetof(FixtureProgram, count), (unsigned char)sizeof(((FixtureProgram*)nullptr)->count), 3, 7u }, { 1, 0, 0 } }, 1, 0 },
 };
 
 static const ReplayTableSpec kReplayTables[] = {
@@ -309,6 +330,15 @@ static_assert(sizeof(((UnitDef*)nullptr)->yardmap) == sizeof(unsigned), "UnitDef
 static_assert(sizeof(((MovementClass*)nullptr)->width) == 1 || sizeof(((MovementClass*)nullptr)->width) == 2 || sizeof(((MovementClass*)nullptr)->width) == 4, "MovementClass::cells: width is a byte, a short or an int");
 static_assert(sizeof(((MovementClass*)nullptr)->height) == 1 || sizeof(((MovementClass*)nullptr)->height) == 2 || sizeof(((MovementClass*)nullptr)->height) == 4, "MovementClass::cells: height is a byte, a short or an int");
 static_assert(sizeof(((MovementClass*)nullptr)->cells) == sizeof(unsigned), "MovementClass::cells is a Ref");
+static_assert(sizeof(((FixtureNamed*)nullptr)->count) == 1 || sizeof(((FixtureNamed*)nullptr)->count) == 2 || sizeof(((FixtureNamed*)nullptr)->count) == 4, "FixtureNamed::words: count is a byte, a short or an int");
+static_assert(__is_same(decltype(&((FixtureNamed*)nullptr)->words[0]), char**), "FixtureNamed::words holds char*");
+static_assert(sizeof(((FixtureNamed*)nullptr)->count) == 1 || sizeof(((FixtureNamed*)nullptr)->count) == 2 || sizeof(((FixtureNamed*)nullptr)->count) == 4, "FixtureNamed::refWords: count is a byte, a short or an int");
+static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->refWords), Ref<Ref<char>>), "FixtureNamed::refWords is a Ref<Ref<char>>");
+static_assert(sizeof(((FixtureNamed*)nullptr)->count) == 1 || sizeof(((FixtureNamed*)nullptr)->count) == 2 || sizeof(((FixtureNamed*)nullptr)->count) == 4, "FixtureNamed::fixed: count is a byte, a short or an int");
+static_assert(__is_same(decltype(&((FixtureNamed*)nullptr)->fixed[0]), char**), "FixtureNamed::fixed holds char*");
+static_assert(sizeof(((FixtureNamed*)nullptr)->fixed) % 4 == 0, "FixtureNamed::fixed holds whole elements");
+static_assert(sizeof(((FixtureProgram*)nullptr)->count) == 1 || sizeof(((FixtureProgram*)nullptr)->count) == 2 || sizeof(((FixtureProgram*)nullptr)->count) == 4, "FixtureProgram::entries: count is a byte, a short or an int");
+static_assert(sizeof(((FixtureProgram*)nullptr)->count) == 1 || sizeof(((FixtureProgram*)nullptr)->count) == 2 || sizeof(((FixtureProgram*)nullptr)->count) == 4, "FixtureProgram::bits: count is a byte, a short or an int");
 static_assert(sizeof(((Game*)nullptr)->players) == 10 * sizeof(Player), "the table of Player holds 10 elements");
 static_assert(sizeof(((Game*)nullptr)->poolCount) == 1 || sizeof(((Game*)nullptr)->poolCount) == 2 || sizeof(((Game*)nullptr)->poolCount) == 4, "Unit: poolCount is a byte, a short or an int");
 static_assert(sizeof(((Game*)nullptr)->units) == sizeof(unsigned), "the table of Unit is a Ref");
@@ -331,6 +361,10 @@ static_assert(sizeof(((Game*)nullptr)->hotRadarCount) == 1 || sizeof(((Game*)nul
 static_assert(sizeof(((Game*)nullptr)->hotRadar) == sizeof(unsigned), "the table of FixtureEye is a Ref");
 static_assert(sizeof(((Game*)nullptr)->count_14367) == 1 || sizeof(((Game*)nullptr)->count_14367) == 2 || sizeof(((Game*)nullptr)->count_14367) == 4, "FixtureTally: count_14367 is a byte, a short or an int");
 static_assert(sizeof(((Game*)nullptr)->list_1435f) == sizeof(unsigned), "the table of FixtureTally is a Ref");
+static_assert(sizeof(decltype(((SimGlobals*)nullptr)->g_losTables)) == 16, "SimGlobals.g_losTables is a block vector");
+static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_losTables)::value_type, LosTable), "SimGlobals.g_losTables holds LosTable");
+static_assert(sizeof(decltype(((SimGlobals*)nullptr)->g_missionOrderTableVec)) == 16, "SimGlobals.g_missionOrderTableVec is a block vector");
+static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_missionOrderTableVec)::value_type, OrderTableEntry), "SimGlobals.g_missionOrderTableVec holds OrderTableEntry");
 
 #pragma pop_macro("g_meteorNextStrikeTime")
 #pragma pop_macro("g_meteorWeaponName")
@@ -347,6 +381,8 @@ static_assert(sizeof(((Game*)nullptr)->list_1435f) == sizeof(unsigned), "the tab
 #pragma pop_macro("g_meteorScheduleGap")
 #pragma pop_macro("g_lastPlaceHeight")
 #pragma pop_macro("g_lastPlaceMetalSum")
+#pragma pop_macro("g_losTables")
+#pragma pop_macro("g_missionOrderTableVec")
 #pragma pop_macro("g_movementClasses")
 
 enum ReplayFieldIndex {
@@ -396,15 +432,29 @@ enum ReplayFieldIndex {
     RF_SIMGLOBALS_G_METEORSCHEDULEGAP,
     RF_SIMGLOBALS_G_LASTPLACEHEIGHT,
     RF_SIMGLOBALS_G_LASTPLACEMETALSUM,
+    RF_SIMGLOBALS_G_LOSTABLES,
+    RF_SIMGLOBALS_G_MISSIONORDERTABLEVEC,
     RF_RNG_MAIN,
     RF_RNG_LOAD,
     RF_RNG_SEED,
 };
 
 static const ReplayVectorSpec kReplayVectors[] = {
+    { RV_VALUE, ROK_FIXTURELOSTABLE, sizeof(LosTable) },
+    { RV_VALUE, ROK_FIXTUREORDERENTRY, sizeof(OrderTableEntry) },
     { RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },
     { RV_VALUE, ROK_KEYEDCELL, sizeof(KeyedCell) },
     { RV_SCALAR, 0, sizeof(short) },
+    { RV_CSTRING, 0, sizeof(char*) },
+    { RV_CSTRINGREF, 0, sizeof(Ref<char>) },
+    { RV_VALUE, ROK_FIXTUREMID, sizeof(FixtureMid) },
+    { RV_VALUE, ROK_FIXTUREROW, sizeof(FixtureRow) },
+    { RV_VALUE, ROK_FIXTURELEAF, sizeof(FixtureLeaf) },
+    { RV_SCALAR, 0, sizeof(short) },
+    { RV_CSTRING, 0, sizeof(char*) },
+    { RV_SCALAR, 0, sizeof(short) },
+    { RV_VALUE, ROK_FIXTURELOSLINE, sizeof(LosLine) },
+    { RV_VALUE, ROK_FIXTURELOSSTEP, sizeof(LosStep) },
 };
 
 static const ReplayElemSpec kReplayElems[] = {
@@ -500,8 +550,18 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FixtureHeap", sizeof(FixtureHeap), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
     { "FixtureNotify", sizeof(FixtureNotify), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
     { "FixtureTally", sizeof(FixtureTally), RS_STATE, 13, 0, 0, 0, 0, 0 },
+    { "FixtureNamed", sizeof(FixtureNamed), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureProgram", sizeof(FixtureProgram), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureNest", sizeof(FixtureNest), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureMid", sizeof(FixtureMid), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureLeaf", sizeof(FixtureLeaf), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureRow", sizeof(FixtureRow), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureLosTable", sizeof(LosTable), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureLosLine", sizeof(LosLine), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureLosStep", sizeof(LosStep), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "FixtureOrderEntry", sizeof(OrderTableEntry), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 63;
+static const unsigned kReplayObjectKindCount = 73;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };
 
@@ -724,9 +784,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "pos", offsetof(KeyedCell, pos), sizeof(((KeyedCell*)nullptr)->pos), ROK_KEYEDCELL, RK_POINT16, 0, 0, 0, {}, 0, 0 },
     { "key", offsetof(KeyedCell, key), sizeof(((KeyedCell*)nullptr)->key), ROK_KEYEDCELL, RK_F32, 0, 0, 0, {}, 0, 0 },
     { "index", offsetof(PlayerAI, index), sizeof(((PlayerAI*)nullptr)->index), ROK_PLAYERAI, RK_U8, 0, 0, 0, {}, 0, 0 },
-    { "visibleUnits", offsetof(PlayerAI, visible.units), sizeof(((PlayerAI*)nullptr)->visible.units), ROK_PLAYERAI, RK_VECTOR, ROK_UNIT, 0, 0, {}, 0, 0, 1 },
-    { "cells", offsetof(PlayerAI, cells), sizeof(((PlayerAI*)nullptr)->cells), ROK_PLAYERAI, RK_VECTOR, 0, 0, 0, {}, 0, 0, 2 },
-    { "counts", offsetof(PlayerAI, counts), sizeof(((PlayerAI*)nullptr)->counts), ROK_PLAYERAI, RK_VECTOR, 0, 0, 0, {}, 0, 0, 3 },
+    { "visibleUnits", offsetof(PlayerAI, visible.units), sizeof(((PlayerAI*)nullptr)->visible.units), ROK_PLAYERAI, RK_VECTOR, ROK_UNIT, 0, 0, {}, 0, 0, 3 },
+    { "cells", offsetof(PlayerAI, cells), sizeof(((PlayerAI*)nullptr)->cells), ROK_PLAYERAI, RK_VECTOR, 0, 0, 0, {}, 0, 0, 4 },
+    { "counts", offsetof(PlayerAI, counts), sizeof(((PlayerAI*)nullptr)->counts), ROK_PLAYERAI, RK_VECTOR, 0, 0, 0, {}, 0, 0, 5 },
     { "count", offsetof(FrameTable, count), sizeof(((FrameTable*)nullptr)->count), ROK_FRAMETABLE, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "width", offsetof(GafFrame, width), sizeof(((GafFrame*)nullptr)->width), ROK_GAFFRAME, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "height", offsetof(GafFrame, height), sizeof(((GafFrame*)nullptr)->height), ROK_GAFFRAME, RK_U16, 0, 0, 0, {}, 0, 0 },
@@ -867,8 +927,39 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "hook", offsetof(FixtureNotify, hook), sizeof(void*), ROK_FIXTURENOTIFY, RK_CBPTR, RCB_CALLBACK, 0, 0, {}, 0, 0 },
     { "link", offsetof(FixtureNotify, link), sizeof(((FixtureNotify*)nullptr)->link), ROK_FIXTURENOTIFY, RK_CBREF, RCB_CALLBACK, 0, 0, {}, 0, 0 },
     { "value", offsetof(FixtureTally, value), sizeof(((FixtureTally*)nullptr)->value), ROK_FIXTURETALLY, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "count", offsetof(FixtureNamed, count), sizeof(((FixtureNamed*)nullptr)->count), ROK_FIXTURENAMED, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "name", offsetof(FixtureNamed, name), sizeof(((FixtureNamed*)nullptr)->name), ROK_FIXTURENAMED, RK_CSTRING, 0, 0, 0, {}, 0, 0 },
+    { "ident", offsetof(FixtureNamed, ident), sizeof(((FixtureNamed*)nullptr)->ident), ROK_FIXTURENAMED, RK_CSTRINGREF, 0, 0, 0, {}, 0, 0 },
+    { "words", offsetof(FixtureNamed, words), sizeof(((FixtureNamed*)nullptr)->words), ROK_FIXTURENAMED, RK_CSTRINGS, 0, 0, 0, {}, 0, 0, 5 },
+    { "refWords", offsetof(FixtureNamed, refWords), sizeof(((FixtureNamed*)nullptr)->refWords), ROK_FIXTURENAMED, RK_CSTRINGS, 0, 0, 0, {}, 0, 0, 6 },
+    { "fixed", offsetof(FixtureNamed, fixed), sizeof(((FixtureNamed*)nullptr)->fixed), ROK_FIXTURENAMED, RK_CSTRINGS, 0, 0, 0, {}, 0, 0, 7 },
+    { "list", offsetof(FixtureNamed, list), sizeof(((FixtureNamed*)nullptr)->list), ROK_FIXTURENAMED, RK_VECTOR, 0, 0, 0, {}, 0, 0, 6 },
+    { "idents", offsetof(FixtureNamed, idents), sizeof(((FixtureNamed*)nullptr)->idents), ROK_FIXTURENAMED, RK_VECTOR, 0, 0, 0, {}, 0, 0, 7 },
+    { "count", offsetof(FixtureProgram, count), sizeof(((FixtureProgram*)nullptr)->count), ROK_FIXTUREPROGRAM, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "entries", offsetof(FixtureProgram, entries), sizeof(void*), ROK_FIXTUREPROGRAM, RK_PTR, ROK_ALLOC, 0, 0, {}, 0, 0 },
+    { "entries[]", offsetof(FixtureProgram, entries), sizeof(void*), ROK_FIXTUREPROGRAM, RK_BLOB, ROK_ALLOC, 0, 0, {}, 0, 0, 8 },
+    { "bits", offsetof(FixtureProgram, bits), sizeof(void*), ROK_FIXTUREPROGRAM, RK_PTR, ROK_ALLOC, 0, 0, {}, 0, 0 },
+    { "bits[]", offsetof(FixtureProgram, bits), sizeof(void*), ROK_FIXTUREPROGRAM, RK_BLOB, ROK_ALLOC, 0, 0, {}, 0, 0, 9 },
+    { "plain", offsetof(FixtureProgram, plain), sizeof(void*), ROK_FIXTUREPROGRAM, RK_PTR, ROK_ALLOC, 0, 0, {}, 0, 0 },
+    { "id", offsetof(FixtureNest, id), sizeof(((FixtureNest*)nullptr)->id), ROK_FIXTURENEST, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "mids", offsetof(FixtureNest, mids), sizeof(((FixtureNest*)nullptr)->mids), ROK_FIXTURENEST, RK_VECTOR, 0, 0, 0, {}, 0, 0, 8 },
+    { "rows", offsetof(FixtureNest, rows), sizeof(((FixtureNest*)nullptr)->rows), ROK_FIXTURENEST, RK_VECTOR, 0, 0, 0, {}, 0, 0, 9 },
+    { "tag", offsetof(FixtureMid, tag), sizeof(((FixtureMid*)nullptr)->tag), ROK_FIXTUREMID, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "leaves", offsetof(FixtureMid, leaves), sizeof(((FixtureMid*)nullptr)->leaves), ROK_FIXTUREMID, RK_VECTOR, 0, 0, 0, {}, 0, 0, 10 },
+    { "kind", offsetof(FixtureLeaf, kind), sizeof(((FixtureLeaf*)nullptr)->kind), ROK_FIXTURELEAF, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "steps", offsetof(FixtureLeaf, steps), sizeof(((FixtureLeaf*)nullptr)->steps), ROK_FIXTURELEAF, RK_VECTOR, 0, 0, 0, {}, 0, 0, 11 },
+    { "names", offsetof(FixtureLeaf, names), sizeof(((FixtureLeaf*)nullptr)->names), ROK_FIXTURELEAF, RK_VECTOR, 0, 0, 0, {}, 0, 0, 12 },
+    { "cells", 0, sizeof(FixtureRow), ROK_FIXTUREROW, RK_VECTOR, 0, 0, 0, {}, 0, 0, 13 },
+    { "lines", 0, sizeof(LosTable), ROK_FIXTURELOSTABLE, RK_VECTOR, 0, 0, 0, {}, 0, 0, 14 },
+    { "steps", 0, sizeof(LosLine), ROK_FIXTURELOSLINE, RK_VECTOR, 0, 0, 0, {}, 0, 0, 15 },
+    { "a", offsetof(LosStep, a), sizeof(((LosStep*)nullptr)->a), ROK_FIXTURELOSSTEP, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "b", offsetof(LosStep, b), sizeof(((LosStep*)nullptr)->b), ROK_FIXTURELOSSTEP, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "value", offsetof(OrderTableEntry, value), sizeof(((OrderTableEntry*)nullptr)->value), ROK_FIXTUREORDERENTRY, RK_CSTRING, 0, 0, 0, {}, 0, 0 },
+    { "name", offsetof(OrderTableEntry, name), sizeof(((OrderTableEntry*)nullptr)->name), ROK_FIXTUREORDERENTRY, RK_CSTRING, 0, 0, 0, {}, 0, 0 },
+    { "drawMask", offsetof(OrderTableEntry, drawMask), sizeof(((OrderTableEntry*)nullptr)->drawMask), ROK_FIXTUREORDERENTRY, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "flags", offsetof(OrderTableEntry, flags), sizeof(((OrderTableEntry*)nullptr)->flags), ROK_FIXTUREORDERENTRY, RK_U32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 335;
+static const unsigned kReplayObjectFieldCount = 366;
 
 static const unsigned short kReplayReachFields[] = { 47, 51, 138, 139, 140, 38, 37, 0, 25, 51, 141, 34, 280, 38, 36, 39, 47, 52, 54, 87 };
 
@@ -1210,6 +1301,42 @@ static_assert(sizeof(((FixtureNotify*)nullptr)->id) == 4, "FixtureNotify::id has
 static_assert(__is_same(decltype(((FixtureNotify*)nullptr)->hook), Callback*), "FixtureNotify::hook holds a Callback*");
 static_assert(__is_same(decltype(((FixtureNotify*)nullptr)->link), Ref<Callback>), "FixtureNotify::link holds a Ref<Callback>");
 static_assert(sizeof(((FixtureTally*)nullptr)->value) == 4, "FixtureTally::value has the size the schema says");
+static_assert(sizeof(((FixtureNamed*)nullptr)->count) == 4, "FixtureNamed::count has the size the schema says");
+static_assert(__is_pointer(decltype(((FixtureNamed*)nullptr)->name)) && __is_same(__remove_cv(__remove_pointer(decltype(((FixtureNamed*)nullptr)->name))), char), "FixtureNamed::name is a char pointer");
+static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->ident), Ref<char>), "FixtureNamed::ident is a Ref<char>");
+static_assert(sizeof(decltype(((FixtureNamed*)nullptr)->list)) == 16, "FixtureNamed::list is a block vector");
+static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->list)::value_type, char*), "FixtureNamed::list holds char*");
+static_assert(sizeof(decltype(((FixtureNamed*)nullptr)->idents)) == 16, "FixtureNamed::idents is a block vector");
+static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->idents)::value_type, Ref<char>), "FixtureNamed::idents holds Ref<char>");
+static_assert(sizeof(((FixtureProgram*)nullptr)->count) == 4, "FixtureProgram::count has the size the schema says");
+static_assert(__is_pointer(decltype(((FixtureProgram*)nullptr)->entries)), "FixtureProgram::entries is a raw pointer");
+static_assert(__is_pointer(decltype(((FixtureProgram*)nullptr)->bits)), "FixtureProgram::bits is a raw pointer");
+static_assert(__is_pointer(decltype(((FixtureProgram*)nullptr)->plain)), "FixtureProgram::plain is a raw pointer");
+static_assert(sizeof(((FixtureNest*)nullptr)->id) == 4, "FixtureNest::id has the size the schema says");
+static_assert(sizeof(decltype(((FixtureNest*)nullptr)->mids)) == 16, "FixtureNest::mids is a block vector");
+static_assert(__is_same(decltype(((FixtureNest*)nullptr)->mids)::value_type, FixtureMid), "FixtureNest::mids holds FixtureMid");
+static_assert(sizeof(decltype(((FixtureNest*)nullptr)->rows)) == 16, "FixtureNest::rows is a block vector");
+static_assert(__is_same(decltype(((FixtureNest*)nullptr)->rows)::value_type, FixtureRow), "FixtureNest::rows holds FixtureRow");
+static_assert(sizeof(((FixtureMid*)nullptr)->tag) == 4, "FixtureMid::tag has the size the schema says");
+static_assert(sizeof(decltype(((FixtureMid*)nullptr)->leaves)) == 16, "FixtureMid::leaves is a block vector");
+static_assert(__is_same(decltype(((FixtureMid*)nullptr)->leaves)::value_type, FixtureLeaf), "FixtureMid::leaves holds FixtureLeaf");
+static_assert(sizeof(((FixtureLeaf*)nullptr)->kind) == 4, "FixtureLeaf::kind has the size the schema says");
+static_assert(sizeof(decltype(((FixtureLeaf*)nullptr)->steps)) == 16, "FixtureLeaf::steps is a block vector");
+static_assert(__is_same(decltype(((FixtureLeaf*)nullptr)->steps)::value_type, short), "FixtureLeaf::steps holds short");
+static_assert(sizeof(decltype(((FixtureLeaf*)nullptr)->names)) == 16, "FixtureLeaf::names is a block vector");
+static_assert(__is_same(decltype(((FixtureLeaf*)nullptr)->names)::value_type, char*), "FixtureLeaf::names holds char*");
+static_assert(sizeof(FixtureRow) == 16, "FixtureRow::cells is a block vector");
+static_assert(__is_same(FixtureRow::value_type, short), "FixtureRow::cells holds short");
+static_assert(sizeof(LosTable) == 16, "LosTable::lines is a block vector");
+static_assert(__is_same(LosTable::value_type, LosLine), "LosTable::lines holds LosLine");
+static_assert(sizeof(LosLine) == 16, "LosLine::steps is a block vector");
+static_assert(__is_same(LosLine::value_type, LosStep), "LosLine::steps holds LosStep");
+static_assert(sizeof(((LosStep*)nullptr)->a) == 2, "LosStep::a has the size the schema says");
+static_assert(sizeof(((LosStep*)nullptr)->b) == 2, "LosStep::b has the size the schema says");
+static_assert(__is_pointer(decltype(((OrderTableEntry*)nullptr)->value)) && __is_same(__remove_cv(__remove_pointer(decltype(((OrderTableEntry*)nullptr)->value))), char), "OrderTableEntry::value is a char pointer");
+static_assert(__is_pointer(decltype(((OrderTableEntry*)nullptr)->name)) && __is_same(__remove_cv(__remove_pointer(decltype(((OrderTableEntry*)nullptr)->name))), char), "OrderTableEntry::name is a char pointer");
+static_assert(sizeof(((OrderTableEntry*)nullptr)->drawMask) == 4, "OrderTableEntry::drawMask has the size the schema says");
+static_assert(sizeof(((OrderTableEntry*)nullptr)->flags) == 4, "OrderTableEntry::flags has the size the schema says");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");
@@ -1585,10 +1712,10 @@ enum ReplaySlotId {
     RSL_COUNT
 };
 
-static const unsigned char kReplayWindMeteorsUpdateWindReads[] = { 0, 3, 4, 8, 9, 10, 12, 13, 46, 47, 48 };
-static const unsigned char kReplayWindMeteorsUpdateWindWrites[] = { 3, 5, 7, 8, 9, 10, 11, 46, 47, 48 };
-static const unsigned char kReplayWindMeteorsUpdateMeteorsReads[] = { 0, 1, 2, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48 };
-static const unsigned char kReplayWindMeteorsUpdateMeteorsWrites[] = { 31, 35, 36, 37, 41, 42, 46, 47, 48 };
+static const unsigned char kReplayWindMeteorsUpdateWindReads[] = { 0, 3, 4, 8, 9, 10, 12, 13, 48, 49, 50 };
+static const unsigned char kReplayWindMeteorsUpdateWindWrites[] = { 3, 5, 7, 8, 9, 10, 11, 48, 49, 50 };
+static const unsigned char kReplayWindMeteorsUpdateMeteorsReads[] = { 0, 1, 2, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 48, 49, 50 };
+static const unsigned char kReplayWindMeteorsUpdateMeteorsWrites[] = { 31, 35, 36, 37, 41, 42, 48, 49, 50 };
 static const unsigned short kReplayWindMeteorsUpdateMeteorsObjReads[] = { 42, 43 };
 static const unsigned char kReplayWindMeteorsInitMeteorsReads[] = { 32, 34, 39 };
 static const unsigned char kReplayWindMeteorsInitMeteorsWrites[] = { 31, 32, 35, 39 };
@@ -1601,10 +1728,10 @@ static const unsigned short kReplayWindMeteorsSetMeteorParamsObjWrites[] = { 104
 static const unsigned char kReplayWindMeteorsSaveMeteorsReads[] = { 31, 35, 36, 37, 40, 41, 42 };
 static const unsigned short kReplayWindMeteorsSaveMeteorsObjReads[] = { 42, 43 };
 static const unsigned char kReplayWindMeteorsLoadMeteorsWrites[] = { 31, 35, 36, 37, 40, 41, 42 };
-static const unsigned char kReplayWindMeteorsCmdMeteorReads[] = { 0, 1, 2, 36, 38, 42, 43, 46, 47, 48 };
-static const unsigned char kReplayWindMeteorsCmdMeteorWrites[] = { 31, 35, 36, 37, 40, 41, 42, 46, 47, 48 };
-static const unsigned char kReplayWindMeteorsUpdateWindOnStreamReads[] = { 0, 3, 4, 8, 9, 10, 12, 13, 46, 47, 48 };
-static const unsigned char kReplayWindMeteorsUpdateWindOnStreamWrites[] = { 3, 5, 7, 8, 9, 10, 11, 46, 47, 48 };
+static const unsigned char kReplayWindMeteorsCmdMeteorReads[] = { 0, 1, 2, 36, 38, 42, 43, 48, 49, 50 };
+static const unsigned char kReplayWindMeteorsCmdMeteorWrites[] = { 31, 35, 36, 37, 40, 41, 42, 48, 49, 50 };
+static const unsigned char kReplayWindMeteorsUpdateWindOnStreamReads[] = { 0, 3, 4, 8, 9, 10, 12, 13, 48, 49, 50 };
+static const unsigned char kReplayWindMeteorsUpdateWindOnStreamWrites[] = { 3, 5, 7, 8, 9, 10, 11, 48, 49, 50 };
 static const unsigned char kReplayEconomyUpdateResourceSharingAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayEconomyUpdateResourceSharingReads[] = { 0, 16 };
 static const unsigned short kReplayEconomyUpdateResourceSharingObjReads[] = { 0, 2, 3, 8, 11, 20, 21, 23, 25, 26, 27, 28, 29, 122, 123 };
@@ -1632,8 +1759,8 @@ static const unsigned short kReplayEconomySpendMetalObjReads[] = { 3, 116, 121 }
 static const unsigned short kReplayEconomySpendMetalObjWrites[] = { 3, 116 };
 static const unsigned short kReplayEconomySpendEnergyAndMetalObjReads[] = { 2, 3, 110, 116, 121 };
 static const unsigned short kReplayEconomySpendEnergyAndMetalObjWrites[] = { 2, 3, 110, 116 };
-static const unsigned char kReplayFeaturesUpdateFeaturesReads[] = { 0, 1, 2, 17, 19, 46, 47, 48 };
-static const unsigned char kReplayFeaturesUpdateFeaturesWrites[] = { 46, 47, 48 };
+static const unsigned char kReplayFeaturesUpdateFeaturesReads[] = { 0, 1, 2, 17, 19, 48, 49, 50 };
+static const unsigned char kReplayFeaturesUpdateFeaturesWrites[] = { 48, 49, 50 };
 static const unsigned short kReplayFeaturesUpdateFeaturesObjReads[] = { 42, 43, 127, 132, 135, 208, 223, 224, 235, 236, 237, 238, 240, 241, 243, 244, 245, 246, 247, 248, 251, 252, 253, 254, 255, 257, 258 };
 static const unsigned short kReplayFeaturesUpdateFeaturesObjWrites[] = { 223, 224, 240, 241, 243, 244, 245, 246, 247, 248, 251, 253, 258 };
 static const unsigned short kReplayFeaturesResolveFeatureLinksObjReads[] = { 209 };
@@ -1670,8 +1797,8 @@ static const unsigned short kReplayFeaturesLoadFeaturesObjWrites[] = { 205, 250,
 static const unsigned short kReplayAiHasReadyUnitInRangeObjReads[] = { 38 };
 static const unsigned char kReplayAiIsPointVisibleReads[] = { 20, 22 };
 static const unsigned short kReplayAiIsPointVisibleObjReads[] = { 32, 33 };
-static const unsigned char kReplayAiReactToAttackReads[] = { 0, 46, 47, 48 };
-static const unsigned char kReplayAiReactToAttackWrites[] = { 46, 47, 48 };
+static const unsigned char kReplayAiReactToAttackReads[] = { 0, 48, 49, 50 };
+static const unsigned char kReplayAiReactToAttackWrites[] = { 48, 49, 50 };
 static const unsigned short kReplayAiReactToAttackObjReads[] = { 0, 25, 26, 29, 35, 36, 37, 38, 47, 49, 55, 56, 57, 58, 60, 61, 62, 63, 65, 66, 67, 68, 87, 89, 90, 91, 92 };
 static const unsigned short kReplayAiReactToAttackObjWrites[] = { 55, 56, 60, 61, 65, 66 };
 static const unsigned short kReplayAiMarkOwnerNetDirtyFromDamageSplitObjReads[] = { 148 };
@@ -1679,15 +1806,15 @@ static const unsigned char kReplayAiDumpPlayerAIReads[] = { 0, 15 };
 static const unsigned short kReplayAiDumpPlayerAIObjReads[] = { 25 };
 static const unsigned short kReplayAiResetAIPlayersObjReads[] = { 0, 25 };
 static const unsigned short kReplayAiGetFactoriesInRadiusObjReads[] = { 36, 39, 87 };
-static const unsigned char kReplayAiUpdatePlayerAIReads[] = { 0, 46, 47, 48 };
-static const unsigned char kReplayAiUpdatePlayerAIWrites[] = { 46, 47, 48 };
+static const unsigned char kReplayAiUpdatePlayerAIReads[] = { 0, 48, 49, 50 };
+static const unsigned char kReplayAiUpdatePlayerAIWrites[] = { 48, 49, 50 };
 static const unsigned short kReplayAiSetUnitSquadObjReads[] = { 37 };
 static const unsigned char kReplayAiCmdPlanReads[] = { 15 };
 static const unsigned short kReplayAiCmdLimitObjReads[] = { 0, 25 };
 static const unsigned char kReplayPathfindingRunSearchesAllOf[] = { ROK_PLAYER };
 static const unsigned short kReplayPathfindingRunSearchesObjReads[] = { 4, 5, 42, 43, 47, 51 };
-static const unsigned char kReplayWeaponsUpdateProjectilesReads[] = { 0, 17, 46, 47, 48 };
-static const unsigned char kReplayWeaponsUpdateProjectilesWrites[] = { 46, 47, 48 };
+static const unsigned char kReplayWeaponsUpdateProjectilesReads[] = { 0, 17, 48, 49, 50 };
+static const unsigned char kReplayWeaponsUpdateProjectilesWrites[] = { 48, 49, 50 };
 static const unsigned short kReplayWeaponsUpdateProjectilesObjReads[] = { 57, 62, 67, 103, 130, 146, 147, 148, 149 };
 static const unsigned short kReplayWeaponsUpdateProjectilesObjWrites[] = { 146, 147, 149 };
 static const unsigned char kReplayWeaponsUpdateExplosionsReads[] = { 17 };
@@ -1723,11 +1850,11 @@ static const unsigned short kReplayTargetingGetWeaponTargetUnitObjWrites[] = { 5
 static const unsigned char kReplayTargetingGetWeaponTargetPosReads[] = { 17 };
 static const unsigned short kReplayTargetingGetWeaponTargetPosObjReads[] = { 44, 47, 48, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 102, 103, 138, 139, 140 };
 static const unsigned short kReplayTargetingGetWeaponTargetPosObjWrites[] = { 55, 56, 60, 61, 65, 66 };
-static const unsigned char kReplayTargetingFindWeaponTargetReads[] = { 18, 46, 47, 48 };
-static const unsigned char kReplayTargetingFindWeaponTargetWrites[] = { 46, 47, 48 };
+static const unsigned char kReplayTargetingFindWeaponTargetReads[] = { 18, 48, 49, 50 };
+static const unsigned char kReplayTargetingFindWeaponTargetWrites[] = { 48, 49, 50 };
 static const unsigned short kReplayTargetingFindWeaponTargetObjReads[] = { 0, 25, 36, 37, 38, 39, 47, 49, 52, 53, 54, 57, 62, 67, 87, 88, 89, 90, 91, 92, 102, 145 };
-static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillReads[] = { 18, 46, 47, 48 };
-static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillWrites[] = { 46, 47, 48 };
+static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillReads[] = { 18, 48, 49, 50 };
+static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillWrites[] = { 48, 49, 50 };
 static const unsigned short kReplayTargetingFindBestTargetIfFireAtWillObjReads[] = { 0, 25, 36, 37, 38, 39, 47, 49, 52, 53, 54, 57, 62, 67, 87, 88, 89, 90, 91, 92, 102, 145 };
 static const unsigned short kReplayTargetingChooseWeaponObjReads[] = { 58, 63, 68 };
 static const unsigned char kReplayLosRadarGetMapCellReads[] = { 1, 2 };
@@ -1779,8 +1906,8 @@ static const unsigned short kReplayOrdersAddBeCarriedOrderObjReads[] = { 73, 185
 static const unsigned char kReplayOrdersRunOrdersReads[] = { 0 };
 static const unsigned short kReplayOrdersRunOrdersObjReads[] = { 0, 25, 36, 37, 50, 183, 185, 186 };
 static const unsigned short kReplayOrdersRunOrdersObjWrites[] = { 50, 183 };
-static const unsigned char kReplayOrdersRunSecondaryOrdersReads[] = { 0, 46, 47, 48 };
-static const unsigned char kReplayOrdersRunSecondaryOrdersWrites[] = { 46, 47, 48 };
+static const unsigned char kReplayOrdersRunSecondaryOrdersReads[] = { 0, 48, 49, 50 };
+static const unsigned char kReplayOrdersRunSecondaryOrdersWrites[] = { 48, 49, 50 };
 static const unsigned short kReplayOrdersRunSecondaryOrdersObjReads[] = { 183, 185, 186 };
 static const unsigned short kReplayOrdersRunSecondaryOrdersObjWrites[] = { 183 };
 static const unsigned short kReplayOrdersLoadMotionObjReads[] = { 45 };
@@ -1868,8 +1995,8 @@ static const unsigned short kReplayPlayersKillPlayerUnitsObjWrites[] = { 38 };
 static const unsigned short kReplayPlayersGiveUnitToPlayerObjReads[] = { 0, 25, 26, 34, 37, 38, 39, 47, 52, 53, 54, 58, 63, 68 };
 static const unsigned short kReplayPlayersGiveUnitToPlayerObjWrites[] = { 34, 35, 38 };
 static const unsigned char kReplayPlayersUpdatePlayersOnStreamAllOf[] = { ROK_PLAYER };
-static const unsigned char kReplayPlayersUpdatePlayersOnStreamReads[] = { 0, 1, 2, 15, 17, 21, 22, 46, 47, 48 };
-static const unsigned char kReplayPlayersUpdatePlayersOnStreamWrites[] = { 21, 46, 47, 48 };
+static const unsigned char kReplayPlayersUpdatePlayersOnStreamReads[] = { 0, 1, 2, 15, 17, 21, 22, 48, 49, 50 };
+static const unsigned char kReplayPlayersUpdatePlayersOnStreamWrites[] = { 21, 48, 49, 50 };
 static const unsigned short kReplayPlayersUpdatePlayersOnStreamObjReads[] = { 0, 4, 5, 23, 25, 26, 27, 28, 38 };
 static const unsigned char kReplayMapGetCellMeanHeightAllOf[] = { ROK_CELL };
 static const unsigned char kReplayMapGetCellMeanHeightReads[] = { 1, 2 };

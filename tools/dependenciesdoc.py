@@ -51,7 +51,6 @@ Gaps in what the data say:
   handlers, because scripted UI input is not logged.
 - Static-only items of ambiguous or unseen types have no row.
 - Events after marker 7 are not attributed to a phase of their own.
-- Open gaps of #866: nested passes, the unresolved sim-event queue, and presentation rows in the phase files.
 """
 
 

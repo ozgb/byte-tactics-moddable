@@ -203,13 +203,13 @@ void __stdcall ShowSavedGameInfo()
         }
     }
     {
-        SetGadgetText(menu, index, DAT_005119b8);
-        SetTranslatedTextByName(menu, "SIDE", DAT_005119b8, 0);
-        SetTranslatedTextByName(menu, "DIFF", DAT_005119b8, 0);
-        SetTranslatedTextByName(menu, "MISSION", DAT_005119b8, 0);
-        SetTranslatedTextByName(menu, "CAMPAIGN", DAT_005119b8, 0);
-        SetTranslatedTextByName(menu, "GAMETYPE", DAT_005119b8, 0);
-        SetTranslatedTextByName(menu, "TIME", DAT_005119b8, 0);
+        SetGadgetText(menu, index, g_emptyText);
+        SetTranslatedTextByName(menu, "SIDE", g_emptyText, 0);
+        SetTranslatedTextByName(menu, "DIFF", g_emptyText, 0);
+        SetTranslatedTextByName(menu, "MISSION", g_emptyText, 0);
+        SetTranslatedTextByName(menu, "CAMPAIGN", g_emptyText, 0);
+        SetTranslatedTextByName(menu, "GAMETYPE", g_emptyText, 0);
+        SetTranslatedTextByName(menu, "TIME", g_emptyText, 0);
     }
 done:
     MarkChanged(&g_game->gui);
@@ -387,7 +387,7 @@ char* __stdcall ListSavedGames(int* count)
     BuildDataPath(buf, g_savegameDir, "*", "SAV");
     *count = CountDirectoryEntries(buf, 0);
     if (*count == 0) {
-        ConfigureListBoxByName(&g_game->gui, "GAMES", DAT_005119b8, 0, nullptr);
+        ConfigureListBoxByName(&g_game->gui, "GAMES", g_emptyText, 0, nullptr);
         return 0;
     }
     g_savegameFileNames = (char*)GameAllocIgnoreTag("SAVEGAME NAMES", *count << 8);

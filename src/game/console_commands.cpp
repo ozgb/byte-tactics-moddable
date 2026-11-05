@@ -199,7 +199,7 @@ void __stdcall CmdAI(CommandArgs* args)
 // FUNCTION: 0x416310
 void __stdcall CmdAssign(CommandArgs* args)
 {
-    MissionType kind(args->GetArg(1, DAT_005119b8));
+    MissionType kind(args->GetArg(1, g_emptyText));
     if (kind.index) {
         int a = args->GetIntArg(1, 0);
         int b = args->GetIntArg(2, 0);
@@ -237,7 +237,7 @@ void __stdcall CmdBurnOne(void* args)
 // FUNCTION: 0x4163d0
 void __stdcall CmdFeature(CommandArgs* args)
 {
-    unsigned short id = FindFeatureType(args->GetArg(1, DAT_005119b8));
+    unsigned short id = FindFeatureType(args->GetArg(1, g_emptyText));
     if (id != 0xffff) {
         void* target = g_seams.los_radar->GetMapCell(g_game->point.x, g_game->point.y);
         PlaceFeature(target, id, 0, 0, 10);
@@ -358,7 +358,7 @@ void __stdcall CmdSearch(CommandArgs* args)
         g_game->pathfinder->stepsPerTick = args->GetIntArg(1, 0);
     }
     if (args->count == 3) {
-        g_game->pathfinder->baseScale = (int)(atof(args->GetArg(2, DAT_005119b8)) * 65536.0);
+        g_game->pathfinder->baseScale = (int)(atof(args->GetArg(2, g_emptyText)) * 65536.0);
     }
 }
 
@@ -389,7 +389,7 @@ void __stdcall CmdSound3D(int unused)
 // FUNCTION: 0x416860
 void __stdcall CmdMove(CommandArgs* args)
 {
-    if (_strcmpi(args->GetArg(0, DAT_005119b8), "move") == 0) {
+    if (_strcmpi(args->GetArg(0, g_emptyText), "move") == 0) {
         int dx = args->GetIntArg(1, 0);
         g_game->pos.x += dx << 20;
         int dz = args->GetIntArg(2, 0);
@@ -485,11 +485,11 @@ void __stdcall CmdGive(CommandArgs* args)
         Player* p = &g_game->players[i];
         if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
             && p->index != 10) {
-            if (_strcmpi(args->GetArg(3, DAT_005119b8), "metal") == 0) {
+            if (_strcmpi(args->GetArg(3, g_emptyText), "metal") == 0) {
                 g_seams.players->TransferEnergy(g_game->localPlayer, args->GetIntArg(1, 0),
                              (float)args->GetIntArg(2, 0), 1);
             }
-            if (_strcmpi(args->GetArg(3, DAT_005119b8), "energy") == 0) {
+            if (_strcmpi(args->GetArg(3, g_emptyText), "energy") == 0) {
                 g_seams.players->TransferMetal(g_game->localPlayer, args->GetIntArg(1, 0),
                              (float)args->GetIntArg(2, 0), 1);
             }
@@ -557,11 +557,11 @@ void __stdcall CmdNoShake(int unused)
 // FUNCTION: 0x416e90
 void __stdcall CmdNow(CommandArgs* args)
 {
-    if (args->count==6 && !strcmp(args->GetArg(1,DAT_005119b8),"Film") &&
-        !strcmp(args->GetArg(2,DAT_005119b8),"Chris") &&
-        !strcmp(args->GetArg(3,DAT_005119b8),"Include") &&
-        !strcmp(args->GetArg(4,DAT_005119b8),"Reload") &&
-        !strcmp(args->GetArg(5,DAT_005119b8),"Assert"))
+    if (args->count==6 && !strcmp(args->GetArg(1,g_emptyText),"Film") &&
+        !strcmp(args->GetArg(2,g_emptyText),"Chris") &&
+        !strcmp(args->GetArg(3,g_emptyText),"Include") &&
+        !strcmp(args->GetArg(4,g_emptyText),"Reload") &&
+        !strcmp(args->GetArg(5,g_emptyText),"Assert"))
         g_game->uiOptionFlags|=2;
     else g_game->uiOptionFlags&=~2;
 }
@@ -664,7 +664,7 @@ void __stdcall CmdClock(int unused)
 void __stdcall CmdFilm(CommandArgs* args)
 {
     if (args->count > 1) {
-        strcpy(g_game->path, args->GetArg(1, DAT_005119b8));
+        strcpy(g_game->path, args->GetArg(1, g_emptyText));
         if (g_game->path[strlen(g_game->path) - 1] == '\\' ||
             g_game->path[strlen(g_game->path) - 1] == '/')
             g_game->path[strlen(g_game->path) - 1] = 0;
@@ -688,7 +688,7 @@ void __stdcall CmdSave(CommandArgs* args)
 {
     char path[256];
     if (args->count > 1) {
-        sprintf(path, "savegame\\%s.sav", args->GetArg(1, DAT_005119b8));
+        sprintf(path, "savegame\\%s.sav", args->GetArg(1, g_emptyText));
         MakeDirectoryPath("savegame");
         SaveGameFile(path, "Generic Game Description", 0x29a);
     }
@@ -698,7 +698,7 @@ void __stdcall CmdSave(CommandArgs* args)
 void __stdcall CmdReload(CommandArgs* args)
 {
     if (args->count > 1) {
-        short id = g_seams.units->FindUnitTypeId(args->GetArg(1, DAT_005119b8));
+        short id = g_seams.units->FindUnitTypeId(args->GetArg(1, g_emptyText));
         if (id) {
             g_seams.units->KillUnitsOfType(id);
             g_seams.units->ReloadUnitType(id);
@@ -782,7 +782,7 @@ void __stdcall CmdMakePoster(CommandArgs* args)
         w = args->GetIntArg(1, 0);
     if (args->count > 2)
         h = args->GetIntArg(2, 0);
-    if (_strcmpi(args->GetArg(1, DAT_005119b8), "all") == 0) {
+    if (_strcmpi(args->GetArg(1, g_emptyText), "all") == 0) {
         w = g_game->mapWidth;
         h = g_game->mapHeight;
     }
@@ -832,7 +832,7 @@ void __stdcall CmdInclude(CommandArgs* args)
     int info;
     char path[60];
 
-    sprintf(path, "debugdat\\%s.txt", args->GetArg(0, DAT_005119b8));
+    sprintf(path, "debugdat\\%s.txt", args->GetArg(0, g_emptyText));
     FileHandle* file = HAPI_OpenFileRead(path);
     if (file != 0) {
         pos = g_game->pos;
@@ -853,7 +853,7 @@ void __stdcall DefaultCommandHandler(CommandArgs* args)
     int count=0;
     for (unsigned short i=1;i<g_game->unitDefCount;++i) {
         UnitDef* def=&g_game->defs[i];
-        if (MatchWildcard(def->unitname,args->GetArg(0,DAT_005119b8))) {
+        if (MatchWildcard(def->unitname,args->GetArg(0,g_emptyText))) {
             if (count) pos.x-=def->modelMinX;
             g_seams.map->SnapWorldPosToFootprint(def,&pos);
             g_seams.units->CreateUnit(args->GetIntArg(1,0),i,pos,1,1,0);
@@ -866,7 +866,7 @@ void __stdcall DefaultCommandHandler(CommandArgs* args)
         Vec3 saved;
         int size;
         char path[60];
-        sprintf(path,"debugdat\\%s.txt",args->GetArg(0,DAT_005119b8));
+        sprintf(path,"debugdat\\%s.txt",args->GetArg(0,g_emptyText));
         FileHandle* file=HAPI_OpenFileRead(path);
         if (file) {
             saved=g_game->pos;
@@ -1218,7 +1218,7 @@ void __stdcall CmdPrintWeights(CommandArgs* args)
             Player* p = &g_game->players[i];
             if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
                 && p->index != 10) {
-                void* f = host_file_create(args->GetArg(2, DAT_005119b8), 0);
+                void* f = host_file_create(args->GetArg(2, g_emptyText), 0);
                 if (f != 0) {
                     g_seams.ai->DumpPlayerAI(args->GetIntArg(1, 0), f);
                     host_file_close(f);

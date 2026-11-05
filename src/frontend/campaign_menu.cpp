@@ -236,7 +236,7 @@ int __stdcall BuildCampaignNameList(char** out, int side)
         BuildDataPath(path, "camps", q, "tdf");
         if ((&parser)->LoadFile(path)) {
             if ((&parser)->SelectRecord("HEADER")) {
-                parser.current->GetFieldString(name, "campaignside", 0x40, DAT_005119b8);
+                parser.current->GetFieldString(name, "campaignside", 0x40, g_emptyText);
                 if (strcmp(g_game->sideDefs[side].name, name) == 0 || strcmp("ALL", name) == 0) {
                     found++;
                     p = AppendNameInBuildCampaignNameList(p, q);
@@ -422,7 +422,7 @@ void DrawHelpPage()
 
     if (nextPage == 0) {
         if (g_briefingPageIndex == 0)
-            SetTranslatedTextByName(&g_game->gui, "MOREBAR", DAT_005119b8, 0);
+            SetTranslatedTextByName(&g_game->gui, "MOREBAR", g_emptyText, 0);
         else
             SetTranslatedTextByName(&g_game->gui, "MOREBAR",
                          Translate("BACK TO START"), 0);
@@ -436,7 +436,7 @@ void DrawHelpPage()
 
     for (int i = linesPerPage * g_briefingPageIndex;
          i < (g_briefingPageIndex + 1) * linesPerPage; i++) {
-        AddTextGadget(dialog, "TextRegion", DAT_005119b8, textX, y, -1, 2);
+        AddTextGadget(dialog, "TextRegion", g_emptyText, textX, y, -1, 2);
         count++;
         char* dst = gadgets[count].u.text;
         gadgets[count].attribs = 0x411;

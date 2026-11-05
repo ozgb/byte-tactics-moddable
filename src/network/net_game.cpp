@@ -712,7 +712,7 @@ void UpdateNetGameInfo(void)
     if (g_game->players[g_game->localPlayer].info->started) {
         g_game->settings.bits_475.flag_475_5 = 1;
     }
-    host_net_update_game_info((host_net*)g_game->net_14, name, DAT_005119b8, d, c, b, a);
+    host_net_update_game_info((host_net*)g_game->net_14, name, g_emptyText, d, c, b, a);
 }
 
 static inline unsigned char FindPlayerInUse()
@@ -964,7 +964,7 @@ void CreateNetGame(void)
     g_game->players[g_game->localPlayer].info->host = 1;
     BuildGameInfo(name, &d, &c, &b, &a);
     g_game->numPlayers = 0;
-    host_net_create_new_game((host_net*)g_game->session, name, DAT_005119b8, d, c, b, a);
+    host_net_create_new_game((host_net*)g_game->session, name, g_emptyText, d, c, b, a);
 }
 
 // FUNCTION: 0x4515d0
@@ -1059,7 +1059,7 @@ int __stdcall JoinNetGame(JoinGuidView guid, int player)
             int v = IsOnlineConfigLoaded();
             char* s = &g_onlineLobbyPlayerName;
             if (v == 0)
-                s = DAT_005119b8;
+                s = g_emptyText;
 
             DPNAME* n2 = net->name;
             if (n2 != 0) {
@@ -2048,7 +2048,7 @@ void __stdcall HandleTimeoutDialog(Gui* gadget)
         if (strlen(entry->text)) {
             SendChatMessage(&g_game->players[g_game->localPlayer], entry->text, 4, 0);
             g_game->bits_2bee_1.dirty = 1;
-            strcpy(entry->text, DAT_005119b8);
+            strcpy(entry->text, g_emptyText);
         }
         BeginTextEdit(&g_game->gui, FindGadgetIndex(((Layer*)g_game->layer)->entries, "TALK", 3));
         ClearSelectedGadget(g_game->message);
@@ -2302,7 +2302,7 @@ int HandleNetPackets()
                     BuildGameInfo(name, &d, &c, &b, &a);
                     if (LocalPlayer()->info->started)
                         g_game->settings.flags_475 |= 0x20;
-                    host_net_update_game_info((host_net*)g_game->session, name, DAT_005119b8, d, c, b, a);
+                    host_net_update_game_info((host_net*)g_game->session, name, g_emptyText, d, c, b, a);
                 }
                 break;
             }

@@ -294,7 +294,7 @@ TdfFile* __stdcall FindFeatureFile(char* name)
 
 static inline void LoadFeatureSeq(TdfRecord* rec, char* key, char* seqname, Gaf* anims, AnimSrc** out)
 {
-    int ok = rec->GetFieldString(seqname, key, 0x100, DAT_005119b8);
+    int ok = rec->GetFieldString(seqname, key, 0x100, g_emptyText);
     if (ok)
         *out = (AnimSrc*)FindOptionalGafEntry(anims, 0, seqname);
     else
@@ -303,7 +303,7 @@ static inline void LoadFeatureSeq(TdfRecord* rec, char* key, char* seqname, Gaf*
 
 static inline void LoadFeatureSeqOnce(TdfRecord* rec, char* key, char* seqname, Gaf* anims, AnimSrc** out)
 {
-    int ok = rec->GetFieldString(seqname, key, 0x100, DAT_005119b8);
+    int ok = rec->GetFieldString(seqname, key, 0x100, g_emptyText);
     if (ok) {
         *out = (AnimSrc*)FindOptionalGafEntry(anims, 0, seqname);
         if (*out)
@@ -331,17 +331,17 @@ int __stdcall LoadFeatureType(char* name)
     g_game->features = (Feature*)SimRealloc(g_game->features, (g_game->featureCount + 1) * 0x100);
     Feature* def = &g_game->features[g_game->featureCount];
     strncpy(def->name, name, 0x80);
-    entry->current->GetFieldString(def->description, "Description", 0x14, DAT_005119b8);
+    entry->current->GetFieldString(def->description, "Description", 0x14, g_emptyText);
     def->footprintX = entry->current->GetFieldInt("footprintx", 0);
     def->footprintZ = entry->current->GetFieldInt("footprintz", 0);
     def->height = entry->current->GetFieldInt("height", 0);
-    ok = entry->current->GetFieldString(file, "object", 0x100, DAT_005119b8);
+    ok = entry->current->GetFieldString(file, "object", 0x100, g_emptyText);
     if (ok) {
         def->noobject = 0;
         def->object = LoadObject3d(file);
     } else {
         def->noobject = 1;
-        entry->current->GetFieldString(file, "filename", 0x100, DAT_005119b8);
+        entry->current->GetFieldString(file, "filename", 0x100, g_emptyText);
         for (j = 0; j < g_game->featureCount; j++) {
             if (strncmp(g_game->features[j].filename, file, 0x10) == 0) {
                 def->anims = nullptr;
@@ -391,7 +391,7 @@ int __stdcall LoadFeatureType(char* name)
     if (_strcmpi(name, "Fortification_Core") == 0)
         def->nodrawundergray = 1;
     def->burnTime = (short)(entry->current->GetFieldDouble("sparktime", 0.0) * 30.0);
-    entry->current->GetFieldString(seqname, "burnweapon", 0x100, DAT_005119b8);
+    entry->current->GetFieldString(seqname, "burnweapon", 0x100, g_emptyText);
     def->burnweapon = (char*)g_seams.weapons->FindWeaponByName(seqname);
     def->anim.index = 0;
     def->anim.value = 0;
@@ -439,15 +439,15 @@ void ResolveFeatureLinks()
     if (*count > 0) {
         do {
             TdfRecord* parser = (TdfRecord*)FindFeatureFile(g_game->features[i].name)->current;
-            if (parser->GetFieldString(buf, "featuredead", 0x100, DAT_005119b8))
+            if (parser->GetFieldString(buf, "featuredead", 0x100, g_emptyText))
                 g_game->features[i].dead = FindOrLoadFeatureType(buf);
             else
                 g_game->features[i].dead = 0xffff;
-            if (parser->GetFieldString(buf, "featurereclamate", 0x100, DAT_005119b8))
+            if (parser->GetFieldString(buf, "featurereclamate", 0x100, g_emptyText))
                 g_game->features[i].reclamate = FindOrLoadFeatureType(buf);
             else
                 g_game->features[i].reclamate = 0xffff;
-            if (parser->GetFieldString(buf, "featureburnt", 0x100, DAT_005119b8))
+            if (parser->GetFieldString(buf, "featureburnt", 0x100, g_emptyText))
                 g_game->features[i].burnt = FindOrLoadFeatureType(buf);
             else
                 g_game->features[i].burnt = 0xffff;

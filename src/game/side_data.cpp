@@ -114,13 +114,13 @@ void __stdcall LoadSideData(void)
         parser.ResetCurrentRecord();
         if (!parser.SelectRecord(name))
             break;
-        if (parser.current->GetFieldString(name, "name", 0x1e, DAT_005119b8))
+        if (parser.current->GetFieldString(name, "name", 0x1e, g_emptyText))
             strcpy(s->name, name);
-        if (parser.current->GetFieldString(name, "nameprefix", 4, DAT_005119b8))
+        if (parser.current->GetFieldString(name, "nameprefix", 4, g_emptyText))
             strcpy(s->nameprefix, name);
-        if (parser.current->GetFieldString(name, "commander", 0x20, DAT_005119b8))
+        if (parser.current->GetFieldString(name, "commander", 0x20, g_emptyText))
             strcpy(s->commander, name);
-        if (parser.current->GetFieldString(name, "font", 0x100, DAT_005119b8)) {
+        if (parser.current->GetFieldString(name, "font", 0x100, g_emptyText)) {
             Font* font;
             BuildDataPath(fontPath, "fonts", name, "FNT");
             font = (Font*)HAPI_LoadFile(fontPath, 0);

@@ -297,7 +297,7 @@ int __stdcall ExecuteCommand(CommandArgs* obj, int mask)
 {
     int result = 0;
     if (obj->count >= 1) {
-        StringRef key(obj->GetArg(0, DAT_005119b8));
+        StringRef key(obj->GetArg(0, g_emptyText));
         key.MakeLower();
         CommandHandlerSlot* h = FindCommandSlot(key.data);
         if (h != 0 && (h->mask & mask)) {

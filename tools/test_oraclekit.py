@@ -473,6 +473,259 @@ class KitDocumentsTest(unittest.TestCase):
         self.assertEqual(missing, [])
 
 
+SIM_HEADER = """\
+enum SimEventKind : unsigned short {
+    SIM_EVENT_NONE = 0,
+    SIM_EVENT_SOUND = 2,
+    SIM_EVENT_NANO = 3,
+};
+"""
+SIM_PAGE = """\
+# Sim events
+
+## The kinds
+
+### SIM_EVENT_NONE
+
+Value 0. Marks an empty record.
+
+Phases: none.
+
+### SIM_EVENT_SOUND
+
+Value 2.
+
+| Argument | Type | Meaning |
+|---|---|---|
+| 0 | sound name number | A number of the sound names table. |
+| 1 | integer | The play flag. |
+
+Flags: none.
+
+Recorded when a unit with flag 0x4000 set is called with flag 8 in state 2 of the pickup order, by kill type 3.
+
+Phases: net (0), units (1).
+
+### SIM_EVENT_NANO
+
+Value 3.
+
+| Argument | Type | Meaning |
+|---|---|---|
+| 0 to 2 | position | The origin. |
+| 3 to 8 | box | The target. |
+| 9 | integer | The particle list. |
+
+Flags: none. Two records (ten arguments).
+
+Phases: units (1).
+"""
+SIM_TERMS = (
+    "term,definition,kit_reference\n"
+    "unit flag 0x4000,The unit is dying.,layout.json Unit.killPending\n"
+    "call flag 8,A referenced unit was removed.,\n"
+    "state 2 of the pickup order,The transport starts a pickup attempt.,layout.json Order.state\n"
+    "kill type 3,A self-destruct.,\n"
+)
+SIM_FILES = {"interfaces/services.h": SIM_HEADER, oraclekit.SIM_EVENTS_PAGE: SIM_PAGE, oraclekit.TERMS_SOURCE: SIM_TERMS}
+SIM_CONTENTS = [("dir", "interfaces", ""), ("file", oraclekit.SIM_EVENTS_PAGE, "")]
+REAL_LAYOUT: dict = {}
+
+
+def real_layout() -> dict:
+    """The layout.json document of a build directory that has a compile_commands.json, the same one for every test."""
+    if not REAL_LAYOUT:
+        for build in ("build/kitb", "build/datack", "build/modern"):
+            if (ROOT / build / "compile_commands.json").exists():
+                REAL_LAYOUT.update(oraclekit.generate_layout(ROOT, ROOT / build))
+                break
+        else:
+            raise unittest.SkipTest("no build directory with compile_commands.json")
+    return REAL_LAYOUT
+
+
+def csv_dicts(data: bytes) -> list[dict[str, str]]:
+    return oraclekit.csv_rows(data)[1]
+
+
+class SimEventKitTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.page = (ROOT / oraclekit.SIM_EVENTS_PAGE).read_text(encoding="utf-8")
+        cls.header = (ROOT / oraclekit.SIM_EVENTS_HEADER).read_text(encoding="utf-8")
+        cls.terms = oraclekit.term_rows((ROOT / oraclekit.TERMS_SOURCE).read_bytes())
+
+    def test_the_queue_and_its_record_are_in_the_layout(self):
+        records = real_layout()["records"]
+        self.assertEqual(records["SimEvent"]["size"], 32)
+        self.assertEqual([f["name"] for f in records["SimEvent"]["fields"]], ["kind", "flags", "tick", "args"])
+        queue = records["SimEventQueue"]
+        self.assertEqual(queue["size"], 16 + 4096 * 32)
+        self.assertEqual([(f["name"], f["offset"], f["size"]) for f in queue["fields"]],
+                         [("head", 0, 4), ("tail", 4, 4), ("dropped", 8, 4), ("reserved", 12, 4), ("records", 16, 4096 * 32)])
+
+    def test_the_layout_of_the_queue_names_no_source_file(self):
+        text = json.dumps({k: v for k, v in real_layout()["records"].items() if k.startswith("SimEvent")})
+        self.assertEqual(oraclekit.names_source(text.encode()), [])
+
+    def test_the_kinds_table_has_a_row_for_each_kind_of_the_enum(self):
+        rows = csv_dicts(oraclekit.kinds_table(self.header, self.page))
+        enum = oraclekit.enum_kinds(self.header)
+        self.assertEqual({r["kind"]: int(r["value"]) for r in rows}, enum)
+        self.assertEqual([int(r["value"]) for r in rows], sorted(enum.values()))
+        self.assertNotIn(24, enum.values())
+        by_kind = {r["kind"]: r for r in rows}
+        speech = by_kind["SIM_EVENT_UNIT_SPEECH"]
+        self.assertEqual((speech["arguments"], speech["records"]), ("3", "1"))
+        self.assertIn("speaks only while it is off screen", speech["flags"])
+        self.assertIn("0 unit index:", speech["argument_list"])
+        nano = by_kind["SIM_EVENT_NANO_PARTICLES"]
+        self.assertEqual((nano["arguments"], nano["records"], nano["flags"]), ("10", "2", "none"))
+        self.assertIn("0-2 position:", nano["argument_list"])
+        self.assertEqual(by_kind["SIM_EVENT_THRUST_PARTICLES"]["arguments"], "9")
+        self.assertEqual((by_kind["SIM_EVENT_NONE"]["arguments"], by_kind["SIM_EVENT_NONE"]["records"]), ("0", "0"))
+
+    def test_the_kinds_table_is_the_same_each_time(self):
+        self.assertEqual(oraclekit.kinds_table(self.header, self.page), oraclekit.kinds_table(self.header, self.page))
+
+    def test_a_kind_the_enum_and_the_page_disagree_on_stops_the_table(self):
+        with self.assertRaises(oraclekit.Refusal) as caught:
+            oraclekit.kinds_table(self.header, self.page.replace("### SIM_EVENT_SOUND\n\nValue 2.", "### SIM_EVENT_SOUND\n\nValue 24.", 1))
+        self.assertIn("SIM_EVENT_SOUND is 24 on the page and 2 in the enum", str(caught.exception))
+        with self.assertRaises(oraclekit.Refusal) as caught:
+            oraclekit.kinds_table(self.header + "\n", self.page.replace("### SIM_EVENT_BLACK_SMOKE", "### SIM_EVENT_BLACKER_SMOKE"))
+        self.assertIn("SIM_EVENT_BLACK_SMOKE is in the enum and not on the page", str(caught.exception))
+        self.assertIn("SIM_EVENT_BLACKER_SMOKE is on the page and not in the enum", str(caught.exception))
+
+    def test_the_page_scan_finds_the_terms_of_the_page(self):
+        keys, hexes = oraclekit.page_terms(self.page)
+        for key in ("call flag 2", "call flag 8", "call flag 32", "state 2 of the pickup order", "state 2", "kill type 7",
+                    "damage kind 10", "damage kind 11", "damage kind 2", "damage kind 1", "map flag 1", "map flag 2", "match flag 2",
+                    "net game flag 1", "spot flag bit 0", "activation bit 0", "activation bit 2",
+                    "game type 1", "game type 2", "game type 3", "player type 1", "player type 2", "player type 3"):
+            self.assertIn(key, keys)
+        for number in (0x2000, 0x10000000, 0x4000, 0x20000000, 0x20, 0x300, 0x60000000):
+            self.assertIn(number, hexes)
+
+    def test_every_number_of_the_page_has_a_definition(self):
+        oraclekit.check_terms(self.page, self.terms)
+        keys, hexes = oraclekit.page_terms(self.page)
+        defined = {oraclekit.norm_term(r["term"]) for r in self.terms}
+        self.assertEqual(sorted(keys - defined), [])
+        self.assertTrue(all(r["definition"].strip() for r in self.terms))
+
+    def test_a_term_of_the_page_without_a_definition_stops_the_export(self):
+        for added, term in (("A unit in state 7 of the pickup order.", "state 7 of the pickup order"),
+                            ("The unit has flag 0x1234.", "0x1234"),
+                            ("The unit dies with kill type 9.", "kill type 9"),
+                            ("Hit by damage kind 12.", "damage kind 12"),
+                            ("The game type must be 4.", "game type 4"),
+                            ("A player of type 4 stays.", "player type 4"),
+                            ("The map flag 4 is set.", "map flag 4"),
+                            ("A step called with flag 16.", "call flag 16")):
+            with self.assertRaises(oraclekit.Refusal) as caught:
+                oraclekit.kit_page(self.page + "\n" + added + "\n", self.terms)
+            self.assertIn(term, str(caught.exception))
+            self.assertIn("has no row", str(caught.exception))
+
+    def test_the_player_and_game_types_are_defined_by_what_they_are(self):
+        by_term = {r["term"]: r for r in self.terms}
+        for n in (1, 2, 3):
+            self.assertIn("docs/scenario-format.md", by_term["game type %d" % n]["kit_reference"])
+            self.assertIn("layout.json Player.type", by_term["player type %d" % n]["kit_reference"])
+        self.assertIn("isfeature", by_term["kill type 7"]["definition"])
+        self.assertIn("nothing else sets it", by_term["match flag 2"]["definition"])
+
+    def test_a_definition_the_page_does_not_use_stops_the_export(self):
+        rows = self.terms + [{"term": "kill type 12", "definition": "A kill.", "kit_reference": ""}]
+        with self.assertRaises(oraclekit.Refusal) as caught:
+            oraclekit.kit_page(self.page, rows)
+        self.assertIn("kill type 12 is defined", str(caught.exception))
+
+    def test_a_row_without_a_definition_is_refused(self):
+        with self.assertRaises(oraclekit.Refusal):
+            oraclekit.term_rows(b"term,definition,kit_reference\nkill type 3,,\n")
+        with self.assertRaises(oraclekit.Refusal):
+            oraclekit.term_rows(b"term,meaning\nkill type 3,x\n")
+
+    def test_the_kit_page_is_the_page_with_the_terms_after_it(self):
+        kit = oraclekit.kit_page(self.page, self.terms).decode()
+        head, tail = kit.split("\n## Terms\n")
+        self.assertEqual(head, oraclekit.one_entry_per_line(self.page).rstrip("\n") + "\n")
+        before, after = self.page.split("\n## Tables\n")
+        self.assertTrue(kit.startswith(before + "\n## Tables\n"))
+        self.assertEqual(after.split("\n## ", 1)[1], head.split("\n## Tables\n")[1].split("\n## ", 1)[1])
+        for row in self.terms:
+            self.assertIn("| %s |" % row["term"], tail)
+        self.assertEqual(kit, oraclekit.kit_page(self.page, self.terms).decode())
+        self.assertEqual(oraclekit.page_terms(kit), oraclekit.page_terms(self.page))
+        self.assertIn("viewed player", kit)
+
+    def test_a_long_numbered_list_is_set_one_entry_to_a_line_and_loses_nothing(self):
+        page = "# T\n\n## Tables\n\n### K\n\nThe kinds: " + ", ".join('%d "name%d"' % (n, n) for n in range(10)) + ".\n\n### S\n\n0 is \"a\", 1 is \"b\".\n\n## End\n"
+        text = oraclekit.one_entry_per_line(page)
+        self.assertIn("The kinds:\n\n- 0 \"name0\"\n- 1 \"name1\"\n", text)
+        self.assertIn('- 9 "name9".\n', text)
+        self.assertIn('0 is "a", 1 is "b".', text)
+        self.assertEqual(re.findall(r'\d+ "name\d+"', text), re.findall(r'\d+ "name\d+"', page))
+        self.assertEqual(oraclekit.one_entry_per_line("no tables here\n"), "no tables here\n")
+        real = oraclekit.one_entry_per_line(self.page)
+        self.assertEqual(oraclekit.page_terms(real), oraclekit.page_terms(self.page))
+        self.assertIn('- 23 "canceldestruct" ("Self destruct terminated").', real)
+        self.assertEqual(oraclekit.one_entry_per_line(real), real)
+
+    def test_the_machine_dependent_notes_are_kept(self):
+        kit = oraclekit.kit_page(self.page, self.terms).decode()
+        for line in self.page.splitlines():
+            if "viewed player" in line or "local player" in line:
+                self.assertIn(line, kit)
+
+    def test_each_term_points_into_the_kit_or_is_defined_here(self):
+        layout_names = set()
+        for name, entry in real_layout()["records"].items():
+            layout_names.update("%s.%s" % (name, f["name"]) for f in entry["fields"])
+        for row in self.terms:
+            for ref in re.findall(r"layout\.json ([A-Z]\w*\.\w+)", row["kit_reference"]):
+                self.assertIn(ref, layout_names, row["term"])
+            for ref in re.findall(r"\b(SIM_EVENT_\w+)\b", row["kit_reference"]):
+                self.assertIn(ref, self.header, row["term"])
+
+    def test_the_export_carries_the_page_the_table_and_the_layout(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, SIM_FILES)
+            kit = Path(out) / "k"
+            layout = {"records": {"SimEventQueue": {"size": 16}}}
+            manifest = oraclekit.export(root, kit, True, layout, SIM_CONTENTS)
+            paths = [f["path"] for f in manifest["files"]]
+            self.assertIn("interfaces/sim_events.csv", paths)
+            self.assertIn("docs/sim-events.md", paths)
+            self.assertIn("SimEventQueue", (kit / "layout.json").read_text())
+            page = (kit / "docs" / "sim-events.md").read_text()
+            self.assertIn("\n## Terms\n", page)
+            self.assertIn("| kill type 3 | A self-destruct. | this page |", page)
+            rows = csv_dicts((kit / "interfaces" / "sim_events.csv").read_bytes())
+            self.assertEqual([r["kind"] for r in rows], ["SIM_EVENT_NONE", "SIM_EVENT_SOUND", "SIM_EVENT_NANO"])
+            self.assertEqual(oraclekit.verify(kit), [])
+
+    def test_the_export_without_a_definition_writes_nothing(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {**SIM_FILES, oraclekit.TERMS_SOURCE: SIM_TERMS.replace("kill type 3,A self-destruct.,\n", "")})
+            kit = Path(out) / "k"
+            with self.assertRaises(oraclekit.Refusal) as caught:
+                oraclekit.export(root, kit, True, {"records": {}}, SIM_CONTENTS)
+            self.assertIn("kill type 3 is used by docs/sim-events.md", str(caught.exception))
+            self.assertFalse(kit.exists())
+
+    def test_the_generated_table_is_checked_for_names_like_a_document(self):
+        files = {"layout.json": LEAK_LAYOUT.encode(), oraclekit.SIM_EVENTS_TABLE: b"kind\nUpdateMeteorShower\n"}
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "meteors.cpp").write_text(LEAK_SOURCE)
+            hits = oraclekit.leak_check(files, Path(tmp))
+        self.assertTrue(any("UpdateMeteorShower" in h for h in hits), hits)
+
+
 LEAK_SOURCE = """\
 // FUNCTION: 0x437de0
 void UpdateMeteorShower(int tickCount)

@@ -23,6 +23,8 @@ sha256 and size, the commit it was cut from, and the kit's version: the pair of 
 | `tools/wasm_fuel.py` | the fuel pass: meters a finished module by the rule of ABI 11, standard library and `wasm-tools` only | `docs/module-abi.md`, section 11 |
 | `tests/replay/` | the stored per-module replay recordings | `docs/replay-format.md` |
 | `data/replay_schema.json` | the annotations and the fields, objects and slots the recordings name | `docs/replay-format.md` |
+| `docs/sim-events.md` | the sim event queue: the record, the queue, each kind of event and when the logic records it, with a `Terms` section at its end (below) | itself |
+| `interfaces/sim_events.csv` | the kinds of sim event as a table (below) | `docs/sim-events.md` |
 | `layout.json` | the state block layout (below) | `docs/module-abi.md`, sections 7 to 9 |
 | `coupling/` | what the subsystems read of each other's state, and what presentation reads (below) | itself |
 
@@ -67,6 +69,28 @@ has `meteor` at bit 5). It carries no cross-references to the decompilation (the
 | `weapon` | `WeaponDef` | the first argument of `weapons.SpawnProjectile` and the result of `weapons.FindWeaponByName`, section 9.2 |
 
 A pointer field stored in the block is a `Ref<T>`: a 32-bit block offset (section 7.1).
+
+## The sim event queue
+
+The logic tells the presentation what happened by recording events into a queue, and `docs/sim-events.md` states the queue,
+the record and each kind. Three files carry it.
+
+`layout.json` has the record `SimEvent` (32 bytes: `kind`, `flags`, `tick`, `args`) and the queue `SimEventQueue` (`head`,
+`tail`, `dropped`, `reserved` and the ring `records`) next to the records of the state block.
+
+`interfaces/sim_events.csv` has a row for each kind of `SimEventKind` in `interfaces/services.h`, sorted by value. The columns
+are `kind` (the enumerator), `value`, `arguments` (how many arguments the event has, the second record's included), `records`
+(0 for the empty record, 1, or 2 when the event has more than six arguments), `flags` (the bits of `SimEvent.flags` the kind
+sets, or `none`), `phases` (where the call graph reaches a record of the kind, as the page's `Phases:` line states) and
+`argument_list` (the arguments in order, joined by ` | `, each as `index type: meaning`, a range as `first-last`).
+
+The page's conditions are written with the engine's own numbers: the flags of an order step, the states of an order, the
+flags of a unit, the map flags, the kill types and the damage kinds. Its last section, `Terms`, defines every one of them, in
+a table of the term, its meaning and the place in the kit that holds it (a field of `layout.json`, an interface name, or this
+page). A term whose meaning the kit's data does not give is defined by what setting the flag does or what each state does.
+The `Terms` section is the same for every export, because it is generated from one list of terms, and the export is refused
+when the page uses a number the list does not define.
+The kit's copy of the page sets each long numbered list of its `Tables` section one entry to a line, with the entries as they are.
 
 ## What the subsystems depend on
 

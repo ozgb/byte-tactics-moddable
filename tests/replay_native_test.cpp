@@ -1395,6 +1395,35 @@ void ApplyUnits(std::vector<Unit*, std::allocator<Unit*> >* out, const char* nam
     }
 }
 
+struct ListAnswer {
+    bool valid;
+    bool over;
+    int capacity;
+    char key[192];
+    std::vector<Unit*, std::allocator<Unit*> > units;
+} g_list;
+
+int EnterList(ReplayText& t, Ref<Unit>* out, int capacity)
+{
+    bool repeat = g_list.valid && g_list.over && capacity > g_list.capacity && strcmp(g_list.key, t.Data()) == 0;
+    if (!repeat) {
+        int before = g_diffs;
+        g_list.valid = false;
+        g_list.units.clear();
+        Enter(t);
+        ApplyUnits(&g_list.units, "out");
+        g_list.valid = g_diffs == before && strlen(t.Data()) < sizeof g_list.key;
+        if (g_list.valid)
+            strcpy(g_list.key, t.Data());
+    }
+    int count = (int)g_list.units.size();
+    for (int k = 0; k < count && k < capacity; k++)
+        out[k] = Ref<Unit>(g_list.units[(unsigned)k]);
+    g_list.over = count > capacity;
+    g_list.capacity = capacity;
+    return count;
+}
+
 void __fastcall LoadMeteorDefaultsSlot(MeteorParams* params)
 {
     params->LoadMeteorDefaults();
@@ -1914,6 +1943,7 @@ void ReplayCall(const char* file, Outcome& out)
     g_detail.Clear();
     BeginHeld();
     g_importIndex = 0;
+    g_list.valid = false;
     g_outCount = 0;
     g_rootCount = 0;
     memset(g_snapshotData, 0, sizeof g_snapshotData);
@@ -2829,8 +2859,50 @@ void BeginImport()
 {
     g_cursor = g_callFirst + 1;
     g_importIndex = 0;
+    g_list.valid = false;
     ReplayHandles().Reset();
     BeginCompare();
+}
+
+void EnemyListSelfTest()
+{
+    printf("a unit list answered from the recorded vector form\n");
+    const char* call = "  i ai.GetVisibleEnemiesInRadius 1 pos=(100,0,200) 300 0\n  o out [Unit#3,Unit#9,Unit#5]\n";
+    Vec3 pos;
+    pos.x = 100;
+    pos.y = 0;
+    pos.z = 200;
+    Ref<Unit> wide[5];
+    Ref<Unit> narrow[2];
+    ResetBlock();
+    LoadCall(call);
+    BeginImport();
+    memset(wide, 0, sizeof wide);
+    int count = Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
+    Check(g_diffs == 0 && count == 3 && wide[0].get() != nullptr && wide[1].get() != nullptr && wide[2].get() != nullptr && wide[3].get() == nullptr, "a capacity at or above the count gets every unit in one call");
+    Check(wide[0].get() != wide[1].get() && wide[1].get() != wide[2].get(), "in the recorded order, one unit each");
+
+    ResetBlock();
+    LoadCall(call);
+    BeginImport();
+    memset(narrow, 0, sizeof narrow);
+    memset(wide, 0, sizeof wide);
+    count = Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, narrow, 2);
+    Check(g_diffs == 0 && count == 3 && narrow[0].get() != nullptr && narrow[1].get() != nullptr, "a capacity below the count gets the first units and the full count");
+    int again = Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
+    Check(g_diffs == 0 && again == 3 && g_importIndex == 1, "a repeat with a larger buffer is answered from the same line");
+    Check(wide[0].get() == narrow[0].get() && wide[1].get() == narrow[1].get() && wide[2].get() != nullptr && wide[3].get() == nullptr, "with the same units in the same order");
+    again = Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
+    printf("a third call: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 ai.GetVisibleEnemiesInRadius") == 0, "a third call is reported as an extra import");
+
+    ResetBlock();
+    LoadCall(call);
+    BeginImport();
+    Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, narrow, 2);
+    Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 301, 0, wide, 5);
+    printf("a repeat with another radius: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 ai.GetVisibleEnemiesInRadius") == 0, "a repeat with other arguments is reported as an extra import");
 }
 
 void ShapeSelfTest()
@@ -3485,6 +3557,7 @@ void SnapshotSelfTest()
     LoadCall(body);
     g_cursor = g_callFirst + 1;
     g_importIndex = 0;
+    g_list.valid = false;
     ReplayHandles().Reset();
     memset(g_snapshotData, 0, sizeof g_snapshotData);
     g_captureUsed = 0;
@@ -5310,6 +5383,7 @@ int SelfTest(const char* file)
     ArraySelfTest();
     FormSelfTest();
     ShapeSelfTest();
+    EnemyListSelfTest();
     InOutRunnerSelfTest();
     PolymorphicSelfTest();
     RefsSelfTest();

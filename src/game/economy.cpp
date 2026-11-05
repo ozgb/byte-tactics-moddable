@@ -327,7 +327,7 @@ void __stdcall UpdatePlayerEconomy(Player* p)
                 } else if (u->def->windgenerator > 0) {
                     AddIncomeW(u, &u->resourceSlot.energyMake, WIND_INCOME((double)g_game->windStrength * u->def->windgenerator));
                 } else if (u->def->tidalgenerator > 0) {
-                    AddIncomeDB(u, &u->resourceSlot.energyMake, g_game->tidal * u->def->tidalgenerator);
+                    AddIncomeDB(u, &u->resourceSlot.energyMake, (double)g_game->tidal * u->def->tidalgenerator);
                 }
             }
         } else if ((u->activateFlags & 1) || (u->flags & 0xc) > 0) {

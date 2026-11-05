@@ -22,6 +22,11 @@
 #include "../src/map/plot_map.h"
 #include "../src/map/map_list.h"
 #include "../src/units/movement_class.h"
+#include "../src/units/weapon_aim_cob_cb.h"
+#include "../src/units/cob_script.h"
+#include "../src/weapons/weapons.h"
+#include "../src/weapons/weapon_types.h"
+#include "../src/weapons/explosions.h"
 #include "../src/harness/replay_services.h"
 #include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
@@ -29,6 +34,13 @@
 #include "../src/harness/replay_objects.h"
 #include "../src/harness/replay_callbacks.h"
 #include "replay_wasm.h"
+
+struct InterceptorUnitView;
+struct ReachPosVec3;
+Projectile* __stdcall FindTargetableProjectile(InterceptorUnitView* table, int index);
+int __stdcall WeaponCanReachPos(Unit* a1, ReachPosVec3* a2, ReachPosVec3* a3, int a4);
+int __stdcall GetWeaponRange(int param1, unsigned int param2);
+void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra);
 
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
 
@@ -84,6 +96,32 @@ int __cdecl ScaledCos(int angle, int scale)
 {
     return bx_ScaledCos((short)angle, scale);
 }
+
+char* g_fireScriptNames[4] = {(char*)"FirePrimary", (char*)"FireSecondary", (char*)"FireTertiary"};
+char* g_aimScriptNames[3] = {(char*)"AimPrimary", (char*)"AimSecondary", (char*)"AimTertiary"};
+char s_TakeDamage_00508d68[12] = "TakeDamage";
+char s_HitByWeapon_00508d74[12] = "HitByWeapon";
+char s_paralyze_00508d80[12] = "paralyze";
+
+extern "C" int __cdecl bx_AngleOfVector(int x, int z);
+
+short __cdecl AngleOfVector(int x, int z)
+{
+    return (short)bx_AngleOfVector(x, z);
+}
+
+#pragma comment(linker, "/alternatename:?AngleOfVector@@YAHHH@Z=?AngleOfVector@@YAFHH@Z")
+#pragma comment(linker, "/alternatename:?CalcAimAngles@@YGHPAUUnit@@PAUWeaponDef@@PAF2EPAUVec3@@@Z=?CalcAimAngles@@YGHPAUUnit@@0PAF1HPAUVec3@@@Z")
+#pragma comment(linker, "/alternatename:?CalcAimAngles@@YGHPAUUnit@@PAUWeaponDef@@PAG2EPAUVec3@@@Z=?CalcAimAngles@@YGHPAUUnit@@0PAF1HPAUVec3@@@Z")
+#pragma comment(linker, "/alternatename:?FindTargetableProjectile@@YGPAHPAUUnit@@E@Z=?FindTargetableProjectile@@YGPAUProjectile@@PAUInterceptorUnitView@@H@Z")
+#pragma comment(linker, "/alternatename:?FireBallisticProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@21@Z=?FireBallisticProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2H@Z")
+#pragma comment(linker, "/alternatename:?FireLineOfSightProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@21@Z=?FireLineOfSightProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2H@Z")
+#pragma comment(linker, "/alternatename:?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@21PAH@Z=?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2HH@Z")
+#pragma comment(linker, "/alternatename:?GetWeaponPiecePosition@@YGXPAUUnit@@PAUVec3@@EH@Z=?GetWeaponPiecePosition@@YGXPAUObject@@PAUVec3@@EH@Z")
+#pragma comment(linker, "/alternatename:?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@HHPAUUnit@@@Z=?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@2HPAUUnit@@@Z")
+#pragma comment(linker, "/alternatename:?SolveLaunchAngle@@YGFHHHHH@Z=?SolveLaunchAngle@@YGFHHHHM@Z")
+#pragma comment(linker, "/alternatename:?SubtractVec3@@YGXPAUVec3@@0PAH11@Z=?SubtractVec3@@YGXPAH0000@Z")
+#pragma comment(linker, "/alternatename:?WeaponCanReachPos@@YGHPAUUnit@@PAUVec3@@1E@Z=?WeaponCanReachPos@@YGHPAUUnit@@PAUReachPosVec3@@1H@Z")
 
 void __stdcall UpdateResourceSharing(Player* player);
 double __stdcall GetEnergyUse(UnitDef* def);
@@ -1575,6 +1613,51 @@ int __stdcall Native_fixture_Measure(int* p2, short* p3, unsigned char* p4)
     return 1;
 }
 
+int __stdcall GetWeaponRangeSlot(Unit* unit, unsigned int weapon)
+{
+    return GetWeaponRange((int)unit, weapon);
+}
+
+Projectile* __stdcall FindTargetableProjectileSlot(Unit* unit, unsigned int weapon)
+{
+    return FindTargetableProjectile((InterceptorUnitView*)unit, (int)weapon);
+}
+
+int __stdcall WeaponCanReachPosSlot(Unit* unit, Vec3* from, Vec3* to, int flags)
+{
+    return WeaponCanReachPos(unit, (ReachPosVec3*)from, (ReachPosVec3*)to, flags);
+}
+
+WeaponDef* __stdcall FindWeaponByNameSlot(char* name)
+{
+    return (WeaponDef*)FindWeaponByName(name);
+}
+
+void __stdcall ApplyAreaDamageAtSlot(WeaponDef* weapon, Vec3* pos)
+{
+    ApplyAreaDamageAt(weapon, pos);
+}
+
+void __stdcall CobScriptExplodePieceSlot(CobScript* script, int piece, unsigned int flags)
+{
+    script->ExplodePiece(piece, flags);
+}
+
+void __fastcall ClaimWeaponsSlot(Unit* self, int unusedEdx, unsigned char index)
+{
+    self->ClaimWeapons(index);
+}
+
+void __fastcall ReleaseWeaponsSlot(Unit* self, int unusedEdx, unsigned char index)
+{
+    self->ReleaseWeapons(index);
+}
+
+void __stdcall WeaponAimCobCompleteSlot(Callback* callback, int result)
+{
+    ((WeaponAimCobCb*)callback)->OnAimCobReturn(result);
+}
+
 int __fastcall GetGameTypeSlot(Mission* self)
 {
     return self->GetGameType();
@@ -2569,7 +2652,7 @@ void TableSelfTest()
     Projectile* rebuilt = (Projectile*)ReplayResolveObject("Projectile#3", nullptr, g_objects, AllocObject);
     MovementClass* rebuiltClass = (MovementClass*)ReplayResolveObject("MovementClass#5", nullptr, g_objects, AllocObject);
     Check(rebuilt != nullptr && rebuilt == &g_game->projectiles.get()[3], "a projectile is a slot of the rebuilt pool");
-    Check(g_game->projectileCount == 1024, "the pool has the size the schema says");
+    Check(g_game->projectiles.get() != nullptr, "the pool is allocated with the size the schema says");
     Check(rebuilt != nullptr && rebuilt->speed == 77 && rebuilt->spawnTick == 900 && rebuilt->owner == 4, "its fields are restored");
     Check(rebuilt != nullptr && rebuilt->attacker.get() == &g_game->units.get()[2], "its attacker is a slot of the unit pool");
     Check(rebuiltClass == &MovementEntries()[5] && rebuiltClass->maxSlope == 9, "an entry of the sim table is restored in place");

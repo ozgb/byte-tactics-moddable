@@ -28,7 +28,7 @@ Contents:
 
 ## 1. Conventions
 
-- All values are little-endian. "i32" and "f64" are the WebAssembly value types; an address or an
+- All values are little-endian. "i32", "f32" and "f64" are the WebAssembly value types; an address or an
   offset is an unsigned 32-bit value held in an i32.
 - A **slot** is a function a module exports for the engine to call, one per entry of an interface
   (a function table the engine calls a subsystem through). A **module** implements the slots of one
@@ -239,8 +239,10 @@ attributes:
   sign extension and bulk memory (which wasm-ld uses to zero bss). The engine's configuration
   gives deterministic relaxed SIMD and NaN canonicalisation and has no threads or fuel; do not rely
   on more than the reference modules use.
-- **Value types at the boundary** are i32 and f64 only (section 7). No slot or import takes or
-  returns an i64, an f32 or more than one result.
+- **Value types at the boundary** are i32, f32 and f64 only (section 7). No slot or import takes or
+  returns an i64 or more than one result. An f32 crosses the boundary bit for bit: neither the host
+  nor the module widens, rounds, canonicalises or otherwise converts it, and a NaN payload and a
+  denormal arrive as they left.
 - **Start function.** A module may have one. It runs while the module is instantiated, before the
   host writes the data words and before the fuel counter is set, so it runs unmetered
   (section 11). It must not depend on the data words.
@@ -286,7 +288,7 @@ A number must be a non-negative integer.
 | `size_budget` | the most bytes the `.wasm` may be | checks |
 | `cxx`, `c` | source files of the module in the reference repository | the reference build only; the kit's manifest leaves them out |
 
-A kind is one of `int`, `f64`, `void` (a result only), `linear`, `block`, `scratch`, `handle`
+A kind is one of `int`, `f32`, `f64`, `void` (a result only), `linear`, `block`, `scratch`, `handle`
 (section 7). A signature has at most 16 arguments and at most one result. `exports` and `data`
 must be lists of names.
 
@@ -326,7 +328,7 @@ them at start-up (section 13).
 - Two windows that overlap, or two table ranges that overlap.
 - A module not in the manifest, loaded twice, or loaded before the memory exists.
 - A module that does not compile, or does not instantiate: an import the host did not define, an
-  import whose type differs from the host's (the host's types are `i` for i32 and `d` for f64),
+  import whose type differs from the host's (the host's types are `i` for i32, `f` for f32 and `d` for f64),
   an import of the memory or table with a minimum above the real size or a maximum below it.
 - A name in `exports` that is not a function export, or a name in `data` that is not an i32 global
   export.
@@ -363,7 +365,7 @@ A slot is a function export of the module's wasm instance, named exactly like th
 - **Finding.** The host finds a slot by export name in the module's instance. It never looks one up
   in the table. (The loader keeps the slots in the order of `exports`, and puts free table entries in
   that order, but a host calls by name.)
-- **Signature.** A slot takes at most 16 arguments and returns at most one result, each i32 or f64,
+- **Signature.** A slot takes at most 16 arguments and returns at most one result, each i32, f32 or f64,
   as the manifest's `slots` entry says in kinds (section 7). Calling-convention keywords of the
   engine's native language do not exist at the boundary: a slot called with an implicit `this` in
   the native build takes it as its first argument.
@@ -379,11 +381,12 @@ A slot is a function export of the module's wasm instance, named exactly like th
 ## 7. Argument kinds and the pointer rule
 
 A kind says what an argument or a result is. The wasm type of `int`, `linear`, `block`, `scratch`
-and `handle` is i32; of `f64`, f64; `void` is no result.
+and `handle` is i32; of `f32`, f32; of `f64`, f64; `void` is no result.
 
 | Kind | At the boundary |
 | --- | --- |
 | `int` | a 32-bit integer: a count, an enumerator (a random stream is 0 for the main stream, 1 for the load stream), a flag, a signed value |
+| `f32` | an IEEE 754 single, the 32 bits carried unchanged: the host moves it as a 32-bit pattern and does not pass it through a wider or a canonicalising type |
 | `f64` | an IEEE 754 double |
 | `void` | no result |
 | `linear` | an address in the shared memory; 0 is null. The object it points to is in the module's window, on its stack, or in the block (or in the scratch area, for a slot argument). A callee reads and writes the object in place |
@@ -427,6 +430,18 @@ behaviour is the contract the existing module was built against.
   look at how many bytes the callee will use, so the module is responsible for passing a buffer big
   enough.
 - A `block` result that is not inside the block is a trap.
+
+### 7.3 A buffer the caller supplies
+
+A slot that returns a list of objects takes a buffer from the caller, so that no native container
+layout is part of the contract. `ai.GetVisibleEnemiesInRadiusList(int player, const Vec3* pos, int
+radius, int flags, Unit** out, int capacity) -> int` (kinds `[int, linear, int, int, linear, int]
+-> int`) is the slot of this form.
+
+- It returns the number of units found, which may be above `capacity`.
+- It writes the first `min(count, capacity)` units to `out`, each as a block offset (section 7.1), in
+  the order the native vector holds them, and writes nothing past `capacity`.
+- A caller that gets a count above its capacity calls again with a larger buffer.
 
 ## 8. Handles and the loader data words
 
@@ -487,7 +502,7 @@ A module's imports are the allowlist below and nothing else.
 - The module's exports must equal the entry's `exports` plus its `data` plus `__fuel_set` and
   `__fuel_get`, exactly.
 - For every import and slot, the manifest's kinds must match the wasm signature: the same number of
-  arguments, `f64` exactly where the wasm type is f64, and `void` exactly where there is no result.
+  arguments, `f32` exactly where the wasm type is f32, `f64` exactly where the wasm type is f64, and `void` exactly where there is no result.
 
 The reference's `imports` check enforces all of this on every built module. It is the check that
 catches non-determinism at the boundary whatever language the module is written in.

@@ -1,0 +1,8171 @@
+bt-replay 2
+subsystem targeting 1.1
+call 0 ResetWeaponTarget
+  r Unit#1.weapon0TargetX 0
+  r Unit#1.weapon0TargetZ 0
+  r Unit#1.weapon0Def null
+  r Unit#1.weapon0Flags 0
+  r Unit#1.weapon1TargetX 0
+  r Unit#1.weapon1TargetZ 0
+  r Unit#1.weapon1Def null
+  r Unit#1.weapon1Flags 0
+  r Unit#1.weapon2TargetX 0
+  r Unit#1.weapon2TargetZ 0
+  r Unit#1.weapon2Def null
+  r Unit#1.weapon2Flags 0
+  a unit Unit#1
+  a weapon 0
+  w Unit#1.weapon0TargetZ -32768
+call 0 ResetWeaponTarget
+  a unit Unit#1
+  a weapon 1
+  w Unit#1.weapon1TargetZ -32768
+call 0 ResetWeaponTarget
+  a unit Unit#1
+  a weapon 2
+  w Unit#1.weapon2TargetZ -32768
+call 0 ResetWeaponTarget
+  r Unit#251.weapon0TargetX 0
+  r Unit#251.weapon0TargetZ 0
+  r Unit#251.weapon0Def null
+  r Unit#251.weapon0Flags 0
+  r Unit#251.weapon1TargetX 0
+  r Unit#251.weapon1TargetZ 0
+  r Unit#251.weapon1Def null
+  r Unit#251.weapon1Flags 0
+  r Unit#251.weapon2TargetX 0
+  r Unit#251.weapon2TargetZ 0
+  r Unit#251.weapon2Def null
+  r Unit#251.weapon2Flags 0
+  a unit Unit#251
+  a weapon 0
+  w Unit#251.weapon0TargetZ -32768
+call 0 ResetWeaponTarget
+  a unit Unit#251
+  a weapon 1
+  w Unit#251.weapon1TargetZ -32768
+call 0 ResetWeaponTarget
+  a unit Unit#251
+  a weapon 2
+  w Unit#251.weapon2TargetZ -32768
+call 0 GetWeaponTargetUnit
+  r Unit#1.weapon0Def weapondef#20
+  r Unit#1.weapon0Flags 18
+  r Unit#1.weapon1Def weapondef#0
+  r Unit#1.weapon1Flags 20
+  r Unit#1.weapon2Def weapondef#22
+  r Unit#1.weapon2Flags 26
+  a unit Unit#1
+  a weapon 0
+  o result null
+call 0 FindWeaponTarget
+  r Game.uiOptionFlags 12
+  r rng.main 0x000005ad
+  r rng.load 0x218b8b73
+  r rng.seed 0x41bd1988
+  r Unit#1.def UnitDef#1
+  r Unit#1.player Player#0
+  r Unit#1.flags 0x90e00221
+  r Unit#1.activateFlags 1
+  r Unit#1.unitDefIndex 34
+  r Unit#1.playerIndex 0
+  r Unit#1.posX 36700160
+  r Unit#1.posY 65536
+  r Unit#1.posZ 15728640
+  r UnitDef#1.flags1 0x0495c0c8
+  r UnitDef#1.range 290
+  r UnitDef#1.categories UnitTypeSet#1
+  r UnitDef#1.weaponCategories0 UnitTypeSet#1
+  r UnitDef#1.weaponCategories1 UnitTypeSet#2
+  r UnitDef#1.weaponCategories2 UnitTypeSet#2
+  r Player#0.active 1
+  r Player#0.type 1
+  r weapondef#20.flags 0x00080809
+  r weapondef#0.flags 0x00000000
+  r weapondef#22.flags 0x04480a09
+  r UnitTypeSet#1.bits x:0800a0244000088020000028000d00080008101002088000c000000000a0020010c0010000000000000000000000000000000000000000000000000000000000
+  r UnitTypeSet#2.bits x:00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  a unit Unit#1
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#1 0 = 200
+  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  o out []
+  o result null
+call 0 ClearWeaponTarget
+  r Unit#1.script CobScript#1
+  a unit Unit#1
+  a weapon 0
+call 0 GetWeaponTargetUnit
+  r Unit#251.weapon0Def weapondef#21
+  r Unit#251.weapon0Flags 18
+  r Unit#251.weapon1Def weapondef#0
+  r Unit#251.weapon1Flags 20
+  r Unit#251.weapon2Def weapondef#23
+  r Unit#251.weapon2Flags 26
+  a unit Unit#251
+  a weapon 0
+  o result null
+call 0 FindWeaponTarget
+  r rng.seed 0x1b2382a5
+  r Unit#251.def UnitDef#2
+  r Unit#251.player Player#1
+  r Unit#251.flags 0x90e00021
+  r Unit#251.activateFlags 1
+  r Unit#251.unitDefIndex 167
+  r Unit#251.playerIndex 1
+  r Unit#251.posX 221249536
+  r Unit#251.posY 65536
+  r Unit#251.posZ 92274688
+  r UnitDef#2.flags1 0x0495c0c8
+  r UnitDef#2.range 290
+  r UnitDef#2.categories UnitTypeSet#1
+  r UnitDef#2.weaponCategories0 UnitTypeSet#1
+  r UnitDef#2.weaponCategories1 UnitTypeSet#2
+  r UnitDef#2.weaponCategories2 UnitTypeSet#2
+  r Player#1.active 1
+  r Player#1.type 2
+  r weapondef#21.flags 0x00080809
+  r weapondef#23.flags 0x04480a09
+  a unit Unit#251
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 0 = 200
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  o out []
+  o result null
+call 0 ClearWeaponTarget
+  r Unit#251.script CobScript#2
+  a unit Unit#251
+  a weapon 0
+call 0 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 2
+  o result null
+call 0 FindWeaponTarget
+  a unit Unit#251
+  a weapon 2
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 2 = 240
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  o out []
+  o result null
+call 0 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 2
+call 1 GetWeaponTargetPos
+  r Game.seaLevel 0
+  r Unit#1.killCount 0
+  r Unit#1.motion UnitMotion#1
+  r UnitMotion#1.velocityX 0
+  r UnitMotion#1.velocityY 0
+  r UnitMotion#1.velocityZ 0
+  r weapondef#20.speed 873813
+  r weapondef#0.speed 0
+  r weapondef#22.speed 436906
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 1 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 1 GetWeaponTargetPos
+  r Unit#251.killCount 0
+  r Unit#251.motion UnitMotion#2
+  r UnitMotion#2.velocityX 0
+  r UnitMotion#2.velocityY 0
+  r UnitMotion#2.velocityZ 0
+  r weapondef#21.speed 873813
+  r weapondef#23.speed 436906
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 1 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 2 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 2 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 2 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 2 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 3 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 3 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 3 FindBestTargetIfFireAtWill
+  r Game.uiOptionFlags 14
+  r rng.main 0x12af81bc
+  r rng.seed 0x21873b87
+  r Unit#1.flags 0x90e00321
+  a unit Unit#1
+  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  o out []
+  o result null
+call 3 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 3 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 3 FindBestTargetIfFireAtWill
+  r rng.seed 0x35552d43
+  a unit Unit#251
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 290 0
+  o out []
+  o result null
+call 4 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 4 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 4 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 4 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 5 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 5 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 5 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 5 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 6 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 6 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 6 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 6 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 7 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 7 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 7 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 7 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 8 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 8 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 8 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 8 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 9 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 9 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 9 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 9 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 10 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 10 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 10 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 10 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 11 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 11 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 11 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 11 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 12 ResetWeaponTarget
+  r Unit#2.weapon0TargetX 0
+  r Unit#2.weapon0TargetZ 0
+  r Unit#2.weapon0Def null
+  r Unit#2.weapon0Flags 0
+  r Unit#2.weapon1TargetX 0
+  r Unit#2.weapon1TargetZ 0
+  r Unit#2.weapon1Def null
+  r Unit#2.weapon1Flags 0
+  r Unit#2.weapon2TargetX 0
+  r Unit#2.weapon2TargetZ 0
+  r Unit#2.weapon2Def null
+  r Unit#2.weapon2Flags 0
+  a unit Unit#2
+  a weapon 0
+  w Unit#2.weapon0TargetZ -32768
+call 12 ResetWeaponTarget
+  a unit Unit#2
+  a weapon 1
+  w Unit#2.weapon1TargetZ -32768
+call 12 ResetWeaponTarget
+  a unit Unit#2
+  a weapon 2
+  w Unit#2.weapon2TargetZ -32768
+call 12 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 12 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 12 GetWeaponTargetPos
+  r Unit#2.script CobScript#3
+  r Unit#2.unitDefIndex 95
+  r Unit#2.killCount 0
+  r Unit#2.motion UnitMotion#3
+  r Unit#2.posX 41943040
+  r Unit#2.posY 65536
+  r Unit#2.posZ 17039360
+  r Unit#2.weapon0Def weapondef#16
+  r Unit#2.weapon0Flags 18
+  r Unit#2.weapon1Def weapondef#0
+  r Unit#2.weapon1Flags 20
+  r Unit#2.weapon2Def weapondef#0
+  r Unit#2.weapon2Flags 24
+  r UnitMotion#3.velocityX 0
+  r UnitMotion#3.velocityY 0
+  r UnitMotion#3.velocityZ 0
+  r weapondef#16.flags 0x00080a01
+  r weapondef#16.speed 655360
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 12 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 12 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 13 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 13 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 13 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 13 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 13 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 14 ResetWeaponTarget
+  r Unit#252.weapon0TargetX 0
+  r Unit#252.weapon0TargetZ 0
+  r Unit#252.weapon0Def null
+  r Unit#252.weapon0Flags 0
+  r Unit#252.weapon1TargetX 0
+  r Unit#252.weapon1TargetZ 0
+  r Unit#252.weapon1Def null
+  r Unit#252.weapon1Flags 0
+  r Unit#252.weapon2TargetX 0
+  r Unit#252.weapon2TargetZ 0
+  r Unit#252.weapon2Def null
+  r Unit#252.weapon2Flags 0
+  a unit Unit#252
+  a weapon 0
+  w Unit#252.weapon0TargetZ -32768
+call 14 ResetWeaponTarget
+  a unit Unit#252
+  a weapon 1
+  w Unit#252.weapon1TargetZ -32768
+call 14 ResetWeaponTarget
+  a unit Unit#252
+  a weapon 2
+  w Unit#252.weapon2TargetZ -32768
+call 14 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 14 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 14 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 14 FindBestTargetIfFireAtWill
+  r rng.seed 0x12cdcb89
+  r Unit#2.def UnitDef#3
+  r Unit#2.player Player#0
+  r Unit#2.flags 0x94240221
+  r Unit#2.activateFlags 0
+  r Unit#2.playerIndex 0
+  r UnitDef#3.flags1 0x00918089
+  r UnitDef#3.range 280
+  r UnitDef#3.categories UnitTypeSet#1
+  r UnitDef#3.weaponCategories0 UnitTypeSet#1
+  r UnitDef#3.weaponCategories1 UnitTypeSet#2
+  r UnitDef#3.weaponCategories2 UnitTypeSet#2
+  a unit Unit#2
+  i ai.GetVisibleEnemiesInRadius 0 pos=(41943040,65536,17039360) 280 0
+  o out []
+  o result null
+call 14 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 14 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 14 GetWeaponTargetPos
+  r Unit#252.script CobScript#4
+  r Unit#252.unitDefIndex 144
+  r Unit#252.killCount 0
+  r Unit#252.motion UnitMotion#4
+  r Unit#252.posX 41943040
+  r Unit#252.posY 65536
+  r Unit#252.posZ 17039360
+  r Unit#252.weapon0Def weapondef#88
+  r Unit#252.weapon0Flags 18
+  r Unit#252.weapon1Def weapondef#0
+  r Unit#252.weapon1Flags 20
+  r Unit#252.weapon2Def weapondef#0
+  r Unit#252.weapon2Flags 24
+  r UnitMotion#4.velocityX 0
+  r UnitMotion#4.velocityY 0
+  r UnitMotion#4.velocityZ 0
+  r weapondef#88.flags 0x00080809
+  r weapondef#88.speed 873813
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 15 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 15 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 15 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 15 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 15 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 15 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 16 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 16 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 16 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 16 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 16 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 16 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 16 FindBestTargetIfFireAtWill
+  r rng.main 0x51dbed40
+  r rng.seed 0x04ed9904
+  r Unit#252.def UnitDef#4
+  r Unit#252.player Player#1
+  r Unit#252.flags 0x98240021
+  r Unit#252.activateFlags 0
+  r Unit#252.playerIndex 1
+  r UnitDef#4.flags1 0x00918089
+  r UnitDef#4.range 275
+  r UnitDef#4.categories UnitTypeSet#2
+  r UnitDef#4.weaponCategories0 UnitTypeSet#2
+  r UnitDef#4.weaponCategories1 UnitTypeSet#2
+  r UnitDef#4.weaponCategories2 UnitTypeSet#2
+  a unit Unit#252
+  i ai.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 275 0
+  o out []
+  o result null
+call 17 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 17 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 17 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 17 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 17 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 17 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 18 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 18 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 18 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 18 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 18 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 18 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 19 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 19 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 19 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 19 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 19 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 19 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 20 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 20 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 20 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 20 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 20 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 20 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 21 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 21 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 21 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 21 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 21 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 21 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 22 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 22 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 22 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 22 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 22 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 22 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 23 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 23 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 23 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 23 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 23 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 23 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 24 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 24 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 24 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 24 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 24 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 24 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 25 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 25 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 25 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 25 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 25 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 25 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 26 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 26 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 26 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 26 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 26 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 26 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 27 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 27 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 27 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 27 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 27 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 27 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 27 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result null
+call 27 FindWeaponTarget
+  r rng.seed 0x0ad8d823
+  a unit Unit#1
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#1 0 = 200
+  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  o out []
+  o result null
+call 27 ClearWeaponTarget
+  a unit Unit#1
+  a weapon 0
+call 27 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result null
+call 27 FindWeaponTarget
+  a unit Unit#2
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#2 0 = 180
+  i ai.GetVisibleEnemiesInRadius 0 pos=(41943040,65536,17039360) 180 0
+  o out []
+  o result null
+call 27 ClearWeaponTarget
+  a unit Unit#2
+  a weapon 0
+call 27 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 0
+  o result null
+call 27 FindWeaponTarget
+  a unit Unit#251
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 0 = 200
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  o out []
+  o result null
+call 27 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 0
+call 27 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 2
+  o result null
+call 27 FindWeaponTarget
+  a unit Unit#251
+  a weapon 2
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 2 = 240
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  o out []
+  o result null
+call 27 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 2
+call 27 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result null
+call 27 FindWeaponTarget
+  a unit Unit#252
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#252 0 = 180
+  i ai.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 180 0
+  o out []
+  o result null
+call 27 ClearWeaponTarget
+  a unit Unit#252
+  a weapon 0
+call 28 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 28 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 28 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 28 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 28 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 28 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 29 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 29 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 29 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 29 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 29 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 29 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 30 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 30 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 30 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 30 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 30 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 30 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 31 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 31 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 31 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 31 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 31 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 31 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 32 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 32 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 32 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 32 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 32 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 32 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 33 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 33 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 33 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 33 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 33 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 33 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 34 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 34 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 34 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 34 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 34 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 34 FindBestTargetIfFireAtWill
+  r rng.seed 0x35caa97f
+  r Unit#251.flags 0x90e40021
+  a unit Unit#251
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 290 0
+  o out []
+  o result null
+call 34 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 35 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 35 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 35 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 35 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 35 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 35 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 36 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 36 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 36 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 36 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 36 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 36 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 37 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 37 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 37 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 37 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 37 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 37 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 38 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 38 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 38 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 38 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 38 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 38 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 39 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 39 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 39 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 39 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 39 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 39 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 40 ResetWeaponTarget
+  r Unit#3.weapon0TargetX 0
+  r Unit#3.weapon0TargetZ 0
+  r Unit#3.weapon0Def null
+  r Unit#3.weapon0Flags 0
+  r Unit#3.weapon1TargetX 0
+  r Unit#3.weapon1TargetZ 0
+  r Unit#3.weapon1Def null
+  r Unit#3.weapon1Flags 0
+  r Unit#3.weapon2TargetX 0
+  r Unit#3.weapon2TargetZ 0
+  r Unit#3.weapon2Def null
+  r Unit#3.weapon2Flags 0
+  a unit Unit#3
+  a weapon 0
+  w Unit#3.weapon0TargetZ -32768
+call 40 ResetWeaponTarget
+  a unit Unit#3
+  a weapon 1
+  w Unit#3.weapon1TargetZ -32768
+call 40 ResetWeaponTarget
+  a unit Unit#3
+  a weapon 2
+  w Unit#3.weapon2TargetZ -32768
+call 40 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 40 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 40 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 40 GetWeaponTargetPos
+  r Unit#3.script CobScript#5
+  r Unit#3.unitDefIndex 54
+  r Unit#3.killCount 0
+  r Unit#3.motion UnitMotion#5
+  r Unit#3.posX 41943040
+  r Unit#3.posY 65536
+  r Unit#3.posZ 17039360
+  r Unit#3.weapon0Def weapondef#111
+  r Unit#3.weapon0Flags 18
+  r Unit#3.weapon1Def weapondef#0
+  r Unit#3.weapon1Flags 20
+  r Unit#3.weapon2Def weapondef#0
+  r Unit#3.weapon2Flags 24
+  r UnitMotion#5.velocityX 0
+  r UnitMotion#5.velocityY 0
+  r UnitMotion#5.velocityZ 0
+  r weapondef#111.flags 0x00080809
+  r weapondef#111.speed 1966080
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 40 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 40 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 40 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 41 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 41 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 41 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 41 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 41 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 41 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 41 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 42 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 42 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 42 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 42 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 42 FindBestTargetIfFireAtWill
+  r rng.seed 0x356db357
+  r Unit#3.def UnitDef#5
+  r Unit#3.player Player#0
+  r Unit#3.flags 0x98240221
+  r Unit#3.activateFlags 0
+  r Unit#3.playerIndex 0
+  r UnitDef#5.flags1 0x009180a9
+  r UnitDef#5.range 263
+  r UnitDef#5.categories UnitTypeSet#1
+  r UnitDef#5.weaponCategories0 UnitTypeSet#1
+  r UnitDef#5.weaponCategories1 UnitTypeSet#2
+  r UnitDef#5.weaponCategories2 UnitTypeSet#2
+  a unit Unit#3
+  i ai.GetVisibleEnemiesInRadius 0 pos=(41943040,65536,17039360) 263 0
+  o out [Unit#252]
+  o Unit#252.flags 0x98280121
+  i services.RandomInt 1 = 0
+  i weapons.WeaponCanReachUnit Unit#3 Unit#252 0 = 1
+  i services.RandomInt 0 = 0
+  o result Unit#252
+call 42 ChooseWeapon
+  a unit Unit#3
+  o result 0
+call 42 SetWeaponTargetUnit
+  r Unit#3.id 3
+  r Unit#3.netDirtyFlags 0
+  r Unit#252.id 252
+  r Unit#252.netDirtyFlags 0
+  a unit Unit#3
+  a target Unit#252
+  a weapon 0
+  w Unit#3.weapon0TargetX 252
+call 42 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 42 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 42 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 43 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 43 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 43 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 43 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 2
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 43 GetWeaponTargetUnit
+  r Unit#3.weapon0Flags 3
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 43 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 43 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 43 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 44 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 44 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 44 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 44 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 44 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 44 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 44 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 44 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 45 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 45 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 45 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 45 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 45 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 45 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 45 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 45 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 46 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 46 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 46 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 46 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 2
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 46 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 46 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 46 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 47 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 47 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 47 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 47 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 3
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 47 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 47 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 47 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 48 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 48 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 48 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 48 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 48 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 48 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 48 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 49 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 49 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 49 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 49 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 49 SetWeaponTargetUnit
+  r Unit#3.netDirtyFlags 1024
+  a unit Unit#3
+  a target Unit#252
+  a weapon 0
+  w Unit#3.netDirtyFlags 0
+call 49 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 49 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 49 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 50 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 50 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 50 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 50 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 50 SetWeaponTargetUnit
+  a unit Unit#3
+  a target Unit#252
+  a weapon 0
+call 50 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 50 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 50 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 51 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 51 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 51 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 51 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 51 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 51 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 51 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 52 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 52 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 52 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  o result 0
+call 52 FindBestTargetIfFireAtWill
+  r Unit#2.flags 0x94240321
+  a unit Unit#2
+  i ai.GetVisibleEnemiesInRadius 0 pos=(41943040,65536,17039360) 280 0
+  o out [Unit#252]
+  i services.RandomInt 1 = 0
+  i weapons.WeaponCanReachUnit Unit#2 Unit#252 0 = 1
+  i services.RandomInt 0 = 0
+  o result Unit#252
+call 52 ChooseWeapon
+  a unit Unit#2
+  o result 0
+call 52 SetWeaponTargetUnit
+  r Unit#2.id 2
+  r Unit#2.netDirtyFlags 0
+  a unit Unit#2
+  a target Unit#252
+  a weapon 0
+  w Unit#2.weapon0TargetX 252
+call 52 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 52 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 52 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 52 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 53 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 53 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 53 GetWeaponTargetPos
+  r Unit#2.weapon0Flags 2
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 53 GetWeaponTargetUnit
+  r Unit#2.weapon0Flags 3
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 53 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 53 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 53 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 53 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 54 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 54 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 54 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 54 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 54 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 54 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 54 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 54 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 55 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 55 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 55 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 55 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 55 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 55 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 55 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 55 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 55 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result null
+call 55 FindWeaponTarget
+  a unit Unit#1
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#1 0 = 200
+  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  o out [Unit#252]
+  i services.RandomInt 1 = 0
+  i weapons.WeaponCanReachUnit Unit#1 Unit#252 0 = 1
+  i services.RandomInt 6800 = 2376
+  w rng.seed 0x35193028
+  o result Unit#252
+call 55 SetWeaponTargetUnit
+  r Unit#1.id 1
+  r Unit#1.netDirtyFlags 0
+  a unit Unit#1
+  a target Unit#252
+  a weapon 0
+  w Unit#1.weapon0TargetX 252
+call 55 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 0
+  o result null
+call 55 FindWeaponTarget
+  a unit Unit#251
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 0 = 200
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  o out []
+  o result null
+call 55 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 0
+call 55 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 2
+  o result null
+call 55 FindWeaponTarget
+  a unit Unit#251
+  a weapon 2
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 2 = 240
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  o out []
+  o result null
+call 55 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 2
+call 55 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result null
+call 55 FindWeaponTarget
+  a unit Unit#252
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#252 0 = 180
+  i ai.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 180 0
+  o out [Unit#1,Unit#2]
+  i services.RandomInt 2 = 0
+  i weapons.WeaponCanReachUnit Unit#252 Unit#1 0 = 1
+  i services.RandomInt 6800 = 44
+  i services.RandomInt 1 = 0
+  i weapons.WeaponCanReachUnit Unit#252 Unit#2 0 = 1
+  i services.RandomInt 0 = 0
+  w rng.seed 0x7a0b6a3c
+  o result Unit#2
+call 55 SetWeaponTargetUnit
+  a unit Unit#252
+  a target Unit#2
+  a weapon 0
+  w Unit#252.weapon0TargetX 2
+call 56 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 56 GetWeaponTargetUnit
+  r Unit#1.weapon0Flags 19
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 56 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 56 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 56 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 56 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41940254,735324,16872544)
+  o pos.x 41940254
+  o pos.y 735324
+  o pos.z 16872544
+  o result 1
+call 56 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 56 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 56 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42039841,930264,16898217)
+  o pos.x 42039841
+  o pos.y 930264
+  o pos.z 16898217
+  o result 1
+call 56 GetWeaponTargetUnit
+  r Unit#252.weapon0Flags 19
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 57 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41928718,735324,16871534)
+  o pos.x 41928718
+  o pos.y 735324
+  o pos.z 16871534
+  o result 1
+call 57 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 57 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 57 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41928718,735324,16871534)
+  o pos.x 41928718
+  o pos.y 735324
+  o pos.z 16871534
+  o result 1
+call 57 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 57 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41928718,735324,16871534)
+  o pos.x 41928718
+  o pos.y 735324
+  o pos.z 16871534
+  o result 1
+call 57 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 57 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 57 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42048450,930264,16898061)
+  o pos.x 42048450
+  o pos.y 930264
+  o pos.z 16898061
+  o result 1
+call 57 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 58 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41933944,735324,16870256)
+  o pos.x 41933944
+  o pos.y 735324
+  o pos.z 16870256
+  o result 1
+call 58 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 58 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 58 FindBestTargetIfFireAtWill
+  a unit Unit#1
+  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  o out [Unit#252]
+  i services.RandomInt 1 = 0
+  i weapons.WeaponCanReachUnit Unit#1 Unit#252 0 = 1
+  i services.RandomInt 6800 = 3133
+  w rng.seed 0x036bc7bd
+  o result Unit#252
+call 58 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41933944,735324,16870256)
+  o pos.x 41933944
+  o pos.y 735324
+  o pos.z 16870256
+  o result 1
+call 58 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 58 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41933944,735324,16870256)
+  o pos.x 41933944
+  o pos.y 735324
+  o pos.z 16870256
+  o result 1
+call 58 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 58 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 58 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42056257,930264,16898979)
+  o pos.x 42056257
+  o pos.y 930264
+  o pos.z 16898979
+  o result 1
+call 58 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 59 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41939194,735324,16868715)
+  o pos.x 41939194
+  o pos.y 735324
+  o pos.z 16868715
+  o result 1
+call 59 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 59 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 59 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41939194,735324,16868715)
+  o pos.x 41939194
+  o pos.y 735324
+  o pos.z 16868715
+  o result 1
+call 59 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 59 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41939194,735324,16868715)
+  o pos.x 41939194
+  o pos.y 735324
+  o pos.z 16868715
+  o result 1
+call 59 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 59 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 59 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42063203,930264,16900966)
+  o pos.x 42063203
+  o pos.y 930264
+  o pos.z 16900966
+  o result 1
+call 59 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 60 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41944454,735324,16866914)
+  o pos.x 41944454
+  o pos.y 735324
+  o pos.z 16866914
+  o result 1
+call 60 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 60 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 60 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41944454,735324,16866914)
+  o pos.x 41944454
+  o pos.y 735324
+  o pos.z 16866914
+  o result 1
+call 60 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 60 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41944454,735324,16866914)
+  o pos.x 41944454
+  o pos.y 735324
+  o pos.z 16866914
+  o result 1
+call 60 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 60 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 60 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42069235,930264,16904005)
+  o pos.x 42069235
+  o pos.y 930264
+  o pos.z 16904005
+  o result 1
+call 60 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 61 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 61 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 61 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 61 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 61 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 61 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 61 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 61 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 61 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42074306,930264,16908074)
+  o pos.x 42074306
+  o pos.y 930264
+  o pos.z 16908074
+  o result 1
+call 61 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 62 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 62 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 62 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 62 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 62 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 62 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 62 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 62 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 62 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42078379,930264,16913141)
+  o pos.x 42078379
+  o pos.y 930264
+  o pos.z 16913141
+  o result 1
+call 62 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 63 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 63 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 63 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 63 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 63 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 63 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 63 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 63 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 63 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42080497,930264,16916997)
+  o pos.x 42080497
+  o pos.y 930264
+  o pos.z 16916997
+  o result 1
+call 63 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 64 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 64 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 64 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 64 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 64 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 64 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 64 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 64 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 64 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42080497,930264,16916997)
+  o pos.x 42080497
+  o pos.y 930264
+  o pos.z 16916997
+  o result 1
+call 64 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 65 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 65 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 65 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 65 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 65 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 65 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41946900,735324,16865990)
+  o pos.x 41946900
+  o pos.y 735324
+  o pos.z 16865990
+  o result 1
+call 65 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 65 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 65 GetWeaponTargetPos
+  r Unit#252.weapon0Flags 18
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42080497,930264,16916997)
+  o pos.x 42080497
+  o pos.y 930264
+  o pos.z 16916997
+  o result 1
+call 65 GetWeaponTargetUnit
+  r Unit#252.weapon0Flags 19
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 66 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41952151,735324,16863817)
+  o pos.x 41952151
+  o pos.y 735324
+  o pos.z 16863817
+  o result 1
+call 66 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 66 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 66 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41952151,735324,16863817)
+  o pos.x 41952151
+  o pos.y 735324
+  o pos.z 16863817
+  o result 1
+call 66 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 66 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41952151,735324,16863817)
+  o pos.x 41952151
+  o pos.y 735324
+  o pos.z 16863817
+  o result 1
+call 66 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 66 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 66 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42080497,930264,16916997)
+  o pos.x 42080497
+  o pos.y 930264
+  o pos.z 16916997
+  o result 1
+call 66 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 67 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957376,735324,16861399)
+  o pos.x 41957376
+  o pos.y 735324
+  o pos.z 16861399
+  o result 1
+call 67 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 67 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 67 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957376,735324,16861399)
+  o pos.x 41957376
+  o pos.y 735324
+  o pos.z 16861399
+  o result 1
+call 67 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 67 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957376,735324,16861399)
+  o pos.x 41957376
+  o pos.y 735324
+  o pos.z 16861399
+  o result 1
+call 67 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 67 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 67 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42080497,930264,16916997)
+  o pos.x 42080497
+  o pos.y 930264
+  o pos.z 16916997
+  o result 1
+call 67 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 68 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 68 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 68 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 68 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 68 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 68 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 68 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 68 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 68 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42080497,930264,16916997)
+  o pos.x 42080497
+  o pos.y 930264
+  o pos.z 16916997
+  o result 1
+call 68 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 69 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 69 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 69 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 69 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 69 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 69 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 69 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 69 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 69 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 69 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42080497,930264,16916997)
+  o pos.x 42080497
+  o pos.y 930264
+  o pos.z 16916997
+  o result 1
+call 69 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 70 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 70 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 70 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 70 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 70 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 70 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 2
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 70 GetWeaponTargetUnit
+  r Unit#3.weapon0Flags 3
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 70 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 70 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 70 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42080497,930264,16916997)
+  o pos.x 42080497
+  o pos.y 930264
+  o pos.z 16916997
+  o result 1
+call 70 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 71 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 71 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 71 GetWeaponTargetPos
+  r Unit#1.weapon0Flags 18
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 71 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 71 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 71 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 71 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 71 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 71 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 71 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42080497,930264,16916997)
+  o pos.x 42080497
+  o pos.y 930264
+  o pos.z 16916997
+  o result 1
+call 71 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 72 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 72 GetWeaponTargetPos
+  r Unit#1.weapon0Flags 19
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 72 GetWeaponTargetPos
+  r Unit#2.weapon0Flags 2
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 72 GetWeaponTargetUnit
+  r Unit#2.weapon0Flags 3
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 72 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41957595,735324,16861292)
+  o pos.x 41957595
+  o pos.y 735324
+  o pos.z 16861292
+  o result 1
+call 72 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 72 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 72 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 72 GetWeaponTargetPos
+  r Unit#252.weapon0Flags 18
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42082851,930264,16923631)
+  o pos.x 42082851
+  o pos.y 930264
+  o pos.z 16923631
+  o result 1
+call 73 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 73 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 73 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 73 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 73 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 2
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 73 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 73 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 73 GetWeaponTargetPos
+  r Unit#252.weapon0Flags 19
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42084142,930264,16931145)
+  o pos.x 42084142
+  o pos.y 930264
+  o pos.z 16931145
+  o result 1
+call 73 FindBestTargetIfFireAtWill
+  r Game.uiOptionFlags 1166
+  r rng.seed 0x7b4009b8
+  a unit Unit#252
+  i ai.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 275 0
+  o out [Unit#1,Unit#2,Unit#3]
+  o Unit#3.flags 0x98240321
+  i services.RandomInt 3 = 1
+  i weapons.WeaponCanReachUnit Unit#252 Unit#2 0 = 1
+  i services.RandomInt 0 = 0
+  i services.RandomInt 2 = 0
+  i weapons.WeaponCanReachUnit Unit#252 Unit#1 0 = 1
+  i services.RandomInt 6800 = 3599
+  i services.RandomInt 1 = 0
+  i weapons.WeaponCanReachUnit Unit#252 Unit#3 0 = 1
+  i services.RandomInt 0 = 0
+  w rng.seed 0x4f78c03f
+  o result Unit#2
+call 73 ChooseWeapon
+  a unit Unit#252
+  o result 0
+call 73 SetWeaponTargetUnit
+  r Unit#252.netDirtyFlags 17408
+  r Unit#252.weapon0TargetX 0
+  a unit Unit#252
+  a target Unit#2
+  a weapon 0
+  w Unit#252.netDirtyFlags 0
+  w Unit#252.weapon0TargetX 2
+call 74 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 74 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 74 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 74 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 74 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 3
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 74 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 74 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 74 GetWeaponTargetPos
+  r Unit#252.weapon0Flags 3
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42084359,930264,16939482)
+  o pos.x 42084359
+  o pos.y 930264
+  o pos.z 16939482
+  o result 1
+call 75 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 75 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 75 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 75 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 75 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 75 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 75 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 75 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42083501,930264,16948580)
+  o pos.x 42083501
+  o pos.y 930264
+  o pos.z 16948580
+  o result 1
+call 76 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 76 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 76 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 76 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 76 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 76 SetWeaponTargetUnit
+  r Unit#3.netDirtyFlags 1024
+  a unit Unit#3
+  a target Unit#252
+  a weapon 0
+  w Unit#3.netDirtyFlags 0
+call 76 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 76 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 76 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42081575,930264,16959912)
+  o pos.x 42081575
+  o pos.y 930264
+  o pos.z 16959912
+  o result 1
+call 77 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 77 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 77 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 77 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 77 GetWeaponTargetPos
+  r Unit#3.posX 41944163
+  r Unit#3.posZ 17030254
+  r UnitMotion#5.velocityX 1123
+  r UnitMotion#5.velocityZ -9106
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 77 SetWeaponTargetUnit
+  a unit Unit#3
+  a target Unit#252
+  a weapon 0
+call 77 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 77 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 77 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42078595,930264,16993545)
+  o pos.x 42078595
+  o pos.y 930264
+  o pos.z 16993545
+  o result 1
+call 78 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 78 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 78 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 78 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 78 GetWeaponTargetPos
+  r UnitMotion#5.velocityX 0
+  r UnitMotion#5.velocityZ 0
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 78 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 78 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 78 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42074584,930264,17027526)
+  o pos.x 42074584
+  o pos.y 930264
+  o pos.z 17027526
+  o result 1
+call 79 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 79 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 79 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 79 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 79 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 79 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 79 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 79 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42075917,930264,17061596)
+  o pos.x 42075917
+  o pos.y 930264
+  o pos.z 17061596
+  o result 1
+call 80 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 80 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 80 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 80 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 80 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 80 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 80 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 80 FindBestTargetIfFireAtWill
+  r Game.uiOptionFlags 1422
+  r rng.seed 0x009590dc
+  a unit Unit#251
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 290 0
+  o out []
+  o result null
+call 80 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42078649,930264,17085696)
+  o pos.x 42078649
+  o pos.y 930264
+  o pos.z 17085696
+  o result 1
+call 81 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 81 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 81 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 81 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 81 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 81 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 81 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 81 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42078649,930264,17085696)
+  o pos.x 42078649
+  o pos.y 930264
+  o pos.z 17085696
+  o result 1
+call 82 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 82 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 82 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 82 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 82 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 82 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 82 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 82 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42078649,930264,17085696)
+  o pos.x 42078649
+  o pos.y 930264
+  o pos.z 17085696
+  o result 1
+call 83 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 83 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 83 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 83 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 83 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 83 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 83 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 83 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42078649,930264,17085696)
+  o pos.x 42078649
+  o pos.y 930264
+  o pos.z 17085696
+  o result 1
+call 83 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 83 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 0
+  o result null
+call 83 FindWeaponTarget
+  r rng.seed 0x5b595bd0
+  a unit Unit#251
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 0 = 200
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  o out []
+  o result null
+call 83 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 0
+call 83 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 2
+  o result null
+call 83 FindWeaponTarget
+  a unit Unit#251
+  a weapon 2
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 2 = 240
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  o out []
+  o result null
+call 83 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 2
+call 84 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 84 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 84 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 84 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 84 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 84 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 84 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 84 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42078649,930264,17085696)
+  o pos.x 42078649
+  o pos.y 930264
+  o pos.z 17085696
+  o result 1
+call 85 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 85 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 85 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 85 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 85 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 85 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 85 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 85 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42078649,930264,17085696)
+  o pos.x 42078649
+  o pos.y 930264
+  o pos.z 17085696
+  o result 1
+call 86 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 86 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 86 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 86 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 86 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 86 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 86 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 86 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42078649,930264,17085696)
+  o pos.x 42078649
+  o pos.y 930264
+  o pos.z 17085696
+  o result 1
+call 87 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 87 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 87 GetWeaponTargetPos
+  r Unit#2.weapon0Flags 2
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 87 GetWeaponTargetUnit
+  r Unit#2.weapon0Flags 3
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 87 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 87 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 87 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 87 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42081612,930264,17119321)
+  o pos.x 42081612
+  o pos.y 930264
+  o pos.z 17119321
+  o result 1
+call 88 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 88 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 88 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 88 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 88 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 88 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 88 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 88 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42083523,930264,17130285)
+  o pos.x 42083523
+  o pos.y 930264
+  o pos.z 17130285
+  o result 1
+call 89 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 89 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 89 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 89 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 89 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 89 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 89 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 89 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42084364,930264,17139372)
+  o pos.x 42084364
+  o pos.y 930264
+  o pos.z 17139372
+  o result 1
+call 90 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 90 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 90 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 90 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 90 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 90 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 90 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 90 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42084130,930264,17147697)
+  o pos.x 42084130
+  o pos.y 930264
+  o pos.z 17147697
+  o result 1
+call 91 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 91 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 91 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 91 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 91 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 91 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 91 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 91 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42082823,930264,17155198)
+  o pos.x 42082823
+  o pos.y 930264
+  o pos.z 17155198
+  o result 1
+call 92 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 92 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 92 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 92 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 92 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 92 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 92 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 92 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42080453,930264,17161818)
+  o pos.x 42080453
+  o pos.y 930264
+  o pos.z 17161818
+  o result 1
+call 93 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 93 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 93 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 93 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 93 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 93 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 93 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 93 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42077037,930264,17167507)
+  o pos.x 42077037
+  o pos.y 930264
+  o pos.z 17167507
+  o result 1
+call 94 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 94 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 94 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 94 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 94 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 94 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 94 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 94 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42072602,930264,17172220)
+  o pos.x 42072602
+  o pos.y 930264
+  o pos.z 17172220
+  o result 1
+call 95 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 95 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 95 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 95 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 95 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 95 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 95 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 95 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42067182,930264,17175924)
+  o pos.x 42067182
+  o pos.y 930264
+  o pos.z 17175924
+  o result 1
+call 96 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 96 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 96 GetWeaponTargetPos
+  r Unit#1.weapon0Flags 18
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 96 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 96 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 96 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 96 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 96 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 96 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 96 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42060817,930264,17178588)
+  o pos.x 42060817
+  o pos.y 930264
+  o pos.z 17178588
+  o result 1
+call 96 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 97 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 97 GetWeaponTargetPos
+  r Unit#1.weapon0Flags 19
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 97 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 97 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 97 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 2
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41958681,735324,16860754)
+  o pos.x 41958681
+  o pos.y 735324
+  o pos.z 16860754
+  o result 1
+call 97 GetWeaponTargetUnit
+  r Unit#3.weapon0Flags 3
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 97 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 97 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 97 GetWeaponTargetPos
+  r Unit#252.weapon0Flags 2
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42053556,930264,17180193)
+  o pos.x 42053556
+  o pos.y 930264
+  o pos.z 17180193
+  o result 1
+call 97 GetWeaponTargetUnit
+  r Unit#252.weapon0Flags 3
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 98 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41963855,735324,16858037)
+  o pos.x 41963855
+  o pos.y 735324
+  o pos.z 16858037
+  o result 1
+call 98 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 98 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41963855,735324,16858037)
+  o pos.x 41963855
+  o pos.y 735324
+  o pos.z 16858037
+  o result 1
+call 98 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 98 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41963855,735324,16858037)
+  o pos.x 41963855
+  o pos.y 735324
+  o pos.z 16858037
+  o result 1
+call 98 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 98 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 98 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 98 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42045455,930264,17180727)
+  o pos.x 42045455
+  o pos.y 930264
+  o pos.z 17180727
+  o result 1
+call 98 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 99 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41968972,735324,16855090)
+  o pos.x 41968972
+  o pos.y 735324
+  o pos.z 16855090
+  o result 1
+call 99 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 99 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41968972,735324,16855090)
+  o pos.x 41968972
+  o pos.y 735324
+  o pos.z 16855090
+  o result 1
+call 99 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 99 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41968972,735324,16855090)
+  o pos.x 41968972
+  o pos.y 735324
+  o pos.z 16855090
+  o result 1
+call 99 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 99 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 99 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 99 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42036574,930264,17180185)
+  o pos.x 42036574
+  o pos.y 930264
+  o pos.z 17180185
+  o result 1
+call 99 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 100 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41974018,735324,16851920)
+  o pos.x 41974018
+  o pos.y 735324
+  o pos.z 16851920
+  o result 1
+call 100 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 100 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41974018,735324,16851920)
+  o pos.x 41974018
+  o pos.y 735324
+  o pos.z 16851920
+  o result 1
+call 100 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 100 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 2
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41974018,735324,16851920)
+  o pos.x 41974018
+  o pos.y 735324
+  o pos.z 16851920
+  o result 1
+call 100 GetWeaponTargetUnit
+  r Unit#3.weapon0Flags 3
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 100 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 100 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 100 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (42026983,930264,17178572)
+  o pos.x 42026983
+  o pos.y 930264
+  o pos.z 17178572
+  o result 1
+call 100 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 101 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41978978,735324,16848537)
+  o pos.x 41978978
+  o pos.y 735324
+  o pos.z 16848537
+  o result 1
+call 101 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 101 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41978978,735324,16848537)
+  o pos.x 41978978
+  o pos.y 735324
+  o pos.z 16848537
+  o result 1
+call 101 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 101 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41978978,735324,16848537)
+  o pos.x 41978978
+  o pos.y 735324
+  o pos.z 16848537
+  o result 1
+call 101 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 101 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 101 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 101 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41998808,930264,17175900)
+  o pos.x 41998808
+  o pos.y 930264
+  o pos.z 17175900
+  o result 1
+call 101 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 102 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41983841,735324,16844949)
+  o pos.x 41983841
+  o pos.y 735324
+  o pos.z 16844949
+  o result 1
+call 102 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 102 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41983841,735324,16844949)
+  o pos.x 41983841
+  o pos.y 735324
+  o pos.z 16844949
+  o result 1
+call 102 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 102 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41983841,735324,16844949)
+  o pos.x 41983841
+  o pos.y 735324
+  o pos.z 16844949
+  o result 1
+call 102 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 102 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 102 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 102 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41964902,930264,17172190)
+  o pos.x 41964902
+  o pos.y 930264
+  o pos.z 17172190
+  o result 1
+call 102 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 103 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41988591,735324,16841167)
+  o pos.x 41988591
+  o pos.y 735324
+  o pos.z 16841167
+  o result 1
+call 103 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 103 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41988591,735324,16841167)
+  o pos.x 41988591
+  o pos.y 735324
+  o pos.z 16841167
+  o result 1
+call 103 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 103 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 2
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41988591,735324,16841167)
+  o pos.x 41988591
+  o pos.y 735324
+  o pos.z 16841167
+  o result 1
+call 103 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 103 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 103 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41951130,930264,17170401)
+  o pos.x 41951130
+  o pos.y 930264
+  o pos.z 17170401
+  o result 1
+call 103 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 104 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993217,735324,16837200)
+  o pos.x 41993217
+  o pos.y 735324
+  o pos.z 16837200
+  o result 1
+call 104 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 104 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993217,735324,16837200)
+  o pos.x 41993217
+  o pos.y 735324
+  o pos.z 16837200
+  o result 1
+call 104 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 104 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 3
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993217,735324,16837200)
+  o pos.x 41993217
+  o pos.y 735324
+  o pos.z 16837200
+  o result 1
+call 104 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 104 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 104 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41951130,930264,17170401)
+  o pos.x 41951130
+  o pos.y 930264
+  o pos.z 17170401
+  o result 1
+call 104 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 105 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 105 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 105 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 105 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 105 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 105 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 105 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 105 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41951130,930264,17170401)
+  o pos.x 41951130
+  o pos.y 930264
+  o pos.z 17170401
+  o result 1
+call 105 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 106 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 106 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 106 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 106 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 106 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 106 SetWeaponTargetUnit
+  r Unit#3.netDirtyFlags 1024
+  a unit Unit#3
+  a target Unit#252
+  a weapon 0
+  w Unit#3.netDirtyFlags 0
+call 106 SetWeaponTargetUnit
+  a unit Unit#3
+  a target Unit#252
+  a weapon 0
+call 106 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 106 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 106 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41951130,930264,17170401)
+  o pos.x 41951130
+  o pos.y 930264
+  o pos.z 17170401
+  o result 1
+call 106 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 107 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 107 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 107 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 107 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 107 GetWeaponTargetPos
+  r Unit#3.posZ 17021079
+  r UnitMotion#5.velocityZ -9175
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 107 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 107 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 107 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41951130,930264,17170401)
+  o pos.x 41951130
+  o pos.y 930264
+  o pos.z 17170401
+  o result 1
+call 107 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 108 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 108 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 108 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 108 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 108 GetWeaponTargetPos
+  r Unit#3.posX 41941916
+  r Unit#3.posZ 17002868
+  r UnitMotion#5.velocityX -2247
+  r UnitMotion#5.velocityZ -18211
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 108 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 108 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 108 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41951130,930264,17170401)
+  o pos.x 41951130
+  o pos.y 930264
+  o pos.z 17170401
+  o result 1
+call 108 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 109 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 109 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 109 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 109 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 109 GetWeaponTargetPos
+  r Unit#3.posX 41935230
+  r Unit#3.posZ 16976170
+  r UnitMotion#5.velocityX -6686
+  r UnitMotion#5.velocityZ -26698
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41993875,735324,16836612)
+  o pos.x 41993875
+  o pos.y 735324
+  o pos.z 16836612
+  o result 1
+call 109 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 109 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 109 GetWeaponTargetPos
+  r Unit#252.weapon0Flags 2
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41951130,930264,17170401)
+  o pos.x 41951130
+  o pos.y 930264
+  o pos.z 17170401
+  o result 1
+call 109 GetWeaponTargetUnit
+  r Unit#252.weapon0Flags 3
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 110 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41989269,735324,16840604)
+  o pos.x 41989269
+  o pos.y 735324
+  o pos.z 16840604
+  o result 1
+call 110 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 110 GetWeaponTargetPos
+  r Unit#2.weapon0Flags 2
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41989269,735324,16840604)
+  o pos.x 41989269
+  o pos.y 735324
+  o pos.z 16840604
+  o result 1
+call 110 GetWeaponTargetUnit
+  r Unit#2.weapon0Flags 3
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 110 GetWeaponTargetPos
+  r Unit#3.posX 41922023
+  r Unit#3.posZ 16941930
+  r UnitMotion#5.velocityX -13207
+  r UnitMotion#5.velocityZ -34240
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41989269,735324,16840604)
+  o pos.x 41989269
+  o pos.y 735324
+  o pos.z 16840604
+  o result 1
+call 110 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 110 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 110 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41917065,930264,17172693)
+  o pos.x 41917065
+  o pos.y 930264
+  o pos.z 17172693
+  o result 1
+call 110 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 111 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41984535,735324,16844413)
+  o pos.x 41984535
+  o pos.y 735324
+  o pos.z 16844413
+  o result 1
+call 111 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 111 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41984535,735324,16844413)
+  o pos.x 41984535
+  o pos.y 735324
+  o pos.z 16844413
+  o result 1
+call 111 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 111 GetWeaponTargetPos
+  r Unit#3.posX 41900396
+  r Unit#3.posZ 16901470
+  r UnitMotion#5.velocityX -21627
+  r UnitMotion#5.velocityZ -40460
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41984535,735324,16844413)
+  o pos.x 41984535
+  o pos.y 735324
+  o pos.z 16844413
+  o result 1
+call 111 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 111 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 111 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41883197,930264,17176279)
+  o pos.x 41883197
+  o pos.y 930264
+  o pos.z 17176279
+  o result 1
+call 111 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 111 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 111 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 0
+  o result null
+call 111 FindWeaponTarget
+  r rng.seed 0x53aeff3c
+  a unit Unit#251
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 0 = 200
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  o out []
+  o result null
+call 111 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 0
+call 111 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 2
+  o result null
+call 111 FindWeaponTarget
+  a unit Unit#251
+  a weapon 2
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 2 = 240
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  o out []
+  o result null
+call 111 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 2
+call 112 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41979688,735324,16848030)
+  o pos.x 41979688
+  o pos.y 735324
+  o pos.z 16848030
+  o result 1
+call 112 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 112 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41979688,735324,16848030)
+  o pos.x 41979688
+  o pos.y 735324
+  o pos.z 16848030
+  o result 1
+call 112 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 112 GetWeaponTargetPos
+  r Unit#3.posX 41868147
+  r Unit#3.posZ 16856856
+  r UnitMotion#5.velocityX -32249
+  r UnitMotion#5.velocityZ -44614
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41979688,735324,16848030)
+  o pos.x 41979688
+  o pos.y 735324
+  o pos.z 16848030
+  o result 1
+call 112 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 112 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 112 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41857903,930264,17178824)
+  o pos.x 41857903
+  o pos.y 930264
+  o pos.z 17178824
+  o result 1
+call 112 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 113 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41974741,735324,16851443)
+  o pos.x 41974741
+  o pos.y 735324
+  o pos.z 16851443
+  o result 1
+call 113 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 113 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41974741,735324,16851443)
+  o pos.x 41974741
+  o pos.y 735324
+  o pos.z 16851443
+  o result 1
+call 113 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 113 GetWeaponTargetPos
+  r Unit#3.posX 41824439
+  r Unit#3.posZ 16809801
+  r UnitMotion#5.velocityX -43708
+  r UnitMotion#5.velocityZ -47055
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41974741,735324,16851443)
+  o pos.x 41974741
+  o pos.y 735324
+  o pos.z 16851443
+  o result 1
+call 113 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 113 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 113 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41848393,930264,17180308)
+  o pos.x 41848393
+  o pos.y 930264
+  o pos.z 17180308
+  o result 1
+call 113 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 114 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41969707,735324,16854645)
+  o pos.x 41969707
+  o pos.y 735324
+  o pos.z 16854645
+  o result 1
+call 114 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 114 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41969707,735324,16854645)
+  o pos.x 41969707
+  o pos.y 735324
+  o pos.z 16854645
+  o result 1
+call 114 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 114 GetWeaponTargetPos
+  r Unit#3.posX 41768278
+  r Unit#3.posZ 16762546
+  r UnitMotion#5.velocityX -56161
+  r UnitMotion#5.velocityZ -47255
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41969707,735324,16854645)
+  o pos.x 41969707
+  o pos.y 735324
+  o pos.z 16854645
+  o result 1
+call 114 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 114 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 114 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41839603,930264,17180720)
+  o pos.x 41839603
+  o pos.y 930264
+  o pos.z 17180720
+  o result 1
+call 114 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 115 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41964599,735324,16857625)
+  o pos.x 41964599
+  o pos.y 735324
+  o pos.z 16857625
+  o result 1
+call 115 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 115 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41964599,735324,16857625)
+  o pos.x 41964599
+  o pos.y 735324
+  o pos.z 16857625
+  o result 1
+call 115 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 115 GetWeaponTargetPos
+  r Unit#3.posX 41699059
+  r Unit#3.posZ 16717519
+  r UnitMotion#5.velocityX -69219
+  r UnitMotion#5.velocityZ -45027
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41964599,735324,16857625)
+  o pos.x 41964599
+  o pos.y 735324
+  o pos.z 16857625
+  o result 1
+call 115 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 115 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 115 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41831600,930264,17180056)
+  o pos.x 41831600
+  o pos.y 930264
+  o pos.z 17180056
+  o result 1
+call 115 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 116 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41959433,735324,16860376)
+  o pos.x 41959433
+  o pos.y 735324
+  o pos.z 16860376
+  o result 1
+call 116 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 116 FindBestTargetIfFireAtWill
+  a unit Unit#1
+  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  o out [Unit#252]
+  i services.RandomInt 1 = 0
+  i weapons.WeaponCanReachUnit Unit#1 Unit#252 0 = 1
+  i services.RandomInt 6800 = 5088
+  w rng.seed 0x05f6e710
+  o result Unit#252
+call 116 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41959433,735324,16860376)
+  o pos.x 41959433
+  o pos.y 735324
+  o pos.z 16860376
+  o result 1
+call 116 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 116 GetWeaponTargetPos
+  r Unit#3.posX 41616605
+  r Unit#3.posZ 16677278
+  r UnitMotion#5.velocityX -82454
+  r UnitMotion#5.velocityZ -40241
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41959433,735324,16860376)
+  o pos.x 41959433
+  o pos.y 735324
+  o pos.z 16860376
+  o result 1
+call 116 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 116 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 116 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41824445,930264,17178322)
+  o pos.x 41824445
+  o pos.y 930264
+  o pos.z 17178322
+  o result 1
+call 116 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 117 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41954222,735324,16862890)
+  o pos.x 41954222
+  o pos.y 735324
+  o pos.z 16862890
+  o result 1
+call 117 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 117 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41954222,735324,16862890)
+  o pos.x 41954222
+  o pos.y 735324
+  o pos.z 16862890
+  o result 1
+call 117 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 117 GetWeaponTargetPos
+  r Unit#3.posX 41521175
+  r Unit#3.posZ 16644445
+  r UnitMotion#5.velocityX -95430
+  r UnitMotion#5.velocityZ -32833
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41954222,735324,16862890)
+  o pos.x 41954222
+  o pos.y 735324
+  o pos.z 16862890
+  o result 1
+call 117 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 117 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 117 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41818192,930264,17175531)
+  o pos.x 41818192
+  o pos.y 930264
+  o pos.z 17175531
+  o result 1
+call 117 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 118 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41948980,735324,16865160)
+  o pos.x 41948980
+  o pos.y 735324
+  o pos.z 16865160
+  o result 1
+call 118 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 118 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41948980,735324,16865160)
+  o pos.x 41948980
+  o pos.y 735324
+  o pos.z 16865160
+  o result 1
+call 118 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 118 GetWeaponTargetPos
+  r Unit#3.posX 41418753
+  r Unit#3.posZ 16621637
+  r UnitMotion#5.velocityX -96168
+  r UnitMotion#5.velocityZ -20364
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41948980,735324,16865160)
+  o pos.x 41948980
+  o pos.y 735324
+  o pos.z 16865160
+  o result 1
+call 118 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 118 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 118 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41812889,930264,17171704)
+  o pos.x 41812889
+  o pos.y 930264
+  o pos.z 17171704
+  o result 1
+call 118 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 119 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41943721,735324,16867180)
+  o pos.x 41943721
+  o pos.y 735324
+  o pos.z 16867180
+  o result 1
+call 119 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 119 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41943721,735324,16867180)
+  o pos.x 41943721
+  o pos.y 735324
+  o pos.z 16867180
+  o result 1
+call 119 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 119 GetWeaponTargetPos
+  r Unit#3.posZ 16608478
+  r UnitMotion#5.velocityX -97560
+  r UnitMotion#5.velocityZ -12036
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41943721,735324,16867180)
+  o pos.x 41943721
+  o pos.y 735324
+  o pos.z 16867180
+  o result 1
+call 119 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 119 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 119 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41808575,930264,17166870)
+  o pos.x 41808575
+  o pos.y 930264
+  o pos.z 17166870
+  o result 1
+call 119 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 120 ResetWeaponTarget
+  r Unit#253.weapon0TargetX 0
+  r Unit#253.weapon0TargetZ 0
+  r Unit#253.weapon0Def null
+  r Unit#253.weapon0Flags 0
+  r Unit#253.weapon1TargetX 0
+  r Unit#253.weapon1TargetZ 0
+  r Unit#253.weapon1Def null
+  r Unit#253.weapon1Flags 0
+  r Unit#253.weapon2TargetX 0
+  r Unit#253.weapon2TargetZ 0
+  r Unit#253.weapon2Def null
+  r Unit#253.weapon2Flags 0
+  a unit Unit#253
+  a weapon 0
+  w Unit#253.weapon0TargetZ -32768
+call 120 ResetWeaponTarget
+  a unit Unit#253
+  a weapon 1
+  w Unit#253.weapon1TargetZ -32768
+call 120 ResetWeaponTarget
+  a unit Unit#253
+  a weapon 2
+  w Unit#253.weapon2TargetZ -32768
+call 120 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41938462,735324,16868945)
+  o pos.x 41938462
+  o pos.y 735324
+  o pos.z 16868945
+  o result 1
+call 120 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 120 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41938462,735324,16868945)
+  o pos.x 41938462
+  o pos.y 735324
+  o pos.z 16868945
+  o result 1
+call 120 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 120 GetWeaponTargetPos
+  r Unit#3.posZ 16595319
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41938462,735324,16868945)
+  o pos.x 41938462
+  o pos.y 735324
+  o pos.z 16868945
+  o result 1
+call 120 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 120 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 120 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41805285,930264,17161067)
+  o pos.x 41805285
+  o pos.y 930264
+  o pos.z 17161067
+  o result 1
+call 120 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 120 GetWeaponTargetPos
+  r Unit#253.script CobScript#6
+  r Unit#253.unitDefIndex 95
+  r Unit#253.killCount 0
+  r Unit#253.motion UnitMotion#6
+  r Unit#253.posX 41943040
+  r Unit#253.posY 65536
+  r Unit#253.posZ 17039360
+  r Unit#253.weapon0Def weapondef#16
+  r Unit#253.weapon0Flags 18
+  r Unit#253.weapon1Def weapondef#0
+  r Unit#253.weapon1Flags 20
+  r Unit#253.weapon2Def weapondef#0
+  r Unit#253.weapon2Flags 24
+  r UnitMotion#6.velocityX 0
+  r UnitMotion#6.velocityY 0
+  r UnitMotion#6.velocityZ 0
+  a unit Unit#253
+  a weapon 0
+  o result 0
+call 121 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41933214,735324,16870450)
+  o pos.x 41933214
+  o pos.y 735324
+  o pos.z 16870450
+  o result 1
+call 121 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 121 GetWeaponTargetPos
+  r Unit#1.weapon0Flags 18
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 121 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41933214,735324,16870450)
+  o pos.x 41933214
+  o pos.y 735324
+  o pos.z 16870450
+  o result 1
+call 121 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 121 GetWeaponTargetPos
+  r Unit#3.posZ 16583472
+  r UnitMotion#5.velocityX -97704
+  r UnitMotion#5.velocityZ -10836
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41933214,735324,16870450)
+  o pos.x 41933214
+  o pos.y 735324
+  o pos.z 16870450
+  o result 1
+call 121 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 121 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 121 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41803042,930264,17154337)
+  o pos.x 41803042
+  o pos.y 930264
+  o pos.z 17154337
+  o result 1
+call 121 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 121 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  o result 0
+call 122 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 122 GetWeaponTargetPos
+  r Unit#1.weapon0Flags 19
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 122 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 122 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 122 GetWeaponTargetPos
+  r Unit#3.posZ 16571625
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 122 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 122 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 122 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801865,930264,17146733)
+  o pos.x 41801865
+  o pos.y 930264
+  o pos.z 17146733
+  o result 1
+call 122 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 122 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  o result 0
+call 122 FindBestTargetIfFireAtWill
+  r rng.seed 0x03cb41f2
+  r Unit#253.def UnitDef#3
+  r Unit#253.player Player#1
+  r Unit#253.flags 0x98240121
+  r Unit#253.activateFlags 0
+  r Unit#253.playerIndex 1
+  a unit Unit#253
+  i ai.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 280 0
+  o out [Unit#1,Unit#2,Unit#3]
+  o Unit#3.posZ 16559778
+  i services.RandomInt 3 = 0
+  i weapons.WeaponCanReachUnit Unit#253 Unit#1 0 = 1
+  i services.RandomInt 6800 = 4273
+  i services.RandomInt 2 = 1
+  i weapons.WeaponCanReachUnit Unit#253 Unit#2 0 = 1
+  i services.RandomInt 0 = 0
+  i services.RandomInt 1 = 0
+  i weapons.WeaponCanReachUnit Unit#253 Unit#3 0 = 1
+  i services.RandomInt 116 = 57
+  w rng.seed 0x1c47a15d
+  o result Unit#2
+call 122 ChooseWeapon
+  a unit Unit#253
+  o result 0
+call 122 SetWeaponTargetUnit
+  r Unit#253.id 253
+  r Unit#253.netDirtyFlags 0
+  a unit Unit#253
+  a target Unit#2
+  a weapon 0
+  w Unit#253.weapon0TargetX 2
+call 123 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 123 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 123 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 123 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 123 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 123 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 123 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 123 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801761,930264,17138313)
+  o pos.x 41801761
+  o pos.y 930264
+  o pos.z 17138313
+  o result 1
+call 123 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 123 GetWeaponTargetPos
+  r Unit#253.weapon0Flags 2
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801761,930264,17138313)
+  o pos.x 41801761
+  o pos.y 930264
+  o pos.z 17138313
+  o result 1
+call 123 GetWeaponTargetUnit
+  r Unit#253.weapon0Flags 3
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 124 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 124 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 124 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 124 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 124 GetWeaponTargetPos
+  r Unit#3.posZ 16547931
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 124 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 124 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 124 FindBestTargetIfFireAtWill
+  a unit Unit#251
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 290 0
+  o out []
+  o result null
+call 124 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41802732,930264,17129139)
+  o pos.x 41802732
+  o pos.y 930264
+  o pos.z 17129139
+  o result 1
+call 124 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 124 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41802732,930264,17129139)
+  o pos.x 41802732
+  o pos.y 930264
+  o pos.z 17129139
+  o result 1
+call 124 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 125 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 125 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 125 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 125 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 125 GetWeaponTargetPos
+  r Unit#3.posZ 16536084
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 125 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 125 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 125 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41804770,930264,17115284)
+  o pos.x 41804770
+  o pos.y 930264
+  o pos.z 17115284
+  o result 1
+call 125 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 125 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41804770,930264,17115284)
+  o pos.x 41804770
+  o pos.y 930264
+  o pos.z 17115284
+  o result 1
+call 125 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 126 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 126 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 126 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 126 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 126 GetWeaponTargetPos
+  r Unit#3.posZ 16525549
+  r UnitMotion#5.velocityX -97836
+  r UnitMotion#5.velocityZ -9636
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929491,735324,16871361)
+  o pos.x 41929491
+  o pos.y 735324
+  o pos.z 16871361
+  o result 1
+call 126 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 126 SetWeaponTargetUnit
+  a unit Unit#3
+  a target Unit#252
+  a weapon 0
+call 126 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 126 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 126 GetWeaponTargetPos
+  r Unit#252.weapon0Flags 2
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41807860,930264,17081603)
+  o pos.x 41807860
+  o pos.y 930264
+  o pos.z 17081603
+  o result 1
+call 126 GetWeaponTargetUnit
+  r Unit#252.weapon0Flags 3
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 126 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41807860,930264,17081603)
+  o pos.x 41807860
+  o pos.y 930264
+  o pos.z 17081603
+  o result 1
+call 126 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 127 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41938075,735324,16872411)
+  o pos.x 41938075
+  o pos.y 735324
+  o pos.z 16872411
+  o result 1
+call 127 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 127 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41938075,735324,16872411)
+  o pos.x 41938075
+  o pos.y 735324
+  o pos.z 16872411
+  o result 1
+call 127 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 127 GetWeaponTargetPos
+  r Unit#3.posZ 16517519
+  r Unit#3.weapon0Flags 2
+  r UnitMotion#5.velocityX -81530
+  r UnitMotion#5.velocityZ -8030
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41938075,735324,16872411)
+  o pos.x 41938075
+  o pos.y 735324
+  o pos.z 16872411
+  o result 1
+call 127 GetWeaponTargetUnit
+  r Unit#3.weapon0Flags 3
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 127 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 127 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 127 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41811978,930264,17047600)
+  o pos.x 41811978
+  o pos.y 930264
+  o pos.z 17047600
+  o result 1
+call 127 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 127 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41811978,930264,17047600)
+  o pos.x 41811978
+  o pos.y 930264
+  o pos.z 17047600
+  o result 1
+call 127 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 128 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41952759,735324,16871577)
+  o pos.x 41952759
+  o pos.y 735324
+  o pos.z 16871577
+  o result 1
+call 128 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 128 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41952759,735324,16871577)
+  o pos.x 41952759
+  o pos.y 735324
+  o pos.z 16871577
+  o result 1
+call 128 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 128 GetWeaponTargetPos
+  r Unit#3.posZ 16511095
+  r UnitMotion#5.velocityX -65224
+  r UnitMotion#5.velocityZ -6424
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41952759,735324,16871577)
+  o pos.x 41952759
+  o pos.y 735324
+  o pos.z 16871577
+  o result 1
+call 128 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 128 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 128 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 128 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41809725,930264,17013534)
+  o pos.x 41809725
+  o pos.y 930264
+  o pos.z 17013534
+  o result 1
+call 128 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 128 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41809725,930264,17013534)
+  o pos.x 41809725
+  o pos.y 930264
+  o pos.z 17013534
+  o result 1
+call 128 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 129 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41950140,735324,16870193)
+  o pos.x 41950140
+  o pos.y 735324
+  o pos.z 16870193
+  o result 1
+call 129 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 129 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41950140,735324,16870193)
+  o pos.x 41950140
+  o pos.y 735324
+  o pos.z 16870193
+  o result 1
+call 129 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 129 GetWeaponTargetPos
+  r Unit#3.posZ 16506277
+  r UnitMotion#5.velocityX -48918
+  r UnitMotion#5.velocityZ -4818
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41950140,735324,16870193)
+  o pos.x 41950140
+  o pos.y 735324
+  o pos.z 16870193
+  o result 1
+call 129 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 129 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 129 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 129 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41806134,930264,16979665)
+  o pos.x 41806134
+  o pos.y 930264
+  o pos.z 16979665
+  o result 1
+call 129 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 129 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41806134,930264,16979665)
+  o pos.x 41806134
+  o pos.y 930264
+  o pos.z 16979665
+  o result 1
+call 129 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 130 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41944911,735324,16868546)
+  o pos.x 41944911
+  o pos.y 735324
+  o pos.z 16868546
+  o result 1
+call 130 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 130 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41944911,735324,16868546)
+  o pos.x 41944911
+  o pos.y 735324
+  o pos.z 16868546
+  o result 1
+call 130 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 130 GetWeaponTargetPos
+  r Unit#3.posZ 16503065
+  r UnitMotion#5.velocityX -32612
+  r UnitMotion#5.velocityZ -3212
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41944911,735324,16868546)
+  o pos.x 41944911
+  o pos.y 735324
+  o pos.z 16868546
+  o result 1
+call 130 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 130 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 130 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 130 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41803585,930264,16954266)
+  o pos.x 41803585
+  o pos.y 930264
+  o pos.z 16954266
+  o result 1
+call 130 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 130 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41803585,930264,16954266)
+  o pos.x 41803585
+  o pos.y 930264
+  o pos.z 16954266
+  o result 1
+call 130 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 131 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41939677,735324,16866640)
+  o pos.x 41939677
+  o pos.y 735324
+  o pos.z 16866640
+  o result 1
+call 131 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 131 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41939677,735324,16866640)
+  o pos.x 41939677
+  o pos.y 735324
+  o pos.z 16866640
+  o result 1
+call 131 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 131 GetWeaponTargetPos
+  r Unit#3.posZ 16501459
+  r UnitMotion#5.velocityX -16306
+  r UnitMotion#5.velocityZ -1606
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41939677,735324,16866640)
+  o pos.x 41939677
+  o pos.y 735324
+  o pos.z 16866640
+  o result 1
+call 131 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 131 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 131 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 131 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41802097,930264,16944753)
+  o pos.x 41802097
+  o pos.y 930264
+  o pos.z 16944753
+  o result 1
+call 131 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 131 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41802097,930264,16944753)
+  o pos.x 41802097
+  o pos.y 930264
+  o pos.z 16944753
+  o result 1
+call 131 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 132 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41934451,735324,16864479)
+  o pos.x 41934451
+  o pos.y 735324
+  o pos.z 16864479
+  o result 1
+call 132 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 132 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41934451,735324,16864479)
+  o pos.x 41934451
+  o pos.y 735324
+  o pos.z 16864479
+  o result 1
+call 132 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 132 GetWeaponTargetPos
+  r UnitMotion#5.velocityX 0
+  r UnitMotion#5.velocityZ 0
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41934451,735324,16864479)
+  o pos.x 41934451
+  o pos.y 735324
+  o pos.z 16864479
+  o result 1
+call 132 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 132 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 132 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 132 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 132 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 132 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 132 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 133 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929250,735324,16862071)
+  o pos.x 41929250
+  o pos.y 735324
+  o pos.z 16862071
+  o result 1
+call 133 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 133 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929250,735324,16862071)
+  o pos.x 41929250
+  o pos.y 735324
+  o pos.z 16862071
+  o result 1
+call 133 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 133 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41929250,735324,16862071)
+  o pos.x 41929250
+  o pos.y 735324
+  o pos.z 16862071
+  o result 1
+call 133 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 133 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 133 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 133 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 133 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 133 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 133 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 134 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41924085,735324,16859422)
+  o pos.x 41924085
+  o pos.y 735324
+  o pos.z 16859422
+  o result 1
+call 134 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 134 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41924085,735324,16859422)
+  o pos.x 41924085
+  o pos.y 735324
+  o pos.z 16859422
+  o result 1
+call 134 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 134 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41924085,735324,16859422)
+  o pos.x 41924085
+  o pos.y 735324
+  o pos.z 16859422
+  o result 1
+call 134 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 134 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 134 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 134 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 134 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 134 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 134 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 135 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41918974,735324,16856538)
+  o pos.x 41918974
+  o pos.y 735324
+  o pos.z 16856538
+  o result 1
+call 135 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 135 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41918974,735324,16856538)
+  o pos.x 41918974
+  o pos.y 735324
+  o pos.z 16856538
+  o result 1
+call 135 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 135 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41918974,735324,16856538)
+  o pos.x 41918974
+  o pos.y 735324
+  o pos.z 16856538
+  o result 1
+call 135 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 135 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 135 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 135 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 135 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 135 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 135 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 136 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41913927,735324,16853427)
+  o pos.x 41913927
+  o pos.y 735324
+  o pos.z 16853427
+  o result 1
+call 136 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 136 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41913927,735324,16853427)
+  o pos.x 41913927
+  o pos.y 735324
+  o pos.z 16853427
+  o result 1
+call 136 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 136 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41913927,735324,16853427)
+  o pos.x 41913927
+  o pos.y 735324
+  o pos.z 16853427
+  o result 1
+call 136 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 136 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 136 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 136 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 136 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 136 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 136 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 137 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41908961,735324,16850100)
+  o pos.x 41908961
+  o pos.y 735324
+  o pos.z 16850100
+  o result 1
+call 137 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 137 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41908961,735324,16850100)
+  o pos.x 41908961
+  o pos.y 735324
+  o pos.z 16850100
+  o result 1
+call 137 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 137 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41908961,735324,16850100)
+  o pos.x 41908961
+  o pos.y 735324
+  o pos.z 16850100
+  o result 1
+call 137 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 137 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 137 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 137 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 137 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 137 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 137 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 138 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 138 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 138 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 138 GetWeaponTargetUnit
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 138 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 138 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 138 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 138 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 138 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 138 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 138 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41801684,930264,16938139)
+  o pos.x 41801684
+  o pos.y 930264
+  o pos.z 16938139
+  o result 1
+call 138 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 138 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 138 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 0
+  o result null
+call 138 FindWeaponTarget
+  r rng.seed 0x22b2ef2c
+  a unit Unit#251
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 0 = 200
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  o out []
+  o result null
+call 138 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 0
+call 138 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 2
+  o result null
+call 138 FindWeaponTarget
+  a unit Unit#251
+  a weapon 2
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 2 = 240
+  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  o out []
+  o result null
+call 138 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 2
+call 139 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 139 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 139 GetWeaponTargetPos
+  r Unit#2.weapon0Flags 2
+  a unit Unit#2
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 139 GetWeaponTargetUnit
+  r Unit#2.weapon0Flags 3
+  a unit Unit#2
+  a weapon 0
+  o result Unit#252
+call 139 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 139 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 139 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 139 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 139 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41802068,930264,16929925)
+  o pos.x 41802068
+  o pos.y 930264
+  o pos.z 16929925
+  o result 1
+call 139 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#2
+call 139 GetWeaponTargetPos
+  a unit Unit#253
+  a weapon 0
+  i units.GetSweetSpot Unit#2
+  o out (41802068,930264,16929925)
+  o pos.x 41802068
+  o pos.y 930264
+  o pos.z 16929925
+  o result 1
+call 139 GetWeaponTargetUnit
+  a unit Unit#253
+  a weapon 0
+  o result Unit#2
+call 140 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 140 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 140 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 140 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 140 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 140 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 140 GetWeaponTargetPos
+  r Unit#2.unitDefIndex 0
+  r Unit#2.motion null
+  a unit Unit#252
+  a weapon 0
+  i units.FindScript CobScript#4 "StartBuilding" = -1
+  i units.StartScriptWithArgs CobScript#4 "TargetCleared" ? 0 1 0 0 0 0 = 0
+  w Unit#252.weapon0TargetX 0
+  o result 0
+call 141 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 141 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 141 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 141 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 141 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 141 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 141 GetWeaponTargetPos
+  r Unit#252.weapon0Flags 18
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 142 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 142 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 142 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 142 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 142 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 142 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 142 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  o result 0
+call 142 FindBestTargetIfFireAtWill
+  a unit Unit#252
+  i ai.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 275 0
+  o out [Unit#1,Unit#3]
+  o Unit#3.flags 0x94240321
+  i services.RandomInt 2 = 0
+  i weapons.WeaponCanReachUnit Unit#252 Unit#1 0 = 1
+  i services.RandomInt 6800 = 19
+  i services.RandomInt 1 = 0
+  i weapons.WeaponCanReachUnit Unit#252 Unit#3 0 = 1
+  i services.RandomInt 130 = 72
+  w rng.seed 0x350a4a5a
+  o result Unit#1
+call 142 ChooseWeapon
+  a unit Unit#252
+  o result 0
+call 142 SetWeaponTargetUnit
+  r Unit#1.netDirtyFlags 9216
+  a unit Unit#252
+  a target Unit#1
+  a weapon 0
+  w Unit#252.weapon0TargetX 1
+call 143 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 143 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 143 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41906262,735324,16848175)
+  o pos.x 41906262
+  o pos.y 735324
+  o pos.z 16848175
+  o result 1
+call 143 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 143 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 143 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 143 GetWeaponTargetPos
+  r Unit#252.weapon0Flags 2
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#1
+  o out (36526063,1261567,15728640)
+  o pos.x 36526063
+  o pos.y 1261567
+  o pos.z 15728640
+  o result 1
+call 143 GetWeaponTargetUnit
+  r Unit#252.weapon0Flags 3
+  a unit Unit#252
+  a weapon 0
+  o result Unit#1
+call 144 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41901446,735324,16844528)
+  o pos.x 41901446
+  o pos.y 735324
+  o pos.z 16844528
+  o result 1
+call 144 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 144 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41901446,735324,16844528)
+  o pos.x 41901446
+  o pos.y 735324
+  o pos.z 16844528
+  o result 1
+call 144 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 144 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 144 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 144 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#1
+  o out (36526063,1261567,15728640)
+  o pos.x 36526063
+  o pos.y 1261567
+  o pos.z 15728640
+  o result 1
+call 144 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#1
+call 145 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41896744,735324,16840687)
+  o pos.x 41896744
+  o pos.y 735324
+  o pos.z 16840687
+  o result 1
+call 145 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 145 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41896744,735324,16840687)
+  o pos.x 41896744
+  o pos.y 735324
+  o pos.z 16840687
+  o result 1
+call 145 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 145 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 145 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 145 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#1
+  o out (36526063,1261567,15728640)
+  o pos.x 36526063
+  o pos.y 1261567
+  o pos.z 15728640
+  o result 1
+call 145 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#1
+call 146 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41892169,735324,16836663)
+  o pos.x 41892169
+  o pos.y 735324
+  o pos.z 16836663
+  o result 1
+call 146 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result Unit#252
+call 146 GetWeaponTargetPos
+  r Unit#1.weapon0Flags 18
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 146 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41892169,735324,16836663)
+  o pos.x 41892169
+  o pos.y 735324
+  o pos.z 16836663
+  o result 1
+call 146 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 146 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 146 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 146 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#1
+  o out (36526063,1261567,15728640)
+  o pos.x 36526063
+  o pos.y 1261567
+  o pos.z 15728640
+  o result 1
+call 146 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#1
+call 147 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41887733,735324,16832468)
+  o pos.x 41887733
+  o pos.y 735324
+  o pos.z 16832468
+  o result 1
+call 147 GetWeaponTargetPos
+  r Unit#1.weapon0Flags 19
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 147 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41887733,735324,16832468)
+  o pos.x 41887733
+  o pos.y 735324
+  o pos.z 16832468
+  o result 1
+call 147 GetWeaponTargetUnit
+  a unit Unit#3
+  a weapon 0
+  o result Unit#252
+call 147 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 147 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 147 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#1
+  o out (36524547,1261567,15728640)
+  o pos.x 36524547
+  o pos.y 1261567
+  o pos.z 15728640
+  o result 1
+call 147 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#1
+call 148 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41883449,735324,16828112)
+  o pos.x 41883449
+  o pos.y 735324
+  o pos.z 16828112
+  o result 1
+call 148 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 148 GetWeaponTargetPos
+  r Unit#3.weapon0Flags 2
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41883449,735324,16828112)
+  o pos.x 41883449
+  o pos.y 735324
+  o pos.z 16828112
+  o result 1
+call 148 SetWeaponTargetUnit
+  r Unit#3.netDirtyFlags 1024
+  a unit Unit#3
+  a target Unit#252
+  a weapon 0
+  w Unit#3.netDirtyFlags 0
+call 148 SetWeaponTargetUnit
+  a unit Unit#3
+  a target Unit#252
+  a weapon 0
+call 148 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 148 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 148 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#1
+  o out (36524547,1261567,15728640)
+  o pos.x 36524547
+  o pos.y 1261567
+  o pos.z 15728640
+  o result 1
+call 148 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#1
+call 149 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41879328,735324,16823607)
+  o pos.x 41879328
+  o pos.y 735324
+  o pos.z 16823607
+  o result 1
+call 149 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 149 GetWeaponTargetPos
+  r Unit#3.posX 41409580
+  r Unit#3.posZ 16501684
+  r Unit#3.weapon0Flags 3
+  r UnitMotion#5.velocityX -9173
+  r UnitMotion#5.velocityZ 225
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41879328,735324,16823607)
+  o pos.x 41879328
+  o pos.y 735324
+  o pos.z 16823607
+  o result 1
+call 149 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 149 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 149 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#1
+  o out (36524547,1261567,15728640)
+  o pos.x 36524547
+  o pos.y 1261567
+  o pos.z 15728640
+  o result 1
+call 149 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#1
+call 150 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41875382,735324,16818967)
+  o pos.x 41875382
+  o pos.y 735324
+  o pos.z 16818967
+  o result 1
+call 150 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 150 GetWeaponTargetPos
+  r Unit#3.posX 41391429
+  r Unit#3.posZ 16504376
+  r UnitMotion#5.velocityX -18151
+  r UnitMotion#5.velocityZ 2692
+  a unit Unit#3
+  a weapon 0
+  i units.GetSweetSpot Unit#252
+  o out (41875382,735324,16818967)
+  o pos.x 41875382
+  o pos.y 735324
+  o pos.z 16818967
+  o result 1
+call 150 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 150 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 150 GetWeaponTargetPos
+  a unit Unit#252
+  a weapon 0
+  i units.GetSweetSpot Unit#1
+  o out (36524547,1261567,15728640)
+  o pos.x 36524547
+  o pos.y 1261567
+  o pos.z 15728640
+  o result 1
+call 150 GetWeaponTargetUnit
+  a unit Unit#252
+  a weapon 0
+  o result Unit#1
+call 151 GetWeaponTargetPos
+  r Unit#252.unitDefIndex 0
+  r Unit#252.motion null
+  a unit Unit#1
+  a weapon 0
+  i units.FindScript CobScript#1 "StartBuilding" = 17
+  i units.StartScriptWithArgs CobScript#1 "TargetCleared" ? 0 1 0 0 0 0 = 1
+  w Unit#1.weapon0TargetX 0
+  o result 0
+call 151 GetWeaponTargetPos
+  r Unit#1.weapon0Flags 18
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 151 GetWeaponTargetPos
+  r Unit#3.posX 41364902
+  r Unit#3.posZ 16511718
+  r UnitMotion#5.velocityX -26527
+  r UnitMotion#5.velocityZ 7342
+  a unit Unit#3
+  a weapon 0
+  i units.FindScript CobScript#5 "StartBuilding" = -1
+  i units.StartScriptWithArgs CobScript#5 "TargetCleared" ? 0 1 0 0 0 0 = 0
+  w Unit#3.weapon0TargetX 0
+  o result 0
+call 152 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 152 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 153 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 153 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 154 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 154 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 155 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 155 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 156 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 156 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 157 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 157 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 158 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 158 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 159 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 159 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 160 ResetWeaponTarget
+  a unit Unit#251
+  a weapon 0
+call 160 ResetWeaponTarget
+  a unit Unit#251
+  a weapon 1
+call 160 ResetWeaponTarget
+  a unit Unit#251
+  a weapon 2
+call 160 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 160 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 160 GetWeaponTargetPos
+  r Unit#251.unitDefIndex 95
+  r Unit#251.motion UnitMotion#7
+  r Unit#251.posX 41943040
+  r Unit#251.posZ 17039360
+  r Unit#251.weapon0Def weapondef#16
+  r Unit#251.weapon2Def weapondef#0
+  r Unit#251.weapon2Flags 24
+  r UnitMotion#7.velocityX 0
+  r UnitMotion#7.velocityY 0
+  r UnitMotion#7.velocityZ 0
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 161 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 161 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 161 FindBestTargetIfFireAtWill
+  r rng.seed 0x207ec909
+  a unit Unit#1
+  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  o out []
+  o result null
+call 161 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 162 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 162 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 162 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 162 FindBestTargetIfFireAtWill
+  r rng.seed 0x63c07e89
+  r Unit#251.def UnitDef#3
+  r Unit#251.flags 0x90240021
+  r Unit#251.activateFlags 0
+  a unit Unit#251
+  i ai.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 280 0
+  o out []
+  o result null
+call 163 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 163 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 163 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 164 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 164 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 164 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 165 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 165 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 165 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 166 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 166 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 166 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 166 GetWeaponTargetUnit
+  a unit Unit#1
+  a weapon 0
+  o result null
+call 166 FindWeaponTarget
+  r rng.seed 0x72b38788
+  a unit Unit#1
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#1 0 = 200
+  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  o out []
+  o result null
+call 166 ClearWeaponTarget
+  a unit Unit#1
+  a weapon 0
+call 166 GetWeaponTargetUnit
+  a unit Unit#251
+  a weapon 0
+  o result null
+call 166 FindWeaponTarget
+  a unit Unit#251
+  a weapon 0
+  a useRange 1
+  i weapons.GetWeaponRange Unit#251 0 = 180
+  i ai.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 180 0
+  o out []
+  o result null
+call 166 ClearWeaponTarget
+  a unit Unit#251
+  a weapon 0
+call 167 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 167 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 167 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 168 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 168 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 168 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 169 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 169 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 169 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0

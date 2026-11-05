@@ -26,7 +26,7 @@ class UnitDef;
 
 void __stdcall InitUnitCategories();
 void __stdcall FreeUnitCategories();
-float __stdcall GetEnergyUse(UnitDef* def);
+double __stdcall GetEnergyUse(UnitDef* def);
 
 void __cdecl CreateMissionUnits();
 void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPacket* p);

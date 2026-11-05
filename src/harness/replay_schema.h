@@ -2050,7 +2050,7 @@ static const unsigned kReplaySlotCount = RSL_COUNT;
 
 static const ReplaySubsystem kReplaySubsystems[] = {
     { "wind_meteors", 1, 2, 1, 0, 12 },
-    { "economy", 2, 0, 1, 12, 12 },
+    { "economy", 3, 0, 1, 12, 12 },
     { "features", 2, 0, 0, 24, 18 },
     { "ai", 3, 1, 0, 42, 24 },
     { "pathfinding", 1, 2, 0, 66, 4 },

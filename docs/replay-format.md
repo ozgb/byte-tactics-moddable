@@ -1114,7 +1114,7 @@ own `pool`, which the module grows), and a write to a `Game` field through a poi
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 
-The same exe replays economy, whose module is native code in every mode: `replay_inject_test.exe` is built with
+The same exe replays economy, which the modern build runs as native code in every mode (it has no WASM module yet): `replay_inject_test.exe` is built with
 the wind-scale injection of 3.0, which scales the wind income in the per-tick economy update, and the divergence is reported at the
 first call whose wind generators were on and at `Player#0.energy`:
 
@@ -1143,7 +1143,7 @@ out `Vec3`:
 wine build/modern/replay_inject_test.exe --expect 352 pos.x tests/replay/targeting/skirmish4-long.txt
 ```
 
-The recordings of targeting, which is native code in every mode: `orders-guard-attacked` (units that guard and are attacked: every
+The recordings of targeting, which the modern build runs as native code in every mode (it has no WASM module yet): `orders-guard-attacked` (units that guard and are attacked: every
 slot but `SetWeaponTargetPos`, `SetWeaponTargetUnit` 315 times, candidates from `ai.GetVisibleEnemiesInRadius`, `ChooseWeapon`),
 `orders-tier2-spider` (`SetWeaponTargetPos` 8 times, and the ground positions of `GetWeaponTargetPos`) and `skirmish4-long`, ticks
 25750 to 25770 only, where a unit with more than five kills fires at a moving unit (the scale of `GetWeaponTargetPos`). `console-units` (the whole run) holds a
@@ -1160,7 +1160,7 @@ nothing is recorded of it.
 wine build/modern/replay_inject_test.exe --expect 7 result tests/replay/map/orders-air-repair.txt
 ```
 
-The recordings of map, which is native code in every mode: `ui-build-place` (the whole run: `BuildAllPassMaps` at load, `CanBuildAt`, `SnapWorldPosToFootprint`, `RefreshPassMap`), `orders-air`, ticks 1020 to 1585 only
+The recordings of map, which the modern build runs as native code in every mode (it has no WASM module yet): `ui-build-place` (the whole run: `BuildAllPassMaps` at load, `CanBuildAt`, `SnapWorldPosToFootprint`, `RefreshPassMap`), `orders-air`, ticks 1020 to 1585 only
 (`SetYardOpen`, `SpatialBucketPrependUnit` and `SpatialBucketUnlinkUnit`, `CanPlaceFootprintAt`, `CanBuildAt`) and `orders-air-repair`, ticks 380 to 385 only (`ClearFootprintAndUnlink`, `IsPadSlotFree`, `GetCellMeanHeight`).
 A window cannot start at tick 0, so only a whole run holds the load-time `BuildAllPassMaps`. The first call that names a field of `Cell` writes it for every cell of the table (a map of 224 by 102 cells is about 23,000 lines a field),
 which is most of each file, and after that only the cells a call changed. `ForceNeighborFootprintReclaim` is in no scenario.
@@ -1178,6 +1178,9 @@ cmake --build build/modern --target wasm_runtime wasm_runtime_inject
 wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm tests/replay/wind_meteors/*.txt
 wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors_inject.wasm --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/wind_meteors/meteors-hailstorm.txt
 ```
+
+The recordings don't depend on how the modern build runs a subsystem. A module of economy, targeting or map, native or
+WASM, has to replay them equal, as `wind_meteors.wasm` replays its own.
 
 `tests/replay_wasm.cpp` loads the module through `lib/wasmloader` as `src/wasm/modules.cpp` does in the game: the
 `wasmtime_host.dll` and `modules.json` beside the module file are used, the sim block of the module's memory is attached

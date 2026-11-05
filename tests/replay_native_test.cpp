@@ -86,7 +86,7 @@ int __cdecl ScaledCos(int angle, int scale)
 }
 
 void __stdcall UpdateResourceSharing(Player* player);
-float __stdcall GetEnergyUse(UnitDef* def);
+double __stdcall GetEnergyUse(UnitDef* def);
 void __stdcall UpdatePlayerEconomy(Player* player);
 void __stdcall UpdateMetalExtraction(Unit* unit);
 

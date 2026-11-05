@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem economy 2.0
+subsystem economy 3.0
 call 40 SpendMetal
   r UnitResources#1.metalUse f32:0x00000000
   r UnitResources#1.player Player#0

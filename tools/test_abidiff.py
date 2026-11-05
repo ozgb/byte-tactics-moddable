@@ -343,7 +343,7 @@ class ServicesEntriesTest(unittest.TestCase):
         self.assertEqual(result.details, ["Args::Put: overloaded (2 signatures), one import name"])
         back = judged(services("void Put(int a); void Put(char* a);"), services("void Put(int a);", minor=1))
         self.assertFalse(back.ok)
-        self.assertEqual(back.details, ["Args::Put: no longer overloaded (1 signature), 2 removed"])
+        self.assertEqual(back.details, ["Args::Put: no longer overloaded (2 signatures -> 1)"])
 
     def test_other_headers_are_not_judged_by_entries(self):
         old = header([SLOT_A]) + "void Free(int a);\n"

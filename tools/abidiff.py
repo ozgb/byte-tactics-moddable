@@ -350,7 +350,7 @@ def compare_entries(old: dict, new: dict) -> list[Change]:
     for name, keys in overloaded.items():
         out.append(Change("breaking", "%s: overloaded (%d signatures), one import name" % (name, len(keys)), (name.replace("::", "_"),)))
     for name, keys in single.items():
-        out.append(Change("breaking", "%s: no longer overloaded (1 signature), %d removed" % (name, len(keys)), (name.replace("::", "_"),)))
+        out.append(Change("breaking", "%s: no longer overloaded (%d signatures -> 1)" % (name, len(keys)), (name.replace("::", "_"),)))
     skip = set(overloaded) | {k for keys in overloaded.values() for k in keys} | set(single) | {k for keys in single.values() for k in keys}
     for name, sig in old.items():
         if name in skip:

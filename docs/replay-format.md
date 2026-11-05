@@ -326,7 +326,7 @@ module has an allocator of its own that the host does not call.
 
 A field of kind `self` points into the object that holds it. `{"name": "screen", "kind": "self", "member": "screenPos"}` is `Eye::screen`, a `Ref` to the same
 Eye's `screenPos`. It is never written as a line, never compared, and never restored from a line: the replayer sets it to the address of that member of the
-object itself, whenever a name resolves to the object. An object that the replayed module moves by assignment (a standard-library `remove_if` over the Eyes copies the
+object itself, whenever a name resolves to the object. An object that the replayed module moves by assignment (removing elements from the Eyes with a standard-library algorithm copies the
 pointer, which then leads into the old element) has it set again by the next line that names it, and a recording from before and after the move is
 the same text.
 
@@ -807,7 +807,7 @@ runners, import stubs and native seam tables of the replayer). The services impo
 annotation: each entry names its declaration in `interfaces/services.h` (checked against the header) and how its arguments,
 result and `o` lines are written. From it the tool writes `src/harness/replay_services.h` (the ids and names),
 `src/harness/replay_services.inc` (the recorder's lines) and `tests/replay_services.h` (the replayer's answers). The one thing
-it cannot write is the hook itself, `ReplayImport call(RI_X); call.Int(..)` at the top of each function in the game source:
+it cannot write is the hook itself, an import-recording line at the top of each function in the game source:
 those functions are the services themselves, reached by direct calls with no table to wrap, so the hook has to be in the
 function; `replayschema.py --check` fails when a hook's arguments differ from its entry or an entry has no hook.
 
@@ -817,7 +817,7 @@ The kinds the self-tests need and no subsystem has (`FixtureView`, `FixtureCell`
 not in `data/replay_schema.json`. `tests/replay_fixtures.json` holds them (`includes`, `game_fields`, `objects`, `fixtures` for the slots the self-tests call, and `inside` for the sites they add
 to a real kind), `tests/replay_fixtures.h` their structs, and `uv run tools/replayschema.py` writes `tests/replay_schema_fixtures.h`, the tables
 of the real kinds with these appended, and `tests/replay_vtables_fixtures.cpp`. `src/harness/replay_schema.h` includes the first when
-`BT_REPLAY_FIXTURES` is defined, which only `tests/replay_native_test.cpp`, `tests/replay_objects_fixtures.cpp` (a copy of `replay_objects.cpp` that defines it first)
+the fixture switch is defined, which only the native replay test, the object fixtures file (a copy of the objects file that defines it first)
 and `tests/replay_fixture_recorder.cpp` (below) do, so the exe's recorder has no fixture kind, and no real member of `Game`
 (`Game::slowest`, `p1b8a` and `p1cd5` are the hosts of the fixtures) is declared as anything but what it is. The fixture annotations are checked
 with the rest.
@@ -830,7 +830,7 @@ is exercised by the tests and `replayschema.py --check` keeps them current:
   its runner `Run_fixture_<Slot>` and `After_fixture_<Slot>`, which call `Native_fixture_<Slot>`, a function that `tests/replay_native_test.cpp` defines. A self-test loads the
   lines of a call, runs the pair and checks `g_diffs` and the first key.
 - `tests/replay_fixture_hooks.inc`: the recording wrapper of the slot (`RecFixture<Slot>`) and a `FixtureSeam` table of them. `tests/replay_fixture_recorder.cpp` includes
-  `replay.cpp` with `BT_REPLAY_FIXTURES` defined and then this file in a second anonymous namespace, so the wrappers are compiled with the recorder's own helpers.
+  the recorder with the fixture switch defined and then this file in a second anonymous namespace, so the wrappers are compiled with the recorder's own helpers.
   The translation unit is a compile check, built by the `replay_native_test` target and linked into no exe. A fixture slot with a `callback` argument is
   wrapped as a slot (the `a` line and the `c` lines of the slot); any other is wrapped as an import, whose lines the stub reads.
 
@@ -892,7 +892,7 @@ One line per group, from the self-test:
   i services.Translate "key" = "Teksti"
   i services.ComputeChecksum x:0102ff 3 = 1234567
   i services.SimAlloc 64 = alloc#1
-  i services.SimAllocTagged "Player Info" 185 = PlayerInfo#1
+  i services.<tagged allocation> "Player Info" 185 = PlayerInfo#1
   i services.SimFree alloc#1
   i services.RecordSimEvent 2 1 [3,4] 2
   i services.FindSlotByDpid 77 = 2
@@ -901,7 +901,7 @@ One line per group, from the self-test:
 ```
 
 The services of the files and data group are `FilePrintf` (the format and the formatted text) and the TDF calls that the subsystems make on records
-and files; the commands group is `Translate`, `CommandArgs::InitArgs` and `ComputeChecksum`; sim plumbing is `SimAlloc`, `SimAllocTagged` (the size
+and files; the commands group is `Translate`, `CommandArgs::InitArgs` and `ComputeChecksum`; sim plumbing is `SimAlloc`, the tagged allocation (the size
 and the tag are compared), `SimFree`, `RecordSimEvent` (kind, flags, args and count), `SimCaptureAlloc` and the slot lookups `FindSlotByDpid` and
 `GetSlotDpid`; the load reads are `LoadGaf`, `LoadAnimGaf`, `FindGafEntry`, `GetGafFrame`, `GetGafSequenceFrame`, `Load3do`, `LoadObject3d` and
 `GetObjectHeight`, with results that are objects of the load kinds `Gaf`, `FrameTable`, `GafFrame` and `Object3do` and the fields that
@@ -911,7 +911,7 @@ saved game that a module calls are the imports `services.HapiBank_OpenAccount`, 
 the box reads and seeks, are recorded as `files.<Slot>` imports, as any import is. A hook records only for the thread that opened the slot, so
 the calls of the loading thread or the drawing code that overlap a slot are not its calls.
 
-A service whose definition is in a source that the replayer links (`SimAlloc`, `SimAllocTagged` and `SimFree`, which `block.cpp` defines) is not
+A service whose definition is in a source that the replayer links (`SimAlloc`, the tagged allocation and `SimFree`, which the block source defines) is not
 defined by the replayer. The hook in the real function asks `call.Answered()`, which is true only while the replayer runs a slot, and the
 generated answer takes the place of the function: it checks the `i` line the module would have written, makes the real allocation and names the
 block as the recording does (`alloc#1`, or the object of the tag's kind) or, for `SimFree`, lets the real free go on. The replayer's own
@@ -968,7 +968,7 @@ recording it finally mutates the recording and expects each mutation reported. `
 with one changed constant and expects that divergence.
 
 The same exe replays economy, whose module is native code in every mode: `replay_inject_test.exe` is built with
-`BT_REPLAY_INJECT_WIND_SCALE=3.0`, which scales the wind income in `UpdatePlayerEconomy`, and the divergence is reported at the
+the wind-scale injection of 3.0, which scales the wind income in the per-tick economy update, and the divergence is reported at the
 first call whose wind generators were on and at `Player#0.energy`:
 
 ```sh
@@ -983,7 +983,7 @@ the first metal maker earns income (the `makesMetal` branch of `UpdatePlayerEcon
 player's slice of the unit table on each call, so a recording carries the `r` lines of all the slice at the first call and the
 changes after it.
 
-`replay_inject_test.exe` is also built with `BT_REPLAY_INJECT_TARGET_SCALE=0x6666` (the 0xcccc of `GetWeaponTargetPos`, the part of the
+`replay_inject_test.exe` is also built with the target-scale injection of 0x6666 (the 0xcccc of the weapon target position, the part of the
 distance a target's body offset moves the aim point), and the divergence is reported at call 352 of `skirmish4-long` and at `pos.x`, the
 out `Vec3`:
 
@@ -998,7 +998,7 @@ slot but `SetWeaponTargetPos`, `SetWeaponTargetUnit` 315 times, candidates from 
 `GetWeaponTargetPos` that returns nonzero records the `pos` it wrote (`o pos.x`); one that returns 0 leaves the stack local of its caller untouched, so
 nothing is recorded of it.
 
-`replay_inject_test.exe` is also built with `BT_REPLAY_INJECT_MEAN_SHIFT=0` (the `>> 1` that halves the sum of the low and high corners of a cell in `GetCellMeanHeight`), and the divergence is reported at call 7 of `orders-air-repair` and at `result`:
+`replay_inject_test.exe` is also built with the mean-shift injection of 0 (the shift by one that halves the sum of the low and high corners of a cell in the cell mean height), and the divergence is reported at call 7 of `orders-air-repair` and at `result`:
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 7 result tests/replay/map/orders-air-repair.txt
@@ -1029,5 +1029,5 @@ as the replayer's block, and the slots are called through the seam the subsystem
 entry per subsystem in a table at the top of that file (wind_meteors only for now); the module file's name selects the
 entry, and the recording's subsystem must be the same one. Each replay of a file loads the module afresh, so the two
 runs of a file start from the same state. A trap or a fuel overrun stops the run with `FAIL`.
-`wind_meteors_inject.wasm` is the module built with `BT_REPLAY_INJECT_GAP_SCALE=31.0` (`wasm_modules.py build-variant`),
+`wind_meteors_inject.wasm` is the module built with the gap-scale injection of 31.0 (`wasm_modules.py build-variant`),
 and the divergence is reported at the same call and field as for the native one.

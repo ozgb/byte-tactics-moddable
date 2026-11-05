@@ -245,7 +245,7 @@ void __stdcall RecEconomyReset(UnitResources* a0, unsigned char a1)
     }
 }
 
-void __stdcall RecEconomySaveUnitAccounts(UnitResources* a0, UnitInfo* a1, HapiBank* a2)
+void __stdcall RecEconomySaveUnitAccounts(UnitResources* a0, Unit* a1, HapiBank* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITRESOURCES, a0);
@@ -261,7 +261,7 @@ void __stdcall RecEconomySaveUnitAccounts(UnitResources* a0, UnitInfo* a1, HapiB
     }
 }
 
-void __stdcall RecEconomyLoadUnitAccounts(UnitResources* a0, UnitInfo* a1, HapiBank* a2)
+void __stdcall RecEconomyLoadUnitAccounts(UnitResources* a0, Unit* a1, HapiBank* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITRESOURCES, a0);

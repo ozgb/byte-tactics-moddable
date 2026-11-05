@@ -232,7 +232,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     unit->flags = (unit->flags & ~0x400000) | ((rec.flags.e << 14) & 0x400000);
     unit->flags = (unit->flags & ~0x3800000) | ((rec.flags.e << 14) & 0x3800000);
 
-    g_seams.economy->LoadUnitAccounts(&unit->resourceSlot, (UnitInfo*)unit, file);
+    g_seams.economy->LoadUnitAccounts(&unit->resourceSlot, unit, file);
     if (rec.f27 != 0)
         g_seams.orders->LoadMotion(unit->motion, 0, unit, file);
 
@@ -318,7 +318,7 @@ void __stdcall SaveUnits(HapiBank* file)
 
             if (unit->motion != 0)
                 g_seams.orders->SaveMotion(unit->motion, 0, unit, file);
-            g_seams.economy->SaveUnitAccounts((UnitResources*)((char*)unit + 0xbc), (UnitInfo*)unit, file);
+            g_seams.economy->SaveUnitAccounts((UnitResources*)((char*)unit + 0xbc), unit, file);
 
             strcpy(rec.name, ((char*)unit->def.get() + 0x20));
             rec.player = unit->playerIndex;

@@ -129,12 +129,12 @@ static void __stdcall ResetNative(UnitResources* self, unsigned char playerIndex
     self->Reset(playerIndex);
 }
 
-static void __stdcall SaveUnitAccountsNative(UnitResources* self, UnitInfo* info, HapiBank* file)
+static void __stdcall SaveUnitAccountsNative(UnitResources* self, Unit* info, HapiBank* file)
 {
     self->SaveUnitAccounts(info, file);
 }
 
-static void __stdcall LoadUnitAccountsNative(UnitResources* self, UnitInfo* info, HapiBank* file)
+static void __stdcall LoadUnitAccountsNative(UnitResources* self, Unit* info, HapiBank* file)
 {
     self->LoadUnitAccounts(info, file);
 }

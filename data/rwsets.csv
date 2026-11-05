@@ -13,7 +13,7 @@ address,function,file,kind,target
 0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,call,sprintf
 0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,field_maybe_written,UnitResources::energyMake
 0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,field_maybe_written,UnitResources::metalMake
-0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,field_read,UnitInfo::id
+0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,field_read,Unit::id
 0x4010b0,UnitResources::SaveUnitAccounts,src/game/economy.cpp,function,
 0x401110,UnitResources::LoadUnitAccounts,src/game/economy.cpp,call,HapiBank::OpenNamedBox
 0x401110,UnitResources::LoadUnitAccounts,src/game/economy.cpp,call,HapiBank::ReadBox
@@ -21,7 +21,7 @@ address,function,file,kind,target
 0x401110,UnitResources::LoadUnitAccounts,src/game/economy.cpp,call,sprintf
 0x401110,UnitResources::LoadUnitAccounts,src/game/economy.cpp,field_maybe_written,UnitResources::energyMake
 0x401110,UnitResources::LoadUnitAccounts,src/game/economy.cpp,field_maybe_written,UnitResources::metalMake
-0x401110,UnitResources::LoadUnitAccounts,src/game/economy.cpp,field_read,UnitInfo::id
+0x401110,UnitResources::LoadUnitAccounts,src/game/economy.cpp,field_read,Unit::id
 0x401110,UnitResources::LoadUnitAccounts,src/game/economy.cpp,function,
 0x401180,UnitResources::RequestEnergy,src/game/economy.cpp,field_read,UnitResources::energyStall
 0x401180,UnitResources::RequestEnergy,src/game/economy.cpp,field_read,UnitResources::energyUse
@@ -27419,7 +27419,7 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::ForceNeighborFootprintReclaim]
 0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
 0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(UnitMotion *, int, Unit *, HapiBank *) __attribute__((fastcall)) [OrdersSeam::LoadMotion]"
-0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(UnitResources *, UnitInfo *, HapiBank *) __attribute__((stdcall)) [EconomySeam::LoadUnitAccounts]"
+0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(UnitResources *, Unit *, HapiBank *) __attribute__((stdcall)) [EconomySeam::LoadUnitAccounts]"
 0x4876c0,SaveUnits,src/units/unit_save.cpp,call,CobScript::SaveScriptState
 0x4876c0,SaveUnits,src/units/unit_save.cpp,call,HapiBank::OpenAccount
 0x4876c0,SaveUnits,src/units/unit_save.cpp,call,HapiBank::OpenNamedBox
@@ -27543,7 +27543,7 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,global_read,g_seams
 0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via int (*)(Order *, int, Unit *, HapiBank *, char *) __attribute__((fastcall)) [OrdersSeam::SerializeOrderToSave]"
 0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(UnitMotion *, int, Unit *, HapiBank *) __attribute__((fastcall)) [OrdersSeam::SaveMotion]"
-0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(UnitResources *, UnitInfo *, HapiBank *) __attribute__((stdcall)) [EconomySeam::SaveUnitAccounts]"
+0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(UnitResources *, Unit *, HapiBank *) __attribute__((stdcall)) [EconomySeam::SaveUnitAccounts]"
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,IdAt
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,_strcmpi
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,operator MissionUnit *
@@ -52140,7 +52140,7 @@ address,function,file,kind,target
 ,RecEconomyLoadUnitAccounts,src/harness/replay_hooks.inc,function,
 ,RecEconomyLoadUnitAccounts,src/harness/replay_hooks.inc,global_read,s_call
 ,RecEconomyLoadUnitAccounts,src/harness/replay_hooks.inc,global_read,s_inner_economy
-,RecEconomyLoadUnitAccounts,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitResources *, UnitInfo *, HapiBank *) __attribute__((stdcall)) [EconomySeam::LoadUnitAccounts]"
+,RecEconomyLoadUnitAccounts,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitResources *, Unit *, HapiBank *) __attribute__((stdcall)) [EconomySeam::LoadUnitAccounts]"
 ,RecEconomyRequestEnergy,src/harness/replay_hooks.inc,call,Add
 ,RecEconomyRequestEnergy,src/harness/replay_hooks.inc,call,ArgObject
 ,RecEconomyRequestEnergy,src/harness/replay_hooks.inc,call,ArgValue
@@ -52182,7 +52182,7 @@ address,function,file,kind,target
 ,RecEconomySaveUnitAccounts,src/harness/replay_hooks.inc,function,
 ,RecEconomySaveUnitAccounts,src/harness/replay_hooks.inc,global_read,s_call
 ,RecEconomySaveUnitAccounts,src/harness/replay_hooks.inc,global_read,s_inner_economy
-,RecEconomySaveUnitAccounts,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitResources *, UnitInfo *, HapiBank *) __attribute__((stdcall)) [EconomySeam::SaveUnitAccounts]"
+,RecEconomySaveUnitAccounts,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitResources *, Unit *, HapiBank *) __attribute__((stdcall)) [EconomySeam::SaveUnitAccounts]"
 ,RecEconomySpendEnergy,src/harness/replay_hooks.inc,call,Add
 ,RecEconomySpendEnergy,src/harness/replay_hooks.inc,call,ArgObject
 ,RecEconomySpendEnergy,src/harness/replay_hooks.inc,call,ArgValue

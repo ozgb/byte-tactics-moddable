@@ -10,11 +10,6 @@
 
 #pragma pack(push, 1)
 
-struct UnitInfo {
-    char unknown_0[0xa8];
-    unsigned short id;
-};
-
 #include "unit_resources.h"
 
 #include "../network/player.h"
@@ -63,7 +58,7 @@ void UnitResources::Reset(unsigned char playerIndex)
 }
 
 // FUNCTION: 0x4010b0
-void UnitResources::SaveUnitAccounts(UnitInfo* info, HapiBank* file)
+void UnitResources::SaveUnitAccounts(Unit* info, HapiBank* file)
 {
     char name[32];
     sprintf(name, "u%04xacc", info->id);
@@ -74,7 +69,7 @@ void UnitResources::SaveUnitAccounts(UnitInfo* info, HapiBank* file)
 }
 
 // FUNCTION: 0x401110
-void UnitResources::LoadUnitAccounts(UnitInfo* info, HapiBank* file)
+void UnitResources::LoadUnitAccounts(Unit* info, HapiBank* file)
 {
     char name[32];
     sprintf(name, "u%04xacc", info->id);

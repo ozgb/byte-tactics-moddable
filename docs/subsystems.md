@@ -134,7 +134,7 @@ Coverage: 93.1% of functions (27 of 29), 80.4% of lines, 44.7% of branches; 2 li
 
 `Player::energy` (mixed); `Player::metal` (mixed); `UnitResources::energyUse` (mixed); `UnitResources::energyUsePaid` (mixed); `UnitResources::metalUse` (mixed); `Player::energyCapacity` (sim); `Player::energyIncome` (sim); `Player::energyUsage` (sim); `Player::energyWasted` (sim); `Player::metalCapacity` (sim); `Player::metalIncome` (sim); `Player::metalUsage` (sim)
 
-**Sim reads.** 64 items only read, 62 named. The most used (`g_game`, the root pointer, left out):
+**Sim reads.** 65 items only read, 63 named. The most used (`g_game`, the root pointer, left out):
 
 `Player::active` (mixed); `Player::type` (mixed); `Game::players` (sim); `Game::localPlayer` (mixed); `Game::netGameFlags` (mixed); `UnitResources::energyMake` (mixed); `Game::difficulty` (mixed); `UnitResources::energyStall` (sim); `UnitResources::metalMake` (mixed); `Player::index` (mixed); `Player::info` (mixed); `Game::ticks` (mixed)
 

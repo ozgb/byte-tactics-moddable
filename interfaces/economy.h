@@ -4,14 +4,13 @@
 struct Player;
 struct Unit;
 struct UnitDef;
-struct UnitInfo;
 class HapiBank;
 class UnitResources;
 
 // Major version of the economy interface, changed when a slot is removed or its signature changes.
-#define ECONOMY_VERSION_MAJOR 1
+#define ECONOMY_VERSION_MAJOR 2
 // Minor version of the economy interface, changed when a slot is added.
-#define ECONOMY_VERSION_MINOR 1
+#define ECONOMY_VERSION_MINOR 0
 
 // Resource sharing between players, and the resource accounts of units.
 struct EconomySeam {
@@ -26,9 +25,9 @@ struct EconomySeam {
     // Clears a unit's resource account and points it at the given player (thiscall in 3.1c, this first). Hooks: none.
     void (__stdcall* Reset)(UnitResources* self, unsigned char playerIndex);
     // Writes a unit's resource account to a saved game (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* SaveUnitAccounts)(UnitResources* self, UnitInfo* info, HapiBank* file);
+    void (__stdcall* SaveUnitAccounts)(UnitResources* self, Unit* info, HapiBank* file);
     // Reads a unit's resource account from a saved game (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* LoadUnitAccounts)(UnitResources* self, UnitInfo* info, HapiBank* file);
+    void (__stdcall* LoadUnitAccounts)(UnitResources* self, Unit* info, HapiBank* file);
     // Asks for energy and returns 1 when it is not stalled (thiscall in 3.1c, this first; the account is passed again as r). Hooks: none.
     int (__stdcall* RequestEnergy)(UnitResources* self, UnitResources* r, float amount);
     // Asks for energy and metal and returns 1 when neither is stalled (thiscall in 3.1c, this first). Hooks: none.

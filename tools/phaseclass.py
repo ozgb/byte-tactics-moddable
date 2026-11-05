@@ -292,6 +292,25 @@ def build(directory: Path, coupling_rows: list[dict]) -> dict[str, list[dict]]:
             "pass_reads": pass_reads(load_kind(directory, "pass"))}
 
 
+def check(directory: Path, tables: dict[str, list[dict]], outputs: dict[str, tuple[Path, list[str]]] | None = None) -> list[str]:
+    """The problems with the stored files and the four data files: what problems_of finds, and each data file that differs from its rows."""
+    problems = problems_of(directory, tables)
+    for name, (path, columns) in (outputs or OUTPUTS).items():
+        text = render_rows(columns, tables[name])
+        have = path.read_text() if path.is_file() else ""
+        if have != text:
+            rel = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
+            diff = difflib.unified_diff(have.splitlines(), text.splitlines(), str(rel), "regenerated", lineterm="", n=0)
+            problems.append("%s differs from the stored files (uv run tools/phaseclass.py --write):\n%s" % (rel, "\n".join(list(diff)[:40])))
+    return problems
+
+
+def check_stored() -> list[str]:
+    """check() on the stored files of data/access_phases and the coupling rows of data/coupling.csv."""
+    tables = build(PHASES_DIR, depclass.read_coupling(depclass.COUPLING_CSV.read_text()))
+    return check(PHASES_DIR, tables)
+
+
 OUTPUTS = {"phase_dependencies": (PHASE_DEPENDENCIES, PHASE_DEPENDENCIES_COLUMNS), "phase_boundaries": (PHASE_BOUNDARIES, BOUNDARY_COLUMNS),
            "draws": (DRAWS, DRAWS_COLUMNS), "pass_reads": (PASS_READS, PASS_READS_COLUMNS)}
 
@@ -312,14 +331,7 @@ def main() -> int:
             path.write_text(render_rows(columns, tables[name]))
         print("phaseclass: " + ", ".join("%d %s" % (len(tables[n]), n) for n in OUTPUTS))
         return 0
-    problems = problems_of(PHASES_DIR, tables)
-    for name, (path, columns) in OUTPUTS.items():
-        text = render_rows(columns, tables[name])
-        have = path.read_text() if path.is_file() else ""
-        if have != text:
-            rel = path.relative_to(ROOT)
-            diff = difflib.unified_diff(have.splitlines(), text.splitlines(), str(rel), "regenerated", lineterm="", n=0)
-            problems.append("%s differs from the stored files (uv run tools/phaseclass.py --write):\n%s" % (rel, "\n".join(list(diff)[:40])))
+    problems = check(PHASES_DIR, tables)
     if problems:
         print("\n".join(problems))
         return 1

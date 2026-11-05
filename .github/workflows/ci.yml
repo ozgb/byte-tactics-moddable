@@ -544,17 +544,12 @@ jobs:
         if: steps.changed.outputs.run == 'true'
         run: uv run tools/test_accesslog.py
 
-      - name: Check the classes of the edges between subsystems
+      - name: Check the classes of the edges between subsystems, across phases, of the draws and of the passes
         if: steps.changed.outputs.run == 'true'
         run: |
           uv run tools/test_depclass.py
-          uv run tools/depclass.py --check
-
-      - name: Check the classes across phases, the draws and the passes
-        if: steps.changed.outputs.run == 'true'
-        run: |
           uv run tools/test_phaseclass.py
-          uv run tools/phaseclass.py --check
+          uv run tools/depclass.py --check
 
       - name: Test the coverage report
         if: steps.changed.outputs.run == 'true'

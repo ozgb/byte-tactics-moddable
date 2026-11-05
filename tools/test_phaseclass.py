@@ -178,5 +178,28 @@ class Store(unittest.TestCase):
             self.assertEqual(depclass.classify(depclass.load_summaries(edges), []), [])
 
 
+class DepclassChecksThePhaseFiles(unittest.TestCase):
+    def test_a_changed_phase_file_fails_depclass_check(self):
+        import contextlib
+        import io
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as t:
+            outputs = {n: (Path(t) / p.name, c) for n, (p, c) in pc.OUTPUTS.items()}
+            tables = pc.build(pc.PHASES_DIR, depclass.read_coupling(depclass.COUPLING_CSV.read_text()))
+            for name, (path, columns) in outputs.items():
+                path.write_text(pc.render_rows(columns, tables[name]))
+            self.assertEqual(pc.check(pc.PHASES_DIR, tables, outputs), [])
+            outputs["draws"][0].write_text(outputs["draws"][0].read_text().replace("fixed", "start-state", 1))
+            self.assertTrue(any("draws.csv differs" in p for p in pc.check(pc.PHASES_DIR, tables, outputs)))
+            with mock.patch.object(pc, "OUTPUTS", outputs), mock.patch.object(pc, "check_stored", lambda: pc.check(pc.PHASES_DIR, tables, outputs)):
+                with mock.patch("sys.argv", ["depclass.py", "--check"]):
+                    buf = io.StringIO()
+                    with contextlib.redirect_stdout(buf):
+                        status = depclass.main()
+            self.assertEqual(status, 1)
+            self.assertIn("draws.csv differs", buf.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main()

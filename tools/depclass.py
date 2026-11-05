@@ -5,6 +5,7 @@
     uv run tools/depclass.py --write         # writes data/dependencies.csv from data/access/*.edges.csv
     uv run tools/depclass.py --check         # fail if data/dependencies.csv differs from what the stored summaries regenerate,
                                              # if a scenario has no summary, or if a coupling.csv edge has no row
+                                             # (and the same for the four files of tools/phaseclass.py)
     uv run tools/test_depclass.py            # tests, on synthetic summaries
 
 This is step 2 of #830. Its input is data/access/<scenario>.edges.csv.gz, one file per scenario of
@@ -225,7 +226,7 @@ def main() -> int:
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--store", type=Path, metavar="DIR", help="store the edges files of DIR in data/access")
     mode.add_argument("--write", action="store_true", help="write data/dependencies.csv")
-    mode.add_argument("--check", action="store_true", help="fail if data/dependencies.csv is stale or a coupling edge has no row")
+    mode.add_argument("--check", action="store_true", help="fail if data/dependencies.csv or a phase file (tools/phaseclass.py) is stale or a coupling edge has no row")
     args = ap.parse_args()
     if args.store:
         print("depclass: stored %d summaries" % store(args.store, ACCESS_DIR))
@@ -247,10 +248,13 @@ def main() -> int:
     if have != text:
         diff = difflib.unified_diff(have.splitlines(), text.splitlines(), "data/dependencies.csv", "regenerated", lineterm="", n=0)
         problems.append("data/dependencies.csv differs from the stored summaries (uv run tools/depclass.py --write):\n" + "\n".join(list(diff)[:40]))
+    import phaseclass
+
+    problems += phaseclass.check_stored()
     if problems:
         print("\n".join(problems))
         return 1
-    print("depclass: data/dependencies.csv matches %d summaries, %d rows" % (len(summaries), len(rows)))
+    print("depclass: data/dependencies.csv matches %d summaries, %d rows; the phase files match" % (len(summaries), len(rows)))
     return 0
 
 

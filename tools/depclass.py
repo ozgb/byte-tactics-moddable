@@ -5,7 +5,8 @@
     uv run tools/depclass.py --write         # writes data/dependencies.csv from data/access/*.edges.csv
     uv run tools/depclass.py --check         # fail if data/dependencies.csv differs from what the stored summaries regenerate,
                                              # if a scenario has no summary, or if a coupling.csv edge has no row
-                                             # (and the same for the four files of tools/phaseclass.py)
+                                             # (and the same for the four files of tools/phaseclass.py),
+                                             # and if a deferrable edge has no `equal` run in data/dependency_checks.csv
     uv run tools/test_depclass.py            # tests, on synthetic summaries
 
 This is step 2 of #830. Its input is data/access/<scenario>.edges.csv.gz, one file per scenario of
@@ -15,7 +16,8 @@ dropped (their counts follow the wall clock; #839 reads them) and gzipped with a
 rows give the same bytes; `tail` is kept and is classified as a phase.
 The ordered rows of the sim event queue (item `sim-event`, step 4's data/access_phases/<scenario>.ordered.csv.gz, in the
 format of the edges files) are read with them: the order of the events that two subsystems queue in one phase is the
-state, like the order of their draws. This tool reads only those files, data/coupling.csv and the names of reference/scenarios, never build/.
+state, like the order of their draws. This tool reads only those files, data/coupling.csv, data/dependency_checks.csv (see
+below) and the names of reference/scenarios, never build/.
 
 Simulation subsystems are coupling.SIM_SUBSYSTEMS: wind_meteors, economy, features, ai, pathfinding, weapons,
 targeting, los_radar, orders, units, players, map. A row whose writer or reader is anything else (game, network,
@@ -45,6 +47,12 @@ data/dependencies.csv has the columns writer,reader,item,phase,class,runs,exampl
 on a tie. For deferrable it is the later of the two rows' first ticks (when the edge was entered).
 `flags` holds `dynamic-only` when data/coupling.csv has no row of any kind from the writer to the reader: the
 runs found a dependency that the static analysis did not.
+
+data/dependency_checks.csv has the columns writer,reader,item,phase,group,scenarios,result, sorted like
+data/dependencies.csv: one row per deferrable edge, from the full-suite run of the build with BT_DEFER_WRITES
+(tools/accesslog.py, #837) that held back that edge's writes to the end of the phase. `group` names the edges run
+together, `scenarios` is how many scenarios the run compared and `result` is `equal` or `diverged`. It is an input of
+`--check` only: `--check` fails on a deferrable edge with no `equal` row that compared every scenario of reference/traces.
 
 Coupling edges used. The `shared_write` rows of data/coupling.csv between two simulation subsystems (from writes,
 to reads or writes the item `target`) are state edges: one the runs never enter is `unobserved`. The `indirect`
@@ -83,6 +91,9 @@ SUFFIX = ".edges.csv"
 COUPLING_CSV = ROOT / "data/coupling.csv"
 SCENARIOS = ROOT / "reference/scenarios"
 OUTPUT = ROOT / "data/dependencies.csv"
+CHECKS_CSV = ROOT / "data/dependency_checks.csv"
+TRACES = ROOT / "reference/traces"
+CHECK_COLUMNS = ["writer", "reader", "item", "phase", "group", "scenarios", "result"]
 COLUMNS = ["writer", "reader", "item", "phase", "class", "runs", "example", "flags"]
 SIM = frozenset(coupling.SIM_SUBSYSTEMS)
 NONE = "-"
@@ -225,12 +236,43 @@ def uncovered(rows: list[dict], coupling_rows: list[dict]) -> list[tuple[str, st
                    if is_sim_edge(c) and (c["from"], c["to"], c["target"]) not in have})
 
 
+def suite_size() -> int:
+    """The number of scenarios a full run compares: the stored traces of reference/traces."""
+    return len(list(TRACES.glob("*.txt")))
+
+
+def read_checks(text: str) -> list[dict]:
+    """The rows of data/dependency_checks.csv."""
+    return list(csv.DictReader(io.StringIO(text)))
+
+
+def unconfirmed(rows: list[dict], checks: list[dict], suite: int) -> list[str]:
+    """One message per deferrable edge of rows that no `equal` check row covers with a run of the whole suite."""
+    confirmed = {(c["writer"], c["reader"], c["item"], c["phase"]) for c in checks
+                 if c["result"] == "equal" and int(c["scenarios"]) >= suite}
+    seen = {(c["writer"], c["reader"], c["item"], c["phase"]): c for c in checks}
+    out = []
+    for r in rows:
+        key = (r["writer"], r["reader"], r["item"], r["phase"])
+        if r["class"] != "deferrable" or key in confirmed:
+            continue
+        c = seen.get(key)
+        if c is None:
+            why = "no row in data/dependency_checks.csv"
+        elif c["result"] != "equal":
+            why = "its run in group %s %s" % (c["group"], c["result"])
+        else:
+            why = "its run compared %s of %d scenarios" % (c["scenarios"], suite)
+        out.append("deferrable edge %s -> %s on %s in %s is not confirmed: %s" % (key[0], key[1], key[2], key[3], why))
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--store", type=Path, metavar="DIR", help="store the edges files of DIR in data/access")
     mode.add_argument("--write", action="store_true", help="write data/dependencies.csv")
-    mode.add_argument("--check", action="store_true", help="fail if data/dependencies.csv or a phase file (tools/phaseclass.py) is stale or a coupling edge has no row")
+    mode.add_argument("--check", action="store_true", help="fail if data/dependencies.csv or a phase file (tools/phaseclass.py) is stale, a coupling edge has no row or a deferrable edge is unconfirmed")
     args = ap.parse_args()
     if args.store:
         print("depclass: stored %d summaries" % store(args.store, ACCESS_DIR))
@@ -248,6 +290,8 @@ def main() -> int:
         problems.append("no summary data/access/%s.edges.csv.gz for reference/scenarios/%s.txt" % (name, name))
     for edge in uncovered(rows, coupling_rows):
         problems.append("coupling edge %s -> %s on %s has no row" % edge)
+    checks = read_checks(CHECKS_CSV.read_text()) if CHECKS_CSV.is_file() else []
+    problems.extend(unconfirmed(rows, checks, suite_size()))
     have = OUTPUT.read_text() if OUTPUT.is_file() else ""
     if have != text:
         diff = difflib.unified_diff(have.splitlines(), text.splitlines(), "data/dependencies.csv", "regenerated", lineterm="", n=0)

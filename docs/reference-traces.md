@@ -7,10 +7,10 @@ code as a base. This page names the current tag: **`reference-traces-v21`**.
 ## What the tag holds
 
 - The source: 3.1c's game logic, and the conformity harness that writes traces
-  (`src/harness/`).
+  (compiled into the test-mode build).
 - The trace format: `bt-trace 3` (the digest files are `bt-digest 3`). The
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
-  `src/harness/trace_schema.h`, and the coverage decisions in
+  `data/trace_schema.json`, and the coverage decisions in
   `data/trace_coverage.csv`.
 - The scenario list: `reference/scenarios/`, 83 scenarios, each with its own
   seeds and tick count.
@@ -89,25 +89,22 @@ one can diverge without a logic bug.
     only).
   - `Mission.startMetal` and `startEnergy` for players 3 to 10 (slots 2 to 9),
     unless the mission is a campaign mission (`Mission.type` is 1). Only
-    `LoadMission` writes them, and only slots 0 and 1 (map_list.cpp:963-966);
-    the only reader is `InitPlayerResources` (players.cpp:942-945),
-    which reads them only for game type 1.
+    the mission loader writes them, and only slots 0 and 1; the only reader is
+    the player resource set-up, which reads them only for game type 1.
 
-  The code is `OrderPosYUnset`, `FxPosYUnset`, the `PathOrderFollow` visit and
-  the `MissionStartRest` visit in `src/harness/harness.cpp`, and the evidence
-  that nothing reads them is on the Order, PathOrder, AiSearchGoal and Mission
-  rows of `data/trace_coverage.csv`.
-- `pos` in `ScoutTimer::OnTimer` (0x408100) is a stack local that 3.1c reads
+  The evidence that nothing reads them is on the Order, PathOrder, AiSearchGoal
+  and Mission rows of `data/trace_coverage.csv`.
+- `pos` in the scout timer's handler is a stack local that 3.1c reads
   before it writes it, and the digests keep the result. Test mode zeroed it;
   the source now zeroes it itself, so the digests are the same in every mode.
-- The two angle halves `GetPieceAngles` (0x43e180) reads at piece index -1 lie
+- The two angle halves that the piece-angle read takes at piece index -1 lie
   before the piece block, where 3.1c reads the allocator's chunk header, and
   the digests keep the result. Test mode left them as they were; the source
   now counts them as 0 for any `index < 0`, so a unit carried at piece -1 has
   its carrier's pitch and heading, and the digests are the same in every mode.
   Bank still adds the first record's `a` word, which is inside the block.
 - `PlayerAI.hasSpecial` is zero until the first unit list refresh, because the
-  constructor never sets it. `FindCellNearFeatures` can read it in the tick that
+  constructor never sets it. The search for a cell near features can read it in the tick that
   first assigns the squads, before that tick's refresh, so it is hashed from
   tick 1.
 
@@ -168,8 +165,8 @@ It does not match the uninterrupted game (`save-midgame`, the same as `skirmish2
 every row from tick 901 differs, all 7200 of them (900 ticks, 8 rows each). Do not compare the two. Compare a
 loaded game with the digests of `load-midgame`.
 
-- At tick 901, phase `units` (the first row), the first differing field is `rng.parkMiller`, then
-  `rng.crtHoldrand`: the save does not hold the random streams, and the load reseeds them. 854 fields differ in
+- At tick 901, phase `units` (the first row), the first differing field is the Park-Miller state of the
+  `rng` record, then `rng.crtHoldrand`: the save does not hold the random streams, and the load reseeds them. 854 fields differ in
   that dump.
 - The players table still differs at tick 901, in these fields:
   - `name` and `fullName` of slots 0 and 1: both hold the same string in the two games (`Arm` and `Core`); the
@@ -187,19 +184,18 @@ loaded game with the digests of `load-midgame`.
   few units.
 
 `active` of slots 0 and 1 and the slots' sides, colours and teams no longer differ: with the options table filled,
-`ApplySlotsToGamePlayers` (src/frontend/skirmish_menu.cpp:575) sets the two players as it does in a skirmish.
+the skirmish set-up that applies the options table to the players sets the two players as it does in a skirmish.
 
-What the code shows about the players fields (`LoadPlayers` and `SavePlayers`, src/game/players.cpp:984-1066):
+What the code shows about the players fields (the player loader and saver):
 
-- `LoadPlayers` reads energy, metal, the totals, the storage bonuses, kills, losses, the timers, `Logo` and
+- The player loader reads energy, metal, the totals, the storage bonuses, kills, losses, the timers, `Logo` and
   `Side`. It does not read `name`, `fullName`, the incomes, the usage or the capacities.
-- `UpdatePlayerEconomy` (economy.cpp:311) sets the capacities to zero and recomputes them every tick, so
+- The per-tick economy update sets the capacities to zero and recomputes them every tick, so
   they differ only until the first economy update.
-- `LoadMatch` (src/game/game_load.cpp:334-346) takes `g_game->playerCount` as the larger of its current
+- The match loader takes the game's `playerCount` as the larger of its current
   value and the highest slot of the options table with kind 1 or 2 plus one. The loaded run's `playerCount` is not set by
-  the save or the harness; `LoadSettings` (src/game/settings.cpp:357-362) sets it to the setting
-  `NumSkirmishPlayers`, or to 4 when there is none. `ApplySlotsToGamePlayers` then calls `SetupPlayerSlot`
-  (src/game/players.cpp:71-130) for every slot below that count, kind 0 included, and that sets `active` to 1. This
+  the save or the harness; the settings loader sets it to the setting
+  `NumSkirmishPlayers`, or to 4 when there is none. The skirmish set-up then runs the player slot set-up for every slot below that count, kind 0 included, and that sets `active` to 1. This
   is what the trace shows for slots 2 and 3 (the options table's kind is 0 for them).
 - This page does not say which phase of a later tick those fields first agree with the uninterrupted game:
   the dumps read here are those of tick 901.
@@ -304,6 +300,5 @@ by decoded contents: `tools/savefile.py` lists the masked bytes, each with its o
 
 `bt-trace N` does not name which fields are hashed. v1 to v21 are
 all `bt-trace 3`, but v1, v2 and v3 hash different fields, so their digests are not
-comparable. The hashed fields are those of `data/trace_schema.json` (and
-`src/harness/trace_schema.h`) at the tag. What makes a new format number is in
+comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

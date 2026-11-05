@@ -46,7 +46,7 @@ Contents:
   zero until written (section 11). Bytes that are never written hash as zero.
 - A **record at address A** means the bytes starting at A; the offsets in the schema file are from A.
 - Pseudo-code below uses these hash operations (defined in section 3): `H8(x)` hashes one byte,
-  `H32(x)` hashes a u32 as four bytes, `HB(bytes)` hashes a run of bytes, `HP(value, target, isRef)`
+  `H32(x)` hashes a u32 as four bytes, `HB(bytes)` hashes a run of bytes, `HP(value, target, is_ref)`
   hashes a pointer ID (section 5), `HT(table, address)` hashes a table of the schema at an address
   (section 4). `END` is `H32(0xffffffff)`.
 - A **live unit** is a unit slot whose field `unitDefIndex` (the u16 at +0xa6 of the unit) is not 0.
@@ -108,7 +108,7 @@ state is one 64-bit value `h`, mod 2^64.
   the same as one run `A ++ B` unless `len(A)` is a multiple of 8.
 - `H8(x)` is the run of one byte `x`. `H32(x)` is the run of the four bytes of `x`, least significant
   first, so it is four byte steps (never a word step). `HB(bytes)` is one run.
-- `HP(value, target, isRef)` is `H8(tag)` then `H32(index)`, where `(tag, index)` is the pointer ID
+- `HP(value, target, is_ref)` is `H8(tag)` then `H32(index)`, where `(tag, index)` is the pointer ID
   of section 5.
 - `END` is `H32(0xffffffff)`, the end of a section.
 
@@ -179,9 +179,9 @@ a number, ANDed, and hashed as 4 bytes whatever its size. Example: the `flags` o
 A pointer is never hashed as an address. It is hashed as an ID: `H8(tag)` then `H32(index)`.
 
 ```
-resolve(value, target, isRef):
+resolve(value, target, is_ref):
     if value == 0:                      return (0, 0)          # null
-    if isRef: value = value + block base
+    if is_ref: value = value + block base
     tag = 1 (heap), index = 0
     switch target:
        unit:       array = units array, stride 0x118, count = the pool count
@@ -338,7 +338,7 @@ for i in 0 .. 299 such that piece i was remembered:
     H32(i)
     HT(Piece, game+0x1ab9f + i*0x34)
     HB(96 bytes at game+0x1e88f + i*96)                       # vertices
-    for k in 0 .. 5: HT(Face, game+0x2590f + (i*6+k)*0x20)    # faces
+    for k in 0 .. 5: HT(Face, game+0x2590f + i*0xc0 + k*0x20)    # faces
 END
 ```
 The piece a debris record "points at" is the u32 at its offset 0: piece `i` is remembered if that
@@ -523,7 +523,7 @@ for node in 0 .. used-1, not free:
         HB(2 bytes: the u16 at n+0x10)               # dump: pathfinder.pool[node].penalty, 0x%04x
 H32(count)                                           # dump: pathfinder.heap.count
 for slot in 0 .. count-1:
-    HP(u32 at items + slot*4, node, isRef=false)     # dump: pathfinder.heap[slot]
+    HP(u32 at items + slot*4, node, is_ref=false)     # dump: pathfinder.heap[slot]
 ```
 The `items` array holds plain node addresses. The `node` target is resolved against the pool of
 this pathfinder, using the unclamped `used` count read from the record.
@@ -548,7 +548,7 @@ for w in 0 .. words-1:
             if (flags AND 8) or state == 1 or state == 2:  HB(c[1])          # .dir
             if state == 1 or state == 2:                    HB(u16 at c+2)   # .node
 ```
-Dump values of these are `VisitValue` style: `0x` plus `2*size` hex digits.
+Dump values of these are written as `0x` plus `2*size` hex digits.
 
 A `.dir` or `.node` line is present only when its condition above holds, and a line that is present
 is hashed. A cell with neither condition has only its `.flags` line.
@@ -570,7 +570,7 @@ for c in 0 .. 31:
     H32(c)
     HB(full*width*4 bytes of cells, one run)         # dump: moveClasses[c].passMap[k], k from 0, 4 bytes each
     if tail != 0:
-        mask = (1 << (tail*2)) - 1
+        mask = 2^(2*tail) - 1
         row[x] = (u32 at cells + (full*width + x)*4) AND mask,  for x in 0 .. width-1
         HB(row, width*4 bytes, one run)              # dump: moveClasses[c].passMap[k], k from full*width
 END
@@ -589,7 +589,7 @@ First the maps of section 5 are built (the numbering walk). Then:
 H8(20)
 for each live unit u, in index order, i its index:
     H32(i)
-    HP(u.head, link, isRef=false)           # u.head: the ref at offset 0xa2, as an address; dump: units[i].head
+    HP(u.head, link, is_ref=false)           # u.head: the ref at offset 0xa2, as an address; dump: units[i].head
     for which in (0, 1):                    # 0: u.list (offset 0x5c), 1: u.list2 (offset 0x60)
         o = chain head as an address (the ref plus the block base)
         H8(which + 1)
@@ -677,7 +677,7 @@ END
 script(i, s):
     HT(ScriptState, s)                                  # dump: units[i].script.<field>
     table = u32 at s+8 (a plain address);  statics = ref at s+0x10;  pieces = ref at s+0x14
-    objectState = ref at s+0x540
+    object_state = ref at s+0x540
     staticCount = pieceCount = 0
     if table != 0: staticCount = u32 at table+0x10;  pieceCount = u32 at table+8
     if staticCount > 4096 or statics == 0: staticCount = 0
@@ -687,8 +687,8 @@ script(i, s):
     HB(staticCount*4 bytes at statics)                  # dump: units[i].script.statics (hex:)
     if pieces == 0: pieceCount = 0
     for p in 0 .. pieceCount-1: HT(ScriptPiece, pieces + p*0x4c)       # dump: units[i].script.pieces[p].<field>
-    if objectState == 0: pieceCount = 0
-    for q in 0 .. pieceCount-1: HT(PieceTransform, objectState + 0x22 + q*0x36)   # dump: units[i].script.transforms[q].<field>
+    if object_state == 0: pieceCount = 0
+    for q in 0 .. pieceCount-1: HT(PieceTransform, object_state + 0x22 + q*0x36)   # dump: units[i].script.transforms[q].<field>
 
 channel(ch):
     state = u32 at ch+0
@@ -699,10 +699,10 @@ channel(ch):
     live = (sp < -1) ? 0 : sp + 1;  live = min(live, 32)
     HB(live*4 bytes at ch+0x24)                         # dump: <prefix>.stack (hex:)
     if (state AND 0xff000000) == 0x02000000:
-        switch (state AND 0xf00000):
-            0x100000, 0x200000:  HT(ScriptChannelPiece, ch)
-            0x400000:            HT(ScriptChannelDelay, ch)
-            0x800000:            HT(ScriptChannelWait, ch)
+        switch (state AND 0x00f00000):
+            0x00100000, 0x00200000:  HT(ScriptChannelPiece, ch)
+            0x00400000:              HT(ScriptChannelDelay, ch)
+            0x00800000:              HT(ScriptChannelWait, ch)
 ```
 A channel with `state == 0` has exactly one line, `<prefix>.state` with the value `0x00000000`, and
 no `.stack` line. A channel with a state other than 0 has the lines of its table (the first is
@@ -739,7 +739,7 @@ Its element count is `(end - begin) / elementSize` when `begin != 0`, `end >= be
 ```
 unitVector(path, V):   n = count with element size 4
                        H32(n)                       # dump: <path>.size
-                       for k in 0 .. n-1: HP(u32 at begin + 4k, unit, isRef=false)     # dump: <path>[k]
+                       for k in 0 .. n-1: HP(u32 at begin + 4k, unit, is_ref=false)     # dump: <path>[k]
 rawVector(path, V, e): n = count with element size e
                        H32(n)                       # dump: <path>
                        HB(n*e bytes at begin)       # dump: <path> (hex:)
@@ -838,13 +838,13 @@ if defs is null or count > 2^14: count = 0
 H32(count)                                              # dump: defs.count
 for i in 0 .. count-1:
     d = defs + i*0x249
-    yardmap = ref at d+0x14e;  ids = ref at d+0x156;  idCount = u32 at d+0x152
-    yardSize = (u32)(i16 at d+0x14a) * (u32)(i16 at d+0x14c)     # mod 2^32
+    yardmap = ref at d+0x14e;  ids = ref at d+0x156;  id_count = u32 at d+0x152
+    yard_size = (u32)(i16 at d+0x14a) * (u32)(i16 at d+0x14c)     # mod 2^32
     HT(UnitDefData, d)                                  # dump: defs[i].<field>
-    if yardmap == null or yardSize > 65536: yardSize = 0
-    H32(yardSize);  HB(yardSize bytes at yardmap)       # dump: defs[i].yardmap (count), defs[i].yardmap (hex:)
-    if ids == null or idCount > 30: idCount = 0
-    H32(idCount);   HB(idCount*2 bytes at ids)          # dump: defs[i].ids (count), defs[i].ids (hex:)
+    if yardmap == null or yard_size > 65536: yard_size = 0
+    H32(yard_size);  HB(yard_size bytes at yardmap)       # dump: defs[i].yardmap (count), defs[i].yardmap (hex:)
+    if ids == null or id_count > 30: id_count = 0
+    H32(id_count);   HB(id_count*2 bytes at ids)          # dump: defs[i].ids (count), defs[i].ids (hex:)
     for m in 0 .. 3:
         mask = u32 (plain address) at d+0x231+m*4 for m < 3, at d+0x23d for m == 3
         H8(mask != 0)
@@ -856,10 +856,10 @@ count is above 2^14), written as 8 hex digits; the definitions that follow are `
 `defs[count-1]`, each with the lines of its `UnitDefData` fields.
 
 `yardmap` and `ids` each have two lines at the same path, in this order: a count line, the
-`H32` value written as 8 hex digits (`yardSize`, `idCount`, after the clamps above), then a `hex:`
+`H32` value written as 8 hex digits (`yard_size`, `id_count`, after the clamps above), then a `hex:`
 line with the bytes that follow it in the hash (an empty `hex:` when the count is 0). The count
 line is always present, so a reader reads the count from it and need not recompute it from the
-definition's fields. The bytes are hashed as read, not written as hex numbers: `ids` is `idCount`
+definition's fields. The bytes are hashed as read, not written as hex numbers: `ids` is `id_count`
 little-endian 16-bit values in memory order.
 
 `defs[i].categories[m]` has a line (`hex:` and the 0x40 bytes) only when the mask address is not
@@ -1014,7 +1014,7 @@ with single spaces between the first three fields and the value, which runs to t
 (a `str:` value may itself contain spaces).
 
 **Order.** For each phase of the tick that runs (`units` to `meteors`; `net` first if it runs) the
-dump has, in order: the lines of the phase row (`gameTick`, `rng.parkMiller`, `rng.crtHoldrand`,
+dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller state of `rng`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
 lines of section 28; in the `meteors` block they end the block). The lines come in exactly the order the hash consumes them, so reading the lines of one

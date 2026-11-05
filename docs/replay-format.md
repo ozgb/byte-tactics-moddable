@@ -104,7 +104,7 @@ and `replayschema.py --check` reports a complete subsystem's slot that reaches s
 ### Several all-of tables in one slot
 
 A rule with `"rule": "all-of"` makes every element of a table kind a root of the call. A slot may have such a rule for several kinds: the
-walk reaches every element of each, in the order of the kinds in the schema, and the slot lists them as `allOf` in the generated
+walk reaches every element of each, in the order of the kinds in the schema, and the slot lists them as `all-of` in the generated
 `data/replay_schema.json`. Each kind is captured, compared and restored as one kind is. A slot with one all-of kind records the same
 text as before.
 
@@ -235,10 +235,10 @@ Both structs are unions of views, and a field is recorded on one side of a union
 | `Feature` | `flags16`, with `flags`, `flagsHigh`, `steep`, `noobject`, `animating` and the other bits | one `u16` field; the other names are `aliases` of it |
 | `Feature` | `seq`, `seqshad`, and the six pointers that `seqburn` to `seqreclamateshad`, `burn`, `death` and `animIds` view | `ptr` fields to a `FrameTable`, the kind of an animation entry; `animTable`, `shadowTable`, `burn`, `death` and `animIds` are `aliases` |
 | `Feature` | `footprint`, `footprintX`, `footprintZ` | one `point16`, with the other two as `aliases` |
-| `Spot` | the two cursors `anim` and `shadow`, or `state`, `pos` and `vel`, or `frame`, `pos2` and `animIndex` | the cursors are `embed` fields of `Handle` with a `when` that reads bit 0 of `flags16` of `features[feature]` (`via`) and wants it set; `state`, `posX` to `velZ` have the same `when` and want it clear; `pos2` is an alias of `pos`, and `frame` and `animIndex` are the `index` and the `src` of the cursor, aliases of `Handle.index` and `Handle.src` |
+| `Spot` | the two cursors `anim` and `shadow`, or `state`, `pos` and `vel`, or `frame`, `pos2` and `animIndex` | the cursors are `embed` fields of `Handle` with a `when` that reads bit 0 of `flags16` of `features[feature]` (`via`) and wants it set; `state`, `posX` to the z velocity have the same `when` and want it clear; `pos2` is an alias of `pos`, and `frame` and `animIndex` are the `index` and the `src` of the cursor, aliases of `Handle.index` and `Handle.src` |
 | `Spot` | `x` and `z`, `cell`; `burnTime`, `timer`, `animBits`, `animHi`, `animLo`; the bits of `flags` | `cell` (a `point16`), `timer` and `flags` (a `u8` each), with the other names as `aliases` |
 
-The `Handle` at `Feature#N.anim` and `Feature#N.shadowAnim`, and at `Spot#N.anim` and `Spot#N.shadow`, is named by its site everywhere, because a table kind finds the container of a pointer by its address, whether or not the walk has named it. A `Handle` the loader initialises in the entry `features[featureCount]`, one past the end of the table until `LoadFeatureType` returns, has no container yet and is named by order.
+The `Handle` at `Feature#N.anim` and `Feature#N.shadowAnim`, and at `Spot#N.anim` and `Spot#N.shadow`, is named by its site everywhere, because a table kind finds the container of a pointer by its address, whether or not the walk has named it. A `Handle` the loader initialises in the entry `features[featureCount]`, one past the end of the table until the feature type loader returns, has no container yet and is named by order.
 
 ```
   r Feature#5.flags16 1
@@ -274,8 +274,8 @@ A field of kind `embeds` is `count` structs of a kind laid out in place (`CobScr
 `"inside": [{"kind": "CobScript", "member": "channels[]"}]`. An element is named by its site and index, and its fields are written one by one, so a changed element
 is its changed fields: `r CobScript#3.channels[2].pc 7`. The index is read off the address, and the replayer resolves `CobScript#3.channels[2]` to the bytes inside the container.
 
-A member of each element is a site too, when the array is of a struct that is no kind: `{"name": "aimCob", "kind": "embeds", "count": 3, "target": "WeaponAimCobCb",
-"member": "weapons[].aimCob"}` in `Unit`, and `"inside": [{"kind": "Unit", "member": "weapons[].aimCob"}]` in the kind, give `Unit#3.weapons[1].aimCob` in walk lines, service lines and argument values.
+A member of each element is a site too, when the array is of a struct that is no kind: `{"name": "callbacks", "kind": "embeds", "count": 3, "target": "AimCallback",
+"member": "weapons[].callbacks"}` in `Unit`, and `"inside": [{"kind": "Unit", "member": "weapons[].callbacks"}]` in the kind, give `Unit#3.weapons[1].callbacks` in walk lines, service lines and argument values.
 
 ### A table behind a ref field
 
@@ -301,7 +301,7 @@ count.
 | Key | Meaning |
 |---|---|
 | `capacity` | an integer, or a member of the base: the number of elements the table has room for, and the number the replayer allocates when a recording first names an element and the `Ref` is null |
-| `alloc` | absent, and the replayer allocates with its own allocator; `"module"` for a table whose memory the module frees (`GrowNodes` calls `operator delete` on `OpenHeap::pool`), which the replayer allocates with the module's own `operator new` |
+| `alloc` | absent, and the replayer allocates with its own allocator; `"module"` for a table whose memory the module frees (the heap's growth routine calls `operator delete` on `OpenHeap.pool`), which the replayer allocates with the module's own `operator new` |
 
 A member capacity is read when the table is allocated, so its field must be restored before the first element is named: `replayschema.py --check` fails for a
 complete subsystem's slot that reaches the kind with a capacity member missing from its read set, as for the factors of a product count. The count and the
@@ -326,7 +326,7 @@ module has an allocator of its own that the host does not call.
 
 A field of kind `self` points into the object that holds it. `{"name": "screen", "kind": "self", "member": "screenPos"}` is `Eye::screen`, a `Ref` to the same
 Eye's `screenPos`. It is never written as a line, never compared, and never restored from a line: the replayer sets it to the address of that member of the
-object itself, whenever a name resolves to the object. An object that the replayed module moves by assignment (`std::remove_if` over the Eyes copies the
+object itself, whenever a name resolves to the object. An object that the replayed module moves by assignment (a standard-library `remove_if` over the Eyes copies the
 pointer, which then leads into the old element) has it set again by the next line that names it, and a recording from before and after the move is
 the same text.
 
@@ -356,9 +356,9 @@ A `ref` with no `ctype` is checked for its size only, as before. An array of ref
 
 ### A vtable pointer the code sets by hand
 
-`"vptr": "g_weaponAimCobVtable"` on a kind says that its first word is a pointer to that global (`extern VirtualFunction const g_weaponAimCobVtable[2]` in `src/data/vtables.cpp`) that
-the code stores itself, and that the type has no virtual member. The recorder checks the word whenever it names or walks an object of the kind, and ends the run with `a WeaponAimCobCb has a vptr that
-is not g_weaponAimCobVtable` when it differs. The word is never written; the replayer stores the address of its own copy of the global when it resolves the object.
+`"vptr": "<global>"` on a kind says that its first word is a pointer to a global table of 2 functions that
+the code stores itself, and that the type has no virtual member. The recorder checks the word whenever it names or walks an object of the kind, and ends the run with `a AimCallback has a vptr that
+is not <global>` when it differs. The word is never written; the replayer stores the address of its own copy of the global when it resolves the object.
 
 ### An embedded polymorphic object
 
@@ -367,8 +367,8 @@ site: `Order#3.link` in lines and arguments (`i units.UnitRefUnlink Order#3.link
 
 ### A pointer that a slot argument carries to an embedded kind
 
-A slot or import argument of another pointer type (`Callback*`) whose object is an embedded kind with a `vptr` is `{"mode": "object", "kind": "WeaponAimCobCb", "line": "callback"}`, and is named by its site,
-`a callback Unit#3.weapons[1].aimCob`, as any object argument is. `mode: callback` stays for the interfaces of `callbacks` with virtual methods, and the import handle that carries
+A slot or import argument of another pointer type (`Callback*`) whose object is an embedded kind with a `vptr` is `{"mode": "object", "kind": "AimCallback", "line": "callback"}`, and is named by its site,
+`a callback Unit#3.weapons[1].callbacks`, as any object argument is. `mode: callback` stays for the interfaces of `callbacks` with virtual methods, and the import handle that carries
 the same object is named the same way.
 
 ## Values
@@ -473,7 +473,7 @@ the base lists: `ApproachRadius#1`, never `OrderFx#1`, and no vptr or address is
 | Key | On | Meaning |
 |---|---|---|
 | `kinds` | a base kind | the concrete kinds the base may be; the base has no fields of its own, its kinds list theirs (the base part included, `source`) |
-| `vtable` | a concrete kind | the global the vptr points at (`extern VirtualFunction const g_approachRadiusVtable[12]` in `src/data/vtables.cpp`); the tool declares it in the schema and `static_assert`s that the type is polymorphic and derives from the base |
+| `vtable` | a concrete kind | the global table of 12 functions the vptr points at; the tool declares it in the schema and `static_assert`s that the type is polymorphic and derives from the base |
 | `poly` | a `ref` field, an object argument or result | names the base the pointer is typed as; it has to be the `target` or `kind`. A pointer to a base without `poly` is an error |
 
 The numbering is per concrete kind, in order of first appearance, as for any state kind. An example of the lines a call holds:
@@ -490,7 +490,7 @@ The fields of the object are those of its concrete kind. The replayer allocates 
 own vtable for that kind as the vptr (the vtable global of the replayer's link, which holds the module sources), so a vtable is
 never replayed as bytes; a `ref` accepts any kind of the base it is typed as. A vptr that matches none of the listed kinds is
 an error: the recorder writes `OrderFx#?`, and the run ends with `cannot write a replay file: an OrderFx has a vtable that is none of
-its kinds` (naming the symbol, `g_pathOrderVtable`, when the vptr is the vtable of another kind of the schema). Only a vtable that is
+its kinds` (naming the symbol when the vptr is the vtable of another kind of the schema). Only a vtable that is
 a global of the sources can be a kind's vtable. A vtable the compiler emits from a class has no name to compare with.
 
 ### Code pointers
@@ -499,7 +499,7 @@ A field of kind `code` holds a pointer to a function that is not a vtable. It is
 function in the named table, or `null`. The tables are the `code_tables` annotation:
 
 ```json
-"code_tables": {"orderNotify": {"entries": ["ReadyOrder", "StandbyOrder", ...], "headers": ["src/orders/unit_orders.h", ...],
+"code_tables": {"orderNotify": {"entries": ["ready", "standby", ...], "headers": ["<interface header>", ...],
                                 "fill": "orders.RegisterAllOrderTypes"}}
 {"name": "notify", "kind": "code", "table": "orderNotify"}
 ```
@@ -510,10 +510,10 @@ function in the named table, or `null`. The tables are the `code_tables` annotat
 
 `entries` are functions in the order of the table (the `notify` pointers `RegisterAllOrderTypes` copies into `g_missionOrderTableVec`,
 in the order it registers them), each declared in one of the `headers`, which have to be `includes` of the schema. The tool writes the
-table as `(const void*)StopOrder` addresses into the schema header, so the recorder finds the index of the game's function and
+table as addresses of the game's functions in the schema header, so the recorder finds the index of the game's function and
 the replayer, linking its own functions, stores its own address for the index. `fill` is the slot (`seam.Slot`) that fills the game's
 table, for the subsystem that owns it. A function that is in none of the entries is an error that names the table (the recorder
-writes `orderNotify[?]`), and an index past the table is refused by the replayer. `GroundPickupOrder` is not an entry, because
+writes `orderNotify[?]`), and an index past the table is refused by the replayer. One order function is not an entry, because
 no header declares it with the type its definition has.
 
 ## Callbacks
@@ -527,8 +527,8 @@ given is a `c` line right after the import's `i` line and before its `o` lines, 
     c visitor#1.Visit Unit#3
     c visitor#1.Visit Unit#9
   i fixture.Scan scanner#1 = 0
-    c scanner#1.VisitUnit Unit#3 = 1
-    c scanner#1.VisitUnit Unit#9 = 0
+    c scanner#1.visit Unit#3 = 1
+    c scanner#1.visit Unit#9 = 0
 ```
 
 The object is a handle named by the interface's `handle` and numbered in the outermost call by first use, like `file#1`. The
@@ -562,7 +562,7 @@ object's at the same place.
 ### A callback held in state
 
 A callback object can also be state the module keeps: the argument of a slot (`StartScript` takes a `Callback*` and the channel it starts calls back when the
-script ends), or a pointer in an object (`Weapon::aimCob`). Two forms name one.
+script ends), or a pointer in an object (`Weapon.callbacks`). Two forms name one.
 
 A slot argument of mode `callback` (the same note as an import's, `{"mode": "callback", "callback": "Callback"}`) is `a <name> <handle>#<n>`, or `a <name> null`.
 A `ref` or `ptr` field that holds one has a `callback` key and no `target`, which names the interface and keeps `target` for an array of block-held structs:
@@ -575,7 +575,7 @@ A `ref` or `ptr` field that holds one has a `callback` key and no `target`, whic
 It is written `callback#2` or `null` in an `r`, `w` or `o` line, as `Kind#N` is, and the walk does not follow it. The tool rejects `callback` on any other
 field kind (the key of a `ref` field of `Game`, the `elem` of a vector, a result, an argument of another mode), on a field of a value kind, and with a
 `target`; it checks the interface against `callbacks` and, in the generated tables, that the member is a `Callback*` for a `ptr` and a `Ref<Callback>` for a `ref`.
-The field kinds are `RK_CBPTR` and `RK_CBREF` there, and a `when` cannot read through one.
+The field kinds there are the callback pointer and the callback reference, and a `when` cannot read through one.
 
 The handle is numbered as the handles of an import are, by first use in the outermost call, and an object is named once, by the line that first
 names it (`r FixtureNotify#1.hook callback#1`, `a done callback#3`). The replayer binds `callback#N` when it parses that line, not when the module first
@@ -667,10 +667,9 @@ The replayer's answer allocates `bytes` from an arena of its own, zeroed, and re
 slot exit it compares each buffer with the recorded bytes and reports a difference at `snapshot#<n>[<byte>]` (recorded and replayed
 byte), at `snapshot#<n>.length` when the sizes differ, and at `snapshot#<n>` when a snapshot was recorded and not allocated, or the
 other way round. The `o snapshot` lines are never the outputs of the import before them. The tool writes the recorder's and the
-replayer's code for a `snapshot` service from its spec; `SimCaptureAlloc` is the one service of the kind, hooked in `sim_radar.cpp`
-with `ReplayImport call(RI_SIM_CAPTURE_ALLOC); call.Int(bytes); call.Ptr(offset);` and `return call.Result(buffer);`. When a module
-links `sim_radar.cpp`, the replayer does not define the function: the answer calls the real one and compares the buffer it returns. The self-test allocates two buffers
-through a function with the signature of `SimCaptureAlloc`, one of 700 bytes, and checks the lines, an equal replay, a changed byte,
+replayer's code for a `snapshot` service from its spec; the capture allocator is the one service of the kind, hooked with an import line that records the byte count and the offset
+and a return that records the buffer. When a module links the radar source, the replayer does not define the function: the answer calls the real one and compares the buffer it returns. The self-test allocates two buffers
+through a function with the signature of the capture allocator, one of 700 bytes, and checks the lines, an equal replay, a changed byte,
 a snapshot the stub did not allocate and a buffer of another size.
 
 ## Fields
@@ -709,7 +708,7 @@ sets). The annotations hold what no header says:
 - `rules`: a hand rule for each row the field sets cannot name: a `field_escape` row, or a `deref_read` or
   `deref_write` on a bare `*float`, `*short`, `*int` and the like. A rule is matched by `kind` and `target` (and by
   `functions`, when it lists the functions whose rows it covers: `*float` is the `energyMake` of a unit account in
-  `AddIncome` and the extraction rate of a unit in `UpdateMetalExtraction`), and any row, not only an escape or a bare
+  the income function and the extraction rate of a unit in the metal extraction update), and any row, not only an escape or a bare
   pointer, may be given one when the rows name only a part of what the code touches (`Point16::x` is a member of `Unit::cell`
   and of `Unit::footprint`). `whole-object` records every field of the named object; `index-array` records the weapon array
   through `weapondef#N`; `fields` adds the object fields it lists under `reads` and `writes` (`Unit.extraction`,
@@ -734,7 +733,7 @@ sets). The annotations hold what no header says:
   field (`weapon0TargetZ`) equals the given value (-32768, the sentinel that says the slot holds a unit); it is never written
   as a line, and the unit it leads to records only the fields of its `reach`. A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
   are recorded as `r weapondef#17.flags` lines. A field may name a `member` of its type that is not its own name
-  (`weapons[1].aimTargetXOrUnitId`, `pos.x`), so that an array element or a part of a `Vec3` is a field.
+  (`weapons[1].aimTarget`, `pos.x`), so that an array element or a part of a `Vec3` is a field.
 - `reach`: a list of `Kind.field` names with an explicit `depth` (the number of objects from the root to the farthest, at most 2),
   on a `unitid` field and on a `units` argument. An object reached through it is recorded with only the listed fields, and
   the walk follows only the listed pointers, so `Unit.def` with `UnitDef.flags1` is depth 2. `replayschema.py --check` fails
@@ -782,7 +781,7 @@ sets). The annotations hold what no header says:
 | `callback` | `UnitVisitor*` and the like, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
 | `callback` | `Callback*` and the like, a slot's argument | `a done callback#3` or `a done null`, and a `c` line for each call the module made on it during the slot (see "A callback held in state") |
 | `vector` (`dir: out`) | `std::vector<Point16>*` an import fills, `{"mode": "vector", "dir": "out", "elem": {"mode": "value", "kind": "Point16"}}` | `o goals [(3,4),(5,6)]` after the import line: the whole vector, each element as the by-value form writes it, `[]` when it is empty; the stub pushes the elements |
-| `units` (`dir: out`) | `std::vector<Unit*>*` an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
+| `units` (`dir: out`) | a vector of `Unit` pointers an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
 | `pending` | anything else | `?` |
 
 A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or

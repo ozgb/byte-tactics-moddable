@@ -128,7 +128,7 @@ differ though its traces are equal.
 
 ## The view stream
 
-The `view` record counts the draws from the view random stream (`HarnessViewRand`), the only random stream that presentation draws
+The `view` record counts the draws from the view random stream, the only random stream that presentation draws
 from. It is absolute: a single line reads on its own, and a build that skips or adds one draw changes the line of that tick and every
 later line. The check names the first tick where the counts differ, so a lost draw is found at the tick it is lost, not at the shake
 tick many ticks later. Draws are counted in the order of the game's own calls; the count says how many draws were made, and the

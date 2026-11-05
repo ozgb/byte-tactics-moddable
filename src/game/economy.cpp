@@ -19,6 +19,7 @@
 #include "../units/unit.h"
 
 #include "game.h"
+#include "../util/x87_compare.h"
 #pragma pack(pop)
 
 // GLOBAL: 0x511de8
@@ -95,7 +96,7 @@ int UnitResources::RequestEnergyAndMetal(float dx, float dy)
 {
     energyUse += dx;
     metalUse += dy;
-    if (energyStall <= 0.0f && metalStall <= 0.0f) {
+    if (StallsAllowRequest(energyStall, metalStall)) {
         energyUsePaid += dx;
         metalUsePaid += dy;
         return 1;
@@ -333,7 +334,7 @@ void __stdcall UpdatePlayerEconomy(Player* p)
         } else if ((u->activateFlags & 1) || (u->flags & 0xc) > 0) {
             UseEnergyD(u, u->def->energyuse);
         }
-        if (u->buildLeft == 0) {
+        if (X87EqTest40(u->buildLeft, 0.0f)) {
             AddIncomeD(u, &u->resourceSlot.energyMake, u->def->energymake);
             AddIncome(u, &u->resourceSlot.metalMake, u->def->metalmake);
             p->metalCapacity += u->def->metalstorage;
@@ -343,7 +344,17 @@ void __stdcall UpdatePlayerEconomy(Player* p)
             if (u->cloakOn) {
                 if (!(u->flags & 0x1000) && u->workTime <= ((unsigned int)g_game->ticks)) {
                     int cost = (int)((u->flags & 0xc) > 0 ? u->def->cloakcostmoving : u->def->cloakcost);
+#ifdef __clang__
+                    int paid = 0;
+                    if (CloakCostPayable((float)cost, u->resourceSlot.player->energy)) {
+                        u->resourceSlot.player->energy -= (float)cost;
+                        u->resourceSlot.energyUse += (float)cost;
+                        paid = 1;
+                    }
+                    g_seams.units->SetStateBits((Unit*)u, 4, paid);
+#else
                     g_seams.units->SetStateBits((Unit*)u, 4, u->resourceSlot.SpendEnergy(cost));
+#endif
                 } else
                     g_seams.units->SetStateBits((Unit*)u, 4, 0);
             } else
@@ -432,7 +443,7 @@ void __stdcall UpdatePlayerEconomy(Player* p)
 #ifdef __clang__
     for (i = 0; i < 2; i++) {
         double take;
-        if (backlogA[i] <= avail[i]) {
+        if (SettlementBacklogCovered(backlogA[i], avail[i])) {
             take = backlogA[i];
             ratioA[i] = 1.0f;
         } else {
@@ -440,7 +451,7 @@ void __stdcall UpdatePlayerEconomy(Player* p)
             ratioA[i] = (double)avail[i] / backlogA[i];
         }
         double left = (double)avail[i] - take;
-        if (demandA[i] <= left) {
+        if (SettlementDemandCovered(demandA[i], left)) {
             take = demandA[i];
             demandRatio[i] = 1.0f;
         } else {
@@ -452,7 +463,7 @@ void __stdcall UpdatePlayerEconomy(Player* p)
 #else
     for (i = 0; i < 2; i++) {
         float take;
-        if (backlogA[i] <= avail[i]) {
+        if (SettlementBacklogCovered(backlogA[i], avail[i])) {
             take = backlogA[i];
             ratioA[i] = 1.0f;
         } else {
@@ -461,7 +472,7 @@ void __stdcall UpdatePlayerEconomy(Player* p)
         }
         avail[i] -= take;
         float left = avail[i];
-        if (demandA[i] <= left) {
+        if (SettlementDemandCovered(demandA[i], left)) {
             take = demandA[i];
             demandRatio[i] = 1.0f;
         } else {

@@ -6,6 +6,7 @@
 #include "../state/game_rand.h"
 #include "../state/sim_globals.h"
 #include "../util/tdf.h"
+#include "../util/x87_compare.h"
 
 struct DPNAME {
     unsigned long dwSize;
@@ -3843,7 +3844,7 @@ void __stdcall UpdateResourceSharing(Player* player)
                     && p->type == 3
                     && p->info->kind == 1
                     && player->allied[i] != 0
-                    && p->metal < player->metal)
+                    && MetalRecipientPoorer(p->metal, player->metal))
                     found = p;
             }
         }
@@ -3864,7 +3865,7 @@ void __stdcall UpdateResourceSharing(Player* player)
                     && p->type == 3
                     && p->info->kind == 1
                     && player->allied[i] != 0
-                    && p->energy < player->energy)
+                    && EnergyRecipientPoorer(p->energy, player->energy))
                     found = p;
             }
         }

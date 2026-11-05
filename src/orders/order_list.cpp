@@ -301,7 +301,7 @@ const char* __stdcall GetOrderName(Unit* obj)
 Order* __stdcall FindOrderByType(Unit* obj, unsigned char kind)
 {
     Order* n;
-    if (g_missionOrderTableVec[kind].flags & 0x40000)
+    if (g_missionOrderTableVec[kind].flags & ORDER_FLAG_SECOND_LIST)
         n = obj->list2;
     else
         n = obj->list;
@@ -730,7 +730,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
 {
     Order* node;
     if (amount > 0) {
-        if (g_missionOrderTableVec[kind & 0xff].flags & 0x40000)
+        if (g_missionOrderTableVec[kind & 0xff].flags & ORDER_FLAG_SECOND_LIST)
             node = owner->list2;
         else
             node = owner->list;
@@ -746,7 +746,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
     }
     for (;;) {
         Order* found = 0;
-        if (g_missionOrderTableVec[kind & 0xff].flags & 0x40000)
+        if (g_missionOrderTableVec[kind & 0xff].flags & ORDER_FLAG_SECOND_LIST)
             node = owner->list2;
         else
             node = owner->list;

@@ -4619,6 +4619,7 @@ ReplayObjectTable::Count,src/harness/replay_objects.h,harness,folder:src/harness
 ReplayObjectTable::Find,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayObjectTable::Name,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayObjectTable::Pointer,src/harness/replay_objects.cpp,harness,folder:src/harness/,
+ReplayObjectTable::Rebuild,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayObjectTable::ReplayObjectTable,src/harness/replay_objects.h,harness,folder:src/harness/,
 ReplayObjectTable::Reset,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayOrdinals::Bind,src/harness/replay_text.cpp,harness,folder:src/harness/,

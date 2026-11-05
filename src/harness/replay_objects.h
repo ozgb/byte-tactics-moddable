@@ -28,7 +28,9 @@ private:
     ReplayObjectTable(const ReplayObjectTable&);
     ReplayObjectTable& operator=(const ReplayObjectTable&);
     enum { KINDS = REPLAY_OBJECT_KINDS, HASH = 16384 };
+    void Rebuild(unsigned kind);
     unsigned count[KINDS];
+    unsigned empty[KINDS];
     void* objects[KINDS][REPLAY_MAX_OBJECTS];
     short slots[KINDS][HASH];
 };

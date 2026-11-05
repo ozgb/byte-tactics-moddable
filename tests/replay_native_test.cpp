@@ -5761,6 +5761,19 @@ void RebindSelfTest()
     Check(g_objects.Find(ROK_ALLOC, cells) == 2 && g_objects.Find(ROK_ALLOC, cells + 19999 % 64) == 1, "another name is still told apart");
 }
 
+void RebindToFreshAddressesSelfTest()
+{
+    printf("a name bound to fresh addresses\n");
+    ResetBlock();
+    static char cells[20000];
+    for (unsigned i = 0; i < 20000; i++)
+        g_objects.Bind(ROK_ALLOC, 1, cells + i);
+    Check(g_objects.Find(ROK_ALLOC, cells + 19999) == 1, "the last address bound is found");
+    Check(g_objects.Find(ROK_ALLOC, cells + 19998) == 0, "the one it replaced is not");
+    static char never;
+    Check(g_objects.Find(ROK_ALLOC, &never) == 0, "an address never bound is not found");
+}
+
 void NestedVectorSelfTest()
 {
     printf("vectors of vectors\n");
@@ -6054,6 +6067,7 @@ int SelfTest(const char* file)
     SharedBlobSelfTest();
     EmptyTargetSelfTest();
     RebindSelfTest();
+    RebindToFreshAddressesSelfTest();
     NestedVectorSelfTest();
     SimVectorSelfTest();
     GameWriteSelfTest();

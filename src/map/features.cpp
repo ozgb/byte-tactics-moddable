@@ -891,6 +891,10 @@ void __stdcall UpdateFeatures()
 #if BT_ACCESS_LOG
     AccessLogPassScope accessPass(ACCESS_PASS_FEATURES);
 #endif
+#if BT_ACCESS_LOG
+    {
+    AccessLogPassScope animPass(ACCESS_PASS_FEATURES_ANIM);
+#endif
     Feature* types = g_game->features;
     for (int k = 0; k < g_game->featureCount; k++) {
         if (types[k].animating) {
@@ -915,6 +919,9 @@ void __stdcall UpdateFeatures()
             }
         }
     }
+#if BT_ACCESS_LOG
+    }
+#endif
     int smoke = (unsigned int)g_game->ticks % 3 == 0;
     int i = g_game->pool.usedHead;
     while (i != -1) {

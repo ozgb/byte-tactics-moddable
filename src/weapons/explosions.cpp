@@ -328,6 +328,10 @@ void UpdateExplosions()
 #if BT_ACCESS_LOG
     AccessLogPassScope accessPass(ACCESS_PASS_EXPLOSIONS);
 #endif
+#if BT_ACCESS_LOG
+    {
+    AccessLogPassScope piecesPass(ACCESS_PASS_EXPLOSIONS_PIECES);
+#endif
     for (int i = 0; i < 100; i++) {
 #if BT_ACCESS_LOG
         AccessLogEntity();
@@ -335,11 +339,17 @@ void UpdateExplosions()
         if (g_explodedPieces[i] != 0 && UpdateExplodedPiece(g_explodedPieces[i]) == 0)
             g_explodedPieces[i] = 0;
     }
+#if BT_ACCESS_LOG
+    }
+#endif
 
     int* pCount = &g_game->count_1491b;
     DebrisView* d = (DebrisView*)(pCount + 1);
     DebrisView* base = d;
     int n;
+#if BT_ACCESS_LOG
+    AccessLogPassScope debrisPass(ACCESS_PASS_EXPLOSIONS_DEBRIS);
+#endif
     for (n = 0; n < *pCount; n++, d++) {
 #if BT_ACCESS_LOG
         AccessLogEntity();

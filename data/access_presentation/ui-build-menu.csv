@@ -390,6 +390,7 @@ startPos,presentation,DrawUnitInfoPanel,startPos,0,
 ticks,game,RecordSimEvent,ticks,0,-
 ticks,game,RunGameSteps,ticks,1,
 ticks,harness,HarnessFrameDrawn,ticks,0,
+ticks,harness,HarnessSimEventSlot,ticks,0,-
 ticks,harness,HarnessSoundEvent,ticks,0,
 ticks,harness,HarnessUiQueue,ticks,0,
 ticks,orders,??0Order@@QAE@EHHHHH@Z,ticks,0,-

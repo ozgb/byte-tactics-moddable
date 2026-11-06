@@ -13,6 +13,7 @@ orders,los_radar,Order::pos,units,g1,84,equal,83,0,0
 orders,players,Unit::pos,units,g1,84,equal,83,0,0
 orders,players,Unit::zFraction,units,g1,84,equal,83,0,0
 orders,units,Order::z,units,g4,84,equal,83,0,0
+orders,units,PathOrder::pos_z,units,g5,84,equal,83,0,0
 orders,units,Unit::metal,units,g4,84,equal,83,0,0
 orders,weapons,Order::kind,projectiles,g4,84,equal,83,0,0
 targeting,weapons,Unit::current,players,g1,84,equal,83,0,0

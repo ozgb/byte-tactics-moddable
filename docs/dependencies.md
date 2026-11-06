@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 66 ordered, 380 immediate, 30 deferrable, 1112 read-only, 1272 unobserved.
+Edges in data/dependencies.csv: 66 ordered, 379 immediate, 31 deferrable, 1132 read-only, 1272 unobserved.
 
 ## Cutting rule
 
@@ -29,11 +29,11 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | features | 15 | 28 | 5 | 80 | 167 | 4 of 11 |
 | ai | 27 | 47 | 5 | 134 | 206 | 2 of 11 |
 | pathfinding | 0 | 2 | 1 | 25 | 53 | 9 of 11 |
-| weapons | 28 | 117 | 8 | 238 | 256 | 2 of 11 |
+| weapons | 28 | 117 | 8 | 239 | 256 | 2 of 11 |
 | targeting | 10 | 47 | 3 | 36 | 82 | 3 of 11 |
-| los_radar | 6 | 44 | 5 | 116 | 228 | 2 of 11 |
-| orders | 16 | 124 | 17 | 177 | 315 | 2 of 11 |
-| units | 18 | 209 | 11 | 96 | 463 | 1 of 11 |
+| los_radar | 6 | 44 | 5 | 135 | 228 | 2 of 11 |
+| orders | 16 | 123 | 18 | 177 | 315 | 2 of 11 |
+| units | 18 | 208 | 12 | 96 | 463 | 1 of 11 |
 | players | 4 | 36 | 4 | 70 | 323 | 4 of 11 |
 | map | 8 | 50 | 0 | 95 | 218 | 2 of 11 |
 
@@ -80,22 +80,22 @@ From data/phase_boundaries.csv. `needed` is `yes` when an `immediate` row spans 
 | boundary | needed | edges | direct | carried | mergeable | example |
 |---|---|---|---|---|---|---|
 | 0\|1 | absent | 0 | 0 | 0 | absent | - |
-| 1\|2 | yes | 288 | 87 | 128 | no | mission-build-unit@1 |
-| 2\|3 | yes | 225 | 1 | 131 | no | mission-build-unit@1 |
-| 3\|4 | yes | 222 | 0 | 131 | no | mission-build-unit@1 |
-| 4\|5 | yes | 54 | 11 | 24 | no | mission-defeat-passes-x@5 |
-| 5\|6 | yes | 7 | 0 | 14 | no | mission-build-unit@16 |
-| 6\|7 | yes | 7 | 0 | 10 | no | mission-build-unit@16 |
+| 1\|2 | yes | 296 | 93 | 127 | no | mission-build-unit@1 |
+| 2\|3 | yes | 227 | 1 | 136 | no | mission-build-unit@1 |
+| 3\|4 | yes | 224 | 0 | 136 | no | mission-build-unit@1 |
+| 4\|5 | yes | 60 | 13 | 24 | no | mission-defeat-passes-x@5 |
+| 5\|6 | yes | 9 | 0 | 14 | no | mission-build-unit@16 |
+| 6\|7 | yes | 9 | 0 | 10 | no | mission-build-unit@16 |
 | 7\|tail | yes | 7 | 0 | 8 | no | mission-build-unit@16 |
-| tail\|presentation | yes | 173 | 173 | 0 | no | allied-victory@8 |
+| tail\|presentation | yes | 38 | 38 | 0 | no | mission-build-unit@1 |
 
 ## Deferral confirmation
 
 Each deferrable edge was held back to the end of its phase in a full-suite run (data/dependency_checks.csv) and the traces compared. The runs confirm the rule and the barrier within the suite's coverage.
 
-Results: 30 equal.
+Results: 31 equal.
 
-`defer_held` is 0 for every one of the 30 edges in 4 groups (332 scenario runs counted in all): in no run did a reader meet a write that the barrier held back.
+`defer_held` is 0 for every one of the 31 edges in 5 groups (415 scenario runs counted in all): in no run did a reader meet a write that the barrier held back.
 
 The runs add no evidence on paths the suite does not reach. The control (tests/defer/immediate-control.defer) shows that the barrier changes a trace on an immediate edge, so the barrier can change what a run shows.
 
@@ -105,6 +105,7 @@ The runs add no evidence on paths the suite does not reach. The control (tests/d
 | g2 | 4 | 84 | 83 | equal | 0 | 0 |
 | g3 | 9 | 84 | 83 | equal | 0 | 1688 |
 | g4 | 3 | 84 | 83 | equal | 0 | 0 |
+| g5 | 1 | 84 | 83 | equal | 0 | 0 |
 
 ## Presentation reads
 
@@ -117,6 +118,58 @@ The sim state that presentation reads between ticks (data/presentation_reads.csv
 | ui-action | 92 | 45 | 91 | 228 |
 | unknown | 55 | 16 | 38 | 109 |
 | all | 189 | 75 | 218 | 482 |
+
+## Presentation feeds
+
+Presentation must not feed the simulation except through the player view. The rows below are the state that presentation wrote and a simulation subsystem read in some run, each with the reason that it is allowed for now (data/presentation_feeds.csv, 45 rows; tools/phaseclass.py --check fails on a feed that is not listed there). Routing them through the player view is a follow-up, not done.
+
+| writer | reader | item | read in | example | reason |
+|---|---|---|---|---|---|
+| presentation | economy | `LoadTntMap: operator new int #2` | units | ten-lava-run@92 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows economy reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | features | `FeatureAnimEntry::src` | features | console-ilose@30 | Not established. FeatureAnimEntry::src is a field of the feature animation pool (entries of 48 bytes, written only by the pool setup in static read sets); no presentation function writes it by static read set, and features reads it in phase features. Likely a type-wide alias of the item, not a real feed. |
+| presentation | features | `LoadTntMap: operator new int #2` | features | allied-victory@2 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows features reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | features | `LoadTntMap: operator new int #2` | projectiles | orders-air-repair@44 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows features reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | features | `LoadTntMap: operator new int #2` | units | mission-build-unit@61 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows features reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | los_radar | `Unit::flags` | players | ui-build-menu@13 | A selection click (click, box, group or category select, deselect) or a build-menu page step sets or clears the select bits and the build-menu page bits of Unit::flags; los_radar reads other bits of the same word (the sensor, radar and sonar jam passes test the alive bit and others). The log item is the whole word, and no read of the select or page bits was found in them (saving and loading units copy those bits into saves). Selection is local to one machine: a sim read of it would be a multiplayer desync risk in 3.1c itself. |
+| presentation | los_radar | `bits_14281` | features | mission-timer@268 | Drawing the fog of war sets the fog-tiles-built bit of the match view flags word (Game::mapFlags) and the loaders and line-of-sight code clear it, a read-modify-write of the word; los_radar reads the mapping, LOS and LOS-type bits of it (from the match settings). Only the fog drawing reads the fog-tiles-built bit. That bit is per machine: the clear is gated on the viewing player. |
+| presentation | los_radar | `bits_14281` | meteors | hailstorm-los-off@2 | Drawing the fog of war sets the fog-tiles-built bit of the match view flags word (Game::mapFlags) and the loaders and line-of-sight code clear it, a read-modify-write of the word; los_radar reads the mapping, LOS and LOS-type bits of it (from the match settings). Only the fog drawing reads the fog-tiles-built bit. That bit is per machine: the clear is gated on the viewing player. |
+| presentation | los_radar | `bits_14281` | players | allied-victory@2 | Drawing the fog of war sets the fog-tiles-built bit of the match view flags word (Game::mapFlags) and the loaders and line-of-sight code clear it, a read-modify-write of the word; los_radar reads the mapping, LOS and LOS-type bits of it (from the match settings). Only the fog drawing reads the fog-tiles-built bit. That bit is per machine: the clear is gated on the viewing player. |
+| presentation | los_radar | `bits_14281` | presentation | edges-economy-targeting@115 | Drawing the fog of war sets the fog-tiles-built bit of the match view flags word (Game::mapFlags) and the loaders and line-of-sight code clear it, a read-modify-write of the word; los_radar (the fog tile builder that the fog drawing calls) reads the mapping, LOS and LOS-type bits of it (from the match settings). Only the fog drawing reads the fog-tiles-built bit. That bit is per machine: the clear is gated on the viewing player. |
+| presentation | los_radar | `bits_14281` | projectiles | edges-economy-targeting@58 | Drawing the fog of war sets the fog-tiles-built bit of the match view flags word (Game::mapFlags) and the loaders and line-of-sight code clear it, a read-modify-write of the word; los_radar reads the mapping, LOS and LOS-type bits of it (from the match settings). Only the fog drawing reads the fog-tiles-built bit. That bit is per machine: the clear is gated on the viewing player. |
+| presentation | los_radar | `bits_14281` | units | mission-build-unit@20 | Drawing the fog of war sets the fog-tiles-built bit of the match view flags word (Game::mapFlags) and the loaders and line-of-sight code clear it, a read-modify-write of the word; los_radar reads the mapping, LOS and LOS-type bits of it (from the match settings). Only the fog drawing reads the fog-tiles-built bit. That bit is per machine: the clear is gated on the viewing player. |
+| presentation | los_radar | `bits_142f1` | players | mission-build-unit@4 | Camera moves and radar clicks set the camera-moved bit of the view dirty flags byte, and the radar picture sets the map-changed and blink bits; line-of-sight recalculation and reveal (los_radar) OR the map-changed and a further bit into it, a read-modify-write gated on the viewing player; no branch on it in simulation code was found. The flags redraw the minimap and are per machine. |
+| presentation | los_radar | `bits_142f1` | tail | mission-build-unit@62 | Camera moves and radar clicks set the camera-moved bit of the view dirty flags byte, and the radar picture sets the map-changed and blink bits; line-of-sight recalculation and reveal (los_radar) OR the map-changed and a further bit into it, a read-modify-write gated on the viewing player; no branch on it in simulation code was found. The flags redraw the minimap and are per machine. |
+| presentation | los_radar | `bits_142f1` | units | conditions-shore-to-shore@6 | Camera moves and radar clicks set the camera-moved bit of the view dirty flags byte, and the radar picture sets the map-changed and blink bits; line-of-sight recalculation and reveal (los_radar) OR the map-changed and a further bit into it, a read-modify-write gated on the viewing player; no branch on it in simulation code was found. The flags redraw the minimap and are per machine. |
+| presentation | los_radar | `scrollX` | presentation | mission-build-unit@72 | The camera scroll position, written by the scroll and camera functions and read by the fog tile builder (los_radar code that the fog drawing calls) to place the fog tiles. It is local to one machine: a sim read of it would be a multiplayer desync risk in 3.1c itself. |
+| presentation | los_radar | `scrollY` | presentation | mission-build-unit@72 | The camera scroll position, written by the scroll and camera functions and read by the fog tile builder (los_radar code that the fog drawing calls) to place the fog tiles. It is local to one machine: a sim read of it would be a multiplayer desync risk in 3.1c itself. |
+| presentation | map | `LoadTntMap: operator new int #2` | explosions | mission-build-unit@74 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows map reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | map | `LoadTntMap: operator new int #2` | features | mission-radius@1536 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows map reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | map | `LoadTntMap: operator new int #2` | players | conditions-dark-side@60 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows map reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | map | `LoadTntMap: operator new int #2` | units | mission-defeat-passes-x@5 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows map reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | orders | `Unit::flags` | units | ui-build-menu@13 | A selection click (click, box, group or category select, deselect) or a build-menu page step sets or clears the select bits and the build-menu page bits of Unit::flags; orders reads other bits of the same word (the order functions test the alive bit and others). The log item is the whole word, and no read of the select or page bits was found in them (saving and loading units copy those bits into saves). Selection is local to one machine: a sim read of it would be a multiplayer desync risk in 3.1c itself. |
+| presentation | players | `Unit::flags` | players | ui-build-menu@13 | A selection click (click, box, group or category select, deselect) or a build-menu page step sets or clears the select bits and the build-menu page bits of Unit::flags; players reads other bits of the same word (line-of-sight refresh and the victory conditions test the alive bit and others). The log item is the whole word, and no read of the select or page bits was found in them (saving and loading units copy those bits into saves). Selection is local to one machine: a sim read of it would be a multiplayer desync risk in 3.1c itself. |
+| presentation | players | `bits_142f1` | tail | allied-victory@8 | Camera moves and radar clicks set the camera-moved bit of the view dirty flags byte, and the radar picture sets the map-changed and blink bits; the blink update (players, in the tail) toggles the blink bit in the same byte. Blink state is local to one machine; the blink toggle is the only reader. |
+| presentation | players | `blinkTimer` | tail | allied-victory@1 | The radar picture resets the blink timer to 7 and the blink update (players, in the tail) counts it down and toggles the blink bit. Local to one machine; only the blink update reads it. |
+| presentation | targeting | `Unit::flags` | units | ui-click-select@34 | A selection click (click, box, group or category select, deselect) or a build-menu page step sets or clears the select bits and the build-menu page bits of Unit::flags; targeting reads other bits of the same word (target search tests the alive bit and others). The log item is the whole word, and no read of the select or page bits was found in them (saving and loading units copy those bits into saves). Selection is local to one machine: a sim read of it would be a multiplayer desync risk in 3.1c itself. |
+| presentation | units | `LoadTntMap: operator new int #2` | features | ui-keys@102 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows units reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | units | `LoadTntMap: operator new int #2` | projectiles | edges-economy-targeting@40 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows units reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | units | `LoadTntMap: operator new int #2` | tail | mission-capture@2 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows units reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | units | `LoadTntMap: operator new int #2` | units | mission-build-unit@2 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows units reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | units | `ModelState::cacheDrawCount` | units | mission-timer@2 | The unit picture cache (drawing) increments cacheDrawCount and clears or rebuilds shadow; the object state update (units) resets cacheDrawCount to 0 when the model moved. ModelState::shadow and part of ModelState::cacheDrawCount may come from two different instances of the same field in the log. |
+| presentation | units | `ModelState::owner` | units | sensors-floating-teeth@98 | Not established. ModelState::owner is written when the unit's object state is created (units) and read by drawing; static read sets show no presentation write and no units read of it. The header of a picture cache chunk at the same offset may alias it. |
+| presentation | units | `ModelState::shadow` | units | mission-build-unit@2 | The unit picture cache (drawing) increments cacheDrawCount and clears or rebuilds shadow; the object state update (units) resets cacheDrawCount to 0 when the model moved. ModelState::shadow and part of ModelState::cacheDrawCount may come from two different instances of the same field in the log. |
+| presentation | units | `Unit::flags` | units | ui-build-menu@13 | A selection click (click, box, group or category select, deselect) or a build-menu page step sets or clears the select bits and the build-menu page bits of Unit::flags; units reads other bits of the same word (construction, death and height updates test the alive bit and others). The log item is the whole word, and no read of the select or page bits was found in them (saving and loading units copy those bits into saves). Selection is local to one machine: a sim read of it would be a multiplayer desync risk in 3.1c itself. |
+| presentation | units | `bits_14281` | units | edges-economy-targeting@116 | Drawing the fog of war sets the fog-tiles-built bit of the match view flags word (Game::mapFlags) and the loaders and line-of-sight code clear it, a read-modify-write of the word; units (the death handler, with the eyeball flash inlined) reads the mapping, LOS and LOS-type bits of it (from the match settings). Only the fog drawing reads the fog-tiles-built bit. That bit is per machine: the clear is gated on the viewing player. |
+| presentation | weapons | `Debris::ref1` | explosions | console-ilose@30 | Not established. The explosions step (weapons) advances the ref1 animation of each debris piece and drawing only reads it; no presentation function writes it by static read set, so this may be a type-wide alias. |
+| presentation | weapons | `Debris::ref2` | explosions | console-ilose@30 | Not established. The explosions step (weapons) advances the ref2 animation of each debris piece and drawing only reads it; no presentation function writes it by static read set, so this may be a type-wide alias. |
+| presentation | weapons | `FeatureAnimEntry::bytes_8` | projectiles | edges-economy-targeting@114 | Not established. FeatureAnimEntry::bytes_8 is a field of the feature animation pool (entries of 48 bytes, written only by the pool setup in static read sets); no presentation function writes it by static read set, and weapons reads it in phase projectiles. Likely a type-wide alias of the item, not a real feed. |
+| presentation | weapons | `FeatureAnimEntry::bytes_8` | units | edges-economy-targeting@115 | Not established. FeatureAnimEntry::bytes_8 is a field of the feature animation pool (entries of 48 bytes, written only by the pool setup in static read sets); no presentation function writes it by static read set, and weapons reads it in phase units. Likely a type-wide alias of the item, not a real feed. |
+| presentation | weapons | `FeatureAnimEntry::src` | projectiles | edges-economy-targeting@114 | Not established. FeatureAnimEntry::src is a field of the feature animation pool (entries of 48 bytes, written only by the pool setup in static read sets); no presentation function writes it by static read set, and weapons reads it in phase projectiles. Likely a type-wide alias of the item, not a real feed. |
+| presentation | weapons | `FeatureAnimEntry::src` | units | edges-economy-targeting@115 | Not established. FeatureAnimEntry::src is a field of the feature animation pool (entries of 48 bytes, written only by the pool setup in static read sets); no presentation function writes it by static read set, and weapons reads it in phase units. Likely a type-wide alias of the item, not a real feed. |
+| presentation | weapons | `LoadTntMap: operator new int #2` | features | ui-keys@237 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows weapons reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | weapons | `LoadTntMap: operator new int #2` | projectiles | hailstorm-los-off@2 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows weapons reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | weapons | `LoadTntMap: operator new int #2` | units | orders-tier2-core@400 | Not established. The item names the second operator new of LoadTntMap (the fog tile buffer of Game::fogGrid, view state), but in allied-victory the log puts one allocation instance of about 660 KB under it, far larger than that buffer, and no static read set shows weapons reading a fog grid; likely a mislabelled or reused heap range, not a real feed. |
+| presentation | weapons | `ModelState::owner` | units | mission-defeat@181 | Not established. ModelState::owner is written when the unit's object state is created (units) and read by drawing; static read sets show no presentation write and no weapons read of it. The header of a picture cache chunk at the same offset may alias it. |
 
 ## Limits and known gaps
 
@@ -142,7 +195,9 @@ Gaps in what the data say:
   handlers, because scripted UI input is not logged.
 - Static-only items of ambiguous or unseen types have no row.
 - Events after marker 7 are not attributed to a phase of their own.
-- Open gaps of #866: nested passes, the unresolved sim-event queue, and presentation rows in the phase files.
+- The passes are per loop over entities (the top-level loops of the phases and their nested loops over units, players,
+  pieces, debris, feature types and per-player units). COB threads, orders and squads inside an entity are not split into
+  passes: the accesses inside one entity's COB threads, orders and squads keep the order of that entity's pass.
 
 ## wind_meteors
 
@@ -200,7 +255,6 @@ There is no subsystem it cannot be cut from.
 
 | phase pair | immediate as writer | immediate as reader | carried as writer | carried as reader |
 |---|---|---|---|---|
-| wind -> presentation | 1 | 0 | 0 | 0 |
 | wind -> projectiles | 0 | 0 | 1 | 0 |
 | wind -> units | 0 | 0 | 3 | 0 |
 
@@ -261,10 +315,10 @@ None.
 | reads from map | `LoadTntMap: operator new int #2` | units | 14 | ten-ring-atoll@103 |
 | writes to orders | `unknown_1b8e` | units | 13 | mission-build-unit@39 |
 | writes to weapons | `unknown_1b8e` | units | 11 | edges-economy-targeting@36 |
+| writes to los_radar | `unknown_1b8e` | units | 10 | edges-economy-targeting@36 |
 | writes to targeting | `unknown_1b8e` | units | 8 | edges-economy-targeting@42 |
 | writes to units | `unknown_1b8e` | players | 8 | edges-economy-targeting@30 |
 | writes to orders | `unknown_1cd9` | units | 7 | mission-build-unit@44 |
-| writes to los_radar | `unknown_1b8e` | units | 6 | orders-guard-attacked@174 |
 | writes to los_radar | `unknown_1cd9` | players | 6 | orders-air-fights@30 |
 | writes to orders | `pad_1df4` | units | 6 | trio-etorrep-glacier@2342 |
 | writes to units | `pad_1df4` | units | 6 | trio-etorrep-glacier@2342 |
@@ -334,16 +388,17 @@ Cannot be cut from, with the edge of the most runs:
 
 | phase pair | immediate as writer | immediate as reader | carried as writer | carried as reader |
 |---|---|---|---|---|
-| players -> features | 5 | 0 | 0 | 0 |
-| players -> presentation | 12 | 0 | 0 | 0 |
-| players -> projectiles | 0 | 0 | 9 | 0 |
+| players -> features | 7 | 0 | 0 | 0 |
+| players -> meteors | 2 | 0 | 0 | 0 |
+| players -> presentation | 6 | 0 | 0 | 0 |
+| players -> projectiles | 0 | 0 | 12 | 0 |
 | players -> tail | 1 | 0 | 0 | 0 |
 | players -> units | 0 | 0 | 28 | 1 |
 | projectiles -> players | 0 | 1 | 0 | 0 |
-| units -> features | 2 | 0 | 0 | 0 |
+| units -> features | 4 | 0 | 0 | 0 |
 | units -> players | 18 | 11 | 0 | 0 |
-| units -> presentation | 7 | 0 | 0 | 0 |
-| units -> projectiles | 9 | 0 | 0 | 0 |
+| units -> presentation | 1 | 0 | 0 | 0 |
+| units -> projectiles | 12 | 0 | 0 | 0 |
 | units -> tail | 1 | 0 | 0 | 0 |
 | units -> units | 0 | 0 | 29 | 2 |
 
@@ -355,15 +410,19 @@ No draws.
 
 ### Within-pass reads
 
-30 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+41 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
 | players | `SettleResourceAccount` | 18 | 2 | `Unit::energy` | 81 |
-| units | `UnitResources::SpendEnergyAndMetal` | 6 | 3 | `Unit::unknown_c0` | 18 |
-| units | `UnitResources::RequestEnergyAndMetal` | 4 | 0 | `Unit::unknown_c0` | 37 |
-| units | `UnitResources::RequestEnergy` | 1 | 0 | `Unit::unknown_c0` | 8 |
-| units | `UpdateMetalExtraction` | 1 | 1 | `LoadTntMap: operator new int #2` | 14 |
+| units | `UnitResources::SpendEnergyAndMetal` | 6 | 3 | `Unit::unknown_c0` | 12 |
+| units.players | `UnitResources::SpendEnergyAndMetal` | 5 | 2 | `Unit::unknown_c0` | 13 |
+| units | `UnitResources::RequestEnergyAndMetal` | 4 | 0 | `Unit::f_dc` | 19 |
+| units.players | `UnitResources::RequestEnergyAndMetal` | 4 | 0 | `Unit::unknown_c0` | 35 |
+| units | `UnitResources::RequestEnergy` | 1 | 0 | `Unit::unknown_c0` | 4 |
+| units | `UpdateMetalExtraction` | 1 | 1 | `LoadTntMap: operator new int #2` | 3 |
+| units.players | `UnitResources::RequestEnergy` | 1 | 0 | `Unit::unknown_c0` | 7 |
+| units.players | `UpdateMetalExtraction` | 1 | 1 | `LoadTntMap: operator new int #2` | 14 |
 
 ### Deferral confirmation
 
@@ -488,7 +547,6 @@ Cannot be cut from, with the edge of the most runs:
 
 | phase pair | immediate as writer | immediate as reader | carried as writer | carried as reader |
 |---|---|---|---|---|
-| features -> presentation | 3 | 0 | 0 | 0 |
 | features -> projectiles | 0 | 0 | 3 | 0 |
 | features -> units | 0 | 0 | 3 | 0 |
 | players -> units | 0 | 0 | 0 | 6 |
@@ -496,12 +554,10 @@ Cannot be cut from, with the edge of the most runs:
 | projectiles -> explosions | 1 | 0 | 0 | 0 |
 | projectiles -> features | 2 | 0 | 0 | 0 |
 | projectiles -> players | 1 | 0 | 0 | 0 |
-| projectiles -> presentation | 2 | 0 | 0 | 0 |
 | projectiles -> units | 0 | 0 | 1 | 0 |
 | units -> explosions | 1 | 0 | 0 | 0 |
 | units -> features | 2 | 4 | 0 | 0 |
 | units -> players | 3 | 0 | 0 | 0 |
-| units -> presentation | 4 | 0 | 0 | 0 |
 | units -> projectiles | 4 | 1 | 0 | 0 |
 | units -> tail | 1 | 0 | 0 | 0 |
 | units -> units | 0 | 0 | 2 | 12 |
@@ -513,33 +569,33 @@ The rows themselves are in data/phase_dependencies.csv.
 | pass | stream | function | entities | draws | start_state | evidence |
 |---|---|---|---|---|---|---|
 | features | rng.crtHoldrand | `UpdateFeatures` | 56 | 2 | fixed | - |
-| features | rng.parkMiller | `SpreadFire` | 2 | 1 to 8 | depends-on-earlier | FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;unresolved:block;FeatureAnimEntry::next |
-| features | rng.parkMiller | `StartFeatureBurning` | 2 | 1 to 5 | depends-on-earlier | FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;unresolved:block;FeatureAnimEntry::next |
-| features | rng.parkMiller | `UpdateFeatures` | 1 | 1 | fixed | - |
-| projectiles | rng.parkMiller | `StartFeatureBurning` | 1 | 1 to 3 | depends-on-earlier | Projectile::angles;Projectile::position;Projectile::speed;unresolved:block |
-| units | rng.parkMiller | `StartFeatureBurning` | 1 | 4 to 51 | depends-on-earlier | Unit::def;Unit::f_1f;f14353;unknown_1cd9 |
+| features | rng.parkMiller | `SpreadFire` | 2 | 1 to 8 | depends-on-earlier | FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;SimEventsCreate: GameAllocIgnoreTag SimEventQueue;unresolved:image |
+| features | rng.parkMiller | `StartFeatureBurning` | 2 | 1 to 5 | depends-on-earlier | FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;SimEventsCreate: GameAllocIgnoreTag SimEventQueue;unresolved:image |
+| features.anim | rng.parkMiller | `UpdateFeatures` | 1 | 1 | fixed | - |
+| projectiles | rng.parkMiller | `StartFeatureBurning` | 1 | 1 to 3 | depends-on-earlier | Projectile::angles;Projectile::position;Projectile::speed;unresolved:image |
+| units | rng.parkMiller | `StartFeatureBurning` | 1 | 4 to 51 | depends-on-earlier | Unit::def;f14353;unknown_1cd9;unresolved:image |
 
 ### Within-pass reads
 
-45 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+63 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
-| units | `ReclaimFeature` | 7 | 3 | `LoadTntMap: operator new int #2` | 3 |
+| units.players | `ReclaimFeature` | 7 | 3 | `LoadTntMap: operator new int #2` | 3 |
 | features | `AllocFeatureSpot` | 4 | 2 | `FeatureAnimEntry::next` | 18 |
 | features | `UpdateFeatures` | 4 | 0 | `FeatureAnimEntry::next` | 20 |
-| units | `AllocFeatureSpot` | 4 | 2 | `FeatureAnimEntry::next` | 10 |
-| units | `PlaceFeature` | 4 | 1 | `Unit::pos` | 7 |
+| units | `AllocFeatureSpot` | 4 | 2 | `FeatureAnimEntry::next` | 9 |
+| units | `PlaceFeature` | 4 | 1 | `Unit::pos` | 6 |
+| units | `ReclaimFeature` | 4 | 1 | `LoadTntMap: operator new int #2` | 2 |
+| units.players | `AllocFeatureSpot` | 4 | 2 | `FeatureAnimEntry::next` | 5 |
+| units.players | `PlaceFeature` | 4 | 1 | `FeatureAnimEntry::bytes_10` | 4 |
 | projectiles | `DamageFeature` | 3 | 2 | `FeatureAnimEntry::bytes_10` | 2 |
 | units | `KillFeature` | 3 | 2 | `FeatureAnimEntry::bytes_10` | 5 |
+| units.players | `KillFeature` | 3 | 2 | `LoadTntMap: operator new int #2` | 3 |
 | features | `ReplaceFeatureWithDead` | 2 | 1 | `LoadTntMap: operator new int #2` | 10 |
 | features | `StartFeatureBurning` | 2 | 2 | `LoadTntMap: operator new int #2` | 1 |
 | units | `DamageFeature` | 2 | 2 | `FeatureAnimEntry::bytes_10` | 1 |
 | units | `RemoveFeature` | 2 | 1 | `LoadTntMap: operator new int #2` | 2 |
-| units | `ReplaceFeatureWithDead` | 2 | 1 | `LoadTntMap: operator new int #2` | 2 |
-| features | `RemoveFeature` | 1 | 1 | `LoadTntMap: operator new int #2` | 10 |
-| features | `SpreadFire` | 1 | 1 | `LoadTntMap: operator new int #2` | 3 |
-| projectiles | `KillFeature` | 1 | 1 | `LoadTntMap: operator new int #2` | 1 |
 
 The 15 groups with the most rows are shown.
 
@@ -700,7 +756,7 @@ Cannot be cut from, with the edge of the most runs:
 |---|---|---|---|---|
 | meteors -> presentation | 0 | 1 | 0 | 0 |
 | players -> features | 1 | 3 | 0 | 0 |
-| players -> presentation | 4 | 3 | 0 | 0 |
+| players -> presentation | 2 | 3 | 0 | 0 |
 | players -> projectiles | 0 | 0 | 1 | 9 |
 | players -> units | 0 | 0 | 5 | 5 |
 | projectiles -> features | 0 | 1 | 0 | 0 |
@@ -709,7 +765,6 @@ Cannot be cut from, with the edge of the most runs:
 | projectiles -> units | 0 | 0 | 3 | 2 |
 | units -> features | 0 | 3 | 0 | 0 |
 | units -> players | 0 | 30 | 0 | 0 |
-| units -> presentation | 1 | 0 | 0 | 0 |
 | units -> projectiles | 0 | 23 | 0 | 0 |
 | units -> units | 0 | 0 | 0 | 17 |
 
@@ -720,20 +775,20 @@ The rows themselves are in data/phase_dependencies.csv.
 | pass | stream | function | entities | draws | start_state | evidence |
 |---|---|---|---|---|---|---|
 | features | rng.parkMiller | `ReactToAttack` | 1 | 1 | fixed | - |
-| players | rng.parkMiller | `??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 1 to 2 | depends-on-earlier | Unit::flags;unresolved:block;unknown_1b8e;SquadManager::SquadManager: new BuildTimer |
+| players | rng.parkMiller | `??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 1 to 2 | depends-on-earlier | unresolved:block;unresolved:image;Unit::flags;unknown_1b8e |
 | players | rng.parkMiller | `??0SpatialTimer@@QAE@PAVSquadManager@@PAX@Z` | 3 | 1 | fixed | - |
-| players | rng.parkMiller | `??0SquadScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 1 to 8 | depends-on-earlier | SquadManager::countdown;SquadManager::SquadManager: new BuildTimer;unresolved:block;Unit::flags |
-| players | rng.parkMiller | `ChooseBuildOption` | 10 | 1 to 144 | depends-on-earlier | unknown_1b8e;unresolved:block;PlayerAI::centre;SquadManager::SquadManager: new BuildTimer |
-| players | rng.parkMiller | `FindBuildPosition` | 9 | 1 to 10 | depends-on-earlier | unknown_1b8e;PlayerAI::centre;unresolved:block;SquadManager::SquadManager: new BuildTimer |
-| players | rng.parkMiller | `PlayerAI::FindRandomPlacementCell` | 5 | 3 to 938 | depends-on-earlier | unknown_1b8e;SquadManager::SquadManager: new BuildTimer;SquadManager::countdown;unresolved:block |
+| players | rng.parkMiller | `??0SquadScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 1 to 8 | depends-on-earlier | unresolved:image;SquadManager::countdown;SquadManager::SquadManager: new BuildTimer;Unit::flags |
+| players | rng.parkMiller | `ChooseBuildOption` | 10 | 1 to 144 | depends-on-earlier | unknown_1b8e;unresolved:image;unresolved:block;SquadManager::SquadManager: new BuildTimer |
+| players | rng.parkMiller | `FindBuildPosition` | 9 | 1 to 10 | depends-on-earlier | unresolved:image;unknown_1b8e;SquadManager::SquadManager: new BuildTimer;SquadManager::countdown |
+| players | rng.parkMiller | `PlayerAI::FindRandomPlacementCell` | 5 | 3 to 938 | depends-on-earlier | unresolved:image;unknown_1b8e;SquadManager::SquadManager: new BuildTimer;SquadManager::countdown |
 | players | rng.parkMiller | `ScoutTimer::OnTimer` | 1 | 1 | fixed | - |
 | players | rng.parkMiller | `UpdatePlayerAI` | 10 | 1 | fixed | - |
 | projectiles | rng.parkMiller | `ReactToAttack` | 5 | 1 | fixed | - |
-| units | rng.parkMiller | `ReactToAttack` | 1 | 1 to 2 | depends-on-earlier | Unit::f_1f;f14353;NewUnitScript: new UnitScript;Unit::f_57 |
+| units | rng.parkMiller | `ReactToAttack` | 1 | 1 to 2 | depends-on-earlier | Unit::f_1f;f14353;unresolved:image;NewUnitScript: new UnitScript |
 
 ### Within-pass reads
 
-97 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+106 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -743,15 +798,15 @@ The rows themselves are in data/phase_dependencies.csv.
 | players | `RetargetWeapon` | 7 | 3 | `SquadManager::cursor` | 84 |
 | players | `SquadManager::FindNearestEnemyUnit` | 7 | 5 | `Unit::activateFlags` | 5 |
 | units | `ReactToAttack` | 7 | 2 | `Unit::def` | 10 |
-| units | `GetVisibleEnemiesInRadius` | 6 | 3 | `Unit::pos` | 21 |
-| units | `SetUnitSquad` | 6 | 4 | `Unit::group` | 25 |
+| units | `SetUnitSquad` | 6 | 4 | `Unit::group` | 16 |
+| units.players | `GetVisibleEnemiesInRadius` | 6 | 3 | `Unit::pos` | 18 |
 | players | `??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 5 | 2 | `Unit::flags` | 46 |
 | players | `ScoutTimer::OnTimer` | 5 | 0 | `PlayerAI::centre` | 74 |
+| units.players | `SetUnitSquad` | 4 | 2 | `Unit::group` | 16 |
 | players | `AssaultTimer::RebalanceAssaultGroupByCentroid` | 3 | 0 | `SquadManager::SquadManager: new AssaultTimer #2` | 27 |
 | players | `GetVisibleEnemiesInRadius` | 3 | 0 | `PlayerAI::hasSpecial` | 45 |
 | players | `SetUnitSquad` | 3 | 1 | `Group::units` | 30 |
 | projectiles | `IsUnderLimit` | 3 | 1 | `Unit::netDirtyFlags` | 8 |
-| players | `??0BuildTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 0 | `Unit::flags` | 30 |
 
 The 15 groups with the most rows are shown.
 
@@ -857,7 +912,7 @@ No row of data/pass_reads.csv has it as reader.
 | ordered | 15 | 13 |
 | immediate | 52 | 65 |
 | deferrable | 4 | 4 |
-| read-only | 0 | 238 |
+| read-only | 0 | 239 |
 | unobserved | 120 | 136 |
 
 **Ordered** (28).
@@ -957,7 +1012,7 @@ The 40 rows with the most runs are shown; the other 77 are in data/dependencies.
 
 | other | weapons is writer | weapons is reader |
 |---|---|---|
-| (no writer) | 0 | 238 |
+| (no writer) | 0 | 239 |
 
 **Unobserved**, by the other subsystem.
 
@@ -997,11 +1052,10 @@ Cannot be cut from, with the edge of the most runs:
 
 | phase pair | immediate as writer | immediate as reader | carried as writer | carried as reader |
 |---|---|---|---|---|
-| explosions -> presentation | 7 | 0 | 0 | 0 |
 | features -> projectiles | 0 | 0 | 0 | 3 |
 | features -> units | 0 | 0 | 4 | 3 |
 | meteors -> players | 0 | 0 | 2 | 0 |
-| meteors -> presentation | 5 | 0 | 0 | 0 |
+| meteors -> presentation | 1 | 0 | 0 | 0 |
 | players -> features | 0 | 6 | 0 | 0 |
 | players -> projectiles | 0 | 0 | 3 | 8 |
 | players -> units | 0 | 0 | 7 | 10 |
@@ -1009,11 +1063,11 @@ Cannot be cut from, with the edge of the most runs:
 | presentation -> units | 0 | 0 | 1 | 2 |
 | projectiles -> features | 1 | 1 | 0 | 0 |
 | projectiles -> players | 15 | 1 | 0 | 0 |
-| projectiles -> presentation | 17 | 0 | 0 | 0 |
+| projectiles -> presentation | 2 | 0 | 0 | 0 |
 | projectiles -> units | 0 | 0 | 18 | 3 |
 | units -> features | 0 | 19 | 0 | 0 |
 | units -> players | 22 | 12 | 0 | 0 |
-| units -> presentation | 25 | 0 | 0 | 0 |
+| units -> presentation | 3 | 0 | 0 | 0 |
 | units -> projectiles | 10 | 36 | 0 | 0 |
 | units -> units | 0 | 0 | 19 | 39 |
 | wind -> projectiles | 0 | 0 | 0 | 1 |
@@ -1026,30 +1080,30 @@ The rows themselves are in data/phase_dependencies.csv.
 |---|---|---|---|---|---|---|
 | projectiles | rng.parkMiller | `UpdateProjectiles` | 3 | 1 | fixed | - |
 | units | rng.parkMiller | `BreakPieceIntoDebris` | 21 | 16 to 392 | depends-on-earlier | f14353;Unit::f_1f;NewUnitScript: new UnitScript;Unit::f_57 |
-| units | rng.parkMiller | `FireTurretWeapon` | 3 | 2 to 4 | depends-on-earlier | f14353;Unit::f_1f;NewUnitScript: new UnitScript;Unit::field_18 |
+| units | rng.parkMiller | `FireTurretWeapon` | 3 | 2 to 4 | depends-on-earlier | f14353;Unit::f_1f;Unit::field_18;NewUnitScript: new UnitScript |
 | units | rng.parkMiller | `UnitScript::ExplodePiece` | 52 | 6 to 96 | depends-on-earlier | f14353;Unit::f_1f;NewUnitScript: new UnitScript;Unit::f_57 |
 
 ### Within-pass reads
 
-339 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+476 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
 | projectiles | `CompactProjectiles` | 45 | 23 | `Projectile::flags` | 16 |
-| units | `UpdateUnitWeapons` | 27 | 11 | `Unit::f_1f` | 84 |
+| units | `UpdateUnitWeapons` | 26 | 11 | `Unit::f_1f` | 74 |
 | projectiles | `UpdateProjectiles` | 24 | 1 | `Projectile::flags` | 16 |
-| explosions | `UpdateExplosions` | 18 | 10 | `Debris::ref1` | 34 |
-| units | `FireTurretWeapon` | 16 | 0 | `Unit::f_1f` | 21 |
-| units | `ApplyAreaDamage` | 14 | 7 | `Unit::def` | 13 |
-| units | `Unit::ClaimWeapons` | 12 | 5 | `Unit::f_57` | 50 |
-| units | `BreakPieceIntoDebris` | 11 | 3 | `Unit::state` | 14 |
+| units.players | `UpdateUnitWeapons` | 18 | 2 | `Unit::f_1f` | 84 |
+| explosions.debris | `UpdateExplosions` | 17 | 9 | `Debris::ref1` | 34 |
+| units.players | `FireTurretWeapon` | 16 | 0 | `Unit::heading` | 13 |
+| units | `ApplyAreaDamage` | 14 | 7 | `Unit::def` | 12 |
+| units | `FireTurretWeapon` | 13 | 0 | `Unit::f_1f` | 17 |
+| units | `BreakPieceIntoDebris` | 11 | 3 | `Unit::state` | 12 |
+| units | `Unit::ClaimWeapons` | 11 | 5 | `Unit::f_57` | 50 |
+| units.players | `ApplyAreaDamage` | 10 | 3 | `Unit::pos` | 4 |
+| units.players | `BreakPieceIntoDebris` | 10 | 2 | `Unit::pos` | 7 |
 | projectiles | `ApplyAreaDamage` | 9 | 2 | `Projectile::attacker` | 4 |
 | units | `FireBallisticProjectile` | 9 | 1 | `Unit::f_1f` | 5 |
-| units | `WeaponCanReachUnit` | 9 | 3 | `Unit::pos` | 15 |
-| units | `ApplyUnitDamage` | 8 | 4 | `Unit::flags` | 12 |
-| units | `ComputeProjectileTime` | 8 | 1 | `Unit::f_1f` | 19 |
-| units | `DamageUnit` | 8 | 5 | `unknown_1b8e` | 7 |
-| units | `StartExplodePiece` | 8 | 1 | `Unit::state` | 14 |
+| units.players | `WeaponCanReachUnit` | 9 | 3 | `Unit::pos` | 13 |
 
 The 15 groups with the most rows are shown.
 
@@ -1205,25 +1259,30 @@ The rows themselves are in data/phase_dependencies.csv.
 
 | pass | stream | function | entities | draws | start_state | evidence |
 |---|---|---|---|---|---|---|
-| players | rng.parkMiller | `FindWeaponTarget` | 3 | 1 to 250 | depends-on-earlier | unresolved:block;SquadManager::cursor;SquadManager::countdown;g_allocSerial |
-| units | rng.parkMiller | `FindWeaponTarget` | 9 | 1 to 100 | depends-on-earlier | f14353;NewUnitScript: new UnitScript;Unit::f_1f;Unit::f_57 |
+| players | rng.parkMiller | `FindWeaponTarget` | 3 | 1 to 250 | depends-on-earlier | unresolved:image;SquadManager::cursor;SquadManager::countdown;g_allocSerial |
+| units | rng.parkMiller | `FindWeaponTarget` | 9 | 1 to 100 | depends-on-earlier | f14353;Unit::f_1f;NewUnitScript: new UnitScript;Unit::f_57 |
 
 ### Within-pass reads
 
-49 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+72 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
-| units | `GetWeaponTargetPos` | 21 | 4 | `Unit::current` | 57 |
-| units | `FindWeaponTarget` | 12 | 6 | `Unit::def` | 17 |
+| units.players | `GetWeaponTargetPos` | 18 | 2 | `Unit::current` | 55 |
+| units | `GetWeaponTargetPos` | 16 | 2 | `Unit::current` | 27 |
+| units.players | `FindWeaponTarget` | 12 | 6 | `Unit::def` | 12 |
+| units | `FindWeaponTarget` | 7 | 3 | `Unit::def` | 8 |
 | players | `ClearWeaponTarget` | 3 | 0 | `Unit::current` | 14 |
 | players | `FindWeaponTarget` | 3 | 2 | `unknown_1b8e` | 45 |
 | players | `GetWeaponTargetUnit` | 3 | 0 | `Unit::current` | 14 |
-| units | `GetWeaponTargetUnit` | 3 | 0 | `Unit::current` | 15 |
+| units | `GetWeaponTargetUnit` | 2 | 0 | `Unit::current` | 9 |
+| units.players | `GetWeaponTargetUnit` | 2 | 0 | `Unit::current` | 13 |
 | projectiles | `GetWeaponTargetUnit` | 1 | 0 | `Unit::field_20` | 1 |
 | units | `ClearWeaponTarget` | 1 | 0 | `Unit::current` | 2 |
-| units | `FindBestTargetIfFireAtWill` | 1 | 0 | `Unit::flags` | 57 |
-| units | `Unit::ChooseWeapon` | 1 | 0 | `Unit::f_1f` | 10 |
+| units | `FindBestTargetIfFireAtWill` | 1 | 0 | `Unit::flags` | 23 |
+| units | `Unit::ChooseWeapon` | 1 | 0 | `Unit::f_1f` | 8 |
+| units.players | `FindBestTargetIfFireAtWill` | 1 | 0 | `Unit::flags` | 49 |
+| units.players | `Unit::ChooseWeapon` | 1 | 0 | `Unit::f_1f` | 5 |
 
 ### Deferral confirmation
 
@@ -1242,7 +1301,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | ordered | 3 | 3 |
 | immediate | 14 | 30 |
 | deferrable | 4 | 1 |
-| read-only | 0 | 116 |
+| read-only | 0 | 135 |
 | unobserved | 95 | 133 |
 
 **Ordered** (6).
@@ -1274,21 +1333,21 @@ The rows themselves are in data/phase_dependencies.csv.
 | reads from units | `Unit::losCacheCell` | units | 48 | conditions-shore-to-shore@6 |
 | reads from ai | `Unit::flags` | players | 30 | duel-coast-to-coast@29 |
 | reads from weapons | `Projectile::position` | projectiles | 28 | hailstorm-los-off@2 |
+| reads from units | `unknown_1b8e` | units | 26 | mission-build-unit@1 |
 | writes to units | `bits_14281` | units | 25 | mission-build-unit@1 |
 | writes to features | `LoadTntMap: operator new int #2` | units | 18 | mission-build-unit@1 |
 | reads from players | `unknown_1b8e` | players | 18 | console-ilose@30 |
+| reads from units | `unknown_1cd9` | units | 18 | console-iwin@30 |
 | writes to weapons | `LoadTntMap: operator new int #2` | units | 17 | mission-build-unit@71 |
 | reads from economy | `pad_1df4` | players | 16 | allied-victory@30 |
-| reads from units | `unknown_1b8e` | units | 15 | mission-build-unit@1 |
-| reads from units | `pad_1df4` | units | 12 | console-iwin@30 |
-| reads from units | `unknown_1cd9` | units | 11 | mission-build-unit@71 |
+| reads from units | `pad_1df4` | units | 15 | console-iwin@30 |
+| reads from economy | `unknown_1b8e` | units | 10 | edges-economy-targeting@36 |
 | reads from orders | `Unit::zFraction` | units | 10 | mission-capture@1 |
 | reads from units | `Unit::flags` | units | 10 | mission-capture@5 |
 | reads from units | `Unit::yFraction` | units | 9 | mission-capture@5 |
 | reads from orders | `Unit::flags` | units | 8 | mission-capture@1 |
 | reads from orders | `Unit::yFraction` | units | 8 | mission-capture@1 |
 | reads from units | `Unit::activateFlags` | units | 7 | mission-capture@1 |
-| reads from economy | `unknown_1b8e` | units | 6 | orders-guard-attacked@174 |
 | reads from economy | `unknown_1cd9` | players | 6 | orders-air-fights@30 |
 | writes to units | `Unit::flags` | players | 6 | mission-build-unit@30 |
 | reads from players | `bits_142f1` | tail | 6 | mission-build-unit@136 |
@@ -1317,7 +1376,7 @@ The 40 rows with the most runs are shown; the other 4 are in data/dependencies.c
 
 | other | los_radar is writer | los_radar is reader |
 |---|---|---|
-| (no writer) | 0 | 116 |
+| (no writer) | 0 | 135 |
 
 **Unobserved**, by the other subsystem.
 
@@ -1358,9 +1417,10 @@ Cannot be cut from, with the edge of the most runs:
 | phase pair | immediate as writer | immediate as reader | carried as writer | carried as reader |
 |---|---|---|---|---|
 | meteors -> players | 0 | 0 | 0 | 2 |
-| players -> features | 2 | 0 | 0 | 0 |
-| players -> presentation | 7 | 5 | 0 | 0 |
-| players -> projectiles | 0 | 0 | 2 | 0 |
+| players -> features | 2 | 2 | 0 | 0 |
+| players -> meteors | 0 | 2 | 0 | 0 |
+| players -> presentation | 2 | 5 | 0 | 0 |
+| players -> projectiles | 0 | 0 | 2 | 5 |
 | players -> tail | 1 | 1 | 0 | 0 |
 | players -> units | 0 | 0 | 7 | 7 |
 | presentation -> features | 0 | 0 | 1 | 0 |
@@ -1368,12 +1428,11 @@ Cannot be cut from, with the edge of the most runs:
 | presentation -> units | 0 | 0 | 1 | 0 |
 | projectiles -> players | 0 | 6 | 0 | 0 |
 | projectiles -> presentation | 0 | 1 | 0 | 0 |
-| tail -> presentation | 3 | 0 | 0 | 0 |
 | units -> explosions | 1 | 0 | 0 | 0 |
-| units -> features | 3 | 0 | 0 | 0 |
+| units -> features | 3 | 2 | 0 | 0 |
 | units -> players | 2 | 33 | 0 | 0 |
-| units -> presentation | 4 | 13 | 0 | 0 |
-| units -> projectiles | 2 | 1 | 0 | 0 |
+| units -> presentation | 0 | 13 | 0 | 0 |
+| units -> projectiles | 2 | 7 | 0 | 0 |
 | units -> tail | 1 | 2 | 0 | 0 |
 | units -> units | 0 | 0 | 1 | 14 |
 
@@ -1385,25 +1444,25 @@ No draws.
 
 ### Within-pass reads
 
-84 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+139 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
-| units | `IsUnitVisibleToPlayer` | 12 | 5 | `Unit::flags` | 10 |
-| units | `RemoveLineOfSight` | 10 | 6 | `InitPlayerSlot: operator new unsigned char` | 17 |
+| units | `IsUnitVisibleToPlayer` | 10 | 3 | `Unit::flags` | 10 |
+| units.players | `IsUnitVisibleToPlayer` | 10 | 3 | `Unit::def` | 7 |
+| units | `RemoveLineOfSight` | 9 | 6 | `InitPlayerSlot: operator new unsigned char` | 17 |
 | players | `IsUnitVisibleToPlayer` | 7 | 4 | `Unit::activateFlags` | 80 |
-| units | `AddLineOfSight` | 7 | 6 | `bits_14281` | 14 |
+| units.players | `RemoveLineOfSight` | 7 | 3 | `InitPlayerSlot: operator new unsigned char` | 13 |
 | players | `RemoveLineOfSight` | 6 | 2 | `Unit::losCacheCell` | 32 |
-| units | `UpdateLineOfSight` | 5 | 1 | `Unit::losCacheCell` | 28 |
+| players.los | `RemoveLineOfSight` | 6 | 3 | `InitPlayerSlot: operator new unsigned char` | 20 |
+| units | `AddLineOfSight` | 6 | 6 | `unknown_1b8e` | 13 |
+| units | `SoundHeardMask` | 6 | 5 | `unknown_1b8e` | 10 |
+| units.players | `SoundHeardMask` | 6 | 5 | `unknown_1b8e` | 9 |
+| units | `UpdateLineOfSight` | 5 | 1 | `bits_14281` | 17 |
 | players | `UpdateLineOfSight` | 4 | 1 | `Unit::losCacheCell` | 57 |
-| units | `IsVisibleByMask` | 4 | 3 | `InitPlayerSlot: operator new unsigned char` | 6 |
-| units | `RevealAroundUnit` | 4 | 4 | `LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY` | 13 |
-| players | `AddLineOfSight` | 3 | 2 | `bits_14281` | 31 |
-| players | `IsVisibleByMask` | 3 | 2 | `InitPlayerSlot: operator new unsigned char` | 39 |
-| players | `RevealAroundUnit` | 3 | 3 | `bits_14281` | 33 |
-| units | `AddEyeball` | 3 | 2 | `bits_14281` | 9 |
-| players | `RecordRadarUnits` | 2 | 1 | `Unit::activateFlags` | 6 |
-| players | `UpdateSensorRadarAndCloak` | 2 | 1 | `unknown_1b8e` | 6 |
+| players.los | `UpdateLineOfSight` | 4 | 1 | `Unit::losCacheCell` | 52 |
+| units.players | `AddLineOfSight` | 4 | 3 | `InitPlayerSlot: operator new unsigned char` | 10 |
+| units.players | `IsVisibleByMask` | 4 | 3 | `InitPlayerSlot: operator new unsigned char` | 5 |
 
 The 15 groups with the most rows are shown.
 
@@ -1424,8 +1483,8 @@ The 15 groups with the most rows are shown.
 | class | as writer | as reader |
 |---|---|---|
 | ordered | 8 | 8 |
-| immediate | 66 | 58 |
-| deferrable | 8 | 9 |
+| immediate | 65 | 58 |
+| deferrable | 9 | 9 |
 | read-only | 0 | 177 |
 | unobserved | 134 | 181 |
 
@@ -1450,7 +1509,7 @@ The 15 groups with the most rows are shown.
 | writes to ai | `sim-event` | projectiles | 1 | long-greenhaven-8p@41408 |
 | reads from weapons | `sim-event` | projectiles | 1 | long-greenhaven-8p@41408 |
 
-**Immediate** (124).
+**Immediate** (123).
 
 | direction | item | phase | runs | example |
 |---|---|---|---|---|
@@ -1495,12 +1554,13 @@ The 15 groups with the most rows are shown.
 | reads from units | `UnitMotion::flags` | units | 25 | mission-timer@51 |
 | reads from weapons | `Unit::netDirtyFlags` | units | 25 | edges-economy-targeting@11 |
 
-The 40 rows with the most runs are shown; the other 84 are in data/dependencies.csv.
+The 40 rows with the most runs are shown; the other 83 are in data/dependencies.csv.
 
-**Deferrable** (17).
+**Deferrable** (18).
 
 | direction | item | phase | runs | example |
 |---|---|---|---|---|
+| writes to units | `PathOrder::pos_z` | units | 7 | orders-air-fights@185 |
 | reads from ai | `Unit::group` | units | 4 | orders-factory@1276 |
 | writes to ai | `Unit::group` | units | 4 | orders-factory@1276 |
 | reads from units | `Unit::killCount` | units | 4 | mission-capture@236 |
@@ -1569,12 +1629,12 @@ Cannot be cut from, with the edge of the most runs:
 | players -> units | 0 | 0 | 6 | 15 |
 | presentation -> units | 0 | 0 | 2 | 0 |
 | projectiles -> players | 2 | 1 | 0 | 0 |
-| projectiles -> units | 0 | 0 | 5 | 9 |
+| projectiles -> units | 0 | 0 | 4 | 9 |
 | units -> features | 8 | 0 | 0 | 0 |
 | units -> players | 31 | 13 | 0 | 0 |
-| units -> presentation | 15 | 4 | 0 | 0 |
+| units -> presentation | 7 | 4 | 0 | 0 |
 | units -> projectiles | 19 | 14 | 0 | 0 |
-| units -> units | 0 | 0 | 44 | 42 |
+| units -> units | 0 | 0 | 42 | 42 |
 
 The rows themselves are in data/phase_dependencies.csv.
 
@@ -1587,9 +1647,9 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | rng.parkMiller | `AirToGroundHoverOrder` | 1 | 1 | fixed | - |
 | units | rng.parkMiller | `AirToGroundOrder` | 2 | 1 | fixed | - |
 | units | rng.parkMiller | `AttackChaseOrder` | 10 | 1 | fixed | - |
-| units | rng.parkMiller | `AttackUTypeOrder` | 7 | 1 to 9 | depends-on-earlier | Unit::f_1f;f14353;NewUnitScript: new UnitScript;Unit::def |
+| units | rng.parkMiller | `AttackUTypeOrder` | 7 | 1 to 9 | depends-on-earlier | f14353;NewUnitScript: new UnitScript;Unit::def;Unit::f_1f |
 | units | rng.parkMiller | `FollowGroundOrder` | 7 | 1 | fixed | - |
-| units | rng.parkMiller | `GuardNoMoveOrder` | 7 | 1 to 58 | depends-on-earlier | NewUnitScript: new UnitScript;Unit::f_1f;f14353;Unit::field_18 |
+| units | rng.parkMiller | `GuardNoMoveOrder` | 7 | 1 to 58 | depends-on-earlier | Unit::f_1f;f14353;NewUnitScript: new UnitScript;Unit::field_18 |
 | units | rng.parkMiller | `PatrolOrder` | 6 | 1 | fixed | - |
 | units | rng.parkMiller | `ReclaimOrder` | 2 | 1 | fixed | - |
 | units | rng.parkMiller | `RepairPatrolOrder` | 2 | 1 | fixed | - |
@@ -1601,7 +1661,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | rng.parkMiller | `StandbyOrder` | 71 | 1 | fixed | - |
 | units | rng.parkMiller | `SuppressOrder` | 1 | 1 | fixed | - |
 | units | rng.parkMiller | `VtolFollowOrder` | 18 | 1 | fixed | - |
-| units | rng.parkMiller | `VtolLandIfCanOrder` | 2 | 1 to 25 | depends-on-earlier | Unit::f_1f;f14353;Unit::f_57;NewUnitScript: new UnitScript |
+| units | rng.parkMiller | `VtolLandIfCanOrder` | 2 | 1 to 25 | depends-on-earlier | f14353;Unit::f_1f;Unit::f_57;unresolved:image |
 | units | rng.parkMiller | `VtolLandingOrder` | 1 | 1 | fixed | - |
 | units | rng.parkMiller | `VtolRepairPatrolOrder` | 2 | 1 | fixed | - |
 | units | rng.parkMiller | `VtolSeekAttackOrder` | 1 | 1 to 2 | depends-on-earlier | NewUnitScript: new UnitScript;Unit::f_1f;Unit::f_57;f14353 |
@@ -1610,25 +1670,25 @@ The rows themselves are in data/phase_dependencies.csv.
 
 ### Within-pass reads
 
-783 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+1258 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
-| units | `??1Order@@QAE@XZ` | 27 | 2 | `Order::flags_42` | 48 |
+| units | `??1Order@@QAE@XZ` | 26 | 2 | `Order::flags_42` | 47 |
 | units | `PackedGoal::TickTowardGoal` | 26 | 0 | `Unit::pos` | 13 |
 | units | `PathOrder::IsComplete` | 26 | 0 | `Unit::pos` | 13 |
-| units | `RunOrders` | 26 | 12 | `Unit::list` | 84 |
-| units | `RepairUnitOrder` | 21 | 6 | `Order::progress` | 3 |
-| units | `UnitMotion::UpdatePosition` | 19 | 7 | `Unit::flags` | 69 |
-| units | `Order::SetAttachedFx` | 18 | 0 | `Order::attached` | 11 |
+| units | `RunOrders` | 26 | 12 | `Unit::netDirtyFlags` | 74 |
+| units | `UnitMotion::UpdatePosition` | 19 | 7 | `Unit::flags` | 37 |
+| units.players | `PathOrder::IsComplete` | 19 | 0 | `PathOrder::approachRadius` | 3 |
+| units | `Order::SetAttachedFx` | 18 | 0 | `Order::attached` | 9 |
+| units | `RepairUnitOrder` | 18 | 6 | `Order::progress` | 3 |
+| units.players | `PackedGoal::TickTowardGoal` | 18 | 0 | `PatrolGoal::points` | 4 |
+| units.players | `RunOrders` | 18 | 4 | `Unit::list` | 84 |
 | units | `VtolMobileBuildOrder` | 17 | 3 | `Unit::carrier` | 5 |
-| units | `GetBuiltOrder` | 16 | 8 | `Order::state` | 51 |
-| units | `BuildingBuildOrder` | 15 | 6 | `Order::state` | 22 |
-| units | `FollowGroundOrder` | 15 | 3 | `Order::state` | 7 |
-| units | `AttackChaseOrder` | 14 | 1 | `Unit::flags` | 12 |
-| units | `AirStrikeOrder` | 13 | 1 | `Order::target` | 2 |
-| units | `AirToGroundOrder` | 13 | 1 | `Unit::pos` | 4 |
-| units | `GetFeature` | 13 | 6 | `Unit::flags` | 12 |
+| units | `BuildingBuildOrder` | 15 | 6 | `Order::state` | 20 |
+| units | `GetBuiltOrder` | 15 | 7 | `Order::state` | 51 |
+| units.players | `RepairUnitOrder` | 15 | 0 | `Order::progress` | 3 |
+| units.players | `UnitMotion::UpdatePosition` | 15 | 3 | `Unit::flags` | 66 |
 
 The 15 groups with the most rows are shown.
 
@@ -1645,6 +1705,7 @@ The 15 groups with the most rows are shown.
 | orders -> players | `Unit::pos` | units | g1 | 84 | equal | 0 | 0 |
 | orders -> players | `Unit::zFraction` | units | g1 | 84 | equal | 0 | 0 |
 | orders -> units | `Order::z` | units | g4 | 84 | equal | 0 | 0 |
+| orders -> units | `PathOrder::pos_z` | units | g5 | 84 | equal | 0 | 0 |
 | orders -> units | `Unit::metal` | units | g4 | 84 | equal | 0 | 0 |
 | orders -> weapons | `Order::kind` | projectiles | g4 | 84 | equal | 0 | 0 |
 | units -> orders | `Unit::activateFlags` | units | g3 | 84 | equal | 0 | 1688 |
@@ -1661,8 +1722,8 @@ The 15 groups with the most rows are shown.
 | class | as writer | as reader |
 |---|---|---|
 | ordered | 9 | 9 |
-| immediate | 147 | 62 |
-| deferrable | 9 | 2 |
+| immediate | 147 | 61 |
+| deferrable | 9 | 3 |
 | read-only | 0 | 96 |
 | unobserved | 311 | 152 |
 
@@ -1689,7 +1750,7 @@ The 15 groups with the most rows are shown.
 | writes to ai | `sim-event` | players | 2 | mission-kill-of-type@30 |
 | writes to map | `rng.parkMiller` | units | 2 | long-greenhaven-8p@27214 |
 
-**Immediate** (209).
+**Immediate** (208).
 
 | direction | item | phase | runs | example |
 |---|---|---|---|---|
@@ -1734,12 +1795,13 @@ The 15 groups with the most rows are shown.
 | writes to orders | `Unit::speed` | units | 51 | conditions-shore-to-shore@6 |
 | reads from orders | `Unit::heading` | units | 50 | mission-build-unit@1 |
 
-The 40 rows with the most runs are shown; the other 169 are in data/dependencies.csv.
+The 40 rows with the most runs are shown; the other 168 are in data/dependencies.csv.
 
-**Deferrable** (11).
+**Deferrable** (12).
 
 | direction | item | phase | runs | example |
 |---|---|---|---|---|
+| reads from orders | `PathOrder::pos_z` | units | 7 | orders-air-fights@185 |
 | writes to orders | `Unit::killCount` | units | 4 | mission-capture@236 |
 | reads from orders | `Order::z` | units | 3 | long-greenhaven-8p@15931 |
 | reads from orders | `Unit::metal` | units | 2 | long-greenhaven-8p@35612 |
@@ -1799,20 +1861,19 @@ Cannot be cut from, with the edge of the most runs:
 |---|---|---|---|---|
 | features -> units | 0 | 0 | 1 | 2 |
 | players -> features | 3 | 0 | 0 | 0 |
-| players -> presentation | 2 | 0 | 0 | 0 |
+| players -> presentation | 1 | 0 | 0 | 0 |
 | players -> projectiles | 0 | 0 | 4 | 3 |
 | players -> units | 0 | 0 | 10 | 13 |
 | presentation -> units | 0 | 0 | 2 | 2 |
 | projectiles -> features | 0 | 1 | 0 | 0 |
 | projectiles -> players | 1 | 1 | 0 | 0 |
-| projectiles -> presentation | 3 | 0 | 0 | 0 |
-| projectiles -> units | 0 | 0 | 3 | 10 |
+| projectiles -> units | 0 | 0 | 3 | 9 |
 | units -> features | 15 | 5 | 0 | 0 |
 | units -> players | 79 | 5 | 0 | 0 |
-| units -> presentation | 44 | 6 | 0 | 0 |
-| units -> projectiles | 37 | 10 | 0 | 0 |
+| units -> presentation | 12 | 6 | 0 | 0 |
+| units -> projectiles | 40 | 10 | 0 | 0 |
 | units -> tail | 1 | 2 | 0 | 0 |
-| units -> units | 0 | 0 | 113 | 35 |
+| units -> units | 0 | 0 | 113 | 33 |
 | wind -> units | 0 | 0 | 0 | 3 |
 
 The rows themselves are in data/phase_dependencies.csv.
@@ -1821,30 +1882,30 @@ The rows themselves are in data/phase_dependencies.csv.
 
 | pass | stream | function | entities | draws | start_state | evidence |
 |---|---|---|---|---|---|---|
-| units | rng.parkMiller | `CobScript::RunThread` | 10 | 1 to 2 | depends-on-earlier | Unit::f_1f;f14353;NewUnitScript: new UnitScript;Unit::f_57 |
-| units | rng.parkMiller | `InitUnitFromType` | 3 | 1 to 2 | depends-on-earlier | Unit::f_1f;f14353;NewUnitScript: new UnitScript;Unit::f_57 |
+| units | rng.parkMiller | `CobScript::RunThread` | 10 | 1 to 2 | depends-on-earlier | f14353;Unit::f_1f;NewUnitScript: new UnitScript;Unit::f_57 |
+| units | rng.parkMiller | `InitUnitFromType` | 3 | 1 to 2 | depends-on-earlier | Unit::f_1f;f14353;Unit::f_57;NewUnitScript: new UnitScript |
 
 ### Within-pass reads
 
-433 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+717 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
-| units | `UpdateAllUnits` | 24 | 14 | `Unit::healthPercent` | 84 |
-| units | `ApplyUnitDeath` | 20 | 10 | `Unit::script` | 20 |
-| units | `KillUnit` | 16 | 8 | `Unit::def` | 20 |
-| units | `UnitScript::EmitSfx` | 16 | 3 | `ModelState::owner` | 14 |
-| units | `GetPieceOffset` | 15 | 2 | `ModelState::pieces` | 49 |
+| units | `UpdateAllUnits` | 24 | 14 | `Unit::healthPercent` | 74 |
+| units | `ApplyUnitDeath` | 20 | 10 | `Unit::flags` | 16 |
+| units.players | `UpdateAllUnits` | 18 | 8 | `Unit::healthPercent` | 84 |
+| units | `KillUnit` | 16 | 8 | `Unit::flags` | 16 |
 | units | `AlignUnitToGround` | 14 | 6 | `LoadTntMap: operator new int #2` | 19 |
-| units | `UnitScript::SetPieceRotation` | 14 | 4 | `ModelState::pieces` | 57 |
-| units | `UnitScript::GetPieceRotation` | 13 | 3 | `ModelState::pieces` | 58 |
-| units | `CobScript::AnimatePieces` | 12 | 4 | `Piece::active` | 64 |
+| units | `GetPieceOffset` | 14 | 1 | `Unit::state` | 32 |
+| units.players | `ApplyUnitDeath` | 14 | 5 | `Unit::script` | 11 |
+| units.players | `GetPieceOffset` | 14 | 1 | `Unit::heading` | 43 |
+| units | `UnitScript::EmitSfx` | 13 | 0 | `ModelState::owner` | 13 |
+| units.players | `UnitScript::EmitSfx` | 13 | 3 | `ModelState::owner` | 8 |
+| units | `CobScript::AnimatePieces` | 12 | 4 | `Piece::active` | 60 |
 | units | `GetPieceAngles` | 12 | 3 | `Unit::field_64` | 25 |
-| units | `GetSweetSpot` | 12 | 4 | `ModelState::root` | 19 |
-| units | `UnitScript::GetUnitValue` | 12 | 6 | `ModelState::owner` | 58 |
-| units | `AddBuildProgress` | 11 | 5 | `Unit::flags` | 42 |
-| units | `ApplyAttachUnit` | 11 | 4 | `UnitMotion::flags` | 9 |
-| units | `UnitScript::GetPieceTranslation` | 11 | 1 | `ModelState::animDirty` | 45 |
+| units | `UnitScript::GetUnitValue` | 12 | 6 | `ModelState::owner` | 57 |
+| units | `UnitScript::SetPieceRotation` | 12 | 2 | `ModelState::bitmap` | 51 |
+| units.players | `GetSweetSpot` | 12 | 4 | `ModelState::root` | 19 |
 
 The 15 groups with the most rows are shown.
 
@@ -1853,6 +1914,7 @@ The 15 groups with the most rows are shown.
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
 | orders -> units | `Order::z` | units | g4 | 84 | equal | 0 | 0 |
+| orders -> units | `PathOrder::pos_z` | units | g5 | 84 | equal | 0 | 0 |
 | orders -> units | `Unit::metal` | units | g4 | 84 | equal | 0 | 0 |
 | units -> ai | `Unit::activateFlags` | units | g1 | 84 | equal | 0 | 0 |
 | units -> features | `FeatureAnimEntry::bytes_10` | units | g1 | 84 | equal | 0 | 0 |
@@ -1977,12 +2039,11 @@ Cannot be cut from, with the edge of the most runs:
 
 | phase pair | immediate as writer | immediate as reader | carried as writer | carried as reader |
 |---|---|---|---|---|
-| players -> presentation | 3 | 0 | 0 | 0 |
-| players -> projectiles | 0 | 0 | 4 | 0 |
+| players -> presentation | 1 | 0 | 0 | 0 |
+| players -> projectiles | 0 | 0 | 6 | 0 |
 | players -> tail | 0 | 1 | 0 | 0 |
 | players -> units | 0 | 0 | 17 | 1 |
 | projectiles -> players | 0 | 1 | 0 | 0 |
-| tail -> presentation | 1 | 0 | 0 | 0 |
 | units -> players | 0 | 15 | 0 | 0 |
 | units -> tail | 0 | 1 | 0 | 0 |
 | units -> units | 0 | 0 | 1 | 8 |
@@ -1995,25 +2056,25 @@ No draws.
 
 ### Within-pass reads
 
-43 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+45 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
 | players | `UpdatePlayersOnStream` | 6 | 5 | `unknown_1b8e` | 84 |
-| units | `MissionConditions::NotifyUnitDied` | 6 | 4 | `MissionConditions::RegisterConditions: new VictoryCaptureUnitType` | 2 |
 | units | `VictoryKillAllOfType::OnUnitDied` | 6 | 3 | `MissionConditions::RegisterConditions: new VictoryCaptureUnitType` | 2 |
-| units | `DefeatAllUnitsKilledOfType::OnUnitDied` | 4 | 2 | `Unit::def` | 4 |
+| units | `MissionConditions::NotifyUnitDied` | 4 | 2 | `MissionConditions::RegisterConditions: new VictoryCaptureUnitType` | 2 |
 | units | `VictoryKillAllMobileUnits::OnUnitDied` | 4 | 2 | `Unit::motion` | 1 |
+| units.players | `DefeatAllUnitsKilledOfType::OnUnitDied` | 4 | 2 | `Unit::def` | 2 |
 | players | `CountCombatPlayers` | 2 | 2 | `unknown_1b8e` | 1 |
-| units | `DefeatAllUnitsKilledOfType::VisitUnit` | 2 | 1 | `Unit::unitDefIndex` | 1 |
 | units | `VictoryKillUnitType::OnUnitDied` | 2 | 1 | `Unit::def` | 1 |
+| units.players | `DefeatAllUnitsKilledOfType::VisitUnit` | 2 | 1 | `Unit::unitDefIndex` | 1 |
+| units.players | `MissionConditions::NotifyUnitDied` | 2 | 2 | `MissionConditions::RegisterConditions: new DefeatAllUnitsKilled #2` | 1 |
 | players | `GetEnergyIncome` | 1 | 1 | `pad_1df4` | 15 |
 | players | `GetMetalIncome` | 1 | 1 | `pad_1df4` | 15 |
 | players | `GetNetEnergy` | 1 | 1 | `pad_1df4` | 15 |
 | players | `GetNetMetal` | 1 | 1 | `pad_1df4` | 15 |
 | players | `IsLocalPlayerOutOfUnits` | 1 | 1 | `unknown_1b8e` | 5 |
 | tail | `UpdateBlink` | 1 | 1 | `bits_142f1` | 17 |
-| units | `DefeatUnitTypeKilled::OnUnitDied` | 1 | 0 | `Unit::def` | 2 |
 
 The 15 groups with the most rows are shown.
 
@@ -2156,7 +2217,6 @@ Cannot be cut from, with the edge of the most runs:
 | units -> explosions | 0 | 2 | 0 | 0 |
 | units -> features | 3 | 2 | 0 | 0 |
 | units -> players | 5 | 8 | 0 | 0 |
-| units -> presentation | 3 | 0 | 0 | 0 |
 | units -> projectiles | 4 | 1 | 0 | 0 |
 | units -> tail | 1 | 0 | 0 | 0 |
 | units -> units | 0 | 0 | 6 | 22 |
@@ -2167,29 +2227,29 @@ The rows themselves are in data/phase_dependencies.csv.
 
 | pass | stream | function | entities | draws | start_state | evidence |
 |---|---|---|---|---|---|---|
-| units | rng.parkMiller | `PickRandomReclaimableResourcesInRadius` | 2 | 3 to 6 | depends-on-earlier | NewUnitScript: new UnitScript;Unit::f_1f;f14353;Unit::f_57 |
+| units | rng.parkMiller | `PickRandomReclaimableResourcesInRadius` | 2 | 3 to 6 | depends-on-earlier | Unit::f_1f;f14353;unresolved:image;Unit::f_57 |
 
 ### Within-pass reads
 
-90 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+163 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
-| units | `ClaimFootprintCells` | 12 | 8 | `Unit::cell` | 11 |
-| units | `ClaimFootprintsInArea` | 10 | 5 | `Rec::field_6` | 10 |
+| units.players | `ClaimFootprintCells` | 11 | 7 | `Unit::cell` | 7 |
+| units | `ClaimFootprintsInArea` | 10 | 5 | `Rec::field_6` | 9 |
+| units | `ClaimFootprintCells` | 9 | 5 | `Unit::cell` | 9 |
+| units.players | `ClaimFootprintsInArea` | 9 | 4 | `Rec::field_6` | 5 |
 | units | `VisitObjectsInRange` | 8 | 4 | `Unit::pos` | 5 |
-| units | `ClearFootprintAndUnlink` | 7 | 3 | `Unit::cargoNext` | 21 |
-| units | `RemoveUnitFromMap` | 7 | 2 | `Unit::flags` | 58 |
-| units | `AddUnitToMap` | 6 | 4 | `LoadTntMap: operator new int #2` | 21 |
-| units | `CanPlaceFootprintAt` | 6 | 2 | `Unit::pos` | 7 |
-| units | `RefreshPassMapsForUnit` | 6 | 1 | `UnitMotion::pathLockStamp` | 47 |
-| units | `SetOwner` | 6 | 2 | `Unit::spatialBucket` | 38 |
-| units | `GetPassMapFootprintValue` | 4 | 2 | `UnitMotion::pathLockStamp` | 21 |
-| units | `IsFootprintClear` | 4 | 1 | `LoadTntMap: operator new int #2` | 10 |
-| units | `SetYardOpen` | 4 | 0 | `Unit::flags` | 19 |
-| units | `PickRandomReclaimableResourcesInRadius` | 2 | 0 | `Unit::pos` | 7 |
-| features | `RefreshAllPassMaps` | 1 | 0 | `BuildAllPassMaps: operator new unsigned int` | 10 |
-| projectiles | `RefreshAllPassMaps` | 1 | 0 | `BuildAllPassMaps: operator new unsigned int` | 1 |
+| units | `RemoveUnitFromMap` | 7 | 2 | `LoadTntMap: operator new int #2` | 32 |
+| units.players | `RemoveUnitFromMap` | 7 | 2 | `Unit::flags` | 50 |
+| units | `AddUnitToMap` | 6 | 4 | `LoadTntMap: operator new int #2` | 11 |
+| units | `ClearFootprintAndUnlink` | 6 | 2 | `Rec::field_6` | 16 |
+| units | `RefreshPassMapsForUnit` | 6 | 1 | `UnitMotion::pathLockStamp` | 27 |
+| units | `SetOwner` | 6 | 2 | `Unit::spatialBucket` | 20 |
+| units.players | `CanPlaceFootprintAt` | 6 | 2 | `LoadTntMap: operator new int #2` | 3 |
+| units.players | `ClearFootprintAndUnlink` | 6 | 2 | `Unit::cargoNext` | 12 |
+| units.players | `RefreshPassMapsForUnit` | 6 | 1 | `UnitMotion::pathLockStamp` | 39 |
+| units.players | `VisitObjectsInRange` | 6 | 2 | `Rec::field_6` | 3 |
 
 The 15 groups with the most rows are shown.
 

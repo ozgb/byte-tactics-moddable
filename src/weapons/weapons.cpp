@@ -1512,6 +1512,10 @@ int __stdcall CalcAimAngles(Unit* unit, WeaponDef* target,
 int __stdcall WeaponCanReachPos(Unit* unit, Vec3* a2, Vec3* a3,
                            unsigned char a4);
 
+#ifndef BT_REPLAY_INJECT_RELOAD_BASE
+#define BT_REPLAY_INJECT_RELOAD_BASE 120
+#endif
+
 // FUNCTION: 0x49e1a0
 void __stdcall UpdateUnitWeapons(Unit* unit) {
     unsigned short heading;
@@ -1599,7 +1603,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                     n = 5;
                 int q = unit->health * 20 / unit->def->maxHealth;
                 int pct = 100 - n * 6;
-                e->reloadTimer = (short)((120 - q) * (pct * attached->reloadTime / 100) / 100);
+                e->reloadTimer = (short)((BT_REPLAY_INJECT_RELOAD_BASE - q) * (pct * attached->reloadTime / 100) / 100);
             }
             int m = (attached->flags.b.commandFire) ? 0x800 : 0x400;
             *(unsigned short*)&unit->netDirtyFlags |= m;

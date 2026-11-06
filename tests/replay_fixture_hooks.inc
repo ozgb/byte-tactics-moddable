@@ -192,12 +192,12 @@ int __stdcall RecFixtureStrike(WeaponDef* a0)
     roots.Add(ROK_WEAPONDEF, a0);
     SlotScope scope(RSL_FIXTURE_STRIKE, SUB_FIXTURE, roots);
     if (scope.Open()) {
-        ArgWeapon(s_call, "weapon", a0);
+        ArgObject(s_call, "weapon", ROK_WEAPONDEF, a0);
     }
     ReplayText line;
     if (scope.Import()) {
         line.Add("  i fixture.Strike");
-        ImportWeapon(line, a0);
+        ImportObject(line, ROK_WEAPONDEF, a0);
     }
     int result = s_inner_fixture->Strike(a0);
     if (scope.Import()) {

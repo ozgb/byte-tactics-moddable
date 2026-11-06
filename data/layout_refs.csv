@@ -88,8 +88,8 @@ OpenSkirmishMenu,0x47bbb0,src/frontend/skirmish_menu.cpp,end-of,g_mediumGadgetNa
 OpenSkirmishMenu,0x47bbb0,src/frontend/skirmish_menu.cpp,end-of,g_skirmishGuiName,0,g_skirmishSetupPictureName,,none
 InitSound,0x47ed40,src/sound/sound.cpp,end-of,g_noDirectSoundKey,0,g_useWindowsSoundKey,,none
 InitSound,0x47ed40,src/sound/sound.cpp,end-of,g_useWindowsSoundKey,0,g_soundInitError,,none
-ApplyUnitDamage,0x489ce0,src/units/unit_targets.cpp,end-of,s_HitByWeapon_00508d74,0,s_TakeDamage_00508d68,,none
-ApplyUnitDamage,0x489ce0,src/units/unit_targets.cpp,end-of,s_paralyze_00508d80,0,s_HitByWeapon_00508d74,,none
+ApplyUnitDamage,0x489ce0,src/units/unit_targets.cpp,end-of,g_hitByWeaponScriptName,0,g_takeDamageScriptName,,
+ApplyUnitDamage,0x489ce0,src/units/unit_targets.cpp,end-of,g_paralyzeMissionName,0,g_hitByWeaponScriptName,,
 VictoryKillEnemyCommander::SaveState,0x48eac0,src/game/victory.cpp,end-of,g_killEnemyCommanderKey,0,g_satisfiedKey,,none
 VictoryKillEnemyCommander::SaveState,0x48eac0,src/game/victory.cpp,end-of,g_satisfiedKey,0,g_celebratedKey,,none
 VictoryKillEnemyCommander::LoadState,0x48eb00,src/game/victory.cpp,end-of,g_killEnemyCommanderKey,0,g_satisfiedKey,,none

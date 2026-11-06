@@ -1313,7 +1313,7 @@ void ReplayObjectFieldKey(ReplayText& key, ReplayObjectTable& table, bool assign
 
 namespace {
 
-enum { MAX_WALK_FIELDS = 64, MAX_DEFERRED = 512 };
+enum { MAX_WALK_FIELDS = 128, MAX_DEFERRED = 512 };
 
 bool Walkable(const ReplayObjectField& f)
 {

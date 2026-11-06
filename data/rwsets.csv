@@ -28073,9 +28073,9 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_write,Unit::lastAttackerSlot
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_write,Unit::lastDamageType
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,function,
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_escape,s_paralyze_00508d80
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_maybe_written,s_HitByWeapon_00508d74
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_maybe_written,s_TakeDamage_00508d68
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_escape,g_paralyzeMissionName
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_maybe_written,g_hitByWeaponScriptName
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_maybe_written,g_takeDamageScriptName
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_read,g_game
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,global_read,g_seams
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,indirect via MissionType (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
@@ -47870,27 +47870,14 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateAllUnits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateObjectState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateSfxOccupy
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::AllocWeaponArray
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::ApplyAreaDamageAt
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::ClaimWeapons
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::CobScriptExplodePiece
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::DamageUnit
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::DetonateUnitWeapon
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindFeatureAtPos
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindTargetableProjectile
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindWeaponByName
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FreeExplosions
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FreeWeaponArray
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FreeWeaponTypes
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::GetWeaponRange
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::InitExplosions
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::InitUnitWeaponSlots
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::LoadWeaponTypes
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::ReleaseWeapons
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::RemoveUnitProjectiles
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::SpawnProjectile
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::UpdateExplosions
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::UpdateProjectiles
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::UpdateUnitWeapons
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::WeaponAimCobComplete
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::WeaponCanReachPos
@@ -48211,27 +48198,14 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateAllUnits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateObjectState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateSfxOccupy
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsAllocWeaponArray
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsApplyAreaDamageAt
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsClaimWeapons
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsCobScriptExplodePiece
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsDamageUnit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsDetonateUnitWeapon
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindFeatureAtPos
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindTargetableProjectile
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindWeaponByName
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFreeExplosions
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFreeWeaponArray
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFreeWeaponTypes
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsGetWeaponRange
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsInitExplosions
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsInitUnitWeaponSlots
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsLoadWeaponTypes
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsReleaseWeapons
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsRemoveUnitProjectiles
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsSpawnProjectile
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsUpdateExplosions
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsUpdateProjectiles
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsUpdateUnitWeapons
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsWeaponAimCobComplete
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsWeaponCanReachPos
@@ -52216,6 +52190,11 @@ address,function,file,kind,target
 ,RecAiReactToAttack,src/harness/replay_hooks.inc,call,Add
 ,RecAiReactToAttack,src/harness/replay_hooks.inc,call,ArgObject
 ,RecAiReactToAttack,src/harness/replay_hooks.inc,call,ArgValue
+,RecAiReactToAttack,src/harness/replay_hooks.inc,call,FinishImport
+,RecAiReactToAttack,src/harness/replay_hooks.inc,call,ImportObject
+,RecAiReactToAttack,src/harness/replay_hooks.inc,call,ImportValue
+,RecAiReactToAttack,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecAiReactToAttack,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecAiReactToAttack,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiReactToAttack,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecAiReactToAttack,src/harness/replay_hooks.inc,field_read,AiSeam::ReactToAttack
@@ -52358,6 +52337,12 @@ address,function,file,kind,target
 ,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,Add
 ,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,ArgObject
 ,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,ArgValue
+,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,FinishImport
+,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,ImportObject
+,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,ImportResult
+,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,ImportValue
+,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecEconomySpendEnergyAndMetal,src/harness/replay_hooks.inc,field_read,EconomySeam::SpendEnergyAndMetal
@@ -52407,7 +52392,6 @@ address,function,file,kind,target
 ,RecFeaturesDamageFeature,src/harness/replay_hooks.inc,call,Add
 ,RecFeaturesDamageFeature,src/harness/replay_hooks.inc,call,ArgObject
 ,RecFeaturesDamageFeature,src/harness/replay_hooks.inc,call,ArgValue
-,RecFeaturesDamageFeature,src/harness/replay_hooks.inc,call,ArgWeapon
 ,RecFeaturesDamageFeature,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecFeaturesDamageFeature,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecFeaturesDamageFeature,src/harness/replay_hooks.inc,field_read,FeaturesSeam::DamageFeature
@@ -53282,10 +53266,11 @@ address,function,file,kind,target
 ,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RevealNewUnit]
-,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ArgValue
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,FinishImport
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ImportResult
+,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ImportVec3
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ReplayText::Add
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -53532,8 +53517,8 @@ address,function,file,kind,target
 ,RecNetworkSendFeatureBurning,src/harness/replay_hooks.inc,global_read,s_inner_network
 ,RecNetworkSendFeatureBurning,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, int) __attribute__((stdcall)) [NetworkSeam::SendFeatureBurning]"
 ,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,call,Add
+,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,call,ArgValue
-,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,call,ArgWeapon
 ,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecNetworkSendFeatureHit,src/harness/replay_hooks.inc,field_read,NetworkSeam::SendFeatureHit
@@ -53600,6 +53585,12 @@ address,function,file,kind,target
 ,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,Add
 ,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,ArgObject
 ,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,ArgValue
+,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,FinishImport
+,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,ImportObject
+,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,ImportResult
+,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,ImportValue
+,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecNetworkSendScriptCallByName,src/harness/replay_hooks.inc,field_read,NetworkSeam::SendScriptCallByName
@@ -53639,6 +53630,11 @@ address,function,file,kind,target
 ,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,call,Add
 ,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,call,ArgObject
 ,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,call,ArgValue
+,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,call,FinishImport
+,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,call,ImportObject
+,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,call,ImportValue
+,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecNetworkSendUnitDamage,src/harness/replay_hooks.inc,field_read,NetworkSeam::SendUnitDamage
@@ -53668,6 +53664,11 @@ address,function,file,kind,target
 ,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,call,Add
 ,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,call,ArgObject
 ,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,call,ArgPending
+,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,call,FinishImport
+,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,call,ImportObject
+,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,call,ImportPending
+,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecNetworkSendWeaponFire,src/harness/replay_hooks.inc,field_read,NetworkSeam::SendWeaponFire
@@ -53715,6 +53716,10 @@ address,function,file,kind,target
 ,RecOrdersAiSearchGoalSetWaypoints,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(AiSearchGoal *, Point16 *, int) __attribute__((stdcall)) [OrdersSeam::AiSearchGoalSetWaypoints]"
 ,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,ArgObject
+,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,FinishImport
+,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,ImportObject
+,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersAppendOrder,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecOrdersAppendOrder,src/harness/replay_hooks.inc,field_read,OrdersSeam::AppendOrder
@@ -53816,17 +53821,33 @@ address,function,file,kind,target
 ,RecOrdersLoadOrder,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersLoadOrder,src/harness/replay_hooks.inc,indirect_call,"indirect via Order *(*const)(Unit *, HapiBank *, char *) __attribute__((stdcall)) [OrdersSeam::LoadOrder]"
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,ArgValue
+,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,FinishImport
+,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,ImportResultValue
+,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,ImportValue
+,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,field_read,OrdersSeam::MissionTypeFromName
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,function,
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,global_read,s_inner_orders
+,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,indirect_call,indirect via MissionType (*const)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,ArgPending
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,ArgValue
+,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,FinishImport
+,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,ImportObject
+,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,ImportPending
+,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,ImportResultObject
+,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,ImportValue
+,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,ImportValueStruct
+,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecOrdersNewOrder,src/harness/replay_hooks.inc,field_read,OrdersSeam::NewOrder
@@ -54315,6 +54336,13 @@ address,function,file,kind,target
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ArgObject
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ArgValue
+,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,FinishImport
+,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ImportObject
+,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ImportOutVec3
+,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ImportResult
+,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ImportValue
+,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,field_read,TargetingSeam::GetWeaponTargetPos
@@ -54326,6 +54354,12 @@ address,function,file,kind,target
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,Add
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ArgValue
+,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,FinishImport
+,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ImportObject
+,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ImportResultObject
+,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ImportValue
+,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,field_read,TargetingSeam::GetWeaponTargetUnit
@@ -54568,8 +54602,13 @@ address,function,file,kind,target
 ,RecUnitsFreeUnitTypes,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::FreeUnitTypes]
 ,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,ArgPending
 ,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,ImportOutVec3
+,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,ImportValue
+,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsGetAimFromPosition,src/harness/replay_hooks.inc,field_read,UnitsSeam::GetAimFromPosition
@@ -54615,6 +54654,13 @@ address,function,file,kind,target
 ,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,ImportResultValue
+,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,ImportValue
+,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsGetPieceOffset,src/harness/replay_hooks.inc,field_read,UnitsSeam::GetPieceOffset
@@ -54711,6 +54757,10 @@ address,function,file,kind,target
 ,RecUnitsLoadUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [UnitsSeam::LoadUnits]
 ,RecUnitsMarkRecentlyDamaged,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsMarkRecentlyDamaged,src/harness/replay_hooks.inc,call,ArgObject
+,RecUnitsMarkRecentlyDamaged,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsMarkRecentlyDamaged,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsMarkRecentlyDamaged,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsMarkRecentlyDamaged,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsMarkRecentlyDamaged,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsMarkRecentlyDamaged,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsMarkRecentlyDamaged,src/harness/replay_hooks.inc,field_read,UnitsSeam::MarkRecentlyDamaged
@@ -54764,6 +54814,14 @@ address,function,file,kind,target
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ArgInOutScalarExit
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ImportInOutScalar
+,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ImportOutInOutScalar
+,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ImportResult
+,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ImportValue
+,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsQueryScript,src/harness/replay_hooks.inc,field_read,UnitsSeam::QueryScript
@@ -54842,6 +54900,13 @@ address,function,file,kind,target
 ,RecUnitsStartScript,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsStartScript,src/harness/replay_hooks.inc,call,ArgPending
 ,RecUnitsStartScript,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsStartScript,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsStartScript,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsStartScript,src/harness/replay_hooks.inc,call,ImportPending
+,RecUnitsStartScript,src/harness/replay_hooks.inc,call,ImportResult
+,RecUnitsStartScript,src/harness/replay_hooks.inc,call,ImportValue
+,RecUnitsStartScript,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsStartScript,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsStartScript,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsStartScript,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsStartScript,src/harness/replay_hooks.inc,field_read,UnitsSeam::StartScript
@@ -54922,22 +54987,6 @@ address,function,file,kind,target
 ,RecUnitsUpdateSfxOccupy,src/harness/replay_hooks.inc,global_read,s_call
 ,RecUnitsUpdateSfxOccupy,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsUpdateSfxOccupy,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitMotion *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::UpdateSfxOccupy]"
-,RecWeaponsAllocWeaponArray,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsAllocWeaponArray,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsAllocWeaponArray,src/harness/replay_hooks.inc,field_read,WeaponsSeam::AllocWeaponArray
-,RecWeaponsAllocWeaponArray,src/harness/replay_hooks.inc,function,
-,RecWeaponsAllocWeaponArray,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsAllocWeaponArray,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WeaponsSeam::AllocWeaponArray]
-,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,call,Add
-,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,call,ArgPending
-,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,call,ArgWeapon
-,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,field_read,WeaponsSeam::ApplyAreaDamageAt
-,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,function,
-,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,global_read,s_call
-,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsApplyAreaDamageAt,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(WeaponDef *, Vec3 *) __attribute__((stdcall)) [WeaponsSeam::ApplyAreaDamageAt]"
 ,RecWeaponsClaimWeapons,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsClaimWeapons,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsClaimWeapons,src/harness/replay_hooks.inc,call,ArgValue
@@ -54948,16 +54997,6 @@ address,function,file,kind,target
 ,RecWeaponsClaimWeapons,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWeaponsClaimWeapons,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsClaimWeapons,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
-,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,call,Add
-,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,call,ArgObject
-,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,call,ArgValue
-,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,field_read,WeaponsSeam::CobScriptExplodePiece
-,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,function,
-,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,global_read,s_call
-,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsCobScriptExplodePiece,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(CobScript *, int, unsigned int) __attribute__((stdcall)) [WeaponsSeam::CobScriptExplodePiece]"
 ,RecWeaponsDamageUnit,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsDamageUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsDamageUnit,src/harness/replay_hooks.inc,call,ArgValue
@@ -54968,26 +55007,6 @@ address,function,file,kind,target
 ,RecWeaponsDamageUnit,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWeaponsDamageUnit,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsDamageUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, Unit *, int, int, unsigned short) __attribute__((stdcall)) [WeaponsSeam::DamageUnit]"
-,RecWeaponsDetonateUnitWeapon,src/harness/replay_hooks.inc,call,Add
-,RecWeaponsDetonateUnitWeapon,src/harness/replay_hooks.inc,call,ArgObject
-,RecWeaponsDetonateUnitWeapon,src/harness/replay_hooks.inc,call,ArgValue
-,RecWeaponsDetonateUnitWeapon,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsDetonateUnitWeapon,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsDetonateUnitWeapon,src/harness/replay_hooks.inc,field_read,WeaponsSeam::DetonateUnitWeapon
-,RecWeaponsDetonateUnitWeapon,src/harness/replay_hooks.inc,function,
-,RecWeaponsDetonateUnitWeapon,src/harness/replay_hooks.inc,global_read,s_call
-,RecWeaponsDetonateUnitWeapon,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsDetonateUnitWeapon,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int) __attribute__((stdcall)) [WeaponsSeam::DetonateUnitWeapon]"
-,RecWeaponsFindFeatureAtPos,src/harness/replay_hooks.inc,call,ArgPending
-,RecWeaponsFindFeatureAtPos,src/harness/replay_hooks.inc,call,ArgValue
-,RecWeaponsFindFeatureAtPos,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsFindFeatureAtPos,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsFindFeatureAtPos,src/harness/replay_hooks.inc,field_read,WeaponsSeam::FindFeatureAtPos
-,RecWeaponsFindFeatureAtPos,src/harness/replay_hooks.inc,function,
-,RecWeaponsFindFeatureAtPos,src/harness/replay_hooks.inc,global_read,s_call
-,RecWeaponsFindFeatureAtPos,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsFindFeatureAtPos,src/harness/replay_hooks.inc,global_read,s_tail
-,RecWeaponsFindFeatureAtPos,src/harness/replay_hooks.inc,indirect_call,"indirect via unsigned short (*const)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ArgValue
@@ -55012,24 +55031,6 @@ address,function,file,kind,target
 ,RecWeaponsFindWeaponByName,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWeaponsFindWeaponByName,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsFindWeaponByName,src/harness/replay_hooks.inc,indirect_call,indirect via WeaponDef *(*const)(char *) __attribute__((stdcall)) [WeaponsSeam::FindWeaponByName]
-,RecWeaponsFreeExplosions,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsFreeExplosions,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsFreeExplosions,src/harness/replay_hooks.inc,field_read,WeaponsSeam::FreeExplosions
-,RecWeaponsFreeExplosions,src/harness/replay_hooks.inc,function,
-,RecWeaponsFreeExplosions,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsFreeExplosions,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WeaponsSeam::FreeExplosions]
-,RecWeaponsFreeWeaponArray,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsFreeWeaponArray,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsFreeWeaponArray,src/harness/replay_hooks.inc,field_read,WeaponsSeam::FreeWeaponArray
-,RecWeaponsFreeWeaponArray,src/harness/replay_hooks.inc,function,
-,RecWeaponsFreeWeaponArray,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsFreeWeaponArray,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WeaponsSeam::FreeWeaponArray]
-,RecWeaponsFreeWeaponTypes,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsFreeWeaponTypes,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsFreeWeaponTypes,src/harness/replay_hooks.inc,field_read,WeaponsSeam::FreeWeaponTypes
-,RecWeaponsFreeWeaponTypes,src/harness/replay_hooks.inc,function,
-,RecWeaponsFreeWeaponTypes,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsFreeWeaponTypes,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WeaponsSeam::FreeWeaponTypes]
 ,RecWeaponsGetWeaponRange,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsGetWeaponRange,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsGetWeaponRange,src/harness/replay_hooks.inc,call,ArgValue
@@ -55047,12 +55048,6 @@ address,function,file,kind,target
 ,RecWeaponsGetWeaponRange,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsGetWeaponRange,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecWeaponsGetWeaponRange,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, unsigned int) __attribute__((stdcall)) [WeaponsSeam::GetWeaponRange]"
-,RecWeaponsInitExplosions,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsInitExplosions,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsInitExplosions,src/harness/replay_hooks.inc,field_read,WeaponsSeam::InitExplosions
-,RecWeaponsInitExplosions,src/harness/replay_hooks.inc,function,
-,RecWeaponsInitExplosions,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsInitExplosions,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WeaponsSeam::InitExplosions]
 ,RecWeaponsInitUnitWeaponSlots,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsInitUnitWeaponSlots,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsInitUnitWeaponSlots,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55062,12 +55057,6 @@ address,function,file,kind,target
 ,RecWeaponsInitUnitWeaponSlots,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWeaponsInitUnitWeaponSlots,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsInitUnitWeaponSlots,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [WeaponsSeam::InitUnitWeaponSlots]
-,RecWeaponsLoadWeaponTypes,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsLoadWeaponTypes,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsLoadWeaponTypes,src/harness/replay_hooks.inc,field_read,WeaponsSeam::LoadWeaponTypes
-,RecWeaponsLoadWeaponTypes,src/harness/replay_hooks.inc,function,
-,RecWeaponsLoadWeaponTypes,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsLoadWeaponTypes,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WeaponsSeam::LoadWeaponTypes]
 ,RecWeaponsReleaseWeapons,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsReleaseWeapons,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsReleaseWeapons,src/harness/replay_hooks.inc,call,ArgValue
@@ -55078,15 +55067,6 @@ address,function,file,kind,target
 ,RecWeaponsReleaseWeapons,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWeaponsReleaseWeapons,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsReleaseWeapons,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
-,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,call,Add
-,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,call,ArgObject
-,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,field_read,WeaponsSeam::RemoveUnitProjectiles
-,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,function,
-,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,global_read,s_call
-,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsRemoveUnitProjectiles,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [WeaponsSeam::RemoveUnitProjectiles]
 ,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ArgValue
 ,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ArgVec3
@@ -55106,18 +55086,6 @@ address,function,file,kind,target
 ,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(WeaponDef *, Vec3 *, Vec3 *, int) __attribute__((stdcall)) [WeaponsSeam::SpawnProjectile]"
-,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,field_read,WeaponsSeam::UpdateExplosions
-,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,function,
-,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WeaponsSeam::UpdateExplosions]
-,RecWeaponsUpdateProjectiles,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsUpdateProjectiles,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsUpdateProjectiles,src/harness/replay_hooks.inc,field_read,WeaponsSeam::UpdateProjectiles
-,RecWeaponsUpdateProjectiles,src/harness/replay_hooks.inc,function,
-,RecWeaponsUpdateProjectiles,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsUpdateProjectiles,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WeaponsSeam::UpdateProjectiles]
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55127,7 +55095,8 @@ address,function,file,kind,target
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [WeaponsSeam::UpdateUnitWeapons]
-,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,call,ArgPending
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,call,Add
+,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,call,ArgValue
 ,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -55138,7 +55107,7 @@ address,function,file,kind,target
 ,RecWeaponsWeaponAimCobComplete,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Callback *, int) __attribute__((stdcall)) [WeaponsSeam::WeaponAimCobComplete]"
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ArgObject
-,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ArgPending
+,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ArgValue
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -56645,6 +56614,7 @@ address,function,file,kind,target
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_approachRadiusVtable
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_pathOrderVtable
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_ringApproachVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_weaponAimCobVtable
 ,ReplayVtableName,src/harness/replay_vtables.cpp,function,
 ,ReplayWalk,src/harness/replay_objects.cpp,call,BlockAt
 ,ReplayWalk,src/harness/replay_objects.cpp,call,Expand

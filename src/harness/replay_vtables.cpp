@@ -5,6 +5,7 @@
 extern void (* const g_approachRadiusVtable[])();
 extern void (* const g_ringApproachVtable[])();
 extern void (* const g_pathOrderVtable[])();
+extern void (* const g_weaponAimCobVtable[])();
 
 const void* ReplayVtable(unsigned kind)
 {
@@ -15,6 +16,8 @@ const void* ReplayVtable(unsigned kind)
         return g_ringApproachVtable;
     case ROK_PATHORDER:
         return g_pathOrderVtable;
+    case ROK_WEAPONAIMCOBCB:
+        return g_weaponAimCobVtable;
     default:
         return nullptr;
     }
@@ -29,6 +32,8 @@ const char* ReplayVtableName(unsigned kind)
         return "g_ringApproachVtable";
     case ROK_PATHORDER:
         return "g_pathOrderVtable";
+    case ROK_WEAPONAIMCOBCB:
+        return "g_weaponAimCobVtable";
     default:
         return "";
     }

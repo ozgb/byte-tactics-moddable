@@ -1038,6 +1038,11 @@ CAST_MODES = {"object", "struct", "structs", "vec3"}
 SCALAR_INOUT = {"int*", "unsigned int*", "short*", "unsigned short*", "unsigned char*"}
 
 
+def is_vec3_out(a: dict) -> bool:
+    """A `Vec3` struct the slot fills (dir out): as an import argument it is the `o <name> (x,y,z)` line a `vec3` out argument writes, only when `when` holds."""
+    return a["mode"] == "struct" and a.get("dir") == "out" and a.get("kind") == "Vec3"
+
+
 def is_scalar_inout(a: dict) -> bool:
     """A pointer to a scalar that is read and written back: `{"mode": "value", "dir": "inout"}` with no kind."""
     return a["mode"] == "value" and a.get("dir") == "inout"
@@ -2133,6 +2138,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
                 L.append('        ImportOutBytes(line, "%s", a%d, (int)result, %s);' % (a["line"], i, length_parts(a, i)[1]))
             elif a["mode"] == "vec3" and a.get("dir") == "out":
                 L.append('        ImportOutVec3(line, "%s", %s);' % (a["line"], arg_var(a, i)))
+            elif is_vec3_out(a):
+                L.append('        %sImportOutVec3(line, "%s", %s);' % ("if (result != 0) " if a.get("when") else "", a["line"], arg_var(a, i)))
             elif a["mode"] == "units":
                 L.append('        ImportOutUnits(line, "%s", a%d, kReplayReachFields + %d, %d);' % (a["line"], i, a["reachFirst"], a["reachCount"]))
             elif a["mode"] == "vector":
@@ -2361,6 +2368,16 @@ def render_slots(ann: dict, model: dict) -> str:
             L.append("    g_seams.%s = &g_import_%s;" % (seam, seam))
             for slot in slots + replays.get(seam, []):
                 L.append("    g_import_%s.%s = Imp_%s_%s;" % (seam, slot, seam, slot))
+    for sub, spec in ready.items():
+        stubbed = [i.split(".")[0] for i in spec["imports"] if i.split(".")[0] in ready]
+        if not stubbed:
+            continue
+        L.append('    if (strcmp(g_subsystem, "%s") == 0) {' % sub)
+        for seam in dict.fromkeys(stubbed):
+            L.append("        g_seams.%s = &g_import_%s;" % (seam, seam))
+            for slot in imports[seam] + replays.get(seam, []):
+                L.append("        g_import_%s.%s = Imp_%s_%s;" % (seam, slot, seam, slot))
+        L.append("    }")
     L += ["}", ""]
     return "\n".join(L)
 
@@ -2445,6 +2462,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append("    Space(t);\n    ReplayAddWeapon(t, %s);" % v)
         elif m == "vec3" and a.get("dir") == "out":
             pass
+        elif is_vec3_out(a):
+            pass
         elif m == "units" or m == "vector":
             pass
         elif m == "struct" and a.get("dir") == "inout":
@@ -2470,7 +2489,7 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
     for i, a in enumerate(s["args"]):
         if a["mode"] == "bytes-out":
             L.append('    ApplyBytes(a%d, %s, "%s");' % (i, length_parts(a, i)[1], a["line"]))
-        elif a["mode"] == "vec3" and a.get("dir") == "out":
+        elif (a["mode"] == "vec3" and a.get("dir") == "out") or is_vec3_out(a):
             L.append('    ApplyVec3(%s, "%s");' % (arg_var(a, i), a["line"]))
         elif a["mode"] == "units":
             L.append('    ApplyUnits(a%d, "%s");' % (i, a["line"]))

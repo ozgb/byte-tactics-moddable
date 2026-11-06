@@ -48,6 +48,9 @@ char* __stdcall FindWeaponByName(char* name);
 void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj);
 
 int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit, Unit* target, Vec3* point);
+int __stdcall FireVLaunchWeapon(Unit* source, UnitWeaponSlot* shot, Unit* target, Vec3* aim);
+int __stdcall FireLineOfSightWeapon(Unit* unit, UnitWeaponSlot* aim, Unit* target, Vec3* point);
+int __stdcall FireDroppedWeapon(Unit* unit, UnitWeaponSlot* aim, Unit* target, Vec3* point);
 
 void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit);
 

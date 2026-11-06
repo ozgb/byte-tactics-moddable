@@ -137,7 +137,6 @@ Order::unit,orders,??1Order@@QAE@XZ,AddOrder: new Order,0,-
 Order::unit,presentation,DrawBuildFootprint,AddOrder: new Order,0,
 Order::unit,presentation,DrawUnitRangeRings,AddOrder: new Order,0,
 Order::unit,presentation,DrawWeaponCoverage,AddOrder: new Order,0,
-Pathfinder::path,pathfinding,Pathfinder::AbortIfGoalMatch,CreatePathfinderNative: new Pathfinder,0,-
 Unit::activateFlags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::activateFlags,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::activateFlags,presentation,DrawUnitRangeRings,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
@@ -389,7 +388,7 @@ p1b8a,presentation,UnitTable::DrawPieces,p1b8a,0,
 pad_14273,los_radar,BuildFogTiles,pad_14273,0,
 pad_14273,los_radar,Visible,pad_14273,0,
 pad_14273,map,CanBuildAt,pad_14273,0,
-pathfinder,orders,AiSearchGoal::SetPathOrder,pathfinder,0,-
+pathfinder,pathfinding,PathfindingCancel,pathfinder,0,-
 playerIndex,los_radar,BuildFogTiles,playerIndex,0,
 playerIndex,los_radar,Visible,playerIndex,0,
 playerIndex,map,CanBuildAt,playerIndex,0,

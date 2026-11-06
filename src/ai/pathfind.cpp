@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <malloc.h>
 #include "../state/block.h"
 #include <string.h>
 #include "win_types.h"
@@ -189,7 +190,8 @@ int __stdcall DirectionFromStep(int dx, int dy)
 __int64 Pathfinder::Estimate(int param1, int param2)
 {
     int a = costScale;
-    return ((__int64)PathGoalDistance(&Extra()->goal, param1, param2) * (__int64)a) >> 0x10;
+    PathGoalArea goal = Extra()->goal;
+    return ((__int64)PathGoalDistance(&goal, param1, param2) * (__int64)a) >> 0x10;
 }
 
 // FUNCTION: 0x40da70
@@ -414,15 +416,20 @@ void Pathfinder::StartSearch(const PathPending* request, const PathUnitState* st
     extra->goal = request->goal;
     extra->footprintX = state->footprintX;
     extra->footprintZ = state->footprintY;
-    world->SeenSize(&extra->seenWidth, &extra->seenHeight);
+    int seenWidth;
+    int seenHeight;
+    world->SeenSize(&seenWidth, &seenHeight);
+    extra->seenWidth = seenWidth;
+    extra->seenHeight = seenHeight;
     start.x = state->cell.x;
     start.y = state->cell.y;
     world->BeginSearch(object);
     ResetTable();
     ClearDirtyCells();
 
-    PathPoint* goals = (PathPoint*)((char*)this + extra->goalOffset);
-    int goalCount = PathGoalCells(&extra->goal, goals, extra->goalCapacity);
+    PathGoalArea goal = request->goal;
+    PathPoint* goals = (PathPoint*)_alloca(extra->goalCapacity * sizeof(PathPoint));
+    int goalCount = PathGoalCells(&goal, goals, extra->goalCapacity);
     int bestDist = 0x7fffffff;
     for (PathPoint* p = goals; p != goals + goalCount; p++) {
         MarkGoal(p->x, p->y);
@@ -436,7 +443,7 @@ void Pathfinder::StartSearch(const PathPending* request, const PathUnitState* st
         }
     }
 
-    if (PathGoalContains(&extra->goal, start.x, start.y)) {
+    if (PathGoalContains(&goal, start.x, start.y)) {
         AddEvent(PATH_EVENT_STARTED, PATH_START_DIRECT);
         Finish();
         return;
@@ -863,8 +870,6 @@ void __stdcall PathfindingInit(const PathMapInfo* map)
     size += cells * sizeof(PathCell);
     unsigned int dirtyOffset = size;
     size += dirtyBytes;
-    unsigned int goalOffset = size;
-    size += goalCapacity * sizeof(PathPoint);
     unsigned int pendingOffset = size;
     size += pendingCapacity * sizeof(PathPending);
     unsigned int requesterBuckets = size;
@@ -887,7 +892,6 @@ void __stdcall PathfindingInit(const PathMapInfo* map)
     extra->itemsOffset = itemsOffset;
     extra->cellsOffset = cellsOffset;
     extra->dirtyOffset = dirtyOffset;
-    extra->goalOffset = goalOffset;
     extra->pendingOffset = pendingOffset;
     extra->requesterBuckets = requesterBuckets;
     extra->unitBuckets = unitBuckets;

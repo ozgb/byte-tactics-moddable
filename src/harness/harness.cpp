@@ -40,6 +40,7 @@
 #include "../debug/debug_lib.h"
 #include "harness.h"
 #include "replay.h"
+#include "../ai/pathfind_hpa.h"
 
 enum { MAX_PLAYERS = 10 };
 
@@ -113,6 +114,8 @@ static Quirks s_scenarioQuirkSet;
 static char s_switchQuirks[512];
 static char s_quirkSpec[512] = "3.1c";
 static unsigned s_quirkHash = 0;
+static int s_pathfinderHpa = 0;
+static int s_pathfinderLine = 0;
 static unsigned s_quirkTamperTick = 0;
 static int s_quirkTamper = 0;
 static unsigned s_quirkReachTick = 0;
@@ -854,6 +857,14 @@ static void ReadKey(int lineNo, const char* key, char* value)
             sprintf(detail, ": %s", err);
             FailLine(lineNo, "is not a quirk spec", key, detail);
         }
+    } else if (strcmp(key, "pathfinder") == 0) {
+        if (s_pathfinderLine != 0)
+            FailLine(lineNo, "is a second pathfinder line", key, "");
+        if (strcmp(value, "hpa") == 0)
+            s_pathfinderHpa = 1;
+        else if (strcmp(value, "default") != 0)
+            FailLine(lineNo, "must be default or hpa", key, "");
+        s_pathfinderLine = lineNo;
     } else if (strcmp(key, "quirks_tamper") == 0) {
         s_quirkTamperTick = ParseNumber(lineNo, key, value);
         s_quirkTamper = 1;
@@ -1524,6 +1535,8 @@ void HarnessInit(char* cmdLine)
     EnterHarnessTestMode();
     ReadScenario(path);
     ResolveQuirks();
+    if (s_pathfinderHpa)
+        g_seams.pathfinding = PathfindingHpaSeam();
     ReplayInstall();
     s_viewState = s_viewSeed;
 
@@ -4366,6 +4379,8 @@ static void OpenTrace(unsigned controlWord)
             TRACE_FORMAT, commit, s_scenarioPath, s_gameSeed, s_crtSeed, s_viewSeed, controlWord);
     if (!QuirksAllOff(g_quirks))
         fprintf(s_trace, "quirks %08x %s\n", s_quirkHash, s_quirkSpec);
+    if (s_pathfinderHpa)
+        fprintf(s_trace, "pathfinder hpa\n");
     if (s_dumpEnabled) {
         s_dump = fopen("dump.txt", "wb");
         if (s_dump == NULL)

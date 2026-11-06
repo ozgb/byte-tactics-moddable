@@ -283,7 +283,6 @@ struct PathExtra {
     int itemsOffset;
     int cellsOffset;
     int dirtyOffset;
-    int goalOffset;
     int pendingOffset;
     int requesterBuckets;
     int unitBuckets;
@@ -333,13 +332,15 @@ public:
     int EstimateCost(int x, int y)
     {
         int factor = costScale;
-        int v = PathGoalDistance(&Extra()->goal, x, y);
+        PathGoalArea goal = Extra()->goal;
+        int v = PathGoalDistance(&goal, x, y);
         return (int)(((__int64)v * factor) >> 16);
     }
     int Cost(int x, int y)
     {
         int s = costScale;
-        return (int)(((__int64)s * PathGoalDistance(&Extra()->goal, x, y)) >> 0x10);
+        PathGoalArea goal = Extra()->goal;
+        return (int)(((__int64)s * PathGoalDistance(&goal, x, y)) >> 0x10);
     }
     void ResetTable()
     {
@@ -362,7 +363,8 @@ public:
     int CostFix(int x, int y)
     {
         int s = costScale;
-        return FixMul(s, PathGoalDistance(&Extra()->goal, x, y));
+        PathGoalArea goal = Extra()->goal;
+        return FixMul(s, PathGoalDistance(&goal, x, y));
     }
     unsigned int Passable(int x, int y)
     {

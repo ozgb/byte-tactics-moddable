@@ -66,7 +66,8 @@ fpu_control_word 0x<5 uppercase hex digits>
 ```
 
 When any quirk flag is on, one more line follows, `quirks <8 lowercase hex digits> <spec>`. With
-every flag off the line is absent. Then one row per line:
+every flag off the line is absent. When the scenario selects the demo pathfinder (`pathfinder hpa`,
+`docs/scenario-format.md`), the line `pathfinder hpa` follows the `quirks` line, if any; it is absent otherwise. Then one row per line:
 
 ```
 <tick> <phase> <16 lowercase hex digits>

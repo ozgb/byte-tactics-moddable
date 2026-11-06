@@ -234,7 +234,6 @@ height,los_radar,FreeLosTables,height,1,
 height,presentation,DrawBattleFrame,height,1,
 height,units,GetGroundHeight,height,1,
 localPlayer,presentation,DrawBattleFrame,localPlayer,1,
-localPlayer,presentation,UpdateCdCategoryByActivity,localPlayer,0,-
 net,presentation,DrawBattleFrame,net,1,
 p1b8a,presentation,DrawBattleFrame,p1b8a,1,
 p1b8a,presentation,DrawUnitInfoPanel,p1b8a,0,-
@@ -280,7 +279,6 @@ unknown_1b8e,presentation,DrawProjectiles,unknown_1b8e,0,
 unknown_1b8e,presentation,NanoParticle::DrawParticle,unknown_1b8e,0,
 unknown_1b8e,presentation,SmokeParticles::Render,unknown_1b8e,0,
 unknown_1b8e,presentation,ThrustParticle::DrawParticle,unknown_1b8e,0,
-unknown_1b8e,presentation,UpdateCdCategoryByActivity,unknown_1b8e,0,-
 vertices,platform,RotateByAngles,vertices,0,
 width,los_radar,BuildFogTiles,width,0,
 width,los_radar,FreeLosTables,width,1,

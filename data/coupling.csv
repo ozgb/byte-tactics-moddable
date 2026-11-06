@@ -277,6 +277,7 @@ features,orders,shared_write,Point16::y,41
 features,orders,shared_write,Vec3::x,84
 features,orders,shared_write,Vec3::y,60
 features,orders,shared_write,Vec3::z,84
+features,pathfinding,indirect,HpaCellsChanged,2
 features,pathfinding,indirect,PathfindingCellsChanged,2
 features,pathfinding,shared_write,Point16::x,7
 features,pathfinding,shared_write,Point16::y,7
@@ -667,6 +668,8 @@ game,orders,shared_write,UnitDef::flags1,31
 game,orders,shared_write,Vec3::x,84
 game,orders,shared_write,Vec3::y,60
 game,orders,shared_write,Vec3::z,84
+game,pathfinding,indirect,HpaInit,1
+game,pathfinding,indirect,HpaShutdown,1
 game,pathfinding,indirect,PathfindingInit,1
 game,pathfinding,indirect,PathfindingShutdown,1
 game,pathfinding,shared_write,PathMapInfo::height,2
@@ -1464,6 +1467,7 @@ harness,orders,shared_write,WeaponsSeam::FindFeatureAtPos,3
 harness,orders,shared_write,WeaponsSeam::GetWeaponRange,2
 harness,orders,shared_write,WeaponsSeam::ReleaseWeapons,17
 harness,orders,shared_write,WeaponsSeam::WeaponCanReachUnit,7
+harness,pathfinding,call,PathfindingHpaSeam,1
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
@@ -2158,6 +2162,7 @@ map,orders,shared_write,Unit::spatialBucket,10
 map,orders,shared_write,Vec3::x,84
 map,orders,shared_write,Vec3::y,60
 map,orders,shared_write,Vec3::z,84
+map,pathfinding,indirect,HpaCellsChanged,2
 map,pathfinding,indirect,PathfindingCellsChanged,2
 map,pathfinding,shared_write,Point16::x,7
 map,pathfinding,shared_write,Point16::y,7
@@ -2723,6 +2728,8 @@ orders,network,shared_write,Unit::flags,3
 orders,network,shared_write,Unit::health,1
 orders,network,shared_write,Unit::pos,1
 orders,network,shared_write,UnitWeaponSlot::stockpile,1
+orders,pathfinding,indirect,HpaCancel,2
+orders,pathfinding,indirect,HpaSubmit,1
 orders,pathfinding,indirect,PathfindingCancel,2
 orders,pathfinding,indirect,PathfindingSubmit,1
 orders,pathfinding,shared_write,PathPoint::x,5
@@ -2922,8 +2929,7 @@ pathfinding,economy,shared_write,Point16::x,1
 pathfinding,economy,shared_write,Point16::y,1
 pathfinding,features,shared_write,Point16::x,10
 pathfinding,features,shared_write,Point16::y,10
-pathfinding,game,call,SimAlloc,1
-pathfinding,game,call,SimAllocTagged,1
+pathfinding,game,call,SimAllocTagged,2
 pathfinding,game,call,SimFree,3
 pathfinding,game,shared_write,Point16::x,1
 pathfinding,game,shared_write,Point16::y,1
@@ -2955,19 +2961,21 @@ pathfinding,players,shared_write,Point16::x,3
 pathfinding,players,shared_write,Point16::y,3
 pathfinding,presentation,shared_write,Point16::x,5
 pathfinding,presentation,shared_write,Point16::y,5
-pathfinding,seams,indirect,WorldBeginSearch,1
-pathfinding,seams,indirect,WorldEndSearch,2
+pathfinding,seams,indirect,WorldBeginSearch,2
+pathfinding,seams,indirect,WorldEndSearch,5
 pathfinding,seams,indirect,WorldFirstUnit,1
-pathfinding,seams,indirect,WorldInBounds,1
+pathfinding,seams,indirect,WorldInBounds,2
 pathfinding,seams,indirect,WorldIsPlaying,1
 pathfinding,seams,indirect,WorldLastUnit,1
+pathfinding,seams,indirect,WorldLineOfSight,2
+pathfinding,seams,indirect,WorldMoveClass,1
 pathfinding,seams,indirect,WorldNextUnit,1
-pathfinding,seams,indirect,WorldPass,1
+pathfinding,seams,indirect,WorldPass,2
 pathfinding,seams,indirect,WorldPlayerCount,1
 pathfinding,seams,indirect,WorldSeen,1
 pathfinding,seams,indirect,WorldSeenSize,1
-pathfinding,seams,indirect,WorldTick,2
-pathfinding,seams,indirect,WorldUnitState,1
+pathfinding,seams,indirect,WorldTick,4
+pathfinding,seams,indirect,WorldUnitState,2
 pathfinding,seams,indirect,WorldUnitsPerPlayer,1
 pathfinding,seams,shared_write,PathPoint::x,1
 pathfinding,seams,shared_write,PathPoint::y,1
@@ -3554,6 +3562,8 @@ players,orders,shared_write,UnitWeaponSlot::stockpile,1
 players,orders,shared_write,Vec3::x,84
 players,orders,shared_write,Vec3::y,60
 players,orders,shared_write,Vec3::z,84
+players,pathfinding,indirect,HpaPoll,1
+players,pathfinding,indirect,HpaStep,1
 players,pathfinding,indirect,PathfindingPoll,1
 players,pathfinding,indirect,PathfindingStep,1
 players,pathfinding,shared_write,Point16::x,7
@@ -4673,7 +4683,7 @@ seams,harness,shared_write,Seams::los_radar,2
 seams,harness,shared_write,Seams::map,2
 seams,harness,shared_write,Seams::network,1
 seams,harness,shared_write,Seams::orders,1
-seams,harness,shared_write,Seams::pathfinding,3
+seams,harness,shared_write,Seams::pathfinding,4
 seams,harness,shared_write,Seams::players,1
 seams,harness,shared_write,Seams::targeting,1
 seams,harness,shared_write,Seams::units,2

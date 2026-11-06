@@ -1,0 +1,764 @@
+bt-replay 2
+subsystem targeting 1.1
+call 740 GetWeaponTargetPos
+  r Game.seaLevel 0
+  r Unit#1.script CobScript#1
+  r Unit#1.unitDefIndex 34
+  r Unit#1.killCount 0
+  r Unit#1.motion UnitMotion#1
+  r Unit#1.posX 43650856
+  r Unit#1.posY 65536
+  r Unit#1.posZ 22023259
+  r Unit#1.weapon0TargetX 0
+  r Unit#1.weapon0TargetZ -32768
+  r Unit#1.weapon0Def weapondef#20
+  r Unit#1.weapon0Flags 18
+  r Unit#1.weapon1TargetX 0
+  r Unit#1.weapon1TargetZ -32768
+  r Unit#1.weapon1Def weapondef#0
+  r Unit#1.weapon1Flags 20
+  r Unit#1.weapon2TargetX 0
+  r Unit#1.weapon2TargetZ -32768
+  r Unit#1.weapon2Def weapondef#22
+  r Unit#1.weapon2Flags 26
+  r UnitMotion#1.velocityX 0
+  r UnitMotion#1.velocityY 0
+  r UnitMotion#1.velocityZ 0
+  r weapondef#20.flags 0x00080809
+  r weapondef#20.speed 873813
+  r weapondef#0.flags 0x00000000
+  r weapondef#0.speed 0
+  r weapondef#22.flags 0x04480a09
+  r weapondef#22.speed 436906
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 740 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 740 GetWeaponTargetPos
+  r Unit#3.script CobScript#2
+  r Unit#3.unitDefIndex 71
+  r Unit#3.killCount 0
+  r Unit#3.motion null
+  r Unit#3.posX 46137344
+  r Unit#3.posY 65536
+  r Unit#3.posZ 19922944
+  r Unit#3.weapon0TargetX 0
+  r Unit#3.weapon0TargetZ -32768
+  r Unit#3.weapon0Def weapondef#80
+  r Unit#3.weapon0Flags 2
+  r Unit#3.weapon1TargetX 0
+  r Unit#3.weapon1TargetZ -32768
+  r Unit#3.weapon1Def weapondef#0
+  r Unit#3.weapon1Flags 20
+  r Unit#3.weapon2TargetX 0
+  r Unit#3.weapon2TargetZ -32768
+  r Unit#3.weapon2Def weapondef#0
+  r Unit#3.weapon2Flags 24
+  r weapondef#80.flags 0x00080809
+  r weapondef#80.speed 1966080
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 740 GetWeaponTargetPos
+  r Unit#251.script CobScript#3
+  r Unit#251.unitDefIndex 167
+  r Unit#251.killCount 0
+  r Unit#251.motion UnitMotion#2
+  r Unit#251.posX 198625775
+  r Unit#251.posY 65536
+  r Unit#251.posZ 86369770
+  r Unit#251.weapon0TargetX 0
+  r Unit#251.weapon0TargetZ -32768
+  r Unit#251.weapon0Def weapondef#21
+  r Unit#251.weapon0Flags 2
+  r Unit#251.weapon1TargetX 0
+  r Unit#251.weapon1TargetZ -32768
+  r Unit#251.weapon1Def weapondef#0
+  r Unit#251.weapon1Flags 20
+  r Unit#251.weapon2TargetX 0
+  r Unit#251.weapon2TargetZ -32768
+  r Unit#251.weapon2Def weapondef#23
+  r Unit#251.weapon2Flags 10
+  r UnitMotion#2.velocityX 0
+  r UnitMotion#2.velocityY 0
+  r UnitMotion#2.velocityZ 0
+  r weapondef#21.flags 0x00080809
+  r weapondef#21.speed 873813
+  r weapondef#23.flags 0x04480a09
+  r weapondef#23.speed 436906
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 740 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 741 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 741 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 741 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 741 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 741 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 742 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 742 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 742 FindBestTargetIfFireAtWill
+  r Game.uiOptionFlags 12
+  r rng.main 0xea405842
+  r rng.load 0x5cbf709b
+  r rng.seed 0x4624ad09
+  r Unit#1.def UnitDef#1
+  r Unit#1.player Player#0
+  r Unit#1.flags 0x90e80321
+  r Unit#1.activateFlags 1
+  r Unit#1.playerIndex 0
+  r UnitDef#1.flags1 0x0495c0c8
+  r UnitDef#1.range 290
+  r UnitDef#1.categories UnitTypeSet#1
+  r UnitDef#1.weaponCategories0 UnitTypeSet#1
+  r UnitDef#1.weaponCategories1 UnitTypeSet#2
+  r UnitDef#1.weaponCategories2 UnitTypeSet#2
+  r Player#0.active 1
+  r Player#0.type 1
+  r UnitTypeSet#1.bits x:0800a0244000088020000028000d00080008101002088000c000000000a0020010c0010000000000000000000000000000000000000000000000000000000000
+  r UnitTypeSet#2.bits x:00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  a unit Unit#1
+  i ai.GetVisibleEnemiesInRadius 0 pos=(43650856,65536,22023259) 290 0
+  o out []
+  o result null
+call 742 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 742 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 742 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 743 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 743 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 743 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 743 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 743 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 744 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 744 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 744 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 744 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 744 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 745 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 745 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 745 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 745 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 745 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 746 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 746 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 746 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 746 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 746 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 747 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 747 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 747 FindBestTargetIfFireAtWill
+  r rng.seed 0x11dc4dd9
+  r Unit#1.flags 0x90e00321
+  a unit Unit#1
+  i ai.GetVisibleEnemiesInRadius 0 pos=(43650856,65536,22023259) 290 0
+  o out []
+  o result null
+call 747 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 747 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 747 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 748 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 748 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 748 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 748 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 748 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 749 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 749 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 749 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 749 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 749 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 750 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 750 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 750 ClearWeaponTarget
+  a unit Unit#1
+  a weapon 0
+call 750 ClearWeaponTarget
+  a unit Unit#1
+  a weapon 1
+call 750 ClearWeaponTarget
+  a unit Unit#1
+  a weapon 2
+call 750 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 750 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 750 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 751 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 751 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 751 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 751 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 751 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 752 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 752 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 752 FindBestTargetIfFireAtWill
+  r rng.seed 0x7e690818
+  r Unit#1.flags 0x90d00321
+  a unit Unit#1
+  o result null
+call 752 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 752 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 752 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 753 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 753 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 753 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 753 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 753 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 754 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 754 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 754 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 754 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 754 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 755 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 755 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 755 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 755 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 755 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 756 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 756 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 756 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 756 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 756 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 757 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 757 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 757 FindBestTargetIfFireAtWill
+  r rng.seed 0x2192a07e
+  r Unit#1.flags 0x90e00321
+  a unit Unit#1
+  i ai.GetVisibleEnemiesInRadius 0 pos=(43650856,65536,22023259) 290 0
+  o out []
+  o result null
+call 757 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 757 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 757 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 758 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 758 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 758 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 758 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 758 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 759 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 759 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 759 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 759 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 759 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 760 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 760 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 760 ClearWeaponTarget
+  a unit Unit#1
+  a weapon 0
+call 760 ClearWeaponTarget
+  a unit Unit#1
+  a weapon 1
+call 760 ClearWeaponTarget
+  a unit Unit#1
+  a weapon 2
+call 760 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 760 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 760 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 761 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 761 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 761 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 761 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 761 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 762 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 762 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 762 FindBestTargetIfFireAtWill
+  r rng.seed 0x2166c16a
+  r Unit#1.flags 0x90c00321
+  a unit Unit#1
+  o result null
+call 762 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 762 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 762 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 763 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 763 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 763 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 763 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 763 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 764 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 764 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 764 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 764 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 764 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 765 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 765 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 765 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 765 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 765 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 766 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 766 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 766 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 766 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 766 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 767 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 767 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 767 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 767 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 767 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 768 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 768 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 768 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 768 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 768 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 769 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 769 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 769 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 769 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 769 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 770 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 770 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 770 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  o result 0
+call 770 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 770 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0

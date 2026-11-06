@@ -75,6 +75,25 @@ A call without any such line is idle. The last known value of a field is the one
 of any earlier call, or the call's own tick for `Game.ticks`. A field with no known value counts as different.
 The known values start empty at the first recorded call.
 
+An `o` line right after an `i` line (and after the `c` lines of that import) is the import's, until the first `o` line whose name begins with one of the
+slot's closing names, and every `o` line from there on is closing. The closing names of a slot are the names it records for what it writes
+through its own arguments and for its return value: `result`, and the name of each out argument (`pos.` for the out `Vec3` `pos`, which writes
+`o pos.x`, `o pos.y` and `o pos.z`), and any `snapshot#` line. The generated runner gives them to the replayer with `SetClosing` (`tests/replay_slots.h`,
+from the schema entry of the slot), and the replayer compares the beginning of the name after `o `, so an import's own names (`out`, `dst`, `Unit#251.flags`)
+never end its lines early, and a slot with no closing name has no closing `o` line. The recorder writes the closing lines last, so the last
+import's `o` lines can be followed at once by closing ones:
+
+```
+  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  o out []
+  o result null
+```
+
+Here `o out []` is the import's and `o result null` is the slot's.
+
+An out struct recorded `"when": "result != 0"` (`pos` of `GetWeaponTargetPos`) is written, and compared by the replayer, only when the result is nonzero: a call that returns 0
+has no `o pos.*` line, the replayer's `Vec3` is zeroed before the call, and whatever the slot leaves in it is not compared (the result is).
+
 ## Objects
 
 Game objects that a subsystem reaches through pointers are written as `Kind#N`: `Player#1`, `Unit#3`,
@@ -1101,9 +1120,11 @@ targeting:
 - `SetWeaponTargetPos` with a z of -32768: it needs a world z of 32768, and scenarios and the harness reject positions off the map.
 - `SetWeaponTargetUnit` with a null target: 3.1c faults on it.
 - `FindWeaponTarget` rejecting a candidate that is not alive or is dying: the candidate list holds only live units, so neither check can fail.
-- `FindWeaponTarget` with bit 10 (0x400) of `Game.uiOptionFlags` set: `console-units` sets it in 16 recorded searches, from call 73, but no recording has it decide a pick (the shooter not computer-controlled and the candidate's def not always attackable, with the bit set).
-- `GetWeaponTargetPos` with the lead condition "the weapon slot has no weapon" failing alone: its only caller, `UpdateUnitWeapons`, skips a slot without bit 2 (`weapons.cpp:1529`), and bit 2 means "has a weapon" (`InitUnitWeaponSlots`, `weapons.cpp:1495`).
+- `GetWeaponTargetPos` with the lead condition "the weapon slot has no weapon" failing alone: its only caller, `UpdateUnitWeapons`, skips a slot whose `flags` lack the value 2 (bit 1, `weapons.cpp:1529`), and the value 2 means "has a weapon" (`InitUnitWeaponSlots` sets it when the slot's weapon has a nonzero index, `weapons.cpp:1495`).
 - `Unit::ChooseWeapon` returning 1 or 2 (weapon slot 0 empty, slot 1 or 2 defined): no shipped unit has that shape. Checked by reading every `units/*.fbi` and `weapons/*.tdf` of the 30 archives of `~/.ta` (`totala1` to `totala4`, `tactics1` to `tactics8`, `worlds`, `rev31.gp3`, the `.ufo` and `.ccx` files) with the `Hpi` reader of `tools/tdfnumbers.py`: no unit leaves its first weapon key empty, or names a weapon of ID 0 there, while its second or third weapon key names a weapon of nonzero ID.
+- `Unit::ChooseWeapon` with no weapon at all (all three slots without the value 2, which returns 0 through the third branch): its only caller, `AttackChaseOrder` (`unit_orders.cpp:804`), runs only for a unit with the armed bit (flag 0x80000000), and a unit gets that bit at creation from bit 16 of its def's `flags1`, which `unit_types.cpp:681` sets only when one of the three weapon keys names a weapon other than the weapon of index 0 (the default, `NOWEAPON`). A slot holds the value 2 exactly when its weapon has a nonzero index, so an armed unit has a slot with it. The 821 `units/*.fbi` of the archives (read as above) have only the weapon shapes (slot 1, 2, 3) 100, 110, 101 and 111, or none at all, and no unit names `NOWEAPON`.
+- `FindBestTargetIfFireAtWill` with a fire order of 3: `Unit.fireOrder` takes its value from `standingfireorder` of the unit's FBI at creation (the shipped units have 0, 2 or none, which is 2), from the `STANDING_FIREORDER` order (`StandingFireOrder`, whose mode the order panel gives as 0, 1 or 2 and the scenario `firestate` line limits to 0, 1 and 2), or by copy from the builder or factory (`getbuilt`). The 3 of `control_panel.cpp:863` is the panel's "mixed" display and is never an order's mode. Fire order 1 is recorded: `orders-immediate`, ticks 740 to 770 only, holds the call at tick 752 (the `firestate 1` of tick 750, before `firestate 2` at 755 and `firestate 0` at 760), which returns null without an import.
+- A negative `UnitDef.range`: the loader reads it as `(short)` of the key `sightdistance` (`unit_types.cpp:489`) and nothing writes it again, so only a value below 0 or above 32767 gives one, and the `SightDistance` of the 821 shipped `units/*.fbi` lies between 55 and 490. `FindWeaponTarget` with `useRange` 0 and `FindBestTargetIfFireAtWill` pass it to `GetVisibleEnemiesInRadius` as the radius.
 - `GetWeaponTargetPos` with a cruise weapon, or a weapon of speed 0, and a unit with more than five kills (the other lead conditions are met): not reached by the scenario suite; it would need a veteran missile silo or bomber.
 - `ai.GetVisibleEnemiesInRadiusList`: it has no 3.1c call site, only the vector form `ai.GetVisibleEnemiesInRadius` is called, which the recordings carry. The replayer answers a call of it from the next recorded vector line with the same player, position, radius and flags: it writes the first `capacity` units of the recorded list, in order, and returns the recorded count; a repeat with the same arguments and a larger capacity, after a count above the capacity, is answered from the same line and takes no further import, and any other extra call is a divergence.
 - A unit target with `unitDefIndex` 0 where the second condition of the guard (the aim target field being nonzero) is false: that condition is always true there.
@@ -1173,7 +1194,7 @@ wine build/modern/replay_inject_test.exe --expect 352 pos.x tests/replay/targeti
 
 The recordings of targeting, which the modern build runs as native code in every mode (it has no WASM module yet): `orders-guard-attacked` (units that guard and are attacked: every
 slot but `SetWeaponTargetPos`, `SetWeaponTargetUnit` 315 times, candidates from `ai.GetVisibleEnemiesInRadius`, `ChooseWeapon`),
-`orders-tier2-spider` (`SetWeaponTargetPos` 8 times, and the ground positions of `GetWeaponTargetPos`) and `skirmish4-long`, ticks
+`orders-tier2-spider` (`SetWeaponTargetPos` 8 times, and the ground positions of `GetWeaponTargetPos`), `orders-immediate`, ticks 740 to 770 only (a unit with fire order 1, 2 and 0 in turn, which searches only with 2), `edges-targeting-lead` (the whole run, 1300 ticks, listed below) and `skirmish4-long`, ticks
 25750 to 25770 only, where a unit with more than five kills fires at a moving unit (the scale of `GetWeaponTargetPos`). `console-units` (the whole run) holds a
 unit target whose `unitDefIndex` is 0, so `GetWeaponTargetPos` returns 0 and the target is cleared. `edges-economy-targeting` (the whole run, 260 ticks) holds
 a search with more than 50 candidates, candidates at the same spot (`services.RandomInt` of 0), a unit with fire order 0, a kamikaze unit
@@ -1181,6 +1202,12 @@ among the candidates, a paralyzer weapon against a paralyzed target, a veteran c
 the D-gun (`SetWeaponTargetPos` on weapon 2), and an aim at ground under the sea (`units.GetGroundHeight` returns 1). Each
 `GetWeaponTargetPos` that returns nonzero records the `pos` it wrote (`o pos.x`); one that returns 0 leaves the stack local of its caller untouched, so
 nothing is recorded of it.
+
+`edges-targeting-lead` (the whole run) holds three outcomes the other recordings lack. All its lines are of `tests/replay/targeting/edges-targeting-lead.txt`:
+
+- Ground height equal to the sea level: `sealevel 1`, then the D-gun at the ground at (850, 300), where `units.GetGroundHeight` returns 1: call 11, line 918, `GetWeaponTargetPos` returns 1 with `o pos.y 65536` (16 calls, from tick 11).
+- Bit 10 (0x400) of `Game.uiOptionFlags` (`shootall`, tick 60) deciding a pick: call 83, line 4210, `FindWeaponTarget` of the human commander `Unit#1` takes the enemy `CORSOLAR` (`Unit#502`, a def without `shootme`) as its only candidate and picks it.
+- The lead check of `GetWeaponTargetPos` at 4, 5, 6 and 7 kills, in `Unit#2` (an `ARMHLT`) aiming at `CORCK` constructors that patrol: with 4 kills the aim point is the sweet spot while the target moves (first at call 766, line 34535), with 5 kills the same (call 866, line 38675), and with 6 kills the target's velocity is added (`o out` differs from `o pos.x` and `o pos.z`): call 1072, line 47154, with `UnitMotion#8` velocity read just before it. The first calls at each count are 724 (4 kills, line 32831), 864 (5, line 38603), 998 (6, line 44114), 1127 (7, line 49388), 1233 (8, line 53796). A target that moves at 6 kills is one call in the run (and 12 at 7), because the tower kills quickly.
 
 `replay_inject_test.exe` is also built with the mean-shift injection of 0 (the shift by one that halves the sum of the low and high corners of a cell in the cell mean height), and the divergence is reported at call 7 of `orders-air-repair` and at `result`:
 

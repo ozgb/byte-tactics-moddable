@@ -934,50 +934,112 @@ int __stdcall RecAiGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2,
     return result;
 }
 
-void __fastcall RecPathfindingRunSearches(Pathfinder* a0)
+void __stdcall RecPathfindingInit(const PathMapInfo* a0)
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_PATHFINDING_RUNSEARCHES, SUB_PATHFINDING, roots);
+    SlotScope scope(RSL_PATHFINDING_INIT, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgPending(s_call, "map");
     }
-    s_inner_pathfinding->RunSearches(a0);
+    s_inner_pathfinding->Init(a0);
     if (scope.Open()) {
     }
 }
 
-void __stdcall RecPathfindingAbortIfGoalMatch(Pathfinder* a0, AiSearchGoal* a1)
+void __stdcall RecPathfindingShutdown()
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_PATHFINDING_ABORTIFGOALMATCH, SUB_PATHFINDING, roots);
+    SlotScope scope(RSL_PATHFINDING_SHUTDOWN, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
-        ArgPending(s_call, "goal");
     }
-    s_inner_pathfinding->AbortIfGoalMatch(a0, a1);
+    s_inner_pathfinding->Shutdown();
     if (scope.Open()) {
     }
 }
 
-void __stdcall RecPathfindingDestroy(Pathfinder* a0)
+void __stdcall RecPathfindingSubmit(const PathRequest* a0)
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_PATHFINDING_DESTROY, SUB_PATHFINDING, roots);
+    SlotScope scope(RSL_PATHFINDING_SUBMIT, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgPending(s_call, "request");
     }
-    s_inner_pathfinding->Destroy(a0);
+    s_inner_pathfinding->Submit(a0);
     if (scope.Open()) {
     }
 }
 
-void __stdcall RecPathfindingCreate()
+void __stdcall RecPathfindingCancel(PathHandle a0)
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_PATHFINDING_CREATE, SUB_PATHFINDING, roots);
+    SlotScope scope(RSL_PATHFINDING_CANCEL, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "requester");
+    }
+    s_inner_pathfinding->Cancel(a0);
     if (scope.Open()) {
     }
-    s_inner_pathfinding->Create();
+}
+
+void __stdcall RecPathfindingCellsChanged(int a0, int a1, int a2, int a3)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_CELLSCHANGED, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "left", a0);
+        ArgValue(s_call, "top", a1);
+        ArgValue(s_call, "right", a2);
+        ArgValue(s_call, "bottom", a3);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathfinding.CellsChanged");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+        ImportValue(line, a3);
+    }
+    s_inner_pathfinding->CellsChanged(a0, a1, a2, a3);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecPathfindingStep()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_STEP, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+    }
+    s_inner_pathfinding->Step();
+    if (scope.Open()) {
+    }
+}
+
+int __stdcall RecPathfindingPoll(PathEvent* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_POLL, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "out");
+    }
+    int result = s_inner_pathfinding->Poll(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecPathfindingProject(PathTraceView* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_PROJECT, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "out");
+    }
+    s_inner_pathfinding->Project(a0);
     if (scope.Open()) {
     }
 }
@@ -1831,34 +1893,6 @@ unsigned int __stdcall RecLosRadarSoundHeardMask(const Vec3* a0)
     return result;
 }
 
-void __stdcall RecOrdersAiSearchGoalSetWaypoints(AiSearchGoal* a0, Point16* a1, int a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_ORDERS_AISEARCHGOALSETWAYPOINTS, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "self");
-        ArgPending(s_call, "points");
-        ArgValue(s_call, "count", a2);
-    }
-    s_inner_orders->AiSearchGoalSetWaypoints(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecOrdersOrderFxAddFlags(OrderFx* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_ORDERFX, a0);
-    SlotScope scope(RSL_ORDERS_ORDERFXADDFLAGS, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_ORDERFX, a0);
-        ArgValue(s_call, "flags", a1);
-    }
-    s_inner_orders->OrderFxAddFlags(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecOrdersAppendOrder(Unit* a0, Order* a1)
 {
     ReplayRoots roots;
@@ -2116,28 +2150,6 @@ void __stdcall RecOrdersClearOrderTypeTable()
     }
 }
 
-void __stdcall RecOrdersCreatePathfinder()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_ORDERS_CREATEPATHFINDER, SUB_ORDERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_orders->CreatePathfinder();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecOrdersDestroyPathfinder()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_ORDERS_DESTROYPATHFINDER, SUB_ORDERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_orders->DestroyPathfinder();
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecOrdersNewUnitMotion(Unit* a0)
 {
     ReplayRoots roots;
@@ -2216,68 +2228,6 @@ void __stdcall RecOrdersQueueBuildOrder(char* a0, Unit* a1, int a2)
     }
 }
 
-int __stdcall RecOrdersOrderFxIsGoal(OrderFx* a0, int a1, int a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_ORDERFX, a0);
-    SlotScope scope(RSL_ORDERS_ORDERFXISGOAL, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_ORDERFX, a0);
-        ArgValue(s_call, "x", a1);
-        ArgValue(s_call, "y", a2);
-    }
-    int result = s_inner_orders->OrderFxIsGoal(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecOrdersOrderFxFillGoalCells(OrderFx* a0, std::vector<Point16, std::allocator<Point16> >* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_ORDERFX, a0);
-    SlotScope scope(RSL_ORDERS_ORDERFXFILLGOALCELLS, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_ORDERFX, a0);
-        ArgPending(s_call, "goals");
-    }
-    s_inner_orders->OrderFxFillGoalCells(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecOrdersOrderFxApproxDist(OrderFx* a0, int a1, int a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_ORDERFX, a0);
-    SlotScope scope(RSL_ORDERS_ORDERFXAPPROXDIST, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_ORDERFX, a0);
-        ArgValue(s_call, "x", a1);
-        ArgValue(s_call, "y", a2);
-    }
-    int result = s_inner_orders->OrderFxApproxDist(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-AiSearchGoal* __stdcall RecOrdersUnitMotionClaimRepath(UnitMotion* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITMOTION, a0);
-    SlotScope scope(RSL_ORDERS_UNITMOTIONCLAIMREPATH, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
-    }
-    AiSearchGoal* result = s_inner_orders->UnitMotionClaimRepath(a0);
-    if (scope.Open()) {
-    }
-    return result;
-}
-
 void __stdcall RecOrdersOrderOrStatusFlags(OrderBase* a0, unsigned int a1)
 {
     ReplayRoots roots;
@@ -2301,6 +2251,18 @@ void __stdcall RecOrdersUnitMotionReadNetState(UnitMotion* a0, BitReader* a1)
         ArgPending(s_call, "reader");
     }
     s_inner_orders->UnitMotionReadNetState(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecOrdersApplyPathEvent(const PathEvent* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ORDERS_APPLYPATHEVENT, SUB_ORDERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "event");
+    }
+    s_inner_orders->ApplyPathEvent(a0);
     if (scope.Open()) {
     }
 }
@@ -5120,6 +5082,8 @@ bool IsImportOf(unsigned owner, unsigned slot)
     case SUB_FEATURES:
         if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
             return true;
+        if (slot == RSL_PATHFINDING_CELLSCHANGED)
+            return true;
         return false;
     case SUB_WEAPONS:
         if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
@@ -5145,6 +5109,8 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_LOS_RADAR_UPDATECELLHEIGHTRANGE)
             return true;
         if (slot == RSL_LOS_RADAR_GETMAPCELL)
+            return true;
+        if (slot == RSL_PATHFINDING_CELLSCHANGED)
             return true;
         return false;
     default:
@@ -5330,13 +5296,21 @@ void HookSeams(const bool* on)
     if (on[SUB_AI])
         s_rec_ai.GetVisibleEnemiesInRadiusList = RecAiGetVisibleEnemiesInRadiusList;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.RunSearches = RecPathfindingRunSearches;
+        s_rec_pathfinding.Init = RecPathfindingInit;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.AbortIfGoalMatch = RecPathfindingAbortIfGoalMatch;
+        s_rec_pathfinding.Shutdown = RecPathfindingShutdown;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.Destroy = RecPathfindingDestroy;
+        s_rec_pathfinding.Submit = RecPathfindingSubmit;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.Create = RecPathfindingCreate;
+        s_rec_pathfinding.Cancel = RecPathfindingCancel;
+    if (on[SUB_PATHFINDING] || on[SUB_FEATURES] || on[SUB_MAP])
+        s_rec_pathfinding.CellsChanged = RecPathfindingCellsChanged;
+    if (on[SUB_PATHFINDING])
+        s_rec_pathfinding.Step = RecPathfindingStep;
+    if (on[SUB_PATHFINDING])
+        s_rec_pathfinding.Poll = RecPathfindingPoll;
+    if (on[SUB_PATHFINDING])
+        s_rec_pathfinding.Project = RecPathfindingProject;
     if (on[SUB_WEAPONS])
         s_rec_weapons.UpdateProjectiles = RecWeaponsUpdateProjectiles;
     if (on[SUB_WEAPONS])
@@ -5450,10 +5424,6 @@ void HookSeams(const bool* on)
     if (on[SUB_LOS_RADAR] || on[SUB_FEATURES] || on[SUB_WEAPONS])
         s_rec_los_radar.SoundHeardMask = RecLosRadarSoundHeardMask;
     if (on[SUB_ORDERS])
-        s_rec_orders.AiSearchGoalSetWaypoints = RecOrdersAiSearchGoalSetWaypoints;
-    if (on[SUB_ORDERS])
-        s_rec_orders.OrderFxAddFlags = RecOrdersOrderFxAddFlags;
-    if (on[SUB_ORDERS])
         s_rec_orders.AppendOrder = RecOrdersAppendOrder;
     if (on[SUB_ORDERS])
         s_rec_orders.AddOrder = RecOrdersAddOrder;
@@ -5488,10 +5458,6 @@ void HookSeams(const bool* on)
     if (on[SUB_ORDERS])
         s_rec_orders.ClearOrderTypeTable = RecOrdersClearOrderTypeTable;
     if (on[SUB_ORDERS])
-        s_rec_orders.CreatePathfinder = RecOrdersCreatePathfinder;
-    if (on[SUB_ORDERS])
-        s_rec_orders.DestroyPathfinder = RecOrdersDestroyPathfinder;
-    if (on[SUB_ORDERS])
         s_rec_orders.NewUnitMotion = RecOrdersNewUnitMotion;
     if (on[SUB_ORDERS])
         s_rec_orders.LoadOrder = RecOrdersLoadOrder;
@@ -5502,17 +5468,11 @@ void HookSeams(const bool* on)
     if (on[SUB_ORDERS])
         s_rec_orders.QueueBuildOrder = RecOrdersQueueBuildOrder;
     if (on[SUB_ORDERS])
-        s_rec_orders.OrderFxIsGoal = RecOrdersOrderFxIsGoal;
-    if (on[SUB_ORDERS])
-        s_rec_orders.OrderFxFillGoalCells = RecOrdersOrderFxFillGoalCells;
-    if (on[SUB_ORDERS])
-        s_rec_orders.OrderFxApproxDist = RecOrdersOrderFxApproxDist;
-    if (on[SUB_ORDERS])
-        s_rec_orders.UnitMotionClaimRepath = RecOrdersUnitMotionClaimRepath;
-    if (on[SUB_ORDERS])
         s_rec_orders.OrderOrStatusFlags = RecOrdersOrderOrStatusFlags;
     if (on[SUB_ORDERS])
         s_rec_orders.UnitMotionReadNetState = RecOrdersUnitMotionReadNetState;
+    if (on[SUB_ORDERS])
+        s_rec_orders.ApplyPathEvent = RecOrdersApplyPathEvent;
     if (on[SUB_UNITS])
         s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
     if (on[SUB_UNITS] || on[SUB_TARGETING])

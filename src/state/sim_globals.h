@@ -25,9 +25,7 @@ struct SimGlobals {
     int g_aiCommandsEnabled = 1;
     char g_emptyText[8];
     Ref<PlayerAI> g_playerAI[10];
-    int g_playerBudgetCap[10];
-    int g_playerTickLoad[10];
-    int g_budgetRefreshCounter;
+    unsigned char pad_34[84];
     unsigned char pad_88[4];
     Ref<ExplodedPiece> g_explodedPieces[100];
     DebrisCache g_debrisMemCache;
@@ -79,10 +77,8 @@ inline SimGlobals& Sim()
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 static_assert(__builtin_offsetof(SimGlobals, g_playerAI) - __builtin_offsetof(SimGlobals, g_emptyText) == 8, "g_emptyText is followed by g_playerAI");
-static_assert(__builtin_offsetof(SimGlobals, g_playerBudgetCap) - __builtin_offsetof(SimGlobals, g_playerAI) == 40, "g_playerAI is followed by g_playerBudgetCap");
-static_assert(__builtin_offsetof(SimGlobals, g_playerTickLoad) - __builtin_offsetof(SimGlobals, g_playerBudgetCap) == 40, "g_playerBudgetCap is followed by g_playerTickLoad");
-static_assert(__builtin_offsetof(SimGlobals, g_budgetRefreshCounter) - __builtin_offsetof(SimGlobals, g_playerTickLoad) == 40, "g_playerTickLoad is followed by g_budgetRefreshCounter");
-static_assert(__builtin_offsetof(SimGlobals, pad_88) - __builtin_offsetof(SimGlobals, g_budgetRefreshCounter) == 4, "g_budgetRefreshCounter is followed by pad_88");
+static_assert(__builtin_offsetof(SimGlobals, pad_34) - __builtin_offsetof(SimGlobals, g_playerAI) == 40, "g_playerAI is followed by pad_34");
+static_assert(__builtin_offsetof(SimGlobals, pad_88) - __builtin_offsetof(SimGlobals, pad_34) == 84, "pad_34 is followed by pad_88");
 static_assert(__builtin_offsetof(SimGlobals, g_debrisMemCache) - __builtin_offsetof(SimGlobals, g_explodedPieces) == 400, "g_explodedPieces is followed by g_debrisMemCache");
 static_assert(__builtin_offsetof(SimGlobals, pad_23c) - __builtin_offsetof(SimGlobals, g_meteorNextStrikeTime) == 4, "g_meteorNextStrikeTime is followed by pad_23c");
 static_assert(__builtin_offsetof(SimGlobals, g_meteorWeaponName) - __builtin_offsetof(SimGlobals, pad_23c) == 4, "pad_23c is followed by g_meteorWeaponName");
@@ -120,9 +116,7 @@ static_assert(sizeof(((SimGlobals*)0)->g_losTables) == 16, "g_losTables size");
 #define g_aiCommandsEnabled (Sim().g_aiCommandsEnabled)
 #define g_emptyText (Sim().g_emptyText)
 #define g_playerAI (Sim().g_playerAI)
-#define g_playerBudgetCap (Sim().g_playerBudgetCap)
-#define g_playerTickLoad (Sim().g_playerTickLoad)
-#define g_budgetRefreshCounter (Sim().g_budgetRefreshCounter)
+#define pad_34 (Sim().pad_34)
 #define pad_88 (Sim().pad_88)
 #define g_explodedPieces (Sim().g_explodedPieces)
 #define g_debrisMemCache (Sim().g_debrisMemCache)

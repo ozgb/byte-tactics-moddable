@@ -180977,6 +180977,7 @@ call 1024 SetYardOpen
   a open 1
   i los_radar.GetMapCell 40 16 = Cell#3624
   o Cell#3624.metal 3
+  i pathfinding.CellsChanged 40 16 46 21
   w Unit#2.flags 0x3ce42321
   w Unit#2.cobStateFlags 4
   w MovementClass#0.cells 265:50d5ffffd0ffffffd0ffffff50d5ffff

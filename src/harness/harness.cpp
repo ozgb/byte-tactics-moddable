@@ -1719,7 +1719,6 @@ enum {
     GAME_SPOT_ENTRIES = 0x1420b,
     GAME_SPOT_USED_HEAD = 0x14213,
     GAME_SPOT_REST_HEAD = 0x14217,
-    GAME_PATHFINDER = 0x14207,
     GAME_FEATURE_COUNT = 0x14253,
     GAME_FEATURES = 0x1426f,
     GAME_POOL_COUNT = 0x14351,
@@ -2107,13 +2106,16 @@ static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsi
         stride = REC_STRIDE;
         count = GameU32(GAME_SPATIAL_COUNT);
         break;
-    case TT_NODE:
-        if (GameRef(GAME_PATHFINDER) == 0)
+    case TT_NODE: {
+        PathTraceView view;
+        g_seams.pathfinding->Project(&view);
+        if (view.record == NULL)
             return;
-        base = RefAbs(*(unsigned*)(GameRef(GAME_PATHFINDER) + PF_POOL));
+        base = RefAbs(*(const unsigned*)((const unsigned char*)view.record + PF_POOL));
         stride = NODE_STRIDE;
-        count = *(unsigned*)(GameRef(GAME_PATHFINDER) + PF_USED);
+        count = *(const unsigned*)((const unsigned char*)view.record + PF_USED);
         break;
+    }
     case TT_MOVECLASS:
         base = (unsigned)MoveClasses();
         stride = MOVECLASS_STRIDE;
@@ -2731,9 +2733,36 @@ static void VisitPathCells(const unsigned char* pf)
     }
 }
 
+static void VisitPathGlobals(const PathTraceView& view)
+{
+    static const int zeros[10] = { 0 };
+    const void* addresses[3] = { view.tickLoad != NULL ? (const void*)view.tickLoad : (const void*)zeros,
+                                 view.budgetCap != NULL ? (const void*)view.budgetCap : (const void*)zeros,
+                                 view.refreshCounter != NULL ? (const void*)view.refreshCounter : (const void*)zeros };
+    for (unsigned k = 0; k < kPathGlobalsCount; k++) {
+        const TraceGlobal* g = &kPathGlobals[k];
+        TraceField f;
+        char path[96];
+        f.name = g->name;
+        f.offset = 0;
+        f.size = g->size;
+        f.kind = g->kind;
+        f.target = g->target;
+        f.mask = 0;
+        HashBuf((const unsigned char*)addresses[k], g->size);
+        if (s_dumpNow) {
+            sprintf(path, "pathfinder.%s", g->name);
+            DumpPrefix(path);
+            DumpValue((const unsigned char*)addresses[k], &f);
+        }
+    }
+}
+
 static void VisitPathfinder()
 {
-    unsigned char* pf = (unsigned char*)GameRef(GAME_PATHFINDER);
+    PathTraceView view;
+    g_seams.pathfinding->Project(&view);
+    unsigned char* pf = (unsigned char*)view.record;
     HashByte(16);
     HashByte(pf != NULL);
     if (pf != NULL) {
@@ -2745,7 +2774,7 @@ static void VisitPathfinder()
     }
     EndSection();
     HashByte(17);
-    VisitGlobalList("pathfinder", kPathGlobals, kPathGlobalsCount);
+    VisitPathGlobals(view);
     EndSection();
 }
 

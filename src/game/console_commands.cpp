@@ -355,10 +355,10 @@ void __stdcall CmdEdge(CommandArgs* args)
 void __stdcall CmdSearch(CommandArgs* args)
 {
     if (args->GetIntArg(1, 0)) {
-        g_game->pathfinder->stepsPerTick = args->GetIntArg(1, 0);
+        SetSearchStepsPerTick(args->GetIntArg(1, 0));
     }
     if (args->count == 3) {
-        g_game->pathfinder->baseScale = (int)(atof(args->GetArg(2, g_emptyText)) * 65536.0);
+        SetSearchBaseScale((int)(atof(args->GetArg(2, g_emptyText)) * 65536.0));
     }
 }
 
@@ -1133,25 +1133,27 @@ void __stdcall DrawMapDebugOverlay(void* surface)
                         DrawLine(surface, p[1].x, p[1].y, p[3].x, p[3].y, color);
                     }
                 }
-                PathCell* cell = g_game->pathfinder->grid.At(x, y);
-                if (cell->flags & 4) {
+                int cellFlags;
+                int cellDir;
+                PathfindingDebugCell(x, y, &cellFlags, &cellDir);
+                if (cellFlags & 4) {
                     SetFont(g_game->fontSmlFont);
                     SetTextColors(HarnessViewRand() & 255, GetTextKeyColor());
                     DrawString(surface, "G", p[0].x, p[0].y, -1);
                 }
-                unsigned char kind = cell->flags & ~4;
+                unsigned char kind = cellFlags & ~4;
                 if (kind != 0 && kind != 3) {
                     int cx = p[0].x + 8, cy = p[0].y + 8;
-                    switch (cell->flags) {
+                    switch (cellFlags) {
                     case 1: arrowColor = colors[15]; break;
                     case 2: arrowColor = colors[4]; break;
                     }
-                    DrawLine(surface, cx - g_dirDeltaX[(signed char)cell->dir] * 14,
-                                 cy - g_dirDeltaZ[(signed char)cell->dir] * 14, cx, cy, arrowColor);
-                    int direction = ((signed char)cell->dir + 1) & 7;
+                    DrawLine(surface, cx - g_dirDeltaX[(signed char)cellDir] * 14,
+                                 cy - g_dirDeltaZ[(signed char)cellDir] * 14, cx, cy, arrowColor);
+                    int direction = ((signed char)cellDir + 1) & 7;
                     DrawLine(surface, cx - g_dirDeltaX[direction] * 4,
                                  cy - g_dirDeltaZ[direction] * 4, cx, cy, arrowColor);
-                    direction = ((signed char)cell->dir - 1) & 7;
+                    direction = ((signed char)cellDir - 1) & 7;
                     DrawLine(surface, cx - g_dirDeltaX[direction] * 4,
                                  cy - g_dirDeltaZ[direction] * 4, cx, cy, arrowColor);
                 }

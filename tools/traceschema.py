@@ -918,10 +918,7 @@ METEOR_GLOBALS: list[tuple[str, str, int, str | None]] = [
     ("scheduleGap", "g_meteorScheduleGap", 4, None),
 ]
 REF_GLOBALS = REF_FIELDS
-GLOBAL_DECLS: dict[str, str] = {
-    "g_playerTickLoad": "int g_playerTickLoad[10]",
-    "g_playerBudgetCap": "int g_playerBudgetCap[10]",
-}
+GLOBAL_DECLS: dict[str, str] = {}
 METEOR_DECLS: dict[str, str] = {
     "g_meteorWeaponName": "char g_meteorWeaponName[32]",
     "g_meteorOrigin": "Point16 g_meteorOrigin",
@@ -1378,7 +1375,7 @@ def generate():
         moved[name] = "offsetof(SimGlobals, %s)" % field
     for name, (container, offset) in sim.interior_of.items():
         moved[name] = "offsetof(SimGlobals, %s) + 0x%x" % (container, offset)
-    used = [symbol for group in (METEOR_GLOBALS, SCALAR_GLOBALS, PATH_GLOBALS) for _, symbol, _, _ in group
+    used = [symbol for group in (METEOR_GLOBALS, SCALAR_GLOBALS) for _, symbol, _, _ in group
             if symbol in moved]
     used += [sim.interior_of[symbol][0] for symbol in used if symbol in sim.interior_of]
     if used:
@@ -1391,7 +1388,7 @@ def generate():
             lines.append('#pragma push_macro("%s")' % symbol)
             lines.append("#undef %s" % symbol)
     declared = set()
-    for group in (METEOR_GLOBALS, SCALAR_GLOBALS, PATH_GLOBALS):
+    for group in (METEOR_GLOBALS, SCALAR_GLOBALS):
         for _, symbol, size, _ in group:
             if symbol in declared or symbol in moved:
                 continue
@@ -1404,12 +1401,14 @@ def generate():
                                ("kPathGlobals", "pathfinder", PATH_GLOBALS)):
         model["globals"][gkey] = []
         lines.append("static const TraceGlobal %s[] = {" % cname)
-        for name, symbol, size, target in group:
+        for index, (name, symbol, size, target) in enumerate(group):
             kind = "TF_REF" if symbol in REF_GLOBALS else "TF_POINTER" if target else ("TF_BYTES" if size > 8 else "TF_SCALAR")
             model["globals"][gkey].append({"name": name, "size": size, "kind": KIND_NAMES[kind],
                                            "target": target.lower() if target else None})
             tail = "TT_" + target if target else "TT_NONE"
-            if symbol in moved:
+            if cname == "kPathGlobals":
+                lines.append("    { %s, (const void*)%d, %d, %s, %s }," % (c_string(name), index, size, kind, tail))
+            elif symbol in moved:
                 lines.append("    { %s, (const void*)(%s), %d, %s, %s, 1 }," % (
                     c_string(name), moved[symbol], size, kind, tail))
             else:

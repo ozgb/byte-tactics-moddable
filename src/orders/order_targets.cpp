@@ -79,15 +79,13 @@ struct PathOrderRecord {
 #pragma pack(pop)
 
 
-class Pathfinder;
 
 #pragma pack(push, 1)
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
-#include "../ai/pathfinder.h"
 
 #include "../../interfaces/seams.h"
 
@@ -371,20 +369,66 @@ int ApproachRadius::Serialize(int unused, HapiBank* file, char* name)
     return 1;
 }
 
+static void AppendAreaCells(const PathGoalArea* area, std::vector<Point16>* list)
+{
+    PathPoint cells[1024];
+    int n = PathGoalCells(area, cells, 1024);
+    for (int i = 0; i < n; i++) {
+        Point16 p;
+        p.x = cells[i].x;
+        p.y = cells[i].y;
+        list->push_back(p);
+    }
+}
+
+void ApproachRadius::GetGoalArea(PathGoalArea* out)
+{
+    memset(out, 0, sizeof(*out));
+    out->kind = PATH_GOAL_CIRCLE;
+    out->centre.x = pos.x;
+    out->centre.y = pos.y;
+    out->radius[0] = radius;
+    out->radiusSq[0] = radiusSq;
+}
+
+void RingApproach::GetGoalArea(PathGoalArea* out)
+{
+    memset(out, 0, sizeof(*out));
+    out->kind = PATH_GOAL_RING;
+    out->centre.x = pos.x;
+    out->centre.y = pos.y;
+    out->radius[0] = inner;
+    out->radius[1] = outer;
+    out->radiusSq[0] = innerSq;
+    out->radiusSq[1] = outerSq;
+}
+
+void PointMarker::GetGoalArea(PathGoalArea* out)
+{
+    memset(out, 0, sizeof(*out));
+    out->kind = PATH_GOAL_RECT;
+    out->left = x1;
+    out->right = x2;
+    out->top = y1;
+    out->bottom = y2;
+}
+
 // FUNCTION: 0x44d0e0
 void ApproachRadius::AppendGoalCell(void* cells)
 {
     ApproachRadiusCellVector* list = (ApproachRadiusCellVector*)cells;
     list->clear();
-    list->push_back(*(Point16*)&pos);
+    PathGoalArea area;
+    GetGoalArea(&area);
+    AppendAreaCells(&area, list);
 }
 
 // FUNCTION: 0x44d290
 int ApproachRadius::ContainsCell(int px, int py)
 {
-    int dy = py - pos.y;
-    int dx = px - pos.x;
-    return dx * dx + dy * dy <= radiusSq;
+    PathGoalArea area;
+    GetGoalArea(&area);
+    return PathGoalContains(&area, px, py);
 }
 
 static inline void ToWorld(int* out, Point16 a, Point16 b)
@@ -403,24 +447,15 @@ int ApproachRadius::FillWorldPos(int* out)
 // FUNCTION: 0x44d310
 int ApproachRadius::ContainsUnit(Unit* obj)
 {
-    int dy = obj->cell.y - pos.y;
-    int dx = obj->cell.x - pos.x;
-    return dx * dx + dy * dy <= radiusSq;
+    return ContainsCell(obj->cell.x, obj->cell.y);
 }
 
 // FUNCTION: 0x44d350
 int ApproachRadius::ApproxDistExcess(int px, int py)
 {
-    int dx = abs(px - pos.x);
-    int dy = abs(py - pos.y);
-    int d;
-    if (dx > dy)
-        d = dy * 7 + dx * 18;
-    else
-        d = dx * 7 + dy * 18;
-    if (d < radius)
-        return 0;
-    return d - radius;
+    PathGoalArea area;
+    GetGoalArea(&area);
+    return PathGoalDistance(&area, px, py);
 }
 
 // FUNCTION: 0x44d3b0 ??0RingApproach@@QAE@PAUOrder@@HHHH@Z
@@ -499,9 +534,9 @@ void RingApproach::AppendGoalCell(void* cells)
 {
     RingApproachCellVector* list = (RingApproachCellVector*)cells;
     list->clear();
-    Point16 p = *(Point16*)&pos;
-    p.y = p.y + (outer + inner) / 32;
-    list->push_back(p);
+    PathGoalArea area;
+    GetGoalArea(&area);
+    AppendAreaCells(&area, list);
 }
 
 static inline void ToWorld(Vec3* out, Point16 a, Point16 b)
@@ -542,36 +577,23 @@ int RingApproach::FillWorldPos(Vec3* out)
 // FUNCTION: 0x44d7c0
 int RingApproach::ContainsCell(int px, int py)
 {
-    int dy = py - y;
-    int dx = px - x;
-    int distSq = dy * dy + dx * dx;
-    return distSq <= outerSq && distSq >= innerSq;
+    PathGoalArea area;
+    GetGoalArea(&area);
+    return PathGoalContains(&area, px, py);
 }
 
 // FUNCTION: 0x44d800
 int RingApproach::ContainsUnit(Unit* unit)
 {
-    int dy = unit->cell.y - y;
-    int dx = unit->cell.x - x;
-    int distSq = dx * dx + dy * dy;
-    return distSq <= outerSq && distSq >= innerSq;
+    return ContainsCell(unit->cell.x, unit->cell.y);
 }
 
 // FUNCTION: 0x44d840
 int RingApproach::ApproxDistExcess(int px, int py)
 {
-    int dx = abs(px - x);
-    int dy = abs(py - y);
-    int d;
-    if (dx > dy)
-        d = dy * 7 + dx * 18;
-    else
-        d = dx * 7 + dy * 18;
-    if (d > outer)
-        return d - outer;
-    if (d < inner)
-        return inner - d;
-    return 0;
+    PathGoalArea area;
+    GetGoalArea(&area);
+    return PathGoalDistance(&area, px, py);
 }
 
 // FUNCTION: 0x44d8a0 ??0PointMarker@@QAE@PAUOrder@@UPoint16@@1@Z
@@ -651,48 +673,17 @@ int PointMarker::FillWorldPos(int* out)
 // FUNCTION: 0x44dcb0
 int PointMarker::ContainsCell(int x, int y)
 {
-    if ((x == x1 || x == x2) && y >= y1 && y <= y2) {
-        return 1;
-    }
-    if ((y == y1 || y == y2) && x >= x1 && x <= x2) {
-        return 1;
-    }
-    return 0;
+    PathGoalArea area;
+    GetGoalArea(&area);
+    return PathGoalContains(&area, x, y);
 }
-
-#define MARKER_MIN(a, b) ((a) < (b) ? (a) : (b))
 
 // FUNCTION: 0x44dd00
 int PointMarker::ApproxDist(int x, int y)
 {
-    int dx;
-    if (x < x1) {
-        dx = x1 - x;
-    }
-    else if (x > x2) {
-        dx = x - x2;
-    }
-    else {
-        if (y < y1)
-            return (y1 - y) * 16;
-        if (y > y2)
-            return (y - y2) * 16;
-        int mx = MARKER_MIN(x - x1, x2 - x);
-        int my = MARKER_MIN(y - y1, y2 - y);
-        return MARKER_MIN(mx, my) * 16;
-    }
-
-    int dy;
-    if (y < y1)
-        dy = y1 - y;
-    else if (y > y2)
-        dy = y - y2;
-    else
-        return dx * 16;
-
-    if (dx > dy)
-        return dx * 16 + dy * 6;
-    return dy * 16 + dx * 6;
+    PathGoalArea area;
+    GetGoalArea(&area);
+    return PathGoalDistance(&area, x, y);
 }
 
 // FUNCTION: 0x44ddc0
@@ -1208,6 +1199,29 @@ Point16* __stdcall CopyDwordRangeUnchecked(Point16* first, Point16* last, Point1
     return dest;
 }
 
+static void SubmitRepath(AiSearchGoal* goal)
+{
+    PathRequest request;
+    memset(&request, 0, sizeof(request));
+    request.unit = goal->owner.offset;
+    request.notBefore = goal->repathClaimTick + 0x3c;
+    request.requester = Ref<AiSearchGoal>(goal).offset;
+    request.target = goal->target.offset;
+    OrderFx* fx = goal->target.get();
+    switch (fx->GetType()) {
+    case 4:
+        ((ApproachRadius*)fx)->GetGoalArea(&request.goal);
+        break;
+    case 5:
+        ((RingApproach*)fx)->GetGoalArea(&request.goal);
+        break;
+    case 6:
+        ((PointMarker*)fx)->GetGoalArea(&request.goal);
+        break;
+    }
+    g_seams.pathfinding->Submit(&request);
+}
+
 // FUNCTION: 0x44ef20
 // FUNCTION: 0x44ef60 ??_GPathGoal@@UAEPAXI@Z
 PathGoal::PathGoal(Unit* p)
@@ -1346,8 +1360,10 @@ void AiSearchGoal::TickTowardGoal()
             flag_3 = 1;
         }
     }
-    if (target && (Motion(owner)->flags & 4 || count < 2))
+    if (target && (Motion(owner)->flags & 4 || count < 2)) {
         flag_1 = 1;
+        SubmitRepath(this);
+    }
 }
 
 // FUNCTION: 0x44f260
@@ -1372,7 +1388,7 @@ int AiSearchGoal::HasReadyWaypoints()
 // FUNCTION: 0x44f2a0
 void AiSearchGoal::SetPathOrder(void* param)
 {
-    g_seams.pathfinding->AbortIfGoalMatch(g_game->pathfinder, this);
+    g_seams.pathfinding->Cancel(Ref<AiSearchGoal>(this).offset);
     if (target)
         target->AddFlags(0x80);
     active = 0;
@@ -1417,13 +1433,15 @@ void AiSearchGoal::SetPathOrder(void* param)
     if (repathClaimTick <= (unsigned int)g_game->ticks - 10)
         repathClaimTick = 0;
     flag_3 = 1;
+    if (flag_1)
+        SubmitRepath(this);
 }
 
 // FUNCTION: 0x44f040 ??_GAiSearchGoal@@UAEPAXI@Z
 // FUNCTION: 0x44f450
 AiSearchGoal::~AiSearchGoal()
 {
-    g_seams.pathfinding->AbortIfGoalMatch(g_game->pathfinder, this);
+    g_seams.pathfinding->Cancel(Ref<AiSearchGoal>(this).offset);
 }
 
 // FUNCTION: 0x44f480
@@ -1498,17 +1516,27 @@ void PatrolGoal::FillWaypointWorldPos(Vec3* out, int unused, int n)
     }
 }
 
-// FUNCTION: 0x44f6a0
-void CreatePathfinder()
+void __stdcall ApplyPathEvent(const PathEvent* event)
 {
-    g_seams.pathfinding->Create();
-}
-
-// FUNCTION: 0x44f6e0
-void DestroyPathfinder()
-{
-    g_seams.pathfinding->Destroy(g_game->pathfinder);
-    g_game->pathfinder = 0;
+    Ref<AiSearchGoal> goal;
+    goal.offset = event->requester;
+    if (event->kind == PATH_EVENT_STARTED) {
+        goal->repathClaimTick = event->tick;
+        Ref<OrderFx> fx;
+        fx.offset = event->target;
+        fx->AddFlags(event->status == PATH_START_DIRECT ? 0x100 : 0x200);
+    } else if (event->kind == PATH_EVENT_FINISHED) {
+        if (event->count == 0) {
+            goal->SetWaypoints(0, 0);
+        } else {
+            Point16 points[PATH_MAX_WAYPOINTS];
+            for (int i = 0; i < event->count; i++) {
+                points[i].x = event->points[i].x;
+                points[i].y = event->points[i].y;
+            }
+            goal->SetWaypoints(points, event->count);
+        }
+    }
 }
 
 #pragma pack(pop)
@@ -1522,25 +1550,12 @@ typedef void (InsertPointVector::*InsertPointVectorFn)(
 // FUNCTION: 0x44ec30 ?insert@?$vector@UPoint16@@V?$allocator@UPoint16@@@std@@@std@@QAEXPAUPoint16@@IABU3@@Z
 InsertPointVectorFn g_insert_0044ec30 = &InsertPointVector::insert;
 
-static Point16 MakePoint16(int x, int y)
-{
-    Point16 p;
-    p.x = (short)x;
-    p.y = (short)y;
-    return p;
-}
-
 // FUNCTION: 0x44da00
 void PointMarker::AppendGoalCell(void* cells)
 {
     PointMarkerCellVector* list = (PointMarkerCellVector*)cells;
     list->clear();
-    for (int i = x1; i <= x2; i++) {
-        list->push_back(MakePoint16(i, y1));
-        list->push_back(MakePoint16(i, y2));
-    }
-    for (int j = y1 + 1; j <= y2 - 1; j++) {
-        list->push_back(MakePoint16(x1, j));
-        list->push_back(MakePoint16(x2, j));
-    }
+    PathGoalArea area;
+    GetGoalArea(&area);
+    AppendAreaCells(&area, list);
 }

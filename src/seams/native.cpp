@@ -33,6 +33,7 @@
 #include "../util/angles.h"
 
 struct Player;
+#include "pathfinding_world.h"
 
 #include "../game/game_state.h"
 #include "../map/meteors.h"
@@ -534,36 +535,6 @@ static void __stdcall RefreshUnitIfStaleNative(MovementClass* self, Unit* unit)
     self->RefreshUnitIfStale((UnitPassMapView*)unit);
 }
 
-static void __stdcall AiSearchGoalSetWaypointsNative(AiSearchGoal* self, Point16* points, int count)
-{
-    self->SetWaypoints(points, count);
-}
-
-static void __stdcall OrderFxAddFlagsNative(OrderFx* self, int flags)
-{
-    self->AddFlags(flags);
-}
-
-static int __stdcall OrderFxIsGoalNative(OrderFx* self, int x, int y)
-{
-    return self->ContainsCell(x, y);
-}
-
-static void __stdcall OrderFxFillGoalCellsNative(OrderFx* self, std::vector<Point16>* goals)
-{
-    self->FillGoalCells(goals);
-}
-
-static int __stdcall OrderFxApproxDistNative(OrderFx* self, int x, int y)
-{
-    return self->ApproxDist(x, y);
-}
-
-static AiSearchGoal* __stdcall UnitMotionClaimRepathNative(UnitMotion* motion)
-{
-    return motion->ClaimRepath();
-}
-
 static void __stdcall OrderOrStatusFlagsNative(OrderBase* order, unsigned int flags)
 {
     order->OrStatusFlags(flags);
@@ -584,27 +555,17 @@ static void __stdcall CobScriptExplodePieceNative(CobScript* script, int piece, 
     script->ExplodePiece(piece, flags);
 }
 
-static void __fastcall RunSearchesNative(Pathfinder* self)
-{
-    self->RunSearches();
-}
-
-static void __stdcall AbortIfGoalMatchNative(Pathfinder* self, AiSearchGoal* goal)
-{
-    self->AbortIfGoalMatch((int)goal);
-}
-
-static void __stdcall DestroyPathfinderNative(Pathfinder* self)
-{
-    delete self;
-}
-
-static void __stdcall CreatePathfinderNative()
-{
-    g_game->pathfinder = new (kSim) Pathfinder;
-}
-
 Seams g_seams;
+
+void SetSearchStepsPerTick(int steps)
+{
+    PathfindingSetStepsPerTick(steps);
+}
+
+void SetSearchBaseScale(int scale)
+{
+    PathfindingSetBaseScale(scale);
+}
 
 static WindMeteorsSeam s_wind_meteors;
 static EconomySeam s_economy;
@@ -809,16 +770,15 @@ void InstallNativeSeams()
     s_los_radar.RecordRadarMapped = RecordRadarMapped;
     s_los_radar.UpdateSensorRadarAndCloak = UpdateSensorRadarAndCloak;
     s_los_radar.SoundHeardMask = SoundHeardMask;
-    s_pathfinding.RunSearches = RunSearchesNative;
-    s_pathfinding.AbortIfGoalMatch = AbortIfGoalMatchNative;
-    s_pathfinding.Destroy = DestroyPathfinderNative;
-    s_pathfinding.Create = CreatePathfinderNative;
-    s_orders.AiSearchGoalSetWaypoints = AiSearchGoalSetWaypointsNative;
-    s_orders.OrderFxAddFlags = OrderFxAddFlagsNative;
-    s_orders.OrderFxIsGoal = OrderFxIsGoalNative;
-    s_orders.OrderFxFillGoalCells = OrderFxFillGoalCellsNative;
-    s_orders.OrderFxApproxDist = OrderFxApproxDistNative;
-    s_orders.UnitMotionClaimRepath = UnitMotionClaimRepathNative;
+    s_pathfinding.Init = PathfindingInit;
+    s_pathfinding.Shutdown = PathfindingShutdown;
+    s_pathfinding.Submit = PathfindingSubmit;
+    s_pathfinding.Cancel = PathfindingCancel;
+    s_pathfinding.CellsChanged = PathfindingCellsChanged;
+    s_pathfinding.Step = PathfindingStep;
+    s_pathfinding.Poll = PathfindingPoll;
+    s_pathfinding.Project = PathfindingProject;
+    s_orders.ApplyPathEvent = ApplyPathEvent;
     s_orders.OrderOrStatusFlags = OrderOrStatusFlagsNative;
     s_orders.UnitMotionReadNetState = UnitMotionReadNetStateNative;
     s_units.MovementClassGet = MovementClassGetNative;
@@ -893,8 +853,6 @@ void InstallNativeSeams()
     s_orders.IssueAttackOrder = IssueAttackOrder;
     s_orders.RegisterAllOrderTypes = RegisterAllOrderTypes;
     s_orders.ClearOrderTypeTable = ClearOrderTypeTable;
-    s_orders.CreatePathfinder = CreatePathfinder;
-    s_orders.DestroyPathfinder = DestroyPathfinder;
     s_players.GetEnergyIncome = GetEnergyIncome;
     s_players.GetMetalIncome = GetMetalIncome;
     s_players.GetNetEnergy = (float (__stdcall *)(Player *))GetNetEnergy;
@@ -1115,4 +1073,5 @@ void InstallNativeSeams()
     g_seams.map = &s_map;
     g_seams.files = &s_files;
     g_seams.network = &s_network;
+    g_seams.pathworld = NativePathWorld();
 }

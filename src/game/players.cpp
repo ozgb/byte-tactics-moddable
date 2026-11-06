@@ -513,7 +513,10 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
 #if BT_ACCESS_LOG
     AccessLogPassScope accessPass(ACCESS_PASS_PLAYERS);
 #endif
-    g_seams.pathfinding->RunSearches(g_game->pathfinder);
+    g_seams.pathfinding->Step();
+    PathEvent event;
+    while (g_seams.pathfinding->Poll(&event))
+        g_seams.orders->ApplyPathEvent(&event);
     unsigned char bl = 0;
     for (;;) {
         if (!IsPlayerSlotInRange(bl))

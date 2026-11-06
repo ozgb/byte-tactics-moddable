@@ -32,8 +32,9 @@ This step is done when every one of your pull requests is waiting on the maintai
 Take a new issue while you hold **fewer than 10 claims** (`docs/team.md`, "Issue states": a claim counts until its pull request merges or you release it). Prefer issues that touch different files from the ones you hold; two that regenerate the same files merge one at a time.
 
 1. Find available issues (`docs/team.md`, "Issue states"), using the commands in `AGENTS.md` step 2. Take the earliest in #2's order section.
-2. **Check it's ready.** Read the issue and the code it touches. It's ready when you could start without making a decision the plan doesn't cover, it fits in one reviewable pull request, and its "Done when" is checkable. If not, label it `needs-grooming`, comment what's missing or how it could be split, and pick another.
-3. Claim it as `AGENTS.md` step 2 describes.
+2. **Check it's ready.** Read the issue and the code it touches. It's ready when you could start without making a decision the plan doesn't cover and its "Done when" is checkable. Size is never a reason to send it back: a large issue whose decisions are made is one pull request (`docs/team.md`, "Issue size"). Label it `needs-grooming` only when it needs a decision, or its parts must land in order; comment what's missing, and pick another.
+3. **Take siblings with it.** If other available issues touch the same files and run the same gate, claim them together and close them in one pull request.
+4. Claim it as `AGENTS.md` step 2 describes.
 
 ### 3. Implement
 
@@ -41,7 +42,7 @@ Follow `AGENTS.md` steps 3 to 5: work in `tools/worktree.sh <N>`, stay inside th
 
 - **Done means the issue's "Done when" holds**, every task is done or listed under "Left out", and every check it names passed when you ran it. Report results exactly; a check you didn't run is "not run".
 - **Decisions the issue leaves open** that are small and local: make them, and explain them in the pull request. Decisions that change an interface, another issue or #2's decisions: comment on the issue with the options and your recommendation, label it `needs-grooming`, and move on; the maintainer decides.
-- **Work you find that the issue doesn't cover:** leave it out and list it in the pull request under "Left out", or comment on the issue. The maintainer decides whether it becomes an issue.
+- **Work you find that the issue doesn't cover:** if it stays inside the plan's boundaries, needs no decision the plan doesn't make, and touches the code the pull request already changes, do it and list it under "Also done". Otherwise list it under "Left out" with your view of whether it is worth doing at all. The maintainer decides what happens to it, and most of it doesn't become an issue.
 
 Then go back to step 1.
 

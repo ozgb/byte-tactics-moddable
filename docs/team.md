@@ -69,7 +69,17 @@ Only the maintainer merges. A branch doesn't have to contain `moddable`'s head t
 
 | Label | Set by | Meaning | Cleared by |
 |---|---|---|---|
-| `needs-grooming` | the lead (or anyone) | An issue isn't concrete enough to implement, or is too big for one pull request. A comment says what's missing. | the maintainer, after fleshing out or splitting it |
+| `needs-grooming` | the lead (or anyone) | An issue needs a decision the plan doesn't make, or has parts that must land in order ("Issue size"). A comment says what's missing. | the maintainer, after fleshing out or splitting it |
+
+## Issue size
+
+Every pull request pays a fixed cost: a gate run, a review round and, when it changes generated `data/` or `reference/` files, a regeneration after each merge ahead of it. Size issues so that cost is paid as rarely as the work allows.
+
+- **Size is never a reason to split.** Agents write and review large pull requests well, so a large issue whose decisions the plan already makes is done in one pull request, in as many commits as it needs.
+- **Split only along a real boundary:** one part needs a decision or an interface that another part settles first, or the parts touch disjoint files and gain from running in parallel. Never split to fill the queue or to make issues small.
+- **Split once.** A sub-issue isn't split again; if one turns out to need it, regroup its parent instead.
+- **Combine siblings.** Open issues that touch the same files and run the same gate become one issue; close the others as merged into it. A pull request may also close several such issues at once (`Closes #A`, `Closes #B`).
+- **Leftover work is triaged, not filed by default** (the maintainer's "Reconcile after a merge"): most of it is dropped or folded into an open issue.
 
 ## Issue states
 

@@ -85,7 +85,10 @@ comment `Released` on the issue and unassign yourself.
 
 Each issue's tasks, CI checks and "Done when" are the specification. Do what
 it asks, and finish every task or list it under "Left out" in the pull
-request.
+request. Work the issue doesn't cover, on code you already change, goes in
+the same pull request under "Also done" when it needs no new decision; every
+pull request costs a gate run, so don't defer it to a new issue
+(`docs/team.md`, "Issue size").
 
 While you work, keep to the plan's boundaries. CI enforces each one as its
 issue lands:
@@ -173,12 +176,16 @@ Model: <tool> / <model>
 Checks:
 - <each check the issue names>: <result>
 
+Also done:
+- work outside the issue, on code it already changes (or "none")
+
 Left out:
 - what the issue asked for that you did not do, and why (or "none")
 ```
 
 `Closes #<N>` is what unblocks the issues waiting on yours. Open one pull
-request per issue.
+request per issue, or one for several issues that share files and a gate,
+with a `Closes` line for each.
 
 ## Comments in code
 

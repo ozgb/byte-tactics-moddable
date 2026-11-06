@@ -95,16 +95,16 @@ Each deferrable edge was held back to the end of its phase in a full-suite run (
 
 Results: 30 equal.
 
-`defer_held` is 0 for every one of the 30 edges in 4 groups (332 scenario runs counted in all): in no run did a reader meet a write that the barrier held back.
+`defer_held` is 0 for every one of the 30 edges in 4 groups (336 scenario runs counted in all): in no run did a reader meet a write that the barrier held back.
 
 The runs add no evidence on paths the suite does not reach. The control (tests/defer/immediate-control.defer) shows that the barrier changes a trace on an immediate edge, so the barrier can change what a run shows.
 
 | group | edges | scenarios | counted | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|
-| g1 | 14 | 84 | 83 | equal | 0 | 0 |
-| g2 | 4 | 84 | 83 | equal | 0 | 0 |
-| g3 | 9 | 84 | 83 | equal | 0 | 1688 |
-| g4 | 3 | 84 | 83 | equal | 0 | 0 |
+| g1 | 14 | 85 | 84 | equal | 0 | 0 |
+| g2 | 4 | 85 | 84 | equal | 0 | 0 |
+| g3 | 9 | 85 | 84 | equal | 0 | 1688 |
+| g4 | 3 | 85 | 84 | equal | 0 | 0 |
 
 ## Presentation reads
 
@@ -369,7 +369,7 @@ No draws.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| los_radar -> economy | `Unit::workTime` | players | g1 | 84 | equal | 0 | 0 |
+| los_radar -> economy | `Unit::workTime` | players | g1 | 85 | equal | 0 | 0 |
 
 ## features
 
@@ -547,11 +547,11 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| features -> orders | `FeatureAnimEntry::bytes_10` | units | g2 | 84 | equal | 0 | 0 |
-| features -> orders | `Unit::metal` | units | g2 | 84 | equal | 0 | 0 |
-| features -> weapons | `FeatureAnimEntry::bytes_8` | projectiles | g1 | 84 | equal | 0 | 0 |
-| orders -> features | `Unit::metal` | units | g1 | 84 | equal | 0 | 0 |
-| units -> features | `FeatureAnimEntry::bytes_10` | units | g1 | 84 | equal | 0 | 0 |
+| features -> orders | `FeatureAnimEntry::bytes_10` | units | g2 | 85 | equal | 0 | 0 |
+| features -> orders | `Unit::metal` | units | g2 | 85 | equal | 0 | 0 |
+| features -> weapons | `FeatureAnimEntry::bytes_8` | projectiles | g1 | 85 | equal | 0 | 0 |
+| orders -> features | `Unit::metal` | units | g1 | 85 | equal | 0 | 0 |
+| units -> features | `FeatureAnimEntry::bytes_10` | units | g1 | 85 | equal | 0 | 0 |
 
 ## ai
 
@@ -759,11 +759,11 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| ai -> orders | `Unit::group` | units | g1 | 84 | equal | 0 | 0 |
-| los_radar -> ai | `LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY` | players | g1 | 84 | equal | 0 | 0 |
-| orders -> ai | `Unit::group` | units | g3 | 84 | equal | 0 | 1688 |
-| units -> ai | `Unit::activateFlags` | units | g1 | 84 | equal | 0 | 0 |
-| weapons -> ai | `Unit::lastDamageType` | features | g1 | 84 | equal | 0 | 0 |
+| ai -> orders | `Unit::group` | units | g1 | 85 | equal | 0 | 0 |
+| los_radar -> ai | `LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY` | players | g1 | 85 | equal | 0 | 0 |
+| orders -> ai | `Unit::group` | units | g3 | 85 | equal | 0 | 1688 |
+| units -> ai | `Unit::activateFlags` | units | g1 | 85 | equal | 0 | 0 |
+| weapons -> ai | `Unit::lastDamageType` | features | g1 | 85 | equal | 0 | 0 |
 
 ## pathfinding
 
@@ -846,7 +846,7 @@ No row of data/pass_reads.csv has it as reader.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| los_radar -> pathfinding | `LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY` | players | g3 | 84 | equal | 0 | 1688 |
+| los_radar -> pathfinding | `LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY` | players | g3 | 85 | equal | 0 | 1688 |
 
 ## weapons
 
@@ -1057,14 +1057,14 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| features -> weapons | `FeatureAnimEntry::bytes_8` | projectiles | g1 | 84 | equal | 0 | 0 |
-| orders -> weapons | `Order::kind` | projectiles | g4 | 84 | equal | 0 | 0 |
-| targeting -> weapons | `Unit::current` | players | g1 | 84 | equal | 0 | 0 |
-| units -> weapons | `FeatureAnimEntry::bytes_10` | units | g3 | 84 | equal | 0 | 1688 |
-| weapons -> ai | `Unit::lastDamageType` | features | g1 | 84 | equal | 0 | 0 |
-| weapons -> orders | `Unit::attacker` | units | g3 | 84 | equal | 0 | 1688 |
-| weapons -> orders | `Unit::field_1e` | units | g3 | 84 | equal | 0 | 1688 |
-| weapons -> orders | `Unit::lastDamageType` | units | g3 | 84 | equal | 0 | 1688 |
+| features -> weapons | `FeatureAnimEntry::bytes_8` | projectiles | g1 | 85 | equal | 0 | 0 |
+| orders -> weapons | `Order::kind` | projectiles | g4 | 85 | equal | 0 | 0 |
+| targeting -> weapons | `Unit::current` | players | g1 | 85 | equal | 0 | 0 |
+| units -> weapons | `FeatureAnimEntry::bytes_10` | units | g3 | 85 | equal | 0 | 1688 |
+| weapons -> ai | `Unit::lastDamageType` | features | g1 | 85 | equal | 0 | 0 |
+| weapons -> orders | `Unit::attacker` | units | g3 | 85 | equal | 0 | 1688 |
+| weapons -> orders | `Unit::field_1e` | units | g3 | 85 | equal | 0 | 1688 |
+| weapons -> orders | `Unit::lastDamageType` | units | g3 | 85 | equal | 0 | 1688 |
 
 ## targeting
 
@@ -1229,9 +1229,9 @@ The rows themselves are in data/phase_dependencies.csv.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| targeting -> weapons | `Unit::current` | players | g1 | 84 | equal | 0 | 0 |
-| units -> targeting | `Unit::activateFlags` | players | g2 | 84 | equal | 0 | 0 |
-| units -> targeting | `Unit::activateFlags` | units | g2 | 84 | equal | 0 | 0 |
+| targeting -> weapons | `Unit::current` | players | g1 | 85 | equal | 0 | 0 |
+| units -> targeting | `Unit::activateFlags` | players | g2 | 85 | equal | 0 | 0 |
+| units -> targeting | `Unit::activateFlags` | units | g2 | 85 | equal | 0 | 0 |
 
 ## los_radar
 
@@ -1411,11 +1411,11 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| los_radar -> ai | `LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY` | players | g1 | 84 | equal | 0 | 0 |
-| los_radar -> economy | `Unit::workTime` | players | g1 | 84 | equal | 0 | 0 |
-| los_radar -> pathfinding | `LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY` | players | g3 | 84 | equal | 0 | 1688 |
-| los_radar -> players | `bits_142f1` | tail | g1 | 84 | equal | 0 | 0 |
-| orders -> los_radar | `Order::pos` | units | g1 | 84 | equal | 0 | 0 |
+| los_radar -> ai | `LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY` | players | g1 | 85 | equal | 0 | 0 |
+| los_radar -> economy | `Unit::workTime` | players | g1 | 85 | equal | 0 | 0 |
+| los_radar -> pathfinding | `LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY` | players | g3 | 85 | equal | 0 | 1688 |
+| los_radar -> players | `bits_142f1` | tail | g1 | 85 | equal | 0 | 0 |
+| orders -> los_radar | `Order::pos` | units | g1 | 85 | equal | 0 | 0 |
 
 ## orders
 
@@ -1636,23 +1636,23 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| ai -> orders | `Unit::group` | units | g1 | 84 | equal | 0 | 0 |
-| features -> orders | `FeatureAnimEntry::bytes_10` | units | g2 | 84 | equal | 0 | 0 |
-| features -> orders | `Unit::metal` | units | g2 | 84 | equal | 0 | 0 |
-| orders -> ai | `Unit::group` | units | g3 | 84 | equal | 0 | 1688 |
-| orders -> features | `Unit::metal` | units | g1 | 84 | equal | 0 | 0 |
-| orders -> los_radar | `Order::pos` | units | g1 | 84 | equal | 0 | 0 |
-| orders -> players | `Unit::pos` | units | g1 | 84 | equal | 0 | 0 |
-| orders -> players | `Unit::zFraction` | units | g1 | 84 | equal | 0 | 0 |
-| orders -> units | `Order::z` | units | g4 | 84 | equal | 0 | 0 |
-| orders -> units | `Unit::metal` | units | g4 | 84 | equal | 0 | 0 |
-| orders -> weapons | `Order::kind` | projectiles | g4 | 84 | equal | 0 | 0 |
-| units -> orders | `Unit::activateFlags` | units | g3 | 84 | equal | 0 | 1688 |
-| units -> orders | `Unit::killCount` | units | g3 | 84 | equal | 0 | 1688 |
-| units -> orders | `Unit::metal` | units | g3 | 84 | equal | 0 | 1688 |
-| weapons -> orders | `Unit::attacker` | units | g3 | 84 | equal | 0 | 1688 |
-| weapons -> orders | `Unit::field_1e` | units | g3 | 84 | equal | 0 | 1688 |
-| weapons -> orders | `Unit::lastDamageType` | units | g3 | 84 | equal | 0 | 1688 |
+| ai -> orders | `Unit::group` | units | g1 | 85 | equal | 0 | 0 |
+| features -> orders | `FeatureAnimEntry::bytes_10` | units | g2 | 85 | equal | 0 | 0 |
+| features -> orders | `Unit::metal` | units | g2 | 85 | equal | 0 | 0 |
+| orders -> ai | `Unit::group` | units | g3 | 85 | equal | 0 | 1688 |
+| orders -> features | `Unit::metal` | units | g1 | 85 | equal | 0 | 0 |
+| orders -> los_radar | `Order::pos` | units | g1 | 85 | equal | 0 | 0 |
+| orders -> players | `Unit::pos` | units | g1 | 85 | equal | 0 | 0 |
+| orders -> players | `Unit::zFraction` | units | g1 | 85 | equal | 0 | 0 |
+| orders -> units | `Order::z` | units | g4 | 85 | equal | 0 | 0 |
+| orders -> units | `Unit::metal` | units | g4 | 85 | equal | 0 | 0 |
+| orders -> weapons | `Order::kind` | projectiles | g4 | 85 | equal | 0 | 0 |
+| units -> orders | `Unit::activateFlags` | units | g3 | 85 | equal | 0 | 1688 |
+| units -> orders | `Unit::killCount` | units | g3 | 85 | equal | 0 | 1688 |
+| units -> orders | `Unit::metal` | units | g3 | 85 | equal | 0 | 1688 |
+| weapons -> orders | `Unit::attacker` | units | g3 | 85 | equal | 0 | 1688 |
+| weapons -> orders | `Unit::field_1e` | units | g3 | 85 | equal | 0 | 1688 |
+| weapons -> orders | `Unit::lastDamageType` | units | g3 | 85 | equal | 0 | 1688 |
 
 ## units
 
@@ -1852,17 +1852,17 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| orders -> units | `Order::z` | units | g4 | 84 | equal | 0 | 0 |
-| orders -> units | `Unit::metal` | units | g4 | 84 | equal | 0 | 0 |
-| units -> ai | `Unit::activateFlags` | units | g1 | 84 | equal | 0 | 0 |
-| units -> features | `FeatureAnimEntry::bytes_10` | units | g1 | 84 | equal | 0 | 0 |
-| units -> orders | `Unit::activateFlags` | units | g3 | 84 | equal | 0 | 1688 |
-| units -> orders | `Unit::killCount` | units | g3 | 84 | equal | 0 | 1688 |
-| units -> orders | `Unit::metal` | units | g3 | 84 | equal | 0 | 1688 |
-| units -> players | `Unit::yFraction` | units | g1 | 84 | equal | 0 | 0 |
-| units -> targeting | `Unit::activateFlags` | players | g2 | 84 | equal | 0 | 0 |
-| units -> targeting | `Unit::activateFlags` | units | g2 | 84 | equal | 0 | 0 |
-| units -> weapons | `FeatureAnimEntry::bytes_10` | units | g3 | 84 | equal | 0 | 1688 |
+| orders -> units | `Order::z` | units | g4 | 85 | equal | 0 | 0 |
+| orders -> units | `Unit::metal` | units | g4 | 85 | equal | 0 | 0 |
+| units -> ai | `Unit::activateFlags` | units | g1 | 85 | equal | 0 | 0 |
+| units -> features | `FeatureAnimEntry::bytes_10` | units | g1 | 85 | equal | 0 | 0 |
+| units -> orders | `Unit::activateFlags` | units | g3 | 85 | equal | 0 | 1688 |
+| units -> orders | `Unit::killCount` | units | g3 | 85 | equal | 0 | 1688 |
+| units -> orders | `Unit::metal` | units | g3 | 85 | equal | 0 | 1688 |
+| units -> players | `Unit::yFraction` | units | g1 | 85 | equal | 0 | 0 |
+| units -> targeting | `Unit::activateFlags` | players | g2 | 85 | equal | 0 | 0 |
+| units -> targeting | `Unit::activateFlags` | units | g2 | 85 | equal | 0 | 0 |
+| units -> weapons | `FeatureAnimEntry::bytes_10` | units | g3 | 85 | equal | 0 | 1688 |
 
 ## players
 
@@ -2021,10 +2021,10 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| los_radar -> players | `bits_142f1` | tail | g1 | 84 | equal | 0 | 0 |
-| orders -> players | `Unit::pos` | units | g1 | 84 | equal | 0 | 0 |
-| orders -> players | `Unit::zFraction` | units | g1 | 84 | equal | 0 | 0 |
-| units -> players | `Unit::yFraction` | units | g1 | 84 | equal | 0 | 0 |
+| los_radar -> players | `bits_142f1` | tail | g1 | 85 | equal | 0 | 0 |
+| orders -> players | `Unit::pos` | units | g1 | 85 | equal | 0 | 0 |
+| orders -> players | `Unit::zFraction` | units | g1 | 85 | equal | 0 | 0 |
+| units -> players | `Unit::yFraction` | units | g1 | 85 | equal | 0 | 0 |
 
 ## map
 

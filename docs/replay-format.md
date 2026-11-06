@@ -84,8 +84,8 @@ their value forms are the `objects` of the schema:
 
 | Scope | Kind | `N` | Where it lives |
 |---|---|---|---|
-| state | `UnitDef` and the like | order of first appearance in the file, so it is stable across calls | in the block, linked by `Ref` |
-| state, `table` | `Player`, `Unit`, `Projectile`, `MovementClass`, `Cell`, `Feature`, `Spot`, `Pool` | the index in the table: `Player#3` is `Game.players[3]`, `Unit#17` is slot 17 of the unit pool, `Projectile#3` is `Game.projectiles[3]`, `Cell#2051` is `Game.cells[2051]`, that is `y*width+x`, `Feature#5` is `Game.features[5]`, `Spot#9` is `Game.spots[9]` and `Pool#0` is `Game.pool` | an array in `Game` or `SimGlobals`, or a `Ref` to one |
+| state | a kind with no `table` that is linked by a `Ref` | order of first appearance in the file, so it is stable across calls | in the block, linked by `Ref` |
+| state, `table` | `Player`, `Unit`, `UnitDef`, `Projectile`, `MovementClass`, `Cell`, `Feature`, `Spot`, `Pool` | the index in the table: `Player#3` is `Game.players[3]`, `Unit#17` is slot 17 of the unit pool, `UnitDef#2` is `Game.defs[2]`, `Projectile#3` is `Game.projectiles[3]`, `Cell#2051` is `Game.cells[2051]`, that is `y*width+x`, `Feature#5` is `Game.features[5]`, `Spot#9` is `Game.spots[9]` and `Pool#0` is `Game.pool` | an array in `Game` or `SimGlobals`, or a `Ref` to one |
 | state, `inside` | `UnitResources` of a unit, `Handle` of a feature or a spot | the site, the container and the member: `Unit#17.resourceSlot`, `Feature#5.anim`, `Spot#9.shadow` | a member of another kind (see An object embedded at several sites) |
 | index | `weapondef` | the index in `Game.weapons` | in the block's weapon array |
 | value | `MeteorParams`, `Vec3` | none: the lines are written with the argument's name, `params.radius`, `pos.x` | an argument struct of one call |
@@ -119,6 +119,8 @@ product of the fields' current values and stores nothing, since neither factor i
 the first element is named: `Game.width` and `Game.height` are in the read set of every slot that reaches a `Cell`, so their `r`
 lines come before the first `Cell#N`. A slot's annotation adds a field to its read set with `"reads": ["Game.width", "Game.height"]`,
 and `replayschema.py --check` reports a complete subsystem's slot that reaches such a kind with a factor missing from its read set.
+
+`UnitDef` is a `Ref` table over `defs` with `unitDefCount` and `alloc` 1024, and `UnitDef#N` is the index in `Game.defs`, the same in every recording.
 
 `Player` and `Unit` are instances of this form (`players` is `{"base": "game", "member": "players", "count": 10}`, `units` is a
 `Ref` with `poolCount` and `alloc` 5001), so the text of every committed recording is the same as before the form had a name.

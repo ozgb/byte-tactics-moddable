@@ -625,8 +625,8 @@ class Tables(unittest.TestCase):
         self.assertIn("offsetof(Game, projectiles)", text)
         self.assertIn("offsetof(SimGlobals, g_movementClasses.entries)", text)
         self.assertIn('#pragma push_macro("g_movementClasses")', text)
-        self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 5,', text)
-        self.assertIn('{ "UnitDef", sizeof(UnitDef), RS_STATE, RT_ORDER,', text)
+        self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 6,', text)
+        self.assertIn('{ "UnitDef", sizeof(UnitDef), RS_STATE, 3,', text)
 
     def test_the_size_of_an_inline_table_is_checked_against_its_count(self):
         files, _, _ = self.generated()
@@ -1553,7 +1553,7 @@ class Conditions(unittest.TestCase):
         for when, message in (({"via": "nowhere", "field": "flags", "equals": 0}, "nowhere, which is no field of FixtureSlave"),
                               ({"via": "moved", "field": "flags", "equals": 0}, "the `via` field moved has a `when` of its own"),
                               ({"via": "player", "field": "flags", "equals": 0}, "the condition's `kind` names the table kind it indexes"),
-                              ({"via": "player", "kind": "UnitDef", "field": "flags1", "equals": 0}, "the condition's `kind` names the table kind it indexes"),
+                              ({"via": "player", "kind": "CobScript", "field": "flags1", "equals": 0}, "the condition's `kind` names the table kind it indexes"),
                               ({"via": "master", "kind": "FixtureView", "field": "flags", "equals": 0}, "leads to its target, and `kind` is for an integer"),
                               ({"kind": "Player", "field": "flags", "equals": 0}, "there is no `via`")):
             errors = self.errors(annotations(), "FixtureSlave", "speed", when)

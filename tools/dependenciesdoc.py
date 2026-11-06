@@ -51,6 +51,9 @@ Gaps in what the data say:
   handlers, because scripted UI input is not logged.
 - Static-only items of ambiguous or unseen types have no row.
 - Events after marker 7 are not attributed to a phase of their own.
+- The passes are per loop over entities (the top-level loops of the phases and their nested loops over units, players,
+  pieces, debris, feature types and per-player units). COB threads, orders and squads inside an entity are not split into
+  passes: the accesses inside one entity's COB threads, orders and squads keep the order of that entity's pass.
 """
 
 

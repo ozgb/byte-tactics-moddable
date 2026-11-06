@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v23` is the fixed target for anyone writing a new
+The git tag `reference-traces-v24` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v23`**.
+code as a base. This page names the current tag: **`reference-traces-v24`**.
 
 ## What the tag holds
 
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v23`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v23
+git checkout reference-traces-v24
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -131,7 +131,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v23
+git checkout reference-traces-v24
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -203,9 +203,9 @@ What the code shows about the players fields (the player loader and saver):
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v23`
+the digests that should become a target gets a new tag (`reference-traces-v25`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v23`.
+`reference-traces-v24`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -301,12 +301,17 @@ and so on), and this page is updated to name it. The current tag is
   the economy and targeting cases the other scenarios do not reach (an extractor over the map edge, a
   slot 2 unit, a swarm of more than 50 targets, a kamikaze unit, a fire order of 0, an attack on ground
   under the sea). The 83 earlier digests, the sound logs, the UI logs, the frames and the save are those of v22.
+- `reference-traces-v24`: the same 84 scenarios as v23, with the sim event log in the gate (#874). The
+  traces are regenerated from the reference build that writes the event log, so their headers name
+  that commit; every digest, the sound logs, the UI logs, the frames and the save are those of v23.
+  New: `reference/events/<scenario>.txt`, the digest of each scenario's event log per tick and phase
+  (`docs/events-log.md`).
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
-`bt-trace N` does not name which fields are hashed. v1 to v23 are
+`bt-trace N` does not name which fields are hashed. v1 to v24 are
 all `bt-trace 3`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

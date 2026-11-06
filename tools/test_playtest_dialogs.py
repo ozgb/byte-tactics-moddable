@@ -113,7 +113,7 @@ def fake_run(tmp: Path, put=None, collect=None) -> argparse.Namespace:
     scenario = tmp / "scenario.txt"
     scenario.write_text("ticks 1\n")
     return argparse.Namespace(work=tmp / "work", out=tmp / "out", exes=[exe], testmode=scenario, put=put or [],
-                              collect=collect or [], notes=[])
+                              collect=collect or [], notes=[], record=None, recordings=lambda: [])
 
 
 def test_put_places_a_file_in_the_game_copy() -> None:

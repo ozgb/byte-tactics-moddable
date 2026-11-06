@@ -1,0 +1,3 @@
+{
+ "economy/mp-sharing": "uv run tools/playtest.py --exe build/modern/TotalA.exe --scenario mp --record economy:1:4300 --game-dir DIR"
+}

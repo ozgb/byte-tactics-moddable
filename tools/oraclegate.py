@@ -248,7 +248,7 @@ def judge(module: Path, subsystem: str, full: bool, build: Path, out: Path, game
         play += ["--game-dir", game_dir]
     with (out / "logs/replay.txt").open("w") as f:
         subprocess.run(play, stdout=f, stderr=subprocess.STDOUT, text=True, cwd=ROOT)
-    names = [f"{subsystem}/{p.stem}" for p in sorted((replay.RECORDINGS / subsystem).glob("*.txt"))]
+    names = [f"{subsystem}/{p.stem}" for p in replay.scenario_recordings(subsystem)]
     recordings = parse_recordings(json.loads(verdicts.read_text())) if verdicts.is_file() else {}
     for name in names:
         recordings.setdefault(name, {"status": "failed"})

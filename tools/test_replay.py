@@ -3,13 +3,104 @@
     uv run tools/test_replay.py
 """
 
+import struct
 import tempfile
 import unittest
 from pathlib import Path
 
 import replay
 
+METAL_FACTOR = 0x3EAAAAAB
+ENERGY_FACTOR = 0x3F000000
+
 GOOD = "bt-replay 2\nsubsystem wind_meteors 1.2\ncall 1 UpdateWind\ncall 2 UpdateMeteors\n  r Game.width 1024\n  i services.GameRand main = 5\n  w rng.main 0x00000001\n"
+
+
+def f32(bits: int) -> float:
+    return struct.unpack("<f", struct.pack("<I", bits))[0]
+
+
+def f32_bits(value: float) -> int:
+    return struct.unpack("<I", struct.pack("<f", value))[0]
+
+
+def share_amount_bits(stock: int, keep: int, factor: int, capacity: int, partner: int) -> int:
+    """ShareAmount (src/network/resource_share.h) as the x87 gives it at 53-bit precision: doubles, rounded to a float at the end."""
+    product = (f32(stock) - f32(keep)) * f32(factor)
+    limit = f32(capacity) - f32(partner)
+    return f32_bits(product if product < limit else limit)
+
+
+def float_bits(text: str) -> int:
+    assert text.startswith("f32:0x"), text
+    return int(text[6:], 16)
+
+
+def share_transfers(text: str) -> list[dict]:
+    """Every players.TransferMetal and players.TransferEnergy import of a recording, with the amount the model gives for the values the
+    recording knows at that point (the last r or w line of each field). The metal share passes through TransferEnergy and the energy share
+    through TransferMetal, as UpdateResourceSharing calls them; the factors are 1/3 and 1/2."""
+    known: dict[str, str] = {}
+    found = []
+    tick = None
+    for line in text.split("\n"):
+        words = line.strip().split(" ")
+        if line.startswith("call "):
+            tick = int(words[1])
+        elif words[0] in ("r", "w") and len(words) == 3:
+            known[words[1]] = words[2]
+        elif words[0] == "i" and words[1] in ("players.TransferMetal", "players.TransferEnergy"):
+            source, target = int(words[2]), int(words[3])
+            kind, factor = ("metal", METAL_FACTOR) if words[1] == "players.TransferEnergy" else ("energy", ENERGY_FACTOR)
+            names = [f"Player#{source}.{kind}", f"Player#{source}.share{kind.capitalize()}", f"Player#{target}.{kind}Capacity", f"Player#{target}.{kind}"]
+            record = {"tick": tick, "import": words[1], "recorded": float_bits(words[4]), "inputs": names}
+            if all(n in known for n in names):
+                stock, keep, capacity, partner = (float_bits(known[n]) for n in names)
+                record["expected"] = share_amount_bits(stock, keep, factor, capacity, partner)
+                record["limited"] = f32(capacity) - f32(partner) <= (f32(stock) - f32(keep)) * f32(factor)
+            found.append(record)
+    return found
+
+
+def share_problems(text: str) -> list[str]:
+    """The transfers whose recorded amount is not the model's, bit for bit."""
+    return [f"tick {t['tick']} {t['import']}: recorded 0x{t['recorded']:08x}, " + (f"model 0x{t['expected']:08x}" if "expected" in t else f"inputs unknown {t['inputs']}")
+            for t in share_transfers(text) if t.get("expected") != t["recorded"]]
+
+
+SHARING = replay.RECORDINGS / "economy" / "mp-sharing.txt"
+
+
+class Sharing(unittest.TestCase):
+    def test_the_model_is_resource_share_h(self):
+        self.assertEqual(f32(share_amount_bits(f32_bits(1000.0), f32_bits(100.0), METAL_FACTOR, f32_bits(1000.0), f32_bits(0.0))), 300.0)
+        self.assertEqual(f32(share_amount_bits(f32_bits(1000.0), f32_bits(100.0), ENERGY_FACTOR, f32_bits(1000.0), f32_bits(0.0))), 450.0)
+        self.assertEqual(f32(share_amount_bits(f32_bits(1000.0), f32_bits(100.0), ENERGY_FACTOR, f32_bits(1000.0), f32_bits(900.0))), 100.0)
+
+    def test_the_recording_reaches_both_transfers_and_every_amount_is_the_models(self):
+        text = SHARING.read_text()
+        transfers = share_transfers(text)
+        self.assertGreaterEqual(sum(t["import"] == "players.TransferMetal" for t in transfers), 3)
+        self.assertGreaterEqual(sum(t["import"] == "players.TransferEnergy" for t in transfers), 3)
+        self.assertEqual(share_problems(text), [])
+
+    def test_the_recording_reaches_both_limits_of_the_amount(self):
+        transfers = share_transfers(SHARING.read_text())
+        for name in ("players.TransferMetal", "players.TransferEnergy"):
+            self.assertEqual({t["limited"] for t in transfers if t["import"] == name}, {True, False}, name)
+
+    def test_an_amount_one_ulp_off_is_a_problem(self):
+        text = SHARING.read_text()
+        for name in ("players.TransferMetal", "players.TransferEnergy"):
+            line = next(l for l in text.split("\n") if l.startswith(f"  i {name} "))
+            words = line.split(" ")
+            recorded = float_bits(words[6])
+            for step in (1, -1):
+                words[6] = f"f32:0x{recorded + step:08x}"
+                self.assertEqual(len(share_problems(text.replace(line, " ".join(words), 1))), 1, (name, step))
+
+    def test_an_unknown_input_is_a_problem(self):
+        self.assertEqual(len(share_problems("call 1 UpdateResourceSharing\n  i players.TransferMetal 0 1 f32:0x42c80000 1\n")), 1)
 
 
 class Scenario(unittest.TestCase):

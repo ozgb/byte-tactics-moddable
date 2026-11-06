@@ -48,6 +48,25 @@ def test_single_instance_run_is_not_wrapped() -> None:
         assert run.instances[0].wrap(["wine", "x.exe"]) == ["wine", "x.exe"]
 
 
+def test_record_values() -> None:
+    known = {"economy", "map"}
+    assert playtest.check_record("economy", known) is None
+    assert playtest.check_record("economy:30:900", known) is None
+    assert playtest.check_record("sound", known) is not None
+    assert playtest.check_record("economy:30", known) is not None
+    assert playtest.check_record("economy:0:9", known) is not None
+    assert playtest.check_record("economy:9:3", known) is not None
+    assert playtest.check_record("economy:a:3", known) is not None
+
+
+def test_record_names_the_file_of_the_run() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        sc = playtest.Scenario("two", [], {}, instances=2)
+        assert make_run(Path(d), sc).recordings() == []
+        run = playtest.Run(1, "two", sc, [Path(d) / "TotalA.exe"], "modern", Path(d), {}, "-all", record="economy:30:900")
+        assert run.recordings() == ["replay-economy.txt"]
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

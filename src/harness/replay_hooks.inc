@@ -1809,6 +1809,28 @@ void __stdcall RecLosRadarUpdateSensorRadarAndCloak()
     }
 }
 
+unsigned int __stdcall RecLosRadarSoundHeardMask(const Vec3* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_SOUNDHEARDMASK, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgStruct(s_call, "a", "at", ROK_VEC3, a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i los_radar.SoundHeardMask");
+    }
+    unsigned int result = s_inner_los_radar->SoundHeardMask(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 void __stdcall RecOrdersAiSearchGoalSetWaypoints(AiSearchGoal* a0, Point16* a1, int a2)
 {
     ReplayRoots roots;
@@ -5095,6 +5117,14 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_FILES_BANKWRITEBOX)
             return true;
         return false;
+    case SUB_FEATURES:
+        if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
+            return true;
+        return false;
+    case SUB_WEAPONS:
+        if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
+            return true;
+        return false;
     case SUB_TARGETING:
         if (slot == RSL_AI_GETVISIBLEENEMIESINRADIUS)
             return true;
@@ -5417,6 +5447,8 @@ void HookSeams(const bool* on)
         s_rec_los_radar.RecordRadarMapped = RecLosRadarRecordRadarMapped;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.UpdateSensorRadarAndCloak = RecLosRadarUpdateSensorRadarAndCloak;
+    if (on[SUB_LOS_RADAR] || on[SUB_FEATURES] || on[SUB_WEAPONS])
+        s_rec_los_radar.SoundHeardMask = RecLosRadarSoundHeardMask;
     if (on[SUB_ORDERS])
         s_rec_orders.AiSearchGoalSetWaypoints = RecOrdersAiSearchGoalSetWaypoints;
     if (on[SUB_ORDERS])

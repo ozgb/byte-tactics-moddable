@@ -1,17 +1,11 @@
 #ifndef PATHFINDER_H
 #define PATHFINDER_H
 
-#include <vector>
-
 #include "../../interfaces/seams.h"
+#include "../../interfaces/services.h"
 #include "../state/block.h"
-#include "../units/movement_class.h"
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
-
-struct Unit;
-class AiSearchGoal;
-class OrderFx;
 
 void __cdecl operator delete(void* p);
 
@@ -261,6 +255,44 @@ public:
     }
 };
 
+struct PathPending {
+    PathHandle requester;
+    PathUnit unit;
+    PathHandle target;
+    unsigned int notBefore;
+    PathGoalArea goal;
+    int nextRequester;
+    int nextUnit;
+};
+
+struct PathExtra {
+    int nodeLimit;
+    int goalCapacity;
+    int pendingCapacity;
+    int pendingCount;
+    int pendingFree;
+    int bucketMask;
+    int eventCapacity;
+    int eventCount;
+    int eventNext;
+    int seenWidth;
+    int seenHeight;
+    int footprintX;
+    int footprintZ;
+    int poolOffset;
+    int itemsOffset;
+    int cellsOffset;
+    int dirtyOffset;
+    int pendingOffset;
+    int requesterBuckets;
+    int unitBuckets;
+    int eventsOffset;
+    PathGoalArea goal;
+    int budgetCap[10];
+    int tickLoad[10];
+    int refreshCounter;
+};
+
 #pragma pack(push, 1)
 class Pathfinder : public OpenHeap {
 public:
@@ -275,10 +307,10 @@ public:
     int steps;
     int costScale;
     int baseScale;
-    Ref<Unit> object;
-    Ref<AiSearchGoal> path;
-    Ref<OrderFx> target;
-    Ref<MovementClass> owner;
+    PathUnit object;
+    PathHandle path;
+    PathHandle target;
+    PathClass owner;
     union {
         TurnCostTable table;
         unsigned char turnCost[8];
@@ -288,19 +320,27 @@ public:
         unsigned char stepCost[8];
     };
     unsigned char player;
-    Ref<Unit> cursor[10];
+    PathUnit cursor[10];
     int budget[10];
 
+    enum { kExtraOffset = 208 };
+
+    PathExtra* Extra()
+    {
+        return (PathExtra*)((char*)this + kExtraOffset);
+    }
     int EstimateCost(int x, int y)
     {
         int factor = costScale;
-        int v = g_seams.orders->OrderFxApproxDist(target, x, y);
+        PathGoalArea goal = Extra()->goal;
+        int v = PathGoalDistance(&goal, x, y);
         return (int)(((__int64)v * factor) >> 16);
     }
     int Cost(int x, int y)
     {
         int s = costScale;
-        return (int)(((__int64)s * g_seams.orders->OrderFxApproxDist(target, x, y)) >> 0x10);
+        PathGoalArea goal = Extra()->goal;
+        return (int)(((__int64)s * PathGoalDistance(&goal, x, y)) >> 0x10);
     }
     void ResetTable()
     {
@@ -315,19 +355,16 @@ public:
     }
     void Release()
     {
-        g_seams.units->RefreshUnitIfStale(owner, object);
+        g_seams.pathworld->EndSearch(object);
         object = 0;
         owner = 0;
     }
-    void Finish()
-    {
-        g_seams.orders->AiSearchGoalSetWaypoints(path, 0, 0);
-        Release();
-    }
+    void Finish();
     int CostFix(int x, int y)
     {
         int s = costScale;
-        return FixMul(s, g_seams.orders->OrderFxApproxDist(target, x, y));
+        PathGoalArea goal = Extra()->goal;
+        return FixMul(s, PathGoalDistance(&goal, x, y));
     }
     unsigned int Passable(int x, int y)
     {
@@ -385,11 +422,10 @@ public:
     int ExpandBestNode();
     void TracePath();
     int ProbeStraightPath();
-    void StartSearch(OrderFx* t);
+    void StartSearch(const PathPending* request, const PathUnitState* state);
     void ReleaseHeldPathLock();
-    void AbortIfGoalMatch(int goal);
+    void AbortIfGoalMatch(PathHandle goal);
     Pathfinder();
-    ~Pathfinder();
     void RunSearches();
     void RemoveNode(int k);
     // FUNCTION: 0x40f110 ?GrowNodes@Pathfinder@@QAEXH@Z
@@ -398,21 +434,45 @@ public:
         int cap = capacity;
         if (n < cap)
             n = cap + (cap >> 1) + 0x10;
-        Node* newe = (Node*)SimAlloc(n * 0x14);
-        int i;
-        for (i = 0; i < used; i++)
-            *(newe + i) = pool[i];
-        operator delete(pool);
-        Ref<Node>* newp = (Ref<Node>*)SimAlloc(n * 4);
-        for (i = 0; i < count; i++)
-            newp[i] = newe + (items[i] - pool);
-        operator delete(items);
-        pool = newe;
-        items = newp;
+        PathExtra* extra = Extra();
+        if (n > extra->nodeLimit)
+            n = extra->nodeLimit;
+        if (!pool) {
+            pool = Ref<Node>((Node*)((char*)this + extra->poolOffset));
+            items = Ref<Ref<Node>>((Ref<Node>*)((char*)this + extra->itemsOffset));
+        }
         capacity = n;
     }
     void FreeNode(int index);
+
+    PathPending* Entry(int index)
+    {
+        return (PathPending*)((char*)this + Extra()->pendingOffset) + (index - 1);
+    }
+    int* RequesterBucket(PathHandle requester);
+    int* UnitBucket(PathUnit unit);
+    int FindPending(PathHandle requester);
+    int FindPendingOfUnit(PathUnit unit);
+    void RemovePending(int index);
+    PathEvent* AddEvent(int kind, int status);
+    void Submit(const PathRequest* request);
+    void Cancel(PathHandle requester);
+    int Poll(PathEvent* out);
+    void Step();
 };
 #pragma pack(pop)
+
+Pathfinder* GetPathfinder();
+void __stdcall PathfindingInit(const PathMapInfo* map);
+void __stdcall PathfindingShutdown();
+void __stdcall PathfindingSubmit(const PathRequest* request);
+void __stdcall PathfindingCancel(PathHandle requester);
+void __stdcall PathfindingCellsChanged(int left, int top, int right, int bottom);
+void __stdcall PathfindingStep();
+int __stdcall PathfindingPoll(PathEvent* out);
+void __stdcall PathfindingProject(PathTraceView* out);
+void PathfindingSetStepsPerTick(int steps);
+void PathfindingSetBaseScale(int scale);
+void PathfindingDebugCell(int x, int y, int* flags, int* dir);
 
 #endif

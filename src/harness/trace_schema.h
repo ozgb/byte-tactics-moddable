@@ -1425,12 +1425,6 @@ static const unsigned kGameScalarFieldCount = 14;
 #undef g_meteorScheduleGap
 #pragma push_macro("g_economyPacketTick")
 #undef g_economyPacketTick
-#pragma push_macro("g_playerTickLoad")
-#undef g_playerTickLoad
-#pragma push_macro("g_playerBudgetCap")
-#undef g_playerBudgetCap
-#pragma push_macro("g_budgetRefreshCounter")
-#undef g_budgetRefreshCounter
 
 static const TraceGlobal kMeteorGlobals[] = {
     { "nextStrikeTime", (const void*)(offsetof(SimGlobals, g_meteorNextStrikeTime)), 4, TF_SCALAR, TT_NONE, 1 },
@@ -1455,15 +1449,12 @@ static const TraceGlobal kScalarGlobals[] = {
 static const unsigned kScalarGlobalsCount = 1;
 
 static const TraceGlobal kPathGlobals[] = {
-    { "playerTickLoad", (const void*)(offsetof(SimGlobals, g_playerTickLoad)), 40, TF_BYTES, TT_NONE, 1 },
-    { "playerBudgetCap", (const void*)(offsetof(SimGlobals, g_playerBudgetCap)), 40, TF_BYTES, TT_NONE, 1 },
-    { "budgetRefreshCounter", (const void*)(offsetof(SimGlobals, g_budgetRefreshCounter)), 4, TF_SCALAR, TT_NONE, 1 },
+    { "playerTickLoad", (const void*)0, 40, TF_BYTES, TT_NONE },
+    { "playerBudgetCap", (const void*)1, 40, TF_BYTES, TT_NONE },
+    { "budgetRefreshCounter", (const void*)2, 4, TF_SCALAR, TT_NONE },
 };
 static const unsigned kPathGlobalsCount = 3;
 
-#pragma pop_macro("g_budgetRefreshCounter")
-#pragma pop_macro("g_playerBudgetCap")
-#pragma pop_macro("g_playerTickLoad")
 #pragma pop_macro("g_economyPacketTick")
 #pragma pop_macro("g_meteorScheduleGap")
 #pragma pop_macro("g_meteorTarget")

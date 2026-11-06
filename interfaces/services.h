@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 8
+#define SERVICES_VERSION_MINOR 9
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -32,6 +32,15 @@ struct HeapEntry {
     int value;
     float key;
 };
+
+struct PathPoint;
+struct PathGoalArea;
+// Whether a cell is in a goal area.
+int __stdcall PathGoalContains(const PathGoalArea* goal, int x, int y);
+// The estimated distance from a cell to a goal area, the heuristic of a search.
+int __stdcall PathGoalDistance(const PathGoalArea* goal, int x, int y);
+// Writes up to max of the cells of a goal area that a search may mark as its goals and returns how many it has; with a null out it only counts them.
+int __stdcall PathGoalCells(const PathGoalArea* goal, PathPoint* out, int max);
 
 // Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);

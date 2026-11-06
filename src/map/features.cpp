@@ -840,6 +840,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
     p2.x = index % g_game->width;
     p2.y = index / g_game->width;
     g_seams.map->RefreshAllPassMaps(p2, f->footprint);
+    g_seams.pathfinding->CellsChanged(p2.x, p2.y, p2.x + f->footprint.x - 1, p2.y + f->footprint.y - 1);
     return spot;
 }
 
@@ -1051,6 +1052,7 @@ int __stdcall RemoveFeature(Cell* cell, int flag)
     p.x = index % g_game->width;
     p.y = index / g_game->width;
     g_seams.map->RefreshAllPassMaps(p, f->footprint);
+    g_seams.pathfinding->CellsChanged(p.x, p.y, p.x + f->footprint.x - 1, p.y + f->footprint.y - 1);
     return 1;
 }
 

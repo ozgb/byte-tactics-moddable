@@ -514,7 +514,11 @@ void LoadBattleAssets()
     g_seams.wind_meteors->InitMeteors();
     g_seams.los_radar->InitRadar();
     g_seams.players->InitPlayers();
-    g_seams.orders->CreatePathfinder();
+    PathMapInfo mapInfo;
+    mapInfo.width = g_game->width;
+    mapInfo.height = g_game->height;
+    mapInfo.unitSlots = g_game->poolCount;
+    g_seams.pathfinding->Init(&mapInfo);
     g_seams.weapons->InitExplosions();
     InitCommands();
     for (int i = 0; i < 10; i++)
@@ -578,7 +582,7 @@ void ShutdownIngameSystems()
     g_seams.units->FreeUnitMemory();
     DestroyParticleLists();
     g_seams.weapons->FreeExplosions();
-    g_seams.orders->DestroyPathfinder();
+    g_seams.pathfinding->Shutdown();
     g_seams.players->FreePlayers();
     g_seams.los_radar->FreeRadar();
     g_seams.los_radar->FreeMapResources();

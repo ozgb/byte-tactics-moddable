@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <malloc.h>
 #include "../state/block.h"
 #include <string.h>
 #include "win_types.h"
@@ -78,34 +79,17 @@ void __stdcall PushHeapSiftUp(HeapEntry* first, int hole, int top, HeapEntry val
     first[hole] = val;
 }
 
+#include <new>
 #include "pathfinder.h"
 
 extern signed char g_dirDeltaX[];
 extern signed char g_dirDeltaZ[];
 
-class PathGoal;
-
 #pragma pack(push, 1)
-struct UnitMotionPlannerView {
-    Ref<PathGoal> planner;
-    Ref<MovementClass> owner;
-};
-
-#include "../units/unit.h"
-
-#include "../network/player.h"
-
 #include "../game/game.h"
 #pragma pack(pop)
 
 extern Game* g_game;
-
-#include "../units/movement_class.h"
-
-#include "../../interfaces/seams.h"
-
-#include "ai_search_goal.h"
-#include "../state/sim_globals.h"
 
 inline int Pathfinder::Push(const NodeData& d)
 {
@@ -118,6 +102,8 @@ inline int Pathfinder::Push(const NodeData& d)
     }
     if (count == capacity)
         GrowNodes(-1);
+    if (count == capacity)
+        return 0;
     int i = count++;
     int k = freeHead;
     if (k == -1)
@@ -131,31 +117,22 @@ inline int Pathfinder::Push(const NodeData& d)
     return k;
 }
 
-static int IsPlaying(unsigned char i)
-{
-    if (i < 10) {
-        Player* p = &g_game->players[i];
-        if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
-            && p->index != 10)
-            return 1;
-    }
-    return 0;
-}
-
 #pragma auto_inline(off)
 
 // FUNCTION: 0x40d7b0
 int Pathfinder::GetCellState(int x, int y)
 {
-    if (!g_seams.units->MovementClassInBounds(owner, x, y))
+    PathWorldView* world = g_seams.pathworld;
+    if (!world->InBounds(owner, x, y))
         return 0;
-    int cx = (x >> 1) + (owner->footprintX >> 2);
-    int cy = (y >> 1) + (owner->footprintZ >> 2);
-    if (cx >= (g_game->width >> 1) || cy >= (g_game->height >> 1))
+    PathExtra* extra = Extra();
+    int cx = (x >> 1) + (extra->footprintX >> 2);
+    int cy = (y >> 1) + (extra->footprintZ >> 2);
+    if (cx >= extra->seenWidth || cy >= extra->seenHeight)
         return 0;
-    if (!((1 << player) & g_game->visibilityMask[cy * (g_game->width >> 1) + cx]))
+    if (!world->Seen(player, cx, cy))
         return 2;
-    return g_seams.units->MovementClassGet(owner, x, y);
+    return world->Pass(owner, x, y);
 }
 
 // FUNCTION: 0x40d880
@@ -213,7 +190,8 @@ int __stdcall DirectionFromStep(int dx, int dy)
 __int64 Pathfinder::Estimate(int param1, int param2)
 {
     int a = costScale;
-    return ((__int64)g_seams.orders->OrderFxApproxDist(target, param1, param2) * (__int64)a) >> 0x10;
+    PathGoalArea goal = Extra()->goal;
+    return ((__int64)PathGoalDistance(&goal, param1, param2) * (__int64)a) >> 0x10;
 }
 
 // FUNCTION: 0x40da70
@@ -304,7 +282,6 @@ void Pathfinder::TracePath()
     Point16 cur = found;
     int dir = (char)grid.At(found.x, found.y)->dir;
     Point16 pts[64];
-    Point16 out[64];
     pts[0] = cur;
     int n = 1;
 
@@ -323,12 +300,16 @@ void Pathfinder::TracePath()
     int count = n;
     if (count >= 0x40)
         count = 0x40;
+    PathExtra* extra = Extra();
+    PathEvent* event = AddEvent(PATH_EVENT_FINISHED, n > 0x40 ? PATH_PARTIAL : PATH_FOUND);
+    if (event == 0)
+        return;
+    event->count = count;
     for (int i = 0; i < count; i++) {
         Point16 pt = pts[(n - 1 - i) & 0x3f];
-        out[i].x = (pt.x * 2 + owner->footprintX) * 8;
-        out[i].y = (pt.y * 2 + owner->footprintZ) * 8;
+        event->points[i].x = (pt.x * 2 + extra->footprintX) * 8;
+        event->points[i].y = (pt.y * 2 + extra->footprintZ) * 8;
     }
-    g_seams.orders->AiSearchGoalSetWaypoints(path, out, count);
 }
 
 // FUNCTION: 0x40e160
@@ -426,19 +407,31 @@ greedy:
 }
 
 // FUNCTION: 0x40e630
-void Pathfinder::StartSearch(OrderFx* t)
+void Pathfinder::StartSearch(const PathPending* request, const PathUnitState* state)
 {
-    owner = ((UnitMotionPlannerView *)object->motion.get())->owner;
-    target = t;
-    start = object->cell;
-    g_seams.units->RefreshMovedUnits(owner, object);
+    PathWorldView* world = g_seams.pathworld;
+    PathExtra* extra = Extra();
+    owner = state->moveClass;
+    target = request->target;
+    extra->goal = request->goal;
+    extra->footprintX = state->footprintX;
+    extra->footprintZ = state->footprintY;
+    int seenWidth;
+    int seenHeight;
+    world->SeenSize(&seenWidth, &seenHeight);
+    extra->seenWidth = seenWidth;
+    extra->seenHeight = seenHeight;
+    start.x = state->cell.x;
+    start.y = state->cell.y;
+    world->BeginSearch(object);
     ResetTable();
     ClearDirtyCells();
 
-    std::vector<Point16> goals;
-    g_seams.orders->OrderFxFillGoalCells(target, &goals);
+    PathGoalArea goal = request->goal;
+    PathPoint* goals = (PathPoint*)_alloca(extra->goalCapacity * sizeof(PathPoint));
+    int goalCount = PathGoalCells(&goal, goals, extra->goalCapacity);
     int bestDist = 0x7fffffff;
-    for (Point16* p = goals.begin(); p != goals.end(); p++) {
+    for (PathPoint* p = goals; p != goals + goalCount; p++) {
         MarkGoal(p->x, p->y);
         int dy = start.y - p->y;
         int dx = start.x - p->x;
@@ -450,22 +443,22 @@ void Pathfinder::StartSearch(OrderFx* t)
         }
     }
 
-    if (g_seams.orders->OrderFxIsGoal(target, start.x, start.y)) {
-        g_seams.orders->OrderFxAddFlags(target.get(), 0x100);
+    if (PathGoalContains(&goal, start.x, start.y)) {
+        AddEvent(PATH_EVENT_STARTED, PATH_START_DIRECT);
         Finish();
         return;
     }
     int cost = Cost(start.x, start.y);
     if (!grid.InBounds(start.x, start.y)) {
-        g_seams.orders->OrderFxAddFlags(target.get(), 0x200);
+        AddEvent(PATH_EVENT_STARTED, PATH_START_INDIRECT);
         Finish();
         return;
     }
     probe = ProbeStraightPath();
     if (probe == 0) {
-        g_seams.orders->OrderFxAddFlags(target.get(), 0x100);
+        AddEvent(PATH_EVENT_STARTED, PATH_START_DIRECT);
     } else {
-        g_seams.orders->OrderFxAddFlags(target.get(), 0x200);
+        AddEvent(PATH_EVENT_STARTED, PATH_START_INDIRECT);
         if (probe >= cost) {
             Finish();
             return;
@@ -476,23 +469,29 @@ void Pathfinder::StartSearch(OrderFx* t)
     unsigned int i = grid.Index(start.x, start.y);
     grid.dirty[i >> 8] |= 1 << ((i >> 3) & 0x1f);
     grid.cells[i].flags |= 1;
-    grid.cells[i].dir = ((((unsigned short)object->heading) + 0x1000) >> 13) & 7;
+    grid.cells[i].dir = ((((unsigned short)state->heading) + 0x1000) >> 13) & 7;
     grid.cells[i].node = Push(d);
     range = 4;
+}
+
+void Pathfinder::Finish()
+{
+    AddEvent(PATH_EVENT_FINISHED, PATH_FAILED);
+    Release();
 }
 
 // FUNCTION: 0x40e9a0
 void Pathfinder::ReleaseHeldPathLock()
 {
-    g_seams.units->RefreshUnitIfStale(owner, object);
+    g_seams.pathworld->EndSearch(object);
     object = 0;
     owner = 0;
 }
 
 // FUNCTION: 0x40e9c0
-void Pathfinder::AbortIfGoalMatch(int goal)
+void Pathfinder::AbortIfGoalMatch(PathHandle goal)
 {
-    if (goal == (int)path.get()) {
+    if (goal == path) {
         object = 0;
         path = 0;
         target = 0;
@@ -503,30 +502,23 @@ void Pathfinder::AbortIfGoalMatch(int goal)
 // FUNCTION: 0x40e9e0
 Pathfinder::Pathfinder()
 {
-    pool = 0;
-    items = 0;
+    PathExtra* extra = Extra();
+    pool = Ref<Node>((Node*)0);
+    items = Ref<Ref<Node>>((Ref<Node>*)0);
     capacity = 0;
     count = 0;
     freeHead = -1;
     used = 0;
     topPopped = 0;
-    grid.width = 0;
-    grid.height = 0;
-    grid.count = 0;
-    memset(&grid.cells, 0, sizeof(grid.cells));
 
-    int w, h;
-    h = g_game->height;
-    w = g_game->width;
-    grid.width = w;
-    grid.height = h;
-    operator delete(grid.cells);
-    grid.count = (h * w + 7) & ~7;
-    grid.cells = grid.count ? new (kSim) PathCell[grid.count] : 0;
+    grid.width = g_game->width;
+    grid.height = g_game->height;
+    grid.count = (grid.height * grid.width + 7) & ~7;
+    grid.cells = Ref<PathCell>((PathCell*)((char*)this + extra->cellsOffset));
 
     unsigned int m = (grid.count + 0xff) >> 8;
     unsigned int n = m * 4;
-    grid.dirty = (unsigned int*)SimAllocTagged("AISearch touched mapentries", n);
+    grid.dirty = Ref<unsigned int>((unsigned int*)((char*)this + extra->dirtyOffset));
     memset(grid.dirty, 0xff, n - 1);
     *(int*)((char*)grid.dirty.get() + n - 4) = 0;
 
@@ -543,51 +535,184 @@ Pathfinder::Pathfinder()
     baseScale = 0x18000;
 
     for (unsigned int k = 0; k < 10; k++) {
-        g_playerBudgetCap[k] = baseScale;
+        extra->budgetCap[k] = baseScale;
         budget[k] = 0;
-        cursor[k] = *(Ref<Unit>*)((char*)g_game + 0x1a7f + 0x14b * (k + 1));
+        cursor[k] = g_seams.pathworld->FirstUnit(k);
     }
 }
 
-// FUNCTION: 0x40eb30
-Pathfinder::~Pathfinder()
+int* Pathfinder::RequesterBucket(PathHandle requester)
 {
-    GameFreeThunk(grid.dirty);
-    operator delete(grid.cells);
-    operator delete(pool);
-    operator delete(items);
+    PathExtra* extra = Extra();
+    return (int*)((char*)this + extra->requesterBuckets) + (((requester * 0x9e3779b1u) >> 16) & extra->bucketMask);
+}
+
+int* Pathfinder::UnitBucket(PathUnit unit)
+{
+    PathExtra* extra = Extra();
+    return (int*)((char*)this + extra->unitBuckets) + (((unit * 0x9e3779b1u) >> 16) & extra->bucketMask);
+}
+
+int Pathfinder::FindPending(PathHandle requester)
+{
+    for (int i = *RequesterBucket(requester); i != 0; i = Entry(i)->nextRequester) {
+        if (Entry(i)->requester == requester)
+            return i;
+    }
+    return 0;
+}
+
+int Pathfinder::FindPendingOfUnit(PathUnit unit)
+{
+    for (int i = *UnitBucket(unit); i != 0; i = Entry(i)->nextUnit) {
+        if (Entry(i)->unit == unit)
+            return i;
+    }
+    return 0;
+}
+
+static void UnlinkRequester(Pathfinder* pf, int index)
+{
+    PathPending* e = pf->Entry(index);
+    int* link = pf->RequesterBucket(e->requester);
+    while (*link != index)
+        link = &pf->Entry(*link)->nextRequester;
+    *link = e->nextRequester;
+}
+
+static void UnlinkUnit(Pathfinder* pf, int index)
+{
+    PathPending* e = pf->Entry(index);
+    int* link = pf->UnitBucket(e->unit);
+    while (*link != index)
+        link = &pf->Entry(*link)->nextUnit;
+    *link = e->nextUnit;
+}
+
+void Pathfinder::RemovePending(int index)
+{
+    PathExtra* extra = Extra();
+    UnlinkRequester(this, index);
+    UnlinkUnit(this, index);
+    PathPending* e = Entry(index);
+    e->requester = 0;
+    e->nextRequester = extra->pendingFree;
+    extra->pendingFree = index;
+    extra->pendingCount--;
+}
+
+void Pathfinder::Submit(const PathRequest* request)
+{
+    if (object != 0 && path == request->requester)
+        return;
+    PathExtra* extra = Extra();
+    int index = FindPending(request->requester);
+    if (index != 0) {
+        PathPending* e = Entry(index);
+        if (e->unit != request->unit) {
+            UnlinkUnit(this, index);
+            e->unit = request->unit;
+            int* bucket = UnitBucket(e->unit);
+            e->nextUnit = *bucket;
+            *bucket = index;
+        }
+    } else {
+        index = extra->pendingFree;
+        if (index == 0)
+            return;
+        PathPending* e = Entry(index);
+        extra->pendingFree = e->nextRequester;
+        extra->pendingCount++;
+        e->requester = request->requester;
+        e->unit = request->unit;
+        int* rb = RequesterBucket(e->requester);
+        e->nextRequester = *rb;
+        *rb = index;
+        int* ub = UnitBucket(e->unit);
+        e->nextUnit = *ub;
+        *ub = index;
+    }
+    PathPending* e = Entry(index);
+    e->target = request->target;
+    e->notBefore = request->notBefore;
+    e->goal = request->goal;
+}
+
+void Pathfinder::Cancel(PathHandle requester)
+{
+    AbortIfGoalMatch(requester);
+    int index = FindPending(requester);
+    if (index != 0)
+        RemovePending(index);
+    PathExtra* extra = Extra();
+    PathEvent* events = (PathEvent*)((char*)this + extra->eventsOffset);
+    int kept = extra->eventNext;
+    for (int i = extra->eventNext; i < extra->eventCount; i++) {
+        if (events[i].requester != requester)
+            events[kept++] = events[i];
+    }
+    extra->eventCount = kept;
+}
+
+PathEvent* Pathfinder::AddEvent(int kind, int status)
+{
+    PathExtra* extra = Extra();
+    if (extra->eventCount >= extra->eventCapacity)
+        return 0;
+    PathEvent* event = (PathEvent*)((char*)this + extra->eventsOffset) + extra->eventCount++;
+    event->kind = kind;
+    event->status = status;
+    event->unit = object;
+    event->requester = path;
+    event->target = target;
+    event->tick = g_seams.pathworld->Tick();
+    event->count = 0;
+    return event;
+}
+
+int Pathfinder::Poll(PathEvent* out)
+{
+    PathExtra* extra = Extra();
+    if (extra->eventNext >= extra->eventCount)
+        return 0;
+    *out = ((PathEvent*)((char*)this + extra->eventsOffset))[extra->eventNext++];
+    return 1;
 }
 
 // FUNCTION: 0x40eb70
 void Pathfinder::RunSearches()
 {
-    unsigned short players = g_game->numPlayers;
+    PathWorldView* world = g_seams.pathworld;
+    PathExtra* extra = Extra();
+    extra->eventCount = 0;
+    extra->eventNext = 0;
+    int players = world->PlayerCount();
     if (players == 0)
         return;
     int share = stepsPerTick / players;
     int total = 0;
-    if (++g_budgetRefreshCounter >= 150) {
-        g_budgetRefreshCounter = 0;
+    if (++extra->refreshCounter >= 150) {
+        extra->refreshCounter = 0;
         for (int i = 0; i < 10; i++) {
-            int r = g_playerTickLoad[i] / g_game->unitsPerPlayer;
+            int r = extra->tickLoad[i] / world->UnitsPerPlayer();
             if (r < 1)
-                g_playerBudgetCap[i] = baseScale * 6;
+                extra->budgetCap[i] = baseScale * 6;
             else if (r < 2)
-                g_playerBudgetCap[i] = baseScale * 3;
+                extra->budgetCap[i] = baseScale * 3;
             else if (r < 3)
-                g_playerBudgetCap[i] = baseScale;
+                extra->budgetCap[i] = baseScale;
             else
-                g_playerBudgetCap[i] = baseScale;
-            g_playerTickLoad[i] = 0;
+                extra->budgetCap[i] = baseScale;
+            extra->tickLoad[i] = 0;
         }
     }
     for (int i = 0; i < 10; i++) {
-        if (IsPlaying(i)) {
+        if (world->IsPlaying(i)) {
             budget[i] += share;
             total += budget[i];
         }
     }
-    while (total > 0) {
+    while (total > 0 && extra->eventCount + 3 <= extra->eventCapacity) {
         steps = 0;
         if (object == 0) {
             steps = 1;
@@ -595,22 +720,23 @@ void Pathfinder::RunSearches()
                 if (++player >= 10)
                     player = 0;
             }
-            Player* pl = &g_game->players[player];
-            g_playerTickLoad[player]++;
-            Ref<Unit>* c = &cursor[player];
-            if (*c == pl->unitsEnd)
-                *c = pl->unitsBegin;
+            extra->tickLoad[player]++;
+            PathUnit* c = &cursor[player];
+            if (*c == world->LastUnit(player))
+                *c = world->FirstUnit(player);
             else
-                *c = c->get() + 1;
-            Unit* u = cursor[player];
-            if (((short)u->unitDefIndex) != 0 && ((UnitMotionPlannerView *)u->motion.get()) != 0 && ((UnitMotionPlannerView *)u->motion.get())->owner.get() != 0) {
-                path = g_seams.orders->UnitMotionClaimRepath(u->motion);
-                if (path != 0) {
-                    object = u;
-                    steps += 100;
-                    costScale = g_playerBudgetCap[player];
-                    ((Pathfinder*)this)->StartSearch(path->target);
-                }
+                *c = world->NextUnit(*c);
+            PathUnit u = *c;
+            int index = FindPendingOfUnit(u);
+            PathUnitState state;
+            if (index != 0 && (unsigned int)world->Tick() >= Entry(index)->notBefore && world->UnitState(u, &state)) {
+                PathPending request = *Entry(index);
+                RemovePending(index);
+                path = request.requester;
+                object = u;
+                steps += 100;
+                costScale = extra->budgetCap[player];
+                StartSearch(&request, &state);
             }
         } else if (Size() != 0) {
             while (1) {
@@ -649,8 +775,7 @@ void Pathfinder::RunSearches()
                     break;
             }
         } else {
-            g_seams.orders->AiSearchGoalSetWaypoints(path, 0, 0);
-            Release();
+            Finish();
         }
         total -= steps;
         budget[player] -= steps;
@@ -716,3 +841,138 @@ void Pathfinder::FreeNode(int index)
 }
 
 #pragma auto_inline(on)
+
+Pathfinder* GetPathfinder()
+{
+    return g_game->pathfinder.get();
+}
+
+void __stdcall PathfindingInit(const PathMapInfo* map)
+{
+    int cells = (map->width * map->height + 7) & ~7;
+    int nodeLimit = cells + 1;
+    if (nodeLimit > 0x10000)
+        nodeLimit = 0x10000;
+    int dirtyBytes = ((cells + 0xff) >> 8) * 4;
+    int goalCapacity = 2 * (map->width + map->height) + 256;
+    int pendingCapacity = map->unitSlots + 16;
+    int buckets = 16;
+    while (buckets < pendingCapacity)
+        buckets <<= 1;
+    int eventCapacity = 512;
+
+    unsigned int size = Pathfinder::kExtraOffset + sizeof(PathExtra);
+    unsigned int poolOffset = size;
+    size += nodeLimit * sizeof(Node);
+    unsigned int itemsOffset = size;
+    size += nodeLimit * sizeof(Ref<Node>);
+    unsigned int cellsOffset = size;
+    size += cells * sizeof(PathCell);
+    unsigned int dirtyOffset = size;
+    size += dirtyBytes;
+    unsigned int pendingOffset = size;
+    size += pendingCapacity * sizeof(PathPending);
+    unsigned int requesterBuckets = size;
+    size += buckets * sizeof(int);
+    unsigned int unitBuckets = size;
+    size += buckets * sizeof(int);
+    unsigned int eventsOffset = size;
+    size += eventCapacity * sizeof(PathEvent);
+
+    char* region = (char*)SimAllocTagged("AISearch region", size);
+    g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)region);
+    PathExtra* extra = (PathExtra*)(region + Pathfinder::kExtraOffset);
+    extra->nodeLimit = nodeLimit;
+    extra->goalCapacity = goalCapacity;
+    extra->pendingCapacity = pendingCapacity;
+    extra->pendingFree = 1;
+    extra->bucketMask = buckets - 1;
+    extra->eventCapacity = eventCapacity;
+    extra->poolOffset = poolOffset;
+    extra->itemsOffset = itemsOffset;
+    extra->cellsOffset = cellsOffset;
+    extra->dirtyOffset = dirtyOffset;
+    extra->pendingOffset = pendingOffset;
+    extra->requesterBuckets = requesterBuckets;
+    extra->unitBuckets = unitBuckets;
+    extra->eventsOffset = eventsOffset;
+    PathPending* pending = (PathPending*)(region + pendingOffset);
+    for (int i = 0; i < pendingCapacity; i++)
+        pending[i].nextRequester = i + 2 <= pendingCapacity ? i + 2 : 0;
+    new (region) Pathfinder;
+}
+
+void __stdcall PathfindingShutdown()
+{
+    SimFree(g_game->pathfinder.get());
+    g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)0);
+}
+
+void __stdcall PathfindingSubmit(const PathRequest* request)
+{
+    Pathfinder* pf = GetPathfinder();
+    if (pf != 0)
+        pf->Submit(request);
+}
+
+void __stdcall PathfindingCancel(PathHandle requester)
+{
+    Pathfinder* pf = GetPathfinder();
+    if (pf != 0)
+        pf->Cancel(requester);
+}
+
+void __stdcall PathfindingCellsChanged(int, int, int, int)
+{
+}
+
+void __stdcall PathfindingStep()
+{
+    Pathfinder* pf = GetPathfinder();
+    if (pf != 0)
+        pf->RunSearches();
+}
+
+int __stdcall PathfindingPoll(PathEvent* out)
+{
+    Pathfinder* pf = GetPathfinder();
+    return pf != 0 ? pf->Poll(out) : 0;
+}
+
+void __stdcall PathfindingProject(PathTraceView* out)
+{
+    Pathfinder* pf = GetPathfinder();
+    if (pf == 0) {
+        out->record = 0;
+        out->budgetCap = 0;
+        out->tickLoad = 0;
+        out->refreshCounter = 0;
+        return;
+    }
+    PathExtra* extra = pf->Extra();
+    out->record = pf;
+    out->budgetCap = extra->budgetCap;
+    out->tickLoad = extra->tickLoad;
+    out->refreshCounter = &extra->refreshCounter;
+}
+
+void PathfindingSetStepsPerTick(int steps)
+{
+    Pathfinder* pf = GetPathfinder();
+    if (pf != 0)
+        pf->stepsPerTick = steps;
+}
+
+void PathfindingSetBaseScale(int scale)
+{
+    Pathfinder* pf = GetPathfinder();
+    if (pf != 0)
+        pf->baseScale = scale;
+}
+
+void PathfindingDebugCell(int x, int y, int* flags, int* dir)
+{
+    PathCell* cell = GetPathfinder()->grid.At(x, y);
+    *flags = cell->flags;
+    *dir = cell->dir;
+}

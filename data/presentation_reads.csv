@@ -122,9 +122,6 @@ Order::type,orders,ui-action,SIM_EVENT_BUILD_MENU_UPDATE,per-player-filter,2
 Order::type,presentation,ui-action,,per-player-filter,1
 Order::unit,orders,ui-action,,per-player-filter,5
 Order::unit,presentation,ui-action,,per-player-filter,2
-PathCell::dir,presentation,ui-action,,all-players,0
-PathCell::flags,presentation,ui-action,,all-players,0
-Pathfinder::path,pathfinding,unknown,,all-players,4
 PieceFrame::always0,presentation,unknown,,per-player-filter,0
 PieceFrame::count,presentation,ui-action,,per-player-filter,8
 PieceFrame::flags,presentation,ui-action,,per-player-filter,8
@@ -427,7 +424,7 @@ pad_14273,presentation,unknown,,all-players,5
 pad_1df4,orders,unknown,,own,1
 pad_1df4,presentation,every-frame,,own,12
 pad_3816f,presentation,every-frame,,all-players,11
-pathfinder,orders,unknown,,all-players,4
+pathfinder,pathfinding,unknown,,all-players,4
 pauseFlags,presentation,ui-action,,all-players,0
 playerIndex,ai,every-frame,,own,3
 playerIndex,los_radar,ui-action,,own,84

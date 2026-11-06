@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 66 ordered, 380 immediate, 30 deferrable, 1112 read-only, 1272 unobserved.
+Edges in data/dependencies.csv: 66 ordered, 380 immediate, 30 deferrable, 1122 read-only, 1272 unobserved.
 
 ## Cutting rule
 
@@ -31,7 +31,7 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | pathfinding | 0 | 2 | 1 | 25 | 53 | 9 of 11 |
 | weapons | 28 | 117 | 8 | 238 | 256 | 2 of 11 |
 | targeting | 10 | 47 | 3 | 36 | 82 | 3 of 11 |
-| los_radar | 6 | 44 | 5 | 116 | 228 | 2 of 11 |
+| los_radar | 6 | 44 | 5 | 126 | 228 | 2 of 11 |
 | orders | 16 | 124 | 17 | 177 | 315 | 2 of 11 |
 | units | 18 | 209 | 11 | 96 | 463 | 1 of 11 |
 | players | 4 | 36 | 4 | 70 | 323 | 4 of 11 |
@@ -80,9 +80,9 @@ From data/phase_boundaries.csv. `needed` is `yes` when an `immediate` row spans 
 | boundary | needed | edges | direct | carried | mergeable | example |
 |---|---|---|---|---|---|---|
 | 0\|1 | absent | 0 | 0 | 0 | absent | - |
-| 1\|2 | yes | 288 | 87 | 128 | no | mission-build-unit@1 |
-| 2\|3 | yes | 225 | 1 | 131 | no | mission-build-unit@1 |
-| 3\|4 | yes | 222 | 0 | 131 | no | mission-build-unit@1 |
+| 1\|2 | yes | 291 | 90 | 128 | no | mission-build-unit@1 |
+| 2\|3 | yes | 225 | 1 | 134 | no | mission-build-unit@1 |
+| 3\|4 | yes | 222 | 0 | 134 | no | mission-build-unit@1 |
 | 4\|5 | yes | 54 | 11 | 24 | no | mission-defeat-passes-x@5 |
 | 5\|6 | yes | 7 | 0 | 14 | no | mission-build-unit@16 |
 | 6\|7 | yes | 7 | 0 | 10 | no | mission-build-unit@16 |
@@ -336,14 +336,14 @@ Cannot be cut from, with the edge of the most runs:
 |---|---|---|---|---|
 | players -> features | 5 | 0 | 0 | 0 |
 | players -> presentation | 12 | 0 | 0 | 0 |
-| players -> projectiles | 0 | 0 | 9 | 0 |
+| players -> projectiles | 0 | 0 | 12 | 0 |
 | players -> tail | 1 | 0 | 0 | 0 |
 | players -> units | 0 | 0 | 28 | 1 |
 | projectiles -> players | 0 | 1 | 0 | 0 |
 | units -> features | 2 | 0 | 0 | 0 |
 | units -> players | 18 | 11 | 0 | 0 |
 | units -> presentation | 7 | 0 | 0 | 0 |
-| units -> projectiles | 9 | 0 | 0 | 0 |
+| units -> projectiles | 10 | 0 | 0 | 0 |
 | units -> tail | 1 | 0 | 0 | 0 |
 | units -> units | 0 | 0 | 29 | 2 |
 
@@ -1242,7 +1242,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | ordered | 3 | 3 |
 | immediate | 14 | 30 |
 | deferrable | 4 | 1 |
-| read-only | 0 | 116 |
+| read-only | 0 | 126 |
 | unobserved | 95 | 133 |
 
 **Ordered** (6).
@@ -1279,8 +1279,8 @@ The rows themselves are in data/phase_dependencies.csv.
 | writes to weapons | `LoadTntMap: operator new int #2` | units | 18 | mission-build-unit@71 |
 | reads from players | `unknown_1b8e` | players | 18 | console-ilose@30 |
 | reads from economy | `pad_1df4` | players | 16 | allied-victory@30 |
-| reads from units | `unknown_1b8e` | units | 15 | mission-build-unit@1 |
-| reads from units | `pad_1df4` | units | 12 | console-iwin@30 |
+| reads from units | `unknown_1b8e` | units | 16 | mission-build-unit@1 |
+| reads from units | `pad_1df4` | units | 13 | console-iwin@30 |
 | reads from orders | `Unit::zFraction` | units | 11 | mission-capture@1 |
 | reads from units | `Unit::flags` | units | 11 | mission-capture@5 |
 | reads from units | `unknown_1cd9` | units | 11 | mission-build-unit@71 |
@@ -1317,7 +1317,7 @@ The 40 rows with the most runs are shown; the other 4 are in data/dependencies.c
 
 | other | los_radar is writer | los_radar is reader |
 |---|---|---|
-| (no writer) | 0 | 116 |
+| (no writer) | 0 | 126 |
 
 **Unobserved**, by the other subsystem.
 
@@ -1360,7 +1360,7 @@ Cannot be cut from, with the edge of the most runs:
 | meteors -> players | 0 | 0 | 0 | 2 |
 | players -> features | 2 | 0 | 0 | 0 |
 | players -> presentation | 7 | 5 | 0 | 0 |
-| players -> projectiles | 0 | 0 | 2 | 0 |
+| players -> projectiles | 0 | 0 | 2 | 3 |
 | players -> tail | 1 | 1 | 0 | 0 |
 | players -> units | 0 | 0 | 7 | 7 |
 | presentation -> features | 0 | 0 | 1 | 0 |
@@ -1373,7 +1373,7 @@ Cannot be cut from, with the edge of the most runs:
 | units -> features | 3 | 0 | 0 | 0 |
 | units -> players | 2 | 33 | 0 | 0 |
 | units -> presentation | 4 | 13 | 0 | 0 |
-| units -> projectiles | 2 | 1 | 0 | 0 |
+| units -> projectiles | 2 | 4 | 0 | 0 |
 | units -> tail | 1 | 2 | 0 | 0 |
 | units -> units | 0 | 0 | 1 | 14 |
 
@@ -1385,7 +1385,7 @@ No draws.
 
 ### Within-pass reads
 
-84 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+85 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -1810,7 +1810,7 @@ Cannot be cut from, with the edge of the most runs:
 | units -> features | 15 | 5 | 0 | 0 |
 | units -> players | 79 | 5 | 0 | 0 |
 | units -> presentation | 44 | 6 | 0 | 0 |
-| units -> projectiles | 37 | 10 | 0 | 0 |
+| units -> projectiles | 39 | 10 | 0 | 0 |
 | units -> tail | 1 | 2 | 0 | 0 |
 | units -> units | 0 | 0 | 114 | 35 |
 | wind -> units | 0 | 0 | 0 | 3 |

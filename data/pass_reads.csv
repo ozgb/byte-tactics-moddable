@@ -1989,12 +1989,13 @@ units,unknown_1b8e,ai,ReactToAttack,same-record,1,mission-defeat-all-units@185
 units,unknown_1b8e,ai,SetUnitSquad,same-record,10,mission-build-unit@1
 units,unknown_1b8e,economy,UnitResources::SpendEnergyAndMetal,same-record,9,edges-economy-targeting@36
 units,unknown_1b8e,features,ReclaimFeature,same-record,1,long-great-divide-2p@33881
-units,unknown_1b8e,game,SoundHeardMask,same-record,13,edges-economy-targeting@36
+units,unknown_1b8e,game,SoundHeardMask,same-record,12,edges-economy-targeting@36
 units,unknown_1b8e,los_radar,AddLineOfSight,same-record,13,mission-build-unit@1
 units,unknown_1b8e,los_radar,IsUnitVisibleToPlayer,same-record,6,edges-targeting-lead@155
 units,unknown_1b8e,los_radar,IsVisibleByMask,same-record,5,mission-defeat-all-units@186
 units,unknown_1b8e,los_radar,RemoveLineOfSight,same-record,12,mission-build-unit@1
 units,unknown_1b8e,los_radar,RevealAroundUnit,same-record,13,mission-build-unit@1
+units,unknown_1b8e,los_radar,SoundHeardMask,same-record,1,edges-targeting-lead@940
 units,unknown_1b8e,map,AddUnitToMap,same-record,4,orders-air-fights@161
 units,unknown_1b8e,map,ClaimFootprintCells,same-record,4,edges-economy-targeting@245
 units,unknown_1b8e,network,BroadcastBuilderLink,same-record,2,long-greenhaven-8p@14221

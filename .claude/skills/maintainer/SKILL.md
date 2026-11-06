@@ -21,7 +21,7 @@ Check it out in its own worktree, never the clone root: `tools/worktree.sh --pr 
 
 Hold it against each of these, and record a finding for every miss:
 
-- **Spec:** every task in the linked issue is done or listed under "Left out" with a reason you accept, and its "Done when" holds. Nothing outside the issue slipped in.
+- **Spec:** every task in the linked issue is done or listed under "Left out" with a reason you accept, and its "Done when" holds. Nothing outside the issue slipped in, beyond work on the same code listed under "Also done".
 - **The gate:** the lead runs it and the pull request reports it; don't re-run it. Run the quick checks yourself (CI, commit format, `commentlint`, the issue's `tools/test_*.py`, hand-set data columns). CI's `checks` job must be green.
 - **Conformity:** behaviour changes only behind a quirk flag that's off by default, or in a mod; with no mods, traces match the reference (the modern build's `reference.py --check --exe`).
 - **The plan's boundaries** (`AGENTS.md` step 3): determinism, state only in the state block, subsystems through seams, presentation through the player view, platform through the host interface.
@@ -37,16 +37,20 @@ Then post one review: the verdict line for the current head SHA, the findings, a
 For each issue closed by a pull request you merged:
 
 - **Downstream issues:** for each issue it unblocked and each later issue that touches the same code, check its text still matches what was actually built: names, interfaces, files, decisions made in the pull request. Edit it where it no longer does.
-- **"Left out" and new findings:** each item listed in "Left out", and anything the work uncovered, becomes a task on an existing issue or a new sub-issue, with its blockers set in both places (`docs/team.md`, "Issue states").
+- **"Left out" and new findings:** triage each item listed in "Left out", and anything the work uncovered, in this order of preference:
+  1. **Drop it** when #2's plan doesn't need it (a nicety, a cleanup with no reader, a guess at future use). Say so in one line on the closed issue.
+  2. **Fold it** into an open issue that touches the same code, as a task there.
+  3. **File it** as a new issue only when the plan needs it and no open issue fits, with its blockers set in both places (`docs/team.md`, "Issue states").
 - **#2:** keep its order section and decisions in step with what merged.
 
 ### 3. Groom upcoming issues
 
-Groom every issue labelled `needs-grooming`, then every **upcoming** issue: open issues whose blockers are all closed or have a pull request under review. An issue is groomed when the lead could start it without a decision the plan doesn't make, it fits in one reviewable pull request, and its "Done when" is checkable.
+Groom every issue labelled `needs-grooming`, then every **upcoming** issue: open issues whose blockers are all closed or have a pull request under review. An issue is groomed when the lead could start it without a decision the plan doesn't make, it fits in one pull request by `docs/team.md`, "Issue size", and its "Done when" is checkable.
 
 - **Flesh out** an issue whose tasks are too vague: name the files, functions, data and commands, from the code as it stands now.
-- **Split** an issue too big for one pull request into sub-issues of it, each with its own tasks, CI checks and "Done when", and blockers between them. The original stays open as their parent.
+- **Split** an issue only along a real boundary ("Issue size"), never for size, and never a sub-issue a second time. Each part gets its own tasks, CI checks and "Done when", and blockers between them; the original stays open as their parent.
+- **Combine** open issues that touch the same files and run the same gate into one, and close the rest as merged into it.
 - **Answer** what the lead asked in its `needs-grooming` comment, then remove the label.
-- **Keep the queue full.** The lead may hold up to 10 claims (`docs/team.md`, "Issue states"), so keep at least 10 issues available to claim beyond those it holds: groomed, unblocked, unassigned and not labelled `needs-grooming`. When there are fewer, file and groom the next parts in #2's order until there are 10, or until #2 has nothing left to file. Prefer parts that touch different files, so that they can be worked in parallel.
+- **Keep the queue stocked.** Keep at least 3 issues available to claim beyond those the lead holds: groomed, unblocked, unassigned and not labelled `needs-grooming`. When there are fewer, file and groom the next parts in #2's order, sized by "Issue size". Never split an issue to stock the queue.
 
 **Decide** what the plan leaves open. Choose by #2's goals (conformity first, then moddability, then the rest) and its decisions, and the work already merged. Record each decision with its reason on the issue it affects; a decision that shapes more than one issue also goes into #2's decisions. Revise one of #2's decisions only when merged work shows it doesn't hold, and say what showed it.

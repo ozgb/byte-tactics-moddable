@@ -47,7 +47,6 @@ SOURCE_DIRS = ("src", "interfaces", "include", "lib")
 SOURCE_SUFFIXES = {".c", ".cpp", ".h", ".hpp", ".inc"}
 UI_TYPES = {".html": "text/html", ".js": "text/javascript", ".css": "text/css"}
 
-# Bands of the architecture map, top to bottom.
 SUBSYSTEMS = {
     "presentation": (0, "Rendering, menus, in-game UI and sound. Runs outside the tick phases; the UI issues orders into the game."),
     "game": (0, "Start-up, match load and save, and the main loop: RunGameSteps calls every phase of a tick."),

@@ -1579,3 +1579,6 @@ StartSearch,WorldBeginSearch,"slot of the PathWorldView table filled by NativePa
 StartSearch,WorldLineOfSight,"slot of the PathWorldView table filled by NativePathWorld (src/seams/pathfinding_world.cpp), PathWorldView::LineOfSight, StartSearch (src/ai/pathfind_hpa.cpp)"
 StartSearch,WorldTick,"slot of the PathWorldView table filled by NativePathWorld (src/seams/pathfinding_world.cpp), PathWorldView::Tick, StartSearch (src/ai/pathfind_hpa.cpp)"
 StartSearch,WorldUnitState,"slot of the PathWorldView table filled by NativePathWorld (src/seams/pathfinding_world.cpp), PathWorldView::UnitState, StartSearch (src/ai/pathfind_hpa.cpp)"
+StepsFor,WorldSearchStepLimit,"slot of the PathWorldView table filled by NativePathWorld (src/seams/pathfinding_world.cpp), PathWorldView::SearchStepLimit, StepsFor (src/ai/pathfind.cpp)"
+HpaStep,WorldSearchStepLimit,"slot of the PathWorldView table filled by NativePathWorld (src/seams/pathfinding_world.cpp), PathWorldView::SearchStepLimit, HpaStep (src/ai/pathfind_hpa.cpp)"
+LoadBattleAssets,PathfindingRegionSize,"seam slot filled by InstallNativeSeams, PathfindingSeam::RegionSize, LoadBattleAssets (src/game/game_state.cpp), src/seams/native.cpp"

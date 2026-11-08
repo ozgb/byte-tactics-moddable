@@ -4899,7 +4899,7 @@ SimHighWater,src/state/block.cpp,game,default,
 SimOwns,src/state/block.cpp,game,default,
 SimRandStream,src/state/block.cpp,game,default,
 SimRealloc,src/state/block.cpp,game,default,
-SimSearchSteps,src/state/block.cpp,game,default,
+SimSearchSteps,src/state/block.cpp,game,phase:UpdatePlayers,game
 SimSetSearchSteps,src/state/block.cpp,game,default,
 SiteNamed,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 SiteRoom,src/harness/replay_objects.cpp,harness,folder:src/harness/,

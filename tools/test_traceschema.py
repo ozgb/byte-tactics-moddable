@@ -148,7 +148,7 @@ class MovedGlobalsTest(unittest.TestCase):
         self.assertIn("(const void*)(offsetof(SimGlobals, g_packetManager) + 0x8), 4, TF_SCALAR, TT_NONE, 1 },", text)
         self.assertNotIn("extern int g_meteorActive;", text)
         self.assertNotIn("g_playerBudgetCap", text)
-        self.assertIn("{ \"playerTickLoad\", (const void*)0, 40, TF_BYTES, TT_NONE },", text)
+        self.assertIn("{ \"playerTickLoad\", nullptr, 40, TF_BYTES, TT_NONE },", text)
         self.assertIn("{ \"budgetRefreshCounter\", (const void*)2, 4, TF_SCALAR, TT_NONE },", text)
         self.assertIn('#include "../state/sim_globals.h"', text)
         self.assertIn('#pragma push_macro("g_meteorActive")', text)

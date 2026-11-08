@@ -283,17 +283,17 @@ Coverage: 93.6% of functions (44 of 47), 92.2% of lines, 87.1% of branches; 3 li
 
 **Entry points.** Phase roots: none. `PathfindingStep` and `PathfindingPoll` are called by `UpdatePlayers` (players).
 
-18 functions are called from other subsystems. The most called, with their callers:
+19 functions are called from other subsystems. The most called, with their callers:
 
 - `PathfindingCellsChanged` (2 from features, 2 from map)
 - `AdjustHeap` (2 from platform)
 - `PathfindingCancel` (2 from orders)
 - `PathfindingDebugCell` (1 from presentation)
-- By calling subsystem (functions called): game 4, orders 4, players 4, features 2, map 2, harness 1, platform 1, presentation 1, seams 1
+- By calling subsystem (functions called): game 5, orders 4, players 4, features 2, map 2, harness 1, platform 1, presentation 1, seams 1
 
-**Imports.** 20 functions of 2 subsystems, by target, each with the number of functions it calls there:
+**Imports.** 21 functions of 2 subsystems, by target, each with the number of functions it calls there:
 
-- seams (16): `WorldBeginSearch`, `WorldEndSearch`, `WorldFirstUnit`, `WorldInBounds`, and 12 more
+- seams (17): `WorldBeginSearch`, `WorldEndSearch`, `WorldFirstUnit`, `WorldInBounds`, and 13 more
 - platform (4): `PathGoalCells`, `PathGoalContains`, `PathGoalDistance`, `operator new`
 
 **Sim writes.** 238 items in all, 236 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
@@ -306,8 +306,8 @@ Coverage: 93.6% of functions (44 of 47), 92.2% of lines, 87.1% of branches; 3 li
 
 **Draft interface.**
 
-- Exports: 18 functions (`PathfindingStep` and `PathfindingPoll` (players), `PathfindingSubmit` and `PathfindingCancel` (orders), `PathfindingCellsChanged` (map, features)).
-- Needs from seams: 20 functions in seams, platform.
+- Exports: 19 functions (`PathfindingStep` and `PathfindingPoll` (players), `PathfindingSubmit` and `PathfindingCancel` (orders), `PathfindingCellsChanged` (map, features)).
+- Needs from seams: 21 functions in seams, platform.
 - Owns: 234 named sim items that only this subsystem writes, for example `OpenHeap::items`, `OpenHeap::pool`, `Node::index`, `OpenHeap::count`, `Grid::dirty`.
 - Shares: 2 named sim items that other subsystems also write, for example `Grid::cells`, `Grid::width`, `Grid::count`, `Grid::height`.
 - Few functions are called from outside, so the entry side is small. The import side is the world view (`PathWorldView`, filled in `src/seams/pathfinding_world.cpp`) and the goal geometry (`PathGoalContains`, `PathGoalDistance` and `PathGoalCells`, which orders and the search share). The search calls nothing in orders: a request carries its goal as data and the results come back as events that orders applies.
@@ -588,7 +588,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Command-line switch only (2): `Onl_LoadConfigFile`, `SetPacketRate`. Switches a scenario cannot pass (`-blockscan` and the network options).
 - Entered by the console scenarios (#445): `SendShareEnergy`, `SendShareMetal`, `SendPacketToPlayer`, `FindSlotByDpidInSendPacketToPlayer`, `PlayerReady` and `Player::SetType`, which the console commands `Give` and `AI` reach.
 
-**game** (274 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 154 functions are called from outside, by platform (76 distinct functions) and presentation (30); the busiest are `SetCursorMode` (19), `SimAllocTagged` (18), `AllocSite::~AllocSite` (12). It imports 492 functions, the most of any subsystem, 218 of them from presentation, then platform 102, network 30, files 23 and units 22.
+**game** (274 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 154 functions are called from outside, by platform (76 distinct functions) and presentation (30); the busiest are `SetCursorMode` (19), `SimAllocTagged` (18), `AllocSite::~AllocSite` (12). It imports 493 functions, the most of any subsystem, 218 of them from presentation, then platform 102, network 30, files 23 and units 22.
 
 **game, functions no scenario enters** (73 of 233 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 160 are entered, 68.7%), by reason:
 
@@ -630,7 +630,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **platform** (827 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 310 functions are called from outside, by presentation (159 distinct functions), game (102), network (51) and units (49); the busiest are `GameFreeThunk` (162), `operator new` (123), `operator delete` (82), then `Translate` (77) and `GameAllocIgnoreTag` (76). It imports 180 functions: game 76, presentation 46.
 
-**seams** (131 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 116 functions are called from outside. It imports 105 functions.
+**seams** (131 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 117 functions are called from outside. It imports 105 functions.
 
 **files** (169 functions). No phase root. The archive and bank readers (`src/files`: `HapiBank`, HPI and SQSH archives). 78 functions are called from outside.
 

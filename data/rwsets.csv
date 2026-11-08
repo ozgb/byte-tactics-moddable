@@ -48661,6 +48661,7 @@ address,function,file,kind,target
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_read,Hdr::evCount
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_read,HpaView::h
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_read,HpaView::w
+,HpaStep,src/ai/pathfind_hpa.cpp,field_read,PathWorldView::SearchStepLimit
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_read,PathWorldView::Tick
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_write,Hdr::evCount
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_write,Hdr::evHead
@@ -48668,6 +48669,7 @@ address,function,file,kind,target
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_write,Hdr::nPts
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_write,Req::used
 ,HpaStep,src/ai/pathfind_hpa.cpp,function,
+,HpaStep,src/ai/pathfind_hpa.cpp,indirect_call,indirect via unsigned int (*const)() __attribute__((stdcall)) [PathWorldView::SearchStepLimit]
 ,HpaStep,src/ai/pathfind_hpa.cpp,indirect_call,indirect via unsigned int (*const)() __attribute__((stdcall)) [PathWorldView::Tick]
 ,HpaSubmit,src/ai/pathfind_hpa.cpp,call,Open
 ,HpaSubmit,src/ai/pathfind_hpa.cpp,call,operator=
@@ -50708,7 +50710,7 @@ address,function,file,kind,target
 ,MatchSetupCurrent,src/game/match_setup.cpp,function,
 ,MatchSetupCurrent,src/game/match_setup.cpp,global_read,s_matchBlockBytes
 ,MatchSetupOfInfo,src/game/match_setup.cpp,call,memcpy
-,MatchSetupOfInfo,src/game/match_setup.cpp,field_escape,PlayerInfo::unknown_ad
+,MatchSetupOfInfo,src/game/match_setup.cpp,field_escape,PlayerInfo::matchSetup
 ,MatchSetupOfInfo,src/game/match_setup.cpp,field_maybe_written,MatchSetup::searchSteps
 ,MatchSetupOfInfo,src/game/match_setup.cpp,field_write,MatchSetup::blockBytes
 ,MatchSetupOfInfo,src/game/match_setup.cpp,function,
@@ -50734,7 +50736,7 @@ address,function,file,kind,target
 ,MatchSetupSizeBlock,src/game/match_setup.cpp,global_write,s_matchBlockBytes
 ,MatchSetupToInfo,src/game/match_setup.cpp,call,MatchSetupRequested
 ,MatchSetupToInfo,src/game/match_setup.cpp,call,memcpy
-,MatchSetupToInfo,src/game/match_setup.cpp,field_escape,PlayerInfo::unknown_ad
+,MatchSetupToInfo,src/game/match_setup.cpp,field_escape,PlayerInfo::matchSetup
 ,MatchSetupToInfo,src/game/match_setup.cpp,field_read,MatchSetup::blockBytes
 ,MatchSetupToInfo,src/game/match_setup.cpp,field_read,MatchSetup::searchSteps
 ,MatchSetupToInfo,src/game/match_setup.cpp,function,

@@ -641,7 +641,7 @@ class RegionTest(unittest.TestCase):
     def test_region_parts_follow_the_offsets_the_region_holds(self):
         items = al.Items(types=al.TypeTable(self.layouts))
         with mock.patch.object(al, "PATHFINDER_HEADER", Path(tempfile.mkdtemp()) / "pathfinder.h"):
-            al.PATHFINDER_HEADER.write_text("enum { kExtraOffset = 64 };")
+            al.PATHFINDER_HEADER.write_text("enum { EXTRA_OFFSET = 64 };")
             parts = al.region_parts(items, "Init: new AISearch region")
         by_name = {items.strings[p[4]]: p for p in parts}
         self.assertEqual(by_name["Init: new AISearch region.record"][:4], (al.NONE, 0, al.NONE, 64))

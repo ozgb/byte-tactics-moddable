@@ -503,7 +503,7 @@ def region_parts(items: "Items", row_name: str) -> list[tuple]:
     The record and PathExtra sit at fixed offsets; each array runs to the start of the next. The items are `Type::field` for
     the typed parts and `<allocation>.<part>` for the others."""
     layouts = items.types.layouts
-    extra_at = int(re.search(r"kExtraOffset\s*=\s*(\d+)", PATHFINDER_HEADER.read_text()).group(1))
+    extra_at = int(re.search(r"EXTRA_OFFSET\s*=\s*(\d+)", PATHFINDER_HEADER.read_text()).group(1))
     extra_size, extra_fields = layouts.record("PathExtra")
     where = {f.name: extra_at + f.start for f in extra_fields}
     parts = []

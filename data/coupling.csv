@@ -671,6 +671,7 @@ game,orders,shared_write,Vec3::z,84
 game,pathfinding,indirect,HpaInit,1
 game,pathfinding,indirect,HpaShutdown,1
 game,pathfinding,indirect,PathfindingInit,1
+game,pathfinding,indirect,PathfindingRegionSize,1
 game,pathfinding,indirect,PathfindingShutdown,1
 game,pathfinding,shared_write,PathMapInfo::height,2
 game,pathfinding,shared_write,PathMapInfo::moveClassCount,1
@@ -2980,6 +2981,7 @@ pathfinding,seams,indirect,WorldMoveClass,1
 pathfinding,seams,indirect,WorldNextUnit,1
 pathfinding,seams,indirect,WorldPass,2
 pathfinding,seams,indirect,WorldPlayerCount,1
+pathfinding,seams,indirect,WorldSearchStepLimit,2
 pathfinding,seams,indirect,WorldSeen,1
 pathfinding,seams,indirect,WorldSeenSize,1
 pathfinding,seams,indirect,WorldTick,4

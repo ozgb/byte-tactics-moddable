@@ -1359,7 +1359,8 @@ void __stdcall HpaStep()
     h->evHead = 0;
     h->evCount = 0;
     h->nPts = 0;
-    int budget = kStepBudget;
+    unsigned int limit = v.w->SearchStepLimit();
+    int budget = limit != 0 ? (int)limit : kStepBudget;
     Settle(h, &budget);
     while (budget > 0 && h->evCount < kEventCap - 4) {
         if (!h->active) {

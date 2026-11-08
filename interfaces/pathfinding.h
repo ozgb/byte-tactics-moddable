@@ -151,6 +151,8 @@ struct PathUnitState {
 struct PathWorldView {
     // The tick being played.
     unsigned int (__stdcall* Tick)(void);
+    // The most search work per tick the match setup allows, or 0 for no limit; each implementation applies it as a ceiling in its own units of work.
+    unsigned int (__stdcall* SearchStepLimit)(void);
     // The number of players in the match.
     int (__stdcall* PlayerCount)(void);
     // Whether a player (0 to 9) is in the match and plays.

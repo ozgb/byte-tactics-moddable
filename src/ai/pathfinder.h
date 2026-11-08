@@ -477,7 +477,6 @@ void __stdcall PathfindingCellsChanged(int left, int top, int right, int bottom,
 void __stdcall PathfindingStep();
 int __stdcall PathfindingPoll(PathEvent* out, PathPoint* points, int capacity);
 void __stdcall PathfindingWriteState(const StateWriter* writer);
-void PathfindingSetStepsPerTick(int steps);
 void PathfindingSetBaseScale(int scale);
 void PathfindingDebugCell(int x, int y, int* flags, int* dir);
 

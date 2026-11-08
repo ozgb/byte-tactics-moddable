@@ -23,7 +23,9 @@ struct BlockHeader {
     unsigned int inUse;
     unsigned int highWater;
     bx_rand_state streams[2];
-    unsigned int reserved[10];
+    unsigned int size;
+    unsigned int searchSteps;
+    unsigned int reserved[8];
 };
 
 static_assert(sizeof(BlockHeader) == 64, "the block header is 64 bytes");
@@ -40,6 +42,7 @@ const unsigned int kMinChunk = 16;
 const unsigned int kFirstChunk = sizeof(BlockHeader);
 
 char* g_base;
+bool g_growable;
 unsigned int g_insideThread;
 void* g_lock = host_mutex_create();
 void** g_tracked[8];
@@ -47,23 +50,23 @@ unsigned int g_trackedCount;
 
 void Fatal(const char* what)
 {
-    fprintf(stderr, "sim block: %s (kSimBlockBytes = %u)\n", what, kSimBlockBytes);
+    unsigned int size = g_base != nullptr && ((BlockHeader*)g_base)->size != 0 ? ((BlockHeader*)g_base)->size : kSimBlockBytes;
+    fprintf(stderr, "sim block: %s (size %u, ceiling %u)\n", what, size, kSimBlockCeilingBytes);
     abort();
 }
 
 void OutOfBlock()
 {
-    Fatal("out of memory, raise kSimBlockBytes in src/state/block.h");
+    Fatal("out of memory, the match setup's block size is too small");
 }
 
 void Reserve()
 {
-    void* p = host_mem_reserve(kSimBlockBytes);
-    if (p != 0)
-        p = host_mem_commit(p, kSimBlockBytes);
+    void* p = SimBlockNew(kSimBlockBytes);
     if (p == 0)
         OutOfBlock();
     g_base = (char*)p;
+    g_growable = true;
 }
 
 BlockHeader* Head()
@@ -76,6 +79,12 @@ BlockChunk* At(unsigned int off)
     return (BlockChunk*)(g_base + off);
 }
 
+unsigned int Size()
+{
+    unsigned int size = Head()->size;
+    return size != 0 ? size : kSimBlockBytes;
+}
+
 void Prepare()
 {
     if (g_base == 0)
@@ -83,6 +92,7 @@ void Prepare()
     BlockHeader* h = Head();
     if (h->ready == 0) {
         h->ready = 1;
+        h->size = kSimBlockBytes;
         h->streams[0].holdrand = 1;
         h->streams[1].holdrand = 1;
         h->freeHead = kFirstChunk;
@@ -112,8 +122,8 @@ struct Guard {
 
 unsigned int ChunkSizeFor(unsigned int size)
 {
-    if (size > kSimBlockBytes)
-        return kSimBlockBytes + kMinChunk;
+    if (size > Size())
+        return Size() + kMinChunk;
     unsigned int need = ((size + 7) & ~7u) + kChunkHeader;
     return need < kMinChunk ? kMinChunk : need;
 }
@@ -129,7 +139,7 @@ void CountUse(unsigned int bytes)
 BlockChunk* Lookup(void* p)
 {
     unsigned int off = (unsigned int)((char*)p - g_base) - kChunkHeader;
-    if (g_base == 0 || off >= kSimBlockBytes || off < kFirstChunk || (off & 7) != 0)
+    if (g_base == 0 || off >= Size() || off < kFirstChunk || (off & 7) != 0)
         Fatal("pointer is not a sim block");
     BlockChunk* c = At(off);
     if ((c->size & kFreeBit) != 0)
@@ -242,7 +252,7 @@ void* ReallocLocked(void* p, unsigned int size)
         return p;
     }
     unsigned int nextOff = off + sz;
-    if (nextOff < kSimBlockBytes && (At(nextOff)->size & kFreeBit) != 0) {
+    if (nextOff < Size() && (At(nextOff)->size & kFreeBit) != 0) {
         BlockChunk* n = At(nextOff);
         unsigned int combined = sz + (n->size & ~kFreeBit);
         if (combined >= need) {
@@ -332,10 +342,10 @@ void __cdecl SimBlockForEach(void(__cdecl* fn)(void* payload, unsigned int size,
 {
     Guard guard;
     unsigned int off = kFirstChunk;
-    while (off + kMinChunk <= kSimBlockBytes) {
+    while (off + kMinChunk <= Size()) {
         BlockChunk* c = At(off);
         unsigned int sz = c->size & ~kFreeBit;
-        if (sz < kMinChunk || (sz & 7) != 0 || sz > kSimBlockBytes - off)
+        if (sz < kMinChunk || (sz & 7) != 0 || sz > Size() - off)
             break;
         if ((c->size & kFreeBit) == 0 && c->aux <= sz - kChunkHeader)
             fn((char*)c + kChunkHeader, c->aux, ctx);
@@ -345,7 +355,7 @@ void __cdecl SimBlockForEach(void(__cdecl* fn)(void* payload, unsigned int size,
 
 bool __cdecl SimOwns(const void* p)
 {
-    return g_base != 0 && (unsigned int)((const char*)p - g_base) < kSimBlockBytes;
+    return g_base != 0 && (unsigned int)((const char*)p - g_base) < Size();
 }
 
 unsigned int __cdecl SimHighWater()
@@ -357,6 +367,63 @@ unsigned int __cdecl SimHighWater()
 void __cdecl SimBlockInit()
 {
     Guard guard;
+}
+
+void* __cdecl SimBlockNew(unsigned int size)
+{
+    void* p = host_mem_reserve(kSimBlockCeilingBytes);
+    if (p != nullptr && host_mem_commit(p, size) == nullptr) {
+        host_mem_release(p);
+        return nullptr;
+    }
+    return p;
+}
+
+unsigned int __cdecl SimBlockSize()
+{
+    Guard guard;
+    return Size();
+}
+
+void __cdecl SimBlockGrow(unsigned int bytes)
+{
+    Guard guard;
+    bytes = (bytes + kSimBlockPage - 1) & ~(kSimBlockPage - 1);
+    unsigned int old = Size();
+    if (bytes <= old)
+        return;
+    if (bytes > kSimBlockCeilingBytes)
+        Fatal("the block would pass its ceiling");
+    if (g_growable && host_mem_commit(g_base + old, bytes - old) == nullptr)
+        OutOfBlock();
+    unsigned int last = 0;
+    for (unsigned int off = Head()->freeHead; off != 0; off = At(off)->aux)
+        last = off;
+    unsigned int added = bytes - old;
+    if (last != 0 && last + (At(last)->size & ~kFreeBit) == old) {
+        At(last)->size += added;
+    } else {
+        BlockChunk* tail = At(old);
+        tail->size = added | kFreeBit;
+        tail->aux = 0;
+        if (last != 0)
+            At(last)->aux = old;
+        else
+            Head()->freeHead = old;
+    }
+    Head()->size = bytes;
+}
+
+unsigned int __cdecl SimSearchSteps()
+{
+    Guard guard;
+    return Head()->searchSteps;
+}
+
+void __cdecl SimSetSearchSteps(unsigned int steps)
+{
+    Guard guard;
+    Head()->searchSteps = steps;
 }
 
 unsigned int* __cdecl SimRandStream(int stream)
@@ -372,11 +439,12 @@ void* __cdecl SimBlockBase()
     return g_base;
 }
 
-void __cdecl SimBlockAttach(void* base)
+void __cdecl SimBlockAttach(void* base, bool growable)
 {
+    g_growable = growable;
     for (unsigned int i = 0; i < g_trackedCount; i++) {
         unsigned int off = (unsigned int)((char*)*g_tracked[i] - g_base);
-        if (g_base != 0 && *g_tracked[i] != 0 && off < kSimBlockBytes)
+        if (g_base != 0 && *g_tracked[i] != 0 && off < Size())
             *g_tracked[i] = (char*)base + off;
     }
     g_base = (char*)base;

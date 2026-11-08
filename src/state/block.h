@@ -6,8 +6,12 @@
 #include "alloc_hooks.h"
 #include "../harness/replay.h"
 
-// The size of the block every sim allocation comes from, in bytes.
+// The size of the block every sim allocation comes from when the match setup asks for no more, in bytes.
 const unsigned int kSimBlockBytes = 32u << 20;
+// The most the block can grow to, in bytes: the address space reserved for it.
+const unsigned int kSimBlockCeilingBytes = 256u << 20;
+// The unit a block's size is a multiple of, in bytes (a WASM page).
+const unsigned int kSimBlockPage = 65536;
 enum : unsigned int { SIM_TICKS_PER_SECOND = 30 };
 
 // Allocates size zeroed bytes from the sim block, 8-byte aligned.
@@ -49,8 +53,23 @@ void* __cdecl SimBlockBase();
 // The holdrand of a rand stream of the block (0 is the main thread's, 1 the load thread's), reserving the block first if need be.
 unsigned int* __cdecl SimRandStream(int stream);
 
-// Makes a copy of the block (kSimBlockBytes bytes) the live sim block.
-void __cdecl SimBlockAttach(void* base);
+// Makes a copy of the block (SimBlockSize bytes) the live sim block; growable says whether the range after it is reserved address space that SimBlockGrow may commit.
+void __cdecl SimBlockAttach(void* base, bool growable = false);
+
+// Reserves kSimBlockCeilingBytes of address space, commits the first size bytes and returns its start, or null.
+void* __cdecl SimBlockNew(unsigned int size);
+
+// The size of the block now, in bytes.
+unsigned int __cdecl SimBlockSize();
+
+// Grows the block to bytes (rounded up to kSimBlockPage), adding the difference to the free list; a smaller size is ignored.
+void __cdecl SimBlockGrow(unsigned int bytes);
+
+// The search steps per tick of the match setup, 0 for none.
+unsigned int __cdecl SimSearchSteps();
+
+// Sets the search steps per tick of the match setup.
+void __cdecl SimSetSearchSteps(unsigned int steps);
 
 // Releases the block so that the next use reserves a fresh zeroed one; a tracked pointer becomes null.
 void __cdecl SimBlockReset();

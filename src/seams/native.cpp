@@ -557,11 +557,6 @@ static void __stdcall CobScriptExplodePieceNative(CobScript* script, int piece, 
 
 Seams g_seams;
 
-void SetSearchStepsPerTick(int steps)
-{
-    PathfindingSetStepsPerTick(steps);
-}
-
 void SetSearchBaseScale(int scale)
 {
     PathfindingSetBaseScale(scale);
@@ -581,6 +576,11 @@ static PlayersSeam s_players;
 static MapSeam s_map;
 static FilesSeam s_files;
 static NetworkSeam s_network;
+
+const PathfindingSeam* DefaultPathfindingSeam()
+{
+    return &s_pathfinding;
+}
 
 static void __fastcall LoadMeteorDefaultsNative(MeteorParams* params)
 {

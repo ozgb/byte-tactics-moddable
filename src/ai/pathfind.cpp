@@ -17,6 +17,12 @@ static inline bool operator<(const HeapEntry& a, const HeapEntry& b)
 #include "../../interfaces/pathfinding.h"
 #include "../../interfaces/state_writer.h"
 
+static int StepsFor(const PathWorldView* world)
+{
+    unsigned int limit = world->SearchStepLimit();
+    return limit != 0 ? (int)limit : 0x535;
+}
+
 // FUNCTION: 0x40d5e0
 void __stdcall CopyDwordPair(int* dest, int* src) {
     if (dest != 0) {
@@ -530,7 +536,7 @@ Pathfinder::Pathfinder()
     ClearDirtyCells();
 
     object = 0;
-    stepsPerTick = 0x535;
+    stepsPerTick = StepsFor(g_seams.pathworld);
     steps = 0;
     player = 0;
     costScale = 0;
@@ -695,6 +701,7 @@ void Pathfinder::RunSearches()
     int players = world->PlayerCount();
     if (players == 0)
         return;
+    stepsPerTick = StepsFor(world);
     int share = stepsPerTick / players;
     int total = 0;
     if (++extra->refreshCounter >= 150) {
@@ -1108,13 +1115,6 @@ void __stdcall PathfindingWriteState(const StateWriter* w)
         }
         w->Int(nullptr, 0, 4, 0);
     }
-}
-
-void PathfindingSetStepsPerTick(int steps)
-{
-    Pathfinder* pf = GetPathfinder();
-    if (pf != nullptr)
-        pf->stepsPerTick = steps;
 }
 
 void PathfindingSetBaseScale(int scale)

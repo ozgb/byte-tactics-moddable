@@ -41,8 +41,8 @@ extern Seams g_seams;
 // Points g_seams at the built-in 3.1c implementations.
 void InstallNativeSeams();
 
-// Sets the search steps the default pathfinder spends per tick, for the search console command.
-void SetSearchStepsPerTick(int steps);
+// 3.1c's pathfinding, whichever implementation g_seams.pathfinding holds.
+const PathfindingSeam* DefaultPathfindingSeam();
 // Sets the base weight of the default pathfinder's heuristic in 16.16 fixed point, for the search console command.
 void SetSearchBaseScale(int scale);
 

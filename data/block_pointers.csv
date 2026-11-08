@@ -1001,6 +1001,7 @@ LoadUnitTypes: MODEL PTRS #2,0x33e,LoadBattleAssets: TEMP PROJECTED PTS #2,1,360
 LoadUnitTypes: MODEL PTRS #2,0x25a,LoadGuiLayer,1,2700,0xc790,not-a-pointer,words of LoadUnitTypes: MODEL PTRS that only look like addresses
 LoadUnitTypes: MODEL PTRS #2,0x86 0xf2 0x132 0x15a 0x1da 0x1fa 0x28e 0x2ae 0x406,LoadTntMap: TILE SET #3,7,84720,0x180b7b-0x9b0b9f,not-a-pointer,Model pointer table words at odd offsets: they straddle two pointers and only look like addresses
 LoadWeaponType,*,*,0,0,-,not-a-pointer,words of LoadWeaponType that only look like addresses
+Mission::LoadBriefing: Briefing,*,*,0,0,-,not-a-pointer,"Briefing text: characters, no pointers; four of them read as an address where the heap lands"
 Mission::LoadMissionData: MISSIONFEATURE DATA #3,*,*,0,0,-,not-a-pointer,"MissionFeature table: a 0x80-byte name and two ints, no pointers; words in the name only look like addresses"
 Mission::LoadMissionData: MISSIONFEATURE DATA #3,0x81,CMemoryCache::InitCache: CMemoryCache CCH,1,9000,0x22ffe0,not-a-pointer,"MissionFeature table: a 0x80-byte name and two ints, no pointers; words in the name only look like addresses"
 Mission::LoadMissionData: MISSIONFEATURE DATA #3,0xc31,LoadTntMap: TILE SET #3,1,5400,0x2ffe0,not-a-pointer,"MissionFeature table: a 0x80-byte name and two ints, no pointers; words in the name only look like addresses"
@@ -1280,6 +1281,7 @@ SimGlobals.g_randomSeed,0x0,LoadTntMap: TILE SET #3,28,542,0x8b3b-0xa25ecc,not-a
 SimGlobals.g_randomSeed,0x0,NanoParticles::Emit,2,6,0x7-0x1c9,not-a-pointer,"g_randomSeed: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_randomSeed,0x0,SmokeParticles::Emit,1,1,0x1b,not-a-pointer,"g_randomSeed: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_randomSeed,0x0,TimedSubParticles::Emit,2,16,0x22-0x391,not-a-pointer,"g_randomSeed: integers (ticks, counts, seed) that only look like addresses"
+SimGlobals.pad_234,*,*,0,0,-,not-a-pointer,"Padding between fields, no pointer; a word of it reads as an address where the heap lands"
 SimGlobals.pad_2a0,*,*,0,0,-,not-a-pointer,"the 8-byte gap before g_movementClasses, whose unaligned word at +6 takes the low half of entries[0].name"
 SimGlobals.pad_2a0,0x6,HAPI_LoadFile,1,360,0xffe0,not-a-pointer,"the 8-byte gap before g_movementClasses, whose unaligned word at +6 takes the low half of entries[0].name"
 SimGlobals.pad_88,*,*,0,0,-,not-a-pointer,words of SimGlobals.pad_88 that only look like addresses

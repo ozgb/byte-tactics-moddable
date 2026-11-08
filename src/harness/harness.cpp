@@ -42,6 +42,7 @@
 #include "harness.h"
 #include "replay.h"
 #include "../ai/pathfind_hpa.h"
+#include "../game/match_setup.h"
 
 enum { MAX_PLAYERS = 10 };
 
@@ -116,6 +117,7 @@ static char s_switchQuirks[512];
 static char s_quirkSpec[512] = "3.1c";
 static unsigned s_quirkHash = 0;
 static int s_pathfinderHpa = 0;
+static MatchSetup s_matchSetup;
 static int s_pathfinderLine = 0;
 static unsigned s_quirkTamperTick = 0;
 static int s_quirkTamper = 0;
@@ -773,7 +775,8 @@ static void ReadFrames(int lineNo, char* value)
 static int KeyIsDecidedByLoad(const char* key)
 {
     static const char* const keys[] = { "game_type", "campaign", "map", "difficulty", "commander_death", "mapping",
-        "line_of_sight", "los_type", "start_positions", "local_player", "spawn", "order", "console", "save" };
+        "line_of_sight", "los_type", "start_positions", "local_player", "spawn", "order", "console", "save", "block_bytes",
+        "search_steps" };
     for (unsigned i = 0; i < sizeof keys / sizeof keys[0]; i++) {
         if (strcmp(key, keys[i]) == 0)
             return 1;
@@ -845,7 +848,14 @@ static void ReadKey(int lineNo, const char* key, char* value)
         s_stepsPerFrame = ParseNumber(lineNo, key, value);
         if (s_stepsPerFrame < 1 || s_stepsPerFrame > 8)
             FailLine(lineNo, "must be from 1 to 8", key, "");
-    } else if (strcmp(key, "frames") == 0)
+    } else if (strcmp(key, "block_bytes") == 0) {
+        const char* why = "";
+        s_matchSetup.blockBytes = ParseNumber(lineNo, key, value);
+        if (!MatchSetupBlockBytesValid(s_matchSetup.blockBytes, &why))
+            FailLine(lineNo, why, key, "");
+    } else if (strcmp(key, "search_steps") == 0)
+        s_matchSetup.searchSteps = ParseRange(lineNo, key, value, 0x7fffffff);
+    else if (strcmp(key, "frames") == 0)
         ReadFrames(lineNo, value);
     else if (strcmp(key, "ticks") == 0) {
         s_ticks = ParseNumber(lineNo, key, value);
@@ -1535,6 +1545,7 @@ void HarnessInit(char* cmdLine)
 
     EnterHarnessTestMode();
     ReadScenario(path);
+    MatchSetupRequest(s_matchSetup);
     ResolveQuirks();
     if (s_pathfinderHpa)
         g_seams.pathfinding = PathfindingHpaSeam();
@@ -1619,26 +1630,25 @@ static void UiEndOfTick();
 static void RoundTripBlock()
 {
     unsigned char* old = (unsigned char*)SimBlockBase();
-    unsigned char* copy = (unsigned char*)host_mem_alloc(kSimBlockBytes);
+    unsigned int size = SimBlockSize();
+    unsigned char* copy = (unsigned char*)host_mem_alloc(size);
     if (copy == nullptr || old == nullptr) {
         Fail("testmode: no block or no memory for the roundtrip copy of it\n");
         return;
     }
-    memcpy(copy, old, kSimBlockBytes);
+    memcpy(copy, old, size);
     if (ModulesMemory()->base != nullptr) {
-        memset(old, 0xcd, kSimBlockBytes);
-        memcpy(old, copy, kSimBlockBytes);
+        memset(old, 0xcd, size);
+        memcpy(old, copy, size);
     } else {
-        void* fresh = host_mem_reserve(kSimBlockBytes);
-        if (fresh != nullptr)
-            fresh = host_mem_commit(fresh, kSimBlockBytes);
+        void* fresh = SimBlockNew(size);
         if (fresh == nullptr) {
             Fail("testmode: no memory for the roundtrip block\n");
             return;
         }
-        memcpy(fresh, copy, kSimBlockBytes);
-        memset(old, 0xcd, kSimBlockBytes);
-        SimBlockAttach(fresh);
+        memcpy(fresh, copy, size);
+        memset(old, 0xcd, size);
+        SimBlockAttach(fresh, true);
         host_mem_release(old);
     }
     host_mem_free(copy);
@@ -1708,6 +1718,11 @@ void HarnessAfterStep()
     else
         sprintf(msg, "testmode: reached tick %u\n", s_ticks);
     host_log(msg);
+    MatchSetup setup = MatchSetupCurrent();
+    if (setup.blockBytes != kSimBlockBytes || setup.searchSteps != 0) {
+        sprintf(msg, "testmode: match setup block_bytes %u search_steps %u\n", setup.blockBytes, setup.searchSteps);
+        host_log(msg);
+    }
     char replayError[300];
     replayError[0] = '\0';
     if (!ReplayWrite(replayError, sizeof replayError)) {
@@ -4359,6 +4374,10 @@ static void OpenTrace(unsigned controlWord)
         fprintf(s_trace, "quirks %08x %s\n", s_quirkHash, s_quirkSpec);
     if (s_pathfinderHpa)
         fprintf(s_trace, "pathfinder hpa\n");
+    if (s_matchSetup.blockBytes != 0)
+        fprintf(s_trace, "block_bytes %u\n", s_matchSetup.blockBytes);
+    if (s_matchSetup.searchSteps != 0)
+        fprintf(s_trace, "search_steps %u\n", s_matchSetup.searchSteps);
     if (s_dumpEnabled) {
         s_dump = fopen("dump.txt", "wb");
         if (s_dump == NULL)

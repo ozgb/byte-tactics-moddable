@@ -2931,6 +2931,7 @@ address,function,file,kind,target
 0x40e9c0,Pathfinder::AbortIfGoalMatch,src/ai/pathfind.cpp,function,
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,Pathfinder::ClearDirtyCells
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,Pathfinder::Extra
+0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,StepsFor
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,get
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,memset
 0x40e9e0,Pathfinder::Pathfinder,src/ai/pathfind.cpp,call,operator unsigned int *
@@ -2987,6 +2988,7 @@ address,function,file,kind,target
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,Pathfinder::RemovePending
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,Pathfinder::StartSearch
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,Pathfinder::TracePath
+0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,StepsFor
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator Node *
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator PathCell *
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,call,operator Ref<Node> *
@@ -3051,6 +3053,7 @@ address,function,file,kind,target
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_write,Pathfinder::player
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_write,Pathfinder::range
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_write,Pathfinder::steps
+0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,field_write,Pathfinder::stepsPerTick
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,function,
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,global_read,g_seams
 0x40eb70,Pathfinder::RunSearches,src/ai/pathfind.cpp,indirect_call,indirect via PathUnit (*)(PathUnit) __attribute__((stdcall)) [PathWorldView::NextUnit]
@@ -4702,7 +4705,7 @@ address,function,file,kind,target
 0x416780,CmdSearch,src/game/console_commands.cpp,call,CommandArgs::GetArg
 0x416780,CmdSearch,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x416780,CmdSearch,src/game/console_commands.cpp,call,SetSearchBaseScale
-0x416780,CmdSearch,src/game/console_commands.cpp,call,SetSearchStepsPerTick
+0x416780,CmdSearch,src/game/console_commands.cpp,call,SimSetSearchSteps
 0x416780,CmdSearch,src/game/console_commands.cpp,call,bx_atof_msvc5
 0x416780,CmdSearch,src/game/console_commands.cpp,field_read,CommandArgs::count
 0x416780,CmdSearch,src/game/console_commands.cpp,function,
@@ -10298,6 +10301,9 @@ address,function,file,kind,target
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,call,HapiBank::SaveBank
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,call,HapiBank::SetIntegerItem
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,call,HapiBank::SetStringItem
+0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,call,MatchSetupBlockBytesKey
+0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,call,MatchSetupCurrent
+0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,call,MatchSetupSearchStepsKey
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,call,SaveSurface
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,call,WriteCameraPosition
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,call,operator Mission *
@@ -10329,6 +10335,8 @@ address,function,file,kind,target
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,MapSeam::SaveMetalPlotmap
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,MapSeam::SavePlayerFeaturesPlotmap
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,MapSeam::SelectMission
+0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,MatchSetup::blockBytes
+0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,MatchSetup::searchSteps
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,PlayerInfo::side
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,PlayersSeam::SaveConditions
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,PlayersSeam::SavePlayers
@@ -10371,6 +10379,7 @@ address,function,file,kind,target
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,global_read,g_saveBankName
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,global_read,g_seams
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,global_read,g_summaryAccountName
+0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,global_read,kSimBlockBytes
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via char *(*)(Mission *) __attribute__((fastcall)) [MapSeam::GetCampaignName]
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via char *(*)(Mission *) __attribute__((fastcall)) [MapSeam::GetMissionName]
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::AdvanceMission]
@@ -14620,6 +14629,7 @@ address,function,file,kind,target
 0x449bb0,OpenBattleRoom,src/frontend/multi.cpp,call,IsScreenNamed
 0x449bb0,OpenBattleRoom,src/frontend/multi.cpp,call,LoadGuiLayer
 0x449bb0,OpenBattleRoom,src/frontend/multi.cpp,call,LoadPictureCached
+0x449bb0,OpenBattleRoom,src/frontend/multi.cpp,call,MatchSetupToInfo
 0x449bb0,OpenBattleRoom,src/frontend/multi.cpp,call,Mission::ComputeMapChecksum
 0x449bb0,OpenBattleRoom,src/frontend/multi.cpp,call,Mission::GetMissionName
 0x449bb0,OpenBattleRoom,src/frontend/multi.cpp,call,Mission::GetTerrainSizeTier
@@ -30124,11 +30134,13 @@ address,function,file,kind,target
 0x4916a0,ShutdownGame,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [OrdersSeam::ClearOrderTypeTable]
 0x4916a0,ShutdownGame,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::FreeUnitInfo]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,CreateParticleLists
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,DefaultPathfindingSeam
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,GameAllocIgnoreTag
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,GetTicks
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,InitCommands
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,LoadLightBar
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,LoadTextureGafs
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,MatchSetupSizeBlock
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetCameraState
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetChatHudIndices
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetSpeech
@@ -30214,6 +30226,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via PathClass (*)(int) __attribute__((stdcall)) [PathWorldView::MoveClass]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via unsigned int (*)(const PathMapInfo *) __attribute__((stdcall)) [PathfindingSeam::RegionSize]
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via unsigned int (*const)(const PathMapInfo *) __attribute__((stdcall)) [PathfindingSeam::RegionSize]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::FreeFeatureFileList]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::LoadFeatureFileList]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::NopAfterFeatureEnum]
@@ -31598,6 +31611,7 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,call,GameSrand
 0x497180,LoadMatch,src/game/game_load.cpp,call,HandleNetPackets
 0x497180,LoadMatch,src/game/game_load.cpp,call,HapiBank::CloseBank
+0x497180,LoadMatch,src/game/game_load.cpp,call,HapiBank::GetIntegerItem
 0x497180,LoadMatch,src/game/game_load.cpp,call,HapiBank::HasItem
 0x497180,LoadMatch,src/game/game_load.cpp,call,HapiBank::OpenAccount
 0x497180,LoadMatch,src/game/game_load.cpp,call,HarnessCrtSeed
@@ -31606,6 +31620,11 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,call,LoadGuiLayer
 0x497180,LoadMatch,src/game/game_load.cpp,call,LoadPictureCached
 0x497180,LoadMatch,src/game/game_load.cpp,call,LoadSavedGameState
+0x497180,LoadMatch,src/game/game_load.cpp,call,MatchSetupBegin
+0x497180,LoadMatch,src/game/game_load.cpp,call,MatchSetupBlockBytesKey
+0x497180,LoadMatch,src/game/game_load.cpp,call,MatchSetupOfInfo
+0x497180,LoadMatch,src/game/game_load.cpp,call,MatchSetupRequested
+0x497180,LoadMatch,src/game/game_load.cpp,call,MatchSetupSearchStepsKey
 0x497180,LoadMatch,src/game/game_load.cpp,call,PacketManager::SendAllQueued
 0x497180,LoadMatch,src/game/game_load.cpp,call,RandomInt
 0x497180,LoadMatch,src/game/game_load.cpp,call,ReportGameEvent
@@ -31703,6 +31722,8 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,field_write,MapViewFlags::bit0
 0x497180,LoadMatch,src/game/game_load.cpp,field_write,MapViewFlags::bit1
 0x497180,LoadMatch,src/game/game_load.cpp,field_write,MapViewFlags::bit2
+0x497180,LoadMatch,src/game/game_load.cpp,field_write,MatchSetup::blockBytes
+0x497180,LoadMatch,src/game/game_load.cpp,field_write,MatchSetup::searchSteps
 0x497180,LoadMatch,src/game/game_load.cpp,field_write,PlayerInfo::flags_9b
 0x497180,LoadMatch,src/game/game_load.cpp,field_write,PlayerRecordFlags::started
 0x497180,LoadMatch,src/game/game_load.cpp,fn_ref,HandleMain2LayoutEvent
@@ -44242,10 +44263,10 @@ address,function,file,kind,target
 ,CheckSpawns,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,ChooseWeaponNative,src/seams/native.cpp,call,Unit::ChooseWeapon
 ,ChooseWeaponNative,src/seams/native.cpp,function,
+,ChunkSizeFor,src/state/block.cpp,call,Size
 ,ChunkSizeFor,src/state/block.cpp,function,
 ,ChunkSizeFor,src/state/block.cpp,global_read,kChunkHeader
 ,ChunkSizeFor,src/state/block.cpp,global_read,kMinChunk
-,ChunkSizeFor,src/state/block.cpp,global_read,kSimBlockBytes
 ,ClaimWeaponsNative,src/seams/native.cpp,call,Unit::ClaimWeapons
 ,ClaimWeaponsNative,src/seams/native.cpp,function,
 ,ClampBucketCoord,src/map/terrain.cpp,function,
@@ -44677,6 +44698,8 @@ address,function,file,kind,target
 ,DecodeQuoted,src/harness/replay_objects.cpp,deref_read,*char
 ,DecodeQuoted,src/harness/replay_objects.cpp,deref_write,*unsigned char
 ,DecodeQuoted,src/harness/replay_objects.cpp,function,
+,DefaultPathfindingSeam,src/seams/native.cpp,function,
+,DefaultPathfindingSeam,src/seams/native.cpp,global_escape,s_pathfinding@src/seams/native.cpp
 ,DefeatAllUnitsKilledOfType::DefeatAllUnitsKilledOfType,src/game/victory_conditions.h,call,strcpy
 ,DefeatAllUnitsKilledOfType::DefeatAllUnitsKilledOfType,src/game/victory_conditions.h,field_maybe_written,DefeatAllUnitsKilledOfType::name
 ,DefeatAllUnitsKilledOfType::DefeatAllUnitsKilledOfType,src/game/victory_conditions.h,function,
@@ -45471,11 +45494,17 @@ address,function,file,kind,target
 ,FarFrom,src/units/object_state.cpp,field_read,Vector3s::y
 ,FarFrom,src/units/object_state.cpp,field_read,Vector3s::z
 ,FarFrom,src/units/object_state.cpp,function,
+,Fatal,src/game/match_setup.cpp,call,host_fatal
+,Fatal,src/game/match_setup.cpp,call,host_log
+,Fatal,src/game/match_setup.cpp,function,
 ,Fatal,src/state/block.cpp,call,abort
 ,Fatal,src/state/block.cpp,call,fprintf
+,Fatal,src/state/block.cpp,field_read,BlockHeader::size
 ,Fatal,src/state/block.cpp,function,
 ,Fatal,src/state/block.cpp,global_maybe_written,_iob
+,Fatal,src/state/block.cpp,global_read,g_base
 ,Fatal,src/state/block.cpp,global_read,kSimBlockBytes
+,Fatal,src/state/block.cpp,global_read,kSimBlockCeilingBytes
 ,FatalErrorImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,FatalErrorImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,FatalErrorImport,src/wasm/wind_meteors_glue.cpp,call,Linear
@@ -47085,6 +47114,7 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,call,Fail
 ,HarnessAfterStep,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessAfterStep,src/harness/harness.cpp,call,MakeDirectoryPath
+,HarnessAfterStep,src/harness/harness.cpp,call,MatchSetupCurrent
 ,HarnessAfterStep,src/harness/harness.cpp,call,ModulesCheckStatics
 ,HarnessAfterStep,src/harness/harness.cpp,call,ReplayWrite
 ,HarnessAfterStep,src/harness/harness.cpp,call,RoundTripBlock
@@ -47100,9 +47130,12 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,field_read,Game::endGameFlags
 ,HarnessAfterStep,src/harness/harness.cpp,field_read,Game::endGameVictory
 ,HarnessAfterStep,src/harness/harness.cpp,field_read,Game::ticks
+,HarnessAfterStep,src/harness/harness.cpp,field_read,MatchSetup::blockBytes
+,HarnessAfterStep,src/harness/harness.cpp,field_read,MatchSetup::searchSteps
 ,HarnessAfterStep,src/harness/harness.cpp,function,
 ,HarnessAfterStep,src/harness/harness.cpp,global_escape,s_commit@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,g_game
+,HarnessAfterStep,src/harness/harness.cpp,global_read,kSimBlockBytes
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_blockScan@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
@@ -47206,6 +47239,7 @@ address,function,file,kind,target
 ,HarnessInit,src/harness/harness.cpp,call,GetMemSetValue
 ,HarnessInit,src/harness/harness.cpp,call,InstallNativeSeams
 ,HarnessInit,src/harness/harness.cpp,call,IsMemSet
+,HarnessInit,src/harness/harness.cpp,call,MatchSetupRequest
 ,HarnessInit,src/harness/harness.cpp,call,ModulesHideSwitch
 ,HarnessInit,src/harness/harness.cpp,call,OpenTrace
 ,HarnessInit,src/harness/harness.cpp,call,ParseBlockScan
@@ -47232,6 +47266,7 @@ address,function,file,kind,target
 ,HarnessInit,src/harness/harness.cpp,global_maybe_written,s_scenarioPath@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,global_read,s_blockScan@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,global_read,s_fpuControlWord@src/harness/harness.cpp
+,HarnessInit,src/harness/harness.cpp,global_read,s_matchSetup@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,global_read,s_pathfinderHpa@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,global_read,s_viewSeed@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,global_write,g_seams
@@ -50531,13 +50566,13 @@ address,function,file,kind,target
 ,Lookup,src/orders/order_dispatch.cpp,indirect_call,indirect via Cell *(*)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetMapCellAtPosition]
 ,Lookup,src/state/block.cpp,call,At
 ,Lookup,src/state/block.cpp,call,Fatal
+,Lookup,src/state/block.cpp,call,Size
 ,Lookup,src/state/block.cpp,field_read,BlockChunk::size
 ,Lookup,src/state/block.cpp,function,
 ,Lookup,src/state/block.cpp,global_read,g_base
 ,Lookup,src/state/block.cpp,global_read,kChunkHeader
 ,Lookup,src/state/block.cpp,global_read,kFirstChunk
 ,Lookup,src/state/block.cpp,global_read,kFreeBit
-,Lookup,src/state/block.cpp,global_read,kSimBlockBytes
 ,LosTable::GetLine,src/map/los_lines.h,call,operator[]
 ,LosTable::GetLine,src/map/los_lines.h,deref_read,*LosTable
 ,LosTable::GetLine,src/map/los_lines.h,function,
@@ -50653,6 +50688,57 @@ address,function,file,kind,target
 ,MarkOwnerNetDirtyFromDamageSplitNative,src/seams/native.cpp,function,
 ,Marked,src/orders/order_dispatch.cpp,field_read,FeatureMarkView::ffe
 ,Marked,src/orders/order_dispatch.cpp,function,
+,MatchSetupBegin,src/game/match_setup.cpp,call,Fatal
+,MatchSetupBegin,src/game/match_setup.cpp,call,MatchSetupBlockBytesValid
+,MatchSetupBegin,src/game/match_setup.cpp,call,SimSetSearchSteps
+,MatchSetupBegin,src/game/match_setup.cpp,call,sprintf
+,MatchSetupBegin,src/game/match_setup.cpp,field_read,MatchSetup::blockBytes
+,MatchSetupBegin,src/game/match_setup.cpp,field_read,MatchSetup::searchSteps
+,MatchSetupBegin,src/game/match_setup.cpp,function,
+,MatchSetupBegin,src/game/match_setup.cpp,global_write,s_blockBytes
+,MatchSetupBlockBytesKey,src/game/match_setup.cpp,function,
+,MatchSetupBlockBytesValid,src/game/match_setup.cpp,deref_write,*char
+,MatchSetupBlockBytesValid,src/game/match_setup.cpp,function,
+,MatchSetupBlockBytesValid,src/game/match_setup.cpp,global_read,kSimBlockBytes
+,MatchSetupBlockBytesValid,src/game/match_setup.cpp,global_read,kSimBlockCeilingBytes
+,MatchSetupBlockBytesValid,src/game/match_setup.cpp,global_read,kSimBlockPage
+,MatchSetupCurrent,src/game/match_setup.cpp,call,SimSearchSteps
+,MatchSetupCurrent,src/game/match_setup.cpp,field_write,MatchSetup::blockBytes
+,MatchSetupCurrent,src/game/match_setup.cpp,field_write,MatchSetup::searchSteps
+,MatchSetupCurrent,src/game/match_setup.cpp,function,
+,MatchSetupCurrent,src/game/match_setup.cpp,global_read,s_matchBlockBytes
+,MatchSetupOfInfo,src/game/match_setup.cpp,call,memcpy
+,MatchSetupOfInfo,src/game/match_setup.cpp,field_escape,PlayerInfo::unknown_ad
+,MatchSetupOfInfo,src/game/match_setup.cpp,field_maybe_written,MatchSetup::searchSteps
+,MatchSetupOfInfo,src/game/match_setup.cpp,field_write,MatchSetup::blockBytes
+,MatchSetupOfInfo,src/game/match_setup.cpp,function,
+,MatchSetupOfInfo,src/game/match_setup.cpp,global_read,kSimBlockPage
+,MatchSetupRequest,src/game/match_setup.cpp,call,operator=
+,MatchSetupRequest,src/game/match_setup.cpp,function,
+,MatchSetupRequest,src/game/match_setup.cpp,global_write,s_commandLineRead
+,MatchSetupRequest,src/game/match_setup.cpp,global_write,s_requested
+,MatchSetupRequested,src/game/match_setup.cpp,call,ReadCommandLine
+,MatchSetupRequested,src/game/match_setup.cpp,function,
+,MatchSetupRequested,src/game/match_setup.cpp,global_read,s_requested
+,MatchSetupSearchStepsKey,src/game/match_setup.cpp,function,
+,MatchSetupSizeBlock,src/game/match_setup.cpp,call,Fatal
+,MatchSetupSizeBlock,src/game/match_setup.cpp,call,SimBlockGrow
+,MatchSetupSizeBlock,src/game/match_setup.cpp,call,sprintf
+,MatchSetupSizeBlock,src/game/match_setup.cpp,function,
+,MatchSetupSizeBlock,src/game/match_setup.cpp,global_read,kSimBlockBytes
+,MatchSetupSizeBlock,src/game/match_setup.cpp,global_read,kSimBlockCeilingBytes
+,MatchSetupSizeBlock,src/game/match_setup.cpp,global_read,kSimBlockPage
+,MatchSetupSizeBlock,src/game/match_setup.cpp,global_read,s_blockBytes
+,MatchSetupSizeBlock,src/game/match_setup.cpp,global_read,s_matchBlockBytes
+,MatchSetupSizeBlock,src/game/match_setup.cpp,global_write,s_blockBytes
+,MatchSetupSizeBlock,src/game/match_setup.cpp,global_write,s_matchBlockBytes
+,MatchSetupToInfo,src/game/match_setup.cpp,call,MatchSetupRequested
+,MatchSetupToInfo,src/game/match_setup.cpp,call,memcpy
+,MatchSetupToInfo,src/game/match_setup.cpp,field_escape,PlayerInfo::unknown_ad
+,MatchSetupToInfo,src/game/match_setup.cpp,field_read,MatchSetup::blockBytes
+,MatchSetupToInfo,src/game/match_setup.cpp,field_read,MatchSetup::searchSteps
+,MatchSetupToInfo,src/game/match_setup.cpp,function,
+,MatchSetupToInfo,src/game/match_setup.cpp,global_read,kSimBlockPage
 ,MatchWildcard,src/files/files_api.h,field_read,FilesSeam::MatchWildcard
 ,MatchWildcard,src/files/files_api.h,field_read,Seams::files
 ,MatchWildcard,src/files/files_api.h,function,
@@ -51436,6 +51522,8 @@ address,function,file,kind,target
 ,OpenTrace,src/harness/harness.cpp,call,memcpy
 ,OpenTrace,src/harness/harness.cpp,call,setvbuf
 ,OpenTrace,src/harness/harness.cpp,call,strcpy
+,OpenTrace,src/harness/harness.cpp,field_read,MatchSetup::blockBytes
+,OpenTrace,src/harness/harness.cpp,field_read,MatchSetup::searchSteps
 ,OpenTrace,src/harness/harness.cpp,function,
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_commit@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_eventsBuffer@src/harness/harness.cpp
@@ -51449,6 +51537,7 @@ address,function,file,kind,target
 ,OpenTrace,src/harness/harness.cpp,global_read,s_dumpEnabled@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_gameSeed@src/harness/harness.cpp
+,OpenTrace,src/harness/harness.cpp,global_read,s_matchSetup@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_pathfinderHpa@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_quirkHash@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_sound@src/harness/harness.cpp
@@ -52005,9 +52094,6 @@ address,function,file,kind,target
 ,PathfindingSetBaseScale,src/ai/pathfind.cpp,call,GetPathfinder
 ,PathfindingSetBaseScale,src/ai/pathfind.cpp,field_write,Pathfinder::baseScale
 ,PathfindingSetBaseScale,src/ai/pathfind.cpp,function,
-,PathfindingSetStepsPerTick,src/ai/pathfind.cpp,call,GetPathfinder
-,PathfindingSetStepsPerTick,src/ai/pathfind.cpp,field_write,Pathfinder::stepsPerTick
-,PathfindingSetStepsPerTick,src/ai/pathfind.cpp,function,
 ,PathfindingShutdown,src/ai/pathfind.cpp,call,get
 ,PathfindingShutdown,src/ai/pathfind.cpp,call,operator=
 ,PathfindingShutdown,src/ai/pathfind.cpp,field_read,Game::pathfinder
@@ -52324,6 +52410,7 @@ address,function,file,kind,target
 ,Prepare,src/state/block.cpp,field_write,BlockChunk::size
 ,Prepare,src/state/block.cpp,field_write,BlockHeader::freeHead
 ,Prepare,src/state/block.cpp,field_write,BlockHeader::ready
+,Prepare,src/state/block.cpp,field_write,BlockHeader::size
 ,Prepare,src/state/block.cpp,field_write,bx_rand_state::holdrand
 ,Prepare,src/state/block.cpp,function,
 ,Prepare,src/state/block.cpp,global_read,g_base
@@ -52609,6 +52696,19 @@ address,function,file,kind,target
 ,ReachUnitLineOfFire,src/weapons/weapons.cpp,field_read,ReachUnitVec3::x
 ,ReachUnitLineOfFire,src/weapons/weapons.cpp,field_read,ReachUnitVec3::z
 ,ReachUnitLineOfFire,src/weapons/weapons.cpp,function,
+,ReadCommandLine,src/game/match_setup.cpp,call,Fatal
+,ReadCommandLine,src/game/match_setup.cpp,call,MatchSetupBlockBytesValid
+,ReadCommandLine,src/game/match_setup.cpp,call,SwitchValue
+,ReadCommandLine,src/game/match_setup.cpp,call,host_command_line
+,ReadCommandLine,src/game/match_setup.cpp,call,sprintf
+,ReadCommandLine,src/game/match_setup.cpp,field_maybe_written,MatchSetup::blockBytes
+,ReadCommandLine,src/game/match_setup.cpp,field_maybe_written,MatchSetup::searchSteps
+,ReadCommandLine,src/game/match_setup.cpp,field_read,MatchSetup::blockBytes
+,ReadCommandLine,src/game/match_setup.cpp,function,
+,ReadCommandLine,src/game/match_setup.cpp,global_maybe_written,s_requested
+,ReadCommandLine,src/game/match_setup.cpp,global_read,s_commandLineRead
+,ReadCommandLine,src/game/match_setup.cpp,global_read,s_requested
+,ReadCommandLine,src/game/match_setup.cpp,global_write,s_commandLineRead
 ,ReadConsole,src/harness/harness.cpp,call,FailLine
 ,ReadConsole,src/harness/harness.cpp,call,NextToken
 ,ReadConsole,src/harness/harness.cpp,call,ParseNumber
@@ -52671,6 +52771,7 @@ address,function,file,kind,target
 ,ReadInput,src/harness/harness.cpp,global_write,s_inputCount@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,call,FailLine
 ,ReadKey,src/harness/harness.cpp,call,KeyIsDecidedByLoad
+,ReadKey,src/harness/harness.cpp,call,MatchSetupBlockBytesValid
 ,ReadKey,src/harness/harness.cpp,call,ParseNumber
 ,ReadKey,src/harness/harness.cpp,call,ParseRange
 ,ReadKey,src/harness/harness.cpp,call,QuirksNormalise
@@ -52691,6 +52792,9 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,call,strlen
 ,ReadKey,src/harness/harness.cpp,call,strncmp
 ,ReadKey,src/harness/harness.cpp,deref_read,*char
+,ReadKey,src/harness/harness.cpp,field_read,MatchSetup::blockBytes
+,ReadKey,src/harness/harness.cpp,field_write,MatchSetup::blockBytes
+,ReadKey,src/harness/harness.cpp,field_write,MatchSetup::searchSteps
 ,ReadKey,src/harness/harness.cpp,function,
 ,ReadKey,src/harness/harness.cpp,global_maybe_written,s_campaign@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_maybe_written,s_decidedKey@src/harness/harness.cpp
@@ -52704,6 +52808,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_read,s_gameTypeLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_loadAhead@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_loadLine@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_read,s_matchSetup@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_pathfinderLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_quirkReach@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_roundTripCount@src/harness/harness.cpp
@@ -52732,6 +52837,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_write,s_mapLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_mapping@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_mappingLine@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_matchSetup@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_pathfinderHpa@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_pathfinderLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkReach@src/harness/harness.cpp
@@ -52891,6 +52997,7 @@ address,function,file,kind,target
 ,ReallocLocked,src/state/block.cpp,call,FreeLocked
 ,ReallocLocked,src/state/block.cpp,call,Head
 ,ReallocLocked,src/state/block.cpp,call,Lookup
+,ReallocLocked,src/state/block.cpp,call,Size
 ,ReallocLocked,src/state/block.cpp,call,memcpy
 ,ReallocLocked,src/state/block.cpp,call,memset
 ,ReallocLocked,src/state/block.cpp,field_read,BlockChunk::aux
@@ -52904,7 +53011,6 @@ address,function,file,kind,target
 ,ReallocLocked,src/state/block.cpp,global_read,kChunkHeader
 ,ReallocLocked,src/state/block.cpp,global_read,kFreeBit
 ,ReallocLocked,src/state/block.cpp,global_read,kMinChunk
-,ReallocLocked,src/state/block.cpp,global_read,kSimBlockBytes
 ,ReattachFxToUnitNative,src/seams/native.cpp,call,Order::ReattachFxToUnit
 ,ReattachFxToUnitNative,src/seams/native.cpp,function,
 ,RebuildSpans,src/harness/block_scan.cpp,call,Inside
@@ -57597,11 +57703,11 @@ address,function,file,kind,target
 ,RequestEnergyNative,src/seams/native.cpp,call,UnitResources::RequestEnergy
 ,RequestEnergyNative,src/seams/native.cpp,function,
 ,Reserve,src/state/block.cpp,call,OutOfBlock
-,Reserve,src/state/block.cpp,call,host_mem_commit
-,Reserve,src/state/block.cpp,call,host_mem_reserve
+,Reserve,src/state/block.cpp,call,SimBlockNew
 ,Reserve,src/state/block.cpp,function,
 ,Reserve,src/state/block.cpp,global_read,kSimBlockBytes
 ,Reserve,src/state/block.cpp,global_write,g_base
+,Reserve,src/state/block.cpp,global_write,g_growable
 ,ReserveUnitPtrVector,src/ai/ai_player.cpp,call,BlockVector::Reserve
 ,ReserveUnitPtrVector,src/ai/ai_player.cpp,call,BlockVector::Size
 ,ReserveUnitPtrVector,src/ai/ai_player.cpp,function,
@@ -57745,16 +57851,15 @@ address,function,file,kind,target
 ,RoundTripBlock,src/harness/harness.cpp,call,ModulesMemory
 ,RoundTripBlock,src/harness/harness.cpp,call,SimBlockAttach
 ,RoundTripBlock,src/harness/harness.cpp,call,SimBlockBase
+,RoundTripBlock,src/harness/harness.cpp,call,SimBlockNew
+,RoundTripBlock,src/harness/harness.cpp,call,SimBlockSize
 ,RoundTripBlock,src/harness/harness.cpp,call,host_mem_alloc
-,RoundTripBlock,src/harness/harness.cpp,call,host_mem_commit
 ,RoundTripBlock,src/harness/harness.cpp,call,host_mem_free
 ,RoundTripBlock,src/harness/harness.cpp,call,host_mem_release
-,RoundTripBlock,src/harness/harness.cpp,call,host_mem_reserve
 ,RoundTripBlock,src/harness/harness.cpp,call,memcpy
 ,RoundTripBlock,src/harness/harness.cpp,call,memset
 ,RoundTripBlock,src/harness/harness.cpp,field_read,ModuleMemory::base
 ,RoundTripBlock,src/harness/harness.cpp,function,
-,RoundTripBlock,src/harness/harness.cpp,global_read,kSimBlockBytes
 ,Rows,src/util/tdf.cpp,deref_read,*std::vector<TdfField>
 ,Rows,src/util/tdf.cpp,field_escape,TdfEntries::v
 ,Rows,src/util/tdf.cpp,function,
@@ -58274,8 +58379,6 @@ address,function,file,kind,target
 ,SetPos,src/ingame/camera.cpp,global_read,g_game
 ,SetSearchBaseScale,src/seams/native.cpp,call,PathfindingSetBaseScale
 ,SetSearchBaseScale,src/seams/native.cpp,function,
-,SetSearchStepsPerTick,src/seams/native.cpp,call,PathfindingSetStepsPerTick
-,SetSearchStepsPerTick,src/seams/native.cpp,function,
 ,SetSource,src/gui/dialogs.cpp,call,GetGafSequenceFrame
 ,SetSource,src/gui/dialogs.cpp,call,InitGafSequence
 ,SetSource,src/gui/dialogs.cpp,call,SetCursorSprite
@@ -58541,18 +58644,20 @@ address,function,file,kind,target
 ,SimAllocTagged,src/state/block.h,call,SimAlloc
 ,SimAllocTagged,src/state/block.h,call,_ReturnAddress
 ,SimAllocTagged,src/state/block.h,function,
+,SimBlockAttach,src/state/block.cpp,call,Size
 ,SimBlockAttach,src/state/block.cpp,deref_read,*void
 ,SimBlockAttach,src/state/block.cpp,deref_write,*void
 ,SimBlockAttach,src/state/block.cpp,function,
 ,SimBlockAttach,src/state/block.cpp,global_read,g_base
 ,SimBlockAttach,src/state/block.cpp,global_read,g_tracked
 ,SimBlockAttach,src/state/block.cpp,global_read,g_trackedCount
-,SimBlockAttach,src/state/block.cpp,global_read,kSimBlockBytes
 ,SimBlockAttach,src/state/block.cpp,global_write,g_base
+,SimBlockAttach,src/state/block.cpp,global_write,g_growable
 ,SimBlockBase,src/state/block.cpp,function,
 ,SimBlockBase,src/state/block.cpp,global_read,g_base
 ,SimBlockForEach,src/state/block.cpp,call,At
 ,SimBlockForEach,src/state/block.cpp,call,Guard::~Guard
+,SimBlockForEach,src/state/block.cpp,call,Size
 ,SimBlockForEach,src/state/block.cpp,field_read,BlockChunk::aux
 ,SimBlockForEach,src/state/block.cpp,field_read,BlockChunk::size
 ,SimBlockForEach,src/state/block.cpp,function,
@@ -58560,10 +58665,34 @@ address,function,file,kind,target
 ,SimBlockForEach,src/state/block.cpp,global_read,kFirstChunk
 ,SimBlockForEach,src/state/block.cpp,global_read,kFreeBit
 ,SimBlockForEach,src/state/block.cpp,global_read,kMinChunk
-,SimBlockForEach,src/state/block.cpp,global_read,kSimBlockBytes
 ,SimBlockForEach,src/state/block.cpp,indirect_call,"indirect via void (*)(void *, unsigned int, void *) __attribute__((cdecl)) [fn]"
+,SimBlockGrow,src/state/block.cpp,call,At
+,SimBlockGrow,src/state/block.cpp,call,Fatal
+,SimBlockGrow,src/state/block.cpp,call,Guard::~Guard
+,SimBlockGrow,src/state/block.cpp,call,Head
+,SimBlockGrow,src/state/block.cpp,call,OutOfBlock
+,SimBlockGrow,src/state/block.cpp,call,Size
+,SimBlockGrow,src/state/block.cpp,call,host_mem_commit
+,SimBlockGrow,src/state/block.cpp,field_read,BlockChunk::aux
+,SimBlockGrow,src/state/block.cpp,field_read,BlockChunk::size
+,SimBlockGrow,src/state/block.cpp,field_read,BlockHeader::freeHead
+,SimBlockGrow,src/state/block.cpp,field_write,BlockChunk::aux
+,SimBlockGrow,src/state/block.cpp,field_write,BlockChunk::size
+,SimBlockGrow,src/state/block.cpp,field_write,BlockHeader::freeHead
+,SimBlockGrow,src/state/block.cpp,field_write,BlockHeader::size
+,SimBlockGrow,src/state/block.cpp,function,
+,SimBlockGrow,src/state/block.cpp,global_read,g_base
+,SimBlockGrow,src/state/block.cpp,global_read,g_growable
+,SimBlockGrow,src/state/block.cpp,global_read,kFreeBit
+,SimBlockGrow,src/state/block.cpp,global_read,kSimBlockCeilingBytes
+,SimBlockGrow,src/state/block.cpp,global_read,kSimBlockPage
 ,SimBlockInit,src/state/block.cpp,call,Guard::~Guard
 ,SimBlockInit,src/state/block.cpp,function,
+,SimBlockNew,src/state/block.cpp,call,host_mem_commit
+,SimBlockNew,src/state/block.cpp,call,host_mem_release
+,SimBlockNew,src/state/block.cpp,call,host_mem_reserve
+,SimBlockNew,src/state/block.cpp,function,
+,SimBlockNew,src/state/block.cpp,global_read,kSimBlockCeilingBytes
 ,SimBlockReset,src/state/block.cpp,call,host_mem_release
 ,SimBlockReset,src/state/block.cpp,deref_write,*void
 ,SimBlockReset,src/state/block.cpp,function,
@@ -58571,6 +58700,9 @@ address,function,file,kind,target
 ,SimBlockReset,src/state/block.cpp,global_read,g_tracked
 ,SimBlockReset,src/state/block.cpp,global_read,g_trackedCount
 ,SimBlockReset,src/state/block.cpp,global_write,g_base
+,SimBlockSize,src/state/block.cpp,call,Guard::~Guard
+,SimBlockSize,src/state/block.cpp,call,Size
+,SimBlockSize,src/state/block.cpp,function,
 ,SimBlockTrack,src/state/block.cpp,call,Fatal
 ,SimBlockTrack,src/state/block.cpp,function,
 ,SimBlockTrack,src/state/block.cpp,global_read,g_tracked
@@ -58653,9 +58785,9 @@ address,function,file,kind,target
 ,SimHighWater,src/state/block.cpp,call,Head
 ,SimHighWater,src/state/block.cpp,field_read,BlockHeader::highWater
 ,SimHighWater,src/state/block.cpp,function,
+,SimOwns,src/state/block.cpp,call,Size
 ,SimOwns,src/state/block.cpp,function,
 ,SimOwns,src/state/block.cpp,global_read,g_base
-,SimOwns,src/state/block.cpp,global_read,kSimBlockBytes
 ,SimRandStream,src/state/block.cpp,call,Guard::~Guard
 ,SimRandStream,src/state/block.cpp,call,Head
 ,SimRandStream,src/state/block.cpp,field_escape,bx_rand_state::holdrand
@@ -58671,6 +58803,14 @@ address,function,file,kind,target
 ,SimRealloc,src/state/block.cpp,global_read,g_allocHooks
 ,SimRealloc,src/state/block.cpp,indirect_call,indirect via void (*const)(void *) __attribute__((cdecl)) [AllocHooks::removed]
 ,SimRealloc,src/state/block.cpp,indirect_call,"indirect via void (*const)(void *, unsigned int) __attribute__((cdecl)) [AllocHooks::added]"
+,SimSearchSteps,src/state/block.cpp,call,Guard::~Guard
+,SimSearchSteps,src/state/block.cpp,call,Head
+,SimSearchSteps,src/state/block.cpp,field_read,BlockHeader::searchSteps
+,SimSearchSteps,src/state/block.cpp,function,
+,SimSetSearchSteps,src/state/block.cpp,call,Guard::~Guard
+,SimSetSearchSteps,src/state/block.cpp,call,Head
+,SimSetSearchSteps,src/state/block.cpp,field_write,BlockHeader::searchSteps
+,SimSetSearchSteps,src/state/block.cpp,function,
 ,SiteNamed,src/harness/replay_objects.cpp,call,strlen
 ,SiteNamed,src/harness/replay_objects.cpp,call,strncmp
 ,SiteNamed,src/harness/replay_objects.cpp,field_read,ReplayInsideSite::container
@@ -58683,6 +58823,10 @@ address,function,file,kind,target
 ,SiteRoom,src/harness/replay_objects.cpp,field_read,ReplayInsideSite::count
 ,SiteRoom,src/harness/replay_objects.cpp,field_read,ReplayInsideSite::room
 ,SiteRoom,src/harness/replay_objects.cpp,function,
+,Size,src/state/block.cpp,call,Head
+,Size,src/state/block.cpp,field_read,BlockHeader::size
+,Size,src/state/block.cpp,function,
+,Size,src/state/block.cpp,global_read,kSimBlockBytes
 ,SkipComment,src/util/tdf.cpp,deref_read,*char
 ,SkipComment,src/util/tdf.cpp,deref_write,*char
 ,SkipComment,src/util/tdf.cpp,function,
@@ -58927,6 +59071,7 @@ address,function,file,kind,target
 ,Start,src/wasm/modules.cpp,call,wl_module_int
 ,Start,src/wasm/modules.cpp,field_read,ModuleMemory::base
 ,Start,src/wasm/modules.cpp,field_read,wl_layout::block_base
+,Start,src/wasm/modules.cpp,field_read,wl_layout::block_max
 ,Start,src/wasm/modules.cpp,field_read,wl_layout::block_size
 ,Start,src/wasm/modules.cpp,field_read,wl_layout::has_block
 ,Start,src/wasm/modules.cpp,field_read,wl_layout::scratch_base
@@ -58948,6 +59093,7 @@ address,function,file,kind,target
 ,Start,src/wasm/modules.cpp,function,
 ,Start,src/wasm/modules.cpp,global_read,kModuleName
 ,Start,src/wasm/modules.cpp,global_read,kSimBlockBytes
+,Start,src/wasm/modules.cpp,global_read,kSimBlockCeilingBytes
 ,Start,src/wasm/modules.cpp,global_read,s_loader
 ,Start,src/wasm/modules.cpp,global_read,s_memory
 ,Start,src/wasm/modules.cpp,global_read,s_timing
@@ -59082,6 +59228,9 @@ address,function,file,kind,target
 ,SteepCell,src/map/terrain.cpp,function,
 ,SteepCell,src/map/terrain.cpp,global_read,g_game
 ,StepPage,src/ingame/control_panel.cpp,function,
+,StepsFor,src/ai/pathfind.cpp,field_read,PathWorldView::SearchStepLimit
+,StepsFor,src/ai/pathfind.cpp,function,
+,StepsFor,src/ai/pathfind.cpp,indirect_call,indirect via unsigned int (*const)() __attribute__((stdcall)) [PathWorldView::SearchStepLimit]
 ,Stop,src/wasm/wind_meteors_glue.cpp,call,ModulesFatal
 ,Stop,src/wasm/wind_meteors_glue.cpp,call,sprintf
 ,Stop,src/wasm/wind_meteors_glue.cpp,function,
@@ -59254,6 +59403,13 @@ address,function,file,kind,target
 ,SwapBanks,src/harness/block_scan.cpp,global_read,g_spanMin
 ,SwapBanks,src/harness/block_scan.cpp,global_read,g_spans
 ,SwapPtr,src/graphics/gaf.cpp,function,
+,SwitchValue,src/game/match_setup.cpp,call,Fatal
+,SwitchValue,src/game/match_setup.cpp,call,strlen
+,SwitchValue,src/game/match_setup.cpp,call,strncmp
+,SwitchValue,src/game/match_setup.cpp,call,strtoul
+,SwitchValue,src/game/match_setup.cpp,deref_read,*char
+,SwitchValue,src/game/match_setup.cpp,deref_write,*unsigned int
+,SwitchValue,src/game/match_setup.cpp,function,
 ,SyncRecordIntVector::assign_first,src/network/unit_sync.cpp,call,CopyDwordRangeOverwrite
 ,SyncRecordIntVector::assign_first,src/network/unit_sync.cpp,call,SyncRecordIntVector::Size
 ,SyncRecordIntVector::assign_first,src/network/unit_sync.cpp,call,SyncRecordIntVector::begin
@@ -61030,6 +61186,8 @@ address,function,file,kind,target
 ,WorldPosition,src/harness/harness.cpp,deref_read,*unsigned char
 ,WorldPosition,src/harness/harness.cpp,deref_write,*int
 ,WorldPosition,src/harness/harness.cpp,function,
+,WorldSearchStepLimit,src/seams/pathfinding_world.cpp,call,SimSearchSteps
+,WorldSearchStepLimit,src/seams/pathfinding_world.cpp,function,
 ,WorldSeen,src/seams/pathfinding_world.cpp,call,operator unsigned short *
 ,WorldSeen,src/seams/pathfinding_world.cpp,deref_read,*unsigned short
 ,WorldSeen,src/seams/pathfinding_world.cpp,field_read,Game::visibilityMask

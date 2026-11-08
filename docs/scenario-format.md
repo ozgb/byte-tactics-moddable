@@ -90,6 +90,8 @@ describes, plays it tick by tick, writes the outputs of section 7 and exits.
 | `frames` | ticks | none | Ticks at which the run dumps the frame drawn at the end of that tick's loop pass (`docs/frame-dump.md`). One line only. |
 | `quirks` | a quirk spec | `3.1c` | The quirk flags of the run (section 6). |
 | `pathfinder` | `default` or `hpa` | `default` | Test only: `hpa` installs the demo pathfinder (`src/ai/pathfind_hpa.cpp`) in place of 3.1c's search before the match starts. A run with it does not conform to the reference traces. One line only. |
+| `block_bytes` | 0, or a multiple of 65536 from 33554432 to 268435456 | 0 | The size of the state block, in bytes (`docs/state.md`). 0 sizes it from what the loaded modules need, which is 32 MiB with 3.1c's pathfinding. The traces equal at any size. A save keeps it. One line only. |
+| `search_steps` | 0 to 2147483647 | 0 | The search steps per tick pathfinding is limited to. 0 is no limit: 3.1c's 1333. A save keeps it. The `search` console command sets it. One line only. |
 | `quirks_tamper` | tick | none | Test only: flips a quirk flag at this tick, so the frozen-flags check of section 2 exits with status 2. |
 | `quirks_reach` | `<tick> <flag name>` | none | Test only: at that tick makes the game reach the guard of the named quirk flag (section 6). |
 | `roundtrip` | tick | none | Test only, up to 16 lines: after the step of this tick, the run copies the shared state block, overwrites the block with a fill pattern and restores the copy, then plays on. A build that holds game state outside the block diverges from the stored traces. A tick of 0 or after `ticks` is an error. |
@@ -270,8 +272,8 @@ the game cannot load, exits with status 2 and a message that names the file.
   take effect when the match loads.
 - **Keys it may not set:** the save decides them, so a scenario with a `load` line that sets one exits with
   status 2 and names it: `game_type`, `campaign`, `map`, `difficulty`, `commander_death`, `mapping`,
-  `line_of_sight`, `los_type`, `start_positions`, `local_player`, every `player<N>.*` key, `save`, `spawn`,
-  `order` and `console`. `map` and the `player<N>.*` keys are not required.
+  `line_of_sight`, `los_type`, `start_positions`, `local_player`, `block_bytes`, `search_steps`, every
+  `player<N>.*` key, `save`, `spawn`, `order` and `console`. `map` and the `player<N>.*` keys are not required.
 - **The tick.** The save holds the game's tick counter, so the loaded game continues from the saved tick. The
   save is made after the step of its tick, so the first row of the loaded run's trace is tick saved tick + 1
   (901 for `save-midgame`), and the trace has no rows before it. `ticks` is the last tick traced, counted from

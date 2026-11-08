@@ -94,6 +94,47 @@ Found during review, and re-checked against the code for #783. Functions are cit
 - Not a crossing: `g_explodedPieces`. `DrawExplosions` and `DrawExplodedPieces` (explosions.cpp) only clear a slot when `DrawExplodedPiece` returns 0, which it never does.
 - Not a crossing: `g_debrisMemCache`. The older note said the end-game screen frees it, but the only calls outside the explosion code are `InitMemoryCache` and `FreeMemoryCache` (endgame.cpp), which run at startup and through `atexit`. No commit removed a crossing there: the attribution was wrong when the note was written (6b9479b31).
 
+## The size of the block
+
+The sim block is a range of address space of 256 MiB (`kSimBlockCeilingBytes`) of which the first `size` bytes are
+committed and allocated from. `size` is 32 MiB (`kSimBlockBytes`) at start-up and grows, never shrinks, to the size
+of the match, a multiple of 65536 from 32 MiB to 256 MiB. It lives in the block's header (`BlockHeader::size`), so a
+copy of the block carries it. The growth adds the new bytes at the top to the free list, and the allocator is first
+fit from the bottom, so a larger block moves only the point where memory runs out: trace hashes use pointer IDs, not
+addresses, and equal at any size.
+
+I picked 256 MiB as eight times the default: it leaves an i686 process (2 GiB of user address space) room for its
+own heap, it fits wasm32 (4 GiB) and the 2 GiB or so a browser gives a memory, and WASM mode commits the ceiling up
+front in the one linear memory (`docs/module-abi.md`, 2.1).
+
+The size is the base game's 32 MiB plus the bytes the loaded modules declare beyond the default's (today the
+pathfinding region: `RegionSize` of the installed implementation minus the default's, if positive), rounded up to a
+page. With no replacement it is exactly 32 MiB.
+
+## The match setup
+
+Two values every player agrees on, both 0 by default (`src/game/match_setup.h`):
+- `blockBytes`: 0 sizes the block as above; otherwise it is the block's size, which must be at least what the
+  modules need.
+- `searchSteps`: the search steps per tick pathfinding is limited to, 0 for none (`docs/pathfinding-interface.md`).
+
+Where they come from and how they travel:
+- **A test-mode run:** the scenario keys `block_bytes` and `search_steps` (`docs/scenario-format.md`). A game
+  outside test mode takes the switches `-blockbytes <n>` and `-searchsteps <n>` of the command line.
+- **A lobby:** the host puts them in its `PlayerInfo`, bytes 173 to 178 (the unused tail `unknown_ad`: a 16-bit count
+  of 65536-byte pages, then a 32-bit step count), which the lobby already broadcasts to everyone, and every
+  machine reads them from the host's record when the match loads (`LoadMatch`, game type 3). Zeros are the defaults,
+  so a 3.1c host's lobby is unchanged. With `blockBytes` 0 each machine derives the size from its own modules, so players with different
+  modules would differ; nothing checks that yet (a host that wants it checked sets `blockBytes`, which a machine
+  whose modules need more refuses).
+- **A saved game:** `SaveGameFile` writes the items `BlockBytes` and `SearchSteps` in the summary account, only when
+  they are not the defaults, so a save of a default match is byte for byte what it was. A load reads them before the
+  assets load and they replace the command line's.
+- **The match:** `searchSteps` lives in the block header (`BlockHeader::searchSteps`), so a copy of the block and a
+  roundtrip keep it. The `search` console command sets it.
+- **Replays:** a recording of a subsystem (`docs/replay-format.md`) calls the world view, whose
+  `SearchStepLimit` returns the value like any other read. The format is unchanged.
+
 ## Determinism findings
 
 - **`g_timeoutTimerStart`** is set from wall-clock `GetTicks()` in `CheckPlayerTimeouts` (net_game.cpp), and `IsTimedOut` reads it. This is network only and already a #40 task.

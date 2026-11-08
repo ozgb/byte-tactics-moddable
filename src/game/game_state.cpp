@@ -10,6 +10,7 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/host.h"
 #include "game_state.h"
+#include "match_setup.h"
 #include "../state/block.h"
 #include "console_commands.h"
 #include "../util/tdf.h"
@@ -525,6 +526,8 @@ void LoadBattleAssets()
             mapInfo.moveClassCount++;
     }
     unsigned int pathRegionSize = g_seams.pathfinding->RegionSize(&mapInfo);
+    unsigned int defaultRegionSize = DefaultPathfindingSeam()->RegionSize(&mapInfo);
+    MatchSetupSizeBlock(pathRegionSize > defaultRegionSize ? pathRegionSize - defaultRegionSize : 0);
     void* pathRegion = SimAllocRegion("AISearch region", pathRegionSize);
     g_seams.pathfinding->Init(&mapInfo, pathRegion, pathRegionSize);
     g_seams.weapons->InitExplosions();

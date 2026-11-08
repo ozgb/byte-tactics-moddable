@@ -56,6 +56,7 @@ static unsigned int s_tick;
 static PathPoint s_cell[kUnits + 1];
 
 static unsigned int __stdcall WTick() { return s_tick; }
+static unsigned int __stdcall WSearchStepLimit() { return 160; }
 static int __stdcall WPlayerCount() { return 1; }
 static int __stdcall WIsPlaying(int player) { return player == 0; }
 static int __stdcall WUnitsPerPlayer() { return kUnits; }
@@ -91,7 +92,7 @@ static int __stdcall WTerrainPass(PathClass, int x, int y) { return s_pass[y][x]
 static void __stdcall WBegin(PathUnit) {}
 static void __stdcall WEnd(PathUnit) {}
 
-static PathWorldView s_world = { WTick, WPlayerCount, WIsPlaying, WUnitsPerPlayer, WFirstUnit, WLastUnit, WNextUnit, WUnitState,
+static PathWorldView s_world = { WTick, WSearchStepLimit, WPlayerCount, WIsPlaying, WUnitsPerPlayer, WFirstUnit, WLastUnit, WNextUnit, WUnitState,
                                  WMoveClass, WInBounds, WPass, WSeenSize, WSeen, WLineOfSight, WTerrainPass, WBegin, WEnd };
 
 static unsigned long long Fnv(unsigned long long h, const void* p, unsigned int n)
@@ -181,7 +182,6 @@ static void Setup()
     PathMapInfo map = { kW, kH, kUnits + 1, 1 };
     unsigned int size = PathfindingRegionSize(&map);
     PathfindingInit(&map, SimAlloc(size), size);
-    PathfindingSetStepsPerTick(160);
 }
 
 static void Request(PathUnit unit, int x, int y)

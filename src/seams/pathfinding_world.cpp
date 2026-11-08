@@ -42,6 +42,11 @@ static unsigned int __stdcall WorldTick()
     return (unsigned int)g_game->ticks;
 }
 
+static unsigned int __stdcall WorldSearchStepLimit()
+{
+    return SimSearchSteps();
+}
+
 static int __stdcall WorldPlayerCount()
 {
     return g_game->numPlayers;
@@ -183,7 +188,7 @@ static void __stdcall WorldEndSearch(PathUnit unit)
 }
 
 static PathWorldView s_world = {
-    WorldTick, WorldPlayerCount, WorldIsPlaying, WorldUnitsPerPlayer, WorldFirstUnit, WorldLastUnit,
+    WorldTick, WorldSearchStepLimit, WorldPlayerCount, WorldIsPlaying, WorldUnitsPerPlayer, WorldFirstUnit, WorldLastUnit,
     WorldNextUnit, WorldUnitState, WorldMoveClass, WorldInBounds, WorldPass, WorldSeenSize, WorldSeen,
     WorldLineOfSight, WorldTerrainPass, WorldBeginSearch, WorldEndSearch,
 };

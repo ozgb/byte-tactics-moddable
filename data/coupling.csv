@@ -485,7 +485,7 @@ game,files,call,HAPI_OpenFileAppend,2
 game,files,call,HAPI_OpenFileRead,2
 game,files,call,HAPI_WriteFile,1
 game,files,call,HapiBank::CloseBank,7
-game,files,call,HapiBank::GetIntegerItem,3
+game,files,call,HapiBank::GetIntegerItem,4
 game,files,call,HapiBank::GetStringItem,3
 game,files,call,HapiBank::HasItem,3
 game,files,call,HapiBank::InitBank,3
@@ -744,10 +744,12 @@ game,platform,call,ToggleFullScreen,2
 game,platform,call,Translate,7
 game,platform,call,UpdateTimers,1
 game,platform,call,host_alert,1
+game,platform,call,host_command_line,1
 game,platform,call,host_crash_report,3
 game,platform,call,host_crash_set_cleanup,1
 game,platform,call,host_debug_break,1
 game,platform,call,host_dir_set_current,1
+game,platform,call,host_fatal,1
 game,platform,call,host_file_close,3
 game,platform,call,host_file_config_int,1
 game,platform,call,host_file_create,2
@@ -755,8 +757,9 @@ game,platform,call,host_file_exe_path,3
 game,platform,call,host_file_open_append,1
 game,platform,call,host_file_write,1
 game,platform,call,host_instance_running,1
-game,platform,call,host_mem_commit,1
-game,platform,call,host_mem_release,1
+game,platform,call,host_log,1
+game,platform,call,host_mem_commit,2
+game,platform,call,host_mem_release,2
 game,platform,call,host_mem_reserve,1
 game,platform,call,host_memory_status,1
 game,platform,call,host_message,2
@@ -1099,8 +1102,8 @@ game,presentation,shared_write,UnitDef::flags1,6
 game,presentation,shared_write,Vec3::x,42
 game,presentation,shared_write,Vec3::y,43
 game,presentation,shared_write,Vec3::z,41
+game,seams,call,DefaultPathfindingSeam,1
 game,seams,call,SetSearchBaseScale,1
-game,seams,call,SetSearchStepsPerTick,1
 game,seams,indirect,AdvanceMissionNative,1
 game,seams,indirect,DeactivateConditionsNative,2
 game,seams,indirect,GetCampaignNameNative,2
@@ -1294,6 +1297,9 @@ harness,game,call,ApplySlotsToGamePlayers,1
 harness,game,call,ExecuteCommandLine,1
 harness,game,call,FreeSummaryBank,1
 harness,game,call,GameHoldrand,2
+harness,game,call,MatchSetupBlockBytesValid,1
+harness,game,call,MatchSetupCurrent,1
+harness,game,call,MatchSetupRequest,1
 harness,game,call,OpenHapiBank,1
 harness,game,call,OpenSummaryBank,1
 harness,game,call,QuirksAllOff,1
@@ -1306,6 +1312,8 @@ harness,game,call,SaveGameFile,1
 harness,game,call,SimBlockAttach,1
 harness,game,call,SimBlockBase,19
 harness,game,call,SimBlockForEach,1
+harness,game,call,SimBlockNew,1
+harness,game,call,SimBlockSize,1
 harness,game,call,SimOwns,1
 harness,game,shared_write,EconomySeam::UpdateResourceSharing,1
 harness,game,shared_write,FeaturesSeam::GetCellFeature,1
@@ -1486,11 +1494,11 @@ harness,platform,call,host_image_range,1
 harness,platform,call,host_inject_event,1
 harness,platform,call,host_log,6
 harness,platform,call,host_mem_alloc,1
-harness,platform,call,host_mem_commit,2
+harness,platform,call,host_mem_commit,1
 harness,platform,call,host_mem_free,1
 harness,platform,call,host_mem_readable,1
 harness,platform,call,host_mem_release,1
-harness,platform,call,host_mem_reserve,2
+harness,platform,call,host_mem_reserve,1
 harness,platform,call,host_mutex_create,1
 harness,platform,call,host_mutex_lock,3
 harness,platform,call,host_mutex_unlock,3
@@ -3821,6 +3829,7 @@ presentation,game,call,GetPreferenceInt,1
 presentation,game,call,GetPreferredLanguage,2
 presentation,game,call,InstallOutOfMemoryHandler,1
 presentation,game,call,LoadSettings,2
+presentation,game,call,MatchSetupToInfo,1
 presentation,game,call,ReadGameRegistryValue,3
 presentation,game,call,SaveAllMissionsSetting,1
 presentation,game,call,SaveSettings,8
@@ -4519,6 +4528,7 @@ seams,files,shared_write,FilesSeam::OpenRead,1
 seams,files,shared_write,FilesSeam::Read,1
 seams,files,shared_write,FilesSeam::Seek,1
 seams,files,shared_write,Seams::files,58
+seams,game,call,SimSearchSteps,1
 seams,game,shared_write,EconomySeam::UpdateResourceSharing,1
 seams,game,shared_write,FeaturesSeam::GetCellFeature,1
 seams,game,shared_write,FeaturesSeam::UpdateFeatures,1
@@ -4886,7 +4896,6 @@ seams,orders,shared_write,WeaponsSeam::GetWeaponRange,2
 seams,orders,shared_write,WeaponsSeam::ReleaseWeapons,17
 seams,orders,shared_write,WeaponsSeam::WeaponCanReachUnit,7
 seams,pathfinding,call,PathfindingSetBaseScale,1
-seams,pathfinding,call,PathfindingSetStepsPerTick,1
 seams,pathfinding,shared_write,PathPoint::x,6
 seams,pathfinding,shared_write,PathPoint::y,6
 seams,pathfinding,shared_write,PathUnitState::footprintX,2

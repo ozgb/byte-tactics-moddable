@@ -434,8 +434,16 @@ int wl_load_manifest_text(wl_loader* loader, const char* text, size_t size, cons
             || !read_unsigned(loader, root, "block_size", owner, 1, &layout.block_size)) {
             goto bad;
         }
-        if ((unsigned long)layout.block_base + layout.block_size > (unsigned long)layout.pages * 65536ul) {
-            set_error(loader, "%s: the block [%#x, %#x) does not fit the memory", name, layout.block_base, layout.block_base + layout.block_size);
+        layout.block_max = layout.block_size;
+        if (wl_json_get(root, "block_max") && !read_unsigned(loader, root, "block_max", owner, 1, &layout.block_max)) {
+            goto bad;
+        }
+        if (layout.block_max < layout.block_size) {
+            set_error(loader, "%s: block_max is below block_size", name);
+            goto bad;
+        }
+        if ((unsigned long)layout.block_base + layout.block_max > (unsigned long)layout.pages * 65536ul) {
+            set_error(loader, "%s: the block [%#x, %#x) does not fit the memory", name, layout.block_base, layout.block_base + layout.block_max);
             goto bad;
         }
     }

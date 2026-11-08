@@ -57,8 +57,8 @@ in progress if it is that goal's. There is no pending queue to cancel from, sinc
 
 `RunSearches` runs once per tick, first in the players phase, before the players' own updates.
 
-- **The budget.** 0x535 (1333) steps per tick, divided equally among the players in the match
-  (`numPlayers`). Each player's share is added to that player's bank, `budget[p]`, for every playing
+- **The budget.** 0x535 (1333) steps per tick, or the match setup's search step limit when it is above 0
+  (section 7, `SearchStepLimit`), divided equally among the players in the match (`numPlayers`). Each player's share is added to that player's bank, `budget[p]`, for every playing
   player. The step loop runs while the sum of the banks is above 0.
 - **One search at a time.** The pathfinder has one search slot (`object`).
 - **When the slot is empty**, it serves the current player (`player`) while that player's bank is positive,
@@ -131,8 +131,9 @@ implementation can call it or not. Not calling it changes when the pass maps are
 sees, so a replacement that skips it doesn't conform even with the same waypoints.
 
 Inside the default, and not reached by any consumer:
-- the budget (`stepsPerTick`, `baseScale`), set by the `SetSearchStepsPerTick` and `SetSearchBaseScale`
-  calls of the seams table (the `search` console command);
+- the budget (`stepsPerTick`, `baseScale`): `stepsPerTick` is the match setup's search step limit, or 0x535
+  when there is none, read through `SearchStepLimit` at every `RunSearches` (the `search` console command sets
+  the limit); `baseScale` is set by the `SetSearchBaseScale` call of the seams table;
 - the debug overlay's per-cell flags (`PathfindingDebugCell`);
 - the quirks of section 6.
 
@@ -184,6 +185,7 @@ Every slot reads only, apart from `BeginSearch` and `EndSearch`.
 | Slot | What it gives | In 3.1c |
 |---|---|---|
 | `Tick` | the tick being played | `g_game->ticks` |
+| `SearchStepLimit` | the match setup's search steps per tick, 0 for none | the sim block's header (`SimSearchSteps`) |
 | `PlayerCount`, `IsPlaying` | the players that share the budget | `numPlayers`, and an active human, AI or network player |
 | `UnitsPerPlayer`, `FirstUnit`, `LastUnit`, `NextUnit` | each player's unit slots, as handles | the players' unit arrays, walked by the cursors |
 | `UnitState` | a unit's player, cell, heading, movement class and its class's footprint | the unit and its `UnitMotion` |
@@ -216,6 +218,19 @@ The state of an implementation is one region of the state block. The engine asks
    number of movement classes), so every player computes the same size.
 2. The engine allocates the region (`SimAllocRegion`, tag `AISearch region`) and calls `Init(map, region, size)`.
 3. At match end `Shutdown` returns the region and the engine frees it.
+
+**The block is sized from it.** The sim block is 32 MiB (`kSimBlockBytes`) unless the match needs more. When the
+map has loaded, before the region is allocated, the engine takes `RegionSize(map)` of the installed
+implementation and of the default, and sizes the block as 32 MiB plus the difference when the installed one asks
+for more, rounded up to 64 KiB (`docs/state.md`, "The size of the block"). With the default installed the block is
+exactly 32 MiB. A replacement whose region does not fit under the ceiling (256 MiB) stops the match with a message.
+
+**The search step limit.** The match setup may carry a number of search steps per tick (0, the default, is none).
+Every implementation reads it through `SearchStepLimit` and applies it as a ceiling in its own units of work: the
+interface sets no number, since a step of one implementation is not a step of another. The default reads it as
+`stepsPerTick`: 0 is 3.1c's 0x535 and conforms, N is N steps per tick, shared among the players and banked as
+before. Because every machine runs every search, the limit is how a match bounds what a costly implementation may
+spend.
 
 The implementation keeps no pointer to the region outside `Game::pathfinder`, the root only pathfinding reads and
 writes. Any module with private state can use the same three calls: a size slot, an `Init` that receives the region,

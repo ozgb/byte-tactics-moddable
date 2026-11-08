@@ -6,6 +6,7 @@
 #include <math.h>
 #include <malloc.h>
 #include "../../interfaces/host.h"
+#include "../state/block.h"
 #include "../../interfaces/ref.h"
 #include <wctype.h>
 
@@ -355,7 +356,7 @@ void __stdcall CmdEdge(CommandArgs* args)
 void __stdcall CmdSearch(CommandArgs* args)
 {
     if (args->GetIntArg(1, 0)) {
-        SetSearchStepsPerTick(args->GetIntArg(1, 0));
+        SimSetSearchSteps((unsigned int)args->GetIntArg(1, 0));
     }
     if (args->count == 3) {
         SetSearchBaseScale((int)(atof(args->GetArg(2, g_emptyText)) * 65536.0));

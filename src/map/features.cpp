@@ -141,6 +141,7 @@ unsigned short __stdcall GetCellFeature(Cell* cell)
 }
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/pathfinding.h"
 
 // FUNCTION: 0x421eb0
 Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def)
@@ -840,7 +841,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
     p2.x = index % g_game->width;
     p2.y = index / g_game->width;
     g_seams.map->RefreshAllPassMaps(p2, f->footprint);
-    g_seams.pathfinding->CellsChanged(p2.x, p2.y, p2.x + f->footprint.x - 1, p2.y + f->footprint.y - 1);
+    g_seams.pathfinding->CellsChanged(p2.x, p2.y, p2.x + f->footprint.x - 1, p2.y + f->footprint.y - 1, 0xffffffffu, PATH_CHANGE_TERRAIN);
     return spot;
 }
 
@@ -1052,7 +1053,7 @@ int __stdcall RemoveFeature(Cell* cell, int flag)
     p.x = index % g_game->width;
     p.y = index / g_game->width;
     g_seams.map->RefreshAllPassMaps(p, f->footprint);
-    g_seams.pathfinding->CellsChanged(p.x, p.y, p.x + f->footprint.x - 1, p.y + f->footprint.y - 1);
+    g_seams.pathfinding->CellsChanged(p.x, p.y, p.x + f->footprint.x - 1, p.y + f->footprint.y - 1, 0xffffffffu, PATH_CHANGE_TERRAIN);
     return 1;
 }
 

@@ -490,7 +490,7 @@ END
 
 ### 8.7 pathfinder (sections 16 and 17)
 
-`pf` is the ref at `game+0x14207`: the start of the pathfinder's region in the state block. The three arrays of section 17 (`globals.pathfinder`) are in the same region; the harness reaches the record and them through the `Project` slot of the pathfinding seam, and the bytes hashed are the same.
+`pf` is the ref at `game+0x14207`: the start of the pathfinder's region in the state block. The three arrays of section 17 (`globals.pathfinder`) are in the same region; the default pathfinder writes them through the `WriteState` slot of the pathfinding seam (`interfaces/state_writer.h`), in the order below, and the bytes hashed are the same. An implementation that is not the default writes its own records in section 16 (the demo's `hpa`), and nothing in section 17.
 
 ```
 H8(16)

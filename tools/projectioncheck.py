@@ -1,24 +1,24 @@
-"""Check that a projection function is pure, stateless and free of scenario logic, from the relocations of the build.
+"""Check that a state-writing function is pure, stateless and free of scenario logic, from the relocations of the build.
 
     uv run tools/projectioncheck.py --objects @build/modern/objects.rsp           # print every violation
     uv run tools/projectioncheck.py --objects @build/modern/objects.rsp --check
     uv run tools/test_projectioncheck.py                                           # tests, on hand-written units
 
-A projection (PathfindingProject, interfaces/pathfinding.h) fills a view of the simulation's state for the trace and
-changes nothing. The code of one function is a section of an object whose relocations name the symbols it needs
+The state writer of the default pathfinder (PathfindingWriteState, interfaces/pathfinding.h) hands the host the state that
+decides what the module does next, through the functions of a StateWriter, and changes nothing and keeps nothing. The code of one function is a section of an object whose relocations name the symbols it needs
 (tools/seamlink.py reads them). From the projection function the check follows every call to a function that some
 object of the build defines, and judges each symbol that function references:
 
   region root   g_game, the pointer through which the region is reached, and SimBlockBase and SimOwns, which
-                Ref<T>::get calls to turn an offset into an address: the projection may read them
+                Ref<T>::get calls to turn an offset into an address: the writer may read them
+  literal       a string constant (the name of a field), which is read only
   own           a function of the build that the projection calls, which is walked in turn
   anything else is a violation: a global or a static (state the call could keep or change), a library function
                 (memcpy and the like write through their arguments), an import, or a function that no object defines.
 
 A violation whose symbol names the tick, the scenario, the harness, the replay gate or the test mode is reported as
-scenario logic, any other as impure. It also reads the rows of data/rwsets.csv for the walked functions: the only
-writes allowed are to the fields of the view that the caller passes in (field_write to PathTraceView::*). Standard
-library plus tools/seamlink.py.
+scenario logic, any other as impure. It also reads the rows of data/rwsets.csv for the walked functions: no write is allowed, since the
+only way out is the writer. Standard library plus tools/seamlink.py.
 """
 
 import argparse
@@ -32,9 +32,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from seamlink import unit_of, response, Unit
 from sources import ROOT, base_name
 
-PROJECTIONS = (("src/ai/pathfind.cpp", "PathfindingProject"),)
+PROJECTIONS = (("src/ai/pathfind.cpp", "PathfindingWriteState"),)
 ROOT_SYMBOLS = ("?g_game@@3PAUGame@@A", "?SimBlockBase@@YAPAXXZ", "?SimOwns@@YA_NPBX@Z")
-VIEW_TYPES = ("PathTraceView",)
+LITERAL = "??_C@"
 SCENARIO = re.compile(r"tick|scenario|harness|replay|testmode|test_mode", re.I)
 RWSETS = "data/rwsets.csv"
 WRITES = ("field_write", "deref_write", "global_write", "field_maybe_written", "deref_maybe_written", "global_maybe_written")
@@ -58,7 +58,7 @@ def walk(units: list, file: str, name: str) -> tuple:
     while todo:
         function = todo.pop()
         for symbol in sorted(refs.get(function, ())):
-            if symbol in ROOT_SYMBOLS:
+            if symbol in ROOT_SYMBOLS or symbol.startswith(LITERAL):
                 continue
             if symbol in defined:
                 if symbol not in seen:
@@ -77,8 +77,6 @@ def writes(root: Path, file: str, names: list) -> list:
         for row in csv.DictReader(f):
             if row["function"] not in names or row["kind"] not in WRITES:
                 continue
-            if row["target"].split("::")[0] in VIEW_TYPES:
-                continue
             found.add((row["function"], row["kind"], row["target"]))
     return sorted(found)
 
@@ -95,7 +93,7 @@ def problems(units: list, root: Path, projections: tuple = PROJECTIONS) -> list:
             else:
                 out.append(f"{name}: {function} references {symbol}, which is neither the region root nor a function walked")
         for function, kind, target in writes(root, file, names):
-            out.append(f"{name}: {function} has {kind} {target}, but the projection writes only the view it fills")
+            out.append(f"{name}: {function} has {kind} {target}, but the writer changes nothing")
     return out
 
 

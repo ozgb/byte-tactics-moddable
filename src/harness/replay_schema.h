@@ -1070,6 +1070,7 @@ enum ReplaySlotId {
     RSL_AI_CMDWEIGHT,
     RSL_AI_CMDLIMIT,
     RSL_AI_GETVISIBLEENEMIESINRADIUSLIST,
+    RSL_PATHFINDING_REGIONSIZE,
     RSL_PATHFINDING_INIT,
     RSL_PATHFINDING_SHUTDOWN,
     RSL_PATHFINDING_SUBMIT,
@@ -1077,7 +1078,7 @@ enum ReplaySlotId {
     RSL_PATHFINDING_CELLSCHANGED,
     RSL_PATHFINDING_STEP,
     RSL_PATHFINDING_POLL,
-    RSL_PATHFINDING_PROJECT,
+    RSL_PATHFINDING_WRITESTATE,
     RSL_WEAPONS_UPDATEPROJECTILES,
     RSL_WEAPONS_UPDATEEXPLOSIONS,
     RSL_WEAPONS_SPAWNPROJECTILE,
@@ -1556,9 +1557,9 @@ static const unsigned short kReplayUnitsGetGroundHeightObjReads[] = { 129 };
 static const unsigned short kReplayUnitsSetStateBitsObjReads[] = { 0, 25, 37, 44 };
 static const unsigned short kReplayUnitsSetStateBitsObjWrites[] = { 39 };
 static const unsigned char kReplayUnitsRefreshMovedUnitsReads[] = { 0 };
-static const unsigned short kReplayUnitsRefreshMovedUnitsObjReads[] = { 141, 156 };
+static const unsigned short kReplayUnitsRefreshMovedUnitsObjReads[] = { 42, 43, 141, 151, 156, 158 };
 static const unsigned short kReplayUnitsRefreshMovedUnitsObjWrites[] = { 141, 156 };
-static const unsigned short kReplayUnitsRefreshUnitIfStaleObjReads[] = { 141, 156 };
+static const unsigned short kReplayUnitsRefreshUnitIfStaleObjReads[] = { 42, 43, 141, 151, 156, 158 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayUnitsAllocateUnitMemoryReads[] = { 26 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryWrites[] = { 26 };
@@ -1769,6 +1770,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "CmdWeight", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "CmdLimit", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiCmdLimitObjReads, 2, nullptr, 0, nullptr, 0 },
     { "GetVisibleEnemiesInRadiusList", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "RegionSize", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Init", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Shutdown", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Submit", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -1776,7 +1778,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "CellsChanged", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Step", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Poll", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Project", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "WriteState", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateProjectiles", SUB_WEAPONS, kReplayWeaponsUpdateProjectilesReads, 5, kReplayWeaponsUpdateProjectilesWrites, 3, kReplayWeaponsUpdateProjectilesObjReads, 9, kReplayWeaponsUpdateProjectilesObjWrites, 3, nullptr, 0 },
     { "UpdateExplosions", SUB_WEAPONS, kReplayWeaponsUpdateExplosionsReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SpawnProjectile", SUB_WEAPONS, kReplayWeaponsSpawnProjectileReads, 2, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -1866,8 +1868,8 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "SetStateBits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSetStateBitsObjReads, 4, kReplayUnitsSetStateBitsObjWrites, 1, nullptr, 0 },
     { "MovementClassGet", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "MovementClassInBounds", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "RefreshMovedUnits", SUB_UNITS, kReplayUnitsRefreshMovedUnitsReads, 1, nullptr, 0, kReplayUnitsRefreshMovedUnitsObjReads, 2, kReplayUnitsRefreshMovedUnitsObjWrites, 2, nullptr, 0 },
-    { "RefreshUnitIfStale", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsRefreshUnitIfStaleObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "RefreshMovedUnits", SUB_UNITS, kReplayUnitsRefreshMovedUnitsReads, 1, nullptr, 0, kReplayUnitsRefreshMovedUnitsObjReads, 6, kReplayUnitsRefreshMovedUnitsObjWrites, 2, nullptr, 0 },
+    { "RefreshUnitIfStale", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsRefreshUnitIfStaleObjReads, 6, nullptr, 0, nullptr, 0 },
     { "StartScript", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "QueryScript", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetAimFromPosition", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2049,16 +2051,16 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "economy", 3, 0, 1, 12, 12 },
     { "features", 2, 0, 0, 24, 18 },
     { "ai", 3, 1, 0, 42, 24 },
-    { "pathfinding", 2, 0, 0, 66, 8 },
-    { "weapons", 1, 5, 0, 74, 25 },
-    { "targeting", 1, 1, 1, 99, 9 },
-    { "los_radar", 2, 1, 0, 108, 22 },
-    { "orders", 2, 0, 0, 130, 25 },
-    { "units", 1, 7, 0, 155, 58 },
-    { "players", 1, 5, 0, 213, 29 },
-    { "map", 3, 0, 1, 242, 16 },
-    { "files", 2, 0, 0, 258, 58 },
-    { "network", 1, 0, 0, 316, 22 },
+    { "pathfinding", 3, 0, 0, 66, 9 },
+    { "weapons", 1, 5, 0, 75, 25 },
+    { "targeting", 1, 1, 1, 100, 9 },
+    { "los_radar", 2, 1, 0, 109, 22 },
+    { "orders", 3, 0, 0, 131, 25 },
+    { "units", 1, 7, 0, 156, 58 },
+    { "players", 1, 5, 0, 214, 29 },
+    { "map", 3, 0, 1, 243, 16 },
+    { "files", 2, 0, 0, 259, 58 },
+    { "network", 1, 0, 0, 317, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

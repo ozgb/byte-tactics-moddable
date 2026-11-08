@@ -329,7 +329,7 @@ int __stdcall Imp_ai_GetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a
     return EnterList(t, a4, a5);
 }
 
-void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3)
+void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
 {
     ReplayText t;
     StartImport(t, "pathfinding.CellsChanged");
@@ -341,6 +341,10 @@ void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3)
     ReplayValue(t, a2);
     Space(t);
     ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    Space(t);
+    ReplayValue(t, a5);
     const char* r = Enter(t);
     (void)r;
 }

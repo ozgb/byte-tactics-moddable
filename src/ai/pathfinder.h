@@ -265,6 +265,11 @@ struct PathPending {
     int nextUnit;
 };
 
+struct PathEventRecord {
+    PathEvent event;
+    PathPoint points[64];
+};
+
 struct PathExtra {
     int nodeLimit;
     int goalCapacity;
@@ -454,23 +459,24 @@ public:
     int FindPending(PathHandle requester);
     int FindPendingOfUnit(PathUnit unit);
     void RemovePending(int index);
-    PathEvent* AddEvent(int kind, int status);
+    PathEventRecord* AddEvent(int kind, int status);
     void Submit(const PathRequest* request);
     void Cancel(PathHandle requester);
-    int Poll(PathEvent* out);
+    int Poll(PathEvent* out, PathPoint* points, int capacity);
     void Step();
 };
 #pragma pack(pop)
 
 Pathfinder* GetPathfinder();
-void __stdcall PathfindingInit(const PathMapInfo* map);
-void __stdcall PathfindingShutdown();
+unsigned int __stdcall PathfindingRegionSize(const PathMapInfo* map);
+void __stdcall PathfindingInit(const PathMapInfo* map, void* region, unsigned int size);
+void* __stdcall PathfindingShutdown();
 void __stdcall PathfindingSubmit(const PathRequest* request);
 void __stdcall PathfindingCancel(PathHandle requester);
-void __stdcall PathfindingCellsChanged(int left, int top, int right, int bottom);
+void __stdcall PathfindingCellsChanged(int left, int top, int right, int bottom, unsigned int classes, int cause);
 void __stdcall PathfindingStep();
-int __stdcall PathfindingPoll(PathEvent* out);
-void __stdcall PathfindingProject(PathTraceView* out);
+int __stdcall PathfindingPoll(PathEvent* out, PathPoint* points, int capacity);
+void __stdcall PathfindingWriteState(const StateWriter* writer);
 void PathfindingSetStepsPerTick(int steps);
 void PathfindingSetBaseScale(int scale);
 void PathfindingDebugCell(int x, int y, int* flags, int* dir);

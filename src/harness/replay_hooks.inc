@@ -934,27 +934,44 @@ int __stdcall RecAiGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2,
     return result;
 }
 
-void __stdcall RecPathfindingInit(const PathMapInfo* a0)
+unsigned int __stdcall RecPathfindingRegionSize(const PathMapInfo* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_REGIONSIZE, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "map");
+    }
+    unsigned int result = s_inner_pathfinding->RegionSize(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecPathfindingInit(const PathMapInfo* a0, void* a1, unsigned int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_INIT, SUB_PATHFINDING, roots);
     if (scope.Open()) {
         ArgPending(s_call, "map");
+        ArgPending(s_call, "region");
+        ArgValue(s_call, "size", a2);
     }
-    s_inner_pathfinding->Init(a0);
+    s_inner_pathfinding->Init(a0, a1, a2);
     if (scope.Open()) {
     }
 }
 
-void __stdcall RecPathfindingShutdown()
+void* __stdcall RecPathfindingShutdown()
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_SHUTDOWN, SUB_PATHFINDING, roots);
     if (scope.Open()) {
     }
-    s_inner_pathfinding->Shutdown();
+    void* result = s_inner_pathfinding->Shutdown();
     if (scope.Open()) {
     }
+    return result;
 }
 
 void __stdcall RecPathfindingSubmit(const PathRequest* a0)
@@ -981,7 +998,7 @@ void __stdcall RecPathfindingCancel(PathHandle a0)
     }
 }
 
-void __stdcall RecPathfindingCellsChanged(int a0, int a1, int a2, int a3)
+void __stdcall RecPathfindingCellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_CELLSCHANGED, SUB_PATHFINDING, roots);
@@ -990,6 +1007,8 @@ void __stdcall RecPathfindingCellsChanged(int a0, int a1, int a2, int a3)
         ArgValue(s_call, "top", a1);
         ArgValue(s_call, "right", a2);
         ArgValue(s_call, "bottom", a3);
+        ArgValue(s_call, "classes", a4);
+        ArgValue(s_call, "cause", a5);
     }
     ReplayText line;
     if (scope.Import()) {
@@ -998,8 +1017,10 @@ void __stdcall RecPathfindingCellsChanged(int a0, int a1, int a2, int a3)
         ImportValue(line, a1);
         ImportValue(line, a2);
         ImportValue(line, a3);
+        ImportValue(line, a4);
+        ImportValue(line, a5);
     }
-    s_inner_pathfinding->CellsChanged(a0, a1, a2, a3);
+    s_inner_pathfinding->CellsChanged(a0, a1, a2, a3, a4, a5);
     if (scope.Import()) {
         FinishImport(line);
     }
@@ -1018,28 +1039,30 @@ void __stdcall RecPathfindingStep()
     }
 }
 
-int __stdcall RecPathfindingPoll(PathEvent* a0)
+int __stdcall RecPathfindingPoll(PathEvent* a0, PathPoint* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_POLL, SUB_PATHFINDING, roots);
     if (scope.Open()) {
         ArgPending(s_call, "out");
+        ArgPending(s_call, "points");
+        ArgValue(s_call, "capacity", a2);
     }
-    int result = s_inner_pathfinding->Poll(a0);
+    int result = s_inner_pathfinding->Poll(a0, a1, a2);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-void __stdcall RecPathfindingProject(PathTraceView* a0)
+void __stdcall RecPathfindingWriteState(const StateWriter* a0)
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_PATHFINDING_PROJECT, SUB_PATHFINDING, roots);
+    SlotScope scope(RSL_PATHFINDING_WRITESTATE, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "out");
+        ArgPending(s_call, "writer");
     }
-    s_inner_pathfinding->Project(a0);
+    s_inner_pathfinding->WriteState(a0);
     if (scope.Open()) {
     }
 }
@@ -2255,14 +2278,15 @@ void __stdcall RecOrdersUnitMotionReadNetState(UnitMotion* a0, BitReader* a1)
     }
 }
 
-void __stdcall RecOrdersApplyPathEvent(const PathEvent* a0)
+void __stdcall RecOrdersApplyPathEvent(const PathEvent* a0, const PathPoint* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_APPLYPATHEVENT, SUB_ORDERS, roots);
     if (scope.Open()) {
         ArgPending(s_call, "event");
+        ArgPending(s_call, "waypoints");
     }
-    s_inner_orders->ApplyPathEvent(a0);
+    s_inner_orders->ApplyPathEvent(a0, a1);
     if (scope.Open()) {
     }
 }
@@ -5296,6 +5320,8 @@ void HookSeams(const bool* on)
     if (on[SUB_AI])
         s_rec_ai.GetVisibleEnemiesInRadiusList = RecAiGetVisibleEnemiesInRadiusList;
     if (on[SUB_PATHFINDING])
+        s_rec_pathfinding.RegionSize = RecPathfindingRegionSize;
+    if (on[SUB_PATHFINDING])
         s_rec_pathfinding.Init = RecPathfindingInit;
     if (on[SUB_PATHFINDING])
         s_rec_pathfinding.Shutdown = RecPathfindingShutdown;
@@ -5310,7 +5336,7 @@ void HookSeams(const bool* on)
     if (on[SUB_PATHFINDING])
         s_rec_pathfinding.Poll = RecPathfindingPoll;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.Project = RecPathfindingProject;
+        s_rec_pathfinding.WriteState = RecPathfindingWriteState;
     if (on[SUB_WEAPONS])
         s_rec_weapons.UpdateProjectiles = RecWeaponsUpdateProjectiles;
     if (on[SUB_WEAPONS])

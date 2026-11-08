@@ -1,11 +1,11 @@
-"""Check, over the stored access-log summaries, that pathfinding's state is private and that its projection shows no shadow field.
+"""Check, over the stored access-log summaries, that pathfinding's state is private and that its written state shows no shadow field.
 
     uv run tools/accesslog.py run --build-dir build/access <every scenario>
     uv run tools/privatestate.py --store build/access/access    # keeps the reads files, gzipped, in data/access_reads
     uv run tools/privatestate.py --check                        # both checks below, on the stored data
     uv run tools/test_privatestate.py                           # tests, on synthetic summaries
 
-Private. The state of the default pathfinder is one allocation of the state block (the region, allocated by PathfindingInit
+Private. The state of the default pathfinder is one allocation of the state block (the region, allocated by the engine in LoadBattleAssets and set up by PathfindingInit
 and reached through `Game::pathfinder`, the item `pathfinder`). tools/accesslog.py names the parts of the allocation as
 `Pathfinder::field`, `PathExtra::field`, `Node::field`, `PathCell::field` and `PathPending::field` and the others
 `<allocation>.<part>`. --check fails on any row of the stored summaries (data/access/*.edges.csv.gz, the cross, pass and
@@ -16,11 +16,11 @@ Reads. `<scenario>.reads.csv` (item,reader,count,first_tick, written by lib/acce
 at all in the windows of a tick, a subsystem's reads of its own writes included, which the edges files leave out
 (lib/accesslog/classifier.h). The `presentation` window is not in it.
 
-Shadow fields. The harness hashes sections 16 and 17 of docs/trace-format.md from the view that the projection fills: the
+Shadow fields. The harness hashes sections 16 and 17 of docs/trace-format.md from the records that the default pathfinder writes (PathfindingWriteState): the
 tables Pathfinder, PathfinderSearch and Node of data/trace_schema.json, the cells and dirty words of the grid, the open heap and
 the three globals. EXPOSED maps each of those fields to the log item that holds it. --check fails when
-  * a field of those tables has no entry in EXPOSED (the projection grew a field this check does not know),
-  * an item of EXPOSED has no read by pathfinding in any stored scenario: the projection shows state that the simulation never
+  * a field of those tables has no entry in EXPOSED (the written state grew a field this check does not know),
+  * an item of EXPOSED has no read by pathfinding in any stored scenario: the writer shows state that the simulation never
     reads, a shadow field. data/projection_shadow_allow.csv (item,reason) lists the ones that are 3.1c state the trace has always
     hashed, each with a reason; a row for an item that is read is stale.
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
@@ -52,7 +52,7 @@ NONE = "-"
 REGION_ROOT = "pathfinder"
 REGION_TYPES = ("Pathfinder", "PathExtra", "Node", "PathCell", "PathPending")
 REGION_ALLOCATION = re.compile(r"AISearch region")
-REGION_FUNCTION = "PathfindingInit"
+REGION_FUNCTION = "LoadBattleAssets"
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",

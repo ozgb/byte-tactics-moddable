@@ -180977,7 +180977,7 @@ call 1024 SetYardOpen
   a open 1
   i los_radar.GetMapCell 40 16 = Cell#3624
   o Cell#3624.metal 3
-  i pathfinding.CellsChanged 40 16 46 21
+  i pathfinding.CellsChanged 40 16 46 21 4294967295 2
   w Unit#2.flags 0x3ce42321
   w Unit#2.cobStateFlags 4
   w MovementClass#0.cells 265:50d5ffffd0ffffffd0ffffff50d5ffff
@@ -267525,6 +267525,7 @@ call 1045 RemoveUnitFromMap
   r Unit#2499.cargo null
   r Unit#2500.cargo null
   a unit Unit#1
+  i pathfinding.CellsChanged 34 17 38 21 4 2
   w MovementClass#2.cells 258:ffffffffffffffffffffffffffffffff
   w UnitMotion#1.pathLockStamp 1045
   w Cell#4292.unit 0
@@ -267693,6 +267694,7 @@ call 1366 RemoveUnitFromMap
   r Unit#1.flags 0x90e00321
   r Unit#1.cobStateFlags 1
   a unit Unit#251
+  i pathfinding.CellsChanged 186 85 190 89 4 2
   w MovementClass#2.cells 1306:f4ffff01f4ffff01f57f5501ff7f0000ff7f0000
   w UnitMotion#2.pathLockStamp 1366
   w Cell#19676.unit 0
@@ -268022,6 +268024,7 @@ call 1501 RemoveUnitFromMap
   r Unit#2.cargo null
   r Unit#251.flags 0x90e40025
   a unit Unit#3
+  i pathfinding.CellsChanged 40 17 45 22 4 2
   w MovementClass#2.cells 265:50d5ffffd0ffffffd0ffffff50d5ffff
   w UnitMotion#3.pathLockStamp 1501
   w Cell#4298.unit 0
@@ -268104,6 +268107,7 @@ call 1515 RemoveUnitFromMap
   r Unit#1.flags 0x90e10325
   r Unit#251.flags 0x90e40025
   a unit Unit#1
+  i pathfinding.CellsChanged 36 17 40 21 4 2
   w MovementClass#2.cells 260:ffffffffffffffff55d5ffff
   w UnitMotion#1.pathLockStamp 1515
   w Cell#4294.unit 0

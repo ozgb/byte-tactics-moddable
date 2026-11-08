@@ -48,7 +48,7 @@ follows the wall clock, so their counts (and the first tick of a rare one) chang
 all, a subsystem's reads of its own writes included, which the edges file drops. The `presentation` window is left out. tools/privatestate.py
 stores it in data/access_reads and judges it.
 
-The region of the default pathfinder (the allocation of PathfindingInit tagged "AISearch region") is sized when the map loads, so its
+The region of the default pathfinder (the allocation of LoadBattleAssets tagged "AISearch region", which the engine makes at the size RegionSize gave and hands to PathfindingInit) is sized when the map loads, so its
 items are given as parts: `tables` writes, after the sites, a part list for the site (region_parts) in which a part's start and end are a
 fixed offset or a word of the allocation itself (PathExtra's offsets), and the log reads those words when it resolves an address. The
 record, PathExtra, the node pool, the cells and the queued requests are `Pathfinder::field`, `PathExtra::field`, `Node::field`,
@@ -180,7 +180,7 @@ TAG_TYPES = {"UNIT MEMORY": "Unit", "WEAPON ARRAY": "Projectile"}
 PATHFINDER_HEADER = ROOT / "src/ai/pathfinder.h"
 FLATTENED = ("Pathfinder", "PathExtra", "Node", "PathCell", "PathPending")
 REGION_TAGS = ("AISearch region",)
-REGION_OWNER_FUNCTION = "PathfindingInit"
+REGION_OWNER_FUNCTION = "LoadBattleAssets"
 OUTPUT_FILES = ("access.edges.csv", "access.stats.txt", "access.presentation.csv", "access.cross.csv", "access.draws.csv", "access.pass.csv",
                 "access.ordered.csv", "access.reads.csv")
 RAW_FILE = "access.raw.txt"

@@ -1,6 +1,8 @@
 #include <stddef.h>
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/pathfinding.h"
+#include "../../interfaces/state_writer.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include "../network/player.h"
@@ -32,6 +34,12 @@ enum {
     kClassBudgetBytes = 12 << 20
 };
 
+enum {
+    MAX_WAYPOINTS = 64,
+    MAX_BANNED = 8,
+    POINT_CAP = 128 * 64
+};
+
 enum Phase {
     PH_INIT = 0,
     PH_BUILD = 1,
@@ -58,6 +66,7 @@ struct ClusterRec {
 struct Local {
     int ox, oy, w, h;
     int mode;
+    int terrain;
     int tx, ty;
     int n;
     int found;
@@ -68,6 +77,11 @@ struct Local {
     int hpos[kMaxLocal];
     signed char par[kMaxLocal];
     unsigned char st[kMaxLocal];
+};
+
+struct Ev {
+    PathEvent e;
+    int first;
 };
 
 struct Req {
@@ -86,6 +100,7 @@ struct Hdr {
     unsigned magic;
     int W, H, cs, shift, CW, CH, nClu, NN;
     int nSlots, reqCap;
+    int nPts;
     PathClass classes[32];
     int slotOf[32];
     int slotsUsed;
@@ -96,6 +111,7 @@ struct Hdr {
     unsigned lastTick;
 
     int offVer, offRec, offReq, offEv;
+    int offPts;
     int offAG, offAPar, offAStamp, offAKey, offAPos, offAHeap;
     int offRoute, offPath;
 
@@ -125,10 +141,16 @@ struct Hdr {
     int truncated;
     int pullAnchor, pullK;
     int nWp;
-    int wp[PATH_MAX_WAYPOINTS + 2];
+    int wp[MAX_WAYPOINTS + 2];
     int wpOverflow;
     int pullInit;
-    int retried;
+    PathPoint rawGoal[kMaxGoalCells];
+    int nRaw;
+    int nearest;
+    int nearNode;
+    int nearDist;
+    int nBanned;
+    int banned[MAX_BANNED];
 
     Local scratch[2];
 };
@@ -138,7 +160,8 @@ struct HpaView {
     int* ver;
     ClusterRec* rec;
     Req* req;
-    PathEvent* ev;
+    Ev* ev;
+    PathPoint* pts;
     int* ag;
     int* apar;
     int* astamp;
@@ -170,7 +193,8 @@ bool Open(HpaView* v)
     v->ver = (int*)(b + h->offVer);
     v->rec = (ClusterRec*)(b + h->offRec);
     v->req = (Req*)(b + h->offReq);
-    v->ev = (PathEvent*)(b + h->offEv);
+    v->ev = (Ev*)(b + h->offEv);
+    v->pts = (PathPoint*)(b + h->offPts);
     v->ag = (int*)(b + h->offAG);
     v->apar = (int*)(b + h->offAPar);
     v->astamp = (int*)(b + h->offAStamp);
@@ -264,26 +288,27 @@ inline int Octile(int dx, int dy)
     return hi * kStraight + lo * (kDiagonal - kStraight);
 }
 
-int CellExtra(const HpaView* v, PathClass cls, int x, int y)
+int CellExtra(const HpaView* v, PathClass cls, int x, int y, int terrain)
 {
     const Hdr* h = v->h;
     if (x < 0 || y < 0 || x >= h->W || y >= h->H)
         return -1;
     if (!v->w->InBounds(cls, x, y))
         return -1;
-    int p = v->w->Pass(cls, x, y);
+    int p = terrain ? v->w->TerrainPass(cls, x, y) : v->w->Pass(cls, x, y);
     if (p <= 0)
         return -1;
     return p == 1 ? kPassOneExtra : 0;
 }
 
-void LInit(Local* L, const Hdr* h, int cluster, int mode)
+void LInit(Local* L, const Hdr* h, int cluster, int mode, int terrain)
 {
     L->ox = (cluster % h->CW) << h->shift;
     L->oy = (cluster / h->CW) << h->shift;
     L->w = h->W - L->ox < h->cs ? h->W - L->ox : h->cs;
     L->h = h->H - L->oy < h->cs ? h->H - L->oy : h->cs;
     L->mode = mode;
+    L->terrain = terrain;
     L->tx = L->ty = 0;
     L->n = 0;
     L->found = -1;
@@ -339,12 +364,12 @@ int LStep(Local* L, const HpaView* v, PathClass cls, const PathGoalArea* goal)
         int vi = LIndex(h, L, nx, ny);
         if (L->st[vi] == 2)
             continue;
-        int extra = CellExtra(v, cls, nx, ny);
+        int extra = CellExtra(v, cls, nx, ny, L->terrain);
         if (extra < 0)
             continue;
         int step = kStraight;
         if (d & 1) {
-            if (CellExtra(v, cls, nx, uy) < 0 || CellExtra(v, cls, ux, ny) < 0)
+            if (CellExtra(v, cls, nx, uy, L->terrain) < 0 || CellExtra(v, cls, ux, ny, L->terrain) < 0)
                 continue;
             step = kDiagonal;
         }
@@ -418,7 +443,7 @@ void BuildCluster(HpaView* v, int slot, int c)
                 int ay = ay0 + ady * i;
                 int bx = ax + kSideDx[s];
                 int by = ay + kSideDy[s];
-                open = CellExtra(v, cls, ax, ay) >= 0 && CellExtra(v, cls, bx, by) >= 0;
+                open = CellExtra(v, cls, ax, ay, 1) >= 0 && CellExtra(v, cls, bx, by, 1) >= 0;
             }
             if (open) {
                 if (runStart < 0)
@@ -440,7 +465,7 @@ void BuildCluster(HpaView* v, int slot, int c)
     for (int i = 0; i + 1 < r->count; i++) {
         int sx = r->cell[i] % h->W;
         int sy = r->cell[i] / h->W;
-        LInit(L, h, c, 0);
+        LInit(L, h, c, 0, 1);
         LPush(L, h, sx, sy, 0);
         for (;;) {
             int res = LStep(L, v, cls, 0);
@@ -500,7 +525,9 @@ PathEvent* NewEvent(HpaView* v, int kind, int status)
     Hdr* h = v->h;
     if (h->evCount >= kEventCap)
         return 0;
-    PathEvent* e = &v->ev[h->evCount++];
+    Ev* rec = &v->ev[h->evCount++];
+    rec->first = h->nPts;
+    PathEvent* e = &rec->e;
     e->kind = kind;
     e->status = status;
     e->unit = h->req.unit;
@@ -516,10 +543,11 @@ void EmitCells(HpaView* v, int kind, int status, const int* cells, int n)
     PathEvent* e = NewEvent(v, kind, status);
     if (e == 0)
         return;
-    if (n > PATH_MAX_WAYPOINTS)
-        n = PATH_MAX_WAYPOINTS;
+    if (n > MAX_WAYPOINTS)
+        n = MAX_WAYPOINTS;
     for (int i = 0; i < n; i++)
-        e->points[i] = WorldPoint(v->h, cells[i]);
+        v->pts[v->h->nPts + i] = WorldPoint(v->h, cells[i]);
+    v->h->nPts += n;
     e->count = n;
 }
 
@@ -536,7 +564,7 @@ void FinishSearch(HpaView* v, int status, const int* cells, int n)
 void EmitProgress(HpaView* v)
 {
     Hdr* h = v->h;
-    int cells[PATH_MAX_WAYPOINTS];
+    int cells[MAX_WAYPOINTS];
     int n = 0;
     cells[n++] = h->sy * h->W + h->sx;
     if (h->phase == PH_ABSTRACT && h->aInit) {
@@ -548,12 +576,12 @@ void EmitProgress(HpaView* v)
             }
         }
     } else if (h->phase >= PH_REFINE) {
-        for (int i = 0; i < h->nRoute && n < PATH_MAX_WAYPOINTS - 1; i++) {
+        for (int i = 0; i < h->nRoute && n < MAX_WAYPOINTS - 1; i++) {
             int u = v->route[i];
             const ClusterRec* r = &v->rec[h->slot * h->nClu + (u >> 5)];
             cells[n++] = r->cell[u & 31];
         }
-        if (n < PATH_MAX_WAYPOINTS)
+        if (n < MAX_WAYPOINTS)
             cells[n++] = h->nearGoal;
     }
     if (n < 2)
@@ -590,6 +618,9 @@ int HeuristicOf(const HpaView* v, int n)
 void Relax(HpaView* v, int from, int to, int cost)
 {
     Hdr* h = v->h;
+    for (int i = 0; i < h->nBanned; i++)
+        if (h->banned[i] == to)
+            return;
     Touch(v, to);
     int ng = v->ag[from] + cost;
     if (ng >= v->ag[to])
@@ -620,16 +651,19 @@ void ResetSearchState(Hdr* h)
     h->pullInit = 0;
     h->nWp = 0;
     h->wpOverflow = 0;
+    h->nearest = 0;
+    h->nearNode = -1;
+    h->nearDist = kInf;
 }
 
 void StartSearch(HpaView* v, const Req* q, int* budget)
 {
     Hdr* h = v->h;
+    h->nBanned = 0;
     const PathWorldView* w = v->w;
     h->active = 1;
     h->req = q->r;
     h->phase = PH_INIT;
-    h->retried = 0;
     h->aseq = q->seq;
     h->lastTick = w->Tick();
     ResetSearchState(h);
@@ -642,8 +676,8 @@ void StartSearch(HpaView* v, const Req* q, int* budget)
         FinishSearch(v, PATH_FAILED, 0, 0);
         return;
     }
-    h->sx = us.cell.x;
-    h->sy = us.cell.y;
+    h->sx = q->r.useStart ? q->r.start.x : us.cell.x;
+    h->sy = q->r.useStart ? q->r.start.y : us.cell.y;
     h->fx = us.footprintX;
     h->fy = us.footprintY;
     h->slot = -1;
@@ -673,8 +707,11 @@ void StartSearch(HpaView* v, const Req* q, int* budget)
     h->nGoal = 0;
     int best = kInf;
     h->nearGoal = start;
+    h->nRaw = 0;
+    for (int i = 0; i < n && i < kMaxGoalCells; i++)
+        h->rawGoal[h->nRaw++] = raw[i];
     for (int i = 0; i < n; i++) {
-        if (CellExtra(v, us.moveClass, raw[i].x, raw[i].y) < 0)
+        if (CellExtra(v, us.moveClass, raw[i].x, raw[i].y, 0) < 0)
             continue;
         h->goalCells[h->nGoal++] = raw[i];
         int d = Octile(raw[i].x - h->sx, raw[i].y - h->sy);
@@ -683,7 +720,7 @@ void StartSearch(HpaView* v, const Req* q, int* budget)
             h->nearGoal = raw[i].y * h->W + raw[i].x;
         }
     }
-    if (h->nGoal == 0) {
+    if (h->nRaw == 0) {
         NewEvent(v, PATH_EVENT_STARTED, PATH_START_INDIRECT);
         FinishSearch(v, PATH_FAILED, 0, 0);
         return;
@@ -691,7 +728,7 @@ void StartSearch(HpaView* v, const Req* q, int* budget)
     (*budget)--;
     int gx = h->nearGoal % h->W;
     int gy = h->nearGoal / h->W;
-    if (w->LineOfSight(us.moveClass, h->sx, h->sy, gx, gy)) {
+    if (h->nGoal > 0 && w->LineOfSight(us.moveClass, h->sx, h->sy, gx, gy)) {
         int cells[2] = { start, h->nearGoal };
         NewEvent(v, PATH_EVENT_STARTED, PATH_START_DIRECT);
         FinishSearch(v, PATH_FOUND, cells, 2);
@@ -738,7 +775,7 @@ void RunStartFlood(HpaView* v, int* budget)
     Local* L = &h->scratch[0];
     PathClass cls = ClassOfActive(h);
     if (!h->localReady) {
-        LInit(L, h, h->startCluster, 0);
+        LInit(L, h, h->startCluster, 0, 0);
         LPush(L, h, h->sx, h->sy, 0);
         h->localReady = 1;
     }
@@ -774,7 +811,7 @@ void RunGoalFlood(HpaView* v, int* budget)
     }
     int c = h->goalClusters[h->gcIdx];
     if (!h->localReady) {
-        LInit(L, h, c, 0);
+        LInit(L, h, c, 0, 0);
         for (int i = 0; i < h->nGoal; i++)
             if (ClusterOf(h, h->goalCells[i].x, h->goalCells[i].y) == c)
                 LPush(L, h, h->goalCells[i].x, h->goalCells[i].y, 0);
@@ -798,12 +835,26 @@ void RunGoalFlood(HpaView* v, int* budget)
     h->localReady = 0;
 }
 
-void BuildRoute(HpaView* v)
+int GoalDistSq(const Hdr* h, int cell)
+{
+    int x = cell % h->W;
+    int y = cell / h->W;
+    int best = kInf;
+    for (int i = 0; i < h->nRaw; i++) {
+        int dx = x - h->rawGoal[i].x;
+        int dy = y - h->rawGoal[i].y;
+        int d = dx * dx + dy * dy;
+        if (d < best)
+            best = d;
+    }
+    return best;
+}
+
+void BuildRoute(HpaView* v, int end)
 {
     Hdr* h = v->h;
-    int goal = h->NN - 1;
     h->nRoute = 0;
-    int u = v->apar[goal];
+    int u = end == h->NN - 1 ? v->apar[end] : end;
     int count = 0;
     while (u >= 0) {
         v->route[count++] = u;
@@ -845,16 +896,31 @@ void RunAbstract(HpaView* v, int* budget)
         }
     }
     if (h->aHeapN == 0) {
-        Invalidate(v, h->startCluster);
-        for (int i = 0; i < h->nGoalClusters; i++)
-            Invalidate(v, h->goalClusters[i]);
-        FinishSearch(v, PATH_FAILED, 0, 0);
+        if (h->nearNode < 0) {
+            int start = h->sy * h->W + h->sx;
+            FinishSearch(v, PATH_NEAREST, &start, 1);
+            return;
+        }
+        BuildRoute(v, h->nearNode);
+        h->nearest = 1;
+        h->phase = PH_REFINE;
+        h->segIdx = 0;
+        h->nPath = 1;
+        v->path[0] = h->sy * h->W + h->sx;
+        h->localReady = 0;
         return;
     }
     (*budget)--;
     int u = HeapPop(v->aheap, &h->aHeapN, v->apos, v->akey);
+    if (u != goal) {
+        int d = GoalDistSq(h, NodeCell(v, u));
+        if (d < h->nearDist && d < GoalDistSq(h, h->sy * h->W + h->sx)) {
+            h->nearDist = d;
+            h->nearNode = u;
+        }
+    }
     if (u == goal) {
-        BuildRoute(v);
+        BuildRoute(v, goal);
         h->phase = PH_REFINE;
         h->segIdx = 0;
         h->nPath = 1;
@@ -880,7 +946,7 @@ void RunAbstract(HpaView* v, int* budget)
     int ay = r->cell[i] / h->W;
     int bx = ax + kSideDx[s];
     int by = ay + kSideDy[s];
-    int extra = CellExtra(v, ClassOfActive(h), bx, by);
+    int extra = CellExtra(v, ClassOfActive(h), bx, by, 1);
     if (extra >= 0) {
         int nc = ClusterOf(h, bx, by);
         Ensure(v, h->slot, nc);
@@ -941,11 +1007,15 @@ void RunRefine(HpaView* v, int* budget)
                 h->segIdx++;
                 return;
             }
-            LInit(L, h, ClusterOf(h, lx, ly), 1);
+            LInit(L, h, ClusterOf(h, lx, ly), 1, 0);
             L->tx = tx;
             L->ty = ty;
         } else {
-            LInit(L, h, ClusterOf(h, lx, ly), 2);
+            if (h->nearest) {
+                h->segIdx++;
+                return;
+            }
+            LInit(L, h, ClusterOf(h, lx, ly), 2, 0);
         }
         LPush(L, h, lx, ly, 0);
         h->localReady = 1;
@@ -961,15 +1031,22 @@ void RunRefine(HpaView* v, int* budget)
         h->localReady = 0;
         return;
     }
-    Invalidate(v, ClusterOf(h, lx, ly));
-    if (h->segIdx < h->nRoute) {
-        int tcell = NodeCell(v, v->route[h->segIdx]);
-        Invalidate(v, ClusterOf(h, tcell % h->W, tcell / h->W));
-    }
-    if (!h->retried) {
-        h->retried = 1;
-        ResetSearchState(h);
-        h->phase = PH_BUILD;
+    if (h->segIdx < h->nRoute && h->nBanned < MAX_BANNED) {
+        h->banned[h->nBanned++] = v->route[h->segIdx];
+        h->aInit = 0;
+        h->aHeapN = 0;
+        h->nRoute = 0;
+        h->segIdx = 0;
+        h->nPath = 0;
+        h->truncated = 0;
+        h->pullInit = 0;
+        h->nWp = 0;
+        h->wpOverflow = 0;
+        h->localReady = 0;
+        h->nearest = 0;
+        h->nearNode = -1;
+        h->nearDist = kInf;
+        h->phase = PH_ABSTRACT;
         return;
     }
     if (h->nPath <= 1) {
@@ -1013,11 +1090,11 @@ void RunPull(HpaView* v, int* budget)
             h->pullK++;
         } else {
             int na = h->pullK - 1 > h->pullAnchor ? h->pullK - 1 : h->pullK;
-            if (h->nWp < PATH_MAX_WAYPOINTS + 1)
+            if (h->nWp < MAX_WAYPOINTS + 1)
                 h->wp[h->nWp++] = v->path[na];
             h->pullAnchor = na;
             h->pullK = na + 1;
-            if (h->nWp > PATH_MAX_WAYPOINTS) {
+            if (h->nWp > MAX_WAYPOINTS) {
                 h->wpOverflow = 1;
                 done = true;
             }
@@ -1028,14 +1105,14 @@ void RunPull(HpaView* v, int* budget)
     if (!h->wpOverflow) {
         int lastCell = v->path[h->nPath - 1];
         if (h->wp[h->nWp - 1] != lastCell) {
-            if (h->nWp < PATH_MAX_WAYPOINTS + 1)
+            if (h->nWp < MAX_WAYPOINTS + 1)
                 h->wp[h->nWp++] = lastCell;
             else
                 h->wpOverflow = 1;
         }
     }
-    int status = PATH_FOUND;
-    if (h->truncated || h->nWp > PATH_MAX_WAYPOINTS || h->wpOverflow)
+    int status = h->nearest ? PATH_NEAREST : PATH_FOUND;
+    if (h->truncated || h->nWp > MAX_WAYPOINTS || h->wpOverflow)
         status = PATH_PARTIAL;
     FinishSearch(v, status, h->wp, h->nWp);
 }
@@ -1087,7 +1164,7 @@ void PurgeEvents(HpaView* v, PathHandle requester)
     Hdr* h = v->h;
     int out = h->evHead;
     for (int i = h->evHead; i < h->evCount; i++) {
-        if (v->ev[i].requester == requester)
+        if (v->ev[i].e.requester == requester)
             continue;
         if (out != i)
             v->ev[out] = v->ev[i];
@@ -1096,108 +1173,117 @@ void PurgeEvents(HpaView* v, PathHandle requester)
     h->evCount = out;
 }
 
-void __stdcall HpaInit(const PathMapInfo* map)
-{
-    const PathWorldView* w = World();
-    Hdr* old = (Hdr*)g_game->pathfinder.get();
-    if (old != 0 && old->magic == kMagic)
-        SimFree(old);
-    g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)0);
+struct Layout {
+    int W, H, cs, shift, nClu, nSlots, reqCap, NN;
+    int offVer, offRec, offReq, offEv, offPts;
+    int offAG, offAPar, offAStamp, offAKey, offAPos, offAHeap, offRoute, offPath;
+    int size;
+};
 
-    int W = map->width;
-    int H = map->height;
-    int cs = 16;
-    int shift = 4;
-    int nClu = ((W + cs - 1) >> shift) * ((H + cs - 1) >> shift);
-    int nClasses = 0;
-    for (int i = 0; i < 32; i++)
-        if (w->MoveClass(i) != 0)
-            nClasses++;
-    if (nClu * (int)sizeof(ClusterRec) * (nClasses < 6 ? nClasses : 6) > kClassBudgetBytes) {
-        cs = 32;
-        shift = 5;
-        nClu = ((W + cs - 1) >> shift) * ((H + cs - 1) >> shift);
+Layout LayoutFor(const PathMapInfo* map)
+{
+    Layout l;
+    l.W = map->width;
+    l.H = map->height;
+    int nClasses = map->moveClassCount < 1 ? 1 : map->moveClassCount;
+    l.cs = 16;
+    l.shift = 4;
+    l.nClu = ((l.W + l.cs - 1) >> l.shift) * ((l.H + l.cs - 1) >> l.shift);
+    if (l.nClu * (int)sizeof(ClusterRec) * nClasses > kClassBudgetBytes) {
+        l.cs = 32;
+        l.shift = 5;
+        l.nClu = ((l.W + l.cs - 1) >> l.shift) * ((l.H + l.cs - 1) >> l.shift);
     }
-    int perSlot = nClu * (int)sizeof(ClusterRec);
-    int nSlots = kClassBudgetBytes / perSlot;
-    if (nSlots > nClasses)
-        nSlots = nClasses;
-    if (nSlots < 1)
-        nSlots = 1;
-    int reqCap = map->unitSlots > 16 ? map->unitSlots : 16;
-    int NN = nClu * 32 + 1;
+    l.nSlots = nClasses;
+    l.reqCap = map->unitSlots > 16 ? map->unitSlots : 16;
+    l.NN = l.nClu * 32 + 1;
 
     int off = Align8((int)sizeof(Hdr));
-    int offVer = off;
-    off = Align8(off + nClu * 4);
-    int offRec = off;
-    off = Align8(off + nSlots * perSlot);
-    int offReq = off;
-    off = Align8(off + reqCap * (int)sizeof(Req));
-    int offEv = off;
-    off = Align8(off + kEventCap * (int)sizeof(PathEvent));
-    int offAG = off;
-    off += NN * 4;
-    int offAPar = off;
-    off += NN * 4;
-    int offAStamp = off;
-    off += NN * 4;
-    int offAKey = off;
-    off += NN * 4;
-    int offAPos = off;
-    off += NN * 4;
-    int offAHeap = off;
-    off += NN * 4;
-    int offRoute = off;
-    off += NN * 4;
-    int offPath = off;
+    l.offVer = off;
+    off = Align8(off + l.nClu * 4);
+    l.offRec = off;
+    off = Align8(off + l.nSlots * l.nClu * (int)sizeof(ClusterRec));
+    l.offReq = off;
+    off = Align8(off + l.reqCap * (int)sizeof(Req));
+    l.offEv = off;
+    off = Align8(off + kEventCap * (int)sizeof(Ev));
+    l.offPts = off;
+    off = Align8(off + POINT_CAP * (int)sizeof(PathPoint));
+    l.offAG = off;
+    off += l.NN * 4;
+    l.offAPar = off;
+    off += l.NN * 4;
+    l.offAStamp = off;
+    off += l.NN * 4;
+    l.offAKey = off;
+    off += l.NN * 4;
+    l.offAPos = off;
+    off += l.NN * 4;
+    l.offAHeap = off;
+    off += l.NN * 4;
+    l.offRoute = off;
+    off += l.NN * 4;
+    l.offPath = off;
     off += kPathCap * 4;
+    l.size = off;
+    return l;
+}
 
-    char* region = (char*)SimAllocTagged("AISearch region", (unsigned)off);
+unsigned int __stdcall HpaRegionSize(const PathMapInfo* map)
+{
+    return (unsigned int)LayoutFor(map).size;
+}
+
+void __stdcall HpaInit(const PathMapInfo* map, void* regionBase, unsigned int)
+{
+    const PathWorldView* w = World();
+    Layout l = LayoutFor(map);
+    char* region = (char*)regionBase;
     Hdr* h = (Hdr*)region;
     h->magic = kMagic;
-    h->W = W;
-    h->H = H;
-    h->cs = cs;
-    h->shift = shift;
-    h->CW = (W + cs - 1) >> shift;
-    h->CH = (H + cs - 1) >> shift;
-    h->nClu = nClu;
-    h->NN = NN;
-    h->nSlots = nSlots;
-    h->reqCap = reqCap;
-    h->offVer = offVer;
-    h->offRec = offRec;
-    h->offReq = offReq;
-    h->offEv = offEv;
-    h->offAG = offAG;
-    h->offAPar = offAPar;
-    h->offAStamp = offAStamp;
-    h->offAKey = offAKey;
-    h->offAPos = offAPos;
-    h->offAHeap = offAHeap;
-    h->offRoute = offRoute;
-    h->offPath = offPath;
+    h->W = l.W;
+    h->H = l.H;
+    h->cs = l.cs;
+    h->shift = l.shift;
+    h->CW = (l.W + l.cs - 1) >> l.shift;
+    h->CH = (l.H + l.cs - 1) >> l.shift;
+    h->nClu = l.nClu;
+    h->NN = l.NN;
+    h->nSlots = l.nSlots;
+    h->reqCap = l.reqCap;
+    h->offVer = l.offVer;
+    h->offRec = l.offRec;
+    h->offReq = l.offReq;
+    h->offEv = l.offEv;
+    h->offPts = l.offPts;
+    h->offAG = l.offAG;
+    h->offAPar = l.offAPar;
+    h->offAStamp = l.offAStamp;
+    h->offAKey = l.offAKey;
+    h->offAPos = l.offAPos;
+    h->offAHeap = l.offAHeap;
+    h->offRoute = l.offRoute;
+    h->offPath = l.offPath;
     for (int i = 0; i < 32; i++) {
         h->classes[i] = w->MoveClass(i);
         h->slotOf[i] = -1;
     }
-    int* ver = (int*)(region + offVer);
-    for (int i = 0; i < nClu; i++)
+    int* ver = (int*)(region + l.offVer);
+    for (int i = 0; i < l.nClu; i++)
         ver[i] = 1;
     g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)region);
 }
 
-void __stdcall HpaShutdown()
+void* __stdcall HpaShutdown()
 {
     Hdr* h = (Hdr*)g_game->pathfinder.get();
     if (h != 0 && h->magic == kMagic) {
         HpaView v;
         if (Open(&v) && h->active)
             v.w->EndSearch(h->req.unit);
-        SimFree(h);
     }
     g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)0);
+    return h;
 }
 
 void __stdcall HpaSubmit(const PathRequest* request)
@@ -1241,8 +1327,10 @@ void __stdcall HpaCancel(PathHandle requester)
     PurgeEvents(&v, requester);
 }
 
-void __stdcall HpaCellsChanged(int left, int top, int right, int bottom)
+void __stdcall HpaCellsChanged(int left, int top, int right, int bottom, unsigned int classes, int cause)
 {
+    if (cause != PATH_CHANGE_TERRAIN || classes == 0)
+        return;
     HpaView v;
     if (!Open(&v))
         return;
@@ -1270,6 +1358,7 @@ void __stdcall HpaStep()
     h->lastTick = tick;
     h->evHead = 0;
     h->evCount = 0;
+    h->nPts = 0;
     int budget = kStepBudget;
     Settle(h, &budget);
     while (budget > 0 && h->evCount < kEventCap - 4) {
@@ -1288,7 +1377,7 @@ void __stdcall HpaStep()
         EmitProgress(&v);
 }
 
-int __stdcall HpaPoll(PathEvent* out)
+int __stdcall HpaPoll(PathEvent* out, PathPoint* points, int capacity)
 {
     HpaView v;
     if (!Open(&v))
@@ -1296,20 +1385,165 @@ int __stdcall HpaPoll(PathEvent* out)
     Hdr* h = v.h;
     if (h->evHead >= h->evCount)
         return 0;
-    *out = v.ev[h->evHead++];
+    const Ev* rec = &v.ev[h->evHead++];
+    *out = rec->e;
+    for (int i = 0; i < rec->e.count && i < capacity; i++)
+        points[i] = v.pts[rec->first + i];
     return 1;
 }
 
-void __stdcall HpaProject(PathTraceView* out)
+void WriteRequest(const StateWriter* w, int pending, int index, const PathRequest* r, unsigned seq)
 {
-    out->record = 0;
-    out->budgetCap = 0;
-    out->tickLoad = 0;
-    out->refreshCounter = 0;
+    if (pending) {
+        w->Int("request[%u].seq", index, 4, seq);
+        w->Handle("request[%u].unit", index, STATE_HANDLE_UNIT, r->unit);
+        w->Handle("request[%u].requester", index, STATE_HANDLE_HEAP, r->requester);
+        w->Handle("request[%u].target", index, STATE_HANDLE_HEAP, r->target);
+        w->Int("request[%u].notBefore", index, 4, r->notBefore);
+        w->Bytes("request[%u].goal", index, &r->goal, sizeof(r->goal));
+        w->Int("request[%u].useStart", index, 4, r->useStart);
+        w->Bytes("request[%u].start", index, &r->start, sizeof(r->start));
+    } else {
+        w->Int("search.seq", 0, 4, seq);
+        w->Handle("search.unit", 0, STATE_HANDLE_UNIT, r->unit);
+        w->Handle("search.requester", 0, STATE_HANDLE_HEAP, r->requester);
+        w->Handle("search.target", 0, STATE_HANDLE_HEAP, r->target);
+        w->Int("search.notBefore", 0, 4, r->notBefore);
+        w->Bytes("search.goal", 0, &r->goal, sizeof(r->goal));
+        w->Int("search.useStart", 0, 4, r->useStart);
+        w->Bytes("search.start", 0, &r->start, sizeof(r->start));
+    }
+}
+
+void WriteSearch(const StateWriter* w, HpaView* v)
+{
+    Hdr* h = v->h;
+    WriteRequest(w, 0, 0, &h->req, h->aseq);
+    w->Int("search.phase", 0, 4, h->phase);
+    w->Int("search.slot", 0, 4, h->slot);
+    w->Int("search.sx", 0, 4, h->sx);
+    w->Int("search.sy", 0, 4, h->sy);
+    w->Int("search.fx", 0, 4, h->fx);
+    w->Int("search.fy", 0, 4, h->fy);
+    w->Int("search.startCluster", 0, 4, h->startCluster);
+    w->Int("search.nGoal", 0, 4, h->nGoal);
+    w->Bytes("search.goalCells", 0, h->goalCells, h->nGoal * (int)sizeof(PathPoint));
+    w->Int("search.nRaw", 0, 4, h->nRaw);
+    w->Bytes("search.rawGoal", 0, h->rawGoal, h->nRaw * (int)sizeof(PathPoint));
+    w->Int("search.nearGoal", 0, 4, h->nearGoal);
+    w->Int("search.nGoalClusters", 0, 4, h->nGoalClusters);
+    w->Bytes("search.goalClusters", 0, h->goalClusters, h->nGoalClusters * 4);
+    w->Int("search.gcIdx", 0, 4, h->gcIdx);
+    w->Int("search.localReady", 0, 4, h->localReady);
+    w->Int("search.directCost", 0, 4, h->directCost);
+    w->Bytes("search.startCost", 0, h->startCost, sizeof(h->startCost));
+    w->Int("search.nGoalNodes", 0, 4, h->nGoalNodes);
+    w->Bytes("search.goalNodes", 0, h->goalNodes, h->nGoalNodes * (int)sizeof(GoalNode));
+    w->Int("search.aHeapN", 0, 4, h->aHeapN);
+    w->Int("search.aInit", 0, 4, h->aInit);
+    w->Int("search.nRoute", 0, 4, h->nRoute);
+    w->Int("search.segIdx", 0, 4, h->segIdx);
+    w->Int("search.nPath", 0, 4, h->nPath);
+    w->Int("search.truncated", 0, 4, h->truncated);
+    w->Int("search.pullAnchor", 0, 4, h->pullAnchor);
+    w->Int("search.pullK", 0, 4, h->pullK);
+    w->Int("search.nWp", 0, 4, h->nWp);
+    w->Bytes("search.wp", 0, h->wp, h->nWp * 4);
+    w->Int("search.wpOverflow", 0, 4, h->wpOverflow);
+    w->Int("search.pullInit", 0, 4, h->pullInit);
+    w->Int("search.nearest", 0, 4, h->nearest);
+    w->Int("search.nearNode", 0, 4, h->nearNode);
+    w->Int("search.nearDist", 0, 4, h->nearDist);
+    w->Int("search.nBanned", 0, 4, h->nBanned);
+    w->Bytes("search.banned", 0, h->banned, h->nBanned * 4);
+    if (h->localReady) {
+        const Local* L = &h->scratch[0];
+        int cells = h->cs * h->cs;
+        w->Int("local.ox", 0, 4, L->ox);
+        w->Int("local.oy", 0, 4, L->oy);
+        w->Int("local.w", 0, 4, L->w);
+        w->Int("local.h", 0, 4, L->h);
+        w->Int("local.mode", 0, 4, L->mode);
+        w->Int("local.terrain", 0, 4, L->terrain);
+        w->Int("local.tx", 0, 4, L->tx);
+        w->Int("local.ty", 0, 4, L->ty);
+        w->Int("local.n", 0, 4, L->n);
+        w->Int("local.found", 0, 4, L->found);
+        w->Int("local.goalAt", 0, 4, L->goalAt);
+        w->Bytes("local.st", 0, L->st, cells);
+        w->Bytes("local.hpos", 0, L->hpos, cells * 4);
+        w->Bytes("local.heap", 0, L->heap, L->n * 4);
+        for (int i = 0; i < cells; i++) {
+            if (L->st[i] == 0)
+                continue;
+            w->Int("local.g[%u]", i, 4, L->g[i]);
+            w->Int("local.key[%u]", i, 4, L->key[i]);
+            w->Int("local.par[%u]", i, 1, (unsigned char)L->par[i]);
+        }
+    }
+    if (h->phase >= PH_ABSTRACT) {
+        for (int n = 0; n < h->NN; n++) {
+            if (v->astamp[n] != (int)h->searchId)
+                continue;
+            w->Int("abstract.ag[%u]", n, 4, v->ag[n]);
+            w->Int("abstract.apar[%u]", n, 4, v->apar[n]);
+            w->Int("abstract.akey[%u]", n, 4, v->akey[n]);
+            w->Int("abstract.apos[%u]", n, 4, v->apos[n]);
+        }
+        w->Bytes("abstract.heap", 0, v->aheap, h->aHeapN * 4);
+        w->Bytes("abstract.route", 0, v->route, h->nRoute * 4);
+        w->Bytes("abstract.path", 0, v->path, h->nPath * 4);
+    }
+}
+
+void __stdcall HpaWriteState(const StateWriter* w)
+{
+    w->Begin(16, "hpa");
+    HpaView v;
+    if (!Open(&v)) {
+        w->Int(nullptr, 0, 1, 0);
+        return;
+    }
+    Hdr* h = v.h;
+    w->Int(nullptr, 0, 1, 1);
+    w->Int("width", 0, 4, h->W);
+    w->Int("height", 0, 4, h->H);
+    w->Int("clusterSize", 0, 4, h->cs);
+    w->Int("clusters", 0, 4, h->nClu);
+    w->Int("slots", 0, 4, h->nSlots);
+    w->Int("slotsUsed", 0, 4, h->slotsUsed);
+    w->Int("seqCounter", 0, 4, h->seqCounter);
+    w->Int("searchId", 0, 4, h->searchId);
+    w->Int("debt", 0, 4, h->debt);
+    w->Int("lastTick", 0, 4, h->lastTick);
+    w->Int("active", 0, 4, h->active);
+    for (int i = 0; i < 32; i++)
+        w->Handle("class[%u]", i, STATE_HANDLE_MOVE_CLASS, h->classes[i]);
+    w->Bytes("slotOf", 0, h->slotOf, sizeof(h->slotOf));
+    w->Bytes("version", 0, v.ver, h->nClu * 4);
+    for (int slot = 0; slot < h->slotsUsed; slot++) {
+        for (int c = 0; c < h->nClu; c++) {
+            const ClusterRec* r = &v.rec[slot * h->nClu + c];
+            if (r->version != v.ver[c])
+                continue;
+            int index = slot * h->nClu + c;
+            w->Int("cluster[%u].count", index, 4, r->count);
+            w->Bytes("cluster[%u].cell", index, r->cell, r->count * 4);
+            w->Bytes("cluster[%u].side", index, r->side, r->count);
+            for (int i = 0; i + 1 < r->count; i++)
+                w->Bytes("cluster[%u].cost", index, &r->cost[TriIndex(i, i + 1)], (r->count - 1 - i) * 2);
+        }
+    }
+    for (int i = 0; i < h->reqCap; i++) {
+        if (v.req[i].used)
+            WriteRequest(w, 1, i, &v.req[i].r, v.req[i].seq);
+    }
+    if (h->active)
+        WriteSearch(w, &v);
 }
 
 PathfindingSeam s_hpa = {
-    HpaInit, HpaShutdown, HpaSubmit, HpaCancel, HpaCellsChanged, HpaStep, HpaPoll, HpaProject
+    HpaRegionSize, HpaInit, HpaShutdown, HpaSubmit, HpaCancel, HpaCellsChanged, HpaStep, HpaPoll, HpaWriteState
 };
 
 }

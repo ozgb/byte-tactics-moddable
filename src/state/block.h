@@ -25,6 +25,9 @@ __declspec(noinline) inline void* __cdecl SimAllocTagged(const char* tag, unsign
     return call.Result(SimAlloc(size));
 }
 
+// Allocates the region of a module's private state, whose size the module asked for; the tag names the site for the analysis tools.
+void* __cdecl SimAllocRegion(const char* tag, unsigned int size);
+
 // Resizes a sim block like realloc, zeroing the bytes beyond the old size.
 void* __cdecl SimRealloc(void* p, unsigned int size);
 

@@ -1,6 +1,6 @@
 # The pathfinding interface
 
-Pathfinding sits behind a general interface, `interfaces/pathfinding.h` (version 2.0). 3.1c's search is
+Pathfinding sits behind a general interface, `interfaces/pathfinding.h` (version 3.0). 3.1c's search is
 its default implementation (`src/ai/pathfind.cpp`). This page is the inventory that interface was cut
 from (#883):
 - what 3.1c's search takes, when it runs, and what it leaves;
@@ -42,7 +42,9 @@ in progress if it is that goal's. There is no pending queue to cancel from, sinc
 
 **In the interface:**
 - `Submit` takes a request: a unit, a goal area (`PathGoalArea`), a `notBefore` tick, and two opaque
-  handles (the goal object and the order effect).
+  handles (the goal object and the order effect), and optionally a start cell (`useStart`, `start`) that a
+  search uses instead of the unit's cell, to continue from the end of a partial route. Orders never set it,
+  so the default never sees it.
 - Orders submit wherever 3.1c sets `flag_1`, with `notBefore = repathClaimTick + 60`.
 - Orders call `Cancel` wherever 3.1c called `AbortIfGoalMatch`, and when `SetPathOrder` clears `flag_1`.
 - The goal area is copied from the order effect when the request is submitted. The three areas'
@@ -95,13 +97,14 @@ in progress if it is that goal's. There is no pending queue to cancel from, sinc
 | Search started, the straight-line probe reaches the goal (or the start is in it) | order flag 0x100 (`Order::subFlags`, through the order effect) | `STARTED`, `PATH_START_DIRECT` |
 | Search started, the probe doesn't reach it (or the start is off the grid) | order flag 0x200 | `STARTED`, `PATH_START_INDIRECT` |
 | Found | the corners of the route, from the start, as waypoints in world units (cell × 16 + footprint × 8), into the goal object; `flag_1` cleared, `active` set | `FINISHED`, `PATH_FOUND` |
-| Found, more than 64 corners | only the 64 corners nearest the start (a 64-entry ring buffer) | `FINISHED`, `PATH_PARTIAL` |
+| Found, more than 64 corners | only the 64 corners nearest the start (a 64-entry ring buffer inside the default) | `FINISHED`, `PATH_PARTIAL` |
 | Failed, or ended at once | `SetWaypoints(0, 0)`: `active` cleared, and order flag 0x40 unless the unit is already in the goal | `FINISHED`, `PATH_FAILED`, no points |
 | Claim | `repathClaimTick` = the tick | the `STARTED` event's tick |
 
 The goal object keeps at most 20 waypoints (`SetWaypoints` cuts the rest), so a long route is always
 partial in practice. The unit asks again when it runs out (section 1). The cut belongs to the consumer:
-the event carries up to 64.
+the event's `count` is the route's full length, and `Poll` copies as many waypoints as the caller's
+buffer holds (orders pass 64).
 
 Partial results over several ticks don't happen in 3.1c (a search reports once, at its end). The
 interface has `PATH_EVENT_PROGRESS` for implementations that do.
@@ -118,8 +121,8 @@ Orders apply each polled event with `ApplyPathEvent` (`src/orders/order_targets.
 | `repathClaimTick` (the 60-tick throttle) | the goal object | in the result: written from the `STARTED` event's tick; the request's `notBefore` carries it back |
 | Order flags 0x100 and 0x200 (`Order::subFlags`) | the order's own update | in the result: the `STARTED` event's `PathStart` |
 | Order flag 0x40 (no route) | the order's own update | in the result: a `FINISHED` event with no points |
-| The cut to 20 waypoints | the goal object (`SetWaypoints`) | in the result: the consumer cuts, the event carries up to 64 |
-| The pass maps re-stamped for the searching unit's class | movement, for its own collision tests | **internal**: the default calls `BeginSearch` and `EndSearch`, which are 3.1c's lazy refresh (section 7) |
+| The cut to 20 waypoints | the goal object (`SetWaypoints`) | in the result: the consumer cuts, `Poll` copies as many as its buffer holds |
+| The pass maps re-stamped for the searching unit's class | movement, for its own collision tests | **internal**: every implementation must call `BeginSearch` and `EndSearch` around a search, which are 3.1c's lazy refresh (section 7) |
 | `PROGRESS` events | nobody | orders ignore them; 3.1c never sends one |
 
 Everything movement reads of a search is in the result. The one coupling left is the pass maps'
@@ -135,8 +138,12 @@ Inside the default, and not reached by any consumer:
 
 ## 5. The traced state
 
-Sections 16 and 17 of `docs/trace-format.md`. The harness hashes them from the view `Project` fills, not
-from the game record. The default's view points into its own region, so the bytes are 3.1c's.
+Sections 16 and 17 of `docs/trace-format.md`. The harness gets them from the `WriteState` slot, which writes the
+implementation's private state through a `StateWriter` (`interfaces/state_writer.h`: records, integers, bytes and
+handles that the host hashes, and in test mode dumps). The default writes the bytes 3.1c's tables give, as the
+reference's harness hashed them from the game record, so the traces equal the reference's. Another implementation
+writes whatever decides what it does next, in its own records; the demo writes its cluster cache, its requests and
+its search in progress.
 
 | Item | Carries over between ticks | Kind |
 |---|---|---|
@@ -184,20 +191,37 @@ Every slot reads only, apart from `BeginSearch` and `EndSearch`.
 | `InBounds`, `Pass` | a class's pass map | `MovementClassInBounds`, `MovementClassGet` |
 | `SeenSize`, `Seen` | a player's visibility grid, 2 by 2 cells a square | `visibilityMask` |
 | `LineOfSight` | a straight walk over a class's pass map | not in 3.1c; for any-angle implementations |
+| `TerrainPass` | the pass state from terrain and features alone, without the stamps of units | `GetPassMapFootprintValueWithEdgeStrips` with the unit test left out |
 | `BeginSearch`, `EndSearch` | bring the pass map up to date around a search for a unit | `RefreshMovedUnits`, `RefreshUnitIfStale` |
 
 Units and classes are handles, and the view gives no pointer into the engine, so an implementation in
 a WASM module can use the same table through imports.
 
-`CellsChanged` is the other way in: the map calls it after a terrain or feature change re-stamps the
-pass maps (`src/map/terrain.cpp`, `src/map/features.cpp`). It names a rectangle of cells, not a class.
-The default ignores it (it reads the pass maps live); the HPA\* demo marks its clusters there stale.
+`CellsChanged` is the other way in. It names a rectangle of cells, the movement classes (a mask of `MoveClass`
+indexes) and the cause:
+- `PATH_CHANGE_TERRAIN`: terrain or features changed (`src/map/terrain.cpp`, `src/map/features.cpp`), so
+  `TerrainPass` may differ;
+- `PATH_CHANGE_UNITS`: the stamps of units on the pass maps were refreshed (building footprints in
+  `src/map/terrain.cpp`, and `RefreshPassMapsForUnit`, `RefreshMovedUnits` and `RefreshUnitIfStale` in
+  `src/units/movement_class.cpp`, which call it for each class they re-stamp). `TerrainPass` did not change.
+
+A unit-stamp call can arrive while the implementation is inside `Step`, because `BeginSearch` triggers the refresh.
+The default ignores `CellsChanged`. The HPA\* demo marks its clusters stale for a terrain change only; it builds the
+cluster graph from `TerrainPass` and treats units as local obstacles (the refinement and flood steps read `Pass`).
 
 ## 8. The private region
 
-The default's state is one block of the state block, allocated by `Init` (`SimAllocTagged`, tag
-`AISearch region`, in `src/ai/pathfind.cpp`) and freed by `Shutdown`. `Game::pathfinder` holds its
-reference. Its size follows from the map at load, and it never grows:
+The state of an implementation is one region of the state block. The engine asks for its size and allocates it:
+1. `RegionSize(map)` returns the bytes needed. It depends on the `PathMapInfo` alone (map size, unit slots and the
+   number of movement classes), so every player computes the same size.
+2. The engine allocates the region (`SimAllocRegion`, tag `AISearch region`) and calls `Init(map, region, size)`.
+3. At match end `Shutdown` returns the region and the engine frees it.
+
+The implementation keeps no pointer to the region outside `Game::pathfinder`, the root only pathfinding reads and
+writes. Any module with private state can use the same three calls: a size slot, an `Init` that receives the region,
+a `Shutdown` that hands it back.
+
+The default's region holds:
 
 | Part | Size | Holds |
 |---|---|---|
@@ -208,18 +232,59 @@ reference. Its size follows from the map at load, and it never grows:
 | grid | one `PathCell` per cell (rounded up to 8) | the cells' marks |
 | dirty words | one bit per 8 cells | which cells a search marked |
 | pending requests | unit slots + 16 `PathPending`s, and two hash indexes | the requests not yet started, by requester and by unit |
-| events | 512 `PathEvent`s | the last step's events, until polled |
+| events | 512 events with up to 64 waypoints each | the last step's events, until polled |
 
-A search's goal cells, which it needs only while it starts, are on the stack: every call out of
-pathfinding (the goal maths, the world view) gets a copy or a local, never a pointer into the region.
+The demo's region scales with the number of movement classes: a cluster cache per class, `nClasses * clusters *
+sizeof(ClusterRec)` (680 bytes a cluster), with 16-cell clusters, or 32-cell ones when the cache of every class
+would pass 12 MB. It has no cap on the classes.
 
 The pool and the heap items are counted in the record but filled only as a search needs them, as 3.1c's
-`GrowNodes` did, so the bytes the trace hashes are 3.1c's.
+`GrowNodes` did, so the bytes the trace hashes are 3.1c's. A search's goal cells, which it needs only while it
+starts, are on the stack: every call out of pathfinding gets a copy or a local, never a pointer into the region.
 
 Only pathfinding reads or writes the region and `Game::pathfinder`. Two checks hold that:
 - `tools/seamlink.py`, statically, over every function's field accesses (`data/rwsets.csv`);
 - the access log (#835), at run time, over every scenario.
 
-`Project` gives the harness pointers into the region (the record and the three globals), so the trace
-hashes the region without the harness knowing its layout. Another implementation may give null
-pointers, and sections 16 and 17 are then empty.
+## 9. The waypoints 3.1c's movement follows
+
+`UnitMotion::SteerGroundUnit` (`src/orders/order_list.cpp`) reads three consecutive waypoints of the goal object,
+`p[0]`, `p[1]` and `p[2]`, through `FillWaypointWorldPos` (it repeats the last one when the route runs out). It
+steers towards `p[1]` and brakes when `p[2]` is near. Waypoints are in world units (16 per cell), and the goal
+object keeps at most 20.
+
+What it assumes of them:
+- **Segments along the eight grid directions.** When the unit is more than 5 cells (80 world units) from `p[1]`,
+  movement does not aim at `p[1]`: it moves the aim point back along the direction from `p[0]` to `p[1]` until it
+  is 5 cells from the unit. That is right only if the unit stands on the line through `p[0]` and `p[1]`. A search
+  that follows cells moves the unit along such lines (horizontal, vertical or diagonal), and the unit rejoins
+  them at each corner.
+- **A route that starts where the unit is.** `p[0]` is the first waypoint, the unit's own position.
+- **Corners, not every cell.** A segment may be long; the aim point stays on its line.
+
+What fails otherwise: with a segment at another angle (an any-angle route), the aim point lies on a line the
+unit is not on, and the unit steers to it without closing in on the segment's end. Units then circle or stall
+short of the goal, and the goal object asks for a new path only when it has fewer than 2 waypoints left or the
+unit is blocked, so the stall lasts. An implementation that wants any-angle routes needs a movement that steers to
+`p[1]` itself, which belongs to the movement interface. The demo reduces its routes to the eight directions
+for this reason.
+
+The default emits `cell * 16 + footprint * 8` on each axis, where `footprint` is the footprint of the unit's
+movement class (`PathUnitState::footprintX`, `footprintY`). The demo emits the same plus 8, the centre of the cell.
+Movement tolerates both: it only needs the segment directions above.
+
+## 10. Goal units
+
+A goal area's centre is in cells and its radii (one for a circle, two for a ring) are in world units, 16 to a
+cell, the same as waypoints. The default derives what 3.1c compares: the squared radius in cells for containment,
+`(r / 16) * (r / 16)`, and the radius itself against its own distance estimate (`src/util/path_goal.cpp`). The
+interface says nothing of that estimate.
+
+## 11. Nearest reachable
+
+`PATH_NEAREST` ends a search whose goal can't be reached with a route to the reachable cell nearest to the goal,
+measured as the straight-line distance in cells to the nearest cell of the goal area, among the cells the search
+expanded. The default never reports it: when its open list empties it reports `PATH_FAILED` with no route. It does
+not keep the best cell it saw, so a status that fits would need a change to the search, not to the interface. The
+demo reports it instead of `PATH_FAILED` for an unreachable goal (it considers the cluster boundary nodes it
+expanded and the start).

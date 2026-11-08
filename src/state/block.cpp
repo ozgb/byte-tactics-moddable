@@ -422,3 +422,8 @@ void __cdecl operator delete[](void* p, const SimHeap&)
 {
     SimFree(p);
 }
+
+void* __cdecl SimAllocRegion(const char* tag, unsigned int size)
+{
+    return SimAllocTagged(tag, size);
+}

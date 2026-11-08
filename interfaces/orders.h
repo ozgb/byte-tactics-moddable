@@ -11,11 +11,12 @@ struct Unit;
 struct Order;
 struct Point16;
 struct PathEvent;
+struct PathPoint;
 struct Vec3;
 class MissionType;
 
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
-#define ORDERS_VERSION_MAJOR 2
+#define ORDERS_VERSION_MAJOR 3
 // Minor version of the orders interface, changed when a slot is added.
 #define ORDERS_VERSION_MINOR 0
 
@@ -82,8 +83,8 @@ struct OrdersSeam {
     void (__stdcall* OrderOrStatusFlags)(OrderBase* order, unsigned int flags);
     // Reads the network state of a unit's movement from a packet, through the goal that moves it. Hooks: none.
     void (__stdcall* UnitMotionReadNetState)(UnitMotion* motion, BitReader* reader);
-    // Applies an event of a path search to its requester: a started search sets the claim tick of the goal and a status flag on the order, a finished one gives the goal its waypoints. Hooks: none.
-    void (__stdcall* ApplyPathEvent)(const PathEvent* event);
+    // Applies an event of a path search to its requester, with the waypoints Poll copied for it: a started search sets the claim tick of the goal and a status flag on the order, a finished one gives the goal its waypoints. Hooks: none.
+    void (__stdcall* ApplyPathEvent)(const PathEvent* event, const PathPoint* waypoints);
 };
 
 #endif

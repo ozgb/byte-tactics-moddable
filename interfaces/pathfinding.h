@@ -1,8 +1,10 @@
 #ifndef INTERFACES_PATHFINDING_H
 #define INTERFACES_PATHFINDING_H
 
+#include "state_writer.h"
+
 // Major version of the pathfinding interface, changed when a slot is removed or its signature changes.
-#define PATHFINDING_VERSION_MAJOR 2
+#define PATHFINDING_VERSION_MAJOR 3
 // Minor version of the pathfinding interface, changed when a slot is added.
 #define PATHFINDING_VERSION_MINOR 0
 
@@ -13,10 +15,7 @@ typedef unsigned int PathClass;
 // An object of the requester's that pathfinding stores and hands back in events, and never reads.
 typedef unsigned int PathHandle;
 
-// The most waypoints one event carries.
-#define PATH_MAX_WAYPOINTS 64
-
-// A point: in cells for the world view and goal areas, in world units (16 per cell) for waypoints.
+// A point: in cells for the world view and the centre of a goal area, in world units (16 per cell) for waypoints.
 struct PathPoint {
     // East.
     short x;
@@ -40,12 +39,10 @@ enum PathGoalKind {
 struct PathGoalArea {
     // A PathGoalKind.
     int kind;
-    // The centre of a circle or a ring.
+    // The centre of a circle or a ring, in cells.
     PathPoint centre;
-    // The radius of a circle in radius[0], and the inner and outer radii of a ring in radius[0] and radius[1]: in the units of the distance estimate (about 18 per cell).
+    // The radius of a circle in radius[0], and the inner and outer radii of a ring in radius[0] and radius[1], in world units (16 per cell).
     int radius[2];
-    // The same radii squared in cells, as the containment tests compare them.
-    int radiusSq[2];
     // A rectangle's first and last column.
     int left, right;
     // A rectangle's first and last row.
@@ -64,6 +61,10 @@ struct PathRequest {
     PathHandle requester;
     // A second handle of the requester's, carried with the request.
     PathHandle target;
+    // Whether start is used instead of the unit's cell, to continue a route from where an earlier one ended.
+    int useStart;
+    // The cell the search starts from when useStart is set.
+    PathPoint start;
 };
 
 // The kinds of event a step produces.
@@ -91,10 +92,12 @@ enum PathStatus {
     // The route was cut short and leads towards the goal.
     PATH_PARTIAL = 1,
     // There is no route; count is 0.
-    PATH_FAILED = 2
+    PATH_FAILED = 2,
+    // The goal cannot be reached; the route ends at the reachable cell nearest to it, measured as the straight-line distance in cells to the nearest cell of the goal area, among the cells the search expanded.
+    PATH_NEAREST = 3
 };
 
-// What happened to a request in the last step.
+// What happened to a request in the last step; its waypoints are in world units, and the default movement follows only segments along the eight grid directions (the default search emits cell * 16 + footprint * 8, the demo adds 8).
 struct PathEvent {
     // A PathEventKind.
     int kind;
@@ -108,10 +111,8 @@ struct PathEvent {
     PathHandle target;
     // The tick of the step.
     unsigned int tick;
-    // The number of waypoints.
+    // The number of waypoints of the route; Poll copies as many as fit the caller's buffer, from the start of the route.
     int count;
-    // The waypoints from the start, in world units; they need not lie on cell centres.
-    PathPoint points[PATH_MAX_WAYPOINTS];
 };
 
 // The map a match starts on.
@@ -120,6 +121,16 @@ struct PathMapInfo {
     int width, height;
     // The number of unit slots.
     int unitSlots;
+    // The number of movement classes the map uses.
+    int moveClassCount;
+};
+
+// Why a rectangle of cells changed.
+enum PathChange {
+    // Terrain or features changed, so every unit's route may.
+    PATH_CHANGE_TERRAIN = 1,
+    // The stamps of units on the pass maps were refreshed; TerrainPass did not change.
+    PATH_CHANGE_UNITS = 2
 };
 
 // Where a unit is and how it moves.
@@ -166,42 +177,34 @@ struct PathWorldView {
     int (__stdcall* Seen)(int player, int x, int y);
     // Whether a unit of a movement class can go straight between two cells: every cell the segment crosses is in bounds and not blocked.
     int (__stdcall* LineOfSight)(PathClass moveClass, int x0, int y0, int x1, int y1);
-    // Brings the pass state of a unit's movement class up to date before a search for it, leaving the unit's own cells as they were.
+    // A cell's pass state for a movement class from terrain and features alone, as Pass without the stamps of units: 0 blocked, 1 passable at a cost, 2 or more open.
+    int (__stdcall* TerrainPass)(PathClass moveClass, int x, int y);
+    // Brings the pass state of a unit's movement class up to date; every implementation calls it before it reads the pass state for a search of the unit, because movement reads the maps it refreshes.
     void (__stdcall* BeginSearch)(PathUnit unit);
-    // Brings the unit's own cells up to date after its search.
+    // Brings the unit's own cells up to date; every implementation calls it when a search of the unit ends or is dropped, because movement reads the maps it refreshes.
     void (__stdcall* EndSearch)(PathUnit unit);
-};
-
-// The state the trace hashes (sections 16 and 17 of docs/trace-format.md), in the layouts given there.
-struct PathTraceView {
-    // The pathfinder record, or null when there is none.
-    const void* record;
-    // The ten per-player heuristic weights.
-    const int* budgetCap;
-    // The ten per-player search counts of the current window.
-    const int* tickLoad;
-    // The ticks since the weights were last set.
-    const int* refreshCounter;
 };
 
 // Path searches for units.
 struct PathfindingSeam {
-    // Builds the state for a map that has just loaded, in a region of the state block it allocates; called once per match, before the first step.
-    void (__stdcall* Init)(const PathMapInfo* map);
-    // Frees that state when the match ends.
-    void (__stdcall* Shutdown)(void);
+    // The bytes of private state the implementation needs for a map; it depends on the map alone, and is called before Init.
+    unsigned int (__stdcall* RegionSize)(const PathMapInfo* map);
+    // Builds the state for a map that has just loaded, in a region the engine allocated of the size RegionSize gave; called once per match, before the first step.
+    void (__stdcall* Init)(const PathMapInfo* map, void* region, unsigned int size);
+    // Ends the match and returns the region, which the engine frees.
+    void* (__stdcall* Shutdown)(void);
     // Adds a request, or replaces the pending one of the same requester; ignored while that requester's search runs. It is first considered at the next step.
     void (__stdcall* Submit)(const PathRequest* request);
     // Drops a requester's pending or running request; no event of it is polled afterwards.
     void (__stdcall* Cancel)(PathHandle requester);
-    // Tells the implementation that the cells of a rectangle changed blocking or cost; called when they change, so before the next step.
-    void (__stdcall* CellsChanged)(int left, int top, int right, int bottom);
+    // Tells the implementation that the cells of a rectangle changed in the pass maps of the movement classes whose index bits are set in classes, for a PathChange; called when they change, so before the next step, and possibly during one.
+    void (__stdcall* CellsChanged)(int left, int top, int right, int bottom, unsigned int classes, int cause);
     // Does this tick's search work, as much as the implementation chooses; called once per tick, in the players phase.
     void (__stdcall* Step)(void);
-    // Takes the next event of the last step, in the order they happened; returns 0 when none is left. Called after Step, in the same phase.
-    int (__stdcall* Poll)(PathEvent* out);
-    // Fills the view of the state the trace hashes; it reads only, and keeps nothing.
-    void (__stdcall* Project)(PathTraceView* out);
+    // Takes the next event of the last step, in the order they happened, and copies the first min(count, capacity) waypoints of its route to points; returns 0 when none is left. Called after Step, in the same phase.
+    int (__stdcall* Poll)(PathEvent* out, PathPoint* points, int capacity);
+    // Writes all the state that decides what the implementation does next; it reads only, and keeps nothing.
+    void (__stdcall* WriteState)(const StateWriter* writer);
 };
 
 #endif

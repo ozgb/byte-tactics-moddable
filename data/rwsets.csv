@@ -7812,7 +7812,7 @@ address,function,file,kind,target
 0x423c50,PlaceFeature,src/map/features.cpp,global_read,g_seams
 0x423c50,PlaceFeature,src/map/features.cpp,indirect_call,indirect via ModelState *(*)(Object3do *) __attribute__((stdcall)) [UnitsSeam::CreateObjectState]
 0x423c50,PlaceFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [MapSeam::RefreshAllPassMaps]"
-0x423c50,PlaceFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(int, int, int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
+0x423c50,PlaceFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x424050,UpdateFeatures,src/map/features.cpp,call,BurnOut
 0x424050,UpdateFeatures,src/map/features.cpp,call,FeatureVec3
 0x424050,UpdateFeatures,src/map/features.cpp,call,MoveFeatureSpot
@@ -7963,7 +7963,7 @@ address,function,file,kind,target
 0x4246b0,RemoveFeature,src/map/features.cpp,global_read,g_seams
 0x4246b0,RemoveFeature,src/map/features.cpp,indirect_call,indirect via void (*)(ModelState *) __attribute__((stdcall)) [UnitsSeam::FreeObjectState]
 0x4246b0,RemoveFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [MapSeam::RefreshAllPassMaps]"
-0x4246b0,RemoveFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(int, int, int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
+0x4246b0,RemoveFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x424840,RemoveAllFeatures,src/map/features.cpp,call,RemoveFeature
 0x424840,RemoveAllFeatures,src/map/features.cpp,call,operator Cell *
 0x424840,RemoveAllFeatures,src/map/features.cpp,deref_escape,*Cell
@@ -12862,7 +12862,14 @@ address,function,file,kind,target
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Game::ticks
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::footprintX
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::lastTick
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::name
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Point16::x
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Point16::y
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Seams::pathfinding
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,UnitPassMapStampView::a
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,UnitPassMapStampView::b
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,UnitPassMapStampView::unit
@@ -12871,17 +12878,26 @@ address,function,file,kind,target
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_escape,g_movementClasses
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_read,g_game
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_read,g_movementClasses
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_read,g_seams
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,get
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,operator!=
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,operator->
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,deref_escape,*UnitPassMapRecordView
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Game::ticks
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Game::units
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Game::unitsEnd
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MapSeam::RefreshPassMap
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::footprintX
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::lastTick
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Point16::x
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Point16::y
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Seams::map
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Seams::pathfinding
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapRecordView::a
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapRecordView::b
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapRecordView::flags
@@ -12892,20 +12908,31 @@ address,function,file,kind,target
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_write,MotionTickView::lastTick
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_write,MovementClass::lastTick
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,function,
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,global_escape,g_movementClasses
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,global_read,g_game
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,global_read,g_seams
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(MovementClass *, int, Point16, Point16) __attribute__((fastcall)) [MapSeam::RefreshPassMap]"
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,call,operator->
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MapSeam::RefreshPassMap
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::footprintX
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::lastTick
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Point16::x
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Point16::y
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Seams::map
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Seams::pathfinding
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,UnitPassMapView::a
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,UnitPassMapView::b
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,UnitPassMapView::unit
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,function,
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,global_escape,g_movementClasses
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,global_read,g_seams
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(MovementClass *, int, Point16, Point16) __attribute__((fastcall)) [MapSeam::RefreshPassMap]"
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,call,operator=
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,field_read,PathLockSrcView::rect
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,field_write,PathLockDstView::rect
@@ -20846,7 +20873,7 @@ address,function,file,kind,target
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,global_write,g_economyPacketTick
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,"indirect via Unit *(*)(unsigned char, unsigned short, Vec3, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
-0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via int (*)(PathEvent *) __attribute__((stdcall)) [PathfindingSeam::Poll]
+0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,"indirect via int (*)(PathEvent *, PathPoint *, int) __attribute__((stdcall)) [PathfindingSeam::Poll]"
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
@@ -20860,7 +20887,7 @@ address,function,file,kind,target
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerEconomy]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,"indirect via void (*)(SquadManager *, int) __attribute__((fastcall)) [AiSeam::SquadManagerTickIfActive]"
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
-0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)(const PathEvent *) __attribute__((stdcall)) [OrdersSeam::ApplyPathEvent]
+0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,"indirect via void (*)(const PathEvent *, const PathPoint *) __attribute__((stdcall)) [OrdersSeam::ApplyPathEvent]"
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::UpdatePlayerAI]
 0x464f80,UpdatePlayersOnStream,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
 0x4658e0,IsFootprintVisible,src/game/players.cpp,call,IsExplored
@@ -24808,7 +24835,7 @@ address,function,file,kind,target
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,global_read,g_game
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,global_read,g_seams
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [LosRadarSeam::UpdateCellHeightRange]"
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,indirect_call,"indirect via void (*)(int, int, int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
+0x47cc30,AddUnitToMap,src/map/terrain.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,call,RefreshPassMapsForUnit
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,call,VisitObjectsInArea
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,call,get
@@ -24939,7 +24966,7 @@ address,function,file,kind,target
 0x47dac0,SetYardOpen,src/map/terrain.cpp,function,
 0x47dac0,SetYardOpen,src/map/terrain.cpp,global_read,g_quirks
 0x47dac0,SetYardOpen,src/map/terrain.cpp,global_read,g_seams
-0x47dac0,SetYardOpen,src/map/terrain.cpp,indirect_call,"indirect via void (*)(int, int, int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
+0x47dac0,SetYardOpen,src/map/terrain.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,call,RefreshAllPassMaps
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,call,VisitObjectsInArea
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,field_read,PathfindingSeam::CellsChanged
@@ -24952,7 +24979,7 @@ address,function,file,kind,target
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,field_write,Unit::flags
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,function,
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,global_read,g_seams
-0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,indirect_call,"indirect via void (*)(int, int, int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
+0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,call,CanBuildAt
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,call,SteepCell
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,call,operator Cell *
@@ -25013,41 +25040,9 @@ address,function,file,kind,target
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Unit::lastTick
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,function,
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,global_read,g_game
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,operator Cell *
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,operator Feature *
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,operator Unit *
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,operator bool
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,operator->
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,deref_escape,*Cell
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,deref_read,*Ref<Unit>
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_escape,Unit::motion
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Cell::feature
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Cell::high
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Cell::low
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Cell::offsetX
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Cell::offsetY
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Cell::unit
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Feature::flags
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Game::cells
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Game::featureCount
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Game::features
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Game::height
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Game::seaLevel
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Game::units
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Game::width
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,MovementClass::badSlope
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,MovementClass::badWaterSlope
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,MovementClass::lastTick
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,MovementClass::maxSlope
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,MovementClass::maxWaterDepth
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,MovementClass::maxWaterSlope
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,MovementClass::minWaterDepth
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,field_read,Unit::lastTick
+0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,FootprintValue
 0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,function,
-0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,global_read,g_game
-0x47e1f0,GetPassMapFootprintValueWithEdgeStrips,src/map/terrain.cpp,call,GetPassMapFootprintValue
-0x47e1f0,GetPassMapFootprintValueWithEdgeStrips,src/map/terrain.cpp,field_read,MovementClass::footprintX
-0x47e1f0,GetPassMapFootprintValueWithEdgeStrips,src/map/terrain.cpp,field_read,MovementClass::footprintZ
+0x47e1f0,GetPassMapFootprintValueWithEdgeStrips,src/map/terrain.cpp,call,FootprintValueWithEdgeStrips
 0x47e1f0,GetPassMapFootprintValueWithEdgeStrips,src/map/terrain.cpp,function,
 0x47e2d0,CanPlaceFootprintAt,src/map/terrain.cpp,call,operator Cell *
 0x47e2d0,CanPlaceFootprintAt,src/map/terrain.cpp,call,operator Feature *
@@ -30137,6 +30132,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetCameraState
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetChatHudIndices
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetSpeech
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimAllocRegion
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimCaptureClear
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimEventsClear
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,memset
@@ -30154,12 +30150,16 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,LosRadarSeam::LoadTntMap
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,MapSeam::BuildAllPassMaps
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,MapSeam::GetGameType
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,PathMapInfo::moveClassCount
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,PathWorldView::MoveClass
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,PathfindingSeam::Init
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,PathfindingSeam::RegionSize
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,PlayersSeam::InitPlayers
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,Seams::features
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,Seams::los_radar
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,Seams::map
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,Seams::pathfinding
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,Seams::pathworld
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,Seams::players
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,Seams::units
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,Seams::weapons
@@ -30201,6 +30201,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::windSpeedDenominator
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::xform
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,PathMapInfo::height
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,PathMapInfo::moveClassCount
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,PathMapInfo::unitSlots
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,PathMapInfo::width
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Player::unitsCreated
@@ -30210,7 +30211,9 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,global_read,g_seams
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,global_write,g_cdActivityRingWriteIdx
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,global_write,g_scorePanelSlidePos
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via PathClass (*)(int) __attribute__((stdcall)) [PathWorldView::MoveClass]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via unsigned int (*)(const PathMapInfo *) __attribute__((stdcall)) [PathfindingSeam::RegionSize]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::FreeFeatureFileList]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::LoadFeatureFileList]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::NopAfterFeatureEnum]
@@ -30228,7 +30231,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WeaponsSeam::LoadWeaponTypes]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WindMeteorsSeam::InitMeteors]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWindOnStream]
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)(const PathMapInfo *) __attribute__((stdcall)) [PathfindingSeam::Init]
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via void (*)(const PathMapInfo *, void *, unsigned int) __attribute__((stdcall)) [PathfindingSeam::Init]"
 0x491a70,Force640x480Surfaces,src/game/game_state.cpp,call,AllocSurface
 0x491a70,Force640x480Surfaces,src/game/game_state.cpp,call,GameFreeThunk
 0x491a70,Force640x480Surfaces,src/game/game_state.cpp,call,GetScreenHeight
@@ -30253,6 +30256,7 @@ address,function,file,kind,target
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,call,DrainSimEvents
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,call,FreeTextureGafs
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,call,GameFreeThunk
+0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,call,SimFree
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,call,Sound::SetTrackCategory
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,call,Sound::StopCdAudio
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,call,operator Mission *
@@ -30298,7 +30302,6 @@ address,function,file,kind,target
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::FreeMapResources]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::FreeRadar]
-0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PathfindingSeam::Shutdown]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::FreePlayers]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::FreeDownloadMenus]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::FreeMovementClasses]
@@ -30310,6 +30313,7 @@ address,function,file,kind,target
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WeaponsSeam::FreeWeaponTypes]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WindMeteorsSeam::EmptyShutdownPreCleanup]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::KillUnit]"
+0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void *(*)() __attribute__((stdcall)) [PathfindingSeam::Shutdown]
 0x491c60,ShutdownIngameAndQuit,src/game/game_state.cpp,call,BlankScreen
 0x491c60,ShutdownIngameAndQuit,src/game/game_state.cpp,call,QuitApp
 0x491c60,ShutdownIngameAndQuit,src/game/game_state.cpp,call,RemoveLocalPlayers
@@ -43395,12 +43399,10 @@ address,function,file,kind,target
 ,Approach,src/ingame/info_panel.cpp,function,
 ,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,call,memset
 ,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,field_read,ApproachRadius::radius
-,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,field_read,ApproachRadius::radiusSq
 ,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,field_read,Point16::x
 ,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,field_read,Point16::y
 ,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,field_write,PathGoalArea::kind
 ,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,field_write,PathGoalArea::radius
-,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,field_write,PathGoalArea::radiusSq
 ,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,field_write,PathPoint::x
 ,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,field_write,PathPoint::y
 ,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,function,
@@ -44050,9 +44052,11 @@ address,function,file,kind,target
 ,CellExtra,src/ai/pathfind_hpa.cpp,field_read,HpaView::w
 ,CellExtra,src/ai/pathfind_hpa.cpp,field_read,PathWorldView::InBounds
 ,CellExtra,src/ai/pathfind_hpa.cpp,field_read,PathWorldView::Pass
+,CellExtra,src/ai/pathfind_hpa.cpp,field_read,PathWorldView::TerrainPass
 ,CellExtra,src/ai/pathfind_hpa.cpp,function,
 ,CellExtra,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via int (*const)(PathClass, int, int) __attribute__((stdcall)) [PathWorldView::InBounds]"
 ,CellExtra,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via int (*const)(PathClass, int, int) __attribute__((stdcall)) [PathWorldView::Pass]"
+,CellExtra,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via int (*const)(PathClass, int, int) __attribute__((stdcall)) [PathWorldView::TerrainPass]"
 ,CellFeatureBlocks,src/map/terrain.cpp,call,get
 ,CellFeatureBlocks,src/map/terrain.cpp,deref_read,*unsigned char
 ,CellFeatureBlocks,src/map/terrain.cpp,field_read,Cell::feature
@@ -44095,6 +44099,7 @@ address,function,file,kind,target
 ,CellToWorld,src/orders/vtol_orders.cpp,field_write,Vec3::x
 ,CellToWorld,src/orders/vtol_orders.cpp,field_write,Vec3::z
 ,CellToWorld,src/orders/vtol_orders.cpp,function,
+,CellsSquared,src/util/path_goal.cpp,function,
 ,CenterPos::CenterPos,src/ai/player_ai.h,field_write,CenterPos::x
 ,CenterPos::CenterPos,src/ai/player_ai.h,field_write,CenterPos::y
 ,CenterPos::CenterPos,src/ai/player_ai.h,function,
@@ -45179,9 +45184,12 @@ address,function,file,kind,target
 ,EmitCells,src/ai/pathfind_hpa.cpp,call,WorldPoint
 ,EmitCells,src/ai/pathfind_hpa.cpp,call,operator=
 ,EmitCells,src/ai/pathfind_hpa.cpp,deref_read,*int
+,EmitCells,src/ai/pathfind_hpa.cpp,deref_write,*PathPoint
+,EmitCells,src/ai/pathfind_hpa.cpp,field_read,Hdr::nPts
 ,EmitCells,src/ai/pathfind_hpa.cpp,field_read,HpaView::h
+,EmitCells,src/ai/pathfind_hpa.cpp,field_read,HpaView::pts
+,EmitCells,src/ai/pathfind_hpa.cpp,field_write,Hdr::nPts
 ,EmitCells,src/ai/pathfind_hpa.cpp,field_write,PathEvent::count
-,EmitCells,src/ai/pathfind_hpa.cpp,field_write,PathEvent::points
 ,EmitCells,src/ai/pathfind_hpa.cpp,function,
 ,EmitLine,src/harness/replay_objects.cpp,call,ReplayText::Add
 ,EmitLine,src/harness/replay_objects.cpp,call,ReplayText::AddChar
@@ -45907,6 +45915,42 @@ address,function,file,kind,target
 ,FootprintCentreSmoke,src/map/features.cpp,function,
 ,FootprintCentreSmoke,src/map/features.cpp,global_read,g_seams
 ,FootprintCentreSmoke,src/map/features.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetGroundHeight]
+,FootprintValue,src/map/terrain.cpp,call,operator Cell *
+,FootprintValue,src/map/terrain.cpp,call,operator Feature *
+,FootprintValue,src/map/terrain.cpp,call,operator Unit *
+,FootprintValue,src/map/terrain.cpp,call,operator bool
+,FootprintValue,src/map/terrain.cpp,call,operator->
+,FootprintValue,src/map/terrain.cpp,deref_escape,*Cell
+,FootprintValue,src/map/terrain.cpp,deref_read,*Ref<Unit>
+,FootprintValue,src/map/terrain.cpp,field_escape,Unit::motion
+,FootprintValue,src/map/terrain.cpp,field_read,Cell::feature
+,FootprintValue,src/map/terrain.cpp,field_read,Cell::high
+,FootprintValue,src/map/terrain.cpp,field_read,Cell::low
+,FootprintValue,src/map/terrain.cpp,field_read,Cell::offsetX
+,FootprintValue,src/map/terrain.cpp,field_read,Cell::offsetY
+,FootprintValue,src/map/terrain.cpp,field_read,Cell::unit
+,FootprintValue,src/map/terrain.cpp,field_read,Feature::flags
+,FootprintValue,src/map/terrain.cpp,field_read,Game::cells
+,FootprintValue,src/map/terrain.cpp,field_read,Game::featureCount
+,FootprintValue,src/map/terrain.cpp,field_read,Game::features
+,FootprintValue,src/map/terrain.cpp,field_read,Game::height
+,FootprintValue,src/map/terrain.cpp,field_read,Game::seaLevel
+,FootprintValue,src/map/terrain.cpp,field_read,Game::units
+,FootprintValue,src/map/terrain.cpp,field_read,Game::width
+,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::badSlope
+,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::badWaterSlope
+,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::lastTick
+,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::maxSlope
+,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::maxWaterDepth
+,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::maxWaterSlope
+,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::minWaterDepth
+,FootprintValue,src/map/terrain.cpp,field_read,Unit::lastTick
+,FootprintValue,src/map/terrain.cpp,function,
+,FootprintValue,src/map/terrain.cpp,global_read,g_game
+,FootprintValueWithEdgeStrips,src/map/terrain.cpp,call,FootprintValue
+,FootprintValueWithEdgeStrips,src/map/terrain.cpp,field_read,MovementClass::footprintX
+,FootprintValueWithEdgeStrips,src/map/terrain.cpp,field_read,MovementClass::footprintZ
+,FootprintValueWithEdgeStrips,src/map/terrain.cpp,function,
 ,ForgetEmbedded,src/harness/replay_objects.cpp,call,ForgetEmbedded
 ,ForgetEmbedded,src/harness/replay_objects.cpp,call,ReplayKnown::Get
 ,ForgetEmbedded,src/harness/replay_objects.cpp,call,ReplayKnown::Set
@@ -46669,6 +46713,8 @@ address,function,file,kind,target
 ,GetSweetSpotNative,src/seams/native.cpp,function,
 ,GetTerrainLengthNative,src/seams/native.cpp,call,Mission::GetTerrainLength
 ,GetTerrainLengthNative,src/seams/native.cpp,function,
+,GetTerrainPassValue,src/map/terrain.cpp,call,FootprintValueWithEdgeStrips
+,GetTerrainPassValue,src/map/terrain.cpp,function,
 ,GetTextPixelWidth,src/gui/gui.cpp,call,GetFont
 ,GetTextPixelWidth,src/gui/gui.cpp,call,GetGafFrame
 ,GetTextPixelWidth,src/gui/gui.cpp,call,GetTextWidth
@@ -46709,6 +46755,11 @@ address,function,file,kind,target
 ,GoalClassOf,src/harness/harness.cpp,global_escape,g_packedGoalVtable
 ,GoalClassOf,src/harness/harness.cpp,global_escape,g_packedPosGoalVtable
 ,GoalClassOf,src/harness/harness.cpp,global_escape,g_patrolGoalVtable
+,GoalDistSq,src/ai/pathfind_hpa.cpp,field_read,Hdr::W
+,GoalDistSq,src/ai/pathfind_hpa.cpp,field_read,Hdr::nRaw
+,GoalDistSq,src/ai/pathfind_hpa.cpp,field_read,PathPoint::x
+,GoalDistSq,src/ai/pathfind_hpa.cpp,field_read,PathPoint::y
+,GoalDistSq,src/ai/pathfind_hpa.cpp,function,
 ,Grid::Grid,src/map/grid.h,call,operator=
 ,Grid::Grid,src/map/grid.h,field_write,Grid::cells
 ,Grid::Grid,src/map/grid.h,field_write,Grid::count
@@ -47893,10 +47944,11 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::CellsChanged
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Init
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Poll
-,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Project
+,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::RegionSize
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Shutdown
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Step
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Submit
+,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::WriteState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::DeactivateConditions
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::DeleteConditions
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::FreeConditions
@@ -48245,10 +48297,11 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingCellsChanged
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingInit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingPoll
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingProject
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingRegionSize
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingShutdown
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingStep
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingSubmit
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingWriteState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersDeactivateConditions
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersDeleteConditions
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersFreeConditions
@@ -48474,18 +48527,31 @@ address,function,file,kind,target
 ,HpaCellsChanged,src/ai/pathfind_hpa.cpp,field_read,HpaView::ver
 ,HpaCellsChanged,src/ai/pathfind_hpa.cpp,field_write,Hdr::phase
 ,HpaCellsChanged,src/ai/pathfind_hpa.cpp,function,
-,HpaInit,src/ai/pathfind_hpa.cpp,call,Align8
-,HpaInit,src/ai/pathfind_hpa.cpp,call,SimAllocTagged
-,HpaInit,src/ai/pathfind_hpa.cpp,call,SimFree
+,HpaInit,src/ai/pathfind_hpa.cpp,call,LayoutFor
 ,HpaInit,src/ai/pathfind_hpa.cpp,call,World
-,HpaInit,src/ai/pathfind_hpa.cpp,call,get
 ,HpaInit,src/ai/pathfind_hpa.cpp,call,operator=
 ,HpaInit,src/ai/pathfind_hpa.cpp,deref_write,*int
-,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Game::pathfinder
-,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Hdr::magic
-,HpaInit,src/ai/pathfind_hpa.cpp,field_read,PathMapInfo::height
-,HpaInit,src/ai/pathfind_hpa.cpp,field_read,PathMapInfo::unitSlots
-,HpaInit,src/ai/pathfind_hpa.cpp,field_read,PathMapInfo::width
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::H
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::NN
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::W
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::cs
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::nClu
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::nSlots
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offAG
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offAHeap
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offAKey
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offAPar
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offAPos
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offAStamp
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offEv
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offPath
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offPts
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offRec
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offReq
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offRoute
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::offVer
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::reqCap
+,HpaInit,src/ai/pathfind_hpa.cpp,field_read,Layout::shift
 ,HpaInit,src/ai/pathfind_hpa.cpp,field_read,PathWorldView::MoveClass
 ,HpaInit,src/ai/pathfind_hpa.cpp,field_write,Game::pathfinder
 ,HpaInit,src/ai/pathfind_hpa.cpp,field_write,Hdr::CH
@@ -48506,6 +48572,7 @@ address,function,file,kind,target
 ,HpaInit,src/ai/pathfind_hpa.cpp,field_write,Hdr::offAStamp
 ,HpaInit,src/ai/pathfind_hpa.cpp,field_write,Hdr::offEv
 ,HpaInit,src/ai/pathfind_hpa.cpp,field_write,Hdr::offPath
+,HpaInit,src/ai/pathfind_hpa.cpp,field_write,Hdr::offPts
 ,HpaInit,src/ai/pathfind_hpa.cpp,field_write,Hdr::offRec
 ,HpaInit,src/ai/pathfind_hpa.cpp,field_write,Hdr::offReq
 ,HpaInit,src/ai/pathfind_hpa.cpp,field_write,Hdr::offRoute
@@ -48518,21 +48585,24 @@ address,function,file,kind,target
 ,HpaInit,src/ai/pathfind_hpa.cpp,indirect_call,indirect via PathClass (*const)(int) __attribute__((stdcall)) [PathWorldView::MoveClass]
 ,HpaPoll,src/ai/pathfind_hpa.cpp,call,Open
 ,HpaPoll,src/ai/pathfind_hpa.cpp,call,operator=
-,HpaPoll,src/ai/pathfind_hpa.cpp,deref_read,*PathEvent
+,HpaPoll,src/ai/pathfind_hpa.cpp,deref_escape,*Ev
+,HpaPoll,src/ai/pathfind_hpa.cpp,deref_read,*PathPoint
 ,HpaPoll,src/ai/pathfind_hpa.cpp,deref_write,*PathEvent
+,HpaPoll,src/ai/pathfind_hpa.cpp,deref_write,*PathPoint
+,HpaPoll,src/ai/pathfind_hpa.cpp,field_read,Ev::e
+,HpaPoll,src/ai/pathfind_hpa.cpp,field_read,Ev::first
 ,HpaPoll,src/ai/pathfind_hpa.cpp,field_read,Hdr::evCount
 ,HpaPoll,src/ai/pathfind_hpa.cpp,field_read,Hdr::evHead
 ,HpaPoll,src/ai/pathfind_hpa.cpp,field_read,HpaView::ev
 ,HpaPoll,src/ai/pathfind_hpa.cpp,field_read,HpaView::h
+,HpaPoll,src/ai/pathfind_hpa.cpp,field_read,HpaView::pts
+,HpaPoll,src/ai/pathfind_hpa.cpp,field_read,PathEvent::count
 ,HpaPoll,src/ai/pathfind_hpa.cpp,field_write,Hdr::evHead
 ,HpaPoll,src/ai/pathfind_hpa.cpp,function,
-,HpaProject,src/ai/pathfind_hpa.cpp,field_write,PathTraceView::budgetCap
-,HpaProject,src/ai/pathfind_hpa.cpp,field_write,PathTraceView::record
-,HpaProject,src/ai/pathfind_hpa.cpp,field_write,PathTraceView::refreshCounter
-,HpaProject,src/ai/pathfind_hpa.cpp,field_write,PathTraceView::tickLoad
-,HpaProject,src/ai/pathfind_hpa.cpp,function,
+,HpaRegionSize,src/ai/pathfind_hpa.cpp,call,LayoutFor
+,HpaRegionSize,src/ai/pathfind_hpa.cpp,field_read,Layout::size
+,HpaRegionSize,src/ai/pathfind_hpa.cpp,function,
 ,HpaShutdown,src/ai/pathfind_hpa.cpp,call,Open
-,HpaShutdown,src/ai/pathfind_hpa.cpp,call,SimFree
 ,HpaShutdown,src/ai/pathfind_hpa.cpp,call,get
 ,HpaShutdown,src/ai/pathfind_hpa.cpp,call,operator=
 ,HpaShutdown,src/ai/pathfind_hpa.cpp,field_read,Game::pathfinder
@@ -48560,6 +48630,7 @@ address,function,file,kind,target
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_write,Hdr::evCount
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_write,Hdr::evHead
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_write,Hdr::lastTick
+,HpaStep,src/ai/pathfind_hpa.cpp,field_write,Hdr::nPts
 ,HpaStep,src/ai/pathfind_hpa.cpp,field_write,Req::used
 ,HpaStep,src/ai/pathfind_hpa.cpp,function,
 ,HpaStep,src/ai/pathfind_hpa.cpp,indirect_call,indirect via unsigned int (*const)() __attribute__((stdcall)) [PathWorldView::Tick]
@@ -48579,6 +48650,47 @@ address,function,file,kind,target
 ,HpaSubmit,src/ai/pathfind_hpa.cpp,field_write,Req::seq
 ,HpaSubmit,src/ai/pathfind_hpa.cpp,field_write,Req::used
 ,HpaSubmit,src/ai/pathfind_hpa.cpp,function,
+,HpaWriteState,src/ai/pathfind_hpa.cpp,call,Open
+,HpaWriteState,src/ai/pathfind_hpa.cpp,call,TriIndex
+,HpaWriteState,src/ai/pathfind_hpa.cpp,call,WriteRequest
+,HpaWriteState,src/ai/pathfind_hpa.cpp,call,WriteSearch
+,HpaWriteState,src/ai/pathfind_hpa.cpp,deref_escape,*ClusterRec
+,HpaWriteState,src/ai/pathfind_hpa.cpp,deref_read,*int
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_escape,ClusterRec::cell
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_escape,ClusterRec::side
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_escape,Hdr::slotOf
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,ClusterRec::cost
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,ClusterRec::count
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,ClusterRec::version
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::H
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::W
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::active
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::classes
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::cs
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::debt
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::lastTick
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::nClu
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::nSlots
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::reqCap
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::searchId
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::seqCounter
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Hdr::slotsUsed
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,HpaView::h
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,HpaView::rec
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,HpaView::req
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,HpaView::ver
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Req::r
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Req::seq
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,Req::used
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,StateWriter::Begin
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,StateWriter::Bytes
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,StateWriter::Handle
+,HpaWriteState,src/ai/pathfind_hpa.cpp,field_read,StateWriter::Int
+,HpaWriteState,src/ai/pathfind_hpa.cpp,function,
+,HpaWriteState,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
+,HpaWriteState,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
+,HpaWriteState,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
+,HpaWriteState,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(int, const char *) __attribute__((stdcall)) [StateWriter::Begin]"
 ,IdAt,src/units/unit_save.cpp,function,
 ,Identity,src/graphics/particles.cpp,function,
 ,ImageHelpEnabled,src/host/win32/crash.cpp,call,HasCommandLineSwitch
@@ -49096,10 +49208,11 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::CellsChanged
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Init
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Poll
-,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Project
+,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::RegionSize
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Shutdown
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Step
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Submit
+,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::WriteState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PlayersSeam::DeactivateConditions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PlayersSeam::DeleteConditions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PlayersSeam::FreeConditions
@@ -49495,10 +49608,11 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingCellsChanged
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingInit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingPoll
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingProject
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingRegionSize
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingShutdown
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingStep
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingSubmit
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingWriteState
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PickRandomReclaimableResourcesInRadius
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PlaceFeature
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PlaceMissionFeatures
@@ -50053,6 +50167,7 @@ address,function,file,kind,target
 ,LInit,src/ai/pathfind_hpa.cpp,field_write,Local::ox
 ,LInit,src/ai/pathfind_hpa.cpp,field_write,Local::oy
 ,LInit,src/ai/pathfind_hpa.cpp,field_write,Local::st
+,LInit,src/ai/pathfind_hpa.cpp,field_write,Local::terrain
 ,LInit,src/ai/pathfind_hpa.cpp,field_write,Local::tx
 ,LInit,src/ai/pathfind_hpa.cpp,field_write,Local::ty
 ,LInit,src/ai/pathfind_hpa.cpp,field_write,Local::w
@@ -50095,6 +50210,7 @@ address,function,file,kind,target
 ,LStep,src/ai/pathfind_hpa.cpp,field_read,Local::ox
 ,LStep,src/ai/pathfind_hpa.cpp,field_read,Local::oy
 ,LStep,src/ai/pathfind_hpa.cpp,field_read,Local::st
+,LStep,src/ai/pathfind_hpa.cpp,field_read,Local::terrain
 ,LStep,src/ai/pathfind_hpa.cpp,field_read,Local::tx
 ,LStep,src/ai/pathfind_hpa.cpp,field_read,Local::ty
 ,LStep,src/ai/pathfind_hpa.cpp,field_read,Local::w
@@ -50129,6 +50245,68 @@ address,function,file,kind,target
 ,Land,src/orders/vtol_orders.cpp,global_read,g_seams
 ,Land,src/orders/vtol_orders.cpp,global_read,kSim
 ,Land,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
+,LayoutFor,src/ai/pathfind.cpp,field_read,PathMapInfo::height
+,LayoutFor,src/ai/pathfind.cpp,field_read,PathMapInfo::unitSlots
+,LayoutFor,src/ai/pathfind.cpp,field_read,PathMapInfo::width
+,LayoutFor,src/ai/pathfind.cpp,field_read,RegionLayout::buckets
+,LayoutFor,src/ai/pathfind.cpp,field_read,RegionLayout::cells
+,LayoutFor,src/ai/pathfind.cpp,field_read,RegionLayout::dirtyBytes
+,LayoutFor,src/ai/pathfind.cpp,field_read,RegionLayout::eventCapacity
+,LayoutFor,src/ai/pathfind.cpp,field_read,RegionLayout::nodeLimit
+,LayoutFor,src/ai/pathfind.cpp,field_read,RegionLayout::pendingCapacity
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::buckets
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::cells
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::cellsOffset
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::dirtyBytes
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::dirtyOffset
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::eventCapacity
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::eventsOffset
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::goalCapacity
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::itemsOffset
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::nodeLimit
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::pendingCapacity
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::pendingOffset
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::poolOffset
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::requesterBuckets
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::size
+,LayoutFor,src/ai/pathfind.cpp,field_write,RegionLayout::unitBuckets
+,LayoutFor,src/ai/pathfind.cpp,function,
+,LayoutFor,src/ai/pathfind_hpa.cpp,call,Align8
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,Layout::H
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,Layout::NN
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,Layout::W
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,Layout::cs
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,Layout::nClu
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,Layout::nSlots
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,Layout::reqCap
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,Layout::shift
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,PathMapInfo::height
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,PathMapInfo::moveClassCount
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,PathMapInfo::unitSlots
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_read,PathMapInfo::width
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::H
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::NN
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::W
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::cs
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::nClu
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::nSlots
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offAG
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offAHeap
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offAKey
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offAPar
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offAPos
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offAStamp
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offEv
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offPath
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offPts
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offRec
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offReq
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offRoute
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::offVer
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::reqCap
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::shift
+,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::size
+,LayoutFor,src/ai/pathfind_hpa.cpp,function,
 ,Length,src/weapons/weapons.cpp,call,bx_sqrt
 ,Length,src/weapons/weapons.cpp,field_read,Vec3::x
 ,Length,src/weapons/weapons.cpp,field_read,Vec3::y
@@ -50890,14 +51068,17 @@ address,function,file,kind,target
 ,NewConditionsNative,src/seams/native.cpp,call,operator new
 ,NewConditionsNative,src/seams/native.cpp,function,
 ,NewConditionsNative,src/seams/native.cpp,global_read,kSim
-,NewEvent,src/ai/pathfind_hpa.cpp,deref_escape,*PathEvent
+,NewEvent,src/ai/pathfind_hpa.cpp,deref_escape,*Ev
+,NewEvent,src/ai/pathfind_hpa.cpp,field_escape,Ev::e
 ,NewEvent,src/ai/pathfind_hpa.cpp,field_read,Hdr::evCount
 ,NewEvent,src/ai/pathfind_hpa.cpp,field_read,Hdr::lastTick
+,NewEvent,src/ai/pathfind_hpa.cpp,field_read,Hdr::nPts
 ,NewEvent,src/ai/pathfind_hpa.cpp,field_read,HpaView::ev
 ,NewEvent,src/ai/pathfind_hpa.cpp,field_read,HpaView::h
 ,NewEvent,src/ai/pathfind_hpa.cpp,field_read,PathRequest::requester
 ,NewEvent,src/ai/pathfind_hpa.cpp,field_read,PathRequest::target
 ,NewEvent,src/ai/pathfind_hpa.cpp,field_read,PathRequest::unit
+,NewEvent,src/ai/pathfind_hpa.cpp,field_write,Ev::first
 ,NewEvent,src/ai/pathfind_hpa.cpp,field_write,Hdr::evCount
 ,NewEvent,src/ai/pathfind_hpa.cpp,field_write,PathEvent::count
 ,NewEvent,src/ai/pathfind_hpa.cpp,field_write,PathEvent::kind
@@ -50970,6 +51151,13 @@ address,function,file,kind,target
 ,NodeData::NodeData,src/ai/pathfinder.h,field_write,Point16::x
 ,NodeData::NodeData,src/ai/pathfinder.h,field_write,Point16::y
 ,NodeData::NodeData,src/ai/pathfinder.h,function,
+,NodeIsLive,src/ai/pathfind.cpp,call,operator Node *
+,NodeIsLive,src/ai/pathfind.cpp,call,operator Ref<Node> *
+,NodeIsLive,src/ai/pathfind.cpp,field_read,Node::index
+,NodeIsLive,src/ai/pathfind.cpp,field_read,OpenHeap::items
+,NodeIsLive,src/ai/pathfind.cpp,field_read,OpenHeap::pool
+,NodeIsLive,src/ai/pathfind.cpp,field_read,Ref<Node>::offset
+,NodeIsLive,src/ai/pathfind.cpp,function,
 ,NormaliseCell,src/harness/harness.cpp,deref_read,*unsigned char
 ,NormaliseCell,src/harness/harness.cpp,deref_write,*unsigned char
 ,NormaliseCell,src/harness/harness.cpp,function,
@@ -51148,6 +51336,7 @@ address,function,file,kind,target
 ,Open,src/ai/pathfind_hpa.cpp,field_read,Hdr::offAStamp
 ,Open,src/ai/pathfind_hpa.cpp,field_read,Hdr::offEv
 ,Open,src/ai/pathfind_hpa.cpp,field_read,Hdr::offPath
+,Open,src/ai/pathfind_hpa.cpp,field_read,Hdr::offPts
 ,Open,src/ai/pathfind_hpa.cpp,field_read,Hdr::offRec
 ,Open,src/ai/pathfind_hpa.cpp,field_read,Hdr::offReq
 ,Open,src/ai/pathfind_hpa.cpp,field_read,Hdr::offRoute
@@ -51161,6 +51350,7 @@ address,function,file,kind,target
 ,Open,src/ai/pathfind_hpa.cpp,field_write,HpaView::ev
 ,Open,src/ai/pathfind_hpa.cpp,field_write,HpaView::h
 ,Open,src/ai/pathfind_hpa.cpp,field_write,HpaView::path
+,Open,src/ai/pathfind_hpa.cpp,field_write,HpaView::pts
 ,Open,src/ai/pathfind_hpa.cpp,field_write,HpaView::rec
 ,Open,src/ai/pathfind_hpa.cpp,field_write,HpaView::req
 ,Open,src/ai/pathfind_hpa.cpp,field_write,HpaView::route
@@ -51329,6 +51519,9 @@ address,function,file,kind,target
 ,OvrFile::OvrFile,src/units/unit_types.cpp,function,
 ,OvrFile::~OvrFile,src/units/unit_types.cpp,call,HapiBank::CloseBank
 ,OvrFile::~OvrFile,src/units/unit_types.cpp,function,
+,OwnNodeIndex,src/ai/pathfind.cpp,field_read,OpenHeap::used
+,OwnNodeIndex,src/ai/pathfind.cpp,field_read,Ref<Node>::offset
+,OwnNodeIndex,src/ai/pathfind.cpp,function,
 ,OwnedString::~OwnedString,src/map/los_tables.cpp,call,StringRef::ReleaseRef
 ,OwnedString::~OwnedString,src/map/los_tables.cpp,function,
 ,PacketManager::~PacketManager,src/state/sim_globals.cpp,function,
@@ -51486,10 +51679,11 @@ address,function,file,kind,target
 ,PathGoalCells,src/util/path_goal.cpp,field_read,PathPoint::x
 ,PathGoalCells,src/util/path_goal.cpp,field_read,PathPoint::y
 ,PathGoalCells,src/util/path_goal.cpp,function,
+,PathGoalContains,src/util/path_goal.cpp,call,CellsSquared
 ,PathGoalContains,src/util/path_goal.cpp,field_read,PathGoalArea::bottom
 ,PathGoalContains,src/util/path_goal.cpp,field_read,PathGoalArea::kind
 ,PathGoalContains,src/util/path_goal.cpp,field_read,PathGoalArea::left
-,PathGoalContains,src/util/path_goal.cpp,field_read,PathGoalArea::radiusSq
+,PathGoalContains,src/util/path_goal.cpp,field_read,PathGoalArea::radius
 ,PathGoalContains,src/util/path_goal.cpp,field_read,PathGoalArea::right
 ,PathGoalContains,src/util/path_goal.cpp,field_read,PathGoalArea::top
 ,PathGoalContains,src/util/path_goal.cpp,field_read,PathPoint::x
@@ -51561,6 +51755,7 @@ address,function,file,kind,target
 ,PathOrderAttach::~PathOrderAttach,src/units/unit_targets.cpp,field_write,PathOrderAttach::owner
 ,PathOrderAttach::~PathOrderAttach,src/units/unit_targets.cpp,function,
 ,Pathfinder::AddEvent,src/ai/pathfind.cpp,call,Pathfinder::Extra
+,Pathfinder::AddEvent,src/ai/pathfind.cpp,field_escape,PathEventRecord::event
 ,Pathfinder::AddEvent,src/ai/pathfind.cpp,field_read,PathExtra::eventCapacity
 ,Pathfinder::AddEvent,src/ai/pathfind.cpp,field_read,PathExtra::eventCount
 ,Pathfinder::AddEvent,src/ai/pathfind.cpp,field_read,PathExtra::eventsOffset
@@ -51585,8 +51780,8 @@ address,function,file,kind,target
 ,Pathfinder::Cancel,src/ai/pathfind.cpp,call,Pathfinder::FindPending
 ,Pathfinder::Cancel,src/ai/pathfind.cpp,call,Pathfinder::RemovePending
 ,Pathfinder::Cancel,src/ai/pathfind.cpp,call,operator=
-,Pathfinder::Cancel,src/ai/pathfind.cpp,deref_read,*PathEvent
-,Pathfinder::Cancel,src/ai/pathfind.cpp,deref_write,*PathEvent
+,Pathfinder::Cancel,src/ai/pathfind.cpp,deref_read,*PathEventRecord
+,Pathfinder::Cancel,src/ai/pathfind.cpp,deref_write,*PathEventRecord
 ,Pathfinder::Cancel,src/ai/pathfind.cpp,field_read,PathEvent::requester
 ,Pathfinder::Cancel,src/ai/pathfind.cpp,field_read,PathExtra::eventCount
 ,Pathfinder::Cancel,src/ai/pathfind.cpp,field_read,PathExtra::eventNext
@@ -51642,8 +51837,11 @@ address,function,file,kind,target
 ,Pathfinder::Passable,src/ai/pathfinder.h,function,
 ,Pathfinder::Poll,src/ai/pathfind.cpp,call,Pathfinder::Extra
 ,Pathfinder::Poll,src/ai/pathfind.cpp,call,operator=
-,Pathfinder::Poll,src/ai/pathfind.cpp,deref_read,*PathEvent
 ,Pathfinder::Poll,src/ai/pathfind.cpp,deref_write,*PathEvent
+,Pathfinder::Poll,src/ai/pathfind.cpp,deref_write,*PathPoint
+,Pathfinder::Poll,src/ai/pathfind.cpp,field_read,PathEvent::count
+,Pathfinder::Poll,src/ai/pathfind.cpp,field_read,PathEventRecord::event
+,Pathfinder::Poll,src/ai/pathfind.cpp,field_read,PathEventRecord::points
 ,Pathfinder::Poll,src/ai/pathfind.cpp,field_read,PathExtra::eventCount
 ,Pathfinder::Poll,src/ai/pathfind.cpp,field_read,PathExtra::eventNext
 ,Pathfinder::Poll,src/ai/pathfind.cpp,field_read,PathExtra::eventsOffset
@@ -51764,12 +51962,22 @@ address,function,file,kind,target
 ,PathfindingDebugCell,src/ai/pathfind.cpp,function,
 ,PathfindingHpaSeam,src/ai/pathfind_hpa.cpp,function,
 ,PathfindingHpaSeam,src/ai/pathfind_hpa.cpp,global_escape,s_hpa
-,PathfindingInit,src/ai/pathfind.cpp,call,SimAllocTagged
+,PathfindingInit,src/ai/pathfind.cpp,call,LayoutFor
 ,PathfindingInit,src/ai/pathfind.cpp,call,operator new
 ,PathfindingInit,src/ai/pathfind.cpp,call,operator=
-,PathfindingInit,src/ai/pathfind.cpp,field_read,PathMapInfo::height
-,PathfindingInit,src/ai/pathfind.cpp,field_read,PathMapInfo::unitSlots
-,PathfindingInit,src/ai/pathfind.cpp,field_read,PathMapInfo::width
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::buckets
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::cellsOffset
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::dirtyOffset
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::eventCapacity
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::eventsOffset
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::goalCapacity
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::itemsOffset
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::nodeLimit
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::pendingCapacity
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::pendingOffset
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::poolOffset
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::requesterBuckets
+,PathfindingInit,src/ai/pathfind.cpp,field_read,RegionLayout::unitBuckets
 ,PathfindingInit,src/ai/pathfind.cpp,field_write,Game::pathfinder
 ,PathfindingInit,src/ai/pathfind.cpp,field_write,PathExtra::bucketMask
 ,PathfindingInit,src/ai/pathfind.cpp,field_write,PathExtra::cellsOffset
@@ -51791,23 +51999,15 @@ address,function,file,kind,target
 ,PathfindingPoll,src/ai/pathfind.cpp,call,GetPathfinder
 ,PathfindingPoll,src/ai/pathfind.cpp,call,Pathfinder::Poll
 ,PathfindingPoll,src/ai/pathfind.cpp,function,
-,PathfindingProject,src/ai/pathfind.cpp,call,GetPathfinder
-,PathfindingProject,src/ai/pathfind.cpp,call,Pathfinder::Extra
-,PathfindingProject,src/ai/pathfind.cpp,field_escape,PathExtra::budgetCap
-,PathfindingProject,src/ai/pathfind.cpp,field_escape,PathExtra::refreshCounter
-,PathfindingProject,src/ai/pathfind.cpp,field_escape,PathExtra::tickLoad
-,PathfindingProject,src/ai/pathfind.cpp,field_write,PathTraceView::budgetCap
-,PathfindingProject,src/ai/pathfind.cpp,field_write,PathTraceView::record
-,PathfindingProject,src/ai/pathfind.cpp,field_write,PathTraceView::refreshCounter
-,PathfindingProject,src/ai/pathfind.cpp,field_write,PathTraceView::tickLoad
-,PathfindingProject,src/ai/pathfind.cpp,function,
+,PathfindingRegionSize,src/ai/pathfind.cpp,call,LayoutFor
+,PathfindingRegionSize,src/ai/pathfind.cpp,field_read,RegionLayout::size
+,PathfindingRegionSize,src/ai/pathfind.cpp,function,
 ,PathfindingSetBaseScale,src/ai/pathfind.cpp,call,GetPathfinder
 ,PathfindingSetBaseScale,src/ai/pathfind.cpp,field_write,Pathfinder::baseScale
 ,PathfindingSetBaseScale,src/ai/pathfind.cpp,function,
 ,PathfindingSetStepsPerTick,src/ai/pathfind.cpp,call,GetPathfinder
 ,PathfindingSetStepsPerTick,src/ai/pathfind.cpp,field_write,Pathfinder::stepsPerTick
 ,PathfindingSetStepsPerTick,src/ai/pathfind.cpp,function,
-,PathfindingShutdown,src/ai/pathfind.cpp,call,SimFree
 ,PathfindingShutdown,src/ai/pathfind.cpp,call,get
 ,PathfindingShutdown,src/ai/pathfind.cpp,call,operator=
 ,PathfindingShutdown,src/ai/pathfind.cpp,field_read,Game::pathfinder
@@ -51820,6 +52020,54 @@ address,function,file,kind,target
 ,PathfindingSubmit,src/ai/pathfind.cpp,call,GetPathfinder
 ,PathfindingSubmit,src/ai/pathfind.cpp,call,Pathfinder::Submit
 ,PathfindingSubmit,src/ai/pathfind.cpp,function,
+,PathfindingWriteState,src/ai/pathfind.cpp,call,GetPathfinder
+,PathfindingWriteState,src/ai/pathfind.cpp,call,Pathfinder::Extra
+,PathfindingWriteState,src/ai/pathfind.cpp,call,WriteCells
+,PathfindingWriteState,src/ai/pathfind.cpp,call,WriteNodes
+,PathfindingWriteState,src/ai/pathfind.cpp,field_escape,PathExtra::budgetCap
+,PathfindingWriteState,src/ai/pathfind.cpp,field_escape,PathExtra::tickLoad
+,PathfindingWriteState,src/ai/pathfind.cpp,field_escape,Pathfinder::budget
+,PathfindingWriteState,src/ai/pathfind.cpp,field_escape,Pathfinder::stepCost
+,PathfindingWriteState,src/ai/pathfind.cpp,field_escape,Pathfinder::turnCost
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,OpenHeap::count
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,OpenHeap::freeHead
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,OpenHeap::topPopped
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,OpenHeap::used
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,PathExtra::refreshCounter
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,PathGrid::count
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,PathGrid::height
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,PathGrid::width
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::baseScale
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::costScale
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::cursor
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::goalX
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::goalY
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::object
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::owner
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::path
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::player
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::probe
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::range
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::steps
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::stepsPerTick
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Pathfinder::target
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Point16::x
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Point16::y
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Ref<Node>::offset
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Ref<PathCell>::offset
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Ref<Ref<Node>>::offset
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,Ref<unsigned int>::offset
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,StateWriter::Begin
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,StateWriter::Bytes
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,StateWriter::Handle
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,StateWriter::Int
+,PathfindingWriteState,src/ai/pathfind.cpp,field_read,StateWriter::Run
+,PathfindingWriteState,src/ai/pathfind.cpp,function,
+,PathfindingWriteState,src/ai/pathfind.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
+,PathfindingWriteState,src/ai/pathfind.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
+,PathfindingWriteState,src/ai/pathfind.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
+,PathfindingWriteState,src/ai/pathfind.cpp,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [StateWriter::Run]
+,PathfindingWriteState,src/ai/pathfind.cpp,indirect_call,"indirect via void (*const)(int, const char *) __attribute__((stdcall)) [StateWriter::Begin]"
 ,Patrol,src/orders/vtol_orders.cpp,call,AddVec3
 ,Patrol,src/orders/vtol_orders.cpp,call,AppendOrder
 ,Patrol,src/orders/vtol_orders.cpp,call,FindPads
@@ -52165,8 +52413,8 @@ address,function,file,kind,target
 ,PumpNetPackets,src/network/net_game.cpp,global_maybe_written,g_packetManager
 ,PumpNetPackets,src/network/net_game.cpp,global_read,g_usePacketManager
 ,PurgeEvents,src/ai/pathfind_hpa.cpp,call,operator=
-,PurgeEvents,src/ai/pathfind_hpa.cpp,deref_read,*PathEvent
-,PurgeEvents,src/ai/pathfind_hpa.cpp,deref_write,*PathEvent
+,PurgeEvents,src/ai/pathfind_hpa.cpp,deref_read,*Ev
+,PurgeEvents,src/ai/pathfind_hpa.cpp,deref_write,*Ev
 ,PurgeEvents,src/ai/pathfind_hpa.cpp,field_read,Hdr::evCount
 ,PurgeEvents,src/ai/pathfind_hpa.cpp,field_read,Hdr::evHead
 ,PurgeEvents,src/ai/pathfind_hpa.cpp,field_read,HpaView::ev
@@ -54338,7 +54586,7 @@ address,function,file,kind,target
 ,RecOrdersApplyPathEvent,src/harness/replay_hooks.inc,function,
 ,RecOrdersApplyPathEvent,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersApplyPathEvent,src/harness/replay_hooks.inc,global_read,s_inner_orders
-,RecOrdersApplyPathEvent,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const PathEvent *) __attribute__((stdcall)) [OrdersSeam::ApplyPathEvent]
+,RecOrdersApplyPathEvent,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(const PathEvent *, const PathPoint *) __attribute__((stdcall)) [OrdersSeam::ApplyPathEvent]"
 ,RecOrdersClearOrderTypeTable,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersClearOrderTypeTable,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecOrdersClearOrderTypeTable,src/harness/replay_hooks.inc,field_read,OrdersSeam::ClearOrderTypeTable
@@ -54563,15 +54811,16 @@ address,function,file,kind,target
 ,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,function,
 ,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
-,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, int, int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
+,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 ,RecPathfindingInit,src/harness/replay_hooks.inc,call,ArgPending
+,RecPathfindingInit,src/harness/replay_hooks.inc,call,ArgValue
 ,RecPathfindingInit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingInit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecPathfindingInit,src/harness/replay_hooks.inc,field_read,PathfindingSeam::Init
 ,RecPathfindingInit,src/harness/replay_hooks.inc,function,
 ,RecPathfindingInit,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPathfindingInit,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
-,RecPathfindingInit,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const PathMapInfo *) __attribute__((stdcall)) [PathfindingSeam::Init]
+,RecPathfindingInit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(const PathMapInfo *, void *, unsigned int) __attribute__((stdcall)) [PathfindingSeam::Init]"
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,call,ArgPending
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,call,ArgValue
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -54581,21 +54830,23 @@ address,function,file,kind,target
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,global_read,s_tail
-,RecPathfindingPoll,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(PathEvent *) __attribute__((stdcall)) [PathfindingSeam::Poll]
-,RecPathfindingProject,src/harness/replay_hooks.inc,call,ArgPending
-,RecPathfindingProject,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecPathfindingProject,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecPathfindingProject,src/harness/replay_hooks.inc,field_read,PathfindingSeam::Project
-,RecPathfindingProject,src/harness/replay_hooks.inc,function,
-,RecPathfindingProject,src/harness/replay_hooks.inc,global_read,s_call
-,RecPathfindingProject,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
-,RecPathfindingProject,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(PathTraceView *) __attribute__((stdcall)) [PathfindingSeam::Project]
+,RecPathfindingPoll,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(PathEvent *, PathPoint *, int) __attribute__((stdcall)) [PathfindingSeam::Poll]"
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,call,ArgPending
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,field_read,PathfindingSeam::RegionSize
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,function,
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,indirect_call,indirect via unsigned int (*const)(const PathMapInfo *) __attribute__((stdcall)) [PathfindingSeam::RegionSize]
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,field_read,PathfindingSeam::Shutdown
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,function,
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
-,RecPathfindingShutdown,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [PathfindingSeam::Shutdown]
+,RecPathfindingShutdown,src/harness/replay_hooks.inc,indirect_call,indirect via void *(*const)() __attribute__((stdcall)) [PathfindingSeam::Shutdown]
 ,RecPathfindingStep,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingStep,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecPathfindingStep,src/harness/replay_hooks.inc,field_read,PathfindingSeam::Step
@@ -54610,6 +54861,14 @@ address,function,file,kind,target
 ,RecPathfindingSubmit,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPathfindingSubmit,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
 ,RecPathfindingSubmit,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const PathRequest *) __attribute__((stdcall)) [PathfindingSeam::Submit]
+,RecPathfindingWriteState,src/harness/replay_hooks.inc,call,ArgPending
+,RecPathfindingWriteState,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathfindingWriteState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathfindingWriteState,src/harness/replay_hooks.inc,field_read,PathfindingSeam::WriteState
+,RecPathfindingWriteState,src/harness/replay_hooks.inc,function,
+,RecPathfindingWriteState,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathfindingWriteState,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
+,RecPathfindingWriteState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const StateWriter *) __attribute__((stdcall)) [PathfindingSeam::WriteState]
 ,RecPlayersDeactivateConditions,src/harness/replay_hooks.inc,call,ArgPending
 ,RecPlayersDeactivateConditions,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPlayersDeactivateConditions,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -56074,6 +56333,8 @@ address,function,file,kind,target
 ,Relax,src/ai/pathfind_hpa.cpp,deref_read,*int
 ,Relax,src/ai/pathfind_hpa.cpp,deref_write,*int
 ,Relax,src/ai/pathfind_hpa.cpp,field_maybe_written,Hdr::aHeapN
+,Relax,src/ai/pathfind_hpa.cpp,field_read,Hdr::banned
+,Relax,src/ai/pathfind_hpa.cpp,field_read,Hdr::nBanned
 ,Relax,src/ai/pathfind_hpa.cpp,field_read,HpaView::ag
 ,Relax,src/ai/pathfind_hpa.cpp,field_read,HpaView::aheap
 ,Relax,src/ai/pathfind_hpa.cpp,field_read,HpaView::akey
@@ -57360,6 +57621,9 @@ address,function,file,kind,target
 ,ResetSearchState,src/ai/pathfind_hpa.cpp,field_write,Hdr::nPath
 ,ResetSearchState,src/ai/pathfind_hpa.cpp,field_write,Hdr::nRoute
 ,ResetSearchState,src/ai/pathfind_hpa.cpp,field_write,Hdr::nWp
+,ResetSearchState,src/ai/pathfind_hpa.cpp,field_write,Hdr::nearDist
+,ResetSearchState,src/ai/pathfind_hpa.cpp,field_write,Hdr::nearNode
+,ResetSearchState,src/ai/pathfind_hpa.cpp,field_write,Hdr::nearest
 ,ResetSearchState,src/ai/pathfind_hpa.cpp,field_write,Hdr::pullInit
 ,ResetSearchState,src/ai/pathfind_hpa.cpp,field_write,Hdr::segIdx
 ,ResetSearchState,src/ai/pathfind_hpa.cpp,field_write,Hdr::truncated
@@ -57370,13 +57634,8 @@ address,function,file,kind,target
 ,Resolve,src/harness/harness.cpp,call,GameU32
 ,Resolve,src/harness/harness.cpp,call,MapFind
 ,Resolve,src/harness/harness.cpp,call,MoveClasses
-,Resolve,src/harness/harness.cpp,call,RefAbs
-,Resolve,src/harness/harness.cpp,deref_read,*unsigned int
 ,Resolve,src/harness/harness.cpp,deref_read,*unsigned short
 ,Resolve,src/harness/harness.cpp,deref_write,*unsigned int
-,Resolve,src/harness/harness.cpp,field_read,PathTraceView::record
-,Resolve,src/harness/harness.cpp,field_read,PathfindingSeam::Project
-,Resolve,src/harness/harness.cpp,field_read,Seams::pathfinding
 ,Resolve,src/harness/harness.cpp,function,
 ,Resolve,src/harness/harness.cpp,global_escape,s_fxIds@src/harness/harness.cpp
 ,Resolve,src/harness/harness.cpp,global_escape,s_fxKeys@src/harness/harness.cpp
@@ -57384,8 +57643,6 @@ address,function,file,kind,target
 ,Resolve,src/harness/harness.cpp,global_escape,s_linkKeys@src/harness/harness.cpp
 ,Resolve,src/harness/harness.cpp,global_escape,s_orderIds@src/harness/harness.cpp
 ,Resolve,src/harness/harness.cpp,global_escape,s_orderKeys@src/harness/harness.cpp
-,Resolve,src/harness/harness.cpp,global_read,g_seams
-,Resolve,src/harness/harness.cpp,indirect_call,indirect via void (*)(PathTraceView *) __attribute__((stdcall)) [PathfindingSeam::Project]
 ,ResolveQuirks,src/harness/harness.cpp,call,Fail
 ,ResolveQuirks,src/harness/harness.cpp,call,QuirksHash
 ,ResolveQuirks,src/harness/harness.cpp,call,QuirksNormalise
@@ -57478,12 +57735,9 @@ address,function,file,kind,target
 ,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_read,Point16::x
 ,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_read,Point16::y
 ,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_read,RingApproach::inner
-,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_read,RingApproach::innerSq
 ,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_read,RingApproach::outer
-,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_read,RingApproach::outerSq
 ,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_write,PathGoalArea::kind
 ,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_write,PathGoalArea::radius
-,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_write,PathGoalArea::radiusSq
 ,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_write,PathPoint::x
 ,RingApproach::GetGoalArea,src/orders/order_targets.cpp,field_write,PathPoint::y
 ,RingApproach::GetGoalArea,src/orders/order_targets.cpp,function,
@@ -57510,10 +57764,11 @@ address,function,file,kind,target
 ,RunAbstract,src/ai/pathfind_hpa.cpp,call,ClusterOf
 ,RunAbstract,src/ai/pathfind_hpa.cpp,call,Ensure
 ,RunAbstract,src/ai/pathfind_hpa.cpp,call,FinishSearch
+,RunAbstract,src/ai/pathfind_hpa.cpp,call,GoalDistSq
 ,RunAbstract,src/ai/pathfind_hpa.cpp,call,HeapPop
 ,RunAbstract,src/ai/pathfind_hpa.cpp,call,HeapPush
 ,RunAbstract,src/ai/pathfind_hpa.cpp,call,HeuristicOf
-,RunAbstract,src/ai/pathfind_hpa.cpp,call,Invalidate
+,RunAbstract,src/ai/pathfind_hpa.cpp,call,NodeCell
 ,RunAbstract,src/ai/pathfind_hpa.cpp,call,NodeCost
 ,RunAbstract,src/ai/pathfind_hpa.cpp,call,Relax
 ,RunAbstract,src/ai/pathfind_hpa.cpp,call,Settle
@@ -57533,10 +57788,10 @@ address,function,file,kind,target
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::aHeapN
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::aInit
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::directCost
-,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::goalClusters
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::nClu
-,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::nGoalClusters
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::nGoalNodes
+,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::nearDist
+,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::nearNode
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::searchId
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::slot
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_read,Hdr::startCluster
@@ -57555,6 +57810,9 @@ address,function,file,kind,target
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_write,Hdr::aInit
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_write,Hdr::localReady
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_write,Hdr::nPath
+,RunAbstract,src/ai/pathfind_hpa.cpp,field_write,Hdr::nearDist
+,RunAbstract,src/ai/pathfind_hpa.cpp,field_write,Hdr::nearNode
+,RunAbstract,src/ai/pathfind_hpa.cpp,field_write,Hdr::nearest
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_write,Hdr::phase
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_write,Hdr::searchId
 ,RunAbstract,src/ai/pathfind_hpa.cpp,field_write,Hdr::segIdx
@@ -57642,6 +57900,7 @@ address,function,file,kind,target
 ,RunPull,src/ai/pathfind_hpa.cpp,field_read,Hdr::W
 ,RunPull,src/ai/pathfind_hpa.cpp,field_read,Hdr::nPath
 ,RunPull,src/ai/pathfind_hpa.cpp,field_read,Hdr::nWp
+,RunPull,src/ai/pathfind_hpa.cpp,field_read,Hdr::nearest
 ,RunPull,src/ai/pathfind_hpa.cpp,field_read,Hdr::pullAnchor
 ,RunPull,src/ai/pathfind_hpa.cpp,field_read,Hdr::pullInit
 ,RunPull,src/ai/pathfind_hpa.cpp,field_read,Hdr::pullK
@@ -57661,33 +57920,41 @@ address,function,file,kind,target
 ,RunRefine,src/ai/pathfind_hpa.cpp,call,ClassOfActive
 ,RunRefine,src/ai/pathfind_hpa.cpp,call,ClusterOf
 ,RunRefine,src/ai/pathfind_hpa.cpp,call,FinishSearch
-,RunRefine,src/ai/pathfind_hpa.cpp,call,Invalidate
 ,RunRefine,src/ai/pathfind_hpa.cpp,call,LInit
 ,RunRefine,src/ai/pathfind_hpa.cpp,call,LPush
 ,RunRefine,src/ai/pathfind_hpa.cpp,call,LStep
 ,RunRefine,src/ai/pathfind_hpa.cpp,call,NodeCell
-,RunRefine,src/ai/pathfind_hpa.cpp,call,ResetSearchState
 ,RunRefine,src/ai/pathfind_hpa.cpp,deref_read,*int
 ,RunRefine,src/ai/pathfind_hpa.cpp,deref_write,*int
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_escape,Hdr::scratch
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_read,Hdr::W
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_read,Hdr::localReady
+,RunRefine,src/ai/pathfind_hpa.cpp,field_read,Hdr::nBanned
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_read,Hdr::nPath
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_read,Hdr::nRoute
-,RunRefine,src/ai/pathfind_hpa.cpp,field_read,Hdr::retried
+,RunRefine,src/ai/pathfind_hpa.cpp,field_read,Hdr::nearest
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_read,Hdr::segIdx
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_read,Hdr::truncated
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_read,HpaView::h
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_read,HpaView::path
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_read,HpaView::route
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_read,PathRequest::goal
+,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::aHeapN
+,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::aInit
+,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::banned
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::localReady
+,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::nBanned
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::nPath
+,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::nRoute
+,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::nWp
+,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::nearDist
+,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::nearNode
+,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::nearest
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::phase
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::pullInit
-,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::retried
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::segIdx
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::truncated
+,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Hdr::wpOverflow
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Local::tx
 ,RunRefine,src/ai/pathfind_hpa.cpp,field_write,Local::ty
 ,RunRefine,src/ai/pathfind_hpa.cpp,function,
@@ -58262,6 +58529,8 @@ address,function,file,kind,target
 ,SimAlloc,src/state/block.cpp,function,
 ,SimAlloc,src/state/block.cpp,global_read,g_allocHooks
 ,SimAlloc,src/state/block.cpp,indirect_call,"indirect via void (*const)(void *, unsigned int) __attribute__((cdecl)) [AllocHooks::added]"
+,SimAllocRegion,src/state/block.cpp,call,SimAllocTagged
+,SimAllocRegion,src/state/block.cpp,function,
 ,SimAllocTagged,src/state/block.h,call,AllocSite::~AllocSite
 ,SimAllocTagged,src/state/block.h,call,ReplayImport::Answered
 ,SimAllocTagged,src/state/block.h,call,ReplayImport::AnsweredPointer
@@ -58709,6 +58978,7 @@ address,function,file,kind,target
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::goalClusters
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nGoal
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nGoalClusters
+,StartSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nRaw
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nSlots
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nearGoal
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::slot
@@ -58722,6 +58992,7 @@ address,function,file,kind,target
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,PathPoint::y
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,PathRequest::goal
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,PathRequest::unit
+,StartSearch,src/ai/pathfind_hpa.cpp,field_read,PathRequest::useStart
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,PathUnitState::footprintX
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,PathUnitState::footprintY
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_read,PathUnitState::moveClass
@@ -58738,12 +59009,14 @@ address,function,file,kind,target
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::goalCells
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::goalClusters
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::lastTick
+,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::nBanned
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::nGoal
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::nGoalClusters
+,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::nRaw
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::nearGoal
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::phase
+,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::rawGoal
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::req
-,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::retried
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::slot
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::slotOf
 ,StartSearch,src/ai/pathfind_hpa.cpp,field_write,Hdr::slotsUsed
@@ -60146,6 +60419,14 @@ address,function,file,kind,target
 ,VisitMissionConditions,src/harness/harness.cpp,call,sprintf
 ,VisitMissionConditions,src/harness/harness.cpp,function,
 ,VisitMissionConditions,src/harness/harness.cpp,global_read,kMissionConditionsTable@src/harness/trace_schema.h
+,VisitModuleState,src/harness/harness.cpp,call,WriterEndRecord
+,VisitModuleState,src/harness/harness.cpp,field_read,PathfindingSeam::WriteState
+,VisitModuleState,src/harness/harness.cpp,field_read,Seams::pathfinding
+,VisitModuleState,src/harness/harness.cpp,function,
+,VisitModuleState,src/harness/harness.cpp,global_read,g_seams
+,VisitModuleState,src/harness/harness.cpp,global_read,s_stateWriter@src/harness/harness.cpp
+,VisitModuleState,src/harness/harness.cpp,global_write,s_writerOpen@src/harness/harness.cpp
+,VisitModuleState,src/harness/harness.cpp,indirect_call,indirect via void (*)(const StateWriter *) __attribute__((stdcall)) [PathfindingSeam::WriteState]
 ,VisitMotions,src/harness/harness.cpp,call,EndSection
 ,VisitMotions,src/harness/harness.cpp,call,HashByte
 ,VisitMotions,src/harness/harness.cpp,call,HashU32
@@ -60191,68 +60472,6 @@ address,function,file,kind,target
 ,VisitPassMaps,src/harness/harness.cpp,function,
 ,VisitPassMaps,src/harness/harness.cpp,global_escape,s_passRow@src/harness/harness.cpp
 ,VisitPassMaps,src/harness/harness.cpp,global_write,s_passRow@src/harness/harness.cpp
-,VisitPathCells,src/harness/harness.cpp,call,FormatPath
-,VisitPathCells,src/harness/harness.cpp,call,RefAbs
-,VisitPathCells,src/harness/harness.cpp,call,VisitU32
-,VisitPathCells,src/harness/harness.cpp,call,VisitValue
-,VisitPathCells,src/harness/harness.cpp,deref_read,*unsigned char
-,VisitPathCells,src/harness/harness.cpp,deref_read,*unsigned int
-,VisitPathCells,src/harness/harness.cpp,deref_read,*unsigned short
-,VisitPathCells,src/harness/harness.cpp,function,
-,VisitPathGlobals,src/harness/harness.cpp,call,DumpPrefix
-,VisitPathGlobals,src/harness/harness.cpp,call,DumpValue
-,VisitPathGlobals,src/harness/harness.cpp,call,HashBuf
-,VisitPathGlobals,src/harness/harness.cpp,call,sprintf
-,VisitPathGlobals,src/harness/harness.cpp,field_read,PathTraceView::budgetCap
-,VisitPathGlobals,src/harness/harness.cpp,field_read,PathTraceView::refreshCounter
-,VisitPathGlobals,src/harness/harness.cpp,field_read,PathTraceView::tickLoad
-,VisitPathGlobals,src/harness/harness.cpp,field_read,TraceGlobal::kind
-,VisitPathGlobals,src/harness/harness.cpp,field_read,TraceGlobal::name
-,VisitPathGlobals,src/harness/harness.cpp,field_read,TraceGlobal::size
-,VisitPathGlobals,src/harness/harness.cpp,field_read,TraceGlobal::target
-,VisitPathGlobals,src/harness/harness.cpp,field_write,TraceField::kind
-,VisitPathGlobals,src/harness/harness.cpp,field_write,TraceField::mask
-,VisitPathGlobals,src/harness/harness.cpp,field_write,TraceField::name
-,VisitPathGlobals,src/harness/harness.cpp,field_write,TraceField::offset
-,VisitPathGlobals,src/harness/harness.cpp,field_write,TraceField::size
-,VisitPathGlobals,src/harness/harness.cpp,field_write,TraceField::target
-,VisitPathGlobals,src/harness/harness.cpp,function,
-,VisitPathGlobals,src/harness/harness.cpp,global_escape,kPathGlobals@src/harness/trace_schema.h
-,VisitPathGlobals,src/harness/harness.cpp,global_escape,zeros@VisitPathGlobals
-,VisitPathGlobals,src/harness/harness.cpp,global_read,kPathGlobalsCount@src/harness/trace_schema.h
-,VisitPathGlobals,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
-,VisitPathNodes,src/harness/harness.cpp,call,FormatPath
-,VisitPathNodes,src/harness/harness.cpp,call,HashU32
-,VisitPathNodes,src/harness/harness.cpp,call,RefAbs
-,VisitPathNodes,src/harness/harness.cpp,call,VisitElement
-,VisitPathNodes,src/harness/harness.cpp,call,VisitPointer
-,VisitPathNodes,src/harness/harness.cpp,call,VisitValue
-,VisitPathNodes,src/harness/harness.cpp,call,memset
-,VisitPathNodes,src/harness/harness.cpp,call,strcat
-,VisitPathNodes,src/harness/harness.cpp,deref_read,*int
-,VisitPathNodes,src/harness/harness.cpp,deref_read,*unsigned int
-,VisitPathNodes,src/harness/harness.cpp,deref_read,*unsigned short
-,VisitPathNodes,src/harness/harness.cpp,function,
-,VisitPathNodes,src/harness/harness.cpp,global_escape,s_nodeFree@src/harness/harness.cpp
-,VisitPathNodes,src/harness/harness.cpp,global_read,kNodeTable@src/harness/trace_schema.h
-,VisitPathNodes,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
-,VisitPathNodes,src/harness/harness.cpp,global_read,s_nodeFree@src/harness/harness.cpp
-,VisitPathNodes,src/harness/harness.cpp,global_write,s_nodeFree@src/harness/harness.cpp
-,VisitPathfinder,src/harness/harness.cpp,call,EndSection
-,VisitPathfinder,src/harness/harness.cpp,call,HashByte
-,VisitPathfinder,src/harness/harness.cpp,call,VisitElement
-,VisitPathfinder,src/harness/harness.cpp,call,VisitPathCells
-,VisitPathfinder,src/harness/harness.cpp,call,VisitPathGlobals
-,VisitPathfinder,src/harness/harness.cpp,call,VisitPathNodes
-,VisitPathfinder,src/harness/harness.cpp,deref_read,*unsigned int
-,VisitPathfinder,src/harness/harness.cpp,field_read,PathTraceView::record
-,VisitPathfinder,src/harness/harness.cpp,field_read,PathfindingSeam::Project
-,VisitPathfinder,src/harness/harness.cpp,field_read,Seams::pathfinding
-,VisitPathfinder,src/harness/harness.cpp,function,
-,VisitPathfinder,src/harness/harness.cpp,global_read,g_seams
-,VisitPathfinder,src/harness/harness.cpp,global_read,kPathfinderSearchTable@src/harness/trace_schema.h
-,VisitPathfinder,src/harness/harness.cpp,global_read,kPathfinderTable@src/harness/trace_schema.h
-,VisitPathfinder,src/harness/harness.cpp,indirect_call,indirect via void (*)(PathTraceView *) __attribute__((stdcall)) [PathfindingSeam::Project]
 ,VisitPlayerAI,src/harness/harness.cpp,call,EndSection
 ,VisitPlayerAI,src/harness/harness.cpp,call,FormatPath
 ,VisitPlayerAI,src/harness/harness.cpp,call,HashByte
@@ -60487,9 +60706,9 @@ address,function,file,kind,target
 ,VisitWorld,src/harness/harness.cpp,call,VisitEyes
 ,VisitWorld,src/harness/harness.cpp,call,VisitGameScalars
 ,VisitWorld,src/harness/harness.cpp,call,VisitMapCells
+,VisitWorld,src/harness/harness.cpp,call,VisitModuleState
 ,VisitWorld,src/harness/harness.cpp,call,VisitMoveClasses
 ,VisitWorld,src/harness/harness.cpp,call,VisitPassMaps
-,VisitWorld,src/harness/harness.cpp,call,VisitPathfinder
 ,VisitWorld,src/harness/harness.cpp,call,VisitPlayerHeap
 ,VisitWorld,src/harness/harness.cpp,call,VisitSpatial
 ,VisitWorld,src/harness/harness.cpp,call,VisitUnitHeap
@@ -60822,6 +61041,10 @@ address,function,file,kind,target
 ,WorldSeenSize,src/seams/pathfinding_world.cpp,field_read,Game::width
 ,WorldSeenSize,src/seams/pathfinding_world.cpp,function,
 ,WorldSeenSize,src/seams/pathfinding_world.cpp,global_read,g_game
+,WorldTerrainPass,src/seams/pathfinding_world.cpp,call,ClassOf
+,WorldTerrainPass,src/seams/pathfinding_world.cpp,call,GetTerrainPassValue
+,WorldTerrainPass,src/seams/pathfinding_world.cpp,call,WorldInBounds
+,WorldTerrainPass,src/seams/pathfinding_world.cpp,function,
 ,WorldTick,src/seams/pathfinding_world.cpp,field_read,Game::ticks
 ,WorldTick,src/seams/pathfinding_world.cpp,function,
 ,WorldTick,src/seams/pathfinding_world.cpp,global_read,g_game
@@ -60925,6 +61148,21 @@ address,function,file,kind,target
 ,WriteBufferToFile,src/files/files_api.h,function,
 ,WriteBufferToFile,src/files/files_api.h,global_read,g_seams
 ,WriteBufferToFile,src/files/files_api.h,indirect_call,"indirect via int (*)(char *, void *, int) __attribute__((stdcall)) [FilesSeam::WriteBuffer]"
+,WriteCells,src/ai/pathfind.cpp,call,operator PathCell *
+,WriteCells,src/ai/pathfind.cpp,call,operator unsigned int *
+,WriteCells,src/ai/pathfind.cpp,deref_read,*PathCell
+,WriteCells,src/ai/pathfind.cpp,deref_read,*unsigned int
+,WriteCells,src/ai/pathfind.cpp,field_read,PathCell::dir
+,WriteCells,src/ai/pathfind.cpp,field_read,PathCell::flags
+,WriteCells,src/ai/pathfind.cpp,field_read,PathCell::node
+,WriteCells,src/ai/pathfind.cpp,field_read,PathGrid::cells
+,WriteCells,src/ai/pathfind.cpp,field_read,PathGrid::count
+,WriteCells,src/ai/pathfind.cpp,field_read,PathGrid::dirty
+,WriteCells,src/ai/pathfind.cpp,field_read,Ref<PathCell>::offset
+,WriteCells,src/ai/pathfind.cpp,field_read,Ref<unsigned int>::offset
+,WriteCells,src/ai/pathfind.cpp,field_read,StateWriter::Int
+,WriteCells,src/ai/pathfind.cpp,function,
+,WriteCells,src/ai/pathfind.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,WriteDump,src/host/win32/display.cpp,call,CloseHandle
 ,WriteDump,src/host/win32/display.cpp,call,CreateDirectoryA
 ,WriteDump,src/host/win32/display.cpp,call,CreateFileA
@@ -60945,6 +61183,124 @@ address,function,file,kind,target
 ,WriteDump,src/host/win32/display.cpp,global_read,g_windowedHeight
 ,WriteDump,src/host/win32/display.cpp,global_read,g_windowedWidth
 ,WriteDump,src/host/win32/display.cpp,global_write,g_dumpIndex
+,WriteNodes,src/ai/pathfind.cpp,call,NodeIsLive
+,WriteNodes,src/ai/pathfind.cpp,call,OwnNodeIndex
+,WriteNodes,src/ai/pathfind.cpp,call,Pathfinder::Extra
+,WriteNodes,src/ai/pathfind.cpp,call,operator Node *
+,WriteNodes,src/ai/pathfind.cpp,call,operator Ref<Node> *
+,WriteNodes,src/ai/pathfind.cpp,deref_escape,*Node
+,WriteNodes,src/ai/pathfind.cpp,field_read,Node::index
+,WriteNodes,src/ai/pathfind.cpp,field_read,NodeData::f
+,WriteNodes,src/ai/pathfind.cpp,field_read,NodeData::g
+,WriteNodes,src/ai/pathfind.cpp,field_read,NodeData::penalty
+,WriteNodes,src/ai/pathfind.cpp,field_read,NodeData::steps
+,WriteNodes,src/ai/pathfind.cpp,field_read,OpenHeap::count
+,WriteNodes,src/ai/pathfind.cpp,field_read,OpenHeap::items
+,WriteNodes,src/ai/pathfind.cpp,field_read,OpenHeap::pool
+,WriteNodes,src/ai/pathfind.cpp,field_read,OpenHeap::used
+,WriteNodes,src/ai/pathfind.cpp,field_read,PathExtra::nodeLimit
+,WriteNodes,src/ai/pathfind.cpp,field_read,Point16::x
+,WriteNodes,src/ai/pathfind.cpp,field_read,Point16::y
+,WriteNodes,src/ai/pathfind.cpp,field_read,Ref<Node>::offset
+,WriteNodes,src/ai/pathfind.cpp,field_read,Ref<Ref<Node>>::offset
+,WriteNodes,src/ai/pathfind.cpp,field_read,StateWriter::Handle
+,WriteNodes,src/ai/pathfind.cpp,field_read,StateWriter::Int
+,WriteNodes,src/ai/pathfind.cpp,field_read,StateWriter::Run
+,WriteNodes,src/ai/pathfind.cpp,function,
+,WriteNodes,src/ai/pathfind.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
+,WriteNodes,src/ai/pathfind.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
+,WriteNodes,src/ai/pathfind.cpp,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [StateWriter::Run]
+,WriteRequest,src/ai/pathfind_hpa.cpp,field_read,PathRequest::goal
+,WriteRequest,src/ai/pathfind_hpa.cpp,field_read,PathRequest::notBefore
+,WriteRequest,src/ai/pathfind_hpa.cpp,field_read,PathRequest::requester
+,WriteRequest,src/ai/pathfind_hpa.cpp,field_read,PathRequest::start
+,WriteRequest,src/ai/pathfind_hpa.cpp,field_read,PathRequest::target
+,WriteRequest,src/ai/pathfind_hpa.cpp,field_read,PathRequest::unit
+,WriteRequest,src/ai/pathfind_hpa.cpp,field_read,PathRequest::useStart
+,WriteRequest,src/ai/pathfind_hpa.cpp,field_read,StateWriter::Bytes
+,WriteRequest,src/ai/pathfind_hpa.cpp,field_read,StateWriter::Handle
+,WriteRequest,src/ai/pathfind_hpa.cpp,field_read,StateWriter::Int
+,WriteRequest,src/ai/pathfind_hpa.cpp,function,
+,WriteRequest,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
+,WriteRequest,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
+,WriteRequest,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
+,WriteSearch,src/ai/pathfind_hpa.cpp,call,WriteRequest
+,WriteSearch,src/ai/pathfind_hpa.cpp,deref_read,*int
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Hdr::banned
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Hdr::goalCells
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Hdr::goalClusters
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Hdr::goalNodes
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Hdr::rawGoal
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Hdr::scratch
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Hdr::startCost
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Hdr::wp
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Local::heap
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Local::hpos
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_escape,Local::st
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::NN
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::aHeapN
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::aInit
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::aseq
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::cs
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::directCost
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::fx
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::fy
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::gcIdx
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::localReady
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nBanned
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nGoal
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nGoalClusters
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nGoalNodes
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nPath
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nRaw
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nRoute
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nWp
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nearDist
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nearGoal
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nearNode
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::nearest
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::phase
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::pullAnchor
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::pullInit
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::pullK
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::req
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::searchId
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::segIdx
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::slot
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::startCluster
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::sx
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::sy
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::truncated
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Hdr::wpOverflow
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,HpaView::ag
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,HpaView::aheap
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,HpaView::akey
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,HpaView::apar
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,HpaView::apos
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,HpaView::astamp
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,HpaView::h
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,HpaView::path
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,HpaView::route
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::found
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::g
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::goalAt
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::h
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::key
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::mode
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::n
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::ox
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::oy
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::par
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::st
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::terrain
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::tx
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::ty
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,Local::w
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,StateWriter::Bytes
+,WriteSearch,src/ai/pathfind_hpa.cpp,field_read,StateWriter::Int
+,WriteSearch,src/ai/pathfind_hpa.cpp,function,
+,WriteSearch,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
+,WriteSearch,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,WriteTabsInline,src/gui/gui_file.cpp,call,HAPI_WriteFile
 ,WriteTabsInline,src/gui/gui_file.cpp,function,
 ,WriteTiming,src/wasm/modules.cpp,call,ModulesFatal
@@ -60960,6 +61316,63 @@ address,function,file,kind,target
 ,WriteTiming,src/wasm/modules.cpp,global_read,s_timingFirstTick
 ,WriteTiming,src/wasm/modules.cpp,global_read,s_timingMs
 ,WriteTiming,src/wasm/modules.cpp,global_read,s_wasm
+,WriterAdd,src/harness/harness.cpp,call,HashBuf
+,WriterAdd,src/harness/harness.cpp,call,memcpy
+,WriterAdd,src/harness/harness.cpp,function,
+,WriterAdd,src/harness/harness.cpp,global_escape,s_writerRun@src/harness/harness.cpp
+,WriterAdd,src/harness/harness.cpp,global_read,s_writerRunLeft@src/harness/harness.cpp
+,WriterAdd,src/harness/harness.cpp,global_read,s_writerRunLength@src/harness/harness.cpp
+,WriterAdd,src/harness/harness.cpp,global_write,s_writerRunLeft@src/harness/harness.cpp
+,WriterAdd,src/harness/harness.cpp,global_write,s_writerRunLength@src/harness/harness.cpp
+,WriterBegin,src/harness/harness.cpp,call,HashByte
+,WriterBegin,src/harness/harness.cpp,call,WriterEndRecord
+,WriterBegin,src/harness/harness.cpp,call,strncpy
+,WriterBegin,src/harness/harness.cpp,function,
+,WriterBegin,src/harness/harness.cpp,global_maybe_written,s_writerRecord@src/harness/harness.cpp
+,WriterBegin,src/harness/harness.cpp,global_write,s_writerOpen@src/harness/harness.cpp
+,WriterBegin,src/harness/harness.cpp,global_write,s_writerRecord@src/harness/harness.cpp
+,WriterBegin,src/harness/harness.cpp,global_write,s_writerRunLeft@src/harness/harness.cpp
+,WriterBegin,src/harness/harness.cpp,global_write,s_writerRunLength@src/harness/harness.cpp
+,WriterBytes,src/harness/harness.cpp,call,DumpPrefix
+,WriterBytes,src/harness/harness.cpp,call,WriterAdd
+,WriterBytes,src/harness/harness.cpp,call,WriterPath
+,WriterBytes,src/harness/harness.cpp,call,fprintf
+,WriterBytes,src/harness/harness.cpp,call,fputc
+,WriterBytes,src/harness/harness.cpp,call,fputs
+,WriterBytes,src/harness/harness.cpp,deref_read,*unsigned char
+,WriterBytes,src/harness/harness.cpp,function,
+,WriterBytes,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,WriterBytes,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,WriterEndRecord,src/harness/harness.cpp,call,EndSection
+,WriterEndRecord,src/harness/harness.cpp,function,
+,WriterEndRecord,src/harness/harness.cpp,global_read,s_writerOpen@src/harness/harness.cpp
+,WriterEndRecord,src/harness/harness.cpp,global_write,s_writerOpen@src/harness/harness.cpp
+,WriterHandle,src/harness/harness.cpp,call,DumpPrefix
+,WriterHandle,src/harness/harness.cpp,call,HashByte
+,WriterHandle,src/harness/harness.cpp,call,HashU32
+,WriterHandle,src/harness/harness.cpp,call,Resolve
+,WriterHandle,src/harness/harness.cpp,call,SimBlockBase
+,WriterHandle,src/harness/harness.cpp,call,WriterPath
+,WriterHandle,src/harness/harness.cpp,call,fprintf
+,WriterHandle,src/harness/harness.cpp,call,fputc
+,WriterHandle,src/harness/harness.cpp,call,fputs
+,WriterHandle,src/harness/harness.cpp,function,
+,WriterHandle,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,WriterHandle,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,WriterHandle,src/harness/harness.cpp,global_read,s_targetNames@src/harness/harness.cpp
+,WriterInt,src/harness/harness.cpp,call,DumpPrefix
+,WriterInt,src/harness/harness.cpp,call,WriterAdd
+,WriterInt,src/harness/harness.cpp,call,WriterPath
+,WriterInt,src/harness/harness.cpp,call,fprintf
+,WriterInt,src/harness/harness.cpp,function,
+,WriterInt,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,WriterInt,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,WriterPath,src/harness/harness.cpp,call,sprintf
+,WriterPath,src/harness/harness.cpp,function,
+,WriterPath,src/harness/harness.cpp,global_maybe_written,s_writerRecord@src/harness/harness.cpp
+,WriterRun,src/harness/harness.cpp,function,
+,WriterRun,src/harness/harness.cpp,global_write,s_writerRunLeft@src/harness/harness.cpp
+,WriterRun,src/harness/harness.cpp,global_write,s_writerRunLength@src/harness/harness.cpp
 ,_Construct,src/ai/ai_player.cpp,call,CopyDwordIfNonNull
 ,_Construct,src/ai/ai_player.cpp,call,CopyDwordPair
 ,_Construct,src/ai/ai_player.cpp,call,CopyOneByte

@@ -14,6 +14,8 @@ static inline bool operator<(const HeapEntry& a, const HeapEntry& b)
 }
 
 #include "pathfind.h"
+#include "../../interfaces/pathfinding.h"
+#include "../../interfaces/state_writer.h"
 
 // FUNCTION: 0x40d5e0
 void __stdcall CopyDwordPair(int* dest, int* src) {
@@ -301,10 +303,10 @@ void Pathfinder::TracePath()
     if (count >= 0x40)
         count = 0x40;
     PathExtra* extra = Extra();
-    PathEvent* event = AddEvent(PATH_EVENT_FINISHED, n > 0x40 ? PATH_PARTIAL : PATH_FOUND);
+    PathEventRecord* event = AddEvent(PATH_EVENT_FINISHED, n > 0x40 ? PATH_PARTIAL : PATH_FOUND);
     if (event == 0)
         return;
-    event->count = count;
+    event->event.count = count;
     for (int i = 0; i < count; i++) {
         Point16 pt = pts[(n - 1 - i) & 0x3f];
         event->points[i].x = (pt.x * 2 + extra->footprintX) * 8;
@@ -645,21 +647,22 @@ void Pathfinder::Cancel(PathHandle requester)
     if (index != 0)
         RemovePending(index);
     PathExtra* extra = Extra();
-    PathEvent* events = (PathEvent*)((char*)this + extra->eventsOffset);
+    PathEventRecord* events = (PathEventRecord*)((char*)this + extra->eventsOffset);
     int kept = extra->eventNext;
     for (int i = extra->eventNext; i < extra->eventCount; i++) {
-        if (events[i].requester != requester)
+        if (events[i].event.requester != requester)
             events[kept++] = events[i];
     }
     extra->eventCount = kept;
 }
 
-PathEvent* Pathfinder::AddEvent(int kind, int status)
+PathEventRecord* Pathfinder::AddEvent(int kind, int status)
 {
     PathExtra* extra = Extra();
     if (extra->eventCount >= extra->eventCapacity)
         return 0;
-    PathEvent* event = (PathEvent*)((char*)this + extra->eventsOffset) + extra->eventCount++;
+    PathEventRecord* record = (PathEventRecord*)((char*)this + extra->eventsOffset) + extra->eventCount++;
+    PathEvent* event = &record->event;
     event->kind = kind;
     event->status = status;
     event->unit = object;
@@ -667,15 +670,18 @@ PathEvent* Pathfinder::AddEvent(int kind, int status)
     event->target = target;
     event->tick = g_seams.pathworld->Tick();
     event->count = 0;
-    return event;
+    return record;
 }
 
-int Pathfinder::Poll(PathEvent* out)
+int Pathfinder::Poll(PathEvent* out, PathPoint* points, int capacity)
 {
     PathExtra* extra = Extra();
     if (extra->eventNext >= extra->eventCount)
         return 0;
-    *out = ((PathEvent*)((char*)this + extra->eventsOffset))[extra->eventNext++];
+    PathEventRecord* record = (PathEventRecord*)((char*)this + extra->eventsOffset) + extra->eventNext++;
+    *out = record->event;
+    for (int i = 0; i < record->event.count && i < capacity; i++)
+        points[i] = record->points[i];
     return 1;
 }
 
@@ -847,126 +853,274 @@ Pathfinder* GetPathfinder()
     return g_game->pathfinder.get();
 }
 
-void __stdcall PathfindingInit(const PathMapInfo* map)
+namespace {
+struct RegionLayout {
+    int cells, nodeLimit, dirtyBytes, goalCapacity, pendingCapacity, buckets, eventCapacity;
+    unsigned int poolOffset, itemsOffset, cellsOffset, dirtyOffset, pendingOffset, requesterBuckets, unitBuckets, eventsOffset, size;
+};
+
+RegionLayout LayoutFor(const PathMapInfo* map)
 {
-    int cells = (map->width * map->height + 7) & ~7;
-    int nodeLimit = cells + 1;
-    if (nodeLimit > 0x10000)
-        nodeLimit = 0x10000;
-    int dirtyBytes = ((cells + 0xff) >> 8) * 4;
-    int goalCapacity = 2 * (map->width + map->height) + 256;
-    int pendingCapacity = map->unitSlots + 16;
-    int buckets = 16;
-    while (buckets < pendingCapacity)
-        buckets <<= 1;
-    int eventCapacity = 512;
+    RegionLayout l;
+    l.cells = (map->width * map->height + 7) & ~7;
+    l.nodeLimit = l.cells + 1;
+    if (l.nodeLimit > 0x10000)
+        l.nodeLimit = 0x10000;
+    l.dirtyBytes = ((l.cells + 0xff) >> 8) * 4;
+    l.goalCapacity = 2 * (map->width + map->height) + 256;
+    l.pendingCapacity = map->unitSlots + 16;
+    l.buckets = 16;
+    while (l.buckets < l.pendingCapacity)
+        l.buckets <<= 1;
+    l.eventCapacity = 512;
 
     unsigned int size = Pathfinder::kExtraOffset + sizeof(PathExtra);
-    unsigned int poolOffset = size;
-    size += nodeLimit * sizeof(Node);
-    unsigned int itemsOffset = size;
-    size += nodeLimit * sizeof(Ref<Node>);
-    unsigned int cellsOffset = size;
-    size += cells * sizeof(PathCell);
-    unsigned int dirtyOffset = size;
-    size += dirtyBytes;
-    unsigned int pendingOffset = size;
-    size += pendingCapacity * sizeof(PathPending);
-    unsigned int requesterBuckets = size;
-    size += buckets * sizeof(int);
-    unsigned int unitBuckets = size;
-    size += buckets * sizeof(int);
-    unsigned int eventsOffset = size;
-    size += eventCapacity * sizeof(PathEvent);
+    l.poolOffset = size;
+    size += l.nodeLimit * sizeof(Node);
+    l.itemsOffset = size;
+    size += l.nodeLimit * sizeof(Ref<Node>);
+    l.cellsOffset = size;
+    size += l.cells * sizeof(PathCell);
+    l.dirtyOffset = size;
+    size += l.dirtyBytes;
+    l.pendingOffset = size;
+    size += l.pendingCapacity * sizeof(PathPending);
+    l.requesterBuckets = size;
+    size += l.buckets * sizeof(int);
+    l.unitBuckets = size;
+    size += l.buckets * sizeof(int);
+    l.eventsOffset = size;
+    size += l.eventCapacity * sizeof(PathEventRecord);
+    l.size = size;
+    return l;
+}
+}
 
-    char* region = (char*)SimAllocTagged("AISearch region", size);
+unsigned int __stdcall PathfindingRegionSize(const PathMapInfo* map)
+{
+    return LayoutFor(map).size;
+}
+
+void __stdcall PathfindingInit(const PathMapInfo* map, void* regionBase, unsigned int)
+{
+    RegionLayout l = LayoutFor(map);
+    char* region = (char*)regionBase;
     g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)region);
     PathExtra* extra = (PathExtra*)(region + Pathfinder::kExtraOffset);
-    extra->nodeLimit = nodeLimit;
-    extra->goalCapacity = goalCapacity;
-    extra->pendingCapacity = pendingCapacity;
+    extra->nodeLimit = l.nodeLimit;
+    extra->goalCapacity = l.goalCapacity;
+    extra->pendingCapacity = l.pendingCapacity;
     extra->pendingFree = 1;
-    extra->bucketMask = buckets - 1;
-    extra->eventCapacity = eventCapacity;
-    extra->poolOffset = poolOffset;
-    extra->itemsOffset = itemsOffset;
-    extra->cellsOffset = cellsOffset;
-    extra->dirtyOffset = dirtyOffset;
-    extra->pendingOffset = pendingOffset;
-    extra->requesterBuckets = requesterBuckets;
-    extra->unitBuckets = unitBuckets;
-    extra->eventsOffset = eventsOffset;
-    PathPending* pending = (PathPending*)(region + pendingOffset);
-    for (int i = 0; i < pendingCapacity; i++)
-        pending[i].nextRequester = i + 2 <= pendingCapacity ? i + 2 : 0;
+    extra->bucketMask = l.buckets - 1;
+    extra->eventCapacity = l.eventCapacity;
+    extra->poolOffset = l.poolOffset;
+    extra->itemsOffset = l.itemsOffset;
+    extra->cellsOffset = l.cellsOffset;
+    extra->dirtyOffset = l.dirtyOffset;
+    extra->pendingOffset = l.pendingOffset;
+    extra->requesterBuckets = l.requesterBuckets;
+    extra->unitBuckets = l.unitBuckets;
+    extra->eventsOffset = l.eventsOffset;
+    PathPending* pending = (PathPending*)(region + l.pendingOffset);
+    for (int i = 0; i < l.pendingCapacity; i++)
+        pending[i].nextRequester = i + 2 <= l.pendingCapacity ? i + 2 : 0;
     new (region) Pathfinder;
 }
 
-void __stdcall PathfindingShutdown()
+void* __stdcall PathfindingShutdown()
 {
-    SimFree(g_game->pathfinder.get());
+    void* region = g_game->pathfinder.get();
     g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)0);
+    return region;
 }
 
 void __stdcall PathfindingSubmit(const PathRequest* request)
 {
     Pathfinder* pf = GetPathfinder();
-    if (pf != 0)
+    if (pf != nullptr)
         pf->Submit(request);
 }
 
 void __stdcall PathfindingCancel(PathHandle requester)
 {
     Pathfinder* pf = GetPathfinder();
-    if (pf != 0)
+    if (pf != nullptr)
         pf->Cancel(requester);
 }
 
-void __stdcall PathfindingCellsChanged(int, int, int, int)
+void __stdcall PathfindingCellsChanged(int, int, int, int, unsigned int, int)
 {
 }
 
 void __stdcall PathfindingStep()
 {
     Pathfinder* pf = GetPathfinder();
-    if (pf != 0)
+    if (pf != nullptr)
         pf->RunSearches();
 }
 
-int __stdcall PathfindingPoll(PathEvent* out)
+int __stdcall PathfindingPoll(PathEvent* out, PathPoint* points, int capacity)
 {
     Pathfinder* pf = GetPathfinder();
-    return pf != 0 ? pf->Poll(out) : 0;
+    if (pf == nullptr)
+        return 0;
+    return pf->Poll(out, points, capacity);
 }
 
-void __stdcall PathfindingProject(PathTraceView* out)
+namespace {
+enum { CELL_LIMIT = 1 << 22 };
+
+unsigned int OwnNodeIndex(const Pathfinder* pf, unsigned int itemOffset)
+{
+    unsigned int poolOffset = pf->pool.offset;
+    if (itemOffset == 0 || poolOffset == 0 || itemOffset < poolOffset)
+        return STATE_NO_INDEX;
+    unsigned int delta = itemOffset - poolOffset;
+    if (delta % sizeof(Node) != 0 || delta / sizeof(Node) >= (unsigned int)pf->used)
+        return STATE_NO_INDEX;
+    return delta / sizeof(Node);
+}
+
+bool NodeIsLive(const Pathfinder* pf, int node, int count)
+{
+    int slot = pf->pool[node].index;
+    return slot >= 0 && slot < count && pf->items[slot].offset == pf->pool.offset + (unsigned int)node * sizeof(Node);
+}
+
+void WriteNodes(const StateWriter* w, Pathfinder* pf)
+{
+    int used = pf->used;
+    int count = pf->count;
+    if (pf->pool.offset == 0 || pf->items.offset == 0 || used < 0 || used > pf->Extra()->nodeLimit || count < 0 || count > used) {
+        used = 0;
+        count = 0;
+    }
+    for (int node = 0; node < used; node++) {
+        if (!NodeIsLive(pf, node, count))
+            continue;
+        Node* n = &pf->pool[node];
+        w->Int(nullptr, 0, 4, node);
+        w->Run(5);
+        w->Int("pool[%u].index", node, 4, n->index);
+        w->Int("pool[%u].pos_x", node, 2, (unsigned short)n->data.pos.x);
+        w->Int("pool[%u].pos_y", node, 2, (unsigned short)n->data.pos.y);
+        w->Int("pool[%u].g", node, 4, n->data.g);
+        w->Int("pool[%u].f", node, 4, n->data.f);
+        w->Int("pool[%u].steps", node, 2, (unsigned short)n->data.steps);
+        if (n->data.g != 0)
+            w->Int("pool[%u].penalty", node, 2, (unsigned short)n->data.penalty);
+    }
+    w->Int("heap.count", 0, 4, count);
+    for (int slot = 0; slot < count; slot++)
+        w->Handle("heap[%u]", slot, STATE_HANDLE_OWN, OwnNodeIndex(pf, pf->items[slot].offset));
+}
+
+void WriteCells(const StateWriter* w, Pathfinder* pf)
+{
+    unsigned int count = pf->grid.count;
+    if (pf->grid.cells.offset == 0 || pf->grid.dirty.offset == 0 || count > CELL_LIMIT)
+        count = 0;
+    unsigned int words = (count + 255) >> 8;
+    for (unsigned int word = 0; word < words; word++) {
+        unsigned int bits = pf->grid.dirty[word];
+        if (bits == 0)
+            continue;
+        w->Int("dirty[%u]", word, 4, bits);
+        for (unsigned int bit = 0; bit < 32; bit++) {
+            if (!((bits >> bit) & 1))
+                continue;
+            for (unsigned int k = 0; k < 8; k++) {
+                unsigned int index = (word << 8) + (bit << 3) + k;
+                if (index >= count)
+                    break;
+                const PathCell& c = pf->grid.cells[index];
+                unsigned int state = c.flags & 3;
+                w->Int("cells[%u].flags", index, 1, c.flags);
+                if ((c.flags & 8) || state == 1 || state == 2)
+                    w->Int("cells[%u].dir", index, 1, c.dir);
+                if (state == 1 || state == 2)
+                    w->Int("cells[%u].node", index, 2, c.node);
+            }
+        }
+    }
+}
+}
+
+void __stdcall PathfindingWriteState(const StateWriter* w)
 {
     Pathfinder* pf = GetPathfinder();
-    if (pf == 0) {
-        out->record = 0;
-        out->budgetCap = 0;
-        out->tickLoad = 0;
-        out->refreshCounter = 0;
-        return;
+    w->Begin(16, "pathfinder");
+    w->Int(nullptr, 0, 1, pf != nullptr);
+    if (pf != nullptr) {
+        w->Handle("pool", 0, STATE_HANDLE_HEAP, pf->pool.offset);
+        w->Handle("items", 0, STATE_HANDLE_HEAP, pf->items.offset);
+        w->Run(4);
+        w->Int("freeHead", 0, 4, pf->freeHead);
+        w->Int("used", 0, 4, pf->used);
+        w->Int("count", 0, 4, pf->count);
+        w->Int("topPopped", 0, 4, pf->topPopped);
+        w->Handle("cells", 0, STATE_HANDLE_HEAP, pf->grid.cells.offset);
+        w->Run(3);
+        w->Int("width", 0, 4, pf->grid.width);
+        w->Int("height", 0, 4, pf->grid.height);
+        w->Int("cellCount", 0, 4, pf->grid.count);
+        w->Handle("dirty", 0, STATE_HANDLE_HEAP, pf->grid.dirty.offset);
+        w->Run(4);
+        w->Int("stepsPerTick", 0, 4, pf->stepsPerTick);
+        w->Int("steps", 0, 4, pf->steps);
+        w->Int("costScale", 0, 4, pf->costScale);
+        w->Int("baseScale", 0, 4, pf->baseScale);
+        w->Handle("object", 0, STATE_HANDLE_UNIT, pf->object);
+        w->Int("player", 0, 1, pf->player);
+        for (int k = 0; k < 10; k++)
+            w->Handle("cursor[%u]", k, STATE_HANDLE_UNIT, pf->cursor[k]);
+        w->Bytes("budget", 0, pf->budget, sizeof(pf->budget));
+        if (pf->object != 0) {
+            w->Run(2);
+            w->Int("start_x", 0, 2, (unsigned short)pf->start.x);
+            w->Int("start_y", 0, 2, (unsigned short)pf->start.y);
+            w->Run(4);
+            w->Int("goalX", 0, 4, pf->goalX);
+            w->Int("goalY", 0, 4, pf->goalY);
+            w->Int("probe", 0, 4, pf->probe);
+            w->Int("range", 0, 4, pf->range);
+            w->Handle("path", 0, STATE_HANDLE_HEAP, pf->path);
+            w->Handle("target", 0, STATE_HANDLE_HEAP, pf->target);
+            w->Handle("owner", 0, STATE_HANDLE_MOVE_CLASS, pf->owner);
+            w->Run(2);
+            w->Bytes("turnCost", 0, pf->turnCost, 8);
+            w->Bytes("stepCost", 0, pf->stepCost, 8);
+        }
+        WriteNodes(w, pf);
+        WriteCells(w, pf);
     }
-    PathExtra* extra = pf->Extra();
-    out->record = pf;
-    out->budgetCap = extra->budgetCap;
-    out->tickLoad = extra->tickLoad;
-    out->refreshCounter = &extra->refreshCounter;
+    w->Begin(17, "pathfinder");
+    if (pf != nullptr) {
+        PathExtra* extra = pf->Extra();
+        w->Bytes("playerTickLoad", 0, extra->tickLoad, sizeof(extra->tickLoad));
+        w->Bytes("playerBudgetCap", 0, extra->budgetCap, sizeof(extra->budgetCap));
+        w->Int("budgetRefreshCounter", 0, 4, extra->refreshCounter);
+    } else {
+        for (int k = 0; k < 2; k++) {
+            w->Run(10);
+            for (int i = 0; i < 10; i++)
+                w->Int(nullptr, 0, 4, 0);
+        }
+        w->Int(nullptr, 0, 4, 0);
+    }
 }
 
 void PathfindingSetStepsPerTick(int steps)
 {
     Pathfinder* pf = GetPathfinder();
-    if (pf != 0)
+    if (pf != nullptr)
         pf->stepsPerTick = steps;
 }
 
 void PathfindingSetBaseScale(int scale)
 {
     Pathfinder* pf = GetPathfinder();
-    if (pf != 0)
+    if (pf != nullptr)
         pf->baseScale = scale;
 }
 

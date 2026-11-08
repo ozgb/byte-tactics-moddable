@@ -87,11 +87,12 @@ static int __stdcall WLineOfSight(PathClass, int x0, int y0, int x1, int y1)
 {
     return s_pass[y0][x0] != 0 && s_pass[y1][x1] != 0;
 }
+static int __stdcall WTerrainPass(PathClass, int x, int y) { return s_pass[y][x]; }
 static void __stdcall WBegin(PathUnit) {}
 static void __stdcall WEnd(PathUnit) {}
 
 static PathWorldView s_world = { WTick, WPlayerCount, WIsPlaying, WUnitsPerPlayer, WFirstUnit, WLastUnit, WNextUnit, WUnitState,
-                                 WMoveClass, WInBounds, WPass, WSeenSize, WSeen, WLineOfSight, WBegin, WEnd };
+                                 WMoveClass, WInBounds, WPass, WSeenSize, WSeen, WLineOfSight, WTerrainPass, WBegin, WEnd };
 
 static unsigned long long Fnv(unsigned long long h, const void* p, unsigned int n)
 {
@@ -118,78 +119,42 @@ static const Field kSearch[] = { { 48, 2 }, { 50, 2 }, { 56, 4 }, { 60, 4 }, { 6
                                  { 100, 4 }, { 104, 8 }, { 112, 8 } };
 static const unsigned int kObject = 88;
 
-static unsigned long long HashView(const PathTraceView& view)
+static unsigned long long s_hash;
+static int s_lines;
+
+static void __stdcall WriterBegin(int section, const char*)
 {
-    unsigned long long h = 0xcbf29ce484222325ull;
-    const unsigned char* pf = (const unsigned char*)view.record;
-    h = FnvU32(h, pf != 0);
-    if (pf != 0) {
-        for (unsigned int i = 0; i < sizeof kRecord / sizeof kRecord[0]; i++)
-            h = Fnv(h, pf + kRecord[i].offset, kRecord[i].size);
-        if (*(const unsigned int*)(pf + kObject) != 0)
-            for (unsigned int i = 0; i < sizeof kSearch / sizeof kSearch[0]; i++)
-                h = Fnv(h, pf + kSearch[i].offset, kSearch[i].size);
-        const Pathfinder* p = (const Pathfinder*)pf;
-        const Node* pool = p->pool.get();
-        int used = p->used, count = p->count, freeHead = p->freeHead;
-        static unsigned char isFree[0x10000];
-        memset(isFree, 0, sizeof isFree);
-        for (int guard = 0; guard < used && freeHead >= 0 && freeHead < used; guard++) {
-            if (isFree[freeHead])
-                break;
-            isFree[freeHead] = 1;
-            freeHead = pool[freeHead].index;
-        }
-        for (int n = 0; n < used; n++) {
-            if (isFree[n])
-                continue;
-            h = FnvU32(h, n);
-            h = Fnv(h, &pool[n].index, 4);
-            h = Fnv(h, &pool[n].data.pos, 4);
-            h = Fnv(h, &pool[n].data.g, 8);
-            h = Fnv(h, &pool[n].data.steps, 2);
-            if (pool[n].data.g != 0)
-                h = Fnv(h, &pool[n].data.penalty, 2);
-        }
-        h = FnvU32(h, count);
-        for (int slot = 0; slot < count; slot++)
-            h = FnvU32(h, (unsigned int)(p->items[slot].get() - pool));
-        const PathCell* cells = p->grid.cells.get();
-        const unsigned int* dirty = p->grid.dirty.get();
-        unsigned int words = (p->grid.count + 255) >> 8;
-        for (unsigned int w = 0; w < words; w++) {
-            if (dirty[w] == 0)
-                continue;
-            h = FnvU32(h, dirty[w]);
-            for (unsigned int bit = 0; bit < 32; bit++) {
-                if (!((dirty[w] >> bit) & 1))
-                    continue;
-                for (unsigned int k = 0; k < 8; k++) {
-                    unsigned int index = (w << 8) + (bit << 3) + k;
-                    if (index >= (unsigned int)p->grid.count)
-                        break;
-                    const PathCell& c = cells[index];
-                    unsigned int state = c.flags & 3;
-                    h = Fnv(h, &c.flags, 1);
-                    if ((c.flags & 8) || state == 1 || state == 2)
-                        h = Fnv(h, &c.dir, 1);
-                    if (state == 1 || state == 2)
-                        h = Fnv(h, &c.node, 2);
-                }
-            }
-        }
-    }
-    h = Fnv(h, view.tickLoad ? (const void*)view.tickLoad : (const void*)&view, view.tickLoad ? 40 : 0);
-    h = Fnv(h, view.budgetCap ? (const void*)view.budgetCap : (const void*)&view, view.budgetCap ? 40 : 0);
-    h = Fnv(h, view.refreshCounter ? (const void*)view.refreshCounter : (const void*)&view, view.refreshCounter ? 4 : 0);
-    return h;
+    s_hash = FnvU32(s_hash, 0xffff0000u + section);
 }
+
+static void __stdcall WriterInt(const char*, int, int size, unsigned int value)
+{
+    s_hash = Fnv(s_hash, &value, size);
+    s_lines++;
+}
+
+static void __stdcall WriterBytes(const char*, int, const void* data, int size)
+{
+    s_hash = Fnv(s_hash, data, size);
+    s_lines++;
+}
+
+static void __stdcall WriterHandle(const char*, int, int kind, unsigned int value)
+{
+    s_hash = FnvU32(FnvU32(s_hash, kind), value);
+    s_lines++;
+}
+
+static void __stdcall WriterRun(int) {}
+
+static const StateWriter s_writer = { WriterBegin, WriterInt, WriterBytes, WriterHandle, WriterRun };
 
 static unsigned long long HashProjection()
 {
-    PathTraceView view;
-    PathfindingProject(&view);
-    return HashView(view);
+    s_hash = 0xcbf29ce484222325ull;
+    s_lines = 0;
+    PathfindingWriteState(&s_writer);
+    return s_hash;
 }
 
 static unsigned long long HashBlock()
@@ -213,8 +178,9 @@ static void Setup()
     g_game->width = kW;
     g_game->height = kH;
     g_seams.pathworld = &s_world;
-    PathMapInfo map = { kW, kH, kUnits + 1 };
-    PathfindingInit(&map);
+    PathMapInfo map = { kW, kH, kUnits + 1, 1 };
+    unsigned int size = PathfindingRegionSize(&map);
+    PathfindingInit(&map, SimAlloc(size), size);
     PathfindingSetStepsPerTick(160);
 }
 
@@ -230,7 +196,6 @@ static void Request(PathUnit unit, int x, int y)
     r.goal.centre.x = (short)x;
     r.goal.centre.y = (short)y;
     r.goal.radius[0] = 18;
-    r.goal.radiusSq[0] = 1;
     PathfindingSubmit(&r);
 }
 
@@ -239,7 +204,8 @@ static void Tick()
     s_tick++;
     PathfindingStep();
     PathEvent e;
-    while (PathfindingPoll(&e))
+    PathPoint points[64];
+    while (PathfindingPoll(&e, points, 64))
         ;
 }
 
@@ -279,19 +245,11 @@ int main()
     Check(pf->object != 0, "a search is running");
     Check(pf->count > 3, "the open heap holds nodes");
 
-    PathTraceView first, second;
-    memset(&first, 0xaa, sizeof first);
-    memset(&second, 0x55, sizeof second);
     unsigned long long block = HashBlock();
-    PathfindingProject(&first);
-    Check(HashBlock() == block, "Project writes nothing to the state block");
-    PathfindingProject(&second);
-    Check(HashBlock() == block, "a second Project writes nothing to the state block");
-    Check(memcmp(&first, &second, sizeof first) == 0, "Project fills the same view whatever the view held before");
-    Check(first.record == pf, "the view points into the live record");
-    PathfindingProject(&first);
-    PathfindingProject(&second);
-    Check(second.record == first.record && second.budgetCap == first.budgetCap, "the view is the same from one call to the next");
+    unsigned long long first = HashProjection();
+    Check(HashBlock() == block, "WriteState writes nothing to the state block");
+    Check(HashProjection() == first, "WriteState writes the same state twice");
+    Check(s_lines > 100, "WriteState writes the record, the nodes and the cells");
 
     unsigned char* base = (unsigned char*)pf;
     for (unsigned int i = 0; i < sizeof kRecord / sizeof kRecord[0]; i++)
@@ -355,23 +313,23 @@ int main()
         Mutate("a cell node", (unsigned char*)&cells[searched].node, 2);
     }
 
-    PathTraceView view;
-    PathfindingProject(&view);
-    Mutate("a tick load", (unsigned char*)view.tickLoad, 4);
-    Mutate("a budget cap", (unsigned char*)view.budgetCap, 4);
-    Mutate("the refresh counter", (unsigned char*)view.refreshCounter, 4);
+    PathExtra* extra = pf->Extra();
+    Mutate("a tick load", (unsigned char*)extra->tickLoad, 4);
+    Mutate("a budget cap", (unsigned char*)extra->budgetCap, 4);
+    Mutate("the refresh counter", (unsigned char*)&extra->refreshCounter, 4);
 
     unsigned long long before = HashBlock();
-    PathfindingProject(&view);
-    Check(HashBlock() == before, "Project still writes nothing after the mutations");
+    HashProjection();
+    Check(HashBlock() == before, "WriteState still writes nothing after the mutations");
 
-    PathfindingShutdown();
-    PathfindingProject(&view);
-    Check(view.record == 0 && view.budgetCap == 0 && view.tickLoad == 0 && view.refreshCounter == 0, "with no region the view is empty");
-    PathMapInfo map = { kW, kH, kUnits + 1 };
-    PathfindingInit(&map);
-    PathfindingProject(&view);
-    Check(view.record == GetPathfinder() && view.record != 0, "a new region is projected, not the old one");
+    SimFree(PathfindingShutdown());
+    unsigned long long empty = HashProjection();
+    Check(empty != first, "with no region the state written is empty");
+    PathMapInfo map = { kW, kH, kUnits + 1, 1 };
+    unsigned int size = PathfindingRegionSize(&map);
+    PathfindingInit(&map, SimAlloc(size), size);
+    Check(GetPathfinder() != 0, "a new region is built");
+    Check(HashProjection() != empty, "a new region is written");
 
     printf(g_failures ? "FAILED\n" : "pathfinding_projection_test: all passed\n");
     return g_failures != 0;

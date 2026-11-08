@@ -6,6 +6,7 @@
 #include "../network/player.h"
 #include "../game/game.h"
 #include "../units/movement_class.h"
+#include "../map/terrain.h"
 #include "../units/unit.h"
 #include "../util/vec3.h"
 #include "../state/sim_globals.h"
@@ -160,6 +161,13 @@ static int __stdcall WorldLineOfSight(PathClass moveClass, int x0, int y0, int x
     }
 }
 
+static int __stdcall WorldTerrainPass(PathClass moveClass, int x, int y)
+{
+    if (!WorldInBounds(moveClass, x, y))
+        return 0;
+    return (int)GetTerrainPassValue(ClassOf(moveClass), x, y);
+}
+
 static void __stdcall WorldBeginSearch(PathUnit unit)
 {
     Unit* u = UnitOf(unit);
@@ -177,7 +185,7 @@ static void __stdcall WorldEndSearch(PathUnit unit)
 static PathWorldView s_world = {
     WorldTick, WorldPlayerCount, WorldIsPlaying, WorldUnitsPerPlayer, WorldFirstUnit, WorldLastUnit,
     WorldNextUnit, WorldUnitState, WorldMoveClass, WorldInBounds, WorldPass, WorldSeenSize, WorldSeen,
-    WorldLineOfSight, WorldBeginSearch, WorldEndSearch,
+    WorldLineOfSight, WorldTerrainPass, WorldBeginSearch, WorldEndSearch,
 };
 
 PathWorldView* NativePathWorld()

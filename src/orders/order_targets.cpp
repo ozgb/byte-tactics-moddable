@@ -388,7 +388,6 @@ void ApproachRadius::GetGoalArea(PathGoalArea* out)
     out->centre.x = pos.x;
     out->centre.y = pos.y;
     out->radius[0] = radius;
-    out->radiusSq[0] = radiusSq;
 }
 
 void RingApproach::GetGoalArea(PathGoalArea* out)
@@ -399,8 +398,6 @@ void RingApproach::GetGoalArea(PathGoalArea* out)
     out->centre.y = pos.y;
     out->radius[0] = inner;
     out->radius[1] = outer;
-    out->radiusSq[0] = innerSq;
-    out->radiusSq[1] = outerSq;
 }
 
 void PointMarker::GetGoalArea(PathGoalArea* out)
@@ -1516,7 +1513,7 @@ void PatrolGoal::FillWaypointWorldPos(Vec3* out, int unused, int n)
     }
 }
 
-void __stdcall ApplyPathEvent(const PathEvent* event)
+void __stdcall ApplyPathEvent(const PathEvent* event, const PathPoint* waypoints)
 {
     Ref<AiSearchGoal> goal;
     goal.offset = event->requester;
@@ -1529,12 +1526,13 @@ void __stdcall ApplyPathEvent(const PathEvent* event)
         if (event->count == 0) {
             goal->SetWaypoints(0, 0);
         } else {
-            Point16 points[PATH_MAX_WAYPOINTS];
-            for (int i = 0; i < event->count; i++) {
-                points[i].x = event->points[i].x;
-                points[i].y = event->points[i].y;
+            Point16 points[PATH_WAYPOINT_CAPACITY];
+            int count = event->count < PATH_WAYPOINT_CAPACITY ? event->count : PATH_WAYPOINT_CAPACITY;
+            for (int i = 0; i < count; i++) {
+                points[i].x = waypoints[i].x;
+                points[i].y = waypoints[i].y;
             }
-            goal->SetWaypoints(points, event->count);
+            goal->SetWaypoints(points, count);
         }
     }
 }

@@ -11,7 +11,7 @@ from pathlib import Path
 
 import privatestate as ps
 
-ALLOCATION = "PathfindingInit: GameAllocIgnoreTag AISearch region"
+ALLOCATION = "LoadBattleAssets: GameAllocIgnoreTag AISearch region"
 
 
 class PrivateItemTest(unittest.TestCase):

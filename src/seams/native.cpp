@@ -770,6 +770,7 @@ void InstallNativeSeams()
     s_los_radar.RecordRadarMapped = RecordRadarMapped;
     s_los_radar.UpdateSensorRadarAndCloak = UpdateSensorRadarAndCloak;
     s_los_radar.SoundHeardMask = SoundHeardMask;
+    s_pathfinding.RegionSize = PathfindingRegionSize;
     s_pathfinding.Init = PathfindingInit;
     s_pathfinding.Shutdown = PathfindingShutdown;
     s_pathfinding.Submit = PathfindingSubmit;
@@ -777,7 +778,7 @@ void InstallNativeSeams()
     s_pathfinding.CellsChanged = PathfindingCellsChanged;
     s_pathfinding.Step = PathfindingStep;
     s_pathfinding.Poll = PathfindingPoll;
-    s_pathfinding.Project = PathfindingProject;
+    s_pathfinding.WriteState = PathfindingWriteState;
     s_orders.ApplyPathEvent = ApplyPathEvent;
     s_orders.OrderOrStatusFlags = OrderOrStatusFlagsNative;
     s_orders.UnitMotionReadNetState = UnitMotionReadNetStateNative;

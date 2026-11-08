@@ -1,19 +1,24 @@
 #include "../../interfaces/pathfinding.h"
 #include "../../interfaces/services.h"
 
+static int CellsSquared(int radius)
+{
+    return (radius / 16) * (radius / 16);
+}
+
 int __stdcall PathGoalContains(const PathGoalArea* goal, int x, int y)
 {
     switch (goal->kind) {
     case PATH_GOAL_CIRCLE: {
         int dy = y - goal->centre.y;
         int dx = x - goal->centre.x;
-        return dx * dx + dy * dy <= goal->radiusSq[0];
+        return dx * dx + dy * dy <= CellsSquared(goal->radius[0]);
     }
     case PATH_GOAL_RING: {
         int dy = y - goal->centre.y;
         int dx = x - goal->centre.x;
         int distSq = dy * dy + dx * dx;
-        return distSq <= goal->radiusSq[1] && distSq >= goal->radiusSq[0];
+        return distSq <= CellsSquared(goal->radius[1]) && distSq >= CellsSquared(goal->radius[0]);
     }
     case PATH_GOAL_RECT:
         if ((x == goal->left || x == goal->right) && y >= goal->top && y <= goal->bottom)

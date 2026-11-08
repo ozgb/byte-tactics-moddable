@@ -62,6 +62,8 @@ players,InitPlayerSlot: operator new unsigned char,los_radar,RadarProjectileShow
 players,InitPlayerSlot: operator new unsigned char,los_radar,RecordRadarMapped,other-record,1,orders-air-fights@720
 players,InitPlayerSlot: operator new unsigned char,los_radar,RemoveLineOfSight,other-record,31,mission-passes-z@1
 players,InitPlayerSlot: operator new unsigned char,los_radar,UpdateSensorRadarAndCloak,other-record,2,orders-air-fights@90
+players,LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::Cancel,same-record,3,long-greenhaven-8p@11430
+players,LoadBattleAssets: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::Cancel,same-record,3,long-greenhaven-8p@11430
 players,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,RevealAroundUnit,same-record,29,mission-capture@21
 players,NewUnitScript: new UnitScript,units,CobScript::FUN_004b07b0,other-record,1,long-great-divide-2p@40500
 players,NewUnitScript: new UnitScript,units,CobScript::StartScript,other-record,1,ten-ring-atoll@6540
@@ -80,8 +82,6 @@ players,PathOrder::unit,orders,AddOrder,other-record,1,long-greenhaven-8p@26010
 players,PathPending::nextRequester,pathfinding,Pathfinder::Cancel,other-record,3,long-greenhaven-8p@11430
 players,PathPending::nextUnit,pathfinding,Pathfinder::Cancel,other-record,1,long-greenhaven-8p@27900
 players,PathPending::requester,pathfinding,Pathfinder::Cancel,other-record,3,long-greenhaven-8p@11430
-players,PathfindingInit: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::Cancel,same-record,3,long-greenhaven-8p@11430
-players,PathfindingInit: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::Cancel,same-record,3,long-greenhaven-8p@11430
 players,PlayerAI::builders,ai,ScoutTimer::OnTimer,other-record,61,combat-deaths@90
 players,PlayerAI::centre,ai,??0SquadScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,other-record,22,ten-lava-run@30
 players,PlayerAI::centre,ai,FindBuildPosition,other-record,62,combat-deaths@90
@@ -453,8 +453,6 @@ units,ApproachRadius::pos,orders,ApproachRadius::ContainsCell,other-record,16,mi
 units,ApproachRadius::pos,orders,SubmitRepath,other-record,9,mission-kill-of-type@54
 units,ApproachRadius::radius,orders,ApproachRadius::ContainsCell,other-record,16,mission-capture@2
 units,ApproachRadius::radius,orders,SubmitRepath,other-record,9,mission-kill-of-type@54
-units,ApproachRadius::radiusSq,orders,ApproachRadius::ContainsCell,other-record,16,mission-capture@2
-units,ApproachRadius::radiusSq,orders,SubmitRepath,other-record,9,mission-kill-of-type@54
 units,ApproachRadius::y,orders,ApproachRadius::ContainsCell,other-record,16,mission-capture@2
 units,ApproachRadius::y,orders,SubmitRepath,other-record,9,mission-kill-of-type@54
 units,AttachMove: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@31041
@@ -494,6 +492,10 @@ units,InitPlayerSlot: operator new unsigned char,los_radar,RemoveLineOfSight,sam
 units,InitPlayerSlot: operator new unsigned char,los_radar,SoundHeardMask,other-record,6,orders-air-fights@211
 units,InitPlayerSlot: operator new unsigned char,los_radar,SoundHeardMask,same-record,6,orders-air-fights@211
 units,IssueAttackOrder: new Order #2,seams,OrderOrStatusFlagsNative,other-record,1,edges-economy-targeting@245
+units,LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::Cancel,same-record,34,mission-build-unit@1
+units,LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::FindPending,same-record,34,mission-build-unit@1
+units,LoadBattleAssets: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::Cancel,same-record,9,mission-capture@31
+units,LoadBattleAssets: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::FindPending,same-record,34,mission-build-unit@1
 units,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,RevealAroundUnit,same-record,13,mission-kill-of-type@99
 units,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,map,CanPlaceFootprintAt,same-record,1,long-greenhaven-8p@25957
 units,LoadTntMap: operator new int #2,economy,UpdateMetalExtraction,same-record,14,ten-ring-atoll@103
@@ -508,8 +510,8 @@ units,LoadTntMap: operator new int #2,map,CanBuildAt,same-record,17,ten-ring-ato
 units,LoadTntMap: operator new int #2,map,CanPlaceFootprintAt,same-record,5,mission-timer@186
 units,LoadTntMap: operator new int #2,map,CanPlaceUnitFootprint,same-record,45,mission-build-unit@1
 units,LoadTntMap: operator new int #2,map,ClaimFootprintCells,same-record,10,mission-kill-of-type@98
+units,LoadTntMap: operator new int #2,map,FootprintValue,same-record,2,edges-economy-targeting@244
 units,LoadTntMap: operator new int #2,map,GetFootprintHeight,same-record,17,ten-ring-atoll@103
-units,LoadTntMap: operator new int #2,map,GetPassMapFootprintValue,same-record,2,edges-economy-targeting@244
 units,LoadTntMap: operator new int #2,map,IsFootprintClear,same-record,10,mission-kill-of-type@98
 units,LoadTntMap: operator new int #2,map,RemoveUnitFromMap,same-record,53,mission-build-unit@1
 units,LoadTntMap: operator new int #2,units,AlignUnitToGround,same-record,19,mission-build-unit@1
@@ -911,15 +913,10 @@ units,PathPending::nextUnit,pathfinding,Pathfinder::Cancel,same-record,2,skirmis
 units,PathPending::requester,pathfinding,Pathfinder::Cancel,other-record,9,mission-defeat-all-units@1
 units,PathPending::requester,pathfinding,Pathfinder::Cancel,same-record,1,skirmish4-long@25574
 units,PathPending::requester,pathfinding,Pathfinder::FindPending,other-record,16,mission-defeat-all-units@1
-units,PathPending::requester,pathfinding,Pathfinder::FindPending,same-record,1,long-greenhaven-8p@50624
 units,PathPending::unit,pathfinding,Pathfinder::Cancel,other-record,9,mission-capture@31
 units,PathPending::unit,pathfinding,Pathfinder::Cancel,same-record,1,skirmish4-long@25574
 units,PathPending::unit,pathfinding,Pathfinder::FindPending,other-record,16,mission-kill-of-type@54
 units,Pathfinder::object,pathfinding,Pathfinder::FindPending,same-record,10,mission-kill-of-type@61
-units,PathfindingInit: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::Cancel,same-record,34,mission-build-unit@1
-units,PathfindingInit: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::FindPending,same-record,34,mission-build-unit@1
-units,PathfindingInit: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::Cancel,same-record,9,mission-capture@31
-units,PathfindingInit: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::FindPending,same-record,34,mission-build-unit@1
 units,PatrolGoal::count,orders,??0PackedGoal@@QAE@PAUGoalOwnerUnit@@@Z,other-record,6,mission-timer@184
 units,PatrolGoal::points,orders,??0PackedGoal@@QAE@PAUGoalOwnerUnit@@@Z,other-record,6,mission-timer@184
 units,PatrolGoal::points,orders,PackedGoal::TickTowardGoal,other-record,9,mission-capture@1
@@ -968,12 +965,8 @@ units,Rec::field_6,map,VisitObjectsInRange,other-record,3,long-greenhaven-8p@120
 units,Rec::field_6,map,VisitObjectsInRange,same-record,3,long-greenhaven-8p@13085
 units,RingApproach::inner,orders,RingApproach::ContainsCell,other-record,4,sensors-los-off@3513
 units,RingApproach::inner,orders,SubmitRepath,other-record,2,long-great-divide-2p@29345
-units,RingApproach::innerSq,orders,RingApproach::ContainsCell,other-record,4,sensors-los-off@3513
-units,RingApproach::innerSq,orders,SubmitRepath,other-record,2,long-great-divide-2p@29345
 units,RingApproach::outer,orders,RingApproach::ContainsCell,other-record,4,sensors-los-off@3513
 units,RingApproach::outer,orders,SubmitRepath,other-record,2,long-great-divide-2p@29345
-units,RingApproach::outerSq,orders,RingApproach::ContainsCell,other-record,4,sensors-los-off@3513
-units,RingApproach::outerSq,orders,SubmitRepath,other-record,2,long-great-divide-2p@29345
 units,RingApproach::pos,orders,RingApproach::ContainsCell,other-record,4,sensors-los-off@3513
 units,RingApproach::pos,orders,SubmitRepath,other-record,2,long-great-divide-2p@29345
 units,RingApproach::y,orders,RingApproach::ContainsCell,other-record,4,sensors-los-off@3513
@@ -1446,7 +1439,7 @@ units,Unit::losSightFrameIdx,los_radar,UpdateLineOfSight,other-record,28,mission
 units,Unit::metal,features,ReclaimFeature,other-record,2,long-greenhaven-8p@19936
 units,Unit::metal,units,AddBuildProgress,other-record,1,long-greenhaven-8p@39150
 units,Unit::motion,map,AddUnitToMap,other-record,13,mission-build-unit@134
-units,Unit::motion,map,GetPassMapFootprintValue,other-record,11,edges-economy-targeting@117
+units,Unit::motion,map,FootprintValue,other-record,11,edges-economy-targeting@117
 units,Unit::motion,map,RefreshPassMapsForUnit,other-record,16,edges-economy-targeting@117
 units,Unit::motion,orders,??1Order@@QAE@XZ,other-record,13,edges-economy-targeting@117
 units,Unit::motion,orders,AiSearchGoal::TickTowardGoal,other-record,22,mission-build-unit@75
@@ -1887,8 +1880,8 @@ units,UnitMotion::obj,orders,UnitMotion::SteerGroundUnit,same-record,20,ui-build
 units,UnitMotion::obj,orders,UnitMotion::UpdateMotion,other-record,22,mission-timer@51
 units,UnitMotion::obj,orders,UnitMotion::UpdateMotion,same-record,22,mission-timer@51
 units,UnitMotion::p2,orders,UnitMotion::ApplyBankAndPitch,other-record,10,mission-capture@1
-units,UnitMotion::pathLockStamp,map,GetPassMapFootprintValue,other-record,21,mission-build-unit@1
-units,UnitMotion::pathLockStamp,map,GetPassMapFootprintValue,same-record,4,units-transport@2114
+units,UnitMotion::pathLockStamp,map,FootprintValue,other-record,21,mission-build-unit@1
+units,UnitMotion::pathLockStamp,map,FootprintValue,same-record,4,units-transport@2114
 units,UnitMotion::pathLockStamp,map,RefreshPassMapsForUnit,other-record,47,mission-capture@1
 units,UnitMotion::speed,orders,UnitMotion::ApplyClampedTurnDelta,other-record,84,allied-victory@1
 units,UnitMotion::speed,orders,UnitMotion::ApplyClampedTurnDelta,same-record,19,ui-build-menu@87

@@ -10,7 +10,7 @@ from pathlib import Path
 import projectioncheck
 from seamlink import Unit
 
-PROJECT = "?PathfindingProject@@YGXPAUPathTraceView@@@Z"
+PROJECT = "?PathfindingWriteState@@YGXPBUStateWriter@@@Z"
 GET = "?GetPathfinder@@YGPAVPathfinder@@XZ"
 GAME = "?g_game@@3PAUGame@@A"
 BASE = "?SimBlockBase@@YAPAXXZ"
@@ -37,8 +37,12 @@ class ProjectionCheckTest(unittest.TestCase):
         return projectioncheck.problems(list(units), self.root)
 
     def test_reading_the_root_is_allowed(self):
-        self.rows(("PathfindingProject", "field_write", "PathTraceView::record"))
+        self.rows(("PathfindingWriteState", "field_read", "Game::pathfinder"))
         self.assertEqual(self.check(self.unit([GAME, BASE])), [])
+
+    def test_a_string_literal_is_allowed(self):
+        self.rows()
+        self.assertEqual(self.check(self.unit(["??_C@_05ABCDEF@pool?$AA@"])), [])
 
     def test_a_walked_callee_is_judged(self):
         self.rows()
@@ -66,11 +70,11 @@ class ProjectionCheckTest(unittest.TestCase):
             self.assertIn("names the tick, the scenario or the harness", found[0])
 
     def test_a_write_to_state_is_found(self):
-        self.rows(("PathfindingProject", "field_write", "PathExtra::refreshCounter"), ("PathfindingProject", "global_write", "g_x"),
-                  ("PathfindingProject", "field_write", "PathTraceView::tickLoad"), ("PathfindingProject", "field_read", "Game::pathfinder"))
+        self.rows(("PathfindingWriteState", "field_write", "PathExtra::refreshCounter"), ("PathfindingWriteState", "global_write", "g_x"),
+                  ("PathfindingWriteState", "field_write", "StateWriter::Begin"), ("PathfindingWriteState", "field_read", "Game::pathfinder"))
         found = self.check(self.unit([GAME]))
-        self.assertEqual(len(found), 2)
-        self.assertTrue(all("writes only the view" in line for line in found))
+        self.assertEqual(len(found), 3)
+        self.assertTrue(all("changes nothing" in line for line in found))
 
     def test_writes_of_functions_not_walked_are_ignored(self):
         self.rows(("RunSearches", "field_write", "Pathfinder::steps"))

@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 66 ordered, 378 immediate, 29 deferrable, 1167 read-only, 1283 unobserved.
+Edges in data/dependencies.csv: 66 ordered, 378 immediate, 29 deferrable, 1163 read-only, 1283 unobserved.
 
 ## Cutting rule
 
@@ -28,11 +28,11 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | economy | 0 | 56 | 1 | 25 | 129 | 2 of 11 |
 | features | 15 | 28 | 5 | 80 | 169 | 4 of 11 |
 | ai | 27 | 47 | 5 | 134 | 206 | 2 of 11 |
-| pathfinding | 0 | 0 | 0 | 64 | 64 | 11 of 11 |
+| pathfinding | 0 | 0 | 0 | 63 | 64 | 11 of 11 |
 | weapons | 28 | 117 | 8 | 239 | 256 | 2 of 11 |
 | targeting | 10 | 47 | 3 | 36 | 82 | 3 of 11 |
 | los_radar | 6 | 44 | 4 | 135 | 227 | 2 of 11 |
-| orders | 16 | 123 | 17 | 174 | 332 | 3 of 11 |
+| orders | 16 | 123 | 17 | 171 | 332 | 3 of 11 |
 | units | 18 | 208 | 11 | 96 | 455 | 2 of 11 |
 | players | 4 | 36 | 4 | 69 | 322 | 4 of 11 |
 | map | 8 | 50 | 0 | 95 | 220 | 2 of 11 |
@@ -775,7 +775,7 @@ The 15 groups with the most rows are shown.
 | ordered | 0 | 0 |
 | immediate | 0 | 0 |
 | deferrable | 0 | 0 |
-| read-only | 0 | 64 |
+| read-only | 0 | 63 |
 | unobserved | 28 | 36 |
 
 **Ordered** (0).
@@ -794,7 +794,7 @@ None.
 
 | other | pathfinding is writer | pathfinding is reader |
 |---|---|---|
-| (no writer) | 0 | 64 |
+| (no writer) | 0 | 63 |
 
 **Unobserved**, by the other subsystem.
 
@@ -827,12 +827,12 @@ No draws.
 
 ### Within-pass reads
 
-31 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+30 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
 | units | `Pathfinder::Cancel` | 13 | 9 | `PathExtra::eventCount` | 37 |
-| units | `Pathfinder::FindPending` | 10 | 7 | `PathExtra::pendingCount` | 34 |
+| units | `Pathfinder::FindPending` | 9 | 6 | `LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets` | 34 |
 | players | `Pathfinder::Cancel` | 8 | 5 | `PathExtra::eventCount` | 5 |
 
 ### Deferral confirmation
@@ -1416,7 +1416,7 @@ The 15 groups with the most rows are shown.
 | ordered | 8 | 8 |
 | immediate | 65 | 58 |
 | deferrable | 8 | 9 |
-| read-only | 0 | 174 |
+| read-only | 0 | 171 |
 | unobserved | 142 | 190 |
 
 **Ordered** (16).
@@ -1513,7 +1513,7 @@ The 40 rows with the most runs are shown; the other 83 are in data/dependencies.
 
 | other | orders is writer | orders is reader |
 |---|---|---|
-| (no writer) | 0 | 174 |
+| (no writer) | 0 | 171 |
 
 **Unobserved**, by the other subsystem.
 
@@ -1599,7 +1599,7 @@ The rows themselves are in data/phase_dependencies.csv.
 
 ### Within-pass reads
 
-806 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+800 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -1610,12 +1610,12 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | `RepairUnitOrder` | 21 | 6 | `Order::progress` | 3 |
 | units | `UnitMotion::UpdatePosition` | 19 | 7 | `Unit::flags` | 69 |
 | units | `Order::SetAttachedFx` | 18 | 0 | `Order::attached` | 11 |
-| units | `SubmitRepath` | 17 | 0 | `ApproachRadius::pos` | 9 |
 | units | `VtolMobileBuildOrder` | 17 | 3 | `Unit::carrier` | 5 |
 | units | `GetBuiltOrder` | 16 | 8 | `Order::state` | 51 |
 | units | `BuildingBuildOrder` | 15 | 6 | `Order::state` | 22 |
 | units | `FollowGroundOrder` | 15 | 3 | `Order::state` | 7 |
 | units | `AttackChaseOrder` | 14 | 1 | `Unit::flags` | 12 |
+| units | `SubmitRepath` | 14 | 0 | `ApproachRadius::pos` | 9 |
 | units | `AirStrikeOrder` | 13 | 1 | `Order::target` | 2 |
 | units | `AirToGroundOrder` | 13 | 1 | `Unit::pos` | 4 |
 
@@ -2172,7 +2172,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | `CanPlaceFootprintAt` | 6 | 2 | `Unit::pos` | 7 |
 | units | `RefreshPassMapsForUnit` | 6 | 1 | `UnitMotion::pathLockStamp` | 47 |
 | units | `SetOwner` | 6 | 2 | `Unit::spatialBucket` | 38 |
-| units | `GetPassMapFootprintValue` | 4 | 2 | `UnitMotion::pathLockStamp` | 21 |
+| units | `FootprintValue` | 4 | 2 | `UnitMotion::pathLockStamp` | 21 |
 | units | `IsFootprintClear` | 4 | 1 | `LoadTntMap: operator new int #2` | 10 |
 | units | `SetYardOpen` | 4 | 0 | `Unit::flags` | 19 |
 | units | `PickRandomReclaimableResourcesInRadius` | 2 | 0 | `Unit::pos` | 7 |

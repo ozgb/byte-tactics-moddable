@@ -83,6 +83,7 @@ struct UnitPassMapStampView {
 
 #include "../network/player.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/pathfinding.h"
 
 #include "../map/mission.h"
 
@@ -376,6 +377,11 @@ void FreeMovementClasses(void)
     } while (p < (int)g_movementClassEntries + (int)sizeof(MovementClassTable));
 }
 
+#define REPORT_STAMPED_CELLS(moveClass, a, b) \
+    g_seams.pathfinding->CellsChanged((a).x - (moveClass)->footprintX < 0 ? 0 : (a).x - (moveClass)->footprintX, \
+                                      (a).y - (moveClass)->footprintZ < 0 ? 0 : (a).y - (moveClass)->footprintZ, \
+                                      (a).x + (b).x, (a).y + (b).y, 1u << (int)((moveClass) - g_movementClasses.entries), PATH_CHANGE_UNITS)
+
 // FUNCTION: 0x440a40
 void __stdcall RefreshAllPassMaps(Point16 a, Point16 b)
 {
@@ -395,11 +401,16 @@ void __stdcall RefreshPassMapsForUnit(UnitPassMapStampView* p)
         for (int i = 0; i < 32; i++) {
             if (last < g_movementClasses.entries[i].lastTick) {
                 ((MovementClass*)&g_movementClasses.entries[i])->RefreshPassMap(p->a, p->b);
+                REPORT_STAMPED_CELLS(&g_movementClasses.entries[i], p->a, p->b);
             }
         }
         return;
     }
     RefreshAllPassMaps(p->a, p->b);
+    for (int i = 0; i < 32; i++) {
+        if (g_movementClasses.entries[i].name != nullptr)
+            REPORT_STAMPED_CELLS(&g_movementClasses.entries[i], p->a, p->b);
+    }
 }
 
 // FUNCTION: 0x440af0
@@ -416,6 +427,7 @@ void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
     p->unit->lastTick = (unsigned int)g_game->ticks;
     if (prev < old) {
         g_seams.map->RefreshPassMap(this, 0, p->a, p->b);
+        REPORT_STAMPED_CELLS(this, p->a, p->b);
     }
     if (start != old) {
         for (UnitPassMapRecordView* r = &((UnitPassMapRecordView *)g_game->units.get())[1]; r <= (UnitPassMapRecordView *)g_game->unitsEnd.get(); r++) {
@@ -423,6 +435,7 @@ void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
                 unsigned int t = r->unit->lastTick;
                 if (t >= old && t < start) {
                     g_seams.map->RefreshPassMap(this, 0, r->a, r->b);
+                    REPORT_STAMPED_CELLS(this, r->a, r->b);
                 }
             }
         }
@@ -435,6 +448,7 @@ void MovementClass::RefreshUnitIfStale(UnitPassMapView* p)
 {
     if (p->unit->lastTick < lastTick) {
         g_seams.map->RefreshPassMap(this, 0, p->a, p->b);
+        REPORT_STAMPED_CELLS(this, p->a, p->b);
     }
 }
 

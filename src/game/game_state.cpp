@@ -10,6 +10,7 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/host.h"
 #include "game_state.h"
+#include "../state/block.h"
 #include "console_commands.h"
 #include "../util/tdf.h"
 
@@ -518,7 +519,14 @@ void LoadBattleAssets()
     mapInfo.width = g_game->width;
     mapInfo.height = g_game->height;
     mapInfo.unitSlots = g_game->poolCount;
-    g_seams.pathfinding->Init(&mapInfo);
+    mapInfo.moveClassCount = 0;
+    for (int i = 0; i < 32; i++) {
+        if (g_seams.pathworld->MoveClass(i) != 0)
+            mapInfo.moveClassCount++;
+    }
+    unsigned int pathRegionSize = g_seams.pathfinding->RegionSize(&mapInfo);
+    void* pathRegion = SimAllocRegion("AISearch region", pathRegionSize);
+    g_seams.pathfinding->Init(&mapInfo, pathRegion, pathRegionSize);
     g_seams.weapons->InitExplosions();
     InitCommands();
     for (int i = 0; i < 10; i++)
@@ -582,7 +590,9 @@ void ShutdownIngameSystems()
     g_seams.units->FreeUnitMemory();
     DestroyParticleLists();
     g_seams.weapons->FreeExplosions();
-    g_seams.pathfinding->Shutdown();
+    void* pathRegion = g_seams.pathfinding->Shutdown();
+    if (pathRegion != nullptr)
+        SimFree(pathRegion);
     g_seams.players->FreePlayers();
     g_seams.los_radar->FreeRadar();
     g_seams.los_radar->FreeMapResources();

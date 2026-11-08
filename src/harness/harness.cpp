@@ -18,6 +18,7 @@
 #include "../game/game_load.h"
 #include "condition_class.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/state_writer.h"
 #include "../quirks/quirks.h"
 #include "../wasm/modules.h"
 #include "../state/sim_events.h"
@@ -2119,16 +2120,6 @@ static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsi
         stride = REC_STRIDE;
         count = GameU32(GAME_SPATIAL_COUNT);
         break;
-    case TT_NODE: {
-        PathTraceView view;
-        g_seams.pathfinding->Project(&view);
-        if (view.record == NULL)
-            return;
-        base = RefAbs(*(const unsigned*)((const unsigned char*)view.record + PF_POOL));
-        stride = NODE_STRIDE;
-        count = *(const unsigned*)((const unsigned char*)view.record + PF_USED);
-        break;
-    }
     case TT_MOVECLASS:
         base = (unsigned)MoveClasses();
         stride = MOVECLASS_STRIDE;
@@ -2664,131 +2655,118 @@ static void VisitEyes()
     EndSection();
 }
 
-static unsigned char s_nodeFree[NODE_LIMIT];
+static int s_writerOpen = 0;
+static char s_writerRecord[64];
+static unsigned char s_writerRun[256];
+static unsigned s_writerRunLength = 0;
+static int s_writerRunLeft = 0;
 
-static void VisitPathNodes(const unsigned char* pf)
+static void WriterEndRecord()
 {
-    unsigned char* pool = (unsigned char*)RefAbs(*(unsigned*)(pf + PF_POOL));
-    unsigned* items = (unsigned*)RefAbs(*(unsigned*)(pf + PF_ITEMS));
-    int freeHead = *(int*)(pf + PF_FREE_HEAD);
-    unsigned used = *(unsigned*)(pf + PF_USED);
-    unsigned count = *(unsigned*)(pf + PF_COUNT);
-    char path[96];
-    if (pool == NULL || items == NULL || used > NODE_LIMIT || count > used) {
-        used = 0;
-        count = 0;
-    }
-    memset(s_nodeFree, 0, used);
-    for (unsigned guard = 0; guard < used && freeHead >= 0 && (unsigned)freeHead < used; guard++) {
-        if (s_nodeFree[freeHead])
-            break;
-        s_nodeFree[freeHead] = 1;
-        freeHead = *(int*)(pool + freeHead * NODE_STRIDE);
-    }
-    for (unsigned node = 0; node < used; node++) {
-        unsigned char* n = pool + node * NODE_STRIDE;
-        if (s_nodeFree[node])
-            continue;
-        HashU32(node);
-        FormatPath(path, "pathfinder.pool[%u]", node);
-        VisitElement(path, n, &kNodeTable);
-        if (*(int*)(n + NODE_G) != 0) {
-            if (s_dumpNow)
-                strcat(path, ".penalty");
-            VisitValue(path, *(unsigned short*)(n + NODE_PENALTY), 2);
-        }
-    }
-    VisitValue("pathfinder.heap.count", count, 4);
-    for (unsigned slot = 0; slot < count; slot++) {
-        FormatPath(path, "pathfinder.heap[%u]", slot);
-        VisitPointer(path, RefAbs(items[slot]), TT_NODE);
+    if (s_writerOpen) {
+        EndSection();
+        s_writerOpen = 0;
     }
 }
 
-static void VisitPathCells(const unsigned char* pf)
+static void WriterAdd(const unsigned char* p, unsigned n)
 {
-    unsigned char* cells = (unsigned char*)RefAbs(*(unsigned*)(pf + PF_CELLS));
-    unsigned* dirty = (unsigned*)RefAbs(*(unsigned*)(pf + PF_DIRTY));
-    unsigned count = *(unsigned*)(pf + PF_CELL_COUNT);
-    char path[96];
-    unsigned words;
-    if (cells == NULL || dirty == NULL || count > CELL_LIMIT)
-        count = 0;
-    words = (count + 255) >> 8;
-    for (unsigned w = 0; w < words; w++) {
-        unsigned bits = dirty[w];
-        if (bits == 0)
-            continue;
-        FormatPath(path, "pathfinder.dirty[%u]", w);
-        VisitU32(path, bits);
-        for (unsigned bit = 0; bit < 32; bit++) {
-            if (!((bits >> bit) & 1))
-                continue;
-            for (unsigned k = 0; k < 8; k++) {
-                unsigned index = (w << 8) + (bit << 3) + k;
-                const unsigned char* c = cells + index * 4;
-                unsigned flags = c[0];
-                unsigned state = flags & 3;
-                if (index >= count)
-                    break;
-                FormatPath(path, "pathfinder.cells[%u].flags", index);
-                VisitValue(path, flags, 1);
-                if ((flags & 8) || state == 1 || state == 2) {
-                    FormatPath(path, "pathfinder.cells[%u].dir", index);
-                    VisitValue(path, c[1], 1);
-                }
-                if (state == 1 || state == 2) {
-                    FormatPath(path, "pathfinder.cells[%u].node", index);
-                    VisitValue(path, *(const unsigned short*)(c + 2), 2);
-                }
-            }
+    if (s_writerRunLeft > 0 && s_writerRunLength + n <= sizeof s_writerRun) {
+        memcpy(s_writerRun + s_writerRunLength, p, n);
+        s_writerRunLength += n;
+        if (--s_writerRunLeft == 0) {
+            HashBuf(s_writerRun, s_writerRunLength);
+            s_writerRunLength = 0;
         }
+        return;
+    }
+    HashBuf(p, n);
+}
+
+static void WriterPath(char* out, const char* field, int index)
+{
+    char leaf[96];
+    sprintf(leaf, field, (unsigned)index);
+    sprintf(out, "%s.%s", s_writerRecord, leaf);
+}
+
+static void __stdcall WriterBegin(int section, const char* name)
+{
+    WriterEndRecord();
+    HashByte((unsigned char)section);
+    strncpy(s_writerRecord, name, sizeof s_writerRecord - 1);
+    s_writerRecord[sizeof s_writerRecord - 1] = '\0';
+    s_writerRunLeft = 0;
+    s_writerRunLength = 0;
+    s_writerOpen = 1;
+}
+
+static void __stdcall WriterInt(const char* field, int index, int size, unsigned int value)
+{
+    WriterAdd((const unsigned char*)&value, (unsigned)size);
+    if (s_dumpNow && field != nullptr) {
+        char path[160];
+        WriterPath(path, field, index);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%0*x\n", size * 2, size == 4 ? value : value & ((1u << (size * 8)) - 1));
     }
 }
 
-static void VisitPathGlobals(const PathTraceView& view)
+static void __stdcall WriterBytes(const char* field, int index, const void* data, int size)
 {
-    static const int zeros[10] = { 0 };
-    const void* addresses[3] = { view.tickLoad != NULL ? (const void*)view.tickLoad : (const void*)zeros,
-                                 view.budgetCap != NULL ? (const void*)view.budgetCap : (const void*)zeros,
-                                 view.refreshCounter != NULL ? (const void*)view.refreshCounter : (const void*)zeros };
-    for (unsigned k = 0; k < kPathGlobalsCount; k++) {
-        const TraceGlobal* g = &kPathGlobals[k];
-        TraceField f;
-        char path[96];
-        f.name = g->name;
-        f.offset = 0;
-        f.size = g->size;
-        f.kind = g->kind;
-        f.target = g->target;
-        f.mask = 0;
-        HashBuf((const unsigned char*)addresses[k], g->size);
-        if (s_dumpNow) {
-            sprintf(path, "pathfinder.%s", g->name);
-            DumpPrefix(path);
-            DumpValue((const unsigned char*)addresses[k], &f);
-        }
+    WriterAdd((const unsigned char*)data, (unsigned)size);
+    if (s_dumpNow && field != nullptr) {
+        char path[160];
+        WriterPath(path, field, index);
+        DumpPrefix(path);
+        fputs("hex:", s_dump);
+        for (int b = 0; b < size; b++)
+            fprintf(s_dump, "%02x", ((const unsigned char*)data)[b]);
+        fputc('\n', s_dump);
     }
 }
 
-static void VisitPathfinder()
+static void __stdcall WriterHandle(const char* field, int index, int kind, unsigned int value)
 {
-    PathTraceView view;
-    g_seams.pathfinding->Project(&view);
-    unsigned char* pf = (unsigned char*)view.record;
-    HashByte(16);
-    HashByte(pf != NULL);
-    if (pf != NULL) {
-        VisitElement("pathfinder", pf, &kPathfinderTable);
-        if (*(unsigned*)(pf + PF_OBJECT) != 0)
-            VisitElement("pathfinder", pf, &kPathfinderSearchTable);
-        VisitPathNodes(pf);
-        VisitPathCells(pf);
+    unsigned tag = 0;
+    unsigned id = 0;
+    if (kind == STATE_HANDLE_OWN) {
+        if (value != STATE_NO_INDEX) {
+            tag = TT_NODE;
+            id = value;
+        }
+    } else {
+        Resolve((unsigned)SimBlockBase(), value, true, kind, &tag, &id);
     }
-    EndSection();
-    HashByte(17);
-    VisitPathGlobals(view);
-    EndSection();
+    HashByte((unsigned char)tag);
+    HashU32(id);
+    if (s_dumpNow && field != nullptr) {
+        char path[160];
+        WriterPath(path, field, index);
+        DumpPrefix(path);
+        if (tag == 0)
+            fputs("null", s_dump);
+        else if (tag == TT_HEAP)
+            fputs("heap", s_dump);
+        else
+            fprintf(s_dump, "%s:%u", s_targetNames[tag], id);
+        fputc('\n', s_dump);
+    }
+}
+
+static void __stdcall WriterRun(int count)
+{
+    s_writerRunLeft = count;
+    s_writerRunLength = 0;
+}
+
+static const StateWriter s_stateWriter = { WriterBegin, WriterInt, WriterBytes, WriterHandle, WriterRun };
+
+static void VisitModuleState()
+{
+    s_writerOpen = 0;
+    g_seams.pathfinding->WriteState(&s_stateWriter);
+    WriterEndRecord();
 }
 
 static void VisitMoveClasses()
@@ -3626,7 +3604,7 @@ static void VisitWorld()
     VisitExplored();
     VisitSpatial();
     VisitEyes();
-    VisitPathfinder();
+    VisitModuleState();
     VisitMoveClasses();
     VisitPassMaps();
     VisitUnitHeap();

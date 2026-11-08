@@ -1,4 +1,7 @@
 #include <memory.h>
+#include <string.h>
+#include "../../interfaces/pathfinding.h"
+#include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include "../files/files_api.h"
 #include <stdlib.h>

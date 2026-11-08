@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "../../interfaces/pathfinding.h"
 #include "../../interfaces/services.h"
 
@@ -98,7 +99,7 @@ struct CellSink {
     int total;
     void Add(int x, int y)
     {
-        if (out != 0 && total < max) {
+        if (out != nullptr && total < max) {
             out[total].x = (short)x;
             out[total].y = (short)y;
         }
@@ -128,7 +129,7 @@ int __stdcall PathGoalCells(const PathGoalArea* goal, PathPoint* out, int max)
         }
         break;
     }
-    if (out != 0 && sink.total > max)
+    if (out != nullptr && sink.total > max)
         return max;
     return sink.total;
 }

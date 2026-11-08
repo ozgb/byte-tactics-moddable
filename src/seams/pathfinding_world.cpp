@@ -1,6 +1,7 @@
 #include <stddef.h>
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/pathfinding.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include "../network/player.h"
@@ -86,11 +87,11 @@ static int __stdcall WorldUnitState(PathUnit unit, PathUnitState* out)
 {
     Unit* u = UnitOf(unit);
     UnitMotionPlannerView* motion = (UnitMotionPlannerView*)u->motion.get();
-    if (((short)u->unitDefIndex) == 0 || motion == 0 || motion->owner.get() == 0)
+    if (((short)u->unitDefIndex) == 0 || motion == nullptr || motion->owner.get() == nullptr)
         return 0;
     MovementClass* moveClass = motion->owner.get();
     Player* owner = u->player.get();
-    out->player = owner != 0 ? (int)(owner - g_game->players) : 0;
+    out->player = owner != nullptr ? (int)(owner - g_game->players) : 0;
     out->cell.x = u->cell.x;
     out->cell.y = u->cell.y;
     out->heading = (unsigned short)u->heading;
@@ -103,7 +104,7 @@ static int __stdcall WorldUnitState(PathUnit unit, PathUnitState* out)
 static PathClass __stdcall WorldMoveClass(int index)
 {
     MovementClass* entry = &g_movementClasses.entries[index & 31];
-    if (entry->name == 0)
+    if (entry->name == nullptr)
         return 0;
     return Ref<MovementClass>(entry).offset;
 }

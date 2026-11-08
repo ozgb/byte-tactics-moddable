@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <malloc.h>
 #include "../state/block.h"
 #include <string.h>
 #include "win_types.h"
@@ -15,6 +14,9 @@ static inline bool operator<(const HeapEntry& a, const HeapEntry& b)
 
 #include "pathfind.h"
 #include "../../interfaces/pathfinding.h"
+#include "../../interfaces/ref.h"
+#include "../../interfaces/seams.h"
+#include "../../interfaces/services.h"
 #include "../../interfaces/state_writer.h"
 
 static int StepsFor(const PathWorldView* world)
@@ -310,7 +312,7 @@ void Pathfinder::TracePath()
         count = 0x40;
     PathExtra* extra = Extra();
     PathEventRecord* event = AddEvent(PATH_EVENT_FINISHED, n > 0x40 ? PATH_PARTIAL : PATH_FOUND);
-    if (event == 0)
+    if (event == nullptr)
         return;
     event->event.count = count;
     for (int i = 0; i < count; i++) {
@@ -883,7 +885,7 @@ RegionLayout LayoutFor(const PathMapInfo* map)
         l.buckets <<= 1;
     l.eventCapacity = 512;
 
-    unsigned int size = Pathfinder::kExtraOffset + sizeof(PathExtra);
+    unsigned int size = Pathfinder::EXTRA_OFFSET + sizeof(PathExtra);
     l.poolOffset = size;
     size += l.nodeLimit * sizeof(Node);
     l.itemsOffset = size;
@@ -915,7 +917,7 @@ void __stdcall PathfindingInit(const PathMapInfo* map, void* regionBase, unsigne
     RegionLayout l = LayoutFor(map);
     char* region = (char*)regionBase;
     g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)region);
-    PathExtra* extra = (PathExtra*)(region + Pathfinder::kExtraOffset);
+    PathExtra* extra = (PathExtra*)(region + Pathfinder::EXTRA_OFFSET);
     extra->nodeLimit = l.nodeLimit;
     extra->goalCapacity = l.goalCapacity;
     extra->pendingCapacity = l.pendingCapacity;
@@ -939,7 +941,7 @@ void __stdcall PathfindingInit(const PathMapInfo* map, void* regionBase, unsigne
 void* __stdcall PathfindingShutdown()
 {
     void* region = g_game->pathfinder.get();
-    g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)0);
+    g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)nullptr);
     return region;
 }
 

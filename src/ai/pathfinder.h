@@ -328,11 +328,11 @@ public:
     PathUnit cursor[10];
     int budget[10];
 
-    enum { kExtraOffset = 208 };
+    enum { EXTRA_OFFSET = 208 };
 
     PathExtra* Extra()
     {
-        return (PathExtra*)((char*)this + kExtraOffset);
+        return (PathExtra*)((char*)this + EXTRA_OFFSET);
     }
     int EstimateCost(int x, int y)
     {

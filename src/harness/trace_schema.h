@@ -1449,7 +1449,7 @@ static const TraceGlobal kScalarGlobals[] = {
 static const unsigned kScalarGlobalsCount = 1;
 
 static const TraceGlobal kPathGlobals[] = {
-    { "playerTickLoad", (const void*)0, 40, TF_BYTES, TT_NONE },
+    { "playerTickLoad", nullptr, 40, TF_BYTES, TT_NONE },
     { "playerBudgetCap", (const void*)1, 40, TF_BYTES, TT_NONE },
     { "budgetRefreshCounter", (const void*)2, 4, TF_SCALAR, TT_NONE },
 };

@@ -8,6 +8,7 @@
 #include "../state/sim_radar.h"
 #include "../state/game_rand.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/pathfinding.h"
 #include "../../interfaces/host.h"
 #include "game_state.h"
 #include "match_setup.h"

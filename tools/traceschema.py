@@ -1407,7 +1407,8 @@ def generate():
                                            "target": target.lower() if target else None})
             tail = "TT_" + target if target else "TT_NONE"
             if cname == "kPathGlobals":
-                lines.append("    { %s, (const void*)%d, %d, %s, %s }," % (c_string(name), index, size, kind, tail))
+                address = "nullptr" if index == 0 else "(const void*)%d" % index
+                lines.append("    { %s, %s, %d, %s, %s }," % (c_string(name), address, size, kind, tail))
             elif symbol in moved:
                 lines.append("    { %s, (const void*)(%s), %d, %s, %s, 1 }," % (
                     c_string(name), moved[symbol], size, kind, tail))

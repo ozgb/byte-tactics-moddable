@@ -4,7 +4,7 @@
 #include "../../interfaces/pathfinding.h"
 #include "../../interfaces/state_writer.h"
 #include "../../interfaces/ref.h"
-#include "../state/block.h"
+#include "../../interfaces/services.h"
 #include "../network/player.h"
 #include "../game/game.h"
 
@@ -15,23 +15,23 @@
 namespace {
 
 enum {
-    kMagic = 0x31415048,
-    kStepBudget = 0x535,
-    kMaxNodes = 12,
-    kMaxPerSide = 3,
-    kTri = kMaxNodes * (kMaxNodes - 1) / 2,
-    kMaxGoalCells = 64,
-    kMaxGoalClusters = 8,
-    kMaxGoalNodes = kMaxGoalClusters * kMaxNodes,
-    kEventCap = 128,
-    kPathCap = 8192,
-    kMaxLocal = 32 * 32,
-    kStraight = 10,
-    kDiagonal = 14,
-    kPassOneExtra = 30,
-    kInf = 0x3fffffff,
-    kNoEdge = 0xffff,
-    kClassBudgetBytes = 12 << 20
+    MAGIC = 0x31415048,
+    STEP_BUDGET = 0x535,
+    MAX_NODES = 12,
+    MAX_PER_SIDE = 3,
+    TRI = MAX_NODES * (MAX_NODES - 1) / 2,
+    MAX_GOAL_CELLS = 64,
+    MAX_GOAL_CLUSTERS = 8,
+    MAX_GOAL_NODES = MAX_GOAL_CLUSTERS * MAX_NODES,
+    EVENT_CAP = 128,
+    PATH_CAP = 8192,
+    MAX_LOCAL = 32 * 32,
+    STRAIGHT = 10,
+    DIAGONAL = 14,
+    PASS_ONE_EXTRA = 30,
+    INF = 0x3fffffff,
+    NO_EDGE = 0xffff,
+    CLASS_BUDGET_BYTES = 12 << 20
 };
 
 enum {
@@ -58,9 +58,9 @@ const int kSideDy[4] = { -1, 0, 1, 0 };
 struct ClusterRec {
     int version;
     int count;
-    int cell[kMaxNodes];
-    unsigned char side[kMaxNodes];
-    unsigned short cost[kTri];
+    int cell[MAX_NODES];
+    unsigned char side[MAX_NODES];
+    unsigned short cost[TRI];
 };
 
 struct Local {
@@ -71,12 +71,12 @@ struct Local {
     int n;
     int found;
     int goalAt;
-    int g[kMaxLocal];
-    int key[kMaxLocal];
-    int heap[kMaxLocal];
-    int hpos[kMaxLocal];
-    signed char par[kMaxLocal];
-    unsigned char st[kMaxLocal];
+    int g[MAX_LOCAL];
+    int key[MAX_LOCAL];
+    int heap[MAX_LOCAL];
+    int hpos[MAX_LOCAL];
+    signed char par[MAX_LOCAL];
+    unsigned char st[MAX_LOCAL];
 };
 
 struct Ev {
@@ -122,16 +122,16 @@ struct Hdr {
     int slot;
     int sx, sy, fx, fy;
     int startCluster;
-    PathPoint goalCells[kMaxGoalCells];
+    PathPoint goalCells[MAX_GOAL_CELLS];
     int nGoal;
     int nearGoal;
-    int goalClusters[kMaxGoalClusters];
+    int goalClusters[MAX_GOAL_CLUSTERS];
     int nGoalClusters;
     int gcIdx;
     int localReady;
     int directCost;
-    int startCost[kMaxNodes];
-    GoalNode goalNodes[kMaxGoalNodes];
+    int startCost[MAX_NODES];
+    GoalNode goalNodes[MAX_GOAL_NODES];
     int nGoalNodes;
     int aHeapN;
     int aInit;
@@ -144,7 +144,7 @@ struct Hdr {
     int wp[MAX_WAYPOINTS + 2];
     int wpOverflow;
     int pullInit;
-    PathPoint rawGoal[kMaxGoalCells];
+    PathPoint rawGoal[MAX_GOAL_CELLS];
     int nRaw;
     int nearest;
     int nearNode;
@@ -186,7 +186,7 @@ inline const PathWorldView* World()
 bool Open(HpaView* v)
 {
     Hdr* h = (Hdr*)g_game->pathfinder.get();
-    if (h == 0 || h->magic != kMagic)
+    if (h == nullptr || h->magic != MAGIC)
         return false;
     char* b = (char*)h;
     v->h = h;
@@ -285,7 +285,7 @@ inline int Octile(int dx, int dy)
         dy = -dy;
     int lo = dx < dy ? dx : dy;
     int hi = dx < dy ? dy : dx;
-    return hi * kStraight + lo * (kDiagonal - kStraight);
+    return hi * STRAIGHT + lo * (DIAGONAL - STRAIGHT);
 }
 
 int CellExtra(const HpaView* v, PathClass cls, int x, int y, int terrain)
@@ -298,90 +298,90 @@ int CellExtra(const HpaView* v, PathClass cls, int x, int y, int terrain)
     int p = terrain ? v->w->TerrainPass(cls, x, y) : v->w->Pass(cls, x, y);
     if (p <= 0)
         return -1;
-    return p == 1 ? kPassOneExtra : 0;
+    return p == 1 ? PASS_ONE_EXTRA : 0;
 }
 
-void LInit(Local* L, const Hdr* h, int cluster, int mode, int terrain)
+void LInit(Local* lc, const Hdr* h, int cluster, int mode, int terrain)
 {
-    L->ox = (cluster % h->CW) << h->shift;
-    L->oy = (cluster / h->CW) << h->shift;
-    L->w = h->W - L->ox < h->cs ? h->W - L->ox : h->cs;
-    L->h = h->H - L->oy < h->cs ? h->H - L->oy : h->cs;
-    L->mode = mode;
-    L->terrain = terrain;
-    L->tx = L->ty = 0;
-    L->n = 0;
-    L->found = -1;
-    L->goalAt = -1;
+    lc->ox = (cluster % h->CW) << h->shift;
+    lc->oy = (cluster / h->CW) << h->shift;
+    lc->w = h->W - lc->ox < h->cs ? h->W - lc->ox : h->cs;
+    lc->h = h->H - lc->oy < h->cs ? h->H - lc->oy : h->cs;
+    lc->mode = mode;
+    lc->terrain = terrain;
+    lc->tx = lc->ty = 0;
+    lc->n = 0;
+    lc->found = -1;
+    lc->goalAt = -1;
     int cells = h->cs * h->cs;
     for (int i = 0; i < cells; i++) {
-        L->st[i] = 0;
-        L->hpos[i] = -1;
+        lc->st[i] = 0;
+        lc->hpos[i] = -1;
     }
 }
 
-inline int LIndex(const Hdr* h, const Local* L, int x, int y)
+inline int LIndex(const Hdr* h, const Local* lc, int x, int y)
 {
-    return ((y - L->oy) << h->shift) + (x - L->ox);
+    return ((y - lc->oy) << h->shift) + (x - lc->ox);
 }
 
-void LPush(Local* L, const Hdr* h, int x, int y, int g)
+void LPush(Local* lc, const Hdr* h, int x, int y, int g)
 {
-    int i = LIndex(h, L, x, y);
-    L->st[i] = 1;
-    L->g[i] = g;
-    L->par[i] = -1;
-    L->key[i] = g;
-    if (L->mode == 1)
-        L->key[i] += Octile(x - L->tx, y - L->ty);
-    HeapPush(L->heap, &L->n, L->hpos, L->key, i);
+    int i = LIndex(h, lc, x, y);
+    lc->st[i] = 1;
+    lc->g[i] = g;
+    lc->par[i] = -1;
+    lc->key[i] = g;
+    if (lc->mode == 1)
+        lc->key[i] += Octile(x - lc->tx, y - lc->ty);
+    HeapPush(lc->heap, &lc->n, lc->hpos, lc->key, i);
 }
 
-int LStep(Local* L, const HpaView* v, PathClass cls, const PathGoalArea* goal)
+int LStep(Local* lc, const HpaView* v, PathClass cls, const PathGoalArea* goal)
 {
     const Hdr* h = v->h;
-    if (L->n == 0)
+    if (lc->n == 0)
         return 2;
-    int u = HeapPop(L->heap, &L->n, L->hpos, L->key);
-    L->st[u] = 2;
-    int ux = L->ox + (u & (h->cs - 1));
-    int uy = L->oy + (u >> h->shift);
-    if (L->mode == 1 && ux == L->tx && uy == L->ty) {
-        L->found = u;
+    int u = HeapPop(lc->heap, &lc->n, lc->hpos, lc->key);
+    lc->st[u] = 2;
+    int ux = lc->ox + (u & (h->cs - 1));
+    int uy = lc->oy + (u >> h->shift);
+    if (lc->mode == 1 && ux == lc->tx && uy == lc->ty) {
+        lc->found = u;
         return 1;
     }
-    if (L->mode == 2 && PathGoalContains(goal, ux, uy)) {
-        L->found = u;
+    if (lc->mode == 2 && PathGoalContains(goal, ux, uy)) {
+        lc->found = u;
         return 1;
     }
-    if (L->mode == 0 && goal != 0 && L->goalAt < 0 && PathGoalContains(goal, ux, uy))
-        L->goalAt = u;
+    if (lc->mode == 0 && goal != nullptr && lc->goalAt < 0 && PathGoalContains(goal, ux, uy))
+        lc->goalAt = u;
     for (int d = 0; d < 8; d++) {
         int nx = ux + kDx[d];
         int ny = uy + kDy[d];
-        if (nx < L->ox || ny < L->oy || nx >= L->ox + L->w || ny >= L->oy + L->h)
+        if (nx < lc->ox || ny < lc->oy || nx >= lc->ox + lc->w || ny >= lc->oy + lc->h)
             continue;
-        int vi = LIndex(h, L, nx, ny);
-        if (L->st[vi] == 2)
+        int vi = LIndex(h, lc, nx, ny);
+        if (lc->st[vi] == 2)
             continue;
-        int extra = CellExtra(v, cls, nx, ny, L->terrain);
+        int extra = CellExtra(v, cls, nx, ny, lc->terrain);
         if (extra < 0)
             continue;
-        int step = kStraight;
+        int step = STRAIGHT;
         if (d & 1) {
-            if (CellExtra(v, cls, nx, uy, L->terrain) < 0 || CellExtra(v, cls, ux, ny, L->terrain) < 0)
+            if (CellExtra(v, cls, nx, uy, lc->terrain) < 0 || CellExtra(v, cls, ux, ny, lc->terrain) < 0)
                 continue;
-            step = kDiagonal;
+            step = DIAGONAL;
         }
-        int ng = L->g[u] + step + extra;
-        if (L->st[vi] == 0 || ng < L->g[vi]) {
-            L->g[vi] = ng;
-            L->par[vi] = (signed char)d;
-            L->st[vi] = 1;
-            L->key[vi] = ng;
-            if (L->mode == 1)
-                L->key[vi] += Octile(nx - L->tx, ny - L->ty);
-            HeapPush(L->heap, &L->n, L->hpos, L->key, vi);
+        int ng = lc->g[u] + step + extra;
+        if (lc->st[vi] == 0 || ng < lc->g[vi]) {
+            lc->g[vi] = ng;
+            lc->par[vi] = (signed char)d;
+            lc->st[vi] = 1;
+            lc->key[vi] = ng;
+            if (lc->mode == 1)
+                lc->key[vi] += Octile(nx - lc->tx, ny - lc->ty);
+            HeapPush(lc->heap, &lc->n, lc->hpos, lc->key, vi);
         }
     }
     return 0;
@@ -389,7 +389,7 @@ int LStep(Local* L, const HpaView* v, PathClass cls, const PathGoalArea* goal)
 
 inline int TriIndex(int i, int j)
 {
-    return i * (2 * kMaxNodes - i - 1) / 2 + (j - i - 1);
+    return i * (2 * MAX_NODES - i - 1) / 2 + (j - i - 1);
 }
 
 inline int NodeCost(const ClusterRec* r, int i, int j)
@@ -407,7 +407,7 @@ void BuildCluster(HpaView* v, int slot, int c)
         if (h->slotOf[i] == slot)
             cls = h->classes[i];
     ClusterRec* r = &v->rec[slot * h->nClu + c];
-    Local* L = &h->scratch[1];
+    Local* lc = &h->scratch[1];
     int ox = (c % h->CW) << h->shift;
     int oy = (c / h->CW) << h->shift;
     int cw = h->W - ox < h->cs ? h->W - ox : h->cs;
@@ -449,7 +449,7 @@ void BuildCluster(HpaView* v, int slot, int c)
                 if (runStart < 0)
                     runStart = i;
             } else if (runStart >= 0) {
-                if (segments < kMaxPerSide && r->count < kMaxNodes) {
+                if (segments < MAX_PER_SIDE && r->count < MAX_NODES) {
                     int mid = (runStart + i - 1) / 2;
                     r->cell[r->count] = (ay0 + ady * mid) * h->W + ax0 + adx * mid;
                     r->side[r->count] = (unsigned char)s;
@@ -460,22 +460,22 @@ void BuildCluster(HpaView* v, int slot, int c)
             }
         }
     }
-    for (int i = 0; i < kTri; i++)
-        r->cost[i] = kNoEdge;
+    for (int i = 0; i < TRI; i++)
+        r->cost[i] = NO_EDGE;
     for (int i = 0; i + 1 < r->count; i++) {
         int sx = r->cell[i] % h->W;
         int sy = r->cell[i] / h->W;
-        LInit(L, h, c, 0, 1);
-        LPush(L, h, sx, sy, 0);
+        LInit(lc, h, c, 0, 1);
+        LPush(lc, h, sx, sy, 0);
         for (;;) {
-            int res = LStep(L, v, cls, 0);
+            int res = LStep(lc, v, cls, nullptr);
             work++;
             if (res != 0)
                 break;
             bool all = true;
             for (int j = i + 1; j < r->count; j++) {
-                int lj = LIndex(h, L, r->cell[j] % h->W, r->cell[j] / h->W);
-                if (L->st[lj] != 2) {
+                int lj = LIndex(h, lc, r->cell[j] % h->W, r->cell[j] / h->W);
+                if (lc->st[lj] != 2) {
                     all = false;
                     break;
                 }
@@ -484,9 +484,9 @@ void BuildCluster(HpaView* v, int slot, int c)
                 break;
         }
         for (int j = i + 1; j < r->count; j++) {
-            int lj = LIndex(h, L, r->cell[j] % h->W, r->cell[j] / h->W);
-            if (L->st[lj] == 2) {
-                int g = L->g[lj];
+            int lj = LIndex(h, lc, r->cell[j] % h->W, r->cell[j] / h->W);
+            if (lc->st[lj] == 2) {
+                int g = lc->g[lj];
                 r->cost[TriIndex(i, j)] = (unsigned short)(g > 0xfffe ? 0xfffe : g);
             }
         }
@@ -523,8 +523,8 @@ inline PathPoint WorldPoint(const Hdr* h, int cell)
 PathEvent* NewEvent(HpaView* v, int kind, int status)
 {
     Hdr* h = v->h;
-    if (h->evCount >= kEventCap)
-        return 0;
+    if (h->evCount >= EVENT_CAP)
+        return nullptr;
     Ev* rec = &v->ev[h->evCount++];
     rec->first = h->nPts;
     PathEvent* e = &rec->e;
@@ -541,7 +541,7 @@ PathEvent* NewEvent(HpaView* v, int kind, int status)
 void EmitCells(HpaView* v, int kind, int status, const int* cells, int n)
 {
     PathEvent* e = NewEvent(v, kind, status);
-    if (e == 0)
+    if (e == nullptr)
         return;
     if (n > MAX_WAYPOINTS)
         n = MAX_WAYPOINTS;
@@ -601,7 +601,7 @@ void Touch(HpaView* v, int n)
     if (v->astamp[n] != (int)h->searchId) {
         v->astamp[n] = (int)h->searchId;
         v->apos[n] = -1;
-        v->ag[n] = kInf;
+        v->ag[n] = INF;
         v->apar[n] = -1;
     }
 }
@@ -612,7 +612,7 @@ int HeuristicOf(const HpaView* v, int n)
         return 0;
     int cell = NodeCell(v, n);
     PathGoalArea goal = v->h->req.goal;
-    return PathGoalDistance(&goal, cell % v->h->W, cell / v->h->W) * kStraight;
+    return PathGoalDistance(&goal, cell % v->h->W, cell / v->h->W) * STRAIGHT;
 }
 
 void Relax(HpaView* v, int from, int to, int cost)
@@ -653,7 +653,7 @@ void ResetSearchState(Hdr* h)
     h->wpOverflow = 0;
     h->nearest = 0;
     h->nearNode = -1;
-    h->nearDist = kInf;
+    h->nearDist = INF;
 }
 
 void StartSearch(HpaView* v, const Req* q, int* budget)
@@ -673,7 +673,7 @@ void StartSearch(HpaView* v, const Req* q, int* budget)
     PathUnitState us;
     if (!w->UnitState(q->r.unit, &us)) {
         NewEvent(v, PATH_EVENT_STARTED, PATH_START_INDIRECT);
-        FinishSearch(v, PATH_FAILED, 0, 0);
+        FinishSearch(v, PATH_FAILED, nullptr, 0);
         return;
     }
     h->sx = q->r.useStart ? q->r.start.x : us.cell.x;
@@ -691,7 +691,7 @@ void StartSearch(HpaView* v, const Req* q, int* budget)
     int start = h->sy * h->W + h->sx;
     if (h->slot < 0 || h->sx < 0 || h->sy < 0 || h->sx >= h->W || h->sy >= h->H) {
         NewEvent(v, PATH_EVENT_STARTED, PATH_START_INDIRECT);
-        FinishSearch(v, PATH_FAILED, 0, 0);
+        FinishSearch(v, PATH_FAILED, nullptr, 0);
         return;
     }
     h->startCluster = ClusterOf(h, h->sx, h->sy);
@@ -702,13 +702,13 @@ void StartSearch(HpaView* v, const Req* q, int* budget)
         return;
     }
 
-    PathPoint raw[kMaxGoalCells];
-    int n = PathGoalCells(&goal, raw, kMaxGoalCells);
+    PathPoint raw[MAX_GOAL_CELLS];
+    int n = PathGoalCells(&goal, raw, MAX_GOAL_CELLS);
     h->nGoal = 0;
-    int best = kInf;
+    int best = INF;
     h->nearGoal = start;
     h->nRaw = 0;
-    for (int i = 0; i < n && i < kMaxGoalCells; i++)
+    for (int i = 0; i < n && i < MAX_GOAL_CELLS; i++)
         h->rawGoal[h->nRaw++] = raw[i];
     for (int i = 0; i < n; i++) {
         if (CellExtra(v, us.moveClass, raw[i].x, raw[i].y, 0) < 0)
@@ -722,7 +722,7 @@ void StartSearch(HpaView* v, const Req* q, int* budget)
     }
     if (h->nRaw == 0) {
         NewEvent(v, PATH_EVENT_STARTED, PATH_START_INDIRECT);
-        FinishSearch(v, PATH_FAILED, 0, 0);
+        FinishSearch(v, PATH_FAILED, nullptr, 0);
         return;
     }
     (*budget)--;
@@ -743,7 +743,7 @@ void StartSearch(HpaView* v, const Req* q, int* budget)
         for (int k = 0; k < h->nGoalClusters; k++)
             if (h->goalClusters[k] == c)
                 seen = true;
-        if (!seen && h->nGoalClusters < kMaxGoalClusters)
+        if (!seen && h->nGoalClusters < MAX_GOAL_CLUSTERS)
             h->goalClusters[h->nGoalClusters++] = c;
     }
     h->phase = PH_BUILD;
@@ -772,28 +772,28 @@ void RunBuild(HpaView* v, int* budget)
 void RunStartFlood(HpaView* v, int* budget)
 {
     Hdr* h = v->h;
-    Local* L = &h->scratch[0];
+    Local* lc = &h->scratch[0];
     PathClass cls = ClassOfActive(h);
     if (!h->localReady) {
-        LInit(L, h, h->startCluster, 0, 0);
-        LPush(L, h, h->sx, h->sy, 0);
+        LInit(lc, h, h->startCluster, 0, 0);
+        LPush(lc, h, h->sx, h->sy, 0);
         h->localReady = 1;
     }
     PathGoalArea goal = h->req.goal;
-    int res = LStep(L, v, cls, &goal);
+    int res = LStep(lc, v, cls, &goal);
     (*budget)--;
     if (res == 0)
         return;
     const ClusterRec* r = &v->rec[h->slot * h->nClu + h->startCluster];
-    for (int i = 0; i < kMaxNodes; i++) {
+    for (int i = 0; i < MAX_NODES; i++) {
         h->startCost[i] = -1;
         if (i < r->count) {
-            int li = LIndex(h, L, r->cell[i] % h->W, r->cell[i] / h->W);
-            if (L->st[li] == 2)
-                h->startCost[i] = L->g[li];
+            int li = LIndex(h, lc, r->cell[i] % h->W, r->cell[i] / h->W);
+            if (lc->st[li] == 2)
+                h->startCost[i] = lc->g[li];
         }
     }
-    h->directCost = L->goalAt >= 0 ? L->g[L->goalAt] : -1;
+    h->directCost = lc->goalAt >= 0 ? lc->g[lc->goalAt] : -1;
     h->phase = PH_GOAL_FLOOD;
     h->localReady = 0;
     h->gcIdx = 0;
@@ -802,7 +802,7 @@ void RunStartFlood(HpaView* v, int* budget)
 void RunGoalFlood(HpaView* v, int* budget)
 {
     Hdr* h = v->h;
-    Local* L = &h->scratch[0];
+    Local* lc = &h->scratch[0];
     PathClass cls = ClassOfActive(h);
     if (h->gcIdx >= h->nGoalClusters) {
         h->phase = PH_ABSTRACT;
@@ -811,24 +811,24 @@ void RunGoalFlood(HpaView* v, int* budget)
     }
     int c = h->goalClusters[h->gcIdx];
     if (!h->localReady) {
-        LInit(L, h, c, 0, 0);
+        LInit(lc, h, c, 0, 0);
         for (int i = 0; i < h->nGoal; i++)
             if (ClusterOf(h, h->goalCells[i].x, h->goalCells[i].y) == c)
-                LPush(L, h, h->goalCells[i].x, h->goalCells[i].y, 0);
+                LPush(lc, h, h->goalCells[i].x, h->goalCells[i].y, 0);
         h->localReady = 1;
     }
-    int res = LStep(L, v, cls, 0);
+    int res = LStep(lc, v, cls, nullptr);
     (*budget)--;
     if (res == 0)
         return;
     const ClusterRec* r = &v->rec[h->slot * h->nClu + c];
     for (int i = 0; i < r->count; i++) {
-        int li = LIndex(h, L, r->cell[i] % h->W, r->cell[i] / h->W);
-        if (L->st[li] == 2 && h->nGoalNodes < kMaxGoalNodes) {
+        int li = LIndex(h, lc, r->cell[i] % h->W, r->cell[i] / h->W);
+        if (lc->st[li] == 2 && h->nGoalNodes < MAX_GOAL_NODES) {
             GoalNode* g = &h->goalNodes[h->nGoalNodes++];
             g->cluster = c;
             g->local = i;
-            g->cost = L->g[li];
+            g->cost = lc->g[li];
         }
     }
     h->gcIdx++;
@@ -839,7 +839,7 @@ int GoalDistSq(const Hdr* h, int cell)
 {
     int x = cell % h->W;
     int y = cell / h->W;
-    int best = kInf;
+    int best = INF;
     for (int i = 0; i < h->nRaw; i++) {
         int dx = x - h->rawGoal[i].x;
         int dy = y - h->rawGoal[i].y;
@@ -938,7 +938,7 @@ void RunAbstract(HpaView* v, int* budget)
         if (j == i)
             continue;
         int cost = NodeCost(r, i, j);
-        if (cost != kNoEdge)
+        if (cost != NO_EDGE)
             Relax(v, u, (c << 5) | j, cost);
     }
     int s = r->side[i];
@@ -955,28 +955,28 @@ void RunAbstract(HpaView* v, int* budget)
         int bcell = by * h->W + bx;
         for (int j = 0; j < nr->count; j++)
             if (nr->cell[j] == bcell)
-                Relax(v, u, (nc << 5) | j, kStraight + extra);
+                Relax(v, u, (nc << 5) | j, STRAIGHT + extra);
     }
 }
 
-void AppendLocalPath(HpaView* v, Local* L)
+void AppendLocalPath(HpaView* v, Local* lc)
 {
     Hdr* h = v->h;
-    int tmp[kMaxLocal];
+    int tmp[MAX_LOCAL];
     int n = 0;
-    int u = L->found;
-    while (L->par[u] >= 0) {
+    int u = lc->found;
+    while (lc->par[u] >= 0) {
         tmp[n++] = u;
-        int d = L->par[u];
+        int d = (unsigned char)lc->par[u];
         u -= kDy[d] * h->cs + kDx[d];
     }
     for (int i = n - 1; i >= 0; i--) {
-        if (h->nPath >= kPathCap) {
+        if (h->nPath >= PATH_CAP) {
             h->truncated = 1;
             return;
         }
-        int x = L->ox + (tmp[i] & (h->cs - 1));
-        int y = L->oy + (tmp[i] >> h->shift);
+        int x = lc->ox + (tmp[i] & (h->cs - 1));
+        int y = lc->oy + (tmp[i] >> h->shift);
         v->path[h->nPath++] = y * h->W + x;
     }
 }
@@ -984,7 +984,7 @@ void AppendLocalPath(HpaView* v, Local* L)
 void RunRefine(HpaView* v, int* budget)
 {
     Hdr* h = v->h;
-    Local* L = &h->scratch[0];
+    Local* lc = &h->scratch[0];
     PathClass cls = ClassOfActive(h);
     int last = h->nPath > 0 ? v->path[h->nPath - 1] : 0;
     int lx = last % h->W;
@@ -1000,33 +1000,33 @@ void RunRefine(HpaView* v, int* budget)
             int tx = tcell % h->W;
             int ty = tcell / h->W;
             if (ClusterOf(h, tx, ty) != ClusterOf(h, lx, ly)) {
-                if (h->nPath >= kPathCap)
+                if (h->nPath >= PATH_CAP)
                     h->truncated = 1;
                 else
                     v->path[h->nPath++] = tcell;
                 h->segIdx++;
                 return;
             }
-            LInit(L, h, ClusterOf(h, lx, ly), 1, 0);
-            L->tx = tx;
-            L->ty = ty;
+            LInit(lc, h, ClusterOf(h, lx, ly), 1, 0);
+            lc->tx = tx;
+            lc->ty = ty;
         } else {
             if (h->nearest) {
                 h->segIdx++;
                 return;
             }
-            LInit(L, h, ClusterOf(h, lx, ly), 2, 0);
+            LInit(lc, h, ClusterOf(h, lx, ly), 2, 0);
         }
-        LPush(L, h, lx, ly, 0);
+        LPush(lc, h, lx, ly, 0);
         h->localReady = 1;
     }
     PathGoalArea goal = h->req.goal;
-    int res = LStep(L, v, cls, &goal);
+    int res = LStep(lc, v, cls, &goal);
     (*budget)--;
     if (res == 0)
         return;
     if (res == 1) {
-        AppendLocalPath(v, L);
+        AppendLocalPath(v, lc);
         h->segIdx++;
         h->localReady = 0;
         return;
@@ -1045,12 +1045,12 @@ void RunRefine(HpaView* v, int* budget)
         h->localReady = 0;
         h->nearest = 0;
         h->nearNode = -1;
-        h->nearDist = kInf;
+        h->nearDist = INF;
         h->phase = PH_ABSTRACT;
         return;
     }
     if (h->nPath <= 1) {
-        FinishSearch(v, PATH_FAILED, 0, 0);
+        FinishSearch(v, PATH_FAILED, nullptr, 0);
         return;
     }
     h->truncated = 1;
@@ -1148,12 +1148,12 @@ void RunActive(HpaView* v, int* budget)
 Req* PickNext(HpaView* v, unsigned tick)
 {
     Hdr* h = v->h;
-    Req* best = 0;
+    Req* best = nullptr;
     for (int i = 0; i < h->reqCap; i++) {
         Req* q = &v->req[i];
         if (!q->used || q->r.notBefore > tick)
             continue;
-        if (best == 0 || q->seq < best->seq)
+        if (best == nullptr || q->seq < best->seq)
             best = q;
     }
     return best;
@@ -1189,7 +1189,7 @@ Layout LayoutFor(const PathMapInfo* map)
     l.cs = 16;
     l.shift = 4;
     l.nClu = ((l.W + l.cs - 1) >> l.shift) * ((l.H + l.cs - 1) >> l.shift);
-    if (l.nClu * (int)sizeof(ClusterRec) * nClasses > kClassBudgetBytes) {
+    if (l.nClu * (int)sizeof(ClusterRec) * nClasses > CLASS_BUDGET_BYTES) {
         l.cs = 32;
         l.shift = 5;
         l.nClu = ((l.W + l.cs - 1) >> l.shift) * ((l.H + l.cs - 1) >> l.shift);
@@ -1206,7 +1206,7 @@ Layout LayoutFor(const PathMapInfo* map)
     l.offReq = off;
     off = Align8(off + l.reqCap * (int)sizeof(Req));
     l.offEv = off;
-    off = Align8(off + kEventCap * (int)sizeof(Ev));
+    off = Align8(off + EVENT_CAP * (int)sizeof(Ev));
     l.offPts = off;
     off = Align8(off + POINT_CAP * (int)sizeof(PathPoint));
     l.offAG = off;
@@ -1224,7 +1224,7 @@ Layout LayoutFor(const PathMapInfo* map)
     l.offRoute = off;
     off += l.NN * 4;
     l.offPath = off;
-    off += kPathCap * 4;
+    off += PATH_CAP * 4;
     l.size = off;
     return l;
 }
@@ -1240,7 +1240,7 @@ void __stdcall HpaInit(const PathMapInfo* map, void* regionBase, unsigned int)
     Layout l = LayoutFor(map);
     char* region = (char*)regionBase;
     Hdr* h = (Hdr*)region;
-    h->magic = kMagic;
+    h->magic = MAGIC;
     h->W = l.W;
     h->H = l.H;
     h->cs = l.cs;
@@ -1277,12 +1277,12 @@ void __stdcall HpaInit(const PathMapInfo* map, void* regionBase, unsigned int)
 void* __stdcall HpaShutdown()
 {
     Hdr* h = (Hdr*)g_game->pathfinder.get();
-    if (h != 0 && h->magic == kMagic) {
+    if (h != nullptr && h->magic == MAGIC) {
         HpaView v;
         if (Open(&v) && h->active)
             v.w->EndSearch(h->req.unit);
     }
-    g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)0);
+    g_game->pathfinder = Ref<Pathfinder>((Pathfinder*)nullptr);
     return h;
 }
 
@@ -1294,17 +1294,17 @@ void __stdcall HpaSubmit(const PathRequest* request)
     Hdr* h = v.h;
     if (h->active && h->req.requester == request->requester)
         return;
-    Req* free = 0;
+    Req* free = nullptr;
     for (int i = 0; i < h->reqCap; i++) {
         Req* q = &v.req[i];
         if (q->used && q->r.requester == request->requester) {
             q->r = *request;
             return;
         }
-        if (!q->used && free == 0)
+        if (!q->used && free == nullptr)
             free = q;
     }
-    if (free == 0)
+    if (free == nullptr)
         return;
     free->r = *request;
     free->seq = ++h->seqCounter;
@@ -1360,12 +1360,12 @@ void __stdcall HpaStep()
     h->evCount = 0;
     h->nPts = 0;
     unsigned int limit = v.w->SearchStepLimit();
-    int budget = limit != 0 ? (int)limit : kStepBudget;
+    int budget = limit != 0 ? (int)limit : STEP_BUDGET;
     Settle(h, &budget);
-    while (budget > 0 && h->evCount < kEventCap - 4) {
+    while (budget > 0 && h->evCount < EVENT_CAP - 4) {
         if (!h->active) {
             Req* q = PickNext(&v, tick);
-            if (q == 0)
+            if (q == nullptr)
                 break;
             Req copy = *q;
             q->used = 0;
@@ -1458,28 +1458,28 @@ void WriteSearch(const StateWriter* w, HpaView* v)
     w->Int("search.nBanned", 0, 4, h->nBanned);
     w->Bytes("search.banned", 0, h->banned, h->nBanned * 4);
     if (h->localReady) {
-        const Local* L = &h->scratch[0];
+        const Local* lc = &h->scratch[0];
         int cells = h->cs * h->cs;
-        w->Int("local.ox", 0, 4, L->ox);
-        w->Int("local.oy", 0, 4, L->oy);
-        w->Int("local.w", 0, 4, L->w);
-        w->Int("local.h", 0, 4, L->h);
-        w->Int("local.mode", 0, 4, L->mode);
-        w->Int("local.terrain", 0, 4, L->terrain);
-        w->Int("local.tx", 0, 4, L->tx);
-        w->Int("local.ty", 0, 4, L->ty);
-        w->Int("local.n", 0, 4, L->n);
-        w->Int("local.found", 0, 4, L->found);
-        w->Int("local.goalAt", 0, 4, L->goalAt);
-        w->Bytes("local.st", 0, L->st, cells);
-        w->Bytes("local.hpos", 0, L->hpos, cells * 4);
-        w->Bytes("local.heap", 0, L->heap, L->n * 4);
+        w->Int("local.ox", 0, 4, lc->ox);
+        w->Int("local.oy", 0, 4, lc->oy);
+        w->Int("local.w", 0, 4, lc->w);
+        w->Int("local.h", 0, 4, lc->h);
+        w->Int("local.mode", 0, 4, lc->mode);
+        w->Int("local.terrain", 0, 4, lc->terrain);
+        w->Int("local.tx", 0, 4, lc->tx);
+        w->Int("local.ty", 0, 4, lc->ty);
+        w->Int("local.n", 0, 4, lc->n);
+        w->Int("local.found", 0, 4, lc->found);
+        w->Int("local.goalAt", 0, 4, lc->goalAt);
+        w->Bytes("local.st", 0, lc->st, cells);
+        w->Bytes("local.hpos", 0, lc->hpos, cells * 4);
+        w->Bytes("local.heap", 0, lc->heap, lc->n * 4);
         for (int i = 0; i < cells; i++) {
-            if (L->st[i] == 0)
+            if (lc->st[i] == 0)
                 continue;
-            w->Int("local.g[%u]", i, 4, L->g[i]);
-            w->Int("local.key[%u]", i, 4, L->key[i]);
-            w->Int("local.par[%u]", i, 1, (unsigned char)L->par[i]);
+            w->Int("local.g[%u]", i, 4, lc->g[i]);
+            w->Int("local.key[%u]", i, 4, lc->key[i]);
+            w->Int("local.par[%u]", i, 1, (unsigned char)lc->par[i]);
         }
     }
     if (h->phase >= PH_ABSTRACT) {

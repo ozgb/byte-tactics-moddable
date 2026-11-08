@@ -28,6 +28,7 @@ struct UnitDef;
 
 #include "../network/player_info.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/pathfinding.h"
 
 #include "../network/player.h"
 

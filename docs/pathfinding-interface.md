@@ -285,8 +285,9 @@ unit is blocked, so the stall lasts. An implementation that wants any-angle rout
 for this reason.
 
 The default emits `cell * 16 + footprint * 8` on each axis, where `footprint` is the footprint of the unit's
-movement class (`PathUnitState::footprintX`, `footprintY`). The demo emits the same plus 8, the centre of the cell.
-Movement tolerates both: it only needs the segment directions above.
+movement class (`PathUnitState::footprintX`, `footprintY`). The demo emits the same. A
+waypoint 8 off puts the unit in the neighbouring row or column, which may be blocked, and units then stop in a
+corridor one cell wide.
 
 ## 10. Goal units
 

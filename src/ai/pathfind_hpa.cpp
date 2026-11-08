@@ -515,8 +515,8 @@ void Settle(Hdr* h, int* budget)
 inline PathPoint WorldPoint(const Hdr* h, int cell)
 {
     PathPoint p;
-    p.x = (short)((cell % h->W) * 16 + h->fx * 8 + 8);
-    p.y = (short)((cell / h->W) * 16 + h->fy * 8 + 8);
+    p.x = (short)((cell % h->W) * 16 + h->fx * 8);
+    p.y = (short)((cell / h->W) * 16 + h->fy * 8);
     return p;
 }
 

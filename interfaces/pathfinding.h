@@ -97,7 +97,7 @@ enum PathStatus {
     PATH_NEAREST = 3
 };
 
-// What happened to a request in the last step; its waypoints are in world units, and the default movement follows only segments along the eight grid directions (the default search emits cell * 16 + footprint * 8, the demo adds 8).
+// What happened to a request in the last step; its waypoints are in world units, and the default movement follows only segments along the eight grid directions (the default search and the demo emit cell * 16 + footprint * 8).
 struct PathEvent {
     // A PathEventKind.
     int kind;

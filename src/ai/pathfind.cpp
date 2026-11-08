@@ -701,7 +701,9 @@ void Pathfinder::RunSearches()
     int players = world->PlayerCount();
     if (players == 0)
         return;
-    stepsPerTick = StepsFor(world);
+    int limit = StepsFor(world);
+    if (stepsPerTick != limit)
+        stepsPerTick = limit;
     int share = stepsPerTick / players;
     int total = 0;
     if (++extra->refreshCounter >= 150) {

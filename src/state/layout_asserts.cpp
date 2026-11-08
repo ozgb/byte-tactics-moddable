@@ -2038,7 +2038,7 @@ static_assert(offsetof(PlayerInfo, maxUnits) == 165, "");
 static_assert(offsetof(PlayerInfo, versionMajor) == 167, "");
 static_assert(offsetof(PlayerInfo, versionMinor) == 168, "");
 static_assert(offsetof(PlayerInfo, mapCrc) == 169, "");
-static_assert(offsetof(PlayerInfo, unknown_ad) == 173, "");
+static_assert(offsetof(PlayerInfo, matchSetup) == 173, "");
 static_assert(sizeof(PlayerInfoEntry) == 331, "");
 static_assert(offsetof(PlayerInfoEntry, info) == 0, "");
 static_assert(offsetof(PlayerInfoEntry, unknown_4) == 4, "");

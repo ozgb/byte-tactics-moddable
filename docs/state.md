@@ -121,7 +121,7 @@ Two values every player agrees on, both 0 by default (`src/game/match_setup.h`):
 Where they come from and how they travel:
 - **A test-mode run:** the scenario keys `block_bytes` and `search_steps` (`docs/scenario-format.md`). A game
   outside test mode takes the switches `-blockbytes <n>` and `-searchsteps <n>` of the command line.
-- **A lobby:** the host puts them in its `PlayerInfo`, bytes 173 to 178 (the unused tail `unknown_ad`: a 16-bit count
+- **A lobby:** the host puts them in its `PlayerInfo`, bytes 173 to 178 (the unused tail `matchSetup`: a 16-bit count
   of 65536-byte pages, then a 32-bit step count), which the lobby already broadcasts to everyone, and every
   machine reads them from the host's record when the match loads (`LoadMatch`, game type 3). Zeros are the defaults,
   so a 3.1c host's lobby is unchanged. With `blockBytes` 0 each machine derives the size from its own modules, so players with different

@@ -97,8 +97,8 @@ MatchSetup MatchSetupOfInfo(const PlayerInfo* info)
 {
     unsigned short pages;
     MatchSetup setup;
-    memcpy(&pages, info->unknown_ad, sizeof pages);
-    memcpy(&setup.searchSteps, info->unknown_ad + sizeof pages, sizeof setup.searchSteps);
+    memcpy(&pages, info->matchSetup, sizeof pages);
+    memcpy(&setup.searchSteps, info->matchSetup + sizeof pages, sizeof setup.searchSteps);
     setup.blockBytes = (unsigned int)pages * kSimBlockPage;
     return setup;
 }
@@ -107,8 +107,8 @@ void MatchSetupToInfo(PlayerInfo* info)
 {
     MatchSetup setup = MatchSetupRequested();
     unsigned short pages = (unsigned short)(setup.blockBytes / kSimBlockPage);
-    memcpy(info->unknown_ad, &pages, sizeof pages);
-    memcpy(info->unknown_ad + sizeof pages, &setup.searchSteps, sizeof setup.searchSteps);
+    memcpy(info->matchSetup, &pages, sizeof pages);
+    memcpy(info->matchSetup + sizeof pages, &setup.searchSteps, sizeof setup.searchSteps);
 }
 
 void MatchSetupBegin(const MatchSetup& setup)

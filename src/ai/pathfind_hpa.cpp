@@ -17,8 +17,8 @@ namespace {
 enum {
     kMagic = 0x31415048,
     kStepBudget = 0x535,
-    kMaxNodes = 24,
-    kMaxPerSide = 6,
+    kMaxNodes = 12,
+    kMaxPerSide = 3,
     kTri = kMaxNodes * (kMaxNodes - 1) / 2,
     kMaxGoalCells = 64,
     kMaxGoalClusters = 8,

@@ -250,8 +250,8 @@ The default's region holds:
 | events | 512 events with up to 64 waypoints each | the last step's events, until polled |
 
 The demo's region scales with the number of movement classes: a cluster cache per class, `nClasses * clusters *
-sizeof(ClusterRec)` (680 bytes a cluster), with 16-cell clusters, or 32-cell ones when the cache of every class
-would pass 12 MB. It has no cap on the classes.
+sizeof(ClusterRec)` (200 bytes a cluster: at most 12 border nodes and their pairwise costs), with 16-cell clusters, or 32-cell ones when
+the cache of every class would pass 12 MB (Acid Pools, 15 classes: 16-cell clusters, a region of 11.75 MB). It has no cap on the classes.
 
 The pool and the heap items are counted in the record but filled only as a search needs them, as 3.1c's
 `GrowNodes` did, so the bytes the trace hashes are 3.1c's. A search's goal cells, which it needs only while it

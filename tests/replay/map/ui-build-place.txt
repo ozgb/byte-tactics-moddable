@@ -317257,7 +317257,21 @@ call 138 AddUnitToMap
   r Unit#1.posZ 21615654
   a unit Unit#2
   i los_radar.UpdateCellHeightRange (37,21) (6,6)
-  i pathfinding.CellsChanged 38 22 41 25 4294967295 2
+  i pathfinding.CellsChanged 36 20 42 26 1 2
+  i pathfinding.CellsChanged 36 20 42 26 2 2
+  i pathfinding.CellsChanged 36 20 42 26 4 2
+  i pathfinding.CellsChanged 35 19 42 26 8 2
+  i pathfinding.CellsChanged 35 19 42 26 16 2
+  i pathfinding.CellsChanged 36 20 42 26 32 2
+  i pathfinding.CellsChanged 35 19 42 26 64 2
+  i pathfinding.CellsChanged 33 17 42 26 128 2
+  i pathfinding.CellsChanged 32 16 42 26 256 2
+  i pathfinding.CellsChanged 34 18 42 26 512 2
+  i pathfinding.CellsChanged 32 16 42 26 1024 2
+  i pathfinding.CellsChanged 35 19 42 26 2048 2
+  i pathfinding.CellsChanged 35 19 42 26 4096 2
+  i pathfinding.CellsChanged 34 18 42 26 8192 2
+  i pathfinding.CellsChanged 35 19 42 26 16384 2
   w Unit#2.spatialBucket SpatialBucket#89
   w MovementClass#0.cells 260:ff55d5ffff01d0ffff01d0ffff01d0ffff01d0ffff01d0ffff55d5ff
   w MovementClass#1.cells 260:ff55d5ffff01d0ffff01d0ffff01d0ffff01d0ffff01d0ffff55d5ff

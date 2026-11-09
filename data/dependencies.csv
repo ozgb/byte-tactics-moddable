@@ -1391,8 +1391,6 @@ features,orders,Unit::metal,units,deferrable,3,skirmish4-long@23084,
 features,orders,Vec3::x,-,unobserved,0,,
 features,orders,Vec3::y,-,unobserved,0,,
 features,orders,Vec3::z,-,unobserved,0,,
-features,pathfinding,HpaCellsChanged,-,unobserved,0,,indirect
-features,pathfinding,PathfindingCellsChanged,-,unobserved,0,,indirect
 features,pathfinding,Point16::x,-,unobserved,0,,
 features,pathfinding,Point16::y,-,unobserved,0,,
 features,players,Point16::x,-,unobserved,0,,
@@ -2521,6 +2519,8 @@ units,orders,rng.parkMiller,units,ordered,20,mission-kill-of-type@3,
 units,orders,sim-event,units,ordered,48,mission-timer@51,
 units,orders,unknown_1b8e,units,immediate,47,mission-build-unit@1,
 units,orders,unknown_1cd9,units,immediate,39,mission-timer@51,
+units,pathfinding,HpaCellsChanged,-,unobserved,0,,indirect
+units,pathfinding,PathfindingCellsChanged,-,unobserved,0,,indirect
 units,pathfinding,Point16::x,-,unobserved,0,,
 units,pathfinding,Point16::y,-,unobserved,0,,
 units,players,Game::defs,-,unobserved,0,,

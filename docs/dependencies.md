@@ -26,14 +26,14 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 |---|---|---|---|---|---|---|
 | wind_meteors | 0 | 0 | 0 | 20 | 104 | 11 of 11 |
 | economy | 0 | 56 | 1 | 25 | 129 | 2 of 11 |
-| features | 15 | 28 | 5 | 80 | 169 | 4 of 11 |
+| features | 15 | 28 | 5 | 80 | 167 | 4 of 11 |
 | ai | 27 | 47 | 5 | 134 | 206 | 2 of 11 |
 | pathfinding | 0 | 0 | 0 | 63 | 64 | 11 of 11 |
 | weapons | 28 | 117 | 8 | 239 | 256 | 2 of 11 |
 | targeting | 10 | 47 | 3 | 36 | 82 | 3 of 11 |
 | los_radar | 6 | 44 | 4 | 135 | 227 | 2 of 11 |
 | orders | 16 | 123 | 17 | 171 | 332 | 3 of 11 |
-| units | 18 | 208 | 11 | 96 | 455 | 2 of 11 |
+| units | 18 | 208 | 11 | 96 | 457 | 2 of 11 |
 | players | 4 | 36 | 4 | 69 | 322 | 4 of 11 |
 | map | 8 | 50 | 0 | 95 | 220 | 2 of 11 |
 
@@ -382,7 +382,7 @@ No draws.
 | immediate | 15 | 13 |
 | deferrable | 3 | 2 |
 | read-only | 0 | 80 |
-| unobserved | 93 | 76 |
+| unobserved | 91 | 76 |
 
 **Ordered** (15).
 
@@ -462,7 +462,7 @@ No draws.
 | los_radar | 9 | 14 |
 | map | 16 | 10 |
 | orders | 16 | 8 |
-| pathfinding | 4 | 2 |
+| pathfinding | 2 | 2 |
 | players | 6 | 9 |
 | targeting | 3 | 3 |
 | units | 9 | 8 |
@@ -802,12 +802,12 @@ None.
 |---|---|---|
 | ai | 2 | 2 |
 | economy | 2 | 0 |
-| features | 2 | 4 |
+| features | 2 | 2 |
 | los_radar | 2 | 2 |
 | map | 2 | 4 |
 | orders | 10 | 12 |
 | players | 2 | 6 |
-| units | 2 | 2 |
+| units | 2 | 4 |
 | weapons | 2 | 2 |
 | wind_meteors | 2 | 2 |
 
@@ -1653,7 +1653,7 @@ The 15 groups with the most rows are shown.
 | immediate | 146 | 62 |
 | deferrable | 9 | 2 |
 | read-only | 0 | 96 |
-| unobserved | 303 | 152 |
+| unobserved | 305 | 152 |
 
 **Ordered** (18).
 
@@ -1757,7 +1757,7 @@ The 40 rows with the most runs are shown; the other 168 are in data/dependencies
 | los_radar | 30 | 6 |
 | map | 40 | 15 |
 | orders | 70 | 41 |
-| pathfinding | 2 | 2 |
+| pathfinding | 4 | 2 |
 | players | 28 | 37 |
 | targeting | 12 | 3 |
 | weapons | 39 | 22 |

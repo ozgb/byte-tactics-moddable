@@ -1922,9 +1922,9 @@ static const unsigned short kReplayUnitsGetGroundHeightObjReads[] = { 129 };
 static const unsigned short kReplayUnitsSetStateBitsObjReads[] = { 0, 25, 37, 44 };
 static const unsigned short kReplayUnitsSetStateBitsObjWrites[] = { 39 };
 static const unsigned char kReplayUnitsRefreshMovedUnitsReads[] = { 0 };
-static const unsigned short kReplayUnitsRefreshMovedUnitsObjReads[] = { 42, 43, 141, 151, 156, 158 };
+static const unsigned short kReplayUnitsRefreshMovedUnitsObjReads[] = { 42, 43, 141, 151, 153, 154, 156, 158 };
 static const unsigned short kReplayUnitsRefreshMovedUnitsObjWrites[] = { 141, 156 };
-static const unsigned short kReplayUnitsRefreshUnitIfStaleObjReads[] = { 42, 43, 141, 151, 156, 158 };
+static const unsigned short kReplayUnitsRefreshUnitIfStaleObjReads[] = { 42, 43, 141, 151, 153, 154, 156, 158 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayUnitsAllocateUnitMemoryReads[] = { 26 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryWrites[] = { 26 };
@@ -2233,8 +2233,8 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "SetStateBits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSetStateBitsObjReads, 4, kReplayUnitsSetStateBitsObjWrites, 1, nullptr, 0 },
     { "MovementClassGet", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "MovementClassInBounds", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "RefreshMovedUnits", SUB_UNITS, kReplayUnitsRefreshMovedUnitsReads, 1, nullptr, 0, kReplayUnitsRefreshMovedUnitsObjReads, 6, kReplayUnitsRefreshMovedUnitsObjWrites, 2, nullptr, 0 },
-    { "RefreshUnitIfStale", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsRefreshUnitIfStaleObjReads, 6, nullptr, 0, nullptr, 0 },
+    { "RefreshMovedUnits", SUB_UNITS, kReplayUnitsRefreshMovedUnitsReads, 1, nullptr, 0, kReplayUnitsRefreshMovedUnitsObjReads, 8, kReplayUnitsRefreshMovedUnitsObjWrites, 2, nullptr, 0 },
+    { "RefreshUnitIfStale", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsRefreshUnitIfStaleObjReads, 8, nullptr, 0, nullptr, 0 },
     { "StartScript", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "QueryScript", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetAimFromPosition", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },

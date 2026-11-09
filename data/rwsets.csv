@@ -4704,12 +4704,15 @@ address,function,file,kind,target
 0x416730,CmdEdge,src/game/console_commands.cpp,global_read,g_game
 0x416780,CmdSearch,src/game/console_commands.cpp,call,CommandArgs::GetArg
 0x416780,CmdSearch,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
-0x416780,CmdSearch,src/game/console_commands.cpp,call,SetSearchBaseScale
 0x416780,CmdSearch,src/game/console_commands.cpp,call,SimSetSearchSteps
 0x416780,CmdSearch,src/game/console_commands.cpp,call,bx_atof_msvc5
 0x416780,CmdSearch,src/game/console_commands.cpp,field_read,CommandArgs::count
+0x416780,CmdSearch,src/game/console_commands.cpp,field_read,PathfindingSeam::SetSearchScale
+0x416780,CmdSearch,src/game/console_commands.cpp,field_read,Seams::pathfinding
 0x416780,CmdSearch,src/game/console_commands.cpp,function,
 0x416780,CmdSearch,src/game/console_commands.cpp,global_maybe_written,g_emptyText
+0x416780,CmdSearch,src/game/console_commands.cpp,global_read,g_seams
+0x416780,CmdSearch,src/game/console_commands.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [PathfindingSeam::SetSearchScale]
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,call,Sound::PlayCdTrack
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,field_read,Game::sound
@@ -5189,7 +5192,6 @@ address,function,file,kind,target
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,FindNextSelectedUnit
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,GetTextKeyColor
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,HarnessViewRand
-0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,PathfindingDebugCell
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,SetFont
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,SetTextColors
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,call,_itoa
@@ -5215,10 +5217,12 @@ address,function,file,kind,target
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Game::width
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Movement::states
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Movement::width
+0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,PathfindingSeam::DebugCell
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Player::explored
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Player::exploredWidth
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Point::x
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Point::y
+0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Seams::pathfinding
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Tile::feature
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Tile::flags
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,field_read,Tile::height
@@ -5239,6 +5243,8 @@ address,function,file,kind,target
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,global_read,g_dirDeltaZ
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,global_read,g_game
 0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,global_read,g_movementClassColors
+0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,global_read,g_seams
+0x418310,DrawMapDebugOverlay,src/game/console_commands.cpp,indirect_call,"indirect via void (*)(int, int, int *, int *) __attribute__((stdcall)) [PathfindingSeam::DebugCell]"
 0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,call,CommandArgs::GetArg
 0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x418bb0,CmdPrintWeights,src/game/console_commands.cpp,call,host_file_close
@@ -7788,12 +7794,10 @@ address,function,file,kind,target
 0x423c50,PlaceFeature,src/map/features.cpp,field_read,Game::height
 0x423c50,PlaceFeature,src/map/features.cpp,field_read,Game::width
 0x423c50,PlaceFeature,src/map/features.cpp,field_read,MapSeam::RefreshAllPassMaps
-0x423c50,PlaceFeature,src/map/features.cpp,field_read,PathfindingSeam::CellsChanged
 0x423c50,PlaceFeature,src/map/features.cpp,field_read,Point16::x
 0x423c50,PlaceFeature,src/map/features.cpp,field_read,Point16::y
 0x423c50,PlaceFeature,src/map/features.cpp,field_read,Pool::entries
 0x423c50,PlaceFeature,src/map/features.cpp,field_read,Seams::map
-0x423c50,PlaceFeature,src/map/features.cpp,field_read,Seams::pathfinding
 0x423c50,PlaceFeature,src/map/features.cpp,field_read,Seams::units
 0x423c50,PlaceFeature,src/map/features.cpp,field_read,UnitsSeam::CreateObjectState
 0x423c50,PlaceFeature,src/map/features.cpp,field_write,Cell::feature
@@ -7815,7 +7819,6 @@ address,function,file,kind,target
 0x423c50,PlaceFeature,src/map/features.cpp,global_read,g_seams
 0x423c50,PlaceFeature,src/map/features.cpp,indirect_call,indirect via ModelState *(*)(Object3do *) __attribute__((stdcall)) [UnitsSeam::CreateObjectState]
 0x423c50,PlaceFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [MapSeam::RefreshAllPassMaps]"
-0x423c50,PlaceFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x424050,UpdateFeatures,src/map/features.cpp,call,BurnOut
 0x424050,UpdateFeatures,src/map/features.cpp,call,FeatureVec3
 0x424050,UpdateFeatures,src/map/features.cpp,call,MoveFeatureSpot
@@ -7950,11 +7953,9 @@ address,function,file,kind,target
 0x4246b0,RemoveFeature,src/map/features.cpp,field_read,Game::spots
 0x4246b0,RemoveFeature,src/map/features.cpp,field_read,Game::width
 0x4246b0,RemoveFeature,src/map/features.cpp,field_read,MapSeam::RefreshAllPassMaps
-0x4246b0,RemoveFeature,src/map/features.cpp,field_read,PathfindingSeam::CellsChanged
 0x4246b0,RemoveFeature,src/map/features.cpp,field_read,Point16::x
 0x4246b0,RemoveFeature,src/map/features.cpp,field_read,Point16::y
 0x4246b0,RemoveFeature,src/map/features.cpp,field_read,Seams::map
-0x4246b0,RemoveFeature,src/map/features.cpp,field_read,Seams::pathfinding
 0x4246b0,RemoveFeature,src/map/features.cpp,field_read,Seams::units
 0x4246b0,RemoveFeature,src/map/features.cpp,field_read,Spot::state
 0x4246b0,RemoveFeature,src/map/features.cpp,field_read,UnitsSeam::FreeObjectState
@@ -7966,7 +7967,6 @@ address,function,file,kind,target
 0x4246b0,RemoveFeature,src/map/features.cpp,global_read,g_seams
 0x4246b0,RemoveFeature,src/map/features.cpp,indirect_call,indirect via void (*)(ModelState *) __attribute__((stdcall)) [UnitsSeam::FreeObjectState]
 0x4246b0,RemoveFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [MapSeam::RefreshAllPassMaps]"
-0x4246b0,RemoveFeature,src/map/features.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x424840,RemoveAllFeatures,src/map/features.cpp,call,RemoveFeature
 0x424840,RemoveAllFeatures,src/map/features.cpp,call,operator Cell *
 0x424840,RemoveAllFeatures,src/map/features.cpp,deref_escape,*Cell
@@ -12858,14 +12858,10 @@ address,function,file,kind,target
 0x440a00,FreeMovementClasses,src/units/movement_class.cpp,call,FreeC
 0x440a00,FreeMovementClasses,src/units/movement_class.cpp,function,
 0x440a00,FreeMovementClasses,src/units/movement_class.cpp,global_escape,g_movementClassEntries
-0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,call,MovementClass::RefreshPassMap
-0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
-0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::name
+0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,call,RefreshAndReportAllPassMaps
 0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,function,
-0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,global_escape,g_movementClasses
-0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,global_read,g_movementClasses
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,MovementClass::RefreshPassMap
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,RefreshAllPassMaps
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,RefreshAllPassMapsForUnits
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,operator!=
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,operator->
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
@@ -12873,8 +12869,9 @@ address,function,file,kind,target
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::footprintX
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::height
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::lastTick
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::name
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::width
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Point16::x
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Point16::y
@@ -12901,7 +12898,9 @@ address,function,file,kind,target
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::footprintX
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::height
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::lastTick
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::width
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Point16::x
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Point16::y
@@ -12928,7 +12927,9 @@ address,function,file,kind,target
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::footprintX
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::height
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::lastTick
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::width
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Point16::x
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Point16::y
@@ -24793,7 +24794,7 @@ address,function,file,kind,target
 0x47cbd0,ClearFootprintAndUnlink,src/map/terrain.cpp,field_write,Unit::cargoNext
 0x47cbd0,ClearFootprintAndUnlink,src/map/terrain.cpp,field_write,Unit::spatialBucket
 0x47cbd0,ClearFootprintAndUnlink,src/map/terrain.cpp,function,
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,RefreshAllPassMaps
+0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,RefreshAllPassMapsForUnits
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,SetOwner
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,get
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,operator Cell *
@@ -24816,13 +24817,11 @@ address,function,file,kind,target
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::width
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::width_142a3
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,LosRadarSeam::UpdateCellHeightRange
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,PathfindingSeam::CellsChanged
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Player::active
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Player::type
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Point16::x
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Point16::y
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Seams::los_radar
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Seams::pathfinding
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::bit2
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::cell
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::def
@@ -24845,7 +24844,6 @@ address,function,file,kind,target
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,global_read,g_game
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,global_read,g_seams
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [LosRadarSeam::UpdateCellHeightRange]"
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,call,RefreshPassMapsForUnit
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,call,VisitObjectsInArea
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,call,get
@@ -24958,14 +24956,10 @@ address,function,file,kind,target
 0x47d970,IsFootprintClear,src/map/terrain.cpp,global_read,g_game
 0x47dac0,SetYardOpen,src/map/terrain.cpp,call,ClaimFootprintCells
 0x47dac0,SetYardOpen,src/map/terrain.cpp,call,IsFootprintClear
-0x47dac0,SetYardOpen,src/map/terrain.cpp,call,RefreshAllPassMaps
+0x47dac0,SetYardOpen,src/map/terrain.cpp,call,RefreshAllPassMapsForUnits
 0x47dac0,SetYardOpen,src/map/terrain.cpp,call,operator->
 0x47dac0,SetYardOpen,src/map/terrain.cpp,call,operator==
-0x47dac0,SetYardOpen,src/map/terrain.cpp,field_read,PathfindingSeam::CellsChanged
-0x47dac0,SetYardOpen,src/map/terrain.cpp,field_read,Point16::x
-0x47dac0,SetYardOpen,src/map/terrain.cpp,field_read,Point16::y
 0x47dac0,SetYardOpen,src/map/terrain.cpp,field_read,Quirks::skipEmptyYardmap
-0x47dac0,SetYardOpen,src/map/terrain.cpp,field_read,Seams::pathfinding
 0x47dac0,SetYardOpen,src/map/terrain.cpp,field_read,Unit::cell
 0x47dac0,SetYardOpen,src/map/terrain.cpp,field_read,Unit::def
 0x47dac0,SetYardOpen,src/map/terrain.cpp,field_read,Unit::flags
@@ -24975,21 +24969,13 @@ address,function,file,kind,target
 0x47dac0,SetYardOpen,src/map/terrain.cpp,field_write,Unit::flags
 0x47dac0,SetYardOpen,src/map/terrain.cpp,function,
 0x47dac0,SetYardOpen,src/map/terrain.cpp,global_read,g_quirks
-0x47dac0,SetYardOpen,src/map/terrain.cpp,global_read,g_seams
-0x47dac0,SetYardOpen,src/map/terrain.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
-0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,call,RefreshAllPassMaps
+0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,call,RefreshAllPassMapsForUnits
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,call,VisitObjectsInArea
-0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,field_read,PathfindingSeam::CellsChanged
-0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,field_read,Point16::x
-0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,field_read,Point16::y
-0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,field_read,Seams::pathfinding
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,field_read,Unit::cell
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,field_read,Unit::flags
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,field_read,Unit::footprint
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,field_write,Unit::flags
 0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,function,
-0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,global_read,g_seams
-0x47db20,ForceNeighborFootprintReclaim,src/map/terrain.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,call,CanBuildAt
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,call,SteepCell
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,call,operator Cell *
@@ -44303,6 +44289,9 @@ address,function,file,kind,target
 ,ClampToCell,src/orders/order_list.cpp,function,
 ,ClampToZero,src/orders/order_list.cpp,function,
 ,ClampVolume,src/sound/samples.cpp,function,
+,ClassBitOfActive,src/ai/pathfind_hpa.cpp,field_read,Hdr::slot
+,ClassBitOfActive,src/ai/pathfind_hpa.cpp,field_read,Hdr::slotOf
+,ClassBitOfActive,src/ai/pathfind_hpa.cpp,function,
 ,ClassOf,src/seams/pathfinding_world.cpp,call,get
 ,ClassOf,src/seams/pathfinding_world.cpp,field_write,Ref<MovementClass>::offset
 ,ClassOf,src/seams/pathfinding_world.cpp,function,
@@ -48548,8 +48537,10 @@ address,function,file,kind,target
 ,HpaCancel,src/ai/pathfind_hpa.cpp,field_write,Req::used
 ,HpaCancel,src/ai/pathfind_hpa.cpp,function,
 ,HpaCancel,src/ai/pathfind_hpa.cpp,indirect_call,indirect via void (*const)(PathUnit) __attribute__((stdcall)) [PathWorldView::EndSearch]
+,HpaCellsChanged,src/ai/pathfind_hpa.cpp,call,ClassBitOfActive
 ,HpaCellsChanged,src/ai/pathfind_hpa.cpp,call,Open
 ,HpaCellsChanged,src/ai/pathfind_hpa.cpp,call,ResetSearchState
+,HpaCellsChanged,src/ai/pathfind_hpa.cpp,call,SearchUsesCluster
 ,HpaCellsChanged,src/ai/pathfind_hpa.cpp,deref_read,*int
 ,HpaCellsChanged,src/ai/pathfind_hpa.cpp,deref_write,*int
 ,HpaCellsChanged,src/ai/pathfind_hpa.cpp,field_read,Hdr::CW
@@ -49243,9 +49234,11 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,OrdersSeam::UpdateMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Cancel
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::CellsChanged
+,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::DebugCell
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Init
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Poll
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::RegionSize
+,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::SetSearchScale
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Shutdown
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Step
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PathfindingSeam::Submit
@@ -49643,9 +49636,11 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ParseDownloadableAiWeightScripts
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingCancel
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingCellsChanged
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingDebugCell
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingInit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingPoll
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingRegionSize
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingSetBaseScale
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingShutdown
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingStep
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingSubmit
@@ -50692,6 +50687,7 @@ address,function,file,kind,target
 ,Marked,src/orders/order_dispatch.cpp,function,
 ,MatchSetupBegin,src/game/match_setup.cpp,call,Fatal
 ,MatchSetupBegin,src/game/match_setup.cpp,call,MatchSetupBlockBytesValid
+,MatchSetupBegin,src/game/match_setup.cpp,call,MatchSetupSearchStepsValid
 ,MatchSetupBegin,src/game/match_setup.cpp,call,SimSetSearchSteps
 ,MatchSetupBegin,src/game/match_setup.cpp,call,sprintf
 ,MatchSetupBegin,src/game/match_setup.cpp,field_read,MatchSetup::blockBytes
@@ -50723,6 +50719,8 @@ address,function,file,kind,target
 ,MatchSetupRequested,src/game/match_setup.cpp,function,
 ,MatchSetupRequested,src/game/match_setup.cpp,global_read,s_requested
 ,MatchSetupSearchStepsKey,src/game/match_setup.cpp,function,
+,MatchSetupSearchStepsValid,src/game/match_setup.cpp,deref_write,*char
+,MatchSetupSearchStepsValid,src/game/match_setup.cpp,function,
 ,MatchSetupSizeBlock,src/game/match_setup.cpp,call,Fatal
 ,MatchSetupSizeBlock,src/game/match_setup.cpp,call,SimBlockGrow
 ,MatchSetupSizeBlock,src/game/match_setup.cpp,call,sprintf
@@ -52700,12 +52698,14 @@ address,function,file,kind,target
 ,ReachUnitLineOfFire,src/weapons/weapons.cpp,function,
 ,ReadCommandLine,src/game/match_setup.cpp,call,Fatal
 ,ReadCommandLine,src/game/match_setup.cpp,call,MatchSetupBlockBytesValid
+,ReadCommandLine,src/game/match_setup.cpp,call,MatchSetupSearchStepsValid
 ,ReadCommandLine,src/game/match_setup.cpp,call,SwitchValue
 ,ReadCommandLine,src/game/match_setup.cpp,call,host_command_line
 ,ReadCommandLine,src/game/match_setup.cpp,call,sprintf
 ,ReadCommandLine,src/game/match_setup.cpp,field_maybe_written,MatchSetup::blockBytes
 ,ReadCommandLine,src/game/match_setup.cpp,field_maybe_written,MatchSetup::searchSteps
 ,ReadCommandLine,src/game/match_setup.cpp,field_read,MatchSetup::blockBytes
+,ReadCommandLine,src/game/match_setup.cpp,field_read,MatchSetup::searchSteps
 ,ReadCommandLine,src/game/match_setup.cpp,function,
 ,ReadCommandLine,src/game/match_setup.cpp,global_maybe_written,s_requested
 ,ReadCommandLine,src/game/match_setup.cpp,global_read,s_commandLineRead
@@ -52774,6 +52774,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,call,FailLine
 ,ReadKey,src/harness/harness.cpp,call,KeyIsDecidedByLoad
 ,ReadKey,src/harness/harness.cpp,call,MatchSetupBlockBytesValid
+,ReadKey,src/harness/harness.cpp,call,MatchSetupSearchStepsValid
 ,ReadKey,src/harness/harness.cpp,call,ParseNumber
 ,ReadKey,src/harness/harness.cpp,call,ParseRange
 ,ReadKey,src/harness/harness.cpp,call,QuirksNormalise
@@ -52795,6 +52796,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,call,strncmp
 ,ReadKey,src/harness/harness.cpp,deref_read,*char
 ,ReadKey,src/harness/harness.cpp,field_read,MatchSetup::blockBytes
+,ReadKey,src/harness/harness.cpp,field_read,MatchSetup::searchSteps
 ,ReadKey,src/harness/harness.cpp,field_write,MatchSetup::blockBytes
 ,ReadKey,src/harness/harness.cpp,field_write,MatchSetup::searchSteps
 ,ReadKey,src/harness/harness.cpp,function,
@@ -56391,6 +56393,24 @@ address,function,file,kind,target
 ,Recording::Recording,src/harness/replay.cpp,function,
 ,RefAbs,src/harness/harness.cpp,call,SimBlockBase
 ,RefAbs,src/harness/harness.cpp,function,
+,RefreshAllPassMapsForUnits,src/units/movement_class.cpp,call,RefreshAndReportAllPassMaps
+,RefreshAllPassMapsForUnits,src/units/movement_class.cpp,function,
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,call,MovementClass::RefreshPassMap
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::footprintX
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::height
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::name
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::width
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,Point16::x
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,Point16::y
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,Seams::pathfinding
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,function,
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,global_escape,g_movementClasses
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,global_read,g_movementClasses
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,global_read,g_seams
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 ,RefreshMapListNative,src/seams/native.cpp,call,Mission::RefreshMapList
 ,RefreshMapListNative,src/seams/native.cpp,function,
 ,RefreshMovedUnitsNative,src/seams/native.cpp,call,MovementClass::RefreshMovedUnits
@@ -58221,7 +58241,17 @@ address,function,file,kind,target
 ,SearchRange,src/orders/vtol_orders.cpp,field_read,Unit::def
 ,SearchRange,src/orders/vtol_orders.cpp,field_read,UnitDef::range
 ,SearchRange,src/orders/vtol_orders.cpp,function,
+,SearchUsesCluster,src/ai/pathfind_hpa.cpp,deref_read,*int
+,SearchUsesCluster,src/ai/pathfind_hpa.cpp,field_read,Hdr::aInit
+,SearchUsesCluster,src/ai/pathfind_hpa.cpp,field_read,Hdr::goalClusters
+,SearchUsesCluster,src/ai/pathfind_hpa.cpp,field_read,Hdr::nGoalClusters
+,SearchUsesCluster,src/ai/pathfind_hpa.cpp,field_read,Hdr::searchId
+,SearchUsesCluster,src/ai/pathfind_hpa.cpp,field_read,Hdr::startCluster
+,SearchUsesCluster,src/ai/pathfind_hpa.cpp,field_read,HpaView::astamp
+,SearchUsesCluster,src/ai/pathfind_hpa.cpp,field_read,HpaView::h
+,SearchUsesCluster,src/ai/pathfind_hpa.cpp,function,
 ,SeedNetworkHost,src/harness/harness.cpp,call,Fail
+,SeedNetworkHost,src/harness/harness.cpp,call,MatchSetupToInfo
 ,SeedNetworkHost,src/harness/harness.cpp,call,memset
 ,SeedNetworkHost,src/harness/harness.cpp,call,operator PlayerInfo *
 ,SeedNetworkHost,src/harness/harness.cpp,call,strcpy
@@ -58379,8 +58409,6 @@ address,function,file,kind,target
 ,SetPos,src/ingame/camera.cpp,field_write,Game::scrollY
 ,SetPos,src/ingame/camera.cpp,function,
 ,SetPos,src/ingame/camera.cpp,global_read,g_game
-,SetSearchBaseScale,src/seams/native.cpp,call,PathfindingSetBaseScale
-,SetSearchBaseScale,src/seams/native.cpp,function,
 ,SetSource,src/gui/dialogs.cpp,call,GetGafSequenceFrame
 ,SetSource,src/gui/dialogs.cpp,call,InitGafSequence
 ,SetSource,src/gui/dialogs.cpp,call,SetCursorSprite

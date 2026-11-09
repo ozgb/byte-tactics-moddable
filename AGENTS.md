@@ -61,11 +61,11 @@ tell the human.
 
 ## 2. Pick an issue
 
-Take an open sub-issue of #2 with no open blockers and no assignee:
+Take an open, groomed sub-issue of #2 with no open blockers and no assignee:
 
 ```sh
 gh api --paginate repos/ozgb/byte-tactics-moddable/issues/2/sub_issues \
-  --jq '.[] | select(.state=="open" and (.assignees | length) == 0) | .number'
+  --jq '.[] | select(.state=="open" and (.assignees | length) == 0 and ([.labels[].name] | index("needs-grooming") | not)) | .number'
 gh api repos/ozgb/byte-tactics-moddable/issues/<N>/dependencies/blocked_by \
   --jq '[.[] | select(.state=="open") | .number]'      # must print []
 ```
@@ -104,8 +104,9 @@ issue lands:
 - A change in behaviour is either a bug or a quirk flag that is off by default
   (#1). With every flag off, traces match the reference.
 
-When the plan looks wrong for your issue, say so in a comment on the issue
-and let the maintainer decide (`docs/team.md`), rather than working around it.
+When the plan looks wrong for your issue, say so in a comment on the issue and
+let the maintainer decide, or consult the human on a major architecture
+decision (`docs/team.md`), rather than working around it.
 
 ## 4. Pass the gate
 

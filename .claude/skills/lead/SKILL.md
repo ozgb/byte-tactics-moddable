@@ -41,7 +41,7 @@ Take a new issue while you hold **fewer than 10 claims** (`docs/team.md`, "Issue
 Follow `AGENTS.md` steps 3 to 5: work in `tools/worktree.sh <N>`, stay inside the plan's boundaries, pass every check the issue names, and open the pull request with `--base moddable`. Plan the change yourself, then hand the work to subagents (see "Delegating" below).
 
 - **Done means the issue's "Done when" holds**, every task is done or listed under "Left out", and every check it names passed when you ran it. Report results exactly; a check you didn't run is "not run".
-- **Decisions the issue leaves open** that are small and local: make them, and explain them in the pull request. Decisions that change an interface, another issue or #2's decisions: comment on the issue with the options and your recommendation, label it `needs-grooming`, and move on; the maintainer decides.
+- **Decisions the issue leaves open** that are small and local: make them, and explain them in the pull request. Decisions that change an interface, another issue or #2's decisions: comment on the issue with the options and your recommendation, label it `needs-grooming`, and move on; the maintainer decides, or consults the human on a major architecture decision (`docs/team.md`).
 - **Work you find that the issue doesn't cover:** if it stays inside the plan's boundaries, needs no decision the plan doesn't make, and touches the code the pull request already changes, do it and list it under "Also done". Otherwise list it under "Left out" with your view of whether it is worth doing at all. The maintainer decides what happens to it, and most of it doesn't become an issue.
 
 Then go back to step 1.

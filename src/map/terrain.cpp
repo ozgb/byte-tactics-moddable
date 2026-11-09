@@ -309,8 +309,7 @@ void __stdcall AddUnitToMap(Unit* obj)
             pad.x = obj->cell.x - 1;
             pad.y = obj->cell.y - 1;
             g_seams.los_radar->UpdateCellHeightRange(pad, grown);
-            RefreshAllPassMaps(obj->cell, obj->footprint);
-            g_seams.pathfinding->CellsChanged(obj->cell.x, obj->cell.y, obj->cell.x + obj->footprint.x - 1, obj->cell.y + obj->footprint.y - 1, 0xffffffffu, PATH_CHANGE_UNITS);
+            RefreshAllPassMapsForUnits(obj->cell, obj->footprint);
             return;
         }
         if ((f & 3) == 1) {
@@ -675,8 +674,7 @@ void __stdcall SetYardOpen(Unit* obj, int flag)
         obj->bit2 = flag;
         obj->flags |= 0x8000000;
         ClaimFootprintCells(obj);
-        RefreshAllPassMaps(obj->cell, obj->footprint);
-        g_seams.pathfinding->CellsChanged(obj->cell.x, obj->cell.y, obj->cell.x + obj->footprint.x - 1, obj->cell.y + obj->footprint.y - 1, 0xffffffffu, PATH_CHANGE_UNITS);
+        RefreshAllPassMapsForUnits(obj->cell, obj->footprint);
     }
 }
 
@@ -689,8 +687,7 @@ void __stdcall ForceNeighborFootprintReclaim(Unit* obj)
     Point16 size = obj->footprint;
     Point16 pos = obj->cell;
     VisitObjectsInArea(pos, size, &visitor);
-    RefreshAllPassMaps(obj->cell, obj->footprint);
-    g_seams.pathfinding->CellsChanged(obj->cell.x, obj->cell.y, obj->cell.x + obj->footprint.x - 1, obj->cell.y + obj->footprint.y - 1, 0xffffffffu, PATH_CHANGE_UNITS);
+    RefreshAllPassMapsForUnits(obj->cell, obj->footprint);
 }
 
 int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los);

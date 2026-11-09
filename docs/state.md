@@ -116,11 +116,13 @@ page. With no replacement it is exactly 32 MiB.
 Two values every player agrees on, both 0 by default (`src/game/match_setup.h`):
 - `blockBytes`: 0 sizes the block as above; otherwise it is the block's size, which must be at least what the
   modules need.
-- `searchSteps`: the search steps per tick pathfinding is limited to, 0 for none (`docs/pathfinding-interface.md`).
+- `searchSteps`: the search steps per tick pathfinding is limited to, at most 2147483647; 0 leaves each implementation
+  its own default budget (`docs/pathfinding-interface.md`). A larger value is refused wherever it comes from.
 
 Where they come from and how they travel:
-- **A test-mode run:** the scenario keys `block_bytes` and `search_steps` (`docs/scenario-format.md`). A game
-  outside test mode takes the switches `-blockbytes <n>` and `-searchsteps <n>` of the command line.
+- **A test-mode run:** the scenario keys `block_bytes` and `search_steps` (`docs/scenario-format.md`); `game_type 3` puts
+  them in the host's `PlayerInfo`, as a lobby does. A game outside test mode takes the switches `-blockbytes <n>` and
+  `-searchsteps <n>` of the command line.
 - **A lobby:** the host puts them in its `PlayerInfo`, bytes 173 to 178 (the unused tail `matchSetup`: a 16-bit count
   of 65536-byte pages, then a 32-bit step count), which the lobby already broadcasts to everyone, and every
   machine reads them from the host's record when the match loads (`LoadMatch`, game type 3). Zeros are the defaults,

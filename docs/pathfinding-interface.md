@@ -133,9 +133,12 @@ sees, so a replacement that skips it doesn't conform even with the same waypoint
 Inside the default, and not reached by any consumer:
 - the budget (`stepsPerTick`, `baseScale`): `stepsPerTick` is the match setup's search step limit, or 0x535
   when there is none, read through `SearchStepLimit` at every `RunSearches` (the `search` console command sets
-  the limit); `baseScale` is set by the `SetSearchBaseScale` call of the seams table;
-- the debug overlay's per-cell flags (`PathfindingDebugCell`);
+  the limit); `baseScale` is set by the second number of that command, through the optional `SetSearchScale` slot;
+- the debug overlay's per-cell flags, through the optional `DebugCell` slot;
 - the quirks of section 6.
+
+Another implementation can leave those two slots null. The `search` command then ignores its second number, and the
+overlay draws the pass map without search cells.
 
 ## 5. The traced state
 
@@ -143,8 +146,11 @@ Sections 16 and 17 of `docs/trace-format.md`. The harness gets them from the `Wr
 implementation's private state through a `StateWriter` (`interfaces/state_writer.h`: records, integers, bytes and
 handles that the host hashes, and in test mode dumps). The default writes the bytes 3.1c's tables give, as the
 reference's harness hashed them from the game record, so the traces equal the reference's. Another implementation
-writes whatever decides what it does next, in its own records; the demo writes its cluster cache, its requests and
-its search in progress.
+writes whatever decides what it does next and the engine does not already hash elsewhere, in its own records; the
+demo writes its cluster cache, its requests and its search in progress.
+
+The default does not write its pending requests. Each one mirrors `flag_1` and `repathClaimTick` of its goal object,
+which section 21 hashes, and the layout of sections 16 and 17 is the trace format's.
 
 | Item | Carries over between ticks | Kind |
 |---|---|---|
@@ -185,7 +191,7 @@ Every slot reads only, apart from `BeginSearch` and `EndSearch`.
 | Slot | What it gives | In 3.1c |
 |---|---|---|
 | `Tick` | the tick being played | `g_game->ticks` |
-| `SearchStepLimit` | the match setup's search steps per tick, 0 for none | the sim block's header (`SimSearchSteps`) |
+| `SearchStepLimit` | the match setup's search steps per tick, or 0 when it sets none and the implementation uses its own default budget | the sim block's header (`SimSearchSteps`) |
 | `PlayerCount`, `IsPlaying` | the players that share the budget | `numPlayers`, and an active human, AI or network player |
 | `UnitsPerPlayer`, `FirstUnit`, `LastUnit`, `NextUnit` | each player's unit slots, as handles | the players' unit arrays, walked by the cursors |
 | `UnitState` | a unit's player, cell, heading, movement class and its class's footprint | the unit and its `UnitMotion` |
@@ -200,16 +206,19 @@ Units and classes are handles, and the view gives no pointer into the engine, so
 a WASM module can use the same table through imports.
 
 `CellsChanged` is the other way in. It names a rectangle of cells, the movement classes (a mask of `MoveClass`
-indexes) and the cause:
-- `PATH_CHANGE_TERRAIN`: terrain or features changed (`src/map/terrain.cpp`, `src/map/features.cpp`), so
-  `TerrainPass` may differ;
+indexes) and the cause. The engine calls it once per class with the rectangle that class's pass map was rewritten in:
+for a change of `width` by `height` cells at (x, y), from (x - footprint, y - footprint) to (x + width, y + height),
+clipped to the map.
+- `PATH_CHANGE_TERRAIN`: features changed (the `RefreshAllPassMaps` slot of the map seam, which `PlaceFeature` and
+  `RemoveFeature` call), so `TerrainPass` may differ;
 - `PATH_CHANGE_UNITS`: the stamps of units on the pass maps were refreshed (building footprints in
   `src/map/terrain.cpp`, and `RefreshPassMapsForUnit`, `RefreshMovedUnits` and `RefreshUnitIfStale` in
-  `src/units/movement_class.cpp`, which call it for each class they re-stamp). `TerrainPass` did not change.
+  `src/units/movement_class.cpp`). `TerrainPass` did not change.
 
 A unit-stamp call can arrive while the implementation is inside `Step`, because `BeginSearch` triggers the refresh.
 The default ignores `CellsChanged`. The HPA\* demo marks its clusters stale for a terrain change only; it builds the
-cluster graph from `TerrainPass` and treats units as local obstacles (the refinement and flood steps read `Pass`).
+cluster graph from `TerrainPass` and treats units as local obstacles (the refinement and flood steps read `Pass`). It
+restarts a running search only when the change is in that search's class and in a cluster the search has used.
 
 ## 8. The private region
 

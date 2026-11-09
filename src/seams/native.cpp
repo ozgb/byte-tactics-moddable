@@ -557,11 +557,6 @@ static void __stdcall CobScriptExplodePieceNative(CobScript* script, int piece, 
 
 Seams g_seams;
 
-void SetSearchBaseScale(int scale)
-{
-    PathfindingSetBaseScale(scale);
-}
-
 static WindMeteorsSeam s_wind_meteors;
 static EconomySeam s_economy;
 static FeaturesSeam s_features;
@@ -779,6 +774,8 @@ void InstallNativeSeams()
     s_pathfinding.Step = PathfindingStep;
     s_pathfinding.Poll = PathfindingPoll;
     s_pathfinding.WriteState = PathfindingWriteState;
+    s_pathfinding.SetSearchScale = PathfindingSetBaseScale;
+    s_pathfinding.DebugCell = PathfindingDebugCell;
     s_orders.ApplyPathEvent = ApplyPathEvent;
     s_orders.OrderOrStatusFlags = OrderOrStatusFlagsNative;
     s_orders.UnitMotionReadNetState = UnitMotionReadNetStateNative;

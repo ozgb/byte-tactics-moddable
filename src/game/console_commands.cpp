@@ -358,8 +358,8 @@ void __stdcall CmdSearch(CommandArgs* args)
     if (args->GetIntArg(1, 0)) {
         SimSetSearchSteps((unsigned int)args->GetIntArg(1, 0));
     }
-    if (args->count == 3) {
-        SetSearchBaseScale((int)(atof(args->GetArg(2, g_emptyText)) * 65536.0));
+    if (args->count == 3 && g_seams.pathfinding->SetSearchScale != nullptr) {
+        g_seams.pathfinding->SetSearchScale((int)(atof(args->GetArg(2, g_emptyText)) * 65536.0));
     }
 }
 
@@ -1134,9 +1134,10 @@ void __stdcall DrawMapDebugOverlay(void* surface)
                         DrawLine(surface, p[1].x, p[1].y, p[3].x, p[3].y, color);
                     }
                 }
-                int cellFlags;
-                int cellDir;
-                PathfindingDebugCell(x, y, &cellFlags, &cellDir);
+                int cellFlags = 0;
+                int cellDir = 0;
+                if (g_seams.pathfinding->DebugCell != nullptr)
+                    g_seams.pathfinding->DebugCell(x, y, &cellFlags, &cellDir);
                 if (cellFlags & 4) {
                     SetFont(g_game->fontSmlFont);
                     SetTextColors(HarnessViewRand() & 255, GetTextKeyColor());

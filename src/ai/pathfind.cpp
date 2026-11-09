@@ -1121,14 +1121,14 @@ void __stdcall PathfindingWriteState(const StateWriter* w)
     }
 }
 
-void PathfindingSetBaseScale(int scale)
+void __stdcall PathfindingSetBaseScale(int scale)
 {
     Pathfinder* pf = GetPathfinder();
     if (pf != nullptr)
         pf->baseScale = scale;
 }
 
-void PathfindingDebugCell(int x, int y, int* flags, int* dir)
+void __stdcall PathfindingDebugCell(int x, int y, int* flags, int* dir)
 {
     PathCell* cell = GetPathfinder()->grid.At(x, y);
     *flags = cell->flags;

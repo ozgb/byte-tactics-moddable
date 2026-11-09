@@ -61,7 +61,7 @@ struct PathRequest {
     PathHandle requester;
     // A second handle of the requester's, carried with the request.
     PathHandle target;
-    // Whether start is used instead of the unit's cell, to continue a route from where an earlier one ended.
+    // Whether start is used instead of the unit's cell, to continue a route from where an earlier one ended; the default implementation ignores it, because 3.1c's orders never ask for it.
     int useStart;
     // The cell the search starts from when useStart is set.
     PathPoint start;
@@ -151,7 +151,7 @@ struct PathUnitState {
 struct PathWorldView {
     // The tick being played.
     unsigned int (__stdcall* Tick)(void);
-    // The most search work per tick the match setup allows, or 0 for no limit; each implementation applies it as a ceiling in its own units of work.
+    // The most search work per tick the match setup allows, in the implementation's own units of work, or 0 when the match sets no limit and the implementation uses its own default budget.
     unsigned int (__stdcall* SearchStepLimit)(void);
     // The number of players in the match.
     int (__stdcall* PlayerCount)(void);
@@ -205,8 +205,12 @@ struct PathfindingSeam {
     void (__stdcall* Step)(void);
     // Takes the next event of the last step, in the order they happened, and copies the first min(count, capacity) waypoints of its route to points; returns 0 when none is left. Called after Step, in the same phase.
     int (__stdcall* Poll)(PathEvent* out, PathPoint* points, int capacity);
-    // Writes all the state that decides what the implementation does next; it reads only, and keeps nothing.
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
     void (__stdcall* WriteState)(const StateWriter* writer);
+    // Optional, null when the implementation has none: applies the second number of the search console command, in 16.16 fixed point.
+    void (__stdcall* SetSearchScale)(int scale);
+    // Optional, null when the implementation has none: fills what the debug overlay draws on a cell. Bits 0 and 1 of flags are 0 not visited, 1 open, 2 closed or 3 blocked, bit 2 marks a goal cell, and dir is a grid direction (0 north, then counter-clockwise).
+    void (__stdcall* DebugCell)(int x, int y, int* flags, int* dir);
 };
 
 #endif

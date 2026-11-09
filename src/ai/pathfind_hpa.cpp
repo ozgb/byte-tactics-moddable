@@ -612,7 +612,7 @@ int HeuristicOf(const HpaView* v, int n)
         return 0;
     int cell = NodeCell(v, n);
     PathGoalArea goal = v->h->req.goal;
-    return PathGoalDistance(&goal, cell % v->h->W, cell / v->h->W) * STRAIGHT;
+    return PathGoalDistance(&goal, cell % v->h->W, cell / v->h->W) * STRAIGHT / 16;
 }
 
 void Relax(HpaView* v, int from, int to, int cost)
@@ -1327,6 +1327,30 @@ void __stdcall HpaCancel(PathHandle requester)
     PurgeEvents(&v, requester);
 }
 
+bool SearchUsesCluster(const HpaView* v, int cluster)
+{
+    const Hdr* h = v->h;
+    if (cluster == h->startCluster)
+        return true;
+    for (int i = 0; i < h->nGoalClusters; i++)
+        if (h->goalClusters[i] == cluster)
+            return true;
+    if (!h->aInit)
+        return false;
+    for (int j = 0; j < MAX_NODES; j++)
+        if (v->astamp[(cluster << 5) | j] == (int)h->searchId)
+            return true;
+    return false;
+}
+
+unsigned int ClassBitOfActive(const Hdr* h)
+{
+    for (int i = 0; i < 32; i++)
+        if (h->slotOf[i] == h->slot)
+            return 1u << i;
+    return 0;
+}
+
 void __stdcall HpaCellsChanged(int left, int top, int right, int bottom, unsigned int classes, int cause)
 {
     if (cause != PATH_CHANGE_TERRAIN || classes == 0)
@@ -1339,10 +1363,17 @@ void __stdcall HpaCellsChanged(int left, int top, int right, int bottom, unsigne
     int y0 = (top - 1 < 0 ? 0 : top - 1) >> h->shift;
     int x1 = (right + 1 >= h->W ? h->W - 1 : right + 1) >> h->shift;
     int y1 = (bottom + 1 >= h->H ? h->H - 1 : bottom + 1) >> h->shift;
-    for (int cy = y0; cy <= y1; cy++)
-        for (int cx = x0; cx <= x1; cx++)
-            v.ver[cy * h->CW + cx]++;
-    if (h->active && h->phase >= PH_BUILD) {
+    bool restart = false;
+    bool searching = h->active && h->phase >= PH_BUILD && (classes & ClassBitOfActive(h)) != 0;
+    for (int cy = y0; cy <= y1; cy++) {
+        for (int cx = x0; cx <= x1; cx++) {
+            int cluster = cy * h->CW + cx;
+            v.ver[cluster]++;
+            if (searching && SearchUsesCluster(&v, cluster))
+                restart = true;
+        }
+    }
+    if (restart) {
         ResetSearchState(h);
         h->phase = PH_BUILD;
     }

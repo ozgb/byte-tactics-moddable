@@ -67,7 +67,6 @@ public:
 #include "../../link/globals.h"
 extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "../../interfaces/seams.h"
-#include "../../interfaces/pathfinding.h"
 #include "../../interfaces/map.h"
 #include "../state/sim_globals.h"
 

@@ -387,12 +387,12 @@ void FreeMovementClasses(void)
 static void RefreshAndReportAllPassMaps(Point16 a, Point16 b, int cause)
 {
     for (int i = 0; i < 32; i++) {
-        if (g_movementClasses.entries[i].name != 0) {
+        if (g_movementClasses.entries[i].name != nullptr) {
             ((MovementClass*)&g_movementClasses.entries[i])->RefreshPassMap(a, b);
         }
     }
     for (int i = 0; i < 32; i++) {
-        if (g_movementClasses.entries[i].name != 0) {
+        if (g_movementClasses.entries[i].name != nullptr) {
             REPORT_PASS_MAP_CHANGE(&g_movementClasses.entries[i], a, b, cause);
         }
     }

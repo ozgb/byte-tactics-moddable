@@ -13,6 +13,8 @@ const char* MatchSetupSearchStepsKey();
 
 bool MatchSetupBlockBytesValid(unsigned int blockBytes, const char** why);
 
+bool MatchSetupSearchStepsValid(unsigned int searchSteps, const char** why);
+
 void MatchSetupRequest(const MatchSetup& setup);
 
 MatchSetup MatchSetupRequested();

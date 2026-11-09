@@ -7,6 +7,7 @@
 - steps-high, steps-low: a limit above and below the default's 1333, each played twice with identical traces, and different from each other.
 - setup-save, setup-load: the save keeps the block size and the limit, and the loaded game plays them.
 - hpa-derived: the demo pathfinder's region makes the engine size a block above 32 MiB.
+- net-setup: a game_type 3 match plays the setup the host's PlayerInfo carries.
 """
 
 import argparse
@@ -106,6 +107,9 @@ def main():
     run, log = play(options, "hpa-derived")
     line = setup_line(log)
     check(line is not None and line[0] > FLOOR and line[0] % 65536 == 0, f"hpa-derived: the demo's region sized the block above 32 MiB ({line})")
+
+    run, log = play(options, "net-setup")
+    check(setup_line(log) == (96 << 20, 3000), "net-setup: game_type 3 plays the block size and the limit from the host's PlayerInfo")
     sys.exit(1 if check.failed else 0)
 
 

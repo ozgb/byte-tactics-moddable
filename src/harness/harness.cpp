@@ -853,9 +853,12 @@ static void ReadKey(int lineNo, const char* key, char* value)
         s_matchSetup.blockBytes = ParseNumber(lineNo, key, value);
         if (!MatchSetupBlockBytesValid(s_matchSetup.blockBytes, &why))
             FailLine(lineNo, why, key, "");
-    } else if (strcmp(key, "search_steps") == 0)
-        s_matchSetup.searchSteps = ParseRange(lineNo, key, value, 0x7fffffff);
-    else if (strcmp(key, "frames") == 0)
+    } else if (strcmp(key, "search_steps") == 0) {
+        const char* why = "";
+        s_matchSetup.searchSteps = ParseNumber(lineNo, key, value);
+        if (!MatchSetupSearchStepsValid(s_matchSetup.searchSteps, &why))
+            FailLine(lineNo, why, key, "");
+    } else if (strcmp(key, "frames") == 0)
         ReadFrames(lineNo, value);
     else if (strcmp(key, "ticks") == 0) {
         s_ticks = ParseNumber(lineNo, key, value);
@@ -1124,6 +1127,8 @@ static void SeedNetworkHost(int host)
         info->maxUnits = g_game->maxUnits_37eec;
         info->metal = (unsigned short)s_players[i].metal;
         info->energy = (unsigned short)s_players[i].energy;
+        if (i == host)
+            MatchSetupToInfo(info);
     }
     for (int i = 0; i < MAX_PLAYERS; i++) {
         for (int k = 0; k < MAX_PLAYERS; k++) {

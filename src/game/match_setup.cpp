@@ -52,6 +52,11 @@ void ReadCommandLine()
         sprintf(text, "-blockbytes %u: %s", s_requested.blockBytes, why);
         Fatal(text);
     }
+    if (!MatchSetupSearchStepsValid(s_requested.searchSteps, &why)) {
+        char text[200];
+        sprintf(text, "-searchsteps %u: %s", s_requested.searchSteps, why);
+        Fatal(text);
+    }
 }
 
 }
@@ -78,6 +83,14 @@ bool MatchSetupBlockBytesValid(unsigned int blockBytes, const char** why)
         *why = "must be at most 268435456";
     else
         return true;
+    return false;
+}
+
+bool MatchSetupSearchStepsValid(unsigned int searchSteps, const char** why)
+{
+    if (searchSteps <= 0x7fffffff)
+        return true;
+    *why = "must be at most 2147483647";
     return false;
 }
 
@@ -117,6 +130,11 @@ void MatchSetupBegin(const MatchSetup& setup)
     if (!MatchSetupBlockBytesValid(setup.blockBytes, &why)) {
         char text[200];
         sprintf(text, "match setup: block size %u %s", setup.blockBytes, why);
+        Fatal(text);
+    }
+    if (!MatchSetupSearchStepsValid(setup.searchSteps, &why)) {
+        char text[200];
+        sprintf(text, "match setup: search steps %u %s", setup.searchSteps, why);
         Fatal(text);
     }
     s_blockBytes = setup.blockBytes;

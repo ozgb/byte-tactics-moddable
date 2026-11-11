@@ -98,6 +98,8 @@ COUPLING_DATA = {
                                    "Unit::flags,presentation,unknown,,all-players,0\n"
                                    "Build: operator new int,map,unknown,,own,1\n"
                                    "Make: new Order,map,unknown,,own,2\n",
+    "data/presentation_feeds.csv": "writer,reader,item,phase,example,reason\n"
+                                   "presentation,units,Unit::flags,units,a@1,Selection\n",
     "data/dependency_checks.csv": "writer,reader,item,phase,group,scenarios,result,scenarios_counted,defer_held,defer_third_stores\n"
                                   "ai,units,Unit::flags,players,g1,3,equal,3,0,0\n",
 }
@@ -870,6 +872,12 @@ class CouplingTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             _, files = coupling_export(tmp, Path(out) / "k")
             self.assertEqual(sorted(files), sorted(n + ".csv" for n in oraclekit.COUPLING))
+
+    def test_the_presentation_feeds_are_exported_with_their_reason(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            _, files = coupling_export(tmp, Path(out) / "k")
+            self.assertEqual(files["presentation_feeds.csv"],
+                             "writer,reader,item,phase,example,reason\npresentation,units,Unit::flags,units,a@1,Selection\n")
 
     def test_the_function_column_of_draws_becomes_a_site_number(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:

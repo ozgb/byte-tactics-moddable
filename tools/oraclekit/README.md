@@ -113,6 +113,7 @@ with a header row, sorted. The edge between two subsystems is the writer of an i
 | `coupling/draws.csv` | `pass`, `stream`, `subsystem`, `site`, `entities`, `draws_min`, `draws_max`, `ticks`, `start_state`, `evidence`, `example` |
 | `coupling/pass_reads.csv` | `pass`, `item`, `reader`, `evidence`, `runs`, `example` |
 | `coupling/presentation_reads.csv` | `item`, `reader`, `pattern`, `covered_by_event`, `visibility`, `runs` |
+| `coupling/presentation_feeds.csv` | `writer`, `reader`, `item`, `phase`, `example`, `reason` |
 | `coupling/dependency_checks.csv` | `writer`, `reader`, `item`, `phase`, `group`, `scenarios`, `result`, `scenarios_counted`, `defer_held`, `defer_third_stores` |
 
 `runs` counts the scenarios that show the row in its class; `example` is one of them. `flags` is `dynamic-only` when
@@ -148,6 +149,10 @@ tick), `ui-action` (read when the player acts), `after-event` (read after one ki
 `covered_by_event` as in `interfaces/services.h`) or `unknown`; `visibility` is `own` (the player's own records),
 `per-player-filter` (units, features, projectiles and their kin, as line of sight shows them) or `all-players`; a `runs`
 of 0 means no scenario showed the read.
+
+`presentation_feeds.csv` lists the state that the view writes and a simulation subsystem reads (`writer` is `presentation`,
+`phase` is the phase of the read), each with the reason that it is allowed: until the player view carries it, a re-implementation
+must reproduce these reads, and the per-player ones are a desync risk in multiplayer.
 
 Three kinds of item are named by what they are, not by the code that touches them. An `unobserved` row flagged `indirect`
 is a call from the writer's subsystem into the reader's through a function pointer: its item is the slot, written

@@ -705,24 +705,65 @@ def base_regions(rows: list[dict], fields: list, size: int, items: Items, kind: 
     return paint_order(regions)
 
 
+SOURCE_SPELLINGS = {"operator new": ("operator new", "SimAlloc"), "GameAllocIgnoreTag": ("GameAllocIgnoreTag", "SimAllocTagged", "SimAllocRegion"),
+                    "realloc": ("realloc", "SimRealloc")}
+CAST = r"(?:\(\s*(?:const\s+)?(?:struct\s+|class\s+)?(?P<cast>(?:unsigned\s+|signed\s+)?[\w:]+)\s*\**\s*\)\s*\(?\s*|static_cast<\s*(?:const\s+)?(?P<scast>(?:unsigned\s+|signed\s+)?[\w:]+)\s*\**\s*>\s*\(\s*)?"
+
+
+def allocation_calls(body: str, allocator: str) -> list[tuple[int, set[str]]]:
+    """The calls of an allocator in a function's source, as (position, names): the names a heap row of the call can
+    carry, its cast type, the operand of a `sizeof` and the string literals of its arguments, or the type of a `new`."""
+    if allocator in ("new", "new[]"):
+        return [(m.start(), {m.group(1)}) for m in re.finditer(r"\bnew\s*(?:\([^()]*\)\s*)?(?:struct\s+|class\s+)?([\w:]+)", body)
+                if m.group(1) not in ("operator",)]
+    spellings = SOURCE_SPELLINGS.get(allocator, (allocator,))
+    pattern = CAST + r"\b(?:%s)\s*\(" % "|".join(r"\s+".join(map(re.escape, s.split())) for s in spellings)
+    out = []
+    for m in re.finditer(pattern, body):
+        args = body[m.end(): body.find(";", m.end())]
+        names = set(re.findall(r'"([^"]*)"', args)) | set(re.findall(r"sizeof\s*\(\s*(?:struct\s+|class\s+)?([\w:]+)\s*\)", args))
+        names |= {re.sub(r"\s+", " ", n) for n in (m.group("cast"), m.group("scast")) if n}
+        out.append((m.start(), names))
+    return out
+
+
 def source_order(rows: list[tuple[dict, re.Match]]) -> list[tuple[dict, re.Match]]:
-    """The heap rows of one function in the order their allocation first appears in its source (the order of the
-    compiled call sites), else in the csv's order."""
+    """The heap rows of one function in the order their allocation appears in its source (the order of the compiled
+    call sites): a row `#k` is the k-th call of its allocator that carries its type or tag, and a row no call carries
+    takes the first call of its allocator that no row took. A row of an allocator the function's source does not call
+    is placed by the first whole-word use of its type or tag, else after the others."""
     if len(rows) < 2:
         return rows
     path = sources.find_source(int(rows[0][0]["address"], 16)) if rows[0][0]["address"] else None
     text = path.read_text(errors="replace") if path else ""
     marker = text.find("FUNCTION: %s" % rows[0][0]["address"])
-
-    def position(item: tuple[dict, re.Match]) -> int:
-        what = item[1].group("what") or ""
-        for needle in ('"%s"' % what, what):
-            at = text.find(needle, max(marker, 0)) if what else -1
-            if at >= 0:
-                return at
-        return 1 << 30
-
-    return sorted(rows, key=position)
+    body = text[max(marker, 0):]
+    following = body.find("// FUNCTION:", 1)
+    if following > 0:
+        body = body[:following]
+    calls = {m.group("allocator"): allocation_calls(body, m.group("allocator")) for _, m in rows}
+    taken: set[int] = set()
+    at: dict[int, int] = {}
+    for i, (row, m) in enumerate(rows):
+        what = m.group("what") or ""
+        rank = re.search(r" #(\d+)$", row["name"])
+        k = int(rank.group(1)) if rank else 1
+        carrying = [p for p, names in calls[m.group("allocator")] if what and what in names]
+        if len(carrying) >= k:
+            at[i] = carrying[k - 1]
+            taken.add(at[i])
+    for i, (row, m) in enumerate(rows):
+        if i in at:
+            continue
+        free = [p for p, _ in calls[m.group("allocator")] if p not in taken]
+        if free:
+            at[i] = free[0]
+            taken.add(at[i])
+            continue
+        what = m.group("what") or ""
+        found = None if calls[m.group("allocator")] or not what else re.search(r"\b%s\b" % re.escape(what), body)
+        at[i] = found.start() if found else 1 << 30
+    return [rows[i] for i in sorted(range(len(rows)), key=lambda i: (at[i], i))]
 
 
 def build_items(info: MapInfo, map_path: Path, layouts: Layouts, rows: list[dict], globals_rows: list[dict]) -> tuple[Items, dict]:

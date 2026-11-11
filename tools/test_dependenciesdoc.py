@@ -27,7 +27,7 @@ def check(writer, reader, held="0", group="g1"):
 
 
 def data(deps, checks):
-    return {"deps": deps, "phasedeps": [], "bounds": [], "draws": [], "passreads": [], "checks": checks, "pres": [],
+    return {"deps": deps, "phasedeps": [], "bounds": [], "draws": [], "passreads": [], "checks": checks, "pres": [], "feeds": [],
             "sims": SIMS, "scenarios": 4}
 
 
@@ -94,6 +94,16 @@ class Render(unittest.TestCase):
         self.assertIn("4 scenarios", text)
         self.assertIn("## Limits and known gaps", text)
         self.assertEqual(text, self.doc())
+
+    def test_the_feeds_section_lists_each_row_with_its_reason(self):
+        d = data([dep("a", "b", "immediate")], [])
+        d["feeds"] = [{"writer": "presentation", "reader": "los_radar", "item": "scrollX", "phase": "players", "example": "s@4",
+                       "reason": "Per-player view state; a 3.1c desync risk"}]
+        text = dd.render(d)
+        self.assertIn("## Presentation feeds", text)
+        self.assertIn("| presentation | los_radar | `scrollX` | players | s@4 | Per-player view state; a 3.1c desync risk |", text)
+        self.assertIn("Routing them through the player view is a follow-up", text)
+        self.assertIn("There are none.", self.doc())
 
     def run_main(self, args, doc):
         out = io.StringIO()

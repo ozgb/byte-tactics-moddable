@@ -12,12 +12,16 @@ orders,features,Unit::metal,units,g1,84,equal,83,0,0
 orders,los_radar,Order::pos,units,g1,84,equal,83,0,0
 orders,players,Unit::pos,units,g1,84,equal,83,0,0
 orders,players,Unit::zFraction,units,g1,84,equal,83,0,0
+orders,units,Order::pos,projectiles,g6,84,equal,83,0,0
 orders,units,Order::z,units,g4,84,equal,83,0,0
+orders,units,PathOrder::pos_z,units,g5,84,equal,83,0,0
 orders,units,Unit::metal,units,g4,84,equal,83,0,0
 orders,weapons,Order::kind,projectiles,g4,84,equal,83,0,0
 targeting,weapons,Unit::current,players,g1,84,equal,83,0,0
 units,ai,Unit::activateFlags,units,g1,84,equal,83,0,0
 units,features,FeatureAnimEntry::bytes_10,units,g1,84,equal,83,0,0
+units,orders,AirManeuverOrder::target,units,g6,84,equal,83,0,0
+units,orders,PathOrder::unit,units,g6,84,equal,83,0,0
 units,orders,Unit::activateFlags,units,g3,84,equal,83,0,1688
 units,orders,Unit::killCount,units,g3,84,equal,83,0,1688
 units,orders,Unit::metal,units,g3,84,equal,83,0,1688

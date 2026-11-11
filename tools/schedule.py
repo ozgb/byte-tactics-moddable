@@ -470,6 +470,13 @@ class Program:
                 self.slots["%s::%s" % m.groups()].add(r["target"])
             else:
                 self.resolved[r["caller"]].append(r["target"])
+        self.phase_slot: dict[str, str] = {}
+        for r in subsystems:
+            if r.get("rule", "").startswith("phase:"):
+                wanted = "::" + r["rule"][len("phase:"):]
+                found = sorted(k for k in self.slots if k.endswith(wanted))
+                if found:
+                    self.phase_slot[r["function"]] = found[0]
         self.marks: dict[str, list[Mark]] = {path: file_marks(text) for path, text in sources.items()}
         self.memo: dict[tuple, list[Node]] = {}
         self.memo_own: dict[tuple, set] = {}
@@ -594,6 +601,11 @@ class Program:
                                     self.hands_back(used, impls, slot in self.methods), fn.name, slot))
                 continue
             for name in names:
+                if name in self.phase_slot and fn.name not in self.slots[self.phase_slot[name]]:
+                    slot = self.phase_slot[name]
+                    callee = self.seam_owner[slot.split("::")[0]]
+                    out.append(Node("entry", self.slot_label(slot), callee, False, fn.name, slot))
+                    continue
                 if name in EFFECTS:
                     out.append(Node("effect", EFFECTS[name], sub))
                     continue

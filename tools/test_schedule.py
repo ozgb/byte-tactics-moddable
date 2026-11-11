@@ -142,6 +142,30 @@ class Orders(unittest.TestCase):
         self.assertEqual([(n.kind, n.label) for n in steps], [("effect", "draw rng")])
 
 
+class PhaseFunctions(unittest.TestCase):
+    def labels(self, caller_calls):
+        fns = functions() + [fn("SchedUnits", "src/sched.cpp", 1, 3)]
+        fns[0]["calls"] = caller_calls
+        subs = SUBSYSTEMS + [{"function": "SchedUnits", "file": "src/sched.cpp", "subsystem": "game", "rule": "phase:UpdateAll"}]
+        p = sc.Program(fns, subs, [], SEAMS, NATIVE, SOURCES)
+        tick = p.fns["RunTick"][0]
+        return [(n.kind, n.label, n.sub) for n in p.expand(tick, "game", lines=[(1, 13)])]
+
+    def test_a_call_to_a_phase_function_is_the_slots_entry_point(self):
+        slot = self.labels([(4, "indirect_call", seam("UnitsSeam", "UpdateAll"), False)])
+        direct = self.labels([(4, "call", "SchedUnits", False)])
+        self.assertEqual(direct, slot)
+        self.assertEqual(direct, [("entry", "units.UpdateAll", "units")])
+
+    def test_the_implementation_of_the_slot_is_inlined(self):
+        fns = functions() + [fn("SchedUnits", "src/sched.cpp", 1, 3, [(2, "call", "Run2", False)])]
+        fns[1]["calls"] = [(2, "call", "SchedUnits", False)]
+        subs = SUBSYSTEMS + [{"function": "SchedUnits", "file": "src/sched.cpp", "subsystem": "game", "rule": "phase:UpdateAll"}]
+        p = sc.Program(fns, subs, [], SEAMS, NATIVE, SOURCES)
+        update_all = p.fns["UpdateAll"][0]
+        self.assertEqual([n.kind for n in p.expand(update_all, "units")], [])
+
+
 class Classes(unittest.TestCase):
     def classes(self, **kw):
         p = page(**kw)

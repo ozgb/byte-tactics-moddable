@@ -7,6 +7,7 @@ address,function,file,kind,target
 0x401070,ResetAccount,src/game/economy.cpp,call,operator=
 0x401070,ResetAccount,src/game/economy.cpp,field_escape,Game::players
 0x401070,ResetAccount,src/game/economy.cpp,field_read,Player::econ
+0x401070,ResetAccount,src/game/economy.cpp,field_read,Player::index
 0x401070,ResetAccount,src/game/economy.cpp,field_write,UnitResources::player
 0x401070,ResetAccount,src/game/economy.cpp,function,
 0x401070,ResetAccount,src/game/economy.cpp,global_read,g_game
@@ -20548,6 +20549,7 @@ address,function,file,kind,target
 0x464700,InitPlayerSlot,src/game/players.cpp,call,operator new
 0x464700,InitPlayerSlot,src/game/players.cpp,call,operator unsigned char *
 0x464700,InitPlayerSlot,src/game/players.cpp,call,operator=
+0x464700,InitPlayerSlot,src/game/players.cpp,field_escape,Game::players
 0x464700,InitPlayerSlot,src/game/players.cpp,field_read,AiSeam::CreatePlayerAI
 0x464700,InitPlayerSlot,src/game/players.cpp,field_read,AiSeam::CreateSquadManager
 0x464700,InitPlayerSlot,src/game/players.cpp,field_read,AiSeam::CreateSquads

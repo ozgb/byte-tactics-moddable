@@ -199,7 +199,7 @@ guard:
     if (!p->econ) {
         p->econ = new (kSim) UnitResources;
     }
-    EconEmit(ECONOMY_RESET, p->index, 0, 0, 0, 0);
+    EconEmit(ECONOMY_RESET, (int)(p - g_game->players), 0, 0, 0, 0);
     p->flags &= 0xfffe;
     p->kills = 0;
     p->losses = 0;

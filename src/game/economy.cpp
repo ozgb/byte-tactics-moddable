@@ -181,7 +181,7 @@ static void ResetAccount(int player, EconUnit unit)
     if (unit == 0) {
         UnitResources* r = g_game->players[player].econ.get();
         memset(r, 0, sizeof(*r));
-        r->player = &g_game->players[player];
+        r->player = &g_game->players[g_game->players[player].index];
         return;
     }
     memset(UnitAccountOf(unit), 0, sizeof(EconAccount));

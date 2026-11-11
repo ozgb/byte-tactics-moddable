@@ -2325,7 +2325,7 @@ network,economy,call,ShareMapInfo,1
 network,economy,shared_write,Game::netGameFlags,5
 network,economy,shared_write,Player::active,2
 network,economy,shared_write,Player::energyWasted,1
-network,economy,shared_write,Player::index,2
+network,economy,shared_write,Player::index,3
 network,economy,shared_write,Player::info,2
 network,economy,shared_write,Player::metalWasted,1
 network,economy,shared_write,Player::totalEnergyConsumed,1
@@ -3376,7 +3376,7 @@ players,economy,shared_write,Player::energyIncome,1
 players,economy,shared_write,Player::energyStorageBonus,2
 players,economy,shared_write,Player::energyUsage,1
 players,economy,shared_write,Player::energyWasted,1
-players,economy,shared_write,Player::index,2
+players,economy,shared_write,Player::index,3
 players,economy,shared_write,Player::info,2
 players,economy,shared_write,Player::metal,5
 players,economy,shared_write,Player::metalCapacity,3
@@ -3775,7 +3775,7 @@ presentation,economy,indirect,EconomyUnitAccount,1
 presentation,economy,shared_write,Game::netGameFlags,5
 presentation,economy,shared_write,Player::active,2
 presentation,economy,shared_write,Player::energy,5
-presentation,economy,shared_write,Player::index,2
+presentation,economy,shared_write,Player::index,3
 presentation,economy,shared_write,Player::metal,5
 presentation,features,shared_write,Cell::flags,10
 presentation,features,shared_write,Fixed::whole,2

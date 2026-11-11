@@ -9,6 +9,8 @@
 #include "../game/unit_resources.h"
 #include "../files/files_api.h"
 #include "players.h"
+#include "scheduler.h"
+#include "economy_events.h"
 #include "../util/tdf.h"
 
 struct Player;
@@ -197,7 +199,7 @@ guard:
     if (!p->econ) {
         p->econ = new (kSim) UnitResources;
     }
-    g_seams.economy->Reset(p->econ, p->index);
+    EconEmit(ECONOMY_RESET, p->index, 0, 0, 0, 0);
     p->flags &= 0xfffe;
     p->kills = 0;
     p->losses = 0;
@@ -357,32 +359,9 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
     }
     if (amount == 0.0f)
         return;
-    Player* player;
-    player = flag ? (g_seams.economy->SpendEnergy(g_game->players[from].econ, amount),
-                     g_game->players[to].econ->player)
-                  : g_game->players[to].econ->player;
-    if (player->active != 0 && player->type == 2) {
-        switch (g_game->difficulty) {
-        case 0:
-            g_game->players[to].econ->energyMake
-                = g_game->players[to].econ->energyMake - amount * -0.5;
-            break;
-        case 1:
-            g_game->players[to].econ->energyMake
-                = g_game->players[to].econ->energyMake - amount * -0.7;
-            break;
-        default: {
-            float m = g_game->players[to].econ->energyMake;
-            m += amount;
-            g_game->players[to].econ->energyMake = m;
-            break;
-        }
-        }
-    } else {
-        float m = g_game->players[to].econ->energyMake;
-        m += amount;
-        g_game->players[to].econ->energyMake = m;
-    }
+    if (flag)
+        EconEmit(ECONOMY_SPEND, from, 0, ECON_ENERGY, amount, 0);
+    EconEmit(ECONOMY_INCOME, to, 0, ECON_ENERGY, amount, 0);
     if (flag)
         g_seams.network->SendShareMetal(from, to, amount);
 }
@@ -401,24 +380,9 @@ void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount
     }
     if (amount == 0.0f)
         return;
-    Player* player;
-    player = flag ? (g_seams.economy->SpendMetal(g_game->players[from].econ, amount), g_game->players[to].econ->player)
-                  : g_game->players[to].econ->player;
-    if (player->active != 0 && player->type == 2) {
-        switch (g_game->difficulty) {
-        case 0:
-            g_game->players[to].econ->metalMake += amount * 0.5;
-            break;
-        case 1:
-            g_game->players[to].econ->metalMake += amount * 0.7;
-            break;
-        default:
-            g_game->players[to].econ->metalMake = amount + g_game->players[to].econ->metalMake;
-            break;
-        }
-    } else {
-        g_game->players[to].econ->metalMake = amount + g_game->players[to].econ->metalMake;
-    }
+    if (flag)
+        EconEmit(ECONOMY_SPEND, from, 0, ECON_METAL, 0, amount);
+    EconEmit(ECONOMY_INCOME, to, 0, ECON_METAL, 0, amount);
     if (flag)
         g_seams.network->SendShareEnergy(from, to, amount);
 }
@@ -495,13 +459,16 @@ static int HasMorePlayerSlots(unsigned char i)
     return 0;
 }
 
-static const double kNegSeven = -0.7;
-static const double kNegHalf = -0.5;
 static const float kHundred = 100.0f;
 
 void __stdcall UpdatePlayers()
 {
-    g_seams.players->UpdatePlayersOnStream(RAND_STREAM_MAIN);
+    SchedPlayersPhase(RAND_STREAM_MAIN);
+}
+
+void __stdcall UpdatePlayersOnStream(RandStream stream)
+{
+    SchedPlayersPhase(stream);
 }
 
 #if BT_ACCESS_LOG
@@ -509,287 +476,258 @@ void __stdcall UpdatePlayers()
 #endif
 
 // FUNCTION: 0x464f80
-void __stdcall UpdatePlayersOnStream(RandStream stream)
+int __stdcall UpdatePlayerHead(int player, RandStream stream)
 {
-#if BT_ACCESS_LOG
-    AccessLogPassScope accessPass(ACCESS_PASS_PLAYERS);
-#endif
-    g_seams.pathfinding->Step();
-    PathEvent event;
-    PathPoint waypoints[64];
-    while (g_seams.pathfinding->Poll(&event, waypoints, 64)) {
-        HarnessPathEvent(&event, waypoints, 64);
-        g_seams.orders->ApplyPathEvent(&event, waypoints);
+    unsigned char bl = (unsigned char)player;
+    if (!IsPlayerSlotInRange(bl))
+        return 0;
+    Player* pi;
+    if (g_game->players[bl].active == 0)
+        return 0;
+    pi = &g_game->players[bl];
+
+    {
+        unsigned char t = pi->type;
+        if (t != 1 && t != 2 && t != 3)
+            return 0;
     }
-    unsigned char bl = 0;
-    for (;;) {
-        if (!IsPlayerSlotInRange(bl))
-            goto next_bl;
-        Player* pi;
-        if (g_game->players[bl].active == 0)
-            goto next_bl;
-        pi = &g_game->players[bl];
-
-        {
-            unsigned char t = pi->type;
-            if (t != 1 && t != 2 && t != 3)
-                goto next_bl;
-        }
-        if (pi->index == 0xa)
-            goto next_bl;
-        {
-            Player* pi2 = &g_game->players[bl];
-            if (pi2->active == 0)
-                goto next_bl;
-            unsigned char t2 = pi2->type;
-            if (t2 != 1 && t2 != 2 && t2 != 3)
-                goto next_bl;
-            if (pi2->index == 0xa)
-                goto next_bl;
-        }
+    if (pi->index == 0xa)
+        return 0;
+    {
+        Player* pi2 = &g_game->players[bl];
+        if (pi2->active == 0)
+            return 0;
+        unsigned char t2 = pi2->type;
+        if (t2 != 1 && t2 != 2 && t2 != 3)
+            return 0;
+        if (pi2->index == 0xa)
+            return 0;
+    }
 
 #if BT_ACCESS_LOG
-        AccessLogEntity();
+    AccessLogEntity();
 #endif
-        if (pi->ai != 0)
-            g_seams.ai->SquadManagerTickIfActive(pi->ai, 0);
+    if (pi->ai != 0)
+        g_seams.ai->SquadManagerTickIfActive(pi->ai, 0);
 
-        g_seams.ai->UpdatePlayerAI(bl);
+    g_seams.ai->UpdatePlayerAI(bl);
 
-        {
-            Unit* u = pi->unitsBegin;
+    {
+        Unit* u = pi->unitsBegin;
 #if BT_ACCESS_LOG
-            AccessLogPassScope losPass(ACCESS_PASS_PLAYERS_LOS);
+        AccessLogPassScope losPass(ACCESS_PASS_PLAYERS_LOS);
 #endif
-            while (u <= pi->unitsEnd) {
+        while (u <= pi->unitsEnd) {
 #if BT_ACCESS_LOG
-                AccessLogEntity();
+            AccessLogEntity();
 #endif
-                if (u->flags & 0x10000000)
-                    g_seams.los_radar->UpdateUnitLineOfSight(u);
-                u = (Unit*)((char*)u + 0x118);
-            }
+            if (u->flags & 0x10000000)
+                g_seams.los_radar->UpdateUnitLineOfSight(u);
+            u = (Unit*)((char*)u + 0x118);
         }
+    }
 
-        if (bl == g_game->playerIndex)
-            g_seams.los_radar->RecordRadarUnits();
+    if (bl == g_game->playerIndex)
+        g_seams.los_radar->RecordRadarUnits();
 
-        if ((unsigned int)pi->updateTime > (unsigned int)g_game->ticks)
-            goto next_bl;
-        pi->updateTime += 0x1e;
+    if ((unsigned int)pi->updateTime > (unsigned int)g_game->ticks)
+        return 0;
+    pi->updateTime += 0x1e;
 
-        if (bl == g_game->localPlayer) {
-            if (g_seams.map->GetGameType(g_game->net) == 1) {
-                if (g_game->list_391ed->CheckVictory() == 0) {
-                    if (g_game->list_391ed->CheckDefeat(stream) != 0) {
-                        if (g_game->endGameCountdown < 0) {
-                            g_game->endGameCountdown = 4;
-                        } else {
-                            g_game->endGameCountdown--;
-                            if (g_game->endGameCountdown < 0) {
-                                g_game->endGameFlags |= 4;
-                                g_game->endGameVictory = 0;
-                                g_game->bits.flag6 = 1;
-                            }
-                        }
-                    }
-                } else {
+    if (bl == g_game->localPlayer) {
+        if (g_seams.map->GetGameType(g_game->net) == 1) {
+            if (g_game->list_391ed->CheckVictory() == 0) {
+                if (g_game->list_391ed->CheckDefeat(stream) != 0) {
                     if (g_game->endGameCountdown < 0) {
                         g_game->endGameCountdown = 4;
                     } else {
                         g_game->endGameCountdown--;
                         if (g_game->endGameCountdown < 0) {
                             g_game->endGameFlags |= 4;
-                            g_game->endGameVictory = 1;
-                            g_game->bits.flag5 = 1;
+                            g_game->endGameVictory = 0;
+                            g_game->bits.flag6 = 1;
                         }
                     }
-                    goto skip508;
                 }
-            } else if ((pi->active == 0 ||
-                        (pi->info->flags_9b & 0x40) == 0) &&
-                       g_game->list_391ed->CheckDefeat(stream) != 0) {
+            } else {
                 if (g_game->endGameCountdown < 0) {
                     g_game->endGameCountdown = 4;
                 } else {
                     g_game->endGameCountdown--;
                     if (g_game->endGameCountdown < 0) {
-                        if (g_game->commanderDeath == 2) {
-                            PlayerInfo* self =
-                                g_game->players[FindHostSlot()].info;
-                            unsigned int typeId;
-                            typeId = g_seams.units->FindUnitTypeId(
-                                &g_game->startPos[0x232 *
-                                    g_game->players[g_game->localPlayer].info->side]) & 0xffff;
-                            int bound = 9999;
-                            int typeOff = typeId * 0x249;
-                            Vec3 pos;
-                            do {
-                                int cx = g_game->baseX / 10;
-                                int cy = g_game->baseY / 10;
-                                pos.x = (RandomInt(g_game->baseX - 2 * cx) + cx) << 16;
-                                pos.y = 0;
-                                pos.z = (RandomInt(g_game->baseY - 2 * cy) + cy) << 16;
-                                int hh = g_game->height << 16;
-                                int hits = 0;
-                                unsigned int zacc =
-                                    (unsigned int)pos.z - (unsigned int)hh;
-                                int outer = 3;
-                                int hw = g_game->width << 16;
-                                do {
-                                    unsigned int xacc =
-                                        (unsigned int)pos.x - (unsigned int)hw;
-                                    int inner = 3;
-                                    Point16 cell;
-                                    cell.y = zacc >> 20;
-                                    do {
-                                        cell.x = xacc >> 20;
-                                        if (g_seams.map->CanPlaceUnitFootprint(
-                                                (UnitDef*)((char*)g_game->defs.get() + typeOff),
-                                                0, cell, 1) != 0)
-                                            hits++;
-                                        xacc += hw;
-                                    } while (--inner != 0);
-                                    zacc += hh;
-                                } while (--outer != 0);
-                                if (hits >= 9 && (short)g_seams.weapons->FindFeatureAtPos(&pos, 0, 0) == -1) {
-                                    if (g_game->net->lavaWorld == 0)
-                                        break;
-                                    if (g_seams.map->GetCellMeanHeight(&pos) >
-                                        (int)g_game->seaLevel)
-                                        break;
-                                }
-                            } while (--bound > 0);
-
-                            {
-                                Unit* unit = g_seams.units->CreateUnit(
-                                    g_game->localPlayer, typeId, pos, 1, 1, 0);
-                                SetStartingStorageBonus(pi,
-                                             self->metal * 100,
-                                             self->energy * 100);
-                                {
-                                    float* slot = &unit->energy;
-                                    float f = (float)self->energy * kHundred;
-                                    if (unit->owner->active != 0 &&
-                                        unit->owner->type == 2) {
-                                        switch (g_game->difficulty) {
-                                        case 0: f = *slot - f * kNegHalf; break;
-                                        case 1: f = *slot - f * kNegSeven; break;
-                                        default: f = *slot + f; break;
-                                        }
-                                    } else {
-                                        f = *slot + f;
-                                    }
-                                    *slot = f;
-                                }
-                                {
-                                    float* slot = &unit->metal;
-                                    float f = (float)self->metal * kHundred;
-                                    if (unit->owner->active != 0 &&
-                                        unit->owner->type == 2) {
-                                        switch (g_game->difficulty) {
-                                        case 0: f = *slot - f * kNegHalf; break;
-                                        case 1: f = *slot - f * kNegSeven; break;
-                                        default: f = *slot + f; break;
-                                        }
-                                    } else {
-                                        f = *slot + f;
-                                    }
-                                    *slot = f;
-                                }
-                                g_seams.los_radar->RecalculateLineOfSight(1);
-                                RecordFocusCommander(1);
-                            }
-                        } else {
-                            goto watch_check;
-                        }
+                        g_game->endGameFlags |= 4;
+                        g_game->endGameVictory = 1;
+                        g_game->bits.flag5 = 1;
                     }
-                }
-            } else {
-                goto check230;
-            }
-        }
-
-    skip508:
-        if (pi->active != 0) {
-            unsigned char t = pi->type;
-            if ((t == 1 || t == 2 || t == 3) && pi->index != 0xa) {
-                if ((pi->unitCount != 0 || pi->unitsCreated == 0) &&
-                    (t == 1 || t == 2)) {
-                    if ((g_game->endGameFlags & 4) == 0 &&
-                        g_game->endGameCountdown < 0) {
-                        g_seams.economy->UpdatePlayerEconomy(pi);
-                    }
-                }
-            }
-        }
-
-        if (bl == g_game->playerIndex) {
-            g_seams.los_radar->UpdateSensorRadarAndCloak();
-            g_seams.los_radar->RecordRadarMapped();
-            if (g_seams.map->GetGameType(g_game->net) == 3) {
-                g_economyPacketTick++;
-                if ((g_economyPacketTick & 3) == 0)
-                    g_seams.network->BroadcastPlayerEconomy(pi);
-            }
-        }
-        goto next_bl;
-
-    watch_check:
-        if (g_seams.map->GetGameType(g_game->net) == 3 &&
-            pi->rejectReason == 0) {
-            if ((g_game->players[FindHostSlot()].info->flags_9b & 0x80) != 0 ||
-                CountActiveAIPlayers() > 0) {
-                pi->info->bit6 = 1;
-                if (bl == g_game->localPlayer) {
-                    g_game->mapFlags &= 0xfffe;
-                    g_game->mapFlags &= 0xfffd;
-                    g_seams.los_radar->RecalculateLineOfSight(1);
-                    g_seams.network->BroadcastPlayerInfo();
-                    if (CountActiveAIPlayers() == 0) {
-                        RecordWatchPrompt(bl);
-                        goto skip508;
-                    }
-                    if (CountCombatPlayers() <= 0)
-                        goto skip508;
-                    RecordWatchModeNotice(bl);
-                    g_game->endGameVictory = 0;
-                    goto skip508;
                 }
                 goto skip508;
             }
-        }
-
-    flags82e:
-        g_game->endGameFlags |= 4;
-        g_game->endGameVictory = 0;
-        if (pi->rejectReason == 0)
-            g_game->bits.flag6 = 1;
-        goto skip508;
-
-    check230:
-        if (g_game->list_391ed->CheckVictory() != 0)
-            goto countdown_extra;
-        goto skip508;
-
-    countdown_extra:
-        if (g_game->endGameCountdown < 0) {
-            g_game->endGameCountdown = 4;
-        } else {
-            g_game->endGameCountdown--;
+        } else if ((pi->active == 0 ||
+                    (pi->info->flags_9b & 0x40) == 0) &&
+                   g_game->list_391ed->CheckDefeat(stream) != 0) {
             if (g_game->endGameCountdown < 0) {
-                g_game->endGameFlags |= 4;
-                g_game->endGameVictory = 1;
-                g_game->bits.flag5 = 1;
-            }
-        }
-        goto skip508;
+                g_game->endGameCountdown = 4;
+            } else {
+                g_game->endGameCountdown--;
+                if (g_game->endGameCountdown < 0) {
+                    if (g_game->commanderDeath == 2) {
+                        PlayerInfo* self =
+                            g_game->players[FindHostSlot()].info;
+                        unsigned int typeId;
+                        typeId = g_seams.units->FindUnitTypeId(
+                            &g_game->startPos[0x232 *
+                                g_game->players[g_game->localPlayer].info->side]) & 0xffff;
+                        int bound = 9999;
+                        int typeOff = typeId * 0x249;
+                        Vec3 pos;
+                        do {
+                            int cx = g_game->baseX / 10;
+                            int cy = g_game->baseY / 10;
+                            pos.x = (RandomInt(g_game->baseX - 2 * cx) + cx) << 16;
+                            pos.y = 0;
+                            pos.z = (RandomInt(g_game->baseY - 2 * cy) + cy) << 16;
+                            int hh = g_game->height << 16;
+                            int hits = 0;
+                            unsigned int zacc =
+                                (unsigned int)pos.z - (unsigned int)hh;
+                            int outer = 3;
+                            int hw = g_game->width << 16;
+                            do {
+                                unsigned int xacc =
+                                    (unsigned int)pos.x - (unsigned int)hw;
+                                int inner = 3;
+                                Point16 cell;
+                                cell.y = zacc >> 20;
+                                do {
+                                    cell.x = xacc >> 20;
+                                    if (g_seams.map->CanPlaceUnitFootprint(
+                                            (UnitDef*)((char*)g_game->defs.get() + typeOff),
+                                            0, cell, 1) != 0)
+                                        hits++;
+                                    xacc += hw;
+                                } while (--inner != 0);
+                                zacc += hh;
+                            } while (--outer != 0);
+                            if (hits >= 9 && (short)g_seams.weapons->FindFeatureAtPos(&pos, 0, 0) == -1) {
+                                if (g_game->net->lavaWorld == 0)
+                                    break;
+                                if (g_seams.map->GetCellMeanHeight(&pos) >
+                                    (int)g_game->seaLevel)
+                                    break;
+                            }
+                        } while (--bound > 0);
 
-    next_bl:
-        if (!HasMorePlayerSlots(++bl))
-            break;
+                        {
+                            Unit* unit = g_seams.units->CreateUnit(
+                                g_game->localPlayer, typeId, pos, 1, 1, 0);
+                            SetStartingStorageBonus(pi,
+                                         self->metal * 100,
+                                         self->energy * 100);
+                            {
+                                float f = (float)self->energy * kHundred;
+                                EconEmit(ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_ENERGY, f, 0);
+                            }
+                            {
+                                float f = (float)self->metal * kHundred;
+                                EconEmit(ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, f);
+                            }
+                            g_seams.los_radar->RecalculateLineOfSight(1);
+                            RecordFocusCommander(1);
+                        }
+                    } else {
+                        goto watch_check;
+                    }
+                }
+            }
+        } else {
+            goto check230;
+        }
     }
 
+
+skip508:
+    if (pi->active != 0) {
+        unsigned char t = pi->type;
+        if ((t == 1 || t == 2 || t == 3) && pi->index != 0xa) {
+            if ((pi->unitCount != 0 || pi->unitsCreated == 0) &&
+                (t == 1 || t == 2)) {
+                if ((g_game->endGameFlags & 4) == 0 &&
+                    g_game->endGameCountdown < 0) {
+                    return 2;
+                }
+            }
+        }
+    }
+    return 1;
+
+watch_check:
+    if (g_seams.map->GetGameType(g_game->net) == 3 &&
+        pi->rejectReason == 0) {
+        if ((g_game->players[FindHostSlot()].info->flags_9b & 0x80) != 0 ||
+            CountActiveAIPlayers() > 0) {
+            pi->info->bit6 = 1;
+            if (bl == g_game->localPlayer) {
+                g_game->mapFlags &= 0xfffe;
+                g_game->mapFlags &= 0xfffd;
+                g_seams.los_radar->RecalculateLineOfSight(1);
+                g_seams.network->BroadcastPlayerInfo();
+                if (CountActiveAIPlayers() == 0) {
+                    RecordWatchPrompt(bl);
+                    goto skip508;
+                }
+                if (CountCombatPlayers() <= 0)
+                    goto skip508;
+                RecordWatchModeNotice(bl);
+                g_game->endGameVictory = 0;
+                goto skip508;
+            }
+            goto skip508;
+        }
+    }
+
+flags82e:
+    g_game->endGameFlags |= 4;
+    g_game->endGameVictory = 0;
+    if (pi->rejectReason == 0)
+        g_game->bits.flag6 = 1;
+    goto skip508;
+
+check230:
+    if (g_game->list_391ed->CheckVictory() != 0)
+        goto countdown_extra;
+    goto skip508;
+
+countdown_extra:
+    if (g_game->endGameCountdown < 0) {
+        g_game->endGameCountdown = 4;
+    } else {
+        g_game->endGameCountdown--;
+        if (g_game->endGameCountdown < 0) {
+            g_game->endGameFlags |= 4;
+            g_game->endGameVictory = 1;
+            g_game->bits.flag5 = 1;
+        }
+    }
+    goto skip508;
+}
+
+void __stdcall UpdatePlayerTail(int player)
+{
+    unsigned char bl = (unsigned char)player;
+    Player* pi = &g_game->players[bl];
+    if (bl == g_game->playerIndex) {
+        g_seams.los_radar->UpdateSensorRadarAndCloak();
+        g_seams.los_radar->RecordRadarMapped();
+        if (g_seams.map->GetGameType(g_game->net) == 3) {
+            g_economyPacketTick++;
+            if ((g_economyPacketTick & 3) == 0)
+                g_seams.network->BroadcastPlayerEconomy(pi);
+        }
+    }
+}
+
+void __stdcall UpdatePlayersFinish()
+{
     if (g_seams.map->GetGameType(g_game->net) == 3 &&
         g_game->commanderDeath != 2 &&
         CountCombatPlayers() == 0) {
@@ -805,6 +743,7 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
         }
     }
 }
+
 
 static inline int IsVisible(Player* player, Vec3Words* pos)
 {

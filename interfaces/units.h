@@ -24,7 +24,7 @@ class UnitTypeSet;
 // Major version of the units interface, changed when a slot is removed or its signature changes.
 #define UNITS_VERSION_MAJOR 1
 // Minor version of the units interface, changed when a slot is added.
-#define UNITS_VERSION_MINOR 7
+#define UNITS_VERSION_MINOR 8
 
 // Unit simulation.
 struct UnitsSeam {
@@ -144,6 +144,8 @@ struct UnitsSeam {
     void (__stdcall* FreeObjectState)(ModelState* state);
     // Poses the model of a unit from its current angles and animation when they changed. Hooks: none.
     void (__stdcall* UpdateObjectState)(UnitDrawView* unit);
+    // Advances one unit for one tick, as UpdateAllUnits does for each unit of each player. Hooks: none.
+    void (__stdcall* UpdateUnit)(Unit* unit);
 };
 
 #endif

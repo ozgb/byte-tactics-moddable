@@ -34,6 +34,7 @@
 
 struct Player;
 #include "pathfinding_world.h"
+#include "../game/economy.h"
 
 #include "../game/game_state.h"
 #include "../map/meteors.h"
@@ -84,7 +85,6 @@ Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 #include "../ingame/info_panel.h"
 
 #include "../units/unit_commands.h"
-void __stdcall UpdatePlayerEconomy(Player* p);
 #include "../units/unit_motion.h"
 
 Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot, unsigned char owner);
@@ -124,46 +124,6 @@ Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 
 
 
-
-static void __stdcall ResetNative(UnitResources* self, unsigned char playerIndex)
-{
-    self->Reset(playerIndex);
-}
-
-static void __stdcall SaveUnitAccountsNative(UnitResources* self, Unit* info, HapiBank* file)
-{
-    self->SaveUnitAccounts(info, file);
-}
-
-static void __stdcall LoadUnitAccountsNative(UnitResources* self, Unit* info, HapiBank* file)
-{
-    self->LoadUnitAccounts(info, file);
-}
-
-static int __stdcall RequestEnergyNative(UnitResources* self, UnitResources* r, float amount)
-{
-    return self->RequestEnergy(r, amount);
-}
-
-static int __stdcall RequestEnergyAndMetalNative(UnitResources* self, float energy, float metal)
-{
-    return self->RequestEnergyAndMetal(energy, metal);
-}
-
-static int __stdcall SpendEnergyNative(UnitResources* self, float amount)
-{
-    return self->SpendEnergy(amount);
-}
-
-static int __stdcall SpendMetalNative(UnitResources* self, float amount)
-{
-    return self->SpendMetal(amount);
-}
-
-static int __stdcall SpendEnergyAndMetalNative(UnitResources* self, float energy, float metal)
-{
-    return self->SpendEnergyAndMetal(energy, metal);
-}
 
 static int __stdcall FindScriptNative(CobScript* script, const char* name)
 {
@@ -704,18 +664,17 @@ void InstallNativeSeams()
     s_wind_meteors.LoadMeteors = LoadMeteors;
     s_wind_meteors.CmdMeteor = CmdMeteor;
     s_wind_meteors.UpdateWindOnStream = UpdateWindOnStream;
-    s_economy.UpdateResourceSharing = UpdateResourceSharing;
-    s_economy.GetEnergyUse = GetEnergyUse;
-    s_economy.UpdatePlayerEconomy = UpdatePlayerEconomy;
-    s_economy.UpdateMetalExtraction = UpdateMetalExtraction;
-    s_economy.Reset = ResetNative;
-    s_economy.SaveUnitAccounts = SaveUnitAccountsNative;
-    s_economy.LoadUnitAccounts = LoadUnitAccountsNative;
-    s_economy.RequestEnergy = RequestEnergyNative;
-    s_economy.RequestEnergyAndMetal = RequestEnergyAndMetalNative;
-    s_economy.SpendEnergy = SpendEnergyNative;
-    s_economy.SpendMetal = SpendMetalNative;
-    s_economy.SpendEnergyAndMetal = SpendEnergyAndMetalNative;
+    s_economy.RegionSize = EconomyRegionSize;
+    s_economy.Init = EconomyInit;
+    s_economy.Shutdown = EconomyShutdown;
+    s_economy.Apply = EconomyApply;
+    s_economy.UpdatePlayerEconomy = EconomyUpdatePlayer;
+    s_economy.UpdateMetalExtraction = EconomyUpdateMetalExtraction;
+    s_economy.UpdateResourceSharing = EconomyUpdateResourceSharing;
+    s_economy.RequestGranted = EconomyRequestGranted;
+    s_economy.GetEnergyUse = EconomyGetEnergyUse;
+    s_economy.UnitAccount = EconomyUnitAccount;
+    s_economy.WriteState = EconomyWriteState;
     s_features.UpdateFeatures = UpdateFeatures;
     s_features.LoadFeatureFileList = LoadFeatureFileList;
     s_features.FreeFeatureFileList = FreeFeatureFileList;
@@ -918,6 +877,9 @@ void InstallNativeSeams()
     s_players.NotifyUnitCreated = NotifyUnitCreatedNative;
     s_players.NotifyUnitDied = NotifyUnitDiedNative;
     s_players.UpdatePlayersOnStream = UpdatePlayersOnStream;
+    s_players.UpdatePlayerHead = UpdatePlayerHead;
+    s_players.UpdatePlayerTail = UpdatePlayerTail;
+    s_players.UpdatePlayersFinish = UpdatePlayersFinish;
     s_units.AllocateUnitMemory = AllocateUnitMemory;
     s_units.FreeUnitMemory = FreeUnitMemory;
     s_units.FreeUnitInfo = FreeUnitInfo;
@@ -958,6 +920,7 @@ void InstallNativeSeams()
     s_units.CreateObjectState = CreateObjectState;
     s_units.FreeObjectState = FreeObjectState;
     s_units.UpdateObjectState = UpdateObjectState;
+    s_units.UpdateUnit = UpdateUnit;
     s_orders.ReattachFxToUnit = ReattachFxToUnitNative;
     s_orders.SerializeOrderToSave = SerializeOrderToSaveNative;
     s_orders.AddBeCarriedOrder = AddBeCarriedOrder;

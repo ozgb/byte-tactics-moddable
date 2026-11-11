@@ -102,6 +102,7 @@ void FreeWeaponArray(void)
 }
 
 #include "../../interfaces/seams.h"
+#include "../game/economy_events.h"
 
 // FUNCTION: 0x499ab0
 void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, Unit* source,
@@ -1585,8 +1586,8 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                 if (e->stockpile)
                     can = 1;
             } else {
-                if (unit->resourceSlot.player->energy >= attached->energyPerShot &&
-                    unit->resourceSlot.player->metal >= attached->metalPerShot)
+                if (unit->owner->energy >= attached->energyPerShot &&
+                    unit->owner->metal >= attached->metalPerShot)
                     can = 1;
             }
             if (can == 0)
@@ -1608,7 +1609,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
             int m = (attached->flags.b.commandFire) ? 0x800 : 0x400;
             *(unsigned short*)&unit->netDirtyFlags |= m;
             if (!attached->flags.b.stockpile)
-                g_seams.economy->SpendEnergyAndMetal(&unit->resourceSlot, attached->energyPerShot, attached->metalPerShot);
+                EconEmit(ECONOMY_SPEND, unit->playerIndex, EconHandleOf(unit), ECON_ENERGY | ECON_METAL, attached->energyPerShot, attached->metalPerShot);
         } else {
             ((unsigned char*)&unit->netDirtyFlags)[1] |= 0x10;
         }

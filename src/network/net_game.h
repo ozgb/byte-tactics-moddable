@@ -66,7 +66,6 @@ int __stdcall CountComputerPlayers();
 int __stdcall CountLocalComputerPlayers();
 int __stdcall CountActiveHumanOrAiPlayers();
 int __stdcall CountRemotePlayers();
-void __stdcall UpdateResourceSharing(Player* player);
 
 int __stdcall GetLocalDpid();
 int __stdcall GetLocalHumanDpid();

@@ -13,7 +13,7 @@
   "table_slots": 32,
   "majors": {
     "ai": 3,
-    "economy": 3,
+    "economy": 4,
     "features": 2,
     "files": 2,
     "host": 2,
@@ -37,18 +37,12 @@
       "GetVisibleEnemiesInRadiusList": [["int", "linear", "int", "int", "linear", "int"], "int"]
     },
     "economy": {
-      "UpdateResourceSharing": [["block"], "void"],
-      "GetEnergyUse": [["block"], "f64"],
-      "UpdatePlayerEconomy": [["block"], "void"],
-      "UpdateMetalExtraction": [["block"], "void"],
-      "Reset": [["block", "int"], "void"],
-      "SaveUnitAccounts": [["block", "block", "handle"], "void"],
-      "LoadUnitAccounts": [["block", "block", "handle"], "void"],
-      "RequestEnergy": [["block", "block", "f32"], "int"],
-      "RequestEnergyAndMetal": [["block", "f32", "f32"], "int"],
-      "SpendEnergy": [["block", "f32"], "int"],
-      "SpendMetal": [["block", "f32"], "int"],
-      "SpendEnergyAndMetal": [["block", "f32", "f32"], "int"]
+      "UpdateResourceSharing": [["int"], "void"],
+      "GetEnergyUse": [["int"], "f64"],
+      "UpdatePlayerEconomy": [["int"], "void"],
+      "UpdateMetalExtraction": [["int"], "void"],
+      "RequestGranted": [["int", "int"], "int"],
+      "UnitAccount": [["int", "linear"], "void"]
     },
     "files": {
       "BankOpenNamedBox": [["handle", "linear"], "int"],

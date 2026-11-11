@@ -99,18 +99,26 @@ struct EconMapInfo {
 
 // What economy reads of a unit.
 struct EconUnitInfo {
-    // Its player (0 to 9).
+    // Its player (0 to 9), the one whose account it is.
     int player;
     // Its type.
     EconType type;
-    // Whether it is under construction.
-    int unfinished;
+    // Whether it is a structure, which is switched on and off, not a unit that moves.
+    int structure;
     // Whether it is switched on.
     int active;
-    // Whether it is cloaked.
-    int cloaked;
+    // Whether it is set to cloak.
+    int cloakOn;
+    // Whether it may not cloak now.
+    int cloakBlocked;
     // Whether it moved this tick.
     int moving;
+    // The tick from which a cloaked unit pays its upkeep again.
+    unsigned int workTime;
+    // How much of it is left to build, from 0 (finished) to 1.
+    float buildLeft;
+    // The metal an extractor makes per tick, as UpdateMetalExtraction last set it.
+    float extraction;
     // Its cell, the top left of its footprint.
     int cellX, cellY;
     // The size of its footprint, in cells.
@@ -151,10 +159,16 @@ struct EconPlayerInfo {
     int active;
     // How the player is controlled: 1 local, 2 computer, 3 remote.
     int controller;
+    // The player's number as the slot records it; 10 for none.
+    int index;
+    // Whether the player's setup says it is a human: the kind of player that takes a share.
+    int human;
     // Whether the player shares metal, energy and its map with allies, from its setup.
     int shareMetal, shareEnergy, shareMapping;
     // Whether the player is still in the game: it has units, or never had any.
     int inGame;
+    // Whether the player's storage bonus counts.
+    int storage;
 };
 
 // The world as economy sees it, read only apart from Emit; given by the engine.
@@ -181,7 +195,7 @@ struct EconomyWorldView {
     EconUnit (__stdcall* NextUnit)(EconUnit unit);
     // The index of a unit's slot, from 0 to unitSlots - 1.
     int (__stdcall* UnitSlot)(EconUnit unit);
-    // Fills a unit's info; returns 0 when the slot is empty.
+    // Fills a unit's info; returns 0 when the unit is not in play, which settlement skips.
     int (__stdcall* UnitInfo)(EconUnit unit, EconUnitInfo* out);
     // Fills a unit type's info.
     void (__stdcall* TypeInfo)(EconType type, EconTypeInfo* out);

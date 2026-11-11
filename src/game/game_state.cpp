@@ -9,6 +9,9 @@
 #include "../state/game_rand.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/pathfinding.h"
+#include "../../interfaces/economy.h"
+#include "economy.h"
+#include "../seams/economy_world.h"
 #include "../../interfaces/host.h"
 #include "game_state.h"
 #include "match_setup.h"
@@ -516,7 +519,6 @@ void LoadBattleAssets()
     g_game->carry = 0;
     g_seams.wind_meteors->InitMeteors();
     g_seams.los_radar->InitRadar();
-    g_seams.players->InitPlayers();
     PathMapInfo mapInfo;
     mapInfo.width = g_game->width;
     mapInfo.height = g_game->height;
@@ -526,9 +528,18 @@ void LoadBattleAssets()
         if (g_seams.pathworld->MoveClass(i) != 0)
             mapInfo.moveClassCount++;
     }
+    EconMapInfo econInfo;
+    econInfo.unitSlots = g_game->poolCount;
+    econInfo.playerCount = g_game->numPlayers;
     unsigned int pathRegionSize = g_seams.pathfinding->RegionSize(&mapInfo);
     unsigned int defaultRegionSize = DefaultPathfindingSeam()->RegionSize(&mapInfo);
-    MatchSetupSizeBlock(pathRegionSize > defaultRegionSize ? pathRegionSize - defaultRegionSize : 0);
+    unsigned int econRegionSize = g_seams.economy->RegionSize(&econInfo);
+    unsigned int defaultEconRegionSize = EconomyRegionSize(&econInfo);
+    MatchSetupSizeBlock((pathRegionSize > defaultRegionSize ? pathRegionSize - defaultRegionSize : 0)
+        + (econRegionSize > defaultEconRegionSize ? econRegionSize - defaultEconRegionSize : 0));
+    void* econRegion = SimAllocRegion("Economy region", econRegionSize);
+    g_seams.economy->Init(&econInfo, NativeEconomyWorld(), econRegion, econRegionSize);
+    g_seams.players->InitPlayers();
     void* pathRegion = SimAllocRegion("AISearch region", pathRegionSize);
     g_seams.pathfinding->Init(&mapInfo, pathRegion, pathRegionSize);
     g_seams.weapons->InitExplosions();
@@ -597,6 +608,9 @@ void ShutdownIngameSystems()
     void* pathRegion = g_seams.pathfinding->Shutdown();
     if (pathRegion != nullptr)
         SimFree(pathRegion);
+    void* econRegion = g_seams.economy->Shutdown();
+    if (econRegion != nullptr)
+        SimFree(econRegion);
     g_seams.players->FreePlayers();
     g_seams.los_radar->FreeRadar();
     g_seams.los_radar->FreeMapResources();

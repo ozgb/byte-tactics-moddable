@@ -946,6 +946,7 @@ void OpenMain2Layout()
 
 #include "../../interfaces/ref.h"
 #include "../harness/harness.h"
+#include "../game/scheduler.h"
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
 #endif
@@ -1035,7 +1036,7 @@ void __stdcall RunGameSteps(int showStats)
             AccumulateProfileTime(&g_game->timers, 0);
         }
         HarnessRecordPhase(1);
-        g_seams.units->UpdateAllUnits();
+        SchedUnitsPhase();
         UpdateAutoFollow();
         HarnessPhase(1);
         DrainSimEvents();
@@ -1048,7 +1049,7 @@ void __stdcall RunGameSteps(int showStats)
         HarnessPhase(3);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 8);
-        g_seams.players->UpdatePlayers();
+        SchedPlayersPhase(RAND_STREAM_MAIN);
         HarnessPhase(4);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 2);
@@ -1098,7 +1099,7 @@ void __stdcall RunGameSteps(int showStats)
 #if BT_ACCESS_LOG
             AccessLogEntity();
 #endif
-            g_seams.economy->UpdateResourceSharing(&g_game->players[g_game->localPlayer]);
+            g_seams.economy->UpdateResourceSharing(g_game->localPlayer);
             g_packetManager.SendAllQueued(0);
             AccumulateProfileTime(&g_game->timers, 0);
         }

@@ -30027,8 +30027,8 @@ address,function,file,kind,target
 0x4916a0,ShutdownGame,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [OrdersSeam::ClearOrderTypeTable]
 0x4916a0,ShutdownGame,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::FreeUnitInfo]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,CreateParticleLists
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,DefaultEconomySeam
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,DefaultPathfindingSeam
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,EconomyRegionSize
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,GameAllocIgnoreTag
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,GetTicks
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,InitCommands
@@ -30128,6 +30128,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via unsigned int (*)(const EconMapInfo *) __attribute__((stdcall)) [EconomySeam::RegionSize]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via unsigned int (*)(const PathMapInfo *) __attribute__((stdcall)) [PathfindingSeam::RegionSize]
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via unsigned int (*const)(const EconMapInfo *) __attribute__((stdcall)) [EconomySeam::RegionSize]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via unsigned int (*const)(const PathMapInfo *) __attribute__((stdcall)) [PathfindingSeam::RegionSize]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::FreeFeatureFileList]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::LoadFeatureFileList]
@@ -44564,6 +44565,8 @@ address,function,file,kind,target
 ,DecodeQuoted,src/harness/replay_objects.cpp,deref_read,*char
 ,DecodeQuoted,src/harness/replay_objects.cpp,deref_write,*unsigned char
 ,DecodeQuoted,src/harness/replay_objects.cpp,function,
+,DefaultEconomySeam,src/seams/native.cpp,function,
+,DefaultEconomySeam,src/seams/native.cpp,global_escape,s_economy@src/seams/native.cpp
 ,DefaultPathfindingSeam,src/seams/native.cpp,function,
 ,DefaultPathfindingSeam,src/seams/native.cpp,global_escape,s_pathfinding@src/seams/native.cpp
 ,DefeatAllUnitsKilledOfType::DefeatAllUnitsKilledOfType,src/game/victory_conditions.h,call,strcpy
@@ -58321,11 +58324,16 @@ address,function,file,kind,target
 ,SchedUnitsPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [NetworkSeam::SendUnitStates]
 ,SchedUnitsPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [UnitsSeam::UpdateUnit]
 ,ScheduleEconomyEvent,src/game/scheduler.cpp,call,HarnessEconomyEvent
+,ScheduleEconomyEvent,src/game/scheduler.cpp,call,ReplayImport::Ptr
+,ScheduleEconomyEvent,src/game/scheduler.cpp,call,ReplayImport::Result
+,ScheduleEconomyEvent,src/game/scheduler.cpp,call,ReplayImport::~ReplayImport
 ,ScheduleEconomyEvent,src/game/scheduler.cpp,field_read,EconomySeam::Apply
 ,ScheduleEconomyEvent,src/game/scheduler.cpp,field_read,Seams::economy
 ,ScheduleEconomyEvent,src/game/scheduler.cpp,function,
 ,ScheduleEconomyEvent,src/game/scheduler.cpp,global_read,g_seams
 ,ScheduleEconomyEvent,src/game/scheduler.cpp,indirect_call,indirect via int (*)(const EconomyEvent *) __attribute__((stdcall)) [EconomySeam::Apply]
+,ScheduleMetalExtraction,src/game/scheduler.cpp,call,ReplayImport::Int
+,ScheduleMetalExtraction,src/game/scheduler.cpp,call,ReplayImport::~ReplayImport
 ,ScheduleMetalExtraction,src/game/scheduler.cpp,field_read,EconomySeam::UpdateMetalExtraction
 ,ScheduleMetalExtraction,src/game/scheduler.cpp,field_read,Seams::economy
 ,ScheduleMetalExtraction,src/game/scheduler.cpp,function,

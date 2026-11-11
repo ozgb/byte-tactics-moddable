@@ -178,6 +178,8 @@ economy,players,shared_write,Player::metalIncome,1
 economy,players,shared_write,Player::metalStorageBonus,3
 economy,players,shared_write,Player::metalUsage,1
 economy,players,shared_write,Player::metalWasted,3
+economy,players,shared_write,Player::shareEnergy,1
+economy,players,shared_write,Player::shareMetal,1
 economy,players,shared_write,Player::totalEnergyConsumed,2
 economy,players,shared_write,Player::totalEnergyProduced,3
 economy,players,shared_write,Player::totalMetalConsumed,2
@@ -190,6 +192,8 @@ economy,presentation,shared_write,Player::energyWasted,1
 economy,presentation,shared_write,Player::metal,4
 economy,presentation,shared_write,Player::metalCapacity,3
 economy,presentation,shared_write,Player::metalWasted,1
+economy,presentation,shared_write,Player::shareEnergy,1
+economy,presentation,shared_write,Player::shareMetal,1
 economy,presentation,shared_write,Player::totalEnergyProduced,1
 economy,presentation,shared_write,Player::totalMetalProduced,1
 economy,presentation,shared_write,Ref<Unit>::offset,1
@@ -460,7 +464,6 @@ game,ai,shared_write,UnitDef::flags1,8
 game,ai,shared_write,Vec3::x,18
 game,ai,shared_write,Vec3::y,11
 game,ai,shared_write,Vec3::z,18
-game,economy,call,EconomyRegionSize,1
 game,economy,indirect,EconomyApply,1
 game,economy,indirect,EconomyInit,1
 game,economy,indirect,EconomyRegionSize,1
@@ -540,10 +543,10 @@ game,harness,call,HarnessStartSkirmish,1
 game,harness,call,HarnessStepsPerFrame,1
 game,harness,call,ReplayImport::Answered,5
 game,harness,call,ReplayImport::AnsweredPointer,3
-game,harness,call,ReplayImport::Int,5
-game,harness,call,ReplayImport::Ptr,5
-game,harness,call,ReplayImport::Result,2
-game,harness,call,ReplayImport::~ReplayImport,7
+game,harness,call,ReplayImport::Int,6
+game,harness,call,ReplayImport::Ptr,6
+game,harness,call,ReplayImport::Result,3
+game,harness,call,ReplayImport::~ReplayImport,9
 game,harness,shared_write,EconomyEvent::account,1
 game,harness,shared_write,EconomyEvent::energy,1
 game,harness,shared_write,EconomyEvent::kind,1
@@ -1145,6 +1148,7 @@ game,presentation,shared_write,UnitDef::flags1,6
 game,presentation,shared_write,Vec3::x,42
 game,presentation,shared_write,Vec3::y,43
 game,presentation,shared_write,Vec3::z,41
+game,seams,call,DefaultEconomySeam,1
 game,seams,call,DefaultPathfindingSeam,1
 game,seams,call,NativeEconomyWorld,1
 game,seams,indirect,AdvanceMissionNative,1
@@ -1294,6 +1298,7 @@ harness,ai,shared_write,g_quirks,1
 harness,economy,indirect,EconomyWriteState,1
 harness,economy,shared_write,Game::localPlayer,6
 harness,economy,shared_write,NetworkSeam::BroadcastPlayerInfo,2
+harness,economy,shared_write,NetworkSeam::SendShareMapInfo,1
 harness,economy,shared_write,Seams::los_radar,1
 harness,economy,shared_write,Seams::network,3
 harness,features,shared_write,Game::playerIndex,1
@@ -1693,6 +1698,7 @@ harness,seams,shared_write,NetworkSeam::SendProjectileDetonated,1
 harness,seams,shared_write,NetworkSeam::SendScriptCall,1
 harness,seams,shared_write,NetworkSeam::SendScriptCallByName,1
 harness,seams,shared_write,NetworkSeam::SendShareEnergy,1
+harness,seams,shared_write,NetworkSeam::SendShareMapInfo,1
 harness,seams,shared_write,NetworkSeam::SendShareMetal,1
 harness,seams,shared_write,NetworkSeam::SendUnitDamage,1
 harness,seams,shared_write,NetworkSeam::SendUnitKilled,1
@@ -3371,6 +3377,8 @@ players,economy,shared_write,Player::metalIncome,1
 players,economy,shared_write,Player::metalStorageBonus,2
 players,economy,shared_write,Player::metalUsage,1
 players,economy,shared_write,Player::metalWasted,1
+players,economy,shared_write,Player::shareEnergy,2
+players,economy,shared_write,Player::shareMetal,2
 players,economy,shared_write,Player::totalEnergyConsumed,1
 players,economy,shared_write,Player::totalEnergyProduced,1
 players,economy,shared_write,Player::totalMetalConsumed,1
@@ -3617,6 +3625,8 @@ players,presentation,shared_write,Player::metalCapacity,3
 players,presentation,shared_write,Player::metalWasted,1
 players,presentation,shared_write,Player::rank,1
 players,presentation,shared_write,Player::rejectReason,2
+players,presentation,shared_write,Player::shareEnergy,1
+players,presentation,shared_write,Player::shareMetal,1
 players,presentation,shared_write,Player::totalEnergyProduced,1
 players,presentation,shared_write,Player::totalMetalProduced,1
 players,presentation,shared_write,Player::type,43
@@ -4473,6 +4483,7 @@ seams,economy,shared_write,EconUnitInfo::structure,1
 seams,economy,shared_write,EconUnitInfo::type,2
 seams,economy,shared_write,EconUnitInfo::workTime,1
 seams,economy,shared_write,NetworkSeam::BroadcastPlayerInfo,2
+seams,economy,shared_write,NetworkSeam::SendShareMapInfo,1
 seams,economy,shared_write,Ref<Unit>::offset,1
 seams,economy,shared_write,Seams::los_radar,1
 seams,economy,shared_write,Seams::network,3
@@ -4662,6 +4673,7 @@ seams,harness,shared_write,NetworkSeam::SendProjectileDetonated,2
 seams,harness,shared_write,NetworkSeam::SendScriptCall,2
 seams,harness,shared_write,NetworkSeam::SendScriptCallByName,2
 seams,harness,shared_write,NetworkSeam::SendShareEnergy,2
+seams,harness,shared_write,NetworkSeam::SendShareMapInfo,2
 seams,harness,shared_write,NetworkSeam::SendShareMetal,2
 seams,harness,shared_write,NetworkSeam::SendUnitDamage,2
 seams,harness,shared_write,NetworkSeam::SendUnitKilled,2

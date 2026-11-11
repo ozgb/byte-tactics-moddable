@@ -70,7 +70,7 @@ so a function carries the set of roots that reach it. HarnessPhase numbers them 
 
   0 HandleNetPackets   1 UpdateAllUnits   2 UpdateProjectiles   3 UpdateExplosions
   4 UpdatePlayers      5 UpdateFeatures   6 StepAllGafSequences and UpdateWind
-  7 UpdateMeteors      8 UpdateResourceSharing
+  7 UpdateMeteors      8 EconomyUpdateResourceSharing
   d RunGameSteps itself (the tick counter and the step loop), not what it calls
 
 Load. `load_write` follows the same walk from LOAD_ROOTS: LoadMatch, and
@@ -209,7 +209,7 @@ KEPT = ("class", "note")
 PHASE_LABELS = {"HandleNetPackets": "0", "UpdateAllUnits": "1", "UpdateProjectiles": "2",
                 "UpdateExplosions": "3", "UpdatePlayers": "4", "UpdateFeatures": "5",
                 "StepAllGafSequences": "6", "UpdateWind": "6", "UpdateMeteors": "7",
-                "UpdateResourceSharing": "8"}
+                "EconomyUpdateResourceSharing": "8"}
 DRIVER = "RunGameSteps"
 DRIVER_LABEL = "d"
 LOAD_ROOTS = ["LoadMatch", "AssignStartPositions"]

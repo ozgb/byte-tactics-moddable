@@ -18,6 +18,7 @@ from pathlib import Path
 
 SERVER = "https://ntfy.sh"
 FILE = "NTFY_TOPIC"
+ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789"
 
 
 def clone_root(cwd=None) -> Path:
@@ -36,7 +37,7 @@ def topic(root: Path) -> tuple[str, bool]:
         name = path.read_text().strip()
         if name:
             return name, False
-    name = "bt-" + secrets.token_urlsafe(24)
+    name = "bt-" + "".join(secrets.choice(ALPHABET) for _ in range(10))
     path.write_text(name + "\n")
     path.chmod(0o600)
     return name, True

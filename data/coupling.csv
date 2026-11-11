@@ -1308,7 +1308,7 @@ harness,game,call,QuirksParse,2
 harness,game,call,ReplayGateRef,6
 harness,game,call,SaveGameFile,1
 harness,game,call,SimBlockAttach,1
-harness,game,call,SimBlockBase,19
+harness,game,call,SimBlockBase,20
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimBlockNew,1
 harness,game,call,SimBlockSize,1
@@ -1475,7 +1475,7 @@ harness,pathfinding,call,PathfindingHpaSeam,1
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
-harness,platform,call,HarnessTestMode,14
+harness,platform,call,HarnessTestMode,15
 harness,platform,call,IsMemSet,1
 harness,platform,call,ModulesCheckStatics,1
 harness,platform,call,ModulesHideSwitch,1
@@ -2925,6 +2925,11 @@ pathfinding,features,shared_write,Point16::x,10
 pathfinding,features,shared_write,Point16::y,10
 pathfinding,game,shared_write,Point16::x,1
 pathfinding,game,shared_write,Point16::y,1
+pathfinding,harness,shared_write,PathEvent::count,1
+pathfinding,harness,shared_write,PathEvent::kind,1
+pathfinding,harness,shared_write,PathEvent::status,1
+pathfinding,harness,shared_write,PathEvent::tick,1
+pathfinding,harness,shared_write,PathEvent::unit,1
 pathfinding,harness,shared_write,Point16::x,1
 pathfinding,harness,shared_write,Point16::y,1
 pathfinding,los_radar,shared_write,Point16::x,4
@@ -3423,6 +3428,7 @@ players,game,shared_write,Unit::health,1
 players,game,shared_write,Vec3::x,4
 players,game,shared_write,Vec3::y,2
 players,game,shared_write,Vec3::z,4
+players,harness,call,HarnessPathEvent,1
 players,harness,shared_write,Game::endGameFlags,2
 players,harness,shared_write,Game::endGameVictory,2
 players,harness,shared_write,Game::localPlayer,3

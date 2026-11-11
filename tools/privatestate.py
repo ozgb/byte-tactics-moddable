@@ -16,7 +16,8 @@ Reads. `<scenario>.reads.csv` (item,reader,count,first_tick, written by lib/acce
 at all in the windows of a tick, a subsystem's reads of its own writes included, which the edges files leave out
 (lib/accesslog/classifier.h). The `presentation` window is not in it.
 
-Shadow fields. The harness hashes sections 16 and 17 of docs/trace-format.md from the records that the default pathfinder writes (PathfindingWriteState): the
+Shadow fields. The harness dumps sections 16 and 17 of docs/trace-format.md (a diagnostic, not hashed since bt-trace 4) from the records
+that the default pathfinder writes (PathfindingWriteState): the
 tables Pathfinder, PathfinderSearch and Node of data/trace_schema.json, the cells and dirty words of the grid, the open heap and
 the three globals. EXPOSED maps each of those fields to the log item that holds it. --check fails when
   * a field of those tables has no entry in EXPOSED (the written state grew a field this check does not know),

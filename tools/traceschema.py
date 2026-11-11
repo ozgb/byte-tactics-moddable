@@ -5,7 +5,8 @@
 
 The JSON is the same tables as data, for a re-implementation that has no use for the header:
 per table the fields in hash order and the plan the hash walks, the masks with their reasons,
-and the fields left out of the hash with their reasons.
+and the fields left out of the hash with their reasons. Its "results" entry is the record the
+host hashes for each path event it delivers (section 32), in hash order.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -25,7 +26,7 @@ from rwsets import load_sim_map
 from simglobals import REF_FIELDS
 
 ROOT = Path(__file__).resolve().parent.parent
-TRACE_FORMAT = 3
+TRACE_FORMAT = 4
 ROOTS = [ROOT / p for p in [
     "src/units/unit.h", "src/game/game.h", "src/network/player.h", "src/network/settings.h",
     "src/weapons/projectile.h", "src/weapons/debris.h", "src/util/rot16.h",
@@ -895,6 +896,17 @@ PATH_GLOBALS: list[tuple[str, str, int, str | None]] = [
     ("budgetRefreshCounter", "g_budgetRefreshCounter", 4, None),
 ]
 
+RESULTS_SECTION = 32
+RESULT_POINTS = 64
+RESULT_FIELDS: list[tuple[str, int, str, str | None]] = [
+    ("kind", 4, "scalar", None),
+    ("status", 4, "scalar", None),
+    ("unit", 4, "ref", "unit"),
+    ("tick", 4, "scalar", None),
+    ("count", 4, "scalar", None),
+    ("points", 4, "bytes", None),
+]
+
 WIND_FIELDS: list[tuple[str, str]] = [
     ("windCounter", "unsigned int"), ("windSpeedDenominator", "int"), ("windX", "int"),
     ("windY", "int"), ("windZ", "int"), ("windDirection", "unsigned short"),
@@ -1267,6 +1279,12 @@ def render_json(model):
     groups = list(model["globals"])
     for n, g in enumerate(groups):
         out.append('    %s: %s%s' % (one(g), many(model["globals"][g], "    "), "," if n + 1 < len(groups) else ""))
+    out.append("  },")
+    results = model["results"]
+    out.append('  "results": {')
+    out.append('    "section": %d,' % results["section"])
+    out.append('    "points": %d,' % results["points"])
+    out.append('    "fields": %s' % many(results["fields"], "    "))
     out.append("  }")
     out.append("}")
     return "\n".join(out) + "\n"
@@ -1424,6 +1442,9 @@ def generate():
         lines.append("")
     lines.append("#endif")
     model["tables"] = dict(sorted(model_tables.items()))
+    model["results"] = {"section": RESULTS_SECTION, "points": RESULT_POINTS,
+                        "fields": [{"name": n, "size": size, "kind": kind, "target": target}
+                                   for n, size, kind, target in RESULT_FIELDS]}
     return "\n".join(lines) + "\n", schema.errors, render_json(model)
 
 

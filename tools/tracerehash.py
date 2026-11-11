@@ -5,7 +5,8 @@
 Prints `<tick> <phase> <hash>` for every phase row and the world row of each dumped tick. With
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
-sections 29 to 31 in the world row.
+sections 29 to 31 in the world row. The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
+shape but not hashed; the world row ends with the path results (section 32).
 """
 
 import argparse
@@ -75,13 +76,13 @@ def field_name(field: dict) -> str:
     return field["name"] or "+0x%x" % field["offset"]
 
 
-def parse_dump(text: str) -> dict[tuple[int, str], list[tuple[str, str]]]:
-    """The (path, value) lines of each (tick, phase) block of a dump, in file order."""
+def parse_dump(text: str, trace_format: int) -> dict[tuple[int, str], list[tuple[str, str]]]:
+    """The (path, value) lines of each (tick, phase) block of a bt-dump <trace_format> dump, in file order."""
     lines = text.split("\n")
     if lines and lines[-1] == "":
         lines.pop()
-    if not lines or lines[0] != "bt-dump 3":
-        raise Error("not a bt-dump 3 file")
+    if not lines or lines[0] != f"bt-dump {trace_format}":
+        raise Error(f"not a bt-dump {trace_format} file")
     blocks: dict[tuple[int, str], list[tuple[str, str]]] = {}
     for n, line in enumerate(lines[1:], 2):
         parts = line.split(" ", 3)
@@ -353,8 +354,9 @@ class Walker:
             self.unit_definitions()
             self.weapon_definitions()
             self.mission()
+        self.results()
         if self.pos != len(self.lines):
-            raise Error(f"{len(self.lines) - self.pos} dump lines left after section 28, from {self.lines[self.pos][0]}")
+            raise Error(f"{len(self.lines) - self.pos} dump lines left after section 32, from {self.lines[self.pos][0]}")
         return self.hash.h
 
     def game(self) -> None:
@@ -409,6 +411,14 @@ class Walker:
         h.end()
 
     def pathfinder(self) -> None:
+        hashed = self.hash
+        self.hash = Hasher()
+        try:
+            self.pathfinder_report()
+        finally:
+            self.hash = hashed
+
+    def pathfinder_report(self) -> None:
         h = self.hash
         h.h8(16)
         present = self.present("Pathfinder", "pathfinder")
@@ -452,6 +462,21 @@ class Walker:
                 node = self.take_if(f"pathfinder.cells[{index}].node")
                 if node is not None:
                     h.run(int(node, 16).to_bytes(2, "little"))
+
+    def results(self) -> None:
+        h = self.hash
+        spec = self.schema.data["results"]
+        h.h8(spec["section"])
+        count = int(self.take("results.count"), 16)
+        h.h32(count)
+        for k in range(count):
+            for f in spec["fields"]:
+                path = f"results[{k}].{f['name']}"
+                if f["kind"] == "bytes":
+                    h.run(self.hex_run(path))
+                else:
+                    self.hash_field(f, self.take(path))
+        h.end()
 
     def move_classes(self) -> None:
         h = self.hash
@@ -799,7 +824,7 @@ def main() -> int:
     args = ap.parse_args()
     try:
         schema = Schema(json.loads(Path(args.schema).read_text()))
-        rows = rehash(schema, parse_dump(read_text(args.dump)))
+        rows = rehash(schema, parse_dump(read_text(args.dump), schema.data["trace_format"]))
         expected = parse_trace_rows(read_text(args.trace)) if args.trace else None
     except (Error, OSError, ValueError, KeyError) as e:
         print(f"tracerehash: {e}", file=sys.stderr)

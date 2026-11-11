@@ -24,6 +24,7 @@
 #include "../state/sim_events.h"
 #include "../state/sim_globals.h"
 #include "block_scan.h"
+#include "path_results.h"
 #include "../state/block.h"
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
@@ -2784,9 +2785,68 @@ static const StateWriter s_stateWriter = { WriterBegin, WriterInt, WriterBytes, 
 
 static void VisitModuleState()
 {
+    if (!s_dumpNow)
+        return;
+    unsigned long long kept = s_hash;
     s_writerOpen = 0;
     g_seams.pathfinding->WriteState(&s_stateWriter);
     WriterEndRecord();
+    s_hash = kept;
+}
+
+static PathResults s_pathResults;
+static bool s_pathResultsLost;
+
+void __stdcall HarnessPathEvent(const PathEvent* event, const PathPoint* points, int capacity)
+{
+    if (!HarnessTestMode() || s_trace == nullptr)
+        return;
+    if (!PathResultsAdd(&s_pathResults, event, points, capacity))
+        s_pathResultsLost = true;
+}
+
+static void VisitPathResults()
+{
+    if (s_pathResultsLost)
+        Fail("testmode: no memory for the path results\n");
+    for (unsigned k = 0; k < s_pathResults.count; k++) {
+        PathResult* r = &s_pathResults.items[k];
+        Resolve((unsigned)SimBlockBase(), r->unitRef, true, TT_UNIT, &r->unitTag, &r->unitId);
+    }
+    s_hash = PathResultsHash(&s_pathResults, s_hash);
+    if (!s_dumpNow)
+        return;
+    char path[64];
+    DumpPrefix("results.count");
+    fprintf(s_dump, "0x%08x\n", s_pathResults.count);
+    for (unsigned k = 0; k < s_pathResults.count; k++) {
+        const PathResult* r = &s_pathResults.items[k];
+        static const char* const kNames[] = { "kind", "status", "tick", "count" };
+        const unsigned values[] = { (unsigned)r->kind, (unsigned)r->status, r->tick, (unsigned)r->count };
+        for (int f = 0; f < 4; f++) {
+            sprintf(path, "results[%u].%s", k, kNames[f]);
+            DumpPrefix(path);
+            fprintf(s_dump, "0x%08x\n", values[f]);
+            if (f != 1)
+                continue;
+            sprintf(path, "results[%u].unit", k);
+            DumpPrefix(path);
+            if (r->unitTag == 0)
+                fputs("null", s_dump);
+            else if (r->unitTag == TT_HEAP)
+                fputs("heap", s_dump);
+            else
+                fprintf(s_dump, "%s:%u", s_targetNames[r->unitTag], r->unitId);
+            fputc('\n', s_dump);
+        }
+        sprintf(path, "results[%u].points", k);
+        DumpPrefix(path);
+        fputs("hex:", s_dump);
+        const unsigned char* bytes = (const unsigned char*)r->points;
+        for (unsigned b = 0; b < r->delivered * sizeof(PathPoint); b++)
+            fprintf(s_dump, "%02x", bytes[b]);
+        fputc('\n', s_dump);
+    }
 }
 
 static void VisitMoveClasses()
@@ -3631,6 +3691,7 @@ static void VisitWorld()
     VisitPlayerHeap();
     if (s_traceTick == 1)
         VisitConstants();
+    VisitPathResults();
 }
 
 enum {
@@ -4315,6 +4376,7 @@ void HarnessPhase(int phase)
             fprintf(s_trace, "%u %s %08x%08x\n", tick, s_phaseNames[8], (unsigned)(s_hash >> 32), (unsigned)s_hash);
     }
     if (phase == 7) {
+        PathResultsClear(&s_pathResults);
         fflush(s_trace);
         if (s_sound != nullptr)
             fflush(s_sound);

@@ -76,15 +76,15 @@ class HasherTest(unittest.TestCase):
 
 class DumpTest(unittest.TestCase):
     def test_parse_dump_keeps_values_with_spaces(self):
-        blocks = tr.parse_dump("bt-dump 3\n7 units a.b str:x y\n7 units a.c 0x01\n")
+        blocks = tr.parse_dump("bt-dump 4\n7 units a.b str:x y\n7 units a.c 0x01\n", 4)
         self.assertEqual(blocks[(7, "units")], [("a.b", "str:x y"), ("a.c", "0x01")])
 
     def test_parse_dump_rejects_other_formats(self):
         with self.assertRaises(tr.Error):
-            tr.parse_dump("bt-dump 2\n")
+            tr.parse_dump("bt-dump 3\n", 4)
 
     def test_parse_trace_rows(self):
-        rows = tr.parse_trace_rows("bt-trace 3\n5 units 0123456789abcdef\n")
+        rows = tr.parse_trace_rows("bt-trace 4\n5 units 0123456789abcdef\n")
         self.assertEqual(rows, {(5, "units"): "0123456789abcdef"})
 
 
@@ -118,6 +118,73 @@ class WalkerTest(unittest.TestCase):
         w = self.walker([("t.a", "0x00000000")])
         self.assertTrue(w.present("T", "t"))
         self.assertFalse(w.present("T", "u"))
+
+
+RESULTS = tr.Schema(
+    {
+        "targets": [{"tag": 1, "name": "heap"}, {"tag": 2, "name": "unit"}],
+        "tables": {
+            "Pathfinder": {
+                "fields": [{"name": "object", "offset": 0, "size": 4, "kind": "pointer", "target": "unit"}],
+                "plan": [{"name": "object", "offset": 0, "size": 4, "kind": "pointer", "target": "unit"}],
+            }
+        },
+        "globals": {"pathfinder": [{"name": "counter", "size": 4, "kind": "scalar", "target": None}]},
+        "results": {
+            "section": 32,
+            "points": 64,
+            "fields": [
+                {"name": "kind", "size": 4, "kind": "scalar", "target": None},
+                {"name": "status", "size": 4, "kind": "scalar", "target": None},
+                {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
+                {"name": "tick", "size": 4, "kind": "scalar", "target": None},
+                {"name": "count", "size": 4, "kind": "scalar", "target": None},
+                {"name": "points", "size": 4, "kind": "bytes", "target": None},
+            ],
+        },
+    }
+)
+
+
+class ResultsTest(unittest.TestCase):
+    def test_results_hash_each_event_in_order(self):
+        w = tr.Walker(RESULTS, [
+            ("results.count", "0x00000001"),
+            ("results[0].kind", "0x00000002"),
+            ("results[0].status", "0x00000000"),
+            ("results[0].unit", "unit:7"),
+            ("results[0].tick", "0x00000018"),
+            ("results[0].count", "0x00000002"),
+            ("results[0].points", "hex:1800280038004800"),
+        ])
+        w.results()
+        want = tr.Hasher()
+        want.h8(32)
+        want.h32(1)
+        want.h32(2)
+        want.h32(0)
+        want.pointer(2, 7)
+        want.h32(0x18)
+        want.h32(2)
+        want.run(bytes.fromhex("1800280038004800"))
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+        self.assertEqual(w.pos, 7)
+
+    def test_no_results_is_section_count_and_end(self):
+        w = tr.Walker(RESULTS, [("results.count", "0x00000000")])
+        w.results()
+        want = tr.Hasher()
+        want.h8(32)
+        want.h32(0)
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+
+    def test_pathfinder_report_is_read_but_not_hashed(self):
+        w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005")])
+        w.pathfinder()
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, 1)
 
 
 class ReadTextTest(unittest.TestCase):

@@ -5,7 +5,7 @@ digest files. It is enough to compute every row of `trace.txt` from the game sta
 recompute the same rows from a `dump.txt`. It is written in terms of the state block layout and
 `data/trace_schema.json`, so an engine in any language can follow it without the reference's source.
 
-The format is `bt-trace 3`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
+The format is `bt-trace 4`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
 
 Contents:
 
@@ -56,7 +56,7 @@ Contents:
 Plain text, LF line endings. The header is seven lines, in this order:
 
 ```
-bt-trace 3
+bt-trace 4
 commit <40 lowercase hex digits, or "unknown">
 scenario <the path as given to the run>
 game_seed <decimal>
@@ -121,12 +121,13 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 
 | Key | Meaning |
 | --- | --- |
-| `trace_format` | The format number, 3. |
+| `trace_format` | The format number, 4. |
 | `targets` | The pointer target names with their numeric `tag` (used in section 5). |
 | `tables` | Table name to table, sorted by name. |
 | `game_scalars` | Fields of the game record hashed in the `game` section (section 8.1), in hash order. |
 | `wind` | Fields of the game record hashed in the wind section, in hash order. |
 | `globals` | Named simulation globals: `meteors`, `game` and `pathfinder`, each a list in hash order. |
+| `results` | The path results section (section 8.21): its `section` number, the most waypoints of an event it hashes (`points`), and the `fields` of an event in hash order. |
 
 A **table** has `size` (the byte size of the record it describes), `fields`, `plan`, and for most
 tables `excluded`. A table with `split_of` is a part of another table: it holds fields of that
@@ -276,11 +277,14 @@ section 8 wind             (7.6)
 section 9 meteors          (7.7)
 ```
 
-**The world row** starts again from the offset basis and hashes sections 10 to 28 in order, then
-sections 29 to 31 when the tick is 1. It has no tick or random preamble.
+**The world row** starts again from the offset basis and hashes sections 10 to 28 in order, leaving
+out sections 16 and 17, then sections 29 to 31 when the tick is 1, then section 32. It has no tick or
+random preamble. Sections 16 and 17, the pathfinder's own report of its state, are only dumped
+(section 8.7): pathfinding is judged by the results it delivers (section 32) and by the rest of the
+trace.
 
 Each section begins with `H8(section number)` and ends with `END`, except where noted (the
-`explosions` group is three sections, 3 to 5, each with its own `END`; the pathfinder is two
+`explosions` group is three sections, 3 to 5, each with its own `END`; the pathfinder's dump is two
 sections, 16 and 17).
 
 ## 7. Sections of the phase rows
@@ -488,9 +492,14 @@ for e in 0 .. count-1: HT(Eye, eyes + e*0x24)    # dump: eyes[e].<field>
 END
 ```
 
-### 8.7 pathfinder (sections 16 and 17)
+### 8.7 pathfinder (sections 16 and 17, dumped only)
 
-`pf` is the ref at `game+0x14207`: the start of the pathfinder's region in the state block. The three arrays of section 17 (`globals.pathfinder`) are in the same region; the default pathfinder writes them through the `WriteState` slot of the pathfinding seam (`interfaces/state_writer.h`), in the order below, and the bytes hashed are the same. An implementation that is not the default writes its own records in section 16 (the demo's `hpa`), and nothing in section 17.
+These two sections are not part of the world row: no row hashes them. A dump still holds their
+lines, at their place between sections 15 and 18, as a diagnostic: when the path results (section 32)
+differ, they show the module's state at that tick. The walk below gives the order and the values of
+those lines; the hash it describes is computed and dropped.
+
+`pf` is the ref at `game+0x14207`: the start of the pathfinder's region in the state block. The three arrays of section 17 (`globals.pathfinder`) are in the same region; the default pathfinder writes them through the `WriteState` slot of the pathfinding seam (`interfaces/state_writer.h`), in the order below, and the lines dumped are the same. An implementation that is not the default writes its own records in section 16 (the demo's `hpa`), and nothing in section 17.
 
 ```
 H8(16)
@@ -972,6 +981,45 @@ Line forms, for `ku` in `0 .. unitCount-1` and `kf` in `0 .. featureCount-1`:
 
 The string refs of a unit entry are relative to the start of the state block, as every ref is.
 
+### 8.21 path results (section 32)
+
+The events pathfinding delivered in this tick, in the order the engine took them from its `Poll` slot
+(`interfaces/pathfinding.h`) in the `players` phase, with a buffer of 64 waypoints. The host records
+each event as it takes it, before the engine acts on it, and empties the record after the world row of
+the tick, so the world lines a dump writes after an earlier phase hold the events delivered so far.
+The fields are `results.fields` of the schema, in this order.
+
+```
+H8(32)
+H32(n)                                         # dump: results.count
+for k in 0 .. n-1, in delivery order:
+    H32(kind)                                  # dump: results[k].kind
+    H32(status)                                # dump: results[k].status
+    HP(the event's unit, unit, is_ref=true)    # dump: results[k].unit
+    H32(tick)                                  # dump: results[k].tick
+    H32(count)                                 # dump: results[k].count
+    HB(the first min(max(count, 0), 64) waypoints, 4 bytes each: i16 x, i16 y)   # dump: results[k].points (hex:)
+END
+```
+
+- `kind` is 0 (a search started), 1 (a route so far, the search goes on) or 2 (a search ended).
+- `status` is, for a start, 0 when the unit's cell is in the goal or a straight walk from it reaches
+  the goal and 1 otherwise; for an end, 0 (found), 1 (partial: the route was cut short), 2 (failed,
+  `count` 0) or 3 (nearest: the route ends at the reachable cell nearest the goal).
+- The unit is the unit slot the request was for, as a pointer ID with target `unit` (section 5),
+  null for none.
+- `tick` is the game tick of the step that produced the event, `count` the waypoints of the route,
+  which may be more than the 64 the buffer holds. Waypoints are in world units.
+- The requester's handles are not hashed: what the requester keeps of a result is hashed where it is
+  kept (sections 20 and 21).
+
+3.1c's search, the default, delivers for each search it starts one start event and then one end event,
+in the step that ends it: found with the corners of the route from the start (at most 64), partial with
+the 64 corners nearest the start when the route had more, or failed. It never delivers a route so far
+or a nearest end. A search that ends as it starts (the unit's cell is in the goal or off the map, or
+the straight walk from it ends no cheaper than the start) delivers its start event and a failed end in
+the same step.
+
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
@@ -989,8 +1037,8 @@ It is written as 16 lowercase hex digits. A test-mode tick has 8 rows, so the st
 The digest file is:
 
 ```
-bt-digest 3
-trace_format bt-trace 3
+bt-digest 4
+trace_format bt-trace 4
 commit <40 hex digits, or unknown>
 scenario <path>
 game_seed <n>
@@ -1004,7 +1052,8 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 ## 10. dump.txt
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
-every hashed value of that one tick, after each phase of the tick. The first line is `bt-dump 3`; every
+every hashed value of that one tick, after each phase of the tick, and the lines of sections 16 and
+17, which no row hashes. The first line is `bt-dump 4`; every
 other line is
 
 ```
@@ -1018,8 +1067,11 @@ with single spaces between the first three fields and the value, which runs to t
 dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller state of `rng`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
-lines of section 28; in the `meteors` block they end the block). The lines come in exactly the order the hash consumes them, so reading the lines of one
-(phase, part) block in order and applying the rules of sections 6 to 8 reproduces its hash.
+lines of section 28), then the lines of section 32, which end the block. The `pathfinder.*` lines of
+sections 16 and 17 sit between those of sections 15 and 18 but are not hash input (section 8.7). Every
+other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
+block in order, skipping the `pathfinder.*` lines, and applying the rules of sections 6 to 8
+reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
 The phase row ends with the last `meteors.<name>` line (section 9), and the world row begins with
@@ -1057,7 +1109,8 @@ not print excluded fields.
 
 To recompute a hash from the dump:
 
-1. Read the lines of the block, in order, and parse the paths into the structure of sections 6 to 8.
+1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), and parse the
+   paths into the structure of sections 6 to 8.
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`
    run into its bytes; a pointer into its ID.
@@ -1070,13 +1123,13 @@ To recompute a hash from the dump:
 ### What you need besides the lines
 
 - A table is hashed only when its lines are present: a unit, order, motion, script, AI record,
-  squad manager, squads, econ, mission conditions, pathfinder, spatial overflow, mission, weapon
+  squad manager, squads, econ, mission conditions, spatial overflow, mission, weapon
   damage table and category mask each have a presence byte (or are in a loop that skips them), which is
   1 exactly when their lines are in the block. A `0` presence byte has no line.
 - The conditional tables of sections 8.9, 8.11 and 8.10 (`OrderPosY`, `PathOrderPosY`,
   `PathOrderHeading`, `PathOrderPiece`, `PathOrderFollow`, `AirManeuverOrderHeading`,
   `LiteGoalState`) and of 8.12 (`ScriptChannelPiece`, `ScriptChannelDelay`, `ScriptChannelWait`),
-  and `MissionStartRest`, `PathfinderSearch`, are hashed exactly when the table's fields are present
+  and `MissionStartRest` are hashed exactly when the table's fields are present
   at the same path.
 - `SpotObject` against `SpotAnim` is told by the names of the fields at the path: the line after
   `features[i].next` is `anim.index` for a SpotAnim and `state` for a SpotObject (section 7.5).
@@ -1109,7 +1162,8 @@ To recompute a hash from the dump:
 
 ## 12. Format numbers
 
-`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 3.
+`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 4.
+Format 4 took sections 16 and 17 out of the world row (they are only dumped) and added section 32.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

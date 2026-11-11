@@ -8,6 +8,8 @@
 #include "../units/unit.h"
 #include "game.h"
 #include "scheduler.h"
+#include "../harness/replay.h"
+#include "../harness/replay_services.h"
 
 #include "../../link/globals.h"
 
@@ -24,9 +26,11 @@ static Unit* UnitOfHandle(EconUnit handle)
 
 int __stdcall ScheduleEconomyEvent(const EconomyEvent* event)
 {
+    ReplayImport call(RI_SCHEDULE_ECONOMY_EVENT);
+    call.Ptr(event);
     int outcome = g_seams.economy->Apply(event);
     HarnessEconomyEvent(event, outcome);
-    return outcome;
+    return call.Result(outcome);
 }
 
 void SchedEconomyEffect(const EconomyEvent* effect)
@@ -53,6 +57,8 @@ void SchedEconomyEffect(const EconomyEvent* effect)
 
 void __stdcall ScheduleMetalExtraction(unsigned int unit)
 {
+    ReplayImport call(RI_SCHEDULE_METAL_EXTRACTION);
+    call.Int((int)unit);
     g_seams.economy->UpdateMetalExtraction(unit);
 }
 

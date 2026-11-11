@@ -331,6 +331,17 @@ void ReplayImportEnd(ReplayImport& c)
         t.AddInt(a[3].v.i);
         break;
     }
+    case RI_SCHEDULE_ECONOMY_EVENT:
+    {
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_SCHEDULE_METAL_EXTRACTION:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        break;
+    }
     case RI_SIM_CAPTURE_ALLOC:
     {
         AddSpace(t);

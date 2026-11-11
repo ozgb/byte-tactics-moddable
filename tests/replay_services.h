@@ -414,6 +414,24 @@ void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsig
     (void)r;
 }
 
+int __stdcall ScheduleEconomyEvent(const EconomyEvent* event)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_ECONOMY_EVENT);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
+void __stdcall ScheduleMetalExtraction(unsigned int unit)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_METAL_EXTRACTION);
+    Space(t);
+    t.AddInt((int)(unsigned int)unit);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)
 {
     ReplayText t;

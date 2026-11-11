@@ -4098,7 +4098,8 @@
     "issue": 712,
     "services": [
      "RandomInt",
-     "RecordSimEvent"
+     "RecordSimEvent",
+     "ScheduleEconomyEvent"
     ]
    },
    "files": {
@@ -5451,6 +5452,30 @@
     ]
    },
    {
+    "name": "ScheduleEconomyEvent",
+    "id": "RI_SCHEDULE_ECONOMY_EVENT",
+    "declaration": "int __stdcall ScheduleEconomyEvent(const EconomyEvent* event);",
+    "args": [
+     {
+      "mode": "skip",
+      "param": "event"
+     }
+    ],
+    "result": "int"
+   },
+   {
+    "name": "ScheduleMetalExtraction",
+    "id": "RI_SCHEDULE_METAL_EXTRACTION",
+    "declaration": "void __stdcall ScheduleMetalExtraction(unsigned int unit);",
+    "args": [
+     {
+      "mode": "int",
+      "param": "unit",
+      "cast": "unsigned int"
+     }
+    ]
+   },
+   {
     "name": "SimCaptureAlloc",
     "id": "RI_SIM_CAPTURE_ALLOC",
     "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
@@ -6148,9 +6173,9 @@
    }
   },
   "units": {
-   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [1, 8], "status": "pending", "imports": [], "pending": {"untracked": 76, "ruleless": 29, "unresolvedSlots": ["UpdateAllUnits", "MovementClassGet", "MovementClassInBounds", "UnitTypeSetAddTypeOrCategory", "UnitRefUnlink"], "unannotatedArgs": ["StartScriptWithArgs(callback)", "StartScript(callback)", "UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "GetNanoPiecePosition(out)", "GetPieceAngles result", "UnitRefUnlink(ref)", "StartScriptWithArgsByIndex(callback)", "UpdateObjectState(unit)"]}},
+   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [1, 8], "status": "pending", "imports": [], "pending": {"untracked": 76, "ruleless": 29, "unresolvedSlots": ["MovementClassGet", "MovementClassInBounds", "UnitTypeSetAddTypeOrCategory", "UnitRefUnlink"], "unannotatedArgs": ["StartScriptWithArgs(callback)", "StartScript(callback)", "UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "GetNanoPiecePosition(out)", "GetPieceAngles result", "UnitRefUnlink(ref)", "StartScriptWithArgsByIndex(callback)", "UpdateObjectState(unit)"]}},
    "slots": {
-    "UpdateAllUnits": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateAllUnits"},
+    "UpdateAllUnits": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateAllUnits"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateAllUnits"},
     "GetGroundHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetGroundHeight"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.height"], "objectWrites": [], "allOf": [], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos", "axes": "xz"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetGroundHeight"},
     "GetSweetSpot": {"conv": "__stdcall", "ret": "void", "functions": ["GetSweetSpot"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "out", "type": "Vec3*", "line": "out", "mode": "vec3", "dir": "out", "label": "out"}], "result": null, "native": "GetSweetSpot"},
     "FindScript": {"conv": "__stdcall", "ret": "int", "functions": ["CobScript::FindScript"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "script", "type": "CobScript*", "line": "script", "mode": "object", "kind": "CobScript"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "FindScript"},
@@ -6212,9 +6237,9 @@
    }
   },
   "players": {
-   "header": {"interface": "interfaces/players.h", "struct": "PlayersSeam", "version": [1, 6], "status": "pending", "imports": [], "pending": {"untracked": 42, "ruleless": 12, "unresolvedSlots": ["UpdatePlayers", "DeactivateConditions", "DeleteConditions", "UpdatePlayersOnStream", "NewConditions"], "unannotatedArgs": ["GiveUnitToPlayer(packet)", "DeactivateConditions(conditions)", "LoadConditions(conditions)", "SaveConditions(conditions)", "RegisterConditions(conditions)", "RegisterConditions(mission)", "FreeConditions(conditions)", "DeleteConditions(conditions)", "NotifyUnitCreated(conditions)", "NotifyUnitDied(conditions)", "NewConditions result"]}},
+   "header": {"interface": "interfaces/players.h", "struct": "PlayersSeam", "version": [1, 6], "status": "pending", "imports": [], "pending": {"untracked": 42, "ruleless": 12, "unresolvedSlots": ["DeactivateConditions", "DeleteConditions", "NewConditions"], "unannotatedArgs": ["GiveUnitToPlayer(packet)", "DeactivateConditions(conditions)", "LoadConditions(conditions)", "SaveConditions(conditions)", "RegisterConditions(conditions)", "RegisterConditions(mission)", "FreeConditions(conditions)", "DeleteConditions(conditions)", "NotifyUnitCreated(conditions)", "NotifyUnitDied(conditions)", "NewConditions result"]}},
    "slots": {
-    "UpdatePlayers": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdatePlayers"},
+    "UpdatePlayers": {"conv": "__stdcall", "ret": "void", "functions": ["UpdatePlayers"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdatePlayers"},
     "TransferMetal": {"conv": "__stdcall", "ret": "void", "functions": ["TransferMetal"], "reads": [], "writes": [], "objectReads": ["Player.energy"], "objectWrites": [], "allOf": [], "args": [{"name": "from", "type": "unsigned char", "line": "from", "mode": "scalar"}, {"name": "to", "type": "unsigned char", "line": "to", "mode": "scalar"}, {"name": "amount", "type": "float", "line": "amount", "mode": "scalar"}, {"name": "flag", "type": "int", "line": "flag", "mode": "scalar"}], "result": null, "native": "TransferMetal"},
     "TransferEnergy": {"conv": "__stdcall", "ret": "void", "functions": ["TransferEnergy"], "reads": [], "writes": [], "objectReads": ["Player.metal"], "objectWrites": [], "allOf": [], "args": [{"name": "from", "type": "unsigned char", "line": "from", "mode": "scalar"}, {"name": "to", "type": "unsigned char", "line": "to", "mode": "scalar"}, {"name": "amount", "type": "float", "line": "amount", "mode": "scalar"}, {"name": "flag", "type": "int", "line": "flag", "mode": "scalar"}], "result": null, "native": "TransferEnergy"},
     "GetEnergyIncome": {"conv": "__stdcall", "ret": "float", "functions": ["GetEnergyIncome"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}], "result": {"type": "float", "mode": "scalar"}, "native": "GetEnergyIncome"},
@@ -6241,7 +6266,7 @@
     "DeleteConditions": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "conditions", "type": "MissionConditions*", "line": "conditions", "mode": "pending"}], "result": null, "native": "DeleteConditions"},
     "NotifyUnitCreated": {"conv": "__fastcall", "ret": "void", "functions": ["MissionConditions::NotifyUnitCreated"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "conditions", "type": "MissionConditions*", "line": "conditions", "mode": "pending"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "NotifyUnitCreated"},
     "NotifyUnitDied": {"conv": "__fastcall", "ret": "void", "functions": ["MissionConditions::NotifyUnitDied"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "conditions", "type": "MissionConditions*", "line": "conditions", "mode": "pending"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "NotifyUnitDied"},
-    "UpdatePlayersOnStream": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "stream", "type": "RandStream", "line": "stream", "mode": "stream"}], "result": null, "native": "UpdatePlayersOnStream"},
+    "UpdatePlayersOnStream": {"conv": "__stdcall", "ret": "void", "functions": ["UpdatePlayersOnStream"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "stream", "type": "RandStream", "line": "stream", "mode": "stream"}], "result": null, "native": "UpdatePlayersOnStream"},
     "NewConditions": {"conv": "__stdcall", "ret": "MissionConditions*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "MissionConditions*", "mode": "pending"}, "native": "NewConditions"},
     "UpdatePlayerHead": {"conv": "__stdcall", "ret": "int", "functions": ["UpdatePlayerHead"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.mapFlags", "Game.playerIndex", "Game.localPlayer", "rng.main", "rng.load", "rng.seed"], "writes": ["Game.mapFlags", "rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.info", "Player.type", "Player.index", "Player.unitCount", "Player.unitsCreated", "Unit.flags", "Unit.playerIndex"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "stream", "type": "RandStream", "line": "stream", "mode": "stream"}], "result": {"type": "int", "mode": "scalar"}, "native": "UpdatePlayerHead"},
     "UpdatePlayerTail": {"conv": "__stdcall", "ret": "void", "functions": ["UpdatePlayerTail"], "reads": ["Game.playerIndex"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "UpdatePlayerTail"},

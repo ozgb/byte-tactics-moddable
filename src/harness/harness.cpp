@@ -3359,6 +3359,122 @@ static void VisitConstants()
     VisitMission();
 }
 
+enum { PATH_RESULT_POINTS = 64 };
+
+struct PathResult {
+    int kind;
+    int status;
+    unsigned unitTag;
+    unsigned unitId;
+    unsigned tick;
+    int count;
+    int delivered;
+    short points[PATH_RESULT_POINTS * 2];
+};
+
+static PathResult* s_pathResults = NULL;
+static unsigned s_pathResultCount = 0;
+static unsigned s_pathResultCapacity = 0;
+
+static void AddPathResult(const void* unit, int kind, int status, const void* points, int count)
+{
+    if (!s_testMode || s_trace == NULL)
+        return;
+    if (s_pathResultCount == s_pathResultCapacity) {
+        unsigned grown = s_pathResultCapacity == 0 ? 64 : s_pathResultCapacity * 2;
+        PathResult* items = (PathResult*)realloc(s_pathResults, grown * sizeof(PathResult));
+        if (items == NULL) {
+            Fail("testmode: no memory for the path results\n");
+            return;
+        }
+        s_pathResults = items;
+        s_pathResultCapacity = grown;
+    }
+    PathResult* r = &s_pathResults[s_pathResultCount++];
+    memset(r, 0, sizeof *r);
+    r->kind = kind;
+    r->status = status;
+    Resolve((unsigned)unit, TT_UNIT, &r->unitTag, &r->unitId);
+    r->tick = GameU32(GAME_TICK);
+    r->count = count;
+    r->delivered = count < 0 ? 0 : (count > PATH_RESULT_POINTS ? PATH_RESULT_POINTS : count);
+    if (r->delivered > 0)
+        memcpy(r->points, points, r->delivered * 4);
+}
+
+void __stdcall HarnessPathStarted(const void* unit, int status)
+{
+    AddPathResult(unit, 0, status, NULL, 0);
+}
+
+void __stdcall HarnessPathFinished(const void* unit, int status, const void* points, int count)
+{
+    AddPathResult(unit, 2, status, points, count);
+}
+
+static void VisitPathResults()
+{
+    char path[64];
+    unsigned k;
+    HashByte(32);
+    HashU32(s_pathResultCount);
+    if (s_dumpNow) {
+        DumpPrefix("results.count");
+        fprintf(s_dump, "0x%08x\n", s_pathResultCount);
+    }
+    for (k = 0; k < s_pathResultCount; k++) {
+        const PathResult* r = &s_pathResults[k];
+        HashU32((unsigned)r->kind);
+        HashU32((unsigned)r->status);
+        HashByte((unsigned char)r->unitTag);
+        HashU32(r->unitId);
+        HashU32(r->tick);
+        HashU32((unsigned)r->count);
+        HashBuf((const unsigned char*)r->points, r->delivered * 4);
+        if (!s_dumpNow)
+            continue;
+        sprintf(path, "results[%u].kind", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->kind);
+        sprintf(path, "results[%u].status", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->status);
+        sprintf(path, "results[%u].unit", k);
+        DumpPrefix(path);
+        if (r->unitTag == 0)
+            fputs("null", s_dump);
+        else if (r->unitTag == TT_HEAP)
+            fputs("heap", s_dump);
+        else
+            fprintf(s_dump, "%s:%u", s_targetNames[r->unitTag], r->unitId);
+        fputc('\n', s_dump);
+        sprintf(path, "results[%u].tick", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", r->tick);
+        sprintf(path, "results[%u].count", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->count);
+        sprintf(path, "results[%u].points", k);
+        DumpPrefix(path);
+        fputs("hex:", s_dump);
+        for (int b = 0; b < r->delivered * 4; b++)
+            fprintf(s_dump, "%02x", ((const unsigned char*)r->points)[b]);
+        fputc('\n', s_dump);
+    }
+    EndSection();
+}
+
+static void VisitPrivatePathfinder()
+{
+    if (!s_dumpNow)
+        return;
+    unsigned lo = s_hashLo;
+    unsigned hi = s_hashHi;
+    VisitPathfinder();
+    s_hashLo = lo;
+    s_hashHi = hi;
+}
+
 static void VisitWorld()
 {
     VisitGameScalars();
@@ -3367,13 +3483,14 @@ static void VisitWorld()
     VisitExplored();
     VisitSpatial();
     VisitEyes();
-    VisitPathfinder();
+    VisitPrivatePathfinder();
     VisitMoveClasses();
     VisitPassMaps();
     VisitUnitHeap();
     VisitPlayerHeap();
     if (s_traceTick == 1)
         VisitConstants();
+    VisitPathResults();
 }
 
 enum {
@@ -4221,6 +4338,7 @@ void HarnessPhase(int phase)
             fprintf(s_trace, "%u %s %08x%08x\n", tick, s_phaseNames[8], s_hashHi, s_hashLo);
     }
     if (phase == 7) {
+        s_pathResultCount = 0;
         fflush(s_trace);
         if (s_sound != NULL)
             fflush(s_sound);

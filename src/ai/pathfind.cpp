@@ -271,6 +271,9 @@ extern int g_playerBudgetCap[10];
 
 #include "../units/movement_class.h"
 
+void __stdcall HarnessPathStarted(const void* unit, int status);
+void __stdcall HarnessPathFinished(const void* unit, int status, const void* points, int count);
+
 // What the search is looking for.
 class Target {
 public:
@@ -506,6 +509,7 @@ public:
     }
     void Finish()
     {
+        HarnessPathFinished(object, 2, 0, 0);
         path->SetWaypoints(0, 0);
         Release();
     }
@@ -848,6 +852,7 @@ void Pathfinder::TracePath()
         out[i].x = (pt.x * 2 + owner->footprintX) * 8;
         out[i].y = (pt.y * 2 + owner->footprintZ) * 8;
     }
+    HarnessPathFinished(object, n > 0x40 ? 1 : 0, out, count);
     path->SetWaypoints(out, count);
 }
 
@@ -981,20 +986,24 @@ void Pathfinder::StartSearch(Target* t)
 
     // Each early exit is its own `Finish(); return;`, not a goto to a shared block.
     if (target->IsGoal(start.x, start.y)) {
+        HarnessPathStarted(object, 0);
         ((OrderFx*)target)->AddFlags(0x100);
         Finish();
         return;
     }
     int cost = Cost(start.x, start.y);
     if (!grid.InBounds(start.x, start.y)) {
+        HarnessPathStarted(object, 1);
         ((OrderFx*)target)->AddFlags(0x200);
         Finish();
         return;
     }
     probe = ProbeStraightPath();
     if (probe == 0) {
+        HarnessPathStarted(object, 0);
         ((OrderFx*)target)->AddFlags(0x100);
     } else {
+        HarnessPathStarted(object, 1);
         ((OrderFx*)target)->AddFlags(0x200);
         if (probe >= cost) {
             Finish();
@@ -1190,6 +1199,7 @@ void Pathfinder::RunSearches()
                     break;
             }
         } else {
+            HarnessPathFinished(object, 2, 0, 0);
             path->SetWaypoints(0, 0);
             Release();
         }
@@ -1262,3 +1272,6 @@ void Pathfinder::FreeNode(int index)
 }
 
 #pragma auto_inline(on)
+
+extern int g_pathResultPad0;
+extern int g_pathResultPad1;

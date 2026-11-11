@@ -2,6 +2,9 @@
 0x408100 ScoutTimer::OnTimer
 0x408620 BuildTimer::TryIssueIdleFactoryBuildOrder
 0x4086d0 BuildTimer::OnTimer
+0x40e050 Pathfinder::TracePath
+0x40e630 Pathfinder::StartSearch
+0x40eb70 Pathfinder::RunSearches
 0x418310 DrawMapDebugOverlay
 0x418cd0 CmdShareMetal
 0x418d90 CmdShareEnergy

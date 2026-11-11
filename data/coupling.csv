@@ -1885,6 +1885,8 @@ pathfinding,ai,shared_write,Point16::x,9
 pathfinding,ai,shared_write,Point16::y,9
 pathfinding,features,shared_write,Point16::x,11
 pathfinding,features,shared_write,Point16::y,2
+pathfinding,harness,call,HarnessPathFinished,3
+pathfinding,harness,call,HarnessPathStarted,1
 pathfinding,los_radar,shared_write,Grid::cells,6
 pathfinding,los_radar,shared_write,Grid::count,3
 pathfinding,los_radar,shared_write,Grid::height,7

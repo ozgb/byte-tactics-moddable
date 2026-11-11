@@ -26,7 +26,7 @@ explosions.pieces,DebrisCache::InitSimCache: GameAllocIgnoreTag CMemoryCache CCH
 explosions.pieces,SimEventsCreate: GameAllocIgnoreTag SimEventQueue,game,RecordSimEvent,same-record,11,edges-economy-targeting@130
 explosions.pieces,count_1491b,weapons,UpdateExplodedPiece,same-record,12,edges-economy-targeting@130
 explosions.pieces,g_explodedPieces,weapons,UpdateExplosions,same-record,19,edges-economy-targeting@117
-features,BuildAllPassMaps: operator new unsigned int,map,RefreshAllPassMaps,other-record,10,mission-kill-mobile@189
+features,BuildAllPassMaps: operator new unsigned int,map,RefreshAndReportAllPassMaps,other-record,10,mission-kill-mobile@189
 features,FeatureAnimEntry::bytes_10,features,ReplaceFeatureWithDead,other-record,4,mission-timer@199
 features,FeatureAnimEntry::bytes_10,features,UpdateFeatures,other-record,5,mission-kill-of-type@185
 features,FeatureAnimEntry::bytes_10,game,StepGafSequence,other-record,1,mission-kill-of-type@185
@@ -40,16 +40,17 @@ features,FeatureAnimEntry::src,game,StepGafSequence,other-record,10,mission-kill
 features,FeatureAnimEntry::src,presentation,ClipRects,other-record,4,mission-timer@204
 features,FeatureAnimEntry::state,game,StepGafSequence,other-record,14,console-ilose@30
 features,FeatureAnimEntry::state,presentation,ClipRects,other-record,4,mission-kill-of-type@186
-features,LoadTntMap: operator new int #2,features,RemoveFeature,same-record,10,mission-kill-mobile@189
-features,LoadTntMap: operator new int #2,features,ReplaceFeatureWithDead,same-record,10,mission-kill-mobile@189
-features,LoadTntMap: operator new int #2,features,SpreadFire,same-record,3,mission-timer@268
-features,LoadTntMap: operator new int #2,features,StartFeatureBurning,same-record,1,long-great-divide-2p@31478
-features,LoadTntMap: operator new int #2,units,GetGroundHeight,same-record,4,mission-timer@204
-features,LoadTntMap: operator new int #2,weapons,ApplyAreaDamage,same-record,3,mission-timer@268
+features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,RemoveFeature,same-record,10,mission-kill-mobile@189
+features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,ReplaceFeatureWithDead,same-record,10,mission-kill-mobile@189
+features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,SpreadFire,same-record,3,mission-timer@268
+features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,StartFeatureBurning,same-record,1,long-great-divide-2p@31478
+features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,same-record,4,mission-timer@204
+features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,ApplyAreaDamage,same-record,3,mission-timer@268
 features,SimEventsCreate: GameAllocIgnoreTag SimEventQueue,game,RecordSimEvent,same-record,4,mission-kill-of-type@186
 features,list_1421b,features,AllocFeatureSpot,same-record,10,mission-kill-mobile@189
 features,list_1421b,features,StartFeatureBurning,same-record,1,long-great-divide-2p@31478
 features,pad_14213,features,AllocFeatureSpot,same-record,18,meteors-earthquake@1
+features.anim,Feature::anim,game,StepGafSequence,other-record,14,allied-victory@1
 meteors,-,-,-,none,0,
 players,Group::units,ai,??0AssaultTimer@@QAE@PAVSquadManager@@PAUGroup@@HH@Z,other-record,10,skirmish4@4800
 players,Group::units,ai,??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,other-record,10,skirmish4@4800
@@ -66,6 +67,8 @@ players,InitPlayerSlot: operator new unsigned char,los_radar,RadarProjectileShow
 players,InitPlayerSlot: operator new unsigned char,los_radar,RecordRadarMapped,other-record,1,orders-air-fights@720
 players,InitPlayerSlot: operator new unsigned char,los_radar,RemoveLineOfSight,other-record,31,mission-passes-z@1
 players,InitPlayerSlot: operator new unsigned char,los_radar,UpdateSensorRadarAndCloak,other-record,2,orders-air-fights@90
+players,LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::Cancel,same-record,3,long-greenhaven-8p@11430
+players,LoadBattleAssets: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::Cancel,same-record,3,long-greenhaven-8p@11430
 players,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,RevealAroundUnit,same-record,29,mission-capture@21
 players,NewUnitScript: new UnitScript,units,CobScript::FUN_004b07b0,other-record,1,long-great-divide-2p@40500
 players,NewUnitScript: new UnitScript,units,CobScript::StartScript,other-record,1,ten-ring-atoll@6540
@@ -75,9 +78,12 @@ players,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,AiSearchGoal:
 players,Order::AttachBuildFootprintMarker: new PointMarker,orders,??1Order@@QAE@XZ,other-record,1,skirmish4-long@14490
 players,Order::AttachBuildFootprintMarker: new PointMarker,orders,AiSearchGoal::SetPathOrder,other-record,1,skirmish4-long@14490
 players,Order::flags_42,ai,ScoutTimer::OnTimer,other-record,26,duel-coast-to-coast@180
-players,PathOrder::ref,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@22950
-players,PathOrder::ref,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@22950
-players,PathOrder::unit,orders,AddOrder,other-record,1,long-greenhaven-8p@26010
+players,PathExtra::eventCount,pathfinding,Pathfinder::Cancel,same-record,5,eight-pincushion-teams@8100
+players,PathExtra::pendingCount,pathfinding,Pathfinder::Cancel,same-record,3,long-greenhaven-8p@11430
+players,PathExtra::pendingFree,pathfinding,Pathfinder::Cancel,same-record,3,long-greenhaven-8p@11430
+players,PathPending::nextRequester,pathfinding,Pathfinder::Cancel,other-record,3,long-greenhaven-8p@11430
+players,PathPending::nextUnit,pathfinding,Pathfinder::Cancel,other-record,1,long-greenhaven-8p@27900
+players,PathPending::requester,pathfinding,Pathfinder::Cancel,other-record,3,long-greenhaven-8p@11430
 players,PlayerAI::builders,ai,ScoutTimer::OnTimer,other-record,61,combat-deaths@90
 players,PlayerAI::centre,ai,??0SquadScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,other-record,22,ten-lava-run@30
 players,PlayerAI::centre,ai,FindBuildPosition,other-record,62,combat-deaths@90
@@ -90,9 +96,9 @@ players,PlayerAI::searchRadius,ai,FindBuildPosition,other-record,29,duel-coast-t
 players,PlayerAI::visible,ai,GetVisibleEnemiesInRadius,other-record,45,mission-capture@30
 players,PlayerAI::visible,ai,PlayerAI::RefreshUnitLists,other-record,84,allied-victory@30
 players,SimEventsCreate: GameAllocIgnoreTag SimEventQueue,game,RecordSimEvent,same-record,20,mission-build-unit@30
-players,SquadManager::SquadManager: new AssaultTimer #2,ai,AssaultTimer::RebalanceAssaultGroupByCentroid,other-record,27,duel-coast-to-coast@300
-players,SquadManager::SquadManager: new AssaultTimer #2,ai,SquadManager::TickIfActive,other-record,30,duel-coast-to-coast@150
 players,SquadManager::SquadManager: new BuildTimer,ai,SquadManager::TickIfActive,other-record,30,duel-coast-to-coast@30
+players,SquadManager::SquadManager: new EscortTimer,ai,AssaultTimer::RebalanceAssaultGroupByCentroid,other-record,27,duel-coast-to-coast@300
+players,SquadManager::SquadManager: new EscortTimer,ai,SquadManager::TickIfActive,other-record,30,duel-coast-to-coast@150
 players,SquadManager::SquadManager: new EscortTimer #2,ai,AssaultTimer::RebalanceAssaultGroupByCentroid,other-record,27,duel-coast-to-coast@300
 players,SquadManager::SquadManager: new EscortTimer #2,ai,SquadManager::TickIfActive,other-record,30,duel-coast-to-coast@150
 players,SquadManager::SquadManager: new ScoutTimer,ai,SquadManager::TickIfActive,other-record,30,duel-coast-to-coast@90
@@ -177,7 +183,8 @@ players,UnitResources::metalUse,economy,SettleResourceAccount,other-record,81,al
 players,UnitResources::metalUsePaid,economy,SettleResourceAccount,other-record,81,allied-victory@30
 players,VtolLandIfCanOrder: new PathOrder #4,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@47250
 players,VtolLandIfCanOrder: new PathOrder #4,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@47250
-players,VtolPatrolOrder: new Order,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@44621
+players,VtolPatrolOrder: new PathOrder,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@44621
+players,VtolPatrolOrder: new PathOrder,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@44621
 players,bits,players,UpdatePlayersOnStream,same-record,11,mission-build-unit@180
 players,bits_14281,los_radar,AddLineOfSight,same-record,31,mission-passes-z@1
 players,bits_14281,los_radar,IsUnitVisibleToPlayer,same-record,36,edges-economy-targeting@30
@@ -245,7 +252,7 @@ players.los,Unit::losSightFrameIdx,los_radar,UpdateLineOfSight,other-record,52,m
 players.los,bits_14281,los_radar,RemoveLineOfSight,same-record,13,mission-build-unit@1
 players.los,bits_14281,los_radar,UpdateLineOfSight,same-record,41,mission-build-unit@1
 players.los,bits_142f1,los_radar,RemoveLineOfSight,same-record,13,mission-build-unit@1
-projectiles,BuildAllPassMaps: operator new unsigned int,map,RefreshAllPassMaps,other-record,1,long-greenhaven-8p@25352
+projectiles,BuildAllPassMaps: operator new unsigned int,map,RefreshAndReportAllPassMaps,other-record,1,long-greenhaven-8p@25352
 projectiles,FeatureAnimEntry::bytes_10,features,DamageFeature,other-record,1,long-great-divide-2p@33971
 projectiles,FeatureAnimEntry::bytes_10,features,DamageFeature,same-record,2,long-greenhaven-8p@33472
 projectiles,FeatureAnimEntry::bytes_10,weapons,ApplyAreaDamage,other-record,1,skirmish4-long@24994
@@ -254,14 +261,14 @@ projectiles,FeatureAnimEntry::bytes_8,weapons,ApplyAreaDamage,other-record,1,lon
 projectiles,FeatureAnimEntry::src,weapons,ApplyAreaDamage,other-record,1,long-great-divide-2p@33971
 projectiles,IssueAttackOrder: new Order #2,seams,OrderOrStatusFlagsNative,other-record,1,edges-economy-targeting@60
 projectiles,IssueAttackOrder: new Order #2,seams,OrderOrStatusFlagsNative,same-record,3,edges-economy-targeting@105
-projectiles,LoadTntMap: operator new int #2,features,DamageFeature,same-record,2,long-greenhaven-8p@25352
-projectiles,LoadTntMap: operator new int #2,features,KillFeature,same-record,1,long-greenhaven-8p@25352
-projectiles,LoadTntMap: operator new int #2,features,RemoveFeature,same-record,1,long-greenhaven-8p@25352
-projectiles,LoadTntMap: operator new int #2,features,ReplaceFeatureWithDead,same-record,1,long-greenhaven-8p@25352
-projectiles,LoadTntMap: operator new int #2,units,GetGroundHeight,same-record,3,skirmish4-long@22750
-projectiles,LoadTntMap: operator new int #2,weapons,ApplyAreaDamage,same-record,3,skirmish4-long@22750
-projectiles,LoadTntMap: operator new int #2,weapons,CheckProjectileCollision,same-record,4,orders-guard-attacked@159
-projectiles,LoadTntMap: operator new int #2,weapons,DetonateProjectile,same-record,3,skirmish4-long@22750
+projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,DamageFeature,same-record,2,long-greenhaven-8p@25352
+projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,KillFeature,same-record,1,long-greenhaven-8p@25352
+projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,RemoveFeature,same-record,1,long-greenhaven-8p@25352
+projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,ReplaceFeatureWithDead,same-record,1,long-greenhaven-8p@25352
+projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,same-record,3,skirmish4-long@22750
+projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,ApplyAreaDamage,same-record,3,skirmish4-long@22750
+projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,CheckProjectileCollision,same-record,4,orders-guard-attacked@159
+projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,DetonateProjectile,same-record,3,skirmish4-long@22750
 projectiles,ModelState::animDirty,units,GetPieceOffset,other-record,1,skirmish4-long@26047
 projectiles,ModelState::bitmap,units,GetPieceOffset,other-record,1,skirmish4-long@26047
 projectiles,ModelState::cacheDrawCount,units,GetPieceOffset,other-record,1,skirmish4-long@26047
@@ -433,39 +440,37 @@ tail,bits_142f1,los_radar,RemoveLineOfSight,same-record,12,mission-build-unit@13
 tail,bits_142f1,players,UpdateBlink,same-record,17,mission-build-unit@72
 tail,pad_38d81,game,RunGameSteps,same-record,84,allied-victory@1
 units,AddOrder: new Order,seams,OrderOrStatusFlagsNative,other-record,4,mission-kill-mobile@180
-units,AirManeuverOrder::flags,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@40825
-units,AirManeuverOrder::flags,orders,AirManeuverOrder::IsComplete,other-record,1,long-greenhaven-8p@40825
-units,AirManeuverOrder::other,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@40825
-units,AirManeuverOrder::other,platform,GetHeadingBetween,other-record,1,long-greenhaven-8p@40825
-units,AirManeuverOrder::self,orders,AirManeuverOrder::GetDesiredHeading,other-record,1,long-greenhaven-8p@48722
-units,AirManeuverOrder::target,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@40825
-units,AirStrikeOrder: new Order #3,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@51778
-units,AirStrikeOrder: new Order #3,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@38033
-units,AirStrikeOrder: new Order #3,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@38033
-units,AirStrikeOrder: new PathOrder #2,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@38185
-units,AirStrikeOrder: new PathOrder #2,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@38220
-units,AirStrikeOrder: new PathOrder #2,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@38185
-units,AirStrikeOrder: new PathOrder #2,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@38220
-units,AirToAirOrder: new AirManeuverOrder #2,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@40825
-units,AirToAirOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@48837
-units,AirToGroundOrder: new Order #3,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@36494
-units,AirToGroundOrder: new Order #3,orders,PackedGoal::TickTowardGoal,other-record,2,orders-air-fights@697
-units,AirToGroundOrder: new Order #3,orders,PathOrder::IsComplete,other-record,2,orders-air-fights@697
-units,AirToGroundOrder: new PathOrder,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@36275
-units,AirToGroundOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@34202
-units,AirToGroundOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@34202
-units,AirToGroundOrder: new PathOrder #2,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@36276
-units,AirToGroundOrder: new PathOrder #2,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@37404
-units,AirToGroundOrder: new PathOrder #2,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@37404
+units,AirManeuverOrder::target,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@48775
+units,AirStrikeOrder: new Order #3,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@38185
+units,AirStrikeOrder: new Order #3,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@38220
+units,AirStrikeOrder: new Order #3,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@38220
+units,AirStrikeOrder: new PathOrder,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@51778
+units,AirStrikeOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@38033
+units,AirStrikeOrder: new PathOrder,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@51778
+units,AirStrikeOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@38033
+units,AirToAirOrder: new AirManeuverOrder,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@48837
+units,AirToAirOrder: new Order #3,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@40825
+units,AirToGroundOrder: new PathOrder,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@36494
+units,AirToGroundOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,2,orders-air-fights@697
+units,AirToGroundOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,2,orders-air-fights@697
+units,AirToGroundOrder: new PathOrder #2,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@36275
+units,AirToGroundOrder: new PathOrder #2,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@34202
+units,AirToGroundOrder: new PathOrder #2,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@34202
+units,AirToGroundOrder: new PathOrder #3,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@36276
+units,AirToGroundOrder: new PathOrder #3,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@37404
+units,AirToGroundOrder: new PathOrder #3,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@37404
 units,AirToGroundOrder: new PathOrder #4,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@36575
 units,AirToGroundOrder: new PathOrder #4,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@37323
 units,AirToGroundOrder: new PathOrder #4,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@37323
-units,ApproachRadius::pos,orders,ApproachRadius::ContainsUnit,other-record,12,mission-capture@2
-units,ApproachRadius::radiusSq,orders,ApproachRadius::ContainsUnit,other-record,12,mission-capture@2
-units,ApproachRadius::y,orders,ApproachRadius::ContainsUnit,other-record,12,mission-capture@2
+units,ApproachRadius::pos,orders,ApproachRadius::ContainsCell,other-record,12,mission-capture@2
+units,ApproachRadius::pos,orders,SubmitRepath,other-record,9,mission-kill-of-type@54
+units,ApproachRadius::radius,orders,ApproachRadius::ContainsCell,other-record,12,mission-capture@2
+units,ApproachRadius::radius,orders,SubmitRepath,other-record,9,mission-kill-of-type@54
+units,ApproachRadius::y,orders,ApproachRadius::ContainsCell,other-record,12,mission-capture@2
+units,ApproachRadius::y,orders,SubmitRepath,other-record,9,mission-kill-of-type@54
 units,AttachMove: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@31041
 units,AttachMove: new PathOrder,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@31041
-units,BuildAllPassMaps: operator new unsigned int,map,RefreshAllPassMaps,other-record,13,mission-build-unit@1
+units,BuildAllPassMaps: operator new unsigned int,map,RefreshAndReportAllPassMaps,other-record,13,mission-build-unit@1
 units,BuildAllPassMaps: operator new unsigned int,map,RefreshPassMapsForUnit,other-record,12,edges-economy-targeting@117
 units,BuildAllPassMaps: operator new unsigned int,map,RefreshPassMapsForUnit,same-record,8,mission-passes-x@120
 units,CobScript::SetCob: realloc int,units,CobScript::RunThread,other-record,62,mission-build-unit@1
@@ -495,36 +500,36 @@ units,InitPlayerSlot: operator new unsigned char,los_radar,IsVisibleByMask,other
 units,InitPlayerSlot: operator new unsigned char,los_radar,RemoveLineOfSight,same-record,17,mission-build-unit@1
 units,InitPlayerSlot: operator new unsigned char,los_radar,SoundHeardMask,other-record,5,orders-air-fights@445
 units,InitPlayerSlot: operator new unsigned char,los_radar,SoundHeardMask,same-record,5,orders-air-fights@445
+units,LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::Cancel,same-record,18,mission-build-unit@1
+units,LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::FindPending,same-record,19,mission-build-unit@1
+units,LoadBattleAssets: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::Cancel,same-record,9,mission-capture@31
+units,LoadBattleAssets: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::FindPending,same-record,18,mission-build-unit@1
 units,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,RevealAroundUnit,same-record,8,mission-kill-of-type@99
 units,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,map,CanPlaceFootprintAt,same-record,1,long-greenhaven-8p@29335
-units,LoadTntMap: operator new int #2,economy,UpdateMetalExtraction,same-record,3,skirmish4-long@13614
-units,LoadTntMap: operator new int #2,features,DamageFeature,same-record,1,edges-economy-targeting@244
-units,LoadTntMap: operator new int #2,features,GetCellFeature,same-record,4,mission-kill-of-type@128
-units,LoadTntMap: operator new int #2,features,KillFeature,same-record,3,edges-economy-targeting@244
-units,LoadTntMap: operator new int #2,features,ReclaimFeature,same-record,2,long-greenhaven-8p@30464
-units,LoadTntMap: operator new int #2,features,RemoveFeature,same-record,2,long-great-divide-2p@35389
-units,LoadTntMap: operator new int #2,features,ReplaceFeatureWithDead,same-record,2,long-great-divide-2p@35389
-units,LoadTntMap: operator new int #2,map,AddUnitToMap,same-record,11,mission-kill-of-type@90
-units,LoadTntMap: operator new int #2,map,CanBuildAt,same-record,5,ten-ring-atoll@7406
-units,LoadTntMap: operator new int #2,map,CanPlaceFootprintAt,same-record,4,mission-timer@186
-units,LoadTntMap: operator new int #2,map,CanPlaceUnitFootprint,same-record,25,mission-build-unit@13
-units,LoadTntMap: operator new int #2,map,ClaimFootprintCells,same-record,8,mission-kill-of-type@98
-units,LoadTntMap: operator new int #2,map,GetFootprintHeight,same-record,4,six-painted-desert@12453
-units,LoadTntMap: operator new int #2,map,GetPassMapFootprintValue,same-record,2,edges-economy-targeting@244
-units,LoadTntMap: operator new int #2,map,IsFootprintClear,same-record,8,mission-kill-of-type@98
-units,LoadTntMap: operator new int #2,map,RemoveUnitFromMap,same-record,32,mission-build-unit@1
-units,LoadTntMap: operator new int #2,units,AlignUnitToGround,same-record,19,mission-build-unit@1
-units,LoadTntMap: operator new int #2,units,GetGroundHeight,same-record,21,mission-build-unit@1
-units,LoadTntMap: operator new int #2,weapons,ApplyAreaDamage,same-record,1,edges-economy-targeting@244
-units,LoadTntMap: operator new int #2,weapons,DetonateProjectile,same-record,1,edges-economy-targeting@244
-units,LoadTntMap: operator new int #2,weapons,FindFeatureAtPos,same-record,4,mission-kill-of-type@128
-units,MissionConditions::RegisterConditions: new VictoryCaptureUnitType,players,MissionConditions::NotifyUnitCreated,other-record,1,mission-timer@186
-units,MissionConditions::RegisterConditions: new VictoryCaptureUnitType,players,MissionConditions::NotifyUnitDied,other-record,2,mission-timer@180
-units,MissionConditions::RegisterConditions: new VictoryCaptureUnitType,players,MissionConditions::NotifyUnitDied,same-record,1,mission-timer@194
-units,MissionConditions::RegisterConditions: new VictoryCaptureUnitType,players,VictoryKillAllOfType::OnUnitDied,other-record,2,mission-timer@180
-units,MissionConditions::RegisterConditions: new VictoryCaptureUnitType,players,VictoryKillAllOfType::OnUnitDied,same-record,1,mission-timer@194
-units,MissionConditions::RegisterConditions: new VictoryDestroyAllUnits #2,players,MissionConditions::NotifyUnitDied,other-record,1,mission-kill-mobile@180
-units,MissionConditions::RegisterConditions: new VictoryKillAllOfType,players,MissionConditions::NotifyUnitDied,same-record,1,mission-kill-of-type@185
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,economy,UpdateMetalExtraction,same-record,3,skirmish4-long@13614
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,DamageFeature,same-record,1,edges-economy-targeting@244
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,same-record,4,mission-kill-of-type@128
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,KillFeature,same-record,3,edges-economy-targeting@244
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,ReclaimFeature,same-record,2,long-greenhaven-8p@30464
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,RemoveFeature,same-record,2,long-great-divide-2p@35389
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,ReplaceFeatureWithDead,same-record,2,long-great-divide-2p@35389
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,AddUnitToMap,same-record,11,mission-kill-of-type@90
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,CanBuildAt,same-record,5,ten-ring-atoll@7406
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,CanPlaceFootprintAt,same-record,4,mission-timer@186
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,CanPlaceUnitFootprint,same-record,25,mission-build-unit@13
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,ClaimFootprintCells,same-record,8,mission-kill-of-type@98
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,FootprintValue,same-record,2,edges-economy-targeting@244
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetFootprintHeight,same-record,4,six-painted-desert@12453
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,IsFootprintClear,same-record,8,mission-kill-of-type@98
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,RemoveUnitFromMap,same-record,32,mission-build-unit@1
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,AlignUnitToGround,same-record,19,mission-build-unit@1
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,same-record,21,mission-build-unit@1
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,ApplyAreaDamage,same-record,1,edges-economy-targeting@244
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,DetonateProjectile,same-record,1,edges-economy-targeting@244
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,FindFeatureAtPos,same-record,4,mission-kill-of-type@128
+units,MissionConditions::RegisterConditions: new VictoryKillAllOfType,players,MissionConditions::NotifyUnitDied,same-record,1,mission-timer@194
+units,MissionConditions::RegisterConditions: new VictoryKillAllOfType,players,VictoryKillAllOfType::OnUnitDied,same-record,1,mission-timer@194
+units,MissionConditions::RegisterConditions: new VictoryKillUnitType,players,MissionConditions::NotifyUnitDied,same-record,1,mission-kill-of-type@185
 units,ModelState::animDirty,units,GetPieceOffset,other-record,28,orders-tier2-spider@21
 units,ModelState::animDirty,units,PoseModel,other-record,3,mission-radius@2639
 units,ModelState::animDirty,units,RestorePieceVertices,other-record,3,skirmish4-long@22213
@@ -654,29 +659,36 @@ units,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,??1Order@@QAE@X
 units,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,AiSearchGoal::SetPathOrder,other-record,8,edges-economy-targeting@79
 units,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,AiSearchGoal::SetPathOrder,same-record,1,skirmish4-long@25574
 units,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,AiSearchGoal::TickTowardGoal,other-record,17,mission-capture@2
+units,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,ApproachRadius::ContainsUnit,other-record,17,mission-capture@2
 units,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,Order::SetAttachedFx,other-record,5,edges-economy-targeting@55
+units,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,SubmitRepath,other-record,9,mission-kill-of-type@54
 units,Order::AttachBuildFootprintMarker: new PointMarker,orders,??1Order@@QAE@XZ,other-record,5,mission-kill-of-type@187
 units,Order::AttachBuildFootprintMarker: new PointMarker,orders,AiSearchGoal::SetPathOrder,other-record,4,mission-kill-of-type@187
 units,Order::AttachBuildFootprintMarker: new PointMarker,orders,AiSearchGoal::TickTowardGoal,other-record,9,mission-kill-of-type@183
 units,Order::AttachBuildFootprintMarker: new PointMarker,orders,OrderFx::ContainsUnit,other-record,9,mission-kill-of-type@183
+units,Order::AttachBuildFootprintMarker: new PointMarker,orders,SubmitRepath,other-record,6,ten-ring-atoll@7201
 units,Order::AttachRingApproachGoal: new RingApproach,orders,??1Order@@QAE@XZ,other-record,4,sensors-los-off@3860
 units,Order::AttachRingApproachGoal: new RingApproach,orders,AiSearchGoal::TickTowardGoal,other-record,4,sensors-los-off@3513
-units,Order::attached,orders,??1Order@@QAE@XZ,other-record,18,mission-build-unit@1
+units,Order::AttachRingApproachGoal: new RingApproach,orders,RingApproach::ContainsUnit,other-record,4,sensors-los-off@3513
+units,Order::AttachRingApproachGoal: new RingApproach,orders,SubmitRepath,other-record,1,long-great-divide-2p@29345
+units,Order::attached,orders,??1Order@@QAE@XZ,other-record,19,mission-build-unit@1
 units,Order::attached,orders,??1Order@@QAE@XZ,same-record,1,skirmish4-long@25574
 units,Order::attached,orders,Order::AttachApproachRadiusGoal,other-record,15,mission-capture@1
 units,Order::attached,orders,Order::AttachBuildFootprintMarker,other-record,7,mission-kill-of-type@1
-units,Order::attached,orders,Order::SetAttachedFx,other-record,9,edges-economy-targeting@54
+units,Order::attached,orders,Order::SetAttachedFx,other-record,10,mission-timer@1
 units,Order::flags,orders,??1Order@@QAE@XZ,other-record,9,mission-kill-of-type@183
-units,Order::flags,orders,PathOrder::FillWorldPos,other-record,10,orders-air-fights@57
-units,Order::flags,orders,PathOrder::GetDesiredHeading,other-record,7,orders-air-fights@57
-units,Order::flags,orders,PathOrder::IsComplete,other-record,10,orders-air-fights@57
-units,Order::flags,orders,PathOrder::KeepAfterComplete,other-record,7,orders-air-fights@64
+units,Order::flags,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@33264
+units,Order::flags,orders,AirManeuverOrder::IsComplete,other-record,1,long-greenhaven-8p@33264
+units,Order::flags,orders,PathOrder::FillWorldPos,other-record,4,orders-air-fights@57
+units,Order::flags,orders,PathOrder::GetDesiredHeading,other-record,4,orders-air-fights@57
+units,Order::flags,orders,PathOrder::IsComplete,other-record,4,orders-air-fights@57
+units,Order::flags,orders,PathOrder::KeepAfterComplete,other-record,3,orders-air-fights@64
 units,Order::flags,orders,RunOrders,other-record,67,mission-build-unit@1
 units,Order::flags,orders,RunOrders,same-record,1,load-midgame@1170
 units,Order::flags,orders,RunSecondaryOrders,other-record,10,mission-defeat-all-units@30
-units,Order::flags_42,orders,??1Order@@QAE@XZ,other-record,47,mission-capture@1
+units,Order::flags_42,orders,??1Order@@QAE@XZ,other-record,48,mission-capture@1
 units,Order::flags_42,orders,AiSearchGoal::SetPathOrder,other-record,8,mission-capture@1
-units,Order::flags_42,orders,DeleteOrder,other-record,46,mission-capture@1
+units,Order::flags_42,orders,DeleteOrder,other-record,47,mission-capture@1
 units,Order::flags_42,orders,DeleteOrders,other-record,7,mission-kill-mobile@180
 units,Order::flags_42,orders,EnsurePatrolReturnOrder,other-record,7,mission-capture@1
 units,Order::flags_42,orders,GetOrderFlags,other-record,6,mission-kill-mobile@180
@@ -685,36 +697,39 @@ units,Order::flags_42,orders,RemoveAndDelete,other-record,5,mission-kill-mobile@
 units,Order::flags_42,orders,RunOrders,other-record,1,skirmish4-long@18110
 units,Order::flags_42,orders,StartBuildingScript,other-record,3,skirmish4-long@26049
 units,Order::flags_42,orders,StopBuildingScript,other-record,1,long-great-divide-2p@33704
-units,Order::kind,orders,??1Order@@QAE@XZ,other-record,4,mission-kill-of-type@183
+units,Order::kind,orders,??1Order@@QAE@XZ,other-record,5,mission-kill-of-type@183
+units,Order::kind,orders,EnsurePatrolReturnOrder,other-record,6,mission-capture@1
 units,Order::kind,orders,FollowGroundOrder,other-record,1,mission-capture@1
 units,Order::kind,orders,GetBuiltOrder,other-record,1,orders-air@2332
-units,Order::kind,orders,OrderFx::AddFlags,other-record,6,orders-air-fights@64
-units,Order::kind,orders,PathGoal::SetPathOrder,other-record,6,orders-air-fights@64
+units,Order::kind,orders,OrderFx::AddFlags,other-record,2,orders-air-fights@64
+units,Order::kind,orders,PathGoal::SetPathOrder,other-record,2,orders-air-fights@64
 units,Order::kind,orders,RunOrders,other-record,27,mission-build-unit@1
 units,Order::kind,orders,RunOrders,same-record,50,conditions-shore-to-shore@6
 units,Order::kind,orders,RunSecondaryOrders,other-record,2,mission-kill-of-type@90
 units,Order::next,orders,DeleteOrder,other-record,10,mission-capture@1
-units,Order::next,orders,DeleteOrders,other-record,3,mission-kill-of-type@183
-units,Order::next,orders,EnqueueOrderType,other-record,3,long-great-divide-2p@24992
+units,Order::next,orders,DeleteOrders,other-record,4,mission-kill-of-type@183
+units,Order::next,orders,EnqueueOrderType,other-record,5,mission-passes-x@374
 units,Order::next,orders,EnsurePatrolReturnOrder,other-record,7,mission-capture@1
 units,Order::next,orders,GetBuiltOrder,other-record,1,orders-air@2332
 units,Order::next,orders,RemoveAndDelete,other-record,2,mission-kill-of-type@183
 units,Order::next,orders,RunOrders,other-record,1,skirmish4-long@16465
 units,Order::next,orders,RunSecondaryOrders,other-record,2,mission-timer@51
 units,Order::next,orders,VtolMoveOrder,other-record,2,long-greenhaven-8p@17517
-units,Order::pos,features,ReclaimFeature,other-record,2,long-greenhaven-8p@19936
-units,Order::pos,map,SnapWorldPosToFootprint,other-record,3,long-greenhaven-8p@14733
+units,Order::pos,map,SnapWorldPosToFootprint,other-record,2,long-greenhaven-8p@15327
+units,Order::pos,orders,??0Order@@QAE@EHHHHH@Z,other-record,1,orders-factory@1276
+units,Order::pos,orders,??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z,other-record,3,skirmish4-long@24415
+units,Order::pos,orders,AirManeuverOrder::GetDesiredHeading,other-record,1,long-greenhaven-8p@33749
 units,Order::pos,orders,FollowGroundOrder,other-record,1,mission-capture@91
 units,Order::pos,orders,MobileBuildOrder,other-record,6,mission-kill-of-type@1
 units,Order::pos,orders,Order::AttachApproachRadiusGoal,other-record,6,mission-defeat-all-units@1
-units,Order::pos,orders,PathOrder::FillWorldPos,other-record,5,orders-air-fights@57
-units,Order::pos,orders,VtolMobileBuildOrder,other-record,3,long-greenhaven-8p@14354
+units,Order::pos,orders,PathOrder::FillWorldPos,other-record,2,orders-air-fights@57
+units,Order::pos,orders,VtolMobileBuildOrder,other-record,3,skirmish4-long@22411
 units,Order::pos,orders,VtolMoveOrder,other-record,4,mission-capture@104
-units,Order::pos,orders,VtolPatrolOrder,other-record,6,mission-passes-x@106
-units,Order::pos,platform,GetHeadingBetween,other-record,6,mission-passes-x@106
-units,Order::pos,weapons,FindFeatureAtPos,other-record,2,long-greenhaven-8p@19780
+units,Order::pos,orders,VtolPatrolOrder,other-record,5,mission-timer@165
+units,Order::pos,platform,GetHeadingBetween,other-record,5,mission-timer@165
+units,Order::pos,weapons,FindFeatureAtPos,other-record,2,long-greenhaven-8p@19810
 units,Order::progress,orders,AirStrikeOrder,other-record,1,long-greenhaven-8p@30481
-units,Order::progress,orders,AirToGroundOrder,other-record,1,long-greenhaven-8p@51476
+units,Order::progress,orders,AirToGroundOrder,other-record,1,long-greenhaven-8p@40265
 units,Order::progress,orders,AttackChaseOrder,other-record,5,edges-economy-targeting@54
 units,Order::progress,orders,CellToWorldPos,other-record,2,long-greenhaven-8p@44044
 units,Order::progress,orders,MobileBuildOrder,other-record,2,long-greenhaven-8p@19081
@@ -749,7 +764,8 @@ units,Order::state,orders,RunOrders,other-record,62,mission-build-unit@1
 units,Order::state,orders,RunOrders,same-record,1,load-midgame@1170
 units,Order::state,orders,RunSecondaryOrders,other-record,6,mission-defeat-all-units@30
 units,Order::state,orders,VtolFollowOrder,other-record,2,mission-timer@1
-units,Order::state,orders,VtolHelpBuildOrder,other-record,3,long-greenhaven-8p@16391
+units,Order::state,orders,VtolHelpBuildOrder,other-record,4,orders-air-fights@294
+units,Order::state,orders,VtolLandIfCanOrder,other-record,1,skirmish4-long@25919
 units,Order::state,orders,VtolMobileBuildOrder,other-record,4,long-greenhaven-8p@11613
 units,Order::state,orders,VtolMoveOrder,other-record,4,mission-capture@1
 units,Order::state,orders,VtolPatrolOrder,other-record,6,mission-capture@1
@@ -766,53 +782,55 @@ units,Order::subFlags,orders,OrderFx::AddFlags,other-record,11,orders-air-fights
 units,Order::subFlags,orders,PathGoal::SetPathOrder,other-record,5,mission-timer@180
 units,Order::subFlags,orders,RunOrders,other-record,67,mission-build-unit@1
 units,Order::subFlags,orders,RunOrders,same-record,9,mission-kill-mobile@180
-units,Order::target,orders,AirStrikeOrder,other-record,2,orders-air-fights@1334
-units,Order::target,orders,AirToAirOrder,other-record,1,long-greenhaven-8p@37991
-units,Order::target,orders,AirToGroundOrder,other-record,1,long-greenhaven-8p@34262
+units,Order::target,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@33343
+units,Order::target,orders,AirStrikeOrder,other-record,1,long-greenhaven-8p@30464
+units,Order::target,orders,AirToAirOrder,other-record,1,long-greenhaven-8p@38197
+units,Order::target,orders,AirToGroundOrder,other-record,1,long-greenhaven-8p@35862
 units,Order::target,orders,AttackChaseOrder,other-record,5,edges-economy-targeting@54
 units,Order::target,orders,BuildingBuildOrder,other-record,19,mission-kill-of-type@99
-units,Order::target,orders,CellToWorldPos,other-record,3,orders-air-fights@1000
+units,Order::target,orders,CellToWorldPos,other-record,2,long-greenhaven-8p@42033
 units,Order::target,orders,FollowGroundOrder,other-record,5,mission-capture@1
 units,Order::target,orders,GetBuiltOrder,other-record,15,orders-factory@1276
 units,Order::target,orders,GetBuiltOrder,same-record,4,eight-full-moon@8021
 units,Order::target,orders,HelpBuildOrder,other-record,4,sensors-los-off@3860
-units,Order::target,orders,IsAhead,other-record,1,long-greenhaven-8p@42884
+units,Order::target,orders,IsAhead,other-record,1,long-greenhaven-8p@38197
 units,Order::target,orders,MobileBuildOrder,other-record,7,sensors-los-off@3001
 units,Order::target,orders,Order::Advance,other-record,4,edges-economy-targeting@54
 units,Order::target,orders,PathOrderAttach::SetUnit,other-record,12,mission-kill-of-type@1
 units,Order::target,orders,PathOrderAttach::SetUnit,same-record,3,eight-full-moon@8082
 units,Order::target,orders,RepairPatrolOrder,other-record,3,long-greenhaven-8p@15481
-units,Order::target,orders,RepairUnitOrder,other-record,3,skirmish4-long@24269
+units,Order::target,orders,RepairUnitOrder,other-record,3,skirmish4-long@26034
 units,Order::target,orders,RepairUnitOrder,same-record,1,long-great-divide-2p@44817
 units,Order::target,orders,VtolFollowOrder,other-record,2,mission-timer@1
 units,Order::target,orders,VtolFollowOrder,same-record,2,mission-timer@192
-units,Order::target,orders,VtolHelpBuildOrder,other-record,3,long-greenhaven-8p@16391
+units,Order::target,orders,VtolHelpBuildOrder,other-record,4,orders-air-fights@294
 units,Order::target,orders,VtolMobileBuildOrder,other-record,3,long-greenhaven-8p@11974
-units,Order::target,orders,VtolRepairPatrolOrder,other-record,2,long-greenhaven-8p@16831
+units,Order::target,orders,VtolRepairPatrolOrder,other-record,2,long-greenhaven-8p@38611
 units,Order::target,orders,WaitForAttackOrder,other-record,3,mission-build-unit@1
 units,Order::target,orders,WaitForAttackOrder,same-record,2,mission-kill-mobile@180
-units,Order::target,units,ClearUnitRefs,other-record,2,skirmish4-long@25574
+units,Order::target,platform,GetHeadingBetween,other-record,1,long-greenhaven-8p@33343
+units,Order::target,units,ClearUnitRefs,other-record,1,skirmish4-long@25574
 units,Order::target,units,UnitRef::Unlink,other-record,47,mission-capture@1
-units,Order::target,units,UnitRef::Unlink,same-record,6,mission-kill-mobile@180
+units,Order::target,units,UnitRef::Unlink,same-record,7,mission-kill-mobile@180
 units,Order::type,orders,AirToAirOrder,other-record,1,long-greenhaven-8p@45060
 units,Order::type,orders,AttackChaseOrder,other-record,5,edges-economy-targeting@54
 units,Order::type,orders,AttackUTypeOrder,other-record,1,mission-kill-of-type@186
-units,Order::type,orders,BuildingBuildOrder,other-record,6,mission-kill-of-type@99
+units,Order::type,orders,BuildingBuildOrder,other-record,7,mission-kill-of-type@99
 units,Order::type,orders,MobileBuildOrder,other-record,4,mission-kill-of-type@1
 units,Order::type,orders,MoveGroundOrder,other-record,6,mission-defeat-all-units@1
 units,Order::type,orders,ReclaimOrder,other-record,2,long-great-divide-2p@23872
 units,Order::type,orders,SelfDestructOrder,other-record,6,mission-kill-of-type@90
 units,Order::type,orders,VtolMobileBuildOrder,other-record,3,long-greenhaven-8p@20722
-units,Order::type,orders,VtolReclaimOrder,other-record,2,long-greenhaven-8p@20101
+units,Order::type,orders,VtolReclaimOrder,other-record,2,long-greenhaven-8p@19914
 units,Order::type,orders,WaitOrder,other-record,6,mission-build-unit@1
-units,Order::unit,orders,??0AirManeuverOrder@@QAE@PAUOrder@@ABUVec3@@1@Z,other-record,1,long-greenhaven-8p@42884
+units,Order::unit,orders,??0AirManeuverOrder@@QAE@PAUOrder@@ABUVec3@@1@Z,other-record,1,long-greenhaven-8p@38238
 units,Order::unit,orders,??0ApproachRadius@@QAE@PAUOrder@@HHH@Z,other-record,6,mission-capture@1
-units,Order::unit,orders,??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z,other-record,4,mission-capture@1
-units,Order::unit,orders,??0PathOrder@@QAE@PAUOrder@@PAUUnit@@@Z,other-record,1,long-greenhaven-8p@30474
+units,Order::unit,orders,??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z,other-record,5,mission-capture@1
+units,Order::unit,orders,??0PathOrder@@QAE@PAUOrder@@PAUUnit@@@Z,other-record,1,long-greenhaven-8p@30481
 units,Order::unit,orders,??0PointMarker@@QAE@PAUOrder@@UPoint16@@1@Z,other-record,4,mission-kill-of-type@1
 units,Order::unit,orders,??1Order@@QAE@XZ,other-record,10,mission-capture@1
 units,Order::unit,orders,ApproachRadius::FillWorldPos,other-record,5,mission-capture@1
-units,Order::unit,orders,CellToWorldPos,other-record,3,orders-air-fights@1000
+units,Order::unit,orders,CellToWorldPos,other-record,2,long-greenhaven-8p@44044
 units,Order::unit,orders,Order::AnnounceStatusIfFlagged,other-record,4,long-great-divide-2p@8251
 units,Order::unit,orders,Order::AttachApproachRadiusGoal,other-record,6,mission-capture@1
 units,Order::unit,orders,Order::AttachBuildFootprintMarker,other-record,4,mission-kill-of-type@1
@@ -822,41 +840,49 @@ units,Order::unit,orders,RepairUnitOrder,other-record,3,skirmish4-long@26341
 units,Order::unit,orders,RunOrders,other-record,26,mission-build-unit@1
 units,Order::unit,orders,RunOrders,same-record,50,conditions-shore-to-shore@6
 units,Order::unit,orders,RunSecondaryOrders,other-record,2,mission-kill-of-type@90
-units,Order::unknown_12,orders,PathOrder::FillWorldPos,other-record,8,mission-capture@154
+units,Order::unknown_12,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@33343
+units,Order::unknown_12,orders,PathOrder::FillWorldPos,other-record,2,orders-air-fights@926
+units,Order::unknown_1a,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@33343
 units,Order::unknown_1a,orders,PathOrderAttach::SetUnit,other-record,6,sensors-los-off@1369
 units,Order::unknown_1a,orders,PathOrderAttach::SetUnit,same-record,3,sensors-los-off@1369
-units,Order::unknown_1a,units,ClearUnitRefs,other-record,2,skirmish4-long@25574
+units,Order::unknown_1a,platform,GetHeadingBetween,other-record,1,long-greenhaven-8p@33343
+units,Order::unknown_1a,units,ClearUnitRefs,other-record,1,skirmish4-long@25574
 units,Order::unknown_1a,units,NotifyUnitRefs,other-record,3,mission-kill-mobile@180
 units,Order::unknown_1a,units,UnitRef::Unlink,other-record,45,mission-kill-mobile@180
 units,Order::unknown_1a,units,UnitRef::Unlink,same-record,1,long-greenhaven-8p@42055
-units,Order::wakeFrame,orders,PathOrder::FillWorldPos,other-record,1,sensors-los-off@7125
-units,Order::wakeFrame,orders,PathOrder::IsComplete,other-record,10,mission-passes-x@111
+units,Order::wakeFrame,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@33264
+units,Order::wakeFrame,orders,PathOrder::IsComplete,other-record,2,orders-air-fights@927
 units,Order::wakeFrame,orders,RunOrders,other-record,65,mission-build-unit@1
 units,Order::wakeFrame,orders,RunOrders,same-record,47,conditions-shore-to-shore@6
 units,Order::wakeFrame,orders,RunSecondaryOrders,other-record,10,mission-kill-mobile@31
 units,Order::z,orders,AttackChaseOrder,other-record,1,edges-economy-targeting@54
-units,PathOrder::altitude,orders,??1Order@@QAE@XZ,other-record,1,mission-timer@187
-units,PathOrder::altitude,orders,GetOrderFlags,other-record,1,mission-timer@187
-units,PathOrder::approachRadius,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@37650
-units,PathOrder::approachRadius,orders,PathOrder::IsComplete,other-record,6,orders-air-fights@112
-units,PathOrder::approachRadius,orders,RunOrders,other-record,5,mission-timer@187
-units,PathOrder::flags,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@37650
-units,PathOrder::flags,orders,AirManeuverOrder::IsComplete,other-record,1,long-greenhaven-8p@37650
-units,PathOrder::flags,orders,PathOrder::FillWorldPos,other-record,7,mission-capture@104
-units,PathOrder::flags,orders,PathOrder::GetDesiredHeading,other-record,7,mission-capture@104
-units,PathOrder::flags,orders,PathOrder::IsComplete,other-record,7,mission-capture@104
-units,PathOrder::flags,orders,PathOrder::KeepAfterComplete,other-record,4,orders-air-fights@1347
-units,PathOrder::pos,orders,AirManeuverOrder::GetDesiredHeading,other-record,1,long-greenhaven-8p@47971
-units,PathOrder::pos,orders,PathOrder::FillWorldPos,other-record,7,mission-capture@104
-units,PathOrder::pos_y,orders,PathOrder::FillWorldPos,other-record,5,mission-capture@104
-units,PathOrder::ref,orders,??1Order@@QAE@XZ,other-record,1,mission-timer@187
-units,PathOrder::ref,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@37650
-units,PathOrder::ref,orders,PathGoal::SetPathOrder,other-record,1,mission-timer@187
-units,PathOrder::ref,orders,RunOrders,other-record,5,mission-timer@187
-units,PathOrder::ref,platform,GetHeadingBetween,other-record,1,long-greenhaven-8p@37650
-units,PathOrder::unit,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@37650
-units,PathOrder::unit,orders,DeleteOrders,other-record,1,mission-timer@187
-units,PathOrder::unit,orders,PathOrder::FillWorldPos,other-record,6,orders-air-fights@112
+units,PathExtra::eventCount,pathfinding,Pathfinder::Cancel,same-record,22,mission-build-unit@1
+units,PathExtra::pendingCount,pathfinding,Pathfinder::Cancel,same-record,9,mission-capture@31
+units,PathExtra::pendingCount,pathfinding,Pathfinder::FindPending,same-record,18,mission-build-unit@1
+units,PathExtra::pendingFree,pathfinding,Pathfinder::Cancel,same-record,9,mission-capture@31
+units,PathExtra::pendingFree,pathfinding,Pathfinder::FindPending,same-record,18,mission-build-unit@1
+units,PathOrder::approachRadius,orders,PathOrder::IsComplete,other-record,8,orders-air-fights@112
+units,PathOrder::flags,orders,PathOrder::FillWorldPos,other-record,8,mission-capture@104
+units,PathOrder::flags,orders,PathOrder::GetDesiredHeading,other-record,8,mission-capture@104
+units,PathOrder::flags,orders,PathOrder::IsComplete,other-record,8,mission-capture@104
+units,PathOrder::flags,orders,PathOrder::KeepAfterComplete,other-record,5,mission-passes-x@373
+units,PathOrder::pos,orders,PathOrder::FillWorldPos,other-record,8,mission-capture@104
+units,PathOrder::pos_y,orders,PathOrder::FillWorldPos,other-record,6,mission-capture@104
+units,PathOrder::pos_z,units,GetGroundHeight,other-record,1,orders-air-fights@710
+units,PathOrder::unit,orders,PathOrder::FillWorldPos,other-record,8,orders-air-fights@112
+units,PathPending::nextRequester,pathfinding,Pathfinder::Cancel,other-record,9,mission-defeat-all-units@1
+units,PathPending::nextRequester,pathfinding,Pathfinder::Cancel,same-record,1,skirmish4-long@25574
+units,PathPending::nextRequester,pathfinding,Pathfinder::FindPending,other-record,16,mission-build-unit@1
+units,PathPending::nextRequester,pathfinding,Pathfinder::FindPending,same-record,13,mission-capture@1
+units,PathPending::nextUnit,pathfinding,Pathfinder::Cancel,other-record,9,mission-capture@31
+units,PathPending::nextUnit,pathfinding,Pathfinder::Cancel,same-record,1,skirmish4-long@25574
+units,PathPending::requester,pathfinding,Pathfinder::Cancel,other-record,9,mission-defeat-all-units@1
+units,PathPending::requester,pathfinding,Pathfinder::Cancel,same-record,1,skirmish4-long@25574
+units,PathPending::requester,pathfinding,Pathfinder::FindPending,other-record,12,mission-defeat-all-units@1
+units,PathPending::unit,pathfinding,Pathfinder::Cancel,other-record,9,mission-capture@31
+units,PathPending::unit,pathfinding,Pathfinder::Cancel,same-record,1,skirmish4-long@25574
+units,PathPending::unit,pathfinding,Pathfinder::FindPending,other-record,12,mission-kill-of-type@54
+units,Pathfinder::object,pathfinding,Pathfinder::FindPending,same-record,7,mission-kill-of-type@61
 units,PatrolGoal::count,orders,??0PackedGoal@@QAE@PAUGoalOwnerUnit@@@Z,other-record,6,mission-timer@184
 units,PatrolGoal::points,orders,??0PackedGoal@@QAE@PAUGoalOwnerUnit@@@Z,other-record,6,mission-timer@184
 units,PatrolGoal::points,orders,PackedGoal::TickTowardGoal,other-record,8,mission-capture@1
@@ -874,9 +900,13 @@ units,Piece::turnSpeed,units,CobScript::AnimatePieces,other-record,60,load-midga
 units,Piece::turnSpeed,units,CobScript::AnimatePieces,same-record,8,orders-factory@793
 units,Piece::turnSpeed,units,CobScript::RunThread,other-record,40,mission-defeat-passes-x@3
 units,PointMarker::x1,orders,PointMarker::ContainsCell,other-record,9,mission-kill-of-type@183
+units,PointMarker::x1,orders,SubmitRepath,other-record,5,ten-ring-atoll@7201
 units,PointMarker::x2,orders,PointMarker::ContainsCell,other-record,9,mission-kill-of-type@183
+units,PointMarker::x2,orders,SubmitRepath,other-record,5,ten-ring-atoll@7201
 units,PointMarker::y1,orders,PointMarker::ContainsCell,other-record,9,mission-kill-of-type@183
-units,PointMarker::y2,orders,PointMarker::ContainsCell,other-record,8,ten-ring-atoll@6301
+units,PointMarker::y1,orders,SubmitRepath,other-record,5,ten-ring-atoll@7201
+units,PointMarker::y2,orders,PointMarker::ContainsCell,other-record,9,mission-kill-of-type@183
+units,PointMarker::y2,orders,SubmitRepath,other-record,5,ten-ring-atoll@7201
 units,PrepVtolClimb: new PathOrder,orders,Order::SetAttachedFx,other-record,5,mission-capture@104
 units,PrepVtolClimb: new PathOrder,orders,OrderFx::AddFlags,other-record,1,long-greenhaven-8p@43002
 units,PrepVtolClimb: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,4,mission-capture@104
@@ -895,9 +925,14 @@ units,Rec::field_6,map,SetOwner,same-record,8,mission-build-unit@50
 units,Rec::field_6,map,SpatialBucket::PrependUnit,other-record,7,mission-kill-of-type@182
 units,Rec::field_6,map,VisitObjectsInRange,other-record,3,long-greenhaven-8p@13085
 units,Rec::field_6,map,VisitObjectsInRange,same-record,3,long-greenhaven-8p@13085
-units,RingApproach::outerSq,orders,RingApproach::ContainsUnit,other-record,3,sensors-los-off@3513
-units,RingApproach::pos,orders,RingApproach::ContainsUnit,other-record,3,sensors-los-off@3513
-units,RingApproach::y,orders,RingApproach::ContainsUnit,other-record,3,sensors-los-off@3513
+units,RingApproach::inner,orders,RingApproach::ContainsCell,other-record,3,sensors-los-off@3513
+units,RingApproach::inner,orders,SubmitRepath,other-record,1,long-great-divide-2p@29345
+units,RingApproach::outer,orders,RingApproach::ContainsCell,other-record,3,sensors-los-off@3513
+units,RingApproach::outer,orders,SubmitRepath,other-record,1,long-great-divide-2p@29345
+units,RingApproach::pos,orders,RingApproach::ContainsCell,other-record,3,sensors-los-off@3513
+units,RingApproach::pos,orders,SubmitRepath,other-record,1,long-great-divide-2p@29345
+units,RingApproach::y,orders,RingApproach::ContainsCell,other-record,3,sensors-los-off@3513
+units,RingApproach::y,orders,SubmitRepath,other-record,1,long-great-divide-2p@29345
 units,SimEventsCreate: GameAllocIgnoreTag SimEventQueue,game,RecordSimEvent,same-record,60,mission-build-unit@1
 units,Unit::activateFlags,los_radar,IsUnitVisibleToPlayer,other-record,6,mission-timer@187
 units,Unit::activateFlags,los_radar,IsUnitVisibleToPlayer,same-record,2,ten-ring-atoll@2754
@@ -1343,7 +1378,7 @@ units,Unit::losSightFrameIdx,los_radar,UpdateLineOfSight,other-record,16,mission
 units,Unit::metal,features,ReclaimFeature,other-record,1,long-great-divide-2p@35389
 units,Unit::metal,units,AddBuildProgress,other-record,1,long-greenhaven-8p@44232
 units,Unit::motion,map,AddUnitToMap,other-record,9,mission-build-unit@134
-units,Unit::motion,map,GetPassMapFootprintValue,other-record,11,edges-economy-targeting@117
+units,Unit::motion,map,FootprintValue,other-record,11,edges-economy-targeting@117
 units,Unit::motion,map,RefreshPassMapsForUnit,other-record,14,edges-economy-targeting@117
 units,Unit::motion,orders,??1Order@@QAE@XZ,other-record,11,edges-economy-targeting@117
 units,Unit::motion,orders,AiSearchGoal::TickTowardGoal,other-record,18,mission-build-unit@75
@@ -1707,6 +1742,7 @@ units,UnitMotion::UnitMotion: new PatrolGoal,orders,LiteGoal::TickTowardGoal,sam
 units,UnitMotion::UnitMotion: new PatrolGoal,orders,Order::SetAttachedFx,other-record,9,mission-capture@1
 units,UnitMotion::UnitMotion: new PatrolGoal,orders,PathGoal::SetPathOrder,other-record,9,mission-capture@1
 units,UnitMotion::UnitMotion: new PatrolGoal,orders,UnitMotion::UpdateMotion,other-record,16,mission-kill-of-type@1
+units,UnitMotion::flags,orders,??0UnitMotion@@QAE@PAUUnit@@@Z,other-record,10,mission-kill-of-type@90
 units,UnitMotion::flags,orders,AiSearchGoal::TickTowardGoal,other-record,25,mission-build-unit@13
 units,UnitMotion::flags,orders,AiSearchGoal::TickTowardGoal,same-record,13,sensors-los-off@1369
 units,UnitMotion::flags,orders,LiteGoal::TickTowardGoal,other-record,17,mission-timer@1
@@ -1727,7 +1763,7 @@ units,UnitMotion::flags,orders,VtolMobileBuildOrder,other-record,3,long-greenhav
 units,UnitMotion::flags,orders,VtolMobileBuildOrder,same-record,5,long-greenhaven-8p@11405
 units,UnitMotion::flags,orders,VtolSeekAttackOrder,other-record,1,orders-air-fights@873
 units,UnitMotion::flags,units,ApplyAttachUnit,other-record,7,mission-kill-of-type@185
-units,UnitMotion::lastMoveTick,units,AlignUnitToGround,other-record,4,units-transport@2116
+units,UnitMotion::lastMoveTick,units,AlignUnitToGround,other-record,4,units-transport@2115
 units,UnitMotion::obj,orders,??1Order@@QAE@XZ,other-record,2,mission-timer@186
 units,UnitMotion::obj,orders,Order::AttachApproachRadiusGoal,other-record,3,long-great-divide-2p@8251
 units,UnitMotion::obj,orders,Order::AttachBuildFootprintMarker,other-record,1,long-greenhaven-8p@24481
@@ -1740,8 +1776,8 @@ units,UnitMotion::obj,orders,UnitMotion::SteerGroundUnit,same-record,20,ui-build
 units,UnitMotion::obj,orders,UnitMotion::UpdateMotion,other-record,15,mission-timer@51
 units,UnitMotion::obj,orders,UnitMotion::UpdateMotion,same-record,22,mission-timer@51
 units,UnitMotion::p2,orders,UnitMotion::ApplyBankAndPitch,other-record,9,mission-capture@1
-units,UnitMotion::pathLockStamp,map,GetPassMapFootprintValue,other-record,10,mission-build-unit@1
-units,UnitMotion::pathLockStamp,map,GetPassMapFootprintValue,same-record,4,units-transport@2114
+units,UnitMotion::pathLockStamp,map,FootprintValue,other-record,10,mission-build-unit@1
+units,UnitMotion::pathLockStamp,map,FootprintValue,same-record,4,units-transport@2114
 units,UnitMotion::pathLockStamp,map,RefreshPassMapsForUnit,other-record,27,mission-capture@1
 units,UnitMotion::speed,orders,UnitMotion::ApplyClampedTurnDelta,other-record,47,mission-build-unit@1
 units,UnitMotion::speed,orders,UnitMotion::ApplyClampedTurnDelta,same-record,19,ui-build-menu@87
@@ -1770,13 +1806,13 @@ units,UnitScript::state,weapons,UnitScript::ExplodePiece,other-record,1,mission-
 units,Vec3::x,units,UnitScript::EmitSfx,other-record,2,mission-radius@1285
 units,Vec3::y,units,UnitScript::EmitSfx,other-record,2,mission-radius@1285
 units,Vec3::z,units,UnitScript::EmitSfx,other-record,2,mission-radius@1285
-units,VictoryKillAllOfType::name,players,VictoryKillUnitType::OnUnitDied,same-record,1,mission-kill-of-type@185
-units,VtolFollowOrder: new Order #4,orders,Order::SetAttachedFx,other-record,1,mission-timer@165
-units,VtolFollowOrder: new PathOrder #2,orders,??1Order@@QAE@XZ,other-record,1,mission-timer@180
-units,VtolFollowOrder: new PathOrder #2,orders,Order::SetAttachedFx,other-record,1,orders-air-fights@710
-units,VtolFollowOrder: new PathOrder #2,orders,PackedGoal::TickTowardGoal,other-record,2,mission-timer@180
-units,VtolFollowOrder: new PathOrder #2,orders,PathGoal::SetPathOrder,other-record,2,mission-timer@180
-units,VtolFollowOrder: new PathOrder #2,orders,PathOrder::IsComplete,other-record,2,mission-timer@180
+units,VictoryKillUnitType::numLeftToKill,players,VictoryKillUnitType::OnUnitDied,same-record,1,mission-kill-of-type@185
+units,VtolFollowOrder: new Order #2,orders,Order::SetAttachedFx,other-record,1,mission-timer@165
+units,VtolFollowOrder: new PathOrder #3,orders,??1Order@@QAE@XZ,other-record,1,mission-timer@180
+units,VtolFollowOrder: new PathOrder #3,orders,Order::SetAttachedFx,other-record,1,orders-air-fights@710
+units,VtolFollowOrder: new PathOrder #3,orders,PackedGoal::TickTowardGoal,other-record,2,mission-timer@180
+units,VtolFollowOrder: new PathOrder #3,orders,PathGoal::SetPathOrder,other-record,2,mission-timer@180
+units,VtolFollowOrder: new PathOrder #3,orders,PathOrder::IsComplete,other-record,2,mission-timer@180
 units,VtolHelpBuildOrder: new PathOrder,orders,??1Order@@QAE@XZ,other-record,2,skirmish4-long@24415
 units,VtolHelpBuildOrder: new PathOrder #2,orders,Order::SetAttachedFx,other-record,3,skirmish4-long@24300
 units,VtolHelpBuildOrder: new PathOrder #2,orders,PackedGoal::TickTowardGoal,other-record,1,skirmish4-long@24121
@@ -1799,19 +1835,22 @@ units,VtolMoveOrder: new PathOrder,orders,OrderFx::AddFlags,other-record,2,long-
 units,VtolMoveOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,5,orders-air-fights@296
 units,VtolMoveOrder: new PathOrder,orders,PathGoal::SetPathOrder,other-record,2,long-greenhaven-8p@32814
 units,VtolMoveOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,5,orders-air-fights@296
-units,VtolPatrolOrder: new Order,orders,PackedGoal::TickTowardGoal,other-record,4,mission-capture@154
-units,VtolPatrolOrder: new Order,orders,PathOrder::IsComplete,other-record,4,mission-capture@154
+units,VtolPatrolOrder: new PathOrder,orders,OrderFx::AddFlags,other-record,4,mission-passes-x@373
+units,VtolPatrolOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,4,mission-capture@154
+units,VtolPatrolOrder: new PathOrder,orders,PathGoal::SetPathOrder,other-record,4,mission-passes-x@373
+units,VtolPatrolOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,4,mission-capture@154
 units,VtolReclaimOrder: new PathOrder,orders,??1Order@@QAE@XZ,other-record,1,long-great-divide-2p@50108
 units,VtolReclaimOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,2,long-greenhaven-8p@44044
 units,VtolReclaimOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@44044
-units,VtolRepairPatrolOrder: new Order,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@53387
-units,VtolRepairPatrolOrder: new Order,orders,PackedGoal::TickTowardGoal,other-record,2,long-greenhaven-8p@31078
-units,VtolRepairPatrolOrder: new Order,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@31078
+units,VtolRepairPatrolOrder: new PathOrder,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@53387
+units,VtolRepairPatrolOrder: new PathOrder,orders,OrderFx::AddFlags,other-record,1,long-greenhaven-8p@43471
+units,VtolRepairPatrolOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,2,long-greenhaven-8p@31078
+units,VtolRepairPatrolOrder: new PathOrder,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@43471
+units,VtolRepairPatrolOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@31078
 units,VtolRepairUnitOrder: new PathOrder,orders,??1Order@@QAE@XZ,other-record,2,long-great-divide-2p@49816
 units,VtolRepairUnitOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,2,long-great-divide-2p@49628
 units,VtolRepairUnitOrder: new PathOrder,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@53387
 units,VtolRepairUnitOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,2,long-great-divide-2p@49628
-units,VtolStandbyOrder: new PathOrder,orders,RunOrders,other-record,3,mission-timer@187
 units,bits_14281,los_radar,AddEyeball,same-record,9,mission-build-unit@1
 units,bits_14281,los_radar,AddLineOfSight,same-record,10,mission-build-unit@1
 units,bits_14281,los_radar,RemoveLineOfSight,same-record,7,mission-capture@1
@@ -1952,23 +1991,22 @@ units,unknown_1cd9,units,UpdateAllUnits,same-record,54,mission-build-unit@44
 units,unknown_1cd9,weapons,ApplyUnitDamage,same-record,4,mission-kill-mobile@180
 units,unknown_1cd9,weapons,DamageUnit,same-record,6,mission-kill-mobile@180
 units,unknown_1cd9,weapons,UpdateUnitWeapons,same-record,6,mission-build-unit@44
-units.players,AirManeuverOrder::flags,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@47853
-units.players,AirManeuverOrder::flags,orders,AirManeuverOrder::IsComplete,other-record,1,long-greenhaven-8p@47853
-units.players,AirManeuverOrder::other,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@47853
-units.players,AirManeuverOrder::other,platform,GetHeadingBetween,other-record,1,long-greenhaven-8p@47853
-units.players,AirManeuverOrder::self,orders,AirManeuverOrder::GetDesiredHeading,other-record,1,long-greenhaven-8p@47853
-units.players,AirManeuverOrder::target,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@47853
-units.players,AirToAirOrder: new AirManeuverOrder #2,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@47853
-units.players,AirToGroundOrder: new Order #3,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@39091
-units.players,AirToGroundOrder: new Order #3,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@39091
-units.players,AirToGroundOrder: new PathOrder #2,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@38915
-units.players,AirToGroundOrder: new PathOrder #2,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@38915
+units.players,AirToAirOrder: new Order #3,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@47853
+units.players,AirToGroundOrder: new PathOrder,orders,OrderFx::AddFlags,other-record,1,long-greenhaven-8p@39160
+units.players,AirToGroundOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@39091
+units.players,AirToGroundOrder: new PathOrder,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@39160
+units.players,AirToGroundOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@39091
+units.players,AirToGroundOrder: new PathOrder #3,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@38915
+units.players,AirToGroundOrder: new PathOrder #3,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@38915
 units.players,AirToGroundOrder: new PathOrder #4,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@47426
 units.players,AirToGroundOrder: new PathOrder #4,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@47426
-units.players,ApproachRadius::pos,orders,ApproachRadius::ContainsUnit,other-record,11,mission-passes-z@5
-units.players,ApproachRadius::radiusSq,orders,ApproachRadius::ContainsUnit,other-record,11,mission-passes-z@5
-units.players,ApproachRadius::y,orders,ApproachRadius::ContainsUnit,other-record,11,mission-passes-z@5
-units.players,BuildAllPassMaps: operator new unsigned int,map,RefreshAllPassMaps,other-record,15,mission-build-unit@1
+units.players,ApproachRadius::pos,orders,ApproachRadius::ContainsCell,other-record,11,mission-passes-z@5
+units.players,ApproachRadius::pos,orders,SubmitRepath,other-record,6,edges-economy-targeting@203
+units.players,ApproachRadius::radius,orders,ApproachRadius::ContainsCell,other-record,11,mission-passes-z@5
+units.players,ApproachRadius::radius,orders,SubmitRepath,other-record,6,edges-economy-targeting@203
+units.players,ApproachRadius::y,orders,ApproachRadius::ContainsCell,other-record,11,mission-passes-z@5
+units.players,ApproachRadius::y,orders,SubmitRepath,other-record,6,edges-economy-targeting@203
+units.players,BuildAllPassMaps: operator new unsigned int,map,RefreshAndReportAllPassMaps,other-record,15,mission-build-unit@1
 units.players,BuildAllPassMaps: operator new unsigned int,map,RefreshPassMapsForUnit,other-record,10,ten-ring-atoll@103
 units.players,BuildAllPassMaps: operator new unsigned int,map,RefreshPassMapsForUnit,same-record,14,eight-full-moon@103
 units.players,CobScript::SetCob: realloc int,units,CobScript::RunThread,other-record,80,mission-capture@1
@@ -1993,27 +2031,31 @@ units.players,InitPlayerSlot: operator new unsigned char,los_radar,RemoveLineOfS
 units.players,InitPlayerSlot: operator new unsigned char,los_radar,SoundHeardMask,other-record,5,orders-air-fights@211
 units.players,InitPlayerSlot: operator new unsigned char,los_radar,SoundHeardMask,same-record,5,orders-air-fights@211
 units.players,IssueAttackOrder: new Order #2,seams,OrderOrStatusFlagsNative,other-record,1,edges-economy-targeting@245
+units.players,LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::Cancel,same-record,28,mission-build-unit@1
+units.players,LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::FindPending,same-record,28,mission-build-unit@1
+units.players,LoadBattleAssets: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::Cancel,same-record,4,edges-economy-targeting@245
+units.players,LoadBattleAssets: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::FindPending,same-record,28,mission-build-unit@1
 units.players,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,RevealAroundUnit,same-record,9,mission-capture@147
 units.players,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,map,CanPlaceFootprintAt,same-record,1,long-greenhaven-8p@25957
-units.players,LoadTntMap: operator new int #2,economy,UpdateMetalExtraction,same-record,14,ten-ring-atoll@103
-units.players,LoadTntMap: operator new int #2,features,GetCellFeature,same-record,5,mission-build-unit@1
-units.players,LoadTntMap: operator new int #2,features,KillFeature,same-record,3,long-greenhaven-8p@13607
-units.players,LoadTntMap: operator new int #2,features,ReclaimFeature,same-record,3,long-greenhaven-8p@13607
-units.players,LoadTntMap: operator new int #2,features,RemoveFeature,same-record,1,long-greenhaven-8p@31052
-units.players,LoadTntMap: operator new int #2,features,ReplaceFeatureWithDead,same-record,1,long-greenhaven-8p@31052
-units.players,LoadTntMap: operator new int #2,map,AddUnitToMap,same-record,17,ten-ring-atoll@103
-units.players,LoadTntMap: operator new int #2,map,CanBuildAt,same-record,17,ten-ring-atoll@103
-units.players,LoadTntMap: operator new int #2,map,CanPlaceFootprintAt,same-record,3,long-greenhaven-8p@15922
-units.players,LoadTntMap: operator new int #2,map,CanPlaceUnitFootprint,same-record,39,mission-build-unit@1
-units.players,LoadTntMap: operator new int #2,map,ClaimFootprintCells,same-record,6,long-greenhaven-8p@5445
-units.players,LoadTntMap: operator new int #2,map,GetFootprintHeight,same-record,17,ten-ring-atoll@103
-units.players,LoadTntMap: operator new int #2,map,IsFootprintClear,same-record,6,long-greenhaven-8p@5445
-units.players,LoadTntMap: operator new int #2,map,RemoveUnitFromMap,same-record,44,mission-build-unit@1
-units.players,LoadTntMap: operator new int #2,units,AlignUnitToGround,same-record,13,mission-kill-mobile@1
-units.players,LoadTntMap: operator new int #2,units,GetGroundHeight,same-record,45,conditions-dark-side@17
-units.players,LoadTntMap: operator new int #2,weapons,FindFeatureAtPos,same-record,4,eight-pincushion-teams@11753
-units.players,MissionConditions::RegisterConditions: new DefeatAllUnitsKilled #2,players,MissionConditions::NotifyUnitDied,same-record,1,mission-radius@2523
-units.players,MissionConditions::RegisterConditions: new VictoryBuildUnitType,players,MissionConditions::NotifyUnitDied,same-record,1,mission-capture@499
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,economy,UpdateMetalExtraction,same-record,14,ten-ring-atoll@103
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,same-record,5,mission-build-unit@1
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,KillFeature,same-record,3,long-greenhaven-8p@13607
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,ReclaimFeature,same-record,3,long-greenhaven-8p@13607
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,RemoveFeature,same-record,1,long-greenhaven-8p@31052
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,ReplaceFeatureWithDead,same-record,1,long-greenhaven-8p@31052
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,AddUnitToMap,same-record,17,ten-ring-atoll@103
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,CanBuildAt,same-record,17,ten-ring-atoll@103
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,CanPlaceFootprintAt,same-record,3,long-greenhaven-8p@15922
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,CanPlaceUnitFootprint,same-record,39,mission-build-unit@1
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,ClaimFootprintCells,same-record,6,long-greenhaven-8p@5445
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetFootprintHeight,same-record,17,ten-ring-atoll@103
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,IsFootprintClear,same-record,6,long-greenhaven-8p@5445
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,RemoveUnitFromMap,same-record,44,mission-build-unit@1
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,AlignUnitToGround,same-record,13,mission-kill-mobile@1
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,same-record,45,conditions-dark-side@17
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,FindFeatureAtPos,same-record,4,eight-pincushion-teams@11753
+units.players,MissionConditions::RegisterConditions: new DefeatUnitTypeKilled,players,MissionConditions::NotifyUnitDied,same-record,1,mission-radius@2523
+units.players,MissionConditions::RegisterConditions: new VictoryCaptureUnitType,players,MissionConditions::NotifyUnitDied,same-record,1,mission-capture@499
 units.players,ModelState::animDirty,units,GetPieceOffset,other-record,38,mission-passes-z@99
 units.players,ModelState::animDirty,units,UnitScript::GetPieceRotation,other-record,22,mission-defeat-all-units@30
 units.players,ModelState::animDirty,units,UnitScript::GetPieceTranslation,other-record,29,mission-capture@2
@@ -2128,12 +2170,17 @@ units.players,NewUnitScript: new UnitScript,units,CobScript::StartThread,other-r
 units.players,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,??1Order@@QAE@XZ,other-record,8,edges-economy-targeting@245
 units.players,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,AiSearchGoal::SetPathOrder,other-record,5,edges-economy-targeting@192
 units.players,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,AiSearchGoal::TickTowardGoal,other-record,12,mission-passes-z@5
+units.players,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,ApproachRadius::ContainsUnit,other-record,12,mission-passes-z@5
 units.players,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,Order::SetAttachedFx,other-record,4,edges-economy-targeting@174
+units.players,Order::AttachApproachRadiusGoal: new ApproachRadius,orders,SubmitRepath,other-record,6,edges-economy-targeting@203
 units.players,Order::AttachBuildFootprintMarker: new PointMarker,orders,??1Order@@QAE@XZ,other-record,6,ten-lava-run@392
 units.players,Order::AttachBuildFootprintMarker: new PointMarker,orders,AiSearchGoal::SetPathOrder,other-record,7,ten-lava-run@181
 units.players,Order::AttachBuildFootprintMarker: new PointMarker,orders,AiSearchGoal::TickTowardGoal,other-record,31,duel-coast-to-coast@181
 units.players,Order::AttachBuildFootprintMarker: new PointMarker,orders,OrderFx::ContainsUnit,other-record,31,duel-coast-to-coast@181
+units.players,Order::AttachBuildFootprintMarker: new PointMarker,orders,SubmitRepath,other-record,8,ten-ring-atoll@1552
 units.players,Order::AttachRingApproachGoal: new RingApproach,orders,AiSearchGoal::TickTowardGoal,other-record,3,skirmish4-long@14118
+units.players,Order::AttachRingApproachGoal: new RingApproach,orders,RingApproach::ContainsUnit,other-record,3,skirmish4-long@14118
+units.players,Order::AttachRingApproachGoal: new RingApproach,orders,SubmitRepath,other-record,1,long-greenhaven-8p@49192
 units.players,Order::Order: new RingApproach,orders,AiSearchGoal::TickTowardGoal,other-record,1,load-midgame@1159
 units.players,Order::Order: new RingApproach,orders,OrderFx::ContainsUnit,other-record,1,load-midgame@1159
 units.players,Order::attached,orders,??1Order@@QAE@XZ,other-record,13,mission-defeat-passes-x@195
@@ -2141,51 +2188,53 @@ units.players,Order::attached,orders,Order::AttachApproachRadiusGoal,other-recor
 units.players,Order::attached,orders,Order::AttachBuildFootprintMarker,other-record,23,conditions-dark-side@5
 units.players,Order::attached,orders,Order::SetAttachedFx,other-record,6,edges-economy-targeting@58
 units.players,Order::flags,orders,??1Order@@QAE@XZ,other-record,3,mission-radius@2526
-units.players,Order::flags,orders,PathOrder::FillWorldPos,other-record,2,long-greenhaven-8p@14320
-units.players,Order::flags,orders,PathOrder::GetDesiredHeading,other-record,2,long-greenhaven-8p@31066
-units.players,Order::flags,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@14320
-units.players,Order::flags,orders,PathOrder::KeepAfterComplete,other-record,2,long-greenhaven-8p@14361
+units.players,Order::flags,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@48838
+units.players,Order::flags,orders,AirManeuverOrder::IsComplete,other-record,1,long-greenhaven-8p@48838
 units.players,Order::flags,orders,RunOrders,other-record,61,mission-build-unit@1
 units.players,Order::flags,orders,RunSecondaryOrders,other-record,1,allied-victory@30
 units.players,Order::flags_42,orders,??1Order@@QAE@XZ,other-record,11,mission-defeat-passes-x@195
 units.players,Order::flags_42,orders,AiSearchGoal::SetPathOrder,other-record,11,mission-defeat-all-units@181
+units.players,Order::flags_42,orders,AirStrikeOrder,other-record,1,long-greenhaven-8p@44574
+units.players,Order::flags_42,orders,AppendOrder,other-record,1,long-greenhaven-8p@46711
 units.players,Order::flags_42,orders,DeleteOrder,other-record,11,mission-defeat-passes-x@195
-units.players,Order::flags_42,orders,DeleteOrders,other-record,1,long-greenhaven-8p@35272
+units.players,Order::flags_42,orders,DeleteOrders,other-record,1,long-greenhaven-8p@28502
 units.players,Order::flags_42,orders,EnsurePatrolReturnOrder,other-record,5,mission-capture@1
-units.players,Order::flags_42,orders,GetOrderFlags,other-record,2,edges-economy-targeting@245
+units.players,Order::flags_42,orders,GetOrderFlags,other-record,3,edges-economy-targeting@245
 units.players,Order::flags_42,orders,Order::AnnounceStatusIfFlagged,other-record,10,mission-capture@1
-units.players,Order::flags_42,orders,Order::MergeFlagsFromTable,other-record,1,long-greenhaven-8p@34992
+units.players,Order::flags_42,orders,Order::MergeFlagsFromTable,other-record,1,long-greenhaven-8p@31012
 units.players,Order::flags_42,orders,RunOrders,other-record,1,long-greenhaven-8p@49182
-units.players,Order::flags_42,orders,StartBuildingScript,other-record,3,sensors-los-off@1402
+units.players,Order::flags_42,orders,StartBuildingScript,other-record,4,sensors-los-off@1402
 units.players,Order::flags_42,orders,StopBuildingScript,other-record,1,long-greenhaven-8p@29178
-units.players,Order::kind,orders,??1Order@@QAE@XZ,other-record,2,long-greenhaven-8p@33413
+units.players,Order::kind,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@33413
+units.players,Order::kind,orders,EnsurePatrolReturnOrder,other-record,4,mission-capture@1
 units.players,Order::kind,orders,FollowGroundOrder,other-record,1,mission-capture@451
-units.players,Order::kind,orders,OrderFx::AddFlags,other-record,2,long-greenhaven-8p@19165
-units.players,Order::kind,orders,PathGoal::SetPathOrder,other-record,2,long-greenhaven-8p@19165
+units.players,Order::kind,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@37141
 units.players,Order::kind,orders,RunOrders,other-record,34,mission-capture@1
+units.players,Order::next,orders,AirStrikeOrder,other-record,1,long-greenhaven-8p@44574
 units.players,Order::next,orders,DeleteOrder,other-record,5,eight-greenhaven@4808
 units.players,Order::next,orders,DeleteOrders,other-record,1,long-greenhaven-8p@22224
-units.players,Order::next,orders,EnqueueOrderType,other-record,2,skirmish4-long@16997
+units.players,Order::next,orders,EnqueueOrderType,other-record,3,skirmish4-long@16997
 units.players,Order::next,orders,EnsurePatrolReturnOrder,other-record,4,mission-capture@1
 units.players,Order::next,orders,RunOrders,other-record,1,long-greenhaven-8p@49182
 units.players,Order::next,orders,VtolMoveOrder,other-record,1,long-greenhaven-8p@21679
-units.players,Order::pos,features,ReclaimFeature,other-record,2,long-greenhaven-8p@13607
-units.players,Order::pos,map,SnapWorldPosToFootprint,other-record,10,ten-ring-atoll@181
-units.players,Order::pos,orders,FollowGroundOrder,other-record,2,mission-capture@151
-units.players,Order::pos,orders,MobileBuildOrder,other-record,25,conditions-dark-side@5
-units.players,Order::pos,orders,Order::AttachApproachRadiusGoal,other-record,8,mission-capture@166
-units.players,Order::pos,orders,PathOrder::FillWorldPos,other-record,3,skirmish4-long@19347
-units.players,Order::pos,orders,VtolMobileBuildOrder,other-record,3,long-greenhaven-8p@13729
-units.players,Order::pos,orders,VtolMoveOrder,other-record,2,long-greenhaven-8p@17754
+units.players,Order::pos,features,ReclaimFeature,other-record,1,long-greenhaven-8p@16116
+units.players,Order::pos,map,SnapWorldPosToFootprint,other-record,7,ten-ring-atoll@181
+units.players,Order::pos,orders,??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z,other-record,3,long-greenhaven-8p@16876
+units.players,Order::pos,orders,AirManeuverOrder::GetDesiredHeading,other-record,1,long-greenhaven-8p@33702
+units.players,Order::pos,orders,FollowGroundOrder,other-record,2,mission-capture@451
+units.players,Order::pos,orders,MobileBuildOrder,other-record,23,conditions-dark-side@5
+units.players,Order::pos,orders,Order::AttachApproachRadiusGoal,other-record,8,mission-capture@451
+units.players,Order::pos,orders,VtolMobileBuildOrder,other-record,3,long-greenhaven-8p@14131
+units.players,Order::pos,orders,VtolMoveOrder,other-record,1,long-greenhaven-8p@22906
 units.players,Order::pos,orders,VtolPatrolOrder,other-record,3,long-greenhaven-8p@10561
 units.players,Order::pos,platform,GetHeadingBetween,other-record,3,long-greenhaven-8p@10561
-units.players,Order::pos,weapons,FindFeatureAtPos,other-record,3,long-greenhaven-8p@13421
+units.players,Order::pos,weapons,FindFeatureAtPos,other-record,3,long-greenhaven-8p@13471
 units.players,Order::progress,orders,AirStrikeOrder,other-record,1,long-greenhaven-8p@30408
 units.players,Order::progress,orders,AirToAirOrder,other-record,1,long-greenhaven-8p@42813
 units.players,Order::progress,orders,AirToGroundHoverOrder,other-record,1,long-greenhaven-8p@47696
 units.players,Order::progress,orders,AirToGroundOrder,other-record,1,long-greenhaven-8p@34381
 units.players,Order::progress,orders,AttackChaseOrder,other-record,6,edges-economy-targeting@58
-units.players,Order::progress,orders,CellToWorldPos,other-record,1,long-greenhaven-8p@39770
+units.players,Order::progress,orders,CellToWorldPos,other-record,2,long-greenhaven-8p@39752
 units.players,Order::progress,orders,MobileBuildOrder,other-record,1,long-greenhaven-8p@14733
 units.players,Order::progress,orders,RepairUnitOrder,other-record,3,long-greenhaven-8p@22793
 units.players,Order::progress,orders,VtolMobileBuildOrder,other-record,2,long-greenhaven-8p@27125
@@ -2208,9 +2257,10 @@ units.players,Order::state,orders,FollowGroundOrder,other-record,2,mission-passe
 units.players,Order::state,orders,GetBuiltOrder,other-record,33,mission-passes-z@146
 units.players,Order::state,orders,HelpBuildOrder,other-record,4,sensors-los-off@864
 units.players,Order::state,orders,MobileBuildOrder,other-record,34,conditions-dark-side@5
-units.players,Order::state,orders,MoveGroundOrder,other-record,7,long-greenhaven-8p@6301
-units.players,Order::state,orders,ParkOrder,other-record,1,long-greenhaven-8p@34992
-units.players,Order::state,orders,ReclaimOrder,other-record,3,long-greenhaven-8p@13501
+units.players,Order::state,orders,MoveGroundOrder,other-record,8,mission-capture@451
+units.players,Order::state,orders,ParkOrder,other-record,1,long-greenhaven-8p@28358
+units.players,Order::state,orders,PatrolOrder,other-record,1,mission-capture@154
+units.players,Order::state,orders,ReclaimOrder,other-record,3,long-greenhaven-8p@13475
 units.players,Order::state,orders,RepairPatrolOrder,other-record,5,long-greenhaven-8p@11251
 units.players,Order::state,orders,RepairUnitOrder,other-record,3,long-greenhaven-8p@22793
 units.players,Order::state,orders,RunOrders,other-record,30,mission-build-unit@1
@@ -2218,8 +2268,8 @@ units.players,Order::state,orders,RunSecondaryOrders,other-record,1,allied-victo
 units.players,Order::state,orders,VtolHelpBuildOrder,other-record,3,long-greenhaven-8p@16021
 units.players,Order::state,orders,VtolMobileBuildOrder,other-record,4,long-greenhaven-8p@11611
 units.players,Order::state,orders,VtolMoveOrder,other-record,1,long-greenhaven-8p@17418
-units.players,Order::state,orders,VtolPatrolOrder,other-record,2,long-greenhaven-8p@10621
-units.players,Order::state,orders,VtolReclaimOrder,other-record,2,long-greenhaven-8p@19814
+units.players,Order::state,orders,VtolPatrolOrder,other-record,3,long-greenhaven-8p@10621
+units.players,Order::state,orders,VtolReclaimOrder,other-record,3,long-greenhaven-8p@19814
 units.players,Order::state,orders,VtolRepairPatrolOrder,other-record,3,long-greenhaven-8p@15931
 units.players,Order::state,orders,WaitForAttackOrder,other-record,1,mission-passes-x@1
 units.players,Order::state,orders,WaitOrder,other-record,4,mission-build-unit@1
@@ -2230,30 +2280,31 @@ units.players,Order::subFlags,orders,OrderFx::AddFlags,other-record,3,long-green
 units.players,Order::subFlags,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@43315
 units.players,Order::subFlags,orders,RunOrders,other-record,55,mission-build-unit@1
 units.players,Order::subFlags,orders,RunOrders,same-record,2,mission-defeat-passes-x@195
+units.players,Order::target,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@33304
 units.players,Order::target,orders,AirStrikeOrder,other-record,1,long-greenhaven-8p@30408
-units.players,Order::target,orders,AirToAirOrder,other-record,1,long-greenhaven-8p@33263
-units.players,Order::target,orders,AirToGroundHoverOrder,other-record,1,long-greenhaven-8p@47673
-units.players,Order::target,orders,AirToGroundOrder,other-record,1,long-greenhaven-8p@31033
+units.players,Order::target,orders,AirToAirOrder,other-record,1,long-greenhaven-8p@42678
+units.players,Order::target,orders,AirToGroundHoverOrder,other-record,1,long-greenhaven-8p@47696
+units.players,Order::target,orders,AirToGroundOrder,other-record,1,long-greenhaven-8p@34381
 units.players,Order::target,orders,AttackChaseOrder,other-record,7,edges-economy-targeting@58
 units.players,Order::target,orders,AttackChaseOrder,same-record,4,mission-defeat-passes-x@195
 units.players,Order::target,orders,AttackNoMoveOrder,same-record,1,orders-tier2-core@253
 units.players,Order::target,orders,BuildingBuildOrder,other-record,15,mission-passes-z@146
-units.players,Order::target,orders,CellToWorldPos,other-record,2,long-great-divide-2p@39110
+units.players,Order::target,orders,CellToWorldPos,other-record,2,long-great-divide-2p@39121
 units.players,Order::target,orders,FollowGroundOrder,other-record,2,mission-capture@451
-units.players,Order::target,orders,GetBuiltOrder,other-record,1,long-greenhaven-8p@46829
 units.players,Order::target,orders,HelpBuildOrder,other-record,4,sensors-los-off@864
-units.players,Order::target,orders,IsAhead,other-record,1,long-greenhaven-8p@33263
+units.players,Order::target,orders,IsAhead,other-record,1,long-greenhaven-8p@42678
 units.players,Order::target,orders,MobileBuildOrder,other-record,32,ten-lava-run@164
 units.players,Order::target,orders,Order::Advance,other-record,3,skirmish4-long@18001
 units.players,Order::target,orders,PathOrderAttach::SetUnit,other-record,8,eight-pincushion-teams@944
 units.players,Order::target,orders,RepairPatrolOrder,other-record,3,long-greenhaven-8p@17101
-units.players,Order::target,orders,RepairUnitOrder,other-record,3,long-greenhaven-8p@22525
+units.players,Order::target,orders,RepairUnitOrder,other-record,3,long-greenhaven-8p@22793
 units.players,Order::target,orders,VtolHelpBuildOrder,other-record,3,long-greenhaven-8p@16021
 units.players,Order::target,orders,VtolMobileBuildOrder,other-record,4,long-greenhaven-8p@11611
-units.players,Order::target,orders,VtolRepairPatrolOrder,other-record,3,long-greenhaven-8p@20791
+units.players,Order::target,orders,VtolRepairPatrolOrder,other-record,2,long-greenhaven-8p@16831
 units.players,Order::target,orders,WaitForAttackOrder,other-record,1,mission-passes-x@1
+units.players,Order::target,platform,GetHeadingBetween,other-record,1,long-greenhaven-8p@33304
 units.players,Order::target,units,ClearUnitRefs,other-record,4,edges-economy-targeting@245
-units.players,Order::target,units,UnitRef::Unlink,other-record,11,ten-lava-run@392
+units.players,Order::target,units,UnitRef::Unlink,other-record,10,ten-lava-run@392
 units.players,Order::target,units,UnitRef::Unlink,same-record,5,mission-defeat-passes-x@195
 units.players,Order::type,orders,AirToAirOrder,other-record,1,long-greenhaven-8p@37724
 units.players,Order::type,orders,AirToGroundHoverOrder,other-record,1,long-greenhaven-8p@47696
@@ -2265,17 +2316,17 @@ units.players,Order::type,orders,MoveGroundOrder,other-record,5,mission-capture@
 units.players,Order::type,orders,ReclaimOrder,other-record,2,long-greenhaven-8p@14536
 units.players,Order::type,orders,SelfDestructOrder,other-record,1,allied-victory@180
 units.players,Order::type,orders,VtolMobileBuildOrder,other-record,3,long-greenhaven-8p@15712
-units.players,Order::type,orders,VtolReclaimOrder,other-record,1,long-greenhaven-8p@19782
+units.players,Order::type,orders,VtolReclaimOrder,other-record,2,long-greenhaven-8p@19782
 units.players,Order::type,orders,WaitOrder,other-record,3,mission-capture@1
-units.players,Order::unit,orders,??0AirManeuverOrder@@QAE@PAUOrder@@ABUVec3@@1@Z,other-record,1,long-greenhaven-8p@33263
+units.players,Order::unit,orders,??0AirManeuverOrder@@QAE@PAUOrder@@ABUVec3@@1@Z,other-record,1,long-greenhaven-8p@42813
 units.players,Order::unit,orders,??0ApproachRadius@@QAE@PAUOrder@@HHH@Z,other-record,6,mission-capture@451
 units.players,Order::unit,orders,??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z,other-record,3,long-greenhaven-8p@14100
 units.players,Order::unit,orders,??0PathOrder@@QAE@PAUOrder@@PAUUnit@@@Z,other-record,1,long-greenhaven-8p@30408
-units.players,Order::unit,orders,??0PathOrder@@QAE@PAUOrder@@PAUUnit@@ABUVec3@@@Z,other-record,1,long-greenhaven-8p@47673
+units.players,Order::unit,orders,??0PathOrder@@QAE@PAUOrder@@PAUUnit@@ABUVec3@@@Z,other-record,1,long-greenhaven-8p@47696
 units.players,Order::unit,orders,??0PointMarker@@QAE@PAUOrder@@UPoint16@@1@Z,other-record,7,skirmish4@181
-units.players,Order::unit,orders,??1Order@@QAE@XZ,other-record,6,mission-capture@573
+units.players,Order::unit,orders,??1Order@@QAE@XZ,other-record,5,eight-greenhaven@4808
 units.players,Order::unit,orders,ApproachRadius::FillWorldPos,other-record,6,mission-capture@451
-units.players,Order::unit,orders,CellToWorldPos,other-record,2,long-great-divide-2p@39110
+units.players,Order::unit,orders,CellToWorldPos,other-record,2,long-greenhaven-8p@39752
 units.players,Order::unit,orders,Order::AnnounceStatusIfFlagged,other-record,6,mission-capture@451
 units.players,Order::unit,orders,Order::AttachApproachRadiusGoal,other-record,6,mission-capture@451
 units.players,Order::unit,orders,Order::AttachBuildFootprintMarker,other-record,7,skirmish4@181
@@ -2283,34 +2334,44 @@ units.players,Order::unit,orders,Order::SetAttachedFx,other-record,6,edges-econo
 units.players,Order::unit,orders,PointMarker::FillWorldPos,other-record,7,skirmish4@181
 units.players,Order::unit,orders,RepairUnitOrder,other-record,3,long-greenhaven-8p@23851
 units.players,Order::unit,orders,RunOrders,other-record,34,mission-capture@1
-units.players,Order::unknown_12,orders,PathOrder::FillWorldPos,other-record,3,long-greenhaven-8p@8639
-units.players,Order::unknown_1a,orders,PathOrderAttach::SetUnit,other-record,2,long-greenhaven-8p@14221
+units.players,Order::unknown_12,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@33302
+units.players,Order::unknown_12,orders,PathOrder::FillWorldPos,other-record,1,long-greenhaven-8p@30601
+units.players,Order::unknown_1a,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@33304
+units.players,Order::unknown_1a,orders,PathOrderAttach::SetUnit,other-record,1,long-greenhaven-8p@14221
+units.players,Order::unknown_1a,platform,GetHeadingBetween,other-record,1,long-greenhaven-8p@33304
 units.players,Order::unknown_1a,units,ClearUnitRefs,other-record,4,edges-economy-targeting@245
-units.players,Order::unknown_1a,units,UnitRef::Unlink,other-record,8,ten-lava-run@392
-units.players,Order::wakeFrame,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@14320
+units.players,Order::unknown_1a,units,UnitRef::Unlink,other-record,7,ten-lava-run@392
+units.players,Order::wakeFrame,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@48838
 units.players,Order::wakeFrame,orders,RunOrders,other-record,56,mission-capture@1
 units.players,Order::wakeFrame,orders,RunSecondaryOrders,other-record,1,allied-victory@60
 units.players,Order::z,orders,AttackChaseOrder,other-record,2,edges-economy-targeting@58
 units.players,Order::z,orders,RepairUnitOrder,other-record,1,long-greenhaven-8p@38924
-units.players,PathOrder::approachRadius,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@37993
-units.players,PathOrder::approachRadius,orders,PathOrder::IsComplete,other-record,3,eight-pincushion-teams@12450
-units.players,PathOrder::approachRadius,orders,RunOrders,other-record,2,long-greenhaven-8p@22906
-units.players,PathOrder::flags,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@37993
-units.players,PathOrder::flags,orders,AirManeuverOrder::IsComplete,other-record,1,long-greenhaven-8p@37993
-units.players,PathOrder::flags,orders,PathOrder::FillWorldPos,other-record,3,long-greenhaven-8p@11440
+units.players,PathExtra::eventCount,pathfinding,Pathfinder::Cancel,same-record,29,mission-build-unit@1
+units.players,PathExtra::pendingCount,pathfinding,Pathfinder::Cancel,same-record,4,edges-economy-targeting@245
+units.players,PathExtra::pendingCount,pathfinding,Pathfinder::FindPending,same-record,28,mission-build-unit@1
+units.players,PathExtra::pendingFree,pathfinding,Pathfinder::Cancel,same-record,4,edges-economy-targeting@245
+units.players,PathExtra::pendingFree,pathfinding,Pathfinder::FindPending,same-record,28,mission-build-unit@1
+units.players,PathOrder::approachRadius,orders,PathOrder::IsComplete,other-record,3,long-greenhaven-8p@11405
+units.players,PathOrder::flags,orders,PathOrder::FillWorldPos,other-record,3,long-greenhaven-8p@11405
 units.players,PathOrder::flags,orders,PathOrder::GetDesiredHeading,other-record,3,long-greenhaven-8p@12150
-units.players,PathOrder::flags,orders,PathOrder::IsComplete,other-record,3,long-greenhaven-8p@11440
-units.players,PathOrder::flags,orders,PathOrder::KeepAfterComplete,other-record,1,long-greenhaven-8p@13050
-units.players,PathOrder::pos,orders,AirManeuverOrder::GetDesiredHeading,other-record,1,long-greenhaven-8p@48781
-units.players,PathOrder::pos,orders,PathOrder::FillWorldPos,other-record,3,long-greenhaven-8p@11440
+units.players,PathOrder::flags,orders,PathOrder::IsComplete,other-record,3,long-greenhaven-8p@11405
+units.players,PathOrder::flags,orders,PathOrder::KeepAfterComplete,other-record,2,long-greenhaven-8p@13050
+units.players,PathOrder::pos,orders,PathOrder::FillWorldPos,other-record,3,long-greenhaven-8p@11405
 units.players,PathOrder::pos_y,orders,PathOrder::FillWorldPos,other-record,2,long-greenhaven-8p@13566
-units.players,PathOrder::ref,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@37597
-units.players,PathOrder::ref,orders,PathOrder::GetDesiredHeading,other-record,1,long-greenhaven-8p@47700
-units.players,PathOrder::ref,orders,RunOrders,other-record,2,long-greenhaven-8p@22906
-units.players,PathOrder::ref,platform,GetHeadingBetween,other-record,1,long-greenhaven-8p@37597
-units.players,PathOrder::unit,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@37993
-units.players,PathOrder::unit,orders,PathOrder::FillWorldPos,other-record,3,long-greenhaven-8p@11440
-units.players,PathOrder::unit,orders,PathOrder::GetDesiredHeading,other-record,1,long-greenhaven-8p@47700
+units.players,PathOrder::ref,orders,PathOrder::GetDesiredHeading,other-record,1,long-greenhaven-8p@47674
+units.players,PathOrder::ref,orders,PathOrder::KeepAfterComplete,other-record,1,long-greenhaven-8p@47748
+units.players,PathOrder::unit,orders,PathOrder::FillWorldPos,other-record,3,long-greenhaven-8p@11405
+units.players,PathOrder::unit,orders,PathOrder::GetDesiredHeading,other-record,1,long-greenhaven-8p@47674
+units.players,PathPending::nextRequester,pathfinding,Pathfinder::Cancel,other-record,4,edges-economy-targeting@245
+units.players,PathPending::nextRequester,pathfinding,Pathfinder::FindPending,other-record,28,mission-build-unit@1
+units.players,PathPending::nextRequester,pathfinding,Pathfinder::FindPending,same-record,9,six-hundred-isles@271
+units.players,PathPending::nextUnit,pathfinding,Pathfinder::Cancel,other-record,3,skirmish4-long@15161
+units.players,PathPending::nextUnit,pathfinding,Pathfinder::Cancel,same-record,1,long-greenhaven-8p@44215
+units.players,PathPending::requester,pathfinding,Pathfinder::Cancel,other-record,4,edges-economy-targeting@245
+units.players,PathPending::requester,pathfinding,Pathfinder::FindPending,other-record,10,edges-economy-targeting@203
+units.players,PathPending::unit,pathfinding,Pathfinder::Cancel,other-record,3,skirmish4-long@15161
+units.players,PathPending::unit,pathfinding,Pathfinder::FindPending,other-record,10,edges-economy-targeting@203
+units.players,Pathfinder::object,pathfinding,Pathfinder::FindPending,same-record,7,edges-economy-targeting@173
 units.players,PatrolGoal::count,orders,??0PackedGoal@@QAE@PAUGoalOwnerUnit@@@Z,other-record,2,long-greenhaven-8p@13729
 units.players,PatrolGoal::points,orders,??0PackedGoal@@QAE@PAUGoalOwnerUnit@@@Z,other-record,2,long-greenhaven-8p@13729
 units.players,PatrolGoal::points,orders,PackedGoal::TickTowardGoal,other-record,4,long-greenhaven-8p@11405
@@ -2324,9 +2385,13 @@ units.players,Piece::turn,units,CobScript::AnimatePieces,other-record,48,mission
 units.players,Piece::turnSpeed,units,CobScript::AnimatePieces,other-record,51,load-midgame@1
 units.players,Piece::turnSpeed,units,CobScript::RunThread,other-record,45,mission-passes-x@3
 units.players,PointMarker::x1,orders,PointMarker::ContainsCell,other-record,27,duel-coast-to-coast@181
+units.players,PointMarker::x1,orders,SubmitRepath,other-record,6,quad-fox-holes@3511
 units.players,PointMarker::x2,orders,PointMarker::ContainsCell,other-record,27,duel-coast-to-coast@181
+units.players,PointMarker::x2,orders,SubmitRepath,other-record,6,quad-fox-holes@3511
 units.players,PointMarker::y1,orders,PointMarker::ContainsCell,other-record,27,duel-coast-to-coast@181
+units.players,PointMarker::y1,orders,SubmitRepath,other-record,6,quad-fox-holes@3511
 units.players,PointMarker::y2,orders,PointMarker::ContainsCell,other-record,27,duel-coast-to-coast@181
+units.players,PointMarker::y2,orders,SubmitRepath,other-record,6,quad-fox-holes@3511
 units.players,PrepVtolClimb: new PathOrder,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@30564
 units.players,PrepVtolClimb: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@30516
 units.players,PrepVtolClimb: new PathOrder,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@30516
@@ -2346,9 +2411,14 @@ units.players,Rec::field_6,map,SetOwner,other-record,17,eight-greenhaven@105
 units.players,Rec::field_6,map,SpatialBucket::PrependUnit,other-record,4,ten-ring-atoll@6196
 units.players,Rec::field_6,map,VisitObjectsInRange,other-record,3,long-greenhaven-8p@12038
 units.players,Rec::field_6,map,VisitObjectsInRange,same-record,2,skirmish4-long@25848
-units.players,RingApproach::outerSq,orders,RingApproach::ContainsUnit,other-record,3,skirmish4-long@17385
-units.players,RingApproach::pos,orders,RingApproach::ContainsUnit,other-record,3,skirmish4-long@17385
-units.players,RingApproach::y,orders,RingApproach::ContainsUnit,other-record,3,skirmish4-long@17385
+units.players,RingApproach::inner,orders,RingApproach::ContainsCell,other-record,3,skirmish4-long@17385
+units.players,RingApproach::inner,orders,SubmitRepath,other-record,1,long-greenhaven-8p@49192
+units.players,RingApproach::outer,orders,RingApproach::ContainsCell,other-record,3,skirmish4-long@17385
+units.players,RingApproach::outer,orders,SubmitRepath,other-record,1,long-greenhaven-8p@49192
+units.players,RingApproach::pos,orders,RingApproach::ContainsCell,other-record,3,skirmish4-long@17385
+units.players,RingApproach::pos,orders,SubmitRepath,other-record,1,long-greenhaven-8p@49192
+units.players,RingApproach::y,orders,RingApproach::ContainsCell,other-record,3,skirmish4-long@17385
+units.players,RingApproach::y,orders,SubmitRepath,other-record,1,long-greenhaven-8p@49192
 units.players,SimEventsCreate: GameAllocIgnoreTag SimEventQueue,game,RecordSimEvent,same-record,44,mission-build-unit@1
 units.players,Unit::activateFlags,los_radar,IsUnitVisibleToPlayer,other-record,6,mission-capture@1
 units.players,Unit::activateFlags,units,Unit::SetStateBits,other-record,10,mission-timer@1
@@ -2678,7 +2748,7 @@ units.players,Unit::losSightFrameIdx,los_radar,UpdateLineOfSight,other-record,20
 units.players,Unit::metal,features,ReclaimFeature,other-record,1,long-greenhaven-8p@19936
 units.players,Unit::metal,units,AddBuildProgress,other-record,1,long-greenhaven-8p@39150
 units.players,Unit::motion,map,AddUnitToMap,other-record,9,mission-defeat-all-units@185
-units.players,Unit::motion,map,GetPassMapFootprintValue,other-record,3,skirmish4-long@17836
+units.players,Unit::motion,map,FootprintValue,other-record,3,skirmish4-long@17836
 units.players,Unit::motion,map,RefreshPassMapsForUnit,other-record,10,mission-defeat-all-units@185
 units.players,Unit::motion,orders,??1Order@@QAE@XZ,other-record,6,mission-defeat-passes-x@195
 units.players,Unit::motion,orders,AiSearchGoal::TickTowardGoal,other-record,16,mission-build-unit@75
@@ -3004,6 +3074,7 @@ units.players,UnitMotion::UnitMotion: new PatrolGoal,orders,LiteGoal::TickToward
 units.players,UnitMotion::UnitMotion: new PatrolGoal,orders,Order::SetAttachedFx,other-record,5,mission-kill-of-type@191
 units.players,UnitMotion::UnitMotion: new PatrolGoal,orders,PathGoal::SetPathOrder,other-record,5,mission-kill-of-type@191
 units.players,UnitMotion::UnitMotion: new PatrolGoal,orders,UnitMotion::UpdateMotion,other-record,6,mission-kill-of-type@1
+units.players,UnitMotion::flags,orders,??0UnitMotion@@QAE@PAUUnit@@@Z,other-record,9,long-greenhaven-8p@5416
 units.players,UnitMotion::flags,orders,AiSearchGoal::TickTowardGoal,other-record,43,mission-capture@1
 units.players,UnitMotion::flags,orders,LiteGoal::TickTowardGoal,other-record,8,ten-ring-atoll@4127
 units.players,UnitMotion::flags,orders,PrepVtolClimb,other-record,3,long-greenhaven-8p@8440
@@ -3023,7 +3094,7 @@ units.players,UnitMotion::obj,orders,UnitMotion::SteerAircraft,other-record,3,lo
 units.players,UnitMotion::obj,orders,UnitMotion::SteerGroundUnit,other-record,19,ui-build-menu@87
 units.players,UnitMotion::obj,orders,UnitMotion::UpdateMotion,other-record,19,ui-build-menu@87
 units.players,UnitMotion::p2,orders,UnitMotion::ApplyBankAndPitch,other-record,4,long-greenhaven-8p@10385
-units.players,UnitMotion::pathLockStamp,map,GetPassMapFootprintValue,other-record,18,mission-build-unit@71
+units.players,UnitMotion::pathLockStamp,map,FootprintValue,other-record,18,mission-build-unit@71
 units.players,UnitMotion::pathLockStamp,map,RefreshPassMapsForUnit,other-record,39,mission-capture@17
 units.players,UnitMotion::speed,orders,UnitMotion::ApplyClampedTurnDelta,other-record,83,allied-victory@1
 units.players,UnitMotion::speed,orders,UnitMotion::SteerGroundUnit,other-record,60,load-midgame@1
@@ -3058,14 +3129,15 @@ units.players,VtolMoveOrder: new PathOrder,orders,OrderFx::AddFlags,other-record
 units.players,VtolMoveOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,2,long-greenhaven-8p@18043
 units.players,VtolMoveOrder: new PathOrder,orders,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@40657
 units.players,VtolMoveOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@18043
-units.players,VtolPatrolOrder: new Order,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@38697
-units.players,VtolPatrolOrder: new Order,orders,PackedGoal::TickTowardGoal,other-record,2,long-greenhaven-8p@17859
-units.players,VtolPatrolOrder: new Order,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@17859
+units.players,VtolPatrolOrder: new PathOrder,orders,??1Order@@QAE@XZ,other-record,1,long-greenhaven-8p@38697
+units.players,VtolPatrolOrder: new PathOrder,orders,OrderFx::AddFlags,other-record,2,long-greenhaven-8p@19165
+units.players,VtolPatrolOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,2,long-greenhaven-8p@17859
+units.players,VtolPatrolOrder: new PathOrder,orders,PathGoal::SetPathOrder,other-record,2,long-greenhaven-8p@19165
+units.players,VtolPatrolOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@17859
 units.players,VtolReclaimOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,1,long-greenhaven-8p@45801
 units.players,VtolReclaimOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,1,long-greenhaven-8p@45801
-units.players,VtolRepairPatrolOrder: new Order,orders,PackedGoal::TickTowardGoal,other-record,2,long-greenhaven-8p@28881
-units.players,VtolRepairPatrolOrder: new Order,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@28881
-units.players,VtolStandbyOrder: new PathOrder,orders,RunOrders,other-record,1,long-greenhaven-8p@26010
+units.players,VtolRepairPatrolOrder: new PathOrder,orders,PackedGoal::TickTowardGoal,other-record,2,long-greenhaven-8p@28881
+units.players,VtolRepairPatrolOrder: new PathOrder,orders,PathOrder::IsComplete,other-record,2,long-greenhaven-8p@28881
 units.players,bits_14281,los_radar,AddLineOfSight,same-record,7,mission-capture@147
 units.players,bits_14281,los_radar,IsUnitVisibleToPlayer,same-record,6,mission-capture@1
 units.players,bits_14281,los_radar,IsVisibleByMask,same-record,5,mission-capture@1

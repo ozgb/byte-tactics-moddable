@@ -60,8 +60,12 @@ LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,ui-action,,all-players,84
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,map,unknown,,all-players,1
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,orders,ui-action,,all-players,1
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,presentation,unknown,,all-players,5
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,every-frame,,all-players,84
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,unknown,,all-players,1
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,orders,ui-action,,all-players,1
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,every-frame,,all-players,84
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,every-frame,,all-players,84
 LoadUnitFbi: GameAllocIgnoreTag BUILDING YARD,map,unknown,,all-players,1
-LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,ui-action,,all-players,8
 MapViewFlags::bit0,presentation,ui-action,,all-players,0
 MapViewFlags::bit1,presentation,ui-action,,all-players,0
 MapViewFlags::bit2,presentation,ui-action,,all-players,0

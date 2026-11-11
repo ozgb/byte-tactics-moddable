@@ -54,6 +54,11 @@ Gaps in what the data say:
 - The passes are per loop over entities (the top-level loops of the phases and their nested loops over units, players,
   pieces, debris, feature types and per-player units). COB threads, orders and squads inside an entity are not split into
   passes: the accesses inside one entity's COB threads, orders and squads keep the order of that entity's pass.
+- An item has one last writer for all its instances. A block allocated over freed memory keeps the last writer of the
+  item, so a read of a fresh block can show an edge from an earlier instance (heap reuse). Resetting it per address
+  would need a writer per address, which the log does not keep.
+- The sim event queue is an item (`SimEventsCreate: GameAllocIgnoreTag SimEventQueue`) but not a row of
+  data/dependencies.csv: its writer is `game`, not a simulation subsystem. The `sim-event` ordered rows carry its order.
 """
 
 

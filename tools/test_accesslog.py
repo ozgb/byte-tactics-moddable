@@ -101,7 +101,6 @@ int main()
         else if (op == 'r') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); { unsigned fl = c.Read(a, b, d, e, f); fprintf(stderr, "%u\n", (fl & 1) ? fl | (c.MatchLevel() << 2) : fl); } }
         else if (op == 'n') { scanf("%u", &a); c.Entity(a, 0); }
         else if (op == 'm') { scanf("%u %u", &a, &b); c.Entity(a, b); }
-        else if (op == 'x') { scanf("%u", &a); c.ForgetWriter(a); }
         else if (op == 'p') { c.PushLevel(); }
         else if (op == 'q') { c.PopLevel(); }
         else if (op == 'w') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); c.Write(a, b, d, e, f); }
@@ -197,7 +196,6 @@ class ReferenceClassifier:
             s = self.state[item]
             if not s["read"]:
                 self.count(s["writer"], NO_SUB, item, UNREAD, tick)
-            s["read"] = 1
         self.written = []
 
     def item_state(self, item):
@@ -239,10 +237,6 @@ class ReferenceClassifier:
     def set_entity(self, ordinal, floor=0):
         self.levels[-1] = [ordinal, floor]
 
-    def forget(self, item):
-        s = self.item_state(item)
-        s["stamp"], s["epoch"], s["wsub"], s["ord"] = 0, 0, 0, 0
-
     def push(self):
         self.levels.append([0, 0])
 
@@ -265,7 +259,7 @@ def feed(script, reference):
     """Run a script (a list of tuples) through the Python reference and return the C++ driver's text for it."""
     for op, *args in script:
         {"B": reference.begin, "L": reference.resolve, "E": reference.end, "r": reference.read, "w": reference.write,
-         "o": reference.ordered, "n": reference.set_entity, "m": reference.set_entity, "x": reference.forget, "p": lambda: reference.push(), "q": lambda: reference.pop()}[op](*args)
+         "o": reference.ordered, "n": reference.set_entity, "m": reference.set_entity, "p": lambda: reference.push(), "q": lambda: reference.pop()}[op](*args)
     return "\n".join("%s %s" % (op, " ".join(str(a) for a in args)) for op, *args in script) + "\n"
 
 
@@ -397,13 +391,6 @@ class ClassifierTest(unittest.TestCase):
         feed(script, reference)
         self.assertEqual(reference.flags, [EARLIER_ENTITY | SAME_RECORD | 2 << 2])
         self.both(script)
-
-    def test_a_forgotten_writer_leaves_no_cross_edge_and_no_read_after_write(self):
-        script = [("B", PENDING), ("w", 5, 0, 0, 1, 1), ("L", 1), ("E", 1), ("B", 2), ("w", 6, 0, 0, 1, 2), ("x", 5), ("x", 6),
-                  ("r", 5, 0, 0, 2, 2), ("r", 6, 0, 0, 2, 2), ("E", 2)]
-        lines = self.both(script)
-        self.assertEqual([line for line in lines if int(line.split()[4]) in (CROSS, RAW)], [])
-        self.assertIn("%u 2 5 2 %u 1 2" % (NO_SUB, UNWRITTEN), lines)
 
     def test_a_new_window_starts_outside_every_entity(self):
         self.both([("B", 2), ("n", 4), ("w", 5, 0, 0, 1, 1), ("E", 1), ("B", 3), ("w", 6, 0, 0, 1, 1), ("n", 1), ("r", 6, 0, 0, 1, 1), ("E", 1)])

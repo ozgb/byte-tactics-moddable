@@ -153,7 +153,7 @@ void ReplayWasmReload()
         Stop(error);
     Check(wl_load_manifest_file(s_loader, manifest));
     const wl_layout* layout = wl_get_layout(s_loader);
-    if (!layout->has_block || layout->block_size != kSimBlockBytes)
+    if (!layout->has_block || layout->block_size != kSimBlockBytes || layout->block_max != kSimBlockCeilingBytes)
         Stop("the manifest's block does not match the sim block");
     Check(wl_create_memory(s_loader));
     s_memory.base = wl_memory_base(s_loader);

@@ -83,6 +83,7 @@ struct UnitPassMapStampView {
 
 #include "../network/player.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/pathfinding.h"
 
 #include "../map/mission.h"
 
@@ -376,14 +377,36 @@ void FreeMovementClasses(void)
     } while (p < (int)g_movementClassEntries + (int)sizeof(MovementClassTable));
 }
 
-// FUNCTION: 0x440a40
-void __stdcall RefreshAllPassMaps(Point16 a, Point16 b)
+#define REPORT_PASS_MAP_CHANGE(moveClass, a, b, cause) \
+    g_seams.pathfinding->CellsChanged((a).x - (moveClass)->footprintX < 0 ? 0 : (a).x - (moveClass)->footprintX, \
+                                      (a).y - (moveClass)->footprintZ < 0 ? 0 : (a).y - (moveClass)->footprintZ, \
+                                      (a).x + (b).x >= (int)(moveClass)->width ? (int)(moveClass)->width - 1 : (a).x + (b).x, \
+                                      (a).y + (b).y >= (int)(moveClass)->height ? (int)(moveClass)->height - 1 : (a).y + (b).y, \
+                                      1u << (int)((moveClass) - g_movementClasses.entries), cause)
+
+static void RefreshAndReportAllPassMaps(Point16 a, Point16 b, int cause)
 {
     for (int i = 0; i < 32; i++) {
-        if (g_movementClasses.entries[i].name != 0) {
+        if (g_movementClasses.entries[i].name != nullptr) {
             ((MovementClass*)&g_movementClasses.entries[i])->RefreshPassMap(a, b);
         }
     }
+    for (int i = 0; i < 32; i++) {
+        if (g_movementClasses.entries[i].name != nullptr) {
+            REPORT_PASS_MAP_CHANGE(&g_movementClasses.entries[i], a, b, cause);
+        }
+    }
+}
+
+// FUNCTION: 0x440a40
+void __stdcall RefreshAllPassMaps(Point16 a, Point16 b)
+{
+    RefreshAndReportAllPassMaps(a, b, PATH_CHANGE_TERRAIN);
+}
+
+void __stdcall RefreshAllPassMapsForUnits(Point16 a, Point16 b)
+{
+    RefreshAndReportAllPassMaps(a, b, PATH_CHANGE_UNITS);
 }
 
 // FUNCTION: 0x440a70
@@ -395,11 +418,12 @@ void __stdcall RefreshPassMapsForUnit(UnitPassMapStampView* p)
         for (int i = 0; i < 32; i++) {
             if (last < g_movementClasses.entries[i].lastTick) {
                 ((MovementClass*)&g_movementClasses.entries[i])->RefreshPassMap(p->a, p->b);
+                REPORT_PASS_MAP_CHANGE(&g_movementClasses.entries[i], p->a, p->b, PATH_CHANGE_UNITS);
             }
         }
         return;
     }
-    RefreshAllPassMaps(p->a, p->b);
+    RefreshAllPassMapsForUnits(p->a, p->b);
 }
 
 // FUNCTION: 0x440af0
@@ -416,6 +440,7 @@ void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
     p->unit->lastTick = (unsigned int)g_game->ticks;
     if (prev < old) {
         g_seams.map->RefreshPassMap(this, 0, p->a, p->b);
+        REPORT_PASS_MAP_CHANGE(this, p->a, p->b, PATH_CHANGE_UNITS);
     }
     if (start != old) {
         for (UnitPassMapRecordView* r = &((UnitPassMapRecordView *)g_game->units.get())[1]; r <= (UnitPassMapRecordView *)g_game->unitsEnd.get(); r++) {
@@ -423,6 +448,7 @@ void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
                 unsigned int t = r->unit->lastTick;
                 if (t >= old && t < start) {
                     g_seams.map->RefreshPassMap(this, 0, r->a, r->b);
+                    REPORT_PASS_MAP_CHANGE(this, r->a, r->b, PATH_CHANGE_UNITS);
                 }
             }
         }
@@ -435,6 +461,7 @@ void MovementClass::RefreshUnitIfStale(UnitPassMapView* p)
 {
     if (p->unit->lastTick < lastTick) {
         g_seams.map->RefreshPassMap(this, 0, p->a, p->b);
+        REPORT_PASS_MAP_CHANGE(this, p->a, p->b, PATH_CHANGE_UNITS);
     }
 }
 

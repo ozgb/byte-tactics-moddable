@@ -14,6 +14,9 @@ __pycache__/
 # Per-issue working copies (tools/worktree.sh).
 /.worktrees/
 
+# The human's ntfy.sh topic (tools/notify.py): whoever knows it can read it.
+/NTFY_TOPIC
+
 # Compiler listings (/Fa) from agents; never part of the source.
 src/**/*.asm
 

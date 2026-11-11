@@ -1,11 +1,6 @@
 #ifndef INTERFACES_ORDERS_H
 #define INTERFACES_ORDERS_H
 
-namespace std {
-template<class T> class allocator;
-template<class T, class A> class vector;
-}
-
 class AiSearchGoal;
 class BitReader;
 class OrderBase;
@@ -15,13 +10,15 @@ class UnitMotion;
 struct Unit;
 struct Order;
 struct Point16;
+struct PathEvent;
+struct PathPoint;
 struct Vec3;
 class MissionType;
 
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
-#define ORDERS_VERSION_MAJOR 1
+#define ORDERS_VERSION_MAJOR 3
 // Minor version of the orders interface, changed when a slot is added.
-#define ORDERS_VERSION_MINOR 10
+#define ORDERS_VERSION_MINOR 0
 
 // Order flag: the order has a target unit.
 #define ORDER_FLAG_TARGET 0x200
@@ -38,10 +35,6 @@ class MissionType;
 
 // Unit orders and command queues.
 struct OrdersSeam {
-    // Gives a path search goal the waypoints a search found (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* AiSearchGoalSetWaypoints)(AiSearchGoal* self, Point16* points, int count);
-    // Sets bits in the flags of an order's target (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* OrderFxAddFlags)(OrderFx* self, int flags);
     // Adds an order to the end of a unit's order list. Hooks: none.
     void (__stdcall* AppendOrder)(Unit* owner, Order* node);
     // Gives a unit an order of a kind against a target unit or a position (the order is queued behind the others unless remove is set). Hooks: none.
@@ -76,10 +69,6 @@ struct OrdersSeam {
     void (__stdcall* RegisterAllOrderTypes)(void);
     // Empties the order type table. Hooks: none.
     void (__stdcall* ClearOrderTypeTable)(void);
-    // Creates the pathfinder of a game and stores it in the game state. Hooks: none.
-    void (__stdcall* CreatePathfinder)(void);
-    // Destroys the pathfinder of a game and clears it in the game state. Hooks: none.
-    void (__stdcall* DestroyPathfinder)(void);
     // Allocates the movement of a unit from the sim block, builds it and stores it in the unit. Hooks: none.
     void (__stdcall* NewUnitMotion)(Unit* unit);
     // Allocates an order from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
@@ -90,18 +79,12 @@ struct OrdersSeam {
     Order* (__stdcall* NewOrder)(MissionType kind, Unit* target, void* pos, int a, int b, int c);
     // Changes the queued count of a unit type in the build list of a unit, by name, and never plays a sound. Hooks: none.
     void (__stdcall* QueueBuildOrder)(char* name, Unit* unit, int count);
-    // Returns 1 when a cell is a goal of an order's target. Hooks: none.
-    int (__stdcall* OrderFxIsGoal)(OrderFx* self, int x, int y);
-    // Appends the goal cells of an order's target to a list. Hooks: none.
-    void (__stdcall* OrderFxFillGoalCells)(OrderFx* self, std::vector<Point16, std::allocator<Point16> >* goals);
-    // Returns the cost of a cell for the path search of an order's target. Hooks: none.
-    int (__stdcall* OrderFxApproxDist)(OrderFx* self, int x, int y);
-    // Takes the path search goal of a unit's movement that waits for a new search, or 0 when there is none. Hooks: none.
-    AiSearchGoal* (__stdcall* UnitMotionClaimRepath)(UnitMotion* motion);
     // Sets status flags on an order that listens to a unit, through the status handler of its kind. Hooks: none.
     void (__stdcall* OrderOrStatusFlags)(OrderBase* order, unsigned int flags);
     // Reads the network state of a unit's movement from a packet, through the goal that moves it. Hooks: none.
     void (__stdcall* UnitMotionReadNetState)(UnitMotion* motion, BitReader* reader);
+    // Applies an event of a path search to its requester, with the waypoints Poll copied for it: a started search sets the claim tick of the goal and a status flag on the order, a finished one gives the goal its waypoints. Hooks: none.
+    void (__stdcall* ApplyPathEvent)(const PathEvent* event, const PathPoint* waypoints);
 };
 
 #endif

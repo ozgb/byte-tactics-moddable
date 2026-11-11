@@ -217,7 +217,7 @@ void Start()
     if (!wl_load_manifest_file(s_loader, manifest))
         LoaderFatal(wl_error(s_loader));
     const wl_layout* layout = wl_get_layout(s_loader);
-    if (!layout->has_block || layout->block_size != kSimBlockBytes)
+    if (!layout->has_block || layout->block_size != kSimBlockBytes || layout->block_max != kSimBlockCeilingBytes)
         LoaderFatal("the manifest's block does not match the game's sim block");
     if (!wl_create_memory(s_loader))
         LoaderFatal(wl_error(s_loader));

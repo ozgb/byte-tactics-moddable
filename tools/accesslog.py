@@ -44,6 +44,17 @@ file, except for the rows of the `presentation` window: how many frames the game
 follows the wall clock, so their counts (and the first tick of a rare one) change from run to run. `run
 --twice` plays a scenario again and checks that every other row is equal.
 
+`<scenario>.reads.csv` lists every read, item,reader,count,first_tick, with no regard to writers: the subsystems that read an item at
+all, a subsystem's reads of its own writes included, which the edges file drops. The `presentation` window is left out. tools/privatestate.py
+stores it in data/access_reads and judges it.
+
+The region of the default pathfinder (the allocation of LoadBattleAssets tagged "AISearch region", which the engine makes at the size RegionSize gave and hands to PathfindingInit) is sized when the map loads, so its
+items are given as parts: `tables` writes, after the sites, a part list for the site (region_parts) in which a part's start and end are a
+fixed offset or a word of the allocation itself (PathExtra's offsets), and the log reads those words when it resolves an address. The
+record, PathExtra, the node pool, the cells and the queued requests are `Pathfinder::field`, `PathExtra::field`, `Node::field`,
+`PathCell::field` and `PathPending::field` (nested members as `Node::data.g`, flat_fields); the heap, dirty words, goal cells, buckets and
+events are `<allocation>.<part>`.
+
 `<scenario>.presentation.csv` (step 5 of #830, tools/presreads.py) lists what the `presentation` window reads, at
 function grain: item,reader,function,windows,events,container (the item's variable, global, region of Game or
 allocation: the row of state_classes.csv an item refined to `Type::field` lies in). `windows` is the number of presentation windows (the span
@@ -166,8 +177,12 @@ LAYOUT_FLAGS = ["--target=i686-pc-windows-msvc", "/nologo", "-fms-compatibility"
                 "-fsyntax-only", "-Xclang", "-fdump-record-layouts-complete"]
 HEAP_ROW = re.compile(r"^(?P<function>.+?): (?P<allocator>new\[\]|new|operator new|\w+)(?: (?P<what>.*?))?(?: #\d+)?$")
 TAG_TYPES = {"UNIT MEMORY": "Unit", "WEAPON ARRAY": "Projectile"}
+PATHFINDER_HEADER = ROOT / "src/ai/pathfinder.h"
+FLATTENED = ("Pathfinder", "PathExtra", "Node", "PathCell", "PathPending")
+REGION_TAGS = ("AISearch region",)
+REGION_OWNER_FUNCTION = "LoadBattleAssets"
 OUTPUT_FILES = ("access.edges.csv", "access.stats.txt", "access.presentation.csv", "access.cross.csv", "access.draws.csv", "access.pass.csv",
-                "access.ordered.csv")
+                "access.ordered.csv", "access.reads.csv")
 RAW_FILE = "access.raw.txt"
 REF_HELPER = re.compile(r"\$(?:Pod)?Ref@")
 
@@ -390,6 +405,10 @@ class TypeTable:
         found = self.layouts.record(base)
         if not found or not found[0]:
             return NONE, 0
+        if base in FLATTENED and base not in self.index:
+            size, flat = flat_fields(self.layouts, base)
+            self.index[base] = len(self.entries)
+            self.entries.append((size, sorted(flat)))
         if base not in self.index:
             size, fields = found
             out: list[tuple[int, int, str]] = []
@@ -409,6 +428,95 @@ class TypeTable:
         return self.index[base], found[0]
 
 
+def flat_fields(layouts: Layouts, record: str) -> tuple[int, list[tuple[int, int, str]]]:
+    """The size of a record and its leaf members as (start, end, `Type::a.b`): base classes and nested records are
+    walked into, while a Ref, an array and the members of a union are leaves (the first of a union's members that starts at an
+    offset names it)."""
+    text = layouts.text
+    head = re.search(r"^ *0 \| (?:struct|class|union) %s\n" % re.escape(record), text, re.M)
+    if not head:
+        raise SystemExit("accesslog: no layout of %s" % record)
+    lines = []
+    size = 0
+    for line in text[head.end():].split("\n"):
+        if "[sizeof=" in line:
+            size = int(re.search(r"sizeof=(\d+)", line).group(1))
+            break
+        m = stateclasses.LAYOUT_LINE.match(line)
+        if not m:
+            break
+        start, _, _, indent, body = m.groups()
+        lines.append((int(start), (len(indent) - 1) // 2, body))
+    leaves: list[tuple[int, str, str]] = []
+    stack: list[tuple[int, str, bool, bool]] = []
+    for i, (start, depth, body) in enumerate(lines):
+        while stack and stack[-1][0] >= depth:
+            stack.pop()
+        transparent = body.endswith("(base)") or "(anonymous" in body or "(unnamed" in body
+        parent_union = bool(stack) and stack[-1][3]
+        if stack and stack[-1][2]:
+            continue
+        prefix = stack[-1][1] if stack else ""
+        if transparent:
+            stack.append((depth, prefix, False, body.lstrip().startswith("union") and "(anonymous" in body))
+            continue
+        if " " not in body:
+            continue
+        name = body.rsplit(None, 1)[-1]
+        type_ = RECORD_KEYWORD_RE.sub("", body[:-len(name)].strip())
+        nested = i + 1 < len(lines) and lines[i + 1][1] > depth
+        leaf = not nested or parent_union or "[" in type_ or type_.startswith(("Ref<", "PodRef<"))
+        if leaf:
+            leaves.append((start, prefix + name, type_))
+            if nested:
+                stack.append((depth, prefix, True, False))
+        else:
+            stack.append((depth, prefix + name + ".", False, False))
+    out = []
+    seen: set[int] = set()
+    starts = sorted({s for s, _, _ in leaves} | {size})
+    for start, name, type_ in leaves:
+        if start in seen:
+            continue
+        seen.add(start)
+        natural = layouts.size_of(type_)
+        following = next(x for x in starts if x > start)
+        end = min(size, start + natural) if natural else following
+        if end > start:
+            out.append((start, end, "%s::%s" % (record, name)))
+    return size, out
+
+
+RECORD_KEYWORD_RE = re.compile(r"^(struct|union|class|enum)\s+")
+
+
+REGION_SLOTS = (("pool", "Node", "poolOffset"), ("heap", None, "itemsOffset"), ("cells", "PathCell", "cellsOffset"),
+                ("dirty", None, "dirtyOffset"), ("pending", "PathPending", "pendingOffset"),
+                ("requesterBuckets", None, "requesterBuckets"), ("unitBuckets", None, "unitBuckets"),
+                ("events", None, "eventsOffset"))
+
+
+def region_parts(items: "Items", row_name: str) -> list[tuple]:
+    """The parts of the pathfinding state region as (start slot, start, end slot, end, item, type, stride), the words of
+    accesslog.items. A bound is an offset in the allocation (slot NONE, or end NONE for its end) or the word of the allocation at
+    the slot's offset: pathfinding sizes its parts when the map loads, and the log reads them when it resolves an address.
+    The record and PathExtra sit at fixed offsets; each array runs to the start of the next. The items are `Type::field` for
+    the typed parts and `<allocation>.<part>` for the others."""
+    layouts = items.types.layouts
+    extra_at = int(re.search(r"EXTRA_OFFSET\s*=\s*(\d+)", PATHFINDER_HEADER.read_text()).group(1))
+    extra_size, extra_fields = layouts.record("PathExtra")
+    where = {f.name: extra_at + f.start for f in extra_fields}
+    parts = []
+    for name, type_, fixed in (("record", "Pathfinder", (0, extra_at)), ("extra", "PathExtra", (extra_at, extra_at + extra_size))):
+        tid, _ = items.types.refine(type_)
+        parts.append((NONE, fixed[0], NONE, fixed[1], items.string("%s.%s" % (row_name, name)), tid, fixed[1] - fixed[0]))
+    for i, (name, type_, slot) in enumerate(REGION_SLOTS):
+        tid, stride = items.types.refine(type_)
+        end = (where[REGION_SLOTS[i + 1][2]], NONE) if i + 1 < len(REGION_SLOTS) else (NONE, NONE)
+        parts.append((where[slot], NONE, end[0], end[1], items.string("%s.%s" % (row_name, name)), tid, stride))
+    return parts
+
+
 def run_layout_dump(source: Path, build_dir: Path) -> str:
     """The record layouts clang-cl prints for one translation unit, with the build's include path."""
     include = (ROOT / "toolchain/msvc5-sp3/INCLUDE").resolve()
@@ -426,6 +534,9 @@ def layouts_of(build_dir: Path) -> Layouts:
     with tempfile.TemporaryDirectory() as tmp:
         probe = Path(tmp) / "probe.cpp"
         probe.write_text('#include "%s"\nstatic_assert(sizeof(SimGlobals) > 0, "");\n' % SIM_GLOBALS_HEADER.as_posix())
+        text += "\n" + run_layout_dump(probe, build_dir)
+        probe.write_text('#include "%s"\nstatic_assert(sizeof(Pathfinder) > 0 && sizeof(PathExtra) > 0 && sizeof(PathPending) > 0 && '
+                         'sizeof(PathCell) > 0 && sizeof(Node) > 0, "");\n' % PATHFINDER_HEADER.as_posix())
         text += "\n" + run_layout_dump(probe, build_dir)
     return Layouts(text)
 
@@ -507,6 +618,7 @@ class Items:
     statics: list[tuple[int, int, int, int, int]] = field(default_factory=list)
     bases: list[tuple[int, int, list[tuple[int, int, int, int, int]]]] = field(default_factory=list)
     sites: list[tuple[int, int, int, int]] = field(default_factory=list)
+    parts: dict[int, list[tuple]] = field(default_factory=dict)
 
     def string(self, text: str) -> int:
         """The index of an item name, added on first use."""
@@ -539,6 +651,10 @@ class Items:
         out.append(struct.pack("<I", len(self.sites)))
         for row in sorted(self.sites):
             out.append(struct.pack("<IIII", *row))
+        out.append(struct.pack("<I", len(self.parts)))
+        for ra in sorted(self.parts):
+            out.append(struct.pack("<II", ra, len(self.parts[ra])))
+            out.extend(struct.pack("<IIIIIII", *p) for p in self.parts[ra])
         return b"".join(out)
 
 
@@ -660,6 +776,8 @@ def build_items(info: MapInfo, map_path: Path, layouts: Layouts, rows: list[dict
         what = TAG_TYPES.get(m.group("what") or "", m.group("what") or "")
         tid, stride = items.types.refine(what if re.fullmatch(r"\w+", what) else None)
         items.sites.append((ra, items.string(row["name"]), tid, stride))
+        if (m.group("what") or "") in REGION_TAGS and m.group("function") == REGION_OWNER_FUNCTION:
+            items.parts[ra] = region_parts(items, row["name"])
         stats["heap_sites"] += 1
     return items, stats
 
@@ -806,7 +924,7 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
         failed += why is not None
         for suffix, source in (("edges.csv", "access.edges.csv"), ("stats.txt", "access.stats.txt"), ("presentation.csv", "access.presentation.csv"),
                                ("cross.csv", "access.cross.csv"), ("draws.csv", "access.draws.csv"), ("pass.csv", "access.pass.csv"),
-                               ("ordered.csv", "access.ordered.csv"), ("raw.txt", RAW_FILE)):
+                               ("ordered.csv", "access.ordered.csv"), ("reads.csv", "access.reads.csv"), ("raw.txt", RAW_FILE)):
             if (directory / source).is_file():
                 shutil.copyfile(directory / source, out / ("%s.%s" % (name, suffix)))
         if twice:

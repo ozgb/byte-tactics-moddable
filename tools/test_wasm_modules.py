@@ -216,7 +216,7 @@ class WindowTests(unittest.TestCase):
 
 
 class LayoutTests(unittest.TestCase):
-    PINS = {"block_base": 1048576, "block_size": 33554432, "scratch": [983040, 65536], "memory_pages": 528}
+    PINS = {"block_base": 1048576, "block_size": 33554432, "block_max": 268435456, "scratch": [983040, 65536], "memory_pages": 4112}
     RANGES = [("a", 65536, 131072), ("b", 196608, 202688)]
 
     def test_the_game_manifest_layout_passes(self):

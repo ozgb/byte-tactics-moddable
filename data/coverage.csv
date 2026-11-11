@@ -1,5 +1,5 @@
 subsystem,function,file,functions,functions_entered,lines,lines_hit,branches,branches_covered,decorated,dead,reason
-ai,*,,100,89,1201,1065,694,580,,33,
+ai,*,,101,90,1206,1070,694,580,,33,
 ai,??G@YG?AUMovableVec3@@ABU0@0@Z,src/ai/ai_player.cpp,0,0,0,0,0,0,??G@YG?AUMovableVec3@@ABU0@0@Z,1,
 ai,AIProfileParser::AIProfileParser,src/ai/ai_profile.cpp,0,0,0,0,0,0,??0AIProfileParser@@QAE@XZ,1,
 ai,AIProfileParser::NextToken,src/ai/ai_profile.cpp,0,0,0,0,0,0,?NextToken@AIProfileParser@@QAEHXZ,1,
@@ -44,11 +44,16 @@ ai,SumUnitRatingsInRange,src/ai/ai_player.cpp,1,0,0,0,0,0,?SumUnitRatingsInRange
 ai,UpdateConverter,src/ai/ai_player.cpp,0,0,0,0,0,0,?UpdateConverter@@YGXPAUUnit@@@Z,1,
 ai,Vec::Vec,src/ai/vec.h,0,0,0,0,0,0,??0Vec@@QAE@HHH@Z,1,
 ai,std::_Construct,src/ai/ai_player.cpp,0,0,0,0,0,0,?_Construct@std@@YGXPAUPercentByte@@ABU2@@Z,1,
-economy,*,,29,27,520,412,304,137,,3,
+economy,*,,36,29,545,425,306,140,,3,
 economy,CallOnEachReverse,src/game/economy.cpp,0,0,0,0,0,0,?CallOnEachReverse@@YGXPAVArrayElement@@HHP81@AEXXZ@Z,1,
+economy,EnergyRecipientPoorer,src/util/x87_compare.h,1,0,0,0,0,0,?EnergyRecipientPoorer@@YG_NMM@Z,0,network-game
 economy,InitStartingResourcesFromSkirmish,src/game/main_loop.cpp,0,0,0,0,0,0,?InitStartingResourcesFromSkirmish@@YGXXZ,1,
+economy,MetalRecipientPoorer,src/util/x87_compare.h,1,0,0,0,0,0,?MetalRecipientPoorer@@YG_NMM@Z,0,network-game
 economy,SetStartingStorageBonusInline,src/game/main_loop.cpp,0,0,0,0,0,0,?SetStartingStorageBonusInline@@YGXPAUPlayer@@HH@Z,1,
+economy,ShareAmount,src/network/resource_share.h,1,0,0,0,0,0,?ShareAmount@@YGMMMMMM@Z,0,network-game
+economy,ShareEnergyAmount,src/network/resource_share.h,1,0,0,0,0,0,?ShareEnergyAmount@@YGMMMMM@Z,0,network-game
 economy,ShareMapInfo,src/units/units.cpp,1,0,0,0,0,0,?ShareMapInfo@@YGXEE@Z,0,share-dialog
+economy,ShareMetalAmount,src/network/resource_share.h,1,0,0,0,0,0,?ShareMetalAmount@@YGMMMMM@Z,0,network-game
 economy,UpdateResourceSharing,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateResourceSharing@@YGXPAUPlayer@@@Z,0,network-game
 features,*,,44,43,1017,859,448,322,,4,
 features,??$copy@PAGPAG@std@@YGPAGPAG00@Z,src/map/features.cpp,0,0,0,0,0,0,??$copy@PAGPAG@std@@YGPAGPAG00@Z,1,
@@ -122,7 +127,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,233,160,4614,2582,1788,650,,23,
+game,*,,233,160,4621,2525,1790,627,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -275,7 +280,7 @@ map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?Resiz
 map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
 map,VisitObjectsInRect,src/map/terrain.cpp,0,0,0,0,0,0,?VisitObjectsInRect@@YGXHHHHPAVUnitVisitor@@@Z,1,
-network,*,,297,54,5260,582,2564,99,,74,
+network,*,,297,50,5260,546,2564,88,,74,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,
 network,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,src/network/unit_sync.cpp,1,0,0,0,0,0,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,0,menu
 network,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,1,
@@ -385,6 +390,7 @@ network,GetPlayerSlot,src/network/net_game.cpp,0,0,0,0,0,0,?GetPlayerSlot@@YGEPA
 network,GetRejectReasonText,src/network/net_game.cpp,1,0,0,0,0,0,?GetRejectReasonText@@YGPADH@Z,0,menu
 network,GetSessionGuidInstance,src/network/online_report.cpp,1,0,0,0,0,0,?GetSessionGuidInstance@@YGHH@Z,0,network
 network,GetUnitDefTable,src/network/unit_sync.cpp,0,0,0,0,0,0,?GetUnitDefTable@@YGPAVUnitDef@@XZ,1,
+network,HandleNetPackets,src/network/net_game.cpp,1,0,0,0,0,0,?HandleNetPackets@@YGHXZ,0,network
 network,HandlePing,src/network/net_game.cpp,1,0,0,0,0,0,?HandlePing@@YGXPAULatencyPacket@@@Z,0,network
 network,HandlePlayerEconomy,src/network/net_game.cpp,1,0,0,0,0,0,?HandlePlayerEconomy@@YGXPAUPlayerViewStatePacket@@PAUPlayer@@@Z,0,network
 network,HandleTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?HandleTimeoutDialog@@YGXPAUGui@@@Z,0,network
@@ -467,6 +473,7 @@ network,PacketManager::QueueOnChannel,src/network/packets.cpp,1,0,0,0,0,0,?Queue
 network,PacketManager::QueuePacket,src/network/packets.cpp,1,0,0,0,0,0,?QueuePacket@PacketManager@@QAEHHHPAXI@Z,0,network
 network,PacketManager::ReleaseAllChannels,src/network/packets.cpp,0,0,0,0,0,0,?ReleaseAllChannels@PacketManager@@QAEXXZ,1,
 network,PacketManager::ReleaseChannel,src/network/packets.cpp,0,0,0,0,0,0,?ReleaseChannel@PacketManager@@QAEXH@Z,1,
+network,PacketManager::SendAllQueued,src/network/packets.cpp,1,0,0,0,0,0,?SendAllQueued@PacketManager@@QAEHH@Z,0,network
 network,PacketManager::SendFrameState,src/network/packets.cpp,0,0,0,0,0,0,?SendFrameState@PacketManager@@QAEHHPAUFrameStateMsg@@@Z,1,
 network,PacketManager::SetDefaultSendPacing,src/network/packets.cpp,1,0,0,0,0,0,?SetDefaultSendPacing@PacketManager@@QAEXH@Z,0,network
 network,PacketManager::~PacketManager,src/state/sim_globals.cpp,1,0,0,0,0,0,??1PacketManager@@UAE@XZ,0,shutdown
@@ -520,9 +527,11 @@ network,ScrollToNextMessageUnit,src/network/net_chat.cpp,1,0,0,0,0,0,?ScrollToNe
 network,SendAlliance,src/network/net_game.cpp,0,0,0,0,0,0,?SendAlliance@@YGHHHDH@Z,1,
 network,SendChatMessage,src/network/net_chat.cpp,1,0,0,0,0,0,?SendChatMessage@@YGXPAUPlayer@@PADH1@Z,0,menu
 network,SendChatPacket,src/network/net_game.cpp,1,0,0,0,0,0,?SendChatPacket@@YGHPAD@Z,0,menu
+network,SendLoadProgress,src/network/net_game.cpp,1,0,0,0,0,0,?SendLoadProgress@@YGXXZ,0,network
 network,SendLobbySyncRequests,src/network/net_game.cpp,1,0,0,0,0,0,?SendLobbySyncRequests@@YGXXZ,0,network
 network,SendNetHeartbeat,src/network/net_game.cpp,1,0,0,0,0,0,?SendNetHeartbeat@@YGXXZ,0,menu
 network,SendPacket,src/network/unit_sync.cpp,0,0,0,0,0,0,?SendPacket@@YGXIPAUUnitSyncPacket@@@Z,1,
+network,SendProbe,src/network/net_game.cpp,1,0,0,0,0,0,?SendProbe@@YGXHH@Z,0,network
 network,SendScriptCallNoArgs,src/network/net_game.cpp,0,0,0,0,0,0,?SendScriptCallNoArgs@@YGHPAUUnit@@F@Z,1,
 network,SendScriptCallNoArgsByName,src/network/net_game.cpp,0,0,0,0,0,0,?SendScriptCallNoArgsByName@@YGHPAUUnit@@PAD@Z,1,
 network,SendShareMapInfo,src/network/net_game.cpp,1,0,0,0,0,0,?SendShareMapInfo@@YGXEE@Z,0,menu
@@ -687,7 +696,9 @@ pathfinding,Pathfinder::MarkGoalCell,src/ai/pathfind.cpp,0,0,0,0,0,0,?MarkGoalCe
 pathfinding,Pathfinder::ReleaseHeldPathLock,src/ai/pathfind.cpp,0,0,0,0,0,0,?ReleaseHeldPathLock@Pathfinder@@QAEXXZ,1,
 pathfinding,Pathfinder::RemoveNode,src/ai/pathfind.cpp,1,0,0,0,0,0,?RemoveNode@Pathfinder@@QAEXH@Z,0,unreachable
 pathfinding,Pathfinder::~Pathfinder,src/ai/pathfind.cpp,1,0,0,0,0,0,??1Pathfinder@@QAE@XZ,0,shutdown
-platform,*,,739,391,8281,3321,3356,880,,84,
+platform,*,,746,396,8307,3339,3376,889,,84,
+platform,??$X87LtTest01@MM@@YG_NMM@Z,src/util/x87_compare.h,1,0,0,0,0,0,??$X87LtTest01@MM@@YG_NMM@Z,0,
+platform,??$X87LtTest01@NN@@YG_NNN@Z,src/util/x87_compare.h,1,0,0,0,0,0,??$X87LtTest01@NN@@YG_NNN@Z,0,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,
@@ -1178,7 +1189,7 @@ players,VictoryUnitTypePassesX::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?Load
 players,VictoryUnitTypePassesX::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesX@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
-presentation,*,,1145,567,31537,11848,11998,3553,,295,
+presentation,*,,1149,565,31609,11460,12038,3558,,295,
 presentation,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,src/graphics/memory_cache.h,1,0,0,0,0,0,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,0,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
@@ -1217,6 +1228,7 @@ presentation,BeginTextEdit,src/gui/gui.cpp,1,0,0,0,0,0,?BeginTextEdit@@YGXPAUGui
 presentation,BindGadgetAnimSequence,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?BindGadgetAnimSequence@@YGXPAURec1@@PAD@Z,0,
 presentation,BindNamedSliderWithCallback,src/frontend/multi.cpp,1,0,0,0,0,0,?BindNamedSliderWithCallback@@YGXPADHHP6GXPAUGui@@H@Z@Z,0,
 presentation,BindUnitRestrictSlider,src/frontend/multi.cpp,1,0,0,0,0,0,?BindUnitRestrictSlider@@YGXPADHHP6GXPAUGui@@H@Z@Z,0,
+presentation,BlitCompressedLit,src/graphics/blit.cpp,1,0,0,0,0,0,BlitCompressedLit,0,
 presentation,BlitOptionsPanel,src/frontend/options.cpp,0,0,0,0,0,0,?BlitOptionsPanel@@YGXXZ,1,
 presentation,BmpWriter::Close,src/graphics/pcx.cpp,1,0,0,0,0,0,?Close@BmpWriter@@QAEXXZ,0,
 presentation,BmpWriter::Init,src/graphics/pcx.cpp,1,0,0,0,0,0,?Init@BmpWriter@@QAEPAV1@XZ,0,
@@ -1326,6 +1338,7 @@ presentation,DrawColorGrid,src/gui/dialogs.cpp,0,0,0,0,0,0,?DrawColorGrid@@YGXPA
 presentation,DrawDashedCircle,src/graphics/draw.cpp,1,0,0,0,0,0,?DrawDashedCircle@@YGXPAUSurface@@HHHHHH@Z,0,
 presentation,DrawEndGameFrame,src/frontend/endgame.cpp,0,0,0,0,0,0,?DrawEndGameFrame@@YGHXZ,1,
 presentation,DrawExplodedPieces,src/weapons/explosions.cpp,0,0,0,0,0,0,?DrawExplodedPieces@@YGXPAX@Z,1,
+presentation,DrawFrameLit,src/graphics/gaf.cpp,1,0,0,0,0,0,?DrawFrameLit@@YGXPAUSurface@@PAUGafFrame@@HHH@Z,0,
 presentation,DrawFrameRate,src/graphics/display.cpp,0,0,0,0,0,0,?DrawFrameRate@@YGHXZ,1,
 presentation,DrawFrameScaled,src/graphics/gaf.cpp,0,0,0,0,0,0,?DrawFrameScaled@@YGXPAUSurface@@PAUGafFrame@@HHNN@Z,1,
 presentation,DrawFrameScaledBlended,src/graphics/gaf.cpp,0,0,0,0,0,0,?DrawFrameScaledBlended@@YGXPAUSurface@@PAUGafFrame@@HHNN@Z,1,
@@ -1341,6 +1354,7 @@ presentation,DrawLineGadget,src/gui/gui.cpp,1,0,0,0,0,0,?DrawLineGadget@@YGXPAUG
 presentation,DrawListBox,src/gui/gui.cpp,1,0,0,0,0,0,?DrawListBox@@YGXPAUGui@@H@Z,0,
 presentation,DrawLitLine,src/graphics/draw.cpp,1,0,0,0,0,0,?DrawLitLine@@YGPAUSurface@@PAU1@HHHHH@Z,0,
 presentation,DrawLitRectangle,src/graphics/draw.cpp,1,0,0,0,0,0,?DrawLitRectangle@@YGPAUSurface@@PAU1@PAHH@Z,0,
+presentation,DrawLoadingBar,src/game/game_load.cpp,1,0,0,0,0,0,?DrawLoadingBar@@YGXPAX0HPAE1HPADHPAH@Z,0,
 presentation,DrawMapTileSelectionOutline,src/ingame/info_panel.cpp,1,0,0,0,0,0,?DrawMapTileSelectionOutline@@YGXPAXPAFUTileOutlineSize@@H@Z,0,
 presentation,DrawNetworkStats,src/ingame/info_panel.cpp,1,0,0,0,0,0,?DrawNetworkStats@@YGXPAX@Z,0,
 presentation,DrawOrderRangeRing,src/ingame/markers.cpp,1,0,0,0,0,0,?DrawOrderRangeRing@@YGXPAXPAUView@@PAUOrder@@PAUPos@@H@Z,0,
@@ -1363,6 +1377,7 @@ presentation,DrawSoftwareCursor,src/gui/mouse.cpp,0,0,0,0,0,0,?DrawSoftwareCurso
 presentation,DrawStringCentered,src/graphics/font.cpp,0,0,0,0,0,0,?DrawStringCentered@@YGXPAUSurface@@PAEH@Z,1,
 presentation,DrawSunkenBox,src/gui/listbox.cpp,1,0,0,0,0,0,?DrawSunkenBox@@YGXPAXPAURect@@HHH@Z,0,
 presentation,DrawSurfaceKeyed,src/graphics/surface.cpp,0,0,0,0,0,0,?DrawSurfaceKeyed@@YGXPAUSurface@@0HHH@Z,1,
+presentation,DrawSyncStatus,src/game/game_load.cpp,1,0,0,0,0,0,?DrawSyncStatus@@YGXPAX@Z,0,
 presentation,DrawTextInput,src/gui/gui.cpp,1,0,0,0,0,0,?DrawTextInput@@YGXPAUGui@@H@Z,0,
 presentation,DrawTriangleContours,src/game/console_commands.cpp,1,0,0,0,0,0,?DrawTriangleContours@@YGXPAXUPoint@@H1H1H@Z,0,
 presentation,DrawUnitBuilderProbe,src/ingame/info_panel.cpp,0,0,0,0,0,0,?DrawUnitBuilderProbe@@YGHPAX@Z,1,
@@ -1491,6 +1506,7 @@ presentation,GetSliderBarSurface,src/gui/gui.cpp,1,0,0,0,0,0,?GetSliderBarSurfac
 presentation,GetSliderRects,src/gui/gui.cpp,1,0,0,0,0,0,?GetSliderRects@@YGXPAUGadget@@HPAH1@Z,0,
 presentation,GetTextBackColor,src/graphics/draw.cpp,0,0,0,0,0,0,?GetTextBackColor@@YGHXZ,1,
 presentation,GetTextForeColor,src/graphics/draw.cpp,0,0,0,0,0,0,?GetTextForeColor@@YGHXZ,1,
+presentation,GetTextPixelWidth,src/gui/gui.cpp,1,0,0,0,0,0,?GetTextPixelWidth@@YGHPAE@Z,0,
 presentation,GetTrackLength,src/sound/cd_audio.cpp,0,0,0,0,0,0,?GetTrackLength@@YGHH@Z,1,
 presentation,GiveSelectedUnitsToPlayer,src/ingame/game_dialogs.cpp,1,0,0,0,0,0,?GiveSelectedUnitsToPlayer@@YGXE@Z,0,
 presentation,GrabBackground,src/graphics/gaf.cpp,0,0,0,0,0,0,?GrabBackground@@YGXPAXPAUGafFrame@@HH@Z,1,
@@ -1642,6 +1658,7 @@ presentation,MainLoopContinueStub,src/frontend/frontend.cpp,1,0,0,0,0,0,?MainLoo
 presentation,MainLoopContinueStub_B,src/frontend/frontend.cpp,1,0,0,0,0,0,?MainLoopContinueStub_B@@YGHXZ,0,
 presentation,MainLoopContinueStub_C,src/frontend/frontend.cpp,1,0,0,0,0,0,?MainLoopContinueStub_C@@YGHXZ,0,
 presentation,MapContains,src/sound/sound.cpp,1,0,0,0,0,0,?MapContains@@YGHIIHH@Z,0,
+presentation,MarkLayerChanged,src/gui/gui.cpp,1,0,0,0,0,0,?MarkLayerChanged@@YGXPAUGui@@@Z,0,
 presentation,MarkLocalVisibleUnits,src/ingame/selection.cpp,0,0,0,0,0,0,?MarkLocalVisibleUnits@@YGXXZ,1,
 presentation,Measure,src/gui/gui.cpp,1,0,0,0,0,0,?Measure@@YGHPADH@Z,0,
 presentation,MeasureDrawListBoxText,src/gui/gui.cpp,1,0,0,0,0,0,?MeasureDrawListBoxText@@YGHPAD@Z,0,

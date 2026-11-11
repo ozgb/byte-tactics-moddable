@@ -1,0 +1,14 @@
+# game_type 3 with a 96 MiB block and a limit of 3000 search steps per tick: the setup reaches the match through the host's PlayerInfo.
+game_seed 435
+crt_seed 1435
+view_seed 2435
+game_type 3
+map Metal Heck
+start_positions fixed
+ticks 120
+player0.controller human
+player0.side Arm
+player1.controller human
+player1.side Core
+block_bytes 100663296
+search_steps 3000

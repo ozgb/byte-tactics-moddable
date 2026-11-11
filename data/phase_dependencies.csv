@@ -31,17 +31,6 @@ economy,ai,unknown_1cd9,players,units,carried,13,long-greenhaven-8p@121,
 economy,ai,unknown_1cd9,units,players,immediate,16,orders-air-repair@41,
 economy,ai,unknown_1cd9,units,projectiles,immediate,7,mission-build-unit@70,
 economy,ai,unknown_1cd9,units,units,carried,2,mission-radius@1535,
-economy,features,Unit::energy,players,units,carried,2,long-greenhaven-8p@23701,dynamic-only
-economy,features,Unit::energy,units,units,carried,1,long-greenhaven-8p@23462,dynamic-only
-economy,features,Unit::metal,players,units,carried,2,long-greenhaven-8p@23701,dynamic-only
-economy,features,Unit::metal,units,units,carried,1,long-greenhaven-8p@23462,dynamic-only
-economy,features,Unit::owner,units,units,carried,1,long-greenhaven-8p@23462,dynamic-only
-economy,features,pad_1df4,players,units,carried,1,long-greenhaven-8p@23701,dynamic-only
-economy,features,pad_1df4,units,units,carried,1,long-greenhaven-8p@24693,dynamic-only
-economy,features,unknown_1b8e,players,units,carried,1,long-great-divide-2p@51391,dynamic-only
-economy,features,unknown_1b8e,units,units,carried,1,long-great-divide-2p@37654,dynamic-only
-economy,features,unknown_1cd9,players,units,carried,1,long-great-divide-2p@51391,dynamic-only
-economy,features,unknown_1cd9,units,units,carried,1,long-great-divide-2p@37432,dynamic-only
 economy,los_radar,pad_1df4,players,projectiles,carried,4,edges-economy-targeting@61,
 economy,los_radar,pad_1df4,players,units,carried,15,edges-economy-targeting@61,
 economy,los_radar,pad_1df4,units,players,immediate,5,ten-lava-run@5388,
@@ -103,16 +92,12 @@ economy,targeting,unknown_1b8e,units,units,carried,12,mission-build-unit@40,dyna
 economy,targeting,unknown_1cd9,players,units,carried,23,orders-guard-attacked@61,dynamic-only
 economy,targeting,unknown_1cd9,units,players,immediate,5,mission-build-unit@66,dynamic-only
 economy,targeting,unknown_1cd9,units,units,carried,6,edges-targeting-lead@175,dynamic-only
-economy,units,Unit::metal,players,units,carried,6,orders-guard-reclaim@301,
-economy,units,Unit::metal,units,units,carried,2,sensors-los-off@5762,
-economy,units,Unit::owner,units,units,carried,2,sensors-los-off@5762,
-economy,units,pad_1df4,players,units,carried,21,allied-victory@31,
-economy,units,pad_1df4,units,units,carried,6,trio-etorrep-glacier@2343,
-economy,units,unknown_1b8e,players,units,carried,82,allied-victory@31,
-economy,units,unknown_1b8e,units,units,carried,17,orders-tier2-spider@28,
-economy,units,unknown_1cd9,players,units,carried,82,allied-victory@31,
-economy,units,unknown_1cd9,units,units,carried,16,orders-air-repair@42,
-economy,weapons,Unit::owner,units,units,carried,5,mission-passes-z@100,
+economy,units,pad_1df4,players,units,carried,21,allied-victory@31,dynamic-only
+economy,units,pad_1df4,units,units,carried,6,trio-etorrep-glacier@2343,dynamic-only
+economy,units,unknown_1b8e,players,units,carried,82,allied-victory@31,dynamic-only
+economy,units,unknown_1b8e,units,units,carried,17,orders-tier2-spider@28,dynamic-only
+economy,units,unknown_1cd9,players,units,carried,82,allied-victory@31,dynamic-only
+economy,units,unknown_1cd9,units,units,carried,16,orders-air-repair@42,dynamic-only
 economy,weapons,pad_1df4,players,features,immediate,1,long-greenhaven-8p@24930,
 economy,weapons,pad_1df4,players,projectiles,carried,3,edges-targeting-lead@1021,
 economy,weapons,pad_1df4,players,units,carried,6,edges-targeting-lead@211,
@@ -130,8 +115,6 @@ economy,weapons,unknown_1cd9,players,units,carried,18,orders-air-repair@31,
 economy,weapons,unknown_1cd9,units,features,immediate,1,long-great-divide-2p@38198,
 economy,weapons,unknown_1cd9,units,projectiles,immediate,10,mission-build-unit@66,
 economy,weapons,unknown_1cd9,units,units,carried,7,mission-build-unit@45,
-features,economy,Unit::energy,units,players,immediate,2,long-greenhaven-8p@17310,
-features,economy,Unit::metal,units,players,immediate,2,long-greenhaven-8p@17310,
 features,map,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,projectiles,explosions,immediate,3,long-greenhaven-8p@22242,
 features,map,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,projectiles,players,immediate,3,skirmish4-long@22828,
 features,map,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,explosions,immediate,15,mission-build-unit@71,
@@ -141,7 +124,6 @@ features,units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,projectiles,features,i
 features,units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,features,immediate,3,mission-kill-of-type@186,
 features,units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,projectiles,immediate,3,skirmish4-long@22127,
 features,units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,tail,immediate,1,mission-radius@1535,
-features,units,Unit::metal,units,units,carried,1,long-greenhaven-8p@39062,
 features,weapons,FeatureAnimEntry::bytes_10,features,projectiles,carried,5,ui-keys@100,
 features,weapons,FeatureAnimEntry::bytes_10,features,units,carried,6,mission-timer@186,
 features,weapons,FeatureAnimEntry::bytes_10,projectiles,units,carried,2,mission-build-unit@75,
@@ -217,8 +199,6 @@ orders,ai,Unit::pos,units,units,carried,18,mission-defeat-passes-x@33,
 orders,ai,Unit::yFraction,units,players,immediate,19,mission-build-unit@30,
 orders,ai,Unit::zFraction,units,players,immediate,75,combat-deaths@30,
 orders,ai,Unit::zFraction,units,units,carried,18,mission-defeat-passes-x@33,
-orders,economy,Unit::flags,units,players,immediate,25,mission-timer@60,
-orders,economy,Unit::workTime,units,players,immediate,2,conditions-dark-side@360,
 orders,features,Order::pos,players,units,carried,2,long-greenhaven-8p@39061,
 orders,features,Order::pos,units,units,carried,2,long-greenhaven-8p@13607,
 orders,features,Unit::pos,units,units,carried,1,long-great-divide-2p@29880,
@@ -338,9 +318,9 @@ players,targeting,pad_1df4,players,units,carried,1,skirmish4-long@26341,
 players,targeting,unknown_1b8e,players,units,carried,10,mission-build-unit@61,
 players,targeting,unknown_1cd9,players,units,carried,1,allied-victory@331,
 players,units,Unit::field_64,units,units,carried,1,conditions-dark-side@2675,
-players,units,pad_1df4,players,units,carried,2,allied-victory@211,
-players,units,unknown_1b8e,players,units,carried,16,mission-build-unit@31,
-players,units,unknown_1cd9,players,units,carried,17,mission-build-unit@31,
+players,units,pad_1df4,players,units,carried,1,skirmish4-long@26101,
+players,units,unknown_1b8e,players,units,carried,15,mission-build-unit@31,
+players,units,unknown_1cd9,players,units,carried,12,mission-build-unit@31,
 players,weapons,unknown_1b8e,players,projectiles,carried,2,mission-build-unit@61,
 players,weapons,unknown_1b8e,players,units,carried,3,mission-build-unit@61,
 players,weapons,unknown_1cd9,players,projectiles,carried,2,mission-build-unit@61,
@@ -388,20 +368,11 @@ units,ai,unknown_1b8e,units,units,carried,5,orders-tier2-vader@133,
 units,ai,unknown_1cd9,units,players,immediate,60,console-iwin@30,
 units,ai,unknown_1cd9,units,projectiles,immediate,3,mission-radius@2523,
 units,ai,unknown_1cd9,units,units,carried,4,mission-kill-mobile@182,
-units,economy,Unit::activateFlags,units,players,immediate,37,orders-air-fights@30,
-units,economy,Unit::def,units,players,immediate,37,mission-kill-of-type@90,
-units,economy,Unit::flags,units,players,immediate,74,combat-deaths@30,
-units,economy,Unit::metal,units,players,immediate,5,orders-immediate@450,
-units,economy,Unit::speed,units,players,immediate,50,conditions-shore-to-shore@30,
-units,economy,pad_1df4,units,players,immediate,13,ten-lava-run@210,
 units,economy,pad_1df4,units,units,carried,2,skirmish4-long@21842,
 units,economy,unknown_1b8e,units,units,carried,4,edges-economy-targeting@115,
 units,features,FeatureAnimEntry::bytes_10,units,features,immediate,2,edges-targeting-lead@161,
 units,features,Unit::field_64,units,units,carried,3,mission-build-unit@75,
-units,features,Unit::metal,units,units,carried,1,long-greenhaven-8p@39382,
 units,features,Vec3::x,units,features,immediate,4,edges-targeting-lead@261,
-units,features,pad_1df4,units,units,carried,1,long-greenhaven-8p@23462,
-units,features,unknown_1b8e,units,units,carried,1,long-great-divide-2p@28575,
 units,los_radar,Unit::activateFlags,players,presentation,immediate,11,allied-victory@30,
 units,los_radar,Unit::activateFlags,players,units,carried,7,mission-capture@61,
 units,los_radar,Unit::activateFlags,units,players,immediate,62,mission-build-unit@1,
@@ -596,6 +567,7 @@ units,weapons,Unit::motion,units,units,carried,7,edges-economy-targeting@115,
 units,weapons,Unit::netDirtyFlags,units,players,immediate,3,skirmish4-long@25864,
 units,weapons,Unit::netDirtyFlags,units,projectiles,immediate,1,long-great-divide-2p@49269,
 units,weapons,Unit::netDirtyFlags,units,units,carried,3,orders-air-fights@633,
+units,weapons,Unit::owner,units,units,carried,5,mission-passes-z@100,
 units,weapons,Unit::pos,units,features,immediate,2,long-greenhaven-8p@22254,
 units,weapons,Unit::pos,units,players,immediate,5,mission-passes-z@166,
 units,weapons,Unit::pos,units,projectiles,immediate,5,mission-passes-z@209,
@@ -651,8 +623,6 @@ weapons,ai,Unit::netDirtyFlags,players,projectiles,carried,2,mission-build-unit@
 weapons,ai,Unit::netDirtyFlags,units,projectiles,immediate,12,edges-economy-targeting@36,
 weapons,ai,Unit::weapon,units,players,immediate,18,mission-kill-of-type@90,
 weapons,ai,Unit::weapon,units,projectiles,immediate,1,long-greenhaven-8p@22711,
-weapons,economy,Unit::flags,projectiles,players,immediate,4,edges-targeting-lead@1230,
-weapons,economy,Unit::workTime,units,players,immediate,2,edges-economy-targeting@60,
 weapons,los_radar,Projectile::owner,meteors,players,carried,3,hailstorm-los-off@2,
 weapons,los_radar,Projectile::owner,projectiles,players,immediate,9,meteors-hailstorm@50,
 weapons,los_radar,Projectile::owner,units,players,immediate,10,mission-build-unit@44,

@@ -217,7 +217,7 @@ struct EconomySeam {
     int (__stdcall* Apply)(const EconomyEvent* event);
     // Settles one player's units for a tick, in the players phase: charges their upkeep, adds their income and emits their effects. Hooks: ResourceIncome, StatsAccumulate.
     void (__stdcall* UpdatePlayerEconomy)(int player);
-    // Sets a metal extractor's rate from the metal under its footprint and emits its effect; called when it is built, moved or loaded. Hooks: none.
+    // Sets a metal extractor's rate from the metal under its footprint and emits its effect; called when the unit is created or loaded. Hooks: none.
     void (__stdcall* UpdateMetalExtraction)(EconUnit unit);
     // Shares one player's surplus with its allies, by effects, in the tick's tail of a network game. Hooks: none.
     void (__stdcall* UpdateResourceSharing)(int player);

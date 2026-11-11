@@ -93,7 +93,13 @@ its own view state where 3.1c keeps it (below).
 **What others read of economy:**
 - **Views, in the state block, hashed:** the resource fields of the `Player` record (stores, incomes, usages,
   capacities, totals, waste, storage bonuses, share levels), the player accounts `players[i].econ`, and
-  `Unit::extraction`. Others read them as they did; only economy writes them during play.
+  `Unit::extraction`. Others read them as they did. Economy is not yet their only writer (#948):
+  - in the players phase, the commander respawn sets the storage bonuses (`SetStartingStorageBonus`);
+  - in network play, `HandlePlayerEconomy` copies another player's figures from a packet;
+  - the `ATM` console command (`CmdATM`) adds to the local player's stores, and the debug hotkey in the tick
+    (`RunGameSteps`) fills every player's stores to capacity;
+  - at set-up, `InitPlayerSlot` zeroes the fields, and `InitPlayerResources` and `SpawnCommanderAtStartPos` set the
+    storage bonuses.
 - **Queries:** `GetEnergyUse` (the computer player's ratings), `RequestGranted` (builders), `UnitAccount` (the unit's
   info panel and the saved game).
 
@@ -103,8 +109,11 @@ its own view state where 3.1c keeps it (below).
 stall, and the last tick's make and use) was 48 bytes of the unit record. It is now economy's: `RegionSize` gives
 `unitSlots * 48`, the engine allocates it (`SimAllocRegion`, tag `Economy region`) in `LoadBattleAssets` before the
 players are set up, `Init` receives it and `Shutdown` hands it back, as pathfinding's. The 48 bytes of the unit record
-stay, unused, so no other offset moves. Only economy reads or writes the region (`tools/privatestate.py`,
-`tools/seamlink.py`).
+stay, unused, so no other offset moves. Only economy reads or writes the region: `tools/privatestate.py --check`
+judges it from the access log. (`tools/seamlink.py --private-state` covers pathfinding's region only.)
+`tools/seamlink.py --pilot-seams` checks the seam statically: only economy and the engine call its writing slots, and
+no query slot's function writes state or makes an indirect call other than the world view's reads. One case it can't
+see: inside `UnitAccount` itself, a write to the region looks like the write to its `out` parameter.
 
 **What the trace hashes** (`bt-trace 5`, `docs/trace-format.md`):
 - the view state above, as before;

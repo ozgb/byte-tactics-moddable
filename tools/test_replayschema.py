@@ -74,8 +74,8 @@ class Sets(unittest.TestCase):
         self.assertEqual((s["reads"], s["writes"]), ([], []))
 
     def test_object_fields_join_the_object_sets(self):
-        model, _ = build([row("UpdatePlayerEconomy", "field_read", "Player::energy"), row("UpdatePlayerEconomy", "field_write", "Unit::health")])
-        s = model["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]
+        model, _ = build([row("UpdateUnitWeapons", "field_read", "Player::energy"), row("UpdateUnitWeapons", "field_write", "Unit::health")])
+        s = model["subsystems"]["weapons"]["slots"]["UpdateUnitWeapons"]
         names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
         self.assertEqual([names[i] for i in s["objectReads"]], ["Player.energy"])
         self.assertEqual([names[i] for i in s["objectWrites"]], ["Unit.health"])
@@ -92,7 +92,7 @@ class Accounting(unittest.TestCase):
 
     def test_a_pending_subsystem_lists_what_is_left(self):
         assignment = rs.read_assignment()
-        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map", "weapons")
+        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons")
                              for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         model, errors = build([row(slot, "field_read", "Game::mapWidth"), row(slot, "field_escape", "Unit::unmatched")])
         pending = model["subsystems"][sub]["pending"]
@@ -126,7 +126,7 @@ class Unrecorded(unittest.TestCase):
         self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
         ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("SetMeteorParams", spec["slots"])
         self.assertEqual(spec["unrecorded"], {"SetMeteorParams": {"reason": "load class", "native": "SetMeteorParams"}})
@@ -162,7 +162,7 @@ class Unrecorded(unittest.TestCase):
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
         ann = self.imported()
         files, errors, model = rs.generate(rs.read_rows(), ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], [])
         weapons = model["subsystems"]["weapons"]
         self.assertNotIn("SpawnProjectile", weapons["slots"])
         kept = weapons["unrecorded"]["SpawnProjectile"]
@@ -189,44 +189,53 @@ class Unrecorded(unittest.TestCase):
         ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "#711"})
         _, errors = build([], ann)
         self.assertEqual([e for e in errors if "pending" in e], [])
-        ann["subsystems"]["economy"]["imports"].append("wind_meteors.SetMeteorParams")
+        ann["subsystems"]["weapons"]["imports"].append("wind_meteors.SetMeteorParams")
         _, errors = build([], ann)
         self.assertTrue(any("wind_meteors is complete but has pending args" in e and "SetMeteorParams(params)" in e for e in errors), errors)
 
 
 class Rules(unittest.TestCase):
-    def slot(self, rows, name="UpdatePlayerEconomy", sub="economy"):
+    def slot(self, rows, name="UpdateUnitWeapons", sub="weapons"):
         model, errors = build(rows)
         names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
         s = model["subsystems"][sub]["slots"][name]
         return {"reads": [names[i] for i in s["objectReads"]], "writes": [names[i] for i in s["objectWrites"]], "allOf": s["allOf"], "errors": errors}
 
+    def ruled(self, rows, name):
+        ann = annotations()
+        ann["rules"].append({"kind": "deref_write", "target": "*float", "rule": "fields", "functions": ["DamageUnit"], "writes": ["Unit.workTime"], "note": "test"})
+        ann["rules"].append({"kind": "deref_write", "target": "*float", "rule": "fields", "functions": ["GetWeaponRange"], "writes": ["Unit.health"], "note": "test"})
+        model, errors = build(rows, ann)
+        names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
+        s = model["subsystems"]["weapons"]["slots"][name]
+        return {"reads": [names[i] for i in s["objectReads"]], "writes": [names[i] for i in s["objectWrites"]]}
+
     def test_a_write_through_a_float_pointer_lands_on_the_fields_of_its_rule(self):
-        s = self.slot([row("AddIncome", "deref_write", "*float")])
-        self.assertEqual(s["writes"], ["UnitResources.energyMake", "UnitResources.metalMake"])
+        s = self.ruled([row("DamageUnit", "deref_write", "*float")], "DamageUnit")
+        self.assertEqual(s["writes"], ["Unit.workTime"])
         self.assertEqual(s["reads"], [])
 
     def test_a_rule_of_functions_does_not_cover_the_others(self):
-        s = self.slot([row("UpdateMetalExtraction", "deref_write", "*float")], "UpdateMetalExtraction")
-        self.assertEqual(s["writes"], ["Unit.extraction"])
-        s = self.slot([row("UseEnergyD", "deref_write", "*float")])
-        self.assertEqual(s["writes"], ["UnitResources.energyUse"])
+        s = self.ruled([row("DamageUnit", "deref_write", "*float")], "DamageUnit")
+        self.assertEqual(s["writes"], ["Unit.workTime"])
+        s = self.ruled([row("GetWeaponRange", "deref_write", "*float")], "GetWeaponRange")
+        self.assertEqual(s["writes"], ["Unit.health"])
 
     def test_an_alias_names_the_field_that_records_a_bit_field(self):
-        s = self.slot([row("UpdatePlayerEconomy", "field_read", "Unit::cloakOn")])
+        s = self.slot([row("UpdateUnitWeapons", "field_read", "Unit::cloakOn")])
         self.assertEqual(s["reads"], ["Unit.flags"])
 
     def test_a_plain_row_may_have_a_rule(self):
-        s = self.slot([row("UpdateMetalExtraction", "field_read", "Point16::x")], "UpdateMetalExtraction")
+        s = self.slot([row("DamageUnit", "field_read", "Point16::x")], "DamageUnit")
         self.assertEqual(s["reads"], ["Unit.cell", "Unit.footprint"])
 
     def test_an_all_of_rule_makes_every_slot_of_the_table_a_root(self):
-        s = self.slot([row("UpdateResourceSharing", "field_escape", "Game::players")], "UpdateResourceSharing")
+        s = self.slot([row("DamageUnit", "field_escape", "Game::players")], "DamageUnit")
         self.assertEqual(s["allOf"], ["Player"])
 
     def test_a_member_a_state_type_does_not_record_is_unaccounted_for(self):
-        _, errors = build([row("UpdatePlayerEconomy", "field_read", "Player::noSuchMember")])
-        self.assertTrue(any("economy is complete but has pending untracked" in e and "Player::noSuchMember" in e for e in errors), errors)
+        _, errors = build([row("UpdateUnitWeapons", "field_read", "Player::noSuchMember")])
+        self.assertTrue(any("weapons is complete but has pending untracked" in e and "Player::noSuchMember" in e for e in errors), errors)
 
     def test_the_range_marks_both_fields_of_the_pair(self):
         files, _, _ = rs.generate(rs.read_rows())
@@ -442,7 +451,7 @@ class TargetingForms(unittest.TestCase):
 
 
 class UnannotatedTypes(unittest.TestCase):
-    ROW = row("UpdatePlayerEconomy", "field_read", "OpenHeap::count")
+    ROW = row("UpdateUnitWeapons", "field_read", "OpenHeap::count")
 
     def pending(self, rows, ann=None):
         _, errors = build(rows, ann)
@@ -451,12 +460,12 @@ class UnannotatedTypes(unittest.TestCase):
     def test_a_field_row_on_a_type_that_is_no_kind_is_an_error_naming_the_row(self):
         errors = self.pending([self.ROW])
         self.assertEqual(len(errors), 1, errors)
-        self.assertIn("economy is complete but has pending types", errors[0])
+        self.assertIn("weapons is complete but has pending types", errors[0])
         self.assertIn("field_read OpenHeap::count", errors[0])
 
     def test_a_pending_subsystem_is_not_asked(self):
         assignment = rs.read_assignment()
-        sub, slot = [(m, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map", "weapons")
+        sub, slot = [(m, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons")
                      for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         _, errors = build([row(slot, "field_read", "OpenHeap::count")])
         self.assertEqual([e for e in errors if "OpenHeap" in e], [])
@@ -488,19 +497,19 @@ class UnannotatedTypes(unittest.TestCase):
         self.assertEqual(self.pending([self.ROW], ann), [])
 
     def test_a_type_of_a_kind_is_not_asked(self):
-        self.assertEqual(self.pending([row("UpdatePlayerEconomy", "field_read", "Player::active")]), [])
+        self.assertEqual(self.pending([row("UpdateUnitWeapons", "field_read", "Player::active")]), [])
 
     def test_a_seam_table_is_not_asked(self):
-        self.assertEqual(self.pending([row("UpdatePlayerEconomy", "field_read", "Seams::units"), row("UpdatePlayerEconomy", "field_read", "UnitsSeam::SetStateBits")]), [])
+        self.assertEqual(self.pending([row("UpdateUnitWeapons", "field_read", "Seams::units"), row("UpdateUnitWeapons", "field_read", "UnitsSeam::SetStateBits")]), [])
 
     def test_a_service_class_the_subsystem_lists_is_not_asked(self):
         self.assertEqual(self.pending([row("UpdateMeteors", "field_read", "TdfFile::current"), row("UpdateMeteors", "field_read", "CommandArgs::count")]), [])
-        self.assertEqual(len(self.pending([row("UpdatePlayerEconomy", "field_read", "TdfFile::current")])), 1)
+        self.assertEqual(len(self.pending([row("UpdateUnitWeapons", "field_read", "TdfFile::current")])), 1)
 
 
 class PendingList(unittest.TestCase):
     def test_every_pending_item_is_printed_one_per_line(self):
-        rows = [row("UpdatePlayerEconomy", "field_read", "Cold%d::x" % i) for i in range(9)]
+        rows = [row("UpdateUnitWeapons", "field_read", "Cold%d::x" % i) for i in range(9)]
         _, errors = build(rows)
         message = [e for e in errors if "pending types" in e][0]
         lines = message.split("\n")
@@ -509,29 +518,29 @@ class PendingList(unittest.TestCase):
 
 
 class IndirectCalls(unittest.TestCase):
-    SEAM = "indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
+    SEAM = "indirect via void (*)(Unit *) __attribute__((stdcall)) [UnitsSeam::MarkRecentlyDamaged]"
     OTHER = "indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
     OWN = "indirect via void (*)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWindOnStream]"
     TABLE = "indirect via int (*)(void *, Order *, unsigned int) __attribute__((stdcall)) [OrderTableEntry::notify]"
     VIRTUAL = "virtual OrderFx::GetType"
     CONCRETE = ["ApproachRadius::GetType", "RingApproach::GetType", "PathOrder::GetType"]
 
-    def pending(self, rows, ann=None, slot_name="UpdatePlayerEconomy"):
+    def pending(self, rows, ann=None, slot_name="DamageUnit"):
         model, errors = build(rows, ann)
-        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "weapons"))], model["subsystems"]["economy"]["slots"].get(slot_name)
+        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], model["subsystems"]["weapons"]["slots"].get(slot_name)
 
     def economy(self, **changes):
         ann = annotations()
-        ann["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"].update(changes)
+        ann["subsystems"]["weapons"]["slots"]["DamageUnit"].update(changes)
         return ann
 
     def test_a_call_through_an_import_is_accounted_for(self):
-        self.assertEqual(self.pending([row("UpdatePlayerEconomy", "indirect_call", self.SEAM)])[0], [])
+        self.assertEqual(self.pending([row("DamageUnit", "indirect_call", self.SEAM)])[0], [])
 
     def test_a_call_through_a_seam_it_does_not_import_is_an_error(self):
-        errors, _ = self.pending([row("UpdatePlayerEconomy", "indirect_call", self.OTHER)])
+        errors, _ = self.pending([row("DamageUnit", "indirect_call", self.OTHER)])
         self.assertEqual(len(errors), 1, errors)
-        self.assertIn("economy is complete but has pending indirect", errors[0])
+        self.assertIn("weapons is complete but has pending indirect", errors[0])
         self.assertIn("ClearWeaponTarget", errors[0])
 
     def test_a_call_to_a_slot_of_its_own_seam_needs_the_functions_in_the_closure(self):
@@ -541,62 +550,62 @@ class IndirectCalls(unittest.TestCase):
         self.assertTrue(any("pending indirect" in e and "UpdateWindOnStream" in e for e in errors), errors)
 
     def test_a_code_pointer_is_an_error(self):
-        errors, _ = self.pending([row("UpdatePlayerEconomy", "indirect_call", self.TABLE)])
+        errors, _ = self.pending([row("DamageUnit", "indirect_call", self.TABLE)])
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("OrderTableEntry::notify", errors[0])
 
     def test_a_vtable_dispatch_needs_the_concrete_functions_in_the_closure(self):
-        rows = [row("UpdatePlayerEconomy", "indirect_call", self.VIRTUAL)] + [row(f, "function", "") for f in self.CONCRETE]
+        rows = [row("DamageUnit", "indirect_call", self.VIRTUAL)] + [row(f, "function", "") for f in self.CONCRETE]
         errors, _ = self.pending(rows)
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("ApproachRadius::GetType", errors[0])
         ann = self.economy()
-        ann["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]["functions"] += self.CONCRETE
+        ann["subsystems"]["weapons"]["slots"]["DamageUnit"]["functions"] += self.CONCRETE
         self.assertEqual(self.pending(rows, ann)[0], [])
 
     def test_one_concrete_function_out_of_the_closure_is_still_an_error(self):
-        rows = [row("UpdatePlayerEconomy", "indirect_call", self.VIRTUAL)] + [row(f, "function", "") for f in self.CONCRETE]
+        rows = [row("DamageUnit", "indirect_call", self.VIRTUAL)] + [row(f, "function", "") for f in self.CONCRETE]
         ann = self.economy()
-        ann["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]["functions"] += self.CONCRETE[:2]
+        ann["subsystems"]["weapons"]["slots"]["DamageUnit"]["functions"] += self.CONCRETE[:2]
         errors, _ = self.pending(rows, ann)
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("PathOrder::GetType", errors[0])
 
     def test_a_dispatch_on_a_class_that_is_no_kind_is_an_error(self):
-        errors, _ = self.pending([row("UpdatePlayerEconomy", "indirect_call", "virtual DirectPlay::Close")])
+        errors, _ = self.pending([row("DamageUnit", "indirect_call", "virtual DirectPlay::Close")])
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("DirectPlay", errors[0])
 
     def test_through_adds_the_functions_to_the_closure(self):
-        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE), row("StopOrder", "field_write", "Unit::health")]
+        rows = [row("DamageUnit", "indirect_call", self.TABLE), row("StopOrder", "field_write", "Unit::health")]
         errors, slot = self.pending(rows, self.economy(through={self.TABLE: ["StopOrder"]}))
         self.assertEqual(errors, [])
         model, _ = build(rows, self.economy(through={self.TABLE: ["StopOrder"]}))
         names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
-        self.assertEqual([names[i] for i in model["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]["objectWrites"]], ["Unit.health"])
+        self.assertEqual([names[i] for i in model["subsystems"]["weapons"]["slots"]["DamageUnit"]["objectWrites"]], ["Unit.health"])
 
     def test_through_may_be_named_by_the_field_in_brackets(self):
-        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE), row("StopOrder", "function", "")]
+        rows = [row("DamageUnit", "indirect_call", self.TABLE), row("StopOrder", "function", "")]
         self.assertEqual(self.pending(rows, self.economy(through={"OrderTableEntry::notify": ["StopOrder"]}))[0], [])
 
     def test_the_functions_of_through_are_held_to_the_same_checks(self):
-        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE), row("StopOrder", "function", ""), row("StopOrder", "indirect_call", self.OTHER)]
+        rows = [row("DamageUnit", "indirect_call", self.TABLE), row("StopOrder", "function", ""), row("StopOrder", "indirect_call", self.OTHER)]
         errors, _ = self.pending(rows, self.economy(through={self.TABLE: ["StopOrder"]}))
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("ClearWeaponTarget", errors[0])
 
     def test_through_with_a_reason_is_a_call_that_does_nothing(self):
-        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE)]
+        rows = [row("DamageUnit", "indirect_call", self.TABLE)]
         self.assertEqual(self.pending(rows, self.economy(through={self.TABLE: {"reason": "the table is empty on the recorded paths"}}))[0], [])
 
     def test_through_with_nothing_and_no_reason_is_an_error(self):
-        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE)]
+        rows = [row("DamageUnit", "indirect_call", self.TABLE)]
         for entry in ([], {}):
             errors, _ = self.pending(rows, self.economy(through={self.TABLE: entry}))
             self.assertTrue(any("through" in e and "reason" in e for e in errors), errors)
 
     def test_through_that_names_no_function_is_an_error(self):
-        rows = [row("UpdatePlayerEconomy", "indirect_call", self.TABLE)]
+        rows = [row("DamageUnit", "indirect_call", self.TABLE)]
         errors, _ = self.pending(rows, self.economy(through={self.TABLE: ["NoSuchFunction"]}))
         self.assertTrue(any("NoSuchFunction" in e and "no function" in e for e in errors), errors)
 
@@ -709,23 +718,26 @@ class ProductCounts(unittest.TestCase):
 
     def test_a_slot_that_reaches_the_table_must_read_both_factors(self):
         ann = annotations()
-        del ann["subsystems"]["economy"]["slots"]["UpdateMetalExtraction"]
+        del ann["subsystems"]["map"]["slots"]["GetCellMeanHeight"]
         _, errors, _ = rs.generate(rs.read_rows(), ann)
-        self.assertTrue(any("economy.UpdateMetalExtraction reaches Cell, whose count multiplies Game.width" in e for e in errors), errors)
-        self.assertTrue(any("economy.UpdateMetalExtraction reaches Cell, whose count multiplies Game.height" in e for e in errors), errors)
+        self.assertTrue(any("map.GetCellMeanHeight reaches Cell, whose count multiplies Game.width" in e for e in errors), errors)
+        self.assertTrue(any("map.GetCellMeanHeight reaches Cell, whose count multiplies Game.height" in e for e in errors), errors)
+
+    def without_factors(self):
+        return [r for r in rs.read_rows() if not (r["function"] in ("GetCellMeanHeight", "GetCellCachedWidth", "WholePart") and r["target"] in ("Game::width", "Game::height"))]
 
     def test_one_missing_factor_is_reported_alone(self):
         ann = annotations()
-        ann["subsystems"]["economy"]["slots"]["UpdateMetalExtraction"]["reads"] = ["Game.width"]
-        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        ann["subsystems"]["map"]["slots"]["GetCellMeanHeight"]["reads"] = ["Game.width"]
+        _, errors, _ = rs.generate(self.without_factors(), ann)
         found = [e for e in errors if "reaches Cell" in e]
         self.assertEqual(len(found), 1, found)
         self.assertIn("Game.height", found[0])
 
     def test_an_extra_read_must_be_a_block_field(self):
         ann = annotations()
-        ann["subsystems"]["economy"]["slots"]["UpdateMetalExtraction"]["reads"] = ["Game.width", "Game.height", "Game.nothing"]
-        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        ann["subsystems"]["map"]["slots"]["GetCellMeanHeight"]["reads"] = ["Game.width", "Game.height", "Game.nothing"]
+        _, errors, _ = rs.generate(self.without_factors(), ann)
         self.assertTrue(any("the extra read Game.nothing is no block field" in e for e in errors), errors)
 
 
@@ -1616,20 +1628,18 @@ class InsideSites(unittest.TestCase):
         files, errors, _ = self.generated()
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertIn('    { ROK_UNITRESOURCES, ROK_UNIT, offsetof(Unit, resourceSlot), "resourceSlot", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, shadowAnim), "shadowAnim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 13;", text)
+        self.assertIn("kReplayInsideSiteCount = 12;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
         text = files[rs.SCHEMA_H]
-        self.assertIn('{ "UnitResources", sizeof(UnitResources), RS_STATE, RT_ORDER, 0, 1, 0, 0, 0 },', text)
-        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 1, 6, 0, 0, 0 },', text)
+        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 0, 6, 0, 0, 0 },', text)
         self.assertIn('{ "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0, 0 },', text)
 
     def test_the_sites_of_a_kind_are_in_the_model(self):
@@ -1642,8 +1652,8 @@ class InsideSites(unittest.TestCase):
 
     def test_the_single_site_form_is_an_error(self):
         ann = annotations()
-        ann["objects"]["UnitResources"]["inside"] = {"kind": "Unit", "member": "resourceSlot"}
-        self.assertTrue(any("UnitResources inside: `inside` lists the sites" in e for e in self.generated(ann)[1]))
+        ann["objects"]["WeaponAimCobCb"]["inside"] = {"kind": "Unit", "member": "aimCob"}
+        self.assertTrue(any("WeaponAimCobCb inside: `inside` lists the sites" in e for e in self.generated(ann)[1]))
 
     def test_a_site_is_an_embed_field_of_a_state_kind(self):
         ann = annotations()
@@ -1664,7 +1674,7 @@ class InsideSites(unittest.TestCase):
 
     def test_a_container_is_not_itself_inside_a_kind_and_a_table_is_not_inside_one(self):
         ann = annotations()
-        ann["objects"]["FixtureHolder"]["inside"] = [{"kind": "Unit", "member": "resourceSlot"}]
+        ann["objects"]["FixtureHolder"]["inside"] = [{"kind": "Feature", "member": "anim"}]
         errors = self.generated(ann)[1]
         self.assertTrue(any("Handle inside: the container FixtureHolder is itself inside another kind" in e for e in errors), errors)
         ann = annotations()
@@ -1733,9 +1743,9 @@ class AllOfKinds(unittest.TestCase):
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureLane", "note": "test"})
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1b8a", "rule": "all-of", "object": "FixtureCell", "note": "test"})
-        rows = [row("UpdateResourceSharing", "field_escape", t) for t in ("Game::p1cd5", "Game::players", "Game::p1b8a")]
+        rows = [row("DamageUnit", "field_escape", t) for t in ("Game::p1cd5", "Game::players", "Game::p1b8a")]
         model, errors = build(rows + list(extra), ann)
-        return model["subsystems"]["economy"]["slots"]["UpdateResourceSharing"], errors
+        return model["subsystems"]["weapons"]["slots"]["DamageUnit"], errors
 
     def test_a_slot_lists_every_all_of_kind_in_kind_order(self):
         s, errors = self.rules()
@@ -1743,36 +1753,36 @@ class AllOfKinds(unittest.TestCase):
         self.assertEqual(s["allOf"], ["Player", "FixtureCell", "FixtureLane"])
 
     def test_a_kind_named_twice_is_listed_once(self):
-        s, errors = self.rules([row("UpdateResourceSharing", "field_escape", "Game::players")])
+        s, errors = self.rules([row("DamageUnit", "field_escape", "Game::players")])
         self.assertEqual([e for e in errors if "all-of" in e], [])
         self.assertEqual(s["allOf"], ["Player", "FixtureCell", "FixtureLane"])
 
     def test_the_generated_slot_has_a_list_of_kinds(self):
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureLane", "note": "test"})
-        files, errors, _ = rs.generate(rs.read_rows() + [row("UpdateResourceSharing", "field_escape", "Game::p1cd5")], ann)
+        files, errors, _ = rs.generate(rs.read_rows() + [row("DamageUnit", "field_escape", "Game::p1cd5"), row("DamageUnit", "field_escape", "Game::players")], ann)
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertIn("kReplayEconomyUpdateResourceSharingAllOf[] = { ROK_PLAYER, ROK_FIXTURELANE };", text)
-        slot = [l for l in text.split("\n") if l.startswith('    { "UpdateResourceSharing", SUB_ECONOMY')][0]
-        self.assertTrue(slot.endswith("kReplayEconomyUpdateResourceSharingAllOf, 2 },"), slot)
+        self.assertIn("kReplayWeaponsDamageUnitAllOf[] = { ROK_PLAYER, ROK_FIXTURELANE };", text)
+        slot = [l for l in text.split("\n") if l.startswith('    { "DamageUnit", SUB_WEAPONS')][0]
+        self.assertTrue(slot.endswith("kReplayWeaponsDamageUnitAllOf, 2 },"), slot)
 
     def test_a_slot_with_one_kind_is_a_list_of_one(self):
         files, _, _ = rs.generate(rs.read_rows())
         text = files[rs.SCHEMA_H]
-        self.assertIn("kReplayEconomyUpdateResourceSharingAllOf[] = { ROK_PLAYER };", text)
-        slot = [l for l in text.split("\n") if l.startswith('    { "UpdateResourceSharing", SUB_ECONOMY')][0]
-        self.assertTrue(slot.endswith("kReplayEconomyUpdateResourceSharingAllOf, 1 },"), slot)
+        self.assertIn("kReplayWeaponsFindTargetableProjectileAllOf[] = { ROK_PROJECTILE };", text)
+        slot = [l for l in text.split("\n") if l.startswith('    { "FindTargetableProjectile", SUB_WEAPONS')][0]
+        self.assertTrue(slot.endswith("kReplayWeaponsFindTargetableProjectileAllOf, 1 },"), slot)
 
     def test_a_slot_with_none_has_no_list(self):
         files, _, _ = rs.generate(rs.read_rows())
-        slot = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "UpdatePlayerEconomy", SUB_ECONOMY')][0]
+        slot = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "GetWeaponRange", SUB_WEAPONS')][0]
         self.assertTrue(slot.endswith("nullptr, 0 },"), slot)
 
     def test_a_kind_with_no_table_is_an_error(self):
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "Vec3", "note": "test"})
-        _, errors = build([row("UpdateResourceSharing", "field_escape", "Game::p1cd5")], ann)
+        _, errors = build([row("DamageUnit", "field_escape", "Game::p1cd5")], ann)
         self.assertTrue(any("the all-of rule names Vec3, which is no table kind of the schema" in e for e in errors), errors)
 
 
@@ -2198,7 +2208,7 @@ class ElementForms(unittest.TestCase):
         self.has(ann, "a kind in a table behind a ref field is a state kind with no sites")
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureGroup", "note": "test"})
-        errors = rs.generate(rs.read_rows() + [row("UpdateResourceSharing", "field_escape", "Game::p1cd5")], ann)[1]
+        errors = rs.generate(rs.read_rows() + [row("DamageUnit", "field_escape", "Game::p1cd5"), row("DamageUnit", "field_escape", "Game::players")], ann)[1]
         self.assertTrue(any("the all-of rule names FixtureGroup, which is no table kind of the schema" in e for e in errors), errors)
 
     def test_a_vptr_kind_has_its_global_in_the_vtable_functions(self):
@@ -2311,10 +2321,10 @@ class CapacityTables(unittest.TestCase):
     def test_a_slot_that_reaches_the_table_reads_the_capacity_member(self):
         ann = self.table(annotations(), capacity="hotRadarCount")
         ann["rules"].append({"kind": "field_escape", "target": "Game::hotRadar", "rule": "all-of", "object": "FixtureEye", "note": "test"})
-        errors = rs.generate(rs.read_rows() + [row("UpdateResourceSharing", "field_escape", "Game::hotRadar")], ann)[1]
-        self.assertTrue(any("economy.UpdateResourceSharing reaches FixtureEye, whose capacity is Game.hotRadarCount" in e for e in errors), errors)
-        ann["subsystems"]["economy"]["slots"].setdefault("UpdateResourceSharing", {})["reads"] = ["Game.hotRadarCount"]
-        errors = rs.generate(rs.read_rows() + [row("UpdateResourceSharing", "field_escape", "Game::hotRadar")], ann)[1]
+        errors = rs.generate(rs.read_rows() + [row("DamageUnit", "field_escape", "Game::hotRadar")], ann)[1]
+        self.assertTrue(any("weapons.DamageUnit reaches FixtureEye, whose capacity is Game.hotRadarCount" in e for e in errors), errors)
+        ann["subsystems"]["weapons"]["slots"].setdefault("DamageUnit", {})["reads"] = ["Game.hotRadarCount"]
+        errors = rs.generate(rs.read_rows() + [row("DamageUnit", "field_escape", "Game::hotRadar")], ann)[1]
         self.assertEqual([e for e in errors if "reaches" in e], [])
 
     def test_a_table_behind_a_ref_field_has_a_capacity_that_is_a_member_of_the_owner(self):
@@ -2445,9 +2455,9 @@ class SelfPointers(unittest.TestCase):
         self.assertEqual(self.generated(ann)[1], [])
 
     def test_a_row_on_a_self_pointer_is_an_object_field(self):
-        model, errors = build([row("UpdatePlayerEconomy", "field_read", "FixtureEye::screen")])
+        model, errors = build([row("UpdateUnitWeapons", "field_read", "FixtureEye::screen")])
         names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
-        s = model["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]
+        s = model["subsystems"]["weapons"]["slots"]["UpdateUnitWeapons"]
         self.assertIn("FixtureEye.screen", [names[i] for i in s["objectReads"]])
 
 
@@ -2619,9 +2629,9 @@ class Blobs(unittest.TestCase):
         self.assertNotIn("plain[]", [f["name"] for f in model["object_fields"]])
 
     def test_a_row_that_names_the_pointer_brings_the_bytes_into_the_set(self):
-        model, _ = build([row("UpdatePlayerEconomy", "field_read", "FixtureProgram::entries")])
+        model, _ = build([row("UpdateUnitWeapons", "field_read", "FixtureProgram::entries")])
         names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
-        s = model["subsystems"]["economy"]["slots"]["UpdatePlayerEconomy"]
+        s = model["subsystems"]["weapons"]["slots"]["UpdateUnitWeapons"]
         self.assertEqual([names[i] for i in s["objectReads"]], ["FixtureProgram.entries", "FixtureProgram.entries[]"])
 
     def test_the_real_schema_has_none_of_it(self):
@@ -2816,7 +2826,6 @@ class CompleteImports(unittest.TestCase):
         body = body[:body.index("    }\n")]
         self.assertIn("g_seams.targeting = &g_import_targeting;", body)
         self.assertIn("g_import_targeting.GetWeaponTargetPos = Imp_targeting_GetWeaponTargetPos;", body)
-        self.assertIn("g_seams.economy = &g_import_economy;", body)
 
     def test_a_subsystem_with_no_complete_import_binds_nothing_more(self):
         text = self.generated()[rs.SLOTS_H]

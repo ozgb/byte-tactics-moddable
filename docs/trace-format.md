@@ -1062,8 +1062,8 @@ END
   game stores it, copied when the event is recorded.
 - The resource accounts of units are private to economy and are not hashed (the Unit table leaves out
   bytes 0xbc to 0xeb, section 4); the player accounts of section 27 and the players' resource fields
-  still are. What economy's `WriteState` reports is dumped between sections 15 and 18, with the prefix
-  `economy.`, and is not hash input.
+  still are. What economy's `WriteState` reports (its record, numbered 34) is dumped between sections 15 and
+  18, with the prefix `economy.`, and is not hash input.
 
 ## 9. The per-tick digest
 

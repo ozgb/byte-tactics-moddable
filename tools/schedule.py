@@ -71,6 +71,29 @@ TRANSPARENT = {None, "seams", "platform", "game"}
 ENGINE = {"presentation", "harness", "network", "files"}
 
 
+def parameter_types(function_type: str) -> list[str]:
+    """The parameter types of a function type, as written."""
+    start = function_type.find("(")
+    if start < 0:
+        return []
+    out, depth, current = [], 0, ""
+    for ch in function_type[start + 1:]:
+        if ch in "([<":
+            depth += 1
+        elif ch in ")]>":
+            if depth == 0:
+                break
+            depth -= 1
+        if ch == "," and depth == 0:
+            out.append(current.strip())
+            current = ""
+        else:
+            current += ch
+    if current.strip():
+        out.append(current.strip())
+    return out
+
+
 class OrderWalker(rwsets.Walker):
     """rwsets' walker that also keeps the calls in the order they run, with their line and whether the result is used."""
 
@@ -172,7 +195,8 @@ class OrderWalker(rwsets.Walker):
                 return None
 
     def forward(self, node: dict, kind: str, target: str) -> None:
-        """Note each parameter this call is handed, and where, so a write through it in the callee is seen."""
+        """Note each parameter this call is handed a pointer or reference into (never a copy, nor a pointer to const),
+        and where, so a write through it in the callee is seen."""
         inner = node.get("inner", [])
         if not inner:
             return
@@ -181,9 +205,22 @@ class OrderWalker(rwsets.Walker):
             root = self.param_root(callee["inner"][0])
             if root is not None:
                 self.forwards.append([kind, target, -1, root[0]])
+        params = parameter_types(rwsets.type_text(callee.get("type", {}))) if node.get("kind") == "CallExpr" else []
         for index, arg in enumerate(inner[1:]):
             root = self.param_root(arg)
-            if root is not None:
+            if root is None:
+                continue
+            arg_type = arg.get("type", {})
+            core = arg
+            while core.get("kind") in CASTS and core.get("inner"):
+                core = core["inner"][0]
+            if rwsets.is_pointer(arg_type):
+                handed = not rwsets.pointee_const(arg_type)
+            elif index < len(params) and params[index].endswith("&"):
+                handed = not rwsets.pointee_const({"qualType": params[index]})
+            else:
+                handed = rwsets.is_pointer(core.get("type", {})) and not rwsets.pointee_const(core.get("type", {}))
+            if handed:
                 self.forwards.append([kind, target, index, root[0]])
 
     def local_object(self, node: dict) -> bool:
@@ -945,7 +982,7 @@ class Splits:
 
     def splits_inside(self, step: Node, writer: str, reader: str, item: str, stack: tuple, loose: bool) -> bool:
         """Whether a write of the writer followed by a read of the reader is found inside the step."""
-        key = ("inside", step.slot, writer, reader, item, loose)
+        key = ("inside", step.slot, writer, reader, item, loose, stack)
         if key not in self.memo:
             self.memo[key] = False
             if step.slot not in stack:
@@ -1067,7 +1104,11 @@ The orders are read from the program, not from a run. That decides what they cla
   through that argument, or hands it to code outside the program (a library container, say). The address of a local
   of the caller counts also when no code for the entry point is known. An argument the call only reads is an input,
   and the record an entry point works on, given as its first argument (an account of the economy, say), is not a
-  value handed back.
+  value handed back. That record is recognised by the name the native adapter of the slot gives its first
+  parameter, so a slot whose first argument is a local object the callee fills (as some AI commands' sets of unit
+  types are) is also not counted. An argument is followed into another function only as a pointer or reference to
+  write through: a copy, or a pointer to const, is read. Writes made by a callback the caller passes (a visitor object, say) are not seen when the
+  callback is reached through a cast to its base type, so such a call is classed by its other values only.
 - **Writes**, for the classes, are the writes to a field of a record or to a variable of the game that the program
   shows, anywhere in what a call runs (nested entry points included, and for a call outside an interface its own
   writes, not those of what it calls in turn), and allocations, random draws and sim events. Writes to a local object

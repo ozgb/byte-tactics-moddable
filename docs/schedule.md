@@ -134,7 +134,7 @@ Each entity:
 1. `orders.MissionTypeFromName`: query
 1. `orders.NewOrder`: mixed
 1. `orders.AppendOrder`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 1. `ai.MarkOwnerNetDirtyFromDamageSplit`: intent
 1. `los_radar.GetMapCell`: query
 1. `features.GetFootprintCentre`: query
@@ -320,7 +320,7 @@ The steps of the tick after its last phase:
 
 1. `players.UpdateBlink`: intent
 1. `los_radar.ExpireEyeballs`: intent
-1. `economy.UpdateResourceSharing`: mixed
+1. `economy.UpdateResourceSharing`: intent
 
 ## Entry points
 
@@ -969,7 +969,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `orders.MissionTypeFromName`: query
 1. `orders.NewOrder`: mixed
 1. `orders.AppendOrder`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 1. `features.GetFootprintCentre`: query
 1. `features.DamageFeature`: intent
 1. `los_radar.GetMapCellAtPosition`: query
@@ -997,7 +997,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `orders.MissionTypeFromName`: query
 1. `orders.NewOrder`: mixed
 1. `orders.AppendOrder`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 
 ### `weapons.DetonateUnitWeapon`
 
@@ -1010,7 +1010,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `orders.MissionTypeFromName`: query
 1. `orders.NewOrder`: mixed
 1. `orders.AppendOrder`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 1. `ai.MarkOwnerNetDirtyFromDamageSplit`: intent
 1. `los_radar.GetMapCell`: query
 1. `features.GetFootprintCentre`: query
@@ -1058,7 +1058,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `orders.MissionTypeFromName`: query
 1. `orders.NewOrder`: mixed
 1. `orders.AppendOrder`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 1. `ai.MarkOwnerNetDirtyFromDamageSplit`: intent
 1. `los_radar.GetMapCell`: query
 1. `features.GetFootprintCentre`: query
@@ -1525,7 +1525,11 @@ The orders are read from the program, not from a run. That decides what they cla
   through that argument, or hands it to code outside the program (a library container, say). The address of a local
   of the caller counts also when no code for the entry point is known. An argument the call only reads is an input,
   and the record an entry point works on, given as its first argument (an account of the economy, say), is not a
-  value handed back.
+  value handed back. That record is recognised by the name the native adapter of the slot gives its first
+  parameter, so a slot whose first argument is a local object the callee fills (as some AI commands' sets of unit
+  types are) is also not counted. An argument is followed into another function only as a pointer or reference to
+  write through: a copy, or a pointer to const, is read. Writes made by a callback the caller passes (a visitor object, say) are not seen when the
+  callback is reached through a cast to its base type, so such a call is classed by its other values only.
 - **Writes**, for the classes, are the writes to a field of a record or to a variable of the game that the program
   shows, anywhere in what a call runs (nested entry points included, and for a call outside an interface its own
   writes, not those of what it calls in turn), and allocations, random draws and sim events. Writes to a local object

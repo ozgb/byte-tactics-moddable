@@ -180,6 +180,16 @@ class Classes(unittest.TestCase):
         self.assertEqual(self.spend_class([[0, False]], forwards=[["call", "push_back", -1, 0]]), {"mixed"})
         self.assertEqual(self.spend_class([[0, False]], forwards=[["call", "operator=", 1, 0]]), {"intent"})
 
+    def test_forwarding_cycle(self):
+        cyc_f = fn("CycF", "src/economy.cpp", 5, 7)
+        cyc_g = fn("CycG", "src/economy.cpp", 5, 7)
+        cyc_f["forwards"] = [["call", "CycG", 0, 0]]
+        cyc_g["forwards"] = [["call", "CycF", 0, 0]]
+        spend = [["call", "CycF", 0, 0]]
+        self.assertEqual(self.spend_class([[0, False]], forwards=spend, extra=[cyc_f, cyc_g]), {"intent"})
+        cyc_g["param_writes"] = [0]
+        self.assertEqual(self.spend_class([[0, False]], forwards=spend, extra=[cyc_f, cyc_g]), {"mixed"})
+
     def test_record_a_method_works_on_is_not_a_used_value(self):
         native = NATIVE + "static void __stdcall Spend(Account* self, int amount)\n"
         self.assertEqual(self.spend_class([[0, False]], writes=[0], native=native), {"intent"})
@@ -406,6 +416,12 @@ void Caller(O* o) {
 }
 void Set(O* o, int* in, int* out) { *out = *in; o->n = 1; }
 void Forward(O* o, int* p) { Set(o, 0, p); }
+int strcmp(const char* a, const char* b);
+int Less(float a, float b);
+void Fill(int* out);
+void Bump(int& r);
+int Find(O* o, const char* name) { return strcmp(name, "x"); }
+void Hops(O* o, char* name, float* f, int* p) { Find(o, name); Less(*f, o->n); Fill(p); Bump(o->n); }
 """
 
 
@@ -432,6 +448,11 @@ class SyntaxTree(unittest.TestCase):
         self.assertEqual(self.functions["Set"]["param_writes"], [0, 2])
         self.assertEqual(self.functions["Forward"]["param_writes"], [])
         self.assertEqual(self.functions["Forward"]["forwards"], [["call", "Set", 0, 0], ["call", "Set", 2, 1]])
+
+    def test_only_pointers_and_references_to_write_are_forwarded(self):
+        self.assertEqual(self.functions["Find"]["forwards"], [])
+        self.assertEqual(self.functions["Hops"]["forwards"],
+                         [["call", "Find", 0, 0], ["call", "Fill", 0, 3], ["call", "Bump", 0, 0]])
 
     def test_write_is_ordered_after_the_value_it_stores(self):
         steps = [(kind, target) for line, kind, target, _ in self.functions["Caller"]["calls"] if line == 15]

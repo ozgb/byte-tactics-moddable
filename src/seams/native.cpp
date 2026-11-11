@@ -126,17 +126,17 @@ Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 
 
 
-static void __stdcall UpdateAllUnitsNative(void)
+static void __stdcall UpdateAllUnits(void)
 {
     SchedUnitsPhase();
 }
 
-static void __stdcall UpdatePlayersNative(void)
+static void __stdcall UpdatePlayers(void)
 {
     SchedPlayersPhase(RAND_STREAM_MAIN);
 }
 
-static void __stdcall UpdatePlayersOnStreamNative(RandStream stream)
+static void __stdcall UpdatePlayersOnStream(RandStream stream)
 {
     SchedPlayersPhase(stream);
 }
@@ -892,7 +892,7 @@ void InstallNativeSeams()
     s_players.NewConditions = NewConditionsNative;
     s_players.NotifyUnitCreated = NotifyUnitCreatedNative;
     s_players.NotifyUnitDied = NotifyUnitDiedNative;
-    s_players.UpdatePlayersOnStream = UpdatePlayersOnStreamNative;
+    s_players.UpdatePlayersOnStream = UpdatePlayersOnStream;
     s_players.UpdatePlayerHead = UpdatePlayerHead;
     s_players.UpdatePlayerTail = UpdatePlayerTail;
     s_players.UpdatePlayersFinish = UpdatePlayersFinish;
@@ -954,8 +954,8 @@ void InstallNativeSeams()
     s_weapons.UpdateProjectiles = UpdateProjectiles;
     s_weapons.UpdateExplosions = UpdateExplosions;
     s_weapons.SpawnProjectile = SpawnProjectile;
-    s_units.UpdateAllUnits = UpdateAllUnitsNative;
-    s_players.UpdatePlayers = UpdatePlayersNative;
+    s_units.UpdateAllUnits = UpdateAllUnits;
+    s_players.UpdatePlayers = UpdatePlayers;
     s_files.OpenRead = HAPI_OpenFileRead;
     s_files.OpenAppend = HAPI_OpenFileAppend;
     s_files.Create = HAPI_CreateFile;

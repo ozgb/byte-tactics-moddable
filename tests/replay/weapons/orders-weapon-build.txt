@@ -17,6 +17,7 @@ call 700 UpdateUnitWeapons
   r Unit#1.killCount 0
   r Unit#1.playerIndex 0
   r Unit#1.netDirtyFlags 0
+  r Unit#1.owner Player#0
   r Unit#1.motion UnitMotion#1
   r Unit#1.posX 36700160
   r Unit#1.posY 65536
@@ -8408,7 +8409,8 @@ call 700 UpdateUnitWeapons
   r WeaponFire#255.fire null
   r UnitDef#34.maxHealth 3000
   r UnitDef#34.modelMaxYHigh 39
-  r Unit#1.resourceSlot.player Player#0
+  r Player#0.energy f32:0x47654c00
+  r Player#0.metal f32:0x46ea4200
   r UnitMotion#1.speed 0
   r weapondef#20.flags 0x00080809
   r weapondef#20.speed 873813
@@ -8461,8 +8463,6 @@ call 700 UpdateUnitWeapons
   r Unit#1.weapons[0].aimCob.nAimCobDone 0
   r Unit#1.weapons[1].aimCob.nAimCobDone 0
   r Unit#1.weapons[2].aimCob.nAimCobDone 0
-  r Player#0.energy f32:0x47654c00
-  r Player#0.metal f32:0x46ea4200
   a unit Unit#1
   i targeting.GetWeaponTargetPos Unit#1 0 = 0
   i targeting.GetWeaponTargetPos Unit#1 2 = 0
@@ -8476,6 +8476,7 @@ call 700 UpdateUnitWeapons
   r Unit#2.killCount 0
   r Unit#2.playerIndex 0
   r Unit#2.netDirtyFlags 0
+  r Unit#2.owner Player#0
   r Unit#2.motion null
   r Unit#2.posX 41943040
   r Unit#2.posY 65536
@@ -8511,7 +8512,6 @@ call 700 UpdateUnitWeapons
   r Unit#2.weapon2MuzzleDelta 0
   r UnitDef#10.maxHealth 780
   r UnitDef#10.modelMaxYHigh 46
-  r Unit#2.resourceSlot.player Player#0
   r weapondef#30.flags 0x59143211
   r weapondef#30.speed 1747626
   r weapondef#30.acceleration 4369
@@ -8543,6 +8543,7 @@ call 700 UpdateUnitWeapons
   r Unit#251.killCount 0
   r Unit#251.playerIndex 1
   r Unit#251.netDirtyFlags 0
+  r Unit#251.owner Player#1
   r Unit#251.motion UnitMotion#2
   r Unit#251.posX 199814850
   r Unit#251.posY 65536
@@ -8578,7 +8579,8 @@ call 700 UpdateUnitWeapons
   r Unit#251.weapon2MuzzleDelta 1495040
   r UnitDef#167.maxHealth 3000
   r UnitDef#167.modelMaxYHigh 38
-  r Unit#251.resourceSlot.player Player#1
+  r Player#1.energy f32:0x447a0000
+  r Player#1.metal f32:0x447a0000
   r UnitMotion#2.speed 70123
   r weapondef#21.flags 0x00080809
   r weapondef#21.speed 873813
@@ -8615,8 +8617,6 @@ call 700 UpdateUnitWeapons
   r Unit#251.weapons[0].aimCob.nAimCobDone 0
   r Unit#251.weapons[1].aimCob.nAimCobDone 0
   r Unit#251.weapons[2].aimCob.nAimCobDone 0
-  r Player#1.energy f32:0x447a0000
-  r Player#1.metal f32:0x447a0000
   a unit Unit#251
   i targeting.GetWeaponTargetPos Unit#251 0 = 0
   i targeting.GetWeaponTargetPos Unit#251 2 = 0
@@ -8990,12 +8990,12 @@ call 720 UpdateUnitWeapons
   r Unit#252.killCount 0
   r Unit#252.playerIndex 1
   r Unit#252.netDirtyFlags 0
+  r Unit#252.owner Player#1
   r Unit#252.motion null
   r Unit#252.heading -32382
   r Unit#252.pitch 0
   r UnitDef#208.maxHealth 175
   r UnitDef#208.modelMaxYHigh 22
-  r Unit#252.resourceSlot.player Player#1
   r Unit#252.weapons[0].aimCob.nAimCobDone 0
   r Unit#252.weapons[1].aimCob.nAimCobDone 0
   r Unit#252.weapons[2].aimCob.nAimCobDone 0

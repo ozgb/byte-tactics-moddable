@@ -17,6 +17,7 @@ call 100 UpdateUnitWeapons
   r Unit#1.killCount 0
   r Unit#1.playerIndex 0
   r Unit#1.netDirtyFlags 0
+  r Unit#1.owner Player#0
   r Unit#1.motion UnitMotion#1
   r Unit#1.posX 41570669
   r Unit#1.posY 65536
@@ -8408,7 +8409,8 @@ call 100 UpdateUnitWeapons
   r WeaponFire#255.fire null
   r UnitDef#34.maxHealth 3000
   r UnitDef#34.modelMaxYHigh 39
-  r Unit#1.resourceSlot.player Player#0
+  r Player#0.energy f32:0x476a9200
+  r Player#0.metal f32:0x46ea6732
   r UnitMotion#1.speed 78643
   r weapondef#20.flags 0x00080809
   r weapondef#20.speed 873813
@@ -8461,8 +8463,6 @@ call 100 UpdateUnitWeapons
   r Unit#1.weapons[0].aimCob.nAimCobDone 0
   r Unit#1.weapons[1].aimCob.nAimCobDone 0
   r Unit#1.weapons[2].aimCob.nAimCobDone 0
-  r Player#0.energy f32:0x476a9200
-  r Player#0.metal f32:0x46ea6732
   a unit Unit#1
   i targeting.GetWeaponTargetPos Unit#1 0 = 0
   i targeting.GetWeaponTargetPos Unit#1 2 = 0
@@ -8476,6 +8476,7 @@ call 100 UpdateUnitWeapons
   r Unit#2.killCount 0
   r Unit#2.playerIndex 0
   r Unit#2.netDirtyFlags 0
+  r Unit#2.owner Player#0
   r Unit#2.motion UnitMotion#2
   r Unit#2.posX 39321600
   r Unit#2.posY 2883584
@@ -8511,7 +8512,6 @@ call 100 UpdateUnitWeapons
   r Unit#2.weapon2MuzzleDelta 0
   r UnitDef#51.maxHealth 196
   r UnitDef#51.modelMaxYHigh 10
-  r Unit#2.resourceSlot.player Player#0
   r UnitMotion#2.speed 65536
   r weapondef#108.flags 0x00143201
   r weapondef#108.speed 1048576
@@ -8544,6 +8544,7 @@ call 100 UpdateUnitWeapons
   r Unit#3.killCount 0
   r Unit#3.playerIndex 0
   r Unit#3.netDirtyFlags 0
+  r Unit#3.owner Player#0
   r Unit#3.motion UnitMotion#3
   r Unit#3.posX 41943040
   r Unit#3.posY 2424832
@@ -8577,7 +8578,6 @@ call 100 UpdateUnitWeapons
   r Unit#3.weapon2FirePitch 0
   r Unit#3.weapon2Stockpile 0
   r Unit#3.weapon2MuzzleDelta 0
-  r Unit#3.resourceSlot.player Player#0
   r UnitMotion#3.speed 65536
   r Unit#3.weapons[0].aimCob.nAimCobDone 0
   r Unit#3.weapons[1].aimCob.nAimCobDone 0
@@ -8594,6 +8594,7 @@ call 100 UpdateUnitWeapons
   r Unit#4.killCount 0
   r Unit#4.playerIndex 0
   r Unit#4.netDirtyFlags 0
+  r Unit#4.owner Player#0
   r Unit#4.motion UnitMotion#4
   r Unit#4.posX 39321600
   r Unit#4.posY 65536
@@ -8629,7 +8630,6 @@ call 100 UpdateUnitWeapons
   r Unit#4.weapon2MuzzleDelta 0
   r UnitDef#123.maxHealth 320
   r UnitDef#123.modelMaxYHigh 12
-  r Unit#4.resourceSlot.player Player#0
   r UnitMotion#4.speed 0
   r weapondef#3.flags 0x04000100
   r weapondef#3.speed 0
@@ -8662,6 +8662,7 @@ call 100 UpdateUnitWeapons
   r Unit#5.killCount 0
   r Unit#5.playerIndex 0
   r Unit#5.netDirtyFlags 0
+  r Unit#5.owner Player#0
   r Unit#5.motion UnitMotion#5
   r Unit#5.posX 42649328
   r Unit#5.posY 4653056
@@ -8697,7 +8698,6 @@ call 100 UpdateUnitWeapons
   r Unit#5.weapon2MuzzleDelta 0
   r UnitDef#29.maxHealth 280
   r UnitDef#29.modelMaxYHigh 15
-  r Unit#5.resourceSlot.player Player#0
   r UnitMotion#5.speed 120472
   r Unit#5.weapons[0].aimCob.nAimCobDone 0
   r Unit#5.weapons[1].aimCob.nAimCobDone 0
@@ -8713,6 +8713,7 @@ call 100 UpdateUnitWeapons
   r Unit#251.killCount 0
   r Unit#251.playerIndex 1
   r Unit#251.netDirtyFlags 0
+  r Unit#251.owner Player#1
   r Unit#251.motion UnitMotion#6
   r Unit#251.posX 221249536
   r Unit#251.posY 65536
@@ -8748,7 +8749,8 @@ call 100 UpdateUnitWeapons
   r Unit#251.weapon2MuzzleDelta 1495040
   r UnitDef#167.maxHealth 3000
   r UnitDef#167.modelMaxYHigh 38
-  r Unit#251.resourceSlot.player Player#1
+  r Player#1.energy f32:0x447a0000
+  r Player#1.metal f32:0x447a0000
   r UnitMotion#6.speed 0
   r weapondef#21.flags 0x00080809
   r weapondef#21.speed 873813
@@ -8785,8 +8787,6 @@ call 100 UpdateUnitWeapons
   r Unit#251.weapons[0].aimCob.nAimCobDone 0
   r Unit#251.weapons[1].aimCob.nAimCobDone 0
   r Unit#251.weapons[2].aimCob.nAimCobDone 0
-  r Player#1.energy f32:0x447a0000
-  r Player#1.metal f32:0x447a0000
   a unit Unit#251
   i targeting.GetWeaponTargetPos Unit#251 0 = 0
   i targeting.GetWeaponTargetPos Unit#251 2 = 0
@@ -8800,6 +8800,7 @@ call 100 UpdateUnitWeapons
   r Unit#252.killCount 0
   r Unit#252.playerIndex 1
   r Unit#252.netDirtyFlags 0
+  r Unit#252.owner Player#1
   r Unit#252.motion UnitMotion#7
   r Unit#252.posX 50462720
   r Unit#252.posY 65536
@@ -8835,7 +8836,6 @@ call 100 UpdateUnitWeapons
   r Unit#252.weapon2MuzzleDelta 0
   r UnitDef#144.maxHealth 265
   r UnitDef#144.modelMaxYHigh 26
-  r Unit#252.resourceSlot.player Player#1
   r UnitMotion#7.speed 0
   r weapondef#88.flags 0x00080809
   r weapondef#88.speed 873813
@@ -9415,7 +9415,7 @@ call 114 UpdateUnitWeapons
   i units.StartScript CobScript#2 "FirePrimary" ? 0 = 1
   i units.StartScriptWithArgs CobScript#2 "RockUnit" ? 0 2 -612 -515 0 0 = 0
   i services.RecordSimEvent 9 0 [40187277,3718991,18528182,9] 4
-  i economy.SpendEnergyAndMetal Unit#2.resourceSlot f32:0x00000000 f32:0x00000000 = 1
+  i services.ScheduleEconomyEvent = 1
   w Game.projectileCount 1
   w Unit#2.workTime 714
   w Unit#2.netDirtyFlags 1024
@@ -9856,7 +9856,7 @@ call 121 UpdateUnitWeapons
   i units.StartScript CobScript#3 "FirePrimary" ? 0 = 1
   i units.StartScriptWithArgs CobScript#3 "RockUnit" ? 0 2 -660 -453 0 0 = 0
   i services.RecordSimEvent 9 0 [42802113,3748074,18513840,9] 4
-  i economy.SpendEnergyAndMetal Unit#3.resourceSlot f32:0x00000000 f32:0x00000000 = 1
+  i services.ScheduleEconomyEvent = 1
   w Game.projectileCount 2
   w Unit#3.workTime 721
   w Unit#3.netDirtyFlags 1024
@@ -12012,12 +12012,12 @@ call 161 UpdateUnitWeapons
   r Unit#6.killCount 0
   r Unit#6.playerIndex 0
   r Unit#6.netDirtyFlags 0
+  r Unit#6.owner Player#0
   r Unit#6.motion null
   r Unit#6.heading 32663
   r Unit#6.pitch 0
   r UnitDef#112.maxHealth 326
   r UnitDef#112.modelMaxYHigh 38
-  r Unit#6.resourceSlot.player Player#0
   r Unit#6.weapons[0].aimCob.nAimCobDone 0
   r Unit#6.weapons[1].aimCob.nAimCobDone 0
   r Unit#6.weapons[2].aimCob.nAimCobDone 0
@@ -14324,9 +14324,9 @@ call 210 WeaponAimCobComplete
 call 211 UpdateUnitWeapons
   r rng.seed 0x749a3077
   r Unit#1.workTime 510
-  r Unit#3.flags 0x9024002a
   r Player#0.energy f32:0x476a8643
   r Player#0.metal f32:0x46ea5e31
+  r Unit#3.flags 0x9024002a
   a unit Unit#1
   i targeting.GetWeaponTargetPos Unit#1 0 = 0
   i targeting.GetWeaponTargetPos Unit#1 2 = 0
@@ -14383,7 +14383,7 @@ call 211 UpdateUnitWeapons
   i services.RecordSimEvent 30 0 [57,49961472,1440891,23505142,3] 5
   i units.StartScript CobScript#7 "FirePrimary" ? 0 = 1
   i units.StartScriptWithArgs CobScript#7 "RockUnit" ? 0 2 799 49 0 0 = 0
-  i economy.SpendEnergyAndMetal Unit#252.resourceSlot f32:0x00000000 f32:0x00000000 = 1
+  i services.ScheduleEconomyEvent = 1
   w Game.projectileCount 1
   w rng.seed 0x36f30390
   w Unit#252.workTime 811

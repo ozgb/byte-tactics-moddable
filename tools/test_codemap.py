@@ -97,8 +97,16 @@ class ModelTest(unittest.TestCase):
         self.assertNotIn("SetStateBitsNative", callees)
 
     def test_a_wrapper_with_its_own_work_stays_visible(self):
-        wrapper = self.function("DestroyPathfinderNative")
-        self.assertIs(self.model.through_native(wrapper), wrapper)
+        busy = []
+        for function in self.model.functions:
+            if function.subsystem != "seams":
+                continue
+            targets = {self.model.choose(t, function) for kind, t in function.rows if kind == "call"} - {None}
+            if len([t for t in targets if t.subsystem != "seams"]) > 1:
+                busy.append(function)
+        self.assertTrue(busy)
+        for wrapper in busy:
+            self.assertIs(self.model.through_native(wrapper), wrapper)
 
     def test_tick_lists_the_phases_in_order(self):
         names = [p["name"] for p in self.model.tick_phases()["phases"]]

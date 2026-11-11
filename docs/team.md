@@ -9,7 +9,7 @@ The plan in #2 sets the goals and the decisions. The human makes every major arc
 
 They share one GitHub account, and they talk through GitHub: pull request reviews, review comments, issue comments and the labels below. This file is the contract between them. Both roles also follow `AGENTS.md`.
 
-They also send each other quick notes on two Valkey streams, `bt:to-lead` and `bt:to-maintainer` (port 6390, password in `~/.local/share/bt-valkey/password`), so that a new verdict, issue or decision is seen on the next pass. A note points at GitHub and never replaces it: the review, comment or label it mentions is on GitHub too. The lead reads `bt:to-lead` on every pass (`.claude/skills/lead/SKILL.md`, step 0).
+They also send each other quick notes on two Valkey streams, `bt:to-lead` and `bt:to-maintainer` (port 6390, password in `~/.local/share/bt-valkey/password`), so that a new verdict, issue or decision is seen on the next pass. A note points at GitHub and never replaces it: the review, comment or label it mentions is on GitHub too. Each role reads its own stream on every pass and answers on the other's: the lead reads `bt:to-lead` (`.claude/skills/lead/SKILL.md`, step 0) and the maintainer reads `bt:to-maintainer` (`.claude/skills/maintainer/SKILL.md`, step 0).
 
 ## Directories
 

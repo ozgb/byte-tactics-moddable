@@ -9,7 +9,6 @@
 #include "../game/unit_resources.h"
 #include "../files/files_api.h"
 #include "players.h"
-#include "scheduler.h"
 #include "economy_events.h"
 #include "../util/tdf.h"
 
@@ -460,16 +459,6 @@ static int HasMorePlayerSlots(unsigned char i)
 }
 
 static const float kHundred = 100.0f;
-
-void __stdcall UpdatePlayers()
-{
-    SchedPlayersPhase(RAND_STREAM_MAIN);
-}
-
-void __stdcall UpdatePlayersOnStream(RandStream stream)
-{
-    SchedPlayersPhase(stream);
-}
 
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"

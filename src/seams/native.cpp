@@ -120,10 +120,26 @@ Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../ingame/control_panel.h"
 #include "../units/unit_scripts.h"
 #include "../units/unit_position.h"
+#include "../game/scheduler.h"
 #include "../orders/order_queue.h"
 
 
 
+
+static void __stdcall UpdateAllUnitsNative(void)
+{
+    SchedUnitsPhase();
+}
+
+static void __stdcall UpdatePlayersNative(void)
+{
+    SchedPlayersPhase(RAND_STREAM_MAIN);
+}
+
+static void __stdcall UpdatePlayersOnStreamNative(RandStream stream)
+{
+    SchedPlayersPhase(stream);
+}
 
 static int __stdcall FindScriptNative(CobScript* script, const char* name)
 {
@@ -876,7 +892,7 @@ void InstallNativeSeams()
     s_players.NewConditions = NewConditionsNative;
     s_players.NotifyUnitCreated = NotifyUnitCreatedNative;
     s_players.NotifyUnitDied = NotifyUnitDiedNative;
-    s_players.UpdatePlayersOnStream = UpdatePlayersOnStream;
+    s_players.UpdatePlayersOnStream = UpdatePlayersOnStreamNative;
     s_players.UpdatePlayerHead = UpdatePlayerHead;
     s_players.UpdatePlayerTail = UpdatePlayerTail;
     s_players.UpdatePlayersFinish = UpdatePlayersFinish;
@@ -938,8 +954,8 @@ void InstallNativeSeams()
     s_weapons.UpdateProjectiles = UpdateProjectiles;
     s_weapons.UpdateExplosions = UpdateExplosions;
     s_weapons.SpawnProjectile = SpawnProjectile;
-    s_units.UpdateAllUnits = UpdateAllUnits;
-    s_players.UpdatePlayers = UpdatePlayers;
+    s_units.UpdateAllUnits = UpdateAllUnitsNative;
+    s_players.UpdatePlayers = UpdatePlayersNative;
     s_files.OpenRead = HAPI_OpenFileRead;
     s_files.OpenAppend = HAPI_OpenFileAppend;
     s_files.Create = HAPI_CreateFile;

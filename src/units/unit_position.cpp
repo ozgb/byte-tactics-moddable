@@ -88,7 +88,6 @@ int __stdcall GetGroundHeight(Vec3* pos);
 int __cdecl AngleOfVector(int x, int z);
 #include "../network/net_game.h"
 #include "unit_position.h"
-#include "../game/scheduler.h"
 #include "../ingame/selection.h"
 #include "unit_motion.h"
 #include "unit_position.h"
@@ -318,11 +317,6 @@ void __stdcall UpdateUnit(Unit* u)
     if (u->killPending) {
         KillUnit(u, u->lastDamageType);
     }
-}
-
-void __stdcall UpdateAllUnits(void)
-{
-    SchedUnitsPhase();
 }
 
 // FUNCTION: 0x48b200

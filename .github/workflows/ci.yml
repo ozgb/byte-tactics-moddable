@@ -93,6 +93,9 @@ jobs:
           python3 tools/test_citecheck.py
           python3 tools/citecheck.py
 
+      - name: Test the code map
+        run: python3 tools/test_codemap.py
+
       - name: Test the oracle kit export
         run: python3 tools/test_oraclekit.py
 

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Codemap</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="bar">
+  <a id="brand" href="#/">codemap</a>
+  <nav>
+    <a href="#/" data-nav="map">Architecture</a>
+    <a id="nav-tick" data-nav="tick">One tick</a>
+  </nav>
+  <div id="search-wrap">
+    <input id="search" type="search" autocomplete="off" spellcheck="false"
+      placeholder="Search functions, data, types, files, 0x addresses  ( / )" aria-label="Search">
+    <div id="results" role="listbox" hidden></div>
+  </div>
+  <div id="trail" aria-label="Recently visited"></div>
+</header>
+<main id="layout">
+  <section id="stage"></section>
+  <div id="divider" role="separator" aria-orientation="vertical" title="Drag to resize"></div>
+  <aside id="side"></aside>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

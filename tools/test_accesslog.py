@@ -697,6 +697,46 @@ class RegionTest(unittest.TestCase):
         self.assertIn('("reads.csv", "access.reads.csv")', Path(al.__file__).read_text())
 
 
+class SourceOrderTest(unittest.TestCase):
+    SOURCE = """// FUNCTION: 0x401000
+void LoadMap()
+{
+    int* tnt = Load();
+    int* dst = (int*)GameAllocIgnoreTag("TILE MAP", 4);
+    unsigned char* plot = (unsigned char*)SimAllocTagged("PLOT MEMORY", 13);
+    int* list = (int*)operator new(0x10);
+    int buf = (int)operator new(8);
+    PathOrder* p = new (kSim) PathOrder();
+    Order* o = new (kSim) Order();
+    unsigned short* ids = (unsigned short*)SimAllocTagged(name, 4);
+}
+// FUNCTION: 0x401100
+void Other()
+{
+    int* far = (int*)operator new(4);
+}
+"""
+
+    def order(self, names):
+        path = Path(tempfile.mkdtemp()) / "map.cpp"
+        path.write_text(self.SOURCE)
+        rows = [({"name": "LoadMap: " + n, "address": "0x401000"}, al.HEAP_ROW.match("LoadMap: " + n)) for n in names]
+        with mock.patch.object(al.sources, "find_source", return_value=path):
+            return [r["name"][len("LoadMap: "):] for r, _ in al.source_order(rows)]
+
+    def test_a_type_row_is_placed_at_its_call_not_at_the_first_use_of_the_type(self):
+        self.assertEqual(self.order(["operator new int", "operator new int #2", "GameAllocIgnoreTag TILE MAP",
+                                     "GameAllocIgnoreTag PLOT MEMORY"]),
+                         ["GameAllocIgnoreTag TILE MAP", "GameAllocIgnoreTag PLOT MEMORY", "operator new int", "operator new int #2"])
+
+    def test_a_type_is_not_found_inside_a_longer_name(self):
+        self.assertEqual(self.order(["new Order", "new PathOrder"]), ["new PathOrder", "new Order"])
+
+    def test_a_row_no_call_carries_takes_the_free_call_of_its_allocator(self):
+        self.assertEqual(self.order(["GameAllocIgnoreTag unsigned short", "GameAllocIgnoreTag MODEL", "GameAllocIgnoreTag TILE MAP"]),
+                         ["GameAllocIgnoreTag TILE MAP", "GameAllocIgnoreTag MODEL", "GameAllocIgnoreTag unsigned short"])
+
+
 class PresentationTest(unittest.TestCase):
     def test_funcs_round_trip(self):
         data = al.pack_funcs([(0x401000, 0x401040, "Draw"), (0x401040, 0x401100, "Unit::Move")])

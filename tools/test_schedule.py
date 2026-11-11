@@ -5,6 +5,8 @@
 
 import contextlib
 import io
+import os
+import shutil
 import sys
 import tempfile
 import unittest
@@ -68,7 +70,8 @@ def functions(query_writes=False, units_reads=False):
         fn("UpdateAll", "src/units.cpp", 1, 9,
            [(5, "indirect_call", seam("EconomySeam", "Spend"), False),
             (6, "indirect_call", seam("EconomySeam", "Query"), True),
-            (7, "indirect_call", seam("OrdersSeam", "Run"), False)],
+            (7, "indirect_call", seam("OrdersSeam", "Run"), False)]
+           + ([(8, "field_read", "Player::energy", False)] if units_reads else []),
            [("field_read", "Player::energy")] if units_reads else []),
         fn("Spend", "src/economy.cpp", 1, 3, items=[("field_write", "Player::energy")]),
         fn("Query", "src/economy.cpp", 5, 7, returns="int",
@@ -84,6 +87,15 @@ SUBSYSTEMS = [{"function": "RunTick", "file": "src/tick.cpp", "subsystem": "game
               {"function": "Run", "file": "src/orders.cpp", "subsystem": "orders"}]
 SOURCES = {"src/tick.cpp": TICK, "src/units.cpp": UNITS, "src/economy.cpp": "\n" * 8, "src/orders.cpp": "\n" * 4}
 LOOPS = {("units", 1): "each unit."}
+FIXED = {"LOOPS": LOOPS, "TICK_STEPS": {}, "SILENT_INTENTS": {}}
+
+
+def fixed(**names):
+    """The page's description tables, set for the hand-written program (or as given)."""
+    stack = contextlib.ExitStack()
+    for name, value in dict(FIXED, **names).items():
+        stack.enter_context(mock.patch.object(sc, name, value))
+    return stack
 
 
 def program(**kw):
@@ -185,19 +197,34 @@ class Splits(unittest.TestCase):
 
 class Problems(unittest.TestCase):
     def test_loops_must_match_the_marks(self):
-        with mock.patch.object(sc, "LOOPS", {("units", 1): "x", ("ghost", 1): "y"}), mock.patch.object(sc, "TICK_STEPS", {}):
+        with fixed(LOOPS={("units", 1): "x", ("ghost", 1): "y"}):
             self.assertEqual(page().problems(), ["LOOPS describes pass ghost, loop 1, which the marks do not hold"])
-        with mock.patch.object(sc, "LOOPS", {}), mock.patch.object(sc, "TICK_STEPS", {}):
+        with fixed(LOOPS={}):
             self.assertEqual(page().problems(), ["pass units, loop 1 has no description in LOOPS"])
 
     def test_tick_steps_must_be_called(self):
-        with mock.patch.object(sc, "LOOPS", LOOPS), mock.patch.object(sc, "TICK_STEPS", {"Gone": "x"}):
+        with fixed(TICK_STEPS={"Gone": "x"}):
             self.assertEqual(page().problems(), ["TICK_STEPS describes Gone, which the tick does not call"])
+
+    def test_intent_with_no_write_is_reported(self):
+        p = program()
+        p.fns["Spend"][0].items = set()
+        with fixed():
+            self.assertEqual(sc.Page(p, [], []).problems(),
+                             ["economy.Spend is called as an intent but no write is found in it: it may hand back a value "
+                              "the caller uses; class it, or give the reason in SILENT_INTENTS"])
+        with fixed(SILENT_INTENTS={"economy.Spend": "a notification."}):
+            self.assertEqual(sc.Page(p, [], []).problems(), [])
+            self.assertIn("| `economy.Spend` | a notification. |", sc.render(sc.Page(p, [], [])))
+
+    def test_listed_intent_that_writes_is_reported(self):
+        with fixed(SILENT_INTENTS={"economy.Spend": "x"}):
+            self.assertEqual(page().problems(), ["SILENT_INTENTS lists economy.Spend, which is no intent without a write"])
 
 
 class Render(unittest.TestCase):
     def render(self):
-        with mock.patch.object(sc, "LOOPS", LOOPS), mock.patch.object(sc, "TICK_STEPS", {}):
+        with fixed():
             return sc.render(page([dep("economy", "orders")]))
 
     def test_content(self):
@@ -206,8 +233,8 @@ class Render(unittest.TestCase):
         self.assertIn("Phase units, through `units.UpdateAll`. It visits each unit.", text)
         self.assertIn("1. `economy.Spend`: intent\n1. `economy.Query`: view read\n1. `orders.Run`: intent\n", text)
         self.assertIn("| units | `orders.Run` | intent |", text)
-        self.assertIn("| economy | orders | units, each entity | split | `economy.Spend` | `orders.Run` | by item | 1 | 0 |",
-                      text)
+        self.assertIn("| economy | orders | units, each entity | split | `economy.Spend` (step 1) | `orders.Run` (step 3) |  "
+                      "| by item | 1 | 0 |", text)
         self.assertIn("### `orders.Run`\n\n1. a draw from the Park-Miller generator (`rng`)\n", text)
         self.assertIn("| economy | 0 / 1 | 0 / 0 | 0 / 1 | 0 / 0 | 1 | 0 | 1 |", text)
 
@@ -217,11 +244,165 @@ class Render(unittest.TestCase):
             self.assertNotIn(name, text)
 
 
+NESTED = """void UpdateAll() {
+    AccessLogPassScope outer(ACCESS_PASS_UNITS_PLAYERS);
+    for (int p = 0; p < 2; ++p) {
+        AccessLogEntity();
+        g_seams.economy->Spend(u);
+        {
+        AccessLogPassScope inner(ACCESS_PASS_UNITS);
+        for (int i = 0; i < n; ++i) {
+            AccessLogEntity();
+            g_seams.orders->Run(u);
+        }
+        }
+        x = g_seams.economy->Query(u);
+    }
+}
+"""
+
+
+def labels(steps):
+    return [n.label for n in steps]
+
+
+class Cycles(unittest.TestCase):
+    def test_a_cut_order_is_not_kept(self):
+        extra = [fn("CycA", "src/units.cpp", 20, 23, [(21, "call", "CycB", False),
+                                                      (22, "indirect_call", seam("OrdersSeam", "Run"), False)]),
+                 fn("CycB", "src/units.cpp", 25, 28, [(26, "call", "CycA", False),
+                                                      (27, "indirect_call", seam("EconomySeam", "Spend"), False)])]
+        subs = SUBSYSTEMS + [{"function": f["function"], "file": f["file"], "subsystem": "units"} for f in extra]
+        p = sc.Program(functions() + extra, subs, [], SEAMS, NATIVE, SOURCES)
+        self.assertEqual(labels(p.expand(p.fns["CycA"][0], "units")), ["economy.Spend", "orders.Run"])
+        self.assertEqual(labels(p.expand(p.fns["CycB"][0], "units")), ["economy.Spend", "orders.Run", "economy.Spend"])
+
+
+class NestedPasses(unittest.TestCase):
+    def program(self):
+        fns = functions()
+        fns[1] = fn("UpdateAll", "src/units.cpp", 1, 15,
+                    [(5, "indirect_call", seam("EconomySeam", "Spend"), False),
+                     (10, "indirect_call", seam("OrdersSeam", "Run"), False),
+                     (13, "indirect_call", seam("EconomySeam", "Query"), True)])
+        return sc.Program(fns, SUBSYSTEMS, [], SEAMS, NATIVE, dict(SOURCES, **{"src/units.cpp": NESTED}))
+
+    def test_inner_pass_is_a_step_of_its_parent(self):
+        passes = {p.name: p for p in sc.build(self.program())["passes"]}
+        outer, inner = passes["units.players"], passes["units"]
+        self.assertEqual((inner.parent, inner.depth, outer.parent), ("units.players", 1, ""))
+        entity = next(part for part in outer.parts if part.kind == "entity")
+        self.assertEqual([(n.kind, n.label) for n in entity.steps],
+                         [("entry", "economy.Spend"), ("pass", "units"), ("entry", "economy.Query")])
+        self.assertEqual(labels(next(part for part in inner.parts if part.kind == "entity").steps), ["orders.Run"])
+
+    def test_loops_name_both_passes(self):
+        loops = {("units.players", 1): "each player.", ("units", 1): "each unit."}
+        with fixed(LOOPS=loops):
+            p = sc.Page(self.program(), [], [])
+            self.assertEqual(p.problems(), [])
+            self.assertIn("Nested in the pass `units.players`, where its lists name it.", sc.render(p))
+
+
+class Placements(unittest.TestCase):
+    def placed(self, p, row):
+        (_, found), = sc.Page(p, [row], []).placed
+        return found
+
+    def test_writer_step_that_reaches_the_read_is_named(self):
+        p = program()
+        p.fns["Spend"][0].calls = [[2, "indirect_call", seam("OrdersSeam", "Run"), False]]
+        found = self.placed(p, dep("economy", "orders"))
+        self.assertEqual((found.kind, found.first, found.second, found.inside),
+                         ("split", "economy.Spend", "orders.Run", "economy.Spend"))
+        with fixed():
+            self.assertIn("| `orders.Run` (step 3) | `economy.Spend` | by item |",
+                          sc.render(sc.Page(p, [dep("economy", "orders")], [])))
+
+    def nested(self, calls):
+        p = program()
+        p.fns["UpdateAll"][0].calls = [[5, "indirect_call", seam("EconomySeam", "Spend"), False]]
+        p.fns["Spend"][0].calls = calls
+        return self.placed(p, dep("economy", "orders"))
+
+    def test_write_before_a_nested_call_in_source_order(self):
+        write = [2, "field_write", "Player::energy", False]
+        run = [3, "indirect_call", seam("OrdersSeam", "Run"), False]
+        found = self.nested([write, run])
+        self.assertEqual((found.kind, found.where, found.second), ("before", "units, each entity, in `economy.Spend`",
+                                                                   "orders.Run"))
+        found = self.nested([run, write])
+        self.assertEqual((found.kind, found.where, found.first, found.second),
+                         ("across", "units, each entity", "economy.Spend", "economy.Spend"))
+
+    def test_caller_write_before_a_later_call_of_a_listed_step(self):
+        p = program()
+        p.fns["UpdateAll"][0].calls = [[5, "indirect_call", seam("OrdersSeam", "Run"), False],
+                                       [6, "field_write", "Player::energy", False],
+                                       [7, "indirect_call", seam("OrdersSeam", "Run"), False]]
+        found = self.placed(p, dep("units", "orders"))
+        self.assertEqual((found.kind, found.first, found.second, found.second_at, found.first_after),
+                         ("before", "", "orders.Run", 1, 1))
+        with fixed():
+            self.assertIn("| write before calling | the caller, after step 1 | `orders.Run` again, after the write |",
+                          sc.render(sc.Page(p, [dep("units", "orders")], [])))
+
+    def test_reader_before_writer_is_across_entities(self):
+        p = program()
+        p.fns["Run"][0].items = {("field_write", "Player::energy")}
+        found = self.placed(p, dep("orders", "economy"))
+        self.assertEqual((found.kind, found.first, found.second), ("across", "orders.Run", "economy.Query"))
+
+
+SNIPPET = """struct A { short pitch; short bank; };
+struct O { A angles; int n; };
+struct Seam { void (*Fill)(int* out); void (*Peek)(const int* in); void (*Take)(O* o); int (*Count)(); };
+struct Seams { Seam* s; };
+Seams g_seams;
+A Get(O* o) { A p; p.pitch = o->angles.pitch; p.bank = 1; o->n = 2; return p; }
+struct B { int k; B() { this->k = 0; } };
+void Caller(O* o) {
+    int v;
+    g_seams.s->Fill(&v);
+    g_seams.s->Peek(&v);
+    g_seams.s->Take(o);
+    g_seams.s->Count();
+    o->n = g_seams.s->Count();
+}
+"""
+
+
+@unittest.skipUnless(shutil.which("clang-cl"), "clang-cl is not installed")
+class SyntaxTree(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, {"BT_NO_ASTCACHE": "1"}):
+            root = Path(tmp)
+            (root / "src").mkdir()
+            (root / "src/a.cpp").write_text(SNIPPET)
+            argv = ["clang-cl", "--target=i686-pc-windows-msvc", "/nologo", "-TP", "-fms-compatibility",
+                    "-fms-extensions", "-fsyntax-only", "-Xclang", "-ast-dump=json", "--", str(root / "src/a.cpp")]
+            cls.functions = {f["function"]: f for f in sc.analyse((root, argv, str(root)))}
+
+    def test_used_and_out_arguments(self):
+        calls = [(line, target.split("[")[-1].rstrip("]"), used) for line, kind, target, used
+                 in self.functions["Caller"]["calls"] if kind == "indirect_call"]
+        self.assertEqual(calls, [(10, "Seam::Fill", True), (11, "Seam::Peek", False), (12, "Seam::Take", False),
+                                 (13, "Seam::Count", False), (14, "Seam::Count", True)])
+
+    def test_write_is_ordered_after_the_value_it_stores(self):
+        steps = [(kind, target) for line, kind, target, _ in self.functions["Caller"]["calls"] if line == 14]
+        self.assertEqual(steps[-2:], [("indirect_call", "indirect via int (*)() [Seam::Count]"), ("field_write", "O::n")])
+
+    def test_local_and_constructed_objects_are_not_written(self):
+        self.assertEqual(sorted(self.functions["Get"]["items"]), [("field_read", "A::pitch"), ("field_write", "O::n")])
+        self.assertEqual(self.functions["B::B"]["items"], [])
+
+
 class Main(unittest.TestCase):
     def run_main(self, args, doc):
         out, err = io.StringIO(), io.StringIO()
-        with mock.patch.object(sc, "load", lambda build_dir, jobs: page([dep("economy", "orders")])), \
-                mock.patch.object(sc, "LOOPS", LOOPS), mock.patch.object(sc, "TICK_STEPS", {}), \
+        with mock.patch.object(sc, "load", lambda build_dir, jobs: page([dep("economy", "orders")])), fixed(), \
                 contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             code = sc.main(args + ["--doc", str(doc)])
         return code, out.getvalue() + err.getvalue()

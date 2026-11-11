@@ -46,6 +46,7 @@ SLOT_REASON = re.compile(r"^(?:seam slot filled by InstallNativeSeams|slot of th
                          r" \([^)]*\)), (\w+)::(\w+),")
 CONTROL = {"IfStmt": 0, "WhileStmt": 0, "SwitchStmt": 0, "DoStmt": 1, "ForStmt": 2}
 BRANCHING = {"IfStmt", "WhileStmt", "SwitchStmt", "DoStmt", "ForStmt", "ConditionalOperator"}
+PLAIN_POINTEES = {"int", "short", "char", "long", "float", "double", "bool"}
 CONSTRUCTS = {"CXXConstructExpr", "CXXTemporaryObjectExpr"}
 WRAPPERS = {"ExprWithCleanups", "ParenExpr", "CStyleCastExpr", "ImplicitCastExpr", "CXXBindTemporaryExpr",
             "MaterializeTemporaryExpr"}
@@ -74,6 +75,10 @@ class OrderWalker(rwsets.Walker):
         self.stack: list[dict] = []
         self.pending: dict | None = None
         self.branches = 0
+        self.local_field: str | None = None
+        self.deferred: list[list] = []
+        parts = name.split("::")
+        self.constructor = len(parts) > 1 and parts[-1] == parts[-2]
 
     def visit(self, node: dict, mode: str = "R") -> None:
         if node.get("kind") in BRANCHING or (node.get("kind") == "BinaryOperator" and node.get("opcode") in ("&&", "||")):
@@ -82,17 +87,85 @@ class OrderWalker(rwsets.Walker):
             name = re.sub(r"^(?:const |struct |class )+", "", node.get("type", {}).get("qualType", ""))
             if re.fullmatch(r"\w+(?:::\w+)*", name):
                 self.calls.append([node["_line"], "call", "%s::%s" % (name, name.split("::")[-1]), False, id(node)])
+        assigns = node.get("kind") == "CompoundAssignOperator" or (node.get("kind") == "BinaryOperator"
+                                                                    and node.get("opcode") == "=")
+        if assigns:
+            self.deferred.append([])
         self.stack.append(node)
         try:
             super().visit(node, mode)
         finally:
             self.stack.pop()
+            if assigns:
+                self.calls += self.deferred.pop()
 
     def record(self, kind: str, target: str) -> None:
         super().record(kind, target)
         if kind in ("call", "indirect_call") and self.pending is not None:
             node, self.pending = self.pending, None
-            self.calls.append([node["_line"], kind, target, self.used(node), id(node)])
+            self.calls.append([node["_line"], kind, target, self.used(node) or self.out_argument(node), id(node)])
+
+    def access(self, category: str, target: str, mode: str) -> None:
+        if category == "field" and target == self.local_field:
+            return
+        super().access(category, target, mode)
+        if category in ("field", "global") and not (category == "global" and target.split("@")[0] == rwsets.SIM_POINTER):
+            line = next((n["_line"] for n in reversed(self.stack) if "_line" in n), 0)
+            for suffix in rwsets.MODE_KINDS[mode]:
+                into = self.deferred[-1] if self.deferred and suffix in ("write", "maybe_written") else self.calls
+                into.append([line, "%s_%s" % (category, suffix), target, False, None])
+
+    def lvalue(self, node: dict, mode: str, path: bool = False) -> None:
+        if node["kind"] != "MemberExpr" or path or rwsets.sim_global(node) or not self.local_object(node):
+            super().lvalue(node, mode, path)
+            return
+        base = node.get("inner", [{}])[0]
+        outer, self.local_field = self.local_field, "%s::%s" % (rwsets.record_name(base.get("type", {})),
+                                                                node.get("name") or "<anon>")
+        try:
+            super().lvalue(node, mode, path)
+        finally:
+            self.local_field = outer
+
+    def local_object(self, node: dict) -> bool:
+        """Whether a field access lands in a local object of the function, or in the object a constructor builds."""
+        while True:
+            kind = node.get("kind")
+            inner = node.get("inner", [])
+            if kind == "MemberExpr" and inner:
+                if node.get("isArrow"):
+                    root = rwsets.strip(inner[0])
+                    return root.get("kind") == "CXXThisExpr" and self.constructor
+                node = inner[0]
+            elif kind in ("ParenExpr", "ImplicitCastExpr", "ArraySubscriptExpr") and inner:
+                node = inner[0]
+            elif kind == "DeclRefExpr":
+                ref = node.get("referencedDecl", {})
+                if ref.get("kind") not in ("VarDecl", "ParmVarDecl") or ref.get("id") not in self.locals:
+                    return False
+                return self.locals[ref["id"]] is None and not rwsets.type_text(ref.get("type", {})).strip().endswith("&")
+            else:
+                return False
+
+    @staticmethod
+    def out_argument(node: dict) -> bool:
+        """Whether a call hands back a value through an argument: the address of an object, an array, or a pointer to a
+        non-const plain value."""
+        if node.get("kind") not in ("CallExpr", "CXXMemberCallExpr"):
+            return False
+        for arg in node.get("inner", [])[1:]:
+            arg_type = arg.get("type", {})
+            if not rwsets.is_pointer(arg_type) or rwsets.pointee_const(arg_type):
+                continue
+            inner = rwsets.strip(arg)
+            if inner.get("kind") == "UnaryOperator" and inner.get("opcode") == "&":
+                return True
+            if arg.get("kind") == "ImplicitCastExpr" and arg.get("castKind") == "ArrayToPointerDecay":
+                return True
+            pointee = re.sub(r"^(?:struct |class |unsigned |signed )+", "", rwsets.type_text(arg_type)).rstrip(" *")
+            if pointee in PLAIN_POINTEES or pointee in VALUE_TYPES or pointee.startswith("std::"):
+                return True
+        return False
 
     def used(self, node: dict) -> bool:
         """Whether the value of a call is used: false when the call is a statement of its own or cast to void."""
@@ -209,7 +282,7 @@ def file_marks(text: str) -> list[Mark]:
     for number, line in enumerate(clean.split("\n"), 1):
         m = PASS_MARK.search(line)
         if m:
-            marks.append(Mark("pass", number, ends[number], m.group(1).lower()))
+            marks.append(Mark("pass", number, ends[number], m.group(1).lower().replace("_", ".", 1)))
         if ENTITY_MARK.search(line):
             marks.append(Mark("entity", number, ends[number]))
         m = PHASE_MARK.search(line)
@@ -236,7 +309,7 @@ class Node:
     caller: str = ""
     slot: str = ""
     own: set = field(default_factory=set)
-    children: list = field(default_factory=list)
+    access: str = ""
 
 
 @dataclass
@@ -304,16 +377,37 @@ class Program:
 
     def expand(self, fn: Fn, sub: str, stack: tuple = (), lines: tuple | None = None, own: set | None = None) -> list[Node]:
         """The steps of a function run on behalf of `sub`, with the calls inside `sub` inlined."""
+        return self.expand_cut(fn, sub, stack, lines, own)[0]
+
+    def expand_cut(self, fn: Fn, sub: str, stack: tuple = (), lines: tuple | None = None,
+                   own: set | None = None) -> tuple[list[Node], set]:
+        """The steps, and the functions on the stack whose calls were left out to break a cycle: a result cut by an
+        ancestor is not kept, since the same function reached another way runs those calls."""
         key = (fn.name, fn.file, fn.start, sub)
         if lines is None and key in self.memo:
             if own is not None:
                 own |= self.memo_own[key]
-            return self.memo[key]
+            return self.memo[key], set()
         mine: set = {(fn.name, fn.file, fn.start)}
         out: list[Node] = []
+        cut: set = set()
         stack = stack + (key,)
+
+        def inline(g: Fn) -> None:
+            nonlocal out
+            inner = (g.name, g.file, g.start, sub)
+            if inner in stack:
+                cut.add(inner)
+                return
+            steps, below = self.expand_cut(g, sub, stack, own=mine)
+            out += steps
+            cut.update(below)
+
         for line, kind, target, used in fn.calls:
-            if lines is not None and not lines[0] <= line <= lines[1]:
+            if lines is not None and not any(a <= line <= b for a, b in lines):
+                continue
+            if kind not in ("call", "indirect_call"):
+                out.append(Node("access", target, sub, access=kind))
                 continue
             how, names = self.targets(fn, kind, target)
             if how == "slot":
@@ -322,8 +416,7 @@ class Program:
                 if callee is None or callee == sub:
                     for impl in sorted(self.slots[slot]):
                         for g in self.lookup(impl):
-                            if (g.name, g.file, g.start, sub) not in stack:
-                                out += self.expand(g, sub, stack, own=mine)
+                            inline(g)
                 else:
                     out.append(Node("entry", self.slot_label(slot), callee, used, fn.name, slot))
                 continue
@@ -338,14 +431,15 @@ class Program:
                         out.append(Node("engine", g.name, g.sub, used, fn.name))
                     elif g.sub in SIMS and g.sub != sub:
                         out.append(Node("direct", g.name, g.sub, used, fn.name))
-                    elif (g.name, g.file, g.start, sub) not in stack:
-                        out += self.expand(g, sub, stack, own=mine)
-        if lines is None:
+                    else:
+                        inline(g)
+        cut.discard(key)
+        if lines is None and not cut:
             self.memo[key] = out
             self.memo_own[key] = mine
         if own is not None:
             own |= mine
-        return out
+        return out, cut
 
     def slot_label(self, slot: str) -> str:
         struct, name = slot.split("::")
@@ -396,10 +490,10 @@ class Program:
 
 @dataclass
 class Part:
-    """A run of one pass: the work before its loops, one loop's entity, or the work after."""
+    """A run of one pass: the work before its loops, one loop's entity, between two loops, or the work after."""
     kind: str
     index: int
-    lines: tuple[int, int]
+    lines: list
     steps: list
     own: set
 
@@ -411,41 +505,87 @@ class Pass:
     holder: str
     sub: str
     parts: list
+    parent: str = ""
+    depth: int = 0
 
 
-def pass_parts(program: Program, fn: Fn, sub: str, name: str) -> list[Part]:
-    """The parts of a pass function: before the first loop, each entity, between and after."""
-    marks = program.marks_in(fn)
-    entities = [m for m in marks if m.kind == "entity"]
-    begin = next(m.line for m in marks if m.kind == "pass" and m.name == name)
-    end = next(m.end for m in marks if m.kind == "pass" and m.name == name)
-    parts: list[Part] = []
+def segments(begin: int, end: int, inner: list[Mark]) -> tuple[list, list]:
+    """The line ranges of begin..end outside the inner passes, and the inner passes in it, each at its place: a list
+    of ('lines', (a, b)) and ('pass', mark)."""
+    out: list = []
     cursor = begin
-    for i, e in enumerate(entities, 1):
-        loop_start = cursor
-        if e.line > cursor:
-            parts.append(("between" if parts else "before", i - 1, (cursor, e.line - 1)))
-        parts.append(("entity", i, (e.line, e.end)))
-        cursor = e.end + 1
-        del loop_start
+    for m in sorted(inner, key=lambda m: m.line):
+        if m.line < begin or m.end > end:
+            continue
+        if m.line > cursor:
+            out.append(("lines", (cursor, m.line - 1)))
+        out.append(("pass", m))
+        cursor = m.end + 1
     if cursor <= end:
-        parts.append(("after", len(entities), (cursor, end)))
-    out = []
-    for kind, index, lines in parts:
-        own: set = set()
-        steps = program.expand(fn, sub, lines=lines, own=own)
-        out.append(Part(kind, index, lines, steps, own))
+        out.append(("lines", (cursor, end)))
+    return out, [m for kind, m in out if kind == "pass"]
+
+
+def part_steps(program: Program, fn: Fn, sub: str, pieces: list, own: set) -> list[Node]:
+    steps: list[Node] = []
+    for kind, value in pieces:
+        if kind == "pass":
+            steps.append(Node("pass", value.name, sub))
+        else:
+            steps += program.expand(fn, sub, lines=[value], own=own)
+    return steps
+
+
+def pass_tree(program: Program, fn: Fn, sub: str, phase: str, holder: str) -> list[Pass]:
+    """The passes a pass function marks, outermost first, each with its parts; an inner pass is a step of the part
+    of its parent that holds it."""
+    marks = program.marks_in(fn)
+    scopes = [m for m in marks if m.kind == "pass"]
+    entities = [m for m in marks if m.kind == "entity"]
+
+    def inside(m: Mark, outer: Mark) -> bool:
+        return m is not outer and outer.line <= m.line and m.end <= outer.end
+
+    def parent(m: Mark) -> Mark | None:
+        holders = [o for o in scopes if inside(m, o)]
+        return max(holders, key=lambda o: o.line) if holders else None
+
+    out: list[Pass] = []
+
+    def visit(scope: Mark, depth: int) -> None:
+        children = [m for m in scopes if parent(m) is scope]
+        own_entities = [e for e in entities if scope.line <= e.line <= scope.end
+                        and not any(c.line <= e.line <= c.end for c in children)]
+        pieces: list = []
+        cursor = scope.line
+        for i, e in enumerate(own_entities, 1):
+            if e.line > cursor:
+                pieces.append(("between" if pieces else "before", i - 1, (cursor, e.line - 1)))
+            pieces.append(("entity", i, (e.line, e.end)))
+            cursor = e.end + 1
+        if cursor <= scope.end:
+            pieces.append(("after" if own_entities else "steps", len(own_entities), (cursor, scope.end)))
+        parts = []
+        for kind, index, (a, b) in pieces:
+            split, _ = segments(a, b, children)
+            own: set = set()
+            parts.append(Part(kind, index, [v for k, v in split if k == "lines"], part_steps(program, fn, sub, split, own),
+                              own))
+        up = parent(scope)
+        out.append(Pass(scope.name, phase, holder, sub, parts, up.name if up else "", depth))
+        for child in sorted(children, key=lambda m: m.line):
+            visit(child, depth + 1)
+
+    for top in [m for m in scopes if parent(m) is None]:
+        visit(top, 0)
     return out
 
 
-def find_pass(program: Program, own: set) -> tuple[Fn, str] | None:
+def find_pass(program: Program, own: set) -> Fn | None:
     for key in sorted(own):
         f = program.fn_of(key)
-        if f is None:
-            continue
-        names = [m.name for m in program.marks_in(f) if m.kind == "pass"]
-        if names:
-            return f, names[0]
+        if f is not None and any(m.kind == "pass" for m in program.marks_in(f)):
+            return f
     return None
 
 
@@ -456,18 +596,17 @@ def build(program: Program) -> dict:
     passes = []
     for phase in PHASES:
         own: set = set()
-        steps = program.expand(tick, "game", lines=ranges[phase], own=own)
+        steps = program.expand(tick, "game", lines=[ranges[phase]], own=own)
         phases.append((phase, steps))
         if phase == "tail":
-            passes.append(Pass("tail", phase, "", "game", [Part("steps", 0, ranges[phase], steps, own)]))
+            passes.append(Pass("tail", phase, "", "game", [Part("steps", 0, [ranges[phase]], steps, own)]))
             continue
         for step in steps:
             if step.kind != "entry":
                 continue
-            found = find_pass(program, program.entry(step.slot)[1])
-            if found:
-                fn, name = found
-                passes.append(Pass(name, phase, step.label, step.sub, pass_parts(program, fn, step.sub, name)))
+            fn = find_pass(program, program.entry(step.slot)[1])
+            if fn is not None:
+                passes += pass_tree(program, fn, step.sub, phase, step.label)
     return {"phases": phases, "passes": passes}
 
 
@@ -504,6 +643,9 @@ class Effects:
         for n in steps:
             if n.kind == "effect":
                 writes = True
+            elif n.kind == "direct":
+                writes = writes or any(state_write(i) for f in self.program.lookup(n.label) if f.sub == n.sub
+                                       for i in f.items)
             elif n.kind == "entry" and n.slot not in stack and n.slot != slot:
                 w, s = self.reach(n.slot, stack + (slot,))
                 writes = writes or w
@@ -517,7 +659,21 @@ class Effects:
         steps, own = self.program.entry(slot)
         fns = [self.program.fn_of(k) for k in own]
         body = [f for f in fns if f is not None and f.sub not in ("seams",)]
-        return not steps and len(body) <= 1 and all(f.branches == 0 for f in body)
+        calls = [n for n in steps if n.kind in ("entry", "effect", "direct", "engine")]
+        return not calls and len(body) <= 1 and all(f.branches == 0 for f in body)
+
+    def silent(self, slot: str) -> bool:
+        """An entry point in which nothing is seen to change: no write of any kind (through pointers and to plain values
+        included), no draw and no sim event, nested entry points included."""
+        _, slots = self.reach(slot)
+        for s in slots:
+            steps, own = self.program.entry(s)
+            if any(n.kind == "effect" for n in steps):
+                return False
+            if any(k.endswith(("_write", "_maybe_written")) or (k, t) in ALLOCATIONS
+                   for k, t in self.program.items_of(own)):
+                return False
+        return True
 
     def classify(self, node: Node) -> str:
         writes, _ = self.reach(node.slot)
@@ -530,20 +686,28 @@ class Effects:
 
 @dataclass
 class Placement:
-    """Where an immediate edge falls: the kind of split, the part and entry point it is in, and the steps around it."""
+    """Where an immediate edge falls: the kind, the part (and entry point) it is in, the writer's and reader's steps
+    with their positions in that list, the writer's step when it also reaches a read (the split may lie in it), and
+    for a write by the caller the last step listed before it."""
     kind: str
     where: str
     first: str = ""
     second: str = ""
     by_subsystem: bool = False
+    first_at: int = 0
+    second_at: int = 0
+    inside: str = ""
+    first_after: int = 0
 
 
 class Splits:
-    """Places each immediate edge in the orders: the first write before a read, inside one part of a pass."""
+    """Places each immediate edge in the orders: the first write before a later read, inside one part of a pass."""
 
     def __init__(self, program: Program):
         self.program = program
         self.memo: dict[tuple, bool] = {}
+        self.closures: dict[str, list[str]] = {}
+        self.lists: dict[tuple, tuple] = {}
         targets: set = set()
         for fns in program.fns.values():
             for f in fns:
@@ -551,7 +715,7 @@ class Splits:
         self.targets = targets
 
     def matcher(self, item: str, loose: bool = False):
-        """A test on (kind, target) rows for the item, or None when no row of any function can name it (or `loose`)."""
+        """A test on access targets for the item, or None when no function can name it (or `loose`)."""
         if loose or ": " in item or item.startswith(("rng.", "unresolved:")):
             return None
         if "::" in item:
@@ -562,64 +726,142 @@ class Splits:
     def hits(self, sub: str, own: set, who: str, match, write: bool) -> bool:
         if sub != who:
             return False
-        if match is None:
-            return True
         kinds = WRITE_KINDS if write else READ_KINDS
-        return any(k in kinds and match(t) for k, t in self.program.items_of(own))
+        rows = [(k, t) for k, t in self.program.items_of(own) if k in kinds]
+        if write:
+            rows = [r for r in rows if state_write(r)]
+        return any(match is None or match(t) for _, t in rows)
 
-    def reach(self, slot: str, who: str, item: str, match, write: bool, stack: tuple = ()) -> bool:
+    def closure(self, slot: str) -> list[str]:
+        """The entry point and every entry point it reaches, nested ones included."""
+        if slot not in self.closures:
+            seen = [slot]
+            todo = [slot]
+            while todo:
+                for n in self.program.entry(todo.pop())[0]:
+                    if n.kind == "entry" and n.slot not in seen:
+                        seen.append(n.slot)
+                        todo.append(n.slot)
+            self.closures[slot] = seen
+        return self.closures[slot]
+
+    def reach(self, slot: str, who: str, item: str, match, write: bool) -> bool:
+        """Whether the entry point, or one it reaches, is the writer's write (or the reader's read) of the item."""
         key = (slot, who, item if match is not None else "", write)
-        if key in self.memo:
-            return self.memo[key]
-        steps, own = self.program.entry(slot)
-        sub = self.program.seam_owner[slot.split("::")[0]]
-        found = self.hits(sub, own, who, match, write) or any(
-            self.reach(n.slot, who, item, match, write, stack + (slot,))
-            for n in steps if n.kind == "entry" and n.slot not in stack and n.slot != slot)
-        if not stack:
+        if key not in self.memo:
+            found = False
+            for s in self.closure(slot):
+                own_key = ("own", s, who, item if match is not None else "", write)
+                if own_key not in self.memo:
+                    sub = self.program.seam_owner[s.split("::")[0]]
+                    self.memo[own_key] = self.hits(sub, self.program.entry(s)[1], who, match, write)
+                if self.memo[own_key]:
+                    found = True
+                    break
             self.memo[key] = found
-        return found
+        return self.memo[key]
 
-    def locate(self, where: str, steps: list, own: set, sub: str, writer: str, reader: str, item: str,
+    def locate(self, where: str, steps: list, sub: str, writer: str, reader: str, item: str,
                stack: tuple = (), loose: bool = False) -> Placement | None:
-        """The first place in these steps, or nested in one of them, where the writer's write comes before the reader's read."""
+        """The first write of the writer, in these steps or nested in one of them, followed by a read of the reader."""
         match = self.matcher(item, loose)
-        entries = [n for n in steps if n.kind == "entry"]
-        w = [i for i, n in enumerate(entries) if self.reach(n.slot, writer, item, match, True)]
-        r = [i for i, n in enumerate(entries) if self.reach(n.slot, reader, item, match, False)]
         loose = match is None
-        if w and r and w[0] < r[-1]:
-            j = next(j for j in r if j > w[0])
-            return Placement("split", where, entries[w[0]].label, entries[j].label, loose)
-        if w and self.hits(sub, own, reader, match, False):
-            return Placement("apply", where, entries[w[0]].label, "", loose)
-        if r and self.hits(sub, own, writer, match, True):
-            return Placement("before", where, "", entries[r[0]].label, loose)
-        for n in entries:
-            if n.slot in stack:
+        writes = []
+        reads = []
+        for i, n in self.entries_of(steps):
+            if self.reach(n.slot, writer, item, match, True):
+                writes.append(i)
+            if self.reach(n.slot, reader, item, match, False):
+                reads.append(i)
+        table = self.accesses_of(steps)
+        for who, write, into in ((writer, True, writes), (reader, False, reads)):
+            if sub == who:
+                for target, where_at in table["write" if write else "read"].items():
+                    if match is None or match(target):
+                        into += where_at
+        writes.sort()
+        reads.sort()
+        for w in writes:
+            later = [r for r in reads if r > w]
+            if not later:
                 continue
-            if self.reach(n.slot, writer, item, match, True) and self.reach(n.slot, reader, item, match, False):
-                inner_steps, inner_own = self.program.entry(n.slot)
-                found = self.locate("%s, in %s" % (where, code(n.label)), inner_steps, inner_own, n.sub, writer, reader, item, stack + (n.slot,), loose)
+            r = later[0]
+            first, second = steps[w], steps[r]
+            kind = {("entry", "entry"): "split", ("entry", "access"): "apply", ("access", "entry"): "before"}.get(
+                (first.kind, second.kind))
+            if kind is None:
+                continue
+            inside = first.label if first.kind == "entry" and w in reads else ""
+            return Placement(kind, where, first.label if first.kind == "entry" else "",
+                             second.label if second.kind == "entry" else "", loose,
+                             self.position(steps, w), self.position(steps, r), inside,
+                             self.listed(steps, w) if first.kind == "access" else 0)
+        for i in writes:
+            n = steps[i]
+            if n.kind == "entry" and i in reads and n.slot not in stack:
+                inner, _ = self.program.entry(n.slot)
+                found = self.locate("%s, in %s" % (where, code(n.label)), inner, n.sub, writer, reader, item,
+                                    stack + (n.slot,), loose)
                 if found:
                     return found
         return None
 
-    def order(self, steps: list, own: set, sub: str, writer: str, reader: str, item: str, loose: bool = False) -> str:
-        """`reader-first` when the steps reach both sides but the reader first only, `absent` when they reach one side or none."""
-        match = self.matcher(item, loose)
-        entries = [n for n in steps if n.kind == "entry"]
-        w = [i for i, n in enumerate(entries) if self.reach(n.slot, writer, item, match, True)] + \
-            ([-1] if self.hits(sub, own, writer, match, True) else [])
-        r = [i for i, n in enumerate(entries) if self.reach(n.slot, reader, item, match, False)] + \
-            ([-1] if self.hits(sub, own, reader, match, False) else [])
-        if w and r:
-            return "reader-first"
-        return "absent"
+    def entries_of(self, steps: list) -> list:
+        key = ("entries", id(steps))
+        if key not in self.lists:
+            self.lists[key] = (steps, [(i, n) for i, n in enumerate(steps) if n.kind == "entry"])
+        return self.lists[key][1]
+
+    def accesses_of(self, steps: list) -> dict:
+        """The positions of the state writes and the reads among the steps, by the item they touch."""
+        key = ("accesses", id(steps))
+        if key not in self.lists:
+            table: dict = {"write": defaultdict(list), "read": defaultdict(list)}
+            for i, n in enumerate(steps):
+                if n.kind != "access":
+                    continue
+                if n.access in WRITE_KINDS and state_write((n.access, n.label)):
+                    table["write"][n.label].append(i)
+                elif n.access in READ_KINDS:
+                    table["read"][n.label].append(i)
+            self.lists[key] = (steps, table)
+        return self.lists[key][1]
+
+    def across(self, where: str, steps: list, writer: str, reader: str, item: str) -> Placement | None:
+        """An entity whose steps write the item only after every read of it: the read is in a later entity."""
+        match = self.matcher(item)
+        for loose in ((match is None,) if match is None else (False, True)):
+            m = None if loose else match
+            entries = [(i, n) for i, n in enumerate(steps) if n.kind == "entry"]
+            writes = [i for i, n in entries if self.reach(n.slot, writer, item, m, True)]
+            reads = [i for i, n in entries if self.reach(n.slot, reader, item, m, False)]
+            if writes and reads and reads[-1] <= writes[0]:
+                return Placement("across", where, steps[writes[0]].label, steps[reads[0]].label, loose,
+                                 self.position(steps, writes[0]), self.position(steps, reads[0]))
+        return None
+
+    @staticmethod
+    def listed(steps: list, index: int) -> int:
+        """How many steps the part's list shows up to this point."""
+        return len({(n.kind, n.label) for n in steps[:index + 1] if n.kind in ("entry", "effect", "direct")})
+
+    @staticmethod
+    def position(steps: list, index: int) -> int:
+        """The number of the step in the part's list as the page shows it: entry points, draws and sim events, each
+        listed where it first occurs (1 up)."""
+        seen: list = []
+        for n in steps[:index + 1]:
+            if n.kind in ("entry", "effect", "direct") and (n.kind, n.label) not in seen:
+                seen.append((n.kind, n.label))
+        target = steps[index]
+        if target.kind != "entry":
+            return 0
+        return seen.index((target.kind, target.label)) + 1
 
 
 CLASSES = ["view read", "query", "intent", "mixed"]
-PLACEMENTS = {"split": "split", "apply": "apply before continuing", "before": "write before calling"}
+PLACEMENTS = {"split": "split", "apply": "apply before continuing", "before": "write before calling",
+              "across": "across entities"}
 TICK_STEPS = {
     "HandleNetPackets": "the network packets received since the last tick are applied (network play only: a test-mode run "
                         "does not run this phase)",
@@ -631,47 +873,74 @@ TICK_STEPS = {
 }
 TICK_HIDDEN = {"AccumulateProfileTime"}
 LOOPS = {
-    ("units", 1): "each unit of each player. The players are taken in slot order, 0 to 9; a player is skipped unless it is "
-                  "active, its type is 1, 2 or 3 and its index is not 10. Within a player, its unit slots are taken from the "
-                  "first to the last in index order, and a slot is visited when it holds a unit (its type index is not 0).",
+    ("units.players", 1): "each player, in slot order from 0 to 9; a player is skipped unless it is active, its type is "
+                          "1, 2 or 3 and its index is not 10.",
+    ("units", 1): "each unit slot of the player, from the first to the last in index order; a slot is visited when it "
+                  "holds a unit (its type index is not 0).",
     ("projectiles", 1): "each projectile slot, in index order, from 0 to the count of projectiles as it was when the pass "
                         "began. Projectiles that the pass adds are not visited in the same pass.",
-    ("explosions", 1): "each of the 100 slots of the exploded pieces, in index order; an empty slot does nothing.",
-    ("explosions", 2): "each debris record, in index order, from 0 up to the count of debris records.",
+    ("explosions.pieces", 1): "each of the 100 slots of the exploded pieces, in index order; an empty slot does nothing.",
+    ("explosions.debris", 1): "each debris record, in index order, from 0 up to the count of debris records.",
     ("players", 1): "each player slot, in slot order from 0 to 9; a player is skipped unless it is active, its type is 1, "
                     "2 or 3 and its index is not 10.",
-    ("features", 1): "each record of the list of burning and animated features, from the head of the used list along its "
-                     "links.",
+    ("players.los", 1): "each unit slot of the player, from the first to the last in index order, whether or not it "
+                        "holds a unit.",
+    ("features.anim", 1): "each feature type, in index order, from 0 to the count of feature types.",
+    ("features.anim", 2): "the map scan, once per pass: the scan index steps down one cell (from the first cell it "
+                          "wraps to the last), and the feature on the scanned cell may seed another nearby.",
+    ("features", 1): "each record of the list of burning and animated features, from the head of the used list along "
+                     "its links.",
     ("wind", 1): "the wind once per tick: the pass has one entity.",
     ("meteors", 1): "the meteor shower once per tick: the pass has one entity.",
+}
+SILENT_INTENTS = {
+    "pathfinding.CellsChanged": "a notification: what it does is left to the implementation, and the reference's does "
+                                "nothing.",
+    "units.FindScript": "a lookup whose value the caller discards: it has no effect.",
+    "orders.DestroyMotionObject": "it writes through a virtual call whose targets are not resolved.",
+    "players.NotifyUnitCreated": "it writes through a virtual call whose targets are not resolved.",
+    "players.NotifyUnitDied": "it writes through a virtual call whose targets are not resolved.",
+    "weapons.WeaponAimCobComplete": "it writes through a virtual call whose targets are not resolved.",
 }
 LIMITS = """\
 The orders are read from the program, not from a run. That decides what they claim:
 
 - **Program order.** A step is listed where its call stands. The conditions around a call are left out: a step runs
   only when its conditions hold, and a call in a loop, or reached on several paths, can run more than once. A list
-  names each step once, where it first occurs.
+  names each step once, where it first occurs; the split points give a step by its number in that list, and say
+  `again, after step n` (or `again, after the write`) when the call that matters is a later call of a step listed
+  earlier. A write by the caller is placed by the steps listed before it.
 - **Nested calls** are followed through everything the subsystem runs itself, through the virtual calls and function
-  pointers whose targets are known, and through the engine's shared helpers. Calls into presentation, network and file
-  code are left out of the lists, and so is the test harness.
+  pointers whose targets are known, and through the engine's shared helpers. A call is followed into every function
+  of its name, overloads included, so a list can hold steps (and a class count writes) that one call does not run.
+  Calls into presentation, network and file code are left out of the lists, and so is the test harness.
+- **Values.** The caller uses a call's value when it uses the value returned, or when it hands the call the address
+  of an object, an array or a pointer to a plain value to fill in.
 - **Writes**, for the classes, are the writes to a field of a record or to a variable of the game that the program
-  shows, anywhere in what a call runs (nested entry points included), and random draws and sim events. Writes to the
-  fields of plain values (positions, points, fixed-point numbers) are not counted, because a local value and one in
-  the state look alike there, and neither are writes through a bare pointer. A call whose value is used and that
-  writes state only in those ways is classed as a view read or a query.
+  shows, anywhere in what a call runs (nested entry points and calls outside an interface included), and allocations,
+  random draws and sim events. Writes to a local object of the function, or to the object a constructor builds, are
+  not counted, and neither are writes to the fields of plain values (positions, points, fixed-point numbers) through
+  a pointer, nor other writes through a bare pointer. A call whose value is used and that writes state only in those
+  ways is classed as a view read or a query; an intent in which no write of any kind is found is listed under
+  Intents with no write found.
 - **Split points** place each `immediate` row of coupling/dependencies.csv (the access log, run on the scenario
-  suite) at the first step that writes its item before a later step that reads it. Where the program names the item,
-  the two steps must touch it. Where it does not (a region of the game record, an allocation, or an item reached under
-  another name), or no such pair of steps is found, the row is placed by subsystem: at the first step of the writer
-  before a later step of the reader. Those rows are marked `by subsystem`; the split they name is the earliest one that
-  can be needed.
-- **Across entities.** The column `across` counts the rows of a group whose item an earlier entity of the same pass
-  wrote and a later one read (coupling/pass_reads.csv). Such a row needs the order of the entities, which the
-  scheduler keeps, and may need no split inside the entity.
+  suite) at the first step of the writer that reaches a write of its item and is followed by a step of the reader that
+  reaches a read of it, in one list (the code of the list's own subsystem counts as `the caller`). Where the program
+  names the item, the two steps must touch it. Where it does not (a region of the game record, an allocation, or an
+  item reached under another name), or no such pair is found, the row is matched by subsystem: the writer's first step
+  that writes anything, and the reader's next step that reads anything. A row matched by subsystem says where a
+  split can be, not where it must be.
+- **Inside a step.** When the writer's step also reaches a read of the item by the reader, the write and the read can
+  both lie inside that step, and the split may be needed there instead: the row names the step under `may split
+  inside`. The search goes inside a step only when its list holds no pair.
+- **Across entities.** A row placed `across entities` has every step of the reader before the writer's first step
+  in one entity's list, or in that step with no write of the writer followed by a read: the read is in a later
+  entity, whose order the scheduler keeps, and no split inside the entity is needed. The column `across` counts the
+  rows of a group whose item an earlier entity of the same pass wrote and a later one read (coupling/pass_reads.csv).
 """
 
 
-def distinct(nodes: list, kinds=("entry", "effect", "direct")) -> list:
+def distinct(nodes: list, kinds=("entry", "effect", "direct", "pass")) -> list:
     """The steps of these kinds, each once, in the order they first occur."""
     out: dict[tuple, Node] = {}
     for n in nodes:
@@ -729,11 +998,16 @@ class Page:
 
     def place(self, d: dict) -> Placement | None:
         parts = [(p, part) for p in self.built["passes"] if p.phase == d["phase"] for part in p.parts]
-        parts.sort(key=lambda x: x[1].kind != "entity")
+        parts.sort(key=lambda x: (x[1].kind != "entity", -x[0].depth))
         for loose in (False, True):
             for p, part in parts:
-                found = self.splits.locate(self.part_name(p, part), part.steps, part.own, p.sub, d["writer"],
-                                           d["reader"], d["item"], loose=loose)
+                found = self.splits.locate(self.part_name(p, part), part.steps, p.sub, d["writer"], d["reader"],
+                                           d["item"], loose=loose)
+                if found:
+                    return found
+        for p, part in parts:
+            if part.kind == "entity":
+                found = self.splits.across(self.part_name(p, part), part.steps, d["writer"], d["reader"], d["item"])
                 if found:
                     return found
         return None
@@ -748,13 +1022,6 @@ class Page:
             return "%s, between loops %d and %d" % (p.name, part.index, part.index + 1)
         return "%s, %s the loop%s" % (p.name, part.kind, "s" if loops > 1 else "")
 
-    def site_classes(self, label: str, caller: str | None = None) -> list[str]:
-        seen: Counter = Counter()
-        for (who, callee), classes in self.calls.items():
-            if callee == label and caller in (None, who):
-                seen.update(classes)
-        return [c for c in CLASSES if seen[c]]
-
     def steps_list(self, nodes: list, caller: str) -> list[str]:
         items = distinct(nodes)
         if not items:
@@ -768,6 +1035,8 @@ class Page:
                 out.append("1. " + {"draw rng": "a draw from the Park-Miller generator (`rng`)",
                                     "draw crt": "a draw from the C runtime generator (`rng.crtHoldrand`)",
                                     "sim event": "a sim event is recorded"}[n.label])
+            elif n.kind == "pass":
+                out.append("1. the pass %s (below)" % code(n.label))
             else:
                 out.append("1. a call into %s outside its interface" % n.sub)
         return out
@@ -798,7 +1067,8 @@ class Page:
         for d, found in self.placed:
             if found is None:
                 continue
-            key = (d["writer"], d["reader"], found.kind, found.where, found.first, found.second, found.by_subsystem)
+            key = (d["writer"], d["reader"], found.kind, found.where, found.first, found.first_at, found.second,
+                   found.second_at, found.inside, found.by_subsystem, found.first_after)
             out[d["phase"]][key] += 1
             names = {p.name for p in self.built["passes"] if p.phase == d["phase"]}
             if any((name, d["item"], d["reader"]) in self.across for name in names):
@@ -822,7 +1092,7 @@ class Page:
                 continue
             writes[d["writer"]] += 1
             reads[d["reader"]] += 1
-            if ", each entity" in found.where:
+            if ", each entity" in found.where and found.kind != "across":
                 inside[d["writer"]] += 1
                 if d["reader"] != d["writer"]:
                     inside[d["reader"]] += 1
@@ -832,6 +1102,12 @@ class Page:
                         + [str(writes[sub]), str(reads[sub]), str(inside[sub])])
         return rows
 
+    def silent_intents(self) -> list[str]:
+        """The entry points called as intents in which no write of any kind, draw or sim event is found."""
+        labels = {self.program.slot_label(s): s for s in self.reached}
+        return sorted({label for (_, label), classes in self.calls.items()
+                       if classes["intent"] and self.effects.silent(labels[label])})
+
     def unplaced(self) -> list[dict]:
         return [d for d, found in self.placed if found is None]
 
@@ -839,8 +1115,6 @@ class Page:
         """What --check refuses besides a stale page: a step or a pass without its description, or one left over."""
         out = []
         names = {(p.name, part.index) for p in self.built["passes"] for part in p.parts if part.kind == "entity"}
-        names |= {(p.name, 1) for p in self.built["passes"] if p.name != "tail" and not any(
-            part.kind == "entity" for part in p.parts)}
         for key in sorted(names - set(LOOPS)):
             out.append("pass %s, loop %d has no description in LOOPS" % key)
         for key in sorted(set(LOOPS) - names):
@@ -850,6 +1124,13 @@ class Page:
             out.append("the tick calls %s, which TICK_STEPS does not describe" % name)
         for name in sorted(set(TICK_STEPS) - engine):
             out.append("TICK_STEPS describes %s, which the tick does not call" % name)
+        silent = self.silent_intents()
+        for label in silent:
+            if label not in SILENT_INTENTS:
+                out.append("%s is called as an intent but no write is found in it: it may hand back a value the caller "
+                           "uses; class it, or give the reason in SILENT_INTENTS" % label)
+        for label in sorted(set(SILENT_INTENTS) - set(silent)):
+            out.append("SILENT_INTENTS lists %s, which is no intent without a write" % label)
         for d in self.unplaced():
             out.append("no split point for the immediate row %s -> %s, %s, phase %s" % (d["writer"], d["reader"], d["item"],
                                                                                    d["phase"]))
@@ -888,7 +1169,12 @@ def render(page: Page) -> str:
         "  - **apply before continuing:** a step of the writer, read afterwards by the code that called it: the event",
         "    must be applied when the step returns;",
         "  - **write before calling:** the caller wrote the item before calling a step of the reader: its event must be",
-        "    applied before that call.",
+        "    applied before that call;",
+        "  - **across entities:** the reader's steps all come before the writer's in one entity: the read is in a later",
+        "    entity, and the entity order covers it.",
+        "- **A call into a subsystem outside its interface:** a call into code another subsystem owns (a constructor or a",
+        "  helper of its records) that goes through no seam. It has no class; its writes count for the entry point that",
+        "  makes it.",
         "",
         "## The tick",
         "",
@@ -900,11 +1186,13 @@ def render(page: Page) -> str:
     for p in page.built["passes"]:
         if p.name == "tail":
             continue
-        lines += ["### %s" % p.name, "",
-                  "Phase %s, through %s. %s" % (p.phase, code(p.holder), " ".join(
-                      "Loop %d visits %s" % (i, LOOPS[(p.name, i)]) if sum(q.kind == "entity" for q in p.parts) > 1
-                      else "It visits %s" % LOOPS[(p.name, i)]
-                      for i in sorted({q.index for q in p.parts if q.kind == "entity"} or {1}))), ""]
+        loops = sorted({q.index for q in p.parts if q.kind == "entity"})
+        said = " ".join(("Loop %d visits %s" % (i, LOOPS[(p.name, i)]) if len(loops) > 1
+                         else "It visits %s" % LOOPS[(p.name, i)]) for i in loops)
+        where = ("Nested in the pass %s, where its lists name it." % code(p.parent) if p.parent
+                 else "Phase %s, through %s." % (p.phase, code(p.holder)))
+        lines += ["### %s" % p.name, "", (where + " " + (said or "It has no loop of its own: it runs the passes it "
+                                                          "names, in order.")).strip(), ""]
         for part in p.parts:
             title = page.part_name(p, part).split(", ", 1)[1]
             lines += ["%s:" % (title[0].upper() + title[1:]), ""] + page.steps_list(part.steps, p.sub) + [""]
@@ -920,6 +1208,10 @@ def render(page: Page) -> str:
         if not distinct(steps):
             continue
         lines += ["### %s" % code(page.program.slot_label(slot)), ""] + page.steps_list(steps, sub) + [""]
+    lines += ["## Intents with no write found", "",
+              "Entry points called as intents in which nothing is seen to change (Limits), with the reason.", ""]
+    lines += table(["entry point", "why"], [[code(label), SILENT_INTENTS[label]] for label in page.silent_intents()
+                                           if label in SILENT_INTENTS]) + [""]
     lines += ["## Cross-subsystem calls", "",
               "Every call from one subsystem to another's entry point that a tick reaches, with the classes of its call",
               "sites (one caller can use the value at one site and not at another). The tick itself calls the passes and",
@@ -939,11 +1231,25 @@ def render(page: Page) -> str:
             continue
         lines += ["### Phase %s" % phase, ""]
         rows = []
-        for (writer, reader, kind, where, first, second, loose), n, across in groups[phase]:
-            read = ("a later " if second == first else "") + code(second) if second else "the caller"
-            rows.append([writer, reader, where, PLACEMENTS[kind], code(first) if first else "the caller", read, "by subsystem" if loose else "by item", str(n),
-                         str(across)])
-        lines += table(["writer", "reader", "place", "split", "write in", "read in", "matched", "rows", "across"], rows)
+        for (writer, reader, kind, where, first, first_at, second, second_at, inside, loose, after), n, across in \
+                groups[phase]:
+            if first:
+                write = "%s (step %d)" % (code(first), first_at)
+            else:
+                write = "the caller, after step %d" % after if after else "the caller, before the first step"
+            anchor = first_at or after
+            if not second:
+                read = "the caller"
+            elif second_at > anchor or kind == "across":
+                read = "%s (step %d)" % (code(second), second_at)
+            elif first:
+                read = "%s again, after step %d" % (code(second), first_at)
+            else:
+                read = "%s again, after the write" % code(second)
+            rows.append([writer, reader, where, PLACEMENTS[kind], write, read, code(inside) if inside else "",
+                         "by subsystem" if loose else "by item", str(n), str(across)])
+        lines += table(["writer", "reader", "place", "split", "write in", "read in", "may split inside", "matched", "rows",
+                        "across"], rows)
         lines += [""]
     lines += ["## By subsystem", "",
               "For each subsystem: the calls it makes to other subsystems' entry points in each class, and the calls it",

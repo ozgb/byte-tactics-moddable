@@ -24,7 +24,19 @@ When it fires:
 
 ## A cycle
 
-Work through these in order. Reviews come first, because the lead waits on them. Stop when a full pass finds nothing to do, and report what you did, the decisions you made, and each issue and pull request waiting on the human.
+Work through these in order, from step 0. Reviews come first after your messages, because the lead waits on them. Stop when a full pass finds nothing to do, and report what you did, the decisions you made, and each issue and pull request waiting on the human.
+
+### 0. Your messages
+
+Read the lead's messages to you on every pass, before anything else. They arrive on the Valkey stream `bt:to-maintainer`: a pull request ready for review, a question, an issue taken.
+
+```sh
+P="$(cat ~/.local/share/bt-valkey/password)"
+valkey-cli -p 6390 -a "$P" --no-auth-warning XRANGE bt:to-maintainer '(<last id you read>' +
+valkey-cli -p 6390 -a "$P" --no-auth-warning XREVRANGE bt:to-maintainer + - COUNT 10    # at the start of a session
+```
+
+Keep the id of the last message you read, and act on each new one in the steps below. To answer, or to tell the lead about a verdict, a merge or a new issue: `valkey-cli -p 6390 -a "$P" --no-auth-warning XADD bt:to-lead '*' from maintainer type <review|merged|decision|issue|note> ref '#N' body 'Maintainer: ...'`. A message doesn't replace GitHub: reviews, labels and decisions still go there.
 
 ### 1. Review pull requests
 

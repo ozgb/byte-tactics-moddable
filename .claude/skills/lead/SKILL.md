@@ -11,7 +11,19 @@ Before the first cycle, check the setup (`AGENTS.md` step 1, and `docs/team.md`,
 
 ## A cycle
 
-Work through these in order, and start again from step 1 after each pass. Issue agents run in the background and you are notified when one returns; wait for that rather than polling. Stop when a full pass finds nothing to do and no issue agent is running, and report what you did, each pull request and its state, and anything waiting on the human.
+Work through these in order, and start again from step 0 after each pass. Issue agents run in the background and you are notified when one returns; wait for that rather than polling. Stop when a full pass finds nothing to do and no issue agent is running, and report what you did, each pull request and its state, and anything waiting on the human.
+
+### 0. Your messages
+
+Read the maintainer's messages to you on every pass, before anything else. They arrive on the Valkey stream `bt:to-lead`, and they often come before GitHub shows the same thing: a new issue first in "Priority now", a review verdict, the human's approval.
+
+```sh
+P="$(cat ~/.local/share/bt-valkey/password)"
+valkey-cli -p 6390 -a "$P" --no-auth-warning XRANGE bt:to-lead '(<last id you read>' +
+valkey-cli -p 6390 -a "$P" --no-auth-warning XREVRANGE bt:to-lead + - COUNT 10    # at the start of a session
+```
+
+Keep the id of the last message you read, and act on each new one in the steps below. To answer, or to tell the maintainer what you took: `valkey-cli -p 6390 -a "$P" --no-auth-warning XADD bt:to-maintainer '*' from lead type <note|done|pause> ref '#N' body 'Lead: ...'`. A message doesn't replace GitHub: reviews, claims and questions for the human still go there.
 
 ### 1. Your pull requests
 

@@ -570,6 +570,26 @@ Order* __stdcall Imp_orders_NewOrder(MissionType a0, Unit* a1, void* a2, int a3,
     return o;
 }
 
+void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "pathfinding.CellsChanged");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    Space(t);
+    ReplayValue(t, a5);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 WindMeteorsSeam g_native_wind_meteors = {
     UpdateWind,
     UpdateMeteors,
@@ -1637,6 +1657,7 @@ TargetingSeam g_import_targeting;
 EconomySeam g_import_economy;
 AiSeam g_import_ai;
 OrdersSeam g_import_orders;
+PathfindingSeam g_import_pathfinding;
 
 void BindSeams()
 {
@@ -1684,6 +1705,8 @@ void BindSeams()
     g_import_orders.MissionTypeFromName = Imp_orders_MissionTypeFromName;
     g_import_orders.AppendOrder = Imp_orders_AppendOrder;
     g_import_orders.NewOrder = Imp_orders_NewOrder;
+    g_seams.pathfinding = &g_import_pathfinding;
+    g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.SpawnProjectile = Imp_weapons_SpawnProjectile;

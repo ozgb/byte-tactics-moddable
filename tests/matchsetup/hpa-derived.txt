@@ -1,0 +1,12 @@
+# The demo pathfinder on Acid Pools (15 movement classes): the engine sizes the block from the region it declares.
+game_seed 883
+crt_seed 1883
+view_seed 2883
+pathfinder hpa
+map Acid Pools
+start_positions fixed
+ticks 120
+player0.controller ai
+player0.side Arm
+player1.controller ai
+player1.side Core

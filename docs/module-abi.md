@@ -56,8 +56,8 @@ any module is loaded. Modules do not create or grow them.
 
 ### 2.1 The memory
 
-- The module imports it as `env.memory`. Its size is `memory_pages` of the manifest (528 pages of
-  65536 bytes in the game manifest, 34603008 bytes). Its minimum and maximum are both
+- The module imports it as `env.memory`. Its size is `memory_pages` of the manifest (4112 pages of
+  65536 bytes in the game manifest, 269484032 bytes: the block's ceiling and the 1 MiB below it). Its minimum and maximum are both
   `memory_pages`, so it never grows and never moves, and an address stays valid for the whole run.
 - A module declares its own minimum in its import. It must be at most `memory_pages`. It must not
   declare a maximum smaller than `memory_pages`. Linking with `--import-memory` and no
@@ -69,10 +69,14 @@ any module is loaded. Modules do not create or grow them.
   | unused, so that address 0 is never an object | below the lowest window (0x10000 in the manifests) | convention |
   | module windows, one per module, `window` bytes each | from each module's `data_base` | `window`, `modules[].data_base` |
   | scratch area, 65536 bytes | 0xF0000 (983040) | `scratch` = `[base, size]` |
-  | the state block, 32 MiB | 0x100000 (1048576) | `block_base`, `block_size` |
+  | the state block, 32 MiB to 256 MiB | 0x100000 (1048576) | `block_base`, `block_size`, `block_max` |
 
-  The block ends exactly at the end of the memory: `block_base + block_size` equals
-  `memory_pages * 65536`.
+  The memory holds the block at its ceiling: `block_base + block_max` equals `memory_pages * 65536`.
+  The block itself is as large as the match needs (`block_size` to `block_max`, a multiple of 65536,
+  `docs/state.md`, "The size of the block"): it starts at `block_base`, the engine tells modules
+  only addresses inside it, and the bytes after its end are never read or written. A module must not
+  assume the block ends at the end of the memory. A manifest without `block_max` has a block of
+  `block_size` bytes only.
 - Windows sit below the scratch area. The loader refuses a window that reaches the scratch base or
   the block base (section 5).
 - **The state block** holds the whole simulation state. The engine allocates and owns it; modules
@@ -262,7 +266,7 @@ manifest per run.
 | `window` | bytes of every module window, more than 0 | loader, required |
 | `table_slots` | table entries of every module range | loader, required |
 | `stack_size` | bytes of every module stack | host and checks (the loader accepts it) |
-| `block_base`, `block_size` | the state block: both or neither | loader |
+| `block_base`, `block_size`, `block_max` | the state block: `block_base` and `block_size` both or neither; `block_max`, optional, at least `block_size` (the default), is the most the block can grow to | loader |
 | `scratch` | `[base, size]` of the scratch area | loader |
 | `majors`, `signatures`, `adapters` | section 10 | loader |
 | `modules` | a non-empty list of module entries | loader, required |
@@ -794,12 +798,12 @@ The values below are read from the files named; they are copied here for orienta
 
 | Name | Game manifest | Fixture manifest |
 | --- | --- | --- |
-| `memory_pages` | 528 | 4 |
+| `memory_pages` | 4112 | 4 |
 | `table_size` | 80 | 64 |
 | `window` | 65536 | 65536 |
 | `table_slots` | 32 | 16 |
 | `stack_size` | 4096 | 4096 |
-| `block_base`, `block_size` | 1048576 (0x100000), 33554432 | none |
+| `block_base`, `block_size`, `block_max` | 1048576 (0x100000), 33554432, 268435456 | none |
 | `scratch` | `[983040, 65536]` (0xF0000) | none |
 | `build_flags` | `-mno-nontrapping-fptoint` | none |
 | `fuel` | version 1 | none |

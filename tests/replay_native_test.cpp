@@ -2385,7 +2385,10 @@ void ObjectSelfTest()
     Unit* a = &pool[2];
     Unit* m = &pool[3];
     Unit* b = &pool[5];
-    UnitDef* def = (UnitDef*)SimAlloc(sizeof(UnitDef));
+    UnitDef* defs = (UnitDef*)SimAlloc(2 * (unsigned)sizeof(UnitDef));
+    g_game->defs = defs;
+    g_game->unitDefCount = 2;
+    UnitDef* def = &defs[1];
     player->active = 1;
     player->id = 7;
     player->energy = 1500.5f;
@@ -4145,10 +4148,13 @@ void MaskedViewSelfTest()
     ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
     FixtureView* view = (FixtureView*)SimAlloc(sizeof(FixtureView));
     FrameTable* frames = (FrameTable*)SimAlloc(sizeof(FrameTable));
-    UnitDef* def = (UnitDef*)SimAlloc(sizeof(UnitDef));
+    UnitDef* defs = (UnitDef*)SimAlloc(2 * (unsigned)sizeof(UnitDef));
+    g_game->defs = defs;
+    g_game->unitDefCount = 2;
+    UnitDef* def = &defs[1];
     memset((void*)view, 0, sizeof(FixtureView));
     memset((void*)frames, 0, sizeof(FrameTable));
-    memset((void*)def, 0, sizeof(UnitDef));
+    memset((void*)defs, 0, 2 * sizeof(UnitDef));
     frames->count = 3;
     view->flags = 0x0100;
     view->plain.count = 7;

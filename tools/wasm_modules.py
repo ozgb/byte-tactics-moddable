@@ -510,7 +510,7 @@ def check_window(entry, pins, info, others):
 def check_layout(pins, ranges):
     """Reasons the module ranges (name, low, high) and the scratch range overlap each other or reach the block, or the pages do not hold the block."""
     problems = []
-    base, size = pins["block_base"], pins["block_size"]
+    base, size = pins["block_base"], pins.get("block_max", pins["block_size"])
     scratch_low, scratch_size = pins["scratch"]
     named = list(ranges) + [("scratch", scratch_low, scratch_low + scratch_size)]
     for name, low, high in named:

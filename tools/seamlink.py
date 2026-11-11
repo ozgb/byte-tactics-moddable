@@ -4,6 +4,7 @@
     uv run tools/seamlink.py --objects @build/modern/objects.rsp --summary  # also count per subsystem
     uv run tools/seamlink.py --objects @build/modern/objects.rsp --write    # write data/seam_exceptions.csv
     uv run tools/seamlink.py --objects @build/modern/objects.rsp --check
+    uv run tools/seamlink.py --private-state                                # pathfinding's region, from data/rwsets.csv
     uv run tools/test_seamlink.py                                           # tests, on hand-written units
 
 The build puts every function in its own COMDAT section, so the relocations of a
@@ -33,7 +34,10 @@ defines the rest. data/seam_exceptions.csv (subsystem,function,symbol,reason) li
 violations that remain, each with a `TODO(#n): ...` reason. --check fails on a violation
 without a row and on a row that no longer occurs, so the list only shrinks. A row whose
 symbol starts with `virtual ` is a virtual call between subsystems, which
-`tools/coupling.py --virtual --check` judges and this tool ignores. Standard library plus tools/objread.py.
+`tools/coupling.py --virtual --check` judges and this tool ignores. 
+--private-state fails when a function of any subsystem other than pathfinding reads, writes or lets escape
+Game::pathfinder or a member of a type of pathfinding's state region, from the field and deref rows of
+data/rwsets.csv and the owners of data/subsystems.csv. Standard library plus tools/objread.py.
 """
 
 import argparse
@@ -72,6 +76,13 @@ SEAM_TABLE = "g_seams"
 REASON = re.compile(r"TODO\(#[0-9]+\): \S")
 VIRTUAL_PREFIX = "virtual "
 REL_DIR32, REL_REL32 = 6, 20
+RWSETS = "data/rwsets.csv"
+PRIVATE_OWNER = "pathfinding"
+PRIVATE_ITEMS = ("Game::pathfinder",)
+PRIVATE_TYPES = ("NodeData", "Node", "PathCell", "PathGrid", "TurnCostTable", "TurnCostPair", "OpenHeap", "PathPending",
+                 "PathExtra", "Pathfinder")
+PRIVATE_KINDS = ("field_read", "field_write", "field_escape", "field_maybe_written", "deref_read", "deref_write",
+                 "deref_escape", "deref_maybe_written")
 
 
 @dataclass
@@ -471,6 +482,27 @@ def summary(vs: list, allowed_counts: dict = None) -> str:
     return "\n".join(lines)
 
 
+def private_state(root: Path) -> list:
+    """(subsystem, function, kind, target) of every access to pathfinding's region by another subsystem."""
+    owners = {}
+    with (root / SUBSYSTEMS).open(newline="") as f:
+        for r in csv.DictReader(f):
+            owners[(r["function"], r["file"])] = r["subsystem"]
+    types = set(PRIVATE_TYPES)
+    found = set()
+    with (root / RWSETS).open(newline="") as f:
+        for r in csv.DictReader(f):
+            if r["kind"] not in PRIVATE_KINDS:
+                continue
+            target = r["target"]
+            if target not in PRIVATE_ITEMS and not types & set(re.findall(r"\w+", target)):
+                continue
+            owner = owners.get((r["function"], r["file"]), "unowned")
+            if owner != PRIVATE_OWNER:
+                found.add((owner, r["function"], r["kind"], target))
+    return sorted(found)
+
+
 def response(arg: str) -> list:
     if arg.startswith("@"):
         return [Path(line.strip()) for line in Path(arg[1:]).read_text().splitlines() if line.strip()]
@@ -479,13 +511,22 @@ def response(arg: str) -> list:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("--objects", nargs="+", required=True, help="object files, or @file listing them")
+    parser.add_argument("--objects", nargs="+", default=[], help="object files, or @file listing them")
+    parser.add_argument("--private-state", action="store_true",
+                        help=f"fail on an access to pathfinding's state region by another subsystem, from {RWSETS}")
     parser.add_argument("--root", default=str(ROOT))
     parser.add_argument("--write", action="store_true", help=f"write {EXCEPTIONS}")
     parser.add_argument("--check", action="store_true", help=f"fail on a violation without a row in {EXCEPTIONS} or a stale row")
     parser.add_argument("--summary", action="store_true", help="also print the counts per subsystem")
     args = parser.parse_args(argv)
     root = Path(args.root)
+    if args.private_state:
+        bad = private_state(root)
+        for owner, function, kind, target in bad:
+            print(f"{owner} {function} {kind} {target}: pathfinding's region is private to {PRIVATE_OWNER}")
+        return 1 if bad else 0
+    if not args.objects:
+        parser.error("--objects is required")
     units = [unit_of(p) for a in args.objects for p in response(a)]
     vs, counts = analyse(units, root, definition_aliases([p for a in args.objects for p in response(a)]))
     if args.write:

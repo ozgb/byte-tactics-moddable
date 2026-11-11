@@ -1,0 +1,7 @@
+# The game saved by hpa-crossing at tick 3500, loaded and played on to tick 14000 with the demo pathfinder.
+game_seed 883
+crt_seed 1883
+view_seed 2883
+pathfinder hpa
+ticks 14000
+load hpa-crossing

@@ -10,7 +10,9 @@ uv run tools/coupling.py --check              # fail if either file differs from
 uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and sim items per subsystem
 ```
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5286 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+To browse the same data with the source beside it (the subsystem map, a flow chart and call graph for each function, and who reads and writes each global and field), run `uv run tools/codemap.py`: it serves an interactive view on 127.0.0.1 and opens it in a browser.
+
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5428 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -20,20 +22,20 @@ The subsystems and the issue each maps to:
 | [economy](#economy) | 39 | #11 |
 | [features](#features) | 47 | #12 |
 | [ai](#ai) | 129 | #13 |
-| [pathfinding](#pathfinding) | 55 | #14 |
+| [pathfinding](#pathfinding) | 145 | #14 |
 | [weapons](#weapons) | 106 | #15 |
 | [targeting](#targeting) | 11 | #16 |
 | [los_radar](#los_radar) | 88 | #17 |
-| [orders](#orders) | 375 | #18 |
+| [orders](#orders) | 378 | #18 |
 | [units](#the-remaining-subsystems) | 212 | none yet |
 | [players](#the-remaining-subsystems) | 143 | none yet |
-| [map](#the-remaining-subsystems) | 105 | none yet |
+| [map](#the-remaining-subsystems) | 110 | none yet |
 | [network](#the-remaining-subsystems) | 342 | none yet |
-| [game](#the-remaining-subsystems) | 254 | none yet |
-| [harness](#the-remaining-subsystems) | 827 | none yet |
+| [game](#the-remaining-subsystems) | 275 | none yet |
+| [harness](#the-remaining-subsystems) | 831 | none yet |
 | [presentation](#the-remaining-subsystems) | 1429 | none yet |
-| [platform](#the-remaining-subsystems) | 820 | none yet |
-| [seams](#the-remaining-subsystems) | 118 | none yet |
+| [platform](#the-remaining-subsystems) | 827 | none yet |
+| [seams](#the-remaining-subsystems) | 130 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
 
 The ten subsystems without a module issue are described briefly [below](#the-remaining-subsystems). #10 (per-module replay tests) uses all of them.
@@ -99,12 +101,13 @@ Coverage: 5.9% of functions (1 of 17), 1.8% of lines, 0.0% of branches; 16 live 
 
 Issue #11. 39 functions. The resource accounts (`UnitResources`), `UpdatePlayerEconomy`, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`, `UpdateResourceSharing` in `src/network/net_game.cpp`).
 
-Coverage: 93.1% of functions (27 of 29), 79.2% of lines, 45.1% of branches; 2 live functions no scenario enters, and 3 more are dead (data/coverage.csv).
+Coverage: 80.6% of functions (29 of 36), 78.0% of lines, 45.8% of branches; 7 live functions no scenario enters, and 3 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (2 of 29 after `conditions-dark-side` and `conditions-shore-to-shore` (#420) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445); 27 are entered, 93.1%), by reason:
+**Live functions no scenario enters** (7 of 36 after `conditions-dark-side` and `conditions-shore-to-shore` (#420) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445); 29 are entered, 80.6%), by reason:
 
 - Share dialog or network only (1): `ShareMapInfo` (the map-share button of the ally share dialog, or a share packet).
 - Network game only (1): `UpdateResourceSharing`. `RunGameSteps` calls it only when `showStats` is set and the packet manager is in use, and it returns at once unless `netGameFlags & 1`.
+- Network game only (5): `EnergyRecipientPoorer`, `MetalRecipientPoorer`, `ShareAmount`, `ShareEnergyAmount`, `ShareMetalAmount`. They run only inside `UpdateResourceSharing`'s transfer branches, so only resource sharing in a network game reaches them; the mp play-test records them (#904).
 - Entered by the console: `CmdNoEnergy`, `CmdNoMetal`, `CmdSetShareEnergy`, `CmdSetShareMetal`, `CmdShareAll`, `CmdShareEnergy`, `CmdShareMetal` and `UnitResources::SpendMetal` (through `TransferMetal`, console `Give`). `console-economy` (#445) types them; the share commands do nothing without a network game (`netGameFlags & 1`), so they change no hashed field.
 
 **Entry points.** Phase roots: `UpdateResourceSharing`, called from `RunGameSteps` only when `showStats` is set and the packet manager is in use, and it returns at once unless `netGameFlags & 1` (a network game). The per-tick income step `UpdatePlayerEconomy` is not a root: `UpdatePlayers` (players) calls it, so most of the economy runs inside the players phase.
@@ -199,7 +202,7 @@ Coverage: 97.7% of functions (43 of 44), 84.5% of lines, 71.9% of branches; 1 li
 **Draft interface.**
 
 - Exports: 23 functions (`UpdateFeatures`, the cell accessor `GetCellFeature`, `PlaceFeature` (los_radar, units), `DamageFeature` (weapons, network), `ReclaimFeature` (orders), and the load, save, pool and file-list calls from game and los_radar).
-- Needs from seams: 48 functions in platform, files, presentation, game, seams, network, units, los_radar, map.
+- Needs from seams: 48 functions in platform, files, game, seams, network, presentation, units, los_radar, map.
 - Owns: 70 named sim items that only this subsystem writes, for example `Game::features`, `Game::featureCount`, `Pool::entries`, `Cell::spot`, `Spot::feature`.
 - Shares: 3 named sim items that other subsystems also write, for example `Cell::feature`, `Cell::flags`.
 - It imports from presentation (`EmitWhiteSmoke`, `PlaySoundAtByName`, the GAF loaders). Sim code that draws or plays sound has to raise events instead (#22).
@@ -214,9 +217,9 @@ Coverage: 97.7% of functions (43 of 44), 84.5% of lines, 71.9% of branches; 1 li
 
 Issue #13. 129 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
-Coverage: 89.0% of functions (89 of 100), 88.7% of lines, 83.6% of branches; 11 live functions no scenario enters, and 33 more are dead (data/coverage.csv).
+Coverage: 89.1% of functions (90 of 101), 88.7% of lines, 83.6% of branches; 11 live functions no scenario enters, and 33 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (11 of 100 after #420 and `console-sight` (#445); 89 are entered, 89.0%), by reason:
+**Live functions no scenario enters** (11 of 101 after #420 and `console-sight` (#445); 90 are entered, 89.1%), by reason:
 
 - Shutdown only (4): `DestroyPlayerAI`, `FreeSquads`, `SquadManager::DeleteTimers` and `SquadTimer::~SquadTimer`. All four are called from `FreePlayers`, which `ShutdownIngameSystems` calls and no scenario runs.
 - Console command only (1): `DumpPlayerAI` (console `PrintWeights`). It writes the file its second argument names, so the `console` key leaves it out (#445). `console-sight` enters `ResetAIPlayers` (console `ReloadAIProfiles`).
@@ -271,7 +274,7 @@ Coverage: 89.0% of functions (89 of 100), 88.7% of lines, 83.6% of branches; 11 
 
 ## pathfinding
 
-Issue #14. 55 functions. The search in `src/ai/pathfind*.cpp`: per-player cost tables, the node budget, the open heap and the grid.
+Issue #14. 145 functions. The search in `src/ai/pathfind*.cpp`: per-player cost tables, the node budget, the open heap and the grid.
 
 Coverage: 93.6% of functions (44 of 47), 92.2% of lines, 87.1% of branches; 3 live functions no scenario enters, and 9 more are dead (data/coverage.csv).
 
@@ -280,43 +283,41 @@ Coverage: 93.6% of functions (44 of 47), 92.2% of lines, 87.1% of branches; 3 li
 - Unreachable (2): `Pathfinder::RemoveNode` and `OpenHeap::SiftDownInline`. `RunSearches` is the only caller of `RemoveNode`, and it zeroes `topPopped` just before the `if (!topPopped)` that guards the call, so the call is dead code in 3.1c. `SiftDownInline` is called only by `RemoveNode`.
 - Shutdown only (1): `Pathfinder::~Pathfinder` (called from `DestroyPathfinder` in `ShutdownIngameSystems`). Test mode ends with `host_exit(0)` right after the last tick, so no scenario runs the shutdown.
 
-**Entry points.** Phase roots: none. `Pathfinder::RunSearches` is called by `UpdatePlayers` (players).
+**Entry points.** Phase roots: none. `PathfindingStep` and `PathfindingPoll` are called by `UpdatePlayers` (players).
 
-5 functions are called from other subsystems. The most called, with their callers:
+19 functions are called from other subsystems. The most called, with their callers:
 
+- `PathfindingCellsChanged` (2 from map, 2 from units)
 - `AdjustHeap` (2 from platform)
-- `PathGrid::At` (1 from presentation)
-- `Pathfinder::AbortIfGoalMatch` (1 from seams)
-- `Pathfinder::RunSearches` (1 from seams)
-- By calling subsystem (functions called): seams 3, platform 1, presentation 1
+- `PathfindingCancel` (2 from orders)
+- `PathfindingDebugCell` (1 from presentation)
+- By calling subsystem (functions called): game 6, orders 4, players 4, map 2, units 2, harness 1, platform 1, presentation 1
 
-**Imports.** 16 functions of 3 subsystems, by target, each with the number of functions it calls there:
+**Imports.** 21 functions of 2 subsystems, by target, each with the number of functions it calls there:
 
-- seams (10): `AiSearchGoalSetWaypointsNative`, `MovementClassGetNative`, `MovementClassInBoundsNative`, `OrderFxAddFlagsNative`, and 6 more
-- platform (4): `operator delete`, `GameFreeThunk`, `operator new`, `operator==`
-- game (2): `SimAlloc`, `SimAllocTagged`
+- seams (17): `WorldBeginSearch`, `WorldEndSearch`, `WorldFirstUnit`, `WorldInBounds`, and 13 more
+- platform (4): `PathGoalCells`, `PathGoalContains`, `PathGoalDistance`, `operator new`
 
-**Sim writes.** 46 items in all, 44 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
+**Sim writes.** 238 items in all, 236 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
 `Node::index` (sim); `PathCell::flags` (sim); `OpenHeap::count` (sim); `OpenHeap::freeHead` (sim); `OpenHeap::topPopped` (sim); `Pathfinder::object` (mixed); `Pathfinder::owner` (mixed); `OpenHeap::used` (sim); `PathCell::dir` (sim); `Pathfinder::steps` (sim); `NodeData::f` (sim); `NodeData::g` (sim)
 
-**Sim reads.** 35 items only read, 35 named. The most used (`g_game`, the root pointer, left out):
+**Sim reads.** 45 items only read, 45 named. The most used (`g_game`, the root pointer, left out):
 
-`Pathfinder::grid` (sim); `Seams::orders` (sim); `Seams::units` (sim); `OrdersSeam::AiSearchGoalSetWaypoints` (sim); `Game::height` (sim); `Game::players` (sim); `Game::width` (sim); `MovementClass::footprintX` (mixed); `MovementClass::footprintZ` (mixed); `NodeData::pos` (sim); `Unit::motion` (mixed); `UnitsSeam::RefreshUnitIfStale` (sim)
+`Pathfinder::grid` (sim); `PathWorldView::Pass` (sim); `PathWorldView::InBounds` (sim); `PathWorldView::Seen` (sim); `PathWorldView::PlayerCount` (sim); `PathWorldView::UnitState` (sim); `Game::height` (sim); `Game::width` (sim); `NodeData::pos` (sim); `PathUnitState::footprintX` (sim); `PathRequest::goal` (sim); `PathWorldView::Tick` (sim)
 
 **Draft interface.**
 
-- Exports: 5 functions (`Pathfinder::RunSearches` (players), `Pathfinder::AbortIfGoalMatch` (orders), `MakeHeap` and `PopHeapFirst` (ai)).
-- Needs from seams: 16 functions in seams, platform, game.
-- Owns: 42 named sim items that only this subsystem writes, for example `OpenHeap::items`, `OpenHeap::pool`, `Node::index`, `OpenHeap::count`, `Grid::dirty`.
+- Exports: 19 functions (`PathfindingStep` and `PathfindingPoll` (players), `PathfindingSubmit` and `PathfindingCancel` (orders), `PathfindingCellsChanged` (map, features)).
+- Needs from seams: 21 functions in seams, platform.
+- Owns: 234 named sim items that only this subsystem writes, for example `OpenHeap::items`, `OpenHeap::pool`, `Node::index`, `OpenHeap::count`, `Grid::dirty`.
 - Shares: 2 named sim items that other subsystems also write, for example `Grid::cells`, `Grid::width`, `Grid::count`, `Grid::height`.
-- Few functions are called from outside, so the entry side is small. The import side is not: many of its imports are goal-object methods (`PathGoal`, `PointMarker`, `RingApproach`, `OrderFx`, `ApproachRadius`, `AiSearchGoal`) that orders implements. The goals are a callback interface that orders passes in.
-- The budget (`Pathfinder::budget`, `g_playerBudgetCap`, `g_budgetRefreshCounter`, `g_playerTickLoad`) is state this module writes alone: the limit #14 wants the module to read from outside.
+- Few functions are called from outside, so the entry side is small. The import side is the world view (`PathWorldView`, filled in `src/seams/pathfinding_world.cpp`) and the goal geometry (`PathGoalContains`, `PathGoalDistance` and `PathGoalCells`, which orders and the search share). The search calls nothing in orders: a request carries its goal as data and the results come back as events that orders applies.
+- The budget (`Pathfinder::budget` and the per-player counters in the region) is state this module writes alone, and the trace reads it through `PathfindingWriteState`.
 
 **Open questions.**
 
 - `Grid::cells`, `width` and `height` show as written by pathfinding, los_radar and map. Either `Grid` is one name for unrelated structs (type-wide evidence) or there is a real shared grid; a clang layout run would tell.
-- The goals live in `order_targets.cpp` (orders) but only pathfinding calls `ApproxDist` and `ContainsCell`. Should the goal interface be declared by pathfinding?
 
 ## weapons
 
@@ -484,7 +485,7 @@ Coverage: 95.4% of functions (62 of 65), 89.7% of lines, 77.2% of branches; 3 li
 
 ## orders
 
-Issue #18. 375 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`). The largest subsystem.
+Issue #18. 378 functions. The order state machines, VTOL orders, order lists, unit motion (`UnitMotion`) and the order goal objects (`src/orders/*.cpp`). The largest subsystem.
 
 Coverage: 84.8% of functions (312 of 368), 82.6% of lines, 65.3% of branches; 56 live functions no scenario enters, and 24 more are dead (data/coverage.csv).
 
@@ -497,42 +498,39 @@ Coverage: 84.8% of functions (312 of 368), 82.6% of lines, 65.3% of branches; 56
 
 **Entry points.** Phase roots: none. `UpdateAllUnits` (units) calls `RunOrders`; units also call `UnitMotion::UpdateMotion`.
 
-56 functions are called from other subsystems. The most called, with their callers:
+40 functions are called from other subsystems. The most called, with their callers:
 
 - `CopyDwordIfNonNull` (4 from platform)
 - `Order::OrStatusFlags` (1 from seams)
-- `ApproachRadius::ApproxDistExcess` (1 from seams)
-- `OrderFx::ApproxDist` (1 from seams)
-- `PointMarker::ApproxDist` (1 from seams)
-- `RingApproach::ApproxDistExcess` (1 from seams)
+- `ApplyPathEvent` (1 from players)
 - `DeleteOrder` (1 from harness, 1 from presentation)
-- By calling subsystem (functions called): seams 23, presentation 12, network 6, game 4, units 4, ai 3, harness 3, map 3, platform 1, weapons 1
+- By calling subsystem (functions called): presentation 12, seams 8, network 6, units 4, ai 3, harness 3, map 3, game 2, platform 1, players 1, weapons 1
 
-**Imports.** 95 functions of 12 subsystems, by target, each with the number of functions it calls there:
+**Imports.** 99 functions of 13 subsystems, by target, each with the number of functions it calls there:
 
-- seams (26): `ClaimWeaponsNative`, `ReleaseWeaponsNative`, `SetStateBitsNative`, `SetWeaponTargetUnitNative`, and 22 more
-- platform (15): `operator new`, `RandomInt`, `GetHeadingBetween`, `operator==`, and 11 more
+- seams (23): `ClaimWeaponsNative`, `ReleaseWeaponsNative`, `SetStateBitsNative`, `SetWeaponTargetUnitNative`, and 19 more
+- platform (18): `operator new`, `RandomInt`, `GetHeadingBetween`, `operator==`, and 14 more
 - units (13): `GetNanoPiecePosition`, `AttachUnitToPiece`, `AddBuildProgress`, `AddRepairProgress`, and 9 more
 - network (8): `BitReader::ReadBits`, `BitWriter::WriteBits`, `SendScriptCallNoArgs`, `BitReader::ReadBit`, and 4 more
 - files (7): `HapiBank::OpenNamedBox`, `HapiBank::SeekBox`, `HapiBank::ReadBox`, `HapiBank::WriteBox`, and 3 more
 - map (7): `CanPlaceUnitFootprint`, `IsPadSlotFree`, `PickRandomReclaimableResourcesInRadius`, `SnapWorldPosToFootprint`, and 3 more
 - game (6): `RecordBuildMenuUpdate`, `RecordNanoParticles`, `RecordReverseNanoParticles`, `RecordSelectionOrdersDirty`, `RecordTeleportParticles`, `RecordUnitSpeech`
-- 5 smaller targets: features (3), los_radar (3), targeting (3), weapons (3), players (1)
+- 6 smaller targets: pathfinding (4), features (3), los_radar (3), targeting (3), weapons (3), players (1)
 
-**Sim writes.** 123 items in all, 117 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
+**Sim writes.** 133 items in all, 127 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
 `Order::flags` (mixed); `Order::flags_42` (mixed); `Order::pos` (mixed); `Order::state` (mixed); `Order::next` (mixed); `Order::subFlags` (mixed); `Order::unit` (mixed); `Unit::workTime` (mixed); `Box::hi` (mixed); `Order::attached` (mixed); `AiSearchGoal::flag_3` (mixed); `Order::angle` (mixed)
 
-**Sim reads.** 281 items only read, 280 named. The most used (`g_game`, the root pointer, left out):
+**Sim reads.** 288 items only read, 287 named. The most used (`g_game`, the root pointer, left out):
 
 `Unit::def` (mixed); `Seams::units` (sim); `Unit::motion` (mixed); `Order::target` (sim); `Seams::weapons` (sim); `Unit::list` (sim); `UnitDef::flags1` (mixed); `WeaponsSeam::ClaimWeapons` (sim); `Unit::list2` (sim); `Unit::player` (sim); `Game::ticks` (mixed); `Seams::targeting` (sim)
 
 **Draft interface.**
 
-- Exports: 56 functions (`RunOrders`, `RunSecondaryOrders`, `AddOrder`, `DeleteOrders`, `GetOrderType`, `IssueAttackOrder`, `OrderType::GetTableEntry` (presentation), the `UnitMotion::` functions called from outside (`UpdateMotion`, `LoadMotion`, `SaveMotion`, `DestroyObject`), and the goal methods pathfinding calls).
-- Needs from seams: 95 functions in seams, platform, units, network, files, map, game, features, los_radar, targeting, weapons, players.
-- Owns: 87 named sim items that only this subsystem writes, for example `Order::state`, `Order::pos`, `Order::next`, `PathOrderAttach::owner`, `Order::unit`.
-- Shares: 30 named sim items that other subsystems also write, for example `Order::flags`, `Unit::pos`, `Unit::flags`, `Unit::health`, `Unit::buildLeft`.
+- Exports: 40 functions (`RunOrders`, `RunSecondaryOrders`, `AddOrder`, `DeleteOrders`, `GetOrderType`, `IssueAttackOrder`, `OrderType::GetTableEntry` (presentation), the `UnitMotion::` functions called from outside (`UpdateMotion`, `LoadMotion`, `SaveMotion`, `DestroyObject`), and the goal methods pathfinding calls).
+- Needs from seams: 99 functions in seams, platform, units, network, files, map, game, features, los_radar, targeting, weapons, pathfinding, players.
+- Owns: 96 named sim items that only this subsystem writes, for example `Order::state`, `Order::pos`, `Order::next`, `PathOrderAttach::owner`, `Order::unit`.
+- Shares: 31 named sim items that other subsystems also write, for example `Order::flags`, `Unit::pos`, `Unit::flags`, `Unit::health`, `Unit::buildLeft`.
 - The units imports are the unit lifecycle and geometry: `CreateUnit`, `SetUnitPosition`, `Unit::SetStateBits`, COB script calls and piece positions. The weapons imports are mostly the claim and release of weapons, which orders reaches through seams.
 - It is the heaviest writer of core unit fields: `Unit::pos` and `Unit::flags`. The fields are also written by units and presentation (`pos`), and by many other subsystems (`flags`).
 
@@ -545,7 +543,7 @@ Coverage: 84.8% of functions (312 of 368), 82.6% of lines, 65.3% of branches; 56
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (212 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 64 functions are called from outside; the busiest are `FindUnitTypeId` (18), `GetNanoPiecePosition` (15), `AttachUnitToPiece` (10). It is called most by game (22 distinct functions) and seams (18). It imports 158 functions, mostly platform (49), presentation (8), seams (26) and files (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 81.5% of functions (150 of 184), 85.9% of lines, 73.8% of branches; 34 live functions no scenario enters, and 32 more are dead (data/coverage.csv). The list of those 34 is under **units, functions no scenario enters** below.
+**units** (212 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 64 functions are called from outside; the busiest are `FindUnitTypeId` (18), `GetNanoPiecePosition` (15), `AttachUnitToPiece` (10). It is called most by game (22 distinct functions) and seams (18). It imports 160 functions, mostly platform (49), presentation (8), seams (26) and files (17). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`, COB scripts), and it is the other side of most of orders' writes. Coverage: 81.5% of functions (150 of 184), 85.9% of lines, 73.8% of branches; 34 live functions no scenario enters, and 32 more are dead (data/coverage.csv). The list of those 34 is under **units, functions no scenario enters** below.
 
 **units, functions no scenario enters** (34 of 184 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 150 are entered, 81.5%), by reason:
 
@@ -559,7 +557,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Unit info dialog only (2): `MakePropList` and its static `spd`.
 - Slot no code calls (1): `AimCobStub` (slot 1 of `g_weaponAimCobVtable`). It returns 0; not explained further.
 
-**players** (143 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 36 functions are called from outside, mostly by game (14) and presentation (10); the busiest are `KillPlayerUnits` (5), `TransferEnergy` (4), `TransferMetal` (4). It imports 67 functions: platform 13, network 6, seams 12, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 67.1% of functions (96 of 143), 68.9% of lines, 58.4% of branches; 47 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 47 follows this paragraph.
+**players** (143 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 36 functions are called from outside, mostly by game (14) and presentation (10); the busiest are `KillPlayerUnits` (5), `TransferEnergy` (4), `TransferMetal` (4). It imports 71 functions: platform 13, network 6, seams 11, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 67.1% of functions (96 of 143), 68.9% of lines, 58.4% of branches; 47 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 47 follows this paragraph.
 
 **players, functions no scenario enters** (47 of 143 after `conditions-dark-side` and `conditions-shore-to-shore` (#420), `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), the six `console-` scenarios (#445), and the ten `mission-` scenarios of #764; 96 are entered, 67.1%), by reason:
 
@@ -570,7 +568,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Shutdown only (1): `FreePlayers` (called from `ShutdownIngameSystems`, which no scenario runs).
 - Entered by the console: `TransferEnergy` and `TransferMetal` (console `Give`, `console-economy`) and `MissionConditions::Deactivate` (console `Kill`, `console-units`) (#445).
 
-**map** (105 functions). No phase root. 51 functions are called from outside, by presentation (24), seams (19), game (10) and orders (7); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 64 functions: platform 28, files 11, los_radar 6, game 3, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 80.9% of functions (76 of 94), 87.0% of lines, 77.2% of branches; 18 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
+**map** (110 functions). No phase root. 52 functions are called from outside, by presentation (24), seams (20), game (10) and orders (7); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 66 functions: platform 28, files 11, los_radar 6, game 3, wind_meteors 4. It holds the terrain, the pass maps and footprints. Coverage: 80.9% of functions (76 of 94), 87.0% of lines, 77.2% of branches; 18 live functions no scenario enters, and 12 more are dead (data/coverage.csv).
 
 **map, functions no scenario enters** (18 of 94 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 76 are entered, 80.9%), by reason:
 
@@ -582,9 +580,10 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **network** (342 functions). Phase root `HandleNetPackets`, which dispatches into every subsystem, so what it reaches says nothing about the owner. 97 functions are called from outside, mostly by presentation (54) and game (30); the busiest are `BroadcastPacket` (5), `BroadcastPlayerInfo` (19), `AddMessage` (8). It imports 121 functions: platform 51, presentation 24, players 9, units 9. Its packet handlers write many sim items (284 in all).
 
-**network, functions no scenario enters** (243 of 297 after `save-midgame` (#422) and `allied-victory` (#432), and the six `console-` scenarios (#445); 54 are entered, 18.2%), by reason:
+**network, functions no scenario enters** (247 of 297 after `save-midgame` (#422) and `allied-victory` (#432), and the six `console-` scenarios (#445); 50 are entered, 16.8%), by reason:
 
 - Network only (155): `??$copy_backward@PAHPAH@std@@YGPAHPAH00@Z`, `??$copy_backward@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z`, `??$fill@PAHH@std@@YGXPAH0ABH@Z`, `??$fill@PAVUnitSyncPlayer@@V1@@std@@YGXPAVUnitSyncPlayer@@0ABV1@@Z`, `AddNetPlayer`, `AssignPlayerColor`, `AssignStartPositions`, `BitReader::ReadBits`, `BitReader::ReadSignedBits`, `BitWriter::BitWriter`, `BitWriter::FreeBuffer`, `BitWriter::GrowBuffer`, `BitWriter::SetByteAt`, `BitWriter::WriteBits`, `BroadcastAllyTeam`, `BroadcastPendingViewState`, `CheckDuplicatePlayerIds`, `CheckPlayerTimeouts`, `CloseNetSession`, `CommandAllowed`, `CopyWords`, `CountMessage`, `CountPacket`, `CreateNetGame`, `DefaultPacketHandler`, `DequeueByCalls`, `DropPlayer`, `EnumPlayersCallback`, `FindFirstActiveLocalIdInRejectPlayer`, `FindConnectedPlayerId`, `FindSlotByDpidInSetAlliance`, `FindSlotByDpidInRejectPlayer`, `FindLobbyHostDpid`, `FindLobbyHostPlayer`, `FindLobbyHostPlayerId`, `FindHostSlotInAssignStartPositions`, `FindSlotByIdInAddNetPlayer`, `FindSlotByIdInIsColorFree`, `FindSlotByIdInOpenTimeoutDialog`, `FirstJoinedId`, `FindFirstType1IdInAssignStartPositions`, `FormatNetStats`, `FrameQueue::QueueFrames`, `FrameQueue::ResetFrames`, `FrameQueue::~FrameQueue`, `FrameRing::Pop`, `FrameRing::Push`, `FreeTeam`, `GetCreatedLobbyInterface`, `GetFrame`, `GetHostDpid`, `GetLocalHumanDpid`, `GetPlayerDpid`, `GetSessionGuidInstance`, `HandlePing`, `HandlePlayerEconomy`, `HandleTimeoutDialog`, `InGame`, `InfoPacket`, `InitLobbiedConnection`, `InitNetConnection`, `InitPacketManager`, `IsActiveLocalInSetAlliance`, `IsColorFree`, `IsConnected`, `IsReusable`, `IsActiveLocalAiInSetAlliance`, `IsActiveRemoteInSetAllianceB`, `IsTimedOut`, `IsActiveLocalHumanInRemovePlayer`, `IsActiveRemoteInSetAlliance`, `IsActiveRemoteInRemovePlayer`, `IsValid`, `JoinLobbyGame`, `JoinLobbyGameEntry`, `JoinLobbyGameThread`, `JoinNetGame`, `LeaveNetGame`, `LocalPlayer`, `NetCondenser::Accumulate`, `NetCondenser::ReceivePacket`, `NetCondenser::SendPacket`, `NetCondenser::SendPacketTo`, `NetSendFeatureHit`, `NetSendFeatureReclaimed`, `NetSendOwnershipTransfer`, `NetSendProjectileDetonated`, `NetSendUnitDamage`, `NetSendUnitStates`, `NetSendWeaponFire`, `NetSendWeaponFireAt`, `NextFrameSeqInReceiveFrame`, `OpenTimeoutDialog`, `PacketBuffer::AppendPacket`, `PacketBuffer::FreePackets`, `PacketBuffer::RemovePacket`, `PacketChannel::AddPacket`, `PacketChannel::AllocBuffer`, `PacketChannel::AllocPacket`, `PacketChannel::EnqueuePacket`, `PacketChannel::GrowPools`, `PacketChannel::InitPools`, `PacketChannel::SendQueued`, `PacketChannel::~PacketChannel`, `PacketManager::AppendToSendBuffer`, `PacketManager::FindChannel`, `PacketManager::HandleIntegrityNop`, `PacketManager::QueueOnChannel`, `PacketManager::QueuePacket`, `PacketManager::SetDefaultSendPacing`, `PacketReceiver::FindPlayerFrameInfo`, `PacketReceiver::ReceiveFrame`, `PacketReceiver::~PacketReceiver`, `PacketRing::Peek`, `PacketRing::Pop`, `PacketRing::PopPacket`, `PacketRing::Push`, `PacketRing::PushPacket`, `PacketTrace`, `PeekFrame`, `Player::FreeSideDataAndFogSightCounts`, `Player::IsPlayableSlot`, `SlotDpidInUpdateResourceSharing`, `PlayerFrameInfo::Initialize`, `PlayerFrameInfo::~PlayerFrameInfo`, `PrevFrameSeqInReceiveFrame`, `PumpNetPackets`, `QueryOnlineFlags`, `QueueCount`, `RIReport`, `RIReportGameChat`, `RISetCallbacks`, `ReceiveNetPacket`, `RejectPacketType2`, `RejectPacketType5`, `RejectPacketType6`, `RejectPacketType7`, `RejectPacketType8`, `RejectPlayer`, `RemovePlayer`, `ClearPlayerSlotInRemovePlayer`, `ReportGameChat`, `ReportPacketGap`, `SendLobbySyncRequests`, `SetAlliance`, `TakeFrame`, `UnitAt`, `UnitSync::CheckUnitAvailable`, `UnitSync::HandleSyncPacket`, `UnitSync::NotifyEntryChanged`, `UnitSync::ReceiveSyncPacket`, `UnitSync::SendSyncPacket`, `UnitSyncMap::FindExact`, `UnitSyncMap::LowerBound`, `UpdateTimeoutDialog`. Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
+- Network only (4): `HandleNetPackets`, `PacketManager::SendAllQueued`, `SendLoadProgress`, `SendProbe`. Test mode reached them only in the loading frames, which it has skipped since #885 (it waits for the load in one frame). `SendLoadProgress` has no other caller (`LoadingScreenFrame`). No scenario enters the others' other callers: the main loop's wait branch (`HandleNetPackets`, `SendAllQueued`, `SendProbe`), the lobby (`HandleNetPackets`, `SendAllQueued`), the end-game screen (`HandleNetPackets`) and the in-game dialogs (`HandleNetPackets`, `SendAllQueued`).
 - Menu or front end only (74): `??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z`, `??$copy@PBUUnitSyncPacketElem@@PAU1@@std@@YGPAUUnitSyncPacketElem@@PBU1@0PAU1@@Z`, `AreAllPlayersReady`, `SyncRecordIntVectorBase::Capacity`, `SyncRecordIntVectorBase::count`, `SyncRecordIntVector::Size`, `SyncRecordIntVector::assign_first`, `SyncRecordIntVector::assign_second`, `SyncRecordIntVector::begin`, `SyncRecordIntVector::begin`, `SyncRecordIntVector::burn`, `SyncRecordIntVector::end`, `CopyDwordRangeOverwrite`, `CountComputerPlayers`, `CountHumanPlayers`, `CountLocalComputerPlayers`, `CreateLocalPlayer`, `CreateUnitSync`, `DeleteUnitSync`, `FindPlayerInUse`, `FindFlag97SlotInIsHostLocal`, `FindReadyPlayer`, `FindTarget`, `FinishUnitSync`, `IsUnitDefFlags2Bit16Set`, `GetRejectReasonText`, `IsHostLocal`, `IsHuman`, `IsPlaying`, `UnitSyncMapLess::operator?R`, `NopChecksumEntryDtor`, `OnlineGetLinkInfo`, `OnlineProcessButtonCommand`, `OnlineTranslate`, `PacketSequencer::Inl`, `PacketSequencer::PacketSequencer`, `PacketSequencer::SendUnsequenced`, `PacketSequencer::operator?4`, `Pass`, `RequestPlayerColor`, `SendChatMessage`, `SendChatPacket`, `SendNetHeartbeat`, `SendShareMapInfo`, `SyncChecksumVector::~SyncChecksumVector`, `SyncPlayerRecord::operator?4`, `UnitSync::AllPlayersSynced`, `UnitSync::AllowUnit`, `UnitSync::ApplyToUnitTypes`, `UnitSync::DisallowUnit`, `UnitSync::End`, `UnitSync::Find`, `UnitSync::GetSyncStatusText`, `UnitSync::GetUnitEntry`, `UnitSync::IsPlayerSynced`, `UnitSync::PopChangedEntry`, `UnitSync::ProcessSync`, `UnitSync::SetUnitLimit`, `UnitSync::UnitSync`, `UnitSync::~UnitSync`, `UnitSyncIter::UnitSyncIter`, `UnitSyncIter::operator?8`, `UnitSyncMap::Buynode`, `UnitSyncMap::End`, `UnitSyncMap::Erase`, `UnitSyncMap::Init`, `UnitSyncMap::UnitSyncMap`, `UnitSyncMap::operator?A`, `UnitSyncMap::~UnitSyncMap`, `UnitSyncPlayer::UnitSyncPlayer`, `UnitSyncPlayer::UnitSyncPlayer`, `UnitSyncPlayer::operator?4`, `UnitSyncPlayer::~UnitSyncPlayer`, `allocator::destroy`. The lobby, menus and dialogs, which test mode skips. Covered by #398's UI log.
 - Console command, host only (4): `CmdCompression`, `GetByteRates`, `PacketManager::NopRet_D`, `SumMessageStats`. Network settings and statistics (`CmdCompression`, `CmdNetStats`), which change no game state, so #445's `console` key leaves them out. Covered by #398.
 - Key, window or screenshot input only (2): `CycleMessageUnits`, `ScrollToNextMessageUnit`. Test mode sends no input. Covered by #398.
@@ -592,7 +591,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Command-line switch only (2): `Onl_LoadConfigFile`, `SetPacketRate`. Switches a scenario cannot pass (`-blockscan` and the network options).
 - Entered by the console scenarios (#445): `SendShareEnergy`, `SendShareMetal`, `SendPacketToPlayer`, `FindSlotByDpidInSendPacketToPlayer`, `PlayerReady` and `Player::SetType`, which the console commands `Give` and `AI` reach.
 
-**game** (254 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 147 functions are called from outside, by platform (76 distinct functions) and presentation (29); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 485 functions, the most of any subsystem, 218 of them from presentation, then platform 99, network 30, files 23 and units 22.
+**game** (275 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 155 functions are called from outside, by platform (76 distinct functions) and presentation (30); the busiest are `SetCursorMode` (19), `SimAllocTagged` (18), `AllocSite::~AllocSite` (12). It imports 493 functions, the most of any subsystem, 218 of them from presentation, then platform 102, network 30, files 23 and units 22.
 
 **game, functions no scenario enters** (73 of 233 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 160 are entered, 68.7%), by reason:
 
@@ -628,13 +627,13 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Template instances no entered function uses (67): `??8@YG_NABU?$Ref@D@@PAD@Z`, `??8@YG_NABU?$Ref@G@@PAG@Z`, `??8@YG_NABU?$Ref@UFrameRing@@@@PAUFrameRing@@@Z`, `??8@YG_NABU?$Ref@VOrderFx@@@@PAVOrderFx@@@Z`, `??8@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z`, `??9@YG_NABU?$Ref@D@@PAD@Z`, `??9@YG_NABU?$Ref@UHotRadarSlot@@@@PAUHotRadarSlot@@@Z`, `??9@YG_NABU?$Ref@UWeaponDef@@@@PAUWeaponDef@@@Z`, `??9@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z`, `??9@YG_NABU?$Ref@VUnitDef@@@@PAVUnitDef@@@Z`, `BlockVector::Capacity`, `BlockVector::Capacity`, `BlockVector::Clear`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::operator?4`, `BlockVector::operator?4`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `Ref::Ref`, `Ref::Ref`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?D`. These are the `Ref` accessors and comparisons of `interfaces/ref.h` and the `BlockVector` members of `src/state/block_vector.h`, one instance for each type and member. No function a scenario enters calls them.
 - Error paths only (1): `RefOutsideBlock`. The fatal error of a `Ref` whose pointer lies outside the state block, which a passing run never reaches.
 
-**harness** (827 functions). The test harness of #3 (`src/harness`). No phase root. 32 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 69 functions (game 17, platform 28).
+**harness** (831 functions). The test harness of #3 (`src/harness`). No phase root. 32 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 77 functions (game 24, platform 28).
 
-**presentation** (1429 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 274 functions are called from outside, mostly by game (218 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 353 functions: platform 159, network 54, files 32, game 29, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
+**presentation** (1429 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 274 functions are called from outside, mostly by game (218 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 354 functions: platform 159, network 54, files 32, game 30, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
-**platform** (820 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 305 functions are called from outside, by presentation (159 distinct functions), game (99), network (51) and units (49); the busiest are `GameFreeThunk` (163), `operator new` (124), `operator delete` (86), then `Translate` (77) and `GameAllocIgnoreTag` (76). It imports 180 functions: game 76, presentation 46.
+**platform** (827 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 310 functions are called from outside, by presentation (159 distinct functions), game (102), network (51) and units (49); the busiest are `GameFreeThunk` (162), `operator new` (123), `operator delete` (82), then `Translate` (77) and `GameAllocIgnoreTag` (76). It imports 180 functions: game 76, presentation 46.
 
-**seams** (118 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 112 functions are called from outside. It imports 120 functions.
+**seams** (130 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 116 functions are called from outside. It imports 104 functions.
 
 **files** (169 functions). No phase root. The archive and bank readers (`src/files`: `HapiBank`, HPI and SQSH archives). 78 functions are called from outside.
 
@@ -733,9 +732,9 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | subsystem | entered of live functions | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|
 | **wind_meteors** | 1 of 17 | 5.9% | 1.8% | 0.0% | 16 | 0 |
-| **economy** | 27 of 29 | 93.1% | 79.2% | 45.1% | 2 | 3 |
+| **economy** | 29 of 36 | 80.6% | 78.0% | 45.8% | 7 | 3 |
 | **features** | 43 of 44 | 97.7% | 84.5% | 71.9% | 1 | 4 |
-| **ai** | 89 of 100 | 89.0% | 88.7% | 83.6% | 11 | 33 |
+| **ai** | 90 of 101 | 89.1% | 88.7% | 83.6% | 11 | 33 |
 | **pathfinding** | 44 of 47 | 93.6% | 92.2% | 87.1% | 3 | 9 |
 | **weapons** | 80 of 93 | 86.0% | 86.8% | 71.7% | 13 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 81.6% | 0 | 1 |
@@ -745,10 +744,10 @@ A live function whose lines or branches follow timing (a wall-clock sampler, a w
 | **players** | 96 of 143 | 67.1% | 68.9% | 58.4% | 47 | 10 |
 | **map** | 76 of 94 | 80.9% | 87.0% | 77.2% | 18 | 12 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
-| game | 160 of 233 | 68.7% | 56.0% | 36.4% | 73 | 23 |
-| network | 54 of 297 | 18.2% | 11.1% | 3.9% | 243 | 74 |
-| platform | 391 of 739 | 52.9% | 40.1% | 26.2% | 348 | 84 |
-| presentation | 567 of 1145 | 49.5% | 37.6% | 29.6% | 578 | 295 |
+| game | 160 of 233 | 68.7% | 54.6% | 35.0% | 73 | 23 |
+| network | 50 of 297 | 16.8% | 10.4% | 3.4% | 247 | 74 |
+| platform | 396 of 746 | 53.1% | 40.2% | 26.3% | 350 | 84 |
+| presentation | 565 of 1149 | 49.2% | 36.3% | 29.6% | 584 | 295 |
 | seams | 106 of 117 | 90.6% | 95.5% | - | 11 | 0 |
 | state | 493 of 564 | 87.4% | 70.2% | 49.7% | 71 | 58 |
 

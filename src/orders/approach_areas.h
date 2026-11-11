@@ -4,6 +4,8 @@
 #include "order_fx.h"
 #include "../util/vec3.h"
 
+struct PathGoalArea;
+
 #pragma pack(push, 1)
 class __declspec(novtable) ApproachRadius : public OrderFx {
 public:
@@ -32,6 +34,7 @@ public:
     int Serialize(int unused, HapiBank* file, char* name);
     int GetType();
     void AppendGoalCell(void* cells);
+    void GetGoalArea(PathGoalArea* out);
 };
 
 class __declspec(novtable) RingApproach : public OrderFx {
@@ -69,6 +72,7 @@ public:
     int Serialize(int unused, HapiBank* file, char* name);
     int FillWorldPos(Vec3* out);
     void AppendGoalCell(void* cells);
+    void GetGoalArea(PathGoalArea* out);
 };
 
 class __declspec(novtable) PointMarker : public OrderFx {
@@ -87,6 +91,7 @@ public:
     int FillWorldPos(int* out);
     int Serialize(int unused, HapiBank* file, char* name);
     void AppendGoalCell(void* cells);
+    void GetGoalArea(PathGoalArea* out);
 };
 
 struct ApproachRadiusRecord {

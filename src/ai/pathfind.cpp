@@ -1273,7 +1273,5 @@ void Pathfinder::FreeNode(int index)
 
 #pragma auto_inline(on)
 
-// Unused here: the symbol ids these declarations take keep ProbeStraightPath (0x40e160)
-// matching with the harness's path result hooks above (docs/c2-regalloc.md).
 extern int g_pathResultPad0;
 extern int g_pathResultPad1;

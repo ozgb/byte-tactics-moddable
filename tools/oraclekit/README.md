@@ -29,6 +29,7 @@ highest one reachable from it, and no file under `reference/` other than a `.md`
 | `docs/sim-events.md` | the sim event queue: the record, the queue, each kind of event and when the logic records it, with a `Terms` section at its end (below) | itself |
 | `interfaces/sim_events.csv` | the kinds of sim event as a table (below) | `docs/sim-events.md` |
 | `layout.json` | the state block layout (below) | `docs/module-abi.md`, sections 7 to 9 |
+| `docs/schedule.md` | the order of effects: the phases of a tick, each pass's loop and the order of the entry points within an entity, the class of each call one subsystem makes to another, and where a write is read back within one entity's update (the split points) | itself, with `coupling/dependencies.csv` |
 | `coupling/` | what the subsystems read of each other's state, and what presentation reads (below) | itself |
 
 ## Presentation is not a module

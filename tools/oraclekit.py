@@ -111,6 +111,7 @@ CONTENTS = [
     ("file", SIM_EVENTS_PAGE, "the sim event queue and its kinds, with the terms it uses defined"),
     ("file", "data/replay_schema.json", "the annotations of the replay format"),
     ("file", "docs/ai-ratings.md", "numeric details of the computer player's ratings"),
+    ("file", "docs/schedule.md", "3.1c's order of effects: the tick, the passes, the class of each cross-subsystem call and the split points"),
 ]
 
 ROLES = {

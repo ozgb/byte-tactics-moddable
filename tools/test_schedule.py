@@ -154,6 +154,18 @@ class Classes(unittest.TestCase):
     def test_used_and_writing_is_mixed(self):
         self.assertEqual(self.classes(query_writes=True)["economy.Query"], ["mixed"])
 
+    def test_out_argument_is_a_used_value_except_the_record_worked_on(self):
+        fns = functions()
+        fns[1]["calls"][0] = [5, "indirect_call", seam("EconomySeam", "Spend"), [0]]
+        self.assertEqual(sc.Page(sc.Program(fns, SUBSYSTEMS, [], SEAMS, NATIVE, SOURCES), [], []).calls[
+            ("units", "economy.Spend")].keys(), {"mixed"})
+        native = NATIVE + "static void __stdcall Spend(Account* self, int amount)\n"
+        p = sc.Page(sc.Program(fns, SUBSYSTEMS, [], SEAMS, native, SOURCES), [], [])
+        self.assertEqual(p.calls[("units", "economy.Spend")].keys(), {"intent"})
+        fns[1]["calls"][0][3] = [0, 1]
+        p = sc.Page(sc.Program(fns, SUBSYSTEMS, [], SEAMS, native, SOURCES), [], [])
+        self.assertEqual(p.calls[("units", "economy.Spend")].keys(), {"mixed"})
+
     def test_branches_make_a_query(self):
         p = program()
         p.fns["Query"][0].branches = 1
@@ -387,8 +399,8 @@ class SyntaxTree(unittest.TestCase):
     def test_used_and_out_arguments(self):
         calls = [(line, target.split("[")[-1].rstrip("]"), used) for line, kind, target, used
                  in self.functions["Caller"]["calls"] if kind == "indirect_call"]
-        self.assertEqual(calls, [(10, "Seam::Fill", True), (11, "Seam::Peek", False), (12, "Seam::Take", False),
-                                 (13, "Seam::Count", False), (14, "Seam::Count", True)])
+        self.assertEqual(calls, [(10, "Seam::Fill", [0]), (11, "Seam::Peek", []), (12, "Seam::Take", []),
+                                 (13, "Seam::Count", []), (14, "Seam::Count", True)])
 
     def test_write_is_ordered_after_the_value_it_stores(self):
         steps = [(kind, target) for line, kind, target, _ in self.functions["Caller"]["calls"] if line == 14]

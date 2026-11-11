@@ -756,7 +756,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. a draw from the Park-Miller generator (`rng`)
 1. `targeting.ResetWeaponTarget`: intent
 1. `weapons.ReleaseWeapons`: intent
-1. `economy.Reset`: mixed
+1. `economy.Reset`: intent
 1. `ai.SetUnitSquad`: intent
 1. `los_radar.IsUnitVisibleToPlayer`: query
 1. a sim event is recorded
@@ -837,7 +837,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. a draw from the Park-Miller generator (`rng`)
 1. `targeting.ResetWeaponTarget`: intent
 1. `weapons.ReleaseWeapons`: intent
-1. `economy.Reset`: mixed
+1. `economy.Reset`: intent
 1. `ai.SetUnitSquad`: intent
 1. `los_radar.IsUnitVisibleToPlayer`: query
 1. a sim event is recorded
@@ -853,7 +853,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `map.SpatialBucketUnlinkUnit`: intent
 1. `map.SpatialBucketPrependUnit`: intent
 1. `orders.AddBeCarriedOrder`: intent
-1. `economy.LoadUnitAccounts`: query
+1. `economy.LoadUnitAccounts`: intent
 1. `orders.LoadMotion`: intent
 1. `orders.LoadOrder`: mixed
 1. `orders.ReattachFxToUnit`: intent
@@ -1077,7 +1077,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. a sim event is recorded
 1. `units.StartScript`: intent
 1. a draw from the Park-Miller generator (`rng`)
-1. `economy.SpendEnergyAndMetal`: mixed
+1. `economy.SpendEnergyAndMetal`: intent
 
 ### `wind_meteors.UpdateMeteors`
 
@@ -1238,10 +1238,10 @@ is not listed.
 | targeting | `weapons.GetWeaponRange` | view read |
 | targeting | `weapons.WeaponCanReachUnit` | query |
 | units | `ai.SetUnitSquad` | intent |
-| units | `economy.LoadUnitAccounts` | query |
+| units | `economy.LoadUnitAccounts` | intent |
 | units | `economy.RequestEnergy` | mixed |
 | units | `economy.RequestEnergyAndMetal` | mixed |
-| units | `economy.Reset` | mixed |
+| units | `economy.Reset` | intent |
 | units | `economy.UpdateMetalExtraction` | intent |
 | units | `features.PlaceFeature` | mixed |
 | units | `los_radar.AddEyeball` | mixed |
@@ -1284,7 +1284,7 @@ is not listed.
 | units | `weapons.WeaponAimCobComplete` | intent |
 | weapons | `ai.MarkOwnerNetDirtyFromDamageSplit` | intent |
 | weapons | `ai.ReactToAttack` | intent |
-| weapons | `economy.SpendEnergyAndMetal` | mixed |
+| weapons | `economy.SpendEnergyAndMetal` | intent |
 | weapons | `features.DamageFeature` | intent |
 | weapons | `features.GetFootprintCentre` | query |
 | weapons | `los_radar.GetMapCell` | query |
@@ -1492,15 +1492,15 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | subsystem | view read | query | intent | mixed | edges written | edges read | inside an entity |
 |---|---|---|---|---|---|---|---|
 | wind_meteors | 0 / 0 | 0 / 0 | 0 / 0 | 1 / 0 | 0 | 0 | 0 |
-| economy | 0 / 0 | 1 / 2 | 3 / 2 | 1 / 7 | 45 | 11 | 54 |
+| economy | 0 / 0 | 1 / 1 | 3 / 5 | 1 / 5 | 45 | 11 | 54 |
 | features | 1 / 0 | 4 / 3 | 2 / 2 | 2 / 2 | 15 | 13 | 28 |
 | ai | 0 / 0 | 7 / 5 | 4 / 5 | 2 / 0 | 4 | 43 | 47 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 5 | 0 / 1 | 0 | 0 | 0 |
-| weapons | 0 / 2 | 10 / 6 | 8 / 13 | 6 / 2 | 52 | 65 | 117 |
+| weapons | 0 / 2 | 10 / 6 | 9 / 13 | 5 / 2 | 52 | 65 | 117 |
 | targeting | 1 / 0 | 3 / 6 | 1 / 5 | 2 / 3 | 5 | 42 | 45 |
 | los_radar | 0 / 0 | 3 / 13 | 0 / 10 | 0 / 1 | 14 | 30 | 43 |
 | orders | 2 / 0 | 23 / 2 | 22 / 13 | 12 / 3 | 64 | 54 | 118 |
-| units | 1 / 1 | 3 / 16 | 35 / 22 | 6 / 15 | 142 | 61 | 203 |
+| units | 1 / 1 | 2 / 16 | 37 / 22 | 5 / 15 | 142 | 61 | 203 |
 | players | 1 / 0 | 3 / 0 | 14 / 6 | 5 / 0 | 14 | 22 | 35 |
 | map | 0 / 4 | 3 / 8 | 2 / 10 | 0 / 3 | 18 | 32 | 50 |
 
@@ -1518,7 +1518,8 @@ The orders are read from the program, not from a run. That decides what they cla
   of its name, overloads included, so a list can hold steps (and a class count writes) that one call does not run.
   Calls into presentation, network and file code are left out of the lists, and so is the test harness.
 - **Values.** The caller uses a call's value when it uses the value returned, or when it hands the call the address
-  of an object, an array or a pointer to a plain value to fill in.
+  of an object, an array or a pointer to a plain value to fill in. The record an entry point works on, given as its
+  first argument (an account of the economy, say), is not a value handed back.
 - **Writes**, for the classes, are the writes to a field of a record or to a variable of the game that the program
   shows, anywhere in what a call runs (nested entry points and calls outside an interface included), and allocations,
   random draws and sim events. Writes to a local object of the function, or to the object a constructor builds, are

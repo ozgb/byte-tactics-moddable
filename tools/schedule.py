@@ -59,6 +59,7 @@ SEAMS_HEADER = ROOT / "interfaces" / "seams.h"
 SEAM_FIELD = re.compile(r"^\s*(\w+)\*\s+(\w+);", re.M)
 NATIVE = ROOT / "src" / "seams" / "native.cpp"
 NATIVE_TABLE = re.compile(r"^static (\w+) s_(\w+);", re.M)
+NATIVE_SELF = re.compile(r"^static [^;{(]*?\b(\w+)\s*\(\s*(?:const\s+)?\w+\s*\*\s*self\b", re.M)
 NATIVE_SLOT = re.compile(r"^\s*s_(\w+)\.(\w+)\s*=\s*(?:\(.*\))?\s*(\w+);", re.M)
 
 EFFECTS = {"RandomInt": "draw rng", "GameRand": "draw crt", "RecordSimEvent": "sim event"}
@@ -103,7 +104,7 @@ class OrderWalker(rwsets.Walker):
         super().record(kind, target)
         if kind in ("call", "indirect_call") and self.pending is not None:
             node, self.pending = self.pending, None
-            self.calls.append([node["_line"], kind, target, self.used(node) or self.out_argument(node), id(node)])
+            self.calls.append([node["_line"], kind, target, self.used(node) or self.out_arguments(node), id(node)])
 
     def access(self, category: str, target: str, mode: str) -> None:
         if category == "field" and target == self.local_field:
@@ -148,24 +149,23 @@ class OrderWalker(rwsets.Walker):
                 return False
 
     @staticmethod
-    def out_argument(node: dict) -> bool:
-        """Whether a call hands back a value through an argument: the address of an object, an array, or a pointer to a
-        non-const plain value."""
+    def out_arguments(node: dict) -> list[int]:
+        """The arguments (from 0) through which a call can hand back a value: the address of an object, an array, or a
+        pointer to a non-const plain value."""
+        out: list[int] = []
         if node.get("kind") not in ("CallExpr", "CXXMemberCallExpr"):
-            return False
-        for arg in node.get("inner", [])[1:]:
+            return out
+        for index, arg in enumerate(node.get("inner", [])[1:]):
             arg_type = arg.get("type", {})
             if not rwsets.is_pointer(arg_type) or rwsets.pointee_const(arg_type):
                 continue
             inner = rwsets.strip(arg)
-            if inner.get("kind") == "UnaryOperator" and inner.get("opcode") == "&":
-                return True
-            if arg.get("kind") == "ImplicitCastExpr" and arg.get("castKind") == "ArrayToPointerDecay":
-                return True
             pointee = re.sub(r"^(?:struct |class |unsigned |signed )+", "", rwsets.type_text(arg_type)).rstrip(" *")
-            if pointee in PLAIN_POINTEES or pointee in VALUE_TYPES or pointee.startswith("std::"):
-                return True
-        return False
+            if (inner.get("kind") == "UnaryOperator" and inner.get("opcode") == "&") \
+                    or (arg.get("kind") == "ImplicitCastExpr" and arg.get("castKind") == "ArrayToPointerDecay") \
+                    or pointee in PLAIN_POINTEES or pointee in VALUE_TYPES or pointee.startswith("std::"):
+                out.append(index)
+        return out
 
     def used(self, node: dict) -> bool:
         """Whether the value of a call is used: false when the call is a statement of its own or cast to void."""
@@ -340,9 +340,13 @@ class Program:
         self.slots: dict[str, set[str]] = defaultdict(set)
         self.resolved: dict[str, list[str]] = defaultdict(list)
         tables = {name: struct for struct, name in NATIVE_TABLE.findall(native)}
+        adapters = set(NATIVE_SELF.findall(native))
+        self.methods: set[str] = set()
         for table, slot, impl in NATIVE_SLOT.findall(native):
             if table in tables:
                 self.slots["%s::%s" % (tables[table], slot)].add(impl)
+                if impl in adapters:
+                    self.methods.add("%s::%s" % (tables[table], slot))
         for r in edges:
             m = SLOT_REASON.match(r["reason"])
             if m:
@@ -418,7 +422,8 @@ class Program:
                         for g in self.lookup(impl):
                             inline(g)
                 else:
-                    out.append(Node("entry", self.slot_label(slot), callee, used, fn.name, slot))
+                    hands_back = used is True or any(i > 0 or slot not in self.methods for i in used or ())
+                    out.append(Node("entry", self.slot_label(slot), callee, hands_back, fn.name, slot))
                 continue
             for name in names:
                 if name in EFFECTS:
@@ -428,9 +433,9 @@ class Program:
                 inside = [g for g in found if g.sub in TRANSPARENT or g.sub == sub]
                 for g in inside or found:
                     if g.sub in ENGINE:
-                        out.append(Node("engine", g.name, g.sub, used, fn.name))
+                        out.append(Node("engine", g.name, g.sub, bool(used), fn.name))
                     elif g.sub in SIMS and g.sub != sub:
-                        out.append(Node("direct", g.name, g.sub, used, fn.name))
+                        out.append(Node("direct", g.name, g.sub, bool(used), fn.name))
                     else:
                         inline(g)
         cut.discard(key)
@@ -915,7 +920,8 @@ The orders are read from the program, not from a run. That decides what they cla
   of its name, overloads included, so a list can hold steps (and a class count writes) that one call does not run.
   Calls into presentation, network and file code are left out of the lists, and so is the test harness.
 - **Values.** The caller uses a call's value when it uses the value returned, or when it hands the call the address
-  of an object, an array or a pointer to a plain value to fill in.
+  of an object, an array or a pointer to a plain value to fill in. The record an entry point works on, given as its
+  first argument (an account of the economy, say), is not a value handed back.
 - **Writes**, for the classes, are the writes to a field of a record or to a variable of the game that the program
   shows, anywhere in what a call runs (nested entry points and calls outside an interface included), and allocations,
   random draws and sim events. Writes to a local object of the function, or to the object a constructor builds, are

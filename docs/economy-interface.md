@@ -49,10 +49,28 @@ difficulty (0.5 at the easiest, 0.7 at the next). The sites now pass the raw amo
 results are bit for bit 3.1c's: each site's arithmetic is `(float)((double)account + (double)amount * factor)`, and
 a double holds every float sum exactly enough for the float rounding to agree.
 
-**Refused intents.** An event is an intent, checked when it is applied. `Apply` returns its outcome: 1 when applied, 0
-when refused, which leaves the state as it was (a SPEND whose store is short). The scheduler records the outcome with
-the event (trace section 33), so a refusal is seen by the trace and by any caller that asks for it. Under this
-scheduler no event 3.1c makes is refused except a SPEND that 3.1c also refused.
+**Refused intents.** An event is an intent, checked when it is applied. `Apply` returns its outcome:
+- a SPEND: 1 when applied, 0 when refused (its store is short), which leaves the state as it was;
+- a REQUEST: 1 when granted, 0 when not (the account is stalled). It is charged either way, as in 3.1c;
+- every other kind: 1.
+
+The scheduler records the outcome with the event (trace section 33), so a refusal is seen by the trace and by any
+caller that asks for it. Under this scheduler no event 3.1c makes is refused except a SPEND that 3.1c also refused.
+
+Across the 85 reference scenarios, the scheduler records these events and effects:
+
+| Kind | Outcome 1 | Outcome 0 |
+|---|---:|---:|
+| RESET | 3,642 | 0 |
+| LOAD | 4 | 0 |
+| REQUEST | 1,731,216 | 1,072,998 |
+| SPEND | 6,212 | 0 |
+| INCOME | 1,788 | 0 |
+| CLOAK | 855,102 | 0 |
+| EXTRACTOR | 640 | 0 |
+| SHARE | 0 | 0 |
+
+No scenario shares resources, so SHARE is not exercised.
 
 ## 3. Effects out of economy
 

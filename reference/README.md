@@ -326,7 +326,7 @@ game state after each phase of each tick, then a hash of the world tables, flush
 every tick. LF line endings.
 
 ```
-bt-trace 3
+bt-trace 4
 commit <40-hex sha from commit.txt beside the exe, or unknown>
 scenario <path as given to -testmode>
 game_seed <n>
@@ -347,9 +347,8 @@ per phase, because they are large and no phase owns them:
   `endGameCountdown`, `endGameFlags`, and the CD and economy packet counters);
 - the map: `Game.cells` (13 bytes a cell), the visibility mask, each player's explored
   grid, the spatial grid (`Rec`, 10 bytes) with its overflow record, and the eyeball pool;
-- the pathfinder: the object, its node pool (used nodes only, in pool order, with the
-  open heap as node IDs), the `PathCell` groups whose dirty bit is set, and the per-player
-  budget globals;
+- the pathfinder's state (the object, its node pool, the dirty `PathCell` groups and the budget
+  globals) only in a dump (`pathfinder.*` lines): since format 4 it is not hashed;
 - the movement classes and their pass maps;
 - the heap objects of the units (format 3), walked in unit index order and numbered as the
   walk meets them:
@@ -367,6 +366,8 @@ per phase, because they are large and no phase owns them:
 
   They are in the world row, not the per-phase tables, because a script alone is over a
   kilobyte, and a divergence there names the tick and the section, not the phase.
+- the path results (format 4): every search start and search end the pathfinder delivered
+  this tick, in delivery order, with its status, unit, tick, point count and points.
 
 The hash is 64-bit FNV-1a over a canonical serialisation of that state: 8-byte
 little-endian words first, then the remaining bytes one at a time (so the result does not
@@ -392,7 +393,7 @@ A dump of a large map is large: the cells, the explored grids and the pass maps
 are one line per record.
 
 ```
-bt-dump 3
+bt-dump 4
 <tick> <phase> <path> <value>
 ```
 
@@ -520,8 +521,8 @@ per tick (the 7 phases `units` to `meteors`, since `net` does not run, then `wor
 The file:
 
 ```
-bt-digest 3
-trace_format bt-trace 3
+bt-digest 4
+trace_format bt-trace 4
 commit <sha of the build that produced it>
 scenario reference/scenarios/<name>.txt
 game_seed <n>

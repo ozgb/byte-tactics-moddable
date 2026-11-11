@@ -8,7 +8,7 @@ code as a base. This page names the current tag: **`reference-traces-v3`**.
 
 - The source: 3.1c's game logic, and the conformity harness that writes traces
   (`src/harness/`).
-- The trace format: `bt-trace 3` (the digest files are `bt-digest 3`). The
+- The trace format: `bt-trace 4` (the digest files are `bt-digest 4`). The
   format is in `reference/README.md`, the hashed fields in
   `src/harness/trace_schema.h`, and the coverage decisions in
   `data/trace_coverage.csv`.
@@ -121,7 +121,7 @@ uv run tools/tracedigest.py trace.txt --commit <sha> --scenario reference/scenar
 diff mine.txt reference/traces/skirmish2.txt
 ```
 
-The digest file starts with a header (`bt-digest 3`, trace format, commit,
+The digest file starts with a header (`bt-digest 4`, trace format, commit,
 scenario, seeds, `fpu_control_word`), then one `<tick> <digest>` line per
 tick. Your header must agree with the stored one except for `commit`. The
 first differing tick is where your engine first diverges.

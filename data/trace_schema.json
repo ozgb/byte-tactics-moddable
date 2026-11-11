@@ -1,5 +1,5 @@
 {
-  "trace_format": 4,
+  "trace_format": 5,
   "targets": [{"tag": 1, "name": "heap"}, {"tag": 2, "name": "unit"}, {"tag": 3, "name": "player"}, {"tag": 4, "name": "unitdef"}, {"tag": 5, "name": "weapondef"}, {"tag": 6, "name": "projectile"}, {"tag": 7, "name": "feature"}, {"tag": 8, "name": "piece"}, {"tag": 9, "name": "rec"}, {"tag": 10, "name": "node"}, {"tag": 11, "name": "moveclass"}, {"tag": 12, "name": "order"}, {"tag": 13, "name": "orderfx"}, {"tag": 14, "name": "link"}],
   "tables": {
     "AiSearchGoal": {
@@ -1253,15 +1253,6 @@
         {"name": "", "offset": 180, "size": 4, "kind": "bytes", "target": null},
         {"name": "killCount", "offset": 184, "size": 2, "kind": "scalar", "target": null},
         {"name": "", "offset": 186, "size": 2, "kind": "scalar", "target": null},
-        {"name": "energy", "offset": 188, "size": 4, "kind": "scalar", "target": null},
-        {"name": "", "offset": 192, "size": 20, "kind": "bytes", "target": null},
-        {"name": "metal", "offset": 212, "size": 4, "kind": "scalar", "target": null},
-        {"name": "", "offset": 216, "size": 4, "kind": "bytes", "target": null},
-        {"name": "f_dc", "offset": 220, "size": 4, "kind": "scalar", "target": null},
-        {"name": "", "offset": 224, "size": 4, "kind": "bytes", "target": null},
-        {"name": "field_e4", "offset": 228, "size": 2, "kind": "scalar", "target": null},
-        {"name": "f_e6", "offset": 230, "size": 2, "kind": "scalar", "target": null},
-        {"name": "", "offset": 232, "size": 4, "kind": "bytes", "target": null},
         {"name": "owner", "offset": 236, "size": 4, "kind": "ref", "target": "player"},
         {"name": "attacker", "offset": 240, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "lastAttackerSlot", "offset": 244, "size": 1, "kind": "scalar", "target": null},
@@ -1309,13 +1300,13 @@
         {"name": "script", "offset": 154, "size": 4, "kind": "ref", "target": "heap"},
         {"name": "state", "offset": 158, "size": 4, "kind": "ref", "target": "heap"},
         {"name": "head", "offset": 162, "size": 4, "kind": "ref", "target": "heap"},
-        {"name": "", "offset": 166, "size": 70, "kind": "bytes", "target": null},
+        {"name": "", "offset": 166, "size": 22, "kind": "bytes", "target": null},
         {"name": "owner", "offset": 236, "size": 4, "kind": "ref", "target": "player"},
         {"name": "attacker", "offset": 240, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "", "offset": 244, "size": 36, "kind": "bytes", "target": null}
       ],
       "excluded": [
-
+        {"field": "+0xbc..+0xeb", "reason": "the resource account, private to economy: the hash judges it through the economy events (section 33)"}
       ]
     },
     "UnitDefData": {
@@ -1603,5 +1594,19 @@
       {"name": "count", "size": 4, "kind": "scalar", "target": null},
       {"name": "points", "size": 4, "kind": "bytes", "target": null}
     ]
+  },
+  "economy": {
+    "section": 33,
+    "fields": [
+      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
+      {"name": "player", "size": 4, "kind": "scalar", "target": null},
+      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
+      {"name": "resources", "size": 4, "kind": "scalar", "target": null},
+      {"name": "energy", "size": 4, "kind": "scalar", "target": null},
+      {"name": "metal", "size": 4, "kind": "scalar", "target": null},
+      {"name": "value", "size": 4, "kind": "scalar", "target": null},
+      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
+    ],
+    "account": {"kind": 1, "size": 48}
   }
 }

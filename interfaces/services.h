@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 10
+#define SERVICES_VERSION_MINOR 11
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -44,6 +44,9 @@ int __stdcall PathGoalCells(const PathGoalArea* goal, PathPoint* out, int max);
 struct PathEvent;
 // In test mode, records a pathfinding event as the engine delivers it, with its waypoints, for the trace's path results.
 void __stdcall HarnessPathEvent(const PathEvent* event, const PathPoint* points, int capacity);
+struct EconomyEvent;
+// In test mode, records an economy event or effect as the scheduler applies it, with the outcome of its application, for the trace's economy events.
+void __stdcall HarnessEconomyEvent(const EconomyEvent* event, int outcome);
 
 // Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);

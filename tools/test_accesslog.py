@@ -766,8 +766,8 @@ class RunTest(unittest.TestCase):
     def test_equal_and_different_traces(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
-            header = "bt-digest 4\ntrace_format bt-trace 4\ncommit x\nscenario s\ngame_seed 1\ncrt_seed 1\nview_seed 1\nfpu_control_word 0x1\n"
-            trace = "\n".join(["bt-trace 4", "commit x", "scenario s", "game_seed 1", "crt_seed 1", "view_seed 1",
+            header = "bt-digest 5\ntrace_format bt-trace 5\ncommit x\nscenario s\ngame_seed 1\ncrt_seed 1\nview_seed 1\nfpu_control_word 0x1\n"
+            trace = "\n".join(["bt-trace 5", "commit x", "scenario s", "game_seed 1", "crt_seed 1", "view_seed 1",
                                "fpu_control_word 0x1", "1 units 00000000000000aa", "2 units 00000000000000bb", ""])
             (tmp / "trace.txt").write_text(trace)
             import tracedigest

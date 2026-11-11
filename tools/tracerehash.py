@@ -6,7 +6,7 @@ Prints `<tick> <phase> <hash>` for every phase row and the world row of each dum
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
 sections 29 to 31 in the world row. The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
-shape but not hashed; the world row ends with the path results (section 32).
+shape but not hashed; the world row ends with the path results (section 32) and the economy events (section 33).
 """
 
 import argparse
@@ -355,8 +355,9 @@ class Walker:
             self.weapon_definitions()
             self.mission()
         self.results()
+        self.economy()
         if self.pos != len(self.lines):
-            raise Error(f"{len(self.lines) - self.pos} dump lines left after section 32, from {self.lines[self.pos][0]}")
+            raise Error(f"{len(self.lines) - self.pos} dump lines left after section 33, from {self.lines[self.pos][0]}")
         return self.hash.h
 
     def game(self) -> None:
@@ -417,6 +418,8 @@ class Walker:
             self.pathfinder_report()
         finally:
             self.hash = hashed
+        while (self.peek() or "").startswith("economy."):
+            self.pos += 1
 
     def pathfinder_report(self) -> None:
         h = self.hash
@@ -476,6 +479,26 @@ class Walker:
                     h.run(self.hex_run(path))
                 else:
                     self.hash_field(f, self.take(path))
+        h.end()
+
+    def economy(self) -> None:
+        h = self.hash
+        spec = self.schema.data["economy"]
+        h.h8(spec["section"])
+        count = int(self.take("economy.count"), 16)
+        h.h32(count)
+        for k in range(count):
+            kind = None
+            for f in spec["fields"]:
+                value = self.take(f"economy[{k}].{f['name']}")
+                if f["name"] == "kind":
+                    kind = int(value, 16)
+                self.hash_field(f, value)
+            if kind == spec["account"]["kind"]:
+                run = self.hex_run(f"economy[{k}].account")
+                if len(run) != spec["account"]["size"]:
+                    raise Error(f"economy[{k}].account has {len(run)} bytes, expected {spec['account']['size']}")
+                h.run(run)
         h.end()
 
     def move_classes(self) -> None:

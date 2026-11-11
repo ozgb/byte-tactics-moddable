@@ -25,6 +25,7 @@
 #include "../state/sim_globals.h"
 #include "block_scan.h"
 #include "path_results.h"
+#include "economy_results.h"
 #include "../state/block.h"
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
@@ -2790,6 +2791,7 @@ static void VisitModuleState()
     unsigned long long kept = s_hash;
     s_writerOpen = 0;
     g_seams.pathfinding->WriteState(&s_stateWriter);
+    g_seams.economy->WriteState(&s_stateWriter);
     WriterEndRecord();
     s_hash = kept;
 }
@@ -2844,6 +2846,70 @@ static void VisitPathResults()
         fputs("hex:", s_dump);
         const unsigned char* bytes = (const unsigned char*)r->points;
         for (unsigned b = 0; b < r->delivered * sizeof(PathPoint); b++)
+            fprintf(s_dump, "%02x", bytes[b]);
+        fputc('\n', s_dump);
+    }
+}
+
+static EconomyResults s_economyResults;
+static bool s_economyResultsLost;
+
+void __stdcall HarnessEconomyEvent(const EconomyEvent* event, int outcome)
+{
+    if (!HarnessTestMode() || s_trace == nullptr)
+        return;
+    if (!EconomyResultsAdd(&s_economyResults, event, outcome))
+        s_economyResultsLost = true;
+}
+
+static void VisitEconomyResults()
+{
+    if (s_economyResultsLost)
+        Fail("testmode: no memory for the economy events\n");
+    for (unsigned k = 0; k < s_economyResults.count; k++) {
+        EconomyResult* r = &s_economyResults.items[k];
+        Resolve((unsigned)SimBlockBase(), r->unitRef, true, TT_UNIT, &r->unitTag, &r->unitId);
+    }
+    s_hash = EconomyResultsHash(&s_economyResults, s_hash);
+    if (!s_dumpNow)
+        return;
+    char path[64];
+    DumpPrefix("economy.count");
+    fprintf(s_dump, "0x%08x\n", s_economyResults.count);
+    for (unsigned k = 0; k < s_economyResults.count; k++) {
+        const EconomyResult* r = &s_economyResults.items[k];
+        unsigned energyBits, metalBits;
+        memcpy(&energyBits, &r->energy, sizeof energyBits);
+        memcpy(&metalBits, &r->metal, sizeof metalBits);
+        sprintf(path, "economy[%u].kind", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->kind);
+        sprintf(path, "economy[%u].player", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->player);
+        sprintf(path, "economy[%u].unit", k);
+        DumpPrefix(path);
+        if (r->unitTag == 0)
+            fputs("null", s_dump);
+        else if (r->unitTag == TT_HEAP)
+            fputs("heap", s_dump);
+        else
+            fprintf(s_dump, "%s:%u", s_targetNames[r->unitTag], r->unitId);
+        fputc('\n', s_dump);
+        static const char* const kNames[] = { "resources", "energy", "metal", "value", "outcome" };
+        const unsigned values[] = { r->resources, energyBits, metalBits, (unsigned)r->value, (unsigned)r->outcome };
+        for (int f = 0; f < 5; f++) {
+            sprintf(path, "economy[%u].%s", k, kNames[f]);
+            DumpPrefix(path);
+            fprintf(s_dump, "0x%08x\n", values[f]);
+        }
+        if (r->kind != ECONOMY_LOAD)
+            continue;
+        sprintf(path, "economy[%u].account", k);
+        DumpPrefix(path);
+        fputs("hex:", s_dump);
+        const unsigned char* bytes = (const unsigned char*)r->account;
+        for (unsigned b = 0; b < sizeof r->account; b++)
             fprintf(s_dump, "%02x", bytes[b]);
         fputc('\n', s_dump);
     }
@@ -3692,6 +3758,7 @@ static void VisitWorld()
     if (s_traceTick == 1)
         VisitConstants();
     VisitPathResults();
+    VisitEconomyResults();
 }
 
 enum {
@@ -4377,6 +4444,7 @@ void HarnessPhase(int phase)
     }
     if (phase == 7) {
         PathResultsClear(&s_pathResults);
+        EconomyResultsClear(&s_economyResults);
         fflush(s_trace);
         if (s_sound != nullptr)
             fflush(s_sound);

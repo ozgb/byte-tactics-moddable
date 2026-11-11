@@ -5,7 +5,7 @@ digest files. It is enough to compute every row of `trace.txt` from the game sta
 recompute the same rows from a `dump.txt`. It is written in terms of the state block layout and
 `data/trace_schema.json`, so an engine in any language can follow it without the reference's source.
 
-The format is `bt-trace 4`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
+The format is `bt-trace 5`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
 
 Contents:
 
@@ -56,7 +56,7 @@ Contents:
 Plain text, LF line endings. The header is seven lines, in this order:
 
 ```
-bt-trace 4
+bt-trace 5
 commit <40 lowercase hex digits, or "unknown">
 scenario <the path as given to the run>
 game_seed <decimal>
@@ -121,13 +121,14 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 
 | Key | Meaning |
 | --- | --- |
-| `trace_format` | The format number, 4. |
+| `trace_format` | The format number, 5. |
 | `targets` | The pointer target names with their numeric `tag` (used in section 5). |
 | `tables` | Table name to table, sorted by name. |
 | `game_scalars` | Fields of the game record hashed in the `game` section (section 8.1), in hash order. |
 | `wind` | Fields of the game record hashed in the wind section, in hash order. |
 | `globals` | Named simulation globals: `meteors`, `game` and `pathfinder`, each a list in hash order. |
 | `results` | The path results section (section 8.21): its `section` number, the most waypoints of an event it hashes (`points`), and the `fields` of an event in hash order. |
+| `economy` | The economy events section (section 8.22): its `section` number, the `fields` of an event in hash order, and the `account` that a LOAD event adds (the `kind` of the event it follows and its `size` in bytes). |
 
 A **table** has `size` (the byte size of the record it describes), `fields`, `plan`, and for most
 tables `excluded`. A table with `split_of` is a part of another table: it holds fields of that
@@ -171,6 +172,8 @@ a mask).
 `excluded` lists fields of the record that are not hashed through the table, with the reason. Some
 are hashed another way (a count and a run, the class of the object) described in the sections;
 others are left out for good.
+An `excluded` entry named `+0x<low>..+0x<high>` leaves out every field of the record that starts in that
+range of offsets, the bounds included (the Unit table leaves out `+0xbc..+0xeb`, the resource account).
 
 **Masks.** The masks the schema holds are the ones in the field lists. A masked field is read as
 a number, ANDed, and hashed as 4 bytes whatever its size. Example: the `flags` of an `Order`
@@ -278,10 +281,10 @@ section 9 meteors          (7.7)
 ```
 
 **The world row** starts again from the offset basis and hashes sections 10 to 28 in order, leaving
-out sections 16 and 17, then sections 29 to 31 when the tick is 1, then section 32. It has no tick or
+out sections 16 and 17, then sections 29 to 31 when the tick is 1, then sections 32 and 33. It has no tick or
 random preamble. Sections 16 and 17, the pathfinder's own report of its state, are only dumped
 (section 8.7): pathfinding is judged by the results it delivers (section 32) and by the rest of the
-trace.
+trace. The economy is judged likewise by the events applied to it (section 33).
 
 Each section begins with `H8(section number)` and ends with `END`, except where noted (the
 `explosions` group is three sections, 3 to 5, each with its own `END`; the pathfinder's dump is two
@@ -1020,6 +1023,48 @@ or a nearest end. A search that ends as it starts (the unit's cell is in the goa
 the straight walk from it ends no cheaper than the start) delivers its start event and a failed end in
 the same step.
 
+### 8.22 economy events (section 33)
+
+The events and effects of economy in this tick, in the order the scheduler applied them
+(`interfaces/economy.h`). The scheduler records an event right after `Apply` returns, with the outcome
+`Apply` gave (nothing nests inside an event), and an effect right before the engine applies it, with
+outcome 1, so the events that an effect causes (a share's SPEND and INCOME) follow it. The host empties
+the record after the world row of the tick, so the world lines a dump writes after an earlier phase
+hold the records made so far. The fields are `economy.fields` of the schema, in this order.
+
+```
+H8(33)
+H32(n)                                         # dump: economy.count
+for k in 0 .. n-1, in application order:
+    H32(kind)                                  # dump: economy[k].kind
+    H32(player)                                # dump: economy[k].player
+    HP(the record's unit, unit, is_ref=true)   # dump: economy[k].unit
+    H32(resources)                             # dump: economy[k].resources
+    H32(energy as its 4 bytes)                 # dump: economy[k].energy
+    H32(metal as its 4 bytes)                  # dump: economy[k].metal
+    H32(value)                                 # dump: economy[k].value
+    H32(outcome)                               # dump: economy[k].outcome
+    if kind == 1:  the 12 words of the account, as one run of 48 bytes: HB(48 bytes)   # dump: economy[k].account (hex:)
+END
+```
+
+- `kind` is an event: 0 RESET, 1 LOAD, 2 REQUEST, 3 SPEND, 4 INCOME; or an effect: 16 CLOAK,
+  17 EXTRACTOR, 18 SHARE.
+- `player` is the player index of the account's player (a unit's owner, or the player for unit 0), or
+  the giver of a SHARE. The unit is a pointer ID with target `unit` (section 5), null for a player's own
+  account and for the kinds that name no unit.
+- `resources` holds the bits of the resources the record is about: 1 energy, 2 metal. An INCOME carries
+  exactly one bit. `energy` and `metal` are the amounts as IEEE 754 single bits, `value` the argument of
+  an effect (CLOAK: 1 to keep the unit cloaked and 0 to uncloak it; EXTRACTOR: the metal under the
+  footprint; SHARE: the amount given). Fields a kind does not use are 0.
+- `outcome` is the result of `Apply`: 1, or 0 for a SPEND whose store was short.
+- A LOAD adds the account it sets, the 12 float words of a unit's resource account in the order a saved
+  game stores it, copied when the event is recorded.
+- The resource accounts of units are private to economy and are not hashed (the Unit table leaves out
+  bytes 0xbc to 0xeb, section 4); the player accounts of section 27 and the players' resource fields
+  still are. What economy's `WriteState` reports is dumped between sections 15 and 18, with the prefix
+  `economy.`, and is not hash input.
+
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
@@ -1037,8 +1082,8 @@ It is written as 16 lowercase hex digits. A test-mode tick has 8 rows, so the st
 The digest file is:
 
 ```
-bt-digest 4
-trace_format bt-trace 4
+bt-digest 5
+trace_format bt-trace 5
 commit <40 hex digits, or unknown>
 scenario <path>
 game_seed <n>
@@ -1067,10 +1112,11 @@ with single spaces between the first three fields and the value, which runs to t
 dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller state of `rng`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
-lines of section 28), then the lines of section 32, which end the block. The `pathfinder.*` lines of
-sections 16 and 17 sit between those of sections 15 and 18 but are not hash input (section 8.7). Every
+lines of section 28), then the lines of sections 32 and 33, which end the block. The `pathfinder.*` lines of
+sections 16 and 17, and the `economy.*` lines of economy's own report that follow them, sit between those of
+sections 15 and 18 but are not hash input (sections 8.7 and 8.22). Every
 other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
-block in order, skipping the `pathfinder.*` lines, and applying the rules of sections 6 to 8
+block in order, skipping the `pathfinder.*` and report `economy.*` lines, and applying the rules of sections 6 to 8
 reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
@@ -1109,7 +1155,7 @@ not print excluded fields.
 
 To recompute a hash from the dump:
 
-1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), and parse the
+1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7) and the `economy.*` lines that follow them (section 8.22), and parse the
    paths into the structure of sections 6 to 8.
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`
@@ -1162,8 +1208,10 @@ To recompute a hash from the dump:
 
 ## 12. Format numbers
 
-`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 4.
+`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 5.
 Format 4 took sections 16 and 17 out of the world row (they are only dumped) and added section 32.
+Format 5 added section 33 (the economy events, section 8.22) after section 32, and took the resource
+account of a unit (bytes 0xbc to 0xeb of a `Unit`) out of the hash of the Unit table.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

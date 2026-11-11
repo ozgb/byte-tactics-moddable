@@ -142,6 +142,20 @@ RESULTS = tr.Schema(
                 {"name": "points", "size": 4, "kind": "bytes", "target": None},
             ],
         },
+        "economy": {
+            "section": 33,
+            "fields": [
+                {"name": "kind", "size": 4, "kind": "scalar", "target": None},
+                {"name": "player", "size": 4, "kind": "scalar", "target": None},
+                {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
+                {"name": "resources", "size": 4, "kind": "scalar", "target": None},
+                {"name": "energy", "size": 4, "kind": "scalar", "target": None},
+                {"name": "metal", "size": 4, "kind": "scalar", "target": None},
+                {"name": "value", "size": 4, "kind": "scalar", "target": None},
+                {"name": "outcome", "size": 4, "kind": "scalar", "target": None},
+            ],
+            "account": {"kind": 1, "size": 48},
+        },
     }
 )
 
@@ -179,6 +193,61 @@ class ResultsTest(unittest.TestCase):
         want.h32(0)
         want.end()
         self.assertEqual(w.hash.h, want.h)
+
+    def test_economy_hashes_each_event_and_the_account_of_a_load(self):
+        account = bytes(range(48))
+        w = tr.Walker(RESULTS, [
+            ("economy.count", "0x00000002"),
+            ("economy[0].kind", "0x00000003"),
+            ("economy[0].player", "0x00000001"),
+            ("economy[0].unit", "unit:7"),
+            ("economy[0].resources", "0x00000003"),
+            ("economy[0].energy", "0x3f800000"),
+            ("economy[0].metal", "0x40000000"),
+            ("economy[0].value", "0x00000000"),
+            ("economy[0].outcome", "0x00000001"),
+            ("economy[1].kind", "0x00000001"),
+            ("economy[1].player", "0x00000000"),
+            ("economy[1].unit", "null"),
+            ("economy[1].resources", "0x00000000"),
+            ("economy[1].energy", "0x00000000"),
+            ("economy[1].metal", "0x00000000"),
+            ("economy[1].value", "0x00000000"),
+            ("economy[1].outcome", "0x00000001"),
+            ("economy[1].account", "hex:" + account.hex()),
+        ])
+        w.economy()
+        want = tr.Hasher()
+        want.h8(33)
+        want.h32(2)
+        for word in (3, 1):
+            want.h32(word)
+        want.pointer(2, 7)
+        for word in (3, 0x3F800000, 0x40000000, 0, 1, 1, 0):
+            want.h32(word)
+        want.pointer(0, 0)
+        for word in (0, 0, 0, 0, 1):
+            want.h32(word)
+        want.run(account)
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+        self.assertEqual(w.pos, 18)
+
+    def test_no_economy_events_is_section_count_and_end(self):
+        w = tr.Walker(RESULTS, [("economy.count", "0x00000000")])
+        w.economy()
+        want = tr.Hasher()
+        want.h8(33)
+        want.h32(0)
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+
+    def test_economy_report_after_the_pathfinder_is_skipped(self):
+        w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005"), ("economy.accounts", "0x00000001"),
+                                ("moveClasses[0].x", "0x00000001")])
+        w.pathfinder()
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, 2)
 
     def test_pathfinder_report_is_read_but_not_hashed(self):
         w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005")])

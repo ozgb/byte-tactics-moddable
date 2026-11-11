@@ -6,7 +6,8 @@
 The JSON is the same tables as data, for a re-implementation that has no use for the header:
 per table the fields in hash order and the plan the hash walks, the masks with their reasons,
 and the fields left out of the hash with their reasons. Its "results" entry is the record the
-host hashes for each path event it delivers (section 32), in hash order.
+host hashes for each path event it delivers (section 32), in hash order; its "economy" entry is the
+record for each economy event (section 33), with the account that only a LOAD adds.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -26,7 +27,7 @@ from rwsets import load_sim_map
 from simglobals import REF_FIELDS
 
 ROOT = Path(__file__).resolve().parent.parent
-TRACE_FORMAT = 4
+TRACE_FORMAT = 5
 ROOTS = [ROOT / p for p in [
     "src/units/unit.h", "src/game/game.h", "src/network/player.h", "src/network/settings.h",
     "src/weapons/projectile.h", "src/weapons/debris.h", "src/util/rot16.h",
@@ -101,6 +102,7 @@ POINTER_NAMES: dict[tuple[str, int], str] = {
 }
 
 EXCLUSIONS: list[tuple[str, str, str]] = [
+    ("Unit", "+0xbc..+0xeb", "the resource account, private to economy: the hash judges it through the economy events (section 33)"),
     ("Eye", "screen", "points at the record's own screenPos"),
     ("Eye", "flagPtr", "points at the record's own flagB"),
     ("Node", "penalty", "NodeData(x, y, g, f, steps) leaves it unset for the start node; the visit hashes it when g is not 0"),
@@ -898,6 +900,19 @@ PATH_GLOBALS: list[tuple[str, str, int, str | None]] = [
 
 RESULTS_SECTION = 32
 RESULT_POINTS = 64
+ECONOMY_SECTION = 33
+ECONOMY_ACCOUNT_WORDS = 12
+ECONOMY_LOAD_KIND = 1
+ECONOMY_FIELDS: list[tuple[str, int, str, str | None]] = [
+    ("kind", 4, "scalar", None),
+    ("player", 4, "scalar", None),
+    ("unit", 4, "ref", "unit"),
+    ("resources", 4, "scalar", None),
+    ("energy", 4, "scalar", None),
+    ("metal", 4, "scalar", None),
+    ("value", 4, "scalar", None),
+    ("outcome", 4, "scalar", None),
+]
 RESULT_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("kind", 4, "scalar", None),
     ("status", 4, "scalar", None),
@@ -1164,6 +1179,8 @@ def finish(schema, ctype, key):
     leaves, size = schema.layout(ctype)
     names = NAMES.get(key, {})
     excluded = {(t, f) for t, f, _ in EXCLUSIONS if t == key}
+    ranges = [tuple(int(end, 16) for end in f.replace("+0x", "").split("..")) for t, f, _ in EXCLUSIONS
+              if t == key and ".." in f]
     leaves = [dict(leaf) for leaf in leaves]
     for offset, target in sorted(POINTERS.get(key, {}).items()):
         leaves = retype_pointer(schema, key, leaves, offset, target)
@@ -1177,6 +1194,8 @@ def finish(schema, ctype, key):
         mask = MASKS.get((key, leaf["offset"]))
         if mask:
             leaf["mask"] = mask[0]
+        if any(lo <= leaf["offset"] <= hi for lo, hi in ranges):
+            continue
         label = leaf["name"] or "+0x%x" % leaf["offset"]
         if (key, label) in excluded or (key, base_name(leaf)) in excluded or (key, "+0x%x" % leaf["offset"]) in excluded:
             continue
@@ -1285,6 +1304,12 @@ def render_json(model):
     out.append('    "section": %d,' % results["section"])
     out.append('    "points": %d,' % results["points"])
     out.append('    "fields": %s' % many(results["fields"], "    "))
+    out.append("  },")
+    economy = model["economy"]
+    out.append('  "economy": {')
+    out.append('    "section": %d,' % economy["section"])
+    out.append('    "fields": %s,' % many(economy["fields"], "    "))
+    out.append('    "account": %s' % one(economy["account"]))
     out.append("  }")
     out.append("}")
     return "\n".join(out) + "\n"
@@ -1445,6 +1470,10 @@ def generate():
     model["results"] = {"section": RESULTS_SECTION, "points": RESULT_POINTS,
                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
                                    for n, size, kind, target in RESULT_FIELDS]}
+    model["economy"] = {"section": ECONOMY_SECTION,
+                        "fields": [{"name": n, "size": size, "kind": kind, "target": target}
+                                   for n, size, kind, target in ECONOMY_FIELDS],
+                        "account": {"kind": ECONOMY_LOAD_KIND, "size": 4 * ECONOMY_ACCOUNT_WORDS}}
     return "\n".join(lines) + "\n", schema.errors, render_json(model)
 
 

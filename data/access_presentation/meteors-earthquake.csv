@@ -7,6 +7,9 @@ InitPlayerSlot: operator new unsigned char,los_radar,BuildFogTiles,InitPlayerSlo
 InitPlayerSlot: operator new unsigned char,presentation,DrawProjectiles,InitPlayerSlot: operator new unsigned char,0,
 InitPlayerSlot: operator new unsigned char,presentation,SmokeParticles::Render,InitPlayerSlot: operator new unsigned char,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,BuildFogTiles,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 Mission::type,map,Mission::GetGameType,SetMissionType: new Mission,1,
 ModelState::animDirty,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::animDirty,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-

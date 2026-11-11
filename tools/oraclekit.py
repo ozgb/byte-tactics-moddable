@@ -71,7 +71,7 @@ README_SOURCE = "tools/oraclekit/README.md"
 MODULES = "wasm/modules.json"
 COUPLING_DIR = "coupling"
 COUPLING = ("dependencies", "phase_dependencies", "phase_boundaries", "draws", "pass_reads", "presentation_reads",
-            "dependency_checks")
+            "presentation_feeds", "dependency_checks")
 ALLOCATION_ITEM = re.compile(r": ")
 STREAM_NAMES = {"rng.parkMiller": "rng"}
 FUEL_PASS = "tools/wasm_fuel.py"
@@ -431,6 +431,7 @@ MERGE_KEYS = {
     "phase_dependencies": ("writer", "reader", "item", "phase_from", "phase_to", "class"),
     "pass_reads": ("pass", "item", "reader", "evidence"),
     "presentation_reads": ("item", "reader", "pattern", "covered_by_event", "visibility"),
+    "presentation_feeds": ("writer", "reader", "item", "phase"),
     "dependency_checks": ("writer", "reader", "item", "phase", "group"),
 }
 

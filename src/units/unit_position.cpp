@@ -267,7 +267,7 @@ static inline int PlayerMore(unsigned char i)
 void __stdcall UpdateAllUnits(void)
 {
 #if BT_ACCESS_LOG
-    AccessLogPassScope accessPass(ACCESS_PASS_UNITS);
+    AccessLogPassScope accessPass(ACCESS_PASS_UNITS_PLAYERS);
 #endif
     int* cnt;
     unsigned char i;
@@ -284,9 +284,16 @@ void __stdcall UpdateAllUnits(void)
         unsigned char k = p->type;
         if (k != 1 && k != 2 && k != 3) continue;
         if (p->index == 0xa) continue;
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         {
             Unit* last = p->unitsEnd;
             Unit* u = p->unitsBegin;
+#if BT_ACCESS_LOG
+            {
+            AccessLogPassScope unitsPass(ACCESS_PASS_UNITS);
+#endif
             while (u <= last) {
                     if (u->unitDefIndex != 0) {
 #if BT_ACCESS_LOG
@@ -355,6 +362,9 @@ void __stdcall UpdateAllUnits(void)
                     }
                     u = (Unit*)((char*)u + 0x118);
                 }
+#if BT_ACCESS_LOG
+            }
+#endif
                 if (g_game->netGameFlags & 1) {
                     if (p->active != 0) {
                         unsigned char k4 = p->type;

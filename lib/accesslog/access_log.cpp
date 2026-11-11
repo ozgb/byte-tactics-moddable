@@ -7,6 +7,8 @@
 #include "classifier.h"
 #include "../../src/state/alloc_hooks.h"
 #include "../../src/state/sim_events.h"
+#include "../../src/state/sim_radar.h"
+#include "../../src/state/block.h"
 
 #define NS __attribute__((no_sanitize("address")))
 
@@ -86,7 +88,16 @@ const unsigned kDrawBits = 13;
 const unsigned kPassBits = 16;
 const unsigned kEntDraws = 32;
 const char* const kPassNames[] = {"other", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail",
+                                  "features.anim", "explosions.pieces", "explosions.debris", "units.players", "players.los",
                                   "presentation"};
+const unsigned kPresentationPass = ACCESS_PASS_COUNT;
+static_assert(sizeof(kPassNames) / sizeof(kPassNames[0]) == kPresentationPass + 1, "a name for each pass and presentation");
+static_assert(ACCESS_MARK_PASS + ACCESS_PASS_COUNT <= ACCESS_MARK_COUNT, "a mark for each pass");
+const unsigned kPassDepth = 8;
+struct PassFrame {
+    int pass;
+    unsigned entOrd;
+};
 const unsigned kKinds = 40;
 const unsigned kPresBits = 16;
 struct PresEntry {
@@ -128,6 +139,9 @@ const char** g_itemNames;
 unsigned g_idUnresolvedImage, g_idUnresolvedBlock, g_idRng[3], g_idSound, g_idUi, g_idSimEvent;
 int g_pass;
 unsigned g_entOrd;
+unsigned g_ordCounter;
+unsigned g_passDepth;
+PassFrame g_passStack[kPassDepth];
 EntDraw g_ent[kEntDraws];
 unsigned g_entN;
 bool g_entTaint;
@@ -796,7 +810,7 @@ NS void FlushEntity()
     g_entTaint = false;
 }
 
-NS void NotePassRead(unsigned item, unsigned sub, void* ra, unsigned flags)
+NS void NotePassRead(unsigned item, unsigned sub, void* ra, unsigned flags, unsigned level)
 {
     unsigned f = FunctionOf(ra);
     if (g_funcRng != 0 && g_funcRng[f])
@@ -805,7 +819,7 @@ NS void NotePassRead(unsigned item, unsigned sub, void* ra, unsigned flags)
     if (!g_entTaint)
         g_entTaint = true;
     AddTaint(g_taint, &g_taintN, item);
-    unsigned pass = (unsigned)g_pass;
+    unsigned pass = (unsigned)(level < g_passDepth ? g_passStack[level].pass : g_pass);
     unsigned h = (pass * 40503u) ^ (item * 3266489917u) ^ (sub * 2246822519u) ^ (f * 2654435761u) ^ (evidence * 668265263u);
     h ^= h >> 15;
     unsigned mask = (1u << kPassBits) - 1;
@@ -1179,7 +1193,7 @@ NS void Record(int store, unsigned a, unsigned size, void* ra)
             }
             unsigned flags = g_classifier.Read(h.item, h.entA, h.entB, sub, g_tick);
             if ((flags & READ_EARLIER_ENTITY) != 0 && g_passReads != 0)
-                NotePassRead(h.item, sub, ra, flags);
+                NotePassRead(h.item, sub, ra, flags, g_classifier.MatchLevel());
         }
         if (g_raw)
             RawLine(store ? "W" : "R", sub, h.item, h, cursor);
@@ -1203,21 +1217,43 @@ NS void ProcessSimEvent()
         g_classifier.Ordered(5, g_idSimEvent, sub, g_tick);
 }
 
-NS void SetPass(int pass)
+NS void EnterPass(int pass)
 {
     if (g_draws != 0)
         FlushEntity();
+    if (g_passDepth == kPassDepth)
+        Die("accesslog: passes nest deeper than the pass stack\n");
+    PassFrame* f = &g_passStack[g_passDepth++];
+    f->pass = g_pass;
+    f->entOrd = g_entOrd;
     g_pass = pass;
-    g_entOrd = 0;
-    g_classifier.Entity(0);
+    g_entOrd = ++g_ordCounter;
+    g_classifier.PushLevel();
+    g_classifier.Entity(g_entOrd, g_entOrd);
+}
+
+NS void LeavePass()
+{
+    if (g_draws != 0)
+        FlushEntity();
+    if (g_passDepth == 0) {
+        g_pass = ACCESS_PASS_NONE;
+        g_entOrd = 0;
+        g_classifier.Entity(0, 0);
+        return;
+    }
+    PassFrame* f = &g_passStack[--g_passDepth];
+    g_pass = f->pass;
+    g_entOrd = f->entOrd;
+    g_classifier.PopLevel();
 }
 
 NS void NextEntity()
 {
     if (g_draws != 0)
         FlushEntity();
-    g_entOrd++;
-    g_classifier.Entity(g_entOrd);
+    g_entOrd = ++g_ordCounter;
+    g_classifier.Entity(g_entOrd, g_classifier.Floor());
 }
 
 NS bool Mark(unsigned a)
@@ -1231,9 +1267,9 @@ NS bool Mark(unsigned a)
     } else if (offset == ACCESS_MARK_ENTITY) {
         NextEntity();
     } else if (offset == ACCESS_MARK_PASS_END) {
-        SetPass(ACCESS_PASS_NONE);
+        LeavePass();
     } else if (offset >= ACCESS_MARK_PASS) {
-        SetPass((int)(offset - ACCESS_MARK_PASS));
+        EnterPass((int)(offset - ACCESS_MARK_PASS));
     }
     return true;
 }
@@ -1286,14 +1322,8 @@ NS Alloc* NewAlloc()
     return &g_pool[g_poolCount++];
 }
 
-NS void __cdecl OnAdded(void* p, unsigned size)
+NS void AddAlloc(unsigned a, unsigned size, unsigned site)
 {
-    Quiet quiet;
-    unsigned a = (unsigned)p;
-    if (!g_ready || a - g_blockLo >= kBlock)
-        return;
-    host_mutex_lock(g_allocLock);
-    unsigned site = g_depth > 0 ? g_curSite : 0;
     unsigned lo = 0, hi = g_siteCount;
     while (lo < hi) {
         unsigned mid = (lo + hi) / 2;
@@ -1323,6 +1353,16 @@ NS void __cdecl OnAdded(void* p, unsigned size)
     unsigned g = (a - g_blockLo) / 8;
     g_granuleIndex[g] = index;
     SetBit(g);
+}
+
+NS void __cdecl OnAdded(void* p, unsigned size)
+{
+    Quiet quiet;
+    unsigned a = (unsigned)p;
+    if (!g_ready || a - g_blockLo >= kBlock)
+        return;
+    host_mutex_lock(g_allocLock);
+    AddAlloc(a, size, g_depth > 0 ? g_curSite : 0);
     host_mutex_unlock(g_allocLock);
 }
 
@@ -1620,6 +1660,65 @@ extern "C" NS void __cdecl __asan_handle_no_return(void) {}
 extern "C" NS void __cdecl __asan_set_shadow_00(unsigned, unsigned) {}
 extern "C" NS void __cdecl __asan_set_shadow_f8(unsigned, unsigned) {}
 
+NS unsigned SiteWithin(void (*function)())
+{
+    unsigned start = (unsigned)function;
+    for (unsigned i = 0; i < g_siteCount; i++)
+        if (g_sites[i].ra > start && g_sites[i].ra - start < 0x100)
+            return g_sites[i].ra;
+    return 0;
+}
+
+struct PreHook {
+    unsigned queues, arenas;
+};
+
+NS void __cdecl CountExisting(void*, unsigned size, void* ctx)
+{
+    PreHook* c = (PreHook*)ctx;
+    if (size == sizeof(SimEventQueue))
+        c->queues++;
+    else if (size == sizeof(SimRadarArena))
+        c->arenas++;
+}
+
+NS unsigned SiteOfCreator(void (*function)(), unsigned size)
+{
+    unsigned site = SiteWithin(function);
+    if (site == 0) {
+        char text[128];
+        sprintf(text, "accesslog: no allocation site follows the creator of the pre-hook chunk of %u bytes\n", size);
+        Die(text);
+    }
+    return site;
+}
+
+NS void __cdecl AdoptExisting(void* payload, unsigned size, void*)
+{
+    unsigned site = 0;
+    if (size == sizeof(SimEventQueue))
+        site = SiteOfCreator(SimEventsCreate, size);
+    else if (size == sizeof(SimRadarArena))
+        site = SiteOfCreator(SimCaptureCreate, size);
+    AddAlloc((unsigned)payload, size, site);
+}
+
+NS void AdoptPreHookChunks()
+{
+    PreHook c = {0, 0};
+    SimBlockForEach(CountExisting, &c);
+    char text[128];
+    if (c.queues > 1) {
+        sprintf(text, "accesslog: %u pre-hook chunks have the size of the sim event queue (%u bytes)\n", c.queues, (unsigned)sizeof(SimEventQueue));
+        Die(text);
+    }
+    if (c.arenas > 1) {
+        sprintf(text, "accesslog: %u pre-hook chunks have the size of the sim radar arena (%u bytes)\n", c.arenas, (unsigned)sizeof(SimRadarArena));
+        Die(text);
+    }
+    SimBlockForEach(AdoptExisting, 0);
+}
+
 NS void AccessLogInit()
 {
     unsigned size;
@@ -1654,6 +1753,7 @@ NS void AccessLogInit()
 #if BT_DEFER_WRITES
     DeferLoad();
 #endif
+    AdoptPreHookChunks();
     g_allocHooks = &g_hooks;
     g_ready = true;
 }
@@ -1667,6 +1767,8 @@ NS void AccessLogWindow(int window)
         FlushEntity();
     g_pass = ACCESS_PASS_NONE;
     g_entOrd = 0;
+    g_ordCounter = 0;
+    g_passDepth = 0;
 #if BT_DEFER_WRITES
     DeferFlush();
 #endif
@@ -1741,7 +1843,7 @@ NS void AccessLogDraw(int stream, void* ra)
     g_classifier.Ordered(s, g_idRng[s], sub, g_tick);
     if (g_draws == 0)
         return;
-    unsigned pass = g_pass != ACCESS_PASS_NONE ? (unsigned)g_pass : g_window == ACCESS_WINDOW_PRESENTATION ? 9u : 0u;
+    unsigned pass = g_pass != ACCESS_PASS_NONE ? (unsigned)g_pass : g_window == ACCESS_WINDOW_PRESENTATION ? kPresentationPass : 0u;
     unsigned func = FunctionOf(ra);
     EntDraw* e = 0;
     for (unsigned i = 0; i < g_entN; i++)

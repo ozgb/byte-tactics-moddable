@@ -20,8 +20,12 @@ LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,BuildFogTiles,LoadTntMap:
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,Visible,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,orders,Visible,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,-
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,presentation,SmokeParticles::Render,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
-LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,DrawBattleFrame,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,
-LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,HitTestUnitScreenHull,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,0,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,orders,Lookup,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,0,-
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 Mission::type,map,Mission::GetGameType,SetMissionType: new Mission,1,
 ModelState::animDirty,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
 ModelState::animDirty,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,

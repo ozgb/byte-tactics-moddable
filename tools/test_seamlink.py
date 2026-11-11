@@ -87,14 +87,23 @@ class SeamLinkTest(unittest.TestCase):
     def test_seam_table_is_allowed(self):
         self.assertEqual(self.run_with(self.wind("?g_seams@@3USeams@@A")), [])
 
-    def test_a_phase_function_of_the_engine_is_a_seam(self):
+    def filler(self, name, target):
+        unit = Unit(seamlink.NATIVE_TABLE, code={f"?{name}@@YGXXZ"})
+        unit.refs = [(f"?{name}@@YGXXZ", target)]
+        return unit
+
+    def test_a_phase_function_of_the_engine_is_a_seam_for_a_phase_slot_filler_only(self):
         engine = Unit("src/game/scheduler.cpp", code={"?RunPhase@@YAXXZ"})
         other = Unit("src/game/other.cpp", code={"?Other@@YAXXZ"})
-        self.assertEqual(len(self.run_with(self.wind("?RunPhase@@YAXXZ"), engine)), 1)
-        self.write("data/subsystems.csv", SUBSYSTEMS + "RunPhase,src/game/scheduler.cpp,game,phase:Update,game\n")
-        self.assertEqual(self.run_with(self.wind("?RunPhase@@YAXXZ"), engine), [])
-        self.write("data/subsystems.csv", SUBSYSTEMS + "Other,src/game/other.cpp,game,phase:Update,game\n")
-        self.assertEqual(len(self.run_with(self.wind("?Other@@YAXXZ"), other)), 1)
+        fillers = SUBSYSTEMS + "UpdateAllUnits,src/seams/native.cpp,units,x,\nUpdatePlayers,src/seams/native.cpp,players,x,\nUnitsNative,src/seams/native.cpp,units,x,\n"
+        self.write("data/subsystems.csv", fillers)
+        self.assertEqual(len(self.run_with(self.filler("UpdateAllUnits", "?RunPhase@@YAXXZ"), engine)), 1)
+        self.write("data/subsystems.csv", fillers + "RunPhase,src/game/scheduler.cpp,game,phase:Update,game\n")
+        self.assertEqual(self.run_with(self.filler("UpdateAllUnits", "?RunPhase@@YAXXZ"), self.filler("UpdatePlayers", "?RunPhase@@YAXXZ"), engine), [])
+        found = self.run_with(self.wind("?RunPhase@@YAXXZ"), self.filler("UnitsNative", "?RunPhase@@YAXXZ"), engine)
+        self.assertEqual([v.line() for v in found], ["units UnitsNative -> RunPhase (code, game)", "wind_meteors Tick -> RunPhase (code, game)"])
+        self.write("data/subsystems.csv", fillers + "Other,src/game/other.cpp,game,phase:Update,game\n")
+        self.assertEqual(len(self.run_with(self.filler("UpdateAllUnits", "?Other@@YAXXZ"), other)), 1)
 
     def test_state_block_file_and_declaration_are_allowed(self):
         state = Unit("src/state/block.cpp", data={"?g_block@@3HA"})
@@ -344,54 +353,168 @@ Move,src/units/units.cpp,units,x,
         self.assertEqual(found[0][0], "unowned")
 
 
+ECONOMY_HEADER = """#include "state_writer.h"
+// A ledger.
+struct EconLedger {
+    float make;
+    float stall;
+};
+struct EconAccount {
+    EconLedger energy;
+    EconLedger metal;
+};
+struct EconomyWorldView {
+    unsigned int (__stdcall* Tick)(void);
+    int (__stdcall* UnitInfo)(EconUnit unit, EconUnitInfo* out);
+    void (__stdcall* Emit)(const EconomyEvent* effect);
+};
+struct EconomySeam {
+    unsigned int (__stdcall* RegionSize)(const EconMapInfo* map);
+    void (__stdcall* Init)(const EconMapInfo* map, const EconomyWorldView* world, void* region, unsigned int size);
+    void* (__stdcall* Shutdown)(void);
+    int (__stdcall* Apply)(const EconomyEvent* event);
+    void (__stdcall* UpdatePlayerEconomy)(int player);
+    void (__stdcall* UpdateMetalExtraction)(EconUnit unit);
+    void (__stdcall* UpdateResourceSharing)(int player);
+    int (__stdcall* RequestGranted)(EconUnit unit, unsigned int resources);
+    double (__stdcall* GetEnergyUse)(EconType type);
+    void (__stdcall* UnitAccount)(EconUnit unit, EconAccount* out);
+    void (__stdcall* WriteState)(const StateWriter* writer);
+};
+"""
+FILLERS = {"RegionSize": "Size", "Init": "EconomyInit", "Shutdown": "EconomyShutdown", "Apply": "EconomyApply",
+           "UpdatePlayerEconomy": "EconomyUpdatePlayer", "UpdateMetalExtraction": "EconomyExtract",
+           "UpdateResourceSharing": "EconomyShare", "RequestGranted": "Gate", "GetEnergyUse": "Use", "UnitAccount": "Account",
+           "WriteState": "Dump"}
+QUERY_FILLERS = ("Size", "Gate", "Use", "Account", "Dump")
+
+
+def native(fillers):
+    return "static EconomySeam s_economy;\nstatic PlayersSeam s_players;\ns_players.Init = PlayersInit;\n" + "".join(
+        f"s_economy.{slot} = {fn};\n" for slot, fn in fillers.items())
+
+
 class PilotSeamsTest(unittest.TestCase):
     SUBS = """function,file,subsystem,rule,override
 Tick,src/game/scheduler.cpp,game,x,
 Hurt,src/units/units.cpp,units,x,
 Pay,src/orders/orders.cpp,orders,x,
+DrawPanel,src/ingame/info_panel.cpp,presentation,x,
+ShowDialog,src/ingame/game_dialogs.cpp,presentation,x,
+RunGameSteps,src/ingame/game_dialogs.cpp,game,x,
 Gate,src/game/economy.cpp,economy,x,
+Account,src/game/economy.cpp,economy,x,
+Dump,src/game/economy.cpp,economy,x,
 Help,src/game/economy.cpp,economy,x,
 """
-    NATIVE = "s_economy.Apply = EconomyApply;\ns_economy.RequestGranted = Gate;\ns_economy.WriteState = Dump;\n"
 
-    def check(self, rows):
+    def check(self, rows, header=ECONOMY_HEADER, fillers=None):
+        fillers = FILLERS if fillers is None else fillers
+        rows = [(f, "src/game/economy.cpp", "function", "") for f in QUERY_FILLERS] + list(rows)
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             (root / "data").mkdir()
             (root / "src/seams").mkdir(parents=True)
-            (root / seamlink.NATIVE_TABLE).write_text(self.NATIVE)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text(native(fillers))
+            (root / seamlink.ECONOMY_HEADER).write_text(header)
             (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
             (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
                                                 + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
             return seamlink.pilot_seams(root)
 
-    def slot(self, name):
-        return f"indirect via void (*)(int) __attribute__((stdcall)) [EconomySeam::{name}]"
+    def slot(self, name, seam="EconomySeam"):
+        return f"indirect via void (*)(int) __attribute__((stdcall)) [{seam}::{name}]"
+
+    def test_the_tree_as_given_passes(self):
+        self.assertEqual(self.check([]), [])
 
     def test_the_engine_may_call_writing_slots(self):
-        self.assertEqual(self.check([("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("Apply"))]), [])
+        rows = [("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("Apply")),
+                ("RecEconomyApply", "src/harness/replay_hooks.inc", "indirect_call", self.slot("Apply")),
+                ("LoadBattleAssets", "src/game/game_state.cpp", "indirect_call", self.slot("Init")),
+                ("ShutdownIngameSystems", "src/game/game_state.cpp", "indirect_call", self.slot("Shutdown")),
+                ("RunGameSteps", "src/ingame/game_dialogs.cpp", "indirect_call", self.slot("UpdateResourceSharing")),
+                ("RunGameSteps", "src/ingame/game_dialogs.cpp", "field_read", "EconomySeam::UpdateResourceSharing"),
+                ("Help", "src/game/economy.cpp", "indirect_call", self.slot("Apply"))]
+        self.assertEqual(self.check(rows), [])
 
     def test_another_subsystem_calling_a_writing_slot_is_found(self):
         found = self.check([("Hurt", "src/units/units.cpp", "indirect_call", self.slot("Apply")),
                             ("Pay", "src/orders/orders.cpp", "indirect_call", self.slot("UpdatePlayerEconomy"))])
         self.assertEqual([f[:3] for f in found], [("call", "orders", "Pay"), ("call", "units", "Hurt")])
 
+    def test_a_presentation_or_unowned_caller_of_a_writing_slot_is_found(self):
+        found = self.check([("DrawPanel", "src/ingame/info_panel.cpp", "indirect_call", self.slot("Apply")),
+                            ("ShowDialog", "src/ingame/game_dialogs.cpp", "indirect_call", self.slot("UpdateResourceSharing")),
+                            ("Mystery", "src/x.cpp", "field_read", "EconomySeam::Apply"),
+                            ("LoadBattleAssets", "src/other.cpp", "indirect_call", self.slot("Init"))])
+        self.assertEqual([f[:3] for f in found], [("call", "presentation", "DrawPanel"), ("call", "presentation", "ShowDialog"),
+                                                  ("call", "unowned", "LoadBattleAssets"), ("call", "unowned", "Mystery")])
+
     def test_query_slots_may_be_called(self):
-        self.assertEqual(self.check([("Hurt", "src/units/units.cpp", "indirect_call", self.slot("RequestGranted"))]), [])
+        self.assertEqual(self.check([("Hurt", "src/units/units.cpp", "indirect_call", self.slot("RequestGranted")),
+                                     ("DrawPanel", "src/ingame/info_panel.cpp", "indirect_call", self.slot("UnitAccount"))]), [])
+
+    def test_a_slot_missing_from_the_native_table_is_found(self):
+        fillers = {k: v for k, v in FILLERS.items() if k not in ("RegionSize", "Apply")}
+        found = self.check([], fillers=fillers)
+        self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Apply"), ("slot", "RegionSize")])
+
+    def test_a_native_table_without_an_economy_seam_fills_nothing(self):
+        found = self.check([], fillers={})
+        self.assertEqual(len(found), len(FILLERS))
+        self.assertEqual({f[0] for f in found}, {"slot"})
+
+    def test_a_slot_in_neither_list_and_a_listed_slot_not_in_the_header_are_found(self):
+        header = ECONOMY_HEADER.replace("    void (__stdcall* WriteState)", "    void (__stdcall* Debug)(int x);\n    void (__stdcall* WriteState)")
+        header = header.replace("    double (__stdcall* GetEnergyUse)(EconType type);\n", "")
+        found = self.check([], header=header, fillers=dict(FILLERS, Debug="EconomyDebug"))
+        self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Debug"), ("slot", "GetEnergyUse")])
 
     def test_a_write_behind_a_query_slot_is_found(self):
         found = self.check([("Gate", "src/game/economy.cpp", "field_write", "Player::energy")])
-        self.assertEqual(found, [("query", "economy", "Gate", "EconomySeam::RequestGranted writes Player::energy")])
+        self.assertEqual(found, [("query", "economy", "Gate", "EconomySeam::RequestGranted field write Player::energy")])
 
     def test_a_write_in_a_callee_is_found(self):
         found = self.check([("Gate", "src/game/economy.cpp", "call", "Help"), ("Help", "src/game/economy.cpp", "global_write", "g_x")])
         self.assertEqual(len(found), 1)
         self.assertEqual(found[0][2], "Help")
 
-    def test_writes_to_out_parameters_and_to_writing_functions_are_not_found(self):
-        rows = [("Gate", "src/game/economy.cpp", "deref_write", "*EconAccount"), ("Dump", "src/game/economy.cpp", "field_write", "EconLedger::make"),
+    def test_the_out_parameter_may_be_written_but_not_the_region(self):
+        self.assertEqual(self.check([("Account", "src/game/economy.cpp", "deref_write", "*EconAccount"),
+                                     ("Account", "src/game/economy.cpp", "field_write", "EconLedger::stall"),
+                                     ("Account", "src/game/economy.cpp", "call", "UnitAccountOf"),
+                                     ("UnitAccountOf", "src/game/economy.cpp", "deref_escape", "*EconAccount")]), [])
+        found = self.check([("Gate", "src/game/economy.cpp", "field_write", "EconLedger::stall"),
+                            ("Account", "src/game/economy.cpp", "call", "Help"),
+                            ("Help", "src/game/economy.cpp", "deref_write", "*EconAccount"),
+                            ("Account", "src/game/economy.cpp", "deref_maybe_written", "*EconAccount")])
+        self.assertEqual([(f[2], f[3].split(" ", 1)[1]) for f in found],
+                         [("Account", "deref maybe written *EconAccount"), ("Gate", "field write EconLedger::stall"),
+                          ("Help", "deref write *EconAccount")])
+
+    def test_info_structs_and_unreached_writers_are_not_found(self):
+        rows = [("Gate", "src/game/economy.cpp", "field_write", "EconUnitInfo::player"),
                 ("Help", "src/game/economy.cpp", "field_write", "Player::energy")]
         self.assertEqual(self.check(rows), [])
+
+    def test_an_indirect_call_behind_a_query_other_than_a_world_read_is_found(self):
+        self.assertEqual(self.check([("Gate", "src/game/economy.cpp", "indirect_call", self.slot("UnitInfo", "EconomyWorldView")),
+                                     ("Dump", "src/game/economy.cpp", "indirect_call", self.slot("Int", "StateWriter"))]), [])
+        found = self.check([("Gate", "src/game/economy.cpp", "call", "Help"),
+                            ("Help", "src/game/economy.cpp", "indirect_call", self.slot("Emit", "EconomyWorldView")),
+                            ("Account", "src/game/economy.cpp", "indirect_call", self.slot("Int", "StateWriter")),
+                            ("Dump", "src/game/economy.cpp", "indirect_call", "virtual Thing::Poke"),
+                            ("Use", "src/game/economy.cpp", "indirect_call", "indirect via void (*)() [callback]")])
+        self.assertEqual([f[2] for f in found], ["Account", "Dump", "Help", "Use"])
+
+    def test_a_call_without_rows_behind_a_query_is_found(self):
+        self.assertEqual(self.check([("Account", "src/game/economy.cpp", "call", "operator=")]), [])
+        found = self.check([("Gate", "src/game/economy.cpp", "call", "memset"), ("Use", "src/game/economy.cpp", "asm", "inline")])
+        self.assertEqual([(f[2], f[3]) for f in found],
+                         [("Use", "EconomySeam::GetEnergyUse has inline assembly"),
+                          ("memset", "EconomySeam::RequestGranted calls memset, which data/rwsets.csv has no rows for")])
 
 
 if __name__ == "__main__":

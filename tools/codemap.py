@@ -544,7 +544,9 @@ class Model:
         self.parse_flows()
 
     def git_commit(self):
-        result = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.root, capture_output=True, text=True)
+        result = subprocess.run(
+            ["git", "merge-base", "HEAD", "origin/moddable"], cwd=self.root, capture_output=True, text=True
+        )
         return result.stdout.strip() if result.returncode == 0 else "moddable"
 
     def data(self, name):
@@ -1147,7 +1149,9 @@ class Model:
         return {"file": relative, "text": self.source_for(relative)[0]}
 
 
-def make_handler(model):
+def make_handler(model, port):
+    allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
+
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
             pass
@@ -1167,6 +1171,9 @@ def make_handler(model):
                 self.send_body(json.dumps(value, separators=(",", ":")).encode(), "application/json")
 
         def do_GET(self):
+            if self.headers.get("Host") not in allowed_hosts:
+                self.send_body(b"forbidden host", "text/plain", 403)
+                return
             url = urlparse(self.path)
             if url.path.startswith("/api/"):
                 query = {key: values[0] for key, values in parse_qs(url.query).items()}
@@ -1186,7 +1193,8 @@ def make_handler(model):
             if route == "index":
                 return model.index()
             if route == "fn":
-                return model.function_payload(int(query["id"]))
+                index = int(query["id"])
+                return model.function_payload(index) if index >= 0 else None
             if route == "item":
                 return model.item_payload(query["name"])
             if route == "type":
@@ -1221,7 +1229,11 @@ def main(argv=None):
     )
     if args.stats:
         return 0
-    server = ThreadingHTTPServer(("127.0.0.1", args.port), make_handler(model))
+    try:
+        server = ThreadingHTTPServer(("127.0.0.1", args.port), make_handler(model, args.port))
+    except OSError as error:
+        print(f"codemap: cannot listen on 127.0.0.1:{args.port} ({error.strerror}); try --port", file=sys.stderr)
+        return 1
     url = f"http://127.0.0.1:{args.port}/"
     print(f"codemap: serving {url} (Ctrl-C to stop)", flush=True)
     if not args.no_open:

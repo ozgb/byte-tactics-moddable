@@ -1044,7 +1044,8 @@ for k in 0 .. n-1, in application order:
     H32(metal as its 4 bytes)                  # dump: economy[k].metal
     H32(value)                                 # dump: economy[k].value
     H32(outcome)                               # dump: economy[k].outcome
-    if kind == 1:  the 12 words of the account, as one run of 48 bytes: HB(48 bytes)   # dump: economy[k].account (hex:)
+    if kind == 1:
+        for w in 0 .. 11: H32(account[w])      # dump: economy[k].account (hex:, the 48 bytes)
 END
 ```
 
@@ -1063,7 +1064,7 @@ END
 - The resource accounts of units are private to economy and are not hashed (the Unit table leaves out
   bytes 0xbc to 0xeb, section 4); the player accounts of section 27 and the players' resource fields
   still are. What economy's `WriteState` reports (its record, numbered 34) is dumped between sections 15 and
-  18, with the prefix `economy.`, and is not hash input.
+  18, with the prefix `economyState.`, and is not hash input.
 
 ## 9. The per-tick digest
 
@@ -1113,10 +1114,10 @@ dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller stat
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
 lines of section 28), then the lines of sections 32 and 33, which end the block. The `pathfinder.*` lines of
-sections 16 and 17, and the `economy.*` lines of economy's own report that follow them, sit between those of
+sections 16 and 17, and the `economyState.*` lines of economy's own report that follow them, sit between those of
 sections 15 and 18 but are not hash input (sections 8.7 and 8.22). Every
 other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
-block in order, skipping the `pathfinder.*` and report `economy.*` lines, and applying the rules of sections 6 to 8
+block in order, skipping the `pathfinder.*` and `economyState.*` lines, and applying the rules of sections 6 to 8
 reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
@@ -1155,7 +1156,7 @@ not print excluded fields.
 
 To recompute a hash from the dump:
 
-1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7) and the `economy.*` lines that follow them (section 8.22), and parse the
+1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7) and the `economyState.*` lines that follow them (section 8.22), and parse the
    paths into the structure of sections 6 to 8.
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`

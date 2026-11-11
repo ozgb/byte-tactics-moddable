@@ -730,7 +730,7 @@ void __stdcall EconomyWriteState(const StateWriter* w)
             if (s_world->UnitInfo(u, &ui))
                 count++;
     }
-    w->Begin(34, "economy");
+    w->Begin(34, "economyState");
     w->Int("count", 0, 4, count);
     unsigned int k = 0;
     for (int player = 0; player < 10; player++) {

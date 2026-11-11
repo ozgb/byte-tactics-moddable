@@ -418,7 +418,7 @@ class Walker:
             self.pathfinder_report()
         finally:
             self.hash = hashed
-        while (self.peek() or "").startswith("economy."):
+        while (self.peek() or "").startswith("economyState."):
             self.pos += 1
 
     def pathfinder_report(self) -> None:
@@ -498,7 +498,8 @@ class Walker:
                 run = self.hex_run(f"economy[{k}].account")
                 if len(run) != spec["account"]["size"]:
                     raise Error(f"economy[{k}].account has {len(run)} bytes, expected {spec['account']['size']}")
-                h.run(run)
+                for w in range(0, len(run), 4):
+                    h.h32(int.from_bytes(run[w : w + 4], "little"))
         h.end()
 
     def move_classes(self) -> None:

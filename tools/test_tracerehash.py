@@ -228,7 +228,8 @@ class ResultsTest(unittest.TestCase):
         want.pointer(0, 0)
         for word in (0, 0, 0, 0, 1):
             want.h32(word)
-        want.run(account)
+        for i in range(0, len(account), 4):
+            want.h32(int.from_bytes(account[i : i + 4], "little"))
         want.end()
         self.assertEqual(w.hash.h, want.h)
         self.assertEqual(w.pos, 18)
@@ -243,7 +244,7 @@ class ResultsTest(unittest.TestCase):
         self.assertEqual(w.hash.h, want.h)
 
     def test_economy_report_after_the_pathfinder_is_skipped(self):
-        w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005"), ("economy.accounts", "0x00000001"),
+        w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005"), ("economyState.count", "0x00000001"),
                                 ("moveClasses[0].x", "0x00000001")])
         w.pathfinder()
         self.assertEqual(w.hash.h, tr.OFFSET_BASIS)

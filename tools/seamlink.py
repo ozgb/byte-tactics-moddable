@@ -16,7 +16,8 @@ template or compiler-made function such as Ref<T>::Ref, a static initialiser or 
 deleting destructor) is judged for every simulation subsystem that has a function in its
 source file; a file with no simulation function is not checked:
 
-  seam          g_seams, or anything interfaces/seams.h declares outside the table struct
+  seam          g_seams, or anything interfaces/seams.h declares outside the table struct, or a function that data/subsystems.csv
+                gives a `phase:` rule (the engine's entry point for a phase, which the default seam slot of it calls)
   state         g_game, a symbol defined in src/state/, or declared in interfaces/ref.h and not defined elsewhere
   service       declared at depth 0 in interfaces/services.h, or a member of a class it defines
   host          declared in interfaces/host.h
@@ -242,6 +243,7 @@ class Rules:
     const_names: set
     code_defs: dict
     data_defs: dict
+    phases: set = field(default_factory=set)
 
     def sole_owner(self, file: str):
         """The subsystem that owns every function of the file, or None for a shared file."""
@@ -288,6 +290,15 @@ def const_names(root: Path) -> set:
         return {r["name"] for r in csv.DictReader(f) if r["class"] in CONST_CLASSES}
 
 
+def phase_functions(root: Path) -> set:
+    """The functions data/subsystems.csv gives a `phase:` rule: the engine's entry points for a phase, which the default seam slots call."""
+    path = root / SUBSYSTEMS
+    if not path.exists():
+        return set()
+    with path.open(newline="") as f:
+        return {r["function"] for r in csv.DictReader(f) if r.get("rule", "").startswith("phase:")}
+
+
 def build_rules(root: Path, units: list) -> Rules:
     by_function, by_file = read_subsystems(root)
     code_defs, data_defs = {}, {}
@@ -304,7 +315,7 @@ def build_rules(root: Path, units: list) -> Rules:
     for header in STATE_HEADERS:
         state |= header_names(root, header)
     return Rules(by_function, by_file, services, header_names(root, HOST_HEADER), header_names(root, SEAMS_HEADER) | {SEAM_TABLE}, state,
-                 header_names(root, BITEXACT_HEADER), const_names(root), code_defs, data_defs)
+                 header_names(root, BITEXACT_HEADER), const_names(root), code_defs, data_defs, phase_functions(root))
 
 
 def classify(rules: Rules, subsystem: str, symbol: str):
@@ -313,7 +324,7 @@ def classify(rules: Rules, subsystem: str, symbol: str):
     last = name.split("::")[-1]
     if last == GAME_POINTER:
         return "state"
-    if name in rules.seams or last in rules.seams:
+    if name in rules.seams or last in rules.seams or (last in rules.phases and "::" not in name):
         return "seam"
     files = rules.code_defs.get(symbol, set()) | rules.data_defs.get(symbol, set())
     in_state = all(f.startswith(STATE_DIR) for f in files)

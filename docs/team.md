@@ -2,7 +2,7 @@
 
 Two Claude sessions run the plan in #2:
 
-- the **lead** (`/lead`) implements issues, opens pull requests and gets them to a mergeable state;
+- the **lead** (`/lead`) implements issues, opens pull requests and gets them to a mergeable state, through one issue agent per issue ("Issue agents" below);
 - the **maintainer** (`/maintainer`) reviews and merges pull requests, and keeps the issues true to the plan and to the work already merged.
 
 The plan in #2 sets the goals and the decisions. The human makes every major architecture decision ("Major architecture decisions" below); the maintainer settles anything else the plan leaves open.
@@ -23,7 +23,15 @@ cd ~/source/repos/byte-tactics-moddable-maintainer  && BT_ROLE=maintainer claude
 - The maintainer reviews only in `.worktrees/review-<PR>` (`tools/worktree.sh --pr <PR>`).
 - Each clone links `toolchain/` and `orig/TotalA.exe` from an existing setup or gets them from `tools/setup_toolchain.sh`; the worktree script links them into every worktree.
 
+Both roles normally run inside a [bwai sandbox](https://github.com/ozgb/bubblewrap-ai). Its broker decides which commands reach the host, and pushes go through `git-safe push`, which pushes only the current branch and only as a fast-forward: no force-push, no protected branch.
+
 `BT_ROLE` turns on a hook (`tools/role_guard.py`, registered in `.claude/settings.json`) that blocks file edits and history-changing git commands outside the role's own worktrees, for the session and its subagents alike. Sessions without `BT_ROLE` are unaffected.
+
+## Issue agents
+
+The lead keeps its own context for the queue and doesn't implement. Each issue it takes goes to an **issue agent**: an Opus subagent with fresh context that owns that one issue, in its worktree, from the readiness check to an open pull request, and again for each review round (`.claude/skills/lead/issue-agent.md`). An issue agent may hand slices of the work to its own subagents.
+
+An issue agent is the lead to everyone else: it signs `Lead:`, follows this file, and the maintainer reviews its work as the lead's.
 
 ## Signing
 
@@ -55,7 +63,7 @@ gh api repos/ozgb/byte-tactics-moddable/pulls/<PR> --jq .head.sha
 
 A pull request **needs review** when it is open, not a draft, and its head SHA differs from the SHA in its latest verdict (or it has none). Pushing new commits is how the author asks for another review: no label or mention is needed.
 
-A pull request body names the gate tier it ran: `--tier` (the scenarios of `GATE_TIER`, the gate of every change the gate applies to) or the full `--check` (the gate only of a change that regenerates the stored reference data, as `reference/README.md`, "When the full suite is the gate", says). A body that names only `--tier` for such a change is sent back. The play-tests are not part of a pull request's gate: they run with the full `--check` on `moddable` when `uv run tools/fullgate.py due` passes.
+A pull request body names the gate tier it ran: `--tier` (the scenarios of `GATE_TIER`, the gate of every change the gate applies to) or the full `--check` (the gate only of a change that regenerates the stored reference data, as `reference/README.md`, "When the full suite is the gate", says). A body that names only `--tier` for such a change is sent back. The play-tests are not part of a pull request's gate: they run with the full `--check` on `moddable` nightly, run by the maintainer when a merge since the last run needed the gate (`uv run tools/fullgate.py due` exits 1).
 
 ## Human review
 
@@ -67,6 +75,8 @@ Most pull requests are merged on the maintainer's review alone. One **needs huma
 - or the human asked to see it, on the pull request or its issue.
 
 A decision the human hasn't made yet is still consulted on the issue first ("Major architecture decisions"); human review is for what the human has to see before it lands.
+
+The lead says so when it opens such a pull request: a **Human review** line in the body names the items on this list that the change hits.
 
 The maintainer takes such a pull request as far as it can without the human: every finding of its own is fixed or answered, CI is green, and it would merge. Then it:
 
@@ -130,7 +140,7 @@ A pull request that makes a major decision the human hasn't made gets a `changes
 ## Issue states
 
 - **Available:** open, no assignee, no open blockers (`blocked_by` API, mirrored in the "Blocked by" line), not labelled `needs-grooming` or `parked`.
-- **Claimed:** assigned, with a "Lead: Claimed" comment. The lead holds up to 10 claims at a time, counting each from its claim until its pull request merges or it is released. Claims that change the same files, such as the replay schema or the generated `data/` files, still merge one at a time, oldest pull request first.
+- **Claimed:** assigned, with a "Lead: Claimed" comment. The lead holds up to 3 claims at a time, counting each from its claim until its pull request merges or it is released. Claims that change the same files, such as the replay schema or the generated `data/` files, still merge one at a time, oldest pull request first.
 - **Done:** closed by the merged pull request's `Closes #N`.
 
 Blockers are kept in two places that must agree: the `blocked_by` dependency API, which tools query, and the "**Blocked by:**" line at the top of the body, which people read. Whoever changes one changes the other.

@@ -131,13 +131,14 @@ change regenerates the stored reference data (`reference/` traces, sounds, UI
 logs, frames or saves, or the trace format; `reference/README.md`, "When the
 full suite is the gate"). The play-tests (`tools/playtest.py` smoke, full, mp
 and music) are not part of a pull request's gate: they run with the full
-`--check` on `moddable` when `uv run tools/fullgate.py due` passes (every 5
-gated merges), and the lead reports them in the `Full gate on <sha>` comment
-on #632. #286 is what they catch, and the trade is speed for a later catch.
-A periodic failure is fixed afterwards, not by freezing merges: the lead files
-it at once as an issue, first in #2's order, with the failing scenario or
-play-test and the merges since the last pass; merges continue, and the next
-periodic run must pass. `--both-modes` plays each scenario in WASM and with native modules in one pool and passes only when
+`--check` on `moddable` nightly, when a merge since the last run needed the
+gate (`uv run tools/fullgate.py due` exits 1), and the maintainer reports them
+in the `Full gate on <sha>` comment on #632. #286 is what they catch, and the
+trade is speed for a later catch. A nightly failure is fixed afterwards, not by
+freezing merges: the maintainer files it at once as an issue, never `parked`,
+first in #2's "Priority now", with the failing scenario or play-test and the
+merges since the last pass; merges continue, and the next nightly run must
+pass. `--both-modes` plays each scenario in WASM and with native modules in one pool and passes only when
 both equal; every game of a `--check` holds one of the machine's run slots, so gates share the
 machine's slots, and a second `--check` waits only for a gate with the same cache key (`--no-lock` takes
 no slot and no key lock, for runs that are not gates). Run either on a fresh prefix (remove
@@ -163,9 +164,15 @@ upstream's 8aad1812).
 ```sh
 git fetch origin moddable && git rebase origin/moddable
 # re-run the gate
-git push -u origin issue-<N>
+git push -u origin issue-<N>      # git-safe push, in the bwai sandbox
 gh pr create --repo ozgb/byte-tactics-moddable --base moddable --title "<Type>: <Subject>" --body-file <file>
 ```
+
+Rebase only before the first push. Once the branch is pushed, bring in
+`moddable` by merging `origin/moddable` into it: a rebase needs a force-push,
+and `git-safe push` (the only push in the
+[bwai sandbox](https://github.com/ozgb/bubblewrap-ai) the roles run in) refuses
+anything but a fast-forward.
 
 The body:
 

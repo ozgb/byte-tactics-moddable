@@ -63,7 +63,7 @@ call 0 FindWeaponTarget
   r rng.main 0x00000586
   r rng.load 0xf778dc24
   r rng.seed 0x76f2d31e
-  r Unit#1.def UnitDef#1
+  r Unit#1.def UnitDef#34
   r Unit#1.player Player#0
   r Unit#1.flags 0x90e00221
   r Unit#1.activateFlags 1
@@ -72,12 +72,12 @@ call 0 FindWeaponTarget
   r Unit#1.posX 36700160
   r Unit#1.posY 65536
   r Unit#1.posZ 15728640
-  r UnitDef#1.flags1 0x0495c0c8
-  r UnitDef#1.range 290
-  r UnitDef#1.categories UnitTypeSet#1
-  r UnitDef#1.weaponCategories0 UnitTypeSet#1
-  r UnitDef#1.weaponCategories1 UnitTypeSet#2
-  r UnitDef#1.weaponCategories2 UnitTypeSet#2
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.range 290
+  r UnitDef#34.categories UnitTypeSet#1
+  r UnitDef#34.weaponCategories0 UnitTypeSet#1
+  r UnitDef#34.weaponCategories1 UnitTypeSet#2
+  r UnitDef#34.weaponCategories2 UnitTypeSet#2
   r Player#0.active 1
   r Player#0.type 1
   r weapondef#20.flags 0x00080809
@@ -108,7 +108,7 @@ call 0 GetWeaponTargetUnit
   o result null
 call 0 FindWeaponTarget
   r rng.seed 0x6926fa60
-  r Unit#251.def UnitDef#2
+  r Unit#251.def UnitDef#167
   r Unit#251.player Player#1
   r Unit#251.flags 0x90e00021
   r Unit#251.activateFlags 1
@@ -117,12 +117,12 @@ call 0 FindWeaponTarget
   r Unit#251.posX 221249536
   r Unit#251.posY 65536
   r Unit#251.posZ 92274688
-  r UnitDef#2.flags1 0x0495c0c8
-  r UnitDef#2.range 290
-  r UnitDef#2.categories UnitTypeSet#1
-  r UnitDef#2.weaponCategories0 UnitTypeSet#1
-  r UnitDef#2.weaponCategories1 UnitTypeSet#2
-  r UnitDef#2.weaponCategories2 UnitTypeSet#2
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.range 290
+  r UnitDef#167.categories UnitTypeSet#1
+  r UnitDef#167.weaponCategories0 UnitTypeSet#1
+  r UnitDef#167.weaponCategories1 UnitTypeSet#2
+  r UnitDef#167.weaponCategories2 UnitTypeSet#2
   r Player#1.active 1
   r Player#1.type 2
   r weapondef#21.flags 0x00080809
@@ -447,17 +447,17 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x0096e59b
-  r Unit#3.def UnitDef#3
+  r Unit#3.def UnitDef#114
   r Unit#3.player Player#0
   r Unit#3.flags 0x90240221
   r Unit#3.activateFlags 0
   r Unit#3.playerIndex 0
-  r UnitDef#3.flags1 0x00818089
-  r UnitDef#3.range 210
-  r UnitDef#3.categories UnitTypeSet#1
-  r UnitDef#3.weaponCategories0 UnitTypeSet#1
-  r UnitDef#3.weaponCategories1 UnitTypeSet#2
-  r UnitDef#3.weaponCategories2 UnitTypeSet#2
+  r UnitDef#114.flags1 0x00818089
+  r UnitDef#114.range 210
+  r UnitDef#114.categories UnitTypeSet#1
+  r UnitDef#114.weaponCategories0 UnitTypeSet#1
+  r UnitDef#114.weaponCategories1 UnitTypeSet#2
+  r UnitDef#114.weaponCategories2 UnitTypeSet#2
   a unit Unit#3
   i ai.GetVisibleEnemiesInRadius 0 pos=(44564480,65536,28180480) 210 0
   o out []

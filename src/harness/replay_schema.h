@@ -812,6 +812,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "fire", offsetof(WeaponDef, fire), sizeof(((WeaponDef*)nullptr)->fire), ROK_WEAPONFIRE, RK_CODE, 1, 0, 0, {}, 0, 0 },
 };
 static const unsigned kReplayObjectFieldCount = 330;
+static const unsigned kReplayWalkableFieldCount = 52;
 
 static const unsigned short kReplayReachFields[] = { 47, 51, 181, 182, 183, 38, 37, 0, 25, 51, 184, 38, 36, 39, 47, 52, 54, 109 };
 

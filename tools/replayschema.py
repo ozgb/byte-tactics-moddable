@@ -254,6 +254,7 @@ VECTOR_SCALARS = {"char": 1, "unsigned char": 1, "short": 2, "unsigned short": 2
                   "unsigned long": 4, "float": 4, "double": 8}
 VECTOR_MODES = {"object": "RV_OBJECT", "scalar": "RV_SCALAR", "value": "RV_VALUE", "cstring": "RV_CSTRING"}
 VECTOR_ENUMS = dict(VECTOR_MODES, cstringref="RV_CSTRINGREF")
+WALKED_KINDS = ("ref", "embed", "unitid", "weapon", "refs", "embeds")
 
 
 def check_vector(where: str, spec: dict, owner: str, ann: dict, errors: list[str]) -> dict:
@@ -1896,7 +1897,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         L.append('    { "%s", %s, %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
             f["name"], "0" if derived else "offsetof(%s, %s)" % (t, member), size_text, kind_id[f["object"]], FIELD_KINDS[field_kind(f)], target, range_end.get(i, 0), range_begin.get(i, 0),
             when, f.get("reachFirst", 0), f.get("reachCount", 0), extra))
-    L += ["};", "static const unsigned kReplayObjectFieldCount = %d;" % len(ofields), ""]
+    walkable = sum(1 for f in ofields if field_kind(f) in WALKED_KINDS or (f["kind"] == "vector" and vectors[f["vector"] - 1]["mode"] == "object"))
+    L += ["};", "static const unsigned kReplayObjectFieldCount = %d;" % len(ofields), "static const unsigned kReplayWalkableFieldCount = %d;" % walkable, ""]
     L += ["static const unsigned short kReplayReachFields[] = { %s };" % ", ".join(str(i) for i in model["reach_table"] or [0]), ""]
     for f in ofields:
         t = types[f["object"]]

@@ -1229,7 +1229,7 @@ The recordings of weapons, which the modern build runs as native code in every m
 - `combat-deaths`, ticks 850 to 1000: a solar plant and a laser tower self-destruct, `DamageUnit` with 30000 damage (`ai.ReactToAttack`, `units.MarkRecentlyDamaged`).
 
 `Game.projectiles` is a table of 300 projectiles (the 300 of the game's `projectileCount < 300` guard), every element a root of `UpdateUnitWeapons` and `FindTargetableProjectile`, so a shot made at index `projectileCount` finds its element and the first call records all 300 with every field the slot reads (about 8,000 lines). `Game.tracked` and `Game.value_142f3`, which `InitProjectile` writes and reads for the camera, are `exempt`.
-The recorder's walker holds 128 walkable fields in a slot set.
+The recorder's walker holds as many fields as the schema has walkable object fields (references, embedded objects, unit ids, weapons and vectors of objects), a count the generated schema states, so no slot set can overflow it.
 
 A subsystem that imports a slot of another complete subsystem (`weapons` imports `targeting.GetWeaponTargetPos` and `economy.SpendEnergyAndMetal`, and `targeting` and `wind_meteors` import `weapons` slots) is replayed against the import stubs of that seam, not against the other module: `BindSeams` binds the stubs of the seams a recording's subsystem imports from, after the native tables.
 

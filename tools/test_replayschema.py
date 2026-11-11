@@ -628,6 +628,21 @@ class Tables(unittest.TestCase):
         self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 6,', text)
         self.assertIn('{ "UnitDef", sizeof(UnitDef), RS_STATE, 3,', text)
 
+    def test_the_walker_holds_every_walkable_object_field(self):
+        files, _, _ = self.generated()
+        text = files[rs.SCHEMA_H]
+        vectors = re.search(r"kReplayVectors\[\] = \{\n(.*?)\n\};", text, re.S).group(1).splitlines()
+        fields = re.search(r"kReplayObjectFields\[\] = \{\n(.*?)\n\};", text, re.S).group(1).splitlines()
+        walked = 0
+        for line in fields:
+            kind = re.search(r", RK_(\w+), ", line).group(1)
+            if kind in ("REF", "EMBED", "UNITID", "WEAPON", "REFS", "EMBEDS"):
+                walked += 1
+            elif kind == "VECTOR" and "RV_OBJECT" in vectors[int(line.rstrip(" },").rsplit(", ", 1)[1]) - 1]:
+                walked += 1
+        self.assertGreater(walked, 0)
+        self.assertIn("static const unsigned kReplayWalkableFieldCount = %d;" % walked, text)
+
     def test_the_size_of_an_inline_table_is_checked_against_its_count(self):
         files, _, _ = self.generated()
         self.assertIn("sizeof(((Game*)nullptr)->players) == 10 * sizeof(Player)", files[rs.SCHEMA_H])

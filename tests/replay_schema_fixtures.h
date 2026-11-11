@@ -1054,6 +1054,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "flags", offsetof(OrderTableEntry, flags), sizeof(((OrderTableEntry*)nullptr)->flags), ROK_FIXTUREORDERENTRY, RK_U32, 0, 0, 0, {}, 0, 0 },
 };
 static const unsigned kReplayObjectFieldCount = 436;
+static const unsigned kReplayWalkableFieldCount = 70;
 
 static const unsigned short kReplayReachFields[] = { 47, 51, 181, 182, 183, 38, 37, 0, 25, 51, 184, 34, 350, 38, 36, 39, 47, 52, 54, 109 };
 

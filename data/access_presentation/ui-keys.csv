@@ -147,7 +147,6 @@ Order::unit,orders,??1Order@@QAE@XZ,EnsurePatrolReturnOrder: new Order,0,-
 Order::unit,presentation,DrawUnitRangeRings,AddOrder: new Order,0,
 Order::unit,presentation,DrawWeaponCoverage,AddOrder: new Order,0,
 Order::unit,presentation,DrawWeaponCoverage,EnsurePatrolReturnOrder: new Order,0,
-Pathfinder::path,pathfinding,Pathfinder::AbortIfGoalMatch,CreatePathfinderNative: new Pathfinder,0,-
 Pool::entries,presentation,BlitFeatureGaf,pool,0,
 Projectile::active,presentation,DrawProjectiles,AllocWeaponArray: GameAllocIgnoreTag WEAPON ARRAY,0,
 Projectile::position,presentation,DrawProjectiles,AllocWeaponArray: GameAllocIgnoreTag WEAPON ARRAY,0,
@@ -389,7 +388,7 @@ p1b8a,presentation,DrawUnitInfoPanel,p1b8a,0,
 p1b8a,presentation,UnitTable::DrawPieces,p1b8a,0,
 pad_14273,los_radar,BuildFogTiles,pad_14273,0,-
 pad_14273,los_radar,Visible,pad_14273,0,
-pathfinder,orders,AiSearchGoal::SetPathOrder,pathfinder,0,-
+pathfinder,pathfinding,PathfindingCancel,pathfinder,0,-
 playerIndex,los_radar,BuildFogTiles,playerIndex,0,-
 playerIndex,los_radar,Visible,playerIndex,0,
 playerIndex,presentation,CollectVisibleUnitIds,playerIndex,1,
@@ -407,6 +406,7 @@ startPos,presentation,DrawBattleFrame,startPos,1,
 startPos,presentation,DrawUnitInfoPanel,startPos,0,
 ticks,game,RecordSimEvent,ticks,0,-
 ticks,game,RunGameSteps,ticks,1,
+ticks,harness,HarnessSimEventSlot,ticks,0,-
 ticks,harness,HarnessSoundEvent,ticks,0,
 ticks,harness,HarnessUiCancel,ticks,0,-
 ticks,harness,HarnessUiOrder,ticks,0,

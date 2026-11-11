@@ -1,0 +1,12 @@
+# save-midgame with a 96 MiB block and a limit of 3000 search steps per tick: the save keeps both.
+game_seed 1
+crt_seed 1
+view_seed 1
+map The Pass
+start_positions fixed
+ticks 1800
+player0.side Arm
+player1.side Core
+save 900
+block_bytes 100663296
+search_steps 3000

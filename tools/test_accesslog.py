@@ -550,6 +550,125 @@ class LayoutTest(unittest.TestCase):
         self.assertEqual(types, 1)
 
 
+POOL_LAYOUT = """*** Dumping AST Record Layout
+         0 | struct PathExtra
+         0 |   int nodeLimit
+         4 |   int poolOffset
+         8 |   int itemsOffset
+        12 |   int cellsOffset
+        16 |   int dirtyOffset
+        20 |   int goalOffset
+        24 |   int pendingOffset
+        28 |   int requesterBuckets
+        32 |   int unitBuckets
+        36 |   int eventsOffset
+        40 |   int[10] budgetCap
+           | [sizeof=80, align=4,
+           |  nvsize=80, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct Node
+         0 |   int index
+         4 |   struct NodeData data
+         4 |     struct Point16 pos
+         4 |       short x
+         6 |       short y
+         8 |     int g
+           | [sizeof=12, align=4,
+           |  nvsize=12, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class Pathfinder
+         0 |   class OpenHeap (base)
+         0 |     struct Ref<struct Node> pool
+         0 |       unsigned int offset
+         4 |     int count
+         8 |   struct PathGrid grid
+         8 |     struct Ref<struct PathCell> cells
+         8 |       unsigned int offset
+        12 |     unsigned int width
+        16 |   union Pathfinder::(anonymous at x.h:315:5) 
+        16 |     struct TurnCostTable table
+        16 |       unsigned char[8] values
+        16 |     unsigned char[8] turnCost
+        24 |   PathUnit[10] cursor
+           | [sizeof=64, align=1,
+           |  nvsize=64, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct PathCell
+         0 |   unsigned char flags
+         1 |   unsigned char dir
+         2 |   unsigned short node
+           | [sizeof=4, align=2,
+           |  nvsize=4, nvalign=2]
+
+*** Dumping AST Record Layout
+         0 | struct PathPending
+         0 |   int requester
+         4 |   int unit
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+"""
+
+
+class RegionTest(unittest.TestCase):
+    def setUp(self):
+        self.layouts = al.Layouts(POOL_LAYOUT)
+
+    def test_flat_fields_walk_bases_and_nested_records(self):
+        size, fields = al.flat_fields(self.layouts, "Node")
+        self.assertEqual(size, 12)
+        self.assertEqual(fields, [(0, 4, "Node::index"), (4, 6, "Node::data.pos.x"), (6, 8, "Node::data.pos.y"), (8, 12, "Node::data.g")])
+
+    def test_refs_arrays_and_unions_are_leaves(self):
+        _, fields = al.flat_fields(self.layouts, "Pathfinder")
+        names = {n: (s, e) for s, e, n in fields}
+        self.assertEqual(names["Pathfinder::pool"], (0, 4))
+        self.assertEqual(names["Pathfinder::count"], (4, 8))
+        self.assertEqual(names["Pathfinder::grid.cells"], (8, 12))
+        self.assertEqual(names["Pathfinder::grid.width"], (12, 16))
+        self.assertEqual(names["Pathfinder::table"], (16, 24))
+        self.assertNotIn("Pathfinder::turnCost", names)
+        self.assertEqual(names["Pathfinder::cursor"][0], 24)
+
+    def test_a_flattened_type_refines_by_leaf(self):
+        types = al.TypeTable(self.layouts)
+        tid, stride = types.refine("Node")
+        self.assertEqual(stride, 12)
+        self.assertIn((8, 12, "Node::data.g"), types.entries[tid][1])
+
+    def test_region_parts_follow_the_offsets_the_region_holds(self):
+        items = al.Items(types=al.TypeTable(self.layouts))
+        with mock.patch.object(al, "PATHFINDER_HEADER", Path(tempfile.mkdtemp()) / "pathfinder.h"):
+            al.PATHFINDER_HEADER.write_text("enum { EXTRA_OFFSET = 64 };")
+            parts = al.region_parts(items, "Init: new AISearch region")
+        by_name = {items.strings[p[4]]: p for p in parts}
+        self.assertEqual(by_name["Init: new AISearch region.record"][:4], (al.NONE, 0, al.NONE, 64))
+        self.assertEqual(by_name["Init: new AISearch region.extra"][:4], (al.NONE, 64, al.NONE, 144))
+        pool = by_name["Init: new AISearch region.pool"]
+        self.assertEqual(pool[:4], (64 + 4, al.NONE, 64 + 8, al.NONE))
+        self.assertEqual(pool[6], 12)
+        heap = by_name["Init: new AISearch region.heap"]
+        self.assertEqual((heap[5], heap[6]), (al.NONE, 0))
+        events = by_name["Init: new AISearch region.events"]
+        self.assertEqual(events[:4], (64 + 36, al.NONE, al.NONE, al.NONE))
+        self.assertEqual(len(parts), 2 + len(al.REGION_SLOTS))
+
+    def test_items_pack_appends_the_parts_by_site(self):
+        items = al.Items(types=al.TypeTable(self.layouts))
+        items.sites.append((0x401234, items.string("Init: new AISearch region"), al.NONE, 0))
+        items.parts[0x401234] = [(al.NONE, 0, al.NONE, 64, items.string("a"), al.NONE, 0), (4, al.NONE, 8, al.NONE, items.string("b"), al.NONE, 0)]
+        data = items.pack()
+        tail = data[-(4 + 8 + 2 * 28):]
+        self.assertEqual(struct.unpack_from("<III", tail, 0), (1, 0x401234, 2))
+        self.assertEqual(struct.unpack_from("<7I", tail, 12)[:4], (al.NONE, 0, al.NONE, 64))
+
+    def test_the_reads_file_is_collected_and_kept(self):
+        self.assertIn("access.reads.csv", al.OUTPUT_FILES)
+        self.assertIn('("reads.csv", "access.reads.csv")', Path(al.__file__).read_text())
+
+
 class PresentationTest(unittest.TestCase):
     def test_funcs_round_trip(self):
         data = al.pack_funcs([(0x401000, 0x401040, "Draw"), (0x401040, 0x401100, "Unit::Move")])

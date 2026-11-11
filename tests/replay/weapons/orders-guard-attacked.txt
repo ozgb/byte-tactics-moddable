@@ -9,7 +9,7 @@ call 1 UpdateUnitWeapons
   r rng.load 0xdaf77e88
   r rng.seed 0x7996f52e
   r Unit#1.health 3000
-  r Unit#1.def UnitDef#1
+  r Unit#1.def UnitDef#34
   r Unit#1.flags 0x90e00321
   r Unit#1.workTime 0
   r Unit#1.script CobScript#1
@@ -8406,8 +8406,8 @@ call 1 UpdateUnitWeapons
   r WeaponFire#253.fire null
   r WeaponFire#254.fire null
   r WeaponFire#255.fire null
-  r UnitDef#1.maxHealth 3000
-  r UnitDef#1.modelMaxYHigh 39
+  r UnitDef#34.maxHealth 3000
+  r UnitDef#34.modelMaxYHigh 39
   r Unit#1.resourceSlot.player Player#0
   r UnitMotion#1.speed 0
   r weapondef#20.flags 0x00080809
@@ -8468,7 +8468,7 @@ call 1 UpdateUnitWeapons
   i targeting.GetWeaponTargetPos Unit#1 2 = 0
 call 1 UpdateUnitWeapons
   r Unit#251.health 3000
-  r Unit#251.def UnitDef#2
+  r Unit#251.def UnitDef#167
   r Unit#251.flags 0x90e00021
   r Unit#251.workTime 0
   r Unit#251.script CobScript#2
@@ -8509,8 +8509,8 @@ call 1 UpdateUnitWeapons
   r Unit#251.weapon2FirePitch 0
   r Unit#251.weapon2Stockpile 0
   r Unit#251.weapon2MuzzleDelta 1495040
-  r UnitDef#2.maxHealth 3000
-  r UnitDef#2.modelMaxYHigh 38
+  r UnitDef#167.maxHealth 3000
+  r UnitDef#167.modelMaxYHigh 38
   r Unit#251.resourceSlot.player Player#1
   r UnitMotion#2.speed 0
   r weapondef#21.flags 0x00080809
@@ -8672,14 +8672,14 @@ call 10 ReleaseWeapons
   a unusedEdx 0
   a index 2
 call 10 InitUnitWeaponSlots
-  r Unit#2.def UnitDef#3
+  r Unit#2.def UnitDef#95
   r Unit#2.script CobScript#3
   r Unit#2.posX 212336640
   r Unit#2.posY 65536
   r Unit#2.posZ 87162880
-  r UnitDef#3.weapon0 weapondef#16
-  r UnitDef#3.weapon1 weapondef#0
-  r UnitDef#3.weapon2 weapondef#0
+  r UnitDef#95.weapon0 weapondef#16
+  r UnitDef#95.weapon1 weapondef#0
+  r UnitDef#95.weapon2 weapondef#0
   r weapondef#16.index 16
   r weapondef#16.reloadTime 12
   r weapondef#0.index 0
@@ -8750,7 +8750,7 @@ call 10 ReleaseWeapons
   a unusedEdx 0
   a index 2
 call 10 InitUnitWeaponSlots
-  r Unit#3.def UnitDef#3
+  r Unit#3.def UnitDef#95
   r Unit#3.script CobScript#4
   r Unit#3.posX 204472320
   r Unit#3.posY 65536
@@ -8822,7 +8822,7 @@ call 10 ReleaseWeapons
   a unusedEdx 0
   a index 2
 call 10 InitUnitWeaponSlots
-  r Unit#4.def UnitDef#3
+  r Unit#4.def UnitDef#95
   r Unit#4.script CobScript#5
   r Unit#4.posX 201850880
   r Unit#4.posY 65536
@@ -8894,14 +8894,14 @@ call 10 ReleaseWeapons
   a unusedEdx 0
   a index 2
 call 10 InitUnitWeaponSlots
-  r Unit#5.def UnitDef#4
+  r Unit#5.def UnitDef#51
   r Unit#5.script CobScript#6
   r Unit#5.posX 196608000
   r Unit#5.posY 65536
   r Unit#5.posZ 85196800
-  r UnitDef#4.weapon0 weapondef#108
-  r UnitDef#4.weapon1 weapondef#0
-  r UnitDef#4.weapon2 weapondef#0
+  r UnitDef#51.weapon0 weapondef#108
+  r UnitDef#51.weapon1 weapondef#0
+  r UnitDef#51.weapon2 weapondef#0
   r weapondef#108.index 108
   r weapondef#108.reloadTime 90
   a unit Unit#5
@@ -8943,8 +8943,8 @@ call 10 UpdateUnitWeapons
   r Unit#2.motion UnitMotion#3
   r Unit#2.heading 0
   r Unit#2.pitch 0
-  r UnitDef#3.maxHealth 250
-  r UnitDef#3.modelMaxYHigh 26
+  r UnitDef#95.maxHealth 250
+  r UnitDef#95.modelMaxYHigh 26
   r Unit#2.resourceSlot.player Player#0
   r UnitMotion#3.speed 0
   r weapondef#16.flags 0x00080a01
@@ -9014,8 +9014,8 @@ call 10 UpdateUnitWeapons
   r Unit#5.motion UnitMotion#6
   r Unit#5.heading 0
   r Unit#5.pitch 0
-  r UnitDef#4.maxHealth 196
-  r UnitDef#4.modelMaxYHigh 10
+  r UnitDef#51.maxHealth 196
+  r UnitDef#51.modelMaxYHigh 10
   r Unit#5.resourceSlot.player Player#0
   r UnitMotion#6.speed 0
   r weapondef#108.flags 0x00143201
@@ -9256,8 +9256,8 @@ call 20 UpdateUnitWeapons
   a unit Unit#2
   i targeting.GetWeaponTargetPos Unit#2 0 = 0
 call 20 WeaponCanReachUnit
-  r UnitDef#3.flags1 0x00918089
-  r UnitDef#2.flags1 0x0495c0c8
+  r UnitDef#95.flags1 0x00918089
+  r UnitDef#167.flags1 0x0495c0c8
   a shooter Unit#2
   a target Unit#251
   a weapon 0
@@ -11521,7 +11521,7 @@ call 72 DamageUnit
   r Unit#251.lastAttackerSlot 0
   r Unit#251.lastDamageType 1
   r Unit#251.list Order#1
-  r UnitDef#2.damagemodifier 65536
+  r UnitDef#167.damagemodifier 65536
   r Player#1.active 1
   r Player#1.type 2
   r Unit#2.player Player#0
@@ -11532,7 +11532,7 @@ call 72 DamageUnit
   r Unit#2.list Order#2
   r Order#1.kind 6
   r Order#1.ticks 0
-  r UnitDef#3.damagemodifier 65536
+  r UnitDef#95.damagemodifier 65536
   r Player#0.active 1
   r Player#0.type 1
   r Order#2.kind 6
@@ -20188,7 +20188,7 @@ call 159 ReleaseWeapons
   w Unit#251.weapon0Flags 19
   w Unit#251.weapon2Flags 26
 call 159 WeaponCanReachUnit
-  r UnitDef#4.flags1 0x00818889
+  r UnitDef#51.flags1 0x00818889
   a shooter Unit#251
   a target Unit#5
   a weapon 0
@@ -20402,7 +20402,7 @@ call 160 DamageUnit
   r Unit#5.lastAttackerSlot 10
   r Unit#5.lastDamageType 0
   r Unit#5.list Order#3
-  r UnitDef#4.damagemodifier 65536
+  r UnitDef#51.damagemodifier 65536
   r Order#3.kind 4
   r Order#3.ticks 0
   a source Unit#251
@@ -27521,9 +27521,6 @@ call 216 UpdateUnitWeapons
   i targeting.GetWeaponTargetPos Unit#251 2 = 0
 call 216 DamageUnit
   r Unit#251.attacker Unit#3
-  r Unit#251.list Order#5
-  r Order#5.kind 6
-  r Order#5.ticks 0
   a source Unit#251
   a target Unit#251
   a amount 1

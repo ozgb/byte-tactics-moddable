@@ -9,7 +9,7 @@ call 700 UpdateUnitWeapons
   r rng.load 0x4cb6cfba
   r rng.seed 0x65020525
   r Unit#1.health 3000
-  r Unit#1.def UnitDef#1
+  r Unit#1.def UnitDef#34
   r Unit#1.flags 0x90e00321
   r Unit#1.workTime 0
   r Unit#1.script CobScript#1
@@ -8406,8 +8406,8 @@ call 700 UpdateUnitWeapons
   r WeaponFire#253.fire null
   r WeaponFire#254.fire null
   r WeaponFire#255.fire null
-  r UnitDef#1.maxHealth 3000
-  r UnitDef#1.modelMaxYHigh 39
+  r UnitDef#34.maxHealth 3000
+  r UnitDef#34.modelMaxYHigh 39
   r Unit#1.resourceSlot.player Player#0
   r UnitMotion#1.speed 0
   r weapondef#20.flags 0x00080809
@@ -8468,7 +8468,7 @@ call 700 UpdateUnitWeapons
   i targeting.GetWeaponTargetPos Unit#1 2 = 0
 call 700 UpdateUnitWeapons
   r Unit#2.health 780
-  r Unit#2.def UnitDef#2
+  r Unit#2.def UnitDef#10
   r Unit#2.flags 0xb0e80321
   r Unit#2.workTime 0
   r Unit#2.script CobScript#2
@@ -8509,8 +8509,8 @@ call 700 UpdateUnitWeapons
   r Unit#2.weapon2FirePitch 0
   r Unit#2.weapon2Stockpile 0
   r Unit#2.weapon2MuzzleDelta 0
-  r UnitDef#2.maxHealth 780
-  r UnitDef#2.modelMaxYHigh 46
+  r UnitDef#10.maxHealth 780
+  r UnitDef#10.modelMaxYHigh 46
   r Unit#2.resourceSlot.player Player#0
   r weapondef#30.flags 0x59143211
   r weapondef#30.speed 1747626
@@ -8535,7 +8535,7 @@ call 700 UpdateUnitWeapons
   i targeting.GetWeaponTargetPos Unit#2 0 = 0
 call 700 UpdateUnitWeapons
   r Unit#251.health 3000
-  r Unit#251.def UnitDef#3
+  r Unit#251.def UnitDef#167
   r Unit#251.flags 0x90e40025
   r Unit#251.workTime 0
   r Unit#251.script CobScript#3
@@ -8576,8 +8576,8 @@ call 700 UpdateUnitWeapons
   r Unit#251.weapon2FirePitch 0
   r Unit#251.weapon2Stockpile 0
   r Unit#251.weapon2MuzzleDelta 1495040
-  r UnitDef#3.maxHealth 3000
-  r UnitDef#3.modelMaxYHigh 38
+  r UnitDef#167.maxHealth 3000
+  r UnitDef#167.modelMaxYHigh 38
   r Unit#251.resourceSlot.player Player#1
   r UnitMotion#2.speed 70123
   r weapondef#21.flags 0x00080809
@@ -8949,14 +8949,14 @@ call 720 ReleaseWeapons
   a unusedEdx 0
   a index 2
 call 720 InitUnitWeaponSlots
-  r Unit#252.def UnitDef#4
+  r Unit#252.def UnitDef#208
   r Unit#252.script CobScript#4
   r Unit#252.posX 195559424
   r Unit#252.posY 65536
   r Unit#252.posZ 83361792
-  r UnitDef#4.weapon0 weapondef#0
-  r UnitDef#4.weapon1 weapondef#0
-  r UnitDef#4.weapon2 weapondef#0
+  r UnitDef#208.weapon0 weapondef#0
+  r UnitDef#208.weapon1 weapondef#0
+  r UnitDef#208.weapon2 weapondef#0
   r weapondef#0.index 0
   a unit Unit#252
   i units.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 0
@@ -8993,8 +8993,8 @@ call 720 UpdateUnitWeapons
   r Unit#252.motion null
   r Unit#252.heading -32382
   r Unit#252.pitch 0
-  r UnitDef#4.maxHealth 175
-  r UnitDef#4.modelMaxYHigh 22
+  r UnitDef#208.maxHealth 175
+  r UnitDef#208.modelMaxYHigh 22
   r Unit#252.resourceSlot.player Player#1
   r Unit#252.weapons[0].aimCob.nAimCobDone 0
   r Unit#252.weapons[1].aimCob.nAimCobDone 0

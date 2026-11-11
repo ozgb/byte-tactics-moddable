@@ -9,7 +9,7 @@ call 850 UpdateUnitWeapons
   r rng.load 0x4cfcf4f8
   r rng.seed 0x4cf83d6b
   r Unit#1.health 3000
-  r Unit#1.def UnitDef#1
+  r Unit#1.def UnitDef#34
   r Unit#1.flags 0x90e00321
   r Unit#1.workTime 1149
   r Unit#1.script CobScript#1
@@ -8406,8 +8406,8 @@ call 850 UpdateUnitWeapons
   r WeaponFire#253.fire null
   r WeaponFire#254.fire null
   r WeaponFire#255.fire null
-  r UnitDef#1.maxHealth 3000
-  r UnitDef#1.modelMaxYHigh 39
+  r UnitDef#34.maxHealth 3000
+  r UnitDef#34.modelMaxYHigh 39
   r Unit#1.resourceSlot.player Player#0
   r UnitMotion#1.speed 0
   r weapondef#20.flags 0x00080809
@@ -8468,7 +8468,7 @@ call 850 UpdateUnitWeapons
   i targeting.GetWeaponTargetPos Unit#1 2 = 0
 call 850 UpdateUnitWeapons
   r Unit#2.health 75
-  r Unit#2.def UnitDef#2
+  r Unit#2.def UnitDef#112
   r Unit#2.flags 0x30282321
   r Unit#2.workTime 0
   r Unit#2.script CobScript#2
@@ -8509,8 +8509,8 @@ call 850 UpdateUnitWeapons
   r Unit#2.weapon2FirePitch 0
   r Unit#2.weapon2Stockpile 0
   r Unit#2.weapon2MuzzleDelta 0
-  r UnitDef#2.maxHealth 326
-  r UnitDef#2.modelMaxYHigh 38
+  r UnitDef#112.maxHealth 326
+  r UnitDef#112.modelMaxYHigh 38
   r Unit#2.resourceSlot.player Player#0
   r Unit#2.weapons[0].aimCob.nAimCobDone 0
   r Unit#2.weapons[1].aimCob.nAimCobDone 0
@@ -8519,7 +8519,7 @@ call 850 UpdateUnitWeapons
 call 850 UpdateUnitWeapons
   r rng.seed 0x3d886347
   r Unit#3.health 618
-  r Unit#3.def UnitDef#3
+  r Unit#3.def UnitDef#71
   r Unit#3.flags 0xb0282321
   r Unit#3.workTime 0
   r Unit#3.script CobScript#3
@@ -8560,8 +8560,8 @@ call 850 UpdateUnitWeapons
   r Unit#3.weapon2FirePitch 0
   r Unit#3.weapon2Stockpile 0
   r Unit#3.weapon2MuzzleDelta 0
-  r UnitDef#3.maxHealth 750
-  r UnitDef#3.modelMaxYHigh 46
+  r UnitDef#71.maxHealth 750
+  r UnitDef#71.modelMaxYHigh 46
   r Unit#3.resourceSlot.player Player#0
   r weapondef#80.flags 0x00080809
   r weapondef#80.speed 1966080
@@ -8586,7 +8586,7 @@ call 850 UpdateUnitWeapons
   i targeting.GetWeaponTargetPos Unit#3 0 = 0
 call 850 UpdateUnitWeapons
   r Unit#251.health 3000
-  r Unit#251.def UnitDef#4
+  r Unit#251.def UnitDef#167
   r Unit#251.flags 0x90e40021
   r Unit#251.workTime 981
   r Unit#251.script CobScript#4
@@ -8627,8 +8627,8 @@ call 850 UpdateUnitWeapons
   r Unit#251.weapon2FirePitch 0
   r Unit#251.weapon2Stockpile 0
   r Unit#251.weapon2MuzzleDelta 1495040
-  r UnitDef#4.maxHealth 3000
-  r UnitDef#4.modelMaxYHigh 38
+  r UnitDef#167.maxHealth 3000
+  r UnitDef#167.modelMaxYHigh 38
   r Unit#251.resourceSlot.player Player#1
   r UnitMotion#2.speed 0
   r weapondef#21.flags 0x00080809
@@ -8673,7 +8673,7 @@ call 850 UpdateUnitWeapons
   i targeting.GetWeaponTargetPos Unit#251 2 = 0
 call 850 UpdateUnitWeapons
   r Unit#252.health 175
-  r Unit#252.def UnitDef#5
+  r Unit#252.def UnitDef#208
   r Unit#252.flags 0x30282021
   r Unit#252.workTime 0
   r Unit#252.script CobScript#5
@@ -8714,8 +8714,8 @@ call 850 UpdateUnitWeapons
   r Unit#252.weapon2FirePitch 0
   r Unit#252.weapon2Stockpile 0
   r Unit#252.weapon2MuzzleDelta 0
-  r UnitDef#5.maxHealth 175
-  r UnitDef#5.modelMaxYHigh 22
+  r UnitDef#208.maxHealth 175
+  r UnitDef#208.modelMaxYHigh 22
   r Unit#252.resourceSlot.player Player#1
   r Unit#252.weapons[0].aimCob.nAimCobDone 0
   r Unit#252.weapons[1].aimCob.nAimCobDone 0
@@ -8839,8 +8839,8 @@ call 857 DamageUnit
   r Unit#2.lastAttackerSlot 10
   r Unit#2.lastDamageType 0
   r Unit#2.list Order#1
-  r UnitDef#2.flags1 0x0084008a
-  r UnitDef#2.damagemodifier 21845
+  r UnitDef#112.flags1 0x0084008a
+  r UnitDef#112.damagemodifier 21845
   r Player#0.active 1
   r Player#0.type 1
   r Order#1.kind 19
@@ -10687,8 +10687,8 @@ call 964 DamageUnit
   r Unit#3.lastAttackerSlot 10
   r Unit#3.lastDamageType 0
   r Unit#3.list Order#2
-  r UnitDef#3.flags1 0x0081808a
-  r UnitDef#3.damagemodifier 65536
+  r UnitDef#71.flags1 0x0081808a
+  r UnitDef#71.damagemodifier 65536
   r Order#2.kind 22
   r Order#2.ticks 0
   a source Unit#3
@@ -10769,8 +10769,8 @@ call 968 DamageUnit
   r Unit#1.lastAttackerSlot 10
   r Unit#1.lastDamageType 1
   r Unit#1.list Order#3
-  r UnitDef#1.flags1 0x0495c0c8
-  r UnitDef#1.damagemodifier 65536
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.damagemodifier 65536
   r Order#3.kind 41
   r Order#3.ticks 0
   a source Unit#1

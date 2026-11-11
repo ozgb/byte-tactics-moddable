@@ -897,11 +897,17 @@ void __stdcall UpdateFeatures()
 #endif
     Feature* types = g_game->features;
     for (int k = 0; k < g_game->featureCount; k++) {
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         if (types[k].animating) {
             StepGafSequence(&types[k].anim);
             StepGafSequence(&types[k].shadowAnim);
         }
     }
+#if BT_ACCESS_LOG
+    AccessLogEntity();
+#endif
     if (--g_game->scanIndex < 0) {
         g_game->scanIndex = g_game->width * g_game->height - 1;
     } else {

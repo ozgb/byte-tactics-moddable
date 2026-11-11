@@ -90,7 +90,9 @@ const unsigned kEntDraws = 32;
 const char* const kPassNames[] = {"other", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail",
                                   "features.anim", "explosions.pieces", "explosions.debris", "units.players", "players.los",
                                   "presentation"};
-const unsigned kPresentationPass = 14;
+const unsigned kPresentationPass = ACCESS_PASS_COUNT;
+static_assert(sizeof(kPassNames) / sizeof(kPassNames[0]) == kPresentationPass + 1, "a name for each pass and presentation");
+static_assert(ACCESS_MARK_PASS + ACCESS_PASS_COUNT <= ACCESS_MARK_COUNT, "a mark for each pass");
 const unsigned kPassDepth = 8;
 struct PassFrame {
     int pass;

@@ -262,9 +262,9 @@ jobs:
           uv run tools/test_tidy.py
           uv run tools/tidy.py "origin/$BASE_REF...HEAD"
 
-      - name: Compile the game, data, bitexact, block_test, ref_test, pathfinding_writer_test, replay_test and replay_native_test
+      - name: Compile the game, data, bitexact, block_test, ref_test, pathfinding_writer_test, economy_writer_test, replay_test and replay_native_test
         if: steps.changed.outputs.run == 'true'
-        run: cmake --build build/modern --target game data bitexact block_test ref_test pathfinding_writer_test replay_test replay_native_test
+        run: cmake --build build/modern --target game data bitexact block_test ref_test pathfinding_writer_test economy_writer_test replay_test replay_native_test
 
       - name: Compile the game and data with the access log
         if: steps.changed.outputs.run == 'true'
@@ -333,7 +333,7 @@ jobs:
           cmake --build build/modern --target wasm_runtime wasm_runtime_inject
           df -h /
 
-      - name: Run block_test, ref_test, pathfinding_writer_test, replay_test and the native and WASM replays under Wine
+      - name: Run block_test, ref_test, pathfinding_writer_test, economy_writer_test, replay_test and the native and WASM replays under Wine
         if: steps.changed.outputs.run == 'true'
         env:
           WINEDEBUG: -all
@@ -355,6 +355,7 @@ jobs:
             build/modern/block_test.exe
             build/modern/ref_test.exe
             build/modern/pathfinding_writer_test.exe
+            build/modern/economy_writer_test.exe
             build/modern/replay_test.exe
             build/modern/replay_native_test.exe
             build/modern/replay_inject_test.exe
@@ -558,6 +559,7 @@ jobs:
           uv run tools/test_seamlink.py
           uv run tools/seamlink.py --objects @build/modern/objects.rsp --check
           uv run tools/seamlink.py --private-state
+          uv run tools/seamlink.py --pilot-seams
 
       - name: Check the state writer of pathfinding is pure, stateless and free of scenario logic
         if: steps.changed.outputs.run == 'true'

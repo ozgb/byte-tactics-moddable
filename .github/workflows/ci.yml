@@ -174,7 +174,6 @@ jobs:
       - name: Point apt at a reachable Ubuntu mirror
         if: steps.changed.outputs.run == 'true'
         run: &apt-mirror |
-          echo '0.0.0.0 azure.archive.ubuntu.com' | sudo tee -a /etc/hosts
           list=/etc/apt/apt-mirrors.txt
           if ! grep -rqs "mirror+file:$list" /etc/apt/sources.list /etc/apt/sources.list.d; then
             echo "apt reads no mirror list at $list; its sources stay as they are"

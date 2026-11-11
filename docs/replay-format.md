@@ -121,6 +121,11 @@ lines come before the first `Cell#N`. A slot's annotation adds a field to its re
 and `replayschema.py --check` reports a complete subsystem's slot that reaches such a kind with a factor missing from its read set.
 
 `UnitDef` is a `Ref` table over `defs` with `unitDefCount` and `alloc` 1024, and `UnitDef#N` is the index in `Game.defs`, the same in every recording.
+The replayer takes a table's `alloc` elements from the sim block (`SimAlloc`), so `alloc` times the element size must fit in the block,
+which is `kSimBlockBytes` (32 MiB) unless the match setup asks for more. A `UnitDef` is 585 bytes: 1024 of them take 599,040 bytes,
+while 65536 would take 38,338,560, more than the block, and the replayer would stop in `OutOfBlock` with
+`sim block: out of memory, the match setup's block size is too small`. 3.1c has 279 definitions; a mod whose recordings name
+`UnitDef#1024` or higher needs `alloc` raised, and past about 57,000 definitions the block as well.
 
 `Player` and `Unit` are instances of this form (`players` is `{"base": "game", "member": "players", "count": 10}`, `units` is a
 `Ref` with `poolCount` and `alloc` 5001), so the text of every committed recording is the same as before the form had a name.

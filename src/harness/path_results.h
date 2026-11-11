@@ -8,6 +8,7 @@ enum { PATH_RESULT_SECTION = 32, PATH_RESULT_POINTS = 64 };
 struct PathResult {
     int kind;
     int status;
+    PathUnit unitRef;
     unsigned int unitTag;
     unsigned int unitId;
     unsigned int tick;
@@ -22,8 +23,7 @@ struct PathResults {
     unsigned int capacity;
 };
 
-int PathResultsAdd(PathResults* results, const PathEvent* event, const PathPoint* points, int capacity, unsigned int unitTag,
-                   unsigned int unitId);
+int PathResultsAdd(PathResults* results, const PathEvent* event, const PathPoint* points, int capacity);
 void PathResultsClear(PathResults* results);
 unsigned long long PathResultsHash(const PathResults* results, unsigned long long h);
 

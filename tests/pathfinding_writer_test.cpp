@@ -274,7 +274,9 @@ static void PlayResults(ResultRun* run, bool tamper)
                     run->tampered = t;
                 }
             }
-            Check(PathResultsAdd(&s_results, &e, points, 64, kUnitTag, e.unit) != 0, "a result is recorded");
+            Check(PathResultsAdd(&s_results, &e, points, 64) != 0, "a result is recorded");
+            s_results.items[s_results.count - 1].unitTag = kUnitTag;
+            s_results.items[s_results.count - 1].unitId = e.unit;
         }
         run->results[t] = PathResultsHash(&s_results, 0xcbf29ce484222325ull);
         run->written[t] = HashWritten();

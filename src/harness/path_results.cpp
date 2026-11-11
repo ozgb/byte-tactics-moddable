@@ -35,8 +35,7 @@ static unsigned long long HashRun(unsigned long long h, const unsigned char* p, 
     return h;
 }
 
-int PathResultsAdd(PathResults* results, const PathEvent* event, const PathPoint* points, int capacity, unsigned int unitTag,
-                   unsigned int unitId)
+int PathResultsAdd(PathResults* results, const PathEvent* event, const PathPoint* points, int capacity)
 {
     if (results->count == results->capacity) {
         unsigned int grown = results->capacity == 0 ? 64 : results->capacity * 2;
@@ -50,8 +49,7 @@ int PathResultsAdd(PathResults* results, const PathEvent* event, const PathPoint
     memset(r, 0, sizeof *r);
     r->kind = event->kind;
     r->status = event->status;
-    r->unitTag = unitTag;
-    r->unitId = unitId;
+    r->unitRef = event->unit;
     r->tick = event->tick;
     r->count = event->count;
     int delivered = event->count < 0 ? 0 : event->count;

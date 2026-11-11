@@ -2083,14 +2083,6 @@ static void HashByte(unsigned char v)
     s_hash = (s_hash ^ v) * kHashPrime;
 }
 
-static void ResolveInPool(unsigned p, int target, unsigned base, unsigned stride, unsigned count, unsigned* tag, unsigned* index)
-{
-    if (base != 0 && p >= base && p - base < stride * count && (p - base) % stride == 0) {
-        *tag = target;
-        *index = (p - base) / stride;
-    }
-}
-
 static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsigned* tag, unsigned* index)
 {
     unsigned base = 0;
@@ -2169,7 +2161,10 @@ static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsi
     default:
         return;
     }
-    ResolveInPool(p, target, base, stride, count, tag, index);
+    if (base != 0 && p >= base && p - base < stride * count && (p - base) % stride == 0) {
+        *tag = target;
+        *index = (p - base) / stride;
+    }
 }
 
 static void HashPointer(unsigned p, int target, bool isRef = false)
@@ -2800,24 +2795,24 @@ static void VisitModuleState()
 }
 
 static PathResults s_pathResults;
+static bool s_pathResultsLost;
 
 void __stdcall HarnessPathEvent(const PathEvent* event, const PathPoint* points, int capacity)
 {
     if (!HarnessTestMode() || s_trace == nullptr)
         return;
-    unsigned tag = 0;
-    unsigned id = 0;
-    if (event->unit != 0) {
-        tag = TT_HEAP;
-        ResolveInPool(event->unit + (unsigned)SimBlockBase(), TT_UNIT, GameRef(GAME_UNITS), UNIT_STRIDE,
-                      *(unsigned short*)GameAt(GAME_POOL_COUNT), &tag, &id);
-    }
-    if (!PathResultsAdd(&s_pathResults, event, points, capacity, tag, id))
-        Fail("testmode: no memory for the path results\n");
+    if (!PathResultsAdd(&s_pathResults, event, points, capacity))
+        s_pathResultsLost = true;
 }
 
 static void VisitPathResults()
 {
+    if (s_pathResultsLost)
+        Fail("testmode: no memory for the path results\n");
+    for (unsigned k = 0; k < s_pathResults.count; k++) {
+        PathResult* r = &s_pathResults.items[k];
+        Resolve((unsigned)SimBlockBase(), r->unitRef, true, TT_UNIT, &r->unitTag, &r->unitId);
+    }
     s_hash = PathResultsHash(&s_pathResults, s_hash);
     if (!s_dumpNow)
         return;

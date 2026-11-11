@@ -47268,18 +47268,12 @@ address,function,file,kind,target
 ,HarnessLoadEnded,src/harness/harness.cpp,call,host_event_set
 ,HarnessLoadEnded,src/harness/harness.cpp,function,
 ,HarnessLoadEnded,src/harness/harness.cpp,global_read,s_loadEnded@src/harness/harness.cpp
-,HarnessPathEvent,src/harness/harness.cpp,call,Fail
-,HarnessPathEvent,src/harness/harness.cpp,call,GameAt
-,HarnessPathEvent,src/harness/harness.cpp,call,GameRef
 ,HarnessPathEvent,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessPathEvent,src/harness/harness.cpp,call,PathResultsAdd
-,HarnessPathEvent,src/harness/harness.cpp,call,ResolveInPool
-,HarnessPathEvent,src/harness/harness.cpp,call,SimBlockBase
-,HarnessPathEvent,src/harness/harness.cpp,deref_read,*unsigned short
-,HarnessPathEvent,src/harness/harness.cpp,field_read,PathEvent::unit
 ,HarnessPathEvent,src/harness/harness.cpp,function,
 ,HarnessPathEvent,src/harness/harness.cpp,global_maybe_written,s_pathResults@src/harness/harness.cpp
 ,HarnessPathEvent,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
+,HarnessPathEvent,src/harness/harness.cpp,global_write,s_pathResultsLost@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,call,GameHoldrand
 ,HarnessPhase,src/harness/harness.cpp,call,GameU32
 ,HarnessPhase,src/harness/harness.cpp,call,HarnessTestMode
@@ -51850,6 +51844,7 @@ address,function,file,kind,target
 ,PathResultsAdd,src/harness/path_results.cpp,field_read,PathEvent::kind
 ,PathResultsAdd,src/harness/path_results.cpp,field_read,PathEvent::status
 ,PathResultsAdd,src/harness/path_results.cpp,field_read,PathEvent::tick
+,PathResultsAdd,src/harness/path_results.cpp,field_read,PathEvent::unit
 ,PathResultsAdd,src/harness/path_results.cpp,field_read,PathResults::capacity
 ,PathResultsAdd,src/harness/path_results.cpp,field_read,PathResults::count
 ,PathResultsAdd,src/harness/path_results.cpp,field_read,PathResults::items
@@ -51858,8 +51853,7 @@ address,function,file,kind,target
 ,PathResultsAdd,src/harness/path_results.cpp,field_write,PathResult::kind
 ,PathResultsAdd,src/harness/path_results.cpp,field_write,PathResult::status
 ,PathResultsAdd,src/harness/path_results.cpp,field_write,PathResult::tick
-,PathResultsAdd,src/harness/path_results.cpp,field_write,PathResult::unitId
-,PathResultsAdd,src/harness/path_results.cpp,field_write,PathResult::unitTag
+,PathResultsAdd,src/harness/path_results.cpp,field_write,PathResult::unitRef
 ,PathResultsAdd,src/harness/path_results.cpp,field_write,PathResults::capacity
 ,PathResultsAdd,src/harness/path_results.cpp,field_write,PathResults::count
 ,PathResultsAdd,src/harness/path_results.cpp,field_write,PathResults::items
@@ -57796,7 +57790,6 @@ address,function,file,kind,target
 ,Resolve,src/harness/harness.cpp,call,GameU32
 ,Resolve,src/harness/harness.cpp,call,MapFind
 ,Resolve,src/harness/harness.cpp,call,MoveClasses
-,Resolve,src/harness/harness.cpp,call,ResolveInPool
 ,Resolve,src/harness/harness.cpp,deref_read,*unsigned short
 ,Resolve,src/harness/harness.cpp,deref_write,*unsigned int
 ,Resolve,src/harness/harness.cpp,function,
@@ -57806,8 +57799,6 @@ address,function,file,kind,target
 ,Resolve,src/harness/harness.cpp,global_escape,s_linkKeys@src/harness/harness.cpp
 ,Resolve,src/harness/harness.cpp,global_escape,s_orderIds@src/harness/harness.cpp
 ,Resolve,src/harness/harness.cpp,global_escape,s_orderKeys@src/harness/harness.cpp
-,ResolveInPool,src/harness/harness.cpp,deref_write,*unsigned int
-,ResolveInPool,src/harness/harness.cpp,function,
 ,ResolveQuirks,src/harness/harness.cpp,call,Fail
 ,ResolveQuirks,src/harness/harness.cpp,call,QuirksHash
 ,ResolveQuirks,src/harness/harness.cpp,call,QuirksNormalise
@@ -60699,7 +60690,10 @@ address,function,file,kind,target
 ,VisitPassMaps,src/harness/harness.cpp,global_escape,s_passRow@src/harness/harness.cpp
 ,VisitPassMaps,src/harness/harness.cpp,global_write,s_passRow@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,call,DumpPrefix
+,VisitPathResults,src/harness/harness.cpp,call,Fail
 ,VisitPathResults,src/harness/harness.cpp,call,PathResultsHash
+,VisitPathResults,src/harness/harness.cpp,call,Resolve
+,VisitPathResults,src/harness/harness.cpp,call,SimBlockBase
 ,VisitPathResults,src/harness/harness.cpp,call,fprintf
 ,VisitPathResults,src/harness/harness.cpp,call,fputc
 ,VisitPathResults,src/harness/harness.cpp,call,fputs
@@ -60707,12 +60701,15 @@ address,function,file,kind,target
 ,VisitPathResults,src/harness/harness.cpp,deref_escape,*PathResult
 ,VisitPathResults,src/harness/harness.cpp,deref_read,*unsigned char
 ,VisitPathResults,src/harness/harness.cpp,field_escape,PathResult::points
+,VisitPathResults,src/harness/harness.cpp,field_maybe_written,PathResult::unitId
+,VisitPathResults,src/harness/harness.cpp,field_maybe_written,PathResult::unitTag
 ,VisitPathResults,src/harness/harness.cpp,field_read,PathResult::count
 ,VisitPathResults,src/harness/harness.cpp,field_read,PathResult::delivered
 ,VisitPathResults,src/harness/harness.cpp,field_read,PathResult::kind
 ,VisitPathResults,src/harness/harness.cpp,field_read,PathResult::status
 ,VisitPathResults,src/harness/harness.cpp,field_read,PathResult::tick
 ,VisitPathResults,src/harness/harness.cpp,field_read,PathResult::unitId
+,VisitPathResults,src/harness/harness.cpp,field_read,PathResult::unitRef
 ,VisitPathResults,src/harness/harness.cpp,field_read,PathResult::unitTag
 ,VisitPathResults,src/harness/harness.cpp,field_read,PathResults::count
 ,VisitPathResults,src/harness/harness.cpp,field_read,PathResults::items
@@ -60722,6 +60719,7 @@ address,function,file,kind,target
 ,VisitPathResults,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,global_read,s_pathResults@src/harness/harness.cpp
+,VisitPathResults,src/harness/harness.cpp,global_read,s_pathResultsLost@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,global_read,s_targetNames@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
 ,VisitPlayerAI,src/harness/harness.cpp,call,EndSection

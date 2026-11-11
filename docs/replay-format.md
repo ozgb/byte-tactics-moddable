@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, economy, targeting, map and weapons have recordings so far. The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map and weapons have recordings so far; economy and pathfinding have none yet (their interfaces take a region and a world view at Init, which the recorder cannot record: #698). The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -36,18 +36,14 @@ window is optional) and writes `replay-<subsystem>.txt` when the game exits thro
 unchanged. The play-test passes it to instance 1:
 
 ```sh
-uv run tools/playtest.py --exe build/modern/TotalA.exe --scenario mp --record economy[:FIRST:LAST] --game-dir DIR
+uv run tools/playtest.py --exe build/modern/TotalA.exe --scenario mp --record <subsystem>[:FIRST:LAST] --game-dir DIR
 ```
 
-`tools/playtest.py` copies the file to the run's directory (`build/playtest/<session>/mp-modern/replay-economy.txt`), and it is
+`tools/playtest.py` copies the file to the run's directory (`build/playtest/<session>/mp-modern/replay-<subsystem>.txt`), and it is
 committed under `tests/replay/<subsystem>/` like any recording. A play-test has no reference trace to show that the game ran as 3.1c
 would, and `tools/replay.py --check` cannot play it again, so `tests/replay/playtests.json` lists each one
 (`"<subsystem>/<name>": "<the command that records it>"`) and `--check`, the default plan and `tools/oraclegate.py` leave it out.
-CI replays it with the others (`tools/ci_replays.sh`). `tools/test_replay.py` checks its arithmetic: every
-`players.TransferMetal` and `players.TransferEnergy` amount in `tests/replay/economy/mp-sharing.txt` must equal
-the share amount of the stock, share level, capacity and partner stock the recording knows (a third of the stock above the level for
-metal, half for energy, at most the partner's room), computed the way the x87 does at 53-bit precision, bit for bit. `UpdateResourceSharing` passes the metal share to
-`players.TransferEnergy` and the energy share to `players.TransferMetal`.
+CI replays it with the others (`tools/ci_replays.sh`). No play-test recording is stored at present: the one of economy went with its 3.0 interface.
 
 ## Lines
 
@@ -105,7 +101,7 @@ their value forms are the `objects` of the schema:
 |---|---|---|---|
 | state | a kind with no `table` that is linked by a `Ref` | order of first appearance in the file, so it is stable across calls | in the block, linked by `Ref` |
 | state, `table` | `Player`, `Unit`, `UnitDef`, `Projectile`, `MovementClass`, `Cell`, `Feature`, `Spot`, `Pool` | the index in the table: `Player#3` is `Game.players[3]`, `Unit#17` is slot 17 of the unit pool, `UnitDef#2` is `Game.defs[2]`, `Projectile#3` is `Game.projectiles[3]`, `Cell#2051` is `Game.cells[2051]`, that is `y*width+x`, `Feature#5` is `Game.features[5]`, `Spot#9` is `Game.spots[9]` and `Pool#0` is `Game.pool` | an array in `Game` or `SimGlobals`, or a `Ref` to one |
-| state, `inside` | `UnitResources` of a unit, `Handle` of a feature or a spot | the site, the container and the member: `Unit#17.resourceSlot`, `Feature#5.anim`, `Spot#9.shadow` | a member of another kind (see An object embedded at several sites) |
+| state, `inside` | `Handle` of a feature or a spot | the site, the container and the member: `Feature#5.anim`, `Spot#9.shadow` | a member of another kind (see An object embedded at several sites) |
 | index | `weapondef` | the index in `Game.weapons` | in the block's weapon array |
 | value | `MeteorParams`, `Vec3` | none: the lines are written with the argument's name, `params.radius`, `pos.x` | an argument struct of one call |
 | handle | `file`, `rec`, `bank` | order of first use in the outermost call | the import's own objects, not state |
@@ -432,7 +428,7 @@ the same object is named the same way.
 | Vec3 | `(x,y,z)` |
 | string | double quotes, C escapes, up to the first NUL |
 | string behind a pointer (`cstring`) | the same, or `null` for a null pointer |
-| pointer to an object (`ref` or `ptr`) | `Unit#17`, `UnitDef#2`, `weapondef#17`, `Unit#17.resourceSlot`, or `null` |
+| pointer to an object (`ref` or `ptr`) | `Unit#17`, `UnitDef#2`, `weapondef#17`, `Feature#5.anim`, or `null` |
 | object handed to an import | `file#1`, `rec#2`, `bank#1` |
 | random stream | `main` or `load` |
 
@@ -874,18 +870,17 @@ sets). The annotations hold what no header says:
   checks every size against the real struct.
 - `rules`: a hand rule for each row the field sets cannot name: a `field_escape` row, or a `deref_read` or
   `deref_write` on a bare `*float`, `*short`, `*int` and the like. A rule is matched by `kind` and `target` (and by
-  `functions`, when it lists the functions whose rows it covers: `*float` is the `energyMake` of a unit account in
-  the income function and the extraction rate of a unit in the metal extraction update), and any row, not only an escape or a bare
+  `functions`, when it lists the functions whose rows it covers: `*float` is a field of one kind in one function and of another kind in a second), and any row, not only an escape or a bare
   pointer, may be given one when the rows name only a part of what the code touches (`Point16.x` is a member of `Unit.cell`
   and of `Unit.footprint`). `whole-object` records every field of the named object; `index-array` records the weapon array
   through `weapondef#N`; `fields` adds the object fields it lists under `reads` and `writes` (`Unit.extraction`,
-  `UnitResources.energyMake`), so that a write through a pointer is recorded as a `w` line of the field it lands on;
+  `Player.energy`), so that a write through a pointer is recorded as a `w` line of the field it lands on;
   `all-of` makes every slot of a table kind a root of the call (`Game.players` is walked by index), and a slot may have the rule for
   several kinds. A rule's `reads` and `writes` may also name block fields, `Game.visibilityMask` or `SimGlobals.g_x`, which join the slot's read and write sets: a write
   through a `*short` or a `memset` into `Game` is a `w` line of the field it lands on. `replayschema.py
   --check` fails for a row of a subsystem function with no rule and for a rule that matches no row.
-- `objects`' extras: `table` (an object, see Objects) names a kind by its index in a table, `inside` (a list of `{"kind": "Unit",
-  "member": "resourceSlot"}`) names every member of another kind that the kind lives in (`Unit#17.resourceSlot`), a field of kind
+- `objects`' extras: `table` (an object, see Objects) names a kind by its index in a table, `inside` (a list of `{"kind": "Feature",
+  "member": "anim"}`) names every member of another kind that the kind lives in (`Feature#5.anim`), a field of kind
   `embed` leads to such an object, `range_end_of` marks the end pointer of a closed range, and `aliases` (`Unit.cloakOn`) are
   the other targets of the rows that one field records (a bit field is recorded as its word). `replayschema.py --check` fails for a site
   that is no `embed` field of its container, for one that two kinds claim, and for the old single-site object form.
@@ -954,7 +949,7 @@ sets). The annotations hold what no header says:
 | `units-buffer` (`dir: out`, `capacity`) | a buffer of `Ref<Unit>` the caller supplies, with the argument that holds its capacity; the slot has `playsAs`, the recorded slot whose line it replays | nothing in the call; the stub is the import of the `playsAs` slot (the arguments but the buffer and capacity), so it reads that slot's `o out` line |
 | `pending` | anything else | `?` |
 
-A `bytes-in` import line carries the bytes the call passed in, so a `files.BankWriteBox` line is `i files.BankWriteBox bank#1 x:0102 2 = 2`: the handle, the bytes written, the length, then the result. It has no `o` line. A `bytes-out` import has no bytes in its line: `files.BankReadBox` shows `?` for the destination and the bytes arrive in the `o dst x:...` line after it, as long as the result. The `BankWriteBox` lines of the recordings are in `tests/replay/economy/save-midgame.txt` (8 lines, under `SaveUnitAccounts`).
+A `bytes-in` import line carries the bytes the call passed in, so a `files.BankWriteBox` line is `i files.BankWriteBox bank#1 x:0102 2 = 2`: the handle, the bytes written, the length, then the result. It has no `o` line. A `bytes-out` import has no bytes in its line: `files.BankReadBox` shows `?` for the destination and the bytes arrive in the `o dst x:...` line after it, as long as the result.
 
 A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
@@ -1113,17 +1108,7 @@ inside a nested command fails the recording.
 
 ## Not recorded
 
-No scenario reaches these paths of economy and targeting, and no recording holds them. Each has its reason.
-
-economy:
-
-- `UpdateResourceSharing`: it acts only in a network game, and test mode runs every player on one machine.
-- `UpdatePlayerEconomy` for a player of type 3: type 3 is a remote network player, which only a lobby with network players creates.
-- `UpdatePlayerEconomy` for a unit whose resource slot belongs to another player than the one settled: every unit is created in its owner's part of the unit table and `Reset` ties the slot to that owner, so only a corrupt save could differ.
-- `LoadUnitAccounts` with a missing box: every saved unit has its account box, so only a save from an older build lacks one.
-- The false sides of `SpendMetal`, `SpendEnergyAndMetal` and the `SpendEnergy` of `TransferMetal` (not enough in stock): their callers check the stock first (`TransferEnergy` and `TransferMetal` cap the amount at the stock in `players.cpp`, and the shot in `UpdateUnitWeapons` fires only when both stocks cover it, `weapons.cpp`).
-- The false side of `SpendEnergy` in the cloak payment of `UpdatePlayerEconomy` (a cloaked unit that cannot pay, which `units.SetStateBits <unit> 4 0` records and which decloaks it): the payment is made only when the player's energy stock is at least the cost, and otherwise the unit decloaks, but the one cloaked unit of the recordings, `Unit#3` of `edges-economy-targeting`, pays at all eight calls (ticks 30 to 240, `units.SetStateBits Unit#3 4 1`) from the 60000 energy of `player0.energy`, and no scenario runs a cloaked unit out of energy.
-- An extractor with no COB script: every shipped extractor has one.
+No scenario reaches these paths of targeting, and no recording holds them. Each has its reason.
 
 targeting:
 
@@ -1181,28 +1166,9 @@ own `pool`, which the module grows), and a write to a `Game` field through a poi
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 
-The same exe replays economy, which the modern build runs as native code in every mode (it has no WASM module yet): `replay_inject_test.exe` is built with
-the wind-scale injection of 3.0, which scales the wind income in the per-tick economy update, and the divergence is reported at the
-first call whose wind generators were on and at `Player#0.energy`:
+Economy and pathfinding are not recorded yet: both take a region and a world view at `Init` and economy takes an event struct (#698 is the recorder's follow-up for that shape).
 
-```sh
-wine build/modern/replay_native_test.exe tests/replay/economy/*.txt
-wine build/modern/replay_inject_test.exe --expect 5501 Player#0.energy tests/replay/economy/duel-shore-to-shore.txt
-```
-
-The recordings of economy and the scenarios they come from: `duel-shore-to-shore` (wind generators from tick 1620, metal
-extractors from tick 480), `duel-coast-to-coast` (tidal generators from tick 3330, extractors) and `load-midgame` (the
-accounts read back from a saved game, `LoadUnitAccounts`, and extractors) and `ten-ring-atoll`, ticks 6270 to 6270 only, where
-the first metal maker earns income (the `makesMetal` branch of `UpdatePlayerEconomy`). `save-midgame`, ticks 900 to 900 only, holds
-`SaveUnitAccounts` (each unit's account box written through `files.BankOpenNamedBox`, `files.BankSeekBox` and `files.BankWriteBox`),
-`console-economy`, ticks 40 to 100 only, holds `SpendMetal` and `SpendEnergy` (the console `give` commands), and
-`edges-economy-targeting` (the whole run, 260 ticks) holds `RequestEnergy` (repairs), `SpendEnergyAndMetal` (shots), a cloak payment in
-`UpdatePlayerEconomy` (`units.SetStateBits`), an extractor whose footprint hangs over the map edge (`los_radar.GetMapCell` returns null)
-and `Reset` of a resource slot for player index 2. `UpdatePlayerEconomy` walks every unit of the
-player's slice of the unit table on each call, so a recording carries the `r` lines of all the slice at the first call and the
-changes after it.
-
-`replay_inject_test.exe` is also built with the target-scale injection of 0x6666 (the 0xcccc of the weapon target position, the part of the
+`replay_inject_test.exe` is built with the target-scale injection of 0x6666 (the 0xcccc of the weapon target position, the part of the
 distance a target's body offset moves the aim point), and the divergence is reported at call 352 of `skirmish4-long` and at `pos.x`, the
 out `Vec3`:
 
@@ -1259,7 +1225,7 @@ The recordings of weapons, which the modern build runs as native code in every m
 `Game.projectiles` is a table of 300 projectiles (the 300 of the game's `projectileCount < 300` guard), every element a root of `UpdateUnitWeapons` and `FindTargetableProjectile`, so a shot made at index `projectileCount` finds its element and the first call records all 300 with every field the slot reads (about 8,000 lines). `Game.tracked` and `Game.value_142f3`, which `InitProjectile` writes and reads for the camera, are `exempt`.
 The recorder's walker holds as many fields as the schema has walkable object fields (references, embedded objects, unit ids, weapons and vectors of objects), a count the generated schema states, so no slot set can overflow it.
 
-A subsystem that imports a slot of another complete subsystem (`weapons` imports `targeting.GetWeaponTargetPos` and `economy.SpendEnergyAndMetal`, and `targeting` and `wind_meteors` import `weapons` slots) is replayed against the import stubs of that seam, not against the other module: `BindSeams` binds the stubs of the seams a recording's subsystem imports from, after the native tables.
+A subsystem that imports a slot of another complete subsystem (`weapons` imports `targeting.GetWeaponTargetPos`, and `targeting` and `wind_meteors` import `weapons` slots) is replayed against the import stubs of that seam, not against the other module: `BindSeams` binds the stubs of the seams a recording's subsystem imports from, after the native tables.
 
 ### Against the WASM module
 
@@ -1272,7 +1238,7 @@ wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm t
 wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors_inject.wasm --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/wind_meteors/meteors-hailstorm.txt
 ```
 
-The recordings don't depend on how the modern build runs a subsystem. A module of economy, targeting or map, native or
+The recordings don't depend on how the modern build runs a subsystem. A module of targeting or map, native or
 WASM, has to replay them equal, as `wind_meteors.wasm` replays its own.
 
 `tests/replay_wasm.cpp` loads the module through `lib/wasmloader` as `src/wasm/modules.cpp` does in the game: the

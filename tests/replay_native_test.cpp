@@ -123,11 +123,6 @@ short __cdecl AngleOfVector(int x, int z)
 #pragma comment(linker, "/alternatename:?SubtractVec3@@YGXPAUVec3@@0PAH11@Z=?SubtractVec3@@YGXPAH0000@Z")
 #pragma comment(linker, "/alternatename:?WeaponCanReachPos@@YGHPAUUnit@@PAUVec3@@1E@Z=?WeaponCanReachPos@@YGHPAUUnit@@PAUReachPosVec3@@1H@Z")
 
-void __stdcall UpdateResourceSharing(Player* player);
-double __stdcall GetEnergyUse(UnitDef* def);
-void __stdcall UpdatePlayerEconomy(Player* player);
-void __stdcall UpdateMetalExtraction(Unit* unit);
-
 struct ConstructedElement {
     ConstructedElement();
     ~ConstructedElement();
@@ -1534,46 +1529,6 @@ void __stdcall SetWeaponTargetPosSlot(Unit* unit, Vec3* pos, int weapon)
     SetWeaponTargetPos((char*)unit, &pos->x, weapon);
 }
 
-void __stdcall ResetSlot(UnitResources* self, unsigned char playerIndex)
-{
-    self->Reset(playerIndex);
-}
-
-void __stdcall SaveUnitAccountsSlot(UnitResources* self, Unit* info, HapiBank* file)
-{
-    self->SaveUnitAccounts(info, file);
-}
-
-void __stdcall LoadUnitAccountsSlot(UnitResources* self, Unit* info, HapiBank* file)
-{
-    self->LoadUnitAccounts(info, file);
-}
-
-int __stdcall RequestEnergySlot(UnitResources* self, UnitResources* r, float amount)
-{
-    return self->RequestEnergy(r, amount);
-}
-
-int __stdcall RequestEnergyAndMetalSlot(UnitResources* self, float energy, float metal)
-{
-    return self->RequestEnergyAndMetal(energy, metal);
-}
-
-int __stdcall SpendEnergySlot(UnitResources* self, float amount)
-{
-    return self->SpendEnergy(amount);
-}
-
-int __stdcall SpendMetalSlot(UnitResources* self, float amount)
-{
-    return self->SpendMetal(amount);
-}
-
-int __stdcall SpendEnergyAndMetalSlot(UnitResources* self, float energy, float metal)
-{
-    return self->SpendEnergyAndMetal(energy, metal);
-}
-
 int __stdcall Native_fixture_Query(FixtureAmount* first, FixtureAmount* second)
 {
     if (first != nullptr)
@@ -2406,15 +2361,9 @@ void ObjectSelfTest()
     b->player = player;
     def->energymake = 25.0f;
     def->windgenerator = 0.75f;
-    UnitResources* econ = (UnitResources*)SimAlloc(sizeof(UnitResources));
-    player->econ = econ;
-    econ->energyMake = 7.0f;
-    econ->player = player;
     player->totalEnergyProduced = 123.5;
     player->allied[3] = 1;
     player->type = 2;
-    a->resourceSlot.energyMake = 2.5f;
-    a->resourceSlot.player = player;
     a->cell.x = 5;
     a->cell.y = 6;
     a->flags = 0x10000000u;
@@ -2444,10 +2393,6 @@ void ObjectSelfTest()
     Check(strstr(text.Data(), "  r Unit#6.") == nullptr && strstr(text.Data(), "  r Unit#1.") == nullptr, "no slot outside the range is reached");
     Check(strstr(text.Data(), "  r Unit#5.def UnitDef#1\n") != nullptr, "the units share UnitDef#1");
     Check(strstr(text.Data(), "UnitDef#2") == nullptr, "no other definition is reached");
-    Check(strstr(text.Data(), "  r Player#3.econ UnitResources#1\n") != nullptr, "a separate account is named by its order");
-    Check(strstr(text.Data(), "  r UnitResources#1.energyMake f32:0x40e00000\n") != nullptr, "the fields of a separate account are recorded");
-    Check(strstr(text.Data(), "  r Unit#2.resourceSlot.energyMake f32:0x40200000\n") != nullptr, "the account inside a unit is named by the unit and the member");
-    Check(strstr(text.Data(), "  r Unit#2.resourceSlot.player Player#3\n") != nullptr, "the account inside a unit leads back to its player");
     Check(strstr(text.Data(), "  r Player#3.totalEnergyProduced f64:0x405ee00000000000\n") != nullptr, "a double is written as its bits");
     Check(strstr(text.Data(), "  r Player#3.allied x:0000000100000000000000\n") != nullptr, "an array of bytes is written in hex");
     Check(strstr(text.Data(), "  r Unit#2.cell (5,6)\n") != nullptr, "a cell is written as a point");
@@ -2486,8 +2431,6 @@ void ObjectSelfTest()
     Check(rm->health == 3, "a unit inside the range is restored");
     Check(ra->def.get() != nullptr && ra->def.get() == rb->def.get(), "both units share one rebuilt UnitDef");
     Check(ra->player.get() == rebuilt && rb->player.get() == rebuilt, "the units point back at the player");
-    Check(ra->resourceSlot.energyMake == 2.5f && ra->resourceSlot.player.get() == rebuilt, "the account inside a unit is restored in the unit");
-    Check(rebuilt->econ.get() != nullptr && rebuilt->econ.get()->energyMake == 7.0f, "a separate account is rebuilt");
     Unit* raimed = (Unit*)ReplayResolveObject("Unit#7", nullptr, g_objects, AllocObject);
     Check(raimed != nullptr && raimed->unitDefIndex == 9 && raimed->motion.get() != nullptr && raimed->motion.get()->velocity.x == 11, "the unit named by an id is rebuilt in its slot, with its motion");
     Check(raimed != nullptr && raimed->health == 0, "and nothing else of it");

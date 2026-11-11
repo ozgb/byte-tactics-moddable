@@ -36,14 +36,6 @@
     "ai": {
       "GetVisibleEnemiesInRadiusList": [["int", "linear", "int", "int", "linear", "int"], "int"]
     },
-    "economy": {
-      "UpdateResourceSharing": [["int"], "void"],
-      "GetEnergyUse": [["int"], "f64"],
-      "UpdatePlayerEconomy": [["int"], "void"],
-      "UpdateMetalExtraction": [["int"], "void"],
-      "RequestGranted": [["int", "int"], "int"],
-      "UnitAccount": [["int", "linear"], "void"]
-    },
     "files": {
       "BankOpenNamedBox": [["handle", "linear"], "int"],
       "BankSeekBox": [["handle", "int"], "void"],

@@ -272,11 +272,6 @@
       "kind": "f32"
      },
      {
-      "name": "econ",
-      "kind": "ref",
-      "target": "UnitResources"
-     },
-     {
       "name": "info",
       "kind": "ref",
       "target": "PlayerInfo"
@@ -399,11 +394,6 @@
       "aliases": [
        "UnitInfo::id"
       ]
-     },
-     {
-      "name": "resourceSlot",
-      "kind": "embed",
-      "target": "UnitResources"
      },
      {
       "name": "unitDefIndex",
@@ -1102,107 +1092,6 @@
      {
       "name": "interval",
       "kind": "f32"
-     }
-    ]
-   },
-   "UnitResources": {
-    "type": "UnitResources",
-    "scope": "state",
-    "inside": [
-     {
-      "kind": "Unit",
-      "member": "resourceSlot"
-     }
-    ],
-    "fields": [
-     {
-      "name": "energyMake",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::produced"
-      ]
-     },
-     {
-      "name": "energyUse",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::used"
-      ]
-     },
-     {
-      "name": "energyUsePaid",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::demand"
-      ]
-     },
-     {
-      "name": "energyStall",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::backlog"
-      ]
-     },
-     {
-      "name": "energyMakePrev",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::lastProduced"
-      ]
-     },
-     {
-      "name": "energyUsePrev",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::lastUsed"
-      ]
-     },
-     {
-      "name": "metalMake",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::produced"
-      ]
-     },
-     {
-      "name": "metalUse",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::used"
-      ]
-     },
-     {
-      "name": "metalUsePaid",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::demand"
-      ]
-     },
-     {
-      "name": "metalStall",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::backlog"
-      ]
-     },
-     {
-      "name": "metalMakePrev",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::lastProduced"
-      ]
-     },
-     {
-      "name": "metalUsePrev",
-      "kind": "f32",
-      "aliases": [
-       "ResourceAccount::lastUsed"
-      ]
-     },
-     {
-      "name": "player",
-      "kind": "ref",
-      "target": "Player"
      }
     ]
    },
@@ -2555,62 +2444,6 @@
     "target": "*float",
     "rule": "fields",
     "functions": [
-     "AddIncome",
-     "AddIncomeD",
-     "AddIncomeDB",
-     "AddIncomeW"
-    ],
-    "writes": [
-     "UnitResources.energyMake",
-     "UnitResources.metalMake"
-    ],
-    "note": "dst is the energy or metal produced of a unit account"
-   },
-   {
-    "kind": "deref_read",
-    "target": "*float",
-    "rule": "fields",
-    "functions": [
-     "AddIncome",
-     "AddIncomeD",
-     "AddIncomeDB",
-     "AddIncomeW"
-    ],
-    "reads": [
-     "UnitResources.energyMake",
-     "UnitResources.metalMake"
-    ],
-    "note": "the read half of dst += v"
-   },
-   {
-    "kind": "deref_write",
-    "target": "*float",
-    "rule": "fields",
-    "functions": [
-     "UseEnergyD"
-    ],
-    "writes": [
-     "UnitResources.energyUse"
-    ],
-    "note": "used is the energy used of a unit account"
-   },
-   {
-    "kind": "deref_read",
-    "target": "*float",
-    "rule": "fields",
-    "functions": [
-     "UseEnergyD"
-    ],
-    "reads": [
-     "UnitResources.energyUse"
-    ],
-    "note": "the read half of *used += v"
-   },
-   {
-    "kind": "deref_write",
-    "target": "*float",
-    "rule": "fields",
-    "functions": [
      "UpdateMetalExtraction"
     ],
     "writes": [
@@ -2679,154 +2512,6 @@
      "Unit.footprint"
     ],
     "note": "the cell and the footprint of a unit are Point16 members"
-   },
-   {
-    "kind": "field_escape",
-    "target": "UnitResources::energyMake",
-    "rule": "fields",
-    "reads": [
-     "UnitResources.energyMake",
-     "UnitResources.energyUse",
-     "UnitResources.energyUsePaid",
-     "UnitResources.energyStall",
-     "UnitResources.energyMakePrev",
-     "UnitResources.energyUsePrev"
-    ],
-    "writes": [
-     "UnitResources.energyMake",
-     "UnitResources.energyUse",
-     "UnitResources.energyUsePaid",
-     "UnitResources.energyStall",
-     "UnitResources.energyMakePrev",
-     "UnitResources.energyUsePrev"
-    ],
-    "note": "EnergyAccount views the first six floats of a unit account as a ResourceAccount"
-   },
-   {
-    "kind": "field_escape",
-    "target": "UnitResources::metalMake",
-    "rule": "fields",
-    "reads": [
-     "UnitResources.metalMake",
-     "UnitResources.metalUse",
-     "UnitResources.metalUsePaid",
-     "UnitResources.metalStall",
-     "UnitResources.metalMakePrev",
-     "UnitResources.metalUsePrev"
-    ],
-    "writes": [
-     "UnitResources.metalMake",
-     "UnitResources.metalUse",
-     "UnitResources.metalUsePaid",
-     "UnitResources.metalStall",
-     "UnitResources.metalMakePrev",
-     "UnitResources.metalUsePrev"
-    ],
-    "note": "MetalAccount views the second six floats of a unit account as a ResourceAccount"
-   },
-   {
-    "kind": "field_escape",
-    "target": "UnitResources::energyUse",
-    "rule": "fields",
-    "reads": [
-     "UnitResources.energyUse"
-    ],
-    "writes": [
-     "UnitResources.energyUse"
-    ],
-    "note": "the address of the energy used is taken for the float* used"
-   },
-   {
-    "kind": "field_read",
-    "target": "UnitResources::energyMake",
-    "rule": "fields",
-    "functions": [
-     "UnitResources::SaveUnitAccounts"
-    ],
-    "reads": [
-     "UnitResources.energyMake",
-     "UnitResources.energyUse",
-     "UnitResources.energyUsePaid",
-     "UnitResources.energyStall",
-     "UnitResources.energyMakePrev",
-     "UnitResources.energyUsePrev"
-    ],
-    "note": "the account is written to the bank as 0x18 bytes from its address"
-   },
-   {
-    "kind": "field_read",
-    "target": "UnitResources::metalMake",
-    "rule": "fields",
-    "functions": [
-     "UnitResources::SaveUnitAccounts"
-    ],
-    "reads": [
-     "UnitResources.metalMake",
-     "UnitResources.metalUse",
-     "UnitResources.metalUsePaid",
-     "UnitResources.metalStall",
-     "UnitResources.metalMakePrev",
-     "UnitResources.metalUsePrev"
-    ],
-    "note": "the account is written to the bank as 0x18 bytes from its address"
-   },
-   {
-    "kind": "field_maybe_written",
-    "target": "UnitResources::energyMake",
-    "rule": "fields",
-    "functions": [
-     "UnitResources::LoadUnitAccounts"
-    ],
-    "writes": [
-     "UnitResources.energyMake",
-     "UnitResources.energyUse",
-     "UnitResources.energyUsePaid",
-     "UnitResources.energyStall",
-     "UnitResources.energyMakePrev",
-     "UnitResources.energyUsePrev"
-    ],
-    "note": "the account is read from the bank as 0x18 bytes to its address"
-   },
-   {
-    "kind": "field_maybe_written",
-    "target": "UnitResources::metalMake",
-    "rule": "fields",
-    "functions": [
-     "UnitResources::LoadUnitAccounts"
-    ],
-    "writes": [
-     "UnitResources.metalMake",
-     "UnitResources.metalUse",
-     "UnitResources.metalUsePaid",
-     "UnitResources.metalStall",
-     "UnitResources.metalMakePrev",
-     "UnitResources.metalUsePrev"
-    ],
-    "note": "the account is read from the bank as 0x18 bytes to its address"
-   },
-   {
-    "kind": "call",
-    "target": "memset",
-    "rule": "fields",
-    "functions": [
-     "UnitResources::Reset"
-    ],
-    "writes": [
-     "UnitResources.energyMake",
-     "UnitResources.energyUse",
-     "UnitResources.energyUsePaid",
-     "UnitResources.energyStall",
-     "UnitResources.energyMakePrev",
-     "UnitResources.energyUsePrev",
-     "UnitResources.metalMake",
-     "UnitResources.metalUse",
-     "UnitResources.metalUsePaid",
-     "UnitResources.metalStall",
-     "UnitResources.metalMakePrev",
-     "UnitResources.metalUsePrev",
-     "UnitResources.player"
-    ],
-    "note": "the whole account is cleared"
    },
    {
     "kind": "field_escape",
@@ -3662,18 +3347,6 @@
     "note": "the address of the position is given to a function that only reads it"
    },
    {
-    "kind": "field_maybe_written",
-    "target": "Unit::resourceSlot",
-    "rule": "fields",
-    "functions": [
-     "UpdateUnitWeapons"
-    ],
-    "reads": [
-     "Unit.resourceSlot"
-    ],
-    "note": "the account is given to economy.SpendEnergyAndMetal, whose changes to it are the import's"
-   },
-   {
     "kind": "field_escape",
     "target": "Unit::netDirtyFlags",
     "rule": "fields",
@@ -4232,7 +3905,6 @@
      "units.MarkRecentlyDamaged",
      "targeting.GetWeaponTargetPos",
      "targeting.GetWeaponTargetUnit",
-     "economy.SpendEnergyAndMetal",
      "network.SendScriptCallByName",
      "network.SendUnitDamage",
      "network.SendWeaponFire",
@@ -4484,128 +4156,8 @@
     }
    },
    "economy": {
-    "status": "complete",
-    "issue": 668,
-    "imports": [
-     "units.SetStateBits",
-     "units.StartScriptWithArgs",
-     "los_radar.GetMapCell",
-     "network.SendShareMapInfo",
-     "players.TransferEnergy",
-     "players.TransferMetal",
-     "files.BankOpenNamedBox",
-     "files.BankSeekBox",
-     "files.BankReadBox",
-     "files.BankWriteBox"
-    ],
-    "slots": {
-     "UpdatePlayerEconomy": {
-      "functions": [
-       "UpdatePlayerEconomy",
-       "SettleResourceAccount",
-       "AddIncome",
-       "AddIncomeD",
-       "AddIncomeDB",
-       "AddIncomeW",
-       "EnergyAccount",
-       "MetalAccount",
-       "UseEnergy",
-       "UseEnergyD",
-       "UnitResources::RequestEnergy",
-       "UnitResources::SpendEnergy"
-      ]
-     },
-     "UpdateMetalExtraction": {
-      "reads": [
-       "Game.width",
-       "Game.height"
-      ]
-     },
-     "Reset": {
-      "native": "ResetSlot",
-      "args": {
-       "self": {
-        "mode": "object",
-        "kind": "UnitResources"
-       }
-      }
-     },
-     "SaveUnitAccounts": {
-      "native": "SaveUnitAccountsSlot",
-      "args": {
-       "self": {
-        "mode": "object",
-        "kind": "UnitResources"
-       },
-       "info": {
-        "mode": "object",
-        "kind": "Unit"
-       }
-      }
-     },
-     "LoadUnitAccounts": {
-      "native": "LoadUnitAccountsSlot",
-      "args": {
-       "self": {
-        "mode": "object",
-        "kind": "UnitResources"
-       },
-       "info": {
-        "mode": "object",
-        "kind": "Unit"
-       }
-      }
-     },
-     "RequestEnergy": {
-      "native": "RequestEnergySlot",
-      "args": {
-       "self": {
-        "mode": "object",
-        "kind": "UnitResources"
-       },
-       "r": {
-        "mode": "object",
-        "kind": "UnitResources"
-       }
-      }
-     },
-     "RequestEnergyAndMetal": {
-      "native": "RequestEnergyAndMetalSlot",
-      "args": {
-       "self": {
-        "mode": "object",
-        "kind": "UnitResources"
-       }
-      }
-     },
-     "SpendEnergy": {
-      "native": "SpendEnergySlot",
-      "args": {
-       "self": {
-        "mode": "object",
-        "kind": "UnitResources"
-       }
-      }
-     },
-     "SpendMetal": {
-      "native": "SpendMetalSlot",
-      "args": {
-       "self": {
-        "mode": "object",
-        "kind": "UnitResources"
-       }
-      }
-     },
-     "SpendEnergyAndMetal": {
-      "native": "SpendEnergyAndMetalSlot",
-      "args": {
-       "self": {
-        "mode": "object",
-        "kind": "UnitResources"
-       }
-      }
-     }
-    }
+    "status": "pending",
+    "slots": {}
    },
    "targeting": {
     "status": "complete",

@@ -351,12 +351,6 @@ static int UseEnergyD(EconAccount* a, int handicap, float v)
     return 0;
 }
 
-#ifdef BT_REPLAY_INJECT_WIND_SCALE
-#define WIND_INCOME(v) ((v) * BT_REPLAY_INJECT_WIND_SCALE)
-#else
-#define WIND_INCOME(v) (v)
-#endif
-
 // FUNCTION: 0x401360
 void __stdcall EconomyUpdatePlayer(int player)
 {
@@ -403,7 +397,7 @@ void __stdcall EconomyUpdatePlayer(int player)
                     if (ok)
                         AddIncome(&acct->metal.make, handicap, (float)ti.makesMetal);
                 } else if (ti.windGenerator > 0) {
-                    AddIncomeW(&acct->energy.make, handicap, WIND_INCOME((double)s_world->Wind() * ti.windGenerator));
+                    AddIncomeW(&acct->energy.make, handicap, (double)s_world->Wind() * ti.windGenerator);
                 } else if (ti.tidalGenerator > 0) {
                     AddIncome(&acct->energy.make, handicap, (double)s_world->Tide() * ti.tidalGenerator);
                 }

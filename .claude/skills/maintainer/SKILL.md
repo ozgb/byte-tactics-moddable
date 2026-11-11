@@ -11,7 +11,7 @@ Before the first cycle, check the setup (`AGENTS.md` step 1, and `docs/team.md`,
 
 ## A cycle
 
-Work through these in order. Reviews come first, because the lead waits on them. Stop when a full pass finds nothing to do, and report what you did, the decisions you made and each issue waiting on the human.
+Work through these in order. Reviews come first, because the lead waits on them. Stop when a full pass finds nothing to do, and report what you did, the decisions you made, and each issue and pull request waiting on the human.
 
 ### 1. Review pull requests
 
@@ -29,9 +29,13 @@ Hold it against each of these, and record a finding for every miss:
 - **Correctness:** use the `code-review` skill on the pull request for bugs.
 - **House rules:** comments only in the three forms (`AGENTS.md`, "Comments in code"), commit messages in the house format ending with `Assisted-by:`, a pull request body with `Closes #N`, the checks and "Left out".
 
+Decide whether it **needs human review** (`docs/team.md`, "Human review"). If it does, review it exactly as any other until nothing is left for the lead; then follow "Human review" there: an `approve` with a Human review section, the `needs-human-review` label and one ping through `tools/notify.py`. If `tools/notify.py` reports a new topic, put the subscribe URL in your report, never on GitHub.
+
 Then post one review: the verdict line for the current head SHA, the findings, and inline comments on the lines they concern. For a pull request you reviewed before, check each earlier finding was changed or answered; accept a reasoned answer or keep the finding (`docs/team.md`, "Disagreements").
 
-**Merge** on `approve` when checks are green and the tree you tested is the tree that lands (`docs/team.md`, "Branches behind `moddable`"): `gh pr merge <PR> --merge --delete-branch`. A branch that is behind but doesn't overlap the missed commits is merged as it stands. Don't ask for an update that would only reset your approval. When it does overlap, the update is a must-change finding in your review, not a request after an `approve`. Then remove its worktree and go to step 2 for its issue.
+**Waiting on the human:** for a pull request labelled `needs-human-review`, read the human's comments since your ping (unsigned comments, `docs/team.md`, "Human review") and act on them as that section says. Don't ping again while nothing has changed.
+
+**Merge** on `approve`, without the `needs-human-review` label, when checks are green and the tree you tested is the tree that lands (`docs/team.md`, "Branches behind `moddable`"): `gh pr merge <PR> --merge --delete-branch`. A branch that is behind but doesn't overlap the missed commits is merged as it stands. Don't ask for an update that would only reset your approval. When it does overlap, the update is a must-change finding in your review, not a request after an `approve`. Then remove its worktree and go to step 2 for its issue.
 
 ### 2. Reconcile after a merge
 
@@ -52,7 +56,7 @@ Skip every issue labelled `parked`. Groom every issue labelled `needs-grooming` 
 - **Flesh out** an issue whose tasks are too vague: name the files, functions, data and commands, from the code as it stands now.
 - **Split** an issue only along a real boundary ("Issue size"), never for size, and never a sub-issue a second time. Each part gets its own tasks, CI checks and "Done when", and blockers between them; the original stays open as their parent.
 - **Combine** open issues that touch the same files and run the same gate into one, and close the rest as merged into it.
-- **Answer** what the lead asked in its `needs-grooming` comment, then remove the label. When the answer is a major architecture decision, consult the human instead and keep the label until they have answered.
+- **Answer** what the lead asked in its `needs-grooming` comment, then remove the label. When the answer is a major architecture decision, consult the human instead and keep the label until they have answered. Ping them once when you add `needs-human`: `uv run tools/notify.py --title "#<N> needs your decision" --click <issue URL> "<the question, one line>"`.
 - **Keep the queue stocked.** Keep at least 3 issues available to claim beyond those the lead holds: groomed, unblocked, unassigned and not labelled `needs-grooming`. When there are fewer, file and groom the next parts of #2's "Priority now", sized by "Issue size"; when it has none left, say so in the report rather than unparking or filing other work. Never split an issue to stock the queue.
 
 **Decide** what the plan leaves open, and consult the human on every major architecture decision. Choose, or recommend, by #2's goals (conformity first, then moddability, then the rest) and its decisions, and the work already merged. Record each decision with its reason on the issue it affects; a decision that shapes more than one issue also goes into #2's decisions. Propose revising one of #2's decisions when merged work shows it doesn't hold, and say what showed it; the human decides.

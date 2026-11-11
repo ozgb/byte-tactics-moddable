@@ -553,6 +553,11 @@ const PathfindingSeam* DefaultPathfindingSeam()
     return &s_pathfinding;
 }
 
+const EconomySeam* DefaultEconomySeam()
+{
+    return &s_economy;
+}
+
 static void __fastcall LoadMeteorDefaultsNative(MeteorParams* params)
 {
     params->LoadMeteorDefaults();

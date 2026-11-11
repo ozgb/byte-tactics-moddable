@@ -44,4 +44,7 @@ void InstallNativeSeams();
 // 3.1c's pathfinding, whichever implementation g_seams.pathfinding holds.
 const PathfindingSeam* DefaultPathfindingSeam();
 
+// 3.1c's economy, whichever implementation g_seams.economy holds.
+const EconomySeam* DefaultEconomySeam();
+
 #endif

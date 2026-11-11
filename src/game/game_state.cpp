@@ -534,7 +534,7 @@ void LoadBattleAssets()
     unsigned int pathRegionSize = g_seams.pathfinding->RegionSize(&mapInfo);
     unsigned int defaultRegionSize = DefaultPathfindingSeam()->RegionSize(&mapInfo);
     unsigned int econRegionSize = g_seams.economy->RegionSize(&econInfo);
-    unsigned int defaultEconRegionSize = EconomyRegionSize(&econInfo);
+    unsigned int defaultEconRegionSize = DefaultEconomySeam()->RegionSize(&econInfo);
     MatchSetupSizeBlock((pathRegionSize > defaultRegionSize ? pathRegionSize - defaultRegionSize : 0)
         + (econRegionSize > defaultEconRegionSize ? econRegionSize - defaultEconRegionSize : 0));
     void* econRegion = SimAllocRegion("Economy region", econRegionSize);

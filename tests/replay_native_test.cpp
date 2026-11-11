@@ -2655,7 +2655,8 @@ void TableSelfTest()
     Projectile* rebuilt = (Projectile*)ReplayResolveObject("Projectile#3", nullptr, g_objects, AllocObject);
     MovementClass* rebuiltClass = (MovementClass*)ReplayResolveObject("MovementClass#5", nullptr, g_objects, AllocObject);
     Check(rebuilt != nullptr && rebuilt == &g_game->projectiles.get()[3], "a projectile is a slot of the rebuilt pool");
-    Check(g_game->projectiles.get() != nullptr, "the pool is allocated with the size the schema says");
+    Check(ReplayResolveObject("Projectile#299", nullptr, g_objects, AllocObject) == &g_game->projectiles.get()[299], "the last slot of the pool resolves");
+    Check(ReplayResolveObject("Projectile#300", nullptr, g_objects, AllocObject) == nullptr, "the pool holds the 300 slots the schema says");
     Check(rebuilt != nullptr && rebuilt->speed == 77 && rebuilt->spawnTick == 900 && rebuilt->owner == 4, "its fields are restored");
     Check(rebuilt != nullptr && rebuilt->attacker.get() == &g_game->units.get()[2], "its attacker is a slot of the unit pool");
     Check(rebuiltClass == &MovementEntries()[5] && rebuiltClass->maxSlope == 9, "an entry of the sim table is restored in place");

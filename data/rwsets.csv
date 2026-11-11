@@ -49766,7 +49766,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitMotionReadNetStateNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitRefUnlinkNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitTypeSetAddTypeOrCategoryNative
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateAllUnitsNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateAllUnits
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateBlink
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateCellHeightRange
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateExplosions
@@ -49777,9 +49777,9 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayerHead
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayerTail
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayers
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayersFinish
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayersNative
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayersOnStreamNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayersOnStream
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateProjectiles
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateSensorRadarAndCloak
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateSfxOccupyNative
@@ -60137,8 +60137,8 @@ address,function,file,kind,target
 ,UnlockPosts,src/host/win32/headless.cpp,function,
 ,UnlockPosts,src/host/win32/headless.cpp,global_maybe_written,g_postLock
 ,UnsignedLess::operator(),src/debug/free_block_map.h,function,
-,UpdateAllUnitsNative,src/seams/native.cpp,call,SchedUnitsPhase
-,UpdateAllUnitsNative,src/seams/native.cpp,function,
+,UpdateAllUnits,src/seams/native.cpp,call,SchedUnitsPhase
+,UpdateAllUnits,src/seams/native.cpp,function,
 ,UpdateAutoFollow,src/ingame/control_panel.cpp,call,CycleCameraFollow
 ,UpdateAutoFollow,src/ingame/control_panel.cpp,call,CycleSelection
 ,UpdateAutoFollow,src/ingame/control_panel.cpp,call,IsKeyDown
@@ -60181,6 +60181,8 @@ address,function,file,kind,target
 ,UpdatePlayerTail,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarMapped]
 ,UpdatePlayerTail,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::UpdateSensorRadarAndCloak]
 ,UpdatePlayerTail,src/game/players.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerEconomy]
+,UpdatePlayers,src/seams/native.cpp,call,SchedPlayersPhase
+,UpdatePlayers,src/seams/native.cpp,function,
 ,UpdatePlayersFinish,src/game/players.cpp,call,CountCombatPlayers
 ,UpdatePlayersFinish,src/game/players.cpp,call,operator Mission *
 ,UpdatePlayersFinish,src/game/players.cpp,field_read,Game::commanderDeath
@@ -60197,10 +60199,8 @@ address,function,file,kind,target
 ,UpdatePlayersFinish,src/game/players.cpp,global_read,g_game
 ,UpdatePlayersFinish,src/game/players.cpp,global_read,g_seams
 ,UpdatePlayersFinish,src/game/players.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
-,UpdatePlayersNative,src/seams/native.cpp,call,SchedPlayersPhase
-,UpdatePlayersNative,src/seams/native.cpp,function,
-,UpdatePlayersOnStreamNative,src/seams/native.cpp,call,SchedPlayersPhase
-,UpdatePlayersOnStreamNative,src/seams/native.cpp,function,
+,UpdatePlayersOnStream,src/seams/native.cpp,call,SchedPlayersPhase
+,UpdatePlayersOnStream,src/seams/native.cpp,function,
 ,UpdateSfxOccupyNative,src/seams/native.cpp,call,SfxOccupyTracker::UpdateSfxOccupy
 ,UpdateSfxOccupyNative,src/seams/native.cpp,function,
 ,UpdateSubState,src/frontend/frontend.cpp,call,SetSubState

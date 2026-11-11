@@ -1608,3 +1608,7 @@ UpdateUnit,RunSecondaryOrders,"seam slot filled by InstallNativeSeams, OrdersSea
 UpdateUnit,UpdateMotionNative,"seam slot filled by InstallNativeSeams, OrdersSeam::UpdateMotion, UpdateUnit (src/units/unit_position.cpp), src/seams/native.cpp"
 UpdateUnit,UpdateUnitWeapons,"seam slot filled by InstallNativeSeams, WeaponsSeam::UpdateUnitWeapons, UpdateUnit (src/units/unit_position.cpp), src/seams/native.cpp"
 UpdateUnitWeapons,StartScriptWithArgsNative,"seam slot filled by InstallNativeSeams, UnitsSeam::StartScriptWithArgs, UpdateUnitWeapons (src/weapons/weapons.cpp), src/seams/native.cpp"
+SchedPlayersPhase,UpdatePlayerHead,"seam slot filled by InstallNativeSeams, PlayersSeam::UpdatePlayerHead, SchedPlayersPhase (src/game/scheduler.cpp), src/seams/native.cpp"
+SchedPlayersPhase,UpdatePlayerTail,"seam slot filled by InstallNativeSeams, PlayersSeam::UpdatePlayerTail, SchedPlayersPhase (src/game/scheduler.cpp), src/seams/native.cpp"
+SchedPlayersPhase,UpdatePlayersFinish,"seam slot filled by InstallNativeSeams, PlayersSeam::UpdatePlayersFinish, SchedPlayersPhase (src/game/scheduler.cpp), src/seams/native.cpp"
+SchedUnitsPhase,UpdateUnit,"seam slot filled by InstallNativeSeams, UnitsSeam::UpdateUnit, SchedUnitsPhase (src/game/scheduler.cpp), src/seams/native.cpp"

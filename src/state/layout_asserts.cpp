@@ -11,6 +11,7 @@
 #pragma pack(push, 1)
 #include "../util/vec3.h"
 #include "../../include/v4i.h"
+#include "../../interfaces/economy.h"
 #include "../../interfaces/services.h"
 #include "../ai/ai_search_goal.h"
 #include "../ai/group.h"
@@ -321,6 +322,16 @@ static_assert(offsetof(DefeatDeathTimerRunsOut, endTick) == 12, "");
 static_assert(sizeof(DefeatUnitTypeKilled) == 48, "");
 static_assert(offsetof(DefeatUnitTypeKilled, name) == 12, "");
 static_assert(offsetof(DefeatUnitTypeKilled, numLeftToKill) == 44, "");
+static_assert(sizeof(EconAccount) == 48, "");
+static_assert(offsetof(EconAccount, energy) == 0, "");
+static_assert(offsetof(EconAccount, metal) == 24, "");
+static_assert(sizeof(EconLedger) == 24, "");
+static_assert(offsetof(EconLedger, make) == 0, "");
+static_assert(offsetof(EconLedger, use) == 4, "");
+static_assert(offsetof(EconLedger, usePaid) == 8, "");
+static_assert(offsetof(EconLedger, stall) == 12, "");
+static_assert(offsetof(EconLedger, makePrev) == 16, "");
+static_assert(offsetof(EconLedger, usePrev) == 20, "");
 static_assert(sizeof(EndGamePlayerSlot) == 58, "");
 static_assert(offsetof(EndGamePlayerSlot, active) == 0, "");
 static_assert(offsetof(EndGamePlayerSlot, unknown_1) == 1, "");

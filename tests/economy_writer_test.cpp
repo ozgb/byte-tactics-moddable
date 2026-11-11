@@ -252,6 +252,18 @@ static int Scripted(EconomyEvent* out, int index, int tick)
     return 0;
 }
 
+enum { kTamperTick = 40 };
+
+static int PilotApply(Run* run, bool tamper, int tick, const EconomyEvent* e)
+{
+    int outcome = EconomyApply(e);
+    if (tamper && tick == kTamperTick && run->tampered < 0 && e->kind == ECONOMY_SPEND && outcome == 1) {
+        run->tampered = tick;
+        return 0;
+    }
+    return outcome;
+}
+
 static void Play(Run* run, bool tamper)
 {
     Restart();
@@ -273,21 +285,16 @@ static void Play(Run* run, bool tamper)
         for (int i = 0; Scripted(&e, i, t); i++) {
             if (e.kind == ECONOMY_REQUEST) {
                 int granted = EconomyRequestGranted(e.unit, e.resources);
-                int outcome = EconomyApply(&e);
+                int outcome = PilotApply(run, tamper, t, &e);
                 Check(outcome == granted, "RequestGranted says what the REQUEST then returns");
                 run->granted += outcome;
                 EconomyResultsAdd(&s_results, &e, outcome);
                 continue;
             }
-            int outcome = EconomyApply(&e);
+            int outcome = PilotApply(run, tamper, t, &e);
             if (e.kind == ECONOMY_SPEND)
                 run->spent += outcome;
-            EconomyEvent seen = e;
-            if (tamper && run->tampered < 0 && e.kind == ECONOMY_SPEND && outcome == 1 && t >= 40) {
-                seen.energy += 1.0f;
-                run->tampered = t;
-            }
-            EconomyResultsAdd(&s_results, &seen, outcome);
+            EconomyResultsAdd(&s_results, &e, outcome);
         }
         EconomyUpdatePlayer(0);
         EconomyUpdatePlayer(1);
@@ -305,15 +312,17 @@ static void CheckResultsSection()
     Play(&tampered, true);
     Check(plain.granted > 0 && plain.spent > 0, "requests are granted and spends succeed");
     Check(memcmp(&plain, &again, sizeof plain) == 0, "two runs of the default give the same results, written state and region");
-    Check(tampered.tampered >= 0, "the tampered pilot changes an event");
+    Check(tampered.tampered == kTamperTick, "the tampered pilot refuses a SPEND the default grants, at the tampered tick");
     Check(memcmp(plain.written, tampered.written, sizeof plain.written) == 0,
           "the tampered pilot reports the default's state every tick");
+    Check(memcmp(plain.region, tampered.region, sizeof plain.region) == 0,
+          "the tampered pilot's region is the default's every tick");
     int first = -1;
     for (int t = 0; t < kTicks && first < 0; t++) {
         if (plain.results[t] != tampered.results[t])
             first = t;
     }
-    Check(first == tampered.tampered, "the economy events section differs first at the tick of the changed event");
+    Check(first == kTamperTick, "the economy events section differs first at the tampered tick");
     printf("tampered tick %d, first differing tick %d\n", tampered.tampered, first);
     Check(plain.region[0] != plain.region[kTicks - 1], "the events change the region");
 }

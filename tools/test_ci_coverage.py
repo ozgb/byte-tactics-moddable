@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 NOT_IN_CI = {
     "test_harness_load.py": "needs Wine and build/modern/TotalA.exe",
     "test_blockscan.py": "plays scenarios: needs Wine, the exe and game data",
+    "test_matchsetup.py": "plays scenarios: needs Wine, the exe and game data",
 }
 
 

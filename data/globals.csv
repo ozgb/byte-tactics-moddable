@@ -312,9 +312,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x50da00,g_pentiumProEvents,.data,272,gap,data,Entry_004df590[],1,1,2,conflicting: array or pointer,2,,DAT_0050da00,17,src/debug/perf_counters.cpp,00030560d4dc500003000000000343600001106048dc500001000000000000000002116030dc500002000000000000000002126024dc50000200000000000000
 0x5119b8,g_emptyText,.bss,8,gap,data,char[],32,2,3,conflicting: shape,34,,DAT_005119b8,,SimGlobals,
 0x5119c0,g_playerAI,.bss,40,gap,data,PlayerAI*[],2,1,2,conflicting: struct names only,3,0x28,DAT_005119c0,,SimGlobals,
-0x5119e8,g_playerBudgetCap,.bss,40,type,data,int[10],1,0,1,one type,1,0x28,INT_ARRAY_005119e8,,SimGlobals,
-0x511a10,g_playerTickLoad,.bss,40,type,data,int[10],1,0,1,one type,1,,INT_ARRAY_00511a10,,SimGlobals,
-0x511a38,g_budgetRefreshCounter,.bss,4,type,data,int,1,0,1,one type,1,,INT_00511a38,,SimGlobals,
+0x5119e8,pad_34,.bss,84,gap,unreferenced,unsigned char[84],0,0,0,,0,,,,SimGlobals,
 0x511a3c,pad_88,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,SimGlobals,
 0x511a40,g_byteRatesLastReceived,.bss,4,type,data,int,1,0,1,one type,1,,INT_00511a40,,,
 0x511a44,g_compressionPercent,.bss,4,type,data,int,1,0,1,one type,1,,INT_00511a44,,,

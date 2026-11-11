@@ -8,8 +8,11 @@
 #include "../state/sim_radar.h"
 #include "../state/game_rand.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/pathfinding.h"
 #include "../../interfaces/host.h"
 #include "game_state.h"
+#include "match_setup.h"
+#include "../state/block.h"
 #include "console_commands.h"
 #include "../util/tdf.h"
 
@@ -514,7 +517,20 @@ void LoadBattleAssets()
     g_seams.wind_meteors->InitMeteors();
     g_seams.los_radar->InitRadar();
     g_seams.players->InitPlayers();
-    g_seams.orders->CreatePathfinder();
+    PathMapInfo mapInfo;
+    mapInfo.width = g_game->width;
+    mapInfo.height = g_game->height;
+    mapInfo.unitSlots = g_game->poolCount;
+    mapInfo.moveClassCount = 0;
+    for (int i = 0; i < 32; i++) {
+        if (g_seams.pathworld->MoveClass(i) != 0)
+            mapInfo.moveClassCount++;
+    }
+    unsigned int pathRegionSize = g_seams.pathfinding->RegionSize(&mapInfo);
+    unsigned int defaultRegionSize = DefaultPathfindingSeam()->RegionSize(&mapInfo);
+    MatchSetupSizeBlock(pathRegionSize > defaultRegionSize ? pathRegionSize - defaultRegionSize : 0);
+    void* pathRegion = SimAllocRegion("AISearch region", pathRegionSize);
+    g_seams.pathfinding->Init(&mapInfo, pathRegion, pathRegionSize);
     g_seams.weapons->InitExplosions();
     InitCommands();
     for (int i = 0; i < 10; i++)
@@ -578,7 +594,9 @@ void ShutdownIngameSystems()
     g_seams.units->FreeUnitMemory();
     DestroyParticleLists();
     g_seams.weapons->FreeExplosions();
-    g_seams.orders->DestroyPathfinder();
+    void* pathRegion = g_seams.pathfinding->Shutdown();
+    if (pathRegion != nullptr)
+        SimFree(pathRegion);
     g_seams.players->FreePlayers();
     g_seams.los_radar->FreeRadar();
     g_seams.los_radar->FreeMapResources();

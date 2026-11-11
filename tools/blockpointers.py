@@ -277,7 +277,7 @@ def load_code_map(map_path: Path) -> CodeMap:
     return parse_map(map_path.read_text(errors="replace"), empty_functions(map_path.parent / "objs"))
 
 
-ALLOCATORS = re.compile(r"\?(SimAllocTagged|GameAlloc|GameCalloc|GameRealloc|GameStrdup|SimAlloc|SimRealloc)\w*@@")
+ALLOCATORS = re.compile(r"\?(SimAllocRegion|SimAllocTagged|GameAlloc|GameCalloc|GameRealloc|GameStrdup|SimAlloc|SimRealloc)\w*@@")
 NEW_OPERATORS = ("??2", "??_U")
 CODE_SECTION = 0x20000000
 

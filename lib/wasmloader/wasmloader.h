@@ -46,6 +46,7 @@ typedef struct wl_layout {
     int has_block;
     unsigned block_base;
     unsigned block_size;
+    unsigned block_max;
     unsigned scratch_base;
     unsigned scratch_size;
 } wl_layout;

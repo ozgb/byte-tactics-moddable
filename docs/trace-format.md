@@ -30,7 +30,7 @@ Contents:
 - **The state** has two parts. The **game record** is one flat array of bytes, addressed by offset
   from its first byte (written `game+0x1b63`). The **state block** holds everything the simulation
   allocates (units, projectiles, orders, scripts, the map, and so on). A few simulation globals
-  (the two random generator states, the order kind names, the meteor, pathfinder budget and economy
+  (the two random generator states, the order kind names, the meteor and economy
   counters, the table of moving classes, and the arrays of exploded pieces and AI records) live
   outside both; they are named where they are used.
 - **Addresses.** A pointer-sized field holds a 32-bit address. A field of kind `ref` (see section 4)
@@ -66,7 +66,8 @@ fpu_control_word 0x<5 uppercase hex digits>
 ```
 
 When any quirk flag is on, one more line follows, `quirks <8 lowercase hex digits> <spec>`. With
-every flag off the line is absent. Then one row per line:
+every flag off the line is absent. When the scenario selects the demo pathfinder (`pathfinder hpa`,
+`docs/scenario-format.md`), the line `pathfinder hpa` follows the `quirks` line, if any; it is absent otherwise. Then one row per line:
 
 ```
 <tick> <phase> <16 lowercase hex digits>
@@ -489,7 +490,7 @@ END
 
 ### 8.7 pathfinder (sections 16 and 17)
 
-`pf` is the ref at `game+0x14207`.
+`pf` is the ref at `game+0x14207`: the start of the pathfinder's region in the state block. The three arrays of section 17 (`globals.pathfinder`) are in the same region; the default pathfinder writes them through the `WriteState` slot of the pathfinding seam (`interfaces/state_writer.h`), in the order below, and the bytes hashed are the same. An implementation that is not the default writes its own records in section 16 (the demo's `hpa`), and nothing in section 17.
 
 ```
 H8(16)

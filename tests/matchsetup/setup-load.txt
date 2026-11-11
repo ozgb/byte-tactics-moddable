@@ -1,0 +1,6 @@
+# setup-save's game loaded: the save, not the scenario, decides the block size and the search steps.
+ticks 1800
+game_seed 1
+crt_seed 1
+view_seed 1
+load setup-save

@@ -43,10 +43,18 @@ struct Base {
 };
 struct Site {
     unsigned ra, item, type, stride;
+    const unsigned* parts;
+    unsigned partCount;
 };
 struct Alloc {
     unsigned start, size, item, type, stride, seq, next;
+    const unsigned* parts;
+    unsigned partCount;
 };
+struct ReadCell {
+    unsigned count, firstTick;
+};
+const unsigned kPartWords = 7;
 struct Hit {
     unsigned item, container, entA, entB, end;
 };
@@ -152,6 +160,7 @@ Base* g_bases;
 unsigned g_baseCount;
 Site* g_sites;
 unsigned g_siteCount;
+ReadCell* g_reads;
 
 unsigned g_imageLo, g_imageSize;
 Section g_sections[16];
@@ -355,6 +364,19 @@ NS void LoadItems(const unsigned char* data)
         g_sites[i].type = r.U32();
         g_sites[i].stride = r.U32();
     }
+    unsigned partSets = r.U32();
+    for (unsigned i = 0; i < partSets; i++) {
+        unsigned ra = r.U32();
+        unsigned n = r.U32();
+        const unsigned* words = (const unsigned*)r.p;
+        r.p += 4 * kPartWords * n;
+        for (unsigned k = 0; k < g_siteCount; k++) {
+            if (g_sites[k].ra == ra) {
+                g_sites[k].parts = words;
+                g_sites[k].partCount = n;
+            }
+        }
+    }
 }
 
 NS void LoadFuncs(const unsigned char* data)
@@ -537,6 +559,32 @@ NS void RefineInRegion(unsigned item, unsigned type, unsigned stride, unsigned s
     }
 }
 
+NS unsigned PartBound(const Alloc* al, unsigned at, unsigned fixed)
+{
+    if (at == kNone)
+        return fixed == kNone ? al->size : fixed;
+    return at + 4 <= al->size ? *(const unsigned*)(al->start + at) : 0;
+}
+
+NS bool ResolvePart(const Alloc* al, unsigned a, Hit* h)
+{
+    unsigned off = a - al->start;
+    for (unsigned i = 0; i < al->partCount; i++) {
+        const unsigned* w = al->parts + kPartWords * i;
+        unsigned start = PartBound(al, w[0], w[1]);
+        unsigned end = PartBound(al, w[2], w[3]);
+        if (end > al->size)
+            end = al->size;
+        if (off < start || off >= end)
+            continue;
+        RefineInRegion(w[4], w[5], w[6], al->start + start, end - start, off - start, a, h);
+        if (w[5] == kNone || w[6] == 0)
+            h->end = al->start + end;
+        return true;
+    }
+    return false;
+}
+
 NS bool FindAlloc(unsigned a, Alloc** out)
 {
     unsigned g = (a - g_blockLo) / 8;
@@ -657,10 +705,12 @@ NS bool Resolve(unsigned a, Hit* h)
         }
         Alloc* al;
         if (FindAlloc(a, &al)) {
-            RefineInRegion(al->item, al->type, al->stride, al->start, al->size, a - al->start, a, h);
+            if (!ResolvePart(al, a, h)) {
+                RefineInRegion(al->item, al->type, al->stride, al->start, al->size, a - al->start, a, h);
+                if (al->type == kNone || al->stride == 0)
+                    h->end = al->start + al->size;
+            }
             h->entA = al->seq;
-            if (al->type == kNone || al->stride == 0)
-                h->end = al->start + al->size;
             if (al->item == g_idUnresolvedBlock)
                 g_stats.unresolvedBlock++;
             return true;
@@ -1080,6 +1130,30 @@ NS void DeferLoad()
 }
 #endif
 
+NS void NoteRead(unsigned item, unsigned sub)
+{
+    if (g_reads == 0 || sub >= g_subCount)
+        return;
+    ReadCell* c = &g_reads[item * g_subCount + sub];
+    if (c->count++ == 0)
+        c->firstTick = g_tick;
+}
+
+NS void NoteReadSpan(unsigned from, unsigned end, unsigned sub)
+{
+    Stats saved = g_stats;
+    for (unsigned cursor = from; cursor < end;) {
+        Hit h;
+        if (!Resolve(cursor, &h)) {
+            cursor++;
+            continue;
+        }
+        NoteRead(h.item, sub);
+        cursor = h.end > cursor ? h.end : cursor + 1;
+    }
+    g_stats = saved;
+}
+
 NS void Record(int store, unsigned a, unsigned size, void* ra)
 {
     unsigned sub = Attribute(ra);
@@ -1110,6 +1184,11 @@ NS void Record(int store, unsigned a, unsigned size, void* ra)
             g_stats.writes++;
             g_classifier.Write(h.item, h.entA, h.entB, sub, g_tick);
         } else {
+            if (g_window != ACCESS_WINDOW_PRESENTATION) {
+                NoteRead(h.item, sub);
+                if (size <= 16 && h.end < end)
+                    NoteReadSpan(h.end, end, sub);
+            }
             unsigned flags = g_classifier.Read(h.item, h.entA, h.entB, sub, g_tick);
             if ((flags & READ_EARLIER_ENTITY) != 0 && g_passReads != 0)
                 NotePassRead(h.item, sub, ra, flags, g_classifier.MatchLevel());
@@ -1259,7 +1338,11 @@ NS void AddAlloc(unsigned a, unsigned size, unsigned site)
         al->item = g_sites[lo].item;
         al->type = g_sites[lo].type;
         al->stride = g_sites[lo].stride;
+        al->parts = g_sites[lo].parts;
+        al->partCount = g_sites[lo].partCount;
     } else {
+        al->parts = 0;
+        al->partCount = 0;
         al->item = g_idUnresolvedBlock;
         al->type = kNone;
         al->stride = 0;
@@ -1501,6 +1584,29 @@ NS void WritePassReads()
     WriteWhole("access.pass.csv", out);
 }
 
+NS void WriteReads()
+{
+    Out out = {0, 0, 0};
+    out.Add("item,reader,count,first_tick\n");
+    for (unsigned i = 0; i < g_itemCount; i++) {
+        for (unsigned sub = 0; sub < g_subCount; sub++) {
+            const ReadCell* c = &g_reads[i * g_subCount + sub];
+            if (c->count == 0)
+                continue;
+            out.Add("\"");
+            out.Add(g_itemNames[i]);
+            out.Add("\",");
+            out.Add(SubName(sub));
+            out.Add(",");
+            out.Num(c->count);
+            out.Add(",");
+            out.Num(c->firstTick);
+            out.Add("\n");
+        }
+    }
+    WriteWhole("access.reads.csv", out);
+}
+
 }
 
 #define ACCESS_CALLBACK(N)                                                                                 \
@@ -1642,6 +1748,7 @@ NS void AccessLogInit()
         Die("accesslog: out of memory\n");
     g_draws = (DrawAgg*)Zeroed(sizeof(DrawAgg) << kDrawBits);
     g_passReads = (PassRead*)Zeroed(sizeof(PassRead) << kPassBits);
+    g_reads = (ReadCell*)Zeroed(sizeof(ReadCell) * g_itemCount * g_subCount);
     g_raw = getenv("ACCESSLOG_RAW") != 0;
     if (g_raw) {
         g_rawFile = host_file_create("access.raw.txt", 0);
@@ -1824,6 +1931,7 @@ NS void AccessLogFinish()
     FlushEntity();
     WriteDraws();
     WritePassReads();
+    WriteReads();
     Out stats = {0, 0, 0};
     struct {
         const char* name;

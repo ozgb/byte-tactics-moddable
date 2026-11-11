@@ -16,8 +16,9 @@ template or compiler-made function such as Ref<T>::Ref, a static initialiser or 
 deleting destructor) is judged for every simulation subsystem that has a function in its
 source file; a file with no simulation function is not checked:
 
-  seam          g_seams, or anything interfaces/seams.h declares outside the table struct, or a function that data/subsystems.csv
-                gives a `phase:` rule (the engine's entry point for a phase, which the default seam slot of it calls)
+  seam          g_seams, or anything interfaces/seams.h declares outside the table struct, or a function of the scheduler
+                (src/game/scheduler.cpp) that data/subsystems.csv gives a `phase:` rule (the engine's entry point for a phase,
+                which the default seam slot of it calls)
   state         g_game, a symbol defined in src/state/, or declared in interfaces/ref.h and not defined elsewhere
   service       declared at depth 0 in interfaces/services.h, or a member of a class it defines
   host          declared in interfaces/host.h
@@ -95,6 +96,7 @@ ECONOMY_OWNER = "economy"
 ECONOMY_WRITING_SLOTS = ("Apply", "UpdatePlayerEconomy", "UpdateMetalExtraction", "UpdateResourceSharing", "Init", "Shutdown")
 ECONOMY_QUERY_SLOTS = ("RequestGranted", "GetEnergyUse", "UnitAccount", "WriteState")
 NATIVE_TABLE = "src/seams/native.cpp"
+SCHEDULER_FILE = "src/game/scheduler.cpp"
 WRITE_KINDS = ("field_write", "field_maybe_written", "field_escape", "global_write", "global_maybe_written", "global_escape",
                "deref_write", "deref_maybe_written", "deref_escape")
 ECONOMY_OUTPUT_TYPES = re.compile(r"\bEcon(Account|Ledger|UnitInfo|TypeInfo|PlayerInfo)\b")
@@ -291,12 +293,13 @@ def const_names(root: Path) -> set:
 
 
 def phase_functions(root: Path) -> set:
-    """The functions data/subsystems.csv gives a `phase:` rule: the engine's entry points for a phase, which the default seam slots call."""
+    """The functions of the scheduler's file that data/subsystems.csv gives a `phase:` rule: the engine's entry points for a phase, which the default seam slots call."""
     path = root / SUBSYSTEMS
     if not path.exists():
         return set()
     with path.open(newline="") as f:
-        return {r["function"] for r in csv.DictReader(f) if r.get("rule", "").startswith("phase:")}
+        return {r["function"] for r in csv.DictReader(f)
+                if r.get("rule", "").startswith("phase:") and r["file"] == SCHEDULER_FILE}
 
 
 def build_rules(root: Path, units: list) -> Rules:

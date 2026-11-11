@@ -40,6 +40,8 @@ DATA = ROOT / "data"
 DOC = ROOT / "docs" / "schedule.md"
 SIMS = ["wind_meteors", "economy", "features", "ai", "pathfinding", "weapons", "targeting", "los_radar", "orders", "units",
         "players", "map"]
+SPLICE_SCALE = 1000
+SPLICE_DEPTH = 3
 PHASES = ["net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail"]
 SEAM_HINT = re.compile(r"\[(\w+)::(\w+)\]$")
 SLOT_REASON = re.compile(r"^(?:seam slot filled by InstallNativeSeams|slot of the PathWorldView table filled by NativePathWorld"
@@ -470,14 +472,16 @@ class Program:
                 self.slots["%s::%s" % m.groups()].add(r["target"])
             else:
                 self.resolved[r["caller"]].append(r["target"])
+        self.marks: dict[str, list[Mark]] = {path: file_marks(text) for path, text in sources.items()}
+        self.ends: dict[str, list[int]] = {path: block_ends(blank(text)) for path, text in sources.items()}
         self.phase_slot: dict[str, str] = {}
         for r in subsystems:
-            if r.get("rule", "").startswith("phase:"):
+            if r.get("rule", "").startswith("phase:") and r["subsystem"] not in SIMS and any(
+                    m.kind == "pass" for f in self.fns.get(r["function"], []) for m in self.marks_in(f)):
                 wanted = "::" + r["rule"][len("phase:"):]
                 found = sorted(k for k in self.slots if k.endswith(wanted))
                 if found:
                     self.phase_slot[r["function"]] = found[0]
-        self.marks: dict[str, list[Mark]] = {path: file_marks(text) for path, text in sources.items()}
         self.memo: dict[tuple, list[Node]] = {}
         self.memo_own: dict[tuple, set] = {}
         self.entries: dict[str, tuple[list[Node], set]] = {}
@@ -540,6 +544,53 @@ class Program:
 
     def marks_in(self, fn: Fn) -> list[Mark]:
         return [m for m in self.marks.get(fn.file, []) if fn.start <= m.line <= fn.end]
+
+    def inlined_slot(self, fn: Fn, kind: str, target: str, sub: str) -> list[Fn]:
+        """The functions a seam call of the subsystem `sub` runs inside it, or those of a call to a phase function."""
+        how, names = self.targets(fn, kind, target)
+        if how == "slot":
+            slot = names[0]
+            if self.seam_owner.get(slot.split("::")[0]) not in (None, sub):
+                return []
+            return [g for impl in sorted(self.slots[slot]) for g in self.lookup(impl)]
+        return [g for name in names if name in self.phase_slot for g in self.lookup(name, fn.file)]
+
+    def spliced(self, fn: Fn, sub: str) -> tuple[Fn, list[Mark], list[tuple]]:
+        """The function with the marks of the functions behind its seam and phase calls spliced in at the call, in a line
+        space of its own (each line scaled, so a callee's lines fit between the call's line and the next): the function
+        with calls and lines rewritten, its marks, and (first line, last line, key) of each callee spliced in. A callee's
+        mark that runs to the end of the callee runs to the end of the block that holds the call. One level of
+        callees, then deeper ones until a function is seen twice."""
+        spans: list[tuple] = []
+        marks: list[Mark] = []
+        calls: list = []
+
+        def emit(g: Fn, base: int, scale: int, block_end, stack: tuple) -> None:
+            def v(line: int) -> int:
+                return base + (line - g.start + 1) * scale
+
+            for m in self.marks_in(g):
+                end = block_end if m.end >= g.end and block_end is not None else v(m.end)
+                marks.append(Mark(m.kind, v(m.line), end, m.name))
+            ends = self.ends.get(g.file, [])
+            for line, kind, target, used in g.calls:
+                inner = []
+                if kind in ("call", "indirect_call"):
+                    inner = [h for h in self.inlined_slot(g, kind, target, sub) if (h.name, h.file, h.start) not in stack]
+                if not inner:
+                    calls.append([v(line), kind, target, used])
+                    continue
+                for h in inner:
+                    key = (h.name, h.file, h.start)
+                    spans.append((v(line), v(line) + scale - 1, key))
+                    block = v(ends[line]) if line < len(ends) else None
+                    emit(h, v(line), scale // SPLICE_SCALE, block, stack + (key,))
+
+        top = SPLICE_SCALE ** SPLICE_DEPTH
+        emit(fn, 0, top, None, ((fn.name, fn.file, fn.start),))
+        merged = Fn(fn.name, fn.file, fn.start, fn.end, calls, fn.items, fn.branches, fn.returns, fn.sub, fn.param_writes,
+                    fn.forwards)
+        return merged, marks, spans
 
     def targets(self, fn: Fn, kind: str, target: str) -> tuple[str, list[str]]:
         """('slot', [slot]) for a seam call, else ('call', [function names]) the call can reach."""
@@ -724,7 +775,7 @@ def part_steps(program: Program, fn: Fn, sub: str, pieces: list, own: set) -> li
 def pass_tree(program: Program, fn: Fn, sub: str, phase: str, holder: str) -> list[Pass]:
     """The passes a pass function marks, outermost first, each with its parts; an inner pass is a step of the part
     of its parent that holds it."""
-    marks = program.marks_in(fn)
+    fn, marks, spans = program.spliced(fn, sub)
     scopes = [m for m in marks if m.kind == "pass"]
     entities = [m for m in marks if m.kind == "entity"]
 
@@ -754,8 +805,10 @@ def pass_tree(program: Program, fn: Fn, sub: str, phase: str, holder: str) -> li
         for kind, index, (a, b) in pieces:
             split, _ = segments(a, b, children)
             own: set = set()
-            parts.append(Part(kind, index, [v for k, v in split if k == "lines"], part_steps(program, fn, sub, split, own),
-                              own))
+            lines = [v for k, v in split if k == "lines"]
+            steps = part_steps(program, fn, sub, split, own)
+            own |= {key for first, last, key in spans if any(a <= last and first <= z for a, z in lines)}
+            parts.append(Part(kind, index, lines, steps, own))
         up = parent(scope)
         out.append(Pass(scope.name, phase, holder, sub, parts, up.name if up else "", depth))
         for child in sorted(children, key=lambda m: m.line):
@@ -766,12 +819,17 @@ def pass_tree(program: Program, fn: Fn, sub: str, phase: str, holder: str) -> li
     return out
 
 
-def find_pass(program: Program, own: set) -> Fn | None:
+def find_pass(program: Program, own: set, sub: str = "") -> Fn | None:
+    """The function that holds a pass among those an entry point runs: of those with a pass mark, the one that no other
+    of them has spliced in."""
+    found = []
     for key in sorted(own):
         f = program.fn_of(key)
         if f is not None and any(m.kind == "pass" for m in program.marks_in(f)):
-            return f
-    return None
+            found.append(f)
+    inner = {key for f in found for _, _, key in program.spliced(f, sub)[2]}
+    outer = [f for f in found if (f.name, f.file, f.start) not in inner]
+    return (outer or found or [None])[0]
 
 
 def build(program: Program) -> dict:
@@ -789,7 +847,7 @@ def build(program: Program) -> dict:
         for step in steps:
             if step.kind != "entry":
                 continue
-            fn = find_pass(program, program.entry(step.slot)[1])
+            fn = find_pass(program, program.entry(step.slot)[1], step.sub)
             if fn is not None:
                 passes += pass_tree(program, fn, step.sub, phase, step.label)
     return {"phases": phases, "passes": passes}

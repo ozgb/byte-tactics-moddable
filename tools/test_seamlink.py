@@ -89,9 +89,12 @@ class SeamLinkTest(unittest.TestCase):
 
     def test_a_phase_function_of_the_engine_is_a_seam(self):
         engine = Unit("src/game/scheduler.cpp", code={"?RunPhase@@YAXXZ"})
+        other = Unit("src/game/other.cpp", code={"?Other@@YAXXZ"})
         self.assertEqual(len(self.run_with(self.wind("?RunPhase@@YAXXZ"), engine)), 1)
         self.write("data/subsystems.csv", SUBSYSTEMS + "RunPhase,src/game/scheduler.cpp,game,phase:Update,game\n")
         self.assertEqual(self.run_with(self.wind("?RunPhase@@YAXXZ"), engine), [])
+        self.write("data/subsystems.csv", SUBSYSTEMS + "Other,src/game/other.cpp,game,phase:Update,game\n")
+        self.assertEqual(len(self.run_with(self.wind("?Other@@YAXXZ"), other)), 1)
 
     def test_state_block_file_and_declaration_are_allowed(self):
         state = Unit("src/state/block.cpp", data={"?g_block@@3HA"})

@@ -1,4 +1,4 @@
-"""Check, over the stored access-log summaries, that pathfinding's state is private and that its written state shows no shadow field.
+"""Check, over the stored access-log summaries, that the pilots' state is private to them and that pathfinding's written state shows no shadow field.
 
     uv run tools/accesslog.py run --build-dir build/access <every scenario>
     uv run tools/privatestate.py --store build/access/access    # keeps the reads files, gzipped, in data/access_reads
@@ -24,6 +24,15 @@ the three globals. EXPOSED maps each of those fields to the log item that holds 
   * an item of EXPOSED has no read by pathfinding in any stored scenario: the writer shows state that the simulation never
     reads, a shadow field. data/shadow_field_allow.csv (item,reason) lists the ones that are 3.1c state the trace has always
     hashed, each with a reason; a row for an item that is read is stale.
+Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone) and economy.
+Economy's unit accounts live in one allocation, "Economy region" (allocated by the engine in LoadBattleAssets, set up by EconomyInit), whose
+parts the log names `<allocation>.<part>` like pathfinding's: no subsystem but economy writes or reads one. The player accounts
+(`players[i].econ`, type UnitResources) stay in the state block and are read by others, so a `UnitResources::*` item is private for writes
+only: any writer but economy fails, which is what makes every income, spend and request reach them through the scheduler's events. Economy's
+other view state, the resource fields of the Player record, is named in the log by the Game union aliases (`unknown_1b8e`, `pad_1df4`,
+`unknown_1cd9`) that other fields of the record share, so it can't be told from the rest of the record and is not checked. Economy's
+WriteState (section 34) is dumped and never hashed, so no shadow-field check applies to it.
+
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
 """
@@ -35,6 +44,7 @@ import io
 import json
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 import depclass
@@ -54,6 +64,20 @@ REGION_ROOT = "pathfinder"
 REGION_TYPES = ("Pathfinder", "PathExtra", "Node", "PathCell", "PathPending")
 REGION_ALLOCATION = re.compile(r"AISearch region")
 REGION_FUNCTION = "LoadBattleAssets"
+
+
+@dataclass(frozen=True)
+class Owner:
+    """A subsystem with private state: the items of its types, its region root and its allocation, and the items private for writes only."""
+    name: str
+    root: str
+    types: tuple
+    allocation: re.Pattern
+    write_types: tuple = ()
+
+
+OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
+          Owner("economy", "", (), re.compile(r"Economy region"), ("UnitResources",)))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",
@@ -103,13 +127,23 @@ def exposed(schema: dict) -> tuple[dict, list]:
     return out, problems
 
 
+def private_to(item: str) -> tuple[str, tuple[str, ...]]:
+    """(owner, roles) of an item of the log that is private state: the owner's name and the roles ("writer", "reader") no other subsystem may take. ("", ()) if it is not."""
+    for o in OWNERS:
+        if o.root and item == o.root:
+            return o.name, ("writer", "reader")
+        if item.split("::")[0] in o.types:
+            return o.name, ("writer", "reader")
+        if item.startswith(REGION_FUNCTION + ":") and o.allocation.search(item) is not None:
+            return o.name, ("writer", "reader")
+        if item.split("::")[0] in o.write_types:
+            return o.name, ("writer",)
+    return "", ()
+
+
 def is_private(item: str) -> bool:
-    """Whether an item of the log is the region's root or a part of the default pathfinder's allocation."""
-    if item == REGION_ROOT:
-        return True
-    if item.split("::")[0] in REGION_TYPES:
-        return True
-    return item.startswith(REGION_FUNCTION + ":") and REGION_ALLOCATION.search(item) is not None
+    """Whether an item of the log is the root or a part of the allocation of an owner, or a private type of it."""
+    return private_to(item)[0] != ""
 
 
 def read_gz(path: Path) -> list[dict]:
@@ -131,16 +165,18 @@ def stored_rows() -> dict[str, list[tuple[str, str, str]]]:
 
 
 def violations(rows: dict[str, list[tuple[str, str, str]]]) -> list[str]:
-    """One message for each (file kind, writer, reader, item) of the rows in which a subsystem but pathfinding writes or reads private state."""
+    """One message for each (file kind, role, subsystem, item) of the rows in which a subsystem but the owner takes a role the item bars."""
     found = set()
     for kind, triples in rows.items():
         for writer, reader, item in triples:
-            if not is_private(item):
+            owner, roles = private_to(item)
+            if not owner:
                 continue
             for role, who in (("writer", writer), ("reader", reader)):
-                if who not in (NONE, OWNER):
-                    found.add((kind, role, who, item))
-    return ["%s: %s %s on %s, which is private to %s" % (k, r, w, i, OWNER) for k, r, w, i in sorted(found)]
+                if role in roles and who not in (NONE, owner):
+                    found.add((kind, role, who, item, owner, "private" if len(roles) > 1 else "written only by"))
+    return ["%s: %s %s on %s, which is %s %s" % (k, r, w, i, "private to" if how == "private" else "written only by", o)
+            for k, r, w, i, o, how in sorted(found)]
 
 
 def canonical(item: str) -> str:
@@ -225,7 +261,7 @@ def main() -> int:
     if problems:
         print("\n".join(problems))
         return 1
-    print("privatestate: the region is private to %s in the stored summaries and every field the trace hashes is read" % OWNER)
+    print("privatestate: the regions are private to %s in the stored summaries and every field the trace hashes is read" % ", ".join(o.name for o in OWNERS))
     return 0
 
 

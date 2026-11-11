@@ -335,5 +335,55 @@ Move,src/units/units.cpp,units,x,
         self.assertEqual(found[0][0], "unowned")
 
 
+class PilotSeamsTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Tick,src/game/scheduler.cpp,game,x,
+Hurt,src/units/units.cpp,units,x,
+Pay,src/orders/orders.cpp,orders,x,
+Gate,src/game/economy.cpp,economy,x,
+Help,src/game/economy.cpp,economy,x,
+"""
+    NATIVE = "s_economy.Apply = EconomyApply;\ns_economy.RequestGranted = Gate;\ns_economy.WriteState = Dump;\n"
+
+    def check(self, rows):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / seamlink.NATIVE_TABLE).write_text(self.NATIVE)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root)
+
+    def slot(self, name):
+        return f"indirect via void (*)(int) __attribute__((stdcall)) [EconomySeam::{name}]"
+
+    def test_the_engine_may_call_writing_slots(self):
+        self.assertEqual(self.check([("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("Apply"))]), [])
+
+    def test_another_subsystem_calling_a_writing_slot_is_found(self):
+        found = self.check([("Hurt", "src/units/units.cpp", "indirect_call", self.slot("Apply")),
+                            ("Pay", "src/orders/orders.cpp", "indirect_call", self.slot("UpdatePlayerEconomy"))])
+        self.assertEqual([f[:3] for f in found], [("call", "orders", "Pay"), ("call", "units", "Hurt")])
+
+    def test_query_slots_may_be_called(self):
+        self.assertEqual(self.check([("Hurt", "src/units/units.cpp", "indirect_call", self.slot("RequestGranted"))]), [])
+
+    def test_a_write_behind_a_query_slot_is_found(self):
+        found = self.check([("Gate", "src/game/economy.cpp", "field_write", "Player::energy")])
+        self.assertEqual(found, [("query", "economy", "Gate", "EconomySeam::RequestGranted writes Player::energy")])
+
+    def test_a_write_in_a_callee_is_found(self):
+        found = self.check([("Gate", "src/game/economy.cpp", "call", "Help"), ("Help", "src/game/economy.cpp", "global_write", "g_x")])
+        self.assertEqual(len(found), 1)
+        self.assertEqual(found[0][2], "Help")
+
+    def test_writes_to_out_parameters_and_to_writing_functions_are_not_found(self):
+        rows = [("Gate", "src/game/economy.cpp", "deref_write", "*EconAccount"), ("Dump", "src/game/economy.cpp", "field_write", "EconLedger::make"),
+                ("Help", "src/game/economy.cpp", "field_write", "Player::energy")]
+        self.assertEqual(self.check(rows), [])
+
+
 if __name__ == "__main__":
     unittest.main()

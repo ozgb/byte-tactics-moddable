@@ -5,6 +5,7 @@
     uv run tools/seamlink.py --objects @build/modern/objects.rsp --write    # write data/seam_exceptions.csv
     uv run tools/seamlink.py --objects @build/modern/objects.rsp --check
     uv run tools/seamlink.py --private-state                                # pathfinding's region, from data/rwsets.csv
+    uv run tools/seamlink.py --pilot-seams                                  # economy's writing and query slots, from data/rwsets.csv
     uv run tools/test_seamlink.py                                           # tests, on hand-written units
 
 The build puts every function in its own COMDAT section, so the relocations of a
@@ -37,7 +38,13 @@ symbol starts with `virtual ` is a virtual call between subsystems, which
 `tools/coupling.py --virtual --check` judges and this tool ignores. 
 --private-state fails when a function of any subsystem other than pathfinding reads, writes or lets escape
 Game::pathfinder or a member of a type of pathfinding's state region, from the field and deref rows of
-data/rwsets.csv and the owners of data/subsystems.csv. Standard library plus tools/objread.py.
+data/rwsets.csv and the owners of data/subsystems.csv.
+--pilot-seams judges economy's seam (interfaces/economy.h), which is applied by the scheduler and written by nothing else. It fails
+when a function of a simulation subsystem other than economy makes an indirect call through one of the writing slots
+(EconomySeam::Apply, UpdatePlayerEconomy, UpdateMetalExtraction, UpdateResourceSharing, Init, Shutdown: only the engine, that is
+the scheduler, the game's set-up and the tick loop, may), and when the function behind a query slot (RequestGranted, GetEnergyUse,
+UnitAccount, WriteState, found in src/seams/native.cpp) or a function of its file that it calls writes state other than the
+caller's own out parameters (the Econ* output types). Standard library plus tools/objread.py.
 """
 
 import argparse
@@ -83,6 +90,13 @@ PRIVATE_TYPES = ("NodeData", "Node", "PathCell", "PathGrid", "TurnCostTable", "T
                  "PathExtra", "Pathfinder")
 PRIVATE_KINDS = ("field_read", "field_write", "field_escape", "field_maybe_written", "deref_read", "deref_write",
                  "deref_escape", "deref_maybe_written")
+ECONOMY_OWNER = "economy"
+ECONOMY_WRITING_SLOTS = ("Apply", "UpdatePlayerEconomy", "UpdateMetalExtraction", "UpdateResourceSharing", "Init", "Shutdown")
+ECONOMY_QUERY_SLOTS = ("RequestGranted", "GetEnergyUse", "UnitAccount", "WriteState")
+NATIVE_TABLE = "src/seams/native.cpp"
+WRITE_KINDS = ("field_write", "field_maybe_written", "field_escape", "global_write", "global_maybe_written", "global_escape",
+               "deref_write", "deref_maybe_written", "deref_escape")
+ECONOMY_OUTPUT_TYPES = re.compile(r"\bEcon(Account|Ledger|UnitInfo|TypeInfo|PlayerInfo)\b")
 
 
 @dataclass
@@ -503,6 +517,49 @@ def private_state(root: Path) -> list:
     return sorted(found)
 
 
+def pilot_seams(root: Path) -> list:
+    """(kind, subsystem, function, slot) of every call into an economy writing slot by a simulation subsystem other than economy,
+    and of every write by a function behind an economy query slot."""
+    owners = {}
+    with (root / SUBSYSTEMS).open(newline="") as f:
+        for r in csv.DictReader(f):
+            owners[(r["function"], r["file"])] = r["subsystem"]
+    rows = []
+    with (root / RWSETS).open(newline="") as f:
+        rows = list(csv.DictReader(f))
+    found = set()
+    writing = {f"EconomySeam::{s}" for s in ECONOMY_WRITING_SLOTS}
+    for r in rows:
+        if r["kind"] != "indirect_call":
+            continue
+        for slot in re.findall(r"\[(EconomySeam::\w+)\]", r["target"]):
+            owner = owners.get((r["function"], r["file"]), "unowned")
+            if slot in writing and owner in SIMULATION and owner != ECONOMY_OWNER:
+                found.add(("call", owner, r["function"], slot))
+    native = (root / NATIVE_TABLE).read_text()
+    behind = {}
+    for slot in ECONOMY_QUERY_SLOTS:
+        m = re.search(r"\b\w+\.%s\s*=\s*(\w+)\s*;" % slot, native)
+        if m:
+            behind[m.group(1)] = slot
+    functions = {}
+    for r in rows:
+        functions.setdefault(r["function"], []).append(r)
+    for name, slot in behind.items():
+        todo, seen = [name], set()
+        while todo:
+            fn = todo.pop()
+            if fn in seen:
+                continue
+            seen.add(fn)
+            for r in functions.get(fn, []):
+                if r["kind"] == "call":
+                    todo.append(r["target"])
+                elif r["kind"] in WRITE_KINDS and not ECONOMY_OUTPUT_TYPES.search(r["target"]):
+                    found.add(("query", owners.get((fn, r["file"]), "unowned"), fn, f"EconomySeam::{slot} writes {r['target']}"))
+    return sorted(found)
+
+
 def response(arg: str) -> list:
     if arg.startswith("@"):
         return [Path(line.strip()) for line in Path(arg[1:]).read_text().splitlines() if line.strip()]
@@ -514,6 +571,8 @@ def main(argv=None) -> int:
     parser.add_argument("--objects", nargs="+", default=[], help="object files, or @file listing them")
     parser.add_argument("--private-state", action="store_true",
                         help=f"fail on an access to pathfinding's state region by another subsystem, from {RWSETS}")
+    parser.add_argument("--pilot-seams", action="store_true",
+                        help=f"fail on a call into economy's writing slots by another subsystem or a write behind its query slots, from {RWSETS}")
     parser.add_argument("--root", default=str(ROOT))
     parser.add_argument("--write", action="store_true", help=f"write {EXCEPTIONS}")
     parser.add_argument("--check", action="store_true", help=f"fail on a violation without a row in {EXCEPTIONS} or a stale row")
@@ -524,6 +583,14 @@ def main(argv=None) -> int:
         bad = private_state(root)
         for owner, function, kind, target in bad:
             print(f"{owner} {function} {kind} {target}: pathfinding's region is private to {PRIVATE_OWNER}")
+        return 1 if bad else 0
+    if args.pilot_seams:
+        bad = pilot_seams(root)
+        for kind, owner, function, what in bad:
+            if kind == "call":
+                print(f"{owner} {function} calls {what}: only the engine applies economy's writing slots")
+            else:
+                print(f"{owner} {function} behind {what}: economy's query slots write no state")
         return 1 if bad else 0
     if not args.objects:
         parser.error("--objects is required")

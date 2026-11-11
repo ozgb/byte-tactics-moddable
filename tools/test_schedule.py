@@ -154,17 +154,36 @@ class Classes(unittest.TestCase):
     def test_used_and_writing_is_mixed(self):
         self.assertEqual(self.classes(query_writes=True)["economy.Query"], ["mixed"])
 
-    def test_out_argument_is_a_used_value_except_the_record_worked_on(self):
-        fns = functions()
-        fns[1]["calls"][0] = [5, "indirect_call", seam("EconomySeam", "Spend"), [0]]
-        self.assertEqual(sc.Page(sc.Program(fns, SUBSYSTEMS, [], SEAMS, NATIVE, SOURCES), [], []).calls[
-            ("units", "economy.Spend")].keys(), {"mixed"})
+    def spend_class(self, args, writes=(), forwards=(), native=NATIVE, extra=()):
+        fns = functions() + list(extra)
+        fns[1]["calls"][0] = [5, "indirect_call", seam("EconomySeam", "Spend"), args]
+        fns[2]["param_writes"] = list(writes)
+        fns[2]["forwards"] = list(forwards)
+        subs = SUBSYSTEMS + [{"function": f["function"], "file": f["file"], "subsystem": "economy"} for f in extra]
+        page = sc.Page(sc.Program(fns, subs, [], SEAMS, native, SOURCES), [], [])
+        return set(page.calls[("units", "economy.Spend")])
+
+    def test_argument_written_through_is_a_used_value(self):
+        self.assertEqual(self.spend_class([[0, False]], writes=[0]), {"mixed"})
+
+    def test_state_field_passed_as_an_input_is_not(self):
+        self.assertEqual(self.spend_class([[0, False]]), {"intent"})
+        self.assertEqual(self.spend_class([[0, True]]), {"intent"})
+
+    def test_write_through_a_callee_counts(self):
+        fill = fn("Fill", "src/economy.cpp", 5, 7)
+        fill["param_writes"] = [1]
+        self.assertEqual(self.spend_class([[0, False]], forwards=[["call", "Fill", 1, 0]], extra=[fill]), {"mixed"})
+        self.assertEqual(self.spend_class([[0, False]], forwards=[["call", "Fill", 0, 0]], extra=[fill]), {"intent"})
+
+    def test_argument_handed_to_unknown_code_counts(self):
+        self.assertEqual(self.spend_class([[0, False]], forwards=[["call", "push_back", -1, 0]]), {"mixed"})
+        self.assertEqual(self.spend_class([[0, False]], forwards=[["call", "operator=", 1, 0]]), {"intent"})
+
+    def test_record_a_method_works_on_is_not_a_used_value(self):
         native = NATIVE + "static void __stdcall Spend(Account* self, int amount)\n"
-        p = sc.Page(sc.Program(fns, SUBSYSTEMS, [], SEAMS, native, SOURCES), [], [])
-        self.assertEqual(p.calls[("units", "economy.Spend")].keys(), {"intent"})
-        fns[1]["calls"][0][3] = [0, 1]
-        p = sc.Page(sc.Program(fns, SUBSYSTEMS, [], SEAMS, native, SOURCES), [], [])
-        self.assertEqual(p.calls[("units", "economy.Spend")].keys(), {"mixed"})
+        self.assertEqual(self.spend_class([[0, False]], writes=[0], native=native), {"intent"})
+        self.assertEqual(self.spend_class([[0, False], [1, False]], writes=[0, 1], native=native), {"mixed"})
 
     def test_branches_make_a_query(self):
         p = program()
@@ -323,7 +342,8 @@ class Placements(unittest.TestCase):
 
     def test_writer_step_that_reaches_the_read_is_named(self):
         p = program()
-        p.fns["Spend"][0].calls = [[2, "indirect_call", seam("OrdersSeam", "Run"), False]]
+        p.fns["Spend"][0].calls = [[2, "field_write", "Player::energy", False],
+                                   [3, "indirect_call", seam("OrdersSeam", "Run"), False]]
         found = self.placed(p, dep("economy", "orders"))
         self.assertEqual((found.kind, found.first, found.second, found.inside),
                          ("split", "economy.Spend", "orders.Run", "economy.Spend"))
@@ -368,7 +388,8 @@ class Placements(unittest.TestCase):
 
 SNIPPET = """struct A { short pitch; short bank; };
 struct O { A angles; int n; };
-struct Seam { void (*Fill)(int* out); void (*Peek)(const int* in); void (*Take)(O* o); int (*Count)(); };
+struct Seam { void (*Fill)(int* out); void (*Peek)(const int* in); void (*Take)(O* o); int (*Count)();
+               void (*Name)(char* name); void (*Pos)(int* pos); };
 struct Seams { Seam* s; };
 Seams g_seams;
 A Get(O* o) { A p; p.pitch = o->angles.pitch; p.bank = 1; o->n = 2; return p; }
@@ -380,7 +401,11 @@ void Caller(O* o) {
     g_seams.s->Take(o);
     g_seams.s->Count();
     o->n = g_seams.s->Count();
+    g_seams.s->Name("RockUnit");
+    g_seams.s->Pos(&o->n);
 }
+void Set(O* o, int* in, int* out) { *out = *in; o->n = 1; }
+void Forward(O* o, int* p) { Set(o, 0, p); }
 """
 
 
@@ -399,11 +424,17 @@ class SyntaxTree(unittest.TestCase):
     def test_used_and_out_arguments(self):
         calls = [(line, target.split("[")[-1].rstrip("]"), used) for line, kind, target, used
                  in self.functions["Caller"]["calls"] if kind == "indirect_call"]
-        self.assertEqual(calls, [(10, "Seam::Fill", [0]), (11, "Seam::Peek", []), (12, "Seam::Take", []),
-                                 (13, "Seam::Count", []), (14, "Seam::Count", True)])
+        self.assertEqual(calls, [(11, "Seam::Fill", [[0, True]]), (12, "Seam::Peek", []), (13, "Seam::Take", []),
+                                 (14, "Seam::Count", []), (15, "Seam::Count", True), (16, "Seam::Name", []),
+                                 (17, "Seam::Pos", [[0, False]])])
+
+    def test_writes_through_and_forwarded_parameters(self):
+        self.assertEqual(self.functions["Set"]["param_writes"], [0, 2])
+        self.assertEqual(self.functions["Forward"]["param_writes"], [])
+        self.assertEqual(self.functions["Forward"]["forwards"], [["call", "Set", 0, 0], ["call", "Set", 2, 1]])
 
     def test_write_is_ordered_after_the_value_it_stores(self):
-        steps = [(kind, target) for line, kind, target, _ in self.functions["Caller"]["calls"] if line == 14]
+        steps = [(kind, target) for line, kind, target, _ in self.functions["Caller"]["calls"] if line == 15]
         self.assertEqual(steps[-2:], [("indirect_call", "indirect via int (*)() [Seam::Count]"), ("field_write", "O::n")])
 
     def test_local_and_constructed_objects_are_not_written(self):

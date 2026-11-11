@@ -48,6 +48,10 @@ CONTROL = {"IfStmt": 0, "WhileStmt": 0, "SwitchStmt": 0, "DoStmt": 1, "ForStmt":
 BRANCHING = {"IfStmt", "WhileStmt", "SwitchStmt", "DoStmt", "ForStmt", "ConditionalOperator"}
 PLAIN_POINTEES = {"int", "short", "char", "long", "float", "double", "bool"}
 CONSTRUCTS = {"CXXConstructExpr", "CXXTemporaryObjectExpr"}
+ASSIGNS = {"operator=", "operator+=", "operator-=", "operator*=", "operator/=", "operator|=", "operator&="}
+FILLS = {"memset", "memcpy", "memmove", "strcpy", "strncpy", "sprintf"}
+CASTS = {"ImplicitCastExpr", "ParenExpr", "CStyleCastExpr", "CXXStaticCastExpr", "CXXReinterpretCastExpr",
+         "CXXConstCastExpr", "CXXFunctionalCastExpr"}
 WRAPPERS = {"ExprWithCleanups", "ParenExpr", "CStyleCastExpr", "ImplicitCastExpr", "CXXBindTemporaryExpr",
             "MaterializeTemporaryExpr"}
 PASS_MARK = re.compile(r"\bAccessLogPassScope\s+\w+\(ACCESS_PASS_(\w+)\)")
@@ -78,6 +82,9 @@ class OrderWalker(rwsets.Walker):
         self.branches = 0
         self.local_field: str | None = None
         self.deferred: list[list] = []
+        self.params: list[str] = []
+        self.param_writes: set[int] = set()
+        self.forwards: list[list] = []
         parts = name.split("::")
         self.constructor = len(parts) > 1 and parts[-1] == parts[-2]
 
@@ -88,6 +95,11 @@ class OrderWalker(rwsets.Walker):
             name = re.sub(r"^(?:const |struct |class )+", "", node.get("type", {}).get("qualType", ""))
             if re.fullmatch(r"\w+(?:::\w+)*", name):
                 self.calls.append([node["_line"], "call", "%s::%s" % (name, name.split("::")[-1]), False, id(node)])
+        if mode in ("W", "RW") and (node.get("kind") in rwsets.LVALUE_KINDS
+                                    or (node.get("kind") == "UnaryOperator" and node.get("opcode") == "*")):
+            root = self.param_root(node)
+            if root is not None and root[1]:
+                self.param_writes.add(root[0])
         assigns = node.get("kind") == "CompoundAssignOperator" or (node.get("kind") == "BinaryOperator"
                                                                     and node.get("opcode") == "=")
         if assigns:
@@ -104,6 +116,7 @@ class OrderWalker(rwsets.Walker):
         super().record(kind, target)
         if kind in ("call", "indirect_call") and self.pending is not None:
             node, self.pending = self.pending, None
+            self.forward(node, kind, target)
             self.calls.append([node["_line"], kind, target, self.used(node) or self.out_arguments(node), id(node)])
 
     def access(self, category: str, target: str, mode: str) -> None:
@@ -128,6 +141,51 @@ class OrderWalker(rwsets.Walker):
         finally:
             self.local_field = outer
 
+    def param_root(self, node: dict) -> tuple[int, bool] | None:
+        """The parameter (from 0, -1 for the object of a method) an lvalue or pointer lies in, and whether reaching it
+        goes through that pointer."""
+        through = False
+        while True:
+            kind = node.get("kind")
+            inner = node.get("inner", [])
+            if kind in CASTS and inner:
+                node = inner[0]
+            elif kind == "MemberExpr" and inner:
+                through = through or bool(node.get("isArrow"))
+                node = inner[0]
+            elif kind == "ArraySubscriptExpr" and inner:
+                base = inner[0]
+                through = through or not (base.get("kind") == "ImplicitCastExpr"
+                                          and base.get("castKind") == "ArrayToPointerDecay")
+                node = base
+            elif kind == "UnaryOperator" and node.get("opcode") in ("*", "&") and inner:
+                through = through or node.get("opcode") == "*"
+                node = inner[0]
+            elif kind == "CXXThisExpr":
+                return -1, through
+            elif kind == "DeclRefExpr":
+                ref = node.get("referencedDecl", {})
+                if ref.get("kind") == "ParmVarDecl" and ref.get("id") in self.params:
+                    return self.params.index(ref["id"]), through
+                return None
+            else:
+                return None
+
+    def forward(self, node: dict, kind: str, target: str) -> None:
+        """Note each parameter this call is handed, and where, so a write through it in the callee is seen."""
+        inner = node.get("inner", [])
+        if not inner:
+            return
+        callee = rwsets.strip(inner[0])
+        if node.get("kind") == "CXXMemberCallExpr" and callee.get("kind") == "MemberExpr" and callee.get("inner"):
+            root = self.param_root(callee["inner"][0])
+            if root is not None:
+                self.forwards.append([kind, target, -1, root[0]])
+        for index, arg in enumerate(inner[1:]):
+            root = self.param_root(arg)
+            if root is not None:
+                self.forwards.append([kind, target, index, root[0]])
+
     def local_object(self, node: dict) -> bool:
         """Whether a field access lands in a local object of the function, or in the object a constructor builds."""
         while True:
@@ -148,24 +206,42 @@ class OrderWalker(rwsets.Walker):
             else:
                 return False
 
-    @staticmethod
-    def out_arguments(node: dict) -> list[int]:
-        """The arguments (from 0) through which a call can hand back a value: the address of an object, an array, or a
-        pointer to a non-const plain value."""
-        out: list[int] = []
+    def out_arguments(self, node: dict) -> list[list]:
+        """The arguments through which a call can hand back a value, as [index from 0, whether it is the address of a
+        local of the caller]: the address of an object, an array, or a pointer to a non-const plain value, never a
+        string literal."""
+        out: list[list] = []
         if node.get("kind") not in ("CallExpr", "CXXMemberCallExpr"):
             return out
         for index, arg in enumerate(node.get("inner", [])[1:]):
             arg_type = arg.get("type", {})
             if not rwsets.is_pointer(arg_type) or rwsets.pointee_const(arg_type):
                 continue
-            inner = rwsets.strip(arg)
+            inner = arg
+            while inner.get("kind") in CASTS and inner.get("inner"):
+                inner = inner["inner"][0]
+            if inner.get("kind") == "StringLiteral":
+                continue
             pointee = re.sub(r"^(?:struct |class |unsigned |signed )+", "", rwsets.type_text(arg_type)).rstrip(" *")
-            if (inner.get("kind") == "UnaryOperator" and inner.get("opcode") == "&") \
-                    or (arg.get("kind") == "ImplicitCastExpr" and arg.get("castKind") == "ArrayToPointerDecay") \
-                    or pointee in PLAIN_POINTEES or pointee in VALUE_TYPES or pointee.startswith("std::"):
-                out.append(index)
+            address = inner.get("kind") == "UnaryOperator" and inner.get("opcode") == "&"
+            array = arg.get("kind") == "ImplicitCastExpr" and arg.get("castKind") == "ArrayToPointerDecay"
+            if address or array or pointee in PLAIN_POINTEES or pointee in VALUE_TYPES or pointee.startswith("std::"):
+                local = (address or array) and self.local_variable(inner["inner"][0] if address else arg["inner"][0])
+                out.append([index, local])
         return out
+
+    def local_variable(self, node: dict) -> bool:
+        """Whether an lvalue is a variable of the function (not static) or a part of one, reached with no pointer."""
+        while node.get("kind") in ("ParenExpr", "ImplicitCastExpr", "ArraySubscriptExpr") or (
+                node.get("kind") == "MemberExpr" and not node.get("isArrow")):
+            if not node.get("inner"):
+                return False
+            if node["kind"] == "ArraySubscriptExpr" and node["inner"][0].get("castKind") != "ArrayToPointerDecay":
+                return False
+            node = node["inner"][0]
+        ref = node.get("referencedDecl", {}) if node.get("kind") == "DeclRefExpr" else {}
+        return ref.get("kind") in ("VarDecl", "ParmVarDecl") and ref.get("id") in self.locals \
+            and self.locals[ref["id"]] is None
 
     def used(self, node: dict) -> bool:
         """Whether the value of a call is used: false when the call is a statement of its own or cast to void."""
@@ -206,6 +282,7 @@ class OrderAnalyzer(rwsets.Analyzer):
         rwsets.SIM.current_file = rel
         walker = OrderWalker(self, name)
         walker.prepare(node)
+        walker.params = [c["id"] for c in node.get("inner", ()) if c.get("kind") == "ParmVarDecl"]
         for child in node.get("inner", ()):
             if child["kind"].endswith("Stmt") or child["kind"] == "CXXCtorInitializer":
                 walker.visit(child, "R")
@@ -213,7 +290,7 @@ class OrderAnalyzer(rwsets.Analyzer):
         self.functions.append({
             "function": name, "file": rel, "start": node["_line"], "end": node["_end"],
             "items": sorted(walker.items), "calls": [c[:4] for c in walker.calls], "branches": walker.branches,
-            "returns": returns,
+            "returns": returns, "param_writes": sorted(walker.param_writes), "forwards": walker.forwards,
         })
 
 
@@ -323,6 +400,8 @@ class Fn:
     branches: int
     returns: str
     sub: str | None
+    param_writes: set = field(default_factory=set)
+    forwards: list = field(default_factory=list)
 
 
 class Program:
@@ -335,7 +414,8 @@ class Program:
         for f in functions:
             self.fns[f["function"]].append(Fn(f["function"], f["file"], f["start"], f["end"], f["calls"],
                                               {tuple(i) for i in f["items"]}, f["branches"], f["returns"],
-                                              owner.get((f["function"], f["file"]))))
+                                              owner.get((f["function"], f["file"])), set(f.get("param_writes", ())),
+                                              f.get("forwards", [])))
         self.seam_owner = {struct: name for struct, name in SEAM_FIELD.findall(seams_header) if name in SIMS}
         self.slots: dict[str, set[str]] = defaultdict(set)
         self.resolved: dict[str, list[str]] = defaultdict(list)
@@ -357,12 +437,62 @@ class Program:
         self.memo: dict[tuple, list[Node]] = {}
         self.memo_own: dict[tuple, set] = {}
         self.entries: dict[str, tuple[list[Node], set]] = {}
+        self.through: dict[tuple, bool] = {}
+        self.unknown: set[str] = set()
 
     def lookup(self, name: str, near: str = "") -> list[Fn]:
         """The definitions of a name, those in the caller's file first when there are several."""
         found = self.fns.get(name, [])
         same = [f for f in found if f.file == near]
         return same or found
+
+    def writes_through(self, fn: Fn, index: int, stack: tuple = ()) -> bool | None:
+        """Whether the function, or a function it hands the parameter to, writes through its parameter `index`: None
+        when it hands the parameter to code that is not known (a library or an unresolved virtual call)."""
+        key = (fn.name, fn.file, fn.start, index)
+        if key in self.through:
+            return self.through[key]
+        if key in stack:
+            return False
+        found: bool | None = index in fn.param_writes
+        for kind, target, to, mine in fn.forwards:
+            if found:
+                break
+            if mine != index:
+                continue
+            if kind == "call" and (target in FILLS or target.startswith("operator")):
+                found = True if to == 0 and (target in FILLS or target in ASSIGNS) else found
+                continue
+            how, names = self.targets(fn, kind, target)
+            if how == "slot" and names[0].split("::")[0] not in self.seam_owner:
+                continue
+            impls = [g for name in (sorted(self.slots[names[0]]) if how == "slot" else names)
+                     for g in self.lookup(name, fn.file) if g.sub not in ENGINE]
+            if not impls:
+                self.unknown.add(target)
+                found = None
+                continue
+            for g in impls:
+                inner = self.writes_through(g, to, stack + (key,))
+                if inner or (inner is None and not found):
+                    found = inner
+        if not stack or found:
+            self.through[key] = found
+        return found
+
+    def hands_back(self, used, impls: list[Fn], method: bool) -> bool:
+        """Whether a call's value reaches the caller: the value returned, or an argument the callee writes through or
+        hands to code that is not known (the address of a local of the caller, when no callee is known), never the
+        record a method works on."""
+        if used is True:
+            return True
+        for index, local in used or ():
+            if method and index == 0:
+                continue
+            written = [self.writes_through(g, index) for g in impls]
+            if any(w is not False for w in written) or (local and not impls):
+                return True
+        return False
 
     def marks_in(self, fn: Fn) -> list[Mark]:
         return [m for m in self.marks.get(fn.file, []) if fn.start <= m.line <= fn.end]
@@ -422,8 +552,9 @@ class Program:
                         for g in self.lookup(impl):
                             inline(g)
                 else:
-                    hands_back = used is True or any(i > 0 or slot not in self.methods for i in used or ())
-                    out.append(Node("entry", self.slot_label(slot), callee, hands_back, fn.name, slot))
+                    impls = [g for impl in sorted(self.slots[slot]) for g in self.lookup(impl)]
+                    out.append(Node("entry", self.slot_label(slot), callee,
+                                    self.hands_back(used, impls, slot in self.methods), fn.name, slot))
                 continue
             for name in names:
                 if name in EFFECTS:
@@ -433,9 +564,9 @@ class Program:
                 inside = [g for g in found if g.sub in TRANSPARENT or g.sub == sub]
                 for g in inside or found:
                     if g.sub in ENGINE:
-                        out.append(Node("engine", g.name, g.sub, bool(used), fn.name))
+                        out.append(Node("engine", g.name, g.sub, used is True, fn.name))
                     elif g.sub in SIMS and g.sub != sub:
-                        out.append(Node("direct", g.name, g.sub, bool(used), fn.name))
+                        out.append(Node("direct", g.name, g.sub, self.hands_back(used, [g], False), fn.name))
                     else:
                         inline(g)
         cut.discard(key)
@@ -796,7 +927,8 @@ class Splits:
                 (first.kind, second.kind))
             if kind is None:
                 continue
-            inside = first.label if first.kind == "entry" and w in reads else ""
+            inside = first.label if first.kind == "entry" and w in reads and self.splits_inside(
+                first, writer, reader, item, stack, loose) else ""
             return Placement(kind, where, first.label if first.kind == "entry" else "",
                              second.label if second.kind == "entry" else "", loose,
                              self.position(steps, w), self.position(steps, r), inside,
@@ -810,6 +942,17 @@ class Splits:
                 if found:
                     return found
         return None
+
+    def splits_inside(self, step: Node, writer: str, reader: str, item: str, stack: tuple, loose: bool) -> bool:
+        """Whether a write of the writer followed by a read of the reader is found inside the step."""
+        key = ("inside", step.slot, writer, reader, item, loose)
+        if key not in self.memo:
+            self.memo[key] = False
+            if step.slot not in stack:
+                inner, _ = self.program.entry(step.slot)
+                self.memo[key] = self.locate("", inner, step.sub, writer, reader, item, stack + (step.slot,),
+                                             loose) is not None
+        return self.memo[key]
 
     def entries_of(self, steps: list) -> list:
         key = ("entries", id(steps))
@@ -920,15 +1063,18 @@ The orders are read from the program, not from a run. That decides what they cla
   of its name, overloads included, so a list can hold steps (and a class count writes) that one call does not run.
   Calls into presentation, network and file code are left out of the lists, and so is the test harness.
 - **Values.** The caller uses a call's value when it uses the value returned, or when it hands the call the address
-  of an object, an array or a pointer to a plain value to fill in. The record an entry point works on, given as its
-  first argument (an account of the economy, say), is not a value handed back.
+  of an object, an array or a pointer to a plain value (never a string) that the call fills in: what it runs writes
+  through that argument, or hands it to code outside the program (a library container, say). The address of a local
+  of the caller counts also when no code for the entry point is known. An argument the call only reads is an input,
+  and the record an entry point works on, given as its first argument (an account of the economy, say), is not a
+  value handed back.
 - **Writes**, for the classes, are the writes to a field of a record or to a variable of the game that the program
-  shows, anywhere in what a call runs (nested entry points and calls outside an interface included), and allocations,
-  random draws and sim events. Writes to a local object of the function, or to the object a constructor builds, are
-  not counted, and neither are writes to the fields of plain values (positions, points, fixed-point numbers) through
-  a pointer, nor other writes through a bare pointer. A call whose value is used and that writes state only in those
-  ways is classed as a view read or a query; an intent in which no write of any kind is found is listed under
-  Intents with no write found.
+  shows, anywhere in what a call runs (nested entry points included, and for a call outside an interface its own
+  writes, not those of what it calls in turn), and allocations, random draws and sim events. Writes to a local object
+  of the function, or to the object a constructor builds, are not counted, and neither are writes to the fields of
+  plain values (positions, points, fixed-point numbers) through a pointer, nor other writes through a bare pointer. A
+  call whose value is used and that writes state only in those ways is classed as a view read or a query; an intent
+  in which no write of any kind is found is listed under Intents with no write found.
 - **Split points** place each `immediate` row of coupling/dependencies.csv (the access log, run on the scenario
   suite) at the first step of the writer that reaches a write of its item and is followed by a step of the reader that
   reaches a read of it, in one list (the code of the list's own subsystem counts as `the caller`). Where the program
@@ -936,9 +1082,9 @@ The orders are read from the program, not from a run. That decides what they cla
   item reached under another name), or no such pair is found, the row is matched by subsystem: the writer's first step
   that writes anything, and the reader's next step that reads anything. A row matched by subsystem says where a
   split can be, not where it must be.
-- **Inside a step.** When the writer's step also reaches a read of the item by the reader, the write and the read can
-  both lie inside that step, and the split may be needed there instead: the row names the step under `may split
-  inside`. The search goes inside a step only when its list holds no pair.
+- **Inside a step.** When the writer's step also holds a write of the item followed by a read of it by the reader,
+  the split may be needed inside that step instead: the row names the step under `may split inside`. The search goes
+  inside a step for the place itself only when its list holds no pair.
 - **Across entities.** A row placed `across entities` has every step of the reader before the writer's first step
   in one entity's list, or in that step with no write of the writer followed by a read: the read is in a later
   entity, whose order the scheduler keeps, and no split inside the entity is needed. The column `across` counts the

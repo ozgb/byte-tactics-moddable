@@ -89,7 +89,7 @@ Each entity:
 1. `orders.RunOrders`: intent
 1. `orders.RunSecondaryOrders`: intent
 1. `orders.UpdateMotion`: intent
-1. `los_radar.AddEyeball`: mixed
+1. `los_radar.AddEyeball`: intent
 1. `players.NotifyUnitDied`: intent
 1. `orders.DeleteOrders`: intent
 1. `ai.SetUnitSquad`: intent
@@ -102,7 +102,7 @@ Each entity:
 1. `map.GetGameType`: view read
 1. `weapons.DetonateUnitWeapon`: intent
 1. `los_radar.GetMapCell`: query
-1. `features.PlaceFeature`: mixed
+1. `features.PlaceFeature`: intent, mixed
 1. `orders.OrderOrStatusFlags`: intent
 1. `orders.DestroyMotionObject`: intent
 1. `players.KillPlayerUnits`: intent
@@ -256,7 +256,7 @@ Each entity:
 1. `units.CreateObjectState`: mixed
 1. a draw from the Park-Miller generator (`rng`)
 1. `los_radar.SoundHeardMask`: query
-1. `weapons.ApplyAreaDamageAt`: mixed
+1. `weapons.ApplyAreaDamageAt`: intent
 
 After the loop:
 
@@ -312,7 +312,7 @@ None.
 Each entity:
 
 1. a draw from the C runtime generator (`rng.crtHoldrand`)
-1. `weapons.SpawnProjectile`: mixed
+1. `weapons.SpawnProjectile`: intent
 
 ### After the phases
 
@@ -343,7 +343,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. `targeting.GetWeaponTargetUnit`: query
 1. `weapons.FindTargetableProjectile`: query
-1. `targeting.SetWeaponTargetPos`: query
+1. `targeting.SetWeaponTargetPos`: intent
 1. `targeting.ClearWeaponTarget`: intent
 1. `targeting.FindWeaponTarget`: mixed
 1. `targeting.SetWeaponTargetUnit`: intent
@@ -357,7 +357,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `economy.UpdateMetalExtraction`
 
 1. `los_radar.GetMapCell`: query
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 
 ### `economy.UpdatePlayerEconomy`
 
@@ -419,7 +419,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `map.GetCellMeanHeight`: query
 1. a draw from the C runtime generator (`rng.crtHoldrand`)
 1. `los_radar.SoundHeardMask`: query
-1. `weapons.ApplyAreaDamageAt`: mixed
+1. `weapons.ApplyAreaDamageAt`: intent
 
 ### `los_radar.IsUnitVisibleToPlayer`
 
@@ -521,7 +521,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `units.GetGroundHeight`: query
 1. `weapons.ReleaseWeapons`: intent
 1. a draw from the Park-Miller generator (`rng`)
-1. `targeting.SetWeaponTargetPos`: query
+1. `targeting.SetWeaponTargetPos`: intent
 1. `ai.GetFactoriesInRadius`: query
 1. `targeting.SetWeaponTargetUnit`: intent
 1. `weapons.WeaponCanReachUnit`: query
@@ -544,12 +544,12 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `players.GiveUnitToPlayer`: intent
 1. `targeting.GetWeaponTargetUnit`: query
 1. `units.ApplyUnfinishedBuildDecay`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 1. `ai.GetVisibleEnemiesInRadius`: query
 1. `map.SnapWorldPosToFootprint`: query
 1. `targeting.FindBestTargetIfFireAtWill`: mixed
 1. `weapons.FindFeatureAtPos`: query
-1. `features.ReclaimFeature`: mixed
+1. `features.ReclaimFeature`: intent
 1. `units.CanReclaim`: query
 1. `map.VisitObjectsInRange`: query
 1. `map.PickRandomReclaimableResourcesInRadius`: mixed
@@ -578,7 +578,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `units.GetGroundHeight`: query
 1. `weapons.ReleaseWeapons`: intent
 1. a draw from the Park-Miller generator (`rng`)
-1. `targeting.SetWeaponTargetPos`: query
+1. `targeting.SetWeaponTargetPos`: intent
 1. `targeting.ClearWeaponTarget`: intent
 1. `ai.GetFactoriesInRadius`: query
 1. `targeting.SetWeaponTargetUnit`: intent
@@ -602,12 +602,12 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `players.GiveUnitToPlayer`: intent
 1. `targeting.GetWeaponTargetUnit`: query
 1. `units.ApplyUnfinishedBuildDecay`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 1. `ai.GetVisibleEnemiesInRadius`: query
 1. `map.SnapWorldPosToFootprint`: query
 1. `targeting.FindBestTargetIfFireAtWill`: mixed
 1. `weapons.FindFeatureAtPos`: query
-1. `features.ReclaimFeature`: mixed
+1. `features.ReclaimFeature`: intent
 1. `units.CanReclaim`: query
 1. `map.VisitObjectsInRange`: query
 1. `map.PickRandomReclaimableResourcesInRadius`: mixed
@@ -688,7 +688,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `targeting.ClearWeaponTarget`
 
 1. `units.FindScript`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 
 ### `targeting.FindBestTargetIfFireAtWill`
 
@@ -708,7 +708,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. `units.GetGroundHeight`: query
 1. `units.FindScript`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 1. `units.GetSweetSpot`: mixed
 
 ### `units.AddBuildProgress`
@@ -813,7 +813,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. a draw from the Park-Miller generator (`rng`)
 1. `weapons.WeaponAimCobComplete`: intent
 1. `weapons.CobScriptExplodePiece`: intent
-1. `los_radar.AddEyeball`: mixed
+1. `los_radar.AddEyeball`: intent
 1. `players.NotifyUnitDied`: intent
 1. `orders.DeleteOrders`: intent
 1. `ai.SetUnitSquad`: intent
@@ -827,7 +827,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `map.GetGameType`: view read
 1. `weapons.DetonateUnitWeapon`: intent
 1. `los_radar.GetMapCell`: query
-1. `features.PlaceFeature`: mixed
+1. `features.PlaceFeature`: intent, mixed
 1. `orders.OrderOrStatusFlags`: intent
 1. `orders.DestroyMotionObject`: intent
 1. `players.KillPlayerUnits`: intent
@@ -933,7 +933,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `orders.RunOrders`: intent
 1. `orders.RunSecondaryOrders`: intent
 1. `orders.UpdateMotion`: intent
-1. `los_radar.AddEyeball`: mixed
+1. `los_radar.AddEyeball`: intent
 1. `players.NotifyUnitDied`: intent
 1. `orders.DeleteOrders`: intent
 1. `ai.SetUnitSquad`: intent
@@ -946,7 +946,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `map.GetGameType`: view read
 1. `weapons.DetonateUnitWeapon`: intent
 1. `los_radar.GetMapCell`: query
-1. `features.PlaceFeature`: mixed
+1. `features.PlaceFeature`: intent, mixed
 1. `orders.OrderOrStatusFlags`: intent
 1. `orders.DestroyMotionObject`: intent
 1. `players.KillPlayerUnits`: intent
@@ -979,7 +979,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `weapons.ClaimWeapons`
 
 1. `units.FindScript`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 
 ### `weapons.CobScriptExplodePiece`
 
@@ -1025,12 +1025,12 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `units.QueryScript`: mixed
 1. `units.GetPieceOffset`: query
 1. `units.GetAimFromPosition`: mixed
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 
 ### `weapons.ReleaseWeapons`
 
 1. `units.FindScript`: intent
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent
 
 ### `weapons.SpawnProjectile`
 
@@ -1068,7 +1068,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. `targeting.GetWeaponTargetPos`: mixed
 1. `units.GetAimFromPosition`: mixed
-1. `units.StartScriptWithArgs`: mixed
+1. `units.StartScriptWithArgs`: intent, mixed
 1. a call into units outside its interface
 1. `targeting.GetWeaponTargetUnit`: query
 1. `units.QueryScript`: mixed
@@ -1082,7 +1082,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `wind_meteors.UpdateMeteors`
 
 1. a draw from the C runtime generator (`rng.crtHoldrand`)
-1. `weapons.SpawnProjectile`: mixed
+1. `weapons.SpawnProjectile`: intent
 
 ### `wind_meteors.UpdateWind`
 
@@ -1118,7 +1118,7 @@ is not listed.
 | ai | `targeting.ClearWeaponTarget` | intent |
 | ai | `targeting.FindWeaponTarget` | mixed |
 | ai | `targeting.GetWeaponTargetUnit` | query |
-| ai | `targeting.SetWeaponTargetPos` | query |
+| ai | `targeting.SetWeaponTargetPos` | intent |
 | ai | `targeting.SetWeaponTargetUnit` | intent |
 | ai | `units.NotifyUnitRefs` | intent |
 | ai | `weapons.FindTargetableProjectile` | query |
@@ -1127,7 +1127,7 @@ is not listed.
 | economy | `players.TransferEnergy` | intent |
 | economy | `players.TransferMetal` | intent |
 | economy | `units.SetStateBits` | intent |
-| economy | `units.StartScriptWithArgs` | mixed |
+| economy | `units.StartScriptWithArgs` | intent |
 | features | `los_radar.GetMapCell` | query |
 | features | `los_radar.SoundHeardMask` | query |
 | features | `map.GetCellMeanHeight` | query |
@@ -1136,7 +1136,7 @@ is not listed.
 | features | `units.CreateObjectState` | mixed |
 | features | `units.FreeObjectState` | intent |
 | features | `units.GetGroundHeight` | query |
-| features | `weapons.ApplyAreaDamageAt` | mixed |
+| features | `weapons.ApplyAreaDamageAt` | intent |
 | los_radar | `ai.HasReadyUnitInRange` | query |
 | los_radar | `ai.IsPointVisible` | query |
 | los_radar | `map.VisitObjectsInRange` | query |
@@ -1149,7 +1149,7 @@ is not listed.
 | orders | `ai.GetVisibleEnemiesInRadius` | query |
 | orders | `economy.RequestEnergyAndMetal` | mixed |
 | orders | `features.GetCellFeature` | query |
-| orders | `features.ReclaimFeature` | mixed |
+| orders | `features.ReclaimFeature` | intent |
 | orders | `features.RemoveFeature` | intent |
 | orders | `los_radar.GetMapCellAtPosition` | query |
 | orders | `los_radar.GetOriginCellAtPosition` | query |
@@ -1170,7 +1170,7 @@ is not listed.
 | orders | `targeting.ClearWeaponTarget` | intent |
 | orders | `targeting.FindBestTargetIfFireAtWill` | mixed |
 | orders | `targeting.GetWeaponTargetUnit` | query |
-| orders | `targeting.SetWeaponTargetPos` | query |
+| orders | `targeting.SetWeaponTargetPos` | intent |
 | orders | `targeting.SetWeaponTargetUnit` | intent |
 | orders | `units.AddBuildProgress` | mixed |
 | orders | `units.AddRepairProgress` | intent, mixed |
@@ -1193,7 +1193,7 @@ is not listed.
 | orders | `units.SetStateBits` | intent |
 | orders | `units.SetUnitPosition` | intent |
 | orders | `units.StartScript` | intent |
-| orders | `units.StartScriptWithArgs` | mixed |
+| orders | `units.StartScriptWithArgs` | intent |
 | orders | `units.StartScriptWithArgsByIndex` | intent |
 | orders | `units.UnitRefUnlink` | intent |
 | orders | `units.UpdateSfxOccupy` | intent |
@@ -1234,7 +1234,7 @@ is not listed.
 | targeting | `units.FindScript` | intent |
 | targeting | `units.GetGroundHeight` | query |
 | targeting | `units.GetSweetSpot` | mixed |
-| targeting | `units.StartScriptWithArgs` | mixed |
+| targeting | `units.StartScriptWithArgs` | intent |
 | targeting | `weapons.GetWeaponRange` | view read |
 | targeting | `weapons.WeaponCanReachUnit` | query |
 | units | `ai.SetUnitSquad` | intent |
@@ -1243,8 +1243,8 @@ is not listed.
 | units | `economy.RequestEnergyAndMetal` | mixed |
 | units | `economy.Reset` | intent |
 | units | `economy.UpdateMetalExtraction` | intent |
-| units | `features.PlaceFeature` | mixed |
-| units | `los_radar.AddEyeball` | mixed |
+| units | `features.PlaceFeature` | intent, mixed |
+| units | `los_radar.AddEyeball` | intent |
 | units | `los_radar.GetMapCell` | query |
 | units | `los_radar.IsUnitVisibleToPlayer` | query |
 | units | `los_radar.RemoveUnitLineOfSight` | intent |
@@ -1305,8 +1305,8 @@ is not listed.
 | weapons | `units.PoseUnitModel` | intent |
 | weapons | `units.QueryScript` | mixed |
 | weapons | `units.StartScript` | intent |
-| weapons | `units.StartScriptWithArgs` | mixed |
-| wind_meteors | `weapons.SpawnProjectile` | mixed |
+| weapons | `units.StartScriptWithArgs` | intent, mixed |
+| wind_meteors | `weapons.SpawnProjectile` | intent |
 
 ## Split points
 
@@ -1319,13 +1319,13 @@ the split lies in.
 
 | writer | reader | place | split | write in | read in | may split inside | matched | rows | across |
 |---|---|---|---|---|---|---|---|---|---|
-| economy | ai | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `los_radar.IsUnitVisibleToPlayer` again, after step 6 | `weapons.UpdateUnitWeapons` | by subsystem | 3 | 3 |
+| economy | ai | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `los_radar.IsUnitVisibleToPlayer` again, after step 6 |  | by subsystem | 3 | 3 |
 | economy | features | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `orders.RunOrders` (step 9) |  | by subsystem | 5 | 5 |
-| economy | los_radar | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `los_radar.IsUnitVisibleToPlayer` again, after step 6 | `weapons.UpdateUnitWeapons` | by subsystem | 3 | 3 |
+| economy | los_radar | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `los_radar.IsUnitVisibleToPlayer` again, after step 6 |  | by subsystem | 3 | 3 |
 | economy | map | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `weapons.DamageUnit` (step 7) |  | by subsystem | 2 | 2 |
 | economy | orders | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `weapons.DamageUnit` (step 7) |  | by subsystem | 5 | 3 |
-| economy | targeting | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `weapons.DamageUnit` (step 7) | `weapons.UpdateUnitWeapons` | by subsystem | 3 | 3 |
-| economy | units | units, each entity | apply before continuing | `weapons.UpdateUnitWeapons` (step 6) | the caller | `weapons.UpdateUnitWeapons` | by subsystem | 5 | 5 |
+| economy | targeting | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `weapons.DamageUnit` (step 7) |  | by subsystem | 3 | 3 |
+| economy | units | units, each entity | apply before continuing | `weapons.UpdateUnitWeapons` (step 6) | the caller |  | by subsystem | 5 | 5 |
 | economy | weapons | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `weapons.CobScriptExplodePiece` again, after step 6 | `weapons.UpdateUnitWeapons` | by subsystem | 4 | 4 |
 | features | map | units, each entity | split | `orders.RunOrders` (step 9) | `orders.RunSecondaryOrders` (step 10) | `orders.RunOrders` | by subsystem | 1 | 1 |
 | features | units | units, each entity | apply before continuing | `orders.RunOrders` (step 9) | the caller | `orders.RunOrders` | by subsystem | 2 | 2 |
@@ -1336,12 +1336,13 @@ the split lies in.
 | los_radar | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by subsystem | 1 | 0 |
 | los_radar | units | units, each entity | apply before continuing | `weapons.DamageUnit` (step 7) | the caller | `weapons.DamageUnit` | by subsystem | 2 | 2 |
 | los_radar | weapons | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by subsystem | 1 | 1 |
-| map | ai | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 1 | 1 |
+| map | ai | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 |  | by item | 1 | 1 |
 | map | economy | units, each entity | split | `weapons.DamageUnit` (step 7) | `economy.RequestEnergy` (step 8) | `weapons.DamageUnit` | by subsystem | 1 | 1 |
 | map | features | units, each entity | split | `weapons.DamageUnit` (step 7) | `orders.RunOrders` (step 9) |  | by subsystem | 1 | 1 |
 | map | los_radar | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 1 | 1 |
 | map | los_radar | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by subsystem | 1 | 0 |
-| map | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 2 | 2 |
+| map | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 |  | by item | 1 | 1 |
+| map | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 1 | 1 |
 | map | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by subsystem | 1 | 1 |
 | map | players | units, each entity | split | `weapons.DamageUnit` (step 7) | `orders.RunOrders` (step 9) |  | by item | 1 | 0 |
 | map | targeting | units, each entity | split | `weapons.DamageUnit` (step 7) | `orders.RunOrders` (step 9) |  | by item | 1 | 1 |
@@ -1373,7 +1374,7 @@ the split lies in.
 | targeting | orders | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `weapons.DamageUnit` (step 7) |  | by subsystem | 1 | 1 |
 | targeting | weapons | units, each entity | split | `weapons.UpdateUnitWeapons` (step 6) | `weapons.CobScriptExplodePiece` again, after step 6 | `weapons.UpdateUnitWeapons` | by subsystem | 4 | 4 |
 | units | ai | units, each entity | write before calling | the caller, before the first step | `los_radar.IsUnitVisibleToPlayer` (step 2) |  | by subsystem | 6 | 6 |
-| units | ai | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 4 | 4 |
+| units | ai | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 |  | by item | 4 | 4 |
 | units | economy | units, each entity | write before calling | the caller, before the first step | `weapons.UpdateUnitWeapons` (step 6) |  | by subsystem | 4 | 3 |
 | units | economy | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 3 | 0 |
 | units | features | units, each entity | write before calling | the caller, before the first step | `orders.RunOrders` (step 9) |  | by subsystem | 3 | 3 |
@@ -1386,26 +1387,28 @@ the split lies in.
 | units | orders | units, each entity | write before calling | the caller, before the first step | `weapons.DamageUnit` (step 7) |  | by subsystem | 16 | 16 |
 | units | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `orders.RunOrders` (step 9) |  | by item | 6 | 6 |
 | units | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `orders.UpdateMotion` (step 11) |  | by item | 2 | 2 |
-| units | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 6 | 6 |
+| units | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 |  | by item | 1 | 1 |
+| units | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 5 | 5 |
 | units | players | units, each entity | write before calling | the caller, before the first step | `weapons.DamageUnit` (step 7) |  | by subsystem | 8 | 4 |
 | units | players | units, each entity | split | `weapons.DamageUnit` (step 7) | `orders.RunOrders` (step 9) |  | by item | 4 | 1 |
 | units | targeting | units, each entity | write before calling | the caller, before the first step | `weapons.UpdateUnitWeapons` (step 6) |  | by subsystem | 8 | 8 |
 | units | targeting | units, each entity | split | `weapons.DamageUnit` (step 7) | `orders.RunOrders` (step 9) |  | by item | 5 | 5 |
 | units | weapons | units, each entity | write before calling | the caller, after step 27 | `players.KillPlayerUnits` (step 28) |  | by item | 1 | 1 |
 | units | weapons | units, each entity | write before calling | the caller, before the first step | `weapons.CobScriptExplodePiece` (step 5) |  | by subsystem | 21 | 14 |
-| units | weapons | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 10 | 10 |
-| weapons | ai | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 3 | 2 |
-| weapons | map | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 1 | 1 |
+| units | weapons | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 |  | by item | 3 | 3 |
+| units | weapons | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 7 | 7 |
+| weapons | ai | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 |  | by item | 3 | 2 |
+| weapons | map | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 |  | by item | 1 | 1 |
 | weapons | orders | units, each entity | split | `weapons.CobScriptExplodePiece` (step 5) | `weapons.DamageUnit` (step 7) |  | by subsystem | 5 | 5 |
 | weapons | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `orders.RunOrders` (step 9) |  | by item | 1 | 1 |
-| weapons | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 1 | 1 |
+| weapons | orders | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 |  | by item | 1 | 1 |
 | weapons | players | units, each entity | split | `weapons.CobScriptExplodePiece` (step 5) | `weapons.DamageUnit` (step 7) |  | by subsystem | 3 | 0 |
 | weapons | players | units, each entity | split | `weapons.DamageUnit` (step 7) | `orders.RunOrders` (step 9) |  | by item | 1 | 0 |
 | weapons | targeting | units, each entity | split | `weapons.CobScriptExplodePiece` (step 5) | `weapons.UpdateUnitWeapons` (step 6) |  | by subsystem | 8 | 8 |
 | weapons | units | units, each entity | apply before continuing | `weapons.CobScriptExplodePiece` (step 5) | the caller | `weapons.CobScriptExplodePiece` | by subsystem | 7 | 7 |
 | weapons | units | units, each entity | apply before continuing | `weapons.DamageUnit` (step 7) | the caller |  | by item | 3 | 3 |
 | weapons | units | units, each entity | apply before continuing | `weapons.DamageUnit` (step 7) | the caller | `weapons.DamageUnit` | by item | 1 | 1 |
-| weapons | units | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 | `weapons.DamageUnit` | by item | 1 | 1 |
+| weapons | units | units, each entity | split | `weapons.DamageUnit` (step 7) | `weapons.DamageUnit` again, after step 7 |  | by item | 1 | 1 |
 
 ### Phase projectiles
 
@@ -1417,15 +1420,15 @@ the split lies in.
 | features | weapons | projectiles, each entity | apply before continuing | `features.DamageFeature` (step 18) | the caller |  | by subsystem | 2 | 2 |
 | orders | ai | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `ai.ReactToAttack` again, after step 9 | `ai.ReactToAttack` | by item | 1 | 1 |
 | orders | ai | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `orders.NewOrder` (step 12) | `ai.ReactToAttack` | by subsystem | 1 | 1 |
-| orders | units | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `orders.NewOrder` (step 12) | `ai.ReactToAttack` | by item | 1 | 1 |
+| orders | units | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `orders.NewOrder` (step 12) |  | by item | 1 | 1 |
 | orders | units | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `orders.NewOrder` (step 12) | `ai.ReactToAttack` | by subsystem | 2 | 2 |
 | orders | weapons | projectiles, each entity | apply before continuing | `ai.ReactToAttack` (step 9) | the caller | `ai.ReactToAttack` | by subsystem | 1 | 1 |
 | units | orders | projectiles, each entity | split | `units.QueryScript` (step 1) | `ai.ReactToAttack` (step 9) |  | by subsystem | 1 | 1 |
 | units | weapons | projectiles, each entity | apply before continuing | `units.QueryScript` (step 1) | the caller | `units.QueryScript` | by subsystem | 1 | 1 |
 | weapons | ai | projectiles, each entity | write before calling | the caller, after step 9 | `ai.ReactToAttack` again, after the write |  | by item | 2 | 2 |
 | weapons | ai | projectiles, each entity | write before calling | the caller, after step 13 | `ai.ReactToAttack` again, after the write |  | by item | 1 | 1 |
-| weapons | ai | projectiles, each entity | split | `units.QueryScript` (step 1) | `ai.ReactToAttack` (step 9) | `units.QueryScript` | by subsystem | 4 | 4 |
-| weapons | los_radar | projectiles, each entity | split | `units.QueryScript` (step 1) | `los_radar.SoundHeardMask` (step 3) | `units.QueryScript` | by subsystem | 1 | 1 |
+| weapons | ai | projectiles, each entity | split | `units.QueryScript` (step 1) | `ai.ReactToAttack` (step 9) |  | by subsystem | 4 | 4 |
+| weapons | los_radar | projectiles, each entity | split | `units.QueryScript` (step 1) | `los_radar.SoundHeardMask` (step 3) |  | by subsystem | 1 | 1 |
 | weapons | orders | projectiles, each entity | write before calling | the caller, after step 13 | `ai.ReactToAttack` again, after the write |  | by item | 1 | 1 |
 | weapons | targeting | projectiles, each entity | split | `units.QueryScript` (step 1) | `ai.ReactToAttack` (step 9) |  | by subsystem | 2 | 1 |
 
@@ -1491,16 +1494,16 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 
 | subsystem | view read | query | intent | mixed | edges written | edges read | inside an entity |
 |---|---|---|---|---|---|---|---|
-| wind_meteors | 0 / 0 | 0 / 0 | 0 / 0 | 1 / 0 | 0 | 0 | 0 |
-| economy | 0 / 0 | 1 / 1 | 3 / 5 | 1 / 5 | 45 | 11 | 54 |
-| features | 1 / 0 | 4 / 3 | 2 / 2 | 2 / 2 | 15 | 13 | 28 |
-| ai | 0 / 0 | 7 / 5 | 4 / 5 | 2 / 0 | 4 | 43 | 47 |
+| wind_meteors | 0 / 0 | 0 / 0 | 1 / 0 | 0 / 0 | 0 | 0 | 0 |
+| economy | 0 / 0 | 1 / 1 | 4 / 5 | 0 / 5 | 45 | 11 | 54 |
+| features | 1 / 0 | 4 / 3 | 3 / 4 | 1 / 1 | 15 | 13 | 28 |
+| ai | 0 / 0 | 6 / 5 | 5 / 5 | 2 / 0 | 4 | 43 | 47 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 5 | 0 / 1 | 0 | 0 | 0 |
-| weapons | 0 / 2 | 10 / 6 | 9 / 13 | 5 / 2 | 52 | 65 | 117 |
-| targeting | 1 / 0 | 3 / 6 | 1 / 5 | 2 / 3 | 5 | 42 | 45 |
-| los_radar | 0 / 0 | 3 / 13 | 0 / 10 | 0 / 1 | 14 | 30 | 43 |
-| orders | 2 / 0 | 23 / 2 | 22 / 13 | 12 / 3 | 64 | 54 | 118 |
-| units | 1 / 1 | 2 / 16 | 37 / 22 | 5 / 15 | 142 | 61 | 203 |
+| weapons | 0 / 2 | 10 / 6 | 10 / 15 | 5 / 0 | 52 | 65 | 117 |
+| targeting | 1 / 0 | 3 / 4 | 2 / 7 | 1 / 3 | 5 | 42 | 45 |
+| los_radar | 0 / 0 | 3 / 13 | 0 / 11 | 0 / 0 | 14 | 30 | 43 |
+| orders | 2 / 0 | 22 / 2 | 25 / 13 | 10 / 3 | 64 | 54 | 118 |
+| units | 1 / 1 | 2 / 16 | 39 / 26 | 4 / 12 | 142 | 61 | 203 |
 | players | 1 / 0 | 3 / 0 | 14 / 6 | 5 / 0 | 14 | 22 | 35 |
 | map | 0 / 4 | 3 / 8 | 2 / 10 | 0 / 3 | 18 | 32 | 50 |
 
@@ -1518,15 +1521,18 @@ The orders are read from the program, not from a run. That decides what they cla
   of its name, overloads included, so a list can hold steps (and a class count writes) that one call does not run.
   Calls into presentation, network and file code are left out of the lists, and so is the test harness.
 - **Values.** The caller uses a call's value when it uses the value returned, or when it hands the call the address
-  of an object, an array or a pointer to a plain value to fill in. The record an entry point works on, given as its
-  first argument (an account of the economy, say), is not a value handed back.
+  of an object, an array or a pointer to a plain value (never a string) that the call fills in: what it runs writes
+  through that argument, or hands it to code outside the program (a library container, say). The address of a local
+  of the caller counts also when no code for the entry point is known. An argument the call only reads is an input,
+  and the record an entry point works on, given as its first argument (an account of the economy, say), is not a
+  value handed back.
 - **Writes**, for the classes, are the writes to a field of a record or to a variable of the game that the program
-  shows, anywhere in what a call runs (nested entry points and calls outside an interface included), and allocations,
-  random draws and sim events. Writes to a local object of the function, or to the object a constructor builds, are
-  not counted, and neither are writes to the fields of plain values (positions, points, fixed-point numbers) through
-  a pointer, nor other writes through a bare pointer. A call whose value is used and that writes state only in those
-  ways is classed as a view read or a query; an intent in which no write of any kind is found is listed under
-  Intents with no write found.
+  shows, anywhere in what a call runs (nested entry points included, and for a call outside an interface its own
+  writes, not those of what it calls in turn), and allocations, random draws and sim events. Writes to a local object
+  of the function, or to the object a constructor builds, are not counted, and neither are writes to the fields of
+  plain values (positions, points, fixed-point numbers) through a pointer, nor other writes through a bare pointer. A
+  call whose value is used and that writes state only in those ways is classed as a view read or a query; an intent
+  in which no write of any kind is found is listed under Intents with no write found.
 - **Split points** place each `immediate` row of coupling/dependencies.csv (the access log, run on the scenario
   suite) at the first step of the writer that reaches a write of its item and is followed by a step of the reader that
   reaches a read of it, in one list (the code of the list's own subsystem counts as `the caller`). Where the program
@@ -1534,9 +1540,9 @@ The orders are read from the program, not from a run. That decides what they cla
   item reached under another name), or no such pair is found, the row is matched by subsystem: the writer's first step
   that writes anything, and the reader's next step that reads anything. A row matched by subsystem says where a
   split can be, not where it must be.
-- **Inside a step.** When the writer's step also reaches a read of the item by the reader, the write and the read can
-  both lie inside that step, and the split may be needed there instead: the row names the step under `may split
-  inside`. The search goes inside a step only when its list holds no pair.
+- **Inside a step.** When the writer's step also holds a write of the item followed by a read of it by the reader,
+  the split may be needed inside that step instead: the row names the step under `may split inside`. The search goes
+  inside a step for the place itself only when its list holds no pair.
 - **Across entities.** A row placed `across entities` has every step of the reader before the writer's first step
   in one entity's list, or in that step with no write of the writer followed by a read: the read is in a later
   entity, whose order the scheduler keeps, and no split inside the entity is needed. The column `across` counts the

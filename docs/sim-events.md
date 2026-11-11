@@ -106,7 +106,7 @@ Recorded when a unit announces something. The sim records nothing for a unit tha
 
 No call site records slot 0 or slot 1 (select, which the interface handles).
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation says the line only for a unit of the local player, and drops it when the unit has died by then or, with flag bit 0, is on screen. The line enters a queue that keeps one line per kind, ordered by priority.
 
@@ -123,7 +123,7 @@ Flags: none.
 
 Recorded when a victory condition of the mission is first satisfied, once for each condition (sound name 0). The conditions are: the enemy commander is killed, all enemy units are destroyed, all mobile enemy units are killed, a unit of the given type is built, a unit of the given type is captured, all units of a type are killed, a unit of a type is killed, a unit reaches a radius, a unit of a type passes a given x, a unit of a type passes a given z.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation plays the sound by name.
 
@@ -149,7 +149,7 @@ Recorded by these orders, once for each step that does the following. The origin
 
 There is no air resurrect. The flow runs from the origin to the box.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation draws a beam of particles flowing from the origin to the box.
 
@@ -171,7 +171,7 @@ Recorded by these orders. The origin is the nanolathe point of the builder. For 
 - Reclaim of a unit (ground and air): each step in which the unit is within build range and can be reclaimed, one event.
 - Reclaim of a feature: each step while the order's remaining time is above 15 for a ground builder, or above 30 for an air builder, two identical events. The box is the feature's footprint: its low corner is the feature's cell at the ground height there, and its high corner adds the footprint size in cells and the feature's height.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation draws a beam of particles flowing from the box to the origin.
 
@@ -190,7 +190,7 @@ Flags: none.
 
 Recorded when a teleport order runs (once, in its only step), once for each slot of the unit table other than the teleporter whose position lies inside the box of the teleporter: the teleporter's position plus the minimum model extents of its definition (low corner) and plus the maximum extents (high corner), compared on x, y and z, inclusive. The scan does not test whether the slot holds a living unit, so a free slot whose stale position lies in the box records too. The event is recorded just before that slot's position is set to the end position.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation draws sparks flying from the start to the end.
 
@@ -210,7 +210,7 @@ Flags: none. Two records (nine arguments).
 
 Recorded when a unit's script emits effect 0 (lifetime 6) or effect 1 (lifetime 7) from a piece. The start and end are the piece's two offsets from the unit's position (the second offset has its z subtracted as the first does). The script effect is dropped, with nothing recorded, unless the unit is visible to the player being viewed (the sim's player index for the viewing machine); this depends on the local machine's viewed player.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation streams a jet plume from the start to the end.
 
@@ -229,7 +229,7 @@ Flags: none.
 
 Recorded when a unit's script emits effect 2 (period 16), 3 (period 8), 4 (period 16, positions swapped) or 5 (period 8, positions swapped) from a piece. The positions are the piece's two offsets from the unit's position. The script effect is dropped, with nothing recorded, unless the unit is visible to the player being viewed (the sim's player index for the viewing machine); this depends on the local machine's viewed player.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation trails a wake from the start to the end.
 
@@ -248,7 +248,7 @@ Flags: none.
 
 Recorded when a unit's script emits effect 0x103 from a piece. The start is the piece's position (the unit's position plus the piece's position, with z subtracted) and the end has the same x and z at the sea level height. The script effect is dropped, with nothing recorded, unless the unit is visible to the player being viewed (the sim's player index for the viewing machine); this depends on the local machine's viewed player.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation raises bubbles from the start to the end.
 
@@ -282,7 +282,7 @@ Flags: none.
 
 Recorded when a feature whose definition has a geothermal vent is placed on the map. This happens for every such feature when a match is loaded (so the first drain of a match can hold hundreds), and again whenever such a feature is placed later, as when a burnt feature replaces a feature that burned down.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation starts a timed plume of particles rising over the vent.
 
@@ -323,7 +323,7 @@ Recorded in two cases.
 
 Both tests use the local player, so the event differs between machines.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation counts the amount in the disc activity meter, which picks the music, when either player is the local player.
 
@@ -388,7 +388,7 @@ Recorded in these cases:
 
 Repair, reclaim and capture orders never record it.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation redraws the orders panel if the unit is selected and belongs to the local player.
 
@@ -412,7 +412,7 @@ Recorded for the builder in these cases:
 - A weapon with a stockpile is fired and the unit's stockpile is decremented.
 - Construction of a unit is finished for the builder, which requires the builder to exist and have a build list in its definition and the target to exist. This runs from the factory order above, from the interface and from the network packet that finishes construction.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation writes the queued build counts into the build menu if the unit is the one it shows.
 
@@ -428,7 +428,7 @@ Flags: none.
 
 Recorded at the end of an attach order, after the unit's carrier and motion mode have been set, when the unit exists, does not have unit flag 0x20000000 (a structure), carries no cargo of its own, and the order's target is either none (the unit is detached) or an existing unit other than the unit that is itself not carried. Attaching and detaching both record it.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation removes the unit from the selection when it can no longer be selected (unfinished, in transit, or carried by a transport that may not carry it).
 
@@ -444,7 +444,7 @@ Flags: none.
 
 Recorded when construction of a unit is finished (see `SIM_EVENT_BUILD_MENU_UPDATE`), the builder exists and has a build list in its definition, the target exists, the target's player is active and of type 1 or 2, and the target unit has its unit flag 0x20000000 set (the unit is a structure that stays in place). The screen is 0, the build menu.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation marks the GUI as changed when that screen is on top.
 
@@ -580,7 +580,7 @@ Recorded in two cases.
 - A wreck: when a unit dies with wreckage level above 0 and the wreck, after following the next-wreck chain one step for each level above 1, has an id below 0xfffb, the unit's cell exists, and the kill type is not 7. Above sea level (the ground height at the unit is above the sea level) it is recorded whether or not the wreck was placed. At or below sea level it is recorded only when placing the wreck failed; a wreck that was placed under water records no smoke. The position is the unit's position; period 15, lifetime 900.
 - An explosion effect: when fewer than 300 explosion effects exist, the caller's flag is 0, and the whole part of the effect's y is above the sea level. The flag is 0 for an impact on a cell that is not below sea level, for explosions that a unit script makes from a piece, and for two debris paths; it is 1 for an impact on a cell below sea level, for the splash of a projectile crossing the sea level and for the other debris paths. Period 7, lifetime 15.
 
-Phases: net (0), units (1), projectiles (2), explosions (3), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), explosions (3), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation starts a smoke plume. The smoke picks its animation frames from the view random stream.
 
@@ -603,7 +603,7 @@ Recorded in these cases:
 - A burning feature with no 3D object (a sprite feature whose spot flag bit 0 is set), when the tick counter is divisible by 3. The list is 5. The position is the centre of the feature's footprint, offset by two draws of the sim random stream scaled by the size and offset of the current animation frame.
 - A unit's script emits effect 0x101 from a piece, at the piece's position (the unit's position plus the piece's position, with z subtracted), subject to the visibility test of the other script effects, which depends on the viewed player of the local machine.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation puffs white smoke at the position.
 
@@ -620,7 +620,7 @@ Flags: none.
 
 Recorded when a unit's script emits effect 0x102 from a piece, at the piece's position (the unit's position plus the piece's position, with z subtracted). The script effect is dropped, with nothing recorded, unless the unit is visible to the player being viewed (the sim's player index for the viewing machine); this depends on the local machine's viewed player.
 
-Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation puffs black smoke at the position.
 

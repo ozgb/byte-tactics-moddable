@@ -63,7 +63,7 @@ gh api repos/ozgb/byte-tactics-moddable/pulls/<PR> --jq .head.sha
 
 A pull request **needs review** when it is open, not a draft, and its head SHA differs from the SHA in its latest verdict (or it has none). Pushing new commits is how the author asks for another review: no label or mention is needed.
 
-A pull request body names the gate tier it ran: `--tier` (the scenarios of `GATE_TIER`, the gate of every change the gate applies to) or the full `--check` (the gate only of a change that regenerates the stored reference data, as `reference/README.md`, "When the full suite is the gate", says). A body that names only `--tier` for such a change is sent back. The play-tests are not part of a pull request's gate: they run with the full `--check` on `moddable` once every 5 gated merges (`uv run tools/fullgate.py due` exits 1 when the run is due).
+A pull request body names the gate tier it ran: `--tier` (the scenarios of `GATE_TIER`, the gate of every change the gate applies to) or the full `--check` (the gate only of a change that regenerates the stored reference data, as `reference/README.md`, "When the full suite is the gate", says). A body that names only `--tier` for such a change is sent back. The play-tests are not part of a pull request's gate: they run with the full `--check` on `moddable` nightly, run by the maintainer when a merge since the last run needed the gate (`uv run tools/fullgate.py due` exits 1).
 
 ## Human review
 

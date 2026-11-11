@@ -31039,8 +31039,6 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,HarnessPhase
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,HarnessRecordPhase
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,PacketManager::SendAllQueued
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedPlayersPhase
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedUnitsPhase
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,StepAllGafSequences
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,UpdateAutoFollow
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,UpdateCameraFollow
@@ -31056,12 +31054,15 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,LosRadarSeam::ExpireEyeballs
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Player::displayTimer
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,PlayersSeam::UpdateBlink
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,PlayersSeam::UpdatePlayers
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::economy
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::features
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::los_radar
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::players
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::units
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::weapons
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::wind_meteors
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,UnitsSeam::UpdateAllUnits
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,WeaponsSeam::UpdateExplosions
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,WeaponsSeam::UpdateProjectiles
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,WindMeteorsSeam::UpdateMeteors
@@ -31077,6 +31078,8 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::UpdateFeatures]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::ExpireEyeballs]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::UpdateBlink]
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::UpdatePlayers]
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::UpdateAllUnits]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WeaponsSeam::UpdateExplosions]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WeaponsSeam::UpdateProjectiles]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WindMeteorsSeam::UpdateMeteors]
@@ -31531,7 +31534,6 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,call,PacketManager::SendAllQueued
 0x497180,LoadMatch,src/game/game_load.cpp,call,RandomInt
 0x497180,LoadMatch,src/game/game_load.cpp,call,ReportGameEvent
-0x497180,LoadMatch,src/game/game_load.cpp,call,SchedPlayersPhase
 0x497180,LoadMatch,src/game/game_load.cpp,call,SeedRandom
 0x497180,LoadMatch,src/game/game_load.cpp,call,SetCameraPosition
 0x497180,LoadMatch,src/game/game_load.cpp,call,SpawnCommanderAtStartPos
@@ -31601,6 +31603,7 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,PlayersSeam::InitPlayerResources
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,PlayersSeam::LoadPlayerControllers
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,PlayersSeam::RebuildAIFeatureCells
+0x497180,LoadMatch,src/game/game_load.cpp,field_read,PlayersSeam::UpdatePlayersOnStream
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,Seams::los_radar
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,Seams::map
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,Seams::players
@@ -31644,6 +31647,7 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::InitPlayerResources]
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::RebuildAIFeatureCells]
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [PlayersSeam::LoadPlayerControllers]
+0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(RandStream) __attribute__((stdcall)) [PlayersSeam::UpdatePlayersOnStream]
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
 0x497c70,LoadThreadMain,src/game/game_load.cpp,call,HarnessLoadEnded
 0x497c70,LoadThreadMain,src/game/game_load.cpp,call,LoadMatch
@@ -58260,7 +58264,7 @@ address,function,file,kind,target
 ,SchedEconomyEffect,src/game/scheduler.cpp,call,HarnessEconomyEvent
 ,SchedEconomyEffect,src/game/scheduler.cpp,call,UnitOfHandle
 ,SchedEconomyEffect,src/game/scheduler.cpp,call,get
-,SchedEconomyEffect,src/game/scheduler.cpp,call,operator bool
+,SchedEconomyEffect,src/game/scheduler.cpp,call,operator!=
 ,SchedEconomyEffect,src/game/scheduler.cpp,field_read,EconomyEvent::energy
 ,SchedEconomyEffect,src/game/scheduler.cpp,field_read,EconomyEvent::kind
 ,SchedEconomyEffect,src/game/scheduler.cpp,field_read,EconomyEvent::metal

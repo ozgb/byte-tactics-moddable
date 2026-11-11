@@ -175,7 +175,6 @@ unsigned int __cdecl GetTicks();
 #include "main.h"
 
 #include "../../interfaces/seams.h"
-#include "scheduler.h"
 #include "../state/sim_globals.h"
 int __stdcall PointInRect(Rect* r, int x, int y);
 
@@ -429,7 +428,7 @@ tail:
     currec->data->flags_9b |= 0x10;
     BroadcastPlayerInfo();
     UpdateNetGameInfo();
-    SchedPlayersPhase(RAND_STREAM_LOAD);
+    g_seams.players->UpdatePlayersOnStream(RAND_STREAM_LOAD);
     g_seams.players->InitPlayerResources();
 
     HapiBank* mission = ((HapiBank*)g_game->pendingSaveStore);

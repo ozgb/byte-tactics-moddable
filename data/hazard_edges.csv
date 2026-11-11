@@ -1612,3 +1612,6 @@ SchedPlayersPhase,UpdatePlayerHead,"seam slot filled by InstallNativeSeams, Play
 SchedPlayersPhase,UpdatePlayerTail,"seam slot filled by InstallNativeSeams, PlayersSeam::UpdatePlayerTail, SchedPlayersPhase (src/game/scheduler.cpp), src/seams/native.cpp"
 SchedPlayersPhase,UpdatePlayersFinish,"seam slot filled by InstallNativeSeams, PlayersSeam::UpdatePlayersFinish, SchedPlayersPhase (src/game/scheduler.cpp), src/seams/native.cpp"
 SchedUnitsPhase,UpdateUnit,"seam slot filled by InstallNativeSeams, UnitsSeam::UpdateUnit, SchedUnitsPhase (src/game/scheduler.cpp), src/seams/native.cpp"
+LoadMatch,UpdatePlayersOnStream,"seam slot filled by InstallNativeSeams, PlayersSeam::UpdatePlayersOnStream, LoadMatch (src/game/game_load.cpp), src/seams/native.cpp"
+RunGameSteps,UpdateAllUnits,"seam slot filled by InstallNativeSeams, UnitsSeam::UpdateAllUnits, RunGameSteps (src/ingame/game_dialogs.cpp), src/seams/native.cpp"
+RunGameSteps,UpdatePlayers,"seam slot filled by InstallNativeSeams, PlayersSeam::UpdatePlayers, RunGameSteps (src/ingame/game_dialogs.cpp), src/seams/native.cpp"

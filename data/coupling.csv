@@ -844,7 +844,9 @@ game,players,indirect,TransferMetal,2
 game,players,indirect,UpdateBlink,1
 game,players,indirect,UpdatePlayerHead,1
 game,players,indirect,UpdatePlayerTail,1
+game,players,indirect,UpdatePlayers,1
 game,players,indirect,UpdatePlayersFinish,1
+game,players,indirect,UpdatePlayersOnStream,1
 game,players,shared_write,Game::commanderDeath,3
 game,players,shared_write,Game::displayContext,1
 game,players,shared_write,Game::endGameCountdown,2
@@ -1206,6 +1208,7 @@ game,units,indirect,LoadUnits,1
 game,units,indirect,RefreshUnitInfo,1
 game,units,indirect,ReloadUnitType,1
 game,units,indirect,SaveUnits,1
+game,units,indirect,UpdateAllUnits,1
 game,units,indirect,UpdateUnit,1
 game,units,shared_write,Angles16::heading,10
 game,units,shared_write,Fixed::whole,1
@@ -1391,6 +1394,7 @@ harness,game,shared_write,PlayersSeam::TransferMetal,2
 harness,game,shared_write,PlayersSeam::UpdateBlink,1
 harness,game,shared_write,PlayersSeam::UpdatePlayerHead,1
 harness,game,shared_write,PlayersSeam::UpdatePlayerTail,1
+harness,game,shared_write,PlayersSeam::UpdatePlayers,1
 harness,game,shared_write,PlayersSeam::UpdatePlayersFinish,1
 harness,game,shared_write,Seams::ai,5
 harness,game,shared_write,Seams::economy,6
@@ -1401,7 +1405,7 @@ harness,game,shared_write,Seams::network,1
 harness,game,shared_write,Seams::orders,4
 harness,game,shared_write,Seams::pathfinding,4
 harness,game,shared_write,Seams::players,15
-harness,game,shared_write,Seams::units,16
+harness,game,shared_write,Seams::units,17
 harness,game,shared_write,Seams::weapons,3
 harness,game,shared_write,Seams::wind_meteors,5
 harness,game,shared_write,UnitsSeam::AttachUnitToPiece,1
@@ -1411,6 +1415,7 @@ harness,game,shared_write,UnitsSeam::GetGroundHeight,1
 harness,game,shared_write,UnitsSeam::KillUnit,1
 harness,game,shared_write,UnitsSeam::SetStateBits,1
 harness,game,shared_write,UnitsSeam::StartScriptWithArgs,1
+harness,game,shared_write,UnitsSeam::UpdateAllUnits,1
 harness,game,shared_write,UnitsSeam::UpdateUnit,1
 harness,game,shared_write,WindMeteorsSeam::UpdateMeteors,1
 harness,game,shared_write,WindMeteorsSeam::UpdateWind,1
@@ -1734,6 +1739,7 @@ harness,seams,shared_write,PlayersSeam::TransferMetal,1
 harness,seams,shared_write,PlayersSeam::UpdateBlink,1
 harness,seams,shared_write,PlayersSeam::UpdatePlayerHead,1
 harness,seams,shared_write,PlayersSeam::UpdatePlayerTail,1
+harness,seams,shared_write,PlayersSeam::UpdatePlayers,1
 harness,seams,shared_write,PlayersSeam::UpdatePlayersFinish,1
 harness,seams,shared_write,Seams::ai,1
 harness,seams,shared_write,Seams::economy,1
@@ -1793,6 +1799,7 @@ harness,seams,shared_write,UnitsSeam::StartScript,1
 harness,seams,shared_write,UnitsSeam::StartScriptWithArgs,1
 harness,seams,shared_write,UnitsSeam::StartScriptWithArgsByIndex,1
 harness,seams,shared_write,UnitsSeam::UnitRefUnlink,1
+harness,seams,shared_write,UnitsSeam::UpdateAllUnits,1
 harness,seams,shared_write,UnitsSeam::UpdateSfxOccupy,1
 harness,seams,shared_write,UnitsSeam::UpdateUnit,1
 harness,seams,shared_write,WeaponsSeam::ClaimWeapons,1
@@ -4567,6 +4574,7 @@ seams,game,shared_write,PlayersSeam::TransferMetal,2
 seams,game,shared_write,PlayersSeam::UpdateBlink,1
 seams,game,shared_write,PlayersSeam::UpdatePlayerHead,1
 seams,game,shared_write,PlayersSeam::UpdatePlayerTail,1
+seams,game,shared_write,PlayersSeam::UpdatePlayers,1
 seams,game,shared_write,PlayersSeam::UpdatePlayersFinish,1
 seams,game,shared_write,Ref<Unit>::offset,2
 seams,game,shared_write,Seams::ai,5
@@ -4579,7 +4587,7 @@ seams,game,shared_write,Seams::orders,4
 seams,game,shared_write,Seams::pathfinding,4
 seams,game,shared_write,Seams::pathworld,1
 seams,game,shared_write,Seams::players,15
-seams,game,shared_write,Seams::units,16
+seams,game,shared_write,Seams::units,17
 seams,game,shared_write,Seams::weapons,3
 seams,game,shared_write,Seams::wind_meteors,5
 seams,game,shared_write,Unit::motion,1
@@ -4590,6 +4598,7 @@ seams,game,shared_write,UnitsSeam::GetGroundHeight,1
 seams,game,shared_write,UnitsSeam::KillUnit,1
 seams,game,shared_write,UnitsSeam::SetStateBits,1
 seams,game,shared_write,UnitsSeam::StartScriptWithArgs,1
+seams,game,shared_write,UnitsSeam::UpdateAllUnits,1
 seams,game,shared_write,UnitsSeam::UpdateUnit,1
 seams,game,shared_write,WeaponsSeam::UpdateExplosions,1
 seams,game,shared_write,WeaponsSeam::UpdateProjectiles,1
@@ -4709,6 +4718,7 @@ seams,harness,shared_write,PlayersSeam::TransferMetal,2
 seams,harness,shared_write,PlayersSeam::UpdateBlink,2
 seams,harness,shared_write,PlayersSeam::UpdatePlayerHead,2
 seams,harness,shared_write,PlayersSeam::UpdatePlayerTail,2
+seams,harness,shared_write,PlayersSeam::UpdatePlayers,2
 seams,harness,shared_write,PlayersSeam::UpdatePlayersFinish,2
 seams,harness,shared_write,Seams::ai,2
 seams,harness,shared_write,Seams::economy,2
@@ -4768,6 +4778,7 @@ seams,harness,shared_write,UnitsSeam::StartScript,2
 seams,harness,shared_write,UnitsSeam::StartScriptWithArgs,2
 seams,harness,shared_write,UnitsSeam::StartScriptWithArgsByIndex,2
 seams,harness,shared_write,UnitsSeam::UnitRefUnlink,2
+seams,harness,shared_write,UnitsSeam::UpdateAllUnits,2
 seams,harness,shared_write,UnitsSeam::UpdateSfxOccupy,2
 seams,harness,shared_write,UnitsSeam::UpdateUnit,2
 seams,harness,shared_write,WeaponsSeam::ClaimWeapons,2

@@ -946,7 +946,6 @@ void OpenMain2Layout()
 
 #include "../../interfaces/ref.h"
 #include "../harness/harness.h"
-#include "../game/scheduler.h"
 #include "../../interfaces/rand_stream.h"
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
@@ -1037,7 +1036,7 @@ void __stdcall RunGameSteps(int showStats)
             AccumulateProfileTime(&g_game->timers, 0);
         }
         HarnessRecordPhase(1);
-        SchedUnitsPhase();
+        g_seams.units->UpdateAllUnits();
         UpdateAutoFollow();
         HarnessPhase(1);
         DrainSimEvents();
@@ -1050,7 +1049,7 @@ void __stdcall RunGameSteps(int showStats)
         HarnessPhase(3);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 8);
-        SchedPlayersPhase(RAND_STREAM_MAIN);
+        g_seams.players->UpdatePlayers();
         HarnessPhase(4);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 2);

@@ -34,7 +34,7 @@ extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
 struct ConstructedElement {
     ConstructedElement();
     ~ConstructedElement();
-    int field_0;
+    int value;
 };
 ConstructedElement::ConstructedElement() {}
 ConstructedElement::~ConstructedElement() {}

@@ -13,6 +13,8 @@ class CobScript;
 class UnitMotion;
 class UnitResources;
 #include "../game/economy_events.h"
+#include "../../interfaces/economy.h"
+#include "../../interfaces/services.h"
 struct SpotStateUnitView;
 struct Object3do;
 

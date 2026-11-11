@@ -45,7 +45,7 @@ void SchedEconomyEffect(const EconomyEvent* effect)
     case ECONOMY_EFFECT_EXTRACTOR: {
         Unit* unit = UnitOfHandle(effect->unit);
         if (unit->script != nullptr)
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", 0, 0, 1, effect->value, 0, 0, 0);
+            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", nullptr, 0, 1, effect->value, 0, 0, 0);
         break;
     }
     case ECONOMY_EFFECT_SHARE:

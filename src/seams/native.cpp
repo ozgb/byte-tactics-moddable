@@ -121,6 +121,7 @@ Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../units/unit_scripts.h"
 #include "../units/unit_position.h"
 #include "../game/scheduler.h"
+#include "../../interfaces/rand_stream.h"
 #include "../orders/order_queue.h"
 
 

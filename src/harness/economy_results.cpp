@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "economy_results.h"
+#include "../../interfaces/economy.h"
 
 static const unsigned long long kPrime = 0x100000001b3ull;
 

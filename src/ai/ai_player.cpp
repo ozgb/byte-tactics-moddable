@@ -210,6 +210,7 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
 #include "../../interfaces/services.h"
+#include "../../interfaces/economy.h"
 #include "../units/squads.h"
 #include "../util/math.h"
 #include "pathfind.h"

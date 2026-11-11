@@ -976,6 +976,7 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
 
 #include "../../interfaces/seams.h"
 #include "../game/economy_events.h"
+#include "../../interfaces/economy.h"
 
 // FUNCTION: 0x41ba60
 int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)

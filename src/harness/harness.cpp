@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include "../../interfaces/host.h"
 #include "../../interfaces/services.h"
+#include "../../interfaces/economy.h"
 
 #include "../game/game.h"
 #include "../map/mission.h"
@@ -2909,7 +2910,8 @@ static void VisitEconomyResults()
         DumpPrefix(path);
         fputs("hex:", s_dump);
         const unsigned char* bytes = (const unsigned char*)r->account;
-        for (unsigned b = 0; b < sizeof r->account; b++)
+        const unsigned accountSize = sizeof r->account;
+        for (unsigned b = 0; b < accountSize; b++)
             fprintf(s_dump, "%02x", bytes[b]);
         fputc('\n', s_dump);
     }

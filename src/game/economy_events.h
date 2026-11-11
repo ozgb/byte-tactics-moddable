@@ -14,7 +14,7 @@ inline EconUnit EconHandleOf(Unit* unit)
     return Ref<Unit>(unit).offset;
 }
 
-inline int EconEmit(int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal, const EconAccount* account = 0)
+inline int EconEmit(int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal, const EconAccount* account = nullptr)
 {
     EconomyEvent event;
     memset(&event, 0, sizeof(event));

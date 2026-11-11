@@ -142,6 +142,7 @@ unsigned short __stdcall GetCellFeature(Cell* cell)
 
 #include "../../interfaces/seams.h"
 #include "../game/economy_events.h"
+#include "../../interfaces/economy.h"
 
 // FUNCTION: 0x421eb0
 Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def)

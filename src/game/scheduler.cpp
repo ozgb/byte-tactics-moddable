@@ -4,7 +4,9 @@
 #include "../../interfaces/services.h"
 #include "../../interfaces/ref.h"
 #include "../network/player.h"
-#include "../units/unit_def.h"
+#include "../../interfaces/economy.h"
+#include "../../interfaces/rand_stream.h"
+#include "../units/cob_script.h"
 #include "../units/unit.h"
 #include "game.h"
 #include "scheduler.h"
@@ -42,7 +44,7 @@ void SchedEconomyEffect(const EconomyEvent* effect)
         break;
     case ECONOMY_EFFECT_EXTRACTOR: {
         Unit* unit = UnitOfHandle(effect->unit);
-        if (unit->script)
+        if (unit->script != nullptr)
             g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", 0, 0, 1, effect->value, 0, 0, 0);
         break;
     }

@@ -184,6 +184,7 @@ public:
 
 #include "../../link/globals.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/economy.h"
 
 struct GafSequenceRecord;
 struct GafFileIndex;

@@ -3,7 +3,6 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/ref.h"
-#include "../state/block.h"
 #include "../network/player.h"
 #include "../network/player_info.h"
 #include "../game/game.h"
@@ -104,7 +103,7 @@ static int __stdcall WorldUnitInfo(EconUnit unit, EconUnitInfo* out)
     out->cellY = u->cell.y;
     out->footprintX = u->footprint.x;
     out->footprintY = u->footprint.y;
-    out->hasScript = u->script != 0;
+    out->hasScript = u->script != nullptr;
     return (u->flags & 0x10000000) != 0;
 }
 

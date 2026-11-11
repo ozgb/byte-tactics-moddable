@@ -114,6 +114,7 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
                            int a, int b, int c);
 #include "../graphics/particles.h"
 #include "../game/economy_events.h"
+#include "../../interfaces/economy.h"
 char* __stdcall lstrcpynA(char* dest, const char* src, int count);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
 extern char DAT_004fc6e8[];

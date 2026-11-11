@@ -947,6 +947,7 @@ void OpenMain2Layout()
 #include "../../interfaces/ref.h"
 #include "../harness/harness.h"
 #include "../game/scheduler.h"
+#include "../../interfaces/rand_stream.h"
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
 #endif

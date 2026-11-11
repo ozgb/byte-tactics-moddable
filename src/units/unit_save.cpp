@@ -148,6 +148,7 @@ void __stdcall LoadUnits(HapiBank* file)
 #include "../../interfaces/seams.h"
 #include "../../interfaces/orders.h"
 #include "../game/economy_events.h"
+#include "../../interfaces/economy.h"
 
 // FUNCTION: 0x4010b0
 static void SaveUnitAccounts(Unit* info, HapiBank* file)

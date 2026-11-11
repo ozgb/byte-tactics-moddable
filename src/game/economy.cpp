@@ -7,6 +7,9 @@
 #include "../files/files_api.h"
 #include "../../interfaces/seams.h"
 #include "economy.h"
+#include "../../interfaces/economy.h"
+#include "../../interfaces/ref.h"
+#include "../../interfaces/state_writer.h"
 #include "../state/block.h"
 #include "../network/resource_share.h"
 
@@ -168,7 +171,7 @@ void __stdcall EconomyInit(const EconMapInfo*, const EconomyWorldView* world, vo
 void* __stdcall EconomyShutdown()
 {
     void* region = s_region;
-    s_region = 0;
+    s_region = nullptr;
     return region;
 }
 

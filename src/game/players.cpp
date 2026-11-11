@@ -10,6 +10,7 @@
 #include "../files/files_api.h"
 #include "players.h"
 #include "economy_events.h"
+#include "../../interfaces/economy.h"
 #include "../util/tdf.h"
 
 struct Player;

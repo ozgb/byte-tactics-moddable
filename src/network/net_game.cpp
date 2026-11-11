@@ -3894,6 +3894,8 @@ int CountCombatPlayers()
     return count;
 }
 
+extern "C" int __cdecl HarnessEconomyEvent(int kind, ...);
+
 // Shared-resource tick: every 60 game ticks, if the local player is over its
 // energy (or metal) reserve and has the matching flag, give up to a third (a
 // half for metal) of the surplus to the neediest ally that shows up in the
@@ -3928,6 +3930,7 @@ void __stdcall UpdateResourceSharing(Player* player)
             // The min() must be a ternary into a fresh local, not an if.
             float result = amount < limit ? amount : limit;
             amount = result;
+            HarnessEconomyEvent(18, player->index, 0, 2, 0.0f, amount, found->index, 1, 0);
             TransferEnergy(player->index, found->index, amount, 1);
         }
 
@@ -3953,6 +3956,7 @@ void __stdcall UpdateResourceSharing(Player* player)
             // The min() must be a ternary into a fresh local, not an if.
             float result = amount < limit ? amount : limit;
             amount = result;
+            HarnessEconomyEvent(18, player->index, 0, 1, amount, 0.0f, found->index, 1, 0);
             TransferMetal(player->index, found->index, amount, 1);
         }
     }

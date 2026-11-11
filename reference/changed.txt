@@ -1,3 +1,7 @@
+0x401110 UnitResources::LoadUnitAccounts
+0x401360 UpdatePlayerEconomy
+0x402640 BuildingBuildOrder
+0x402b70 BuildWeaponOrder
 0x406f80 ReactToAttack
 0x408100 ScoutTimer::OnTimer
 0x408620 BuildTimer::TryIssueIdleFactoryBuildOrder
@@ -17,6 +21,8 @@
 0x419670 IssueMobileBuildOrders
 0x41aa00 HandleBuildPanelClick
 0x41b8d0 FinishConstruction
+0x41ba60 AddBuildProgress
+0x41bd10 AddRepairProgress
 0x41c110 MarkSelectionOrdersDirty
 0x41c150 UpdateBuildMenuIfFocusUnit
 0x41c640 AccumulateScreenShake
@@ -26,10 +32,12 @@
 0x421620 StartExplodePiece
 0x421700 BreakPieceIntoDebris
 0x4233a0 StartFeatureBurning
+0x4237d0 ReclaimFeature
 0x425b80 UpdateMenuSparks
 0x432610 LoadSavedGameState
 0x4326b0 SaveGameFile
 0x435da0 Mission::LoadMission
+0x437840 UpdateMetalExtraction
 0x437cd0 InitMeteors
 0x437de0 UpdateMeteors
 0x43e180 GetPieceAngles
@@ -37,6 +45,10 @@
 0x44fc10 NetCondenser::SendPacket
 0x450380 AnnouncePlayerLeft
 0x453d40 HandleNetPackets
+0x457d30 UpdateResourceSharing
+0x464700 InitPlayerSlot
+0x464b30 TransferMetal
+0x464c60 TransferEnergy
 0x464f80 UpdatePlayers
 0x466c20 UpdateRadarMapped
 0x466dc0 DrawRadarUnits
@@ -73,6 +85,7 @@
 0x47f8c0 RemoveSpeechOfUnit
 0x47fd70 SpeechQueue::PlaySpeech
 0x4851c0 FindHighestPointOnLine
+0x485a40 InitUnitFromType
 0x4864b0 KillUnit
 0x4866d0 ApplyUnitDeath
 0x489ce0 ApplyUnitDamage
@@ -103,6 +116,7 @@
 0x497180 LoadMatch
 0x497f40 LoadingScreenFrame
 0x49be60 DrawProjectiles
+0x49e1a0 UpdateUnitWeapons
 0x49e830 GameMain
 0x49f6c0 PlayWavFromDisk
 0x4b5cc0 WindowProc

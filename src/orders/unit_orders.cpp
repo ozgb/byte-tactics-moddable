@@ -676,9 +676,7 @@ static inline Point16 GridCell(Vec3 pos, Point16 size)
     return cell;
 }
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-void StartScreenFade();
-void StepScreenFade();
+extern "C" int __cdecl HarnessEconomyEvent(...);
 
 // Order handler "Nanolathing" of a mobile builder: places the unit to build
 // at the script's build piece, then spends worker time on it. When the order
@@ -706,6 +704,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
             } else {
                 unit->resourceSlot.metalMake += (double)refund;
             }
+            HarnessEconomyEvent(4, -1, unit, 2, 0.0f, refund, 0, 1, 0);
             FinishConstruction(unit, order->target.owner);
             DamageUnit(unit, order->target.owner, 30000, 9, 0);
         }
@@ -829,7 +828,8 @@ int __stdcall BuildWeaponOrder(Unit* unit, Order* order, int unused)
         fprev = prev;
         int metalCharge = (int)(fnext * t->metalCost / ftotal) - (int)(fprev * t->metalCost / ftotal);
         energyCharge = (int)(fnext * t->energyCost / ftotal) - (int)(fprev * t->energyCost / ftotal);
-        if (unit->resourceSlot.RequestEnergyAndMetal(energyCharge, metalCharge)) {
+        if (HarnessEconomyEvent(2, -1, unit, 3, (float)energyCharge, (float)metalCharge, 0,
+                                unit->resourceSlot.RequestEnergyAndMetal(energyCharge, metalCharge), 0)) {
             order->progress = next;
             if (next >= t->buildTime)
                 return 1;
@@ -1714,6 +1714,22 @@ int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
     return 7;
 }
 
+extern int g_economyPad0;
+extern int g_economyPad1;
+extern int g_economyPad2;
+extern int g_economyPad3;
+extern int g_economyPad4;
+extern int g_economyPad5;
+extern int g_economyPad6;
+extern int g_economyPad7;
+extern int g_economyPad8;
+extern int g_economyPad9;
+extern int g_economyPad10;
+extern int g_economyPad11;
+extern int g_economyPad12;
+extern int g_economyPad13;
+extern int g_economyPad14;
+extern int g_economyPad15;
 // FUNCTION: 0x405d90
 void DamagedAllyCollector::CollectDamagedAlly(Unit* unit)
 {

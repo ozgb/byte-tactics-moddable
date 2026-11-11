@@ -2734,6 +2734,8 @@ int __stdcall SendScriptCallByName(Unit* obj, char* name, char field_5, int fiel
                            unsigned short field_e, unsigned short field_12);
 void __stdcall UpdateBuildMenuIfFocusUnit(Unit* unit);
 
+extern "C" int __cdecl HarnessEconomyEvent(int kind, ...);
+
 // FUNCTION: 0x49e1a0
 void __stdcall UpdateUnitWeapons(Unit* unit) {
     unsigned short heading;
@@ -2827,8 +2829,10 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
             }
             int m = (attached->flags.b.commandFire) ? 0x800 : 0x400;
             unit->f_ba.w |= m;
-            if (!attached->flags.b.stockpile)
-                unit->resourceSlot.SpendEnergyAndMetal(attached->energyPerShot, attached->metalPerShot);
+            if (!attached->flags.b.stockpile) {
+                HarnessEconomyEvent(3, -1, unit, 3, (float)attached->energyPerShot, (float)attached->metalPerShot, 0,
+                                    unit->resourceSlot.SpendEnergyAndMetal(attached->energyPerShot, attached->metalPerShot), 0);
+            }
         } else {
             unit->f_ba.b[1] |= 0x10;
         }

@@ -450,7 +450,7 @@ void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
     InitUnitFromType(unit, pos, param_5);
     InitUnitScript(unit);
     g_seams.weapons->InitUnitWeaponSlots(unit);
-    g_seams.economy->UpdateMetalExtraction(EconHandleOf(unit));
+    ScheduleMetalExtraction(EconHandleOf(unit));
     if (type->mobile == 1) {
         g_seams.orders->NewUnitMotion(unit);
         unit->angles.heading = unit->def->buildangleUnsigned;
@@ -476,7 +476,7 @@ static inline void __stdcall InitSpawnedUnit(unsigned short unitType, Vec3 pos,
     InitUnitFromType(unit, pos, param_5);
     InitUnitScript(unit);
     g_seams.weapons->InitUnitWeaponSlots(unit);
-    g_seams.economy->UpdateMetalExtraction(EconHandleOf(unit));
+    ScheduleMetalExtraction(EconHandleOf(unit));
     if (type->mobile == 1) {
         g_seams.orders->NewUnitMotion(unit);
         unit->angles.heading = unit->def->buildangleUnsigned;

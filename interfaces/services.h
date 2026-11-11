@@ -47,6 +47,10 @@ void __stdcall HarnessPathEvent(const PathEvent* event, const PathPoint* points,
 struct EconomyEvent;
 // In test mode, records an economy event or effect as the scheduler applies it, with the outcome of its application, for the trace's economy events.
 void __stdcall HarnessEconomyEvent(const EconomyEvent* event, int outcome);
+// Applies an economy event through the engine's scheduler, which records it, and returns its outcome; its effect is visible to the next read.
+int __stdcall ScheduleEconomyEvent(const EconomyEvent* event);
+// Has the engine's scheduler run economy's UpdateMetalExtraction for a unit (an economy unit handle) and apply its effects before it returns.
+void __stdcall ScheduleMetalExtraction(unsigned int unit);
 
 // Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);

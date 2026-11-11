@@ -5,7 +5,7 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/ref.h"
-#include "scheduler.h"
+#include "../../interfaces/services.h"
 
 struct Unit;
 
@@ -25,7 +25,7 @@ inline int EconEmit(int kind, int player, EconUnit unit, unsigned int resources,
     event.energy = energy;
     event.metal = metal;
     event.account = account;
-    return SchedEconomy(&event);
+    return ScheduleEconomyEvent(&event);
 }
 
 template <class U>

@@ -22,7 +22,7 @@ static Unit* UnitOfHandle(EconUnit handle)
     return ref.get();
 }
 
-int SchedEconomy(const EconomyEvent* event)
+int __stdcall ScheduleEconomyEvent(const EconomyEvent* event)
 {
     int outcome = g_seams.economy->Apply(event);
     HarnessEconomyEvent(event, outcome);
@@ -49,6 +49,11 @@ void SchedEconomyEffect(const EconomyEvent* effect)
             g_seams.players->TransferMetal((unsigned char)effect->player, (unsigned char)effect->value, effect->energy, 1);
         break;
     }
+}
+
+void __stdcall ScheduleMetalExtraction(unsigned int unit)
+{
+    g_seams.economy->UpdateMetalExtraction(unit);
 }
 
 void SchedUnitsPhase()

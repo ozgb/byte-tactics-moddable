@@ -43,15 +43,16 @@ For each issue closed by a pull request you merged:
   2. **Fold it** into an open issue that touches the same code, as a task there.
   3. **File it** as a new issue only when the plan needs it and no open issue fits, with its blockers set in both places (`docs/team.md`, "Issue states").
 - **#2:** keep its order section and decisions in step with what merged.
+- **Leftovers of a parked issue:** fold them into it or drop them; a new issue filed from them is labelled `parked`.
 
 ### 3. Groom upcoming issues
 
-Groom every issue labelled `needs-grooming` and not `needs-human`, then every **upcoming** issue: open issues whose blockers are all closed or have a pull request under review. An issue is groomed when the lead could start it without a decision the plan doesn't make, it fits in one pull request by `docs/team.md`, "Issue size", and its "Done when" is checkable.
+Skip every issue labelled `parked`. Groom every issue labelled `needs-grooming` and not `needs-human`, then every **upcoming** issue: open issues whose blockers are all closed or have a pull request under review. An issue is groomed when the lead could start it without a decision the plan doesn't make, it fits in one pull request by `docs/team.md`, "Issue size", and its "Done when" is checkable.
 
 - **Flesh out** an issue whose tasks are too vague: name the files, functions, data and commands, from the code as it stands now.
 - **Split** an issue only along a real boundary ("Issue size"), never for size, and never a sub-issue a second time. Each part gets its own tasks, CI checks and "Done when", and blockers between them; the original stays open as their parent.
 - **Combine** open issues that touch the same files and run the same gate into one, and close the rest as merged into it.
 - **Answer** what the lead asked in its `needs-grooming` comment, then remove the label. When the answer is a major architecture decision, consult the human instead and keep the label until they have answered.
-- **Keep the queue stocked.** Keep at least 3 issues available to claim beyond those the lead holds: groomed, unblocked, unassigned and not labelled `needs-grooming`. When there are fewer, file and groom the next parts in #2's order, sized by "Issue size". Never split an issue to stock the queue.
+- **Keep the queue stocked.** Keep at least 3 issues available to claim beyond those the lead holds: groomed, unblocked, unassigned and not labelled `needs-grooming`. When there are fewer, file and groom the next parts of #2's "Priority now", sized by "Issue size"; when it has none left, say so in the report rather than unparking or filing other work. Never split an issue to stock the queue.
 
 **Decide** what the plan leaves open, and consult the human on every major architecture decision. Choose, or recommend, by #2's goals (conformity first, then moddability, then the rest) and its decisions, and the work already merged. Record each decision with its reason on the issue it affects; a decision that shapes more than one issue also goes into #2's decisions. Propose revising one of #2's decisions when merged work shows it doesn't hold, and say what showed it; the human decides.

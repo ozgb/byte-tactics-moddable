@@ -71,6 +71,7 @@ Only the maintainer merges. A branch doesn't have to contain `moddable`'s head t
 |---|---|---|---|
 | `needs-grooming` | the lead (or anyone) | An issue needs a decision the plan doesn't make, or has parts that must land in order ("Issue size"). A comment says what's missing. | the maintainer, after fleshing out or splitting it |
 | `needs-human` | the maintainer, alongside `needs-grooming` | The issue waits on a major architecture decision. A comment asks the question. | the human, after answering it |
+| `parked` | the human | The issue is outside #2's "Priority now". Nobody claims, grooms or splits it, and the queue isn't stocked from it. | the human |
 
 ## Issue size
 
@@ -103,7 +104,7 @@ A pull request that makes a major decision the human hasn't made gets a `changes
 
 ## Issue states
 
-- **Available:** open, no assignee, no open blockers (`blocked_by` API, mirrored in the "Blocked by" line), not labelled `needs-grooming`.
+- **Available:** open, no assignee, no open blockers (`blocked_by` API, mirrored in the "Blocked by" line), not labelled `needs-grooming` or `parked`.
 - **Claimed:** assigned, with a "Lead: Claimed" comment. The lead holds up to 10 claims at a time, counting each from its claim until its pull request merges or it is released. Claims that change the same files, such as the replay schema or the generated `data/` files, still merge one at a time, oldest pull request first.
 - **Done:** closed by the merged pull request's `Closes #N`.
 

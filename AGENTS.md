@@ -65,7 +65,7 @@ Take an open, groomed sub-issue of #2 with no open blockers and no assignee:
 
 ```sh
 gh api --paginate repos/ozgb/byte-tactics-moddable/issues/2/sub_issues \
-  --jq '.[] | select(.state=="open" and (.assignees | length) == 0 and ([.labels[].name] | index("needs-grooming") | not)) | .number'
+  --jq '.[] | select(.state=="open" and (.assignees | length) == 0 and ([.labels[].name] | (index("needs-grooming") or index("parked")) | not)) | .number'
 gh api repos/ozgb/byte-tactics-moddable/issues/<N>/dependencies/blocked_by \
   --jq '[.[] | select(.state=="open") | .number]'      # must print []
 ```

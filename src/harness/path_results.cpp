@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "path_results.h"
+#include "../../interfaces/pathfinding.h"
 
 static const unsigned long long kPrime = 0x100000001b3ull;
 
@@ -40,7 +41,7 @@ int PathResultsAdd(PathResults* results, const PathEvent* event, const PathPoint
     if (results->count == results->capacity) {
         unsigned int grown = results->capacity == 0 ? 64 : results->capacity * 2;
         PathResult* items = (PathResult*)realloc(results->items, grown * sizeof(PathResult));
-        if (items == 0)
+        if (items == nullptr)
             return 0;
         results->items = items;
         results->capacity = grown;

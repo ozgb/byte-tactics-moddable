@@ -547,8 +547,10 @@ signatures are `signatures.services` of the manifest.
 | `HapiBank_SetIntegerItem` | `[handle, linear, int] -> int` | writes an integer item of the open account |
 | `HapiBank_GetIntegerItem` | `[handle, linear, int] -> int` | reads an integer item, or the default |
 
-The services interface is at major 1 and minor 8 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
-`interfaces/services.h`). `CommandArgs_Count` came with minor 8, an addition: a module built without it needs nothing.
+The services interface is at major 1 and minor 10 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+`interfaces/services.h`). `CommandArgs_Count` came with minor 8, the goal-area services (`PathGoalContains`,
+`PathGoalDistance`, `PathGoalCells`) with minor 9 and `HarnessPathEvent`, which the players phase calls for the trace's
+path results, with minor 10. Each is an addition: a module built without it needs nothing.
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter

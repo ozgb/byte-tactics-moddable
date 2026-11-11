@@ -62,7 +62,7 @@ struct PlayerInfo {
     unsigned char versionMajor;
     unsigned char versionMinor;
     unsigned int mapCrc;
-    char unknown_ad[0xb9 - 0xad];
+    char matchSetup[0xb9 - 0xad];
 };
 #pragma pack(pop)
 

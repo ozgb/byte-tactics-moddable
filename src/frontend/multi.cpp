@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "../game/match_setup.h"
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 #include <math.h>
@@ -4320,6 +4321,8 @@ void OpenBattleRoom()
         info->fixedloc = g_game->options->fixedLocations;
         info->commander = g_game->multiCommanderDeath;
     }
+    if (host)
+        MatchSetupToInfo(info);
 
     if (!host || g_game->bits_2c74.locked) {
         for (char** p = g_hostOnlyGadgets; *p; p++)

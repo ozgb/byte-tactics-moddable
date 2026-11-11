@@ -32,6 +32,7 @@ void __stdcall ForceNeighborFootprintReclaim(Unit* obj);
 void __stdcall SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos);
 int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, int h);
 unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y);
+unsigned int __stdcall GetTerrainPassValue(MovementClass* obj, int x, int y);
 int __stdcall IsPadSlotFree(Unit* pad, int id);
 void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
 void __stdcall VisitObjectsInRange(Vec3* pos, int range, UnitVisitor* visitor);

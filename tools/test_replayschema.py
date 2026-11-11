@@ -898,16 +898,18 @@ class Polymorphic(unittest.TestCase):
         self.assertIn('{ "attached", offsetof(Order, attached), sizeof(((Order*)nullptr)->attached), ROK_ORDER, RK_REF, ROK_ORDERFX,', files[rs.SCHEMA_H])
 
     def test_an_argument_of_the_base_type_is_recorded_as_the_base(self):
-        files, errors, model = self.generated()
+        ann = annotations()
+        ann["subsystems"]["orders"]["slots"] = {"AppendOrder": {"args": {"node": {"mode": "object", "kind": "OrderFx", "poly": "OrderFx"}}}}
+        files, errors, model = self.generated(ann)
         self.assertEqual(errors, [])
-        arg = model["subsystems"]["orders"]["slots"]["OrderFxAddFlags"]["args"][0]
+        arg = model["subsystems"]["orders"]["slots"]["AppendOrder"]["args"][1]
         self.assertEqual((arg["mode"], arg["kind"], arg["poly"]), ("object", "OrderFx", "OrderFx"))
-        self.assertIn("roots.Add(ROK_ORDERFX, a0);", files[rs.HOOKS_H])
+        self.assertIn("roots.Add(ROK_ORDERFX, a1);", files[rs.HOOKS_H])
 
     def test_an_argument_note_of_the_base_needs_poly(self):
         ann = annotations()
-        ann["subsystems"]["orders"]["slots"] = {"OrderFxAddFlags": {"args": {"self": {"mode": "object", "kind": "OrderFx"}}}}
-        self.assertTrue(any("the argument self points at the base kind OrderFx and needs" in e for e in self.errors(ann)))
+        ann["subsystems"]["orders"]["slots"] = {"AppendOrder": {"args": {"node": {"mode": "object", "kind": "OrderFx"}}}}
+        self.assertTrue(any("the argument node points at the base kind OrderFx and needs" in e for e in self.errors(ann)))
 
     def test_poly_of_a_kind_that_is_no_base_is_an_error(self):
         ann = annotations()

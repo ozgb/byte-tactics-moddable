@@ -230,7 +230,7 @@ PLATFORM_NAME = re.compile(r"(^|_)(hwnd|hinst|handle|module|device|process|dll|p
                            r"windows_sound|window_(class|name)|blit_lock|lzss_lock|screen_lock|squash_thread|"
                            r"image_help")
 PLATFORM_ALLOCATORS = {"VirtualAlloc"}
-SIM_ALLOCATORS = {"SimAlloc": "operator new", "SimAllocTagged": "GameAllocIgnoreTag", "SimRealloc": "realloc"}
+SIM_ALLOCATORS = {"SimAlloc": "operator new", "SimAllocTagged": "GameAllocIgnoreTag", "SimAllocRegion": "GameAllocIgnoreTag", "SimRealloc": "realloc"}
 ALLOCATORS = (set(hazards.ALLOCATORS) | {"calloc", "GameAllocIgnoreTag", "GameAllocShared", "GameAllocThunk",
                                          "VirtualAlloc"} | set(SIM_ALLOCATORS))
 TEMPORARIES = ("MaterializeTemporaryExpr", "CXXBindTemporaryExpr")

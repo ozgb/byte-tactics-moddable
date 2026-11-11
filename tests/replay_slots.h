@@ -329,6 +329,26 @@ int __stdcall Imp_ai_GetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a
     return EnterList(t, a4, a5);
 }
 
+void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "pathfinding.CellsChanged");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    Space(t);
+    ReplayValue(t, a5);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 WindMeteorsSeam g_native_wind_meteors = {
     UpdateWind,
     UpdateMeteors,
@@ -1199,6 +1219,7 @@ LosRadarSeam g_import_los_radar;
 NetworkSeam g_import_network;
 PlayersSeam g_import_players;
 AiSeam g_import_ai;
+PathfindingSeam g_import_pathfinding;
 
 void BindSeams()
 {
@@ -1236,4 +1257,6 @@ void BindSeams()
     g_seams.ai = &g_import_ai;
     g_import_ai.GetVisibleEnemiesInRadius = Imp_ai_GetVisibleEnemiesInRadius;
     g_import_ai.GetVisibleEnemiesInRadiusList = Imp_ai_GetVisibleEnemiesInRadiusList;
+    g_seams.pathfinding = &g_import_pathfinding;
+    g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
 }

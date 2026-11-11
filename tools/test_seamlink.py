@@ -288,5 +288,52 @@ class SeamLinkTest(unittest.TestCase):
         self.assertIn("wind_meteors: 2 violations (1 code, 1 data)", text)
 
 
+class PrivateStateTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Search,src/ai/pathfind.cpp,pathfinding,x,
+Step,src/ai/pathfind.cpp,pathfinding,x,
+Order,src/orders/orders.cpp,orders,x,
+Move,src/units/units.cpp,units,x,
+"""
+
+    def check(self, rows):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f"0x1,{f},{p},{k},{t}\n" for f, p, k, t in rows))
+            return seamlink.private_state(root)
+
+    def test_owner_may_touch_everything(self):
+        rows = [("Search", "src/ai/pathfind.cpp", "field_write", "Pathfinder::grid"),
+                ("Step", "src/ai/pathfind.cpp", "field_read", "Game::pathfinder"),
+                ("Search", "src/ai/pathfind.cpp", "deref_write", "*PathCell")]
+        self.assertEqual(self.check(rows), [])
+
+    def test_other_subsystem_field_access_is_found(self):
+        found = self.check([("Order", "src/orders/orders.cpp", "field_read", "Pathfinder::stepsPerTick")])
+        self.assertEqual(found, [("orders", "Order", "field_read", "Pathfinder::stepsPerTick")])
+
+    def test_game_pathfinder_item_is_private(self):
+        found = self.check([("Move", "src/units/units.cpp", "field_write", "Game::pathfinder")])
+        self.assertEqual([f[0] for f in found], ["units"])
+
+    def test_deref_of_a_region_type_is_found(self):
+        found = self.check([("Move", "src/units/units.cpp", "deref_read", "*Ref<Node>"),
+                            ("Move", "src/units/units.cpp", "deref_write", "*PathCell")])
+        self.assertEqual(len(found), 2)
+
+    def test_similar_names_and_calls_are_not_found(self):
+        rows = [("Order", "src/orders/orders.cpp", "field_read", "Game::pathfinderCount"),
+                ("Order", "src/orders/orders.cpp", "field_read", "PathEvent::kind"),
+                ("Order", "src/orders/orders.cpp", "call", "Pathfinder::Submit")]
+        self.assertEqual(self.check(rows), [])
+
+    def test_unowned_function_is_found(self):
+        found = self.check([("Mystery", "src/x.cpp", "field_read", "OpenHeap::count")])
+        self.assertEqual(found[0][0], "unowned")
+
+
 if __name__ == "__main__":
     unittest.main()

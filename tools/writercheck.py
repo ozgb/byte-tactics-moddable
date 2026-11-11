@@ -1,18 +1,18 @@
 """Check that a state-writing function is pure, stateless and free of scenario logic, from the relocations of the build.
 
-    uv run tools/projectioncheck.py --objects @build/modern/objects.rsp           # print every violation
-    uv run tools/projectioncheck.py --objects @build/modern/objects.rsp --check
-    uv run tools/test_projectioncheck.py                                           # tests, on hand-written units
+    uv run tools/writercheck.py --objects @build/modern/objects.rsp           # print every violation
+    uv run tools/writercheck.py --objects @build/modern/objects.rsp --check
+    uv run tools/test_writercheck.py                                           # tests, on hand-written units
 
 The state writer of the default pathfinder (PathfindingWriteState, interfaces/pathfinding.h) hands the host the state that
 decides what the module does next, through the functions of a StateWriter, and changes nothing and keeps nothing. The code of one function is a section of an object whose relocations name the symbols it needs
-(tools/seamlink.py reads them). From the projection function the check follows every call to a function that some
+(tools/seamlink.py reads them). From the writer function the check follows every call to a function that some
 object of the build defines, and judges each symbol that function references:
 
   region root   g_game, the pointer through which the region is reached, and SimBlockBase and SimOwns, which
                 Ref<T>::get calls to turn an offset into an address: the writer may read them
   literal       a string constant (the name of a field), which is read only
-  own           a function of the build that the projection calls, which is walked in turn
+  own           a function of the build that the writer calls, which is walked in turn
   anything else is a violation: a global or a static (state the call could keep or change), a library function
                 (memcpy and the like write through their arguments), an import, or a function that no object defines.
 
@@ -32,7 +32,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from seamlink import unit_of, response, Unit
 from sources import ROOT, base_name
 
-PROJECTIONS = (("src/ai/pathfind.cpp", "PathfindingWriteState"),)
+WRITERS = (("src/ai/pathfind.cpp", "PathfindingWriteState"),)
 ROOT_SYMBOLS = ("?g_game@@3PAUGame@@A", "?SimBlockBase@@YAPAXXZ", "?SimOwns@@YA_NPBX@Z")
 LITERAL = "??_C@"
 SCENARIO = re.compile(r"tick|scenario|harness|replay|testmode|test_mode", re.I)
@@ -41,7 +41,7 @@ WRITES = ("field_write", "deref_write", "global_write", "field_maybe_written", "
 
 
 def walk(units: list, file: str, name: str) -> tuple:
-    """(violations, walked): the (function, symbol, kind) triples of the projection `name` of `file` and the base names of the
+    """(violations, walked): the (function, symbol, kind) triples of the writer `name` of `file` and the base names of the
     functions walked. A kind is `scenario` or `impure`."""
     defined = {}
     for unit in units:
@@ -81,9 +81,9 @@ def writes(root: Path, file: str, names: list) -> list:
     return sorted(found)
 
 
-def problems(units: list, root: Path, projections: tuple = PROJECTIONS) -> list:
+def problems(units: list, root: Path, writers: tuple = WRITERS) -> list:
     out = []
-    for file, name in projections:
+    for file, name in writers:
         found, names = walk(units, file, name)
         for function, symbol, kind in found:
             if kind == "missing":
@@ -108,7 +108,7 @@ def main(argv=None) -> int:
     for line in bad:
         print(line)
     if not bad and not args.check:
-        print("projectioncheck: %s are pure, stateless and free of scenario logic" % ", ".join(n for _, n in PROJECTIONS))
+        print("writercheck: %s are pure, stateless and free of scenario logic" % ", ".join(n for _, n in WRITERS))
     return 1 if bad else 0
 
 

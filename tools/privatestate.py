@@ -21,7 +21,7 @@ tables Pathfinder, PathfinderSearch and Node of data/trace_schema.json, the cell
 the three globals. EXPOSED maps each of those fields to the log item that holds it. --check fails when
   * a field of those tables has no entry in EXPOSED (the written state grew a field this check does not know),
   * an item of EXPOSED has no read by pathfinding in any stored scenario: the writer shows state that the simulation never
-    reads, a shadow field. data/projection_shadow_allow.csv (item,reason) lists the ones that are 3.1c state the trace has always
+    reads, a shadow field. data/shadow_field_allow.csv (item,reason) lists the ones that are 3.1c state the trace has always
     hashed, each with a reason; a row for an item that is read is stale.
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
@@ -46,7 +46,7 @@ ACCESS_DIR = ROOT / "data/access"
 PHASES_DIR = ROOT / "data/access_phases"
 PRESENTATION_DIR = ROOT / "data/access_presentation"
 SCHEMA = ROOT / "data/trace_schema.json"
-ALLOW = ROOT / "data/projection_shadow_allow.csv"
+ALLOW = ROOT / "data/shadow_field_allow.csv"
 ALLOW_COLUMNS = ["item", "reason"]
 NONE = "-"
 REGION_ROOT = "pathfinder"

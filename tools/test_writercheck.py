@@ -1,13 +1,13 @@
-"""Tests for projectioncheck.py, on hand-written units and temporary trees.
+"""Tests for writercheck.py, on hand-written units and temporary trees.
 
-    uv run tools/test_projectioncheck.py
+    uv run tools/test_writercheck.py
 """
 
 import tempfile
 import unittest
 from pathlib import Path
 
-import projectioncheck
+import writercheck
 from seamlink import Unit
 
 PROJECT = "?PathfindingWriteState@@YGXPBUStateWriter@@@Z"
@@ -18,7 +18,7 @@ FILE = "src/ai/pathfind.cpp"
 RWSETS = "address,function,file,kind,target\n"
 
 
-class ProjectionCheckTest(unittest.TestCase):
+class WriterCheckTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
@@ -34,7 +34,7 @@ class ProjectionCheckTest(unittest.TestCase):
         return unit
 
     def check(self, *units):
-        return projectioncheck.problems(list(units), self.root)
+        return writercheck.problems(list(units), self.root)
 
     def test_reading_the_root_is_allowed(self):
         self.rows(("PathfindingWriteState", "field_read", "Game::pathfinder"))
@@ -80,7 +80,7 @@ class ProjectionCheckTest(unittest.TestCase):
         self.rows(("RunSearches", "field_write", "Pathfinder::steps"))
         self.assertEqual(self.check(self.unit([GAME])), [])
 
-    def test_a_missing_projection_is_a_problem(self):
+    def test_a_missing_writer_is_a_problem(self):
         self.rows()
         found = self.check(Unit(FILE, code={"?Other@@YAXXZ"}))
         self.assertEqual(len(found), 1)

@@ -150,7 +150,7 @@ static void __stdcall WriterRun(int) {}
 
 static const StateWriter s_writer = { WriterBegin, WriterInt, WriterBytes, WriterHandle, WriterRun };
 
-static unsigned long long HashProjection()
+static unsigned long long HashWritten()
 {
     s_hash = 0xcbf29ce484222325ull;
     s_lines = 0;
@@ -216,19 +216,19 @@ static void FlipByte(unsigned char* at)
 
 static void Mutate(const char* what, unsigned char* at, unsigned int size)
 {
-    unsigned long long base = HashProjection();
+    unsigned long long base = HashWritten();
     unsigned char saved[64];
     memcpy(saved, at, size);
     for (unsigned int i = 0; i < size; i += (size >= 4 ? 4 : size)) {
         FlipByte(at + i);
         char message[160];
-        sprintf(message, "flipping %s byte %u changes the projection", what, i);
-        Check(HashProjection() != base, message);
+        sprintf(message, "flipping %s byte %u changes the written state", what, i);
+        Check(HashWritten() != base, message);
         memcpy(at, saved, size);
     }
     char message[160];
-    sprintf(message, "restoring %s restores the projection", what);
-    Check(HashProjection() == base, message);
+    sprintf(message, "restoring %s restores the written state", what);
+    Check(HashWritten() == base, message);
 }
 
 int main()
@@ -237,18 +237,18 @@ int main()
     Request(1, 28, 4);
     Request(2, 28, 12);
     Request(3, 28, 28);
-    unsigned long long idle = HashProjection();
+    unsigned long long idle = HashWritten();
     Pathfinder* pf = GetPathfinder();
     for (int i = 0; i < 40 && !(pf->object != 0 && pf->count > 3 && pf->used > 8); i++)
         Tick();
-    Check(HashProjection() != idle, "a step changes the projection");
+    Check(HashWritten() != idle, "a step changes the written state");
     Check(pf->object != 0, "a search is running");
     Check(pf->count > 3, "the open heap holds nodes");
 
     unsigned long long block = HashBlock();
-    unsigned long long first = HashProjection();
+    unsigned long long first = HashWritten();
     Check(HashBlock() == block, "WriteState writes nothing to the state block");
-    Check(HashProjection() == first, "WriteState writes the same state twice");
+    Check(HashWritten() == first, "WriteState writes the same state twice");
     Check(s_lines > 100, "WriteState writes the record, the nodes and the cells");
 
     unsigned char* base = (unsigned char*)pf;
@@ -282,14 +282,14 @@ int main()
         Mutate("a node penalty", (unsigned char*)&n->data.penalty, 2);
     }
     if (pf->count >= 2) {
-        unsigned long long before = HashProjection();
+        unsigned long long before = HashWritten();
         Ref<Node> a = pf->items[0];
         pf->items[0] = pf->items[1];
         pf->items[1] = a;
-        Check(HashProjection() != before, "swapping two heap entries changes the projection");
+        Check(HashWritten() != before, "swapping two heap entries changes the written state");
         pf->items[1] = pf->items[0];
         pf->items[0] = a;
-        Check(HashProjection() == before, "swapping them back restores the projection");
+        Check(HashWritten() == before, "swapping them back restores the written state");
     }
 
     const unsigned int* dirty = pf->grid.dirty.get();
@@ -319,18 +319,18 @@ int main()
     Mutate("the refresh counter", (unsigned char*)&extra->refreshCounter, 4);
 
     unsigned long long before = HashBlock();
-    HashProjection();
+    HashWritten();
     Check(HashBlock() == before, "WriteState still writes nothing after the mutations");
 
     SimFree(PathfindingShutdown());
-    unsigned long long empty = HashProjection();
+    unsigned long long empty = HashWritten();
     Check(empty != first, "with no region the state written is empty");
     PathMapInfo map = { kW, kH, kUnits + 1, 1 };
     unsigned int size = PathfindingRegionSize(&map);
     PathfindingInit(&map, SimAlloc(size), size);
     Check(GetPathfinder() != 0, "a new region is built");
-    Check(HashProjection() != empty, "a new region is written");
+    Check(HashWritten() != empty, "a new region is written");
 
-    printf(g_failures ? "FAILED\n" : "pathfinding_projection_test: all passed\n");
+    printf(g_failures ? "FAILED\n" : "pathfinding_writer_test: all passed\n");
     return g_failures != 0;
 }

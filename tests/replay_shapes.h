@@ -87,7 +87,7 @@ int __stdcall Imp_fixture_Strike(WeaponDef* a0)
     ReplayText t;
     StartImport(t, "fixture.Strike");
     Space(t);
-    ReplayAddWeapon(t, a0);
+    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, false);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
@@ -167,7 +167,7 @@ int g_result_fixture_Strike;
 
 void Run_fixture_Strike()
 {
-    WeaponDef* p0 = (WeaponDef*)ArgWeapon("weapon");
+    WeaponDef* p0 = (WeaponDef*)ArgObject("weapon", ROK_WEAPONDEF);
     SetClosing("result");
     g_result_fixture_Strike = Native_fixture_Strike(p0);
 }

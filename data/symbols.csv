@@ -4256,9 +4256,9 @@ address,name
 0x508ab4,g_noDirectSoundKey
 0x508be8,g_killedScriptName
 0x508bf0,g_takenLeadFormat
-0x508d68,s_TakeDamage_00508d68
-0x508d74,s_HitByWeapon_00508d74
-0x508d80,s_paralyze_00508d80
+0x508d68,g_takeDamageScriptName
+0x508d74,g_hitByWeaponScriptName
+0x508d80,g_paralyzeMissionName
 0x508d8c,s_SelectMultipleUnits_00508d8c
 0x508f24,g_celebratedKey
 0x508f30,g_satisfiedKey

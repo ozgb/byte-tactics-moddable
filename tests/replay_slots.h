@@ -191,6 +191,22 @@ int __stdcall Imp_units_StartScriptWithArgs(CobScript* a0, char* a1, Callback* a
     return ParseResult<int>(r);
 }
 
+int __stdcall Imp_units_StartScript(CobScript* a0, const char* a1, Callback* a2, int a3)
+{
+    ReplayText t;
+    StartImport(t, "units.StartScript");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_COBSCRIPT, a0, false);
+    Space(t);
+    t.AddString((const char*)a1);
+    Space(t);
+    t.Add("?");
+    Space(t);
+    ReplayValue(t, a3);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
 int __stdcall Imp_units_FindScript(CobScript* a0, const char* a1)
 {
     ReplayText t;
@@ -201,6 +217,65 @@ int __stdcall Imp_units_FindScript(CobScript* a0, const char* a1)
     t.AddString((const char*)a1);
     const char* r = Enter(t);
     return ParseResult<int>(r);
+}
+
+void __stdcall Imp_units_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
+{
+    ReplayText t;
+    StartImport(t, "units.GetAimFromPosition");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    ApplyVec3(a1, "out");
+    (void)r;
+}
+
+Vec3 __stdcall Imp_units_GetPieceOffset(Unit* a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "units.GetPieceOffset");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    return ParseValueText<Vec3>(ROK_VEC3, r);
+}
+
+int __stdcall Imp_units_QueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
+{
+    ReplayText t;
+    StartImport(t, "units.QueryScript");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_COBSCRIPT, a0, false);
+    Space(t);
+    t.AddString((const char*)a1);
+    Space(t);
+    AddInOutScalar(t, a2);
+    Space(t);
+    AddInOutScalar(t, a3);
+    Space(t);
+    AddInOutScalar(t, a4);
+    Space(t);
+    AddInOutScalar(t, a5);
+    const char* r = Enter(t);
+    ApplyInOutScalar(a2, "p2");
+    ApplyInOutScalar(a3, "p3");
+    ApplyInOutScalar(a4, "p4");
+    ApplyInOutScalar(a5, "p5");
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_units_MarkRecentlyDamaged(Unit* a0)
+{
+    ReplayText t;
+    StartImport(t, "units.MarkRecentlyDamaged");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    const char* r = Enter(t);
+    (void)r;
 }
 
 int __stdcall Imp_units_GetGroundHeight(Vec3* a0)
@@ -239,6 +314,17 @@ Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
     return o;
 }
 
+unsigned int __stdcall Imp_los_radar_SoundHeardMask(const Vec3* a0)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.SoundHeardMask");
+    Space(t);
+    t.Add("at=");
+    AddVec3(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<unsigned int>(r);
+}
+
 void __stdcall Imp_los_radar_UpdateCellHeightRange(Point16 a0, Point16 a1)
 {
     ReplayText t;
@@ -259,6 +345,64 @@ void __stdcall Imp_network_SendShareMapInfo(unsigned char a0, unsigned char a1)
     ReplayValue(t, a0);
     Space(t);
     ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+int __stdcall Imp_network_SendScriptCallByName(Unit* a0, char* a1, char a2, int a3, int a4, int a5, int a6)
+{
+    ReplayText t;
+    StartImport(t, "network.SendScriptCallByName");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    t.AddString((const char*)a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    Space(t);
+    ReplayValue(t, a5);
+    Space(t);
+    ReplayValue(t, a6);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_network_SendUnitDamage(Unit* a0, Unit* a1, int a2, int a3, unsigned short a4)
+{
+    ReplayText t;
+    StartImport(t, "network.SendUnitDamage");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2, Vec3* a3, Vec3* a4)
+{
+    ReplayText t;
+    StartImport(t, "network.SendWeaponFire");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    t.Add("?");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, false);
+    Space(t);
+    t.Add("?");
+    Space(t);
+    t.Add("?");
     const char* r = Enter(t);
     (void)r;
 }
@@ -295,6 +439,60 @@ void __stdcall Imp_players_TransferMetal(unsigned char a0, unsigned char a1, flo
     (void)r;
 }
 
+int __stdcall Imp_targeting_GetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "targeting.GetWeaponTargetPos");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    ApplyVec3(a1, "pos");
+    return ParseResult<int>(r);
+}
+
+Unit* __stdcall Imp_targeting_GetWeaponTargetUnit(Unit* a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "targeting.GetWeaponTargetUnit");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    Unit* o = (Unit*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    return o;
+}
+
+int __stdcall Imp_economy_SpendEnergyAndMetal(UnitResources* a0, float a1, float a2)
+{
+    ReplayText t;
+    StartImport(t, "economy.SpendEnergyAndMetal");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNITRESOURCES, a0, false);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_ai_ReactToAttack(Unit* a0, Unit* a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "ai.ReactToAttack");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 void __stdcall Imp_ai_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
 {
     ReplayText t;
@@ -327,6 +525,49 @@ int __stdcall Imp_ai_GetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a
     Space(t);
     ReplayValue(t, a3);
     return EnterList(t, a4, a5);
+}
+
+MissionType __stdcall Imp_orders_MissionTypeFromName(const char* a0)
+{
+    ReplayText t;
+    StartImport(t, "orders.MissionTypeFromName");
+    Space(t);
+    t.AddString((const char*)a0);
+    const char* r = Enter(t);
+    return ParseValueText<MissionType>(ROK_MISSIONTYPE, r);
+}
+
+void __stdcall Imp_orders_AppendOrder(Unit* a0, Order* a1)
+{
+    ReplayText t;
+    StartImport(t, "orders.AppendOrder");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_ORDER, a1, false);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+Order* __stdcall Imp_orders_NewOrder(MissionType a0, Unit* a1, void* a2, int a3, int a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "orders.NewOrder");
+    Space(t);
+    AddValueStruct(t, ROK_MISSIONTYPE, &a0);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    Space(t);
+    t.Add("?");
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    Space(t);
+    ReplayValue(t, a5);
+    const char* r = Enter(t);
+    Order* o = (Order*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    return o;
 }
 
 void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
@@ -377,6 +618,34 @@ EconomySeam g_native_economy = {
     SpendEnergySlot,
     SpendMetalSlot,
     SpendEnergyAndMetalSlot,
+};
+
+WeaponsSeam g_native_weapons = {
+    UpdateProjectiles,
+    UpdateExplosions,
+    SpawnProjectile,
+    FindWeaponByNameSlot,
+    ApplyAreaDamageAtSlot,
+    GetWeaponRangeSlot,
+    WeaponCanReachUnit,
+    FindTargetableProjectileSlot,
+    WeaponCanReachPosSlot,
+    AllocWeaponArray,
+    FreeWeaponArray,
+    LoadWeaponTypes,
+    FreeWeaponTypes,
+    InitExplosions,
+    FreeExplosions,
+    DamageUnit,
+    FindFeatureAtPos,
+    ReleaseWeaponsSlot,
+    ClaimWeaponsSlot,
+    DetonateUnitWeapon,
+    InitUnitWeaponSlots,
+    RemoveUnitProjectiles,
+    UpdateUnitWeapons,
+    WeaponAimCobCompleteSlot,
+    CobScriptExplodePieceSlot,
 };
 
 TargetingSeam g_native_targeting = {
@@ -659,6 +928,124 @@ void Run_economy_SpendEnergyAndMetal()
 void After_economy_SpendEnergyAndMetal()
 {
     CompareResult(g_result_economy_SpendEnergyAndMetal);
+}
+
+int g_result_weapons_GetWeaponRange;
+
+void Run_weapons_GetWeaponRange()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    unsigned int p1 = ArgScalar<unsigned int>("weapon");
+    SetClosing("result");
+    g_result_weapons_GetWeaponRange = g_seams.weapons->GetWeaponRange(p0, p1);
+}
+
+void After_weapons_GetWeaponRange()
+{
+    CompareResult(g_result_weapons_GetWeaponRange);
+}
+
+int g_result_weapons_WeaponCanReachUnit;
+
+void Run_weapons_WeaponCanReachUnit()
+{
+    Unit* p0 = (Unit*)ArgObject("shooter", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("target", ROK_UNIT);
+    unsigned char p2 = ArgScalar<unsigned char>("weapon");
+    SetClosing("result");
+    g_result_weapons_WeaponCanReachUnit = g_seams.weapons->WeaponCanReachUnit(p0, p1, p2);
+}
+
+void After_weapons_WeaponCanReachUnit()
+{
+    CompareResult(g_result_weapons_WeaponCanReachUnit);
+}
+
+Projectile* g_result_weapons_FindTargetableProjectile;
+
+void Run_weapons_FindTargetableProjectile()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    unsigned int p1 = ArgScalar<unsigned int>("weapon");
+    SetClosing("result");
+    g_result_weapons_FindTargetableProjectile = g_seams.weapons->FindTargetableProjectile(p0, p1);
+}
+
+void After_weapons_FindTargetableProjectile()
+{
+    CompareObjectResult(ROK_PROJECTILE, g_result_weapons_FindTargetableProjectile);
+}
+
+int g_result_weapons_WeaponCanReachPos;
+
+void Run_weapons_WeaponCanReachPos()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    Vec3 p1;
+    memset(&p1, 0, sizeof p1);
+    ParseStruct("from", ROK_VEC3, &p1);
+    Vec3 p2;
+    memset(&p2, 0, sizeof p2);
+    ParseStruct("to", ROK_VEC3, &p2);
+    int p3 = ArgScalar<int>("flags");
+    SetClosing("result");
+    g_result_weapons_WeaponCanReachPos = g_seams.weapons->WeaponCanReachPos(p0, &p1, &p2, p3);
+}
+
+void After_weapons_WeaponCanReachPos()
+{
+    CompareResult(g_result_weapons_WeaponCanReachPos);
+}
+
+void Run_weapons_DamageUnit()
+{
+    Unit* p0 = (Unit*)ArgObject("source", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("target", ROK_UNIT);
+    int p2 = ArgScalar<int>("amount");
+    int p3 = ArgScalar<int>("type");
+    unsigned short p4 = ArgScalar<unsigned short>("extra");
+    SetClosing(nullptr);
+    g_seams.weapons->DamageUnit(p0, p1, p2, p3, p4);
+}
+
+void Run_weapons_ReleaseWeapons()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    int p1 = ArgScalar<int>("unusedEdx");
+    unsigned char p2 = ArgScalar<unsigned char>("index");
+    SetClosing(nullptr);
+    g_seams.weapons->ReleaseWeapons(p0, p1, p2);
+}
+
+void Run_weapons_ClaimWeapons()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    int p1 = ArgScalar<int>("unusedEdx");
+    unsigned char p2 = ArgScalar<unsigned char>("index");
+    SetClosing(nullptr);
+    g_seams.weapons->ClaimWeapons(p0, p1, p2);
+}
+
+void Run_weapons_InitUnitWeaponSlots()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.weapons->InitUnitWeaponSlots(p0);
+}
+
+void Run_weapons_UpdateUnitWeapons()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.weapons->UpdateUnitWeapons(p0);
+}
+
+void Run_weapons_WeaponAimCobComplete()
+{
+    Callback* p0 = (Callback*)ArgObject("callback", ROK_WEAPONAIMCOBCB);
+    int p1 = ArgScalar<int>("result");
+    SetClosing(nullptr);
+    g_seams.weapons->WeaponAimCobComplete(p0, p1);
 }
 
 void Run_targeting_SetWeaponTargetUnit()
@@ -1069,6 +1456,46 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_economy_SpendEnergyAndMetal();
         return true;
     }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0) {
+        Run_weapons_GetWeaponRange();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponCanReachUnit") == 0) {
+        Run_weapons_WeaponCanReachUnit();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "FindTargetableProjectile") == 0) {
+        Run_weapons_FindTargetableProjectile();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponCanReachPos") == 0) {
+        Run_weapons_WeaponCanReachPos();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "DamageUnit") == 0) {
+        Run_weapons_DamageUnit();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "ReleaseWeapons") == 0) {
+        Run_weapons_ReleaseWeapons();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "ClaimWeapons") == 0) {
+        Run_weapons_ClaimWeapons();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "InitUnitWeaponSlots") == 0) {
+        Run_weapons_InitUnitWeaponSlots();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateUnitWeapons") == 0) {
+        Run_weapons_UpdateUnitWeapons();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponAimCobComplete") == 0) {
+        Run_weapons_WeaponAimCobComplete();
+        return true;
+    }
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SetWeaponTargetUnit") == 0) {
         Run_targeting_SetWeaponTargetUnit();
         return true;
@@ -1188,6 +1615,14 @@ void RunAfter(const char* subsystem, const char* slot)
         After_economy_SpendMetal();
     if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "SpendEnergyAndMetal") == 0)
         After_economy_SpendEnergyAndMetal();
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0)
+        After_weapons_GetWeaponRange();
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponCanReachUnit") == 0)
+        After_weapons_WeaponCanReachUnit();
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "FindTargetableProjectile") == 0)
+        After_weapons_FindTargetableProjectile();
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponCanReachPos") == 0)
+        After_weapons_WeaponCanReachPos();
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "GetWeaponTargetUnit") == 0)
         After_targeting_GetWeaponTargetUnit();
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "GetWeaponTargetPos") == 0)
@@ -1218,20 +1653,19 @@ UnitsSeam g_import_units;
 LosRadarSeam g_import_los_radar;
 NetworkSeam g_import_network;
 PlayersSeam g_import_players;
+TargetingSeam g_import_targeting;
+EconomySeam g_import_economy;
 AiSeam g_import_ai;
+OrdersSeam g_import_orders;
 PathfindingSeam g_import_pathfinding;
 
 void BindSeams()
 {
     g_seams.wind_meteors = &g_native_wind_meteors;
     g_seams.economy = &g_native_economy;
+    g_seams.weapons = &g_native_weapons;
     g_seams.targeting = &g_native_targeting;
     g_seams.map = &g_native_map;
-    g_seams.weapons = &g_import_weapons;
-    g_import_weapons.SpawnProjectile = Imp_weapons_SpawnProjectile;
-    g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
-    g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
-    g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
     g_seams.files = &g_import_files;
     g_import_files.BankOpenAccount = Imp_files_BankOpenAccount;
     g_import_files.BankSetInteger = Imp_files_BankSetInteger;
@@ -1243,20 +1677,55 @@ void BindSeams()
     g_seams.units = &g_import_units;
     g_import_units.SetStateBits = Imp_units_SetStateBits;
     g_import_units.StartScriptWithArgs = Imp_units_StartScriptWithArgs;
+    g_import_units.StartScript = Imp_units_StartScript;
     g_import_units.FindScript = Imp_units_FindScript;
+    g_import_units.GetAimFromPosition = Imp_units_GetAimFromPosition;
+    g_import_units.GetPieceOffset = Imp_units_GetPieceOffset;
+    g_import_units.QueryScript = Imp_units_QueryScript;
+    g_import_units.MarkRecentlyDamaged = Imp_units_MarkRecentlyDamaged;
     g_import_units.GetGroundHeight = Imp_units_GetGroundHeight;
     g_import_units.GetSweetSpot = Imp_units_GetSweetSpot;
     g_seams.los_radar = &g_import_los_radar;
     g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+    g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
     g_import_los_radar.UpdateCellHeightRange = Imp_los_radar_UpdateCellHeightRange;
     g_seams.network = &g_import_network;
     g_import_network.SendShareMapInfo = Imp_network_SendShareMapInfo;
+    g_import_network.SendScriptCallByName = Imp_network_SendScriptCallByName;
+    g_import_network.SendUnitDamage = Imp_network_SendUnitDamage;
+    g_import_network.SendWeaponFire = Imp_network_SendWeaponFire;
     g_seams.players = &g_import_players;
     g_import_players.TransferEnergy = Imp_players_TransferEnergy;
     g_import_players.TransferMetal = Imp_players_TransferMetal;
     g_seams.ai = &g_import_ai;
+    g_import_ai.ReactToAttack = Imp_ai_ReactToAttack;
     g_import_ai.GetVisibleEnemiesInRadius = Imp_ai_GetVisibleEnemiesInRadius;
     g_import_ai.GetVisibleEnemiesInRadiusList = Imp_ai_GetVisibleEnemiesInRadiusList;
+    g_seams.orders = &g_import_orders;
+    g_import_orders.MissionTypeFromName = Imp_orders_MissionTypeFromName;
+    g_import_orders.AppendOrder = Imp_orders_AppendOrder;
+    g_import_orders.NewOrder = Imp_orders_NewOrder;
     g_seams.pathfinding = &g_import_pathfinding;
     g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
+    if (strcmp(g_subsystem, "wind_meteors") == 0) {
+        g_seams.weapons = &g_import_weapons;
+        g_import_weapons.SpawnProjectile = Imp_weapons_SpawnProjectile;
+        g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
+        g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
+        g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
+    }
+    if (strcmp(g_subsystem, "weapons") == 0) {
+        g_seams.targeting = &g_import_targeting;
+        g_import_targeting.GetWeaponTargetPos = Imp_targeting_GetWeaponTargetPos;
+        g_import_targeting.GetWeaponTargetUnit = Imp_targeting_GetWeaponTargetUnit;
+        g_seams.economy = &g_import_economy;
+        g_import_economy.SpendEnergyAndMetal = Imp_economy_SpendEnergyAndMetal;
+    }
+    if (strcmp(g_subsystem, "targeting") == 0) {
+        g_seams.weapons = &g_import_weapons;
+        g_import_weapons.SpawnProjectile = Imp_weapons_SpawnProjectile;
+        g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
+        g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
+        g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
+    }
 }

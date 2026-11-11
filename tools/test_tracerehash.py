@@ -76,12 +76,12 @@ class HasherTest(unittest.TestCase):
 
 class DumpTest(unittest.TestCase):
     def test_parse_dump_keeps_values_with_spaces(self):
-        blocks = tr.parse_dump("bt-dump 4\n7 units a.b str:x y\n7 units a.c 0x01\n")
+        blocks = tr.parse_dump("bt-dump 4\n7 units a.b str:x y\n7 units a.c 0x01\n", 4)
         self.assertEqual(blocks[(7, "units")], [("a.b", "str:x y"), ("a.c", "0x01")])
 
     def test_parse_dump_rejects_other_formats(self):
         with self.assertRaises(tr.Error):
-            tr.parse_dump("bt-dump 3\n")
+            tr.parse_dump("bt-dump 3\n", 4)
 
     def test_parse_trace_rows(self):
         rows = tr.parse_trace_rows("bt-trace 4\n5 units 0123456789abcdef\n")
@@ -136,7 +136,7 @@ RESULTS = tr.Schema(
             "fields": [
                 {"name": "kind", "size": 4, "kind": "scalar", "target": None},
                 {"name": "status", "size": 4, "kind": "scalar", "target": None},
-                {"name": "unit", "size": 4, "kind": "pointer", "target": "unit"},
+                {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
                 {"name": "tick", "size": 4, "kind": "scalar", "target": None},
                 {"name": "count", "size": 4, "kind": "scalar", "target": None},
                 {"name": "points", "size": 4, "kind": "bytes", "target": None},

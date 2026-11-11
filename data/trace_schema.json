@@ -1598,7 +1598,7 @@
     "fields": [
       {"name": "kind", "size": 4, "kind": "scalar", "target": null},
       {"name": "status", "size": 4, "kind": "scalar", "target": null},
-      {"name": "unit", "size": 4, "kind": "pointer", "target": "unit"},
+      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
       {"name": "tick", "size": 4, "kind": "scalar", "target": null},
       {"name": "count", "size": 4, "kind": "scalar", "target": null},
       {"name": "points", "size": 4, "kind": "bytes", "target": null}

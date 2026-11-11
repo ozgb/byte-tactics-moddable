@@ -245,7 +245,7 @@ class SchemaJsonTest(unittest.TestCase):
         self.assertEqual([f["name"] for f in results["fields"]], ["kind", "status", "unit", "tick", "count", "points"])
         targets = {t["name"] for t in self.model["targets"]}
         for f in results["fields"]:
-            self.assertEqual(f["target"] in targets, f["kind"] == "pointer", f["name"])
+            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
 
 
 class CheckTest(unittest.TestCase):

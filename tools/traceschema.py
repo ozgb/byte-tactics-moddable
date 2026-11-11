@@ -901,7 +901,7 @@ RESULT_POINTS = 64
 RESULT_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("kind", 4, "scalar", None),
     ("status", 4, "scalar", None),
-    ("unit", 4, "pointer", "unit"),
+    ("unit", 4, "ref", "unit"),
     ("tick", 4, "scalar", None),
     ("count", 4, "scalar", None),
     ("points", 4, "bytes", None),

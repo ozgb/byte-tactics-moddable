@@ -995,7 +995,7 @@ H32(n)                                         # dump: results.count
 for k in 0 .. n-1, in delivery order:
     H32(kind)                                  # dump: results[k].kind
     H32(status)                                # dump: results[k].status
-    HP(the event's unit, unit)                 # dump: results[k].unit
+    HP(the event's unit, unit, is_ref=true)    # dump: results[k].unit
     H32(tick)                                  # dump: results[k].tick
     H32(count)                                 # dump: results[k].count
     HB(the first min(max(count, 0), 64) waypoints, 4 bytes each: i16 x, i16 y)   # dump: results[k].points (hex:)
@@ -1067,8 +1067,11 @@ with single spaces between the first three fields and the value, which runs to t
 dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller state of `rng`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
-lines of section 28), then the lines of section 32, which end the block. The lines come in exactly the order the hash consumes them, so reading the lines of one
-(phase, part) block in order and applying the rules of sections 6 to 8 reproduces its hash.
+lines of section 28), then the lines of section 32, which end the block. The `pathfinder.*` lines of
+sections 16 and 17 sit between those of sections 15 and 18 but are not hash input (section 8.7). Every
+other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
+block in order, skipping the `pathfinder.*` lines, and applying the rules of sections 6 to 8
+reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
 The phase row ends with the last `meteors.<name>` line (section 9), and the world row begins with
@@ -1106,7 +1109,8 @@ not print excluded fields.
 
 To recompute a hash from the dump:
 
-1. Read the lines of the block, in order, and parse the paths into the structure of sections 6 to 8.
+1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), and parse the
+   paths into the structure of sections 6 to 8.
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`
    run into its bytes; a pointer into its ID.
@@ -1119,13 +1123,13 @@ To recompute a hash from the dump:
 ### What you need besides the lines
 
 - A table is hashed only when its lines are present: a unit, order, motion, script, AI record,
-  squad manager, squads, econ, mission conditions, pathfinder, spatial overflow, mission, weapon
+  squad manager, squads, econ, mission conditions, spatial overflow, mission, weapon
   damage table and category mask each have a presence byte (or are in a loop that skips them), which is
   1 exactly when their lines are in the block. A `0` presence byte has no line.
 - The conditional tables of sections 8.9, 8.11 and 8.10 (`OrderPosY`, `PathOrderPosY`,
   `PathOrderHeading`, `PathOrderPiece`, `PathOrderFollow`, `AirManeuverOrderHeading`,
   `LiteGoalState`) and of 8.12 (`ScriptChannelPiece`, `ScriptChannelDelay`, `ScriptChannelWait`),
-  and `MissionStartRest`, `PathfinderSearch`, are hashed exactly when the table's fields are present
+  and `MissionStartRest` are hashed exactly when the table's fields are present
   at the same path.
 - `SpotObject` against `SpotAnim` is told by the names of the fields at the path: the line after
   `features[i].next` is `anim.index` for a SpotAnim and `state` for a SpotObject (section 7.5).

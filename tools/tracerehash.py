@@ -20,7 +20,6 @@ OFFSET_BASIS = 0xCBF29CE484222325
 PRIME = 0x100000001B3
 MASK64 = (1 << 64) - 1
 END = 0xFFFFFFFF
-FORMAT = 4
 PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors")
 TIMER_CLASS = (0, 7, 2, 3, 6, 1, 2, 3, 4, 5)
 AI_RAW_VECTORS = ("cells", "vec_65", "counts", "vec_8d", "weights", "vec_ad", "vec_bd", "values", "locked")
@@ -77,13 +76,13 @@ def field_name(field: dict) -> str:
     return field["name"] or "+0x%x" % field["offset"]
 
 
-def parse_dump(text: str) -> dict[tuple[int, str], list[tuple[str, str]]]:
-    """The (path, value) lines of each (tick, phase) block of a dump, in file order."""
+def parse_dump(text: str, trace_format: int) -> dict[tuple[int, str], list[tuple[str, str]]]:
+    """The (path, value) lines of each (tick, phase) block of a bt-dump <trace_format> dump, in file order."""
     lines = text.split("\n")
     if lines and lines[-1] == "":
         lines.pop()
-    if not lines or lines[0] != f"bt-dump {FORMAT}":
-        raise Error(f"not a bt-dump {FORMAT} file")
+    if not lines or lines[0] != f"bt-dump {trace_format}":
+        raise Error(f"not a bt-dump {trace_format} file")
     blocks: dict[tuple[int, str], list[tuple[str, str]]] = {}
     for n, line in enumerate(lines[1:], 2):
         parts = line.split(" ", 3)
@@ -825,7 +824,7 @@ def main() -> int:
     args = ap.parse_args()
     try:
         schema = Schema(json.loads(Path(args.schema).read_text()))
-        rows = rehash(schema, parse_dump(read_text(args.dump)))
+        rows = rehash(schema, parse_dump(read_text(args.dump), schema.data["trace_format"]))
         expected = parse_trace_rows(read_text(args.trace)) if args.trace else None
     except (Error, OSError, ValueError, KeyError) as e:
         print(f"tracerehash: {e}", file=sys.stderr)

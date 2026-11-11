@@ -11,8 +11,11 @@ Feature::shadowTable,presentation,BlitFeatureGaf,LoadFeatureType: realloc Featur
 InitPlayerSlot: operator new unsigned char,los_radar,BuildFogTiles,InitPlayerSlot: operator new unsigned char,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,BuildFogTiles,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,Visible,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
-LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,DrawBattleFrame,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,
-LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,HitTestUnitScreenHull,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,0,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 Mission::type,map,Mission::GetGameType,SetMissionType: new Mission,1,
 ModelState::animDirty,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
 ModelState::animDirty,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
@@ -107,7 +110,6 @@ Order::target,units,UnitRef::Unlink,AddOrder: new Order,0,
 Order::target,units,UnitRef::Unlink,EnsurePatrolReturnOrder: new Order,0,-
 Order::unit,orders,??1Order@@QAE@XZ,AddOrder: new Order,0,
 Order::unit,orders,??1Order@@QAE@XZ,EnsurePatrolReturnOrder: new Order,0,-
-Pathfinder::path,pathfinding,Pathfinder::AbortIfGoalMatch,CreatePathfinderNative: new Pathfinder,0,-
 Unit::activateFlags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::cargo,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::cargo,presentation,CMemoryCache::MergeIntoComposite,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
@@ -313,7 +315,7 @@ p1b8a,presentation,DrawUnitInfoPanel,p1b8a,0,
 p1b8a,presentation,UnitTable::DrawPieces,p1b8a,0,
 pad_14273,los_radar,BuildFogTiles,pad_14273,0,
 pad_14273,los_radar,Visible,pad_14273,0,
-pathfinder,orders,AiSearchGoal::SetPathOrder,pathfinder,0,-
+pathfinder,pathfinding,PathfindingCancel,pathfinder,0,-
 playerIndex,los_radar,BuildFogTiles,playerIndex,0,
 playerIndex,los_radar,Visible,playerIndex,0,
 playerIndex,presentation,CollectVisibleUnitIds,playerIndex,1,

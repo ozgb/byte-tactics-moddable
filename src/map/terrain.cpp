@@ -308,7 +308,7 @@ void __stdcall AddUnitToMap(Unit* obj)
             pad.x = obj->cell.x - 1;
             pad.y = obj->cell.y - 1;
             g_seams.los_radar->UpdateCellHeightRange(pad, grown);
-            RefreshAllPassMaps(obj->cell, obj->footprint);
+            RefreshAllPassMapsForUnits(obj->cell, obj->footprint);
             return;
         }
         if ((f & 3) == 1) {
@@ -673,7 +673,7 @@ void __stdcall SetYardOpen(Unit* obj, int flag)
         obj->bit2 = flag;
         obj->flags |= 0x8000000;
         ClaimFootprintCells(obj);
-        RefreshAllPassMaps(obj->cell, obj->footprint);
+        RefreshAllPassMapsForUnits(obj->cell, obj->footprint);
     }
 }
 
@@ -686,7 +686,7 @@ void __stdcall ForceNeighborFootprintReclaim(Unit* obj)
     Point16 size = obj->footprint;
     Point16 pos = obj->cell;
     VisitObjectsInArea(pos, size, &visitor);
-    RefreshAllPassMaps(obj->cell, obj->footprint);
+    RefreshAllPassMapsForUnits(obj->cell, obj->footprint);
 }
 
 int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los);
@@ -825,8 +825,7 @@ int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell)
     return 3;
 }
 
-// FUNCTION: 0x47dfc0
-int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, int h)
+static int FootprintValue(MovementClass* obj, int x, int y, int w, int h, int stampUnits)
 {
     if (x < 0 || y < 0)
         return 0;
@@ -866,7 +865,7 @@ int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, 
 
             if (blocked)
                 return 0;
-            if (cell->unit != 0) {
+            if (stampUnits && cell->unit != 0) {
                 Ref<Unit>& unit = (*(Ref<Unit>*)&g_game->units[cell->unit].motion);
                 if (!unit || ((unsigned int)unit->lastTick) < obj->lastTick)
                     return 0;
@@ -896,21 +895,37 @@ int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, 
     return result;
 }
 
-// FUNCTION: 0x47e1f0
-unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y)
+// FUNCTION: 0x47dfc0
+int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, int h)
+{
+    return FootprintValue(obj, x, y, w, h, 1);
+}
+
+static unsigned int FootprintValueWithEdgeStrips(MovementClass* obj, int x, int y, int stampUnits)
 {
     int h = obj->footprintZ;
     int w = obj->footprintX;
-    unsigned int r = GetPassMapFootprintValue(obj, x, y, w, h);
+    unsigned int r = FootprintValue(obj, x, y, w, h, stampUnits);
     if (r <= 1)
         return r;
-    if (GetPassMapFootprintValue(obj, x - 1, y - 1, w + 1, 1) != 3)
+    if (FootprintValue(obj, x - 1, y - 1, w + 1, 1, stampUnits) != 3)
         return 1;
-    if (GetPassMapFootprintValue(obj, x + w, y - 1, 1, h + 1) != 3)
+    if (FootprintValue(obj, x + w, y - 1, 1, h + 1, stampUnits) != 3)
         return 1;
-    if (GetPassMapFootprintValue(obj, x, y + h, w + 1, 1) != 3)
+    if (FootprintValue(obj, x, y + h, w + 1, 1, stampUnits) != 3)
         return 1;
-    return GetPassMapFootprintValue(obj, x - 1, y, 1, h + 1) == 3 ? 3 : 1;
+    return FootprintValue(obj, x - 1, y, 1, h + 1, stampUnits) == 3 ? 3 : 1;
+}
+
+// FUNCTION: 0x47e1f0
+unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y)
+{
+    return FootprintValueWithEdgeStrips(obj, x, y, 1);
+}
+
+unsigned int __stdcall GetTerrainPassValue(MovementClass* obj, int x, int y)
+{
+    return FootprintValueWithEdgeStrips(obj, x, y, 0);
 }
 
 // FUNCTION: 0x47e2d0

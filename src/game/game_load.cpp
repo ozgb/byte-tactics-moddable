@@ -128,6 +128,7 @@ void RegisterUnitOrders(void);
 #include "../frontend/skirmish_menu.h"
 #include "game_state.h"
 #include "settings_campaign.h"
+#include "match_setup.h"
 #include "../units/unit_commands.h"
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "../network/unit_sync.h"
@@ -198,6 +199,7 @@ void __cdecl LoadMatch(void*)
     GameSrand(RAND_STREAM_LOAD, HarnessCrtSeed((unsigned)time(NULL)));
     g_game->ticks = 0;
 
+    const PlayerInfo* hostInfo = nullptr;
     switch (g_seams.map->GetGameType(((Mission*)g_game->net))) {
     case 1:
         g_nonCampaignGame = 0;
@@ -241,6 +243,7 @@ void __cdecl LoadMatch(void*)
 
         int sel2 = FindHostSlot();
         PlayerInfo* p2 = (*(LoadingPlayerRecord(*)[10])&g_game->players)[sel2].data;
+        hostInfo = p2;
         g_nonCampaignGame = p2->cheating;
         g_game->commanderDeath = p2->commander;
         g_game->mapFlags_14281.bit1 = p2->los;
@@ -275,6 +278,16 @@ void __cdecl LoadMatch(void*)
             }
         }
     }
+
+    MatchSetup setup = hostInfo != nullptr ? MatchSetupOfInfo(hostInfo) : MatchSetupRequested();
+    if (((HapiBank*)g_game->pendingSaveStore) != nullptr) {
+        ((HapiBank*)g_game->pendingSaveStore)->OpenAccount("summary");
+        if (((HapiBank*)g_game->pendingSaveStore)->HasItem(MatchSetupBlockBytesKey()))
+            setup.blockBytes = (unsigned int)((HapiBank*)g_game->pendingSaveStore)->GetIntegerItem((char*)MatchSetupBlockBytesKey(), 0);
+        if (((HapiBank*)g_game->pendingSaveStore)->HasItem(MatchSetupSearchStepsKey()))
+            setup.searchSteps = (unsigned int)((HapiBank*)g_game->pendingSaveStore)->GetIntegerItem((char*)MatchSetupSearchStepsKey(), 0);
+    }
+    MatchSetupBegin(setup);
 
     LoadBattleAssets();
 

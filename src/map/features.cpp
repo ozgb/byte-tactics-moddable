@@ -891,13 +891,23 @@ void __stdcall UpdateFeatures()
 #if BT_ACCESS_LOG
     AccessLogPassScope accessPass(ACCESS_PASS_FEATURES);
 #endif
+#if BT_ACCESS_LOG
+    {
+    AccessLogPassScope animPass(ACCESS_PASS_FEATURES_ANIM);
+#endif
     Feature* types = g_game->features;
     for (int k = 0; k < g_game->featureCount; k++) {
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
         if (types[k].animating) {
             StepGafSequence(&types[k].anim);
             StepGafSequence(&types[k].shadowAnim);
         }
     }
+#if BT_ACCESS_LOG
+    AccessLogEntity();
+#endif
     if (--g_game->scanIndex < 0) {
         g_game->scanIndex = g_game->width * g_game->height - 1;
     } else {
@@ -915,6 +925,9 @@ void __stdcall UpdateFeatures()
             }
         }
     }
+#if BT_ACCESS_LOG
+    }
+#endif
     int smoke = (unsigned int)g_game->ticks % 3 == 0;
     int i = g_game->pool.usedHead;
     while (i != -1) {

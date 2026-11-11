@@ -87,7 +87,7 @@ call 0 FindWeaponTarget
   r rng.main 0x00000740
   r rng.load 0x29a1f44e
   r rng.seed 0x1feda8a2
-  r Unit#1.def UnitDef#1
+  r Unit#1.def UnitDef#34
   r Unit#1.player Player#0
   r Unit#1.flags 0x90e00221
   r Unit#1.activateFlags 1
@@ -96,12 +96,12 @@ call 0 FindWeaponTarget
   r Unit#1.posX 36700160
   r Unit#1.posY 65536
   r Unit#1.posZ 15728640
-  r UnitDef#1.flags1 0x0495c0c8
-  r UnitDef#1.range 290
-  r UnitDef#1.categories UnitTypeSet#1
-  r UnitDef#1.weaponCategories0 UnitTypeSet#1
-  r UnitDef#1.weaponCategories1 UnitTypeSet#2
-  r UnitDef#1.weaponCategories2 UnitTypeSet#2
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.range 290
+  r UnitDef#34.categories UnitTypeSet#1
+  r UnitDef#34.weaponCategories0 UnitTypeSet#1
+  r UnitDef#34.weaponCategories1 UnitTypeSet#2
+  r UnitDef#34.weaponCategories2 UnitTypeSet#2
   r Player#0.active 1
   r Player#0.type 1
   r weapondef#20.flags 0x00080809
@@ -132,7 +132,7 @@ call 0 GetWeaponTargetUnit
   o result null
 call 0 FindWeaponTarget
   r rng.seed 0x028f99a0
-  r Unit#251.def UnitDef#1
+  r Unit#251.def UnitDef#34
   r Unit#251.player Player#1
   r Unit#251.flags 0x90e00021
   r Unit#251.activateFlags 1
@@ -180,7 +180,7 @@ call 0 GetWeaponTargetUnit
   a weapon 0
   o result null
 call 0 FindWeaponTarget
-  r Unit#501.def UnitDef#2
+  r Unit#501.def UnitDef#167
   r Unit#501.player Player#2
   r Unit#501.flags 0x90e00021
   r Unit#501.activateFlags 1
@@ -189,12 +189,12 @@ call 0 FindWeaponTarget
   r Unit#501.posX 5242880
   r Unit#501.posY 65536
   r Unit#501.posZ 81788928
-  r UnitDef#2.flags1 0x0495c0c8
-  r UnitDef#2.range 290
-  r UnitDef#2.categories UnitTypeSet#1
-  r UnitDef#2.weaponCategories0 UnitTypeSet#1
-  r UnitDef#2.weaponCategories1 UnitTypeSet#2
-  r UnitDef#2.weaponCategories2 UnitTypeSet#2
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.range 290
+  r UnitDef#167.categories UnitTypeSet#1
+  r UnitDef#167.weaponCategories0 UnitTypeSet#1
+  r UnitDef#167.weaponCategories1 UnitTypeSet#2
+  r UnitDef#167.weaponCategories2 UnitTypeSet#2
   r Player#2.active 1
   r Player#2.type 1
   r weapondef#21.flags 0x00080809
@@ -814,7 +814,7 @@ call 7 GetWeaponTargetPos
   o result 0
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x4e99dea7
-  r Unit#3.def UnitDef#3
+  r Unit#3.def UnitDef#80
   r Unit#3.player Player#0
   r Unit#3.flags 0x30280a21
   r Unit#3.activateFlags 0
@@ -826,12 +826,12 @@ call 7 FindBestTargetIfFireAtWill
   r Unit#3.weapon0Def weapondef#0
   r Unit#3.weapon1Def weapondef#0
   r Unit#3.weapon2Def weapondef#0
-  r UnitDef#3.flags1 0x108000ba
-  r UnitDef#3.range 55
-  r UnitDef#3.categories UnitTypeSet#2
-  r UnitDef#3.weaponCategories0 UnitTypeSet#2
-  r UnitDef#3.weaponCategories1 UnitTypeSet#2
-  r UnitDef#3.weaponCategories2 UnitTypeSet#2
+  r UnitDef#80.flags1 0x108000ba
+  r UnitDef#80.range 55
+  r UnitDef#80.categories UnitTypeSet#2
+  r UnitDef#80.weaponCategories0 UnitTypeSet#2
+  r UnitDef#80.weaponCategories1 UnitTypeSet#2
+  r UnitDef#80.weaponCategories2 UnitTypeSet#2
   a unit Unit#3
   i ai.GetVisibleEnemiesInRadius 0 pos=(39321600,65536,21495808) 55 0
   o out []
@@ -854,7 +854,7 @@ call 7 GetWeaponTargetPos
   o result 0
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x57e8ce41
-  r Unit#503.def UnitDef#4
+  r Unit#503.def UnitDef#165
   r Unit#503.player Player#2
   r Unit#503.flags 0x14e40021
   r Unit#503.activateFlags 0
@@ -866,19 +866,19 @@ call 7 FindBestTargetIfFireAtWill
   r Unit#503.weapon0Def weapondef#0
   r Unit#503.weapon1Def weapondef#0
   r Unit#503.weapon2Def weapondef#0
-  r UnitDef#4.flags1 0x009080c9
-  r UnitDef#4.range 230
-  r UnitDef#4.categories UnitTypeSet#2
-  r UnitDef#4.weaponCategories0 UnitTypeSet#2
-  r UnitDef#4.weaponCategories1 UnitTypeSet#2
-  r UnitDef#4.weaponCategories2 UnitTypeSet#2
+  r UnitDef#165.flags1 0x009080c9
+  r UnitDef#165.range 230
+  r UnitDef#165.categories UnitTypeSet#2
+  r UnitDef#165.weaponCategories0 UnitTypeSet#2
+  r UnitDef#165.weaponCategories1 UnitTypeSet#2
+  r UnitDef#165.weaponCategories2 UnitTypeSet#2
   a unit Unit#503
   i ai.GetVisibleEnemiesInRadius 2 pos=(55443456,65536,19398656) 230 0
   o out []
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x753d3a7d
-  r Unit#504.def UnitDef#4
+  r Unit#504.def UnitDef#165
   r Unit#504.player Player#2
   r Unit#504.flags 0x18e40021
   r Unit#504.activateFlags 0
@@ -896,7 +896,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x06cb20ad
-  r Unit#505.def UnitDef#4
+  r Unit#505.def UnitDef#165
   r Unit#505.player Player#2
   r Unit#505.flags 0x18e40021
   r Unit#505.activateFlags 0
@@ -914,7 +914,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x01ce4157
-  r Unit#506.def UnitDef#4
+  r Unit#506.def UnitDef#165
   r Unit#506.player Player#2
   r Unit#506.flags 0x1ce40021
   r Unit#506.activateFlags 0
@@ -932,7 +932,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x0c23b7ae
-  r Unit#507.def UnitDef#4
+  r Unit#507.def UnitDef#165
   r Unit#507.player Player#2
   r Unit#507.flags 0x18e40021
   r Unit#507.activateFlags 0
@@ -950,7 +950,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x7cf006bb
-  r Unit#508.def UnitDef#4
+  r Unit#508.def UnitDef#165
   r Unit#508.player Player#2
   r Unit#508.flags 0x18e40021
   r Unit#508.activateFlags 0
@@ -968,7 +968,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x724a1f11
-  r Unit#509.def UnitDef#4
+  r Unit#509.def UnitDef#165
   r Unit#509.player Player#2
   r Unit#509.flags 0x18e40021
   r Unit#509.activateFlags 0
@@ -986,7 +986,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x603dcfb5
-  r Unit#510.def UnitDef#4
+  r Unit#510.def UnitDef#165
   r Unit#510.player Player#2
   r Unit#510.flags 0x18e40021
   r Unit#510.activateFlags 0
@@ -1004,7 +1004,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x7a0fa56f
-  r Unit#511.def UnitDef#4
+  r Unit#511.def UnitDef#165
   r Unit#511.player Player#2
   r Unit#511.flags 0x18e40021
   r Unit#511.activateFlags 0
@@ -1022,7 +1022,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x19365904
-  r Unit#512.def UnitDef#4
+  r Unit#512.def UnitDef#165
   r Unit#512.player Player#2
   r Unit#512.flags 0x18e40021
   r Unit#512.activateFlags 0
@@ -1040,7 +1040,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x3f0e228a
-  r Unit#513.def UnitDef#4
+  r Unit#513.def UnitDef#165
   r Unit#513.player Player#2
   r Unit#513.flags 0x18e40021
   r Unit#513.activateFlags 0
@@ -1058,7 +1058,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x38fdb25d
-  r Unit#514.def UnitDef#4
+  r Unit#514.def UnitDef#165
   r Unit#514.player Player#2
   r Unit#514.flags 0x18e40021
   r Unit#514.activateFlags 0
@@ -1076,7 +1076,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x17c914e6
-  r Unit#515.def UnitDef#4
+  r Unit#515.def UnitDef#165
   r Unit#515.player Player#2
   r Unit#515.flags 0x18e40021
   r Unit#515.activateFlags 0
@@ -1094,7 +1094,7 @@ call 7 FindBestTargetIfFireAtWill
   o result null
 call 7 FindBestTargetIfFireAtWill
   r rng.seed 0x127b143d
-  r Unit#516.def UnitDef#4
+  r Unit#516.def UnitDef#165
   r Unit#516.player Player#2
   r Unit#516.flags 0x18e40021
   r Unit#516.activateFlags 0
@@ -3814,17 +3814,17 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x1fb43cbc
-  r Unit#4.def UnitDef#5
+  r Unit#4.def UnitDef#54
   r Unit#4.player Player#0
   r Unit#4.flags 0x94240221
   r Unit#4.activateFlags 0
   r Unit#4.playerIndex 0
-  r UnitDef#5.flags1 0x009180a9
-  r UnitDef#5.range 263
-  r UnitDef#5.categories UnitTypeSet#1
-  r UnitDef#5.weaponCategories0 UnitTypeSet#1
-  r UnitDef#5.weaponCategories1 UnitTypeSet#2
-  r UnitDef#5.weaponCategories2 UnitTypeSet#2
+  r UnitDef#54.flags1 0x009180a9
+  r UnitDef#54.range 263
+  r UnitDef#54.categories UnitTypeSet#1
+  r UnitDef#54.weaponCategories0 UnitTypeSet#1
+  r UnitDef#54.weaponCategories1 UnitTypeSet#2
+  r UnitDef#54.weaponCategories2 UnitTypeSet#2
   a unit Unit#4
   i ai.GetVisibleEnemiesInRadius 0 pos=(216268800,65536,84541440) 263 0
   o out []
@@ -3835,7 +3835,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x71ff6ae6
-  r Unit#5.def UnitDef#5
+  r Unit#5.def UnitDef#54
   r Unit#5.player Player#0
   r Unit#5.flags 0x9c240221
   r Unit#5.activateFlags 0
@@ -3850,7 +3850,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x37c35c82
-  r Unit#6.def UnitDef#5
+  r Unit#6.def UnitDef#54
   r Unit#6.player Player#0
   r Unit#6.flags 0x9c240221
   r Unit#6.activateFlags 0
@@ -3865,7 +3865,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x7aee7767
-  r Unit#7.def UnitDef#5
+  r Unit#7.def UnitDef#54
   r Unit#7.player Player#0
   r Unit#7.flags 0x9c240221
   r Unit#7.activateFlags 0
@@ -3880,7 +3880,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x3de14a3e
-  r Unit#8.def UnitDef#5
+  r Unit#8.def UnitDef#54
   r Unit#8.player Player#0
   r Unit#8.flags 0x9c240221
   r Unit#8.activateFlags 0
@@ -3895,7 +3895,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x11d14c2f
-  r Unit#9.def UnitDef#5
+  r Unit#9.def UnitDef#54
   r Unit#9.player Player#0
   r Unit#9.flags 0x9c240221
   r Unit#9.activateFlags 0
@@ -3910,7 +3910,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x43e0aacc
-  r Unit#10.def UnitDef#5
+  r Unit#10.def UnitDef#54
   r Unit#10.player Player#0
   r Unit#10.flags 0x9c240221
   r Unit#10.activateFlags 0
@@ -3925,7 +3925,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x52ed59e4
-  r Unit#11.def UnitDef#5
+  r Unit#11.def UnitDef#54
   r Unit#11.player Player#0
   r Unit#11.flags 0x9c240221
   r Unit#11.activateFlags 0
@@ -3940,7 +3940,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x5ca8b244
-  r Unit#12.def UnitDef#5
+  r Unit#12.def UnitDef#54
   r Unit#12.player Player#0
   r Unit#12.flags 0x9c240221
   r Unit#12.activateFlags 0
@@ -3955,7 +3955,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x474fbde2
-  r Unit#13.def UnitDef#5
+  r Unit#13.def UnitDef#54
   r Unit#13.player Player#0
   r Unit#13.flags 0x9c240221
   r Unit#13.activateFlags 0
@@ -3970,7 +3970,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x443b6501
-  r Unit#14.def UnitDef#5
+  r Unit#14.def UnitDef#54
   r Unit#14.player Player#0
   r Unit#14.flags 0x9c240221
   r Unit#14.activateFlags 0
@@ -3985,7 +3985,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x176447a6
-  r Unit#15.def UnitDef#5
+  r Unit#15.def UnitDef#54
   r Unit#15.player Player#0
   r Unit#15.flags 0x9c240221
   r Unit#15.activateFlags 0
@@ -4000,7 +4000,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x389bef49
-  r Unit#16.def UnitDef#5
+  r Unit#16.def UnitDef#54
   r Unit#16.player Player#0
   r Unit#16.flags 0x9c240221
   r Unit#16.activateFlags 0
@@ -4015,7 +4015,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x057abea8
-  r Unit#17.def UnitDef#5
+  r Unit#17.def UnitDef#54
   r Unit#17.player Player#0
   r Unit#17.flags 0x9c240221
   r Unit#17.activateFlags 0
@@ -4030,7 +4030,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x3d7b0a67
-  r Unit#18.def UnitDef#5
+  r Unit#18.def UnitDef#54
   r Unit#18.player Player#0
   r Unit#18.flags 0x9c240221
   r Unit#18.activateFlags 0
@@ -4045,7 +4045,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x58e80fb9
-  r Unit#19.def UnitDef#5
+  r Unit#19.def UnitDef#54
   r Unit#19.player Player#0
   r Unit#19.flags 0x9c240221
   r Unit#19.activateFlags 0
@@ -4060,7 +4060,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x6b606848
-  r Unit#20.def UnitDef#5
+  r Unit#20.def UnitDef#54
   r Unit#20.player Player#0
   r Unit#20.flags 0x9c240221
   r Unit#20.activateFlags 0
@@ -4075,7 +4075,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x065e860b
-  r Unit#21.def UnitDef#5
+  r Unit#21.def UnitDef#54
   r Unit#21.player Player#0
   r Unit#21.flags 0x9c240221
   r Unit#21.activateFlags 0
@@ -4090,7 +4090,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x27b23f71
-  r Unit#22.def UnitDef#5
+  r Unit#22.def UnitDef#54
   r Unit#22.player Player#0
   r Unit#22.flags 0x9c240221
   r Unit#22.activateFlags 0
@@ -4105,7 +4105,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x27632813
-  r Unit#23.def UnitDef#5
+  r Unit#23.def UnitDef#54
   r Unit#23.player Player#0
   r Unit#23.flags 0x9c240221
   r Unit#23.activateFlags 0
@@ -4120,7 +4120,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x5edc0b98
-  r Unit#24.def UnitDef#5
+  r Unit#24.def UnitDef#54
   r Unit#24.player Player#0
   r Unit#24.flags 0x9c240221
   r Unit#24.activateFlags 0
@@ -4135,7 +4135,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x407d58cf
-  r Unit#25.def UnitDef#5
+  r Unit#25.def UnitDef#54
   r Unit#25.player Player#0
   r Unit#25.flags 0x9c240221
   r Unit#25.activateFlags 0
@@ -4150,7 +4150,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x65519f1c
-  r Unit#26.def UnitDef#5
+  r Unit#26.def UnitDef#54
   r Unit#26.player Player#0
   r Unit#26.flags 0x9c240221
   r Unit#26.activateFlags 0
@@ -4165,7 +4165,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x51a51b3b
-  r Unit#27.def UnitDef#5
+  r Unit#27.def UnitDef#54
   r Unit#27.player Player#0
   r Unit#27.flags 0x9c240221
   r Unit#27.activateFlags 0
@@ -4180,7 +4180,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x2e9ee85d
-  r Unit#28.def UnitDef#5
+  r Unit#28.def UnitDef#54
   r Unit#28.player Player#0
   r Unit#28.flags 0x9c240221
   r Unit#28.activateFlags 0
@@ -4195,7 +4195,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x42a94994
-  r Unit#29.def UnitDef#5
+  r Unit#29.def UnitDef#54
   r Unit#29.player Player#0
   r Unit#29.flags 0x9c240221
   r Unit#29.activateFlags 0
@@ -4210,7 +4210,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x781db5bc
-  r Unit#30.def UnitDef#5
+  r Unit#30.def UnitDef#54
   r Unit#30.player Player#0
   r Unit#30.flags 0x9c240221
   r Unit#30.activateFlags 0
@@ -4225,7 +4225,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x6686873f
-  r Unit#31.def UnitDef#5
+  r Unit#31.def UnitDef#54
   r Unit#31.player Player#0
   r Unit#31.flags 0x9c240221
   r Unit#31.activateFlags 0
@@ -4240,7 +4240,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x0a196daf
-  r Unit#32.def UnitDef#5
+  r Unit#32.def UnitDef#54
   r Unit#32.player Player#0
   r Unit#32.flags 0x9c240221
   r Unit#32.activateFlags 0
@@ -4255,7 +4255,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x0b700157
-  r Unit#33.def UnitDef#5
+  r Unit#33.def UnitDef#54
   r Unit#33.player Player#0
   r Unit#33.flags 0x9c240221
   r Unit#33.activateFlags 0
@@ -4270,7 +4270,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x6667fc9e
-  r Unit#34.def UnitDef#5
+  r Unit#34.def UnitDef#54
   r Unit#34.player Player#0
   r Unit#34.flags 0x9c240221
   r Unit#34.activateFlags 0
@@ -4285,7 +4285,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x34fa1d98
-  r Unit#35.def UnitDef#5
+  r Unit#35.def UnitDef#54
   r Unit#35.player Player#0
   r Unit#35.flags 0x9c240221
   r Unit#35.activateFlags 0
@@ -4300,7 +4300,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x10ad0154
-  r Unit#36.def UnitDef#5
+  r Unit#36.def UnitDef#54
   r Unit#36.player Player#0
   r Unit#36.flags 0x9c240221
   r Unit#36.activateFlags 0
@@ -4315,7 +4315,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x4e323a59
-  r Unit#37.def UnitDef#5
+  r Unit#37.def UnitDef#54
   r Unit#37.player Player#0
   r Unit#37.flags 0x9c240221
   r Unit#37.activateFlags 0
@@ -4330,7 +4330,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x4394d12a
-  r Unit#38.def UnitDef#5
+  r Unit#38.def UnitDef#54
   r Unit#38.player Player#0
   r Unit#38.flags 0x9c240221
   r Unit#38.activateFlags 0
@@ -4345,7 +4345,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x5f303f0f
-  r Unit#39.def UnitDef#5
+  r Unit#39.def UnitDef#54
   r Unit#39.player Player#0
   r Unit#39.flags 0x9c240221
   r Unit#39.activateFlags 0
@@ -4360,7 +4360,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x587c229b
-  r Unit#40.def UnitDef#5
+  r Unit#40.def UnitDef#54
   r Unit#40.player Player#0
   r Unit#40.flags 0x9c240221
   r Unit#40.activateFlags 0
@@ -4375,7 +4375,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x3dc41b7f
-  r Unit#41.def UnitDef#5
+  r Unit#41.def UnitDef#54
   r Unit#41.player Player#0
   r Unit#41.flags 0x9c240221
   r Unit#41.activateFlags 0
@@ -4390,7 +4390,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x15e94e87
-  r Unit#42.def UnitDef#5
+  r Unit#42.def UnitDef#54
   r Unit#42.player Player#0
   r Unit#42.flags 0x9c240221
   r Unit#42.activateFlags 0
@@ -4405,7 +4405,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x08228c4e
-  r Unit#43.def UnitDef#5
+  r Unit#43.def UnitDef#54
   r Unit#43.player Player#0
   r Unit#43.flags 0x9c240221
   r Unit#43.activateFlags 0
@@ -4420,7 +4420,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x1429590e
-  r Unit#44.def UnitDef#5
+  r Unit#44.def UnitDef#54
   r Unit#44.player Player#0
   r Unit#44.flags 0x9c240221
   r Unit#44.activateFlags 0
@@ -4435,7 +4435,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x2695b079
-  r Unit#45.def UnitDef#5
+  r Unit#45.def UnitDef#54
   r Unit#45.player Player#0
   r Unit#45.flags 0x9c240221
   r Unit#45.activateFlags 0
@@ -4450,7 +4450,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x2d74ebb9
-  r Unit#46.def UnitDef#5
+  r Unit#46.def UnitDef#54
   r Unit#46.player Player#0
   r Unit#46.flags 0x9c240221
   r Unit#46.activateFlags 0
@@ -4465,7 +4465,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x571fd5ff
-  r Unit#47.def UnitDef#5
+  r Unit#47.def UnitDef#54
   r Unit#47.player Player#0
   r Unit#47.flags 0x9c240221
   r Unit#47.activateFlags 0
@@ -4480,7 +4480,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x6b1a8508
-  r Unit#48.def UnitDef#5
+  r Unit#48.def UnitDef#54
   r Unit#48.player Player#0
   r Unit#48.flags 0x9c240221
   r Unit#48.activateFlags 0
@@ -4495,7 +4495,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x1a140727
-  r Unit#49.def UnitDef#5
+  r Unit#49.def UnitDef#54
   r Unit#49.player Player#0
   r Unit#49.flags 0x9c240221
   r Unit#49.activateFlags 0
@@ -4510,7 +4510,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x18e19ed1
-  r Unit#50.def UnitDef#5
+  r Unit#50.def UnitDef#54
   r Unit#50.player Player#0
   r Unit#50.flags 0x9c240221
   r Unit#50.activateFlags 0
@@ -4525,7 +4525,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x0481b81a
-  r Unit#51.def UnitDef#5
+  r Unit#51.def UnitDef#54
   r Unit#51.player Player#0
   r Unit#51.flags 0x98240221
   r Unit#51.activateFlags 0
@@ -4540,7 +4540,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x605db545
-  r Unit#52.def UnitDef#5
+  r Unit#52.def UnitDef#54
   r Unit#52.player Player#0
   r Unit#52.flags 0x98240221
   r Unit#52.activateFlags 0
@@ -4555,7 +4555,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x2827f670
-  r Unit#53.def UnitDef#5
+  r Unit#53.def UnitDef#54
   r Unit#53.player Player#0
   r Unit#53.flags 0x98240221
   r Unit#53.activateFlags 0
@@ -4570,7 +4570,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x57a447a8
-  r Unit#54.def UnitDef#5
+  r Unit#54.def UnitDef#54
   r Unit#54.player Player#0
   r Unit#54.flags 0x98240221
   r Unit#54.activateFlags 0
@@ -4585,7 +4585,7 @@ call 12 GetWeaponTargetPos
   o result 0
 call 12 FindBestTargetIfFireAtWill
   r rng.seed 0x625c938b
-  r Unit#55.def UnitDef#5
+  r Unit#55.def UnitDef#54
   r Unit#55.player Player#0
   r Unit#55.flags 0x98240221
   r Unit#55.activateFlags 0
@@ -5155,17 +5155,17 @@ call 14 GetWeaponTargetPos
   o result 0
 call 14 FindBestTargetIfFireAtWill
   r rng.seed 0x2bdabd20
-  r Unit#252.def UnitDef#6
+  r Unit#252.def UnitDef#114
   r Unit#252.player Player#1
   r Unit#252.flags 0x98240021
   r Unit#252.activateFlags 0
   r Unit#252.playerIndex 1
-  r UnitDef#6.flags1 0x00818089
-  r UnitDef#6.range 210
-  r UnitDef#6.categories UnitTypeSet#1
-  r UnitDef#6.weaponCategories0 UnitTypeSet#1
-  r UnitDef#6.weaponCategories1 UnitTypeSet#2
-  r UnitDef#6.weaponCategories2 UnitTypeSet#2
+  r UnitDef#114.flags1 0x00818089
+  r UnitDef#114.range 210
+  r UnitDef#114.categories UnitTypeSet#1
+  r UnitDef#114.weaponCategories0 UnitTypeSet#1
+  r UnitDef#114.weaponCategories1 UnitTypeSet#2
+  r UnitDef#114.weaponCategories2 UnitTypeSet#2
   a unit Unit#252
   i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,87162880) 210 0
   o out []
@@ -5176,7 +5176,7 @@ call 14 GetWeaponTargetPos
   o result 0
 call 14 FindBestTargetIfFireAtWill
   r rng.seed 0x25b6965e
-  r Unit#253.def UnitDef#6
+  r Unit#253.def UnitDef#114
   r Unit#253.player Player#1
   r Unit#253.flags 0x98240021
   r Unit#253.activateFlags 0
@@ -5191,7 +5191,7 @@ call 14 GetWeaponTargetPos
   o result 0
 call 14 FindBestTargetIfFireAtWill
   r rng.seed 0x764a08a9
-  r Unit#254.def UnitDef#6
+  r Unit#254.def UnitDef#114
   r Unit#254.player Player#1
   r Unit#254.flags 0x98240021
   r Unit#254.activateFlags 0
@@ -23227,12 +23227,12 @@ call 55 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(39637658,65536,15947770) 200 0
   o out [Unit#502]
   o Unit#502.flags 0x30280121
-  o Unit#502.def UnitDef#7
+  o Unit#502.def UnitDef#246
   o Unit#502.activateFlags 1
   o Unit#502.unitDefIndex 246
   o Unit#502.posX 45613056
   o Unit#502.posZ 24641536
-  o UnitDef#7.flags1 0x0084008a
+  o UnitDef#246.flags1 0x0084008a
   i services.RandomInt 1 = 0
   o result null
 call 55 ClearWeaponTarget
@@ -100484,7 +100484,7 @@ call 187 GetWeaponTargetPos
   o result 1
 call 187 FindBestTargetIfFireAtWill
   r rng.seed 0x3656b9e8
-  r Unit#255.def UnitDef#8
+  r Unit#255.def UnitDef#131
   r Unit#255.player Player#1
   r Unit#255.flags 0x18040021
   r Unit#255.activateFlags 0
@@ -100496,12 +100496,12 @@ call 187 FindBestTargetIfFireAtWill
   r Unit#255.weapon0Def weapondef#0
   r Unit#255.weapon1Def weapondef#0
   r Unit#255.weapon2Def weapondef#0
-  r UnitDef#8.flags1 0x10808081
-  r UnitDef#8.range 101
-  r UnitDef#8.categories UnitTypeSet#2
-  r UnitDef#8.weaponCategories0 UnitTypeSet#2
-  r UnitDef#8.weaponCategories1 UnitTypeSet#2
-  r UnitDef#8.weaponCategories2 UnitTypeSet#2
+  r UnitDef#131.flags1 0x10808081
+  r UnitDef#131.range 101
+  r UnitDef#131.categories UnitTypeSet#2
+  r UnitDef#131.weaponCategories0 UnitTypeSet#2
+  r UnitDef#131.weaponCategories1 UnitTypeSet#2
+  r UnitDef#131.weaponCategories2 UnitTypeSet#2
   a unit Unit#255
   o result null
 call 187 GetWeaponTargetPos

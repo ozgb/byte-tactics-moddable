@@ -92,7 +92,7 @@ class Accounting(unittest.TestCase):
 
     def test_a_pending_subsystem_lists_what_is_left(self):
         assignment = rs.read_assignment()
-        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map")
+        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map", "weapons")
                              for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         model, errors = build([row(slot, "field_read", "Game::mapWidth"), row(slot, "field_escape", "Unit::unmatched")])
         pending = model["subsystems"][sub]["pending"]
@@ -126,7 +126,7 @@ class Unrecorded(unittest.TestCase):
         self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
         ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith("map")], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("SetMeteorParams", spec["slots"])
         self.assertEqual(spec["unrecorded"], {"SetMeteorParams": {"reason": "load class", "native": "SetMeteorParams"}})
@@ -162,7 +162,7 @@ class Unrecorded(unittest.TestCase):
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
         ann = self.imported()
         files, errors, model = rs.generate(rs.read_rows(), ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith("map")], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons"))], [])
         weapons = model["subsystems"]["weapons"]
         self.assertNotIn("SpawnProjectile", weapons["slots"])
         kept = weapons["unrecorded"]["SpawnProjectile"]
@@ -456,7 +456,7 @@ class UnannotatedTypes(unittest.TestCase):
 
     def test_a_pending_subsystem_is_not_asked(self):
         assignment = rs.read_assignment()
-        sub, slot = [(m, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map")
+        sub, slot = [(m, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "economy", "targeting", "map", "weapons")
                      for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         _, errors = build([row(slot, "field_read", "OpenHeap::count")])
         self.assertEqual([e for e in errors if "OpenHeap" in e], [])
@@ -518,7 +518,7 @@ class IndirectCalls(unittest.TestCase):
 
     def pending(self, rows, ann=None, slot_name="UpdatePlayerEconomy"):
         model, errors = build(rows, ann)
-        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith("map")], model["subsystems"]["economy"]["slots"].get(slot_name)
+        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "weapons"))], model["subsystems"]["economy"]["slots"].get(slot_name)
 
     def economy(self, **changes):
         ann = annotations()
@@ -625,8 +625,23 @@ class Tables(unittest.TestCase):
         self.assertIn("offsetof(Game, projectiles)", text)
         self.assertIn("offsetof(SimGlobals, g_movementClasses.entries)", text)
         self.assertIn('#pragma push_macro("g_movementClasses")', text)
-        self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 5,', text)
-        self.assertIn('{ "UnitDef", sizeof(UnitDef), RS_STATE, RT_ORDER,', text)
+        self.assertIn('{ "Projectile", sizeof(Projectile), RS_STATE, 6,', text)
+        self.assertIn('{ "UnitDef", sizeof(UnitDef), RS_STATE, 3,', text)
+
+    def test_the_walker_holds_every_walkable_object_field(self):
+        files, _, _ = self.generated()
+        text = files[rs.SCHEMA_H]
+        vectors = re.search(r"kReplayVectors\[\] = \{\n(.*?)\n\};", text, re.S).group(1).splitlines()
+        fields = re.search(r"kReplayObjectFields\[\] = \{\n(.*?)\n\};", text, re.S).group(1).splitlines()
+        walked = 0
+        for line in fields:
+            kind = re.search(r", RK_(\w+), ", line).group(1)
+            if kind in ("REF", "EMBED", "UNITID", "WEAPON", "REFS", "EMBEDS"):
+                walked += 1
+            elif kind == "VECTOR" and "RV_OBJECT" in vectors[int(line.rstrip(" },").rsplit(", ", 1)[1]) - 1]:
+                walked += 1
+        self.assertGreater(walked, 0)
+        self.assertIn("static const unsigned kReplayWalkableFieldCount = %d;" % walked, text)
 
     def test_the_size_of_an_inline_table_is_checked_against_its_count(self):
         files, _, _ = self.generated()
@@ -898,16 +913,18 @@ class Polymorphic(unittest.TestCase):
         self.assertIn('{ "attached", offsetof(Order, attached), sizeof(((Order*)nullptr)->attached), ROK_ORDER, RK_REF, ROK_ORDERFX,', files[rs.SCHEMA_H])
 
     def test_an_argument_of_the_base_type_is_recorded_as_the_base(self):
-        files, errors, model = self.generated()
+        ann = annotations()
+        ann["subsystems"]["orders"]["slots"] = {"AppendOrder": {"args": {"node": {"mode": "object", "kind": "OrderFx", "poly": "OrderFx"}}}}
+        files, errors, model = self.generated(ann)
         self.assertEqual(errors, [])
-        arg = model["subsystems"]["orders"]["slots"]["OrderFxAddFlags"]["args"][0]
+        arg = model["subsystems"]["orders"]["slots"]["AppendOrder"]["args"][1]
         self.assertEqual((arg["mode"], arg["kind"], arg["poly"]), ("object", "OrderFx", "OrderFx"))
-        self.assertIn("roots.Add(ROK_ORDERFX, a0);", files[rs.HOOKS_H])
+        self.assertIn("roots.Add(ROK_ORDERFX, a1);", files[rs.HOOKS_H])
 
     def test_an_argument_note_of_the_base_needs_poly(self):
         ann = annotations()
-        ann["subsystems"]["orders"]["slots"] = {"OrderFxAddFlags": {"args": {"self": {"mode": "object", "kind": "OrderFx"}}}}
-        self.assertTrue(any("the argument self points at the base kind OrderFx and needs" in e for e in self.errors(ann)))
+        ann["subsystems"]["orders"]["slots"] = {"AppendOrder": {"args": {"node": {"mode": "object", "kind": "OrderFx"}}}}
+        self.assertTrue(any("the argument node points at the base kind OrderFx and needs" in e for e in self.errors(ann)))
 
     def test_poly_of_a_kind_that_is_no_base_is_an_error(self):
         ann = annotations()
@@ -1553,7 +1570,7 @@ class Conditions(unittest.TestCase):
         for when, message in (({"via": "nowhere", "field": "flags", "equals": 0}, "nowhere, which is no field of FixtureSlave"),
                               ({"via": "moved", "field": "flags", "equals": 0}, "the `via` field moved has a `when` of its own"),
                               ({"via": "player", "field": "flags", "equals": 0}, "the condition's `kind` names the table kind it indexes"),
-                              ({"via": "player", "kind": "UnitDef", "field": "flags1", "equals": 0}, "the condition's `kind` names the table kind it indexes"),
+                              ({"via": "player", "kind": "CobScript", "field": "flags1", "equals": 0}, "the condition's `kind` names the table kind it indexes"),
                               ({"via": "master", "kind": "FixtureView", "field": "flags", "equals": 0}, "leads to its target, and `kind` is for an integer"),
                               ({"kind": "Player", "field": "flags", "equals": 0}, "there is no `via`")):
             errors = self.errors(annotations(), "FixtureSlave", "speed", when)
@@ -1606,7 +1623,7 @@ class InsideSites(unittest.TestCase):
         self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 12;", text)
+        self.assertIn("kReplayInsideSiteCount = 13;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
@@ -2212,7 +2229,7 @@ class ElementForms(unittest.TestCase):
 
     def test_a_pointer_to_an_embedded_kind_is_an_object_argument_named_by_its_site(self):
         ann = annotations()
-        ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"] = {"args": {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}}
+        ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"]["args"] = {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
@@ -2783,6 +2800,39 @@ class LinkSources(unittest.TestCase):
             real = replay_subsystems.load
             with mock.patch.object(replay_subsystems, "load", lambda: real(path)):
                 self.assertIn(other["file"], rs.replay_link_sources())
+
+
+class CompleteImports(unittest.TestCase):
+    """A complete subsystem that imports a slot of another complete one is replayed against the import stubs, not the other module."""
+
+    def generated(self):
+        files, errors, _ = rs.generate(rs.read_rows(), annotations())
+        self.assertEqual(errors, [])
+        return files
+
+    def test_the_importer_binds_the_stubs_of_a_complete_seam(self):
+        text = self.generated()[rs.SLOTS_H]
+        body = text[text.index('if (strcmp(g_subsystem, "weapons") == 0) {'):]
+        body = body[:body.index("    }\n")]
+        self.assertIn("g_seams.targeting = &g_import_targeting;", body)
+        self.assertIn("g_import_targeting.GetWeaponTargetPos = Imp_targeting_GetWeaponTargetPos;", body)
+        self.assertIn("g_seams.economy = &g_import_economy;", body)
+
+    def test_a_subsystem_with_no_complete_import_binds_nothing_more(self):
+        text = self.generated()[rs.SLOTS_H]
+        self.assertNotIn('strcmp(g_subsystem, "economy") == 0) {', text)
+
+    def test_a_vec3_the_slot_fills_is_an_out_line_of_the_import(self):
+        files = self.generated()
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecTargetingGetWeaponTargetPos"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('if (result != 0) ImportOutVec3(line, "pos", a1);', body)
+        slots = files[rs.SLOTS_H]
+        stub = slots[slots.index("Imp_targeting_GetWeaponTargetPos("):]
+        stub = stub[:stub.index("\n}\n")]
+        self.assertIn('ApplyVec3(a1, "pos");', stub)
+        self.assertNotIn('t.Add("?")', stub)
 
 
 if __name__ == "__main__":

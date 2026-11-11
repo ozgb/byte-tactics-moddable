@@ -1,22 +1,22 @@
 """Count the merges on origin/moddable that needed the gate since the last full gate run.
 
     uv run tools/fullgate.py                          # print the count and whether the full run is due
-    uv run tools/fullgate.py due                      # the same, exit 1 when the count is CADENCE or more
+    uv run tools/fullgate.py due                      # the same, exit 1 when any merge needed the gate
     uv run tools/fullgate.py run                      # play the full suite, the round trip and the coverage check, print the comment text
     uv run tools/fullgate.py --no-fetch               # do not fetch origin/moddable first
     uv run tools/fullgate.py --comments-json FILE     # tracking issue comments from a file (gh's --json comments)
     uv run tools/test_fullgate.py                     # tests, on a temporary repository and fake comments
 
-The pull request gate plays the tier; the full `reference.py --check` runs on the tip of moddable once every
-CADENCE merges that needed a gate (issue #631). The lead runs it when `due` exits 1, then comments on tracking
-issue #632: `Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n>
+The pull request gate plays the tier; the full `reference.py --check` runs on the tip of moddable nightly, when
+a merge since the last run needed a gate (issue #631). The maintainer runs it when `due` exits 1, then comments
+on tracking issue #632: `Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n>
 equal, coverage: <result>`. The newest comment of that form names the last full run. The merges counted are the first-parent merge commits `Merge pull request #N`
 on origin/moddable after that sha whose diff against their first parent touches GATE_PATHS, the paths
 reference/README.md, "Gate", says need a gate (test_fullgate.py checks the two agree).
 
 `run` plays `reference.py --check --both-modes --no-cache` and then, straight after it, `--check --no-cache
 --roundtrip auto` (the same exe, a fresh Wine prefix for each), prints their output to stderr and the text of the
-comment to stdout (or to --out FILE), and exits with the first nonzero status of the three. Posting stays with the lead.
+comment to stdout (or to --out FILE), and exits with the first nonzero status of the three. Posting stays with the maintainer.
 The round trip run scans block pointers too; the comment names them only when they are not all covered.
 
 After them `run` builds the coverage exe (tools/coverage_runtime.sh, then the BT_COVERAGE=ON build in build/coverage, with its
@@ -43,7 +43,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 REPO = "ozgb/byte-tactics-moddable"
 TRACKING_ISSUE = 632
-CADENCE = 5
 BUILD_FAILED = -1
 BRANCH = "origin/moddable"
 GATE_PATHS = (
@@ -266,8 +265,9 @@ def main() -> int:
     merges = merges_since(sha)
     needed = [number for number, _, gate in merges if gate]
     names = ", ".join(f"#{n}" for n in needed) or "none"
-    print(f"fullgate: {len(needed)} of {CADENCE} merges since the full gate on {sha[:7]} needed the gate: {names}")
-    due = len(needed) >= CADENCE
+    merge_word = "merge" if len(needed) == 1 else "merges"
+    print(f"fullgate: {len(needed)} {merge_word} since the full gate on {sha[:7]} needed the gate: {names}")
+    due = bool(needed)
     print("fullgate: the full gate is due" if due else "fullgate: the full gate is not due")
     return 1 if due and args.command == "due" else 0
 

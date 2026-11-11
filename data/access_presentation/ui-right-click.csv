@@ -20,8 +20,12 @@ LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,BuildFogTiles,LoadTntMap:
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,Visible,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,orders,Visible,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,-
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,presentation,SmokeParticles::Render,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
-LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,DrawBattleFrame,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,
-LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,HitTestUnitScreenHull,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,0,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,orders,Lookup,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,0,-
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 Mission::type,map,Mission::GetGameType,SetMissionType: new Mission,1,
 ModelState::animDirty,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
 ModelState::animDirty,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
@@ -110,7 +114,6 @@ Order::subFlags,orders,AiSearchGoal::SetPathOrder,AddOrder: new Order,0,-
 Order::target,orders,PathOrderAttach::SetUnit,AddOrder: new Order,0,-
 Order::target,units,UnitRef::Unlink,AddOrder: new Order,0,-
 Order::unit,orders,??1Order@@QAE@XZ,AddOrder: new Order,0,-
-Pathfinder::path,pathfinding,Pathfinder::AbortIfGoalMatch,CreatePathfinderNative: new Pathfinder,0,-
 Projectile::active,presentation,DrawProjectiles,AllocWeaponArray: GameAllocIgnoreTag WEAPON ARRAY,0,
 Projectile::position,ai,IsPointVisible,AllocWeaponArray: GameAllocIgnoreTag WEAPON ARRAY,0,
 Projectile::position,presentation,DrawProjectiles,AllocWeaponArray: GameAllocIgnoreTag WEAPON ARRAY,0,
@@ -349,7 +352,7 @@ pad_14273,presentation,SmokeParticles::Render,pad_14273,0,
 pad_1df4,orders,GetFeature,pad_1df4,0,-
 pad_1df4,orders,GetOrderCursor,pad_1df4,0,
 pad_1df4,presentation,DrawUnitInfoPanel,pad_1df4,0,-
-pathfinder,orders,AiSearchGoal::SetPathOrder,pathfinder,0,-
+pathfinder,pathfinding,PathfindingCancel,pathfinder,0,-
 playerIndex,ai,IsPointVisible,playerIndex,0,
 playerIndex,los_radar,BuildFogTiles,playerIndex,0,
 playerIndex,los_radar,Visible,playerIndex,0,

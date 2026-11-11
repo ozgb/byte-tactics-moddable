@@ -22,7 +22,7 @@ call 6270 UpdatePlayerEconomy
   r Player#0.flags 1
   r Player#0.type 2
   r Unit#4.buildLeft f32:0x00000000
-  r Unit#4.def UnitDef#4
+  r Unit#4.def UnitDef#259
   r Unit#4.flags 0x30282321
   r Unit#4.activateFlags 1
   r Unit#4.workTime 0
@@ -40,17 +40,17 @@ call 6270 UpdatePlayerEconomy
   r UnitResources#1.metalMakePrev f32:0x00000000
   r UnitResources#1.metalUsePrev f32:0x00000000
   r UnitResources#1.player Player#0
-  r UnitDef#4.energymake f32:0x00000000
-  r UnitDef#4.windgenerator f32:0x00000000
-  r UnitDef#4.tidalgenerator f32:0x41a80d9b
-  r UnitDef#4.energyuse f32:0x00000000
-  r UnitDef#4.metalmake f32:0x00000000
-  r UnitDef#4.extractsMetal f32:0x00000000
-  r UnitDef#4.cloakcost f32:0x00000000
-  r UnitDef#4.cloakcostmoving f32:0x00000000
-  r UnitDef#4.energystorage f32:0x00000000
-  r UnitDef#4.metalstorage f32:0x00000000
-  r UnitDef#4.makesMetal 0
+  r UnitDef#259.energymake f32:0x00000000
+  r UnitDef#259.windgenerator f32:0x00000000
+  r UnitDef#259.tidalgenerator f32:0x41a80d9b
+  r UnitDef#259.energyuse f32:0x00000000
+  r UnitDef#259.metalmake f32:0x00000000
+  r UnitDef#259.extractsMetal f32:0x00000000
+  r UnitDef#259.cloakcost f32:0x00000000
+  r UnitDef#259.cloakcostmoving f32:0x00000000
+  r UnitDef#259.energystorage f32:0x00000000
+  r UnitDef#259.metalstorage f32:0x00000000
+  r UnitDef#259.makesMetal 0
   r Unit#4.resourceSlot.energyMake f32:0x437b4f71
   r Unit#4.resourceSlot.energyUse f32:0x00000000
   r Unit#4.resourceSlot.energyUsePaid f32:0x00000000

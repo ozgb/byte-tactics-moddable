@@ -98,8 +98,11 @@ int main()
         if (op == 'B') { scanf("%u", &a); c.BeginWindow(a); }
         else if (op == 'L') { scanf("%u", &a); c.ResolveLabel(a); }
         else if (op == 'E') { scanf("%u", &a); c.EndWindow(a); }
-        else if (op == 'r') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); fprintf(stderr, "%u\n", c.Read(a, b, d, e, f)); }
-        else if (op == 'n') { scanf("%u", &a); c.Entity(a); }
+        else if (op == 'r') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); { unsigned fl = c.Read(a, b, d, e, f); fprintf(stderr, "%u\n", (fl & 1) ? fl | (c.MatchLevel() << 2) : fl); } }
+        else if (op == 'n') { scanf("%u", &a); c.Entity(a, 0); }
+        else if (op == 'm') { scanf("%u %u", &a, &b); c.Entity(a, b); }
+        else if (op == 'p') { c.PushLevel(); }
+        else if (op == 'q') { c.PopLevel(); }
         else if (op == 'w') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); c.Write(a, b, d, e, f); }
         else if (op == 'o') { scanf("%u %u %u %u", &a, &b, &d, &e); c.Ordered(a, b, d, e); }
     }
@@ -148,7 +151,7 @@ class ReferenceClassifier:
         self.window = 0
         self.current = 0
         self.window_labels = [[0] * 32, [0] * 32]
-        self.entity = 0
+        self.levels = [[0, 0]]
         self.flags = []
 
     def count(self, writer, reader, item, evidence, tick, frm=0):
@@ -162,7 +165,7 @@ class ReferenceClassifier:
         self.stamp += 1
         self.label = label
         self.written = []
-        self.entity = 0
+        self.levels = [[0, 0]]
         if label == PENDING:
             self.epoch += 1
             self.current ^= 1
@@ -206,10 +209,13 @@ class ReferenceClassifier:
             if s["writer"] != sub or s["ent"] != (a, b):
                 self.count(s["writer"], sub, item, RAW, tick)
             s["read"] = 1
-            if s["ord"] != 0 and s["ord"] < self.entity:
-                flags |= EARLIER_ENTITY
-                if s["ent"] == (a, b):
-                    flags |= SAME_RECORD
+            for depth in range(len(self.levels) - 1, -1, -1):
+                entity, floor = self.levels[depth]
+                if s["ord"] > floor and s["ord"] < entity:
+                    flags |= EARLIER_ENTITY | depth << 2
+                    if s["ent"] == (a, b):
+                        flags |= SAME_RECORD
+                    break
         else:
             self.count(NO_SUB, sub, item, UNWRITTEN, tick)
             if s["epoch"] == self.epoch and s["wsub"] != sub:
@@ -226,10 +232,16 @@ class ReferenceClassifier:
             s["stamp"] = self.stamp
             self.written.append(item)
         s["writer"], s["ent"], s["read"] = sub, (a, b), 0
-        s["ord"], s["epoch"], s["wsub"], s["win"] = self.entity, self.epoch, sub, self.window
+        s["ord"], s["epoch"], s["wsub"], s["win"] = self.levels[-1][0], self.epoch, sub, self.window
 
-    def set_entity(self, ordinal):
-        self.entity = ordinal
+    def set_entity(self, ordinal, floor=0):
+        self.levels[-1] = [ordinal, floor]
+
+    def push(self):
+        self.levels.append([0, 0])
+
+    def pop(self):
+        self.levels.pop()
 
     def ordered(self, stream, item, sub, tick):
         last = self.streams.get(stream)
@@ -247,7 +259,7 @@ def feed(script, reference):
     """Run a script (a list of tuples) through the Python reference and return the C++ driver's text for it."""
     for op, *args in script:
         {"B": reference.begin, "L": reference.resolve, "E": reference.end, "r": reference.read, "w": reference.write,
-         "o": reference.ordered, "n": reference.set_entity}[op](*args)
+         "o": reference.ordered, "n": reference.set_entity, "m": reference.set_entity, "p": lambda: reference.push(), "q": lambda: reference.pop()}[op](*args)
     return "\n".join("%s %s" % (op, " ".join(str(a) for a in args)) for op, *args in script) + "\n"
 
 
@@ -363,6 +375,22 @@ class ClassifierTest(unittest.TestCase):
         feed([("B", 2), ("w", 5, 0, 0, 1, 1), ("n", 3), ("r", 5, 0, 0, 1, 1), ("E", 1)], reference)
         self.assertEqual(reference.flags, [0])
         self.both([("B", 2), ("w", 5, 0, 0, 1, 1), ("n", 3), ("r", 5, 0, 0, 1, 1), ("E", 1)])
+
+    def test_a_read_in_a_later_outer_entity_is_earlier_at_the_outer_level(self):
+        script = [("B", 2), ("p",), ("m", 1, 1), ("p",), ("m", 2, 2), ("m", 3, 2), ("w", 5, 0, 0, 1, 1), ("q",), ("m", 4, 1),
+                  ("p",), ("m", 5, 5), ("m", 6, 5), ("r", 5, 0, 0, 2, 1), ("q",), ("E", 1)]
+        reference = ReferenceClassifier()
+        feed(script, reference)
+        self.assertEqual(reference.flags, [EARLIER_ENTITY | SAME_RECORD | 1 << 2])
+        self.both(script)
+
+    def test_a_read_in_the_same_inner_pass_is_earlier_at_the_inner_level(self):
+        script = [("B", 2), ("p",), ("m", 1, 1), ("p",), ("m", 3, 2), ("w", 5, 0, 0, 1, 1), ("m", 4, 2), ("r", 5, 0, 0, 2, 1),
+                  ("q",), ("E", 1)]
+        reference = ReferenceClassifier()
+        feed(script, reference)
+        self.assertEqual(reference.flags, [EARLIER_ENTITY | SAME_RECORD | 2 << 2])
+        self.both(script)
 
     def test_a_new_window_starts_outside_every_entity(self):
         self.both([("B", 2), ("n", 4), ("w", 5, 0, 0, 1, 1), ("E", 1), ("B", 3), ("w", 6, 0, 0, 1, 1), ("n", 1), ("r", 6, 0, 0, 1, 1), ("E", 1)])
@@ -548,6 +576,165 @@ class LayoutTest(unittest.TestCase):
         self.assertIn("g_players", names)
         (types,) = struct.unpack_from("<I", data, pos)
         self.assertEqual(types, 1)
+
+
+POOL_LAYOUT = """*** Dumping AST Record Layout
+         0 | struct PathExtra
+         0 |   int nodeLimit
+         4 |   int poolOffset
+         8 |   int itemsOffset
+        12 |   int cellsOffset
+        16 |   int dirtyOffset
+        20 |   int goalOffset
+        24 |   int pendingOffset
+        28 |   int requesterBuckets
+        32 |   int unitBuckets
+        36 |   int eventsOffset
+        40 |   int[10] budgetCap
+           | [sizeof=80, align=4,
+           |  nvsize=80, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct Node
+         0 |   int index
+         4 |   struct NodeData data
+         4 |     struct Point16 pos
+         4 |       short x
+         6 |       short y
+         8 |     int g
+           | [sizeof=12, align=4,
+           |  nvsize=12, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class Pathfinder
+         0 |   class OpenHeap (base)
+         0 |     struct Ref<struct Node> pool
+         0 |       unsigned int offset
+         4 |     int count
+         8 |   struct PathGrid grid
+         8 |     struct Ref<struct PathCell> cells
+         8 |       unsigned int offset
+        12 |     unsigned int width
+        16 |   union Pathfinder::(anonymous at x.h:315:5) 
+        16 |     struct TurnCostTable table
+        16 |       unsigned char[8] values
+        16 |     unsigned char[8] turnCost
+        24 |   PathUnit[10] cursor
+           | [sizeof=64, align=1,
+           |  nvsize=64, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct PathCell
+         0 |   unsigned char flags
+         1 |   unsigned char dir
+         2 |   unsigned short node
+           | [sizeof=4, align=2,
+           |  nvsize=4, nvalign=2]
+
+*** Dumping AST Record Layout
+         0 | struct PathPending
+         0 |   int requester
+         4 |   int unit
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+"""
+
+
+class RegionTest(unittest.TestCase):
+    def setUp(self):
+        self.layouts = al.Layouts(POOL_LAYOUT)
+
+    def test_flat_fields_walk_bases_and_nested_records(self):
+        size, fields = al.flat_fields(self.layouts, "Node")
+        self.assertEqual(size, 12)
+        self.assertEqual(fields, [(0, 4, "Node::index"), (4, 6, "Node::data.pos.x"), (6, 8, "Node::data.pos.y"), (8, 12, "Node::data.g")])
+
+    def test_refs_arrays_and_unions_are_leaves(self):
+        _, fields = al.flat_fields(self.layouts, "Pathfinder")
+        names = {n: (s, e) for s, e, n in fields}
+        self.assertEqual(names["Pathfinder::pool"], (0, 4))
+        self.assertEqual(names["Pathfinder::count"], (4, 8))
+        self.assertEqual(names["Pathfinder::grid.cells"], (8, 12))
+        self.assertEqual(names["Pathfinder::grid.width"], (12, 16))
+        self.assertEqual(names["Pathfinder::table"], (16, 24))
+        self.assertNotIn("Pathfinder::turnCost", names)
+        self.assertEqual(names["Pathfinder::cursor"][0], 24)
+
+    def test_a_flattened_type_refines_by_leaf(self):
+        types = al.TypeTable(self.layouts)
+        tid, stride = types.refine("Node")
+        self.assertEqual(stride, 12)
+        self.assertIn((8, 12, "Node::data.g"), types.entries[tid][1])
+
+    def test_region_parts_follow_the_offsets_the_region_holds(self):
+        items = al.Items(types=al.TypeTable(self.layouts))
+        with mock.patch.object(al, "PATHFINDER_HEADER", Path(tempfile.mkdtemp()) / "pathfinder.h"):
+            al.PATHFINDER_HEADER.write_text("enum { EXTRA_OFFSET = 64 };")
+            parts = al.region_parts(items, "Init: new AISearch region")
+        by_name = {items.strings[p[4]]: p for p in parts}
+        self.assertEqual(by_name["Init: new AISearch region.record"][:4], (al.NONE, 0, al.NONE, 64))
+        self.assertEqual(by_name["Init: new AISearch region.extra"][:4], (al.NONE, 64, al.NONE, 144))
+        pool = by_name["Init: new AISearch region.pool"]
+        self.assertEqual(pool[:4], (64 + 4, al.NONE, 64 + 8, al.NONE))
+        self.assertEqual(pool[6], 12)
+        heap = by_name["Init: new AISearch region.heap"]
+        self.assertEqual((heap[5], heap[6]), (al.NONE, 0))
+        events = by_name["Init: new AISearch region.events"]
+        self.assertEqual(events[:4], (64 + 36, al.NONE, al.NONE, al.NONE))
+        self.assertEqual(len(parts), 2 + len(al.REGION_SLOTS))
+
+    def test_items_pack_appends_the_parts_by_site(self):
+        items = al.Items(types=al.TypeTable(self.layouts))
+        items.sites.append((0x401234, items.string("Init: new AISearch region"), al.NONE, 0))
+        items.parts[0x401234] = [(al.NONE, 0, al.NONE, 64, items.string("a"), al.NONE, 0), (4, al.NONE, 8, al.NONE, items.string("b"), al.NONE, 0)]
+        data = items.pack()
+        tail = data[-(4 + 8 + 2 * 28):]
+        self.assertEqual(struct.unpack_from("<III", tail, 0), (1, 0x401234, 2))
+        self.assertEqual(struct.unpack_from("<7I", tail, 12)[:4], (al.NONE, 0, al.NONE, 64))
+
+    def test_the_reads_file_is_collected_and_kept(self):
+        self.assertIn("access.reads.csv", al.OUTPUT_FILES)
+        self.assertIn('("reads.csv", "access.reads.csv")', Path(al.__file__).read_text())
+
+
+class SourceOrderTest(unittest.TestCase):
+    SOURCE = """// FUNCTION: 0x401000
+void LoadMap()
+{
+    int* tnt = Load();
+    int* dst = (int*)GameAllocIgnoreTag("TILE MAP", 4);
+    unsigned char* plot = (unsigned char*)SimAllocTagged("PLOT MEMORY", 13);
+    int* list = (int*)operator new(0x10);
+    int buf = (int)operator new(8);
+    PathOrder* p = new (kSim) PathOrder();
+    Order* o = new (kSim) Order();
+    unsigned short* ids = (unsigned short*)SimAllocTagged(name, 4);
+}
+// FUNCTION: 0x401100
+void Other()
+{
+    int* far = (int*)operator new(4);
+}
+"""
+
+    def order(self, names):
+        path = Path(tempfile.mkdtemp()) / "map.cpp"
+        path.write_text(self.SOURCE)
+        rows = [({"name": "LoadMap: " + n, "address": "0x401000"}, al.HEAP_ROW.match("LoadMap: " + n)) for n in names]
+        with mock.patch.object(al.sources, "find_source", return_value=path):
+            return [r["name"][len("LoadMap: "):] for r, _ in al.source_order(rows)]
+
+    def test_a_type_row_is_placed_at_its_call_not_at_the_first_use_of_the_type(self):
+        self.assertEqual(self.order(["operator new int", "operator new int #2", "GameAllocIgnoreTag TILE MAP",
+                                     "GameAllocIgnoreTag PLOT MEMORY"]),
+                         ["GameAllocIgnoreTag TILE MAP", "GameAllocIgnoreTag PLOT MEMORY", "operator new int", "operator new int #2"])
+
+    def test_a_type_is_not_found_inside_a_longer_name(self):
+        self.assertEqual(self.order(["new Order", "new PathOrder"]), ["new PathOrder", "new Order"])
+
+    def test_a_row_no_call_carries_takes_the_free_call_of_its_allocator(self):
+        self.assertEqual(self.order(["GameAllocIgnoreTag unsigned short", "GameAllocIgnoreTag MODEL", "GameAllocIgnoreTag TILE MAP"]),
+                         ["GameAllocIgnoreTag TILE MAP", "GameAllocIgnoreTag MODEL", "GameAllocIgnoreTag unsigned short"])
 
 
 class PresentationTest(unittest.TestCase):

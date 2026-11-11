@@ -1,0 +1,67 @@
+# Eighteen units of five movement classes cross Acid Pools (1024 by 734 cells) in opposite directions while structures go up in their way; saved at tick 3500. Select the demo with the pathfinder key.
+game_seed 883
+crt_seed 1883
+view_seed 2883
+pathfinder hpa
+map Acid Pools
+start_positions fixed
+commander_death 0
+mapping 0
+line_of_sight 0
+ticks 14000
+save 3500
+player0.controller human
+player0.side Arm
+player0.metal 20000
+player0.energy 20000
+player1.controller human
+player1.side Core
+player1.metal 20000
+player1.energy 20000
+
+spawn 10 0 ARMPW 2984 2920
+spawn 10 0 ARMPW 3048 2920
+spawn 10 0 ARMPW 3112 2920
+spawn 10 0 ARMPW 3176 2920
+spawn 10 0 ARMSAM 3240 2920
+spawn 10 0 ARMSAM 3304 2920
+spawn 10 0 ARMSAM 3368 2920
+spawn 10 0 ARMBULL 2984 2984
+spawn 10 0 ARMBULL 3048 2984
+spawn 10 0 ARMFLEA 3112 2984
+spawn 10 0 ARMFLEA 3176 2984
+spawn 10 0 ARMSH 3240 2984
+spawn 10 0 ARMSH 3304 2984
+spawn 10 0 ARMSH 3368 2984
+spawn 10 1 ARMPW 6824 3368
+spawn 10 1 ARMPW 7048 3368
+spawn 10 1 ARMFLEA 6632 3432
+spawn 10 1 ARMFLEA 6568 3464
+
+order 20 0:ARMPW:1 move 6600 3480
+order 20 0:ARMPW:2 move 7336 3512
+order 20 0:ARMPW:3 move 7016 3544
+order 20 0:ARMPW:4 move 7144 3544
+order 20 0:ARMSAM:1 move 6728 3576
+order 20 0:ARMSAM:2 move 6568 3608
+order 20 0:ARMSAM:3 move 6856 3608
+order 20 0:ARMBULL:1 move 6984 3672
+order 20 0:ARMBULL:2 move 7112 3672
+order 20 0:ARMFLEA:1 move 6696 3704
+order 20 0:ARMFLEA:2 move 6632 3832
+order 20 0:ARMSH:1 move 6760 3928
+order 20 0:ARMSH:2 move 6600 3960
+order 20 0:ARMSH:3 move 6728 4056
+order 20 1:ARMPW:1 move 2968 2568
+order 20 1:ARMPW:2 move 3096 2568
+order 20 1:ARMFLEA:1 move 3224 2568
+order 20 1:ARMFLEA:2 move 3416 2568
+
+spawn 600 0 ARMSOLAR 4616 3080
+spawn 700 0 ARMSOLAR 4680 3080
+spawn 800 0 ARMSOLAR 4744 3080
+spawn 1000 1 CORLAB 5000 3000
+spawn 1400 0 ARMSOLAR 5120 2600
+spawn 1500 0 ARMSOLAR 5120 2536
+spawn 2000 1 CORLAB 5700 2250
+

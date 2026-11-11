@@ -35,6 +35,10 @@ FeaturePseudoUnit::unknown_a8,presentation,UnitTable::BuildObjectPicture,InitFea
 FeaturePseudoUnit::unknown_a8,presentation,UnitTable::DrawPieces,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
 InitPlayerSlot: operator new unsigned char,los_radar,BuildFogTiles,InitPlayerSlot: operator new unsigned char,0,-
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,BuildFogTiles,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,-
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 Mission::type,map,Mission::GetGameType,SetMissionType: new Mission,1,
 ModelState::animDirty,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::animDirty,units,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,

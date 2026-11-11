@@ -18,6 +18,7 @@
 #include "../game/game_load.h"
 #include "condition_class.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/state_writer.h"
 #include "../quirks/quirks.h"
 #include "../wasm/modules.h"
 #include "../state/sim_events.h"
@@ -40,6 +41,8 @@
 #include "../debug/debug_lib.h"
 #include "harness.h"
 #include "replay.h"
+#include "../ai/pathfind_hpa.h"
+#include "../game/match_setup.h"
 
 enum { MAX_PLAYERS = 10 };
 
@@ -113,6 +116,9 @@ static Quirks s_scenarioQuirkSet;
 static char s_switchQuirks[512];
 static char s_quirkSpec[512] = "3.1c";
 static unsigned s_quirkHash = 0;
+static int s_pathfinderHpa = 0;
+static MatchSetup s_matchSetup;
+static int s_pathfinderLine = 0;
 static unsigned s_quirkTamperTick = 0;
 static int s_quirkTamper = 0;
 static unsigned s_quirkReachTick = 0;
@@ -769,7 +775,8 @@ static void ReadFrames(int lineNo, char* value)
 static int KeyIsDecidedByLoad(const char* key)
 {
     static const char* const keys[] = { "game_type", "campaign", "map", "difficulty", "commander_death", "mapping",
-        "line_of_sight", "los_type", "start_positions", "local_player", "spawn", "order", "console", "save" };
+        "line_of_sight", "los_type", "start_positions", "local_player", "spawn", "order", "console", "save", "block_bytes",
+        "search_steps" };
     for (unsigned i = 0; i < sizeof keys / sizeof keys[0]; i++) {
         if (strcmp(key, keys[i]) == 0)
             return 1;
@@ -841,6 +848,16 @@ static void ReadKey(int lineNo, const char* key, char* value)
         s_stepsPerFrame = ParseNumber(lineNo, key, value);
         if (s_stepsPerFrame < 1 || s_stepsPerFrame > 8)
             FailLine(lineNo, "must be from 1 to 8", key, "");
+    } else if (strcmp(key, "block_bytes") == 0) {
+        const char* why = "";
+        s_matchSetup.blockBytes = ParseNumber(lineNo, key, value);
+        if (!MatchSetupBlockBytesValid(s_matchSetup.blockBytes, &why))
+            FailLine(lineNo, why, key, "");
+    } else if (strcmp(key, "search_steps") == 0) {
+        const char* why = "";
+        s_matchSetup.searchSteps = ParseNumber(lineNo, key, value);
+        if (!MatchSetupSearchStepsValid(s_matchSetup.searchSteps, &why))
+            FailLine(lineNo, why, key, "");
     } else if (strcmp(key, "frames") == 0)
         ReadFrames(lineNo, value);
     else if (strcmp(key, "ticks") == 0) {
@@ -854,6 +871,14 @@ static void ReadKey(int lineNo, const char* key, char* value)
             sprintf(detail, ": %s", err);
             FailLine(lineNo, "is not a quirk spec", key, detail);
         }
+    } else if (strcmp(key, "pathfinder") == 0) {
+        if (s_pathfinderLine != 0)
+            FailLine(lineNo, "is a second pathfinder line", key, "");
+        if (strcmp(value, "hpa") == 0)
+            s_pathfinderHpa = 1;
+        else if (strcmp(value, "default") != 0)
+            FailLine(lineNo, "must be default or hpa", key, "");
+        s_pathfinderLine = lineNo;
     } else if (strcmp(key, "quirks_tamper") == 0) {
         s_quirkTamperTick = ParseNumber(lineNo, key, value);
         s_quirkTamper = 1;
@@ -1102,6 +1127,8 @@ static void SeedNetworkHost(int host)
         info->maxUnits = g_game->maxUnits_37eec;
         info->metal = (unsigned short)s_players[i].metal;
         info->energy = (unsigned short)s_players[i].energy;
+        if (i == host)
+            MatchSetupToInfo(info);
     }
     for (int i = 0; i < MAX_PLAYERS; i++) {
         for (int k = 0; k < MAX_PLAYERS; k++) {
@@ -1523,7 +1550,10 @@ void HarnessInit(char* cmdLine)
 
     EnterHarnessTestMode();
     ReadScenario(path);
+    MatchSetupRequest(s_matchSetup);
     ResolveQuirks();
+    if (s_pathfinderHpa)
+        g_seams.pathfinding = PathfindingHpaSeam();
     ReplayInstall();
     s_viewState = s_viewSeed;
 
@@ -1605,26 +1635,25 @@ static void UiEndOfTick();
 static void RoundTripBlock()
 {
     unsigned char* old = (unsigned char*)SimBlockBase();
-    unsigned char* copy = (unsigned char*)host_mem_alloc(kSimBlockBytes);
+    unsigned int size = SimBlockSize();
+    unsigned char* copy = (unsigned char*)host_mem_alloc(size);
     if (copy == nullptr || old == nullptr) {
         Fail("testmode: no block or no memory for the roundtrip copy of it\n");
         return;
     }
-    memcpy(copy, old, kSimBlockBytes);
+    memcpy(copy, old, size);
     if (ModulesMemory()->base != nullptr) {
-        memset(old, 0xcd, kSimBlockBytes);
-        memcpy(old, copy, kSimBlockBytes);
+        memset(old, 0xcd, size);
+        memcpy(old, copy, size);
     } else {
-        void* fresh = host_mem_reserve(kSimBlockBytes);
-        if (fresh != nullptr)
-            fresh = host_mem_commit(fresh, kSimBlockBytes);
+        void* fresh = SimBlockNew(size);
         if (fresh == nullptr) {
             Fail("testmode: no memory for the roundtrip block\n");
             return;
         }
-        memcpy(fresh, copy, kSimBlockBytes);
-        memset(old, 0xcd, kSimBlockBytes);
-        SimBlockAttach(fresh);
+        memcpy(fresh, copy, size);
+        memset(old, 0xcd, size);
+        SimBlockAttach(fresh, true);
         host_mem_release(old);
     }
     host_mem_free(copy);
@@ -1694,6 +1723,11 @@ void HarnessAfterStep()
     else
         sprintf(msg, "testmode: reached tick %u\n", s_ticks);
     host_log(msg);
+    MatchSetup setup = MatchSetupCurrent();
+    if (setup.blockBytes != kSimBlockBytes || setup.searchSteps != 0) {
+        sprintf(msg, "testmode: match setup block_bytes %u search_steps %u\n", setup.blockBytes, setup.searchSteps);
+        host_log(msg);
+    }
     char replayError[300];
     replayError[0] = '\0';
     if (!ReplayWrite(replayError, sizeof replayError)) {
@@ -1719,7 +1753,6 @@ enum {
     GAME_SPOT_ENTRIES = 0x1420b,
     GAME_SPOT_USED_HEAD = 0x14213,
     GAME_SPOT_REST_HEAD = 0x14217,
-    GAME_PATHFINDER = 0x14207,
     GAME_FEATURE_COUNT = 0x14253,
     GAME_FEATURES = 0x1426f,
     GAME_POOL_COUNT = 0x14351,
@@ -2106,13 +2139,6 @@ static void Resolve(unsigned blockBase, unsigned p, bool isRef, int target, unsi
         base = GameRef(GAME_SPATIAL_CELLS);
         stride = REC_STRIDE;
         count = GameU32(GAME_SPATIAL_COUNT);
-        break;
-    case TT_NODE:
-        if (GameRef(GAME_PATHFINDER) == 0)
-            return;
-        base = RefAbs(*(unsigned*)(GameRef(GAME_PATHFINDER) + PF_POOL));
-        stride = NODE_STRIDE;
-        count = *(unsigned*)(GameRef(GAME_PATHFINDER) + PF_USED);
         break;
     case TT_MOVECLASS:
         base = (unsigned)MoveClasses();
@@ -2649,104 +2675,118 @@ static void VisitEyes()
     EndSection();
 }
 
-static unsigned char s_nodeFree[NODE_LIMIT];
+static int s_writerOpen = 0;
+static char s_writerRecord[64];
+static unsigned char s_writerRun[256];
+static unsigned s_writerRunLength = 0;
+static int s_writerRunLeft = 0;
 
-static void VisitPathNodes(const unsigned char* pf)
+static void WriterEndRecord()
 {
-    unsigned char* pool = (unsigned char*)RefAbs(*(unsigned*)(pf + PF_POOL));
-    unsigned* items = (unsigned*)RefAbs(*(unsigned*)(pf + PF_ITEMS));
-    int freeHead = *(int*)(pf + PF_FREE_HEAD);
-    unsigned used = *(unsigned*)(pf + PF_USED);
-    unsigned count = *(unsigned*)(pf + PF_COUNT);
-    char path[96];
-    if (pool == NULL || items == NULL || used > NODE_LIMIT || count > used) {
-        used = 0;
-        count = 0;
-    }
-    memset(s_nodeFree, 0, used);
-    for (unsigned guard = 0; guard < used && freeHead >= 0 && (unsigned)freeHead < used; guard++) {
-        if (s_nodeFree[freeHead])
-            break;
-        s_nodeFree[freeHead] = 1;
-        freeHead = *(int*)(pool + freeHead * NODE_STRIDE);
-    }
-    for (unsigned node = 0; node < used; node++) {
-        unsigned char* n = pool + node * NODE_STRIDE;
-        if (s_nodeFree[node])
-            continue;
-        HashU32(node);
-        FormatPath(path, "pathfinder.pool[%u]", node);
-        VisitElement(path, n, &kNodeTable);
-        if (*(int*)(n + NODE_G) != 0) {
-            if (s_dumpNow)
-                strcat(path, ".penalty");
-            VisitValue(path, *(unsigned short*)(n + NODE_PENALTY), 2);
-        }
-    }
-    VisitValue("pathfinder.heap.count", count, 4);
-    for (unsigned slot = 0; slot < count; slot++) {
-        FormatPath(path, "pathfinder.heap[%u]", slot);
-        VisitPointer(path, RefAbs(items[slot]), TT_NODE);
+    if (s_writerOpen) {
+        EndSection();
+        s_writerOpen = 0;
     }
 }
 
-static void VisitPathCells(const unsigned char* pf)
+static void WriterAdd(const unsigned char* p, unsigned n)
 {
-    unsigned char* cells = (unsigned char*)RefAbs(*(unsigned*)(pf + PF_CELLS));
-    unsigned* dirty = (unsigned*)RefAbs(*(unsigned*)(pf + PF_DIRTY));
-    unsigned count = *(unsigned*)(pf + PF_CELL_COUNT);
-    char path[96];
-    unsigned words;
-    if (cells == NULL || dirty == NULL || count > CELL_LIMIT)
-        count = 0;
-    words = (count + 255) >> 8;
-    for (unsigned w = 0; w < words; w++) {
-        unsigned bits = dirty[w];
-        if (bits == 0)
-            continue;
-        FormatPath(path, "pathfinder.dirty[%u]", w);
-        VisitU32(path, bits);
-        for (unsigned bit = 0; bit < 32; bit++) {
-            if (!((bits >> bit) & 1))
-                continue;
-            for (unsigned k = 0; k < 8; k++) {
-                unsigned index = (w << 8) + (bit << 3) + k;
-                const unsigned char* c = cells + index * 4;
-                unsigned flags = c[0];
-                unsigned state = flags & 3;
-                if (index >= count)
-                    break;
-                FormatPath(path, "pathfinder.cells[%u].flags", index);
-                VisitValue(path, flags, 1);
-                if ((flags & 8) || state == 1 || state == 2) {
-                    FormatPath(path, "pathfinder.cells[%u].dir", index);
-                    VisitValue(path, c[1], 1);
-                }
-                if (state == 1 || state == 2) {
-                    FormatPath(path, "pathfinder.cells[%u].node", index);
-                    VisitValue(path, *(const unsigned short*)(c + 2), 2);
-                }
-            }
+    if (s_writerRunLeft > 0 && s_writerRunLength + n <= sizeof s_writerRun) {
+        memcpy(s_writerRun + s_writerRunLength, p, n);
+        s_writerRunLength += n;
+        if (--s_writerRunLeft == 0) {
+            HashBuf(s_writerRun, s_writerRunLength);
+            s_writerRunLength = 0;
         }
+        return;
+    }
+    HashBuf(p, n);
+}
+
+static void WriterPath(char* out, const char* field, int index)
+{
+    char leaf[96];
+    sprintf(leaf, field, (unsigned)index);
+    sprintf(out, "%s.%s", s_writerRecord, leaf);
+}
+
+static void __stdcall WriterBegin(int section, const char* name)
+{
+    WriterEndRecord();
+    HashByte((unsigned char)section);
+    strncpy(s_writerRecord, name, sizeof s_writerRecord - 1);
+    s_writerRecord[sizeof s_writerRecord - 1] = '\0';
+    s_writerRunLeft = 0;
+    s_writerRunLength = 0;
+    s_writerOpen = 1;
+}
+
+static void __stdcall WriterInt(const char* field, int index, int size, unsigned int value)
+{
+    WriterAdd((const unsigned char*)&value, (unsigned)size);
+    if (s_dumpNow && field != nullptr) {
+        char path[160];
+        WriterPath(path, field, index);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%0*x\n", size * 2, size == 4 ? value : value & ((1u << (size * 8)) - 1));
     }
 }
 
-static void VisitPathfinder()
+static void __stdcall WriterBytes(const char* field, int index, const void* data, int size)
 {
-    unsigned char* pf = (unsigned char*)GameRef(GAME_PATHFINDER);
-    HashByte(16);
-    HashByte(pf != NULL);
-    if (pf != NULL) {
-        VisitElement("pathfinder", pf, &kPathfinderTable);
-        if (*(unsigned*)(pf + PF_OBJECT) != 0)
-            VisitElement("pathfinder", pf, &kPathfinderSearchTable);
-        VisitPathNodes(pf);
-        VisitPathCells(pf);
+    WriterAdd((const unsigned char*)data, (unsigned)size);
+    if (s_dumpNow && field != nullptr) {
+        char path[160];
+        WriterPath(path, field, index);
+        DumpPrefix(path);
+        fputs("hex:", s_dump);
+        for (int b = 0; b < size; b++)
+            fprintf(s_dump, "%02x", ((const unsigned char*)data)[b]);
+        fputc('\n', s_dump);
     }
-    EndSection();
-    HashByte(17);
-    VisitGlobalList("pathfinder", kPathGlobals, kPathGlobalsCount);
-    EndSection();
+}
+
+static void __stdcall WriterHandle(const char* field, int index, int kind, unsigned int value)
+{
+    unsigned tag = 0;
+    unsigned id = 0;
+    if (kind == STATE_HANDLE_OWN) {
+        if (value != STATE_NO_INDEX) {
+            tag = TT_NODE;
+            id = value;
+        }
+    } else {
+        Resolve((unsigned)SimBlockBase(), value, true, kind, &tag, &id);
+    }
+    HashByte((unsigned char)tag);
+    HashU32(id);
+    if (s_dumpNow && field != nullptr) {
+        char path[160];
+        WriterPath(path, field, index);
+        DumpPrefix(path);
+        if (tag == 0)
+            fputs("null", s_dump);
+        else if (tag == TT_HEAP)
+            fputs("heap", s_dump);
+        else
+            fprintf(s_dump, "%s:%u", s_targetNames[tag], id);
+        fputc('\n', s_dump);
+    }
+}
+
+static void __stdcall WriterRun(int count)
+{
+    s_writerRunLeft = count;
+    s_writerRunLength = 0;
+}
+
+static const StateWriter s_stateWriter = { WriterBegin, WriterInt, WriterBytes, WriterHandle, WriterRun };
+
+static void VisitModuleState()
+{
+    s_writerOpen = 0;
+    g_seams.pathfinding->WriteState(&s_stateWriter);
+    WriterEndRecord();
 }
 
 static void VisitMoveClasses()
@@ -3584,7 +3624,7 @@ static void VisitWorld()
     VisitExplored();
     VisitSpatial();
     VisitEyes();
-    VisitPathfinder();
+    VisitModuleState();
     VisitMoveClasses();
     VisitPassMaps();
     VisitUnitHeap();
@@ -4337,6 +4377,12 @@ static void OpenTrace(unsigned controlWord)
             TRACE_FORMAT, commit, s_scenarioPath, s_gameSeed, s_crtSeed, s_viewSeed, controlWord);
     if (!QuirksAllOff(g_quirks))
         fprintf(s_trace, "quirks %08x %s\n", s_quirkHash, s_quirkSpec);
+    if (s_pathfinderHpa)
+        fprintf(s_trace, "pathfinder hpa\n");
+    if (s_matchSetup.blockBytes != 0)
+        fprintf(s_trace, "block_bytes %u\n", s_matchSetup.blockBytes);
+    if (s_matchSetup.searchSteps != 0)
+        fprintf(s_trace, "search_steps %u\n", s_matchSetup.searchSteps);
     if (s_dumpEnabled) {
         s_dump = fopen("dump.txt", "wb");
         if (s_dump == NULL)

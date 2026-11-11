@@ -11304,1483 +11304,1483 @@ call 930 UpdatePlayerEconomy
   r Unit#3.activateFlags 0
   r Unit#3.workTime 0
   r Unit#4.buildLeft f32:0x00000000
-  r Unit#4.def UnitDef#279
+  r Unit#4.def UnitDef#0
   r Unit#4.flags 0x00000000
   r Unit#4.activateFlags 0
   r Unit#4.workTime 0
   r Unit#4.extraction f32:0x00000000
   r Unit#5.buildLeft f32:0x00000000
-  r Unit#5.def UnitDef#279
+  r Unit#5.def UnitDef#0
   r Unit#5.flags 0x00000000
   r Unit#5.activateFlags 0
   r Unit#5.workTime 0
   r Unit#5.extraction f32:0x00000000
   r Unit#6.buildLeft f32:0x00000000
-  r Unit#6.def UnitDef#279
+  r Unit#6.def UnitDef#0
   r Unit#6.flags 0x00000000
   r Unit#6.activateFlags 0
   r Unit#6.workTime 0
   r Unit#6.extraction f32:0x00000000
   r Unit#7.buildLeft f32:0x00000000
-  r Unit#7.def UnitDef#279
+  r Unit#7.def UnitDef#0
   r Unit#7.flags 0x00000000
   r Unit#7.activateFlags 0
   r Unit#7.workTime 0
   r Unit#7.extraction f32:0x00000000
   r Unit#8.buildLeft f32:0x00000000
-  r Unit#8.def UnitDef#279
+  r Unit#8.def UnitDef#0
   r Unit#8.flags 0x00000000
   r Unit#8.activateFlags 0
   r Unit#8.workTime 0
   r Unit#8.extraction f32:0x00000000
   r Unit#9.buildLeft f32:0x00000000
-  r Unit#9.def UnitDef#279
+  r Unit#9.def UnitDef#0
   r Unit#9.flags 0x00000000
   r Unit#9.activateFlags 0
   r Unit#9.workTime 0
   r Unit#9.extraction f32:0x00000000
   r Unit#10.buildLeft f32:0x00000000
-  r Unit#10.def UnitDef#279
+  r Unit#10.def UnitDef#0
   r Unit#10.flags 0x00000000
   r Unit#10.activateFlags 0
   r Unit#10.workTime 0
   r Unit#10.extraction f32:0x00000000
   r Unit#11.buildLeft f32:0x00000000
-  r Unit#11.def UnitDef#279
+  r Unit#11.def UnitDef#0
   r Unit#11.flags 0x00000000
   r Unit#11.activateFlags 0
   r Unit#11.workTime 0
   r Unit#11.extraction f32:0x00000000
   r Unit#12.buildLeft f32:0x00000000
-  r Unit#12.def UnitDef#279
+  r Unit#12.def UnitDef#0
   r Unit#12.flags 0x00000000
   r Unit#12.activateFlags 0
   r Unit#12.workTime 0
   r Unit#12.extraction f32:0x00000000
   r Unit#13.buildLeft f32:0x00000000
-  r Unit#13.def UnitDef#279
+  r Unit#13.def UnitDef#0
   r Unit#13.flags 0x00000000
   r Unit#13.activateFlags 0
   r Unit#13.workTime 0
   r Unit#13.extraction f32:0x00000000
   r Unit#14.buildLeft f32:0x00000000
-  r Unit#14.def UnitDef#279
+  r Unit#14.def UnitDef#0
   r Unit#14.flags 0x00000000
   r Unit#14.activateFlags 0
   r Unit#14.workTime 0
   r Unit#14.extraction f32:0x00000000
   r Unit#15.buildLeft f32:0x00000000
-  r Unit#15.def UnitDef#279
+  r Unit#15.def UnitDef#0
   r Unit#15.flags 0x00000000
   r Unit#15.activateFlags 0
   r Unit#15.workTime 0
   r Unit#15.extraction f32:0x00000000
   r Unit#16.buildLeft f32:0x00000000
-  r Unit#16.def UnitDef#279
+  r Unit#16.def UnitDef#0
   r Unit#16.flags 0x00000000
   r Unit#16.activateFlags 0
   r Unit#16.workTime 0
   r Unit#16.extraction f32:0x00000000
   r Unit#17.buildLeft f32:0x00000000
-  r Unit#17.def UnitDef#279
+  r Unit#17.def UnitDef#0
   r Unit#17.flags 0x00000000
   r Unit#17.activateFlags 0
   r Unit#17.workTime 0
   r Unit#17.extraction f32:0x00000000
   r Unit#18.buildLeft f32:0x00000000
-  r Unit#18.def UnitDef#279
+  r Unit#18.def UnitDef#0
   r Unit#18.flags 0x00000000
   r Unit#18.activateFlags 0
   r Unit#18.workTime 0
   r Unit#18.extraction f32:0x00000000
   r Unit#19.buildLeft f32:0x00000000
-  r Unit#19.def UnitDef#279
+  r Unit#19.def UnitDef#0
   r Unit#19.flags 0x00000000
   r Unit#19.activateFlags 0
   r Unit#19.workTime 0
   r Unit#19.extraction f32:0x00000000
   r Unit#20.buildLeft f32:0x00000000
-  r Unit#20.def UnitDef#279
+  r Unit#20.def UnitDef#0
   r Unit#20.flags 0x00000000
   r Unit#20.activateFlags 0
   r Unit#20.workTime 0
   r Unit#20.extraction f32:0x00000000
   r Unit#21.buildLeft f32:0x00000000
-  r Unit#21.def UnitDef#279
+  r Unit#21.def UnitDef#0
   r Unit#21.flags 0x00000000
   r Unit#21.activateFlags 0
   r Unit#21.workTime 0
   r Unit#21.extraction f32:0x00000000
   r Unit#22.buildLeft f32:0x00000000
-  r Unit#22.def UnitDef#279
+  r Unit#22.def UnitDef#0
   r Unit#22.flags 0x00000000
   r Unit#22.activateFlags 0
   r Unit#22.workTime 0
   r Unit#22.extraction f32:0x00000000
   r Unit#23.buildLeft f32:0x00000000
-  r Unit#23.def UnitDef#279
+  r Unit#23.def UnitDef#0
   r Unit#23.flags 0x00000000
   r Unit#23.activateFlags 0
   r Unit#23.workTime 0
   r Unit#23.extraction f32:0x00000000
   r Unit#24.buildLeft f32:0x00000000
-  r Unit#24.def UnitDef#279
+  r Unit#24.def UnitDef#0
   r Unit#24.flags 0x00000000
   r Unit#24.activateFlags 0
   r Unit#24.workTime 0
   r Unit#24.extraction f32:0x00000000
   r Unit#25.buildLeft f32:0x00000000
-  r Unit#25.def UnitDef#279
+  r Unit#25.def UnitDef#0
   r Unit#25.flags 0x00000000
   r Unit#25.activateFlags 0
   r Unit#25.workTime 0
   r Unit#25.extraction f32:0x00000000
   r Unit#26.buildLeft f32:0x00000000
-  r Unit#26.def UnitDef#279
+  r Unit#26.def UnitDef#0
   r Unit#26.flags 0x00000000
   r Unit#26.activateFlags 0
   r Unit#26.workTime 0
   r Unit#26.extraction f32:0x00000000
   r Unit#27.buildLeft f32:0x00000000
-  r Unit#27.def UnitDef#279
+  r Unit#27.def UnitDef#0
   r Unit#27.flags 0x00000000
   r Unit#27.activateFlags 0
   r Unit#27.workTime 0
   r Unit#27.extraction f32:0x00000000
   r Unit#28.buildLeft f32:0x00000000
-  r Unit#28.def UnitDef#279
+  r Unit#28.def UnitDef#0
   r Unit#28.flags 0x00000000
   r Unit#28.activateFlags 0
   r Unit#28.workTime 0
   r Unit#28.extraction f32:0x00000000
   r Unit#29.buildLeft f32:0x00000000
-  r Unit#29.def UnitDef#279
+  r Unit#29.def UnitDef#0
   r Unit#29.flags 0x00000000
   r Unit#29.activateFlags 0
   r Unit#29.workTime 0
   r Unit#29.extraction f32:0x00000000
   r Unit#30.buildLeft f32:0x00000000
-  r Unit#30.def UnitDef#279
+  r Unit#30.def UnitDef#0
   r Unit#30.flags 0x00000000
   r Unit#30.activateFlags 0
   r Unit#30.workTime 0
   r Unit#30.extraction f32:0x00000000
   r Unit#31.buildLeft f32:0x00000000
-  r Unit#31.def UnitDef#279
+  r Unit#31.def UnitDef#0
   r Unit#31.flags 0x00000000
   r Unit#31.activateFlags 0
   r Unit#31.workTime 0
   r Unit#31.extraction f32:0x00000000
   r Unit#32.buildLeft f32:0x00000000
-  r Unit#32.def UnitDef#279
+  r Unit#32.def UnitDef#0
   r Unit#32.flags 0x00000000
   r Unit#32.activateFlags 0
   r Unit#32.workTime 0
   r Unit#32.extraction f32:0x00000000
   r Unit#33.buildLeft f32:0x00000000
-  r Unit#33.def UnitDef#279
+  r Unit#33.def UnitDef#0
   r Unit#33.flags 0x00000000
   r Unit#33.activateFlags 0
   r Unit#33.workTime 0
   r Unit#33.extraction f32:0x00000000
   r Unit#34.buildLeft f32:0x00000000
-  r Unit#34.def UnitDef#279
+  r Unit#34.def UnitDef#0
   r Unit#34.flags 0x00000000
   r Unit#34.activateFlags 0
   r Unit#34.workTime 0
   r Unit#34.extraction f32:0x00000000
   r Unit#35.buildLeft f32:0x00000000
-  r Unit#35.def UnitDef#279
+  r Unit#35.def UnitDef#0
   r Unit#35.flags 0x00000000
   r Unit#35.activateFlags 0
   r Unit#35.workTime 0
   r Unit#35.extraction f32:0x00000000
   r Unit#36.buildLeft f32:0x00000000
-  r Unit#36.def UnitDef#279
+  r Unit#36.def UnitDef#0
   r Unit#36.flags 0x00000000
   r Unit#36.activateFlags 0
   r Unit#36.workTime 0
   r Unit#36.extraction f32:0x00000000
   r Unit#37.buildLeft f32:0x00000000
-  r Unit#37.def UnitDef#279
+  r Unit#37.def UnitDef#0
   r Unit#37.flags 0x00000000
   r Unit#37.activateFlags 0
   r Unit#37.workTime 0
   r Unit#37.extraction f32:0x00000000
   r Unit#38.buildLeft f32:0x00000000
-  r Unit#38.def UnitDef#279
+  r Unit#38.def UnitDef#0
   r Unit#38.flags 0x00000000
   r Unit#38.activateFlags 0
   r Unit#38.workTime 0
   r Unit#38.extraction f32:0x00000000
   r Unit#39.buildLeft f32:0x00000000
-  r Unit#39.def UnitDef#279
+  r Unit#39.def UnitDef#0
   r Unit#39.flags 0x00000000
   r Unit#39.activateFlags 0
   r Unit#39.workTime 0
   r Unit#39.extraction f32:0x00000000
   r Unit#40.buildLeft f32:0x00000000
-  r Unit#40.def UnitDef#279
+  r Unit#40.def UnitDef#0
   r Unit#40.flags 0x00000000
   r Unit#40.activateFlags 0
   r Unit#40.workTime 0
   r Unit#40.extraction f32:0x00000000
   r Unit#41.buildLeft f32:0x00000000
-  r Unit#41.def UnitDef#279
+  r Unit#41.def UnitDef#0
   r Unit#41.flags 0x00000000
   r Unit#41.activateFlags 0
   r Unit#41.workTime 0
   r Unit#41.extraction f32:0x00000000
   r Unit#42.buildLeft f32:0x00000000
-  r Unit#42.def UnitDef#279
+  r Unit#42.def UnitDef#0
   r Unit#42.flags 0x00000000
   r Unit#42.activateFlags 0
   r Unit#42.workTime 0
   r Unit#42.extraction f32:0x00000000
   r Unit#43.buildLeft f32:0x00000000
-  r Unit#43.def UnitDef#279
+  r Unit#43.def UnitDef#0
   r Unit#43.flags 0x00000000
   r Unit#43.activateFlags 0
   r Unit#43.workTime 0
   r Unit#43.extraction f32:0x00000000
   r Unit#44.buildLeft f32:0x00000000
-  r Unit#44.def UnitDef#279
+  r Unit#44.def UnitDef#0
   r Unit#44.flags 0x00000000
   r Unit#44.activateFlags 0
   r Unit#44.workTime 0
   r Unit#44.extraction f32:0x00000000
   r Unit#45.buildLeft f32:0x00000000
-  r Unit#45.def UnitDef#279
+  r Unit#45.def UnitDef#0
   r Unit#45.flags 0x00000000
   r Unit#45.activateFlags 0
   r Unit#45.workTime 0
   r Unit#45.extraction f32:0x00000000
   r Unit#46.buildLeft f32:0x00000000
-  r Unit#46.def UnitDef#279
+  r Unit#46.def UnitDef#0
   r Unit#46.flags 0x00000000
   r Unit#46.activateFlags 0
   r Unit#46.workTime 0
   r Unit#46.extraction f32:0x00000000
   r Unit#47.buildLeft f32:0x00000000
-  r Unit#47.def UnitDef#279
+  r Unit#47.def UnitDef#0
   r Unit#47.flags 0x00000000
   r Unit#47.activateFlags 0
   r Unit#47.workTime 0
   r Unit#47.extraction f32:0x00000000
   r Unit#48.buildLeft f32:0x00000000
-  r Unit#48.def UnitDef#279
+  r Unit#48.def UnitDef#0
   r Unit#48.flags 0x00000000
   r Unit#48.activateFlags 0
   r Unit#48.workTime 0
   r Unit#48.extraction f32:0x00000000
   r Unit#49.buildLeft f32:0x00000000
-  r Unit#49.def UnitDef#279
+  r Unit#49.def UnitDef#0
   r Unit#49.flags 0x00000000
   r Unit#49.activateFlags 0
   r Unit#49.workTime 0
   r Unit#49.extraction f32:0x00000000
   r Unit#50.buildLeft f32:0x00000000
-  r Unit#50.def UnitDef#279
+  r Unit#50.def UnitDef#0
   r Unit#50.flags 0x00000000
   r Unit#50.activateFlags 0
   r Unit#50.workTime 0
   r Unit#50.extraction f32:0x00000000
   r Unit#51.buildLeft f32:0x00000000
-  r Unit#51.def UnitDef#279
+  r Unit#51.def UnitDef#0
   r Unit#51.flags 0x00000000
   r Unit#51.activateFlags 0
   r Unit#51.workTime 0
   r Unit#51.extraction f32:0x00000000
   r Unit#52.buildLeft f32:0x00000000
-  r Unit#52.def UnitDef#279
+  r Unit#52.def UnitDef#0
   r Unit#52.flags 0x00000000
   r Unit#52.activateFlags 0
   r Unit#52.workTime 0
   r Unit#52.extraction f32:0x00000000
   r Unit#53.buildLeft f32:0x00000000
-  r Unit#53.def UnitDef#279
+  r Unit#53.def UnitDef#0
   r Unit#53.flags 0x00000000
   r Unit#53.activateFlags 0
   r Unit#53.workTime 0
   r Unit#53.extraction f32:0x00000000
   r Unit#54.buildLeft f32:0x00000000
-  r Unit#54.def UnitDef#279
+  r Unit#54.def UnitDef#0
   r Unit#54.flags 0x00000000
   r Unit#54.activateFlags 0
   r Unit#54.workTime 0
   r Unit#54.extraction f32:0x00000000
   r Unit#55.buildLeft f32:0x00000000
-  r Unit#55.def UnitDef#279
+  r Unit#55.def UnitDef#0
   r Unit#55.flags 0x00000000
   r Unit#55.activateFlags 0
   r Unit#55.workTime 0
   r Unit#55.extraction f32:0x00000000
   r Unit#56.buildLeft f32:0x00000000
-  r Unit#56.def UnitDef#279
+  r Unit#56.def UnitDef#0
   r Unit#56.flags 0x00000000
   r Unit#56.activateFlags 0
   r Unit#56.workTime 0
   r Unit#56.extraction f32:0x00000000
   r Unit#57.buildLeft f32:0x00000000
-  r Unit#57.def UnitDef#279
+  r Unit#57.def UnitDef#0
   r Unit#57.flags 0x00000000
   r Unit#57.activateFlags 0
   r Unit#57.workTime 0
   r Unit#57.extraction f32:0x00000000
   r Unit#58.buildLeft f32:0x00000000
-  r Unit#58.def UnitDef#279
+  r Unit#58.def UnitDef#0
   r Unit#58.flags 0x00000000
   r Unit#58.activateFlags 0
   r Unit#58.workTime 0
   r Unit#58.extraction f32:0x00000000
   r Unit#59.buildLeft f32:0x00000000
-  r Unit#59.def UnitDef#279
+  r Unit#59.def UnitDef#0
   r Unit#59.flags 0x00000000
   r Unit#59.activateFlags 0
   r Unit#59.workTime 0
   r Unit#59.extraction f32:0x00000000
   r Unit#60.buildLeft f32:0x00000000
-  r Unit#60.def UnitDef#279
+  r Unit#60.def UnitDef#0
   r Unit#60.flags 0x00000000
   r Unit#60.activateFlags 0
   r Unit#60.workTime 0
   r Unit#60.extraction f32:0x00000000
   r Unit#61.buildLeft f32:0x00000000
-  r Unit#61.def UnitDef#279
+  r Unit#61.def UnitDef#0
   r Unit#61.flags 0x00000000
   r Unit#61.activateFlags 0
   r Unit#61.workTime 0
   r Unit#61.extraction f32:0x00000000
   r Unit#62.buildLeft f32:0x00000000
-  r Unit#62.def UnitDef#279
+  r Unit#62.def UnitDef#0
   r Unit#62.flags 0x00000000
   r Unit#62.activateFlags 0
   r Unit#62.workTime 0
   r Unit#62.extraction f32:0x00000000
   r Unit#63.buildLeft f32:0x00000000
-  r Unit#63.def UnitDef#279
+  r Unit#63.def UnitDef#0
   r Unit#63.flags 0x00000000
   r Unit#63.activateFlags 0
   r Unit#63.workTime 0
   r Unit#63.extraction f32:0x00000000
   r Unit#64.buildLeft f32:0x00000000
-  r Unit#64.def UnitDef#279
+  r Unit#64.def UnitDef#0
   r Unit#64.flags 0x00000000
   r Unit#64.activateFlags 0
   r Unit#64.workTime 0
   r Unit#64.extraction f32:0x00000000
   r Unit#65.buildLeft f32:0x00000000
-  r Unit#65.def UnitDef#279
+  r Unit#65.def UnitDef#0
   r Unit#65.flags 0x00000000
   r Unit#65.activateFlags 0
   r Unit#65.workTime 0
   r Unit#65.extraction f32:0x00000000
   r Unit#66.buildLeft f32:0x00000000
-  r Unit#66.def UnitDef#279
+  r Unit#66.def UnitDef#0
   r Unit#66.flags 0x00000000
   r Unit#66.activateFlags 0
   r Unit#66.workTime 0
   r Unit#66.extraction f32:0x00000000
   r Unit#67.buildLeft f32:0x00000000
-  r Unit#67.def UnitDef#279
+  r Unit#67.def UnitDef#0
   r Unit#67.flags 0x00000000
   r Unit#67.activateFlags 0
   r Unit#67.workTime 0
   r Unit#67.extraction f32:0x00000000
   r Unit#68.buildLeft f32:0x00000000
-  r Unit#68.def UnitDef#279
+  r Unit#68.def UnitDef#0
   r Unit#68.flags 0x00000000
   r Unit#68.activateFlags 0
   r Unit#68.workTime 0
   r Unit#68.extraction f32:0x00000000
   r Unit#69.buildLeft f32:0x00000000
-  r Unit#69.def UnitDef#279
+  r Unit#69.def UnitDef#0
   r Unit#69.flags 0x00000000
   r Unit#69.activateFlags 0
   r Unit#69.workTime 0
   r Unit#69.extraction f32:0x00000000
   r Unit#70.buildLeft f32:0x00000000
-  r Unit#70.def UnitDef#279
+  r Unit#70.def UnitDef#0
   r Unit#70.flags 0x00000000
   r Unit#70.activateFlags 0
   r Unit#70.workTime 0
   r Unit#70.extraction f32:0x00000000
   r Unit#71.buildLeft f32:0x00000000
-  r Unit#71.def UnitDef#279
+  r Unit#71.def UnitDef#0
   r Unit#71.flags 0x00000000
   r Unit#71.activateFlags 0
   r Unit#71.workTime 0
   r Unit#71.extraction f32:0x00000000
   r Unit#72.buildLeft f32:0x00000000
-  r Unit#72.def UnitDef#279
+  r Unit#72.def UnitDef#0
   r Unit#72.flags 0x00000000
   r Unit#72.activateFlags 0
   r Unit#72.workTime 0
   r Unit#72.extraction f32:0x00000000
   r Unit#73.buildLeft f32:0x00000000
-  r Unit#73.def UnitDef#279
+  r Unit#73.def UnitDef#0
   r Unit#73.flags 0x00000000
   r Unit#73.activateFlags 0
   r Unit#73.workTime 0
   r Unit#73.extraction f32:0x00000000
   r Unit#74.buildLeft f32:0x00000000
-  r Unit#74.def UnitDef#279
+  r Unit#74.def UnitDef#0
   r Unit#74.flags 0x00000000
   r Unit#74.activateFlags 0
   r Unit#74.workTime 0
   r Unit#74.extraction f32:0x00000000
   r Unit#75.buildLeft f32:0x00000000
-  r Unit#75.def UnitDef#279
+  r Unit#75.def UnitDef#0
   r Unit#75.flags 0x00000000
   r Unit#75.activateFlags 0
   r Unit#75.workTime 0
   r Unit#75.extraction f32:0x00000000
   r Unit#76.buildLeft f32:0x00000000
-  r Unit#76.def UnitDef#279
+  r Unit#76.def UnitDef#0
   r Unit#76.flags 0x00000000
   r Unit#76.activateFlags 0
   r Unit#76.workTime 0
   r Unit#76.extraction f32:0x00000000
   r Unit#77.buildLeft f32:0x00000000
-  r Unit#77.def UnitDef#279
+  r Unit#77.def UnitDef#0
   r Unit#77.flags 0x00000000
   r Unit#77.activateFlags 0
   r Unit#77.workTime 0
   r Unit#77.extraction f32:0x00000000
   r Unit#78.buildLeft f32:0x00000000
-  r Unit#78.def UnitDef#279
+  r Unit#78.def UnitDef#0
   r Unit#78.flags 0x00000000
   r Unit#78.activateFlags 0
   r Unit#78.workTime 0
   r Unit#78.extraction f32:0x00000000
   r Unit#79.buildLeft f32:0x00000000
-  r Unit#79.def UnitDef#279
+  r Unit#79.def UnitDef#0
   r Unit#79.flags 0x00000000
   r Unit#79.activateFlags 0
   r Unit#79.workTime 0
   r Unit#79.extraction f32:0x00000000
   r Unit#80.buildLeft f32:0x00000000
-  r Unit#80.def UnitDef#279
+  r Unit#80.def UnitDef#0
   r Unit#80.flags 0x00000000
   r Unit#80.activateFlags 0
   r Unit#80.workTime 0
   r Unit#80.extraction f32:0x00000000
   r Unit#81.buildLeft f32:0x00000000
-  r Unit#81.def UnitDef#279
+  r Unit#81.def UnitDef#0
   r Unit#81.flags 0x00000000
   r Unit#81.activateFlags 0
   r Unit#81.workTime 0
   r Unit#81.extraction f32:0x00000000
   r Unit#82.buildLeft f32:0x00000000
-  r Unit#82.def UnitDef#279
+  r Unit#82.def UnitDef#0
   r Unit#82.flags 0x00000000
   r Unit#82.activateFlags 0
   r Unit#82.workTime 0
   r Unit#82.extraction f32:0x00000000
   r Unit#83.buildLeft f32:0x00000000
-  r Unit#83.def UnitDef#279
+  r Unit#83.def UnitDef#0
   r Unit#83.flags 0x00000000
   r Unit#83.activateFlags 0
   r Unit#83.workTime 0
   r Unit#83.extraction f32:0x00000000
   r Unit#84.buildLeft f32:0x00000000
-  r Unit#84.def UnitDef#279
+  r Unit#84.def UnitDef#0
   r Unit#84.flags 0x00000000
   r Unit#84.activateFlags 0
   r Unit#84.workTime 0
   r Unit#84.extraction f32:0x00000000
   r Unit#85.buildLeft f32:0x00000000
-  r Unit#85.def UnitDef#279
+  r Unit#85.def UnitDef#0
   r Unit#85.flags 0x00000000
   r Unit#85.activateFlags 0
   r Unit#85.workTime 0
   r Unit#85.extraction f32:0x00000000
   r Unit#86.buildLeft f32:0x00000000
-  r Unit#86.def UnitDef#279
+  r Unit#86.def UnitDef#0
   r Unit#86.flags 0x00000000
   r Unit#86.activateFlags 0
   r Unit#86.workTime 0
   r Unit#86.extraction f32:0x00000000
   r Unit#87.buildLeft f32:0x00000000
-  r Unit#87.def UnitDef#279
+  r Unit#87.def UnitDef#0
   r Unit#87.flags 0x00000000
   r Unit#87.activateFlags 0
   r Unit#87.workTime 0
   r Unit#87.extraction f32:0x00000000
   r Unit#88.buildLeft f32:0x00000000
-  r Unit#88.def UnitDef#279
+  r Unit#88.def UnitDef#0
   r Unit#88.flags 0x00000000
   r Unit#88.activateFlags 0
   r Unit#88.workTime 0
   r Unit#88.extraction f32:0x00000000
   r Unit#89.buildLeft f32:0x00000000
-  r Unit#89.def UnitDef#279
+  r Unit#89.def UnitDef#0
   r Unit#89.flags 0x00000000
   r Unit#89.activateFlags 0
   r Unit#89.workTime 0
   r Unit#89.extraction f32:0x00000000
   r Unit#90.buildLeft f32:0x00000000
-  r Unit#90.def UnitDef#279
+  r Unit#90.def UnitDef#0
   r Unit#90.flags 0x00000000
   r Unit#90.activateFlags 0
   r Unit#90.workTime 0
   r Unit#90.extraction f32:0x00000000
   r Unit#91.buildLeft f32:0x00000000
-  r Unit#91.def UnitDef#279
+  r Unit#91.def UnitDef#0
   r Unit#91.flags 0x00000000
   r Unit#91.activateFlags 0
   r Unit#91.workTime 0
   r Unit#91.extraction f32:0x00000000
   r Unit#92.buildLeft f32:0x00000000
-  r Unit#92.def UnitDef#279
+  r Unit#92.def UnitDef#0
   r Unit#92.flags 0x00000000
   r Unit#92.activateFlags 0
   r Unit#92.workTime 0
   r Unit#92.extraction f32:0x00000000
   r Unit#93.buildLeft f32:0x00000000
-  r Unit#93.def UnitDef#279
+  r Unit#93.def UnitDef#0
   r Unit#93.flags 0x00000000
   r Unit#93.activateFlags 0
   r Unit#93.workTime 0
   r Unit#93.extraction f32:0x00000000
   r Unit#94.buildLeft f32:0x00000000
-  r Unit#94.def UnitDef#279
+  r Unit#94.def UnitDef#0
   r Unit#94.flags 0x00000000
   r Unit#94.activateFlags 0
   r Unit#94.workTime 0
   r Unit#94.extraction f32:0x00000000
   r Unit#95.buildLeft f32:0x00000000
-  r Unit#95.def UnitDef#279
+  r Unit#95.def UnitDef#0
   r Unit#95.flags 0x00000000
   r Unit#95.activateFlags 0
   r Unit#95.workTime 0
   r Unit#95.extraction f32:0x00000000
   r Unit#96.buildLeft f32:0x00000000
-  r Unit#96.def UnitDef#279
+  r Unit#96.def UnitDef#0
   r Unit#96.flags 0x00000000
   r Unit#96.activateFlags 0
   r Unit#96.workTime 0
   r Unit#96.extraction f32:0x00000000
   r Unit#97.buildLeft f32:0x00000000
-  r Unit#97.def UnitDef#279
+  r Unit#97.def UnitDef#0
   r Unit#97.flags 0x00000000
   r Unit#97.activateFlags 0
   r Unit#97.workTime 0
   r Unit#97.extraction f32:0x00000000
   r Unit#98.buildLeft f32:0x00000000
-  r Unit#98.def UnitDef#279
+  r Unit#98.def UnitDef#0
   r Unit#98.flags 0x00000000
   r Unit#98.activateFlags 0
   r Unit#98.workTime 0
   r Unit#98.extraction f32:0x00000000
   r Unit#99.buildLeft f32:0x00000000
-  r Unit#99.def UnitDef#279
+  r Unit#99.def UnitDef#0
   r Unit#99.flags 0x00000000
   r Unit#99.activateFlags 0
   r Unit#99.workTime 0
   r Unit#99.extraction f32:0x00000000
   r Unit#100.buildLeft f32:0x00000000
-  r Unit#100.def UnitDef#279
+  r Unit#100.def UnitDef#0
   r Unit#100.flags 0x00000000
   r Unit#100.activateFlags 0
   r Unit#100.workTime 0
   r Unit#100.extraction f32:0x00000000
   r Unit#101.buildLeft f32:0x00000000
-  r Unit#101.def UnitDef#279
+  r Unit#101.def UnitDef#0
   r Unit#101.flags 0x00000000
   r Unit#101.activateFlags 0
   r Unit#101.workTime 0
   r Unit#101.extraction f32:0x00000000
   r Unit#102.buildLeft f32:0x00000000
-  r Unit#102.def UnitDef#279
+  r Unit#102.def UnitDef#0
   r Unit#102.flags 0x00000000
   r Unit#102.activateFlags 0
   r Unit#102.workTime 0
   r Unit#102.extraction f32:0x00000000
   r Unit#103.buildLeft f32:0x00000000
-  r Unit#103.def UnitDef#279
+  r Unit#103.def UnitDef#0
   r Unit#103.flags 0x00000000
   r Unit#103.activateFlags 0
   r Unit#103.workTime 0
   r Unit#103.extraction f32:0x00000000
   r Unit#104.buildLeft f32:0x00000000
-  r Unit#104.def UnitDef#279
+  r Unit#104.def UnitDef#0
   r Unit#104.flags 0x00000000
   r Unit#104.activateFlags 0
   r Unit#104.workTime 0
   r Unit#104.extraction f32:0x00000000
   r Unit#105.buildLeft f32:0x00000000
-  r Unit#105.def UnitDef#279
+  r Unit#105.def UnitDef#0
   r Unit#105.flags 0x00000000
   r Unit#105.activateFlags 0
   r Unit#105.workTime 0
   r Unit#105.extraction f32:0x00000000
   r Unit#106.buildLeft f32:0x00000000
-  r Unit#106.def UnitDef#279
+  r Unit#106.def UnitDef#0
   r Unit#106.flags 0x00000000
   r Unit#106.activateFlags 0
   r Unit#106.workTime 0
   r Unit#106.extraction f32:0x00000000
   r Unit#107.buildLeft f32:0x00000000
-  r Unit#107.def UnitDef#279
+  r Unit#107.def UnitDef#0
   r Unit#107.flags 0x00000000
   r Unit#107.activateFlags 0
   r Unit#107.workTime 0
   r Unit#107.extraction f32:0x00000000
   r Unit#108.buildLeft f32:0x00000000
-  r Unit#108.def UnitDef#279
+  r Unit#108.def UnitDef#0
   r Unit#108.flags 0x00000000
   r Unit#108.activateFlags 0
   r Unit#108.workTime 0
   r Unit#108.extraction f32:0x00000000
   r Unit#109.buildLeft f32:0x00000000
-  r Unit#109.def UnitDef#279
+  r Unit#109.def UnitDef#0
   r Unit#109.flags 0x00000000
   r Unit#109.activateFlags 0
   r Unit#109.workTime 0
   r Unit#109.extraction f32:0x00000000
   r Unit#110.buildLeft f32:0x00000000
-  r Unit#110.def UnitDef#279
+  r Unit#110.def UnitDef#0
   r Unit#110.flags 0x00000000
   r Unit#110.activateFlags 0
   r Unit#110.workTime 0
   r Unit#110.extraction f32:0x00000000
   r Unit#111.buildLeft f32:0x00000000
-  r Unit#111.def UnitDef#279
+  r Unit#111.def UnitDef#0
   r Unit#111.flags 0x00000000
   r Unit#111.activateFlags 0
   r Unit#111.workTime 0
   r Unit#111.extraction f32:0x00000000
   r Unit#112.buildLeft f32:0x00000000
-  r Unit#112.def UnitDef#279
+  r Unit#112.def UnitDef#0
   r Unit#112.flags 0x00000000
   r Unit#112.activateFlags 0
   r Unit#112.workTime 0
   r Unit#112.extraction f32:0x00000000
   r Unit#113.buildLeft f32:0x00000000
-  r Unit#113.def UnitDef#279
+  r Unit#113.def UnitDef#0
   r Unit#113.flags 0x00000000
   r Unit#113.activateFlags 0
   r Unit#113.workTime 0
   r Unit#113.extraction f32:0x00000000
   r Unit#114.buildLeft f32:0x00000000
-  r Unit#114.def UnitDef#279
+  r Unit#114.def UnitDef#0
   r Unit#114.flags 0x00000000
   r Unit#114.activateFlags 0
   r Unit#114.workTime 0
   r Unit#114.extraction f32:0x00000000
   r Unit#115.buildLeft f32:0x00000000
-  r Unit#115.def UnitDef#279
+  r Unit#115.def UnitDef#0
   r Unit#115.flags 0x00000000
   r Unit#115.activateFlags 0
   r Unit#115.workTime 0
   r Unit#115.extraction f32:0x00000000
   r Unit#116.buildLeft f32:0x00000000
-  r Unit#116.def UnitDef#279
+  r Unit#116.def UnitDef#0
   r Unit#116.flags 0x00000000
   r Unit#116.activateFlags 0
   r Unit#116.workTime 0
   r Unit#116.extraction f32:0x00000000
   r Unit#117.buildLeft f32:0x00000000
-  r Unit#117.def UnitDef#279
+  r Unit#117.def UnitDef#0
   r Unit#117.flags 0x00000000
   r Unit#117.activateFlags 0
   r Unit#117.workTime 0
   r Unit#117.extraction f32:0x00000000
   r Unit#118.buildLeft f32:0x00000000
-  r Unit#118.def UnitDef#279
+  r Unit#118.def UnitDef#0
   r Unit#118.flags 0x00000000
   r Unit#118.activateFlags 0
   r Unit#118.workTime 0
   r Unit#118.extraction f32:0x00000000
   r Unit#119.buildLeft f32:0x00000000
-  r Unit#119.def UnitDef#279
+  r Unit#119.def UnitDef#0
   r Unit#119.flags 0x00000000
   r Unit#119.activateFlags 0
   r Unit#119.workTime 0
   r Unit#119.extraction f32:0x00000000
   r Unit#120.buildLeft f32:0x00000000
-  r Unit#120.def UnitDef#279
+  r Unit#120.def UnitDef#0
   r Unit#120.flags 0x00000000
   r Unit#120.activateFlags 0
   r Unit#120.workTime 0
   r Unit#120.extraction f32:0x00000000
   r Unit#121.buildLeft f32:0x00000000
-  r Unit#121.def UnitDef#279
+  r Unit#121.def UnitDef#0
   r Unit#121.flags 0x00000000
   r Unit#121.activateFlags 0
   r Unit#121.workTime 0
   r Unit#121.extraction f32:0x00000000
   r Unit#122.buildLeft f32:0x00000000
-  r Unit#122.def UnitDef#279
+  r Unit#122.def UnitDef#0
   r Unit#122.flags 0x00000000
   r Unit#122.activateFlags 0
   r Unit#122.workTime 0
   r Unit#122.extraction f32:0x00000000
   r Unit#123.buildLeft f32:0x00000000
-  r Unit#123.def UnitDef#279
+  r Unit#123.def UnitDef#0
   r Unit#123.flags 0x00000000
   r Unit#123.activateFlags 0
   r Unit#123.workTime 0
   r Unit#123.extraction f32:0x00000000
   r Unit#124.buildLeft f32:0x00000000
-  r Unit#124.def UnitDef#279
+  r Unit#124.def UnitDef#0
   r Unit#124.flags 0x00000000
   r Unit#124.activateFlags 0
   r Unit#124.workTime 0
   r Unit#124.extraction f32:0x00000000
   r Unit#125.buildLeft f32:0x00000000
-  r Unit#125.def UnitDef#279
+  r Unit#125.def UnitDef#0
   r Unit#125.flags 0x00000000
   r Unit#125.activateFlags 0
   r Unit#125.workTime 0
   r Unit#125.extraction f32:0x00000000
   r Unit#126.buildLeft f32:0x00000000
-  r Unit#126.def UnitDef#279
+  r Unit#126.def UnitDef#0
   r Unit#126.flags 0x00000000
   r Unit#126.activateFlags 0
   r Unit#126.workTime 0
   r Unit#126.extraction f32:0x00000000
   r Unit#127.buildLeft f32:0x00000000
-  r Unit#127.def UnitDef#279
+  r Unit#127.def UnitDef#0
   r Unit#127.flags 0x00000000
   r Unit#127.activateFlags 0
   r Unit#127.workTime 0
   r Unit#127.extraction f32:0x00000000
   r Unit#128.buildLeft f32:0x00000000
-  r Unit#128.def UnitDef#279
+  r Unit#128.def UnitDef#0
   r Unit#128.flags 0x00000000
   r Unit#128.activateFlags 0
   r Unit#128.workTime 0
   r Unit#128.extraction f32:0x00000000
   r Unit#129.buildLeft f32:0x00000000
-  r Unit#129.def UnitDef#279
+  r Unit#129.def UnitDef#0
   r Unit#129.flags 0x00000000
   r Unit#129.activateFlags 0
   r Unit#129.workTime 0
   r Unit#129.extraction f32:0x00000000
   r Unit#130.buildLeft f32:0x00000000
-  r Unit#130.def UnitDef#279
+  r Unit#130.def UnitDef#0
   r Unit#130.flags 0x00000000
   r Unit#130.activateFlags 0
   r Unit#130.workTime 0
   r Unit#130.extraction f32:0x00000000
   r Unit#131.buildLeft f32:0x00000000
-  r Unit#131.def UnitDef#279
+  r Unit#131.def UnitDef#0
   r Unit#131.flags 0x00000000
   r Unit#131.activateFlags 0
   r Unit#131.workTime 0
   r Unit#131.extraction f32:0x00000000
   r Unit#132.buildLeft f32:0x00000000
-  r Unit#132.def UnitDef#279
+  r Unit#132.def UnitDef#0
   r Unit#132.flags 0x00000000
   r Unit#132.activateFlags 0
   r Unit#132.workTime 0
   r Unit#132.extraction f32:0x00000000
   r Unit#133.buildLeft f32:0x00000000
-  r Unit#133.def UnitDef#279
+  r Unit#133.def UnitDef#0
   r Unit#133.flags 0x00000000
   r Unit#133.activateFlags 0
   r Unit#133.workTime 0
   r Unit#133.extraction f32:0x00000000
   r Unit#134.buildLeft f32:0x00000000
-  r Unit#134.def UnitDef#279
+  r Unit#134.def UnitDef#0
   r Unit#134.flags 0x00000000
   r Unit#134.activateFlags 0
   r Unit#134.workTime 0
   r Unit#134.extraction f32:0x00000000
   r Unit#135.buildLeft f32:0x00000000
-  r Unit#135.def UnitDef#279
+  r Unit#135.def UnitDef#0
   r Unit#135.flags 0x00000000
   r Unit#135.activateFlags 0
   r Unit#135.workTime 0
   r Unit#135.extraction f32:0x00000000
   r Unit#136.buildLeft f32:0x00000000
-  r Unit#136.def UnitDef#279
+  r Unit#136.def UnitDef#0
   r Unit#136.flags 0x00000000
   r Unit#136.activateFlags 0
   r Unit#136.workTime 0
   r Unit#136.extraction f32:0x00000000
   r Unit#137.buildLeft f32:0x00000000
-  r Unit#137.def UnitDef#279
+  r Unit#137.def UnitDef#0
   r Unit#137.flags 0x00000000
   r Unit#137.activateFlags 0
   r Unit#137.workTime 0
   r Unit#137.extraction f32:0x00000000
   r Unit#138.buildLeft f32:0x00000000
-  r Unit#138.def UnitDef#279
+  r Unit#138.def UnitDef#0
   r Unit#138.flags 0x00000000
   r Unit#138.activateFlags 0
   r Unit#138.workTime 0
   r Unit#138.extraction f32:0x00000000
   r Unit#139.buildLeft f32:0x00000000
-  r Unit#139.def UnitDef#279
+  r Unit#139.def UnitDef#0
   r Unit#139.flags 0x00000000
   r Unit#139.activateFlags 0
   r Unit#139.workTime 0
   r Unit#139.extraction f32:0x00000000
   r Unit#140.buildLeft f32:0x00000000
-  r Unit#140.def UnitDef#279
+  r Unit#140.def UnitDef#0
   r Unit#140.flags 0x00000000
   r Unit#140.activateFlags 0
   r Unit#140.workTime 0
   r Unit#140.extraction f32:0x00000000
   r Unit#141.buildLeft f32:0x00000000
-  r Unit#141.def UnitDef#279
+  r Unit#141.def UnitDef#0
   r Unit#141.flags 0x00000000
   r Unit#141.activateFlags 0
   r Unit#141.workTime 0
   r Unit#141.extraction f32:0x00000000
   r Unit#142.buildLeft f32:0x00000000
-  r Unit#142.def UnitDef#279
+  r Unit#142.def UnitDef#0
   r Unit#142.flags 0x00000000
   r Unit#142.activateFlags 0
   r Unit#142.workTime 0
   r Unit#142.extraction f32:0x00000000
   r Unit#143.buildLeft f32:0x00000000
-  r Unit#143.def UnitDef#279
+  r Unit#143.def UnitDef#0
   r Unit#143.flags 0x00000000
   r Unit#143.activateFlags 0
   r Unit#143.workTime 0
   r Unit#143.extraction f32:0x00000000
   r Unit#144.buildLeft f32:0x00000000
-  r Unit#144.def UnitDef#279
+  r Unit#144.def UnitDef#0
   r Unit#144.flags 0x00000000
   r Unit#144.activateFlags 0
   r Unit#144.workTime 0
   r Unit#144.extraction f32:0x00000000
   r Unit#145.buildLeft f32:0x00000000
-  r Unit#145.def UnitDef#279
+  r Unit#145.def UnitDef#0
   r Unit#145.flags 0x00000000
   r Unit#145.activateFlags 0
   r Unit#145.workTime 0
   r Unit#145.extraction f32:0x00000000
   r Unit#146.buildLeft f32:0x00000000
-  r Unit#146.def UnitDef#279
+  r Unit#146.def UnitDef#0
   r Unit#146.flags 0x00000000
   r Unit#146.activateFlags 0
   r Unit#146.workTime 0
   r Unit#146.extraction f32:0x00000000
   r Unit#147.buildLeft f32:0x00000000
-  r Unit#147.def UnitDef#279
+  r Unit#147.def UnitDef#0
   r Unit#147.flags 0x00000000
   r Unit#147.activateFlags 0
   r Unit#147.workTime 0
   r Unit#147.extraction f32:0x00000000
   r Unit#148.buildLeft f32:0x00000000
-  r Unit#148.def UnitDef#279
+  r Unit#148.def UnitDef#0
   r Unit#148.flags 0x00000000
   r Unit#148.activateFlags 0
   r Unit#148.workTime 0
   r Unit#148.extraction f32:0x00000000
   r Unit#149.buildLeft f32:0x00000000
-  r Unit#149.def UnitDef#279
+  r Unit#149.def UnitDef#0
   r Unit#149.flags 0x00000000
   r Unit#149.activateFlags 0
   r Unit#149.workTime 0
   r Unit#149.extraction f32:0x00000000
   r Unit#150.buildLeft f32:0x00000000
-  r Unit#150.def UnitDef#279
+  r Unit#150.def UnitDef#0
   r Unit#150.flags 0x00000000
   r Unit#150.activateFlags 0
   r Unit#150.workTime 0
   r Unit#150.extraction f32:0x00000000
   r Unit#151.buildLeft f32:0x00000000
-  r Unit#151.def UnitDef#279
+  r Unit#151.def UnitDef#0
   r Unit#151.flags 0x00000000
   r Unit#151.activateFlags 0
   r Unit#151.workTime 0
   r Unit#151.extraction f32:0x00000000
   r Unit#152.buildLeft f32:0x00000000
-  r Unit#152.def UnitDef#279
+  r Unit#152.def UnitDef#0
   r Unit#152.flags 0x00000000
   r Unit#152.activateFlags 0
   r Unit#152.workTime 0
   r Unit#152.extraction f32:0x00000000
   r Unit#153.buildLeft f32:0x00000000
-  r Unit#153.def UnitDef#279
+  r Unit#153.def UnitDef#0
   r Unit#153.flags 0x00000000
   r Unit#153.activateFlags 0
   r Unit#153.workTime 0
   r Unit#153.extraction f32:0x00000000
   r Unit#154.buildLeft f32:0x00000000
-  r Unit#154.def UnitDef#279
+  r Unit#154.def UnitDef#0
   r Unit#154.flags 0x00000000
   r Unit#154.activateFlags 0
   r Unit#154.workTime 0
   r Unit#154.extraction f32:0x00000000
   r Unit#155.buildLeft f32:0x00000000
-  r Unit#155.def UnitDef#279
+  r Unit#155.def UnitDef#0
   r Unit#155.flags 0x00000000
   r Unit#155.activateFlags 0
   r Unit#155.workTime 0
   r Unit#155.extraction f32:0x00000000
   r Unit#156.buildLeft f32:0x00000000
-  r Unit#156.def UnitDef#279
+  r Unit#156.def UnitDef#0
   r Unit#156.flags 0x00000000
   r Unit#156.activateFlags 0
   r Unit#156.workTime 0
   r Unit#156.extraction f32:0x00000000
   r Unit#157.buildLeft f32:0x00000000
-  r Unit#157.def UnitDef#279
+  r Unit#157.def UnitDef#0
   r Unit#157.flags 0x00000000
   r Unit#157.activateFlags 0
   r Unit#157.workTime 0
   r Unit#157.extraction f32:0x00000000
   r Unit#158.buildLeft f32:0x00000000
-  r Unit#158.def UnitDef#279
+  r Unit#158.def UnitDef#0
   r Unit#158.flags 0x00000000
   r Unit#158.activateFlags 0
   r Unit#158.workTime 0
   r Unit#158.extraction f32:0x00000000
   r Unit#159.buildLeft f32:0x00000000
-  r Unit#159.def UnitDef#279
+  r Unit#159.def UnitDef#0
   r Unit#159.flags 0x00000000
   r Unit#159.activateFlags 0
   r Unit#159.workTime 0
   r Unit#159.extraction f32:0x00000000
   r Unit#160.buildLeft f32:0x00000000
-  r Unit#160.def UnitDef#279
+  r Unit#160.def UnitDef#0
   r Unit#160.flags 0x00000000
   r Unit#160.activateFlags 0
   r Unit#160.workTime 0
   r Unit#160.extraction f32:0x00000000
   r Unit#161.buildLeft f32:0x00000000
-  r Unit#161.def UnitDef#279
+  r Unit#161.def UnitDef#0
   r Unit#161.flags 0x00000000
   r Unit#161.activateFlags 0
   r Unit#161.workTime 0
   r Unit#161.extraction f32:0x00000000
   r Unit#162.buildLeft f32:0x00000000
-  r Unit#162.def UnitDef#279
+  r Unit#162.def UnitDef#0
   r Unit#162.flags 0x00000000
   r Unit#162.activateFlags 0
   r Unit#162.workTime 0
   r Unit#162.extraction f32:0x00000000
   r Unit#163.buildLeft f32:0x00000000
-  r Unit#163.def UnitDef#279
+  r Unit#163.def UnitDef#0
   r Unit#163.flags 0x00000000
   r Unit#163.activateFlags 0
   r Unit#163.workTime 0
   r Unit#163.extraction f32:0x00000000
   r Unit#164.buildLeft f32:0x00000000
-  r Unit#164.def UnitDef#279
+  r Unit#164.def UnitDef#0
   r Unit#164.flags 0x00000000
   r Unit#164.activateFlags 0
   r Unit#164.workTime 0
   r Unit#164.extraction f32:0x00000000
   r Unit#165.buildLeft f32:0x00000000
-  r Unit#165.def UnitDef#279
+  r Unit#165.def UnitDef#0
   r Unit#165.flags 0x00000000
   r Unit#165.activateFlags 0
   r Unit#165.workTime 0
   r Unit#165.extraction f32:0x00000000
   r Unit#166.buildLeft f32:0x00000000
-  r Unit#166.def UnitDef#279
+  r Unit#166.def UnitDef#0
   r Unit#166.flags 0x00000000
   r Unit#166.activateFlags 0
   r Unit#166.workTime 0
   r Unit#166.extraction f32:0x00000000
   r Unit#167.buildLeft f32:0x00000000
-  r Unit#167.def UnitDef#279
+  r Unit#167.def UnitDef#0
   r Unit#167.flags 0x00000000
   r Unit#167.activateFlags 0
   r Unit#167.workTime 0
   r Unit#167.extraction f32:0x00000000
   r Unit#168.buildLeft f32:0x00000000
-  r Unit#168.def UnitDef#279
+  r Unit#168.def UnitDef#0
   r Unit#168.flags 0x00000000
   r Unit#168.activateFlags 0
   r Unit#168.workTime 0
   r Unit#168.extraction f32:0x00000000
   r Unit#169.buildLeft f32:0x00000000
-  r Unit#169.def UnitDef#279
+  r Unit#169.def UnitDef#0
   r Unit#169.flags 0x00000000
   r Unit#169.activateFlags 0
   r Unit#169.workTime 0
   r Unit#169.extraction f32:0x00000000
   r Unit#170.buildLeft f32:0x00000000
-  r Unit#170.def UnitDef#279
+  r Unit#170.def UnitDef#0
   r Unit#170.flags 0x00000000
   r Unit#170.activateFlags 0
   r Unit#170.workTime 0
   r Unit#170.extraction f32:0x00000000
   r Unit#171.buildLeft f32:0x00000000
-  r Unit#171.def UnitDef#279
+  r Unit#171.def UnitDef#0
   r Unit#171.flags 0x00000000
   r Unit#171.activateFlags 0
   r Unit#171.workTime 0
   r Unit#171.extraction f32:0x00000000
   r Unit#172.buildLeft f32:0x00000000
-  r Unit#172.def UnitDef#279
+  r Unit#172.def UnitDef#0
   r Unit#172.flags 0x00000000
   r Unit#172.activateFlags 0
   r Unit#172.workTime 0
   r Unit#172.extraction f32:0x00000000
   r Unit#173.buildLeft f32:0x00000000
-  r Unit#173.def UnitDef#279
+  r Unit#173.def UnitDef#0
   r Unit#173.flags 0x00000000
   r Unit#173.activateFlags 0
   r Unit#173.workTime 0
   r Unit#173.extraction f32:0x00000000
   r Unit#174.buildLeft f32:0x00000000
-  r Unit#174.def UnitDef#279
+  r Unit#174.def UnitDef#0
   r Unit#174.flags 0x00000000
   r Unit#174.activateFlags 0
   r Unit#174.workTime 0
   r Unit#174.extraction f32:0x00000000
   r Unit#175.buildLeft f32:0x00000000
-  r Unit#175.def UnitDef#279
+  r Unit#175.def UnitDef#0
   r Unit#175.flags 0x00000000
   r Unit#175.activateFlags 0
   r Unit#175.workTime 0
   r Unit#175.extraction f32:0x00000000
   r Unit#176.buildLeft f32:0x00000000
-  r Unit#176.def UnitDef#279
+  r Unit#176.def UnitDef#0
   r Unit#176.flags 0x00000000
   r Unit#176.activateFlags 0
   r Unit#176.workTime 0
   r Unit#176.extraction f32:0x00000000
   r Unit#177.buildLeft f32:0x00000000
-  r Unit#177.def UnitDef#279
+  r Unit#177.def UnitDef#0
   r Unit#177.flags 0x00000000
   r Unit#177.activateFlags 0
   r Unit#177.workTime 0
   r Unit#177.extraction f32:0x00000000
   r Unit#178.buildLeft f32:0x00000000
-  r Unit#178.def UnitDef#279
+  r Unit#178.def UnitDef#0
   r Unit#178.flags 0x00000000
   r Unit#178.activateFlags 0
   r Unit#178.workTime 0
   r Unit#178.extraction f32:0x00000000
   r Unit#179.buildLeft f32:0x00000000
-  r Unit#179.def UnitDef#279
+  r Unit#179.def UnitDef#0
   r Unit#179.flags 0x00000000
   r Unit#179.activateFlags 0
   r Unit#179.workTime 0
   r Unit#179.extraction f32:0x00000000
   r Unit#180.buildLeft f32:0x00000000
-  r Unit#180.def UnitDef#279
+  r Unit#180.def UnitDef#0
   r Unit#180.flags 0x00000000
   r Unit#180.activateFlags 0
   r Unit#180.workTime 0
   r Unit#180.extraction f32:0x00000000
   r Unit#181.buildLeft f32:0x00000000
-  r Unit#181.def UnitDef#279
+  r Unit#181.def UnitDef#0
   r Unit#181.flags 0x00000000
   r Unit#181.activateFlags 0
   r Unit#181.workTime 0
   r Unit#181.extraction f32:0x00000000
   r Unit#182.buildLeft f32:0x00000000
-  r Unit#182.def UnitDef#279
+  r Unit#182.def UnitDef#0
   r Unit#182.flags 0x00000000
   r Unit#182.activateFlags 0
   r Unit#182.workTime 0
   r Unit#182.extraction f32:0x00000000
   r Unit#183.buildLeft f32:0x00000000
-  r Unit#183.def UnitDef#279
+  r Unit#183.def UnitDef#0
   r Unit#183.flags 0x00000000
   r Unit#183.activateFlags 0
   r Unit#183.workTime 0
   r Unit#183.extraction f32:0x00000000
   r Unit#184.buildLeft f32:0x00000000
-  r Unit#184.def UnitDef#279
+  r Unit#184.def UnitDef#0
   r Unit#184.flags 0x00000000
   r Unit#184.activateFlags 0
   r Unit#184.workTime 0
   r Unit#184.extraction f32:0x00000000
   r Unit#185.buildLeft f32:0x00000000
-  r Unit#185.def UnitDef#279
+  r Unit#185.def UnitDef#0
   r Unit#185.flags 0x00000000
   r Unit#185.activateFlags 0
   r Unit#185.workTime 0
   r Unit#185.extraction f32:0x00000000
   r Unit#186.buildLeft f32:0x00000000
-  r Unit#186.def UnitDef#279
+  r Unit#186.def UnitDef#0
   r Unit#186.flags 0x00000000
   r Unit#186.activateFlags 0
   r Unit#186.workTime 0
   r Unit#186.extraction f32:0x00000000
   r Unit#187.buildLeft f32:0x00000000
-  r Unit#187.def UnitDef#279
+  r Unit#187.def UnitDef#0
   r Unit#187.flags 0x00000000
   r Unit#187.activateFlags 0
   r Unit#187.workTime 0
   r Unit#187.extraction f32:0x00000000
   r Unit#188.buildLeft f32:0x00000000
-  r Unit#188.def UnitDef#279
+  r Unit#188.def UnitDef#0
   r Unit#188.flags 0x00000000
   r Unit#188.activateFlags 0
   r Unit#188.workTime 0
   r Unit#188.extraction f32:0x00000000
   r Unit#189.buildLeft f32:0x00000000
-  r Unit#189.def UnitDef#279
+  r Unit#189.def UnitDef#0
   r Unit#189.flags 0x00000000
   r Unit#189.activateFlags 0
   r Unit#189.workTime 0
   r Unit#189.extraction f32:0x00000000
   r Unit#190.buildLeft f32:0x00000000
-  r Unit#190.def UnitDef#279
+  r Unit#190.def UnitDef#0
   r Unit#190.flags 0x00000000
   r Unit#190.activateFlags 0
   r Unit#190.workTime 0
   r Unit#190.extraction f32:0x00000000
   r Unit#191.buildLeft f32:0x00000000
-  r Unit#191.def UnitDef#279
+  r Unit#191.def UnitDef#0
   r Unit#191.flags 0x00000000
   r Unit#191.activateFlags 0
   r Unit#191.workTime 0
   r Unit#191.extraction f32:0x00000000
   r Unit#192.buildLeft f32:0x00000000
-  r Unit#192.def UnitDef#279
+  r Unit#192.def UnitDef#0
   r Unit#192.flags 0x00000000
   r Unit#192.activateFlags 0
   r Unit#192.workTime 0
   r Unit#192.extraction f32:0x00000000
   r Unit#193.buildLeft f32:0x00000000
-  r Unit#193.def UnitDef#279
+  r Unit#193.def UnitDef#0
   r Unit#193.flags 0x00000000
   r Unit#193.activateFlags 0
   r Unit#193.workTime 0
   r Unit#193.extraction f32:0x00000000
   r Unit#194.buildLeft f32:0x00000000
-  r Unit#194.def UnitDef#279
+  r Unit#194.def UnitDef#0
   r Unit#194.flags 0x00000000
   r Unit#194.activateFlags 0
   r Unit#194.workTime 0
   r Unit#194.extraction f32:0x00000000
   r Unit#195.buildLeft f32:0x00000000
-  r Unit#195.def UnitDef#279
+  r Unit#195.def UnitDef#0
   r Unit#195.flags 0x00000000
   r Unit#195.activateFlags 0
   r Unit#195.workTime 0
   r Unit#195.extraction f32:0x00000000
   r Unit#196.buildLeft f32:0x00000000
-  r Unit#196.def UnitDef#279
+  r Unit#196.def UnitDef#0
   r Unit#196.flags 0x00000000
   r Unit#196.activateFlags 0
   r Unit#196.workTime 0
   r Unit#196.extraction f32:0x00000000
   r Unit#197.buildLeft f32:0x00000000
-  r Unit#197.def UnitDef#279
+  r Unit#197.def UnitDef#0
   r Unit#197.flags 0x00000000
   r Unit#197.activateFlags 0
   r Unit#197.workTime 0
   r Unit#197.extraction f32:0x00000000
   r Unit#198.buildLeft f32:0x00000000
-  r Unit#198.def UnitDef#279
+  r Unit#198.def UnitDef#0
   r Unit#198.flags 0x00000000
   r Unit#198.activateFlags 0
   r Unit#198.workTime 0
   r Unit#198.extraction f32:0x00000000
   r Unit#199.buildLeft f32:0x00000000
-  r Unit#199.def UnitDef#279
+  r Unit#199.def UnitDef#0
   r Unit#199.flags 0x00000000
   r Unit#199.activateFlags 0
   r Unit#199.workTime 0
   r Unit#199.extraction f32:0x00000000
   r Unit#200.buildLeft f32:0x00000000
-  r Unit#200.def UnitDef#279
+  r Unit#200.def UnitDef#0
   r Unit#200.flags 0x00000000
   r Unit#200.activateFlags 0
   r Unit#200.workTime 0
   r Unit#200.extraction f32:0x00000000
   r Unit#201.buildLeft f32:0x00000000
-  r Unit#201.def UnitDef#279
+  r Unit#201.def UnitDef#0
   r Unit#201.flags 0x00000000
   r Unit#201.activateFlags 0
   r Unit#201.workTime 0
   r Unit#201.extraction f32:0x00000000
   r Unit#202.buildLeft f32:0x00000000
-  r Unit#202.def UnitDef#279
+  r Unit#202.def UnitDef#0
   r Unit#202.flags 0x00000000
   r Unit#202.activateFlags 0
   r Unit#202.workTime 0
   r Unit#202.extraction f32:0x00000000
   r Unit#203.buildLeft f32:0x00000000
-  r Unit#203.def UnitDef#279
+  r Unit#203.def UnitDef#0
   r Unit#203.flags 0x00000000
   r Unit#203.activateFlags 0
   r Unit#203.workTime 0
   r Unit#203.extraction f32:0x00000000
   r Unit#204.buildLeft f32:0x00000000
-  r Unit#204.def UnitDef#279
+  r Unit#204.def UnitDef#0
   r Unit#204.flags 0x00000000
   r Unit#204.activateFlags 0
   r Unit#204.workTime 0
   r Unit#204.extraction f32:0x00000000
   r Unit#205.buildLeft f32:0x00000000
-  r Unit#205.def UnitDef#279
+  r Unit#205.def UnitDef#0
   r Unit#205.flags 0x00000000
   r Unit#205.activateFlags 0
   r Unit#205.workTime 0
   r Unit#205.extraction f32:0x00000000
   r Unit#206.buildLeft f32:0x00000000
-  r Unit#206.def UnitDef#279
+  r Unit#206.def UnitDef#0
   r Unit#206.flags 0x00000000
   r Unit#206.activateFlags 0
   r Unit#206.workTime 0
   r Unit#206.extraction f32:0x00000000
   r Unit#207.buildLeft f32:0x00000000
-  r Unit#207.def UnitDef#279
+  r Unit#207.def UnitDef#0
   r Unit#207.flags 0x00000000
   r Unit#207.activateFlags 0
   r Unit#207.workTime 0
   r Unit#207.extraction f32:0x00000000
   r Unit#208.buildLeft f32:0x00000000
-  r Unit#208.def UnitDef#279
+  r Unit#208.def UnitDef#0
   r Unit#208.flags 0x00000000
   r Unit#208.activateFlags 0
   r Unit#208.workTime 0
   r Unit#208.extraction f32:0x00000000
   r Unit#209.buildLeft f32:0x00000000
-  r Unit#209.def UnitDef#279
+  r Unit#209.def UnitDef#0
   r Unit#209.flags 0x00000000
   r Unit#209.activateFlags 0
   r Unit#209.workTime 0
   r Unit#209.extraction f32:0x00000000
   r Unit#210.buildLeft f32:0x00000000
-  r Unit#210.def UnitDef#279
+  r Unit#210.def UnitDef#0
   r Unit#210.flags 0x00000000
   r Unit#210.activateFlags 0
   r Unit#210.workTime 0
   r Unit#210.extraction f32:0x00000000
   r Unit#211.buildLeft f32:0x00000000
-  r Unit#211.def UnitDef#279
+  r Unit#211.def UnitDef#0
   r Unit#211.flags 0x00000000
   r Unit#211.activateFlags 0
   r Unit#211.workTime 0
   r Unit#211.extraction f32:0x00000000
   r Unit#212.buildLeft f32:0x00000000
-  r Unit#212.def UnitDef#279
+  r Unit#212.def UnitDef#0
   r Unit#212.flags 0x00000000
   r Unit#212.activateFlags 0
   r Unit#212.workTime 0
   r Unit#212.extraction f32:0x00000000
   r Unit#213.buildLeft f32:0x00000000
-  r Unit#213.def UnitDef#279
+  r Unit#213.def UnitDef#0
   r Unit#213.flags 0x00000000
   r Unit#213.activateFlags 0
   r Unit#213.workTime 0
   r Unit#213.extraction f32:0x00000000
   r Unit#214.buildLeft f32:0x00000000
-  r Unit#214.def UnitDef#279
+  r Unit#214.def UnitDef#0
   r Unit#214.flags 0x00000000
   r Unit#214.activateFlags 0
   r Unit#214.workTime 0
   r Unit#214.extraction f32:0x00000000
   r Unit#215.buildLeft f32:0x00000000
-  r Unit#215.def UnitDef#279
+  r Unit#215.def UnitDef#0
   r Unit#215.flags 0x00000000
   r Unit#215.activateFlags 0
   r Unit#215.workTime 0
   r Unit#215.extraction f32:0x00000000
   r Unit#216.buildLeft f32:0x00000000
-  r Unit#216.def UnitDef#279
+  r Unit#216.def UnitDef#0
   r Unit#216.flags 0x00000000
   r Unit#216.activateFlags 0
   r Unit#216.workTime 0
   r Unit#216.extraction f32:0x00000000
   r Unit#217.buildLeft f32:0x00000000
-  r Unit#217.def UnitDef#279
+  r Unit#217.def UnitDef#0
   r Unit#217.flags 0x00000000
   r Unit#217.activateFlags 0
   r Unit#217.workTime 0
   r Unit#217.extraction f32:0x00000000
   r Unit#218.buildLeft f32:0x00000000
-  r Unit#218.def UnitDef#279
+  r Unit#218.def UnitDef#0
   r Unit#218.flags 0x00000000
   r Unit#218.activateFlags 0
   r Unit#218.workTime 0
   r Unit#218.extraction f32:0x00000000
   r Unit#219.buildLeft f32:0x00000000
-  r Unit#219.def UnitDef#279
+  r Unit#219.def UnitDef#0
   r Unit#219.flags 0x00000000
   r Unit#219.activateFlags 0
   r Unit#219.workTime 0
   r Unit#219.extraction f32:0x00000000
   r Unit#220.buildLeft f32:0x00000000
-  r Unit#220.def UnitDef#279
+  r Unit#220.def UnitDef#0
   r Unit#220.flags 0x00000000
   r Unit#220.activateFlags 0
   r Unit#220.workTime 0
   r Unit#220.extraction f32:0x00000000
   r Unit#221.buildLeft f32:0x00000000
-  r Unit#221.def UnitDef#279
+  r Unit#221.def UnitDef#0
   r Unit#221.flags 0x00000000
   r Unit#221.activateFlags 0
   r Unit#221.workTime 0
   r Unit#221.extraction f32:0x00000000
   r Unit#222.buildLeft f32:0x00000000
-  r Unit#222.def UnitDef#279
+  r Unit#222.def UnitDef#0
   r Unit#222.flags 0x00000000
   r Unit#222.activateFlags 0
   r Unit#222.workTime 0
   r Unit#222.extraction f32:0x00000000
   r Unit#223.buildLeft f32:0x00000000
-  r Unit#223.def UnitDef#279
+  r Unit#223.def UnitDef#0
   r Unit#223.flags 0x00000000
   r Unit#223.activateFlags 0
   r Unit#223.workTime 0
   r Unit#223.extraction f32:0x00000000
   r Unit#224.buildLeft f32:0x00000000
-  r Unit#224.def UnitDef#279
+  r Unit#224.def UnitDef#0
   r Unit#224.flags 0x00000000
   r Unit#224.activateFlags 0
   r Unit#224.workTime 0
   r Unit#224.extraction f32:0x00000000
   r Unit#225.buildLeft f32:0x00000000
-  r Unit#225.def UnitDef#279
+  r Unit#225.def UnitDef#0
   r Unit#225.flags 0x00000000
   r Unit#225.activateFlags 0
   r Unit#225.workTime 0
   r Unit#225.extraction f32:0x00000000
   r Unit#226.buildLeft f32:0x00000000
-  r Unit#226.def UnitDef#279
+  r Unit#226.def UnitDef#0
   r Unit#226.flags 0x00000000
   r Unit#226.activateFlags 0
   r Unit#226.workTime 0
   r Unit#226.extraction f32:0x00000000
   r Unit#227.buildLeft f32:0x00000000
-  r Unit#227.def UnitDef#279
+  r Unit#227.def UnitDef#0
   r Unit#227.flags 0x00000000
   r Unit#227.activateFlags 0
   r Unit#227.workTime 0
   r Unit#227.extraction f32:0x00000000
   r Unit#228.buildLeft f32:0x00000000
-  r Unit#228.def UnitDef#279
+  r Unit#228.def UnitDef#0
   r Unit#228.flags 0x00000000
   r Unit#228.activateFlags 0
   r Unit#228.workTime 0
   r Unit#228.extraction f32:0x00000000
   r Unit#229.buildLeft f32:0x00000000
-  r Unit#229.def UnitDef#279
+  r Unit#229.def UnitDef#0
   r Unit#229.flags 0x00000000
   r Unit#229.activateFlags 0
   r Unit#229.workTime 0
   r Unit#229.extraction f32:0x00000000
   r Unit#230.buildLeft f32:0x00000000
-  r Unit#230.def UnitDef#279
+  r Unit#230.def UnitDef#0
   r Unit#230.flags 0x00000000
   r Unit#230.activateFlags 0
   r Unit#230.workTime 0
   r Unit#230.extraction f32:0x00000000
   r Unit#231.buildLeft f32:0x00000000
-  r Unit#231.def UnitDef#279
+  r Unit#231.def UnitDef#0
   r Unit#231.flags 0x00000000
   r Unit#231.activateFlags 0
   r Unit#231.workTime 0
   r Unit#231.extraction f32:0x00000000
   r Unit#232.buildLeft f32:0x00000000
-  r Unit#232.def UnitDef#279
+  r Unit#232.def UnitDef#0
   r Unit#232.flags 0x00000000
   r Unit#232.activateFlags 0
   r Unit#232.workTime 0
   r Unit#232.extraction f32:0x00000000
   r Unit#233.buildLeft f32:0x00000000
-  r Unit#233.def UnitDef#279
+  r Unit#233.def UnitDef#0
   r Unit#233.flags 0x00000000
   r Unit#233.activateFlags 0
   r Unit#233.workTime 0
   r Unit#233.extraction f32:0x00000000
   r Unit#234.buildLeft f32:0x00000000
-  r Unit#234.def UnitDef#279
+  r Unit#234.def UnitDef#0
   r Unit#234.flags 0x00000000
   r Unit#234.activateFlags 0
   r Unit#234.workTime 0
   r Unit#234.extraction f32:0x00000000
   r Unit#235.buildLeft f32:0x00000000
-  r Unit#235.def UnitDef#279
+  r Unit#235.def UnitDef#0
   r Unit#235.flags 0x00000000
   r Unit#235.activateFlags 0
   r Unit#235.workTime 0
   r Unit#235.extraction f32:0x00000000
   r Unit#236.buildLeft f32:0x00000000
-  r Unit#236.def UnitDef#279
+  r Unit#236.def UnitDef#0
   r Unit#236.flags 0x00000000
   r Unit#236.activateFlags 0
   r Unit#236.workTime 0
   r Unit#236.extraction f32:0x00000000
   r Unit#237.buildLeft f32:0x00000000
-  r Unit#237.def UnitDef#279
+  r Unit#237.def UnitDef#0
   r Unit#237.flags 0x00000000
   r Unit#237.activateFlags 0
   r Unit#237.workTime 0
   r Unit#237.extraction f32:0x00000000
   r Unit#238.buildLeft f32:0x00000000
-  r Unit#238.def UnitDef#279
+  r Unit#238.def UnitDef#0
   r Unit#238.flags 0x00000000
   r Unit#238.activateFlags 0
   r Unit#238.workTime 0
   r Unit#238.extraction f32:0x00000000
   r Unit#239.buildLeft f32:0x00000000
-  r Unit#239.def UnitDef#279
+  r Unit#239.def UnitDef#0
   r Unit#239.flags 0x00000000
   r Unit#239.activateFlags 0
   r Unit#239.workTime 0
   r Unit#239.extraction f32:0x00000000
   r Unit#240.buildLeft f32:0x00000000
-  r Unit#240.def UnitDef#279
+  r Unit#240.def UnitDef#0
   r Unit#240.flags 0x00000000
   r Unit#240.activateFlags 0
   r Unit#240.workTime 0
   r Unit#240.extraction f32:0x00000000
   r Unit#241.buildLeft f32:0x00000000
-  r Unit#241.def UnitDef#279
+  r Unit#241.def UnitDef#0
   r Unit#241.flags 0x00000000
   r Unit#241.activateFlags 0
   r Unit#241.workTime 0
   r Unit#241.extraction f32:0x00000000
   r Unit#242.buildLeft f32:0x00000000
-  r Unit#242.def UnitDef#279
+  r Unit#242.def UnitDef#0
   r Unit#242.flags 0x00000000
   r Unit#242.activateFlags 0
   r Unit#242.workTime 0
   r Unit#242.extraction f32:0x00000000
   r Unit#243.buildLeft f32:0x00000000
-  r Unit#243.def UnitDef#279
+  r Unit#243.def UnitDef#0
   r Unit#243.flags 0x00000000
   r Unit#243.activateFlags 0
   r Unit#243.workTime 0
   r Unit#243.extraction f32:0x00000000
   r Unit#244.buildLeft f32:0x00000000
-  r Unit#244.def UnitDef#279
+  r Unit#244.def UnitDef#0
   r Unit#244.flags 0x00000000
   r Unit#244.activateFlags 0
   r Unit#244.workTime 0
   r Unit#244.extraction f32:0x00000000
   r Unit#245.buildLeft f32:0x00000000
-  r Unit#245.def UnitDef#279
+  r Unit#245.def UnitDef#0
   r Unit#245.flags 0x00000000
   r Unit#245.activateFlags 0
   r Unit#245.workTime 0
   r Unit#245.extraction f32:0x00000000
   r Unit#246.buildLeft f32:0x00000000
-  r Unit#246.def UnitDef#279
+  r Unit#246.def UnitDef#0
   r Unit#246.flags 0x00000000
   r Unit#246.activateFlags 0
   r Unit#246.workTime 0
   r Unit#246.extraction f32:0x00000000
   r Unit#247.buildLeft f32:0x00000000
-  r Unit#247.def UnitDef#279
+  r Unit#247.def UnitDef#0
   r Unit#247.flags 0x00000000
   r Unit#247.activateFlags 0
   r Unit#247.workTime 0
   r Unit#247.extraction f32:0x00000000
   r Unit#248.buildLeft f32:0x00000000
-  r Unit#248.def UnitDef#279
+  r Unit#248.def UnitDef#0
   r Unit#248.flags 0x00000000
   r Unit#248.activateFlags 0
   r Unit#248.workTime 0
   r Unit#248.extraction f32:0x00000000
   r Unit#249.buildLeft f32:0x00000000
-  r Unit#249.def UnitDef#279
+  r Unit#249.def UnitDef#0
   r Unit#249.flags 0x00000000
   r Unit#249.activateFlags 0
   r Unit#249.workTime 0
   r Unit#249.extraction f32:0x00000000
   r Unit#250.buildLeft f32:0x00000000
-  r Unit#250.def UnitDef#279
+  r Unit#250.def UnitDef#0
   r Unit#250.flags 0x00000000
   r Unit#250.activateFlags 0
   r Unit#250.workTime 0
@@ -12806,17 +12806,17 @@ call 930 UpdatePlayerEconomy
   r UnitDef#112.energystorage f32:0x00000000
   r UnitDef#112.metalstorage f32:0x00000000
   r UnitDef#112.makesMetal 0
-  r UnitDef#279.energymake f32:0x00000000
-  r UnitDef#279.windgenerator f32:0x00000000
-  r UnitDef#279.tidalgenerator f32:0x00000000
-  r UnitDef#279.energyuse f32:0x00000000
-  r UnitDef#279.metalmake f32:0x00000000
-  r UnitDef#279.extractsMetal f32:0x00000000
-  r UnitDef#279.cloakcost f32:0x00000000
-  r UnitDef#279.cloakcostmoving f32:0x00000000
-  r UnitDef#279.energystorage f32:0x00000000
-  r UnitDef#279.metalstorage f32:0x00000000
-  r UnitDef#279.makesMetal 0
+  r UnitDef#0.energymake f32:0x00000000
+  r UnitDef#0.windgenerator f32:0x00000000
+  r UnitDef#0.tidalgenerator f32:0x00000000
+  r UnitDef#0.energyuse f32:0x00000000
+  r UnitDef#0.metalmake f32:0x00000000
+  r UnitDef#0.extractsMetal f32:0x00000000
+  r UnitDef#0.cloakcost f32:0x00000000
+  r UnitDef#0.cloakcostmoving f32:0x00000000
+  r UnitDef#0.energystorage f32:0x00000000
+  r UnitDef#0.metalstorage f32:0x00000000
+  r UnitDef#0.makesMetal 0
   r Unit#4.resourceSlot.energyMake f32:0x00000000
   r Unit#4.resourceSlot.energyUse f32:0x00000000
   r Unit#4.resourceSlot.energyUsePaid f32:0x00000000
@@ -16074,1495 +16074,1495 @@ call 930 UpdatePlayerEconomy
   r Unit#251.activateFlags 1
   r Unit#251.workTime 0
   r Unit#252.buildLeft f32:0x00000000
-  r Unit#252.def UnitDef#279
+  r Unit#252.def UnitDef#0
   r Unit#252.flags 0x00000000
   r Unit#252.activateFlags 0
   r Unit#252.workTime 0
   r Unit#252.extraction f32:0x00000000
   r Unit#253.buildLeft f32:0x00000000
-  r Unit#253.def UnitDef#279
+  r Unit#253.def UnitDef#0
   r Unit#253.flags 0x00000000
   r Unit#253.activateFlags 0
   r Unit#253.workTime 0
   r Unit#253.extraction f32:0x00000000
   r Unit#254.buildLeft f32:0x00000000
-  r Unit#254.def UnitDef#279
+  r Unit#254.def UnitDef#0
   r Unit#254.flags 0x00000000
   r Unit#254.activateFlags 0
   r Unit#254.workTime 0
   r Unit#254.extraction f32:0x00000000
   r Unit#255.buildLeft f32:0x00000000
-  r Unit#255.def UnitDef#279
+  r Unit#255.def UnitDef#0
   r Unit#255.flags 0x00000000
   r Unit#255.activateFlags 0
   r Unit#255.workTime 0
   r Unit#255.extraction f32:0x00000000
   r Unit#256.buildLeft f32:0x00000000
-  r Unit#256.def UnitDef#279
+  r Unit#256.def UnitDef#0
   r Unit#256.flags 0x00000000
   r Unit#256.activateFlags 0
   r Unit#256.workTime 0
   r Unit#256.extraction f32:0x00000000
   r Unit#257.buildLeft f32:0x00000000
-  r Unit#257.def UnitDef#279
+  r Unit#257.def UnitDef#0
   r Unit#257.flags 0x00000000
   r Unit#257.activateFlags 0
   r Unit#257.workTime 0
   r Unit#257.extraction f32:0x00000000
   r Unit#258.buildLeft f32:0x00000000
-  r Unit#258.def UnitDef#279
+  r Unit#258.def UnitDef#0
   r Unit#258.flags 0x00000000
   r Unit#258.activateFlags 0
   r Unit#258.workTime 0
   r Unit#258.extraction f32:0x00000000
   r Unit#259.buildLeft f32:0x00000000
-  r Unit#259.def UnitDef#279
+  r Unit#259.def UnitDef#0
   r Unit#259.flags 0x00000000
   r Unit#259.activateFlags 0
   r Unit#259.workTime 0
   r Unit#259.extraction f32:0x00000000
   r Unit#260.buildLeft f32:0x00000000
-  r Unit#260.def UnitDef#279
+  r Unit#260.def UnitDef#0
   r Unit#260.flags 0x00000000
   r Unit#260.activateFlags 0
   r Unit#260.workTime 0
   r Unit#260.extraction f32:0x00000000
   r Unit#261.buildLeft f32:0x00000000
-  r Unit#261.def UnitDef#279
+  r Unit#261.def UnitDef#0
   r Unit#261.flags 0x00000000
   r Unit#261.activateFlags 0
   r Unit#261.workTime 0
   r Unit#261.extraction f32:0x00000000
   r Unit#262.buildLeft f32:0x00000000
-  r Unit#262.def UnitDef#279
+  r Unit#262.def UnitDef#0
   r Unit#262.flags 0x00000000
   r Unit#262.activateFlags 0
   r Unit#262.workTime 0
   r Unit#262.extraction f32:0x00000000
   r Unit#263.buildLeft f32:0x00000000
-  r Unit#263.def UnitDef#279
+  r Unit#263.def UnitDef#0
   r Unit#263.flags 0x00000000
   r Unit#263.activateFlags 0
   r Unit#263.workTime 0
   r Unit#263.extraction f32:0x00000000
   r Unit#264.buildLeft f32:0x00000000
-  r Unit#264.def UnitDef#279
+  r Unit#264.def UnitDef#0
   r Unit#264.flags 0x00000000
   r Unit#264.activateFlags 0
   r Unit#264.workTime 0
   r Unit#264.extraction f32:0x00000000
   r Unit#265.buildLeft f32:0x00000000
-  r Unit#265.def UnitDef#279
+  r Unit#265.def UnitDef#0
   r Unit#265.flags 0x00000000
   r Unit#265.activateFlags 0
   r Unit#265.workTime 0
   r Unit#265.extraction f32:0x00000000
   r Unit#266.buildLeft f32:0x00000000
-  r Unit#266.def UnitDef#279
+  r Unit#266.def UnitDef#0
   r Unit#266.flags 0x00000000
   r Unit#266.activateFlags 0
   r Unit#266.workTime 0
   r Unit#266.extraction f32:0x00000000
   r Unit#267.buildLeft f32:0x00000000
-  r Unit#267.def UnitDef#279
+  r Unit#267.def UnitDef#0
   r Unit#267.flags 0x00000000
   r Unit#267.activateFlags 0
   r Unit#267.workTime 0
   r Unit#267.extraction f32:0x00000000
   r Unit#268.buildLeft f32:0x00000000
-  r Unit#268.def UnitDef#279
+  r Unit#268.def UnitDef#0
   r Unit#268.flags 0x00000000
   r Unit#268.activateFlags 0
   r Unit#268.workTime 0
   r Unit#268.extraction f32:0x00000000
   r Unit#269.buildLeft f32:0x00000000
-  r Unit#269.def UnitDef#279
+  r Unit#269.def UnitDef#0
   r Unit#269.flags 0x00000000
   r Unit#269.activateFlags 0
   r Unit#269.workTime 0
   r Unit#269.extraction f32:0x00000000
   r Unit#270.buildLeft f32:0x00000000
-  r Unit#270.def UnitDef#279
+  r Unit#270.def UnitDef#0
   r Unit#270.flags 0x00000000
   r Unit#270.activateFlags 0
   r Unit#270.workTime 0
   r Unit#270.extraction f32:0x00000000
   r Unit#271.buildLeft f32:0x00000000
-  r Unit#271.def UnitDef#279
+  r Unit#271.def UnitDef#0
   r Unit#271.flags 0x00000000
   r Unit#271.activateFlags 0
   r Unit#271.workTime 0
   r Unit#271.extraction f32:0x00000000
   r Unit#272.buildLeft f32:0x00000000
-  r Unit#272.def UnitDef#279
+  r Unit#272.def UnitDef#0
   r Unit#272.flags 0x00000000
   r Unit#272.activateFlags 0
   r Unit#272.workTime 0
   r Unit#272.extraction f32:0x00000000
   r Unit#273.buildLeft f32:0x00000000
-  r Unit#273.def UnitDef#279
+  r Unit#273.def UnitDef#0
   r Unit#273.flags 0x00000000
   r Unit#273.activateFlags 0
   r Unit#273.workTime 0
   r Unit#273.extraction f32:0x00000000
   r Unit#274.buildLeft f32:0x00000000
-  r Unit#274.def UnitDef#279
+  r Unit#274.def UnitDef#0
   r Unit#274.flags 0x00000000
   r Unit#274.activateFlags 0
   r Unit#274.workTime 0
   r Unit#274.extraction f32:0x00000000
   r Unit#275.buildLeft f32:0x00000000
-  r Unit#275.def UnitDef#279
+  r Unit#275.def UnitDef#0
   r Unit#275.flags 0x00000000
   r Unit#275.activateFlags 0
   r Unit#275.workTime 0
   r Unit#275.extraction f32:0x00000000
   r Unit#276.buildLeft f32:0x00000000
-  r Unit#276.def UnitDef#279
+  r Unit#276.def UnitDef#0
   r Unit#276.flags 0x00000000
   r Unit#276.activateFlags 0
   r Unit#276.workTime 0
   r Unit#276.extraction f32:0x00000000
   r Unit#277.buildLeft f32:0x00000000
-  r Unit#277.def UnitDef#279
+  r Unit#277.def UnitDef#0
   r Unit#277.flags 0x00000000
   r Unit#277.activateFlags 0
   r Unit#277.workTime 0
   r Unit#277.extraction f32:0x00000000
   r Unit#278.buildLeft f32:0x00000000
-  r Unit#278.def UnitDef#279
+  r Unit#278.def UnitDef#0
   r Unit#278.flags 0x00000000
   r Unit#278.activateFlags 0
   r Unit#278.workTime 0
   r Unit#278.extraction f32:0x00000000
   r Unit#279.buildLeft f32:0x00000000
-  r Unit#279.def UnitDef#279
+  r Unit#279.def UnitDef#0
   r Unit#279.flags 0x00000000
   r Unit#279.activateFlags 0
   r Unit#279.workTime 0
   r Unit#279.extraction f32:0x00000000
   r Unit#280.buildLeft f32:0x00000000
-  r Unit#280.def UnitDef#279
+  r Unit#280.def UnitDef#0
   r Unit#280.flags 0x00000000
   r Unit#280.activateFlags 0
   r Unit#280.workTime 0
   r Unit#280.extraction f32:0x00000000
   r Unit#281.buildLeft f32:0x00000000
-  r Unit#281.def UnitDef#279
+  r Unit#281.def UnitDef#0
   r Unit#281.flags 0x00000000
   r Unit#281.activateFlags 0
   r Unit#281.workTime 0
   r Unit#281.extraction f32:0x00000000
   r Unit#282.buildLeft f32:0x00000000
-  r Unit#282.def UnitDef#279
+  r Unit#282.def UnitDef#0
   r Unit#282.flags 0x00000000
   r Unit#282.activateFlags 0
   r Unit#282.workTime 0
   r Unit#282.extraction f32:0x00000000
   r Unit#283.buildLeft f32:0x00000000
-  r Unit#283.def UnitDef#279
+  r Unit#283.def UnitDef#0
   r Unit#283.flags 0x00000000
   r Unit#283.activateFlags 0
   r Unit#283.workTime 0
   r Unit#283.extraction f32:0x00000000
   r Unit#284.buildLeft f32:0x00000000
-  r Unit#284.def UnitDef#279
+  r Unit#284.def UnitDef#0
   r Unit#284.flags 0x00000000
   r Unit#284.activateFlags 0
   r Unit#284.workTime 0
   r Unit#284.extraction f32:0x00000000
   r Unit#285.buildLeft f32:0x00000000
-  r Unit#285.def UnitDef#279
+  r Unit#285.def UnitDef#0
   r Unit#285.flags 0x00000000
   r Unit#285.activateFlags 0
   r Unit#285.workTime 0
   r Unit#285.extraction f32:0x00000000
   r Unit#286.buildLeft f32:0x00000000
-  r Unit#286.def UnitDef#279
+  r Unit#286.def UnitDef#0
   r Unit#286.flags 0x00000000
   r Unit#286.activateFlags 0
   r Unit#286.workTime 0
   r Unit#286.extraction f32:0x00000000
   r Unit#287.buildLeft f32:0x00000000
-  r Unit#287.def UnitDef#279
+  r Unit#287.def UnitDef#0
   r Unit#287.flags 0x00000000
   r Unit#287.activateFlags 0
   r Unit#287.workTime 0
   r Unit#287.extraction f32:0x00000000
   r Unit#288.buildLeft f32:0x00000000
-  r Unit#288.def UnitDef#279
+  r Unit#288.def UnitDef#0
   r Unit#288.flags 0x00000000
   r Unit#288.activateFlags 0
   r Unit#288.workTime 0
   r Unit#288.extraction f32:0x00000000
   r Unit#289.buildLeft f32:0x00000000
-  r Unit#289.def UnitDef#279
+  r Unit#289.def UnitDef#0
   r Unit#289.flags 0x00000000
   r Unit#289.activateFlags 0
   r Unit#289.workTime 0
   r Unit#289.extraction f32:0x00000000
   r Unit#290.buildLeft f32:0x00000000
-  r Unit#290.def UnitDef#279
+  r Unit#290.def UnitDef#0
   r Unit#290.flags 0x00000000
   r Unit#290.activateFlags 0
   r Unit#290.workTime 0
   r Unit#290.extraction f32:0x00000000
   r Unit#291.buildLeft f32:0x00000000
-  r Unit#291.def UnitDef#279
+  r Unit#291.def UnitDef#0
   r Unit#291.flags 0x00000000
   r Unit#291.activateFlags 0
   r Unit#291.workTime 0
   r Unit#291.extraction f32:0x00000000
   r Unit#292.buildLeft f32:0x00000000
-  r Unit#292.def UnitDef#279
+  r Unit#292.def UnitDef#0
   r Unit#292.flags 0x00000000
   r Unit#292.activateFlags 0
   r Unit#292.workTime 0
   r Unit#292.extraction f32:0x00000000
   r Unit#293.buildLeft f32:0x00000000
-  r Unit#293.def UnitDef#279
+  r Unit#293.def UnitDef#0
   r Unit#293.flags 0x00000000
   r Unit#293.activateFlags 0
   r Unit#293.workTime 0
   r Unit#293.extraction f32:0x00000000
   r Unit#294.buildLeft f32:0x00000000
-  r Unit#294.def UnitDef#279
+  r Unit#294.def UnitDef#0
   r Unit#294.flags 0x00000000
   r Unit#294.activateFlags 0
   r Unit#294.workTime 0
   r Unit#294.extraction f32:0x00000000
   r Unit#295.buildLeft f32:0x00000000
-  r Unit#295.def UnitDef#279
+  r Unit#295.def UnitDef#0
   r Unit#295.flags 0x00000000
   r Unit#295.activateFlags 0
   r Unit#295.workTime 0
   r Unit#295.extraction f32:0x00000000
   r Unit#296.buildLeft f32:0x00000000
-  r Unit#296.def UnitDef#279
+  r Unit#296.def UnitDef#0
   r Unit#296.flags 0x00000000
   r Unit#296.activateFlags 0
   r Unit#296.workTime 0
   r Unit#296.extraction f32:0x00000000
   r Unit#297.buildLeft f32:0x00000000
-  r Unit#297.def UnitDef#279
+  r Unit#297.def UnitDef#0
   r Unit#297.flags 0x00000000
   r Unit#297.activateFlags 0
   r Unit#297.workTime 0
   r Unit#297.extraction f32:0x00000000
   r Unit#298.buildLeft f32:0x00000000
-  r Unit#298.def UnitDef#279
+  r Unit#298.def UnitDef#0
   r Unit#298.flags 0x00000000
   r Unit#298.activateFlags 0
   r Unit#298.workTime 0
   r Unit#298.extraction f32:0x00000000
   r Unit#299.buildLeft f32:0x00000000
-  r Unit#299.def UnitDef#279
+  r Unit#299.def UnitDef#0
   r Unit#299.flags 0x00000000
   r Unit#299.activateFlags 0
   r Unit#299.workTime 0
   r Unit#299.extraction f32:0x00000000
   r Unit#300.buildLeft f32:0x00000000
-  r Unit#300.def UnitDef#279
+  r Unit#300.def UnitDef#0
   r Unit#300.flags 0x00000000
   r Unit#300.activateFlags 0
   r Unit#300.workTime 0
   r Unit#300.extraction f32:0x00000000
   r Unit#301.buildLeft f32:0x00000000
-  r Unit#301.def UnitDef#279
+  r Unit#301.def UnitDef#0
   r Unit#301.flags 0x00000000
   r Unit#301.activateFlags 0
   r Unit#301.workTime 0
   r Unit#301.extraction f32:0x00000000
   r Unit#302.buildLeft f32:0x00000000
-  r Unit#302.def UnitDef#279
+  r Unit#302.def UnitDef#0
   r Unit#302.flags 0x00000000
   r Unit#302.activateFlags 0
   r Unit#302.workTime 0
   r Unit#302.extraction f32:0x00000000
   r Unit#303.buildLeft f32:0x00000000
-  r Unit#303.def UnitDef#279
+  r Unit#303.def UnitDef#0
   r Unit#303.flags 0x00000000
   r Unit#303.activateFlags 0
   r Unit#303.workTime 0
   r Unit#303.extraction f32:0x00000000
   r Unit#304.buildLeft f32:0x00000000
-  r Unit#304.def UnitDef#279
+  r Unit#304.def UnitDef#0
   r Unit#304.flags 0x00000000
   r Unit#304.activateFlags 0
   r Unit#304.workTime 0
   r Unit#304.extraction f32:0x00000000
   r Unit#305.buildLeft f32:0x00000000
-  r Unit#305.def UnitDef#279
+  r Unit#305.def UnitDef#0
   r Unit#305.flags 0x00000000
   r Unit#305.activateFlags 0
   r Unit#305.workTime 0
   r Unit#305.extraction f32:0x00000000
   r Unit#306.buildLeft f32:0x00000000
-  r Unit#306.def UnitDef#279
+  r Unit#306.def UnitDef#0
   r Unit#306.flags 0x00000000
   r Unit#306.activateFlags 0
   r Unit#306.workTime 0
   r Unit#306.extraction f32:0x00000000
   r Unit#307.buildLeft f32:0x00000000
-  r Unit#307.def UnitDef#279
+  r Unit#307.def UnitDef#0
   r Unit#307.flags 0x00000000
   r Unit#307.activateFlags 0
   r Unit#307.workTime 0
   r Unit#307.extraction f32:0x00000000
   r Unit#308.buildLeft f32:0x00000000
-  r Unit#308.def UnitDef#279
+  r Unit#308.def UnitDef#0
   r Unit#308.flags 0x00000000
   r Unit#308.activateFlags 0
   r Unit#308.workTime 0
   r Unit#308.extraction f32:0x00000000
   r Unit#309.buildLeft f32:0x00000000
-  r Unit#309.def UnitDef#279
+  r Unit#309.def UnitDef#0
   r Unit#309.flags 0x00000000
   r Unit#309.activateFlags 0
   r Unit#309.workTime 0
   r Unit#309.extraction f32:0x00000000
   r Unit#310.buildLeft f32:0x00000000
-  r Unit#310.def UnitDef#279
+  r Unit#310.def UnitDef#0
   r Unit#310.flags 0x00000000
   r Unit#310.activateFlags 0
   r Unit#310.workTime 0
   r Unit#310.extraction f32:0x00000000
   r Unit#311.buildLeft f32:0x00000000
-  r Unit#311.def UnitDef#279
+  r Unit#311.def UnitDef#0
   r Unit#311.flags 0x00000000
   r Unit#311.activateFlags 0
   r Unit#311.workTime 0
   r Unit#311.extraction f32:0x00000000
   r Unit#312.buildLeft f32:0x00000000
-  r Unit#312.def UnitDef#279
+  r Unit#312.def UnitDef#0
   r Unit#312.flags 0x00000000
   r Unit#312.activateFlags 0
   r Unit#312.workTime 0
   r Unit#312.extraction f32:0x00000000
   r Unit#313.buildLeft f32:0x00000000
-  r Unit#313.def UnitDef#279
+  r Unit#313.def UnitDef#0
   r Unit#313.flags 0x00000000
   r Unit#313.activateFlags 0
   r Unit#313.workTime 0
   r Unit#313.extraction f32:0x00000000
   r Unit#314.buildLeft f32:0x00000000
-  r Unit#314.def UnitDef#279
+  r Unit#314.def UnitDef#0
   r Unit#314.flags 0x00000000
   r Unit#314.activateFlags 0
   r Unit#314.workTime 0
   r Unit#314.extraction f32:0x00000000
   r Unit#315.buildLeft f32:0x00000000
-  r Unit#315.def UnitDef#279
+  r Unit#315.def UnitDef#0
   r Unit#315.flags 0x00000000
   r Unit#315.activateFlags 0
   r Unit#315.workTime 0
   r Unit#315.extraction f32:0x00000000
   r Unit#316.buildLeft f32:0x00000000
-  r Unit#316.def UnitDef#279
+  r Unit#316.def UnitDef#0
   r Unit#316.flags 0x00000000
   r Unit#316.activateFlags 0
   r Unit#316.workTime 0
   r Unit#316.extraction f32:0x00000000
   r Unit#317.buildLeft f32:0x00000000
-  r Unit#317.def UnitDef#279
+  r Unit#317.def UnitDef#0
   r Unit#317.flags 0x00000000
   r Unit#317.activateFlags 0
   r Unit#317.workTime 0
   r Unit#317.extraction f32:0x00000000
   r Unit#318.buildLeft f32:0x00000000
-  r Unit#318.def UnitDef#279
+  r Unit#318.def UnitDef#0
   r Unit#318.flags 0x00000000
   r Unit#318.activateFlags 0
   r Unit#318.workTime 0
   r Unit#318.extraction f32:0x00000000
   r Unit#319.buildLeft f32:0x00000000
-  r Unit#319.def UnitDef#279
+  r Unit#319.def UnitDef#0
   r Unit#319.flags 0x00000000
   r Unit#319.activateFlags 0
   r Unit#319.workTime 0
   r Unit#319.extraction f32:0x00000000
   r Unit#320.buildLeft f32:0x00000000
-  r Unit#320.def UnitDef#279
+  r Unit#320.def UnitDef#0
   r Unit#320.flags 0x00000000
   r Unit#320.activateFlags 0
   r Unit#320.workTime 0
   r Unit#320.extraction f32:0x00000000
   r Unit#321.buildLeft f32:0x00000000
-  r Unit#321.def UnitDef#279
+  r Unit#321.def UnitDef#0
   r Unit#321.flags 0x00000000
   r Unit#321.activateFlags 0
   r Unit#321.workTime 0
   r Unit#321.extraction f32:0x00000000
   r Unit#322.buildLeft f32:0x00000000
-  r Unit#322.def UnitDef#279
+  r Unit#322.def UnitDef#0
   r Unit#322.flags 0x00000000
   r Unit#322.activateFlags 0
   r Unit#322.workTime 0
   r Unit#322.extraction f32:0x00000000
   r Unit#323.buildLeft f32:0x00000000
-  r Unit#323.def UnitDef#279
+  r Unit#323.def UnitDef#0
   r Unit#323.flags 0x00000000
   r Unit#323.activateFlags 0
   r Unit#323.workTime 0
   r Unit#323.extraction f32:0x00000000
   r Unit#324.buildLeft f32:0x00000000
-  r Unit#324.def UnitDef#279
+  r Unit#324.def UnitDef#0
   r Unit#324.flags 0x00000000
   r Unit#324.activateFlags 0
   r Unit#324.workTime 0
   r Unit#324.extraction f32:0x00000000
   r Unit#325.buildLeft f32:0x00000000
-  r Unit#325.def UnitDef#279
+  r Unit#325.def UnitDef#0
   r Unit#325.flags 0x00000000
   r Unit#325.activateFlags 0
   r Unit#325.workTime 0
   r Unit#325.extraction f32:0x00000000
   r Unit#326.buildLeft f32:0x00000000
-  r Unit#326.def UnitDef#279
+  r Unit#326.def UnitDef#0
   r Unit#326.flags 0x00000000
   r Unit#326.activateFlags 0
   r Unit#326.workTime 0
   r Unit#326.extraction f32:0x00000000
   r Unit#327.buildLeft f32:0x00000000
-  r Unit#327.def UnitDef#279
+  r Unit#327.def UnitDef#0
   r Unit#327.flags 0x00000000
   r Unit#327.activateFlags 0
   r Unit#327.workTime 0
   r Unit#327.extraction f32:0x00000000
   r Unit#328.buildLeft f32:0x00000000
-  r Unit#328.def UnitDef#279
+  r Unit#328.def UnitDef#0
   r Unit#328.flags 0x00000000
   r Unit#328.activateFlags 0
   r Unit#328.workTime 0
   r Unit#328.extraction f32:0x00000000
   r Unit#329.buildLeft f32:0x00000000
-  r Unit#329.def UnitDef#279
+  r Unit#329.def UnitDef#0
   r Unit#329.flags 0x00000000
   r Unit#329.activateFlags 0
   r Unit#329.workTime 0
   r Unit#329.extraction f32:0x00000000
   r Unit#330.buildLeft f32:0x00000000
-  r Unit#330.def UnitDef#279
+  r Unit#330.def UnitDef#0
   r Unit#330.flags 0x00000000
   r Unit#330.activateFlags 0
   r Unit#330.workTime 0
   r Unit#330.extraction f32:0x00000000
   r Unit#331.buildLeft f32:0x00000000
-  r Unit#331.def UnitDef#279
+  r Unit#331.def UnitDef#0
   r Unit#331.flags 0x00000000
   r Unit#331.activateFlags 0
   r Unit#331.workTime 0
   r Unit#331.extraction f32:0x00000000
   r Unit#332.buildLeft f32:0x00000000
-  r Unit#332.def UnitDef#279
+  r Unit#332.def UnitDef#0
   r Unit#332.flags 0x00000000
   r Unit#332.activateFlags 0
   r Unit#332.workTime 0
   r Unit#332.extraction f32:0x00000000
   r Unit#333.buildLeft f32:0x00000000
-  r Unit#333.def UnitDef#279
+  r Unit#333.def UnitDef#0
   r Unit#333.flags 0x00000000
   r Unit#333.activateFlags 0
   r Unit#333.workTime 0
   r Unit#333.extraction f32:0x00000000
   r Unit#334.buildLeft f32:0x00000000
-  r Unit#334.def UnitDef#279
+  r Unit#334.def UnitDef#0
   r Unit#334.flags 0x00000000
   r Unit#334.activateFlags 0
   r Unit#334.workTime 0
   r Unit#334.extraction f32:0x00000000
   r Unit#335.buildLeft f32:0x00000000
-  r Unit#335.def UnitDef#279
+  r Unit#335.def UnitDef#0
   r Unit#335.flags 0x00000000
   r Unit#335.activateFlags 0
   r Unit#335.workTime 0
   r Unit#335.extraction f32:0x00000000
   r Unit#336.buildLeft f32:0x00000000
-  r Unit#336.def UnitDef#279
+  r Unit#336.def UnitDef#0
   r Unit#336.flags 0x00000000
   r Unit#336.activateFlags 0
   r Unit#336.workTime 0
   r Unit#336.extraction f32:0x00000000
   r Unit#337.buildLeft f32:0x00000000
-  r Unit#337.def UnitDef#279
+  r Unit#337.def UnitDef#0
   r Unit#337.flags 0x00000000
   r Unit#337.activateFlags 0
   r Unit#337.workTime 0
   r Unit#337.extraction f32:0x00000000
   r Unit#338.buildLeft f32:0x00000000
-  r Unit#338.def UnitDef#279
+  r Unit#338.def UnitDef#0
   r Unit#338.flags 0x00000000
   r Unit#338.activateFlags 0
   r Unit#338.workTime 0
   r Unit#338.extraction f32:0x00000000
   r Unit#339.buildLeft f32:0x00000000
-  r Unit#339.def UnitDef#279
+  r Unit#339.def UnitDef#0
   r Unit#339.flags 0x00000000
   r Unit#339.activateFlags 0
   r Unit#339.workTime 0
   r Unit#339.extraction f32:0x00000000
   r Unit#340.buildLeft f32:0x00000000
-  r Unit#340.def UnitDef#279
+  r Unit#340.def UnitDef#0
   r Unit#340.flags 0x00000000
   r Unit#340.activateFlags 0
   r Unit#340.workTime 0
   r Unit#340.extraction f32:0x00000000
   r Unit#341.buildLeft f32:0x00000000
-  r Unit#341.def UnitDef#279
+  r Unit#341.def UnitDef#0
   r Unit#341.flags 0x00000000
   r Unit#341.activateFlags 0
   r Unit#341.workTime 0
   r Unit#341.extraction f32:0x00000000
   r Unit#342.buildLeft f32:0x00000000
-  r Unit#342.def UnitDef#279
+  r Unit#342.def UnitDef#0
   r Unit#342.flags 0x00000000
   r Unit#342.activateFlags 0
   r Unit#342.workTime 0
   r Unit#342.extraction f32:0x00000000
   r Unit#343.buildLeft f32:0x00000000
-  r Unit#343.def UnitDef#279
+  r Unit#343.def UnitDef#0
   r Unit#343.flags 0x00000000
   r Unit#343.activateFlags 0
   r Unit#343.workTime 0
   r Unit#343.extraction f32:0x00000000
   r Unit#344.buildLeft f32:0x00000000
-  r Unit#344.def UnitDef#279
+  r Unit#344.def UnitDef#0
   r Unit#344.flags 0x00000000
   r Unit#344.activateFlags 0
   r Unit#344.workTime 0
   r Unit#344.extraction f32:0x00000000
   r Unit#345.buildLeft f32:0x00000000
-  r Unit#345.def UnitDef#279
+  r Unit#345.def UnitDef#0
   r Unit#345.flags 0x00000000
   r Unit#345.activateFlags 0
   r Unit#345.workTime 0
   r Unit#345.extraction f32:0x00000000
   r Unit#346.buildLeft f32:0x00000000
-  r Unit#346.def UnitDef#279
+  r Unit#346.def UnitDef#0
   r Unit#346.flags 0x00000000
   r Unit#346.activateFlags 0
   r Unit#346.workTime 0
   r Unit#346.extraction f32:0x00000000
   r Unit#347.buildLeft f32:0x00000000
-  r Unit#347.def UnitDef#279
+  r Unit#347.def UnitDef#0
   r Unit#347.flags 0x00000000
   r Unit#347.activateFlags 0
   r Unit#347.workTime 0
   r Unit#347.extraction f32:0x00000000
   r Unit#348.buildLeft f32:0x00000000
-  r Unit#348.def UnitDef#279
+  r Unit#348.def UnitDef#0
   r Unit#348.flags 0x00000000
   r Unit#348.activateFlags 0
   r Unit#348.workTime 0
   r Unit#348.extraction f32:0x00000000
   r Unit#349.buildLeft f32:0x00000000
-  r Unit#349.def UnitDef#279
+  r Unit#349.def UnitDef#0
   r Unit#349.flags 0x00000000
   r Unit#349.activateFlags 0
   r Unit#349.workTime 0
   r Unit#349.extraction f32:0x00000000
   r Unit#350.buildLeft f32:0x00000000
-  r Unit#350.def UnitDef#279
+  r Unit#350.def UnitDef#0
   r Unit#350.flags 0x00000000
   r Unit#350.activateFlags 0
   r Unit#350.workTime 0
   r Unit#350.extraction f32:0x00000000
   r Unit#351.buildLeft f32:0x00000000
-  r Unit#351.def UnitDef#279
+  r Unit#351.def UnitDef#0
   r Unit#351.flags 0x00000000
   r Unit#351.activateFlags 0
   r Unit#351.workTime 0
   r Unit#351.extraction f32:0x00000000
   r Unit#352.buildLeft f32:0x00000000
-  r Unit#352.def UnitDef#279
+  r Unit#352.def UnitDef#0
   r Unit#352.flags 0x00000000
   r Unit#352.activateFlags 0
   r Unit#352.workTime 0
   r Unit#352.extraction f32:0x00000000
   r Unit#353.buildLeft f32:0x00000000
-  r Unit#353.def UnitDef#279
+  r Unit#353.def UnitDef#0
   r Unit#353.flags 0x00000000
   r Unit#353.activateFlags 0
   r Unit#353.workTime 0
   r Unit#353.extraction f32:0x00000000
   r Unit#354.buildLeft f32:0x00000000
-  r Unit#354.def UnitDef#279
+  r Unit#354.def UnitDef#0
   r Unit#354.flags 0x00000000
   r Unit#354.activateFlags 0
   r Unit#354.workTime 0
   r Unit#354.extraction f32:0x00000000
   r Unit#355.buildLeft f32:0x00000000
-  r Unit#355.def UnitDef#279
+  r Unit#355.def UnitDef#0
   r Unit#355.flags 0x00000000
   r Unit#355.activateFlags 0
   r Unit#355.workTime 0
   r Unit#355.extraction f32:0x00000000
   r Unit#356.buildLeft f32:0x00000000
-  r Unit#356.def UnitDef#279
+  r Unit#356.def UnitDef#0
   r Unit#356.flags 0x00000000
   r Unit#356.activateFlags 0
   r Unit#356.workTime 0
   r Unit#356.extraction f32:0x00000000
   r Unit#357.buildLeft f32:0x00000000
-  r Unit#357.def UnitDef#279
+  r Unit#357.def UnitDef#0
   r Unit#357.flags 0x00000000
   r Unit#357.activateFlags 0
   r Unit#357.workTime 0
   r Unit#357.extraction f32:0x00000000
   r Unit#358.buildLeft f32:0x00000000
-  r Unit#358.def UnitDef#279
+  r Unit#358.def UnitDef#0
   r Unit#358.flags 0x00000000
   r Unit#358.activateFlags 0
   r Unit#358.workTime 0
   r Unit#358.extraction f32:0x00000000
   r Unit#359.buildLeft f32:0x00000000
-  r Unit#359.def UnitDef#279
+  r Unit#359.def UnitDef#0
   r Unit#359.flags 0x00000000
   r Unit#359.activateFlags 0
   r Unit#359.workTime 0
   r Unit#359.extraction f32:0x00000000
   r Unit#360.buildLeft f32:0x00000000
-  r Unit#360.def UnitDef#279
+  r Unit#360.def UnitDef#0
   r Unit#360.flags 0x00000000
   r Unit#360.activateFlags 0
   r Unit#360.workTime 0
   r Unit#360.extraction f32:0x00000000
   r Unit#361.buildLeft f32:0x00000000
-  r Unit#361.def UnitDef#279
+  r Unit#361.def UnitDef#0
   r Unit#361.flags 0x00000000
   r Unit#361.activateFlags 0
   r Unit#361.workTime 0
   r Unit#361.extraction f32:0x00000000
   r Unit#362.buildLeft f32:0x00000000
-  r Unit#362.def UnitDef#279
+  r Unit#362.def UnitDef#0
   r Unit#362.flags 0x00000000
   r Unit#362.activateFlags 0
   r Unit#362.workTime 0
   r Unit#362.extraction f32:0x00000000
   r Unit#363.buildLeft f32:0x00000000
-  r Unit#363.def UnitDef#279
+  r Unit#363.def UnitDef#0
   r Unit#363.flags 0x00000000
   r Unit#363.activateFlags 0
   r Unit#363.workTime 0
   r Unit#363.extraction f32:0x00000000
   r Unit#364.buildLeft f32:0x00000000
-  r Unit#364.def UnitDef#279
+  r Unit#364.def UnitDef#0
   r Unit#364.flags 0x00000000
   r Unit#364.activateFlags 0
   r Unit#364.workTime 0
   r Unit#364.extraction f32:0x00000000
   r Unit#365.buildLeft f32:0x00000000
-  r Unit#365.def UnitDef#279
+  r Unit#365.def UnitDef#0
   r Unit#365.flags 0x00000000
   r Unit#365.activateFlags 0
   r Unit#365.workTime 0
   r Unit#365.extraction f32:0x00000000
   r Unit#366.buildLeft f32:0x00000000
-  r Unit#366.def UnitDef#279
+  r Unit#366.def UnitDef#0
   r Unit#366.flags 0x00000000
   r Unit#366.activateFlags 0
   r Unit#366.workTime 0
   r Unit#366.extraction f32:0x00000000
   r Unit#367.buildLeft f32:0x00000000
-  r Unit#367.def UnitDef#279
+  r Unit#367.def UnitDef#0
   r Unit#367.flags 0x00000000
   r Unit#367.activateFlags 0
   r Unit#367.workTime 0
   r Unit#367.extraction f32:0x00000000
   r Unit#368.buildLeft f32:0x00000000
-  r Unit#368.def UnitDef#279
+  r Unit#368.def UnitDef#0
   r Unit#368.flags 0x00000000
   r Unit#368.activateFlags 0
   r Unit#368.workTime 0
   r Unit#368.extraction f32:0x00000000
   r Unit#369.buildLeft f32:0x00000000
-  r Unit#369.def UnitDef#279
+  r Unit#369.def UnitDef#0
   r Unit#369.flags 0x00000000
   r Unit#369.activateFlags 0
   r Unit#369.workTime 0
   r Unit#369.extraction f32:0x00000000
   r Unit#370.buildLeft f32:0x00000000
-  r Unit#370.def UnitDef#279
+  r Unit#370.def UnitDef#0
   r Unit#370.flags 0x00000000
   r Unit#370.activateFlags 0
   r Unit#370.workTime 0
   r Unit#370.extraction f32:0x00000000
   r Unit#371.buildLeft f32:0x00000000
-  r Unit#371.def UnitDef#279
+  r Unit#371.def UnitDef#0
   r Unit#371.flags 0x00000000
   r Unit#371.activateFlags 0
   r Unit#371.workTime 0
   r Unit#371.extraction f32:0x00000000
   r Unit#372.buildLeft f32:0x00000000
-  r Unit#372.def UnitDef#279
+  r Unit#372.def UnitDef#0
   r Unit#372.flags 0x00000000
   r Unit#372.activateFlags 0
   r Unit#372.workTime 0
   r Unit#372.extraction f32:0x00000000
   r Unit#373.buildLeft f32:0x00000000
-  r Unit#373.def UnitDef#279
+  r Unit#373.def UnitDef#0
   r Unit#373.flags 0x00000000
   r Unit#373.activateFlags 0
   r Unit#373.workTime 0
   r Unit#373.extraction f32:0x00000000
   r Unit#374.buildLeft f32:0x00000000
-  r Unit#374.def UnitDef#279
+  r Unit#374.def UnitDef#0
   r Unit#374.flags 0x00000000
   r Unit#374.activateFlags 0
   r Unit#374.workTime 0
   r Unit#374.extraction f32:0x00000000
   r Unit#375.buildLeft f32:0x00000000
-  r Unit#375.def UnitDef#279
+  r Unit#375.def UnitDef#0
   r Unit#375.flags 0x00000000
   r Unit#375.activateFlags 0
   r Unit#375.workTime 0
   r Unit#375.extraction f32:0x00000000
   r Unit#376.buildLeft f32:0x00000000
-  r Unit#376.def UnitDef#279
+  r Unit#376.def UnitDef#0
   r Unit#376.flags 0x00000000
   r Unit#376.activateFlags 0
   r Unit#376.workTime 0
   r Unit#376.extraction f32:0x00000000
   r Unit#377.buildLeft f32:0x00000000
-  r Unit#377.def UnitDef#279
+  r Unit#377.def UnitDef#0
   r Unit#377.flags 0x00000000
   r Unit#377.activateFlags 0
   r Unit#377.workTime 0
   r Unit#377.extraction f32:0x00000000
   r Unit#378.buildLeft f32:0x00000000
-  r Unit#378.def UnitDef#279
+  r Unit#378.def UnitDef#0
   r Unit#378.flags 0x00000000
   r Unit#378.activateFlags 0
   r Unit#378.workTime 0
   r Unit#378.extraction f32:0x00000000
   r Unit#379.buildLeft f32:0x00000000
-  r Unit#379.def UnitDef#279
+  r Unit#379.def UnitDef#0
   r Unit#379.flags 0x00000000
   r Unit#379.activateFlags 0
   r Unit#379.workTime 0
   r Unit#379.extraction f32:0x00000000
   r Unit#380.buildLeft f32:0x00000000
-  r Unit#380.def UnitDef#279
+  r Unit#380.def UnitDef#0
   r Unit#380.flags 0x00000000
   r Unit#380.activateFlags 0
   r Unit#380.workTime 0
   r Unit#380.extraction f32:0x00000000
   r Unit#381.buildLeft f32:0x00000000
-  r Unit#381.def UnitDef#279
+  r Unit#381.def UnitDef#0
   r Unit#381.flags 0x00000000
   r Unit#381.activateFlags 0
   r Unit#381.workTime 0
   r Unit#381.extraction f32:0x00000000
   r Unit#382.buildLeft f32:0x00000000
-  r Unit#382.def UnitDef#279
+  r Unit#382.def UnitDef#0
   r Unit#382.flags 0x00000000
   r Unit#382.activateFlags 0
   r Unit#382.workTime 0
   r Unit#382.extraction f32:0x00000000
   r Unit#383.buildLeft f32:0x00000000
-  r Unit#383.def UnitDef#279
+  r Unit#383.def UnitDef#0
   r Unit#383.flags 0x00000000
   r Unit#383.activateFlags 0
   r Unit#383.workTime 0
   r Unit#383.extraction f32:0x00000000
   r Unit#384.buildLeft f32:0x00000000
-  r Unit#384.def UnitDef#279
+  r Unit#384.def UnitDef#0
   r Unit#384.flags 0x00000000
   r Unit#384.activateFlags 0
   r Unit#384.workTime 0
   r Unit#384.extraction f32:0x00000000
   r Unit#385.buildLeft f32:0x00000000
-  r Unit#385.def UnitDef#279
+  r Unit#385.def UnitDef#0
   r Unit#385.flags 0x00000000
   r Unit#385.activateFlags 0
   r Unit#385.workTime 0
   r Unit#385.extraction f32:0x00000000
   r Unit#386.buildLeft f32:0x00000000
-  r Unit#386.def UnitDef#279
+  r Unit#386.def UnitDef#0
   r Unit#386.flags 0x00000000
   r Unit#386.activateFlags 0
   r Unit#386.workTime 0
   r Unit#386.extraction f32:0x00000000
   r Unit#387.buildLeft f32:0x00000000
-  r Unit#387.def UnitDef#279
+  r Unit#387.def UnitDef#0
   r Unit#387.flags 0x00000000
   r Unit#387.activateFlags 0
   r Unit#387.workTime 0
   r Unit#387.extraction f32:0x00000000
   r Unit#388.buildLeft f32:0x00000000
-  r Unit#388.def UnitDef#279
+  r Unit#388.def UnitDef#0
   r Unit#388.flags 0x00000000
   r Unit#388.activateFlags 0
   r Unit#388.workTime 0
   r Unit#388.extraction f32:0x00000000
   r Unit#389.buildLeft f32:0x00000000
-  r Unit#389.def UnitDef#279
+  r Unit#389.def UnitDef#0
   r Unit#389.flags 0x00000000
   r Unit#389.activateFlags 0
   r Unit#389.workTime 0
   r Unit#389.extraction f32:0x00000000
   r Unit#390.buildLeft f32:0x00000000
-  r Unit#390.def UnitDef#279
+  r Unit#390.def UnitDef#0
   r Unit#390.flags 0x00000000
   r Unit#390.activateFlags 0
   r Unit#390.workTime 0
   r Unit#390.extraction f32:0x00000000
   r Unit#391.buildLeft f32:0x00000000
-  r Unit#391.def UnitDef#279
+  r Unit#391.def UnitDef#0
   r Unit#391.flags 0x00000000
   r Unit#391.activateFlags 0
   r Unit#391.workTime 0
   r Unit#391.extraction f32:0x00000000
   r Unit#392.buildLeft f32:0x00000000
-  r Unit#392.def UnitDef#279
+  r Unit#392.def UnitDef#0
   r Unit#392.flags 0x00000000
   r Unit#392.activateFlags 0
   r Unit#392.workTime 0
   r Unit#392.extraction f32:0x00000000
   r Unit#393.buildLeft f32:0x00000000
-  r Unit#393.def UnitDef#279
+  r Unit#393.def UnitDef#0
   r Unit#393.flags 0x00000000
   r Unit#393.activateFlags 0
   r Unit#393.workTime 0
   r Unit#393.extraction f32:0x00000000
   r Unit#394.buildLeft f32:0x00000000
-  r Unit#394.def UnitDef#279
+  r Unit#394.def UnitDef#0
   r Unit#394.flags 0x00000000
   r Unit#394.activateFlags 0
   r Unit#394.workTime 0
   r Unit#394.extraction f32:0x00000000
   r Unit#395.buildLeft f32:0x00000000
-  r Unit#395.def UnitDef#279
+  r Unit#395.def UnitDef#0
   r Unit#395.flags 0x00000000
   r Unit#395.activateFlags 0
   r Unit#395.workTime 0
   r Unit#395.extraction f32:0x00000000
   r Unit#396.buildLeft f32:0x00000000
-  r Unit#396.def UnitDef#279
+  r Unit#396.def UnitDef#0
   r Unit#396.flags 0x00000000
   r Unit#396.activateFlags 0
   r Unit#396.workTime 0
   r Unit#396.extraction f32:0x00000000
   r Unit#397.buildLeft f32:0x00000000
-  r Unit#397.def UnitDef#279
+  r Unit#397.def UnitDef#0
   r Unit#397.flags 0x00000000
   r Unit#397.activateFlags 0
   r Unit#397.workTime 0
   r Unit#397.extraction f32:0x00000000
   r Unit#398.buildLeft f32:0x00000000
-  r Unit#398.def UnitDef#279
+  r Unit#398.def UnitDef#0
   r Unit#398.flags 0x00000000
   r Unit#398.activateFlags 0
   r Unit#398.workTime 0
   r Unit#398.extraction f32:0x00000000
   r Unit#399.buildLeft f32:0x00000000
-  r Unit#399.def UnitDef#279
+  r Unit#399.def UnitDef#0
   r Unit#399.flags 0x00000000
   r Unit#399.activateFlags 0
   r Unit#399.workTime 0
   r Unit#399.extraction f32:0x00000000
   r Unit#400.buildLeft f32:0x00000000
-  r Unit#400.def UnitDef#279
+  r Unit#400.def UnitDef#0
   r Unit#400.flags 0x00000000
   r Unit#400.activateFlags 0
   r Unit#400.workTime 0
   r Unit#400.extraction f32:0x00000000
   r Unit#401.buildLeft f32:0x00000000
-  r Unit#401.def UnitDef#279
+  r Unit#401.def UnitDef#0
   r Unit#401.flags 0x00000000
   r Unit#401.activateFlags 0
   r Unit#401.workTime 0
   r Unit#401.extraction f32:0x00000000
   r Unit#402.buildLeft f32:0x00000000
-  r Unit#402.def UnitDef#279
+  r Unit#402.def UnitDef#0
   r Unit#402.flags 0x00000000
   r Unit#402.activateFlags 0
   r Unit#402.workTime 0
   r Unit#402.extraction f32:0x00000000
   r Unit#403.buildLeft f32:0x00000000
-  r Unit#403.def UnitDef#279
+  r Unit#403.def UnitDef#0
   r Unit#403.flags 0x00000000
   r Unit#403.activateFlags 0
   r Unit#403.workTime 0
   r Unit#403.extraction f32:0x00000000
   r Unit#404.buildLeft f32:0x00000000
-  r Unit#404.def UnitDef#279
+  r Unit#404.def UnitDef#0
   r Unit#404.flags 0x00000000
   r Unit#404.activateFlags 0
   r Unit#404.workTime 0
   r Unit#404.extraction f32:0x00000000
   r Unit#405.buildLeft f32:0x00000000
-  r Unit#405.def UnitDef#279
+  r Unit#405.def UnitDef#0
   r Unit#405.flags 0x00000000
   r Unit#405.activateFlags 0
   r Unit#405.workTime 0
   r Unit#405.extraction f32:0x00000000
   r Unit#406.buildLeft f32:0x00000000
-  r Unit#406.def UnitDef#279
+  r Unit#406.def UnitDef#0
   r Unit#406.flags 0x00000000
   r Unit#406.activateFlags 0
   r Unit#406.workTime 0
   r Unit#406.extraction f32:0x00000000
   r Unit#407.buildLeft f32:0x00000000
-  r Unit#407.def UnitDef#279
+  r Unit#407.def UnitDef#0
   r Unit#407.flags 0x00000000
   r Unit#407.activateFlags 0
   r Unit#407.workTime 0
   r Unit#407.extraction f32:0x00000000
   r Unit#408.buildLeft f32:0x00000000
-  r Unit#408.def UnitDef#279
+  r Unit#408.def UnitDef#0
   r Unit#408.flags 0x00000000
   r Unit#408.activateFlags 0
   r Unit#408.workTime 0
   r Unit#408.extraction f32:0x00000000
   r Unit#409.buildLeft f32:0x00000000
-  r Unit#409.def UnitDef#279
+  r Unit#409.def UnitDef#0
   r Unit#409.flags 0x00000000
   r Unit#409.activateFlags 0
   r Unit#409.workTime 0
   r Unit#409.extraction f32:0x00000000
   r Unit#410.buildLeft f32:0x00000000
-  r Unit#410.def UnitDef#279
+  r Unit#410.def UnitDef#0
   r Unit#410.flags 0x00000000
   r Unit#410.activateFlags 0
   r Unit#410.workTime 0
   r Unit#410.extraction f32:0x00000000
   r Unit#411.buildLeft f32:0x00000000
-  r Unit#411.def UnitDef#279
+  r Unit#411.def UnitDef#0
   r Unit#411.flags 0x00000000
   r Unit#411.activateFlags 0
   r Unit#411.workTime 0
   r Unit#411.extraction f32:0x00000000
   r Unit#412.buildLeft f32:0x00000000
-  r Unit#412.def UnitDef#279
+  r Unit#412.def UnitDef#0
   r Unit#412.flags 0x00000000
   r Unit#412.activateFlags 0
   r Unit#412.workTime 0
   r Unit#412.extraction f32:0x00000000
   r Unit#413.buildLeft f32:0x00000000
-  r Unit#413.def UnitDef#279
+  r Unit#413.def UnitDef#0
   r Unit#413.flags 0x00000000
   r Unit#413.activateFlags 0
   r Unit#413.workTime 0
   r Unit#413.extraction f32:0x00000000
   r Unit#414.buildLeft f32:0x00000000
-  r Unit#414.def UnitDef#279
+  r Unit#414.def UnitDef#0
   r Unit#414.flags 0x00000000
   r Unit#414.activateFlags 0
   r Unit#414.workTime 0
   r Unit#414.extraction f32:0x00000000
   r Unit#415.buildLeft f32:0x00000000
-  r Unit#415.def UnitDef#279
+  r Unit#415.def UnitDef#0
   r Unit#415.flags 0x00000000
   r Unit#415.activateFlags 0
   r Unit#415.workTime 0
   r Unit#415.extraction f32:0x00000000
   r Unit#416.buildLeft f32:0x00000000
-  r Unit#416.def UnitDef#279
+  r Unit#416.def UnitDef#0
   r Unit#416.flags 0x00000000
   r Unit#416.activateFlags 0
   r Unit#416.workTime 0
   r Unit#416.extraction f32:0x00000000
   r Unit#417.buildLeft f32:0x00000000
-  r Unit#417.def UnitDef#279
+  r Unit#417.def UnitDef#0
   r Unit#417.flags 0x00000000
   r Unit#417.activateFlags 0
   r Unit#417.workTime 0
   r Unit#417.extraction f32:0x00000000
   r Unit#418.buildLeft f32:0x00000000
-  r Unit#418.def UnitDef#279
+  r Unit#418.def UnitDef#0
   r Unit#418.flags 0x00000000
   r Unit#418.activateFlags 0
   r Unit#418.workTime 0
   r Unit#418.extraction f32:0x00000000
   r Unit#419.buildLeft f32:0x00000000
-  r Unit#419.def UnitDef#279
+  r Unit#419.def UnitDef#0
   r Unit#419.flags 0x00000000
   r Unit#419.activateFlags 0
   r Unit#419.workTime 0
   r Unit#419.extraction f32:0x00000000
   r Unit#420.buildLeft f32:0x00000000
-  r Unit#420.def UnitDef#279
+  r Unit#420.def UnitDef#0
   r Unit#420.flags 0x00000000
   r Unit#420.activateFlags 0
   r Unit#420.workTime 0
   r Unit#420.extraction f32:0x00000000
   r Unit#421.buildLeft f32:0x00000000
-  r Unit#421.def UnitDef#279
+  r Unit#421.def UnitDef#0
   r Unit#421.flags 0x00000000
   r Unit#421.activateFlags 0
   r Unit#421.workTime 0
   r Unit#421.extraction f32:0x00000000
   r Unit#422.buildLeft f32:0x00000000
-  r Unit#422.def UnitDef#279
+  r Unit#422.def UnitDef#0
   r Unit#422.flags 0x00000000
   r Unit#422.activateFlags 0
   r Unit#422.workTime 0
   r Unit#422.extraction f32:0x00000000
   r Unit#423.buildLeft f32:0x00000000
-  r Unit#423.def UnitDef#279
+  r Unit#423.def UnitDef#0
   r Unit#423.flags 0x00000000
   r Unit#423.activateFlags 0
   r Unit#423.workTime 0
   r Unit#423.extraction f32:0x00000000
   r Unit#424.buildLeft f32:0x00000000
-  r Unit#424.def UnitDef#279
+  r Unit#424.def UnitDef#0
   r Unit#424.flags 0x00000000
   r Unit#424.activateFlags 0
   r Unit#424.workTime 0
   r Unit#424.extraction f32:0x00000000
   r Unit#425.buildLeft f32:0x00000000
-  r Unit#425.def UnitDef#279
+  r Unit#425.def UnitDef#0
   r Unit#425.flags 0x00000000
   r Unit#425.activateFlags 0
   r Unit#425.workTime 0
   r Unit#425.extraction f32:0x00000000
   r Unit#426.buildLeft f32:0x00000000
-  r Unit#426.def UnitDef#279
+  r Unit#426.def UnitDef#0
   r Unit#426.flags 0x00000000
   r Unit#426.activateFlags 0
   r Unit#426.workTime 0
   r Unit#426.extraction f32:0x00000000
   r Unit#427.buildLeft f32:0x00000000
-  r Unit#427.def UnitDef#279
+  r Unit#427.def UnitDef#0
   r Unit#427.flags 0x00000000
   r Unit#427.activateFlags 0
   r Unit#427.workTime 0
   r Unit#427.extraction f32:0x00000000
   r Unit#428.buildLeft f32:0x00000000
-  r Unit#428.def UnitDef#279
+  r Unit#428.def UnitDef#0
   r Unit#428.flags 0x00000000
   r Unit#428.activateFlags 0
   r Unit#428.workTime 0
   r Unit#428.extraction f32:0x00000000
   r Unit#429.buildLeft f32:0x00000000
-  r Unit#429.def UnitDef#279
+  r Unit#429.def UnitDef#0
   r Unit#429.flags 0x00000000
   r Unit#429.activateFlags 0
   r Unit#429.workTime 0
   r Unit#429.extraction f32:0x00000000
   r Unit#430.buildLeft f32:0x00000000
-  r Unit#430.def UnitDef#279
+  r Unit#430.def UnitDef#0
   r Unit#430.flags 0x00000000
   r Unit#430.activateFlags 0
   r Unit#430.workTime 0
   r Unit#430.extraction f32:0x00000000
   r Unit#431.buildLeft f32:0x00000000
-  r Unit#431.def UnitDef#279
+  r Unit#431.def UnitDef#0
   r Unit#431.flags 0x00000000
   r Unit#431.activateFlags 0
   r Unit#431.workTime 0
   r Unit#431.extraction f32:0x00000000
   r Unit#432.buildLeft f32:0x00000000
-  r Unit#432.def UnitDef#279
+  r Unit#432.def UnitDef#0
   r Unit#432.flags 0x00000000
   r Unit#432.activateFlags 0
   r Unit#432.workTime 0
   r Unit#432.extraction f32:0x00000000
   r Unit#433.buildLeft f32:0x00000000
-  r Unit#433.def UnitDef#279
+  r Unit#433.def UnitDef#0
   r Unit#433.flags 0x00000000
   r Unit#433.activateFlags 0
   r Unit#433.workTime 0
   r Unit#433.extraction f32:0x00000000
   r Unit#434.buildLeft f32:0x00000000
-  r Unit#434.def UnitDef#279
+  r Unit#434.def UnitDef#0
   r Unit#434.flags 0x00000000
   r Unit#434.activateFlags 0
   r Unit#434.workTime 0
   r Unit#434.extraction f32:0x00000000
   r Unit#435.buildLeft f32:0x00000000
-  r Unit#435.def UnitDef#279
+  r Unit#435.def UnitDef#0
   r Unit#435.flags 0x00000000
   r Unit#435.activateFlags 0
   r Unit#435.workTime 0
   r Unit#435.extraction f32:0x00000000
   r Unit#436.buildLeft f32:0x00000000
-  r Unit#436.def UnitDef#279
+  r Unit#436.def UnitDef#0
   r Unit#436.flags 0x00000000
   r Unit#436.activateFlags 0
   r Unit#436.workTime 0
   r Unit#436.extraction f32:0x00000000
   r Unit#437.buildLeft f32:0x00000000
-  r Unit#437.def UnitDef#279
+  r Unit#437.def UnitDef#0
   r Unit#437.flags 0x00000000
   r Unit#437.activateFlags 0
   r Unit#437.workTime 0
   r Unit#437.extraction f32:0x00000000
   r Unit#438.buildLeft f32:0x00000000
-  r Unit#438.def UnitDef#279
+  r Unit#438.def UnitDef#0
   r Unit#438.flags 0x00000000
   r Unit#438.activateFlags 0
   r Unit#438.workTime 0
   r Unit#438.extraction f32:0x00000000
   r Unit#439.buildLeft f32:0x00000000
-  r Unit#439.def UnitDef#279
+  r Unit#439.def UnitDef#0
   r Unit#439.flags 0x00000000
   r Unit#439.activateFlags 0
   r Unit#439.workTime 0
   r Unit#439.extraction f32:0x00000000
   r Unit#440.buildLeft f32:0x00000000
-  r Unit#440.def UnitDef#279
+  r Unit#440.def UnitDef#0
   r Unit#440.flags 0x00000000
   r Unit#440.activateFlags 0
   r Unit#440.workTime 0
   r Unit#440.extraction f32:0x00000000
   r Unit#441.buildLeft f32:0x00000000
-  r Unit#441.def UnitDef#279
+  r Unit#441.def UnitDef#0
   r Unit#441.flags 0x00000000
   r Unit#441.activateFlags 0
   r Unit#441.workTime 0
   r Unit#441.extraction f32:0x00000000
   r Unit#442.buildLeft f32:0x00000000
-  r Unit#442.def UnitDef#279
+  r Unit#442.def UnitDef#0
   r Unit#442.flags 0x00000000
   r Unit#442.activateFlags 0
   r Unit#442.workTime 0
   r Unit#442.extraction f32:0x00000000
   r Unit#443.buildLeft f32:0x00000000
-  r Unit#443.def UnitDef#279
+  r Unit#443.def UnitDef#0
   r Unit#443.flags 0x00000000
   r Unit#443.activateFlags 0
   r Unit#443.workTime 0
   r Unit#443.extraction f32:0x00000000
   r Unit#444.buildLeft f32:0x00000000
-  r Unit#444.def UnitDef#279
+  r Unit#444.def UnitDef#0
   r Unit#444.flags 0x00000000
   r Unit#444.activateFlags 0
   r Unit#444.workTime 0
   r Unit#444.extraction f32:0x00000000
   r Unit#445.buildLeft f32:0x00000000
-  r Unit#445.def UnitDef#279
+  r Unit#445.def UnitDef#0
   r Unit#445.flags 0x00000000
   r Unit#445.activateFlags 0
   r Unit#445.workTime 0
   r Unit#445.extraction f32:0x00000000
   r Unit#446.buildLeft f32:0x00000000
-  r Unit#446.def UnitDef#279
+  r Unit#446.def UnitDef#0
   r Unit#446.flags 0x00000000
   r Unit#446.activateFlags 0
   r Unit#446.workTime 0
   r Unit#446.extraction f32:0x00000000
   r Unit#447.buildLeft f32:0x00000000
-  r Unit#447.def UnitDef#279
+  r Unit#447.def UnitDef#0
   r Unit#447.flags 0x00000000
   r Unit#447.activateFlags 0
   r Unit#447.workTime 0
   r Unit#447.extraction f32:0x00000000
   r Unit#448.buildLeft f32:0x00000000
-  r Unit#448.def UnitDef#279
+  r Unit#448.def UnitDef#0
   r Unit#448.flags 0x00000000
   r Unit#448.activateFlags 0
   r Unit#448.workTime 0
   r Unit#448.extraction f32:0x00000000
   r Unit#449.buildLeft f32:0x00000000
-  r Unit#449.def UnitDef#279
+  r Unit#449.def UnitDef#0
   r Unit#449.flags 0x00000000
   r Unit#449.activateFlags 0
   r Unit#449.workTime 0
   r Unit#449.extraction f32:0x00000000
   r Unit#450.buildLeft f32:0x00000000
-  r Unit#450.def UnitDef#279
+  r Unit#450.def UnitDef#0
   r Unit#450.flags 0x00000000
   r Unit#450.activateFlags 0
   r Unit#450.workTime 0
   r Unit#450.extraction f32:0x00000000
   r Unit#451.buildLeft f32:0x00000000
-  r Unit#451.def UnitDef#279
+  r Unit#451.def UnitDef#0
   r Unit#451.flags 0x00000000
   r Unit#451.activateFlags 0
   r Unit#451.workTime 0
   r Unit#451.extraction f32:0x00000000
   r Unit#452.buildLeft f32:0x00000000
-  r Unit#452.def UnitDef#279
+  r Unit#452.def UnitDef#0
   r Unit#452.flags 0x00000000
   r Unit#452.activateFlags 0
   r Unit#452.workTime 0
   r Unit#452.extraction f32:0x00000000
   r Unit#453.buildLeft f32:0x00000000
-  r Unit#453.def UnitDef#279
+  r Unit#453.def UnitDef#0
   r Unit#453.flags 0x00000000
   r Unit#453.activateFlags 0
   r Unit#453.workTime 0
   r Unit#453.extraction f32:0x00000000
   r Unit#454.buildLeft f32:0x00000000
-  r Unit#454.def UnitDef#279
+  r Unit#454.def UnitDef#0
   r Unit#454.flags 0x00000000
   r Unit#454.activateFlags 0
   r Unit#454.workTime 0
   r Unit#454.extraction f32:0x00000000
   r Unit#455.buildLeft f32:0x00000000
-  r Unit#455.def UnitDef#279
+  r Unit#455.def UnitDef#0
   r Unit#455.flags 0x00000000
   r Unit#455.activateFlags 0
   r Unit#455.workTime 0
   r Unit#455.extraction f32:0x00000000
   r Unit#456.buildLeft f32:0x00000000
-  r Unit#456.def UnitDef#279
+  r Unit#456.def UnitDef#0
   r Unit#456.flags 0x00000000
   r Unit#456.activateFlags 0
   r Unit#456.workTime 0
   r Unit#456.extraction f32:0x00000000
   r Unit#457.buildLeft f32:0x00000000
-  r Unit#457.def UnitDef#279
+  r Unit#457.def UnitDef#0
   r Unit#457.flags 0x00000000
   r Unit#457.activateFlags 0
   r Unit#457.workTime 0
   r Unit#457.extraction f32:0x00000000
   r Unit#458.buildLeft f32:0x00000000
-  r Unit#458.def UnitDef#279
+  r Unit#458.def UnitDef#0
   r Unit#458.flags 0x00000000
   r Unit#458.activateFlags 0
   r Unit#458.workTime 0
   r Unit#458.extraction f32:0x00000000
   r Unit#459.buildLeft f32:0x00000000
-  r Unit#459.def UnitDef#279
+  r Unit#459.def UnitDef#0
   r Unit#459.flags 0x00000000
   r Unit#459.activateFlags 0
   r Unit#459.workTime 0
   r Unit#459.extraction f32:0x00000000
   r Unit#460.buildLeft f32:0x00000000
-  r Unit#460.def UnitDef#279
+  r Unit#460.def UnitDef#0
   r Unit#460.flags 0x00000000
   r Unit#460.activateFlags 0
   r Unit#460.workTime 0
   r Unit#460.extraction f32:0x00000000
   r Unit#461.buildLeft f32:0x00000000
-  r Unit#461.def UnitDef#279
+  r Unit#461.def UnitDef#0
   r Unit#461.flags 0x00000000
   r Unit#461.activateFlags 0
   r Unit#461.workTime 0
   r Unit#461.extraction f32:0x00000000
   r Unit#462.buildLeft f32:0x00000000
-  r Unit#462.def UnitDef#279
+  r Unit#462.def UnitDef#0
   r Unit#462.flags 0x00000000
   r Unit#462.activateFlags 0
   r Unit#462.workTime 0
   r Unit#462.extraction f32:0x00000000
   r Unit#463.buildLeft f32:0x00000000
-  r Unit#463.def UnitDef#279
+  r Unit#463.def UnitDef#0
   r Unit#463.flags 0x00000000
   r Unit#463.activateFlags 0
   r Unit#463.workTime 0
   r Unit#463.extraction f32:0x00000000
   r Unit#464.buildLeft f32:0x00000000
-  r Unit#464.def UnitDef#279
+  r Unit#464.def UnitDef#0
   r Unit#464.flags 0x00000000
   r Unit#464.activateFlags 0
   r Unit#464.workTime 0
   r Unit#464.extraction f32:0x00000000
   r Unit#465.buildLeft f32:0x00000000
-  r Unit#465.def UnitDef#279
+  r Unit#465.def UnitDef#0
   r Unit#465.flags 0x00000000
   r Unit#465.activateFlags 0
   r Unit#465.workTime 0
   r Unit#465.extraction f32:0x00000000
   r Unit#466.buildLeft f32:0x00000000
-  r Unit#466.def UnitDef#279
+  r Unit#466.def UnitDef#0
   r Unit#466.flags 0x00000000
   r Unit#466.activateFlags 0
   r Unit#466.workTime 0
   r Unit#466.extraction f32:0x00000000
   r Unit#467.buildLeft f32:0x00000000
-  r Unit#467.def UnitDef#279
+  r Unit#467.def UnitDef#0
   r Unit#467.flags 0x00000000
   r Unit#467.activateFlags 0
   r Unit#467.workTime 0
   r Unit#467.extraction f32:0x00000000
   r Unit#468.buildLeft f32:0x00000000
-  r Unit#468.def UnitDef#279
+  r Unit#468.def UnitDef#0
   r Unit#468.flags 0x00000000
   r Unit#468.activateFlags 0
   r Unit#468.workTime 0
   r Unit#468.extraction f32:0x00000000
   r Unit#469.buildLeft f32:0x00000000
-  r Unit#469.def UnitDef#279
+  r Unit#469.def UnitDef#0
   r Unit#469.flags 0x00000000
   r Unit#469.activateFlags 0
   r Unit#469.workTime 0
   r Unit#469.extraction f32:0x00000000
   r Unit#470.buildLeft f32:0x00000000
-  r Unit#470.def UnitDef#279
+  r Unit#470.def UnitDef#0
   r Unit#470.flags 0x00000000
   r Unit#470.activateFlags 0
   r Unit#470.workTime 0
   r Unit#470.extraction f32:0x00000000
   r Unit#471.buildLeft f32:0x00000000
-  r Unit#471.def UnitDef#279
+  r Unit#471.def UnitDef#0
   r Unit#471.flags 0x00000000
   r Unit#471.activateFlags 0
   r Unit#471.workTime 0
   r Unit#471.extraction f32:0x00000000
   r Unit#472.buildLeft f32:0x00000000
-  r Unit#472.def UnitDef#279
+  r Unit#472.def UnitDef#0
   r Unit#472.flags 0x00000000
   r Unit#472.activateFlags 0
   r Unit#472.workTime 0
   r Unit#472.extraction f32:0x00000000
   r Unit#473.buildLeft f32:0x00000000
-  r Unit#473.def UnitDef#279
+  r Unit#473.def UnitDef#0
   r Unit#473.flags 0x00000000
   r Unit#473.activateFlags 0
   r Unit#473.workTime 0
   r Unit#473.extraction f32:0x00000000
   r Unit#474.buildLeft f32:0x00000000
-  r Unit#474.def UnitDef#279
+  r Unit#474.def UnitDef#0
   r Unit#474.flags 0x00000000
   r Unit#474.activateFlags 0
   r Unit#474.workTime 0
   r Unit#474.extraction f32:0x00000000
   r Unit#475.buildLeft f32:0x00000000
-  r Unit#475.def UnitDef#279
+  r Unit#475.def UnitDef#0
   r Unit#475.flags 0x00000000
   r Unit#475.activateFlags 0
   r Unit#475.workTime 0
   r Unit#475.extraction f32:0x00000000
   r Unit#476.buildLeft f32:0x00000000
-  r Unit#476.def UnitDef#279
+  r Unit#476.def UnitDef#0
   r Unit#476.flags 0x00000000
   r Unit#476.activateFlags 0
   r Unit#476.workTime 0
   r Unit#476.extraction f32:0x00000000
   r Unit#477.buildLeft f32:0x00000000
-  r Unit#477.def UnitDef#279
+  r Unit#477.def UnitDef#0
   r Unit#477.flags 0x00000000
   r Unit#477.activateFlags 0
   r Unit#477.workTime 0
   r Unit#477.extraction f32:0x00000000
   r Unit#478.buildLeft f32:0x00000000
-  r Unit#478.def UnitDef#279
+  r Unit#478.def UnitDef#0
   r Unit#478.flags 0x00000000
   r Unit#478.activateFlags 0
   r Unit#478.workTime 0
   r Unit#478.extraction f32:0x00000000
   r Unit#479.buildLeft f32:0x00000000
-  r Unit#479.def UnitDef#279
+  r Unit#479.def UnitDef#0
   r Unit#479.flags 0x00000000
   r Unit#479.activateFlags 0
   r Unit#479.workTime 0
   r Unit#479.extraction f32:0x00000000
   r Unit#480.buildLeft f32:0x00000000
-  r Unit#480.def UnitDef#279
+  r Unit#480.def UnitDef#0
   r Unit#480.flags 0x00000000
   r Unit#480.activateFlags 0
   r Unit#480.workTime 0
   r Unit#480.extraction f32:0x00000000
   r Unit#481.buildLeft f32:0x00000000
-  r Unit#481.def UnitDef#279
+  r Unit#481.def UnitDef#0
   r Unit#481.flags 0x00000000
   r Unit#481.activateFlags 0
   r Unit#481.workTime 0
   r Unit#481.extraction f32:0x00000000
   r Unit#482.buildLeft f32:0x00000000
-  r Unit#482.def UnitDef#279
+  r Unit#482.def UnitDef#0
   r Unit#482.flags 0x00000000
   r Unit#482.activateFlags 0
   r Unit#482.workTime 0
   r Unit#482.extraction f32:0x00000000
   r Unit#483.buildLeft f32:0x00000000
-  r Unit#483.def UnitDef#279
+  r Unit#483.def UnitDef#0
   r Unit#483.flags 0x00000000
   r Unit#483.activateFlags 0
   r Unit#483.workTime 0
   r Unit#483.extraction f32:0x00000000
   r Unit#484.buildLeft f32:0x00000000
-  r Unit#484.def UnitDef#279
+  r Unit#484.def UnitDef#0
   r Unit#484.flags 0x00000000
   r Unit#484.activateFlags 0
   r Unit#484.workTime 0
   r Unit#484.extraction f32:0x00000000
   r Unit#485.buildLeft f32:0x00000000
-  r Unit#485.def UnitDef#279
+  r Unit#485.def UnitDef#0
   r Unit#485.flags 0x00000000
   r Unit#485.activateFlags 0
   r Unit#485.workTime 0
   r Unit#485.extraction f32:0x00000000
   r Unit#486.buildLeft f32:0x00000000
-  r Unit#486.def UnitDef#279
+  r Unit#486.def UnitDef#0
   r Unit#486.flags 0x00000000
   r Unit#486.activateFlags 0
   r Unit#486.workTime 0
   r Unit#486.extraction f32:0x00000000
   r Unit#487.buildLeft f32:0x00000000
-  r Unit#487.def UnitDef#279
+  r Unit#487.def UnitDef#0
   r Unit#487.flags 0x00000000
   r Unit#487.activateFlags 0
   r Unit#487.workTime 0
   r Unit#487.extraction f32:0x00000000
   r Unit#488.buildLeft f32:0x00000000
-  r Unit#488.def UnitDef#279
+  r Unit#488.def UnitDef#0
   r Unit#488.flags 0x00000000
   r Unit#488.activateFlags 0
   r Unit#488.workTime 0
   r Unit#488.extraction f32:0x00000000
   r Unit#489.buildLeft f32:0x00000000
-  r Unit#489.def UnitDef#279
+  r Unit#489.def UnitDef#0
   r Unit#489.flags 0x00000000
   r Unit#489.activateFlags 0
   r Unit#489.workTime 0
   r Unit#489.extraction f32:0x00000000
   r Unit#490.buildLeft f32:0x00000000
-  r Unit#490.def UnitDef#279
+  r Unit#490.def UnitDef#0
   r Unit#490.flags 0x00000000
   r Unit#490.activateFlags 0
   r Unit#490.workTime 0
   r Unit#490.extraction f32:0x00000000
   r Unit#491.buildLeft f32:0x00000000
-  r Unit#491.def UnitDef#279
+  r Unit#491.def UnitDef#0
   r Unit#491.flags 0x00000000
   r Unit#491.activateFlags 0
   r Unit#491.workTime 0
   r Unit#491.extraction f32:0x00000000
   r Unit#492.buildLeft f32:0x00000000
-  r Unit#492.def UnitDef#279
+  r Unit#492.def UnitDef#0
   r Unit#492.flags 0x00000000
   r Unit#492.activateFlags 0
   r Unit#492.workTime 0
   r Unit#492.extraction f32:0x00000000
   r Unit#493.buildLeft f32:0x00000000
-  r Unit#493.def UnitDef#279
+  r Unit#493.def UnitDef#0
   r Unit#493.flags 0x00000000
   r Unit#493.activateFlags 0
   r Unit#493.workTime 0
   r Unit#493.extraction f32:0x00000000
   r Unit#494.buildLeft f32:0x00000000
-  r Unit#494.def UnitDef#279
+  r Unit#494.def UnitDef#0
   r Unit#494.flags 0x00000000
   r Unit#494.activateFlags 0
   r Unit#494.workTime 0
   r Unit#494.extraction f32:0x00000000
   r Unit#495.buildLeft f32:0x00000000
-  r Unit#495.def UnitDef#279
+  r Unit#495.def UnitDef#0
   r Unit#495.flags 0x00000000
   r Unit#495.activateFlags 0
   r Unit#495.workTime 0
   r Unit#495.extraction f32:0x00000000
   r Unit#496.buildLeft f32:0x00000000
-  r Unit#496.def UnitDef#279
+  r Unit#496.def UnitDef#0
   r Unit#496.flags 0x00000000
   r Unit#496.activateFlags 0
   r Unit#496.workTime 0
   r Unit#496.extraction f32:0x00000000
   r Unit#497.buildLeft f32:0x00000000
-  r Unit#497.def UnitDef#279
+  r Unit#497.def UnitDef#0
   r Unit#497.flags 0x00000000
   r Unit#497.activateFlags 0
   r Unit#497.workTime 0
   r Unit#497.extraction f32:0x00000000
   r Unit#498.buildLeft f32:0x00000000
-  r Unit#498.def UnitDef#279
+  r Unit#498.def UnitDef#0
   r Unit#498.flags 0x00000000
   r Unit#498.activateFlags 0
   r Unit#498.workTime 0
   r Unit#498.extraction f32:0x00000000
   r Unit#499.buildLeft f32:0x00000000
-  r Unit#499.def UnitDef#279
+  r Unit#499.def UnitDef#0
   r Unit#499.flags 0x00000000
   r Unit#499.activateFlags 0
   r Unit#499.workTime 0
   r Unit#499.extraction f32:0x00000000
   r Unit#500.buildLeft f32:0x00000000
-  r Unit#500.def UnitDef#279
+  r Unit#500.def UnitDef#0
   r Unit#500.flags 0x00000000
   r Unit#500.activateFlags 0
   r Unit#500.workTime 0

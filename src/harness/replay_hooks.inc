@@ -354,7 +354,18 @@ int __stdcall RecEconomySpendEnergyAndMetal(UnitResources* a0, float a1, float a
         ArgValue(s_call, "energy", a1);
         ArgValue(s_call, "metal", a2);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i economy.SpendEnergyAndMetal");
+        ImportObject(line, ROK_UNITRESOURCES, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+    }
     int result = s_inner_economy->SpendEnergyAndMetal(a0, a1, a2);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -551,7 +562,7 @@ void __stdcall RecFeaturesDamageFeature(Cell* a0, int a1, int a2, WeaponDef* a3)
         ArgObject(s_call, "cell", ROK_CELL, a0);
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "z", a2);
-        ArgWeapon(s_call, "weapon", a3);
+        ArgObject(s_call, "weapon", ROK_WEAPONDEF, a3);
     }
     s_inner_features->DamageFeature(a0, a1, a2, a3);
     if (scope.Open()) {
@@ -668,7 +679,17 @@ void __stdcall RecAiReactToAttack(Unit* a0, Unit* a1, int a2)
         ArgObject(s_call, "unit", ROK_UNIT, a1);
         ArgValue(s_call, "amount", a2);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i ai.ReactToAttack");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportObject(line, ROK_UNIT, a1);
+        ImportValue(line, a2);
+    }
     s_inner_ai->ReactToAttack(a0, a1, a2);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -934,138 +955,135 @@ int __stdcall RecAiGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2,
     return result;
 }
 
-void __fastcall RecPathfindingRunSearches(Pathfinder* a0)
+unsigned int __stdcall RecPathfindingRegionSize(const PathMapInfo* a0)
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_PATHFINDING_RUNSEARCHES, SUB_PATHFINDING, roots);
+    SlotScope scope(RSL_PATHFINDING_REGIONSIZE, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "self");
+        ArgPending(s_call, "map");
     }
-    s_inner_pathfinding->RunSearches(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPathfindingAbortIfGoalMatch(Pathfinder* a0, AiSearchGoal* a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PATHFINDING_ABORTIFGOALMATCH, SUB_PATHFINDING, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "self");
-        ArgPending(s_call, "goal");
-    }
-    s_inner_pathfinding->AbortIfGoalMatch(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPathfindingDestroy(Pathfinder* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PATHFINDING_DESTROY, SUB_PATHFINDING, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "self");
-    }
-    s_inner_pathfinding->Destroy(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPathfindingCreate()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PATHFINDING_CREATE, SUB_PATHFINDING, roots);
-    if (scope.Open()) {
-    }
-    s_inner_pathfinding->Create();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsUpdateProjectiles()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_UPDATEPROJECTILES, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_weapons->UpdateProjectiles();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsUpdateExplosions()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_UPDATEEXPLOSIONS, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_weapons->UpdateExplosions();
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecWeaponsSpawnProjectile(WeaponDef* a0, Vec3* a1, Vec3* a2, int a3)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_WEAPONDEF, a0);
-    SlotScope scope(RSL_WEAPONS_SPAWNPROJECTILE, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgWeapon(s_call, "weapon", a0);
-        ArgVec3(s_call, "pos", a1);
-        ArgVec3(s_call, "vel", a2);
-        ArgValue(s_call, "flag", a3);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i weapons.SpawnProjectile");
-        ImportWeapon(line, a0);
-        ImportVec3(line, "pos", a1);
-        ImportVec3(line, "vel", a2);
-        ImportValue(line, a3);
-    }
-    int result = s_inner_weapons->SpawnProjectile(a0, a1, a2, a3);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
+    unsigned int result = s_inner_pathfinding->RegionSize(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-WeaponDef* __stdcall RecWeaponsFindWeaponByName(char* a0)
+void __stdcall RecPathfindingInit(const PathMapInfo* a0, void* a1, unsigned int a2)
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_FINDWEAPONBYNAME, SUB_WEAPONS, roots);
+    SlotScope scope(RSL_PATHFINDING_INIT, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgValue(s_call, "name", (const char*)a0);
+        ArgPending(s_call, "map");
+        ArgPending(s_call, "region");
+        ArgValue(s_call, "size", a2);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i weapons.FindWeaponByName");
-        ImportValue(line, (const char*)a0);
+    s_inner_pathfinding->Init(a0, a1, a2);
+    if (scope.Open()) {
     }
-    WeaponDef* result = s_inner_weapons->FindWeaponByName(a0);
-    if (scope.Import()) {
-        ImportResultWeapon(line, result, 1, "flags");
-        FinishImport(line);
+}
+
+void* __stdcall RecPathfindingShutdown()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_SHUTDOWN, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
     }
+    void* result = s_inner_pathfinding->Shutdown();
     if (scope.Open()) {
     }
     return result;
 }
 
-void __stdcall RecWeaponsApplyAreaDamageAt(WeaponDef* a0, Vec3* a1)
+void __stdcall RecPathfindingSubmit(const PathRequest* a0)
 {
     ReplayRoots roots;
-    roots.Add(ROK_WEAPONDEF, a0);
-    SlotScope scope(RSL_WEAPONS_APPLYAREADAMAGEAT, SUB_WEAPONS, roots);
+    SlotScope scope(RSL_PATHFINDING_SUBMIT, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgWeapon(s_call, "weapon", a0);
-        ArgPending(s_call, "pos");
+        ArgPending(s_call, "request");
     }
-    s_inner_weapons->ApplyAreaDamageAt(a0, a1);
+    s_inner_pathfinding->Submit(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecPathfindingCancel(PathHandle a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_CANCEL, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "requester");
+    }
+    s_inner_pathfinding->Cancel(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecPathfindingCellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_CELLSCHANGED, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "left", a0);
+        ArgValue(s_call, "top", a1);
+        ArgValue(s_call, "right", a2);
+        ArgValue(s_call, "bottom", a3);
+        ArgValue(s_call, "classes", a4);
+        ArgValue(s_call, "cause", a5);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathfinding.CellsChanged");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+        ImportValue(line, a3);
+        ImportValue(line, a4);
+        ImportValue(line, a5);
+    }
+    s_inner_pathfinding->CellsChanged(a0, a1, a2, a3, a4, a5);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecPathfindingStep()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_STEP, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+    }
+    s_inner_pathfinding->Step();
+    if (scope.Open()) {
+    }
+}
+
+int __stdcall RecPathfindingPoll(PathEvent* a0, PathPoint* a1, int a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_POLL, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "out");
+        ArgPending(s_call, "points");
+        ArgValue(s_call, "capacity", a2);
+    }
+    int result = s_inner_pathfinding->Poll(a0, a1, a2);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecPathfindingWriteState(const StateWriter* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHFINDING_WRITESTATE, SUB_PATHFINDING, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "writer");
+    }
+    s_inner_pathfinding->WriteState(a0);
     if (scope.Open()) {
     }
 }
@@ -1148,8 +1166,8 @@ int __stdcall RecWeaponsWeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3)
     SlotScope scope(RSL_WEAPONS_WEAPONCANREACHPOS, SUB_WEAPONS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgPending(s_call, "from");
-        ArgPending(s_call, "to");
+        ArgStruct(s_call, "a", "from", ROK_VEC3, a1);
+        ArgStruct(s_call, "a", "to", ROK_VEC3, a2);
         ArgValue(s_call, "flags", a3);
     }
     int result = s_inner_weapons->WeaponCanReachPos(a0, a1, a2, a3);
@@ -1157,72 +1175,6 @@ int __stdcall RecWeaponsWeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
-}
-
-void __stdcall RecWeaponsAllocWeaponArray()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_ALLOCWEAPONARRAY, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_weapons->AllocWeaponArray();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsFreeWeaponArray()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_FREEWEAPONARRAY, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_weapons->FreeWeaponArray();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsLoadWeaponTypes()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_LOADWEAPONTYPES, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_weapons->LoadWeaponTypes();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsFreeWeaponTypes()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_FREEWEAPONTYPES, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_weapons->FreeWeaponTypes();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsInitExplosions()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_INITEXPLOSIONS, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_weapons->InitExplosions();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsFreeExplosions()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_FREEEXPLOSIONS, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_weapons->FreeExplosions();
-    if (scope.Open()) {
-    }
 }
 
 void __stdcall RecWeaponsDamageUnit(Unit* a0, Unit* a1, int a2, int a3, unsigned short a4)
@@ -1241,22 +1193,6 @@ void __stdcall RecWeaponsDamageUnit(Unit* a0, Unit* a1, int a2, int a3, unsigned
     s_inner_weapons->DamageUnit(a0, a1, a2, a3, a4);
     if (scope.Open()) {
     }
-}
-
-unsigned short __stdcall RecWeaponsFindFeatureAtPos(Vec3* a0, Point16* a1, Point16* a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_FINDFEATUREATPOS, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "pos");
-        ArgPending(s_call, "cell");
-        ArgPending(s_call, "size");
-    }
-    unsigned short result = s_inner_weapons->FindFeatureAtPos(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
 }
 
 void __fastcall RecWeaponsReleaseWeapons(Unit* a0, int a1, unsigned char a2)
@@ -1289,20 +1225,6 @@ void __fastcall RecWeaponsClaimWeapons(Unit* a0, int a1, unsigned char a2)
     }
 }
 
-void __stdcall RecWeaponsDetonateUnitWeapon(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_WEAPONS_DETONATEUNITWEAPON, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "second", a1);
-    }
-    s_inner_weapons->DetonateUnitWeapon(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecWeaponsInitUnitWeaponSlots(Unit* a0)
 {
     ReplayRoots roots;
@@ -1312,19 +1234,6 @@ void __stdcall RecWeaponsInitUnitWeaponSlots(Unit* a0)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
     }
     s_inner_weapons->InitUnitWeaponSlots(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsRemoveUnitProjectiles(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_WEAPONS_REMOVEUNITPROJECTILES, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_weapons->RemoveUnitProjectiles(a0);
     if (scope.Open()) {
     }
 }
@@ -1345,27 +1254,13 @@ void __stdcall RecWeaponsUpdateUnitWeapons(Unit* a0)
 void __stdcall RecWeaponsWeaponAimCobComplete(Callback* a0, int a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_WEAPONAIMCOBCB, a0);
     SlotScope scope(RSL_WEAPONS_WEAPONAIMCOBCOMPLETE, SUB_WEAPONS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "callback");
+        ArgObject(s_call, "callback", ROK_WEAPONAIMCOBCB, a0);
         ArgValue(s_call, "result", a1);
     }
     s_inner_weapons->WeaponAimCobComplete(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsCobScriptExplodePiece(CobScript* a0, int a1, unsigned int a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_WEAPONS_COBSCRIPTEXPLODEPIECE, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "piece", a1);
-        ArgValue(s_call, "flags", a2);
-    }
-    s_inner_weapons->CobScriptExplodePiece(a0, a1, a2);
     if (scope.Open()) {
     }
 }
@@ -1438,7 +1333,17 @@ Unit* __stdcall RecTargetingGetWeaponTargetUnit(Unit* a0, int a1)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
         ArgValue(s_call, "weapon", a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i targeting.GetWeaponTargetUnit");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, a1);
+    }
     Unit* result = s_inner_targeting->GetWeaponTargetUnit(a0, a1);
+    if (scope.Import()) {
+        ImportResultObject(line, ROK_UNIT, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, result, "o");
     }
@@ -1454,7 +1359,18 @@ int __stdcall RecTargetingGetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
         ArgValue(s_call, "weapon", a2);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i targeting.GetWeaponTargetPos");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, a2);
+    }
     int result = s_inner_targeting->GetWeaponTargetPos(a0, a1, a2);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        if (result != 0) ImportOutVec3(line, "pos", a1);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         if (result != 0) ArgStruct(s_tail, "o", "pos", ROK_VEC3, a1);
         ArgValue(s_tail, "result", result, "o");
@@ -1814,11 +1730,12 @@ unsigned int __stdcall RecLosRadarSoundHeardMask(const Vec3* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_SOUNDHEARDMASK, SUB_LOS_RADAR, roots);
     if (scope.Open()) {
-        ArgStruct(s_call, "a", "at", ROK_VEC3, a0);
+        ArgVec3(s_call, "at", a0);
     }
     ReplayText line;
     if (scope.Import()) {
         line.Add("  i los_radar.SoundHeardMask");
+        ImportVec3(line, "at", a0);
     }
     unsigned int result = s_inner_los_radar->SoundHeardMask(a0);
     if (scope.Import()) {
@@ -1831,34 +1748,6 @@ unsigned int __stdcall RecLosRadarSoundHeardMask(const Vec3* a0)
     return result;
 }
 
-void __stdcall RecOrdersAiSearchGoalSetWaypoints(AiSearchGoal* a0, Point16* a1, int a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_ORDERS_AISEARCHGOALSETWAYPOINTS, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "self");
-        ArgPending(s_call, "points");
-        ArgValue(s_call, "count", a2);
-    }
-    s_inner_orders->AiSearchGoalSetWaypoints(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecOrdersOrderFxAddFlags(OrderFx* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_ORDERFX, a0);
-    SlotScope scope(RSL_ORDERS_ORDERFXADDFLAGS, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_ORDERFX, a0);
-        ArgValue(s_call, "flags", a1);
-    }
-    s_inner_orders->OrderFxAddFlags(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecOrdersAppendOrder(Unit* a0, Order* a1)
 {
     ReplayRoots roots;
@@ -1869,7 +1758,16 @@ void __stdcall RecOrdersAppendOrder(Unit* a0, Order* a1)
         ArgObject(s_call, "owner", ROK_UNIT, a0);
         ArgObject(s_call, "node", ROK_ORDER, a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i orders.AppendOrder");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportObject(line, ROK_ORDER, a1);
+    }
     s_inner_orders->AppendOrder(a0, a1);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -2116,28 +2014,6 @@ void __stdcall RecOrdersClearOrderTypeTable()
     }
 }
 
-void __stdcall RecOrdersCreatePathfinder()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_ORDERS_CREATEPATHFINDER, SUB_ORDERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_orders->CreatePathfinder();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecOrdersDestroyPathfinder()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_ORDERS_DESTROYPATHFINDER, SUB_ORDERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_orders->DestroyPathfinder();
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecOrdersNewUnitMotion(Unit* a0)
 {
     ReplayRoots roots;
@@ -2175,8 +2051,18 @@ MissionType __stdcall RecOrdersMissionTypeFromName(const char* a0)
     if (scope.Open()) {
         ArgValue(s_call, "name", (const char*)a0);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i orders.MissionTypeFromName");
+        ImportValue(line, (const char*)a0);
+    }
     MissionType result = s_inner_orders->MissionTypeFromName(a0);
+    if (scope.Import()) {
+        ImportResultValue(line, ROK_MISSIONTYPE, &result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
+        ArgValueStruct(s_tail, "o", "result", ROK_MISSIONTYPE, &result);
     }
     return result;
 }
@@ -2187,14 +2073,28 @@ Order* __stdcall RecOrdersNewOrder(MissionType a0, Unit* a1, void* a2, int a3, i
     roots.Add(ROK_UNIT, a1);
     SlotScope scope(RSL_ORDERS_NEWORDER, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "kind");
+        ArgValueStruct(s_call, "a", "kind", ROK_MISSIONTYPE, &a0);
         ArgObject(s_call, "target", ROK_UNIT, a1);
         ArgPending(s_call, "pos");
         ArgValue(s_call, "a", a3);
         ArgValue(s_call, "b", a4);
         ArgValue(s_call, "c", a5);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i orders.NewOrder");
+        ImportValueStruct(line, ROK_MISSIONTYPE, &a0);
+        ImportObject(line, ROK_UNIT, a1);
+        ImportPending(line);
+        ImportValue(line, a3);
+        ImportValue(line, a4);
+        ImportValue(line, a5);
+    }
     Order* result = s_inner_orders->NewOrder(a0, a1, a2, a3, a4, a5);
+    if (scope.Import()) {
+        ImportResultObject(line, ROK_ORDER, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDER, result, "o");
     }
@@ -2214,68 +2114,6 @@ void __stdcall RecOrdersQueueBuildOrder(char* a0, Unit* a1, int a2)
     s_inner_orders->QueueBuildOrder(a0, a1, a2);
     if (scope.Open()) {
     }
-}
-
-int __stdcall RecOrdersOrderFxIsGoal(OrderFx* a0, int a1, int a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_ORDERFX, a0);
-    SlotScope scope(RSL_ORDERS_ORDERFXISGOAL, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_ORDERFX, a0);
-        ArgValue(s_call, "x", a1);
-        ArgValue(s_call, "y", a2);
-    }
-    int result = s_inner_orders->OrderFxIsGoal(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecOrdersOrderFxFillGoalCells(OrderFx* a0, std::vector<Point16, std::allocator<Point16> >* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_ORDERFX, a0);
-    SlotScope scope(RSL_ORDERS_ORDERFXFILLGOALCELLS, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_ORDERFX, a0);
-        ArgPending(s_call, "goals");
-    }
-    s_inner_orders->OrderFxFillGoalCells(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecOrdersOrderFxApproxDist(OrderFx* a0, int a1, int a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_ORDERFX, a0);
-    SlotScope scope(RSL_ORDERS_ORDERFXAPPROXDIST, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_ORDERFX, a0);
-        ArgValue(s_call, "x", a1);
-        ArgValue(s_call, "y", a2);
-    }
-    int result = s_inner_orders->OrderFxApproxDist(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-AiSearchGoal* __stdcall RecOrdersUnitMotionClaimRepath(UnitMotion* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITMOTION, a0);
-    SlotScope scope(RSL_ORDERS_UNITMOTIONCLAIMREPATH, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
-    }
-    AiSearchGoal* result = s_inner_orders->UnitMotionClaimRepath(a0);
-    if (scope.Open()) {
-    }
-    return result;
 }
 
 void __stdcall RecOrdersOrderOrStatusFlags(OrderBase* a0, unsigned int a1)
@@ -2301,6 +2139,19 @@ void __stdcall RecOrdersUnitMotionReadNetState(UnitMotion* a0, BitReader* a1)
         ArgPending(s_call, "reader");
     }
     s_inner_orders->UnitMotionReadNetState(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecOrdersApplyPathEvent(const PathEvent* a0, const PathPoint* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ORDERS_APPLYPATHEVENT, SUB_ORDERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "event");
+        ArgPending(s_call, "waypoints");
+    }
+    s_inner_orders->ApplyPathEvent(a0, a1);
     if (scope.Open()) {
     }
 }
@@ -2527,7 +2378,19 @@ int __stdcall RecUnitsStartScript(CobScript* a0, const char* a1, Callback* a2, i
         ArgPending(s_call, "callback");
         ArgValue(s_call, "update", a3);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i units.StartScript");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+        ImportPending(line);
+        ImportValue(line, a3);
+    }
     int result = s_inner_units->StartScript(a0, a1, a2, a3);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -2547,7 +2410,25 @@ int __stdcall RecUnitsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, int
         ArgInOutScalar(s_call, "p4", a4);
         ArgInOutScalar(s_call, "p5", a5);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i units.QueryScript");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+        ImportInOutScalar(line, a2);
+        ImportInOutScalar(line, a3);
+        ImportInOutScalar(line, a4);
+        ImportInOutScalar(line, a5);
+    }
     int result = s_inner_units->QueryScript(a0, a1, a2, a3, a4, a5);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        ImportOutInOutScalar(line, "p2", a2);
+        ImportOutInOutScalar(line, "p3", a3);
+        ImportOutInOutScalar(line, "p4", a4);
+        ImportOutInOutScalar(line, "p5", a5);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgInOutScalarExit(s_tail, "p2", a2);
         ArgInOutScalarExit(s_tail, "p3", a3);
@@ -2565,10 +2446,19 @@ void __stdcall RecUnitsGetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
     SlotScope scope(RSL_UNITS_GETAIMFROMPOSITION, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgPending(s_call, "out");
         ArgValue(s_call, "weapon", a2);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i units.GetAimFromPosition");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, a2);
+    }
     s_inner_units->GetAimFromPosition(a0, a1, a2);
+    if (scope.Import()) {
+        ImportOutVec3(line, "out", a1);
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -2582,9 +2472,19 @@ Vec3 __stdcall RecUnitsGetPieceOffset(Unit* a0, int a1)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
         ArgValue(s_call, "piece", a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i units.GetPieceOffset");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, a1);
+    }
     Vec3 result = s_inner_units->GetPieceOffset(a0, a1);
+    if (scope.Import()) {
+        ImportResultValue(line, ROK_VEC3, &result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
     }
     return result;
 }
@@ -2613,7 +2513,15 @@ void __stdcall RecUnitsMarkRecentlyDamaged(Unit* a0)
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i units.MarkRecentlyDamaged");
+        ImportObject(line, ROK_UNIT, a0);
+    }
     s_inner_units->MarkRecentlyDamaged(a0);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4809,7 +4717,19 @@ void __stdcall RecNetworkSendUnitDamage(Unit* a0, Unit* a1, int a2, int a3, unsi
         ArgValue(s_call, "kind", a3);
         ArgValue(s_call, "extra", a4);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendUnitDamage");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportObject(line, ROK_UNIT, a1);
+        ImportValue(line, a2);
+        ImportValue(line, a3);
+        ImportValue(line, a4);
+    }
     s_inner_network->SendUnitDamage(a0, a1, a2, a3, a4);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4872,7 +4792,19 @@ void __stdcall RecNetworkSendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2, 
         ArgPending(s_call, "origin");
         ArgPending(s_call, "aimOrVel");
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendWeaponFire");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportPending(line);
+        ImportObject(line, ROK_UNIT, a2);
+        ImportPending(line);
+        ImportPending(line);
+    }
     s_inner_network->SendWeaponFire(a0, a1, a2, a3, a4);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4912,7 +4844,7 @@ void __stdcall RecNetworkSendFeatureHit(WeaponDef* a0, int a1, int a2)
     roots.Add(ROK_WEAPONDEF, a0);
     SlotScope scope(RSL_NETWORK_SENDFEATUREHIT, SUB_NETWORK, roots);
     if (scope.Open()) {
-        ArgWeapon(s_call, "weapon", a0);
+        ArgObject(s_call, "weapon", ROK_WEAPONDEF, a0);
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "z", a2);
     }
@@ -4997,7 +4929,22 @@ int __stdcall RecNetworkSendScriptCallByName(Unit* a0, char* a1, char a2, int a3
         ArgValue(s_call, "arg2", a5);
         ArgValue(s_call, "arg3", a6);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendScriptCallByName");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, (const char*)a1);
+        ImportValue(line, a2);
+        ImportValue(line, a3);
+        ImportValue(line, a4);
+        ImportValue(line, a5);
+        ImportValue(line, a6);
+    }
     int result = s_inner_network->SendScriptCallByName(a0, a1, a2, a3, a4, a5, a6);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -5080,6 +5027,58 @@ void __stdcall RecNetworkSendUnitStates(Player* a0)
     }
 }
 
+int __stdcall RecWeaponsSpawnProjectile(WeaponDef* a0, Vec3* a1, Vec3* a2, int a3)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_WEAPONDEF, a0);
+    SlotScope scope(RSL_WEAPONS_SPAWNPROJECTILE, SUB_WEAPONS, roots, false);
+    if (scope.Open()) {
+        ArgWeapon(s_call, "weapon", a0);
+        ArgVec3(s_call, "pos", a1);
+        ArgVec3(s_call, "vel", a2);
+        ArgValue(s_call, "flag", a3);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i weapons.SpawnProjectile");
+        ImportWeapon(line, a0);
+        ImportVec3(line, "pos", a1);
+        ImportVec3(line, "vel", a2);
+        ImportValue(line, a3);
+    }
+    int result = s_inner_weapons->SpawnProjectile(a0, a1, a2, a3);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+WeaponDef* __stdcall RecWeaponsFindWeaponByName(char* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_WEAPONS_FINDWEAPONBYNAME, SUB_WEAPONS, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "name", (const char*)a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i weapons.FindWeaponByName");
+        ImportValue(line, (const char*)a0);
+    }
+    WeaponDef* result = s_inner_weapons->FindWeaponByName(a0);
+    if (scope.Import()) {
+        ImportResultWeapon(line, result, 1, "flags");
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+    return result;
+}
+
 bool IsImportOf(unsigned owner, unsigned slot)
 {
     switch (owner) {
@@ -5120,9 +5119,45 @@ bool IsImportOf(unsigned owner, unsigned slot)
     case SUB_FEATURES:
         if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
             return true;
+        if (slot == RSL_PATHFINDING_CELLSCHANGED)
+            return true;
         return false;
     case SUB_WEAPONS:
         if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
+            return true;
+        if (slot == RSL_UNITS_STARTSCRIPT)
+            return true;
+        if (slot == RSL_UNITS_STARTSCRIPTWITHARGS)
+            return true;
+        if (slot == RSL_UNITS_FINDSCRIPT)
+            return true;
+        if (slot == RSL_UNITS_GETAIMFROMPOSITION)
+            return true;
+        if (slot == RSL_UNITS_GETPIECEOFFSET)
+            return true;
+        if (slot == RSL_UNITS_QUERYSCRIPT)
+            return true;
+        if (slot == RSL_UNITS_MARKRECENTLYDAMAGED)
+            return true;
+        if (slot == RSL_TARGETING_GETWEAPONTARGETPOS)
+            return true;
+        if (slot == RSL_TARGETING_GETWEAPONTARGETUNIT)
+            return true;
+        if (slot == RSL_ECONOMY_SPENDENERGYANDMETAL)
+            return true;
+        if (slot == RSL_NETWORK_SENDSCRIPTCALLBYNAME)
+            return true;
+        if (slot == RSL_NETWORK_SENDUNITDAMAGE)
+            return true;
+        if (slot == RSL_NETWORK_SENDWEAPONFIRE)
+            return true;
+        if (slot == RSL_AI_REACTTOATTACK)
+            return true;
+        if (slot == RSL_ORDERS_MISSIONTYPEFROMNAME)
+            return true;
+        if (slot == RSL_ORDERS_APPENDORDER)
+            return true;
+        if (slot == RSL_ORDERS_NEWORDER)
             return true;
         return false;
     case SUB_TARGETING:
@@ -5145,6 +5180,8 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_LOS_RADAR_UPDATECELLHEIGHTRANGE)
             return true;
         if (slot == RSL_LOS_RADAR_GETMAPCELL)
+            return true;
+        if (slot == RSL_PATHFINDING_CELLSCHANGED)
             return true;
         return false;
     default:
@@ -5243,7 +5280,7 @@ void HookSeams(const bool* on)
         s_rec_economy.SpendEnergy = RecEconomySpendEnergy;
     if (on[SUB_ECONOMY])
         s_rec_economy.SpendMetal = RecEconomySpendMetal;
-    if (on[SUB_ECONOMY])
+    if (on[SUB_ECONOMY] || on[SUB_WEAPONS])
         s_rec_economy.SpendEnergyAndMetal = RecEconomySpendEnergyAndMetal;
     if (on[SUB_FEATURES])
         s_rec_features.UpdateFeatures = RecFeaturesUpdateFeatures;
@@ -5287,7 +5324,7 @@ void HookSeams(const bool* on)
         s_rec_ai.HasReadyUnitInRange = RecAiHasReadyUnitInRange;
     if (on[SUB_AI])
         s_rec_ai.IsPointVisible = RecAiIsPointVisible;
-    if (on[SUB_AI])
+    if (on[SUB_AI] || on[SUB_WEAPONS])
         s_rec_ai.ReactToAttack = RecAiReactToAttack;
     if (on[SUB_AI])
         s_rec_ai.MarkOwnerNetDirtyFromDamageSplit = RecAiMarkOwnerNetDirtyFromDamageSplit;
@@ -5330,23 +5367,23 @@ void HookSeams(const bool* on)
     if (on[SUB_AI])
         s_rec_ai.GetVisibleEnemiesInRadiusList = RecAiGetVisibleEnemiesInRadiusList;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.RunSearches = RecPathfindingRunSearches;
+        s_rec_pathfinding.RegionSize = RecPathfindingRegionSize;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.AbortIfGoalMatch = RecPathfindingAbortIfGoalMatch;
+        s_rec_pathfinding.Init = RecPathfindingInit;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.Destroy = RecPathfindingDestroy;
+        s_rec_pathfinding.Shutdown = RecPathfindingShutdown;
     if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.Create = RecPathfindingCreate;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.UpdateProjectiles = RecWeaponsUpdateProjectiles;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.UpdateExplosions = RecWeaponsUpdateExplosions;
-    if (on[SUB_WEAPONS] || on[SUB_WIND_METEORS])
-        s_rec_weapons.SpawnProjectile = RecWeaponsSpawnProjectile;
-    if (on[SUB_WEAPONS] || on[SUB_WIND_METEORS])
-        s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.ApplyAreaDamageAt = RecWeaponsApplyAreaDamageAt;
+        s_rec_pathfinding.Submit = RecPathfindingSubmit;
+    if (on[SUB_PATHFINDING])
+        s_rec_pathfinding.Cancel = RecPathfindingCancel;
+    if (on[SUB_PATHFINDING] || on[SUB_FEATURES] || on[SUB_MAP])
+        s_rec_pathfinding.CellsChanged = RecPathfindingCellsChanged;
+    if (on[SUB_PATHFINDING])
+        s_rec_pathfinding.Step = RecPathfindingStep;
+    if (on[SUB_PATHFINDING])
+        s_rec_pathfinding.Poll = RecPathfindingPoll;
+    if (on[SUB_PATHFINDING])
+        s_rec_pathfinding.WriteState = RecPathfindingWriteState;
     if (on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_weapons.GetWeaponRange = RecWeaponsGetWeaponRange;
     if (on[SUB_WEAPONS] || on[SUB_TARGETING])
@@ -5356,37 +5393,17 @@ void HookSeams(const bool* on)
     if (on[SUB_WEAPONS])
         s_rec_weapons.WeaponCanReachPos = RecWeaponsWeaponCanReachPos;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.AllocWeaponArray = RecWeaponsAllocWeaponArray;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.FreeWeaponArray = RecWeaponsFreeWeaponArray;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.LoadWeaponTypes = RecWeaponsLoadWeaponTypes;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.FreeWeaponTypes = RecWeaponsFreeWeaponTypes;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.InitExplosions = RecWeaponsInitExplosions;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.FreeExplosions = RecWeaponsFreeExplosions;
-    if (on[SUB_WEAPONS])
         s_rec_weapons.DamageUnit = RecWeaponsDamageUnit;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.FindFeatureAtPos = RecWeaponsFindFeatureAtPos;
     if (on[SUB_WEAPONS])
         s_rec_weapons.ReleaseWeapons = RecWeaponsReleaseWeapons;
     if (on[SUB_WEAPONS])
         s_rec_weapons.ClaimWeapons = RecWeaponsClaimWeapons;
     if (on[SUB_WEAPONS])
-        s_rec_weapons.DetonateUnitWeapon = RecWeaponsDetonateUnitWeapon;
-    if (on[SUB_WEAPONS])
         s_rec_weapons.InitUnitWeaponSlots = RecWeaponsInitUnitWeaponSlots;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.RemoveUnitProjectiles = RecWeaponsRemoveUnitProjectiles;
     if (on[SUB_WEAPONS])
         s_rec_weapons.UpdateUnitWeapons = RecWeaponsUpdateUnitWeapons;
     if (on[SUB_WEAPONS])
         s_rec_weapons.WeaponAimCobComplete = RecWeaponsWeaponAimCobComplete;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.CobScriptExplodePiece = RecWeaponsCobScriptExplodePiece;
     if (on[SUB_TARGETING])
         s_rec_targeting.SetWeaponTargetUnit = RecTargetingSetWeaponTargetUnit;
     if (on[SUB_TARGETING])
@@ -5395,9 +5412,9 @@ void HookSeams(const bool* on)
         s_rec_targeting.ClearWeaponTarget = RecTargetingClearWeaponTarget;
     if (on[SUB_TARGETING])
         s_rec_targeting.ResetWeaponTarget = RecTargetingResetWeaponTarget;
-    if (on[SUB_TARGETING])
+    if (on[SUB_TARGETING] || on[SUB_WEAPONS])
         s_rec_targeting.GetWeaponTargetUnit = RecTargetingGetWeaponTargetUnit;
-    if (on[SUB_TARGETING])
+    if (on[SUB_TARGETING] || on[SUB_WEAPONS])
         s_rec_targeting.GetWeaponTargetPos = RecTargetingGetWeaponTargetPos;
     if (on[SUB_TARGETING])
         s_rec_targeting.FindWeaponTarget = RecTargetingFindWeaponTarget;
@@ -5449,11 +5466,7 @@ void HookSeams(const bool* on)
         s_rec_los_radar.UpdateSensorRadarAndCloak = RecLosRadarUpdateSensorRadarAndCloak;
     if (on[SUB_LOS_RADAR] || on[SUB_FEATURES] || on[SUB_WEAPONS])
         s_rec_los_radar.SoundHeardMask = RecLosRadarSoundHeardMask;
-    if (on[SUB_ORDERS])
-        s_rec_orders.AiSearchGoalSetWaypoints = RecOrdersAiSearchGoalSetWaypoints;
-    if (on[SUB_ORDERS])
-        s_rec_orders.OrderFxAddFlags = RecOrdersOrderFxAddFlags;
-    if (on[SUB_ORDERS])
+    if (on[SUB_ORDERS] || on[SUB_WEAPONS])
         s_rec_orders.AppendOrder = RecOrdersAppendOrder;
     if (on[SUB_ORDERS])
         s_rec_orders.AddOrder = RecOrdersAddOrder;
@@ -5488,40 +5501,30 @@ void HookSeams(const bool* on)
     if (on[SUB_ORDERS])
         s_rec_orders.ClearOrderTypeTable = RecOrdersClearOrderTypeTable;
     if (on[SUB_ORDERS])
-        s_rec_orders.CreatePathfinder = RecOrdersCreatePathfinder;
-    if (on[SUB_ORDERS])
-        s_rec_orders.DestroyPathfinder = RecOrdersDestroyPathfinder;
-    if (on[SUB_ORDERS])
         s_rec_orders.NewUnitMotion = RecOrdersNewUnitMotion;
     if (on[SUB_ORDERS])
         s_rec_orders.LoadOrder = RecOrdersLoadOrder;
-    if (on[SUB_ORDERS])
+    if (on[SUB_ORDERS] || on[SUB_WEAPONS])
         s_rec_orders.MissionTypeFromName = RecOrdersMissionTypeFromName;
-    if (on[SUB_ORDERS])
+    if (on[SUB_ORDERS] || on[SUB_WEAPONS])
         s_rec_orders.NewOrder = RecOrdersNewOrder;
     if (on[SUB_ORDERS])
         s_rec_orders.QueueBuildOrder = RecOrdersQueueBuildOrder;
     if (on[SUB_ORDERS])
-        s_rec_orders.OrderFxIsGoal = RecOrdersOrderFxIsGoal;
-    if (on[SUB_ORDERS])
-        s_rec_orders.OrderFxFillGoalCells = RecOrdersOrderFxFillGoalCells;
-    if (on[SUB_ORDERS])
-        s_rec_orders.OrderFxApproxDist = RecOrdersOrderFxApproxDist;
-    if (on[SUB_ORDERS])
-        s_rec_orders.UnitMotionClaimRepath = RecOrdersUnitMotionClaimRepath;
-    if (on[SUB_ORDERS])
         s_rec_orders.OrderOrStatusFlags = RecOrdersOrderOrStatusFlags;
     if (on[SUB_ORDERS])
         s_rec_orders.UnitMotionReadNetState = RecOrdersUnitMotionReadNetState;
+    if (on[SUB_ORDERS])
+        s_rec_orders.ApplyPathEvent = RecOrdersApplyPathEvent;
     if (on[SUB_UNITS])
         s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
     if (on[SUB_UNITS] || on[SUB_TARGETING])
         s_rec_units.GetGroundHeight = RecUnitsGetGroundHeight;
     if (on[SUB_UNITS] || on[SUB_TARGETING])
         s_rec_units.GetSweetSpot = RecUnitsGetSweetSpot;
-    if (on[SUB_UNITS] || on[SUB_TARGETING])
+    if (on[SUB_UNITS] || on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_units.FindScript = RecUnitsFindScript;
-    if (on[SUB_UNITS] || on[SUB_ECONOMY] || on[SUB_TARGETING])
+    if (on[SUB_UNITS] || on[SUB_ECONOMY] || on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_units.StartScriptWithArgs = RecUnitsStartScriptWithArgs;
     if (on[SUB_UNITS] || on[SUB_ECONOMY])
         s_rec_units.SetStateBits = RecUnitsSetStateBits;
@@ -5533,17 +5536,17 @@ void HookSeams(const bool* on)
         s_rec_units.RefreshMovedUnits = RecUnitsRefreshMovedUnits;
     if (on[SUB_UNITS])
         s_rec_units.RefreshUnitIfStale = RecUnitsRefreshUnitIfStale;
-    if (on[SUB_UNITS])
+    if (on[SUB_UNITS] || on[SUB_WEAPONS])
         s_rec_units.StartScript = RecUnitsStartScript;
-    if (on[SUB_UNITS])
+    if (on[SUB_UNITS] || on[SUB_WEAPONS])
         s_rec_units.QueryScript = RecUnitsQueryScript;
-    if (on[SUB_UNITS])
+    if (on[SUB_UNITS] || on[SUB_WEAPONS])
         s_rec_units.GetAimFromPosition = RecUnitsGetAimFromPosition;
-    if (on[SUB_UNITS])
+    if (on[SUB_UNITS] || on[SUB_WEAPONS])
         s_rec_units.GetPieceOffset = RecUnitsGetPieceOffset;
     if (on[SUB_UNITS])
         s_rec_units.GetPiecePosition = RecUnitsGetPiecePosition;
-    if (on[SUB_UNITS])
+    if (on[SUB_UNITS] || on[SUB_WEAPONS])
         s_rec_units.MarkRecentlyDamaged = RecUnitsMarkRecentlyDamaged;
     if (on[SUB_UNITS])
         s_rec_units.NotifyUnitRefs = RecUnitsNotifyUnitRefs;
@@ -5843,7 +5846,7 @@ void HookSeams(const bool* on)
         s_rec_network.SendBuilderLink = RecNetworkSendBuilderLink;
     if (on[SUB_NETWORK])
         s_rec_network.SendUnitKilled = RecNetworkSendUnitKilled;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_WEAPONS])
         s_rec_network.SendUnitDamage = RecNetworkSendUnitDamage;
     if (on[SUB_NETWORK])
         s_rec_network.SendAttach = RecNetworkSendAttach;
@@ -5851,7 +5854,7 @@ void HookSeams(const bool* on)
         s_rec_network.SendOwnershipTransfer = RecNetworkSendOwnershipTransfer;
     if (on[SUB_NETWORK])
         s_rec_network.SendActivateFlags = RecNetworkSendActivateFlags;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_WEAPONS])
         s_rec_network.SendWeaponFire = RecNetworkSendWeaponFire;
     if (on[SUB_NETWORK])
         s_rec_network.SendWeaponFireAt = RecNetworkSendWeaponFireAt;
@@ -5867,7 +5870,7 @@ void HookSeams(const bool* on)
         s_rec_network.SendFeatureReclaimed = RecNetworkSendFeatureReclaimed;
     if (on[SUB_NETWORK])
         s_rec_network.SendScriptCall = RecNetworkSendScriptCall;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_WEAPONS])
         s_rec_network.SendScriptCallByName = RecNetworkSendScriptCallByName;
     if (on[SUB_NETWORK])
         s_rec_network.SendShareMetal = RecNetworkSendShareMetal;
@@ -5879,6 +5882,10 @@ void HookSeams(const bool* on)
         s_rec_network.BroadcastPlayerEconomy = RecNetworkBroadcastPlayerEconomy;
     if (on[SUB_NETWORK])
         s_rec_network.SendUnitStates = RecNetworkSendUnitStates;
+    if (on[SUB_WIND_METEORS])
+        s_rec_weapons.SpawnProjectile = RecWeaponsSpawnProjectile;
+    if (on[SUB_WIND_METEORS])
+        s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
     g_seams.wind_meteors = &s_rec_wind_meteors;
     g_seams.economy = &s_rec_economy;
     g_seams.features = &s_rec_features;

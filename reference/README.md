@@ -308,8 +308,8 @@ The gate applies when a pull request changes `src/`, `include/`,
 trace format data (`data/layout_refs.csv`, `data/trace_schema.json`,
 `tools/traceschema.py`), or the tools that run the exe
 (`tools/reference.py`, `tools/playtest.py`). Other changes do not need
-it. The merges that did are the ones counted for the full-suite cadence
-below.
+it. The merges that did are the ones the nightly full suite runs for
+(below).
 
 `--traces` writes every trace with the reference branch's sha as `commit`. `--check` plays
 every scenario (`--parallel N` at a time, default half the CPUs and at most 6, or 10 with `--both-modes`), prints one line per scenario with its run time
@@ -387,10 +387,11 @@ periodic run.
 
 ### The full suite on moddable
 
-The full `--check` runs on the tip of `moddable` once every 5 merged pull requests that needed the
-gate. `uv run tools/fullgate.py` prints how many have merged since the newest `Full gate on <sha>`
-comment on the tracking issue (#632), and `uv run tools/fullgate.py due` exits 1 at 5 or more. When
-it is due, the lead runs `uv run tools/fullgate.py run` on the tip. It plays the full `--check
+The full `--check` runs nightly on the tip of `moddable`, when a pull request that needed the gate
+has merged since the last run. `uv run tools/fullgate.py` lists those merged since the newest `Full
+gate on <sha>` comment on the tracking issue (#632), and `uv run tools/fullgate.py due` exits 1 when
+there is one or more. When it is due, the maintainer runs `uv run tools/fullgate.py run` on the tip
+(`tools/worktree.sh --tip`). A night with no run is not a failure: the next one covers its merges. It plays the full `--check
 --both-modes --no-cache` (no `--tier`) and then, straight after it on a fresh prefix, `--check --no-cache
 --roundtrip auto`, which saves the block at an early, a middle and the second to last tick of every scenario,
 restores it and carries on, so that state outside the block shows as a divergence from the stored traces. The
@@ -402,12 +403,12 @@ round trip run scans and checks block pointers as the full run does. Last it bui
 Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n> equal, coverage: <result>
 ```
 
-The lead posts it on #632 and adds the play-tests (`tools/playtest.py` smoke, full, mp and music) and their results.
+The maintainer posts it on #632 and adds the play-tests (`tools/playtest.py` smoke, full, mp and music) and their results.
 A run that fails appends `, both modes exit <n>`, `, round trip exit <n>` or `, coverage exit <n>`, and names round trip block pointer
 problems in parentheses after the round trip count.
 
-**A periodic failure is fixed afterwards, not by freezing merges.** The lead files it at once as an
-issue, first in #2's order, with the failing scenario or play-test and the merges since the last pass
+**A periodic failure is fixed afterwards, not by freezing merges.** The maintainer files it at once
+as an issue, never `parked`, first in #2's "Priority now", with the failing scenario or play-test and the merges since the last pass
 (`tools/tracediff.py` gives the first tick of a divergence). Merges continue; the next periodic run
 must pass.
 

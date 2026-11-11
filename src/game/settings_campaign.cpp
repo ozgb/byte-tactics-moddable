@@ -7,6 +7,8 @@
 #include "../host/settings_io.h"
 #include "mission_conditions.h"
 #include "settings_campaign.h"
+#include "match_setup.h"
+#include "../state/block.h"
 
 class Mission;
 
@@ -144,6 +146,11 @@ int __stdcall SaveGameFile(char* path, char* description, int gameId)
     }
     (&file)->SetIntegerItem(g_gameIdKey, gameId);
     (&file)->SetIntegerItem(g_gameTimeKey, g_game->ticks);
+    MatchSetup setup = MatchSetupCurrent();
+    if (setup.blockBytes != kSimBlockBytes)
+        (&file)->SetIntegerItem(MatchSetupBlockBytesKey(), (int)setup.blockBytes);
+    if (setup.searchSteps != 0)
+        (&file)->SetIntegerItem(MatchSetupSearchStepsKey(), (int)setup.searchSteps);
     if (g_game->mode_391f1 == 6) {
         (&file)->OpenNamedBox(g_radarImageBoxName);
         SaveSurface((Surface *)g_game->finalSurface, &file);

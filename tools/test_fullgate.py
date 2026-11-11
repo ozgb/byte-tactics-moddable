@@ -84,20 +84,27 @@ class FullGateTest(unittest.TestCase):
     def full_run(self):
         return [comment(f"Full gate on {self.base[:9]}: 65 of 65 equal, block pointers: ok", "2026-11-02T10:00:00Z")]
 
-    def test_below_cadence_is_not_due(self):
-        self.merges(fullgate.CADENCE - 1)
+    def test_no_gated_merge_is_not_due(self):
+        merge_pr(self.repo, 100, "docs/notes.md")
+        self.finish()
         code, out, _ = self.run_main(self.full_run(), "due")
         self.assertEqual(code, 0)
-        self.assertIn("4 of 5 merges since the full gate on", out)
-        self.assertIn("#100, #101, #102, #103", out)
+        self.assertIn("0 merges since the full gate on", out)
         self.assertIn("not due", out)
 
-    def test_cadence_is_due(self):
-        self.merges(fullgate.CADENCE)
+    def test_one_gated_merge_is_due(self):
+        self.merges(1)
         code, out, _ = self.run_main(self.full_run(), "due")
         self.assertEqual(code, 1)
-        self.assertIn("5 of 5 merges", out)
+        self.assertIn("1 merge since the full gate on", out)
         self.assertEqual(self.run_main(self.full_run())[0], 0)
+
+    def test_every_gated_merge_is_named(self):
+        self.merges(4)
+        code, out, _ = self.run_main(self.full_run(), "due")
+        self.assertEqual(code, 1)
+        self.assertIn("4 merges since the full gate on", out)
+        self.assertIn("#100, #101, #102, #103", out)
 
     def test_docs_only_merge_is_not_counted(self):
         merge_pr(self.repo, 100, "docs/notes.md")
@@ -106,7 +113,7 @@ class FullGateTest(unittest.TestCase):
         self.finish()
         code, out, _ = self.run_main(self.full_run())
         self.assertEqual(code, 0)
-        self.assertIn("1 of 5 merges", out)
+        self.assertIn("1 merge since", out)
         self.assertIn(": #101", out)
         self.assertNotIn("#100", out)
 
@@ -143,7 +150,7 @@ class FullGateTest(unittest.TestCase):
         self.finish()
         code, out, _ = self.run_main([comment(f"Full gate on {before}: ok", "2026-11-02T10:00:00Z")])
         self.assertEqual(code, 0)
-        self.assertIn("1 of 5 merges", out)
+        self.assertIn("1 merge since", out)
         self.assertNotIn("#100", out)
 
     def test_no_comment_exits_2(self):

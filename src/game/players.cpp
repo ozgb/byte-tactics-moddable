@@ -28,6 +28,7 @@ struct UnitDef;
 
 #include "../network/player_info.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/pathfinding.h"
 
 #include "../network/player.h"
 
@@ -513,7 +514,11 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
 #if BT_ACCESS_LOG
     AccessLogPassScope accessPass(ACCESS_PASS_PLAYERS);
 #endif
-    g_seams.pathfinding->RunSearches(g_game->pathfinder);
+    g_seams.pathfinding->Step();
+    PathEvent event;
+    PathPoint waypoints[64];
+    while (g_seams.pathfinding->Poll(&event, waypoints, 64))
+        g_seams.orders->ApplyPathEvent(&event, waypoints);
     unsigned char bl = 0;
     for (;;) {
         if (!IsPlayerSlotInRange(bl))
@@ -551,7 +556,13 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
 
         {
             Unit* u = pi->unitsBegin;
+#if BT_ACCESS_LOG
+            AccessLogPassScope losPass(ACCESS_PASS_PLAYERS_LOS);
+#endif
             while (u <= pi->unitsEnd) {
+#if BT_ACCESS_LOG
+                AccessLogEntity();
+#endif
                 if (u->flags & 0x10000000)
                     g_seams.los_radar->UpdateUnitLineOfSight(u);
                 u = (Unit*)((char*)u + 0x118);

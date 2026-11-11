@@ -238,9 +238,9 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x508ab4,g_noDirectSoundKey,.data,16,gap,string,char[],1,0,1,one type,1,,s_NoDirectSound_00508ab4,,,4e6f446972656374536f756e64000000
 0x508be8,g_killedScriptName,.data,8,gap,string,char[],1,0,1,one type,1,,s_Killed_00508be8,,,4b696c6c65640000
 0x508bf0,g_takenLeadFormat,.data,36,gap,string,char[],1,0,1,one type,1,,s__s_has_taken_the_lead_with__d_ki_00508bf0,,,2573206861732074616b656e20746865206c6561642077697468202564206b696c6c7300
-0x508d68,s_TakeDamage_00508d68,.data,12,gap,string,char[],1,0,1,one type,1,,s_TakeDamage_00508d68,,,54616b6544616d6167650000
-0x508d74,s_HitByWeapon_00508d74,.data,12,gap,string,char[],1,0,1,one type,1,,s_HitByWeapon_00508d74,,,4869744279576561706f6e00
-0x508d80,s_paralyze_00508d80,.data,12,gap,string,char[],1,0,1,one type,1,,s_paralyze_00508d80,,,706172616c797a6500000000
+0x508d68,g_takeDamageScriptName,.data,12,gap,string,char[],1,0,1,one type,1,,s_TakeDamage_00508d68,,,54616b6544616d6167650000
+0x508d74,g_hitByWeaponScriptName,.data,12,gap,string,char[],1,0,1,one type,1,,s_HitByWeapon_00508d74,,,4869744279576561706f6e00
+0x508d80,g_paralyzeMissionName,.data,12,gap,string,char[],1,0,1,one type,1,,s_paralyze_00508d80,,,706172616c797a6500000000
 0x508d8c,s_SelectMultipleUnits_00508d8c,.data,20,gap,string,char[],1,0,1,one type,1,,s_SelectMultipleUnits_00508d8c,,,53656c6563744d756c7469706c65556e69747300
 0x508f24,g_celebratedKey,.data,12,gap,string,char[],1,0,1,one type,1,,s_Celebrated_00508f24,,,43656c656272617465640000
 0x508f30,g_satisfiedKey,.data,12,gap,string,char[],1,0,1,one type,1,,s_Satisfied_00508f30,,,536174697366696564000000
@@ -312,9 +312,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x50da00,g_pentiumProEvents,.data,272,gap,data,Entry_004df590[],1,1,2,conflicting: array or pointer,2,,DAT_0050da00,17,src/debug/perf_counters.cpp,00030560d4dc500003000000000343600001106048dc500001000000000000000002116030dc500002000000000000000002126024dc50000200000000000000
 0x5119b8,g_emptyText,.bss,8,gap,data,char[],32,2,3,conflicting: shape,34,,DAT_005119b8,,SimGlobals,
 0x5119c0,g_playerAI,.bss,40,gap,data,PlayerAI*[],2,1,2,conflicting: struct names only,3,0x28,DAT_005119c0,,SimGlobals,
-0x5119e8,g_playerBudgetCap,.bss,40,type,data,int[10],1,0,1,one type,1,0x28,INT_ARRAY_005119e8,,SimGlobals,
-0x511a10,g_playerTickLoad,.bss,40,type,data,int[10],1,0,1,one type,1,,INT_ARRAY_00511a10,,SimGlobals,
-0x511a38,g_budgetRefreshCounter,.bss,4,type,data,int,1,0,1,one type,1,,INT_00511a38,,SimGlobals,
+0x5119e8,pad_34,.bss,84,gap,unreferenced,unsigned char[84],0,0,0,,0,,,,SimGlobals,
 0x511a3c,pad_88,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,SimGlobals,
 0x511a40,g_byteRatesLastReceived,.bss,4,type,data,int,1,0,1,one type,1,,INT_00511a40,,,
 0x511a44,g_compressionPercent,.bss,4,type,data,int,1,0,1,one type,1,,INT_00511a44,,,

@@ -18688,7 +18688,6 @@ address,function,file,kind,target
 0x4644d0,ResetPlayerSlots,src/game/players_464290.cpp,global_read,g_game
 0x464700,InitPlayerSlot,src/game/players_464290.cpp,call,CreatePlayerAI
 0x464700,InitPlayerSlot,src/game/players_464290.cpp,call,CreateSquads
-0x464700,InitPlayerSlot,src/game/players_464290.cpp,call,HarnessEconomyEvent
 0x464700,InitPlayerSlot,src/game/players_464290.cpp,call,UnitResources::Reset
 0x464700,InitPlayerSlot,src/game/players_464290.cpp,call,memset
 0x464700,InitPlayerSlot,src/game/players_464290.cpp,call,operator delete
@@ -18755,6 +18754,7 @@ address,function,file,kind,target
 0x4648e0,LoadDefaultAIScript,src/game/players_464290.cpp,field_read,Player::type
 0x4648e0,LoadDefaultAIScript,src/game/players_464290.cpp,function,
 0x4648e0,LoadDefaultAIScript,src/game/players_464290.cpp,global_read,g_game
+0x464990,InitPlayers,src/game/players_464290.cpp,call,HarnessEconomyEvent
 0x464990,InitPlayers,src/game/players_464290.cpp,call,InitPlayerSlot
 0x464990,InitPlayers,src/game/players_464290.cpp,call,LoadDefaultAIScript
 0x464990,InitPlayers,src/game/players_464290.cpp,field_escape,Game::players

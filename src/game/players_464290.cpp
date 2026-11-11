@@ -392,7 +392,6 @@ guard:
         p->econ = new UnitResources;
     }
     p->econ->Reset(p->team);
-    HarnessEconomyEvent(0, p->team, 0, 0, 0.0f, 0.0f, 0, 1, 0);
     p->flags &= 0xfffe;
     p->kills = 0;
     p->losses = 0;
@@ -472,6 +471,7 @@ void InitPlayers()
         Player* p = &g_game->players[i];
         if (p->type) {
             InitPlayerSlot(p);
+            HarnessEconomyEvent(0, i, 0, 0, 0.0f, 0.0f, 0, 1, 0);
         }
     }
     LoadDefaultAIScript();

@@ -46,7 +46,7 @@
 0x450380 AnnouncePlayerLeft
 0x453d40 HandleNetPackets
 0x457d30 UpdateResourceSharing
-0x464700 InitPlayerSlot
+0x464990 InitPlayers
 0x464b30 TransferMetal
 0x464c60 TransferEnergy
 0x464f80 UpdatePlayers

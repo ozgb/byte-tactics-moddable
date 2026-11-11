@@ -31,10 +31,10 @@ data/phase_dependencies.csv has the columns writer,reader,item,phase_from,phase_
 row is an edge between two different simulation subsystems (coupling.SIM_SUBSYSTEMS, as tools/depclass.py counts
 them) across phases. A row whose reader is `presentation` is left out of it and of data/phase_boundaries.csv, in
 --write and in --check alike, because the stored files no longer hold it and data/presentation_reads.csv covers it. A row
-whose writer is `presentation` and whose reader is a simulation subsystem stays in it, and --check fails on each such
-row is a presentation feed: presentation must not feed the simulation except through the player view, so each feed
-is listed with its reason in data/presentation_feeds.csv (below) until the player view carries it. A row with any
-other writer outside the simulation subsystems is dropped. Items `unresolved:*` are dropped. The class is
+whose writer is `presentation` and whose reader is a simulation subsystem is a presentation feed and is left out of both
+files too: presentation must not feed the simulation except through the player view, so each feed is listed with its
+reason in data/presentation_feeds.csv (below) until the player view carries it, and --check fails on a feed that is not
+listed there. A row with any other writer outside the simulation subsystems is dropped. Items `unresolved:*` are dropped. The class is
 `immediate` when a run shows a read in phase_to of what phase_from wrote earlier in the tick (the reader needs the
 writer's phase to come first), and `carried` when a run shows a read in phase_to of what phase_from, a later phase,
 wrote in the tick before (the reader needs the writer's phase to come after it; the order of a tick's phases is
@@ -76,7 +76,9 @@ data/pass_reads.csv has the columns pass,item,reader,function,evidence,runs,exam
 earlier entity of the pass wrote them, by the function that read. `evidence` is `same-record` when the earlier write
 was to the record (the allocation and element) that the read hit, else `other-record` (the item is the same field of
 another record: the log keeps one last writer per item, so this is the weaker evidence). A pass with no such read has
-one row with item `-` and evidence `none`.
+one row with item `-` and evidence `none`. The passes are PASSES: the loops of the phases and the loops nested in them
+(`features.anim` the feature types and the seeding scan, `explosions.pieces`, `explosions.debris`, `units.players` the
+players whose units `units` walks, `players.los` the units of one player's line of sight).
 """
 
 import argparse
@@ -102,7 +104,8 @@ KINDS = ("cross", "draws", "pass", "ordered")
 PHASE_NAMES = ["net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail", "presentation"]
 PHASE_INDEX = {name: i for i, name in enumerate(PHASE_NAMES)}
 PRESENTATION = "presentation"
-PASSES = ["units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail"]
+PASSES = ["units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail", "features.anim",
+          "explosions.pieces", "explosions.debris", "units.players", "players.los"]
 SORT_COLUMNS = {"cross": ("writer", "reader", "item", "phase_from", "phase_to", "evidence"),
                 "draws": ("pass", "stream", "subsystem", "function"),
                 "pass": ("pass", "item", "reader", "function", "evidence"),

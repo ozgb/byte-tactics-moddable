@@ -313,7 +313,7 @@ Coverage: 93.6% of functions (44 of 47), 92.2% of lines, 87.1% of branches; 3 li
 - Owns: 234 named sim items that only this subsystem writes, for example `OpenHeap::items`, `OpenHeap::pool`, `Node::index`, `OpenHeap::count`, `Grid::dirty`.
 - Shares: 2 named sim items that other subsystems also write, for example `Grid::cells`, `Grid::width`, `Grid::count`, `Grid::height`.
 - Few functions are called from outside, so the entry side is small. The import side is the world view (`PathWorldView`, filled in `src/seams/pathfinding_world.cpp`) and the goal geometry (`PathGoalContains`, `PathGoalDistance` and `PathGoalCells`, which orders and the search share). The search calls nothing in orders: a request carries its goal as data and the results come back as events that orders applies.
-- The budget (`Pathfinder::budget` and the per-player counters in the region) is state this module writes alone, and the trace reads it through `PathfindingWriteState`.
+- The budget (`Pathfinder::budget` and the per-player counters in the region) is state this module writes alone; the trace hashes the events it delivers (section 32) and only dumps this state, through `PathfindingWriteState`.
 
 **Open questions.**
 

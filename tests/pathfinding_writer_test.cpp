@@ -4,6 +4,7 @@
 #include "../src/state/block.h"
 #include "../src/ai/pathfind.h"
 #include "../src/ai/pathfinder.h"
+#include "../src/harness/path_results.h"
 #pragma pack(push, 1)
 #include "../src/game/game.h"
 #pragma pack(pop)
@@ -231,6 +232,74 @@ static void Mutate(const char* what, unsigned char* at, unsigned int size)
     Check(HashWritten() == base, message);
 }
 
+enum { kResultTicks = 120, kUnitTag = 2 };
+
+struct ResultRun {
+    unsigned long long written[kResultTicks];
+    unsigned long long results[kResultTicks];
+    int tampered;
+    int finished;
+};
+
+static PathResults s_results;
+
+static void Restart()
+{
+    SimFree(PathfindingShutdown());
+    PathMapInfo map = { kW, kH, kUnits + 1, 1 };
+    unsigned int size = PathfindingRegionSize(&map);
+    PathfindingInit(&map, SimAlloc(size), size);
+    s_tick = 0;
+}
+
+static void PlayResults(ResultRun* run, bool tamper)
+{
+    Restart();
+    Request(1, 28, 4);
+    Request(2, 28, 12);
+    Request(3, 28, 28);
+    run->tampered = -1;
+    run->finished = 0;
+    for (int t = 0; t < kResultTicks; t++) {
+        s_tick++;
+        PathfindingStep();
+        PathResultsClear(&s_results);
+        PathEvent e;
+        PathPoint points[64];
+        while (PathfindingPoll(&e, points, 64)) {
+            if (e.kind == PATH_EVENT_FINISHED && e.status == PATH_FOUND) {
+                run->finished++;
+                if (tamper && run->tampered < 0) {
+                    e.status = PATH_PARTIAL;
+                    run->tampered = t;
+                }
+            }
+            Check(PathResultsAdd(&s_results, &e, points, 64, kUnitTag, e.unit) != 0, "a result is recorded");
+        }
+        run->results[t] = PathResultsHash(&s_results, 0xcbf29ce484222325ull);
+        run->written[t] = HashWritten();
+    }
+}
+
+static void CheckResultsSection()
+{
+    static ResultRun plain, again, tampered;
+    PlayResults(&plain, false);
+    PlayResults(&again, false);
+    PlayResults(&tampered, true);
+    Check(plain.finished > 0, "a search finishes with a route");
+    Check(memcmp(&plain, &again, sizeof plain) == 0, "two runs of the default give the same results and written state");
+    Check(tampered.tampered >= 0, "the tampered pathfinder changes an event");
+    Check(memcmp(plain.written, tampered.written, sizeof plain.written) == 0,
+          "the tampered pathfinder reports the default's state every tick");
+    int first = -1;
+    for (int t = 0; t < kResultTicks && first < 0; t++) {
+        if (plain.results[t] != tampered.results[t])
+            first = t;
+    }
+    Check(first == tampered.tampered, "the results section differs first at the tick of the changed event");
+}
+
 int main()
 {
     Setup();
@@ -330,6 +399,8 @@ int main()
     PathfindingInit(&map, SimAlloc(size), size);
     Check(GetPathfinder() != 0, "a new region is built");
     Check(HashWritten() != empty, "a new region is written");
+
+    CheckResultsSection();
 
     printf(g_failures ? "FAILED\n" : "pathfinding_writer_test: all passed\n");
     return g_failures != 0;

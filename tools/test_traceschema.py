@@ -236,6 +236,17 @@ class SchemaJsonTest(unittest.TestCase):
         self.assertEqual((weapon["size"], weapon["kind"], weapon["target"]), (4, "ref", "weapondef"))
         self.assertEqual(self.model["wind"][0]["name"], "windCounter")
 
+    def test_results_section_matches_the_harness_and_names_its_fields_in_hash_order(self):
+        results = self.model["results"]
+        header = (ts.ROOT / "src/harness/path_results.h").read_text()
+        constants = dict(re.findall(r"(PATH_RESULT_\w+) = (\d+)", header))
+        self.assertEqual((results["section"], results["points"]),
+                         (int(constants["PATH_RESULT_SECTION"]), int(constants["PATH_RESULT_POINTS"])))
+        self.assertEqual([f["name"] for f in results["fields"]], ["kind", "status", "unit", "tick", "count", "points"])
+        targets = {t["name"] for t in self.model["targets"]}
+        for f in results["fields"]:
+            self.assertEqual(f["target"] in targets, f["kind"] == "pointer", f["name"])
+
 
 class CheckTest(unittest.TestCase):
     def run_main(self, header_text, json_text, *args):

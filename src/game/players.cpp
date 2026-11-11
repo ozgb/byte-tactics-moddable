@@ -29,6 +29,7 @@ struct UnitDef;
 #include "../network/player_info.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/pathfinding.h"
+#include "../harness/harness.h"
 
 #include "../network/player.h"
 
@@ -517,8 +518,10 @@ void __stdcall UpdatePlayersOnStream(RandStream stream)
     g_seams.pathfinding->Step();
     PathEvent event;
     PathPoint waypoints[64];
-    while (g_seams.pathfinding->Poll(&event, waypoints, 64))
+    while (g_seams.pathfinding->Poll(&event, waypoints, 64)) {
+        HarnessPathEvent(&event, waypoints, 64);
         g_seams.orders->ApplyPathEvent(&event, waypoints);
+    }
     unsigned char bl = 0;
     for (;;) {
         if (!IsPlayerSlotInRange(bl))

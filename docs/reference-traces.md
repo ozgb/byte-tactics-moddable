@@ -1,14 +1,14 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v25` is the fixed target for anyone writing a new
+The git tag `reference-traces-v26` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v25`**.
+code as a base. This page names the current tag: **`reference-traces-v26`**.
 
 ## What the tag holds
 
 - The source: 3.1c's game logic, and the conformity harness that writes traces
   (compiled into the test-mode build).
-- The trace format: `bt-trace 3` (the digest files are `bt-digest 3`). The
+- The trace format: `bt-trace 4` (the digest files are `bt-digest 4`). The
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `data/trace_schema.json`, and the coverage decisions in
   `data/trace_coverage.csv`.
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v25`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v25
+git checkout reference-traces-v26
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -120,7 +120,7 @@ uv run tools/tracedigest.py trace.txt --commit <sha> --scenario reference/scenar
 diff mine.txt reference/traces/skirmish2.txt
 ```
 
-The digest file starts with a header (`bt-digest 3`, trace format, commit,
+The digest file starts with a header (`bt-digest 4`, trace format, commit,
 scenario, seeds, `fpu_control_word`), then one `<tick> <digest>` line per
 tick. Your header must agree with the stored one except for `commit`. The
 first differing tick is where your engine first diverges.
@@ -131,7 +131,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v25
+git checkout reference-traces-v26
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -205,7 +205,7 @@ What the code shows about the players fields (the player loader and saver):
 A tag is never moved. A later change to the trace format, the scenario list or
 the digests that should become a target gets a new tag (`reference-traces-v26`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v25`.
+`reference-traces-v26`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -311,12 +311,16 @@ and so on), and this page is updated to name it. The current tag is
   unit that picks an enemy building because of `shootall`, and the lead of a veteran's aim at a moving
   target at 4, 5 and 6 kills. The 84 earlier digests, event digests, sound logs and UI logs, the frames
   and the save are those of v24.
+- `reference-traces-v26`: the same 85 scenarios as v25 in trace format `bt-trace 4` (#936). The world row
+  no longer hashes the pathfinder's state (sections 16 and 17, now only dumped) and ends with the path
+  results (section 32): every event the pathfinder delivers, with its waypoints, in delivery order. Every
+  digest changes; the event digests, sound logs, UI logs, frames and the save are those of v25.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3` and v26 is `bt-trace 4`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

@@ -1,5 +1,5 @@
 {
-  "trace_format": 3,
+  "trace_format": 4,
   "targets": [{"tag": 1, "name": "heap"}, {"tag": 2, "name": "unit"}, {"tag": 3, "name": "player"}, {"tag": 4, "name": "unitdef"}, {"tag": 5, "name": "weapondef"}, {"tag": 6, "name": "projectile"}, {"tag": 7, "name": "feature"}, {"tag": 8, "name": "piece"}, {"tag": 9, "name": "rec"}, {"tag": 10, "name": "node"}, {"tag": 11, "name": "moveclass"}, {"tag": 12, "name": "order"}, {"tag": 13, "name": "orderfx"}, {"tag": 14, "name": "link"}],
   "tables": {
     "AiSearchGoal": {
@@ -1590,6 +1590,18 @@
       {"name": "playerTickLoad", "size": 40, "kind": "bytes", "target": null},
       {"name": "playerBudgetCap", "size": 40, "kind": "bytes", "target": null},
       {"name": "budgetRefreshCounter", "size": 4, "kind": "scalar", "target": null}
+    ]
+  },
+  "results": {
+    "section": 32,
+    "points": 64,
+    "fields": [
+      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
+      {"name": "status", "size": 4, "kind": "scalar", "target": null},
+      {"name": "unit", "size": 4, "kind": "pointer", "target": "unit"},
+      {"name": "tick", "size": 4, "kind": "scalar", "target": null},
+      {"name": "count", "size": 4, "kind": "scalar", "target": null},
+      {"name": "points", "size": 4, "kind": "bytes", "target": null}
     ]
   }
 }

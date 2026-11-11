@@ -5,7 +5,7 @@ its default implementation (`src/ai/pathfind.cpp`). This page is the inventory t
 from (#883):
 - what 3.1c's search takes, when it runs, and what it leaves;
 - what its consumers read;
-- what the trace hashes of it;
+- what the trace hashes of it, and what it only dumps;
 - which of 3.1c's behaviours stay inside the default.
 
 Each item a consumer reads is marked **in the result** (it fits a general path record: a waypoint list
@@ -142,10 +142,14 @@ overlay draws the pass map without search cells.
 
 ## 5. The traced state
 
-Sections 16 and 17 of `docs/trace-format.md`. The harness gets them from the `WriteState` slot, which writes the
-implementation's private state through a `StateWriter` (`interfaces/state_writer.h`: records, integers, bytes and
-handles that the host hashes, and in test mode dumps). The default writes the bytes 3.1c's tables give, as the
-reference's harness hashed them from the game record, so the traces equal the reference's. Another implementation
+Pathfinding is judged by what it delivers. Section 32 of `docs/trace-format.md` hashes every event `Poll` returns,
+with its waypoints, in delivery order, as the host takes it; the reference records the same events where 3.1c's
+search writes its results. A pathfinder whose events differ fails there, whatever state it reports.
+
+Its state is private. Sections 16 and 17 of `docs/trace-format.md` are in a dump and in no trace row. The harness
+gets them from the `WriteState` slot, which writes the implementation's private state through a `StateWriter`
+(`interfaces/state_writer.h`: records, integers, bytes and handles that the host dumps in test mode). The default writes the bytes 3.1c's tables give, as the reference's harness reads them from the
+game record, so a dump of the default shows the reference's lines, which helps find why its results differ. Another implementation
 writes whatever decides what it does next and the engine does not already hash elsewhere, in its own records; the
 demo writes its cluster cache, its requests and its search in progress.
 
@@ -160,8 +164,8 @@ which section 21 hashes, and the layout of sections 16 and 17 is the trace forma
 | grid cells and dirty words | yes: a search's marks stay until the next search clears them | search state |
 | `g_playerBudgetCap`, `g_playerTickLoad`, `g_budgetRefreshCounter` | yes | schedule state |
 
-Nothing in these sections is a result: the results are in section 21 (the goal objects) and section 20
-(the orders' flags), which the consumers own.
+Nothing in these sections is a result: the results are in section 32 (the events), section 21 (the goal objects)
+and section 20 (the orders' flags), which the consumers own.
 
 ## 6. Quirks that stay inside the default
 
@@ -249,7 +253,7 @@ The default's region holds:
 
 | Part | Size | Holds |
 |---|---|---|
-| `Pathfinder` record | 208 bytes | 3.1c's record, as section 16 hashes it |
+| `Pathfinder` record | 208 bytes | 3.1c's record, as section 16 dumps it |
 | `PathExtra` | fixed | the capacities and offsets of the parts below, the current search's goal area, and the three section 17 globals |
 | node pool | min(cells + 1, 0x10000) `Node`s | the open and closed nodes |
 | heap items | as many `Ref<Node>`s | the open list |
@@ -263,7 +267,7 @@ sizeof(ClusterRec)` (200 bytes a cluster: at most 12 border nodes and their pair
 the cache of every class would pass 12 MB (Acid Pools, 15 classes: 16-cell clusters, a region of 11.75 MB). It has no cap on the classes.
 
 The pool and the heap items are counted in the record but filled only as a search needs them, as 3.1c's
-`GrowNodes` did, so the bytes the trace hashes are 3.1c's. A search's goal cells, which it needs only while it
+`GrowNodes` did, so the bytes the dump shows are 3.1c's. A search's goal cells, which it needs only while it
 starts, are on the stack: every call out of pathfinding gets a copy or a local, never a pointer into the region.
 
 Only pathfinding reads or writes the region and `Game::pathfinder`. Two checks hold that:

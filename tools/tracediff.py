@@ -17,8 +17,9 @@ phase that differs, with its value in A and in B. Set WINEARCH=win64 for Wine.
       all 1 differing fields:
         units[12].health: a=0x0064 b=0x0063
 
-The row `world` is the tables hashed once per tick (game scalars, map, line of sight, pathfinder),
-after the last phase's row. A dump holds them after every phase, so the fields of a `world` divergence
+The row `world` is the tables hashed once per tick (game scalars, map, line of sight, orders, path
+results), after the last phase's row. The pathfinder's own report (`pathfinder.*`) is dumped but not
+hashed: it shows the module's state at a divergence the path results (`results[k].*`) found. A dump holds them after every phase, so the fields of a `world` divergence
 are read from the last phase's lines.
 
 `--traces` compares existing trace files without running, and reports the first

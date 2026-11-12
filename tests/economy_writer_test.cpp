@@ -4,7 +4,6 @@
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
 #include "../src/game/economy.h"
-#include "../src/harness/economy_results.h"
 #pragma pack(push, 1)
 #include "../src/game/unit_resources.h"
 #include "../src/network/player.h"
@@ -55,7 +54,7 @@ static void Check(bool ok, const char* what)
 enum { kUnits = 4, kPlayers = 2, kTicks = 90, kUnitTag = 2 };
 
 static unsigned int s_tick;
-static EconomyResults s_results;
+static int s_effects;
 
 static unsigned int __stdcall WTick() { return s_tick; }
 static int __stdcall WDifficulty() { return 1; }
@@ -97,19 +96,19 @@ static void __stdcall WTypeInfo(EconType type, EconTypeInfo* out)
     memset(out, 0, sizeof *out);
     if (type == 0) {
         out->energyMake = 20.0f;
-        out->energyStorage = 100.0f;
+        out->energyStorage = 5000.0f;
         out->energyUse = 1.5f;
     } else {
         out->windGenerator = 0.7f;
         out->metalMake = 0.1f;
-        out->metalStorage = 50.0f;
+        out->metalStorage = 5000.0f;
         out->energyUse = 0.3f;
     }
 }
 static int __stdcall WCellMetal(int, int) { return 10; }
-static void __stdcall WEmit(const EconomyEvent* effect)
+static void __stdcall WEmit(const EconomyEvent*)
 {
-    EconomyResultsAdd(&s_results, effect, 1);
+    s_effects++;
 }
 
 static EconomyWorldView s_world = { WTick, WDifficulty, WSharingEnabled, WWind, WTide, WPlayerInfo, WAllied, WFirstUnit, WLastUnit,
@@ -196,7 +195,7 @@ static void Restart()
     memset(s_region, 0xa5, s_regionSize);
     EconomyInit(&map, &s_world, s_region, s_regionSize);
     s_tick = 0;
-    EconomyResultsClear(&s_results);
+    s_effects = 0;
 }
 
 static void Setup()
@@ -224,7 +223,7 @@ static EconomyEvent Event(int kind, int player, EconUnit unit, unsigned int reso
 
 struct Run {
     unsigned long long written[kTicks];
-    unsigned long long results[kTicks];
+    unsigned long long stores[kTicks];
     unsigned long long region[kTicks];
     int tampered;
     int granted;
@@ -254,14 +253,24 @@ static int Scripted(EconomyEvent* out, int index, int tick)
 
 enum { kTamperTick = 40 };
 
-static int PilotApply(Run* run, bool tamper, int tick, const EconomyEvent* e)
+static unsigned long long HashStores()
 {
-    int outcome = EconomyApply(e);
-    if (tamper && tick == kTamperTick && run->tampered < 0 && e->kind == ECONOMY_SPEND && outcome == 1) {
+    unsigned long long h = 0xcbf29ce484222325ull;
+    for (int p = 0; p < kPlayers; p++) {
+        h = Fnv(h, &g_game->players[p].energy, sizeof(float));
+        h = Fnv(h, &g_game->players[p].metal, sizeof(float));
+    }
+    return h;
+}
+
+static int PilotSpend(Run* run, bool tamper, int tick, const EconomyEvent* e)
+{
+    Player* pl = &g_game->players[e->player];
+    if (tamper && tick == kTamperTick && run->tampered < 0 && pl->energy >= e->energy && pl->metal >= e->metal) {
         run->tampered = tick;
         return 0;
     }
-    return outcome;
+    return EconomySpend(e);
 }
 
 static void Play(Run* run, bool tamper)
@@ -280,50 +289,50 @@ static void Play(Run* run, bool tamper)
     }
     for (int t = 0; t < kTicks; t++) {
         s_tick++;
-        EconomyResultsClear(&s_results);
         EconomyEvent e;
         for (int i = 0; Scripted(&e, i, t); i++) {
-            if (e.kind == ECONOMY_REQUEST) {
-                int granted = EconomyRequestGranted(e.unit, e.resources);
-                int outcome = PilotApply(run, tamper, t, &e);
-                Check(outcome == granted, "RequestGranted says what the REQUEST then returns");
-                run->granted += outcome;
-                EconomyResultsAdd(&s_results, &e, outcome);
+            if (e.kind == ECONOMY_SPEND) {
+                run->spent += PilotSpend(run, tamper, t, &e);
                 continue;
             }
-            int outcome = PilotApply(run, tamper, t, &e);
-            if (e.kind == ECONOMY_SPEND)
-                run->spent += outcome;
-            EconomyResultsAdd(&s_results, &e, outcome);
+            if (e.kind == ECONOMY_REQUEST) {
+                int granted = EconomyRequestGranted(e.unit, e.resources);
+                int outcome = EconomyApply(&e);
+                Check(outcome == granted, "RequestGranted says what the REQUEST then returns");
+                run->granted += outcome;
+                continue;
+            }
+            EconomyApply(&e);
         }
         EconomyUpdatePlayer(0);
         EconomyUpdatePlayer(1);
-        run->results[t] = EconomyResultsHash(&s_results, 0xcbf29ce484222325ull);
+        run->stores[t] = HashStores();
         run->written[t] = HashWritten();
         run->region[t] = HashRegion();
     }
 }
 
-static void CheckResultsSection()
+static void CheckRefusedSpend()
 {
     static Run plain, again, tampered;
     Play(&plain, false);
     Play(&again, false);
     Play(&tampered, true);
     Check(plain.granted > 0 && plain.spent > 0, "requests are granted and spends succeed");
-    Check(memcmp(&plain, &again, sizeof plain) == 0, "two runs of the default give the same results, written state and region");
+    Check(memcmp(&plain, &again, sizeof plain) == 0, "two runs of the default give the same stores, written state and region");
     Check(tampered.tampered == kTamperTick, "the tampered pilot refuses a SPEND the default grants, at the tampered tick");
-    Check(memcmp(plain.written, tampered.written, sizeof plain.written) == 0,
-          "the tampered pilot reports the default's state every tick");
-    Check(memcmp(plain.region, tampered.region, sizeof plain.region) == 0,
-          "the tampered pilot's region is the default's every tick");
     int first = -1;
-    for (int t = 0; t < kTicks && first < 0; t++) {
-        if (plain.results[t] != tampered.results[t])
-            first = t;
+    int differing = 0;
+    for (int t = 0; t < kTicks; t++) {
+        if (plain.stores[t] != tampered.stores[t]) {
+            if (first < 0)
+                first = t;
+            differing++;
+        }
     }
-    Check(first == kTamperTick, "the economy events section differs first at the tampered tick");
-    printf("tampered tick %d, first differing tick %d\n", tampered.tampered, first);
+    Check(first == kTamperTick, "the players' energy and metal stores differ first at the tampered tick");
+    Check(differing == kTicks - kTamperTick, "the players' energy and metal stores differ at every tick from the tampered tick on");
+    printf("tampered tick %d, first differing tick %d, %d differing ticks\n", tampered.tampered, first, differing);
     Check(plain.region[0] != plain.region[kTicks - 1], "the events change the region");
 }
 
@@ -345,7 +354,7 @@ int main()
     EconomyApply(&e);
     Check(HashWritten() != before, "an event to a unit's account changes the written state");
 
-    CheckResultsSection();
+    CheckRefusedSpend();
 
     printf(g_failures ? "FAILED\n" : "economy_writer_test: all passed\n");
     return g_failures != 0;

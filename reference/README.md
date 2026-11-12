@@ -366,8 +366,9 @@ per phase, because they are large and no phase owns them:
 
   They are in the world row, not the per-phase tables, because a script alone is over a
   kilobyte, and a divergence there names the tick and the section, not the phase.
-- the path results (format 4): every search start and search end the pathfinder delivered
-  this tick, in delivery order, with its status, unit, tick, point count and points.
+- the path results: every search start and search end the pathfinder delivered this tick,
+  in delivery order, with its status, unit, tick, point count and points, only in a dump
+  (`results.*` lines): since format 5 they are not hashed.
 
 A unit's resource account (bytes `0xbc` to `0xeb` of a unit, economy's private state) is not
 hashed since format 5.

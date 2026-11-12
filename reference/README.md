@@ -368,12 +368,9 @@ per phase, because they are large and no phase owns them:
   kilobyte, and a divergence there names the tick and the section, not the phase.
 - the path results (format 4): every search start and search end the pathfinder delivered
   this tick, in delivery order, with its status, unit, tick, point count and points.
-- the economy records (format 5): every write another subsystem makes to economy's state
-  (reset, load, request, spend, income) and every effect economy has on another subsystem
-  (cloak, extractor rate, share) this tick, in the order the game makes them, with its kind,
-  player, unit, resources, energy and metal amounts, value and outcome (and the twelve
-  account words of a load). A unit's resource account (bytes `0xbc` to `0xeb` of a unit)
-  is not hashed: the records carry what economy is given and does.
+
+A unit's resource account (bytes `0xbc` to `0xeb` of a unit, economy's private state) is not
+hashed since format 5.
 
 The hash is 64-bit FNV-1a over a canonical serialisation of that state: 8-byte
 little-endian words first, then the remaining bytes one at a time (so the result does not
@@ -411,9 +408,7 @@ Paths are `gameTick`, `rng.parkMiller`, `rng.crtHoldrand`, `units[i].<field>`,
 `players[i].explored[k]`, `spatial[i].<field>`, `eyes[i].<field>`,
 `pathfinder.<field>` (with `.pool[k]`, `.heap[k]`, `.dirty[w]`, `.cells[k].flags`),
 `pathfinder.playerTickLoad` and the other budget globals, `results.count` and
-`results[k].<field>` (the path results), `economy.count` and `economy[k].kind`, `.player`,
-`.unit`, `.resources`, `.energy`, `.metal` (the amounts as `0x` float bits), `.value`,
-`.outcome` and, for a load, `.account` (the economy records), `moveClasses[i].<field>` and
+`results[k].<field>` (the path results), `moveClasses[i].<field>` and
 `moveClasses[i].passMap[k]`, and for the unit heap objects `units[i].head`,
 `units[i].list[k].<field>` and `units[i].list2[k].<field>`, `units[i].motion.<field>` with
 `units[i].motion.goal.class` (0 none, 1 patrol, 2 AI search, 3 packed, 4 lite, 5 packed

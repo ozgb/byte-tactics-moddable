@@ -617,8 +617,6 @@ void __stdcall ResetWeaponTarget(Unit* unit, int index);
 void __stdcall SetUnitSquad(Unit* unit, int param_2);
 int __stdcall RandomInt(int range);
 
-extern "C" int __cdecl HarnessEconomyEvent(int kind, ...);
-
 // Sets up a unit from its unit type: flags, offsets, screen position, weapon
 // targets and the squad. The screen Y projection uses the passed position Z.
 // FUNCTION: 0x485a40
@@ -699,7 +697,6 @@ void __stdcall InitUnitFromType(Unit* unit, Pos_00485a40 pos, int param_5)
 
     unit->losSightFrameIdx = 0;
     unit->resourceSlot.Reset(unit->playerIndex);
-    HarnessEconomyEvent(0, unit->playerIndex, unit, 0, 0.0f, 0.0f, 0, 1, 0);
     unit->transportPiece = 0xff;
     unit->hoverBobPhase = (short)RandomInt(0x10000);
     SetUnitSquad(unit, 0);
@@ -1305,7 +1302,6 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         } else {
             (*par)->resourceSlot.metalMake += f;
         }
-        HarnessEconomyEvent(4, -1, *par, 2, 0.0f, f, 0, 1, 0);
     }
     if (cmd->cobKilledSeverity > 0 && unit->buildLeft == 0.0f)
         DetonateUnitWeapon(unit, cmd->killType == 3);

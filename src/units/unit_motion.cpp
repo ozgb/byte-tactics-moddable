@@ -175,8 +175,6 @@ extern Game* g_game;
 
 Cell* __stdcall GetMapCell(int x, int y);
 
-extern "C" int __cdecl HarnessEconomyEvent(int kind, ...);
-
 // Wind/metal picker for a metal extractor: when the unit type extracts metal
 // (+0x1ce > 0), sums the metal byte of every map cell under the unit's
 // footprint and stores the resulting rate at +0x58, then tells the script.
@@ -201,10 +199,8 @@ void __stdcall UpdateMetalExtraction(Unit* unit)
             }
         }
         unit->extraction = unit->def->extractsMetal * 1.52587890625e-05 * (float)total.value;
-        if (unit->script) {
-            HarnessEconomyEvent(17, -1, unit, 0, 0.0f, 0.0f, total.parts.whole, 1, 0);
+        if (unit->script)
             unit->script->StartScriptWithArgs("SetSpeed", 0, 0, 1, total.parts.whole, 0, 0, 0);
-        }
     }
 }
 

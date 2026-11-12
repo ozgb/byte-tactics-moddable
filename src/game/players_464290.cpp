@@ -351,8 +351,6 @@ void __cdecl operator delete(void* p);
 void __stdcall CreateSquads(Player* p);
 void __stdcall CreatePlayerAI(int player);
 
-extern "C" int __cdecl HarnessEconomyEvent(int kind, ...);
-
 // FUNCTION: 0x464700
 void __stdcall InitPlayerSlot(Player* p)
 {
@@ -471,7 +469,6 @@ void InitPlayers()
         Player* p = &g_game->players[i];
         if (p->type) {
             InitPlayerSlot(p);
-            HarnessEconomyEvent(0, i, 0, 0, 0.0f, 0.0f, 0, 1, 0);
         }
     }
     LoadDefaultAIScript();
@@ -597,7 +594,7 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
         return;
     Player* player;
     // Receiver read inside both arms of the flag test: homes `to` in ebx.
-    player = flag ? (HarnessEconomyEvent(3, from, 0, 1, amount, 0.0f, 0, g_game->players[from].econ->SpendEnergy(amount), 0),
+    player = flag ? (g_game->players[from].econ->SpendEnergy(amount),
                      g_game->players[to].econ->player)
                   : g_game->players[to].econ->player;
     if (player->active != 0 && player->type == 2) {
@@ -624,7 +621,6 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
         m += amount;
         g_game->players[to].econ->energyMake = m;
     }
-    HarnessEconomyEvent(4, to, 0, 1, amount, 0.0f, 0, 1, 0);
     if (flag)
         SendShareMetal(from, to, *(int*)&amount);
 }
@@ -652,8 +648,7 @@ void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount
         return;
     Player* player;
     // Receiver read inside both arms of the flag test: homes `to` in ebx.
-    player = flag ? (HarnessEconomyEvent(3, from, 0, 2, 0.0f, amount, 0, g_game->players[from].econ->SpendMetal(amount), 0),
-                     g_game->players[to].econ->player)
+    player = flag ? (g_game->players[from].econ->SpendMetal(amount), g_game->players[to].econ->player)
                   : g_game->players[to].econ->player;
     if (player->active != 0 && player->type == 2) {
         switch (g_game->difficulty) {
@@ -672,7 +667,6 @@ void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount
     } else {
         g_game->players[to].econ->metalMake = amount + g_game->players[to].econ->metalMake;
     }
-    HarnessEconomyEvent(4, to, 0, 2, 0.0f, amount, 0, 1, 0);
     if (flag)
         SendShareEnergy(from, to, *(int*)&amount);
 }
@@ -979,7 +973,6 @@ void __stdcall UpdatePlayers()
                                         f = *slot + f;
                                     }
                                     *slot = f;
-                                    HarnessEconomyEvent(4, -1, unit, 1, (float)self->energy * kHundred, 0.0f, 0, 1, 0);
                                 }
                                 {
                                     float* slot = &unit->metalMake;
@@ -995,7 +988,6 @@ void __stdcall UpdatePlayers()
                                         f = *slot + f;
                                     }
                                     *slot = f;
-                                    HarnessEconomyEvent(4, -1, unit, 2, 0.0f, (float)self->metal * kHundred, 0, 1, 0);
                                 }
                                 RecalculateLineOfSight(1);
                                 FocusCommander(1);

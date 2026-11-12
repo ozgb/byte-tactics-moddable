@@ -49,7 +49,7 @@ POINTERS: dict[str, dict[int, str]] = {
 POINTER_NAMES: dict[tuple[str, int], str] = {}
 
 EXCLUDED_RANGES: list[tuple[str, int, int, str]] = [
-    ("Unit", 0xBC, 0xEC, "the resource account: economy's private state, which the economy records carry"),
+    ("Unit", 0xBC, 0xEC, "the resource account: economy's private state"),
 ]
 
 EXCLUSIONS: list[tuple[str, str, str]] = [

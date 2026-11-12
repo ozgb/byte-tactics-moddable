@@ -3464,147 +3464,6 @@ static void VisitPathResults()
     EndSection();
 }
 
-struct EconomyRecord {
-    int kind;
-    int player;
-    unsigned unitTag;
-    unsigned unitId;
-    unsigned resources;
-    unsigned energy;
-    unsigned metal;
-    int value;
-    int outcome;
-    int hasAccount;
-    unsigned account[12];
-};
-
-static EconomyRecord* s_economyRecords = NULL;
-static unsigned s_economyCount = 0;
-static unsigned s_economyCapacity = 0;
-
-static int OwnerIndex(const void* unit)
-{
-    unsigned owner;
-    unsigned base;
-    if (unit == NULL)
-        return -1;
-    owner = *(const unsigned*)((const unsigned char*)unit + 0xec);
-    base = (unsigned)GameAt(GAME_PLAYERS);
-    if (owner < base || owner >= base + PLAYER_STRIDE * PLAYER_SLOTS)
-        return -1;
-    return (int)((owner - base) / PLAYER_STRIDE);
-}
-
-extern "C" int __cdecl HarnessEconomyEvent(int kind, ...)
-{
-    va_list args;
-    va_start(args, kind);
-    int player = va_arg(args, int);
-    const void* unit = va_arg(args, const void*);
-    unsigned resources = va_arg(args, unsigned);
-    float energy = (float)va_arg(args, double);
-    float metal = (float)va_arg(args, double);
-    int value = va_arg(args, int);
-    int outcome = va_arg(args, int);
-    const void* account = va_arg(args, const void*);
-    va_end(args);
-    if (!s_testMode || s_trace == NULL)
-        return outcome;
-    if (s_economyCount == s_economyCapacity) {
-        unsigned grown = s_economyCapacity == 0 ? 256 : s_economyCapacity * 2;
-        EconomyRecord* items = (EconomyRecord*)realloc(s_economyRecords, grown * sizeof(EconomyRecord));
-        if (items == NULL) {
-            Fail("testmode: no memory for the economy records\n");
-            return outcome;
-        }
-        s_economyRecords = items;
-        s_economyCapacity = grown;
-    }
-    EconomyRecord* r = &s_economyRecords[s_economyCount++];
-    memset(r, 0, sizeof *r);
-    r->kind = kind;
-    r->player = player < 0 ? OwnerIndex(unit) : player;
-    Resolve((unsigned)unit, TT_UNIT, &r->unitTag, &r->unitId);
-    r->resources = resources;
-    r->energy = *(const unsigned*)&energy;
-    r->metal = *(const unsigned*)&metal;
-    r->value = value;
-    r->outcome = outcome;
-    if (account != NULL) {
-        r->hasAccount = 1;
-        memcpy(r->account, account, sizeof r->account);
-    }
-    return outcome;
-}
-
-static void VisitEconomyEvents()
-{
-    char path[64];
-    unsigned k;
-    HashByte(33);
-    HashU32(s_economyCount);
-    if (s_dumpNow) {
-        DumpPrefix("economy.count");
-        fprintf(s_dump, "0x%08x\n", s_economyCount);
-    }
-    for (k = 0; k < s_economyCount; k++) {
-        const EconomyRecord* r = &s_economyRecords[k];
-        HashU32((unsigned)r->kind);
-        HashU32((unsigned)r->player);
-        HashByte((unsigned char)r->unitTag);
-        HashU32(r->unitId);
-        HashU32(r->resources);
-        HashU32(r->energy);
-        HashU32(r->metal);
-        HashU32((unsigned)r->value);
-        HashU32((unsigned)r->outcome);
-        if (r->kind == 1)
-            for (int w = 0; w < 12; w++)
-                HashU32(r->account[w]);
-        if (!s_dumpNow)
-            continue;
-        sprintf(path, "economy[%u].kind", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->kind);
-        sprintf(path, "economy[%u].player", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->player);
-        sprintf(path, "economy[%u].unit", k);
-        DumpPrefix(path);
-        if (r->unitTag == 0)
-            fputs("null", s_dump);
-        else if (r->unitTag == TT_HEAP)
-            fputs("heap", s_dump);
-        else
-            fprintf(s_dump, "%s:%u", s_targetNames[r->unitTag], r->unitId);
-        fputc('\n', s_dump);
-        sprintf(path, "economy[%u].resources", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", r->resources);
-        sprintf(path, "economy[%u].energy", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", r->energy);
-        sprintf(path, "economy[%u].metal", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", r->metal);
-        sprintf(path, "economy[%u].value", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->value);
-        sprintf(path, "economy[%u].outcome", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
-        if (r->kind == 1) {
-            sprintf(path, "economy[%u].account", k);
-            DumpPrefix(path);
-            fputs("hex:", s_dump);
-            for (int b = 0; b < (int)sizeof r->account; b++)
-                fprintf(s_dump, "%02x", ((const unsigned char*)r->account)[b]);
-            fputc('\n', s_dump);
-        }
-    }
-    EndSection();
-}
-
 static void VisitPrivatePathfinder()
 {
     if (!s_dumpNow)
@@ -3632,7 +3491,6 @@ static void VisitWorld()
     if (s_traceTick == 1)
         VisitConstants();
     VisitPathResults();
-    VisitEconomyEvents();
 }
 
 enum {
@@ -4481,7 +4339,6 @@ void HarnessPhase(int phase)
     }
     if (phase == 7) {
         s_pathResultCount = 0;
-        s_economyCount = 0;
         fflush(s_trace);
         if (s_sound != NULL)
             fflush(s_sound);

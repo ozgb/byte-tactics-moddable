@@ -138,8 +138,6 @@ void UnitResources::SaveUnitAccounts(UnitInfo* info, HapiBank* file)
     file->WriteBox(&metalMake, 0x18);
 }
 
-extern "C" int __cdecl HarnessEconomyEvent(int kind, ...);
-
 // Load counterpart of 0x4010b0: reads the two 0x18-byte blocks back from the
 // unit's "u%04xacc" entry, if it exists.
 // FUNCTION: 0x401110
@@ -151,7 +149,6 @@ void UnitResources::LoadUnitAccounts(UnitInfo* info, HapiBank* file)
         file->SeekBox(0);
         file->ReadBox(&energyMake, 0x18);
         file->ReadBox(&metalMake, 0x18);
-        HarnessEconomyEvent(1, -1, info, 0, 0.0f, 0.0f, 0, 1, this);
     }
 }
 

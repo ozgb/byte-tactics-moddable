@@ -937,8 +937,6 @@ static inline void AddScaled(Unit* unit, float& res, double amount)
         res += amount;
     }
 }
-extern "C" int __cdecl HarnessEconomyEvent(int kind, ...);
-
 // FUNCTION: 0x4237d0
 int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
 {
@@ -951,7 +949,6 @@ int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
     if ((cell->flags & 1) && (f->flags & 1))
         return 0;
     AddScaled(unit, unit->energy, f->energy);
-    HarnessEconomyEvent(4, -1, unit, 1, (float)f->energy, 0.0f, 0, 1, 0);
     float metal = f->metal;
     if (unit->player->active && unit->player->type == 2) {
         switch (g_game->difficulty) {
@@ -968,7 +965,6 @@ int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
     } else {
         unit->metal += metal;
     }
-    HarnessEconomyEvent(4, -1, unit, 2, 0.0f, metal, 0, 1, 0);
     KillFeature(x, z, 1);
     if (g_game->mapInfo->GetGameType() == 3) {
         FeatureDamagePacket packet;

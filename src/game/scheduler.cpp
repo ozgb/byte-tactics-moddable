@@ -3,7 +3,6 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/services.h"
-#include "../../interfaces/ref.h"
 #include "../network/player.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/rand_stream.h"
@@ -59,8 +58,10 @@ void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
     if (size > sizeof(InboxEntry::words))
         FatalError((char*)"an event is larger than an inbox entry");
     int kind = *static_cast<const int*>(event);
-    for (int i = 0; i < g_schedRouteCount; i++) {
-        const SchedRoute* route = &g_schedRoutes[i];
+    int count;
+    const SchedRoute* routes = SchedRoutes(&count);
+    for (int i = 0; i < count; i++) {
+        const SchedRoute* route = &routes[i];
         if (route->outbox != outbox || route->kind != kind)
             continue;
         if (route->synchronous || !s_inTick) {

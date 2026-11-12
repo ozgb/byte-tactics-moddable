@@ -5,7 +5,7 @@
 #include "players.h"
 #include "scheduler.h"
 
-const SchedRoute g_schedRoutes[] = {
+static const SchedRoute s_routes[] = {
     {SCHED_UNITS, ECONOMY_RESET, SCHED_ECONOMY, EconomyInbox, 0},
     {SCHED_UNITS, ECONOMY_LOAD, SCHED_ECONOMY, EconomyInbox, 0},
     {SCHED_UNITS, ECONOMY_REQUEST, SCHED_ECONOMY, EconomyInbox, 0},
@@ -20,4 +20,8 @@ const SchedRoute g_schedRoutes[] = {
     {SCHED_ECONOMY, ECONOMY_EFFECT_SHARE, SCHED_PLAYERS, PlayersOnEconomyShare, 0},
 };
 
-const int g_schedRouteCount = sizeof(g_schedRoutes) / sizeof(g_schedRoutes[0]);
+const SchedRoute* SchedRoutes(int* count)
+{
+    *count = sizeof(s_routes) / sizeof(s_routes[0]);
+    return s_routes;
+}

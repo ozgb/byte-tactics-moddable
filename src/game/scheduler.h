@@ -13,8 +13,7 @@ struct SchedRoute {
     int synchronous;
 };
 
-extern const SchedRoute g_schedRoutes[];
-extern const int g_schedRouteCount;
+const SchedRoute* SchedRoutes(int* count);
 
 void __stdcall SchedDeliver(int module);
 void SchedBeginTick();

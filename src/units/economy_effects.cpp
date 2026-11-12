@@ -7,8 +7,6 @@
 #include "unit.h"
 #include "economy_effects.h"
 
-#include "../../link/globals.h"
-
 static Unit* UnitOfHandle(EconUnit handle)
 {
     Ref<Unit> ref;

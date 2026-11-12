@@ -22,7 +22,10 @@ event kind:
   a player's update. The scheduler also drains every inbox at each phase boundary (`docs/schedule.md`), before the
   phase's trace row, and after `UpdateResourceSharing` in the tail, before the network packets are sent; at the tick
   boundary it drains them again and stops the game if one still holds an event. Outside a tick (set-up, loading) a
-  published event is delivered at once.
+  published event is delivered at once. One more delivery point is not a run: an inbox holds 1024 events, and when a
+  publish finds its subscriber's inbox full, the scheduler delivers that inbox first, in the middle of the publisher's
+  update, then queues the event. The order of the events is kept, but the subscriber's handlers run there. No scenario
+  is known to fill an inbox: economy's is also delivered before every `RequestGranted`, which precedes every REQUEST.
 - **Synchronous slots.** A same-statement answer comes only from a slot the interface marks synchronous. The engine
   delivers the module's pending inbox before it calls one, so the slot sees every event published before it.
 - **Plain data.** Events carry no pointers: a LOAD carries the account's twelve words.

@@ -61,7 +61,7 @@ enum EconomyEventKind {
 
 // The kinds of effect economy publishes to its outbox, for the modules that subscribe to them.
 enum EconomyEffectKind {
-    // A cloaked unit's upkeep was or was not paid this tick: value is 1 to keep it cloaked and 0 to uncloak it.
+    // Synchronous: a cloaked unit's upkeep was or was not paid this tick, value 1 to keep it cloaked and 0 to uncloak it; delivered before Emit returns, since sensors read it in the same player's update.
     ECONOMY_EFFECT_CLOAK = 16,
     // A metal extractor's rate changed: value is the metal under its footprint, which its script is told.
     ECONOMY_EFFECT_EXTRACTOR = 17,

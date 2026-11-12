@@ -142,9 +142,10 @@ overlay draws the pass map without search cells.
 
 ## 5. The traced state
 
-Pathfinding is judged by what it delivers. Section 32 of `docs/trace-format.md` hashes every event `Poll` returns,
-with its waypoints, in delivery order, as the host takes it; the reference records the same events where 3.1c's
-search writes its results. A pathfinder whose events differ fails there, whatever state it reports.
+Pathfinding is judged by the state its results leave: what the orders and goal objects keep of a path (sections 20
+and 21 of `docs/trace-format.md`) and the rest of the world row. Section 32 dumps every event `Poll` returns, with its
+waypoints, in delivery order, as the host takes it; the reference records the same events where 3.1c's search writes
+its results. No row hashes section 32: it is a diagnostic that shows what a pathfinder delivered when a row differs.
 
 Its state is private. Sections 16 and 17 of `docs/trace-format.md` are in a dump and in no trace row. The harness
 gets them from the `WriteState` slot, which writes the implementation's private state through a `StateWriter`
@@ -164,8 +165,8 @@ which section 21 hashes, and the layout of sections 16 and 17 is the trace forma
 | grid cells and dirty words | yes: a search's marks stay until the next search clears them | search state |
 | `g_playerBudgetCap`, `g_playerTickLoad`, `g_budgetRefreshCounter` | yes | schedule state |
 
-Nothing in these sections is a result: the results are in section 32 (the events), section 21 (the goal objects)
-and section 20 (the orders' flags), which the consumers own.
+Nothing in these sections is a result: the results are in section 21 (the goal objects) and section 20 (the orders'
+flags), which the consumers own, and the events that carried them are dumped in section 32.
 
 ## 6. Quirks that stay inside the default
 

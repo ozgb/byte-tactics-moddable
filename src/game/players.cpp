@@ -461,13 +461,6 @@ static int IsPlayerSlotInRange(unsigned char i)
     return 1;
 }
 
-static int HasMorePlayerSlots(unsigned char i)
-{
-    if (i < 0xa)
-        return 1;
-    return 0;
-}
-
 static const float kHundred = 100.0f;
 
 #if BT_ACCESS_LOG

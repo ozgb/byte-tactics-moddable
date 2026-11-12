@@ -441,14 +441,6 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
         u->motion->speed = reader->ReadBits(0x20);
 }
 
-// FUNCTION: 0x48b710
-void __stdcall SendUnitStates(Player* p)
-{
-    extern Game* g_game;
-    p->syncTick = g_game->ticks;
-    g_seams.network->SendUnitStates(p);
-}
-
 // FUNCTION: 0x48b920
 void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
 {

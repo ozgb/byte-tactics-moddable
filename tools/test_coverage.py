@@ -522,31 +522,99 @@ class KitTest(unittest.TestCase):
         plain = cov.summarize(EXPORT, KEY, NAME)[0]["economy"]
         kit = self.totals(self.NEVER)
         self.assertEqual((plain.functions, kit.functions), (2, 1))
-        self.assertEqual(kit.kit, [self.NEVER])
+        self.assertEqual(kit.apart, [self.NEVER])
         self.assertEqual(kit.never_entered, [])
         self.assertEqual(kit.reasons, {self.NEVER: self.REASON})
-        self.assertIn("economy Never (src/game/economy.cpp)", cov.kit_list({"economy": kit}))
+        self.assertIn("kit functions (no 3.1c code calls them, left out of the sums):\neconomy Never (src/game/economy.cpp)",
+                      cov.apart_list({"economy": kit}))
         with tempfile.TemporaryDirectory() as d:
             out = Path(d) / "coverage.csv"
             cov.write_csv({"economy": kit}, out)
             back = cov.read_csv(out)
-        self.assertEqual(back["economy"].kit, [self.NEVER])
-        self.assertEqual(cov.kit_keys(back), {("economy", *self.NEVER): self.REASON})
+        self.assertEqual(back["economy"].apart, [self.NEVER])
+        self.assertEqual(cov.apart_keys(back), {("economy", *self.NEVER): self.REASON})
 
     def test_a_kit_row_outside_seams_or_on_a_non_native_is_rejected(self):
         natives = {"GetNative"}
-        rows = lambda sub, name: {sub: cov.Totals(kit=[(name, "src/seams/native.cpp", "?F@@YAXXZ")])}
-        self.assertEqual(cov.misplaced_kit(rows("seams", "GetNative"), natives), "")
-        self.assertIn("economy Never", cov.misplaced_kit(rows("economy", "Never"), natives))
-        self.assertIn("seams Other", cov.misplaced_kit(rows("seams", "Other"), natives))
-        self.assertIn("seams GetNative", cov.misplaced_kit(rows("seams", "GetNative"), set()))
+
+        def rows(sub, name):
+            key = (name, "src/seams/native.cpp", "?F@@YAXXZ")
+            return {sub: cov.Totals(apart=[key], reasons={key: self.REASON})}
+        self.assertEqual(cov.misplaced_apart(rows("seams", "GetNative"), natives), "")
+        self.assertIn("economy Never", cov.misplaced_apart(rows("economy", "Never"), natives))
+        self.assertIn("seams Other", cov.misplaced_apart(rows("seams", "Other"), natives))
+        self.assertIn("seams GetNative", cov.misplaced_apart(rows("seams", "GetNative"), set()))
 
     def test_an_entered_kit_row_fails_the_check(self):
         entered = self.totals(self.RESET)
-        self.assertEqual(entered.kit, [])
+        self.assertEqual(entered.apart, [])
         self.assertEqual(entered.functions, 2)
-        self.assertIn("the reason is wrong and the function counts again", cov.entered_kit({"economy": entered}))
-        self.assertEqual(cov.entered_kit({"economy": self.totals(self.NEVER)}), "")
+        self.assertIn("the reason is wrong and the function counts again", cov.entered_apart({"economy": entered}))
+        self.assertEqual(cov.entered_apart({"economy": self.totals(self.NEVER)}), "")
+
+
+DEMO_EXPORT = {"data": [{"functions": [
+    entry("?Search@@YAXXZ", "src/ai/pathfind.cpp", 5, [region(1, 1, 4, 2, 5)], [[2, 5, 2, 9, 5, 0, 0, 0, 4]]),
+    entry("?RunBuild@?A0x1234abcd@@YAXXZ", cov.DEMO_FILE, 0, [region(10, 1, 19, 2, 0)], [[12, 5, 12, 9, 0, 0, 0, 0, 4]]),
+    entry("?Touch@?A0x1234abcd@@YAXXZ", cov.DEMO_FILE, 3, [region(30, 1, 32, 2, 3)]),
+]}]}
+DEMO_KEY = {("src/ai/pathfind.cpp", "Search"): "pathfinding", (cov.DEMO_FILE, "RunBuild"): "pathfinding",
+            (cov.DEMO_FILE, "Touch"): "pathfinding"}
+DEMO_NAME = {"Search": {"pathfinding"}, "RunBuild": {"pathfinding"}, "Touch": {"pathfinding"}}
+
+
+class DemoTest(unittest.TestCase):
+    BUILD = ("RunBuild", cov.DEMO_FILE, "?RunBuild@?A0x@@YAXXZ")
+    TOUCH = ("Touch", cov.DEMO_FILE, "?Touch@?A0x@@YAXXZ")
+    REASON = "demo: hpa"
+
+    def totals(self, *keys):
+        apart = {("pathfinding", *key): self.REASON for key in keys}
+        return cov.summarize(DEMO_EXPORT, DEMO_KEY, DEMO_NAME, None, None, apart)[0]["pathfinding"]
+
+    def test_a_demo_row_is_left_out_of_the_sums(self):
+        plain = cov.summarize(DEMO_EXPORT, DEMO_KEY, DEMO_NAME)[0]["pathfinding"]
+        demo = self.totals(self.BUILD)
+        self.assertEqual((plain.functions, plain.functions_entered, plain.lines, plain.branches), (3, 2, 17, 4))
+        self.assertEqual((demo.functions, demo.functions_entered, demo.lines, demo.branches), (2, 2, 7, 2))
+        self.assertEqual(demo.never_entered, [])
+        self.assertEqual(demo.apart, [self.BUILD])
+        self.assertEqual(cov.unreasoned({"pathfinding": demo}), "")
+
+    def test_a_demo_row_round_trips_and_is_listed_apart(self):
+        demo = self.totals(self.BUILD)
+        listed = cov.apart_list({"pathfinding": demo})
+        self.assertIn("demo functions", listed)
+        self.assertIn("pathfinding RunBuild (src/ai/pathfind_hpa.cpp)", listed)
+        self.assertNotIn("kit functions", listed)
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "coverage.csv"
+            cov.write_csv({"pathfinding": demo}, out)
+            text = out.read_text()
+            back = cov.read_csv(out)
+        self.assertIn("pathfinding,RunBuild,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?RunBuild@?A0x@@YAXXZ,0,demo: hpa", text)
+        self.assertIn("pathfinding,*,,2,2,7,7,2,", text)
+        self.assertEqual(back["pathfinding"].apart, [self.BUILD])
+        self.assertEqual(back["pathfinding"].never_entered, [])
+        self.assertEqual(cov.apart_keys(back), {("pathfinding", *self.BUILD): self.REASON})
+        self.assertEqual(cov.misplaced_apart(back, set()), "")
+
+    def test_a_demo_row_outside_the_demo_file_is_rejected(self):
+        key = ("Search", "src/ai/pathfind.cpp", "?Search@@YAXXZ")
+        rows = {"pathfinding": cov.Totals(apart=[key], reasons={key: self.REASON})}
+        self.assertIn("have a `demo:` reason but are not defined in src/ai/pathfind_hpa.cpp:\npathfinding Search",
+                      cov.misplaced_apart(rows, set()))
+
+    def test_a_demo_row_does_not_pass_as_a_kit_row(self):
+        key = ("GetNative", "src/seams/native.cpp", "?GetNative@@YAXXZ")
+        rows = {"seams": cov.Totals(apart=[key], reasons={key: self.REASON})}
+        self.assertIn("seams GetNative", cov.misplaced_apart(rows, {"GetNative"}))
+
+    def test_an_entered_demo_row_fails_the_check(self):
+        entered = self.totals(self.BUILD, self.TOUCH)
+        self.assertEqual(entered.apart_entered, [("Touch", cov.DEMO_FILE, "?Touch@?A0x@@YAXXZ")])
+        self.assertEqual(entered.functions, 2)
+        self.assertIn("pathfinding Touch (src/ai/pathfind_hpa.cpp)", cov.entered_apart({"pathfinding": entered}))
 
 
 class PlaySuiteTest(unittest.TestCase):

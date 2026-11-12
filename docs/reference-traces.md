@@ -319,8 +319,8 @@ and so on), and this page is updated to name it. The current tag is
   hash state, and events are only dumped. The Unit table no longer hashes a unit's resource account
   (bytes 0xbc to 0xeb), which is economy's private state since economy runs behind the scheduler. The
   world row no longer hashes the path results (section 32), which a dump still holds as a diagnostic, and
-  a moddable dump adds the economy events (section 33): every event the scheduler applies to economy and
-  every effect economy asks of others, in application order, with its outcome. Section 33 is in no row,
+  a moddable dump adds the economy events (section 33): every event economy consumes from its inbox or
+  answers in its synchronous `Spend`, and every effect it publishes, in that order, with its outcome. Section 33 is in no row,
   and the reference does not record it, so a reference dump has no `economy.*` lines. Every digest
   changes; the event digests, sound logs, UI logs, frames and the save are those of v26.
 

@@ -1030,12 +1030,13 @@ the same step.
 
 ### 8.22 economy events (section 33, dumped only)
 
-The events and effects of economy in this tick, in the order the scheduler applied them
-(`interfaces/economy.h`). No row hashes them (section 6): a dump holds their lines, after those of
-section 32, as a diagnostic. The reference build does not record them, so its dumps have no
-`economy.*` lines. The scheduler records an event right after `Apply` returns, with the outcome
-`Apply` gave (nothing nests inside an event), and an effect right before the engine applies it, with
-outcome 1, so the events that an effect causes (a share's SPEND and INCOME) follow it. The host empties
+The events and effects of economy in this tick (`interfaces/economy.h`). No row hashes them
+(section 6): a dump holds their lines, after those of section 32, as a diagnostic. The reference
+build does not record them, so its dumps have no `economy.*` lines. An event is recorded when economy
+consumes it from its inbox, right after `Apply` returns, with the outcome `Apply` gave, and a SPEND when
+the synchronous `Spend` answers, with its answer; an effect is recorded when economy publishes it to its
+outbox, with outcome 1. So the records are in economy's order of consumption and publication, and the
+events that an effect causes (a share's SPEND and INCOME) follow it. The host empties
 the record after the world row of the tick, so the lines a dump writes after an earlier phase hold the
 records made so far. The fields are `economy.fields` of the schema, in this order.
 

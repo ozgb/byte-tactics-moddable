@@ -45,7 +45,7 @@ struct PathEvent;
 // In test mode, records a pathfinding event as the engine delivers it, with its waypoints, for the trace's path results.
 void __stdcall HarnessPathEvent(const PathEvent* event, const PathPoint* points, int capacity);
 struct EconomyEvent;
-// In test mode, records an economy event or effect as the scheduler applies it, with the outcome of its application, for the trace's economy events.
+// In test mode, records an economy event as economy consumes or answers it, or an effect as economy publishes it, with its outcome, for the dump's economy events.
 void __stdcall HarnessEconomyEvent(const EconomyEvent* event, int outcome);
 // The modules that own an outbox or an inbox in the scheduler's router.
 enum SchedModule {

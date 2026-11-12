@@ -58312,8 +58312,10 @@ address,function,file,kind,target
 ,SchedPublish,src/game/scheduler.cpp,call,ReplayImport::Ptr
 ,SchedPublish,src/game/scheduler.cpp,call,ReplayImport::~ReplayImport
 ,SchedPublish,src/game/scheduler.cpp,call,SchedDeliver
+,SchedPublish,src/game/scheduler.cpp,call,SchedRoutes
 ,SchedPublish,src/game/scheduler.cpp,call,memcpy
 ,SchedPublish,src/game/scheduler.cpp,call,memset
+,SchedPublish,src/game/scheduler.cpp,deref_escape,*SchedRoute
 ,SchedPublish,src/game/scheduler.cpp,deref_read,*int
 ,SchedPublish,src/game/scheduler.cpp,field_escape,Inbox::entries
 ,SchedPublish,src/game/scheduler.cpp,field_escape,InboxEntry::words
@@ -58327,12 +58329,13 @@ address,function,file,kind,target
 ,SchedPublish,src/game/scheduler.cpp,field_write,Inbox::tail
 ,SchedPublish,src/game/scheduler.cpp,field_write,InboxEntry::handler
 ,SchedPublish,src/game/scheduler.cpp,function,
-,SchedPublish,src/game/scheduler.cpp,global_escape,g_schedRoutes
 ,SchedPublish,src/game/scheduler.cpp,global_escape,s_inboxes
-,SchedPublish,src/game/scheduler.cpp,global_read,g_schedRouteCount
 ,SchedPublish,src/game/scheduler.cpp,global_read,kInboxCapacity
 ,SchedPublish,src/game/scheduler.cpp,global_read,s_inTick
 ,SchedPublish,src/game/scheduler.cpp,indirect_call,indirect via void (*const)(const void *) __attribute__((stdcall)) [SchedRoute::handler]
+,SchedRoutes,src/game/routes.cpp,deref_write,*int
+,SchedRoutes,src/game/routes.cpp,function,
+,SchedRoutes,src/game/routes.cpp,global_escape,s_routes@src/game/routes.cpp
 ,SchedUnitsPhase,src/game/scheduler.cpp,call,SchedDeliver
 ,SchedUnitsPhase,src/game/scheduler.cpp,call,operator Unit *
 ,SchedUnitsPhase,src/game/scheduler.cpp,field_escape,Game::players

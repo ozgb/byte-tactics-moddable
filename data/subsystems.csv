@@ -4834,6 +4834,7 @@ SchedPending,src/game/scheduler.cpp,game,default:src/game/,
 SchedPhaseBoundary,src/game/scheduler.cpp,game,default:src/game/,
 SchedPlayersPhase,src/game/scheduler.cpp,game,phase:UpdatePlayers,game
 SchedPublish,src/game/scheduler.cpp,game,default:src/game/,
+SchedRoutes,src/game/routes.cpp,game,default:src/game/,
 SchedUnitsPhase,src/game/scheduler.cpp,game,phase:UpdateAllUnits,game
 ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,seams,folder:src/seams/,
 ScheduleEconomySpend,src/seams/economy_world.cpp,seams,folder:src/seams/,

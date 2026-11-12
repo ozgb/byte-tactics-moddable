@@ -2816,7 +2816,6 @@ static void VisitPathResults()
         PathResult* r = &s_pathResults.items[k];
         Resolve((unsigned)SimBlockBase(), r->unitRef, true, TT_UNIT, &r->unitTag, &r->unitId);
     }
-    s_hash = PathResultsHash(&s_pathResults, s_hash);
     if (!s_dumpNow)
         return;
     char path[64];
@@ -2871,7 +2870,6 @@ static void VisitEconomyResults()
         EconomyResult* r = &s_economyResults.items[k];
         Resolve((unsigned)SimBlockBase(), r->unitRef, true, TT_UNIT, &r->unitTag, &r->unitId);
     }
-    s_hash = EconomyResultsHash(&s_economyResults, s_hash);
     if (!s_dumpNow)
         return;
     char path[64];

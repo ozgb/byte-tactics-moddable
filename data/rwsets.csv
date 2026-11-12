@@ -24,8 +24,8 @@ address,function,file,kind,target
 0x4010b0,SaveUnitAccounts,src/units/unit_save.cpp,function,
 0x4010b0,SaveUnitAccounts,src/units/unit_save.cpp,global_read,g_seams
 0x4010b0,SaveUnitAccounts,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(EconUnit, EconAccount *) __attribute__((stdcall)) [EconomySeam::UnitAccount]"
-0x401110,LoadUnitAccounts,src/units/unit_save.cpp,call,EconEmit
 0x401110,LoadUnitAccounts,src/units/unit_save.cpp,call,EconHandleOf
+0x401110,LoadUnitAccounts,src/units/unit_save.cpp,call,EconPublishLoad
 0x401110,LoadUnitAccounts,src/units/unit_save.cpp,call,HapiBank::OpenNamedBox
 0x401110,LoadUnitAccounts,src/units/unit_save.cpp,call,HapiBank::ReadBox
 0x401110,LoadUnitAccounts,src/units/unit_save.cpp,call,HapiBank::SeekBox
@@ -351,8 +351,8 @@ address,function,file,kind,target
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x402430,SelfRepairOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,AddOrder
-0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,EconEmit
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,EconHandleOf
+0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,EconPublish
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,GridCell
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::SetUnit
@@ -5792,8 +5792,8 @@ address,function,file,kind,target
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,global_read,g_game
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,global_read,g_seams
 0x41b8d0,FinishConstruction,src/ingame/control_panel.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *) __attribute__((stdcall)) [NetworkSeam::SendBuilderLink]"
-0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,EconEmit
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,EconHandleOf
+0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,EconPublish
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,EconRequestEnergyAndMetal
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,FinishConstruction
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,get
@@ -7676,8 +7676,8 @@ address,function,file,kind,target
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,global_read,g_game
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,global_read,g_seams
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
-0x4237d0,ReclaimFeature,src/map/features.cpp,call,EconEmit
 0x4237d0,ReclaimFeature,src/map/features.cpp,call,EconHandleOf
+0x4237d0,ReclaimFeature,src/map/features.cpp,call,EconPublish
 0x4237d0,ReclaimFeature,src/map/features.cpp,call,GetFeature
 0x4237d0,ReclaimFeature,src/map/features.cpp,call,KillFeature
 0x4237d0,ReclaimFeature,src/map/features.cpp,call,operator Mission *
@@ -20541,7 +20541,7 @@ address,function,file,kind,target
 0x4644d0,ResetPlayerSlots,src/game/players.cpp,function,
 0x4644d0,ResetPlayerSlots,src/game/players.cpp,global_escape,g_emptyText
 0x4644d0,ResetPlayerSlots,src/game/players.cpp,global_read,g_game
-0x464700,InitPlayerSlot,src/game/players.cpp,call,EconEmit
+0x464700,InitPlayerSlot,src/game/players.cpp,call,EconPublish
 0x464700,InitPlayerSlot,src/game/players.cpp,call,SimAlloc
 0x464700,InitPlayerSlot,src/game/players.cpp,call,memset
 0x464700,InitPlayerSlot,src/game/players.cpp,call,operator bool
@@ -20677,7 +20677,8 @@ address,function,file,kind,target
 0x464b10,GetNetMetal,src/game/players.cpp,field_read,NetMetalSource::metalIncome
 0x464b10,GetNetMetal,src/game/players.cpp,field_read,NetMetalSource::metalUsage
 0x464b10,GetNetMetal,src/game/players.cpp,function,
-0x464b30,TransferMetal,src/game/players.cpp,call,EconEmit
+0x464b30,TransferMetal,src/game/players.cpp,call,EconPublish
+0x464b30,TransferMetal,src/game/players.cpp,call,EconSpend
 0x464b30,TransferMetal,src/game/players.cpp,field_read,NetworkSeam::SendShareMetal
 0x464b30,TransferMetal,src/game/players.cpp,field_read,Player::energy
 0x464b30,TransferMetal,src/game/players.cpp,field_read,Seams::network
@@ -20685,7 +20686,8 @@ address,function,file,kind,target
 0x464b30,TransferMetal,src/game/players.cpp,global_read,g_game
 0x464b30,TransferMetal,src/game/players.cpp,global_read,g_seams
 0x464b30,TransferMetal,src/game/players.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float) __attribute__((stdcall)) [NetworkSeam::SendShareMetal]"
-0x464c60,TransferEnergy,src/game/players.cpp,call,EconEmit
+0x464c60,TransferEnergy,src/game/players.cpp,call,EconPublish
+0x464c60,TransferEnergy,src/game/players.cpp,call,EconSpend
 0x464c60,TransferEnergy,src/game/players.cpp,field_read,NetworkSeam::SendShareEnergy
 0x464c60,TransferEnergy,src/game/players.cpp,field_read,Player::metal
 0x464c60,TransferEnergy,src/game/players.cpp,field_read,Seams::network
@@ -20719,8 +20721,8 @@ address,function,file,kind,target
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
 0x464f80,UpdatePlayerHead,src/game/players.cpp,call,CountActiveAIPlayers
 0x464f80,UpdatePlayerHead,src/game/players.cpp,call,CountCombatPlayers
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,EconEmit
 0x464f80,UpdatePlayerHead,src/game/players.cpp,call,EconHandleOf
+0x464f80,UpdatePlayerHead,src/game/players.cpp,call,EconPublish
 0x464f80,UpdatePlayerHead,src/game/players.cpp,call,FindHostSlot
 0x464f80,UpdatePlayerHead,src/game/players.cpp,call,IsPlayerSlotInRange
 0x464f80,UpdatePlayerHead,src/game/players.cpp,call,MissionConditions::CheckDefeat
@@ -26671,8 +26673,8 @@ address,function,file,kind,target
 0x485980,FreeUnitMemory,src/units/units.cpp,field_write,Game::units
 0x485980,FreeUnitMemory,src/units/units.cpp,function,
 0x485980,FreeUnitMemory,src/units/units.cpp,global_read,g_game
-0x485a40,InitUnitFromType,src/units/units.cpp,call,EconEmit
 0x485a40,InitUnitFromType,src/units/units.cpp,call,EconHandleOf
+0x485a40,InitUnitFromType,src/units/units.cpp,call,EconPublish
 0x485a40,InitUnitFromType,src/units/units.cpp,call,RandomInt
 0x485a40,InitUnitFromType,src/units/units.cpp,call,get
 0x485a40,InitUnitFromType,src/units/units.cpp,call,operator->
@@ -26989,8 +26991,8 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,CobScript::StartScriptWithArgs
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,CobScript::~CobScript
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,CreateUnitCorpse
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,EconEmit
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,EconHandleOf
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,EconPublish
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,FindSlotByDpid
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,FreeObjectState
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordCdActivity
@@ -28389,13 +28391,6 @@ address,function,file,kind,target
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::RemoveUnitFromMap]
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Game::ticks
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,NetworkSeam::SendUnitStates
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_read,Seams::network
-0x48b710,SendUnitStates,src/units/unit_position.cpp,field_write,Player::syncTick
-0x48b710,SendUnitStates,src/units/unit_position.cpp,function,
-0x48b710,SendUnitStates,src/units/unit_position.cpp,global_read,g_seams
-0x48b710,SendUnitStates,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [NetworkSeam::SendUnitStates]
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,BitReader::ReadBit
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,BitReader::ReadBits
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,CreateUnitFromPacket
@@ -31041,6 +31036,10 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,HarnessPhase
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,HarnessRecordPhase
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,PacketManager::SendAllQueued
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedBeginTick
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedDeliver
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedEndTick
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedPhaseBoundary
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,StepAllGafSequences
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,UpdateAutoFollow
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,UpdateCameraFollow
@@ -33292,8 +33291,8 @@ address,function,file,kind,target
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *, unsigned char) __attribute__((stdcall)) [UnitsSeam::GetAimFromPosition]"
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,AngleOfVector
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,CalcAimAngles
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,EconEmit
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,EconHandleOf
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,EconSpend
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,RecordBuildMenuUpdate
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,SolveLaunchAngle
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,SubtractVec3
@@ -45043,30 +45042,36 @@ address,function,file,kind,target
 ,DumpValue,src/harness/harness.cpp,function,
 ,DumpValue,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,DumpValue,src/harness/harness.cpp,global_read,s_targetNames@src/harness/harness.cpp
-,EconEmit,src/game/economy_events.h,call,ScheduleEconomyEvent
-,EconEmit,src/game/economy_events.h,call,memset
-,EconEmit,src/game/economy_events.h,field_write,EconomyEvent::account
-,EconEmit,src/game/economy_events.h,field_write,EconomyEvent::energy
-,EconEmit,src/game/economy_events.h,field_write,EconomyEvent::kind
-,EconEmit,src/game/economy_events.h,field_write,EconomyEvent::metal
-,EconEmit,src/game/economy_events.h,field_write,EconomyEvent::player
-,EconEmit,src/game/economy_events.h,field_write,EconomyEvent::resources
-,EconEmit,src/game/economy_events.h,field_write,EconomyEvent::unit
-,EconEmit,src/game/economy_events.h,function,
+,EconEvent,src/game/economy_events.h,call,memset
+,EconEvent,src/game/economy_events.h,field_write,EconomyEvent::energy
+,EconEvent,src/game/economy_events.h,field_write,EconomyEvent::kind
+,EconEvent,src/game/economy_events.h,field_write,EconomyEvent::metal
+,EconEvent,src/game/economy_events.h,field_write,EconomyEvent::player
+,EconEvent,src/game/economy_events.h,field_write,EconomyEvent::resources
+,EconEvent,src/game/economy_events.h,field_write,EconomyEvent::unit
+,EconEvent,src/game/economy_events.h,function,
 ,EconHandleOf,src/game/economy_events.h,field_read,Ref<Unit>::offset
 ,EconHandleOf,src/game/economy_events.h,function,
+,EconPublish,src/game/economy_events.h,call,EconEvent
+,EconPublish,src/game/economy_events.h,call,SchedPublish
+,EconPublish,src/game/economy_events.h,function,
+,EconPublishLoad,src/game/economy_events.h,call,EconEvent
+,EconPublishLoad,src/game/economy_events.h,call,SchedPublish
+,EconPublishLoad,src/game/economy_events.h,call,operator=
+,EconPublishLoad,src/game/economy_events.h,field_write,EconomyEvent::account
+,EconPublishLoad,src/game/economy_events.h,function,
+,EconSpend,src/game/economy_events.h,call,EconEvent
+,EconSpend,src/game/economy_events.h,call,ScheduleEconomySpend
+,EconSpend,src/game/economy_events.h,function,
 ,EconomyApply,src/game/economy.cpp,call,AccountOf
 ,EconomyApply,src/game/economy.cpp,call,AddIncome
 ,EconomyApply,src/game/economy.cpp,call,HandicapOf
 ,EconomyApply,src/game/economy.cpp,call,RequestOn
 ,EconomyApply,src/game/economy.cpp,call,ResetAccount
-,EconomyApply,src/game/economy.cpp,call,SpendOn
 ,EconomyApply,src/game/economy.cpp,call,UnitAccountOf
 ,EconomyApply,src/game/economy.cpp,call,operator=
-,EconomyApply,src/game/economy.cpp,deref_read,*EconAccount
 ,EconomyApply,src/game/economy.cpp,deref_write,*EconAccount
 ,EconomyApply,src/game/economy.cpp,field_maybe_written,EconLedger::make
-,EconomyApply,src/game/economy.cpp,field_maybe_written,Game::players
 ,EconomyApply,src/game/economy.cpp,field_read,EconomyEvent::account
 ,EconomyApply,src/game/economy.cpp,field_read,EconomyEvent::energy
 ,EconomyApply,src/game/economy.cpp,field_read,EconomyEvent::kind
@@ -45075,7 +45080,12 @@ address,function,file,kind,target
 ,EconomyApply,src/game/economy.cpp,field_read,EconomyEvent::resources
 ,EconomyApply,src/game/economy.cpp,field_read,EconomyEvent::unit
 ,EconomyApply,src/game/economy.cpp,function,
-,EconomyApply,src/game/economy.cpp,global_read,g_game
+,EconomyInbox,src/seams/economy_world.cpp,call,HarnessEconomyEvent
+,EconomyInbox,src/seams/economy_world.cpp,field_read,EconomySeam::Apply
+,EconomyInbox,src/seams/economy_world.cpp,field_read,Seams::economy
+,EconomyInbox,src/seams/economy_world.cpp,function,
+,EconomyInbox,src/seams/economy_world.cpp,global_read,g_seams
+,EconomyInbox,src/seams/economy_world.cpp,indirect_call,indirect via int (*)(const EconomyEvent *) __attribute__((stdcall)) [EconomySeam::Apply]
 ,EconomyInit,src/game/economy.cpp,call,SimBlockTrack
 ,EconomyInit,src/game/economy.cpp,function,
 ,EconomyInit,src/game/economy.cpp,global_escape,s_region@src/game/economy.cpp
@@ -45117,26 +45127,19 @@ address,function,file,kind,target
 ,EconomyResultsAdd,src/harness/economy_results.cpp,function,
 ,EconomyResultsClear,src/harness/economy_results.cpp,field_write,EconomyResults::count
 ,EconomyResultsClear,src/harness/economy_results.cpp,function,
-,EconomyResultsHash,src/harness/economy_results.cpp,call,FloatBits
-,EconomyResultsHash,src/harness/economy_results.cpp,call,HashByte
-,EconomyResultsHash,src/harness/economy_results.cpp,call,HashU32
-,EconomyResultsHash,src/harness/economy_results.cpp,deref_escape,*EconomyResult
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResult::account
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResult::energy
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResult::kind
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResult::metal
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResult::outcome
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResult::player
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResult::resources
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResult::unitId
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResult::unitTag
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResult::value
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResults::count
-,EconomyResultsHash,src/harness/economy_results.cpp,field_read,EconomyResults::items
-,EconomyResultsHash,src/harness/economy_results.cpp,function,
 ,EconomyShutdown,src/game/economy.cpp,function,
 ,EconomyShutdown,src/game/economy.cpp,global_read,s_region@src/game/economy.cpp
 ,EconomyShutdown,src/game/economy.cpp,global_write,s_region@src/game/economy.cpp
+,EconomySpend,src/game/economy.cpp,call,AccountOf
+,EconomySpend,src/game/economy.cpp,call,SpendOn
+,EconomySpend,src/game/economy.cpp,field_maybe_written,Game::players
+,EconomySpend,src/game/economy.cpp,field_read,EconomyEvent::energy
+,EconomySpend,src/game/economy.cpp,field_read,EconomyEvent::metal
+,EconomySpend,src/game/economy.cpp,field_read,EconomyEvent::player
+,EconomySpend,src/game/economy.cpp,field_read,EconomyEvent::resources
+,EconomySpend,src/game/economy.cpp,field_read,EconomyEvent::unit
+,EconomySpend,src/game/economy.cpp,function,
+,EconomySpend,src/game/economy.cpp,global_read,g_game
 ,EconomyUnitAccount,src/game/economy.cpp,call,UnitAccountOf
 ,EconomyUnitAccount,src/game/economy.cpp,call,operator=
 ,EconomyUnitAccount,src/game/economy.cpp,deref_read,*EconAccount
@@ -45943,8 +45946,6 @@ address,function,file,kind,target
 ,FixedField,src/units/unit_types.cpp,function,
 ,FlagsPtr,src/ingame/selection.cpp,field_escape,Unit::flags
 ,FlagsPtr,src/ingame/selection.cpp,function,
-,FloatBits,src/harness/economy_results.cpp,call,memcpy
-,FloatBits,src/harness/economy_results.cpp,function,
 ,FloatBits,src/network/net_game.cpp,call,memcpy
 ,FloatBits,src/network/net_game.cpp,function,
 ,FootprintCentreSmoke,src/map/features.cpp,deref_read,*Point16
@@ -47427,7 +47428,6 @@ address,function,file,kind,target
 ,HasCommandLineSwitch,src/host/win32/crash.cpp,call,strlen
 ,HasCommandLineSwitch,src/host/win32/crash.cpp,deref_read,*char
 ,HasCommandLineSwitch,src/host/win32/crash.cpp,function,
-,HasMorePlayerSlots,src/game/players.cpp,function,
 ,HasNextMission,src/frontend/endgame.cpp,call,Mission::GetGameType
 ,HasNextMission,src/frontend/endgame.cpp,call,Mission::MissionExists
 ,HasNextMission,src/frontend/endgame.cpp,call,operator Mission *
@@ -47451,14 +47451,10 @@ address,function,file,kind,target
 ,HashBuf,src/harness/harness.cpp,global_read,kHashPrime@src/harness/harness.cpp
 ,HashBuf,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
 ,HashBuf,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
-,HashByte,src/harness/economy_results.cpp,function,
-,HashByte,src/harness/economy_results.cpp,global_read,kPrime@src/harness/economy_results.cpp
 ,HashByte,src/harness/harness.cpp,function,
 ,HashByte,src/harness/harness.cpp,global_read,kHashPrime@src/harness/harness.cpp
 ,HashByte,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
 ,HashByte,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
-,HashByte,src/harness/path_results.cpp,function,
-,HashByte,src/harness/path_results.cpp,global_read,kPrime@src/harness/path_results.cpp
 ,HashField,src/harness/harness.cpp,call,HashBuf
 ,HashField,src/harness/harness.cpp,call,HashPointer
 ,HashField,src/harness/harness.cpp,call,HashU32
@@ -47485,19 +47481,10 @@ address,function,file,kind,target
 ,HashRow,src/harness/block_scan.cpp,field_read,Row::targetTag
 ,HashRow,src/harness/block_scan.cpp,function,
 ,HashRow,src/harness/block_scan.cpp,global_read,kRowBits
-,HashRun,src/harness/path_results.cpp,call,HashByte
-,HashRun,src/harness/path_results.cpp,call,memcpy
-,HashRun,src/harness/path_results.cpp,deref_read,*unsigned char
-,HashRun,src/harness/path_results.cpp,function,
-,HashRun,src/harness/path_results.cpp,global_read,kPrime@src/harness/path_results.cpp
-,HashU32,src/harness/economy_results.cpp,call,HashByte
-,HashU32,src/harness/economy_results.cpp,function,
 ,HashU32,src/harness/harness.cpp,function,
 ,HashU32,src/harness/harness.cpp,global_read,kHashPrime@src/harness/harness.cpp
 ,HashU32,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
 ,HashU32,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
-,HashU32,src/harness/path_results.cpp,call,HashByte
-,HashU32,src/harness/path_results.cpp,function,
 ,HashWords,src/harness/harness.cpp,call,memcpy
 ,HashWords,src/harness/harness.cpp,function,
 ,HashWords,src/harness/harness.cpp,global_read,kHashPrime@src/harness/harness.cpp
@@ -47858,6 +47845,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::RegionSize
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::RequestGranted
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::Shutdown
+,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::Spend
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::UnitAccount
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::UpdateMetalExtraction
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::UpdatePlayerEconomy
@@ -48201,6 +48189,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyRegionSize
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyRequestGranted
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyShutdown
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomySpend
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyUnitAccount
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyUpdateMetalExtraction
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyUpdatePlayerEconomy
@@ -49081,6 +49070,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,EconomySeam::RegionSize
 ,InstallNativeSeams,src/seams/native.cpp,field_write,EconomySeam::RequestGranted
 ,InstallNativeSeams,src/seams/native.cpp,field_write,EconomySeam::Shutdown
+,InstallNativeSeams,src/seams/native.cpp,field_write,EconomySeam::Spend
 ,InstallNativeSeams,src/seams/native.cpp,field_write,EconomySeam::UnitAccount
 ,InstallNativeSeams,src/seams/native.cpp,field_write,EconomySeam::UpdateMetalExtraction
 ,InstallNativeSeams,src/seams/native.cpp,field_write,EconomySeam::UpdatePlayerEconomy
@@ -49514,6 +49504,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomyRegionSize
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomyRequestGranted
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomyShutdown
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomySpend
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomyUnitAccount
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomyUpdateMetalExtraction
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomyUpdatePlayer
@@ -51918,21 +51909,6 @@ address,function,file,kind,target
 ,PathResultsAdd,src/harness/path_results.cpp,function,
 ,PathResultsClear,src/harness/path_results.cpp,field_write,PathResults::count
 ,PathResultsClear,src/harness/path_results.cpp,function,
-,PathResultsHash,src/harness/path_results.cpp,call,HashByte
-,PathResultsHash,src/harness/path_results.cpp,call,HashRun
-,PathResultsHash,src/harness/path_results.cpp,call,HashU32
-,PathResultsHash,src/harness/path_results.cpp,deref_escape,*PathResult
-,PathResultsHash,src/harness/path_results.cpp,field_escape,PathResult::points
-,PathResultsHash,src/harness/path_results.cpp,field_read,PathResult::count
-,PathResultsHash,src/harness/path_results.cpp,field_read,PathResult::delivered
-,PathResultsHash,src/harness/path_results.cpp,field_read,PathResult::kind
-,PathResultsHash,src/harness/path_results.cpp,field_read,PathResult::status
-,PathResultsHash,src/harness/path_results.cpp,field_read,PathResult::tick
-,PathResultsHash,src/harness/path_results.cpp,field_read,PathResult::unitId
-,PathResultsHash,src/harness/path_results.cpp,field_read,PathResult::unitTag
-,PathResultsHash,src/harness/path_results.cpp,field_read,PathResults::count
-,PathResultsHash,src/harness/path_results.cpp,field_read,PathResults::items
-,PathResultsHash,src/harness/path_results.cpp,function,
 ,Pathfinder::AddEvent,src/ai/pathfind.cpp,call,Pathfinder::Extra
 ,Pathfinder::AddEvent,src/ai/pathfind.cpp,field_escape,PathEventRecord::event
 ,Pathfinder::AddEvent,src/ai/pathfind.cpp,field_read,PathExtra::eventCapacity
@@ -52372,6 +52348,18 @@ address,function,file,kind,target
 ,Player_Get,src/map/radar_capture.cpp,field_escape,Game::players_1b63_14b
 ,Player_Get,src/map/radar_capture.cpp,function,
 ,Player_Get,src/map/radar_capture.cpp,global_read,g_game
+,PlayersOnEconomyShare,src/game/players.cpp,field_read,EconomyEvent::energy
+,PlayersOnEconomyShare,src/game/players.cpp,field_read,EconomyEvent::metal
+,PlayersOnEconomyShare,src/game/players.cpp,field_read,EconomyEvent::player
+,PlayersOnEconomyShare,src/game/players.cpp,field_read,EconomyEvent::resources
+,PlayersOnEconomyShare,src/game/players.cpp,field_read,EconomyEvent::value
+,PlayersOnEconomyShare,src/game/players.cpp,field_read,PlayersSeam::TransferEnergy
+,PlayersOnEconomyShare,src/game/players.cpp,field_read,PlayersSeam::TransferMetal
+,PlayersOnEconomyShare,src/game/players.cpp,field_read,Seams::players
+,PlayersOnEconomyShare,src/game/players.cpp,function,
+,PlayersOnEconomyShare,src/game/players.cpp,global_read,g_seams
+,PlayersOnEconomyShare,src/game/players.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float, int) __attribute__((stdcall)) [PlayersSeam::TransferEnergy]"
+,PlayersOnEconomyShare,src/game/players.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float, int) __attribute__((stdcall)) [PlayersSeam::TransferMetal]"
 ,Point16::operator!=,src/util/vec3.h,field_read,Point16::x
 ,Point16::operator!=,src/util/vec3.h,field_read,Point16::y
 ,Point16::operator!=,src/util/vec3.h,function,
@@ -53407,6 +53395,16 @@ address,function,file,kind,target
 ,RecEconomyShutdown,src/harness/replay_hooks.inc,function,
 ,RecEconomyShutdown,src/harness/replay_hooks.inc,global_read,s_inner_economy
 ,RecEconomyShutdown,src/harness/replay_hooks.inc,indirect_call,indirect via void *(*const)() __attribute__((stdcall)) [EconomySeam::Shutdown]
+,RecEconomySpend,src/harness/replay_hooks.inc,call,ArgPending
+,RecEconomySpend,src/harness/replay_hooks.inc,call,ArgValue
+,RecEconomySpend,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecEconomySpend,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecEconomySpend,src/harness/replay_hooks.inc,field_read,EconomySeam::Spend
+,RecEconomySpend,src/harness/replay_hooks.inc,function,
+,RecEconomySpend,src/harness/replay_hooks.inc,global_read,s_call
+,RecEconomySpend,src/harness/replay_hooks.inc,global_read,s_inner_economy
+,RecEconomySpend,src/harness/replay_hooks.inc,global_read,s_tail
+,RecEconomySpend,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(const EconomyEvent *) __attribute__((stdcall)) [EconomySeam::Spend]
 ,RecEconomyUnitAccount,src/harness/replay_hooks.inc,call,ArgPending
 ,RecEconomyUnitAccount,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecEconomyUnitAccount,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -58263,31 +58261,32 @@ address,function,file,kind,target
 ,ScenarioTable,src/harness/harness.cpp,field_read,Game::options
 ,ScenarioTable,src/harness/harness.cpp,function,
 ,ScenarioTable,src/harness/harness.cpp,global_read,g_game
-,SchedEconomyEffect,src/game/scheduler.cpp,call,HarnessEconomyEvent
-,SchedEconomyEffect,src/game/scheduler.cpp,call,UnitOfHandle
-,SchedEconomyEffect,src/game/scheduler.cpp,call,get
-,SchedEconomyEffect,src/game/scheduler.cpp,call,operator!=
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,EconomyEvent::energy
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,EconomyEvent::kind
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,EconomyEvent::metal
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,EconomyEvent::player
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,EconomyEvent::resources
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,EconomyEvent::unit
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,EconomyEvent::value
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,PlayersSeam::TransferEnergy
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,PlayersSeam::TransferMetal
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,Seams::players
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,Seams::units
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,Unit::script
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,UnitsSeam::SetStateBits
-,SchedEconomyEffect,src/game/scheduler.cpp,field_read,UnitsSeam::StartScriptWithArgs
-,SchedEconomyEffect,src/game/scheduler.cpp,function,
-,SchedEconomyEffect,src/game/scheduler.cpp,global_read,g_seams
-,SchedEconomyEffect,src/game/scheduler.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
-,SchedEconomyEffect,src/game/scheduler.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
-,SchedEconomyEffect,src/game/scheduler.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float, int) __attribute__((stdcall)) [PlayersSeam::TransferEnergy]"
-,SchedEconomyEffect,src/game/scheduler.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float, int) __attribute__((stdcall)) [PlayersSeam::TransferMetal]"
+,SchedBeginTick,src/game/scheduler.cpp,function,
+,SchedBeginTick,src/game/scheduler.cpp,global_write,s_inTick
+,SchedDeliver,src/game/scheduler.cpp,field_escape,InboxEntry::words
+,SchedDeliver,src/game/scheduler.cpp,field_read,Inbox::entries
+,SchedDeliver,src/game/scheduler.cpp,field_read,Inbox::head
+,SchedDeliver,src/game/scheduler.cpp,field_read,Inbox::tail
+,SchedDeliver,src/game/scheduler.cpp,field_read,InboxEntry::handler
+,SchedDeliver,src/game/scheduler.cpp,field_write,Inbox::head
+,SchedDeliver,src/game/scheduler.cpp,function,
+,SchedDeliver,src/game/scheduler.cpp,global_escape,s_inboxes
+,SchedDeliver,src/game/scheduler.cpp,global_read,kInboxCapacity
+,SchedDeliver,src/game/scheduler.cpp,indirect_call,indirect via void (*)(const void *) __attribute__((stdcall)) [InboxEntry::handler]
+,SchedEndTick,src/game/scheduler.cpp,call,FatalError
+,SchedEndTick,src/game/scheduler.cpp,call,SchedPending
+,SchedEndTick,src/game/scheduler.cpp,call,SchedPhaseBoundary
+,SchedEndTick,src/game/scheduler.cpp,function,
+,SchedEndTick,src/game/scheduler.cpp,global_write,s_inTick
+,SchedPending,src/game/scheduler.cpp,field_read,Inbox::head
+,SchedPending,src/game/scheduler.cpp,field_read,Inbox::tail
+,SchedPending,src/game/scheduler.cpp,function,
+,SchedPending,src/game/scheduler.cpp,global_read,s_inboxes
+,SchedPhaseBoundary,src/game/scheduler.cpp,call,SchedDeliver
+,SchedPhaseBoundary,src/game/scheduler.cpp,call,SchedPending
+,SchedPhaseBoundary,src/game/scheduler.cpp,function,
 ,SchedPlayersPhase,src/game/scheduler.cpp,call,HarnessPathEvent
+,SchedPlayersPhase,src/game/scheduler.cpp,call,SchedDeliver
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,EconomySeam::UpdatePlayerEconomy
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,OrdersSeam::ApplyPathEvent
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,PathfindingSeam::Poll
@@ -58308,6 +58307,33 @@ address,function,file,kind,target
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,"indirect via void (*)(const PathEvent *, const PathPoint *) __attribute__((stdcall)) [OrdersSeam::ApplyPathEvent]"
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [EconomySeam::UpdatePlayerEconomy]
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [PlayersSeam::UpdatePlayerTail]
+,SchedPublish,src/game/scheduler.cpp,call,FatalError
+,SchedPublish,src/game/scheduler.cpp,call,ReplayImport::Int
+,SchedPublish,src/game/scheduler.cpp,call,ReplayImport::Ptr
+,SchedPublish,src/game/scheduler.cpp,call,ReplayImport::~ReplayImport
+,SchedPublish,src/game/scheduler.cpp,call,SchedDeliver
+,SchedPublish,src/game/scheduler.cpp,call,memcpy
+,SchedPublish,src/game/scheduler.cpp,call,memset
+,SchedPublish,src/game/scheduler.cpp,deref_read,*int
+,SchedPublish,src/game/scheduler.cpp,field_escape,Inbox::entries
+,SchedPublish,src/game/scheduler.cpp,field_escape,InboxEntry::words
+,SchedPublish,src/game/scheduler.cpp,field_read,Inbox::head
+,SchedPublish,src/game/scheduler.cpp,field_read,Inbox::tail
+,SchedPublish,src/game/scheduler.cpp,field_read,SchedRoute::handler
+,SchedPublish,src/game/scheduler.cpp,field_read,SchedRoute::kind
+,SchedPublish,src/game/scheduler.cpp,field_read,SchedRoute::outbox
+,SchedPublish,src/game/scheduler.cpp,field_read,SchedRoute::subscriber
+,SchedPublish,src/game/scheduler.cpp,field_read,SchedRoute::synchronous
+,SchedPublish,src/game/scheduler.cpp,field_write,Inbox::tail
+,SchedPublish,src/game/scheduler.cpp,field_write,InboxEntry::handler
+,SchedPublish,src/game/scheduler.cpp,function,
+,SchedPublish,src/game/scheduler.cpp,global_escape,g_schedRoutes
+,SchedPublish,src/game/scheduler.cpp,global_escape,s_inboxes
+,SchedPublish,src/game/scheduler.cpp,global_read,g_schedRouteCount
+,SchedPublish,src/game/scheduler.cpp,global_read,kInboxCapacity
+,SchedPublish,src/game/scheduler.cpp,global_read,s_inTick
+,SchedPublish,src/game/scheduler.cpp,indirect_call,indirect via void (*const)(const void *) __attribute__((stdcall)) [SchedRoute::handler]
+,SchedUnitsPhase,src/game/scheduler.cpp,call,SchedDeliver
 ,SchedUnitsPhase,src/game/scheduler.cpp,call,operator Unit *
 ,SchedUnitsPhase,src/game/scheduler.cpp,field_escape,Game::players
 ,SchedUnitsPhase,src/game/scheduler.cpp,field_read,Game::netGameFlags
@@ -58329,22 +58355,33 @@ address,function,file,kind,target
 ,SchedUnitsPhase,src/game/scheduler.cpp,global_read,g_seams
 ,SchedUnitsPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [NetworkSeam::SendUnitStates]
 ,SchedUnitsPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [UnitsSeam::UpdateUnit]
-,ScheduleEconomyEvent,src/game/scheduler.cpp,call,HarnessEconomyEvent
-,ScheduleEconomyEvent,src/game/scheduler.cpp,call,ReplayImport::Ptr
-,ScheduleEconomyEvent,src/game/scheduler.cpp,call,ReplayImport::Result
-,ScheduleEconomyEvent,src/game/scheduler.cpp,call,ReplayImport::~ReplayImport
-,ScheduleEconomyEvent,src/game/scheduler.cpp,field_read,EconomySeam::Apply
-,ScheduleEconomyEvent,src/game/scheduler.cpp,field_read,Seams::economy
-,ScheduleEconomyEvent,src/game/scheduler.cpp,function,
-,ScheduleEconomyEvent,src/game/scheduler.cpp,global_read,g_seams
-,ScheduleEconomyEvent,src/game/scheduler.cpp,indirect_call,indirect via int (*)(const EconomyEvent *) __attribute__((stdcall)) [EconomySeam::Apply]
-,ScheduleMetalExtraction,src/game/scheduler.cpp,call,ReplayImport::Int
-,ScheduleMetalExtraction,src/game/scheduler.cpp,call,ReplayImport::~ReplayImport
-,ScheduleMetalExtraction,src/game/scheduler.cpp,field_read,EconomySeam::UpdateMetalExtraction
-,ScheduleMetalExtraction,src/game/scheduler.cpp,field_read,Seams::economy
-,ScheduleMetalExtraction,src/game/scheduler.cpp,function,
-,ScheduleMetalExtraction,src/game/scheduler.cpp,global_read,g_seams
-,ScheduleMetalExtraction,src/game/scheduler.cpp,indirect_call,indirect via void (*)(EconUnit) __attribute__((stdcall)) [EconomySeam::UpdateMetalExtraction]
+,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::Int
+,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::Result
+,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::~ReplayImport
+,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,SchedDeliver
+,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,field_read,EconomySeam::RequestGranted
+,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,field_read,Seams::economy
+,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,function,
+,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,global_read,g_seams
+,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,indirect_call,"indirect via int (*)(EconUnit, unsigned int) __attribute__((stdcall)) [EconomySeam::RequestGranted]"
+,ScheduleEconomySpend,src/seams/economy_world.cpp,call,HarnessEconomyEvent
+,ScheduleEconomySpend,src/seams/economy_world.cpp,call,ReplayImport::Ptr
+,ScheduleEconomySpend,src/seams/economy_world.cpp,call,ReplayImport::Result
+,ScheduleEconomySpend,src/seams/economy_world.cpp,call,ReplayImport::~ReplayImport
+,ScheduleEconomySpend,src/seams/economy_world.cpp,call,SchedDeliver
+,ScheduleEconomySpend,src/seams/economy_world.cpp,field_read,EconomySeam::Spend
+,ScheduleEconomySpend,src/seams/economy_world.cpp,field_read,Seams::economy
+,ScheduleEconomySpend,src/seams/economy_world.cpp,function,
+,ScheduleEconomySpend,src/seams/economy_world.cpp,global_read,g_seams
+,ScheduleEconomySpend,src/seams/economy_world.cpp,indirect_call,indirect via int (*)(const EconomyEvent *) __attribute__((stdcall)) [EconomySeam::Spend]
+,ScheduleMetalExtraction,src/seams/economy_world.cpp,call,ReplayImport::Int
+,ScheduleMetalExtraction,src/seams/economy_world.cpp,call,ReplayImport::~ReplayImport
+,ScheduleMetalExtraction,src/seams/economy_world.cpp,call,SchedDeliver
+,ScheduleMetalExtraction,src/seams/economy_world.cpp,field_read,EconomySeam::UpdateMetalExtraction
+,ScheduleMetalExtraction,src/seams/economy_world.cpp,field_read,Seams::economy
+,ScheduleMetalExtraction,src/seams/economy_world.cpp,function,
+,ScheduleMetalExtraction,src/seams/economy_world.cpp,global_read,g_seams
+,ScheduleMetalExtraction,src/seams/economy_world.cpp,indirect_call,indirect via void (*)(EconUnit) __attribute__((stdcall)) [EconomySeam::UpdateMetalExtraction]
 ,ScreenX,src/ingame/markers.cpp,field_read,View::scroll_x
 ,ScreenX,src/ingame/markers.cpp,function,
 ,ScreenY,src/ingame/markers.cpp,field_read,View::scroll_y
@@ -60006,9 +60043,9 @@ address,function,file,kind,target
 ,UnitOfHandle,src/game/economy.cpp,call,get
 ,UnitOfHandle,src/game/economy.cpp,field_write,Ref<Unit>::offset
 ,UnitOfHandle,src/game/economy.cpp,function,
-,UnitOfHandle,src/game/scheduler.cpp,call,get
-,UnitOfHandle,src/game/scheduler.cpp,field_write,Ref<Unit>::offset
-,UnitOfHandle,src/game/scheduler.cpp,function,
+,UnitOfHandle,src/units/economy_effects.cpp,call,get
+,UnitOfHandle,src/units/economy_effects.cpp,field_write,Ref<Unit>::offset
+,UnitOfHandle,src/units/economy_effects.cpp,function,
 ,UnitRef::Get,src/units/unit_ref.h,call,operator Unit *
 ,UnitRef::Get,src/units/unit_ref.h,field_read,UnitRef::owner
 ,UnitRef::Get,src/units/unit_ref.h,function,
@@ -60082,6 +60119,25 @@ address,function,file,kind,target
 ,UnitTypeSet::UnitTypeSet,src/units/unit_type_set.h,function,
 ,UnitTypeSetAddTypeOrCategoryNative,src/seams/native.cpp,call,UnitTypeSet::AddTypeOrCategory
 ,UnitTypeSetAddTypeOrCategoryNative,src/seams/native.cpp,function,
+,UnitsOnEconomyCloak,src/units/economy_effects.cpp,call,UnitOfHandle
+,UnitsOnEconomyCloak,src/units/economy_effects.cpp,field_read,EconomyEvent::unit
+,UnitsOnEconomyCloak,src/units/economy_effects.cpp,field_read,EconomyEvent::value
+,UnitsOnEconomyCloak,src/units/economy_effects.cpp,field_read,Seams::units
+,UnitsOnEconomyCloak,src/units/economy_effects.cpp,field_read,UnitsSeam::SetStateBits
+,UnitsOnEconomyCloak,src/units/economy_effects.cpp,function,
+,UnitsOnEconomyCloak,src/units/economy_effects.cpp,global_read,g_seams
+,UnitsOnEconomyCloak,src/units/economy_effects.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,call,UnitOfHandle
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,call,get
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,call,operator!=
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,field_read,EconomyEvent::unit
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,field_read,EconomyEvent::value
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,field_read,Seams::units
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,field_read,Unit::script
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,field_read,UnitsSeam::StartScriptWithArgs
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,function,
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,global_read,g_seams
+,UnitsOnEconomyExtractor,src/units/economy_effects.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
 ,UnlinkBucketUnit,src/map/terrain.cpp,call,operator!=
 ,UnlinkBucketUnit,src/map/terrain.cpp,call,operator->
 ,UnlinkBucketUnit,src/map/terrain.cpp,call,operator=
@@ -60577,7 +60633,6 @@ address,function,file,kind,target
 ,VisitDeferred,src/harness/replay_objects.cpp,global_escape,kReplayReachFields@src/harness/replay_schema.h
 ,VisitDeferred,src/harness/replay_objects.cpp,global_read,kReplayObjectFields@src/harness/replay_schema.h
 ,VisitEconomyResults,src/harness/harness.cpp,call,DumpPrefix
-,VisitEconomyResults,src/harness/harness.cpp,call,EconomyResultsHash
 ,VisitEconomyResults,src/harness/harness.cpp,call,Fail
 ,VisitEconomyResults,src/harness/harness.cpp,call,Resolve
 ,VisitEconomyResults,src/harness/harness.cpp,call,SimBlockBase
@@ -60609,9 +60664,7 @@ address,function,file,kind,target
 ,VisitEconomyResults,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitEconomyResults,src/harness/harness.cpp,global_read,s_economyResults@src/harness/harness.cpp
 ,VisitEconomyResults,src/harness/harness.cpp,global_read,s_economyResultsLost@src/harness/harness.cpp
-,VisitEconomyResults,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
 ,VisitEconomyResults,src/harness/harness.cpp,global_read,s_targetNames@src/harness/harness.cpp
-,VisitEconomyResults,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
 ,VisitElement,src/harness/harness.cpp,call,DumpFields
 ,VisitElement,src/harness/harness.cpp,call,HashPlan
 ,VisitElement,src/harness/harness.cpp,field_read,TraceTable::fieldCount
@@ -60876,7 +60929,6 @@ address,function,file,kind,target
 ,VisitPassMaps,src/harness/harness.cpp,global_write,s_passRow@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,call,DumpPrefix
 ,VisitPathResults,src/harness/harness.cpp,call,Fail
-,VisitPathResults,src/harness/harness.cpp,call,PathResultsHash
 ,VisitPathResults,src/harness/harness.cpp,call,Resolve
 ,VisitPathResults,src/harness/harness.cpp,call,SimBlockBase
 ,VisitPathResults,src/harness/harness.cpp,call,fprintf
@@ -60902,11 +60954,9 @@ address,function,file,kind,target
 ,VisitPathResults,src/harness/harness.cpp,global_read,kNames@VisitPathResults
 ,VisitPathResults,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
-,VisitPathResults,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,global_read,s_pathResults@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,global_read,s_pathResultsLost@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,global_read,s_targetNames@src/harness/harness.cpp
-,VisitPathResults,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
 ,VisitPlayerAI,src/harness/harness.cpp,call,EndSection
 ,VisitPlayerAI,src/harness/harness.cpp,call,FormatPath
 ,VisitPlayerAI,src/harness/harness.cpp,call,HashByte
@@ -61420,7 +61470,8 @@ address,function,file,kind,target
 ,WorldDifficulty,src/seams/economy_world.cpp,field_read,Game::difficulty
 ,WorldDifficulty,src/seams/economy_world.cpp,function,
 ,WorldDifficulty,src/seams/economy_world.cpp,global_read,g_game
-,WorldEmit,src/seams/economy_world.cpp,call,SchedEconomyEffect
+,WorldEmit,src/seams/economy_world.cpp,call,HarnessEconomyEvent
+,WorldEmit,src/seams/economy_world.cpp,call,SchedPublish
 ,WorldEmit,src/seams/economy_world.cpp,function,
 ,WorldEndSearch,src/seams/pathfinding_world.cpp,call,UnitOf
 ,WorldEndSearch,src/seams/pathfinding_world.cpp,call,get

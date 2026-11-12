@@ -880,7 +880,6 @@ address,function,file
 0x48b090,Unit::SetStateBits,src/units/unit.cpp
 0x48b200,WriteUnitState,src/units/unit_position.cpp
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp
-0x48b710,SendUnitStates,src/units/unit_position.cpp
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp
 0x48bae0,CollectVisibleUnitIds,src/ingame/selection.cpp
 0x48bcb0,IsUnitVisible,src/ingame/selection.cpp

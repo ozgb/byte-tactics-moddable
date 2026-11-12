@@ -1247,6 +1247,11 @@ economy,orders,pad_1df4,units,immediate,6,trio-etorrep-glacier@2342,
 economy,orders,unknown_1b8e,players,immediate,1,long-great-divide-2p@27300,
 economy,orders,unknown_1b8e,units,immediate,14,mission-build-unit@39,
 economy,orders,unknown_1cd9,units,immediate,7,mission-build-unit@44,
+economy,players,EconomyEvent::energy,-,unobserved,0,,
+economy,players,EconomyEvent::metal,-,unobserved,0,,
+economy,players,EconomyEvent::player,-,unobserved,0,,
+economy,players,EconomyEvent::resources,-,unobserved,0,,
+economy,players,EconomyEvent::value,-,unobserved,0,,
 economy,players,Player::energy,-,unobserved,0,,
 economy,players,Player::energyCapacity,-,unobserved,0,,
 economy,players,Player::energyIncome,-,unobserved,0,,
@@ -1273,11 +1278,14 @@ economy,targeting,pad_1df4,units,immediate,3,eight-pincushion-teams@11325,dynami
 economy,targeting,unknown_1b8e,players,immediate,44,mission-capture@30,dynamic-only
 economy,targeting,unknown_1b8e,units,immediate,9,edges-economy-targeting@42,dynamic-only
 economy,targeting,unknown_1cd9,units,immediate,4,edges-targeting-lead@486,dynamic-only
-economy,units,pad_1df4,players,immediate,2,ten-ring-atoll@6540,dynamic-only
-economy,units,pad_1df4,units,immediate,6,trio-etorrep-glacier@2342,dynamic-only
-economy,units,unknown_1b8e,players,immediate,8,edges-economy-targeting@30,dynamic-only
-economy,units,unknown_1b8e,units,immediate,17,orders-tier2-spider@27,dynamic-only
-economy,units,unknown_1cd9,units,immediate,16,orders-air-repair@41,dynamic-only
+economy,units,EconomyEvent::unit,-,unobserved,0,,
+economy,units,EconomyEvent::value,-,unobserved,0,,
+economy,units,Ref<Unit>::offset,-,unobserved,0,,
+economy,units,pad_1df4,players,immediate,2,ten-ring-atoll@6540,
+economy,units,pad_1df4,units,immediate,6,trio-etorrep-glacier@2342,
+economy,units,unknown_1b8e,players,immediate,8,edges-economy-targeting@30,
+economy,units,unknown_1b8e,units,immediate,17,orders-tier2-spider@27,
+economy,units,unknown_1cd9,units,immediate,16,orders-air-repair@41,
 economy,weapons,Player::energy,-,unobserved,0,,
 economy,weapons,Player::metal,-,unobserved,0,,
 economy,weapons,pad_1df4,units,immediate,3,eight-full-moon@8021,
@@ -2167,6 +2175,7 @@ units,ai,unknown_1b8e,units,immediate,18,mission-build-unit@1,
 units,ai,unknown_1cd9,units,immediate,10,mission-build-unit@71,
 units,economy,EconomyRequestGranted,-,unobserved,0,,indirect
 units,economy,EconomyUnitAccount,-,unobserved,0,,indirect
+units,economy,Ref<Unit>::offset,-,unobserved,0,,
 units,economy,Unit::extraction,-,unobserved,0,,
 units,economy,pad_1df4,units,immediate,3,eight-full-moon@8021,
 units,economy,unknown_1b8e,units,immediate,1,skirmish4-long@24661,
@@ -2305,6 +2314,7 @@ units,orders,PathOrderAttach::next,-,unobserved,0,,
 units,orders,PathOrderAttach::owner,-,unobserved,0,,
 units,orders,Point16::x,-,unobserved,0,,
 units,orders,Point16::y,-,unobserved,0,,
+units,orders,Ref<Unit>::offset,-,unobserved,0,,
 units,orders,RunOrders,-,unobserved,0,,indirect
 units,orders,RunSecondaryOrders,-,unobserved,0,,indirect
 units,orders,Unit::activateFlags,-,unobserved,0,,

@@ -1241,7 +1241,6 @@ players,DefeatUnitTypeKilled::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadSt
 players,DefeatUnitTypeKilled::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@DefeatUnitTypeKilled@@UAEXPAVHapiBank@@@Z,0,save-load
 players,FillScoreTables,src/game/statistics.cpp,1,0,0,0,0,0,?FillScoreTables@@YGHXZ,0,network
 players,FreePlayers,src/game/players.cpp,1,0,0,0,0,0,?FreePlayers@@YGXXZ,0,shutdown
-players,HasMorePlayerSlots,src/game/players.cpp,0,0,0,0,0,0,?HasMorePlayerSlots@@YGHE@Z,1,
 players,IsLocalPlayerEliminated,src/game/victory.cpp,0,0,0,0,0,0,?IsLocalPlayerEliminated@@YGHXZ,1,
 players,IsLocalPlayerOutOfUnits,src/game/victory.cpp,0,0,0,0,0,0,?IsLocalPlayerOutOfUnits@@YGHXZ,1,
 players,IsReporterDllLoaded,src/game/statistics.cpp,1,0,0,0,0,0,?IsReporterDllLoaded@@YG_NXZ,0,network
@@ -2357,7 +2356,6 @@ units,PointerSpanBytes,src/units/unit_commands.cpp,0,0,0,0,0,0,?PointerSpanBytes
 units,QuickSort,src/units/unit_commands.cpp,0,0,0,0,0,0,?QuickSort@@YGXPAPAUPlayer@@0P6GHPAU1@1@ZH@Z,1,
 units,ReadUnitState,src/units/unit_position.cpp,1,0,0,0,0,0,?ReadUnitState@@YGXPAVBitReader@@PAUUnit@@@Z,0,network
 units,ReceiveUnitStates,src/units/unit_position.cpp,1,0,0,0,0,0,?ReceiveUnitStates@@YGXPAUPlayer@@PAI@Z,0,network
-units,SendUnitStates,src/units/unit_position.cpp,0,0,0,0,0,0,?SendUnitStates@@YGXPAUPlayer@@@Z,1,
 units,SnapUnitToGround,src/units/unit_position.cpp,0,0,0,0,0,0,?SnapUnitToGround@@YGXPAUUnit@@@Z,1,
 units,StepPointTowards,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?StepPointTowards@@YG?AUPoint16@@U1@0F@Z,1,
 units,StepTowards,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?StepTowards@@YGHHHH@Z,1,

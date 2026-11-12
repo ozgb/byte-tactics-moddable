@@ -174,7 +174,7 @@ static void LoadUnitAccounts(Unit* info, HapiBank* file)
         file->SeekBox(0);
         file->ReadBox(&account.energy, 0x18);
         file->ReadBox(&account.metal, 0x18);
-        EconEmit(ECONOMY_LOAD, info->playerIndex, EconHandleOf(info), 0, 0, 0, &account);
+        EconPublishLoad(SCHED_UNITS, info->playerIndex, EconHandleOf(info), account);
     }
 }
 

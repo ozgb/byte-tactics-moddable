@@ -1610,7 +1610,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
             int m = (attached->flags.b.commandFire) ? 0x800 : 0x400;
             *(unsigned short*)&unit->netDirtyFlags |= m;
             if (!attached->flags.b.stockpile)
-                EconEmit(ECONOMY_SPEND, unit->playerIndex, EconHandleOf(unit), ECON_ENERGY | ECON_METAL, attached->energyPerShot, attached->metalPerShot);
+                EconSpend(unit->playerIndex, EconHandleOf(unit), ECON_ENERGY | ECON_METAL, attached->energyPerShot, attached->metalPerShot);
         } else {
             ((unsigned char*)&unit->netDirtyFlags)[1] |= 0x10;
         }

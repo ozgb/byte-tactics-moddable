@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <string.h>
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/services.h"
@@ -6,7 +7,6 @@
 #include "../network/player.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/rand_stream.h"
-#include "../units/cob_script.h"
 #include "../units/unit.h"
 #include "game.h"
 #include "scheduler.h"
@@ -19,49 +19,92 @@
 #include "../../lib/accesslog/access_log.h"
 #endif
 
-static Unit* UnitOfHandle(EconUnit handle)
-{
-    Ref<Unit> ref;
-    ref.offset = handle;
-    return ref.get();
+namespace {
+
+const unsigned int kEventWords = 20;
+const unsigned int kInboxCapacity = 1024;
+
+struct InboxEntry {
+    SchedHandler handler;
+    unsigned int words[kEventWords];
+};
+
+struct Inbox {
+    InboxEntry entries[kInboxCapacity];
+    unsigned int head;
+    unsigned int tail;
+};
+
+Inbox s_inboxes[SCHED_MODULE_COUNT];
+int s_inTick;
+
 }
 
-int __stdcall ScheduleEconomyEvent(const EconomyEvent* event)
+void __stdcall SchedDeliver(int module)
 {
-    ReplayImport call(RI_SCHEDULE_ECONOMY_EVENT);
+    Inbox* inbox = &s_inboxes[module];
+    while (inbox->head != inbox->tail) {
+        InboxEntry entry = inbox->entries[inbox->head % kInboxCapacity];
+        inbox->head++;
+        entry.handler(entry.words);
+    }
+}
+
+void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
+{
+    ReplayImport call(RI_SCHED_PUBLISH);
+    call.Int(outbox);
     call.Ptr(event);
-    int outcome = g_seams.economy->Apply(event);
-    HarnessEconomyEvent(event, outcome);
-    return call.Result(outcome);
-}
-
-void SchedEconomyEffect(const EconomyEvent* effect)
-{
-    HarnessEconomyEvent(effect, 1);
-    switch (effect->kind) {
-    case ECONOMY_EFFECT_CLOAK:
-        g_seams.units->SetStateBits(UnitOfHandle(effect->unit), 4, effect->value);
-        break;
-    case ECONOMY_EFFECT_EXTRACTOR: {
-        Unit* unit = UnitOfHandle(effect->unit);
-        if (unit->script != nullptr)
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", nullptr, 0, 1, effect->value, 0, 0, 0);
-        break;
-    }
-    case ECONOMY_EFFECT_SHARE:
-        if (effect->resources & ECON_METAL)
-            g_seams.players->TransferEnergy((unsigned char)effect->player, (unsigned char)effect->value, effect->metal, 1);
-        else
-            g_seams.players->TransferMetal((unsigned char)effect->player, (unsigned char)effect->value, effect->energy, 1);
-        break;
+    call.Int((int)size);
+    if (size > sizeof(InboxEntry::words))
+        FatalError((char*)"an event is larger than an inbox entry");
+    int kind = *static_cast<const int*>(event);
+    for (int i = 0; i < g_schedRouteCount; i++) {
+        const SchedRoute* route = &g_schedRoutes[i];
+        if (route->outbox != outbox || route->kind != kind)
+            continue;
+        if (route->synchronous || !s_inTick) {
+            SchedDeliver(route->subscriber);
+            route->handler(event);
+            continue;
+        }
+        Inbox* inbox = &s_inboxes[route->subscriber];
+        if (inbox->tail - inbox->head == kInboxCapacity)
+            SchedDeliver(route->subscriber);
+        InboxEntry* entry = &inbox->entries[inbox->tail % kInboxCapacity];
+        entry->handler = route->handler;
+        memset(entry->words, 0, sizeof(entry->words));
+        memcpy(entry->words, event, size);
+        inbox->tail++;
     }
 }
 
-void __stdcall ScheduleMetalExtraction(unsigned int unit)
+static int SchedPending()
 {
-    ReplayImport call(RI_SCHEDULE_METAL_EXTRACTION);
-    call.Int((int)unit);
-    g_seams.economy->UpdateMetalExtraction(unit);
+    for (int module = 0; module < SCHED_MODULE_COUNT; module++)
+        if (s_inboxes[module].head != s_inboxes[module].tail)
+            return 1;
+    return 0;
+}
+
+void SchedBeginTick()
+{
+    s_inTick = 1;
+}
+
+void SchedPhaseBoundary()
+{
+    while (SchedPending())
+        for (int module = 0; module < SCHED_MODULE_COUNT; module++)
+            SchedDeliver(module);
+}
+
+void SchedEndTick()
+{
+    SchedPhaseBoundary();
+    if (SchedPending())
+        FatalError((char*)"an inbox holds an event at the tick boundary");
+    s_inTick = 0;
 }
 
 void SchedUnitsPhase()
@@ -94,6 +137,7 @@ void SchedUnitsPhase()
 #if BT_ACCESS_LOG
                         AccessLogEntity();
 #endif
+                        SchedDeliver(SCHED_UNITS);
                         g_seams.units->UpdateUnit(u);
                     }
                     u = (Unit*)((char*)u + 0x118);
@@ -127,12 +171,17 @@ void SchedPlayersPhase(RandStream stream)
         g_seams.orders->ApplyPathEvent(&event, waypoints);
     }
     for (int player = 0; player < 10; player++) {
+        SchedDeliver(SCHED_PLAYERS);
         int step = g_seams.players->UpdatePlayerHead(player, stream);
         if (step == 0)
             continue;
-        if (step == 2)
+        if (step == 2) {
+            SchedDeliver(SCHED_ECONOMY);
             g_seams.economy->UpdatePlayerEconomy(player);
+        }
+        SchedDeliver(SCHED_PLAYERS);
         g_seams.players->UpdatePlayerTail(player);
     }
+    SchedDeliver(SCHED_PLAYERS);
     g_seams.players->UpdatePlayersFinish();
 }

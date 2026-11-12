@@ -9,6 +9,9 @@
 #include "../map/cell.h"
 #include "../units/unit_def.h"
 #include "../units/unit.h"
+#include "../../interfaces/services.h"
+#include "../harness/replay.h"
+#include "../harness/replay_services.h"
 #include "../game/scheduler.h"
 #include "economy_world.h"
 
@@ -131,7 +134,8 @@ static int __stdcall WorldCellMetal(int x, int y)
 
 static void __stdcall WorldEmit(const EconomyEvent* effect)
 {
-    SchedEconomyEffect(effect);
+    HarnessEconomyEvent(effect, 1);
+    SchedPublish(SCHED_ECONOMY, effect, sizeof(*effect));
 }
 
 static EconomyWorldView s_world = {
@@ -143,4 +147,37 @@ static EconomyWorldView s_world = {
 const EconomyWorldView* __stdcall NativeEconomyWorld()
 {
     return &s_world;
+}
+
+void EconomyInbox(const void* event)
+{
+    const EconomyEvent* e = static_cast<const EconomyEvent*>(event);
+    HarnessEconomyEvent(e, g_seams.economy->Apply(e));
+}
+
+int __stdcall ScheduleEconomySpend(const EconomyEvent* spend)
+{
+    ReplayImport call(RI_SCHEDULE_ECONOMY_SPEND);
+    call.Ptr(spend);
+    SchedDeliver(SCHED_ECONOMY);
+    int outcome = g_seams.economy->Spend(spend);
+    HarnessEconomyEvent(spend, outcome);
+    return call.Result(outcome);
+}
+
+int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources)
+{
+    ReplayImport call(RI_SCHEDULE_ECONOMY_REQUEST_GRANTED);
+    call.Int((int)unit);
+    call.Int((int)resources);
+    SchedDeliver(SCHED_ECONOMY);
+    return call.Result(g_seams.economy->RequestGranted(unit, resources));
+}
+
+void __stdcall ScheduleMetalExtraction(unsigned int unit)
+{
+    ReplayImport call(RI_SCHEDULE_METAL_EXTRACTION);
+    call.Int((int)unit);
+    SchedDeliver(SCHED_ECONOMY);
+    g_seams.economy->UpdateMetalExtraction(unit);
 }

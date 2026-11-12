@@ -199,7 +199,7 @@ guard:
     if (!p->econ) {
         p->econ = new (kSim) UnitResources;
     }
-    EconEmit(ECONOMY_RESET, (int)(p - g_game->players), 0, 0, 0, 0);
+    EconPublish(SCHED_PLAYERS, ECONOMY_RESET, (int)(p - g_game->players), 0, 0, 0, 0);
     p->flags &= 0xfffe;
     p->kills = 0;
     p->losses = 0;
@@ -360,8 +360,8 @@ void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount,
     if (amount == 0.0f)
         return;
     if (flag)
-        EconEmit(ECONOMY_SPEND, from, 0, ECON_ENERGY, amount, 0);
-    EconEmit(ECONOMY_INCOME, to, 0, ECON_ENERGY, amount, 0);
+        EconSpend(from, 0, ECON_ENERGY, amount, 0);
+    EconPublish(SCHED_PLAYERS, ECONOMY_INCOME, to, 0, ECON_ENERGY, amount, 0);
     if (flag)
         g_seams.network->SendShareMetal(from, to, amount);
 }
@@ -381,10 +381,19 @@ void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount
     if (amount == 0.0f)
         return;
     if (flag)
-        EconEmit(ECONOMY_SPEND, from, 0, ECON_METAL, 0, amount);
-    EconEmit(ECONOMY_INCOME, to, 0, ECON_METAL, 0, amount);
+        EconSpend(from, 0, ECON_METAL, 0, amount);
+    EconPublish(SCHED_PLAYERS, ECONOMY_INCOME, to, 0, ECON_METAL, 0, amount);
     if (flag)
         g_seams.network->SendShareEnergy(from, to, amount);
+}
+
+void PlayersOnEconomyShare(const void* event)
+{
+    const EconomyEvent* effect = static_cast<const EconomyEvent*>(event);
+    if (effect->resources & ECON_METAL)
+        g_seams.players->TransferEnergy((unsigned char)effect->player, (unsigned char)effect->value, effect->metal, 1);
+    else
+        g_seams.players->TransferMetal((unsigned char)effect->player, (unsigned char)effect->value, effect->energy, 1);
 }
 
 // FUNCTION: 0x464da0
@@ -615,11 +624,11 @@ int __stdcall UpdatePlayerHead(int player, RandStream stream)
                                          self->energy * 100);
                             {
                                 float f = (float)self->energy * kHundred;
-                                EconEmit(ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_ENERGY, f, 0);
+                                EconPublish(SCHED_PLAYERS, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_ENERGY, f, 0);
                             }
                             {
                                 float f = (float)self->metal * kHundred;
-                                EconEmit(ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, f);
+                                EconPublish(SCHED_PLAYERS, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, f);
                             }
                             g_seams.los_radar->RecalculateLineOfSight(1);
                             RecordFocusCommander(1);

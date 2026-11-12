@@ -373,6 +373,7 @@ struct EconomySeam {
     void (__stdcall* Init)(const EconMapInfo* map, const EconomyWorldView* world, void* region, unsigned int size);
     void* (__stdcall* Shutdown)(void);
     int (__stdcall* Apply)(const EconomyEvent* event);
+    int (__stdcall* Spend)(const EconomyEvent* spend);
     void (__stdcall* UpdatePlayerEconomy)(int player);
     void (__stdcall* UpdateMetalExtraction)(EconUnit unit);
     void (__stdcall* UpdateResourceSharing)(int player);
@@ -383,7 +384,7 @@ struct EconomySeam {
 };
 """
 FILLERS = {"RegionSize": "Size", "Init": "EconomyInit", "Shutdown": "EconomyShutdown", "Apply": "EconomyApply",
-           "UpdatePlayerEconomy": "EconomyUpdatePlayer", "UpdateMetalExtraction": "EconomyExtract",
+           "Spend": "EconomySpend",            "UpdatePlayerEconomy": "EconomyUpdatePlayer", "UpdateMetalExtraction": "EconomyExtract",
            "UpdateResourceSharing": "EconomyShare", "RequestGranted": "Gate", "GetEnergyUse": "Use", "UnitAccount": "Account",
            "WriteState": "Dump"}
 QUERY_FILLERS = ("Size", "Gate", "Use", "Account", "Dump")
@@ -399,6 +400,7 @@ class PilotSeamsTest(unittest.TestCase):
 Tick,src/game/scheduler.cpp,game,x,
 Hurt,src/units/units.cpp,units,x,
 Pay,src/orders/orders.cpp,orders,x,
+Fire,src/weapons/weapons.cpp,weapons,x,
 DrawPanel,src/ingame/info_panel.cpp,presentation,x,
 ShowDialog,src/ingame/game_dialogs.cpp,presentation,x,
 RunGameSteps,src/ingame/game_dialogs.cpp,game,x,
@@ -432,6 +434,8 @@ Help,src/game/economy.cpp,economy,x,
     def test_the_engine_may_call_writing_slots(self):
         rows = [("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("Apply")),
                 ("RecEconomyApply", "src/harness/replay_hooks.inc", "indirect_call", self.slot("Apply")),
+                ("EconomyInbox", "src/seams/economy_world.cpp", "indirect_call", self.slot("Apply")),
+                ("ScheduleEconomySpend", "src/seams/economy_world.cpp", "indirect_call", self.slot("Spend")),
                 ("LoadBattleAssets", "src/game/game_state.cpp", "indirect_call", self.slot("Init")),
                 ("ShutdownIngameSystems", "src/game/game_state.cpp", "indirect_call", self.slot("Shutdown")),
                 ("RunGameSteps", "src/ingame/game_dialogs.cpp", "indirect_call", self.slot("UpdateResourceSharing")),
@@ -441,8 +445,9 @@ Help,src/game/economy.cpp,economy,x,
 
     def test_another_subsystem_calling_a_writing_slot_is_found(self):
         found = self.check([("Hurt", "src/units/units.cpp", "indirect_call", self.slot("Apply")),
-                            ("Pay", "src/orders/orders.cpp", "indirect_call", self.slot("UpdatePlayerEconomy"))])
-        self.assertEqual([f[:3] for f in found], [("call", "orders", "Pay"), ("call", "units", "Hurt")])
+                            ("Pay", "src/orders/orders.cpp", "indirect_call", self.slot("UpdatePlayerEconomy")),
+                            ("Fire", "src/weapons/weapons.cpp", "indirect_call", self.slot("Spend"))])
+        self.assertEqual([f[:3] for f in found], [("call", "orders", "Pay"), ("call", "units", "Hurt"), ("call", "weapons", "Fire")])
 
     def test_a_presentation_or_unowned_caller_of_a_writing_slot_is_found(self):
         found = self.check([("DrawPanel", "src/ingame/info_panel.cpp", "indirect_call", self.slot("Apply")),

@@ -27,6 +27,5 @@ struct EconomyResults {
 
 int EconomyResultsAdd(EconomyResults* results, const EconomyEvent* event, int outcome);
 void EconomyResultsClear(EconomyResults* results);
-unsigned long long EconomyResultsHash(const EconomyResults* results, unsigned long long h);
 
 #endif

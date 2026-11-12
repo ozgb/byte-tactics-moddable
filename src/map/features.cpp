@@ -662,8 +662,8 @@ int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
         return 0;
     if ((cell->flags & 1) && (f->flags & 1))
         return 0;
-    EconEmit(ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_ENERGY, f->energy, 0);
-    EconEmit(ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, f->metal);
+    EconPublish(SCHED_FEATURES, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_ENERGY, f->energy, 0);
+    EconPublish(SCHED_FEATURES, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, f->metal);
     KillFeature(x, z, 1);
     if (g_seams.map->GetGameType(g_game->net) == 3)
         g_seams.network->SendFeatureReclaimed(unit, x, z);

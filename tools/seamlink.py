@@ -47,11 +47,12 @@ data/rwsets.csv, the header and src/seams/native.cpp. It fails on:
 
   slots         a slot of EconomySeam in neither list below, a listed slot that is not one, or a listed slot that the
                 EconomySeam table of src/seams/native.cpp does not fill (`<table>.<slot> = <function>;`)
-  callers       an indirect call through a writing slot (Apply, UpdatePlayerEconomy, UpdateMetalExtraction,
+  callers       an indirect call through a writing slot (Apply, Spend, UpdatePlayerEconomy, UpdateMetalExtraction,
                 UpdateResourceSharing, Init, Shutdown), or a field_read or field_escape of one (which a call through a
                 copy of the slot needs), by any function but economy's own (data/subsystems.csv) and the engine's: the
-                files of the scheduler (src/game/scheduler.cpp, which applies the events, effects and phases) and of the
-                harness's recorders (src/harness/replay_hooks.inc, which forward a slot call to the slot they replaced),
+                files of the scheduler (src/game/scheduler.cpp, which routes the events and runs the phases), of economy's
+                glue (src/seams/economy_world.cpp: its inbox handler and the synchronous services), and of the harness's
+                recorders (src/harness/replay_hooks.inc, which forward a slot call to the slot they replaced),
                 and the functions LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp: Init and Shutdown
                 at set-up and teardown) and RunGameSteps (src/ingame/game_dialogs.cpp: the tick's UpdateResourceSharing).
                 A presentation or unowned function fails like any other.
@@ -120,7 +121,7 @@ PRIVATE_TYPES = ("NodeData", "Node", "PathCell", "PathGrid", "TurnCostTable", "T
 PRIVATE_KINDS = ("field_read", "field_write", "field_escape", "field_maybe_written", "deref_read", "deref_write",
                  "deref_escape", "deref_maybe_written")
 ECONOMY_OWNER = "economy"
-ECONOMY_WRITING_SLOTS = ("Apply", "UpdatePlayerEconomy", "UpdateMetalExtraction", "UpdateResourceSharing", "Init", "Shutdown")
+ECONOMY_WRITING_SLOTS = ("Apply", "Spend", "UpdatePlayerEconomy", "UpdateMetalExtraction", "UpdateResourceSharing", "Init", "Shutdown")
 ECONOMY_QUERY_SLOTS = ("RegionSize", "RequestGranted", "GetEnergyUse", "UnitAccount", "WriteState")
 ECONOMY_HEADER = "interfaces/economy.h"
 ECONOMY_SEAM = "EconomySeam"
@@ -133,7 +134,8 @@ ENGINE_FUNCTIONS = (("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownI
 ROWLESS_CALLS = ("operator=", "X87LeTest41")
 NATIVE_TABLE = "src/seams/native.cpp"
 SCHEDULER_FILE = "src/game/scheduler.cpp"
-ENGINE_FILES = (SCHEDULER_FILE, "src/harness/replay_hooks.inc")
+ECONOMY_GLUE_FILE = "src/seams/economy_world.cpp"
+ENGINE_FILES = (SCHEDULER_FILE, ECONOMY_GLUE_FILE, "src/harness/replay_hooks.inc")
 PHASE_FILLERS = ((NATIVE_TABLE, "UpdateAllUnits"), (NATIVE_TABLE, "UpdatePlayers"), (NATIVE_TABLE, "UpdatePlayersOnStream"))
 QUERY_WRITE_KINDS = ("field_write", "field_maybe_written", "global_write", "global_maybe_written", "deref_write", "deref_maybe_written")
 OUT_KINDS = ("field_write", "deref_write")

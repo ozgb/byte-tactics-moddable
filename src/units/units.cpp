@@ -384,7 +384,7 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
 
     unit->losSightFrameIdx = 0;
     unit->owner = &g_game->players[unit->playerIndex];
-    EconEmit(ECONOMY_RESET, unit->playerIndex, EconHandleOf(unit), 0, 0, 0);
+    EconPublish(SCHED_UNITS, ECONOMY_RESET, unit->playerIndex, EconHandleOf(unit), 0, 0, 0);
     unit->transportPiece = 0xff;
     unit->hoverBobPhase = (short)RandomInt(0x10000);
     g_seams.ai->SetUnitSquad(unit, 0);
@@ -815,7 +815,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         float f = health;
         f *= unit->def->metalCost;
         Unit* attacker = par->get();
-        EconEmit(ECONOMY_INCOME, attacker->playerIndex, EconHandleOf(attacker), ECON_METAL, 0, f);
+        EconPublish(SCHED_UNITS, ECONOMY_INCOME, attacker->playerIndex, EconHandleOf(attacker), ECON_METAL, 0, f);
     }
     if (cmd->cobKilledSeverity > 0 && unit->buildLeft == 0.0f)
         g_seams.weapons->DetonateUnitWeapon(unit, cmd->killType == 3);

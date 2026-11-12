@@ -331,8 +331,25 @@ void ReplayImportEnd(ReplayImport& c)
         t.AddInt(a[3].v.i);
         break;
     }
-    case RI_SCHEDULE_ECONOMY_EVENT:
+    case RI_SCHED_PUBLISH:
     {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddSpace(t);
+        t.AddInt(a[2].v.i);
+        break;
+    }
+    case RI_SCHEDULE_ECONOMY_SPEND:
+    {
+        AddResult(t, c.result);
+        break;
+    }
+    case RI_SCHEDULE_ECONOMY_REQUEST_GRANTED:
+    {
+        AddSpace(t);
+        t.AddInt(a[0].v.i);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
         AddResult(t, c.result);
         break;
     }

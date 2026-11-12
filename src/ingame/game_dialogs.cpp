@@ -946,6 +946,8 @@ void OpenMain2Layout()
 
 #include "../../interfaces/ref.h"
 #include "../harness/harness.h"
+#include "../game/scheduler.h"
+#include "../../interfaces/services.h"
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
 #endif
@@ -1028,39 +1030,48 @@ void __stdcall RunGameSteps(int showStats)
     while (n--) {
         g_game->ticks++;
         HarnessBeforeStep();
+        SchedBeginTick();
 
         if (showStats) {
             HandleNetPackets();
+            SchedPhaseBoundary();
             HarnessPhase(0);
             AccumulateProfileTime(&g_game->timers, 0);
         }
         HarnessRecordPhase(1);
         g_seams.units->UpdateAllUnits();
         UpdateAutoFollow();
+        SchedPhaseBoundary();
         HarnessPhase(1);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 1);
         g_seams.weapons->UpdateProjectiles();
+        SchedPhaseBoundary();
         HarnessPhase(2);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 7);
         g_seams.weapons->UpdateExplosions();
+        SchedPhaseBoundary();
         HarnessPhase(3);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 8);
         g_seams.players->UpdatePlayers();
+        SchedPhaseBoundary();
         HarnessPhase(4);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 2);
 
         g_seams.features->UpdateFeatures();
+        SchedPhaseBoundary();
         HarnessPhase(5);
         DrainSimEvents();
         StepAllGafSequences();
         g_seams.wind_meteors->UpdateWind();
+        SchedPhaseBoundary();
         HarnessPhase(6);
         DrainSimEvents();
         g_seams.wind_meteors->UpdateMeteors();
+        SchedPhaseBoundary();
         HarnessPhase(7);
 #if BT_ACCESS_LOG
         AccessLogPassScope tailPass(ACCESS_PASS_TAIL);
@@ -1098,13 +1109,16 @@ void __stdcall RunGameSteps(int showStats)
 #if BT_ACCESS_LOG
             AccessLogEntity();
 #endif
+            SchedDeliver(SCHED_ECONOMY);
             g_seams.economy->UpdateResourceSharing(g_game->localPlayer);
+            SchedPhaseBoundary();
             g_packetManager.SendAllQueued(0);
             AccumulateProfileTime(&g_game->timers, 0);
         }
 #if BT_ACCESS_LOG
         AccessLogEntity();
 #endif
+        SchedEndTick();
         DrainSimEvents();
         HarnessAfterStep();
     }

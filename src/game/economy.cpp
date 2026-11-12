@@ -281,12 +281,10 @@ int __stdcall EconomyApply(const EconomyEvent* event)
         ResetAccount(event->player, event->unit);
         return 1;
     case ECONOMY_LOAD:
-        *UnitAccountOf(event->unit) = *event->account;
+        *UnitAccountOf(event->unit) = event->account;
         return 1;
     case ECONOMY_REQUEST:
         return RequestOn(AccountOf(event->player, event->unit), event->resources, event->energy, event->metal);
-    case ECONOMY_SPEND:
-        return SpendOn(AccountOf(event->player, event->unit), &g_game->players[event->player], event->resources, event->energy, event->metal);
     case ECONOMY_INCOME: {
         EconAccount* a = AccountOf(event->player, event->unit);
         int handicap = HandicapOf(event->player);
@@ -298,6 +296,11 @@ int __stdcall EconomyApply(const EconomyEvent* event)
     }
     }
     return 0;
+}
+
+int __stdcall EconomySpend(const EconomyEvent* spend)
+{
+    return SpendOn(AccountOf(spend->player, spend->unit), &g_game->players[spend->player], spend->resources, spend->energy, spend->metal);
 }
 
 int __stdcall EconomyRequestGranted(EconUnit unit, unsigned int resources)

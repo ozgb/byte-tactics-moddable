@@ -414,10 +414,34 @@ void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsig
     (void)r;
 }
 
-int __stdcall ScheduleEconomyEvent(const EconomyEvent* event)
+void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
 {
     ReplayText t;
-    StartImport(t, RI_SCHEDULE_ECONOMY_EVENT);
+    StartImport(t, RI_SCHED_PUBLISH);
+    Space(t);
+    t.AddInt((int)outbox);
+    Space(t);
+    t.AddInt((int)(unsigned int)size);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+int __stdcall ScheduleEconomySpend(const EconomyEvent* spend)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_ECONOMY_SPEND);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
+int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_ECONOMY_REQUEST_GRANTED);
+    Space(t);
+    t.AddInt((int)(unsigned int)unit);
+    Space(t);
+    t.AddInt((int)(unsigned int)resources);
     const char* result = Enter(t);
     return atoi(result);
 }

@@ -232,6 +232,20 @@ int __stdcall RecEconomyApply(const EconomyEvent* a0)
     return result;
 }
 
+int __stdcall RecEconomySpend(const EconomyEvent* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONOMY_SPEND, SUB_ECONOMY, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "spend");
+    }
+    int result = s_inner_economy->Spend(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 void __stdcall RecEconomyUpdatePlayerEconomy(int a0)
 {
     ReplayRoots roots;
@@ -5160,6 +5174,8 @@ void HookSeams(const bool* on)
         s_rec_economy.Shutdown = RecEconomyShutdown;
     if (on[SUB_ECONOMY])
         s_rec_economy.Apply = RecEconomyApply;
+    if (on[SUB_ECONOMY])
+        s_rec_economy.Spend = RecEconomySpend;
     if (on[SUB_ECONOMY])
         s_rec_economy.UpdatePlayerEconomy = RecEconomyUpdatePlayerEconomy;
     if (on[SUB_ECONOMY])

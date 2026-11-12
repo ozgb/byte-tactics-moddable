@@ -9415,7 +9415,7 @@ call 114 UpdateUnitWeapons
   i units.StartScript CobScript#2 "FirePrimary" ? 0 = 1
   i units.StartScriptWithArgs CobScript#2 "RockUnit" ? 0 2 -612 -515 0 0 = 0
   i services.RecordSimEvent 9 0 [40187277,3718991,18528182,9] 4
-  i services.ScheduleEconomyEvent = 1
+  i services.ScheduleEconomySpend = 1
   w Game.projectileCount 1
   w Unit#2.workTime 714
   w Unit#2.netDirtyFlags 1024
@@ -9856,7 +9856,7 @@ call 121 UpdateUnitWeapons
   i units.StartScript CobScript#3 "FirePrimary" ? 0 = 1
   i units.StartScriptWithArgs CobScript#3 "RockUnit" ? 0 2 -660 -453 0 0 = 0
   i services.RecordSimEvent 9 0 [42802113,3748074,18513840,9] 4
-  i services.ScheduleEconomyEvent = 1
+  i services.ScheduleEconomySpend = 1
   w Game.projectileCount 2
   w Unit#3.workTime 721
   w Unit#3.netDirtyFlags 1024
@@ -14383,7 +14383,7 @@ call 211 UpdateUnitWeapons
   i services.RecordSimEvent 30 0 [57,49961472,1440891,23505142,3] 5
   i units.StartScript CobScript#7 "FirePrimary" ? 0 = 1
   i units.StartScriptWithArgs CobScript#7 "RockUnit" ? 0 2 799 49 0 0 = 0
-  i services.ScheduleEconomyEvent = 1
+  i services.ScheduleEconomySpend = 1
   w Game.projectileCount 1
   w rng.seed 0x36f30390
   w Unit#252.workTime 811

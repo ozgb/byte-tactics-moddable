@@ -22669,7 +22669,7 @@ call 30518 UpdateUnitWeapons
   o p2 (0)
   i los_radar.SoundHeardMask at=(342103469,23199744,13069824) = 128
   i services.RecordSimEvent 30 0 [42,342103469,23199744,13069824,128] 5
-  i services.ScheduleEconomyEvent = 1
+  i services.ScheduleEconomySpend = 1
   w Game.projectileCount 3
   w Unit#1783.workTime 31118
   w Unit#1783.netDirtyFlags 2048

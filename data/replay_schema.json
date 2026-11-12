@@ -4099,7 +4099,7 @@
     "services": [
      "RandomInt",
      "RecordSimEvent",
-     "ScheduleEconomyEvent"
+     "ScheduleEconomySpend"
     ]
    },
    "files": {
@@ -5452,13 +5452,51 @@
     ]
    },
    {
-    "name": "ScheduleEconomyEvent",
-    "id": "RI_SCHEDULE_ECONOMY_EVENT",
-    "declaration": "int __stdcall ScheduleEconomyEvent(const EconomyEvent* event);",
+    "name": "SchedPublish",
+    "id": "RI_SCHED_PUBLISH",
+    "declaration": "void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);",
     "args": [
+     {
+      "mode": "int",
+      "param": "outbox"
+     },
      {
       "mode": "skip",
       "param": "event"
+     },
+     {
+      "mode": "int",
+      "param": "size",
+      "cast": "unsigned int"
+     }
+    ]
+   },
+   {
+    "name": "ScheduleEconomySpend",
+    "id": "RI_SCHEDULE_ECONOMY_SPEND",
+    "declaration": "int __stdcall ScheduleEconomySpend(const EconomyEvent* spend);",
+    "args": [
+     {
+      "mode": "skip",
+      "param": "spend"
+     }
+    ],
+    "result": "int"
+   },
+   {
+    "name": "ScheduleEconomyRequestGranted",
+    "id": "RI_SCHEDULE_ECONOMY_REQUEST_GRANTED",
+    "declaration": "int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);",
+    "args": [
+     {
+      "mode": "int",
+      "param": "unit",
+      "cast": "unsigned int"
+     },
+     {
+      "mode": "int",
+      "param": "resources",
+      "cast": "unsigned int"
      }
     ],
     "result": "int"
@@ -6005,12 +6043,13 @@
    }
   },
   "economy": {
-   "header": {"interface": "interfaces/economy.h", "struct": "EconomySeam", "version": [4, 0], "status": "pending", "imports": [], "pending": {"untracked": 0, "ruleless": 0, "unresolvedSlots": ["RegionSize", "Init", "Shutdown", "Apply", "UpdatePlayerEconomy", "UpdateMetalExtraction", "UpdateResourceSharing", "RequestGranted", "GetEnergyUse", "UnitAccount", "WriteState"], "unannotatedArgs": ["RegionSize(map)", "Init(map)", "Init(world)", "Init(region)", "Shutdown result", "Apply(event)", "UpdateMetalExtraction(unit)", "RequestGranted(unit)", "GetEnergyUse(type)", "UnitAccount(unit)", "UnitAccount(out)", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/economy.h", "struct": "EconomySeam", "version": [4, 0], "status": "pending", "imports": [], "pending": {"untracked": 0, "ruleless": 0, "unresolvedSlots": ["RegionSize", "Init", "Shutdown", "Apply", "Spend", "UpdatePlayerEconomy", "UpdateMetalExtraction", "UpdateResourceSharing", "RequestGranted", "GetEnergyUse", "UnitAccount", "WriteState"], "unannotatedArgs": ["RegionSize(map)", "Init(map)", "Init(world)", "Init(region)", "Shutdown result", "Apply(event)", "Spend(spend)", "UpdateMetalExtraction(unit)", "RequestGranted(unit)", "GetEnergyUse(type)", "UnitAccount(unit)", "UnitAccount(out)", "WriteState(writer)"]}},
    "slots": {
     "RegionSize": {"conv": "__stdcall", "ret": "unsigned int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "EconMapInfo*", "line": "map", "mode": "pending"}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "RegionSize"},
     "Init": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "EconMapInfo*", "line": "map", "mode": "pending"}, {"name": "world", "type": "EconomyWorldView*", "line": "world", "mode": "pending"}, {"name": "region", "type": "void*", "line": "region", "mode": "pending"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": null, "native": "Init"},
     "Shutdown": {"conv": "__stdcall", "ret": "void*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "void*", "mode": "pending"}, "native": "Shutdown"},
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "event", "type": "EconomyEvent*", "line": "event", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
+    "Spend": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "spend", "type": "EconomyEvent*", "line": "spend", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "Spend"},
     "UpdatePlayerEconomy": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "UpdatePlayerEconomy"},
     "UpdateMetalExtraction": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "EconUnit", "line": "unit", "mode": "pending"}], "result": null, "native": "UpdateMetalExtraction"},
     "UpdateResourceSharing": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "UpdateResourceSharing"},

@@ -14,7 +14,7 @@ inline EconUnit EconHandleOf(Unit* unit)
     return Ref<Unit>(unit).offset;
 }
 
-inline int EconEmit(int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal, const EconAccount* account = nullptr)
+inline EconomyEvent EconEvent(int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal)
 {
     EconomyEvent event;
     memset(&event, 0, sizeof(event));
@@ -24,28 +24,46 @@ inline int EconEmit(int kind, int player, EconUnit unit, unsigned int resources,
     event.resources = resources;
     event.energy = energy;
     event.metal = metal;
+    return event;
+}
+
+inline void EconPublish(int outbox, int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal)
+{
+    EconomyEvent event = EconEvent(kind, player, unit, resources, energy, metal);
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void EconPublishLoad(int outbox, int player, EconUnit unit, const EconAccount& account)
+{
+    EconomyEvent event = EconEvent(ECONOMY_LOAD, player, unit, 0, 0, 0);
     event.account = account;
-    return ScheduleEconomyEvent(&event);
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline int EconSpend(int player, EconUnit unit, unsigned int resources, float energy, float metal)
+{
+    EconomyEvent event = EconEvent(ECONOMY_SPEND, player, unit, resources, energy, metal);
+    return ScheduleEconomySpend(&event);
 }
 
 template <class U>
-inline int EconRequest(U* unit, unsigned int resources, float energy, float metal)
+inline int EconRequest(int outbox, U* unit, unsigned int resources, float energy, float metal)
 {
-    int granted = g_seams.economy->RequestGranted(EconHandleOf(unit), resources);
-    EconEmit(ECONOMY_REQUEST, unit->playerIndex, EconHandleOf(unit), resources, energy, metal);
+    int granted = ScheduleEconomyRequestGranted(EconHandleOf(unit), resources);
+    EconPublish(outbox, ECONOMY_REQUEST, unit->playerIndex, EconHandleOf(unit), resources, energy, metal);
     return granted;
 }
 
 template <class U>
-inline int EconRequestEnergy(U* unit, float energy)
+inline int EconRequestEnergy(int outbox, U* unit, float energy)
 {
-    return EconRequest(unit, ECON_ENERGY, energy, 0);
+    return EconRequest(outbox, unit, ECON_ENERGY, energy, 0);
 }
 
 template <class U>
-inline int EconRequestEnergyAndMetal(U* unit, float energy, float metal)
+inline int EconRequestEnergyAndMetal(int outbox, U* unit, float energy, float metal)
 {
-    return EconRequest(unit, ECON_ENERGY | ECON_METAL, energy, metal);
+    return EconRequest(outbox, unit, ECON_ENERGY | ECON_METAL, energy, metal);
 }
 
 #endif

@@ -28,6 +28,7 @@ void __stdcall UpdatePlayersFinish();
 void __stdcall InitPlayerResources();
 void __stdcall LoadPlayerControllers(HapiBank* file);
 void __stdcall UpdateBlink();
+void PlayersOnEconomyShare(const void* event);
 
 int CountActiveAIPlayers();
 int CountCombatPlayers();

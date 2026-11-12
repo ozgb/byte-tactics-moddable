@@ -690,6 +690,7 @@ void InstallNativeSeams()
     s_economy.Init = EconomyInit;
     s_economy.Shutdown = EconomyShutdown;
     s_economy.Apply = EconomyApply;
+    s_economy.Spend = EconomySpend;
     s_economy.UpdatePlayerEconomy = EconomyUpdatePlayer;
     s_economy.UpdateMetalExtraction = EconomyUpdateMetalExtraction;
     s_economy.UpdateResourceSharing = EconomyUpdateResourceSharing;

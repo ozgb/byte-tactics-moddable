@@ -45,21 +45,21 @@ struct EconAccount {
     EconLedger metal;
 };
 
-// The kinds of event the scheduler applies to economy.
+// The kinds of event other modules publish to economy's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published.
 enum EconomyEventKind {
-    // Clears an account and gives it to player; outcome 1.
+    // Queued: clears an account and gives it to player; outcome 1.
     ECONOMY_RESET = 0,
-    // Sets a unit's account to account, read from a saved game; outcome 1.
+    // Queued: sets a unit's account to account, read from a saved game; outcome 1.
     ECONOMY_LOAD = 1,
-    // A unit asks for the energy (and metal) of this tick's work, which is charged as asked; outcome 1 when it is granted, as RequestGranted said.
+    // Queued: a unit asks for the energy (and metal) of this tick's work, which is charged as asked; outcome 1 when it is granted, as RequestGranted said.
     ECONOMY_REQUEST = 2,
-    // Takes energy and metal from the store of the account's player and books it as used; outcome 1, or 0 when the store is short and nothing changes.
+    // Not queued: a call to the synchronous Spend slot, which takes energy and metal from the store of the account's player and books it as used; outcome 1, or 0 when the store is short and nothing changes.
     ECONOMY_SPEND = 3,
-    // Adds income to an account; the implementation decides what the account's player is given; outcome 1.
+    // Queued: adds income to an account; the implementation decides what the account's player is given; outcome 1.
     ECONOMY_INCOME = 4
 };
 
-// The kinds of effect economy asks the engine to apply to other subsystems.
+// The kinds of effect economy publishes to its outbox, for the modules that subscribe to them.
 enum EconomyEffectKind {
     // A cloaked unit's upkeep was or was not paid this tick: value is 1 to keep it cloaked and 0 to uncloak it.
     ECONOMY_EFFECT_CLOAK = 16,
@@ -69,7 +69,7 @@ enum EconomyEffectKind {
     ECONOMY_EFFECT_SHARE = 18
 };
 
-// An event (EconomyEventKind) or an effect (EconomyEffectKind); fields an event does not use are 0.
+// An event (EconomyEventKind) or an effect (EconomyEffectKind), as plain data with no pointers; fields an event does not use are 0.
 struct EconomyEvent {
     // An EconomyEventKind or an EconomyEffectKind.
     int kind;
@@ -85,8 +85,8 @@ struct EconomyEvent {
     float metal;
     // The effect's argument, as its kind says.
     int value;
-    // The account a LOAD sets, read before the call returns; null for the other kinds.
-    const EconAccount* account;
+    // The account a LOAD sets; 0 for the other kinds.
+    EconAccount account;
 };
 
 // The map a match starts on.
@@ -171,7 +171,7 @@ struct EconPlayerInfo {
     int storage;
 };
 
-// The world as economy sees it, read only apart from Emit; given by the engine.
+// The world as economy sees it, read only apart from Emit, as of each module's last run; given by the engine.
 struct EconomyWorldView {
     // The tick being played.
     unsigned int (__stdcall* Tick)(void);
@@ -201,11 +201,11 @@ struct EconomyWorldView {
     void (__stdcall* TypeInfo)(EconType type, EconTypeInfo* out);
     // The metal of a map cell, or -1 when the cell is off the map.
     int (__stdcall* CellMetal)(int x, int y);
-    // Hands an effect to the engine, which applies it before Emit returns.
+    // Publishes an effect to economy's outbox; the router delivers it to its subscribers at the next phase boundary, or before Emit returns for a kind its table marks synchronous.
     void (__stdcall* Emit)(const EconomyEvent* effect);
 };
 
-// Resources: the players' stores and the accounts of players and units.
+// Resources: the players' stores and the accounts of players and units. The engine delivers economy's pending inbox, through Apply, before each run (UpdatePlayerEconomy, UpdateMetalExtraction, UpdateResourceSharing) and each synchronous slot, and at each phase boundary.
 struct EconomySeam {
     // The bytes of private state the implementation needs for a map; called before Init.
     unsigned int (__stdcall* RegionSize)(const EconMapInfo* map);
@@ -213,15 +213,17 @@ struct EconomySeam {
     void (__stdcall* Init)(const EconMapInfo* map, const EconomyWorldView* world, void* region, unsigned int size);
     // Ends the match and returns the region, which the engine frees.
     void* (__stdcall* Shutdown)(void);
-    // Applies an event and returns its outcome; its effect is visible to the next read.
+    // Consumes one queued event of the inbox and returns its outcome, 0 for a refused intent, which the engine records in the trace's dump and returns to no one.
     int (__stdcall* Apply)(const EconomyEvent* event);
+    // Synchronous: applies a spend (an event of kind ECONOMY_SPEND) after the engine delivered the pending inbox, and returns its outcome, visible at once. Hooks: none.
+    int (__stdcall* Spend)(const EconomyEvent* spend);
     // Settles one player's units for a tick, in the players phase: charges their upkeep, adds their income and emits their effects. Hooks: ResourceIncome, StatsAccumulate.
     void (__stdcall* UpdatePlayerEconomy)(int player);
     // Sets a metal extractor's rate from the metal under its footprint and emits its effect; called when the unit is created or loaded. Hooks: none.
     void (__stdcall* UpdateMetalExtraction)(EconUnit unit);
     // Shares one player's surplus with its allies, by effects, in the tick's tail of a network game. Hooks: none.
     void (__stdcall* UpdateResourceSharing)(int player);
-    // Whether a request for the given resources by a unit would be granted now; a query, called just before the REQUEST it decides. Hooks: none.
+    // Synchronous: whether a request for the given resources by a unit would be granted now, after the engine delivered the pending inbox; a query, called just before the REQUEST it decides. Hooks: none.
     int (__stdcall* RequestGranted)(EconUnit unit, unsigned int resources);
     // Returns the energy a unit type uses per tick, or minus what it makes from wind or tide, as the exact product, not rounded to 32 bits; a query. Hooks: none.
     double (__stdcall* GetEnergyUse)(EconType type);

@@ -47,9 +47,32 @@ void __stdcall HarnessPathEvent(const PathEvent* event, const PathPoint* points,
 struct EconomyEvent;
 // In test mode, records an economy event or effect as the scheduler applies it, with the outcome of its application, for the trace's economy events.
 void __stdcall HarnessEconomyEvent(const EconomyEvent* event, int outcome);
-// Applies an economy event through the engine's scheduler, which records it, and returns its outcome; its effect is visible to the next read.
-int __stdcall ScheduleEconomyEvent(const EconomyEvent* event);
-// Has the engine's scheduler run economy's UpdateMetalExtraction for a unit (an economy unit handle) and apply its effects before it returns.
+// The modules that own an outbox or an inbox in the scheduler's router.
+enum SchedModule {
+    // The engine itself, outside any module.
+    SCHED_ENGINE = 0,
+    // Economy (interfaces/economy.h).
+    SCHED_ECONOMY = 1,
+    // Units.
+    SCHED_UNITS = 2,
+    // Orders.
+    SCHED_ORDERS = 3,
+    // Players.
+    SCHED_PLAYERS = 4,
+    // Features.
+    SCHED_FEATURES = 5,
+    // Weapons.
+    SCHED_WEAPONS = 6,
+    // The number of modules.
+    SCHED_MODULE_COUNT = 7
+};
+// Publishes an event, plain data whose first int is its kind, to a module's outbox; the router copies it to the inbox of each subscriber of that kind, which consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick).
+void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
+// Calls economy's synchronous Spend slot for a spend (an event of kind ECONOMY_SPEND) after delivering economy's pending inbox, records it, and returns its outcome, visible at once.
+int __stdcall ScheduleEconomySpend(const EconomyEvent* spend);
+// Calls economy's synchronous RequestGranted slot for a unit (an economy unit handle) and the resources it asks for, after delivering economy's pending inbox.
+int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
+// Runs economy's UpdateMetalExtraction for a unit (an economy unit handle) after delivering economy's pending inbox; its effects are published to economy's outbox.
 void __stdcall ScheduleMetalExtraction(unsigned int unit);
 
 // Returns the heading of the horizontal vector from one position to another.

@@ -84,11 +84,15 @@ is counted as before, but its lines and branches are left out of its subsystem's
 `--write` keeps them. `--write` and `--check` fail when a marked (subsystem, function, file, decorated) row
 matches no live function of the export.
 
-Kit functions. A never-entered row with `dead` 0 and a reason starting `kit:` marks a live function that no 3.1c code calls,
-such as the native of a seam slot added for the oracle kit. It is left out of its subsystem's sums as a dead function is, and
-printed in its own list. Only a row of the `seams` subsystem whose function is the native (`<Slot>Native`) of a slot that
-`--slots all` lists may carry the prefix; `--write` and `--check` fail on any other. `--write` carries the reason over, and
-`--check` fails when a kit row's function is entered, since its reason is then wrong and the function counts again.
+Functions counted apart. A never-entered row with `dead` 0 and a reason starting `kit:` or `demo:` marks a live function
+that the suite cannot enter by design. It is left out of its subsystem's sums as a dead function is, and printed in its own
+list. `kit:` marks a function that no 3.1c code calls, such as the native of a seam slot added for the oracle kit: only a row
+of the `seams` subsystem whose function is the native (`<Slot>Native`) of a slot that `--slots all` lists may carry it.
+`demo:` marks a function of the HPA* pathfinder demo (#930), an alternative to 3.1c's pathfinder that a scenario selects
+only by changing its traces, so that pathfinding's totals measure the default pathfinder alone: only a row of a function
+defined in src/ai/pathfind_hpa.cpp may carry it. `--write` and `--check` fail on a row that breaks its prefix's rule.
+`--write` carries the reason over, and `--check` fails when such a row's function is entered, since its reason is then
+wrong and the function counts again.
 
 data/coverage.csv: columns subsystem, function, file, functions, functions_entered, lines, lines_hit,
 branches, branches_covered, decorated, dead, reason. One totals row per subsystem (function `*`, file and decorated
@@ -147,6 +151,9 @@ SKIPPED_REGION = 2
 UNSTABLE = "unstable:"
 KIT = "kit:"
 KIT_SUBSYSTEM = "seams"
+DEMO = "demo:"
+DEMO_FILE = "src/ai/pathfind_hpa.cpp"
+APART = (KIT, DEMO)
 SATURATED = 1 << 62
 TIER_LINE_FLOOR = 96
 TICKS_PER_SECOND = 6
@@ -194,8 +201,8 @@ class Totals:
     branches_covered: int = 0
     dead: int = 0
     unstable: list[tuple[str, str, str]] = field(default_factory=list)
-    kit: list[tuple[str, str, str]] = field(default_factory=list)
-    kit_entered: list[tuple[str, str, str]] = field(default_factory=list)
+    apart: list[tuple[str, str, str]] = field(default_factory=list)
+    apart_entered: list[tuple[str, str, str]] = field(default_factory=list)
     never_entered: list[tuple[str, str, str]] = field(default_factory=list)
     dead_functions: list[tuple[str, str, str]] = field(default_factory=list)
     reasons: dict[tuple[str, str, str], str] = field(default_factory=dict)
@@ -339,8 +346,8 @@ def subsystem_of(fn: Function, by_key: dict[tuple[str, str], str], by_name: dict
 def summarize(export: dict, by_key: dict[tuple[str, str], str], by_name: dict[str, set[str]],
               live: set[str] | None = None,
               unstable: dict[tuple[str, str, str, str], str] | None = None,
-              kit: dict[tuple[str, str, str, str], str] | None = None) -> tuple[dict[str, Totals], int, int]:
-    """(subsystem -> Totals, entries excluded, functions unassigned) of an llvm-cov export, counting each (file, decorated name) once. Dead functions (see merge_copies) are listed and counted apart, and left out of the sums. A function named by an unstable key (subsystem, function, file, decorated) counts as before but with no lines or branches, and is listed in its subsystem's unstable and reasons. A never-entered function named by a kit key is listed in its subsystem's kit and reasons, and left out of the sums as a dead function is; an entered one counts as before and is listed in kit_entered."""
+              apart: dict[tuple[str, str, str, str], str] | None = None) -> tuple[dict[str, Totals], int, int]:
+    """(subsystem -> Totals, entries excluded, functions unassigned) of an llvm-cov export, counting each (file, decorated name) once. Dead functions (see merge_copies) are listed and counted apart, and left out of the sums. A function named by an unstable key (subsystem, function, file, decorated) counts as before but with no lines or branches, and is listed in its subsystem's unstable and reasons. A never-entered function named by an apart key (a `kit:` or `demo:` row) is listed in its subsystem's apart and reasons, and left out of the sums as a dead function is; an entered one counts as before and is listed in apart_entered."""
     groups: dict[tuple[str, str], list[Copy]] = {}
     missed: dict[str, list[tuple[str, str, str]]] = {}
     dead: dict[str, list[tuple[str, str, str]]] = {}
@@ -363,12 +370,12 @@ def summarize(export: dict, by_key: dict[tuple[str, str], str], by_name: dict[st
             dead.setdefault(subsystem, []).append((fn.name, fn.file, decorated))
             continue
         key = (subsystem, fn.name, fn.file, path_free(decorated))
-        if kit and key in kit:
+        if apart and key in apart:
             if fn.entered:
-                t.kit_entered.append(key[1:])
+                t.apart_entered.append(key[1:])
             else:
-                t.kit.append(key[1:])
-                t.reasons[key[1:]] = kit[key]
+                t.apart.append(key[1:])
+                t.reasons[key[1:]] = apart[key]
                 continue
         if unstable and key in unstable:
             fn.lines = fn.lines_hit = fn.branches = fn.branches_covered = 0
@@ -383,8 +390,8 @@ def summarize(export: dict, by_key: dict[tuple[str, str], str], by_name: dict[st
         totals[subsystem].dead_functions = sorted(rows)
     for t in totals.values():
         t.unstable.sort()
-        t.kit.sort()
-        t.kit_entered.sort()
+        t.apart.sort()
+        t.apart_entered.sort()
     return totals, excluded, unassigned
 
 
@@ -406,8 +413,8 @@ def csv_rows(totals: dict[str, Totals]) -> list[list[str]]:
         rows += [[subsystem, name, file, 0, 0, 0, 0, 0, 0, path_free(decorated), 1, ""] for name, file, decorated in t.dead_functions]
         rows += [[subsystem, name, file, 0, 0, 0, 0, 0, 0, decorated, 0, t.reasons.get((name, file, decorated), UNSTABLE)]
                  for name, file, decorated in t.unstable]
-        rows += [[subsystem, name, file, 1, 0, 0, 0, 0, 0, decorated, 0, t.reasons.get((name, file, decorated), KIT)]
-                 for name, file, decorated in t.kit]
+        rows += [[subsystem, name, file, 1, 0, 0, 0, 0, 0, decorated, 0, t.reasons.get((name, file, decorated), "")]
+                 for name, file, decorated in t.apart]
         rows[first:] = sorted(rows[first:], key=lambda r: (r[1] != "*", r[1], r[2], r[9]))
     return [[str(c) for c in r] for r in rows]
 
@@ -438,9 +445,9 @@ def read_csv(path: Path) -> dict[str, Totals]:
                 key = (row["function"], row["file"], row["decorated"])
                 t.unstable.append(key)
                 t.reasons[key] = row["reason"]
-            elif row.get("reason", "").startswith(KIT):
+            elif row.get("reason", "").startswith(APART):
                 key = (row["function"], row["file"], row["decorated"])
-                t.kit.append(key)
+                t.apart.append(key)
                 t.reasons[key] = row["reason"]
             else:
                 key = (row["function"], row["file"], row["decorated"])
@@ -455,9 +462,9 @@ def unstable_keys(totals: dict[str, Totals]) -> dict[tuple[str, str, str, str], 
     return {(subsystem, *key): t.reasons[key] for subsystem, t in totals.items() for key in t.unstable}
 
 
-def kit_keys(totals: dict[str, Totals]) -> dict[tuple[str, str, str, str], str]:
-    """(subsystem, function, file, decorated) -> reason of the kit rows that read_csv found."""
-    return {(subsystem, *key): t.reasons[key] for subsystem, t in totals.items() for key in t.kit}
+def apart_keys(totals: dict[str, Totals]) -> dict[tuple[str, str, str, str], str]:
+    """(subsystem, function, file, decorated) -> reason of the `kit:` and `demo:` rows that read_csv found."""
+    return {(subsystem, *key): t.reasons[key] for subsystem, t in totals.items() for key in t.apart}
 
 
 def slot_natives() -> set[str]:
@@ -472,29 +479,46 @@ def slot_natives() -> set[str]:
     return found
 
 
-def misplaced_kit(old: dict[str, Totals], natives: set[str]) -> str:
-    """The failure text listing the kit rows outside the seams subsystem or on a function that is no slot's native, or an empty string."""
-    rows = sorted(f"{subsystem} {name} ({file})" for subsystem, t in old.items() for name, file, _ in t.kit
-                  if subsystem != KIT_SUBSYSTEM or name not in natives)
+def misplaced_apart(old: dict[str, Totals], natives: set[str]) -> str:
+    """The failure text listing the `kit:` rows outside the seams subsystem or on a function that is no slot's native, and the `demo:` rows of a function outside DEMO_FILE, or an empty string."""
+    kit, demo = [], []
+    for subsystem, t in old.items():
+        for name, file, decorated in t.apart:
+            reason = t.reasons.get((name, file, decorated), "")
+            if reason.startswith(KIT) and (subsystem != KIT_SUBSYSTEM or name not in natives):
+                kit.append(f"{subsystem} {name} ({file})")
+            elif reason.startswith(DEMO) and file != DEMO_FILE:
+                demo.append(f"{subsystem} {name} ({file})")
+    parts = []
+    if kit:
+        parts.append(f"coverage: {len(kit)} rows of data/coverage.csv have a `{KIT}` reason but are not the native of a slot in "
+                     f"the {KIT_SUBSYSTEM} subsystem:\n" + "\n".join(sorted(kit)))
+    if demo:
+        parts.append(f"coverage: {len(demo)} rows of data/coverage.csv have a `{DEMO}` reason but are not defined in "
+                     f"{DEMO_FILE}:\n" + "\n".join(sorted(demo)))
+    return "\n".join(parts)
+
+
+def entered_apart(got: dict[str, Totals]) -> str:
+    """The failure text listing the `kit:` and `demo:` rows whose function a scenario entered, or an empty string."""
+    rows = sorted(f"{subsystem} {name} ({file})" for subsystem, t in got.items() for name, file, _ in t.apart_entered)
     if not rows:
         return ""
-    return (f"coverage: {len(rows)} rows of data/coverage.csv have a `{KIT}` reason but are not the native of a slot in "
-            f"the {KIT_SUBSYSTEM} subsystem:\n" + "\n".join(rows))
+    return (f"coverage: {len(rows)} functions with a `{KIT}` or `{DEMO}` reason in data/coverage.csv are entered, so the reason "
+            "is wrong and the function counts again; remove the row:\n" + "\n".join(rows))
 
 
-def entered_kit(got: dict[str, Totals]) -> str:
-    """The failure text listing the kit rows whose function a scenario entered, or an empty string."""
-    rows = sorted(f"{subsystem} {name} ({file})" for subsystem, t in got.items() for name, file, _ in t.kit_entered)
-    if not rows:
-        return ""
-    return (f"coverage: {len(rows)} functions with a `{KIT}` reason in data/coverage.csv are entered, so the reason is wrong "
-            "and the function counts again; remove the row:\n" + "\n".join(rows))
-
-
-def kit_list(totals: dict[str, Totals]) -> str:
-    """The kit functions of every subsystem, one per line, or an empty string."""
-    rows = [f"{subsystem} {name} ({file})" for subsystem in sorted(totals) for name, file, _ in totals[subsystem].kit]
-    return ("kit functions (no 3.1c code calls them, left out of the sums):\n" + "\n".join(rows)) if rows else ""
+def apart_list(totals: dict[str, Totals]) -> str:
+    """The `kit:` functions and the `demo:` functions of every subsystem, one per line under a heading each, or an empty string."""
+    heads = ((KIT, "kit functions (no 3.1c code calls them, left out of the sums):"),
+             (DEMO, "demo functions (the HPA* demo, which no gate scenario selects, left out of the sums):"))
+    parts = []
+    for prefix, head in heads:
+        rows = [f"{subsystem} {name} ({file})" for subsystem in sorted(totals) for name, file, decorated in totals[subsystem].apart
+                if totals[subsystem].reasons.get((name, file, decorated), "").startswith(prefix)]
+        if rows:
+            parts.append(head + "\n" + "\n".join(rows))
+    return "\n".join(parts)
 
 
 def unmatched_unstable(want: dict[tuple[str, str, str, str], str], got: dict[str, Totals]) -> str:
@@ -934,16 +958,16 @@ def main() -> None:
     by_key, by_name = read_subsystems()
     old = read_csv(OUT) if OUT.is_file() else {}
     marked = unstable_keys(old)
-    kit = kit_keys(old)
-    if (args.write or args.check) and kit and misplaced_kit(old, slot_natives()):
-        sys.exit(misplaced_kit(old, slot_natives()))
+    apart = apart_keys(old)
+    if (args.write or args.check) and apart and misplaced_apart(old, slot_natives()):
+        sys.exit(misplaced_apart(old, slot_natives()))
     totals, excluded, unassigned = summarize(export(args.exe, profdata), by_key, by_name,
-                                           read_live_counters(live_path), marked, kit)
+                                           read_live_counters(live_path), marked, apart)
     if (args.write or args.check) and unmatched_unstable(marked, totals):
         sys.exit(unmatched_unstable(marked, totals))
     print(table(totals))
-    if kit_list(totals):
-        print(kit_list(totals))
+    if apart_list(totals):
+        print(apart_list(totals))
     if args.write and not totals:
         sys.exit("coverage: no game function in the export; not writing an empty baseline")
     print(f"excluded (harness, build, outside the repository): {excluded} functions")
@@ -963,8 +987,8 @@ def main() -> None:
             sys.exit(unreasoned(totals))
     if args.check:
         carry_reasons(totals, old)
-        if entered_kit(totals):
-            sys.exit(entered_kit(totals))
+        if entered_apart(totals):
+            sys.exit(entered_apart(totals))
         falls, notes = compare(old, totals)
         for note in notes:
             print(f"note: {note}")

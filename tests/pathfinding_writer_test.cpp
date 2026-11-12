@@ -4,7 +4,6 @@
 #include "../src/state/block.h"
 #include "../src/ai/pathfind.h"
 #include "../src/ai/pathfinder.h"
-#include "../src/harness/path_results.h"
 #pragma pack(push, 1)
 #include "../src/game/game.h"
 #pragma pack(pop)
@@ -232,16 +231,73 @@ static void Mutate(const char* what, unsigned char* at, unsigned int size)
     Check(HashWritten() == base, message);
 }
 
-enum { kResultTicks = 120, kUnitTag = 2 };
+enum { kResultTicks = 120, kGoalPoints = 20, kEventPoints = 64 };
+
+enum Tamper { TAMPER_NONE, TAMPER_WAYPOINT, TAMPER_STATUS };
+
+struct ConsumerGoal {
+    PathPoint points[kGoalPoints];
+    int count;
+    unsigned int repathClaimTick;
+    unsigned char flags;
+};
+
+static ConsumerGoal s_goals[kUnits + 1];
+static unsigned int s_orderSubFlags[kUnits + 1];
+
+static void ConsumerReset()
+{
+    memset(s_goals, 0, sizeof s_goals);
+    memset(s_orderSubFlags, 0, sizeof s_orderSubFlags);
+    for (int u = 0; u <= kUnits; u++)
+        s_goals[u].flags = 8;
+}
+
+static void ConsumerApply(const PathEvent* e, const PathPoint* points)
+{
+    ConsumerGoal* goal = &s_goals[e->requester / 16];
+    unsigned int* subFlags = &s_orderSubFlags[e->target];
+    if (e->kind == PATH_EVENT_STARTED) {
+        goal->repathClaimTick = e->tick;
+        *subFlags |= e->status == PATH_START_DIRECT ? 0x100 : 0x200;
+    } else if (e->kind == PATH_EVENT_FINISHED) {
+        if (e->count == 0) {
+            *subFlags |= 0x40;
+            goal->flags &= ~1;
+        } else {
+            int n = e->count < kEventPoints ? e->count : kEventPoints;
+            if (n > kGoalPoints)
+                n = kGoalPoints;
+            goal->count = n;
+            memcpy(goal->points, points, n * sizeof(PathPoint));
+            goal->flags |= 1;
+        }
+        goal->flags = (unsigned char)((goal->flags & ~2) | 8);
+    }
+}
+
+static unsigned long long ConsumerHash()
+{
+    unsigned long long h = 0xcbf29ce484222325ull;
+    for (int u = 1; u <= kUnits; u++) {
+        const ConsumerGoal* g = &s_goals[u];
+        h = FnvU32(h, g->count);
+        h = FnvU32(h, g->repathClaimTick);
+        unsigned char flags = g->flags & 0xb;
+        h = Fnv(h, &flags, 1);
+        int n = g->count < kGoalPoints ? g->count : kGoalPoints;
+        h = Fnv(h, g->points, n * sizeof(PathPoint));
+        h = FnvU32(h, s_orderSubFlags[u]);
+    }
+    return h;
+}
 
 struct ResultRun {
     unsigned long long written[kResultTicks];
-    unsigned long long results[kResultTicks];
+    unsigned long long consumer[kResultTicks];
     int tampered;
     int finished;
 };
-
-static PathResults s_results;
 
 static void Restart()
 {
@@ -250,9 +306,10 @@ static void Restart()
     unsigned int size = PathfindingRegionSize(&map);
     PathfindingInit(&map, SimAlloc(size), size);
     s_tick = 0;
+    ConsumerReset();
 }
 
-static void PlayResults(ResultRun* run, bool tamper)
+static void PlayResults(ResultRun* run, Tamper tamper)
 {
     Restart();
     Request(1, 28, 4);
@@ -263,43 +320,62 @@ static void PlayResults(ResultRun* run, bool tamper)
     for (int t = 0; t < kResultTicks; t++) {
         s_tick++;
         PathfindingStep();
-        PathResultsClear(&s_results);
         PathEvent e;
-        PathPoint points[64];
-        while (PathfindingPoll(&e, points, 64)) {
-            if (e.kind == PATH_EVENT_FINISHED && e.status == PATH_FOUND) {
+        PathPoint points[kEventPoints];
+        while (PathfindingPoll(&e, points, kEventPoints)) {
+            if (e.kind == PATH_EVENT_FINISHED && e.status == PATH_FOUND && e.count > 0) {
                 run->finished++;
-                if (tamper && run->tampered < 0) {
-                    e.status = PATH_PARTIAL;
+                if (tamper != TAMPER_NONE && run->tampered < 0) {
+                    if (tamper == TAMPER_WAYPOINT) {
+                        int last = (e.count < kGoalPoints ? e.count : kGoalPoints) - 1;
+                        points[last].x = (short)(points[last].x + 16);
+                    } else {
+                        e.status = PATH_PARTIAL;
+                    }
                     run->tampered = t;
                 }
             }
-            Check(PathResultsAdd(&s_results, &e, points, 64) != 0, "a result is recorded");
-            s_results.items[s_results.count - 1].unitTag = kUnitTag;
-            s_results.items[s_results.count - 1].unitId = e.unit;
+            ConsumerApply(&e, points);
         }
-        run->results[t] = PathResultsHash(&s_results, 0xcbf29ce484222325ull);
+        run->consumer[t] = ConsumerHash();
         run->written[t] = HashWritten();
     }
 }
 
-static void CheckResultsSection()
+static int FirstDifference(const unsigned long long* a, const unsigned long long* b)
 {
-    static ResultRun plain, again, tampered;
-    PlayResults(&plain, false);
-    PlayResults(&again, false);
-    PlayResults(&tampered, true);
-    Check(plain.finished > 0, "a search finishes with a route");
-    Check(memcmp(&plain, &again, sizeof plain) == 0, "two runs of the default give the same results and written state");
-    Check(tampered.tampered >= 0, "the tampered pathfinder changes an event");
-    Check(memcmp(plain.written, tampered.written, sizeof plain.written) == 0,
-          "the tampered pathfinder reports the default's state every tick");
-    int first = -1;
-    for (int t = 0; t < kResultTicks && first < 0; t++) {
-        if (plain.results[t] != tampered.results[t])
-            first = t;
+    for (int t = 0; t < kResultTicks; t++) {
+        if (a[t] != b[t])
+            return t;
     }
-    Check(first == tampered.tampered, "the results section differs first at the tick of the changed event");
+    return -1;
+}
+
+static void CheckResultsReachHashedState()
+{
+    static ResultRun plain, again, moved, relabelled;
+    PlayResults(&plain, TAMPER_NONE);
+    PlayResults(&again, TAMPER_NONE);
+    PlayResults(&moved, TAMPER_WAYPOINT);
+    PlayResults(&relabelled, TAMPER_STATUS);
+    Check(plain.finished > 0, "a search finishes with a route");
+    Check(memcmp(&plain, &again, sizeof plain) == 0, "two runs of the default give the same consumer and written state");
+
+    Check(moved.tampered >= 0, "the tampered pathfinder moves a delivered waypoint");
+    Check(FirstDifference(plain.written, moved.written) < 0,
+          "the pathfinder that moves a waypoint reports the default's state every tick");
+    int first = FirstDifference(plain.consumer, moved.consumer);
+    Check(first >= 0 && first == moved.tampered, "the consumer's hashed state differs first at the tick of the moved waypoint");
+    bool stays = first >= 0;
+    for (int t = first; stays && t < kResultTicks; t++)
+        stays = plain.consumer[t] != moved.consumer[t];
+    Check(stays, "the consumer's hashed state keeps the moved waypoint to the end of the run");
+
+    Check(relabelled.tampered >= 0, "the tampered pathfinder relabels a found route as partial");
+    Check(FirstDifference(plain.written, relabelled.written) < 0,
+          "the pathfinder that relabels a route reports the default's state every tick");
+    Check(FirstDifference(plain.consumer, relabelled.consumer) < 0,
+          "the end status of a route with waypoints reaches no hashed state");
 }
 
 int main()
@@ -402,7 +478,7 @@ int main()
     Check(GetPathfinder() != 0, "a new region is built");
     Check(HashWritten() != empty, "a new region is written");
 
-    CheckResultsSection();
+    CheckResultsReachHashedState();
 
     printf(g_failures ? "FAILED\n" : "pathfinding_writer_test: all passed\n");
     return g_failures != 0;

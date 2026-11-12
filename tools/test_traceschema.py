@@ -236,7 +236,7 @@ class SchemaJsonTest(unittest.TestCase):
         self.assertEqual((weapon["size"], weapon["kind"], weapon["target"]), (4, "ref", "weapondef"))
         self.assertEqual(self.model["wind"][0]["name"], "windCounter")
 
-    def test_results_section_matches_the_harness_and_names_its_fields_in_hash_order(self):
+    def test_results_section_matches_the_harness_and_names_its_fields_in_dump_order(self):
         results = self.model["results"]
         header = (ts.ROOT / "src/harness/path_results.h").read_text()
         constants = dict(re.findall(r"(PATH_RESULT_\w+) = (\d+)", header))
@@ -247,7 +247,7 @@ class SchemaJsonTest(unittest.TestCase):
         for f in results["fields"]:
             self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
 
-    def test_economy_section_matches_the_harness_and_names_its_fields_in_hash_order(self):
+    def test_economy_section_matches_the_harness_and_names_its_fields_in_dump_order(self):
         economy = self.model["economy"]
         header = (ts.ROOT / "src/harness/economy_results.h").read_text()
         constants = dict(re.findall(r"(ECONOMY_RESULT_\w+) = (\d+)", header))

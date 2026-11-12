@@ -5,9 +5,9 @@
 
 The JSON is the same tables as data, for a re-implementation that has no use for the header:
 per table the fields in hash order and the plan the hash walks, the masks with their reasons,
-and the fields left out of the hash with their reasons. Its "results" entry is the record the
-host hashes for each path event it delivers (section 32), in hash order; its "economy" entry is the
-record for each economy event (section 33), with the account that only a LOAD adds.
+and the fields left out of the hash with their reasons. Its "results" entry is the record a dump
+holds for each path event the host delivers (section 32), in dump order; its "economy" entry is the
+record for each economy event (section 33), with the account that only a LOAD adds. No row hashes either.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -102,7 +102,7 @@ POINTER_NAMES: dict[tuple[str, int], str] = {
 }
 
 EXCLUSIONS: list[tuple[str, str, str]] = [
-    ("Unit", "+0xbc..+0xeb", "the resource account, private to economy: the hash judges it through the economy events (section 33)"),
+    ("Unit", "+0xbc..+0xeb", "the resource account, private to economy: the hash judges it by what it feeds in the Player and Unit tables"),
     ("Eye", "screen", "points at the record's own screenPos"),
     ("Eye", "flagPtr", "points at the record's own flagB"),
     ("Node", "penalty", "NodeData(x, y, g, f, steps) leaves it unset for the start node; the visit hashes it when g is not 0"),

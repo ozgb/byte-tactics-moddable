@@ -130,118 +130,50 @@ RESULTS = tr.Schema(
             }
         },
         "globals": {"pathfinder": [{"name": "counter", "size": 4, "kind": "scalar", "target": None}]},
-        "results": {
-            "section": 32,
-            "points": 64,
-            "fields": [
-                {"name": "kind", "size": 4, "kind": "scalar", "target": None},
-                {"name": "status", "size": 4, "kind": "scalar", "target": None},
-                {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-                {"name": "tick", "size": 4, "kind": "scalar", "target": None},
-                {"name": "count", "size": 4, "kind": "scalar", "target": None},
-                {"name": "points", "size": 4, "kind": "bytes", "target": None},
-            ],
-        },
-        "economy": {
-            "section": 33,
-            "fields": [
-                {"name": "kind", "size": 4, "kind": "scalar", "target": None},
-                {"name": "player", "size": 4, "kind": "scalar", "target": None},
-                {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-                {"name": "resources", "size": 4, "kind": "scalar", "target": None},
-                {"name": "energy", "size": 4, "kind": "scalar", "target": None},
-                {"name": "metal", "size": 4, "kind": "scalar", "target": None},
-                {"name": "value", "size": 4, "kind": "scalar", "target": None},
-                {"name": "outcome", "size": 4, "kind": "scalar", "target": None},
-            ],
-            "account": {"kind": 1, "size": 48},
-        },
     }
 )
 
+PATH_RESULTS = [
+    ("results.count", "0x00000001"),
+    ("results[0].kind", "0x00000002"),
+    ("results[0].status", "0x00000000"),
+    ("results[0].unit", "unit:7"),
+    ("results[0].tick", "0x00000018"),
+    ("results[0].count", "0x00000002"),
+    ("results[0].points", "hex:1800280038004800"),
+]
 
-class ResultsTest(unittest.TestCase):
-    def test_results_hash_each_event_in_order(self):
-        w = tr.Walker(RESULTS, [
-            ("results.count", "0x00000001"),
-            ("results[0].kind", "0x00000002"),
-            ("results[0].status", "0x00000000"),
-            ("results[0].unit", "unit:7"),
-            ("results[0].tick", "0x00000018"),
-            ("results[0].count", "0x00000002"),
-            ("results[0].points", "hex:1800280038004800"),
-        ])
-        w.results()
-        want = tr.Hasher()
-        want.h8(32)
-        want.h32(1)
-        want.h32(2)
-        want.h32(0)
-        want.pointer(2, 7)
-        want.h32(0x18)
-        want.h32(2)
-        want.run(bytes.fromhex("1800280038004800"))
-        want.end()
-        self.assertEqual(w.hash.h, want.h)
-        self.assertEqual(w.pos, 7)
+ECONOMY_EVENTS = [
+    ("economy.count", "0x00000001"),
+    ("economy[0].kind", "0x00000001"),
+    ("economy[0].player", "0x00000000"),
+    ("economy[0].unit", "unit:7"),
+    ("economy[0].resources", "0x00000000"),
+    ("economy[0].energy", "0x00000000"),
+    ("economy[0].metal", "0x00000000"),
+    ("economy[0].value", "0x00000000"),
+    ("economy[0].outcome", "0x00000001"),
+    ("economy[0].account", "hex:" + bytes(range(48)).hex()),
+]
 
-    def test_no_results_is_section_count_and_end(self):
-        w = tr.Walker(RESULTS, [("results.count", "0x00000000")])
-        w.results()
-        want = tr.Hasher()
-        want.h8(32)
-        want.h32(0)
-        want.end()
-        self.assertEqual(w.hash.h, want.h)
 
-    def test_economy_hashes_each_event_and_the_account_of_a_load(self):
-        account = bytes(range(48))
-        w = tr.Walker(RESULTS, [
-            ("economy.count", "0x00000002"),
-            ("economy[0].kind", "0x00000003"),
-            ("economy[0].player", "0x00000001"),
-            ("economy[0].unit", "unit:7"),
-            ("economy[0].resources", "0x00000003"),
-            ("economy[0].energy", "0x3f800000"),
-            ("economy[0].metal", "0x40000000"),
-            ("economy[0].value", "0x00000000"),
-            ("economy[0].outcome", "0x00000001"),
-            ("economy[1].kind", "0x00000001"),
-            ("economy[1].player", "0x00000000"),
-            ("economy[1].unit", "null"),
-            ("economy[1].resources", "0x00000000"),
-            ("economy[1].energy", "0x00000000"),
-            ("economy[1].metal", "0x00000000"),
-            ("economy[1].value", "0x00000000"),
-            ("economy[1].outcome", "0x00000001"),
-            ("economy[1].account", "hex:" + account.hex()),
-        ])
-        w.economy()
-        want = tr.Hasher()
-        want.h8(33)
-        want.h32(2)
-        for word in (3, 1):
-            want.h32(word)
-        want.pointer(2, 7)
-        for word in (3, 0x3F800000, 0x40000000, 0, 1, 1, 0):
-            want.h32(word)
-        want.pointer(0, 0)
-        for word in (0, 0, 0, 0, 1):
-            want.h32(word)
-        for i in range(0, len(account), 4):
-            want.h32(int.from_bytes(account[i : i + 4], "little"))
-        want.end()
-        self.assertEqual(w.hash.h, want.h)
-        self.assertEqual(w.pos, 18)
+class DumpedOnlyTest(unittest.TestCase):
+    def test_path_results_and_economy_events_are_skipped(self):
+        w = tr.Walker(RESULTS, PATH_RESULTS + ECONOMY_EVENTS)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(PATH_RESULTS) + len(ECONOMY_EVENTS))
 
-    def test_no_economy_events_is_section_count_and_end(self):
-        w = tr.Walker(RESULTS, [("economy.count", "0x00000000")])
-        w.economy()
-        want = tr.Hasher()
-        want.h8(33)
-        want.h32(0)
-        want.end()
-        self.assertEqual(w.hash.h, want.h)
+    def test_a_dump_without_economy_events_skips_the_path_results(self):
+        w = tr.Walker(RESULTS, PATH_RESULTS)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(PATH_RESULTS))
+
+    def test_skipping_stops_at_a_hashed_line(self):
+        w = tr.Walker(RESULTS, [("results.count", "0x00000000"), ("game.x", "0x01")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
 
     def test_economy_report_after_the_pathfinder_is_skipped(self):
         w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005"), ("economyState.count", "0x00000001"),

@@ -1306,7 +1306,7 @@
         {"name": "", "offset": 244, "size": 36, "kind": "bytes", "target": null}
       ],
       "excluded": [
-        {"field": "+0xbc..+0xeb", "reason": "the resource account, private to economy: the hash judges it through the economy events (section 33)"}
+        {"field": "+0xbc..+0xeb", "reason": "the resource account, private to economy: the hash judges it by what it feeds in the Player and Unit tables"}
       ]
     },
     "UnitDefData": {

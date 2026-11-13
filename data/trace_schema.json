@@ -9,7 +9,7 @@
         {"name": "owner", "offset": 8, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "count", "offset": 92, "size": 4, "kind": "scalar", "target": null},
         {"name": "repathClaimTick", "offset": 96, "size": 4, "kind": "scalar", "target": null},
-        {"name": "flags", "offset": 100, "size": 1, "kind": "scalar", "target": null, "mask": 11, "mask_reason": "bits 4 to 7 are never written; bit 2 is unset by the constructor and read only after SerializeNetUnitState writes it"}
+        {"name": "flags", "offset": 100, "size": 1, "kind": "scalar", "target": null, "mask": 11, "mask_reason": "bits 4 to 7 are never written; bit 2 is unset by the constructor and read only after the unit state sent over the network writes it"}
       ],
       "plan": [
         {"name": "target", "offset": 4, "size": 4, "kind": "ref", "target": "orderfx"},
@@ -42,8 +42,8 @@
       ],
       "excluded": [
         {"field": "vptr", "reason": "the class is hashed as a tag"},
-        {"field": "saveOnly22", "reason": "set to 0 by the constructor and read only by SerializeToSave"},
-        {"field": "value26", "reason": "set only by the loading constructors and read only by SerializeToSave"}
+        {"field": "saveOnly22", "reason": "set to 0 by the constructor and read only when the game is saved"},
+        {"field": "value26", "reason": "set only by the loading constructors and read only when the game is saved"}
       ]
     },
     "AirManeuverOrderHeading": {
@@ -189,7 +189,7 @@
         {"name": "vel_z", "offset": 28, "size": 4, "kind": "scalar", "target": null},
         {"name": "ticks", "offset": 32, "size": 4, "kind": "scalar", "target": null},
         {"name": "scale", "offset": 36, "size": 4, "kind": "scalar", "target": null},
-        {"name": "flags", "offset": 40, "size": 4, "kind": "scalar", "target": null, "mask": 63, "mask_reason": "bits 6 to 31 are never written; StartExplodePiece copies them from an uninitialised stack header"},
+        {"name": "flags", "offset": 40, "size": 4, "kind": "scalar", "target": null, "mask": 63, "mask_reason": "bits 6 to 31 are never written; the explosion of a piece copies them from an uninitialised stack header"},
         {"name": "rec", "offset": 44, "size": 4, "kind": "ref", "target": "heap"}
       ],
       "plan": [
@@ -403,7 +403,7 @@
         {"name": "arg0", "offset": 54, "size": 4, "kind": "scalar", "target": null},
         {"name": "arg1", "offset": 58, "size": 4, "kind": "scalar", "target": null},
         {"name": "arg2", "offset": 62, "size": 4, "kind": "scalar", "target": null},
-        {"name": "flags", "offset": 66, "size": 4, "kind": "scalar", "target": null, "mask": 4292870143, "mask_reason": "bit 0x200000 is set by DrawWeaponCoverage (markers.cpp:564) and read only there (markers.cpp:556)"},
+        {"name": "flags", "offset": 66, "size": 4, "kind": "scalar", "target": null, "mask": 4292870143, "mask_reason": "bit 0x200000 is set by the drawing of the weapon coverage of a selected unit and read only there"},
         {"name": "created", "offset": 70, "size": 4, "kind": "scalar", "target": null},
         {"name": "subFlags", "offset": 78, "size": 4, "kind": "scalar", "target": null},
         {"name": "attached", "offset": 82, "size": 4, "kind": "ref", "target": "orderfx"}
@@ -425,7 +425,7 @@
       "excluded": [
         {"field": "vptr", "reason": "the vtable, the same for every order"},
         {"field": "linkVptr", "reason": "the vtable of the embedded PathOrderAttach"},
-        {"field": "cached", "reason": "written only by DrawWeaponCoverage (markers.cpp:563) and read only there (markers.cpp:557)"},
+        {"field": "cached", "reason": "written only by the drawing of the weapon coverage of a selected unit and read only there"},
         {"field": "next", "reason": "the chain: the visit walks it, so the order of the records carries it"}
       ]
     },
@@ -702,7 +702,7 @@
       "fields": [
         {"name": "translation", "offset": 4, "size": 12, "kind": "bytes", "target": null},
         {"name": "rotation", "offset": 16, "size": 6, "kind": "bytes", "target": null},
-        {"name": "flags", "offset": 40, "size": 2, "kind": "scalar", "target": null, "mask": 7, "mask_reason": "bits 3 to 15 are never written; SaveScriptState saves visible, cached and shaded"}
+        {"name": "flags", "offset": 40, "size": 2, "kind": "scalar", "target": null, "mask": 7, "mask_reason": "bits 3 to 15 are never written; the save of the script state saves visible, cached and shaded"}
       ],
       "plan": [
         {"name": "", "offset": 4, "size": 18, "kind": "bytes", "target": null},
@@ -1429,7 +1429,7 @@
         {"name": "speed", "offset": 32, "size": 4, "kind": "scalar", "target": null},
         {"name": "turn", "offset": 36, "size": 2, "kind": "scalar", "target": null},
         {"name": "pathLockStamp", "offset": 38, "size": 4, "kind": "scalar", "target": null},
-        {"name": "flags", "offset": 46, "size": 1, "kind": "scalar", "target": null, "mask": 7, "mask_reason": "bits 3 to 7 are never written; the constructor sets mode and flag (order_list.cpp:2096)"}
+        {"name": "flags", "offset": 46, "size": 1, "kind": "scalar", "target": null, "mask": 7, "mask_reason": "bits 3 to 7 are never written; the constructor sets mode and flag"}
       ],
       "plan": [
         {"name": "movementClass", "offset": 4, "size": 4, "kind": "ref", "target": "moveclass"},
@@ -1438,7 +1438,7 @@
       ],
       "excluded": [
         {"field": "obj", "reason": "the goal object: the visit hashes its class and fields"},
-        {"field": "lastMoveTick", "reason": "written by UpdatePosition (order_list.cpp:2001) and read by nothing"}
+        {"field": "lastMoveTick", "reason": "written by the motion update of the unit and read by nothing"}
       ]
     },
     "UnitResources": {
@@ -1510,7 +1510,7 @@
       ],
       "excluded": [
         {"field": "description", "reason": "text shown to the player"},
-        {"field": "fire", "reason": "SetWeaponFireHandler derives it from the flags"},
+        {"field": "fire", "reason": "derived from the flags when the weapon types load"},
         {"field": "table", "reason": "the visit hashes the damage entries it points at"},
         {"field": "model", "reason": "render asset pointer"},
         {"field": "explosionSeq", "reason": "render asset pointer"},

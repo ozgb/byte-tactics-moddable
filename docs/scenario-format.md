@@ -89,7 +89,7 @@ describes, plays it tick by tick, writes the outputs of section 7 and exits.
 | `load` | a scenario's file name | none | Starts from a saved game instead of from a map and players (section 5). One line only. |
 | `frames` | ticks | none | Ticks at which the run dumps the frame drawn at the end of that tick's loop pass (`docs/frame-dump.md`). One line only. |
 | `quirks` | a quirk spec | `3.1c` | The quirk flags of the run (section 6). |
-| `pathfinder` | `default` or `hpa` | `default` | Test only: `hpa` installs the demo pathfinder (`src/ai/pathfind_hpa.cpp`) in place of 3.1c's search before the match starts. A run with it does not conform to the reference traces. One line only. |
+| `pathfinder` | `default` or `hpa` | `default` | Test only: `hpa` installs the demo pathfinder (a hierarchical search) in place of 3.1c's search before the match starts. A run with it does not conform to the reference traces. One line only. |
 | `block_bytes` | 0, or a multiple of 65536 from 33554432 to 268435456 | 0 | The size of the state block, in bytes (`docs/state.md`). 0 sizes it from what the loaded modules need, which is 32 MiB with 3.1c's pathfinding. The traces equal at any size. A save keeps it. One line only. |
 | `search_steps` | 0 to 2147483647 | 0 | The search steps per tick pathfinding is limited to. 0 leaves each implementation its own default budget: 3.1c's 1333 for the default. A save keeps it. The `search` console command sets it. One line only. |
 | `quirks_tamper` | tick | none | Test only: flips a quirk flag at this tick, so the frozen-flags check of section 2 exits with status 2. |

@@ -111,7 +111,7 @@ EXCLUSIONS: list[tuple[str, str, str]] = [
     ("Pathfinder", "found_y", "written only when a search reaches its goal, read right after"),
     ("Order", "vptr", "the vtable, the same for every order"),
     ("Order", "linkVptr", "the vtable of the embedded PathOrderAttach"),
-    ("Order", "cached", "written only by DrawWeaponCoverage (markers.cpp:563) and read only there (markers.cpp:557)"),
+    ("Order", "cached", "written only by the drawing of the weapon coverage of a selected unit and read only there"),
     ("Order", "next", "the chain: the visit walks it, so the order of the records carries it"),
     ("ApproachRadius", "vptr", "the class is hashed as a tag"),
     ("RingApproach", "vptr", "the class is hashed as a tag"),
@@ -119,10 +119,10 @@ EXCLUSIONS: list[tuple[str, str, str]] = [
     ("PathOrder", "vptr", "the class is hashed as a tag"),
     ("PathOrder", "refVptr", "the vtable of the embedded PathOrderAttach"),
     ("AirManeuverOrder", "vptr", "the class is hashed as a tag"),
-    ("AirManeuverOrder", "saveOnly22", "set to 0 by the constructor and read only by SerializeToSave"),
-    ("AirManeuverOrder", "value26", "set only by the loading constructors and read only by SerializeToSave"),
+    ("AirManeuverOrder", "saveOnly22", "set to 0 by the constructor and read only when the game is saved"),
+    ("AirManeuverOrder", "value26", "set only by the loading constructors and read only when the game is saved"),
     ("UnitMotion", "obj", "the goal object: the visit hashes its class and fields"),
-    ("UnitMotion", "lastMoveTick", "written by UpdatePosition (order_list.cpp:2001) and read by nothing"),
+    ("UnitMotion", "lastMoveTick", "written by the motion update of the unit and read by nothing"),
     ("PatrolGoal", "vptr", "the class is hashed as a tag"),
     ("PatrolGoal", "points", "only the first count points are live: the visit hashes those"),
     ("AiSearchGoal", "vptr", "the class is hashed as a tag"),
@@ -179,7 +179,7 @@ EXCLUSIONS: list[tuple[str, str, str]] = [
     ("MissionData", "features", "the visit hashes the feature records and their names"),
     ("MissionData", "tail", "the memory and player count strings of the lobby: nothing in a phase reads them"),
     ("WeaponDefData", "description", "text shown to the player"),
-    ("WeaponDefData", "fire", "SetWeaponFireHandler derives it from the flags"),
+    ("WeaponDefData", "fire", "derived from the flags when the weapon types load"),
     ("WeaponDefData", "table", "the visit hashes the damage entries it points at"),
     ("WeaponDefData", "model", "render asset pointer"),
     ("WeaponDefData", "explosionSeq", "render asset pointer"),
@@ -253,12 +253,12 @@ HEAP_TYPES: list[tuple[str, str]] = [
 ]
 
 MASKS: dict[tuple[str, int], tuple[int, str]] = {
-    ("ExplodedPiece", 0x28): (0x3F, "bits 6 to 31 are never written; StartExplodePiece copies them from an uninitialised stack header"),
-    ("Order", 0x42): (0xFFDFFFFF, "bit 0x200000 is set by DrawWeaponCoverage (markers.cpp:564) and read only there (markers.cpp:556)"),
-    ("UnitMotion", 0x2E): (0x07, "bits 3 to 7 are never written; the constructor sets mode and flag (order_list.cpp:2096)"),
-    ("AiSearchGoal", 0x64): (0x0B, "bits 4 to 7 are never written; bit 2 is unset by the constructor and read only after SerializeNetUnitState writes it"),
+    ("ExplodedPiece", 0x28): (0x3F, "bits 6 to 31 are never written; the explosion of a piece copies them from an uninitialised stack header"),
+    ("Order", 0x42): (0xFFDFFFFF, "bit 0x200000 is set by the drawing of the weapon coverage of a selected unit and read only there"),
+    ("UnitMotion", 0x2E): (0x07, "bits 3 to 7 are never written; the constructor sets mode and flag"),
+    ("AiSearchGoal", 0x64): (0x0B, "bits 4 to 7 are never written; bit 2 is unset by the constructor and read only after the unit state sent over the network writes it"),
     ("PackedGoal", 0x27): (0x07, "bits 3 to 7 are never written"),
-    ("PieceTransform", 0x28): (0x07, "bits 3 to 15 are never written; SaveScriptState saves visible, cached and shaded"),
+    ("PieceTransform", 0x28): (0x07, "bits 3 to 15 are never written; the save of the script state saves visible, cached and shaded"),
 }
 
 SYNTHETIC: dict[str, str] = {

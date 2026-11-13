@@ -808,9 +808,70 @@ class LeakCheckTest(unittest.TestCase):
         self.assertTrue(hits[0].startswith("docs/a.md:1:") and "0x437de0" in hits[0], hits)
 
     def test_a_source_identifier_is_a_hit_and_a_layout_name_is_not(self):
-        hits = self.check("Use `UpdateMeteorShower` and `meteorTimer`.\n")
+        hits = self.check("Use `g_meteorNextStrike` and `meteorTimer`.\n")
         self.assertEqual(len(hits), 1)
-        self.assertIn("UpdateMeteorShower", hits[0])
+        self.assertIn("g_meteorNextStrike", hits[0])
+
+    def test_a_source_function_is_a_hit_even_when_kit_data_names_it(self):
+        files = {**leak_files("Call `UpdateMeteorShower` each tick.\n"), "data/x.json": b'{"note": "UpdateMeteorShower"}\n'}
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "meteors.cpp").write_text(LEAK_SOURCE)
+            hits = oraclekit.leak_check(files, Path(tmp))
+        self.assertIn("docs/a.md:1: function 'UpdateMeteorShower' is declared by no interface header", hits)
+        self.assertIn("data/x.json:1: function 'UpdateMeteorShower' is declared by no interface header", hits)
+        self.assertFalse(any("identifier" in h for h in hits), hits)
+
+    def test_a_function_an_interface_or_a_recording_declares_is_no_hit(self):
+        for declaring in ("interfaces/m.h", "tests/replay/m/a.txt"):
+            files = {**leak_files("Call `UpdateMeteorShower` each tick.\n"), declaring: b"void UpdateMeteorShower(int tickCount);\n"}
+            with tempfile.TemporaryDirectory() as tmp:
+                src = Path(tmp) / "src"
+                src.mkdir()
+                (src / "meteors.cpp").write_text(LEAK_SOURCE)
+                self.assertEqual(oraclekit.leak_check(files, Path(tmp)), [], declaring)
+
+    def test_a_source_file_is_a_hit_in_every_text_file(self):
+        files = {**leak_files("Set at `weapons.cpp:1529`, see src/map/meteors.h.\n"), "data/x.json": b'{"includes": ["../map/cell.h"]}\n',
+                 "tests/replay/m/a.txt": b"# from meteors.c\n"}
+        with tempfile.TemporaryDirectory() as tmp:
+            hits = oraclekit.leak_check(files, Path(tmp))
+        self.assertEqual(hits, ["data/x.json:1: names the source file '../map/cell.h'",
+                                "docs/a.md:1: names the source file 'weapons.cpp'",
+                                "docs/a.md:1: names the source file 'src/map/meteors.h'",
+                                "tests/replay/m/a.txt:1: names the source file 'meteors.c'"])
+
+    def test_the_source_file_rule_spares_interface_headers_system_includes_and_python_attributes(self):
+        text = '#include "services.h"\n#include <stdlib.h>\nsee interfaces/services.h and `import.c[0]`\n'
+        self.assertEqual(oraclekit.source_file_hits("interfaces/ref.h", text, {"services.h"}), [])
+        self.assertEqual(oraclekit.source_file_hits("tools/t.py", "self.h = h.h\n", set()), [])
+        self.assertEqual(oraclekit.source_file_hits("tools/t.py", "# see src/a.cpp\n", set()), ["tools/t.py:1: names the source file 'src/a.cpp'"])
+        self.assertEqual(oraclekit.source_file_hits("docs/a.md", "see `other.h`\n", {"services.h"}), ["docs/a.md:1: names the source file 'other.h'"])
+
+    def test_a_quoted_string_of_the_source_is_data(self):
+        source = 'void RockUnit(int a) { }\nvoid Fire(void) { StartScript("RockUnit"); }\n'
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "w.cpp").write_text(source)
+            self.assertEqual(oraclekit.leak_check(leak_files('It starts the script "RockUnit".\n'), Path(tmp)), [])
+            self.assertEqual(len(oraclekit.leak_check(leak_files("It calls RockUnit.\n"), Path(tmp))), 2)
+
+    def test_the_files_under_reference_are_not_asked_about_functions(self):
+        files = {**leak_files("ok\n"), "reference/scenarios/s.txt": b"# takes the UpdateMeteorShower path\n"}
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "meteors.cpp").write_text(LEAK_SOURCE)
+            self.assertEqual(oraclekit.leak_check(files, Path(tmp)), [])
+
+    def test_constructors_are_not_functions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "b.h").write_text("struct UnitBucket { UnitBucket() { } };\nint FirstUnit(int a) { return a; }\n")
+            self.assertEqual(oraclekit.source_functions(Path(tmp)), {"FirstUnit"})
 
     def test_a_name_in_the_checked_document_does_not_allow_itself(self):
         files = leak_files("The `g_meteorNextStrike` global.\n")
@@ -851,6 +912,15 @@ class LeakCheckTest(unittest.TestCase):
         files = {**leak_files("ok\n"), "reference/sounds/a.txt": b"count1 6\n"}
         self.assertIn("count1", oraclekit.allowed_identifiers(files))
 
+    def test_a_document_that_names_a_source_line_stops_the_export_with_its_path_and_line(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {"docs/a.md": "alpha\n\nThe bit is tested at foo.cpp:12.\n"})
+            kit = Path(out) / "k"
+            with self.assertRaises(oraclekit.Refusal) as caught:
+                run_export(root, kit)
+            self.assertIn("docs/a.md:3: names the source file 'foo.cpp'", str(caught.exception))
+            self.assertFalse(kit.exists())
+
     def test_a_leaking_document_stops_the_export_before_it_writes(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             root = repo(tmp, {"docs/a.md": "see 0x437de0\n"})
@@ -859,6 +929,76 @@ class LeakCheckTest(unittest.TestCase):
                 run_export(root, kit)
             self.assertIn("docs/a.md:1:", str(caught.exception))
             self.assertFalse(kit.exists())
+
+
+SCHEMA_TEXT = json.dumps({
+    "annotations": {
+        "includes": ["../orders/unit_orders.h"],
+        "rules": [{"kind": "field_escape", "target": "Game::weapons", "functions": ["AttackChaseOrder"]}],
+        "subsystems": {"orders": {"slots": {"RunOrders": {"functions": ["AttackChaseOrder"],
+                                                          "through": {"OrderTableEntry.notify": ["AttackChaseOrder"]}}}}},
+        "services": [{"name": "GameRand", "header": "src/state/game_rand.h", "declaration": "int GameRand(int s);",
+                      "effect": ["bx_rand(s);"]}],
+        "code_tables": {"orderNotify": {"entries": ["ReadyOrder", "AttackChaseOrder"], "headers": ["src/orders/unit_orders.h"],
+                                        "fill": "orders.RegisterAllOrderTypes"}},
+        "callbacks": {"Scan": {"header": "src/game/victory_conditions.h", "handle": "scanner", "methods": []}},
+    },
+    "subsystems": {"orders": {"slots": {"RunOrders": {"functions": ["AttackChaseOrder"], "reads": ["Game.ticks"]}}}},
+}, indent=1) + "\n"
+CODE_TABLES_TEXT = "table,entry,kit_name\norderNotify,ReadyOrder,Ready\norderNotify,AttackChaseOrder,Attack_Chase\n"
+SCHEMA_SOURCE = "int ReadyOrder(int a) { return a; }\nint AttackChaseOrder(int a) { return a; }\n"
+SCHEMA_CONTENTS = CONTENTS + [("file", oraclekit.SCHEMA, "")]
+
+
+def schema_repo(tmp: str, doc: str = "alpha\n", tables: str = CODE_TABLES_TEXT) -> Path:
+    return repo(tmp, {"docs/a.md": doc, oraclekit.SCHEMA: SCHEMA_TEXT, oraclekit.CODE_TABLES_SOURCE: tables, "src/o.cpp": SCHEMA_SOURCE})
+
+
+class ReplaySchemaKitTest(unittest.TestCase):
+    def test_the_kit_schema_drops_the_source_fields_and_renames_the_code_tables(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = schema_repo(tmp)
+            oraclekit.export(root, Path(out) / "k", True, {"records": {}}, SCHEMA_CONTENTS)
+            text = (Path(out) / "k" / oraclekit.SCHEMA).read_text()
+            for name in ("AttackChaseOrder", "ReadyOrder", "src/", ".h", "bx_rand"):
+                self.assertNotIn(name, text)
+            kit = json.loads(text)
+            self.assertEqual(kit["annotations"]["code_tables"]["orderNotify"],
+                             {"entries": ["Ready", "Attack_Chase"], "fill": "orders.RegisterAllOrderTypes"})
+            self.assertEqual(kit["annotations"]["services"], [{"name": "GameRand", "declaration": "int GameRand(int s);"}])
+            self.assertEqual(kit["subsystems"]["orders"]["slots"]["RunOrders"], {"reads": ["Game.ticks"]})
+            self.assertEqual(kit["annotations"]["rules"], [{"kind": "field_escape", "target": "Game::weapons"}])
+
+    def test_a_function_only_the_source_and_the_schema_name_is_refused_in_a_document(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = schema_repo(tmp, "alpha\n\nIts only caller, `AttackChaseOrder`, runs for an armed unit.\n")
+            kit = Path(out) / "k"
+            with self.assertRaises(oraclekit.Refusal) as caught:
+                oraclekit.export(root, kit, True, {"records": {}}, SCHEMA_CONTENTS)
+            self.assertIn("docs/a.md:3: function 'AttackChaseOrder' is declared by no interface header", str(caught.exception))
+            self.assertIn("docs/a.md:3: identifier 'AttackChaseOrder' is in the source but not in the kit", str(caught.exception))
+            self.assertFalse(kit.exists())
+
+    def test_a_code_table_entry_without_a_row_or_a_row_without_an_entry_is_refused(self):
+        for tables, message in ((CODE_TABLES_TEXT.replace("orderNotify,ReadyOrder,Ready\n", ""), "orderNotify[ReadyOrder] has no row"),
+                                (CODE_TABLES_TEXT + "orderNotify,StopOrder,Stop\n", "names orderNotify[StopOrder]")):
+            with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+                root = schema_repo(tmp, tables=tables)
+                with self.assertRaises(oraclekit.Refusal) as caught:
+                    oraclekit.export(root, Path(out) / "k", True, {"records": {}}, SCHEMA_CONTENTS)
+                self.assertIn(message, str(caught.exception))
+
+    def test_the_real_code_tables_have_a_kit_name_for_every_entry(self):
+        names = oraclekit.code_table_names((ROOT / oraclekit.CODE_TABLES_SOURCE).read_bytes())
+        kit = json.loads(oraclekit.kit_schema((ROOT / oraclekit.SCHEMA).read_bytes(), names))
+        self.assertEqual(kit["annotations"]["code_tables"]["weaponFire"]["entries"], ["turret", "vLaunch", "lineOfSight or selfProp", "dropped"])
+        self.assertIn("Attack_Chase", kit["annotations"]["code_tables"]["orderNotify"]["entries"])
+        self.assertEqual(oraclekit.names_source(json.dumps(kit["annotations"]["code_tables"]).encode()), [])
+
+    def test_a_coupling_item_that_names_a_source_file_is_renamed(self):
+        names = oraclekit.Names({"g_orderTable", "order_list"}, {}, {"g_orderTable": "const"})
+        self.assertEqual(names.item("g_orderTable@src/orders/order_list.cpp"), "heap")
+        self.assertEqual(names.item("g_orderTable"), "g_orderTable")
 
 
 def coupling_export(tmp: str, out: Path, counts: dict | None = None) -> tuple[Path, dict[str, str]]:

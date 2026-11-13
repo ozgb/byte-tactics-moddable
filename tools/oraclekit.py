@@ -17,11 +17,22 @@ neither check applies and it writes `"version": null`.
 Any path under FORBIDDEN, and any file the table does not list, is refused with its path named, and so is a
 generated file or the fuel pass that still names a source (SOURCE_NAME).
 
+`data/replay_schema.json` is exported without the fields that name the source: the `includes`, each slot's `functions` and
+`through`, each rule's `functions`, the `header` of each code table and callback, and the `header`, `pre` and `effect`
+(the replayer's own code) of each service. The entries of a code table are functions of the source, so each becomes its
+`kit_name` in tools/oraclekit/code_tables.csv (table, entry, kit_name): the order type's name for `orderNotify`, the bit of
+`WeaponDef.flags` that selects the handler for `weaponFire`. The export is refused when an entry has no row or a row no entry.
+
 `layout.json` carries no `layout_refs`: they name the decompilation's functions, files and globals, and the globals
 are not records of the state block. After the files are written, `leak_check` runs tools/speclint.py's address,
 identifier and token-run rules over every text file of the kit and the export fails on a hit. The fenced-block rule
-is not applied: the kit documents use `sh` and `json` fences for commands and schema examples. The identifiers a
-file may use are those the kit's structured data defines (`allowed_identifiers`: the json, the interface headers and
+is not applied: the kit documents use `sh` and `json` fences for commands and schema examples. Two more rules apply to every
+text file: one that names a source file (SOURCE_FILE: a path under a source directory, or a `.cpp`, `.c`, `.h`, `.hpp` or `.inc`
+file other than an interface header of the kit and a `<system.h>` include; in a Python file only the directories and `.cpp`,
+`.hpp` and `.inc`) is a hit, and so is one that names a function the source defines and no interface header, `layout.json`,
+the module manifest or a recording declares (`source_functions`). Quoted text that is a string of the source is data, not a
+name. The interface headers are not asked about functions, and the files under reference/ are not either, since they change
+only with a new traces tag. The identifiers a file may use are those the kit's structured data defines (`allowed_identifiers`: the json, the interface headers and
 everything under reference/ and tests/replay/), never the checked text itself. The interface headers declare the names
 and are the source's own declarations, so only the address rule applies to them, and the export strips their
 address-marker lines (`// FUNCTION: 0x...`, `// GLOBAL: 0x...`) before the check and the manifest digests.
@@ -81,6 +92,14 @@ SIM_EVENTS_HEADER = "interfaces/services.h"
 TERMS_SOURCE = "tools/oraclekit/sim_event_terms.csv"
 MODULE_SOURCE_FIELDS = ("cxx", "c")
 SOURCE_NAME = re.compile(r"(?<![\w.-])(?:src|include|orig|lib|build|cmake)/|\.(?:cpp|c|h)\b")
+SOURCE_DIR = r"(?<![\w.-])(?:src|include|orig|lib|cmake)/(?:[\w./-]*\w)?"
+SOURCE_FILE = re.compile(SOURCE_DIR + r"|(?<![\w<])[\w./-]*\w\.(?:cpp|c|h|hpp|inc)\b(?![\w(>\[])")
+SOURCE_FILE_PY = re.compile(SOURCE_DIR + r"|(?<![\w<])[\w./-]*\w\.(?:cpp|hpp|inc)\b(?![\w(>\[])")
+SCHEMA = "data/replay_schema.json"
+CODE_TABLES_SOURCE = "tools/oraclekit/code_tables.csv"
+CODE_TABLE_COLUMNS = ["table", "entry", "kit_name"]
+SLOT_SOURCE_FIELDS = ("functions", "through")
+SERVICE_SOURCE_FIELDS = ("header", "pre", "effect")
 FORBIDDEN = ("src/", "include/", "orig/", "lib/", "build/", "cmake/")
 TAG_PATTERNS = {"interfaces": re.compile(r"^interfaces-v(\d+)$"),
                 "reference_traces": re.compile(r"^reference-traces-v(\d+)$")}
@@ -419,7 +438,7 @@ class Names:
         item = STREAM_NAMES.get(item, item)
         if ALLOCATION_ITEM.search(item):
             return self.allocation(item)
-        if speclint.identifiers(item) <= self.known:
+        if speclint.identifiers(item) <= self.known and not SOURCE_FILE.search(item):
             return item
         name = self.classes.get(item) or self.classes.get(item.split("::", 1)[0])
         self.counts["undefined class" if name else "undefined heap"] += 1
@@ -521,6 +540,44 @@ def kit_modules(data: bytes) -> bytes:
         for field in MODULE_SOURCE_FIELDS:
             entry.pop(field, None)
     return (json.dumps(manifest, indent=1) + "\n").encode()
+
+
+def code_table_names(data: bytes) -> dict[tuple[str, str], str]:
+    """The kit name of each (table, entry) of tools/oraclekit/code_tables.csv."""
+    header, rows = csv_rows(data)
+    if header != CODE_TABLE_COLUMNS:
+        raise Refusal("refused: %s has the columns %s, not %s" % (CODE_TABLES_SOURCE, ",".join(header), ",".join(CODE_TABLE_COLUMNS)))
+    return {(r["table"], r["entry"]): r["kit_name"] for r in rows}
+
+
+def kit_schema(data: bytes, names: dict[tuple[str, str], str]) -> bytes:
+    """The replay schema of the kit: without the fields that name source files and functions, and with each code table entry
+    renamed to its kit name. Refusal when an entry has no kit name or a kit name has no entry."""
+    schema = json.loads(data)
+    annotations = schema.get("annotations", {})
+    annotations.pop("includes", None)
+    for rule in annotations.get("rules", []):
+        rule.pop("functions", None)
+    for subsystems in (annotations.get("subsystems", {}), schema.get("subsystems", {})):
+        for subsystem in subsystems.values():
+            for slot in subsystem.get("slots", {}).values():
+                for field in SLOT_SOURCE_FIELDS:
+                    slot.pop(field, None)
+    for callback in annotations.get("callbacks", {}).values():
+        callback.pop("header", None)
+    for service in annotations.get("services", []):
+        for field in SERVICE_SOURCE_FIELDS:
+            service.pop(field, None)
+    entries = set()
+    for table, spec in annotations.get("code_tables", {}).items():
+        spec.pop("headers", None)
+        entries |= {(table, e) for e in spec.get("entries", [])}
+        spec["entries"] = [names.get((table, e), e) for e in spec.get("entries", [])]
+    problems = ["%s[%s] has no row in %s" % (t, e, CODE_TABLES_SOURCE) for t, e in sorted(entries - set(names))]
+    problems += ["%s names %s[%s], which %s does not have" % (CODE_TABLES_SOURCE, t, e, SCHEMA) for t, e in sorted(set(names) - entries)]
+    if problems:
+        raise Refusal("refused: the code tables of %s and %s differ:\n%s" % (SCHEMA, CODE_TABLES_SOURCE, "\n".join(problems)))
+    return (json.dumps(schema, indent=1) + "\n").encode()
 
 
 def names_source(data: bytes) -> list[str]:
@@ -738,16 +795,73 @@ def allowed_identifiers(files: dict[str, bytes]) -> set[str]:
     return speclint.identifiers(structured_text(files))
 
 
+FUNCTION_DEFINITION = re.compile(r"\b([A-Za-z_]\w*)\s*\((?:[^()]|\([^()]*\))*\)\s*(?:const\s*)?\{")
+TYPE_DEFINITION = re.compile(r"\b(?:struct|class|union|enum)\s+(\w+)|\btypedef\b[^;]*?\b(\w+)\s*(?:\[[^\]]*\])?;")
+DECLARING = (LAYOUT, MODULES)
+DECLARING_DIRS = ("tests/replay/",)
+FROZEN_DIRS = ("reference/",)
+
+
+def source_functions(root: Path) -> set[str]:
+    """The identifier-like names of the functions the source files define, not counting the constructors of a type."""
+    names: set[str] = set()
+    types: set[str] = set()
+    for path in speclint.source_files(root):
+        text = speclint.code_only(path.read_text(encoding="utf-8", errors="replace"))
+        names |= {m.group(1) for m in FUNCTION_DEFINITION.finditer(text) if speclint.is_identifier_like(m.group(1))}
+        types |= {m.group(1) or m.group(2) for m in TYPE_DEFINITION.finditer(text)}
+    return names - types
+
+
+def declared_names(files: dict[str, bytes]) -> set[str]:
+    """The names the kit publishes: those of the interface headers, `layout.json`, the module manifest, the recordings and the
+    services the recordings may name."""
+    parts = [text_of(data) or "" for path, data in files.items()
+             if (path.startswith(DECLARED_DIRS) and path.endswith(".h")) or path in DECLARING or path.startswith(DECLARING_DIRS)]
+    if SCHEMA in files:
+        parts += [s["name"] for s in json.loads(files[SCHEMA]).get("annotations", {}).get("services", [])]
+    return speclint.identifiers("\n".join(parts))
+
+
+def source_file_hits(path: str, text: str, headers: set[str]) -> list[str]:
+    """One line per source directory or source file a kit file names; an interface header of the kit by its name is no hit."""
+    pattern = SOURCE_FILE_PY if path.endswith(".py") else SOURCE_FILE
+    hits = []
+    for number, line in enumerate(text.splitlines(), 1):
+        for m in pattern.finditer(line):
+            name = m.group(0)
+            if name.removeprefix(DECLARED_DIRS[0]) in headers:
+                continue
+            hits.append("%s:%d: names the source file %r" % (path, number, name))
+    return hits
+
+
+def function_hits(path: str, text: str, undeclared: set[str], literals: set[str]) -> list[str]:
+    """One line per function of the source that a kit file names and the kit does not declare; a quoted source string is data."""
+    hits = []
+    for number, line in enumerate(text.splitlines(), 1):
+        data = speclint.QUOTED.sub(lambda m: " " if m.group(0)[1:-1] in literals else " " + m.group(0)[1:-1] + " ", line)
+        for word in sorted(speclint.identifiers(data) & undeclared):
+            hits.append("%s:%d: function %r is declared by no interface header" % (path, number, word))
+    return hits
+
+
 def leak_check(files: dict[str, bytes], root: Path, run: int = speclint.DEFAULT_RUN, index=None) -> list[str]:
-    """One line per hit of speclint's address, identifier and token-run rules over every text file of the export."""
+    """One line per hit of speclint's address, identifier and token-run rules over every text file of the export, and of the
+    source file and function rules."""
     source_ids, source_runs, literals = index if index is not None else speclint.source_index(root, run)
     kit = structured_text(files)
     allowed = speclint.identifiers(kit)
+    undeclared = source_functions(root) - declared_names(files)
+    headers = {Path(p).name for p in files if p.startswith(DECLARED_DIRS) and p.endswith(".h")}
     hits: list[str] = []
     for path in sorted(files):
         text = text_of(files[path])
         if text is None:
             continue
+        hits += source_file_hits(path, text, headers)
+        if not path.startswith(DECLARED_DIRS + FROZEN_DIRS):
+            hits += function_hits(path, text, undeclared, literals)
         for number, message in speclint.lint(text, source_ids, allowed, source_runs, run, literals, kit):
             if message.startswith("fenced block"):
                 continue
@@ -786,6 +900,12 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     except subprocess.CalledProcessError:
         raise Refusal("refused: %s has no tracked file" % MODULES)
     check_names(files)
+    if SCHEMA in files:
+        try:
+            names = code_table_names(blob(root, CODE_TABLES_SOURCE))
+        except subprocess.CalledProcessError:
+            raise Refusal("refused: %s has no tracked file" % CODE_TABLES_SOURCE)
+        files[SCHEMA] = kit_schema(files[SCHEMA], names)
     if SIM_EVENTS_PAGE in files and listed(SIM_EVENTS_PAGE, contents):
         page = files[SIM_EVENTS_PAGE].decode()
         try:

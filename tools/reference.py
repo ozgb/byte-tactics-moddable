@@ -136,6 +136,7 @@ GATE_TIER = (
     "orders-tier2-vader",
     "save-midgame",
     "sensors-floating-teeth-los-off",
+    "share-all",
     "ui-build-menu",
     "ui-build-place",
     "ui-groups",

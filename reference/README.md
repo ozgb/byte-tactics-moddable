@@ -521,6 +521,9 @@ With the ten `mission-` scenarios of #764 in the suite, the rule takes `mission-
 `mission-kill-of-type` are in it: the other five draw extra numbers from the view random stream before tick 1, so their UI logs
 sometimes differ under load, and they wait for #829.
 
+`share-all` (#953) is in the tier by hand: it is the only scenario of the tier that shares resources with an ally, so
+without it the tier would never enter the resource sharing of a network game.
+
 `uv run tools/coverage.py --exe build/coverage/TotalA.exe --choose-tier` (`--runs DIR`, `--max-ticks N`, `--eight NAME`) plays
 nothing: it reproduces this rule from the per-scenario profiles a coverage run left in `build/coverage-run/` and prints the
 scenarios it takes, with their players, ticks and new lines, and their lines and functions as a share of the union of every
@@ -560,6 +563,7 @@ upper bound. Replay parts pick their recordings from it.
 | orders-tier2-vader | 2 | 420 |
 | save-midgame | 2 | 1800 |
 | sensors-floating-teeth-los-off | 2 | 400 |
+| share-all | 2 | 960 |
 | ui-build-menu | 2 | 200 |
 | ui-build-place | 2 | 200 |
 | ui-groups | 2 | 300 |

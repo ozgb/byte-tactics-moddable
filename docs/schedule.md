@@ -1515,6 +1515,7 @@ the split lies in.
 
 | writer | reader | place | split | write in | read in | may split inside | matched | rows | across |
 |---|---|---|---|---|---|---|---|---|---|
+| economy | players | tail, its steps | split | `economy.Apply` (step 3) | a call into players outside its interface (step 6) |  | by subsystem | 1 | 0 |
 | players | los_radar | tail, its steps | split | `players.UpdateBlink` (step 1) | `los_radar.ExpireEyeballs` (step 2) |  | by subsystem | 1 | 1 |
 
 ## By subsystem
@@ -1526,7 +1527,7 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | subsystem | view read | query | intent | mixed | edges written | edges read | inside an entity |
 |---|---|---|---|---|---|---|---|
 | wind_meteors | 0 / 0 | 0 / 0 | 1 / 0 | 0 / 0 | 0 | 0 | 0 |
-| economy | 0 / 0 | 1 / 1 | 0 / 2 | 0 / 8 | 35 | 3 | 38 |
+| economy | 0 / 0 | 1 / 1 | 0 / 2 | 0 / 8 | 36 | 3 | 38 |
 | features | 1 / 0 | 4 / 3 | 3 / 4 | 2 / 1 | 14 | 7 | 21 |
 | ai | 0 / 0 | 5 / 5 | 5 / 5 | 3 / 0 | 4 | 43 | 47 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 5 | 0 / 1 | 0 | 0 | 0 |
@@ -1535,7 +1536,7 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | los_radar | 0 / 0 | 3 / 13 | 0 / 11 | 0 / 0 | 12 | 30 | 41 |
 | orders | 2 / 0 | 22 / 2 | 25 / 13 | 10 / 3 | 64 | 52 | 116 |
 | units | 1 / 1 | 3 / 16 | 37 / 24 | 3 / 12 | 137 | 58 | 195 |
-| players | 1 / 0 | 3 / 0 | 14 / 4 | 5 / 0 | 14 | 22 | 35 |
+| players | 1 / 0 | 3 / 0 | 14 / 4 | 5 / 0 | 14 | 23 | 35 |
 | map | 0 / 4 | 3 / 8 | 2 / 10 | 0 / 3 | 17 | 32 | 49 |
 
 ## Limits
@@ -1574,7 +1575,8 @@ The orders are read from the program, not from a run. That decides what they cla
   names the item, the two steps must touch it. Where it does not (a region of the game record, an allocation, or an
   item reached under another name), or no such pair is found, the row is matched by subsystem: the writer's first step
   that writes anything, and the reader's next step that reads anything. A row matched by subsystem says where a
-  split can be, not where it must be.
+  split can be, not where it must be. A row that no such pair places is looked for again with the calls into a
+  subsystem outside its interface as steps too (the delivery of a queued effect to its subscriber's handler is one).
 - **Inside a step.** When the writer's step also holds a write of the item followed by a read of it by the reader,
   the split may be needed inside that step instead: the row names the step under `may split inside`. The search goes
   inside a step for the place itself only when its list holds no pair.

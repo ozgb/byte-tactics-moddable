@@ -118,6 +118,12 @@ exits with status 2.
 | `player<N>.color` | 0 to 9 | N | The colour index. |
 | `player<N>.metal` | number | 1000 | The starting metal. |
 | `player<N>.energy` | number | 1000 | The starting energy. |
+| `player<N>.remote` | 0 or 1 | 0 | Test only: 1 makes the slot a remote player (section 3.4). |
+| `player<N>.metal_storage` | number | none | Test only, a remote slot only: the slot's metal storage capacity, set before the step of tick 1. |
+| `player<N>.energy_storage` | number | none | Test only, a remote slot only: the slot's energy storage capacity, set before the step of tick 1. |
+| `player<N>.share_metal` | number | none | Test only, a slot that is not remote: turns metal sharing on before the step of tick 1, giving the metal above this level to the poorest ally. |
+| `player<N>.share_energy` | number | none | Test only, a slot that is not remote: the same for energy. |
+| `player<N>.share_mapping` | 0 or 1 | none | Test only, a slot that is not remote: 1 shares the slot's map with its allies. |
 
 ### 3.3 Game types
 
@@ -142,6 +148,22 @@ itself, and before every step it sets every player's load progress to 100. `comm
 `line_of_sight`, `los_type`, `start_positions` and the `metal` and `energy` of the local slot (which sets
 every player's start) come from the scenario as in a skirmish. The packet phase of a tick never runs, so the
 trace has no `net` rows.
+
+### 3.4 Remote slots
+
+A remote slot stands in for a player on another machine, so that the game's resource sharing, which only runs
+in a network game, can be judged. It needs `game_type 3`, `controller human`, and a local player that is
+not remote (`local_player`, or the first human slot by default). A scenario with a remote slot runs the share
+pass of every tick as a network game does; without one, nothing differs from a scenario without these keys.
+A remote slot is an error in an `order` or `spawn` line, and the `share_*` keys are errors on a remote slot and
+in a scenario without one.
+
+No packet arrives from a remote slot, so nothing of its own runs: it has no units (no commander is created for
+it), no computer player, and its economy is never updated. Its metal and energy stay what the start and the
+`console` lines (`nometal`, `noenergy`) make them, its storage what `metal_storage` and `energy_storage` set (0
+without them), and a share it receives is booked as income but never reaches its stores. So an ally keeps
+finding it the poorest and gives to it every share pass. The packets the local slots would send it are written to
+the dump (`docs/trace-format.md`, section 8.23).
 
 ## 4. Scripted lines
 

@@ -223,6 +223,9 @@ seeds) and runs deterministically: two runs give identical traces.
 | quad-two-continents | Two Continents | 4 | 6000 | Four players on Two Continents in teams of players 0 and 3 against 1 and 2, random start positions, 100 metal and energy |
 | sensors-floating-teeth | Hundred Isles | 2 | 400 | Human Arm commander with dragon's teeth owned by the AI player in its camera view (`spawn` for two slots, the feature draw through `IsFootprintVisible` and `IsExplored`) |
 | sensors-floating-teeth-los-off | Hundred Isles | 2 | 400 | The same with `line_of_sight 0`, so the feature draw goes through `IsSeen` |
+| share-all | The Pass | 2 | 960 | Game type 3: a human slot shares metal, energy and its map with an allied remote slot (`player<N>.remote`), so metal and energy shares and the share map are sent on tick 900 |
+| share-energy | The Pass | 2 | 300 | Game type 3: a human slot shares energy with an allied remote slot every 60 ticks |
+| share-metal | The Pass | 2 | 300 | Game type 3: a human slot shares metal with an allied remote slot every 60 ticks, each share capped by the remote's storage |
 | six-hundred-isles | Hundred Isles | 6 | 9000 | Six players on Hundred Isles, alternating sides, five minutes |
 | six-painted-desert | Painted Desert | 6 | 12600 | Six Core players on Painted Desert, random start positions, seven minutes |
 | six-yerrot-mountains | Yerrot Mountains | 6 | 7200 | Six players on Yerrot Mountains in two allied teams of three, four minutes |
@@ -518,6 +521,9 @@ With the ten `mission-` scenarios of #764 in the suite, the rule takes `mission-
 `mission-kill-of-type` are in it: the other five draw extra numbers from the view random stream before tick 1, so their UI logs
 sometimes differ under load, and they wait for #829.
 
+`share-all` (#953) is in the tier by hand: it is the only scenario of the tier that shares resources with an ally, so
+without it the tier would never enter the resource sharing of a network game.
+
 `uv run tools/coverage.py --exe build/coverage/TotalA.exe --choose-tier` (`--runs DIR`, `--max-ticks N`, `--eight NAME`) plays
 nothing: it reproduces this rule from the per-scenario profiles a coverage run left in `build/coverage-run/` and prints the
 scenarios it takes, with their players, ticks and new lines, and their lines and functions as a share of the union of every
@@ -557,6 +563,7 @@ upper bound. Replay parts pick their recordings from it.
 | orders-tier2-vader | 2 | 420 |
 | save-midgame | 2 | 1800 |
 | sensors-floating-teeth-los-off | 2 | 400 |
+| share-all | 2 | 960 |
 | ui-build-menu | 2 | 200 |
 | ui-build-place | 2 | 200 |
 | ui-groups | 2 | 300 |

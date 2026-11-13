@@ -3431,6 +3431,7 @@ void __stdcall SendShareMetal(unsigned char from, unsigned char to, int amount)
         packet.fromNetId = GetSlotDpid(from);
         packet.toNetId = GetSlotDpid(to);
         packet.amount = amount;
+        HarnessSharePacket(&packet, sizeof(packet));
         SendPacketToPlayer(GetSlotDpid(from), GetSlotDpid(to), (unsigned char *)&packet, sizeof(packet));
     }
 }
@@ -3454,6 +3455,7 @@ void __stdcall SendShareEnergy(unsigned char from, unsigned char to, int value)
         packet.fromNetId = GetSlotDpid(from);
         packet.toNetId = GetSlotDpid(to);
         packet.amount = value;
+        HarnessSharePacket(&packet, sizeof(packet));
         SendPacketToPlayer(GetSlotDpid(from), GetSlotDpid(to), (unsigned char *)&packet, sizeof(packet));
     }
 }
@@ -3475,6 +3477,7 @@ void __stdcall SendShareMapInfo(unsigned char from, unsigned char to)
         packet.fromNetId = SlotDpidInUpdateResourceSharing(from);
         packet.toNetId = SlotDpidInUpdateResourceSharing(to);
         packet.amount = 0;
+        HarnessSharePacket(&packet, sizeof(packet));
         SendPacketToPlayer(SlotDpidInUpdateResourceSharing(from), SlotDpidInUpdateResourceSharing(to), (unsigned char *)&packet, sizeof(packet));
     }
 }

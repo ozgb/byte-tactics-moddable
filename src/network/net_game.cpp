@@ -700,6 +700,8 @@ static inline unsigned char FindPlayerIndex_00450380(int id)
 }
 
 int HarnessViewRand();
+int __stdcall HarnessSharing();
+void __stdcall HarnessSharePacket(const void* packet, int size);
 
 #include "../harness/harness_events.h"
 
@@ -3425,6 +3427,7 @@ void __stdcall SendShareMetal(unsigned char from, unsigned char to, int amount)
         packet.fromNetId = PlayerDpid(from);
         packet.toNetId = PlayerDpid(to);
         packet.amount = amount;
+        HarnessSharePacket(&packet, sizeof(packet));
         SendPacketToPlayer(PlayerDpid(from), PlayerDpid(to), &packet, sizeof(packet));
     }
 }
@@ -3452,6 +3455,7 @@ void __stdcall SendShareEnergy(unsigned char from, unsigned char to, int value)
         packet.fromNetId = PlayerDpid(from);
         packet.toNetId = PlayerDpid(to);
         packet.amount = value;
+        HarnessSharePacket(&packet, sizeof(packet));
         SendPacketToPlayer(PlayerDpid(from), PlayerDpid(to), &packet, sizeof(packet));
     }
 }
@@ -3902,7 +3906,7 @@ int CountCombatPlayers()
 // FUNCTION: 0x457d30
 void __stdcall UpdateResourceSharing(Player* player)
 {
-    if ((g_game->flags_2a44 & 1) == 0)
+    if ((g_game->flags_2a44 & 1) == 0 && !HarnessSharing())
         return;
 
     if (g_game->gameTick % 60 == 0) {
@@ -3979,6 +3983,7 @@ void __stdcall UpdateResourceSharing(Player* player)
                     packet.fromNetId = PlayerDpid_00457d30(a);
                     packet.toNetId = PlayerDpid_00457d30(b);
                     packet.amount = 0;
+                    HarnessSharePacket(&packet, sizeof(packet));
                     SendPacketToPlayer(PlayerDpid_00457d30(a), PlayerDpid_00457d30(b),
                                  &packet, sizeof(packet));
                 }

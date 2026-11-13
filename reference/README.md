@@ -53,6 +53,12 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `player<N>.color` | N | Colour index 0 to 9 |
 | `player<N>.metal` | 1000 | Starting metal |
 | `player<N>.energy` | 1000 | Starting energy |
+| `player<N>.remote` | 0 | 1: the slot is a remote player, with no units and no computer player; needs `game_type 3`, `controller human` and a local player that is not remote |
+| `player<N>.metal_storage` | none | Remote slot only: metal storage capacity, set before the step of tick 1 |
+| `player<N>.energy_storage` | none | Remote slot only: energy storage capacity, set before the step of tick 1 |
+| `player<N>.share_metal` | none | Slot that is not remote, and only with a remote slot in the scenario: turns metal sharing on at this level before the step of tick 1 |
+| `player<N>.share_energy` | none | The same for energy |
+| `player<N>.share_mapping` | none | 0 or 1: whether the slot shares its map with its allies |
 
 `player<N>.*` keys take N from 0 to 9. A slot exists when any key names it,
 slots no key names are open, and at least 2 slots must exist. The game's player
@@ -418,6 +424,11 @@ and `.goal.points`, `orderFx[id].<field>` with `orderFx[id].class` (1 approach r
 approach, 3 point marker, 4 path order, 5 air maneuver), and `units[i].script.<field>`,
 `.channels[c].<field>` and `.channels[c].stack`, `.statics`, `.pieces[p].<field>` and
 `.transforms[p].<field>`. Every phase dumps all of them, not only its own subsystem's.
+
+A scenario with a remote slot also runs the share pass of every tick. The resource share packets a step
+would send are not sent; they are recorded and dumped as `packets.count` and
+`packets[k].type`, `.subtype`, `.from`, `.to` and `.amount` (section 35), in sending order, at the end of
+the `meteors` block of the dump tick. No row hashes them, and a step may send at most 64.
 
 A field that differs between two builds is the same `<tick> <phase> <path>`
 with another `<value>`. Scalars are `0x` and the field's bytes as one hex

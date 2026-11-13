@@ -871,7 +871,8 @@ sets). The annotations hold what no header says. The copy in the oracle kit leav
 and `effect` of each service (the replayer's own code); its code tables name their entries as Code pointers says. It also leaves
 out what only the recorder, the replayer and `replayschema.py --check` read, which names the source's globals, types and
 functions: the `exempt`, `exempt_types` and `rules` annotations, the `id` of each service, the `vtable` or `vptr` of each kind,
-the `aliases`, `reachFirst` and `reachCount` of each field and slot argument, and the `allOf` of each slot. A recording names
+the `aliases` of each field, the indices that tie a field or a slot argument to the replayer's table of reached fields, and the
+kinds whose every object a slot walks (the effect of an `all-of` rule). A recording names
 none of these: an object is named by its concrete kind, and a field by its own name. A service or callback interface whose name,
 or a method's, is a name of the source that nothing else in the kit declares is left out too, since no recording of the kit
 calls it; once a recording does, the recording declares it. Every other name of the copy is one that the interface headers,

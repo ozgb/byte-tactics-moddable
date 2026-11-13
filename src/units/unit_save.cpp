@@ -147,6 +147,37 @@ void __stdcall LoadUnits(HapiBank* file)
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/orders.h"
+#include "../game/economy_events.h"
+#include "../../interfaces/economy.h"
+#include "../../interfaces/services.h"
+
+// FUNCTION: 0x4010b0
+static void SaveUnitAccounts(Unit* info, HapiBank* file)
+{
+    char name[32];
+    EconAccount account;
+    g_seams.economy->UnitAccount(EconHandleOf(info), &account);
+    sprintf(name, "u%04xacc", info->id);
+    file->OpenNamedBox(name);
+    file->SeekBox(0);
+    file->WriteBox(&account.energy, 0x18);
+    file->WriteBox(&account.metal, 0x18);
+}
+
+// FUNCTION: 0x401110
+static void LoadUnitAccounts(Unit* info, HapiBank* file)
+{
+    char name[32];
+    EconAccount account;
+    g_seams.economy->UnitAccount(EconHandleOf(info), &account);
+    sprintf(name, "u%04xacc", info->id);
+    if (file->OpenNamedBox(name)) {
+        file->SeekBox(0);
+        file->ReadBox(&account.energy, 0x18);
+        file->ReadBox(&account.metal, 0x18);
+        EconPublishLoad(SCHED_UNITS, info->playerIndex, EconHandleOf(info), account);
+    }
+}
 
 // FUNCTION: 0x487080
 Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
@@ -233,7 +264,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     unit->flags = (unit->flags & ~0x400000) | ((rec.flags.e << 14) & 0x400000);
     unit->flags = (unit->flags & ~0x3800000) | ((rec.flags.e << 14) & 0x3800000);
 
-    g_seams.economy->LoadUnitAccounts(&unit->resourceSlot, unit, file);
+    LoadUnitAccounts(unit, file);
     if (rec.f27 != 0)
         g_seams.orders->LoadMotion(unit->motion, 0, unit, file);
 
@@ -319,7 +350,7 @@ void __stdcall SaveUnits(HapiBank* file)
 
             if (unit->motion != 0)
                 g_seams.orders->SaveMotion(unit->motion, 0, unit, file);
-            g_seams.economy->SaveUnitAccounts((UnitResources*)((char*)unit + 0xbc), unit, file);
+            SaveUnitAccounts(unit, file);
 
             strcpy(rec.name, ((char*)unit->def.get() + 0x20));
             rec.player = unit->playerIndex;

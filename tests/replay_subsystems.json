@@ -21,14 +21,6 @@
       "inject_define": "BT_REPLAY_INJECT_GAP_SCALE=31.0"
     }
   },
-  "economy": {
-    "inject": {
-      "define": "BT_REPLAY_INJECT_WIND_SCALE=3.0",
-      "recording": "duel-shore-to-shore.txt",
-      "expect": 5501,
-      "field": "Player#0.energy"
-    }
-  },
   "targeting": {
     "inject": {
       "define": "BT_REPLAY_INJECT_TARGET_SCALE=0x6666",

@@ -37,7 +37,7 @@ def play(options, name, put=(), collect=()):
     match = re.search(r"in (build/playtest/\S+)", out.stdout)
     if out.returncode != 0 or match is None:
         sys.exit(f"{name}: the run failed\n{out.stdout}{out.stderr}")
-    run = next((ROOT / match.group(1)).iterdir())
+    run = next(p for p in (ROOT / match.group(1)).iterdir() if p.is_dir())
     return run, (run / "wine.log").read_text(errors="replace")
 
 

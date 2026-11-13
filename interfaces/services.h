@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 10
+#define SERVICES_VERSION_MINOR 11
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -44,6 +44,36 @@ int __stdcall PathGoalCells(const PathGoalArea* goal, PathPoint* out, int max);
 struct PathEvent;
 // In test mode, records a pathfinding event as the engine delivers it, with its waypoints, for the trace's path results.
 void __stdcall HarnessPathEvent(const PathEvent* event, const PathPoint* points, int capacity);
+struct EconomyEvent;
+// In test mode, records an economy event as economy consumes or answers it, or an effect as economy publishes it, with its outcome, for the dump's economy events.
+void __stdcall HarnessEconomyEvent(const EconomyEvent* event, int outcome);
+// The modules that own an outbox or an inbox in the scheduler's router.
+enum SchedModule {
+    // The engine itself, outside any module.
+    SCHED_ENGINE = 0,
+    // Economy (interfaces/economy.h).
+    SCHED_ECONOMY = 1,
+    // Units.
+    SCHED_UNITS = 2,
+    // Orders.
+    SCHED_ORDERS = 3,
+    // Players.
+    SCHED_PLAYERS = 4,
+    // Features.
+    SCHED_FEATURES = 5,
+    // Weapons.
+    SCHED_WEAPONS = 6,
+    // The number of modules.
+    SCHED_MODULE_COUNT = 7
+};
+// Publishes an event, plain data whose first int is its kind, to a module's outbox; the router copies it to the inbox of each subscriber of that kind, which consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
+void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
+// Calls economy's synchronous Spend slot for a spend (an event of kind ECONOMY_SPEND) after delivering economy's pending inbox, records it, and returns its outcome, visible at once.
+int __stdcall ScheduleEconomySpend(const EconomyEvent* spend);
+// Calls economy's synchronous RequestGranted slot for a unit (an economy unit handle) and the resources it asks for, after delivering economy's pending inbox.
+int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
+// Runs economy's UpdateMetalExtraction for a unit (an economy unit handle) after delivering economy's pending inbox; its effects are published to economy's outbox.
+void __stdcall ScheduleMetalExtraction(unsigned int unit);
 
 // Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);

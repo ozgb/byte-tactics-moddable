@@ -113,21 +113,8 @@ struct Unit {
         };
         unsigned short netDirtyFlags;
     };
-    union {
-        struct {
-            float energy;
-            char unknown_c0[20];
-            float metal;
-            char unknown_d8[4];
-            int f_dc;
-            char unknown_e0[4];
-            unsigned short field_e4;
-            unsigned short f_e6;
-            char unknown_e8[4];
-            Ref<Player> owner;
-        };
-        UnitResources resourceSlot;
-    };
+    unsigned char unusedAccount[0x30];
+    Ref<Player> owner;
     Ref<Unit> attacker;
     unsigned char lastAttackerSlot;
     unsigned char lastDamageType;
@@ -254,7 +241,7 @@ static_assert(offsetof(Unit, angles) == 0x64, "angles");
 static_assert(offsetof(Unit, pos) == 0x6a, "pos");
 static_assert(offsetof(Unit, netDirtyFlags) == 0xba, "netDirtyFlags");
 static_assert(offsetof(Unit, losCacheCell) == 0x7a, "losCacheCell");
-static_assert(offsetof(Unit, resourceSlot) == 0xbc, "resourceSlot");
+static_assert(offsetof(Unit, unusedAccount) == 0xbc, "unusedAccount");
 static_assert(offsetof(Unit, owner) == 0xec, "owner");
 static_assert(offsetof(Unit, buildLeft) == 0x104, "buildLeft");
 static_assert(offsetof(Unit, cobStateFlags) == 0x10f, "cobStateFlags");

@@ -236,7 +236,7 @@ class SchemaJsonTest(unittest.TestCase):
         self.assertEqual((weapon["size"], weapon["kind"], weapon["target"]), (4, "ref", "weapondef"))
         self.assertEqual(self.model["wind"][0]["name"], "windCounter")
 
-    def test_results_section_matches_the_harness_and_names_its_fields_in_hash_order(self):
+    def test_results_section_matches_the_harness_and_names_its_fields_in_dump_order(self):
         results = self.model["results"]
         header = (ts.ROOT / "src/harness/path_results.h").read_text()
         constants = dict(re.findall(r"(PATH_RESULT_\w+) = (\d+)", header))
@@ -246,6 +246,22 @@ class SchemaJsonTest(unittest.TestCase):
         targets = {t["name"] for t in self.model["targets"]}
         for f in results["fields"]:
             self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
+
+    def test_economy_section_matches_the_harness_and_names_its_fields_in_dump_order(self):
+        economy = self.model["economy"]
+        header = (ts.ROOT / "src/harness/economy_results.h").read_text()
+        constants = dict(re.findall(r"(ECONOMY_RESULT_\w+) = (\d+)", header))
+        self.assertEqual(economy["section"], int(constants["ECONOMY_RESULT_SECTION"]))
+        self.assertEqual(economy["account"]["size"], 4 * int(constants["ECONOMY_RESULT_ACCOUNT_WORDS"]))
+        self.assertEqual([f["name"] for f in economy["fields"]],
+                         ["kind", "player", "unit", "resources", "energy", "metal", "value", "outcome"])
+
+    def test_the_unit_account_is_not_hashed(self):
+        unit = self.model["tables"]["Unit"]
+        self.assertEqual([e["field"] for e in unit["excluded"]], ["+0xbc..+0xeb"])
+        for f in unit["fields"] + unit["plan"]:
+            self.assertFalse(0xBC <= f["offset"] <= 0xEB, f)
+        self.assertIn({"name": "", "offset": 0xA6, "size": 22, "kind": "bytes", "target": None}, unit["plan"])
 
 
 class CheckTest(unittest.TestCase):

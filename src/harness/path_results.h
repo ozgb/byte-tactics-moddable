@@ -25,6 +25,5 @@ struct PathResults {
 
 int PathResultsAdd(PathResults* results, const PathEvent* event, const PathPoint* points, int capacity);
 void PathResultsClear(PathResults* results);
-unsigned long long PathResultsHash(const PathResults* results, unsigned long long h);
 
 #endif

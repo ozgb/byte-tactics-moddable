@@ -12,6 +12,9 @@ class MissionConditions;
 class CobScript;
 class UnitMotion;
 class UnitResources;
+#include "../game/economy_events.h"
+#include "../../interfaces/economy.h"
+#include "../../interfaces/services.h"
 struct SpotStateUnitView;
 struct Object3do;
 
@@ -380,7 +383,8 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
     }
 
     unit->losSightFrameIdx = 0;
-    g_seams.economy->Reset(&unit->resourceSlot, unit->playerIndex);
+    unit->owner = &g_game->players[unit->playerIndex];
+    EconPublish(SCHED_UNITS, ECONOMY_RESET, unit->playerIndex, EconHandleOf(unit), 0, 0, 0);
     unit->transportPiece = 0xff;
     unit->hoverBobPhase = (short)RandomInt(0x10000);
     g_seams.ai->SetUnitSquad(unit, 0);
@@ -448,7 +452,7 @@ void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
     InitUnitFromType(unit, pos, param_5);
     InitUnitScript(unit);
     g_seams.weapons->InitUnitWeaponSlots(unit);
-    g_seams.economy->UpdateMetalExtraction((Unit*)unit);
+    ScheduleMetalExtraction(EconHandleOf(unit));
     if (type->mobile == 1) {
         g_seams.orders->NewUnitMotion(unit);
         unit->angles.heading = unit->def->buildangleUnsigned;
@@ -474,7 +478,7 @@ static inline void __stdcall InitSpawnedUnit(unsigned short unitType, Vec3 pos,
     InitUnitFromType(unit, pos, param_5);
     InitUnitScript(unit);
     g_seams.weapons->InitUnitWeaponSlots(unit);
-    g_seams.economy->UpdateMetalExtraction((Unit*)unit);
+    ScheduleMetalExtraction(EconHandleOf(unit));
     if (type->mobile == 1) {
         g_seams.orders->NewUnitMotion(unit);
         unit->angles.heading = unit->def->buildangleUnsigned;
@@ -810,20 +814,8 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         float health = 1.0f - unit->buildLeft;
         float f = health;
         f *= unit->def->metalCost;
-        if ((*par)->resourceSlot.player->active != 0 && (*par)->resourceSlot.player->type == 2) {
-            switch (g_game->difficulty) {
-            case 0:
-                (*par)->resourceSlot.metalMake = (*par)->resourceSlot.metalMake - f * -0.5;
-                break;
-            case 1:
-                (*par)->resourceSlot.metalMake = (*par)->resourceSlot.metalMake - f * -0.7;
-                break;
-            default:
-                (*par)->resourceSlot.metalMake += f;
-            }
-        } else {
-            (*par)->resourceSlot.metalMake += f;
-        }
+        Unit* attacker = par->get();
+        EconPublish(SCHED_UNITS, ECONOMY_INCOME, attacker->playerIndex, EconHandleOf(attacker), ECON_METAL, 0, f);
     }
     if (cmd->cobKilledSeverity > 0 && unit->buildLeft == 0.0f)
         g_seams.weapons->DetonateUnitWeapon(unit, cmd->killType == 3);

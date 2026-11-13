@@ -26,6 +26,32 @@ class PrivateItemTest(unittest.TestCase):
             self.assertFalse(ps.is_private(item), item)
 
 
+class EconomyOwnerTest(unittest.TestCase):
+    REGION = "LoadBattleAssets: SimAllocRegion Economy region"
+
+    def test_region_parts_are_private_to_economy(self):
+        self.assertEqual(ps.private_to(self.REGION + ".accounts"), ("economy", ("writer", "reader")))
+        self.assertEqual(ps.private_to(ALLOCATION + ".heap")[0], "pathfinding")
+
+    def test_player_accounts_are_private_for_writes_only(self):
+        self.assertEqual(ps.private_to("UnitResources::energyMake"), ("economy", ("writer",)))
+        rows = {"edges": [("players", "economy", "UnitResources::metalMake"), ("economy", "players", "UnitResources::metalMake"),
+                          ("-", "ai", "UnitResources::energyStall")]}
+        found = ps.violations(rows)
+        self.assertEqual(found, ["edges: writer players on UnitResources::metalMake, which is written only by economy"])
+
+    def test_another_subsystem_touching_the_region_is_found(self):
+        rows = {"edges": [("units", "economy", self.REGION + ".accounts"), ("economy", "players", self.REGION + ".accounts")],
+                "reads": [("-", "weapons", self.REGION + ".accounts"), ("-", "economy", self.REGION + ".accounts")]}
+        found = ps.violations(rows)
+        self.assertEqual(len(found), 3)
+        self.assertTrue(all("private to economy" in line for line in found))
+
+    def test_owners_do_not_share_items(self):
+        rows = {"edges": [("economy", "-", "Pathfinder::steps"), ("pathfinding", "-", self.REGION + ".accounts")]}
+        self.assertEqual(len(ps.violations(rows)), 2)
+
+
 class ViolationTest(unittest.TestCase):
     def test_pathfinding_and_no_subsystem_are_allowed(self):
         rows = {"edges": [("pathfinding", "-", "Pathfinder::steps"), ("-", "pathfinding", "Node::data.g"), ("pathfinding", "pathfinding", "pathfinder")],

@@ -210,6 +210,7 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
 #include "../../interfaces/services.h"
+#include "../../interfaces/economy.h"
 #include "../units/squads.h"
 #include "../util/math.h"
 #include "pathfind.h"
@@ -1108,6 +1109,11 @@ int __stdcall RateWeapons(UnitDef* p)
     return MIN(result, 100);
 }
 
+static double __stdcall EnergyUseOf(UnitDef* def)
+{
+    return g_seams.economy->GetEnergyUse((EconType)(def - g_game->defs.get()));
+}
+
 // FUNCTION: 0x4095d0
 int __stdcall RateUnitType(UnitDef* p)
 {
@@ -1116,7 +1122,7 @@ int __stdcall RateUnitType(UnitDef* p)
         result = 0xb;
     if (p->makesMetal != 0)
         result += 10;
-    if (g_seams.economy->GetEnergyUse(p) < 0.0f)
+    if (EnergyUseOf(p) < 0.0f)
         result += 10;
     result = (int)((int)(result - p->metalCost * -0.01f) - p->energyCost * -0.002f);
     int extra = 1;
@@ -1142,7 +1148,7 @@ int __stdcall RateUnitTypeForWeights(UnitDef* p)
         result = 0xb;
     if (p->makesMetal != 0)
         result += 10;
-    if (g_seams.economy->GetEnergyUse(p) < 0.0f)
+    if (EnergyUseOf(p) < 0.0f)
         result += 10;
 #ifdef __clang__
     result = (int)((int)((double)result - (double)p->metalCost * -0.01f) - (double)p->energyCost * -0.002f);
@@ -1177,7 +1183,7 @@ void PlayerAI::ComputeBaseWeights()
             a = 21;
         if (def->canbuild && n < 3)
             a += 30;
-        if (g_seams.economy->GetEnergyUse(def) < 0.0f)
+        if (EnergyUseOf(def) < 0.0f)
             a += 50;
         if (def->HasField1ce())
             a += 50;
@@ -1208,7 +1214,7 @@ void PlayerAI::ComputeBaseWeights()
             x = 0;
         x = min(x, 100);
         e->a = x;
-        e->c = ComputeEnergyRating(def->energyCost, g_seams.economy->GetEnergyUse, def);
+        e->c = ComputeEnergyRating(def->energyCost, EnergyUseOf, def);
 #ifdef __clang__
         e->b = (char)max(0.0f, min(100.0f, (double)(float)((double)def->metalCost * -0.02f + (def->makesMetal ? 25 : 0)) + (def->extractsMetal != 0.0f ? 100 : 0)));
 #else
@@ -1426,7 +1432,7 @@ void PlayerAI::UpdateEveryThirtyTicks()
 // FUNCTION: 0x40ad70
 void __stdcall ProbeUnitDefEnergyRate(int unused1, int unused2, int param_3)
 {
-    g_seams.economy->GetEnergyUse((UnitDef*)param_3);
+    EnergyUseOf((UnitDef*)param_3);
 }
 
 // FUNCTION: 0x40ad80

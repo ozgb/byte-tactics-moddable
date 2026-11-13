@@ -975,6 +975,8 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
 }
 
 #include "../../interfaces/seams.h"
+#include "../game/economy_events.h"
+#include "../../interfaces/economy.h"
 
 // FUNCTION: 0x41ba60
 int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
@@ -1008,28 +1010,13 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
     int hp = (int)(prev * type->maxHealth) - (int)(next * type->maxHealth);
     if (amount < 0.0f) {
         float refund = -metalCharge;
-        float& store = unit->resourceSlot.metalMake;
-        if (unit->resourceSlot.player->active != 0 && unit->resourceSlot.player->type == 2) {
-            switch (g_game->difficulty) {
-            case 0:
-                store += refund * 0.5;
-                break;
-            case 1:
-                store += refund * 0.7;
-                break;
-            default:
-                store += refund;
-                break;
-            }
-        } else {
-            store += refund;
-        }
+        EconPublish(SCHED_UNITS, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, refund);
         unit->health = max(hp + unit->health, 0);
         unit->buildLeft = next;
         unit->flags |= 0x2000;
         if (next >= 1.0f)
             g_seams.weapons->DamageUnit(unit, unit, 30000, 9, 0);
-    } else if (g_seams.economy->RequestEnergyAndMetal(&builder->resourceSlot, energyCharge, metalCharge)) {
+    } else if (EconRequestEnergyAndMetal(SCHED_UNITS, builder, energyCharge, metalCharge)) {
         unit->health = min(hp + unit->health, ((UnitDef*)unit->def.get())->maxHealth);
         unit->buildLeft = next;
         unit->flags |= 0x2000;
@@ -1067,7 +1054,7 @@ int __stdcall AddRepairProgress(Unit* builder, Unit* unit, float f)
         n1 = 1;
     if (n2 >= 1)
         n2 = 1;
-    if (g_seams.economy->RequestEnergy(&builder->resourceSlot, &builder->resourceSlot, (float)n2)) {
+    if (EconRequestEnergy(SCHED_UNITS, builder, (float)n2)) {
         g_seams.weapons->DamageUnit(builder, unit, n1, 10, 0);
         result = 1;
     }

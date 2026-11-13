@@ -55,6 +55,7 @@ InfoModeFlags::raw,presentation,ui-action,,all-players,0
 InitPlayerSlot: operator new unsigned char,los_radar,ui-action,,own,85
 InitPlayerSlot: operator new unsigned char,map,unknown,,own,1
 InitPlayerSlot: operator new unsigned char,presentation,every-frame,,own,68
+LoadBattleAssets: GameAllocIgnoreTag Economy region,economy,unknown,,all-players,8
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,ai,every-frame,,all-players,3
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,ui-action,,all-players,85
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,map,unknown,,all-players,1
@@ -211,7 +212,6 @@ Unit::f_57,presentation,ui-action,,per-player-filter,5
 Unit::f_57,weapons,unknown,,per-player-filter,6
 Unit::field_64,platform,ui-action,,per-player-filter,8
 Unit::field_64,units,every-frame,,per-player-filter,84
-Unit::field_e4,presentation,ui-action,,per-player-filter,8
 Unit::fireOrder,presentation,unknown,,per-player-filter,0
 Unit::flags,los_radar,ui-action,,per-player-filter,12
 Unit::flags,orders,unknown,,per-player-filter,7
@@ -267,8 +267,6 @@ Unit::unitDefIndex,harness,ui-action,,per-player-filter,1
 Unit::unitDefIndex,orders,unknown,,per-player-filter,1
 Unit::unitDefIndex,presentation,every-frame,,per-player-filter,85
 Unit::unknown_4c,presentation,ui-action,,per-player-filter,5
-Unit::unknown_c0,presentation,ui-action,,per-player-filter,8
-Unit::unknown_e8,presentation,ui-action,,per-player-filter,8
 Unit::weapon,orders,unknown,,per-player-filter,3
 Unit::weapon,presentation,ui-action,,per-player-filter,8
 Unit::xWhole,presentation,every-frame,,per-player-filter,85
@@ -343,10 +341,6 @@ UnitDef::weapons,orders,unknown,,all-players,2
 UnitMotion::UnitMotion: new PackedPosGoal,orders,ui-action,,per-player-filter,5
 UnitMotion::obj,orders,ui-action,,per-player-filter,5
 UnitMotion::speed,presentation,every-frame,,per-player-filter,83
-UnitResources::energyMakePrev,presentation,ui-action,,own,0
-UnitResources::energyUsePrev,presentation,ui-action,,own,0
-UnitResources::metalMakePrev,presentation,ui-action,,own,0
-UnitResources::metalUsePrev,presentation,ui-action,,own,0
 UnitTypeSet::bits,presentation,ui-action,,all-players,1
 WeaponDef::areaOfEffect,presentation,ui-action,,all-players,0
 WeaponDef::colour,presentation,ui-action,,all-players,18
@@ -458,6 +452,7 @@ unitDefCount,units,ui-action,SIM_EVENT_BUILD_MENU_UPDATE,all-players,6
 units,game,unknown,,per-player-filter,7
 units,harness,ui-action,,per-player-filter,6
 units,presentation,every-frame,,per-player-filter,85
+units,seams,unknown,,per-player-filter,8
 unitsEnd,presentation,every-frame,,per-player-filter,85
 unknown_1b8e,ai,every-frame,,own,3
 unknown_1b8e,harness,ui-action,,own,1

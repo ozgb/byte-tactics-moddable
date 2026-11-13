@@ -8,6 +8,7 @@ Feature::height,presentation,DrawBattleFrame,LoadFeatureType: realloc Feature,1,
 Feature::shadowTable,presentation,BlitFeatureGaf,LoadFeatureType: realloc Feature,1,
 Group::units,ai,SetUnitSquad,CreateSquads: GameAllocIgnoreTag Group,0,-
 InitPlayerSlot: operator new unsigned char,los_radar,BuildFogTiles,InitPlayerSlot: operator new unsigned char,0,
+LoadBattleAssets: GameAllocIgnoreTag Economy region,economy,EconomyUnitAccount,LoadBattleAssets: GameAllocIgnoreTag Economy region,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,BuildFogTiles,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
@@ -117,7 +118,6 @@ Unit::f_3b,weapons,Unit::ReleaseWeapons,AllocateUnitMemory: GameAllocIgnoreTag U
 Unit::f_57,weapons,Unit::ReleaseWeapons,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::field_64,platform,RotateByAngles,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::field_64,units,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::field_e4,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::flags,orders,GetOrderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::flags,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::flags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
@@ -200,8 +200,6 @@ Unit::unitDefIndex,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAl
 Unit::unitDefIndex,presentation,OpenGeneratorDialog,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::unitDefIndex,presentation,PickUnitUnderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::unitDefIndex,presentation,SelectSquad,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
-Unit::unknown_c0,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::unknown_e8,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::weapon,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::xWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::xWhole,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
@@ -328,6 +326,7 @@ units,presentation,DrawUnitInfoPanel,units,0,
 units,presentation,MarkLocalVisibleUnits,units,0,-
 units,presentation,PickUnitUnderCursor,units,0,
 units,presentation,ResolveCursorModeForSelection,units,0,
+units,seams,WorldUnitSlot,units,0,
 unitsEnd,presentation,ClearSelection,unitsEnd,0,-
 unitsEnd,presentation,ClickSelectHoverUnit,unitsEnd,0,-
 unitsEnd,presentation,CollectVisibleUnitIds,unitsEnd,1,

@@ -113,6 +113,8 @@ struct FixedPosView;
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
                            int a, int b, int c);
 #include "../graphics/particles.h"
+#include "../game/economy_events.h"
+#include "../../interfaces/economy.h"
 char* __stdcall lstrcpynA(char* dest, const char* src, int count);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
 extern char DAT_004fc6e8[];
@@ -356,21 +358,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
     if (flags & 2) {
         if (order->target != 0) {
             float refund = (unsigned int)((1.0f - order->target->buildLeft) * order->target->def->metalCost);
-            if (unit->resourceSlot.player->active && unit->resourceSlot.player->type == 2) {
-                switch (g_game->difficulty) {
-                case 1:
-                    unit->resourceSlot.metalMake += refund * 0.7;
-                    break;
-                case 0:
-                    unit->resourceSlot.metalMake += refund * 0.5;
-                    break;
-                default:
-                    unit->resourceSlot.metalMake += (double)refund;
-                    break;
-                }
-            } else {
-                unit->resourceSlot.metalMake += (double)refund;
-            }
+            EconPublish(SCHED_ORDERS, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, refund);
             g_seams.units->FinishConstruction(unit, order->target);
             g_seams.weapons->DamageUnit(unit, order->target, 30000, 9, 0);
         }
@@ -485,7 +473,7 @@ int __stdcall BuildWeaponOrder(Unit* unit, Order* order, int unused)
         fprev = prev;
         int metalCharge = (int)(fnext * t->metalPerShot / ftotal) - (int)(fprev * t->metalPerShot / ftotal);
         energyCharge = (int)(fnext * t->energyPerShot / ftotal) - (int)(fprev * t->energyPerShot / ftotal);
-        if (g_seams.economy->RequestEnergyAndMetal(&unit->resourceSlot, energyCharge, metalCharge)) {
+        if (EconRequestEnergyAndMetal(SCHED_ORDERS, unit, (float)energyCharge, (float)metalCharge)) {
             order->progress = next;
             if (next >= t->reloadTime)
                 return 1;

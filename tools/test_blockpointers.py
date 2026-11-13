@@ -68,7 +68,7 @@ class ScanTest(unittest.TestCase):
 
     def test_parse_rejects(self):
         with self.assertRaises(ValueError):
-            bp.parse_scan("bt-trace 4\n", "x")
+            bp.parse_scan("bt-trace 5\n", "x")
         with self.assertRaises(ValueError):
             bp.parse_scan("bt-blockptrs 2\nevery\t1\nticks\t1\na\tb\n", "x")
         with self.assertRaises(ValueError):

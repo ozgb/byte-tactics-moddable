@@ -25,14 +25,6 @@ struct UnitDefMetalWindView {
 #include "../game/game.h"
 #pragma pack(pop)
 
-union SumFixed {
-    int value;
-    struct {
-        unsigned short fraction;
-        short whole;
-    } parts;
-};
-
 #include "../graphics/gaf_frame.h"
 
 #include "../graphics/model_types.h"
@@ -43,27 +35,6 @@ union SumFixed {
 #include "../../interfaces/seams.h"
 
 #include "../../link/globals.h"
-
-// FUNCTION: 0x437840
-void __stdcall UpdateMetalExtraction(Unit* unit)
-{
-    if (((UnitDefMetalWindView*)unit->def.get())->extractsMetal > 0.0f) {
-        SumFixed total;
-        total.value = 0;
-        Point16 fp = *(Point16*)&unit->footprint;
-        for (int y = unit->cell.y; y < unit->cell.y + fp.y; y++) {
-            for (int x = unit->cell.x; x < unit->cell.x + fp.x; x++) {
-                Cell* c = g_seams.los_radar->GetMapCell(x, y);
-                if (c) {
-                    total.parts.whole += c->metal + 1;
-                }
-            }
-        }
-        *(float*)&unit->extraction = ((UnitDefMetalWindView*)unit->def.get())->extractsMetal * 1.52587890625e-05 * (float)total.value;
-        if (unit->script)
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", 0, 0, 1, total.parts.whole, 0, 0, 0);
-    }
-}
 
 // FUNCTION: 0x437910
 void __stdcall UpdateWindGenerator(Unit* unit)

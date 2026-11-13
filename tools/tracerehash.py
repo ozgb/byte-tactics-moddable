@@ -6,7 +6,8 @@ Prints `<tick> <phase> <hash>` for every phase row and the world row of each dum
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
 sections 29 to 31 in the world row. The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
-shape but not hashed; the world row ends with the path results (section 32).
+shape but not hashed; economy's report (`economyState.*`), the path results (section 32) and the economy events
+(section 33) are dumped only, and skipped.
 """
 
 import argparse
@@ -24,6 +25,7 @@ PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "w
 TIMER_CLASS = (0, 7, 2, 3, 6, 1, 2, 3, 4, 5)
 AI_RAW_VECTORS = ("cells", "vec_65", "counts", "vec_8d", "weights", "vec_ad", "vec_bd", "values", "locked")
 POS_Y_UNSET_KINDS = ("MobileBuild", "VTOL_MobileBuild", "Reclaim", "VTOL_Reclaim")
+DUMPED_ONLY = ("results.", "results[", "economy.", "economy[")
 
 
 class Error(Exception):
@@ -132,6 +134,10 @@ class Walker:
         self.hash = Hasher()
         self.live: list[int] = []
         self.fx_count = 0
+
+    def skip_dumped(self, prefixes: tuple[str, ...]) -> None:
+        while (self.peek() or "").startswith(prefixes):
+            self.pos += 1
 
     def peek(self) -> str | None:
         return self.lines[self.pos][0] if self.pos < len(self.lines) else None
@@ -354,9 +360,9 @@ class Walker:
             self.unit_definitions()
             self.weapon_definitions()
             self.mission()
-        self.results()
+        self.skip_dumped(DUMPED_ONLY)
         if self.pos != len(self.lines):
-            raise Error(f"{len(self.lines) - self.pos} dump lines left after section 32, from {self.lines[self.pos][0]}")
+            raise Error(f"{len(self.lines) - self.pos} dump lines left after the world row, from {self.lines[self.pos][0]}")
         return self.hash.h
 
     def game(self) -> None:
@@ -417,6 +423,7 @@ class Walker:
             self.pathfinder_report()
         finally:
             self.hash = hashed
+        self.skip_dumped(("economyState.",))
 
     def pathfinder_report(self) -> None:
         h = self.hash
@@ -462,21 +469,6 @@ class Walker:
                 node = self.take_if(f"pathfinder.cells[{index}].node")
                 if node is not None:
                     h.run(int(node, 16).to_bytes(2, "little"))
-
-    def results(self) -> None:
-        h = self.hash
-        spec = self.schema.data["results"]
-        h.h8(spec["section"])
-        count = int(self.take("results.count"), 16)
-        h.h32(count)
-        for k in range(count):
-            for f in spec["fields"]:
-                path = f"results[{k}].{f['name']}"
-                if f["kind"] == "bytes":
-                    h.run(self.hex_run(path))
-                else:
-                    self.hash_field(f, self.take(path))
-        h.end()
 
     def move_classes(self) -> None:
         h = self.hash

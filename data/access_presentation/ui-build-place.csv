@@ -12,6 +12,7 @@ Feature::shadowTable,presentation,BlitFeatureGaf,LoadFeatureType: realloc Featur
 InitPlayerSlot: operator new unsigned char,los_radar,BuildFogTiles,InitPlayerSlot: operator new unsigned char,0,
 InitPlayerSlot: operator new unsigned char,map,IsExploredAtHeight,InitPlayerSlot: operator new unsigned char,0,
 InitPlayerSlot: operator new unsigned char,presentation,NanoParticle::DrawParticle,InitPlayerSlot: operator new unsigned char,0,3
+LoadBattleAssets: GameAllocIgnoreTag Economy region,economy,EconomyUnitAccount,LoadBattleAssets: GameAllocIgnoreTag Economy region,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,BuildFogTiles,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,Visible,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,map,CanBuildAt,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
@@ -174,7 +175,6 @@ Unit::f_57,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag
 Unit::f_57,weapons,Unit::ReleaseWeapons,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::field_64,platform,RotateByAngles,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::field_64,units,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::field_e4,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::flags,orders,GetOrderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::flags,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
@@ -258,8 +258,6 @@ Unit::unitDefIndex,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocI
 Unit::unitDefIndex,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::unitDefIndex,presentation,PickUnitUnderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::unknown_4c,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::unknown_c0,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::unknown_e8,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::weapon,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::xWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::xWhole,units,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
@@ -435,6 +433,7 @@ units,presentation,DrawUnitInfoPanel,units,0,
 units,presentation,HandleBuildPanelClick,units,0,-
 units,presentation,PickUnitUnderCursor,units,0,
 units,presentation,ResolveCursorModeForSelection,units,0,
+units,seams,WorldUnitSlot,units,0,
 unitsEnd,presentation,ClickSelectHoverUnit,unitsEnd,0,-
 unitsEnd,presentation,CollectVisibleUnitIds,unitsEnd,1,
 unknown_1b8e,los_radar,BuildFogTiles,unknown_1b8e,0,

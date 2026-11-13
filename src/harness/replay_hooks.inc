@@ -177,26 +177,132 @@ void __cdecl RecWindMeteorsUpdateWindOnStream(RandStream a0)
     }
 }
 
-void __stdcall RecEconomyUpdateResourceSharing(Player* a0)
+unsigned int __stdcall RecEconomyRegionSize(const EconMapInfo* a0)
 {
     ReplayRoots roots;
-    roots.Add(ROK_PLAYER, a0);
+    SlotScope scope(RSL_ECONOMY_REGIONSIZE, SUB_ECONOMY, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "map");
+    }
+    unsigned int result = s_inner_economy->RegionSize(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecEconomyInit(const EconMapInfo* a0, const EconomyWorldView* a1, void* a2, unsigned int a3)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONOMY_INIT, SUB_ECONOMY, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "map");
+        ArgPending(s_call, "world");
+        ArgPending(s_call, "region");
+        ArgValue(s_call, "size", a3);
+    }
+    s_inner_economy->Init(a0, a1, a2, a3);
+    if (scope.Open()) {
+    }
+}
+
+void* __stdcall RecEconomyShutdown()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONOMY_SHUTDOWN, SUB_ECONOMY, roots);
+    if (scope.Open()) {
+    }
+    void* result = s_inner_economy->Shutdown();
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+int __stdcall RecEconomyApply(const EconomyEvent* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONOMY_APPLY, SUB_ECONOMY, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "event");
+    }
+    int result = s_inner_economy->Apply(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecEconomySpend(const EconomyEvent* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONOMY_SPEND, SUB_ECONOMY, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "spend");
+    }
+    int result = s_inner_economy->Spend(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecEconomyUpdatePlayerEconomy(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONOMY_UPDATEPLAYERECONOMY, SUB_ECONOMY, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    s_inner_economy->UpdatePlayerEconomy(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecEconomyUpdateMetalExtraction(EconUnit a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONOMY_UPDATEMETALEXTRACTION, SUB_ECONOMY, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "unit");
+    }
+    s_inner_economy->UpdateMetalExtraction(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecEconomyUpdateResourceSharing(int a0)
+{
+    ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_UPDATERESOURCESHARING, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgObject(s_call, "player", ROK_PLAYER, a0);
+        ArgValue(s_call, "player", a0);
     }
     s_inner_economy->UpdateResourceSharing(a0);
     if (scope.Open()) {
     }
 }
 
-double __stdcall RecEconomyGetEnergyUse(UnitDef* a0)
+int __stdcall RecEconomyRequestGranted(EconUnit a0, unsigned int a1)
 {
     ReplayRoots roots;
-    roots.Add(ROK_UNITDEF, a0);
+    SlotScope scope(RSL_ECONOMY_REQUESTGRANTED, SUB_ECONOMY, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "unit");
+        ArgValue(s_call, "resources", a1);
+    }
+    int result = s_inner_economy->RequestGranted(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+double __stdcall RecEconomyGetEnergyUse(EconType a0)
+{
+    ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_GETENERGYUSE, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgObject(s_call, "def", ROK_UNITDEF, a0);
+        ArgPending(s_call, "type");
     }
     double result = s_inner_economy->GetEnergyUse(a0);
     if (scope.Open()) {
@@ -205,171 +311,29 @@ double __stdcall RecEconomyGetEnergyUse(UnitDef* a0)
     return result;
 }
 
-void __stdcall RecEconomyUpdatePlayerEconomy(Player* a0)
+void __stdcall RecEconomyUnitAccount(EconUnit a0, EconAccount* a1)
 {
     ReplayRoots roots;
-    roots.Add(ROK_PLAYER, a0);
-    SlotScope scope(RSL_ECONOMY_UPDATEPLAYERECONOMY, SUB_ECONOMY, roots);
+    SlotScope scope(RSL_ECONOMY_UNITACCOUNT, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgObject(s_call, "player", ROK_PLAYER, a0);
+        ArgPending(s_call, "unit");
+        ArgPending(s_call, "out");
     }
-    s_inner_economy->UpdatePlayerEconomy(a0);
+    s_inner_economy->UnitAccount(a0, a1);
     if (scope.Open()) {
     }
 }
 
-void __stdcall RecEconomyUpdateMetalExtraction(Unit* a0)
+void __stdcall RecEconomyWriteState(const StateWriter* a0)
 {
     ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_ECONOMY_UPDATEMETALEXTRACTION, SUB_ECONOMY, roots);
+    SlotScope scope(RSL_ECONOMY_WRITESTATE, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgPending(s_call, "writer");
     }
-    s_inner_economy->UpdateMetalExtraction(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecEconomyReset(UnitResources* a0, unsigned char a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITRESOURCES, a0);
-    SlotScope scope(RSL_ECONOMY_RESET, SUB_ECONOMY, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_UNITRESOURCES, a0);
-        ArgValue(s_call, "playerIndex", a1);
-    }
-    s_inner_economy->Reset(a0, a1);
+    s_inner_economy->WriteState(a0);
     if (scope.Open()) {
     }
-}
-
-void __stdcall RecEconomySaveUnitAccounts(UnitResources* a0, Unit* a1, HapiBank* a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITRESOURCES, a0);
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_ECONOMY_SAVEUNITACCOUNTS, SUB_ECONOMY, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_UNITRESOURCES, a0);
-        ArgObject(s_call, "info", ROK_UNIT, a1);
-        ArgHandle(s_call, "file", OBJ_BANK, a2);
-    }
-    s_inner_economy->SaveUnitAccounts(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecEconomyLoadUnitAccounts(UnitResources* a0, Unit* a1, HapiBank* a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITRESOURCES, a0);
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_ECONOMY_LOADUNITACCOUNTS, SUB_ECONOMY, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_UNITRESOURCES, a0);
-        ArgObject(s_call, "info", ROK_UNIT, a1);
-        ArgHandle(s_call, "file", OBJ_BANK, a2);
-    }
-    s_inner_economy->LoadUnitAccounts(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecEconomyRequestEnergy(UnitResources* a0, UnitResources* a1, float a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITRESOURCES, a0);
-    roots.Add(ROK_UNITRESOURCES, a1);
-    SlotScope scope(RSL_ECONOMY_REQUESTENERGY, SUB_ECONOMY, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_UNITRESOURCES, a0);
-        ArgObject(s_call, "r", ROK_UNITRESOURCES, a1);
-        ArgValue(s_call, "amount", a2);
-    }
-    int result = s_inner_economy->RequestEnergy(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecEconomyRequestEnergyAndMetal(UnitResources* a0, float a1, float a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITRESOURCES, a0);
-    SlotScope scope(RSL_ECONOMY_REQUESTENERGYANDMETAL, SUB_ECONOMY, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_UNITRESOURCES, a0);
-        ArgValue(s_call, "energy", a1);
-        ArgValue(s_call, "metal", a2);
-    }
-    int result = s_inner_economy->RequestEnergyAndMetal(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecEconomySpendEnergy(UnitResources* a0, float a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITRESOURCES, a0);
-    SlotScope scope(RSL_ECONOMY_SPENDENERGY, SUB_ECONOMY, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_UNITRESOURCES, a0);
-        ArgValue(s_call, "amount", a1);
-    }
-    int result = s_inner_economy->SpendEnergy(a0, a1);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecEconomySpendMetal(UnitResources* a0, float a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITRESOURCES, a0);
-    SlotScope scope(RSL_ECONOMY_SPENDMETAL, SUB_ECONOMY, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_UNITRESOURCES, a0);
-        ArgValue(s_call, "amount", a1);
-    }
-    int result = s_inner_economy->SpendMetal(a0, a1);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecEconomySpendEnergyAndMetal(UnitResources* a0, float a1, float a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITRESOURCES, a0);
-    SlotScope scope(RSL_ECONOMY_SPENDENERGYANDMETAL, SUB_ECONOMY, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_UNITRESOURCES, a0);
-        ArgValue(s_call, "energy", a1);
-        ArgValue(s_call, "metal", a2);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i economy.SpendEnergyAndMetal");
-        ImportObject(line, ROK_UNITRESOURCES, a0);
-        ImportValue(line, a1);
-        ImportValue(line, a2);
-    }
-    int result = s_inner_economy->SpendEnergyAndMetal(a0, a1, a2);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
 }
 
 void __stdcall RecFeaturesUpdateFeatures()
@@ -2288,17 +2252,7 @@ void __stdcall RecUnitsSetStateBits(Unit* a0, int a1, int a2)
         ArgValue(s_call, "mask", a1);
         ArgValue(s_call, "set", a2);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.SetStateBits");
-        ImportObject(line, ROK_UNIT, a0);
-        ImportValue(line, a1);
-        ImportValue(line, a2);
-    }
     s_inner_units->SetStateBits(a0, a1, a2);
-    if (scope.Import()) {
-        FinishImport(line);
-    }
     if (scope.Open()) {
     }
 }
@@ -3112,6 +3066,19 @@ void __stdcall RecUnitsUpdateObjectState(UnitDrawView* a0)
     }
 }
 
+void __stdcall RecUnitsUpdateUnit(Unit* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_UNITS_UPDATEUNIT, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    s_inner_units->UpdateUnit(a0);
+    if (scope.Open()) {
+    }
+}
+
 void __stdcall RecPlayersUpdatePlayers()
 {
     ReplayRoots roots;
@@ -3133,18 +3100,7 @@ void __stdcall RecPlayersTransferMetal(unsigned char a0, unsigned char a1, float
         ArgValue(s_call, "amount", a2);
         ArgValue(s_call, "flag", a3);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i players.TransferMetal");
-        ImportValue(line, a0);
-        ImportValue(line, a1);
-        ImportValue(line, a2);
-        ImportValue(line, a3);
-    }
     s_inner_players->TransferMetal(a0, a1, a2, a3);
-    if (scope.Import()) {
-        FinishImport(line);
-    }
     if (scope.Open()) {
     }
 }
@@ -3159,18 +3115,7 @@ void __stdcall RecPlayersTransferEnergy(unsigned char a0, unsigned char a1, floa
         ArgValue(s_call, "amount", a2);
         ArgValue(s_call, "flag", a3);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i players.TransferEnergy");
-        ImportValue(line, a0);
-        ImportValue(line, a1);
-        ImportValue(line, a2);
-        ImportValue(line, a3);
-    }
     s_inner_players->TransferEnergy(a0, a1, a2, a3);
-    if (scope.Import()) {
-        FinishImport(line);
-    }
     if (scope.Open()) {
     }
 }
@@ -3508,6 +3453,44 @@ MissionConditions* __stdcall RecPlayersNewConditions()
     if (scope.Open()) {
     }
     return result;
+}
+
+int __stdcall RecPlayersUpdatePlayerHead(int a0, RandStream a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PLAYERS_UPDATEPLAYERHEAD, SUB_PLAYERS, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+        ArgValue(s_call, "stream", a1);
+    }
+    int result = s_inner_players->UpdatePlayerHead(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecPlayersUpdatePlayerTail(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PLAYERS_UPDATEPLAYERTAIL, SUB_PLAYERS, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    s_inner_players->UpdatePlayerTail(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecPlayersUpdatePlayersFinish()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PLAYERS_UPDATEPLAYERSFINISH, SUB_PLAYERS, roots);
+    if (scope.Open()) {
+    }
+    s_inner_players->UpdatePlayersFinish();
+    if (scope.Open()) {
+    }
 }
 
 int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
@@ -4541,17 +4524,7 @@ int __stdcall RecFilesBankOpenNamedBox(HapiBank* a0, char* a1)
         ArgHandle(s_call, "self", OBJ_BANK, a0);
         ArgValue(s_call, "name", (const char*)a1);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i files.BankOpenNamedBox");
-        ImportHandle(line, OBJ_BANK, a0);
-        ImportValue(line, (const char*)a1);
-    }
     int result = s_inner_files->BankOpenNamedBox(a0, a1);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -4580,16 +4553,7 @@ void __stdcall RecFilesBankSeekBox(HapiBank* a0, int a1)
         ArgHandle(s_call, "self", OBJ_BANK, a0);
         ArgValue(s_call, "pos", a1);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i files.BankSeekBox");
-        ImportHandle(line, OBJ_BANK, a0);
-        ImportValue(line, a1);
-    }
     s_inner_files->BankSeekBox(a0, a1);
-    if (scope.Import()) {
-        FinishImport(line);
-    }
     if (scope.Open()) {
     }
 }
@@ -4603,19 +4567,7 @@ int __stdcall RecFilesBankReadBox(HapiBank* a0, void* a1, int a2)
         ArgPending(s_call, "dst");
         ArgValue(s_call, "len", a2);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i files.BankReadBox");
-        ImportHandle(line, OBJ_BANK, a0);
-        ImportPending(line);
-        ImportValue(line, a2);
-    }
     int result = s_inner_files->BankReadBox(a0, a1, a2);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        ImportOutBytes(line, "dst", a1, (int)result, a2);
-        FinishImport(line);
-    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -4631,18 +4583,7 @@ int __stdcall RecFilesBankWriteBox(HapiBank* a0, const void* a1, int a2)
         ArgPending(s_call, "src");
         ArgValue(s_call, "len", a2);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i files.BankWriteBox");
-        ImportHandle(line, OBJ_BANK, a0);
-        ImportBytes(line, a1, a2);
-        ImportValue(line, a2);
-    }
     int result = s_inner_files->BankWriteBox(a0, a1, a2);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -4987,16 +4928,7 @@ void __stdcall RecNetworkSendShareMapInfo(unsigned char a0, unsigned char a1)
         ArgValue(s_call, "from", a0);
         ArgValue(s_call, "to", a1);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i network.SendShareMapInfo");
-        ImportValue(line, a0);
-        ImportValue(line, a1);
-    }
     s_inner_network->SendShareMapInfo(a0, a1);
-    if (scope.Import()) {
-        FinishImport(line);
-    }
     if (scope.Open()) {
     }
 }
@@ -5094,28 +5026,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_FILES_BANKGETINTEGER)
             return true;
         return false;
-    case SUB_ECONOMY:
-        if (slot == RSL_UNITS_SETSTATEBITS)
-            return true;
-        if (slot == RSL_UNITS_STARTSCRIPTWITHARGS)
-            return true;
-        if (slot == RSL_LOS_RADAR_GETMAPCELL)
-            return true;
-        if (slot == RSL_NETWORK_SENDSHAREMAPINFO)
-            return true;
-        if (slot == RSL_PLAYERS_TRANSFERENERGY)
-            return true;
-        if (slot == RSL_PLAYERS_TRANSFERMETAL)
-            return true;
-        if (slot == RSL_FILES_BANKOPENNAMEDBOX)
-            return true;
-        if (slot == RSL_FILES_BANKSEEKBOX)
-            return true;
-        if (slot == RSL_FILES_BANKREADBOX)
-            return true;
-        if (slot == RSL_FILES_BANKWRITEBOX)
-            return true;
-        return false;
     case SUB_FEATURES:
         if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
             return true;
@@ -5142,8 +5052,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_TARGETING_GETWEAPONTARGETPOS)
             return true;
         if (slot == RSL_TARGETING_GETWEAPONTARGETUNIT)
-            return true;
-        if (slot == RSL_ECONOMY_SPENDENERGYANDMETAL)
             return true;
         if (slot == RSL_NETWORK_SENDSCRIPTCALLBYNAME)
             return true;
@@ -5259,29 +5167,29 @@ void HookSeams(const bool* on)
     if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.UpdateWindOnStream = RecWindMeteorsUpdateWindOnStream;
     if (on[SUB_ECONOMY])
-        s_rec_economy.UpdateResourceSharing = RecEconomyUpdateResourceSharing;
+        s_rec_economy.RegionSize = RecEconomyRegionSize;
     if (on[SUB_ECONOMY])
-        s_rec_economy.GetEnergyUse = RecEconomyGetEnergyUse;
+        s_rec_economy.Init = RecEconomyInit;
+    if (on[SUB_ECONOMY])
+        s_rec_economy.Shutdown = RecEconomyShutdown;
+    if (on[SUB_ECONOMY])
+        s_rec_economy.Apply = RecEconomyApply;
+    if (on[SUB_ECONOMY])
+        s_rec_economy.Spend = RecEconomySpend;
     if (on[SUB_ECONOMY])
         s_rec_economy.UpdatePlayerEconomy = RecEconomyUpdatePlayerEconomy;
     if (on[SUB_ECONOMY])
         s_rec_economy.UpdateMetalExtraction = RecEconomyUpdateMetalExtraction;
     if (on[SUB_ECONOMY])
-        s_rec_economy.Reset = RecEconomyReset;
+        s_rec_economy.UpdateResourceSharing = RecEconomyUpdateResourceSharing;
     if (on[SUB_ECONOMY])
-        s_rec_economy.SaveUnitAccounts = RecEconomySaveUnitAccounts;
+        s_rec_economy.RequestGranted = RecEconomyRequestGranted;
     if (on[SUB_ECONOMY])
-        s_rec_economy.LoadUnitAccounts = RecEconomyLoadUnitAccounts;
+        s_rec_economy.GetEnergyUse = RecEconomyGetEnergyUse;
     if (on[SUB_ECONOMY])
-        s_rec_economy.RequestEnergy = RecEconomyRequestEnergy;
+        s_rec_economy.UnitAccount = RecEconomyUnitAccount;
     if (on[SUB_ECONOMY])
-        s_rec_economy.RequestEnergyAndMetal = RecEconomyRequestEnergyAndMetal;
-    if (on[SUB_ECONOMY])
-        s_rec_economy.SpendEnergy = RecEconomySpendEnergy;
-    if (on[SUB_ECONOMY])
-        s_rec_economy.SpendMetal = RecEconomySpendMetal;
-    if (on[SUB_ECONOMY] || on[SUB_WEAPONS])
-        s_rec_economy.SpendEnergyAndMetal = RecEconomySpendEnergyAndMetal;
+        s_rec_economy.WriteState = RecEconomyWriteState;
     if (on[SUB_FEATURES])
         s_rec_features.UpdateFeatures = RecFeaturesUpdateFeatures;
     if (on[SUB_FEATURES])
@@ -5422,7 +5330,7 @@ void HookSeams(const bool* on)
         s_rec_targeting.FindBestTargetIfFireAtWill = RecTargetingFindBestTargetIfFireAtWill;
     if (on[SUB_TARGETING])
         s_rec_targeting.ChooseWeapon = RecTargetingChooseWeapon;
-    if (on[SUB_LOS_RADAR] || on[SUB_ECONOMY] || on[SUB_MAP])
+    if (on[SUB_LOS_RADAR] || on[SUB_MAP])
         s_rec_los_radar.GetMapCell = RecLosRadarGetMapCell;
     if (on[SUB_LOS_RADAR] || any)
         s_rec_los_radar.CmdShareMapping = RecLosRadarCmdShareMapping;
@@ -5524,9 +5432,9 @@ void HookSeams(const bool* on)
         s_rec_units.GetSweetSpot = RecUnitsGetSweetSpot;
     if (on[SUB_UNITS] || on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_units.FindScript = RecUnitsFindScript;
-    if (on[SUB_UNITS] || on[SUB_ECONOMY] || on[SUB_WEAPONS] || on[SUB_TARGETING])
+    if (on[SUB_UNITS] || on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_units.StartScriptWithArgs = RecUnitsStartScriptWithArgs;
-    if (on[SUB_UNITS] || on[SUB_ECONOMY])
+    if (on[SUB_UNITS])
         s_rec_units.SetStateBits = RecUnitsSetStateBits;
     if (on[SUB_UNITS])
         s_rec_units.MovementClassGet = RecUnitsMovementClassGet;
@@ -5632,11 +5540,13 @@ void HookSeams(const bool* on)
         s_rec_units.FreeObjectState = RecUnitsFreeObjectState;
     if (on[SUB_UNITS])
         s_rec_units.UpdateObjectState = RecUnitsUpdateObjectState;
+    if (on[SUB_UNITS])
+        s_rec_units.UpdateUnit = RecUnitsUpdateUnit;
     if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayers = RecPlayersUpdatePlayers;
-    if (on[SUB_PLAYERS] || on[SUB_ECONOMY])
+    if (on[SUB_PLAYERS])
         s_rec_players.TransferMetal = RecPlayersTransferMetal;
-    if (on[SUB_PLAYERS] || on[SUB_ECONOMY])
+    if (on[SUB_PLAYERS])
         s_rec_players.TransferEnergy = RecPlayersTransferEnergy;
     if (on[SUB_PLAYERS])
         s_rec_players.GetEnergyIncome = RecPlayersGetEnergyIncome;
@@ -5690,6 +5600,12 @@ void HookSeams(const bool* on)
         s_rec_players.UpdatePlayersOnStream = RecPlayersUpdatePlayersOnStream;
     if (on[SUB_PLAYERS])
         s_rec_players.NewConditions = RecPlayersNewConditions;
+    if (on[SUB_PLAYERS])
+        s_rec_players.UpdatePlayerHead = RecPlayersUpdatePlayerHead;
+    if (on[SUB_PLAYERS])
+        s_rec_players.UpdatePlayerTail = RecPlayersUpdatePlayerTail;
+    if (on[SUB_PLAYERS])
+        s_rec_players.UpdatePlayersFinish = RecPlayersUpdatePlayersFinish;
     if (on[SUB_MAP])
         s_rec_map.GetCellMeanHeight = RecMapGetCellMeanHeight;
     if (on[SUB_MAP])
@@ -5828,15 +5744,15 @@ void HookSeams(const bool* on)
         s_rec_files.BankHasItem = RecFilesBankHasItem;
     if (on[SUB_FILES])
         s_rec_files.BankOpenNumberedBox = RecFilesBankOpenNumberedBox;
-    if (on[SUB_FILES] || on[SUB_ECONOMY])
+    if (on[SUB_FILES])
         s_rec_files.BankOpenNamedBox = RecFilesBankOpenNamedBox;
     if (on[SUB_FILES])
         s_rec_files.BankGetBoxSize = RecFilesBankGetBoxSize;
-    if (on[SUB_FILES] || on[SUB_ECONOMY])
+    if (on[SUB_FILES])
         s_rec_files.BankSeekBox = RecFilesBankSeekBox;
-    if (on[SUB_FILES] || on[SUB_ECONOMY])
+    if (on[SUB_FILES])
         s_rec_files.BankReadBox = RecFilesBankReadBox;
-    if (on[SUB_FILES] || on[SUB_ECONOMY])
+    if (on[SUB_FILES])
         s_rec_files.BankWriteBox = RecFilesBankWriteBox;
     if (on[SUB_NETWORK])
         s_rec_network.BroadcastPlayerInfo = RecNetworkBroadcastPlayerInfo;
@@ -5876,7 +5792,7 @@ void HookSeams(const bool* on)
         s_rec_network.SendShareMetal = RecNetworkSendShareMetal;
     if (on[SUB_NETWORK])
         s_rec_network.SendShareEnergy = RecNetworkSendShareEnergy;
-    if (on[SUB_NETWORK] || on[SUB_ECONOMY])
+    if (on[SUB_NETWORK])
         s_rec_network.SendShareMapInfo = RecNetworkSendShareMapInfo;
     if (on[SUB_NETWORK])
         s_rec_network.BroadcastPlayerEconomy = RecNetworkBroadcastPlayerEconomy;

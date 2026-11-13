@@ -141,6 +141,8 @@ unsigned short __stdcall GetCellFeature(Cell* cell)
 }
 
 #include "../../interfaces/seams.h"
+#include "../game/economy_events.h"
+#include "../../interfaces/economy.h"
 
 // FUNCTION: 0x421eb0
 Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def)
@@ -649,24 +651,6 @@ static inline Feature* GetFeature(Cell* cell)
     return &g_game->features[(cell - (cell->offsetY * g_game->width + cell->offsetX))->feature];
 }
 
-static inline void AddScaled(Unit* unit, float& res, double amount)
-{
-    if (unit->owner->active && unit->owner->type == 2) {
-        switch (g_game->difficulty) {
-        case 1:
-            res += amount * 0.7;
-            break;
-        case 0:
-            res += amount * 0.5;
-            break;
-        default:
-            res += amount;
-            break;
-        }
-    } else {
-        res += amount;
-    }
-}
 // FUNCTION: 0x4237d0
 int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
 {
@@ -678,23 +662,8 @@ int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
         return 0;
     if ((cell->flags & 1) && (f->flags & 1))
         return 0;
-    AddScaled(unit, unit->energy, f->energy);
-    float metal = f->metal;
-    if (unit->owner->active && unit->owner->type == 2) {
-        switch (g_game->difficulty) {
-        case 1:
-            unit->metal += metal * 0.7;
-            break;
-        case 0:
-            unit->metal += metal * 0.5;
-            break;
-        default:
-            unit->metal += metal;
-            break;
-        }
-    } else {
-        unit->metal += metal;
-    }
+    EconPublish(SCHED_FEATURES, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_ENERGY, f->energy, 0);
+    EconPublish(SCHED_FEATURES, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, f->metal);
     KillFeature(x, z, 1);
     if (g_seams.map->GetGameType(g_game->net) == 3)
         g_seams.network->SendFeatureReclaimed(unit, x, z);

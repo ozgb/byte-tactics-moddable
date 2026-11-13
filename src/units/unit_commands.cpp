@@ -638,21 +638,6 @@ void UnitTypeSet::AddTypeOrCategory(char* text, int* out)
 struct UnitDef;
 #include "../units/unit_def.h"
 
-// FUNCTION: 0x488f30
-double __stdcall GetEnergyUse(UnitDef* def)
-{
-    if (def->energyuse != 0.0) {
-        return def->energyuse;
-    }
-    if (def->windgenerator > 0.0f) {
-        return -((double)g_game->windStrength * (double)def->windgenerator);
-    }
-    if (def->tidalgenerator > 0.0f) {
-        return -((double)g_game->tidal * (double)def->tidalgenerator);
-    }
-    return 0.0f;
-}
-
 typedef std::vector<UnitCategory> UnitCategoryVector;
 typedef void (UnitCategoryVector::*UnitCategoryInsertFn)(
     UnitCategoryVector::iterator, UnitCategoryVector::size_type, const UnitCategory&);

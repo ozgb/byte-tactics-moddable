@@ -253,128 +253,70 @@ void __stdcall ApplyAttachUnit(OrderView* order)
     }
 }
 
-static inline int PlayerMore(unsigned char i)
-{
-    if (i >= 10) return 0;
-    return 1;
-}
-
-#if BT_ACCESS_LOG
-#include "../../lib/accesslog/access_log.h"
-#endif
-
 // FUNCTION: 0x48ad30
-void __stdcall UpdateAllUnits(void)
+void __stdcall UpdateUnit(Unit* u)
 {
-#if BT_ACCESS_LOG
-    AccessLogPassScope accessPass(ACCESS_PASS_UNITS_PLAYERS);
-#endif
-    int* cnt;
-    unsigned char i;
-    int off;
-    extern Game* g_game;
-    cnt = &g_game->f14353;
-    *cnt = 0;
-    i = 0;
-    off = 0;
-    for (; i < 10; i++, off += 0x14b) {
-        if (!PlayerMore(i)) continue;
-        Player* p = (Player*)((char*)&g_game->players[0] + off);
-        if (p->active == 0) continue;
-        unsigned char k = p->type;
-        if (k != 1 && k != 2 && k != 3) continue;
-        if (p->index == 0xa) continue;
-#if BT_ACCESS_LOG
-        AccessLogEntity();
-#endif
-        {
-            Unit* last = p->unitsEnd;
-            Unit* u = p->unitsBegin;
-#if BT_ACCESS_LOG
-            {
-            AccessLogPassScope unitsPass(ACCESS_PASS_UNITS);
-#endif
-            while (u <= last) {
-                    if (u->unitDefIndex != 0) {
-#if BT_ACCESS_LOG
-                        AccessLogEntity();
-#endif
-                        (*cnt)++;
-                        UpdateWindGenerator(u);
-                        if (p->active != 0) {
-                            unsigned char k2 = p->type;
-                            if (k2 == 1 || k2 == 2) {
-                                g_seams.weapons->UpdateUnitWeapons(u);
-                            }
-                        }
-                        if (u->script != 0) {
-                            ((CobScript*)u->script.get())->RunScripts(1);
-                        }
-                        if (u->recentlyDamagedTimer != 0) {
-                            u->recentlyDamagedTimer--;
-                        }
-                        if (u->postTransferHoldoff != 0) {
-                            u->postTransferHoldoff--;
-                        }
-                        if (u->selected != 0) {
-                            if (!(u->selectable) || u->buildLeft != 0.0f || u->postTransferHoldoff != 0
-                                || (u->carrier != 0 && !(u->carrier->cargoSelectable))) {
-                                u->selected = 0;
-                            }
-                        }
-                        if ((unsigned int)g_game->ticks % 30 == 0) {
-                            int v = u->health * 100 / u->def->maxHealth;
-                            if (v < 0) {
-                                v = 0;
-                            }
-                            if (v > 100) {
-                                v = 100;
-                            }
-                            u->prevHealthPercent = u->healthPercent;
-                            u->healthPercent = v;
-                        }
-                        Player* pl = u->player;
-                        if (pl->active != 0) {
-                            unsigned char k3 = pl->type;
-                            if (k3 == 1 || k3 == 2) {
-                                if (g_game->net->waterDoesDamage != 0
-                                    && g_game->net->waterDamage != 0
-                                    && (unsigned int)g_game->ticks % 30 == 0 && u->yWhole <= g_game->seaLevel
-                                    && !((TerrainFlags*)&u->def->flags1)->bits.floats) {
-                                    g_seams.weapons->DamageUnit(0, u, g_game->net->waterDamage, 0xb, 0);
-                                }
-                                if (u->def->healtimeUnsigned != 0 && u->health < u->def->maxHealth
-                                    && (g_game->ticks & 7) == 0) {
-                                    int n = u->def->healtimeUnsigned * 8;
-                                    AddRepairProgress(u, u, (float)(n / 30));
-                                }
-                                g_seams.orders->RunOrders(u);
-                                g_seams.orders->RunSecondaryOrders(u);
-                                if (u->motion != 0) {
-                                    g_seams.orders->UpdateMotion(u->motion, 0, u);
-                                    UpdateUnitHeight(u);
-                                }
-                            }
-                        }
-                        if (u->killPending) {
-                            KillUnit(u, u->lastDamageType);
-                        }
-                    }
-                    u = (Unit*)((char*)u + 0x118);
-                }
-#if BT_ACCESS_LOG
+    Player* p = u->player;
+    g_game->f14353++;
+    UpdateWindGenerator(u);
+    if (p->active != 0) {
+        unsigned char k2 = p->type;
+        if (k2 == 1 || k2 == 2) {
+            g_seams.weapons->UpdateUnitWeapons(u);
+        }
+    }
+    if (u->script != 0) {
+        ((CobScript*)u->script.get())->RunScripts(1);
+    }
+    if (u->recentlyDamagedTimer != 0) {
+        u->recentlyDamagedTimer--;
+    }
+    if (u->postTransferHoldoff != 0) {
+        u->postTransferHoldoff--;
+    }
+    if (u->selected != 0) {
+        if (!(u->selectable) || u->buildLeft != 0.0f || u->postTransferHoldoff != 0
+            || (u->carrier != 0 && !(u->carrier->cargoSelectable))) {
+            u->selected = 0;
+        }
+    }
+    if ((unsigned int)g_game->ticks % 30 == 0) {
+        int v = u->health * 100 / u->def->maxHealth;
+        if (v < 0) {
+            v = 0;
+        }
+        if (v > 100) {
+            v = 100;
+        }
+        u->prevHealthPercent = u->healthPercent;
+        u->healthPercent = v;
+    }
+    Player* pl = u->player;
+    if (pl->active != 0) {
+        unsigned char k3 = pl->type;
+        if (k3 == 1 || k3 == 2) {
+            if (g_game->net->waterDoesDamage != 0
+                && g_game->net->waterDamage != 0
+                && (unsigned int)g_game->ticks % 30 == 0 && u->yWhole <= g_game->seaLevel
+                && !((TerrainFlags*)&u->def->flags1)->bits.floats) {
+                g_seams.weapons->DamageUnit(0, u, g_game->net->waterDamage, 0xb, 0);
             }
-#endif
-                if (g_game->netGameFlags & 1) {
-                    if (p->active != 0) {
-                        unsigned char k4 = p->type;
-                        if (k4 == 1 || k4 == 2) {
-                            SendUnitStates(p);
-                        }
-                    }
-                }
+            if (u->def->healtimeUnsigned != 0 && u->health < u->def->maxHealth
+                && (g_game->ticks & 7) == 0) {
+                int n = u->def->healtimeUnsigned * 8;
+                AddRepairProgress(u, u, (float)(n / 30));
+            }
+            g_seams.orders->RunOrders(u);
+            g_seams.orders->RunSecondaryOrders(u);
+            if (u->motion != 0) {
+                g_seams.orders->UpdateMotion(u->motion, 0, u);
+                UpdateUnitHeight(u);
             }
         }
+    }
+    if (u->killPending) {
+        KillUnit(u, u->lastDamageType);
+    }
 }
 
 // FUNCTION: 0x48b200
@@ -497,14 +439,6 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
     u->angles = tail;
     if (u->motion)
         u->motion->speed = reader->ReadBits(0x20);
-}
-
-// FUNCTION: 0x48b710
-void __stdcall SendUnitStates(Player* p)
-{
-    extern Game* g_game;
-    p->syncTick = g_game->ticks;
-    g_seams.network->SendUnitStates(p);
 }
 
 // FUNCTION: 0x48b920

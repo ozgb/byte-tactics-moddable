@@ -4,37 +4,6 @@
 #include "path_results.h"
 #include "../../interfaces/pathfinding.h"
 
-static const unsigned long long kPrime = 0x100000001b3ull;
-
-static unsigned long long HashByte(unsigned long long h, unsigned char v)
-{
-    return (h ^ v) * kPrime;
-}
-
-static unsigned long long HashU32(unsigned long long h, unsigned int v)
-{
-    h = HashByte(h, (unsigned char)v);
-    h = HashByte(h, (unsigned char)(v >> 8));
-    h = HashByte(h, (unsigned char)(v >> 16));
-    return HashByte(h, (unsigned char)(v >> 24));
-}
-
-static unsigned long long HashRun(unsigned long long h, const unsigned char* p, unsigned int n)
-{
-    while (n >= 8) {
-        unsigned long long word;
-        memcpy(&word, p, 8);
-        h = (h ^ word) * kPrime;
-        p += 8;
-        n -= 8;
-    }
-    while (n > 0) {
-        h = HashByte(h, *p++);
-        n--;
-    }
-    return h;
-}
-
 int PathResultsAdd(PathResults* results, const PathEvent* event, const PathPoint* points, int capacity)
 {
     if (results->count == results->capacity) {
@@ -66,21 +35,4 @@ int PathResultsAdd(PathResults* results, const PathEvent* event, const PathPoint
 void PathResultsClear(PathResults* results)
 {
     results->count = 0;
-}
-
-unsigned long long PathResultsHash(const PathResults* results, unsigned long long h)
-{
-    h = HashByte(h, PATH_RESULT_SECTION);
-    h = HashU32(h, results->count);
-    for (unsigned int k = 0; k < results->count; k++) {
-        const PathResult* r = &results->items[k];
-        h = HashU32(h, (unsigned int)r->kind);
-        h = HashU32(h, (unsigned int)r->status);
-        h = HashByte(h, (unsigned char)r->unitTag);
-        h = HashU32(h, r->unitId);
-        h = HashU32(h, r->tick);
-        h = HashU32(h, (unsigned int)r->count);
-        h = HashRun(h, (const unsigned char*)r->points, r->delivered * sizeof(PathPoint));
-    }
-    return HashU32(h, 0xffffffffu);
 }

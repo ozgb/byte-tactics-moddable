@@ -130,55 +130,57 @@ RESULTS = tr.Schema(
             }
         },
         "globals": {"pathfinder": [{"name": "counter", "size": 4, "kind": "scalar", "target": None}]},
-        "results": {
-            "section": 32,
-            "points": 64,
-            "fields": [
-                {"name": "kind", "size": 4, "kind": "scalar", "target": None},
-                {"name": "status", "size": 4, "kind": "scalar", "target": None},
-                {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-                {"name": "tick", "size": 4, "kind": "scalar", "target": None},
-                {"name": "count", "size": 4, "kind": "scalar", "target": None},
-                {"name": "points", "size": 4, "kind": "bytes", "target": None},
-            ],
-        },
     }
 )
 
+PATH_RESULTS = [
+    ("results.count", "0x00000001"),
+    ("results[0].kind", "0x00000002"),
+    ("results[0].status", "0x00000000"),
+    ("results[0].unit", "unit:7"),
+    ("results[0].tick", "0x00000018"),
+    ("results[0].count", "0x00000002"),
+    ("results[0].points", "hex:1800280038004800"),
+]
 
-class ResultsTest(unittest.TestCase):
-    def test_results_hash_each_event_in_order(self):
-        w = tr.Walker(RESULTS, [
-            ("results.count", "0x00000001"),
-            ("results[0].kind", "0x00000002"),
-            ("results[0].status", "0x00000000"),
-            ("results[0].unit", "unit:7"),
-            ("results[0].tick", "0x00000018"),
-            ("results[0].count", "0x00000002"),
-            ("results[0].points", "hex:1800280038004800"),
-        ])
-        w.results()
-        want = tr.Hasher()
-        want.h8(32)
-        want.h32(1)
-        want.h32(2)
-        want.h32(0)
-        want.pointer(2, 7)
-        want.h32(0x18)
-        want.h32(2)
-        want.run(bytes.fromhex("1800280038004800"))
-        want.end()
-        self.assertEqual(w.hash.h, want.h)
-        self.assertEqual(w.pos, 7)
+ECONOMY_EVENTS = [
+    ("economy.count", "0x00000001"),
+    ("economy[0].kind", "0x00000001"),
+    ("economy[0].player", "0x00000000"),
+    ("economy[0].unit", "unit:7"),
+    ("economy[0].resources", "0x00000000"),
+    ("economy[0].energy", "0x00000000"),
+    ("economy[0].metal", "0x00000000"),
+    ("economy[0].value", "0x00000000"),
+    ("economy[0].outcome", "0x00000001"),
+    ("economy[0].account", "hex:" + bytes(range(48)).hex()),
+]
 
-    def test_no_results_is_section_count_and_end(self):
-        w = tr.Walker(RESULTS, [("results.count", "0x00000000")])
-        w.results()
-        want = tr.Hasher()
-        want.h8(32)
-        want.h32(0)
-        want.end()
-        self.assertEqual(w.hash.h, want.h)
+
+class DumpedOnlyTest(unittest.TestCase):
+    def test_path_results_and_economy_events_are_skipped(self):
+        w = tr.Walker(RESULTS, PATH_RESULTS + ECONOMY_EVENTS)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(PATH_RESULTS) + len(ECONOMY_EVENTS))
+
+    def test_a_dump_without_economy_events_skips_the_path_results(self):
+        w = tr.Walker(RESULTS, PATH_RESULTS)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(PATH_RESULTS))
+
+    def test_skipping_stops_at_a_hashed_line(self):
+        w = tr.Walker(RESULTS, [("results.count", "0x00000000"), ("game.x", "0x01")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
+
+    def test_economy_report_after_the_pathfinder_is_skipped(self):
+        w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005"), ("economyState.count", "0x00000001"),
+                                ("moveClasses[0].x", "0x00000001")])
+        w.pathfinder()
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, 2)
 
     def test_pathfinder_report_is_read_but_not_hashed(self):
         w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005")])

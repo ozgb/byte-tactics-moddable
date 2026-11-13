@@ -22,11 +22,13 @@ void __stdcall InitPlayers();
 void __stdcall RebuildAIFeatureCells();
 void __stdcall FreePlayers();
 void __stdcall RefreshOwnedUnitsLineOfSight(Player* range);
-void __stdcall UpdatePlayers();
-void __stdcall UpdatePlayersOnStream(RandStream stream);
+int __stdcall UpdatePlayerHead(int player, RandStream stream);
+void __stdcall UpdatePlayerTail(int player);
+void __stdcall UpdatePlayersFinish();
 void __stdcall InitPlayerResources();
 void __stdcall LoadPlayerControllers(HapiBank* file);
 void __stdcall UpdateBlink();
+void PlayersOnEconomyShare(const void* event);
 
 int CountActiveAIPlayers();
 int CountCombatPlayers();

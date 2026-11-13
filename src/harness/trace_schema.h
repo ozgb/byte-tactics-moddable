@@ -2,7 +2,7 @@
 #ifndef TRACE_SCHEMA_H
 #define TRACE_SCHEMA_H
 
-#define TRACE_FORMAT 4
+#define TRACE_FORMAT 5
 
 enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF };
 enum TraceTarget { TT_NONE, TT_HEAP, TT_UNIT, TT_PLAYER, TT_UNITDEF, TT_WEAPONDEF, TT_PROJECTILE,
@@ -94,15 +94,6 @@ static const TraceField kUnitFields[] = {
     { "", 0xb4, 4, TF_BYTES, TT_NONE, 0x0 },
     { "killCount", 0xb8, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "", 0xba, 2, TF_SCALAR, TT_NONE, 0x0 },
-    { "energy", 0xbc, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "", 0xc0, 20, TF_BYTES, TT_NONE, 0x0 },
-    { "metal", 0xd4, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "", 0xd8, 4, TF_BYTES, TT_NONE, 0x0 },
-    { "f_dc", 0xdc, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "", 0xe0, 4, TF_BYTES, TT_NONE, 0x0 },
-    { "field_e4", 0xe4, 2, TF_SCALAR, TT_NONE, 0x0 },
-    { "f_e6", 0xe6, 2, TF_SCALAR, TT_NONE, 0x0 },
-    { "", 0xe8, 4, TF_BYTES, TT_NONE, 0x0 },
     { "owner", 0xec, 4, TF_REF, TT_PLAYER, 0x0 },
     { "attacker", 0xf0, 4, TF_REF, TT_UNIT, 0x0 },
     { "lastAttackerSlot", 0xf4, 1, TF_SCALAR, TT_NONE, 0x0 },
@@ -151,7 +142,7 @@ static const TraceField kUnitPlan[] = {
     { "", 0x9a, 4, TF_REF, TT_HEAP, 0x0 },
     { "", 0x9e, 4, TF_REF, TT_HEAP, 0x0 },
     { "", 0xa2, 4, TF_REF, TT_HEAP, 0x0 },
-    { "", 0xa6, 70, TF_BYTES, TT_NONE, 0x0 },
+    { "", 0xa6, 22, TF_BYTES, TT_NONE, 0x0 },
     { "", 0xec, 4, TF_REF, TT_PLAYER, 0x0 },
     { "", 0xf0, 4, TF_REF, TT_UNIT, 0x0 },
     { "", 0xf4, 36, TF_BYTES, TT_NONE, 0x0 },
@@ -1300,7 +1291,7 @@ static const TraceField kUnitDefDataPlan[] = {
     { "", 0x241, 8, TF_BYTES, TT_NONE, 0x0 },
 };
 
-static const TraceTable kUnitTable = { kUnitFields, 87, kUnitPlan, 30, 0x118 };
+static const TraceTable kUnitTable = { kUnitFields, 78, kUnitPlan, 30, 0x118 };
 static const TraceTable kProjectileTable = { kProjectileFields, 33, kProjectilePlan, 6, 0x6b };
 static const TraceTable kPlayerTable = { kPlayerFields, 66, kPlayerPlan, 12, 0x14b };
 static const TraceTable kDebrisTable = { kDebrisFields, 27, kDebrisPlan, 6, 0x54 };

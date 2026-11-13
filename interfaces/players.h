@@ -13,7 +13,7 @@ class TdfFile;
 // Major version of the players interface, changed when a slot is removed or its signature changes.
 #define PLAYERS_VERSION_MAJOR 1
 // Minor version of the players interface, changed when a slot is added.
-#define PLAYERS_VERSION_MINOR 5
+#define PLAYERS_VERSION_MINOR 6
 
 // Per-player state.
 struct PlayersSeam {
@@ -75,6 +75,12 @@ struct PlayersSeam {
     void (__stdcall* UpdatePlayersOnStream)(RandStream stream);
     // Builds an empty conditions object, active and with no victory or defeat conditions. Hooks: none.
     MissionConditions* (__stdcall* NewConditions)(void);
+    // Runs one player's tick up to the settlement of its economy, drawing from the given stream: returns 0 when the player has no more to do this tick, 1 when only its tail remains, 2 when its economy is due and then its tail. Hooks: none.
+    int (__stdcall* UpdatePlayerHead)(int player, RandStream stream);
+    // Runs the rest of one player's tick, after the settlement of its economy. Hooks: none.
+    void (__stdcall* UpdatePlayerTail)(int player);
+    // Runs what is left of the players' tick after the last player: the end of a network game when no player is left to fight. Hooks: none.
+    void (__stdcall* UpdatePlayersFinish)(void);
 };
 
 #endif

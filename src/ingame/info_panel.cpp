@@ -184,6 +184,7 @@ public:
 
 #include "../../link/globals.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/economy.h"
 
 struct GafSequenceRecord;
 struct GafFileIndex;
@@ -1526,10 +1527,12 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         snapshot.health = (unsigned short)unit->health;
         snapshot.build = unit->killCount;
         snapshot.orderName = GetOrderName(unit);
-        float f0 = unit->resourceSlot.energyUsePrev;
-        float f1 = unit->resourceSlot.energyMakePrev;
-        float f2 = unit->resourceSlot.metalUsePrev;
-        float f3 = unit->resourceSlot.metalMakePrev;
+        EconAccount account;
+        g_seams.economy->UnitAccount(Ref<Unit>(unit).offset, &account);
+        float f0 = account.energy.usePrev;
+        float f1 = account.energy.makePrev;
+        float f2 = account.metal.usePrev;
+        float f3 = account.metal.makePrev;
         snapshot.values[0] = f0;
         snapshot.values[1] = f1;
         snapshot.values[2] = f2;

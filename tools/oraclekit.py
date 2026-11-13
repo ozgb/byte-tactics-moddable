@@ -18,10 +18,17 @@ Any path under FORBIDDEN, and any file the table does not list, is refused with 
 generated file or the fuel pass that still names a source (SOURCE_NAME).
 
 `data/replay_schema.json` is exported without the fields that name the source: the `includes`, each slot's `functions` and
-`through`, each rule's `functions`, the `header` of each code table and callback, and the `header`, `pre` and `effect`
+`through`, the `header` of each code table and callback, and the `header`, `pre` and `effect`
 (the replayer's own code) of each service. The entries of a code table are functions of the source, so each becomes its
 `kit_name` in tools/oraclekit/code_tables.csv (table, entry, kit_name): the order type's name for `orderNotify`, the bit of
 `WeaponDef.flags` that selects the handler for `weaponFire`. The export is refused when an entry has no row or a row no entry.
+The copy also leaves out what only the replayer and its checks read, all of which names source globals, types and functions:
+the `exempt`, `exempt_types` and `rules` annotations, the `id` of each service, the `vtable` or `vptr` of each kind, the
+`aliases`, `reachFirst` and `reachCount` of each field and slot argument, and each slot's `allOf`. A service, or a callback
+interface, whose name (or a method's) is a source identifier that no interface header, `layout.json`, the module manifest or a
+recording declares is left out too: no recording of the kit calls it. The schema then may name only what those files declare
+(`schema_hits`): a field named by its member path (`velY` for `vel.y`) counts as declared by it, and any other source identifier
+in a key or a string of the schema is a hit, with its path in the schema.
 
 `layout.json` carries no `layout_refs`: they name the decompilation's functions, files and globals, and the globals
 are not records of the state block. After the files are written, `leak_check` runs tools/speclint.py's address,
@@ -98,8 +105,11 @@ SOURCE_FILE_PY = re.compile(SOURCE_DIR + r"|(?<![\w<])[\w./-]*\w\.(?:cpp|hpp|inc
 SCHEMA = "data/replay_schema.json"
 CODE_TABLES_SOURCE = "tools/oraclekit/code_tables.csv"
 CODE_TABLE_COLUMNS = ["table", "entry", "kit_name"]
-SLOT_SOURCE_FIELDS = ("functions", "through")
-SERVICE_SOURCE_FIELDS = ("header", "pre", "effect")
+SLOT_SOURCE_FIELDS = ("functions", "through", "allOf")
+SERVICE_SOURCE_FIELDS = ("header", "pre", "effect", "id")
+SCHEMA_CHECK_ANNOTATIONS = ("exempt", "exempt_types", "rules")
+KIND_SOURCE_FIELDS = ("vtable", "vptr")
+FIELD_SOURCE_FIELDS = ("aliases", "reachFirst", "reachCount")
 FORBIDDEN = ("src/", "include/", "orig/", "lib/", "build/", "cmake/")
 TAG_PATTERNS = {"interfaces": re.compile(r"^interfaces-v(\d+)$"),
                 "reference_traces": re.compile(r"^reference-traces-v(\d+)$")}
@@ -550,24 +560,42 @@ def code_table_names(data: bytes) -> dict[tuple[str, str], str]:
     return {(r["table"], r["entry"]): r["kit_name"] for r in rows}
 
 
-def kit_schema(data: bytes, names: dict[tuple[str, str], str]) -> bytes:
-    """The replay schema of the kit: without the fields that name source files and functions, and with each code table entry
-    renamed to its kit name. Refusal when an entry has no kit name or a kit name has no entry."""
+def drop(entry: dict, fields: tuple[str, ...]) -> None:
+    """Remove the given keys from a schema entry; an entry that is not an object has none."""
+    if isinstance(entry, dict):
+        for field in fields:
+            entry.pop(field, None)
+
+
+def kit_schema(data: bytes, names: dict[tuple[str, str], str], undeclared: set[str] = frozenset()) -> bytes:
+    """The replay schema of the kit: without the fields that name source files, functions, globals and types, without the
+    services and callback interfaces named by an `undeclared` identifier, and with each code table entry renamed to its kit
+    name. Refusal when an entry has no kit name or a kit name has no entry."""
     schema = json.loads(data)
     annotations = schema.get("annotations", {})
-    annotations.pop("includes", None)
-    for rule in annotations.get("rules", []):
-        rule.pop("functions", None)
+    drop(annotations, ("includes",) + SCHEMA_CHECK_ANNOTATIONS)
     for subsystems in (annotations.get("subsystems", {}), schema.get("subsystems", {})):
         for subsystem in subsystems.values():
-            for slot in subsystem.get("slots", {}).values():
-                for field in SLOT_SOURCE_FIELDS:
-                    slot.pop(field, None)
-    for callback in annotations.get("callbacks", {}).values():
-        callback.pop("header", None)
+            slots = list(subsystem.get("slots", {}).values()) + list(subsystem.get("header", {}).get("unrecorded", {}).values())
+            for slot in slots:
+                drop(slot, SLOT_SOURCE_FIELDS)
+                for arg in slot.get("args", []):
+                    drop(arg, FIELD_SOURCE_FIELDS)
+    kinds = list(annotations.get("objects", {}).values()) + list(schema.get("objects", []))
+    for kind in kinds:
+        drop(kind, KIND_SOURCE_FIELDS)
+        for field in kind.get("fields", []):
+            drop(field, FIELD_SOURCE_FIELDS)
+    callbacks = annotations.get("callbacks", {})
+    for name in list(callbacks):
+        if ({name} | {m.get("name") for m in callbacks[name].get("methods", [])}) & undeclared:
+            del callbacks[name]
+        else:
+            callbacks[name].pop("header", None)
+    if "services" in annotations:
+        annotations["services"] = [s for s in annotations["services"] if s.get("name") not in undeclared]
     for service in annotations.get("services", []):
-        for field in SERVICE_SOURCE_FIELDS:
-            service.pop(field, None)
+        drop(service, SERVICE_SOURCE_FIELDS)
     entries = set()
     for table, spec in annotations.get("code_tables", {}).items():
         spec.pop("headers", None)
@@ -814,13 +842,53 @@ def source_functions(root: Path) -> set[str]:
 
 
 def declared_names(files: dict[str, bytes]) -> set[str]:
-    """The names the kit publishes: those of the interface headers, `layout.json`, the module manifest, the recordings and the
-    services the recordings may name."""
+    """The names the kit publishes: those of the interface headers, `layout.json`, the module manifest and the recordings."""
     parts = [text_of(data) or "" for path, data in files.items()
              if (path.startswith(DECLARED_DIRS) and path.endswith(".h")) or path in DECLARING or path.startswith(DECLARING_DIRS)]
-    if SCHEMA in files:
-        parts += [s["name"] for s in json.loads(files[SCHEMA]).get("annotations", {}).get("services", [])]
     return speclint.identifiers("\n".join(parts))
+
+
+MEMBER_PART = re.compile(r"[.\[\]]+")
+
+
+def member_name(member: str) -> str:
+    """The name a field takes from its member path: the parts joined, each after the first capitalised (`vel.y` is `velY`)."""
+    parts = [p for p in MEMBER_PART.split(member) if p]
+    return "".join(parts[:1] + [p[:1].upper() + p[1:] for p in parts[1:]])
+
+
+def member_fields(node) -> set[str]:
+    """The names of the schema's fields that are named by their member path."""
+    if isinstance(node, list):
+        return set().union(*(member_fields(v) for v in node))
+    if not isinstance(node, dict):
+        return set()
+    own = {node["name"]} if isinstance(node.get("member"), str) and node.get("name") == member_name(node["member"]) else set()
+    return own.union(*(member_fields(v) for v in node.values()))
+
+
+def schema_hits(data: bytes, undeclared: set[str]) -> list[str]:
+    """One line per key or string of the kit's replay schema that names an `undeclared` identifier, with its path in the
+    schema; a field named by its member path takes its name from the member, which is asked instead."""
+    schema = json.loads(data)
+    undeclared = undeclared - member_fields(schema)
+    hits: list[str] = []
+
+    def visit(node, path: str) -> None:
+        if isinstance(node, dict):
+            for key, value in node.items():
+                for word in sorted(speclint.identifiers(key) & undeclared):
+                    hits.append("%s: %s: the key %r names %r, which the kit does not declare" % (SCHEMA, path or "/", key, word))
+                visit(value, path + "/" + key)
+        elif isinstance(node, list):
+            for i, value in enumerate(node):
+                visit(value, "%s/%d" % (path, i))
+        elif isinstance(node, str):
+            for word in sorted(speclint.identifiers(node) & undeclared):
+                hits.append("%s: %s: %r names %r, which the kit does not declare" % (SCHEMA, path, node, word))
+
+    visit(schema, "")
+    return hits
 
 
 def source_file_hits(path: str, text: str, headers: set[str]) -> list[str]:
@@ -852,9 +920,10 @@ def leak_check(files: dict[str, bytes], root: Path, run: int = speclint.DEFAULT_
     source_ids, source_runs, literals = index if index is not None else speclint.source_index(root, run)
     kit = structured_text(files)
     allowed = speclint.identifiers(kit)
-    undeclared = source_functions(root) - declared_names(files)
+    declared = declared_names(files)
+    undeclared = source_functions(root) - declared
     headers = {Path(p).name for p in files if p.startswith(DECLARED_DIRS) and p.endswith(".h")}
-    hits: list[str] = []
+    hits: list[str] = schema_hits(files[SCHEMA], source_ids - declared) if SCHEMA in files else []
     for path in sorted(files):
         text = text_of(files[path])
         if text is None:
@@ -900,12 +969,14 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     except subprocess.CalledProcessError:
         raise Refusal("refused: %s has no tracked file" % MODULES)
     check_names(files)
+    index = None
     if SCHEMA in files:
         try:
             names = code_table_names(blob(root, CODE_TABLES_SOURCE))
         except subprocess.CalledProcessError:
             raise Refusal("refused: %s has no tracked file" % CODE_TABLES_SOURCE)
-        files[SCHEMA] = kit_schema(files[SCHEMA], names)
+        index = speclint.source_index(root, speclint.DEFAULT_RUN)
+        files[SCHEMA] = kit_schema(files[SCHEMA], names, index[0] - declared_names(files))
     if SIM_EVENTS_PAGE in files and listed(SIM_EVENTS_PAGE, contents):
         page = files[SIM_EVENTS_PAGE].decode()
         try:
@@ -919,7 +990,7 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     if counts is not None:
         counts.update(names.counts)
     files[README] = blob(root, README_SOURCE)
-    hits = (leaks or leak_check)(files, root)
+    hits = leaks(files, root) if leaks else leak_check(files, root, index=index)
     if hits:
         raise Refusal("refused: the kit leaks the decompilation:\n" + "\n".join(hits))
     manifest = manifest_of(files, git(root, "rev-parse", "HEAD").strip(), tags, version, tag_commits(root, tags))

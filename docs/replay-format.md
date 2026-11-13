@@ -588,8 +588,8 @@ outer call, as any write of the module does. The annotation names each interface
 interface:
 
 ```json
-"callbacks": {"UnitScanVisitor": {"header": "<the header of the class>", "handle": "scanner",
-              "methods": [{"name": "VisitUnit", "ret": "int", "args": [{"name": "unit", "type": "Unit*", "mode": "object", "kind": "Unit"}]}]}}
+"callbacks": {"UnitVisitor": {"header": "<the header of the class>", "handle": "visitor",
+              "methods": [{"name": "Visit", "ret": "void", "args": [{"name": "unit", "type": "Unit*", "mode": "object", "kind": "Unit"}]}]}}
 {"mode": "callback", "callback": "UnitVisitor"}
 ```
 
@@ -867,9 +867,17 @@ The target is a state kind with no `table`, `inside`, `kinds` or `vtable`, becau
 `data/replay_schema.json` has the `annotations` (written by hand, kept as written by the tool) and the generated
 `fields`, `objects` and `subsystems` (one entry per simulation subsystem, with its slots and their read and write
 sets). The annotations hold what no header says. The copy in the oracle kit leaves out the fields that name the source: the
-`includes`, the `functions` and `through` of each slot, the `functions` of each rule, the `header` of each code table and
-callback, and the `header`, `pre` and `effect` of each service (the replayer's own code); its code tables name their entries
-as Code pointers says.
+`includes`, the `functions` and `through` of each slot, the `header` of each code table and callback, and the `header`, `pre`
+and `effect` of each service (the replayer's own code); its code tables name their entries as Code pointers says. It also leaves
+out what only the recorder, the replayer and `replayschema.py --check` read, which names the source's globals, types and
+functions: the `exempt`, `exempt_types` and `rules` annotations, the `id` of each service, the `vtable` or `vptr` of each kind,
+the `aliases` of each field, the indices that tie a field or a slot argument to the replayer's table of reached fields, and the
+kinds whose every object a slot walks (the effect of an `all-of` rule). A recording names
+none of these: an object is named by its concrete kind, and a field by its own name. A service or callback interface whose name,
+or a method's, is a name of the source that nothing else in the kit declares is left out too, since no recording of the kit
+calls it; once a recording does, the recording declares it. Every other name of the copy is one that the interface headers,
+`layout.json`, the module manifest or a recording declares (a field named by its member, `velY` for `vel.y`, takes its name
+from the layout), and the export refuses a copy that names any other source name, giving its path in the schema.
 
 - `game_fields`, `sim_fields`, `exempt`: the block fields the recorder tracks, and the targets it ignores.
 - `objects`: each kind's C++ type, scope and fields (name, value kind, target kind of a pointer). The generated header

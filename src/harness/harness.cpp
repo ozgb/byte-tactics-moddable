@@ -1101,6 +1101,11 @@ static void CheckRemoteSlots()
         RejectLine(p->shareEnergyLine, i, "share_energy", "is not for a remote slot");
         RejectLine(p->shareMappingLine, i, "share_mapping", "is not for a remote slot");
     }
+    for (int i = 0; s_remoteSlots == 0 && i < MAX_PLAYERS; i++) {
+        RejectLine(s_players[i].shareMetalLine, i, "share_metal", "needs a remote slot");
+        RejectLine(s_players[i].shareEnergyLine, i, "share_energy", "needs a remote slot");
+        RejectLine(s_players[i].shareMappingLine, i, "share_mapping", "needs a remote slot");
+    }
     if (s_remoteSlots != 0 && s_localPlayer < 0 && s_players[DefaultLocalPlayer()].remote)
         Fail("testmode: a scenario with a remote slot needs a human slot that is not remote\n");
 }

@@ -74,8 +74,8 @@ The known values start empty at the first recorded call.
 An `o` line right after an `i` line (and after the `c` lines of that import) is the import's, until the first `o` line whose name begins with one of the
 slot's closing names, and every `o` line from there on is closing. The closing names of a slot are the names it records for what it writes
 through its own arguments and for its return value: `result`, and the name of each out argument (`pos.` for the out `Vec3` `pos`, which writes
-`o pos.x`, `o pos.y` and `o pos.z`), and any `snapshot#` line. The generated runner gives them to the replayer with `SetClosing` (`tests/replay_slots.h`,
-from the schema entry of the slot), and the replayer compares the beginning of the name after `o `, so an import's own names (`out`, `dst`, `Unit#251.flags`)
+`o pos.x`, `o pos.y` and `o pos.z`), and any `snapshot#` line. The generated runner gives them to the replayer with `SetClosing` (from
+the schema entry of the slot), and the replayer compares the beginning of the name after `o `, so an import's own names (`out`, `dst`, `Unit#251.flags`)
 never end its lines early, and a slot with no closing name has no closing `o` line. The recorder writes the closing lines last, so the last
 import's `o` lines can be followed at once by closing ones:
 
@@ -557,7 +557,10 @@ function in the named table, or `null`. The tables are the `code_tables` annotat
 in the order it registers them), each declared in one of the `headers`, which have to be `includes` of the schema. The tool writes the
 table as addresses of the game's functions in the schema header, so the recorder finds the index of the game's function and
 the replayer, linking its own functions, stores its own address for the index. `fill` is the slot (`seam.Slot`) that fills the game's
-table, for the subsystem that owns it. A kind of the `index` scope cannot hold a code field (`WeaponDef.fire` is set by `SetWeaponFireHandler` at load, to one of four functions): a second kind
+table, for the subsystem that owns it. The copy of the schema in the oracle kit names each entry by what it stands for, not by its
+function: an `orderNotify` entry by the name of its order type in the order type table (the names `orders.MissionTypeFromName` takes;
+two names joined by `/` when one function serves both, and `Ready` for the first, which has no name), and a `weaponFire` entry by the
+bit of `WeaponDef.flags` that selects it (`turret`, else `vLaunch`, else `lineOfSight` or `selfProp`, else `dropped`). A kind of the `index` scope cannot hold a code field (`WeaponDef.fire` is set when the weapon types load, to one of four functions): a second kind
 of the same C type, `WeaponFire`, is a state kind with a `table` over the array (`{"base": "game", "member": "weapons", "count": 256}`, no `ref`) and `fire` as its only field, and a rule with `"rule": "all-of"` on `WeaponDef::fire` makes every weapon a root of the call, so `WeaponFire#17.fire` is
 the handler of `weapondef#17`. The table is recorded whole at the first call that reads it (256 lines) and by changes after that. A function that is in none of the entries is an error that names the table (the recorder
 writes `orderNotify[?]`), and an index past the table is refused by the replayer. One order function is not an entry, because
@@ -585,14 +588,14 @@ outer call, as any write of the module does. The annotation names each interface
 interface:
 
 ```json
-"callbacks": {"UnitScanVisitor": {"header": "src/game/victory_conditions.h", "handle": "scanner",
+"callbacks": {"UnitScanVisitor": {"header": "<the header of the class>", "handle": "scanner",
               "methods": [{"name": "VisitUnit", "ret": "int", "args": [{"name": "unit", "type": "Unit*", "mode": "object", "kind": "Unit"}]}]}}
 {"mode": "callback", "callback": "UnitVisitor"}
 ```
 
 `methods` are the virtual methods of the class in the header, in declaration order (the tool checks the names against the header, and a
-callback interface has no virtual destructor). The tool writes the classes that do the work into `src/harness/replay_callbacks.h`
-and `tests/replay_callbacks.h`. A `callback` argument is allowed on a slot that a subsystem lists in its `imports`, and only there.
+callback interface has no virtual destructor). The tool writes the classes that do the work, one for the recorder
+and one for the replayer. A `callback` argument is allowed on a slot that a subsystem lists in its `imports`, and only there.
 
 The recorder hooks the object's methods for the duration of the import: it points the object's vptr at a class of its own that
 derives from the interface, so each call is recorded and then made on the object's own method, and it puts the vptr back when the
@@ -641,7 +644,7 @@ the closing `o` lines, with the arguments and result the `c` lines of an import 
   o result 5
 ```
 
-The replayer builds the object itself, one class per interface that the tool writes into `tests/replay_callbacks.h` (`ReplayHeldCallback`: the methods of the
+The replayer builds the object itself, one class per interface that the tool writes (`ReplayHeldCallback`: the methods of the
 interface, each recording its call, the object in the block so that a `Ref` can name it), and stores it in the field or passes it to the slot. Each call
 the module makes on it is written as the recorder writes it, named by handle, method and arguments, and returns the result of the recording's call at that
 position (an empty one when there is none). After the slot returns, the replayer compares each object's calls with the `c` lines of its handle, in order,
@@ -863,7 +866,10 @@ The target is a state kind with no `table`, `inside`, `kinds` or `vtable`, becau
 
 `data/replay_schema.json` has the `annotations` (written by hand, kept as written by the tool) and the generated
 `fields`, `objects` and `subsystems` (one entry per simulation subsystem, with its slots and their read and write
-sets). The annotations hold what no header says:
+sets). The annotations hold what no header says. The copy in the oracle kit leaves out the fields that name the source: the
+`includes`, the `functions` and `through` of each slot, the `functions` of each rule, the `header` of each code table and
+callback, and the `header`, `pre` and `effect` of each service (the replayer's own code); its code tables name their entries
+as Code pointers says.
 
 - `game_fields`, `sim_fields`, `exempt`: the block fields the recorder tracks, and the targets it ignores.
 - `objects`: each kind's C++ type, scope and fields (name, value kind, target kind of a pointer). The generated header
@@ -974,12 +980,11 @@ outside one writes nothing. The generated `unrecorded` entry of the subsystem li
 replayer's native table keeps its `native` symbol in place. The tool rejects `"record": false` with no `"reason"` and a
 `"reason"` on a recorded slot.
 
-`uv run tools/replayschema.py` also writes `src/harness/replay_schema.h` (the tables), `src/harness/replay_hooks.inc` (the
-recording copy of every seam table, its argument hooks and the import hooks) and `tests/replay_slots.h` (the slot
-runners, import stubs and native seam tables of the replayer). The services imports (`GameRand`, `RandomInt`, `FatalError`, `BuildDataPath`, the TDF and command classes) are the `services`
+`uv run tools/replayschema.py` also writes the recorder's tables, the recording copy of every seam table with its argument
+hooks and the import hooks, and the slot runners, import stubs and native seam tables of the replayer. The services imports (`GameRand`, `RandomInt`, `FatalError`, `BuildDataPath`, the TDF and command classes) are the `services`
 annotation: each entry names its declaration in `interfaces/services.h` (checked against the header) and how its arguments,
-result and `o` lines are written. From it the tool writes `src/harness/replay_services.h` (the ids and names),
-`src/harness/replay_services.inc` (the recorder's lines) and `tests/replay_services.h` (the replayer's answers). The one thing
+result and `o` lines are written. From it the tool writes the ids and names, the recorder's lines and
+the replayer's answers. The one thing
 it cannot write is the hook itself, an import-recording line at the top of each function in the game source:
 those functions are the services themselves, reached by direct calls with no table to wrap, so the hook has to be in the
 function; `replayschema.py --check` fails when a hook's arguments differ from its entry or an entry has no hook.
@@ -988,21 +993,21 @@ function; `replayschema.py --check` fails when a hook's arguments differ from it
 
 The kinds the self-tests need and no subsystem has (`FixtureView`, `FixtureCell`, `FixtureHolder` and the like, in the examples of this page) are
 not in `data/replay_schema.json`. `tests/replay_fixtures.json` holds them (`includes`, `game_fields`, `objects`, `fixtures` for the slots the self-tests call, and `inside` for the sites they add
-to a real kind), `tests/replay_fixtures.h` their structs, and `uv run tools/replayschema.py` writes `tests/replay_schema_fixtures.h`, the tables
-of the real kinds with these appended, and `tests/replay_vtables_fixtures.cpp`. `src/harness/replay_schema.h` includes the first when
-the fixture switch is defined, which only the native replay test, the object fixtures file (a copy of the objects file that defines it first)
-and `tests/replay_fixture_recorder.cpp` (below) do, so the exe's recorder has no fixture kind, and no real member of `Game`
+to a real kind), a header of the tests their structs, and `uv run tools/replayschema.py` writes the tables
+of the real kinds with these appended, and their vtables. The recorder's tables take the first when
+the fixture switch is defined, which only the native replay test, the object fixtures (a copy of the objects that defines it first)
+and the fixture recorder (below) do, so the exe's recorder has no fixture kind, and no real member of `Game`
 (`Game.slowest`, `p1b8a` and `p1cd5` are the hosts of the fixtures) is declared as anything but what it is. The fixture annotations are checked
 with the rest.
 
 Each slot of `fixtures` is classified as a slot of a subsystem is, and the tool writes three things for it, so that every form of the format
 is exercised by the tests and `replayschema.py --check` keeps them current:
 
-- `tests/replay_shapes.h`: the import stub of the slot (`Imp_fixture_<Slot>`, which the self-tests call as the module would), and, for a slot whose
+- The shapes: the import stub of the slot (`Imp_fixture_<Slot>`, which the self-tests call as the module would), and, for a slot whose
   arguments the runner can pass (the modes `scalar`, `stream`, `text`, `handle`, `object`, `struct`, `structs`, `value`, `argv` and `callback`, with a scalar, object or value result),
-  its runner `Run_fixture_<Slot>` and `After_fixture_<Slot>`, which call `Native_fixture_<Slot>`, a function that `tests/replay_native_test.cpp` defines. A self-test loads the
+  its runner `Run_fixture_<Slot>` and `After_fixture_<Slot>`, which call `Native_fixture_<Slot>`, a function that the native replay test defines. A self-test loads the
   lines of a call, runs the pair and checks `g_diffs` and the first key.
-- `tests/replay_fixture_hooks.inc`: the recording wrapper of the slot (`RecFixture<Slot>`) and a `FixtureSeam` table of them. `tests/replay_fixture_recorder.cpp` includes
+- The fixture hooks: the recording wrapper of the slot (`RecFixture<Slot>`) and a `FixtureSeam` table of them. The fixture recorder includes
   the recorder with the fixture switch defined and then this file in a second anonymous namespace, so the wrappers are compiled with the recorder's own helpers.
   The translation unit is a compile check, built by the `replay_native_test` target and linked into no exe. A fixture slot with a `callback` argument is
   wrapped as a slot (the `a` line and the `c` lines of the slot); any other is wrapped as an import, whose lines the stub reads.
@@ -1116,11 +1121,11 @@ targeting:
 - `SetWeaponTargetPos` with a z of -32768: it needs a world z of 32768, and scenarios and the harness reject positions off the map.
 - `SetWeaponTargetUnit` with a null target: 3.1c faults on it.
 - `FindWeaponTarget` rejecting a candidate that is not alive or is dying: the candidate list holds only live units, so neither check can fail.
-- `GetWeaponTargetPos` with the lead condition "the weapon slot has no weapon" failing alone: its only caller, `UpdateUnitWeapons`, skips a slot whose `flags` lack the value 2 (bit 1, `weapons.cpp:1529`), and the value 2 means "has a weapon" (`InitUnitWeaponSlots` sets it when the slot's weapon has a nonzero index, `weapons.cpp:1495`).
+- `GetWeaponTargetPos` with the lead condition "the weapon slot has no weapon" failing alone: its only caller, `UpdateUnitWeapons`, skips a slot whose `flags` lack the value 2 (bit 1), and the value 2 means "has a weapon": `InitUnitWeaponSlots` sets it when the slot's weapon has a nonzero index.
 - `Unit::ChooseWeapon` returning 1 or 2 (weapon slot 0 empty, slot 1 or 2 defined): no shipped unit has that shape. Checked by reading every `units/*.fbi` and `weapons/*.tdf` of the 30 archives of `~/.ta` (`totala1` to `totala4`, `tactics1` to `tactics8`, `worlds`, `rev31.gp3`, the `.ufo` and `.ccx` files) with the `Hpi` reader of `tools/tdfnumbers.py`: no unit leaves its first weapon key empty, or names a weapon of ID 0 there, while its second or third weapon key names a weapon of nonzero ID.
-- `Unit::ChooseWeapon` with no weapon at all (all three slots without the value 2, which returns 0 through the third branch): its only caller, `AttackChaseOrder` (`unit_orders.cpp:804`), runs only for a unit with the armed bit (flag 0x80000000), and a unit gets that bit at creation from bit 16 of its def's `flags1`, which `unit_types.cpp:681` sets only when one of the three weapon keys names a weapon other than the weapon of index 0 (the default, `NOWEAPON`). A slot holds the value 2 exactly when its weapon has a nonzero index, so an armed unit has a slot with it. The 821 `units/*.fbi` of the archives (read as above) have only the weapon shapes (slot 1, 2, 3) 100, 110, 101 and 111, or none at all, and no unit names `NOWEAPON`.
-- `FindBestTargetIfFireAtWill` with a fire order of 3: `Unit.fireOrder` takes its value from `standingfireorder` of the unit's FBI at creation (the shipped units have 0, 2 or none, which is 2), from the `STANDING_FIREORDER` order (`StandingFireOrder`, whose mode the order panel gives as 0, 1 or 2 and the scenario `firestate` line limits to 0, 1 and 2), or by copy from the builder or factory (`getbuilt`). The 3 of `control_panel.cpp:863` is the panel's "mixed" display and is never an order's mode. Fire order 1 is recorded: `orders-immediate`, ticks 740 to 770 only, holds the call at tick 752 (the `firestate 1` of tick 750, before `firestate 2` at 755 and `firestate 0` at 760), which returns null without an import.
-- A negative `UnitDef.range`: the loader reads it as `(short)` of the key `sightdistance` (`unit_types.cpp:489`) and nothing writes it again, so only a value below 0 or above 32767 gives one, and the `SightDistance` of the 821 shipped `units/*.fbi` lies between 55 and 490. `FindWeaponTarget` with `useRange` 0 and `FindBestTargetIfFireAtWill` pass it to `GetVisibleEnemiesInRadius` as the radius.
+- `Unit::ChooseWeapon` with no weapon at all (all three slots without the value 2, which returns 0 through the third branch): its only caller, the attack order (the order type `Attack_Chase`), runs only for a unit with the armed bit (flag 0x80000000), and a unit gets that bit at creation from bit 16 of its def's `flags1`, which the unit type loader sets only when one of the three weapon keys names a weapon other than the weapon of index 0 (the default, `NOWEAPON`). A slot holds the value 2 exactly when its weapon has a nonzero index, so an armed unit has a slot with it. The 821 `units/*.fbi` of the archives (read as above) have only the weapon shapes (slot 1, 2, 3) 100, 110, 101 and 111, or none at all, and no unit names `NOWEAPON`.
+- `FindBestTargetIfFireAtWill` with a fire order of 3: `Unit.fireOrder` takes its value from `standingfireorder` of the unit's FBI at creation (the shipped units have 0, 2 or none, which is 2), from the `STANDING_FIREORDER` order (the order type `Standing_FireOrder`, whose mode the order panel gives as 0, 1 or 2 and the scenario `firestate` line limits to 0, 1 and 2), or by copy from the builder or factory (`getbuilt`). A 3 is only what the order panel shows when the selected units have different fire orders ("mixed"), and is never an order's mode. Fire order 1 is recorded: `orders-immediate`, ticks 740 to 770 only, holds the call at tick 752 (the `firestate 1` of tick 750, before `firestate 2` at 755 and `firestate 0` at 760), which returns null without an import.
+- A negative `UnitDef.range`: the unit type loader stores the key `sightdistance` in it as a signed 16-bit number and nothing writes it again, so only a value below 0 or above 32767 gives one, and the `SightDistance` of the 821 shipped `units/*.fbi` lies between 55 and 490. `FindWeaponTarget` with `useRange` 0 and `FindBestTargetIfFireAtWill` pass it to `GetVisibleEnemiesInRadius` as the radius.
 - `GetWeaponTargetPos` with a cruise weapon, or a weapon of speed 0, and a unit with more than five kills (the other lead conditions are met): not reached by the scenario suite; it would need a veteran missile silo or bomber.
 - `ai.GetVisibleEnemiesInRadiusList`: it has no 3.1c call site, only the vector form `ai.GetVisibleEnemiesInRadius` is called, which the recordings carry. The replayer answers a call of it from the next recorded vector line with the same player, position, radius and flags: it writes the first `capacity` units of the recorded list, in order, and returns the recorded count; a repeat with the same arguments and a larger capacity, after a count above the capacity, is answered from the same line and takes no further import, and any other extra call is a divergence.
 - A unit target with `unitDefIndex` 0 where the second condition of the guard (the aim target field being nonzero) is false: that condition is always true there.
@@ -1134,7 +1139,7 @@ weapons:
 
 ## Replaying
 
-`tests/replay_native_test.cpp` replays a recording against the native module (`replay_native_test.exe`, built by
+The native replay test replays a recording against the native module (`replay_native_test.exe`, built by
 `cmake --build build/modern --target replay_native_test`, run under Wine in `modern-compile`, with the WASM replays below).
 The subsystem is read from the recording's header; the module sources of a subsystem come from `data/subsystems.csv`.
 CI replays the recordings of a subsystem once it has an entry in `tests/replay_subsystems.json` (its injected change,
@@ -1191,7 +1196,7 @@ nothing is recorded of it.
 
 - Ground height equal to the sea level: `sealevel 1`, then the D-gun at the ground at (850, 300), where `units.GetGroundHeight` returns 1: the call at tick 11, line 918, where `GetWeaponTargetPos` returns 1 with `o pos.y 65536` (16 calls, from tick 11).
 - Bit 10 (0x400) of `Game.uiOptionFlags` (`shootall`, tick 60) deciding a pick: the call at tick 83, line 4210, where `FindWeaponTarget` of the human commander `Unit#1` takes the enemy `CORSOLAR` (`Unit#502`, a def without `shootme`) as its only candidate and picks it.
-- The lead check of `GetWeaponTargetPos` at 4, 5, 6 and 7 kills, in `Unit#2` (an `ARMHLT`) aiming at `CORCK` constructors that patrol: with 4 kills the aim point is the sweet spot while the target moves (first at tick 766, line 34535), with 5 kills the same (tick 866, line 38675), and with 6 kills the target's velocity is added (`o out` differs from `o pos.x` and `o pos.z`): tick 1072, line 47154, with `UnitMotion#8` velocity read just before it. The first calls at each count are at ticks 724 (4 kills, line 32831), 864 (5, line 38603), 998 (6, line 44114), 1127 (7, line 49388) and 1233 (8, line 53796). In this list a line is the `units.GetSweetSpot` import of the call, a few lines below its `call` line. A target that moves at 6 kills is one call in the run (and 12 at 7), because the tower kills quickly.
+- The lead check of `GetWeaponTargetPos` at 4, 5, 6 and 7 kills, in `Unit#2` (an `ARMHLT`) aiming at `CORCK` constructors that patrol: with 4 kills the aim point is the sweet spot while the target moves (first at tick 766, line 34535), with 5 kills the same (tick 866, line 38675), and with 6 kills the target's velocity is added (`o out` differs from `o pos.x` and `o pos.z`): tick 1072, line 47154, with `UnitMotion#8` velocity read just before it. The first calls at each count are at ticks 724 (4 kills, line 32831), 864 (5, line 38603), 998 (6, line 44114), 1127 (7, line 49388) and 1233 (8, line 53796). In this list a line is the `units.GetSweetSpot` import of the call, a few lines below its `call` line. A target that moves at 6 kills is one call in the run (and 62 at 7), because the tower kills quickly.
 
 `replay_inject_test.exe` is also built with the mean-shift injection of 0 (the shift by one that halves the sum of the low and high corners of a cell in the cell mean height), and the divergence is reported at call 7 of `orders-air-repair` and at `result`:
 
@@ -1222,7 +1227,7 @@ The recordings of weapons, which the modern build runs as native code in every m
 - `mission-radius`, ticks 1640 to 1650: a missile ship fires its vertical-launch weapon at tick 1644 (`Unit#269`, `weapondef#130`, whose `WeaponFire#130.fire` is `weaponFire[1]`). The shot reads its target (`targeting.GetWeaponTargetPos`, `targeting.GetWeaponTargetUnit`), queries and starts the fire script (`units.QueryScript` `QueryPrimary`, `units.GetPieceOffset`, `units.StartScript` `FirePrimary`, `units.StartScriptWithArgs` `RockUnit`), records the sound and smoke events, pays (`economy.SpendEnergyAndMetal`) and writes the new `Projectile#4`. The window also holds a turret shot and a line-of-sight shot.
 - `long-greenhaven-8p`, tick 30518 only: a bomber drops a bomb (`Unit#1783`, `weapondef#5`, whose `WeaponFire#5.fire` is `weaponFire[3]`), the first dropped shot of the suite: it reads its target and the weapon piece, records the sound event, pays and writes `Projectile#2` with the bomber's heading. One tick of the eight-player match is 287 calls.
 
-`Game.projectiles` is a table of 300 projectiles (the 300 of the game's `projectileCount < 300` guard), every element a root of `UpdateUnitWeapons` and `FindTargetableProjectile`, so a shot made at index `projectileCount` finds its element and the first call records all 300 with every field the slot reads (about 8,000 lines). `Game.tracked` and `Game.value_142f3`, which `InitProjectile` writes and reads for the camera, are `exempt`.
+`Game.projectiles` is a table of 300 projectiles (the 300 of the game's `projectileCount < 300` guard), every element a root of `UpdateUnitWeapons` and `FindTargetableProjectile`, so a shot made at index `projectileCount` finds its element and the first call records all 300 with every field the slot reads (about 8,000 lines). `Game.tracked` and `Game.value_142f3`, which a new projectile writes and reads for the camera, are `exempt`.
 The recorder's walker holds as many fields as the schema has walkable object fields (references, embedded objects, unit ids, weapons and vectors of objects), a count the generated schema states, so no slot set can overflow it.
 
 A subsystem that imports a slot of another complete subsystem (`weapons` imports `targeting.GetWeaponTargetPos`, and `targeting` and `wind_meteors` import `weapons` slots) is replayed against the import stubs of that seam, not against the other module: `BindSeams` binds the stubs of the seams a recording's subsystem imports from, after the native tables.
@@ -1241,10 +1246,10 @@ wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors_inject
 The recordings don't depend on how the modern build runs a subsystem. A module of targeting or map, native or
 WASM, has to replay them equal, as `wind_meteors.wasm` replays its own.
 
-`tests/replay_wasm.cpp` loads the module through `lib/wasmloader` as `src/wasm/modules.cpp` does in the game: the
+The WASM replay loads the module through the game's own module loader, as the game does: the
 `wasmtime_host.dll` and `modules.json` beside the module file are used, the sim block of the module's memory is attached
 as the replayer's block, and the slots are called through the seam the subsystem's glue builds. The glue calls are one
-entry per subsystem in a table at the top of that file (wind_meteors only for now); the module file's name selects the
+entry per subsystem in a table of the replayer (wind_meteors only for now); the module file's name selects the
 entry, and the recording's subsystem must be the same one. Each replay of a file loads the module afresh, so the two
 runs of a file start from the same state. A trap or a fuel overrun stops the run with `FAIL`.
 `wind_meteors_inject.wasm` is the module built with the gap-scale injection of 31.0 (`wasm_modules.py build-variant`),

@@ -118,10 +118,10 @@
    "g_quirks": "the quirk flags: constant for the run",
    "BucketGrid::width": "a view of Game::width_142a3, which the slots' read sets name",
    "BucketGrid::height": "a view of Game::height_142a7, which the slots' read sets name",
-   "Game::tracked": "camera follow state: the tick writes it and only UpdateCameraFollow reads it (data/state_classes.csv, view)",
+   "Game::tracked": "camera follow state: the tick writes it and only the camera follow reads it (data/state_classes.csv, view)",
    "Game::value_142f3": "camera follow state: the unit the camera follows, which only decides whether the tick writes Game::tracked (data/state_classes.csv, view)",
    "<anon>::halves": "the halves of a stack union that holds the height difference of a shot",
-   "<anon>::value": "a stack union that holds the height difference of a shot (the weapon flags word is read through the rule of FireLineOfSightProjectile)",
+   "<anon>::value": "a stack union that holds the height difference of a shot (the weapon flags word is read through the rule of the line-of-sight shot)",
    "g_aimScriptNames": "a constant table of script names",
    "g_fireScriptNames": "a constant table of script names"
   },
@@ -132,7 +132,7 @@
    "Quirks": "the quirk flags: set before the first tick and never changed",
    "ReachPosVec3": "a view of the Vec3 arguments of WeaponCanReachPos, recorded as the call's arguments, and the stack copies made from them",
    "ReachUnitVec3": "a view of Unit.pos, which the Unit::pos rule records, and the stack copies made from it",
-   "UnitDamagePacket": "the damage packet DamageUnit builds on its stack and ApplyUnitDamage reads at once",
+   "UnitDamagePacket": "the damage packet DamageUnit builds on its stack and applies at once",
    "UnitDamagePacketOut": "the damage packet DamageUnit builds on its stack",
    "WeaponSlotInitState": "the loop counter and the largest reload time of InitUnitWeaponSlots, on its stack"
   },

@@ -138,7 +138,7 @@ players,Unit::flags,los_radar,IsUnitVisibleToPlayer,other-record,79,allied-victo
 players,Unit::flags,los_radar,IsUnitVisibleToPlayer,same-record,26,allied-victory@30
 players,Unit::flags,orders,GetFeature,other-record,3,skirmish4-long@15900
 players,Unit::flags,orders,GetFeature,same-record,2,long-greenhaven-8p@27900
-players,Unit::flags,players,UpdatePlayerHead,other-record,81,edges-economy-targeting@29
+players,Unit::flags,players,UpdatePlayerHead,other-record,84,edges-economy-targeting@29
 players,Unit::flags,players,UpdatePlayerHead,same-record,80,allied-victory@30
 players,Unit::flags,seams,WorldUnitInfo,other-record,78,allied-victory@30
 players,Unit::flags,seams,WorldUnitInfo,same-record,78,allied-victory@30
@@ -228,9 +228,9 @@ players,unknown_1b8e,network,BroadcastPacket,same-record,6,mission-build-unit@30
 players,unknown_1b8e,network,NetSendActivateFlags,same-record,6,mission-build-unit@30
 players,unknown_1b8e,orders,GetFeature,same-record,1,long-great-divide-2p@27300
 players,unknown_1b8e,platform,GetSlotDpid,same-record,6,mission-build-unit@30
-players,unknown_1b8e,players,CountCombatPlayers,same-record,1,allied-victory@30
+players,unknown_1b8e,players,CountCombatPlayers,same-record,4,allied-victory@30
 players,unknown_1b8e,players,IsLocalPlayerOutOfUnits,same-record,5,orders-air-fights@30
-players,unknown_1b8e,players,UpdatePlayerHead,same-record,85,allied-victory@30
+players,unknown_1b8e,players,UpdatePlayerHead,same-record,88,allied-victory@30
 players,unknown_1b8e,seams,WorldPlayerInfo,same-record,82,allied-victory@30
 players,unknown_1b8e,targeting,FindWeaponTarget,same-record,45,mission-capture@30
 players,unknown_1b8e,units,Unit::SetStateBits,same-record,6,mission-build-unit@30
@@ -430,12 +430,13 @@ projectiles,Vec3::x,weapons,UpdateProjectiles,other-record,1,skirmish4-long@2411
 projectiles,count_1491b,weapons,AddExplosionEffect,same-record,11,edges-economy-targeting@36
 projectiles,projectileCount,weapons,CompactProjectiles,same-record,6,orders-guard-attacked@56
 projectiles,projectileCount,weapons,UpdateProjectiles,same-record,4,orders-guard-attacked@163
-tail,FrameTimers::acc,game,RunGameSteps,same-record,85,allied-victory@1
+tail,FrameTimers::acc,game,RunGameSteps,same-record,88,allied-victory@1
 tail,SimEventsCreate: GameAllocIgnoreTag SimEventQueue,presentation,DrainSimEvents,same-record,4,hailstorm-los-off@1
 tail,bits_14281,los_radar,RemoveLineOfSight,same-record,11,mission-build-unit@136
 tail,bits_142f1,los_radar,RemoveLineOfSight,same-record,12,mission-build-unit@136
 tail,bits_142f1,players,UpdateBlink,same-record,18,mission-build-unit@72
-tail,pad_38d81,game,RunGameSteps,same-record,85,allied-victory@1
+tail,pad_38d81,game,RunGameSteps,same-record,88,allied-victory@1
+tail,unknown_1b8e,seams,WorldPlayerInfo,same-record,3,share-all@1
 units,AddOrder: new Order,seams,OrderOrStatusFlagsNative,other-record,4,mission-kill-mobile@180
 units,AirManeuverOrder::target,orders,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@48775
 units,AirStrikeOrder: new Order #3,orders,Order::SetAttachedFx,other-record,1,long-greenhaven-8p@38185

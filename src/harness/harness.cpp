@@ -1101,10 +1101,10 @@ static void CheckRemoteSlots()
         RejectLine(p->shareEnergyLine, i, "share_energy", "is not for a remote slot");
         RejectLine(p->shareMappingLine, i, "share_mapping", "is not for a remote slot");
     }
-    for (int i = 0; s_remoteSlots == 0 && i < MAX_PLAYERS; i++) {
-        RejectLine(s_players[i].shareMetalLine, i, "share_metal", "needs a remote slot");
-        RejectLine(s_players[i].shareEnergyLine, i, "share_energy", "needs a remote slot");
-        RejectLine(s_players[i].shareMappingLine, i, "share_mapping", "needs a remote slot");
+    for (int k = 0; s_remoteSlots == 0 && k < MAX_PLAYERS; k++) {
+        RejectLine(s_players[k].shareMetalLine, k, "share_metal", "needs a remote slot");
+        RejectLine(s_players[k].shareEnergyLine, k, "share_energy", "needs a remote slot");
+        RejectLine(s_players[k].shareMappingLine, k, "share_mapping", "needs a remote slot");
     }
     if (s_remoteSlots != 0 && s_localPlayer < 0 && s_players[DefaultLocalPlayer()].remote)
         Fail("testmode: a scenario with a remote slot needs a human slot that is not remote\n");
@@ -1353,9 +1353,9 @@ static void SetUpSkirmish()
     g_game->field_2a3c = (unsigned short)active;
     ResetPlayerSlots();
     ApplySlotsToGamePlayers();
-    for (int i = 0; i < MAX_PLAYERS; i++) {
-        if (s_players[i].remote)
-            g_game->players[i].type = 3;
+    for (int r = 0; r < MAX_PLAYERS; r++) {
+        if (s_players[r].remote)
+            g_game->players[r].type = 3;
     }
     InitMissionStatus();
 
@@ -3901,25 +3901,34 @@ static void VisitSharePackets()
     s_sharePackets.count = 0;
 }
 
+static void SetInfoBit(unsigned char* player, unsigned bit, int on)
+{
+    unsigned short* flags = (unsigned short*)(*(unsigned char**)(player + 0x27) + 0x97);
+    if (on)
+        *flags = (unsigned short)(*flags | (1 << bit));
+    else
+        *flags = (unsigned short)(*flags & ~(1 << bit));
+}
+
 static void ApplyShareSettings()
 {
     for (int i = 0; i < MAX_PLAYERS; i++) {
         const PlayerSpec* spec = &s_players[i];
-        Player* p = &g_game->players[i];
+        unsigned char* p = (unsigned char*)&g_game->players[i];
         if (spec->metalStorageLine != 0)
-            p->metalCapacity = (float)spec->metalStorage;
+            *(float*)(p + 0xa8) = (float)spec->metalStorage;
         if (spec->energyStorageLine != 0)
-            p->energyCapacity = (float)spec->energyStorage;
+            *(float*)(p + 0xa4) = (float)spec->energyStorage;
         if (spec->shareMetalLine != 0) {
-            p->info->shareMetal = 1;
-            p->shareMetal = (float)spec->shareMetal;
+            SetInfoBit(p, 1, 1);
+            *(float*)(p + 0xe4) = (float)spec->shareMetal;
         }
         if (spec->shareEnergyLine != 0) {
-            p->info->shareEnergy = 1;
-            p->shareEnergy = (float)spec->shareEnergy;
+            SetInfoBit(p, 2, 1);
+            *(float*)(p + 0xe8) = (float)spec->shareEnergy;
         }
         if (spec->shareMappingLine != 0)
-            p->info->shareMapping = spec->shareMapping;
+            SetInfoBit(p, 5, spec->shareMapping);
     }
 }
 

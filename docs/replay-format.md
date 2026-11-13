@@ -867,9 +867,16 @@ The target is a state kind with no `table`, `inside`, `kinds` or `vtable`, becau
 `data/replay_schema.json` has the `annotations` (written by hand, kept as written by the tool) and the generated
 `fields`, `objects` and `subsystems` (one entry per simulation subsystem, with its slots and their read and write
 sets). The annotations hold what no header says. The copy in the oracle kit leaves out the fields that name the source: the
-`includes`, the `functions` and `through` of each slot, the `functions` of each rule, the `header` of each code table and
-callback, and the `header`, `pre` and `effect` of each service (the replayer's own code); its code tables name their entries
-as Code pointers says.
+`includes`, the `functions` and `through` of each slot, the `header` of each code table and callback, and the `header`, `pre`
+and `effect` of each service (the replayer's own code); its code tables name their entries as Code pointers says. It also leaves
+out what only the recorder, the replayer and `replayschema.py --check` read, which names the source's globals, types and
+functions: the `exempt`, `exempt_types` and `rules` annotations, the `id` of each service, the `vtable` or `vptr` of each kind,
+the `aliases`, `reachFirst` and `reachCount` of each field and slot argument, and the `allOf` of each slot. A recording names
+none of these: an object is named by its concrete kind, and a field by its own name. A service or callback interface whose name,
+or a method's, is a name of the source that nothing else in the kit declares is left out too, since no recording of the kit
+calls it; once a recording does, the recording declares it. Every other name of the copy is one that the interface headers,
+`layout.json`, the module manifest or a recording declares (a field named by its member, `velY` for `vel.y`, takes its name
+from the layout), and the export refuses a copy that names any other source name, giving its path in the schema.
 
 - `game_fields`, `sim_fields`, `exempt`: the block fields the recorder tracks, and the targets it ignores.
 - `objects`: each kind's C++ type, scope and fields (name, value kind, target kind of a pointer). The generated header

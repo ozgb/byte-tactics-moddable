@@ -942,11 +942,19 @@ SCHEMA_TEXT = json.dumps({
         "code_tables": {"orderNotify": {"entries": ["ReadyOrder", "AttackChaseOrder"], "headers": ["src/orders/unit_orders.h"],
                                         "fill": "orders.RegisterAllOrderTypes"}},
         "callbacks": {"Scan": {"header": "src/game/victory_conditions.h", "handle": "scanner", "methods": []}},
+        "exempt": {"g_hiddenTable": "a constant table"},
+        "exempt_types": {"HiddenView": "a stack copy"},
+        "objects": {"Spot": {"type": "Spot", "vptr": "g_hiddenVtable",
+                             "fields": [{"name": "velY", "kind": "i32", "member": "vel.y", "aliases": ["HiddenView::y"]}]}},
     },
-    "subsystems": {"orders": {"slots": {"RunOrders": {"functions": ["AttackChaseOrder"], "reads": ["Game.ticks"]}}}},
+    "objects": [{"name": "Spot", "vtable": "g_hiddenVtable", "fields": [{"name": "velY", "kind": "i32", "member": "vel.y",
+                                                                       "aliases": ["HiddenView::y"], "reachFirst": 0, "reachCount": 1}]}],
+    "subsystems": {"orders": {"slots": {"RunOrders": {"functions": ["AttackChaseOrder"], "reads": ["Game.ticks"], "allOf": [],
+                                                      "args": [{"name": "out", "mode": "units", "reachFirst": 0, "reachCount": 1}]}}}},
 }, indent=1) + "\n"
 CODE_TABLES_TEXT = "table,entry,kit_name\norderNotify,ReadyOrder,Ready\norderNotify,AttackChaseOrder,Attack_Chase\n"
-SCHEMA_SOURCE = "int ReadyOrder(int a) { return a; }\nint AttackChaseOrder(int a) { return a; }\n"
+SCHEMA_SOURCE = ("int ReadyOrder(int a) { return a; }\nint AttackChaseOrder(int a) { return a; }\n"
+                 "struct HiddenView { int y; };\nint g_hiddenTable[4];\nint g_hiddenVtable[2];\nint velY;\n")
 SCHEMA_CONTENTS = CONTENTS + [("file", oraclekit.SCHEMA, "")]
 
 
@@ -966,8 +974,53 @@ class ReplaySchemaKitTest(unittest.TestCase):
             self.assertEqual(kit["annotations"]["code_tables"]["orderNotify"],
                              {"entries": ["Ready", "Attack_Chase"], "fill": "orders.RegisterAllOrderTypes"})
             self.assertEqual(kit["annotations"]["services"], [{"name": "GameRand", "declaration": "int GameRand(int s);"}])
-            self.assertEqual(kit["subsystems"]["orders"]["slots"]["RunOrders"], {"reads": ["Game.ticks"]})
-            self.assertEqual(kit["annotations"]["rules"], [{"kind": "field_escape", "target": "Game::weapons"}])
+            self.assertEqual(kit["subsystems"]["orders"]["slots"]["RunOrders"],
+                             {"reads": ["Game.ticks"], "args": [{"name": "out", "mode": "units"}]})
+            for key in ("rules", "exempt", "exempt_types"):
+                self.assertNotIn(key, kit["annotations"])
+            velY = {"name": "velY", "kind": "i32", "member": "vel.y"}
+            self.assertEqual(kit["annotations"]["objects"], {"Spot": {"type": "Spot", "fields": [velY]}})
+            self.assertEqual(kit["objects"], [{"name": "Spot", "fields": [velY]}])
+            for name in ("HiddenView", "g_hidden"):
+                self.assertNotIn(name, text)
+
+    def test_services_and_callbacks_named_by_an_undeclared_source_name_are_left_out(self):
+        schema = json.dumps({"annotations": {
+            "services": [{"name": "SimAlloc", "id": "RI_SIM_ALLOC"}, {"name": "SimAllocTagged", "id": "RI_SIM_ALLOC_TAGGED"}],
+            "callbacks": {"UnitVisitor": {"handle": "visitor", "methods": [{"name": "Visit"}]},
+                          "UnitScanVisitor": {"handle": "scanner", "methods": [{"name": "VisitUnit"}]}}}}).encode()
+        kit = json.loads(oraclekit.kit_schema(schema, {}, {"SimAllocTagged", "VisitUnit", "RI_SIM_ALLOC"}))
+        self.assertEqual(kit["annotations"]["services"], [{"name": "SimAlloc"}])
+        self.assertEqual(list(kit["annotations"]["callbacks"]), ["UnitVisitor"])
+
+    def test_a_schema_entry_naming_an_undeclared_source_global_or_type_is_refused_with_its_path_and_key(self):
+        schema = json.dumps({"annotations": {"game_aliases": {"g_hiddenTable": "Game.table"},
+                                             "objects": {"Spot": {"type": "HiddenView", "fields": [
+                                                 {"name": "velY", "member": "vel.y"}, {"name": "posY", "member": "pos.y"}]}}},
+                             "subsystems": {"s": {"slots": {"Run": {"objectReads": ["Spot.velY", "Spot.posY"]}}}}})
+        layout = json.dumps({"records": {"Spot": {"fields": [{"name": "vel"}, {"name": "pos"}]}}})
+        files = {"layout.json": layout.encode(), oraclekit.SCHEMA: schema.encode()}
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "o.cpp").write_text(SCHEMA_SOURCE + "int posY;\n")
+            hits = oraclekit.leak_check(files, Path(tmp))
+        self.assertEqual(hits, [
+            "data/replay_schema.json: /annotations/game_aliases: the key 'g_hiddenTable' names 'g_hiddenTable', which the kit does not declare",
+            "data/replay_schema.json: /annotations/objects/Spot/type: 'HiddenView' names 'HiddenView', which the kit does not declare",
+        ])
+
+    def test_the_export_refuses_a_schema_that_names_an_undeclared_source_type(self):
+        schema = json.loads(SCHEMA_TEXT)
+        schema["annotations"]["objects"]["Spot"]["type"] = "HiddenView"
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = repo(tmp, {"docs/a.md": "alpha\n", oraclekit.SCHEMA: json.dumps(schema), oraclekit.CODE_TABLES_SOURCE: CODE_TABLES_TEXT,
+                              "src/o.cpp": SCHEMA_SOURCE})
+            kit = Path(out) / "k"
+            with self.assertRaises(oraclekit.Refusal) as caught:
+                oraclekit.export(root, kit, True, {"records": {}}, SCHEMA_CONTENTS)
+            self.assertIn("data/replay_schema.json: /annotations/objects/Spot/type: 'HiddenView' names 'HiddenView'", str(caught.exception))
+            self.assertFalse(kit.exists())
 
     def test_a_function_only_the_source_and_the_schema_name_is_refused_in_a_document(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:

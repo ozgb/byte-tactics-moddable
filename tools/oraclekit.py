@@ -827,7 +827,7 @@ FUNCTION_DEFINITION = re.compile(r"\b([A-Za-z_]\w*)\s*\((?:[^()]|\([^()]*\))*\)\
 TYPE_DEFINITION = re.compile(r"\b(?:struct|class|union|enum)\s+(\w+)|\btypedef\b[^;]*?\b(\w+)\s*(?:\[[^\]]*\])?;")
 DECLARING = (LAYOUT, MODULES)
 DECLARING_DIRS = ("tests/replay/",)
-FROZEN_DIRS = ("reference/",)
+FROZEN_DIRS: tuple[str, ...] = ()
 
 
 def source_functions(root: Path) -> set[str]:

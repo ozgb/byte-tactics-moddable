@@ -1105,7 +1105,7 @@ void __stdcall RunGameSteps(int showStats)
             shown->displayTimer += 0x1e;
         g_seams.los_radar->ExpireEyeballs();
 
-        if (showStats && g_usePacketManager != 0) {
+        if ((showStats && g_usePacketManager != 0) || HarnessSharing()) {
 #if BT_ACCESS_LOG
             AccessLogEntity();
 #endif

@@ -49771,10 +49771,6 @@ address,function,file,kind,target
 ,VisitPathNodes,src/harness/harness.cpp,global_read,s_nodeFree@src/harness/harness.cpp
 ,VisitPathNodes,src/harness/harness.cpp,global_write,s_nodeFree@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,call,DumpPrefix
-,VisitPathResults,src/harness/harness.cpp,call,EndSection
-,VisitPathResults,src/harness/harness.cpp,call,HashBuf
-,VisitPathResults,src/harness/harness.cpp,call,HashByte
-,VisitPathResults,src/harness/harness.cpp,call,HashU32
 ,VisitPathResults,src/harness/harness.cpp,call,fprintf
 ,VisitPathResults,src/harness/harness.cpp,call,fputc
 ,VisitPathResults,src/harness/harness.cpp,call,fputs

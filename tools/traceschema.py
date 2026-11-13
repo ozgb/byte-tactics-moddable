@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TRACE_FORMAT = 4
+TRACE_FORMAT = 5
 TYPES = ROOT / "include/ta_types.h"
 OUT = ROOT / "src/harness/trace_schema.h"
 
@@ -47,6 +47,10 @@ POINTERS: dict[str, dict[int, str]] = {
 }
 
 POINTER_NAMES: dict[tuple[str, int], str] = {}
+
+EXCLUDED_RANGES: list[tuple[str, int, int, str]] = [
+    ("Unit", 0xBC, 0xEC, "the resource account: economy's private state"),
+]
 
 EXCLUSIONS: list[tuple[str, str, str]] = [
     ("Eye", "screen", "points at the record's own screenPos"),
@@ -1050,6 +1054,8 @@ def finish(schema, ctype, key):
         if mask:
             leaf["mask"] = mask[0]
         label = leaf["name"] or "+0x%x" % leaf["offset"]
+        if any(t == key and lo <= leaf["offset"] and leaf["offset"] + leaf["size"] <= hi for t, lo, hi, _ in EXCLUDED_RANGES):
+            continue
         if (key, label) in excluded or (key, base_name(leaf)) in excluded or (key, "+0x%x" % leaf["offset"]) in excluded:
             continue
         out.append(leaf)

@@ -3416,23 +3416,12 @@ static void VisitPathResults()
 {
     char path[64];
     unsigned k;
-    HashByte(32);
-    HashU32(s_pathResultCount);
-    if (s_dumpNow) {
-        DumpPrefix("results.count");
-        fprintf(s_dump, "0x%08x\n", s_pathResultCount);
-    }
+    if (!s_dumpNow)
+        return;
+    DumpPrefix("results.count");
+    fprintf(s_dump, "0x%08x\n", s_pathResultCount);
     for (k = 0; k < s_pathResultCount; k++) {
         const PathResult* r = &s_pathResults[k];
-        HashU32((unsigned)r->kind);
-        HashU32((unsigned)r->status);
-        HashByte((unsigned char)r->unitTag);
-        HashU32(r->unitId);
-        HashU32(r->tick);
-        HashU32((unsigned)r->count);
-        HashBuf((const unsigned char*)r->points, r->delivered * 4);
-        if (!s_dumpNow)
-            continue;
         sprintf(path, "results[%u].kind", k);
         DumpPrefix(path);
         fprintf(s_dump, "0x%08x\n", (unsigned)r->kind);
@@ -3461,7 +3450,6 @@ static void VisitPathResults()
             fprintf(s_dump, "%02x", ((const unsigned char*)r->points)[b]);
         fputc('\n', s_dump);
     }
-    EndSection();
 }
 
 static void VisitPrivatePathfinder()

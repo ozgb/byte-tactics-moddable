@@ -70,6 +70,7 @@ NATIVE_SLOT = re.compile(r"^\s*s_(\w+)\.(\w+)\s*=\s*(?:\(.*\))?\s*(\w+);", re.M)
 
 EFFECTS = {"RandomInt": "draw rng", "GameRand": "draw crt", "RecordSimEvent": "sim event"}
 TRANSPARENT = {None, "seams", "platform", "game"}
+OUTSIDE = "a call into %s outside its interface"
 ENGINE = {"presentation", "harness", "network", "files"}
 
 
@@ -1005,8 +1006,9 @@ class Splits:
         return self.memo[key]
 
     def locate(self, where: str, steps: list, sub: str, writer: str, reader: str, item: str,
-               stack: tuple = (), loose: bool = False) -> Placement | None:
-        """The first write of the writer, in these steps or nested in one of them, followed by a read of the reader."""
+               stack: tuple = (), loose: bool = False, direct: bool = False) -> Placement | None:
+        """The first write of the writer, in these steps or nested in one of them, followed by a read of the reader;
+        with `direct`, the calls outside an interface count as steps too."""
         match = self.matcher(item, loose)
         loose = match is None
         writes = []
@@ -1016,6 +1018,12 @@ class Splits:
                 writes.append(i)
             if self.reach(n.slot, reader, item, match, False):
                 reads.append(i)
+        if direct:
+            for i, n in enumerate(steps):
+                if n.kind == "direct" and self.direct_hits(n, writer, item, match, True):
+                    writes.append(i)
+                if n.kind == "direct" and self.direct_hits(n, reader, item, match, False):
+                    reads.append(i)
         table = self.accesses_of(steps)
         for who, write, into in ((writer, True, writes), (reader, False, reads)):
             if sub == who:
@@ -1030,14 +1038,14 @@ class Splits:
                 continue
             r = later[0]
             first, second = steps[w], steps[r]
-            kind = {("entry", "entry"): "split", ("entry", "access"): "apply", ("access", "entry"): "before"}.get(
-                (first.kind, second.kind))
+            kind = {("entry", "access"): "apply", ("access", "entry"): "before",
+                    ("direct", "access"): "apply", ("access", "direct"): "before"}.get(
+                (first.kind, second.kind), "split" if first.kind != "access" and second.kind != "access" else None)
             if kind is None:
                 continue
             inside = first.label if first.kind == "entry" and w in reads and self.splits_inside(
                 first, writer, reader, item, stack, loose) else ""
-            return Placement(kind, where, first.label if first.kind == "entry" else "",
-                             second.label if second.kind == "entry" else "", loose,
+            return Placement(kind, where, step_label(first), step_label(second), loose,
                              self.position(steps, w), self.position(steps, r), inside,
                              self.listed(steps, w) if first.kind == "access" else 0)
         for i in writes:
@@ -1049,6 +1057,16 @@ class Splits:
                 if found:
                     return found
         return None
+
+    def direct_hits(self, step: Node, who: str, item: str, match, write: bool) -> bool:
+        """Whether a call outside an interface is the writer's write (or the reader's read) of the item."""
+        key = ("direct", step.label, step.sub, who, item if match is not None else "", write)
+        if key not in self.memo:
+            own: set = set()
+            for g in self.program.lookup(step.label):
+                self.program.expand(g, step.sub, own=own)
+            self.memo[key] = self.hits(step.sub, own, who, match, write)
+        return self.memo[key]
 
     def splits_inside(self, step: Node, writer: str, reader: str, item: str, stack: tuple, loose: bool) -> bool:
         """Whether a write of the writer followed by a read of the reader is found inside the step."""
@@ -1109,7 +1127,7 @@ class Splits:
             if n.kind in ("entry", "effect", "direct") and (n.kind, n.label) not in seen:
                 seen.append((n.kind, n.label))
         target = steps[index]
-        if target.kind != "entry":
+        if target.kind not in ("entry", "direct"):
             return 0
         return seen.index((target.kind, target.label)) + 1
 
@@ -1192,7 +1210,8 @@ The orders are read from the program, not from a run. That decides what they cla
   names the item, the two steps must touch it. Where it does not (a region of the game record, an allocation, or an
   item reached under another name), or no such pair is found, the row is matched by subsystem: the writer's first step
   that writes anything, and the reader's next step that reads anything. A row matched by subsystem says where a
-  split can be, not where it must be.
+  split can be, not where it must be. A row that no such pair places is looked for again with the calls into a
+  subsystem outside its interface as steps too (the delivery of a queued effect to its subscriber's handler is one).
 - **Inside a step.** When the writer's step also holds a write of the item followed by a read of it by the reader,
   the split may be needed inside that step instead: the row names the step under `may split inside`. The search goes
   inside a step for the place itself only when its list holds no pair.
@@ -1223,6 +1242,19 @@ def table(header: list[str], rows: list[list]) -> list[str]:
 
 def code(text: str) -> str:
     return "`%s`" % text
+
+
+def step_label(n: Node) -> str:
+    """How a placement names a step: an entry point by its label, a call outside an interface by its subsystem."""
+    if n.kind == "entry":
+        return n.label
+    if n.kind == "direct":
+        return OUTSIDE % n.sub
+    return ""
+
+
+def step_name(label: str) -> str:
+    return label if label.startswith(OUTSIDE.split("%")[0]) else code(label)
 
 
 class Page:
@@ -1273,6 +1305,12 @@ class Page:
                 found = self.splits.across(self.part_name(p, part), part.steps, d["writer"], d["reader"], d["item"])
                 if found:
                     return found
+        for loose in (False, True):
+            for p, part in parts:
+                found = self.splits.locate(self.part_name(p, part), part.steps, p.sub, d["writer"], d["reader"],
+                                           d["item"], loose=loose, direct=True)
+                if found:
+                    return found
         return None
 
     def part_name(self, p: Pass, part: Part) -> str:
@@ -1301,7 +1339,7 @@ class Page:
             elif n.kind == "pass":
                 out.append("1. the pass %s (below)" % code(n.label))
             else:
-                out.append("1. a call into %s outside its interface" % n.sub)
+                out.append("1. " + OUTSIDE % n.sub)
         return out
 
     def tick_rows(self) -> list[list[str]]:
@@ -1497,18 +1535,18 @@ def render(page: Page) -> str:
         for (writer, reader, kind, where, first, first_at, second, second_at, inside, loose, after), n, across in \
                 groups[phase]:
             if first:
-                write = "%s (step %d)" % (code(first), first_at)
+                write = "%s (step %d)" % (step_name(first), first_at)
             else:
                 write = "the caller, after step %d" % after if after else "the caller, before the first step"
             anchor = first_at or after
             if not second:
                 read = "the caller"
             elif second_at > anchor or kind == "across":
-                read = "%s (step %d)" % (code(second), second_at)
+                read = "%s (step %d)" % (step_name(second), second_at)
             elif first:
-                read = "%s again, after step %d" % (code(second), first_at)
+                read = "%s again, after step %d" % (step_name(second), first_at)
             else:
-                read = "%s again, after the write" % code(second)
+                read = "%s again, after the write" % step_name(second)
             rows.append([writer, reader, where, PLACEMENTS[kind], write, read, code(inside) if inside else "",
                          "by subsystem" if loose else "by item", str(n), str(across)])
         lines += table(["writer", "reader", "place", "split", "write in", "read in", "may split inside", "matched", "rows",

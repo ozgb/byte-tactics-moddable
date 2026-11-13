@@ -223,6 +223,9 @@ seeds) and runs deterministically: two runs give identical traces.
 | quad-two-continents | Two Continents | 4 | 6000 | Four players on Two Continents in teams of players 0 and 3 against 1 and 2, random start positions, 100 metal and energy |
 | sensors-floating-teeth | Hundred Isles | 2 | 400 | Human Arm commander with dragon's teeth owned by the AI player in its camera view (`spawn` for two slots, the feature draw through `IsFootprintVisible` and `IsExplored`) |
 | sensors-floating-teeth-los-off | Hundred Isles | 2 | 400 | The same with `line_of_sight 0`, so the feature draw goes through `IsSeen` |
+| share-all | The Pass | 2 | 960 | Game type 3: a human slot shares metal, energy and its map with an allied remote slot (`player<N>.remote`), so metal and energy shares and the share map are sent on tick 900 |
+| share-energy | The Pass | 2 | 300 | Game type 3: a human slot shares energy with an allied remote slot every 60 ticks |
+| share-metal | The Pass | 2 | 300 | Game type 3: a human slot shares metal with an allied remote slot every 60 ticks, each share capped by the remote's storage |
 | six-hundred-isles | Hundred Isles | 6 | 9000 | Six players on Hundred Isles, alternating sides, five minutes |
 | six-painted-desert | Painted Desert | 6 | 12600 | Six Core players on Painted Desert, random start positions, seven minutes |
 | six-yerrot-mountains | Yerrot Mountains | 6 | 7200 | Six players on Yerrot Mountains in two allied teams of three, four minutes |

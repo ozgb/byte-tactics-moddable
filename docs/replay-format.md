@@ -588,8 +588,8 @@ outer call, as any write of the module does. The annotation names each interface
 interface:
 
 ```json
-"callbacks": {"UnitScanVisitor": {"header": "<the header of the class>", "handle": "scanner",
-              "methods": [{"name": "VisitUnit", "ret": "int", "args": [{"name": "unit", "type": "Unit*", "mode": "object", "kind": "Unit"}]}]}}
+"callbacks": {"UnitVisitor": {"header": "<the header of the class>", "handle": "visitor",
+              "methods": [{"name": "Visit", "ret": "void", "args": [{"name": "unit", "type": "Unit*", "mode": "object", "kind": "Unit"}]}]}}
 {"mode": "callback", "callback": "UnitVisitor"}
 ```
 

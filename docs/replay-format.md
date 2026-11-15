@@ -27,8 +27,9 @@ uv run tools/replay.py --compare DIR_A DIR_B
 `--check` records again and fails when a recording of `tests/replay/` differs. `--compare` fails when two
 directories differ and names the first differing line. Record on a fresh Wine prefix, as the gate runs.
 Both play a scenario once for each subsystem it records: a run records one call at a time, so with two `record`
-lines a call one subsystem makes into the other is an import of the first and is missing from the second's
-recording (`orders-guard-attacked`, recorded for targeting and for weapons, lost most of targeting's calls so).
+lines a call one subsystem makes into the other would be an import of the first and missing from the second's
+recording. A run fails instead, with "a call of a recorded subsystem made inside a call of another recorded
+subsystem is not recorded", when such a call happens.
 
 ## A play-test recording
 

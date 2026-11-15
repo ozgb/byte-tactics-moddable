@@ -10,15 +10,20 @@
 
 struct Unit;
 
-inline FeaturesEvent FeaturesEventOf(int kind, int cellIndex, int width)
+inline FeaturesEvent FeaturesEventAt(int kind, int x, int z)
 {
     FeaturesEvent event;
     memset(&event, 0, sizeof(event));
     event.kind = kind;
-    event.x = cellIndex % width;
-    event.z = cellIndex / width;
+    event.x = x;
+    event.z = z;
     event.owner = 10;
     return event;
+}
+
+inline FeaturesEvent FeaturesEventOf(int kind, int cellIndex, int width)
+{
+    return FeaturesEventAt(kind, cellIndex % width, cellIndex / width);
 }
 
 inline void FeaturesPublishPlace(int outbox, int cellIndex, int width, int feature)
@@ -37,10 +42,7 @@ inline void FeaturesPublishRemove(int outbox, int cellIndex, int width)
 template <class U, class V>
 inline void FeaturesPublishReclaim(int outbox, U* unit, const V* pos)
 {
-    FeaturesEvent event = FeaturesEventOf(FEATURES_RECLAIM, 0, 1);
-    event.x = 0;
-    event.z = 0;
-    event.player = unit->playerIndex;
+    FeaturesEvent event = FeaturesEventAt(FEATURES_RECLAIM, 0, 0);
     event.unit = Ref<U>(unit).offset;
     event.pos[0] = pos->x;
     event.pos[1] = pos->y;

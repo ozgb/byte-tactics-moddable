@@ -3052,10 +3052,10 @@ static void VisitFeaturesResults()
     for (unsigned k = 0; k < s_featuresResults.count; k++) {
         const FeaturesResult* r = &s_featuresResults.items[k];
         const FeaturesEvent* e = &r->event;
-        static const char* const kBefore[] = { "kind", "flags", "x", "z", "feature", "owner", "player" };
+        static const char* const kBefore[] = { "kind", "flags", "x", "z", "feature", "owner" };
         const unsigned before[] = { (unsigned)e->kind, (unsigned)e->flags, (unsigned)e->x, (unsigned)e->z,
-                                    (unsigned)e->feature, (unsigned)e->owner, (unsigned)e->player };
-        for (int f = 0; f < 7; f++) {
+                                    (unsigned)e->feature, (unsigned)e->owner };
+        for (int f = 0; f < 6; f++) {
             sprintf(path, "features[%u].%s", k, kBefore[f]);
             DumpPrefix(path);
             fprintf(s_dump, "0x%08x\n", before[f]);

@@ -2120,9 +2120,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
             if (!hits.AddFeature(origin))
                 continue;
             {
-                FeaturesEvent damage = FeaturesEventOf(FEATURES_DAMAGE, 0, 1);
-                damage.x = fx;
-                damage.z = fz;
+                FeaturesEvent damage = FeaturesEventAt(FEATURES_DAMAGE, fx, fz);
                 damage.value = (int)((WeaponDef*)weapon->type.get() - g_game->weapons);
                 SchedPublish(SCHED_WEAPONS, &damage, sizeof(damage));
             }

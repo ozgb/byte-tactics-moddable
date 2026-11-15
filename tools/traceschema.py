@@ -924,7 +924,6 @@ FEATURES_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("z", 4, "scalar", None),
     ("feature", 4, "scalar", None),
     ("owner", 4, "scalar", None),
-    ("player", 4, "scalar", None),
     ("unit", 4, "ref", "unit"),
     ("value", 4, "scalar", None),
     ("state", 4, "handle", None),

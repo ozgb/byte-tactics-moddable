@@ -1160,7 +1160,6 @@ for k in 0 .. n-1, in application order:
     features[k].z
     features[k].feature
     features[k].owner
-    features[k].player
     features[k].unit                           # the record's unit, a pointer ID with target unit (is_ref=true)
     features[k].value
     features[k].state                          # null when 0, heap otherwise: never the number
@@ -1178,7 +1177,7 @@ for k in 0 .. n-1, in application order:
 - `flags` holds the bits of a PLACE: 1 pos is given, 2 rot is given, 4 the placed feature starts to sink.
 - `x` and `z` are the cell the record acts on, or the first cell of a footprint; `width` and `height`
   the size of a footprint in cells. `feature` is the feature type by its number, `owner` the player that
-  owns a placed feature (10 for none), and `player` the player of the unit that reclaims.
+  owns a placed feature (10 for none).
 - `unit` is the unit that reclaims, a pointer ID with target `unit` (section 5), null for the kinds that
   name none. `value` is the argument of the kind (REMOVE: 1 to remove even a feature that refuses
   removal; DAMAGE and AREA_DAMAGE: the number of the weapon's definition).

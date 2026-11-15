@@ -59,8 +59,6 @@ struct FeaturesEvent {
     int feature;
     // The player that owns a placed feature, 10 for none.
     int owner;
-    // The player of the unit that reclaims.
-    int player;
     // The unit that reclaims, as the handle economy's events use.
     unsigned int unit;
     // The argument of the kind, as the kind says.

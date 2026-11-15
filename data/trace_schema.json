@@ -1618,7 +1618,6 @@
       {"name": "z", "size": 4, "kind": "scalar", "target": null},
       {"name": "feature", "size": 4, "kind": "scalar", "target": null},
       {"name": "owner", "size": 4, "kind": "scalar", "target": null},
-      {"name": "player", "size": 4, "kind": "scalar", "target": null},
       {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
       {"name": "value", "size": 4, "kind": "scalar", "target": null},
       {"name": "state", "size": 4, "kind": "handle", "target": null},

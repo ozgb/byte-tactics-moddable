@@ -255,6 +255,7 @@ features,game,call,GameRand,1
 features,game,call,RecordSoundAtName,1
 features,game,call,RecordTimedSubParticles,1
 features,game,call,RecordWhiteSmoke,1
+features,game,call,SchedFeaturesPhase,1
 features,game,call,SchedPublish,1
 features,game,call,SimAllocTagged,2
 features,game,call,SimRealloc,1
@@ -543,6 +544,7 @@ game,features,indirect,ResolveFeatureLinks,1
 game,features,indirect,SaveFeatures,1
 game,features,indirect,ScanFeatureCell,1
 game,features,indirect,UpdateFeatureSpot,1
+game,features,indirect,UpdateFeatures,1
 game,features,shared_write,FeaturesEvent::feature,2
 game,features,shared_write,FeaturesEvent::kind,2
 game,features,shared_write,FeaturesEvent::owner,2
@@ -1240,7 +1242,6 @@ game,seams,indirect,MissionExistsNative,1
 game,seams,indirect,RefreshMapListNative,1
 game,seams,indirect,SaveConditionsNative,1
 game,seams,indirect,SelectMissionNative,2
-game,seams,indirect,UpdateFeatures,1
 game,seams,indirect,WeaponsOnMeteorSpawn,2
 game,seams,indirect,WindMeteorsInbox,2
 game,seams,shared_write,Game::difficulty,1
@@ -4687,7 +4688,6 @@ seams,files,shared_write,FilesSeam::Read,1
 seams,files,shared_write,FilesSeam::Seek,1
 seams,files,shared_write,Seams::files,58
 seams,game,call,SchedDeliver,3
-seams,game,call,SchedFeaturesPhase,1
 seams,game,call,SchedPublish,3
 seams,game,call,SimSearchSteps,1
 seams,game,shared_write,EconomySeam::UpdatePlayerEconomy,1

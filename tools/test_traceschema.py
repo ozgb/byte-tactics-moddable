@@ -270,7 +270,7 @@ class SchemaJsonTest(unittest.TestCase):
         constants = dict(re.findall(r"(FEATURES_RESULT_\w+) = (\d+)", header))
         self.assertEqual(features["section"], int(constants["FEATURES_RESULT_SECTION"]))
         self.assertEqual([f["name"] for f in features["fields"]],
-                         ["kind", "flags", "x", "z", "feature", "owner", "player", "unit", "value", "state",
+                         ["kind", "flags", "x", "z", "feature", "owner", "unit", "value", "state",
                           "width", "height", "pos", "rot", "outcome"])
         targets = {t["name"] for t in self.model["targets"]}
         for f in features["fields"]:

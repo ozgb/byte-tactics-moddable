@@ -20,7 +20,7 @@ The subsystems and the issue each maps to:
 |---|---|---|
 | [wind_meteors](#wind_meteors) | 15 | #9 |
 | [economy](#economy) | 50 | #11 |
-| [features](#features) | 57 | #12 |
+| [features](#features) | 58 | #12 |
 | [ai](#ai) | 130 | #13 |
 | [pathfinding](#pathfinding) | 145 | #14 |
 | [weapons](#weapons) | 107 | #15 |
@@ -35,7 +35,7 @@ The subsystems and the issue each maps to:
 | [harness](#the-remaining-subsystems) | 859 | none yet |
 | [presentation](#the-remaining-subsystems) | 1429 | none yet |
 | [platform](#the-remaining-subsystems) | 821 | none yet |
-| [seams](#the-remaining-subsystems) | 149 | none yet |
+| [seams](#the-remaining-subsystems) | 148 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
 
 The ten subsystems without a module issue are described briefly [below](#the-remaining-subsystems). #10 (per-module replay tests) uses all of them.
@@ -158,7 +158,7 @@ Coverage: 92.3% of functions (48 of 52), 89.6% of lines, 73.5% of branches; 4 li
 
 ## features
 
-Issue #12. 57 functions. `UpdateFeatures` and feature loading, spreading, burning, reclaim and wreckage (`src/map/features*.cpp`).
+Issue #12. 58 functions. `UpdateFeatures` and feature loading, spreading, burning, reclaim and wreckage (`src/map/features*.cpp`).
 
 Coverage: 98.3% of functions (57 of 58), 86.6% of lines, 73.5% of branches; 1 live functions no scenario enters, and 4 more are dead (data/coverage.csv).
 
@@ -169,19 +169,19 @@ Coverage: 98.3% of functions (57 of 58), 86.6% of lines, 73.5% of branches; 1 li
 
 **Entry points.** Phase roots: `UpdateFeatures`, called from `RunGameSteps`.
 
-26 functions are called from other subsystems. The most called, with their callers:
+27 functions are called from other subsystems. The most called, with their callers:
 
 - `GetCellFeature` (1 from game, 1 from map, 1 from orders)
 - `DamageFeature` (1 from network)
 - `CmdBurnAll` (1 from platform)
 - `CmdBurnOne` (1 from platform)
 - `CmdFeature` (1 from platform)
-- By calling subsystem (functions called): game 12, los_radar 4, network 3, platform 3, seams 2, map 1, orders 1, units 1, weapons 1
+- By calling subsystem (functions called): game 13, los_radar 4, network 3, platform 3, seams 2, map 1, orders 1, units 1, weapons 1
 
-**Imports.** 50 functions of 9 subsystems, by target, each with the number of functions it calls there:
+**Imports.** 51 functions of 9 subsystems, by target, each with the number of functions it calls there:
 
 - platform (15): `TdfRecord::GetFieldString`, `RandomInt`, `TdfFile::~TdfFile`, `operator delete`, and 11 more
-- game (10): `EconHandleOf`, `EconPublish`, `GameRand`, `RecordSoundAtName`, `RecordTimedSubParticles`, `RecordWhiteSmoke`, `SchedPublish`, `SimAllocTagged`, `SimRealloc`, `StepGafSequence`
+- game (11): `EconHandleOf`, `EconPublish`, `GameRand`, `RecordSoundAtName`, `RecordTimedSubParticles`, `RecordWhiteSmoke`, `SchedFeaturesPhase`, `SchedPublish`, `SimAllocTagged`, `SimRealloc`, `StepGafSequence`
 - files (9): `HapiBank::GetBoxSize`, `HapiBank::OpenAccount`, `HapiBank::OpenNamedBox`, `HapiBank::SeekBox`, and 5 more
 - seams (5): `GetGameTypeNative`, `GetGroundHeightNative`, `ApplyAreaDamageAtNative`, `FindWeaponByNameNative`, and 1 more
 - network (4): `NetSendFeatureHit`, `NetSendFeatureKilled`, `NetSendFeatureBurning`, `NetSendFeatureReclaimed`
@@ -200,8 +200,8 @@ Coverage: 98.3% of functions (57 of 58), 86.6% of lines, 73.5% of branches; 1 li
 
 **Draft interface.**
 
-- Exports: 26 functions (`UpdateFeatures`, the cell accessor `GetCellFeature`, `PlaceFeature` (los_radar, units), `DamageFeature` (weapons, network), `ReclaimFeature` (orders), and the load, save, pool and file-list calls from game and los_radar).
-- Needs from seams: 50 functions in platform, game, files, seams, network, presentation, harness, los_radar, units.
+- Exports: 27 functions (`UpdateFeatures`, the cell accessor `GetCellFeature`, `PlaceFeature` (los_radar, units), `DamageFeature` (weapons, network), `ReclaimFeature` (orders), and the load, save, pool and file-list calls from game and los_radar).
+- Needs from seams: 51 functions in platform, game, files, seams, network, presentation, harness, los_radar, units.
 - Owns: 75 named sim items that only this subsystem writes, for example `Game::features`, `Game::featureCount`, `Pool::entries`, `Cell::spot`, `Spot::feature`.
 - Shares: 11 named sim items that other subsystems also write, for example `Cell::feature`, `Cell::flags`.
 - It imports from presentation (`EmitWhiteSmoke`, `PlaySoundAtByName`, the GAF loaders). Sim code that draws or plays sound has to raise events instead (#22).
@@ -639,7 +639,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **platform** (821 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 310 functions are called from outside, by presentation (159 distinct functions), game (103), network (51) and units (49); the busiest are `GameFreeThunk` (162), `operator new` (123), `operator delete` (82), then `Translate` (77) and `GameAllocIgnoreTag` (76). It imports 181 functions: game 77, presentation 46.
 
-**seams** (149 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 130 functions are called from outside. It imports 114 functions.
+**seams** (148 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 129 functions are called from outside. It imports 113 functions.
 
 **files** (169 functions). No phase root. The archive and bank readers (`src/files`: `HapiBank`, HPI and SQSH archives). 78 functions are called from outside.
 

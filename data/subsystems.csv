@@ -5145,7 +5145,7 @@ UnsignedLess::operator(),src/debug/free_block_map.h,platform,folder:src/debug/,
 UpdateAllUnits,src/seams/native.cpp,units,folder:src/seams/,units
 UpdateAutoFollow,src/ingame/control_panel.cpp,presentation,presentation,
 UpdateCounts,src/ingame/control_panel.cpp,presentation,presentation,
-UpdateFeatures,src/seams/native.cpp,seams,folder:src/seams/,
+UpdateFeatures,src/seams/native.cpp,features,folder:src/seams/,features
 UpdateMeteorsThunk,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 UpdateMotionNative,src/seams/native.cpp,seams,folder:src/seams/,
 UpdatePlayerTail,src/game/players.cpp,players,file:src/game/players,

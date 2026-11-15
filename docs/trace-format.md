@@ -288,7 +288,7 @@ out sections 16 and 17, then sections 29 to 31 when the tick is 1. It has no tic
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
 section 8.21), the economy events (section 33, section 8.22), the share packets (section 35,
-section 8.23) and wind_meteors' events (section 38, section 8.24) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
+section 8.23) and wind_meteors' events (section 37, section 8.24) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
 hashed: what the orders and goals keep of a path (sections 20 and 21), and the players' and units'
 resource fields.
 
@@ -1108,7 +1108,7 @@ Which packets a step sends, and when, is behaviour of the build, not of the stat
 rows match can send the same packets in a different order within a step (`docs/economy-interface.md`,
 section 8). The lines are a diagnostic of what the receiver would see.
 
-### 8.24 wind_meteors events (section 38, dumped only)
+### 8.24 wind_meteors events (section 37, dumped only)
 
 The events and effects of wind_meteors in this tick (`interfaces/wind_meteors.h`). No row hashes them
 (section 6): a dump holds their lines, after those of section 33, as a diagnostic. The reference
@@ -1128,7 +1128,7 @@ for k in 0 .. n-1, in order of consumption and publication:
 
 `windMeteors.count` and `kind` are written as `0x` and 8 hex digits.
 
-- `kind` is an event: 32 ENABLE, 33 DISABLE, 34 PARAMS, 35 START; or an effect: 48 SPAWN.
+- `kind` is an event: 64 ENABLE, 65 DISABLE, 66 PARAMS, 67 START; or an effect: 80 SPAWN.
 - `data` of an event is the 48 bytes after its `kind`: the meteor shower parameters of a PARAMS event
   (the weapon name in 32 bytes, then the radius, the density, the duration and the interval, 4 bytes
   each, the last three as IEEE 754 single bits where they are floats), and 0 for the other kinds.
@@ -1171,7 +1171,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
 every hashed value of that one tick, after each phase of the tick, and the lines no row hashes: those
-of sections 16 and 17, of economy's report, and of sections 32, 33, 35 and 38. The first line is `bt-dump 5`; every
+of sections 16 and 17, of economy's report, and of sections 32, 33, 35 and 37. The first line is `bt-dump 5`; every
 other line is
 
 ```
@@ -1185,7 +1185,7 @@ with single spaces between the first three fields and the value, which runs to t
 dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller state of `rng`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
-lines of section 28), then the lines of sections 32, 33 and 38, which end the block and are not hash
+lines of section 28), then the lines of sections 32, 33 and 37, which end the block and are not hash
 input (sections 8.21, 8.22 and 8.24). The `meteors` block ends with the lines of section 35 after them
 (section 8.23), also not hash input. The `pathfinder.*` lines of
 sections 16 and 17, and the `economyState.*` lines of economy's own report that follow them, sit between those of
@@ -1291,7 +1291,7 @@ after it, both only dumped, and took the resource account of a unit (bytes 0xbc 
 of the hash of the Unit table. Section 35 (the share packets, section 8.23) was added in format 5,
 without a new number: it is only dumped, after every line a row hashes, and changes no row, no digest
 and no line syntax. A reader that rejects unknown lines at the end of a block must learn to skip
-`packets.*`, as it skips `results.*` and `economy.*`. Section 38 (wind_meteors' events, section 8.24) was
+`packets.*`, as it skips `results.*` and `economy.*`. Section 37 (wind_meteors' events, section 8.24) was
 added the same way, after section 33's lines: a reader must also skip `windMeteors.*`.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is

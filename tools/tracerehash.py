@@ -7,7 +7,7 @@ Prints `<tick> <phase> <hash>` for every phase row and the world row of each dum
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
 sections 29 to 31 in the world row. The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
 shape but not hashed; economy's report (`economyState.*`), the path results (section 32), the economy events
-(section 33), the share packets (section 35) and wind_meteors' events (section 38) are dumped only, and skipped.
+(section 33), the share packets (section 35) and wind_meteors' events (section 37) are dumped only, and skipped.
 """
 
 import argparse

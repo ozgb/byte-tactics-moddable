@@ -266,7 +266,7 @@ class SchemaJsonTest(unittest.TestCase):
 
     def test_wind_meteors_section_names_its_fields_in_dump_order(self):
         wind_meteors = self.model["windMeteors"]
-        self.assertEqual(wind_meteors["section"], 38)
+        self.assertEqual(wind_meteors["section"], 37)
         self.assertEqual([(f["name"], f["kind"], f["target"]) for f in wind_meteors["fields"]],
                          [("kind", "scalar", None), ("data", "bytes", None)])
         self.assertEqual(wind_meteors["fields"][0]["size"], 4)

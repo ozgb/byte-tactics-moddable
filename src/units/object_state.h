@@ -15,6 +15,8 @@ ModelPiece* __stdcall LinkStateEntries(ModelState* state, Object3do* obj, ModelP
 void __fastcall TransformPieces(ModelState* owner, ModelPiece* piece, Vector3s* angles, Vec3* delta, int deep);
 void __fastcall PoseModel(ModelState* model, ModelPiece* piece, int force);
 ModelState* __stdcall CreateObjectState(Object3do* obj);
+unsigned int __stdcall ObjectStateSize(Object3do* obj);
+void __stdcall InitObjectState(ModelState* state, Object3do* obj);
 void __stdcall UpdateObjectState(UnitDrawView* unit);
 void __stdcall FreeObjectState(ModelState* state);
 

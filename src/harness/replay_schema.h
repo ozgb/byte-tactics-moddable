@@ -1173,14 +1173,17 @@ enum ReplaySlotId {
     RSL_FEATURES_PLACEMISSIONFEATURES,
     RSL_FEATURES_STAMPFEATUREMETAL,
     RSL_FEATURES_GETCELLFEATURE,
-    RSL_FEATURES_PLACEFEATURE,
-    RSL_FEATURES_REMOVEFEATURE,
-    RSL_FEATURES_RECLAIMFEATURE,
     RSL_FEATURES_FINDORLOADFEATURETYPE,
-    RSL_FEATURES_DAMAGEFEATURE,
     RSL_FEATURES_GETFOOTPRINTCENTRE,
     RSL_FEATURES_SAVEFEATURES,
     RSL_FEATURES_LOADFEATURES,
+    RSL_FEATURES_APPLY,
+    RSL_FEATURES_PLACE,
+    RSL_FEATURES_FEATURETYPECOUNT,
+    RSL_FEATURES_ANIMATEFEATURETYPE,
+    RSL_FEATURES_SCANFEATURECELL,
+    RSL_FEATURES_FIRSTFEATURESPOT,
+    RSL_FEATURES_UPDATEFEATURESPOT,
     RSL_AI_GETVISIBLEENEMIESINRADIUS,
     RSL_AI_HASREADYUNITINRANGE,
     RSL_AI_ISPOINTVISIBLE,
@@ -1339,6 +1342,7 @@ enum ReplaySlotId {
     RSL_UNITS_FREEOBJECTSTATE,
     RSL_UNITS_UPDATEOBJECTSTATE,
     RSL_UNITS_UPDATEUNIT,
+    RSL_UNITS_OBJECTSTATESIZE,
     RSL_PLAYERS_UPDATEPLAYERS,
     RSL_PLAYERS_TRANSFERMETAL,
     RSL_PLAYERS_TRANSFERENERGY,
@@ -1510,16 +1514,6 @@ static const unsigned short kReplayFeaturesStampFeatureMetalObjReads[] = { 161, 
 static const unsigned short kReplayFeaturesStampFeatureMetalObjWrites[] = { 155 };
 static const unsigned char kReplayFeaturesGetCellFeatureReads[] = { 1 };
 static const unsigned short kReplayFeaturesGetCellFeatureObjReads[] = { 161, 162, 163 };
-static const unsigned char kReplayFeaturesPlaceFeatureReads[] = { 1, 2 };
-static const unsigned short kReplayFeaturesPlaceFeatureObjReads[] = { 41, 42, 161, 265, 266, 291, 303, 309 };
-static const unsigned short kReplayFeaturesPlaceFeatureObjWrites[] = { 161, 162, 163, 296, 297, 298, 299, 303, 304, 305, 306 };
-static const unsigned char kReplayFeaturesRemoveFeatureReads[] = { 1 };
-static const unsigned short kReplayFeaturesRemoveFeatureObjReads[] = { 41, 42, 161, 162, 163, 164, 265, 291, 296, 313 };
-static const unsigned short kReplayFeaturesRemoveFeatureObjWrites[] = { 296, 313 };
-static const unsigned short kReplayFeaturesReclaimFeatureObjReads[] = { 47, 164, 282, 283, 291 };
-static const unsigned char kReplayFeaturesDamageFeatureReads[] = { 22 };
-static const unsigned short kReplayFeaturesDamageFeatureObjReads[] = { 22, 161, 164, 281, 291, 304, 305 };
-static const unsigned short kReplayFeaturesDamageFeatureObjWrites[] = { 304 };
 static const unsigned short kReplayFeaturesGetFootprintCentreObjReads[] = { 41, 42, 265 };
 static const unsigned char kReplayFeaturesSaveFeaturesReads[] = { 1, 2, 19 };
 static const unsigned short kReplayFeaturesSaveFeaturesObjReads[] = { 161, 164, 259, 262, 263, 271, 272, 273, 274, 275, 276, 291, 297, 298, 299, 303, 304, 307 };
@@ -1850,14 +1844,17 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "PlaceMissionFeatures", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesPlaceMissionFeaturesObjReads, 3, nullptr, 0, nullptr, 0 },
     { "StampFeatureMetal", SUB_FEATURES, kReplayFeaturesStampFeatureMetalReads, 2, nullptr, 0, kReplayFeaturesStampFeatureMetalObjReads, 4, kReplayFeaturesStampFeatureMetalObjWrites, 1, nullptr, 0 },
     { "GetCellFeature", SUB_FEATURES, kReplayFeaturesGetCellFeatureReads, 1, nullptr, 0, kReplayFeaturesGetCellFeatureObjReads, 3, nullptr, 0, nullptr, 0 },
-    { "PlaceFeature", SUB_FEATURES, kReplayFeaturesPlaceFeatureReads, 2, nullptr, 0, kReplayFeaturesPlaceFeatureObjReads, 8, kReplayFeaturesPlaceFeatureObjWrites, 11, nullptr, 0 },
-    { "RemoveFeature", SUB_FEATURES, kReplayFeaturesRemoveFeatureReads, 1, nullptr, 0, kReplayFeaturesRemoveFeatureObjReads, 10, kReplayFeaturesRemoveFeatureObjWrites, 2, nullptr, 0 },
-    { "ReclaimFeature", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesReclaimFeatureObjReads, 5, nullptr, 0, nullptr, 0 },
     { "FindOrLoadFeatureType", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "DamageFeature", SUB_FEATURES, kReplayFeaturesDamageFeatureReads, 1, nullptr, 0, kReplayFeaturesDamageFeatureObjReads, 7, kReplayFeaturesDamageFeatureObjWrites, 1, nullptr, 0 },
     { "GetFootprintCentre", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesGetFootprintCentreObjReads, 3, nullptr, 0, nullptr, 0 },
     { "SaveFeatures", SUB_FEATURES, kReplayFeaturesSaveFeaturesReads, 3, nullptr, 0, kReplayFeaturesSaveFeaturesObjReads, 18, nullptr, 0, nullptr, 0 },
     { "LoadFeatures", SUB_FEATURES, kReplayFeaturesLoadFeaturesReads, 1, nullptr, 0, kReplayFeaturesLoadFeaturesObjReads, 1, kReplayFeaturesLoadFeaturesObjWrites, 3, nullptr, 0 },
+    { "Apply", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "Place", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "FeatureTypeCount", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "AnimateFeatureType", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "ScanFeatureCell", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "FirstFeatureSpot", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "UpdateFeatureSpot", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetVisibleEnemiesInRadius", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "HasReadyUnitInRange", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiHasReadyUnitInRangeObjReads, 1, nullptr, 0, nullptr, 0 },
     { "IsPointVisible", SUB_AI, kReplayAiIsPointVisibleReads, 2, nullptr, 0, kReplayAiIsPointVisibleObjReads, 2, nullptr, 0, nullptr, 0 },
@@ -2016,6 +2013,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "FreeObjectState", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateObjectState", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateUnit", SUB_UNITS, kReplayUnitsUpdateUnitReads, 2, nullptr, 0, kReplayUnitsUpdateUnitObjReads, 12, nullptr, 0, nullptr, 0 },
+    { "ObjectStateSize", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdatePlayers", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "TransferMetal", SUB_PLAYERS, nullptr, 0, nullptr, 0, kReplayPlayersTransferMetalObjReads, 1, nullptr, 0, nullptr, 0 },
     { "TransferEnergy", SUB_PLAYERS, nullptr, 0, nullptr, 0, kReplayPlayersTransferEnergyObjReads, 1, nullptr, 0, nullptr, 0 },
@@ -2152,18 +2150,18 @@ static const unsigned kReplaySlotCount = RSL_COUNT;
 static const ReplaySubsystem kReplaySubsystems[] = {
     { "wind_meteors", 1, 2, 1, 0, 12 },
     { "economy", 4, 0, 0, 12, 12 },
-    { "features", 2, 0, 0, 24, 18 },
-    { "ai", 3, 1, 0, 42, 24 },
-    { "pathfinding", 3, 0, 0, 66, 9 },
-    { "weapons", 1, 5, 1, 75, 10 },
-    { "targeting", 1, 1, 1, 85, 9 },
-    { "los_radar", 2, 1, 0, 94, 22 },
-    { "orders", 3, 0, 0, 116, 25 },
-    { "units", 1, 8, 0, 141, 59 },
-    { "players", 1, 6, 0, 200, 32 },
-    { "map", 3, 0, 1, 232, 16 },
-    { "files", 2, 0, 0, 248, 58 },
-    { "network", 1, 0, 0, 306, 22 },
+    { "features", 3, 0, 0, 24, 21 },
+    { "ai", 3, 1, 0, 45, 24 },
+    { "pathfinding", 3, 0, 0, 69, 9 },
+    { "weapons", 1, 5, 1, 78, 10 },
+    { "targeting", 1, 1, 1, 88, 9 },
+    { "los_radar", 2, 1, 0, 97, 22 },
+    { "orders", 3, 0, 0, 119, 25 },
+    { "units", 1, 9, 0, 144, 60 },
+    { "players", 1, 6, 0, 204, 32 },
+    { "map", 3, 0, 1, 236, 16 },
+    { "files", 2, 0, 0, 252, 58 },
+    { "network", 1, 0, 0, 310, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

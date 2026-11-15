@@ -359,6 +359,11 @@ void ReplayImportEnd(ReplayImport& c)
         t.AddInt(a[0].v.i);
         break;
     }
+    case RI_SCHEDULE_FEATURES_PLACE:
+    {
+        AddResult(t, c.result);
+        break;
+    }
     case RI_SIM_CAPTURE_ALLOC:
     {
         AddSpace(t);

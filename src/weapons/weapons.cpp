@@ -103,6 +103,7 @@ void FreeWeaponArray(void)
 
 #include "../../interfaces/seams.h"
 #include "../game/economy_events.h"
+#include "../game/features_events.h"
 #include "../../interfaces/economy.h"
 
 // FUNCTION: 0x499ab0
@@ -2118,7 +2119,13 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 continue;
             if (!hits.AddFeature(origin))
                 continue;
-            g_seams.features->DamageFeature(origin, fx, fz, weapon->type);
+            {
+                FeaturesEvent damage = FeaturesEventOf(FEATURES_DAMAGE, 0, 1);
+                damage.x = fx;
+                damage.z = fz;
+                damage.value = (int)((WeaponDef*)weapon->type.get() - g_game->weapons);
+                SchedPublish(SCHED_WEAPONS, &damage, sizeof(damage));
+            }
         }
     }
 

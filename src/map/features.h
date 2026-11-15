@@ -1,6 +1,7 @@
 #ifndef FEATURES_H
 #define FEATURES_H
 struct TntInfo;
+struct FeaturesEvent;
 
 struct Cell;
 struct Feature;
@@ -40,13 +41,19 @@ void __stdcall KillFeature(int x, int z, int flag);
 void __stdcall ReplaceFeatureWithDead(int x, int y, int flag);
 void __stdcall SpreadFire(Feature* f, Point16* cell);
 void __stdcall ReplaceFeatureWithBurnt(FeatureSite* obj);
-void __stdcall UpdateFeatures();
+int __stdcall FeatureTypeCount();
+void __stdcall AnimateFeatureType(int k);
+void __stdcall ScanFeatureCell();
+int __stdcall FirstFeatureSpot();
+int __stdcall UpdateFeatureSpot(int i);
+int __stdcall PlaceEvent(const FeaturesEvent* e);
+int __stdcall ApplyEvent(const FeaturesEvent* e);
 void __stdcall RemoveAllFeatures(void);
 void __stdcall SaveFeatures(HapiBank* file);
 
 Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def);
 int __stdcall ReclaimFeature(Unit* unit, Vec3* pos);
-void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon);
+int __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon);
 int __stdcall RemoveFeature(Cell* cell, int flag);
 void __stdcall ResolveFeatureLinks();
 void __stdcall LoadFeatures(HapiBank* file);

@@ -13,8 +13,7 @@
 #include "../util/math.h"
 #include "object_state.h"
 
-// FUNCTION: 0x45a8d0
-ModelState* __stdcall CreateObjectState(Object3do* obj)
+unsigned int __stdcall ObjectStateSize(Object3do* obj)
 {
     int count = 1;
     if (obj->child != 0) {
@@ -24,11 +23,22 @@ ModelState* __stdcall CreateObjectState(Object3do* obj)
     if (obj->sibling != 0) {
         count += CountObjects(obj->sibling);
     }
-    int size = count * 0x36 + 0x22;
-    ModelState* state = (ModelState*)SimAllocTagged("Object State", size);
-    memset(state, 0, size);
+    return count * 0x36 + 0x22;
+}
+
+void __stdcall InitObjectState(ModelState* state, Object3do* obj)
+{
+    memset(state, 0, ObjectStateSize(obj));
     state->root = AddStateEntries(state, obj, 0);
     state->animDirty = 1;
+}
+
+// FUNCTION: 0x45a8d0
+ModelState* __stdcall CreateObjectState(Object3do* obj)
+{
+    int size = ObjectStateSize(obj);
+    ModelState* state = (ModelState*)SimAllocTagged("Object State", size);
+    InitObjectState(state, obj);
     return state;
 }
 

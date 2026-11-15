@@ -99,6 +99,7 @@ struct GraphicsOptionFlagsView {
 };
 
 #include "../game/game.h"
+#include "../game/features_events.h"
 
 #pragma pack(pop)
 
@@ -824,7 +825,7 @@ void LoadTntMap()
                 unsigned char* src = info.attr_b + 2;
                 do {
                     if (*src < info.attr_limit)
-                        g_seams.features->PlaceFeature((Cell*)q, *src, 0, 0, 10);
+                        FeaturesPublishPlace(SCHED_ENGINE, (Cell*)q - g_game->cells, g_game->width, *src);
                     q += 0xd;
                     src += 8;
                     a.n--;
@@ -841,7 +842,7 @@ void LoadTntMap()
                     q[4] = *src;
                     q[0xc] = (q[0xc] & 0xd7) | 0x50;
                     if (*(unsigned short*)(src + 1) == 0xfffc)
-                        g_seams.features->PlaceFeature((Cell*)q, 0xfffc, 0, 0, 10);
+                        FeaturesPublishPlace(SCHED_ENGINE, (Cell*)q - g_game->cells, g_game->width, 0xfffc);
                     q += 0xd;
                     src += 4;
                     b.n--;
@@ -854,7 +855,7 @@ void LoadTntMap()
                     int n = a.n;
                     do {
                         if ((int)*sp < info.attr_limit)
-                            g_seams.features->PlaceFeature((Cell*)q, *sp, 0, 0, 10);
+                            FeaturesPublishPlace(SCHED_ENGINE, (Cell*)q - g_game->cells, g_game->width, *sp);
                         q += 0xd;
                         sp += 2;
                         n--;

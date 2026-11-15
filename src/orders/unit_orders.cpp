@@ -114,6 +114,7 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
                            int a, int b, int c);
 #include "../graphics/particles.h"
 #include "../game/economy_events.h"
+#include "../game/features_events.h"
 #include "../../interfaces/economy.h"
 char* __stdcall lstrcpynA(char* dest, const char* src, int count);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
@@ -1765,7 +1766,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
         }
         return 2;
     case 5:
-        g_seams.features->ReclaimFeature(unit, &order->pos);
+        FeaturesPublishReclaim(SCHED_ORDERS, unit, &order->pos);
         return 5;
     }
     return 7;
@@ -2044,7 +2045,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
         FeatureSpot* spot = &g_game->spots[c->offsetY | (c->offsetX << 8)];
         if (spot)
             order->target->angles = spot->rot;
-        g_seams.features->RemoveFeature(g_seams.los_radar->GetMapCellAtPosition(&order->pos), 0);
+        FeaturesPublishRemove(SCHED_ORDERS, g_seams.los_radar->GetMapCellAtPosition(&order->pos) - g_game->cells, g_game->width);
         if (g_seams.map->GetGameType(g_game->net) == 3) {
             int n = c - g_game->cells;
             int w = g_game->width;

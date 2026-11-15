@@ -13,6 +13,7 @@ class CobScript;
 class UnitMotion;
 class UnitResources;
 #include "../game/economy_events.h"
+#include "../game/features_events.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/services.h"
 struct SpotStateUnitView;
@@ -576,12 +577,21 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, UnitSpawnPacket* spaw
     return unit;
 }
 
-struct PlacedFeatureView {
-    char unknown_0[0x18];
-    int velY;
-    int velZ;
-};
 
+static FeaturesEvent CorpseEvent(void* target, unsigned short id, GroundHeightPos* pos, Unit* unit)
+{
+    FeaturesEvent place = FeaturesEventOf(FEATURES_PLACE, (Cell*)target - g_game->cells, g_game->width);
+    place.flags = FEATURES_HAS_POS | FEATURES_HAS_ROT;
+    place.feature = id;
+    place.owner = unit->playerIndex;
+    place.pos[0] = pos->x.value;
+    place.pos[1] = pos->y.value;
+    place.pos[2] = pos->z.value;
+    place.rot[0] = unit->angles.bank;
+    place.rot[1] = unit->angles.heading;
+    place.rot[2] = unit->angles.pitch;
+    return place;
+}
 
 // FUNCTION: 0x486360
 void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
@@ -598,16 +608,14 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
         if (target != 0) {
             GroundHeightPos* pos = (GroundHeightPos*)&unit->pos;
             if (GetGroundHeight(pos) <= g_game->seaLevel) {
-                PlacedFeatureView* r = (PlacedFeatureView*)g_seams.features->PlaceFeature((Cell*)target, id, (Vec3*)pos, (Rot16*)&unit->angles, unit->playerIndex);
-                if (r != 0) {
-                    if (!(unit->def->flags1 & 0x1000000)) {
-                        r->velY = -11468;
-                        r->velZ = 0;
-                    }
+                FeaturesEvent place = CorpseEvent(target, id, pos, unit);
+                if (!(unit->def->flags1 & 0x1000000))
+                    place.flags |= FEATURES_SINK;
+                if (ScheduleFeaturesPlace(&place) != 0)
                     flag = 0;
-                }
             } else {
-                g_seams.features->PlaceFeature((Cell*)target, id, (Vec3*)pos, (Rot16*)&unit->angles, unit->playerIndex);
+                FeaturesEvent place = CorpseEvent(target, id, pos, unit);
+                SchedPublish(SCHED_UNITS, &place, sizeof(place));
             }
             if (flag) {
                 RecordSmoke(Vec3{pos->x.value, pos->y.value, pos->z.value}, 0xf, 900, 9);

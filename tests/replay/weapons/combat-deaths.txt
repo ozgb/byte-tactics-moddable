@@ -8464,8 +8464,14 @@ call 850 UpdateUnitWeapons
   r Unit#1.weapons[1].aimCob.nAimCobDone 0
   r Unit#1.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 850 UpdateUnitWeapons
   r Unit#2.health 75
   r Unit#2.def UnitDef#112
@@ -8583,7 +8589,10 @@ call 850 UpdateUnitWeapons
   r Unit#3.weapons[1].aimCob.nAimCobDone 0
   r Unit#3.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 850 UpdateUnitWeapons
   r Unit#251.health 3000
   r Unit#251.def UnitDef#167
@@ -8669,8 +8678,14 @@ call 850 UpdateUnitWeapons
   r Unit#251.weapons[1].aimCob.nAimCobDone 0
   r Unit#251.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 850 UpdateUnitWeapons
   r Unit#252.health 175
   r Unit#252.def UnitDef#208
@@ -8724,110 +8739,206 @@ call 850 UpdateUnitWeapons
 call 851 UpdateUnitWeapons
   r Unit#1.workTime 1150
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 851 UpdateUnitWeapons
   a unit Unit#2
 call 851 UpdateUnitWeapons
   r Unit#3.health 620
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 851 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 851 UpdateUnitWeapons
   a unit Unit#252
 call 852 UpdateUnitWeapons
   r Unit#1.workTime 1151
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 852 UpdateUnitWeapons
   a unit Unit#2
 call 852 UpdateUnitWeapons
   r Unit#3.health 621
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 852 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 852 UpdateUnitWeapons
   a unit Unit#252
 call 853 UpdateUnitWeapons
   r Unit#1.workTime 1152
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 853 UpdateUnitWeapons
   a unit Unit#2
 call 853 UpdateUnitWeapons
   r Unit#3.health 623
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 853 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 853 UpdateUnitWeapons
   a unit Unit#252
 call 854 UpdateUnitWeapons
   r Unit#1.workTime 1153
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 854 UpdateUnitWeapons
   a unit Unit#2
 call 854 UpdateUnitWeapons
   r Unit#3.health 625
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 854 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 854 UpdateUnitWeapons
   a unit Unit#252
 call 855 UpdateUnitWeapons
   r Unit#1.workTime 1154
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 855 UpdateUnitWeapons
   a unit Unit#2
 call 855 UpdateUnitWeapons
   r Unit#3.health 626
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 855 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 855 UpdateUnitWeapons
   a unit Unit#252
 call 856 UpdateUnitWeapons
   r Unit#1.workTime 1155
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 856 UpdateUnitWeapons
   a unit Unit#2
 call 856 UpdateUnitWeapons
   r Unit#3.health 628
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 856 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 856 UpdateUnitWeapons
   a unit Unit#252
 call 857 UpdateUnitWeapons
   r Unit#1.workTime 1156
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 857 UpdateUnitWeapons
   a unit Unit#2
 call 857 DamageUnit
@@ -8866,71 +8977,140 @@ call 857 UpdateUnitWeapons
   r rng.seed 0x39d15801
   r Unit#3.health 630
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 857 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 857 UpdateUnitWeapons
   a unit Unit#252
 call 858 UpdateUnitWeapons
   r Unit#1.workTime 1157
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 858 UpdateUnitWeapons
   r Unit#3.health 631
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 858 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 858 UpdateUnitWeapons
   a unit Unit#252
 call 859 UpdateUnitWeapons
   r Unit#1.workTime 1158
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 859 UpdateUnitWeapons
   r Unit#3.health 633
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 859 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 859 UpdateUnitWeapons
   a unit Unit#252
 call 860 UpdateUnitWeapons
   r Unit#1.workTime 1159
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 860 UpdateUnitWeapons
   r Unit#3.health 634
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 860 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 860 UpdateUnitWeapons
   a unit Unit#252
 call 861 UpdateUnitWeapons
   r Unit#1.workTime 1160
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 861 UpdateUnitWeapons
   r Unit#3.health 636
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 861 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 861 UpdateUnitWeapons
   a unit Unit#252
 call 861 GetWeaponRange
@@ -8944,137 +9124,272 @@ call 861 GetWeaponRange
 call 862 UpdateUnitWeapons
   r Unit#1.workTime 1161
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 862 UpdateUnitWeapons
   r Unit#3.health 638
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 862 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 862 UpdateUnitWeapons
   a unit Unit#252
 call 863 UpdateUnitWeapons
   r rng.seed 0x5ee8c74e
   r Unit#1.workTime 1162
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 863 UpdateUnitWeapons
   r Unit#3.health 639
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 863 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 863 UpdateUnitWeapons
   a unit Unit#252
 call 864 UpdateUnitWeapons
   r Unit#1.workTime 1163
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 864 UpdateUnitWeapons
   r Unit#3.health 641
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 864 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 864 UpdateUnitWeapons
   a unit Unit#252
 call 865 UpdateUnitWeapons
   r Unit#1.workTime 1164
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 865 UpdateUnitWeapons
   r Unit#3.health 642
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 865 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 865 UpdateUnitWeapons
   a unit Unit#252
 call 866 UpdateUnitWeapons
   r Unit#1.workTime 1165
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 866 UpdateUnitWeapons
   r Unit#3.health 644
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 866 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 866 UpdateUnitWeapons
   a unit Unit#252
 call 867 UpdateUnitWeapons
   r Unit#1.workTime 1166
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 867 UpdateUnitWeapons
   r Unit#3.health 646
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 867 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 867 UpdateUnitWeapons
   a unit Unit#252
 call 868 UpdateUnitWeapons
   r Unit#1.workTime 1167
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 868 UpdateUnitWeapons
   r Unit#3.health 647
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 868 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 868 UpdateUnitWeapons
   a unit Unit#252
 call 869 UpdateUnitWeapons
   r Unit#1.workTime 1168
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 869 UpdateUnitWeapons
   r Unit#3.health 649
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 869 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 869 UpdateUnitWeapons
   a unit Unit#252
 call 870 UpdateUnitWeapons
   r Unit#1.workTime 1169
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 870 UpdateUnitWeapons
   r Unit#3.health 650
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 870 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 870 UpdateUnitWeapons
   a unit Unit#252
 call 871 UpdateUnitWeapons
@@ -9083,273 +9398,543 @@ call 871 UpdateUnitWeapons
   r Player#0.energy f32:0x452d0181
   r Player#0.metal f32:0x4594e762
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 871 UpdateUnitWeapons
   r Unit#3.health 652
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 871 UpdateUnitWeapons
   r Player#1.energy f32:0x4429dffe
   r Player#1.metal f32:0x4471fea1
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 871 UpdateUnitWeapons
   a unit Unit#252
 call 872 UpdateUnitWeapons
   r Unit#1.workTime 1171
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 872 UpdateUnitWeapons
   r Unit#3.health 654
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 872 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 872 UpdateUnitWeapons
   a unit Unit#252
 call 873 UpdateUnitWeapons
   r Unit#1.workTime 1172
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 873 UpdateUnitWeapons
   r Unit#3.health 655
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 873 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 873 UpdateUnitWeapons
   a unit Unit#252
 call 874 UpdateUnitWeapons
   r Unit#1.workTime 1173
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 874 UpdateUnitWeapons
   r Unit#3.health 657
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 874 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 874 UpdateUnitWeapons
   a unit Unit#252
 call 875 UpdateUnitWeapons
   r Unit#1.workTime 1174
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 875 UpdateUnitWeapons
   r Unit#3.health 658
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 875 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 875 UpdateUnitWeapons
   a unit Unit#252
 call 876 UpdateUnitWeapons
   r Unit#1.workTime 1175
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 876 UpdateUnitWeapons
   r Unit#3.health 660
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 876 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 876 UpdateUnitWeapons
   a unit Unit#252
 call 877 UpdateUnitWeapons
   r Unit#1.workTime 1176
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 877 UpdateUnitWeapons
   r Unit#3.health 662
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 877 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 877 UpdateUnitWeapons
   a unit Unit#252
 call 878 UpdateUnitWeapons
   r Unit#1.workTime 1177
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 878 UpdateUnitWeapons
   r Unit#3.health 663
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 878 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 878 UpdateUnitWeapons
   a unit Unit#252
 call 879 UpdateUnitWeapons
   r Unit#1.workTime 1178
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 879 UpdateUnitWeapons
   r Unit#3.health 665
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 879 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 879 UpdateUnitWeapons
   a unit Unit#252
 call 880 UpdateUnitWeapons
   r Unit#1.workTime 1179
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 880 UpdateUnitWeapons
   r Unit#3.health 667
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 880 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 880 UpdateUnitWeapons
   a unit Unit#252
 call 881 UpdateUnitWeapons
   r Unit#1.workTime 1180
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 881 UpdateUnitWeapons
   r Unit#3.health 668
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 881 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 881 UpdateUnitWeapons
   a unit Unit#252
 call 882 UpdateUnitWeapons
   r Unit#1.workTime 1181
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 882 UpdateUnitWeapons
   r Unit#3.health 670
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 882 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 882 UpdateUnitWeapons
   a unit Unit#252
 call 883 UpdateUnitWeapons
   r Unit#1.workTime 1182
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 883 UpdateUnitWeapons
   r Unit#3.health 671
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 883 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 883 UpdateUnitWeapons
   a unit Unit#252
 call 884 UpdateUnitWeapons
   r Unit#1.workTime 1183
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 884 UpdateUnitWeapons
   r Unit#3.health 673
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 884 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 884 UpdateUnitWeapons
   a unit Unit#252
 call 885 UpdateUnitWeapons
   r Unit#1.workTime 1184
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 885 UpdateUnitWeapons
   r Unit#3.health 675
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 885 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 885 UpdateUnitWeapons
   a unit Unit#252
 call 886 UpdateUnitWeapons
   r Unit#1.workTime 1185
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 886 UpdateUnitWeapons
   r Unit#3.health 676
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 886 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 886 UpdateUnitWeapons
   a unit Unit#252
 call 887 UpdateUnitWeapons
   r Unit#1.workTime 1186
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 887 UpdateUnitWeapons
   r Unit#3.health 678
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 887 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 887 UpdateUnitWeapons
   a unit Unit#252
 call 888 UpdateUnitWeapons
   r Unit#1.workTime 1187
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 888 UpdateUnitWeapons
   r Unit#3.health 679
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 888 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 888 UpdateUnitWeapons
   a unit Unit#252
 call 888 GetWeaponRange
@@ -9363,181 +9948,361 @@ call 888 GetWeaponRange
 call 889 UpdateUnitWeapons
   r Unit#1.workTime 1188
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 889 UpdateUnitWeapons
   r Unit#3.health 681
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 889 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 889 UpdateUnitWeapons
   a unit Unit#252
 call 890 UpdateUnitWeapons
   r Unit#1.workTime 1189
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 890 UpdateUnitWeapons
   r Unit#3.health 683
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 890 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 890 UpdateUnitWeapons
   a unit Unit#252
 call 891 UpdateUnitWeapons
   r Unit#1.workTime 1190
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 891 UpdateUnitWeapons
   r Unit#3.health 684
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 891 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 891 UpdateUnitWeapons
   a unit Unit#252
 call 892 UpdateUnitWeapons
   r Unit#1.workTime 1191
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 892 UpdateUnitWeapons
   r Unit#3.health 686
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 892 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 892 UpdateUnitWeapons
   a unit Unit#252
 call 893 UpdateUnitWeapons
   r Unit#1.workTime 1192
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 893 UpdateUnitWeapons
   r Unit#3.health 687
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 893 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 893 UpdateUnitWeapons
   a unit Unit#252
 call 894 UpdateUnitWeapons
   r Unit#1.workTime 1193
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 894 UpdateUnitWeapons
   r Unit#3.health 689
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 894 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 894 UpdateUnitWeapons
   a unit Unit#252
 call 895 UpdateUnitWeapons
   r Unit#1.workTime 1194
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 895 UpdateUnitWeapons
   r Unit#3.health 691
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 895 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 895 UpdateUnitWeapons
   a unit Unit#252
 call 896 UpdateUnitWeapons
   r Unit#1.workTime 1195
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 896 UpdateUnitWeapons
   r Unit#3.health 692
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 896 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 896 UpdateUnitWeapons
   a unit Unit#252
 call 897 UpdateUnitWeapons
   r Unit#1.workTime 1196
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 897 UpdateUnitWeapons
   r Unit#3.health 694
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 897 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 897 UpdateUnitWeapons
   a unit Unit#252
 call 898 UpdateUnitWeapons
   r Unit#1.workTime 1197
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 898 UpdateUnitWeapons
   r Unit#3.health 695
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 898 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 898 UpdateUnitWeapons
   a unit Unit#252
 call 899 UpdateUnitWeapons
   r Unit#1.workTime 1198
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 899 UpdateUnitWeapons
   r Unit#3.health 697
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 899 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 899 UpdateUnitWeapons
   a unit Unit#252
 call 900 UpdateUnitWeapons
   r Unit#1.workTime 1199
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 900 UpdateUnitWeapons
   r Unit#3.health 699
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 900 UpdateUnitWeapons
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 900 UpdateUnitWeapons
   a unit Unit#252
 call 900 ReleaseWeapons
@@ -9550,29 +10315,53 @@ call 901 UpdateUnitWeapons
   r Player#0.energy f32:0x45245424
   r Player#0.metal f32:0x45946881
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 901 UpdateUnitWeapons
   r Unit#3.health 700
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 901 UpdateUnitWeapons
   r Player#1.energy f32:0x442d3ffe
   r Player#1.metal f32:0x447285bf
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 901 UpdateUnitWeapons
   a unit Unit#252
 call 902 UpdateUnitWeapons
   r Unit#1.workTime 1201
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 902 UpdateUnitWeapons
   r Unit#3.health 702
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 902 UpdateUnitWeapons
   r Unit#251.flags 0x90e40025
   r Unit#251.posX 198618640
@@ -9580,266 +10369,482 @@ call 902 UpdateUnitWeapons
   r Unit#251.heading 7874
   r UnitMotion#2.speed 10485
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 902 UpdateUnitWeapons
   a unit Unit#252
 call 903 UpdateUnitWeapons
   r Unit#1.workTime 1202
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 903 UpdateUnitWeapons
   r Unit#3.health 704
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 903 UpdateUnitWeapons
   r Unit#251.posX 198605943
   r Unit#251.posZ 86345401
   r Unit#251.heading 6844
   r UnitMotion#2.speed 20970
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 903 UpdateUnitWeapons
   a unit Unit#252
 call 904 UpdateUnitWeapons
   r Unit#1.workTime 1203
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 904 UpdateUnitWeapons
   r Unit#3.health 705
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 904 UpdateUnitWeapons
   r Unit#251.posX 198589444
   r Unit#251.posZ 86318623
   r Unit#251.heading 5814
   r UnitMotion#2.speed 31455
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 904 UpdateUnitWeapons
   a unit Unit#252
 call 905 UpdateUnitWeapons
   r Unit#1.workTime 1204
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 905 UpdateUnitWeapons
   r Unit#3.health 707
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 905 UpdateUnitWeapons
   r Unit#251.posX 198571049
   r Unit#251.posZ 86280932
   r Unit#251.heading 4784
   r UnitMotion#2.speed 41940
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 905 UpdateUnitWeapons
   a unit Unit#252
 call 906 UpdateUnitWeapons
   r Unit#1.workTime 1205
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 906 UpdateUnitWeapons
   r Unit#3.health 708
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 906 UpdateUnitWeapons
   r Unit#251.posX 198552785
   r Unit#251.posZ 86231790
   r Unit#251.heading 3754
   r UnitMotion#2.speed 52425
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 906 UpdateUnitWeapons
   a unit Unit#252
 call 907 UpdateUnitWeapons
   r Unit#1.workTime 1206
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 907 UpdateUnitWeapons
   r Unit#3.health 710
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 907 UpdateUnitWeapons
   r Unit#251.posX 198536750
   r Unit#251.posZ 86170961
   r Unit#251.heading 2724
   r UnitMotion#2.speed 62910
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 907 UpdateUnitWeapons
   a unit Unit#252
 call 908 UpdateUnitWeapons
   r Unit#1.workTime 1207
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 908 UpdateUnitWeapons
   r Unit#3.health 712
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 908 UpdateUnitWeapons
   r Unit#251.posX 198525614
   r Unit#251.posZ 86101728
   r Unit#251.heading 1694
   r UnitMotion#2.speed 70123
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 908 UpdateUnitWeapons
   a unit Unit#252
 call 909 UpdateUnitWeapons
   r Unit#1.workTime 1208
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 909 UpdateUnitWeapons
   r Unit#3.health 713
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 909 UpdateUnitWeapons
   r Unit#251.posX 198521317
   r Unit#251.posZ 86031733
   r Unit#251.heading 664
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 909 UpdateUnitWeapons
   a unit Unit#252
 call 910 UpdateUnitWeapons
   r Unit#1.workTime 1209
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 910 UpdateUnitWeapons
   r Unit#3.health 715
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 910 UpdateUnitWeapons
   r Unit#251.posX 198523902
   r Unit#251.posZ 85961661
   r Unit#251.heading -366
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 910 UpdateUnitWeapons
   a unit Unit#252
 call 911 UpdateUnitWeapons
   r Unit#1.workTime 1210
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 911 UpdateUnitWeapons
   r Unit#3.health 716
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 911 UpdateUnitWeapons
   r Unit#251.posX 198533335
   r Unit#251.posZ 85892180
   r Unit#251.heading -1396
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 911 UpdateUnitWeapons
   a unit Unit#252
 call 912 UpdateUnitWeapons
   r Unit#1.workTime 1211
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 912 UpdateUnitWeapons
   r Unit#3.health 718
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 912 UpdateUnitWeapons
   r Unit#251.posX 198549539
   r Unit#251.posZ 85823957
   r Unit#251.heading -2426
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 912 UpdateUnitWeapons
   a unit Unit#252
 call 913 UpdateUnitWeapons
   r Unit#1.workTime 1212
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 913 UpdateUnitWeapons
   r Unit#3.health 720
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 913 UpdateUnitWeapons
   r Unit#251.posX 198572351
   r Unit#251.posZ 85757652
   r Unit#251.heading -3456
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 913 UpdateUnitWeapons
   a unit Unit#252
 call 914 UpdateUnitWeapons
   r Unit#1.workTime 1213
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 914 UpdateUnitWeapons
   r Unit#3.health 721
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 914 UpdateUnitWeapons
   r Unit#251.posX 198601549
   r Unit#251.posZ 85693898
   r Unit#251.heading -4486
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 914 UpdateUnitWeapons
   a unit Unit#252
 call 915 UpdateUnitWeapons
   r Unit#1.workTime 1214
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 915 UpdateUnitWeapons
   r Unit#3.health 723
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 915 UpdateUnitWeapons
   r Unit#251.posX 198636859
   r Unit#251.posZ 85633311
   r Unit#251.heading -5516
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 915 UpdateUnitWeapons
   a unit Unit#252
 call 916 UpdateUnitWeapons
   r Unit#1.workTime 1215
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 916 UpdateUnitWeapons
   r Unit#3.health 724
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 916 UpdateUnitWeapons
   r Unit#251.posX 198677938
   r Unit#251.posZ 85576482
   r Unit#251.heading -6546
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 916 UpdateUnitWeapons
   a unit Unit#252
 call 916 GetWeaponRange
@@ -9853,253 +10858,463 @@ call 916 GetWeaponRange
 call 917 UpdateUnitWeapons
   r Unit#1.workTime 1216
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 917 UpdateUnitWeapons
   r Unit#3.health 726
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 917 UpdateUnitWeapons
   r Unit#251.posX 198724393
   r Unit#251.posZ 85523950
   r Unit#251.heading -7576
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 917 UpdateUnitWeapons
   a unit Unit#252
 call 918 UpdateUnitWeapons
   r Unit#1.workTime 1217
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 918 UpdateUnitWeapons
   r Unit#3.health 728
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 918 UpdateUnitWeapons
   r Unit#251.posX 198773364
   r Unit#251.posZ 85473763
   r Unit#251.heading -8073
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 918 UpdateUnitWeapons
   a unit Unit#252
 call 919 UpdateUnitWeapons
   r Unit#1.workTime 1218
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 919 UpdateUnitWeapons
   r Unit#3.health 729
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 919 UpdateUnitWeapons
   r Unit#251.posX 198822335
   r Unit#251.posZ 85423576
   r Unit#251.heading -8075
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 919 UpdateUnitWeapons
   a unit Unit#252
 call 920 UpdateUnitWeapons
   r Unit#1.workTime 1219
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 920 UpdateUnitWeapons
   r Unit#3.health 731
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 920 UpdateUnitWeapons
   r Unit#251.posX 198871306
   r Unit#251.posZ 85373389
   r Unit#251.heading -8077
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 920 UpdateUnitWeapons
   a unit Unit#252
 call 921 UpdateUnitWeapons
   r Unit#1.workTime 1220
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 921 UpdateUnitWeapons
   r Unit#3.health 732
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 921 UpdateUnitWeapons
   r Unit#251.posX 198920277
   r Unit#251.posZ 85323202
   r Unit#251.heading -8079
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 921 UpdateUnitWeapons
   a unit Unit#252
 call 922 UpdateUnitWeapons
   r Unit#1.workTime 1221
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 922 UpdateUnitWeapons
   r Unit#3.health 734
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 922 UpdateUnitWeapons
   r Unit#251.posX 198969248
   r Unit#251.posZ 85273015
   r Unit#251.heading -8080
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 922 UpdateUnitWeapons
   a unit Unit#252
 call 923 UpdateUnitWeapons
   r Unit#1.workTime 1222
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 923 UpdateUnitWeapons
   r Unit#3.health 736
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 923 UpdateUnitWeapons
   r Unit#251.posX 199018219
   r Unit#251.posZ 85222828
   r Unit#251.heading -8082
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 923 UpdateUnitWeapons
   a unit Unit#252
 call 924 UpdateUnitWeapons
   r Unit#1.workTime 1223
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 924 UpdateUnitWeapons
   r Unit#3.health 737
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 924 UpdateUnitWeapons
   r Unit#251.posX 199067190
   r Unit#251.posZ 85172641
   r Unit#251.heading -8084
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 924 UpdateUnitWeapons
   a unit Unit#252
 call 925 UpdateUnitWeapons
   r Unit#1.workTime 1224
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 925 UpdateUnitWeapons
   r Unit#3.health 739
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 925 UpdateUnitWeapons
   r Unit#251.posX 199116161
   r Unit#251.posZ 85122454
   r Unit#251.heading -8085
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 925 UpdateUnitWeapons
   a unit Unit#252
 call 926 UpdateUnitWeapons
   r Unit#1.workTime 1225
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 926 UpdateUnitWeapons
   r Unit#3.health 741
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 926 UpdateUnitWeapons
   r Unit#251.posX 199165132
   r Unit#251.posZ 85072267
   r Unit#251.heading -8087
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 926 UpdateUnitWeapons
   a unit Unit#252
 call 927 UpdateUnitWeapons
   r Unit#1.workTime 1226
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 927 UpdateUnitWeapons
   r Unit#3.health 742
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 927 UpdateUnitWeapons
   r Unit#251.posX 199214103
   r Unit#251.posZ 85022080
   r Unit#251.heading -8089
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 927 UpdateUnitWeapons
   a unit Unit#252
 call 928 UpdateUnitWeapons
   r Unit#1.workTime 1227
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 928 UpdateUnitWeapons
   r Unit#3.health 744
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 928 UpdateUnitWeapons
   r Unit#251.posX 199263074
   r Unit#251.posZ 84971893
   r Unit#251.heading -8091
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 928 UpdateUnitWeapons
   a unit Unit#252
 call 929 UpdateUnitWeapons
   r Unit#1.workTime 1228
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 929 UpdateUnitWeapons
   r Unit#3.health 745
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 929 UpdateUnitWeapons
   r Unit#251.posX 199312045
   r Unit#251.posZ 84921706
   r Unit#251.heading -8092
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 929 UpdateUnitWeapons
   a unit Unit#252
 call 930 UpdateUnitWeapons
   r Unit#1.workTime 1229
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 930 UpdateUnitWeapons
   r Unit#3.health 747
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 930 UpdateUnitWeapons
   r Unit#251.posX 199361016
   r Unit#251.posZ 84871519
   r Unit#251.heading -8094
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 930 UpdateUnitWeapons
   a unit Unit#252
 call 931 UpdateUnitWeapons
@@ -10108,12 +11323,21 @@ call 931 UpdateUnitWeapons
   r Player#0.energy f32:0x451ba6c6
   r Player#0.metal f32:0x4593e9a0
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 931 UpdateUnitWeapons
   r Unit#3.health 749
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 931 UpdateUnitWeapons
   r Unit#251.posX 199409987
   r Unit#251.posZ 84821332
@@ -10121,60 +11345,105 @@ call 931 UpdateUnitWeapons
   r Player#1.energy f32:0x44309ffe
   r Player#1.metal f32:0x44730cdd
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 931 UpdateUnitWeapons
   a unit Unit#252
 call 932 UpdateUnitWeapons
   r Unit#1.workTime 1231
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 932 UpdateUnitWeapons
   r Unit#3.health 750
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 932 UpdateUnitWeapons
   r Unit#251.posX 199459575
   r Unit#251.posZ 84771744
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 932 UpdateUnitWeapons
   a unit Unit#252
 call 933 UpdateUnitWeapons
   r Unit#1.workTime 1232
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 933 ReleaseWeapons
   a unit Unit#1
   a unusedEdx 0
   a index 3
+  i services.SchedPublish 6 28
+  i services.SchedPublish 6 28
   w Unit#1.weapon0Flags 18
   w Unit#1.weapon2Flags 26
 call 933 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 933 ReleaseWeapons
   a unit Unit#3
   a unusedEdx 0
   a index 3
+  i services.SchedPublish 6 28
   w Unit#3.weapon0Flags 18
 call 933 UpdateUnitWeapons
   r Unit#251.posX 199509163
   r Unit#251.posZ 84722156
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 933 UpdateUnitWeapons
   a unit Unit#252
 call 934 UpdateUnitWeapons
   r Unit#1.workTime 1233
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 934 ReleaseWeapons
   a unit Unit#1
   a unusedEdx 0
@@ -10182,7 +11451,10 @@ call 934 ReleaseWeapons
 call 934 UpdateUnitWeapons
   r Unit#3.netDirtyFlags 0
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 934 ReleaseWeapons
   a unit Unit#3
   a unusedEdx 0
@@ -10191,163 +11463,319 @@ call 934 UpdateUnitWeapons
   r Unit#251.posX 199558751
   r Unit#251.posZ 84672568
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 934 UpdateUnitWeapons
   a unit Unit#252
 call 935 UpdateUnitWeapons
   r Unit#1.netDirtyFlags 4
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 935 UpdateUnitWeapons
   r rng.seed 0x691499e7
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 935 UpdateUnitWeapons
   r Unit#251.posX 199608339
   r Unit#251.posZ 84622980
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 935 UpdateUnitWeapons
   a unit Unit#252
 call 936 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 936 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 936 UpdateUnitWeapons
   r Unit#251.posX 199657927
   r Unit#251.posZ 84573392
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 936 UpdateUnitWeapons
   a unit Unit#252
 call 937 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 937 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 937 UpdateUnitWeapons
   r Unit#251.posX 199707515
   r Unit#251.posZ 84523804
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 937 UpdateUnitWeapons
   a unit Unit#252
 call 938 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 938 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 938 UpdateUnitWeapons
   r Unit#251.posX 199757103
   r Unit#251.posZ 84474216
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 938 UpdateUnitWeapons
   a unit Unit#252
 call 939 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 939 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 939 UpdateUnitWeapons
   r Unit#251.posX 199806691
   r Unit#251.posZ 84424628
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 939 UpdateUnitWeapons
   a unit Unit#252
 call 940 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 940 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 940 UpdateUnitWeapons
   r Unit#251.posX 199855662
   r Unit#251.posZ 84374441
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 940 UpdateUnitWeapons
   a unit Unit#252
 call 941 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 941 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 941 UpdateUnitWeapons
   r Unit#251.posX 199904633
   r Unit#251.posZ 84324254
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 941 UpdateUnitWeapons
   a unit Unit#252
 call 942 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 942 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 942 UpdateUnitWeapons
   r Unit#251.posX 199954221
   r Unit#251.posZ 84274666
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 942 UpdateUnitWeapons
   a unit Unit#252
 call 943 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 943 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 943 UpdateUnitWeapons
   r Unit#251.posX 200003192
   r Unit#251.posZ 84224479
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 943 UpdateUnitWeapons
   a unit Unit#252
 call 944 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 944 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 944 UpdateUnitWeapons
   r Unit#251.posX 200052163
   r Unit#251.posZ 84174292
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 944 UpdateUnitWeapons
   a unit Unit#252
 call 944 GetWeaponRange
@@ -10368,256 +11796,496 @@ call 944 GetWeaponRange
   o result 240
 call 945 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 945 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 945 UpdateUnitWeapons
   r Unit#251.posX 200101134
   r Unit#251.posZ 84124105
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 945 UpdateUnitWeapons
   a unit Unit#252
 call 946 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 946 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 946 UpdateUnitWeapons
   r Unit#251.posX 200150722
   r Unit#251.posZ 84074517
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 946 UpdateUnitWeapons
   a unit Unit#252
 call 947 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 947 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 947 UpdateUnitWeapons
   r Unit#251.posX 200199693
   r Unit#251.posZ 84024330
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 947 UpdateUnitWeapons
   a unit Unit#252
 call 948 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 948 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 948 UpdateUnitWeapons
   r Unit#251.posX 200248664
   r Unit#251.posZ 83974143
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 948 UpdateUnitWeapons
   a unit Unit#252
 call 949 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 949 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 949 UpdateUnitWeapons
   r Unit#251.posX 200297635
   r Unit#251.posZ 83923956
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 949 UpdateUnitWeapons
   a unit Unit#252
 call 950 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 950 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 950 UpdateUnitWeapons
   r rng.seed 0x47844296
   r Unit#251.posX 200347223
   r Unit#251.posZ 83874368
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 950 UpdateUnitWeapons
   a unit Unit#252
 call 951 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 951 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 951 UpdateUnitWeapons
   r Unit#251.posX 200396194
   r Unit#251.posZ 83824181
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 951 UpdateUnitWeapons
   a unit Unit#252
 call 952 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 952 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 952 UpdateUnitWeapons
   r Unit#251.posX 200445165
   r Unit#251.posZ 83773994
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 952 UpdateUnitWeapons
   a unit Unit#252
 call 953 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 953 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 953 UpdateUnitWeapons
   r Unit#251.posX 200494136
   r Unit#251.posZ 83723807
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 953 UpdateUnitWeapons
   a unit Unit#252
 call 954 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 954 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 954 UpdateUnitWeapons
   r Unit#251.posX 200543724
   r Unit#251.posZ 83674219
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 954 UpdateUnitWeapons
   a unit Unit#252
 call 955 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 955 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 955 UpdateUnitWeapons
   r Unit#251.posX 200592695
   r Unit#251.posZ 83624032
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 955 UpdateUnitWeapons
   a unit Unit#252
 call 956 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 956 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 956 UpdateUnitWeapons
   r Unit#251.posX 200641666
   r Unit#251.posZ 83573845
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 956 UpdateUnitWeapons
   a unit Unit#252
 call 957 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 957 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 957 UpdateUnitWeapons
   r Unit#251.posX 200691254
   r Unit#251.posZ 83524257
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 957 UpdateUnitWeapons
   a unit Unit#252
 call 958 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 958 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 958 UpdateUnitWeapons
   r Unit#251.posX 200740225
   r Unit#251.posZ 83474070
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 958 UpdateUnitWeapons
   a unit Unit#252
 call 959 UpdateUnitWeapons
   r rng.seed 0x3c2faa88
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 959 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 959 UpdateUnitWeapons
   r Unit#251.posX 200789196
   r Unit#251.posZ 83423883
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 959 UpdateUnitWeapons
   a unit Unit#252
 call 960 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 960 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 960 UpdateUnitWeapons
   r Unit#251.posX 200838167
   r Unit#251.posZ 83373696
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 960 UpdateUnitWeapons
   a unit Unit#252
 call 961 UpdateUnitWeapons
@@ -10625,11 +12293,20 @@ call 961 UpdateUnitWeapons
   r Player#0.energy f32:0x451c7669
   r Player#0.metal f32:0x4593e7ba
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 961 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 961 UpdateUnitWeapons
   r Unit#251.posX 200887755
   r Unit#251.posZ 83324108
@@ -10637,49 +12314,94 @@ call 961 UpdateUnitWeapons
   r Player#1.energy f32:0x4433fffe
   r Player#1.metal f32:0x447393fb
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 961 UpdateUnitWeapons
   a unit Unit#252
 call 962 UpdateUnitWeapons
   r rng.seed 0x1fad0a9a
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 962 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 962 UpdateUnitWeapons
   r Unit#251.posX 200936726
   r Unit#251.posZ 83273921
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 962 UpdateUnitWeapons
   a unit Unit#252
 call 963 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 963 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 963 UpdateUnitWeapons
   r Unit#251.posX 200985697
   r Unit#251.posZ 83223734
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 963 UpdateUnitWeapons
   a unit Unit#252
 call 964 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 964 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 964 DamageUnit
   r Unit#3.player Player#0
   r Unit#3.activateFlags 0
@@ -10714,54 +12436,102 @@ call 964 UpdateUnitWeapons
   r Unit#251.posZ 83173547
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 964 UpdateUnitWeapons
   a unit Unit#252
 call 965 UpdateUnitWeapons
   r Unit#1.health 2028
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 965 UpdateUnitWeapons
   r Unit#251.posX 201084256
   r Unit#251.posZ 83123959
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 965 UpdateUnitWeapons
   a unit Unit#252
 call 966 UpdateUnitWeapons
   r rng.seed 0x17973d11
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 966 UpdateUnitWeapons
   r Unit#251.posX 201133227
   r Unit#251.posZ 83073772
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 966 UpdateUnitWeapons
   a unit Unit#252
 call 967 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 967 UpdateUnitWeapons
   r Unit#251.posX 201182198
   r Unit#251.posZ 83023585
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 967 UpdateUnitWeapons
   a unit Unit#252
 call 968 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 968 DamageUnit
   r Unit#1.player Player#0
   r Unit#1.activateFlags 1
@@ -10784,62 +12554,116 @@ call 968 UpdateUnitWeapons
   r Unit#251.posZ 82973398
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 968 UpdateUnitWeapons
   a unit Unit#252
 call 969 UpdateUnitWeapons
   r rng.seed 0x4a2a3330
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 969 UpdateUnitWeapons
   r Unit#251.posX 201280757
   r Unit#251.posZ 82923810
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 969 UpdateUnitWeapons
   a unit Unit#252
 call 970 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 970 UpdateUnitWeapons
   r Unit#251.posX 201329728
   r Unit#251.posZ 82873623
   r Unit#251.heading -8094
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 970 UpdateUnitWeapons
   a unit Unit#252
 call 971 UpdateUnitWeapons
   r rng.seed 0x1886ba5a
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 971 UpdateUnitWeapons
   r Unit#251.posX 201378699
   r Unit#251.posZ 82823436
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 971 UpdateUnitWeapons
   a unit Unit#252
 call 972 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 972 UpdateUnitWeapons
   r Unit#251.posX 201427670
   r Unit#251.posZ 82773249
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 972 UpdateUnitWeapons
   a unit Unit#252
 call 972 GetWeaponRange
@@ -10856,47 +12680,89 @@ call 972 GetWeaponRange
   o result 240
 call 973 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 973 UpdateUnitWeapons
   r Unit#251.posX 201477258
   r Unit#251.posZ 82723661
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 973 UpdateUnitWeapons
   a unit Unit#252
 call 974 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 974 UpdateUnitWeapons
   r Unit#251.posX 201526229
   r Unit#251.posZ 82673474
   r Unit#251.heading -8094
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 974 UpdateUnitWeapons
   a unit Unit#252
 call 975 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 975 UpdateUnitWeapons
   r Unit#251.posX 201575200
   r Unit#251.posZ 82623287
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 975 UpdateUnitWeapons
   a unit Unit#252
 call 976 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 976 DamageUnit
   a source Unit#1
   a target Unit#1
@@ -10909,105 +12775,201 @@ call 976 UpdateUnitWeapons
   r Unit#251.posZ 82573100
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 976 UpdateUnitWeapons
   a unit Unit#252
 call 977 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 977 UpdateUnitWeapons
   r Unit#251.posX 201673759
   r Unit#251.posZ 82523512
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 977 UpdateUnitWeapons
   a unit Unit#252
 call 978 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 978 UpdateUnitWeapons
   r Unit#251.posX 201722730
   r Unit#251.posZ 82473325
   r Unit#251.heading -8094
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 978 UpdateUnitWeapons
   a unit Unit#252
 call 979 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 979 UpdateUnitWeapons
   r Unit#251.posX 201771701
   r Unit#251.posZ 82423138
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 979 UpdateUnitWeapons
   a unit Unit#252
 call 980 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 980 UpdateUnitWeapons
   r Unit#251.posX 201820672
   r Unit#251.posZ 82372951
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 980 UpdateUnitWeapons
   a unit Unit#252
 call 981 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 981 UpdateUnitWeapons
   r Unit#251.posX 201870260
   r Unit#251.posZ 82323363
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 981 UpdateUnitWeapons
   a unit Unit#252
 call 982 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 982 UpdateUnitWeapons
   r Unit#251.posX 201919231
   r Unit#251.posZ 82273176
   r Unit#251.heading -8094
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 982 UpdateUnitWeapons
   a unit Unit#252
 call 983 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 983 UpdateUnitWeapons
   r Unit#251.posX 201968202
   r Unit#251.posZ 82222989
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 983 UpdateUnitWeapons
   a unit Unit#252
 call 984 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 984 DamageUnit
   a source Unit#1
   a target Unit#1
@@ -11020,87 +12982,165 @@ call 984 UpdateUnitWeapons
   r Unit#251.posZ 82172802
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 984 UpdateUnitWeapons
   a unit Unit#252
 call 985 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 985 UpdateUnitWeapons
   r Unit#251.posX 202066761
   r Unit#251.posZ 82123214
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 985 UpdateUnitWeapons
   a unit Unit#252
 call 986 UpdateUnitWeapons
   r rng.seed 0x3534774a
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 986 UpdateUnitWeapons
   r Unit#251.posX 202115732
   r Unit#251.posZ 82073027
   r Unit#251.heading -8093
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 986 UpdateUnitWeapons
   a unit Unit#252
 call 987 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 987 UpdateUnitWeapons
   r Unit#251.posX 202164703
   r Unit#251.posZ 82022840
   r Unit#251.heading -8095
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 987 UpdateUnitWeapons
   a unit Unit#252
 call 988 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 988 UpdateUnitWeapons
   r Unit#251.posX 202213674
   r Unit#251.posZ 81972653
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 988 UpdateUnitWeapons
   a unit Unit#252
 call 989 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 989 UpdateUnitWeapons
   r Unit#251.posX 202263262
   r Unit#251.posZ 81923065
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 989 UpdateUnitWeapons
   a unit Unit#252
 call 990 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 990 UpdateUnitWeapons
   r Unit#251.posX 202312233
   r Unit#251.posZ 81872878
   r Unit#251.heading -8093
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 990 UpdateUnitWeapons
   a unit Unit#252
 call 991 UpdateUnitWeapons
@@ -11108,8 +13148,14 @@ call 991 UpdateUnitWeapons
   r Player#0.energy f32:0x451dd669
   r Player#0.metal f32:0x4593efba
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 991 UpdateUnitWeapons
   r Unit#251.posX 202361204
   r Unit#251.posZ 81822691
@@ -11117,15 +13163,27 @@ call 991 UpdateUnitWeapons
   r Player#1.energy f32:0x44375ffe
   r Player#1.metal f32:0x44741b19
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 991 UpdateUnitWeapons
   a unit Unit#252
 call 992 UpdateUnitWeapons
   r rng.seed 0x07b8880d
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 992 DamageUnit
   a source Unit#1
   a target Unit#1
@@ -11138,106 +13196,202 @@ call 992 UpdateUnitWeapons
   r Unit#251.posZ 81772504
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 992 UpdateUnitWeapons
   a unit Unit#252
 call 993 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 993 UpdateUnitWeapons
   r Unit#251.posX 202459763
   r Unit#251.posZ 81722916
   r Unit#251.heading -8097
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 993 UpdateUnitWeapons
   a unit Unit#252
 call 994 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 994 UpdateUnitWeapons
   r rng.seed 0x63ec1170
   r Unit#251.posX 202508734
   r Unit#251.posZ 81672729
   r Unit#251.heading -8092
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 994 UpdateUnitWeapons
   a unit Unit#252
 call 995 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 995 UpdateUnitWeapons
   r Unit#251.posX 202557705
   r Unit#251.posZ 81622542
   r Unit#251.heading -8094
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 995 UpdateUnitWeapons
   a unit Unit#252
 call 996 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 996 UpdateUnitWeapons
   r Unit#251.posX 202606676
   r Unit#251.posZ 81572355
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 996 UpdateUnitWeapons
   a unit Unit#252
 call 997 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 997 UpdateUnitWeapons
   r Unit#251.posX 202656264
   r Unit#251.posZ 81522767
   r Unit#251.heading -8098
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 997 UpdateUnitWeapons
   a unit Unit#252
 call 998 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 998 UpdateUnitWeapons
   r Unit#251.posX 202705235
   r Unit#251.posZ 81472580
   r Unit#251.heading -8091
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 998 UpdateUnitWeapons
   a unit Unit#252
 call 999 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 999 UpdateUnitWeapons
   r Unit#251.posX 202754206
   r Unit#251.posZ 81422393
   r Unit#251.heading -8093
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 999 UpdateUnitWeapons
   a unit Unit#252
 call 1000 UpdateUnitWeapons
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1000 DamageUnit
   a source Unit#1
   a target Unit#1
@@ -11250,8 +13404,14 @@ call 1000 UpdateUnitWeapons
   r Unit#251.posZ 81372206
   r Unit#251.heading -8096
   a unit Unit#251
-  i targeting.GetWeaponTargetPos Unit#251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1000 UpdateUnitWeapons
   a unit Unit#252
 call 1000 GetWeaponRange

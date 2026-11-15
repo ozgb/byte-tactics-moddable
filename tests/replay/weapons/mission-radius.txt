@@ -9212,8 +9212,14 @@ call 1640 UpdateUnitWeapons
   a unit Unit#1
 call 1640 UpdateUnitWeapons
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#3.health 5720
   r Unit#3.def UnitDef#15
@@ -9281,12 +9287,16 @@ call 1640 UpdateUnitWeapons
   r Unit#3.weapons[1].aimCob.nAimCobDone 1
   r Unit#3.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (108181794,3246284,57621272)
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (108181794,3246284,57621272)
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   i units.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
   w Unit#3.weapon1Flags 22
@@ -9296,25 +9306,38 @@ call 1640 WeaponAimCobComplete
   w Unit#3.weapons[0].aimCob.nAimCobDone 1
 call 1640 UpdateUnitWeapons
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (108181794,3246284,57621272)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 38
 call 1640 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (108181794,3246284,57621272)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (108181794,3246284,57621272)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
   w Unit#5.weapon0ReloadTimer 42
   w Unit#5.weapon1ReloadTimer 30
 call 1640 UpdateUnitWeapons
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (108181794,3246284,57621272)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (108181794,3246284,57621272)
-  i targeting.GetWeaponTargetUnit Unit#6 1 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
+  i services.ScheduleTargetingTargetUnit Unit#6 1 = Unit#275
   i units.QueryScript CobScript#5 "QuerySecondary" (0) null null null = 1
   o p2 (3)
   i units.GetPieceOffset Unit#6 3 = (0,0,0)
@@ -9419,7 +9442,10 @@ call 1640 UpdateUnitWeapons
   r Unit#7.weapons[1].aimCob.nAimCobDone 0
   r Unit#7.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#8.health 3982
   r Unit#8.def UnitDef#25
@@ -9469,19 +9495,27 @@ call 1640 UpdateUnitWeapons
   r Unit#8.weapons[1].aimCob.nAimCobDone 0
   r Unit#8.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (108181794,3246284,57621272)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
   w Unit#8.weapon0ReloadTimer 35
   w Unit#8.weapon1ReloadTimer 31
 call 1640 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon1ReloadTimer 32
 call 1640 UpdateUnitWeapons
   r Unit#10.health 290
@@ -9535,7 +9569,10 @@ call 1640 UpdateUnitWeapons
   r Unit#9.posZ 58759981
   r UnitMotion#9.speed 50164
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#11.health 2870
   r Unit#11.def UnitDef#67
@@ -9585,23 +9622,45 @@ call 1640 UpdateUnitWeapons
   r Unit#11.weapons[1].aimCob.nAimCobDone 0
   r Unit#11.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (108181794,3246284,57621272)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
   w Unit#13.weapon1ReloadTimer 14
 call 1640 UpdateUnitWeapons
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 0
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (108181794,3246284,57621272)
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
   w Unit#14.weapon1ReloadTimer 58
 call 1640 UpdateUnitWeapons
   r Unit#15.health 528
@@ -9652,9 +9711,14 @@ call 1640 UpdateUnitWeapons
   r Unit#15.weapons[1].aimCob.nAimCobDone 1
   r Unit#15.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (108181794,3246284,57621272)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 108181794
+  o y 3246284
+  o z 57621272
   w Unit#15.weapon1ReloadTimer 36
 call 1640 UpdateUnitWeapons
   r Unit#16.health 560
@@ -9705,8 +9769,14 @@ call 1640 UpdateUnitWeapons
   r Unit#16.weapons[1].aimCob.nAimCobDone 0
   r Unit#16.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#17.health 560
   r Unit#17.def UnitDef#62
@@ -9756,8 +9826,14 @@ call 1640 UpdateUnitWeapons
   r Unit#17.weapons[1].aimCob.nAimCobDone 1
   r Unit#17.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#251.health 52
   r Unit#251.def UnitDef#153
@@ -10259,7 +10335,10 @@ call 1640 UpdateUnitWeapons
   r Unit#260.weapons[1].aimCob.nAimCobDone 0
   r Unit#260.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#261.health 590
   r Unit#261.def UnitDef#157
@@ -10327,7 +10406,10 @@ call 1640 UpdateUnitWeapons
   r Unit#261.weapons[1].aimCob.nAimCobDone 0
   r Unit#261.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#262.health 590
   r Unit#262.def UnitDef#157
@@ -10377,7 +10459,10 @@ call 1640 UpdateUnitWeapons
   r Unit#262.weapons[1].aimCob.nAimCobDone 0
   r Unit#262.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#263.health 590
   r Unit#263.def UnitDef#157
@@ -10427,7 +10512,10 @@ call 1640 UpdateUnitWeapons
   r Unit#263.weapons[1].aimCob.nAimCobDone 0
   r Unit#263.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#264.health 590
   r Unit#264.def UnitDef#157
@@ -10477,7 +10565,10 @@ call 1640 UpdateUnitWeapons
   r Unit#264.weapons[1].aimCob.nAimCobDone 0
   r Unit#264.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#265.health 590
   r Unit#265.def UnitDef#157
@@ -10527,7 +10618,10 @@ call 1640 UpdateUnitWeapons
   r Unit#265.weapons[1].aimCob.nAimCobDone 0
   r Unit#265.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#266.health 1250
   r Unit#266.def UnitDef#138
@@ -10611,10 +10705,15 @@ call 1640 UpdateUnitWeapons
   r Unit#266.weapons[1].aimCob.nAimCobDone 0
   r Unit#266.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#267.health 1250
   r Unit#267.def UnitDef#138
@@ -10664,8 +10763,14 @@ call 1640 UpdateUnitWeapons
   r Unit#267.weapons[1].aimCob.nAimCobDone 0
   r Unit#267.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#268.health 1250
   r Unit#268.def UnitDef#138
@@ -10715,8 +10820,14 @@ call 1640 UpdateUnitWeapons
   r Unit#268.weapons[1].aimCob.nAimCobDone 0
   r Unit#268.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   r Unit#269.health 1250
   r Unit#269.def UnitDef#138
@@ -10766,25 +10877,38 @@ call 1640 UpdateUnitWeapons
   r Unit#269.weapons[1].aimCob.nAimCobDone 0
   r Unit#269.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#269 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#269 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 UpdateUnitWeapons
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94472865,3771319,58731523)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (103845302,3884351,51595380)
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94472865
+  o y 3771319
+  o z 58731523
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 103845302
+  o y 3884351
+  o z 51595380
   w Unit#274.weapon1ReloadTimer 6
 call 1640 UpdateUnitWeapons
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113262591,3571711,50225151)
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (113262591,3571711,50225151)
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113262591
+  o y 3571711
+  o z 50225151
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 113262591
+  o y 3571711
+  o z 50225151
   w Unit#275.weapon1ReloadTimer 50
 call 1640 UpdateUnitWeapons
   r Unit#276.health 1250
@@ -10839,8 +10963,14 @@ call 1640 UpdateUnitWeapons
   r Unit#275.heading -21382
   r UnitMotion#3.speed 169170
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1640 GetWeaponRange
   a unit Unit#11
   a weapon 0
@@ -11001,22 +11131,32 @@ call 1641 UpdateUnitWeapons
   a unit Unit#1
 call 1641 UpdateUnitWeapons
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (108331965,3246284,57699187)
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
   i units.GetAimFromPosition Unit#3 0
   o out (122503554,5472256,46240783)
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (108331965,3246284,57699187)
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
   i units.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
   i units.StartScriptWithArgs CobScript#12 "AimSecondary" ? 0 2 53474 282 0 0 = 1
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 53474 282 0 0 = 0
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon0Flags 18
   w Unit#3.weapon1Flags 23
   w Unit#3.weapon1FireHeading -12062
@@ -11024,80 +11164,128 @@ call 1641 UpdateUnitWeapons
   w Unit#3.weapons[1].aimCob.nAimCobDone 0
 call 1641 UpdateUnitWeapons
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (108331965,3246284,57699187)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 37
 call 1641 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (108331965,3246284,57699187)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (108331965,3246284,57699187)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
   w Unit#5.weapon0ReloadTimer 41
   w Unit#5.weapon1ReloadTimer 29
 call 1641 UpdateUnitWeapons
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (108331965,3246284,57699187)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (108331965,3246284,57699187)
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
   w Unit#6.weapon0ReloadTimer 54
   w Unit#6.weapon1ReloadTimer 83
 call 1641 UpdateUnitWeapons
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   r Unit#8.posX 103842941
   r Unit#8.posZ 51606664
   r UnitMotion#14.speed 7856
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (108331965,3246284,57699187)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
   w Unit#8.weapon0ReloadTimer 34
   w Unit#8.weapon1ReloadTimer 30
 call 1641 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon1ReloadTimer 31
 call 1641 UpdateUnitWeapons
   r Unit#9.posX 94473653
   r Unit#9.posZ 58809113
   r UnitMotion#9.speed 49313
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (108331965,3246284,57699187)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
   w Unit#13.weapon1ReloadTimer 13
 call 1641 UpdateUnitWeapons
   r rng.seed 0x651cc333
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 1
-  o pos (108331965,3246284,57699187)
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
   i units.GetAimFromPosition Unit#14 0
   o out (113262592,3915775,47693825)
   i units.StartScriptWithArgs CobScript#6 "AimPrimary" ? 0 2 60760 64923 0 0 = 1
   i network.SendScriptCallByName Unit#14 "AimPrimary" 2 60760 64923 0 0 = 0
-  i targeting.GetWeaponTargetUnit Unit#14 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (108331965,3246284,57699187)
+  i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
   w Unit#14.weapon0Flags 19
   w Unit#14.weapon0FireHeading -4776
   w Unit#14.weapon0FirePitch -613
@@ -11116,11 +11304,10 @@ call 1641 ClaimWeapons
   a unit Unit#14
   a unusedEdx 0
   a index 0
-  i units.FindScript CobScript#6 "StartBuilding" = -1
-  i units.StartScriptWithArgs CobScript#6 "TargetCleared" ? 0 1 0 0 0 0 = 0
-  w Unit#14.weapon0TargetX 0
+  i services.SchedPublish 6 28
   w Unit#14.weapon0Flags 3
 call 1641 ClaimWeapons
+  r Unit#14.weapon0TargetX 0
   a unit Unit#14
   a unusedEdx 0
   a index 2
@@ -11129,18 +11316,35 @@ call 1641 UpdateUnitWeapons
   r Unit#15.netDirtyFlags 0
   r Unit#14.weapon0TargetX 275
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (108331965,3246284,57699187)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 108331965
+  o y 3246284
+  o z 57699187
   w Unit#15.weapon1ReloadTimer 35
 call 1641 UpdateUnitWeapons
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   a unit Unit#251
 call 1641 UpdateUnitWeapons
@@ -11162,73 +11366,121 @@ call 1641 UpdateUnitWeapons
 call 1641 UpdateUnitWeapons
   r Unit#260.posZ 119013686
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   r Unit#261.posX 164042161
   r Unit#261.posZ 148591745
   r Unit#261.heading -121
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   r Unit#262.posZ 139305749
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   r Unit#263.posZ 117074978
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   r Unit#264.posX 75932227
   r Unit#264.posZ 118121490
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   r Unit#265.posX 58234415
   r Unit#265.posZ 132607481
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   r Unit#266.posZ 140447799
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   r Unit#267.posZ 135552890
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   r Unit#268.posX 182871462
   r Unit#268.posZ 141249827
   r Unit#268.heading 7737
   r UnitMotion#28.speed 32486
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   r Unit#269.posZ 143305342
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#269 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#269 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 UpdateUnitWeapons
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94477097,3771319,58780655)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (103846195,3884351,51599872)
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94477097
+  o y 3771319
+  o z 58780655
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 103846195
+  o y 3884351
+  o z 51599872
   w Unit#274.weapon1ReloadTimer 5
 call 1641 UpdateUnitWeapons
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113264276,3577929,50234297)
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (113264276,3577929,50234297)
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113264276
+  o y 3577929
+  o z 50234297
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 113264276
+  o y 3577929
+  o z 50234297
   w Unit#275.weapon1ReloadTimer 49
 call 1641 WeaponAimCobComplete
   a callback Unit#275.weapons[0].aimCob
@@ -11240,8 +11492,14 @@ call 1641 UpdateUnitWeapons
   r Unit#275.heading -21901
   r UnitMotion#3.speed 167860
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1641 GetWeaponRange
   a unit Unit#274
   a weapon 1
@@ -11355,65 +11613,99 @@ call 1642 UpdateUnitWeapons
   a unit Unit#1
 call 1642 UpdateUnitWeapons
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (108476998,3246284,57783711)
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
   i units.GetAimFromPosition Unit#3 0
   o out (122503554,5472256,46240783)
   i units.StartScriptWithArgs CobScript#12 "AimPrimary" ? 0 2 55606 450 0 0 = 1
   i network.SendScriptCallByName Unit#3 "AimPrimary" 2 55606 450 0 0 = 0
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (108476998,3246284,57783711)
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon0Flags 19
   w Unit#3.weapon0FireHeading -9930
   w Unit#3.weapon0FirePitch 450
   w Unit#3.weapons[0].aimCob.nAimCobDone 0
 call 1642 UpdateUnitWeapons
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (108476998,3246284,57783711)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 36
 call 1642 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (108476998,3246284,57783711)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (108476998,3246284,57783711)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
   w Unit#5.weapon0ReloadTimer 40
   w Unit#5.weapon1ReloadTimer 28
 call 1642 UpdateUnitWeapons
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (108476998,3246284,57783711)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (108476998,3246284,57783711)
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
   w Unit#6.weapon0ReloadTimer 53
   w Unit#6.weapon1ReloadTimer 82
 call 1642 UpdateUnitWeapons
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   r UnitMotion#14.speed 4580
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (108476998,3246284,57783711)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
   w Unit#8.weapon0ReloadTimer 33
   w Unit#8.weapon1ReloadTimer 29
 call 1642 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon1ReloadTimer 30
 call 1642 WeaponAimCobComplete
   a callback Unit#9.weapons[0].aimCob
@@ -11424,43 +11716,84 @@ call 1642 UpdateUnitWeapons
   r Unit#9.posZ 58857398
   r UnitMotion#9.speed 48462
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (108476998,3246284,57783711)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
   w Unit#13.weapon1ReloadTimer 12
 call 1642 UpdateUnitWeapons
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 1
-  o pos (108476998,3246284,57783711)
-  i targeting.GetWeaponTargetUnit Unit#14 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (108476998,3246284,57783711)
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
+  i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
   w Unit#14.weapon1ReloadTimer 56
 call 1642 UpdateUnitWeapons
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (108476998,3246284,57783711)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 108476998
+  o y 3246284
+  o z 57783711
   w Unit#15.weapon1ReloadTimer 34
 call 1642 UpdateUnitWeapons
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   a unit Unit#251
 call 1642 UpdateUnitWeapons
@@ -11482,75 +11815,123 @@ call 1642 UpdateUnitWeapons
 call 1642 UpdateUnitWeapons
   r Unit#260.posZ 118931766
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   r Unit#261.posX 164042989
   r Unit#261.posZ 148524579
   r Unit#261.heading -119
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   r Unit#262.posZ 139238575
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   r Unit#263.posZ 117007804
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   r Unit#264.posX 75979729
   r Unit#264.posZ 118073988
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   r Unit#265.posX 58281917
   r Unit#265.posZ 132559979
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   r Unit#266.posZ 140388817
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   r Unit#267.posZ 135493908
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   r Unit#268.posX 182849245
   r Unit#268.posZ 141225312
   r Unit#268.heading 7740
   r UnitMotion#28.speed 33085
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   r Unit#269.posZ 143246360
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#269 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#269 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1642 UpdateUnitWeapons
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94481256,3771319,58828940)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (95582707,4800512,48742833)
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94481256
+  o y 3771319
+  o z 58828940
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 95582707
+  o y 4800512
+  o z 48742833
   w Unit#274.weapon1ReloadTimer 4
 call 1642 UpdateUnitWeapons
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113265900,3578320,50242950)
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113265900
+  o y 3578320
+  o z 50242950
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
   i units.GetAimFromPosition Unit#275 0
   o out (107486845,3424255,57204978)
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (117437632,3771319,60792290)
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 117437632
+  o y 3771319
+  o z 60792290
   w Unit#275.weapon0Flags 18
   w Unit#275.weapon1ReloadTimer 48
 call 1642 UpdateUnitWeapons
@@ -11559,8 +11940,14 @@ call 1642 UpdateUnitWeapons
   r Unit#275.heading -22420
   r UnitMotion#3.speed 166550
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#1.posX 95592763
   r Unit#1.posZ 49032034
@@ -11588,65 +11975,99 @@ call 1643 UpdateUnitWeapons
   a unit Unit#1
 call 1643 UpdateUnitWeapons
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (108616610,3246284,57874529)
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (108616610,3246284,57874529)
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
 call 1643 WeaponAimCobComplete
   a callback Unit#3.weapons[1].aimCob
   a result 1
   w Unit#3.weapons[1].aimCob.nAimCobDone 1
 call 1643 UpdateUnitWeapons
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (108616610,3246284,57874529)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 35
 call 1643 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (108616610,3246284,57874529)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (108616610,3246284,57874529)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
   w Unit#5.weapon0ReloadTimer 39
   w Unit#5.weapon1ReloadTimer 27
 call 1643 UpdateUnitWeapons
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (108616610,3246284,57874529)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (108616610,3246284,57874529)
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
   w Unit#6.weapon0ReloadTimer 52
   w Unit#6.weapon1ReloadTimer 81
 call 1643 UpdateUnitWeapons
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#8.posX 103844088
   r Unit#8.posZ 51612435
   r UnitMotion#14.speed 1304
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (108616610,3246284,57874529)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
   w Unit#8.weapon0ReloadTimer 32
   w Unit#8.weapon1ReloadTimer 28
 call 1643 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
   i units.GetAimFromPosition Unit#9 0
   o out (94350790,4451562,57212666)
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon0Flags 18
   w Unit#9.weapon1ReloadTimer 29
 call 1643 UpdateUnitWeapons
@@ -11654,43 +12075,84 @@ call 1643 UpdateUnitWeapons
   r Unit#9.posZ 58904835
   r UnitMotion#9.speed 47611
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (108616610,3246284,57874529)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
   w Unit#13.weapon1ReloadTimer 11
 call 1643 UpdateUnitWeapons
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 1
-  o pos (108616610,3246284,57874529)
-  i targeting.GetWeaponTargetUnit Unit#14 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (108616610,3246284,57874529)
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
+  i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
   w Unit#14.weapon1ReloadTimer 55
 call 1643 UpdateUnitWeapons
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (108616610,3246284,57874529)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 108616610
+  o y 3246284
+  o z 57874529
   w Unit#15.weapon1ReloadTimer 33
 call 1643 UpdateUnitWeapons
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   a unit Unit#251
 call 1643 UpdateUnitWeapons
@@ -11712,81 +12174,129 @@ call 1643 UpdateUnitWeapons
 call 1643 UpdateUnitWeapons
   r Unit#260.posZ 118849846
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#261.posX 164043817
   r Unit#261.posZ 148457413
   r Unit#261.heading -118
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#262.posZ 139171401
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#263.posZ 116940630
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#264.posX 76027231
   r Unit#264.posZ 118026486
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#265.posX 58329419
   r Unit#265.posZ 132512477
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#266.posZ 140329835
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#267.posZ 135434926
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#268.posX 182826626
   r Unit#268.posZ 141200353
   r Unit#268.heading 7743
   r UnitMotion#28.speed 33684
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 UpdateUnitWeapons
   r Unit#269.posZ 143187378
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#269 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#269 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1643 WeaponAimCobComplete
   a callback Unit#269.weapons[0].aimCob
   a result 1
   w Unit#269.weapons[0].aimCob.nAimCobDone 1
 call 1643 UpdateUnitWeapons
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94485342,3771319,58876377)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (95580363,4800512,48810528)
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94485342
+  o y 3771319
+  o z 58876377
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 95580363
+  o y 4800512
+  o z 48810528
   w Unit#274.weapon1ReloadTimer 3
 call 1643 UpdateUnitWeapons
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113267524,3578320,50250488)
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113267524
+  o y 3578320
+  o z 50250488
   i units.GetAimFromPosition Unit#275 0
   o out (107656468,3424255,57247264)
   i units.StartScriptWithArgs CobScript#3 "AimPrimary" ? 0 2 15370 230 0 0 = 1
   i network.SendScriptCallByName Unit#275 "AimPrimary" 2 15370 230 0 0 = 0
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (117437632,3771319,60792290)
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 117437632
+  o y 3771319
+  o z 60792290
   w Unit#275.weapon0Flags 19
   w Unit#275.weapon0FireHeading 15370
   w Unit#275.weapon0FirePitch 230
@@ -11798,8 +12308,14 @@ call 1643 UpdateUnitWeapons
   r Unit#275.heading -22939
   r UnitMotion#3.speed 165240
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   r Unit#1.posX 95590274
   r Unit#1.posZ 49099491
@@ -11826,65 +12342,99 @@ call 1644 UpdateUnitWeapons
   a unit Unit#1
 call 1644 UpdateUnitWeapons
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (108750525,3246284,57971329)
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (108750525,3246284,57971329)
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   i units.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
   w Unit#3.weapon1Flags 22
 call 1644 UpdateUnitWeapons
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (108750525,3246284,57971329)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 34
 call 1644 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (108750525,3246284,57971329)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (108750525,3246284,57971329)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
   w Unit#5.weapon0ReloadTimer 38
   w Unit#5.weapon1ReloadTimer 26
 call 1644 UpdateUnitWeapons
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (108750525,3246284,57971329)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (108750525,3246284,57971329)
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
   w Unit#6.weapon0ReloadTimer 51
   w Unit#6.weapon1ReloadTimer 80
 call 1644 UpdateUnitWeapons
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   r Unit#8.flags 0x90240321
   r UnitMotion#14.speed 0
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (108750525,3246284,57971329)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
   w Unit#8.weapon0ReloadTimer 31
   w Unit#8.weapon1ReloadTimer 27
 call 1644 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   i units.GetAimFromPosition Unit#9 0
   o out (94354876,4451562,57260103)
   i units.StartScriptWithArgs CobScript#9 "AimPrimary" ? 0 2 40683 2217 0 0 = 1
   i network.SendScriptCallByName Unit#9 "AimPrimary" 2 40683 2217 0 0 = 0
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon0Flags 19
   w Unit#9.weapon0FireHeading -24853
   w Unit#9.weapon0FirePitch 2217
@@ -11895,43 +12445,84 @@ call 1644 UpdateUnitWeapons
   r Unit#9.posZ 58951424
   r UnitMotion#9.speed 46760
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (108750525,3246284,57971329)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
   w Unit#13.weapon1ReloadTimer 10
 call 1644 UpdateUnitWeapons
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 1
-  o pos (108750525,3246284,57971329)
-  i targeting.GetWeaponTargetUnit Unit#14 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (108750525,3246284,57971329)
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
+  i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
   w Unit#14.weapon1ReloadTimer 54
 call 1644 UpdateUnitWeapons
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (108750525,3246284,57971329)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 108750525
+  o y 3246284
+  o z 57971329
   w Unit#15.weapon1ReloadTimer 32
 call 1644 UpdateUnitWeapons
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   a unit Unit#251
 call 1644 UpdateUnitWeapons
@@ -11953,13 +12544,19 @@ call 1644 UpdateUnitWeapons
 call 1644 UpdateUnitWeapons
   r Unit#260.posZ 118767926
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   r Unit#261.posX 164044645
   r Unit#261.posZ 148390247
   r Unit#261.heading -116
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 WeaponCanReachUnit
   r UnitDef#157.flags1 0x00958089
   a shooter Unit#261
@@ -11973,47 +12570,78 @@ call 1644 ReleaseWeapons
 call 1644 UpdateUnitWeapons
   r Unit#262.posZ 139104227
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   r Unit#263.posZ 116873456
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   r Unit#264.posX 76074733
   r Unit#264.posZ 117978984
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   r Unit#265.posX 58376921
   r Unit#265.posZ 132464975
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   r Unit#266.posZ 140270853
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   r Unit#267.posZ 135375944
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   r Unit#268.posX 182803605
   r Unit#268.posZ 141174950
   r Unit#268.heading 7747
   r UnitMotion#28.speed 34283
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1644 UpdateUnitWeapons
   r Unit#269.posZ 143128396
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#269 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#269 0 = Unit#13
   i units.QueryScript CobScript#38 "QueryPrimary" (0) null null null = 1
   o p2 (0)
   i units.GetPieceOffset Unit#269 0 = (328244,1998847,840607)
@@ -12025,7 +12653,10 @@ call 1644 UpdateUnitWeapons
   i units.StartScriptWithArgs CobScript#38 "RockUnit" ? 0 2 -771 -213 0 0 = 0
   i services.RecordSimEvent 9 0 [143986496,5079039,143969003,9] 4
   i services.ScheduleEconomySpend = 1
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Game.projectileCount 5
   w Unit#269.workTime 2244
   w Unit#269.netDirtyFlags 1024
@@ -12059,19 +12690,27 @@ call 1644 UpdateUnitWeapons
 call 1644 UpdateUnitWeapons
   r Unit#269.posZ 143069414
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94489355,3771319,58922966)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (95577994,4800512,48878877)
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94489355
+  o y 3771319
+  o z 58922966
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 95577994
+  o y 4800512
+  o z 48878877
   w Unit#274.weapon1ReloadTimer 2
 call 1644 UpdateUnitWeapons
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113267010,3578320,50256800)
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (117437632,3771319,60792290)
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113267010
+  o y 3578320
+  o z 50256800
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 117437632
+  o y 3771319
+  o z 60792290
   w Unit#275.weapon1ReloadTimer 46
 call 1644 UpdateUnitWeapons
   r Unit#275.posX 108877255
@@ -12079,8 +12718,14 @@ call 1644 UpdateUnitWeapons
   r Unit#275.heading -23458
   r UnitMotion#3.speed 163930
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   r Unit#1.posX 95587761
   r Unit#1.posZ 49167602
@@ -12111,20 +12756,30 @@ call 1645 UpdateUnitWeapons
   a unit Unit#1
 call 1645 UpdateUnitWeapons
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (108877255,3246284,58075326)
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (108877255,3246284,58075326)
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
   i units.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
   i units.StartScriptWithArgs CobScript#12 "AimSecondary" ? 0 2 53860 315 0 0 = 1
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 53860 315 0 0 = 0
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon1Flags 23
   w Unit#3.weapon1FireHeading -11676
   w Unit#3.weapon1FirePitch 315
@@ -12147,99 +12802,163 @@ call 1645 ClaimWeapons
   a unit Unit#3
   a unusedEdx 0
   a index 0
-  i units.FindScript CobScript#12 "StartBuilding" = -1
-  i units.StartScriptWithArgs CobScript#12 "TargetCleared" ? 0 1 0 0 0 0 = 0
-  w Unit#3.weapon0TargetX 0
+  i services.SchedPublish 6 28
   w Unit#3.weapon0Flags 3
 call 1645 ClaimWeapons
+  r Unit#3.weapon0TargetX 0
   a unit Unit#3
   a unusedEdx 0
   a index 2
 call 1645 UpdateUnitWeapons
   r rng.seed 0x7768a1ae
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (108877255,3246284,58075326)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 33
 call 1645 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (108877255,3246284,58075326)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (108877255,3246284,58075326)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
   w Unit#5.weapon0ReloadTimer 37
   w Unit#5.weapon1ReloadTimer 25
 call 1645 UpdateUnitWeapons
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (108877255,3246284,58075326)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (108877255,3246284,58075326)
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
   w Unit#6.weapon0ReloadTimer 50
   w Unit#6.weapon1ReloadTimer 79
 call 1645 UpdateUnitWeapons
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (108877255,3246284,58075326)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
   w Unit#8.weapon0ReloadTimer 30
   w Unit#8.weapon1ReloadTimer 26
 call 1645 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon1ReloadTimer 27
 call 1645 UpdateUnitWeapons
   r Unit#9.posX 94489851
   r Unit#9.posZ 58997165
   r UnitMotion#9.speed 45909
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   r rng.seed 0x764ee3c0
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (108877255,3246284,58075326)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
   w Unit#13.weapon1ReloadTimer 9
 call 1645 UpdateUnitWeapons
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 1
-  o pos (108877255,3246284,58075326)
-  i targeting.GetWeaponTargetUnit Unit#14 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (108877255,3246284,58075326)
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
+  i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
   w Unit#14.weapon1ReloadTimer 53
 call 1645 UpdateUnitWeapons
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (108877255,3246284,58075326)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 108877255
+  o y 3246284
+  o z 58075326
   w Unit#15.weapon1ReloadTimer 31
 call 1645 UpdateUnitWeapons
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   a unit Unit#251
 call 1645 UpdateUnitWeapons
@@ -12261,58 +12980,98 @@ call 1645 UpdateUnitWeapons
 call 1645 UpdateUnitWeapons
   r Unit#260.posZ 118686006
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   r Unit#261.posX 164045473
   r Unit#261.posZ 148323081
   r Unit#261.heading -114
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   r Unit#262.posZ 139037053
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   r Unit#263.posZ 116806282
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   r Unit#264.posX 76122235
   r Unit#264.posZ 117931482
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   r Unit#265.posX 58424423
   r Unit#265.posZ 132417473
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   r Unit#266.posZ 140211871
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   r Unit#267.posZ 135316962
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   r Unit#268.posX 182780181
   r Unit#268.posZ 141149104
   r Unit#268.heading 7750
   r UnitMotion#28.speed 34882
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1645 UpdateUnitWeapons
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
   i units.StartScriptWithArgs CobScript#38 "AimPrimary" ? 0 2 0 0 0 0 = 1
   i network.SendScriptCallByName Unit#269 "AimPrimary" 2 0 0 0 0 = 0
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#269.weapon0Flags 19
   w Unit#269.weapon0ReloadTimer 269
 call 1645 WeaponAimCobComplete
@@ -12322,19 +13081,27 @@ call 1645 WeaponAimCobComplete
 call 1645 UpdateUnitWeapons
   r Unit#269.posZ 143010432
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94493295,3771319,58968707)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (95575601,4800512,48947882)
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94493295
+  o y 3771319
+  o z 58968707
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 95575601
+  o y 4800512
+  o z 48947882
   w Unit#274.weapon1ReloadTimer 1
 call 1645 UpdateUnitWeapons
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113261801,3578320,50261841)
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (117437632,3771319,60792290)
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113261801
+  o y 3578320
+  o z 50261841
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 117437632
+  o y 3771319
+  o z 60792290
   w Unit#275.weapon1ReloadTimer 45
 call 1645 UpdateUnitWeapons
   r Unit#275.posX 108997751
@@ -12342,8 +13109,14 @@ call 1645 UpdateUnitWeapons
   r Unit#275.heading -23977
   r UnitMotion#3.speed 162620
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   r Game.projectileCount 4
   r Unit#1.posX 95585224
@@ -12427,32 +13200,51 @@ call 1646 UpdateUnitWeapons
   a unit Unit#1
 call 1646 UpdateUnitWeapons
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   r Unit#3.weapon0TargetX 275
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (108997751,3246284,58184527)
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
   i units.GetAimFromPosition Unit#3 0
   o out (122503554,5472256,46240783)
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (108997751,3246284,58184527)
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon0Flags 2
 call 1646 UpdateUnitWeapons
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (108997751,3246284,58184527)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 32
 call 1646 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (108997751,3246284,58184527)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (108997751,3246284,58184527)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
   w Unit#5.weapon0ReloadTimer 36
   w Unit#5.weapon1ReloadTimer 24
 call 1646 GetWeaponRange
@@ -12475,73 +13267,129 @@ call 1646 ClaimWeapons
 call 1646 UpdateUnitWeapons
   r Unit#5.netDirtyFlags 0
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (108997751,3246284,58184527)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (108997751,3246284,58184527)
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
   w Unit#6.weapon0ReloadTimer 49
   w Unit#6.weapon1ReloadTimer 78
 call 1646 UpdateUnitWeapons
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (108997751,3246284,58184527)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
   w Unit#8.weapon0ReloadTimer 29
   w Unit#8.weapon1ReloadTimer 25
 call 1646 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon1ReloadTimer 26
 call 1646 UpdateUnitWeapons
   r Unit#9.posX 94493718
   r Unit#9.posZ 59042058
   r UnitMotion#9.speed 45058
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (108997751,3246284,58184527)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
   w Unit#13.weapon1ReloadTimer 8
 call 1646 UpdateUnitWeapons
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 1
-  o pos (108997751,3246284,58184527)
-  i targeting.GetWeaponTargetUnit Unit#14 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (108997751,3246284,58184527)
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
+  i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
   w Unit#14.weapon1ReloadTimer 52
 call 1646 UpdateUnitWeapons
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (108997751,3246284,58184527)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 108997751
+  o y 3246284
+  o z 58184527
   w Unit#15.weapon1ReloadTimer 30
 call 1646 UpdateUnitWeapons
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   a unit Unit#251
 call 1646 UpdateUnitWeapons
@@ -12563,66 +13411,110 @@ call 1646 UpdateUnitWeapons
 call 1646 UpdateUnitWeapons
   r Unit#260.posZ 118604086
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   r Unit#261.posX 164046301
   r Unit#261.posZ 148255915
   r Unit#261.heading -113
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   r Unit#262.posZ 138969879
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   r Unit#263.posZ 116739108
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   r Unit#264.posX 76169737
   r Unit#264.posZ 117883980
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   r Unit#265.posX 58471925
   r Unit#265.posZ 132369971
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   r Unit#266.posZ 140152889
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   r Unit#267.posZ 135257980
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   r Unit#268.posX 182756355
   r Unit#268.posZ 141122814
   r Unit#268.heading 7753
   r UnitMotion#28.speed 35481
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1646 UpdateUnitWeapons
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#269.weapon0ReloadTimer 268
 call 1646 UpdateUnitWeapons
   r Unit#269.posZ 142951450
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94497162,3771319,59013600)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (95573185,4800512,49017540)
-  i targeting.GetWeaponTargetUnit Unit#274 1 = Unit#1
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94497162
+  o y 3771319
+  o z 59013600
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 95573185
+  o y 4800512
+  o z 49017540
+  i services.ScheduleTargetingTargetUnit Unit#274 1 = Unit#1
   i units.GetAimFromPosition Unit#274 1
   o out (89768043,3932159,54724910)
   i units.QueryScript CobScript#8 "QuerySecondary" (0) null null null = 1
@@ -12676,11 +13568,15 @@ call 1646 UpdateUnitWeapons
   r Unit#1.heading 32440
   r UnitMotion#1.speed 69471
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113259543,3578320,50263622)
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (117437632,3771319,60792290)
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113259543
+  o y 3578320
+  o z 50263622
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 117437632
+  o y 3771319
+  o z 60792290
   w Unit#275.weapon1ReloadTimer 44
 call 1646 UpdateUnitWeapons
   r Unit#275.posX 109111822
@@ -12688,8 +13584,14 @@ call 1646 UpdateUnitWeapons
   r Unit#275.heading -24496
   r UnitMotion#3.speed 161310
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   r Projectile#0.positionX 98073966
   r Projectile#0.positionY 3512969
@@ -12724,36 +13626,55 @@ call 1647 UpdateUnitWeapons
   r Unit#1.heading 32444
   r UnitMotion#1.speed 70126
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (109111822,3246284,58298598)
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
   i units.GetAimFromPosition Unit#3 0
   o out (122503554,5472256,46240783)
   i units.StartScriptWithArgs CobScript#12 "AimPrimary" ? 0 2 56070 467 0 0 = 1
   i network.SendScriptCallByName Unit#3 "AimPrimary" 2 56070 467 0 0 = 0
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (109111822,3246284,58298598)
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon0Flags 3
   w Unit#3.weapon0FireHeading -9466
   w Unit#3.weapon0FirePitch 467
   w Unit#3.weapons[0].aimCob.nAimCobDone 0
 call 1647 UpdateUnitWeapons
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (109111822,3246284,58298598)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 31
 call 1647 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (109111822,3246284,58298598)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (109111822,3246284,58298598)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
   w Unit#5.weapon0ReloadTimer 35
   w Unit#5.weapon1ReloadTimer 23
 call 1647 WeaponCanReachUnit
@@ -12771,73 +13692,129 @@ call 1647 ClaimWeapons
   a index 2
 call 1647 UpdateUnitWeapons
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (109111822,3246284,58298598)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (109111822,3246284,58298598)
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
   w Unit#6.weapon0ReloadTimer 48
   w Unit#6.weapon1ReloadTimer 77
 call 1647 UpdateUnitWeapons
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (109111822,3246284,58298598)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
   w Unit#8.weapon0ReloadTimer 28
   w Unit#8.weapon1ReloadTimer 24
 call 1647 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon1ReloadTimer 25
 call 1647 UpdateUnitWeapons
   r Unit#9.posX 94497512
   r Unit#9.posZ 59086103
   r UnitMotion#9.speed 44207
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (109111822,3246284,58298598)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
   w Unit#13.weapon1ReloadTimer 7
 call 1647 UpdateUnitWeapons
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 1
-  o pos (109111822,3246284,58298598)
-  i targeting.GetWeaponTargetUnit Unit#14 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (109111822,3246284,58298598)
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
+  i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
   w Unit#14.weapon1ReloadTimer 51
 call 1647 UpdateUnitWeapons
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (109111822,3246284,58298598)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 109111822
+  o y 3246284
+  o z 58298598
   w Unit#15.weapon1ReloadTimer 29
 call 1647 UpdateUnitWeapons
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   a unit Unit#251
 call 1647 UpdateUnitWeapons
@@ -12859,65 +13836,109 @@ call 1647 UpdateUnitWeapons
 call 1647 UpdateUnitWeapons
   r Unit#260.posZ 118522166
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   r Unit#261.posX 164047129
   r Unit#261.posZ 148188749
   r Unit#261.heading -111
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   r Unit#262.posZ 138902705
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   r Unit#263.posZ 116671934
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   r Unit#264.posX 76217239
   r Unit#264.posZ 117836478
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   r Unit#265.posX 58519427
   r Unit#265.posZ 132322469
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   r Unit#266.posZ 140093907
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   r Unit#267.posZ 135198998
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   r Unit#268.posX 182732127
   r Unit#268.posZ 141096080
   r Unit#268.heading 7757
   r UnitMotion#28.speed 36080
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1647 UpdateUnitWeapons
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#269.weapon0ReloadTimer 267
 call 1647 UpdateUnitWeapons
   r Unit#269.posZ 142892468
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94500956,3771319,59057645)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (95570715,4800512,49087806)
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94500956
+  o y 3771319
+  o z 59057645
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 95570715
+  o y 4800512
+  o z 49087806
   i units.GetAimFromPosition Unit#274 1
   o out (89769800,3932159,54722482)
   i units.StartScriptWithArgs CobScript#8 "AimSecondary" ? 0 2 65416 1182 0 0 = 1
@@ -12932,11 +13953,15 @@ call 1647 WeaponAimCobComplete
   w Unit#274.weapons[1].aimCob.nAimCobDone 1
 call 1647 UpdateUnitWeapons
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113259543,3578320,50263622)
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (117437632,3771319,60792290)
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113259543
+  o y 3578320
+  o z 50263622
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 117437632
+  o y 3771319
+  o z 60792290
   w Unit#275.weapon1ReloadTimer 43
 call 1647 UpdateUnitWeapons
   r Unit#275.posX 109219263
@@ -12944,8 +13969,14 @@ call 1647 UpdateUnitWeapons
   r Unit#275.heading -25015
   r UnitMotion#3.speed 160000
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   r Projectile#0.positionX 97338979
   r Projectile#0.positionY 3338770
@@ -12981,88 +14012,146 @@ call 1648 UpdateUnitWeapons
   r Unit#1.heading 32445
   r UnitMotion#1.speed 70781
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (109219263,3246284,58417153)
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (109219263,3246284,58417153)
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
 call 1648 WeaponAimCobComplete
   a callback Unit#3.weapons[1].aimCob
   a result 1
   w Unit#3.weapons[1].aimCob.nAimCobDone 1
 call 1648 UpdateUnitWeapons
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (109219263,3246284,58417153)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 30
 call 1648 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (109219263,3246284,58417153)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (109219263,3246284,58417153)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
   w Unit#5.weapon0ReloadTimer 34
   w Unit#5.weapon1ReloadTimer 22
 call 1648 UpdateUnitWeapons
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (109219263,3246284,58417153)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (109219263,3246284,58417153)
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
   w Unit#6.weapon0ReloadTimer 47
   w Unit#6.weapon1ReloadTimer 76
 call 1648 UpdateUnitWeapons
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (109219263,3246284,58417153)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
   w Unit#8.weapon0ReloadTimer 27
   w Unit#8.weapon1ReloadTimer 23
 call 1648 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon1ReloadTimer 24
 call 1648 UpdateUnitWeapons
   r Unit#9.posX 94501233
   r Unit#9.posZ 59129300
   r UnitMotion#9.speed 43356
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (109219263,3246284,58417153)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
   w Unit#13.weapon1ReloadTimer 6
 call 1648 UpdateUnitWeapons
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 1
-  o pos (109219263,3246284,58417153)
-  i targeting.GetWeaponTargetUnit Unit#14 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (109219263,3246284,58417153)
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
+  i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
   w Unit#14.weapon1ReloadTimer 50
 call 1648 WeaponAimCobComplete
   a callback Unit#14.weapons[0].aimCob
@@ -13070,18 +14159,35 @@ call 1648 WeaponAimCobComplete
   w Unit#14.weapons[0].aimCob.nAimCobDone 1
 call 1648 UpdateUnitWeapons
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (109219263,3246284,58417153)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 109219263
+  o y 3246284
+  o z 58417153
   w Unit#15.weapon1ReloadTimer 28
 call 1648 UpdateUnitWeapons
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   a unit Unit#251
 call 1648 UpdateUnitWeapons
@@ -13103,17 +14209,26 @@ call 1648 UpdateUnitWeapons
 call 1648 UpdateUnitWeapons
   r Unit#260.posZ 118440246
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   r Unit#261.posX 164047957
   r Unit#261.posZ 148121583
   r Unit#261.heading -109
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   r Unit#262.posZ 138835531
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 WeaponCanReachUnit
   a shooter Unit#262
   a target Unit#6
@@ -13126,59 +14241,98 @@ call 1648 ReleaseWeapons
 call 1648 UpdateUnitWeapons
   r Unit#263.posZ 116604760
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   r Unit#264.posX 76264741
   r Unit#264.posZ 117788976
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   r Unit#265.posX 58566929
   r Unit#265.posZ 132274967
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   r Unit#266.posZ 140034925
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   r Unit#267.posZ 135140016
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   r Unit#268.posX 182707497
   r Unit#268.posZ 141068902
   r Unit#268.heading 7760
   r UnitMotion#28.speed 36679
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1648 UpdateUnitWeapons
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#269.weapon0ReloadTimer 266
 call 1648 UpdateUnitWeapons
   r Unit#269.posZ 142833486
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94504677,3771319,59100842)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (95568135,4800512,49158583)
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94504677
+  o y 3771319
+  o z 59100842
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 95568135
+  o y 4800512
+  o z 49158583
   w Unit#274.weapon1ReloadTimer 83
 call 1648 UpdateUnitWeapons
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113259543,3578320,50263622)
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (117437632,3771319,60792290)
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113259543
+  o y 3578320
+  o z 50263622
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 117437632
+  o y 3771319
+  o z 60792290
   w Unit#275.weapon1ReloadTimer 42
 call 1648 UpdateUnitWeapons
   r Unit#275.posX 109319936
@@ -13186,8 +14340,14 @@ call 1648 UpdateUnitWeapons
   r Unit#275.heading -25534
   r UnitMotion#3.speed 158690
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   r Projectile#0.positionX 96603992
   r Projectile#0.positionY 3159474
@@ -13224,105 +14384,180 @@ call 1649 UpdateUnitWeapons
   r Unit#1.heading 32446
   r UnitMotion#1.speed 71436
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (109319936,3246284,58539832)
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (109319936,3246284,58539832)
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   i units.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
   w Unit#3.weapon1Flags 22
 call 1649 UpdateUnitWeapons
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (109319936,3246284,58539832)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 29
 call 1649 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (109319936,3246284,58539832)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (109319936,3246284,58539832)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
   w Unit#5.weapon0ReloadTimer 33
   w Unit#5.weapon1ReloadTimer 21
 call 1649 UpdateUnitWeapons
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (109319936,3246284,58539832)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (109319936,3246284,58539832)
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
   w Unit#6.weapon0ReloadTimer 46
   w Unit#6.weapon1ReloadTimer 75
 call 1649 UpdateUnitWeapons
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (109319936,3246284,58539832)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
   w Unit#8.weapon0ReloadTimer 26
   w Unit#8.weapon1ReloadTimer 22
 call 1649 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon1ReloadTimer 23
 call 1649 UpdateUnitWeapons
   r Unit#9.posX 94504881
   r Unit#9.posZ 59171649
   r UnitMotion#9.speed 42505
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (109319936,3246284,58539832)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
   w Unit#13.weapon1ReloadTimer 5
 call 1649 UpdateUnitWeapons
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 1
-  o pos (109319936,3246284,58539832)
-  i targeting.GetWeaponTargetUnit Unit#14 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
+  i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
   i units.GetAimFromPosition Unit#14 0
   o out (113262592,3915775,47693825)
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (109319936,3246284,58539832)
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
   w Unit#14.weapon0Flags 2
   w Unit#14.weapon1ReloadTimer 49
 call 1649 UpdateUnitWeapons
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (109319936,3246284,58539832)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 109319936
+  o y 3246284
+  o z 58539832
   w Unit#15.weapon1ReloadTimer 27
 call 1649 UpdateUnitWeapons
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   a unit Unit#251
 call 1649 UpdateUnitWeapons
@@ -13344,38 +14579,61 @@ call 1649 UpdateUnitWeapons
 call 1649 UpdateUnitWeapons
   r Unit#260.posZ 118358326
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   r Unit#261.posX 164048785
   r Unit#261.posZ 148054417
   r Unit#261.heading -108
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   r Unit#262.posZ 138768357
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   r Unit#263.posZ 116537586
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   r Unit#264.posX 76312243
   r Unit#264.posZ 117741474
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   r Unit#265.posX 58614431
   r Unit#265.posZ 132227465
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   r Unit#266.posZ 139975943
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 WeaponCanReachUnit
   r UnitDef#138.flags1 0x008d8089
   a shooter Unit#266
@@ -13389,38 +14647,63 @@ call 1649 ReleaseWeapons
 call 1649 UpdateUnitWeapons
   r Unit#267.posZ 135081034
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   r Unit#268.posX 182682464
   r Unit#268.posZ 141041280
   r Unit#268.heading 7764
   r UnitMotion#28.speed 37278
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1649 UpdateUnitWeapons
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#269.weapon0ReloadTimer 265
 call 1649 UpdateUnitWeapons
   r Unit#269.posZ 142774504
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94508325,3771319,59143191)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (95565530,4800512,49230014)
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94508325
+  o y 3771319
+  o z 59143191
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 95565530
+  o y 4800512
+  o z 49230014
   w Unit#274.weapon1ReloadTimer 82
 call 1649 UpdateUnitWeapons
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113259543,3578320,50263622)
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (117437632,3771319,60792290)
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113259543
+  o y 3578320
+  o z 50263622
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 117437632
+  o y 3771319
+  o z 60792290
   w Unit#275.weapon1ReloadTimer 41
 call 1649 UpdateUnitWeapons
   r Unit#275.posX 109413688
@@ -13428,8 +14711,14 @@ call 1649 UpdateUnitWeapons
   r Unit#275.heading -26053
   r UnitMotion#3.speed 157380
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   r Game.projectileCount 3
   r Unit#1.health 3358
@@ -13520,20 +14809,30 @@ call 1650 UpdateUnitWeapons
   r Unit#1.posZ 49590014
   r UnitMotion#1.speed 72091
   a unit Unit#2
-  i targeting.GetWeaponTargetPos Unit#2 0 = 0
-  i targeting.GetWeaponTargetPos Unit#2 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#2 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#2 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   a unit Unit#3
-  i targeting.GetWeaponTargetPos Unit#3 0 = 1
-  o pos (109413688,3246284,58666243)
-  i targeting.GetWeaponTargetUnit Unit#3 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#3 1 = 1
-  o pos (109413688,3246284,58666243)
+  i services.ScheduleTargetingTargetPos Unit#3 0 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
+  i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#3 1 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
   i units.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
   i units.StartScriptWithArgs CobScript#12 "AimSecondary" ? 0 2 54377 332 0 0 = 1
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 54377 332 0 0 = 0
-  i targeting.GetWeaponTargetUnit Unit#3 1 = Unit#275
+  i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon1Flags 23
   w Unit#3.weapon1FireHeading -11159
   w Unit#3.weapon1FirePitch 332
@@ -13544,44 +14843,68 @@ call 1650 WeaponAimCobComplete
   w Unit#3.weapons[0].aimCob.nAimCobDone 1
 call 1650 UpdateUnitWeapons
   a unit Unit#4
-  i targeting.GetWeaponTargetPos Unit#4 0 = 1
-  o pos (109413688,3246284,58666243)
-  i targeting.GetWeaponTargetPos Unit#4 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#4 0 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
+  i services.ScheduleTargetingTargetPos Unit#4 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#4.weapon0ReloadTimer 28
 call 1650 UpdateUnitWeapons
   a unit Unit#5
-  i targeting.GetWeaponTargetPos Unit#5 0 = 1
-  o pos (109413688,3246284,58666243)
-  i targeting.GetWeaponTargetPos Unit#5 1 = 1
-  o pos (109413688,3246284,58666243)
+  i services.ScheduleTargetingTargetPos Unit#5 0 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
+  i services.ScheduleTargetingTargetPos Unit#5 1 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
   w Unit#5.weapon0ReloadTimer 32
   w Unit#5.weapon1ReloadTimer 20
 call 1650 UpdateUnitWeapons
   a unit Unit#6
-  i targeting.GetWeaponTargetPos Unit#6 0 = 1
-  o pos (109413688,3246284,58666243)
-  i targeting.GetWeaponTargetPos Unit#6 1 = 1
-  o pos (109413688,3246284,58666243)
+  i services.ScheduleTargetingTargetPos Unit#6 0 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
+  i services.ScheduleTargetingTargetPos Unit#6 1 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
   w Unit#6.weapon0ReloadTimer 45
   w Unit#6.weapon1ReloadTimer 74
 call 1650 UpdateUnitWeapons
   a unit Unit#7
-  i targeting.GetWeaponTargetPos Unit#7 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#7 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   a unit Unit#8
-  i targeting.GetWeaponTargetPos Unit#8 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetPos Unit#8 1 = 1
-  o pos (109413688,3246284,58666243)
+  i services.ScheduleTargetingTargetPos Unit#8 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetPos Unit#8 1 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
   w Unit#8.weapon0ReloadTimer 25
   w Unit#8.weapon1ReloadTimer 21
 call 1650 UpdateUnitWeapons
   a unit Unit#9
-  i targeting.GetWeaponTargetPos Unit#9 0 = 1
-  o pos (90701823,3246284,54001665)
-  i targeting.GetWeaponTargetUnit Unit#9 0 = Unit#274
-  i targeting.GetWeaponTargetPos Unit#9 1 = 1
-  o pos (90701823,3246284,54001665)
+  i services.ScheduleTargetingTargetPos Unit#9 0 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
+  i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
+  i services.ScheduleTargetingTargetPos Unit#9 1 = 1
+  o x 90701823
+  o y 3246284
+  o z 54001665
   w Unit#9.weapon1ReloadTimer 22
 call 1650 WeaponCanReachUnit
   a shooter Unit#9
@@ -13592,11 +14915,10 @@ call 1650 ClaimWeapons
   a unit Unit#9
   a unusedEdx 0
   a index 0
-  i units.FindScript CobScript#9 "StartBuilding" = -1
-  i units.StartScriptWithArgs CobScript#9 "TargetCleared" ? 0 1 0 0 0 0 = 0
-  w Unit#9.weapon0TargetX 0
+  i services.SchedPublish 6 28
   w Unit#9.weapon0Flags 3
 call 1650 ClaimWeapons
+  r Unit#9.weapon0TargetX 0
   a unit Unit#9
   a unusedEdx 0
   a index 2
@@ -13607,32 +14929,56 @@ call 1650 UpdateUnitWeapons
   r Unit#9.weapon0TargetX 274
   r UnitMotion#9.speed 41654
   a unit Unit#10
-  i targeting.GetWeaponTargetPos Unit#10 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#10 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   a unit Unit#11
-  i targeting.GetWeaponTargetPos Unit#11 0 = 0
-  i targeting.GetWeaponTargetPos Unit#11 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#11 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#11 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   a unit Unit#12
-  i targeting.GetWeaponTargetPos Unit#12 0 = 0
-  i targeting.GetWeaponTargetPos Unit#12 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#12 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#12 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   a unit Unit#13
-  i targeting.GetWeaponTargetPos Unit#13 0 = 0
-  i targeting.GetWeaponTargetPos Unit#13 1 = 1
-  o pos (109413688,3246284,58666243)
+  i services.ScheduleTargetingTargetPos Unit#13 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#13 1 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
   w Unit#13.weapon1ReloadTimer 4
 call 1650 UpdateUnitWeapons
   a unit Unit#14
-  i targeting.GetWeaponTargetPos Unit#14 0 = 1
-  o pos (109413688,3246284,58666243)
+  i services.ScheduleTargetingTargetPos Unit#14 0 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
   i units.GetAimFromPosition Unit#14 0
   o out (113262592,3915775,47693825)
   i units.StartScriptWithArgs CobScript#6 "AimPrimary" ? 0 2 62017 64947 0 0 = 1
   i network.SendScriptCallByName Unit#14 "AimPrimary" 2 62017 64947 0 0 = 0
-  i targeting.GetWeaponTargetUnit Unit#14 0 = Unit#275
-  i targeting.GetWeaponTargetPos Unit#14 1 = 1
-  o pos (109413688,3246284,58666243)
+  i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
+  i services.ScheduleTargetingTargetPos Unit#14 1 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
   w Unit#14.weapon0Flags 3
   w Unit#14.weapon0FireHeading -3519
   w Unit#14.weapon0FirePitch -589
@@ -13640,19 +14986,36 @@ call 1650 UpdateUnitWeapons
   w Unit#14.weapons[0].aimCob.nAimCobDone 0
 call 1650 UpdateUnitWeapons
   a unit Unit#15
-  i targeting.GetWeaponTargetPos Unit#15 0 = 0
-  i targeting.GetWeaponTargetPos Unit#15 1 = 1
-  o pos (109413688,3246284,58666243)
+  i services.ScheduleTargetingTargetPos Unit#15 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#15 1 = 1
+  o x 109413688
+  o y 3246284
+  o z 58666243
   w Unit#15.weapon1ReloadTimer 26
 call 1650 UpdateUnitWeapons
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
-  i targeting.GetWeaponTargetPos Unit#16 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#16 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   r rng.seed 0x58a1737f
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
-  i targeting.GetWeaponTargetPos Unit#17 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#17 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   a unit Unit#251
 call 1650 UpdateUnitWeapons
@@ -13674,31 +15037,49 @@ call 1650 UpdateUnitWeapons
 call 1650 UpdateUnitWeapons
   r Unit#260.posZ 118276406
   a unit Unit#260
-  i targeting.GetWeaponTargetPos Unit#260 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#260 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   r Unit#261.posX 164049613
   r Unit#261.posZ 147987251
   r Unit#261.heading -106
   a unit Unit#261
-  i targeting.GetWeaponTargetPos Unit#261 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#261 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   r Unit#262.posZ 138701183
   a unit Unit#262
-  i targeting.GetWeaponTargetPos Unit#262 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#262 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   r Unit#263.posZ 116470412
   a unit Unit#263
-  i targeting.GetWeaponTargetPos Unit#263 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#263 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   r Unit#264.posX 76359745
   r Unit#264.posZ 117693972
   a unit Unit#264
-  i targeting.GetWeaponTargetPos Unit#264 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#264 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   r Unit#265.posX 58661933
   r Unit#265.posZ 132179963
   a unit Unit#265
-  i targeting.GetWeaponTargetPos Unit#265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 WeaponCanReachUnit
   r UnitDef#75.flags1 0x00958089
   a shooter Unit#265
@@ -13712,15 +15093,26 @@ call 1650 ReleaseWeapons
 call 1650 UpdateUnitWeapons
   r Unit#266.posZ 139916961
   a unit Unit#266
-  i targeting.GetWeaponTargetPos Unit#266 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetUnit Unit#266 0 = Unit#13
-  i targeting.GetWeaponTargetPos Unit#266 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#266 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetUnit Unit#266 0 = Unit#13
+  i services.ScheduleTargetingTargetPos Unit#266 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   r Unit#267.posZ 135022052
   a unit Unit#267
-  i targeting.GetWeaponTargetPos Unit#267 0 = 0
-  i targeting.GetWeaponTargetPos Unit#267 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#267 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#267 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   r Unit#268.flags 0x90240001
   r Unit#268.posX 182657029
@@ -13728,30 +15120,49 @@ call 1650 UpdateUnitWeapons
   r Unit#268.heading 7768
   r UnitMotion#28.speed 29491
   a unit Unit#268
-  i targeting.GetWeaponTargetPos Unit#268 0 = 0
-  i targeting.GetWeaponTargetPos Unit#268 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#268 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#268 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 1650 UpdateUnitWeapons
   a unit Unit#269
-  i targeting.GetWeaponTargetPos Unit#269 0 = 1
-  o pos (123748351,3571711,70148095)
-  i targeting.GetWeaponTargetPos Unit#269 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#269 0 = 1
+  o x 123748351
+  o y 3571711
+  o z 70148095
+  i services.ScheduleTargetingTargetPos Unit#269 1 = 0
+  o x 0
+  o y 0
+  o z 0
   w Unit#269.weapon0ReloadTimer 264
 call 1650 UpdateUnitWeapons
   r Unit#269.posZ 142715522
   a unit Unit#274
-  i targeting.GetWeaponTargetPos Unit#274 0 = 1
-  o pos (94511900,3771319,59184692)
-  i targeting.GetWeaponTargetUnit Unit#274 0 = Unit#9
-  i targeting.GetWeaponTargetPos Unit#274 1 = 1
-  o pos (95562872,4800512,49302052)
+  i services.ScheduleTargetingTargetPos Unit#274 0 = 1
+  o x 94511900
+  o y 3771319
+  o z 59184692
+  i services.ScheduleTargetingTargetUnit Unit#274 0 = Unit#9
+  i services.ScheduleTargetingTargetPos Unit#274 1 = 1
+  o x 95562872
+  o y 4800512
+  o z 49302052
   w Unit#274.weapon1ReloadTimer 81
 call 1650 UpdateUnitWeapons
   a unit Unit#275
-  i targeting.GetWeaponTargetPos Unit#275 0 = 1
-  o pos (113264803,3578067,50259179)
-  i targeting.GetWeaponTargetUnit Unit#275 0 = Unit#14
-  i targeting.GetWeaponTargetPos Unit#275 1 = 1
-  o pos (117437632,3771319,60792290)
+  i services.ScheduleTargetingTargetPos Unit#275 0 = 1
+  o x 113264803
+  o y 3578067
+  o z 50259179
+  i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
+  i services.ScheduleTargetingTargetPos Unit#275 1 = 1
+  o x 117437632
+  o y 3771319
+  o z 60792290
   w Unit#275.weapon1ReloadTimer 40
 call 1650 UpdateUnitWeapons
   r rng.seed 0x4fa5c44e
@@ -13760,5 +15171,11 @@ call 1650 UpdateUnitWeapons
   r Unit#275.heading -26572
   r UnitMotion#3.speed 156070
   a unit Unit#276
-  i targeting.GetWeaponTargetPos Unit#276 0 = 0
-  i targeting.GetWeaponTargetPos Unit#276 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#276 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#276 1 = 0
+  o x 0
+  o y 0
+  o z 0

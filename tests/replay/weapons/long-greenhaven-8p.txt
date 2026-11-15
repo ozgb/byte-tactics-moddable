@@ -9263,8 +9263,14 @@ call 30518 UpdateUnitWeapons
   r Unit#265.weapons[1].aimCob.nAimCobDone 0
   r Unit#265.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1
-  i targeting.GetWeaponTargetPos Unit#1 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#2.health 170
   r Unit#2.def UnitDef#78
@@ -10018,7 +10024,10 @@ call 30518 UpdateUnitWeapons
   r Unit#16.weapons[1].aimCob.nAimCobDone 0
   r Unit#16.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#16
-  i targeting.GetWeaponTargetPos Unit#16 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#16 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#17.health 470
   r Unit#17.def UnitDef#67
@@ -10086,7 +10095,10 @@ call 30518 UpdateUnitWeapons
   r Unit#17.weapons[1].aimCob.nAimCobDone 0
   r Unit#17.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#17
-  i targeting.GetWeaponTargetPos Unit#17 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#17 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#18.health 326
   r Unit#18.def UnitDef#112
@@ -10298,7 +10310,10 @@ call 30518 UpdateUnitWeapons
   r Unit#21.weapons[1].aimCob.nAimCobDone 0
   r Unit#21.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#21
-  i targeting.GetWeaponTargetPos Unit#21 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#21 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#22.health 1850
   r Unit#22.def UnitDef#14
@@ -10515,7 +10530,10 @@ call 30518 UpdateUnitWeapons
   r Unit#25.weapons[1].aimCob.nAimCobDone 0
   r Unit#25.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#25
-  i targeting.GetWeaponTargetPos Unit#25 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#25 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#26.health 850
   r Unit#26.def UnitDef#134
@@ -10565,8 +10583,14 @@ call 30518 UpdateUnitWeapons
   r Unit#26.weapons[1].aimCob.nAimCobDone 0
   r Unit#26.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#26
-  i targeting.GetWeaponTargetPos Unit#26 0 = 0
-  i targeting.GetWeaponTargetPos Unit#26 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#26 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#26 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#27.health 75
   r Unit#27.def UnitDef#54
@@ -10634,7 +10658,10 @@ call 30518 UpdateUnitWeapons
   r Unit#27.weapons[1].aimCob.nAimCobDone 0
   r Unit#27.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#27
-  i targeting.GetWeaponTargetPos Unit#27 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#27 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#28.health 43
   r Unit#28.def UnitDef#91
@@ -10785,7 +10812,10 @@ call 30518 UpdateUnitWeapons
   r Unit#30.weapons[1].aimCob.nAimCobDone 0
   r Unit#30.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#30
-  i targeting.GetWeaponTargetPos Unit#30 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#30 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#501.health 3000
   r Unit#501.def UnitDef#34
@@ -10835,8 +10865,14 @@ call 30518 UpdateUnitWeapons
   r Unit#501.weapons[1].aimCob.nAimCobDone 0
   r Unit#501.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#501
-  i targeting.GetWeaponTargetPos Unit#501 0 = 0
-  i targeting.GetWeaponTargetPos Unit#501 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#501 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#501 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#502.health 170
   r Unit#502.def UnitDef#78
@@ -11029,7 +11065,10 @@ call 30518 UpdateUnitWeapons
   r Unit#505.weapons[1].aimCob.nAimCobDone 0
   r Unit#505.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#505
-  i targeting.GetWeaponTargetPos Unit#505 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#505 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#506.health 170
   r Unit#506.def UnitDef#78
@@ -11241,7 +11280,10 @@ call 30518 UpdateUnitWeapons
   r Unit#509.weapons[1].aimCob.nAimCobDone 0
   r Unit#509.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#509
-  i targeting.GetWeaponTargetPos Unit#509 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#509 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#510.health 176
   r Unit#510.def UnitDef#135
@@ -11550,7 +11592,10 @@ call 30518 UpdateUnitWeapons
   r Unit#515.weapons[1].aimCob.nAimCobDone 0
   r Unit#515.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#515
-  i targeting.GetWeaponTargetPos Unit#515 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#515 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#516.health 700
   r Unit#516.def UnitDef#32
@@ -11891,7 +11936,10 @@ call 30518 UpdateUnitWeapons
   r Unit#522.weapons[1].aimCob.nAimCobDone 0
   r Unit#522.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#522
-  i targeting.GetWeaponTargetPos Unit#522 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#522 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#523.health 870
   r Unit#523.def UnitDef#39
@@ -11991,9 +12039,14 @@ call 30518 UpdateUnitWeapons
   a unit Unit#524
 call 30518 UpdateUnitWeapons
   a unit Unit#526
-  i targeting.GetWeaponTargetPos Unit#526 0 = 1
-  o pos (478936456,6607804,146381921)
-  i targeting.GetWeaponTargetPos Unit#526 1 = 0
+  i services.ScheduleTargetingTargetPos Unit#526 0 = 1
+  o x 478936456
+  o y 6607804
+  o z 146381921
+  i services.ScheduleTargetingTargetPos Unit#526 1 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#527.health 326
   r Unit#527.def UnitDef#112
@@ -12431,8 +12484,10 @@ call 30518 UpdateUnitWeapons
   a unit Unit#536
 call 30518 UpdateUnitWeapons
   a unit Unit#539
-  i targeting.GetWeaponTargetPos Unit#539 0 = 1
-  o pos (478936456,6607804,146381921)
+  i services.ScheduleTargetingTargetPos Unit#539 0 = 1
+  o x 478936456
+  o y 6607804
+  o z 146381921
   w Unit#539.weapon0ReloadTimer 28
 call 30518 UpdateUnitWeapons
   r Unit#540.health 170
@@ -12633,8 +12688,14 @@ call 30518 UpdateUnitWeapons
   r Unit#751.weapons[1].aimCob.nAimCobDone 0
   r Unit#751.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#751
-  i targeting.GetWeaponTargetPos Unit#751 0 = 0
-  i targeting.GetWeaponTargetPos Unit#751 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#751 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#751 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#752.health 175
   r Unit#752.def UnitDef#208
@@ -13192,7 +13253,10 @@ call 30518 UpdateUnitWeapons
   r Unit#762.weapons[1].aimCob.nAimCobDone 0
   r Unit#762.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#762
-  i targeting.GetWeaponTargetPos Unit#762 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#762 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#763.health 175
   r Unit#763.def UnitDef#208
@@ -13597,7 +13661,10 @@ call 30518 UpdateUnitWeapons
   r Unit#770.weapons[1].aimCob.nAimCobDone 0
   r Unit#770.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#770
-  i targeting.GetWeaponTargetPos Unit#770 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#770 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#771.health 988
   r Unit#771.def UnitDef#273
@@ -13664,7 +13731,10 @@ call 30518 UpdateUnitWeapons
   r Unit#771.weapons[1].aimCob.nAimCobDone 0
   r Unit#771.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#771
-  i targeting.GetWeaponTargetPos Unit#771 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#771 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#772.health 175
   r Unit#772.def UnitDef#208
@@ -14367,7 +14437,10 @@ call 30518 UpdateUnitWeapons
   r Unit#785.weapons[1].aimCob.nAimCobDone 0
   r Unit#785.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#785
-  i targeting.GetWeaponTargetPos Unit#785 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#785 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#786.health 2273
   r Unit#786.def UnitDef#275
@@ -14484,7 +14557,10 @@ call 30518 UpdateUnitWeapons
   r Unit#787.weapons[1].aimCob.nAimCobDone 0
   r Unit#787.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#787
-  i targeting.GetWeaponTargetPos Unit#787 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#787 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#788.health 168
   r Unit#788.def UnitDef#208
@@ -14584,8 +14660,14 @@ call 30518 UpdateUnitWeapons
   r Unit#1001.weapons[1].aimCob.nAimCobDone 0
   r Unit#1001.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1001
-  i targeting.GetWeaponTargetPos Unit#1001 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1001 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1001 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1001 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1002.health 170
   r Unit#1002.def UnitDef#78
@@ -16105,7 +16187,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1032.weapons[1].aimCob.nAimCobDone 0
   r Unit#1032.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1032
-  i targeting.GetWeaponTargetPos Unit#1032 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1032 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1033.health 360
   r Unit#1033.def UnitDef#65
@@ -16203,7 +16288,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1034.weapons[1].aimCob.nAimCobDone 0
   r Unit#1034.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1034
-  i targeting.GetWeaponTargetPos Unit#1034 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1034 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1035.health 295
   r Unit#1035.def UnitDef#97
@@ -16252,7 +16340,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1035.weapons[1].aimCob.nAimCobDone 0
   r Unit#1035.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1035
-  i targeting.GetWeaponTargetPos Unit#1035 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1035 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1036.health 729
   r Unit#1036.def UnitDef#68
@@ -16446,8 +16537,14 @@ call 30518 UpdateUnitWeapons
   r Unit#1251.weapons[1].aimCob.nAimCobDone 0
   r Unit#1251.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1251
-  i targeting.GetWeaponTargetPos Unit#1251 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1251 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1251 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1251 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1252.health 175
   r Unit#1252.def UnitDef#208
@@ -17140,7 +17237,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1265.weapons[1].aimCob.nAimCobDone 0
   r Unit#1265.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1265
-  i targeting.GetWeaponTargetPos Unit#1265 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1265 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1266.health 710
   r Unit#1266.def UnitDef#165
@@ -17547,7 +17647,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1273.weapons[1].aimCob.nAimCobDone 0
   r Unit#1273.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1273
-  i targeting.GetWeaponTargetPos Unit#1273 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1273 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1274.health 1925
   r Unit#1274.def UnitDef#147
@@ -17933,7 +18036,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1281.weapons[1].aimCob.nAimCobDone 0
   r Unit#1281.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1281
-  i targeting.GetWeaponTargetPos Unit#1281 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1281 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1282.health 320
   r Unit#1282.def UnitDef#246
@@ -18129,8 +18235,10 @@ call 30518 UpdateUnitWeapons
   a unit Unit#1285
 call 30518 UpdateUnitWeapons
   a unit Unit#1286
-  i targeting.GetWeaponTargetPos Unit#1286 0 = 1
-  o pos (461445326,6062080,133709344)
+  i services.ScheduleTargetingTargetPos Unit#1286 0 = 1
+  o x 461445326
+  o y 6062080
+  o z 133709344
   w Unit#1286.weapon0ReloadTimer 84
 call 30518 UpdateUnitWeapons
   r Unit#1287.health 179
@@ -18229,7 +18337,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1288.weapons[1].aimCob.nAimCobDone 0
   r Unit#1288.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1288
-  i targeting.GetWeaponTargetPos Unit#1288 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1288 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1289.health 175
   r Unit#1289.def UnitDef#208
@@ -18715,11 +18826,16 @@ call 30518 UpdateUnitWeapons
   r Unit#1300.weapons[1].aimCob.nAimCobDone 0
   r Unit#1300.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1300
-  i targeting.GetWeaponTargetPos Unit#1300 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1300 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   a unit Unit#1301
-  i targeting.GetWeaponTargetPos Unit#1301 0 = 1
-  o pos (466474246,6654115,105463499)
+  i services.ScheduleTargetingTargetPos Unit#1301 0 = 1
+  o x 466474246
+  o y 6654115
+  o z 105463499
 call 30518 UpdateUnitWeapons
   r Unit#1302.health 320
   r Unit#1302.def UnitDef#246
@@ -19012,7 +19128,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1307.weapons[1].aimCob.nAimCobDone 0
   r Unit#1307.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1307
-  i targeting.GetWeaponTargetPos Unit#1307 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1307 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1308.health 676
   r Unit#1308.def UnitDef#147
@@ -19162,7 +19281,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1310.weapons[1].aimCob.nAimCobDone 0
   r Unit#1310.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1310
-  i targeting.GetWeaponTargetPos Unit#1310 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1310 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1311.health 555
   r Unit#1311.def UnitDef#204
@@ -19211,7 +19333,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1311.weapons[1].aimCob.nAimCobDone 0
   r Unit#1311.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1311
-  i targeting.GetWeaponTargetPos Unit#1311 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1311 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1312.health 249
   r Unit#1312.def UnitDef#232
@@ -19260,7 +19385,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1312.weapons[1].aimCob.nAimCobDone 0
   r Unit#1312.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1312
-  i targeting.GetWeaponTargetPos Unit#1312 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1312 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1501.health 3000
   r Unit#1501.def UnitDef#34
@@ -19310,8 +19438,14 @@ call 30518 UpdateUnitWeapons
   r Unit#1501.weapons[1].aimCob.nAimCobDone 0
   r Unit#1501.weapons[2].aimCob.nAimCobDone 1
   a unit Unit#1501
-  i targeting.GetWeaponTargetPos Unit#1501 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1501 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1501 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1501 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1502.health 170
   r Unit#1502.def UnitDef#78
@@ -19696,8 +19830,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1509.weapons[1].aimCob.nAimCobDone 0
   r Unit#1509.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1509
-  i targeting.GetWeaponTargetPos Unit#1509 0 = 1
-  o pos (307938559,7512063,457741257)
+  i services.ScheduleTargetingTargetPos Unit#1509 0 = 1
+  o x 307938559
+  o y 7512063
+  o z 457741257
   w Unit#1509.weapon0ReloadTimer 26
 call 30518 UpdateUnitWeapons
   r Unit#1510.health 295
@@ -19747,8 +19883,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1510.weapons[1].aimCob.nAimCobDone 0
   r Unit#1510.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1510
-  i targeting.GetWeaponTargetPos Unit#1510 0 = 1
-  o pos (307938559,7512063,457741257)
+  i services.ScheduleTargetingTargetPos Unit#1510 0 = 1
+  o x 307938559
+  o y 7512063
+  o z 457741257
   w Unit#1510.weapon0ReloadTimer 22
 call 30518 UpdateUnitWeapons
   r Unit#1511.health 2580
@@ -20864,8 +21002,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1541.weapons[1].aimCob.nAimCobDone 0
   r Unit#1541.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1541
-  i targeting.GetWeaponTargetPos Unit#1541 0 = 1
-  o pos (307938559,7512063,457741257)
+  i services.ScheduleTargetingTargetPos Unit#1541 0 = 1
+  o x 307938559
+  o y 7512063
+  o z 457741257
   w Unit#1541.weapon0ReloadTimer 17
 call 30518 UpdateUnitWeapons
   r Unit#1542.health 2009
@@ -21111,8 +21251,14 @@ call 30518 UpdateUnitWeapons
   r Unit#1751.weapons[2].aimCob.nAimCobDone 0
   r Unit#1514.netDirtyFlags -32768
   a unit Unit#1751
-  i targeting.GetWeaponTargetPos Unit#1751 0 = 0
-  i targeting.GetWeaponTargetPos Unit#1751 2 = 0
+  i services.ScheduleTargetingTargetPos Unit#1751 0 = 0
+  o x 0
+  o y 0
+  o z 0
+  i services.ScheduleTargetingTargetPos Unit#1751 2 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1752.health 175
   r Unit#1752.def UnitDef#208
@@ -21883,8 +22029,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1767.weapons[1].aimCob.nAimCobDone 0
   r Unit#1767.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1767
-  i targeting.GetWeaponTargetPos Unit#1767 0 = 1
-  o pos (306705361,6163922,20463316)
+  i services.ScheduleTargetingTargetPos Unit#1767 0 = 1
+  o x 306705361
+  o y 6163922
+  o z 20463316
   w Unit#1767.weapon0ReloadTimer 45
 call 30518 UpdateUnitWeapons
   r Unit#1768.health 1925
@@ -22659,9 +22807,11 @@ call 30518 UpdateUnitWeapons
   r Unit#1783.weapons[1].aimCob.nAimCobDone 0
   r Unit#1783.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1783
-  i targeting.GetWeaponTargetPos Unit#1783 0 = 1
-  o pos (306708480,5505024,20447232)
-  i targeting.GetWeaponTargetUnit Unit#1783 0 = null
+  i services.ScheduleTargetingTargetPos Unit#1783 0 = 1
+  o x 306708480
+  o y 5505024
+  o z 20447232
+  i services.ScheduleTargetingTargetUnit Unit#1783 0 = null
   i units.QueryScript CobScript#275 "QueryPrimary" (0) null null null = 1
   o p2 (0)
   i units.GetPieceOffset Unit#1783 0 = (221111,0,-43982)
@@ -22888,7 +23038,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1787.weapons[1].aimCob.nAimCobDone 0
   r Unit#1787.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1787
-  i targeting.GetWeaponTargetPos Unit#1787 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1787 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1788.health 307
   r Unit#1788.def UnitDef#241
@@ -22938,7 +23091,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1788.weapons[1].aimCob.nAimCobDone 0
   r Unit#1788.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1788
-  i targeting.GetWeaponTargetPos Unit#1788 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1788 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1789.health 320
   r Unit#1789.def UnitDef#246
@@ -23084,7 +23240,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1791.weapons[1].aimCob.nAimCobDone 0
   r Unit#1791.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1791
-  i targeting.GetWeaponTargetPos Unit#1791 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1791 0 = 0
+  o x 0
+  o y 0
+  o z 0
 call 30518 UpdateUnitWeapons
   r Unit#1792.health 160
   r Unit#1792.def UnitDef#246
@@ -23278,4 +23437,7 @@ call 30518 UpdateUnitWeapons
   r Unit#1795.weapons[1].aimCob.nAimCobDone 0
   r Unit#1795.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1795
-  i targeting.GetWeaponTargetPos Unit#1795 0 = 0
+  i services.ScheduleTargetingTargetPos Unit#1795 0 = 0
+  o x 0
+  o y 0
+  o z 0

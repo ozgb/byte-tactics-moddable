@@ -1,8 +1,7 @@
 bt-replay 2
-subsystem targeting 1.1
+subsystem targeting 2.0
 call 740 GetWeaponTargetPos
   r Game.seaLevel 0
-  r Unit#1.script CobScript#1
   r Unit#1.unitDefIndex 34
   r Unit#1.killCount 0
   r Unit#1.motion UnitMotion#1
@@ -38,7 +37,6 @@ call 740 GetWeaponTargetPos
   a weapon 2
   o result 0
 call 740 GetWeaponTargetPos
-  r Unit#3.script CobScript#2
   r Unit#3.unitDefIndex 71
   r Unit#3.killCount 0
   r Unit#3.motion null
@@ -63,7 +61,6 @@ call 740 GetWeaponTargetPos
   a weapon 0
   o result 0
 call 740 GetWeaponTargetPos
-  r Unit#251.script CobScript#3
   r Unit#251.unitDefIndex 167
   r Unit#251.killCount 0
   r Unit#251.motion UnitMotion#2
@@ -129,17 +126,17 @@ call 742 FindBestTargetIfFireAtWill
   r rng.main 0xea405842
   r rng.load 0x5cbf709b
   r rng.seed 0x4624ad09
-  r Unit#1.def UnitDef#1
+  r Unit#1.def UnitDef#34
   r Unit#1.player Player#0
   r Unit#1.flags 0x90e80321
   r Unit#1.activateFlags 1
   r Unit#1.playerIndex 0
-  r UnitDef#1.flags1 0x0495c0c8
-  r UnitDef#1.range 290
-  r UnitDef#1.categories UnitTypeSet#1
-  r UnitDef#1.weaponCategories0 UnitTypeSet#1
-  r UnitDef#1.weaponCategories1 UnitTypeSet#2
-  r UnitDef#1.weaponCategories2 UnitTypeSet#2
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.range 290
+  r UnitDef#34.categories UnitTypeSet#1
+  r UnitDef#34.weaponCategories0 UnitTypeSet#1
+  r UnitDef#34.weaponCategories1 UnitTypeSet#2
+  r UnitDef#34.weaponCategories2 UnitTypeSet#2
   r Player#0.active 1
   r Player#0.type 1
   r UnitTypeSet#1.bits x:0800a0244000088020000028000d00080008101002088000c000000000a0020010c0010000000000000000000000000000000000000000000000000000000000
@@ -315,15 +312,35 @@ call 750 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
   o result 0
-call 750 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
-call 750 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 1
-call 750 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 2
+call 750 Apply
+  r Unit#1.id 1
+  r Unit#1.netDirtyFlags 4
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
+call 750 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
+call 750 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 750 GetWeaponTargetPos
   a unit Unit#3
   a weapon 0
@@ -536,15 +553,33 @@ call 760 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
   o result 0
-call 760 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
-call 760 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 1
-call 760 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 2
+call 760 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
+call 760 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
+call 760 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 760 GetWeaponTargetPos
   a unit Unit#3
   a weapon 0

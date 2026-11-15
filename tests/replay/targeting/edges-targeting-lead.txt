@@ -1,6 +1,8 @@
 bt-replay 2
-subsystem targeting 1.1
-call 0 ResetWeaponTarget
+subsystem targeting 2.0
+call 0 Apply
+  r Unit#1.id 1
+  r Unit#1.netDirtyFlags 0
   r Unit#1.weapon0TargetX 0
   r Unit#1.weapon0TargetZ 0
   r Unit#1.weapon0Def null
@@ -13,18 +15,38 @@ call 0 ResetWeaponTarget
   r Unit#1.weapon2TargetZ 0
   r Unit#1.weapon2Def null
   r Unit#1.weapon2Flags 0
-  a unit Unit#1
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#1.weapon0TargetZ -32768
-call 0 ResetWeaponTarget
-  a unit Unit#1
-  a weapon 1
+  o result 1
+call 0 Apply
+  a event.kind 99
+  a event.unit Unit#1
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#1.weapon1TargetZ -32768
-call 0 ResetWeaponTarget
-  a unit Unit#1
-  a weapon 2
+  o result 1
+call 0 Apply
+  a event.kind 99
+  a event.unit Unit#1
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#1.weapon2TargetZ -32768
-call 0 ResetWeaponTarget
+  o result 1
+call 0 Apply
+  r Unit#251.id 251
+  r Unit#251.netDirtyFlags 0
   r Unit#251.weapon0TargetX 0
   r Unit#251.weapon0TargetZ 0
   r Unit#251.weapon0Def null
@@ -37,18 +59,38 @@ call 0 ResetWeaponTarget
   r Unit#251.weapon2TargetZ 0
   r Unit#251.weapon2Def null
   r Unit#251.weapon2Flags 0
-  a unit Unit#251
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#251
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#251.weapon0TargetZ -32768
-call 0 ResetWeaponTarget
-  a unit Unit#251
-  a weapon 1
+  o result 1
+call 0 Apply
+  a event.kind 99
+  a event.unit Unit#251
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#251.weapon1TargetZ -32768
-call 0 ResetWeaponTarget
-  a unit Unit#251
-  a weapon 2
+  o result 1
+call 0 Apply
+  a event.kind 99
+  a event.unit Unit#251
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#251.weapon2TargetZ -32768
-call 0 ResetWeaponTarget
+  o result 1
+call 0 Apply
+  r Unit#501.id 501
+  r Unit#501.netDirtyFlags 0
   r Unit#501.weapon0TargetX 0
   r Unit#501.weapon0TargetZ 0
   r Unit#501.weapon0Def null
@@ -61,17 +103,35 @@ call 0 ResetWeaponTarget
   r Unit#501.weapon2TargetZ 0
   r Unit#501.weapon2Def null
   r Unit#501.weapon2Flags 0
-  a unit Unit#501
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#501.weapon0TargetZ -32768
-call 0 ResetWeaponTarget
-  a unit Unit#501
-  a weapon 1
+  o result 1
+call 0 Apply
+  a event.kind 99
+  a event.unit Unit#501
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#501.weapon1TargetZ -32768
-call 0 ResetWeaponTarget
-  a unit Unit#501
-  a weapon 2
+  o result 1
+call 0 Apply
+  a event.kind 99
+  a event.unit Unit#501
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#501.weapon2TargetZ -32768
+  o result 1
 call 0 GetWeaponTargetUnit
   r Unit#1.weapon0Def weapondef#20
   r Unit#1.weapon0Flags 18
@@ -87,7 +147,7 @@ call 0 FindWeaponTarget
   r rng.main 0x00000773
   r rng.load 0xfe308ac9
   r rng.seed 0x18dbcccf
-  r Unit#1.def UnitDef#1
+  r Unit#1.def UnitDef#34
   r Unit#1.player Player#0
   r Unit#1.flags 0x90e00221
   r Unit#1.activateFlags 1
@@ -96,12 +156,12 @@ call 0 FindWeaponTarget
   r Unit#1.posX 36700160
   r Unit#1.posY 65536
   r Unit#1.posZ 15728640
-  r UnitDef#1.flags1 0x0495c0c8
-  r UnitDef#1.range 290
-  r UnitDef#1.categories UnitTypeSet#1
-  r UnitDef#1.weaponCategories0 UnitTypeSet#1
-  r UnitDef#1.weaponCategories1 UnitTypeSet#2
-  r UnitDef#1.weaponCategories2 UnitTypeSet#2
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.range 290
+  r UnitDef#34.categories UnitTypeSet#1
+  r UnitDef#34.weaponCategories0 UnitTypeSet#1
+  r UnitDef#34.weaponCategories1 UnitTypeSet#2
+  r UnitDef#34.weaponCategories2 UnitTypeSet#2
   r Player#0.active 1
   r Player#0.type 1
   r weapondef#20.flags 0x00080809
@@ -116,10 +176,15 @@ call 0 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
-call 0 ClearWeaponTarget
-  r Unit#1.script CobScript#1
-  a unit Unit#1
-  a weapon 0
+call 0 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 0 GetWeaponTargetUnit
   r Unit#251.weapon0Def weapondef#20
   r Unit#251.weapon0Flags 18
@@ -131,7 +196,7 @@ call 0 GetWeaponTargetUnit
   a weapon 0
   o result null
 call 0 FindWeaponTarget
-  r Unit#251.def UnitDef#1
+  r Unit#251.def UnitDef#34
   r Unit#251.player Player#1
   r Unit#251.flags 0x90e00021
   r Unit#251.activateFlags 1
@@ -149,10 +214,15 @@ call 0 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out []
   o result null
-call 0 ClearWeaponTarget
-  r Unit#251.script CobScript#2
-  a unit Unit#251
-  a weapon 0
+call 0 Apply
+  a event.kind 98
+  a event.unit Unit#251
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 0 GetWeaponTargetUnit
   r Unit#501.weapon0Def weapondef#21
   r Unit#501.weapon0Flags 18
@@ -164,7 +234,7 @@ call 0 GetWeaponTargetUnit
   a weapon 0
   o result null
 call 0 FindWeaponTarget
-  r Unit#501.def UnitDef#2
+  r Unit#501.def UnitDef#167
   r Unit#501.player Player#2
   r Unit#501.flags 0x90e00021
   r Unit#501.activateFlags 1
@@ -173,12 +243,12 @@ call 0 FindWeaponTarget
   r Unit#501.posX 5242880
   r Unit#501.posY 65536
   r Unit#501.posZ 81788928
-  r UnitDef#2.flags1 0x0495c0c8
-  r UnitDef#2.range 290
-  r UnitDef#2.categories UnitTypeSet#1
-  r UnitDef#2.weaponCategories0 UnitTypeSet#1
-  r UnitDef#2.weaponCategories1 UnitTypeSet#2
-  r UnitDef#2.weaponCategories2 UnitTypeSet#2
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.range 290
+  r UnitDef#167.categories UnitTypeSet#1
+  r UnitDef#167.weaponCategories0 UnitTypeSet#1
+  r UnitDef#167.weaponCategories1 UnitTypeSet#2
+  r UnitDef#167.weaponCategories2 UnitTypeSet#2
   r Player#2.active 1
   r Player#2.type 1
   r weapondef#21.flags 0x00080809
@@ -190,10 +260,15 @@ call 0 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 0 ClearWeaponTarget
-  r Unit#501.script CobScript#3
-  a unit Unit#501
-  a weapon 0
+call 0 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1 GetWeaponTargetPos
   r Game.seaLevel 0
   r Unit#1.killCount 0
@@ -332,7 +407,9 @@ call 4 GetWeaponTargetPos
   a unit Unit#501
   a weapon 2
   o result 0
-call 5 ResetWeaponTarget
+call 5 Apply
+  r Unit#502.id 502
+  r Unit#502.netDirtyFlags 0
   r Unit#502.weapon0TargetX 0
   r Unit#502.weapon0TargetZ 0
   r Unit#502.weapon0Def null
@@ -345,18 +422,38 @@ call 5 ResetWeaponTarget
   r Unit#502.weapon2TargetZ 0
   r Unit#502.weapon2Def null
   r Unit#502.weapon2Flags 0
-  a unit Unit#502
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#502
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#502.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#502
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#502
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#502.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#502
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#502
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#502.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#2.id 2
+  r Unit#2.netDirtyFlags 0
   r Unit#2.weapon0TargetX 0
   r Unit#2.weapon0TargetZ 0
   r Unit#2.weapon0Def null
@@ -369,18 +466,38 @@ call 5 ResetWeaponTarget
   r Unit#2.weapon2TargetZ 0
   r Unit#2.weapon2Def null
   r Unit#2.weapon2Flags 0
-  a unit Unit#2
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#2
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#2.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#2
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#2
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#2.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#2
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#2
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#2.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#503.id 503
+  r Unit#503.netDirtyFlags 0
   r Unit#503.weapon0TargetX 0
   r Unit#503.weapon0TargetZ 0
   r Unit#503.weapon0Def null
@@ -393,18 +510,38 @@ call 5 ResetWeaponTarget
   r Unit#503.weapon2TargetZ 0
   r Unit#503.weapon2Def null
   r Unit#503.weapon2Flags 0
-  a unit Unit#503
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#503
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#503.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#503
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#503
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#503.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#503
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#503
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#503.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#504.id 504
+  r Unit#504.netDirtyFlags 0
   r Unit#504.weapon0TargetX 0
   r Unit#504.weapon0TargetZ 0
   r Unit#504.weapon0Def null
@@ -417,18 +554,38 @@ call 5 ResetWeaponTarget
   r Unit#504.weapon2TargetZ 0
   r Unit#504.weapon2Def null
   r Unit#504.weapon2Flags 0
-  a unit Unit#504
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#504
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#504.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#504
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#504
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#504.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#504
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#504
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#504.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#505.id 505
+  r Unit#505.netDirtyFlags 0
   r Unit#505.weapon0TargetX 0
   r Unit#505.weapon0TargetZ 0
   r Unit#505.weapon0Def null
@@ -441,18 +598,38 @@ call 5 ResetWeaponTarget
   r Unit#505.weapon2TargetZ 0
   r Unit#505.weapon2Def null
   r Unit#505.weapon2Flags 0
-  a unit Unit#505
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#505
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#505.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#505
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#505
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#505.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#505
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#505
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#505.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#506.id 506
+  r Unit#506.netDirtyFlags 0
   r Unit#506.weapon0TargetX 0
   r Unit#506.weapon0TargetZ 0
   r Unit#506.weapon0Def null
@@ -465,18 +642,38 @@ call 5 ResetWeaponTarget
   r Unit#506.weapon2TargetZ 0
   r Unit#506.weapon2Def null
   r Unit#506.weapon2Flags 0
-  a unit Unit#506
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#506
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#506.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#506
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#506
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#506.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#506
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#506
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#506.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#507.id 507
+  r Unit#507.netDirtyFlags 0
   r Unit#507.weapon0TargetX 0
   r Unit#507.weapon0TargetZ 0
   r Unit#507.weapon0Def null
@@ -489,18 +686,38 @@ call 5 ResetWeaponTarget
   r Unit#507.weapon2TargetZ 0
   r Unit#507.weapon2Def null
   r Unit#507.weapon2Flags 0
-  a unit Unit#507
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#507
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#507.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#507
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#507
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#507.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#507
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#507
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#507.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#508.id 508
+  r Unit#508.netDirtyFlags 0
   r Unit#508.weapon0TargetX 0
   r Unit#508.weapon0TargetZ 0
   r Unit#508.weapon0Def null
@@ -513,18 +730,38 @@ call 5 ResetWeaponTarget
   r Unit#508.weapon2TargetZ 0
   r Unit#508.weapon2Def null
   r Unit#508.weapon2Flags 0
-  a unit Unit#508
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#508
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#508.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#508
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#508
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#508.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#508
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#508
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#508.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#509.id 509
+  r Unit#509.netDirtyFlags 0
   r Unit#509.weapon0TargetX 0
   r Unit#509.weapon0TargetZ 0
   r Unit#509.weapon0Def null
@@ -537,18 +774,38 @@ call 5 ResetWeaponTarget
   r Unit#509.weapon2TargetZ 0
   r Unit#509.weapon2Def null
   r Unit#509.weapon2Flags 0
-  a unit Unit#509
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#509
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#509.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#509
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#509
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#509.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#509
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#509
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#509.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#510.id 510
+  r Unit#510.netDirtyFlags 0
   r Unit#510.weapon0TargetX 0
   r Unit#510.weapon0TargetZ 0
   r Unit#510.weapon0Def null
@@ -561,18 +818,38 @@ call 5 ResetWeaponTarget
   r Unit#510.weapon2TargetZ 0
   r Unit#510.weapon2Def null
   r Unit#510.weapon2Flags 0
-  a unit Unit#510
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#510
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#510.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#510
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#510
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#510.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#510
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#510
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#510.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#511.id 511
+  r Unit#511.netDirtyFlags 0
   r Unit#511.weapon0TargetX 0
   r Unit#511.weapon0TargetZ 0
   r Unit#511.weapon0Def null
@@ -585,18 +862,38 @@ call 5 ResetWeaponTarget
   r Unit#511.weapon2TargetZ 0
   r Unit#511.weapon2Def null
   r Unit#511.weapon2Flags 0
-  a unit Unit#511
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#511
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#511.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#511
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#511
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#511.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#511
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#511
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#511.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#512.id 512
+  r Unit#512.netDirtyFlags 0
   r Unit#512.weapon0TargetX 0
   r Unit#512.weapon0TargetZ 0
   r Unit#512.weapon0Def null
@@ -609,18 +906,38 @@ call 5 ResetWeaponTarget
   r Unit#512.weapon2TargetZ 0
   r Unit#512.weapon2Def null
   r Unit#512.weapon2Flags 0
-  a unit Unit#512
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#512
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#512.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#512
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#512
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#512.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#512
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#512
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#512.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#513.id 513
+  r Unit#513.netDirtyFlags 0
   r Unit#513.weapon0TargetX 0
   r Unit#513.weapon0TargetZ 0
   r Unit#513.weapon0Def null
@@ -633,18 +950,38 @@ call 5 ResetWeaponTarget
   r Unit#513.weapon2TargetZ 0
   r Unit#513.weapon2Def null
   r Unit#513.weapon2Flags 0
-  a unit Unit#513
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#513
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#513.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#513
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#513
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#513.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#513
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#513
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#513.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#514.id 514
+  r Unit#514.netDirtyFlags 0
   r Unit#514.weapon0TargetX 0
   r Unit#514.weapon0TargetZ 0
   r Unit#514.weapon0Def null
@@ -657,18 +994,38 @@ call 5 ResetWeaponTarget
   r Unit#514.weapon2TargetZ 0
   r Unit#514.weapon2Def null
   r Unit#514.weapon2Flags 0
-  a unit Unit#514
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#514
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#514.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#514
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#514
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#514.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#514
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#514
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#514.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#515.id 515
+  r Unit#515.netDirtyFlags 0
   r Unit#515.weapon0TargetX 0
   r Unit#515.weapon0TargetZ 0
   r Unit#515.weapon0Def null
@@ -681,18 +1038,38 @@ call 5 ResetWeaponTarget
   r Unit#515.weapon2TargetZ 0
   r Unit#515.weapon2Def null
   r Unit#515.weapon2Flags 0
-  a unit Unit#515
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#515
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#515.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#515
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#515
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#515.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#515
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#515
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#515.weapon2TargetZ -32768
-call 5 ResetWeaponTarget
+  o result 1
+call 5 Apply
+  r Unit#516.id 516
+  r Unit#516.netDirtyFlags 0
   r Unit#516.weapon0TargetX 0
   r Unit#516.weapon0TargetZ 0
   r Unit#516.weapon0Def null
@@ -705,17 +1082,35 @@ call 5 ResetWeaponTarget
   r Unit#516.weapon2TargetZ 0
   r Unit#516.weapon2Def null
   r Unit#516.weapon2Flags 0
-  a unit Unit#516
-  a weapon 0
+  a event.kind 99
+  a event.unit Unit#516
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#516.weapon0TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#516
-  a weapon 1
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#516
+  a event.weapon 1
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#516.weapon1TargetZ -32768
-call 5 ResetWeaponTarget
-  a unit Unit#516
-  a weapon 2
+  o result 1
+call 5 Apply
+  a event.kind 99
+  a event.unit Unit#516
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#516.weapon2TargetZ -32768
+  o result 1
 call 5 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -725,7 +1120,6 @@ call 5 GetWeaponTargetPos
   a weapon 2
   o result 0
 call 5 GetWeaponTargetPos
-  r Unit#2.script CobScript#4
   r Unit#2.unitDefIndex 64
   r Unit#2.killCount 0
   r Unit#2.motion null
@@ -880,15 +1274,37 @@ call 10 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
   o result 0
-call 10 SetWeaponTargetPos
-  r Unit#1.netDirtyFlags 0
-  a unit Unit#1
-  a pos.x 55705600
-  a pos.y 65536
-  a pos.z 19660800
-  a weapon 2
+call 10 Apply
+  r Unit#1.weapon0Flags 2
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
+call 10 Apply
+  r Unit#1.weapon2Flags 10
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
+call 10 Apply
+  a event.kind 97
+  a event.unit Unit#1
+  a event.weapon 2
+  a event.target null
+  a event.posX 55705600
+  a event.posY 65536
+  a event.posZ 19660800
   w Unit#1.weapon2TargetX 850
   w Unit#1.weapon2TargetZ 300
+  o result 1
 call 10 GetWeaponTargetPos
   a unit Unit#2
   a weapon 0
@@ -910,8 +1326,6 @@ call 10 GetWeaponTargetPos
   a weapon 2
   o result 0
 call 11 GetWeaponTargetPos
-  r Unit#1.weapon0Flags 2
-  r Unit#1.weapon2Flags 10
   a unit Unit#1
   a weapon 0
   o result 0
@@ -922,6 +1336,30 @@ call 11 GetWeaponTargetPos
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
+  o result 1
+call 11 Apply
+  r Unit#1.weapon0Flags 18
+  r Unit#1.weapon2Flags 11
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
+call 11 Apply
+  r Unit#1.weapon2Flags 27
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  i services.SchedPublish 9 28
+  w Unit#1.weapon2TargetX 0
+  w Unit#1.weapon2TargetZ -32768
   o result 1
 call 11 GetWeaponTargetPos
   a unit Unit#2
@@ -946,10 +1384,6 @@ call 11 GetWeaponTargetPos
 call 12 GetWeaponTargetPos
   r Unit#1.posX 36701124
   r Unit#1.posZ 15718857
-  r Unit#1.weapon0Flags 18
-  r Unit#1.weapon2TargetX 0
-  r Unit#1.weapon2TargetZ -32768
-  r Unit#1.weapon2Flags 27
   r UnitMotion#1.velocityX 964
   r UnitMotion#1.velocityZ -9783
   a unit Unit#1
@@ -1477,25 +1911,31 @@ call 27 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(37547576,65536,15256227) 200 0
   o out []
   o result null
-call 27 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 27 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 27 GetWeaponTargetUnit
   a unit Unit#2
   a weapon 0
   o result null
 call 27 FindWeaponTarget
-  r Unit#2.def UnitDef#3
+  r Unit#2.def UnitDef#64
   r Unit#2.player Player#0
   r Unit#2.flags 0xb0280221
   r Unit#2.activateFlags 0
   r Unit#2.playerIndex 0
-  r UnitDef#3.flags1 0x0081808a
-  r UnitDef#3.range 380
-  r UnitDef#3.categories UnitTypeSet#2
-  r UnitDef#3.weaponCategories0 UnitTypeSet#1
-  r UnitDef#3.weaponCategories1 UnitTypeSet#2
-  r UnitDef#3.weaponCategories2 UnitTypeSet#2
+  r UnitDef#64.flags1 0x0081808a
+  r UnitDef#64.range 380
+  r UnitDef#64.categories UnitTypeSet#2
+  r UnitDef#64.weaponCategories0 UnitTypeSet#1
+  r UnitDef#64.weaponCategories1 UnitTypeSet#2
+  r UnitDef#64.weaponCategories2 UnitTypeSet#2
   a unit Unit#2
   a weapon 0
   a useRange 1
@@ -1503,9 +1943,15 @@ call 27 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(216006656,65536,84934656) 430 0
   o out []
   o result null
-call 27 ClearWeaponTarget
-  a unit Unit#2
-  a weapon 0
+call 27 Apply
+  a event.kind 98
+  a event.unit Unit#2
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 27 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -1518,9 +1964,15 @@ call 27 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out []
   o result null
-call 27 ClearWeaponTarget
-  a unit Unit#251
-  a weapon 0
+call 27 Apply
+  a event.kind 98
+  a event.unit Unit#251
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 27 GetWeaponTargetUnit
   a unit Unit#501
   a weapon 0
@@ -1533,9 +1985,15 @@ call 27 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 27 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 27 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 28 GetWeaponTargetPos
   r UnitMotion#1.velocityX 77923
   r UnitMotion#1.velocityZ 10579
@@ -2338,90 +2796,90 @@ call 53 FindBestTargetIfFireAtWill
   o out [Unit#2,Unit#503,Unit#504,Unit#505,Unit#506,Unit#507,Unit#508,Unit#509,Unit#510,Unit#511,Unit#512,Unit#513,Unit#514,Unit#515,Unit#516]
   o Unit#2.flags 0xb0280321
   o Unit#503.flags 0x18e40121
-  o Unit#503.def UnitDef#4
+  o Unit#503.def UnitDef#165
   o Unit#503.activateFlags 0
   o Unit#503.unitDefIndex 165
   o Unit#503.posX 217661509
   o Unit#503.posZ 84410367
   o Unit#504.flags 0x1ce40121
-  o Unit#504.def UnitDef#4
+  o Unit#504.def UnitDef#165
   o Unit#504.activateFlags 0
   o Unit#504.unitDefIndex 165
   o Unit#504.posX 219516197
   o Unit#504.posZ 85458943
   o Unit#505.flags 0x1ce40121
-  o Unit#505.def UnitDef#4
+  o Unit#505.def UnitDef#165
   o Unit#505.activateFlags 0
   o Unit#505.unitDefIndex 165
   o Unit#505.posX 218783028
   o Unit#505.posZ 85458943
   o Unit#506.flags 0x1ce40121
-  o Unit#506.def UnitDef#4
+  o Unit#506.def UnitDef#165
   o Unit#506.activateFlags 0
   o Unit#506.unitDefIndex 165
   o Unit#506.posX 220561406
   o Unit#506.posZ 85458943
   o Unit#507.flags 0x1ce40121
-  o Unit#507.def UnitDef#4
+  o Unit#507.def UnitDef#165
   o Unit#507.activateFlags 0
   o Unit#507.unitDefIndex 165
   o Unit#507.posX 221613186
   o Unit#507.posZ 85458943
   o Unit#508.flags 0x18e40121
-  o Unit#508.def UnitDef#4
+  o Unit#508.def UnitDef#165
   o Unit#508.activateFlags 0
   o Unit#508.unitDefIndex 165
   o Unit#508.posX 220884231
   o Unit#508.posZ 85458943
   o Unit#509.flags 0x1ce40121
-  o Unit#509.def UnitDef#4
+  o Unit#509.def UnitDef#165
   o Unit#509.activateFlags 0
   o Unit#509.unitDefIndex 165
   o Unit#509.posX 222661925
   o Unit#509.posZ 85458943
   o Unit#510.flags 0x1ce40121
-  o Unit#510.def UnitDef#4
+  o Unit#510.def UnitDef#165
   o Unit#510.activateFlags 0
   o Unit#510.unitDefIndex 165
   o Unit#510.posX 223670069
   o Unit#510.posZ 85458943
   o Unit#511.flags 0x18e40121
-  o Unit#511.def UnitDef#4
+  o Unit#511.def UnitDef#165
   o Unit#511.activateFlags 0
   o Unit#511.unitDefIndex 165
   o Unit#511.posX 222980313
   o Unit#511.posZ 85458943
   o Unit#512.flags 0x1ce40121
-  o Unit#512.def UnitDef#4
+  o Unit#512.def UnitDef#165
   o Unit#512.activateFlags 0
   o Unit#512.unitDefIndex 165
   o Unit#512.posX 224759077
   o Unit#512.posZ 85458943
   o Unit#513.flags 0x18e40121
-  o Unit#513.def UnitDef#4
+  o Unit#513.def UnitDef#165
   o Unit#513.activateFlags 0
   o Unit#513.unitDefIndex 165
   o Unit#513.posX 224025908
   o Unit#513.posZ 85458943
   o Unit#514.flags 0x1ce40121
-  o Unit#514.def UnitDef#4
+  o Unit#514.def UnitDef#165
   o Unit#514.activateFlags 0
   o Unit#514.unitDefIndex 165
   o Unit#514.posX 225804286
   o Unit#514.posZ 85458943
   o Unit#515.flags 0x18e40121
-  o Unit#515.def UnitDef#4
+  o Unit#515.def UnitDef#165
   o Unit#515.activateFlags 0
   o Unit#515.unitDefIndex 165
   o Unit#515.posX 227016705
   o Unit#515.posZ 85458943
   o Unit#516.flags 0x1ce40121
-  o Unit#516.def UnitDef#4
+  o Unit#516.def UnitDef#165
   o Unit#516.activateFlags 0
   o Unit#516.unitDefIndex 165
   o Unit#516.posX 226127111
   o Unit#516.posZ 85458943
-  o UnitDef#4.flags1 0x009080c9
+  o UnitDef#165.flags1 0x009080c9
   i services.RandomInt 15 = 6
   i weapons.WeaponCanReachUnit Unit#251 Unit#508 0 = 1
   i services.RandomInt 10847 = 3630
@@ -2552,17 +3010,23 @@ call 55 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(39637658,65536,15947770) 200 0
   o out [Unit#502]
   o Unit#502.flags 0x30280321
-  o Unit#502.def UnitDef#5
+  o Unit#502.def UnitDef#246
   o Unit#502.activateFlags 1
   o Unit#502.unitDefIndex 246
   o Unit#502.posX 45613056
   o Unit#502.posZ 24641536
-  o UnitDef#5.flags1 0x0084008a
+  o UnitDef#246.flags1 0x0084008a
   i services.RandomInt 1 = 0
   o result null
-call 55 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 55 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 55 GetWeaponTargetUnit
   a unit Unit#2
   a weapon 0
@@ -2634,15 +3098,22 @@ call 55 FindWeaponTarget
   i services.RandomInt 715 = 621
   w rng.seed 0x605650f9
   o result Unit#504
-call 55 SetWeaponTargetUnit
-  r Unit#2.id 2
-  r Unit#2.netDirtyFlags 0
-  r Unit#504.id 504
-  r Unit#504.netDirtyFlags 0
-  a unit Unit#2
-  a target Unit#504
-  a weapon 0
+call 55 Apply
+  r Unit#504.weapon0Def weapondef#0
+  r Unit#504.weapon0Flags 16
+  r Unit#504.weapon1Def weapondef#0
+  r Unit#504.weapon1Flags 20
+  r Unit#504.weapon2Def weapondef#0
+  r Unit#504.weapon2Flags 24
+  a event.kind 96
+  a event.unit Unit#2
+  a event.weapon 0
+  a event.target Unit#504
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#2.weapon0TargetX 504
+  o result 1
 call 55 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -2701,15 +3172,22 @@ call 55 FindWeaponTarget
   i services.RandomInt 12642 = 7389
   w rng.seed 0x6fd94541
   o result Unit#510
-call 55 SetWeaponTargetUnit
-  r Unit#251.id 251
-  r Unit#251.netDirtyFlags 0
-  r Unit#510.id 510
-  r Unit#510.netDirtyFlags 0
-  a unit Unit#251
-  a target Unit#510
-  a weapon 0
+call 55 Apply
+  r Unit#510.weapon0Def weapondef#0
+  r Unit#510.weapon0Flags 16
+  r Unit#510.weapon1Def weapondef#0
+  r Unit#510.weapon1Flags 20
+  r Unit#510.weapon2Def weapondef#0
+  r Unit#510.weapon2Flags 24
+  a event.kind 96
+  a event.unit Unit#251
+  a event.weapon 0
+  a event.target Unit#510
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#251.weapon0TargetX 510
+  o result 1
 call 55 GetWeaponTargetUnit
   a unit Unit#501
   a weapon 0
@@ -2722,9 +3200,15 @@ call 55 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 55 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 55 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 56 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -3278,12 +3762,28 @@ call 66 GetWeaponTargetUnit
   a unit Unit#2
   a weapon 0
   o result Unit#504
-call 66 SetWeaponTargetUnit
-  r Unit#2.weapon0TargetX 0
-  a unit Unit#2
-  a target Unit#504
-  a weapon 0
+call 66 Apply
+  r Unit#2.weapon0Flags 3
+  a event.kind 98
+  a event.unit Unit#2
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  i services.SchedPublish 9 28
+  w Unit#2.weapon0TargetX 0
+  o result 1
+call 66 Apply
+  a event.kind 96
+  a event.unit Unit#2
+  a event.weapon 0
+  a event.target Unit#504
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#2.weapon0TargetX 504
+  o result 1
 call 66 GetWeaponTargetPos
   a unit Unit#251
   a weapon 0
@@ -3321,16 +3821,38 @@ call 67 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
   o result 0
-call 67 SetWeaponTargetPos
-  a unit Unit#1
-  a pos.x 55705600
-  a pos.y 65536
-  a pos.z 19660800
-  a weapon 2
+call 67 Apply
+  r Unit#1.weapon0Flags 2
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
+call 67 Apply
+  r Unit#1.weapon2Flags 10
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
+call 67 Apply
+  a event.kind 97
+  a event.unit Unit#1
+  a event.weapon 2
+  a event.target null
+  a event.posX 55705600
+  a event.posY 65536
+  a event.posZ 19660800
   w Unit#1.weapon2TargetX 850
   w Unit#1.weapon2TargetZ 300
+  o result 1
 call 67 GetWeaponTargetPos
-  r Unit#2.weapon0Flags 3
   r UnitMotion#4.velocityX -5044
   r UnitMotion#4.velocityZ 29055
   a unit Unit#2
@@ -3373,8 +3895,6 @@ call 67 GetWeaponTargetPos
 call 68 GetWeaponTargetPos
   r Unit#1.posX 40498773
   r Unit#1.posZ 16042442
-  r Unit#1.weapon0Flags 2
-  r Unit#1.weapon2Flags 10
   r UnitMotion#1.velocityX 38469
   r UnitMotion#1.velocityZ -8146
   a unit Unit#1
@@ -4131,6 +4651,30 @@ call 82 GetWeaponTargetUnit
   a unit Unit#1
   a weapon 2
   o result null
+call 82 Apply
+  r Unit#1.weapon0Flags 18
+  r Unit#1.weapon2Flags 10
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
+call 82 Apply
+  r Unit#1.weapon2Flags 26
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 2
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  i services.SchedPublish 9 28
+  w Unit#1.weapon2TargetX 0
+  w Unit#1.weapon2TargetZ -32768
+  o result 1
 call 82 GetWeaponTargetPos
   a unit Unit#2
   a weapon 0
@@ -4162,10 +4706,6 @@ call 82 GetWeaponTargetPos
   a weapon 2
   o result 0
 call 83 GetWeaponTargetPos
-  r Unit#1.weapon0Flags 18
-  r Unit#1.weapon2TargetX 0
-  r Unit#1.weapon2TargetZ -32768
-  r Unit#1.weapon2Flags 26
   a unit Unit#1
   a weapon 0
   o result 0
@@ -4221,14 +4761,23 @@ call 83 FindWeaponTarget
   i services.RandomInt 23276 = 12410
   w rng.seed 0x3abaf94a
   o result Unit#502
-call 83 SetWeaponTargetUnit
-  r Unit#1.id 1
-  r Unit#502.id 502
+call 83 Apply
   r Unit#502.netDirtyFlags 4
-  a unit Unit#1
-  a target Unit#502
-  a weapon 0
+  r Unit#502.weapon0Def weapondef#0
+  r Unit#502.weapon0Flags 16
+  r Unit#502.weapon1Def weapondef#0
+  r Unit#502.weapon1Flags 20
+  r Unit#502.weapon2Def weapondef#0
+  r Unit#502.weapon2Flags 24
+  a event.kind 96
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target Unit#502
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#1.weapon0TargetX 502
+  o result 1
 call 83 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -4245,9 +4794,15 @@ call 83 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 83 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 83 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 84 GetWeaponTargetPos
   r Unit#502.motion null
   a unit Unit#1
@@ -5675,9 +6230,15 @@ call 111 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 111 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 111 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 112 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -6972,9 +7533,15 @@ call 138 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 138 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 138 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 139 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -8230,9 +8797,15 @@ call 166 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 166 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 166 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 167 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -9550,9 +10123,15 @@ call 194 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 194 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 194 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 195 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -10850,9 +11429,15 @@ call 222 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 222 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 222 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 223 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -12146,9 +12731,15 @@ call 250 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 250 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 250 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 251 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -13426,9 +14017,15 @@ call 277 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 277 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 277 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 278 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -14728,9 +15325,15 @@ call 305 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 305 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 305 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 306 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -15999,9 +16602,15 @@ call 333 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 333 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 333 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 334 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -17313,9 +17922,15 @@ call 361 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 361 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 361 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 362 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -18441,28 +19056,41 @@ call 386 GetWeaponTargetPos
   r Unit#504.motion null
   a unit Unit#2
   a weapon 0
-  i units.FindScript CobScript#4 "StartBuilding" = -1
-  i units.StartScriptWithArgs CobScript#4 "TargetCleared" ? 0 1 0 0 0 0 = 0
+  i services.SchedPublish 9 28
   w Unit#2.weapon0TargetX 0
   o result 0
-call 386 SetWeaponTargetUnit
+call 386 Apply
   r Unit#2.netDirtyFlags 1024
-  r Unit#513.id 513
-  r Unit#513.netDirtyFlags 0
-  a unit Unit#2
-  a target Unit#513
-  a weapon 0
+  r Unit#2.weapon0Flags 2
+  r Unit#513.weapon0Def weapondef#0
+  r Unit#513.weapon0Flags 16
+  r Unit#513.weapon1Def weapondef#0
+  r Unit#513.weapon1Flags 20
+  r Unit#513.weapon2Def weapondef#0
+  r Unit#513.weapon2Flags 24
+  a event.kind 96
+  a event.unit Unit#2
+  a event.weapon 0
+  a event.target Unit#513
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#2.netDirtyFlags 0
   w Unit#2.weapon0TargetX 513
+  o result 1
 call 386 GetWeaponTargetUnit
-  r Unit#2.weapon0Flags 2
   a unit Unit#2
   a weapon 0
   o result Unit#513
-call 386 SetWeaponTargetUnit
-  a unit Unit#2
-  a target Unit#513
-  a weapon 0
+call 386 Apply
+  a event.kind 96
+  a event.unit Unit#2
+  a event.weapon 0
+  a event.target Unit#513
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 1
 call 386 GetWeaponTargetPos
   a unit Unit#251
   a weapon 0
@@ -18597,9 +19225,15 @@ call 388 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 388 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 388 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 389 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -19868,9 +20502,15 @@ call 416 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 416 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 416 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 417 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -21177,9 +21817,15 @@ call 444 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 444 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 444 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 445 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -22020,8 +22666,7 @@ call 464 GetWeaponTargetPos
   r Unit#502.unitDefIndex 0
   a unit Unit#1
   a weapon 0
-  i units.FindScript CobScript#1 "StartBuilding" = 17
-  i units.StartScriptWithArgs CobScript#1 "TargetCleared" ? 0 1 0 0 0 0 = 1
+  i services.SchedPublish 9 28
   w Unit#1.weapon0TargetX 0
   o result 0
 call 464 GetWeaponTargetPos
@@ -22383,9 +23028,16 @@ call 472 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 472 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 472 Apply
+  r Unit#1.netDirtyFlags 25600
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 472 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -22402,9 +23054,15 @@ call 472 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 472 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 472 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 473 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -23547,9 +24205,15 @@ call 500 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 500 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 500 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 500 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -23566,9 +24230,15 @@ call 500 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 500 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 500 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 501 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -24627,9 +25297,15 @@ call 527 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 527 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 527 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 527 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -24646,9 +25322,15 @@ call 527 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 527 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 527 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 528 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -25801,9 +26483,15 @@ call 555 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 555 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 555 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 555 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -25820,9 +26508,15 @@ call 555 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 555 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 555 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 556 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -26972,9 +27666,15 @@ call 583 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 583 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 583 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 583 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -26991,9 +27691,15 @@ call 583 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 583 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 583 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 584 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -28135,9 +28841,15 @@ call 611 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 611 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 611 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 611 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -28154,9 +28866,15 @@ call 611 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 611 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 611 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 612 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -29310,9 +30028,15 @@ call 638 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 638 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 638 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 638 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -29329,9 +30053,15 @@ call 638 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 638 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 638 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 639 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -30474,9 +31204,15 @@ call 666 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 666 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 666 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 666 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -30493,9 +31229,15 @@ call 666 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 666 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 666 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 667 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -31590,9 +32332,15 @@ call 694 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 694 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 694 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 694 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -31609,9 +32357,15 @@ call 694 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 694 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 694 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 695 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -32756,9 +33510,15 @@ call 722 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 722 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 722 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 722 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -32775,9 +33535,15 @@ call 722 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 722 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 722 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 723 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -33868,9 +34634,15 @@ call 750 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 750 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 750 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 750 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -33888,9 +34660,15 @@ call 750 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 750 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 750 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 751 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -34995,9 +35773,15 @@ call 777 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 777 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 777 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 777 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -35014,9 +35798,15 @@ call 777 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 777 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 777 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 778 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -36153,9 +36943,15 @@ call 805 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 805 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 805 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 805 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -36172,9 +36968,15 @@ call 805 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 805 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 805 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 806 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -37332,9 +38134,15 @@ call 833 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 833 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 833 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 833 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -37351,9 +38159,15 @@ call 833 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 833 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 833 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 834 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -38489,9 +39303,15 @@ call 861 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 861 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 861 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 861 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -38508,9 +39328,15 @@ call 861 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 861 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 861 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 862 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -38611,8 +39437,7 @@ call 864 GetWeaponTargetPos
   r Unit#510.motion null
   a unit Unit#251
   a weapon 0
-  i units.FindScript CobScript#2 "StartBuilding" = 17
-  i units.StartScriptWithArgs CobScript#2 "TargetCleared" ? 0 1 0 0 0 0 = 1
+  i services.SchedPublish 9 28
   w Unit#251.weapon0TargetX 0
   o result 0
 call 864 GetWeaponTargetPos
@@ -39482,9 +40307,15 @@ call 888 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 888 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 888 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 888 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -39529,15 +40360,24 @@ call 888 FindWeaponTarget
   i services.RandomInt 13218 = 2226
   w rng.seed 0x6649551c
   o result Unit#506
-call 888 SetWeaponTargetUnit
+call 888 Apply
   r Unit#251.netDirtyFlags 17408
-  r Unit#506.id 506
-  r Unit#506.netDirtyFlags 0
-  a unit Unit#251
-  a target Unit#506
-  a weapon 0
+  r Unit#506.weapon0Def weapondef#0
+  r Unit#506.weapon0Flags 16
+  r Unit#506.weapon1Def weapondef#0
+  r Unit#506.weapon1Flags 20
+  r Unit#506.weapon2Def weapondef#0
+  r Unit#506.weapon2Flags 24
+  a event.kind 96
+  a event.unit Unit#251
+  a event.weapon 0
+  a event.target Unit#506
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#251.netDirtyFlags 0
   w Unit#251.weapon0TargetX 506
+  o result 1
 call 888 GetWeaponTargetUnit
   a unit Unit#501
   a weapon 0
@@ -39550,9 +40390,15 @@ call 888 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 888 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 888 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 889 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -40752,9 +41598,15 @@ call 916 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 916 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 916 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 916 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -40771,9 +41623,15 @@ call 916 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 916 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 916 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 917 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -41934,9 +42792,15 @@ call 944 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 944 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 944 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 944 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -41953,9 +42817,15 @@ call 944 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 944 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 944 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 945 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -43051,9 +43921,15 @@ call 972 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 972 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 972 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 972 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -43070,9 +43946,15 @@ call 972 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 972 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 972 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 973 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -44053,28 +44935,42 @@ call 997 GetWeaponTargetPos
   r Unit#513.motion null
   a unit Unit#2
   a weapon 0
-  i units.FindScript CobScript#4 "StartBuilding" = -1
-  i units.StartScriptWithArgs CobScript#4 "TargetCleared" ? 0 1 0 0 0 0 = 0
+  i services.SchedPublish 9 28
   w Unit#2.weapon0TargetX 0
   o result 0
-call 997 SetWeaponTargetUnit
+call 997 Apply
   r Unit#2.netDirtyFlags 1024
-  r Unit#515.id 515
+  r Unit#2.weapon0Flags 2
   r Unit#515.netDirtyFlags 4
-  a unit Unit#2
-  a target Unit#515
-  a weapon 0
+  r Unit#515.weapon0Def weapondef#0
+  r Unit#515.weapon0Flags 16
+  r Unit#515.weapon1Def weapondef#0
+  r Unit#515.weapon1Flags 20
+  r Unit#515.weapon2Def weapondef#0
+  r Unit#515.weapon2Flags 24
+  a event.kind 96
+  a event.unit Unit#2
+  a event.weapon 0
+  a event.target Unit#515
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
   w Unit#2.netDirtyFlags 0
   w Unit#2.weapon0TargetX 515
+  o result 1
 call 997 GetWeaponTargetUnit
-  r Unit#2.weapon0Flags 2
   a unit Unit#2
   a weapon 0
   o result Unit#515
-call 997 SetWeaponTargetUnit
-  a unit Unit#2
-  a target Unit#515
-  a weapon 0
+call 997 Apply
+  a event.kind 96
+  a event.unit Unit#2
+  a event.weapon 0
+  a event.target Unit#515
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 1
 call 997 GetWeaponTargetPos
   a unit Unit#251
   a weapon 0
@@ -44232,9 +45128,15 @@ call 1000 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1000 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1000 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1000 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -44251,9 +45153,15 @@ call 1000 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1000 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1000 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1001 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -45346,9 +46254,15 @@ call 1027 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1027 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1027 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1027 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -45365,9 +46279,15 @@ call 1027 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1027 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1027 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1028 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -46462,9 +47382,15 @@ call 1055 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1055 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1055 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1055 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -46481,9 +47407,15 @@ call 1055 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1055 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1055 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1056 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -47623,9 +48555,15 @@ call 1083 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1083 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1083 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1083 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -47642,9 +48580,15 @@ call 1083 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1083 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1083 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1084 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -48769,9 +49713,15 @@ call 1111 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1111 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1111 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1111 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -48788,9 +49738,15 @@ call 1111 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1111 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1111 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1112 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -49900,9 +50856,15 @@ call 1138 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1138 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1138 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1138 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -49919,9 +50881,15 @@ call 1138 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1138 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1138 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1139 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -51080,9 +52048,15 @@ call 1166 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1166 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1166 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1166 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -51099,9 +52073,15 @@ call 1166 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1166 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1166 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1167 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -52216,9 +53196,15 @@ call 1194 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1194 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1194 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1194 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -52235,9 +53221,15 @@ call 1194 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1194 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1194 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1195 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -53373,9 +54365,15 @@ call 1222 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1222 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1222 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1222 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -53392,9 +54390,15 @@ call 1222 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1222 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1222 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1223 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -54513,9 +55517,15 @@ call 1250 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1250 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1250 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1250 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -54532,9 +55542,15 @@ call 1250 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1250 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1250 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1251 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
@@ -55626,9 +56642,15 @@ call 1277 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 0 pos=(40518012,65536,16038368) 200 0
   o out []
   o result null
-call 1277 ClearWeaponTarget
-  a unit Unit#1
-  a weapon 0
+call 1277 Apply
+  a event.kind 98
+  a event.unit Unit#1
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1277 GetWeaponTargetUnit
   a unit Unit#251
   a weapon 0
@@ -55645,9 +56667,15 @@ call 1277 FindWeaponTarget
   i ai.GetVisibleEnemiesInRadius 2 pos=(5242880,65536,81788928) 200 0
   o out []
   o result null
-call 1277 ClearWeaponTarget
-  a unit Unit#501
-  a weapon 0
+call 1277 Apply
+  a event.kind 98
+  a event.unit Unit#501
+  a event.weapon 0
+  a event.target null
+  a event.posX 0
+  a event.posY 0
+  a event.posZ 0
+  o result 0
 call 1278 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0

@@ -25,7 +25,7 @@ event kind:
   published event is delivered at once. One more delivery point is not a run: an inbox holds 1024 events, and when a
   publish finds its subscriber's inbox full, the scheduler delivers that inbox first, in the middle of the publisher's
   update, then queues the event. The order of the events is kept, but the subscriber's handlers run there. No scenario
-  is known to fill an inbox: economy's is also delivered before every `RequestGranted`, which precedes every REQUEST.
+  fills an inbox: economy's holds at most 76 events in the units phase (section 8).
 - **Synchronous slots.** A same-statement answer comes only from a slot the interface marks synchronous. The engine
   delivers the module's pending inbox before it calls one, so the slot sees every event published before it.
 - **Plain data.** Events carry no pointers: a LOAD carries the account's twelve words.
@@ -33,9 +33,11 @@ event kind:
 Economy's place in it:
 - **Queued events into economy:** RESET, LOAD, REQUEST and INCOME, published by units, orders, players and features.
   Economy's handler (`src/seams/economy_world.cpp`) passes each to `Apply`.
-- **Synchronous slots:** `Spend` (the SPEND of a weapon or a transfer) and `RequestGranted`, called through the
-  services `ScheduleEconomySpend` and `ScheduleEconomyRequestGranted`, and the run `UpdateMetalExtraction`, called
-  through `ScheduleMetalExtraction` when a unit is created or loaded (section 4).
+- **Synchronous slots:** `Spend` (the SPEND of a weapon or a transfer), called through the service
+  `ScheduleEconomySpend`, and the run `UpdateMetalExtraction`, called through `ScheduleMetalExtraction` when a unit is
+  created or loaded (section 4).
+- **A query as of the last run:** `RequestGranted`, called through the service `ScheduleEconomyRequestGranted`, which
+  does not deliver economy's inbox first (sections 4 and 8).
 - **Effects out of economy:** CLOAK, EXTRACTOR and SHARE, published to economy's outbox through the world view's
   `Emit`. Units subscribes to CLOAK and EXTRACTOR, players to SHARE; their handlers are adapters onto their own seam
   slots (`src/units/economy_effects.cpp`, `PlayersOnEconomyShare` in `src/game/players.cpp`). EXTRACTOR and SHARE
@@ -52,8 +54,8 @@ The parallel scheduler and performance are out of scope (#937).
 | unit creation (`InitUnitFromType`) | `Reset` of the unit's account | RESET (unit) |
 | player set-up (`InitPlayerSlot`) | `Reset` of the player's account | RESET (unit 0) |
 | loading a unit (`LoadUnitAccounts`) | the account read from the saved game | LOAD, with the account |
-| building (`AddBuildProgress`, `BuildWeaponOrder`) | `RequestEnergyAndMetal`, which charged and answered | synchronous `RequestGranted`, then REQUEST |
-| repairing (`AddRepairProgress`) | `RequestEnergy` | synchronous `RequestGranted`, then REQUEST |
+| building (`AddBuildProgress`, `BuildWeaponOrder`) | `RequestEnergyAndMetal`, which charged and answered | `RequestGranted` (as of economy's last run), then REQUEST |
+| repairing (`AddRepairProgress`) | `RequestEnergy` | `RequestGranted` (as of economy's last run), then REQUEST |
 | firing a weapon that costs resources (`UpdateUnitWeapons`) | `SpendEnergyAndMetal` | synchronous `Spend` |
 | a player's transfer (`TransferMetal`, `TransferEnergy`) | `SpendEnergy` or `SpendMetal` of the giver, then `+=` into the receiver's account | synchronous `Spend` (if announced), then INCOME |
 | a refund while building down (`AddBuildProgress`) or after a cancelled build (`BuildingBuildOrder`) | `+=` into the unit's metal income | INCOME |
@@ -131,12 +133,31 @@ its own view state where 3.1c keeps it (below).
 - **Queries:** `GetEnergyUse` (the computer player's ratings), `RequestGranted` (builders), `UnitAccount` (the unit's
   info panel and the saved game).
 
-**As of economy's last run.** Every read above sees economy's state as of its last run or synchronous slot. Economy's
-pending inbox can only hold RESET, LOAD, REQUEST and INCOME, and those write the accounts alone (the region and
-`players[i].econ`); the stores and the other `Player` fields change only in `Spend` and in the runs, which deliver the
+**As of economy's last run.** Every read above sees economy's state as of its last run or synchronous slot, and none
+delivers the inbox first. Economy's pending inbox can only hold RESET, LOAD, REQUEST and INCOME, and those write the
+accounts alone (the region and `players[i].econ`); the stores and the other `Player` fields change only in `Spend` and in the runs, which deliver the
 inbox first. So a read of the `Player` record sees what it saw in 3.1c. The accounts are read inside the tick only by
-economy itself and by `RequestGranted`, which is synchronous for that reason: a RESET or LOAD in the inbox sets the
-stall it answers from, and a unit created in a slot whose last account was stalled can ask in the same phase.
+economy itself and by `RequestGranted`.
+
+**What `RequestGranted` reads.** It reads only the unit account's `energy.stall` and `metal.stall`. Three things
+write a stall (`data/rwsets.csv`, and the code of `src/game/economy.cpp`):
+- the settlement (`SettleResourceAccount`, the only `field_write` of `EconLedger::stall`), in the run
+  `UpdatePlayerEconomy`, which delivers the inbox before it runs;
+- RESET, whose `ResetAccount` clears the whole account (a `memset`);
+- LOAD, which sets the whole account (`Apply`'s `deref_write` of `*EconAccount`).
+
+REQUEST only reads the stall (`RequestOn` grants nothing while it is above 0), INCOME writes only `make`, and `Spend`
+only `use`. So the answer can differ from 3.1c's only when a RESET or LOAD of the asking unit waits in the inbox, and
+neither can:
+- a RESET is published by `InitUnitFromType`, and both of its callers (`InitUnit`, and `InitSpawnedUnit` under
+  `CreateUnit` and `CreateUnitFromPacket`) call `ScheduleMetalExtraction` next, which delivers economy's inbox before
+  the unit can ask. A unit created in a slot whose last account was stalled therefore asks from its cleared account,
+  as in 3.1c;
+- a LOAD is published only while a saved game loads, outside a tick, where every publish is delivered at once.
+
+`RequestGranted` is therefore a query as of economy's last run, with no delivery before it (section 8). This rests on
+`UpdateMetalExtraction` delivering the inbox at a unit's creation: a change that queues it, or creates a unit without
+it, makes `RequestGranted` read a slot's last account and must make it synchronous again.
 `UnitAccount` is called outside the tick (the saved game) or by presentation, after the tick boundary has emptied
 the inboxes. `GetEnergyUse` reads no account.
 
@@ -184,9 +205,9 @@ or a player's in the players phase (`docs/schedule.md`). The scheduler holds tho
 units' inbox and calls `units.UpdateUnit` for each unit, and the players phase delivers players' inbox and calls
 `players.UpdatePlayerHead`, then (after delivering economy's inbox) `UpdatePlayerEconomy` when it is due, then
 `players.UpdatePlayerTail`, for each player. The requests, refunds, resets and income published inside a unit's or a
-player's update wait in economy's inbox until economy's next synchronous slot or run, or the phase boundary; the
-spends are applied where they are made. A parallel scheduler would have to split the units' update at each spend, or
-apply it before the update continues, as `docs/schedule.md` marks them.
+player's update wait in economy's inbox until economy's next synchronous slot or run, or the phase boundary (a
+`RequestGranted` does not deliver them). The spends are applied where they are made. A parallel scheduler would have
+to split the units' update at each spend, or apply it before the update continues, as `docs/schedule.md` marks them.
 
 ## 7. What stays inside the default
 
@@ -222,6 +243,24 @@ packets section of a dump (`docs/trace-format.md`, section 8.23) shows it in `sh
 packets with the same amounts, in another order. The traces hash no packet, they carry independent state, and network
 compatibility with 3.1c is not kept (#2).
 
-**`RequestGranted` is synchronous by analysis, not by a divergence.** Its answer depends on the stall, which a RESET or
-LOAD in economy's inbox sets (section 4), and a unit created in a slot whose last account was stalled can ask in the
-same phase. Queuing it is not possible: the caller needs the answer in the statement.
+**`RequestGranted` reads as of economy's last run, and is equal (#952).** Until #952 the service delivered economy's
+inbox before every `RequestGranted`, by analysis rather than by a divergence: a RESET or LOAD in the inbox sets the
+stall it answers from. Section 4 shows that neither can be pending when a unit asks: the RESET of a new unit is
+delivered by `ScheduleMetalExtraction` before its creation returns, and a LOAD is published outside the tick. The
+service now asks with no delivery, and the full `--check --both-modes` reports all 88 scenarios equal in both modes.
+
+The gate alone would not show it, so a measuring build (not merged) checked the case too, over the 88 scenarios with
+native modules: at none of the `RequestGranted` calls did economy's inbox hold a RESET or LOAD, of the asking unit or
+any other. The equal gate is therefore not the evidence for the case of section 4 (a unit created in a slot whose
+last account was stalled, asking in the same phase); the evidence is that the RESET is always delivered first, by
+the code path, whichever scenario plays.
+
+REQUEST is now queued in practice. The deepest economy's inbox got in the units phase, in any scenario, was 3 events
+with the delivery before every `RequestGranted` (in four scenarios, among them `long-greenhaven-8p`), and is 76
+without it (`long-greenhaven-8p`, tick 52821; next `skirmish4-long` with 25), far from the 1024 that would deliver it
+early. The units phase now delivers economy's inbox only at a `Spend`, a unit's creation (`ScheduleMetalExtraction`)
+or the phase boundary.
+
+So "ask synchronously before every queued event" is not needed: economy's synchronous edges into units' update are
+now `Spend`, CLOAK's route and `UpdateMetalExtraction`. A later module that answers a query from its own state needs
+a delivery first only when an event that can be pending writes what the query reads.

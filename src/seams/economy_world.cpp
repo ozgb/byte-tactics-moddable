@@ -171,7 +171,6 @@ int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int reso
     ReplayImport call(RI_SCHEDULE_ECONOMY_REQUEST_GRANTED);
     call.Int((int)unit);
     call.Int((int)resources);
-    SchedDeliver(SCHED_ECONOMY);
     return call.Result(g_seams.economy->RequestGranted(unit, resources));
 }
 

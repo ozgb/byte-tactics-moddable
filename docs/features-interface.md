@@ -138,7 +138,10 @@ by value.
 Features keeps no private region, and so it has no `WriteState` report: its state is view state, hashed where it was.
 
 - **The spot pool** (`FeatureAnimEntry`, 0x800 spots on a used and a free list, with the scan's cell index) is
-  features' alone to write, and `privatestate.py --check` fails when another subsystem writes it. It stays in the
+  features' alone to write, and `privatestate.py --check` fails when another subsystem writes a spot's list links
+  (`next`, `prev`), the scan index or a cell's feature fields. The rest of a spot is not checked: it holds the spot's
+  animation cursors, which the GAF helpers step and read for features and for drawing, and the access log names
+  those helpers' subsystems (game and presentation) as their writers. It stays in the
   hash (section 7 of the trace), because weapons and orders read it inside the tick: an explosion's distance to a
   burning feature is measured from its spot, and a resurrected unit takes its wreck's rotation from it. Moving it out
   of the hash would be a trace format bump with a reference half (#946's path), and would give those two reads queries

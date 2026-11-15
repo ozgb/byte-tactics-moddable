@@ -54,25 +54,26 @@ class EconomyOwnerTest(unittest.TestCase):
 
 class FeaturesOwnerTest(unittest.TestCase):
     def test_spots_cell_fields_and_the_scan_index_are_private_for_writes_only(self):
-        for item in ("FeatureAnimEntry::next", "FeatureAnimEntry::bytes_10", "Cell::feature", "Cell::spot", "Cell::offsetX", "Cell::offsetY", "scanIndex"):
+        for item in ("FeatureAnimEntry::next", "FeatureAnimEntry::prev", "Cell::feature", "Cell::spot", "Cell::offsetX", "Cell::offsetY", "scanIndex"):
             self.assertEqual(ps.private_to(item), ("features", ("writer",)), item)
 
     def test_the_cell_flags_and_other_features_state_are_not_private(self):
-        for item in ("Cell::flags", "Cell::unit", "Feature::energy", "featureCount", "FeatureAnimEntry2::next", "scanIndexes"):
+        for item in ("Cell::flags", "Cell::unit", "Feature::energy", "featureCount", "FeatureAnimEntry2::next", "scanIndexes",
+                     "FeatureAnimEntry::src", "FeatureAnimEntry::state", "FeatureAnimEntry::bytes_8", "FeatureAnimEntry::bytes_10"):
             self.assertFalse(ps.is_private(item), item)
 
     def test_a_features_write_passes(self):
-        rows = {"edges": [("features", "weapons", "FeatureAnimEntry::bytes_10"), ("features", "features", "Cell::feature"),
+        rows = {"edges": [("features", "weapons", "FeatureAnimEntry::next"), ("features", "features", "Cell::feature"),
                           ("features", "-", "scanIndex"), ("-", "features", "Cell::spot")],
                 "cross": [("features", "units", "Cell::offsetX")]}
         self.assertEqual(ps.violations(rows), [])
 
     def test_a_units_or_weapons_write_fails(self):
-        rows = {"edges": [("units", "features", "FeatureAnimEntry::bytes_8"), ("weapons", "map", "Cell::feature"),
+        rows = {"edges": [("units", "features", "FeatureAnimEntry::prev"), ("weapons", "map", "Cell::feature"),
                           ("units", "-", "Cell::spot"), ("weapons", "features", "scanIndex")]}
         self.assertEqual(ps.violations(rows),
                          ["edges: writer units on Cell::spot, which is written only by features",
-                          "edges: writer units on FeatureAnimEntry::bytes_8, which is written only by features",
+                          "edges: writer units on FeatureAnimEntry::prev, which is written only by features",
                           "edges: writer weapons on Cell::feature, which is written only by features",
                           "edges: writer weapons on scanIndex, which is written only by features"])
 

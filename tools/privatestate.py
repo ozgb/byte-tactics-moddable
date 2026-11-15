@@ -34,10 +34,12 @@ other view state, the resource fields of the Player record, is named in the log 
 WriteState (section 34) is dumped and never hashed, so no shadow-field check applies to it.
 
 Features' state stays in the state block, hashed and read by others as a view, and is written by features alone, like the player accounts: the
-spots of the feature animation pool (the 0x800 entries of 0x30 bytes allocated by InitFeatureAnimPool as "FEATURE ANIM DATA", which the log names
-`FeatureAnimEntry::field` after the type of an entry, so a type of WRITE_TYPES), the feature fields of a map cell (`Cell::feature` and `Cell::spot`, the
+links of the feature animation pool's spots (the 0x800 entries of 0x30 bytes allocated by InitFeatureAnimPool as "FEATURE ANIM DATA", which the log
+names `FeatureAnimEntry::field` after the type of an entry: `next` and `prev`), the feature fields of a map cell (`Cell::feature` and `Cell::spot`, the
 union with `Cell::offsetX` and `Cell::offsetY`, but not `Cell::flags`, which other subsystems share) and the scan index (`Game::scanIndex`, the item
-`scanIndex`), which the owner lists name as exact items (`write_items`). The cells are in the log one allocation ("PLOT MEMORY") that it names no field
+`scanIndex`), which the owner lists name as exact items (`write_items`). The rest of a spot is not checked: it holds the spot's animation cursors
+(`Spot::anim` and `Spot::shadow`), which the GAF helpers of src/graphics/gaf.cpp step and read for features and for drawing, and the log names those
+helpers' subsystems (game and presentation) as the writers. The cells are in the log one allocation ("PLOT MEMORY") that it names no field
 of, so the Cell items match only once it does; the others match today. Any writer but features fails, which is what makes every placement, removal,
 damage and reclaim reach them through the scheduler's events.
 
@@ -74,8 +76,7 @@ REGION_ALLOCATION = re.compile(r"AISearch region")
 REGION_FUNCTION = "LoadBattleAssets"
 
 
-FEATURES_WRITE_TYPES = ("FeatureAnimEntry",)
-FEATURES_WRITE_ITEMS = ("scanIndex", "Cell::feature", "Cell::spot", "Cell::offsetX", "Cell::offsetY")
+FEATURES_WRITE_ITEMS = ("scanIndex", "Cell::feature", "Cell::spot", "Cell::offsetX", "Cell::offsetY", "FeatureAnimEntry::next", "FeatureAnimEntry::prev")
 
 
 @dataclass(frozen=True)
@@ -91,7 +92,7 @@ class Owner:
 
 OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
           Owner("economy", "", (), re.compile(r"Economy region"), ("UnitResources",)),
-          Owner("features", "", (), None, FEATURES_WRITE_TYPES, FEATURES_WRITE_ITEMS))
+          Owner("features", "", (), None, (), FEATURES_WRITE_ITEMS))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",

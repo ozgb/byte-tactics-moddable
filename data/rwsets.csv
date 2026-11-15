@@ -175,18 +175,15 @@ address,function,file,kind,target
 0x401360,EconomyUpdatePlayer,src/game/economy.cpp,indirect_call,"indirect via void (*const)(int, EconPlayerInfo *) __attribute__((stdcall)) [EconomyWorldView::PlayerInfo]"
 0x401c20,StopOrder,src/orders/unit_orders.cpp,call,AppendOrder
 0x401c20,StopOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
+0x401c20,StopOrder,src/orders/unit_orders.cpp,call,TargetingPublishClear
 0x401c20,StopOrder,src/orders/unit_orders.cpp,call,operator new
 0x401c20,StopOrder,src/orders/unit_orders.cpp,call,operator->
 0x401c20,StopOrder,src/orders/unit_orders.cpp,field_escape,Unit::pos
-0x401c20,StopOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
-0x401c20,StopOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::ClearWeaponTarget
 0x401c20,StopOrder,src/orders/unit_orders.cpp,field_read,Unit::def
 0x401c20,StopOrder,src/orders/unit_orders.cpp,field_read,Unit::flags
 0x401c20,StopOrder,src/orders/unit_orders.cpp,field_read,UnitDef::flags1
 0x401c20,StopOrder,src/orders/unit_orders.cpp,function,
-0x401c20,StopOrder,src/orders/unit_orders.cpp,global_read,g_seams
 0x401c20,StopOrder,src/orders/unit_orders.cpp,global_read,kSim
-0x401c20,StopOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
 0x401cc0,MakeSelectableOrder,src/orders/unit_orders.cpp,field_read,Unit::flags
 0x401cc0,MakeSelectableOrder,src/orders/unit_orders.cpp,field_write,Unit::flags
 0x401cc0,MakeSelectableOrder,src/orders/unit_orders.cpp,function,
@@ -250,24 +247,23 @@ address,function,file,kind,target
 0x402010,SelfDestructOrder,src/orders/unit_orders.cpp,global_read,g_seams
 0x402010,SelfDestructOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int, int, unsigned short) __attribute__((stdcall)) [WeaponsSeam::DamageUnit]"
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
-0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,call,operator Unit *
+0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,call,TargetingPublishSetUnit
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,call,operator==
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,field_read,Order::state
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,field_read,Order::target
-0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
-0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,field_read,WeaponsSeam::ClaimWeapons
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,field_read,WeaponsSeam::ReleaseWeapons
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,field_write,Order::flags
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,function,
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,global_read,g_seams
-0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x402160,AttackNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,PathOrderAttach::SetUnit
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,ScheduleTargetingTargetUnit
+0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,TargetingPublishSetUnit
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,empty
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,operator=
@@ -282,10 +278,7 @@ address,function,file,kind,target
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Order::wait
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Order::waitLimit
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Seams::ai
-0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
-0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::GetWeaponTargetUnit
-0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Unit::flags
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Unit::playerIndex
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Unit::pos
@@ -299,9 +292,7 @@ address,function,file,kind,target
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_write,Order::waitLimit
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,function,
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,global_read,g_seams
-0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via Unit *(*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetUnit]"
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
-0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetVisibleEnemiesInRadius]"
@@ -451,17 +442,15 @@ address,function,file,kind,target
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,function,
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,call,Order::SetAttachedFx
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
+0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,call,TargetingPublishClear
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,field_read,Order::ticks
-0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,field_read,Seams::units
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
-0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::ClearWeaponTarget
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,field_read,UnitsSeam::SetStateBits
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,field_read,WeaponsSeam::ClaimWeapons
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,field_write,Order::ticks
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,function,
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,global_read,g_seams
-0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x402da0,GetBuiltOrder,src/orders/unit_orders.cpp,call,AddOrder
@@ -542,14 +531,11 @@ address,function,file,kind,target
 0x4030d0,StandingMoveOrder,src/orders/unit_orders.cpp,field_read,Order::mode
 0x4030d0,StandingMoveOrder,src/orders/unit_orders.cpp,field_write,Unit::moveOrder
 0x4030d0,StandingMoveOrder,src/orders/unit_orders.cpp,function,
+0x403100,StandingFireOrder,src/orders/unit_orders.cpp,call,TargetingPublishClear
 0x403100,StandingFireOrder,src/orders/unit_orders.cpp,field_read,Order::mode
-0x403100,StandingFireOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
-0x403100,StandingFireOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::ClearWeaponTarget
 0x403100,StandingFireOrder,src/orders/unit_orders.cpp,field_read,UnitWeaponSlot::flags
 0x403100,StandingFireOrder,src/orders/unit_orders.cpp,field_write,Unit::fireOrder
 0x403100,StandingFireOrder,src/orders/unit_orders.cpp,function,
-0x403100,StandingFireOrder,src/orders/unit_orders.cpp,global_read,g_seams
-0x403100,StandingFireOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
 0x403160,QMoveQPatrolOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x403160,QMoveQPatrolOrder,src/orders/unit_orders.cpp,function,
 0x403180,RegisterUnitOrders,src/orders/unit_orders.cpp,call,RegisterOrderTypes
@@ -599,20 +585,18 @@ address,function,file,kind,target
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,call,Order::AttachApproachRadiusGoal
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,call,ScheduleTargetingFireAtWill
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,call,operator bool
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,field_maybe_written,Order::pos
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,field_read,Order::flags
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,field_read,Order::state
-0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
-0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::FindBestTargetIfFireAtWill
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,field_read,Unit::motion
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,field_read,WeaponsSeam::ReleaseWeapons
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,field_write,Order::flags
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,field_write,Order::state
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,function,
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,global_read,g_seams
-0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,indirect_call,indirect via Unit *(*)(Unit *) __attribute__((stdcall)) [TargetingSeam::FindBestTargetIfFireAtWill]
 0x4033a0,PatrolOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,GetHeadingBetween
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,Order::Advance
@@ -624,6 +608,7 @@ address,function,file,kind,target
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,RandomInt
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,ScaledCos
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,ScaledSin
+0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,TargetingPublishSetUnit
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,Vec3Add
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,Whole
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,_hypot
@@ -645,7 +630,6 @@ address,function,file,kind,target
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::ChooseWeapon
-0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,field_read,Unit::def
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,field_read,Unit::flags
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,field_read,Unit::motion
@@ -668,21 +652,20 @@ address,function,file,kind,target
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Unit *, unsigned int) __attribute__((stdcall)) [WeaponsSeam::GetWeaponRange]"
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,indirect_call,indirect via unsigned char (*)(Unit *) __attribute__((fastcall)) [TargetingSeam::ChooseWeapon]
-0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,call,Order::AttachApproachRadiusGoal
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,call,TargetingPublishSetPos
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,call,operator bool
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,call,operator->
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_maybe_written,Order::pos
+0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_read,Order::pos
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_read,Order::radius
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_read,Order::state
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_read,Order::weapon
-0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
-0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::SetWeaponTargetPos
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_read,Unit::def
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_read,Unit::motion
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,field_read,UnitDef::flying
@@ -695,7 +678,6 @@ address,function,file,kind,target
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,function,
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,global_read,g_seams
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Unit *, unsigned int) __attribute__((stdcall)) [WeaponsSeam::GetWeaponRange]"
-0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetPos]"
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x4038a0,SuppressOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,AddOrder
@@ -1288,28 +1270,25 @@ address,function,file,kind,target
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,call,IssueAttackOrder
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,call,ScheduleTargetingFireAtWill
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,call,operator bool
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,field_read,Order::flags
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,field_read,Order::state
-0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
-0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::FindBestTargetIfFireAtWill
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,field_read,Unit::motion
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,field_read,WeaponsSeam::ReleaseWeapons
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,field_write,Order::flags
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,function,
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,global_read,g_seams
-0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,indirect_call,indirect via Unit *(*)(Unit *) __attribute__((stdcall)) [TargetingSeam::FindBestTargetIfFireAtWill]
 0x405fe0,StandbyOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,call,AppendOrder
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,call,ScheduleTargetingFireAtWill
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,call,operator new
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,field_read,Order::flags
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,field_read,Order::state
-0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
-0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::FindBestTargetIfFireAtWill
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,field_read,Unit::flags
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,field_read,Unit::mode
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,field_read,WeaponsSeam::ReleaseWeapons
@@ -1317,7 +1296,6 @@ address,function,file,kind,target
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,function,
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,global_read,g_seams
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,global_read,kSim
-0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,indirect_call,indirect via Unit *(*)(Unit *) __attribute__((stdcall)) [TargetingSeam::FindBestTargetIfFireAtWill]
 0x406090,StandbyMineOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x4061a0,ParkOrder,src/orders/unit_orders.cpp,call,Convert
 0x4061a0,ParkOrder,src/orders/unit_orders.cpp,call,MakePoint
@@ -1351,6 +1329,8 @@ address,function,file,kind,target
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,Order::Target
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,ScheduleTargetingTargetUnit
+0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,TargetingPublishSetUnit
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,UnitTypeSet::Contains
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,get
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,call,operator Order *
@@ -1375,10 +1355,7 @@ address,function,file,kind,target
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Player::allied
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Player::index
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Point16::x
-0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Seams::targeting
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
-0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::GetWeaponTargetUnit
-0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Unit::attacker
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Unit::carrier
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,field_read,Unit::def
@@ -1402,9 +1379,7 @@ address,function,file,kind,target
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,function,
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,global_read,g_seams
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,global_read,kSim
-0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via Unit *(*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetUnit]"
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
-0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 0x406300,FollowGroundOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x406780,GroundPickupOrder,src/orders/unit_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x406780,GroundPickupOrder,src/orders/unit_orders.cpp,call,Order::AttachApproachRadiusGoal
@@ -1554,6 +1529,8 @@ address,function,file,kind,target
 0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,function,
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,RandomInt
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,RecordUnitSpeech
+0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,ScheduleTargetingTargetUnit
+0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,TargetingPublishSetUnit
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,UnitTypeSet::Contains
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,operator bool
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,operator->
@@ -1570,11 +1547,8 @@ address,function,file,kind,target
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Player::index
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Player::type
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Seams::orders
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Seams::targeting
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Seams::units
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Seams::weapons
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,TargetingSeam::GetWeaponTargetUnit
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Unit::buildLeft
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Unit::def
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Unit::flags
@@ -1597,11 +1571,9 @@ address,function,file,kind,target
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,global_read,g_game
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,global_read,g_seams
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,global_read,kZeroFloatAi@src/ai/ai_player.cpp
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,"indirect via Unit *(*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetUnit]"
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,indirect via int (*)(Unit *) __attribute__((stdcall)) [OrdersSeam::GetOrderFlags]
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, int) __attribute__((stdcall)) [OrdersSeam::IssueAttackOrder]"
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [OrdersSeam::DeleteOrders]"
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::NotifyUnitRefs]"
 0x4071f0,SquadManager::FindNearestEnemyUnit,src/ai/ai_player.cpp,call,operator Unit *
@@ -1964,25 +1936,21 @@ address,function,file,kind,target
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,field_read,UnitDef::minwaterdepth
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,field_write,Unit::flags
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,function,
+0x408920,RetargetWeapon,src/ai/ai_player.cpp,call,ScheduleTargetingFind
+0x408920,RetargetWeapon,src/ai/ai_player.cpp,call,TargetingPublishClear
+0x408920,RetargetWeapon,src/ai/ai_player.cpp,call,TargetingPublishSetPos
+0x408920,RetargetWeapon,src/ai/ai_player.cpp,call,TargetingPublishSetUnit
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,call,operator->
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,<anon>::interceptor
-0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,Seams::targeting
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,Seams::weapons
-0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,TargetingSeam::ClearWeaponTarget
-0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,TargetingSeam::FindWeaponTarget
-0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,TargetingSeam::SetWeaponTargetPos
-0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,Unit::flags
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,UnitWeaponSlot::weapon
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,field_read,WeaponsSeam::FindTargetableProjectile
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,function,
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,global_read,g_seams
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,indirect_call,"indirect via Projectile *(*)(Unit *, unsigned int) __attribute__((stdcall)) [WeaponsSeam::FindTargetableProjectile]"
-0x408920,RetargetWeapon,src/ai/ai_player.cpp,indirect_call,"indirect via Unit *(*)(Unit *, unsigned char, int) __attribute__((stdcall)) [TargetingSeam::FindWeaponTarget]"
-0x408920,RetargetWeapon,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
-0x408920,RetargetWeapon,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetPos]"
-0x408920,RetargetWeapon,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,RetargetWeapon
+0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,ScheduleTargetingTargetUnit
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,UnitTypeSet::Contains
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,operator Unit *
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,call,operator bool
@@ -1997,10 +1965,8 @@ address,function,file,kind,target
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_read,Player::index
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_read,Player::unitsBegin
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_read,Player::unitsEnd
-0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_read,Seams::targeting
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_read,SquadManager::cursor
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_read,SquadManager::player
-0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_read,TargetingSeam::GetWeaponTargetUnit
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_read,Unit::activateFlags
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_read,Unit::buildLeft
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_read,Unit::def
@@ -2013,9 +1979,7 @@ address,function,file,kind,target
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,field_write,SquadManager::cursor
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,function,
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,global_read,g_game
-0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,global_read,g_seams
 0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,global_read,kZeroFloatAi@src/ai/ai_player.cpp
-0x4089a0,SquadManager::RetargetWeapons,src/ai/ai_player.cpp,indirect_call,"indirect via Unit *(*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetUnit]"
 0x408bf0,SquadManager::TickTimers,src/ai/ai_player.cpp,call,SquadManager::AssignSquads
 0x408bf0,SquadManager::TickTimers,src/ai/ai_player.cpp,call,SquadTimer::OnTimer
 0x408bf0,SquadManager::TickTimers,src/ai/ai_player.cpp,call,operator!=
@@ -3203,6 +3167,7 @@ address,function,file,kind,target
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,Order::SetDeadlineTicks
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,ScheduleTargetingFireAtWill
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,operator new
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,call,operator+=
@@ -3213,9 +3178,7 @@ address,function,file,kind,target
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,field_read,Order::state
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,field_read,Order::x
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,field_read,Order::z
-0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
-0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::FindBestTargetIfFireAtWill
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,field_read,Unit::cargo
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,field_read,Unit::flags
@@ -3235,7 +3198,6 @@ address,function,file,kind,target
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,function,
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,global_read,kSim
-0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,indirect_call,indirect via Unit *(*)(Unit *) __attribute__((stdcall)) [TargetingSeam::FindBestTargetIfFireAtWill]
 0x40f7d0,VtolStandbyOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x40fa20,VtolMoveOrder,src/orders/vtol_orders.cpp,call,Order::AnnounceStatusIfFlagged
 0x40fa20,VtolMoveOrder,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
@@ -3276,6 +3238,8 @@ address,function,file,kind,target
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,ScheduleTargetingTargetUnit
+0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetUnit
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,UnitTypeSet::Contains
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,call,get
@@ -3305,11 +3269,8 @@ address,function,file,kind,target
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Order::target
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Player::allied
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Player::index
-0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Seams::units
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
-0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::GetWeaponTargetUnit
-0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Unit::attacker
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Unit::carrier
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
@@ -3343,11 +3304,9 @@ address,function,file,kind,target
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,global_read,g_game
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,global_read,kSim
-0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via Unit *(*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetUnit]"
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanRepair]"
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [UnitsSeam::AttachUnitToPiece]"
-0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x40fbe0,VtolFollowOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
@@ -3369,6 +3328,7 @@ address,function,file,kind,target
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetAltitude
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,ScheduleTargetingFireAtWill
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,empty
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,get
@@ -3392,10 +3352,8 @@ address,function,file,kind,target
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Order::target
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Player::index
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::ai
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::units
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::FindBestTargetIfFireAtWill
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Unit::carrier
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,field_read,Unit::health
@@ -3426,7 +3384,6 @@ address,function,file,kind,target
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,global_read,g_game
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,global_read,kSim
-0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,indirect_call,indirect via Unit *(*)(Unit *) __attribute__((stdcall)) [TargetingSeam::FindBestTargetIfFireAtWill]
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [UnitsSeam::AttachUnitToPiece]"
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
@@ -3499,6 +3456,7 @@ address,function,file,kind,target
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,ScheduleTargetingFireAtWill
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,empty
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,operator new
@@ -3514,9 +3472,7 @@ address,function,file,kind,target
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,field_read,Order::subFlags
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,field_read,Player::index
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,field_read,Seams::ai
-0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
-0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::FindBestTargetIfFireAtWill
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,field_read,Unit::health
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,field_read,Unit::motion
@@ -3530,7 +3486,6 @@ address,function,file,kind,target
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,function,
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,global_read,kSim
-0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,indirect_call,indirect via Unit *(*)(Unit *) __attribute__((stdcall)) [TargetingSeam::FindBestTargetIfFireAtWill]
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
 0x4111b0,VtolPickupOrder,src/orders/vtol_orders.cpp,call,BelowSeaLevel
@@ -3689,6 +3644,8 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,TargetingPublishClear
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetPos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,_hypot
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,empty
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,get
@@ -3717,12 +3674,9 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Point16::x
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Point16::y
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Seams::ai
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Struct_Game391e9::gravity
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Struct_Unit96::slotIndex
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::ClearWeaponTarget
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::SetWeaponTargetPos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Unit::flags
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Unit::heading
@@ -3748,8 +3702,6 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,global_read,g_game
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,global_read,kSim
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetPos]"
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
@@ -3769,6 +3721,8 @@ address,function,file,kind,target
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetPos
+0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetUnit
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,_hypot
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,empty
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,get
@@ -3797,10 +3751,7 @@ address,function,file,kind,target
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,field_read,Order::z
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,field_read,Player::index
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,field_read,Seams::ai
-0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
-0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::SetWeaponTargetPos
-0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,field_read,Unit::flags
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,field_read,Unit::heading
@@ -3826,8 +3777,6 @@ address,function,file,kind,target
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,global_read,g_game
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,global_read,kSim
-0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
-0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetPos]"
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
@@ -3845,6 +3794,7 @@ address,function,file,kind,target
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,Sum
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetUnit
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,_hypot
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,get
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator Unit *
@@ -3870,9 +3820,7 @@ address,function,file,kind,target
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::ticks
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::x
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Order::z
-0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
-0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::flags
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,field_read,Unit::heading
@@ -3898,7 +3846,6 @@ address,function,file,kind,target
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,global_read,g_game
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,global_read,kSim
-0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,AddVec3
@@ -3914,6 +3861,7 @@ address,function,file,kind,target
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,Sum
+0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetUnit
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,_hypot
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,empty
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,get
@@ -3945,9 +3893,7 @@ address,function,file,kind,target
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,field_read,Order::z
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,field_read,Player::index
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,field_read,Seams::ai
-0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,field_read,Seams::targeting
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
-0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,field_read,TargetingSeam::SetWeaponTargetUnit
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,field_read,Unit::flags
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,field_read,Unit::health
@@ -3977,7 +3923,6 @@ address,function,file,kind,target
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,global_read,kSim
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
-0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [AiSeam::GetFactoriesInRadius]"
@@ -26650,6 +26595,7 @@ address,function,file,kind,target
 0x485a40,InitUnitFromType,src/units/units.cpp,call,EconHandleOf
 0x485a40,InitUnitFromType,src/units/units.cpp,call,EconPublish
 0x485a40,InitUnitFromType,src/units/units.cpp,call,RandomInt
+0x485a40,InitUnitFromType,src/units/units.cpp,call,TargetingPublishReset
 0x485a40,InitUnitFromType,src/units/units.cpp,call,get
 0x485a40,InitUnitFromType,src/units/units.cpp,call,operator->
 0x485a40,InitUnitFromType,src/units/units.cpp,call,operator=
@@ -26669,9 +26615,7 @@ address,function,file,kind,target
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Point16::x
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Point16::y
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Seams::ai
-0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Seams::targeting
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Seams::weapons
-0x485a40,InitUnitFromType,src/units/units.cpp,field_read,TargetingSeam::ResetWeaponTarget
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Unit::def
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Unit::footprint
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Unit::player
@@ -26742,7 +26686,6 @@ address,function,file,kind,target
 0x485a40,InitUnitFromType,src/units/units.cpp,global_read,g_game
 0x485a40,InitUnitFromType,src/units/units.cpp,global_read,g_seams
 0x485a40,InitUnitFromType,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
-0x485a40,InitUnitFromType,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ResetWeaponTarget]"
 0x485a40,InitUnitFromType,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x485d40,InitUnitScript,src/units/units.cpp,call,CobScript::SetCob
 0x485d40,InitUnitScript,src/units/units.cpp,call,CobScript::StartScript
@@ -27755,44 +27698,22 @@ address,function,file,kind,target
 0x4897b0,NotifyUnitRefs,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(OrderBase *, unsigned int) __attribute__((stdcall)) [OrdersSeam::OrderOrStatusFlags]"
 0x4897e0,Unit::ChooseWeapon,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::flags
 0x4897e0,Unit::ChooseWeapon,src/units/unit_targets.cpp,function,
+0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,call,TargetingPublishClear
 0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,call,Unit::ReleaseWeapons
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,call,get
 0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_escape,Unit::weapons
 0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_escape,UnitWeaponSlot::flags
 0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_read,<anon>::bit1
 0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_read,<anon>::bit4
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_read,AimTargetPair::a
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_read,AimTargetPair::b
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_read,Seams::units
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_read,Unit::script
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_read,UnitsSeam::FindScript
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_read,UnitsSeam::StartScriptWithArgs
 0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_write,<anon>::bit4
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_write,AimTargetPair::a
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,field_write,AimTargetPair::b
 0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,function,
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,global_read,g_seams
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
-0x489800,Unit::ReleaseWeapons,src/units/unit.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *) __attribute__((stdcall)) [UnitsSeam::FindScript]"
+0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,call,TargetingPublishClear
 0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,call,Unit::ClaimWeapons
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,call,get
 0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_escape,Unit::weapons
 0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_escape,UnitWeaponSlot::flags
 0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_read,<anon>::bit1
 0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_read,<anon>::bit4
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_read,AimTargetPair::a
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_read,AimTargetPair::b
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_read,Seams::units
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_read,Unit::script
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_read,UnitsSeam::FindScript
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_read,UnitsSeam::StartScriptWithArgs
 0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_write,<anon>::bit4
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_write,AimTargetPair::a
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,field_write,AimTargetPair::b
 0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,function,
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,global_read,g_seams
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
-0x4898b0,Unit::ClaimWeapons,src/units/unit.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *) __attribute__((stdcall)) [UnitsSeam::FindScript]"
 0x489960,Unit::CanReclaim,src/units/unit.cpp,call,get
 0x489960,Unit::CanReclaim,src/units/unit.cpp,deref_read,*unsigned int
 0x489960,Unit::CanReclaim,src/units/unit.cpp,field_read,Unit::def
@@ -27939,30 +27860,31 @@ address,function,file,kind,target
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,indirect_call,indirect via MissionType (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,indirect_call,"indirect via Order *(*)(MissionType, Unit *, void *, int, int, int) __attribute__((stdcall)) [OrdersSeam::NewOrder]"
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(Unit *, Order *) __attribute__((stdcall)) [OrdersSeam::AppendOrder]"
-0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,deref_read,*unsigned short
-0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,deref_write,*unsigned short
+0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,field_escape,Unit::weapons
+0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,field_read,Unit::id
+0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,field_read,Unit::netDirtyFlags
+0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,field_write,Unit::netDirtyFlags
+0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,field_write,UnitWeaponSlot::aimTargetXOrUnitId
+0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,field_write,UnitWeaponSlot::aimTargetZOrUnitSentinel
 0x48a060,SetWeaponTargetUnit,src/units/unit_targets.cpp,function,
 0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,deref_read,*int
-0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,deref_read,*short
-0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,deref_read,*unsigned short
-0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,deref_write,*short
-0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,deref_write,*unsigned short
+0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,field_escape,Unit::weapons
+0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,field_read,Unit::netDirtyFlags
+0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::aimTargetZOrUnitSentinel
+0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,field_write,Unit::netDirtyFlags
+0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,field_write,UnitWeaponSlot::aimTargetXOrUnitId
+0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,field_write,UnitWeaponSlot::aimTargetZOrUnitSentinel
 0x48a0a0,SetWeaponTargetPos,src/units/unit_targets.cpp,function,
-0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,call,get
+0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,call,PublishCleared
 0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,field_escape,Unit::weapons
 0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,field_read,AimTargetPair::a
 0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,field_read,AimTargetPair::b
-0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,field_read,Seams::units
-0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,field_read,Unit::script
-0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,field_read,UnitsSeam::FindScript
-0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,field_read,UnitsSeam::StartScriptWithArgs
 0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,field_write,AimTargetPair::a
 0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,field_write,AimTargetPair::b
 0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,function,
-0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,global_read,g_seams
-0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
-0x48a0f0,ClearWeaponTarget,src/units/unit_targets.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *) __attribute__((stdcall)) [UnitsSeam::FindScript]"
 0x48a160,ResetWeaponTarget,src/units/unit_targets.cpp,field_escape,Unit::weapons
+0x48a160,ResetWeaponTarget,src/units/unit_targets.cpp,field_read,AimTargetPair::a
+0x48a160,ResetWeaponTarget,src/units/unit_targets.cpp,field_read,AimTargetPair::b
 0x48a160,ResetWeaponTarget,src/units/unit_targets.cpp,field_write,AimTargetPair::a
 0x48a160,ResetWeaponTarget,src/units/unit_targets.cpp,field_write,AimTargetPair::b
 0x48a160,ResetWeaponTarget,src/units/unit_targets.cpp,function,
@@ -27974,6 +27896,7 @@ address,function,file,kind,target
 0x48a190,GetWeaponTargetUnit,src/units/unit_targets.cpp,field_read,Game::units
 0x48a190,GetWeaponTargetUnit,src/units/unit_targets.cpp,function,
 0x48a190,GetWeaponTargetUnit,src/units/unit_targets.cpp,global_read,g_game
+0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,call,PublishCleared
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,call,ScaleBodyOffset
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,call,bx_sqrt
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,call,get
@@ -27987,16 +27910,13 @@ address,function,file,kind,target
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,Seams::units
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,Unit::killCount
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,Unit::motion
-0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,Unit::script
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,Unit::unitDefIndex
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::aimTargetXOrUnitId
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::aimTargetZOrUnitSentinel
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::flags
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::weapon
-0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,UnitsSeam::FindScript
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,UnitsSeam::GetGroundHeight
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,UnitsSeam::GetSweetSpot
-0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,UnitsSeam::StartScriptWithArgs
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,Vec3::x
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,Vec3::y
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,field_read,Vec3::z
@@ -28010,8 +27930,6 @@ address,function,file,kind,target
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,function,
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,global_read,g_game
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,global_read,g_seams
-0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
-0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *) __attribute__((stdcall)) [UnitsSeam::FindScript]"
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetGroundHeight]
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetSweetSpot]"
 0x48a440,IsTargetingUnit,src/units/unit_targets.cpp,field_read,Unit::id
@@ -33265,6 +33183,8 @@ address,function,file,kind,target
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,EconHandleOf
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,EconSpend
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,RecordBuildMenuUpdate
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,ScheduleTargetingTargetPos
+0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,ScheduleTargetingTargetUnit
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,SolveLaunchAngle
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,SubtractVec3
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,call,WeaponCanReachPos
@@ -33289,10 +33209,7 @@ address,function,file,kind,target
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Player::energy
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Player::metal
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Seams::network
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Seams::targeting
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Seams::units
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,TargetingSeam::GetWeaponTargetPos
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,TargetingSeam::GetWeaponTargetUnit
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Unit::def
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Unit::heading
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,field_read,Unit::health
@@ -33322,9 +33239,7 @@ address,function,file,kind,target
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,function,
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,global_read,g_aimScriptNames
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,global_read,g_seams
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,indirect_call,"indirect via Unit *(*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetUnit]"
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
-0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(Unit *, Vec3 *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetPos]"
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(Unit *, char *, char, int, int, int, int) __attribute__((stdcall)) [NetworkSeam::SendScriptCallByName]"
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(void *, void *, void *, void *) __attribute__((stdcall))"
 0x49e1a0,UpdateUnitWeapons,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *, unsigned char) __attribute__((stdcall)) [UnitsSeam::GetAimFromPosition]"
@@ -43304,6 +43219,17 @@ address,function,file,kind,target
 ,ApplyShareSettings,src/harness/harness.cpp,function,
 ,ApplyShareSettings,src/harness/harness.cpp,global_escape,s_players@src/harness/harness.cpp
 ,ApplyShareSettings,src/harness/harness.cpp,global_read,g_game
+,ApplyTargetingEvent,src/units/unit_targets.cpp,call,ClearWeaponTarget
+,ApplyTargetingEvent,src/units/unit_targets.cpp,call,ResetWeaponTarget
+,ApplyTargetingEvent,src/units/unit_targets.cpp,call,SetWeaponTargetPos
+,ApplyTargetingEvent,src/units/unit_targets.cpp,call,SetWeaponTargetUnit
+,ApplyTargetingEvent,src/units/unit_targets.cpp,call,UnitOfHandle
+,ApplyTargetingEvent,src/units/unit_targets.cpp,field_read,TargetingEvent::kind
+,ApplyTargetingEvent,src/units/unit_targets.cpp,field_read,TargetingEvent::pos
+,ApplyTargetingEvent,src/units/unit_targets.cpp,field_read,TargetingEvent::target
+,ApplyTargetingEvent,src/units/unit_targets.cpp,field_read,TargetingEvent::unit
+,ApplyTargetingEvent,src/units/unit_targets.cpp,field_read,TargetingEvent::weapon
+,ApplyTargetingEvent,src/units/unit_targets.cpp,function,
 ,ApplyThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
 ,ApplyThunk,src/wasm/wind_meteors_glue.cpp,call,ToScratch
 ,ApplyThunk,src/wasm/wind_meteors_glue.cpp,function,
@@ -44231,11 +44157,8 @@ address,function,file,kind,target
 ,CleanTag,src/harness/block_scan.cpp,deref_read,*char
 ,CleanTag,src/harness/block_scan.cpp,deref_write,*char
 ,CleanTag,src/harness/block_scan.cpp,function,
-,ClearAllWeaponTargets,src/orders/order_list.cpp,field_read,Seams::targeting
-,ClearAllWeaponTargets,src/orders/order_list.cpp,field_read,TargetingSeam::ClearWeaponTarget
+,ClearAllWeaponTargets,src/orders/order_list.cpp,call,TargetingPublishClear
 ,ClearAllWeaponTargets,src/orders/order_list.cpp,function,
-,ClearAllWeaponTargets,src/orders/order_list.cpp,global_read,g_seams
-,ClearAllWeaponTargets,src/orders/order_list.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
 ,ClearCell,src/map/features.cpp,field_read,Cell::flags
 ,ClearCell,src/map/features.cpp,field_write,Cell::feature
 ,ClearCell,src/map/features.cpp,field_write,Cell::flags
@@ -45071,6 +44994,12 @@ address,function,file,kind,target
 ,DumpPrefix,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,DumpPrefix,src/harness/harness.cpp,global_read,s_tracePhase@src/harness/harness.cpp
 ,DumpPrefix,src/harness/harness.cpp,global_read,s_traceTick@src/harness/harness.cpp
+,DumpUnitName,src/harness/harness.cpp,call,fprintf
+,DumpUnitName,src/harness/harness.cpp,call,fputc
+,DumpUnitName,src/harness/harness.cpp,call,fputs
+,DumpUnitName,src/harness/harness.cpp,function,
+,DumpUnitName,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,DumpUnitName,src/harness/harness.cpp,global_read,s_targetNames@src/harness/harness.cpp
 ,DumpValue,src/harness/harness.cpp,call,ReadMasked
 ,DumpValue,src/harness/harness.cpp,call,Resolve
 ,DumpValue,src/harness/harness.cpp,call,SimBlockBase
@@ -47427,6 +47356,7 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,call,GameU32
 ,HarnessPhase,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessPhase,src/harness/harness.cpp,call,PathResultsClear
+,HarnessPhase,src/harness/harness.cpp,call,TargetingResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,VisitExplosions
 ,HarnessPhase,src/harness/harness.cpp,call,VisitFeatures
 ,HarnessPhase,src/harness/harness.cpp,call,VisitMeteors
@@ -47443,6 +47373,7 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_economyResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_featuresResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_pathResults@src/harness/harness.cpp
+,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_targetingResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_windMeteorsResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,g_randomSeed
 ,HarnessPhase,src/harness/harness.cpp,global_read,kHashOffset@src/harness/harness.cpp
@@ -47516,6 +47447,12 @@ address,function,file,kind,target
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_write,s_started@src/harness/harness.cpp
 ,HarnessStepsPerFrame,src/harness/harness.cpp,function,
 ,HarnessStepsPerFrame,src/harness/harness.cpp,global_read,s_stepsPerFrame@src/harness/harness.cpp
+,HarnessTargetingEvent,src/harness/harness.cpp,call,HarnessTestMode
+,HarnessTargetingEvent,src/harness/harness.cpp,call,TargetingResultsAdd
+,HarnessTargetingEvent,src/harness/harness.cpp,function,
+,HarnessTargetingEvent,src/harness/harness.cpp,global_maybe_written,s_targetingResults@src/harness/harness.cpp
+,HarnessTargetingEvent,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
+,HarnessTargetingEvent,src/harness/harness.cpp,global_write,s_targetingResultsLost@src/harness/harness.cpp
 ,HarnessTestMode,src/util/test_mode.cpp,function,
 ,HarnessTestMode,src/util/test_mode.cpp,global_read,s_testMode@src/util/test_mode.cpp
 ,HarnessUiCancel,src/harness/harness.cpp,call,UiLineStart
@@ -48210,15 +48147,12 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,Seams::units
 ,HookSeams,src/harness/replay_hooks.inc,field_write,Seams::weapons
 ,HookSeams,src/harness/replay_hooks.inc,field_write,Seams::wind_meteors
+,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::ChooseWeapon
-,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::ClearWeaponTarget
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::FindBestTargetIfFireAtWill
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::FindWeaponTarget
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::GetWeaponTargetPos
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::GetWeaponTargetUnit
-,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::ResetWeaponTarget
-,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::SetWeaponTargetPos
-,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::SetWeaponTargetUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::AddBuildProgress
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::AddRepairProgress
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::AllocateUnitMemory
@@ -48539,15 +48473,12 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersUpdatePlayers
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersUpdatePlayersFinish
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersUpdatePlayersOnStream
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingChooseWeapon
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingClearWeaponTarget
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingFindBestTargetIfFireAtWill
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingFindWeaponTarget
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingGetWeaponTargetPos
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingGetWeaponTargetUnit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingResetWeaponTarget
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingSetWeaponTargetPos
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingSetWeaponTargetUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsAddBuildProgress
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsAddRepairProgress
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsAllocateUnitMemory
@@ -49467,15 +49398,12 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,Seams::units
 ,InstallNativeSeams,src/seams/native.cpp,field_write,Seams::weapons
 ,InstallNativeSeams,src/seams/native.cpp,field_write,Seams::wind_meteors
+,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::Apply
 ,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::ChooseWeapon
-,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::ClearWeaponTarget
 ,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::FindBestTargetIfFireAtWill
 ,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::FindWeaponTarget
 ,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::GetWeaponTargetPos
 ,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::GetWeaponTargetUnit
-,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::ResetWeaponTarget
-,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::SetWeaponTargetPos
-,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::SetWeaponTargetUnit
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::AddBuildProgress
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::AddRepairProgress
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::AllocateUnitMemory
@@ -49583,6 +49511,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyAreaDamageAtNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyEvent
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyPathEvent
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyTargetingEvent
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyUnfinishedBuildDecay
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AttachUnitToPiece
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,BankCloseNative
@@ -49620,7 +49549,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClampWorldPosToTerrain
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearFootprintAndUnlink
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearOrderTypeTable
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearWeaponTarget
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdLimit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdPlan
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdShareMapping
@@ -49864,7 +49792,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RenameFile
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReparseAiWeightScriptsIfLimitNotSticky
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ResetAIPlayers
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,ResetWeaponTarget
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ResolveFeatureLinks
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RevealNewUnit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RunOrders
@@ -49890,8 +49817,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetStateBitsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetUnitPosition
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetUnitSquad
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetWeaponTargetPosNative
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetWeaponTargetUnitNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetYardOpen
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetupPlayerSlot
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SnapWorldPosToFootprint
@@ -52747,6 +52672,14 @@ address,function,file,kind,target
 ,PruneUsed,src/orders/order_list.cpp,field_read,Order::flags_42
 ,PruneUsed,src/orders/order_list.cpp,field_read,Unit::list
 ,PruneUsed,src/orders/order_list.cpp,function,
+,PublishCleared,src/units/unit_targets.cpp,call,HarnessTargetingEvent
+,PublishCleared,src/units/unit_targets.cpp,call,SchedPublish
+,PublishCleared,src/units/unit_targets.cpp,call,memset
+,PublishCleared,src/units/unit_targets.cpp,field_read,Ref<Unit>::offset
+,PublishCleared,src/units/unit_targets.cpp,field_write,TargetingEvent::kind
+,PublishCleared,src/units/unit_targets.cpp,field_write,TargetingEvent::unit
+,PublishCleared,src/units/unit_targets.cpp,field_write,TargetingEvent::weapon
+,PublishCleared,src/units/unit_targets.cpp,function,
 ,PublishEffect,src/map/features.cpp,call,HarnessFeaturesEvent
 ,PublishEffect,src/map/features.cpp,call,SchedPublish
 ,PublishEffect,src/map/features.cpp,function,
@@ -55529,6 +55462,16 @@ address,function,file,kind,target
 ,RecPlayersUpdatePlayersOnStream,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPlayersUpdatePlayersOnStream,src/harness/replay_hooks.inc,global_read,s_inner_players
 ,RecPlayersUpdatePlayersOnStream,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(RandStream) __attribute__((stdcall)) [PlayersSeam::UpdatePlayersOnStream]
+,RecTargetingApply,src/harness/replay_hooks.inc,call,ArgStruct
+,RecTargetingApply,src/harness/replay_hooks.inc,call,ArgValue
+,RecTargetingApply,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecTargetingApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecTargetingApply,src/harness/replay_hooks.inc,field_read,TargetingSeam::Apply
+,RecTargetingApply,src/harness/replay_hooks.inc,function,
+,RecTargetingApply,src/harness/replay_hooks.inc,global_read,s_call
+,RecTargetingApply,src/harness/replay_hooks.inc,global_read,s_inner_targeting
+,RecTargetingApply,src/harness/replay_hooks.inc,global_read,s_tail
+,RecTargetingApply,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(const TargetingEvent *) __attribute__((stdcall)) [TargetingSeam::Apply]
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,Add
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,ArgObject
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,ArgValue
@@ -55540,16 +55483,6 @@ address,function,file,kind,target
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,global_read,s_inner_targeting
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,indirect_call,indirect via unsigned char (*const)(Unit *) __attribute__((fastcall)) [TargetingSeam::ChooseWeapon]
-,RecTargetingClearWeaponTarget,src/harness/replay_hooks.inc,call,Add
-,RecTargetingClearWeaponTarget,src/harness/replay_hooks.inc,call,ArgObject
-,RecTargetingClearWeaponTarget,src/harness/replay_hooks.inc,call,ArgValue
-,RecTargetingClearWeaponTarget,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecTargetingClearWeaponTarget,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecTargetingClearWeaponTarget,src/harness/replay_hooks.inc,field_read,TargetingSeam::ClearWeaponTarget
-,RecTargetingClearWeaponTarget,src/harness/replay_hooks.inc,function,
-,RecTargetingClearWeaponTarget,src/harness/replay_hooks.inc,global_read,s_call
-,RecTargetingClearWeaponTarget,src/harness/replay_hooks.inc,global_read,s_inner_targeting
-,RecTargetingClearWeaponTarget,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
 ,RecTargetingFindBestTargetIfFireAtWill,src/harness/replay_hooks.inc,call,Add
 ,RecTargetingFindBestTargetIfFireAtWill,src/harness/replay_hooks.inc,call,ArgObject
 ,RecTargetingFindBestTargetIfFireAtWill,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55575,13 +55508,6 @@ address,function,file,kind,target
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ArgObject
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ArgValue
-,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,FinishImport
-,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ImportObject
-,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ImportOutVec3
-,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ImportResult
-,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ImportValue
-,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,field_read,TargetingSeam::GetWeaponTargetPos
@@ -55593,12 +55519,6 @@ address,function,file,kind,target
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,Add
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ArgValue
-,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,FinishImport
-,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ImportObject
-,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ImportResultObject
-,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ImportValue
-,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,field_read,TargetingSeam::GetWeaponTargetUnit
@@ -55607,37 +55527,6 @@ address,function,file,kind,target
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,global_read,s_inner_targeting
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via Unit *(*const)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetUnit]"
-,RecTargetingResetWeaponTarget,src/harness/replay_hooks.inc,call,Add
-,RecTargetingResetWeaponTarget,src/harness/replay_hooks.inc,call,ArgObject
-,RecTargetingResetWeaponTarget,src/harness/replay_hooks.inc,call,ArgValue
-,RecTargetingResetWeaponTarget,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecTargetingResetWeaponTarget,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecTargetingResetWeaponTarget,src/harness/replay_hooks.inc,field_read,TargetingSeam::ResetWeaponTarget
-,RecTargetingResetWeaponTarget,src/harness/replay_hooks.inc,function,
-,RecTargetingResetWeaponTarget,src/harness/replay_hooks.inc,global_read,s_call
-,RecTargetingResetWeaponTarget,src/harness/replay_hooks.inc,global_read,s_inner_targeting
-,RecTargetingResetWeaponTarget,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ResetWeaponTarget]"
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,call,Add
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,call,ArgObject
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,call,ArgStruct
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,call,ArgValue
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,field_read,TargetingSeam::SetWeaponTargetPos
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,function,
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,global_read,s_call
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,global_read,s_inner_targeting
-,RecTargetingSetWeaponTargetPos,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, Vec3 *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetPos]"
-,RecTargetingSetWeaponTargetUnit,src/harness/replay_hooks.inc,call,Add
-,RecTargetingSetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecTargetingSetWeaponTargetUnit,src/harness/replay_hooks.inc,call,ArgValue
-,RecTargetingSetWeaponTargetUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecTargetingSetWeaponTargetUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecTargetingSetWeaponTargetUnit,src/harness/replay_hooks.inc,field_read,TargetingSeam::SetWeaponTargetUnit
-,RecTargetingSetWeaponTargetUnit,src/harness/replay_hooks.inc,function,
-,RecTargetingSetWeaponTargetUnit,src/harness/replay_hooks.inc,global_read,s_call
-,RecTargetingSetWeaponTargetUnit,src/harness/replay_hooks.inc,global_read,s_inner_targeting
-,RecTargetingSetWeaponTargetUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, Unit *, int) __attribute__((stdcall)) [TargetingSeam::SetWeaponTargetUnit]"
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ArgValue
@@ -58636,6 +58525,53 @@ address,function,file,kind,target
 ,ScheduleMetalExtraction,src/seams/economy_world.cpp,function,
 ,ScheduleMetalExtraction,src/seams/economy_world.cpp,global_read,g_seams
 ,ScheduleMetalExtraction,src/seams/economy_world.cpp,indirect_call,indirect via void (*)(EconUnit) __attribute__((stdcall)) [EconomySeam::UpdateMetalExtraction]
+,ScheduleTargetingFind,src/seams/targeting_world.cpp,call,ReplayImport::Int
+,ScheduleTargetingFind,src/seams/targeting_world.cpp,call,ReplayImport::Ptr
+,ScheduleTargetingFind,src/seams/targeting_world.cpp,call,ReplayImport::~ReplayImport
+,ScheduleTargetingFind,src/seams/targeting_world.cpp,call,Result
+,ScheduleTargetingFind,src/seams/targeting_world.cpp,call,SchedDeliver
+,ScheduleTargetingFind,src/seams/targeting_world.cpp,field_read,Seams::targeting
+,ScheduleTargetingFind,src/seams/targeting_world.cpp,field_read,TargetingSeam::FindWeaponTarget
+,ScheduleTargetingFind,src/seams/targeting_world.cpp,function,
+,ScheduleTargetingFind,src/seams/targeting_world.cpp,global_read,g_seams
+,ScheduleTargetingFind,src/seams/targeting_world.cpp,indirect_call,"indirect via Unit *(*)(Unit *, unsigned char, int) __attribute__((stdcall)) [TargetingSeam::FindWeaponTarget]"
+,ScheduleTargetingFireAtWill,src/seams/targeting_world.cpp,call,ReplayImport::Ptr
+,ScheduleTargetingFireAtWill,src/seams/targeting_world.cpp,call,ReplayImport::~ReplayImport
+,ScheduleTargetingFireAtWill,src/seams/targeting_world.cpp,call,Result
+,ScheduleTargetingFireAtWill,src/seams/targeting_world.cpp,call,SchedDeliver
+,ScheduleTargetingFireAtWill,src/seams/targeting_world.cpp,field_read,Seams::targeting
+,ScheduleTargetingFireAtWill,src/seams/targeting_world.cpp,field_read,TargetingSeam::FindBestTargetIfFireAtWill
+,ScheduleTargetingFireAtWill,src/seams/targeting_world.cpp,function,
+,ScheduleTargetingFireAtWill,src/seams/targeting_world.cpp,global_read,g_seams
+,ScheduleTargetingFireAtWill,src/seams/targeting_world.cpp,indirect_call,indirect via Unit *(*)(Unit *) __attribute__((stdcall)) [TargetingSeam::FindBestTargetIfFireAtWill]
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,call,ReplayImport::Int
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,call,ReplayImport::Ptr
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,call,ReplayImport::Result
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,call,ReplayImport::~ReplayImport
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,call,SchedDeliver
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,call,operator=
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,deref_read,*Vec3
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,field_read,Seams::targeting
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,field_read,TargetingSeam::GetWeaponTargetPos
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,field_read,Vec3::x
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,field_read,Vec3::y
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,field_read,Vec3::z
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,field_write,Vec3::x
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,field_write,Vec3::y
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,field_write,Vec3::z
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,function,
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,global_read,g_seams
+,ScheduleTargetingTargetPos,src/seams/targeting_world.cpp,indirect_call,"indirect via int (*)(Unit *, Vec3 *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetPos]"
+,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,call,ReplayImport::Int
+,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,call,ReplayImport::Ptr
+,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,call,ReplayImport::~ReplayImport
+,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,call,Result
+,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,call,SchedDeliver
+,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,field_read,Seams::targeting
+,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,field_read,TargetingSeam::GetWeaponTargetUnit
+,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,function,
+,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,global_read,g_seams
+,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,indirect_call,"indirect via Unit *(*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetUnit]"
 ,ScreenX,src/ingame/markers.cpp,field_read,View::scroll_x
 ,ScreenX,src/ingame/markers.cpp,function,
 ,ScreenY,src/ingame/markers.cpp,field_read,View::scroll_y
@@ -59000,11 +58936,6 @@ address,function,file,kind,target
 ,SetValue,src/gui/dialogs.cpp,field_write,Gui::cursorFlags
 ,SetValue,src/gui/dialogs.cpp,field_write,Gui::cursorSrc
 ,SetValue,src/gui/dialogs.cpp,function,
-,SetWeaponTargetPosNative,src/seams/native.cpp,call,SetWeaponTargetPos
-,SetWeaponTargetPosNative,src/seams/native.cpp,field_maybe_written,Vec3::x
-,SetWeaponTargetPosNative,src/seams/native.cpp,function,
-,SetWeaponTargetUnitNative,src/seams/native.cpp,call,SetWeaponTargetUnit
-,SetWeaponTargetUnitNative,src/seams/native.cpp,function,
 ,SetWholePart,src/map/terrain.cpp,deref_write,*short
 ,SetWholePart,src/map/terrain.cpp,function,
 ,SettingGetBlob,src/host/settings_io.h,call,host_setting_get
@@ -59932,6 +59863,28 @@ address,function,file,kind,target
 ,TakeVec3,src/ingame/sim_event_drain.cpp,field_write,Vec3::y
 ,TakeVec3,src/ingame/sim_event_drain.cpp,field_write,Vec3::z
 ,TakeVec3,src/ingame/sim_event_drain.cpp,function,
+,TargetingInbox,src/seams/targeting_world.cpp,call,HarnessTargetingEvent
+,TargetingInbox,src/seams/targeting_world.cpp,field_read,Seams::targeting
+,TargetingInbox,src/seams/targeting_world.cpp,field_read,TargetingSeam::Apply
+,TargetingInbox,src/seams/targeting_world.cpp,function,
+,TargetingInbox,src/seams/targeting_world.cpp,global_read,g_seams
+,TargetingInbox,src/seams/targeting_world.cpp,indirect_call,indirect via int (*)(const TargetingEvent *) __attribute__((stdcall)) [TargetingSeam::Apply]
+,TargetingResultsAdd,src/harness/targeting_results.h,call,memset
+,TargetingResultsAdd,src/harness/targeting_results.h,call,operator=
+,TargetingResultsAdd,src/harness/targeting_results.h,call,realloc
+,TargetingResultsAdd,src/harness/targeting_results.h,deref_escape,*TargetingResult
+,TargetingResultsAdd,src/harness/targeting_results.h,deref_read,*TargetingEvent
+,TargetingResultsAdd,src/harness/targeting_results.h,field_read,TargetingResults::capacity
+,TargetingResultsAdd,src/harness/targeting_results.h,field_read,TargetingResults::count
+,TargetingResultsAdd,src/harness/targeting_results.h,field_read,TargetingResults::items
+,TargetingResultsAdd,src/harness/targeting_results.h,field_write,TargetingResult::event
+,TargetingResultsAdd,src/harness/targeting_results.h,field_write,TargetingResult::outcome
+,TargetingResultsAdd,src/harness/targeting_results.h,field_write,TargetingResults::capacity
+,TargetingResultsAdd,src/harness/targeting_results.h,field_write,TargetingResults::count
+,TargetingResultsAdd,src/harness/targeting_results.h,field_write,TargetingResults::items
+,TargetingResultsAdd,src/harness/targeting_results.h,function,
+,TargetingResultsClear,src/harness/targeting_results.h,field_write,TargetingResults::count
+,TargetingResultsClear,src/harness/targeting_results.h,function,
 ,TdfFieldVector::DestroyAll,src/util/tdf.cpp,call,TdfField::~TdfField
 ,TdfFieldVector::DestroyAll,src/util/tdf.cpp,call,operator delete
 ,TdfFieldVector::DestroyAll,src/util/tdf.cpp,field_read,std::vector<TdfField>::_First
@@ -60293,6 +60246,9 @@ address,function,file,kind,target
 ,UnitOfHandle,src/units/economy_effects.cpp,call,get
 ,UnitOfHandle,src/units/economy_effects.cpp,field_write,Ref<Unit>::offset
 ,UnitOfHandle,src/units/economy_effects.cpp,function,
+,UnitOfHandle,src/units/unit_targets.cpp,call,get
+,UnitOfHandle,src/units/unit_targets.cpp,field_write,Ref<Unit>::offset
+,UnitOfHandle,src/units/unit_targets.cpp,function,
 ,UnitRef::Get,src/units/unit_ref.h,call,operator Unit *
 ,UnitRef::Get,src/units/unit_ref.h,field_read,UnitRef::owner
 ,UnitRef::Get,src/units/unit_ref.h,function,
@@ -60401,6 +60357,18 @@ address,function,file,kind,target
 ,UnitsOnFeaturesInitState,src/units/features_effects.cpp,field_read,Game::features
 ,UnitsOnFeaturesInitState,src/units/features_effects.cpp,function,
 ,UnitsOnFeaturesInitState,src/units/features_effects.cpp,global_read,g_game
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,call,get
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,field_read,Seams::units
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,field_read,TargetingEvent::unit
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,field_read,TargetingEvent::weapon
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,field_read,Unit::script
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,field_read,UnitsSeam::FindScript
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,field_read,UnitsSeam::StartScriptWithArgs
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,field_write,Ref<Unit>::offset
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,function,
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,global_read,g_seams
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
+,UnitsOnTargetingCleared,src/units/targeting_effects.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *) __attribute__((stdcall)) [UnitsSeam::FindScript]"
 ,UnlinkBucketUnit,src/map/terrain.cpp,call,operator!=
 ,UnlinkBucketUnit,src/map/terrain.cpp,call,operator->
 ,UnlinkBucketUnit,src/map/terrain.cpp,call,operator=
@@ -61401,6 +61369,37 @@ address,function,file,kind,target
 ,VisitString,src/harness/harness.cpp,function,
 ,VisitString,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,VisitString,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,VisitTargetingResults,src/harness/harness.cpp,call,DumpHexBytes
+,VisitTargetingResults,src/harness/harness.cpp,call,DumpPrefix
+,VisitTargetingResults,src/harness/harness.cpp,call,DumpUnitName
+,VisitTargetingResults,src/harness/harness.cpp,call,Fail
+,VisitTargetingResults,src/harness/harness.cpp,call,Resolve
+,VisitTargetingResults,src/harness/harness.cpp,call,SimBlockBase
+,VisitTargetingResults,src/harness/harness.cpp,call,fprintf
+,VisitTargetingResults,src/harness/harness.cpp,call,sprintf
+,VisitTargetingResults,src/harness/harness.cpp,deref_escape,*TargetingResult
+,VisitTargetingResults,src/harness/harness.cpp,field_escape,TargetingEvent::pos
+,VisitTargetingResults,src/harness/harness.cpp,field_escape,TargetingResult::event
+,VisitTargetingResults,src/harness/harness.cpp,field_maybe_written,TargetingResult::targetId
+,VisitTargetingResults,src/harness/harness.cpp,field_maybe_written,TargetingResult::targetTag
+,VisitTargetingResults,src/harness/harness.cpp,field_maybe_written,TargetingResult::unitId
+,VisitTargetingResults,src/harness/harness.cpp,field_maybe_written,TargetingResult::unitTag
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingEvent::kind
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingEvent::target
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingEvent::unit
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingEvent::weapon
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingResult::outcome
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingResult::targetId
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingResult::targetTag
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingResult::unitId
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingResult::unitTag
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingResults::count
+,VisitTargetingResults,src/harness/harness.cpp,field_read,TargetingResults::items
+,VisitTargetingResults,src/harness/harness.cpp,function,
+,VisitTargetingResults,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,VisitTargetingResults,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,VisitTargetingResults,src/harness/harness.cpp,global_read,s_targetingResults@src/harness/harness.cpp
+,VisitTargetingResults,src/harness/harness.cpp,global_read,s_targetingResultsLost@src/harness/harness.cpp
 ,VisitTimer,src/harness/harness.cpp,call,FormatPath
 ,VisitTimer,src/harness/harness.cpp,call,TimerClassOf
 ,VisitTimer,src/harness/harness.cpp,call,VisitElement
@@ -61534,6 +61533,7 @@ address,function,file,kind,target
 ,VisitWorld,src/harness/harness.cpp,call,VisitPathResults
 ,VisitWorld,src/harness/harness.cpp,call,VisitPlayerHeap
 ,VisitWorld,src/harness/harness.cpp,call,VisitSpatial
+,VisitWorld,src/harness/harness.cpp,call,VisitTargetingResults
 ,VisitWorld,src/harness/harness.cpp,call,VisitUnitHeap
 ,VisitWorld,src/harness/harness.cpp,call,VisitVisibility
 ,VisitWorld,src/harness/harness.cpp,call,VisitWindMeteorsResults

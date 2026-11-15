@@ -1199,63 +1199,18 @@ void __stdcall RecWeaponsWeaponAimCobComplete(Callback* a0, int a1)
     }
 }
 
-void __stdcall RecTargetingSetWeaponTargetUnit(Unit* a0, Unit* a1, int a2)
+int __stdcall RecTargetingApply(const TargetingEvent* a0)
 {
     ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_TARGETING_SETWEAPONTARGETUNIT, SUB_TARGETING, roots);
+    SlotScope scope(RSL_TARGETING_APPLY, SUB_TARGETING, roots);
     if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgObject(s_call, "target", ROK_UNIT, a1);
-        ArgValue(s_call, "weapon", a2);
+        ArgStruct(s_call, "a", "event", ROK_TARGETINGEVENT, a0);
     }
-    s_inner_targeting->SetWeaponTargetUnit(a0, a1, a2);
+    int result = s_inner_targeting->Apply(a0);
     if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
     }
-}
-
-void __stdcall RecTargetingSetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_TARGETING_SETWEAPONTARGETPOS, SUB_TARGETING, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgStruct(s_call, "a", "pos", ROK_VEC3, a1);
-        ArgValue(s_call, "weapon", a2);
-    }
-    s_inner_targeting->SetWeaponTargetPos(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecTargetingClearWeaponTarget(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_TARGETING_CLEARWEAPONTARGET, SUB_TARGETING, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "weapon", a1);
-    }
-    s_inner_targeting->ClearWeaponTarget(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecTargetingResetWeaponTarget(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_TARGETING_RESETWEAPONTARGET, SUB_TARGETING, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "weapon", a1);
-    }
-    s_inner_targeting->ResetWeaponTarget(a0, a1);
-    if (scope.Open()) {
-    }
+    return result;
 }
 
 Unit* __stdcall RecTargetingGetWeaponTargetUnit(Unit* a0, int a1)
@@ -1267,17 +1222,7 @@ Unit* __stdcall RecTargetingGetWeaponTargetUnit(Unit* a0, int a1)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
         ArgValue(s_call, "weapon", a1);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i targeting.GetWeaponTargetUnit");
-        ImportObject(line, ROK_UNIT, a0);
-        ImportValue(line, a1);
-    }
     Unit* result = s_inner_targeting->GetWeaponTargetUnit(a0, a1);
-    if (scope.Import()) {
-        ImportResultObject(line, ROK_UNIT, result);
-        FinishImport(line);
-    }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, result, "o");
     }
@@ -1293,18 +1238,7 @@ int __stdcall RecTargetingGetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
         ArgValue(s_call, "weapon", a2);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i targeting.GetWeaponTargetPos");
-        ImportObject(line, ROK_UNIT, a0);
-        ImportValue(line, a2);
-    }
     int result = s_inner_targeting->GetWeaponTargetPos(a0, a1, a2);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        if (result != 0) ImportOutVec3(line, "pos", a1);
-        FinishImport(line);
-    }
     if (scope.Open()) {
         if (result != 0) ArgStruct(s_tail, "o", "pos", ROK_VEC3, a1);
         ArgValue(s_tail, "result", result, "o");
@@ -5002,10 +4936,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_UNITS_MARKRECENTLYDAMAGED)
             return true;
-        if (slot == RSL_TARGETING_GETWEAPONTARGETPOS)
-            return true;
-        if (slot == RSL_TARGETING_GETWEAPONTARGETUNIT)
-            return true;
         if (slot == RSL_NETWORK_SENDSCRIPTCALLBYNAME)
             return true;
         if (slot == RSL_NETWORK_SENDUNITDAMAGE)
@@ -5027,10 +4957,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_WEAPONS_GETWEAPONRANGE)
             return true;
         if (slot == RSL_WEAPONS_WEAPONCANREACHUNIT)
-            return true;
-        if (slot == RSL_UNITS_FINDSCRIPT)
-            return true;
-        if (slot == RSL_UNITS_STARTSCRIPTWITHARGS)
             return true;
         if (slot == RSL_UNITS_GETGROUNDHEIGHT)
             return true;
@@ -5263,16 +5189,10 @@ void HookSeams(const bool* on)
     if (on[SUB_WEAPONS])
         s_rec_weapons.WeaponAimCobComplete = RecWeaponsWeaponAimCobComplete;
     if (on[SUB_TARGETING])
-        s_rec_targeting.SetWeaponTargetUnit = RecTargetingSetWeaponTargetUnit;
+        s_rec_targeting.Apply = RecTargetingApply;
     if (on[SUB_TARGETING])
-        s_rec_targeting.SetWeaponTargetPos = RecTargetingSetWeaponTargetPos;
-    if (on[SUB_TARGETING])
-        s_rec_targeting.ClearWeaponTarget = RecTargetingClearWeaponTarget;
-    if (on[SUB_TARGETING])
-        s_rec_targeting.ResetWeaponTarget = RecTargetingResetWeaponTarget;
-    if (on[SUB_TARGETING] || on[SUB_WEAPONS])
         s_rec_targeting.GetWeaponTargetUnit = RecTargetingGetWeaponTargetUnit;
-    if (on[SUB_TARGETING] || on[SUB_WEAPONS])
+    if (on[SUB_TARGETING])
         s_rec_targeting.GetWeaponTargetPos = RecTargetingGetWeaponTargetPos;
     if (on[SUB_TARGETING])
         s_rec_targeting.FindWeaponTarget = RecTargetingFindWeaponTarget;
@@ -5380,9 +5300,9 @@ void HookSeams(const bool* on)
         s_rec_units.GetGroundHeight = RecUnitsGetGroundHeight;
     if (on[SUB_UNITS] || on[SUB_TARGETING])
         s_rec_units.GetSweetSpot = RecUnitsGetSweetSpot;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS] || on[SUB_TARGETING])
+    if (on[SUB_UNITS] || on[SUB_WEAPONS])
         s_rec_units.FindScript = RecUnitsFindScript;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS] || on[SUB_TARGETING])
+    if (on[SUB_UNITS] || on[SUB_WEAPONS])
         s_rec_units.StartScriptWithArgs = RecUnitsStartScriptWithArgs;
     if (on[SUB_UNITS])
         s_rec_units.SetStateBits = RecUnitsSetStateBits;

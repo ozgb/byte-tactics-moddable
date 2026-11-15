@@ -252,32 +252,6 @@ void __stdcall Imp_units_GetSweetSpot(Unit* a0, Vec3* a1)
     (void)r;
 }
 
-int __stdcall Imp_targeting_GetWeaponTargetPos(Unit* a0, Vec3* a1, int a2)
-{
-    ReplayText t;
-    StartImport(t, "targeting.GetWeaponTargetPos");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
-    Space(t);
-    ReplayValue(t, a2);
-    const char* r = Enter(t);
-    ApplyVec3(a1, "pos");
-    return ParseResult<int>(r);
-}
-
-Unit* __stdcall Imp_targeting_GetWeaponTargetUnit(Unit* a0, int a1)
-{
-    ReplayText t;
-    StartImport(t, "targeting.GetWeaponTargetUnit");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
-    Space(t);
-    ReplayValue(t, a1);
-    const char* r = Enter(t);
-    Unit* o = (Unit*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
-    return o;
-}
-
 int __stdcall Imp_network_SendScriptCallByName(Unit* a0, char* a1, char a2, int a3, int a4, int a5, int a6)
 {
     ReplayText t;
@@ -487,10 +461,7 @@ WeaponsSeam g_native_weapons = {
 };
 
 TargetingSeam g_native_targeting = {
-    SetWeaponTargetUnitSlot,
-    SetWeaponTargetPosSlot,
-    ClearWeaponTarget,
-    ResetWeaponTarget,
+    ApplyTargetingEvent,
     GetWeaponTargetUnit,
     GetWeaponTargetPos,
     FindWeaponTarget,
@@ -721,40 +692,20 @@ void Run_weapons_WeaponAimCobComplete()
     g_seams.weapons->WeaponAimCobComplete(p0, p1);
 }
 
-void Run_targeting_SetWeaponTargetUnit()
+int g_result_targeting_Apply;
+
+void Run_targeting_Apply()
 {
-    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
-    Unit* p1 = (Unit*)ArgObject("target", ROK_UNIT);
-    int p2 = ArgScalar<int>("weapon");
-    SetClosing(nullptr);
-    g_seams.targeting->SetWeaponTargetUnit(p0, p1, p2);
+    TargetingEvent p0;
+    memset(&p0, 0, sizeof p0);
+    ParseStruct("event", ROK_TARGETINGEVENT, &p0);
+    SetClosing("result");
+    g_result_targeting_Apply = g_seams.targeting->Apply(&p0);
 }
 
-void Run_targeting_SetWeaponTargetPos()
+void After_targeting_Apply()
 {
-    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
-    Vec3 p1;
-    memset(&p1, 0, sizeof p1);
-    ParseStruct("pos", ROK_VEC3, &p1);
-    int p2 = ArgScalar<int>("weapon");
-    SetClosing(nullptr);
-    g_seams.targeting->SetWeaponTargetPos(p0, &p1, p2);
-}
-
-void Run_targeting_ClearWeaponTarget()
-{
-    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
-    int p1 = ArgScalar<int>("weapon");
-    SetClosing(nullptr);
-    g_seams.targeting->ClearWeaponTarget(p0, p1);
-}
-
-void Run_targeting_ResetWeaponTarget()
-{
-    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
-    int p1 = ArgScalar<int>("weapon");
-    SetClosing(nullptr);
-    g_seams.targeting->ResetWeaponTarget(p0, p1);
+    CompareResult(g_result_targeting_Apply);
 }
 
 Unit* g_result_targeting_GetWeaponTargetUnit;
@@ -1097,20 +1048,8 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_weapons_WeaponAimCobComplete();
         return true;
     }
-    if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SetWeaponTargetUnit") == 0) {
-        Run_targeting_SetWeaponTargetUnit();
-        return true;
-    }
-    if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SetWeaponTargetPos") == 0) {
-        Run_targeting_SetWeaponTargetPos();
-        return true;
-    }
-    if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "ClearWeaponTarget") == 0) {
-        Run_targeting_ClearWeaponTarget();
-        return true;
-    }
-    if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "ResetWeaponTarget") == 0) {
-        Run_targeting_ResetWeaponTarget();
+    if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_targeting_Apply();
         return true;
     }
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "GetWeaponTargetUnit") == 0) {
@@ -1212,6 +1151,8 @@ void RunAfter(const char* subsystem, const char* slot)
         After_weapons_FindTargetableProjectile();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponCanReachPos") == 0)
         After_weapons_WeaponCanReachPos();
+    if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "Apply") == 0)
+        After_targeting_Apply();
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "GetWeaponTargetUnit") == 0)
         After_targeting_GetWeaponTargetUnit();
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "GetWeaponTargetPos") == 0)
@@ -1240,7 +1181,6 @@ WeaponsSeam g_import_weapons;
 FilesSeam g_import_files;
 LosRadarSeam g_import_los_radar;
 UnitsSeam g_import_units;
-TargetingSeam g_import_targeting;
 NetworkSeam g_import_network;
 AiSeam g_import_ai;
 OrdersSeam g_import_orders;
@@ -1289,11 +1229,6 @@ void BindSeams()
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
-    }
-    if (strcmp(g_subsystem, "weapons") == 0) {
-        g_seams.targeting = &g_import_targeting;
-        g_import_targeting.GetWeaponTargetPos = Imp_targeting_GetWeaponTargetPos;
-        g_import_targeting.GetWeaponTargetUnit = Imp_targeting_GetWeaponTargetUnit;
     }
     if (strcmp(g_subsystem, "targeting") == 0) {
         g_seams.weapons = &g_import_weapons;

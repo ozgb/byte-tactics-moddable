@@ -1130,7 +1130,7 @@ targeting:
 
 - `ChooseWeapon` returning 1 or 2: no shipped unit has weapon slot 0 empty and slot 1 or 2 defined.
 - `Apply` of a SET_POS with a z of -32768: it needs a world z of 32768, and scenarios and the harness reject positions off the map.
-- `Apply` of a SET_UNIT with a null target: 3.1c faults on it.
+- `Apply` of an event it rejects (a null unit, a weapon outside 0 to 2, or a SET_UNIT with a null target): every publisher passes a live unit and its own weapon number.
 - `FindWeaponTarget` rejecting a candidate that is not alive or is dying: the candidate list holds only live units, so neither check can fail.
 - `GetWeaponTargetPos` with the lead condition "the weapon slot has no weapon" failing alone: its only caller, `UpdateUnitWeapons`, skips a slot whose `flags` lack the value 2 (bit 1), and the value 2 means "has a weapon": `InitUnitWeaponSlots` sets it when the slot's weapon has a nonzero index.
 - `Unit::ChooseWeapon` returning 1 or 2 (weapon slot 0 empty, slot 1 or 2 defined): no shipped unit has that shape. Checked by reading every `units/*.fbi` and `weapons/*.tdf` of the 30 archives of `~/.ta` (`totala1` to `totala4`, `tactics1` to `tactics8`, `worlds`, `rev31.gp3`, the `.ufo` and `.ccx` files) with the `Hpi` reader of `tools/tdfnumbers.py`: no unit leaves its first weapon key empty, or names a weapon of ID 0 there, while its second or third weapon key names a weapon of nonzero ID.

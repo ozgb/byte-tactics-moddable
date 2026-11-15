@@ -474,10 +474,18 @@ static int ResetWeaponTarget(Unit* obj, int index)
 int __stdcall ApplyTargetingEvent(const TargetingEvent* e)
 {
     Unit* unit = UnitOfHandle(e->unit);
+    if (!unit || e->weapon < 0 || e->weapon > 2) {
+        return 0;
+    }
     switch (e->kind) {
-    case TARGETING_SET_UNIT:
-        SetWeaponTargetUnit(unit, UnitOfHandle(e->target), e->weapon);
+    case TARGETING_SET_UNIT: {
+        Unit* target = UnitOfHandle(e->target);
+        if (!target) {
+            return 0;
+        }
+        SetWeaponTargetUnit(unit, target, e->weapon);
         return 1;
+    }
     case TARGETING_SET_POS:
         SetWeaponTargetPos(unit, e->pos, e->weapon);
         return 1;

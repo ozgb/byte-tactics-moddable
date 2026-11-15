@@ -9,7 +9,7 @@ struct Vec3;
 // Minor version of the targeting interface, changed when a slot is added.
 #define TARGETING_VERSION_MINOR 0
 
-// The kinds of event other modules publish to targeting's inbox; each is an intent, applied by Apply in the order it was published.
+// The kinds of event other modules publish to targeting's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event with a null unit, a weapon outside 0 to 2, or (SET_UNIT) a null target changes nothing; outcome 0.
 enum TargetingEventKind {
     // Aims weapon of unit at the unit target, and clears the notices of unit's weapons that its orders wait on (a shot fired, a target out of reach); outcome 1.
     TARGETING_SET_UNIT = 96,

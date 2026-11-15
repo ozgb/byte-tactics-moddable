@@ -272,6 +272,27 @@ static void Play(Run* run, bool tamper)
     run->tampered = s_tampered;
 }
 
+static void CheckRejected()
+{
+    Restart();
+    Unit* shooter = UnitById(kShooter);
+    TargetingEvent aim = TargetingEventOf(TARGETING_SET_UNIT, shooter, 0);
+    aim.target = HandleOf(UnitById(kFirstEnemy));
+    Check(ApplyTargetingEvent(&aim) == 1, "a valid SET_UNIT is applied");
+    std::vector<char> before((char*)s_units, (char*)(s_units + kUnits));
+
+    TargetingEvent noUnit = TargetingEventOf(TARGETING_CLEAR, shooter, 0);
+    noUnit.unit = 0;
+    TargetingEvent noTarget = TargetingEventOf(TARGETING_SET_UNIT, shooter, 1);
+    TargetingEvent high = TargetingEventOf(TARGETING_SET_POS, shooter, 3);
+    TargetingEvent low = TargetingEventOf(TARGETING_RESET, shooter, -1);
+    TargetingEvent clearHigh = TargetingEventOf(TARGETING_CLEAR, shooter, 3);
+    const TargetingEvent* rejected[] = { &noUnit, &noTarget, &high, &low, &clearHigh };
+    for (const TargetingEvent* e : rejected)
+        Check(ApplyTargetingEvent(e) == 0, "an event with a null unit, a null target or a weapon outside 0 to 2 has outcome 0");
+    Check(memcmp(&before[0], s_units, before.size()) == 0, "a rejected event changes no unit");
+}
+
 int main()
 {
     Setup();
@@ -326,6 +347,8 @@ int main()
     Check(differingUnit == kTicks - kTamperTick, "the unit's weapon target differs at every tick from the tampered tick on");
     Check(differingShot == kTicks - kTamperTick, "the projectiles differ at every tick from the tampered tick on");
     printf("tampered tick %d, first differing tick %d, %d differing ticks\n", tampered.tampered, firstUnit, differingUnit);
+
+    CheckRejected();
 
     printf(g_failures ? "FAILED\n" : "targeting_writer_test: all passed\n");
     return g_failures != 0;

@@ -67,7 +67,9 @@ marked synchronous, because its caller uses the answer in the same statement:
   writing its pieces' state). Both happen at 3.1c's statement because the slot is synchronous.
 
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 38) and returned to no
-one: SET_UNIT and SET_POS 1, CLEAR and RESET 1 when the weapon had a target, 0 when not.
+one: SET_UNIT and SET_POS 1, CLEAR and RESET 1 when the weapon had a target, 0 when not. `Apply` first rejects an
+event with a null unit, a weapon outside 0 to 2, or (SET_UNIT) a null target, with outcome 0 and no change. 3.1c's
+callers passed pointers and could publish none of these, so no trace moves; a module publishing from WASM can.
 
 ## 3. Effects out of targeting
 

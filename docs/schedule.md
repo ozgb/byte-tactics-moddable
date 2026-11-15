@@ -1665,7 +1665,7 @@ the split lies in.
 | orders | map | units, each entity | split | `orders.OrderOrStatusFlags` (step 7) | `weapons.UpdateUnitWeapons` (step 15) |  | by subsystem | 3 | 3 |
 | orders | map | units, each entity | split | `orders.RunOrders` (step 17) | `orders.RunSecondaryOrders` (step 18) | `orders.RunOrders` | by item | 1 | 1 |
 | orders | map | units, each entity | split | `orders.UpdateMotion` (step 19) | `orders.AddBeCarriedOrder` (step 27) | `orders.UpdateMotion` | by item | 1 | 1 |
-| orders | targeting | units, each entity | split | `orders.OrderOrStatusFlags` (step 7) | `features.Apply` (step 9) |  | by subsystem | 4 | 3 |
+| orders | targeting | units, each entity | split | `orders.OrderOrStatusFlags` (step 7) | `features.Apply` (step 9) |  | by subsystem | 3 | 3 |
 | orders | targeting | units, each entity | split | `orders.RunOrders` (step 17) | `orders.RunSecondaryOrders` (step 18) | `orders.RunOrders` | by item | 2 | 1 |
 | orders | units | units, each entity | apply before continuing | `orders.OrderOrStatusFlags` (step 7) | the caller |  | by subsystem | 16 | 11 |
 | orders | units | units, each entity | apply before continuing | `orders.UpdateMotion` (step 19) | the caller | `orders.UpdateMotion` | by item | 1 | 1 |
@@ -1678,7 +1678,7 @@ the split lies in.
 | players | units | units, each entity | apply before continuing | `orders.RunOrders` (step 17) | the caller | `orders.RunOrders` | by subsystem | 2 | 2 |
 | players | weapons | units, each entity | split | `orders.RunOrders` (step 17) | `orders.RunSecondaryOrders` (step 18) | `orders.RunOrders` | by item | 2 | 2 |
 | targeting | orders | units, each entity | split | `features.Apply` (step 9) | `orders.RunOrders` (step 17) |  | by item | 1 | 1 |
-| targeting | weapons | units, each entity | split | `features.Apply` (step 9) | `targeting.Apply` (step 12) | `features.Apply` | by subsystem | 3 | 3 |
+| targeting | units | units, each entity | split | `features.Apply` (step 9) | `orders.RunOrders` (step 17) |  | by item | 1 | 1 |
 | targeting | weapons | units, each entity | split | `features.Apply` (step 9) | `weapons.UpdateUnitWeapons` (step 15) |  | by item | 1 | 1 |
 | units | ai | units, each entity | write before calling | the caller, before the first step | `los_radar.IsUnitVisibleToPlayer` (step 2) |  | by subsystem | 6 | 6 |
 | units | ai | units, each entity | split | `weapons.UpdateUnitWeapons` (step 15) | `weapons.DamageUnit` (step 16) | `weapons.UpdateUnitWeapons` | by item | 4 | 4 |
@@ -1698,7 +1698,7 @@ the split lies in.
 | units | players | units, each entity | write before calling | the caller, after step 1 | `orders.RunOrders` (step 17) |  | by item | 1 | 0 |
 | units | players | units, each entity | write before calling | the caller, before the first step | `weapons.UpdateUnitWeapons` (step 15) |  | by subsystem | 8 | 4 |
 | units | players | units, each entity | split | `weapons.UpdateUnitWeapons` (step 15) | `orders.RunOrders` (step 17) |  | by item | 3 | 1 |
-| units | targeting | units, each entity | write before calling | the caller, before the first step | `features.Apply` (step 9) |  | by subsystem | 8 | 8 |
+| units | targeting | units, each entity | write before calling | the caller, before the first step | `features.Apply` (step 9) |  | by subsystem | 6 | 6 |
 | units | targeting | units, each entity | split | `weapons.UpdateUnitWeapons` (step 15) | `orders.RunOrders` (step 17) |  | by item | 3 | 3 |
 | units | targeting | units, each entity | split | `weapons.UpdateUnitWeapons` (step 15) | `orders.RunOrders` (step 17) | `weapons.UpdateUnitWeapons` | by item | 1 | 1 |
 | units | targeting | units, each entity, in `weapons.UpdateUnitWeapons` | split | `orders.NewOrder` (step 15) | `targeting.GetWeaponTargetPos` (step 26) |  | by item | 1 | 1 |
@@ -1715,7 +1715,7 @@ the split lies in.
 | weapons | orders | units, each entity | split | `weapons.UpdateUnitWeapons` (step 15) | `weapons.DamageUnit` (step 16) | `weapons.UpdateUnitWeapons` | by item | 1 | 1 |
 | weapons | players | units, each entity | split | `weapons.CobScriptExplodePiece` (step 6) | `weapons.UpdateUnitWeapons` (step 15) |  | by subsystem | 3 | 0 |
 | weapons | players | units, each entity | split | `weapons.UpdateUnitWeapons` (step 15) | `orders.RunOrders` (step 17) |  | by item | 1 | 0 |
-| weapons | targeting | units, each entity | split | `weapons.CobScriptExplodePiece` (step 6) | `features.Apply` (step 9) |  | by subsystem | 8 | 8 |
+| weapons | targeting | units, each entity | split | `weapons.CobScriptExplodePiece` (step 6) | `features.Apply` (step 9) |  | by subsystem | 6 | 6 |
 | weapons | units | units, each entity | apply before continuing | `weapons.CobScriptExplodePiece` (step 6) | the caller | `weapons.CobScriptExplodePiece` | by subsystem | 7 | 7 |
 | weapons | units | units, each entity | apply before continuing | `weapons.UpdateUnitWeapons` (step 15) | the caller |  | by item | 3 | 3 |
 | weapons | units | units, each entity | apply before continuing | `weapons.UpdateUnitWeapons` (step 15) | the caller | `weapons.UpdateUnitWeapons` | by item | 1 | 1 |
@@ -1725,7 +1725,7 @@ the split lies in.
 
 | writer | reader | place | split | write in | read in | may split inside | matched | rows | across |
 |---|---|---|---|---|---|---|---|---|---|
-| ai | weapons | projectiles, each entity | apply before continuing | `ai.ReactToAttack` (step 9) | the caller | `ai.ReactToAttack` | by subsystem | 1 | 1 |
+| ai | targeting | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `orders.NewOrder` (step 12) | `ai.ReactToAttack` | by subsystem | 1 | 1 |
 | features | map | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `orders.NewOrder` (step 12) |  | by subsystem | 1 | 0 |
 | features | units | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `orders.NewOrder` (step 12) | `ai.ReactToAttack` | by subsystem | 1 | 1 |
 | features | weapons | projectiles, each entity | apply before continuing | `ai.ReactToAttack` (step 9) | the caller | `ai.ReactToAttack` | by subsystem | 2 | 2 |
@@ -1734,14 +1734,15 @@ the split lies in.
 | orders | units | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `orders.NewOrder` (step 12) |  | by item | 1 | 1 |
 | orders | units | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `orders.NewOrder` (step 12) | `ai.ReactToAttack` | by subsystem | 2 | 2 |
 | orders | weapons | projectiles, each entity | apply before continuing | `ai.ReactToAttack` (step 9) | the caller | `ai.ReactToAttack` | by subsystem | 1 | 1 |
+| targeting | ai | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `orders.NewOrder` (step 12) | `ai.ReactToAttack` | by subsystem | 1 | 1 |
 | units | orders | projectiles, each entity | split | `units.QueryScript` (step 1) | `ai.ReactToAttack` (step 9) |  | by subsystem | 1 | 1 |
+| units | weapons | projectiles, each entity | apply before continuing | `units.QueryScript` (step 1) | the caller | `units.QueryScript` | by subsystem | 1 | 1 |
 | weapons | ai | projectiles, each entity | write before calling | the caller, after step 9 | `ai.ReactToAttack` again, after the write |  | by item | 2 | 2 |
 | weapons | ai | projectiles, each entity | write before calling | the caller, after step 13 | `ai.ReactToAttack` again, after the write |  | by item | 1 | 1 |
 | weapons | ai | projectiles, each entity | split | `ai.ReactToAttack` (step 9) | `ai.MarkOwnerNetDirtyFromDamageSplit` (step 15) |  | by item | 1 | 1 |
-| weapons | ai | projectiles, each entity | split | `units.QueryScript` (step 1) | `ai.ReactToAttack` (step 9) |  | by subsystem | 3 | 3 |
+| weapons | ai | projectiles, each entity | split | `units.QueryScript` (step 1) | `ai.ReactToAttack` (step 9) |  | by subsystem | 2 | 2 |
 | weapons | los_radar | projectiles, each entity | split | `units.QueryScript` (step 1) | `los_radar.SoundHeardMask` (step 3) |  | by subsystem | 1 | 1 |
 | weapons | orders | projectiles, each entity | write before calling | the caller, after step 13 | `ai.ReactToAttack` again, after the write |  | by item | 1 | 1 |
-| weapons | targeting | projectiles, each entity | split | `units.QueryScript` (step 1) | `ai.ReactToAttack` (step 9) |  | by subsystem | 2 | 1 |
 
 ### Phase explosions
 
@@ -1779,7 +1780,6 @@ the split lies in.
 | units | map | players, each entity | split | `ai.SquadManagerTickIfActive` (step 1) | `map.CanPlaceUnitFootprint` (step 7) |  | by subsystem | 2 | 0 |
 | units | orders | players, each entity | split | `ai.SquadManagerTickIfActive` (step 1) | `units.CreateUnit` (step 10) |  | by subsystem | 1 | 1 |
 | weapons | ai | players, each entity | split | `ai.SquadManagerTickIfActive` (step 1) | `ai.UpdatePlayerAI` (step 2) | `ai.SquadManagerTickIfActive` | by subsystem | 2 | 2 |
-| weapons | targeting | players, each entity | split | `ai.SquadManagerTickIfActive` (step 1) | `units.CreateUnit` (step 10) | `ai.SquadManagerTickIfActive` | by subsystem | 3 | 3 |
 
 ### Phase features
 
@@ -1809,11 +1809,11 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | features | 1 / 0 | 5 / 3 | 2 / 0 | 2 / 9 | 14 | 2 | 16 |
 | ai | 0 / 0 | 5 / 5 | 4 / 5 | 6 / 0 | 4 | 43 | 47 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 5 | 0 / 1 | 0 | 0 | 0 |
-| weapons | 0 / 2 | 10 / 6 | 8 / 21 | 9 / 0 | 52 | 64 | 116 |
-| targeting | 1 / 0 | 3 / 4 | 2 / 0 | 3 / 11 | 5 | 42 | 47 |
+| weapons | 0 / 2 | 10 / 6 | 8 / 21 | 9 / 0 | 44 | 61 | 105 |
+| targeting | 1 / 0 | 3 / 4 | 2 / 0 | 3 / 11 | 4 | 33 | 37 |
 | los_radar | 0 / 0 | 3 / 13 | 0 / 11 | 0 / 0 | 12 | 30 | 41 |
-| orders | 2 / 0 | 22 / 2 | 22 / 13 | 12 / 3 | 61 | 52 | 113 |
-| units | 1 / 1 | 3 / 17 | 37 / 20 | 5 / 11 | 134 | 58 | 192 |
+| orders | 2 / 0 | 22 / 2 | 22 / 13 | 12 / 3 | 60 | 52 | 112 |
+| units | 1 / 1 | 3 / 17 | 37 / 20 | 5 / 11 | 133 | 59 | 192 |
 | players | 1 / 0 | 3 / 0 | 16 / 4 | 7 / 0 | 14 | 23 | 35 |
 | map | 0 / 4 | 3 / 8 | 2 / 9 | 0 / 3 | 17 | 32 | 49 |
 

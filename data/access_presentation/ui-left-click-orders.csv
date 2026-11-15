@@ -118,7 +118,7 @@ Unit::cargo,presentation,DrawUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT ME
 Unit::carrier,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::carrier,presentation,DrawUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::carrier,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::current,weapons,Unit::ReleaseWeapons,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::current,targeting,ApplyTargetingEvent,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::def,orders,GetFeature,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::def,orders,GetOrderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::def,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
@@ -192,7 +192,7 @@ Unit::pos,presentation,IssueOrderToSelection,AllocateUnitMemory: GameAllocIgnore
 Unit::postTransferHoldoff,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::postTransferHoldoff,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::script,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::script,weapons,Unit::ReleaseWeapons,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::script,units,UnitsOnTargetingCleared,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::speed,presentation,CMemoryCache::ShadeByIntensity,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::speed,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::speed,presentation,DisableUnavailableBuildMenuEntries,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-

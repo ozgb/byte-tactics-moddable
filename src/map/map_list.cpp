@@ -39,6 +39,7 @@ void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 void RegisterUnitOrders();
 
 #include "../../interfaces/wind_meteors.h"
+#include "../seams/wind_meteors_world.h"
 
 #include "../game/data_files.h"
 #include "../util/tdf.h"
@@ -512,16 +513,6 @@ void Mission::RefreshMapList(int multiplayer)
     }
     LoadMissionByName(mapList);
     multi = multiplayer;
-}
-
-static void PublishWindMeteors(int kind, const MeteorShowerParams* params)
-{
-    WindMeteorsEvent event;
-    memset(&event, 0, sizeof event);
-    event.kind = kind;
-    if (params != nullptr)
-        event.params = *params;
-    SchedPublish(SCHED_ENGINE, &event, sizeof event);
 }
 
 // FUNCTION: 0x435da0

@@ -154,6 +154,7 @@ void* __stdcall PlaceFeature(void* target, unsigned short id, void* pos, void* a
 void __stdcall WriteScreenshot(char* name, char* description, int x, int y, int w, int h);
 unsigned int GetTicks();
 #include "../../interfaces/wind_meteors.h"
+#include "../seams/wind_meteors_world.h"
 #include "../../interfaces/services.h"
 #include "../util/commands.h"
 #include "../graphics/object_pool.h"
@@ -810,17 +811,10 @@ void __stdcall CmdMakePoster(CommandArgs* args)
 // FUNCTION: 0x417760
 void __stdcall CmdMeteor(CommandArgs* args)
 {
-    if (args->Count() > 1) {
-        WindMeteorsEvent event;
-        memset(&event, 0, sizeof event);
-        event.kind = args->GetIntArg(1, 0) ? WIND_METEORS_ENABLE : WIND_METEORS_DISABLE;
-        SchedPublish(SCHED_ENGINE, &event, sizeof event);
-    } else {
-        WindMeteorsEvent event;
-        memset(&event, 0, sizeof event);
-        event.kind = WIND_METEORS_START;
-        SchedPublish(SCHED_ENGINE, &event, sizeof event);
-    }
+    if (args->Count() > 1)
+        PublishWindMeteors(args->GetIntArg(1, 0) ? WIND_METEORS_ENABLE : WIND_METEORS_DISABLE, nullptr);
+    else
+        PublishWindMeteors(WIND_METEORS_START, nullptr);
 }
 
 // FUNCTION: 0x4177a0

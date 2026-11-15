@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "../../interfaces/seams.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/wind_meteors.h"
@@ -9,6 +11,16 @@
 #include "wind_meteors_world.h"
 
 #include "../../link/globals.h"
+
+void PublishWindMeteors(int kind, const MeteorShowerParams* params)
+{
+    WindMeteorsEvent event;
+    memset(&event, 0, sizeof event);
+    event.kind = kind;
+    if (params != nullptr)
+        event.params = *params;
+    SchedPublish(SCHED_ENGINE, &event, sizeof event);
+}
 
 void WindMeteorsInbox(const void* event)
 {

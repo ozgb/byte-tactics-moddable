@@ -146,7 +146,7 @@ CONTENTS = [
 ROLES = {
     "game": "Game",
     "sim_globals": "SimGlobals",
-    "params": "MeteorParams",
+    "params": "MeteorShowerParams",
     "vec3": "Vec3",
     "weapon": "WeaponDef",
 }

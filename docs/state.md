@@ -85,7 +85,7 @@ Found during review, and re-checked against the code for #783. Functions are cit
   - `CmdControl` and `CmdView` write `localPlayer` and `playerIndex` (console_commands.cpp), which the tick reads.
   - The cheat toggles write `uiOptionFlags` bits.
   - `CmdILose` and `CmdIWin` write `endGameFlags` and `endGameVictory`.
-  - `CmdMeteor` calls `EnableMeteors`, `DisableMeteors` and `StartMeteorShower`, which write the meteor globals.
+  - `CmdMeteor` publishes the Enable, Disable and Start events of wind_meteors, whose `Apply` writes the meteor globals when the scheduler delivers them.
   - `HandleDebugHotkey` (game_dialogs.cpp) writes `Player.metal` and `Player.energy`.
 - `HandleSurrenderChoice` (options.cpp) writes `endGameFlags`.
 - The options and keys pause bit is `otherFlags`.

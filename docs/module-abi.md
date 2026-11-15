@@ -362,9 +362,9 @@ exits 0 when the file passes, 1 when it prints problems, and 2 when the check co
 ## 6. Slots
 
 A slot is a function export of the module's wasm instance, named exactly like the interface's slot
-(`UpdateWind`, `SetMeteorParams`). The module's `exports` lists them, in the interface's slot order.
-`SetMeteorParams` takes a `linear` address of a `MeteorParams` record, the params record of the
-`wind_meteors` module.
+(`UpdateWind`, `Apply`). The module's `exports` lists them, in the interface's slot order.
+`Apply` takes a `linear` address of a `WindMeteorsEvent` record, the event of the `wind_meteors`
+module's inbox.
 
 - **Finding.** The host finds a slot by export name in the module's instance. It never looks one up
   in the table. (The loader keeps the slots in the order of `exports`, and puts free table entries in
@@ -398,7 +398,7 @@ and `handle` is i32; of `f32`, f32; of `f64`, f64; `void` is no result.
 | `scratch` | a linear address in the scratch area, where the host put a copy of a native object for this call |
 | `handle` | an opaque u32 (section 8) |
 
-A params record such as `MeteorParams` (the `SetMeteorParams` and `LoadMeteorDefaults` argument) is a `linear` argument: the caller owns the object and the callee reads and writes it in place.
+A params or event record such as `MeteorShowerParams` (the `LoadMeteorDefaults` argument) or `WindMeteorsEvent` (the `Apply` argument) is a `linear` argument: the caller owns the object and the callee reads and writes it in place.
 
 ### 7.1 The pointer rule for Milestone 2
 
@@ -481,7 +481,7 @@ and not in the start function.
 | `g_extTdf` | the 4 bytes `tdf` plus a terminating 0, the extension of TDF data files | building a data path |
 | `g_blockBase` | the linear address of the block's first byte (`block_base`, 1048576 today) | adding to a block offset, section 7.1 |
 
-The `MeteorParams` record is not a data word: it reaches a module as the `linear` argument of a slot (section 6).
+The `MeteorShowerParams` and `WindMeteorsEvent` records are not data words: they reach a module as the `linear` argument of a slot (section 6).
 
 The host writes the words directly, not through an import. They are excluded from the hash of
 section 12.
@@ -513,12 +513,10 @@ catches non-determinism at the boundary whatever language the module is written 
 ### 9.2 Interface imports
 
 A group named after an interface imports the interface's slots by their names, with the interface's
-signature. The game manifest's module imports `weapons.SpawnProjectile` and
-`weapons.FindWeaponByName`. The host defines each by calling the engine's slot of the same name.
+signature. The game manifest's module imports `weapons.FindWeaponByName`. The host defines each by calling the engine's slot of the same name.
 
 | Import | Signature (kinds) | Behaviour |
 | --- | --- | --- |
-| `weapons.SpawnProjectile` | `[block, linear, linear, int] -> int` | adds a projectile of the weapon at a position with a velocity (two 3-vectors in the memory); returns 0 when the projectile table is full |
 | `weapons.FindWeaponByName` | `[linear] -> block` | finds a weapon definition by its TDF name (a NUL-terminated string); returns its address in the block, or 0 |
 
 ### 9.3 Engine services
@@ -543,14 +541,15 @@ signatures are `signatures.services` of the manifest.
 | `TdfRecord_GetFieldString` | `[handle, linear, linear, int, linear] -> int` | copies a field's text into a buffer (arguments: record, destination, key, size, default) |
 | `CommandArgs_GetIntArg` | `[scratch, int, int] -> int` | reads argument *index* of a console command as an integer, or the default |
 | `CommandArgs_Count` | `[scratch] -> int` | the number of arguments of a console command, its name included (`meteor 1` has 2); the recordings carry it as the `a args.count` line |
+| `WindMeteorsEmit` | `[linear] -> void` | publishes a `WindMeteorsEffect` (a meteor's SPAWN: weapon slot, position, velocity and whether it is announced) to the engine's outbox; the engine queues the projectile to weapons at the next phase boundary, and the recordings carry the effect's fields as the import's argument |
 | `HapiBank_OpenAccount` | `[handle, linear] -> int` | opens the named account of a saved-game bank |
 | `HapiBank_SetIntegerItem` | `[handle, linear, int] -> int` | writes an integer item of the open account |
 | `HapiBank_GetIntegerItem` | `[handle, linear, int] -> int` | reads an integer item, or the default |
 
-The services interface is at major 1 and minor 11 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+The services interface is at major 1 and minor 12 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
 `interfaces/services.h`). `CommandArgs_Count` came with minor 8, the goal-area services (`PathGoalContains`,
 `PathGoalDistance`, `PathGoalCells`) with minor 9 and `HarnessPathEvent`, which the players phase calls for the trace's
-path results, with minor 10 and `HarnessEconomyEvent`, which the scheduler calls for the trace's economy events, with minor 11. Each is an addition: a module built without it needs nothing.
+path results, with minor 10 and `HarnessEconomyEvent`, which the scheduler calls for the trace's economy events, with minor 11, and `WindMeteorsEmit`, the meteors' SPAWN effect, with minor 12. Each is an addition: a module built without it needs nothing.
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter

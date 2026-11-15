@@ -5023,9 +5023,7 @@ address,function,file,kind,target
 0x417600,CmdMakePoster,src/game/console_commands.cpp,global_read,g_game
 0x417760,CmdMeteor,src/game/console_commands.cpp,call,CommandArgs::Count
 0x417760,CmdMeteor,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
-0x417760,CmdMeteor,src/game/console_commands.cpp,call,SchedPublish
-0x417760,CmdMeteor,src/game/console_commands.cpp,call,memset
-0x417760,CmdMeteor,src/game/console_commands.cpp,field_write,WindMeteorsEvent::kind
+0x417760,CmdMeteor,src/game/console_commands.cpp,call,PublishWindMeteors
 0x417760,CmdMeteor,src/game/console_commands.cpp,function,
 0x4177a0,CmdDrop,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x4177a0,CmdDrop,src/game/console_commands.cpp,field_write,<anon>::b0
@@ -10759,7 +10757,7 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,Mission::LoadBriefing
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,Mission::LoadMissionData
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,Mission::SelectSchema
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,PublishWindMeteors
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,PublishMeteorSetUp
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,TdfFile::LoadFile
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,TdfFile::ResetCurrentRecord
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,TdfFile::SelectRecord
@@ -30042,6 +30040,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetCameraState
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetChatHudIndices
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetSpeech
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SchedWindPhase
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimAllocRegion
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimCaptureClear
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimEventsClear
@@ -30086,7 +30085,6 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,WeaponsSeam::InitExplosions
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,WeaponsSeam::LoadWeaponTypes
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,WindMeteorsSeam::InitMeteors
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,WindMeteorsSeam::UpdateWind
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::bit0_37ebe
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::bit11_37ebe
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::bit7_37f2f
@@ -30149,7 +30147,6 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WeaponsSeam::InitExplosions]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WeaponsSeam::LoadWeaponTypes]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WindMeteorsSeam::InitMeteors]
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWind]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via void (*)(const EconMapInfo *, const EconomyWorldView *, void *, unsigned int) __attribute__((stdcall)) [EconomySeam::Init]"
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via void (*)(const PathMapInfo *, void *, unsigned int) __attribute__((stdcall)) [PathfindingSeam::Init]"
 0x491a70,Force640x480Surfaces,src/game/game_state.cpp,call,AllocSurface
@@ -47473,6 +47470,7 @@ address,function,file,kind,target
 ,HarnessViewRand,src/harness/harness.cpp,global_read,s_viewState@src/harness/harness.cpp
 ,HarnessViewRand,src/harness/harness.cpp,global_write,s_viewDraws@src/harness/harness.cpp
 ,HarnessViewRand,src/harness/harness.cpp,global_write,s_viewState@src/harness/harness.cpp
+,HarnessWindMeteorsEvent,src/harness/harness.cpp,call,Fail
 ,HarnessWindMeteorsEvent,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessWindMeteorsEvent,src/harness/harness.cpp,call,WindMeteorsResultsAdd
 ,HarnessWindMeteorsEvent,src/harness/harness.cpp,function,
@@ -52615,13 +52613,20 @@ address,function,file,kind,target
 ,PruneUsed,src/orders/order_list.cpp,field_read,Order::flags_42
 ,PruneUsed,src/orders/order_list.cpp,field_read,Unit::list
 ,PruneUsed,src/orders/order_list.cpp,function,
-,PublishWindMeteors,src/map/map_list.cpp,call,SchedPublish
-,PublishWindMeteors,src/map/map_list.cpp,call,memset
-,PublishWindMeteors,src/map/map_list.cpp,call,operator=
-,PublishWindMeteors,src/map/map_list.cpp,deref_read,*MeteorShowerParams
-,PublishWindMeteors,src/map/map_list.cpp,field_write,WindMeteorsEvent::kind
-,PublishWindMeteors,src/map/map_list.cpp,field_write,WindMeteorsEvent::params
-,PublishWindMeteors,src/map/map_list.cpp,function,
+,PublishMeteorSetUp,src/map/map_list.cpp,call,SchedPublish
+,PublishMeteorSetUp,src/map/map_list.cpp,call,memset
+,PublishMeteorSetUp,src/map/map_list.cpp,call,operator=
+,PublishMeteorSetUp,src/map/map_list.cpp,deref_read,*MeteorShowerParams
+,PublishMeteorSetUp,src/map/map_list.cpp,field_write,WindMeteorsEvent::kind
+,PublishMeteorSetUp,src/map/map_list.cpp,field_write,WindMeteorsEvent::params
+,PublishMeteorSetUp,src/map/map_list.cpp,function,
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,call,SchedPublish
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,call,memset
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,call,operator=
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,deref_read,*MeteorShowerParams
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,field_write,WindMeteorsEvent::kind
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,field_write,WindMeteorsEvent::params
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,function,
 ,PumpNetPackets,src/network/net_game.cpp,call,HandleNetPackets
 ,PumpNetPackets,src/network/net_game.cpp,call,PacketManager::SendAllQueued
 ,PumpNetPackets,src/network/net_game.cpp,function,
@@ -61404,6 +61409,7 @@ address,function,file,kind,target
 ,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,call,Linear
 ,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,call,WindMeteorsEmit
 ,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,call,memcpy
+,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,field_read,WindMeteorsEffect::weapon
 ,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsFatalPending,src/wasm/wind_meteors_glue.cpp,function,

@@ -639,7 +639,6 @@ game,map,shared_write,UnitDef::flags1,1
 game,map,shared_write,Vec3::x,12
 game,map,shared_write,Vec3::y,4
 game,map,shared_write,Vec3::z,12
-game,map,shared_write,WindMeteorsEvent::kind,1
 game,network,call,AddMessage,2
 game,network,call,AreAllPlayersReady,1
 game,network,call,AssignStartPositions,2
@@ -1171,6 +1170,7 @@ game,presentation,shared_write,Vec3::z,41
 game,seams,call,DefaultEconomySeam,1
 game,seams,call,DefaultPathfindingSeam,1
 game,seams,call,NativeEconomyWorld,1
+game,seams,call,PublishWindMeteors,1
 game,seams,call,ScheduleEconomySpend,1
 game,seams,indirect,AdvanceMissionNative,1
 game,seams,indirect,DeactivateConditionsNative,2
@@ -1296,7 +1296,6 @@ game,wind_meteors,shared_write,Point16::y,5
 game,wind_meteors,shared_write,Vec3::x,1
 game,wind_meteors,shared_write,Vec3::y,1
 game,wind_meteors,shared_write,Vec3::z,1
-game,wind_meteors,shared_write,WindMeteorsEvent::kind,1
 harness,ai,shared_write,EconomySeam::GetEnergyUse,1
 harness,ai,shared_write,Game::difficulty,2
 harness,ai,shared_write,Game::playerIndex,1
@@ -2209,7 +2208,6 @@ map,game,shared_write,Unit::flags,4
 map,game,shared_write,Vec3::x,4
 map,game,shared_write,Vec3::y,2
 map,game,shared_write,Vec3::z,4
-map,game,shared_write,WindMeteorsEvent::kind,1
 map,harness,shared_write,Game::net,1
 map,harness,shared_write,Point16::x,1
 map,harness,shared_write,Point16::y,1
@@ -2324,6 +2322,8 @@ map,seams,shared_write,Unit::flags,1
 map,seams,shared_write,Vec3::x,2
 map,seams,shared_write,Vec3::y,1
 map,seams,shared_write,Vec3::z,1
+map,seams,shared_write,WindMeteorsEvent::kind,1
+map,seams,shared_write,WindMeteorsEvent::params,1
 map,targeting,shared_write,Unit::flags,1
 map,targeting,shared_write,Vec3::x,3
 map,targeting,shared_write,Vec3::y,2
@@ -4627,7 +4627,7 @@ seams,files,shared_write,FilesSeam::Read,1
 seams,files,shared_write,FilesSeam::Seek,1
 seams,files,shared_write,Seams::files,58
 seams,game,call,SchedDeliver,2
-seams,game,call,SchedPublish,2
+seams,game,call,SchedPublish,3
 seams,game,call,SimSearchSteps,1
 seams,game,shared_write,EconomySeam::UpdatePlayerEconomy,1
 seams,game,shared_write,EconomySeam::UpdateResourceSharing,1
@@ -4927,6 +4927,8 @@ seams,map,shared_write,Unit::motion,3
 seams,map,shared_write,Vec3::x,12
 seams,map,shared_write,Vec3::y,4
 seams,map,shared_write,Vec3::z,12
+seams,map,shared_write,WindMeteorsEvent::kind,1
+seams,map,shared_write,WindMeteorsEvent::params,1
 seams,network,shared_write,Unit::motion,1
 seams,orders,call,Order::ReattachFxToUnit,1
 seams,orders,call,Order::SerializeToSave,1
@@ -5240,6 +5242,8 @@ seams,wind_meteors,shared_write,Seams::weapons,1
 seams,wind_meteors,shared_write,Vec3::x,1
 seams,wind_meteors,shared_write,Vec3::y,1
 seams,wind_meteors,shared_write,Vec3::z,1
+seams,wind_meteors,shared_write,WindMeteorsEvent::kind,1
+seams,wind_meteors,shared_write,WindMeteorsEvent::params,1
 targeting,ai,shared_write,Vec3::x,18
 targeting,ai,shared_write,Vec3::y,11
 targeting,ai,shared_write,Vec3::z,18
@@ -6362,6 +6366,7 @@ wind_meteors,platform,shared_write,Point16::y,8
 wind_meteors,platform,shared_write,Vec3::x,22
 wind_meteors,platform,shared_write,Vec3::y,13
 wind_meteors,platform,shared_write,Vec3::z,22
+wind_meteors,platform,shared_write,WindMeteorsEffect::weapon,1
 wind_meteors,players,shared_write,Point16::x,3
 wind_meteors,players,shared_write,Point16::y,3
 wind_meteors,players,shared_write,Vec3::x,3

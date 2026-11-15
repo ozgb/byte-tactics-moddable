@@ -91,7 +91,8 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                   (features': UnitsSeam::GetGroundHeight and LosRadarSeam::GetMapCell; targeting has none) or a slot of a struct that a
                   parameter of the query slot points to (WriteState's StateWriter);
                   calls a function data/rwsets.csv has no rows for (memset, memcpy, a template), but for operator=, the
-                  assignment rwsets records as the write itself, and X87LeTest41, a template that compares two values;
+                  assignment rwsets records as the write itself, X87LeTest41, a template that compares two values, and
+                  operator Unit *, the conversion of a Ref to the pointer it holds;
                   or has inline assembly.
                 A pilot's `services` are called by name and not walked: wind_meteors' LoadMeteorDefaults reads the default
                 meteor data file through the TDF services (BuildDataPath, TdfFile::LoadFile, SelectRecord, ~TdfFile,
@@ -155,7 +156,7 @@ PRIVATE_TYPES = ("NodeData", "Node", "PathCell", "PathGrid", "TurnCostTable", "T
                  "PathExtra", "Pathfinder")
 PRIVATE_KINDS = ("field_read", "field_write", "field_escape", "field_maybe_written", "deref_read", "deref_write",
                  "deref_escape", "deref_maybe_written")
-ROWLESS_CALLS = ("operator=", "X87LeTest41")
+ROWLESS_CALLS = ("operator=", "X87LeTest41", "operator Unit *")
 NATIVE_TABLE = "src/seams/native.cpp"
 SCHEDULER_FILE = "src/game/scheduler.cpp"
 REPLAY_HOOKS_FILE = "src/harness/replay_hooks.inc"

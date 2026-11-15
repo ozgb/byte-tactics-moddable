@@ -1169,7 +1169,6 @@ LOOPS = {
 SILENT_INTENTS = {
     "pathfinding.CellsChanged": "a notification: what it does is left to the implementation, and the reference's does "
                                 "nothing.",
-    "units.FindScript": "a lookup whose value the caller discards: it has no effect.",
     "orders.DestroyMotionObject": "it writes through a virtual call whose targets are not resolved.",
     "players.NotifyUnitCreated": "it writes through a virtual call whose targets are not resolved.",
     "players.NotifyUnitDied": "it writes through a virtual call whose targets are not resolved.",

@@ -129,6 +129,8 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 | `globals` | Named simulation globals: `meteors`, `game` and `pathfinder`, each a list in hash order. |
 | `results` | The path results section (section 8.21), which is dumped and not hashed: its `section` number, the most waypoints of an event it dumps (`points`), and the `fields` of an event in dump order. |
 | `economy` | The economy events section (section 8.22), which is dumped and not hashed: its `section` number, the `fields` of an event in dump order, and the `account` that a LOAD event adds (the `kind` of the event it follows and its `size` in bytes). |
+| `packets` | The share packets section (section 8.23), which is dumped and not hashed: its `section` number and the `fields` of a packet in dump order. |
+| `windMeteors` | The wind_meteors events section (section 8.24), which is dumped and not hashed: its `section` number and the `fields` of a record in dump order. |
 
 A **table** has `size` (the byte size of the record it describes), `fields`, `plan`, and for most
 tables `excluded`. A table with `split_of` is a part of another table: it holds fields of that
@@ -285,8 +287,8 @@ out sections 16 and 17, then sections 29 to 31 when the tick is 1. It has no tic
 
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
-section 8.21), the economy events (section 33, section 8.22) and the share packets (section 35,
-section 8.23) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
+section 8.21), the economy events (section 33, section 8.22), the share packets (section 35,
+section 8.23) and wind_meteors' events (section 38, section 8.24) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
 hashed: what the orders and goals keep of a path (sections 20 and 21), and the players' and units'
 resource fields.
 
@@ -1106,6 +1108,36 @@ Which packets a step sends, and when, is behaviour of the build, not of the stat
 rows match can send the same packets in a different order within a step (`docs/economy-interface.md`,
 section 8). The lines are a diagnostic of what the receiver would see.
 
+### 8.24 wind_meteors events (section 38, dumped only)
+
+The events and effects of wind_meteors in this tick (`interfaces/wind_meteors.h`). No row hashes them
+(section 6): a dump holds their lines, after those of section 33, as a diagnostic. The reference
+build does not record them, so its dumps have no `windMeteors.*` lines. An event is recorded when
+wind_meteors consumes it from its inbox, right after `Apply` returns; an effect is recorded when
+wind_meteors publishes it to its outbox. So the records are in wind_meteors' order of consumption and
+publication. The host empties the record after the world row of the tick, so the lines a dump writes
+after an earlier phase hold the records made so far. The fields are `windMeteors.fields` of the
+schema, in this order.
+
+```
+windMeteors.count                              # n
+for k in 0 .. n-1, in order of consumption and publication:
+    windMeteors[k].kind
+    windMeteors[k].data                        # hex: the record's bytes after its first int
+```
+
+`windMeteors.count` and `kind` are written as `0x` and 8 hex digits.
+
+- `kind` is an event: 32 ENABLE, 33 DISABLE, 34 PARAMS, 35 START; or an effect: 48 SPAWN.
+- `data` of an event is the 48 bytes after its `kind`: the meteor shower parameters of a PARAMS event
+  (the weapon name in 32 bytes, then the radius, the density, the duration and the interval, 4 bytes
+  each, the last three as IEEE 754 single bits where they are floats), and 0 for the other kinds.
+- `data` of an effect is the 32 bytes after its `kind`: for SPAWN the meteor weapon's slot in the match's
+  table of weapons, the position and the velocity (3 ints each) and whether the spawn is announced to the
+  other players.
+- The meteor schedule and the 13 meteor globals are private to wind_meteors and are still hashed (section
+  7.7); the wind fields of the game record are hashed in section 7.6.
+
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
@@ -1139,7 +1171,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
 every hashed value of that one tick, after each phase of the tick, and the lines no row hashes: those
-of sections 16 and 17, of economy's report, and of sections 32, 33 and 35. The first line is `bt-dump 5`; every
+of sections 16 and 17, of economy's report, and of sections 32, 33, 35 and 38. The first line is `bt-dump 5`; every
 other line is
 
 ```
@@ -1153,13 +1185,13 @@ with single spaces between the first three fields and the value, which runs to t
 dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller state of `rng`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
-lines of section 28), then the lines of sections 32 and 33, which end the block and are not hash
-input (sections 8.21 and 8.22). The `meteors` block ends with the lines of section 35 after them
+lines of section 28), then the lines of sections 32, 33 and 38, which end the block and are not hash
+input (sections 8.21, 8.22 and 8.24). The `meteors` block ends with the lines of section 35 after them
 (section 8.23), also not hash input. The `pathfinder.*` lines of
 sections 16 and 17, and the `economyState.*` lines of economy's own report that follow them, sit between those of
 sections 15 and 18 but are not hash input (sections 8.7 and 8.22). Every
 other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
-block in order, skipping the `pathfinder.*`, `economyState.*`, `results.*`, `economy.*` and `packets.*` lines, and
+block in order, skipping the `pathfinder.*`, `economyState.*`, `results.*`, `economy.*`, `windMeteors.*` and `packets.*` lines, and
 applying the rules of sections 6 to 8 reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
@@ -1199,7 +1231,7 @@ not print excluded fields.
 To recompute a hash from the dump:
 
 1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), the `economyState.*` lines that follow them (section 8.22)
-   and the `results.*`, `economy.*` and `packets.*` lines that end the block (sections 8.21 to 8.23), and parse the
+   and the `results.*`, `economy.*`, `windMeteors.*` and `packets.*` lines that end the block (sections 8.21 to 8.24), and parse the
    paths into the structure of sections 6 to 8.
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`
@@ -1259,7 +1291,8 @@ after it, both only dumped, and took the resource account of a unit (bytes 0xbc 
 of the hash of the Unit table. Section 35 (the share packets, section 8.23) was added in format 5,
 without a new number: it is only dumped, after every line a row hashes, and changes no row, no digest
 and no line syntax. A reader that rejects unknown lines at the end of a block must learn to skip
-`packets.*`, as it skips `results.*` and `economy.*`.
+`packets.*`, as it skips `results.*` and `economy.*`. Section 38 (wind_meteors' events, section 8.24) was
+added the same way, after section 33's lines: a reader must also skip `windMeteors.*`.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

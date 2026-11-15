@@ -32,6 +32,10 @@ only: any writer but economy fails, which is what makes every income, spend and 
 other view state, the resource fields of the Player record, is named in the log by the Game union aliases (`unknown_1b8e`, `pad_1df4`,
 `unknown_1cd9`) that other fields of the record share, so it can't be told from the rest of the record and is not checked. Economy's
 WriteState (section 34) is dumped and never hashed, so no shadow-field check applies to it.
+wind_meteors owns no allocation, only named items of the state block. The 13 meteor globals of SimGlobals (g_meteorNextStrikeTime and the others
+in METEOR_GLOBALS, named in the log by the global's name) are private for reads and writes: any subsystem but wind_meteors that reads or writes one
+fails. The wind fields of the Game record (WIND_FIELDS, named in the log by the bare field name) are its view: others read them, so they are private
+for writes only, and any writer but wind_meteors fails.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
@@ -68,16 +72,25 @@ REGION_FUNCTION = "LoadBattleAssets"
 
 @dataclass(frozen=True)
 class Owner:
-    """A subsystem with private state: the items of its types, its region root and its allocation, and the items private for writes only."""
+    """A subsystem with private state: the items of its types, its region root and its allocation, the types of items private for writes only, and the named items private for reads and writes (items) or for writes only (write_items)."""
     name: str
     root: str
     types: tuple
     allocation: re.Pattern
     write_types: tuple = ()
+    items: tuple = ()
+    write_items: tuple = ()
 
 
+METEOR_GLOBALS = ("g_meteorNextStrikeTime", "g_meteorWeaponName", "g_meteorSpawnMagnitude", "g_meteorSpawnInterval", "g_meteorActive",
+                  "g_meteorStrikeEndTime", "g_meteorOrigin", "g_meteorShowerDuration", "g_meteorWeapon", "g_meteorsEnabled",
+                  "g_meteorNextHitTime", "g_meteorTarget", "g_meteorScheduleGap")
+WIND_FIELDS = ("windCounter", "windSpeedDenominator", "windX", "windY", "windZ", "windDirection", "windSpeed", "windStrength",
+               "windEnabled", "windSpeedMin", "windSpeedMax")
+NO_ALLOCATION = re.compile(r"(?!)")
 OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
-          Owner("economy", "", (), re.compile(r"Economy region"), ("UnitResources",)))
+          Owner("economy", "", (), re.compile(r"Economy region"), ("UnitResources",)),
+          Owner("wind_meteors", "", (), NO_ALLOCATION, (), METEOR_GLOBALS, WIND_FIELDS))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",
@@ -136,7 +149,9 @@ def private_to(item: str) -> tuple[str, tuple[str, ...]]:
             return o.name, ("writer", "reader")
         if item.startswith(REGION_FUNCTION + ":") and o.allocation.search(item) is not None:
             return o.name, ("writer", "reader")
-        if item.split("::")[0] in o.write_types:
+        if item in o.items:
+            return o.name, ("writer", "reader")
+        if item.split("::")[0] in o.write_types or item in o.write_items:
             return o.name, ("writer",)
     return "", ()
 

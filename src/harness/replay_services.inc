@@ -365,6 +365,11 @@ void ReplayImportEnd(ReplayImport& c)
         ReplayAddValueOrNull(t, ROK_WINDMETEORSEFFECT, a[0].v.p, Table());
         break;
     }
+    case RI_SCHEDULE_FEATURES_PLACE:
+    {
+        AddResult(t, c.result);
+        break;
+    }
     case RI_SIM_CAPTURE_ALLOC:
     {
         AddSpace(t);

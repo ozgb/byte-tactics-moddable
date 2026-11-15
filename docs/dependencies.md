@@ -24,18 +24,18 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 
 | subsystem | ordered | immediate | deferrable | read-only | unobserved | can be cut from |
 |---|---|---|---|---|---|---|
-| wind_meteors | 0 | 0 | 0 | 20 | 101 | 11 of 11 |
+| wind_meteors | 0 | 0 | 0 | 20 | 107 | 11 of 11 |
 | economy | 0 | 39 | 0 | 4 | 72 | 3 of 11 |
-| features | 15 | 16 | 2 | 79 | 181 | 6 of 11 |
+| features | 15 | 16 | 2 | 79 | 177 | 6 of 11 |
 | ai | 27 | 47 | 5 | 132 | 203 | 2 of 11 |
 | pathfinding | 0 | 0 | 0 | 63 | 58 | 11 of 11 |
-| weapons | 28 | 116 | 8 | 239 | 261 | 2 of 11 |
+| weapons | 28 | 116 | 8 | 239 | 254 | 2 of 11 |
 | targeting | 10 | 47 | 2 | 36 | 82 | 3 of 11 |
 | los_radar | 6 | 42 | 3 | 135 | 223 | 2 of 11 |
 | orders | 16 | 113 | 15 | 169 | 322 | 4 of 11 |
 | units | 18 | 192 | 9 | 106 | 446 | 2 of 11 |
 | players | 4 | 37 | 4 | 75 | 298 | 4 of 11 |
-| map | 8 | 49 | 0 | 97 | 221 | 2 of 11 |
+| map | 8 | 49 | 0 | 97 | 226 | 2 of 11 |
 
 ## Tightly coupled groups
 
@@ -213,7 +213,7 @@ Gaps in what the data say:
 | immediate | 0 | 0 |
 | deferrable | 0 | 0 |
 | read-only | 0 | 20 |
-| unobserved | 52 | 49 |
+| unobserved | 55 | 52 |
 
 **Ordered** (0).
 
@@ -240,13 +240,13 @@ None.
 | ai | 5 | 5 |
 | features | 7 | 5 |
 | los_radar | 5 | 5 |
-| map | 5 | 9 |
+| map | 9 | 12 |
 | orders | 5 | 5 |
 | pathfinding | 2 | 2 |
 | players | 5 | 5 |
 | targeting | 3 | 3 |
 | units | 8 | 5 |
-| weapons | 7 | 5 |
+| weapons | 6 | 5 |
 
 ### Cut from
 
@@ -431,7 +431,7 @@ It has no deferrable edge.
 | immediate | 14 | 2 |
 | deferrable | 2 | 0 |
 | read-only | 0 | 79 |
-| unobserved | 101 | 80 |
+| unobserved | 99 | 78 |
 
 **Ordered** (15).
 
@@ -500,7 +500,7 @@ It has no deferrable edge.
 | players | 5 | 7 |
 | targeting | 3 | 3 |
 | units | 14 | 13 |
-| weapons | 18 | 13 |
+| weapons | 16 | 11 |
 | wind_meteors | 5 | 7 |
 
 ### Cut from
@@ -875,7 +875,7 @@ It has no deferrable edge.
 | immediate | 52 | 64 |
 | deferrable | 4 | 4 |
 | read-only | 0 | 239 |
-| unobserved | 121 | 140 |
+| unobserved | 117 | 137 |
 
 **Ordered** (28).
 
@@ -982,15 +982,15 @@ The 40 rows with the most runs are shown; the other 76 are in data/dependencies.
 |---|---|---|
 | ai | 10 | 7 |
 | economy | 0 | 2 |
-| features | 13 | 18 |
+| features | 11 | 16 |
 | los_radar | 21 | 14 |
-| map | 8 | 12 |
+| map | 6 | 12 |
 | orders | 23 | 15 |
 | pathfinding | 2 | 2 |
 | players | 8 | 17 |
 | targeting | 9 | 6 |
 | units | 22 | 40 |
-| wind_meteors | 5 | 7 |
+| wind_meteors | 5 | 6 |
 
 ### Cut from
 
@@ -2043,7 +2043,7 @@ The 15 groups with the most rows are shown.
 | immediate | 17 | 32 |
 | deferrable | 0 | 0 |
 | read-only | 0 | 97 |
-| unobserved | 97 | 124 |
+| unobserved | 100 | 126 |
 
 **Ordered** (8).
 
@@ -2127,8 +2127,8 @@ None.
 | players | 11 | 14 |
 | targeting | 3 | 3 |
 | units | 15 | 40 |
-| weapons | 12 | 8 |
-| wind_meteors | 9 | 5 |
+| weapons | 12 | 6 |
+| wind_meteors | 12 | 9 |
 
 ### Cut from
 

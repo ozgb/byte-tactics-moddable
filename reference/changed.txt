@@ -37,6 +37,9 @@
 0x44fc10 NetCondenser::SendPacket
 0x450380 AnnouncePlayerLeft
 0x453d40 HandleNetPackets
+0x456ee0 SendShareMetal
+0x457050 SendShareEnergy
+0x457d30 UpdateResourceSharing
 0x464f80 UpdatePlayers
 0x466c20 UpdateRadarMapped
 0x466dc0 DrawRadarUnits

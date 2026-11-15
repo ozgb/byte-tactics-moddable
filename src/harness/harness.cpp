@@ -18,6 +18,7 @@
 #include "condition_class.h"
 #include "../../interfaces/seams.h"
 #include "harness_events.h"
+#include "share_packets.h"
 
 extern Game* g_game;
 
@@ -47,6 +48,18 @@ struct PlayerSpec {
     int energy;
     int metalLine;
     int energyLine;
+    int remote;
+    int remoteLine;
+    int metalStorage;
+    int metalStorageLine;
+    int energyStorage;
+    int energyStorageLine;
+    int shareMetal;
+    int shareMetalLine;
+    int shareEnergy;
+    int shareEnergyLine;
+    int shareMapping;
+    int shareMappingLine;
 };
 
 static int s_testMode = 0;
@@ -76,6 +89,9 @@ static unsigned s_losType = 1;
 static unsigned s_fixedLocations = 1;
 static int s_localPlayer = -1;
 static int s_localPlayerLine = 0;
+static int s_remoteSlots = 0;
+static SharePackets s_sharePackets;
+static int s_sharePacketsLost = 0;
 static unsigned s_ticks = 0;
 static unsigned s_saveTick = 0;
 static int s_saveLine = 0;
@@ -187,6 +203,24 @@ static void ReadPlayerKey(int lineNo, const char* key, const char* value)
     } else if (strcmp(field, "energy") == 0) {
         p->energy = ParseNumber(lineNo, key, value);
         p->energyLine = lineNo;
+    } else if (strcmp(field, "remote") == 0) {
+        p->remote = ParseRange(lineNo, key, value, 1);
+        p->remoteLine = lineNo;
+    } else if (strcmp(field, "metal_storage") == 0) {
+        p->metalStorage = ParseNumber(lineNo, key, value);
+        p->metalStorageLine = lineNo;
+    } else if (strcmp(field, "energy_storage") == 0) {
+        p->energyStorage = ParseNumber(lineNo, key, value);
+        p->energyStorageLine = lineNo;
+    } else if (strcmp(field, "share_metal") == 0) {
+        p->shareMetal = ParseNumber(lineNo, key, value);
+        p->shareMetalLine = lineNo;
+    } else if (strcmp(field, "share_energy") == 0) {
+        p->shareEnergy = ParseNumber(lineNo, key, value);
+        p->shareEnergyLine = lineNo;
+    } else if (strcmp(field, "share_mapping") == 0) {
+        p->shareMapping = ParseRange(lineNo, key, value, 1);
+        p->shareMappingLine = lineNo;
     } else {
         FailLine(lineNo, "is not a known key", key, "");
     }
@@ -818,6 +852,11 @@ static void CheckSpawns()
             sprintf(detail, ", slot %d is not a player the scenario names", sp->slot);
             FailLine(sp->lineNo, "names a bad slot", "spawn", detail);
         }
+        if (s_players[sp->slot].remote) {
+            char detail[100];
+            sprintf(detail, ", slot %d is remote", sp->slot);
+            FailLine(sp->lineNo, "names a remote slot", "spawn", detail);
+        }
         if (sp->tick > s_ticks)
             FailLine(sp->lineNo, "has a tick after the last tick", "spawn", "");
     }
@@ -838,6 +877,10 @@ static void CheckOrders()
         if (!s_players[o->who.slot].human) {
             sprintf(detail, ", slot %d is not controller human", o->who.slot);
             FailLine(o->lineNo, "orders a slot that is not human", "order", detail);
+        }
+        if (s_players[o->who.slot].remote) {
+            sprintf(detail, ", slot %d is remote", o->who.slot);
+            FailLine(o->lineNo, "orders a remote slot", "order", detail);
         }
         if (o->tick > s_ticks)
             FailLine(o->lineNo, "has a tick after the last tick", "order", "");
@@ -1019,6 +1062,54 @@ static void CheckGameType()
     }
 }
 
+static int DefaultLocalPlayer()
+{
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (s_players[i].named && s_players[i].human && !s_players[i].remote)
+            return i;
+    }
+    return 0;
+}
+
+static void RejectLine(int lineNo, int slot, const char* field, const char* what)
+{
+    char key[32];
+    if (lineNo == 0)
+        return;
+    sprintf(key, "player%d.%s", slot, field);
+    FailLine(lineNo, what, key, "");
+}
+
+static void CheckRemoteSlots()
+{
+    s_remoteSlots = 0;
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        PlayerSpec* p = &s_players[i];
+        if (!p->remote) {
+            RejectLine(p->metalStorageLine, i, "metal_storage", "needs player<N>.remote 1");
+            RejectLine(p->energyStorageLine, i, "energy_storage", "needs player<N>.remote 1");
+            continue;
+        }
+        s_remoteSlots++;
+        if (!p->human)
+            RejectLine(p->remoteLine, i, "remote", "needs controller human");
+        if (s_gameType != 3)
+            RejectLine(p->remoteLine, i, "remote", "needs game_type 3");
+        if (s_localPlayer == i)
+            RejectLine(p->remoteLine, i, "remote", "cannot be the local player");
+        RejectLine(p->shareMetalLine, i, "share_metal", "is not for a remote slot");
+        RejectLine(p->shareEnergyLine, i, "share_energy", "is not for a remote slot");
+        RejectLine(p->shareMappingLine, i, "share_mapping", "is not for a remote slot");
+    }
+    for (int k = 0; s_remoteSlots == 0 && k < MAX_PLAYERS; k++) {
+        RejectLine(s_players[k].shareMetalLine, k, "share_metal", "needs a remote slot");
+        RejectLine(s_players[k].shareEnergyLine, k, "share_energy", "needs a remote slot");
+        RejectLine(s_players[k].shareMappingLine, k, "share_mapping", "needs a remote slot");
+    }
+    if (s_remoteSlots != 0 && s_localPlayer < 0 && s_players[DefaultLocalPlayer()].remote)
+        Fail("testmode: a scenario with a remote slot needs a human slot that is not remote\n");
+}
+
 static void CheckScenario()
 {
     if (s_loadLine != 0) {
@@ -1037,6 +1128,7 @@ static void CheckScenario()
         Fail("testmode: scenario needs a map line\n");
     CheckFrames();
     CheckGameType();
+    CheckRemoteSlots();
     CheckOrders();
     CheckSpawns();
     CheckConsoles();
@@ -1261,13 +1353,17 @@ static void SetUpSkirmish()
     g_game->field_2a3c = (unsigned short)active;
     ResetPlayerSlots();
     ApplySlotsToGamePlayers();
+    for (int r = 0; r < MAX_PLAYERS; r++) {
+        if (s_players[r].remote)
+            g_game->players[r].type = 3;
+    }
     InitMissionStatus();
 
     int local = s_localPlayer;
     if (local < 0) {
         local = 0;
         for (int i = MAX_PLAYERS - 1; i >= 0; i--) {
-            if (t->players[i].active == 1)
+            if (t->players[i].active == 1 && !s_players[i].remote)
                 local = i;
         }
     }
@@ -1523,10 +1619,13 @@ void HarnessStartSkirmish()
 }
 
 static void UiEndOfTick();
+static void VisitSharePackets();
 
 void HarnessAfterStep()
 {
     s_eventPhase = -1;
+    if (s_testMode && s_trace != NULL)
+        VisitSharePackets();
     if (s_testMode && s_saveLine != 0 && (unsigned)g_game->ticks == s_saveTick) {
         char directory[] = "savegame";
         char path[] = "savegame\\harness.sav";
@@ -3758,6 +3857,81 @@ static void RunScriptedConsole(const ScriptedConsole* c)
     ExecuteCommandLine(text, mask);
 }
 
+int __stdcall HarnessSharing()
+{
+    return s_testMode && s_remoteSlots != 0;
+}
+
+void __stdcall HarnessSharePacket(const void* packet, int size)
+{
+    if (!HarnessSharing() || s_trace == NULL)
+        return;
+    if (size != SHARE_PACKET_BYTES || s_sharePackets.count == SHARE_PACKET_CAPACITY) {
+        s_sharePacketsLost = 1;
+        return;
+    }
+    const unsigned char* bytes = (const unsigned char*)packet;
+    SharePacket* p = &s_sharePackets.items[s_sharePackets.count++];
+    p->type = bytes[0];
+    memcpy(&p->subtype, bytes + 1, 4);
+    memcpy(&p->from, bytes + 5, 4);
+    memcpy(&p->to, bytes + 9, 4);
+    memcpy(&p->amount, bytes + 13, 4);
+}
+
+static void VisitSharePackets()
+{
+    if (s_sharePacketsLost)
+        Fail("testmode: more share packets in a tick than the record holds\n");
+    if (s_dumpNow && s_dump != NULL) {
+        char path[64];
+        DumpPrefix("packets.count");
+        fprintf(s_dump, "0x%08x\n", s_sharePackets.count);
+        static const char* const kNames[] = { "type", "subtype", "from", "to", "amount" };
+        for (unsigned k = 0; k < s_sharePackets.count; k++) {
+            const SharePacket* r = &s_sharePackets.items[k];
+            const unsigned values[] = { r->type, r->subtype, r->from, r->to, r->amount };
+            for (int f = 0; f < 5; f++) {
+                sprintf(path, "packets[%u].%s", k, kNames[f]);
+                DumpPrefix(path);
+                fprintf(s_dump, "0x%08x\n", values[f]);
+            }
+        }
+    }
+    s_sharePackets.count = 0;
+}
+
+static void SetInfoBit(unsigned char* player, unsigned bit, int on)
+{
+    unsigned short* flags = (unsigned short*)(*(unsigned char**)(player + 0x27) + 0x97);
+    if (on)
+        *flags = (unsigned short)(*flags | (1 << bit));
+    else
+        *flags = (unsigned short)(*flags & ~(1 << bit));
+}
+
+static void ApplyShareSettings()
+{
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        const PlayerSpec* spec = &s_players[i];
+        unsigned char* p = (unsigned char*)&g_game->players[i];
+        if (spec->metalStorageLine != 0)
+            *(float*)(p + 0xa8) = (float)spec->metalStorage;
+        if (spec->energyStorageLine != 0)
+            *(float*)(p + 0xa4) = (float)spec->energyStorage;
+        if (spec->shareMetalLine != 0) {
+            SetInfoBit(p, 1, 1);
+            *(float*)(p + 0xe4) = (float)spec->shareMetal;
+        }
+        if (spec->shareEnergyLine != 0) {
+            SetInfoBit(p, 2, 1);
+            *(float*)(p + 0xe8) = (float)spec->shareEnergy;
+        }
+        if (spec->shareMappingLine != 0)
+            SetInfoBit(p, 5, spec->shareMapping);
+    }
+}
+
 void HarnessBeforeStep()
 {
     if (!s_testMode)
@@ -3769,6 +3943,8 @@ void HarnessBeforeStep()
         for (i = 0; i < MAX_PLAYERS; i++)
             g_game->players[i].progress = 100;
     }
+    if (tick == 1)
+        ApplyShareSettings();
     for (i = 0; i < s_spawnCount; i++) {
         if (s_spawns[i].tick == tick)
             IssueScriptedSpawn(&s_spawns[i]);

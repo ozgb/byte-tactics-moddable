@@ -1251,6 +1251,7 @@ void UpdateFramePacing()
 void HarnessAfterStep();
 void HarnessBeforeStep();
 void HarnessPhase(int phase);
+int __stdcall HarnessSharing();
 void __stdcall HarnessRecordPhase(int phase);
 
 // Runs one game update per pending time step (g_game->simStepsPending), profiling each
@@ -1300,7 +1301,7 @@ void __stdcall RunGameSteps(int showStats)
         UpdateBlink();
         g_game->profileTimingBars.AccumulateProfileTime(8);
 
-        if (showStats && g_usePacketManager != 0) {
+        if ((showStats && g_usePacketManager != 0) || HarnessSharing()) {
             g_seams.economy->UpdateResourceSharing(&g_game->players[g_game->localPlayer]);
             g_packetManager.SendAllQueued(0);
             g_game->profileTimingBars.AccumulateProfileTime(0);

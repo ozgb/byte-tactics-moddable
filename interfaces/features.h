@@ -19,7 +19,7 @@ enum FeaturesEventKind {
     FEATURES_PLACE = 32,
     // Queued: removes the feature on cell (x, z), or on the cell its footprint starts from; value 1 removes even a feature that refuses removal; outcome 1 when one was removed.
     FEATURES_REMOVE = 33,
-    // Queued: weapon (value, the number of its definition) hits the feature whose footprint starts at cell (x, z); outcome 1 when the feature was killed.
+    // Synchronous: weapon (value, the number of its definition) hits the feature whose footprint starts at cell (x, z), applied before the publisher goes on, since a hit may start a fire that draws a random number; outcome 1 when the feature was killed.
     FEATURES_DAMAGE = 34,
     // Queued: unit of player reclaims the feature at pos; outcome 1 when it did, and the feature's energy and metal go to the unit's account as income.
     FEATURES_RECLAIM = 35

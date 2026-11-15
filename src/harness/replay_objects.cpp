@@ -2550,6 +2550,14 @@ void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTab
     value.Free();
 }
 
+void ReplayAddValueOrNull(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table)
+{
+    if (p == nullptr)
+        t.Add("null");
+    else
+        ReplayAddValue(t, kind, p, table);
+}
+
 void ReplayAddValueList(ReplayText& t, unsigned kind, const void* p, unsigned count, ReplayObjectTable& table)
 {
     t.AddChar('[');

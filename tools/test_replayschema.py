@@ -32,10 +32,10 @@ class Interface(unittest.TestCase):
         iface = rs.parse_interface("wind_meteors", "WindMeteorsSeam")
         names = [s["name"] for s in iface["slots"]]
         self.assertEqual(names[0], "UpdateWind")
-        self.assertEqual(len(names), 12)
-        self.assertEqual(iface["version"], [1, 2])
+        self.assertEqual(len(names), 8)
+        self.assertEqual(iface["version"], [2, 0])
         update = iface["slots"][0]
-        self.assertEqual((update["conv"], update["ret"], update["params"]), ("__cdecl", "void", []))
+        self.assertEqual((update["conv"], update["ret"], update["params"]), ("__cdecl", "void", [{"type": "RandStream", "name": "stream"}]))
 
     def test_every_member_of_seams_parses(self):
         for sub, struct in rs.seam_members():
@@ -58,10 +58,10 @@ class Sets(unittest.TestCase):
     def test_reads_and_writes_follow_the_row_kinds(self):
         rows = [row("EnableMeteors", "global_write", "g_meteorsEnabled"),
                 row("SaveMeteors", "global_read", "g_meteorActive"),
-                row("SetMeteorParams", "global_maybe_written", "g_meteorWeaponName")]
-        self.assertEqual(self.slot(rows, "EnableMeteors")["writes"], ["SimGlobals.g_meteorsEnabled"])
+                row("InitMeteors", "global_maybe_written", "g_meteorWeaponName")]
+        self.assertEqual(self.slot(rows, "Apply")["writes"], ["SimGlobals.g_meteorsEnabled"])
         self.assertEqual(self.slot(rows, "SaveMeteors")["reads"], ["SimGlobals.g_meteorActive"])
-        s = self.slot(rows, "SetMeteorParams")
+        s = self.slot(rows, "InitMeteors")
         self.assertEqual((s["reads"], s["writes"]), (["SimGlobals.g_meteorWeaponName"],) * 2)
 
     def test_a_draw_adds_the_generator_words(self):
@@ -70,7 +70,7 @@ class Sets(unittest.TestCase):
         self.assertEqual(s["writes"], rs.RNG_FIELDS)
 
     def test_other_functions_do_not_count(self):
-        s = self.slot([row("Elsewhere", "global_write", "g_meteorActive")], "EnableMeteors")
+        s = self.slot([row("Elsewhere", "global_write", "g_meteorActive")], "Apply")
         self.assertEqual((s["reads"], s["writes"]), ([], []))
 
     def test_object_fields_join_the_object_sets(self):
@@ -109,32 +109,32 @@ class Accounting(unittest.TestCase):
 
     def test_a_pointer_argument_without_an_annotation_is_pending(self):
         ann = annotations()
-        del ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["args"]
+        del ann["subsystems"]["wind_meteors"]["slots"]["Apply"]["args"]
         _, errors = build([], ann)
-        self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
+        self.assertTrue(any("Apply(event)" in e for e in errors), errors)
 
 
 class Unrecorded(unittest.TestCase):
     def unannotated(self):
         ann = annotations()
-        del ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["args"]
+        del ann["subsystems"]["wind_meteors"]["slots"]["Apply"]["args"]
         return ann
 
     def test_a_slot_with_pending_work_passes_only_when_it_is_not_recorded(self):
         ann = self.unannotated()
         _, errors = build([], ann)
-        self.assertTrue(any("SetMeteorParams(params)" in e for e in errors), errors)
-        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "load class"})
+        self.assertTrue(any("Apply(event)" in e for e in errors), errors)
+        ann["subsystems"]["wind_meteors"]["slots"]["Apply"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
         self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
-        self.assertNotIn("SetMeteorParams", spec["slots"])
-        self.assertEqual(spec["unrecorded"], {"SetMeteorParams": {"reason": "load class", "native": "SetMeteorParams"}})
-        self.assertNotIn(("wind_meteors", "SetMeteorParams"), model["slot_list"])
+        self.assertNotIn("Apply", spec["slots"])
+        self.assertEqual(spec["unrecorded"], {"Apply": {"reason": "load class", "native": "WindMeteorsApply"}})
+        self.assertNotIn(("wind_meteors", "Apply"), model["slot_list"])
 
     def test_the_native_table_keeps_the_slot_in_its_place(self):
         ann = self.unannotated()
-        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "#711"})
+        ann["subsystems"]["wind_meteors"]["slots"]["Apply"].update({"record": False, "reason": "#711"})
         model, _ = build([], ann)
         rs.attach_raw_params(model)
         text = rs.render_slots(ann, model)
@@ -144,19 +144,19 @@ class Unrecorded(unittest.TestCase):
 
     def test_a_slot_that_is_not_recorded_needs_a_reason(self):
         ann = annotations()
-        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["record"] = False
+        ann["subsystems"]["wind_meteors"]["slots"]["Apply"]["record"] = False
         _, errors = build([], ann)
-        self.assertTrue(any("SetMeteorParams is not recorded and has no `reason`" in e for e in errors), errors)
+        self.assertTrue(any("Apply is not recorded and has no `reason`" in e for e in errors), errors)
 
     def test_a_reason_on_a_recorded_slot_is_an_error(self):
         ann = annotations()
-        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"]["reason"] = "load class"
+        ann["subsystems"]["wind_meteors"]["slots"]["Apply"]["reason"] = "load class"
         _, errors = build([], ann)
-        self.assertTrue(any("SetMeteorParams has a reason and is recorded" in e for e in errors), errors)
+        self.assertTrue(any("Apply has a reason and is recorded" in e for e in errors), errors)
 
     def imported(self):
         ann = annotations()
-        ann["subsystems"]["weapons"]["slots"]["SpawnProjectile"].update({"record": False, "reason": "#711"})
+        self.assertFalse(ann["subsystems"]["weapons"]["slots"]["FindWeaponByName"]["record"])
         return ann
 
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
@@ -164,34 +164,34 @@ class Unrecorded(unittest.TestCase):
         files, errors, model = rs.generate(rs.read_rows(), ann)
         self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], [])
         weapons = model["subsystems"]["weapons"]
-        self.assertNotIn("SpawnProjectile", weapons["slots"])
-        kept = weapons["unrecorded"]["SpawnProjectile"]
-        self.assertEqual([a["mode"] for a in kept["args"]], ["weapon", "vec3", "vec3", "scalar"])
+        self.assertNotIn("FindWeaponByName", weapons["slots"])
+        kept = weapons["unrecorded"]["FindWeaponByName"]
+        self.assertEqual([a["mode"] for a in kept["args"]], ["text"])
         self.assertEqual((kept["reads"], kept["writes"], kept["functions"]), ([], [], []))
         hooks = files[rs.HOOKS_H]
-        self.assertIn("RecWeaponsSpawnProjectile", hooks)
-        self.assertIn("SlotScope scope(RSL_WEAPONS_SPAWNPROJECTILE, SUB_WEAPONS, roots, false);", hooks)
-        self.assertIn('line.Add("  i weapons.SpawnProjectile");', hooks)
-        self.assertIn("s_rec_weapons.SpawnProjectile = RecWeaponsSpawnProjectile;", hooks)
-        self.assertNotIn("on[SUB_WEAPONS] ||", hooks.split("s_rec_weapons.SpawnProjectile")[0].rsplit("if (", 1)[1])
+        self.assertIn("RecWeaponsFindWeaponByName", hooks)
+        self.assertIn("SlotScope scope(RSL_WEAPONS_FINDWEAPONBYNAME, SUB_WEAPONS, roots, false);", hooks)
+        self.assertIn('line.Add("  i weapons.FindWeaponByName");', hooks)
+        self.assertIn("s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;", hooks)
+        self.assertNotIn("on[SUB_WEAPONS] ||", hooks.split("s_rec_weapons.FindWeaponByName")[0].rsplit("if (", 1)[1])
 
     def test_an_imported_slot_that_is_not_recorded_has_no_recording_slot(self):
         files, _, model = rs.generate(rs.read_rows(), self.imported())
         spec = model["subsystems"]["weapons"]
-        self.assertNotIn(("weapons", "SpawnProjectile"), model["slot_list"])
-        self.assertEqual(spec["slots"].keys() & {"SpawnProjectile"}, set())
+        self.assertNotIn(("weapons", "FindWeaponByName"), model["slot_list"])
+        self.assertEqual(spec["slots"].keys() & {"FindWeaponByName"}, set())
         schema = files[rs.SCHEMA_H]
-        self.assertIn("RSL_WEAPONS_SPAWNPROJECTILE,", schema)
-        self.assertIn('{ "SpawnProjectile", SUB_WEAPONS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },', schema)
+        self.assertIn("RSL_WEAPONS_FINDWEAPONBYNAME,", schema)
+        self.assertIn('{ "FindWeaponByName", SUB_WEAPONS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },', schema)
 
     def test_a_missing_argument_annotation_on_an_imported_unrecorded_slot_is_reported(self):
         ann = self.unannotated()
-        ann["subsystems"]["wind_meteors"]["slots"]["SetMeteorParams"].update({"record": False, "reason": "#711"})
+        ann["subsystems"]["wind_meteors"]["slots"]["Apply"].update({"record": False, "reason": "#711"})
         _, errors = build([], ann)
         self.assertEqual([e for e in errors if "pending" in e], [])
-        ann["subsystems"]["weapons"]["imports"].append("wind_meteors.SetMeteorParams")
+        ann["subsystems"]["weapons"]["imports"].append("wind_meteors.Apply")
         _, errors = build([], ann)
-        self.assertTrue(any("wind_meteors is complete but has pending args" in e and "SetMeteorParams(params)" in e for e in errors), errors)
+        self.assertTrue(any("wind_meteors is complete but has pending args" in e and "Apply(event)" in e for e in errors), errors)
 
 
 class Rules(unittest.TestCase):
@@ -503,7 +503,7 @@ class UnannotatedTypes(unittest.TestCase):
         self.assertEqual(self.pending([row("UpdateUnitWeapons", "field_read", "Seams::units"), row("UpdateUnitWeapons", "field_read", "UnitsSeam::SetStateBits")]), [])
 
     def test_a_service_class_the_subsystem_lists_is_not_asked(self):
-        self.assertEqual(self.pending([row("UpdateMeteors", "field_read", "TdfFile::current"), row("UpdateMeteors", "field_read", "CommandArgs::count")]), [])
+        self.assertEqual(self.pending([row("UpdateMeteors", "field_read", "TdfFile::current"), row("UpdateMeteors", "field_read", "TdfRecord::current")]), [])
         self.assertEqual(len(self.pending([row("UpdateUnitWeapons", "field_read", "TdfFile::current")])), 1)
 
 
@@ -1434,32 +1434,51 @@ class ReentrantServices(unittest.TestCase):
         self.assertIn("ReplayAddArgs(t, (const CommandArgs*)a[2].v.p);", text)
         self.assertIn("t.AddText(s_nested);\n        s_nested.Clear();", text)
 
+    def test_a_value_argument_is_written_as_the_tuple_of_its_fields_in_both_directions(self):
+        spec = [x for x in annotations()["services"] if x["name"] == "WindMeteorsEmit"][0]
+        self.assertEqual(spec["args"], [{"mode": "value", "param": "effect", "kind": "WindMeteorsEffect"}])
+        self.assertIn("ReplayAddValueOrNull(t, ROK_WINDMETEORSEFFECT, a[0].v.p, Table());", rs.render_service_end([spec]))
+        self.assertIn("ReplayAddValueOrNull(t, ROK_WINDMETEORSEFFECT, effect, g_objects);", rs.render_service_answers([spec]))
+
+    def test_a_value_argument_needs_a_value_kind(self):
+        ann = annotations()
+        wm = [s for s in ann["services"] if s["name"] == "WindMeteorsEmit"][0]
+        self.assertEqual(wm["args"][0]["mode"], "value")
+        self.assertEqual(rs.check_service_specs(ann["services"], ann), [])
+        wm["args"][0]["kind"] = "Unit"
+        self.assertTrue(any("value kind" in e for e in rs.check_service_specs(ann["services"], ann)))
+
     def test_the_stub_finds_its_line_among_the_nested_imports_and_plays_the_commands(self):
         answers = rs.render_service_answers([self.spec()])
         self.assertIn("const char* result = EnterNested(t);", answers)
         self.assertIn('PlayNestedCalls("services.ExecuteCommandText");', answers)
 
+    def nested_annotations(self):
+        ann = annotations()
+        ann["subsystems"]["ai"]["slots"]["CmdPlan"] = {"args": {"args": {"mode": "argv"}}}
+        return ann
+
     def test_a_command_slot_is_nested_and_a_slot_that_is_not_a_command_is_not(self):
-        files, errors, model = self.generated()
+        files, errors, model = self.generated(self.nested_annotations())
         self.assertEqual(errors, [])
-        slots = model["subsystems"]["wind_meteors"]["slots"]
-        self.assertTrue(rs.nestable("CmdMeteor", slots["CmdMeteor"]))
-        self.assertFalse(rs.nestable("UpdateWind", slots["UpdateWind"]))
+        slots = model["subsystems"]["ai"]["slots"]
+        self.assertTrue(rs.nestable("CmdPlan", slots["CmdPlan"]))
+        self.assertFalse(rs.nestable("UpdateWind", model["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]))
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecWindMeteorsCmdMeteor("):]
+        body = hooks[hooks.index("RecAiCmdPlan("):]
         body = body[:body.index("\n}\n")]
-        self.assertIn('line.Add("\\n    c wind_meteors.CmdMeteor");', body)
+        self.assertIn('line.Add("\\n    c ai.CmdPlan");', body)
         self.assertIn("ImportArgv(line, a0);", body)
         self.assertIn("FinishNested(line);", body)
-        self.assertIn("bool IsNestedSlot(unsigned slot)\n{\n    switch (slot) {\n    case RSL_WIND_METEORS_CMDMETEOR:", hooks)
-        self.assertIn("if (on[SUB_WIND_METEORS] || any)\n        s_rec_wind_meteors.CmdMeteor = RecWindMeteorsCmdMeteor;", hooks)
+        self.assertIn("bool IsNestedSlot(unsigned slot)\n{\n    switch (slot) {\n    case RSL_AI_CMDPLAN:", hooks)
+        self.assertIn("if (on[SUB_AI] || any)\n        s_rec_ai.CmdPlan = RecAiCmdPlan;", hooks)
 
     def test_the_replayer_makes_the_nested_calls_through_the_seam_table(self):
-        files, _, _ = self.generated()
-        slots = files[rs.SLOTS_H]
-        self.assertIn("void PlayNestedCalls(const char* import)", slots)
-        self.assertIn('if (CallbackIs(name, "wind_meteors.CmdMeteor")) {', slots)
-        self.assertIn("g_seams.wind_meteors->CmdMeteor(&p0.args);", slots)
+        _, _, model = self.generated(self.nested_annotations())
+        player = "\n".join(rs.nested_player({"ai": {"slots": {"CmdPlan": model["subsystems"]["ai"]["slots"]["CmdPlan"]}}}))
+        self.assertIn("void PlayNestedCalls(const char* import)", player)
+        self.assertIn('if (CallbackIs(name, "ai.CmdPlan")) {', player)
+        self.assertIn("g_seams.ai->CmdPlan(&p0.args);", player)
 
     def test_a_length_for_the_text_names_an_int_argument(self):
         ann = annotations()

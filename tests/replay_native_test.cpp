@@ -2166,6 +2166,16 @@ char g_mutationKey[96];
 
 bool Mutate(int mutation)
 {
+    const char* anchor = "  i weapons.SpawnProjectile";
+    const char* anchorName = "weapons.SpawnProjectile";
+    bool spawnImport = false;
+    for (int k = 2; k < g_lineCount; k++)
+        spawnImport = spawnImport || strncmp(g_lines[k], anchor, 27) == 0;
+    if (!spawnImport) {
+        anchor = "  i services.WindMeteorsEmit";
+        anchorName = "services.WindMeteorsEmit";
+    }
+    size_t anchorLength = strlen(anchor);
     int call = -1;
     int imports = 0;
     for (int k = 2; k < g_lineCount; k++) {
@@ -2173,24 +2183,24 @@ bool Mutate(int mutation)
             call++;
             imports = 0;
         } else if (strncmp(g_lines[k], "  i ", 4) == 0) {
-            if (mutation == MUT_ARGUMENT && strncmp(g_lines[k], "  i weapons.SpawnProjectile weapondef#", 38) == 0) {
+            if (mutation == MUT_ARGUMENT && strncmp(g_lines[k], anchor, anchorLength) == 0) {
                 sprintf(g_mutated, "%s", g_lines[k]);
-                char* digit = strstr(g_mutated, "weapondef#") + 10;
+                char* digit = spawnImport ? strstr(g_mutated, "weapondef#") + 10 : strchr(g_mutated, ',') + 1;
                 *digit = *digit == '9' ? '8' : '9';
                 g_lines[k] = g_mutated;
                 g_mutationCall = call;
-                sprintf(g_mutationKey, "import %d weapons.SpawnProjectile", imports);
+                sprintf(g_mutationKey, "import %d %s", imports, anchorName);
                 return true;
             }
-            if (mutation == MUT_MISSING && strncmp(g_lines[k], "  i weapons.SpawnProjectile", 27) == 0) {
+            if (mutation == MUT_MISSING && strncmp(g_lines[k], anchor, anchorLength) == 0) {
                 for (int j = k; j + 1 < g_lineCount; j++)
                     g_lines[j] = g_lines[j + 1];
                 g_lineCount--;
                 g_mutationCall = call;
-                sprintf(g_mutationKey, "import %d weapons.SpawnProjectile", imports);
+                sprintf(g_mutationKey, "import %d %s", imports, anchorName);
                 return true;
             }
-            if (mutation == MUT_EXTRA && strncmp(g_lines[k], "  i weapons.SpawnProjectile", 27) == 0) {
+            if (mutation == MUT_EXTRA && strncmp(g_lines[k], anchor, anchorLength) == 0) {
                 int last = k;
                 while (last + 1 < g_lineCount && strncmp(g_lines[last + 1], "  ", 2) == 0 && strncmp(g_lines[last + 1], "  w ", 4) != 0)
                     last++;
@@ -2241,7 +2251,7 @@ void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
     if (ReplayWasmActive() && strcmp(ReplayWasmSubsystem(), g_subsystem) != 0)
         Fatal(file, 0, "the WASM module is of another subsystem", ReplayWasmSubsystem());
     if (mutation != MUT_NONE && !Mutate(mutation))
-        Fatal(file, 0, "nothing to mutate", "no SpawnProjectile import");
+        Fatal(file, 0, "nothing to mutate", "no spawn import");
     ResetBlock();
     out.calls = 0;
     out.imports = 0;

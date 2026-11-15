@@ -5581,8 +5581,9 @@
     "declaration": "void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect);",
     "args": [
      {
-      "mode": "skip",
-      "param": "effect"
+      "mode": "value",
+      "param": "effect",
+      "kind": "WindMeteorsEffect"
      }
     ]
    },

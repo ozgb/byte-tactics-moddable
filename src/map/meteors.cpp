@@ -16,6 +16,7 @@
 #include "../util/tdf.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/wind_meteors.h"
 #include "../state/sim_globals.h"
 #include "meteors.h"
 
@@ -137,7 +138,7 @@ void UpdateMeteors()
             pos.z += g_meteorOrigin.y << 20;
             WindMeteorsEffect effect;
             effect.kind = WIND_METEORS_EFFECT_SPAWN;
-            effect.weapon = g_meteorWeapon.get() == 0 ? -1 : (int)(g_meteorWeapon.get() - g_game->weapons);
+            effect.weapon = g_meteorWeapon.get() == nullptr ? -1 : (int)(g_meteorWeapon.get() - g_game->weapons);
             effect.x = pos.x;
             effect.y = pos.y;
             effect.z = pos.z;

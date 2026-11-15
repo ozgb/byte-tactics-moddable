@@ -4,8 +4,6 @@
 #include "../util/vec3.h"
 #include "../weapons/weapon_def.h"
 #include "../game/game.h"
-#include "../game/scheduler.h"
-#include "../harness/harness.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "wind_meteors_world.h"

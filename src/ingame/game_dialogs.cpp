@@ -12,6 +12,7 @@
 #include "../sound/sound.h"
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/rand_stream.h"
 
 #include "../graphics/display.h"
 

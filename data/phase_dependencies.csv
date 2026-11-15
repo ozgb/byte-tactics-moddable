@@ -572,7 +572,7 @@ units,weapons,Unit::script,units,projectiles,immediate,7,edges-economy-targeting
 units,weapons,Unit::script,units,units,carried,11,mission-build-unit@72,
 units,weapons,Unit::state,units,units,carried,8,edges-economy-targeting@115,
 units,weapons,Unit::type,units,units,carried,21,orders-tier2-spider@27,
-units,weapons,Unit::unknown_40,units,units,carried,8,ui-keys@74,
+units,weapons,Unit::weapon2AimCob,units,units,carried,8,ui-keys@74,
 units,weapons,Unit::yFraction,units,features,immediate,2,long-greenhaven-8p@22254,
 units,weapons,Unit::yFraction,units,players,immediate,4,mission-radius@1278,
 units,weapons,Unit::yFraction,units,projectiles,immediate,15,edges-economy-targeting@36,

@@ -1579,6 +1579,11 @@ void __stdcall ApplySlot(const WindMeteorsEvent* event)
     WindMeteorsApply(event);
 }
 
+int __stdcall ApplyTargetingSlot(const TargetingEvent* event)
+{
+    return ApplyTargetingEvent(event);
+}
+
 WeaponDef* __stdcall FindWeaponByNameSlot(char* name)
 {
     return (WeaponDef*)FindWeaponByName(name);

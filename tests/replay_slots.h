@@ -461,7 +461,7 @@ WeaponsSeam g_native_weapons = {
 };
 
 TargetingSeam g_native_targeting = {
-    ApplyTargetingEvent,
+    ApplyTargetingSlot,
     GetWeaponTargetUnit,
     GetWeaponTargetPos,
     FindWeaponTarget,

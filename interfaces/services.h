@@ -70,7 +70,7 @@ enum SchedModule {
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
 // Calls economy's synchronous Spend slot for a spend (an event of kind ECONOMY_SPEND) after delivering economy's pending inbox, records it, and returns its outcome, visible at once.
 int __stdcall ScheduleEconomySpend(const EconomyEvent* spend);
-// Calls economy's synchronous RequestGranted slot for a unit (an economy unit handle) and the resources it asks for, after delivering economy's pending inbox.
+// Calls economy's RequestGranted query for a unit (an economy unit handle) and the resources it asks for, as of economy's last run: economy's pending inbox is not delivered first.
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
 // Runs economy's UpdateMetalExtraction for a unit (an economy unit handle) after delivering economy's pending inbox; its effects are published to economy's outbox.
 void __stdcall ScheduleMetalExtraction(unsigned int unit);

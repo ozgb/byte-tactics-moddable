@@ -58451,7 +58451,6 @@ address,function,file,kind,target
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::Int
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::Result
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::~ReplayImport
-,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,SchedDeliver
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,field_read,EconomySeam::RequestGranted
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,field_read,Seams::economy
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,function,

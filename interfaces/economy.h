@@ -223,7 +223,7 @@ struct EconomySeam {
     void (__stdcall* UpdateMetalExtraction)(EconUnit unit);
     // Shares one player's surplus with its allies, by effects, in the tick's tail of a network game. Hooks: none.
     void (__stdcall* UpdateResourceSharing)(int player);
-    // Synchronous: whether a request for the given resources by a unit would be granted now, after the engine delivered the pending inbox; a query, called just before the REQUEST it decides. Hooks: none.
+    // Whether a request for the given resources by a unit would be granted, as of economy's last run (the pending inbox is not delivered first); a query, called just before the REQUEST it decides. Hooks: none.
     int (__stdcall* RequestGranted)(EconUnit unit, unsigned int resources);
     // Returns the energy a unit type uses per tick, or minus what it makes from wind or tide, as the exact product, not rounded to 32 bits; a query. Hooks: none.
     double (__stdcall* GetEnergyUse)(EconType type);

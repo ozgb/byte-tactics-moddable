@@ -52,8 +52,9 @@ calling convention (UpdateWind is __cdecl). It fails, for each pilot, on:
                 copy of the slot needs), by any function but the pilot's own (data/subsystems.csv) and the engine's. The
                 engine's are the files of the scheduler (src/game/scheduler.cpp, which routes the events and runs the
                 phases), of the pilot's glue (src/seams/economy_world.cpp, src/seams/wind_meteors_world.cpp: its inbox
-                handler and the synchronous services), and of the harness's recorders (src/harness/replay_hooks.inc, which
-                forward a slot call to the slot they replaced), and the functions of the pilot's set-up, teardown and
+                handler and the synchronous services), of the harness's recorders (src/harness/replay_hooks.inc, which
+                forward a slot call to the slot they replaced), of a WASM module's glue (src/wasm/wind_meteors_glue.cpp,
+                whose timed native table forwards a run to the native slot), and the functions of the pilot's set-up, teardown and
                 save and load callers:
                   economy       Init, Shutdown, UpdateResourceSharing from LoadBattleAssets and ShutdownIngameSystems
                                 (src/game/game_state.cpp) and RunGameSteps (src/ingame/game_dialogs.cpp)
@@ -78,7 +79,12 @@ calling convention (UpdateWind is __cdecl). It fails, for each pilot, on:
                 meteor data file through the TDF services (BuildDataPath, TdfFile::LoadFile, SelectRecord, ~TdfFile,
                 TdfRecord::GetFieldDouble, GetFieldInt, GetFieldString) and ends in FatalError when the file is bogus. They
                 write no game state, but their callees (the allocator, the file layer and its seam, the replay
-                recorder) write their own bookkeeping, which the walk would otherwise report.
+                recorder) write their own bookkeeping, which the walk would otherwise report. A pilot with services may
+                also maybe-write the out parameter in the filler, since a service it is passed to (GetFieldString, the
+                weapon name) writes it there. A pilot's `service_defaults`
+                are globals it passes to a service as the default text, which the service copies and never writes:
+                wind_meteors' g_emptyText, given to GetFieldString, whose parameter is not const, so rwsets marks it
+                maybe written.
                 An escape (an address taken, such as UnitAccountOf's of the region) is no write: a write through it is a
                 row of the function that makes it, which the walk reaches, or of a call it is passed to (maybe_written).
 
@@ -138,6 +144,7 @@ REPLAY_HOOKS_FILE = "src/harness/replay_hooks.inc"
 PHASE_FILLERS = ((NATIVE_TABLE, "UpdateAllUnits"), (NATIVE_TABLE, "UpdatePlayers"), (NATIVE_TABLE, "UpdatePlayersOnStream"))
 QUERY_WRITE_KINDS = ("field_write", "field_maybe_written", "global_write", "global_maybe_written", "deref_write", "deref_maybe_written")
 OUT_KINDS = ("field_write", "deref_write")
+OUT_SERVICE_KINDS = ("field_maybe_written", "deref_maybe_written")
 SLOT_READ_KINDS = ("field_read", "field_escape")
 SLOT_POINTER = re.compile(r"\(\s*(?:__\w+\s*)?\*\s*(\w+)\s*\)\s*\(([^)]*)\)")
 
@@ -156,6 +163,7 @@ class Pilot:
     world_reads: tuple = ()
     info_types: tuple = ()
     services: tuple = ()
+    service_defaults: tuple = ()
 
 
 ECONOMY = Pilot(
@@ -173,11 +181,12 @@ WIND_METEORS = Pilot(
     owner="wind_meteors", header="interfaces/wind_meteors.h", seam="WindMeteorsSeam",
     writing=("UpdateWind", "UpdateMeteors", "Apply", "InitMeteors", "EmptyShutdownPreCleanup", "SaveMeteors", "LoadMeteors"),
     query=("LoadMeteorDefaults",),
-    engine_files=(SCHEDULER_FILE, "src/seams/wind_meteors_world.cpp", REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, "src/seams/wind_meteors_world.cpp", REPLAY_HOOKS_FILE, "src/wasm/wind_meteors_glue.cpp"),
     engine_functions=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
                       ("LoadSavedGameState", "src/game/settings_campaign.cpp"), ("SaveGameFile", "src/game/settings_campaign.cpp")),
     services=("BuildDataPath", "FatalError", "TdfFile::LoadFile", "TdfFile::SelectRecord", "TdfFile::~TdfFile",
-              "TdfRecord::GetFieldDouble", "TdfRecord::GetFieldInt", "TdfRecord::GetFieldString"))
+              "TdfRecord::GetFieldDouble", "TdfRecord::GetFieldInt", "TdfRecord::GetFieldString"),
+    service_defaults=("g_emptyText",))
 PILOTS = (ECONOMY, WIND_METEORS)
 
 
@@ -699,6 +708,10 @@ def query_problems(pilot: Pilot, functions: dict, owners: dict, slot: str, fille
             elif kind in QUERY_WRITE_KINDS:
                 written = written_type(target)
                 if written in pilot.info_types or (fn == filler and kind in OUT_KINDS and written in out_types):
+                    continue
+                if pilot.services and fn == filler and kind in OUT_SERVICE_KINDS and written in out_types:
+                    continue
+                if kind == "global_maybe_written" and target in pilot.service_defaults:
                     continue
                 found.add(("query", owner, fn, f"{what} {kind.replace('_', ' ')} {target}"))
     return found

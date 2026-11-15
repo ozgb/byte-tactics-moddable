@@ -584,7 +584,8 @@ UpdateWind,src/game/game_state.cpp,wind_meteors,x,
                 ("ShutdownIngameSystems", "src/game/game_state.cpp", "indirect_call", self.slot("EmptyShutdownPreCleanup")),
                 ("LoadSavedGameState", "src/game/settings_campaign.cpp", "indirect_call", self.slot("LoadMeteors")),
                 ("SaveGameFile", "src/game/settings_campaign.cpp", "field_read", "WindMeteorsSeam::SaveMeteors"),
-                ("Help", "src/map/meteors.cpp", "indirect_call", self.slot("UpdateMeteors"))]
+                ("Help", "src/map/meteors.cpp", "indirect_call", self.slot("UpdateMeteors")),
+                ("TimedNativeUpdateWind", "src/wasm/wind_meteors_glue.cpp", "indirect_call", self.slot("UpdateWind"))]
         self.assertEqual(self.check(rows), [])
 
     def test_a_stray_caller_of_a_writing_slot_is_found(self):
@@ -611,15 +612,19 @@ UpdateWind,src/game/game_state.cpp,wind_meteors,x,
         self.assertEqual(self.check([("Defaults", "src/map/meteors.cpp", "field_write", "MeteorShowerParams::radius"),
                                      ("Defaults", "src/map/meteors.cpp", "call", "TdfFile::LoadFile"),
                                      ("Defaults", "src/map/meteors.cpp", "call", "FatalError"),
+                                     ("Defaults", "src/map/meteors.cpp", "field_maybe_written", "MeteorShowerParams::weapon"),
+                                     ("Defaults", "src/map/meteors.cpp", "global_maybe_written", "g_emptyText"),
                                      ("TdfFile::LoadFile", "src/map/tdf.cpp", "global_write", "g_heap")]), [])
         found = self.check([("Defaults", "src/map/meteors.cpp", "field_write", "Game::windX"),
                             ("Defaults", "src/map/meteors.cpp", "global_write", "g_meteorWeapon"),
+                            ("Defaults", "src/map/meteors.cpp", "global_write", "g_emptyText"),
                             ("Defaults", "src/map/meteors.cpp", "call", "Help"),
                             ("Help", "src/map/meteors.cpp", "field_write", "MeteorShowerParams::radius"),
                             ("Defaults", "src/map/meteors.cpp", "call", "memset")])
         self.assertEqual([(f[2], f[3].split(" ", 1)[1]) for f in found],
                          [("memset", "calls memset, which data/rwsets.csv has no rows for"),
-                          ("Defaults", "field write Game::windX"), ("Defaults", "global write g_meteorWeapon"),
+                          ("Defaults", "field write Game::windX"), ("Defaults", "global write g_emptyText"),
+                          ("Defaults", "global write g_meteorWeapon"),
                           ("Help", "field write MeteorShowerParams::radius")])
 
 

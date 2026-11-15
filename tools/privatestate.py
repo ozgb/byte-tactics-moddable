@@ -24,7 +24,7 @@ the three globals. EXPOSED maps each of those fields to the log item that holds 
   * an item of EXPOSED has no read by pathfinding in any stored scenario: the writer shows state that the simulation never
     reads, a shadow field. data/shadow_field_allow.csv (item,reason) lists the ones that are 3.1c state the trace has always
     hashed, each with a reason; a row for an item that is read is stale.
-Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone), economy and features.
+Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone), economy, features and targeting.
 Economy's unit accounts live in one allocation, "Economy region" (allocated by the engine in LoadBattleAssets, set up by EconomyInit), whose
 parts the log names `<allocation>.<part>` like pathfinding's: no subsystem but economy writes or reads one. The player accounts
 (`players[i].econ`, type UnitResources) stay in the state block and are read by others, so a `UnitResources::*` item is private for writes
@@ -48,6 +48,13 @@ union with `Cell::offsetX` and `Cell::offsetY`, but not `Cell::flags`, which oth
 helpers' subsystems (game and presentation) as the writers. The cells are in the log one allocation ("PLOT MEMORY") that it names no field
 of, so the Cell items match only once it does; the others match today. Any writer but features fails, which is what makes every placement, removal,
 damage and reclaim reach them through the scheduler's events.
+
+Targeting's state stays in the Unit record, hashed and read by others, and is written by targeting alone: the weapon target pair of each of the three
+weapon slots of a unit (`UnitWeaponSlot::aimTargetXOrUnitId` and `aimTargetZOrUnitSentinel`), which the log names by the first member of the union of
+`Unit` that starts each slot's words: `Unit::current` (slot 0), `Unit::field_20` (slot 1) and `Unit::unknown_3c` (slot 2). The other members of a slot
+(`Unit::field_8`, `Unit::unknown_24`) are not the pair and are shared with the unit's own set-up, so they are not listed. `Unit::netDirtyFlags` is not
+listed either: targeting clears bits of it, but weapons and orders write it too. Any writer but targeting fails, which is what makes every aim, clear and
+reset of a weapon's target reach the pair through the scheduler's events.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
@@ -84,6 +91,8 @@ REGION_FUNCTION = "LoadBattleAssets"
 
 FEATURES_WRITE_ITEMS = ("scanIndex", "Cell::feature", "Cell::spot", "Cell::offsetX", "Cell::offsetY", "FeatureAnimEntry::next", "FeatureAnimEntry::prev")
 
+TARGETING_WRITE_ITEMS = ("Unit::current", "Unit::field_20", "Unit::unknown_3c")
+
 
 @dataclass(frozen=True)
 class Owner:
@@ -106,7 +115,8 @@ NO_ALLOCATION = re.compile(r"(?!)")
 OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
           Owner("economy", "", (), re.compile(r"Economy region"), ("UnitResources",)),
           Owner("wind_meteors", "", (), NO_ALLOCATION, (), METEOR_GLOBALS, WIND_FIELDS),
-          Owner("features", "", (), NO_ALLOCATION, write_items=FEATURES_WRITE_ITEMS))
+          Owner("features", "", (), NO_ALLOCATION, write_items=FEATURES_WRITE_ITEMS),
+          Owner("targeting", "", (), NO_ALLOCATION, write_items=TARGETING_WRITE_ITEMS))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",

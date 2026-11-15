@@ -159,7 +159,7 @@ SUBSYSTEMS = SIM_SUBSYSTEMS + ["network", "game", "harness", "seams", "presentat
               "files"]
 PHASE_SUBSYSTEMS = {"UpdateAllUnits": "units", "UpdateProjectiles": "weapons",
                     "UpdateExplosions": "weapons", "UpdatePlayers": "players", "UpdateFeatures": "features",
-                    "StepAllGafSequences": "game", "UpdateWind": "wind_meteors", "UpdateMeteors": "wind_meteors",
+                    "StepAllGafSequences": "game", "UpdateWindOnStream": "wind_meteors", "UpdateMeteors": "wind_meteors",
                     "EconomyUpdateResourceSharing": "economy"}
 FOLDER_FIXED = [("src/harness/", "harness"), ("src/seams/", "seams"), ("src/debug/", "platform"), ("src/util/", "platform"),
                 ("src/runtime/", "platform"), ("src/data/", "platform"), ("src/host/", "platform"), ("src/wasm/", "platform"),

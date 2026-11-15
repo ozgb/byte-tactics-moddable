@@ -27,7 +27,7 @@ change or feed the simulation:
 
   HandleNetPackets      phase 0: applies received orders and unit state
   UpdateAllUnits, UpdateProjectiles, UpdateExplosions, UpdatePlayers, UpdateFeatures,
-  StepAllGafSequences, UpdateWind, UpdateMeteors      phases 1 to 7
+  StepAllGafSequences, UpdateWindOnStream, UpdateMeteors      phases 1 to 7
   EconomyUpdateResourceSharing the resource-sharing step after the phases
 
 Load. LOAD_ROOTS are LoadMatch (0x497180), which builds the simulation state when a match
@@ -132,7 +132,7 @@ COLUMNS = ["address", "function", "file", "line", "kind", "target", "verdict", "
 PHASES = ("tick", "load")
 VERDICTS = ("", "real", "false_positive")
 ROOTS = ["HandleNetPackets", "UpdateAllUnits", "UpdateProjectiles", "UpdateExplosions", "UpdatePlayers",
-         "UpdateFeatures", "StepAllGafSequences", "UpdateWind", "UpdateMeteors", "EconomyUpdateResourceSharing"]
+         "UpdateFeatures", "StepAllGafSequences", "UpdateWindOnStream", "UpdateMeteors", "EconomyUpdateResourceSharing"]
 LOAD_ROOTS = ["LoadMatch", "AssignStartPositions"]
 THREAD_ROW_LIMIT = 400
 WARNING_FLAGS = astcache.WARNING_FLAGS

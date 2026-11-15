@@ -1,6 +1,8 @@
 #include "../../interfaces/services.h"
 #include "../../interfaces/economy.h"
+#include "../../interfaces/wind_meteors.h"
 #include "../seams/economy_world.h"
+#include "../seams/wind_meteors_world.h"
 #include "../units/economy_effects.h"
 #include "../../interfaces/features.h"
 #include "../seams/features_world.h"
@@ -32,6 +34,11 @@ static const SchedRoute s_routes[] = {
     {SCHED_FEATURES, FEATURES_EFFECT_INIT_STATE, SCHED_UNITS, UnitsOnFeaturesInitState, 0},
     {SCHED_FEATURES, FEATURES_EFFECT_PASS_MAPS, SCHED_MAP, MapOnFeaturesPassMaps, 0},
     {SCHED_FEATURES, FEATURES_EFFECT_AREA_DAMAGE, SCHED_WEAPONS, WeaponsOnFeaturesAreaDamage, 1},
+    {SCHED_ENGINE, WIND_METEORS_ENABLE, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
+    {SCHED_ENGINE, WIND_METEORS_DISABLE, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
+    {SCHED_ENGINE, WIND_METEORS_PARAMS, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
+    {SCHED_ENGINE, WIND_METEORS_START, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
+    {SCHED_WIND_METEORS, WIND_METEORS_EFFECT_SPAWN, SCHED_WEAPONS, WeaponsOnMeteorSpawn, 0},
 };
 
 const SchedRoute* SchedRoutes(int* count)

@@ -12,6 +12,7 @@
 #include "../sound/sound.h"
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/rand_stream.h"
 
 #include "../graphics/display.h"
 
@@ -1066,11 +1067,11 @@ void __stdcall RunGameSteps(int showStats)
         HarnessPhase(5);
         DrainSimEvents();
         StepAllGafSequences();
-        g_seams.wind_meteors->UpdateWind();
+        SchedWindPhase(RAND_STREAM_MAIN);
         SchedPhaseBoundary();
         HarnessPhase(6);
         DrainSimEvents();
-        g_seams.wind_meteors->UpdateMeteors();
+        SchedMeteorsPhase();
         SchedPhaseBoundary();
         HarnessPhase(7);
 #if BT_ACCESS_LOG

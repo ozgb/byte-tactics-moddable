@@ -28,6 +28,7 @@
 #include "path_results.h"
 #include "economy_results.h"
 #include "features_results.h"
+#include "wind_meteors_results.h"
 #include "../state/block.h"
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
@@ -3093,6 +3094,44 @@ static void VisitFeaturesResults()
     }
 }
 
+static WindMeteorsResults s_windMeteorsResults;
+static bool s_windMeteorsResultsLost;
+
+void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size)
+{
+    if (!HarnessTestMode() || s_trace == nullptr)
+        return;
+    int added = WindMeteorsResultsAdd(&s_windMeteorsResults, record, size);
+    if (added == WIND_METEORS_RESULT_TOO_LARGE)
+        Fail("testmode: a wind_meteors record is not between 4 and 52 bytes\n");
+    if (added == WIND_METEORS_RESULT_NO_MEMORY)
+        s_windMeteorsResultsLost = true;
+}
+
+static void VisitWindMeteorsResults()
+{
+    if (s_windMeteorsResultsLost)
+        Fail("testmode: no memory for the wind_meteors events\n");
+    if (!s_dumpNow)
+        return;
+    char path[64];
+    DumpPrefix("windMeteors.count");
+    fprintf(s_dump, "0x%08x\n", s_windMeteorsResults.count);
+    for (unsigned k = 0; k < s_windMeteorsResults.count; k++) {
+        const WindMeteorsResult* r = &s_windMeteorsResults.items[k];
+        sprintf(path, "windMeteors[%u].kind", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->kind);
+        sprintf(path, "windMeteors[%u].data", k);
+        DumpPrefix(path);
+        fputs("hex:", s_dump);
+        const unsigned char* bytes = (const unsigned char*)r->data;
+        for (unsigned b = 0; b < r->size - sizeof(int); b++)
+            fprintf(s_dump, "%02x", bytes[b]);
+        fputc('\n', s_dump);
+    }
+}
+
 int __stdcall HarnessSharing()
 {
     return HarnessTestMode() && s_remoteSlots != 0;
@@ -4003,6 +4042,7 @@ static void VisitWorld()
         VisitConstants();
     VisitPathResults();
     VisitEconomyResults();
+    VisitWindMeteorsResults();
     VisitFeaturesResults();
 }
 
@@ -4693,6 +4733,7 @@ void HarnessPhase(int phase)
         PathResultsClear(&s_pathResults);
         EconomyResultsClear(&s_economyResults);
         FeaturesResultsClear(&s_featuresResults);
+        WindMeteorsResultsClear(&s_windMeteorsResults);
         fflush(s_trace);
         if (s_sound != nullptr)
             fflush(s_sound);

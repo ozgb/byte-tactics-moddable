@@ -153,7 +153,9 @@ void* __stdcall PlaceFeature(void* target, unsigned short id, void* pos, void* a
 #include "../network/net_stats.h"
 void __stdcall WriteScreenshot(char* name, char* description, int x, int y, int w, int h);
 unsigned int GetTicks();
-#include "../map/meteors.h"
+#include "../../interfaces/wind_meteors.h"
+#include "../seams/wind_meteors_world.h"
+#include "../../interfaces/services.h"
 #include "../util/commands.h"
 #include "../graphics/object_pool.h"
 #include "../graphics/display.h"
@@ -809,14 +811,10 @@ void __stdcall CmdMakePoster(CommandArgs* args)
 // FUNCTION: 0x417760
 void __stdcall CmdMeteor(CommandArgs* args)
 {
-    if (args->Count() > 1) {
-        if (args->GetIntArg(1, 0))
-            EnableMeteors();
-        else
-            DisableMeteors();
-    } else {
-        StartMeteorShower();
-    }
+    if (args->Count() > 1)
+        PublishWindMeteors(args->GetIntArg(1, 0) ? WIND_METEORS_ENABLE : WIND_METEORS_DISABLE, nullptr);
+    else
+        PublishWindMeteors(WIND_METEORS_START, nullptr);
 }
 
 // FUNCTION: 0x4177a0
@@ -1297,11 +1295,6 @@ ConsoleCommand g_consoleCommands[44] = {
     {0, 0, 0},
 };
 
-static void __stdcall CmdMeteorSlot(CommandArgs* args)
-{
-    g_seams.wind_meteors->CmdMeteor(args);
-}
-
 static void __stdcall CmdPlanSlot(CommandArgs* args)
 {
     g_seams.ai->CmdPlan(args);
@@ -1339,7 +1332,7 @@ ConsoleCommand g_cheatCommands[11] = {
     {"DoubleShot", (void (__stdcall *)(CommandArgs *))CmdDoubleShot, 2},
     {"HalfShot", (void (__stdcall *)(CommandArgs *))CmdHalfShot, 2},
     {"NowISee", (void (__stdcall *)(CommandArgs *))CmdNowISee, 2},
-    {"Meteor", CmdMeteorSlot, 2},
+    {"Meteor", CmdMeteor, 2},
     {"MakePoster", CmdMakePoster, 2},
     {0, 0, 0},
 };

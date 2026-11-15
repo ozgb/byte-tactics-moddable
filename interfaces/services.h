@@ -68,8 +68,10 @@ enum SchedModule {
     SCHED_WEAPONS = 6,
     // Map.
     SCHED_MAP = 7,
+    // Wind and meteors (interfaces/wind_meteors.h).
+    SCHED_WIND_METEORS = 8,
     // The number of modules.
-    SCHED_MODULE_COUNT = 8
+    SCHED_MODULE_COUNT = 9
 };
 // Publishes an event, plain data whose first int is its kind, to a module's outbox; the router copies it to the inbox of each subscriber of that kind, which consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
@@ -79,6 +81,11 @@ int __stdcall ScheduleEconomySpend(const EconomyEvent* spend);
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
 // Runs economy's UpdateMetalExtraction for a unit (an economy unit handle) after delivering economy's pending inbox; its effects are published to economy's outbox.
 void __stdcall ScheduleMetalExtraction(unsigned int unit);
+struct WindMeteorsEffect;
+// Publishes an effect of wind_meteors (interfaces/wind_meteors.h) to its outbox, as SchedPublish does, and records it for the dump's wind_meteors events; called by wind_meteors from its runs.
+void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect);
+// In test mode, records a wind_meteors event as wind_meteors consumes it, or an effect as it publishes it, for the dump's wind_meteors events: size bytes of plain data whose first int is its kind.
+void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size);
 
 // Calls features' synchronous Place slot for a placement (an event of kind FEATURES_PLACE) after delivering features' pending inbox, records it, and returns its outcome, visible at once.
 int __stdcall ScheduleFeaturesPlace(const FeaturesEvent* place);

@@ -47,8 +47,8 @@ statics runs wind_meteors under the pinned wasmtime package with the manifest's 
 memory_pages pages, a Game and a SimGlobals zeroed in the block (with the
 size, wind and meteor fields set so showers start within the run), the module's g_game, g_simGlobals,
 g_extTdf and g_blockBase (block_base) written through its exports, and stubs for every import (GameRand and RandomInt from an LCG,
-SpawnProjectile counting its calls, FindWeaponByName returning the first weapon of the Game, FatalError
-raising). It calls InitMeteors, EnableMeteors and SetMeteorParams, then 2000 ticks of UpdateWind and
+WindMeteorsEmit counting its calls, FindWeaponByName returning the first weapon of the Game, FatalError
+raising). It calls InitMeteors and Apply with an ENABLE and a PARAMS event, then 2000 ticks of UpdateWind and
 UpdateMeteors with Game::ticks incremented, and hashes the module's statics (its data and bss, from
 data_base to the low end of its stack, as linked) after setup and after every tick. A module that keeps
 state outside the block fails at the first tick whose hash differs. The field offsets come from
@@ -978,15 +978,14 @@ def statics_run(path=None, report=None):
     def random_int(count):
         return rand32() % count if count > 0 else 0
 
-    def spawn_projectile(_weapon, _pos, _vel, _flag):
+    def emit(_effect):
         state["spawns"] += 1
-        return 1
 
     def fatal_error(_message):
         raise RuntimeError("the module called FatalError")
 
     stubs = {("services", "GameRand"): game_rand, ("services", "RandomInt"): random_int,
-             ("weapons", "SpawnProjectile"): spawn_projectile,
+             ("services", "WindMeteorsEmit"): emit,
              ("weapons", "FindWeaponByName"): lambda _name: game_at + off[("Game", "weapons")],
              ("services", "FatalError"): fatal_error}
 
@@ -1023,8 +1022,10 @@ def statics_run(path=None, report=None):
     put(game_at + off[("Game", "windSpeedDenominator")], 30)
 
     params = scratch
-    memory.write(store, b"Meteor\0".ljust(32, b"\0"), params)
-    memory.write(store, (50).to_bytes(4, "little") + struct.pack("<fff", 0.5, 2.0, 3.0), params + 32)
+    kinds = dict(re.findall(r"(WIND_METEORS_\w+) = (\d+)", open(os.path.join(ROOT, "interfaces", "wind_meteors.h")).read()))
+    enable, parameters = int(kinds["WIND_METEORS_ENABLE"]), int(kinds["WIND_METEORS_PARAMS"])
+    enable_event = struct.pack("<i", enable) + bytes(48)
+    params_event = struct.pack("<i", parameters) + b"Meteor\0".ljust(32, b"\0") + (50).to_bytes(4, "little") + struct.pack("<fff", 0.5, 2.0, 3.0)
 
     budget = entry["fuel_budget"]
 
@@ -1035,10 +1036,12 @@ def statics_run(path=None, report=None):
         return hashlib.sha256(memory.read(store, statics[0], statics[1])).hexdigest()
 
     call("InitMeteors")
-    call("EnableMeteors")
-    call("SetMeteorParams", params)
+    memory.write(store, enable_event, params)
+    call("Apply", params)
+    memory.write(store, params_event, params)
+    call("Apply", params)
     if get(sim_at + off[("SimGlobals", "g_meteorsEnabled")]) != 1:
-        sys.exit("EnableMeteors did not set g_meteorsEnabled in the block")
+        sys.exit("an ENABLE event did not set g_meteorsEnabled in the block")
     setup = digest()
     ticks = off[("Game", "ticks")]
     most = 0
@@ -1046,7 +1049,7 @@ def statics_run(path=None, report=None):
         put(game_at + ticks, tick)
         exports["__fuel_set"](store, budget)
         try:
-            call("UpdateWind")
+            call("UpdateWind", 0)
             call("UpdateMeteors")
         except wasmtime.Trap as trap:
             if exports["__fuel_get"](store) < 0:
@@ -1059,11 +1062,11 @@ def statics_run(path=None, report=None):
             print(f"FAIL: the statics {statics[0]:#x}..{statics[1]:#x} of {entry['name']} changed at tick {tick}")
             return 1
     if state["spawns"] == 0:
-        print("FAIL: SpawnProjectile was never called, so no meteor ran")
+        print("FAIL: WindMeteorsEmit was never called, so no meteor ran")
         return 1
     if report is not None:
         report.update(exports=exports, store=store, spawns=state["spawns"], most=most)
-    print(f"statics: {STATICS_TICKS} ticks, {state['spawns']} SpawnProjectile calls, {statics[1] - statics[0]} bytes hashed, ok")
+    print(f"statics: {STATICS_TICKS} ticks, {state['spawns']} WindMeteorsEmit calls, {statics[1] - statics[0]} bytes hashed, ok")
     print(f"fuel: the most one tick burned on the stubbed run is {most}, under the fuel_budget {budget} of {entry['name']}")
     return 0
 

@@ -1638,5 +1638,12 @@
       {"name": "to", "size": 4, "kind": "scalar", "target": null},
       {"name": "amount", "size": 4, "kind": "scalar", "target": null}
     ]
+  },
+  "windMeteors": {
+    "section": 37,
+    "fields": [
+      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
+      {"name": "data", "size": 4, "kind": "bytes", "target": null}
+    ]
   }
 }

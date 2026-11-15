@@ -31,13 +31,14 @@ FilesSeam s_rec_files;
 const NetworkSeam* s_inner_network;
 NetworkSeam s_rec_network;
 
-void __cdecl RecWindMeteorsUpdateWind()
+void __cdecl RecWindMeteorsUpdateWind(RandStream a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_UPDATEWIND, SUB_WIND_METEORS, roots);
     if (scope.Open()) {
+        ArgValue(s_call, "stream", a0);
     }
-    s_inner_wind_meteors->UpdateWind();
+    s_inner_wind_meteors->UpdateWind(a0);
     if (scope.Open()) {
     }
 }
@@ -49,6 +50,18 @@ void __stdcall RecWindMeteorsUpdateMeteors()
     if (scope.Open()) {
     }
     s_inner_wind_meteors->UpdateMeteors();
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecWindMeteorsApply(const WindMeteorsEvent* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_WIND_METEORS_APPLY, SUB_WIND_METEORS, roots);
+    if (scope.Open()) {
+        ArgStruct(s_call, "a", "event", ROK_WINDMETEORSEVENT, a0);
+    }
+    s_inner_wind_meteors->Apply(a0);
     if (scope.Open()) {
     }
 }
@@ -75,41 +88,7 @@ void __stdcall RecWindMeteorsEmptyShutdownPreCleanup()
     }
 }
 
-void __stdcall RecWindMeteorsEnableMeteors()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WIND_METEORS_ENABLEMETEORS, SUB_WIND_METEORS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_wind_meteors->EnableMeteors();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWindMeteorsDisableMeteors()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WIND_METEORS_DISABLEMETEORS, SUB_WIND_METEORS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_wind_meteors->DisableMeteors();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWindMeteorsSetMeteorParams(MeteorParams* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WIND_METEORS_SETMETEORPARAMS, SUB_WIND_METEORS, roots);
-    if (scope.Open()) {
-        ArgStruct(s_call, "a", "params", ROK_METEORPARAMS, a0);
-    }
-    s_inner_wind_meteors->SetMeteorParams(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecWindMeteorsLoadMeteorDefaults(MeteorParams* a0)
+void __stdcall RecWindMeteorsLoadMeteorDefaults(MeteorShowerParams* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WIND_METEORS_LOADMETEORDEFAULTS, SUB_WIND_METEORS, roots);
@@ -117,7 +96,7 @@ void __fastcall RecWindMeteorsLoadMeteorDefaults(MeteorParams* a0)
     }
     s_inner_wind_meteors->LoadMeteorDefaults(a0);
     if (scope.Open()) {
-        ArgStruct(s_tail, "o", "params", ROK_METEORPARAMS, a0);
+        ArgStruct(s_tail, "o", "params", ROK_METEORSHOWERPARAMS, a0);
     }
 }
 
@@ -141,38 +120,6 @@ void __stdcall RecWindMeteorsLoadMeteors(HapiBank* a0)
         ArgHandle(s_call, "bank", OBJ_BANK, a0);
     }
     s_inner_wind_meteors->LoadMeteors(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWindMeteorsCmdMeteor(CommandArgs* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WIND_METEORS_CMDMETEOR, SUB_WIND_METEORS, roots);
-    if (scope.Open()) {
-        ArgArgv(s_call, a0);
-    }
-    ReplayText line;
-    if (scope.Nested()) {
-        line.Add("\n    c wind_meteors.CmdMeteor");
-        ImportArgv(line, a0);
-    }
-    s_inner_wind_meteors->CmdMeteor(a0);
-    if (scope.Nested()) {
-        FinishNested(line);
-    }
-    if (scope.Open()) {
-    }
-}
-
-void __cdecl RecWindMeteorsUpdateWindOnStream(RandStream a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WIND_METEORS_UPDATEWINDONSTREAM, SUB_WIND_METEORS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "stream", a0);
-    }
-    s_inner_wind_meteors->UpdateWindOnStream(a0);
     if (scope.Open()) {
     }
 }
@@ -4997,36 +4944,6 @@ void __stdcall RecNetworkSendUnitStates(Player* a0)
     }
 }
 
-int __stdcall RecWeaponsSpawnProjectile(WeaponDef* a0, Vec3* a1, Vec3* a2, int a3)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_WEAPONDEF, a0);
-    SlotScope scope(RSL_WEAPONS_SPAWNPROJECTILE, SUB_WEAPONS, roots, false);
-    if (scope.Open()) {
-        ArgWeapon(s_call, "weapon", a0);
-        ArgVec3(s_call, "pos", a1);
-        ArgVec3(s_call, "vel", a2);
-        ArgValue(s_call, "flag", a3);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i weapons.SpawnProjectile");
-        ImportWeapon(line, a0);
-        ImportVec3(line, "pos", a1);
-        ImportVec3(line, "vel", a2);
-        ImportValue(line, a3);
-    }
-    int result = s_inner_weapons->SpawnProjectile(a0, a1, a2, a3);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
 WeaponDef* __stdcall RecWeaponsFindWeaponByName(char* a0)
 {
     ReplayRoots roots;
@@ -5053,8 +4970,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
 {
     switch (owner) {
     case SUB_WIND_METEORS:
-        if (slot == RSL_WEAPONS_SPAWNPROJECTILE)
-            return true;
         if (slot == RSL_WEAPONS_FINDWEAPONBYNAME)
             return true;
         if (slot == RSL_FILES_BANKOPENACCOUNT)
@@ -5138,7 +5053,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
 bool IsNestedSlot(unsigned slot)
 {
     switch (slot) {
-    case RSL_WIND_METEORS_CMDMETEOR:
     case RSL_LOS_RADAR_CMDSHAREMAPPING:
     case RSL_LOS_RADAR_CMDSHARERADAR:
         return true;
@@ -5185,25 +5099,17 @@ void HookSeams(const bool* on)
     if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.UpdateMeteors = RecWindMeteorsUpdateMeteors;
     if (on[SUB_WIND_METEORS])
+        s_rec_wind_meteors.Apply = RecWindMeteorsApply;
+    if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.InitMeteors = RecWindMeteorsInitMeteors;
     if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.EmptyShutdownPreCleanup = RecWindMeteorsEmptyShutdownPreCleanup;
-    if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.EnableMeteors = RecWindMeteorsEnableMeteors;
-    if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.DisableMeteors = RecWindMeteorsDisableMeteors;
-    if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.SetMeteorParams = RecWindMeteorsSetMeteorParams;
     if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.LoadMeteorDefaults = RecWindMeteorsLoadMeteorDefaults;
     if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.SaveMeteors = RecWindMeteorsSaveMeteors;
     if (on[SUB_WIND_METEORS])
         s_rec_wind_meteors.LoadMeteors = RecWindMeteorsLoadMeteors;
-    if (on[SUB_WIND_METEORS] || any)
-        s_rec_wind_meteors.CmdMeteor = RecWindMeteorsCmdMeteor;
-    if (on[SUB_WIND_METEORS])
-        s_rec_wind_meteors.UpdateWindOnStream = RecWindMeteorsUpdateWindOnStream;
     if (on[SUB_ECONOMY])
         s_rec_economy.RegionSize = RecEconomyRegionSize;
     if (on[SUB_ECONOMY])
@@ -5844,8 +5750,6 @@ void HookSeams(const bool* on)
         s_rec_network.BroadcastPlayerEconomy = RecNetworkBroadcastPlayerEconomy;
     if (on[SUB_NETWORK])
         s_rec_network.SendUnitStates = RecNetworkSendUnitStates;
-    if (on[SUB_WIND_METEORS])
-        s_rec_weapons.SpawnProjectile = RecWeaponsSpawnProjectile;
     if (on[SUB_WIND_METEORS])
         s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
     g_seams.wind_meteors = &s_rec_wind_meteors;

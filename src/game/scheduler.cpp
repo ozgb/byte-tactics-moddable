@@ -222,3 +222,15 @@ void SchedPlayersPhase(RandStream stream)
     SchedDeliver(SCHED_PLAYERS);
     g_seams.players->UpdatePlayersFinish();
 }
+
+void SchedWindPhase(RandStream stream)
+{
+    SchedDeliver(SCHED_WIND_METEORS);
+    g_seams.wind_meteors->UpdateWind(stream);
+}
+
+void SchedMeteorsPhase()
+{
+    SchedDeliver(SCHED_WIND_METEORS);
+    g_seams.wind_meteors->UpdateMeteors();
+}

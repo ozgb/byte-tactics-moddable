@@ -52,6 +52,28 @@ class EconomyOwnerTest(unittest.TestCase):
         self.assertEqual(len(ps.violations(rows)), 2)
 
 
+class WindMeteorsOwnerTest(unittest.TestCase):
+    def test_meteor_globals_are_private_for_reads_and_writes(self):
+        self.assertEqual(ps.private_to("g_meteorNextStrikeTime"), ("wind_meteors", ("writer", "reader")))
+        self.assertEqual(len(ps.METEOR_GLOBALS), 13)
+        rows = {"edges": [("wind_meteors", "-", "g_meteorActive"), ("-", "wind_meteors", "g_meteorActive"),
+                          ("-", "weapons", "g_meteorWeapon"), ("game", "-", "g_meteorsEnabled")],
+                "reads": [("-", "game", "g_meteorOrigin"), ("-", "wind_meteors", "g_meteorOrigin")]}
+        self.assertEqual(ps.violations(rows),
+                         ["edges: reader weapons on g_meteorWeapon, which is private to wind_meteors",
+                          "edges: writer game on g_meteorsEnabled, which is private to wind_meteors",
+                          "reads: reader game on g_meteorOrigin, which is private to wind_meteors"])
+
+    def test_wind_fields_are_private_for_writes_only(self):
+        self.assertEqual(ps.private_to("windSpeedMax"), ("wind_meteors", ("writer",)))
+        rows = {"edges": [("wind_meteors", "units", "windSpeed"), ("-", "ai", "windStrength"), ("wind_meteors", "-", "windZ"),
+                          ("units", "-", "windDirection"), ("-", "units", "windSpeed")]}
+        self.assertEqual(ps.violations(rows), ["edges: writer units on windDirection, which is written only by wind_meteors"])
+
+    def test_similar_names_are_not_private(self):
+        for item in ("windgenerator", "UnitDef::windgenerator", "Game::windSpeed", "g_meteors", "g_meteorWeaponX"):
+            self.assertFalse(ps.is_private(item), item)
+
 class FeaturesOwnerTest(unittest.TestCase):
     def test_spots_cell_fields_and_the_scan_index_are_private_for_writes_only(self):
         for item in ("FeatureAnimEntry::next", "FeatureAnimEntry::prev", "Cell::feature", "Cell::spot", "Cell::offsetX", "Cell::offsetY", "scanIndex"):
@@ -82,8 +104,8 @@ class FeaturesOwnerTest(unittest.TestCase):
                 "reads": [("-", "weapons", "FeatureAnimEntry::bytes_10"), ("-", "map", "scanIndex")], "presentation": [("-", "presentation", "Cell::spot")]}
         self.assertEqual(ps.violations(rows), [])
 
-    def test_the_owners_are_pathfinding_economy_and_features(self):
-        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "features"])
+    def test_the_owners_are_pathfinding_economy_wind_meteors_and_features(self):
+        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features"])
 
 
 class ViolationTest(unittest.TestCase):

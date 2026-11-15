@@ -153,8 +153,8 @@ Features keeps no private region, and so it has no `WriteState` report: its stat
   fields, as of features' last run (section 4). They stay hashed view state (section 11), as `Player`'s totals
   did for economy. Before the tick, `LoadTntMap` (`ClearBorderFeatures`) clears the features of the map's border cells
   as it builds the grid; that is set-up, outside the model.
-- **The trace dumps features' events** in section 36 (`docs/trace-format.md`, section 8.24), after economy's section
-  33, and hashes none of them: no trace format bump and no reference half. Each record is an event with the outcome
+- **The trace dumps features' events** in section 36 (`docs/trace-format.md`, section 8.25), after economy's section
+  33 and wind_meteors' section 37, and hashes none of them: no trace format bump and no reference half. Each record is an event with the outcome
   `Apply` gave, or an effect features published, in features' order. A model's piece state is dumped as `null` or
   `heap`, never its address.
 

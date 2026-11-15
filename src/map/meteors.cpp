@@ -16,6 +16,7 @@
 #include "../util/tdf.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/wind_meteors.h"
 #include "../state/sim_globals.h"
 #include "meteors.h"
 
@@ -62,9 +63,9 @@ void DisableMeteors()
 }
 
 // FUNCTION: 0x437d60
-void __stdcall SetMeteorParams(MeteorParams* p)
+void __stdcall SetMeteorParams(const MeteorShowerParams* p)
 {
-    strcpy(g_meteorWeaponName, p->name);
+    strcpy(g_meteorWeaponName, p->weapon);
     g_meteorSpawnMagnitude = p->radius;
     g_meteorSpawnInterval = (int)(30.0 / p->density);
     g_meteorShowerDuration = (int)(p->duration * 30.0);
@@ -135,7 +136,17 @@ void UpdateMeteors()
             pos.x += g_meteorOrigin.x << 20;
             pos.y = -vel.y * 90;
             pos.z += g_meteorOrigin.y << 20;
-            g_seams.weapons->SpawnProjectile(g_meteorWeapon, &pos, &vel, 1);
+            WindMeteorsEffect effect;
+            effect.kind = WIND_METEORS_EFFECT_SPAWN;
+            effect.weapon = g_meteorWeapon.get() == nullptr ? -1 : (int)(g_meteorWeapon.get() - g_game->weapons);
+            effect.x = pos.x;
+            effect.y = pos.y;
+            effect.z = pos.z;
+            effect.vx = vel.x;
+            effect.vy = vel.y;
+            effect.vz = vel.z;
+            effect.announce = 1;
+            WindMeteorsEmit(&effect);
         }
         if (g_meteorStrikeEndTime <= (unsigned int)g_game->ticks)
             g_meteorActive = 0;
@@ -188,22 +199,40 @@ void __stdcall LoadMeteors(HapiBank* file)
 }
 
 // FUNCTION: 0x438320
-void MeteorParams::LoadMeteorDefaults()
+void __stdcall LoadMeteorDefaults(MeteorShowerParams* params)
 {
     TdfFile parser;
     char path[256];
     BuildDataPath(path, "gamedata", "meteor", g_extTdf);
     if (parser.LoadFile(path)
         && parser.SelectRecord("Default")) {
-        if (parser.current->GetFieldString((char*)this, "MeteorWeapon", 0x20, g_emptyText)) {
-            radius = parser.current->GetFieldInt("MeteorRadius", 0);
-            density = (float)parser.current->GetFieldDouble("MeteorDensity", 0.0);
-            duration = (float)parser.current->GetFieldDouble("MeteorDuration", 0.0);
+        if (parser.current->GetFieldString(params->weapon, "MeteorWeapon", 0x20, g_emptyText)) {
+            params->radius = parser.current->GetFieldInt("MeteorRadius", 0);
+            params->density = (float)parser.current->GetFieldDouble("MeteorDensity", 0.0);
+            params->duration = (float)parser.current->GetFieldDouble("MeteorDuration", 0.0);
             float intervalTime = (float)parser.current->GetFieldDouble("MeteorInterval", 0.0);
-            interval = intervalTime;
-            if (radius != 0 && density != 0.0f && duration != 0.0f && intervalTime != 0.0f)
+            params->interval = intervalTime;
+            if (params->radius != 0 && params->density != 0.0f && params->duration != 0.0f && intervalTime != 0.0f)
                 return;
         }
         FatalError("Hey, hoser!  The default meteor shower data was bogus!");
+    }
+}
+
+void __stdcall WindMeteorsApply(const WindMeteorsEvent* event)
+{
+    switch (event->kind) {
+    case WIND_METEORS_ENABLE:
+        EnableMeteors();
+        break;
+    case WIND_METEORS_DISABLE:
+        DisableMeteors();
+        break;
+    case WIND_METEORS_PARAMS:
+        SetMeteorParams(&event->params);
+        break;
+    case WIND_METEORS_START:
+        StartMeteorShower();
+        break;
     }
 }

@@ -30,7 +30,7 @@
     "targeting": 1,
     "units": 1,
     "weapons": 1,
-    "wind_meteors": 1
+    "wind_meteors": 2
   },
   "signatures": {
     "ai": {
@@ -68,7 +68,8 @@
       "CommandArgs_Count": [["scratch"], "int"],
       "HapiBank_OpenAccount": [["handle", "linear"], "int"],
       "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
-      "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"]
+      "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"],
+      "WindMeteorsEmit": [["linear"], "void"]
     },
     "targeting": {
       "SetWeaponTargetUnit": [["block", "block", "int"], "void"],
@@ -95,18 +96,14 @@
       "WeaponCanReachUnit": [["block", "block", "int"], "int"]
     },
     "wind_meteors": {
-      "UpdateWind": [[], "void"],
+      "UpdateWind": [["int"], "void"],
       "UpdateMeteors": [[], "void"],
+      "Apply": [["linear"], "void"],
       "InitMeteors": [[], "void"],
       "EmptyShutdownPreCleanup": [[], "void"],
-      "EnableMeteors": [[], "void"],
-      "DisableMeteors": [[], "void"],
-      "SetMeteorParams": [["linear"], "void"],
       "LoadMeteorDefaults": [["linear"], "void"],
       "SaveMeteors": [["handle"], "void"],
-      "LoadMeteors": [["handle"], "void"],
-      "CmdMeteor": [["scratch"], "void"],
-      "UpdateWindOnStream": [["int"], "void"]
+      "LoadMeteors": [["handle"], "void"]
     }
   },
   "adapters": [],
@@ -115,7 +112,7 @@
       "name": "wind_meteors",
       "interface": "wind_meteors",
       "majors": {
-        "wind_meteors": 1,
+        "wind_meteors": 2,
         "weapons": 1,
         "services": 1
       },
@@ -123,28 +120,23 @@
       "size_budget": 13100,
       "data_base": 196608,
       "table_base": 48,
-      "cxx": ["wasm/wind_meteors/module.cpp", "src/map/meteors.cpp", "src/game/game_state.cpp", "src/game/console_commands.cpp"],
+      "cxx": ["wasm/wind_meteors/module.cpp", "src/map/meteors.cpp", "src/game/game_state.cpp"],
       "c": ["wasm/crt/string.c", "lib/bitexact/trig.c"],
-      "exports": ["UpdateWind", "UpdateMeteors", "InitMeteors", "EmptyShutdownPreCleanup", "EnableMeteors", "DisableMeteors",
-                  "SetMeteorParams", "LoadMeteorDefaults", "SaveMeteors", "LoadMeteors", "CmdMeteor", "UpdateWindOnStream"],
+      "exports": ["UpdateWind", "UpdateMeteors", "Apply", "InitMeteors", "EmptyShutdownPreCleanup", "LoadMeteorDefaults",
+                  "SaveMeteors", "LoadMeteors"],
       "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
       "slots": {
-        "UpdateWind": [[], "void"],
+        "UpdateWind": [["int"], "void"],
         "UpdateMeteors": [[], "void"],
+        "Apply": [["linear"], "void"],
         "InitMeteors": [[], "void"],
         "EmptyShutdownPreCleanup": [[], "void"],
-        "EnableMeteors": [[], "void"],
-        "DisableMeteors": [[], "void"],
-        "SetMeteorParams": [["linear"], "void"],
         "LoadMeteorDefaults": [["linear"], "void"],
         "SaveMeteors": [["handle"], "void"],
-        "LoadMeteors": [["handle"], "void"],
-        "CmdMeteor": [["scratch"], "void"],
-        "UpdateWindOnStream": [["int"], "void"]
+        "LoadMeteors": [["handle"], "void"]
       },
       "imports": {
         "weapons": {
-          "SpawnProjectile": [["block", "linear", "linear", "int"], "int"],
           "FindWeaponByName": [["linear"], "block"]
         },
         "services": {
@@ -159,11 +151,10 @@
           "TdfRecord_GetFieldInt": [["handle", "linear", "int"], "int"],
           "TdfRecord_GetFieldDouble": [["handle", "linear", "f64"], "f64"],
           "TdfRecord_GetFieldString": [["handle", "linear", "linear", "int", "linear"], "int"],
-          "CommandArgs_GetIntArg": [["scratch", "int", "int"], "int"],
-          "CommandArgs_Count": [["scratch"], "int"],
           "HapiBank_OpenAccount": [["handle", "linear"], "int"],
           "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
-          "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"]
+          "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"],
+          "WindMeteorsEmit": [["linear"], "void"]
         }
       }
     }

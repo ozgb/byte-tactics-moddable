@@ -185,7 +185,28 @@ SHARE_PACKETS = [
 ]
 
 
+WIND_METEORS_EVENTS = [
+    ("windMeteors.count", "0x00000002"),
+    ("windMeteors[0].kind", "0x00000023"),
+    ("windMeteors[0].data", "hex:" + bytes(range(48)).hex()),
+    ("windMeteors[1].kind", "0x00000030"),
+    ("windMeteors[1].data", "hex:" + bytes(range(32)).hex()),
+]
+
+
 class DumpedOnlyTest(unittest.TestCase):
+    def test_wind_meteors_events_after_the_share_packets_are_skipped(self):
+        lines = PATH_RESULTS + ECONOMY_EVENTS + SHARE_PACKETS + WIND_METEORS_EVENTS
+        w = tr.Walker(RESULTS, lines)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(lines))
+
+    def test_an_empty_wind_meteors_record_is_skipped(self):
+        w = tr.Walker(RESULTS, [("windMeteors.count", "0x00000000")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
+
     def test_path_results_and_economy_events_are_skipped(self):
         w = tr.Walker(RESULTS, PATH_RESULTS + ECONOMY_EVENTS)
         w.skip_dumped(tr.DUMPED_ONLY)

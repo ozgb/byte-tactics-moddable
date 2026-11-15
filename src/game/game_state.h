@@ -6,7 +6,6 @@
 void __stdcall CreateOffscreenSurface();
 void __stdcall FreeOffscreenSurface();
 void __stdcall SetGameMode(int param);
-void __cdecl UpdateWind();
 void __cdecl UpdateWindOnStream(RandStream stream);
 void __stdcall ResetGameSpeed();
 void __stdcall IncreaseGameSpeed();

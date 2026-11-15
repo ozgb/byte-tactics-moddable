@@ -2028,7 +2028,8 @@ def render_hooks(ann: dict, model: dict) -> str:
         L.append("%s s_rec_%s;" % (spec["struct"], sub))
     L.append("")
     for sub, slot, s in slot_table(subsystems):
-        L += wrapper(sub, subsystems[sub], slot, s, objects, sub + "." + slot in imported, slot in subsystems[sub].get("unrecorded", {}))
+        L += wrapper(sub, subsystems[sub], slot, s, objects, sub + "." + slot in imported, slot in subsystems[sub].get("unrecorded", {}),
+                     model["object_fields"])
     L.append("bool IsImportOf(unsigned owner, unsigned slot)")
     L.append("{")
     L.append("    switch (owner) {")
@@ -2069,7 +2070,28 @@ def render_hooks(ann: dict, model: dict) -> str:
     return "\n".join(L)
 
 
-def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: bool, unrecorded: bool = False) -> list[str]:
+def struct_roots(a: dict, i: int, objects: dict, object_fields: list) -> list[str]:
+    """Roots for the state objects a struct argument names by its ref and ptr fields, so the slot's reads of them are
+    recorded as an object argument's are."""
+    L = []
+    for f in object_fields:
+        if f["object"] != a.get("kind"):
+            continue
+        target = objects.get(f.get("target"))
+        if f["kind"] not in ("ref", "ptr") or target is None or target["scope"] != "state":
+            continue
+        member = "a%d->%s" % (i, f.get("member", f["name"]))
+        if f["kind"] == "ptr":
+            L.append("    if (a%d != nullptr)" % i)
+            L.append("        roots.Add(ROK_%s, %s);" % (upper(f["target"]), member))
+        else:
+            L.append("    if (a%d != nullptr && %s != 0)" % (i, member))
+            L.append("        roots.Add(ROK_%s, (char*)SimBlockBase() + %s);" % (upper(f["target"]), member))
+    return L
+
+
+def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: bool, unrecorded: bool = False,
+            object_fields: list = ()) -> list[str]:
     params = ", ".join("%s a%d" % (raw_type(s, i), i) for i in range(len(s["args"])))
     call_args = ", ".join("a%d" % i for i in range(len(s["args"])))
     rid = "RSL_%s_%s" % (upper(sub), upper(slot))
@@ -2087,6 +2109,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             L.append("    roots.Add(ROK_%s, a%d);" % (upper(a["kind"]), i))
         elif a["mode"] == "weapon":
             L.append("    roots.Add(ROK_WEAPONDEF, a%d);" % i)
+        elif a["mode"] == "struct" and a.get("dir") != "out":
+            L += struct_roots(a, i, objects, object_fields)
     L.append("    SlotScope scope(%s, SUB_%s, roots%s);" % (rid, upper(sub), ", false" if unrecorded else ""))
     callback_args = [i for i, a in enumerate(s["args"]) if a["mode"] == "callback"]
     held_args = [] if is_import else callback_args

@@ -1974,7 +1974,7 @@ static const unsigned short kReplayTargetingApplyObjWrites[] = { 48, 54, 55, 59,
 static const unsigned short kReplayTargetingGetWeaponTargetUnitObjReads[] = { 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67 };
 static const unsigned short kReplayTargetingGetWeaponTargetUnitObjWrites[] = { 54, 55, 59, 60, 64, 65 };
 static const unsigned char kReplayTargetingGetWeaponTargetPosReads[] = { 17 };
-static const unsigned short kReplayTargetingGetWeaponTargetPosObjReads[] = { 45, 46, 50, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 129, 130 };
+static const unsigned short kReplayTargetingGetWeaponTargetPosObjReads[] = { 45, 46, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 129, 130, 182, 183, 184 };
 static const unsigned short kReplayTargetingGetWeaponTargetPosObjWrites[] = { 54, 55, 59, 60, 64, 65 };
 static const unsigned char kReplayTargetingFindWeaponTargetReads[] = { 18, 51, 52, 53 };
 static const unsigned char kReplayTargetingFindWeaponTargetWrites[] = { 51, 52, 53 };
@@ -2295,7 +2295,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "WeaponAimCobComplete", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsWeaponAimCobCompleteObjReads, 1, kReplayWeaponsWeaponAimCobCompleteObjWrites, 1, nullptr, 0 },
     { "Apply", SUB_TARGETING, nullptr, 0, nullptr, 0, kReplayTargetingApplyObjReads, 14, kReplayTargetingApplyObjWrites, 7, nullptr, 0 },
     { "GetWeaponTargetUnit", SUB_TARGETING, nullptr, 0, nullptr, 0, kReplayTargetingGetWeaponTargetUnitObjReads, 12, kReplayTargetingGetWeaponTargetUnitObjWrites, 6, nullptr, 0 },
-    { "GetWeaponTargetPos", SUB_TARGETING, kReplayTargetingGetWeaponTargetPosReads, 1, nullptr, 0, kReplayTargetingGetWeaponTargetPosObjReads, 20, kReplayTargetingGetWeaponTargetPosObjWrites, 6, nullptr, 0 },
+    { "GetWeaponTargetPos", SUB_TARGETING, kReplayTargetingGetWeaponTargetPosReads, 1, nullptr, 0, kReplayTargetingGetWeaponTargetPosObjReads, 26, kReplayTargetingGetWeaponTargetPosObjWrites, 6, nullptr, 0 },
     { "FindWeaponTarget", SUB_TARGETING, kReplayTargetingFindWeaponTargetReads, 4, kReplayTargetingFindWeaponTargetWrites, 3, kReplayTargetingFindWeaponTargetObjReads, 22, nullptr, 0, nullptr, 0 },
     { "FindBestTargetIfFireAtWill", SUB_TARGETING, kReplayTargetingFindBestTargetIfFireAtWillReads, 4, kReplayTargetingFindBestTargetIfFireAtWillWrites, 3, kReplayTargetingFindBestTargetIfFireAtWillObjReads, 22, nullptr, 0, nullptr, 0 },
     { "ChooseWeapon", SUB_TARGETING, nullptr, 0, nullptr, 0, kReplayTargetingChooseWeaponObjReads, 3, nullptr, 0, nullptr, 0 },

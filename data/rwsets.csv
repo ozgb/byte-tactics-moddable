@@ -55462,10 +55462,14 @@ address,function,file,kind,target
 ,RecPlayersUpdatePlayersOnStream,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPlayersUpdatePlayersOnStream,src/harness/replay_hooks.inc,global_read,s_inner_players
 ,RecPlayersUpdatePlayersOnStream,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(RandStream) __attribute__((stdcall)) [PlayersSeam::UpdatePlayersOnStream]
+,RecTargetingApply,src/harness/replay_hooks.inc,call,Add
 ,RecTargetingApply,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecTargetingApply,src/harness/replay_hooks.inc,call,ArgValue
+,RecTargetingApply,src/harness/replay_hooks.inc,call,SimBlockBase
 ,RecTargetingApply,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecTargetingApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecTargetingApply,src/harness/replay_hooks.inc,field_read,TargetingEvent::target
+,RecTargetingApply,src/harness/replay_hooks.inc,field_read,TargetingEvent::unit
 ,RecTargetingApply,src/harness/replay_hooks.inc,field_read,TargetingSeam::Apply
 ,RecTargetingApply,src/harness/replay_hooks.inc,function,
 ,RecTargetingApply,src/harness/replay_hooks.inc,global_read,s_call

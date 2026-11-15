@@ -77,6 +77,10 @@ int HarnessTestMode()
     return 1;
 }
 
+void __stdcall HarnessTargetingEvent(const TargetingEvent*, int)
+{
+}
+
 Game* g_game;
 SimGlobals* g_simGlobals;
 char g_extTdf[4];
@@ -775,8 +779,19 @@ void ParseStruct(const char* name, unsigned kind, void* object)
         char key[96];
         sprintf(key, "%s.%s", name, f.name);
         const char* value = ArgLine(key);
-        if (value != nullptr)
-            ReplayRestoreObjectField(f, object, value, g_objects, nullptr);
+        if (value == nullptr || !ReplayRestoreObjectField(f, object, value, g_objects, AllocObject))
+            continue;
+        void* target = nullptr;
+        if (f.kind == RK_REF) {
+            unsigned offset = *(unsigned*)((unsigned char*)object + f.offset);
+            target = offset == 0 ? nullptr : (char*)SimBlockBase() + offset;
+        }
+        else if (f.kind == RK_PTR)
+            target = *(void**)((unsigned char*)object + f.offset);
+        if (target != nullptr && g_rootCount < REPLAY_MAX_ROOTS) {
+            g_rootKinds[g_rootCount] = f.target;
+            g_rootObjects[g_rootCount++] = target;
+        }
     }
 }
 

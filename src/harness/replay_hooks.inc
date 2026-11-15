@@ -1202,6 +1202,10 @@ void __stdcall RecWeaponsWeaponAimCobComplete(Callback* a0, int a1)
 int __stdcall RecTargetingApply(const TargetingEvent* a0)
 {
     ReplayRoots roots;
+    if (a0 != nullptr && a0->unit != 0)
+        roots.Add(ROK_UNIT, (char*)SimBlockBase() + a0->unit);
+    if (a0 != nullptr && a0->target != 0)
+        roots.Add(ROK_UNIT, (char*)SimBlockBase() + a0->target);
     SlotScope scope(RSL_TARGETING_APPLY, SUB_TARGETING, roots);
     if (scope.Open()) {
         ArgStruct(s_call, "a", "event", ROK_TARGETINGEVENT, a0);

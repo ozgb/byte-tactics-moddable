@@ -1444,7 +1444,7 @@ harness,game,call,QuirksParse,2
 harness,game,call,ReplayGateRef,6
 harness,game,call,SaveGameFile,1
 harness,game,call,SimBlockAttach,1
-harness,game,call,SimBlockBase,23
+harness,game,call,SimBlockBase,24
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimBlockNew,1
 harness,game,call,SimBlockSize,1
@@ -1550,7 +1550,7 @@ harness,network,shared_write,LoadingFlags::value,1
 harness,network,shared_write,Player::alliedBy,2
 harness,network,shared_write,Player::progress,2
 harness,network,shared_write,Player::type,69
-harness,orders,call,Add,117
+harness,orders,call,Add,118
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,shared_write,AiSeam::GetFactoriesInRadius,7
@@ -5291,7 +5291,7 @@ targeting,game,shared_write,Vec3::y,2
 targeting,game,shared_write,Vec3::z,4
 targeting,harness,call,HarnessTargetingEvent,1
 targeting,harness,shared_write,TargetingEvent::kind,1
-targeting,harness,shared_write,TargetingEvent::unit,1
+targeting,harness,shared_write,TargetingEvent::unit,2
 targeting,harness,shared_write,TargetingEvent::weapon,1
 targeting,harness,shared_write,Vec3::x,2
 targeting,harness,shared_write,Vec3::y,1

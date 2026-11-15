@@ -14,5 +14,5 @@ void UnitsOnTargetingCleared(const void* event)
     ref.offset = effect->unit;
     Unit* unit = ref.get();
     g_seams.units->FindScript((CobScript*)unit->script.get(), "StartBuilding");
-    g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TargetCleared", 0, 0, 1, effect->weapon, 0, 0, 0);
+    g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TargetCleared", nullptr, 0, 1, effect->weapon, 0, 0, 0);
 }

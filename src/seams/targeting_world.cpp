@@ -9,8 +9,6 @@
 #include "../game/scheduler.h"
 #include "targeting_world.h"
 
-#include "../../link/globals.h"
-
 void TargetingInbox(const void* event)
 {
     const TargetingEvent* e = static_cast<const TargetingEvent*>(event);

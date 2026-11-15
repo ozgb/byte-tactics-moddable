@@ -644,7 +644,7 @@ Recorded in these cases:
 
 The set of players who hear it (argument 4) is decided when it is recorded. It is 0 if the position's map cell (x and z divided by 16 world units) does not exist. Otherwise each player 0 to 9 is in the set when the position's cell in that player's explored map is inside the map: the position's whole x divided by 32, and its whole z minus half its whole y divided by 32 (the position projected by its height), indexes the map; the player is in the set when, with the map flag 2 set, that player's explored map entry is non-zero, and with it clear, the player's bit in the visibility mask of that cell is set.
 
-Phases: net (0), units (1), projectiles (2), features (5), meteors (7), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation plays the sound at the position, when the sound settings allow it and the local player is in the set. With 3D sound off, a sound off screen plays quieter.
 

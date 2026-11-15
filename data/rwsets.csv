@@ -56688,6 +56688,9 @@ address,function,file,kind,target
 ,ReplayAddValueList,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::size
 ,ReplayAddValueList,src/harness/replay_objects.cpp,function,
 ,ReplayAddValueList,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
+,ReplayAddValueOrNull,src/harness/replay_objects.cpp,call,ReplayAddValue
+,ReplayAddValueOrNull,src/harness/replay_objects.cpp,call,ReplayText::Add
+,ReplayAddValueOrNull,src/harness/replay_objects.cpp,function,
 ,ReplayAddWeapon,src/harness/replay_objects.cpp,call,ReplayText::Add
 ,ReplayAddWeapon,src/harness/replay_objects.cpp,call,ReplayText::AddUnsigned
 ,ReplayAddWeapon,src/harness/replay_objects.cpp,field_escape,Game::weapons
@@ -57244,6 +57247,7 @@ address,function,file,kind,target
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddArgs
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddObjectName
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddTextN
+,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddValueOrNull
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddWords
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayBytes
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayCalls

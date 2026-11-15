@@ -78,8 +78,10 @@ them inside the tick (`docs/dependencies.md`, "wind_meteors": 20 read-only rows,
 - **The wind, a view in the state block, hashed:** the wind fields of the `Game` record (`windSpeed`,
   `windDirection`, `windX`, `windY`, `windZ`, `windStrength`, `windEnabled`, `windCounter`). Units reads the speed,
   direction and flag (wind generators), weapons the components (projectile drift), features `windZ`, ai the limits,
-  and economy the strength through its world view. Only wind_meteors writes them, in the wind phase or at load (`windY` is never written and stays 0);
-  `tools/privatestate.py --check` judges that from the access log.
+  and economy the strength through its world view. Inside the tick only wind_meteors writes them, in the wind phase;
+  `tools/privatestate.py --check` judges that from the access log, which covers the tick's windows only. At load the
+  engine also sets `windCounter` and `windSpeedDenominator` (`LoadBattleAssets`) and the map loader the limits
+  (`windSpeedMin`, `windSpeedMax`), before wind_meteors' load-stream run. `windY` is never written and stays 0.
 - **The meteor schedule:** read by no one else.
 - **Query:** `LoadMeteorDefaults` fills the caller's `MeteorShowerParams` from the default meteor data file. It writes
   no meteor state, and the mission set-up uses the answer in the next statement, so it is a query, not an event. It

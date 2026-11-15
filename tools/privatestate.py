@@ -35,7 +35,9 @@ WriteState (section 34) is dumped and never hashed, so no shadow-field check app
 wind_meteors owns no allocation, only named items of the state block. The 13 meteor globals of SimGlobals (g_meteorNextStrikeTime and the others
 in METEOR_GLOBALS, named in the log by the global's name) are private for reads and writes: any subsystem but wind_meteors that reads or writes one
 fails. The wind fields of the Game record (WIND_FIELDS, named in the log by the bare field name) are its view: others read them, so they are private
-for writes only, and any writer but wind_meteors fails.
+for writes only, and any writer but wind_meteors fails. Like every check here it sees the windows of a tick only, so it holds the wind to
+wind_meteors inside the tick: at load the engine still writes windCounter and windSpeedDenominator (LoadBattleAssets) and the map loader
+the limits windSpeedMin and windSpeedMax (MapSettings), which the log does not cover.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.

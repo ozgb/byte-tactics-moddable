@@ -129,7 +129,7 @@ class Unrecorded(unittest.TestCase):
         self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("Apply", spec["slots"])
-        self.assertEqual(spec["unrecorded"], {"Apply": {"reason": "load class", "native": "WindMeteorsApply"}})
+        self.assertEqual(spec["unrecorded"], {"Apply": {"reason": "load class", "native": "ApplySlot"}})
         self.assertNotIn(("wind_meteors", "Apply"), model["slot_list"])
 
     def test_the_native_table_keeps_the_slot_in_its_place(self):

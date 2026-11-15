@@ -880,13 +880,14 @@ def play(exe: Path, scenario: Path, game_dir: Path, tables_dir: Path | None, raw
     return directories[0], float(json.loads((directories[0] / "result.json").read_text())["seconds"])
 
 
-def loaded_save(build_dir: Path, scenario: Path, game_dir: Path, timeout: float) -> dict[str, Path]:
+def loaded_save(build_dir: Path, scenario: Path, game_dir: Path, timeout: float, defer: Path | None = None) -> dict[str, Path]:
     """The files that place the save of the scenario named by `scenario`'s load line (an empty map when it has none): the
     saving scenario plays first, on the instrumented exe, and its savegame files are kept in build_dir/access/save/<scenario>."""
     saver = tracediff.scenario_load(scenario)
     if saver is None:
         return {}
-    directory, _ = play(build_dir / "TotalA.exe", scenario.parent / (saver + ".txt"), game_dir, build_dir, False, timeout,
+    put = {"accesslog.defer": defer} if defer is not None else None
+    directory, _ = play(build_dir / "TotalA.exe", scenario.parent / (saver + ".txt"), game_dir, build_dir, False, timeout, put,
                         collect=tracediff.SAVE_FILES)
     kept = build_dir / "access" / "save" / scenario.stem
     tracediff.copy_save(directory, kept)
@@ -955,7 +956,7 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
         stored = ROOT / "reference/traces" / (name + ".txt")
         if not scenario.is_file() or not stored.is_file():
             raise SystemExit("accesslog: no scenario or stored trace named %s" % name)
-        put = dict(loaded_save(build_dir, scenario, game_dir, timeout) or {})
+        put = dict(loaded_save(build_dir, scenario, game_dir, timeout, defer) or {})
         if defer is not None:
             put["accesslog.defer"] = defer
         directory, seconds = play(build_dir / "TotalA.exe", scenario, game_dir, build_dir, raw, timeout, put)

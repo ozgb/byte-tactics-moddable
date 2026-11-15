@@ -522,5 +522,141 @@ Help,src/game/economy.cpp,economy,x,
                           ("memset", "EconomySeam::RequestGranted calls memset, which data/rwsets.csv has no rows for")])
 
 
+FEATURES_HEADER = """struct FeaturesSeam {
+    void (__stdcall* UpdateFeatures)(void);
+    void (__stdcall* LoadFeatureFileList)(void);
+    void (__stdcall* InitFeatureAnimPool)(TntInfo* info);
+    unsigned short (__stdcall* GetCellFeature)(Cell* cell);
+    Vec3 (__stdcall* GetFootprintCentre)(Point16* cell, Feature* def);
+    int (__stdcall* Apply)(const FeaturesEvent* event);
+    void (__stdcall* UpdateFeatureSpot)(int spot);
+};
+"""
+FEATURES_FILLERS = {"UpdateFeatures": "FeaturesPhase", "LoadFeatureFileList": "FeLoadList", "InitFeatureAnimPool": "FeInitPool",
+                    "GetCellFeature": "FeCell", "GetFootprintCentre": "FeCentre", "Apply": "FeApply", "UpdateFeatureSpot": "FeSpot"}
+FEATURES_PILOT = seamlink.Pilot(
+    "features", "interfaces/features.h", "FeaturesSeam", ("UpdateFeatures", "Apply", "UpdateFeatureSpot"),
+    ("GetCellFeature", "GetFootprintCentre"), (seamlink.SCHEDULER_FILE, seamlink.FEATURES_GLUE_FILE, seamlink.HARNESS_HOOKS_FILE),
+    (("RunGameSteps", "src/ingame/game_dialogs.cpp"),), seamlink.FEATURES_READ_ONLY_SLOTS,
+    setup=("LoadFeatureFileList", "InitFeatureAnimPool"), setup_callers=(("LoadTntMap", "src/map/line_of_sight.cpp"),),
+    phase_slots=("UpdateFeatures",), by_params=False)
+
+
+class FeaturesPilotTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Tick,src/game/scheduler.cpp,game,x,
+Hurt,src/units/units.cpp,units,x,
+Fire,src/weapons/weapons.cpp,weapons,x,
+LoadTntMap,src/map/line_of_sight.cpp,map,x,
+Other,src/map/line_of_sight.cpp,map,x,
+RunGameSteps,src/ingame/game_dialogs.cpp,game,x,
+FeApply,src/map/features.cpp,features,x,
+FeCell,src/map/features.cpp,features,x,
+FeCentre,src/map/features.cpp,features,x,
+FeHelp,src/map/features.cpp,features,x,
+"""
+
+    def check(self, rows, header=FEATURES_HEADER, fillers=None):
+        fillers = FEATURES_FILLERS if fillers is None else fillers
+        rows = [(f, "src/map/features.cpp", "function", "") for f in ("FeCell", "FeCentre")] + list(rows)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text(
+                "static FeaturesSeam s_features;\n" + "".join(f"s_features.{s} = {f};\n" for s, f in fillers.items()))
+            (root / "interfaces/features.h").write_text(header)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root, FEATURES_PILOT)
+
+    def slot(self, name, seam="FeaturesSeam"):
+        return f"indirect via void (*)(int) __attribute__((stdcall)) [{seam}::{name}]"
+
+    def test_the_tree_as_given_passes(self):
+        self.assertEqual(self.check([]), [])
+
+    def test_the_pilots_table_lists_economy_and_features(self):
+        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "features"])
+        self.assertEqual(set(seamlink.FEATURES_WRITING_SLOTS + seamlink.FEATURES_SETUP_SLOTS + seamlink.FEATURES_QUERY_SLOTS),
+                         set(seamlink.slot_parameters((seamlink.ROOT / "interfaces/features.h").read_text(), "FeaturesSeam"))
+                         if (seamlink.ROOT / "interfaces/features.h").exists() else set())
+
+    def test_another_subsystem_calling_a_writing_slot_is_found(self):
+        found = self.check([("Hurt", "src/units/units.cpp", "indirect_call", self.slot("Apply")),
+                            ("Fire", "src/weapons/weapons.cpp", "field_read", "FeaturesSeam::UpdateFeatureSpot")])
+        self.assertEqual([f[:3] for f in found], [("call", "units", "Hurt"), ("call", "weapons", "Fire")])
+
+    def test_the_engine_and_features_may_call_writing_slots(self):
+        rows = [("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("UpdateFeatureSpot")),
+                ("FeaturesInbox", "src/seams/features_world.cpp", "indirect_call", self.slot("Apply")),
+                ("RecFeaturesApply", "src/harness/replay_hooks.inc", "indirect_call", self.slot("Apply")),
+                ("RunGameSteps", "src/ingame/game_dialogs.cpp", "indirect_call", self.slot("UpdateFeatures")),
+                ("FeaturesPhase", "src/seams/native.cpp", "indirect_call", self.slot("UpdateFeatureSpot")),
+                ("FeHelp", "src/map/features.cpp", "indirect_call", self.slot("Apply"))]
+        self.assertEqual(self.check(rows), [])
+
+    def test_a_setup_slot_is_called_by_its_listed_callers_only(self):
+        self.assertEqual(self.check([("LoadTntMap", "src/map/line_of_sight.cpp", "indirect_call", self.slot("InitFeatureAnimPool")),
+                                     ("RecFeaturesLoadFeatureFileList", "src/harness/replay_hooks.inc", "indirect_call",
+                                      self.slot("LoadFeatureFileList")),
+                                     ("FeHelp", "src/map/features.cpp", "indirect_call", self.slot("LoadFeatureFileList"))]), [])
+        found = self.check([("Other", "src/map/line_of_sight.cpp", "indirect_call", self.slot("InitFeatureAnimPool")),
+                            ("LoadTntMap", "src/other.cpp", "indirect_call", self.slot("InitFeatureAnimPool")),
+                            ("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("LoadFeatureFileList")),
+                            ("Hurt", "src/units/units.cpp", "field_read", "FeaturesSeam::LoadFeatureFileList")])
+        self.assertEqual([f[:3] for f in found], [("setup", "game", "Tick"), ("setup", "map", "Other"),
+                                                  ("setup", "units", "Hurt"), ("setup", "unowned", "LoadTntMap")])
+
+    def test_a_setup_slot_is_no_writing_slot_for_the_engine_files(self):
+        self.assertEqual(self.check([("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("Apply"))]), [])
+
+    def test_a_slot_in_no_list_or_two_lists_or_unfilled_is_found(self):
+        header = FEATURES_HEADER.replace("    int (__stdcall* Apply)", "    void (__stdcall* Debug)(int x);\n    int (__stdcall* Apply)")
+        found = self.check([], header=header, fillers={k: v for k, v in FEATURES_FILLERS.items() if k != "GetCellFeature"})
+        self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Debug"), ("slot", "GetCellFeature")])
+        twice = seamlink.Pilot(**{**FEATURES_PILOT.__dict__, "queries": FEATURES_PILOT.queries + ("Apply",)})
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text("static FeaturesSeam s;\n" + "".join(f"s.{k} = {v};\n" for k, v in FEATURES_FILLERS.items()))
+            (root / "interfaces/features.h").write_text(FEATURES_HEADER)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n")
+            found = seamlink.pilot_seams(root, twice)
+        self.assertEqual([(f[0], f[2]) for f in found if f[0] == "slot"], [("slot", "Apply")])
+
+    def test_a_query_slot_that_writes_is_found(self):
+        found = self.check([("FeCell", "src/map/features.cpp", "field_write", "Cell::feature"),
+                            ("FeCell", "src/map/features.cpp", "call", "FeHelp"),
+                            ("FeHelp", "src/map/features.cpp", "global_write", "g_x")])
+        self.assertEqual([f[2:] for f in found], [("FeCell", "FeaturesSeam::GetCellFeature field write Cell::feature"),
+                                                 ("FeHelp", "FeaturesSeam::GetCellFeature global write g_x")])
+
+    def test_a_query_slot_may_write_the_vector_it_returns_in_its_own_filler_only(self):
+        self.assertEqual(self.check([("FeCentre", "src/map/features.cpp", "field_write", "Vec3::x")]), [])
+        found = self.check([("FeCell", "src/map/features.cpp", "call", "FeHelp"), ("FeHelp", "src/map/features.cpp", "field_write", "Vec3::x")])
+        self.assertEqual([f[2:] for f in found], [("FeHelp", "FeaturesSeam::GetCellFeature field write Vec3::x")])
+
+    def test_a_query_slot_may_call_the_read_only_slots_it_is_allowed(self):
+        self.assertEqual(self.check([("FeCentre", "src/map/features.cpp", "indirect_call", self.slot("GetGroundHeight", "UnitsSeam")),
+                                     ("FeCell", "src/map/features.cpp", "indirect_call", self.slot("GetMapCell", "LosRadarSeam"))]), [])
+
+    def test_a_query_slot_calling_any_other_slot_is_found(self):
+        found = self.check([("FeCell", "src/map/features.cpp", "indirect_call", self.slot("Apply")),
+                            ("FeCentre", "src/map/features.cpp", "indirect_call", self.slot("UpdateUnit", "UnitsSeam")),
+                            ("FeCentre", "src/map/features.cpp", "call", "memset"),
+                            ("FeCell", "src/map/features.cpp", "asm", "inline")])
+        self.assertEqual(sorted(f[3] for f in found),
+                         ["FeaturesSeam::GetCellFeature calls indirect via void (*)(int) __attribute__((stdcall)) [FeaturesSeam::Apply]",
+                          "FeaturesSeam::GetCellFeature has inline assembly",
+                          "FeaturesSeam::GetFootprintCentre calls indirect via void (*)(int) __attribute__((stdcall)) [UnitsSeam::UpdateUnit]",
+                          "FeaturesSeam::GetFootprintCentre calls memset, which data/rwsets.csv has no rows for"])
+
+
 if __name__ == "__main__":
     unittest.main()

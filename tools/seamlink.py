@@ -5,7 +5,7 @@
     uv run tools/seamlink.py --objects @build/modern/objects.rsp --write    # write data/seam_exceptions.csv
     uv run tools/seamlink.py --objects @build/modern/objects.rsp --check
     uv run tools/seamlink.py --private-state                                # pathfinding's region, from data/rwsets.csv
-    uv run tools/seamlink.py --pilot-seams                                  # economy's writing and query slots, from data/rwsets.csv
+    uv run tools/seamlink.py --pilot-seams                                  # economy's and features' seams, from data/rwsets.csv
     uv run tools/test_seamlink.py                                           # tests, on hand-written units
 
 The build puts every function in its own COMDAT section, so the relocations of a
@@ -42,29 +42,43 @@ symbol starts with `virtual ` is a virtual call between subsystems, which
 --private-state fails when a function of any subsystem other than pathfinding reads, writes or lets escape
 Game::pathfinder or a member of a type of pathfinding's state region, from the field and deref rows of
 data/rwsets.csv and the owners of data/subsystems.csv.
---pilot-seams judges economy's seam (interfaces/economy.h), which is applied by the engine and written by nothing else, from
-data/rwsets.csv, the header and src/seams/native.cpp. It fails on:
+--pilot-seams judges the seam of each pilot, economy (interfaces/economy.h) and features (interfaces/features.h), which is
+applied by the engine and written by nothing else, from data/rwsets.csv, the header and src/seams/native.cpp. The PILOTS table
+holds each one's lists of slots, engine and allowed indirect calls. It fails on:
 
-  slots         a slot of EconomySeam in neither list below, a listed slot that is not one, or a listed slot that the
-                EconomySeam table of src/seams/native.cpp does not fill (`<table>.<slot> = <function>;`)
-  callers       an indirect call through a writing slot (Apply, Spend, UpdatePlayerEconomy, UpdateMetalExtraction,
-                UpdateResourceSharing, Init, Shutdown), or a field_read or field_escape of one (which a call through a
-                copy of the slot needs), by any function but economy's own (data/subsystems.csv) and the engine's: the
-                files of the scheduler (src/game/scheduler.cpp, which routes the events and runs the phases), of economy's
-                glue (src/seams/economy_world.cpp: its inbox handler and the synchronous services), and of the harness's
-                recorders (src/harness/replay_hooks.inc, which forward a slot call to the slot they replaced),
-                and the functions LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp: Init and Shutdown
-                at set-up and teardown) and RunGameSteps (src/ingame/game_dialogs.cpp: the tick's UpdateResourceSharing).
-                A presentation or unowned function fails like any other.
-  queries       for each query slot (RegionSize, RequestGranted, GetEnergyUse, UnitAccount, WriteState), the function
-                that fills it and every function it calls by name (rwsets keys functions by name, so every overload),
-                when one
+  slots         a slot of the seam struct in none of the lists below or in two of them, a listed slot that is not one, or a
+                listed slot that the seam's table of src/seams/native.cpp does not fill (`<table>.<slot> = <function>;`)
+  callers       an indirect call through a writing slot, or a field_read or field_escape of one (which a call through a copy
+                of the slot needs), by any function but the owner's own (data/subsystems.csv) and the engine's.
+                Economy's writing slots are Apply, Spend, UpdatePlayerEconomy, UpdateMetalExtraction, UpdateResourceSharing,
+                Init and Shutdown; features' are UpdateFeatures (the phase slot), Apply, Place, AnimateFeatureType,
+                ScanFeatureCell and UpdateFeatureSpot. The engine is the files of the scheduler (src/game/scheduler.cpp,
+                which routes the events and runs the phases), of the owner's glue (src/seams/economy_world.cpp,
+                src/seams/features_world.cpp: its inbox handler and the synchronous services), and of the harness's
+                recorders (src/harness/replay_hooks.inc, which forward a slot call to the slot they replaced); for
+                economy the functions LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp: Init and
+                Shutdown at set-up and teardown) and RunGameSteps (src/ingame/game_dialogs.cpp: the tick's
+                UpdateResourceSharing); for features RunGameSteps, and the filler of UpdateFeatures in src/seams/native.cpp,
+                which runs the scheduler's features phase. A presentation or unowned function fails like any other.
+  set-up        an indirect call through a set-up slot, or a read of one, by any function but the owner's own, the
+                recorders of src/harness/replay_hooks.inc and the listed callers (function, file). Features' set-up slots
+                write, but run outside the tick, from match load, unit-type load and save and load: LoadFeatureFileList,
+                FreeFeatureFileList, NopAfterFeatureEnum, ResolveFeatureLinks, InitFeatureAnimPool, FreeFeaturePool,
+                PlaceMissionFeatures, StampFeatureMetal, FindOrLoadFeatureType, SaveFeatures and LoadFeatures. Their
+                callers are LoadBattleAssets (src/game/game_state.cpp), LoadSavedGameState and SaveGameFile
+                (src/game/settings_campaign.cpp), LoadTntMap and FreeMapResources (src/map/line_of_sight.cpp) and
+                LoadUnitFbi (src/units/unit_types.cpp).
+  queries       for each query slot (economy: RegionSize, RequestGranted, GetEnergyUse, UnitAccount, WriteState; features:
+                GetCellFeature, GetFootprintCentre, FeatureTypeCount, FirstFeatureSpot), the function that fills it and
+                every function it calls by name (rwsets keys functions by name, so every overload), when one
                   writes anything (a *_write or *_maybe_written row), except a field or deref write, in the filler
                   itself, of the type that a non-const pointer parameter of the slot points to or of a struct type that
-                  it holds (UnitAccount's out: EconAccount and EconLedger), and except the world view's info structs
-                  (EconUnitInfo, EconTypeInfo, EconPlayerInfo), which no state holds;
-                  makes an indirect call other than through a read-only slot of EconomyWorldView (all but Emit) or a
-                  slot of a struct that a parameter of the query slot points to (WriteState's StateWriter);
+                  it holds (UnitAccount's out: EconAccount and EconLedger; features' queries take no out parameter), or of
+                  the struct a slot returns by value (GetFootprintCentre's Vec3), and except the info structs of the pilot
+                  (economy's EconUnitInfo, EconTypeInfo, EconPlayerInfo), which no state holds;
+                  makes an indirect call other than through a read-only slot the pilot allows (economy's world view,
+                  all but Emit; features': UnitsSeam::GetGroundHeight and LosRadarSeam::GetMapCell) or a slot of a struct that
+                  a parameter of the query slot points to (WriteState's StateWriter);
                   calls a function data/rwsets.csv has no rows for (memset, memcpy, a template), but for operator=, the
                   assignment rwsets records as the write itself, and X87LeTest41, a template that compares two values;
                   or has inline assembly.
@@ -129,18 +143,61 @@ ECONOMY_WORLD = "EconomyWorldView"
 ECONOMY_WORLD_READS = ("Tick", "Difficulty", "SharingEnabled", "Wind", "Tide", "PlayerInfo", "Allied", "FirstUnit", "LastUnit",
                        "NextUnit", "UnitSlot", "UnitInfo", "TypeInfo", "CellMetal")
 ECONOMY_INFO_TYPES = ("EconUnitInfo", "EconTypeInfo", "EconPlayerInfo")
+FEATURES_OWNER = "features"
+FEATURES_WRITING_SLOTS = ("UpdateFeatures", "Apply", "Place", "AnimateFeatureType", "ScanFeatureCell", "UpdateFeatureSpot")
+FEATURES_SETUP_SLOTS = ("LoadFeatureFileList", "FreeFeatureFileList", "NopAfterFeatureEnum", "ResolveFeatureLinks", "InitFeatureAnimPool",
+                        "FreeFeaturePool", "PlaceMissionFeatures", "StampFeatureMetal", "FindOrLoadFeatureType", "SaveFeatures", "LoadFeatures")
+FEATURES_QUERY_SLOTS = ("GetCellFeature", "GetFootprintCentre", "FeatureTypeCount", "FirstFeatureSpot")
+FEATURES_SETUP_CALLERS = (("LoadBattleAssets", "src/game/game_state.cpp"), ("LoadSavedGameState", "src/game/settings_campaign.cpp"),
+                          ("SaveGameFile", "src/game/settings_campaign.cpp"), ("LoadTntMap", "src/map/line_of_sight.cpp"),
+                          ("FreeMapResources", "src/map/line_of_sight.cpp"), ("LoadUnitFbi", "src/units/unit_types.cpp"))
+FEATURES_HEADER = "interfaces/features.h"
+FEATURES_SEAM = "FeaturesSeam"
+FEATURES_READ_ONLY_SLOTS = ("UnitsSeam::GetGroundHeight", "LosRadarSeam::GetMapCell")
 ENGINE_FUNCTIONS = (("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
                     ("RunGameSteps", "src/ingame/game_dialogs.cpp"))
 ROWLESS_CALLS = ("operator=", "X87LeTest41")
 NATIVE_TABLE = "src/seams/native.cpp"
 SCHEDULER_FILE = "src/game/scheduler.cpp"
 ECONOMY_GLUE_FILE = "src/seams/economy_world.cpp"
-ENGINE_FILES = (SCHEDULER_FILE, ECONOMY_GLUE_FILE, "src/harness/replay_hooks.inc")
-PHASE_FILLERS = ((NATIVE_TABLE, "UpdateAllUnits"), (NATIVE_TABLE, "UpdatePlayers"), (NATIVE_TABLE, "UpdatePlayersOnStream"))
+HARNESS_HOOKS_FILE = "src/harness/replay_hooks.inc"
+ENGINE_FILES = (SCHEDULER_FILE, ECONOMY_GLUE_FILE, HARNESS_HOOKS_FILE)
+FEATURES_GLUE_FILE = "src/seams/features_world.cpp"
+PHASE_FILLERS = ((NATIVE_TABLE, "UpdateAllUnits"), (NATIVE_TABLE, "UpdatePlayers"), (NATIVE_TABLE, "UpdatePlayersOnStream"),
+                 (NATIVE_TABLE, "UpdateFeatures"))
 QUERY_WRITE_KINDS = ("field_write", "field_maybe_written", "global_write", "global_maybe_written", "deref_write", "deref_maybe_written")
 OUT_KINDS = ("field_write", "deref_write")
 SLOT_READ_KINDS = ("field_read", "field_escape")
+SCALAR_TYPES = ("void", "int", "unsigned", "short", "char", "long", "float", "double", "bool")
 SLOT_POINTER = re.compile(r"\(\s*__stdcall\s*\*\s*(\w+)\s*\)\s*\(([^)]*)\)")
+
+
+@dataclass(frozen=True)
+class Pilot:
+    """A seam whose subsystem is applied by the engine and written by nothing else, and what --pilot-seams judges of it."""
+    owner: str
+    header: str
+    seam: str
+    writing: tuple
+    queries: tuple
+    engine_files: tuple
+    engine_functions: tuple
+    allowed_indirect: tuple
+    info_types: tuple = ()
+    setup: tuple = ()
+    setup_callers: tuple = ()
+    phase_slots: tuple = ()
+    by_params: bool = True
+
+
+PILOTS = (
+    Pilot(ECONOMY_OWNER, ECONOMY_HEADER, ECONOMY_SEAM, ECONOMY_WRITING_SLOTS, ECONOMY_QUERY_SLOTS, ENGINE_FILES, ENGINE_FUNCTIONS,
+          tuple(f"{ECONOMY_WORLD}::{s}" for s in ECONOMY_WORLD_READS), info_types=ECONOMY_INFO_TYPES),
+    Pilot(FEATURES_OWNER, FEATURES_HEADER, FEATURES_SEAM, FEATURES_WRITING_SLOTS, FEATURES_QUERY_SLOTS,
+          (SCHEDULER_FILE, FEATURES_GLUE_FILE, HARNESS_HOOKS_FILE), (("RunGameSteps", "src/ingame/game_dialogs.cpp"),),
+          FEATURES_READ_ONLY_SLOTS, setup=FEATURES_SETUP_SLOTS, setup_callers=FEATURES_SETUP_CALLERS, phase_slots=("UpdateFeatures",),
+          by_params=False),
+)
 
 
 @dataclass
@@ -617,23 +674,30 @@ def held_types(header: str, struct: str) -> set:
     return out
 
 
+def returned_struct(header: str, struct: str, slot: str) -> str:
+    """The struct type a slot returns by value, or "" for a scalar, a pointer or void."""
+    m = re.search(r"(\w+)\s*\(\s*__stdcall\s*\*\s*%s\s*\)" % re.escape(slot), struct_body(header, struct))
+    return m.group(1) if m and m.group(1) not in SCALAR_TYPES else ""
+
+
 def written_type(target: str) -> str:
     """The type a field or deref row writes: Type of `Type::field` or of `*Type`."""
     return target.lstrip("*").split("::")[0].strip()
 
 
-def native_fillers(native: str) -> dict:
-    """{slot: function} that src/seams/native.cpp assigns to the slots of its EconomySeam table."""
-    table = re.search(r"\b%s\s+(\w+)\s*;" % ECONOMY_SEAM, native)
+def native_fillers(native: str, seam: str = ECONOMY_SEAM) -> dict:
+    """{slot: function} that src/seams/native.cpp assigns to the slots of its table of the seam struct."""
+    table = re.search(r"\b%s\s+(\w+)\s*;" % seam, native)
     if not table:
         return {}
     return {m.group(1): m.group(2) for m in re.finditer(r"\b%s\.(\w+)\s*=\s*(\w+)\s*;" % re.escape(table.group(1)), native)}
 
 
-def query_problems(functions: dict, owners: dict, slot: str, filler: str, out_types: set, callable_types: set) -> set:
+def query_problems(pilot: Pilot, functions: dict, owners: dict, slot: str, filler: str, out_types: set, callable_types: set,
+                   result: str = "") -> set:
     """The ("query", subsystem, function, what) problems of the filler of a query slot and every function it calls by name."""
     found = set()
-    what = f"{ECONOMY_SEAM}::{slot}"
+    what = f"{pilot.seam}::{slot}"
     todo, seen = [filler], set()
     while todo:
         fn = todo.pop()
@@ -651,61 +715,70 @@ def query_problems(functions: dict, owners: dict, slot: str, filler: str, out_ty
                     todo.append(target)
             elif kind == "indirect_call":
                 via = re.findall(r"\[(\w+)::(\w+)\]", target)
-                if not via or not all((t == ECONOMY_WORLD and s in ECONOMY_WORLD_READS) or (t != ECONOMY_WORLD and t in callable_types)
-                                      for t, s in via):
+                if not via or not all(f"{t}::{s}" in pilot.allowed_indirect or t in callable_types for t, s in via):
                     found.add(("query", owner, fn, f"{what} calls {target}"))
             elif kind == "asm":
                 found.add(("query", owner, fn, f"{what} has inline assembly"))
             elif kind in QUERY_WRITE_KINDS:
                 written = written_type(target)
-                if written in ECONOMY_INFO_TYPES or (fn == filler and kind in OUT_KINDS and written in out_types):
+                if written in pilot.info_types or (fn == filler and kind in OUT_KINDS and written in out_types | {result}):
                     continue
                 found.add(("query", owner, fn, f"{what} {kind.replace('_', ' ')} {target}"))
     return found
 
 
-def pilot_seams(root: Path) -> list:
-    """(kind, subsystem, function, what) of every problem the module docstring lists under --pilot-seams: kind slot, call or query."""
+def pilot_seams(root: Path, pilot: Pilot = PILOTS[0]) -> list:
+    """(kind, subsystem, function, what) of every problem the module docstring lists under --pilot-seams: kind slot, call, setup or query."""
     owners = {}
     with (root / SUBSYSTEMS).open(newline="") as f:
         for r in csv.DictReader(f):
             owners[(r["function"], r["file"])] = r["subsystem"]
     with (root / RWSETS).open(newline="") as f:
         rows = list(csv.DictReader(f))
-    header_path, native_path = root / ECONOMY_HEADER, root / NATIVE_TABLE
+    header_path, native_path = root / pilot.header, root / NATIVE_TABLE
     header = header_path.read_text(encoding="latin-1") if header_path.exists() else ""
-    fillers = native_fillers(native_path.read_text(encoding="latin-1") if native_path.exists() else "")
-    slots = slot_parameters(header, ECONOMY_SEAM)
+    fillers = native_fillers(native_path.read_text(encoding="latin-1") if native_path.exists() else "", pilot.seam)
+    slots = slot_parameters(header, pilot.seam)
+    listed = pilot.writing + pilot.setup + pilot.queries
     found = set()
-    for slot in sorted(set(slots) - set(ECONOMY_WRITING_SLOTS) - set(ECONOMY_QUERY_SLOTS)):
-        found.add(("slot", ECONOMY_OWNER, slot, f"{ECONOMY_SEAM}::{slot} is in neither the writing nor the query slots"))
-    for slot in ECONOMY_WRITING_SLOTS + ECONOMY_QUERY_SLOTS:
+    for slot in sorted(set(slots) - set(listed)):
+        found.add(("slot", pilot.owner, slot, f"{pilot.seam}::{slot} is in none of the lists of slots"))
+    for slot, count in Counter(listed).items():
+        if count > 1:
+            found.add(("slot", pilot.owner, slot, f"{pilot.seam}::{slot} is in more than one list of slots"))
+    for slot in listed:
         if slot not in slots:
-            found.add(("slot", ECONOMY_OWNER, slot, f"{ECONOMY_SEAM}::{slot} is not a slot of {ECONOMY_SEAM} in {ECONOMY_HEADER}"))
+            found.add(("slot", pilot.owner, slot, f"{pilot.seam}::{slot} is not a slot of {pilot.seam} in {pilot.header}"))
         elif slot not in fillers:
-            found.add(("slot", ECONOMY_OWNER, slot, f"{ECONOMY_SEAM}::{slot} is not filled in {NATIVE_TABLE}"))
-    writing = {f"{ECONOMY_SEAM}::{s}" for s in ECONOMY_WRITING_SLOTS}
+            found.add(("slot", pilot.owner, slot, f"{pilot.seam}::{slot} is not filled in {NATIVE_TABLE}"))
+    writing = {f"{pilot.seam}::{s}" for s in pilot.writing}
+    setup = {f"{pilot.seam}::{s}" for s in pilot.setup}
+    phase_fillers = {(fillers[s], NATIVE_TABLE) for s in pilot.phase_slots if s in fillers}
     for r in rows:
         if r["kind"] == "indirect_call":
-            used = re.findall(r"\[(%s::\w+)\]" % ECONOMY_SEAM, r["target"])
+            used = re.findall(r"\[(%s::\w+)\]" % pilot.seam, r["target"])
         elif r["kind"] in SLOT_READ_KINDS:
             used = [r["target"]]
         else:
             continue
-        owner = owners.get((r["function"], r["file"]), "unowned")
-        engine = r["file"] in ENGINE_FILES or (r["function"], r["file"]) in ENGINE_FUNCTIONS
+        key = (r["function"], r["file"])
+        owner = owners.get(key, "unowned")
+        engine = r["file"] in pilot.engine_files or key in pilot.engine_functions or key in phase_fillers
         for slot in used:
-            if slot in writing and owner != ECONOMY_OWNER and not engine:
+            if slot in writing and owner != pilot.owner and not engine:
                 found.add(("call", owner, r["function"], slot))
+            elif slot in setup and owner != pilot.owner and key not in pilot.setup_callers and r["file"] != HARNESS_HOOKS_FILE:
+                found.add(("setup", owner, r["function"], slot))
     functions = {}
     for r in rows:
         functions.setdefault(r["function"], []).append(r)
-    for slot in ECONOMY_QUERY_SLOTS:
+    for slot in pilot.queries:
         if slot not in slots or slot not in fillers:
             continue
-        pointers = [p for p in map(pointee, slots[slot]) if p]
+        pointers = [p for p in map(pointee, slots[slot]) if p] if pilot.by_params else []
         out_types = set().union(*[held_types(header, t) for t, writable in pointers if writable])
-        found |= query_problems(functions, owners, slot, fillers[slot], out_types, {t for t, _ in pointers})
+        found |= query_problems(pilot, functions, owners, slot, fillers[slot], out_types, {t for t, _ in pointers},
+                                  returned_struct(header, pilot.seam, slot))
     return sorted(found)
 
 
@@ -721,7 +794,7 @@ def main(argv=None) -> int:
     parser.add_argument("--private-state", action="store_true",
                         help=f"fail on an access to pathfinding's state region by another subsystem, from {RWSETS}")
     parser.add_argument("--pilot-seams", action="store_true",
-                        help=f"fail on a call into economy's writing slots by another subsystem or a write behind its query slots, from {RWSETS}")
+                        help=f"fail on a call into a pilot's (economy, features) writing or set-up slots by a function not allowed to, or a write behind its query slots, from {RWSETS}")
     parser.add_argument("--root", default=str(ROOT))
     parser.add_argument("--write", action="store_true", help=f"write {EXCEPTIONS}")
     parser.add_argument("--check", action="store_true", help=f"fail on a violation without a row in {EXCEPTIONS} or a stale row")
@@ -734,15 +807,19 @@ def main(argv=None) -> int:
             print(f"{owner} {function} {kind} {target}: pathfinding's region is private to {PRIVATE_OWNER}")
         return 1 if bad else 0
     if args.pilot_seams:
-        bad = pilot_seams(root)
-        for kind, owner, function, what in bad:
-            if kind == "slot":
-                print(f"{what}: every slot of {ECONOMY_SEAM} must be listed and filled")
-            elif kind == "call":
-                print(f"{owner} {function} calls {what}: only the engine applies economy's writing slots")
-            else:
-                print(f"{owner} {function} behind {what}: economy's query slots write no state and call no writer")
-        return 1 if bad else 0
+        failed = False
+        for pilot in PILOTS:
+            for kind, owner, function, what in pilot_seams(root, pilot):
+                failed = True
+                if kind == "slot":
+                    print(f"{what}: every slot of {pilot.seam} must be listed once and filled")
+                elif kind == "call":
+                    print(f"{owner} {function} calls {what}: only the engine applies the writing slots of {pilot.owner}")
+                elif kind == "setup":
+                    print(f"{owner} {function} calls {what}: only the set-up and saved-game callers of {pilot.owner} call its set-up slots")
+                else:
+                    print(f"{owner} {function} behind {what}: a query slot of {pilot.owner} writes no state and calls no writer")
+        return 1 if failed else 0
     if not args.objects:
         parser.error("--objects is required")
     units = [unit_of(p) for a in args.objects for p in response(a)]

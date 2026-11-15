@@ -24,7 +24,7 @@ the three globals. EXPOSED maps each of those fields to the log item that holds 
   * an item of EXPOSED has no read by pathfinding in any stored scenario: the writer shows state that the simulation never
     reads, a shadow field. data/shadow_field_allow.csv (item,reason) lists the ones that are 3.1c state the trace has always
     hashed, each with a reason; a row for an item that is read is stale.
-Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone) and economy.
+Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone), economy and features.
 Economy's unit accounts live in one allocation, "Economy region" (allocated by the engine in LoadBattleAssets, set up by EconomyInit), whose
 parts the log names `<allocation>.<part>` like pathfinding's: no subsystem but economy writes or reads one. The player accounts
 (`players[i].econ`, type UnitResources) stay in the state block and are read by others, so a `UnitResources::*` item is private for writes
@@ -32,6 +32,14 @@ only: any writer but economy fails, which is what makes every income, spend and 
 other view state, the resource fields of the Player record, is named in the log by the Game union aliases (`unknown_1b8e`, `pad_1df4`,
 `unknown_1cd9`) that other fields of the record share, so it can't be told from the rest of the record and is not checked. Economy's
 WriteState (section 34) is dumped and never hashed, so no shadow-field check applies to it.
+
+Features' state stays in the state block, hashed and read by others as a view, and is written by features alone, like the player accounts: the
+spots of the feature animation pool (the 0x800 entries of 0x30 bytes allocated by InitFeatureAnimPool as "FEATURE ANIM DATA", which the log names
+`FeatureAnimEntry::field` after the type of an entry, so a type of WRITE_TYPES), the feature fields of a map cell (`Cell::feature` and `Cell::spot`, the
+union with `Cell::offsetX` and `Cell::offsetY`, but not `Cell::flags`, which other subsystems share) and the scan index (`Game::scanIndex`, the item
+`scanIndex`), which the owner lists name as exact items (`write_items`). The cells are in the log one allocation ("PLOT MEMORY") that it names no field
+of, so the Cell items match only once it does; the others match today. Any writer but features fails, which is what makes every placement, removal,
+damage and reclaim reach them through the scheduler's events.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
@@ -66,18 +74,24 @@ REGION_ALLOCATION = re.compile(r"AISearch region")
 REGION_FUNCTION = "LoadBattleAssets"
 
 
+FEATURES_WRITE_TYPES = ("FeatureAnimEntry",)
+FEATURES_WRITE_ITEMS = ("scanIndex", "Cell::feature", "Cell::spot", "Cell::offsetX", "Cell::offsetY")
+
+
 @dataclass(frozen=True)
 class Owner:
-    """A subsystem with private state: the items of its types, its region root and its allocation, and the items private for writes only."""
+    """A subsystem with private state: the items of its types, its region root and its allocation, and the types and the exact items private for writes only."""
     name: str
     root: str
     types: tuple
-    allocation: re.Pattern
+    allocation: re.Pattern | None
     write_types: tuple = ()
+    write_items: tuple = ()
 
 
 OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
-          Owner("economy", "", (), re.compile(r"Economy region"), ("UnitResources",)))
+          Owner("economy", "", (), re.compile(r"Economy region"), ("UnitResources",)),
+          Owner("features", "", (), None, FEATURES_WRITE_TYPES, FEATURES_WRITE_ITEMS))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",
@@ -134,9 +148,9 @@ def private_to(item: str) -> tuple[str, tuple[str, ...]]:
             return o.name, ("writer", "reader")
         if item.split("::")[0] in o.types:
             return o.name, ("writer", "reader")
-        if item.startswith(REGION_FUNCTION + ":") and o.allocation.search(item) is not None:
+        if o.allocation and item.startswith(REGION_FUNCTION + ":") and o.allocation.search(item) is not None:
             return o.name, ("writer", "reader")
-        if item.split("::")[0] in o.write_types:
+        if item.split("::")[0] in o.write_types or item in o.write_items:
             return o.name, ("writer",)
     return "", ()
 
@@ -261,7 +275,8 @@ def main() -> int:
     if problems:
         print("\n".join(problems))
         return 1
-    print("privatestate: the regions are private to %s in the stored summaries and every field the trace hashes is read" % ", ".join(o.name for o in OWNERS))
+    print("privatestate: the state of %s is private, or written only by its owner, in the stored summaries and every field the trace hashes is read"
+          % ", ".join(o.name for o in OWNERS))
     return 0
 
 

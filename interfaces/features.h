@@ -13,15 +13,15 @@ class HapiBank;
 // Minor version of the features interface, changed when a slot is added.
 #define FEATURES_VERSION_MINOR 0
 
-// The kinds of event other modules publish to features' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published.
+// The kinds of event other modules publish to features' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published, at once when its route is synchronous.
 enum FeaturesEventKind {
-    // Queued: puts feature on cell (x, z), at pos and rot when flags say so, for owner; outcome 1 when it took a spot of the pool, 0 when it took none or was refused.
+    // Synchronous when units publish it (a corpse), applied before units goes on, since the cells it writes are read in the same phase; puts feature on cell (x, z), at pos and rot when flags say so, for owner; outcome 1 when it took a spot of the pool, 0 when it took none or was refused.
     FEATURES_PLACE = 32,
     // Queued: removes the feature on cell (x, z), or on the cell its footprint starts from; value 1 removes even a feature that refuses removal; outcome 1 when one was removed.
     FEATURES_REMOVE = 33,
     // Synchronous: weapon (value, the number of its definition) hits the feature whose footprint starts at cell (x, z), applied before the publisher goes on, since a hit may start a fire that draws a random number; outcome 1 when the feature was killed.
     FEATURES_DAMAGE = 34,
-    // Queued: unit of player reclaims the feature at pos; outcome 1 when it did, and the feature's energy and metal go to the unit's account as income.
+    // Synchronous: unit of player reclaims the feature at pos, applied before orders goes on, since the cells it clears are read in the same phase; outcome 1 when it did, and the feature's energy and metal go to the unit's account as income.
     FEATURES_RECLAIM = 35
 };
 
@@ -33,7 +33,7 @@ enum FeaturesEffectKind {
     FEATURES_EFFECT_INIT_STATE = 49,
     // The features on the cells of the footprint at (x, z), width by height cells, changed: the passability of those cells is to be computed again.
     FEATURES_EFFECT_PASS_MAPS = 50,
-    // A burning feature deals the area damage of weapon (value, the number of its definition) around pos.
+    // Synchronous: a burning feature deals the area damage of weapon (value, the number of its definition) around pos, before features goes on, since the units it hits record sim events and draw numbers in features' order.
     FEATURES_EFFECT_AREA_DAMAGE = 51
 };
 

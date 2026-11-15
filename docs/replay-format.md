@@ -26,6 +26,9 @@ uv run tools/replay.py --compare DIR_A DIR_B
 `--subsystem` is repeatable and defaults to every subsystem that has a `tests/replay/<subsystem>/` directory.
 `--check` records again and fails when a recording of `tests/replay/` differs. `--compare` fails when two
 directories differ and names the first differing line. Record on a fresh Wine prefix, as the gate runs.
+Both play a scenario once for each subsystem it records: a run records one call at a time, so with two `record`
+lines a call one subsystem makes into the other is an import of the first and is missing from the second's
+recording (`orders-guard-attacked`, recorded for targeting and for weapons, lost most of targeting's calls so).
 
 ## A play-test recording
 
@@ -1126,8 +1129,8 @@ No scenario reaches these paths of targeting, and no recording holds them. Each 
 targeting:
 
 - `ChooseWeapon` returning 1 or 2: no shipped unit has weapon slot 0 empty and slot 1 or 2 defined.
-- `SetWeaponTargetPos` with a z of -32768: it needs a world z of 32768, and scenarios and the harness reject positions off the map.
-- `SetWeaponTargetUnit` with a null target: 3.1c faults on it.
+- `Apply` of a SET_POS with a z of -32768: it needs a world z of 32768, and scenarios and the harness reject positions off the map.
+- `Apply` of a SET_UNIT with a null target: 3.1c faults on it.
 - `FindWeaponTarget` rejecting a candidate that is not alive or is dying: the candidate list holds only live units, so neither check can fail.
 - `GetWeaponTargetPos` with the lead condition "the weapon slot has no weapon" failing alone: its only caller, `UpdateUnitWeapons`, skips a slot whose `flags` lack the value 2 (bit 1), and the value 2 means "has a weapon": `InitUnitWeaponSlots` sets it when the slot's weapon has a nonzero index.
 - `Unit::ChooseWeapon` returning 1 or 2 (weapon slot 0 empty, slot 1 or 2 defined): no shipped unit has that shape. Checked by reading every `units/*.fbi` and `weapons/*.tdf` of the 30 archives of `~/.ta` (`totala1` to `totala4`, `tactics1` to `tactics8`, `worlds`, `rev31.gp3`, the `.ufo` and `.ccx` files) with the `Hpi` reader of `tools/tdfnumbers.py`: no unit leaves its first weapon key empty, or names a weapon of ID 0 there, while its second or third weapon key names a weapon of nonzero ID.
@@ -1182,29 +1185,29 @@ with one changed constant and expects that divergence.
 Economy and pathfinding are not recorded yet: both take a region and a world view at `Init` and economy takes an event struct (#698 is the recorder's follow-up for that shape).
 
 `replay_inject_test.exe` is built with the target-scale injection of 0x6666 (the 0xcccc of the weapon target position, the part of the
-distance a target's body offset moves the aim point), and the divergence is reported at call 352 of `skirmish4-long` and at `pos.x`, the
+distance a target's body offset moves the aim point), and the divergence is reported at call 356 of `skirmish4-long` and at `pos.x`, the
 out `Vec3`:
 
 ```sh
-wine build/modern/replay_inject_test.exe --expect 352 pos.x tests/replay/targeting/skirmish4-long.txt
+wine build/modern/replay_inject_test.exe --expect 356 pos.x tests/replay/targeting/skirmish4-long.txt
 ```
 
 The recordings of targeting, which the modern build runs as native code in every mode (it has no WASM module yet): `orders-guard-attacked` (units that guard and are attacked: every
-slot but `SetWeaponTargetPos`, `SetWeaponTargetUnit` 315 times, candidates from `ai.GetVisibleEnemiesInRadius`, `ChooseWeapon`),
-`orders-tier2-spider` (`SetWeaponTargetPos` 8 times, and the ground positions of `GetWeaponTargetPos`), `orders-immediate`, ticks 740 to 770 only (a unit with fire order 1, 2 and 0 in turn, which searches only with 2), `edges-targeting-lead` (the whole run, 1300 ticks, listed below) and `skirmish4-long`, ticks
+slot, and `Apply` of every kind but SET_POS: SET_UNIT 315 times, CLEAR 1014 times, RESET 18 times; candidates from `ai.GetVisibleEnemiesInRadius`, `ChooseWeapon`),
+`orders-tier2-spider` (`Apply` of a SET_POS 8 times, and the ground positions of `GetWeaponTargetPos`), `orders-immediate`, ticks 740 to 770 only (a unit with fire order 1, 2 and 0 in turn, which searches only with 2), `edges-targeting-lead` (the whole run, 1300 ticks, listed below) and `skirmish4-long`, ticks
 25750 to 25770 only, where a unit with more than five kills fires at a moving unit (the scale of `GetWeaponTargetPos`). `console-units` (the whole run) holds a
 unit target whose `unitDefIndex` is 0, so `GetWeaponTargetPos` returns 0 and the target is cleared. `edges-economy-targeting` (the whole run, 260 ticks) holds
 a search with more than 50 candidates, candidates at the same spot (`services.RandomInt` of 0), a unit with fire order 0, a kamikaze unit
 among the candidates, a paralyzer weapon against a paralyzed target, a veteran commander (more than five kills) aiming at a building,
-the D-gun (`SetWeaponTargetPos` on weapon 2), and an aim at ground under the sea (`units.GetGroundHeight` returns 1). Each
+the D-gun (`Apply` of a SET_POS on weapon 2), and an aim at ground under the sea (`units.GetGroundHeight` returns 1). Each
 `GetWeaponTargetPos` that returns nonzero records the `pos` it wrote (`o pos.x`); one that returns 0 leaves the stack local of its caller untouched, so
 nothing is recorded of it.
 
 `edges-targeting-lead` (the whole run) holds three outcomes the other recordings lack. All its lines are of `tests/replay/targeting/edges-targeting-lead.txt`:
 
-- Ground height equal to the sea level: `sealevel 1`, then the D-gun at the ground at (850, 300), where `units.GetGroundHeight` returns 1: the call at tick 11, line 918, where `GetWeaponTargetPos` returns 1 with `o pos.y 65536` (16 calls, from tick 11).
-- Bit 10 (0x400) of `Game.uiOptionFlags` (`shootall`, tick 60) deciding a pick: the call at tick 83, line 4210, where `FindWeaponTarget` of the human commander `Unit#1` takes the enemy `CORSOLAR` (`Unit#502`, a def without `shootme`) as its only candidate and picks it.
-- The lead check of `GetWeaponTargetPos` at 4, 5, 6 and 7 kills, in `Unit#2` (an `ARMHLT`) aiming at `CORCK` constructors that patrol: with 4 kills the aim point is the sweet spot while the target moves (first at tick 766, line 34535), with 5 kills the same (tick 866, line 38675), and with 6 kills the target's velocity is added (`o out` differs from `o pos.x` and `o pos.z`): tick 1072, line 47154, with `UnitMotion#8` velocity read just before it. The first calls at each count are at ticks 724 (4 kills, line 32831), 864 (5, line 38603), 998 (6, line 44114), 1127 (7, line 49388) and 1233 (8, line 53796). In this list a line is the `units.GetSweetSpot` import of the call, a few lines below its `call` line. A target that moves at 6 kills is one call in the run (and 62 at 7), because the tower kills quickly.
+- Ground height equal to the sea level: `sealevel 1`, then the D-gun at the ground at (850, 300), where `units.GetGroundHeight` returns 1: the call at tick 11, line 1332, where `GetWeaponTargetPos` returns 1 with `o pos.y 65536` (16 calls, from tick 11).
+- Bit 10 (0x400) of `Game.uiOptionFlags` (`shootall`, tick 60) deciding a pick: the call at tick 83, line 4750, where `FindWeaponTarget` of the human commander `Unit#1` takes the enemy `CORSOLAR` (`Unit#502`, a def without `shootme`) as its only candidate and picks it.
+- The lead check of `GetWeaponTargetPos` at 4, 5, 6 and 7 kills, in `Unit#2` (an `ARMHLT`) aiming at `CORCK` constructors that patrol: with 4 kills the aim point is the sweet spot while the target moves (first at tick 766, line 35313), with 5 kills the same (tick 866, line 39500), and with 6 kills the target's velocity is added (`o out` differs from `o pos.x` and `o pos.z`): tick 1072, line 48086, with `UnitMotion#8` velocity read just before it. The first calls at each count are at ticks 724 (4 kills, line 33597), 864 (5, line 39429), 998 (6, line 45010), 1127 (7, line 50344) and 1233 (8, line 54800). In this list a line is the `units.GetSweetSpot` import of the call, a few lines below its `call` line. A target that moves at 6 kills is one call in the run (and 62 at 7), because the tower kills quickly.
 
 `replay_inject_test.exe` is also built with the mean-shift injection of 0 (the shift by one that halves the sum of the low and high corners of a cell in the cell mean height), and the divergence is reported at call 7 of `orders-air-repair` and at `result`:
 

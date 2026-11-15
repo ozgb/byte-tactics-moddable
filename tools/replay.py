@@ -5,8 +5,8 @@
     uv run tools/replay.py --compare DIR_A DIR_B
 
 `--record` plays each scenario of reference/scenarios/ (a name or a path; with none, the scenarios that
-tests/replay/<subsystem>/ holds a recording of) under Wine, on a copy that ends with one `record <subsystem>` line
-per subsystem, and writes <DIR>/<subsystem>/<scenario>.txt. `--subsystem` (repeatable) picks the subsystems; the
+tests/replay/<subsystem>/ holds a recording of) under Wine, once per subsystem, on a copy that ends with that
+subsystem's `record` line, and writes <DIR>/<subsystem>/<scenario>.txt. `--subsystem` (repeatable) picks the subsystems; the
 default is every subsystem that has a tests/replay/<subsystem>/ directory. `--native-modules` plays the modules as
 native code (-modules=native). `--check` records into a temporary directory and fails when a recording differs from
 the one in tests/replay/ (not the play-test recordings that tests/replay/playtests.json lists); `--json FILE` also writes, per recording, `equal` or the first difference as the played run has it
@@ -205,9 +205,10 @@ def record(exe: Path, plan: dict[str, list[str]], game_dir: str | None, native: 
 
     def one(name: str) -> None:
         scenario = scenario_path(name)
-        chosen = window if window is not None else {
-            s: stored[f"{s}/{scenario.stem}"] for s in plan[name] if f"{s}/{scenario.stem}" in stored}
-        texts = play_recording(exe, scenario, game_dir, native, chosen, work / scenario.stem, plan[name])
+        texts: dict[str, str] = {}
+        for s in plan[name]:
+            chosen = window if window is not None else stored.get(f"{s}/{scenario.stem}")
+            texts.update(play_recording(exe, scenario, game_dir, native, chosen, work / f"{scenario.stem}-{s}", [s]))
         for subsystem, text in texts.items():
             problems = check_form(text, subsystem)
             if problems:

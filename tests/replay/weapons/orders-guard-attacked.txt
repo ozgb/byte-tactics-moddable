@@ -10028,6 +10028,18 @@ call 27 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 27 GetWeaponRange
+  a unit Unit#1
+  a weapon 0
+  o result 200
+call 27 GetWeaponRange
+  a unit Unit#251
+  a weapon 0
+  o result 200
+call 27 GetWeaponRange
+  a unit Unit#251
+  a weapon 2
+  o result 240
 call 28 UpdateUnitWeapons
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
@@ -10081,6 +10093,14 @@ call 28 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 28 GetWeaponRange
+  a unit Unit#3
+  a weapon 0
+  o result 180
+call 28 GetWeaponRange
+  a unit Unit#4
+  a weapon 0
+  o result 180
 call 29 UpdateUnitWeapons
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
@@ -11581,6 +11601,36 @@ call 55 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 55 GetWeaponRange
+  a unit Unit#1
+  a weapon 0
+  o result 200
+call 55 GetWeaponRange
+  a unit Unit#3
+  a weapon 0
+  o result 180
+call 55 GetWeaponRange
+  a unit Unit#4
+  a weapon 0
+  o result 180
+call 55 GetWeaponRange
+  a unit Unit#251
+  a weapon 0
+  o result 200
+call 55 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#2
+  a weapon 0
+  o result 1
+call 55 GetWeaponRange
+  a unit Unit#251
+  a weapon 2
+  o result 240
+call 55 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#2
+  a weapon 2
+  o result 1
 call 56 UpdateUnitWeapons
   r rng.seed 0x6917298a
   r Projectile#1.positionX 214032330
@@ -12035,6 +12085,18 @@ call 61 UpdateUnitWeapons
   o z 87272022
   i services.ScheduleTargetingTargetUnit Unit#251 2 = Unit#2
 call 61 WeaponCanReachUnit
+  r Unit#3.posX 207813197
+  r Unit#3.posZ 82749486
+  a shooter Unit#251
+  a target Unit#3
+  a weapon 0
+  o result 0
+call 61 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#2
+  a weapon 0
+  o result 1
+call 61 WeaponCanReachUnit
   a shooter Unit#251
   a target Unit#2
   a weapon 0
@@ -12116,8 +12178,6 @@ call 62 UpdateUnitWeapons
   w Projectile#3.piece 4
   w Unit#2.weapons[0].aimCob.nAimCobDone 0
 call 62 UpdateUnitWeapons
-  r Unit#3.posX 207813197
-  r Unit#3.posZ 82749486
   r Unit#3.heading -19315
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -14181,6 +14241,18 @@ call 83 UpdateUnitWeapons
   o z 0
   w Unit#251.weapon0Flags 3
   w Unit#251.weapon0ReloadTimer 24
+call 83 GetWeaponRange
+  a unit Unit#1
+  a weapon 0
+  o result 200
+call 83 GetWeaponRange
+  a unit Unit#3
+  a weapon 0
+  o result 180
+call 83 GetWeaponRange
+  a unit Unit#4
+  a weapon 0
+  o result 180
 call 84 UpdateUnitWeapons
   r rng.seed 0x5ef71db8
   r Projectile#0.positionX 219791805
@@ -16911,6 +16983,18 @@ call 111 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 111 GetWeaponRange
+  a unit Unit#1
+  a weapon 0
+  o result 200
+call 111 GetWeaponRange
+  a unit Unit#3
+  a weapon 0
+  o result 180
+call 111 GetWeaponRange
+  a unit Unit#4
+  a weapon 0
+  o result 180
 call 112 UpdateUnitWeapons
   r Projectile#0.positionX 218768884
   r Projectile#0.positionY 1307416
@@ -19781,6 +19865,48 @@ call 138 WeaponCanReachUnit
   a target Unit#2
   a weapon 0
   o result 1
+call 138 GetWeaponRange
+  a unit Unit#1
+  a weapon 0
+  o result 200
+call 138 GetWeaponRange
+  a unit Unit#251
+  a weapon 0
+  o result 200
+call 138 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#4
+  a weapon 0
+  o result 1
+call 138 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#3
+  a weapon 0
+  o result 1
+call 138 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#2
+  a weapon 0
+  o result 1
+call 138 GetWeaponRange
+  a unit Unit#251
+  a weapon 2
+  o result 240
+call 138 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#2
+  a weapon 2
+  o result 1
+call 138 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#3
+  a weapon 2
+  o result 1
+call 138 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#4
+  a weapon 2
+  o result 1
 call 139 UpdateUnitWeapons
   r Game.projectileCount 6
   r rng.seed 0x34273c14
@@ -20008,6 +20134,10 @@ call 139 ClaimWeapons
   a index 2
   i services.SchedPublish 6 28
   w Unit#251.weapon2Flags 11
+call 139 GetWeaponRange
+  a unit Unit#4
+  a weapon 0
+  o result 180
 call 140 UpdateUnitWeapons
   r Game.projectileCount 8
   r rng.seed 0x7c2047f2
@@ -24692,6 +24822,60 @@ call 166 WeaponCanReachUnit
   a target Unit#2
   a weapon 0
   o result 1
+call 166 GetWeaponRange
+  a unit Unit#1
+  a weapon 0
+  o result 200
+call 166 GetWeaponRange
+  a unit Unit#251
+  a weapon 0
+  o result 200
+call 166 WeaponCanReachUnit
+  r Unit#5.posX 214420764
+  r Unit#5.posZ 88034151
+  a shooter Unit#251
+  a target Unit#5
+  a weapon 0
+  o result 1
+call 166 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#2
+  a weapon 0
+  o result 1
+call 166 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#3
+  a weapon 0
+  o result 1
+call 166 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#4
+  a weapon 0
+  o result 1
+call 166 GetWeaponRange
+  a unit Unit#251
+  a weapon 2
+  o result 240
+call 166 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#5
+  a weapon 2
+  o result 1
+call 166 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#3
+  a weapon 2
+  o result 1
+call 166 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#4
+  a weapon 2
+  o result 1
+call 166 WeaponCanReachUnit
+  a shooter Unit#251
+  a target Unit#2
+  a weapon 2
+  o result 1
 call 167 UpdateUnitWeapons
   r rng.seed 0x4831371c
   r Projectile#0.spawnTick 154
@@ -24846,8 +25030,6 @@ call 167 UpdateUnitWeapons
   o y 0
   o z 0
 call 167 UpdateUnitWeapons
-  r Unit#5.posX 214420764
-  r Unit#5.posZ 88034151
   r UnitMotion#6.speed 539796
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -24912,6 +25094,10 @@ call 167 WeaponCanReachUnit
   a target Unit#3
   a weapon 0
   o result 1
+call 167 GetWeaponRange
+  a unit Unit#4
+  a weapon 0
+  o result 180
 call 168 UpdateUnitWeapons
   r Game.projectileCount 7
   r rng.seed 0x1719344b
@@ -28911,6 +29097,14 @@ call 194 ClaimWeapons
   a index 2
   i services.SchedPublish 6 28
   w Unit#251.weapon2Flags 10
+call 194 GetWeaponRange
+  a unit Unit#1
+  a weapon 0
+  o result 200
+call 194 GetWeaponRange
+  a unit Unit#4
+  a weapon 0
+  o result 180
 call 195 UpdateUnitWeapons
   r Game.projectileCount 8
   r rng.seed 0x383ad0c9
@@ -32859,6 +33053,14 @@ call 222 ClaimWeapons
   a index 2
   i services.SchedPublish 6 28
   w Unit#251.weapon2Flags 10
+call 222 GetWeaponRange
+  a unit Unit#1
+  a weapon 0
+  o result 200
+call 222 GetWeaponRange
+  a unit Unit#4
+  a weapon 0
+  o result 180
 call 223 UpdateUnitWeapons
   r Game.projectileCount 8
   r rng.main 0x1b8ff704
@@ -37271,3 +37473,11 @@ call 250 ClaimWeapons
   a index 2
   i services.SchedPublish 6 28
   w Unit#251.weapon2Flags 10
+call 250 GetWeaponRange
+  a unit Unit#1
+  a weapon 0
+  o result 200
+call 250 GetWeaponRange
+  a unit Unit#4
+  a weapon 0
+  o result 180

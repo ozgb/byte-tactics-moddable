@@ -21,14 +21,15 @@ Features' place in it:
 - **Events into features:** PLACE, REMOVE, DAMAGE and RECLAIM, published by units, orders, weapons and the map
   loader. Features' handler (`FeaturesInbox`, `src/seams/features_world.cpp`) passes each to `Apply`. Each was
   queued first, and the gate made four routes synchronous (section 8): DAMAGE from weapons, RECLAIM from orders,
-  PLACE from units (a corpse), and features' own AREA_DAMAGE to weapons. REMOVE from orders is queued, and so is
-  PLACE from the map loader, which publishes outside the tick, where every route delivers at once.
+  PLACE from units (a corpse), and features' own AREA_DAMAGE to weapons. REMOVE from orders is synchronous by #952's
+  rule (section 8). PLACE from the map loader is queued, but it is published only outside the tick, where every route
+  delivers at once.
 - **Synchronous slot:** `Place`, called through the service `ScheduleFeaturesPlace`, for the one caller that needs
   the answer in the same statement (section 2).
 - **Effects out of features:** FREE_STATE, INIT_STATE, PASS_MAPS and AREA_DAMAGE, published to features' outbox.
   Units subscribes to FREE_STATE and INIT_STATE, map to PASS_MAPS (map has an inbox of its own, `SCHED_MAP`),
   weapons to AREA_DAMAGE; their handlers are adapters onto their own seam slots. FREE_STATE, INIT_STATE and
-  PASS_MAPS are queued. The INCOME of a reclaim goes to economy, as it did since #937.
+  PASS_MAPS are synchronous by #952's rule (section 4). The INCOME of a reclaim goes to economy, as it did since #937.
 - **Runs:** the features phase. The scheduler (`SchedFeaturesPhase`) holds its loops as `docs/schedule.md` gives
   them: `AnimateFeatureType` for each feature type, `ScanFeatureCell` once, then `UpdateFeatureSpot` for each spot of
   the used list, from `FirstFeatureSpot` along the links each update returns. Features' inbox is delivered before the
@@ -45,9 +46,10 @@ Features' place in it:
 | an explosion's area damage (`weapons.cpp`) | `DamageFeature` | DAMAGE, with the weapon's number |
 | the map loader (`LoadTntMap`), outside the tick | `PlaceFeature` | PLACE, delivered at once |
 
-**Answers.** No caller of `RemoveFeature`, `ReclaimFeature` or `DamageFeature` used the value returned, so they are
-queued, and features needs none of the "ask synchronously before the queued event" pattern that #952 judges for
-economy's `RequestGranted`. `PlaceFeature`'s value was used once: under the sea, whether the corpse took a spot of the
+**Answers.** No caller of `RemoveFeature`, `ReclaimFeature` or `DamageFeature` used the value returned, so none needs a
+slot of its own, and features needs none of the "ask synchronously before the queued event" pattern that #952 judges
+for economy's `RequestGranted`. Their routes are synchronous for what the rest of the phase reads (sections 4 and 8),
+not for an answer. `PlaceFeature`'s value was used once: under the sea, whether the corpse took a spot of the
 pool decides whether the unit's death leaves smoke, and the spot was then written by units (its sinking velocity).
 That call is the synchronous `Place`, and the velocity is the event's flag SINK, applied by features.
 
@@ -110,11 +112,29 @@ level, and the weapon definitions it names, all as of each module's last run.
 - **Queries:** `GetCellFeature`, `GetFootprintCentre`, `FeatureTypeCount`, `FirstFeatureSpot`.
 
 **As of features' last run.** Every read above sees features' state as of its last run or its last synchronous
-apply. The only event that can be pending inside the tick is a REMOVE (section 8), and it writes the cells of one
-feature and frees its spot. An instrumented build logged every read of a cell's feature fields and of the spot pool
-over the 88 scenarios, and none read what a pending REMOVE writes. The one call that ran with a REMOVE pending was the
-resurrecting order itself, in the state after the one that published it, which reads no feature. So by #952's rule
-no query needs a delivery first.
+apply. By #952's rule a query needs a delivery first only when an event that can be pending writes what it reads, and
+that is a property of the code, not of what the scenarios reach. Inside the tick no event into features and no effect
+out of it can be pending: every route of features in `src/game/routes.cpp` is synchronous but the map loader's PLACE,
+which `LoadTntMap` publishes only outside the tick, where the scheduler delivers every route at once (#970). So no
+query needs a delivery first. Each route that was queued at first fails the test, and is synchronous for it:
+- **REMOVE** from orders: a second resurrection or a reclaim in the same phase reads the wreck's cells (section 8).
+- **FREE_STATE:** `units.FreeObjectState` returns a model's point lists and state to the sim block's free list, and
+  every allocation later in the phase reads that list. A feature that dies is replaced in the same call (its heap or
+  burnt replacement, `PlaceFeatureAt`), whose `SimAllocTagged` would run with the free pending, and so would every
+  `new (kSim)` of the rest of the phase (an order, a projectile). The trace does not hash where a block goes, but the
+  free list is state in the block, and a queued free leaves it in another order than 3.1c's.
+- **INIT_STATE:** building a model's state allocates the point list of each piece (`AddStateEntries`, "Point List")
+  from the same free list, so a queued INIT_STATE moves those allocations after every other of the phase. The pieces
+  themselves are read only between ticks (the feature's drawing, `info_panel.cpp`, and the save), and nothing in the
+  tick reads the state before it is built; the allocations alone fail the test.
+- **PASS_MAPS:** `RefreshAllPassMaps` rewrites the pass map words around the footprint from the cells and the units
+  stamped on them as they are when it runs (`MovementClass::RefreshPassMap` through
+  `GetPassMapFootprintValueWithEdgeStrips`), and reports the change to pathfinding (`CellsChanged`). In the units
+  phase units' own refreshes (`RefreshPassMapsForUnit`, `MovementClass::RefreshMovedUnits`,
+  `MovementClass::RefreshUnitIfStale`) write the same words and report their own changes, and units move between
+  them. A queued refresh would read the stamps after every unit's move and write last, so the words, and the order of
+  the changes pathfinding is told of, would not be 3.1c's. Pathfinding reads the pass maps only in the players phase
+  (`WorldPass`, `WorldTerrainPass` in `pathfinding_world.cpp`), but the writes race each other.
 
 **The immediate rows of `docs/schedule.md`.** `data/dependencies.csv`, regenerated on this change, has these rows of
 class `immediate` with features as writer or reader. The cells are named by their allocation (`LoadTntMap: ... PLOT
@@ -124,7 +144,7 @@ MEMORY`), and the spots by the raw fields of `FeatureAnimEntry` that overlay the
 | Writer | Reader | Phase | The write | How the read is served now |
 |---|---|---|---|---|
 | features | map, units, weapons | units, projectiles | a corpse placed, a wreck reclaimed, a feature killed or set alight | the synchronous routes PLACE (from units), RECLAIM and DAMAGE apply it at 3.1c's statement |
-| features | map, units, weapons | features | features' own run: a fire spreads or burns out, a feature seeds another | the readers are called from that run, at once: weapons through the synchronous AREA_DAMAGE, map through `GetCellMeanHeight` on a falling spot's position; PASS_MAPS waits for the boundary, and only pathfinding, in the players phase, reads the pass maps it refreshes |
+| features | map, units, weapons | features | features' own run: a fire spreads or burns out, a feature seeds another | the readers are called from that run, at once: weapons through the synchronous AREA_DAMAGE, map through `GetCellMeanHeight` on a falling spot's position, and the pass maps through the synchronous PASS_MAPS |
 | features | weapons | units, projectiles | a spot placed or set alight, whose position an explosion measures from | DAMAGE and PLACE from units are synchronous |
 | los_radar, map | features | units | the other fields of a cell (sight, the unit on it) | features reads them inside a synchronous apply, after los_radar's and map's direct writes, as in 3.1c |
 
@@ -193,7 +213,8 @@ rules, the death and burnt replacements) are the default's, not the interface's.
 ## 8. What the gate decided
 
 Every event and effect was queued first. The tier judged the first build and the full `--check` the later ones, and a
-route whose queueing diverged became synchronous, with the reason here. The scenarios that diverged are listed with
+route whose queueing diverged became synchronous, with the reason here. A route that stayed equal but can be pending
+when a read in the same phase needs what it writes became synchronous too, by #952's rule. The scenarios that diverged are listed with
 the first tick, phase and field, against the reference.
 
 **DAMAGE is synchronous.** Queued, the tier diverged in mission-kill-of-type, first at tick 185, phase units
@@ -220,15 +241,29 @@ tick 29988 and long-greenhaven-8p at tick 22962, both in the features phase. In 
 records a unit's speech (`unit_speech`, unit 33, which a burning feature's area damage hit) where the queued build
 recorded the next fire's `white_smoke` first. Queued, the units a fire hit reacted after the rest of the spot loop.
 
-**Queued, and equal:** REMOVE, the map loader's PLACE, FREE_STATE, INIT_STATE and PASS_MAPS, in every scenario in
-both modes. No read in the tick is of a field that a pending REMOVE, FREE_STATE, INIT_STATE or PASS_MAPS writes,
-by #952's rule (section 4).
+**REMOVE is synchronous by #952's rule, not by a divergence.** Queued, every scenario was equal in both modes, and
+the instrumented build saw one REMOVE (orders-tier2-core, tick 615) with no read of what it writes while it was
+pending. But it can be pending when a read in the same units phase needs it:
+- Two units resurrect one wreck in one phase. The second `ResurrectOrder` (state 5, `unit_orders.cpp`) gives up when
+  `GetCellFeature` of the wreck's cell is 0xfffb or more, that is when the wreck has gone. With the first's REMOVE
+  pending the wreck is still on its cells, so the second creates a second unit and sends a second
+  `SendFeatureReclaimed`.
+- A unit reclaims the wreck after a resurrection in the same phase. The synchronous RECLAIM finds the wreck still on
+  its cells and credits its metal, and the queued REMOVE then removes what the reclaim left there.
+
+In 3.1c `RemoveFeature` ran at the statement, so neither can happen; synchronous, it runs there again.
+
+**FREE_STATE, INIT_STATE and PASS_MAPS are synchronous by the same rule** (section 4). Queued, they were equal in
+every scenario in both modes.
+
+**The map loader's PLACE is queued.** `LoadTntMap` publishes it only outside the tick, where every route delivers at
+once (#970's rule), so it is never pending.
 
 **`Place` is synchronous by analysis, not by a divergence.** Its caller needs the answer in the statement (section
 2).
 
-**Inbox depths.** Over the 88 scenarios, features' inbox held at most one event (the one REMOVE, in orders-tier2-core at
-tick 615); every other event into features was applied at once, by a synchronous route, the `Place` slot or a
-publish outside the tick.
-Map's inbox, which takes PASS_MAPS, held at most 158 (long-great-divide-2p, tick 40905), and units', which takes
-FREE_STATE and INIT_STATE with economy's effects, at most 19 (skirmish4-long, tick 26096); the capacity is 1024.
+**Inbox depths.** With the earlier routes queued, over the 88 scenarios features' inbox held at most one event (the
+one REMOVE, in orders-tier2-core at tick 615), map's, which took PASS_MAPS, at most 158 (long-great-divide-2p, tick
+40905), and units', which took FREE_STATE and INIT_STATE with economy's effects, at most 19 (skirmish4-long, tick
+26096); the capacity is 1024. Now no event or effect of features is queued inside the tick: features' and map's
+inboxes stay empty, and units' holds only economy's effects.

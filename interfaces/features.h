@@ -17,7 +17,7 @@ class HapiBank;
 enum FeaturesEventKind {
     // Synchronous when units publish it (a corpse), applied before units goes on, since the cells it writes are read in the same phase; puts feature on cell (x, z), at pos and rot when flags say so, for owner; outcome 1 when it took a spot of the pool, 0 when it took none or was refused.
     FEATURES_PLACE = 32,
-    // Queued: removes the feature on cell (x, z), or on the cell its footprint starts from; value 1 removes even a feature that refuses removal; outcome 1 when one was removed.
+    // Synchronous: removes the feature on cell (x, z), or on the cell its footprint starts from, applied before orders goes on, since a resurrection or a reclaim later in the same phase reads those cells; value 1 removes even a feature that refuses removal; outcome 1 when one was removed.
     FEATURES_REMOVE = 33,
     // Synchronous: weapon (value, the number of its definition) hits the feature whose footprint starts at cell (x, z), applied before the publisher goes on, since a hit may start a fire that draws a random number; outcome 1 when the feature was killed.
     FEATURES_DAMAGE = 34,
@@ -27,11 +27,11 @@ enum FeaturesEventKind {
 
 // The kinds of effect features publishes to its outbox, for the modules that subscribe to them.
 enum FeaturesEffectKind {
-    // A model's piece state that a removed feature held, state (a state block handle), is no longer needed and may be freed.
+    // Synchronous: a model's piece state that a removed feature held, state (a state block handle), is freed before features goes on, since every allocation later in the phase reads the free list.
     FEATURES_EFFECT_FREE_STATE = 48,
-    // The piece state at state (a state block handle, allocated by features with the size ObjectStateSize gave) is to be built for the model of feature.
+    // Synchronous: the piece state at state (a state block handle, allocated by features with the size ObjectStateSize gave) is built for the model of feature before features goes on, since building it allocates from the sim block.
     FEATURES_EFFECT_INIT_STATE = 49,
-    // The features on the cells of the footprint at (x, z), width by height cells, changed: the passability of those cells is to be computed again.
+    // Synchronous: the features on the cells of the footprint at (x, z), width by height cells, changed, and the passability of those cells is computed again before features goes on, since units' own refreshes in the same phase write the same pass maps.
     FEATURES_EFFECT_PASS_MAPS = 50,
     // Synchronous: a burning feature deals the area damage of weapon (value, the number of its definition) around pos, before features goes on, since the units it hits record sim events and draw numbers in features' order.
     FEATURES_EFFECT_AREA_DAMAGE = 51

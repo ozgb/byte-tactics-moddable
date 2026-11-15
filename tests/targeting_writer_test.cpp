@@ -53,6 +53,7 @@ int __stdcall HarnessTestMode()
 extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
 {
     printf("FAIL: host_fatal: %s: %s\n", title, text);
+    g_failures++;
 }
 
 void __stdcall HarnessTargetingEvent(const TargetingEvent*, int) {}
@@ -60,6 +61,7 @@ void __stdcall SchedPublish(int, const void*, unsigned int) {}
 void __stdcall FatalError(char* text)
 {
     printf("FAIL: FatalError: %s\n", text);
+    g_failures++;
 }
 int __stdcall RandomInt(int n)
 {

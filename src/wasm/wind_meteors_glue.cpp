@@ -295,6 +295,8 @@ IMPORT(WindMeteorsEmitImport)
         return ImportError("WindMeteorsEmit", "the effect is outside the module memory");
     WindMeteorsEffect effect;
     memcpy(&effect, Linear(a[0].i32), sizeof effect);
+    if (effect.weapon < -1 || effect.weapon >= (int)(sizeof(g_game->weapons) / sizeof(g_game->weapons[0])))
+        return ImportError("WindMeteorsEmit", "the weapon slot is outside the table of weapons");
     WindMeteorsEmit(&effect);
     return nullptr;
 }

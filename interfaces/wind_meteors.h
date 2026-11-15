@@ -28,7 +28,7 @@ struct MeteorShowerParams {
 enum WindMeteorsEventKind {
     // Queued: meteor showers fall from the next one due.
     WIND_METEORS_ENABLE = 64,
-    // Queued: a shower that falls due from now on is skipped; one already falling ends as planned.
+    // Queued: a shower that falls due from now on drops no meteor, though its centre and the next one's time are still drawn and set; one already falling ends as planned.
     WIND_METEORS_DISABLE = 65,
     // Queued: sets the meteor weapon's name and the shower timing from params; InitMeteors looks the weapon up.
     WIND_METEORS_PARAMS = 66,

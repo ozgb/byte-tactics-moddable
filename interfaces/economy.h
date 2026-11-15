@@ -47,21 +47,21 @@ struct EconAccount {
 
 // The kinds of event other modules publish to economy's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published.
 enum EconomyEventKind {
-    // Queued: clears an account and gives it to player; outcome 1.
+    // Clears an account and gives it to player; outcome 1.
     ECONOMY_RESET = 0,
-    // Queued: sets a unit's account to account, read from a saved game; outcome 1.
+    // Sets a unit's account to account, read from a saved game; outcome 1.
     ECONOMY_LOAD = 1,
-    // Queued: a unit asks for the energy (and metal) of this tick's work, which is charged as asked; outcome 1 when it is granted, as RequestGranted said.
+    // A unit asks for the energy (and metal) of this tick's work, which is charged as asked; outcome 1 when it is granted, as RequestGranted said.
     ECONOMY_REQUEST = 2,
-    // Not queued: a call to the synchronous Spend slot, which takes energy and metal from the store of the account's player and books it as used; outcome 1, or 0 when the store is short and nothing changes.
+    // A spend, made through the Spend slot: takes energy and metal from the store of the account's player and books it as used; outcome 1, or 0 when the store is short and nothing changes.
     ECONOMY_SPEND = 3,
-    // Queued: adds income to an account; the implementation decides what the account's player is given; outcome 1.
+    // Adds income to an account; the implementation decides what the account's player is given; outcome 1.
     ECONOMY_INCOME = 4
 };
 
 // The kinds of effect economy publishes to its outbox, for the modules that subscribe to them.
 enum EconomyEffectKind {
-    // Synchronous: a cloaked unit's upkeep was or was not paid this tick, value 1 to keep it cloaked and 0 to uncloak it; delivered before Emit returns, since sensors read it in the same player's update.
+    // A cloaked unit's upkeep was or was not paid this tick, value 1 to keep it cloaked and 0 to uncloak it.
     ECONOMY_EFFECT_CLOAK = 16,
     // A metal extractor's rate changed: value is the metal under its footprint, which its script is told.
     ECONOMY_EFFECT_EXTRACTOR = 17,

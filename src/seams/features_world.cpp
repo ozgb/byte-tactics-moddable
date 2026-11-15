@@ -8,8 +8,6 @@
 #include "../game/scheduler.h"
 #include "features_world.h"
 
-#include "../../link/globals.h"
-
 void FeaturesInbox(const void* event)
 {
     const FeaturesEvent* e = static_cast<const FeaturesEvent*>(event);

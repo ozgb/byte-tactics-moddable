@@ -105,6 +105,8 @@ void FreeWeaponArray(void)
 #include "../game/economy_events.h"
 #include "../game/features_events.h"
 #include "../../interfaces/economy.h"
+#include "../../interfaces/features.h"
+#include "../../interfaces/services.h"
 
 // FUNCTION: 0x499ab0
 void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, Unit* source,

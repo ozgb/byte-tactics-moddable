@@ -3,8 +3,6 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/features.h"
 #include "../../interfaces/ref.h"
-#include "../state/block.h"
-#include "../util/vec3.h"
 #include "../graphics/model_types.h"
 #include "../map/feature.h"
 #pragma pack(push, 1)

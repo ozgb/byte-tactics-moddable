@@ -5,8 +5,6 @@
 #include "../util/vec3.h"
 #include "map_features_effects.h"
 
-#include "../../link/globals.h"
-
 void MapOnFeaturesPassMaps(const void* event)
 {
     const FeaturesEvent* effect = static_cast<const FeaturesEvent*>(event);

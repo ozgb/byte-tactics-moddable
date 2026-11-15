@@ -1094,13 +1094,13 @@ int __stdcall PlaceEvent(const FeaturesEvent* e)
     rot.x = (short)e->rot[0];
     rot.y = (short)e->rot[1];
     rot.z = (short)e->rot[2];
-    Spot* spot = PlaceFeature(EventCell(e), (unsigned short)e->feature, (e->flags & FEATURES_HAS_POS) ? &pos : 0,
-                              (e->flags & FEATURES_HAS_ROT) ? &rot : 0, (unsigned char)e->owner);
-    if (spot != 0 && (e->flags & FEATURES_SINK)) {
+    Spot* spot = PlaceFeature(EventCell(e), (unsigned short)e->feature, (e->flags & FEATURES_HAS_POS) ? &pos : nullptr,
+                              (e->flags & FEATURES_HAS_ROT) ? &rot : nullptr, (unsigned char)e->owner);
+    if (spot != nullptr && (e->flags & FEATURES_SINK)) {
         spot->vel.y = -11468;
         spot->vel.z = 0;
     }
-    return spot != 0;
+    return spot != nullptr;
 }
 
 int __stdcall ApplyEvent(const FeaturesEvent* e)

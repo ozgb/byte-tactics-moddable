@@ -3,7 +3,6 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/features.h"
 #include "../util/vec3.h"
-#include "weapon_def.h"
 #include "../game/game.h"
 #include "features_effects.h"
 

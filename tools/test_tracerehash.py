@@ -196,15 +196,15 @@ WIND_METEORS_EVENTS = [
 TARGETING_EVENTS = [
     ("targeting.count", "0x00000002"),
     ("targeting[0].kind", "0x00000061"),
-    ("targeting[0].unit", "units:3"),
+    ("targeting[0].unit", "unit:3"),
     ("targeting[0].weapon", "0x00000001"),
     ("targeting[0].target", "null"),
     ("targeting[0].pos", "hex:" + bytes(range(12)).hex()),
     ("targeting[0].outcome", "0x00000001"),
     ("targeting[1].kind", "0x00000070"),
-    ("targeting[1].unit", "heap"),
+    ("targeting[1].unit", "unit:4"),
     ("targeting[1].weapon", "0x00000000"),
-    ("targeting[1].target", "units:5"),
+    ("targeting[1].target", "unit:5"),
     ("targeting[1].pos", "hex:" + bytes(12).hex()),
     ("targeting[1].outcome", "0x00000001"),
 ]

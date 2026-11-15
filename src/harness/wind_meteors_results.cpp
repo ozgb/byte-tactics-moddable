@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -5,13 +6,13 @@
 
 int WindMeteorsResultsAdd(WindMeteorsResults* results, const void* record, unsigned int size)
 {
-    if (size < sizeof(int) || size > sizeof(WindMeteorsResult))
-        return 0;
+    if (size < sizeof(int) || size > offsetof(WindMeteorsResult, size))
+        return WIND_METEORS_RESULT_TOO_LARGE;
     if (results->count == results->capacity) {
         unsigned int grown = results->capacity == 0 ? 256 : results->capacity * 2;
         WindMeteorsResult* items = (WindMeteorsResult*)realloc(results->items, grown * sizeof(WindMeteorsResult));
         if (items == nullptr)
-            return 0;
+            return WIND_METEORS_RESULT_NO_MEMORY;
         results->items = items;
         results->capacity = grown;
     }
@@ -19,7 +20,7 @@ int WindMeteorsResultsAdd(WindMeteorsResults* results, const void* record, unsig
     memset(r, 0, sizeof *r);
     memcpy(r, record, size);
     r->size = size;
-    return 1;
+    return WIND_METEORS_RESULT_ADDED;
 }
 
 void WindMeteorsResultsClear(WindMeteorsResults* results)

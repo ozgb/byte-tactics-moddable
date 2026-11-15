@@ -17,6 +17,8 @@ struct WindMeteorsResults {
     unsigned int capacity;
 };
 
+enum WindMeteorsResultsAdded { WIND_METEORS_RESULT_TOO_LARGE = -1, WIND_METEORS_RESULT_NO_MEMORY = 0, WIND_METEORS_RESULT_ADDED = 1 };
+
 int WindMeteorsResultsAdd(WindMeteorsResults* results, const void* record, unsigned int size);
 void WindMeteorsResultsClear(WindMeteorsResults* results);
 

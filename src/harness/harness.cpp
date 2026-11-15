@@ -3023,7 +3023,10 @@ void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size)
 {
     if (!HarnessTestMode() || s_trace == nullptr)
         return;
-    if (!WindMeteorsResultsAdd(&s_windMeteorsResults, record, size))
+    int added = WindMeteorsResultsAdd(&s_windMeteorsResults, record, size);
+    if (added == WIND_METEORS_RESULT_TOO_LARGE)
+        Fail("testmode: a wind_meteors record is not between 4 and 52 bytes\n");
+    if (added == WIND_METEORS_RESULT_NO_MEMORY)
         s_windMeteorsResultsLost = true;
 }
 

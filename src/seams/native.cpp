@@ -559,11 +559,6 @@ const EconomySeam* DefaultEconomySeam()
     return &s_economy;
 }
 
-static void __fastcall LoadMeteorDefaultsNative(MeteorParams* params)
-{
-    params->LoadMeteorDefaults();
-}
-
 static_assert(sizeof(HapiBank) == sizeof(AccountBank), "HapiBank and AccountBank must have the same size");
 static_assert(offsetof(HapiBank, bank) == offsetof(AccountBank, bank), "HapiBank and AccountBank must keep the bank pointer at the same offset");
 
@@ -674,18 +669,14 @@ static void __stdcall FindFilesRecursiveNative(char* path, const char* pat, File
 
 void InstallNativeSeams()
 {
-    s_wind_meteors.UpdateWind = UpdateWind;
+    s_wind_meteors.UpdateWind = UpdateWindOnStream;
     s_wind_meteors.UpdateMeteors = UpdateMeteors;
+    s_wind_meteors.Apply = WindMeteorsApply;
     s_wind_meteors.InitMeteors = InitMeteors;
     s_wind_meteors.EmptyShutdownPreCleanup = EmptyShutdownPreCleanup;
-    s_wind_meteors.EnableMeteors = EnableMeteors;
-    s_wind_meteors.DisableMeteors = DisableMeteors;
-    s_wind_meteors.SetMeteorParams = SetMeteorParams;
-    s_wind_meteors.LoadMeteorDefaults = LoadMeteorDefaultsNative;
+    s_wind_meteors.LoadMeteorDefaults = LoadMeteorDefaults;
     s_wind_meteors.SaveMeteors = SaveMeteors;
     s_wind_meteors.LoadMeteors = LoadMeteors;
-    s_wind_meteors.CmdMeteor = CmdMeteor;
-    s_wind_meteors.UpdateWindOnStream = UpdateWindOnStream;
     s_economy.RegionSize = EconomyRegionSize;
     s_economy.Init = EconomyInit;
     s_economy.Shutdown = EconomyShutdown;

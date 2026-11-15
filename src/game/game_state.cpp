@@ -107,11 +107,6 @@ void __stdcall SetGameMode(int param)
 
 #include "../util/math.h"
 
-void __cdecl UpdateWind()
-{
-    g_seams.wind_meteors->UpdateWindOnStream(RAND_STREAM_MAIN);
-}
-
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
 #endif
@@ -505,7 +500,7 @@ void LoadBattleAssets()
     g_seams.map->BuildAllPassMaps();
     g_game->windSpeedDenominator = 5000;
     g_game->windCounter = 0;
-    g_seams.wind_meteors->UpdateWindOnStream(RAND_STREAM_LOAD);
+    g_seams.wind_meteors->UpdateWind(RAND_STREAM_LOAD);
     g_game->xform = GameAllocIgnoreTag("TEMP XFORM PTS", 0x960);
     g_game->projected = GameAllocIgnoreTag("TEMP PROJECTED PTS", 0x640);
     g_game->assemPoints = GameAllocIgnoreTag("ASSEM PTS", 0xa0);

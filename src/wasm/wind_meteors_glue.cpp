@@ -12,7 +12,6 @@
 #include "../weapons/weapon_def.h"
 #include "../util/vec3.h"
 #include "../files/files_bank.h"
-#include "../util/commands.h"
 #include "../../interfaces/host.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
@@ -252,22 +251,6 @@ IMPORT(TdfRecordGetFieldStringImport)
     return nullptr;
 }
 
-IMPORT(CommandArgsGetIntArgImport)
-{
-    (void)user;
-    NEED("CommandArgs_GetIntArg", 0);
-    a[0].i32 = ((CommandArgs*)Linear(a[0].i32))->GetIntArg(a[1].i32, a[2].i32);
-    return nullptr;
-}
-
-IMPORT(CommandArgsCountImport)
-{
-    (void)user;
-    NEED("CommandArgs_Count", 0);
-    a[0].i32 = ((CommandArgs*)Linear(a[0].i32))->Count();
-    return nullptr;
-}
-
 IMPORT(HapiBankOpenAccountImport)
 {
     (void)user;
@@ -304,13 +287,17 @@ IMPORT(HapiBankGetIntegerItemImport)
     return nullptr;
 }
 
-IMPORT(SpawnProjectileImport)
+IMPORT(WindMeteorsEmitImport)
 {
     (void)user;
-    NEED("SpawnProjectile", 0);
-    NEED("SpawnProjectile", 1);
-    NEED("SpawnProjectile", 2);
-    a[0].i32 = g_seams.weapons->SpawnProjectile((WeaponDef*)Linear(a[0].i32), (Vec3*)Linear(a[1].i32), (Vec3*)Linear(a[2].i32), a[3].i32);
+    NEED("WindMeteorsEmit", 0);
+    if (!InMemory((unsigned)a[0].i32 + sizeof(WindMeteorsEffect) - 1))
+        return ImportError("WindMeteorsEmit", "the effect is outside the module memory");
+    WindMeteorsEffect effect;
+    memcpy(&effect, Linear(a[0].i32), sizeof effect);
+    if (effect.weapon < -1 || effect.weapon >= (int)(sizeof(g_game->weapons) / sizeof(g_game->weapons[0])))
+        return ImportError("WindMeteorsEmit", "the weapon slot is outside the table of weapons");
+    WindMeteorsEmit(&effect);
     return nullptr;
 }
 
@@ -344,34 +331,27 @@ const ImportDef kImports[] = {
     {"services", "TdfRecord_GetFieldInt", "iii>i", TdfRecordGetFieldIntImport},
     {"services", "TdfRecord_GetFieldDouble", "iid>d", TdfRecordGetFieldDoubleImport},
     {"services", "TdfRecord_GetFieldString", "iiiii>i", TdfRecordGetFieldStringImport},
-    {"services", "CommandArgs_GetIntArg", "iii>i", CommandArgsGetIntArgImport},
-    {"services", "CommandArgs_Count", "i>i", CommandArgsCountImport},
     {"services", "HapiBank_OpenAccount", "ii>i", HapiBankOpenAccountImport},
     {"services", "HapiBank_SetIntegerItem", "iii>i", HapiBankSetIntegerItemImport},
     {"services", "HapiBank_GetIntegerItem", "iii>i", HapiBankGetIntegerItemImport},
-    {"weapons", "SpawnProjectile", "iiii>i", SpawnProjectileImport},
+    {"services", "WindMeteorsEmit", "i>", WindMeteorsEmitImport},
     {"weapons", "FindWeaponByName", "i>i", FindWeaponByNameImport},
 };
 
 enum Slot {
     SLOT_UPDATE_WIND,
     SLOT_UPDATE_METEORS,
+    SLOT_APPLY,
     SLOT_INIT_METEORS,
     SLOT_EMPTY_SHUTDOWN,
-    SLOT_ENABLE_METEORS,
-    SLOT_DISABLE_METEORS,
-    SLOT_SET_METEOR_PARAMS,
     SLOT_LOAD_METEOR_DEFAULTS,
     SLOT_SAVE_METEORS,
     SLOT_LOAD_METEORS,
-    SLOT_CMD_METEOR,
-    SLOT_UPDATE_WIND_ON_STREAM,
     SLOT_COUNT
 };
 
 const char* const kSlotNames[SLOT_COUNT] = {
-    "UpdateWind", "UpdateMeteors", "InitMeteors", "EmptyShutdownPreCleanup", "EnableMeteors", "DisableMeteors",
-    "SetMeteorParams", "LoadMeteorDefaults", "SaveMeteors", "LoadMeteors", "CmdMeteor", "UpdateWindOnStream",
+    "UpdateWind", "UpdateMeteors", "Apply", "InitMeteors", "EmptyShutdownPreCleanup", "LoadMeteorDefaults", "SaveMeteors", "LoadMeteors",
 };
 
 wasmtime_func_t s_slots[SLOT_COUNT];
@@ -516,21 +496,26 @@ unsigned ToScratch(Slot slot, const void* source, unsigned size, int copyIn)
     return ModulesMemory()->scratch;
 }
 
-unsigned ParamsArgument(Slot slot, MeteorParams* params, int copyIn)
+unsigned ParamsArgument(Slot slot, MeteorShowerParams* params, int copyIn)
 {
     if (SimOwns(params))
         return (unsigned)((unsigned char*)params - ModulesMemory()->base);
-    return ToScratch(slot, params, sizeof(MeteorParams), copyIn);
+    return ToScratch(slot, params, sizeof(MeteorShowerParams), copyIn);
 }
 
-void __cdecl UpdateWindThunk()
+void __cdecl UpdateWindThunk(RandStream stream)
 {
-    Call0(SLOT_UPDATE_WIND);
+    Call1(SLOT_UPDATE_WIND, (unsigned)stream);
 }
 
 void __stdcall UpdateMeteorsThunk()
 {
     Call0(SLOT_UPDATE_METEORS);
+}
+
+void __stdcall ApplyThunk(const WindMeteorsEvent* event)
+{
+    Call1(SLOT_APPLY, ToScratch(SLOT_APPLY, event, sizeof(WindMeteorsEvent), 1));
 }
 
 void __stdcall InitMeteorsThunk()
@@ -543,27 +528,12 @@ void __stdcall EmptyShutdownPreCleanupThunk()
     Call0(SLOT_EMPTY_SHUTDOWN);
 }
 
-void __stdcall EnableMeteorsThunk()
-{
-    Call0(SLOT_ENABLE_METEORS);
-}
-
-void __stdcall DisableMeteorsThunk()
-{
-    Call0(SLOT_DISABLE_METEORS);
-}
-
-void __stdcall SetMeteorParamsThunk(MeteorParams* params)
-{
-    Call1(SLOT_SET_METEOR_PARAMS, ParamsArgument(SLOT_SET_METEOR_PARAMS, params, 1));
-}
-
-void __fastcall LoadMeteorDefaultsThunk(MeteorParams* params)
+void __stdcall LoadMeteorDefaultsThunk(MeteorShowerParams* params)
 {
     unsigned argument = ParamsArgument(SLOT_LOAD_METEOR_DEFAULTS, params, 1);
     Call1(SLOT_LOAD_METEOR_DEFAULTS, argument);
     if (!SimOwns(params))
-        memcpy(params, ModulesMemory()->base + argument, sizeof(MeteorParams));
+        memcpy(params, ModulesMemory()->base + argument, sizeof(MeteorShowerParams));
 }
 
 void __stdcall SaveMeteorsThunk(HapiBank* file)
@@ -574,16 +544,6 @@ void __stdcall SaveMeteorsThunk(HapiBank* file)
 void __stdcall LoadMeteorsThunk(HapiBank* file)
 {
     Call1(SLOT_LOAD_METEORS, HandleOf(file));
-}
-
-void __stdcall CmdMeteorThunk(CommandArgs* args)
-{
-    Call1(SLOT_CMD_METEOR, ToScratch(SLOT_CMD_METEOR, args, sizeof(CommandArgs), 1));
-}
-
-void __cdecl UpdateWindOnStreamThunk(RandStream stream)
-{
-    Call1(SLOT_UPDATE_WIND_ON_STREAM, (unsigned)stream);
 }
 
 const char* RunImport(const ImportDef* def, wasmtime_val_raw_t* a)
@@ -622,10 +582,10 @@ WindMeteorsSeam s_seam;
 const WindMeteorsSeam* s_nativeSeam;
 WindMeteorsSeam s_timedNative;
 
-void __cdecl TimedNativeUpdateWind()
+void __cdecl TimedNativeUpdateWind(RandStream stream)
 {
     unsigned long long start = host_time_counter();
-    s_nativeSeam->UpdateWind();
+    s_nativeSeam->UpdateWind(stream);
     s_slotTime[SLOT_UPDATE_WIND] += host_time_counter() - start;
     s_slotCalls[SLOT_UPDATE_WIND]++;
 }
@@ -677,16 +637,12 @@ int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module, unsigned fue
         return 0;
     s_seam.UpdateWind = UpdateWindThunk;
     s_seam.UpdateMeteors = UpdateMeteorsThunk;
+    s_seam.Apply = ApplyThunk;
     s_seam.InitMeteors = InitMeteorsThunk;
     s_seam.EmptyShutdownPreCleanup = EmptyShutdownPreCleanupThunk;
-    s_seam.EnableMeteors = EnableMeteorsThunk;
-    s_seam.DisableMeteors = DisableMeteorsThunk;
-    s_seam.SetMeteorParams = SetMeteorParamsThunk;
     s_seam.LoadMeteorDefaults = LoadMeteorDefaultsThunk;
     s_seam.SaveMeteors = SaveMeteorsThunk;
     s_seam.LoadMeteors = LoadMeteorsThunk;
-    s_seam.CmdMeteor = CmdMeteorThunk;
-    s_seam.UpdateWindOnStream = UpdateWindOnStreamThunk;
     return 1;
 }
 

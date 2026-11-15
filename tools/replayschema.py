@@ -2742,7 +2742,7 @@ def render_service_ids(services: list[dict]) -> str:
     return "\n".join(L)
 
 
-SERVICE_ARG_MODES = {"stream", "int", "double", "text", "handle", "skip", "bytes", "object", "ints", "allocated", "textn", "commandargs"}
+SERVICE_ARG_MODES = {"stream", "int", "double", "text", "handle", "skip", "bytes", "object", "ints", "allocated", "textn", "commandargs", "value"}
 SERVICE_RESULTS = {"int", "double", "text", "snapshot", "handle", "object", "alloc", "arg"}
 HANDLE_KINDS = ("file", "rec", "bank")
 
@@ -2804,6 +2804,8 @@ def check_service_specs(services: list[dict], ann: dict) -> list[str]:
                 errors.append("%s: the argument %s needs a `kind` that is an object kind of the schema" % (where, a["param"]))
             elif m == "handle" and a.get("kind") not in HANDLE_KINDS:
                 errors.append("%s: the argument %s needs a `kind` of file, rec or bank" % (where, a["param"]))
+            elif m == "value" and (a.get("kind") not in kinds or kinds[a["kind"]]["scope"] != "value"):
+                errors.append("%s: the argument %s needs a `kind` that is a value kind of the schema" % (where, a["param"]))
             if "reach" in a:
                 if m != "object":
                     errors.append("%s: the argument %s has a `reach` and is not an object" % (where, a.get("param")))
@@ -2893,6 +2895,8 @@ def service_input_lines(s: dict, ctx: str) -> list[str]:
             L.append("ReplayAddTextN(t, %s, (int)%s);" % (v, service_param_expr(s, a["length"], ctx)))
         elif m == "commandargs":
             L.append("ReplayAddArgs(t, (const CommandArgs*)%s);" % v)
+        elif m == "value":
+            L.append("ReplayAddValueOrNull(t, ROK_%s, %s, g_objects);" % (upper(a["kind"]), v))
     return L
 
 
@@ -2932,6 +2936,8 @@ def render_service_end(services: list[dict]) -> str:
                 L.append("        ReplayAddTextN(t, (const char*)a[%d].v.p, a[%d].v.i);" % (i, index[a["length"]]))
             elif m == "commandargs":
                 L.append("        ReplayAddArgs(t, (const CommandArgs*)a[%d].v.p);" % i)
+            elif m == "value":
+                L.append("        ReplayAddValueOrNull(t, ROK_%s, a[%d].v.p, Table());" % (upper(a["kind"]), i))
         res = s.get("result")
         pointer = "(c.result.kind == 1 ? c.result.v.p : nullptr)"
         outs_after = [(i, a) for i, a in enumerate(s["args"]) if a.get("reach")]

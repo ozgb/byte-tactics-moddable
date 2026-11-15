@@ -264,6 +264,13 @@ class SchemaJsonTest(unittest.TestCase):
         self.assertEqual([f["name"] for f in packets["fields"]], ["type", "subtype", "from", "to", "amount"])
         self.assertEqual({(f["size"], f["kind"], f["target"]) for f in packets["fields"]}, {(4, "scalar", None)})
 
+    def test_wind_meteors_section_names_its_fields_in_dump_order(self):
+        wind_meteors = self.model["windMeteors"]
+        self.assertEqual(wind_meteors["section"], 37)
+        self.assertEqual([(f["name"], f["kind"], f["target"]) for f in wind_meteors["fields"]],
+                         [("kind", "scalar", None), ("data", "bytes", None)])
+        self.assertEqual(wind_meteors["fields"][0]["size"], 4)
+
     def test_the_unit_account_is_not_hashed(self):
         unit = self.model["tables"]["Unit"]
         self.assertEqual([e["field"] for e in unit["excluded"]], ["+0xbc..+0xeb"])

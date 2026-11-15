@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 11
+#define SERVICES_VERSION_MINOR 12
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -63,8 +63,10 @@ enum SchedModule {
     SCHED_FEATURES = 5,
     // Weapons.
     SCHED_WEAPONS = 6,
+    // Wind and meteors (interfaces/wind_meteors.h).
+    SCHED_WIND_METEORS = 8,
     // The number of modules.
-    SCHED_MODULE_COUNT = 7
+    SCHED_MODULE_COUNT = 9
 };
 // Publishes an event, plain data whose first int is its kind, to a module's outbox; the router copies it to the inbox of each subscriber of that kind, which consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
@@ -74,6 +76,11 @@ int __stdcall ScheduleEconomySpend(const EconomyEvent* spend);
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
 // Runs economy's UpdateMetalExtraction for a unit (an economy unit handle) after delivering economy's pending inbox; its effects are published to economy's outbox.
 void __stdcall ScheduleMetalExtraction(unsigned int unit);
+struct WindMeteorsEffect;
+// Publishes an effect of wind_meteors (interfaces/wind_meteors.h) to its outbox, as SchedPublish does, and records it for the dump's wind_meteors events; called by wind_meteors from its runs.
+void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect);
+// In test mode, records a wind_meteors event as wind_meteors consumes it, or an effect as it publishes it, for the dump's wind_meteors events: size bytes of plain data whose first int is its kind.
+void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size);
 
 // Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);

@@ -38,7 +38,7 @@ class StringRef;
 void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 void RegisterUnitOrders();
 
-#include "meteors.h"
+#include "../../interfaces/wind_meteors.h"
 
 #include "../game/data_files.h"
 #include "../util/tdf.h"
@@ -514,6 +514,16 @@ void Mission::RefreshMapList(int multiplayer)
     multi = multiplayer;
 }
 
+static void PublishMeteorSetUp(int kind, const MeteorShowerParams* params)
+{
+    WindMeteorsEvent event;
+    memset(&event, 0, sizeof event);
+    event.kind = kind;
+    if (params != nullptr)
+        event.params = *params;
+    SchedPublish(SCHED_ENGINE, &event, sizeof event);
+}
+
 // FUNCTION: 0x435da0
 int Mission::LoadMission(char* map)
 {
@@ -521,7 +531,7 @@ int Mission::LoadMission(char* map)
     char schema[0x20];
     char value[0x100];
     char path[0x100];
-    MeteorParams meteor;
+    MeteorShowerParams meteor;
     char desc[0x80];
     char lower[0x80];
 
@@ -672,20 +682,20 @@ int Mission::LoadMission(char* map)
     BuildCampaignFilePath(7, "ai", value, "txt");
     if (!GetNameSlot(7))
         BuildCampaignFilePath(7, "ai", "default", "txt");
-    parser.current->GetFieldString(meteor.name, "MeteorWeapon", 0x20, g_emptyText);
-    if (strlen(meteor.name) != 0) {
+    parser.current->GetFieldString(meteor.weapon, "MeteorWeapon", 0x20, g_emptyText);
+    if (strlen(meteor.weapon) != 0) {
         meteor.radius = parser.current->GetFieldInt("MeteorRadius", 0);
         meteor.density = GetFloat(parser.current, "MeteorDensity");
         meteor.duration = GetFloat(parser.current, "MeteorDuration");
         meteor.interval = GetFloat(parser.current, "MeteorInterval");
         if (meteor.radius == 0 || meteor.density == 0.0f || meteor.duration == 0.0f || meteor.interval == 0.0f)
             g_seams.wind_meteors->LoadMeteorDefaults(&meteor);
-        g_seams.wind_meteors->EnableMeteors();
+        PublishMeteorSetUp(WIND_METEORS_ENABLE, nullptr);
     } else {
-        g_seams.wind_meteors->DisableMeteors();
+        PublishMeteorSetUp(WIND_METEORS_DISABLE, nullptr);
         g_seams.wind_meteors->LoadMeteorDefaults(&meteor);
     }
-    g_seams.wind_meteors->SetMeteorParams(&meteor);
+    PublishMeteorSetUp(WIND_METEORS_PARAMS, &meteor);
     LoadMissionData(schema, &parser);
     return 1;
 }

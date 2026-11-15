@@ -49,14 +49,14 @@ Known limits:
 
 ## Counts
 
-As of the last read of `data/state_classes.csv` (2422 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
+As of the last read of `data/state_classes.csv` (2425 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
 
 | kind | sim | view | platform | mixed | const | total |
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
-| static | 4 | 28 | 529 | 0 | 10 | 571 |
+| static | 4 | 28 | 531 | 0 | 10 | 573 |
 | game-region | 119 | 490 | 129 | 44 | 0 | 782 |
-| heap | 196 | 44 | 81 | 0 | 0 | 321 |
+| heap | 196 | 44 | 82 | 0 | 0 | 322 |
 
 ## Mixed cases and how to split them
 
@@ -85,7 +85,7 @@ Found during review, and re-checked against the code for #783. Functions are cit
   - `CmdControl` and `CmdView` write `localPlayer` and `playerIndex` (console_commands.cpp), which the tick reads.
   - The cheat toggles write `uiOptionFlags` bits.
   - `CmdILose` and `CmdIWin` write `endGameFlags` and `endGameVictory`.
-  - `CmdMeteor` calls `EnableMeteors`, `DisableMeteors` and `StartMeteorShower`, which write the meteor globals.
+  - `CmdMeteor` publishes the Enable, Disable and Start events of wind_meteors, whose `Apply` writes the meteor globals when the scheduler delivers them.
   - `HandleDebugHotkey` (game_dialogs.cpp) writes `Player.metal` and `Player.energy`.
 - `HandleSurrenderChoice` (options.cpp) writes `endGameFlags`.
 - The options and keys pause bit is `otherFlags`.

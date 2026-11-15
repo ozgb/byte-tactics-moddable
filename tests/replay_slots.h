@@ -2,24 +2,6 @@
 
 // included by replay_native_test.cpp after its helpers
 
-int __stdcall Imp_weapons_SpawnProjectile(WeaponDef* a0, Vec3* a1, Vec3* a2, int a3)
-{
-    ReplayText t;
-    StartImport(t, "weapons.SpawnProjectile");
-    Space(t);
-    ReplayAddWeapon(t, a0);
-    Space(t);
-    t.Add("pos=");
-    AddVec3(t, a1);
-    Space(t);
-    t.Add("vel=");
-    AddVec3(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    const char* r = Enter(t);
-    return ParseResult<int>(r);
-}
-
 WeaponDef* __stdcall Imp_weapons_FindWeaponByName(char* a0)
 {
     ReplayText t;
@@ -466,18 +448,14 @@ void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsi
 }
 
 WindMeteorsSeam g_native_wind_meteors = {
-    UpdateWind,
+    UpdateWindSlot,
     UpdateMeteors,
+    ApplySlot,
     InitMeteors,
     EmptyShutdownPreCleanup,
-    EnableMeteors,
-    DisableMeteors,
-    SetMeteorParams,
-    LoadMeteorDefaultsSlot,
+    LoadMeteorDefaults,
     SaveMeteors,
     LoadMeteors,
-    CmdMeteor,
-    UpdateWindOnStream,
 };
 
 WeaponsSeam g_native_weapons = {
@@ -565,14 +543,24 @@ MapSeam g_native_map = {
 
 void Run_wind_meteors_UpdateWind()
 {
+    RandStream p0 = ArgStream("stream");
     SetClosing(nullptr);
-    g_seams.wind_meteors->UpdateWind();
+    g_seams.wind_meteors->UpdateWind(p0);
 }
 
 void Run_wind_meteors_UpdateMeteors()
 {
     SetClosing(nullptr);
     g_seams.wind_meteors->UpdateMeteors();
+}
+
+void Run_wind_meteors_Apply()
+{
+    WindMeteorsEvent p0;
+    memset(&p0, 0, sizeof p0);
+    ParseStruct("event", ROK_WINDMETEORSEVENT, &p0);
+    SetClosing(nullptr);
+    g_seams.wind_meteors->Apply(&p0);
 }
 
 void Run_wind_meteors_InitMeteors()
@@ -587,28 +575,7 @@ void Run_wind_meteors_EmptyShutdownPreCleanup()
     g_seams.wind_meteors->EmptyShutdownPreCleanup();
 }
 
-void Run_wind_meteors_EnableMeteors()
-{
-    SetClosing(nullptr);
-    g_seams.wind_meteors->EnableMeteors();
-}
-
-void Run_wind_meteors_DisableMeteors()
-{
-    SetClosing(nullptr);
-    g_seams.wind_meteors->DisableMeteors();
-}
-
-void Run_wind_meteors_SetMeteorParams()
-{
-    MeteorParams p0;
-    memset(&p0, 0, sizeof p0);
-    ParseStruct("params", ROK_METEORPARAMS, &p0);
-    SetClosing(nullptr);
-    g_seams.wind_meteors->SetMeteorParams(&p0);
-}
-
-MeteorParams g_out_wind_meteors_LoadMeteorDefaults_0;
+MeteorShowerParams g_out_wind_meteors_LoadMeteorDefaults_0;
 
 void Run_wind_meteors_LoadMeteorDefaults()
 {
@@ -619,7 +586,7 @@ void Run_wind_meteors_LoadMeteorDefaults()
 
 void After_wind_meteors_LoadMeteorDefaults()
 {
-    CompareStruct("params", ROK_METEORPARAMS, &g_out_wind_meteors_LoadMeteorDefaults_0);
+    CompareStruct("params", ROK_METEORSHOWERPARAMS, &g_out_wind_meteors_LoadMeteorDefaults_0);
 }
 
 void Run_wind_meteors_SaveMeteors()
@@ -634,21 +601,6 @@ void Run_wind_meteors_LoadMeteors()
     HapiBank* p0 = (HapiBank*)ArgHandle("bank");
     SetClosing(nullptr);
     g_seams.wind_meteors->LoadMeteors(p0);
-}
-
-void Run_wind_meteors_CmdMeteor()
-{
-    ArgvHolder p0;
-    ParseArgv(p0);
-    SetClosing(nullptr);
-    g_seams.wind_meteors->CmdMeteor(&p0.args);
-}
-
-void Run_wind_meteors_UpdateWindOnStream()
-{
-    RandStream p0 = ArgStream("stream");
-    SetClosing(nullptr);
-    g_seams.wind_meteors->UpdateWindOnStream(p0);
 }
 
 int g_result_weapons_GetWeaponRange;
@@ -1067,14 +1019,6 @@ void PlayNestedCalls(const char* import)
         scope.Restore();
         const char* args = nullptr;
         const char* name = NestedName(scope.line[k], &args);
-        if (CallbackIs(name, "wind_meteors.CmdMeteor")) {
-            ArgvHolder p0;
-            ParseArgsList(&args, p0);
-            g_seams.wind_meteors->CmdMeteor(&p0.args);
-            scope.Restore();
-            CallbackDone(import, k, args, nullptr);
-            continue;
-        }
         CallbackUnknown(import, k, name);
     }
 }
@@ -1089,24 +1033,16 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_wind_meteors_UpdateMeteors();
         return true;
     }
+    if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_wind_meteors_Apply();
+        return true;
+    }
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "InitMeteors") == 0) {
         Run_wind_meteors_InitMeteors();
         return true;
     }
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "EmptyShutdownPreCleanup") == 0) {
         Run_wind_meteors_EmptyShutdownPreCleanup();
-        return true;
-    }
-    if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "EnableMeteors") == 0) {
-        Run_wind_meteors_EnableMeteors();
-        return true;
-    }
-    if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "DisableMeteors") == 0) {
-        Run_wind_meteors_DisableMeteors();
-        return true;
-    }
-    if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "SetMeteorParams") == 0) {
-        Run_wind_meteors_SetMeteorParams();
         return true;
     }
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "LoadMeteorDefaults") == 0) {
@@ -1119,14 +1055,6 @@ bool RunSlot(const char* subsystem, const char* slot)
     }
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "LoadMeteors") == 0) {
         Run_wind_meteors_LoadMeteors();
-        return true;
-    }
-    if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "CmdMeteor") == 0) {
-        Run_wind_meteors_CmdMeteor();
-        return true;
-    }
-    if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "UpdateWindOnStream") == 0) {
-        Run_wind_meteors_UpdateWindOnStream();
         return true;
     }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0) {
@@ -1358,7 +1286,6 @@ void BindSeams()
     g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {
         g_seams.weapons = &g_import_weapons;
-        g_import_weapons.SpawnProjectile = Imp_weapons_SpawnProjectile;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
@@ -1370,7 +1297,6 @@ void BindSeams()
     }
     if (strcmp(g_subsystem, "targeting") == 0) {
         g_seams.weapons = &g_import_weapons;
-        g_import_weapons.SpawnProjectile = Imp_weapons_SpawnProjectile;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;

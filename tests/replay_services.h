@@ -456,6 +456,16 @@ void __stdcall ScheduleMetalExtraction(unsigned int unit)
     (void)r;
 }
 
+void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect)
+{
+    ReplayText t;
+    StartImport(t, RI_WIND_METEORS_EMIT);
+    Space(t);
+    ReplayAddValueOrNull(t, ROK_WINDMETEORSEFFECT, effect, g_objects);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)
 {
     ReplayText t;

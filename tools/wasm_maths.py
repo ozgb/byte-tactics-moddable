@@ -17,7 +17,7 @@ another) with RUST_BACKTRACE=1, so that a wasmtime panic prints a backtrace; --p
 tools/wasm_loop.py gives each of its parallel runs.
 
 tests/wasm/maths/maths.c walks the input range of each helper the module reaches (ScaledSin and ScaledCos,
-FixedSine, the float expressions of SetMeteorParams, the wind division and clamp, double to float, atof) and
+FixedSine, the float expressions of Apply (the PARAMS event), the wind division and clamp, double to float, atof) and
 hashes every result with SHA-256. It is built twice from the same source: for the native game with clang-cl
 for i686 (x87 code, -mno-sse, as the game's files are; lib/bitexact compiled with SSE2 doubles, as the game
 links it) against MSVC 5's headers and LIBCMT.LIB, run under Wine with the FPU at 53-bit precision, round to
@@ -25,7 +25,7 @@ nearest (_control87 0x9001F); and for the module with clang --target=wasm32 and 
 lib/bitexact and its generated tables, run under the pinned wasmtime package. The module is built with
 -mno-nontrapping-fptoint, so every float to int conversion is LLVM's range-checked lowering, which gives
 0x80000000 for overflow and NaN as x87 _ftol does; the meteor_*_overflow, _negative and _special cases
-check that on every expression of SetMeteorParams.
+check that on every expression of Apply (the PARAMS event).
 """
 
 import argparse

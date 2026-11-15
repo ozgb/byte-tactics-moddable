@@ -419,11 +419,11 @@ Help,src/game/economy.cpp,economy,x,
             (root / "src/seams").mkdir(parents=True)
             (root / "interfaces").mkdir()
             (root / seamlink.NATIVE_TABLE).write_text(native(fillers))
-            (root / seamlink.ECONOMY_HEADER).write_text(header)
+            (root / seamlink.ECONOMY.header).write_text(header)
             (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
             (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
                                                 + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
-            return seamlink.pilot_seams(root)
+            return seamlink.pilot_seams(root, seamlink.ECONOMY)
 
     def slot(self, name, seam="EconomySeam"):
         return f"indirect via void (*)(int) __attribute__((stdcall)) [{seam}::{name}]"
@@ -520,6 +520,112 @@ Help,src/game/economy.cpp,economy,x,
         self.assertEqual([(f[2], f[3]) for f in found],
                          [("Use", "EconomySeam::GetEnergyUse has inline assembly"),
                           ("memset", "EconomySeam::RequestGranted calls memset, which data/rwsets.csv has no rows for")])
+
+
+WIND_METEORS_HEADER = """#include "rand_stream.h"
+struct MeteorShowerParams {
+    char weapon[32];
+    int radius;
+};
+struct WindMeteorsSeam {
+    void (__cdecl* UpdateWind)(RandStream stream);
+    void (__stdcall* UpdateMeteors)(void);
+    void (__stdcall* Apply)(const WindMeteorsEvent* event);
+    void (__stdcall* InitMeteors)(void);
+    void (__stdcall* EmptyShutdownPreCleanup)(void);
+    void (__stdcall* LoadMeteorDefaults)(MeteorShowerParams* params);
+    void (__stdcall* SaveMeteors)(HapiBank* file);
+    void (__stdcall* LoadMeteors)(HapiBank* file);
+};
+"""
+WIND_FILLERS = {"UpdateWind": "UpdateWind", "UpdateMeteors": "UpdateMeteors", "Apply": "WindMeteorsApply", "InitMeteors": "InitMeteors",
+                "EmptyShutdownPreCleanup": "Empty", "LoadMeteorDefaults": "Defaults", "SaveMeteors": "SaveMeteors",
+                "LoadMeteors": "LoadMeteors"}
+
+
+class WindMeteorsPilotTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Hurt,src/units/units.cpp,units,x,
+Fire,src/weapons/weapons.cpp,weapons,x,
+DrawPanel,src/ingame/info_panel.cpp,presentation,x,
+Defaults,src/map/meteors.cpp,wind_meteors,x,
+Help,src/map/meteors.cpp,wind_meteors,x,
+UpdateWind,src/game/game_state.cpp,wind_meteors,x,
+"""
+
+    def check(self, rows, header=WIND_METEORS_HEADER, fillers=None):
+        fillers = WIND_FILLERS if fillers is None else fillers
+        rows = [("Defaults", "src/map/meteors.cpp", "function", "")] + list(rows)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            text = "static WindMeteorsSeam s_wind_meteors;\n" + "".join(f"s_wind_meteors.{k} = {v};\n" for k, v in fillers.items())
+            (root / seamlink.NATIVE_TABLE).write_text(text)
+            (root / seamlink.WIND_METEORS.header).write_text(header)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root, seamlink.WIND_METEORS)
+
+    def slot(self, name):
+        return f"indirect via void (*)(int) __attribute__((cdecl)) [WindMeteorsSeam::{name}]"
+
+    def test_the_tree_as_given_passes_and_a_cdecl_slot_is_parsed(self):
+        self.assertEqual(self.check([]), [])
+        self.assertIn("UpdateWind", seamlink.slot_parameters(WIND_METEORS_HEADER, "WindMeteorsSeam"))
+
+    def test_the_engine_may_call_writing_slots(self):
+        rows = [("SchedWindPhase", "src/game/scheduler.cpp", "indirect_call", self.slot("UpdateWind")),
+                ("WindMeteorsInbox", "src/seams/wind_meteors_world.cpp", "indirect_call", self.slot("Apply")),
+                ("RecWindMeteorsApply", "src/harness/replay_hooks.inc", "indirect_call", self.slot("Apply")),
+                ("LoadBattleAssets", "src/game/game_state.cpp", "indirect_call", self.slot("InitMeteors")),
+                ("ShutdownIngameSystems", "src/game/game_state.cpp", "indirect_call", self.slot("EmptyShutdownPreCleanup")),
+                ("LoadSavedGameState", "src/game/settings_campaign.cpp", "indirect_call", self.slot("LoadMeteors")),
+                ("SaveGameFile", "src/game/settings_campaign.cpp", "field_read", "WindMeteorsSeam::SaveMeteors"),
+                ("Help", "src/map/meteors.cpp", "indirect_call", self.slot("UpdateMeteors")),
+                ("TimedNativeUpdateWind", "src/wasm/wind_meteors_glue.cpp", "indirect_call", self.slot("UpdateWind"))]
+        self.assertEqual(self.check(rows), [])
+
+    def test_a_stray_caller_of_a_writing_slot_is_found(self):
+        found = self.check([("Hurt", "src/units/units.cpp", "indirect_call", self.slot("UpdateWind")),
+                            ("Fire", "src/weapons/weapons.cpp", "field_escape", "WindMeteorsSeam::Apply"),
+                            ("DrawPanel", "src/ingame/info_panel.cpp", "indirect_call", self.slot("InitMeteors")),
+                            ("LoadBattleAssets", "src/other.cpp", "indirect_call", self.slot("LoadMeteors")),
+                            ("SaveGameFile", "src/game/game_state.cpp", "indirect_call", self.slot("SaveMeteors"))])
+        self.assertEqual([f[:3] for f in found], [("call", "presentation", "DrawPanel"), ("call", "units", "Hurt"),
+                                                  ("call", "unowned", "LoadBattleAssets"), ("call", "unowned", "SaveGameFile"),
+                                                  ("call", "weapons", "Fire")])
+
+    def test_the_query_slot_may_be_called_by_anyone(self):
+        self.assertEqual(self.check([("Hurt", "src/units/units.cpp", "indirect_call", self.slot("LoadMeteorDefaults"))]), [])
+
+    def test_a_slot_missing_from_the_native_table_or_unlisted_is_found(self):
+        found = self.check([], fillers={k: v for k, v in WIND_FILLERS.items() if k != "Apply"})
+        self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Apply")])
+        header = WIND_METEORS_HEADER.replace("    void (__stdcall* LoadMeteors)", "    void (__stdcall* Debug)(void);\n    void (__stdcall* LoadMeteors)")
+        found = self.check([], header=header, fillers=dict(WIND_FILLERS, Debug="Dbg"))
+        self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Debug")])
+
+    def test_a_query_that_writes_is_found_but_its_out_parameter_and_services_are_not(self):
+        self.assertEqual(self.check([("Defaults", "src/map/meteors.cpp", "field_write", "MeteorShowerParams::radius"),
+                                     ("Defaults", "src/map/meteors.cpp", "call", "TdfFile::LoadFile"),
+                                     ("Defaults", "src/map/meteors.cpp", "call", "FatalError"),
+                                     ("Defaults", "src/map/meteors.cpp", "field_maybe_written", "MeteorShowerParams::weapon"),
+                                     ("Defaults", "src/map/meteors.cpp", "global_maybe_written", "g_emptyText"),
+                                     ("TdfFile::LoadFile", "src/map/tdf.cpp", "global_write", "g_heap")]), [])
+        found = self.check([("Defaults", "src/map/meteors.cpp", "field_write", "Game::windX"),
+                            ("Defaults", "src/map/meteors.cpp", "global_write", "g_meteorWeapon"),
+                            ("Defaults", "src/map/meteors.cpp", "global_write", "g_emptyText"),
+                            ("Defaults", "src/map/meteors.cpp", "call", "Help"),
+                            ("Help", "src/map/meteors.cpp", "field_write", "MeteorShowerParams::radius"),
+                            ("Defaults", "src/map/meteors.cpp", "call", "memset")])
+        self.assertEqual([(f[2], f[3].split(" ", 1)[1]) for f in found],
+                         [("memset", "calls memset, which data/rwsets.csv has no rows for"),
+                          ("Defaults", "field write Game::windX"), ("Defaults", "global write g_emptyText"),
+                          ("Defaults", "global write g_meteorWeapon"),
+                          ("Help", "field write MeteorShowerParams::radius")])
 
 
 if __name__ == "__main__":

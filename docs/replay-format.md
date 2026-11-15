@@ -47,13 +47,13 @@ CI replays it with the others (`tools/ci_replays.sh`). No play-test recording is
 
 ## Lines
 
-Text, LF line endings. The header is two lines: `bt-replay 2` and `subsystem wind_meteors 1.2` (the interface
+Text, LF line endings. The header is two lines: `bt-replay 2` and `subsystem wind_meteors 2.0` (the interface
 version). A subsystem whose annotations are not complete yet (`status` in the schema is `pending`) writes
 `incomplete` after the version, and the replayer refuses such a file. The file name carries the scenario.
 
 A call is a line `call <ticks> <Slot>`, where `ticks` is `Game.ticks` when the call starts (`-` before the
 game record exists) and `Slot` is a slot of the interface. Calls are in the order they start. A slot called by
-another slot of the same subsystem (UpdateWind calls UpdateWindOnStream in a native build) is part of the outer
+another slot of the same subsystem (UpdateWind calls its helper for a stream in a native build) is part of the outer
 call and has no line of its own. The lines of a call, indented by two spaces, in this order:
 
 | Line | Meaning |
@@ -103,7 +103,7 @@ their value forms are the `objects` of the schema:
 | state, `table` | `Player`, `Unit`, `UnitDef`, `Projectile`, `MovementClass`, `Cell`, `Feature`, `Spot`, `Pool` | the index in the table: `Player#3` is `Game.players[3]`, `Unit#17` is slot 17 of the unit pool, `UnitDef#2` is `Game.defs[2]`, `Projectile#3` is `Game.projectiles[3]`, `Cell#2051` is `Game.cells[2051]`, that is `y*width+x`, `Feature#5` is `Game.features[5]`, `Spot#9` is `Game.spots[9]` and `Pool#0` is `Game.pool` | an array in `Game` or `SimGlobals`, or a `Ref` to one |
 | state, `inside` | `Handle` of a feature or a spot | the site, the container and the member: `Feature#5.anim`, `Spot#9.shadow` | a member of another kind (see An object embedded at several sites) |
 | index | `weapondef` | the index in `Game.weapons` | in the block's weapon array |
-| value | `MeteorParams`, `Vec3` | none: the lines are written with the argument's name, `params.radius`, `pos.x` | an argument struct of one call |
+| value | `MeteorShowerParams`, `Vec3` | none: the lines are written with the argument's name, `params.radius`, `pos.x` | an argument struct of one call |
 | handle | `file`, `rec`, `bank` | order of first use in the outermost call | the import's own objects, not state |
 
 A kind with a `table` is named by its index in a table that `Game` or `SimGlobals` holds, because the module walks it by
@@ -1037,6 +1037,7 @@ in them. The line carries the arguments by their modes and the result after ` = 
 | `object` (`kind`, `reach`) | `Handle#1` | an object the import writes: its `reach` fields follow the result as `o Handle#1.index 0` lines, and the replayer restores them |
 | `allocated` | `alloc#3`, `PlayerInfo#1`, `alloc#?` | a block that an earlier alloc returned, `alloc#?` when none did |
 | `commandargs` | `["x","y"]` or `null` | the strings of a `CommandArgs` |
+| `value` (`kind`) | `(80,226,90599392,88473600,327630432,104857,-983040,163111,1)` or `null` | the fields of a value kind behind a pointer, in the schema's order, as the tuple a value argument of a slot is written as; a different effect fails the replay at the import |
 
 | Result | Written as |
 |---|---|
@@ -1107,9 +1108,8 @@ allocations are never answered. A service in a source nothing links keeps the de
 as the calls of a callback are:
 
 ```
-  i services.CommandArgs_GetIntArg 1 0 = 1
-  i services.ExecuteCommandText "meteor 1" 8 ["x"] -1 = 1
-    c wind_meteors.CmdMeteor ["meteor","1"]
+  i services.ExecuteCommandText "plan 1" 6 ["x"] -1 = 1
+    c ai.CmdPlan ["plan","1"]
 ```
 
 The arguments of a nested call are written by the modes of a slot argument and the result follows ` = `. What a nested call writes shows in the

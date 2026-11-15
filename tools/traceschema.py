@@ -8,7 +8,8 @@ per table the fields in hash order and the plan the hash walks, the masks with t
 and the fields left out of the hash with their reasons. Its "results" entry is the record a dump
 holds for each path event the host delivers (section 32), in dump order; its "economy" entry is the
 record for each economy event (section 33), with the account that only a LOAD adds; its "packets" entry
-is the record for each resource share packet the step sends (section 35). No row hashes any of them.
+is the record for each resource share packet the step sends (section 35); its "windMeteors" entry is the record for each wind_meteors
+event consumed or effect published (section 37), the kind and then the record's bytes after it. No row hashes any of them.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -922,6 +923,11 @@ PACKET_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("to", 4, "scalar", None),
     ("amount", 4, "scalar", None),
 ]
+WIND_METEORS_SECTION = 37
+WIND_METEORS_FIELDS: list[tuple[str, int, str, str | None]] = [
+    ("kind", 4, "scalar", None),
+    ("data", 4, "bytes", None),
+]
 RESULT_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("kind", 4, "scalar", None),
     ("status", 4, "scalar", None),
@@ -1324,6 +1330,11 @@ def render_json(model):
     out.append('  "packets": {')
     out.append('    "section": %d,' % packets["section"])
     out.append('    "fields": %s' % many(packets["fields"], "    "))
+    out.append("  },")
+    wind_meteors = model["windMeteors"]
+    out.append('  "windMeteors": {')
+    out.append('    "section": %d,' % wind_meteors["section"])
+    out.append('    "fields": %s' % many(wind_meteors["fields"], "    "))
     out.append("  }")
     out.append("}")
     return "\n".join(out) + "\n"
@@ -1491,6 +1502,9 @@ def generate():
     model["packets"] = {"section": PACKETS_SECTION,
                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
                                    for n, size, kind, target in PACKET_FIELDS]}
+    model["windMeteors"] = {"section": WIND_METEORS_SECTION,
+                            "fields": [{"name": n, "size": size, "kind": kind, "target": target}
+                                       for n, size, kind, target in WIND_METEORS_FIELDS]}
     return "\n".join(lines) + "\n", schema.errors, render_json(model)
 
 

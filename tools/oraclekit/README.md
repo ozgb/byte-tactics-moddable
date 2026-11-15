@@ -68,7 +68,7 @@ has `meteor` at bit 5). It carries no cross-references to the decompilation (the
 | --- | --- | --- |
 | `game` | `Game` | section 8.2, `g_game` |
 | `sim_globals` | `SimGlobals` | section 8.2, `g_simGlobals` |
-| `params` | `MeteorParams` | the argument of `SetMeteorParams` and `LoadMeteorDefaults`, section 9 |
+| `params` | `MeteorShowerParams` | the argument of `LoadMeteorDefaults` and the parameters of a PARAMS event, section 9 |
 | `vec3` | `Vec3` | the position and velocity of `weapons.SpawnProjectile`, section 9.2 |
 | `weapon` | `WeaponDef` | the first argument of `weapons.SpawnProjectile` and the result of `weapons.FindWeaponByName`, section 9.2 |
 

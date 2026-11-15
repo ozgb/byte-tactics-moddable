@@ -5023,9 +5023,7 @@ address,function,file,kind,target
 0x417600,CmdMakePoster,src/game/console_commands.cpp,global_read,g_game
 0x417760,CmdMeteor,src/game/console_commands.cpp,call,CommandArgs::Count
 0x417760,CmdMeteor,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
-0x417760,CmdMeteor,src/game/console_commands.cpp,call,DisableMeteors
-0x417760,CmdMeteor,src/game/console_commands.cpp,call,EnableMeteors
-0x417760,CmdMeteor,src/game/console_commands.cpp,call,StartMeteorShower
+0x417760,CmdMeteor,src/game/console_commands.cpp,call,PublishWindMeteors
 0x417760,CmdMeteor,src/game/console_commands.cpp,function,
 0x4177a0,CmdDrop,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x4177a0,CmdDrop,src/game/console_commands.cpp,field_write,<anon>::b0
@@ -10759,6 +10757,7 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,Mission::LoadBriefing
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,Mission::LoadMissionData
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,Mission::SelectSchema
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,PublishMeteorSetUp
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,TdfFile::LoadFile
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,TdfFile::ResetCurrentRecord
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,call,TdfFile::SelectRecord
@@ -10782,9 +10781,9 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,deref_read,*int
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,deref_write,*short
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_escape,Game::maxUnitsSetting
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_escape,MeteorParams::name
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_escape,MeteorShowerParams::weapon
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_escape,Mission::description
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,MeteorParams::name
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,MeteorShowerParams::weapon
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,Mission::description
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,Mission::list
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,Mission::memory
@@ -10792,10 +10791,10 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,Mission::numPlayers
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_maybe_written,Mission::planet
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,Game::list_391ed
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,MeteorParams::density
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,MeteorParams::duration
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,MeteorParams::interval
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,MeteorParams::radius
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,MeteorShowerParams::density
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,MeteorShowerParams::duration
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,MeteorShowerParams::interval
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,MeteorShowerParams::radius
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,Mission::briefing
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,Mission::features
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,Mission::missionIndex
@@ -10808,20 +10807,17 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,Seams::players
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,Seams::wind_meteors
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,TdfFile::current
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,WindMeteorsSeam::DisableMeteors
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,WindMeteorsSeam::EnableMeteors
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,WindMeteorsSeam::LoadMeteorDefaults
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_read,WindMeteorsSeam::SetMeteorParams
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Game::list_391ed
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Game::singleCommanderDeath
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Game::singleLOSType
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Game::singleLineOfSight
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Game::singleMapping
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Game::skip
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,MeteorParams::density
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,MeteorParams::duration
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,MeteorParams::interval
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,MeteorParams::radius
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,MeteorShowerParams::density
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,MeteorShowerParams::duration
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,MeteorShowerParams::interval
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,MeteorShowerParams::radius
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Mission::briefing
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Mission::description
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,field_write,Mission::exists
@@ -10851,10 +10847,7 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,global_read,g_game
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,global_read,g_seams
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,indirect_call,indirect via MissionConditions *(*)() __attribute__((stdcall)) [PlayersSeam::NewConditions]
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WindMeteorsSeam::DisableMeteors]
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WindMeteorsSeam::EnableMeteors]
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,indirect_call,indirect via void (*)(MeteorParams *) __attribute__((fastcall)) [WindMeteorsSeam::LoadMeteorDefaults]
-0x435da0,Mission::LoadMission,src/map/map_list.cpp,indirect_call,indirect via void (*)(MeteorParams *) __attribute__((stdcall)) [WindMeteorsSeam::SetMeteorParams]
+0x435da0,Mission::LoadMission,src/map/map_list.cpp,indirect_call,indirect via void (*)(MeteorShowerParams *) __attribute__((stdcall)) [WindMeteorsSeam::LoadMeteorDefaults]
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,indirect_call,indirect via void (*)(MissionConditions *) __attribute__((stdcall)) [PlayersSeam::DeleteConditions]
 0x435da0,Mission::LoadMission,src/map/map_list.cpp,indirect_call,"indirect via void (*)(MissionConditions *, int, TdfFile *) __attribute__((fastcall)) [PlayersSeam::RegisterConditions]"
 0x436860,Mission::SelectSchema,src/map/map_list.cpp,call,FatalError
@@ -11131,11 +11124,11 @@ address,function,file,kind,target
 0x437d50,DisableMeteors,src/map/meteors.cpp,function,
 0x437d50,DisableMeteors,src/map/meteors.cpp,global_write,g_meteorsEnabled
 0x437d60,SetMeteorParams,src/map/meteors.cpp,call,strcpy
-0x437d60,SetMeteorParams,src/map/meteors.cpp,field_escape,MeteorParams::name
-0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorParams::density
-0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorParams::duration
-0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorParams::interval
-0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorParams::radius
+0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorShowerParams::density
+0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorShowerParams::duration
+0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorShowerParams::interval
+0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorShowerParams::radius
+0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorShowerParams::weapon
 0x437d60,SetMeteorParams,src/map/meteors.cpp,function,
 0x437d60,SetMeteorParams,src/map/meteors.cpp,global_maybe_written,g_meteorWeaponName
 0x437d60,SetMeteorParams,src/map/meteors.cpp,global_write,g_meteorScheduleGap
@@ -11146,18 +11139,27 @@ address,function,file,kind,target
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,ScaledCos
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,ScaledSin
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,StartShower
-0x437de0,UpdateMeteors,src/map/meteors.cpp,call,operator WeaponDef *
+0x437de0,UpdateMeteors,src/map/meteors.cpp,call,WindMeteorsEmit
+0x437de0,UpdateMeteors,src/map/meteors.cpp,call,get
+0x437de0,UpdateMeteors,src/map/meteors.cpp,field_escape,Game::weapons
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Game::ticks
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Point16::x
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Point16::y
-0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Seams::weapons
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Vec3::x
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Vec3::y
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Vec3::z
-0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,WeaponsSeam::SpawnProjectile
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,Vec3::x
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,Vec3::y
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,Vec3::z
+0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,WindMeteorsEffect::announce
+0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,WindMeteorsEffect::kind
+0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,WindMeteorsEffect::vx
+0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,WindMeteorsEffect::vy
+0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,WindMeteorsEffect::vz
+0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,WindMeteorsEffect::weapon
+0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,WindMeteorsEffect::x
+0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,WindMeteorsEffect::y
+0x437de0,UpdateMeteors,src/map/meteors.cpp,field_write,WindMeteorsEffect::z
 0x437de0,UpdateMeteors,src/map/meteors.cpp,function,
 0x437de0,UpdateMeteors,src/map/meteors.cpp,global_read,g_game
 0x437de0,UpdateMeteors,src/map/meteors.cpp,global_read,g_meteorActive
@@ -11170,10 +11172,8 @@ address,function,file,kind,target
 0x437de0,UpdateMeteors,src/map/meteors.cpp,global_read,g_meteorTarget
 0x437de0,UpdateMeteors,src/map/meteors.cpp,global_read,g_meteorWeapon
 0x437de0,UpdateMeteors,src/map/meteors.cpp,global_read,g_meteorsEnabled
-0x437de0,UpdateMeteors,src/map/meteors.cpp,global_read,g_seams
 0x437de0,UpdateMeteors,src/map/meteors.cpp,global_write,g_meteorActive
 0x437de0,UpdateMeteors,src/map/meteors.cpp,global_write,g_meteorNextHitTime
-0x437de0,UpdateMeteors,src/map/meteors.cpp,indirect_call,"indirect via int (*)(WeaponDef *, Vec3 *, Vec3 *, int) __attribute__((stdcall)) [WeaponsSeam::SpawnProjectile]"
 0x438070,StartMeteorShower,src/map/meteors.cpp,call,AddPoints
 0x438070,StartMeteorShower,src/map/meteors.cpp,call,GameRand
 0x438070,StartMeteorShower,src/map/meteors.cpp,call,MakePoint
@@ -11217,25 +11217,26 @@ address,function,file,kind,target
 0x438250,LoadMeteors,src/map/meteors.cpp,global_write,g_meteorStrikeEndTime
 0x438250,LoadMeteors,src/map/meteors.cpp,global_write,g_meteorTarget
 0x438250,LoadMeteors,src/map/meteors.cpp,global_write,g_meteorsEnabled
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,call,BuildDataPath
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,call,FatalError
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,call,TdfFile::LoadFile
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,call,TdfFile::SelectRecord
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,call,TdfFile::~TdfFile
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,call,TdfRecord::GetFieldDouble
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,call,TdfRecord::GetFieldInt
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,call,TdfRecord::GetFieldString
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,field_read,MeteorParams::density
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,field_read,MeteorParams::duration
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,field_read,MeteorParams::radius
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,field_read,TdfFile::current
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,field_write,MeteorParams::density
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,field_write,MeteorParams::duration
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,field_write,MeteorParams::interval
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,field_write,MeteorParams::radius
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,function,
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,global_escape,g_extTdf
-0x438320,MeteorParams::LoadMeteorDefaults,src/map/meteors.cpp,global_maybe_written,g_emptyText
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,call,BuildDataPath
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,call,FatalError
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,call,TdfFile::LoadFile
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,call,TdfFile::SelectRecord
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,call,TdfFile::~TdfFile
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,call,TdfRecord::GetFieldDouble
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,call,TdfRecord::GetFieldInt
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,call,TdfRecord::GetFieldString
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,field_maybe_written,MeteorShowerParams::weapon
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,field_read,MeteorShowerParams::density
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,field_read,MeteorShowerParams::duration
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,field_read,MeteorShowerParams::radius
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,field_read,TdfFile::current
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,field_write,MeteorShowerParams::density
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,field_write,MeteorShowerParams::duration
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,field_write,MeteorShowerParams::interval
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,field_write,MeteorShowerParams::radius
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,function,
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,global_escape,g_extTdf
+0x438320,LoadMeteorDefaults,src/map/meteors.cpp,global_maybe_written,g_emptyText
 0x4384a0,AddBeCarriedOrder,src/orders/order_queue.cpp,call,InsertBefore
 0x4384a0,AddBeCarriedOrder,src/orders/order_queue.cpp,call,Order::~Order
 0x4384a0,AddBeCarriedOrder,src/orders/order_queue.cpp,call,operator Order *
@@ -30039,6 +30040,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetCameraState
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetChatHudIndices
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetSpeech
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SchedWindPhase
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimAllocRegion
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimCaptureClear
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,SimEventsClear
@@ -30083,7 +30085,6 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,WeaponsSeam::InitExplosions
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,WeaponsSeam::LoadWeaponTypes
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,WindMeteorsSeam::InitMeteors
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,WindMeteorsSeam::UpdateWindOnStream
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::bit0_37ebe
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::bit11_37ebe
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,<anon>::bit7_37f2f
@@ -30146,7 +30147,6 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WeaponsSeam::InitExplosions]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WeaponsSeam::LoadWeaponTypes]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WindMeteorsSeam::InitMeteors]
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWindOnStream]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via void (*)(const EconMapInfo *, const EconomyWorldView *, void *, unsigned int) __attribute__((stdcall)) [EconomySeam::Init]"
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via void (*)(const PathMapInfo *, void *, unsigned int) __attribute__((stdcall)) [PathfindingSeam::Init]"
 0x491a70,Force640x480Surfaces,src/game/game_state.cpp,call,AllocSurface
@@ -31043,7 +31043,9 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedBeginTick
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedDeliver
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedEndTick
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedMeteorsPhase
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedPhaseBoundary
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedWindPhase
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,StepAllGafSequences
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,UpdateAutoFollow
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,UpdateCameraFollow
@@ -31066,12 +31068,9 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::players
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::units
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::weapons
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::wind_meteors
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,UnitsSeam::UpdateAllUnits
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,WeaponsSeam::UpdateExplosions
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,WeaponsSeam::UpdateProjectiles
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,WindMeteorsSeam::UpdateMeteors
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,WindMeteorsSeam::UpdateWind
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_write,Game::ticks
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_write,Player::displayTimer
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,function,
@@ -31079,7 +31078,6 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,global_read,g_game
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,global_read,g_seams
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,global_read,g_usePacketManager
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((cdecl)) [WindMeteorsSeam::UpdateWind]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::UpdateFeatures]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::ExpireEyeballs]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::UpdateBlink]
@@ -31087,7 +31085,6 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::UpdateAllUnits]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WeaponsSeam::UpdateExplosions]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WeaponsSeam::UpdateProjectiles]
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WindMeteorsSeam::UpdateMeteors]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [EconomySeam::UpdateResourceSharing]
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,call,SetPageFlipping
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,call,operator Unit *
@@ -43312,6 +43309,9 @@ address,function,file,kind,target
 ,ApplyShareSettings,src/harness/harness.cpp,function,
 ,ApplyShareSettings,src/harness/harness.cpp,global_escape,s_players@src/harness/harness.cpp
 ,ApplyShareSettings,src/harness/harness.cpp,global_read,g_game
+,ApplyThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
+,ApplyThunk,src/wasm/wind_meteors_glue.cpp,call,ToScratch
+,ApplyThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,Approach,src/ingame/control_panel.cpp,function,
 ,Approach,src/ingame/info_panel.cpp,function,
 ,ApproachRadius::GetGoalArea,src/orders/order_targets.cpp,call,memset
@@ -44292,14 +44292,6 @@ address,function,file,kind,target
 ,CmdLimitSlot,src/game/console_commands.cpp,function,
 ,CmdLimitSlot,src/game/console_commands.cpp,global_read,g_seams
 ,CmdLimitSlot,src/game/console_commands.cpp,indirect_call,indirect via void (*)(CommandArgs *) __attribute__((stdcall)) [AiSeam::CmdLimit]
-,CmdMeteorSlot,src/game/console_commands.cpp,field_read,Seams::wind_meteors
-,CmdMeteorSlot,src/game/console_commands.cpp,field_read,WindMeteorsSeam::CmdMeteor
-,CmdMeteorSlot,src/game/console_commands.cpp,function,
-,CmdMeteorSlot,src/game/console_commands.cpp,global_read,g_seams
-,CmdMeteorSlot,src/game/console_commands.cpp,indirect_call,indirect via void (*)(CommandArgs *) __attribute__((stdcall)) [WindMeteorsSeam::CmdMeteor]
-,CmdMeteorThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
-,CmdMeteorThunk,src/wasm/wind_meteors_glue.cpp,call,ToScratch
-,CmdMeteorThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,CmdPlanSlot,src/game/console_commands.cpp,field_read,AiSeam::CmdPlan
 ,CmdPlanSlot,src/game/console_commands.cpp,field_read,Seams::ai
 ,CmdPlanSlot,src/game/console_commands.cpp,function,
@@ -44376,20 +44368,6 @@ address,function,file,kind,target
 ,CommandArgs::GetArgPtr,interfaces/services.h,field_read,CommandArgs::args
 ,CommandArgs::GetArgPtr,interfaces/services.h,field_read,CommandArgs::count
 ,CommandArgs::GetArgPtr,interfaces/services.h,function,
-,CommandArgsCountImport,src/wasm/wind_meteors_glue.cpp,call,CommandArgs::Count
-,CommandArgsCountImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
-,CommandArgsCountImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
-,CommandArgsCountImport,src/wasm/wind_meteors_glue.cpp,call,Linear
-,CommandArgsCountImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
-,CommandArgsCountImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
-,CommandArgsCountImport,src/wasm/wind_meteors_glue.cpp,function,
-,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,call,CommandArgs::GetIntArg
-,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
-,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
-,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,call,Linear
-,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
-,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
-,CommandArgsGetIntArgImport,src/wasm/wind_meteors_glue.cpp,function,
 ,CommandEntry::CommandEntry,src/util/commands.cpp,call,operator=
 ,CommandEntry::CommandEntry,src/util/commands.cpp,deref_write,*CommandHandlerInit
 ,CommandEntry::CommandEntry,src/util/commands.cpp,field_escape,CommandEntry::value1
@@ -44724,8 +44702,6 @@ address,function,file,kind,target
 ,Direction,src/orders/vtol_orders.cpp,call,DirectionFromAngle
 ,Direction,src/orders/vtol_orders.cpp,field_write,Fixed::value
 ,Direction,src/orders/vtol_orders.cpp,function,
-,DisableMeteorsThunk,src/wasm/wind_meteors_glue.cpp,call,Call0
-,DisableMeteorsThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,DispatchOne,src/host/win32/window.cpp,call,DispatchMessageA
 ,DispatchOne,src/host/win32/window.cpp,call,HandleDialogMessage
 ,DispatchOne,src/host/win32/window.cpp,call,TranslateMessage
@@ -45341,8 +45317,6 @@ address,function,file,kind,target
 ,EmitVector,src/harness/replay_objects.cpp,global_read,kReplayVectors@src/harness/replay_schema.h
 ,EmptyShutdownPreCleanupThunk,src/wasm/wind_meteors_glue.cpp,call,Call0
 ,EmptyShutdownPreCleanupThunk,src/wasm/wind_meteors_glue.cpp,function,
-,EnableMeteorsThunk,src/wasm/wind_meteors_glue.cpp,call,Call0
-,EnableMeteorsThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,EndSection,src/harness/harness.cpp,call,HashU32
 ,EndSection,src/harness/harness.cpp,function,
 ,EnergyRecipientPoorer,src/util/x87_compare.h,call,X87LtTest01
@@ -47381,11 +47355,13 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,call,VisitUnits
 ,HarnessPhase,src/harness/harness.cpp,call,VisitWind
 ,HarnessPhase,src/harness/harness.cpp,call,VisitWorld
+,HarnessPhase,src/harness/harness.cpp,call,WindMeteorsResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,fflush
 ,HarnessPhase,src/harness/harness.cpp,call,fprintf
 ,HarnessPhase,src/harness/harness.cpp,function,
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_economyResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_pathResults@src/harness/harness.cpp
+,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_windMeteorsResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,g_randomSeed
 ,HarnessPhase,src/harness/harness.cpp,global_read,kHashOffset@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
@@ -47494,6 +47470,13 @@ address,function,file,kind,target
 ,HarnessViewRand,src/harness/harness.cpp,global_read,s_viewState@src/harness/harness.cpp
 ,HarnessViewRand,src/harness/harness.cpp,global_write,s_viewDraws@src/harness/harness.cpp
 ,HarnessViewRand,src/harness/harness.cpp,global_write,s_viewState@src/harness/harness.cpp
+,HarnessWindMeteorsEvent,src/harness/harness.cpp,call,Fail
+,HarnessWindMeteorsEvent,src/harness/harness.cpp,call,HarnessTestMode
+,HarnessWindMeteorsEvent,src/harness/harness.cpp,call,WindMeteorsResultsAdd
+,HarnessWindMeteorsEvent,src/harness/harness.cpp,function,
+,HarnessWindMeteorsEvent,src/harness/harness.cpp,global_maybe_written,s_windMeteorsResults@src/harness/harness.cpp
+,HarnessWindMeteorsEvent,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
+,HarnessWindMeteorsEvent,src/harness/harness.cpp,global_write,s_windMeteorsResultsLost@src/harness/harness.cpp
 ,HasAbility,src/ingame/control_panel.cpp,field_read,UnitDef::flags2
 ,HasAbility,src/ingame/control_panel.cpp,function,
 ,HasBit,src/units/unit.cpp,function,
@@ -48217,23 +48200,18 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::GetWeaponRange
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::InitUnitWeaponSlots
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::ReleaseWeapons
-,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::SpawnProjectile
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::UpdateUnitWeapons
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::WeaponAimCobComplete
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::WeaponCanReachPos
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::WeaponCanReachUnit
-,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::CmdMeteor
-,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::DisableMeteors
+,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::EmptyShutdownPreCleanup
-,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::EnableMeteors
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::InitMeteors
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::LoadMeteorDefaults
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::LoadMeteors
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::SaveMeteors
-,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::SetMeteorParams
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::UpdateMeteors
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::UpdateWind
-,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::UpdateWindOnStream
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiCmdLimit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiCmdPlan
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiCmdWeight
@@ -48547,23 +48525,18 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsGetWeaponRange
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsInitUnitWeaponSlots
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsReleaseWeapons
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsSpawnProjectile
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsUpdateUnitWeapons
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsWeaponAimCobComplete
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsWeaponCanReachPos
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsWeaponCanReachUnit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsCmdMeteor
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsDisableMeteors
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsEmptyShutdownPreCleanup
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsEnableMeteors
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsInitMeteors
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsLoadMeteorDefaults
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsLoadMeteors
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsSaveMeteors
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsSetMeteorParams
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsUpdateMeteors
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsUpdateWind
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWindMeteorsUpdateWindOnStream
 ,HookSeams,src/harness/replay_hooks.inc,function,
 ,HookSeams,src/harness/replay_hooks.inc,global_escape,s_rec_ai
 ,HookSeams,src/harness/replay_hooks.inc,global_escape,s_rec_economy
@@ -49487,18 +49460,14 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::WeaponAimCobComplete
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::WeaponCanReachPos
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::WeaponCanReachUnit
-,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::CmdMeteor
-,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::DisableMeteors
+,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::Apply
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::EmptyShutdownPreCleanup
-,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::EnableMeteors
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::InitMeteors
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::LoadMeteorDefaults
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::LoadMeteors
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::SaveMeteors
-,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::SetMeteorParams
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::UpdateMeteors
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::UpdateWind
-,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::UpdateWindOnStream
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddBeCarriedOrder
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddBuildProgress
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddEyeball
@@ -49550,7 +49519,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearOrderTypeTable
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearWeaponTarget
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdLimit
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdMeteor
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdPlan
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdShareMapping
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdShareRadar
@@ -49571,7 +49539,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,DestroyMotionObjectNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,DestroyPlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,DetonateUnitWeapon
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,DisableMeteors
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,DumpPlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomyApply
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomyGetEnergyUse
@@ -49586,7 +49553,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomyUpdateResourceSharing
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EconomyWriteState
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,EmptyShutdownPreCleanup
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,EnableMeteors
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ExpireEyeballs
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FindBestTargetIfFireAtWill
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FindFeatureAtPos
@@ -49702,7 +49668,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadFeatures
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadMappingData
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadMetalPlotmap
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadMeteorDefaultsNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadMeteorDefaults
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadMeteors
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadMissionByNameNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadMotionNative
@@ -49816,7 +49782,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SendScriptCallByName
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SendShareMapInfo
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SerializeOrderToSaveNative
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetMeteorParams
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetMissionType
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetStateBitsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetUnitPosition
@@ -49861,12 +49826,12 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateUnit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateUnitLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateUnitWeapons
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateWind
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateWindOnStream
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,VisitObjectsInRangeNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponAimCobCompleteNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponCanReachPos
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponCanReachUnit
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,WindMeteorsApply
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WriteBufferToFile
 ,InstallNativeSeams,src/seams/native.cpp,function,
 ,InstallNativeSeams,src/seams/native.cpp,global_escape,s_ai@src/seams/native.cpp
@@ -50520,8 +50485,6 @@ address,function,file,kind,target
 ,LoadFeatureSeqOnce,src/map/features.cpp,field_write,AnimSrc::kind
 ,LoadFeatureSeqOnce,src/map/features.cpp,function,
 ,LoadFeatureSeqOnce,src/map/features.cpp,global_maybe_written,g_emptyText
-,LoadMeteorDefaultsNative,src/seams/native.cpp,call,MeteorParams::LoadMeteorDefaults
-,LoadMeteorDefaultsNative,src/seams/native.cpp,function,
 ,LoadMeteorDefaultsThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
 ,LoadMeteorDefaultsThunk,src/wasm/wind_meteors_glue.cpp,call,ModulesMemory
 ,LoadMeteorDefaultsThunk,src/wasm/wind_meteors_glue.cpp,call,ParamsArgument
@@ -52650,6 +52613,20 @@ address,function,file,kind,target
 ,PruneUsed,src/orders/order_list.cpp,field_read,Order::flags_42
 ,PruneUsed,src/orders/order_list.cpp,field_read,Unit::list
 ,PruneUsed,src/orders/order_list.cpp,function,
+,PublishMeteorSetUp,src/map/map_list.cpp,call,SchedPublish
+,PublishMeteorSetUp,src/map/map_list.cpp,call,memset
+,PublishMeteorSetUp,src/map/map_list.cpp,call,operator=
+,PublishMeteorSetUp,src/map/map_list.cpp,deref_read,*MeteorShowerParams
+,PublishMeteorSetUp,src/map/map_list.cpp,field_write,WindMeteorsEvent::kind
+,PublishMeteorSetUp,src/map/map_list.cpp,field_write,WindMeteorsEvent::params
+,PublishMeteorSetUp,src/map/map_list.cpp,function,
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,call,SchedPublish
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,call,memset
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,call,operator=
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,deref_read,*MeteorShowerParams
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,field_write,WindMeteorsEvent::kind
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,field_write,WindMeteorsEvent::params
+,PublishWindMeteors,src/seams/wind_meteors_world.cpp,function,
 ,PumpNetPackets,src/network/net_game.cpp,call,HandleNetPackets
 ,PumpNetPackets,src/network/net_game.cpp,call,PacketManager::SendAllQueued
 ,PumpNetPackets,src/network/net_game.cpp,function,
@@ -56182,25 +56159,6 @@ address,function,file,kind,target
 ,RecWeaponsReleaseWeapons,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWeaponsReleaseWeapons,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsReleaseWeapons,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,Add
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ArgValue
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ArgVec3
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ArgWeapon
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,FinishImport
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ImportResult
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ImportValue
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ImportVec3
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ImportWeapon
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,SlotScope::Import
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,field_read,WeaponsSeam::SpawnProjectile
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,function,
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,global_read,s_call
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,global_read,s_inner_weapons
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,global_read,s_tail
-,RecWeaponsSpawnProjectile,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(WeaponDef *, Vec3 *, Vec3 *, int) __attribute__((stdcall)) [WeaponsSeam::SpawnProjectile]"
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -56249,36 +56207,20 @@ address,function,file,kind,target
 ,RecWeaponsWeaponCanReachUnit,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsWeaponCanReachUnit,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecWeaponsWeaponCanReachUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,call,ArgArgv
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,call,FinishNested
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,call,ImportArgv
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,call,SlotScope::Nested
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,field_read,WindMeteorsSeam::CmdMeteor
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,function,
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,global_read,s_call
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
-,RecWindMeteorsCmdMeteor,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(CommandArgs *) __attribute__((stdcall)) [WindMeteorsSeam::CmdMeteor]
-,RecWindMeteorsDisableMeteors,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWindMeteorsDisableMeteors,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWindMeteorsDisableMeteors,src/harness/replay_hooks.inc,field_read,WindMeteorsSeam::DisableMeteors
-,RecWindMeteorsDisableMeteors,src/harness/replay_hooks.inc,function,
-,RecWindMeteorsDisableMeteors,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
-,RecWindMeteorsDisableMeteors,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WindMeteorsSeam::DisableMeteors]
+,RecWindMeteorsApply,src/harness/replay_hooks.inc,call,ArgStruct
+,RecWindMeteorsApply,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecWindMeteorsApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecWindMeteorsApply,src/harness/replay_hooks.inc,field_read,WindMeteorsSeam::Apply
+,RecWindMeteorsApply,src/harness/replay_hooks.inc,function,
+,RecWindMeteorsApply,src/harness/replay_hooks.inc,global_read,s_call
+,RecWindMeteorsApply,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
+,RecWindMeteorsApply,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const WindMeteorsEvent *) __attribute__((stdcall)) [WindMeteorsSeam::Apply]
 ,RecWindMeteorsEmptyShutdownPreCleanup,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecWindMeteorsEmptyShutdownPreCleanup,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecWindMeteorsEmptyShutdownPreCleanup,src/harness/replay_hooks.inc,field_read,WindMeteorsSeam::EmptyShutdownPreCleanup
 ,RecWindMeteorsEmptyShutdownPreCleanup,src/harness/replay_hooks.inc,function,
 ,RecWindMeteorsEmptyShutdownPreCleanup,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
 ,RecWindMeteorsEmptyShutdownPreCleanup,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WindMeteorsSeam::EmptyShutdownPreCleanup]
-,RecWindMeteorsEnableMeteors,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWindMeteorsEnableMeteors,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWindMeteorsEnableMeteors,src/harness/replay_hooks.inc,field_read,WindMeteorsSeam::EnableMeteors
-,RecWindMeteorsEnableMeteors,src/harness/replay_hooks.inc,function,
-,RecWindMeteorsEnableMeteors,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
-,RecWindMeteorsEnableMeteors,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WindMeteorsSeam::EnableMeteors]
 ,RecWindMeteorsInitMeteors,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecWindMeteorsInitMeteors,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecWindMeteorsInitMeteors,src/harness/replay_hooks.inc,field_read,WindMeteorsSeam::InitMeteors
@@ -56292,7 +56234,7 @@ address,function,file,kind,target
 ,RecWindMeteorsLoadMeteorDefaults,src/harness/replay_hooks.inc,function,
 ,RecWindMeteorsLoadMeteorDefaults,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
 ,RecWindMeteorsLoadMeteorDefaults,src/harness/replay_hooks.inc,global_read,s_tail
-,RecWindMeteorsLoadMeteorDefaults,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(MeteorParams *) __attribute__((fastcall)) [WindMeteorsSeam::LoadMeteorDefaults]
+,RecWindMeteorsLoadMeteorDefaults,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(MeteorShowerParams *) __attribute__((stdcall)) [WindMeteorsSeam::LoadMeteorDefaults]
 ,RecWindMeteorsLoadMeteors,src/harness/replay_hooks.inc,call,ArgHandle
 ,RecWindMeteorsLoadMeteors,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecWindMeteorsLoadMeteors,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -56309,34 +56251,20 @@ address,function,file,kind,target
 ,RecWindMeteorsSaveMeteors,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWindMeteorsSaveMeteors,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
 ,RecWindMeteorsSaveMeteors,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [WindMeteorsSeam::SaveMeteors]
-,RecWindMeteorsSetMeteorParams,src/harness/replay_hooks.inc,call,ArgStruct
-,RecWindMeteorsSetMeteorParams,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWindMeteorsSetMeteorParams,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWindMeteorsSetMeteorParams,src/harness/replay_hooks.inc,field_read,WindMeteorsSeam::SetMeteorParams
-,RecWindMeteorsSetMeteorParams,src/harness/replay_hooks.inc,function,
-,RecWindMeteorsSetMeteorParams,src/harness/replay_hooks.inc,global_read,s_call
-,RecWindMeteorsSetMeteorParams,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
-,RecWindMeteorsSetMeteorParams,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(MeteorParams *) __attribute__((stdcall)) [WindMeteorsSeam::SetMeteorParams]
 ,RecWindMeteorsUpdateMeteors,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecWindMeteorsUpdateMeteors,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecWindMeteorsUpdateMeteors,src/harness/replay_hooks.inc,field_read,WindMeteorsSeam::UpdateMeteors
 ,RecWindMeteorsUpdateMeteors,src/harness/replay_hooks.inc,function,
 ,RecWindMeteorsUpdateMeteors,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
 ,RecWindMeteorsUpdateMeteors,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WindMeteorsSeam::UpdateMeteors]
+,RecWindMeteorsUpdateWind,src/harness/replay_hooks.inc,call,ArgValue
 ,RecWindMeteorsUpdateWind,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecWindMeteorsUpdateWind,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecWindMeteorsUpdateWind,src/harness/replay_hooks.inc,field_read,WindMeteorsSeam::UpdateWind
 ,RecWindMeteorsUpdateWind,src/harness/replay_hooks.inc,function,
+,RecWindMeteorsUpdateWind,src/harness/replay_hooks.inc,global_read,s_call
 ,RecWindMeteorsUpdateWind,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
-,RecWindMeteorsUpdateWind,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((cdecl)) [WindMeteorsSeam::UpdateWind]
-,RecWindMeteorsUpdateWindOnStream,src/harness/replay_hooks.inc,call,ArgValue
-,RecWindMeteorsUpdateWindOnStream,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecWindMeteorsUpdateWindOnStream,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecWindMeteorsUpdateWindOnStream,src/harness/replay_hooks.inc,field_read,WindMeteorsSeam::UpdateWindOnStream
-,RecWindMeteorsUpdateWindOnStream,src/harness/replay_hooks.inc,function,
-,RecWindMeteorsUpdateWindOnStream,src/harness/replay_hooks.inc,global_read,s_call
-,RecWindMeteorsUpdateWindOnStream,src/harness/replay_hooks.inc,global_read,s_inner_wind_meteors
-,RecWindMeteorsUpdateWindOnStream,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWindOnStream]
+,RecWindMeteorsUpdateWind,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWind]
 ,RecordBlackSmoke,src/state/sim_effects.h,call,RecordPointParticles
 ,RecordBlackSmoke,src/state/sim_effects.h,function,
 ,RecordBubbles,src/state/sim_effects.h,call,RecordWakeEvent
@@ -56765,6 +56693,9 @@ address,function,file,kind,target
 ,ReplayAddValueList,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::size
 ,ReplayAddValueList,src/harness/replay_objects.cpp,function,
 ,ReplayAddValueList,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
+,ReplayAddValueOrNull,src/harness/replay_objects.cpp,call,ReplayAddValue
+,ReplayAddValueOrNull,src/harness/replay_objects.cpp,call,ReplayText::Add
+,ReplayAddValueOrNull,src/harness/replay_objects.cpp,function,
 ,ReplayAddWeapon,src/harness/replay_objects.cpp,call,ReplayText::Add
 ,ReplayAddWeapon,src/harness/replay_objects.cpp,call,ReplayText::AddUnsigned
 ,ReplayAddWeapon,src/harness/replay_objects.cpp,field_escape,Game::weapons
@@ -57321,6 +57252,7 @@ address,function,file,kind,target
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddArgs
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddObjectName
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddTextN
+,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddValueOrNull
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddWords
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayBytes
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayCalls
@@ -58368,6 +58300,12 @@ address,function,file,kind,target
 ,SchedEndTick,src/game/scheduler.cpp,call,SchedPhaseBoundary
 ,SchedEndTick,src/game/scheduler.cpp,function,
 ,SchedEndTick,src/game/scheduler.cpp,global_write,s_inTick
+,SchedMeteorsPhase,src/game/scheduler.cpp,call,SchedDeliver
+,SchedMeteorsPhase,src/game/scheduler.cpp,field_read,Seams::wind_meteors
+,SchedMeteorsPhase,src/game/scheduler.cpp,field_read,WindMeteorsSeam::UpdateMeteors
+,SchedMeteorsPhase,src/game/scheduler.cpp,function,
+,SchedMeteorsPhase,src/game/scheduler.cpp,global_read,g_seams
+,SchedMeteorsPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WindMeteorsSeam::UpdateMeteors]
 ,SchedPending,src/game/scheduler.cpp,field_read,Inbox::head
 ,SchedPending,src/game/scheduler.cpp,field_read,Inbox::tail
 ,SchedPending,src/game/scheduler.cpp,function,
@@ -58448,6 +58386,12 @@ address,function,file,kind,target
 ,SchedUnitsPhase,src/game/scheduler.cpp,global_read,g_seams
 ,SchedUnitsPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [NetworkSeam::SendUnitStates]
 ,SchedUnitsPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [UnitsSeam::UpdateUnit]
+,SchedWindPhase,src/game/scheduler.cpp,call,SchedDeliver
+,SchedWindPhase,src/game/scheduler.cpp,field_read,Seams::wind_meteors
+,SchedWindPhase,src/game/scheduler.cpp,field_read,WindMeteorsSeam::UpdateWind
+,SchedWindPhase,src/game/scheduler.cpp,function,
+,SchedWindPhase,src/game/scheduler.cpp,global_read,g_seams
+,SchedWindPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWind]
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::Int
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::Result
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::~ReplayImport
@@ -58652,9 +58596,6 @@ address,function,file,kind,target
 ,SetKey,src/host/win32/headless.cpp,global_read,g_keys
 ,SetKey,src/host/win32/headless.cpp,global_read,kKeyCount
 ,SetKey,src/host/win32/headless.cpp,global_write,g_keys
-,SetMeteorParamsThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
-,SetMeteorParamsThunk,src/wasm/wind_meteors_glue.cpp,call,ParamsArgument
-,SetMeteorParamsThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,SetPage,src/ingame/control_panel.cpp,call,get
 ,SetPage,src/ingame/control_panel.cpp,field_read,Unit::def
 ,SetPage,src/ingame/control_panel.cpp,field_read,UnitDef::buildMenuPageCount
@@ -59293,16 +59234,6 @@ address,function,file,kind,target
 ,SpatialBucketPrependUnitNative,src/seams/native.cpp,function,
 ,SpatialBucketUnlinkUnitNative,src/seams/native.cpp,call,SpatialBucket::UnlinkUnit
 ,SpatialBucketUnlinkUnitNative,src/seams/native.cpp,function,
-,SpawnProjectileImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
-,SpawnProjectileImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
-,SpawnProjectileImport,src/wasm/wind_meteors_glue.cpp,call,Linear
-,SpawnProjectileImport,src/wasm/wind_meteors_glue.cpp,field_read,Seams::weapons
-,SpawnProjectileImport,src/wasm/wind_meteors_glue.cpp,field_read,WeaponsSeam::SpawnProjectile
-,SpawnProjectileImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
-,SpawnProjectileImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
-,SpawnProjectileImport,src/wasm/wind_meteors_glue.cpp,function,
-,SpawnProjectileImport,src/wasm/wind_meteors_glue.cpp,global_read,g_seams
-,SpawnProjectileImport,src/wasm/wind_meteors_glue.cpp,indirect_call,"indirect via int (*)(WeaponDef *, Vec3 *, Vec3 *, int) __attribute__((stdcall)) [WeaponsSeam::SpawnProjectile]"
 ,SpeechQueue::Remove,src/sound/sound.cpp,call,GameFreeThunk
 ,SpeechQueue::Remove,src/sound/sound.cpp,call,operator=
 ,SpeechQueue::Remove,src/sound/sound.cpp,field_read,SpeechEntry::data
@@ -59928,7 +59859,7 @@ address,function,file,kind,target
 ,TimedNativeUpdateWind,src/wasm/wind_meteors_glue.cpp,global_read,s_slotTime
 ,TimedNativeUpdateWind,src/wasm/wind_meteors_glue.cpp,global_write,s_slotCalls
 ,TimedNativeUpdateWind,src/wasm/wind_meteors_glue.cpp,global_write,s_slotTime
-,TimedNativeUpdateWind,src/wasm/wind_meteors_glue.cpp,indirect_call,indirect via void (*const)() __attribute__((cdecl)) [WindMeteorsSeam::UpdateWind]
+,TimedNativeUpdateWind,src/wasm/wind_meteors_glue.cpp,indirect_call,indirect via void (*const)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWind]
 ,TimerClassOf,src/harness/harness.cpp,function,
 ,TimerClassOf,src/harness/harness.cpp,global_read,classes@TimerClassOf
 ,TimingTick,src/wasm/modules.cpp,call,WindMeteorsTimeNative
@@ -60374,14 +60305,7 @@ address,function,file,kind,target
 ,UpdateSubState,src/frontend/frontend.cpp,function,
 ,UpdateSubState,src/frontend/frontend.cpp,global_maybe_written,g_frontendSourceFile
 ,UpdateSubState,src/frontend/frontend.cpp,global_read,g_game
-,UpdateWind,src/game/game_state.cpp,field_read,Seams::wind_meteors
-,UpdateWind,src/game/game_state.cpp,field_read,WindMeteorsSeam::UpdateWindOnStream
-,UpdateWind,src/game/game_state.cpp,function,
-,UpdateWind,src/game/game_state.cpp,global_read,g_seams
-,UpdateWind,src/game/game_state.cpp,indirect_call,indirect via void (*)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWindOnStream]
-,UpdateWindOnStreamThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
-,UpdateWindOnStreamThunk,src/wasm/wind_meteors_glue.cpp,function,
-,UpdateWindThunk,src/wasm/wind_meteors_glue.cpp,call,Call0
+,UpdateWindThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
 ,UpdateWindThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,UseEnergy,src/game/economy.cpp,call,AddIncome
 ,UseEnergy,src/game/economy.cpp,call,RequestEnergyOn
@@ -61301,6 +61225,24 @@ address,function,file,kind,target
 ,VisitWind,src/harness/harness.cpp,function,
 ,VisitWind,src/harness/harness.cpp,global_read,kWindFieldCount@src/harness/trace_schema.h
 ,VisitWind,src/harness/harness.cpp,global_read,kWindFields@src/harness/trace_schema.h
+,VisitWindMeteorsResults,src/harness/harness.cpp,call,DumpPrefix
+,VisitWindMeteorsResults,src/harness/harness.cpp,call,Fail
+,VisitWindMeteorsResults,src/harness/harness.cpp,call,fprintf
+,VisitWindMeteorsResults,src/harness/harness.cpp,call,fputc
+,VisitWindMeteorsResults,src/harness/harness.cpp,call,fputs
+,VisitWindMeteorsResults,src/harness/harness.cpp,call,sprintf
+,VisitWindMeteorsResults,src/harness/harness.cpp,deref_escape,*WindMeteorsResult
+,VisitWindMeteorsResults,src/harness/harness.cpp,deref_read,*unsigned char
+,VisitWindMeteorsResults,src/harness/harness.cpp,field_escape,WindMeteorsResult::data
+,VisitWindMeteorsResults,src/harness/harness.cpp,field_read,WindMeteorsResult::kind
+,VisitWindMeteorsResults,src/harness/harness.cpp,field_read,WindMeteorsResult::size
+,VisitWindMeteorsResults,src/harness/harness.cpp,field_read,WindMeteorsResults::count
+,VisitWindMeteorsResults,src/harness/harness.cpp,field_read,WindMeteorsResults::items
+,VisitWindMeteorsResults,src/harness/harness.cpp,function,
+,VisitWindMeteorsResults,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,VisitWindMeteorsResults,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,VisitWindMeteorsResults,src/harness/harness.cpp,global_read,s_windMeteorsResults@src/harness/harness.cpp
+,VisitWindMeteorsResults,src/harness/harness.cpp,global_read,s_windMeteorsResultsLost@src/harness/harness.cpp
 ,VisitWorld,src/harness/harness.cpp,call,VisitConstants
 ,VisitWorld,src/harness/harness.cpp,call,VisitEconomyResults
 ,VisitWorld,src/harness/harness.cpp,call,VisitExplored
@@ -61315,6 +61257,7 @@ address,function,file,kind,target
 ,VisitWorld,src/harness/harness.cpp,call,VisitSpatial
 ,VisitWorld,src/harness/harness.cpp,call,VisitUnitHeap
 ,VisitWorld,src/harness/harness.cpp,call,VisitVisibility
+,VisitWorld,src/harness/harness.cpp,call,VisitWindMeteorsResults
 ,VisitWorld,src/harness/harness.cpp,function,
 ,VisitWorld,src/harness/harness.cpp,global_read,s_traceTick@src/harness/harness.cpp
 ,WakeParticleWholePos::Visible,src/graphics/particles.cpp,call,Identity
@@ -61370,6 +61313,24 @@ address,function,file,kind,target
 ,Walkable,src/harness/replay_objects.cpp,global_read,kReplayVectors@src/harness/replay_schema.h
 ,WeaponAimCobCompleteNative,src/seams/native.cpp,function,
 ,WeaponAimCobCompleteNative,src/seams/native.cpp,indirect_call,virtual Callback::Complete
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_escape,Game::weapons
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_read,Seams::weapons
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_read,WeaponsSeam::SpawnProjectile
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsEffect::announce
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsEffect::vx
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsEffect::vy
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsEffect::vz
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsEffect::weapon
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsEffect::x
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsEffect::y
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsEffect::z
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_write,Vec3::x
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_write,Vec3::y
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_write,Vec3::z
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,function,
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,global_read,g_game
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,global_read,g_seams
+,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,indirect_call,"indirect via int (*)(WeaponDef *, Vec3 *, Vec3 *, int) __attribute__((stdcall)) [WeaponsSeam::SpawnProjectile]"
 ,WhereText,src/wasm/modules.cpp,call,sprintf
 ,WhereText,src/wasm/modules.cpp,call,strcat
 ,WhereText,src/wasm/modules.cpp,call,strlen
@@ -61383,34 +61344,33 @@ address,function,file,kind,target
 ,WholePart,src/map/terrain.cpp,function,
 ,WinMain,src/host/win32/process.cpp,call,GameEntry
 ,WinMain,src/host/win32/process.cpp,function,
+,WindMeteorsApply,src/map/meteors.cpp,call,DisableMeteors
+,WindMeteorsApply,src/map/meteors.cpp,call,EnableMeteors
+,WindMeteorsApply,src/map/meteors.cpp,call,SetMeteorParams
+,WindMeteorsApply,src/map/meteors.cpp,call,StartMeteorShower
+,WindMeteorsApply,src/map/meteors.cpp,field_read,WindMeteorsEvent::kind
+,WindMeteorsApply,src/map/meteors.cpp,field_read,WindMeteorsEvent::params
+,WindMeteorsApply,src/map/meteors.cpp,function,
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,call,strcmp
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,call,wl_data_address
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,call,wl_data_count
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,call,wl_data_name
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,call,wl_export_func
-,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::CmdMeteor
-,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::DisableMeteors
+,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::Apply
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::EmptyShutdownPreCleanup
-,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::EnableMeteors
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::InitMeteors
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::LoadMeteorDefaults
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::LoadMeteors
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::SaveMeteors
-,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::SetMeteorParams
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::UpdateMeteors
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::UpdateWind
-,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,field_write,WindMeteorsSeam::UpdateWindOnStream
-,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,CmdMeteorThunk
-,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,DisableMeteorsThunk
+,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,ApplyThunk
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,EmptyShutdownPreCleanupThunk
-,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,EnableMeteorsThunk
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,InitMeteorsThunk
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,LoadMeteorDefaultsThunk
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,LoadMeteorsThunk
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,SaveMeteorsThunk
-,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,SetMeteorParamsThunk
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,UpdateMeteorsThunk
-,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,UpdateWindOnStreamThunk
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,fn_ref,UpdateWindThunk
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,global_maybe_written,s_fuelGet
@@ -61439,6 +61399,19 @@ address,function,file,kind,target
 ,WindMeteorsDeferFatal,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsDeferFatal,src/wasm/wind_meteors_glue.cpp,global_read,s_importDepth
 ,WindMeteorsDeferFatal,src/wasm/wind_meteors_glue.cpp,global_read,s_importThread
+,WindMeteorsEmit,src/seams/wind_meteors_world.cpp,call,HarnessWindMeteorsEvent
+,WindMeteorsEmit,src/seams/wind_meteors_world.cpp,call,ReplayImport::Ptr
+,WindMeteorsEmit,src/seams/wind_meteors_world.cpp,call,ReplayImport::~ReplayImport
+,WindMeteorsEmit,src/seams/wind_meteors_world.cpp,call,SchedPublish
+,WindMeteorsEmit,src/seams/wind_meteors_world.cpp,function,
+,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
+,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
+,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,call,Linear
+,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,call,WindMeteorsEmit
+,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,call,memcpy
+,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,field_read,WindMeteorsEffect::weapon
+,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
+,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsFatalPending,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsFatalPending,src/wasm/wind_meteors_glue.cpp,global_read,s_fatalPending
 ,WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,call,FuelLeft
@@ -61447,6 +61420,12 @@ address,function,file,kind,target
 ,WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,global_read,s_fuelBudget
 ,WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,global_read,s_fuelOpen
 ,WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,global_write,s_fuelOpen
+,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,call,HarnessWindMeteorsEvent
+,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,field_read,Seams::wind_meteors
+,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsSeam::Apply
+,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,function,
+,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,global_read,g_seams
+,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,indirect_call,indirect via void (*)(const WindMeteorsEvent *) __attribute__((stdcall)) [WindMeteorsSeam::Apply]
 ,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,call,wl_define_import
 ,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,field_read,ImportDef::module
 ,WindMeteorsInstall,src/wasm/wind_meteors_glue.cpp,field_read,ImportDef::name
@@ -61461,6 +61440,20 @@ address,function,file,kind,target
 ,WindMeteorsOutOfFuel,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsOutOfFuel,src/wasm/wind_meteors_glue.cpp,global_read,s_fuelBudget
 ,WindMeteorsOutOfFuel,src/wasm/wind_meteors_glue.cpp,global_read,s_fuelOpen
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,call,memcpy
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,call,memset
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,call,realloc
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,deref_escape,*WindMeteorsResult
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,field_read,WindMeteorsResults::capacity
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,field_read,WindMeteorsResults::count
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,field_read,WindMeteorsResults::items
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,field_write,WindMeteorsResult::size
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,field_write,WindMeteorsResults::capacity
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,field_write,WindMeteorsResults::count
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,field_write,WindMeteorsResults::items
+,WindMeteorsResultsAdd,src/harness/wind_meteors_results.cpp,function,
+,WindMeteorsResultsClear,src/harness/wind_meteors_results.cpp,field_write,WindMeteorsResults::count
+,WindMeteorsResultsClear,src/harness/wind_meteors_results.cpp,function,
 ,WindMeteorsTimeNative,src/wasm/wind_meteors_glue.cpp,call,operator=
 ,WindMeteorsTimeNative,src/wasm/wind_meteors_glue.cpp,deref_read,*WindMeteorsSeam
 ,WindMeteorsTimeNative,src/wasm/wind_meteors_glue.cpp,field_read,Seams::wind_meteors

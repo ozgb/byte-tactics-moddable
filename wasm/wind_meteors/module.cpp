@@ -10,13 +10,11 @@
 #include "src/util/vec3.h"
 #include "src/files/files_api.h"
 #include "src/util/tdf.h"
-#include "src/util/commands.h"
 #include "interfaces/services.h"
 #include "interfaces/seams.h"
 #include "src/state/sim_globals.h"
 #include "src/map/meteors.h"
 #include "src/game/game_state.h"
-#include "src/game/console_commands.h"
 
 #define IMPORT(module, name) __attribute__((import_module(module), import_name(name)))
 #define EXPORT(name) __attribute__((export_name(name)))
@@ -35,10 +33,8 @@ IMPORT("services", "TdfRecord_GetFieldDouble") double service_TdfRecord_GetField
 IMPORT("services", "TdfRecord_GetFieldString") int service_TdfRecord_GetFieldString(TdfRecord* self, char* dst, char* key, size_t size, char* def);
 IMPORT("services", "HapiBank_OpenAccount") int service_HapiBank_OpenAccount(HapiBank* self, char* name);
 IMPORT("services", "HapiBank_SetIntegerItem") int service_HapiBank_SetIntegerItem(HapiBank* self, const char* name, int value);
+IMPORT("services", "WindMeteorsEmit") void service_WindMeteorsEmit(const WindMeteorsEffect* effect);
 IMPORT("services", "HapiBank_GetIntegerItem") int service_HapiBank_GetIntegerItem(HapiBank* self, char* name, int def);
-IMPORT("services", "CommandArgs_GetIntArg") int service_CommandArgs_GetIntArg(CommandArgs* self, int index, int def);
-IMPORT("services", "CommandArgs_Count") int service_CommandArgs_Count(CommandArgs* self);
-IMPORT("weapons", "SpawnProjectile") int weapons_SpawnProjectile(WeaponDef* weapon, Vec3* pos, Vec3* vel, int flag);
 IMPORT("weapons", "FindWeaponByName") WeaponDef* weapons_FindWeaponByName(char* name);
 }
 
@@ -60,8 +56,7 @@ int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
 {
     return service_TdfRecord_GetFieldString(this, dst, key, size, def);
 }
-int CommandArgs::GetIntArg(int index, int def) { return service_CommandArgs_GetIntArg(this, index, def); }
-int CommandArgs::Count() { return service_CommandArgs_Count(this); }
+void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect) { service_WindMeteorsEmit(effect); }
 
 SimGlobals& SimCreate() { __builtin_trap(); }
 
@@ -75,25 +70,18 @@ SimGlobals* g_simGlobals;
 char g_extTdf[4];
 unsigned int g_blockBase;
 
-static void __fastcall LoadMeteorDefaultsSlot(MeteorParams* params) { params->LoadMeteorDefaults(); }
-
 static WindMeteorsSeam s_windMeteors = {
-    .UpdateWind = UpdateWind,
+    .UpdateWind = UpdateWindOnStream,
     .UpdateMeteors = UpdateMeteors,
+    .Apply = WindMeteorsApply,
     .InitMeteors = InitMeteors,
     .EmptyShutdownPreCleanup = EmptyShutdownPreCleanup,
-    .EnableMeteors = EnableMeteors,
-    .DisableMeteors = DisableMeteors,
-    .SetMeteorParams = SetMeteorParams,
-    .LoadMeteorDefaults = LoadMeteorDefaultsSlot,
+    .LoadMeteorDefaults = LoadMeteorDefaults,
     .SaveMeteors = SaveMeteors,
     .LoadMeteors = LoadMeteors,
-    .CmdMeteor = CmdMeteor,
-    .UpdateWindOnStream = UpdateWindOnStream,
 };
 
 static WeaponsSeam s_weapons = {
-    .SpawnProjectile = weapons_SpawnProjectile,
     .FindWeaponByName = weapons_FindWeaponByName,
 };
 
@@ -110,18 +98,14 @@ Seams g_seams = {
 };
 
 extern "C" {
-EXPORT("UpdateWind") void export_UpdateWind(void) { s_windMeteors.UpdateWind(); }
+EXPORT("UpdateWind") void export_UpdateWind(RandStream stream) { s_windMeteors.UpdateWind(stream); }
 EXPORT("UpdateMeteors") void export_UpdateMeteors(void) { s_windMeteors.UpdateMeteors(); }
+EXPORT("Apply") void export_Apply(const WindMeteorsEvent* event) { s_windMeteors.Apply(event); }
 EXPORT("InitMeteors") void export_InitMeteors(void) { s_windMeteors.InitMeteors(); }
 EXPORT("EmptyShutdownPreCleanup") void export_EmptyShutdownPreCleanup(void) { s_windMeteors.EmptyShutdownPreCleanup(); }
-EXPORT("EnableMeteors") void export_EnableMeteors(void) { s_windMeteors.EnableMeteors(); }
-EXPORT("DisableMeteors") void export_DisableMeteors(void) { s_windMeteors.DisableMeteors(); }
-EXPORT("SetMeteorParams") void export_SetMeteorParams(MeteorParams* params) { s_windMeteors.SetMeteorParams(params); }
-EXPORT("LoadMeteorDefaults") void export_LoadMeteorDefaults(MeteorParams* params) { s_windMeteors.LoadMeteorDefaults(params); }
+EXPORT("LoadMeteorDefaults") void export_LoadMeteorDefaults(MeteorShowerParams* params) { s_windMeteors.LoadMeteorDefaults(params); }
 EXPORT("SaveMeteors") void export_SaveMeteors(HapiBank* file) { s_windMeteors.SaveMeteors(file); }
 EXPORT("LoadMeteors") void export_LoadMeteors(HapiBank* file) { s_windMeteors.LoadMeteors(file); }
-EXPORT("CmdMeteor") void export_CmdMeteor(CommandArgs* args) { s_windMeteors.CmdMeteor(args); }
-EXPORT("UpdateWindOnStream") void export_UpdateWindOnStream(RandStream stream) { s_windMeteors.UpdateWindOnStream(stream); }
 }
 
 #include "layout_generated.h"

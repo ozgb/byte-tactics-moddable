@@ -4626,7 +4626,7 @@ seams,files,shared_write,FilesSeam::OpenRead,1
 seams,files,shared_write,FilesSeam::Read,1
 seams,files,shared_write,FilesSeam::Seek,1
 seams,files,shared_write,Seams::files,58
-seams,game,call,SchedDeliver,3
+seams,game,call,SchedDeliver,2
 seams,game,call,SchedPublish,2
 seams,game,call,SimSearchSteps,1
 seams,game,shared_write,EconomySeam::UpdatePlayerEconomy,1

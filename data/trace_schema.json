@@ -1644,5 +1644,16 @@
       {"name": "kind", "size": 4, "kind": "scalar", "target": null},
       {"name": "data", "size": 4, "kind": "bytes", "target": null}
     ]
+  },
+  "targeting": {
+    "section": 38,
+    "fields": [
+      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
+      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
+      {"name": "weapon", "size": 4, "kind": "scalar", "target": null},
+      {"name": "target", "size": 4, "kind": "ref", "target": "unit"},
+      {"name": "pos", "size": 12, "kind": "bytes", "target": null},
+      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
+    ]
   }
 }

@@ -193,8 +193,36 @@ WIND_METEORS_EVENTS = [
     ("windMeteors[1].data", "hex:" + bytes(range(32)).hex()),
 ]
 
+TARGETING_EVENTS = [
+    ("targeting.count", "0x00000002"),
+    ("targeting[0].kind", "0x00000061"),
+    ("targeting[0].unit", "units:3"),
+    ("targeting[0].weapon", "0x00000001"),
+    ("targeting[0].target", "null"),
+    ("targeting[0].pos", "hex:" + bytes(range(12)).hex()),
+    ("targeting[0].outcome", "0x00000001"),
+    ("targeting[1].kind", "0x00000070"),
+    ("targeting[1].unit", "heap"),
+    ("targeting[1].weapon", "0x00000000"),
+    ("targeting[1].target", "units:5"),
+    ("targeting[1].pos", "hex:" + bytes(12).hex()),
+    ("targeting[1].outcome", "0x00000001"),
+]
+
 
 class DumpedOnlyTest(unittest.TestCase):
+    def test_targeting_events_after_the_features_events_are_skipped(self):
+        lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + SHARE_PACKETS
+        w = tr.Walker(RESULTS, lines)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(lines))
+
+    def test_an_empty_targeting_record_is_skipped(self):
+        w = tr.Walker(RESULTS, [("targeting.count", "0x00000000")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
+
     def test_wind_meteors_events_after_the_share_packets_are_skipped(self):
         lines = PATH_RESULTS + ECONOMY_EVENTS + SHARE_PACKETS + WIND_METEORS_EVENTS
         w = tr.Walker(RESULTS, lines)

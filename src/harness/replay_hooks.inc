@@ -398,57 +398,6 @@ unsigned short __stdcall RecFeaturesGetCellFeature(Cell* a0)
     return result;
 }
 
-Spot* __stdcall RecFeaturesPlaceFeature(Cell* a0, unsigned short a1, Vec3* a2, Rot16* a3, unsigned char a4)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_CELL, a0);
-    SlotScope scope(RSL_FEATURES_PLACEFEATURE, SUB_FEATURES, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "cell", ROK_CELL, a0);
-        ArgValue(s_call, "feature", a1);
-        ArgPending(s_call, "pos");
-        ArgPending(s_call, "rot");
-        ArgValue(s_call, "owner", a4);
-    }
-    Spot* result = s_inner_features->PlaceFeature(a0, a1, a2, a3, a4);
-    if (scope.Open()) {
-        ArgObject(s_tail, "result", ROK_SPOT, result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecFeaturesRemoveFeature(Cell* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_CELL, a0);
-    SlotScope scope(RSL_FEATURES_REMOVEFEATURE, SUB_FEATURES, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "cell", ROK_CELL, a0);
-        ArgValue(s_call, "flag", a1);
-    }
-    int result = s_inner_features->RemoveFeature(a0, a1);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecFeaturesReclaimFeature(Unit* a0, Vec3* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_FEATURES_RECLAIMFEATURE, SUB_FEATURES, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgPending(s_call, "pos");
-    }
-    int result = s_inner_features->ReclaimFeature(a0, a1);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
 unsigned short __stdcall RecFeaturesFindOrLoadFeatureType(char* a0)
 {
     ReplayRoots roots;
@@ -461,23 +410,6 @@ unsigned short __stdcall RecFeaturesFindOrLoadFeatureType(char* a0)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
-}
-
-void __stdcall RecFeaturesDamageFeature(Cell* a0, int a1, int a2, WeaponDef* a3)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_CELL, a0);
-    roots.Add(ROK_WEAPONDEF, a3);
-    SlotScope scope(RSL_FEATURES_DAMAGEFEATURE, SUB_FEATURES, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "cell", ROK_CELL, a0);
-        ArgValue(s_call, "x", a1);
-        ArgValue(s_call, "z", a2);
-        ArgObject(s_call, "weapon", ROK_WEAPONDEF, a3);
-    }
-    s_inner_features->DamageFeature(a0, a1, a2, a3);
-    if (scope.Open()) {
-    }
 }
 
 Vec3 __stdcall RecFeaturesGetFootprintCentre(Point16* a0, Feature* a1)
@@ -518,6 +450,97 @@ void __stdcall RecFeaturesLoadFeatures(HapiBank* a0)
     s_inner_features->LoadFeatures(a0);
     if (scope.Open()) {
     }
+}
+
+int __stdcall RecFeaturesApply(const FeaturesEvent* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FEATURES_APPLY, SUB_FEATURES, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "event");
+    }
+    int result = s_inner_features->Apply(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecFeaturesPlace(const FeaturesEvent* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FEATURES_PLACE, SUB_FEATURES, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "place");
+    }
+    int result = s_inner_features->Place(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecFeaturesFeatureTypeCount()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FEATURES_FEATURETYPECOUNT, SUB_FEATURES, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_features->FeatureTypeCount();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecFeaturesAnimateFeatureType(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FEATURES_ANIMATEFEATURETYPE, SUB_FEATURES, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "type", a0);
+    }
+    s_inner_features->AnimateFeatureType(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecFeaturesScanFeatureCell()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FEATURES_SCANFEATURECELL, SUB_FEATURES, roots);
+    if (scope.Open()) {
+    }
+    s_inner_features->ScanFeatureCell();
+    if (scope.Open()) {
+    }
+}
+
+int __stdcall RecFeaturesFirstFeatureSpot()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FEATURES_FIRSTFEATURESPOT, SUB_FEATURES, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_features->FirstFeatureSpot();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecFeaturesUpdateFeatureSpot(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FEATURES_UPDATEFEATURESPOT, SUB_FEATURES, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "spot", a0);
+    }
+    int result = s_inner_features->UpdateFeatureSpot(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
 }
 
 void __stdcall RecAiGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
@@ -3026,6 +3049,21 @@ void __stdcall RecUnitsUpdateUnit(Unit* a0)
     }
 }
 
+unsigned int __stdcall RecUnitsObjectStateSize(Object3do* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_OBJECT3DO, a0);
+    SlotScope scope(RSL_UNITS_OBJECTSTATESIZE, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
+    }
+    unsigned int result = s_inner_units->ObjectStateSize(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 void __stdcall RecPlayersUpdatePlayers()
 {
     ReplayRoots roots;
@@ -5117,21 +5155,27 @@ void HookSeams(const bool* on)
     if (on[SUB_FEATURES])
         s_rec_features.GetCellFeature = RecFeaturesGetCellFeature;
     if (on[SUB_FEATURES])
-        s_rec_features.PlaceFeature = RecFeaturesPlaceFeature;
-    if (on[SUB_FEATURES])
-        s_rec_features.RemoveFeature = RecFeaturesRemoveFeature;
-    if (on[SUB_FEATURES])
-        s_rec_features.ReclaimFeature = RecFeaturesReclaimFeature;
-    if (on[SUB_FEATURES])
         s_rec_features.FindOrLoadFeatureType = RecFeaturesFindOrLoadFeatureType;
-    if (on[SUB_FEATURES])
-        s_rec_features.DamageFeature = RecFeaturesDamageFeature;
     if (on[SUB_FEATURES])
         s_rec_features.GetFootprintCentre = RecFeaturesGetFootprintCentre;
     if (on[SUB_FEATURES])
         s_rec_features.SaveFeatures = RecFeaturesSaveFeatures;
     if (on[SUB_FEATURES])
         s_rec_features.LoadFeatures = RecFeaturesLoadFeatures;
+    if (on[SUB_FEATURES])
+        s_rec_features.Apply = RecFeaturesApply;
+    if (on[SUB_FEATURES])
+        s_rec_features.Place = RecFeaturesPlace;
+    if (on[SUB_FEATURES])
+        s_rec_features.FeatureTypeCount = RecFeaturesFeatureTypeCount;
+    if (on[SUB_FEATURES])
+        s_rec_features.AnimateFeatureType = RecFeaturesAnimateFeatureType;
+    if (on[SUB_FEATURES])
+        s_rec_features.ScanFeatureCell = RecFeaturesScanFeatureCell;
+    if (on[SUB_FEATURES])
+        s_rec_features.FirstFeatureSpot = RecFeaturesFirstFeatureSpot;
+    if (on[SUB_FEATURES])
+        s_rec_features.UpdateFeatureSpot = RecFeaturesUpdateFeatureSpot;
     if (on[SUB_AI] || on[SUB_TARGETING])
         s_rec_ai.GetVisibleEnemiesInRadius = RecAiGetVisibleEnemiesInRadius;
     if (on[SUB_AI])
@@ -5448,6 +5492,8 @@ void HookSeams(const bool* on)
         s_rec_units.UpdateObjectState = RecUnitsUpdateObjectState;
     if (on[SUB_UNITS])
         s_rec_units.UpdateUnit = RecUnitsUpdateUnit;
+    if (on[SUB_UNITS])
+        s_rec_units.ObjectStateSize = RecUnitsObjectStateSize;
     if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayers = RecPlayersUpdatePlayers;
     if (on[SUB_PLAYERS])

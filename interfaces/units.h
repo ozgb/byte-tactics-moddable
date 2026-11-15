@@ -24,7 +24,7 @@ class UnitTypeSet;
 // Major version of the units interface, changed when a slot is removed or its signature changes.
 #define UNITS_VERSION_MAJOR 1
 // Minor version of the units interface, changed when a slot is added.
-#define UNITS_VERSION_MINOR 8
+#define UNITS_VERSION_MINOR 9
 
 // Unit simulation.
 struct UnitsSeam {
@@ -146,6 +146,8 @@ struct UnitsSeam {
     void (__stdcall* UpdateObjectState)(UnitDrawView* unit);
     // Advances one unit for one tick, as UpdateAllUnits does for each unit of each player. Hooks: none.
     void (__stdcall* UpdateUnit)(Unit* unit);
+    // The bytes of the piece state of a 3DO model, which the caller allocates before it publishes the state to be built; a query. Hooks: none.
+    unsigned int (__stdcall* ObjectStateSize)(Object3do* model);
 };
 
 #endif

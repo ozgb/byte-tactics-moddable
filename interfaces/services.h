@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 12
+#define SERVICES_VERSION_MINOR 13
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -47,6 +47,9 @@ void __stdcall HarnessPathEvent(const PathEvent* event, const PathPoint* points,
 struct EconomyEvent;
 // In test mode, records an economy event as economy consumes or answers it, or an effect as economy publishes it, with its outcome, for the dump's economy events.
 void __stdcall HarnessEconomyEvent(const EconomyEvent* event, int outcome);
+struct FeaturesEvent;
+// In test mode, records a features event as features consumes or answers it, or an effect as features publishes it, with its outcome, for the dump's features events.
+void __stdcall HarnessFeaturesEvent(const FeaturesEvent* event, int outcome);
 // The modules that own an outbox or an inbox in the scheduler's router.
 enum SchedModule {
     // The engine itself, outside any module.
@@ -63,6 +66,8 @@ enum SchedModule {
     SCHED_FEATURES = 5,
     // Weapons.
     SCHED_WEAPONS = 6,
+    // Map.
+    SCHED_MAP = 7,
     // Wind and meteors (interfaces/wind_meteors.h).
     SCHED_WIND_METEORS = 8,
     // The number of modules.
@@ -81,6 +86,9 @@ struct WindMeteorsEffect;
 void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect);
 // In test mode, records a wind_meteors event as wind_meteors consumes it, or an effect as it publishes it, for the dump's wind_meteors events: size bytes of plain data whose first int is its kind.
 void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size);
+
+// Calls features' synchronous Place slot for a placement (an event of kind FEATURES_PLACE) after delivering features' pending inbox, records it, and returns its outcome, visible at once.
+int __stdcall ScheduleFeaturesPlace(const FeaturesEvent* place);
 
 // Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);

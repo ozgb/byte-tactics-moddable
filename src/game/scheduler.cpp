@@ -5,6 +5,7 @@
 #include "../../interfaces/services.h"
 #include "../network/player.h"
 #include "../../interfaces/economy.h"
+#include "../../interfaces/features.h"
 #include "../../interfaces/rand_stream.h"
 #include "../units/unit.h"
 #include "game.h"
@@ -156,6 +157,41 @@ void SchedUnitsPhase()
                 }
             }
         }
+    }
+}
+
+void SchedFeaturesPhase()
+{
+#if BT_ACCESS_LOG
+    AccessLogPassScope accessPass(ACCESS_PASS_FEATURES);
+#endif
+#if BT_ACCESS_LOG
+    {
+    AccessLogPassScope animPass(ACCESS_PASS_FEATURES_ANIM);
+#endif
+    SchedDeliver(SCHED_FEATURES);
+    int types = g_seams.features->FeatureTypeCount();
+    for (int k = 0; k < types; k++) {
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
+        g_seams.features->AnimateFeatureType(k);
+    }
+#if BT_ACCESS_LOG
+    AccessLogEntity();
+#endif
+    SchedDeliver(SCHED_FEATURES);
+    g_seams.features->ScanFeatureCell();
+#if BT_ACCESS_LOG
+    }
+#endif
+    int i = g_seams.features->FirstFeatureSpot();
+    while (i != -1) {
+#if BT_ACCESS_LOG
+        AccessLogEntity();
+#endif
+        SchedDeliver(SCHED_FEATURES);
+        i = g_seams.features->UpdateFeatureSpot(i);
     }
 }
 

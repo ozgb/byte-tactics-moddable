@@ -832,6 +832,14 @@ class LoadedSaveTest(unittest.TestCase):
         self.assertEqual(al.loaded_save(build, self.scenarios / "plain.txt", self.root, 5.0), {})
         self.assertEqual(len(self.calls), 1)
 
+    def test_a_defer_file_reaches_the_saving_scenario_too(self):
+        build = self.root / "build"
+        build.mkdir()
+        defer = self.root / "edges.defer"
+        with mock.patch.object(al, "play", self.fake_play):
+            al.loaded_save(build, self.scenarios / "loader.txt", self.root, 5.0, defer)
+        self.assertEqual(self.calls[0][1], {"accesslog.defer": defer})
+
     def test_run_plays_the_saving_scenario_before_the_loading_one(self):
         build = self.root / "build"
         build.mkdir()

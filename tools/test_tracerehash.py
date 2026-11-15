@@ -156,6 +156,24 @@ ECONOMY_EVENTS = [
     ("economy[0].account", "hex:" + bytes(range(48)).hex()),
 ]
 
+FEATURES_EVENTS = [
+    ("features.count", "0x00000001"),
+    ("features[0].kind", "0x00000020"),
+    ("features[0].flags", "0x00000003"),
+    ("features[0].x", "0x00000004"),
+    ("features[0].z", "0x00000005"),
+    ("features[0].feature", "0x00000006"),
+    ("features[0].owner", "0x0000000a"),
+    ("features[0].player", "0x00000000"),
+    ("features[0].unit", "null"),
+    ("features[0].value", "0x00000000"),
+    ("features[0].state", "heap"),
+    ("features[0].width", "0x00000002"),
+    ("features[0].height", "0x00000002"),
+    ("features[0].pos", "hex:" + bytes(range(12)).hex()),
+    ("features[0].rot", "hex:" + bytes(range(12)).hex()),
+    ("features[0].outcome", "0x00000001"),
+]
 
 SHARE_PACKETS = [
     ("packets.count", "0x00000001"),
@@ -207,6 +225,18 @@ class DumpedOnlyTest(unittest.TestCase):
         w.skip_dumped(tr.DUMPED_ONLY)
         self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
         self.assertEqual(w.pos, len(lines))
+
+    def test_features_events_between_the_economy_events_and_the_share_packets_are_skipped(self):
+        lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + SHARE_PACKETS
+        w = tr.Walker(RESULTS, lines)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(lines))
+
+    def test_an_empty_features_record_is_skipped(self):
+        w = tr.Walker(RESULTS, [("features.count", "0x00000000")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
 
     def test_an_empty_packet_record_is_skipped(self):
         w = tr.Walker(RESULTS, [("packets.count", "0x00000000")])

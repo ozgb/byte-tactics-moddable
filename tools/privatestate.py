@@ -24,7 +24,7 @@ the three globals. EXPOSED maps each of those fields to the log item that holds 
   * an item of EXPOSED has no read by pathfinding in any stored scenario: the writer shows state that the simulation never
     reads, a shadow field. data/shadow_field_allow.csv (item,reason) lists the ones that are 3.1c state the trace has always
     hashed, each with a reason; a row for an item that is read is stale.
-Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone) and economy.
+Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone), economy and features.
 Economy's unit accounts live in one allocation, "Economy region" (allocated by the engine in LoadBattleAssets, set up by EconomyInit), whose
 parts the log names `<allocation>.<part>` like pathfinding's: no subsystem but economy writes or reads one. The player accounts
 (`players[i].econ`, type UnitResources) stay in the state block and are read by others, so a `UnitResources::*` item is private for writes
@@ -38,6 +38,16 @@ fails. The wind fields of the Game record (WIND_FIELDS, named in the log by the 
 for writes only, and any writer but wind_meteors fails. Like every check here it sees the windows of a tick only, so it holds the wind to
 wind_meteors inside the tick: at load the engine still writes windCounter and windSpeedDenominator (LoadBattleAssets) and the map loader
 the limits windSpeedMin and windSpeedMax (MapSettings), which the log does not cover.
+
+Features' state stays in the state block, hashed and read by others as a view, and is written by features alone, like the player accounts: the
+links of the feature animation pool's spots (the 0x800 entries of 0x30 bytes allocated by InitFeatureAnimPool as "FEATURE ANIM DATA", which the log
+names `FeatureAnimEntry::field` after the type of an entry: `next` and `prev`), the feature fields of a map cell (`Cell::feature` and `Cell::spot`, the
+union with `Cell::offsetX` and `Cell::offsetY`, but not `Cell::flags`, which other subsystems share) and the scan index (`Game::scanIndex`, the item
+`scanIndex`), which the owner lists name as exact items (`write_items`). The rest of a spot is not checked: it holds the spot's animation cursors
+(`Spot::anim` and `Spot::shadow`), which the GAF helpers of src/graphics/gaf.cpp step and read for features and for drawing, and the log names those
+helpers' subsystems (game and presentation) as the writers. The cells are in the log one allocation ("PLOT MEMORY") that it names no field
+of, so the Cell items match only once it does; the others match today. Any writer but features fails, which is what makes every placement, removal,
+damage and reclaim reach them through the scheduler's events.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
@@ -72,6 +82,9 @@ REGION_ALLOCATION = re.compile(r"AISearch region")
 REGION_FUNCTION = "LoadBattleAssets"
 
 
+FEATURES_WRITE_ITEMS = ("scanIndex", "Cell::feature", "Cell::spot", "Cell::offsetX", "Cell::offsetY", "FeatureAnimEntry::next", "FeatureAnimEntry::prev")
+
+
 @dataclass(frozen=True)
 class Owner:
     """A subsystem with private state: the items of its types, its region root and its allocation, the types of items private for writes only, and the named items private for reads and writes (items) or for writes only (write_items)."""
@@ -92,7 +105,8 @@ WIND_FIELDS = ("windCounter", "windSpeedDenominator", "windX", "windY", "windZ",
 NO_ALLOCATION = re.compile(r"(?!)")
 OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
           Owner("economy", "", (), re.compile(r"Economy region"), ("UnitResources",)),
-          Owner("wind_meteors", "", (), NO_ALLOCATION, (), METEOR_GLOBALS, WIND_FIELDS))
+          Owner("wind_meteors", "", (), NO_ALLOCATION, (), METEOR_GLOBALS, WIND_FIELDS),
+          Owner("features", "", (), NO_ALLOCATION, write_items=FEATURES_WRITE_ITEMS))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",
@@ -278,7 +292,8 @@ def main() -> int:
     if problems:
         print("\n".join(problems))
         return 1
-    print("privatestate: the regions are private to %s in the stored summaries and every field the trace hashes is read" % ", ".join(o.name for o in OWNERS))
+    print("privatestate: the state of %s is private, or written only by its owner, in the stored summaries and every field the trace hashes is read"
+          % ", ".join(o.name for o in OWNERS))
     return 0
 
 

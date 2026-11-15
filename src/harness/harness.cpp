@@ -27,6 +27,7 @@
 #include "block_scan.h"
 #include "path_results.h"
 #include "economy_results.h"
+#include "features_results.h"
 #include "wind_meteors_results.h"
 #include "../state/block.h"
 #if BT_ACCESS_LOG
@@ -3016,6 +3017,83 @@ static void VisitEconomyResults()
     }
 }
 
+static FeaturesResults s_featuresResults;
+static bool s_featuresResultsLost;
+
+void __stdcall HarnessFeaturesEvent(const FeaturesEvent* event, int outcome)
+{
+    if (!HarnessTestMode() || s_trace == nullptr)
+        return;
+    if (!FeaturesResultsAdd(&s_featuresResults, event, outcome))
+        s_featuresResultsLost = true;
+}
+
+static void DumpHexBytes(const void* bytes, unsigned size)
+{
+    fputs("hex:", s_dump);
+    for (unsigned b = 0; b < size; b++)
+        fprintf(s_dump, "%02x", ((const unsigned char*)bytes)[b]);
+    fputc('\n', s_dump);
+}
+
+static void VisitFeaturesResults()
+{
+    if (s_featuresResultsLost)
+        Fail("testmode: no memory for the features events\n");
+    for (unsigned k = 0; k < s_featuresResults.count; k++) {
+        FeaturesResult* r = &s_featuresResults.items[k];
+        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
+    }
+    if (!s_dumpNow)
+        return;
+    char path[64];
+    DumpPrefix("features.count");
+    fprintf(s_dump, "0x%08x\n", s_featuresResults.count);
+    for (unsigned k = 0; k < s_featuresResults.count; k++) {
+        const FeaturesResult* r = &s_featuresResults.items[k];
+        const FeaturesEvent* e = &r->event;
+        static const char* const kBefore[] = { "kind", "flags", "x", "z", "feature", "owner" };
+        const unsigned before[] = { (unsigned)e->kind, (unsigned)e->flags, (unsigned)e->x, (unsigned)e->z,
+                                    (unsigned)e->feature, (unsigned)e->owner };
+        for (int f = 0; f < 6; f++) {
+            sprintf(path, "features[%u].%s", k, kBefore[f]);
+            DumpPrefix(path);
+            fprintf(s_dump, "0x%08x\n", before[f]);
+        }
+        sprintf(path, "features[%u].unit", k);
+        DumpPrefix(path);
+        if (r->unitTag == 0)
+            fputs("null", s_dump);
+        else if (r->unitTag == TT_HEAP)
+            fputs("heap", s_dump);
+        else
+            fprintf(s_dump, "%s:%u", s_targetNames[r->unitTag], r->unitId);
+        fputc('\n', s_dump);
+        sprintf(path, "features[%u].value", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->value);
+        sprintf(path, "features[%u].state", k);
+        DumpPrefix(path);
+        fputs(e->state == 0 ? "null\n" : "heap\n", s_dump);
+        static const char* const kSize[] = { "width", "height" };
+        const unsigned size[] = { (unsigned)e->width, (unsigned)e->height };
+        for (int f = 0; f < 2; f++) {
+            sprintf(path, "features[%u].%s", k, kSize[f]);
+            DumpPrefix(path);
+            fprintf(s_dump, "0x%08x\n", size[f]);
+        }
+        sprintf(path, "features[%u].pos", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->pos, sizeof e->pos);
+        sprintf(path, "features[%u].rot", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->rot, sizeof e->rot);
+        sprintf(path, "features[%u].outcome", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
+    }
+}
+
 static WindMeteorsResults s_windMeteorsResults;
 static bool s_windMeteorsResultsLost;
 
@@ -3965,6 +4043,7 @@ static void VisitWorld()
     VisitPathResults();
     VisitEconomyResults();
     VisitWindMeteorsResults();
+    VisitFeaturesResults();
 }
 
 enum {
@@ -4653,6 +4732,7 @@ void HarnessPhase(int phase)
     if (phase == 7) {
         PathResultsClear(&s_pathResults);
         EconomyResultsClear(&s_economyResults);
+        FeaturesResultsClear(&s_featuresResults);
         WindMeteorsResultsClear(&s_windMeteorsResults);
         fflush(s_trace);
         if (s_sound != nullptr)

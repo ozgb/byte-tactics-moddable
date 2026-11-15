@@ -264,6 +264,18 @@ class SchemaJsonTest(unittest.TestCase):
         self.assertEqual([f["name"] for f in packets["fields"]], ["type", "subtype", "from", "to", "amount"])
         self.assertEqual({(f["size"], f["kind"], f["target"]) for f in packets["fields"]}, {(4, "scalar", None)})
 
+    def test_features_section_matches_the_harness_and_names_its_fields_in_dump_order(self):
+        features = self.model["features"]
+        header = (ts.ROOT / "src/harness/features_results.h").read_text()
+        constants = dict(re.findall(r"(FEATURES_RESULT_\w+) = (\d+)", header))
+        self.assertEqual(features["section"], int(constants["FEATURES_RESULT_SECTION"]))
+        self.assertEqual([f["name"] for f in features["fields"]],
+                         ["kind", "flags", "x", "z", "feature", "owner", "unit", "value", "state",
+                          "width", "height", "pos", "rot", "outcome"])
+        targets = {t["name"] for t in self.model["targets"]}
+        for f in features["fields"]:
+            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
+
     def test_wind_meteors_section_names_its_fields_in_dump_order(self):
         wind_meteors = self.model["windMeteors"]
         self.assertEqual(wind_meteors["section"], 37)

@@ -29,6 +29,7 @@ units,players,Unit::yFraction,units,g1,88,equal,87,0,0
 units,targeting,Unit::activateFlags,players,g2,88,equal,87,0,0
 units,targeting,Unit::activateFlags,units,g2,88,equal,87,0,0
 units,weapons,FeatureAnimEntry::bytes_10,units,g3,88,equal,87,0,1688
+units,weapons,Vec3::x,projectiles,g7,88,equal,87,0,0
 weapons,ai,Unit::lastDamageType,features,g1,88,equal,87,0,0
 weapons,orders,Unit::attacker,units,g3,88,equal,87,0,1688
 weapons,orders,Unit::field_1e,units,g3,88,equal,87,0,1688

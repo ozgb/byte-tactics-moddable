@@ -87,8 +87,6 @@ Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 #include "../units/unit_commands.h"
 #include "../units/unit_motion.h"
 
-Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature, Vec3* pos, Rot16* rot, unsigned char owner);
-
 #include "../map/line_of_sight.h"
 #include "../game/share_commands.h"
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
@@ -130,6 +128,11 @@ Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 static void __stdcall UpdateAllUnits(void)
 {
     SchedUnitsPhase();
+}
+
+static void __stdcall UpdateFeatures(void)
+{
+    SchedFeaturesPhase();
 }
 
 static void __stdcall UpdatePlayers(void)
@@ -230,11 +233,6 @@ static void __stdcall SetWeaponTargetPosNative(Unit* unit, Vec3* pos, int weapon
 static int __stdcall GetWeaponTargetPosNative(Unit* unit, Vec3* pos, int weapon)
 {
     return GetWeaponTargetPos(unit, (Vec3*)pos, weapon);
-}
-
-static void __stdcall DamageFeatureNative(Cell* cell, int x, int z, WeaponDef* weapon)
-{
-    DamageFeature(cell, x, z, weapon);
 }
 
 static int __stdcall GetGroundHeightNative(Vec3* pos)
@@ -699,14 +697,17 @@ void InstallNativeSeams()
     s_features.PlaceMissionFeatures = PlaceMissionFeatures;
     s_features.StampFeatureMetal = StampFeatureMetal;
     s_features.GetCellFeature = GetCellFeature;
-    s_features.PlaceFeature = PlaceFeature;
-    s_features.RemoveFeature = RemoveFeature;
-    s_features.ReclaimFeature = ReclaimFeature;
     s_features.FindOrLoadFeatureType = FindOrLoadFeatureType;
-    s_features.DamageFeature = DamageFeatureNative;
     s_features.GetFootprintCentre = GetFootprintCentre;
     s_features.SaveFeatures = SaveFeatures;
     s_features.LoadFeatures = LoadFeatures;
+    s_features.Apply = ApplyEvent;
+    s_features.Place = PlaceEvent;
+    s_features.FeatureTypeCount = FeatureTypeCount;
+    s_features.AnimateFeatureType = AnimateFeatureType;
+    s_features.ScanFeatureCell = ScanFeatureCell;
+    s_features.FirstFeatureSpot = FirstFeatureSpot;
+    s_features.UpdateFeatureSpot = UpdateFeatureSpot;
     s_targeting.SetWeaponTargetUnit = SetWeaponTargetUnitNative;
     s_targeting.SetWeaponTargetPos = SetWeaponTargetPosNative;
     s_targeting.ClearWeaponTarget = ClearWeaponTarget;
@@ -935,6 +936,7 @@ void InstallNativeSeams()
     s_units.FreeObjectState = FreeObjectState;
     s_units.UpdateObjectState = UpdateObjectState;
     s_units.UpdateUnit = UpdateUnit;
+    s_units.ObjectStateSize = ObjectStateSize;
     s_orders.ReattachFxToUnit = ReattachFxToUnitNative;
     s_orders.SerializeOrderToSave = SerializeOrderToSaveNative;
     s_orders.AddBeCarriedOrder = AddBeCarriedOrder;

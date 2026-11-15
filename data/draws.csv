@@ -1,9 +1,9 @@
 pass,stream,subsystem,function,entities,draws_min,draws_max,ticks,start_state,evidence,example
-features,rng.crtHoldrand,features,UpdateFeatures,56,2,2,6574,fixed,,ui-keys@99
+features,rng.crtHoldrand,features,UpdateFeatureSpot,56,2,2,6574,fixed,,ui-keys@99
 features,rng.parkMiller,ai,ReactToAttack,1,1,1,1,fixed,,orders-guard-attacked@270
-features,rng.parkMiller,features,SpreadFire,2,1,8,157,depends-on-earlier,FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;SimEventsCreate: GameAllocIgnoreTag SimEventQueue;unresolved:image,edges-targeting-lead@261
-features,rng.parkMiller,features,StartFeatureBurning,2,1,5,118,depends-on-earlier,FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;SimEventsCreate: GameAllocIgnoreTag SimEventQueue;unresolved:image,edges-targeting-lead@261
-features.anim,rng.parkMiller,features,UpdateFeatures,1,1,1,5709,fixed,,duel-great-divide@4
+features,rng.parkMiller,features,SpreadFire,2,1,8,157,depends-on-earlier,FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;unresolved:image;SimEventsCreate: GameAllocIgnoreTag SimEventQueue,edges-targeting-lead@261
+features,rng.parkMiller,features,StartFeatureBurning,2,1,5,118,depends-on-earlier,FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;unresolved:image;SimEventsCreate: GameAllocIgnoreTag SimEventQueue,edges-targeting-lead@261
+features.anim,rng.parkMiller,features,ScanFeatureCell,1,1,1,5709,fixed,,duel-great-divide@4
 meteors,rng.crtHoldrand,wind_meteors,UpdateMeteors,1,2,6,551,start-state,,hailstorm-los-off@1
 players,rng.parkMiller,ai,??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,2,1,2,60,depends-on-earlier,unresolved:block;unresolved:image;Unit::flags;unknown_1b8e,mission-kill-of-type@90
 players,rng.parkMiller,ai,??0SpatialTimer@@QAE@PAVSquadManager@@PAX@Z,3,1,1,13898,fixed,,combat-deaths@30

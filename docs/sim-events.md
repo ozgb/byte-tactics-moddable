@@ -300,7 +300,7 @@ Flags: none.
 
 Recorded once for each detonation of a projectile, with the shake magnitude of the weapon definition as both offsets and its shake duration as the strength, whatever the values (they may be 0). A detonation records nothing when the network game option that disables the sea level trigger is set, the impact cell is below sea level and no unit was hit.
 
-Phases: net (0), units (1), projectiles (2), features (5), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation adds the shake to the screen's shake, unless the player turned screen shake off.
 
@@ -662,7 +662,7 @@ Flags: none.
 
 Recorded when a feature starts burning (sound name 1), at the position of the feature's cell: x and z are the cell coordinates shifted left by 20 and y is the cell's height shifted left by 16.
 
-Phases: net (0), units (1), projectiles (2), features (5), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation plays the named sound at the position with the checks of `SIM_EVENT_SOUND_AT`.
 

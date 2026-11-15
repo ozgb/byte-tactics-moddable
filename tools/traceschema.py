@@ -8,7 +8,8 @@ per table the fields in hash order and the plan the hash walks, the masks with t
 and the fields left out of the hash with their reasons. Its "results" entry is the record a dump
 holds for each path event the host delivers (section 32), in dump order; its "economy" entry is the
 record for each economy event (section 33), with the account that only a LOAD adds; its "packets" entry
-is the record for each resource share packet the step sends (section 35); its "windMeteors" entry is the record for each wind_meteors
+is the record for each resource share packet the step sends (section 35); its "features" entry is the
+record for each features event (section 36); its "windMeteors" entry is the record for each wind_meteors
 event consumed or effect published (section 37), the kind and then the record's bytes after it. No row hashes any of them.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
@@ -915,6 +916,23 @@ ECONOMY_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("value", 4, "scalar", None),
     ("outcome", 4, "scalar", None),
 ]
+FEATURES_SECTION = 36
+FEATURES_FIELDS: list[tuple[str, int, str, str | None]] = [
+    ("kind", 4, "scalar", None),
+    ("flags", 4, "scalar", None),
+    ("x", 4, "scalar", None),
+    ("z", 4, "scalar", None),
+    ("feature", 4, "scalar", None),
+    ("owner", 4, "scalar", None),
+    ("unit", 4, "ref", "unit"),
+    ("value", 4, "scalar", None),
+    ("state", 4, "handle", None),
+    ("width", 4, "scalar", None),
+    ("height", 4, "scalar", None),
+    ("pos", 12, "bytes", None),
+    ("rot", 12, "bytes", None),
+    ("outcome", 4, "scalar", None),
+]
 PACKETS_SECTION = 35
 PACKET_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("type", 4, "scalar", None),
@@ -1326,6 +1344,11 @@ def render_json(model):
     out.append('    "fields": %s,' % many(economy["fields"], "    "))
     out.append('    "account": %s' % one(economy["account"]))
     out.append("  },")
+    features = model["features"]
+    out.append('  "features": {')
+    out.append('    "section": %d,' % features["section"])
+    out.append('    "fields": %s' % many(features["fields"], "    "))
+    out.append("  },")
     packets = model["packets"]
     out.append('  "packets": {')
     out.append('    "section": %d,' % packets["section"])
@@ -1499,6 +1522,9 @@ def generate():
                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
                                    for n, size, kind, target in ECONOMY_FIELDS],
                         "account": {"kind": ECONOMY_LOAD_KIND, "size": 4 * ECONOMY_ACCOUNT_WORDS}}
+    model["features"] = {"section": FEATURES_SECTION,
+                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
+                                    for n, size, kind, target in FEATURES_FIELDS]}
     model["packets"] = {"section": PACKETS_SECTION,
                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
                                    for n, size, kind, target in PACKET_FIELDS]}

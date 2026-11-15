@@ -20,6 +20,7 @@ void SchedBeginTick();
 void SchedPhaseBoundary();
 void SchedEndTick();
 void SchedUnitsPhase();
+void SchedFeaturesPhase();
 void SchedPlayersPhase(RandStream stream);
 void SchedWindPhase(RandStream stream);
 void SchedMeteorsPhase();

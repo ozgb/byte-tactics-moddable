@@ -87,6 +87,7 @@ struct Mover {
 #include "../map/feature.h"
 
 #include "../game/game.h"
+#include "../game/features_events.h"
 
 #include "path_order_attach.h"
 
@@ -1757,7 +1758,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
         }
         return 2;
     case 4:
-        g_seams.features->ReclaimFeature(unit, &order->pos);
+        FeaturesPublishReclaim(SCHED_ORDERS, unit, &order->pos);
         return 5;
     }
     return 7;

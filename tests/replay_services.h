@@ -466,6 +466,14 @@ void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect)
     (void)r;
 }
 
+int __stdcall ScheduleFeaturesPlace(const FeaturesEvent* place)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_FEATURES_PLACE);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
 void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)
 {
     ReplayText t;

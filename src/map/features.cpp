@@ -99,6 +99,7 @@ struct Model {
 #include "../game/game.h"
 #include "../state/sim_effects.h"
 #include "../../interfaces/services.h"
+#include "../../interfaces/features.h"
 #include "../state/sim_globals.h"
 #pragma pack(pop)
 
@@ -210,6 +211,38 @@ void StampFeatureMetal(void)
     }
 }
 
+static FeaturesEvent EffectOf(int kind)
+{
+    FeaturesEvent effect;
+    memset(&effect, 0, sizeof(effect));
+    effect.kind = kind;
+    effect.owner = 10;
+    return effect;
+}
+
+static void PublishEffect(const FeaturesEvent& effect)
+{
+    HarnessFeaturesEvent(&effect, 1);
+    SchedPublish(SCHED_FEATURES, &effect, sizeof(effect));
+}
+
+static void FreeState(unsigned int state)
+{
+    FeaturesEvent effect = EffectOf(FEATURES_EFFECT_FREE_STATE);
+    effect.state = state;
+    PublishEffect(effect);
+}
+
+static void RefreshPassMaps(Point16 at, Point16 footprint)
+{
+    FeaturesEvent effect = EffectOf(FEATURES_EFFECT_PASS_MAPS);
+    effect.x = at.x;
+    effect.z = at.y;
+    effect.width = footprint.x;
+    effect.height = footprint.y;
+    PublishEffect(effect);
+}
+
 // FUNCTION: 0x422170
 void FreeFeaturePool()
 {
@@ -219,7 +252,7 @@ void FreeFeaturePool()
         while (idx != -1) {
             Spot* e = &g_game->pool.entries[idx];
             if (!(g_game->features[e->feature].flags & 1))
-                g_seams.units->FreeObjectState((ModelState*)e->state.get());
+                FreeState(e->state.offset);
             idx = e->prev;
         }
     }
@@ -713,7 +746,12 @@ void __stdcall SpreadFire(Feature* f, Point16* cell)
     }
     if (f->burnweapon) {
         Vec3 pos = GetFootprintCentre(cell, f);
-        g_seams.weapons->ApplyAreaDamageAt((WeaponDef*)f->burnweapon.get(), &pos);
+        FeaturesEvent fire = EffectOf(FEATURES_EFFECT_AREA_DAMAGE);
+        fire.value = (int)((WeaponDef*)f->burnweapon.get() - g_game->weapons);
+        fire.pos[0] = pos.x;
+        fire.pos[1] = pos.y;
+        fire.pos[2] = pos.z;
+        PublishEffect(fire);
     }
 }
 
@@ -775,7 +813,12 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
             spot->rot = *rot;
         else
             memset(&spot->rot, 0, sizeof(spot->rot));
-        spot->state = (SpotState*)g_seams.units->CreateObjectState((Object3do *)f->object);
+        unsigned int size = g_seams.units->ObjectStateSize((Object3do*)f->object);
+        spot->state = (SpotState*)SimAllocTagged("Object State", size);
+        FeaturesEvent init = EffectOf(FEATURES_EFFECT_INIT_STATE);
+        init.state = spot->state.offset;
+        init.feature = feature;
+        PublishEffect(init);
         cell->feature = feature;
         cell->spot = i;
         cell->flag0 = 1;
@@ -808,7 +851,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
     Point16 p2;
     p2.x = index % g_game->width;
     p2.y = index / g_game->width;
-    g_seams.map->RefreshAllPassMaps(p2, f->footprint);
+    RefreshPassMaps(p2, f->footprint);
     return spot;
 }
 
@@ -850,33 +893,22 @@ static inline SmokePos SmokeAt(Spot* spot, Feature* f)
     p.y.f.whole += ((unsigned short)frame->yOffset - Rand(h >> 1)) * 2 - ((unsigned short)(h >> 2) << 1);
     return p;
 }
-#if BT_ACCESS_LOG
-#include "../../lib/accesslog/access_log.h"
-#endif
-
-// FUNCTION: 0x424050
-void __stdcall UpdateFeatures()
+int __stdcall FeatureTypeCount()
 {
-#if BT_ACCESS_LOG
-    AccessLogPassScope accessPass(ACCESS_PASS_FEATURES);
-#endif
-#if BT_ACCESS_LOG
-    {
-    AccessLogPassScope animPass(ACCESS_PASS_FEATURES_ANIM);
-#endif
+    return g_game->featureCount;
+}
+
+void __stdcall AnimateFeatureType(int k)
+{
     Feature* types = g_game->features;
-    for (int k = 0; k < g_game->featureCount; k++) {
-#if BT_ACCESS_LOG
-        AccessLogEntity();
-#endif
-        if (types[k].animating) {
-            StepGafSequence(&types[k].anim);
-            StepGafSequence(&types[k].shadowAnim);
-        }
+    if (types[k].animating) {
+        StepGafSequence(&types[k].anim);
+        StepGafSequence(&types[k].shadowAnim);
     }
-#if BT_ACCESS_LOG
-    AccessLogEntity();
-#endif
+}
+
+void __stdcall ScanFeatureCell()
+{
     if (--g_game->scanIndex < 0) {
         g_game->scanIndex = g_game->width * g_game->height - 1;
     } else {
@@ -894,76 +926,77 @@ void __stdcall UpdateFeatures()
             }
         }
     }
-#if BT_ACCESS_LOG
-    }
-#endif
+}
+
+int __stdcall FirstFeatureSpot()
+{
+    return g_game->pool.usedHead;
+}
+
+// FUNCTION: 0x424050
+int __stdcall UpdateFeatureSpot(int i)
+{
     int smoke = (unsigned int)g_game->ticks % 3 == 0;
-    int i = g_game->pool.usedHead;
-    while (i != -1) {
-#if BT_ACCESS_LOG
-        AccessLogEntity();
-#endif
-        Spot* spot = &g_game->pool.entries[i];
-        Feature* f = &g_game->features[spot->feature];
-        int next = spot->prev;
-        if (!f->noobject) {
-            if (Vec3NonZero(&spot->vel)) {
-                spot->pos += spot->vel;
-                int ground = g_seams.map->GetCellMeanHeight(&spot->pos) << 16;
-                if (spot->pos.y <= ground) {
-                    spot->pos.y = ground;
-                    spot->vel = FeatureVec3(0, 0, 0);
-                } else if (spot->pos.y < g_game->seaLevel << 16) {
-                    spot->vel.x = 0;
-                    spot->vel.y = -0x2ccc;
-                    spot->vel.z = 0;
-                } else {
-                    spot->vel.y -= g_game->gravity;
-                }
+    Spot* spot = &g_game->pool.entries[i];
+    Feature* f = &g_game->features[spot->feature];
+    int next = spot->prev;
+    if (!f->noobject) {
+        if (Vec3NonZero(&spot->vel)) {
+            spot->pos += spot->vel;
+            int ground = g_seams.map->GetCellMeanHeight(&spot->pos) << 16;
+            if (spot->pos.y <= ground) {
+                spot->pos.y = ground;
+                spot->vel = FeatureVec3(0, 0, 0);
+            } else if (spot->pos.y < g_game->seaLevel << 16) {
+                spot->vel.x = 0;
+                spot->vel.y = -0x2ccc;
+                spot->vel.z = 0;
             } else {
-                MoveFeatureSpot(i, &g_game->pool.restHead);
-            }
-        } else if (spot->flags & 1) {
-            if (smoke) {
-                SmokePos q = SmokeAt(spot, f);
-                RecordWhiteSmoke(Vec3{q.x.value, q.y.value, q.z.value}, 5);
-            }
-            StepGafSequence(&spot->anim);
-            if (spot->flags & 4)
-                StepGafSequence(&spot->shadow);
-            if (spot->anim.src == 0) {
-                BurnOut(spot);
-            } else if (spot->timer > 0 && !(spot->flags & 8)) {
-                if (--spot->timer == 0)
-                    SpreadFire(f, &spot->cell);
+                spot->vel.y -= g_game->gravity;
             }
         } else {
-            StepGafSequence(&spot->anim);
-            if (spot->flags & 4)
-                StepGafSequence(&spot->shadow);
-            if (spot->anim.src == 0)
-                ReplaceFeatureWithDead(spot->cell.x, spot->cell.y, 0);
+            MoveFeatureSpot(i, &g_game->pool.restHead);
         }
-        i = next;
+    } else if (spot->flags & 1) {
+        if (smoke) {
+            SmokePos q = SmokeAt(spot, f);
+            RecordWhiteSmoke(Vec3{q.x.value, q.y.value, q.z.value}, 5);
+        }
+        StepGafSequence(&spot->anim);
+        if (spot->flags & 4)
+            StepGafSequence(&spot->shadow);
+        if (spot->anim.src == 0) {
+            BurnOut(spot);
+        } else if (spot->timer > 0 && !(spot->flags & 8)) {
+            if (--spot->timer == 0)
+                SpreadFire(f, &spot->cell);
+        }
+    } else {
+        StepGafSequence(&spot->anim);
+        if (spot->flags & 4)
+            StepGafSequence(&spot->shadow);
+        if (spot->anim.src == 0)
+            ReplaceFeatureWithDead(spot->cell.x, spot->cell.y, 0);
     }
+    return next;
 }
 
 // FUNCTION: 0x4244b0
-void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
+int __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
 {
     if (!(g_game->uiOptionFlags_37f2f_1 & 8))
-        return;
+        return 0;
     if (cell->feature >= 0xfffb)
-        return;
+        return 0;
     Feature* f = &g_game->features[cell->feature];
     if (f->indestructible)
-        return;
+        return 0;
     int send;
     int killed = 0;
     if (g_seams.map->GetGameType(g_game->net) == 3) {
         if (!(g_game->players[g_game->playerIndex].info->flags_97 & 1)) {
             g_seams.network->SendFeatureHit(weapon, x, z);
-            return;
+            return 0;
         }
         send = 1;
     } else {
@@ -975,9 +1008,9 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
         if (!f->noobject) {
             Spot* s = &((Spot *)g_game->spots.get())[cell->spot];
             if (s->x != x)
-                return;
+                return 0;
             if (s->z != z)
-                return;
+                return 0;
             s->damage += weapon->damage;
             if (s->damage >= f->damage) {
                 KillFeature(s->x, s->z, 0);
@@ -995,6 +1028,7 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
     }
     if (send && killed)
         g_seams.network->SendFeatureKilled(x, z);
+    return killed;
 }
 
 static inline void ClearCell(Cell* c)
@@ -1015,7 +1049,7 @@ int __stdcall RemoveFeature(Cell* cell, int flag)
     if (cell->flags & 1) {
         Spot* spot = &((Spot *)g_game->spots.get())[cell->spot];
         if (!(f->flags16 & 1)) {
-            g_seams.units->FreeObjectState((ModelState*)spot->state.get());
+            FreeState(spot->state.offset);
             spot->state = 0;
         }
         MoveFeatureSpot(cell->spot, &g_game->pool.freeHead);
@@ -1032,7 +1066,7 @@ int __stdcall RemoveFeature(Cell* cell, int flag)
     Point16 p;
     p.x = index % g_game->width;
     p.y = index / g_game->width;
-    g_seams.map->RefreshAllPassMaps(p, f->footprint);
+    RefreshPassMaps(p, f->footprint);
     return 1;
 }
 
@@ -1046,6 +1080,46 @@ void RemoveAllFeatures(void)
             RemoveFeature(c, 1);
         }
     }
+}
+
+static Cell* EventCell(const FeaturesEvent* e)
+{
+    return &g_game->cells[e->z * g_game->width + e->x];
+}
+
+int __stdcall PlaceEvent(const FeaturesEvent* e)
+{
+    Vec3 pos = FeatureVec3(e->pos[0], e->pos[1], e->pos[2]);
+    Rot16 rot;
+    rot.x = (short)e->rot[0];
+    rot.y = (short)e->rot[1];
+    rot.z = (short)e->rot[2];
+    Spot* spot = PlaceFeature(EventCell(e), (unsigned short)e->feature, (e->flags & FEATURES_HAS_POS) ? &pos : nullptr,
+                              (e->flags & FEATURES_HAS_ROT) ? &rot : nullptr, (unsigned char)e->owner);
+    if (spot != nullptr && (e->flags & FEATURES_SINK)) {
+        spot->vel.y = -11468;
+        spot->vel.z = 0;
+    }
+    return spot != nullptr;
+}
+
+int __stdcall ApplyEvent(const FeaturesEvent* e)
+{
+    switch (e->kind) {
+    case FEATURES_PLACE:
+        return PlaceEvent(e);
+    case FEATURES_REMOVE:
+        return RemoveFeature(EventCell(e), e->value);
+    case FEATURES_DAMAGE:
+        return DamageFeature(EventCell(e), e->x, e->z, &g_game->weapons[e->value]);
+    case FEATURES_RECLAIM: {
+        Ref<Unit> unit;
+        unit.offset = e->unit;
+        Vec3 pos = FeatureVec3(e->pos[0], e->pos[1], e->pos[2]);
+        return ReclaimFeature(unit.get(), &pos);
+    }
+    }
+    return 0;
 }
 
 // FUNCTION: 0x424890

@@ -340,7 +340,6 @@ class TargetingForms(unittest.TestCase):
         slots = model["subsystems"]["targeting"]["slots"]
         pos = [a for a in slots["GetWeaponTargetPos"]["args"] if a["mode"] == "struct"][0]
         self.assertEqual((pos["dir"], pos["when"]), ("out", "result != 0"))
-        self.assertEqual([a["dir"] for a in slots["SetWeaponTargetPos"]["args"] if a["mode"] == "struct"], ["in"])
 
     def test_a_conditional_out_struct_is_recorded_only_when_the_result_is_nonzero(self):
         files, _, _ = self.generated()
@@ -805,7 +804,7 @@ class StructForms(unittest.TestCase):
 
     def targeting(self, **pos):
         ann = annotations()
-        ann["subsystems"]["targeting"]["slots"]["SetWeaponTargetPos"]["args"]["pos"] = dict({"mode": "struct", "kind": "Vec3", "dir": "in"}, **pos)
+        ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"] = dict({"mode": "struct", "kind": "Vec3", "dir": "in"}, **pos)
         return ann
 
     def test_a_nullable_struct_is_recorded_as_null_and_replayed_as_a_null_pointer(self):
@@ -813,10 +812,10 @@ class StructForms(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertIn('ArgStruct(s_call, "a", "pos", ROK_VEC3, a1);', files[rs.HOOKS_H])
         runner = files[rs.SLOTS_H]
-        body = runner[runner.index("void Run_targeting_SetWeaponTargetPos"):]
+        body = runner[runner.index("void Run_targeting_GetWeaponTargetPos"):]
         body = body[:body.index("\n}\n")]
         self.assertIn('Vec3* p1 = (Vec3*)ParseStructOpt("pos", ROK_VEC3, &p1_value);', body)
-        self.assertIn("g_seams.targeting->SetWeaponTargetPos(p0, p1, p2)", body)
+        self.assertIn("g_seams.targeting->GetWeaponTargetPos(p0, p1, p2)", body)
 
     def test_a_weapon_argument_is_a_root_and_is_resolved_by_the_runner(self):
         weapon = {"name": "weapon", "type": "WeaponDef*", "line": "weapon", "mode": "weapon"}
@@ -829,8 +828,8 @@ class StructForms(unittest.TestCase):
         self.assertIn("roots.Add(ROK_WEAPONDEF, a0);", hook)
 
     def test_a_struct_that_is_not_nullable_is_passed_by_address(self):
-        files, _, _ = self.generated(annotations())
-        self.assertIn("g_seams.targeting->SetWeaponTargetPos(p0, &p1, p2)", files[rs.SLOTS_H])
+        files, _, _ = self.generated(self.targeting())
+        self.assertIn("g_seams.targeting->GetWeaponTargetPos(p0, &p1, p2)", files[rs.SLOTS_H])
 
     def test_only_a_struct_in_can_be_nullable(self):
         ann = annotations()
@@ -843,9 +842,9 @@ class StructForms(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertIn('ArgStructs(s_call, "pos", ROK_VEC3, a1, (int)a2);', files[rs.HOOKS_H])
         runner = files[rs.SLOTS_H]
-        body = runner[runner.index("void Run_targeting_SetWeaponTargetPos"):]
+        body = runner[runner.index("void Run_targeting_GetWeaponTargetPos"):]
         self.assertIn('StructsHolder p1;\n    p1.Parse("pos", ROK_VEC3, ArgScalar<int>("weapon"));', body)
-        self.assertIn("g_seams.targeting->SetWeaponTargetPos(p0, (Vec3*)p1.data, p2)", body)
+        self.assertIn("g_seams.targeting->GetWeaponTargetPos(p0, (Vec3*)p1.data, p2)", body)
 
     def test_the_count_names_another_integer_argument(self):
         for count, want in (("nothing", "needs a `count` that names another argument"), ("pos", "needs a `count` that names another argument"), ("unit", "is no integer")):
@@ -2074,12 +2073,12 @@ class ArgumentShapes(unittest.TestCase):
 
     def test_a_slot_with_an_in_out_value_gets_an_after_function(self):
         ann = annotations()
-        ann["subsystems"]["targeting"]["slots"]["SetWeaponTargetPos"]["args"]["pos"] = {"mode": "struct", "kind": "Vec3", "dir": "inout", "nullable": True}
+        ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"] = {"mode": "struct", "kind": "Vec3", "dir": "inout", "nullable": True}
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         slots = files[rs.SLOTS_H]
-        self.assertIn("void After_targeting_SetWeaponTargetPos()", slots)
-        self.assertIn('if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SetWeaponTargetPos") == 0)\n        After_targeting_SetWeaponTargetPos();', slots)
+        self.assertIn("void After_targeting_GetWeaponTargetPos()", slots)
+        self.assertIn('if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "GetWeaponTargetPos") == 0)\n        After_targeting_GetWeaponTargetPos();', slots)
         self.assertIn('ArgInOut(s_call, "pos", ROK_VEC3, a1);', files[rs.HOOKS_H])
 
     def test_the_fixture_slots_are_stubs_of_the_native_self_test(self):
@@ -2841,10 +2840,10 @@ class CompleteImports(unittest.TestCase):
 
     def test_the_importer_binds_the_stubs_of_a_complete_seam(self):
         text = self.generated()[rs.SLOTS_H]
-        body = text[text.index('if (strcmp(g_subsystem, "weapons") == 0) {'):]
+        body = text[text.index('if (strcmp(g_subsystem, "targeting") == 0) {'):]
         body = body[:body.index("    }\n")]
-        self.assertIn("g_seams.targeting = &g_import_targeting;", body)
-        self.assertIn("g_import_targeting.GetWeaponTargetPos = Imp_targeting_GetWeaponTargetPos;", body)
+        self.assertIn("g_seams.weapons = &g_import_weapons;", body)
+        self.assertIn("g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;", body)
 
     def test_a_subsystem_with_no_complete_import_binds_nothing_more(self):
         text = self.generated()[rs.SLOTS_H]
@@ -2853,13 +2852,13 @@ class CompleteImports(unittest.TestCase):
     def test_a_vec3_the_slot_fills_is_an_out_line_of_the_import(self):
         files = self.generated()
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecTargetingGetWeaponTargetPos"):]
+        body = hooks[hooks.index("RecUnitsGetSweetSpot"):]
         body = body[:body.index("\n}\n")]
-        self.assertIn('if (result != 0) ImportOutVec3(line, "pos", a1);', body)
+        self.assertIn('ImportOutVec3(line, "out", a1);', body)
         slots = files[rs.SLOTS_H]
-        stub = slots[slots.index("Imp_targeting_GetWeaponTargetPos("):]
+        stub = slots[slots.index("Imp_units_GetSweetSpot("):]
         stub = stub[:stub.index("\n}\n")]
-        self.assertIn('ApplyVec3(a1, "pos");', stub)
+        self.assertIn('ApplyVec3(a1, "out");', stub)
         self.assertNotIn('t.Add("?")', stub)
 
 

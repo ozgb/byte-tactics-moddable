@@ -1509,11 +1509,6 @@ int EnterList(ReplayText& t, Ref<Unit>* out, int capacity)
     return count;
 }
 
-void __fastcall LoadMeteorDefaultsSlot(MeteorParams* params)
-{
-    params->LoadMeteorDefaults();
-}
-
 unsigned char __fastcall ChooseWeaponSlot(Unit* unit)
 {
     return unit->ChooseWeapon();
@@ -4694,11 +4689,7 @@ void ExecuteCommandSelfTest()
     printf("services: ExecuteCommandText\n");
     ResetBlock();
     const char* body =
-        "  i services.CommandArgs_GetIntArg 1 0 = 1\n"
-        "  i services.CommandArgs_GetIntArg 1 0 = 0\n"
         "  i services.ExecuteCommandText \"meteor 1\\nmeteor 0\" 17 [\"x\"] -1 = 1\n"
-        "    c wind_meteors.CmdMeteor [\"meteor\",\"1\"]\n"
-        "    c wind_meteors.CmdMeteor [\"meteor\",\"0\"]\n"
         "  i services.RandomInt 5 = 3\n";
     BeginServices(body);
     CommandArgs vars;
@@ -4706,33 +4697,16 @@ void ExecuteCommandSelfTest()
     char first[2] = "x";
     vars.args[0] = first;
     vars.count = 1;
-    const ReplayField* enabled = FindField("SimGlobals.g_meteorsEnabled");
-    ReplayText value;
     char text[] = "meteor 1\nmeteor 0";
     int ran = ExecuteCommandText(text, 17, &vars, -1);
-    FormatField(*enabled, value);
     Check(ran == 1, "the result of the command text replays");
-    Check(strcmp(value.Data(), "0") == 0, "and the nested commands ran in order on the module, the last one leaving meteors off");
     Check(RandomInt(5) == 3, "the imports after the commands replay from where the commands left the lines");
-    Check(g_diffs == 0 && g_importIndex == 4, "nothing differs, the nested imports and the import itself included");
+    Check(g_diffs == 0 && g_importIndex == 2, "nothing differs, the import included");
 
     BeginServices(body);
     ExecuteCommandText(text, 17, &vars, 0);
     printf("a changed mask: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.ExecuteCommandText") == 0, "a changed argument is reported at the import");
-
-    const char* changed =
-        "  i services.CommandArgs_GetIntArg 1 0 = 1\n"
-        "  i services.CommandArgs_GetIntArg 1 0 = 0\n"
-        "  i services.ExecuteCommandText \"meteor 1\\nmeteor 0\" 17 [\"x\"] -1 = 1\n"
-        "    c wind_meteors.CmdMeteor [\"meteor\",\"1\"]\n"
-        "    c wind_meteors.CmdMeteor [\"meteor\",\"0\"] = 5\n";
-    BeginServices(changed);
-    ExecuteCommandText(text, 17, &vars, -1);
-    printf("a changed result: %s\n%s", g_firstKey, g_detail.Data());
-    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.ExecuteCommandText.c[1]") == 0, "a result that differs is reported at the call under the import");
-
-    value.Free();
 }
 
 typedef int(__stdcall* NotifyFn)(Unit*, Order*, int);

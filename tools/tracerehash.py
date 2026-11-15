@@ -25,7 +25,7 @@ PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "w
 TIMER_CLASS = (0, 7, 2, 3, 6, 1, 2, 3, 4, 5)
 AI_RAW_VECTORS = ("cells", "vec_65", "counts", "vec_8d", "weights", "vec_ad", "vec_bd", "values", "locked")
 POS_Y_UNSET_KINDS = ("MobileBuild", "VTOL_MobileBuild", "Reclaim", "VTOL_Reclaim")
-DUMPED_ONLY = ("results.", "results[", "economy.", "economy[", "packets.", "packets[")
+DUMPED_ONLY = ("results.", "results[", "economy.", "economy[", "features.", "features[", "packets.", "packets[")
 
 
 class Error(Exception):

@@ -19,7 +19,7 @@ phase that differs, with its value in A and in B. Set WINEARCH=win64 for Wine.
 
 The row `world` is the tables hashed once per tick (game scalars, map, line of sight, orders), after the last
 phase's row. The pathfinder's own report (`pathfinder.*`), economy's report (`economyState.*`), the path results
-(`results[k].*`), the economy events (`economy[k].*`) and the share packets (`packets[k].*`) are dumped but not
+(`results[k].*`), the economy events (`economy[k].*`), the features events (`features[k].*`) and the share packets (`packets[k].*`) are dumped but not
 hashed: they show the modules' state and what they delivered at a divergence. A dump holds them after every phase
 (the share packets after the last phase only), so the fields of a `world` divergence are read from the last phase's
 lines.

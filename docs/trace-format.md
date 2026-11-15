@@ -129,6 +129,7 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 | `globals` | Named simulation globals: `meteors`, `game` and `pathfinder`, each a list in hash order. |
 | `results` | The path results section (section 8.21), which is dumped and not hashed: its `section` number, the most waypoints of an event it dumps (`points`), and the `fields` of an event in dump order. |
 | `economy` | The economy events section (section 8.22), which is dumped and not hashed: its `section` number, the `fields` of an event in dump order, and the `account` that a LOAD event adds (the `kind` of the event it follows and its `size` in bytes). |
+| `features` | The features events section (section 8.24), which is dumped and not hashed: its `section` number and the `fields` of an event in dump order. |
 
 A **table** has `size` (the byte size of the record it describes), `fields`, `plan`, and for most
 tables `excluded`. A table with `split_of` is a part of another table: it holds fields of that
@@ -285,8 +286,8 @@ out sections 16 and 17, then sections 29 to 31 when the tick is 1. It has no tic
 
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
-section 8.21), the economy events (section 33, section 8.22) and the share packets (section 35,
-section 8.23) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
+section 8.21), the economy events (section 33, section 8.22), the features events (section 36,
+section 8.24) and the share packets (section 35, section 8.23) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
 hashed: what the orders and goals keep of a path (sections 20 and 21), and the players' and units'
 resource fields.
 
@@ -1106,6 +1107,54 @@ Which packets a step sends, and when, is behaviour of the build, not of the stat
 rows match can send the same packets in a different order within a step (`docs/economy-interface.md`,
 section 8). The lines are a diagnostic of what the receiver would see.
 
+### 8.24 features events (section 36, dumped only)
+
+The events and effects of features in this tick (`interfaces/features.h`). No row hashes them
+(section 6): a dump holds their lines, after those of section 33, as a diagnostic. The reference
+build does not record them, so its dumps have no `features.*` lines. An event is recorded when features
+consumes it from its inbox, right after `Apply` returns, with the outcome `Apply` gave, and a PLACE when
+the synchronous `Place` answers, with its answer; an effect is recorded when features publishes it to its
+outbox, with outcome 1. So the records are in features' order of consumption and publication. The host
+empties the record after the world row of the tick, so the lines a dump writes after an earlier phase
+hold the records made so far. The fields are `features.fields` of the schema, in this order.
+
+```
+features.count                                 # n
+for k in 0 .. n-1, in application order:
+    features[k].kind
+    features[k].flags
+    features[k].x
+    features[k].z
+    features[k].feature
+    features[k].owner
+    features[k].player
+    features[k].unit                           # the record's unit, a pointer ID with target unit (is_ref=true)
+    features[k].value
+    features[k].state                          # null when 0, heap otherwise: never the number
+    features[k].width
+    features[k].height
+    features[k].pos                            # hex: the 12 bytes, three little-endian i32
+    features[k].rot                            # hex: the 12 bytes, three little-endian i32
+    features[k].outcome
+```
+
+`features.count` and the numbers of a record are written as `0x` and 8 hex digits.
+
+- `kind` is an event: 32 PLACE, 33 REMOVE, 34 DAMAGE, 35 RECLAIM; or an effect: 48 FREE_STATE,
+  49 INIT_STATE, 50 PASS_MAPS, 51 AREA_DAMAGE.
+- `flags` holds the bits of a PLACE: 1 pos is given, 2 rot is given, 4 the placed feature starts to sink.
+- `x` and `z` are the cell the record acts on, or the first cell of a footprint; `width` and `height`
+  the size of a footprint in cells. `feature` is the feature type by its number, `owner` the player that
+  owns a placed feature (10 for none), and `player` the player of the unit that reclaims.
+- `unit` is the unit that reclaims, a pointer ID with target `unit` (section 5), null for the kinds that
+  name none. `value` is the argument of the kind (REMOVE: 1 to remove even a feature that refuses
+  removal; DAMAGE and AREA_DAMAGE: the number of the weapon's definition).
+- `state` is a state block handle: `null` for 0, `heap` for any other value, because a handle's number
+  depends on the allocator and is not behaviour.
+- `pos` is a position in world coordinates with 16 fractional bits and `rot` a rotation in 16-bit angles,
+  x, y and z. Fields a kind does not use are 0.
+- `outcome` is the result of `Apply` or of `Place`, or 1 for an effect.
+
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
@@ -1139,7 +1188,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
 every hashed value of that one tick, after each phase of the tick, and the lines no row hashes: those
-of sections 16 and 17, of economy's report, and of sections 32, 33 and 35. The first line is `bt-dump 5`; every
+of sections 16 and 17, of economy's report, and of sections 32, 33, 35 and 36. The first line is `bt-dump 5`; every
 other line is
 
 ```
@@ -1154,12 +1203,12 @@ dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller stat
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
 lines of section 28), then the lines of sections 32 and 33, which end the block and are not hash
-input (sections 8.21 and 8.22). The `meteors` block ends with the lines of section 35 after them
-(section 8.23), also not hash input. The `pathfinder.*` lines of
+input (sections 8.21 and 8.22), then those of section 36 (section 8.24). The `meteors` block ends with
+the lines of section 35 after them (section 8.23), also not hash input. The `pathfinder.*` lines of
 sections 16 and 17, and the `economyState.*` lines of economy's own report that follow them, sit between those of
 sections 15 and 18 but are not hash input (sections 8.7 and 8.22). Every
 other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
-block in order, skipping the `pathfinder.*`, `economyState.*`, `results.*`, `economy.*` and `packets.*` lines, and
+block in order, skipping the `pathfinder.*`, `economyState.*`, `results.*`, `economy.*`, `features.*` and `packets.*` lines, and
 applying the rules of sections 6 to 8 reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
@@ -1199,7 +1248,7 @@ not print excluded fields.
 To recompute a hash from the dump:
 
 1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), the `economyState.*` lines that follow them (section 8.22)
-   and the `results.*`, `economy.*` and `packets.*` lines that end the block (sections 8.21 to 8.23), and parse the
+   and the `results.*`, `economy.*`, `features.*` and `packets.*` lines that end the block (sections 8.21 to 8.24), and parse the
    paths into the structure of sections 6 to 8.
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`
@@ -1259,7 +1308,8 @@ after it, both only dumped, and took the resource account of a unit (bytes 0xbc 
 of the hash of the Unit table. Section 35 (the share packets, section 8.23) was added in format 5,
 without a new number: it is only dumped, after every line a row hashes, and changes no row, no digest
 and no line syntax. A reader that rejects unknown lines at the end of a block must learn to skip
-`packets.*`, as it skips `results.*` and `economy.*`.
+`packets.*`, as it skips `results.*` and `economy.*`. Section 36 (the features events, section 8.24)
+was added in format 5 in the same way, and a reader must skip `features.*` too.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:
